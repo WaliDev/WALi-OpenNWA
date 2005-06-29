@@ -43,7 +43,7 @@ namespace wali
         return rp;
     }
 
-}
+} // namespace wali
 
 /* Yo, Emacs!
 ;;; Local Variables: ***
