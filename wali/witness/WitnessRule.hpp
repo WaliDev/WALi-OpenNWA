@@ -5,12 +5,15 @@
  * @author Nick Kidd
  */
 
-#include "wali/Witness.hpp"
+#include "wali/witness/Witness.hpp"
 #include "wali/wpds/Rule.hpp"
 
 namespace wali
 {
-    namespace wpds
+    using wpds::Rule;
+    using wpds::rule_t;
+
+    namespace witness
     {
         /*!
          * @class WitnessRule
@@ -52,7 +55,7 @@ namespace wali
                 Rule r;
         };
 
-    } // namespace wpds
+    } // namespace witness
 
 } // namespace wali
 

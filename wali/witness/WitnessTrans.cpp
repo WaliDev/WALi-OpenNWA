@@ -1,13 +1,15 @@
 /*!
  * @author Nick Kidd
- * @version $Revision: 1.4 $
  */
 
-#include "wali/wfa/WitnessTrans.hpp"
+#include "wali/Common.hpp"
+#include "wali/witness/WitnessTrans.hpp"
 
 namespace wali
 {
-    namespace wfa
+    using wfa::Trans;
+
+    namespace witness
     {
         WitnessTrans::WitnessTrans( const Trans& t_ ) : Witness(t_.weight()),t(t_)
         {
@@ -32,7 +34,7 @@ namespace wali
             return t;
         }
             
-    } // namespace wfa
+    } // namespace witness
 
 } // namespace wali
 

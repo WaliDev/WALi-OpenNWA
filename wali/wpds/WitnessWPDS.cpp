@@ -9,10 +9,10 @@
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/Trans.hpp"
 #include "wali/wfa/TransFunctor.hpp"
-#include "wali/wfa/WitnessTrans.hpp"
 #include "wali/wpds/WitnessWPDS.hpp"
-#include "wali/wpds/WitnessRule.hpp"
 #include "wali/wpds/LinkedTrans.hpp"
+#include "wali/witness/WitnessTrans.hpp"
+#include "wali/witness/WitnessRule.hpp"
 
 //
 // TODO : move this elsewhere
@@ -21,7 +21,7 @@ namespace wali
 {
     using wfa::WFA;
     using wfa::Trans;
-    using wfa::WitnessTrans;
+    using witness::WitnessTrans;
 
     namespace wpds
     {
@@ -52,6 +52,9 @@ namespace wali
 
 namespace wali
 {
+    using witness::WitnessRule;
+    using witness::WitnessTrans;
+
     namespace wpds
     {
         // @brief Constructor passes wl to WPDS

@@ -1,11 +1,14 @@
 /*!
  * @author Nick Kidd
  */
-#include "wali/wpds/WitnessRule.hpp"
+#include "wali/Common.hpp"
+#include "wali/witness/WitnessRule.hpp"
 
 namespace wali
 {
-    namespace wpds
+    using wpds::Rule;
+
+    namespace witness
     {
         WitnessRule::WitnessRule( rule_t r_t ) :
             Witness(r_t->weight()),
@@ -42,7 +45,7 @@ namespace wali
             return r;
         }
 
-    } // namespace wpds
+    } // namespace witness
 
 } // namespace wali
 

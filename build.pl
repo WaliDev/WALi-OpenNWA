@@ -23,6 +23,7 @@ my $WALiDIR         = "$TOPDIR/wali";
 my $WFADIR          = "$WALiDIR/wfa";
 my $WPDSDIR         = "$WALiDIR/wpds";
 my $EWPDSDIR        = "$WPDSDIR/ewpds";
+my $WITNESSDIR      = "$WALiDIR/witness";
 my $OBJSFX          = "\$(OBJSFX)";
 my $CXXSFX          = ".cpp";
 my $CC              = "gcc";
@@ -52,28 +53,30 @@ my @WALi_FILES = (
     ,"$WALiDIR/IntSource$CXXSFX"
     ,"$WALiDIR/StringSource$CXXSFX"
     ,"$WALiDIR/KeyPairSource$CXXSFX"
-    ,"$WALiDIR/Witness$CXXSFX"
-    ,"$WALiDIR/WitnessExtend$CXXSFX"
-    ,"$WALiDIR/WitnessCombine$CXXSFX"
-    ,"$WALiDIR/Visitor$CXXSFX"
 #namespace wali::wfa
     ,"$WFADIR/WFA$CXXSFX"
     ,"$WFADIR/State$CXXSFX"
     ,"$WFADIR/Trans$CXXSFX"
     ,"$WFADIR/TransFunctor$CXXSFX"
     ,"$WFADIR/WeightMaker$CXXSFX"
-    ,"$WFADIR/WitnessTrans$CXXSFX"
 #namespace wali::wpds
     ,"$WPDSDIR/Config$CXXSFX"
     ,"$WPDSDIR/Rule$CXXSFX"
     ,"$WPDSDIR/RuleFunctor$CXXSFX"
     ,"$WPDSDIR/LinkedTrans$CXXSFX"
     ,"$WPDSDIR/WPDS$CXXSFX"
-    ,"$WPDSDIR/WitnessRule$CXXSFX"
     ,"$WPDSDIR/WitnessWPDS$CXXSFX"
+#namespace wali::wpds::ewpds
     ,"$EWPDSDIR/EWPDS$CXXSFX"
     ,"$EWPDSDIR/ERule$CXXSFX"
     ,"$EWPDSDIR/MergeFunction$CXXSFX"
+#namespace wali::witness
+    ,"$WITNESSDIR/Visitor$CXXSFX"
+    ,"$WITNESSDIR/Witness$CXXSFX"
+    ,"$WITNESSDIR/WitnessExtend$CXXSFX"
+    ,"$WITNESSDIR/WitnessCombine$CXXSFX"
+    ,"$WITNESSDIR/WitnessRule$CXXSFX"
+    ,"$WITNESSDIR/WitnessTrans$CXXSFX"
 );
 
 sub print_obj_files()
@@ -148,5 +151,5 @@ print MAKEFILE "\t\@echo \"Creating $BUILDDIR/$LIBWALi_SO...\"\n";
 print MAKEFILE "\t$CXX \$(LCFLAGS) -Wl,\$(LINKNAME),$LIBWALi_SO -o \$\@ \$\^";
 print MAKEFILE "\n\n";
 
-#system("/usr/bin/make clean") && die "system failed: $!";
+system("/usr/bin/make clean") && die "system failed: $!";
 system("/usr/bin/make -j2 all") && die "system failed: $!";

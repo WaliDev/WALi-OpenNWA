@@ -62,6 +62,7 @@ namespace wali
                  * @see LinkedTrans
                 */
                 virtual void copy_and_link( const WFA & in, WFA & dest );
+
             protected:
 
         }; // class WitnessWPDS

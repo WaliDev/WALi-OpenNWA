@@ -3,16 +3,17 @@
 
 /*!
  * @author Nick Kidd
- * @version $Revision: 1.2 $
  */
 
 #include "wali/Common.hpp"
-#include "wali/Witness.hpp"
+#include "wali/witness/Witness.hpp"
 #include "wali/wfa/Trans.hpp"
 
 namespace wali
 {
-    namespace wfa
+    using wfa::Trans;
+
+    namespace witness
     {
         /*!
          * @class WitnessTrans
@@ -58,9 +59,9 @@ namespace wali
             protected:
                 Trans t;
 
-        }; // class
+        }; // class WitnessTrans
 
-    } // namespace wfa
+    } // namespace witness
 
 } // namespace wali
 
