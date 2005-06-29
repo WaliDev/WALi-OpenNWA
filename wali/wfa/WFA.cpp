@@ -1,17 +1,15 @@
 /*!
- * $Id: WFA.cpp,v 1.10 2005/06/24 01:14:42 kidd Exp $
- *
  * @author Nick Kidd
- * @version $Revision: 1.10 $
  */
 
-#include <iostream>
+#include "wali/Common.hpp"
 #include "wali/KeyFactory.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/State.hpp"
 #include "wali/wfa/TransFunctor.hpp"
 #include "wali/wfa/Trans.hpp"
 #include "wali/wfa/WeightMaker.hpp"
+#include <iostream>
 
 namespace wali
 {
@@ -469,16 +467,18 @@ namespace wali
                 // method
                 told = tnew;
 
-                // Add tnew to the State's trans list
-                //Printable::get_wpds_err() << "state_map.find( " << tnew->from() << " )...";
+                // Add tnew to the 'from' State's trans list
                 state_map_t::iterator stit = state_map.find( tnew->from() );
-                //Printable::get_wpds_err() << "done.\n ";
                 stit->second->add_trans( tnew );
+
+                // Add tnew to the 'to' State's reverse trans list
+                wali_key_t tokey = tnew->to();
+                state_map_t::iterator to_stit = state_map.find( tokey );
+                to_stit->second->add_rev_trans( tnew );
 
                 // if tnew is an eps transition add to eps_map
                 if( tnew->stack() == WALI_EPSILON )
                 {
-                    wali_key_t tokey = tnew->to();
                     eps_map_t::iterator epsit = eps_map.find( tokey );
                     if( epsit == eps_map.end() ) {
                         trans_list_t ls;
@@ -533,44 +533,9 @@ namespace wali
     } // namespace wfa
 
 } // namespace wali
-/*
- * $Log: WFA.cpp,v $
- * Revision 1.10  2005/06/24 01:14:42  kidd
- * Fix XML output errors for WFA
- *
- * Revision 1.9  2005/06/23 17:11:01  kidd
- * Fix XML output
- *
- * Revision 1.8  2005/06/23 17:07:10  kidd
- * Add Trans::marshall, WFA::marshall and class TransMarshaller
- *
- * Revision 1.7  2005/06/23 16:37:38  kidd
- * Removed CVS $Id: WFA.cpp,v 1.10 2005/06/24 01:14:42 kidd Exp $ from files. Removed some tabs. Fixed header inclusion orders
- * to ensure Common.hpp is included first. Common.hpp now suppresses Visual
- * Studio warning 4786 and ensured RTTI is enabled.
- *
- * Revision 1.6  2005/06/21 23:51:19  kidd
- * Added const qualifier to WFA::is_final_state.
- * Added WFA::print_dot for printing WFA in dot format. Required adding class
- * TransDotty for cycling through the transitions.
- *
- * Revision 1.5  2005/06/17 14:01:43  kidd
- * Cleaned up includes.
- *
- * Revision 1.4  2005/06/16 19:14:25  kidd
- * Added explicit initialization of base class(es) to copy constructor.
- *
- * Revision 1.3  2005/06/07 18:56:43  kidd
- *
- * Initial WFA::intersect implementation. There are some TODOs throughout for
- * things that need touched up.
- *
- * Revision 1.2  2005/06/07 13:25:48  kidd
- *
- * Fixed printing to use KeyFactory. changed add_initial_state to be
- * set_initial_state as only 1 init state is supported.
- *
- * Revision 1.1.1.1  2005/05/31 19:04:01  kidd
- * initial WALi import
- *
+
+/* Yo, Emacs!
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
  */

@@ -3,7 +3,6 @@
 
 /*!
  * @author Nick Kidd
- * @version $Revision: 1.8 $
  */
 
 #include "wali/Common.hpp"
@@ -38,7 +37,7 @@ namespace wali
         /*! @class WFA
          *
          * TODO:
-         *  - Should state_map_t have type HashMap< wali_key_t , State >
+         *  - Should state_map_t have type HashMap< wali_key_t , ref_ptr<State> >
          *      This allows for automatic collection of States via HashMap
          */
 
@@ -135,12 +134,15 @@ namespace wali
                  * passed in reference "Trans & t". This way the user is not given
                  * and handle to the WFA's internal Trans * pointer and deleting
                  * all transitions associated with this WFA when it is deleted is
-                 * safe (FIXME: are we sure about that?). However, because the
-                 * weight of this transition is a sem_elem_t (ref_ptr< SemElem >)
-                 * modifying the weight from the Trans & t will result in
-                 * modification of the weight on the interal Trans * object.
+                 * safe. However, because the weight of this transition is a
+                 * sem_elem_t (ref_ptr< SemElem >) modifying the weight from
+                 * the Trans & t will result in modification of the weight on
+                 * the interal Trans * object.
                  *
                  * @return bool true if transition matching (p,g,q) exists
+                 * @see Trans
+                 * @see SemElem
+                 * @see sem_elem_t
                  */
                 virtual bool find( 
                         wali_key_t p,
@@ -154,7 +156,7 @@ namespace wali
                 virtual void for_each( TransFunctor& tf );
 
                 /*!
-                 * @brief invoke TransFunctor on each Trans
+                 * @brief invoke ConstTransFunctor on each Trans
                  */
                 virtual void for_each( ConstTransFunctor& tf ) const;
 
@@ -203,7 +205,8 @@ namespace wali
 
             protected:
 
-                /*! @brief lookup returns a pointer to a transition matching (p,g,q)
+                /*!
+                 * @brief lookup returns a pointer to a transition matching (p,g,q)
                  *
                  * @return pointer to Trans or NULL(0) if it does not exist
                  */
@@ -212,7 +215,8 @@ namespace wali
                         wali_key_t g,
                         wali_key_t q );
 
-                /*! @brief inserts tnew into the WFA
+                /*!
+                 * @brief inserts tnew into the WFA
                  *
                  * This method inserts Trans * tnew into the WFA.  If a transition
                  * told matching (p,g,q) of tnew already exists, then tnew is
@@ -269,7 +273,7 @@ namespace wali
 #endif  // wali_wfa_WFA_GUARD
 
 /* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
-*/
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
+ */
