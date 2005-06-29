@@ -1,0 +1,54 @@
+/*!
+ * @author Nick Kidd
+ * @version $Revision: 1.4 $
+ */
+
+#include "wali/KeyPairSource.hpp"
+#include "wali/KeyFactory.hpp"
+
+namespace wali
+{
+    KeyPairSource::KeyPairSource( wali_key_t k1, wali_key_t k2 ) : kp(k1,k2) {}
+
+    KeyPairSource::KeyPairSource( const KeyPair& kp_ ) : kp(kp_) {}
+
+    KeyPairSource::~KeyPairSource() {}
+
+    bool KeyPairSource::equal( KeySource* rhs )
+    {
+        static wali::hm_equal< KeyPair > checker;
+        KeyPairSource *kpsrc = dynamic_cast< KeyPairSource* >(rhs);
+        if( 0 != kpsrc )
+            return checker(kp,kpsrc->kp);
+        else
+            return false;
+    }
+
+    size_t KeyPairSource::hash() const
+    {
+        static wali::hm_hash< KeyPair > hasher;
+        return hasher(kp);
+    }
+
+    std::ostream& KeyPairSource::print( std::ostream& o ) const
+    {
+        o << "( ";
+        KeyFactory::print_key(o,kp.first);
+        o << " , ";
+        KeyFactory::print_key(o,kp.second);
+        o << " )";
+        return o;
+    }
+
+    KeyPair KeyPairSource::get_key_pair() const
+    {
+        return kp;
+    }
+
+} // namespace wali
+
+/* Yo, Emacs!
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
+*/

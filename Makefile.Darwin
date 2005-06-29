@@ -1,0 +1,4 @@
+LCFLAGS		= -dynamiclib
+OBJSFX		= .obj
+SOSFX		= .dylib
+LINKNAME	= -install_name
