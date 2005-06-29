@@ -17,25 +17,25 @@ namespace wali
 } // namespace wali
 
 /*!
- * @macro UNUSED_PARAM
+ * @macro ATTR_UNUSED
  *
  * This macro disables GCC warnings for unused parameters. #ifdef
  * is used b/c MS VC++ does not like __attribute__.
  */
 #if defined(__GNUG__)
 #   if( __GNUG__ > 3 )
-#       define UNUSED_PARAM __attribute__((__unused__))
+#       define ATTR_UNUSED __attribute__((__unused__))
 #   else
-#       define UNUSED_PARAM
+#       define ATTR_UNUSED
 #   endif
 #elif defined(_WIN32)
 #   pragma once
-#   define UNUSED_PARAM
+#   define ATTR_UNUSED
 #   if _MSC_VER > 1000
 #       pragma warning(disable: 4786)
 #   endif
 #   if !defined(_CPPRTTI)
-#       error RTTI is required by WALi
+#       error RTTI is required by WALi.
 #   endif
 #endif
 

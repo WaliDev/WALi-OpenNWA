@@ -36,7 +36,7 @@ namespace wali
 		}
 	  }
 
-	  MergeFn *MergeFn::parse_element(const char *s UNUSED_PARAM, SemElem *sem)
+	  MergeFn *MergeFn::parse_element(const char *s ATTR_UNUSED, SemElem *sem)
 	  {
 		return new MergeFn(sem);
 	  }

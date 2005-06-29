@@ -30,7 +30,7 @@ namespace wali
              * value (i.e., disable reference counting) is not 0 is to use 
              * the Countable constructor.
              */
-            Countable( const Countable& c UNUSED_PARAM ) : count(0) {}
+            Countable( const Countable& c ATTR_UNUSED ) : count(0) {}
 
             /*!
              * Countable::operator= does not modify "this's" count.
@@ -38,7 +38,7 @@ namespace wali
              * pointers which refer to this. Therefore, operator= is a 
              * nop.
              */
-            Countable& operator=( const Countable& c UNUSED_PARAM ) throw()
+            Countable& operator=( const Countable& c ATTR_UNUSED ) throw()
             {
                 return *this;
             }

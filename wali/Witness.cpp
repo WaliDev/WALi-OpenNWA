@@ -1,8 +1,8 @@
 /*!
  * @author Nick Kidd
- * @version $Revision: 1.7 $
  */
 
+#include "wali/Common.hpp"
 #include "wali/Witness.hpp"
 #include "wali/WitnessExtend.hpp"
 #include "wali/WitnessCombine.hpp"
@@ -118,10 +118,10 @@ namespace wali
         return o;
     }
 
-} // namespace wali
+}   // namespace wali
 
 /* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
+;;; Local Variables: ***
+;;; tab-width: 4 ***
+;;; End: ***
  */

@@ -3,22 +3,23 @@
 
 /*!
  * @author Nick Kidd
- * @version $Revision: 1.6 $
  */
 
 #include "wali/Common.hpp"
 #include "wali/ref_ptr.hpp"
 #include "wali/SemElem.hpp"
+#include "wali/Visitable.hpp"
 
 namespace wali
 {
+    class Visitor;
     class Witness;
     typedef ref_ptr< Witness > witness_t;
 
     /*!
      * @class Witness
      */
-    class Witness : public SemElem
+    class Witness : public SemElem, public Visitable
     {
         public:
             Witness( sem_elem_t se );
@@ -26,19 +27,37 @@ namespace wali
             virtual ~Witness();
 
             /*!
+             * Returns a new Witness whose user_se is a sem_elem_t ONE
+             * element of the user's weight domain.
+             *
+             * @see SemElem
+             * @see sem_elem_t
              */
             virtual sem_elem_t one() const;
 
             /*!
+             * Returns a new Witness whose user_se is a sem_elem_t ZERO
+             * element of the user's weight domain.
+             *
+             * @see SemElem
+             * @see sem_elem_t
              */
             virtual sem_elem_t zero() const;
 
             /*!
-             * Extend the user supplied weight and create a new Witness
+             * Extend the user supplied weight and create a new WitnessExtend.
+             *
+             * @see WitnessExtend
              */
             virtual sem_elem_t extend( SemElem * se );
 
             /*!
+             * Combines the user's weight and creates a WitnessCombine
+             * if parameter "se" is not already a WitnessCombine.
+             *
+             * @see SemElem
+             * @see sem_elem_t
+             * @see WitnessCombine
              */
             virtual sem_elem_t combine( SemElem * se );
 
@@ -52,6 +71,14 @@ namespace wali
              * Print the Witness to the parameter o. 
              */
             virtual std::ostream& print( std::ostream& o ) const;
+
+            /*!
+             * Accept method allows for different behaviors to be applied to
+             * the Witness DAG.
+             *
+             * @see Visitor
+             */
+            virtual void accept( Visitor& v );
 
             /*!
              * Pretty print in a DAG like structure to the ostream

@@ -13,7 +13,7 @@ namespace wali
      * Anytime a Markable is created it is in the unmarked state.
      * This makes the copy constructor do nothing.
      */
-    Markable::Markable( const Markable& m UNUSED_PARAM ) : marker(false) {}
+    Markable::Markable( const Markable& m ATTR_UNUSED ) : marker(false) {}
 
     /*!
      * The Markable object is already created and may or may not
@@ -21,7 +21,7 @@ namespace wali
      * interface of Markable specifies that state may only
      * be changed through mark and unmark.
      */
-    Markable& Markable::operator=( const Markable& m UNUSED_PARAM )
+    Markable& Markable::operator=( const Markable& m ATTR_UNUSED )
     {
         return *this;
     }

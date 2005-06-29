@@ -55,6 +55,7 @@ my @WALi_FILES = (
     ,"$WALiDIR/Witness$CXXSFX"
     ,"$WALiDIR/WitnessExtend$CXXSFX"
     ,"$WALiDIR/WitnessCombine$CXXSFX"
+    ,"$WALiDIR/Visitor$CXXSFX"
 #namespace wali::wfa
     ,"$WFADIR/WFA$CXXSFX"
     ,"$WFADIR/State$CXXSFX"
