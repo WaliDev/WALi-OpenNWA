@@ -1,13 +1,12 @@
 /*!
- * $Id: Trans.cpp,v 1.9 2005/06/24 01:14:42 kidd Exp $
- *
  * @author Nick Kidd
- * @version $Revision: 1.9 $
  */
-#include <iostream>
-#include <sstream>
+
+#include "wali/Common.hpp"
 #include "wali/KeyFactory.hpp"
 #include "wali/wfa/Trans.hpp"
+#include <iostream>
+#include <sstream>
 
 namespace wali
 {
@@ -17,7 +16,9 @@ namespace wali
         int Trans::numTrans = 0;
 
         Trans::Trans() :
-            kp(WALI_EPSILON,WALI_EPSILON),t(WALI_EPSILON),se(0),delta(0),status(MODIFIED)
+            Countable(true),
+            kp(WALI_EPSILON,WALI_EPSILON), t(WALI_EPSILON),
+            se(0),delta(0),status(MODIFIED)
         {
             {
                 // TODO : R
@@ -30,7 +31,9 @@ namespace wali
                 wali_key_t stack,
                 wali_key_t to,
                 sem_elem_t se_ ) :
-            kp(from,stack),t(to),se(se_),delta(se_),status(MODIFIED) 
+            Countable(true),
+            kp(from,stack), t(to),
+            se(se_), delta(se_), status(MODIFIED) 
         {
             {
                 // TODO : R
@@ -43,7 +46,7 @@ namespace wali
         // knows about is actually the se of param rhs
         //
         Trans::Trans( const Trans & rhs ) :
-            Printable(),Countable(),Markable()
+            Printable(),Countable(true),Markable()
         {
             kp      = rhs.kp;
             t       = rhs.t;
@@ -174,7 +177,7 @@ namespace wali
 } // namespace wali
 
 /* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
 */
