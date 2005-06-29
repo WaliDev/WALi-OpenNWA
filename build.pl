@@ -71,12 +71,13 @@ my @WALi_FILES = (
     ,"$EWPDSDIR/ERule$CXXSFX"
     ,"$EWPDSDIR/MergeFunction$CXXSFX"
 #namespace wali::witness
-    ,"$WITNESSDIR/Visitor$CXXSFX"
     ,"$WITNESSDIR/Witness$CXXSFX"
     ,"$WITNESSDIR/WitnessExtend$CXXSFX"
     ,"$WITNESSDIR/WitnessCombine$CXXSFX"
     ,"$WITNESSDIR/WitnessRule$CXXSFX"
     ,"$WITNESSDIR/WitnessTrans$CXXSFX"
+    ,"$WITNESSDIR/Visitor$CXXSFX"
+    ,"$WITNESSDIR/VisitorDot$CXXSFX"
 );
 
 sub print_obj_files()
