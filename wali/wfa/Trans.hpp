@@ -2,10 +2,7 @@
 #define wali_wfa_TRANS_GUARD 1
 
 /*!
- * $Id: Trans.hpp,v 1.7 2005/06/23 17:07:10 kidd Exp $
- *
  * @author Nick Kidd
- * @version $Revision: 1.7 $
  */
 
 #include <iostream>
@@ -31,8 +28,15 @@ namespace wali
     namespace wfa
     {
 
-        class trans_t;
         class WFA;
+        class Trans;
+
+        /*!
+         * @typedef trans_t
+         * Avoid typing ref_ptr<Trans> when reference counting is begin
+         * enforced.
+         */
+        typedef ref_ptr<Trans> trans_t;
 
         /*!
          * @class Trans
@@ -235,71 +239,14 @@ namespace wali
                 status_t status;
         };
 
-        /*!
-         * @class trans_t
-         *
-         * Wrapper class for ref_ptr<Trans>. This allows for ref_ptr
-         * to not be a templated class.
-         */
-        class trans_t
-        {
-            public:
-                trans_t( Trans *ptr ) : rc(ptr) {}
+    } // namespace wfa
 
-                trans_t( const trans_t & rhs ) : rc( rhs.rc ) {}
+} // namespace wali
 
-                Trans * operator->() {
-                    return get_ptr();
-                }
-
-                Trans & operator*() {
-                    return *get_ptr();
-                }
-
-                trans_t & operator=( const trans_t & rhs ) {
-                    rc = rhs.rc;
-                    return *this;
-                }
-
-                trans_t & operator=( Trans * rhs ) {
-                    rc = rhs;
-                    return *this;
-                }
-
-                Trans *get_ptr() {
-                    return (Trans *)rc.get_ptr();
-                }
-
-                //
-                // const methods
-                //
-                const Trans * operator->() const {
-                    return get_ptr();
-                }
-
-                const Trans & operator*() const {
-                    return *get_ptr();
-                }
-
-                const Trans * get_ptr() const {
-                    return (Trans *)rc.get_ptr();
-                }
-
-                bool is_empty() const {
-                    return rc.is_empty();
-                }
-
-
-            private:
-                ref_ptr< Trans > rc;
-        };
-
-    }
-}
 #endif  // wali_wfa_TRANS_GUARD
 
 /* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
 */
