@@ -1,10 +1,8 @@
 /*!
- * $Id: State.cpp,v 1.1.1.1 2005/05/31 19:04:01 kidd Exp $
- *
  * @author Nick Kidd
- * @version $Revision: 1.1.1.1 $
  */
 
+#include "wali/Common.hpp"
 #include "wali/wfa/State.hpp"
 
 namespace wali
@@ -15,7 +13,7 @@ namespace wali
         int State::numStates = 0;
 
         State::State( wali_key_t key, sem_elem_t W ) :
-            name(key),se(W),delta(W)
+            Countable(true),name(key),se(W),delta(W)
         {
             assert( W.is_valid() );
             quasi = W->zero();
@@ -45,13 +43,18 @@ namespace wali
             // assert( t->from() == this->name );
             trans_ls.push_back( t );
         }
-    }
-}
 
-/*
- * $Log: State.cpp,v $
- * Revision 1.1.1.1  2005/05/31 19:04:01  kidd
- * initial WALi import
- *
+        void State::add_rev_trans( Trans * t )
+        {
+            rev_trans_ls.push_back(t);
+        }
+
+    } // namespace wfa
+
+} // namespace wali
+
+/* Yo, Emacs!
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
  */
-

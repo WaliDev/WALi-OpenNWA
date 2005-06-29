@@ -2,10 +2,7 @@
 #define wpds_STATE_GUARD 1
 
 /*!
- * $Id: State.hpp,v 1.4 2005/06/17 17:26:57 akash Exp $
- *
  * @author Nick Kidd
- * @version $Revision: 1.4 $
  */
 
 #include "wali/Common.hpp"
@@ -22,14 +19,16 @@ namespace wali
         class WPDS;
         namespace ewpds 
         {
-	    class EWPDS;
-	}
+            class EWPDS;
+        }
     }
 
     namespace wfa
     {
         class CA;
         class Trans;
+        class State;
+        typedef ref_ptr<State> state_t;
 
         /*!
          * @class State
@@ -41,7 +40,7 @@ namespace wali
          * @see WFA
          * @see SemElem
          */
-        class State : public Printable, public Markable
+        class State : public Printable, public Markable, public Countable
         {
             public:
                 friend class WFA;
@@ -66,7 +65,17 @@ namespace wali
                  */
                 virtual std::ostream & print( std::ostream & o ) const;
 
-                void add_trans( Trans * );
+                /*!
+                 * Add Trans* t to the set of transitions extending from this
+                 * State.
+                 */
+                void add_trans( Trans * t );
+
+                /*!
+                 * Add Trans* t to the set of transitions that lead into this
+                 * State.
+                 */
+                void add_rev_trans( Trans * t );
 
             protected:
                 wali_key_t name;
@@ -74,31 +83,18 @@ namespace wali
                 sem_elem_t delta;
                 sem_elem_t quasi;
                 std::list< Trans * > trans_ls;
-        };
-    }
-}
+                std::list< Trans * > rev_trans_ls;
+
+        }; //class State
+
+    } // namespace wfa
+
+} // namespace wali
+
 #endif  // wpds_STATE_GUARD
-/*
- * $Log: State.hpp,v $
- * Revision 1.4  2005/06/17 17:26:57  akash
- *
- * Namespace of ewpds has changed.
- *
- * Revision 1.3  2005/06/17 17:21:51  kidd
- * Add emacs tab specifier
- *
- * Revision 1.2  2005/06/16 22:18:58  akash
- *
- * EWPDS is a friend of all classes that consider WPDS to be a friend.
- * Add some extra getters / putters.
- *
- * Revision 1.1.1.1  2005/05/31 19:04:01  kidd
- * initial WALi import
- *
- */
 
 /* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
-*/
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
+ */
