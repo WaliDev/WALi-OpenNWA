@@ -1,10 +1,7 @@
 /*!
- * $Id: t3.cpp,v 1.2 2005/06/23 17:11:25 kidd Exp $
- *
  * @author Nick Kidd
- * @version $Revision: 1.2 $
  *
- * Tests printing WFA in dot format.
+ * Tests printing WFA in dot format and marshalling to XML.
  */
 #include <iostream>
 #include <fstream>
@@ -58,7 +55,9 @@ void dot()
     fa.print_dot( fdot,false );
     fdot.close();
 
-    fa.marshall( std::cout );
+    std::ofstream fxml( "t3.xml" );
+    fa.marshall( fxml );
+    fxml.close();
 
 }
 
@@ -71,28 +70,8 @@ int main()
     return 0;
 }
 
-/*
- * $Log: t3.cpp,v $
- * Revision 1.2  2005/06/23 17:11:25  kidd
- * Add fa.marshall(std::cout) to t3 to compare XML with dot output
- *
- * Revision 1.1  2005/06/21 23:55:35  kidd
- * Added t3.cpp to test WFA::print_dot
- *
- * Revision 1.3  2005/06/17 21:09:19  kidd
- * Add more paths in WitnessWPDS to generate a WitnessCombine
- *
- * Revision 1.2  2005/06/17 02:42:05  kidd
- * Made pds instance be of static ttype WitnessWPDS
- *
- * Revision 1.1  2005/06/10 18:56:00  kidd
- * Witness test code
- *
- */
-
 /* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
 */
-

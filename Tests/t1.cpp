@@ -1,8 +1,7 @@
 /*!
- * $Id: t1.cpp,v 1.2 2005/06/10 18:51:26 kidd Exp $
- *
  * @author Nick Kidd
- * @version $Revision: 1.2 $
+ *
+ * Tests WFA intersection.
  */
 #include <iostream>
 #include "wali/KeyFactory.hpp"
@@ -53,20 +52,8 @@ int main()
     return 0;
 }
 
-/*
- * $Log: t1.cpp,v $
- * Revision 1.2  2005/06/10 18:51:26  kidd
- * Rename doit to dot
- *
- * Revision 1.1  2005/06/07 19:00:19  kidd
- *
- * t1.cpp tests WFA intersection
- *
- */
-
 /* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
 */
-
