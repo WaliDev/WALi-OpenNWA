@@ -2,10 +2,7 @@
 #define wali_wfa_WEIGHT_MAKER_GUARD 1
 
 /*!
- * $Id: WeightMaker.hpp,v 1.2 2005/06/16 23:26:00 kidd Exp $
- *
  * @author Nick Kidd
- * @version $Revision: 1.2 $
  */
 
 #include "wali/Common.hpp"
@@ -72,23 +69,10 @@ namespace wali
 
 } // namespace wfa
 
-#endif	// wali_wfa_WEIGHT_MAKER_GUARD
-
-/*
- * $Log: WeightMaker.hpp,v $
- * Revision 1.2  2005/06/16 23:26:00  kidd
- * Ensure Common.hpp is included by each hpp file
- *
- * Revision 1.1  2005/06/07 18:57:24  kidd
- *
- * WeightMaker specifies the interface used by WFA::intersect in joining weights.
- * KeepLeft and KeepBoth is defined for the user.
- *
- */
+#endif  // wali_wfa_WEIGHT_MAKER_GUARD
 
 /* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
-*/
-
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
+ */
