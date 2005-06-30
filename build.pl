@@ -7,6 +7,7 @@
 #   - forks("make -j2")
 #####
 use strict;
+use warnings;
 use File::Basename;
 
 open MAKEFILE, "> Makefile" or die "Can't open Makefile : $!";
