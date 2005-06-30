@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl -w
 
 #####
 # build.pl
@@ -162,5 +162,8 @@ print MAKEFILE "\t\@echo \"Creating $BUILDDIR/$LIBWALi_SO...\"\n";
 print MAKEFILE "\t$CXX \$(LCFLAGS) -Wl,\$(LINKNAME),$LIBWALi_SO -o \$\@ \$\^";
 print MAKEFILE "\n\n";
 
-system("/usr/bin/make clean") && die "system failed: $!";
-system("/usr/bin/make -j2 all") && die "system failed: $!";
+#
+# make clean ; make -j2 all
+#
+system("/usr/bin/env make clean") && die "system failed: $!";
+system("/usr/bin/env make -j2 all") && die "system failed: $!";
