@@ -10,9 +10,10 @@ use strict;
 use warnings;
 use diagnostics;
 use Carp();
+local $SIG{__WARN__} = \&Carp::cluck;
 use File::Basename;
 
-open MAKEFILE, "> Makefile" or die "Can't open Makefile : $!";
+open(MAKEFILE,'>',"Makefile") or die "Can't open Makefile : $!";
 
 # Set PATH here b/c we fork make later
 $ENV{'PATH'} = '/bin:/usr/bin:/usr/local/bin';
