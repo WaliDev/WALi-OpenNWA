@@ -231,7 +231,8 @@ namespace wali
             wali_key_t fstate = r->from()->state();
             wali_key_t fstack = r->from()->stack();
 
-            if( r->is_rule2() ) {
+            if( r->is_rule2() )
+            {
                 KeyPair kp( t->to(),r->stack2() );
                 WFA::kp_map_t::iterator kpit = fa.kpmap.find( kp );
                 WFA::kp_map_t::iterator kpitEND = fa.kpmap.end();

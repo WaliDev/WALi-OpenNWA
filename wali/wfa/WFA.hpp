@@ -16,6 +16,8 @@
 
 namespace wali
 {
+    class Worklist;
+
     namespace wpds
     {
         class WPDS;
@@ -47,6 +49,17 @@ namespace wali
             // Types
             //
             public:
+                /*!
+                 * @enum query_t
+                 * query_t determines how the weights are extended
+                 * during path_summary. INORDER is the normal each state's
+                 * weight is the combine of all outgoing transitions's weights
+                 * extended by the "to" state. REVERSE reverses this. INORDER
+                 * corresponds to a prestar query while REVERSE corresponds to
+                 * a poststar query when used with WPDS
+                 */
+                enum query_t { INORDER,REVERSE,MAX };
+
                 typedef std::list< Trans * > trans_list_t;
                 typedef wali::HashMap< KeyPair, trans_list_t > kp_map_t;
                 typedef wali::HashMap< wali_key_t , State * > state_map_t;
@@ -62,7 +75,7 @@ namespace wali
                 // Methods
                 //
             public:
-                WFA();
+                WFA( query_t q = INORDER );
                 WFA( const WFA & rhs );
                 WFA & operator=( const WFA & rhs );
 
@@ -181,6 +194,17 @@ namespace wali
                 virtual WFA intersect( WeightMaker& wmaker , WFA& fa );
 
                 /*!
+                 * Performs path summary. Simply calls the path_summary with
+                 * the default Worklist provided by WALi.
+                 */
+                void path_summary();
+
+                /*!
+                 * Performs path summary with the specified Worklist
+                 */
+                virtual void path_summary( Worklist& wl );
+
+                /*!
                  * Write the WFA to the std::ostream parameter, implements
                  * Printable::print
                  *
@@ -250,6 +274,12 @@ namespace wali
 
                 State * get_state( wali_key_t name );
 
+                /*!
+                 * setup_fixpoint clears each states markable flag and sets
+                 * the states weight to zero
+                 */
+                void setup_fixpoint( Worklist& wl );
+
             private:
 
                 //
@@ -262,6 +292,7 @@ namespace wali
                 eps_map_t eps_map;       //! < map from to state to list of eps trans
                 wali_key_t init_state;   //! < initial state of WFA
                 std::set< wali_key_t > F;//! < set of final states
+                query_t query;           //! < determine the extend order for path_summary
 
             private:
         };

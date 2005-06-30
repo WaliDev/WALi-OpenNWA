@@ -4,6 +4,7 @@
 
 #include "wali/Common.hpp"
 #include "wali/KeyFactory.hpp"
+#include "wali/Worklist.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/State.hpp"
 #include "wali/wfa/TransFunctor.hpp"
@@ -16,7 +17,7 @@ namespace wali
     namespace wfa
     {
 
-        WFA::WFA() : init_state( WALI_EPSILON ) {}
+        WFA::WFA( query_t q ) : init_state( WALI_EPSILON ),query(q) {}
 
         WFA::WFA( const WFA & rhs ) : Printable()
         {
@@ -32,6 +33,7 @@ namespace wali
                 // Copy important state information
                 init_state = rhs.init_state;
                 F = rhs.F;
+                query = rhs.query;
 
                 // This will populate all maps
                 TransCopier copier(*this);
@@ -301,6 +303,69 @@ namespace wali
         }
 
         //
+        // Calls path_summary with default Worklist
+        //
+        void WFA::path_summary()
+        {
+            Worklist wl;
+            path_summary(wl);
+        }
+
+        //
+        // Computes path_summary
+        //
+        void WFA::path_summary( Worklist& wl )
+        {
+            setup_fixpoint( wl );
+            while( !wl.empty() )
+            {
+                State* q = (State*)wl.get();
+                sem_elem_t the_delta = q->delta();
+                q->delta() = the_delta->zero();
+
+                // For each Trans (q',x,q)
+                // TODO: Make a State iterator of some
+                std::list< Trans* >::iterator tit = q->rev_trans_ls.begin();
+                std::list< Trans* >::iterator titEND = q->rev_trans_ls.end();
+                for( ; tit != titEND ; tit++ )
+                {
+                    Trans* t = *tit; // (q',x,q)
+                    State *qprime = get_state(t->from()); // q'
+
+                    sem_elem_t extended;
+                    if( query == INORDER )
+                        extended = t->weight()->extend( the_delta );
+                    else
+                        extended = the_delta->extend( t->weight() );
+
+                    // delta => (w+se,w-se)
+                    // Use extended->delta b/c we want the diff b/w the new
+                    // weight (extended) and what was there before
+                    std::pair< sem_elem_t,sem_elem_t > p =
+                        extended->delta( qprime->weight() );
+
+                    // Sets qprime's new weight
+                    // p.first == (l(t) X the_delta) + W(qprime)
+                    qprime->weight() = p.first;
+
+                    // on the worklist?
+                    if( qprime->marked() ) {
+                        qprime->delta() = qprime->delta()->combine(p.second);
+                    }
+                    else {
+                        // not on the worklist means its delta is zero
+                        qprime->delta() = p.second;
+
+                        // add to worklist if not zero
+                        if( !qprime->delta()->equal(extended->zero()) ) {
+                            wl.put(qprime);
+                        }
+                    }
+                }
+            }
+        }
+
+        //
         // @brief print WFA to param o
         //
         std::ostream & WFA::print( std::ostream & o ) const
@@ -529,6 +594,30 @@ namespace wali
                 return state;
             }
         }
+
+        //
+        // Place WFA in state ready for fixpoint
+        //
+        void WFA::setup_fixpoint( Worklist& wl )
+        {
+            state_map_t::iterator it = state_map.begin();
+            state_map_t::iterator itEND = state_map.end();
+            for( ; it != itEND ; it++ )
+            {
+                State* st = it->second;
+                st->unmark();
+                if( is_final_state( st->name() ) ) {
+                    st->weight() = st->weight()->one();
+                    st->delta() = st->delta()->one();
+                }
+                else {
+                    st->weight() = st->weight()->zero();
+                    st->delta() = st->delta()->zero();
+                    wl.put( st );
+                }
+            }
+        }
+
 
     } // namespace wfa
 

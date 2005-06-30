@@ -12,8 +12,8 @@ namespace wali
 
         int State::numStates = 0;
 
-        State::State( wali_key_t key, sem_elem_t W ) :
-            Countable(true),name(key),se(W),delta(W)
+        State::State( wali_key_t k, sem_elem_t W ) :
+            Countable(true),key(k),se(W),delta_se(W)
         {
             assert( W.is_valid() );
             quasi = W->zero();
@@ -33,14 +33,14 @@ namespace wali
 
         std::ostream & State::print( std::ostream & o ) const
         {
-            o << "State[ name=\"" << name << "\" W=\"";
+            o << "State[ name=\"" << name() << "\" W=\"";
             o << se->to_string() << "\" ]";
             return o;
         }
 
         void State::add_trans( Trans * t )
         {
-            // assert( t->from() == this->name );
+            // assert( t->from() == this->key );
             trans_ls.push_back( t );
         }
 
@@ -49,9 +49,9 @@ namespace wali
             rev_trans_ls.push_back(t);
         }
 
-    } // namespace wfa
+    } // keyspace wfa
 
-} // namespace wali
+} // keyspace wali
 
 /* Yo, Emacs!
    ;;; Local Variables: ***
