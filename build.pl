@@ -8,6 +8,8 @@
 #####
 use strict;
 use warnings;
+use diagnostics;
+use Carp();
 use File::Basename;
 
 open MAKEFILE, "> Makefile" or die "Can't open Makefile : $!";
