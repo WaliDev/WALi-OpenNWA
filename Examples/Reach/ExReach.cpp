@@ -1,8 +1,5 @@
 /*!
- * $Id: ExReach.cpp,v 1.2 2005/06/02 17:13:02 kidd Exp $
- *
  * @author Nick Kidd
- * @version $Revision: 1.2 $
  */
 
 /*
@@ -135,13 +132,9 @@ int main()
     std::cerr << "# Reaches : " << Reach::numReaches << std::endl;
     return 0;
 }
-/*
- * $Log $
- */
 
 /* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
 */
-
