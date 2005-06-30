@@ -1,5 +1,11 @@
 #!/usr/bin/perl -w
 
+#####
+# build.pl
+#   - writes a Makefile
+#   - forks("make clean")
+#   - forks("make -j2")
+#####
 use strict;
 use File::Basename;
 
