@@ -1,10 +1,8 @@
 /*!
- * $Id: TransFunctor.cpp,v 1.3 2005/06/23 17:07:10 kidd Exp $
- *
  * @author Nick Kidd
- * @version $Revision: 1.3 $
  */
 
+#include "wali/Common.hpp"
 #include "wali/KeyFactory.hpp"
 #include "wali/wfa/TransFunctor.hpp"
 #include "wali/wfa/Trans.hpp"
@@ -83,7 +81,7 @@ namespace wali
 } // namespace wali
 
 /* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
 */

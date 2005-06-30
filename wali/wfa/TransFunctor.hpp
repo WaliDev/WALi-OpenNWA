@@ -3,10 +3,7 @@
 #pragma once
 
 /*!
- * $Id: TransFunctor.hpp,v 1.3 2005/06/23 17:07:10 kidd Exp $
- *
  * @author Nick Kidd
- * @version $Revision: 1.3 $
  */
 
 #include <iostream>
@@ -34,7 +31,7 @@ namespace wali
                 virtual ~TransFunctor() {}
 
                 virtual void operator()( Trans * t ) = 0;
-        };
+        }; // class TransFunctor
 
         /*!
          * @class ConstTransFunctor
@@ -52,7 +49,7 @@ namespace wali
                 virtual ~ConstTransFunctor() {}
 
                 virtual void operator()( const Trans * t ) = 0;
-        };
+        }; // class ConstTransFunctor
 
         /*!
          * @class TransPrinter
@@ -73,7 +70,7 @@ namespace wali
                 virtual ~TransPrinter() {}
 
                 virtual void operator()( const Trans * t );
-        };
+        }; // class TransPrinter
 
         /*!
          * @class TransCopier
@@ -94,7 +91,7 @@ namespace wali
                 virtual ~TransCopier() {}
 
                 virtual void operator()( const Trans * t );
-        };
+        }; // class TransCopier
 
         /*!
          * @class TransDeleter
@@ -109,7 +106,7 @@ namespace wali
                 virtual ~TransDeleter() {}
 
                 virtual void operator()( Trans * t );
-        };
+        }; // class TransDeleter
 
         /*!
          * @class TransDotty
@@ -126,7 +123,7 @@ namespace wali
                 virtual ~TransDotty() {}
 
                 virtual void operator()( const Trans * t );
-        };
+        }; // class TransDotty
 
         /*!
          * @class TransMarshaller
@@ -142,7 +139,7 @@ namespace wali
                 virtual ~TransMarshaller() {}
 
                 virtual void operator()( const Trans * t );
-        };
+        }; // class TransMarshaller
 
     } // namespace wfa
 
@@ -151,7 +148,7 @@ namespace wali
 #endif  // wali_wfa_TRANS_FUNCTOR_GUARD
 
 /* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
-*/
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
+ */
