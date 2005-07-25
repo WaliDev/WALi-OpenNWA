@@ -3,7 +3,6 @@
 
 /*
  * @author Nick Kidd
- * @version $Revision: 1.21 $
  */
 
 #include <climits>
@@ -42,8 +41,7 @@ namespace wali
 #endif  // wali_COMMON_GUARD
 
 /* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
-*/
-
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
+ */

@@ -3,7 +3,6 @@
 
 /*
  * @author Nicholas Kidd
- * @version $Revision: 1.5 $
  */
 
 // Disable name truncation in Visual Studio

@@ -3,7 +3,6 @@
 
 /*!
  * @author Nick Kidd
- * @version: $Revision $
  */
 
 #include <cstring> // for hm_equal< char * >

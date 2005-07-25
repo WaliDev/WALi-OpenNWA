@@ -3,7 +3,6 @@
 
 /*!
  * @author Nick Kidd
- * @version $Revision: 1.7 $
  */
 
 #include "wali/Common.hpp"

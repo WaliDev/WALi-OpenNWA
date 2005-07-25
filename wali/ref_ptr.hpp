@@ -3,8 +3,6 @@
 
 /*!
  * @author Nick Kidd
- * @version $Revision: 1.3 $
- *
  */
 
 #include <cstdio>

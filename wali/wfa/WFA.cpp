@@ -302,6 +302,21 @@ namespace wali
             return dest;
         }
 
+        /*
+        void WFA::do_fixpoint( Worklist& wl, FixpointLogic& logic )
+        {
+            setup_fixpoint(wl,logic);
+            while( !wl.empty() )
+            {
+                State* q = (State*)wl.get();
+                sem_elem_t the_delta = q->delta();
+                q->delta() = the_delta->zero();
+
+                logic.process(q,the_delta,wl);
+            }
+        }
+        */
+
         //
         // Calls path_summary with default Worklist
         //
@@ -310,6 +325,7 @@ namespace wali
             Worklist wl;
             path_summary(wl);
         }
+
 
         //
         // Computes path_summary
