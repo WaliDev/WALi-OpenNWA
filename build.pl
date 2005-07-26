@@ -19,11 +19,11 @@ open(MAKEFILE,'>',"Makefile") or die "Can't open Makefile : $!";
 $ENV{'PATH'} = '/bin:/usr/bin:/usr/local/bin';
 
 my $TOPDIR          = ".";
-if( my $val = $ENV{'WALiDIR'} ) {
+if( my $val = $ENV{'WALi_HOME'} ) {
     $TOPDIR = $val;
 }
 else {
-    print "ENV{'WALiDIR'} not defined. Defaulting to '.'\n";
+    print "ENV{'WALi_HOME'} not defined. Defaulting to '.'\n";
 }
 my $BUILDDIR        = "$TOPDIR/build";
 my $EDIR            = "$TOPDIR/Examples";
@@ -36,7 +36,6 @@ my $EWPDSDIR        = "$WPDSDIR/ewpds";
 my $WITNESSDIR      = "$WALiDIR/witness";
 my $OBJSFX          = "\$(OBJSFX)";
 my $CXXSFX          = ".cpp";
-my $CC              = "gcc";
 my $CFLAGS          = "-g -Wall -Wformat=2 -W -fPIC";
 my $DFLAGS          = "";
 my $INCS            = "-I$TOPDIR";
@@ -45,11 +44,13 @@ my $LIBWALi_A       = "libwali.a";
 my $LIBWALi_SO      = "libwali\$(SOSFX)";
 #Check for g++
 my $CXX             = "/usr/bin/g++";
-if( my $val = $ENV{'GCCDIR'} ) {
+my $CC              = "/usr/bin/gcc";
+if( my $val = $ENV{'GCC_HOME'} ) {
     $CXX = "$val/bin/g++";
+    $CC  = "$val/bin/gcc";
 }
 else {
-    print STDERR "ENV{'GCCDIR'} not defined. Defauling to /usr/bin/g++\n";
+    print STDERR "ENV{'GCC_HOME'} not defined. Defauling to \"$CXX\" & \"$CC\"\n";
 }
 
 my @WALi_FILES = (

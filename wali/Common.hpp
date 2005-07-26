@@ -21,8 +21,9 @@ namespace wali
  * This macro disables GCC warnings for unused parameters. #ifdef
  * is used b/c MS VC++ does not like __attribute__.
  */
-#if defined(__GNUG__)
-#   if( __GNUG__ > 3 )
+#if defined(__GNUC__)
+#   define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#   if( GCC_VERSION >= 30400 )
 #       define ATTR_UNUSED __attribute__((__unused__))
 #   else
 #       define ATTR_UNUSED
