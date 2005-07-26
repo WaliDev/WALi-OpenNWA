@@ -3,7 +3,6 @@
  */
 
 #include "wali/Common.hpp"
-#include "wali/KeyFactory.hpp"
 #include "wali/wfa/TransFunctor.hpp"
 #include "wali/wfa/Trans.hpp"
 #include "wali/wfa/WFA.hpp"
@@ -56,7 +55,7 @@ namespace wali
             if( print_weights ) {
                 o << "< ";
             }
-            KeyFactory::print_key(o,t->stack());
+            printKey(o,t->stack());
             if( print_weights ) {
                 o << " | ";
                 t->weight()->print( o );

@@ -7,12 +7,11 @@
 
 #include "wali/Common.hpp"
 #include "wali/HashMap.hpp"
+#include "wali/KeySource.hpp"   //! defines hm_hash<wali::KeySource*>
 #include <vector>
 
 namespace wali
 {
-    class KeySource;
-
     /*!
      * @class KeySpace
      */
@@ -30,28 +29,28 @@ namespace wali
              * @param KeySource* ks for which a key is sought
              * @return wali_key_t associated with parameter KeySource
              */
-            wali_key_t get_key( KeySource* ks );
+            wali_key_t getKey( KeySource* ks );
 
             /*!
              * Wrapper method for createing a StringSource and
              * inserting it into the KeySpace
              */
-            wali_key_t get_key( const std::string& s );
+            wali_key_t getKey( const std::string& s );
 
             /*!
              * Wrapper method for createing a IntSource and
              * inserting it into the KeySpace
              */
-            wali_key_t get_key( int i );
+            wali_key_t getKey( int i );
 
             /*!
              * Wrapper method for createing a KeyPairSource and
              * inserting it into the KeySpace
              */
-            wali_key_t get_key( wali_key_t k1, wali_key_t k2 );
+            wali_key_t getKey( wali_key_t k1, wali_key_t k2 );
 
             /*!
-             * get_source retrieves the KeySource* associated to the
+             * getKeySource retrieves the KeySource* associated to the
              * wali_key_t key. If no such KeySource exists, then a NULL
              * pointer (0) is returned.
              *
@@ -61,7 +60,7 @@ namespace wali
              * @param key whose correpsonding KeySource* is desired
              * @return KeySource* associated with parameter key
              */
-            KeySource* get_source( wali_key_t key );
+            KeySource* getKeySource( wali_key_t key );
 
             /*!
              * Reset the KeySpace. Clears all keys and deletes
@@ -79,7 +78,7 @@ namespace wali
              *
              * @see KeySource
              */
-            std::ostream& print_key( std::ostream& o, wali_key_t key );
+            std::ostream& printKey( std::ostream& o, wali_key_t key );
 
             /*!
              * Return std::string rep of KeySource. Looks up the key and calls
@@ -105,10 +104,6 @@ namespace wali
              * are retrieved by a lookup into values
              */
             ks_vector_t values;
-
-        private:
-
-            wali_key_t init_epsilon();
 
     }; // class KeySpace
 

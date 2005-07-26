@@ -5,7 +5,6 @@
 #include "wali/Common.hpp"
 #include "wali/SemElem.hpp"
 #include "wali/Worklist.hpp"
-#include "wali/KeyFactory.hpp"
 #include "wali/KeyPairSource.hpp"
 #include "wali/wfa/State.hpp"
 #include "wali/wfa/TransFunctor.hpp"
@@ -388,7 +387,7 @@ namespace wali
          */
         wali_key_t WPDS::gen_state( wali_key_t state, wali_key_t stack )
         {
-            return KeyFactory::get_key( state,stack );
+            return getKey( state,stack );
         }
 
         std::ostream & WPDS::print( std::ostream & o ) const

@@ -3,7 +3,6 @@
  */
 
 #include <sstream>
-#include "wali/KeyFactory.hpp"
 #include "wali/wpds/Config.hpp"
 
 namespace wali
@@ -28,16 +27,16 @@ namespace wali
 
         std::ostream & Config::print( std::ostream & o ) const
         {
-            o << "(" << KeyFactory::key2str(state());
-            o << " , " << KeyFactory::key2str(stack()) << ")";
+            o << "(" << key2str(state());
+            o << " , " << key2str(stack()) << ")";
             return o;
         }
 
         std::ostream & Config::marshall( std::ostream & o ) const
         {
             o << "<Config>";
-            o << "\t<state name=\"" << KeyFactory::key2str(state()) << "\"/>";
-            o << "\t<stack name=\"" << KeyFactory::key2str(stack()) << "\"/>";
+            o << "\t<state name=\"" << key2str(state()) << "\"/>";
+            o << "\t<stack name=\"" << key2str(stack()) << "\"/>";
             o << "</Config>";
             return o;
         }

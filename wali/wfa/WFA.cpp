@@ -3,7 +3,6 @@
  */
 
 #include "wali/Common.hpp"
-#include "wali/KeyFactory.hpp"
 #include "wali/Worklist.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/State.hpp"
@@ -239,7 +238,7 @@ namespace wali
             WFA dest;
             // do init states
             dest.set_initial_state(
-                    KeyFactory::get_key(initial_state(),fa.initial_state()) );
+                    getKey(initial_state(),fa.initial_state()) );
 
             // do final states
             // Pairwise cross of the sets
@@ -251,7 +250,7 @@ namespace wali
                 std::set< wali_key_t >::iterator faitEND = fa.F.end();
                 for( ; fait != faitEND ; fait++ )
                 {
-                    dest.add_final_state( KeyFactory::get_key(*keyit,*fait) );
+                    dest.add_final_state( getKey(*keyit,*fait) );
                 }
             }
 
@@ -291,8 +290,8 @@ namespace wali
                     for( ; stklsit != stklsitEND ; stklsit++ )
                     {
                         Trans *t2 = *stklsit;
-                        wali_key_t fromkey = KeyFactory::get_key( t->from(),t2->from() );
-                        wali_key_t tokey = KeyFactory::get_key( t->to(),t2->to() );
+                        wali_key_t fromkey = getKey( t->from(),t2->from() );
+                        wali_key_t tokey = getKey( t->to(),t2->to() );
                         sem_elem_t W = wmaker.make_weight(t->weight(),t2->weight());
                         dest.add_trans(fromkey,t->stack(),tokey,W);
                     }
@@ -388,7 +387,7 @@ namespace wali
         {
             o << "WFA -\n";
             o << "\tInitial State : ";
-            o << KeyFactory::key2str(init_state) << std::endl;
+            o << key2str(init_state) << std::endl;
             o << "\tF: {";
             std::set< wali_key_t >::const_iterator cit = F.begin();
             std::set< wali_key_t >::const_iterator citEND = F.end();
@@ -397,7 +396,7 @@ namespace wali
             {
                 if(!first)
                     o << ", ";
-                o << KeyFactory::key2str( *cit );
+                o << key2str( *cit );
             }
             o << "}\n";
 
@@ -422,7 +421,7 @@ namespace wali
             {
                 wali_key_t key = stit->first;
                 o << "\t" << key << " [label=\"";
-                o << KeyFactory::key2str(key);
+                o << key2str(key);
                 o << "\"";
                 if( is_initial_state(key) ) {
                     o  << ",color=green,style=filled";
@@ -446,14 +445,14 @@ namespace wali
             // TODO : add "forward" or "backward" attribute ... like
             // o << "<WFA direction="forward">\n";
             o << "<WFA>\n";
-            o << "\t<initial_state>" << KeyFactory::key2str( initial_state() );
+            o << "\t<initial_state>" << key2str( initial_state() );
             o << "</initial_state>\n";
             std::set< wali_key_t >::const_iterator Fit = F.begin();
             std::set< wali_key_t >::const_iterator FitEND = F.end();
             for( ; Fit != FitEND ; Fit++ )
             {
                 o << "\t<final_state>";
-                o << KeyFactory::key2str( *Fit );
+                o << key2str( *Fit );
                 o << "</final_state>\n";
             }
             TransMarshaller marsh(o);

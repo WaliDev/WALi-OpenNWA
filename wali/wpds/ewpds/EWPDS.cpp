@@ -7,7 +7,6 @@
 #include "wali/Worklist.hpp"
 #include "wali/KeySource.hpp"
 #include "wali/KeyPairSource.hpp"
-#include "wali/KeyFactory.hpp"
 #include "wali/wfa/State.hpp"
 #include "wali/wfa/TransFunctor.hpp"
 #include "wali/wpds/Config.hpp"
@@ -399,7 +398,7 @@ namespace wali
                         for(  ; it != state->trans_ls.end() ; it++ )
                         {
                             Trans * tprime = *it;
-                            KeySource *ks = KeyFactory::get_source(t->to());
+                            KeySource *ks = getKeySource(t->to());
                             KeyPairSource *kps;
                             sem_elem_t wght;
                             tprime->print(std::cerr) << "\n";

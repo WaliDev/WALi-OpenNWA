@@ -4,7 +4,6 @@
 
 #include <sstream>
 #include <cassert>
-#include "wali/KeyFactory.hpp"
 #include "wali/wpds/Rule.hpp"
 #include "wali/wpds/Config.hpp"
 
@@ -77,20 +76,20 @@ namespace wali
         std::ostream & Rule::print( std::ostream &o ) const
         {
             o << "<";
-            KeyFactory::key2str(from_state());
+            key2str(from_state());
             o << ", ";
-            KeyFactory::key2str(from_stack());
+            key2str(from_stack());
             o << "> -> <";
-            KeyFactory::key2str(to_state());
+            key2str(to_state());
             o << ", ";
             wali_key_t stk1 = to_stack1();
             if( stk1 != WALI_EPSILON )
             {
-                KeyFactory::key2str(stk1);
+                key2str(stk1);
                 if( stk2 != WALI_EPSILON )
                 {
                     o << " ";
-                    KeyFactory::key2str(to_stack2());
+                    key2str(to_stack2());
                 }
             }
             else {
@@ -105,15 +104,15 @@ namespace wali
         std::ostream & Rule::marshall( std::ostream & o ) const
         {
             o << "<rule>\n";
-            o << "\t<fromstate>" << KeyFactory::key2str(from_state()) << "</fromstate>\n";
-            o << "\t<fromstack>" << KeyFactory::key2str(from_stack()) << "</fromstack>\n";
-            o << "\t<tostate>" << KeyFactory::key2str(to_state()) << "</tostate>\n";
+            o << "\t<fromstate>" << key2str(from_state()) << "</fromstate>\n";
+            o << "\t<fromstack>" << key2str(from_stack()) << "</fromstack>\n";
+            o << "\t<tostate>" << key2str(to_state()) << "</tostate>\n";
 
             // Check optional stack symbols
             if( WALI_EPSILON != to_stack1() ) {
-                o << "\t<tostack1>" << KeyFactory::key2str(to_stack1()) << "</tostack1>\n";
+                o << "\t<tostack1>" << key2str(to_stack1()) << "</tostack1>\n";
                 if( WALI_EPSILON != to_stack2() ) {
-                    o << "\t<tostack2>" << KeyFactory::key2str(to_stack2()) << "</tostack2>\n";
+                    o << "\t<tostack2>" << key2str(to_stack2()) << "</tostack2>\n";
                 }
             }
             else {

@@ -55,12 +55,13 @@ else {
 
 my @WALi_FILES = (
 # namespace wali
-    "$WALiDIR/Markable$CXXSFX"
+    "$WALiDIR/Common$CXXSFX"
+    ,"$WALiDIR/Markable$CXXSFX"
     ,"$WALiDIR/Printable$CXXSFX"
     ,"$WALiDIR/SemElem$CXXSFX"
     ,"$WALiDIR/SemElemPair$CXXSFX"
     ,"$WALiDIR/Worklist$CXXSFX"
-    ,"$WALiDIR/KeyFactory$CXXSFX"
+    ,"$WALiDIR/KeySpace$CXXSFX"
     ,"$WALiDIR/IntSource$CXXSFX"
     ,"$WALiDIR/StringSource$CXXSFX"
     ,"$WALiDIR/KeyPairSource$CXXSFX"

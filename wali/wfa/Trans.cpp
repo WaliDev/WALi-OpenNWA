@@ -3,7 +3,6 @@
  */
 
 #include "wali/Common.hpp"
-#include "wali/KeyFactory.hpp"
 #include "wali/wfa/Trans.hpp"
 #include <iostream>
 #include <sstream>
@@ -107,13 +106,13 @@ namespace wali
         std::ostream & Trans::print( std::ostream & o ) const
         {
             o << "( ";
-            KeyFactory::print_key(o,from());
+            printKey(o,from());
             o << " , ";
 
-            KeyFactory::print_key(o,stack());
+            printKey(o,stack());
             o << " , ";
 
-            KeyFactory::print_key(o,to());
+            printKey(o,to());
             o << " )";
 
             o << "\t" << se->to_string();
@@ -126,15 +125,15 @@ namespace wali
         {
             o << "<Trans>\n";
             o << "\t<from_state>";
-            o << KeyFactory::key2str( from() );
+            o << key2str( from() );
             o << "</from_state>\n";
 
             o << "\t<stack>";
-            o << KeyFactory::key2str( stack() );
+            o << key2str( stack() );
             o << "</stack>\n";
 
             o << "\t<to_state>";
-            o << KeyFactory::key2str( to() );
+            o << key2str( to() );
             o << "</to_state>\n";
             
             o << "\t<weight>";

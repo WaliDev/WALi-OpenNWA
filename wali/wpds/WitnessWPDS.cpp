@@ -5,7 +5,6 @@
 #include "wali/Common.hpp"
 #include "wali/SemElem.hpp"
 #include "wali/Worklist.hpp"
-#include "wali/KeyFactory.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/Trans.hpp"
 #include "wali/wfa/TransFunctor.hpp"

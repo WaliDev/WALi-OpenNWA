@@ -1,5 +1,5 @@
-#ifndef wali_KEY_PAIR_GUARD
-#define wali_KEY_PAIR_GUARD 1
+#ifndef wali_KEY_CONTAINER_GUARD
+#define wali_KEY_CONTAINER_GUARD 1
 
 /*!
  * @author Nick Kidd
@@ -106,12 +106,12 @@ namespace wali
 
     };
 
-}
-#endif  // wali_KEY_PAIR_GUARD
+} // namespace wali
+
+#endif  // wali_KEY_CONTAINER_GUARD
 
 /* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
 */
-

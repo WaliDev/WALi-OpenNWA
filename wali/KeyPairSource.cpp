@@ -1,10 +1,9 @@
 /*!
  * @author Nick Kidd
- * @version $Revision: 1.4 $
  */
 
+#include "wali/Common.hpp"
 #include "wali/KeyPairSource.hpp"
-#include "wali/KeyFactory.hpp"
 
 namespace wali
 {
@@ -33,9 +32,9 @@ namespace wali
     std::ostream& KeyPairSource::print( std::ostream& o ) const
     {
         o << "( ";
-        KeyFactory::print_key(o,kp.first);
+        printKey(o,kp.first);
         o << " , ";
-        KeyFactory::print_key(o,kp.second);
+        printKey(o,kp.second);
         o << " )";
         return o;
     }

@@ -22,15 +22,14 @@ namespace wali
      * @param KeySource* ks for which a key is sought
      * @return wali_key_t associated with parameter KeySource
      */
-    wali_key_t KeyFactory::get_key( KeySource* ks )
+    wali_key_t KeySpace::getKey( KeySource* ks )
     {
-        static wali_key_t INIT_EPS = init_epsilon();
-        wali_key_t key = INIT_EPS;
         ks_hash_map_t::iterator it = keymap.find(ks);
+        wali_key_t key;
         if( it != keymap.end() )
         {
             key = it->second;
-            // Reclaim the memory. KeyFactory assumes ownership of
+            // Reclaim the memory. KeySpace assumes ownership of
             // all allocated memory passed to it
             delete ks;
         }
@@ -44,33 +43,33 @@ namespace wali
 
     /*!
      * Wrapper method for createing a StringSource and
-     * inserting it into the KeyFactory
+     * inserting it into the KeySpace
      */
-    wali_key_t KeyFactory::get_key( const std::string& s )
+    wali_key_t KeySpace::getKey( const std::string& s )
     {
-        return get_key( new StringSource(s) );
+        return getKey( new StringSource(s) );
     }
 
     /*!
      * Wrapper method for createing a IntSource and
-     * inserting it into the KeyFactory
+     * inserting it into the KeySpace
      */
-    wali_key_t KeyFactory::get_key( int i )
+    wali_key_t KeySpace::getKey( int i )
     {
-        return get_key( new IntSource(i) );
+        return getKey( new IntSource(i) );
     }
 
     /*!
      * Wrapper method for createing a KeyPairSource and
-     * inserting it into the KeyFactory
+     * inserting it into the KeySpace
      */
-    wali_key_t KeyFactory::get_key( wali_key_t k1, wali_key_t k2 )
+    wali_key_t KeySpace::getKey( wali_key_t k1, wali_key_t k2 )
     {
-        return get_key( new KeyPairSource(k1,k2) );
+        return getKey( new KeyPairSource(k1,k2) );
     }
 
     /*!
-     * get_source retrieves the KeySource* associated to the
+     * getKeySource retrieves the KeySource* associated to the
      * wali_key_t key. If no such KeySource exists, then a NULL
      * pointer (0) is returned.
      *
@@ -80,7 +79,7 @@ namespace wali
      * @param key whose correpsonding KeySource* is desired
      * @return KeySource* associated with parameter key
      */
-    KeySource* KeyFactory::get_source( wali_key_t key )
+    KeySource* KeySpace::getKeySource( wali_key_t key )
     {
         KeySource* ksrc = 0;
         if( key < size() )
@@ -91,10 +90,10 @@ namespace wali
     }
 
     /*!
-     * Reset the KeyFactory. Clears all keys and deletes
+     * Reset the KeySpace. Clears all keys and deletes
      * all KeySources
      */
-    void KeyFactory::clear()
+    void KeySpace::clear()
     {
         keymap.clear();
         ks_vector_t::iterator it = values.begin();
@@ -115,7 +114,7 @@ namespace wali
     /*!
      * Return the number of allocated keys
      */
-    size_t KeyFactory::size()
+    size_t KeySpace::size()
     {
         return values.size();
     }
@@ -125,9 +124,9 @@ namespace wali
      *
      * @see KeySource
      */
-    std::ostream& KeyFactory::print_key( std::ostream& o, wali_key_t key )
+    std::ostream& KeySpace::printKey( std::ostream& o, wali_key_t key )
     {
-        KeySource* ksrc = get_source(key);
+        KeySource* ksrc = getKeySource(key);
         if( ksrc ) {
             ksrc->print(o);
         }
@@ -143,9 +142,9 @@ namespace wali
      *
      * @see KeySource
      */
-    std::string KeyFactory::key2str( wali_key_t key )
+    std::string KeySpace::key2str( wali_key_t key )
     {
-        KeySource* ksrc = get_source(key);
+        KeySource* ksrc = getKeySource(key);
         if( ksrc ) {
             return ksrc->to_string();
         }
@@ -154,18 +153,10 @@ namespace wali
         }
     }
 
-    wali_key_t KeyFactory::init_epsilon()
-    {
-        assert( values.size() == 0 );
-        std::string star("*");
-        values.push_back( new StringSource(star) );
-        return WALI_EPSILON;
-    }
-
 } // namespace wali
 
 /* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
-*/
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
+ */
