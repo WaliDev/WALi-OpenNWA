@@ -3,7 +3,8 @@
  */
 
 #include <cassert>
-#include "wali/KeyFactory.hpp"
+#include "wali/KeySpace.hpp"
+#include "wali/KeySource.hpp"
 #include "wali/StringSource.hpp"
 #include "wali/IntSource.hpp"
 #include "wali/KeyPairSource.hpp"
@@ -25,7 +26,7 @@ namespace wali
     {
         static wali_key_t INIT_EPS = init_epsilon();
         wali_key_t key = INIT_EPS;
-        kf_hash_map_t::iterator it = keymap.find(ks);
+        ks_hash_map_t::iterator it = keymap.find(ks);
         if( it != keymap.end() )
         {
             key = it->second;
@@ -96,8 +97,8 @@ namespace wali
     void KeyFactory::clear()
     {
         keymap.clear();
-        kf_vector_t::iterator it = values.begin();
-        kf_vector_t::iterator itEND = values.end();
+        ks_vector_t::iterator it = values.begin();
+        ks_vector_t::iterator itEND = values.end();
         for( ; it != itEND ; it++ )
         {
             KeySource *ksrc = *it;
@@ -105,6 +106,10 @@ namespace wali
             *it = 0;
         }
         values.clear();
+        {
+            ks_vector_t TEMP;
+            TEMP.swap(values);
+        }
     }
 
     /*!
@@ -149,23 +154,6 @@ namespace wali
         }
     }
 
-    //////////////////////////
-    // Static data members
-    //////////////////////////
-
-    /*! 
-     * keymap maps KeySource* to wali_key_t. The wali_key_t is
-     * an index into the vector values
-     */
-    KeyFactory::kf_hash_map_t KeyFactory::keymap;
-
-    /*!
-     * wali_key_t's are guaranteed to be unique w.r.t. this KeyFactory
-     * because they are indexes into the vector values. KeySource's
-     * are retrieved by a lookup into values
-     */
-    KeyFactory::kf_vector_t KeyFactory::values;
-
     wali_key_t KeyFactory::init_epsilon()
     {
         assert( values.size() == 0 );
@@ -173,6 +161,7 @@ namespace wali
         values.push_back( new StringSource(star) );
         return WALI_EPSILON;
     }
+
 } // namespace wali
 
 /* Yo, Emacs!
