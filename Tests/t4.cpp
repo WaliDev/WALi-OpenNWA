@@ -5,7 +5,7 @@
  */
 #include <iostream>
 #include <fstream>
-#include "wali/KeyFactory.hpp"
+#include "wali/Common.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/wpds/WitnessWPDS.hpp"
 // For debug info in main()
@@ -27,29 +27,29 @@ void dot()
 {
     using wali::wpds::WitnessWPDS;
     using wali::wpds::WPDS;
-    using wali::KeyFactory;
+    using wali::getKey;;
     using wali::wali_key_t;
     using wali::sem_elem_t;
     using wali::wfa::WFA;
     using std::cout;
     Reach *reach = new Reach(true);
 
-    wali_key_t p = KeyFactory::get_key("p");
-    wali_key_t acc1 = KeyFactory::get_key("acc1");
-    wali_key_t acc2 = KeyFactory::get_key("acc2");
-    wali_key_t n0 = KeyFactory::get_key("n0");
-    wali_key_t n1 = KeyFactory::get_key("n1");
-    wali_key_t n2 = KeyFactory::get_key("n2");
-    wali_key_t n3 = KeyFactory::get_key("n3");
+    wali_key_t p = getKey("p");
+    wali_key_t acc1 = getKey("acc1");
+    wali_key_t acc2 = getKey("acc2");
+    wali_key_t n0 = getKey("n0");
+    wali_key_t n1 = getKey("n1");
+    wali_key_t n2 = getKey("n2");
+    wali_key_t n3 = getKey("n3");
 
     WFA fa;
     fa.set_initial_state(p);
     fa.add_final_state(acc1);
     fa.add_final_state(acc2);
-    fa.add_trans( p, KeyFactory::get_key("n0"), acc1, reach);
+    fa.add_trans( p, getKey("n0"), acc1, reach);
     fa.add_trans( p, n0, p, reach);
-    fa.add_trans( p, n1, KeyFactory::get_key("q"), reach);
-    fa.add_trans( KeyFactory::get_key("q"), n2, acc2, reach);
+    fa.add_trans( p, n1, getKey("q"), reach);
+    fa.add_trans( getKey("q"), n2, acc2, reach);
     fa.add_trans( acc2, n3, acc2, reach);
 
     fa.path_summary();

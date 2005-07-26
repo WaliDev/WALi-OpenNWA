@@ -10,11 +10,22 @@ namespace wali
 {
 
     //
+    // Only used here in Common.cpp
+    //
+    static KeySpace* createKeySpace()
+    {
+        KeySpace* keySpace = new KeySpace();
+        // WPDS_EPSILON == 0 == "*"
+        keySpace->getKey("*");
+        return keySpace;
+    }
+
+    //
     // This class defines the wali::KeySpace
     //
     KeySpace* getKeySpace()
     {
-        static KeySpace *keySpace = new KeySpace();
+        static KeySpace *keySpace = createKeySpace();
         return keySpace;
     }
 

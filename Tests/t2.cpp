@@ -4,7 +4,7 @@
  * Tests Witnesses
  */
 #include <iostream>
-#include "wali/KeyFactory.hpp"
+#include "wali/Common.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/wpds/WitnessWPDS.hpp"
 // For debug info in main()
@@ -25,7 +25,7 @@ void dot()
 {
     using wali::wpds::WitnessWPDS;
     using wali::wpds::WPDS;
-    using wali::KeyFactory;
+    using wali::getKey;
     using wali::wali_key_t;
     using wali::sem_elem_t;
     using wali::wfa::WFA;
@@ -33,12 +33,12 @@ void dot()
     Reach *reach = new Reach(true);
 
     WitnessWPDS* pds = new WitnessWPDS();
-    wali_key_t p = KeyFactory::get_key("p");
-    wali_key_t acc = KeyFactory::get_key("acc");
-    wali_key_t n0 = KeyFactory::get_key("n0");
-    wali_key_t n1 = KeyFactory::get_key("n1");
-    wali_key_t n2 = KeyFactory::get_key("n2");
-    wali_key_t n3 = KeyFactory::get_key("n3");
+    wali_key_t p = getKey("p");
+    wali_key_t acc = getKey("acc");
+    wali_key_t n0 = getKey("n0");
+    wali_key_t n1 = getKey("n1");
+    wali_key_t n2 = getKey("n2");
+    wali_key_t n3 = getKey("n3");
     // true branch
     pds->add_rule(p,n0,p,n1,reach);
     // false branch
@@ -51,7 +51,7 @@ void dot()
     WFA fain;
     fain.set_initial_state(p);
     fain.add_final_state(acc);
-    fain.add_trans(p,KeyFactory::get_key("n0"),acc,reach);
+    fain.add_trans(p,getKey("n0"),acc,reach);
     fain.print( cout << "----- WFA BEFORE -----\n" ) << std::endl;
 
     WFA faout = pds->poststar(fain);

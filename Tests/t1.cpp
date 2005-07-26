@@ -4,7 +4,6 @@
  * Tests WFA intersection.
  */
 #include <iostream>
-#include "wali/KeyFactory.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/Trans.hpp"
 #include "wali/wfa/State.hpp"
@@ -13,29 +12,29 @@
 
 void dot()
 {
-    using wali::KeyFactory;
     using wali::wali_key_t;
     using wali::sem_elem_t;
+    using wali::getKey;
     using wali::wfa::WFA;
     using std::cout;
     Reach *r = new Reach(true);
 
     // p - n1 - q
     WFA fa1;
-    wali_key_t p = KeyFactory::get_key("p");
-    wali_key_t q = KeyFactory::get_key("q");
+    wali_key_t p = getKey("p");
+    wali_key_t q = getKey("q");
     fa1.set_initial_state( p );
     fa1.add_final_state( q );
-    fa1.add_trans( p, KeyFactory::get_key("n1"), q, r);
+    fa1.add_trans( p, getKey("n1"), q, r);
 
     fa1.print( cout << "WFA 1\n" ) << std::endl;
 
     // m - n1 - q 
     WFA fa2;
-    wali_key_t m = KeyFactory::get_key("m");
+    wali_key_t m = getKey("m");
     fa2.set_initial_state( m );
     fa2.add_final_state( q );
-    fa2.add_trans( m,KeyFactory::get_key("n1"),q,r);
+    fa2.add_trans( m,getKey("n1"),q,r);
     fa2.print( cout << "WFA 2\n" ) << std::endl;
 
 
