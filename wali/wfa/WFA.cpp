@@ -150,6 +150,56 @@ namespace wali
             insert( t );
         }
 
+        //
+        // Erase a trans
+        // Must remove from kpmap and eps_map
+        //
+        void WFA::erase(
+                wali_key_t from,
+                wali_key_t stack,
+                wali_key_t to )
+        {
+            // ignore weight on Trans
+            Trans terase(from,stack,to,0);
+            kp_map_t::iterator kpit = kpmap.find( terase.keypair() );
+
+            if( kpit != kpmap.end() ) {
+                // remove from kpmap
+                // This loop could be moved to its own method
+                trans_list_t& ls = kpit->second;
+                trans_list_t::iterator lsit = ls.begin();
+                trans_list_t::iterator lsitEND = ls.end();
+                for( ; lsit != lsitEND ; lsit++ ) {
+                    if( terase.equal( *lsit ) ) {
+                        ls.erase(lsit);
+                        break;
+                    }
+                }
+                if( WALI_EPSILON == stack ) {
+                    // remove from epsmap
+                    // This loop could be moved to its own method
+                    eps_map_t::iterator epit = eps_map.find( to );
+                    if( epit != eps_map.end() ) {
+                        ls = epit->second;
+                        lsit = ls.begin();
+                        lsitEND = ls.end();
+                        for( ; lsit != lsitEND ; lsit++ ) {
+                            if( terase.equal( *lsit ) ) {
+                                ls.erase(lsit);
+                                break;
+                            }
+                        }
+                    }
+                    //else {
+                    //attempt to remove non existing Trans
+                    //}
+                }
+            }
+            //else {
+            //attempt to remove non existing Trans
+            //}
+        }
+
         bool WFA::find( 
                 wali_key_t p,
                 wali_key_t g,

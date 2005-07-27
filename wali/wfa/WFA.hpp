@@ -140,6 +140,16 @@ namespace wali
                 virtual void add_trans( Trans * t );
 
                 /*!
+                 * @brief erase Trans
+                 *
+                 * Removes Trans (from,stack,to) from the WFA if it exists.
+                 */
+                virtual void erase(
+                        wali_key_t from,
+                        wali_key_t stack,
+                        wali_key_t to );
+
+                /*!
                  * @brief return true if transition matching (p,g,q) exists
                  * and copy that transition into the ref parameter t
                  *
@@ -289,7 +299,7 @@ namespace wali
             protected:
                 kp_map_t kpmap;          //! < map from KeyPair to list of trans
                 state_map_t state_map;   //! < map from key to State
-                eps_map_t eps_map;       //! < map from to state to list of eps trans
+                eps_map_t eps_map;       //! < map from "to state" to list of eps trans ending in "to state"
                 wali_key_t init_state;   //! < initial state of WFA
                 std::set< wali_key_t > F;//! < set of final states
                 query_t query;           //! < determine the extend order for path_summary
