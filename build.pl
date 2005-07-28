@@ -28,11 +28,12 @@ if( my $val = $ENV{'WALi_HOME'} ) {
 else {
     print "ENV{'WALi_HOME'} not defined. Defaulting to '.'\n";
 }
-my $BUILDDIR        = "$TOPDIR/build";
 my $EDIR            = "$TOPDIR/Examples";
 my $TDIR            = "$TOPDIR/Tests";
-my $OBJDIR          = "$BUILDDIR/objects";
-my $WALiDIR         = "$TOPDIR/wali";
+my $OBJDIR          = "$TOPDIR/objects";
+my $LIBDIR          = "$TOPDIR/lib";
+my $SRCDIR          = "$TOPDIR/Source";
+my $WALiDIR         = "$SRCDIR/wali";
 my $WFADIR          = "$WALiDIR/wfa";
 my $WPDSDIR         = "$WALiDIR/wpds";
 my $EWPDSDIR        = "$WPDSDIR/ewpds";
@@ -41,7 +42,7 @@ my $OBJSFX          = "\$(OBJSFX)";
 my $CXXSFX          = ".cpp";
 my $CFLAGS          = "-g -Wall -Wformat=2 -W -fPIC";
 my $DFLAGS          = "";
-my $INCS            = "-I$TOPDIR";
+my $INCS            = "-I$SRCDIR";
 my $LIBS            = "";
 my $LIBWALi_A       = "libwali.a";
 my $LIBWALi_SO      = "libwali\$(SOSFX)";
@@ -111,6 +112,7 @@ print MAKEFILE "UNAME := \$(shell which uname)\n";
 print MAKEFILE "OS := \$(shell \$(UNAME) -s)\n";
 print MAKEFILE "include Makefile.\$(OS)\n";
 print MAKEFILE "\$(shell mkdir -p $OBJDIR)\n";
+print MAKEFILE "\$(shell mkdir -p $LIBDIR)\n";
 
 #
 # Generate make commands
@@ -120,13 +122,13 @@ print MAKEFILE "\n.SILENT:\n\n";
 #
 # Generate all target defs
 #
-print MAKEFILE "all: $BUILDDIR/$LIBWALi_SO $BUILDDIR/$LIBWALi_A\n\n";
+print MAKEFILE "all: $LIBDIR/$LIBWALi_SO $LIBDIR/$LIBWALi_A\n\n";
 
 #
 # Generate clean
 #
 print MAKEFILE "\n.PHONY: clean\n";
-print MAKEFILE "clean:\n\t rm -rf $BUILDDIR/$LIBWALi_A $BUILDDIR/$LIBWALi_SO";
+print MAKEFILE "clean:\n\t rm -rf $LIBDIR/$LIBWALi_A $LIBDIR/$LIBWALi_SO";
 print_obj_files();
 print MAKEFILE "\n\t\$(MAKE) -C $TDIR clean\n\n";
 
@@ -151,20 +153,20 @@ foreach my $tmp (@WALi_FILES) {
 # Generate libwpds++.a def
 #
 print MAKEFILE "\n";
-print MAKEFILE "$BUILDDIR/$LIBWALi_A:";
+print MAKEFILE "$LIBDIR/$LIBWALi_A:";
 print_obj_files();
 print MAKEFILE "\n";
-print MAKEFILE "\t\@echo \"Creating $BUILDDIR/$LIBWALi_A...\"\n";
+print MAKEFILE "\t\@echo \"Creating $LIBDIR/$LIBWALi_A...\"\n";
 print MAKEFILE "\tar rcs \$\@ \$\^";
 print MAKEFILE "\n\n";
 
 #
 # Generate libwpds++.so def
 #
-print MAKEFILE "$BUILDDIR/$LIBWALi_SO:";
+print MAKEFILE "$LIBDIR/$LIBWALi_SO:";
 print_obj_files();
 print MAKEFILE "\n";
-print MAKEFILE "\t\@echo \"Creating $BUILDDIR/$LIBWALi_SO...\"\n";
+print MAKEFILE "\t\@echo \"Creating $LIBDIR/$LIBWALi_SO...\"\n";
 print MAKEFILE "\t$CXX \$(LCFLAGS) -Wl,\$(LINKNAME),$LIBWALi_SO -o \$\@ \$\^";
 print MAKEFILE "\n\n";
 
