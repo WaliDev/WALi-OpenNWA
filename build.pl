@@ -178,3 +178,4 @@ print MAKEFILE "\n\n";
 #
 system("/usr/bin/env make -f $SRCDIR/Makefile clean") && die "system failed: $!";
 system("/usr/bin/env make -f $SRCDIR/Makefile -j2 all") && die "system failed: $!";
+exit(0);
