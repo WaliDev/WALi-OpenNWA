@@ -8,56 +8,13 @@
 #include <climits>
 #include <string>
 #include <iostream>
+#include "wali/Key.hpp"
 
 namespace wali
 {
-    typedef unsigned int wali_key_t;
+    typedef Key wali_key_t;
     static const wali_key_t WALI_EPSILON = 0;
     static const wali_key_t WALI_BAD_KEY = UINT_MAX;
-
-    /*!
-     * Defined in KeySource.hpp
-     */
-    class KeySource;
-
-    /*!
-     * Defined in KeySpace.hpp
-     */
-    class KeySpace;
-
-    /*!
-     * This class defines the wali keyspace
-     */
-    KeySpace* getKeySpace();
-
-    /*!
-     * Wrapper functions.
-     * Call same method of class KeySpace using
-     * the wali::KeySpace object.
-     */
-    wali_key_t getKey( KeySource * ks );
-    wali_key_t getKey( const std::string& s );
-    wali_key_t getKey( int i );
-    wali_key_t getKey( wali_key_t k1, wali_key_t k2 );
-
-    /*!
-     * Return KeySource associated with the key k
-     */
-    KeySource* getKeySource( wali_key_t k );
-
-    /*!
-     * Prints key k to std::ostream o
-     * Essentially performs the lookup from wali_key_t to KeySource and calls
-     * KeySource::print
-     */
-    std::ostream& printKey( std::ostream& o, wali_key_t k );
-
-    /*!
-     * Returns string representation of the key
-     * Essentially performs the lookup from wali_key_t to KeySource and calls
-     * KeySource::to_string
-     */
-    std::string key2str( wali_key_t k );
 
 } // namespace wali
 
@@ -83,7 +40,7 @@ namespace wali
 #   if !defined(_CPPRTTI)
 #       error RTTI is required by WALi.
 #   endif
-#endif
+#endif // defined(__GNUC__)
 
 #endif  // wali_COMMON_GUARD
 

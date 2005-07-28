@@ -64,6 +64,7 @@ my @WALi_FILES = (
     ,"$WALiDIR/SemElem$CXXSFX"
     ,"$WALiDIR/SemElemPair$CXXSFX"
     ,"$WALiDIR/Worklist$CXXSFX"
+    ,"$WALiDIR/Key$CXXSFX"
     ,"$WALiDIR/KeySpace$CXXSFX"
     ,"$WALiDIR/IntSource$CXXSFX"
     ,"$WALiDIR/StringSource$CXXSFX"
