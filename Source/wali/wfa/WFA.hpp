@@ -201,7 +201,18 @@ namespace wali
                  *
                  * @see wali::wfa::WeightMaker
                  */
-                virtual WFA intersect( WeightMaker& wmaker , WFA& fa );
+                WFA intersect( WeightMaker& wmaker , WFA& fa );
+
+                /*!
+                 * Intersect this with parameter fa. The result is stored in
+                 * parameter dest. Parameter dest is cleared before any
+                 * results are stored. The parameter WeightMaker determines
+                 * how intersection should join the weights on matching
+                 * transitions.
+                 *
+                 * NOTE: For now this means (dest != this) && (dest != fa).
+                 */
+                virtual void intersect( WeightMaker& wmaker , WFA& fa, WFA& dest );
 
                 /*!
                  * Performs path summary. Simply calls the path_summary with

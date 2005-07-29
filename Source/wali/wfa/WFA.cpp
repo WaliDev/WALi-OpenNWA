@@ -281,34 +281,61 @@ namespace wali
         }
 
         /* 
-         * Intersect 2 WFAs
+         * Intersect this and fa, returning the result
          */
         WFA WFA::intersect( WeightMaker& wmaker , WFA& fa )
         {
             WFA dest;
-            // do init states
-            dest.set_initial_state(
-                    getKey(initial_state(),fa.initial_state()) );
+            intersect(wmaker,fa,dest);
+            return dest;
+        }
 
-            // do final states
-            // Pairwise cross of the sets
-            std::set< wali_key_t >::iterator keyit = F.begin();
-            std::set< wali_key_t >::iterator keyitEND = F.end();
-            for( ; keyit != keyitEND ; keyit++ )
-            {
-                std::set< wali_key_t >::iterator fait = fa.F.begin();
-                std::set< wali_key_t >::iterator faitEND = fa.F.end();
-                for( ; fait != faitEND ; fait++ )
-                {
-                    dest.add_final_state( getKey(*keyit,*fait) );
-                }
-            }
-
+        /*!
+         * Intersect this and fa, storing the result in dest
+         */
+        void WFA::intersect(
+                WeightMaker& wmaker
+                , WFA& fa
+                , WFA& dest )
+        {
             // Hash transitions of fa on stack symbol. Then probe the hash
             // with this's transitions to add transitions to dest
             StackHasher hashfa;
             fa.for_each(hashfa);
 
+            // Store init state
+            Key dest_init_state = getKey(initial_state(),fa.initial_state());
+
+            // Store final states
+            // Pairwise cross of the sets
+            std::set< Key > dest_final_states;
+            std::set< Key >::iterator keyit = F.begin();
+            std::set< Key >::iterator keyitEND = F.end();
+            for( ; keyit != keyitEND ; keyit++ )
+            {
+                std::set< Key >::iterator fait = fa.F.begin();
+                std::set< Key >::iterator faitEND = fa.F.end();
+                for( ; fait != faitEND ; fait++ )
+                {
+                    dest_final_states.insert( getKey(*keyit,*fait) );
+                }
+            }
+
+            // Reset dest
+            dest.clear();
+
+            // Set dest init state
+            dest.set_initial_state( dest_init_state );
+
+            // Set dest final states
+            keyit = dest_final_states.begin();
+            keyitEND = dest_final_states.end();
+            for( ; keyit != keyitEND ; keyit++ )
+            {
+                dest.add_final_state(*keyit);
+            }
+
+            // Perform intersection
             kp_map_t::iterator kpit = kpmap.begin();
             kp_map_t::iterator kpitEND = kpmap.end();
             for( ; kpit != kpitEND ; kpit++ )
@@ -347,8 +374,6 @@ namespace wali
                     }
                 }
             }
-
-            return dest;
         }
 
         /*

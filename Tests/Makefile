@@ -11,13 +11,13 @@ clean:
 	rm -f *.o *~ core $(TESTS)
 
 t1: t1.cpp ../Examples/Reach/Reach.cpp
-	$(CXX) $(CXXFLAGS) -o $@ $^ -lwali -L../lib
+	$(CXX) $(CXXFLAGS) -o $@ $^ -L../lib -lwali
 
 t2: t2.cpp ../Examples/Reach/Reach.cpp
-	$(CXX) $(CXXFLAGS) -o $@ $^ -lwali -L../lib
+	$(CXX) $(CXXFLAGS) -o $@ $^ -L../lib -lwali
 
 t3: t3.cpp ../Examples/Reach/Reach.cpp
-	$(CXX) $(CXXFLAGS) -o $@ $^ -lwali -L../lib
+	$(CXX) $(CXXFLAGS) -o $@ $^ -L../lib -lwali
 
 t4: t4.cpp ../Examples/Reach/Reach.cpp
-	$(CXX) $(CXXFLAGS) -o $@ $^ -lwali -L../lib
+	$(CXX) $(CXXFLAGS) -o $@ $^ -L../lib -lwali
