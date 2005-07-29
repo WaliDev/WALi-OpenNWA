@@ -34,17 +34,18 @@ my $WFADIR          = "$WALiDIR/wfa";
 my $WPDSDIR         = "$WALiDIR/wpds";
 my $EWPDSDIR        = "$WPDSDIR/ewpds";
 my $WITNESSDIR      = "$WALiDIR/witness";
-my $OBJSFX          = "\$(OBJSFX)";
+my $OBJSFX          = ".lo";
 my $CXXSFX          = ".cpp";
-my $CFLAGS          = "-g -Wall -Wformat=2 -W -fPIC";
-my $DFLAGS          = "";
+my $CFLAGS          = "-g -Wall -Wformat=2 -W";
+my $CPPFLAGS        = "";
+my $LDFLAGS         = "";
 my $INCS            = "-I$SRCDIR";
 my $LIBS            = "";
-my $LIBWALi_A       = "libwali.a";
-my $LIBWALi_SO      = "libwali\$(SOSFX)";
-#Check for g++
-my $CXX             = "/usr/bin/g++";
-my $CC              = "/usr/bin/gcc";
+my $LIBWALi         = "libwali.la";
+my $CXX             = "g++";
+my $CC              = "gcc";
+
+# Check for specific GCC version to be used
 if( my $val = $ENV{'GCC_HOME'} ) {
     $CXX = "$val/bin/g++";
     $CC  = "$val/bin/gcc";
@@ -52,6 +53,10 @@ if( my $val = $ENV{'GCC_HOME'} ) {
 else {
     print STDERR "ENV{'GCC_HOME'} not defined. Defauling to \"$CXX\" & \"$CC\"\n";
 }
+
+# Preprend libtool
+$CXX = "libtool " . $CXX;
+$CC  = "libtool " . $CC;
 
 my @WALi_FILES = (
 # namespace wali
@@ -116,6 +121,13 @@ print MAKEFILE "OS := \$(shell \$(UNAME) -s)\n";
 print MAKEFILE "\$(shell mkdir -p $OBJDIR)\n";
 print MAKEFILE "\$(shell mkdir -p $LIBDIR)\n";
 print MAKEFILE "include $SRCDIR/Makefile.\$(OS)\n";
+print MAKEFILE "CC=$CXX\n";
+print MAKEFILE "CXX=$CXX\n";
+print MAKEFILE "CFLAGS=-g -Wall -Wformat=2 -W\n";
+print MAKEFILE "CPPFLAGS=$CPPFLAGS\n";
+print MAKEFILE "LDFLAGS=$LDFLAGS\n";
+print MAKEFILE "LIBS=$LIBS\n";
+print MAKEFILE "\n.SUFFIXES: $CXXSFX $OBJSFX\n";
 
 #
 # Generate make commands
@@ -125,13 +137,13 @@ print MAKEFILE "\n.SILENT:\n\n";
 #
 # Generate all target defs
 #
-print MAKEFILE "all: $LIBDIR/$LIBWALi_SO $LIBDIR/$LIBWALi_A\n\n";
+print MAKEFILE "all: $LIBDIR/$LIBWALi\n\n";
 
 #
 # Generate clean
 #
 print MAKEFILE "\n.PHONY: clean\n";
-print MAKEFILE "clean:\n\t rm -rf $LIBDIR/$LIBWALi_A $LIBDIR/$LIBWALi_SO";
+print MAKEFILE "clean:\n\t rm -rf $LIBDIR/$LIBWALi";
 print_obj_files();
 print MAKEFILE "\n\t\$(MAKE) -C $TDIR clean\n\n";
 
@@ -149,33 +161,22 @@ foreach my $tmp (@WALi_FILES) {
     my ($name,$path,$suffix) = fileparse($tmp,$CXXSFX);
     print MAKEFILE "$OBJDIR/$name$OBJSFX: $tmp\n";
     print MAKEFILE "\t\@echo \"Compiling $name$suffix ...\"\n";
-    print MAKEFILE "\t$CXX $CFLAGS $DFLAGS $INCS -o $OBJDIR/$name$OBJSFX -c $tmp\n\n";
+    print MAKEFILE "\t$CXX $CFLAGS $CPPFLAGS $INCS -o \$\@ -c \$^\n\n";
 }
 
 #
-# Generate libwpds++.a def
+# Generate libwpds++.la def
 #
-print MAKEFILE "\n";
-print MAKEFILE "$LIBDIR/$LIBWALi_A:";
+print MAKEFILE "$LIBDIR/$LIBWALi:";
 print_obj_files();
 print MAKEFILE "\n";
-print MAKEFILE "\t\@echo \"Creating $LIBDIR/$LIBWALi_A...\"\n";
-print MAKEFILE "\tar rcs \$\@ \$\^";
-print MAKEFILE "\n\n";
-
-#
-# Generate libwpds++.so def
-#
-print MAKEFILE "$LIBDIR/$LIBWALi_SO:";
-print_obj_files();
-print MAKEFILE "\n";
-print MAKEFILE "\t\@echo \"Creating $LIBDIR/$LIBWALi_SO...\"\n";
-print MAKEFILE "\t$CXX \$(LCFLAGS) -Wl,\$(LINKNAME),$LIBWALi_SO -o \$\@ \$\^";
+print MAKEFILE "\t\@echo \"Creating $LIBDIR/$LIBWALi...\"\n";
+print MAKEFILE "\t$CXX -avoid-version -rpath $LIBDIR -o \$\@ \$\^ $LDFLAGS $LIBS";
 print MAKEFILE "\n\n";
 
 #
 # make clean ; make -j2 all
 #
 system("/usr/bin/env make -f $SRCDIR/Makefile clean") && die "system failed: $!";
-system("/usr/bin/env make -f $SRCDIR/Makefile -j2 all") && die "system failed: $!";
+system("/usr/bin/env make -f $SRCDIR/Makefile all") && die "system failed: $!";
 exit(0);

@@ -1,4 +1,4 @@
-CXX=g++
+CXX=libtool g++
 CXXBASE=-ggdb -Wall -W -Werror -Wformat=2
 INCLUDE=-I../Source -I..
 CXXFLAGS=$(CXXBASE) $(INCLUDE)
@@ -8,16 +8,21 @@ all: $(TESTS)
 
 .PHONY: clean
 clean:
-	rm -f *.o *~ core $(TESTS)
+	rm -f *.o *.lo *.dot *.xml *~ core $(TESTS)
 
-t1: t1.cpp ../Examples/Reach/Reach.cpp
-	$(CXX) $(CXXFLAGS) -o $@ $^ -L../lib -lwali
+.SUFFIXES: .lo .cpp
 
-t2: t2.cpp ../Examples/Reach/Reach.cpp
-	$(CXX) $(CXXFLAGS) -o $@ $^ -L../lib -lwali
+.cpp.lo:
+	$(CXX) $(CXXFLAGS) -o $@ -c $^
 
-t3: t3.cpp ../Examples/Reach/Reach.cpp
-	$(CXX) $(CXXFLAGS) -o $@ $^ -L../lib -lwali
+t1: t1.lo ../Examples/Reach/Reach.lo
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lwali
 
-t4: t4.cpp ../Examples/Reach/Reach.cpp
-	$(CXX) $(CXXFLAGS) -o $@ $^ -L../lib -lwali
+t2: t2.lo ../Examples/Reach/Reach.lo
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lwali
+
+t3: t3.lo ../Examples/Reach/Reach.lo
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lwali
+
+t4: t4.lo ../Examples/Reach/Reach.lo
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lwali
