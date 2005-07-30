@@ -14,6 +14,10 @@ use Carp();
 local $SIG{__WARN__} = \&Carp::cluck;
 use File::Basename;
 use Cwd;
+use POSIX;
+
+# Find current system's uname info.
+my($kernel, $hostname, $release, $version, $hardware) = uname();
 
 # Set PATH here b/c we fork make later
 $ENV{'PATH'}        = '/bin:/usr/bin:/usr/local/bin';
@@ -56,9 +60,14 @@ else {
     print STDERR "ENV{'GCC_HOME'} not defined. Defauling to \"$CXX\" & \"$CC\"\n";
 }
 
-# Preprend libtool
-$CXX = "libtool " . $CXX;
-$CC  = "libtool " . $CC;
+# libtool
+
+my $CCLIBTOOL = "libtool --mode=compile";
+my $LDLIBTOOL = "libtool --mode=link";
+if( $kernel eq "Darwin" ) {
+    $CCLIBTOOL = "g" . $CCLIBTOOL;
+    $LDLIBTOOL = "g" . $LDLIBTOOL;
+}
 
 my @WALi_FILES = (
 # namespace wali
@@ -158,7 +167,7 @@ foreach my $tmp (@WALi_FILES) {
     my ($name,$path,$suffix) = fileparse($tmp,$CXXSFX);
     print MAKEFILE "$OBJDIR/$name$OBJSFX: $tmp\n";
     print MAKEFILE "\t\@echo \"Compiling $name$suffix ...\"\n";
-    print MAKEFILE "\t$CXX $CFLAGS $CPPFLAGS $INCS -o \$\@ -c \$^\n\n";
+    print MAKEFILE "\t$CCLIBTOOL $CXX $CFLAGS $CPPFLAGS $INCS -o \$\@ -c \$^\n\n";
 }
 
 #
@@ -168,7 +177,7 @@ print MAKEFILE "$LIBDIR/$LIBWALi:";
 print_obj_files();
 print MAKEFILE "\n";
 print MAKEFILE "\t\@echo \"Creating $LIBDIR/$LIBWALi...\"\n";
-print MAKEFILE "\t$CXX -avoid-version -rpath $LIBDIR -o \$\@ \$\^ $LDFLAGS $LIBS";
+print MAKEFILE "\t$LDLIBTOOL $CXX -avoid-version -rpath $LIBDIR -o \$\@ \$\^ $LDFLAGS $LIBS";
 print MAKEFILE "\n\n";
 
 #
