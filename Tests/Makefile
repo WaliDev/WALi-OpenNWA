@@ -1,6 +1,8 @@
-CXX=libtool g++
+CXX=glibtool --mode=compile g++
+CLINK=glibtool --mode=link g++
 CXXBASE=-ggdb -Wall -W -Werror -Wformat=2
 INCLUDE=-I../Source -I..
+LIBS=-L../lib -lwali
 CXXFLAGS=$(CXXBASE) $(INCLUDE)
 TESTS=t1 t2 t3 t4
 
@@ -16,13 +18,13 @@ clean:
 	$(CXX) $(CXXFLAGS) -o $@ -c $^
 
 t1: t1.lo ../Examples/Reach/Reach.lo
-	$(CXX) $(CXXFLAGS) -o $@ $^ -lwali
+	$(CLINK) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
 t2: t2.lo ../Examples/Reach/Reach.lo
-	$(CXX) $(CXXFLAGS) -o $@ $^ -lwali
+	$(CLINK) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
 t3: t3.lo ../Examples/Reach/Reach.lo
-	$(CXX) $(CXXFLAGS) -o $@ $^ -lwali
+	$(CLINK) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
 t4: t4.lo ../Examples/Reach/Reach.lo
-	$(CXX) $(CXXFLAGS) -o $@ $^ -lwali
+	$(CLINK) $(CXXFLAGS) -o $@ $^ $(LIBS)

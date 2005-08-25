@@ -7,7 +7,6 @@
 #include <fstream>
 #include "wali/Common.hpp"
 #include "wali/wfa/WFA.hpp"
-#include "wali/wpds/WitnessWPDS.hpp"
 // For debug info in main()
 #include "wali/wfa/Trans.hpp"
 #include "wali/wfa/State.hpp"
@@ -25,7 +24,6 @@
 //
 void dot()
 {
-    using wali::wpds::WitnessWPDS;
     using wali::wpds::WPDS;
     using wali::getKey;
     using wali::wali_key_t;

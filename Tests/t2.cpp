@@ -6,7 +6,8 @@
 #include <iostream>
 #include "wali/Common.hpp"
 #include "wali/wfa/WFA.hpp"
-#include "wali/wpds/WitnessWPDS.hpp"
+#include "wali/wpds/WPDS.hpp"
+#include "wali/witness/WitnessWrapper.hpp"
 // For debug info in main()
 #include "wali/wfa/Trans.hpp"
 #include "wali/wfa/State.hpp"
@@ -23,7 +24,6 @@
 //
 void dot()
 {
-    using wali::wpds::WitnessWPDS;
     using wali::wpds::WPDS;
     using wali::getKey;
     using wali::wali_key_t;
@@ -32,7 +32,10 @@ void dot()
     using std::cout;
     Reach *reach = new Reach(true);
 
-    WitnessWPDS* pds = new WitnessWPDS();
+    
+    wali::witness::WitnessWrapper* wrapper = new wali::witness::WitnessWrapper();
+
+    WPDS* pds = new WPDS( wrapper );
     wali_key_t p = getKey("p");
     wali_key_t acc = getKey("acc");
     wali_key_t n0 = getKey("n0");
@@ -47,7 +50,7 @@ void dot()
     pds->add_rule(p,n1,p,n3,reach);
     pds->add_rule(p,n2,p,n3,reach);
 
-    pds->print( std::cout << "---- WitnessWPDS ----\n" ) << std::endl;
+    pds->print( std::cout << "---- WPDS ----\n" ) << std::endl;
     WFA fain;
     fain.set_initial_state(p);
     fain.add_final_state(acc);
@@ -57,6 +60,7 @@ void dot()
     WFA faout = pds->poststar(fain);
     faout.print( cout << "----- WFA AFTER -----\n" ) << std::endl;
 
+    delete wrapper;
     delete pds;
 }
 
