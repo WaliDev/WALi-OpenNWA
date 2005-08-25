@@ -5,6 +5,9 @@
  * @author Nick Kidd
  */
 
+#include "wali/Common.hpp"
+#include "wali/Printable.hpp"
+#include "wali/Key.hpp"
 #include "wali/witness/Witness.hpp"
 #include "wali/wpds/Rule.hpp"
 
@@ -15,6 +18,30 @@ namespace wali
 
     namespace witness
     {
+        class RuleStub : public Printable
+        {
+            public:
+                RuleStub( const Rule& r );
+
+                Key from_state();
+
+                Key from_stack();
+
+                Key to_state();
+
+                Key to_stack1();
+
+                Key to_stack2();
+
+                sem_elem_t weight();
+
+                std::ostream& print( std::ostream& o ) const;
+
+            protected:
+                Key fs,fstk,ts,tstk1,tstk2;
+                sem_elem_t se;
+        };
+
         /*!
          * @class WitnessRule
          *
@@ -49,10 +76,10 @@ namespace wali
                  */
                 virtual std::ostream& pretty_print( std::ostream& o,size_t depth ) const;
 
-                const Rule& rule() const;
+                RuleStub& rule_stub();
 
             protected:
-                Rule r;
+                RuleStub stub;
         };
 
     } // namespace witness

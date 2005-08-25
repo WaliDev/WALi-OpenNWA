@@ -10,6 +10,78 @@ namespace wali
 
     namespace witness
     {
+        ///////////////////
+        // class RuleStub
+        ///////////////////
+        RuleStub::RuleStub( const Rule& r )
+            : fs(r.from_state())
+            , fstk(r.from_stack())
+            , ts(r.to_state())
+            , tstk1(r.to_stack1())
+            , tstk2(r.to_stack2())
+            , se(r.weight())
+            {}
+
+        Key RuleStub::from_state()
+        {
+            return fs;
+        }
+
+        Key RuleStub::from_stack()
+        {
+            return fs;
+        }
+
+        Key RuleStub::to_state()
+        {
+            return ts;
+        }
+
+        Key RuleStub::to_stack1()
+        {
+            return tstk1;
+        }
+
+        Key RuleStub::to_stack2()
+        {
+            return tstk2;
+        }
+
+        sem_elem_t RuleStub::weight()
+        {
+            return se;
+        }
+
+        std::ostream& RuleStub::print( std::ostream& o ) const
+        {
+            o << "<";
+            o << key2str(fs);
+            o << ", ";
+            o << key2str(fstk);
+            o << "> -> <";
+            o << key2str(ts);
+            o << ", ";
+            if( tstk1 != WALI_EPSILON )
+            {
+                o << key2str(tstk1);
+                if( tstk2 != WALI_EPSILON )
+                {
+                    o << " ";
+                    o << key2str(tstk2);
+                }
+            }
+            else {
+                // sanity check
+                assert( WALI_EPSILON == tstk2);
+            }
+            o << ">";
+            o << "\t" << se->to_string();
+            return o;
+        }
+
+        ///////////////////
+        // class WitnessRule
+        ///////////////////
         WitnessRule::WitnessRule( const Rule& r_t ) :
             Witness(r_t.weight()),
             // TODO :
@@ -20,7 +92,7 @@ namespace wali
             //fconfig(r_t->from_state(),r_t->from_stack()),
             //tconfig(r_t->to_state(),r_t->to_stack1()),
             //r(&fconfig,&tconfig,r_t->to_stack2,r_t->weight())
-            r(r_t)
+            stub(r_t)
         {
         }
 
@@ -34,13 +106,13 @@ namespace wali
         {
             format_depth(o,depth);
             o << "WitnessRule: ";
-            r.print(o) << std::endl;
+            stub.print(o) << std::endl;
             return o;
         }
 
-        const Rule& WitnessRule::rule() const
+        RuleStub& WitnessRule::rule_stub()
         {
-            return r;
+            return stub;
         }
 
     } // namespace witness
