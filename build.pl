@@ -94,7 +94,7 @@ my @WALi_FILES = (
     , "$WPDSDIR/RuleFunctor$CXXSFX"
     , "$WPDSDIR/LinkedTrans$CXXSFX"
     , "$WPDSDIR/WPDS$CXXSFX"
-    , "$WPDSDIR/WitnessWPDS$CXXSFX"
+    , "$WPDSDIR/Wrapper$CXXSFX"
 #namespace wali::wpds::ewpds
     , "$EWPDSDIR/EWPDS$CXXSFX"
     , "$EWPDSDIR/ERule$CXXSFX"
@@ -107,6 +107,7 @@ my @WALi_FILES = (
     , "$WITNESSDIR/WitnessTrans$CXXSFX"
     , "$WITNESSDIR/Visitor$CXXSFX"
     , "$WITNESSDIR/VisitorDot$CXXSFX"
+    , "$WITNESSDIR/WitnessWrapper$CXXSFX"
 );
 
 sub print_obj_files()
