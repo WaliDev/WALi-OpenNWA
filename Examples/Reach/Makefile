@@ -1,10 +1,11 @@
-CXX=g++
+CXX=glibtool --mode=compile g++
+CLINK=glibtool --mode=link g++
 CXXBASE=-g -Wall -O2
 CXXFLAGS=$(CXXBASE)
 CXXSFX=.cpp
 WALI_DIR=../..
-INCLUDE=-I. -I$(WALI_DIR)
-LIBS=-L$(WALI_DIR)/build -lwali
+INCLUDE=-I. -I$(WALI_DIR)/Source
+LIBS=-L$(WALI_DIR)/lib -lwali
 SRCS=ExReach$(CXXSFX) Reach$(CXXSFX)
 OBJS=$(SRCS:$(CXXSFX)=.o)
 BINARY=ExReach
@@ -20,7 +21,7 @@ $(CXXSFX).o:
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -o $@ -c $<
 
 $(BINARY): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(INCLUDE) $^ -o $@ $(LIBS)
+	$(CLINK) $(CXXFLAGS) $(INCLUDE) $^ -o $@ $(LIBS)
 
 
 #include $(SRCS:$(CXXSFX)=.d) 
