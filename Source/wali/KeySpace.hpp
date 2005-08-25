@@ -18,6 +18,10 @@ namespace wali
     class KeySpace
     {
         public:
+            KeySpace() {}
+
+            ~KeySpace();
+
             /*!
              * get_key returns the unique wali_key_t associated with the
              * KeySource* ks. If no such key exists, a new wali_key_t will be

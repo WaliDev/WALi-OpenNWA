@@ -11,6 +11,12 @@
 
 namespace wali
 {
+    KeySpace::~KeySpace()
+    {
+        clear();
+        std::cerr << "~KeySpace()...\n";
+    }
+
     /*!
      * get_key returns the unique wali_key_t associated with the
      * KeySource* ks. If no such key exists, a new wali_key_t will be
