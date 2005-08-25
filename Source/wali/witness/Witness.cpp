@@ -100,6 +100,7 @@ namespace wali
 
         std::ostream& Witness::print( std::ostream& o ) const
         {
+            o << "\n";
             return pretty_print(o,0);
         }
 

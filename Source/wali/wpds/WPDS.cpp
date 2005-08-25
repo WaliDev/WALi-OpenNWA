@@ -13,6 +13,7 @@
 #include "wali/wpds/Rule.hpp"
 #include "wali/wpds/RuleFunctor.hpp"
 #include "wali/wpds/LinkedTrans.hpp"
+#include "wali/wpds/Wrapper.hpp"
 #include <iostream>
 #include <cassert>
 
@@ -23,12 +24,12 @@ namespace wali
 {
     namespace wpds
     {
-        class TransCopyLinker : public wali::wfa::ConstTransFunctor
+        class TransCopyLinker : public wali::wfa::TransFunctor
         {
             public:
                 TransCopyLinker( WPDS & w, WFA & faout, Worklist * worklist );
                 virtual ~TransCopyLinker();
-                virtual void operator()( const ::wali::wfa::Trans * t );
+                virtual void operator()( ::wali::wfa::Trans * t );
 
                 WPDS & wpds;
                 WFA & fa;
@@ -53,7 +54,8 @@ namespace wali
     namespace wpds
     {
 
-        WPDS::WPDS( Worklist * wl)
+        WPDS::WPDS( Wrapper* w, Worklist * wl)
+            : wrapper(w)
         {
             if( 0 == wl )
                 wl = new Worklist();
@@ -115,10 +117,11 @@ namespace wali
                 sem_elem_t se )
         {
             rule_t r;
-            return add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se,r );
+            bool rb = add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se,r );
+            return rb;
         }
 
-        WFA WPDS::prestar( const WFA & input )
+        WFA WPDS::prestar( WFA & input )
         {
             WFA fa;
             copy_and_link( input,fa );
@@ -254,7 +257,7 @@ namespace wali
         }
 
         // TODO:
-        WFA WPDS::poststar( const WFA & input )
+        WFA WPDS::poststar( WFA & input )
         {
             WFA fa;
             copy_and_link( input,fa );
@@ -477,7 +480,7 @@ namespace wali
         //
         // link input WFA transitions to Configs
         //
-        void WPDS::copy_and_link( const WFA & in, WFA & dest )
+        void WPDS::copy_and_link( WFA & in, WFA & dest )
         {
             TransCopyLinker linker( *this,dest,worklist );
             in.for_each( linker );
@@ -520,13 +523,21 @@ namespace wali
                 if( tmp->f == f && tmp->t == t && tmp->to_stack2() == stk2 )
                 {
                     rb = true;
-                    tmp->se = tmp->se->combine(se);
+                    if( wrapper ) {
+                        tmp->se = tmp->se->combine(wrapper->wrap(*tmp));
+                    }
+                    else {
+                        tmp->se = tmp->se->combine(se);
+                    }
                     r = tmp;
                     break;
                 }
             }
             if( !rb ) {
                 r =  new Rule(f,t,stk2,se);
+                if( wrapper ) {
+                    r->weight( wrapper->wrap(*r) );
+                }
                 f->forward().push_back(r);
                 t->backward().push_back(r);
             }
@@ -619,12 +630,18 @@ namespace wali
 
         TransCopyLinker::~TransCopyLinker() {}
 
-        void TransCopyLinker::operator()( const Trans * orig )
+        void TransCopyLinker::operator()( Trans * orig )
         {
             Config *c = wpds.make_config( orig->from(),orig->stack() );
-            LinkedTrans *t =
-                new LinkedTrans(orig->from(),orig->stack(),orig->to(),
+            LinkedTrans *t;
+            if( wpds.wrapper ) {
+                t = new LinkedTrans(orig->from(),orig->stack(),orig->to(),
+                        wpds.wrapper->wrap(*orig),c);
+            }
+            else {
+                t = new LinkedTrans(orig->from(),orig->stack(),orig->to(),
                         orig->weight(),c);
+            }
 
             // fa.add_trans takes ownership of passed in pointer
             fa.add_trans( t );
@@ -638,7 +655,7 @@ namespace wali
 } // namespace wali
 
 /* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
 */

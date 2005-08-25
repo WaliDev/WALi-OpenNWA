@@ -37,7 +37,7 @@ namespace wali
                  * @see Rule
                  *
                  */
-                WitnessRule( rule_t r );
+                WitnessRule( const Rule& r );
 
                 /*!
                  * Destructor does nothing.

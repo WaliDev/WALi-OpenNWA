@@ -24,6 +24,7 @@ namespace wali
         class RuleFunctor;
         class ConstRuleFunctor;
         class TransCopyLinker;
+        class Wrapper;
 
         namespace ewpds
         {
@@ -44,7 +45,7 @@ namespace wali
 
                 public:
 
-                    EWPDS( Worklist * worklist = 0 );
+                    EWPDS( Wrapper * wrapper = 0, Worklist * worklist = 0 );
 
                     virtual ~EWPDS();
 
@@ -115,7 +116,7 @@ namespace wali
                      *
                      * @see WFA
                      */
-                    virtual WFA prestar( const WFA & input );
+                    virtual WFA prestar( WFA & input );
 
                     /*!
                      * @brief Perform poststar reachability query
@@ -124,7 +125,7 @@ namespace wali
                      *
                      * @see WFA
                      */
-                    virtual WFA poststar( const WFA & input );
+                    virtual WFA poststar( WFA & input );
 
                     /*!
                      * This method writes the EWPDS to the passed in 

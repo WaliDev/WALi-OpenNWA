@@ -27,6 +27,7 @@ namespace wali
         class RuleFunctor;
         class ConstRuleFunctor;
         class TransCopyLinker;
+        class Wrapper;
 
         using ::wali::wfa::WFA;
 
@@ -57,7 +58,7 @@ namespace wali
 
             public:
 
-                WPDS( Worklist * worklist = 0 );
+                WPDS( Wrapper * wrapper = 0, Worklist * worklist = 0 );
 
                 virtual ~WPDS();
 
@@ -115,7 +116,7 @@ namespace wali
                  *
                  * @see WFA
                  */
-                virtual WFA prestar( const WFA & input );
+                virtual WFA prestar( WFA & input );
 
                 /*!
                  * @brief Perform poststar reachability query
@@ -124,7 +125,7 @@ namespace wali
                  *
                  * @see WFA
                  */
-                virtual WFA poststar( const WFA & input );
+                virtual WFA poststar( WFA & input );
 
                 /*!
                  * This method writes the WPDS to the passed in 
@@ -218,7 +219,7 @@ namespace wali
                  * @see Trans
                  * 
                  */
-                virtual void copy_and_link( const WFA & in, WFA & out );
+                virtual void copy_and_link( WFA & in, WFA & out );
 
                 /*!
                  * Create the Config for the state and stack KeyPair.
@@ -312,6 +313,7 @@ namespace wali
 
 
             protected: // data members
+                Wrapper * wrapper;
                 Worklist * worklist;
                 chash_t configs;
                 std::set< Config * > rule_zeroes;

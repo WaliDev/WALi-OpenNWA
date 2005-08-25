@@ -69,7 +69,7 @@ namespace wali
 
             typedef ref_ptr<ERule> erule_t;
 
-            EWPDS::EWPDS( Worklist * w1) : WPDS(w1)
+            EWPDS::EWPDS( Wrapper * wrapper, Worklist * wl) : WPDS(wrapper, wl)
             { }
 
 
@@ -200,7 +200,7 @@ namespace wali
                 return rhash_it->second;
             }
 
-            WFA EWPDS::prestar( const WFA & input )
+            WFA EWPDS::prestar( WFA & input )
             {
                 WFA fa;
                 WPDS::copy_and_link( input,fa );
@@ -348,7 +348,7 @@ namespace wali
             }
 
             // TODO:
-            WFA EWPDS::poststar( const WFA & input )
+            WFA EWPDS::poststar( WFA & input )
             {
                 WFA fa;
                 copy_and_link_and_pair( input,fa );
