@@ -76,20 +76,20 @@ namespace wali
         std::ostream & Rule::print( std::ostream &o ) const
         {
             o << "<";
-            key2str(from_state());
+            o << key2str(from_state());
             o << ", ";
-            key2str(from_stack());
+            o << key2str(from_stack());
             o << "> -> <";
-            key2str(to_state());
+            o << key2str(to_state());
             o << ", ";
             wali_key_t stk1 = to_stack1();
             if( stk1 != WALI_EPSILON )
             {
-                key2str(stk1);
+                o << key2str(stk1);
                 if( stk2 != WALI_EPSILON )
                 {
                     o << " ";
-                    key2str(to_stack2());
+                    o << key2str(to_stack2());
                 }
             }
             else {
