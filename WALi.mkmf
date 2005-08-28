@@ -72,8 +72,26 @@
         </LibraryList>
     </Project>
 
+    <Project Name='ExReach' RelativePath='Examples/Reach/ewpds' OutputDir='Examples/Reach/ewpds'
+        BuildDir='Examples/Reach/ewpds' Type='executable' id='EWPDSExReach'>
+        <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
+        <IncludeList>
+            <item Name='WALiDir' RelativePath='../../../Source' />
+            <item Name='Reach' RelativePath='../' />
+            <item Name='ewpdsReach' RelativePath='.' />
+        </IncludeList>
+        <InputList>
+            <item Name='Reach' RelativePath='../Reach.cpp' />
+            <item Name='ExReach' RelativePath='ExReach.cpp' />
+        </InputList>
+        <LibraryList>
+            <item Name='wali' RelativePath='../../../lib' />
+        </LibraryList>
+    </Project>
+
     <ProjectGroup Name='examples' >
         <item Name='ExReach' ref='ExReach' /> 
+        <item Name='EWPDSExReach' ref='EWPDSExReach' />
     </ProjectGroup>
 
     <!--

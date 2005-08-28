@@ -24,7 +24,6 @@ fun g()
 #include <wali/wpds/Config.hpp>
 #include <wali/wfa/Trans.hpp>
 #include <wali/wfa/State.hpp>
-#include <wali/KeyFactory.hpp>
 #include "../Reach.hpp"
 #include <string>
 #include <sstream>
@@ -37,13 +36,13 @@ void doReach()
 
     Reach* reachOne = new Reach(true);
     EWPDS myEwpds;
-    wali_key_t p = wali::KeyFactory::get_key("p");
-    wali_key_t accept = wali::KeyFactory::get_key("accept");
+    wali_key_t p = wali::getKey("p");
+    wali_key_t accept = wali::getKey("accept");
     wali_key_t n[10];
     for( int i=0 ; i < 10 ; i++ ) {
         std::stringstream ss;
         ss << "n" << i;
-        n[i] = wali::KeyFactory::get_key( ss.str() );
+        n[i] = wali::getKey( ss.str() );
     }
 
     // f intraprocedural
