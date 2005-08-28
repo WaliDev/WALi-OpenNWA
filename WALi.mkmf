@@ -101,9 +101,6 @@
     <!--
         Begin Tests
     -->
-    <!--
-        End Tests
-    -->
     <!-- Test 1 -->
     <Project Name='t1' RelativePath='Tests' 
         BuildDir='Tests' OuputDir='Tests' Type='executable' id="t1">
