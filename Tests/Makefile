@@ -1,5 +1,5 @@
-CXX=glibtool --mode=compile g++
-CLINK=glibtool --mode=link g++
+CXX=libtool --mode=compile g++
+CLINK=libtool --mode=link g++
 CXXBASE=-ggdb -Wall -W -Werror -Wformat=2
 INCLUDE=-I../Source -I..
 LIBS=-L../lib -lwali
