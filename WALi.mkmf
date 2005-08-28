@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mkmf Name="WALi" id="1" RelativePath="." Default="wali">
 
-    <project Name="wali" RelativePath="Source"
+    <Project Name="wali" RelativePath="Source"
         OutputDir="lib" BuildDir="objects" Type="library" id="wali">
 
-        <compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
-        <includes>
+        <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
+        <IncludeList>
             <item Name='WALiDir' RelativePath='.' />
-        </includes>
-        <inputs>
+        </IncludeList>
+        <InputList>
             <!-- WALi -->
             <item Name="Common" RelativePath="wali/Common.cpp" />
             <item Name="Markable" RelativePath="wali/Markable.cpp" />
@@ -47,30 +47,30 @@
             <item Name="Visitor" RelativePath="wali/witness/Visitor.cpp" />
             <item Name="VisitorDot" RelativePath="wali/witness/VisitorDot.cpp" />
             <item Name="WitnessWrapper" RelativePath="wali/witness/WitnessWrapper.cpp" />
-        </inputs>
-        <libs>
-        </libs>
-    </project>
+        </InputList>
+        <LibraryList>
+        </LibraryList>
+    </Project>
 
     <!--
         Begin Examples
     -->
     <!-- Reach Example -->
-    <project Name='ExReach' RelativePath='Examples/Reach' OutputDir='Examples/Reach'
+    <Project Name='ExReach' RelativePath='Examples/Reach' OutputDir='Examples/Reach'
         BuildDir='Examples/Reach' Type='executable' id='Reach'>
-        <compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
-        <includes>
+        <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
+        <IncludeList>
             <item Name='WALiDir' RelativePath='../../Source' />
             <item Name='Reach' RelativePath='.' />
-        </includes>
-        <inputs>
+        </IncludeList>
+        <InputList>
             <item Name='Reach' RelativePath='Reach.cpp' />
             <item Name='ExReach' RelativePath='ExReach.cpp' />
-        </inputs>
-        <libs>
+        </InputList>
+        <LibraryList>
             <item Name='wali' RelativePath='../../lib' />
-        </libs>
-    </project>
+        </LibraryList>
+    </Project>
 
     <!--
         End Examples
@@ -82,75 +82,78 @@
         End Tests
     -->
     <!-- Test 1 -->
-    <project Name='t1' RelativePath='Tests' 
+    <Project Name='t1' RelativePath='Tests' 
         BuildDir='Tests' OuputDir='Tests' Type='executable' id="t2">
 
-        <compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
-        <includes>
+        <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
+        <IncludeList>
             <item Name='WALiDir' RelativePath='../Source' />
             <item Name='Reach' RelativePath='..' />
-        </includes>
-        <inputs>
+        </IncludeList>
+        <InputList>
             <item Name='t1' RelativePath='t1.cpp' />
             <item Name='Reach' RelativePath='../Examples/Reach/Reach.cpp' />
-        </inputs>
-        <libs>
+        </InputList>
+        <LibraryList>
             <item Name='wali' RelativePath='../lib' />
-        </libs>
-    </project>
+        </LibraryList>
+    </Project>
 
     <!-- Test 2 -->
-    <project Name='t2' RelativePath='Tests' 
+    <Project Name='t2' RelativePath='Tests' 
         BuildDir='Tests' OuputDir='Tests' Type='executable' id="t2">
 
-        <compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
-        <includes>
+        <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
+        <IncludeList>
             <item Name='WALiDir' RelativePath='../Source' />
             <item Name='Reach' RelativePath='..' />
-        </includes>
-        <inputs>
+        </IncludeList>
+        <InputList>
             <item Name='t2' RelativePath='t2.cpp' />
             <item Name='Reach' RelativePath='../Examples/Reach/Reach.cpp' />
-        </inputs>
-        <libs>
+        </InputList>
+        <LibraryList>
             <item Name='wali' RelativePath='../lib' />
-        </libs>
-    </project>
+        </LibraryList>
+    </Project>
 
     <!-- Test 3 -->
-    <project Name='t3' RelativePath='Tests'
+    <Project Name='t3' RelativePath='Tests'
         BuildDir='Tests' OuputDir='Tests' Type='executable' id="t3">
 
-        <compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
-        <includes>
+        <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
+        <IncludeList>
             <item Name='WALiDir' RelativePath='../Source' />
             <item Name='Reach' RelativePath='..' />
-        </includes>
-        <inputs>
+        </IncludeList>
+        <InputList>
             <item Name='t3' RelativePath='t3.cpp' />
             <item Name='Reach' RelativePath='../Examples/Reach/Reach.cpp' />
-        </inputs>
-        <libs>
+        </InputList>
+        <LibraryList>
             <item Name='wali' RelativePath='../lib' />
-        </libs>
-    </project>
+        </LibraryList>
+    </Project>
 
     <!-- Test 4 -->
-    <project Name='t4' RelativePath='Tests' 
+    <Project Name='t4' RelativePath='Tests' 
         BuildDir='Tests' OuputDir='Tests' Type='executable' id="t4">
 
-        <compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
-        <includes>
+        <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
+        <IncludeList>
             <item Name='WALiDir' RelativePath='../Source' />
             <item Name='Reach' RelativePath='..' />
-        </includes>
-        <inputs>
+        </IncludeList>
+        <InputList>
             <item Name='t4' RelativePath='t4.cpp' />
             <item Name='Reach' RelativePath='../Examples/Reach/Reach.cpp' />
-        </inputs>
-        <libs>
+        </InputList>
+        <LibraryList>
             <item Name='wali' RelativePath='../lib' />
-        </libs>
-    </project>
+        </LibraryList>
+    </Project>
 
+    <!--
+        End Tests
+    -->
 </mkmf>
