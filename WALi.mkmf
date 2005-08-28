@@ -57,7 +57,7 @@
     -->
     <!-- Reach Example -->
     <Project Name='ExReach' RelativePath='Examples/Reach' OutputDir='Examples/Reach'
-        BuildDir='Examples/Reach' Type='executable' id='Reach'>
+        BuildDir='Examples/Reach' Type='executable' id='ExReach'>
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
             <item Name='WALiDir' RelativePath='../../Source' />
@@ -72,9 +72,14 @@
         </LibraryList>
     </Project>
 
+    <ProjectGroup Name='examples' >
+        <item Name='ExReach' ref='ExReach' /> 
+    </ProjectGroup>
+
     <!--
         End Examples
     -->
+
     <!--
         Begin Tests
     -->
@@ -83,7 +88,7 @@
     -->
     <!-- Test 1 -->
     <Project Name='t1' RelativePath='Tests' 
-        BuildDir='Tests' OuputDir='Tests' Type='executable' id="t2">
+        BuildDir='Tests' OuputDir='Tests' Type='executable' id="t1">
 
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
@@ -152,6 +157,13 @@
             <item Name='wali' RelativePath='../lib' />
         </LibraryList>
     </Project>
+
+    <ProjectGroup Name='tests' >
+        <item Name='t1' ref='t1' /> 
+        <item Name='t2' ref='t2' /> 
+        <item Name='t3' ref='t3' /> 
+        <item Name='t4' ref='t4' /> 
+    </ProjectGroup>
 
     <!--
         End Tests
