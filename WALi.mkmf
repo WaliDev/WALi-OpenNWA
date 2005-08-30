@@ -90,8 +90,8 @@
     </Project>
 
     <ProjectGroup Name='examples' >
-        <item Name='ExReach' ref='ExReach' /> 
-        <item Name='EWPDSExReach' ref='EWPDSExReach' />
+        <dependency Name='ExReach' ref='ExReach' /> 
+        <dependency Name='EWPDSExReach' ref='EWPDSExReach' />
     </ProjectGroup>
 
     <!--
@@ -174,10 +174,10 @@
     </Project>
 
     <ProjectGroup Name='tests' >
-        <item Name='t1' ref='t1' /> 
-        <item Name='t2' ref='t2' /> 
-        <item Name='t3' ref='t3' /> 
-        <item Name='t4' ref='t4' /> 
+        <dependency Name='t1' ref='t1' /> 
+        <dependency Name='t2' ref='t2' /> 
+        <dependency Name='t3' ref='t3' /> 
+        <dependency Name='t4' ref='t4' /> 
     </ProjectGroup>
 
     <!--
