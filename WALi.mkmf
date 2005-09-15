@@ -60,7 +60,7 @@
     -->
     <!-- Reach Example -->
     <Project Name='ExReach' RelativePath='Examples/Reach' OutputDir='Examples/Reach'
-        BuildDir='Examples/Reach' Type='executable' id='ExReach'>
+        BuildDir='Examples/Reach' Type='executable' >
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
             <item Name='WALiDir' RelativePath='../../Source' />
@@ -75,8 +75,8 @@
         </LibraryList>
     </Project>
 
-    <Project Name='ExReach' RelativePath='Examples/Reach/ewpds' OutputDir='Examples/Reach/ewpds'
-        BuildDir='Examples/Reach/ewpds' Type='executable' id='EWPDSExReach'>
+    <Project Name='EWPDSExReach' RelativePath='Examples/Reach/ewpds' OutputDir='Examples/Reach/ewpds'
+        BuildDir='Examples/Reach/ewpds' Type='executable' >
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
             <item Name='WALiDir' RelativePath='../../../Source' />
