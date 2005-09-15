@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mkmf Name="WALi" id="1" RelativePath="." Default="wali">
+<mkmf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns='mkmf'
+           xsi:schemaLocation='mkmf /u/k/i/kidd/research/mkmf/mkmf.xsd'
+           Default='wali' RelativePath='.' >
 
     <Project Name="wali" RelativePath="Source"
-        OutputDir="lib" BuildDir="objects" Type="library" id="wali">
+        OutputDir="lib" BuildDir="objects" Type="library" >
 
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
@@ -90,8 +93,8 @@
     </Project>
 
     <ProjectGroup Name='examples' >
-        <dependency Name='ExReach' ref='ExReach' /> 
-        <dependency Name='EWPDSExReach' ref='EWPDSExReach' />
+        <dependency Name='ExReach' />
+        <dependency Name='EWPDSExReach' />
     </ProjectGroup>
 
     <!--
@@ -103,7 +106,7 @@
     -->
     <!-- Test 1 -->
     <Project Name='t1' RelativePath='Tests' 
-        BuildDir='Tests' OuputDir='Tests' Type='executable' id="t1">
+        BuildDir='Tests' OuputDir='Tests' Type='executable' >
 
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
@@ -121,7 +124,7 @@
 
     <!-- Test 2 -->
     <Project Name='t2' RelativePath='Tests' 
-        BuildDir='Tests' OuputDir='Tests' Type='executable' id="t2">
+        BuildDir='Tests' OuputDir='Tests' Type='executable' >
 
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
@@ -139,7 +142,7 @@
 
     <!-- Test 3 -->
     <Project Name='t3' RelativePath='Tests'
-        BuildDir='Tests' OuputDir='Tests' Type='executable' id="t3">
+        BuildDir='Tests' OuputDir='Tests' Type='executable' >
 
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
@@ -157,7 +160,7 @@
 
     <!-- Test 4 -->
     <Project Name='t4' RelativePath='Tests' 
-        BuildDir='Tests' OuputDir='Tests' Type='executable' id="t4">
+        BuildDir='Tests' OuputDir='Tests' Type='executable' >
 
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
@@ -174,10 +177,10 @@
     </Project>
 
     <ProjectGroup Name='tests' >
-        <dependency Name='t1' ref='t1' /> 
-        <dependency Name='t2' ref='t2' /> 
-        <dependency Name='t3' ref='t3' /> 
-        <dependency Name='t4' ref='t4' /> 
+        <dependency Name='t1' />
+        <dependency Name='t2' />
+        <dependency Name='t3' />
+        <dependency Name='t4' />
     </ProjectGroup>
 
     <!--
