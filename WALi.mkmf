@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mkmf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xmlns='mkmf'
-           xsi:schemaLocation='mkmf /u/k/i/kidd/research/mkmf/mkmf.xsd'
+           xmlns='http://www.cs.wisc.edu/~kidd/mkmf/'
+           xsi:schemaLocation='http://www.cs.wisc.edu/~kidd/mkmf/
+           http://www.cs.wisc.edu/~kidd/mkmf/mkmf.xsd'
            Default='wali' RelativePath='.' >
 
     <Project Name="wali" RelativePath="Source"
