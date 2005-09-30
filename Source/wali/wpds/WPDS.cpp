@@ -124,7 +124,13 @@ namespace wali
 
         WFA WPDS::prestar( WFA & input )
         {
-            WFA fa;
+            WFA output;
+            prestar(input,output);
+            return output;
+        }
+
+        void WPDS::prestar( WFA & input, WFA & fa )
+        {
             copy_and_link( input,fa );
 
             //
@@ -218,8 +224,6 @@ namespace wali
                     }
                 }
             }
-
-            return fa;
         }
 
         void WPDS::prestar_handle_trans(
@@ -257,10 +261,15 @@ namespace wali
             }
         }
 
-        // TODO:
         WFA WPDS::poststar( WFA & input )
         {
-            WFA fa;
+            WFA output;
+            poststar(input,output);
+            return output;
+        }
+
+        void WPDS::poststar( WFA & input, WFA & fa )
+        {
             copy_and_link( input,fa );
 
             // Generate midstates for each rule type two
@@ -320,8 +329,6 @@ namespace wali
                     }
                 }
             }
-
-            return fa;
         }
 
         void WPDS::poststar_handle_trans(

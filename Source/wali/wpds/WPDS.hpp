@@ -119,6 +119,20 @@ namespace wali
                 virtual WFA prestar( WFA & input );
 
                 /*!
+                 * @brief Perform prestar reachability query
+                 * The result of the query is stored in
+                 * the parameter WFA& output. Any transitions
+                 * in output before the query will be there
+                 * after the query but will have no effect
+                 * on the reachability query.
+                 *
+                 * @return void
+                 *
+                 * @see WFA
+                 */
+                virtual void prestar( WFA & input, WFA & output );
+
+                /*!
                  * @brief Perform poststar reachability query
                  *
                  * @return WFA
@@ -126,6 +140,20 @@ namespace wali
                  * @see WFA
                  */
                 virtual WFA poststar( WFA & input );
+
+                /*!
+                 * @brief Perform poststar reachability query.
+                 * The result of the query is stored in
+                 * the parameter WFA& output. Any transitions
+                 * in output before the query will be there
+                 * after the query but will have no effect
+                 * on the reachability query.
+                 *
+                 * @return WFA
+                 *
+                 * @see WFA
+                 */
+                virtual void poststar( WFA & input, WFA & output );
 
                 /*!
                  * This method writes the WPDS to the passed in 
