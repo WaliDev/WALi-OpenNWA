@@ -19,12 +19,13 @@ namespace wali
      * std::list to hold items.
      */
 
-    class DefaultWorklist : public ::wali::Worklist {
+    class DefaultWorklist : public ::wali::Worklist
+    {
         public:
 
-            DefaultWorklist() {}
+            DefaultWorklist();
 
-            virtual ~DefaultWorklist() {}
+            virtual ~DefaultWorklist();
 
             /*!
              * put
