@@ -6,7 +6,6 @@
  */
 
 #include "wali/Common.hpp"
-#include <list>
 
 namespace wali
 {
@@ -15,12 +14,11 @@ namespace wali
 
     /*! @class Worklist
      *
-     * The default Worklist acts as a Stack and uses
-     * std::list to hold items. All items must subclass
-     * wali::Markable. When an item is placed on a worklist,
-     * the worklist treats the item's "Markable" state as
-     * only being modified by the worklist (i.e., do not place
-     * a Markable item on two worklists at the same time).
+     * Worklist defines the interface of a worklist. All items must subclass
+     * wali::Markable. When an item is placed on a worklist, the worklist
+     * treats the item's "Markable" state as only being modified by the
+     * worklist (i.e., do not place a Markable item on two worklists at the
+     * same time).
      */
 
     class Worklist
@@ -35,7 +33,7 @@ namespace wali
             /*!
              * put
              *
-             * Put a wlmix * in the Worklist.
+             * Put a Markable * in the Worklist.
              * This method should be idempotent but
              * it really does not matter.
              */
@@ -46,7 +44,8 @@ namespace wali
              *
              * Return an item from the worklist.
              * Guaranteed only to be called if 
-             * Worklist is not empty.
+             * Worklist is not empty. May throw an exception or return 
+             * NULL if the worklist is not empty.
              *
              * @return Markable *
              */

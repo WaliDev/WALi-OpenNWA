@@ -3,17 +3,20 @@
  */
 
 #include "wali/Common.hpp"
+#include "wali/Markable.hpp"
 #include "wali/DefaultWorklist.hpp"
 
 namespace wali
 {
     namespace wpds
     {
-        using ::wali::wfa::Trans;
-
         DefaultWorklist::DefaultWorklist() : Worklist() {}
 
-        DefaultWorklist::~DefaultWorklist() {}
+        DefaultWorklist::~DefaultWorklist() {
+            // clear all items that may still be in
+            // this worklist
+            clear();
+        }
 
         void DefaultWorklist::put( Markable * item )
         {
@@ -25,10 +28,13 @@ namespace wali
 
         Markable * DefaultWorklist::get()
         {
-            Markable * item = wl.back();
-            wl.pop_back();
-            item->unmark();
-            return t;
+            Markable * item = 0;
+            if( !empty() ) {
+                item = wl.back();
+                wl.pop_back();
+                item->unmark();
+            }
+            return item;
         }
 
         bool DefaultWorklist::empty() const

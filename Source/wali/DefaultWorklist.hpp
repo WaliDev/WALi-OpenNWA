@@ -1,5 +1,5 @@
-#ifndef wali_WORKLIST_GUARD
-#define wali_WORKLIST_GUARD 1
+#ifndef wali_DEFAULT_WORKLIST_GUARD
+#define wali_DEFAULT_WORKLIST_GUARD 1
 
 /*!
  * @author Nick Kidd
@@ -11,24 +11,15 @@
 
 namespace wali
 {
-
     class Markable;
 
     /*! @class DefaultWorklist
      *
      * The default DefaultWorklist acts as a Stack and uses
-     * std::list to hold items. All items must subclass
-     * wali::Trans. When an item is placed on a worklist,
-     * the worklist treats the item's "Trans" state as
-     * only being modified by the worklist (i.e., do not place
-     * a Trans item on two worklists at the same time).
+     * std::list to hold items.
      */
 
-    class DefaultWorklist : public ::wali::Worklist
-    {
-        public:
-            using ::wali::wfa::Trans;
-
+    class DefaultWorklist : public ::wali::Worklist {
         public:
 
             DefaultWorklist() {}
@@ -38,9 +29,6 @@ namespace wali
             /*!
              * put
              *
-             * Put a wlmix * in the DefaultWorklist.
-             * This method should be idempotent but
-             * it really does not matter.
              */
             virtual void put( Markable *item );
 
@@ -48,8 +36,8 @@ namespace wali
              * get
              *
              * Return an item from the worklist.
-             * Guaranteed only to be called if 
-             * DefaultWorklist is not empty.
+             * Returns NULL if the DefaultWorklist is empty.
+             * In the future it may throw an exception
              *
              * @return Markable *
              */
@@ -76,7 +64,7 @@ namespace wali
 
 } // namespace wali
 
-#endif // wali_WORKLIST_GUARD
+#endif // wali_DEFAULT_WORKLIST_GUARD
 
 /* Yo, Emacs!
    ;;; Local Variables: ***

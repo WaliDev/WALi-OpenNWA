@@ -19,7 +19,7 @@
             <item Name="Printable" RelativePath="wali/Printable.cpp" />
             <item Name="SemElem" RelativePath="wali/SemElem.cpp" />
             <item Name="SemElemPair" RelativePath="wali/SemElemPair.cpp" />
-            <item Name="Worklist" RelativePath="wali/Worklist.cpp" />
+            <item Name="DefaultWorklist" RelativePath="wali/DefaultWorklist.cpp" />
             <item Name="Key" RelativePath="wali/Key.cpp" />
             <item Name="KeySpace" RelativePath="wali/KeySpace.cpp" />
             <item Name="IntSource" RelativePath="wali/IntSource.cpp" />
