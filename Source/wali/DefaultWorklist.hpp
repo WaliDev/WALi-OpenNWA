@@ -6,6 +6,7 @@
  */
 
 #include "wali/Common.hpp"
+#include "wali/Worklist.hpp"
 #include <list>
 
 namespace wali
@@ -13,62 +14,65 @@ namespace wali
 
     class Markable;
 
-    /*! @class Worklist
+    /*! @class DefaultWorklist
      *
-     * The default Worklist acts as a Stack and uses
+     * The default DefaultWorklist acts as a Stack and uses
      * std::list to hold items. All items must subclass
-     * wali::Markable. When an item is placed on a worklist,
-     * the worklist treats the item's "Markable" state as
+     * wali::Trans. When an item is placed on a worklist,
+     * the worklist treats the item's "Trans" state as
      * only being modified by the worklist (i.e., do not place
-     * a Markable item on two worklists at the same time).
+     * a Trans item on two worklists at the same time).
      */
 
-    class Worklist
+    class DefaultWorklist : public ::wali::Worklist
     {
+        public:
+            using ::wali::wfa::Trans;
 
         public:
 
-            Worklist() {}
+            DefaultWorklist() {}
 
-            virtual ~Worklist() {}
+            virtual ~DefaultWorklist() {}
 
             /*!
              * put
              *
-             * Put a wlmix * in the Worklist.
+             * Put a wlmix * in the DefaultWorklist.
              * This method should be idempotent but
              * it really does not matter.
              */
-            virtual void put( Markable *item ) = 0;
+            virtual void put( Markable *item );
 
             /*!
              * get
              *
              * Return an item from the worklist.
              * Guaranteed only to be called if 
-             * Worklist is not empty.
+             * DefaultWorklist is not empty.
              *
              * @return Markable *
              */
-            virtual Markable * get() = 0;
+            virtual Markable * get();
 
             /*!
              * emtpy
              *
-             * @return true if the Worklist is empty
+             * @return true if the DefaultWorklist is empty
              */
-            virtual bool empty() const = 0;
+            virtual bool empty() const;
 
             /*!
              * clear
              *
              * Remove and unmark each item in this worklist.
              */
-            virtual void clear() = 0;
+            virtual void clear();
 
         protected:
+            std::list< Markable * > wl; //!< The default worklist data structure
 
-    }; // class Worklist
+    }; // class DefaultWorklist
 
 } // namespace wali
 

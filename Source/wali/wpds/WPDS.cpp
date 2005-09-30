@@ -14,6 +14,7 @@
 #include "wali/wpds/RuleFunctor.hpp"
 #include "wali/wpds/LinkedTrans.hpp"
 #include "wali/wpds/Wrapper.hpp"
+#include "wali/DefaultWorklist.hpp"
 #include <iostream>
 #include <cassert>
 
@@ -58,7 +59,7 @@ namespace wali
             : wrapper(w)
         {
             if( 0 == wl )
-                wl = new Worklist();
+                wl = new DefaultWorklist();
             worklist = wl;
             worklist->clear();
         }
