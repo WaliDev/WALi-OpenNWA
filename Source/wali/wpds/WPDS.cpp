@@ -161,6 +161,11 @@ namespace wali
                             fa );
                 }
             }
+            prestarProcessWorklist( fa );
+        }
+
+        void WPDS::prestarProcessWorklist( WFA& fa )
+        {
 
             LinkedTrans * t;
 
@@ -286,8 +291,13 @@ namespace wali
                 }
 
             }
+            poststarProcessWorklist(fa);
+        }
 
+        void WPDS::poststarProcessWorklist( WFA& fa )
+        {
             LinkedTrans * t;
+
             while( get_from_worklist( t ) ) {
 
                 t->print( std::cerr << "$$$ Popped t ==> " ) << std::endl;

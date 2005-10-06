@@ -213,6 +213,11 @@ namespace wali
                         rule_t& r );
 
                 /*!
+                 * @brief Performs the fixpoint computation
+                 */
+                virtual void prestarProcessWorklist( WFA& fa );
+
+                /*!
                  * @brief helper method for prestar
                  */
                 void prestar_handle_trans(
@@ -220,6 +225,11 @@ namespace wali
                         WFA & ca  ,
                         rule_t & r,
                         sem_elem_t delta );
+
+                /*!
+                 * @brief Performs the fixpoint computation
+                 */
+                virtual void poststarProcessWorklist( WFA& fa );
 
                 /*!
                  * @brief helper method for poststar
