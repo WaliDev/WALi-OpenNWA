@@ -28,12 +28,12 @@ namespace wali
         class TransCopyLinker : public wali::wfa::TransFunctor
         {
             public:
-                TransCopyLinker( WPDS & w, WFA & faout, Worklist * worklist );
+                TransCopyLinker( WPDS & w, ::wali::wfa::WFA & faout, Worklist * worklist );
                 virtual ~TransCopyLinker();
                 virtual void operator()( ::wali::wfa::Trans * t );
 
                 WPDS & wpds;
-                WFA & fa;
+                ::wali::wfa::WFA & fa;
                 Worklist * worklist;
         };
     }
