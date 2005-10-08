@@ -16,6 +16,13 @@ namespace wali
         return oss.str();
     }
 
+    std::string Printable::toString() const
+    {
+        std::ostringstream oss;
+        print( oss );
+        return oss.str();
+    }
+
 } // namespace wali
 
 /* Yo, Emacs!

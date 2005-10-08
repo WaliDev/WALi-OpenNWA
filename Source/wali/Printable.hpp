@@ -26,6 +26,8 @@ namespace wali
 
             std::string to_string() const;
 
+            std::string toString() const;
+
     }; // class Printable
 
 } // namespace wali
