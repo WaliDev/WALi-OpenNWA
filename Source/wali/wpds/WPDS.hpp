@@ -29,8 +29,6 @@ namespace wali
         class TransCopyLinker;
         class Wrapper;
 
-        using ::wali::wfa::WFA;
-
         /*!
          * @class WPDS
          */
@@ -112,11 +110,11 @@ namespace wali
                 /*!
                  * @brief Perform prestar reachability query
                  *
-                 * @return WFA
+                 * @return ::wali::wfa::WFA
                  *
-                 * @see WFA
+                 * @see ::wali::wfa::WFA
                  */
-                virtual WFA prestar( WFA & input );
+                virtual ::wali::wfa::WFA prestar( ::wali::wfa::WFA & input );
 
                 /*!
                  * @brief Perform prestar reachability query
@@ -128,18 +126,18 @@ namespace wali
                  *
                  * @return void
                  *
-                 * @see WFA
+                 * @see ::wali::wfa::WFA
                  */
-                virtual void prestar( WFA & input, WFA & output );
+                virtual void prestar( ::wali::wfa::WFA & input, ::wali::wfa::WFA & output );
 
                 /*!
                  * @brief Perform poststar reachability query
                  *
                  * @return WFA
                  *
-                 * @see WFA
+                 * @see ::wali::wfa::WFA
                  */
-                virtual WFA poststar( WFA & input );
+                virtual ::wali::wfa::WFA poststar( ::wali::wfa::WFA & input );
 
                 /*!
                  * @brief Perform poststar reachability query.
@@ -149,11 +147,11 @@ namespace wali
                  * after the query but will have no effect
                  * on the reachability query.
                  *
-                 * @return WFA
+                 * @return ::wali::wfa::WFA
                  *
-                 * @see WFA
+                 * @see ::wali::wfa::WFA
                  */
-                virtual void poststar( WFA & input, WFA & output );
+                virtual void poststar( ::wali::wfa::WFA & input, ::wali::wfa::WFA & output );
 
                 /*!
                  * This method writes the WPDS to the passed in 
@@ -215,38 +213,38 @@ namespace wali
                 /*!
                  * @brief Gets WPDS ready for fixpoint
                  */
-                virtual void prestarSetupFixpoint( WFA& input, WFA& fa );
+                virtual void prestarSetupFixpoint( ::wali::wfa::WFA& input, ::wali::wfa::WFA& fa );
 
                 /*!
                  * @brief Performs the fixpoint computation
                  */
-                virtual void prestarComputeFixpoint( WFA& fa );
+                virtual void prestarComputeFixpoint( ::wali::wfa::WFA& fa );
 
                 /*!
                  * @brief helper method for prestar
                  */
                 virtual void prestar_handle_trans(
                         LinkedTrans * t,
-                        WFA & ca  ,
+                        ::wali::wfa::WFA & ca  ,
                         rule_t & r,
                         sem_elem_t delta );
 
                 /*!
                  * @brief Gets WPDS ready for fixpoint
                  */
-                virtual void poststarSetupFixpoint( WFA& input, WFA& fa );
+                virtual void poststarSetupFixpoint( ::wali::wfa::WFA& input, ::wali::wfa::WFA& fa );
 
                 /*!
                  * @brief Performs the fixpoint computation
                  */
-                virtual void poststarComputeFixpoint( WFA& fa );
+                virtual void poststarComputeFixpoint( ::wali::wfa::WFA& fa );
 
                 /*!
                  * @brief helper method for poststar
                  */
                 virtual void poststar_handle_trans(
                         LinkedTrans * t ,
-                        WFA & ca   ,
+                        ::wali::wfa::WFA & ca   ,
                         rule_t & r,
                         sem_elem_t delta
                         );
@@ -267,7 +265,7 @@ namespace wali
                  * @see Trans
                  * 
                  */
-                virtual void copy_and_link( WFA & in, WFA & out );
+                virtual void copy_and_link( ::wali::wfa::WFA & in, ::wali::wfa::WFA & out );
 
                 /*!
                  * Create the Config for the state and stack KeyPair.
@@ -326,7 +324,7 @@ namespace wali
                         wali_key_t to,
                         sem_elem_t se,
                         Config * cfg,
-                        WFA & ca );
+                        ::wali::wfa::WFA & ca );
 
                 /*!
                  * update_prime does not need to take a Config b/c no Config
@@ -341,7 +339,7 @@ namespace wali
                         wali_key_t stack,
                         wali_key_t to,
                         sem_elem_t se,
-                        WFA & ca );
+                        ::wali::wfa::WFA & ca );
 
                 /*!
                  * @return const chash_t reference
