@@ -213,28 +213,38 @@ namespace wali
                         rule_t& r );
 
                 /*!
+                 * @brief Gets WPDS ready for fixpoint
+                 */
+                virtual void prestarSetupFixpoint( WFA& input, WFA& fa );
+
+                /*!
                  * @brief Performs the fixpoint computation
                  */
-                virtual void prestarProcessWorklist( WFA& fa );
+                virtual void prestarComputeFixpoint( WFA& fa );
 
                 /*!
                  * @brief helper method for prestar
                  */
-                void prestar_handle_trans(
+                virtual void prestar_handle_trans(
                         LinkedTrans * t,
                         WFA & ca  ,
                         rule_t & r,
                         sem_elem_t delta );
 
                 /*!
+                 * @brief Gets WPDS ready for fixpoint
+                 */
+                virtual void poststarSetupFixpoint( WFA& input, WFA& fa );
+
+                /*!
                  * @brief Performs the fixpoint computation
                  */
-                virtual void poststarProcessWorklist( WFA& fa );
+                virtual void poststarComputeFixpoint( WFA& fa );
 
                 /*!
                  * @brief helper method for poststar
                  */
-                void poststar_handle_trans(
+                virtual void poststar_handle_trans(
                         LinkedTrans * t ,
                         WFA & ca   ,
                         rule_t & r,
@@ -265,7 +275,7 @@ namespace wali
                  *
                  * @return Config pointer
                  */
-                Config * make_config( wali_key_t state, wali_key_t stack );
+                virtual Config * make_config( wali_key_t state, wali_key_t stack );
 
                 /*!
                  * Creates a rule that links two configurations.
@@ -292,25 +302,25 @@ namespace wali
                  * @see Config
                  * @see KeyPair
                  */
-                Config * find_config( wali_key_t state, wali_key_t stack );
+                virtual Config * find_config( wali_key_t state, wali_key_t stack );
 
                 /*! @brief helper method for fixpoint loop
                  *
                  * return true if LinkedTrans was retrieved from
                  * worklist, false if worklist is empty
                  */
-                bool get_from_worklist( LinkedTrans * & );
+                virtual bool get_from_worklist( LinkedTrans * & );
 
                 /*!
                  * @brief helper method to update worklist
                  */
-                void add_to_worklist( LinkedTrans * t );
+                virtual void add_to_worklist( LinkedTrans * t );
 
                 /*!
                  * @brief helper function to create and link a transition
                  *
                  */
-                void update(
+                virtual void update(
                         wali_key_t from,
                         wali_key_t stack,
                         wali_key_t to,
@@ -326,7 +336,7 @@ namespace wali
                  *
                  * @return generated transition
                  */
-                LinkedTrans * update_prime(
+                virtual LinkedTrans * update_prime(
                         wali_key_t from,
                         wali_key_t stack,
                         wali_key_t to,
@@ -348,7 +358,6 @@ namespace wali
                 }
 
             private: // methods
-
 
             protected: // data members
                 Wrapper * wrapper;

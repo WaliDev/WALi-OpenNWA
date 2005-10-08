@@ -131,6 +131,12 @@ namespace wali
 
         void WPDS::prestar( WFA & input, WFA & fa )
         {
+            prestarSetupFixpoint(input,fa);
+            prestarComputeFixpoint( fa );
+        }
+
+        void WPDS::prestarSetupFixpoint( WFA& input, WFA& fa )
+        {
             copy_and_link( input,fa );
 
             //
@@ -161,10 +167,9 @@ namespace wali
                             fa );
                 }
             }
-            prestarProcessWorklist( fa );
         }
 
-        void WPDS::prestarProcessWorklist( WFA& fa )
+        void WPDS::prestarComputeFixpoint( WFA& fa )
         {
 
             LinkedTrans * t;
@@ -275,6 +280,12 @@ namespace wali
 
         void WPDS::poststar( WFA & input, WFA & fa )
         {
+            poststarSetupFixpoint(input,fa);
+            poststarComputeFixpoint(fa);
+        }
+
+        void WPDS::poststarSetupFixpoint( WFA& input, WFA& fa )
+        {
             copy_and_link( input,fa );
 
             // Generate midstates for each rule type two
@@ -291,10 +302,9 @@ namespace wali
                 }
 
             }
-            poststarProcessWorklist(fa);
         }
 
-        void WPDS::poststarProcessWorklist( WFA& fa )
+        void WPDS::poststarComputeFixpoint( WFA& fa )
         {
             LinkedTrans * t;
 
