@@ -11,7 +11,9 @@
 
 namespace wali
 {
-    class Markable;
+    namespace wfa {
+        class Trans;
+    }
 
     /*! @class DefaultWorklist
      *
@@ -31,7 +33,7 @@ namespace wali
              * put
              *
              */
-            virtual void put( Markable *item );
+            virtual void put( wfa::Trans *item );
 
             /*!
              * get
@@ -40,9 +42,9 @@ namespace wali
              * Returns NULL if the DefaultWorklist is empty.
              * In the future it may throw an exception
              *
-             * @return Markable *
+             * @return wfa::Trans *
              */
-            virtual Markable * get();
+            virtual wfa::Trans * get();
 
             /*!
              * emtpy
@@ -59,7 +61,7 @@ namespace wali
             virtual void clear();
 
         protected:
-            std::list< Markable * > wl; //!< The default worklist data structure
+            std::list< wfa::Trans * > wl; //!< The default worklist data structure
 
     }; // class DefaultWorklist
 

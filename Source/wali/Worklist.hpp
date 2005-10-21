@@ -10,14 +10,16 @@
 namespace wali
 {
 
-    class Markable;
+    namespace wfa {
+        class Trans;
+    }
 
     /*! @class Worklist
      *
      * Worklist defines the interface of a worklist. All items must subclass
-     * wali::Markable. When an item is placed on a worklist, the worklist
-     * treats the item's "Markable" state as only being modified by the
-     * worklist (i.e., do not place a Markable item on two worklists at the
+     * wali::wfa::Trans. When an item is placed on a worklist, the worklist
+     * treats the item's "marked" state as only being modified by the
+     * worklist (i.e., do not place a Trans item on two worklists at the
      * same time).
      */
 
@@ -33,11 +35,11 @@ namespace wali
             /*!
              * put
              *
-             * Put a Markable * in the Worklist.
+             * Put a Trans * in the Worklist.
              * This method should be idempotent but
              * it really does not matter.
              */
-            virtual void put( Markable *item ) = 0;
+            virtual void put( wfa::Trans *item ) = 0;
 
             /*!
              * get
@@ -47,9 +49,9 @@ namespace wali
              * Worklist is not empty. May throw an exception or return 
              * NULL if the worklist is not empty.
              *
-             * @return Markable *
+             * @return Trans *
              */
-            virtual Markable * get() = 0;
+            virtual wfa::Trans * get() = 0;
 
             /*!
              * emtpy

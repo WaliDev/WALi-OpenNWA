@@ -3,8 +3,8 @@
  */
 
 #include "wali/Common.hpp"
-#include "wali/Markable.hpp"
 #include "wali/DefaultWorklist.hpp"
+#include "wali/wfa/Trans.hpp"
 
 namespace wali
 {
@@ -16,7 +16,7 @@ namespace wali
         clear();
     }
 
-    void DefaultWorklist::put( Markable * item )
+    void DefaultWorklist::put( wfa::Trans * item )
     {
         if( !item->marked() ) {
             item->mark();
@@ -24,9 +24,9 @@ namespace wali
         }
     }
 
-    Markable * DefaultWorklist::get()
+    wfa::Trans * DefaultWorklist::get()
     {
-        Markable * item = 0;
+        wfa::Trans * item = 0;
         if( !empty() ) {
             item = wl.back();
             wl.pop_back();
@@ -42,11 +42,11 @@ namespace wali
 
     void DefaultWorklist::clear()
     {
-        std::list< Markable * >::iterator it = wl.begin();
+        std::list< wfa::Trans * >::iterator it = wl.begin();
 
         // iterate through turning off inworklist flag
         for( ; it != wl.end() ; it++ ) {
-            Markable * item = *it;
+            wfa::Trans * item = *it;
             item->unmark();
         }
         // clear the list
