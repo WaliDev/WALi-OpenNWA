@@ -1,4 +1,0 @@
-LCFLAGS		= -shared
-OBJSFX		= .o
-SOSFX		= .so
-LINKNAME	= -soname
