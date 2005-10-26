@@ -16,7 +16,7 @@
 
 namespace wali
 {
-    class Worklist;
+    template< typename T > class Worklist;
 
     namespace wpds
     {
@@ -223,7 +223,7 @@ namespace wali
                 /*!
                  * Performs path summary with the specified Worklist
                  */
-                virtual void path_summary( Worklist& wl );
+                virtual void path_summary( Worklist<State>& wl );
 
                 /*!
                  * Write the WFA to the std::ostream parameter, implements
@@ -299,7 +299,7 @@ namespace wali
                  * setup_fixpoint clears each states markable flag and sets
                  * the states weight to zero
                  */
-                void setup_fixpoint( Worklist& wl );
+                void setup_fixpoint( Worklist<State>& wl );
 
             private:
 

@@ -31,13 +31,13 @@ namespace wali
             class TransCopyPairLinker : public wali::wfa::ConstTransFunctor
             {
                 public:
-                    TransCopyPairLinker( EWPDS & w, WFA & faout, Worklist * worklist );
+                    TransCopyPairLinker( EWPDS & w, WFA & faout, Worklist<wfa::Trans> * worklist );
                     virtual ~TransCopyPairLinker();
                     virtual void operator()( const ::wali::wfa::Trans * t );
 
                     EWPDS & ewpds;
                     WFA & fa;
-                    Worklist * worklist;
+                    Worklist<wfa::Trans> * worklist;
             };
 
             class TransPairCollapse : public wali::wfa::TransFunctor
@@ -69,7 +69,7 @@ namespace wali
 
             typedef ref_ptr<ERule> erule_t;
 
-            EWPDS::EWPDS( Wrapper * wrapper, Worklist * wl) : WPDS(wrapper, wl)
+            EWPDS::EWPDS( Wrapper * wrapper, Worklist<wfa::Trans> * wl) : WPDS(wrapper, wl)
             { }
 
 
@@ -525,7 +525,7 @@ namespace wali
             /////////////////////////////////////////////////////////////////
             // TransCopyPairLinker
             /////////////////////////////////////////////////////////////////
-            TransCopyPairLinker::TransCopyPairLinker( EWPDS & w, WFA & faout, Worklist * wl )
+            TransCopyPairLinker::TransCopyPairLinker( EWPDS & w, WFA & faout, Worklist<wfa::Trans> * wl )
                 : ewpds(w),fa(faout),worklist(wl) {}
 
             TransCopyPairLinker::~TransCopyPairLinker() {}

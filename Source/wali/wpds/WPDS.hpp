@@ -16,7 +16,12 @@
 
 namespace wali
 {
-    class Worklist;
+    template< typename T > class Worklist;
+
+    namespace wfa
+    {
+        class Trans;
+    }
 
     namespace wpds
     {
@@ -56,7 +61,7 @@ namespace wali
 
             public:
 
-                WPDS( Wrapper * wrapper = 0, Worklist * worklist = 0 );
+                WPDS( Wrapper * wrapper = 0, Worklist<wfa::Trans> * worklist = 0 );
 
                 virtual ~WPDS();
 
@@ -359,7 +364,7 @@ namespace wali
 
             protected: // data members
                 Wrapper * wrapper;
-                Worklist * worklist;
+                Worklist<wfa::Trans> * worklist;
                 chash_t configs;
                 std::set< Config * > rule_zeroes;
                 r2hash_t r2hash;

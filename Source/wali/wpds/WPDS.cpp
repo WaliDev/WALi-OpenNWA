@@ -28,13 +28,13 @@ namespace wali
         class TransCopyLinker : public wali::wfa::TransFunctor
         {
             public:
-                TransCopyLinker( WPDS & w, ::wali::wfa::WFA & faout, Worklist * worklist );
+                TransCopyLinker( WPDS & w, ::wali::wfa::WFA & faout, Worklist<wfa::Trans> * worklist );
                 virtual ~TransCopyLinker();
                 virtual void operator()( ::wali::wfa::Trans * t );
 
                 WPDS & wpds;
                 ::wali::wfa::WFA & fa;
-                Worklist * worklist;
+                Worklist<wfa::Trans> * worklist;
         };
     }
 
@@ -55,11 +55,11 @@ namespace wali
     namespace wpds
     {
 
-        WPDS::WPDS( Wrapper* w, Worklist * wl)
+        WPDS::WPDS( Wrapper* w, Worklist<wfa::Trans> * wl)
             : wrapper(w)
         {
             if( 0 == wl )
-                wl = new DefaultWorklist();
+                wl = new DefaultWorklist<wfa::Trans>();
             worklist = wl;
             worklist->clear();
         }
@@ -653,7 +653,7 @@ namespace wali
         /////////////////////////////////////////////////////////////////
         // TransCopyLinker
         /////////////////////////////////////////////////////////////////
-        TransCopyLinker::TransCopyLinker( WPDS & w, WFA & faout, Worklist * wl )
+        TransCopyLinker::TransCopyLinker( WPDS & w, WFA & faout, Worklist<wfa::Trans> * wl )
             : wpds(w),fa(faout),worklist(wl) {}
 
         TransCopyLinker::~TransCopyLinker() {}

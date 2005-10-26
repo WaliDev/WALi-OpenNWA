@@ -25,7 +25,7 @@ namespace wali
     ////////
     // class PriorityWorklist
     ////////
-    PriorityWorklist::PriorityWorklist() : Worklist() {}
+    PriorityWorklist::PriorityWorklist() : Worklist<wfa::Trans>() {}
 
     PriorityWorklist::~PriorityWorklist()
     {

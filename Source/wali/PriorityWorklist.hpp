@@ -24,7 +24,7 @@ namespace wali
         bool operator()( const wfa::Trans* a, const wfa::Trans* b) const;
     };
 
-    class PriorityWorklist : public Worklist
+    class PriorityWorklist : public Worklist<wfa::Trans>
     {
         public:
             typedef std::multiset< wfa::Trans*, StackSymLT > pwl_t;

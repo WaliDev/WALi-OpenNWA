@@ -14,7 +14,7 @@
 namespace wali
 {
     class SemElem;
-    class Worklist;
+    template< typename T > class Worklist;
 
     namespace wpds 
     {
@@ -45,7 +45,7 @@ namespace wali
 
                 public:
 
-                    EWPDS( Wrapper * wrapper = 0, Worklist * worklist = 0 );
+                    EWPDS( Wrapper * wrapper = 0, Worklist<wfa::Trans> * worklist = 0 );
 
                     virtual ~EWPDS();
 

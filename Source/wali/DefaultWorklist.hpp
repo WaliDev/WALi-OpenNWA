@@ -11,29 +11,32 @@
 
 namespace wali
 {
-    namespace wfa {
-        class Trans;
-    }
-
     /*! @class DefaultWorklist
      *
      * The default DefaultWorklist acts as a Stack and uses
      * std::list to hold items.
      */
 
-    class DefaultWorklist : public ::wali::Worklist
+    template< typename T > class DefaultWorklist : public ::wali::Worklist<T>
     {
         public:
 
-            DefaultWorklist();
+            DefaultWorklist() : Worklist<T>() {}
 
-            virtual ~DefaultWorklist();
+            virtual ~DefaultWorklist() {
+                clear();
+            }
 
             /*!
              * put
              *
              */
-            virtual void put( wfa::Trans *item );
+            virtual void put( T *item ) {
+                if( !item->marked() ) {
+                    item->mark();
+                    wl.push_back( item );
+                }
+            }
 
             /*!
              * get
@@ -42,26 +45,46 @@ namespace wali
              * Returns NULL if the DefaultWorklist is empty.
              * In the future it may throw an exception
              *
-             * @return wfa::Trans *
+             * @return T *
              */
-            virtual wfa::Trans * get();
+            virtual T * get() {
+                T * item = 0;
+                if( !empty() ) {
+                    item = wl.back();
+                    wl.pop_back();
+                    item->unmark();
+                }
+                return item;
+            }
 
             /*!
              * emtpy
              *
              * @return true if the DefaultWorklist is empty
              */
-            virtual bool empty() const;
+            virtual bool empty() const {
+                return wl.empty();
+            }
 
             /*!
              * clear
              *
              * Remove and unmark each item in this worklist.
              */
-            virtual void clear();
+            virtual void clear() {
+                typename std::list< T* >::iterator it = wl.begin();
+
+                // iterate through unmarking items
+                for( ; it != wl.end() ; it++ ) {
+                    T * item = *it;
+                    item->unmark();
+                }
+                // clear the list
+                wl.clear();
+            }
 
         protected:
-            std::list< wfa::Trans * > wl; //!< The default worklist data structure
+            std::list< T* > wl; //!< The default worklist data structure
 
     }; // class DefaultWorklist
 

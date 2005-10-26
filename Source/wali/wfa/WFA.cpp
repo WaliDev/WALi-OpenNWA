@@ -396,7 +396,7 @@ namespace wali
         //
         void WFA::path_summary()
         {
-            DefaultWorklist wl;
+            DefaultWorklist<State> wl;
             path_summary(wl);
         }
 
@@ -404,7 +404,7 @@ namespace wali
         //
         // Computes path_summary
         //
-        void WFA::path_summary( Worklist& wl )
+        void WFA::path_summary( Worklist<State>& wl )
         {
             setup_fixpoint( wl );
             while( !wl.empty() )
@@ -688,7 +688,7 @@ namespace wali
         //
         // Place WFA in state ready for fixpoint
         //
-        void WFA::setup_fixpoint( Worklist& wl )
+        void WFA::setup_fixpoint( Worklist<State>& wl )
         {
             state_map_t::iterator it = state_map.begin();
             state_map_t::iterator itEND = state_map.end();
