@@ -20,7 +20,7 @@ namespace wali
      *
      * For now a Key is just an unsigned int
      */
-    typedef unsigned int Key;
+    typedef size_t Key;
 
     /*!
      * Defined in KeySource.hpp
