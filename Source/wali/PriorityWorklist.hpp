@@ -33,7 +33,7 @@ namespace wali
             PriorityWorklist();
             virtual ~PriorityWorklist();
 
-            virtual void put( wfa::Trans *t );
+            virtual bool put( wfa::Trans *t );
 
             virtual wfa::Trans * get();
 

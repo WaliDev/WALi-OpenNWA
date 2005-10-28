@@ -19,28 +19,6 @@
 #include <cassert>
 
 //
-// TODO : move this elsewhere
-//
-namespace wali
-{
-    namespace wpds
-    {
-        class TransCopyLinker : public wali::wfa::TransFunctor
-        {
-            public:
-                TransCopyLinker( WPDS & w, ::wali::wfa::WFA & faout, Worklist<wfa::Trans> * worklist );
-                virtual ~TransCopyLinker();
-                virtual void operator()( ::wali::wfa::Trans * t );
-
-                WPDS & wpds;
-                ::wali::wfa::WFA & fa;
-                Worklist<wfa::Trans> * worklist;
-        };
-    }
-
-}
-
-//
 // TODO: 
 //      look into having each trans w/ pointers to States
 //      eps hash
@@ -55,13 +33,36 @@ namespace wali
     namespace wpds
     {
 
-        WPDS::WPDS( Wrapper* w, Worklist<wfa::Trans> * wl)
-            : wrapper(w)
+        WPDS::WPDS() :
+            wrapper(0)
+                ,worklist( new DefaultWorklist<wfa::Trans>() )
+                ,currentOutputWFA(0)
         {
-            if( 0 == wl )
-                wl = new DefaultWorklist<wfa::Trans>();
-            worklist = wl;
-            worklist->clear();
+        }
+
+        WPDS::WPDS( Wrapper * w ) :
+            wrapper(w)
+                ,worklist( new DefaultWorklist<wfa::Trans>() )
+                ,currentOutputWFA(0)
+        {
+        }
+
+        WPDS::WPDS( Worklist<wfa::Trans> * wl ) :
+            wrapper(0), worklist(wl) ,currentOutputWFA(0)
+        {
+            if( 0 == worklist )
+                worklist = new DefaultWorklist<wfa::Trans>();
+            else
+                worklist->clear();
+        }
+
+        WPDS::WPDS( Wrapper* w, Worklist<wfa::Trans> * wl) :
+            wrapper(w) , worklist(wl) ,currentOutputWFA(0)
+        {
+            if( 0 == worklist )
+                worklist = new DefaultWorklist<wfa::Trans>();
+            else
+                worklist->clear();
         }
 
         WPDS::~WPDS()
@@ -131,13 +132,16 @@ namespace wali
 
         void WPDS::prestar( WFA & input, WFA & fa )
         {
+            currentOutputWFA = &fa;
             prestarSetupFixpoint(input,fa);
             prestarComputeFixpoint( fa );
+            currentOutputWFA = 0;
         }
 
         void WPDS::prestarSetupFixpoint( WFA& input, WFA& fa )
         {
-            copy_and_link( input,fa );
+            //copy_and_link( input,fa );
+            input.for_each(*this);
 
             //
             // do rules 0
@@ -216,12 +220,11 @@ namespace wali
                     {
                         rule_t & r = *lsit;
 
-                        Trans * tp = fa.lookup( r->to_state(),r->to_stack1(),t->from() );
-
-                        if( 0 != tp ) {
-
+                        Trans tp;
+                        if( fa.find(r->to_state(),r->to_stack1(),t->from(),tp) )
+                        {
                             // f(r) * t'
-                            sem_elem_t wrtp = r->weight()->extend( tp->se );
+                            sem_elem_t wrtp = r->weight()->extend( tp.se );
 
                             // f(r) * t' * delta
                             sem_elem_t wnew = wrtp->extend( dnew );
@@ -280,13 +283,16 @@ namespace wali
 
         void WPDS::poststar( WFA & input, WFA & fa )
         {
+            currentOutputWFA = &fa;
             poststarSetupFixpoint(input,fa);
             poststarComputeFixpoint(fa);
+            currentOutputWFA = 0;
         }
 
         void WPDS::poststarSetupFixpoint( WFA& input, WFA& fa )
         {
-            copy_and_link( input,fa );
+            //copy_and_link( input,fa );
+            input.for_each(*this);
 
             // Generate midstates for each rule type two
             r2hash_t::iterator r2it = r2hash.begin();
@@ -508,11 +514,10 @@ namespace wali
         //
         // link input WFA transitions to Configs
         //
-        void WPDS::copy_and_link( WFA & in, WFA & dest )
-        {
-            TransCopyLinker linker( *this,dest,worklist );
-            in.for_each( linker );
-        }
+        //void WPDS::copy_and_link( WFA & in, WFA & dest )
+        //{
+        //   in.for_each( *this );
+        //}
 
         Config * WPDS::make_config( wali_key_t state, wali_key_t stack )
         {
@@ -600,11 +605,16 @@ namespace wali
 
         /*!
          * @brief helper method to update worklist
+         * @return true if t is added to the worklist
          */
-        void WPDS::add_to_worklist( LinkedTrans * t )
+        bool WPDS::add_to_worklist( LinkedTrans * t )
         {
-            if( t->modified() )
+            if( t->modified() ) {
                 worklist->put( t );
+            }
+            else {
+                return false;
+            }
         }
 
         /*!
@@ -623,7 +633,6 @@ namespace wali
             Trans *tmp = fa.insert(t);
             // TODO : make this a debugging stmt
             t = dynamic_cast< LinkedTrans* >(tmp);
-            //t->config = cfg;
             // add_to_worklist checks the modified flag
             add_to_worklist(t);
         }
@@ -651,20 +660,16 @@ namespace wali
         }
 
         /////////////////////////////////////////////////////////////////
-        // TransCopyLinker
+        // Default TransFunctor implementation
         /////////////////////////////////////////////////////////////////
-        TransCopyLinker::TransCopyLinker( WPDS & w, WFA & faout, Worklist<wfa::Trans> * wl )
-            : wpds(w),fa(faout),worklist(wl) {}
 
-        TransCopyLinker::~TransCopyLinker() {}
-
-        void TransCopyLinker::operator()( Trans * orig )
+        void WPDS::operator()( Trans * orig )
         {
-            Config *c = wpds.make_config( orig->from(),orig->stack() );
+            Config *c = make_config( orig->from(),orig->stack() );
             LinkedTrans *t;
-            if( wpds.wrapper ) {
+            if( wrapper ) {
                 t = new LinkedTrans(orig->from(),orig->stack(),orig->to(),
-                        wpds.wrapper->wrap(*orig),c);
+                        wrapper->wrap(*orig),c);
             }
             else {
                 t = new LinkedTrans(orig->from(),orig->stack(),orig->to(),
@@ -672,7 +677,7 @@ namespace wali
             }
 
             // fa.add_trans takes ownership of passed in pointer
-            fa.add_trans( t );
+            currentOutputWFA->add_trans( t );
 
             // add t to the worklist for saturation
             worklist->put( t );

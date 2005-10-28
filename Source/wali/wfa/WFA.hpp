@@ -248,18 +248,6 @@ namespace wali
                  */
                 virtual std::ostream& marshall( std::ostream& o ) const;
 
-            protected:
-
-                /*!
-                 * @brief lookup returns a pointer to a transition matching (p,g,q)
-                 *
-                 * @return pointer to Trans or NULL(0) if it does not exist
-                 */
-                Trans * lookup(
-                        wali_key_t p,
-                        wali_key_t g,
-                        wali_key_t q );
-
                 /*!
                  * @brief inserts tnew into the WFA
                  *
@@ -269,19 +257,24 @@ namespace wali
                  *
                  * @warning: Note that insert assumes ownership of the passed
                  *      in parameter tnew
+                 * @warning: insert does assumes the states of tnew
+                 *      are already in the WFA. If they are not path_summary
+                 *      and other methods might fail
                  *
                  * @return pointer to real transition
                  */
                 Trans * insert( Trans * tnew );
 
-                /*! @brief fold tnew into told
-                 */
-                virtual void combine_trans( Trans * told, Trans * tnew );
-
                 /*! 
                  * Create a State * for the key wali_key_t
                  */
                 void add_state( wali_key_t key , sem_elem_t zero );
+
+            protected:
+
+                /*! @brief fold tnew into told
+                 */
+                virtual void combine_trans( Trans * told, Trans * tnew );
 
                 /*!
                  * WFA::get_state returns a reference to the State named

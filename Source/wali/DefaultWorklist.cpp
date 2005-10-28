@@ -16,12 +16,15 @@ namespace wali
         clear();
     }
 
-    void DefaultWorklist::put( wfa::Trans * item )
+    bool DefaultWorklist::put( wfa::Trans * item )
     {
         if( !item->marked() ) {
             item->mark();
             wl.push_back( item );
+            return true;
         }
+        else
+            return false;
     }
 
     wfa::Trans * DefaultWorklist::get()

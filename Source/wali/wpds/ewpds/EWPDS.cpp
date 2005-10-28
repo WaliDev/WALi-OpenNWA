@@ -203,7 +203,9 @@ namespace wali
             WFA EWPDS::prestar( WFA & input )
             {
                 WFA fa;
-                WPDS::copy_and_link( input,fa );
+                //WPDS::copy_and_link( input,fa );
+                currentOutputWFA = &fa;
+                input.for_each(*this);
 
                 //
                 // do rules 0
@@ -278,12 +280,14 @@ namespace wali
                         {
                             rule_t & r = *lsit;
 
-                            Trans * tp = fa.lookup( r->to_state(),r->to_stack1(),t->from() );
+                            //Trans * tp = fa.lookup( r->to_state(),r->to_stack1(),t->from() );
+                            Trans tp;
+                            if( fa.find(r->to_state(),r->to_stack1(),t->from(),tp) )
+                            {
 
-                            if( 0 != tp ) {
                                 if(!is_pds_state(t->from())) {
                                     // f(r) * t'
-                                    sem_elem_t wrtp = r->weight()->extend( tp->se );
+                                    sem_elem_t wrtp = r->weight()->extend( tp.se );
 
                                     // f(r) * t' * delta
                                     sem_elem_t wnew = wrtp->extend( dnew );
@@ -293,7 +297,7 @@ namespace wali
                                             wnew,r->from(),fa );
                                 } else { // apply merge function
                                     erule_t er = (ERule *)(r.get_ptr());
-                                    sem_elem_t w1 = er->merge_fn()->apply_f( tp->se->one(), tp->se);
+                                    sem_elem_t w1 = er->merge_fn()->apply_f( tp.se->one(), tp.se);
                                     sem_elem_t wnew = w1->extend(dnew);
                                     // update
                                     update( r->from()->state(), r->from()->stack(), t->to(),
@@ -304,6 +308,7 @@ namespace wali
                     }
                 }
 
+                currentOutputWFA = 0;
                 return fa;
             }
 

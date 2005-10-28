@@ -33,8 +33,12 @@ namespace wali
              * Put a Trans * in the Worklist.
              * This method should be idempotent but
              * it really does not matter.
+             *
+             * @return true if the item was added, false if not
+             * A false return value means the item was already "marked"
+             * and hence, is already on this worklist.
              */
-            virtual void put( T *item ) = 0;
+            virtual bool put( T *item ) = 0;
 
             /*!
              * get

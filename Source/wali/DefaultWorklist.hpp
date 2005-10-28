@@ -31,11 +31,14 @@ namespace wali
              * put
              *
              */
-            virtual void put( T *item ) {
+            virtual bool put( T *item ) {
                 if( !item->marked() ) {
                     item->mark();
                     wl.push_back( item );
+                    return true;
                 }
+                else
+                    return false;
             }
 
             /*!
@@ -48,13 +51,14 @@ namespace wali
              * @return T *
              */
             virtual T * get() {
-                T * item = 0;
                 if( !empty() ) {
-                    item = wl.back();
+                    T *item = wl.back();
                     wl.pop_back();
                     item->unmark();
+                    return item;
                 }
-                return item;
+                else
+                    return 0;
             }
 
             /*!

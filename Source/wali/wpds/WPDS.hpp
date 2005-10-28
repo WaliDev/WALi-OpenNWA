@@ -11,6 +11,7 @@
 #include "wali/KeyContainer.hpp"
 #include "wali/SemElem.hpp"
 #include "wali/wfa/WFA.hpp"
+#include "wali/wfa/TransFunctor.hpp"
 #include <iostream>
 #include <set>
 
@@ -38,7 +39,7 @@ namespace wali
          * @class WPDS
          */
 
-        class WPDS : public Printable
+        class WPDS : public Printable, public wali::wfa::TransFunctor
         {
 
             public:
@@ -61,7 +62,10 @@ namespace wali
 
             public:
 
-                WPDS( Wrapper * wrapper = 0, Worklist<wfa::Trans> * worklist = 0 );
+                WPDS();
+                WPDS( Wrapper * wrapper );
+                WPDS( Worklist<wfa::Trans> * worklist );
+                WPDS( Wrapper * wrapper , Worklist<wfa::Trans> * worklist );
 
                 virtual ~WPDS();
 
@@ -270,7 +274,7 @@ namespace wali
                  * @see Trans
                  * 
                  */
-                virtual void copy_and_link( ::wali::wfa::WFA & in, ::wali::wfa::WFA & out );
+                //virtual void copy_and_link( ::wali::wfa::WFA & in, ::wali::wfa::WFA & out );
 
                 /*!
                  * Create the Config for the state and stack KeyPair.
@@ -316,8 +320,9 @@ namespace wali
 
                 /*!
                  * @brief helper method to update worklist
+                 * @return true if t is added to the worklist
                  */
-                virtual void add_to_worklist( LinkedTrans * t );
+                virtual bool add_to_worklist( LinkedTrans * t );
 
                 /*!
                  * @brief helper function to create and link a transition
@@ -329,7 +334,7 @@ namespace wali
                         wali_key_t to,
                         sem_elem_t se,
                         Config * cfg,
-                        ::wali::wfa::WFA & ca );
+                        ::wali::wfa::WFA & fa );
 
                 /*!
                  * update_prime does not need to take a Config b/c no Config
@@ -344,7 +349,7 @@ namespace wali
                         wali_key_t stack,
                         wali_key_t to,
                         sem_elem_t se,
-                        ::wali::wfa::WFA & ca );
+                        ::wali::wfa::WFA & fa );
 
                 /*!
                  * @return const chash_t reference
@@ -360,6 +365,11 @@ namespace wali
                     return configs;
                 }
 
+                /*!
+                 * Implementation of TransFunctor
+                 */
+                virtual void operator()( wali::wfa::Trans* t );
+
             private: // methods
 
             protected: // data members
@@ -368,6 +378,7 @@ namespace wali
                 chash_t configs;
                 std::set< Config * > rule_zeroes;
                 r2hash_t r2hash;
+                wali::wfa::WFA* currentOutputWFA;
 
             private:
 

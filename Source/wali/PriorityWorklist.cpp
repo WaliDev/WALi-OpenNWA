@@ -32,12 +32,15 @@ namespace wali
         clear();
     }
 
-    void PriorityWorklist::put( wfa::Trans *t )
+    bool PriorityWorklist::put( wfa::Trans *t )
     {
         if( !t->marked() ) {
             t->mark();
             workset.insert(t);
+            return true;
         }
+        else
+            return false;
     }
 
     wfa::Trans * PriorityWorklist::get() 

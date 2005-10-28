@@ -206,8 +206,26 @@ namespace wali
                 wali_key_t q,
                 Trans & t )
         {
-            Trans *tret = lookup(p,g,q);
             bool rc = false;
+            Trans *tret = 0;
+            KeyPair kp(p,g);
+            kp_map_t::iterator it = kpmap.find(kp);
+            if( it != kpmap.end() )
+            {
+                trans_list_t &ls = it->second;
+                trans_list_t::iterator lit = ls.begin();
+                for( ; lit != ls.end() ; lit ++ )
+                {
+                    Trans *ttmp = *lit;
+                    // already matched (p,g,*) so just
+                    // check q
+                    if( q == ttmp->to() )
+                    {
+                        tret = ttmp;
+                        break;
+                    }
+                }
+            }
             if( 0 != tret ) {
                 rc = true;
                 t = *tret;
@@ -541,44 +559,12 @@ namespace wali
         ///////////////////////
 
         /*
-         * The action performed by this method remains a mystery...
-         */
-        Trans * WFA::lookup(
-                wali_key_t p,
-                wali_key_t g,
-                wali_key_t q )
-        {
-            Trans *tret = 0;
-            KeyPair kp(p,g);
-            kp_map_t::iterator it = kpmap.find(kp);
-            if( it != kpmap.end() )
-            {
-                trans_list_t &ls = it->second;
-                trans_list_t::iterator lit = ls.begin();
-                for( ; lit != ls.end() ; lit ++ )
-                {
-                    Trans *ttmp = *lit;
-                    // already matched (p,g,*) so just
-                    // check q
-                    if( q == ttmp->to() )
-                    {
-                        tret = ttmp;
-                        break;
-                    }
-                }
-            }
-            return tret;
-        }
-
-        /*
          * Inserts tnew into the WFA. If a transition matching tnew
          * exists, tnew is deleted.
          */
         Trans * WFA::insert( Trans * tnew )
         {
             ////
-            // lookup code repeated to avoid second HashMap lookup
-            // when the iterator gets reused below
             ////
             Trans * told = 0;
             kp_map_t::iterator it = kpmap.find(tnew->keypair());
@@ -651,14 +637,6 @@ namespace wali
         }
 
         //
-        // This is a virtual method.
-        //
-        void WFA::combine_trans( Trans * told, Trans * tnew )
-        {
-            told->combine_weight( tnew->weight() );
-        }
-
-        //
         // Add a state to the state map
         //
         void WFA::add_state( wali_key_t key , sem_elem_t zero )
@@ -666,6 +644,14 @@ namespace wali
             if( state_map.find( key ) == state_map.end() ) {
                 state_map.insert( key , new State( key,zero ) );
             }
+        }
+
+        //
+        // This is a virtual method.
+        //
+        void WFA::combine_trans( Trans * told, Trans * tnew )
+        {
+            told->combine_weight( tnew->weight() );
         }
 
         //
