@@ -162,13 +162,12 @@ namespace wali
                     rule_t r = *rit;
 
                     // add transition for rule
-                    update(
-                            r->from_state(),
-                            r->from_stack(),
-                            r->to_state(),
-                            r->weight(),
-                            r->from(),
-                            fa );
+                    update( r->from_state()
+                            , r->from_stack()
+                            , r->to_state()
+                            , r->weight()
+                            , r->from()
+                          );
                 }
             }
         }
@@ -230,8 +229,12 @@ namespace wali
                             sem_elem_t wnew = wrtp->extend( dnew );
 
                             // update
-                            update( r->from()->state(), r->from()->stack(), t->to(),
-                                    wnew,r->from(),fa );
+                            update( r->from()->state()
+                                    , r->from()->stack()
+                                    , t->to()
+                                    , wnew
+                                    , r->from()
+                                  );
 
                         }
                     }
@@ -265,12 +268,22 @@ namespace wali
                     {
                         Trans * tprime = *lsit;
                         sem_elem_t wtp = wrule_trans->extend( tprime->se );
-                        update( fstate, fstack, tprime->to(), wtp, r->from(), fa );
+                        update( fstate
+                                , fstack
+                                , tprime->to()
+                                , wtp
+                                , r->from()
+                                );
                     }
                 }
             }
             else {
-                update( fstate, fstack, t->to(), wrule_trans, r->from(), fa );
+                update( fstate
+                        , fstack
+                        , t->to()
+                        , wrule_trans
+                        , r->from() 
+                      );
             }
         }
 
@@ -346,12 +359,12 @@ namespace wali
                         Trans * tprime = *it;
                         sem_elem_t wght = tprime->weight()->extend( dnew );
                         Config * config = make_config( t->from(),tprime->stack() );
-                        update( t->from(),
-                                tprime->stack(),
-                                tprime->to(),
-                                wght,
-                                config,
-                                fa );
+                        update( t->from()
+                                , tprime->stack()
+                                , tprime->to()
+                                , wght
+                                , config
+                              );
                     }
                 }
             }
@@ -370,7 +383,7 @@ namespace wali
             sem_elem_t wrule_trans = delta->extend( r->se );
 
             if( r->to_stack2() == WALI_EPSILON ) {
-                update( rtstate, rtstack, t->to(), wrule_trans, r->to(), fa );
+                update( rtstate, rtstack, t->to(), wrule_trans, r->to() );
             }
             else {
 
@@ -379,13 +392,13 @@ namespace wali
                 // TODO: implement gen_state
                 wali_key_t gstate = gen_state( rtstate,rtstack );
 
-                Trans * tprime = update_prime( gstate, r->to_stack2(), t->to(), wrule_trans , fa );
+                Trans * tprime = update_prime( gstate, r->to_stack2(), t->to(), wrule_trans );
 
                 State * state = fa.get_state( gstate );
                 sem_elem_t quasi = state->quasi->combine( wrule_trans );
                 state->quasi = quasi;
 
-                update( rtstate, rtstack, gstate, quasi->quasi_one(), r->to(), fa );
+                update( rtstate, rtstack, gstate, quasi->quasi_one(), r->to() );
 
                 // Trans with generated from states do not go on the worklist
                 // and there is no Config matching them so pass 0 (NULL) as the
@@ -412,7 +425,7 @@ namespace wali
                             Config * config = make_config( teps->from(),tpstk );
                             sem_elem_t epsW = tprime->delta->extend( teps->se );
                             update( teps->from(),tpstk,tpto,
-                                    epsW, config, fa );
+                                    epsW, config );
                         }
                     }
                 }
@@ -594,25 +607,15 @@ namespace wali
         bool WPDS::get_from_worklist( LinkedTrans * & t )
         {
             if( !worklist->empty() ) {
-                t = (LinkedTrans *)worklist->get();
+                //t = (LinkedTrans *)worklist->get();
+                //TODO: make this a debugging statement
+                LinkedTrans *lt = dynamic_cast<LinkedTrans *>(worklist->get());
+                assert(lt);
+                t = lt;
                 return true;
             }
             else {
                 t = 0;
-                return false;
-            }
-        }
-
-        /*!
-         * @brief helper method to update worklist
-         * @return true if t is added to the worklist
-         */
-        bool WPDS::add_to_worklist( LinkedTrans * t )
-        {
-            if( t->modified() ) {
-                worklist->put( t );
-            }
-            else {
                 return false;
             }
         }
@@ -626,15 +629,13 @@ namespace wali
                 wali_key_t stack,
                 wali_key_t to,
                 sem_elem_t se,
-                Config * cfg,
-                WFA & fa )
+                Config * cfg )
         {
-            LinkedTrans * t = new LinkedTrans(from,stack,to,se,cfg);
-            Trans *tmp = fa.insert(t);
-            // TODO : make this a debugging stmt
-            t = dynamic_cast< LinkedTrans* >(tmp);
-            // add_to_worklist checks the modified flag
-            add_to_worklist(t);
+            LinkedTrans * lt = new LinkedTrans(from,stack,to,se,cfg);
+            Trans *t = currentOutputWFA->insert(lt);
+            if( t->modified() ) {
+                worklist->put( t );
+            }
         }
 
         /*!
@@ -649,11 +650,10 @@ namespace wali
                 wali_key_t from,
                 wali_key_t stack,
                 wali_key_t to,
-                sem_elem_t se,
-                WFA & fa )
+                sem_elem_t se )
         {
             LinkedTrans * t = new LinkedTrans(from,stack,to,se,0);
-            Trans * tmp = fa.insert(t);
+            Trans * tmp = currentOutputWFA->insert(t);
             // TODO: Make this a debugging stmt
             t = dynamic_cast<LinkedTrans*>(tmp);
             return t;

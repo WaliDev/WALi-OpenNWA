@@ -319,22 +319,16 @@ namespace wali
                 virtual bool get_from_worklist( LinkedTrans * & );
 
                 /*!
-                 * @brief helper method to update worklist
-                 * @return true if t is added to the worklist
-                 */
-                virtual bool add_to_worklist( LinkedTrans * t );
-
-                /*!
                  * @brief helper function to create and link a transition
                  *
                  */
                 virtual void update(
-                        wali_key_t from,
-                        wali_key_t stack,
-                        wali_key_t to,
-                        sem_elem_t se,
-                        Config * cfg,
-                        ::wali::wfa::WFA & fa );
+                        wali_key_t from
+                        , wali_key_t stack
+                        , wali_key_t to
+                        , sem_elem_t se
+                        , Config * cfg
+                        );
 
                 /*!
                  * update_prime does not need to take a Config b/c no Config
@@ -345,11 +339,11 @@ namespace wali
                  * @return generated transition
                  */
                 virtual LinkedTrans * update_prime(
-                        wali_key_t from,
-                        wali_key_t stack,
-                        wali_key_t to,
-                        sem_elem_t se,
-                        ::wali::wfa::WFA & fa );
+                        wali_key_t from
+                        , wali_key_t stack
+                        , wali_key_t to
+                        , sem_elem_t se
+                        );
 
                 /*!
                  * @return const chash_t reference

@@ -629,9 +629,18 @@ namespace wali
                 }
             }
             else {
-                // combine new into old
-                combine_trans( told,tnew );
-                delete tnew;
+                // Safety check. If told == tnew then the combine
+                // is a waste of effort and the deletion is just plain
+                // wrong.
+                if( told != tnew ) {
+                    // combine new into old
+                    combine_trans( told,tnew );
+                    delete tnew;
+                }
+                else {
+                    std::cerr << "[WARNING - WFA::insert]\n";
+                    std::cerr << "\tAttempt to insert 'Trans' already owned by WFA.\n";
+                }
             }
             return told;
         }

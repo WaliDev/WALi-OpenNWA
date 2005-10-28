@@ -203,7 +203,6 @@ namespace wali
             WFA EWPDS::prestar( WFA & input )
             {
                 WFA fa;
-                //WPDS::copy_and_link( input,fa );
                 currentOutputWFA = &fa;
                 input.for_each(*this);
 
@@ -226,13 +225,12 @@ namespace wali
                         rule_t r = *rit;
 
                         // add transition for rule
-                        update(
-                                r->from_state(),
-                                r->from_stack(),
-                                r->to_state(),
-                                r->weight(),
-                                r->from(),
-                                fa );
+                        update( r->from_state()
+                                , r->from_stack()
+                                , r->to_state()
+                                , r->weight()
+                                , r->from()
+                              );
                     }
                 }
 
@@ -294,14 +292,14 @@ namespace wali
 
                                     // update
                                     update( r->from()->state(), r->from()->stack(), t->to(),
-                                            wnew,r->from(),fa );
+                                            wnew,r->from() );
                                 } else { // apply merge function
                                     erule_t er = (ERule *)(r.get_ptr());
                                     sem_elem_t w1 = er->merge_fn()->apply_f( tp.se->one(), tp.se);
                                     sem_elem_t wnew = w1->extend(dnew);
                                     // update
                                     update( r->from()->state(), r->from()->stack(), t->to(),
-                                            wnew,r->from(),fa );
+                                            wnew,r->from() );
                                 }
                             }
                         }
@@ -343,12 +341,12 @@ namespace wali
                         {
                             Trans * tprime = *lsit;
                             sem_elem_t wtp = wrule_trans->extend( tprime->se );
-                            update( fstate, fstack, tprime->to(), wtp, r->from(), fa );
+                            update( fstate, fstack, tprime->to(), wtp, r->from() );
                         }
                     }
                 }
                 else {
-                    update( fstate, fstack, t->to(), wrule_trans, r->from(), fa );
+                    update( fstate, fstack, t->to(), wrule_trans, r->from() );
                 }
             }
 
@@ -356,6 +354,7 @@ namespace wali
             WFA EWPDS::poststar( WFA & input )
             {
                 WFA fa;
+                currentOutputWFA = &fa;
                 copy_and_link_and_pair( input,fa );
 
                 // Generate midstates for each rule type two
@@ -419,18 +418,19 @@ namespace wali
                                 wght = tprime->weight()->extend( dnew );
                             }
                             Config * config = make_config( t->from(),tprime->stack() );
-                            update( t->from(),
-                                    tprime->stack(),
-                                    tprime->to(),
-                                    wght,
-                                    config,
-                                    fa );
+                            update( t->from()
+                                    , tprime->stack()
+                                    , tprime->to()
+                                    , wght
+                                    , config
+                                  );
                         }
                     }
                 }
                 // convert back from <se,se> to se
                 TransPairCollapse tpc;
                 fa.for_each( tpc );
+                currentOutputWFA = 0;
                 return fa;
             }
 
@@ -448,7 +448,7 @@ namespace wali
                 sem_elem_t wrule_trans = delta->extend( er->extended_weight() );
 
                 if( r->to_stack2() == WALI_EPSILON ) {
-                    update( rtstate, rtstack, t->to(), wrule_trans, r->to(), fa );
+                    update( rtstate, rtstack, t->to(), wrule_trans, r->to() );
                 }
                 else {
 
@@ -457,13 +457,13 @@ namespace wali
                     // TODO: implement gen_state
                     wali_key_t gstate = gen_state( rtstate,rtstack );
 
-                    Trans * tprime = update_prime( gstate, r->to_stack2(), t->to(), wrule_trans , fa );
+                    Trans * tprime = update_prime( gstate, r->to_stack2(), t->to(), wrule_trans  );
 
                     State * state = fa.get_state( gstate );
                     sem_elem_t quasi = state->quasi->combine( wrule_trans );
                     state->quasi = quasi;
 
-                    update( rtstate, rtstack, gstate, quasi->quasi_one(), r->to(), fa );
+                    update( rtstate, rtstack, gstate, quasi->quasi_one(), r->to() );
 
                     // Trans with generated from states do not go on the worklist
                     // and there is no Config matching them so pass 0 (NULL) as the
@@ -493,7 +493,7 @@ namespace wali
                                 Config * config = make_config( teps->from(),tpstk );
 
                                 update( teps->from(),tpstk,tpto,
-                                        epsW, config, fa );
+                                        epsW, config );
                             }
                         }
                     }
