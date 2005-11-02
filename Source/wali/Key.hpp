@@ -44,6 +44,7 @@ namespace wali
      */
     Key getKey( KeySource * ks );
     Key getKey( const std::string& s );
+    Key getKey( const char* s );
     Key getKey( int i );
     Key getKey( Key k1, Key k2 );
 

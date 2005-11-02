@@ -41,7 +41,12 @@ namespace wali
      * @see ref_ptr
      */
 
-    class SemElem : public Printable, public Countable {
+    class SemElem : public Printable, public Countable
+    {
+
+        public:
+            static const std::string XMLSemElemName;
+            static const std::string XMLWeightName;
 
         public:
 
@@ -85,6 +90,8 @@ namespace wali
             //! Print the semiring element to the std::ostream o
             //!
             virtual std::ostream& print( std::ostream & o ) const = 0;
+
+            std::ostream& marshall( std::ostream& o ) const;
 
             //!
             //! from_string is a user defined method for unmarshalling. The

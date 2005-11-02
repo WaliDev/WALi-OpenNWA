@@ -42,6 +42,12 @@ namespace wali
             wali_key_t getKey( const std::string& s );
 
             /*!
+             * Wrapper method for createing a StringSource and
+             * inserting it into the KeySpace
+             */
+            wali_key_t getKey( const char* s );
+
+            /*!
              * Wrapper method for createing a IntSource and
              * inserting it into the KeySpace
              */

@@ -57,6 +57,18 @@ namespace wali
     }
 
     /*!
+     * Wrapper method for createing a StringSource and
+     * inserting it into the KeySpace
+     */
+    wali_key_t KeySpace::getKey( const char* s )
+    {
+        if( s )
+            return getKey( new StringSource(s) );
+        else
+            return WALI_EPSILON;
+    }
+
+    /*!
      * Wrapper method for createing a IntSource and
      * inserting it into the KeySpace
      */

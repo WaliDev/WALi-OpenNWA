@@ -44,6 +44,11 @@ namespace wali
         return getKeySpace()->getKey(s);
     }
 
+    Key getKey( const char* s )
+    {
+        return getKeySpace()->getKey(s);
+    }
+
     Key getKey( int i )
     {
         return getKeySpace()->getKey(i);

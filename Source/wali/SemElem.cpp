@@ -6,7 +6,17 @@
 namespace wali
 {
 
+    const std::string SemElem::XMLSemElemName("Weight");
+    const std::string SemElem::XMLWeightName("Weight");
+
     SemElem::SemElem( bool countme ) : Countable(countme) {}
+
+    std::ostream& SemElem::marshall( std::ostream& o ) const
+    {
+        o << "<" << XMLWeightName << ">";
+        o << toString();
+        o << "</" << XMLWeightName << ">";
+    }
 
     /*
      * diff returns This - se
