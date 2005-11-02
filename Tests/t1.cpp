@@ -8,7 +8,7 @@
 #include "wali/wfa/Trans.hpp"
 #include "wali/wfa/State.hpp"
 #include "wali/wfa/WeightMaker.hpp"
-#include "Examples/Reach/Reach.hpp"
+#include "Reach.hpp"
 
 void dot()
 {

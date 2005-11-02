@@ -12,7 +12,7 @@
 #include "wali/wfa/Trans.hpp"
 #include "wali/wfa/State.hpp"
 // Reachability Weight Domain
-#include "Examples/Reach/Reach.hpp"
+#include "Reach.hpp"
 
 //
 // n0:
