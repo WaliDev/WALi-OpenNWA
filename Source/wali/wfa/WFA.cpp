@@ -561,7 +561,7 @@ namespace wali
             // <State
             o << "\t<" << State::XMLTag;
             // _Name='<name>'
-            o << " " << State::XMLNameTag << "'" << key2str( key ) << "'";
+            o << " " << State::XMLNameTag << "='" << key2str( key ) << "'";
             if( is_initial_state(key) ) {
                 // _initial='TRUE'
                 o << " " << State::XMLInitialTag << "='TRUE'";
