@@ -67,6 +67,7 @@ namespace wali
                 friend class ::wali::wpds::ewpds::EWPDS;
                 enum status_t { MODIFIED,SAME };
                 static int numTrans;
+                static const std::string XMLTransName;
 
             protected:
             private:

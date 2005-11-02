@@ -68,6 +68,8 @@ namespace wali
                 friend class ::wali::wpds::WPDS;
                 friend class ::wali::wpds::ewpds::EWPDS;
 
+                static const std::string XMLWFAName;
+
             protected:
             private:
 

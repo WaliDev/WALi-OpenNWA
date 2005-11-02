@@ -49,6 +49,9 @@ namespace wali
                 friend class wali::wpds::ewpds::EWPDS;
 
                 static int numStates;
+                static const std::string XMLStateName;
+                static const std::string XMLInitialName;
+                static const std::string XMLFinalName;
 
             public:
 

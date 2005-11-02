@@ -13,6 +13,7 @@ namespace wali
     {
 
         int Trans::numTrans = 0;
+        const std::string Trans::XMLTransName("Trans");
 
         Trans::Trans() :
             Countable(true),

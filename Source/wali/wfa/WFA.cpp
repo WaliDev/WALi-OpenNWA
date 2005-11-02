@@ -15,6 +15,7 @@ namespace wali
 {
     namespace wfa
     {
+        const std::string WFA::XMLWFAName("WFA");
 
         WFA::WFA( query_t q ) : init_state( WALI_EPSILON ),query(q) {}
 

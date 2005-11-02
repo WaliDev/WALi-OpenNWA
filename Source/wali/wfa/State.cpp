@@ -11,6 +11,9 @@ namespace wali
     {
 
         int State::numStates = 0;
+        const std::string State::XMLStateName("Name");
+        const std::string State::XMLInitialName("initial");
+        const std::string State::XMLFinalName("final");
 
         State::State( wali_key_t k, sem_elem_t W ) :
             Countable(true),key(k),se(W),delta_se(W)
