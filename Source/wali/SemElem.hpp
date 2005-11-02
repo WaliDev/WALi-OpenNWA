@@ -45,8 +45,7 @@ namespace wali
     {
 
         public:
-            static const std::string XMLSemElemName;
-            static const std::string XMLWeightName;
+            static const std::string XMLTag;
 
         public:
 

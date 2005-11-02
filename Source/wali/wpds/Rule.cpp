@@ -14,19 +14,24 @@ namespace wali
 
         int Rule::numRules = 0;
 
-        const std::string Rule::XMLRuleName("Rule");
+        const std::string Rule::XMLTag("Rule");
+        const std::string Rule::XMLFromTag("from");
+        const std::string Rule::XMLFromStackTag("fromStack");
+        const std::string Rule::XMLToTag("to");
+        const std::string Rule::XMLToStack1Tag("toStack1");
+        const std::string Rule::XMLToStack2Tag("toStack2");
 
         Rule::Rule( Config *f_, Config *t_, wali_key_t stk2_, sem_elem_t se_ ) :
             f(f_),t(t_),stk2(stk2_),se(se_)
         {
             numRules++;
-            std::cerr << "Rule(...) : " << numRules << std::endl;
+            //std::cerr << "Rule(...) : " << numRules << std::endl;
         }
 
         Rule::~Rule()
         {
             numRules--;
-            std::cerr << "~Rule()   : " << numRules << std::endl;
+            //std::cerr << "~Rule()   : " << numRules << std::endl;
         }
 
         const Config & Rule::from() const { return *f; }
@@ -105,25 +110,25 @@ namespace wali
 
         std::ostream & Rule::marshall( std::ostream & o ) const
         {
-            o << "<" << XMLRuleName << " ";
-            o << "from='" << key2str(from_state()) << "' ";
-            o << "fromStack='" << key2str(from_stack()) << "' ";
-            o << "to='" << key2str(to_state()) << "'";
+            o << "<" << XMLTag << " ";
+            o << XMLFromTag << "='" << key2str(from_state()) << "' ";
+            o << XMLFromStackTag << "='" << key2str(from_stack()) << "' ";
+            o << XMLToTag << "='" << key2str(to_state()) << "'";
 
             // Check optional stack symbols
             if( WALI_EPSILON != to_stack1() ) {
-                o << " toStack1='" << key2str(to_stack1()) << "'";
+                o << " " << XMLToStack1Tag << "='" << key2str(to_stack1()) << "'";
                 if( WALI_EPSILON != to_stack2() ) {
-                    o << " toStack2='" << key2str(to_stack2()) << "'";
+                    o << " " << XMLToStack2Tag << "='" << key2str(to_stack2()) << "'";
                 }
             }
             else {
                 // sanity check
                 assert( WALI_EPSILON == to_stack2() );
             }
-            o << ">\n";
-            se->marshall(o << "\t" ) << std::endl;
-            o << "</" << XMLRuleName << ">";
+            o << ">";
+            se->marshall(o);
+            o << "</" << XMLTag << ">";
             return o;
         }
 

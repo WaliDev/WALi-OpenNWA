@@ -6,16 +6,15 @@
 namespace wali
 {
 
-    const std::string SemElem::XMLSemElemName("Weight");
-    const std::string SemElem::XMLWeightName("Weight");
+    const std::string SemElem::XMLTag("Weight");
 
     SemElem::SemElem( bool countme ) : Countable(countme) {}
 
     std::ostream& SemElem::marshall( std::ostream& o ) const
     {
-        o << "<" << XMLWeightName << ">";
+        o << "<" << XMLTag << ">";
         o << toString();
-        o << "</" << XMLWeightName << ">";
+        o << "</" << XMLTag << ">";
     }
 
     /*

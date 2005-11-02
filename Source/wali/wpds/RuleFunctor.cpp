@@ -30,7 +30,7 @@ namespace wali
 
         void RuleMarshaller::operator()( const rule_t & r )
         {
-            r->marshall( os ) << std::endl;
+            r->marshall( os << "\t" ) << std::endl;
         }
 
     }
