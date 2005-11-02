@@ -33,6 +33,8 @@ namespace wali
     namespace wpds
     {
 
+        const std::string WPDS::XMLWPDSName("WPDS");
+
         WPDS::WPDS() :
             wrapper(0)
                 ,worklist( new DefaultWorklist<wfa::Trans>() )
@@ -450,9 +452,9 @@ namespace wali
         std::ostream & WPDS::marshall( std::ostream & o ) const
         {
             RuleMarshaller rm(o);
-            o << "<WPDS>\n";
+            o << "<" << XMLWPDSName << ">\n";
             for_each( rm );
-            o << "</WPDS>";
+            o << "</" << XMLWPDSName << ">";
             return o;
         }
 

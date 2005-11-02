@@ -14,6 +14,8 @@ namespace wali
 
         int Rule::numRules = 0;
 
+        const std::string Rule::XMLRuleName("Rule");
+
         Rule::Rule( Config *f_, Config *t_, wali_key_t stk2_, sem_elem_t se_ ) :
             f(f_),t(t_),stk2(stk2_),se(se_)
         {
@@ -103,24 +105,25 @@ namespace wali
 
         std::ostream & Rule::marshall( std::ostream & o ) const
         {
-            o << "<rule>\n";
-            o << "\t<fromstate>" << key2str(from_state()) << "</fromstate>\n";
-            o << "\t<fromstack>" << key2str(from_stack()) << "</fromstack>\n";
-            o << "\t<tostate>" << key2str(to_state()) << "</tostate>\n";
+            o << "<" << XMLRuleName << " ";
+            o << "from='" << key2str(from_state()) << "' ";
+            o << "fromStack='" << key2str(from_stack()) << "' ";
+            o << "to='" << key2str(to_state()) << "'";
 
             // Check optional stack symbols
             if( WALI_EPSILON != to_stack1() ) {
-                o << "\t<tostack1>" << key2str(to_stack1()) << "</tostack1>\n";
+                o << " toStack1='" << key2str(to_stack1()) << "'";
                 if( WALI_EPSILON != to_stack2() ) {
-                    o << "\t<tostack2>" << key2str(to_stack2()) << "</tostack2>\n";
+                    o << " toStack2='" << key2str(to_stack2()) << "'";
                 }
             }
             else {
                 // sanity check
                 assert( WALI_EPSILON == to_stack2() );
             }
-            o << "\t<weight>" << weight()->to_string() << "</weight>\n";
-            o << "</rule>";
+            o << ">\n";
+            se->marshall(o << "\t" ) << std::endl;
+            o << "</" << XMLRuleName << ">";
             return o;
         }
 

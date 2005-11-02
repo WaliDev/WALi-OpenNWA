@@ -45,6 +45,7 @@ namespace wali
                 friend class WPDS;
                 friend class ewpds::EWPDS;
                 friend class RuleWitness;
+                static const std::string XMLRuleName;
 
             public: // static methods
 
