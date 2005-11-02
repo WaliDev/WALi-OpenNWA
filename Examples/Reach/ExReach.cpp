@@ -31,6 +31,7 @@ fun g()
 #include "Reach.hpp"
 #include <string>
 #include <sstream>
+#include <fstream>
 
 void doReach()
 {
@@ -72,6 +73,10 @@ void doReach()
 
     // Print the WPDS
     myWpds.print( std::cerr ) << std::endl;
+
+    std::ofstream fxml( "myWpds.xml" );
+    myWpds.marshall( fxml );
+    fxml.close();
 
     // Perform poststar query
     WFA query;
