@@ -72,7 +72,7 @@ namespace wali
 
         void TransMarshaller::operator()( const Trans * t )
         {
-            t->marshall(o);
+            t->marshall(o << "\t" ) << "\n";
         }
 
     } // namespace wfa

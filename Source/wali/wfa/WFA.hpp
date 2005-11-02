@@ -68,7 +68,7 @@ namespace wali
                 friend class ::wali::wpds::WPDS;
                 friend class ::wali::wpds::ewpds::EWPDS;
 
-                static const std::string XMLWFAName;
+                static const std::string XMLTag;
 
             protected:
             private:
@@ -250,6 +250,8 @@ namespace wali
                  */
                 virtual std::ostream& marshall( std::ostream& o ) const;
 
+                virtual std::ostream& marshallState( std::ostream& o, Key key ) const;
+
                 /*!
                  * @brief inserts tnew into the WFA
                  *
@@ -271,6 +273,14 @@ namespace wali
                  * Create a State * for the key wali_key_t
                  */
                 void add_state( wali_key_t key , sem_elem_t zero );
+
+                /*!
+                 * @return const pointer to underlying State object or NULL if
+                 * no such state exists.
+                 *
+                 * @note This may throw an exception in the future
+                 */
+                const State* getState( Key name ) const;
 
             protected:
 

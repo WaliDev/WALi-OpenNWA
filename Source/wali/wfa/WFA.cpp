@@ -15,7 +15,7 @@ namespace wali
 {
     namespace wfa
     {
-        const std::string WFA::XMLWFAName("WFA");
+        const std::string WFA::XMLTag("WFA");
 
         WFA::WFA( query_t q ) : init_state( WALI_EPSILON ),query(q) {}
 
@@ -538,26 +538,41 @@ namespace wali
         {
             // TODO : add "forward" or "backward" attribute ... like
             // o << "<WFA direction="forward">\n";
-            o << "<WFA>\n";
-            o << "\t<initial_state>" << key2str( initial_state() );
-            o << "</initial_state>\n";
+            o << "<" << XMLTag << ">\n";
+
+            // do initial state
+            marshallState(o,init_state);
+
+            // do final states
             std::set< wali_key_t >::const_iterator Fit = F.begin();
             std::set< wali_key_t >::const_iterator FitEND = F.end();
             for( ; Fit != FitEND ; Fit++ )
             {
-                o << "\t<final_state>";
-                o << key2str( *Fit );
-                o << "</final_state>\n";
+                marshallState(o,*Fit);
             }
             TransMarshaller marsh(o);
             for_each(marsh);
-            o << "</WFA>";
+            o << "</" << XMLTag << ">";
             return o;
         }
 
-        ///////////////////////
-        // Begin protected WFA
-        ///////////////////////
+        std::ostream& WFA::marshallState( std::ostream& o,Key key ) const
+        {
+            // <State
+            o << "\t<" << State::XMLTag;
+            // _Name='<name>'
+            o << " " << State::XMLNameTag << "'" << key2str( key ) << "'";
+            if( is_initial_state(key) ) {
+                // _initial='TRUE'
+                o << " " << State::XMLInitialTag << "='TRUE'";
+            }
+            if( is_final_state(key) ) {
+                // if is final, then _final='TRUE'
+                o << " " << State::XMLFinalTag << "='TRUE'";
+            }
+            getState(key)->weight()->marshall(o << ">");
+            o << "</" << State::XMLTag << ">\n";
+        }
 
         /*
          * Inserts tnew into the WFA. If a transition matching tnew
@@ -655,6 +670,24 @@ namespace wali
                 state_map.insert( key , new State( key,zero ) );
             }
         }
+
+        const State* WFA::getState( Key name ) const
+        {
+            state_map_t::const_iterator stit = state_map.find( name );
+            if( stit == state_map.end() ) {
+                //throw NoSuchStateException( name );
+                return NULL;
+            }
+            else {
+                const State * state = stit->second;
+                //return *state;
+                return state;
+            }
+        }
+
+        ///////////////////////
+        // Begin protected WFA
+        ///////////////////////
 
         //
         // This is a virtual method.

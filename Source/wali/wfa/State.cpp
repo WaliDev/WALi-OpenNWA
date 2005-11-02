@@ -11,9 +11,10 @@ namespace wali
     {
 
         int State::numStates = 0;
-        const std::string State::XMLStateName("Name");
-        const std::string State::XMLInitialName("initial");
-        const std::string State::XMLFinalName("final");
+        const std::string State::XMLTag("State");
+        const std::string State::XMLInitialTag("initial");
+        const std::string State::XMLFinalTag("final");
+        const std::string State::XMLNameTag("Name");
 
         State::State( wali_key_t k, sem_elem_t W ) :
             Countable(true),key(k),se(W),delta_se(W)
@@ -22,7 +23,8 @@ namespace wali
             quasi = W->zero();
             {
                 // TODO : R
-                std::cerr << "State(...) : " << ++numStates << std::endl;;
+                numStates++;
+                //std::cerr << "State(...) : " << numStates << std::endl;;
             }
         }
 
@@ -30,7 +32,8 @@ namespace wali
         {
             {
                 // TODO : R
-                std::cerr << "~State()   : " << --numStates << std::endl;;
+                numStates--;
+                //std::cerr << "~State()   : " << --numStates << std::endl;;
             }
         }
 
@@ -52,9 +55,9 @@ namespace wali
             rev_trans_ls.push_back(t);
         }
 
-    } // keyspace wfa
+    } // namespace wfa
 
-} // keyspace wali
+} // namespace wali
 
 /* Yo, Emacs!
    ;;; Local Variables: ***

@@ -13,7 +13,10 @@ namespace wali
     {
 
         int Trans::numTrans = 0;
-        const std::string Trans::XMLTransName("Trans");
+        const std::string Trans::XMLTag("Trans");
+        const std::string Trans::XMLFromTag("from");
+        const std::string Trans::XMLStackTag("stack");
+        const std::string Trans::XMLToTag("to");
 
         Trans::Trans() :
             Countable(true),
@@ -22,7 +25,8 @@ namespace wali
         {
             {
                 // TODO : R
-                std::cerr << "Trans(...) : " << ++numTrans << std::endl;
+                numTrans++;
+                //std::cerr << "Trans(...) : " << numTrans << std::endl;
             }
         }
 
@@ -37,7 +41,8 @@ namespace wali
         {
             {
                 // TODO : R
-                std::cerr << "Trans(...) : " << ++numTrans << std::endl;
+                numTrans++;
+                //std::cerr << "Trans(...) : " << numTrans << std::endl;
             }
         }
 
@@ -55,7 +60,8 @@ namespace wali
             status  = rhs.status;
             {
                 // TODO : R
-                std::cerr << "Trans( const Trans& ) : " << ++numTrans << std::endl;
+                numTrans++;
+                //std::cerr << "Trans( const Trans& ) : " << numTrans << std::endl;
             }
         }
 
@@ -63,7 +69,8 @@ namespace wali
         {
             {
                 // TODO : R
-                std::cerr << "~Trans()   : " << --numTrans << std::endl;
+                numTrans--;
+                //std::cerr << "~Trans()   : " << numTrans << std::endl;
             }
         }
 
@@ -124,24 +131,17 @@ namespace wali
 
         std::ostream& Trans::marshall( std::ostream& o ) const
         {
-            o << "<Trans>\n";
-            o << "\t<from_state>";
-            o << key2str( from() );
-            o << "</from_state>\n";
-
-            o << "\t<stack>";
-            o << key2str( stack() );
-            o << "</stack>\n";
-
-            o << "\t<to_state>";
-            o << key2str( to() );
-            o << "</to_state>\n";
+            o << "<" << XMLTag;
+            // from
+            o << " " << XMLFromTag << "='" << key2str(from()) << "'";
+            // stack
+            o << " " << XMLStackTag << "='" << key2str(stack()) << "'";
+            //to 
+            o << " " << XMLToTag << "='" << key2str(to()) << "'>";
             
-            o << "\t<weight>";
-            weight()->print(o);
-            o << "</weight>\n";
+            weight()->marshall(o);
 
-            o << "</Trans>\n";
+            o << "</" << XMLTag << ">";
             return o;
         }
 

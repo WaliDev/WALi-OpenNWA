@@ -49,9 +49,10 @@ namespace wali
                 friend class wali::wpds::ewpds::EWPDS;
 
                 static int numStates;
-                static const std::string XMLStateName;
-                static const std::string XMLInitialName;
-                static const std::string XMLFinalName;
+                static const std::string XMLTag;
+                static const std::string XMLInitialTag;
+                static const std::string XMLFinalTag;
+                static const std::string XMLNameTag;
 
             public:
 
@@ -85,6 +86,10 @@ namespace wali
                  * Return a reference to the State's weight
                  */
                 sem_elem_t& weight() {
+                    return se;
+                }
+
+                const sem_elem_t& weight() const {
                     return se;
                 }
 
