@@ -148,7 +148,7 @@
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
             <item Name='WALiDir' Path='$(WALi_HOME)/Source' />
-            <item Name='Reach' RelativePath='$(WALi_HOME)/Examples/Reach' />
+            <item Name='Reach' Path='$(WALi_HOME)/Examples/Reach' />
         </IncludeList>
         <InputList>
             <item Name='t3' RelativePath='t3.cpp' />
