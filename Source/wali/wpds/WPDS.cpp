@@ -150,18 +150,18 @@ namespace wali
                 fa.clear();
                 fa.set_initial_state( tmp.initial_state() );
                 fa.F = tmp.F;
+                tmp.for_each(*this);
             }
             else {
                 fa.clear();
                 fa.set_initial_state( input.initial_state() );
                 fa.F = input.F;
+                input.for_each(*this);
             }
         }
 
         void WPDS::prestarSetupFixpoint( WFA& input, WFA& fa )
         {
-            //copy_and_link( input,fa );
-            input.for_each(*this);
 
             //
             // do rules 0
@@ -326,8 +326,6 @@ namespace wali
 
         void WPDS::poststarSetupFixpoint( WFA& input, WFA& fa )
         {
-            //copy_and_link( input,fa );
-            input.for_each(*this);
 
             // Generate midstates for each rule type two
             r2hash_t::iterator r2it = r2hash.begin();
