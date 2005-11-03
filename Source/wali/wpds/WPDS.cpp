@@ -135,13 +135,27 @@ namespace wali
         void WPDS::prestar( WFA & input, WFA & fa )
         {
             currentOutputWFA = &fa;
-            fa.clear();
+            setupOutput(input,fa);
             fa.setQuery(WFA::INORDER);
-            fa.set_initial_state( input.initial_state() );
-            fa.F = input.F;
             prestarSetupFixpoint(input,fa);
             prestarComputeFixpoint( fa );
             currentOutputWFA = 0;
+        }
+
+        void WPDS::setupOutput( ::wali::wfa::WFA& input, ::wali::wfa::WFA& fa )
+        {
+            // cannot clear if input == output
+            if( &input == &fa ) {
+                WFA tmp(input);
+                fa.clear();
+                fa.set_initial_state( tmp.initial_state() );
+                fa.F = tmp.F;
+            }
+            else {
+                fa.clear();
+                fa.set_initial_state( input.initial_state() );
+                fa.F = input.F;
+            }
         }
 
         void WPDS::prestarSetupFixpoint( WFA& input, WFA& fa )
@@ -303,10 +317,8 @@ namespace wali
         void WPDS::poststar( WFA & input, WFA & fa )
         {
             currentOutputWFA = &fa;
-            fa.clear();
+            setupOutput(input,fa);
             fa.setQuery(WFA::REVERSE);
-            fa.set_initial_state( input.initial_state() );
-            fa.F = input.F;
             poststarSetupFixpoint(input,fa);
             poststarComputeFixpoint(fa);
             currentOutputWFA = 0;

@@ -221,6 +221,11 @@ namespace wali
                         rule_t& r );
 
                 /*!
+                 * @brief copy relevant material from input WFA to output WFA
+                 */
+                virtual void setupOutput( ::wali::wfa::WFA& input, ::wali::wfa::WFA& fa );
+
+                /*!
                  * @brief Gets WPDS ready for fixpoint
                  */
                 virtual void prestarSetupFixpoint( ::wali::wfa::WFA& input, ::wali::wfa::WFA& fa );
