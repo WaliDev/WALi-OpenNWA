@@ -16,8 +16,17 @@ namespace wali
     namespace wfa
     {
         const std::string WFA::XMLTag("WFA");
+        const std::string WFA::XMLQueryTag("query");
+        const std::string WFA::XMLInorderTag("INORDER");
+        const std::string WFA::XMLReverseTag("REVERSE");
 
-        WFA::WFA( query_t q ) : init_state( WALI_EPSILON ),query(q) {}
+        WFA::WFA( query_t q ) : init_state( WALI_EPSILON ),query(q)
+        {
+            if( query == MAX ) {
+                std::cerr << "[WARNING] Invalid WFA::query. Resetting to INORDER.\n";
+                query = INORDER;
+            }
+        }
 
         WFA::WFA( const WFA & rhs ) : Printable()
         {
@@ -115,12 +124,30 @@ namespace wali
             return init_state;
         }
 
-        /*!
-         * Test if param key is the initial state.
-         */
+        //
+        // Test if param key is the initial state.
+        // 
         bool WFA::is_initial_state( wali_key_t key ) const
         {
             return key == init_state;
+        }
+
+        //
+        // Set the query
+        //
+        WFA::query_t WFA::setQuery( WFA::query_t newQuery )
+        {
+            query_t old = query;
+            query = newQuery;
+            return old;
+        }
+
+        //
+        // get the query
+        //
+        WFA::query_t WFA::getQuery() const
+        {
+            return query;
         }
 
         /*!
@@ -538,7 +565,16 @@ namespace wali
         {
             // TODO : add "forward" or "backward" attribute ... like
             // o << "<WFA direction="forward">\n";
-            o << "<" << XMLTag << ">\n";
+            o << "<" << XMLTag;
+            switch( query ) {
+                case REVERSE:
+                    o << " " << XMLQueryTag << "='REVERSE'>\n";
+                    break;
+                case INORDER:
+                case MAX:
+                    o << " " << XMLQueryTag << "='INORDER'>\n";
+                    break;
+            }
 
             // do initial state
             marshallState(o,init_state);

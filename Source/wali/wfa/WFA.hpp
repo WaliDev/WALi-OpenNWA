@@ -69,6 +69,9 @@ namespace wali
                 friend class ::wali::wpds::ewpds::EWPDS;
 
                 static const std::string XMLTag;
+                static const std::string XMLQueryTag;
+                static const std::string XMLInorderTag;
+                static const std::string XMLReverseTag;
 
             protected:
             private:
@@ -122,6 +125,22 @@ namespace wali
                  * Return true if parameter key is a final state
                  */
                 bool is_final_state( wali_key_t key ) const;
+
+                /*!
+                 * Set the WFA query mode.
+                 * @return the old query mode
+                 */
+                query_t setQuery( query_t newQuery );
+
+                /*!
+                 * @return WFA query mode
+                 *
+                 * The query mode effects how weights are extended during
+                 * path summary. 
+                 *
+                 * @see WFA::query_t
+                 */
+                query_t getQuery() const;
 
                 /*! @brief Add transition (p,g,q) to the WFA
                  *

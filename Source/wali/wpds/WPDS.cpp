@@ -135,6 +135,7 @@ namespace wali
         void WPDS::prestar( WFA & input, WFA & fa )
         {
             currentOutputWFA = &fa;
+            fa.setQuery(WFA::INORDER);
             prestarSetupFixpoint(input,fa);
             prestarComputeFixpoint( fa );
             currentOutputWFA = 0;
@@ -299,6 +300,7 @@ namespace wali
         void WPDS::poststar( WFA & input, WFA & fa )
         {
             currentOutputWFA = &fa;
+            fa.setQuery(WFA::REVERSE);
             poststarSetupFixpoint(input,fa);
             poststarComputeFixpoint(fa);
             currentOutputWFA = 0;
