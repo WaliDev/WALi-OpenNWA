@@ -44,7 +44,7 @@ namespace wali
 
             public:
                 friend class TransCopyLinker;
-                static const std::string XMLWPDSName;
+                static const std::string XMLTag;
 
             protected:
                 typedef HashMap< KeyPair,Config * > chash_t;

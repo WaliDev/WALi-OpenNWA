@@ -33,7 +33,7 @@ namespace wali
     namespace wpds
     {
 
-        const std::string WPDS::XMLWPDSName("WPDS");
+        const std::string WPDS::XMLTag("WPDS");
 
         WPDS::WPDS() :
             wrapper(0)
@@ -454,9 +454,9 @@ namespace wali
         std::ostream & WPDS::marshall( std::ostream & o ) const
         {
             RuleMarshaller rm(o);
-            o << "<" << XMLWPDSName << ">\n";
+            o << "<" << XMLTag << ">\n";
             for_each( rm );
-            o << "</" << XMLWPDSName << ">";
+            o << "</" << XMLTag << ">";
             return o;
         }
 
