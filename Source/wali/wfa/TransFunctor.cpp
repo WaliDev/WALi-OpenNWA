@@ -34,7 +34,7 @@ namespace wali
         {
             {
                 // TODO : REMOVE
-                t->print( std::cerr << "\tDeleting " ) << std::endl;
+                //t->print( std::cerr << "\tDeleting " ) << std::endl;
             }
             delete t;
         }

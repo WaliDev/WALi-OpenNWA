@@ -56,7 +56,7 @@ namespace wali
         {
             {
                 // TODO : R
-                std::cerr << "~WFA()\n";
+                //std::cerr << "~WFA()\n";
             }
             clear();
         }
