@@ -15,6 +15,7 @@ namespace wali
         o << "<" << XMLTag << ">";
         o << toString();
         o << "</" << XMLTag << ">";
+        return o;
     }
 
     /*

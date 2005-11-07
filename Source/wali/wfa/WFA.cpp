@@ -608,6 +608,7 @@ namespace wali
             }
             getState(key)->weight()->marshall(o << ">");
             o << "</" << State::XMLTag << ">\n";
+            return o;
         }
 
         /*
