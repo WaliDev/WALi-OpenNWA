@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="WALi.static"
+	Name="WALi.static.NET"
 	ProjectGUID="{1BCBFF7B-CAA9-4D8D-8B29-A55037D5E62C}"
 	RootNamespace="WALi.static"
 	Keyword="Win32Proj">
