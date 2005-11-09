@@ -134,9 +134,6 @@ namespace wali
 
         void WPDS::prestar( WFA & input, WFA & fa )
         {
-            currentOutputWFA = &fa;
-            setupOutput(input,fa);
-            fa.setQuery(WFA::INORDER);
             prestarSetupFixpoint(input,fa);
             prestarComputeFixpoint( fa );
             currentOutputWFA = 0;
@@ -144,8 +141,9 @@ namespace wali
 
         void WPDS::setupOutput( ::wali::wfa::WFA& input, ::wali::wfa::WFA& fa )
         {
+            currentOutputWFA = &fa;
             // cannot clear if input == output
-            if( &input == &fa ) {
+            if( &input == currentOutputWFA ) {
                 WFA tmp(input);
                 fa.clear();
                 fa.set_initial_state( tmp.initial_state() );
@@ -162,6 +160,8 @@ namespace wali
 
         void WPDS::prestarSetupFixpoint( WFA& input, WFA& fa )
         {
+            setupOutput(input,fa);
+            fa.setQuery(WFA::INORDER);
 
             //
             // do rules 0
@@ -316,9 +316,6 @@ namespace wali
 
         void WPDS::poststar( WFA & input, WFA & fa )
         {
-            currentOutputWFA = &fa;
-            setupOutput(input,fa);
-            fa.setQuery(WFA::REVERSE);
             poststarSetupFixpoint(input,fa);
             poststarComputeFixpoint(fa);
             currentOutputWFA = 0;
@@ -326,6 +323,8 @@ namespace wali
 
         void WPDS::poststarSetupFixpoint( WFA& input, WFA& fa )
         {
+            setupOutput(input,fa);
+            fa.setQuery(WFA::REVERSE);
 
             // Generate midstates for each rule type two
             r2hash_t::iterator r2it = r2hash.begin();
