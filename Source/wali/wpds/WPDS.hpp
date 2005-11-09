@@ -57,7 +57,7 @@ namespace wali
                  * the rule R1 = < s1,a > -> < s2, b c > will add R1 to 
                  * the list that is mapped to by the stack symbol c.
                  */
-                typedef HashMap< wali_key_t, std::list< rule_t > > r2hash_t;
+                typedef HashMap< wali::Key, std::list< rule_t > > r2hash_t;
 
             private:
 
@@ -80,12 +80,12 @@ namespace wali
                  * @return true if rule existed
                  *
                  * @see sem_elem_t
-                 * @see wali_key_t
+                 * @see wali::Key
                  */
                 virtual bool add_rule(
-                        wali_key_t from_state,
-                        wali_key_t from_stack,
-                        wali_key_t to_state,
+                        wali::Key from_state,
+                        wali::Key from_stack,
+                        wali::Key to_state,
                         sem_elem_t se );
 
                 /*! @brief create rule with one r.h.s. stack symbol
@@ -93,13 +93,13 @@ namespace wali
                  * @return true if rule existed
                  *
                  * @see sem_elem_t
-                 * @see wali_key_t
+                 * @see wali::Key
                  */
                 virtual bool add_rule(
-                        wali_key_t from_state,
-                        wali_key_t from_stack,
-                        wali_key_t to_state,
-                        wali_key_t to_stack1,
+                        wali::Key from_state,
+                        wali::Key from_stack,
+                        wali::Key to_state,
+                        wali::Key to_stack1,
                         sem_elem_t se );
 
                 /*! @brief create rule with two r.h.s. stack symbols
@@ -107,14 +107,14 @@ namespace wali
                  * @return true if rule existed
                  *
                  * @see sem_elem_t
-                 * @see wali_key_t
+                 * @see wali::Key
                  */
                 virtual bool add_rule(
-                        wali_key_t from_state,
-                        wali_key_t from_stack,
-                        wali_key_t to_state,
-                        wali_key_t to_stack1,
-                        wali_key_t to_stack2,
+                        wali::Key from_state,
+                        wali::Key from_stack,
+                        wali::Key to_state,
+                        wali::Key to_stack1,
+                        wali::Key to_stack2,
                         sem_elem_t se );
 
                 /*!
@@ -209,14 +209,14 @@ namespace wali
                  * @return true if rule existed
                  *
                  * @see sem_elem_t
-                 * @see wali_key_t
+                 * @see wali::Key
                  */
                 virtual bool add_rule(
-                        wali_key_t from_state,
-                        wali_key_t from_stack,
-                        wali_key_t to_state,
-                        wali_key_t to_stack1,
-                        wali_key_t to_stack2,
+                        wali::Key from_state,
+                        wali::Key from_stack,
+                        wali::Key to_state,
+                        wali::Key to_stack1,
+                        wali::Key to_stack2,
                         sem_elem_t se,
                         rule_t& r );
 
@@ -269,9 +269,9 @@ namespace wali
                  *
                  * gen_state is only used by poststar
                  *
-                 * @return wali_key_t for new state
+                 * @return wali::Key for new state
                  */
-                virtual wali_key_t gen_state( wali_key_t state, wali_key_t stack );
+                virtual wali::Key gen_state( wali::Key state, wali::Key stack );
 
                 /*!
                  * @brief link input WFA transitions to Configs
@@ -288,7 +288,7 @@ namespace wali
                  *
                  * @return Config pointer
                  */
-                virtual Config * make_config( wali_key_t state, wali_key_t stack );
+                virtual Config * make_config( wali::Key state, wali::Key stack );
 
                 /*!
                  * Creates a rule that links two configurations.
@@ -303,7 +303,7 @@ namespace wali
                 virtual bool make_rule(
                         Config *f,
                         Config *t,
-                        wali_key_t stk2,
+                        wali::Key stk2,
                         sem_elem_t se,
                         rule_t& r );
 
@@ -315,7 +315,7 @@ namespace wali
                  * @see Config
                  * @see KeyPair
                  */
-                virtual Config * find_config( wali_key_t state, wali_key_t stack );
+                virtual Config * find_config( wali::Key state, wali::Key stack );
 
                 /*! @brief helper method for fixpoint loop
                  *
@@ -329,9 +329,9 @@ namespace wali
                  *
                  */
                 virtual void update(
-                        wali_key_t from
-                        , wali_key_t stack
-                        , wali_key_t to
+                        wali::Key from
+                        , wali::Key stack
+                        , wali::Key to
                         , sem_elem_t se
                         , Config * cfg
                         );
@@ -345,9 +345,9 @@ namespace wali
                  * @return generated transition
                  */
                 virtual LinkedTrans * update_prime(
-                        wali_key_t from
-                        , wali_key_t stack
-                        , wali_key_t to
+                        wali::Key from
+                        , wali::Key stack
+                        , wali::Key to
                         , sem_elem_t se
                         );
 
