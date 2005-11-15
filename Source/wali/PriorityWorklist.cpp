@@ -7,25 +7,7 @@
 
 namespace wali
 {
-    ////////
-    // class StackSymLT
-    ////////
-    bool StackSymLT::operator()(
-            const wfa::Trans* a,
-            const wfa::Trans* b) const
-    {
-        if( (a->stack() != WALI_EPSILON) && (b->stack() != WALI_EPSILON)) {
-            return a->stack() < b->stack();
-        }
-        else {
-            return a->stack() && (b->stack() == WALI_EPSILON);
-        }
-    }
-
-    ////////
-    // class PriorityWorklist
-    ////////
-    PriorityWorklist::PriorityWorklist() : Worklist<wfa::Trans>() {}
+    PriorityWorklist::PriorityWorklist() : Worklist<wfa::Trans>(), workset(LessThan(*this)) {}
 
     PriorityWorklist::~PriorityWorklist()
     {
@@ -67,6 +49,28 @@ namespace wali
         }
         workset.clear();
     }
+
+    int PriorityWorklist::compareTo( const wfa::Trans* a , const wfa::Trans* b) const
+    {
+        if( a->stack() == b->stack() ) {
+            return 0;
+        }
+        else if( a->stack() < b->stack() ) {
+            return -1;
+        }
+        else {
+            return 1;
+        }
+        /*
+        if( (a->stack() != WALI_EPSILON) && (b->stack() != WALI_EPSILON)) {
+            return (a->stack() < b->stack()) ? -1 : 1;
+        }
+        else {
+            return a->stack() && (b->stack() == WALI_EPSILON);
+        }
+        */
+    }
+
 }
 
 /* Yo, Emacs!

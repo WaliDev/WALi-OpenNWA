@@ -13,24 +13,29 @@
 
 namespace wali
 {
-
-    /*!
-     * @ class StackSymLT
-     *
-     * Implements comparator to use a set for sorting transitions
-     * according in a priority queue.
-     */
-    struct StackSymLT {
-        bool operator()( const wfa::Trans* a, const wfa::Trans* b) const;
-    };
+    class PriorityWorklist;
 
     class PriorityWorklist : public Worklist<wfa::Trans>
     {
+        private:
+            struct LessThan {
+                LessThan( PriorityWorklist& pw ) : pWorklist(pw) {}
+
+                PriorityWorklist& pWorklist;
+
+                bool operator()( const wfa::Trans* a, const wfa::Trans* b ) const
+                {
+                    return pWorklist.compareTo(a,b) < 0;
+                }
+
+            };
+
         public:
-            typedef std::multiset< wfa::Trans*, StackSymLT > pwl_t;
+            typedef std::multiset< wfa::Trans*, LessThan > pwl_t;
 
         public:
             PriorityWorklist();
+
             virtual ~PriorityWorklist();
 
             virtual bool put( wfa::Trans *t );
@@ -40,6 +45,12 @@ namespace wali
             virtual bool empty() const;
 
             virtual void clear();
+
+            /*
+             * Override this for custom sorting. Default is to perform a
+             * comparison on the Trans's stack key.
+             */
+            virtual int compareTo( const wfa::Trans* a, const wfa::Trans* b ) const;
 
         protected:
             pwl_t workset;
