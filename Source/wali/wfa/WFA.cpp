@@ -475,6 +475,7 @@ namespace wali
                 for( ; tit != titEND ; tit++ )
                 {
                     Trans* t = *tit; // (q',x,q)
+                    //t->print( std::cerr << "\t++ Popped " ) << std::endl;
                     State *qprime = get_state(t->from()); // q'
 
                     sem_elem_t extended;
@@ -489,6 +490,8 @@ namespace wali
                     std::pair< sem_elem_t,sem_elem_t > p =
                         extended->delta( qprime->weight() );
 
+                    //p.first->print( std::cerr << "\t++ p.first " ) << std::endl;
+                    //p.second->print( std::cerr << "\t++ p.second " ) << std::endl;
                     // Sets qprime's new weight
                     // p.first == (l(t) X the_delta) + W(qprime)
                     qprime->weight() = p.first;

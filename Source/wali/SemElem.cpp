@@ -49,7 +49,7 @@ namespace wali
     {
         std::pair< sem_elem_t , sem_elem_t > rp;
         rp.first = combine(se);
-        rp.second = diff(se);
+        rp.second = se->diff(this);
         return rp;
     }
 
