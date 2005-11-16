@@ -86,6 +86,9 @@ namespace wali
             kpmap.clear();
             eps_map.clear();
             state_map.clear();
+            F.clear();
+            Q.clear();
+            init_state = WALI_EPSILON;
         }
 
         /*!
