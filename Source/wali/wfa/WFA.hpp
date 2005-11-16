@@ -10,6 +10,7 @@
 #include "wali/SemElem.hpp"
 #include "wali/HashMap.hpp"
 #include "wali/KeyContainer.hpp"
+#include "wali/wfa/WeightMaker.hpp"
 #include <iostream>
 #include <list>
 #include <set>
@@ -34,7 +35,6 @@ namespace wali
         class Trans;
         class TransFunctor;
         class ConstTransFunctor;
-        class WeightMaker;
 
         /*! @class WFA
          *
@@ -215,6 +215,16 @@ namespace wali
                 virtual WFA intersect( WFA& fa );
 
                 /*!
+                 * Intersect this with parameter fa. This is a wrapper
+                 * for intersect( WeightMaker&,WFA&,WFA& ) that passes
+                 * the WeightMaker KeepBoth. Result is stored in dest.
+                 *
+                 * @see wali::wfa::WeightMaker
+                 * @see wali::wfa::KeepBoth
+                 */
+                virtual void intersect( WFA& fa, WFA& dest );
+
+                /*!
                  * Intersect this with parameter fa and return the result
                  * by value. The parameter WeightMaker determines how
                  * intersection should join the weights on matching
@@ -301,6 +311,8 @@ namespace wali
                  */
                 const State* getState( Key name ) const;
 
+                const std::set< Key >& getStates() const;
+
             protected:
 
                 /*! @brief fold tnew into told
@@ -336,7 +348,8 @@ namespace wali
                 state_map_t state_map;   //! < map from key to State
                 eps_map_t eps_map;       //! < map from "to state" to list of eps trans ending in "to state"
                 wali_key_t init_state;   //! < initial state of WFA
-                std::set< wali_key_t > F;//! < set of final states
+                std::set< Key > F;       //! < set of final states
+                std::set< Key > Q;       //! < set of all states
                 query_t query;           //! < determine the extend order for path_summary
 
             private:

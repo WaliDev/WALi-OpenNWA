@@ -65,7 +65,7 @@
         BuildDir='Examples/Reach' Type='executable' >
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
-            <item Name='WALiDir' Path='$(WALi_HOME)/Source' />
+            <item Name='WALiDir' Path='$(WALiDir)/Source' />
             <item Name='Reach' RelativePath='.' />
         </IncludeList>
         <InputList>
@@ -73,7 +73,7 @@
             <item Name='ExReach' RelativePath='ExReach.cpp' />
         </InputList>
         <LibraryList>
-            <item Name='wali' Path='$(WALi_HOME)/lib' />
+            <item Name='wali' Path='$(WALiDir)/lib' />
         </LibraryList>
     </Project>
 
@@ -81,7 +81,7 @@
         BuildDir='Examples/Reach/ewpds' Type='executable' >
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
-            <item Name='WALiDir' Path='$(WALi_HOME)/Source' />
+            <item Name='WALiDir' Path='$(WALiDir)/Source' />
             <item Name='Reach' RelativePath='../' />
             <item Name='ewpdsReach' RelativePath='.' />
         </IncludeList>
@@ -90,7 +90,7 @@
             <item Name='ExReach' RelativePath='ExReach.cpp' />
         </InputList>
         <LibraryList>
-            <item Name='wali' Path='$(WALi_HOME)/lib' />
+            <item Name='wali' Path='$(WALiDir)/lib' />
         </LibraryList>
     </Project>
 
@@ -112,15 +112,15 @@
 
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
-            <item Name='waliDir' Path='$(WALi_HOME)/Source' />
-            <item Name='Reach' Path='$(WALi_HOME)/Examples/Reach' />
+            <item Name='waliDir' Path='$(WALiDir)/Source' />
+            <item Name='Reach' Path='$(WALiDir)/Examples/Reach' />
         </IncludeList>
         <InputList>
             <item Name='t1' RelativePath='t1.cpp' />
-            <item Name='Reach' Path='$(WALi_HOME)/Examples/Reach/Reach.cpp' />
+            <item Name='Reach' Path='$(WALiDir)/Examples/Reach/Reach.cpp' />
         </InputList>
         <LibraryList>
-            <item Name='wali' Path='$(WALi_HOME)/lib' />
+            <item Name='wali' Path='$(WALiDir)/lib' />
         </LibraryList>
     </Project>
 
@@ -130,15 +130,15 @@
 
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
-            <item Name='WALiDir' Path='$(WALi_HOME)/Source' />
-            <item Name='Reach' Path='$(WALi_HOME)/Examples/Reach' />
+            <item Name='WALiDir' Path='$(WALiDir)/Source' />
+            <item Name='Reach' Path='$(WALiDir)/Examples/Reach' />
         </IncludeList>
         <InputList>
             <item Name='t2' RelativePath='t2.cpp' />
-            <item Name='Reach' Path='$(WALi_HOME)/Examples/Reach/Reach.cpp' />
+            <item Name='Reach' Path='$(WALiDir)/Examples/Reach/Reach.cpp' />
         </InputList>
         <LibraryList>
-            <item Name='wali' Path='$(WALi_HOME)/lib' />
+            <item Name='wali' Path='$(WALiDir)/lib' />
         </LibraryList>
     </Project>
 
@@ -148,15 +148,15 @@
 
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
-            <item Name='WALiDir' Path='$(WALi_HOME)/Source' />
-            <item Name='Reach' Path='$(WALi_HOME)/Examples/Reach' />
+            <item Name='WALiDir' Path='$(WALiDir)/Source' />
+            <item Name='Reach' Path='$(WALiDir)/Examples/Reach' />
         </IncludeList>
         <InputList>
             <item Name='t3' RelativePath='t3.cpp' />
-            <item Name='Reach' Path='$(WALi_HOME)/Examples/Reach/Reach.cpp' />
+            <item Name='Reach' Path='$(WALiDir)/Examples/Reach/Reach.cpp' />
         </InputList>
         <LibraryList>
-            <item Name='wali' Path='$(WALi_HOME)/lib' />
+            <item Name='wali' Path='$(WALiDir)/lib' />
         </LibraryList>
     </Project>
 
@@ -166,15 +166,15 @@
 
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
-            <item Name='WALiDir' Path='$(WALi_HOME)/Source' />
-            <item Name='Reach' Path='$(WALi_HOME)/Examples/Reach' />
+            <item Name='WALiDir' Path='$(WALiDir)/Source' />
+            <item Name='Reach' Path='$(WALiDir)/Examples/Reach' />
         </IncludeList>
         <InputList>
             <item Name='t4' RelativePath='t4.cpp' />
-            <item Name='Reach' Path='$(WALi_HOME)/Examples/Reach/Reach.cpp' />
+            <item Name='Reach' Path='$(WALiDir)/Examples/Reach/Reach.cpp' />
         </InputList>
         <LibraryList>
-            <item Name='wali' Path='$(WALi_HOME)/lib' />
+            <item Name='wali' Path='$(WALiDir)/lib' />
         </LibraryList>
     </Project>
 

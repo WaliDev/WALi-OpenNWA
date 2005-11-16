@@ -326,6 +326,12 @@ namespace wali
             return intersect(wmaker,fa);
         }
 
+        void WFA::intersect( WFA& fa, WFA& dest )
+        {
+            KeepBoth wmaker;
+            intersect(wmaker,fa,dest);
+        }
+
         /* 
          * Intersect this and fa, returning the result
          */
@@ -705,6 +711,7 @@ namespace wali
         {
             if( state_map.find( key ) == state_map.end() ) {
                 state_map.insert( key , new State( key,zero ) );
+                Q.insert(key);
             }
         }
 
@@ -720,6 +727,11 @@ namespace wali
                 //return *state;
                 return state;
             }
+        }
+
+        const std::set< Key >& WFA::getStates() const
+        {
+            return Q;
         }
 
         ///////////////////////
@@ -765,11 +777,11 @@ namespace wali
                 if( is_final_state( st->name() ) ) {
                     st->weight() = st->weight()->one();
                     st->delta() = st->delta()->one();
+                    wl.put( st );
                 }
                 else {
                     st->weight() = st->weight()->zero();
                     st->delta() = st->delta()->zero();
-                    wl.put( st );
                 }
             }
         }
