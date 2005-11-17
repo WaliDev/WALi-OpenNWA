@@ -200,7 +200,7 @@ namespace wali
             while( get_from_worklist( t ) )
             {
 
-                t->print( std::cerr << "$$$ Popped t ==> " ) << std::endl;
+                //t->print( std::cerr << "$$$ Popped t ==> " ) << std::endl;
 
                 // Get config
                 Config * config = t->config;
@@ -217,8 +217,8 @@ namespace wali
                 {
                     rule_t & r = *bwit;
 
-                    std::cerr << "\tCalling prestar_handle_trans  :  ";
-                    r->print( std::cout << "\tr == " ) << std::endl;
+                    //std::cerr << "\tCalling prestar_handle_trans  :  ";
+                    //r->print( std::cout << "\tr == " ) << std::endl;
 
                     prestar_handle_trans( t,fa,r,dnew );
 
@@ -348,7 +348,7 @@ namespace wali
 
             while( get_from_worklist( t ) ) {
 
-                t->print( std::cerr << "$$$ Popped t ==> " ) << std::endl;
+                //t->print( std::cerr << "$$$ Popped t ==> " ) << std::endl;
 
                 // Get config
                 Config * config = t->config;
