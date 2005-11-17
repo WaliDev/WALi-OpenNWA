@@ -49,6 +49,9 @@ namespace wali
     {
         std::pair< sem_elem_t , sem_elem_t > rp;
         rp.first = combine(se);
+        // Because of the nature of diff, use se->diff(this). The idea
+        // is that the combine in diff will not be equal to se if this
+        // is 'lower' than se
         rp.second = se->diff(this);
         return rp;
     }
