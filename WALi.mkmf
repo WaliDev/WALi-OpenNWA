@@ -6,11 +6,11 @@
            Default='wali' RelativePath='.' >
 
     <Project Name="wali" RelativePath="Source"
-        OutputDir="lib" BuildDir="objects" Type="library" >
+        OutputDir="lib" BuildDir="objects" Type="Library" >
 
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
-            <item Name='WALiDir' RelativePath='.' />
+            <item Name='WALiDir' Path='$(ProjectDir)' />
         </IncludeList>
         <InputList>
             <!-- WALi -->
@@ -62,42 +62,42 @@
     -->
     <!-- Reach Example -->
     <Project Name='ExReach' RelativePath='Examples/Reach' OutputDir='Examples/Reach'
-        BuildDir='Examples/Reach' Type='executable' >
+        BuildDir='Examples/Reach' Type='Executable' >
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
-            <item Name='WALiDir' Path='$(WALiDir)/Source' />
-            <item Name='Reach' RelativePath='.' />
+            <item Name='Reach' Path='$(ProjectDir)' />
         </IncludeList>
         <InputList>
             <item Name='Reach' RelativePath='Reach.cpp' />
             <item Name='ExReach' RelativePath='ExReach.cpp' />
         </InputList>
-        <LibraryList>
-            <item Name='wali' Path='$(WALiDir)/lib' />
-        </LibraryList>
+        <DependencyList>
+            <item Name='wali' />
+        </DependencyList>
     </Project>
 
     <Project Name='EWPDSExReach' RelativePath='Examples/Reach/ewpds' OutputDir='Examples/Reach/ewpds'
-        BuildDir='Examples/Reach/ewpds' Type='executable' >
+        BuildDir='Examples/Reach/ewpds' Type='Executable' >
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
-            <item Name='WALiDir' Path='$(WALiDir)/Source' />
             <item Name='Reach' RelativePath='../' />
-            <item Name='ewpdsReach' RelativePath='.' />
+            <item Name='ewpdsReach' Path='$(ProjectDir)' />
         </IncludeList>
         <InputList>
             <item Name='Reach' RelativePath='../Reach.cpp' />
             <item Name='ExReach' RelativePath='ExReach.cpp' />
         </InputList>
-        <LibraryList>
-            <item Name='wali' Path='$(WALiDir)/lib' />
-        </LibraryList>
+        <DependencyList>
+            <item Name='wali' />
+        </DependencyList>
     </Project>
 
-    <ProjectGroup Name='examples' >
-        <dependency Name='ExReach' />
-        <dependency Name='EWPDSExReach' />
-    </ProjectGroup>
+    <Project Name='examples' RelativePath='Examples' Type='Empty'>
+        <DependencyList>
+            <item Name='ExReach' />
+            <item Name='EWPDSExReach' />
+        </DependencyList>
+    </Project>
 
     <!--
         End Examples
@@ -108,82 +108,80 @@
     -->
     <!-- Test 1 -->
     <Project Name='t1' RelativePath='Tests' 
-        BuildDir='Tests' OuputDir='Tests' Type='executable' >
+        BuildDir='Tests' OuputDir='Tests' Type='Executable' >
 
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
-            <item Name='waliDir' Path='$(WALiDir)/Source' />
             <item Name='Reach' Path='$(WALiDir)/Examples/Reach' />
         </IncludeList>
         <InputList>
             <item Name='t1' RelativePath='t1.cpp' />
             <item Name='Reach' Path='$(WALiDir)/Examples/Reach/Reach.cpp' />
         </InputList>
-        <LibraryList>
-            <item Name='wali' Path='$(WALiDir)/lib' />
-        </LibraryList>
+        <DependencyList>
+            <item Name='wali' />
+        </DependencyList>
     </Project>
 
     <!-- Test 2 -->
     <Project Name='t2' RelativePath='Tests' 
-        BuildDir='Tests' OuputDir='Tests' Type='executable' >
+        BuildDir='Tests' OuputDir='Tests' Type='Executable' >
 
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
-            <item Name='WALiDir' Path='$(WALiDir)/Source' />
             <item Name='Reach' Path='$(WALiDir)/Examples/Reach' />
         </IncludeList>
         <InputList>
             <item Name='t2' RelativePath='t2.cpp' />
             <item Name='Reach' Path='$(WALiDir)/Examples/Reach/Reach.cpp' />
         </InputList>
-        <LibraryList>
-            <item Name='wali' Path='$(WALiDir)/lib' />
-        </LibraryList>
+        <DependencyList>
+            <item Name='wali' />
+        </DependencyList>
     </Project>
 
     <!-- Test 3 -->
     <Project Name='t3' RelativePath='Tests'
-        BuildDir='Tests' OuputDir='Tests' Type='executable' >
+        BuildDir='Tests' OuputDir='Tests' Type='Executable' >
 
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
-            <item Name='WALiDir' Path='$(WALiDir)/Source' />
             <item Name='Reach' Path='$(WALiDir)/Examples/Reach' />
         </IncludeList>
         <InputList>
             <item Name='t3' RelativePath='t3.cpp' />
             <item Name='Reach' Path='$(WALiDir)/Examples/Reach/Reach.cpp' />
         </InputList>
-        <LibraryList>
-            <item Name='wali' Path='$(WALiDir)/lib' />
-        </LibraryList>
+        <DependencyList>
+            <item Name='wali' />
+        </DependencyList>
     </Project>
 
     <!-- Test 4 -->
     <Project Name='t4' RelativePath='Tests' 
-        BuildDir='Tests' OuputDir='Tests' Type='executable' >
+        BuildDir='Tests' OuputDir='Tests' Type='Executable' >
 
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
         <IncludeList>
-            <item Name='WALiDir' Path='$(WALiDir)/Source' />
             <item Name='Reach' Path='$(WALiDir)/Examples/Reach' />
         </IncludeList>
         <InputList>
             <item Name='t4' RelativePath='t4.cpp' />
             <item Name='Reach' Path='$(WALiDir)/Examples/Reach/Reach.cpp' />
         </InputList>
-        <LibraryList>
-            <item Name='wali' Path='$(WALiDir)/lib' />
-        </LibraryList>
+        <DependencyList>
+            <item Name='wali' />
+        </DependencyList>
     </Project>
 
-    <ProjectGroup Name='tests' >
-        <dependency Name='t1' />
-        <dependency Name='t2' />
-        <dependency Name='t3' />
-        <dependency Name='t4' />
-    </ProjectGroup>
+    <Project Name='tests' RelativePath='Tests' Type='Empty'>
+        <DependencyList>
+            <item Name='t1' />
+            <item Name='t2' />
+            <item Name='t3' />
+            <item Name='t4' />
+        </DependencyList>
+    </Project>
 
     <!--
         End Tests
