@@ -37,12 +37,10 @@ namespace wali
             // left child
             Witness* left = w->left().get_ptr();
             printEdge(w,left);
-            left->accept(*this);
 
             // right child
             Witness* right = w->right().get_ptr();
             printEdge(w,right);
-            right->accept(*this);
 
             // this
             printNode(w, "green", "(x) " + w->weight()->toString());
@@ -57,8 +55,6 @@ namespace wali
             {
                 Witness* child = it->get_ptr();
                 printEdge(w,child);
-                child->accept(*this);
-
             }
 
             // this
