@@ -34,9 +34,17 @@ namespace wali
                 virtual void visitRule( WitnessRule * w );
                 virtual void visitTrans( WitnessTrans * w );
 
+                //
+                // Helper functions for printing in Witness nodes
+                // in dotty format
+                //
                 void printNodeName( Witness * w );
+
                 void printEdge( Witness * head, Witness * tail );
+
                 void printNode( Witness * w, std::string color );
+
+                void printNode( Witness * w, std::string color, std::string label );
 
                 void printNodeName( witness_t& wit ) {
                     printNodeName( wit.get_ptr() );

@@ -45,7 +45,7 @@ namespace wali
             right->accept(*this);
 
             // this
-            printNode(w,"green");
+            printNode(w, "green", "(x) " + w->weight()->toString());
         }
 
         void VisitorDot::visitCombine( WitnessCombine * w )
@@ -62,17 +62,17 @@ namespace wali
             }
 
             // this
-            printNode(w,"light_blue");
+            printNode(w, "light_blue", "(+) " + w->weight()->toString());
         }
 
         void VisitorDot::visitRule( WitnessRule * w )
         {
-            printNode(w,"yellow");
+            printNode(w,"yellow",w->getRuleStub().toString());
         }
 
         void VisitorDot::visitTrans( WitnessTrans * w )
         {
-            printNode(w,"orange");
+            printNode(w,"orange",w->getTrans().toString());
         }
 
         void VisitorDot::printNodeName( Witness * w )
@@ -90,9 +90,14 @@ namespace wali
 
         void VisitorDot::printNode( Witness * w, std::string color )
         {
+            printNode(w,color,w->weight()->toString());
+        }
+
+        void VisitorDot::printNode( Witness * w, std::string color, std::string label )
+        {
             os << "\t";
             printNodeName(w);
-            os << " [label=\"" << w->weight()->to_string();
+            os << " [label=\"" << label;
             os << "\",color=" << color << ",style=filled];\n";
         }
 
