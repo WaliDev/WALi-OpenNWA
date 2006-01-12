@@ -27,12 +27,13 @@ namespace wali
             os << "}\n";
         }
 
-        void VisitorDot::visit( Witness * w )
+        bool VisitorDot::visit( Witness * w )
         {
             printNode(w,"red");
+            return true;
         }
 
-        void VisitorDot::visitExtend( WitnessExtend * w )
+        bool VisitorDot::visitExtend( WitnessExtend * w )
         {
             // left child
             Witness* left = w->left().get_ptr();
@@ -44,9 +45,10 @@ namespace wali
 
             // this
             printNode(w, "green", "(x) " + w->weight()->toString());
+            return true;
         }
 
-        void VisitorDot::visitCombine( WitnessCombine * w )
+        bool VisitorDot::visitCombine( WitnessCombine * w )
         {
             std::list< witness_t >::iterator it = w->children().begin();
             std::list< witness_t >::iterator itEND = w->children().end();
@@ -59,16 +61,19 @@ namespace wali
 
             // this
             printNode(w, "light_blue", "(+) " + w->weight()->toString());
+            return true;
         }
 
-        void VisitorDot::visitRule( WitnessRule * w )
+        bool VisitorDot::visitRule( WitnessRule * w )
         {
             printNode(w,"yellow",w->getRuleStub().toString());
+            return true;
         }
 
-        void VisitorDot::visitTrans( WitnessTrans * w )
+        bool VisitorDot::visitTrans( WitnessTrans * w )
         {
             printNode(w,"orange",w->getTrans().toString());
+            return true;
         }
 
         void VisitorDot::printNodeName( Witness * w )

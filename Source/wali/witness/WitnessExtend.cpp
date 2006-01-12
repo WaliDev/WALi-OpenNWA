@@ -30,11 +30,12 @@ namespace wali
         //
         void WitnessExtend::accept( Visitor& v )
         {
-            v.visitExtend(this);
-            if( hasLeft() )
-                left()->accept(v);
-            if( hasRight() )
-                right()->accept(v);
+            if( v.visitExtend(this) ) {
+                if( hasLeft() )
+                    left()->accept(v);
+                if( hasRight() )
+                    right()->accept(v);
+            }
         }
 
         // Override Witness::prettyPrint

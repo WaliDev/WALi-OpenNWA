@@ -28,11 +28,11 @@ namespace wali
                 VisitorDot( std::ostream& o );
 
                 virtual ~VisitorDot();
-                virtual void visit( Witness * w );
-                virtual void visitExtend( WitnessExtend * w );
-                virtual void visitCombine( WitnessCombine * w );
-                virtual void visitRule( WitnessRule * w );
-                virtual void visitTrans( WitnessTrans * w );
+                virtual bool visit( Witness * w );
+                virtual bool visitExtend( WitnessExtend * w );
+                virtual bool visitCombine( WitnessCombine * w );
+                virtual bool visitRule( WitnessRule * w );
+                virtual bool visitTrans( WitnessTrans * w );
 
                 //
                 // Helper functions for printing in Witness nodes

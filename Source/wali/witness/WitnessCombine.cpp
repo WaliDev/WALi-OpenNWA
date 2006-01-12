@@ -94,11 +94,12 @@ namespace wali
         //
         void WitnessCombine::accept( Visitor& v )
         {
-            v.visitCombine(this);
-            std::list< witness_t >::iterator it = children().begin();
-            for( ; it != children().end(); it++ ) {
-                witness_t& child = *it;
-                child->accept(v);
+            if( v.visitCombine(this) ) {
+                std::list< witness_t >::iterator it = children().begin();
+                for( ; it != children().end(); it++ ) {
+                    witness_t& child = *it;
+                    child->accept(v);
+                }
             }
         }
 

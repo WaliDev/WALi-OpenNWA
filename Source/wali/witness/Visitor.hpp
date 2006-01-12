@@ -33,11 +33,31 @@ namespace wali
         {
             public:
                 virtual ~Visitor() {}
-                virtual void visit( Witness * w );
-                virtual void visitExtend( WitnessExtend * w );
-                virtual void visitCombine( WitnessCombine * w );
-                virtual void visitRule( WitnessRule * w );
-                virtual void visitTrans( WitnessTrans * w );
+
+                /*!
+                 * @return true to continue visiting children, false to stop.
+                 */
+                virtual bool visit( Witness * w );
+
+                /*!
+                 * @return true to continue visiting children, false to stop.
+                 */
+                virtual bool visitExtend( WitnessExtend * w );
+
+                /*!
+                 * @return true to continue visiting children, false to stop.
+                 */
+                virtual bool visitCombine( WitnessCombine * w );
+
+                /*!
+                 * @return true to continue visiting children, false to stop.
+                 */
+                virtual bool visitRule( WitnessRule * w );
+
+                /*!
+                 * @return true to continue visiting children, false to stop.
+                 */
+                virtual bool visitTrans( WitnessTrans * w );
 
         }; // class Visitor
 

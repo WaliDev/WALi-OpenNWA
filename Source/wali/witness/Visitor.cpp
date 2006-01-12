@@ -19,34 +19,34 @@ namespace wali
         //
         // TODO : Replace std::cerr with a WALi error ostream.
         //
-        void Visitor::visit( Witness * w ATTR_UNUSED )
+        bool Visitor::visit( Witness * w ATTR_UNUSED )
         {
             std::cerr << "[ERROR] wali::Visitor::visit invoked. Aborting.\n";
-            assert(0);
+            return false;
         }
 
-        void Visitor::visitExtend( WitnessExtend * w ATTR_UNUSED )
+        bool Visitor::visitExtend( WitnessExtend * w ATTR_UNUSED )
         {
             std::cerr << "[ERROR] wali::Visitor::visitextend invoked. Aborting.\n";
-            assert(0);
+            return false;
         }
 
-        void Visitor::visitCombine( WitnessCombine * w ATTR_UNUSED )
+        bool Visitor::visitCombine( WitnessCombine * w ATTR_UNUSED )
         {
             std::cerr << "[ERROR] wali::Visitor::visitCombine invoked. Aborting.\n";
-            assert(0);
+            return false;
         }
 
-        void Visitor::visitRule( WitnessRule * w ATTR_UNUSED )
+        bool Visitor::visitRule( WitnessRule * w ATTR_UNUSED )
         {
             std::cerr << "[ERROR] wali::Visitor::visitRule invoked. Aborting.\n";
-            assert(0);
+            return false;
         }
 
-        void Visitor::visitTrans( WitnessTrans * w ATTR_UNUSED )
+        bool Visitor::visitTrans( WitnessTrans * w ATTR_UNUSED )
         {
             std::cerr << "[ERROR] wali::Visitor::visitTrans invoked. Aborting.\n";
-            assert(0);
+            return false;
         }
 
     } // namespace witness
