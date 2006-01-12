@@ -37,14 +37,19 @@ namespace wali
                 virtual sem_elem_t combine( SemElem * se );
 
                 /*!
+                 * Override Witness::accept
+                 */
+                virtual void accept( Visitor& v );
+
+                /*!
                  * Override Witness::pretty_print
                  */
-                virtual std::ostream& pretty_print( std::ostream& o, size_t depth ) const;
+                virtual std::ostream& prettyPrint( std::ostream& o, size_t depth ) const;
 
                 /*!
                  * Add a child to this
                  */
-                void add_child( witness_t w );
+                void addChild( witness_t w );
 
                 /*!
                  * The combine of all the weights of the children should (must)

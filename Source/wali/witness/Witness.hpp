@@ -88,7 +88,7 @@ namespace wali
                  *
                  * TODO : The ability to output in dotty format would be nice
                  */
-                virtual std::ostream& pretty_print( std::ostream& o, size_t depth ) const;
+                virtual std::ostream& prettyPrint( std::ostream& o, size_t depth ) const;
 
                 /*!
                  * Prints "  |" to parameter o for each level of depth
@@ -96,7 +96,7 @@ namespace wali
                  * TODO : should "  |" be a macro, a configurable string, or a
                  *      parameter to format_depth?
                  */
-                std::ostream& format_depth( std::ostream& o, size_t depth ) const;
+                std::ostream& formatDepth( std::ostream& o, size_t depth ) const;
 
                 /*!
                  * Returns protected sem_elem_t se member variable that is the

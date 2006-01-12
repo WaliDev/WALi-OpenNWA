@@ -4,6 +4,7 @@
 
 #include "wali/Common.hpp"
 #include "wali/witness/WitnessCombine.hpp"
+#include "wali/witness/Visitor.hpp"
 #include <algorithm>
 
 namespace wali
@@ -83,24 +84,32 @@ namespace wali
                     newwc->absorb(this);
                 }
                 // Add "that" to wc
-                newwc->add_child(that);
+                newwc->addChild(that);
             }
             return newwc;
         }
 
         //
-        // Override Witness::pretty_print
+        // Override Witness::accept
         //
-        std::ostream& WitnessCombine::pretty_print( std::ostream& o, size_t depth ) const
+        void WitnessCombine::accept( Visitor& v )
         {
-            format_depth(o,depth);
+            v.visitCombine(this);
+        }
+
+        //
+        // Override Witness::prettyPrint
+        //
+        std::ostream& WitnessCombine::prettyPrint( std::ostream& o, size_t depth ) const
+        {
+            formatDepth(o,depth);
             o << "WitnessCombine: ";
             user_se->print(o) << std::endl;
             std::list< witness_t >::const_iterator it = kids.begin();
             std::list< witness_t >::const_iterator itEND = kids.end();
             for( ; it != itEND ; it++ )
             {
-                (*it)->pretty_print(o,depth+1);
+                (*it)->prettyPrint(o,depth+1);
             }
             return o;
 
@@ -109,9 +118,9 @@ namespace wali
         //
         // Add a child to this
         //
-        void WitnessCombine::add_child( witness_t w )
+        void WitnessCombine::addChild( witness_t w )
         {
-            std::cerr << "[WitnessCombine::add_child]\n";
+            std::cerr << "[WitnessCombine::addChild]\n";
             kids.push_back( w );
         }
 

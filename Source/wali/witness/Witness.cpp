@@ -76,15 +76,15 @@ namespace wali
                 newwc->absorb(oldwc);
                 if( !combined_se->equal( oldwc->user_se ) ) 
                 {
-                    newwc->add_child(this);
+                    newwc->addChild(this);
                 }
                 // NO ELSE CASE b/c oldwc contains this's weight
             }
             else {
                 // Neither this nor that are of type WitnessCombine. 
                 // Simply add this and that to newwc's children.
-                newwc->add_child(that);
-                newwc->add_child(this);
+                newwc->addChild(that);
+                newwc->addChild(this);
             }
             return newwc;
         }
@@ -101,7 +101,7 @@ namespace wali
         std::ostream& Witness::print( std::ostream& o ) const
         {
             o << "\n";
-            return pretty_print(o,0);
+            return prettyPrint(o,0);
         }
 
         void Witness::accept( Visitor& v )
@@ -110,15 +110,15 @@ namespace wali
         }
 
         // Adds 2 spaces and a vertical bar for each depth
-        std::ostream& Witness::pretty_print( std::ostream& o, size_t depth ) const
+        std::ostream& Witness::prettyPrint( std::ostream& o, size_t depth ) const
         {
-            format_depth( o , depth );
+            formatDepth( o , depth );
             o << "Witness: ";
             user_se->print(o) << std::endl;
             return o;
         }
 
-        std::ostream& Witness::format_depth( std::ostream& o , size_t depth ) const
+        std::ostream& Witness::formatDepth( std::ostream& o , size_t depth ) const
         {
             for( ; depth > 0 ; depth-- )
             {

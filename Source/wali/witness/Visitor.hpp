@@ -34,10 +34,10 @@ namespace wali
             public:
                 virtual ~Visitor() {}
                 virtual void visit( Witness * w );
-                virtual void visit_extend( WitnessExtend * w );
-                virtual void visit_combine( WitnessCombine * w );
-                virtual void visit_rule( WitnessRule * w );
-                virtual void visit_trans( WitnessTrans * w );
+                virtual void visitExtend( WitnessExtend * w );
+                virtual void visitCombine( WitnessCombine * w );
+                virtual void visitRule( WitnessRule * w );
+                virtual void visitTrans( WitnessTrans * w );
 
         }; // class Visitor
 

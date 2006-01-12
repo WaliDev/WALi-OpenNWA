@@ -4,6 +4,7 @@
 
 #include "wali/Common.hpp"
 #include "wali/witness/WitnessExtend.hpp"
+#include "wali/witness/Visitor.hpp"
 
 namespace wali
 {
@@ -24,21 +25,29 @@ namespace wali
         // virtual destructor
         WitnessExtend::~WitnessExtend() {}
 
-        // Override Witness::pretty_print
-        std::ostream& WitnessExtend::pretty_print( std::ostream& o, size_t depth ) const
+        //
+        // Override Witness::accept
+        //
+        void WitnessExtend::accept( Visitor& v )
         {
-            format_depth(o,depth);
+            v.visitExtend(this);
+        }
+
+        // Override Witness::prettyPrint
+        std::ostream& WitnessExtend::prettyPrint( std::ostream& o, size_t depth ) const
+        {
+            formatDepth(o,depth);
             o << "WitnessExtend: ";
             user_se->print(o) << std::endl;
-            if( has_left() )
+            if( hasLeft() )
             {
-                lchild->pretty_print(o,depth+1);
-                if( has_right() )
-                    rchild->pretty_print(o,depth+1);
+                lchild->prettyPrint(o,depth+1);
+                if( hasRight() )
+                    rchild->prettyPrint(o,depth+1);
             }
             else {
                 // TODO : make debug
-                assert( !has_right() );
+                assert( !hasRight() );
             }
             return o;
         }

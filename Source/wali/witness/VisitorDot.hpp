@@ -29,23 +29,23 @@ namespace wali
 
                 virtual ~VisitorDot();
                 virtual void visit( Witness * w );
-                virtual void visit_extend( WitnessExtend * w );
-                virtual void visit_combine( WitnessCombine * w );
-                virtual void visit_rule( WitnessRule * w );
-                virtual void visit_trans( WitnessTrans * w );
+                virtual void visitExtend( WitnessExtend * w );
+                virtual void visitCombine( WitnessCombine * w );
+                virtual void visitRule( WitnessRule * w );
+                virtual void visitTrans( WitnessTrans * w );
 
-                void print_node_name( Witness * w );
-                void print_edge( Witness * head, Witness * tail );
-                void print_node( Witness * w, std::string color );
+                void printNodeName( Witness * w );
+                void printEdge( Witness * head, Witness * tail );
+                void printNode( Witness * w, std::string color );
 
-                void print_node_name( witness_t& wit ) {
-                    print_node_name( wit.get_ptr() );
+                void printNodeName( witness_t& wit ) {
+                    printNodeName( wit.get_ptr() );
                 }
-                void print_edge( witness_t& h,witness_t& t ) {
-                    print_edge(h.get_ptr(),t.get_ptr());
+                void printEdge( witness_t& h,witness_t& t ) {
+                    printEdge(h.get_ptr(),t.get_ptr());
                 }
-                void print_node( witness_t& w,std::string color ) {
-                    print_node( w.get_ptr(),color );
+                void printNode( witness_t& w,std::string color ) {
+                    printNode( w.get_ptr(),color );
                 }
             protected:
                 std::ostream& os;

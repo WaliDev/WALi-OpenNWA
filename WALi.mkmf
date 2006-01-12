@@ -123,8 +123,8 @@
         </DependencyList>
     </Project>
 
-    <!-- Test 2 -->
-    <Project Name='t2' RelativePath='Tests' 
+    <!-- Test witness -->
+    <Project Name='twitness' RelativePath='Tests' 
         BuildDir='Tests' OuputDir='Tests' Type='Executable' >
 
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
@@ -132,7 +132,7 @@
             <item Name='Reach' Path='$(WALiDir)/Examples/Reach' />
         </IncludeList>
         <InputList>
-            <item Name='t2' RelativePath='t2.cpp' />
+            <item Name='twitness' RelativePath='twitness.cpp' />
             <item Name='Reach' Path='$(WALiDir)/Examples/Reach/Reach.cpp' />
         </InputList>
         <DependencyList>
@@ -177,7 +177,7 @@
     <Project Name='tests' RelativePath='Tests' Type='Empty'>
         <DependencyList>
             <item Name='t1' />
-            <item Name='t2' />
+            <item Name='twitness' />
             <item Name='t3' />
             <item Name='t4' />
         </DependencyList>

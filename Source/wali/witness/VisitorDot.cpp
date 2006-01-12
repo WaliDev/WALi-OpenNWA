@@ -29,62 +29,62 @@ namespace wali
 
         void VisitorDot::visit( Witness * w )
         {
-            print_node(w,"red");
+            printNode(w,"red");
         }
 
-        void VisitorDot::visit_extend( WitnessExtend * w )
+        void VisitorDot::visitExtend( WitnessExtend * w )
         {
             // left child
-            print_edge(w,w->left().get_ptr());
+            printEdge(w,w->left().get_ptr());
 
             // right child
-            print_edge(w,w->right().get_ptr());
+            printEdge(w,w->right().get_ptr());
 
             // this
-            print_node(w,"green");
+            printNode(w,"green");
         }
 
-        void VisitorDot::visit_combine( WitnessCombine * w )
+        void VisitorDot::visitCombine( WitnessCombine * w )
         {
             std::list< witness_t >::iterator it = w->children().begin();
             std::list< witness_t >::iterator itEND = w->children().end();
             // each child
             for( ; it != itEND ; it++ )
             {
-                print_edge(w,it->get_ptr());
+                printEdge(w,it->get_ptr());
             }
 
             // this
-            print_node(w,"light_blue");
+            printNode(w,"light_blue");
         }
 
-        void VisitorDot::visit_rule( WitnessRule * w )
+        void VisitorDot::visitRule( WitnessRule * w )
         {
-            print_node(w,"yellow");
+            printNode(w,"yellow");
         }
 
-        void VisitorDot::visit_trans( WitnessTrans * w )
+        void VisitorDot::visitTrans( WitnessTrans * w )
         {
-            print_node(w,"orange");
+            printNode(w,"orange");
         }
 
-        void VisitorDot::print_node_name( Witness * w )
+        void VisitorDot::printNodeName( Witness * w )
         {
             os << "\tw" << (unsigned int)w;
         }
 
-        void VisitorDot::print_edge( Witness * head, Witness * tail )
+        void VisitorDot::printEdge( Witness * head, Witness * tail )
         {
-            print_node_name( head );
+            printNodeName( head );
             os << " -> ";
-            print_node_name( tail );
+            printNodeName( tail );
             os << ";\n";
         }
 
-        void VisitorDot::print_node( Witness * w, std::string color )
+        void VisitorDot::printNode( Witness * w, std::string color )
         {
             os << "\t";
-            print_node_name(w);
+            printNodeName(w);
             os << " [label=\"" << w->weight()->to_string();
             os << "\",color=" << color << ",style=filled];\n";
         }

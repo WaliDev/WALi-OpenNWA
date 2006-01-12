@@ -50,9 +50,14 @@ namespace wali
                 virtual ~WitnessExtend();
 
                 /*!
+                 * Override Witness::accept
+                 */
+                virtual void accept( Visitor& v );
+
+                /*!
                  * Override Witness::pretty_print
                  */
-                virtual std::ostream& pretty_print( std::ostream& o, size_t depth ) const;
+                virtual std::ostream& prettyPrint( std::ostream& o, size_t depth ) const;
 
                 /*!
                  * @return witness_t that is the left child
@@ -62,7 +67,7 @@ namespace wali
                 /*!
                  * @return true if the left child is valid
                  */
-                bool has_left() const { return !lchild.is_empty(); }
+                bool hasLeft() const { return !lchild.is_empty(); }
 
                 /*!
                  * @return witness_t that is the right child
@@ -72,7 +77,7 @@ namespace wali
                 /*!
                  * @return true if the right child is valid
                  */
-                bool has_right() const { return !rchild.is_empty(); }
+                bool hasRight() const { return !rchild.is_empty(); }
 
             protected:
                 witness_t lchild;      //! < left parameter of binary extend

@@ -4,10 +4,13 @@
  * Tests Witnesses
  */
 #include <iostream>
+#include <fstream>
 #include "wali/Common.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/wpds/WPDS.hpp"
+#include "wali/witness/Witness.hpp"
 #include "wali/witness/WitnessWrapper.hpp"
+#include "wali/witness/VisitorDot.hpp"
 // For debug info in main()
 #include "wali/wfa/Trans.hpp"
 #include "wali/wfa/State.hpp"
@@ -60,6 +63,20 @@ void dot()
     WFA faout = pds->poststar(fain);
     faout.print( cout << "----- WFA AFTER -----\n" ) << std::endl;
 
+    wali::wfa::Trans t;
+    if( faout.find(p,n3,acc,t) ) {
+        sem_elem_t se = t.weight();
+        std::ofstream odot("twitness.dot");
+        wali::witness::VisitorDot v(odot);
+        wali::witness::Witness* wit = dynamic_cast<wali::witness::Witness*>(se.get_ptr());
+        if( 0 != wit ) {
+            wit->accept(v);
+        }
+        else {
+            std::cerr << "[ERROR] Weight is not a Witness.";
+            assert(wit);
+        }
+    }
     delete wrapper;
     delete pds;
 }

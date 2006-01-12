@@ -4,6 +4,7 @@
 
 #include "wali/Common.hpp"
 #include "wali/witness/WitnessTrans.hpp"
+#include "wali/witness/Visitor.hpp"
 
 namespace wali
 {
@@ -20,16 +21,24 @@ namespace wali
         {
         }
 
-        // Overrides Witness::pretty_print
-        std::ostream& WitnessTrans::pretty_print( std::ostream& o,size_t depth ) const
+        //
+        // Override Witness::accept
+        //
+        void WitnessTrans::accept( Visitor& v )
         {
-            format_depth(o,depth);
+            v.visitTrans(this);
+        }
+
+        // Overrides Witness::prettyPrint
+        std::ostream& WitnessTrans::prettyPrint( std::ostream& o,size_t depth ) const
+        {
+            formatDepth(o,depth);
             o << "WitnessTrans: ";
             t.print(o) << std::endl;
             return o;
         }
 
-        const Trans& WitnessTrans::trans() const
+        const Trans& WitnessTrans::getTrans() const
         {
             return t;
         }

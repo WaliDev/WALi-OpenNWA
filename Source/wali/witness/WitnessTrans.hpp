@@ -15,6 +15,7 @@ namespace wali
 
     namespace witness
     {
+
         /*!
          * @class WitnessTrans
          *
@@ -50,11 +51,16 @@ namespace wali
                 ~WitnessTrans();
 
                 /*!
-                 * Overrides Witness::pretty_pring
+                 * Override Witness::accept
                  */
-                virtual std::ostream& pretty_print( std::ostream& o,size_t depth ) const;
+                virtual void accept( Visitor& v );
 
-                const Trans& trans() const;
+                /*!
+                 * Overrides Witness::prettyPrint
+                 */
+                virtual std::ostream& prettyPrint( std::ostream& o,size_t depth ) const;
+
+                const Trans& getTrans() const;
 
             protected:
                 Trans t;

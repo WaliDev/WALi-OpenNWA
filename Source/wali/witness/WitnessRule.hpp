@@ -72,11 +72,16 @@ namespace wali
                 ~WitnessRule();
 
                 /*!
-                 * Overrides Witness::pretty_pring
+                 * Override Witness::accept
                  */
-                virtual std::ostream& pretty_print( std::ostream& o,size_t depth ) const;
+                virtual void accept( Visitor& v );
 
-                RuleStub& rule_stub();
+                /*!
+                 * Overrides Witness::prettyPrint
+                 */
+                virtual std::ostream& prettyPrint( std::ostream& o,size_t depth ) const;
+
+                RuleStub& getRuleStub();
 
             protected:
                 RuleStub stub;

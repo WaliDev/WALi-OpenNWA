@@ -3,6 +3,7 @@
  */
 #include "wali/Common.hpp"
 #include "wali/witness/WitnessRule.hpp"
+#include "wali/witness/Visitor.hpp"
 
 namespace wali
 {
@@ -101,16 +102,24 @@ namespace wali
         {
         }
 
-        // override Witness::pretty_print
-        std::ostream& WitnessRule::pretty_print( std::ostream& o,size_t depth ) const
+        //
+        // Override Witness::accept
+        //
+        void WitnessRule::accept( Visitor& v )
         {
-            format_depth(o,depth);
+            v.visitRule(this);
+        }
+
+        // override Witness::prettyPrint
+        std::ostream& WitnessRule::prettyPrint( std::ostream& o,size_t depth ) const
+        {
+            formatDepth(o,depth);
             o << "WitnessRule: ";
             stub.print(o) << std::endl;
             return o;
         }
 
-        RuleStub& WitnessRule::rule_stub()
+        RuleStub& WitnessRule::getRuleStub()
         {
             return stub;
         }
