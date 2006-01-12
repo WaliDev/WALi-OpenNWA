@@ -35,10 +35,14 @@ namespace wali
         void VisitorDot::visitExtend( WitnessExtend * w )
         {
             // left child
-            printEdge(w,w->left().get_ptr());
+            Witness* left = w->left().get_ptr();
+            printEdge(w,left);
+            left->accept(*this);
 
             // right child
-            printEdge(w,w->right().get_ptr());
+            Witness* right = w->right().get_ptr();
+            printEdge(w,right);
+            right->accept(*this);
 
             // this
             printNode(w,"green");
@@ -51,7 +55,10 @@ namespace wali
             // each child
             for( ; it != itEND ; it++ )
             {
-                printEdge(w,it->get_ptr());
+                Witness* child = it->get_ptr();
+                printEdge(w,child);
+                child->accept(*this);
+
             }
 
             // this
