@@ -30,6 +30,16 @@ namespace wali
                 virtual ~Witness();
 
                 /*!
+                 * Test if the Witness has user weight ZERO
+                 */
+                bool isZero();
+
+                /*!
+                 * Test if the Witness has user weight ONE
+                 */
+                bool isOne();
+
+                /*!
                  * Returns a new Witness whose user_se is a sem_elem_t ONE
                  * element of the user's weight domain.
                  *

@@ -30,7 +30,7 @@ namespace wali
 
         Key RuleStub::from_stack()
         {
-            return fs;
+            return fstk;
         }
 
         Key RuleStub::to_state()
