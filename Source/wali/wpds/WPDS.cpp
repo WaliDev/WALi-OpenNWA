@@ -522,23 +522,25 @@ namespace wali
             Config *from = make_config(from_state,from_stack);
             Config *to = make_config(to_state,to_stack1);
 
-            if( to_stack1 == WALI_EPSILON )
-            {
-                assert( to_stack2 == WALI_EPSILON );
-                rule_zeroes.insert( to );
-            }
-
             // make_rule will create links b/w Configs and the Rule
             bool rb = make_rule(from,to,to_stack2,se,r);
 
             // if rb is false then the rule is new
-            if( to_stack2 != WALI_EPSILON && !rb ) {
-                r2hash_t::iterator r2it = r2hash.find( to_stack2 );
-                if( r2it == r2hash.end() ) {
-                    std::list< rule_t > ls;
-                    r2it = r2hash.insert( to_stack2,ls ).first;
+            if( !rb ) {
+                if( to_stack1 == WALI_EPSILON )
+                {
+                    // TODO : make debug check
+                    assert( to_stack2 == WALI_EPSILON );
+                    rule_zeroes.insert( to );
                 }
-                r2it->second.push_back( r );
+                if( to_stack2 != WALI_EPSILON ) {
+                    r2hash_t::iterator r2it = r2hash.find( to_stack2 );
+                    if( r2it == r2hash.end() ) {
+                        std::list< rule_t > ls;
+                        r2it = r2hash.insert( to_stack2,ls ).first;
+                    }
+                    r2it->second.push_back( r );
+                }
             }
             return rb;
         }
@@ -589,7 +591,10 @@ namespace wali
                 {
                     rb = true;
                     if( wrapper ) {
-                        tmp->se = tmp->se->combine(wrapper->wrap(*tmp));
+                        // FIXME: Should we combine user weights at bottom
+                        // of stack?
+                        rule_t wrapTmp =  new Rule(f,t,stk2,se);
+                        tmp->se = tmp->se->combine(wrapper->wrap(*wrapTmp));
                     }
                     else {
                         tmp->se = tmp->se->combine(se);
