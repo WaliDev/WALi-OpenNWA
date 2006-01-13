@@ -53,10 +53,10 @@ namespace wali
             }
 
             // Do this here as both branches perform the combine
-            sem_elem_t combined_se = user_se->combine(that->user_se);
+            sem_elem_t combinedUserSe = user_se->combine(that->user_se);
 
             WitnessCombine * oldwc = dynamic_cast< WitnessCombine* >(that);
-            WitnessCombine * newwc = new WitnessCombine( combined_se );
+            WitnessCombine * newwc = new WitnessCombine( combinedUserSe );
 
             // if this or wit is a WitnessCombine then we may not
             // need to create a new WitnessCombine. There are probably
@@ -65,7 +65,7 @@ namespace wali
             {
                 // that is already a WitnessCombine.
 
-                // if A + B == A, then A >= B in the semiring.
+                // if A + B == A, then A <= B in the semiring.
                 // Use this fact to see if oldwc->user_se contains
                 // this->user_se. We happen to know by the way SemElem::delta
                 // works that the "old" weight on a transition will
@@ -74,7 +74,7 @@ namespace wali
                 // of 'this'.
                 //
                 newwc->absorb(oldwc);
-                if( !combined_se->equal( oldwc->user_se ) ) 
+                if( !combinedUserSe->equal( oldwc->user_se ) ) 
                 {
                     newwc->addChild(this);
                 }

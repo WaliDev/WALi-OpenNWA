@@ -740,6 +740,11 @@ namespace wali
             return Q;
         }
 
+        const std::set< Key >& WFA::getFinalStates() const
+        {
+            return F;
+        }
+
         ///////////////////////
         // Begin protected WFA
         ///////////////////////

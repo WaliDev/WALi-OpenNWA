@@ -313,6 +313,8 @@ namespace wali
 
                 const std::set< Key >& getStates() const;
 
+                const std::set< Key >& getFinalStates() const;
+
             protected:
 
                 /*! @brief fold tnew into told

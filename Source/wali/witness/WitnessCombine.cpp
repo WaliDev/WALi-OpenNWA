@@ -126,7 +126,7 @@ namespace wali
         //
         void WitnessCombine::addChild( witness_t w )
         {
-            std::cerr << "[WitnessCombine::addChild]\n";
+            //std::cerr << "[WitnessCombine::addChild]\n";
             kids.push_back( w );
         }
 
