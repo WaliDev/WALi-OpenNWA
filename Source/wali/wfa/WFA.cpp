@@ -173,11 +173,11 @@ namespace wali
          */
         void WFA::add_trans( Trans * t )
         {
-            //std::cerr << "\tAdding 'from' state\n";
+            //std::cerr << "\tAdding 'from' state'" << key2str(t->from()) << "'\n";
             add_state( t->from(), t->weight()->zero() );
-            //std::cerr << "\tAdding 'to' state\n";
+            //std::cerr << "\tAdding 'to' state '" << key2str(t->to()) << "'\n";
             add_state( t->to(), t->weight()->zero() );
-            //std::cerr << "\tInserting Trans\n";
+            //t->print( std::cerr << "\tInserting Trans" ) << std::endl;
             insert( t );
         }
 
@@ -678,17 +678,21 @@ namespace wali
                 stit->second->add_trans( tnew );
 
                 // Add tnew to the 'to' State's reverse trans list
-                wali_key_t tokey = tnew->to();
-                state_map_t::iterator to_stit = state_map.find( tokey );
+                state_map_t::iterator to_stit = state_map.find( tnew->to() );
+                if( to_stit == state_map.end() ) {
+                    tnew->print( std::cerr << "\n\n+++ WTF +++\n" ) << std::endl;
+                    assert( Q.find(tnew->to()) != Q.end() );
+                    assert( to_stit != state_map.end() );
+                }
                 to_stit->second->add_rev_trans( tnew );
 
                 // if tnew is an eps transition add to eps_map
                 if( tnew->stack() == WALI_EPSILON )
                 {
-                    eps_map_t::iterator epsit = eps_map.find( tokey );
+                    eps_map_t::iterator epsit = eps_map.find( tnew->to() );
                     if( epsit == eps_map.end() ) {
                         trans_list_t ls;
-                        epsit = eps_map.insert( tokey,ls ).first;
+                        epsit = eps_map.insert( tnew->to(),ls ).first;
                     }
                     epsit->second.push_back( tnew );
                 }
