@@ -181,6 +181,12 @@ namespace wali
                 {
                     rule_t r = *rit;
 
+                    // Rule 0s generate a transition right away. Because
+                    // WPDS::update invokes WFA::insert we must make sure
+                    // that the new states are inserted into the WFA. 
+                    fa.add_state( r->from_state(),r->weight()->zero() );
+                    fa.add_state( r->to_state(),r->weight()->zero() );
+
                     // add transition for rule
                     update( r->from_state()
                             , r->from_stack()
@@ -593,8 +599,11 @@ namespace wali
                     if( wrapper ) {
                         // FIXME: Should we combine user weights at bottom
                         // of stack?
-                        rule_t wrapTmp =  new Rule(f,t,stk2,se);
-                        tmp->se = tmp->se->combine(wrapper->wrap(*wrapTmp));
+                        sem_elem_t combinedWeight = se->combine(wrapper->unwrap(tmp->se));
+                        tmp->se = combinedWeight;
+                        tmp->weight( wrapper->wrap(*tmp) );
+                        //rule_t wrapTmp =  new Rule(f,t,stk2,se);
+                        //tmp->se = tmp->se->combine(wrapper->wrap(*wrapTmp));
                     }
                     else {
                         tmp->se = tmp->se->combine(se);

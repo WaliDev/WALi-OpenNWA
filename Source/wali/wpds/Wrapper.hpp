@@ -27,7 +27,9 @@ namespace wali
          * It returns the weight on the Rule and Trans when wrap is invoked and
          * the same weight when unwrap is invoked.
          *
-         * Wrappers can be chained together.
+         * Wrappers can be chained together. It is up to the Wrapper definer
+         * (i.e., the user) to take care of proper chaining. WALi assumes that
+         * unwrap will return an element from the user defined weight domain.
          */
         class Wrapper
         {
