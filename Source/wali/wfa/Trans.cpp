@@ -92,14 +92,14 @@ namespace wali
             se = w;
         }
 
-        void Trans::combine_weight( sem_elem_t w )
+        void Trans::combine_weight( sem_elem_t wnew )
         {
             
-            // delta returns ( w + se, w - se )
+            // delta returns ( wnew + se, wnew - se )
             // Use w->delta(se) b/c we want the returned diff
-            // to be what is in the new weight (w) and not
+            // to be what is in the new weight (wnew) and not
             // in the existing weight (se)
-            std::pair< sem_elem_t , sem_elem_t > p = w->delta( se );
+            std::pair< sem_elem_t , sem_elem_t > p = wnew->delta( se );
 
             // This's weight is w+se
             se = p.first;
