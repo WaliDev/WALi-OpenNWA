@@ -40,7 +40,7 @@ namespace wali
         std::ostream & State::print( std::ostream & o ) const
         {
             o << "State[ name=\"" << name() << "\" W=\"";
-            o << se->to_string() << "\" ]";
+            o << se->toString() << "\" ]";
             return o;
         }
 

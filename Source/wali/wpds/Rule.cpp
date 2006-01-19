@@ -104,7 +104,7 @@ namespace wali
                 assert( WALI_EPSILON == to_stack2());
             }
             o << ">";
-            o << "\t" << weight()->to_string();
+            o << "\t" << weight()->toString();
             return o;
         }
 

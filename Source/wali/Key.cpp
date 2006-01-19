@@ -80,7 +80,7 @@ namespace wali
     //
     // Returns string representation of the key
     // Essentially performs the lookup from Key to KeySource and calls
-    // KeySource::to_string
+    // KeySource::toString
     //
     std::string key2str( Key k )
     {

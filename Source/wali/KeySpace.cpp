@@ -156,7 +156,7 @@ namespace wali
 
     /*!
      * Return std::string rep of KeySource. Looks up the key and calls
-     * KeySource::to_string(). 
+     * KeySource::toString(). 
      *
      * @see KeySource
      */
@@ -164,7 +164,7 @@ namespace wali
     {
         KeySource* ksrc = getKeySource(key);
         if( ksrc ) {
-            return ksrc->to_string();
+            return ksrc->toString();
         }
         else {
             return "??";

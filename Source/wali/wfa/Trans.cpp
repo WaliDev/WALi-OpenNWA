@@ -123,9 +123,9 @@ namespace wali
             printKey(o,to());
             o << " )";
 
-            o << "\t" << se->to_string();
+            o << "\t" << se->toString();
             // FIXME: make a debugging print
-            o << "\tdelta: " << delta->to_string();
+            o << "\tdelta: " << delta->toString();
             return o;
         }
 

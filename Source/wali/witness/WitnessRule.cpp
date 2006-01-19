@@ -76,7 +76,7 @@ namespace wali
                 assert( WALI_EPSILON == tstk2);
             }
             o << ">";
-            o << "\t" << se->to_string();
+            o << "\t" << se->toString();
             return o;
         }
 
