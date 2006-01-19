@@ -246,6 +246,18 @@ namespace wali
                     , shrinkFactor( size * HASHMAP_SHRINK_FRACTION )
                     { initBuckets(); }
 
+                HashMap( const HashMap& hm )
+                {
+                    operator=(hm);
+                }
+
+                HashMap& operator=( const HashMap& hm ) {
+                    clear();
+                    for( const_iterator it = hm.begin() ; it != hm.end() ; it++ ) {
+                        insert(key(it),value(it));
+                    }
+                }
+
                 ~HashMap() {
                     clear();
                     releaseBuckets();
@@ -323,7 +335,7 @@ namespace wali
 
                 Data & value( iterator & it )
                 {
-                return it->second;
+                    return it->second;
                 }
 
                 const Data & value( const_iterator & it ) const
