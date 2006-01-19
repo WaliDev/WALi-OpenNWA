@@ -44,20 +44,23 @@ namespace wali
                 F = rhs.F;
                 query = rhs.query;
 
+                // Be sure to copy the state_map. Otherwise, 
+                // some states that are in rhs but not actually apart
+                // of a transition will be lost.
+                state_map_t::const_iterator it = rhs.state_map.begin();
+                for( ; it != rhs.state_map.end(); it++ ) {
+                    add_state( it->first, it->second->weight()->zero() );
+                }
+
                 // This will populate all maps
                 TransCopier copier(*this);
                 rhs.for_each( copier );
             }
-
             return *this;
         }
 
         WFA::~WFA()
         {
-            {
-                // TODO : R
-                //std::cerr << "~WFA()\n";
-            }
             clear();
         }
 
@@ -376,9 +379,18 @@ namespace wali
                 }
             }
 
+            // Do this here in case dest == this
+            sem_elem_t stateWeight = 
+                wmaker.make_weight( getState(initial_state())->weight()->zero()
+                        , fa.getState(fa.initial_state())->weight()->zero() ); 
+
             // Reset dest
             dest.clear();
 
+            // Note: We need to make sure the state exists b/c
+            // set_initial_state cannot call add_state because there is no
+            // weight to call it with
+            dest.add_state( dest_init_state, stateWeight->zero() );
             // Set dest init state
             dest.set_initial_state( dest_init_state );
 
@@ -388,6 +400,7 @@ namespace wali
             for( ; keyit != keyitEND ; keyit++ )
             {
                 dest.add_final_state(*keyit);
+                dest.add_state(*keyit,stateWeight->zero());
             }
 
             // Perform intersection
