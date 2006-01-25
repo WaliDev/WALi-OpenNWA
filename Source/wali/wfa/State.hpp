@@ -133,6 +133,25 @@ namespace wali
                     return rev_trans_ls.end();
                 }
 
+                bool eraseTransFromForwardsList(
+                        Key from,
+                        Key stack,
+                        Key to );
+
+                bool eraseTransFromReverseList(
+                        Key from,
+                        Key stack,
+                        Key to );
+
+                void clearTransLists();
+
+            protected:
+                bool eraseTransFromList(
+                        Key from,
+                        Key stack,
+                        Key to,
+                        trans_list_t& ls );
+
             protected:
                 wali_key_t key;
                 sem_elem_t se;

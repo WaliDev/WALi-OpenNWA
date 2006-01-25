@@ -237,11 +237,11 @@ namespace wali
             {
                 eraseTransFromEpsMap(from,stack,to);
                 // TODO: clean up State maps
-                //State* state;
-                //state = state_map.find(from)->second;
-                //state->eraseTransFromForwardsList(from,stack,to);
-                //state = state_map.find(to)->second;
-                //state->eraseTransFromReverseList(from,stack,to);
+                State* state;
+                state = state_map.find(from)->second;
+                state->eraseTransFromForwardsList(from,stack,to);
+                state = state_map.find(to)->second;
+                state->eraseTransFromReverseList(from,stack,to);
                 delete t;
             }
         }
@@ -515,8 +515,8 @@ namespace wali
 
                 // For each Trans (q',x,q)
                 // TODO: Make a State iterator of some
-                std::list< Trans* >::iterator tit = q->rev_trans_ls.begin();
-                std::list< Trans* >::iterator titEND = q->rev_trans_ls.end();
+                std::list< Trans* >::iterator tit = q->rbegin();
+                std::list< Trans* >::iterator titEND = q->rend();
                 for( ; tit != titEND ; tit++ )
                 {
                     Trans* t = *tit; // (q',x,q)
@@ -596,6 +596,9 @@ namespace wali
             {
                 State* q = it->second;
                 if( q->weight()->equal( q->weight()->zero() ) ) {
+                    { // BEGIN DEBUGGING
+                        //std::cerr << "Erasing State '" << key2str(q->name()) << "'\n";
+                    } // END DEBUGGING
                     eraseState(q);
                 }
             }
@@ -785,11 +788,13 @@ namespace wali
 
                 // Add tnew to the 'to' State's reverse trans list
                 state_map_t::iterator to_stit = state_map.find( tnew->to() );
-                if( to_stit == state_map.end() ) {
-                    tnew->print( std::cerr << "\n\n+++ WTF +++\n" ) << std::endl;
-                    assert( Q.find(tnew->to()) != Q.end() );
-                    assert( to_stit != state_map.end() );
-                }
+                { // BEGIN DEBUGGING
+                    if( to_stit == state_map.end() ) {
+                        tnew->print( std::cerr << "\n\n+++ WTF +++\n" ) << std::endl;
+                        assert( Q.find(tnew->to()) != Q.end() );
+                        assert( to_stit != state_map.end() );
+                    }
+                } // END DEBUGGING
                 to_stit->second->add_rev_trans( tnew );
 
                 // if tnew is an eps transition add to eps_map
@@ -990,10 +995,19 @@ namespace wali
                     Trans* t = eraseTransFromKpMap( from,stack,to );
 
                     { // BEGIN DEBUGGING
-                        assert( stateTrans == t );
+                        if( t != stateTrans ) {
+                            std::cerr << "[ERROR] WFA::prune\n";
+                            print( std::cerr );
+                            stateTrans->print( std::cerr ) << "\n";
+                            t->print( std::cerr ) << "\n";
+                            assert( stateTrans == t );
+                        }
                     } // END DEBUGGING
 
                     eraseTransFromEpsMap( from,stack,to );
+                    State* toState = state_map.find(to)->second;
+                    toState->eraseTransFromReverseList(from,stack,to);
+
                     delete t;
                 }
             }
@@ -1008,24 +1022,37 @@ namespace wali
                 Trans* t = eraseTransFromKpMap( from,stack,to );
 
                 { // BEGIN DEBUGGING
-                    assert( t != NULL && stateTrans == t );
+                    if( t != NULL && t != stateTrans ) {
+                        std::cerr << "[ERROR] WFA::prune reverse\n";
+                        t->print( std::cerr ) << "\n";
+                        stateTrans->print( std::cerr ) << "\n";
+                        assert( t != NULL && stateTrans == t );
+                    }
                 } // END DEBUGGING
 
                 eraseTransFromEpsMap( from,stack,to );
+                if( from != to ) {
+                    State* fromState = state_map.find(from)->second;
+                    fromState->eraseTransFromForwardsList(from,stack,to);
+                }
                 delete t;
             }
 
             // Remove from state map
             // TODO: Is this necessary?
-            state_map.erase( state->name() );
-            Q.erase(state->name());
-            F.erase(state->name());
+            //state_map.erase( state->name() );
+            //Q.erase(state->name());
+            //F.erase(state->name());
             if( state->name() == getInitialState() ) {
                 setInitialState( WALI_EPSILON );
             }
 
+            // Since we are not deleting the State, we need
+            // to clear its TransLists
+            state->clearTransLists();
+
             // delete the memory
-            delete state;
+            //delete state;
 
             return true;
         }
