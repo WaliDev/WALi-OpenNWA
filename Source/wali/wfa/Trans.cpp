@@ -124,8 +124,10 @@ namespace wali
             o << " )";
 
             o << "\t" << se->toString();
-            // FIXME: make a debugging print
-            o << "\tdelta: " << delta->toString();
+            { // BEGIN DEBUGGING
+                // FIXME: make a debugging print
+                //o << "\tdelta: " << delta->toString();
+            } // END DEBUGGING
             return o;
         }
 

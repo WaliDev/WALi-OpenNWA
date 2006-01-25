@@ -43,11 +43,17 @@ namespace wali
          */
         class State : public Printable, public Markable, public Countable
         {
-            public:
+            public: // friends
                 friend class WFA;
                 friend class wali::wpds::WPDS;
                 friend class wali::wpds::ewpds::EWPDS;
 
+            public: // typedefs
+                typedef std::list< Trans* > trans_list_t;
+                typedef trans_list_t::iterator iterator;
+                typedef trans_list_t::const_iterator const_iterator;
+
+            public: // static vars
                 static int numStates;
                 static const std::string XMLTag;
                 static const std::string XMLInitialTag;
@@ -107,13 +113,33 @@ namespace wali
                     return key;
                 }
 
+                iterator begin()
+                {
+                    return trans_ls.begin();
+                }
+
+                iterator end()
+                {
+                    return trans_ls.end();
+                }
+
+                iterator rbegin()
+                {
+                    return rev_trans_ls.begin();
+                }
+
+                iterator rend()
+                {
+                    return rev_trans_ls.end();
+                }
+
             protected:
                 wali_key_t key;
                 sem_elem_t se;
                 sem_elem_t delta_se;
                 sem_elem_t quasi;
-                std::list< Trans * > trans_ls;
-                std::list< Trans * > rev_trans_ls;
+                trans_list_t trans_ls;
+                trans_list_t rev_trans_ls;
 
         }; //class State
 

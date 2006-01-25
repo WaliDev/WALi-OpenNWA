@@ -94,38 +94,74 @@ namespace wali
             init_state = WALI_EPSILON;
         }
 
-        /*!
-         * @brief set initial state
-         */
-        wali_key_t WFA::set_initial_state( wali_key_t key )
+        //!
+        // @brief set initial state
+        //
+        Key WFA::set_initial_state( Key key )
         {
-            wali_key_t isold = init_state;
+            Key isold = init_state;
             // TODO : Add debug check to verify key exists
             init_state = key;
 
             return isold;
         }
 
-        /*!
-         * Add parameter key to the set of final states
-         */
-        void WFA::add_final_state( wali_key_t key )
+        //!
+        // @brief set initial state
+        //
+        Key WFA::setInitialState( Key key )
+        {
+            Key isold = init_state;
+            // TODO : Add debug check to verify key exists
+            init_state = key;
+
+            return isold;
+        }
+
+        //!
+        // Add parameter key to the set of final states
+        //
+        void WFA::add_final_state( Key key )
         {
             F.insert(key);
         }
 
-        /*!
-         * Return true if parameter key is a final state
-         */
-        bool WFA::is_final_state( wali_key_t key ) const
+        //!
+        // Add parameter key to the set of final states
+        //
+        void WFA::addFinalState( Key key )
+        {
+            F.insert(key);
+        }
+
+        //!
+        // Return true if parameter key is a final state
+        //
+        bool WFA::is_final_state( Key key ) const
         {
             return (F.find(key) != F.end());
         }
 
         /*!
-         * @brief Return the initial state
+         * Return true if parameter key is a final state
          */
-        wali_key_t WFA::initial_state() const
+        bool WFA::isFinalState( Key key ) const
+        {
+            return (F.find(key) != F.end());
+        }
+
+        //
+        // @brief Return the initial state
+        //
+        Key WFA::initial_state() const
+        {
+            return init_state;
+        }
+
+        //
+        //  @brief Return the initial state
+        //
+        Key WFA::getInitialState() const
         {
             return init_state;
         }
@@ -133,7 +169,7 @@ namespace wali
         //
         // Test if param key is the initial state.
         // 
-        bool WFA::is_initial_state( wali_key_t key ) const
+        bool WFA::is_initial_state( Key key ) const
         {
             return key == init_state;
         }
@@ -156,24 +192,24 @@ namespace wali
             return query;
         }
 
-        /*!
-         * @brief add trans (p,g,q,se) to WFA
-         */
+        //!
+        // @brief add trans (p,g,q,se) to WFA
+        //
         void WFA::add_trans(
-                wali_key_t p,
-                wali_key_t g,
-                wali_key_t q,
+                Key p,
+                Key g,
+                Key q,
                 sem_elem_t se )
         {
             add_trans( new Trans(p,g,q,se) );
         }
 
-        /*!
-         * @brief add Trans *t to WFA
-         * Takes care of adding states and calling insert. This
-         * method (actually insert) assumes ownership of the memory
-         * pointed to by the Trans* t.
-         */
+        //!
+        // @brief add Trans *t to WFA
+        // Takes care of adding states and calling insert. This
+        // method (actually insert) assumes ownership of the memory
+        // pointed to by the Trans* t.
+        //
         void WFA::add_trans( Trans * t )
         {
             //std::cerr << "\tAdding 'from' state'" << key2str(t->from()) << "'\n";
@@ -186,58 +222,54 @@ namespace wali
 
         //
         // Erase a trans
-        // Must remove from kpmap and eps_map
+        // Must remove from kpmap and eps_map.
+        // TODO: Must remove t (p,_,q) from p->trans_ls and q->rev_trans_ls
         //
         void WFA::erase(
-                wali_key_t from,
-                wali_key_t stack,
-                wali_key_t to )
+                Key from,
+                Key stack,
+                Key to )
         {
-            // ignore weight on Trans
-            Trans terase(from,stack,to,0);
-            kp_map_t::iterator kpit = kpmap.find( terase.keypair() );
+            // Remove from kpmap
+            Trans* t = eraseTransFromKpMap(from,stack,to);
 
-            if( kpit != kpmap.end() ) {
-                // remove from kpmap
-                // This loop could be moved to its own method
-                trans_list_t& ls = kpit->second;
-                trans_list_t::iterator lsit = ls.begin();
-                trans_list_t::iterator lsitEND = ls.end();
-                for( ; lsit != lsitEND ; lsit++ ) {
-                    if( terase.equal( *lsit ) ) {
-                        ls.erase(lsit);
-                        break;
-                    }
-                }
-                if( WALI_EPSILON == stack ) {
-                    // remove from epsmap
-                    // This loop could be moved to its own method
-                    eps_map_t::iterator epit = eps_map.find( to );
-                    if( epit != eps_map.end() ) {
-                        ls = epit->second;
-                        lsit = ls.begin();
-                        lsitEND = ls.end();
-                        for( ; lsit != lsitEND ; lsit++ ) {
-                            if( terase.equal( *lsit ) ) {
-                                ls.erase(lsit);
-                                break;
-                            }
-                        }
-                    }
-                    //else {
-                    //attempt to remove non existing Trans
-                    //}
-                }
+            if( t != NULL )
+            {
+                eraseTransFromEpsMap(from,stack,to);
+                // TODO: clean up State maps
+                //State* state;
+                //state = state_map.find(from)->second;
+                //state->eraseTransFromForwardsList(from,stack,to);
+                //state = state_map.find(to)->second;
+                //state->eraseTransFromReverseList(from,stack,to);
+                delete t;
             }
-            //else {
-            //attempt to remove non existing Trans
-            //}
         }
 
+        //
+        // Removes State q from the WFA and any transitions leading
+        // to and from q.
+        //
+        bool WFA::eraseState(
+                Key q
+                )
+        {
+            bool eraseSuccess = false;
+            state_map_t::iterator it = state_map.find(q);
+            if( it == state_map.end() ) {
+                return false;
+            }
+            return eraseState( it->second );
+        }
+
+        //
+        // Finds Trans(p,g,q). Invokes copy constructor on parameter t.
+        // Returns true if find was successful.
+        //
         bool WFA::find( 
-                wali_key_t p,
-                wali_key_t g,
-                wali_key_t q,
+                Key p,
+                Key g,
+                Key q,
                 Trans & t )
         {
             bool rc = false;
@@ -301,14 +333,14 @@ namespace wali
         class StackHasher : public TransFunctor
         {
             public:
-                typedef wali::HashMap< wali_key_t , WFA::trans_list_t > stackmap_t;
+                typedef wali::HashMap< Key , WFA::trans_list_t > stackmap_t;
                 stackmap_t stackmap;
 
                 virtual ~StackHasher() {}
 
                 virtual void operator()( Trans * t )
                 {
-                    wali_key_t stack = t->stack();
+                    Key stack = t->stack();
                     stackmap_t::iterator it = stackmap.find( stack );
                     if( it == stackmap.end() )
                     {
@@ -435,8 +467,8 @@ namespace wali
                     for( ; stklsit != stklsitEND ; stklsit++ )
                     {
                         Trans *t2 = *stklsit;
-                        wali_key_t fromkey = getKey( t->from(),t2->from() );
-                        wali_key_t tokey = getKey( t->to(),t2->to() );
+                        Key fromkey = getKey( t->from(),t2->from() );
+                        Key tokey = getKey( t->to(),t2->to() );
                         sem_elem_t W = wmaker.make_weight(t->weight(),t2->weight());
                         dest.add_trans(fromkey,t->stack(),tokey,W);
                     }
@@ -447,10 +479,10 @@ namespace wali
         /*
         void WFA::do_fixpoint( Worklist& wl, FixpointLogic& logic )
         {
-            setup_fixpoint(wl,logic);
+            setupFixpoint(wl,logic);
             while( !wl.empty() )
             {
-                State* q = (State*)wl.get();
+                State* q = wl.get();
                 sem_elem_t the_delta = q->delta();
                 q->delta() = the_delta->zero();
 
@@ -474,10 +506,10 @@ namespace wali
         //
         void WFA::path_summary( Worklist<State>& wl )
         {
-            setup_fixpoint( wl );
+            setupFixpoint( wl );
             while( !wl.empty() )
             {
-                State* q = (State*)wl.get();
+                State* q = wl.get();
                 sem_elem_t the_delta = q->delta();
                 q->delta() = the_delta->zero();
 
@@ -489,7 +521,7 @@ namespace wali
                 {
                     Trans* t = *tit; // (q',x,q)
                     //t->print( std::cerr << "\t++ Popped " ) << std::endl;
-                    State *qprime = get_state(t->from()); // q'
+                    State *qprime = getState(t->from()); // q'
 
                     sem_elem_t extended;
                     if( query == INORDER )
@@ -527,18 +559,79 @@ namespace wali
         }
 
         //
+        // Removes all transitions in the (init_state,F) chop
+        //
+        void WFA::prune()
+        {
+
+            DefaultWorklist<State> wl;
+            setupFixpoint( wl );
+            // first backwards prune
+            while( !wl.empty() )
+            {
+                State* q = wl.get();
+                State::iterator it = q->rbegin();
+                State::iterator itEND = q->rend();
+
+                // (q',_,q)
+                for( ; it != itEND ; it++ )
+                {
+                    Trans* t = *it;
+                    State *qprime = getState(t->from());
+                    if( !qprime->marked() ) {
+                        qprime->weight() = qprime->weight()->one();
+                        wl.put( qprime );
+                    }
+                }
+            }
+
+            //
+            // States that have a weight of 1 are reachable from
+            // the accepting states. If the State has a weight of
+            // zero it can be erased.
+            //
+            state_map_t::iterator it = state_map.begin();
+            state_map_t::iterator itEND = state_map.end();
+            for( ; it != itEND ; it++ )
+            {
+                State* q = it->second;
+                if( q->weight()->equal( q->weight()->zero() ) ) {
+                    eraseState(q);
+                }
+            }
+
+            //
+            // second forward prune
+            // TODO: implement this later
+            //
+        }
+
+        //
         // @brief print WFA to param o
         //
         std::ostream & WFA::print( std::ostream & o ) const
         {
             o << "WFA -\n";
-            o << "\tInitial State : ";
+            o << "  Initial State : ";
             o << key2str(init_state) << std::endl;
-            o << "\tF: {";
-            std::set< wali_key_t >::const_iterator cit = F.begin();
-            std::set< wali_key_t >::const_iterator citEND = F.end();
-            bool first = true;
-            for( ; cit != citEND ; cit++,first=false )
+
+            // Q
+            o << "  Q: {";
+            std::set< Key >::const_iterator cit = Q.begin();
+            std::set< Key >::const_iterator citEND = Q.end();
+            for( bool first=true; cit != citEND ; cit++,first=false )
+            {
+                if(!first)
+                    o << ", ";
+                o << key2str( *cit );
+            }
+            o << "}\n";
+
+            // F
+            o << "  F: {";
+            cit = F.begin();
+            citEND = F.end();
+            for( bool first=true; cit != citEND ; cit++,first=false )
             {
                 if(!first)
                     o << ", ";
@@ -565,7 +658,7 @@ namespace wali
             state_map_t::const_iterator stitEND = state_map.end();
             for( ; stit != stitEND ; stit++ )
             {
-                wali_key_t key = stit->first;
+                Key key = stit->first;
                 o << "\t" << key << " [label=\"";
                 o << key2str(key);
                 o << "\"";
@@ -605,8 +698,8 @@ namespace wali
             marshallState(o,init_state);
 
             // do final states
-            std::set< wali_key_t >::const_iterator Fit = F.begin();
-            std::set< wali_key_t >::const_iterator FitEND = F.end();
+            std::set< Key >::const_iterator Fit = F.begin();
+            std::set< Key >::const_iterator FitEND = F.end();
             for( ; Fit != FitEND ; Fit++ )
             {
                 marshallState(o,*Fit);
@@ -716,7 +809,7 @@ namespace wali
                 // wrong.
                 if( told != tnew ) {
                     // combine new into old
-                    combine_trans( told,tnew );
+                    combineTrans( told,tnew );
                     delete tnew;
                 }
                 else {
@@ -730,7 +823,7 @@ namespace wali
         //
         // Add a state to the state map
         //
-        void WFA::add_state( wali_key_t key , sem_elem_t zero )
+        void WFA::add_state( Key key , sem_elem_t zero )
         {
             if( state_map.find( key ) == state_map.end() ) {
                 state_map.insert( key , new State( key,zero ) );
@@ -769,7 +862,7 @@ namespace wali
         //
         // This is a virtual method.
         //
-        void WFA::combine_trans( Trans * told, Trans * tnew )
+        void WFA::combineTrans( Trans * told, Trans * tnew )
         {
             told->combine_weight( tnew->weight() );
         }
@@ -777,7 +870,7 @@ namespace wali
         //
         // Return State * corresponding to the key
         //
-        State * WFA::get_state( wali_key_t name )
+        State * WFA::getState( Key name )
         {
             state_map_t::iterator stit = state_map.find( name );
             if( stit == state_map.end() ) {
@@ -794,7 +887,7 @@ namespace wali
         //
         // Place WFA in state ready for fixpoint
         //
-        void WFA::setup_fixpoint( Worklist<State>& wl )
+        void WFA::setupFixpoint( Worklist<State>& wl )
         {
             state_map_t::iterator it = state_map.begin();
             state_map_t::iterator itEND = state_map.end();
@@ -814,6 +907,127 @@ namespace wali
             }
         }
 
+        //
+        // Removes Trans(from,stack,to) from the kpmap. Returns true
+        // if the Trans was erased, i.e., the Trans existed.
+        //
+        Trans* WFA::eraseTransFromKpMap(
+                Key from,
+                Key stack,
+                Key to )
+        {
+            Trans* t = NULL;
+
+            // ignore weight on Trans
+            Trans terase(from,stack,to,0);
+            kp_map_t::iterator kpit = kpmap.find( terase.keypair() );
+
+            if( kpit != kpmap.end() ) {
+                // remove from kpmap
+                // This loop could be moved to its own method
+                trans_list_t& ls = kpit->second;
+                trans_list_t::iterator lsit = ls.begin();
+                trans_list_t::iterator lsitEND = ls.end();
+                for( ; lsit != lsitEND ; lsit++ ) {
+                    if( terase.equal( *lsit ) ) {
+                        t = *lsit;
+                        ls.erase(lsit);
+                        break;
+                    }
+                }
+            }
+            return t;
+        }
+
+        bool WFA::eraseTransFromEpsMap(
+                Key from,
+                Key stack,
+                Key to )
+        {
+            Trans terase(from,stack,to,0);
+            bool eraseSuccess = false;
+            if( stack == WALI_EPSILON )
+            {
+                // remove from epsmap
+                // This loop could be moved to its own method
+                eps_map_t::iterator epit = eps_map.find( to );
+                if( epit != eps_map.end() ) {
+                    trans_list_t& ls = epit->second;
+                    trans_list_t::iterator lsit = ls.begin();
+                    trans_list_t::iterator lsitEND = ls.end();
+                    for( ; lsit != lsitEND ; lsit++ ) {
+                        if( terase.equal( *lsit ) ) {
+                            ls.erase(lsit);
+                            eraseSuccess = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            return eraseSuccess;
+        }
+
+        //
+        // Removes State state from the WFA and any transitions leading
+        // to and from state.
+        //
+        bool WFA::eraseState(
+                State* state
+                )
+        {
+            State::iterator it = state->begin();
+            State::iterator itEND = state->end();
+            for( ; it != itEND ; it++ )
+            {
+                Trans* stateTrans = *it;
+                Key from = stateTrans->from();
+                Key stack = stateTrans->stack();
+                Key to = stateTrans->to();
+                Trans* t = eraseTransFromKpMap( from,stack,to );
+
+                { // BEGIN DEBUGGING
+                    assert( stateTrans == t );
+                } // END DEBUGGING
+
+                eraseTransFromEpsMap( from,stack,to );
+                // cyclical transitions are handled below in 
+                // the reverse list
+                if( from != to ) {
+                    delete t;
+                }
+            }
+            it = state->rbegin();
+            itEND = state->rend();
+            for( ; it != itEND ; it++ )
+            {
+                Trans* stateTrans = *it;
+                Key from = stateTrans->from();
+                Key stack = stateTrans->stack();
+                Key to = stateTrans->to();
+                Trans* t = eraseTransFromKpMap( from,stack,to );
+
+                { // BEGIN DEBUGGING
+                    assert( stateTrans == t );
+                } // END DEBUGGING
+
+                eraseTransFromEpsMap( from,stack,to );
+                delete t;
+            }
+
+            // Remove from state map
+            // TODO: Is this necessary?
+            state_map.erase( state->name() );
+            Q.erase(state->name());
+            F.erase(state->name());
+            if( state->name() == getInitialState() ) {
+                setInitialState( WALI_EPSILON );
+            }
+
+            // delete the memory
+            delete state;
+
+            return true;
+        }
 
     } // namespace wfa
 

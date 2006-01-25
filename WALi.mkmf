@@ -174,12 +174,30 @@
         </DependencyList>
     </Project>
 
+    <!-- Test Prune -->
+    <Project Name='tprune' RelativePath='Tests' 
+        BuildDir='Tests' OuputDir='Tests' Type='Executable' >
+
+        <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
+        <IncludeList>
+            <item Name='Reach' Path='$(WALiDir)/Examples/Reach' />
+        </IncludeList>
+        <InputList>
+            <item Name='tprune' RelativePath='tprune.cpp' />
+            <item Name='Reach' Path='$(WALiDir)/Examples/Reach/Reach.cpp' />
+        </InputList>
+        <DependencyList>
+            <item Name='wali' />
+        </DependencyList>
+    </Project>
+
     <Project Name='tests' RelativePath='Tests' Type='Empty'>
         <DependencyList>
             <item Name='t1' />
             <item Name='twitness' />
             <item Name='t3' />
             <item Name='t4' />
+            <item Name='tprune' />
         </DependencyList>
     </Project>
 

@@ -16,7 +16,7 @@ namespace wali
          ***********/
         void TransPrinter::operator()( const Trans* t )
         {
-            t->print(o) << std::endl;
+            t->print(o << "    ") << std::endl;
         }
 
         /***********
@@ -32,10 +32,10 @@ namespace wali
          ***********/
         void TransDeleter::operator()( Trans* t )
         {
-            {
+            { // BEGIN DEBUGGING
                 // TODO : REMOVE
                 //t->print( std::cerr << "\tDeleting " ) << std::endl;
-            }
+            } // END DEBUGGING
             delete t;
         }
 

@@ -39,7 +39,7 @@ namespace wali
         /*! @class WFA
          *
          * TODO:
-         *  - Should state_map_t have type HashMap< wali_key_t , ref_ptr<State> >
+         *  - Should state_map_t have type HashMap< Key , ref_ptr<State> >
          *      This allows for automatic collection of States via HashMap
          */
 
@@ -62,8 +62,8 @@ namespace wali
 
                 typedef std::list< Trans * > trans_list_t;
                 typedef wali::HashMap< KeyPair, trans_list_t > kp_map_t;
-                typedef wali::HashMap< wali_key_t , State * > state_map_t;
-                typedef wali::HashMap< wali_key_t , trans_list_t > eps_map_t;
+                typedef wali::HashMap< Key , State * > state_map_t;
+                typedef wali::HashMap< Key , trans_list_t > eps_map_t;
 
                 friend class ::wali::wpds::WPDS;
                 friend class ::wali::wpds::ewpds::EWPDS;
@@ -98,33 +98,68 @@ namespace wali
                  * set it to the key parameter
                  *
                  * @param key the key for the desired initial state
-                 * @return wali_key_t that is the old initial stat
+                 * @return Key that is the old initial stat
                  */
-                wali_key_t set_initial_state( wali_key_t key );
+                Key set_initial_state( Key key );
+
+                /*!
+                 * @brief set initial state
+                 *
+                 * A WFA has 1 initial state. This method will
+                 * set it to the key parameter
+                 *
+                 * @param key the key for the desired initial state
+                 * @return Key that is the old initial stat
+                 */
+                Key setInitialState( Key key );
 
                 /*!
                  * @brief Return the initial state
                  *
-                 * @return wali_key_t for the initial state
+                 * @return Key for the initial state
                  */
-                wali_key_t initial_state() const;
+                Key initial_state() const;
+
+                /*!
+                 * @brief Return the initial state
+                 *
+                 * @return Key for the initial state
+                 */
+                Key getInitialState() const;
 
                 /*!
                  * Test if param key is the initial state.
                  *
                  * @return true if key == WFA::initial_state()
                  */
-                bool is_initial_state( wali_key_t key ) const;
+                bool is_initial_state( Key key ) const;
+
+                /*!
+                 * Test if param key is the initial state.
+                 *
+                 * @return true if key == WFA::initial_state()
+                 */
+                bool isInitialState( Key key ) const;
 
                 /*!
                  * Add parameter key to the set of final states
                  */
-                void add_final_state( wali_key_t key );
+                void add_final_state( Key key );
+
+                /*!
+                 * Add parameter key to the set of final states
+                 */
+                void addFinalState( Key key );
 
                 /*!
                  * Return true if parameter key is a final state
                  */
-                bool is_final_state( wali_key_t key ) const;
+                bool is_final_state( Key key ) const;
+
+                /*!
+                 * Return true if parameter key is a final state
+                 */
+                bool isFinalState( Key key ) const;
 
                 /*!
                  * Set the WFA query mode.
@@ -144,13 +179,13 @@ namespace wali
 
                 /*! @brief Add transition (p,g,q) to the WFA
                  *
-                 * @see wali_key_t
+                 * @see Key
                  * @see sem_elem_t
                  */
                 virtual void add_trans(
-                        wali_key_t p,
-                        wali_key_t g,
-                        wali_key_t q,
+                        Key p,
+                        Key g,
+                        Key q,
                         sem_elem_t se );
 
                 /*!
@@ -166,9 +201,16 @@ namespace wali
                  * Removes Trans (from,stack,to) from the WFA if it exists.
                  */
                 virtual void erase(
-                        wali_key_t from,
-                        wali_key_t stack,
-                        wali_key_t to );
+                        Key from,
+                        Key stack,
+                        Key to );
+
+                /*!
+                 * @brief erase State q and all of its transitions
+                 *
+                 * @return true if it was sucessful
+                 */
+                virtual bool eraseState( Key q );
 
                 /*!
                  * @brief return true if transition matching (p,g,q) exists
@@ -189,9 +231,9 @@ namespace wali
                  * @see sem_elem_t
                  */
                 virtual bool find( 
-                        wali_key_t p,
-                        wali_key_t g,
-                        wali_key_t q,
+                        Key p,
+                        Key g,
+                        Key q,
                         Trans & t );
 
                 /*!
@@ -249,12 +291,18 @@ namespace wali
                  * Performs path summary. Simply calls the path_summary with
                  * the default Worklist provided by WALi.
                  */
-                void path_summary();
+                virtual void path_summary();
 
                 /*!
                  * Performs path summary with the specified Worklist
                  */
                 virtual void path_summary( Worklist<State>& wl );
+
+                /*!
+                 * Prunes the WFA. This removes any transitions that are
+                 * not in the (getInitialState(),F) chop.
+                 */
+                virtual void prune();
 
                 /*!
                  * Write the WFA to the std::ostream parameter, implements
@@ -299,9 +347,9 @@ namespace wali
                 Trans * insert( Trans * tnew );
 
                 /*! 
-                 * Create a State * for the key wali_key_t
+                 * Create a State * for the key Key
                  */
-                void add_state( wali_key_t key , sem_elem_t zero );
+                void add_state( Key key , sem_elem_t zero );
 
                 /*!
                  * @return const pointer to underlying State object or NULL if
@@ -319,10 +367,10 @@ namespace wali
 
                 /*! @brief fold tnew into told
                  */
-                virtual void combine_trans( Trans * told, Trans * tnew );
+                virtual void combineTrans( Trans * told, Trans * tnew );
 
                 /*!
-                 * WFA::get_state returns a reference to the State named
+                 * WFA::getState returns a reference to the State named
                  * by the parameter name. If not such State exists a NULL
                  * pointer is returned.
                  *
@@ -331,13 +379,43 @@ namespace wali
                  *
                  */
 
-                State * get_state( wali_key_t name );
+                State * getState( Key name );
 
                 /*!
-                 * setup_fixpoint clears each states markable flag and sets
+                 * setupFixpoint clears each states markable flag and sets
                  * the states weight to zero
                  */
-                void setup_fixpoint( Worklist<State>& wl );
+                void setupFixpoint( Worklist<State>& wl );
+
+                /*!
+                 * Erases the specified Trans(from,stack,to) from the
+                 * kpmap. A null return value means no transition existed.
+                 *
+                 * @return the Trans* that was removed from the KpMap
+                 */
+                Trans* eraseTransFromKpMap(
+                        Key from,
+                        Key stack,
+                        Key to );
+
+                /*!
+                 * Erases the specified Trans(from,stack,to) from the
+                 * epsmap. A false return value means no transition existed.
+                 *
+                 * @return true if a transition was erased from EpsMap
+                 */
+                bool eraseTransFromEpsMap(
+                        Key from,
+                        Key stack,
+                        Key to );
+
+                /*!
+                 * Erases the State 'state' from the WFA and all transitions
+                 * that go to or from the State.
+                 *
+                 * @return true
+                 */
+                bool eraseState( State* state );
 
             private:
 
@@ -349,7 +427,7 @@ namespace wali
                 kp_map_t kpmap;          //! < map from KeyPair to list of trans
                 state_map_t state_map;   //! < map from key to State
                 eps_map_t eps_map;       //! < map from "to state" to list of eps trans ending in "to state"
-                wali_key_t init_state;   //! < initial state of WFA
+                Key init_state;          //! < initial state of WFA
                 std::set< Key > F;       //! < set of final states
                 std::set< Key > Q;       //! < set of all states
                 query_t query;           //! < determine the extend order for path_summary

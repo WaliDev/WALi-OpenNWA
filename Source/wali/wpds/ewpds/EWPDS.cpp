@@ -397,7 +397,7 @@ namespace wali
                     }
                     else {
                         // (p,eps,q) + (q,y,q') => (p,y,q')
-                        State * state = fa.get_state( t->to() );
+                        State * state = fa.getState( t->to() );
                         std::list< Trans * >::iterator it = state->trans_ls.begin();
                         for(  ; it != state->trans_ls.end() ; it++ )
                         {
@@ -459,7 +459,7 @@ namespace wali
 
                     Trans * tprime = update_prime( gstate, r->to_stack2(), t->to(), wrule_trans  );
 
-                    State * state = fa.get_state( gstate );
+                    State * state = fa.getState( gstate );
                     sem_elem_t quasi = state->quasi->combine( wrule_trans );
                     state->quasi = quasi;
 
