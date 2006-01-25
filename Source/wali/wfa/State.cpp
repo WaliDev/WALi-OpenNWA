@@ -22,20 +22,20 @@ namespace wali
         {
             assert( W.is_valid() );
             quasi = W->zero();
-            {
+            { // BEGIN DEBUGGING
                 // TODO : R
                 numStates++;
                 //std::cerr << "State(...) : " << numStates << std::endl;;
-            }
+            } // END DEBUGGING
         }
 
         State::~State()
         {
-            {
+            { // BEGIN DEBUGGING
                 // TODO : R
                 numStates--;
                 //std::cerr << "~State()   : " << --numStates << std::endl;;
-            }
+            } // END DEBUGGING
         }
 
         std::ostream & State::print( std::ostream & o ) const
@@ -45,23 +45,9 @@ namespace wali
             return o;
         }
 
-        void State::add_trans( Trans * t )
-        {
-            // assert( t->from() == this->key );
-            trans_ls.push_back( t );
-        }
-
         void State::add_rev_trans( Trans * t )
         {
             rev_trans_ls.push_back(t);
-        }
-
-        bool State::eraseTransFromForwardsList(
-                Key from,
-                Key stack,
-                Key to )
-        {
-            return eraseTransFromList(from,stack,to,trans_ls);
         }
 
         bool State::eraseTransFromReverseList(
@@ -74,7 +60,6 @@ namespace wali
 
         void State::clearTransLists()
         {
-            trans_ls.clear();
             rev_trans_ls.clear();
         }
 

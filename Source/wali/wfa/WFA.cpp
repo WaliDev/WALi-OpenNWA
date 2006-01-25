@@ -212,10 +212,14 @@ namespace wali
         //
         void WFA::add_trans( Trans * t )
         {
+            sem_elem_t ZERO = t->weight()->zero();
+
             //std::cerr << "\tAdding 'from' state'" << key2str(t->from()) << "'\n";
-            add_state( t->from(), t->weight()->zero() );
+            add_state( t->from(), ZERO );
+
             //std::cerr << "\tAdding 'to' state '" << key2str(t->to()) << "'\n";
-            add_state( t->to(), t->weight()->zero() );
+            add_state( t->to(), ZERO );
+
             //t->print( std::cerr << "\tInserting Trans" ) << std::endl;
             insert( t );
         }
@@ -238,8 +242,6 @@ namespace wali
                 eraseTransFromEpsMap(from,stack,to);
                 // TODO: clean up State maps
                 State* state;
-                state = state_map.find(from)->second;
-                state->eraseTransFromForwardsList(from,stack,to);
                 state = state_map.find(to)->second;
                 state->eraseTransFromReverseList(from,stack,to);
                 delete t;
@@ -380,9 +382,10 @@ namespace wali
             return dest;
         }
 
-        /*!
-         * Intersect this and fa, storing the result in dest
-         */
+        //
+        // Intersect this and fa, storing the result in dest
+        // TODO: Note: if this == dest there might be a problem
+        //
         void WFA::intersect(
                 WeightMaker& wmaker
                 , WFA& fa
@@ -431,8 +434,9 @@ namespace wali
             keyitEND = dest_final_states.end();
             for( ; keyit != keyitEND ; keyit++ )
             {
-                dest.add_final_state(*keyit);
-                dest.add_state(*keyit,stateWeight->zero());
+                Key f = *keyit;
+                dest.add_state(f,stateWeight->zero());
+                dest.add_final_state(f);
             }
 
             // Perform intersection
@@ -474,6 +478,8 @@ namespace wali
                     }
                 }
             }
+            // TODO: should the query be set by the user?
+            dest.setQuery( getQuery() );
         }
 
         /*
@@ -514,12 +520,11 @@ namespace wali
                 q->delta() = the_delta->zero();
 
                 // For each Trans (q',x,q)
-                // TODO: Make a State iterator of some
-                std::list< Trans* >::iterator tit = q->rbegin();
-                std::list< Trans* >::iterator titEND = q->rend();
+                State::iterator tit = q->rbegin();
+                State::iterator titEND = q->rend();
                 for( ; tit != titEND ; tit++ )
                 {
-                    Trans* t = *tit; // (q',x,q)
+                    Trans* t = *tit; // (q',_,q)
                     //t->print( std::cerr << "\t++ Popped " ) << std::endl;
                     State *qprime = getState(t->from()); // q'
 
@@ -572,14 +577,16 @@ namespace wali
                 State* q = wl.get();
                 State::iterator it = q->rbegin();
                 State::iterator itEND = q->rend();
+                sem_elem_t ONE = q->weight()->one();
 
                 // (q',_,q)
                 for( ; it != itEND ; it++ )
                 {
                     Trans* t = *it;
-                    State *qprime = getState(t->from());
-                    if( !(qprime->weight()->equal(qprime->weight()->one())) ) {
-                        qprime->weight() = qprime->weight()->one();
+                    State* qprime = getState(t->from());
+                    if( !(qprime->weight()->equal(ONE) ) )
+                    {
+                        qprime->weight() = ONE;
                         wl.put( qprime );
                     }
                 }
@@ -732,10 +739,10 @@ namespace wali
             return o;
         }
 
-        /*
-         * Inserts tnew into the WFA. If a transition matching tnew
-         * exists, tnew is deleted.
-         */
+        //
+        // Inserts tnew into the WFA. If a transition matching tnew
+        // exists, tnew is deleted.
+        //
         Trans * WFA::insert( Trans * tnew )
         {
             ////
@@ -746,7 +753,8 @@ namespace wali
             {
                 trans_list_t &ls = it->second;
                 trans_list_t::iterator lit = ls.begin();
-                for( ; lit != ls.end() ; lit++ )
+                trans_list_t::iterator litEND = ls.end();
+                for( ; lit != litEND ; lit++ )
                 {
                     Trans *ttmp = *lit;
                     // already matched (p,g,*) so just
@@ -782,12 +790,9 @@ namespace wali
                 // method
                 told = tnew;
 
-                // Add tnew to the 'from' State's trans list
-                state_map_t::iterator stit = state_map.find( tnew->from() );
-                stit->second->add_trans( tnew );
-
                 // Add tnew to the 'to' State's reverse trans list
                 state_map_t::iterator to_stit = state_map.find( tnew->to() );
+
                 { // BEGIN DEBUGGING
                     if( to_stit == state_map.end() ) {
                         tnew->print( std::cerr << "\n\n+++ WTF +++\n" ) << std::endl;
@@ -795,6 +800,7 @@ namespace wali
                         assert( to_stit != state_map.end() );
                     }
                 } // END DEBUGGING
+
                 to_stit->second->add_rev_trans( tnew );
 
                 // if tnew is an eps transition add to eps_map
@@ -902,12 +908,12 @@ namespace wali
                 st->unmark();
                 if( is_final_state( st->name() ) ) {
                     st->weight() = st->weight()->one();
-                    st->delta() = st->delta()->one();
+                    st->delta() = st->weight();
                     wl.put( st );
                 }
                 else {
                     st->weight() = st->weight()->zero();
-                    st->delta() = st->delta()->zero();
+                    st->delta() = st->weight();
                 }
             }
         }
@@ -944,13 +950,13 @@ namespace wali
             return t;
         }
 
-        bool WFA::eraseTransFromEpsMap(
+        Trans* WFA::eraseTransFromEpsMap(
                 Key from,
                 Key stack,
                 Key to )
         {
             Trans terase(from,stack,to,0);
-            bool eraseSuccess = false;
+            Trans* t = NULL;
             if( stack == WALI_EPSILON )
             {
                 // remove from epsmap
@@ -962,14 +968,14 @@ namespace wali
                     trans_list_t::iterator lsitEND = ls.end();
                     for( ; lsit != lsitEND ; lsit++ ) {
                         if( terase.equal( *lsit ) ) {
+                            t = *lsit;
                             ls.erase(lsit);
-                            eraseSuccess = true;
                             break;
                         }
                     }
                 }
             }
-            return eraseSuccess;
+            return t;
         }
 
         //
@@ -980,39 +986,8 @@ namespace wali
                 State* state
                 )
         {
-            State::iterator it = state->begin();
-            State::iterator itEND = state->end();
-            for( ; it != itEND ; it++ )
-            {
-                Trans* stateTrans = *it;
-                Key from = stateTrans->from();
-                Key stack = stateTrans->stack();
-                Key to = stateTrans->to();
-
-                // cyclical transitions are handled below in 
-                // the reverse list
-                if( from != to ) {
-                    Trans* t = eraseTransFromKpMap( from,stack,to );
-
-                    { // BEGIN DEBUGGING
-                        if( t != stateTrans ) {
-                            std::cerr << "[ERROR] WFA::prune\n";
-                            print( std::cerr );
-                            stateTrans->print( std::cerr ) << "\n";
-                            t->print( std::cerr ) << "\n";
-                            assert( stateTrans == t );
-                        }
-                    } // END DEBUGGING
-
-                    eraseTransFromEpsMap( from,stack,to );
-                    State* toState = state_map.find(to)->second;
-                    toState->eraseTransFromReverseList(from,stack,to);
-
-                    delete t;
-                }
-            }
-            it = state->rbegin();
-            itEND = state->rend();
+            State::iterator it = state->rbegin();
+            State::iterator itEND = state->rend();
             for( ; it != itEND ; it++ )
             {
                 Trans* stateTrans = *it;
@@ -1030,11 +1005,7 @@ namespace wali
                     }
                 } // END DEBUGGING
 
-                eraseTransFromEpsMap( from,stack,to );
-                if( from != to ) {
-                    State* fromState = state_map.find(from)->second;
-                    fromState->eraseTransFromForwardsList(from,stack,to);
-                }
+                Trans* teps = eraseTransFromEpsMap( from,stack,to );
                 delete t;
             }
 

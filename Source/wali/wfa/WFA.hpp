@@ -404,7 +404,7 @@ namespace wali
                  *
                  * @return true if a transition was erased from EpsMap
                  */
-                bool eraseTransFromEpsMap(
+                Trans* eraseTransFromEpsMap(
                         Key from,
                         Key stack,
                         Key to );

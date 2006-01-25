@@ -378,7 +378,7 @@ namespace wali
                 else {
                     // (p,eps,q) + (q,y,q') => (p,y,q')
                     State * state = fa.getState( t->to() );
-                    std::list< Trans * >::iterator it = state->trans_ls.begin();
+                    State::iterator it = state->trans_ls.begin();
                     for(  ; it != state->trans_ls.end() ; it++ )
                     {
                         Trans * tprime = *it;

@@ -77,12 +77,6 @@ namespace wali
                 virtual std::ostream & print( std::ostream & o ) const;
 
                 /*!
-                 * Add Trans* t to the set of transitions extending from this
-                 * State.
-                 */
-                void add_trans( Trans * t );
-
-                /*!
                  * Add Trans* t to the set of transitions that lead into this
                  * State.
                  */
@@ -113,16 +107,6 @@ namespace wali
                     return key;
                 }
 
-                iterator begin()
-                {
-                    return trans_ls.begin();
-                }
-
-                iterator end()
-                {
-                    return trans_ls.end();
-                }
-
                 iterator rbegin()
                 {
                     return rev_trans_ls.begin();
@@ -132,11 +116,6 @@ namespace wali
                 {
                     return rev_trans_ls.end();
                 }
-
-                bool eraseTransFromForwardsList(
-                        Key from,
-                        Key stack,
-                        Key to );
 
                 bool eraseTransFromReverseList(
                         Key from,
@@ -157,7 +136,6 @@ namespace wali
                 sem_elem_t se;
                 sem_elem_t delta_se;
                 sem_elem_t quasi;
-                trans_list_t trans_ls;
                 trans_list_t rev_trans_ls;
 
         }; //class State
