@@ -578,7 +578,7 @@ namespace wali
                 {
                     Trans* t = *it;
                     State *qprime = getState(t->from());
-                    if( !qprime->marked() ) {
+                    if( !(qprime->weight()->equal(qprime->weight()->one())) ) {
                         qprime->weight() = qprime->weight()->one();
                         wl.put( qprime );
                     }
@@ -983,16 +983,17 @@ namespace wali
                 Key from = stateTrans->from();
                 Key stack = stateTrans->stack();
                 Key to = stateTrans->to();
-                Trans* t = eraseTransFromKpMap( from,stack,to );
 
-                { // BEGIN DEBUGGING
-                    assert( stateTrans == t );
-                } // END DEBUGGING
-
-                eraseTransFromEpsMap( from,stack,to );
                 // cyclical transitions are handled below in 
                 // the reverse list
                 if( from != to ) {
+                    Trans* t = eraseTransFromKpMap( from,stack,to );
+
+                    { // BEGIN DEBUGGING
+                        assert( stateTrans == t );
+                    } // END DEBUGGING
+
+                    eraseTransFromEpsMap( from,stack,to );
                     delete t;
                 }
             }
@@ -1007,7 +1008,7 @@ namespace wali
                 Trans* t = eraseTransFromKpMap( from,stack,to );
 
                 { // BEGIN DEBUGGING
-                    assert( stateTrans == t );
+                    assert( t != NULL && stateTrans == t );
                 } // END DEBUGGING
 
                 eraseTransFromEpsMap( from,stack,to );
