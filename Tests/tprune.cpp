@@ -1,0 +1,48 @@
+/*!
+ * @author Nick Kidd
+ */
+
+#include "wali/wfa/WFA.hpp"
+// Reachability weight domain
+// $(WaliDir)/Examples/Reach/Reach.hpp
+#include "Reach.hpp"
+
+#include <iostream>
+
+int main( int argc, char** argv )
+{
+    using wali::wfa::WFA;
+    using wali::Key;
+    using wali::getKey;
+    using std::cout;
+
+    WFA fa;
+    fa.add_trans( getKey("p"),getKey("n1"),getKey("accept"),new Reach(true) );
+    fa.setInitialState( getKey("p") );
+    fa.addFinalState( getKey("accept") );
+    fa.print( cout );
+    fa.prune();
+    fa.print( cout );
+    cout << "\n------------------------------------------------------------\n\n";
+
+    fa.add_trans( getKey("p"),getKey("n2"),getKey("BAD"),new Reach(true) );
+    fa.print( cout );
+    fa.prune();
+    fa.print( cout );
+    cout << "\n------------------------------------------------------------\n\n";
+
+    fa.add_trans( getKey("p"),getKey("n2"),getKey("BAD"),new Reach(true) );
+    fa.add_trans( getKey("BAD"),getKey("n2"),getKey("BAD"),new Reach(true) );
+    fa.add_trans( getKey("BAD"),getKey("n3"),getKey("BAD2"),new Reach(true) );
+    fa.print( cout );
+    fa.prune();
+    fa.print( cout );
+    cout << "\n------------------------------------------------------------\n\n";
+    return 0;
+}
+
+/* Yo, Emacs!
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
+*/
