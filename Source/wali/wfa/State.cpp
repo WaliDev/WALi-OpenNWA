@@ -55,7 +55,12 @@ namespace wali
                 Key stack,
                 Key to )
         {
-            return transSet.erase(from,stack,to);
+            return (NULL != transSet.erase(from,stack,to));
+        }
+
+        bool State::eraseTrans( Trans* t )
+        {
+            return (NULL != transSet.erase(t));
         }
 
         void State::clearTransSet()

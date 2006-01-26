@@ -121,6 +121,8 @@ namespace wali
                         Key stack,
                         Key to );
 
+                bool eraseTrans( Trans* t );
+
                 void clearTransSet();
 
             protected:

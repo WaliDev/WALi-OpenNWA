@@ -49,7 +49,7 @@ namespace wali
                 // of a transition will be lost.
                 state_map_t::const_iterator it = rhs.state_map.begin();
                 for( ; it != rhs.state_map.end(); it++ ) {
-                    add_state( it->first, it->second->weight()->zero() );
+                    addState( it->first, it->second->weight()->zero() );
                 }
 
                 // This will populate all maps
@@ -213,12 +213,14 @@ namespace wali
         void WFA::addTrans( Trans * t )
         {
             sem_elem_t ZERO = t->weight()->zero();
+            ZERO->print( std::cerr << "ZERO: " ) << std::endl;
+            assert(ZERO.is_valid());
 
             //std::cerr << "\tAdding 'from' state'" << key2str(t->from()) << "'\n";
-            add_state( t->from(), ZERO );
+            addState( t->from(), ZERO );
 
             //std::cerr << "\tAdding 'to' state '" << key2str(t->to()) << "'\n";
-            add_state( t->to(), ZERO );
+            addState( t->to(), ZERO );
 
             //t->print( std::cerr << "\tInserting Trans" ) << std::endl;
             insert( t );
@@ -238,9 +240,9 @@ namespace wali
 
             if( t != NULL )
             {
-                eraseTransFromEpsMap(from,stack,to);
+                eraseTransFromEpsMap(t);
                 State* state = state_map.find(from)->second;
-                state->eraseTrans(from,stack,to);
+                state->eraseTrans(t);
                 delete t;
             }
         }
@@ -420,9 +422,9 @@ namespace wali
             dest.clear();
 
             // Note: We need to make sure the state exists b/c
-            // set_initial_state cannot call add_state because there is no
+            // set_initial_state cannot call addState because there is no
             // weight to call it with
-            dest.add_state( dest_init_state, stateWeight->zero() );
+            dest.addState( dest_init_state, stateWeight->zero() );
             // Set dest init state
             dest.set_initial_state( dest_init_state );
 
@@ -432,7 +434,7 @@ namespace wali
             for( ; keyit != keyitEND ; keyit++ )
             {
                 Key f = *keyit;
-                dest.add_state(f,stateWeight->zero());
+                dest.addState(f,stateWeight->zero());
                 dest.add_final_state(f);
             }
 
@@ -564,6 +566,7 @@ namespace wali
 
         //
         // Removes all transitions in the (init_state,F) chop
+        // TODO: broken
         //
         void WFA::prune()
         {
@@ -851,10 +854,11 @@ namespace wali
         //
         // Add a state to the state map
         //
-        void WFA::add_state( Key key , sem_elem_t zero )
+        void WFA::addState( Key key , sem_elem_t zero )
         {
             if( state_map.find( key ) == state_map.end() ) {
-                state_map.insert( key , new State( key,zero ) );
+                State* state = new State(key,zero);
+                state_map.insert( key , state );
                 Q.insert(key);
             }
         }
@@ -971,33 +975,16 @@ namespace wali
             return t;
         }
 
-        Trans* WFA::eraseTransFromEpsMap(
-                Key from,
-                Key stack,
-                Key to )
+        Trans* WFA::eraseTransFromEpsMap( Trans* terase )
         {
-            Trans terase(from,stack,to,0);
             Trans* t = NULL;
-            if( stack == WALI_EPSILON )
+            if( terase->stack() == WALI_EPSILON )
             {
                 // remove from epsmap
                 // This loop could be moved to its own method
-                eps_map_t::iterator epit = eps_map.find( to );
+                eps_map_t::iterator epit = eps_map.find( terase->to() );
                 if( epit != eps_map.end() ) {
-                    t = epit->second.erase(&terase);
-                    // TODO: ERASE
-                    /*
-                    trans_list_t& ls = epit->second;
-                    trans_list_t::iterator lsit = ls.begin();
-                    trans_list_t::iterator lsitEND = ls.end();
-                    for( ; lsit != lsitEND ; lsit++ ) {
-                        if( terase.equal( *lsit ) ) {
-                            t = *lsit;
-                            ls.erase(lsit);
-                            break;
-                        }
-                    }
-                    */
+                    t = epit->second.erase(terase);
                 }
             }
             return t;
@@ -1019,6 +1006,8 @@ namespace wali
                 Key from = stateTrans->from();
                 Key stack = stateTrans->stack();
                 Key to = stateTrans->to();
+                // TODO: is this necessary
+                // eraseTransFromEpsMap( Trans* )?
                 Trans* t = eraseTransFromKpMap( from,stack,to );
 
                 { // BEGIN DEBUGGING
@@ -1028,9 +1017,17 @@ namespace wali
                         stateTrans->print( std::cerr ) << "\n";
                         assert( t != NULL && stateTrans == t );
                     }
+                    else {
+                        assert(t);
+                    }
                 } // END DEBUGGING
 
-                Trans* teps = eraseTransFromEpsMap( from,stack,to );
+                Trans* teps = eraseTransFromEpsMap(t);
+
+                { // BEGIN DEBUGGING
+                    assert( t == teps );
+                } // END DEBUGGING
+
                 delete t;
             }
 

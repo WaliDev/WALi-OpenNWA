@@ -368,7 +368,7 @@ namespace wali
                 /*! 
                  * Create a State * for the key Key
                  */
-                void add_state( Key key , sem_elem_t zero );
+                void addState( Key key , sem_elem_t zero );
 
                 /*!
                  * @return const pointer to underlying State object or NULL if
@@ -423,10 +423,7 @@ namespace wali
                  *
                  * @return true if a transition was erased from EpsMap
                  */
-                Trans* eraseTransFromEpsMap(
-                        Key from,
-                        Key stack,
-                        Key to );
+                Trans* eraseTransFromEpsMap( Trans* terase );
 
                 /*!
                  * Erases the State 'state' from the WFA and all transitions

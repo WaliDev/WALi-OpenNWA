@@ -186,8 +186,8 @@ namespace wali
                     // Rule 0s generate a transition right away. Because
                     // WPDS::update invokes WFA::insert we must make sure
                     // that the new states are inserted into the WFA. 
-                    fa.add_state( r->from_state(),r->weight()->zero() );
-                    fa.add_state( r->to_state(),r->weight()->zero() );
+                    fa.addState( r->from_state(),r->weight()->zero() );
+                    fa.addState( r->to_state(),r->weight()->zero() );
 
                     // add transition for rule
                     update( r->from_state()
@@ -344,7 +344,7 @@ namespace wali
                 {
                     rule_t & r = *rlsit;
                     wali_key_t gstate = gen_state( r->to_state(),r->to_stack1() );
-                    fa.add_state( gstate,r->weight()->zero() );
+                    fa.addState( gstate,r->weight()->zero() );
                 }
 
             }

@@ -9,6 +9,7 @@
 #include "wali/KeyPairSource.hpp"
 #include "wali/wfa/State.hpp"
 #include "wali/wfa/TransFunctor.hpp"
+#include "wali/wfa/TransSet.hpp"
 #include "wali/wpds/Config.hpp"
 #include "wali/wpds/RuleFunctor.hpp"
 #include "wali/wpds/LinkedTrans.hpp"
@@ -57,6 +58,7 @@ namespace wali
 namespace wali
 {
     using wfa::Trans;
+    using wfa::TransSet;
     using wfa::WFA;
     using wfa::State;
 
@@ -332,14 +334,14 @@ namespace wali
                     KeyPair kp( t->to(),r->stack2() );
                     WFA::kp_map_t::iterator kpit = fa.kpmap.find( kp );
                     WFA::kp_map_t::iterator kpitEND = fa.kpmap.end();
-                    WFA::trans_list_t::iterator lsit;
+                    TransSet::iterator tsit;
 
                     for( ; kpit != kpitEND ; kpit++ )
                     {
-                        WFA::trans_list_t & ls = kpit->second;
-                        for( lsit = ls.begin(); lsit != ls.end(); lsit++ )
+                        TransSet & transSet = kpit->second;
+                        for( tsit = transSet.begin(); tsit != transSet.end(); tsit++ )
                         {
-                            Trans * tprime = *lsit;
+                            Trans * tprime = *tsit;
                             sem_elem_t wtp = wrule_trans->extend( tprime->se );
                             update( fstate, fstack, tprime->to(), wtp, r->from() );
                         }
@@ -367,7 +369,7 @@ namespace wali
                     {
                         erule_t r = (ERule *)((*rlsit).get_ptr());
                         wali_key_t gstate = WPDS::gen_state( r->to_state(),r->to_stack1() );
-                        fa.add_state( gstate,r->extended_weight()->zero() );
+                        fa.addState( gstate,r->extended_weight()->zero() );
                     }
                 }
 
@@ -481,12 +483,12 @@ namespace wali
                             // tprime to key
                             wali_key_t tpto = tprime->to();
                             // get epsilon list ref
-                            WFA::trans_list_t & tls = epsit->second;
+                            TransSet& transSet = epsit->second;
                             // iterate
-                            WFA::trans_list_t::iterator tlsit = tls.begin();
-                            for( ; tlsit != tls.end() ; tlsit++ )
+                            TransSet::iterator tsit = transSet.begin();
+                            for( ; tsit != transSet.end() ; tsit++ )
                             {
-                                Trans * teps = *tlsit;
+                                Trans * teps = *tsit;
                                 // apply merge function
                                 sem_elem_t w = er->merge_fn()->apply_f(SEM_PAIR_GET_FIRST(tprime->delta), SEM_PAIR_GET_FIRST(teps->se));
                                 sem_elem_t epsW = new SemElemPair(w, w->one());

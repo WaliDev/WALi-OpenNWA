@@ -36,9 +36,10 @@ sem_elem_t Reach::zero() const
 sem_elem_t Reach::extend( SemElem* se )
 {
     Reach* rhs = static_cast< Reach* >(se);
+    // this and rhs are one()
     if( isreached && rhs->isreached )
         return one();
-    else // this and rhs are one()
+    else
         return zero();
 }
 

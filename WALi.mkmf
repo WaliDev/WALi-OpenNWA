@@ -31,6 +31,7 @@
             <item Name="State" RelativePath="wali/wfa/State.cpp" />
             <item Name="Trans" RelativePath="wali/wfa/Trans.cpp" />
             <item Name="TransFunctor" RelativePath="wali/wfa/TransFunctor.cpp" />
+            <item Name="TransSet" RelativePath="wali/wfa/TransSet.cpp" />
             <item Name="WeightMaker" RelativePath="wali/wfa/WeightMaker.cpp" />
             <!-- WPDS -->
             <item Name="Config" RelativePath="wali/wpds/Config.cpp" />
@@ -191,6 +192,23 @@
         </DependencyList>
     </Project>
 
+    <!-- Test se -->
+    <Project Name='tse' RelativePath='Tests' 
+        BuildDir='Tests' OuputDir='Tests' Type='Executable' >
+
+        <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
+        <IncludeList>
+            <item Name='Reach' Path='$(WALiDir)/Examples/Reach' />
+        </IncludeList>
+        <InputList>
+            <item Name='tse' RelativePath='tse.cpp' />
+            <item Name='Reach' Path='$(WALiDir)/Examples/Reach/Reach.cpp' />
+        </InputList>
+        <DependencyList>
+            <item Name='wali' />
+        </DependencyList>
+    </Project>
+
     <Project Name='tests' RelativePath='Tests' Type='Empty'>
         <DependencyList>
             <item Name='t1' />
@@ -198,6 +216,7 @@
             <item Name='t3' />
             <item Name='t4' />
             <item Name='tprune' />
+            <item Name='tse' />
         </DependencyList>
     </Project>
 
