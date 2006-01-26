@@ -10,6 +10,7 @@
 #include "wali/Markable.hpp"
 #include "wali/Countable.hpp"
 #include "wali/SemElem.hpp"
+#include "wali/wfa/TransSet.hpp"
 #include <list>
 
 namespace wali
@@ -26,7 +27,6 @@ namespace wali
     namespace wfa
     {
         class CA;
-        class Trans;
         class State;
         //typedef State* state_t;
         //typedef ref_ptr<State> state_t;
@@ -49,9 +49,8 @@ namespace wali
                 friend class wali::wpds::ewpds::EWPDS;
 
             public: // typedefs
-                typedef std::list< Trans* > trans_list_t;
-                typedef trans_list_t::iterator iterator;
-                typedef trans_list_t::const_iterator const_iterator;
+                typedef TransSet::iterator iterator;
+                typedef TransSet::const_iterator const_iterator;
 
             public: // static vars
                 static int numStates;
@@ -80,7 +79,7 @@ namespace wali
                  * Add Trans* t to the set of transitions that lead into this
                  * State.
                  */
-                void add_rev_trans( Trans * t );
+                void addTrans( Trans * t );
 
                 /*!
                  * Return a reference to the State's weight
@@ -107,36 +106,31 @@ namespace wali
                     return key;
                 }
 
-                iterator rbegin()
+                iterator begin()
                 {
-                    return rev_trans_ls.begin();
+                    return transSet.begin();
                 }
 
-                iterator rend()
+                iterator end()
                 {
-                    return rev_trans_ls.end();
+                    return transSet.end();
                 }
 
-                bool eraseTransFromReverseList(
+                bool eraseTrans(
                         Key from,
                         Key stack,
                         Key to );
 
-                void clearTransLists();
+                void clearTransSet();
 
             protected:
-                bool eraseTransFromList(
-                        Key from,
-                        Key stack,
-                        Key to,
-                        trans_list_t& ls );
 
             protected:
                 wali_key_t key;
                 sem_elem_t se;
                 sem_elem_t delta_se;
                 sem_elem_t quasi;
-                trans_list_t rev_trans_ls;
+                TransSet transSet;
 
         }; //class State
 

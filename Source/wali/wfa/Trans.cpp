@@ -18,6 +18,21 @@ namespace wali
         const std::string Trans::XMLStackTag("stack");
         const std::string Trans::XMLToTag("to");
 
+        bool TransLT::operator()( const Trans* a, const Trans* b ) const
+        {
+            if( a->from() == b->from() ) {
+                if( a->stack() == b->stack() ) {
+                    return a->to() < b->to();
+                }
+                else {
+                    return a->stack() < b->stack();
+                }
+            }
+            else {
+                return a->from() < b->from();
+            }
+        }
+
         Trans::Trans() :
             Countable(true),
             kp(WALI_EPSILON,WALI_EPSILON), t(WALI_EPSILON),

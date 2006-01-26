@@ -32,6 +32,16 @@ namespace wali
         class Trans;
 
         /*!
+         * @struct TransLT
+         *
+         * This can be used to place Trans* into std::set or any other STL
+         * container that uses Strict-weak ordering.
+         */
+        struct TransLT {
+            bool operator()( const Trans* a, const Trans* b ) const;
+        };
+
+        /*!
          * @typedef trans_t
          * Avoid typing ref_ptr<Trans> when reference counting is begin
          * enforced.

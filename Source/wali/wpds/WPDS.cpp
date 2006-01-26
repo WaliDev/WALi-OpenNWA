@@ -8,6 +8,7 @@
 #include "wali/KeyPairSource.hpp"
 #include "wali/wfa/State.hpp"
 #include "wali/wfa/TransFunctor.hpp"
+#include "wali/wfa/TransSet.hpp"
 #include "wali/wpds/WPDS.hpp"
 #include "wali/wpds/Config.hpp"
 #include "wali/wpds/Rule.hpp"
@@ -27,6 +28,7 @@
 namespace wali
 {
     using wfa::Trans;
+    using wfa::TransSet;
     using wfa::WFA;
     using wfa::State;
 
@@ -277,22 +279,22 @@ namespace wali
         {
 
             sem_elem_t wrule_trans = r->weight()->extend( delta );
-            wali_key_t fstate = r->from()->state();
-            wali_key_t fstack = r->from()->stack();
+            Key fstate = r->from()->state();
+            Key fstack = r->from()->stack();
 
             if( r->is_rule2() )
             {
                 KeyPair kp( t->to(),r->stack2() );
                 WFA::kp_map_t::iterator kpit = fa.kpmap.find( kp );
                 WFA::kp_map_t::iterator kpitEND = fa.kpmap.end();
-                WFA::trans_list_t::iterator lsit;
+                TransSet::iterator tsit;
 
                 for( ; kpit != kpitEND ; kpit++ )
                 {
-                    WFA::trans_list_t & ls = kpit->second;
-                    for( lsit = ls.begin(); lsit != ls.end(); lsit++ )
+                    TransSet& transSet = kpit->second;
+                    for( tsit = transSet.begin(); tsit != transSet.end(); tsit++ )
                     {
-                        Trans * tprime = *lsit;
+                        Trans * tprime = *tsit;
                         sem_elem_t wtp = wrule_trans->extend( tprime->se );
                         update( fstate
                                 , fstack
@@ -378,8 +380,8 @@ namespace wali
                 else {
                     // (p,eps,q) + (q,y,q') => (p,y,q')
                     State * state = fa.getState( t->to() );
-                    State::iterator it = state->trans_ls.begin();
-                    for(  ; it != state->trans_ls.end() ; it++ )
+                    State::iterator it = state->begin();
+                    for(  ; it != state->end() ; it++ )
                     {
                         Trans * tprime = *it;
                         sem_elem_t wght = tprime->weight()->extend( dnew );
@@ -441,12 +443,12 @@ namespace wali
                         // tprime to key
                         wali_key_t tpto = tprime->to();
                         // get epsilon list ref
-                        WFA::trans_list_t & tls = epsit->second;
+                        TransSet& transSet = epsit->second;
                         // iterate
-                        WFA::trans_list_t::iterator tlsit = tls.begin();
-                        for( ; tlsit != tls.end() ; tlsit++ )
+                        TransSet::iterator tsit = transSet.begin();
+                        for( ; tsit != transSet.end() ; tsit++ )
                         {
-                            Trans * teps = *tlsit;
+                            Trans * teps = *tsit;
                             Config * config = make_config( teps->from(),tpstk );
                             sem_elem_t epsW = tprime->delta->extend( teps->se );
                             update( teps->from(),tpstk,tpto,

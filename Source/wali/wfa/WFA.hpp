@@ -11,6 +11,7 @@
 #include "wali/HashMap.hpp"
 #include "wali/KeyContainer.hpp"
 #include "wali/wfa/WeightMaker.hpp"
+#include "wali/wfa/TransSet.hpp"
 #include <iostream>
 #include <list>
 #include <set>
@@ -32,7 +33,6 @@ namespace wali
     namespace wfa
     {
         class State;
-        class Trans;
         class TransFunctor;
         class ConstTransFunctor;
 
@@ -60,10 +60,9 @@ namespace wali
                  */
                 enum query_t { INORDER,REVERSE,MAX };
 
-                typedef std::list< Trans * > trans_list_t;
-                typedef wali::HashMap< KeyPair, trans_list_t > kp_map_t;
+                typedef wali::HashMap< KeyPair, TransSet > kp_map_t;
                 typedef wali::HashMap< Key , State * > state_map_t;
-                typedef wali::HashMap< Key , trans_list_t > eps_map_t;
+                typedef wali::HashMap< Key , TransSet > eps_map_t;
 
                 friend class ::wali::wpds::WPDS;
                 friend class ::wali::wpds::ewpds::EWPDS;
@@ -181,8 +180,28 @@ namespace wali
                  *
                  * @see Key
                  * @see sem_elem_t
+                 * @depracated use WFA::addTrans
                  */
-                virtual void add_trans(
+                void add_trans( Key p, Key g, Key q, sem_elem_t se ) {
+                    addTrans(p,g,q,se);
+                }
+
+                /*!
+                 * @brief Add Trans t to the WFA
+                 *
+                 * @see Trans
+                 * @depracated use WFA::addTrans
+                 */
+                void add_trans( Trans * t ) {
+                    addTrans(t);
+                }
+
+                /*! @brief Add transition (p,g,q) to the WFA
+                 *
+                 * @see Key
+                 * @see sem_elem_t
+                 */
+                virtual void addTrans(
                         Key p,
                         Key g,
                         Key q,
@@ -191,9 +210,9 @@ namespace wali
                 /*!
                  * @brief Add Trans t to the WFA
                  *
-                 * @see Trans
+                 * @see wali::wfa::Trans
                  */
-                virtual void add_trans( Trans * t );
+                virtual void addTrans( Trans * t );
 
                 /*!
                  * @brief erase Trans

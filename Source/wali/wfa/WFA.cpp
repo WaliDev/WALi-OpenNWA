@@ -195,13 +195,13 @@ namespace wali
         //!
         // @brief add trans (p,g,q,se) to WFA
         //
-        void WFA::add_trans(
+        void WFA::addTrans(
                 Key p,
                 Key g,
                 Key q,
                 sem_elem_t se )
         {
-            add_trans( new Trans(p,g,q,se) );
+            addTrans( new Trans(p,g,q,se) );
         }
 
         //!
@@ -210,7 +210,7 @@ namespace wali
         // method (actually insert) assumes ownership of the memory
         // pointed to by the Trans* t.
         //
-        void WFA::add_trans( Trans * t )
+        void WFA::addTrans( Trans * t )
         {
             sem_elem_t ZERO = t->weight()->zero();
 
@@ -226,8 +226,7 @@ namespace wali
 
         //
         // Erase a trans
-        // Must remove from kpmap and eps_map.
-        // TODO: Must remove t (p,_,q) from p->trans_ls and q->rev_trans_ls
+        // Must remove from kpmap, eps_map, and State('from')
         //
         void WFA::erase(
                 Key from,
@@ -240,10 +239,8 @@ namespace wali
             if( t != NULL )
             {
                 eraseTransFromEpsMap(from,stack,to);
-                // TODO: clean up State maps
-                State* state;
-                state = state_map.find(to)->second;
-                state->eraseTransFromReverseList(from,stack,to);
+                State* state = state_map.find(from)->second;
+                state->eraseTrans(from,stack,to);
                 delete t;
             }
         }
@@ -280,6 +277,13 @@ namespace wali
             kp_map_t::iterator it = kpmap.find(kp);
             if( it != kpmap.end() )
             {
+                TransSet& transSet = it->second;
+                TransSet::iterator tsit= transSet.begin();
+                if( tsit != transSet.end() ) {
+                    tret = *tsit;
+                }
+
+                /*
                 trans_list_t &ls = it->second;
                 trans_list_t::iterator lit = ls.begin();
                 for( ; lit != ls.end() ; lit ++ )
@@ -293,6 +297,7 @@ namespace wali
                         break;
                     }
                 }
+                */
             }
             if( 0 != tret ) {
                 rc = true;
@@ -307,12 +312,8 @@ namespace wali
             kp_map_t::const_iterator itEND = kpmap.end();
             for( ; it != itEND ; it++ )
             {
-                const trans_list_t & ls = it->second;
-                trans_list_t::const_iterator lit = ls.begin();
-                for( ; lit != ls.end() ; lit++ )
-                {
-                    tf(*lit);
-                }
+                const TransSet & transSet = it->second;
+                transSet.each(tf);
             }
         }
 
@@ -322,12 +323,8 @@ namespace wali
             kp_map_t::iterator itEND = kpmap.end();
             for( ; it != itEND ; it++ )
             {
-                trans_list_t & ls = it->second;
-                trans_list_t::iterator lit = ls.begin();
-                for( ; lit != ls.end() ; lit++ )
-                {
-                    tf(*lit);
-                }
+                TransSet & transSet = it->second;
+                transSet.each(tf);
             }
         }
 
@@ -335,7 +332,7 @@ namespace wali
         class StackHasher : public TransFunctor
         {
             public:
-                typedef wali::HashMap< Key , WFA::trans_list_t > stackmap_t;
+                typedef wali::HashMap< Key , TransSet > stackmap_t;
                 stackmap_t stackmap;
 
                 virtual ~StackHasher() {}
@@ -346,10 +343,10 @@ namespace wali
                     stackmap_t::iterator it = stackmap.find( stack );
                     if( it == stackmap.end() )
                     {
-                        WFA::trans_list_t ls;
-                        it = stackmap.insert(stack,ls).first;
+                        TransSet transSet;
+                        it = stackmap.insert(stack,transSet).first;
                     }
-                    it->second.push_back(t);
+                    it->second.insert(t);
                 }
         };
 
@@ -444,15 +441,16 @@ namespace wali
             kp_map_t::iterator kpitEND = kpmap.end();
             for( ; kpit != kpitEND ; kpit++ )
             {
-                trans_list_t & ls = kpit->second;
-                if( ls.empty() )
+                TransSet & transSet = kpit->second;
+                if( transSet.empty() )
                 {
                     continue;
                 }
                 // Probe StackHasher outside of the inner
                 // for loop b/c the kp_map_t hashes on (p,g)
                 // so each trans in the list has stack symbol g
-                Trans *tprobe = ls.front();
+                TransSet::iterator tsit = transSet.begin();
+                Trans *tprobe = *tsit;
                 StackHasher::stackmap_t::iterator stkit;
                 stkit = hashfa.stackmap.find( tprobe->stack() );
 
@@ -460,21 +458,20 @@ namespace wali
                 {
                     continue;
                 }
-                trans_list_t::iterator lsit = ls.begin();
-                for( ; lsit != ls.end() ; lsit++ )
+                for( ; tsit != transSet.end() ; tsit++ )
                 {
                     // Probe StackHasher::stackmap with each trans
-                    Trans *t = *lsit;
+                    Trans *t = *tsit;
                     // match t w/ all trans in the stkit->second
-                    trans_list_t::iterator stklsit = stkit->second.begin();
-                    trans_list_t::iterator stklsitEND = stkit->second.end();
+                    TransSet::iterator stklsit = stkit->second.begin();
+                    TransSet::iterator stklsitEND = stkit->second.end();
                     for( ; stklsit != stklsitEND ; stklsit++ )
                     {
                         Trans *t2 = *stklsit;
                         Key fromkey = getKey( t->from(),t2->from() );
                         Key tokey = getKey( t->to(),t2->to() );
                         sem_elem_t W = wmaker.make_weight(t->weight(),t2->weight());
-                        dest.add_trans(fromkey,t->stack(),tokey,W);
+                        dest.addTrans( new Trans(fromkey,t->stack(),tokey,W) );
                     }
                 }
             }
@@ -512,6 +509,7 @@ namespace wali
         //
         void WFA::path_summary( Worklist<State>& wl )
         {
+#if 0
             setupFixpoint( wl );
             while( !wl.empty() )
             {
@@ -520,8 +518,8 @@ namespace wali
                 q->delta() = the_delta->zero();
 
                 // For each Trans (q',x,q)
-                State::iterator tit = q->rbegin();
-                State::iterator titEND = q->rend();
+                State::iterator tit = q->begin();
+                State::iterator titEND = q->end();
                 for( ; tit != titEND ; tit++ )
                 {
                     Trans* t = *tit; // (q',_,q)
@@ -561,6 +559,7 @@ namespace wali
                     }
                 }
             }
+#endif
         }
 
         //
@@ -568,6 +567,7 @@ namespace wali
         //
         void WFA::prune()
         {
+#if 0
 
             DefaultWorklist<State> wl;
             setupFixpoint( wl );
@@ -614,6 +614,7 @@ namespace wali
             // second forward prune
             // TODO: implement this later
             //
+#endif
         }
 
         //
@@ -746,11 +747,19 @@ namespace wali
         Trans * WFA::insert( Trans * tnew )
         {
             ////
+            // WFA::find code duplicated to keep
+            // a handle on the kp_map_t::iterator
             ////
             Trans * told = 0;
             kp_map_t::iterator it = kpmap.find(tnew->keypair());
             if( it != kpmap.end() )
             {
+                TransSet& transSet = it->second;
+                TransSet::iterator tsit= transSet.begin();
+                if( tsit != transSet.end() ) {
+                    told = *tsit;
+                }
+                /*
                 trans_list_t &ls = it->second;
                 trans_list_t::iterator lit = ls.begin();
                 trans_list_t::iterator litEND = ls.end();
@@ -765,6 +774,7 @@ namespace wali
                         break;
                     }
                 }
+                */
             }
             ////
             // Cases
@@ -781,37 +791,44 @@ namespace wali
             {
                 if( it == kpmap.end() )
                 {
-                    trans_list_t ls;
-                    it = kpmap.insert(tnew->keypair(),ls).first;
+                    TransSet transSet;
+                    //trans_list_t ls;
+                    it = kpmap.insert(tnew->keypair(),transSet).first;
                 }
-                it->second.push_back(tnew);
+                it->second.insert(tnew);
+                //it->second.push_back(tnew);
 
                 // Set told to tnew for the return statement at end of 
                 // method
                 told = tnew;
 
                 // Add tnew to the 'to' State's reverse trans list
-                state_map_t::iterator to_stit = state_map.find( tnew->to() );
+                state_map_t::iterator from_stit = state_map.find( tnew->from() );
 
                 { // BEGIN DEBUGGING
-                    if( to_stit == state_map.end() ) {
+                    if( from_stit == state_map.end() ) {
                         tnew->print( std::cerr << "\n\n+++ WTF +++\n" ) << std::endl;
-                        assert( Q.find(tnew->to()) != Q.end() );
-                        assert( to_stit != state_map.end() );
+                        assert( Q.find(tnew->from()) != Q.end() );
+                        assert( from_stit != state_map.end() );
                     }
                 } // END DEBUGGING
 
-                to_stit->second->add_rev_trans( tnew );
+                from_stit->second->addTrans( tnew );
 
                 // if tnew is an eps transition add to eps_map
                 if( tnew->stack() == WALI_EPSILON )
                 {
                     eps_map_t::iterator epsit = eps_map.find( tnew->to() );
                     if( epsit == eps_map.end() ) {
-                        trans_list_t ls;
-                        epsit = eps_map.insert( tnew->to(),ls ).first;
+                        TransSet transSet;
+                        epsit = eps_map.insert( tnew->to(),transSet ).first;
+                        // TODO: ERASE
+                        //trans_list_t ls;
+                        //epsit = eps_map.insert( tnew->to(),ls ).first;
                     }
-                    epsit->second.push_back( tnew );
+                    epsit->second.insert( tnew );
+                    // TODO: ERASE
+                    //epsit->second.push_back( tnew );
                 }
             }
             else {
@@ -936,6 +953,9 @@ namespace wali
             if( kpit != kpmap.end() ) {
                 // remove from kpmap
                 // This loop could be moved to its own method
+                t = kpit->second.erase(&terase);
+                // TODO: ERASE
+                /*
                 trans_list_t& ls = kpit->second;
                 trans_list_t::iterator lsit = ls.begin();
                 trans_list_t::iterator lsitEND = ls.end();
@@ -946,6 +966,7 @@ namespace wali
                         break;
                     }
                 }
+                */
             }
             return t;
         }
@@ -963,6 +984,9 @@ namespace wali
                 // This loop could be moved to its own method
                 eps_map_t::iterator epit = eps_map.find( to );
                 if( epit != eps_map.end() ) {
+                    t = epit->second.erase(&terase);
+                    // TODO: ERASE
+                    /*
                     trans_list_t& ls = epit->second;
                     trans_list_t::iterator lsit = ls.begin();
                     trans_list_t::iterator lsitEND = ls.end();
@@ -973,6 +997,7 @@ namespace wali
                             break;
                         }
                     }
+                    */
                 }
             }
             return t;
@@ -986,8 +1011,8 @@ namespace wali
                 State* state
                 )
         {
-            State::iterator it = state->rbegin();
-            State::iterator itEND = state->rend();
+            State::iterator it = state->begin();
+            State::iterator itEND = state->end();
             for( ; it != itEND ; it++ )
             {
                 Trans* stateTrans = *it;
@@ -1020,7 +1045,7 @@ namespace wali
 
             // Since we are not deleting the State, we need
             // to clear its TransLists
-            state->clearTransLists();
+            state->clearTransSet();
 
             // delete the memory
             //delete state;

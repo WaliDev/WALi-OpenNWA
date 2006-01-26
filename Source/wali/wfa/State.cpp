@@ -45,43 +45,24 @@ namespace wali
             return o;
         }
 
-        void State::add_rev_trans( Trans * t )
+        void State::addTrans( Trans * t )
         {
-            rev_trans_ls.push_back(t);
+            transSet.insert(t);
         }
 
-        bool State::eraseTransFromReverseList(
+        bool State::eraseTrans(
                 Key from,
                 Key stack,
                 Key to )
         {
-            return eraseTransFromList(from,stack,to,rev_trans_ls);
+            return transSet.erase(from,stack,to);
         }
 
-        void State::clearTransLists()
+        void State::clearTransSet()
         {
-            rev_trans_ls.clear();
+            transSet.clear();
         }
 
-        bool State::eraseTransFromList(
-                Key from,
-                Key stack,
-                Key to,
-                trans_list_t& ls )
-        {
-            Trans terase(from,stack,to,0);
-            bool eraseSuccess = false;
-            iterator it = ls.begin();
-            for( ; it != ls.end() ; it++ ) {
-                Trans* t = *it;
-                if( t->equal(terase) ) {
-                    eraseSuccess = true;
-                    ls.erase(it);
-                    break;
-                }
-            }
-            return eraseSuccess;
-        }
     } // namespace wfa
 
 } // namespace wali
