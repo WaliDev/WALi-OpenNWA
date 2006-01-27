@@ -28,9 +28,11 @@ int main()
     s.print( std::cout << "TransSet " ) << std::endl;
 
     WFA fa;
-    fa.addTrans( new Trans(a,b,c,ONE) );
-    fa.addTrans( new Trans(a,getKey("b"),d,ONE) );
-    fa.print( std::cout ) << std::endl;
+    Reach *x = new Reach(true);
+    fa.addTrans( new Trans(a,b,c,x) );
+    fa.addTrans( new Trans(a,b,c,x) );
+    fa.print( std::cout << "This should succeed\n" ) << std::endl;
+    x->print( std::cout << "This WILL FAIL\n" ) << std::endl;
 
     return 0;
 
