@@ -6,6 +6,7 @@
  */
 
 #include "wali/Common.hpp"
+#include "wali/Printable.hpp"
 #include "wali/wfa/Trans.hpp"
 #include <set>
 
@@ -22,7 +23,7 @@ namespace wali
          * This class basically wraps the std::set implementation
          * to provide a "wali::Key friendly" interface.
          */
-        class TransSet
+        class TransSet : public Printable
         {
             public:
                 typedef std::set< Trans*,TransLT > SetImpl;
@@ -91,6 +92,8 @@ namespace wali
                 const_iterator end() const {
                     return impl.end();
                 }
+
+                std::ostream& print( std::ostream& o ) const;
 
             protected:
                 std::set< Trans*,TransLT > impl;

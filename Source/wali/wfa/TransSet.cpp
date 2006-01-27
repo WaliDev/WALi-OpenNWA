@@ -60,6 +60,19 @@ namespace wali {
             }
         }
 
+        std::ostream& TransSet::print( std::ostream& o ) const {
+            const_iterator it = begin();
+            const_iterator itEND = end();
+            bool first = true;
+            o << "{";
+            for( ; it != itEND ; it++,first=false ) {
+                if( !first )
+                    o << ", ";
+                (*it)->print(o);
+            }
+            o << "}";
+        }
+
     }
 }
 /* Yo, Emacs!
