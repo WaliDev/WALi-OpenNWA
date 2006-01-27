@@ -26,19 +26,19 @@ void dot()
 {
     using wali::wpds::WPDS;
     using wali::getKey;
-    using wali::wali_key_t;
+    using wali::Key;
     using wali::sem_elem_t;
     using wali::wfa::WFA;
     using std::cout;
     Reach *reach = new Reach(true);
 
-    wali_key_t p = getKey("p");
-    wali_key_t acc1 = getKey("acc1");
-    wali_key_t acc2 = getKey("acc2");
-    wali_key_t n0 = getKey("n0");
-    wali_key_t n1 = getKey("n1");
-    wali_key_t n2 = getKey("n2");
-    wali_key_t n3 = getKey("n3");
+    Key p = getKey("p");
+    Key acc1 = getKey("acc1");
+    Key acc2 = getKey("acc2");
+    Key n0 = getKey("n0");
+    Key n1 = getKey("n1");
+    Key n2 = getKey("n2");
+    Key n3 = getKey("n3");
 
     WFA fa;
     fa.setInitialState(p);
@@ -46,7 +46,7 @@ void dot()
     fa.addFinalState(acc2);
     fa.addTrans( p, getKey("n0"), acc1, reach);
     fa.addTrans( p, n0, p, reach);
-    fa.addTrans( p, n1, getKey("q"), reach);
+    fa.addTrans( p, n1, getKey("q"), new Reach(true) );//reach);
     fa.addTrans( getKey("q"), n2, acc2, reach);
     fa.addTrans( acc2, n3, acc2, reach);
     std::ofstream fdot( "t3.dot" );

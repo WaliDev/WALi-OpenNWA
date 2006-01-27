@@ -35,7 +35,7 @@ namespace wali
 
         Trans::Trans() :
             Countable(true),
-            kp(WALI_EPSILON,WALI_EPSILON), t(WALI_EPSILON),
+            kp(WALI_EPSILON,WALI_EPSILON), toStateKey(WALI_EPSILON),
             se(0),delta(0),status(MODIFIED)
         {
             {
@@ -46,12 +46,12 @@ namespace wali
         }
 
         Trans::Trans(
-                wali_key_t from,
-                wali_key_t stack,
-                wali_key_t to,
+                Key from_,
+                Key stack_,
+                Key to_,
                 sem_elem_t se_ ) :
             Countable(true),
-            kp(from,stack), t(to),
+            kp(from_,stack_), toStateKey(to_),
             se(se_), delta(se_), status(MODIFIED) 
         {
             {
@@ -69,7 +69,7 @@ namespace wali
             Printable(),Countable(true),Markable()
         {
             kp      = rhs.kp;
-            t       = rhs.t;
+            toStateKey= rhs.toStateKey;
             se      = rhs.se;
             delta   = rhs.se;
             status  = rhs.status;

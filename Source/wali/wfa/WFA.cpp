@@ -212,6 +212,9 @@ namespace wali
         //
         void WFA::addTrans( Trans * t )
         {
+            t->print( std::cerr << "[WFA::addTrans] " ) << std::endl;
+            std::cerr << "\n+++ ?? +++\n";
+            print( std::cerr ) << std::endl;
             sem_elem_t ZERO = t->weight()->zero();
             ZERO->print( std::cerr << "ZERO: " ) << std::endl;
             assert(ZERO.is_valid());

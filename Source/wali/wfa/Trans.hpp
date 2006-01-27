@@ -99,9 +99,9 @@ namespace wali
                  *
                  * This is used by CA when add_trans is called.
                  */
-                Trans(  wali_key_t from,
-                        wali_key_t stack,
-                        wali_key_t to,
+                Trans(  Key from,
+                        Key stack,
+                        Key to,
                         sem_elem_t se );
 
                 Trans( const Trans & t );
@@ -111,29 +111,29 @@ namespace wali
                 //
                 // getters (const)
                 //
-                /*! @return const wali_key_t of from state */
-                const wali_key_t from() const throw() {
+                /*! @return const Key of from state */
+                const Key from() const throw() {
                     return kp.first;
                 }
 
-                /*! @return const wali_key_t of from state */
-                const wali_key_t from_state() const throw() {
+                /*! @return const Key of from state */
+                const Key from_state() const throw() {
                     return kp.first;
                 }
 
-                /*! @return const wali_key_t of stack symbol */
-                const wali_key_t stack() const throw() {
+                /*! @return const Key of stack symbol */
+                const Key stack() const throw() {
                     return kp.second;
                 }
 
-                /*! @return const wali_key_t of to state */
-                const wali_key_t to() const throw() {
-                    return t;
+                /*! @return const Key of to state */
+                const Key to() const throw() {
+                    return toStateKey;
                 }
 
-                /*! @return const wali_key_t of to state */
-                const wali_key_t to_state() const throw() {
-                    return t;
+                /*! @return const Key of to state */
+                const Key to_state() const throw() {
+                    return toStateKey;
                 }
 
                 /*! @return const sem_elem_t of Trans */
@@ -144,29 +144,29 @@ namespace wali
                 //
                 // getters (non const)
                 //
-                /*! @return wali_key_t of from state */
-                wali_key_t from() throw() {
+                /*! @return Key of from state */
+                Key from() throw() {
                     return kp.first;
                 }
 
-                /*! @return wali_key_t of from state */
-                wali_key_t from_state()throw() {
+                /*! @return Key of from state */
+                Key from_state()throw() {
                     return kp.first;
                 }
 
-                /*! @return wali_key_t of stack symbol */
-                wali_key_t stack() throw() {
+                /*! @return Key of stack symbol */
+                Key stack() throw() {
                     return kp.second;
                 }
 
-                /*! @return wali_key_t of to state */
-                wali_key_t to() throw() {
-                    return t;
+                /*! @return Key of to state */
+                Key to() throw() {
+                    return toStateKey;
                 }
 
-                /*! @return wali_key_t of to state */
-                wali_key_t to_state() throw() {
-                    return t;
+                /*! @return Key of to state */
+                Key to_state() throw() {
+                    return toStateKey;
                 }
 
                 /*! @return sem_elem_t of Trans */
@@ -245,7 +245,7 @@ namespace wali
 
             protected:
                 KeyPair kp;
-                wali_key_t t;
+                Key toStateKey;
                 sem_elem_t se;
                 sem_elem_t delta;
 
