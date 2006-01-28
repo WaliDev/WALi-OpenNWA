@@ -167,6 +167,9 @@
 				RelativePath="..\..\Source\wali\wfa\TransFunctor.cpp">
 			</File>
 			<File
+				RelativePath="..\..\Source\wali\wfa\TransSet.cpp">
+			</File>
+			<File
 				RelativePath="..\..\Source\wali\witness\Visitor.cpp">
 			</File>
 			<File
@@ -293,6 +296,9 @@
 			</File>
 			<File
 				RelativePath="..\..\Source\wali\wfa\TransFunctor.hpp">
+			</File>
+			<File
+				RelativePath="..\..\Source\wali\wfa\TransSet.hpp">
 			</File>
 			<File
 				RelativePath="..\..\Source\wali\witness\Visitable.hpp">

@@ -30,14 +30,9 @@ namespace wali
      */
     sem_elem_t SemElem::diff( SemElem * se )
     {
-        sem_elem_t comb = combine( se );
-        if( equal( comb ) )
-        {
-            // reclaim this memory
-            return zero();
-        }
-        else
-            return comb;
+        std::cerr << "[ERROR] SemElem::diff must be overridden to be used.\n";
+        assert(0);
+        return 0;
     }
 
     sem_elem_t SemElem::quasi_one() const
@@ -45,14 +40,24 @@ namespace wali
         return one();
     }
 
+    //
+    // < this + se, this - se >
+    //
     std::pair< sem_elem_t , sem_elem_t > SemElem::delta( SemElem * se )
     {
         std::pair< sem_elem_t , sem_elem_t > rp;
         rp.first = combine(se);
-        // Because of the nature of diff, use se->diff(this). The idea
-        // is that the combine in diff will not be equal to se if this
-        // is 'lower' than se
-        rp.second = se->diff(this);
+
+        // Because we do not actually have a difference operator,
+        // we simply see if the combine is equal to the passed in parameter.
+        // If not, we say that our new "delta" or "difference" is the 
+        // combined weight
+        if( se->equal( rp.first ) ) {
+            rp.second = zero();
+        }
+        else {
+            rp.second = rp.first;
+        }
         return rp;
     }
 

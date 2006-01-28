@@ -61,7 +61,9 @@ namespace wali
 
             public:
 
-                State( wali_key_t name, sem_elem_t W );
+                State();
+
+                State( Key name, sem_elem_t W );
 
                 virtual ~State();
 
@@ -102,7 +104,7 @@ namespace wali
                 /*!
                  * Return the key associated with this State
                  */
-                wali_key_t name() const {
+                Key name() const {
                     return key;
                 }
 
@@ -125,10 +127,15 @@ namespace wali
 
                 void clearTransSet();
 
+                /*!
+                 * @brief Used for placing States in STL containers
+                 */
+                bool operator()( const State* a, const State* b ) const;
+
             protected:
 
             protected:
-                wali_key_t key;
+                Key key;
                 sem_elem_t se;
                 sem_elem_t delta_se;
                 sem_elem_t quasi;

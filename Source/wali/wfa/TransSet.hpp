@@ -62,6 +62,7 @@ namespace wali
                     // We should never insert the same transition twice
                     assert(b);
                     // END DEBUGGING
+                    return b;
                 }
 
                 void clear() {

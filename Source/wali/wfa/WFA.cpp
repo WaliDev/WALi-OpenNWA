@@ -240,14 +240,19 @@ namespace wali
                 Key to )
         {
             // Remove from kpmap
-            Trans* t = eraseTransFromKpMap(from,stack,to);
+            Trans* tKp = eraseTransFromKpMap(from,stack,to);
 
-            if( t != NULL )
+            if( tKp != NULL )
             {
-                eraseTransFromEpsMap(t);
+                Trans* tEps = eraseTransFromEpsMap(tKp);
+
+                { // BEGIN DEBUGGING
+                    assert( tKp == tEps );
+                } // END DEBUGGING
+
                 State* state = state_map.find(from)->second;
-                state->eraseTrans(t);
-                delete t;
+                state->eraseTrans(tKp);
+                delete tKp;
             }
         }
 
@@ -515,34 +520,55 @@ namespace wali
         //
         void WFA::path_summary( Worklist<State>& wl )
         {
-#if 0
-            setupFixpoint( wl );
+            PredHash_t preds;
+            setupFixpoint( wl,preds );
             while( !wl.empty() )
             {
                 State* q = wl.get();
                 sem_elem_t the_delta = q->delta();
                 q->delta() = the_delta->zero();
 
-                // For each Trans (q',x,q)
-                State::iterator tit = q->begin();
-                State::iterator titEND = q->end();
-                for( ; tit != titEND ; tit++ )
+                // Get a handle on ZERO b/c we use it alot
+                sem_elem_t ZERO = q->weight()->zero();
+
+                PredHash_t::iterator predHashIt = preds.find(q->name());
+                // Some states may have no predecessors, like
+                // the initial state
+                if(  predHashIt == preds.end() )
                 {
-                    Trans* t = *tit; // (q',_,q)
-                    //t->print( std::cerr << "\t++ Popped " ) << std::endl;
-                    State *qprime = getState(t->from()); // q'
+                    continue;
+                }
+                StateSet_t& stateSet = predHashIt->second;
+                //StateSet_t& stateSet = preds.find( q->name() )->second;
+                StateSet_t::iterator stateit = stateSet.begin();
+                for( ; stateit != stateSet.end() ; stateit++ )
+                {
+                    State* qprime = *stateit;
 
-                    sem_elem_t extended;
-                    if( query == INORDER )
-                        extended = t->weight()->extend( the_delta );
-                    else
-                        extended = the_delta->extend( t->weight() );
+                    // For each Trans (q',x,q)
+                    State::iterator tit = qprime->begin();
+                    State::iterator titEND = qprime->end();
+                    // the new W(q')
+                    sem_elem_t newW = qprime->weight()->zero();
+                    // For each (q',_,q)
+                    for( ; tit != titEND ; tit++ )
+                    {
+                        Trans* t = *tit; // (q',_,q)
+                        //t->print( std::cerr << "\t++ Popped " ) << std::endl;
 
+                        sem_elem_t extended;
+                        if( query == INORDER )
+                            extended = t->weight()->extend( the_delta );
+                        else
+                            extended = the_delta->extend( t->weight() );
+                        newW = newW->combine(extended);
+
+                    }
                     // delta => (w+se,w-se)
                     // Use extended->delta b/c we want the diff b/w the new
                     // weight (extended) and what was there before
                     std::pair< sem_elem_t,sem_elem_t > p =
-                        extended->delta( qprime->weight() );
+                        newW->delta( qprime->weight() );
 
                     //p.first->print( std::cerr << "\t++ p.first " ) << std::endl;
                     //p.second->print( std::cerr << "\t++ p.second " ) << std::endl;
@@ -559,13 +585,12 @@ namespace wali
                         qprime->delta() = p.second;
 
                         // add to worklist if not zero
-                        if( !qprime->delta()->equal(extended->zero()) ) {
+                        if( !qprime->delta()->equal(ZERO) ) {
                             wl.put(qprime);
                         }
                     }
                 }
             }
-#endif
         }
 
         //
@@ -574,27 +599,30 @@ namespace wali
         //
         void WFA::prune()
         {
-#if 0
 
             DefaultWorklist<State> wl;
-            setupFixpoint( wl );
+            PredHash_t preds;
+            setupFixpoint( wl,preds );
             // first backwards prune
             while( !wl.empty() )
             {
                 State* q = wl.get();
-                State::iterator it = q->rbegin();
-                State::iterator itEND = q->rend();
+                PredHash_t::iterator predHashIt = preds.find(q->name());
+                if( predHashIt == preds.end() ) {
+                    continue;
+                }
+                StateSet_t& stateSet = predHashIt->second;
+                StateSet_t::iterator stateIt = stateSet.begin();
+                StateSet_t::iterator stateItEND = stateSet.end();
                 sem_elem_t ONE = q->weight()->one();
+                sem_elem_t ZERO = q->weight()->zero();
 
-                // (q',_,q)
-                for( ; it != itEND ; it++ )
+                for( ; stateIt != stateItEND ; stateIt++ )
                 {
-                    Trans* t = *it;
-                    State* qprime = getState(t->from());
-                    if( !(qprime->weight()->equal(ONE) ) )
-                    {
-                        qprime->weight() = ONE;
-                        wl.put( qprime );
+                    State* p = *stateIt;
+                    if( p->weight()->equal(ZERO) ) {
+                        p->weight() = ONE;
+                        wl.put(p);
                     }
                 }
             }
@@ -621,7 +649,6 @@ namespace wali
             // second forward prune
             // TODO: implement this later
             //
-#endif
         }
 
         //
@@ -923,15 +950,16 @@ namespace wali
         //
         // Place WFA in state ready for fixpoint
         //
-        void WFA::setupFixpoint( Worklist<State>& wl )
+        void WFA::setupFixpoint( Worklist<State>& wl, PredHash_t& preds )
         {
             state_map_t::iterator it = state_map.begin();
             state_map_t::iterator itEND = state_map.end();
             for( ; it != itEND ; it++ )
             {
+                // State p
                 State* st = it->second;
                 st->unmark();
-                if( is_final_state( st->name() ) ) {
+                if( isFinalState( st->name() ) ) {
                     st->weight() = st->weight()->one();
                     st->delta() = st->weight();
                     wl.put( st );
@@ -939,6 +967,23 @@ namespace wali
                 else {
                     st->weight() = st->weight()->zero();
                     st->delta() = st->weight();
+                }
+
+                State::iterator stit = st->begin();
+                State::iterator stEnd = st->end();
+
+                for( ; stit != stEnd; stit++ ) {
+                    // (p,_,q)
+                    Trans* t = *stit;
+                    Key toKey = t->to();
+                    PredHash_t::iterator predIt = preds.find(toKey);
+                    if( predIt == preds.end() ) {
+                        StateSet_t stateSet;
+                        predIt = preds.insert(toKey,stateSet).first;
+                    }
+                    //std::cerr << "Adding '" << key2str(st->name()) << "' to pred of '";
+                    //std::cerr << key2str(toKey) << "'\n";
+                    predIt->second.insert( st );
                 }
             }
         }
@@ -952,46 +997,32 @@ namespace wali
                 Key stack,
                 Key to )
         {
-            Trans* t = NULL;
+            Trans* tret = NULL;
 
             // ignore weight on Trans
             Trans terase(from,stack,to,0);
             kp_map_t::iterator kpit = kpmap.find( terase.keypair() );
 
+            // remove from kpmap
             if( kpit != kpmap.end() ) {
-                // remove from kpmap
-                // This loop could be moved to its own method
-                t = kpit->second.erase(&terase);
-                // TODO: ERASE
-                /*
-                trans_list_t& ls = kpit->second;
-                trans_list_t::iterator lsit = ls.begin();
-                trans_list_t::iterator lsitEND = ls.end();
-                for( ; lsit != lsitEND ; lsit++ ) {
-                    if( terase.equal( *lsit ) ) {
-                        t = *lsit;
-                        ls.erase(lsit);
-                        break;
-                    }
-                }
-                */
+                tret = kpit->second.erase(&terase);
             }
-            return t;
+            return tret;
         }
 
         Trans* WFA::eraseTransFromEpsMap( Trans* terase )
         {
-            Trans* t = NULL;
+            Trans* tret = NULL;
             if( terase->stack() == WALI_EPSILON )
             {
                 // remove from epsmap
                 // This loop could be moved to its own method
                 eps_map_t::iterator epit = eps_map.find( terase->to() );
                 if( epit != eps_map.end() ) {
-                    t = epit->second.erase(terase);
+                    tret = epit->second.erase(terase);
                 }
             }
-            return t;
+            return tret;
         }
 
         //
@@ -1012,27 +1043,31 @@ namespace wali
                 Key to = stateTrans->to();
                 // TODO: is this necessary
                 // eraseTransFromEpsMap( Trans* )?
-                Trans* t = eraseTransFromKpMap( from,stack,to );
+                Trans* tKp = eraseTransFromKpMap( from,stack,to );
 
                 { // BEGIN DEBUGGING
-                    if( t != NULL && t != stateTrans ) {
-                        std::cerr << "[ERROR] WFA::prune reverse\n";
-                        t->print( std::cerr ) << "\n";
-                        stateTrans->print( std::cerr ) << "\n";
-                        assert( t != NULL && stateTrans == t );
+                    if( tKp != NULL && tKp != stateTrans ) {
+                        std::cerr << "[ERROR] WFA::eraseState\n";
+                        tKp->print( std::cerr << "\tKpMap Trans: " ) << "\n";
+                        stateTrans->print( std::cerr << "\tState Trans: " ) << "\n";
+                        // Make sure we fail 
+                        assert( tKp != NULL && stateTrans == tKp );
                     }
                     else {
-                        assert(t);
+                        // Fail if tKp == NULL
+                        assert(tKp);
                     }
                 } // END DEBUGGING
 
-                Trans* teps = eraseTransFromEpsMap(t);
+                Trans* teps = eraseTransFromEpsMap(tKp);
 
                 { // BEGIN DEBUGGING
-                    assert( t == teps );
+                    if( teps != NULL ) {
+                        assert( tKp == teps );
+                    }
                 } // END DEBUGGING
 
-                delete t;
+                delete tKp;
             }
 
             // Remove from state map
@@ -1040,9 +1075,9 @@ namespace wali
             //state_map.erase( state->name() );
             //Q.erase(state->name());
             //F.erase(state->name());
-            if( state->name() == getInitialState() ) {
-                setInitialState( WALI_EPSILON );
-            }
+            //if( state->name() == getInitialState() ) {
+            //    setInitialState( WALI_EPSILON );
+            //}
 
             // Since we are not deleting the State, we need
             // to clear its TransLists

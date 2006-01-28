@@ -17,15 +17,23 @@ namespace wali
         const std::string State::XMLFinalTag("final");
         const std::string State::XMLNameTag("Name");
 
-        State::State( wali_key_t k, sem_elem_t W ) :
+        State::State() :
+            Countable(true),key(WALI_EPSILON),se(0),delta_se(0),quasi(0)
+        {
+            { // BEGIN DEBUGGING
+                //std::cerr << "State() : " << numStates << std::endl;;
+                numStates++;
+            } // END DEBUGGING
+        }
+
+        State::State( Key k, sem_elem_t W ) :
             Countable(true),key(k),se(W),delta_se(W)
         {
             assert( W.is_valid() );
             quasi = W->zero();
             { // BEGIN DEBUGGING
-                // TODO : R
+                //std::cerr << "State(Key,sem_elem_t): " << numStates << std::endl;;
                 numStates++;
-                //std::cerr << "State(...) : " << numStates << std::endl;;
             } // END DEBUGGING
         }
 
@@ -66,6 +74,11 @@ namespace wali
         void State::clearTransSet()
         {
             transSet.clear();
+        }
+
+        bool State::operator()( const State* a, const State* b ) const
+        {
+            return a->key < b->key;
         }
 
     } // namespace wfa

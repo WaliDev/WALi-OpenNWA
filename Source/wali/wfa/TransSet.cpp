@@ -71,6 +71,7 @@ namespace wali {
                 (*it)->print(o);
             }
             o << "}";
+            return o;
         }
 
     }
