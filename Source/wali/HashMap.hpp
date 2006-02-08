@@ -259,6 +259,7 @@ namespace wali
                     for( const_iterator it = hm.begin() ; it != hm.end() ; it++ ) {
                         insert(key(it),value(it));
                     }
+                    return *this;
                 }
 
                 ~HashMap() {
