@@ -2,7 +2,7 @@
  * @author Nick Kidd
  */
 
-#include "VarSet.h"
+#include "VarSet.hpp"
 
 std::ostream& operator<<( std::ostream& o , const VarSet& vs )
 {

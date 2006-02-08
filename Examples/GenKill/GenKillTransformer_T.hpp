@@ -4,8 +4,7 @@
 #include <iostream>
 #include <climits>
 #include <cassert>
-#include "common.h"
-#include "ref_ptr.h"
+#include "wali/SemElem.hpp"
 
 /*!
  * @class GenKillTransformer_T
@@ -46,15 +45,15 @@ class Set {
 
 */
 
-template< typename Set > class GenKillTransformer_T {
-
+template< typename Set > class GenKillTransformer_T : public wali::SemElem
+{
     public: // methods
 
         // A client uses makeGenKillTransformer_T to create a
         // GenKillTransformer_T instead of calling the constructor directly;
         // makeGenKillTransformer_T maintains unique representatives for the
         // special semiring values one, zero, and bottom.
-        static GenKillTransformer_T* WPDS_CALL makeGenKillTransformer_T(
+        static GenKillTransformer_T* makeGenKillTransformer_T(
                 const Set& k
                 , const Set& g )
         {
@@ -67,24 +66,34 @@ template< typename Set > class GenKillTransformer_T {
             else if (Set::Eq(k_normalized, Set::EmptySet()) && 
                     Set::Eq(g, Set::EmptySet()))
             {
-                return GenKillTransformer_T::one();
+                return GenKillTransformer_T::id();
             }
             else if (Set::Eq(k_normalized, Set::UniverseSet()) && 
                     Set::Eq(g, Set::EmptySet()))
             {
-                return GenKillTransformer_T::zero();
+                return GenKillTransformer_T::top();
             }
             else {
                 return new GenKillTransformer_T(k_normalized, g);
             }
         }
 
-        ~GenKillTransformer_T() {}
+        virtual ~GenKillTransformer_T() {}
 
         //-------------------------------------------------
         // Semiring methods
         //-------------------------------------------------
-        static GenKillTransformer_T* WPDS_CALL one()
+        virtual wali::sem_elem_t one() const
+        {
+            return id();
+        }
+
+        virtual wali::sem_elem_t zero() const
+        {
+            return top();
+        }
+
+        static GenKillTransformer_T* id()
         {
             // Uses a method-static variable to avoid
             // problems with static-initialization order
@@ -93,7 +102,7 @@ template< typename Set > class GenKillTransformer_T {
             return ONE;
         }
 
-        static GenKillTransformer_T* WPDS_CALL zero()
+        static GenKillTransformer_T* top()
         {
             // Uses a method-static variable to avoid
             // problems with static-initialization order
@@ -102,7 +111,7 @@ template< typename Set > class GenKillTransformer_T {
             return ZERO;
         }
 
-        static GenKillTransformer_T* WPDS_CALL bottom()
+        static GenKillTransformer_T* bottom()
         {
             // Uses a method-static variable to avoid
             // problems with static-initialization order
@@ -118,33 +127,33 @@ template< typename Set > class GenKillTransformer_T {
         // Considering x and y as functions, x extend y = y o x,
         // where (g o f)(v) = g(f(v)).
         //
-        GenKillTransformer_T* extend( GenKillTransformer_T* y ) const
+        virtual wali::sem_elem_t extend( wali::SemElem * se )
         {
-            if( equal(GenKillTransformer_T::zero()) ) {
-                return GenKillTransformer_T::zero();
-            }
-            else if( y->equal(GenKillTransformer_T::zero()) ) {
-                return GenKillTransformer_T::zero();
+            GenKillTransformer_T* y = static_cast<GenKillTransformer_T*>(se);
+            if( equal(top()) || y->equal(top()) ) {
+                return zero();
             }
             Set temp_k( Set::Union( kill, y->kill ) );
             Set temp_g( Set::Union( Set::Diff(gen,y->kill),y->gen) );
             return makeGenKillTransformer_T( temp_k,temp_g );
         }
 
-        GenKillTransformer_T* combine( GenKillTransformer_T* y) const
+        virtual wali::sem_elem_t combine( wali::SemElem * se)
         {
+            GenKillTransformer_T* y = static_cast<GenKillTransformer_T*>(se);
             Set temp_k( Set::Intersect( kill, y->kill ) );
             Set temp_g( Set::Union( gen, y->gen ) );
 
             return makeGenKillTransformer_T( temp_k,temp_g );
         }
 
-        GenKillTransformer_T* quasiOne() const
+        virtual wali::sem_elem_t quasiOne() const
         {
             return one();
         }
 
         //
+
         // diff(GenKillTransformer_T* y)
         //
         // Return the difference between x (this) and y.
@@ -155,8 +164,9 @@ template< typename Set > class GenKillTransformer_T {
         // 2. y combine r = y combine a,
         //    i.e., equal(combine(y,r), combine(y,a)) == true
         //
-        GenKillTransformer_T* diff(GenKillTransformer_T* y) const
+        virtual wali::sem_elem_t diff(SemElem* se) const
         {
+            GenKillTransformer_T* y = static_cast<GenKillTransformer_T*>(se);
 
             Set temp_k(  Set::Diff(Set::UniverseSet(),Set::Diff(y->kill,kill)) );
             Set temp_g(  Set::Diff(gen,y->gen) );
@@ -164,12 +174,13 @@ template< typename Set > class GenKillTransformer_T {
             return makeGenKillTransformer_T(temp_k, temp_g);
         }
 
-        bool equal(GenKillTransformer_T* y) const
+        virtual bool equal(SemElem * se) const
         {
+            GenKillTransformer_T* y = static_cast<GenKillTransformer_T*>(se);
             return Set::Eq(kill,y->kill) && Set::Eq(gen,y->gen);
         }
 
-        std::ostream& print( std::ostream& o ) const
+        virtual std::ostream& print( std::ostream& o ) const
         {
             o << "<\\S.(S - {" << kill << "}) U {" << gen << "}>";
             return o;
@@ -199,10 +210,10 @@ template< typename Set > class GenKillTransformer_T {
             return gen;
         }
 
-        static std::ostream& WPDS_CALL print_static_transformers( std::ostream& o )
+        static std::ostream& print_static_transformers( std::ostream& o )
         {
-            o << "ONE\t=\t"    << *one()    << std::endl;
-            o << "ZERO\t=\t"   << *zero()   << std::endl;
+            o << "ONE\t=\t"    << *id()    << std::endl;
+            o << "ZERO\t=\t"   << *top()   << std::endl;
             o << "BOTTOM\t=\t" << *bottom() << std::endl;
             return o;
         }

@@ -9,7 +9,7 @@
 
 #include <string>
 #include <iostream>
-#include "dictionary_t.h"
+#include "Dictionary_T.hpp"
 
 class VarSet {
     public:
