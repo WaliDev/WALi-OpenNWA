@@ -12,7 +12,7 @@
 namespace wali
 {
 
-    static inline size_t combine_wpds_keys( wali_key_t k1, wali_key_t k2 )
+    static inline size_t combineKeys( Key k1, Key k2 )
     {
         return k1 + (997*k2);
     }
@@ -20,7 +20,7 @@ namespace wali
     /*!
      * KeyPair
      */
-    typedef std::pair< wali_key_t,wali_key_t > KeyPair;
+    typedef std::pair< Key,Key > KeyPair;
 
     /*!
      * @class Triple
@@ -60,7 +60,7 @@ namespace wali
     /*!
      * KeyTriple
      */
-    typedef Triple< wali_key_t,wali_key_t,wali_key_t > KeyTriple;
+    typedef Triple< Key,Key,Key > KeyTriple;
 
     template<> struct hm_hash< KeyPair >
     {
@@ -68,7 +68,7 @@ namespace wali
 
         size_t operator()( const KeyPair & kp ) const
         {
-            return hasher( combine_wpds_keys( kp.first,kp.second ) );
+            return hasher( combineKeys( kp.first,kp.second ) );
         }
 
     };
@@ -89,8 +89,8 @@ namespace wali
 
         size_t operator()( const KeyTriple & kt ) const
         {
-            size_t ans = combine_wpds_keys(kt.first,kt.second);
-            ans = combine_wpds_keys( ans,kt.third);
+            size_t ans = combineKeys(kt.first,kt.second);
+            ans = combineKeys( ans,kt.third);
             return hasher( ans );
         }
 
