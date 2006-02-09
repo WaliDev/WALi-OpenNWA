@@ -164,7 +164,7 @@ template< typename Set > class GenKillTransformer_T : public wali::SemElem
         // 2. y combine r = y combine a,
         //    i.e., equal(combine(y,r), combine(y,a)) == true
         //
-        virtual wali::sem_elem_t diff(SemElem* se) const
+        virtual wali::sem_elem_t diff( wali::SemElem* se) const
         {
             GenKillTransformer_T* y = static_cast<GenKillTransformer_T*>(se);
 
@@ -174,7 +174,7 @@ template< typename Set > class GenKillTransformer_T : public wali::SemElem
             return makeGenKillTransformer_T(temp_k, temp_g);
         }
 
-        virtual bool equal(SemElem * se) const
+        virtual bool equal( wali::SemElem * se) const
         {
             GenKillTransformer_T* y = static_cast<GenKillTransformer_T*>(se);
             return Set::Eq(kill,y->kill) && Set::Eq(gen,y->gen);

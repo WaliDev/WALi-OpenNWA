@@ -253,7 +253,9 @@ public:
 
     // Iterators
     //Dictionary_T<Key_t, Datum_t, KeyComp_t>::iterator *First() const;
-    void begin(Dictionary_T<Key_t, Datum_t, KeyComp_t>::iterator& ) const;
+    void begin( iterator& iter ) const {
+        iter.initialize(Height(), myEntries);
+    }
     inline bool IsRootShared(const Dictionary_T<Key_t, Datum_t, KeyComp_t>& rhs) const;
     
     // Compare two dictionaries. 
@@ -717,15 +719,6 @@ Dictionary_T<Key_t, Datum_t, KeyComp_t> Dictionary_T<Key_t, Datum_t, KeyComp_t>:
 //---------------------------------------------------
 // Iterators
 //---------------------------------------------------
-
-//---------------------------------------------------
-// Begin
-//---------------------------------------------------
-template <class Key_t, class Datum_t, class KeyComp_t>
-void Dictionary_T<Key_t, Datum_t, KeyComp_t>::begin(Dictionary_T<Key_t, Datum_t, KeyComp_t>::iterator& iter) const {
-    iter.initialize(Height(), myEntries);
-}
-
 
 //----------------------------------------
 // Size
