@@ -384,6 +384,15 @@ namespace wali
 
                 const std::set< Key >& getFinalStates() const;
 
+                /* TODO
+                size_t size() const;
+                */
+
+                size_t numStates() const
+                {
+                    return Q.size();
+                }
+
             protected:
 
                 /*! @brief fold tnew into told
