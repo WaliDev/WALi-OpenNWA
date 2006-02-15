@@ -58,6 +58,59 @@
         </LibraryList>
     </Project>
 
+    <Project Name="pgwali" RelativePath="Source"
+        OutputDir="lib" BuildDir="objects" Type="Library" >
+
+        <Compiler Name="g++" cflags="-g -pg -Wall -Wformat=2 -w"/>
+        <IncludeList>
+            <item Name='WALiDir' Path='$(ProjectDir)' />
+        </IncludeList>
+        <InputList>
+            <!-- WALi -->
+            <item Name="Common" RelativePath="wali/Common.cpp" />
+            <item Name="Markable" RelativePath="wali/Markable.cpp" />
+            <item Name="Printable" RelativePath="wali/Printable.cpp" />
+            <item Name="SemElem" RelativePath="wali/SemElem.cpp" />
+            <item Name="SemElemPair" RelativePath="wali/SemElemPair.cpp" />
+            <item Name="PriorityWorklist" RelativePath="wali/PriorityWorklist.cpp" />
+            <item Name="TotalOrderWorklist" RelativePath="wali/TotalOrderWorklist.cpp" />
+            <item Name="Key" RelativePath="wali/Key.cpp" />
+            <item Name="KeySpace" RelativePath="wali/KeySpace.cpp" />
+            <item Name="IntSource" RelativePath="wali/IntSource.cpp" />
+            <item Name="StringSource" RelativePath="wali/StringSource.cpp" />
+            <item Name="KeyPairSource" RelativePath="wali/KeyPairSource.cpp" />
+            <!-- WFA -->
+            <item Name="WFA" RelativePath="wali/wfa/WFA.cpp" />
+            <item Name="State" RelativePath="wali/wfa/State.cpp" />
+            <item Name="Trans" RelativePath="wali/wfa/Trans.cpp" />
+            <item Name="TransFunctor" RelativePath="wali/wfa/TransFunctor.cpp" />
+            <item Name="TransSet" RelativePath="wali/wfa/TransSet.cpp" />
+            <item Name="WeightMaker" RelativePath="wali/wfa/WeightMaker.cpp" />
+            <!-- WPDS -->
+            <item Name="Config" RelativePath="wali/wpds/Config.cpp" />
+            <item Name="Rule" RelativePath="wali/wpds/Rule.cpp" />
+            <item Name="RuleFunctor" RelativePath="wali/wpds/RuleFunctor.cpp" />
+            <item Name="LinkedTrans" RelativePath="wali/wpds/LinkedTrans.cpp" />
+            <item Name="WPDS" RelativePath="wali/wpds/WPDS.cpp" />
+            <item Name="Wrapper" RelativePath="wali/wpds/Wrapper.cpp" />
+            <!-- EWPDS -->
+            <item Name="EWPDS" RelativePath="wali/wpds/ewpds/EWPDS.cpp" />
+            <item Name="ERule" RelativePath="wali/wpds/ewpds/ERule.cpp" />
+            <item Name="MergeFunction" RelativePath="wali/wpds/ewpds/MergeFunction.cpp" />
+            <!-- Witness -->
+            <item Name="Witness" RelativePath="wali/witness/Witness.cpp" />
+            <item Name="WitnessExtend" RelativePath="wali/witness/WitnessExtend.cpp" />
+            <item Name="WitnessCombine" RelativePath="wali/witness/WitnessCombine.cpp" />
+            <item Name="WitnessRule" RelativePath="wali/witness/WitnessRule.cpp" />
+            <item Name="WitnessTrans" RelativePath="wali/witness/WitnessTrans.cpp" />
+            <item Name="Visitor" RelativePath="wali/witness/Visitor.cpp" />
+            <item Name="VisitorDot" RelativePath="wali/witness/VisitorDot.cpp" />
+            <item Name="WitnessWrapper" RelativePath="wali/witness/WitnessWrapper.cpp" />
+        </InputList>
+        <LibraryList>
+        </LibraryList>
+    </Project>
+
     <!--
         Begin Examples
     -->
