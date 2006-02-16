@@ -61,7 +61,7 @@
     <Project Name="pgwali" RelativePath="Source"
         OutputDir="lib" BuildDir="objects" Type="Library" >
 
-        <Compiler Name="g++" cflags="-g -pg -Wall -Wformat=2 -w"/>
+        <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w -pg"/>
         <IncludeList>
             <item Name='WALiDir' Path='$(ProjectDir)' />
         </IncludeList>
@@ -183,6 +183,46 @@
         </InputList>
         <DependencyList>
             <item Name='GenKill' />
+        </DependencyList>
+    </Project>
+
+    <Project Name='pgGenKill' RelativePath='Examples/GenKill'
+        OutputDir='Examples/GenKill' BuildDir='Examples/GenKill' Type='Library'>
+        <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w -pg"/>
+        <IncludeList>
+            <item Name='GenKill' Path='$(ProjectDir)' />
+        </IncludeList>
+        <InputList>
+            <item Name='VarSet' RelativePath='VarSet.cpp' />
+        </InputList>
+        <DependencyList>
+            <item Name='pgwali' />
+        </DependencyList>
+    </Project>
+
+    <Project Name='pgLiveVar' RelativePath='Examples/GenKill/LiveVar' Type='Executable'>
+        <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w -pg"/>
+        <IncludeList>
+            <item Name='LiveVar' Path='$(ProjectDir)' />
+        </IncludeList>
+        <InputList>
+            <item Name='LiveVar' RelativePath='LiveVar.cpp' />
+        </InputList>
+        <DependencyList>
+            <item Name='pgGenKill' />
+        </DependencyList>
+    </Project>
+
+    <Project Name='pgUninitVar' RelativePath='Examples/GenKill/UninitVar' Type='Executable'>
+        <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w -pg"/>
+        <IncludeList>
+            <item Name='UninitVar' Path='$(ProjectDir)' />
+        </IncludeList>
+        <InputList>
+            <item Name='UninitVar' RelativePath='UninitVar.cpp' />
+        </InputList>
+        <DependencyList>
+            <item Name='pgGenKill' />
         </DependencyList>
     </Project>
 
