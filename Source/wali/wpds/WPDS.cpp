@@ -183,6 +183,10 @@ namespace wali
                 {
                     rule_t r = *rit;
 
+                    { // BEGIN DEBUGGING
+                        //r->print( std::cerr << "Adding Rule0: " ) << std::endl;
+                    } // END DEBUGGING
+
                     // Rule 0s generate a transition right away. Because
                     // WPDS::update invokes WFA::insert we must make sure
                     // that the new states are inserted into the WFA. 
@@ -213,8 +217,9 @@ namespace wali
                 // Get config
                 Config * config = t->config;
 
-                // TODO : make debug stmt
-                assert( config );
+                { // BEGIN DEBUGGING
+                    assert( config );
+                } // END DEBUGGING
 
                 sem_elem_t dnew = t->delta;
                 t->delta = dnew->zero();
@@ -285,16 +290,25 @@ namespace wali
             if( r->is_rule2() )
             {
                 KeyPair kp( t->to(),r->stack2() );
+                { // BEGIN DEBUGGING
+                    //r->print( std::cerr << "Handling Rule 2: " ) << std::endl;
+                    //std::cerr << "\t(" << key2str(kp.first) << ", " << key2str(kp.second) << ",*)\n";
+                } // END DEBUGGING
                 WFA::kp_map_t::iterator kpit = fa.kpmap.find( kp );
                 WFA::kp_map_t::iterator kpitEND = fa.kpmap.end();
                 TransSet::iterator tsit;
 
-                for( ; kpit != kpitEND ; kpit++ )
+                if( kpit != kpitEND )
                 {
                     TransSet& transSet = kpit->second;
                     for( tsit = transSet.begin(); tsit != transSet.end(); tsit++ )
                     {
                         Trans * tprime = *tsit;
+                        { // BEGIN DEBUGGING
+                            //std::cerr << "\tMatched: (" << key2str(tprime->from()) << ", ";
+                            //std::cerr << key2str(tprime->stack()) << ", ";
+                            //std::cerr << key2str(tprime->to()) << ")\n";
+                        } // END DEBUGGING
                         sem_elem_t wtp = wrule_trans->extend( tprime->se );
                         update( fstate
                                 , fstack
