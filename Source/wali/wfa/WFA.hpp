@@ -133,13 +133,6 @@ namespace wali
                  *
                  * @return true if key == WFA::initial_state()
                  */
-                bool is_initial_state( Key key ) const;
-
-                /*!
-                 * Test if param key is the initial state.
-                 *
-                 * @return true if key == WFA::initial_state()
-                 */
                 bool isInitialState( Key key ) const;
 
                 /*!
@@ -151,11 +144,6 @@ namespace wali
                  * Add parameter key to the set of final states
                  */
                 void addFinalState( Key key );
-
-                /*!
-                 * Return true if parameter key is a final state
-                 */
-                bool is_final_state( Key key ) const;
 
                 /*!
                  * Return true if parameter key is a final state

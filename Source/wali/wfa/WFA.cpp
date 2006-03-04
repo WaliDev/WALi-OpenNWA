@@ -13,9 +13,9 @@
 
 #define FOR_EACH_STATE(name)                        \
     State* name;                                    \
-    state_map_t::iterator it = state_map.begin();   \
-    state_map_t::iterator itEND = state_map.end();  \
-    for( ; it != itEND && (0 != (name = it->second)) ; it++ )
+    state_map_t::iterator name##it = state_map.begin();   \
+    state_map_t::iterator name##itEND = state_map.end();  \
+    for( ; name##it != name##itEND && (0 != (name = name##it->second)) ; name##it++ )
 
 namespace wali
 {
@@ -143,14 +143,6 @@ namespace wali
         //!
         // Return true if parameter key is a final state
         //
-        bool WFA::is_final_state( Key key ) const
-        {
-            return (F.find(key) != F.end());
-        }
-
-        /*!
-         * Return true if parameter key is a final state
-         */
         bool WFA::isFinalState( Key key ) const
         {
             return (F.find(key) != F.end());
@@ -175,7 +167,7 @@ namespace wali
         //
         // Test if param key is the initial state.
         // 
-        bool WFA::is_initial_state( Key key ) const
+        bool WFA::isInitialState( Key key ) const
         {
             return key == init_state;
         }
@@ -350,6 +342,7 @@ namespace wali
         {
             public:
                 typedef wali::HashMap< Key , TransSet > stackmap_t;
+                typedef stackmap_t::iterator iterator;
                 stackmap_t stackmap;
 
                 virtual ~StackHasher() {}
@@ -365,6 +358,9 @@ namespace wali
                     }
                     it->second.insert(t);
                 }
+
+                iterator begin() { return stackmap.begin(); }
+                iterator end() { return stackmap.end(); }
         };
 
         /*!
@@ -405,10 +401,14 @@ namespace wali
                 , WFA& fa
                 , WFA& dest )
         {
+            query_t lhsQuery = getQuery();
             // Hash transitions of fa on stack symbol. Then probe the hash
             // with this's transitions to add transitions to dest
             StackHasher hashfa;
             fa.for_each(hashfa);
+
+            StackHasher hashThis;
+            for_each( hashThis );
 
             // Store init state
             Key dest_init_state = getKey(initial_state(),fa.initial_state());
@@ -441,7 +441,7 @@ namespace wali
             // weight to call it with
             dest.addState( dest_init_state, stateWeight->zero() );
             // Set dest init state
-            dest.set_initial_state( dest_init_state );
+            dest.setInitialState( dest_init_state );
 
             // Set dest final states
             keyit = dest_final_states.begin();
@@ -450,36 +450,37 @@ namespace wali
             {
                 Key f = *keyit;
                 dest.addState(f,stateWeight->zero());
-                dest.add_final_state(f);
+                dest.addFinalState(f);
             }
 
+            // Set result's query mode
+            dest.setQuery( lhsQuery );
+
             // Perform intersection
+
             kp_map_t::iterator kpit = kpmap.begin();
             kp_map_t::iterator kpitEND = kpmap.end();
-            for( ; kpit != kpitEND ; kpit++ )
+            
+            StackHasher::iterator stit = hashThis.begin();
+            StackHasher::iterator stitEND = hashThis.end();
+            for( ; stit != stitEND ; stit++ )
             {
-                TransSet & transSet = kpit->second;
-                if( transSet.empty() )
-                {
-                    continue;
-                }
                 // Probe StackHasher outside of the inner
-                // for loop b/c the kp_map_t hashes on (p,g)
-                // so each trans in the list has stack symbol g
-                TransSet::iterator tsit = transSet.begin();
-                Trans *tprobe = *tsit;
-                StackHasher::stackmap_t::iterator stkit;
-                stkit = hashfa.stackmap.find( tprobe->stack() );
+                StackHasher::stackmap_t::iterator stkit( hashfa.stackmap.find( stit->first ) );
 
                 if( stkit == hashfa.stackmap.end() )
                 {
                     continue;
                 }
-                for( ; tsit != transSet.end() ; tsit++ )
+                // for each trans in (TransSet) stit->second 
+                TransSet& tsThis = stit->second;
+                TransSet::iterator tsit = tsThis.begin();
+                TransSet::iterator tsitEND = tsThis.end();
+                for( ; tsit != tsitEND ; tsit++ )
                 {
-                    // Probe StackHasher::stackmap with each trans
                     Trans *t = *tsit;
-                    // match t w/ all trans in the stkit->second
+
+                    // for each trans in (TransSet) stkit->second
                     TransSet::iterator stklsit = stkit->second.begin();
                     TransSet::iterator stklsitEND = stkit->second.end();
                     for( ; stklsit != stklsitEND ; stklsit++ )
@@ -492,8 +493,6 @@ namespace wali
                     }
                 }
             }
-            // TODO: should the query be set by the user?
-            dest.setQuery( getQuery() );
         }
 
         /*
@@ -657,16 +656,12 @@ namespace wali
             // the accepting states. If the State has a weight of
             // zero it can be erased.
             //
-            state_map_t::iterator it = state_map.begin();
-            state_map_t::iterator itEND = state_map.end();
-            for( ; it != itEND ; it++ )
-            {
-                State* q = it->second;
-                if( q->weight()->equal( q->weight()->zero() ) ) {
+            FOR_EACH_STATE( eraseMe ) {
+                if( eraseMe->weight()->equal( eraseMe->weight()->zero() ) ) {
                     { // BEGIN DEBUGGING
-                        //std::cerr << "Erasing State '" << key2str(q->name()) << "'\n";
+                        //std::cerr << "Erasing State '" << key2str(eraseMe->name()) << "'\n";
                     } // END DEBUGGING
-                    eraseState(q);
+                    eraseState(eraseMe);
                 }
             }
 
@@ -674,6 +669,43 @@ namespace wali
             // second forward prune
             // TODO: implement this later
             //
+            FOR_EACH_STATE( fwPruneState ) {
+                if( isInitialState( fwPruneState->name() ) ) {
+                    fwPruneState->weight() = fwPruneState->weight()->one();
+                    wl.put( fwPruneState );
+                }
+                else {
+                    fwPruneState->weight() = fwPruneState->weight()->zero();
+                }
+            }
+
+            // forward reachability
+            while( !wl.empty() ) {
+                State* q = wl.get();
+                TransSet::iterator tit = q->begin();
+                TransSet::iterator titEND = q->end();
+                sem_elem_t ONE = q->weight()->one();
+                sem_elem_t ZERO = q->weight()->zero();
+
+                // for all (q,_,q')
+                for( ; tit != titEND ; tit++ )
+                {
+                    Trans* t = *tit;
+                    State* qprime = state_map.find( t->to() )->second;
+                    if( qprime->weight()->equal(ZERO) ) {
+                        qprime->weight() = ONE;
+                        wl.put(qprime);
+                    }
+                }
+            }
+            FOR_EACH_STATE( eraseMe2 ) {
+                if( eraseMe2->weight()->equal( eraseMe->weight()->zero() ) ) {
+                    { // BEGIN DEBUGGING
+                        //std::cerr << "Erasing State '" << key2str(eraseMe2->name()) << "'\n";
+                    } // END DEBUGGING
+                    eraseState(eraseMe2);
+                }
+            }
         }
 
         //
@@ -732,10 +764,10 @@ namespace wali
                 o << "\t" << key << " [label=\"";
                 o << key2str(key);
                 o << "\"";
-                if( is_initial_state(key) ) {
+                if( isInitialState(key) ) {
                     o  << ",color=green,style=filled";
                 }
-                else if( is_final_state(key) ) {
+                else if( isFinalState(key) ) {
                     o  << ",color=light_blue,style=filled";
                 }
                 o << "];\n";
@@ -786,11 +818,11 @@ namespace wali
             o << "\t<" << State::XMLTag;
             // _Name='<name>'
             o << " " << State::XMLNameTag << "='" << key2str( key ) << "'";
-            if( is_initial_state(key) ) {
+            if( isInitialState(key) ) {
                 // _initial='TRUE'
                 o << " " << State::XMLInitialTag << "='TRUE'";
             }
-            if( is_final_state(key) ) {
+            if( isFinalState(key) ) {
                 // if is final, then _final='TRUE'
                 o << " " << State::XMLFinalTag << "='TRUE'";
             }
@@ -1067,7 +1099,6 @@ namespace wali
                 Key stack = stateTrans->stack();
                 Key to = stateTrans->to();
                 // TODO: is this necessary
-                // eraseTransFromEpsMap( Trans* )?
                 Trans* tKp = eraseTransFromKpMap( from,stack,to );
 
                 { // BEGIN DEBUGGING
