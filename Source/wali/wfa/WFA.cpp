@@ -11,6 +11,12 @@
 #include "wali/wfa/WeightMaker.hpp"
 #include <iostream>
 
+#define FOR_EACH_STATE(name)                        \
+    State* name;                                    \
+    state_map_t::iterator it = state_map.begin();   \
+    state_map_t::iterator itEND = state_map.end();  \
+    for( ; it != itEND && (0 != (name = it->second)) ; it++ )
+
 namespace wali
 {
     namespace wfa
@@ -289,7 +295,7 @@ namespace wali
             if( it != kpmap.end() )
             {
                 TransSet& transSet = it->second;
-                TransSet::iterator tsit= transSet.begin();
+                TransSet::iterator tsit= transSet.find(p,g,q);
                 if( tsit != transSet.end() ) {
                     tret = *tsit;
                 }
@@ -520,10 +526,16 @@ namespace wali
         //
         void WFA::path_summary( Worklist<State>& wl )
         {
+            // BEGIN DEBUGGING
+            int numPops = 0;
+            // END DEBUGGING
             PredHash_t preds;
             setupFixpoint( wl,preds );
             while( !wl.empty() )
             {
+                { // BEGIN DEBUGGING
+                    numPops++;
+                } // END DEBUGGING
                 State* q = wl.get();
                 sem_elem_t the_delta = q->delta();
                 q->delta() = the_delta->zero();
@@ -531,15 +543,18 @@ namespace wali
                 // Get a handle on ZERO b/c we use it alot
                 sem_elem_t ZERO = q->weight()->zero();
 
+                // Find predecessor set
                 PredHash_t::iterator predHashIt = preds.find(q->name());
+
                 // Some states may have no predecessors, like
                 // the initial state
                 if(  predHashIt == preds.end() )
                 {
                     continue;
                 }
+
+                // Tell predecessors we have changed
                 StateSet_t& stateSet = predHashIt->second;
-                //StateSet_t& stateSet = preds.find( q->name() )->second;
                 StateSet_t::iterator stateit = stateSet.begin();
                 for( ; stateit != stateSet.end() ; stateit++ )
                 {
@@ -555,13 +570,15 @@ namespace wali
                     {
                         Trans* t = *tit; // (q',_,q)
                         //t->print( std::cerr << "\t++ Popped " ) << std::endl;
+                        if( t->to() == q->name() ) {
 
-                        sem_elem_t extended;
-                        if( query == INORDER )
-                            extended = t->weight()->extend( the_delta );
-                        else
-                            extended = the_delta->extend( t->weight() );
-                        newW = newW->combine(extended);
+                            sem_elem_t extended;
+                            if( query == INORDER )
+                                extended = t->weight()->extend( the_delta );
+                            else
+                                extended = the_delta->extend( t->weight() );
+                            newW = newW->combine(extended);
+                        }
 
                     }
                     // delta => (w+se,w-se)
@@ -591,6 +608,14 @@ namespace wali
                     }
                 }
             }
+            { // BEGIN DEBUGGING
+                std::cerr << "WFA::path_summary needed " << numPops << " pops\n";
+                std::cerr << "WFA state labels:\n";
+                FOR_EACH_STATE( st ) {
+                    std::cerr << "\t" << key2str(st->name()) << ": ";
+                    st->weight()->print( std::cerr ) << std::endl;
+                }
+            } // END DEBUGGING
         }
 
         //
