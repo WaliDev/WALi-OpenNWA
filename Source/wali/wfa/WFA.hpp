@@ -329,7 +329,7 @@ namespace wali
                  */
                 virtual std::ostream& print_dot(
                         std::ostream& o,
-                        bool print_weights=true ) const;
+                        bool print_weights=false ) const;
 
                 /*!
                  * @brief marshall WFA in XML 

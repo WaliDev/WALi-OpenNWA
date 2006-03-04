@@ -532,12 +532,14 @@ namespace wali
             setupFixpoint( wl,preds );
             while( !wl.empty() )
             {
-                { // BEGIN DEBUGGING
-                    numPops++;
-                } // END DEBUGGING
                 State* q = wl.get();
                 sem_elem_t the_delta = q->delta();
                 q->delta() = the_delta->zero();
+
+                { // BEGIN DEBUGGING
+                    numPops++;
+                    //q->print( std::cerr << "  Popped: " ) << std::endl;
+                } // END DEBUGGING
 
                 // Get a handle on ZERO b/c we use it alot
                 sem_elem_t ZERO = q->weight()->zero();
@@ -586,8 +588,13 @@ namespace wali
                     std::pair< sem_elem_t,sem_elem_t > p =
                         newW->delta( qprime->weight() );
 
-                    //p.first->print( std::cerr << "\t++ p.first " ) << std::endl;
-                    //p.second->print( std::cerr << "\t++ p.second " ) << std::endl;
+                    { // BEGIN DEBUGGING
+                        //qprime->weight()->print( std::cerr << "   oldW " << key2str(qprime->name()) ) << std::endl;
+                        //newW->print( std::cerr << "   newW " << key2str(qprime->name()) ) << std::endl;
+                        //p.first->print( std::cerr << "\t++ p.first " ) << std::endl;
+                        //p.second->print( std::cerr << "\t++ p.second " ) << std::endl;
+                    } // END DEBUGGING
+
                     // Sets qprime's new weight
                     // p.first == (l(t) X the_delta) + W(qprime)
                     qprime->weight() = p.first;
