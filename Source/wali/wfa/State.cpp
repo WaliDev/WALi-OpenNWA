@@ -18,7 +18,7 @@ namespace wali
         const std::string State::XMLNameTag("Name");
 
         State::State() :
-            Countable(true),key(WALI_EPSILON),se(0),delta_se(0),quasi(0)
+            Countable(true),key(WALI_EPSILON),se(0),delta_se(0),quasi(0),tag(0)
         {
             { // BEGIN DEBUGGING
                 //std::cerr << "State() : " << numStates << std::endl;;
@@ -27,7 +27,7 @@ namespace wali
         }
 
         State::State( Key k, sem_elem_t W ) :
-            Countable(true),key(k),se(W),delta_se(W)
+            Countable(true),key(k),se(W),delta_se(W),tag(0)
         {
             assert( W.is_valid() );
             quasi = W->zero();

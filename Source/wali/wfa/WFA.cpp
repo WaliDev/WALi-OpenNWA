@@ -11,11 +11,17 @@
 #include "wali/wfa/WeightMaker.hpp"
 #include <iostream>
 
-#define FOR_EACH_STATE(name)                        \
-    State* name;                                    \
-    state_map_t::iterator name##it = state_map.begin();   \
-    state_map_t::iterator name##itEND = state_map.end();  \
+#define FOR_EACH_STATE(name)                                \
+    State* name;                                            \
+    state_map_t::iterator name##it = state_map.begin();     \
+    state_map_t::iterator name##itEND = state_map.end();    \
     for( ; name##it != name##itEND && (0 != (name = name##it->second)) ; name##it++ )
+
+#define FOR_EACH_FINAL_STATE(name)                                  \
+    State* name;                                                    \
+    std::set< Key >::iterator name##it = F.begin();                 \
+    std::set< Key >::iterator name##itEND = F.end();                \
+    for( ; name##it != name##itEND && (0 != (name = getState(*name##it))) ; name##it++ )
 
 namespace wali
 {
@@ -458,9 +464,6 @@ namespace wali
 
             // Perform intersection
 
-            kp_map_t::iterator kpit = kpmap.begin();
-            kp_map_t::iterator kpitEND = kpmap.end();
-            
             StackHasher::iterator stit = hashThis.begin();
             StackHasher::iterator stitEND = hashThis.end();
             for( ; stit != stitEND ; stit++ )
@@ -634,6 +637,13 @@ namespace wali
             DefaultWorklist<State> wl;
             PredHash_t preds;
             setupFixpoint( wl,preds );
+            FOR_EACH_STATE(resetState) {
+                resetState->tag = 0;
+            }
+            FOR_EACH_FINAL_STATE(finalState) {
+                finalState->tag = 1;
+            }
+
             // first backwards prune
             while( !wl.empty() )
             {
@@ -645,72 +655,79 @@ namespace wali
                 StateSet_t& stateSet = predHashIt->second;
                 StateSet_t::iterator stateIt = stateSet.begin();
                 StateSet_t::iterator stateItEND = stateSet.end();
-                sem_elem_t ONE = q->weight()->one();
-                sem_elem_t ZERO = q->weight()->zero();
+                //sem_elem_t ONE = q->weight()->one();
+                //sem_elem_t ZERO = q->weight()->zero();
 
                 for( ; stateIt != stateItEND ; stateIt++ )
                 {
                     State* p = *stateIt;
-                    if( p->weight()->equal(ZERO) ) {
-                        p->weight() = ONE;
+                    if( p->tag == 0 ) {
+                        p->tag = 1;
                         wl.put(p);
                     }
                 }
             }
 
+            State* init = getState( getInitialState() );
+            { // BEGIN DEBUGGING
+                assert( init != 0 );
+            } // END DEBUGGING
+
+            // go from 1->2 or 0->1
+            init->tag++;
+
+            wl.put(init);
+            while( ! wl.empty() ) {
+                State* p = wl.get();
+                TransSet& tSet = p->getTransSet();
+                TransSet::iterator it = tSet.begin();
+                TransSet::iterator itEND = tSet.end();
+                TransSet::iterator eraseIt;
+                // for each (p,_,q)
+                // mark q reached
+                while( it != itEND ) {
+                    Trans* t = *it;
+                    eraseIt = it;
+                    it++;
+                    State* q = getState(t->to());
+                    // A state that was backwards reachable from a final state
+                    // will have a tag of 1. Set tag to 2 to signify it is
+                    // also forwards reachable
+                    if( q->tag == 1 ) {
+                        q->tag = 2;
+                        wl.put(q);
+                    }
+                    else if( q->tag == 0 ) {
+                        // A tag of 0 means the State is not backwards
+                        // reachable. However, since State p was on the
+                        // worklist it is forwards reachable and will not be
+                        // removed. Therefore, we must manually remove these
+                        // transitions.
+                        //
+                        // Simple example:
+                        //    (p,a) -> acc
+                        //    (p,b) -> bad
+                        //
+                        // If we do not remove (p,b) -> bad here, it will be
+                        // leftover
+                        eraseTransFromKpMap(t);
+                        eraseTransFromEpsMap(t);
+                        tSet.erase(eraseIt);
+                        delete t;
+                    }
+                }
+            }
+
             //
-            // States that have a weight of 1 are reachable from
-            // the accepting states. If the State has a weight of
-            // zero it can be erased.
+            // States that have a tag of 2 are forwards and backwards
+            // reachable. Erase all other states.
             //
             FOR_EACH_STATE( eraseMe ) {
-                if( eraseMe->weight()->equal( eraseMe->weight()->zero() ) ) {
+                if( eraseMe->tag != 2 ) {
                     { // BEGIN DEBUGGING
                         //std::cerr << "Erasing State '" << key2str(eraseMe->name()) << "'\n";
                     } // END DEBUGGING
                     eraseState(eraseMe);
-                }
-            }
-
-            //
-            // second forward prune
-            // TODO: implement this later
-            //
-            FOR_EACH_STATE( fwPruneState ) {
-                if( isInitialState( fwPruneState->name() ) ) {
-                    fwPruneState->weight() = fwPruneState->weight()->one();
-                    wl.put( fwPruneState );
-                }
-                else {
-                    fwPruneState->weight() = fwPruneState->weight()->zero();
-                }
-            }
-
-            // forward reachability
-            while( !wl.empty() ) {
-                State* q = wl.get();
-                TransSet::iterator tit = q->begin();
-                TransSet::iterator titEND = q->end();
-                sem_elem_t ONE = q->weight()->one();
-                sem_elem_t ZERO = q->weight()->zero();
-
-                // for all (q,_,q')
-                for( ; tit != titEND ; tit++ )
-                {
-                    Trans* t = *tit;
-                    State* qprime = state_map.find( t->to() )->second;
-                    if( qprime->weight()->equal(ZERO) ) {
-                        qprime->weight() = ONE;
-                        wl.put(qprime);
-                    }
-                }
-            }
-            FOR_EACH_STATE( eraseMe2 ) {
-                if( eraseMe2->weight()->equal( eraseMe->weight()->zero() ) ) {
-                    { // BEGIN DEBUGGING
-                        //std::cerr << "Erasing State '" << key2str(eraseMe2->name()) << "'\n";
-                    } // END DEBUGGING
-                    eraseState(eraseMe2);
                 }
             }
         }
@@ -951,10 +968,10 @@ namespace wali
         //
         void WFA::addState( Key key , sem_elem_t zero )
         {
+            Q.insert(key);
             if( state_map.find( key ) == state_map.end() ) {
                 State* state = new State(key,zero);
                 state_map.insert( key , state );
-                Q.insert(key);
             }
         }
 
@@ -1061,15 +1078,19 @@ namespace wali
                 Key stack,
                 Key to )
         {
-            Trans* tret = NULL;
-
             // ignore weight on Trans
             Trans terase(from,stack,to,0);
-            kp_map_t::iterator kpit = kpmap.find( terase.keypair() );
+            return eraseTransFromKpMap(&terase);
+        }
+
+        Trans* WFA::eraseTransFromKpMap( Trans* terase )
+        {
+            Trans* tret = NULL;
+            kp_map_t::iterator kpit = kpmap.find( terase->keypair() );
 
             // remove from kpmap
             if( kpit != kpmap.end() ) {
-                tret = kpit->second.erase(&terase);
+                tret = kpit->second.erase(terase);
             }
             return tret;
         }
@@ -1102,11 +1123,13 @@ namespace wali
             for( ; it != itEND ; it++ )
             {
                 Trans* stateTrans = *it;
-                Key from = stateTrans->from();
-                Key stack = stateTrans->stack();
-                Key to = stateTrans->to();
-                // TODO: is this necessary
-                Trans* tKp = eraseTransFromKpMap( from,stack,to );
+
+                //Key from = stateTrans->from();
+                //Key stack = stateTrans->stack();
+                //Key to = stateTrans->to();
+                //Trans* tKp = eraseTransFromKpMap( from,stack,to );
+
+                Trans* tKp = eraseTransFromKpMap(stateTrans);
 
                 { // BEGIN DEBUGGING
                     if( tKp != NULL && tKp != stateTrans ) {
@@ -1136,11 +1159,12 @@ namespace wali
             // Remove from state map
             // TODO: Is this necessary?
             //state_map.erase( state->name() );
-            //Q.erase(state->name());
-            //F.erase(state->name());
             //if( state->name() == getInitialState() ) {
             //    setInitialState( WALI_EPSILON );
             //}
+
+            Q.erase(state->name());
+            F.erase(state->name());
 
             // Since we are not deleting the State, we need
             // to clear its TransLists

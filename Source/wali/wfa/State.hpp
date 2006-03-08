@@ -134,12 +134,18 @@ namespace wali
 
             protected:
 
+                TransSet& getTransSet()
+                {
+                    return transSet;
+                }
+
             protected:
                 Key key;
                 sem_elem_t se;
                 sem_elem_t delta_se;
                 sem_elem_t quasi;
                 TransSet transSet;
+                int tag;            //!< Used by WFA::prune
 
         }; //class State
 

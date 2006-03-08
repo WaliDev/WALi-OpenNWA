@@ -416,6 +416,8 @@ namespace wali
                         Key stack,
                         Key to );
 
+                Trans* eraseTransFromKpMap( Trans* terase );
+
                 /*!
                  * Erases the specified Trans(from,stack,to) from the
                  * epsmap. A false return value means no transition existed.
