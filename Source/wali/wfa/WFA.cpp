@@ -1164,7 +1164,7 @@ namespace wali
             //}
 
             Q.erase(state->name());
-            F.erase(state->name());
+            //F.erase(state->name());
 
             // Since we are not deleting the State, we need
             // to clear its TransLists
