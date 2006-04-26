@@ -446,8 +446,12 @@ namespace wali
                 // Config * for update_prime
                 if( tprime->modified() )
                 {
-                    std::cerr <<
-                        "[WPDS::poststar] tprime modified...searching for eps trans\n";
+                    // BEGIN DEBUGGING
+                    {
+                        std::cerr << "[WPDS::poststar]";
+                        std::cerr << "t' modified. Searching for eps trans\n";
+                    }
+                    // END DEBUGGING
 
                     WFA::eps_map_t::iterator epsit = fa.eps_map.find( tprime->to() );
                     if( epsit != fa.eps_map.end() )
