@@ -435,15 +435,24 @@ namespace wali
             }
 
             // Do this here in case dest == this
+            State *initThis = getState(getInitialState());
+            State *initFa = fa.getState(fa.getInitialState());
+            if( initThis == NULL || initFa == NULL )
+            {
+                std::cerr << "[ERROR - WFA::intersect] No initial state.\n";
+                std::cerr << "\tIntersection must be empty.\n";
+                return;
+            }
+
             sem_elem_t stateWeight = 
-                wmaker.make_weight( getState(initial_state())->weight()->zero()
-                        , fa.getState(fa.initial_state())->weight()->zero() ); 
+                wmaker.make_weight( initThis->weight()->zero()
+                        , initFa->weight()->zero() ); 
 
             // Reset dest
             dest.clear();
 
             // Note: We need to make sure the state exists b/c
-            // set_initial_state cannot call addState because there is no
+            // setInitialState cannot call addState because there is no
             // weight to call it with
             dest.addState( dest_init_state, stateWeight->zero() );
             // Set dest init state

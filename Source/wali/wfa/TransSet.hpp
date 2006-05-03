@@ -42,11 +42,11 @@ namespace wali
 
                 iterator find( Key from, Key stack, Key to );
 
-                iterator TransSet::find( Trans* t );
+                iterator find( Trans* t );
 
                 const_iterator find( Key from, Key stack, Key to ) const;
 
-                const_iterator TransSet::find( Trans* t ) const;
+                const_iterator find( Trans* t ) const;
 
                 void each( TransFunctor& tf );
 

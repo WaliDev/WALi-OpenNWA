@@ -170,7 +170,7 @@ namespace wali
                             sem_elem_t delta
                             );
 
-                    void EWPDS::copy_and_link_and_pair( const WFA & in, WFA & dest );
+                    void copy_and_link_and_pair( const WFA & in, WFA & dest );
 
                     virtual bool make_rule(
                             Config * f,
