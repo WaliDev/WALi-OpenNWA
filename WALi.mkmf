@@ -7,8 +7,7 @@
 
     <Project Name="wali" RelativePath="Source"
         OutputDir="lib" BuildDir="objects" Type="Library" >
-
-        <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w"/>
+        <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w -O2"/>
         <IncludeList>
             <item Name='WALiDir' Path='$(ProjectDir)' />
         </IncludeList>
