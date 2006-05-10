@@ -216,20 +216,6 @@ namespace wali
         //
         void WFA::addTrans( Trans * t )
         {
-            //t->print( std::cerr << "Inserting '" ) << "' into:\n";
-            //print( std::cerr );
-            //ZERO->print( std::cerr << "ZERO: " ) << std::endl;
-            sem_elem_t ZERO = t->weight()->zero();
-            { // BEGIN DEBUGGING
-                assert(ZERO.is_valid());
-            } // END DEBUGGING
-
-            //std::cerr << "\tAdding 'from' state'" << key2str(t->from()) << "'\n";
-            addState( t->from(), ZERO );
-
-            //std::cerr << "\tAdding 'to' state '" << key2str(t->to()) << "'\n";
-            addState( t->to(), ZERO );
-
             //t->print( std::cerr << "\tInserting Trans" ) << std::endl;
             insert( t );
         }
@@ -913,6 +899,12 @@ namespace wali
             ////
             if( 0 == told )
             {
+                sem_elem_t ZERO( tnew->weight()->zero() );
+                //std::cerr << "\tAdding 'from' state'" << key2str(t->from()) << "'\n";
+                addState( tnew->from(), ZERO );
+                //std::cerr << "\tAdding 'to' state '" << key2str(t->to()) << "'\n";
+                addState( tnew->to(), ZERO );
+
                 if( it == kpmap.end() )
                 {
                     TransSet transSet;
