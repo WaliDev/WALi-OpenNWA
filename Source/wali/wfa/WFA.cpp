@@ -1034,19 +1034,30 @@ namespace wali
         {
             state_map_t::iterator it = state_map.begin();
             state_map_t::iterator itEND = state_map.end();
+            bool first = true;
+            sem_elem_t ZERO,ONE;
             for( ; it != itEND ; it++ )
             {
                 // State p
                 State* st = it->second;
+                // Get a handle on ONE and ZERO.
+                // Do it here b/c we do not have a way to
+                // get the ONE and ZERO weights w/out first
+                // having a weight, i.e. st->weight()
+                if( first ) {
+                    ONE = st->weight()->one();
+                    ZERO = st->weight()->zero();
+                    first = false;
+                }
                 st->unmark();
                 if( isFinalState( st->name() ) ) {
-                    st->weight() = st->weight()->one();
-                    st->delta() = st->weight();
+                    st->weight() = ONE;
+                    st->delta() = ONE;
                     wl.put( st );
                 }
                 else {
-                    st->weight() = st->weight()->zero();
-                    st->delta() = st->weight();
+                    st->weight() = ZERO;
+                    st->delta() = ZERO;
                 }
 
                 State::iterator stit = st->begin();
