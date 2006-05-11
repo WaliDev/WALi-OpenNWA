@@ -41,6 +41,10 @@ namespace wali
             bool operator()( const Trans* a, const Trans* b ) const;
         };
 
+        struct TransEq {
+            bool operator()( const Trans* a, const Trans* b ) const;
+        };
+
         /*!
          * @typedef trans_t
          * Avoid typing ref_ptr<Trans> when reference counting is begin

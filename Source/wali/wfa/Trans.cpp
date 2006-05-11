@@ -12,6 +12,7 @@ namespace wali
     namespace wfa
     {
 
+
         int Trans::numTrans = 0;
         const std::string Trans::XMLTag("Trans");
         const std::string Trans::XMLFromTag("from");
@@ -31,6 +32,11 @@ namespace wali
             else {
                 return a->from() < b->from();
             }
+        }
+
+        bool TransEq::operator()( const Trans* a, const Trans* b ) const
+        {
+            return a->equal(b);
         }
 
         Trans::Trans() :

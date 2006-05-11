@@ -5,6 +5,12 @@
 #include "wali/wfa/TransSet.hpp"
 #include "wali/wfa/TransFunctor.hpp"
 
+#if IMPL_LIST
+#   define IMPLFIND( impl,t ) std::find<TransSet::iterator,TransSet::iterator,TransEq>(impl.begin(),impl.end(),t)
+#else
+#   define IMPLFIND( impl,t ) impl.find(t)
+#endif
+
 namespace wali {
 
     namespace wfa {
@@ -26,20 +32,20 @@ namespace wali {
 
         TransSet::iterator TransSet::find( Key from, Key stack, Key to ) {
             Trans terase(from,stack,to,0);
-            return impl.find(&terase);
+            return IMPLFIND(impl,&terase);
         }
 
         TransSet::const_iterator TransSet::find( Key from, Key stack, Key to ) const {
             Trans terase(from,stack,to,0);
-            return impl.find(&terase);
+            return find(&terase);
         }
 
         TransSet::iterator TransSet::find( Trans* t ) {
-            return impl.find(t);
+            return IMPLFIND(impl,t);
         }
 
         TransSet::const_iterator TransSet::find( Trans* t ) const {
-            return impl.find(t);
+            return IMPLFIND(impl,t);
         }
 
         void TransSet::each( TransFunctor& tf )
@@ -53,11 +59,26 @@ namespace wali {
 
         void TransSet::each( ConstTransFunctor& tf ) const
         {
-            const_iterator it = begin();
-            const_iterator END = end();
-            for( ; it != END ; it++ ) {
+            const_iterator it = impl.begin();
+            const_iterator itEND = impl.end();
+            for( ; it != itEND ; it++ ) {
                 tf(*it);
             }
+        }
+
+        bool TransSet::insert( Trans* t )
+        {
+            bool b = true;
+#if IMPL_LIST
+            impl.push_back(t);
+#else
+            b = impl.insert(t).second;
+            // BEGIN DEBUGGING
+            // We should never insert the same transition twice
+            assert(b);
+            // END DEBUGGING
+#endif
+            return b;
         }
 
         std::ostream& TransSet::print( std::ostream& o ) const {
@@ -73,7 +94,6 @@ namespace wali {
             o << "}";
             return o;
         }
-
     }
 }
 /* Yo, Emacs!

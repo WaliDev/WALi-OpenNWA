@@ -8,7 +8,15 @@
 #include "wali/Common.hpp"
 #include "wali/Printable.hpp"
 #include "wali/wfa/Trans.hpp"
-#include <set>
+
+#define IMPL_LIST 0
+
+#if IMPL_LIST
+#   include <list>
+#else
+#   include <set>
+#endif
+
 
 namespace wali
 {
@@ -26,9 +34,13 @@ namespace wali
         class TransSet : public Printable
         {
             public:
-                typedef std::set< Trans*,TransLT > SetImpl;
-                typedef SetImpl::iterator iterator;
-                typedef SetImpl::const_iterator const_iterator;
+#if IMPL_LIST
+                typedef std::list< Trans* > impl_t;
+#else
+                typedef std::set< Trans*,TransLT > impl_t;
+#endif
+                typedef impl_t::iterator iterator;
+                typedef impl_t::const_iterator const_iterator;
 
             public:
                 TransSet() {}
@@ -52,17 +64,12 @@ namespace wali
 
                 void each( ConstTransFunctor& tf ) const;
 
+                bool insert( Trans* t );
+
+                std::ostream& print( std::ostream& o ) const;
+
                 void erase( iterator it ) {
                     impl.erase( it );
-                }
-
-                bool insert( Trans* t ) {
-                    bool b = impl.insert(t).second;
-                    // BEGIN DEBUGGING
-                    // We should never insert the same transition twice
-                    assert(b);
-                    // END DEBUGGING
-                    return b;
                 }
 
                 void clear() {
@@ -74,7 +81,7 @@ namespace wali
                 }
 
                 void clearAndReleaseResources() {
-                    SetImpl tmp;
+                    impl_t tmp;
                     tmp.swap(impl);
                 }
 
@@ -94,10 +101,8 @@ namespace wali
                     return impl.end();
                 }
 
-                std::ostream& print( std::ostream& o ) const;
-
             protected:
-                std::set< Trans*,TransLT > impl;
+                impl_t impl;
 
         }; // class TransSet
 
