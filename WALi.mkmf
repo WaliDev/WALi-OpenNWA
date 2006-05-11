@@ -3,7 +3,7 @@
            xmlns='http://www.cs.wisc.edu/~kidd/mkmf/'
            xsi:schemaLocation='http://www.cs.wisc.edu/~kidd/mkmf/
            http://www.cs.wisc.edu/~kidd/mkmf/mkmf.xsd'
-           Default='wali' RelativePath='.' >
+           Default='wali' RelativePath='.' Name='WALi'>
 
     <Project Name="wali" RelativePath="Source"
         OutputDir="lib" BuildDir="objects" Type="Library" >

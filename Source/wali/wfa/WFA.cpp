@@ -908,11 +908,9 @@ namespace wali
                 if( it == kpmap.end() )
                 {
                     TransSet transSet;
-                    //trans_list_t ls;
                     it = kpmap.insert(tnew->keypair(),transSet).first;
                 }
                 it->second.insert(tnew);
-                //it->second.push_back(tnew);
 
                 // Set told to tnew for the return statement at end of 
                 // method
