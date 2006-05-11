@@ -72,7 +72,7 @@ void doReach()
     // Perform poststar query
     WFA query;
     std::cerr << "\t> Adding p,n0,acc to query...";
-    query.add_trans( p, n[0], accept, reachOne );
+    query.addTrans( p, n[0], accept, reachOne );
     std::cerr << "> done\n";
     //query.add_initial_state( p );
     //query.add_final_state( accept );
@@ -82,7 +82,7 @@ void doReach()
 
     // Perfor prestar query
     WFA prequery;
-    prequery.add_trans( p, n[4], accept, reachOne );
+    prequery.addTrans( p, n[4], accept, reachOne );
     //query.add_initial_state( p );
     //query.add_final_state( accept );
     prequery.print( std::cerr << "BEFORE prestar\n" ) << std::endl;

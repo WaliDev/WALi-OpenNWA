@@ -97,7 +97,7 @@ namespace wali
                 /*!
                  * @brief constructor
                  *
-                 * This is used by CA when add_trans is called.
+                 * This is used by WFA when addTrans is called.
                  */
                 Trans(  Key from,
                         Key stack,

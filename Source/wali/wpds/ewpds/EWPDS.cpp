@@ -544,8 +544,8 @@ namespace wali
                     new LinkedTrans(orig->from(),orig->stack(),orig->to(),
                             (SemElem *)(new SemElemPair(orig->weight(), orig->weight()->one())),c);
 
-                // fa.add_trans takes ownership of passed in pointer
-                fa.add_trans( t );
+                // fa.addTrans takes ownership of passed in pointer
+                fa.addTrans( t );
 
                 // add t to the worklist for saturation
                 worklist->put( t );

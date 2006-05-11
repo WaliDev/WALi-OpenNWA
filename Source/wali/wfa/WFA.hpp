@@ -170,26 +170,6 @@ namespace wali
                  *
                  * @see Key
                  * @see sem_elem_t
-                 * @depracated use WFA::addTrans
-                 */
-                void add_trans( Key p, Key g, Key q, sem_elem_t se ) {
-                    addTrans(p,g,q,se);
-                }
-
-                /*!
-                 * @brief Add Trans t to the WFA
-                 *
-                 * @see Trans
-                 * @depracated use WFA::addTrans
-                 */
-                void add_trans( Trans * t ) {
-                    addTrans(t);
-                }
-
-                /*! @brief Add transition (p,g,q) to the WFA
-                 *
-                 * @see Key
-                 * @see sem_elem_t
                  */
                 virtual void addTrans(
                         Key p,

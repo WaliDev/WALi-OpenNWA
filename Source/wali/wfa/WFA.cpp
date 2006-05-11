@@ -967,10 +967,10 @@ namespace wali
         //
         void WFA::addState( Key key , sem_elem_t zero )
         {
-            Q.insert(key);
             if( state_map.find( key ) == state_map.end() ) {
                 State* state = new State(key,zero);
                 state_map.insert( key , state );
+                Q.insert(key);
             }
         }
 

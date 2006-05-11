@@ -713,7 +713,10 @@ namespace wali
         }
 
         /////////////////////////////////////////////////////////////////
-        // Default TransFunctor implementation
+        // Implement TransFunctor.
+        // This is used to copy Transitions from the input automaton
+        // to the output. We create a LinkedTrans for fast (hopefully) indexing
+        // of rules.
         /////////////////////////////////////////////////////////////////
 
         void WPDS::operator()( Trans * orig )
@@ -729,8 +732,8 @@ namespace wali
                         orig->weight(),c);
             }
 
-            // fa.add_trans takes ownership of passed in pointer
-            currentOutputWFA->add_trans( t );
+            // fa.addTrans takes ownership of passed in pointer
+            currentOutputWFA->addTrans( t );
 
             // add t to the worklist for saturation
             worklist->put( t );
