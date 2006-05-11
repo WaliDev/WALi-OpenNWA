@@ -75,6 +75,37 @@ namespace wali
             t->marshall(o << "\t" ) << "\n";
         }
 
+        //////////////////
+        // StackHasher
+        //    - used by WFA::intersect
+        //////////////////
+        void StackHasher::operator()( Trans * t )
+        {
+            Key stack = t->stack();
+            stackmap_t::iterator it = stackmap.find( stack );
+            if( it == stackmap.end() )
+            {
+                TransSet transSet;
+                it = stackmap.insert(stack,transSet).first;
+            }
+            it->second.insert(t);
+        }
+
+        StackHasher::iterator StackHasher::begin()
+        {
+            return stackmap.begin();
+        }
+
+        StackHasher::iterator StackHasher::end()
+        {
+            return stackmap.end();
+        }
+
+        StackHasher::iterator StackHasher::find( Key k )
+        {
+            return stackmap.find(k);
+        }
+
     } // namespace wfa
 
 } // namespace wali

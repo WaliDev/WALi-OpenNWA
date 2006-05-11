@@ -329,31 +329,6 @@ namespace wali
             }
         }
 
-        // TODO : move this class somewhere else
-        class StackHasher : public TransFunctor
-        {
-            public:
-                typedef wali::HashMap< Key , TransSet > stackmap_t;
-                typedef stackmap_t::iterator iterator;
-                stackmap_t stackmap;
-
-                virtual ~StackHasher() {}
-
-                virtual void operator()( Trans * t )
-                {
-                    Key stack = t->stack();
-                    stackmap_t::iterator it = stackmap.find( stack );
-                    if( it == stackmap.end() )
-                    {
-                        TransSet transSet;
-                        it = stackmap.insert(stack,transSet).first;
-                    }
-                    it->second.insert(t);
-                }
-
-                iterator begin() { return stackmap.begin(); }
-                iterator end() { return stackmap.end(); }
-        };
 
         /*!
          * Intersect this with parameter fa. This is a wrapper

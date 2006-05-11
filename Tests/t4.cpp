@@ -44,11 +44,11 @@ void dot()
     fa.set_initial_state(p);
     fa.add_final_state(acc1);
     fa.add_final_state(acc2);
-    fa.add_trans( p, getKey("n0"), acc1, reach);
-    fa.add_trans( p, n0, p, reach);
-    fa.add_trans( p, n1, getKey("q"), reach);
-    fa.add_trans( getKey("q"), n2, acc2, reach);
-    fa.add_trans( acc2, n3, acc2, reach);
+    fa.addTrans( p, getKey("n0"), acc1, reach);
+    fa.addTrans( p, n0, p, reach);
+    fa.addTrans( p, n1, getKey("q"), reach);
+    fa.addTrans( getKey("q"), n2, acc2, reach);
+    fa.addTrans( acc2, n3, acc2, reach);
 
     fa.path_summary();
 }

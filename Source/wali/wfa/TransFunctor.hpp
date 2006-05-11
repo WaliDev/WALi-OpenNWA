@@ -7,6 +7,8 @@
  */
 
 #include <iostream>
+#include "wali/HashMap.hpp"
+#include "wali/wfa/TransSet.hpp"
 
 namespace wali
 {
@@ -140,6 +142,29 @@ namespace wali
 
                 virtual void operator()( const Trans * t );
         }; // class TransMarshaller
+
+        /*!
+         * @class StackHasher
+         * Hashes the transitions on their stack symbol.
+         * Used by WFA::intersect
+         */
+
+        class StackHasher : public TransFunctor
+        {
+            public:
+                typedef wali::HashMap< Key , TransSet > stackmap_t;
+                typedef stackmap_t::iterator iterator;
+                stackmap_t stackmap;
+
+                virtual ~StackHasher() {}
+
+                virtual void operator()( Trans * t );
+
+                iterator begin();
+                iterator end();
+                iterator find( Key k );
+
+        }; // class StackHasher
 
     } // namespace wfa
 

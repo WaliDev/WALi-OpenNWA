@@ -25,7 +25,7 @@ void dot()
     wali_key_t q = getKey("q");
     fa1.set_initial_state( p );
     fa1.add_final_state( q );
-    fa1.add_trans( p, getKey("n1"), q, r);
+    fa1.addTrans( p, getKey("n1"), q, r);
 
     fa1.print( cout << "WFA 1\n" ) << std::endl;
 
@@ -34,7 +34,7 @@ void dot()
     wali_key_t m = getKey("m");
     fa2.set_initial_state( m );
     fa2.add_final_state( q );
-    fa2.add_trans( m,getKey("n1"),q,r);
+    fa2.addTrans( m,getKey("n1"),q,r);
     fa2.print( cout << "WFA 2\n" ) << std::endl;
 
 

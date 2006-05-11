@@ -55,9 +55,9 @@ void dot()
 
     pds->print( std::cout << "---- WPDS ----\n" ) << std::endl;
     WFA fain;
-    fain.set_initial_state(p);
-    fain.add_final_state(acc);
-    fain.add_trans(p,getKey("n0"),acc,reach);
+    fain.setInitialState(p);
+    fain.addFinalState(acc);
+    fain.addTrans(p,getKey("n0"),acc,reach);
     fain.print( cout << "----- WFA BEFORE -----\n" ) << std::endl;
 
     WFA faout = pds->poststar(fain);

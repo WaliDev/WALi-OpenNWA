@@ -17,7 +17,7 @@ int main( int argc, char** argv )
     using std::cout;
 
     WFA fa;
-    fa.add_trans( getKey("p"),getKey("n1"),getKey("accept"),new Reach(true) );
+    fa.addTrans( getKey("p"),getKey("n1"),getKey("accept"),new Reach(true) );
     fa.setInitialState( getKey("p") );
     fa.addFinalState( getKey("accept") );
     fa.print( cout );
@@ -25,15 +25,15 @@ int main( int argc, char** argv )
     fa.print( cout );
     cout << "\n------------------------------------------------------------\n\n";
 
-    fa.add_trans( getKey("p"),getKey("n2"),getKey("BAD"),new Reach(true) );
+    fa.addTrans( getKey("p"),getKey("n2"),getKey("BAD"),new Reach(true) );
     fa.print( cout );
     fa.prune();
     fa.print( cout );
     cout << "\n------------------------------------------------------------\n\n";
 
-    fa.add_trans( getKey("p"),getKey("n2"),getKey("BAD"),new Reach(true) );
-    fa.add_trans( getKey("BAD"),getKey("n2"),getKey("BAD"),new Reach(true) );
-    fa.add_trans( getKey("BAD"),getKey("n3"),getKey("BAD2"),new Reach(true) );
+    fa.addTrans( getKey("p"),getKey("n2"),getKey("BAD"),new Reach(true) );
+    fa.addTrans( getKey("BAD"),getKey("n2"),getKey("BAD"),new Reach(true) );
+    fa.addTrans( getKey("BAD"),getKey("n3"),getKey("BAD2"),new Reach(true) );
     fa.print( cout );
     fa.prune();
     fa.print( cout );
