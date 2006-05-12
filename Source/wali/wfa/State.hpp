@@ -139,6 +139,11 @@ namespace wali
                     return transSet;
                 }
 
+                const TransSet& getTransSet() const
+                {
+                    return transSet;
+                }
+
             protected:
                 Key key;
                 sem_elem_t se;

@@ -148,13 +148,13 @@ namespace wali
             if( &input == currentOutputWFA ) {
                 WFA tmp(input);
                 fa.clear();
-                fa.set_initial_state( tmp.initial_state() );
+                fa.setInitialState( tmp.getInitialState() );
                 fa.F = tmp.F;
                 tmp.for_each(*this);
             }
             else {
                 fa.clear();
-                fa.set_initial_state( input.initial_state() );
+                fa.setInitialState( input.getInitialState() );
                 fa.F = input.F;
                 input.for_each(*this);
             }

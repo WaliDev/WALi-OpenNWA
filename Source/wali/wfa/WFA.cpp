@@ -309,6 +309,7 @@ namespace wali
 
         void WFA::for_each( ConstTransFunctor & tf ) const
         {
+            /*
             kp_map_t::const_iterator it = kpmap.begin();
             kp_map_t::const_iterator itEND = kpmap.end();
             for( ; it != itEND ; it++ )
@@ -316,15 +317,34 @@ namespace wali
                 const TransSet & transSet = it->second;
                 transSet.each(tf);
             }
+            */
+            state_map_t::const_iterator it = state_map.begin();
+            state_map_t::const_iterator itEND = state_map.end();
+            for( ; it != itEND ; it++ )
+            {
+                const State* st = it->second;
+                const TransSet & transSet = st->getTransSet();
+                transSet.each(tf);
+            }
         }
 
         void WFA::for_each( TransFunctor& tf )
         {
+            /*
             kp_map_t::iterator it = kpmap.begin();
             kp_map_t::iterator itEND = kpmap.end();
             for( ; it != itEND ; it++ )
             {
                 TransSet & transSet = it->second;
+                transSet.each(tf);
+            }
+            */
+            state_map_t::iterator it = state_map.begin();
+            state_map_t::iterator itEND = state_map.end();
+            for( ; it != itEND ; it++ )
+            {
+                State* st = it->second;
+                TransSet & transSet = st->getTransSet();
                 transSet.each(tf);
             }
         }
