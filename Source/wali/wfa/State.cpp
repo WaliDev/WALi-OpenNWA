@@ -27,10 +27,12 @@ namespace wali
         }
 
         State::State( Key k, sem_elem_t W ) :
-            Countable(true),key(k),se(W),delta_se(W),tag(0)
+            Countable(true),key(k),se(W),delta_se(W),quasi(W),tag(0)
         {
             assert( W.is_valid() );
-            quasi = W->zero();
+            // States are always created with a weight of Zero
+            // so this is wasted work
+            //quasi = W->zero();
             { // BEGIN DEBUGGING
                 //std::cerr << "State(Key,sem_elem_t): " << numStates << std::endl;;
                 numStates++;
