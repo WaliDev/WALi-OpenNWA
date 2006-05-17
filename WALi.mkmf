@@ -227,6 +227,20 @@
         </DependencyList>
     </Project>
 
+    <Project Name='TestMust' RelativePath='Examples/StackDelta' Type='Executable'>
+        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w'/>
+        <IncludeList>
+            <item Name='Must' Path='$(ProjectDir)' />
+        </IncludeList>
+        <InputList>
+            <item Name='Must' RelativePath='Must.cpp' />
+            <item Name='Test' RelativePath='TestMust.cpp' />
+        </InputList>
+        <DependencyList>
+            <item Name='wali' />
+        </DependencyList>
+    </Project>
+
     <Project Name='examples' RelativePath='Examples' Type='Empty'>
         <DependencyList>
             <item Name='ExReach' />

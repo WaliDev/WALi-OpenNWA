@@ -48,6 +48,24 @@ namespace wali
         }; // KeepLeft
 
         /*!
+         * @class KeepRight
+         *
+         * This class joins the weights by ignoring the second parameter
+         * (rhs).
+         *
+         * @see wali::wfa::WeightMaker
+         * @see wali::sem_elem_t
+         */
+        class KeepRight : public WeightMaker
+        {
+            public:
+                KeepRight() {}
+                virtual ~KeepRight() {}
+                virtual sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs );
+
+        }; // KeepRight
+
+        /*!
          * @class KeepBoth
          *
          * This class joins the weights by pairing them.

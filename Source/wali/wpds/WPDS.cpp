@@ -370,7 +370,7 @@ namespace wali
 
             while( get_from_worklist( t ) ) {
 
-                //t->print( std::cerr << "$$$ Popped t ==> " ) << std::endl;
+                t->print( std::cerr << "$$$ Popped t ==> " ) << std::endl;
 
                 // Get config
                 Config * config = t->config;
@@ -448,12 +448,14 @@ namespace wali
                 {
                     // BEGIN DEBUGGING
                     {
-                        std::cerr << "[WPDS::poststar]";
-                        std::cerr << "t' modified. Searching for eps trans\n";
+                        std::cerr << "[WPDS::poststar] ";
+                        std::cerr << "t' modified: ";
+                        tprime->print( std::cerr );
+                        std::cerr << ".\n  > Searching for eps trans\n";
                     }
                     // END DEBUGGING
 
-                    WFA::eps_map_t::iterator epsit = fa.eps_map.find( tprime->to() );
+                    WFA::eps_map_t::iterator epsit = fa.eps_map.find( tprime->from() );
                     if( epsit != fa.eps_map.end() )
                     {
                         // tprime stack key
@@ -469,6 +471,12 @@ namespace wali
                             Trans * teps = *tsit;
                             Config * config = make_config( teps->from(),tpstk );
                             sem_elem_t epsW = tprime->delta->extend( teps->se );
+                            // BEGIN DEBUGGING
+                            {
+                                teps->print( std::cerr << "\tFound - " ) << std::endl;
+                            }
+                            // END DEBUGGING
+
                             update( teps->from(),tpstk,tpto,
                                     epsW, config );
                         }

@@ -61,6 +61,7 @@ int main()
 
     wfa::KeepRight wmaker;
     wfa::WFA result = postT.intersect( wmaker, preS );
+
     result.prune();
 
     result.print( std::cout << "+++ post*(T) \\cap pre*(S) +++\n" ) << std::endl;

@@ -463,6 +463,7 @@ namespace wali
 
                 if( stkit == hashfa.stackmap.end() )
                 {
+                    //std::cout << "\tSkipping '" << key2str(stit->first) << "'\n";
                     continue;
                 }
                 // for each trans in (TransSet) stit->second 
@@ -482,7 +483,9 @@ namespace wali
                         Key fromkey = getKey( t->from(),t2->from() );
                         Key tokey = getKey( t->to(),t2->to() );
                         sem_elem_t W = wmaker.make_weight(t->weight(),t2->weight());
-                        dest.addTrans( new Trans(fromkey,t->stack(),tokey,W) );
+                        Trans* newTrans = new Trans(fromkey,t->stack(),tokey,W); 
+                        //newTrans->print( std::cout << "\tAdding Trans: " ) << std::endl;
+                        dest.addTrans( newTrans );
                     }
                 }
             }
@@ -864,22 +867,6 @@ namespace wali
                 if( tsit != transSet.end() ) {
                     told = *tsit;
                 }
-                /*
-                trans_list_t &ls = it->second;
-                trans_list_t::iterator lit = ls.begin();
-                trans_list_t::iterator litEND = ls.end();
-                for( ; lit != litEND ; lit++ )
-                {
-                    Trans *ttmp = *lit;
-                    // already matched (p,g,*) so just
-                    // check ->to() field 
-                    if( tnew->to() == ttmp->to() )
-                    {
-                        told = ttmp;
-                        break;
-                    }
-                }
-                */
             }
             ////
             // Cases
@@ -1002,6 +989,11 @@ namespace wali
         //
         void WFA::combineTrans( Trans * told, Trans * tnew )
         {
+            { // BEGIN DEBUGGING
+                std::cerr << "[WFA::combineTrans(old,new)] ";
+                told->print( std::cerr ) << "   .+.   ";
+                tnew->print( std::cerr ) << std::endl;
+            } // END DEBUGGING
             told->combine_weight( tnew->weight() );
         }
 
