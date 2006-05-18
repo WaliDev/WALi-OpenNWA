@@ -55,8 +55,8 @@ namespace wali
 
             assert( config );
 
-            sem_elem_t dnew = t->delta;
-            t->delta = dnew->zero();
+            sem_elem_t dnew = t->getDelta();
+            t->setDelta( dnew->zero() );
 
             // For each forward rule of config
             // Apply rule to create new transition

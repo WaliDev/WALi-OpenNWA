@@ -177,7 +177,7 @@ namespace wali
 
                 // For each rule that connects a Config * to the one
                 // from the outer loop
-                Config::iterator rit = cloc->rbegin();
+                Config::reverse_iterator rit = cloc->rbegin();
                 for( ; rit != cloc->rend(); rit++ )
                 {
                     rule_t r = *rit;
@@ -224,7 +224,7 @@ namespace wali
                 t->delta = dnew->zero();
 
                 // For each backward rule of config
-                Config::iterator bwit = config->rbegin();
+                Config::reverse_iterator bwit = config->rbegin();
                 for( ; bwit != config->rend() ; bwit++ )
                 {
                     rule_t & r = *bwit;
@@ -255,7 +255,7 @@ namespace wali
                         if( fa.find(r->to_state(),r->to_stack1(),t->from(),tp) )
                         {
                             // f(r) * t'
-                            sem_elem_t wrtp = r->weight()->extend( tp.se );
+                            sem_elem_t wrtp = r->weight()->extend( tp.weight() );
 
                             // f(r) * t' * delta
                             sem_elem_t wnew = wrtp->extend( dnew );
@@ -308,7 +308,7 @@ namespace wali
                             //std::cerr << key2str(tprime->stack()) << ", ";
                             //std::cerr << key2str(tprime->to()) << ")\n";
                         } // END DEBUGGING
-                        sem_elem_t wtp = wrule_trans->extend( tprime->se );
+                        sem_elem_t wtp = wrule_trans->extend( tprime->weight() );
                         update( fstate
                                 , fstack
                                 , tprime->to()
@@ -464,7 +464,7 @@ namespace wali
                         {
                             Trans * teps = *tsit;
                             Config * config = make_config( teps->from(),tpstk );
-                            sem_elem_t epsW = tprime->delta->extend( teps->se );
+                            sem_elem_t epsW = tprime->getDelta()->extend( teps->weight() );
 
                             update( teps->from(),tpstk,tpto,
                                     epsW, config );

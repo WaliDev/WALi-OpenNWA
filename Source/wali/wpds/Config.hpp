@@ -46,9 +46,21 @@ namespace wali
                 friend class WPDS;
                 friend class ewpds::EWPDS;
 
-                // For simplicity
+                //
+                // Config does not use iterators in the sense that list uses
+                // them. It has 2 lists, one w/ rules going forward and 1 w/
+                // lists going backwards. When iterating over backward rules,
+                // we use a reverse_iterator in the hopes that the different
+                // types will avoid some typos (because rbegin/rend look so
+                // much like begin and end
+                //
+
+                // Forward iterators
                 typedef std::list< rule_t >::const_iterator const_iterator;
                 typedef std::list< rule_t >::iterator iterator;
+                // Backward iterators
+                typedef std::list< rule_t >::const_reverse_iterator const_reverse_iterator;
+                typedef std::list< rule_t >::reverse_iterator reverse_iterator;
 
                 static int numConfigs;
 
@@ -128,8 +140,8 @@ namespace wali
                  * @see Rule
                  * @see std::list
                  */
-                const_iterator rbegin() const throw() {
-                    return bwrules.begin();
+                const_reverse_iterator rbegin() const throw() {
+                    return bwrules.rbegin();
                 }
 
                 /*!
@@ -138,8 +150,8 @@ namespace wali
                  * @see Rule
                  * @see std::list
                  */
-                const_iterator rend() const throw() {
-                    return bwrules.end();
+                const_reverse_iterator rend() const throw() {
+                    return bwrules.rend();
                 }
 
                 /*!
@@ -168,8 +180,8 @@ namespace wali
                  * @see Rule
                  * @see std::list
                  */
-                iterator rbegin() throw() {
-                    return bwrules.begin();
+                reverse_iterator rbegin() throw() {
+                    return bwrules.rbegin();
                 }
 
                 /*!
@@ -178,8 +190,8 @@ namespace wali
                  * @see Rule
                  * @see std::list
                  */
-                iterator rend() throw() {
-                    return bwrules.end();
+                reverse_iterator rend() throw() {
+                    return bwrules.rend();
                 }
 
                 /*!

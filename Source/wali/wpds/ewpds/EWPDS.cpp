@@ -170,8 +170,8 @@ namespace wali
                     rule_t & r )
             {
                 bool rb = false;
-                std::list< rule_t >::iterator it = f->fwrules.begin();
-                for( ; it != f->forward().end(); it++ ) {
+                Config::iterator it = f->begin();
+                for( ; it != f->end(); it++ ) {
                     rule_t &tmp = *it;
                     if( tmp->from() == f && tmp->to() == t && tmp->to_stack2() == stk2 ) {
                         rb = true;
@@ -182,8 +182,8 @@ namespace wali
                 }
                 if( !rb ) {
                     r =  (Rule *)(new ERule(f,t,stk2,se,mf));
-                    f->fwrules.push_back(r);
-                    t->bwrules.push_back(r);
+                    f->insert(r);
+                    t->rinsert(r);
                 }
                 return rb;
             }
@@ -220,9 +220,8 @@ namespace wali
 
                     // For each rule that connects a Config * to the one
                     // from the outer loop
-                    for( std::list< rule_t >::iterator rit = cloc->bwrules.begin();
-                            rit != cloc->bwrules.end();
-                            rit++ )
+                    Config::reverse_iterator rit = cloc->rbegin();
+                    for( ; rit != cloc->rend(); rit++ )
                     {
                         rule_t r = *rit;
 
@@ -249,12 +248,12 @@ namespace wali
                     // TODO : make debug stmt
                     assert( config );
 
-                    sem_elem_t dnew = t->delta;
-                    t->delta = dnew->zero();
+                    sem_elem_t dnew = t->getDelta();
+                    t->setDelta( dnew->zero() );
 
                     // For each backward rule of config
-                    Config::iterator bwit = config->bwrules.begin();
-                    for( ; bwit != config->bwrules.end() ; bwit++ )
+                    Config::reverse_iterator bwit = config->rbegin();
+                    for( ; bwit != config->rend() ; bwit++ )
                     {
                         rule_t & r = *bwit;
 
@@ -287,7 +286,7 @@ namespace wali
 
                                 if(!is_pds_state(t->from())) {
                                     // f(r) * t'
-                                    sem_elem_t wrtp = r->weight()->extend( tp.se );
+                                    sem_elem_t wrtp = r->weight()->extend( tp.weight() );
 
                                     // f(r) * t' * delta
                                     sem_elem_t wnew = wrtp->extend( dnew );
@@ -297,7 +296,7 @@ namespace wali
                                             wnew,r->from() );
                                 } else { // apply merge function
                                     erule_t er = (ERule *)(r.get_ptr());
-                                    sem_elem_t w1 = er->merge_fn()->apply_f( tp.se->one(), tp.se);
+                                    sem_elem_t w1 = er->merge_fn()->apply_f( tp.weight()->one(), tp.weight());
                                     sem_elem_t wnew = w1->extend(dnew);
                                     // update
                                     update( r->from()->state(), r->from()->stack(), t->to(),
@@ -342,7 +341,7 @@ namespace wali
                         for( tsit = transSet.begin(); tsit != transSet.end(); tsit++ )
                         {
                             Trans * tprime = *tsit;
-                            sem_elem_t wtp = wrule_trans->extend( tprime->se );
+                            sem_elem_t wtp = wrule_trans->extend( tprime->weight() );
                             update( fstate, fstack, tprime->to(), wtp, r->from() );
                         }
                     }
@@ -384,15 +383,15 @@ namespace wali
                     // TODO : make debug stmt
                     assert( config );
 
-                    sem_elem_t dnew = t->delta;
-                    t->delta = dnew->zero();
+                    sem_elem_t dnew = t->getDelta();
+                    t->setDelta( dnew->zero() );
 
                     // For each forward rule of config
                     // Apply rule to create new transition
                     if( WALI_EPSILON != t->stack() )
                     {
-                        Config::iterator fwit = config->fwrules.begin();
-                        for( ; fwit != config->fwrules.end() ; fwit++ ) {
+                        Config::iterator fwit = config->begin();
+                        for( ; fwit != config->end() ; fwit++ ) {
                             rule_t & r = *fwit;
                             poststar_handle_trans( t,fa,r,dnew );
                         }
@@ -490,7 +489,8 @@ namespace wali
                             {
                                 Trans * teps = *tsit;
                                 // apply merge function
-                                sem_elem_t w = er->merge_fn()->apply_f(SEM_PAIR_GET_FIRST(tprime->delta), SEM_PAIR_GET_FIRST(teps->se));
+                                sem_elem_t w = er->merge_fn()->apply_f(
+                                        SEM_PAIR_GET_FIRST(tprime->getDelta()), SEM_PAIR_GET_FIRST(teps->weight()));
                                 sem_elem_t epsW = new SemElemPair(w, w->one());
                                 Config * config = make_config( teps->from(),tpstk );
 
@@ -553,7 +553,7 @@ namespace wali
 
             void TransPairCollapse::operator()( Trans * orig )
             {
-                orig->set_weight(SEM_PAIR_COLLAPSE(orig->weight()));
+                orig->setWeight(SEM_PAIR_COLLAPSE(orig->weight()));
             }
 
         } // namespace ewpds

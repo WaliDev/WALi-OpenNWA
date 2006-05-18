@@ -16,16 +16,6 @@
 
 namespace wali
 {
-    namespace wpds
-    {
-        class WPDS;
-        class DebugWPDS;
-        namespace ewpds
-        {
-            class EWPDS;
-        }
-    }
-
     namespace wfa
     {
 
@@ -78,9 +68,6 @@ namespace wali
             //
             public:
                 friend class WFA;
-                friend class ::wali::wpds::WPDS;
-                friend class ::wali::wpds::DebugWPDS;
-                friend class ::wali::wpds::ewpds::EWPDS;
                 enum status_t { MODIFIED,SAME };
                 static int numTrans;
                 static const std::string XMLTag;
@@ -147,6 +134,15 @@ namespace wali
                     return se;
                 }
 
+                /*!
+                 * @return const sem_elem_t delta of Trans
+                 *
+                 * delta is used in computing fixpoints
+                 */
+                const sem_elem_t getDelta() const throw() {
+                    return delta;
+                }
+
                 //
                 // getters (non const)
                 //
@@ -180,6 +176,18 @@ namespace wali
                     return se;
                 }
 
+                /*!
+                 * @return sem_elem_t delta of Trans
+                 *
+                 * delta is used in computing fixpoints
+                 */
+                sem_elem_t getDelta() throw() {
+                    return delta;
+                }
+
+                /*!
+                 * Set the delta value for the Trans.
+                 */
                 //
                 // setters
                 //
@@ -190,8 +198,14 @@ namespace wali
                  *
                  * @param w the sem_elem_t for the new weight
                  */
-                void weight( sem_elem_t w );
-                void set_weight( sem_elem_t w );
+                void setWeight( sem_elem_t w ) {
+                    se = w;
+                }
+
+                void setDelta( const sem_elem_t w ) {
+                    delta = w;
+                }
+
                 void combine_weight( sem_elem_t w );
 
                 /*! @return true if param rhs is equal to this */

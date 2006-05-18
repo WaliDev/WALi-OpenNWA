@@ -95,24 +95,6 @@ namespace wali
             }
         }
 
-        // TODO : should delta be set to w or zero?
-        void Trans::weight( sem_elem_t w )
-        {
-            if( se->equal(w) ) {
-                status = SAME;
-            }
-            else {
-                status = MODIFIED;
-            }
-            se = w;
-        }
-
-        // TODO : is this correct ?
-        void Trans::set_weight( sem_elem_t w )
-        {
-            se = w;
-        }
-
         void Trans::combine_weight( sem_elem_t wnew )
         {
             
