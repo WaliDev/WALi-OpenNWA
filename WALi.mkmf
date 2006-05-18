@@ -118,8 +118,8 @@
         Begin Examples
     -->
     <!-- Reach Example -->
-    <Project Name='ExReach' RelativePath='Examples/Reach' OutputDir='Examples/Reach'
-        BuildDir='Examples/Reach' Type='Executable' >
+    <Project Name='ExReach' RelativePath='Examples/Reach'
+        OutputDir='Examples/bin' BuildDir='Examples/Reach' Type='Executable' >
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
             <item Name='Reach' Path='$(ProjectDir)' />
@@ -133,7 +133,7 @@
         </DependencyList>
     </Project>
 
-    <Project Name='EWPDSExReach' RelativePath='Examples/Reach/ewpds' OutputDir='Examples/Reach/ewpds'
+    <Project Name='EWPDSExReach' RelativePath='Examples/Reach/ewpds' OutputDir='Examples/bin'
         BuildDir='Examples/Reach/ewpds' Type='Executable' >
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
@@ -150,7 +150,7 @@
     </Project>
 
     <Project Name='GenKill' RelativePath='Examples/GenKill'
-        OutputDir='Examples/GenKill' BuildDir='Examples/GenKill' Type='Library'>
+        OutputDir='Examples/bin' BuildDir='Examples/GenKill' Type='Library'>
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
             <item Name='GenKill' Path='$(ProjectDir)' />
@@ -163,7 +163,8 @@
         </DependencyList>
     </Project>
 
-    <Project Name='LiveVar' RelativePath='Examples/GenKill/LiveVar' Type='Executable'>
+    <Project Name='LiveVar' RelativePath='Examples/GenKill/LiveVar' 
+        OutputDir='Examples/bin' Type='Executable'>
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
             <item Name='LiveVar' Path='$(ProjectDir)' />
@@ -176,7 +177,8 @@
         </DependencyList>
     </Project>
 
-    <Project Name='UninitVar' RelativePath='Examples/GenKill/UninitVar' Type='Executable'>
+    <Project Name='UninitVar' RelativePath='Examples/GenKill/UninitVar' 
+        OutputDir='Examples/bin' Type='Executable'>
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
             <item Name='UninitVar' Path='$(ProjectDir)' />
@@ -190,7 +192,7 @@
     </Project>
 
     <Project Name='pgGenKill' RelativePath='Examples/GenKill'
-        OutputDir='Examples/GenKill' BuildDir='Examples/GenKill' Type='Library'>
+        OutputDir='Examples/bin' BuildDir='Examples/GenKill' Type='Library'>
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -pg'/>
         <IncludeList>
             <item Name='GenKill' Path='$(ProjectDir)' />
@@ -203,7 +205,8 @@
         </DependencyList>
     </Project>
 
-    <Project Name='pgLiveVar' RelativePath='Examples/GenKill/LiveVar' Type='Executable'>
+    <Project Name='pgLiveVar' RelativePath='Examples/GenKill/LiveVar' 
+        OutputDir='Examples/bin' Type='Executable'>
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -pg'/>
         <IncludeList>
             <item Name='LiveVar' Path='$(ProjectDir)' />
@@ -216,7 +219,8 @@
         </DependencyList>
     </Project>
 
-    <Project Name='pgUninitVar' RelativePath='Examples/GenKill/UninitVar' Type='Executable'>
+    <Project Name='pgUninitVar' RelativePath='Examples/GenKill/UninitVar' 
+        OutputDir='Examples/bin' Type='Executable'>
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -pg'/>
         <IncludeList>
             <item Name='UninitVar' Path='$(ProjectDir)' />
@@ -229,7 +233,8 @@
         </DependencyList>
     </Project>
 
-    <Project Name='TestMust' RelativePath='Examples/StackDelta' Type='Executable'>
+    <Project Name='TestMust' RelativePath='Examples/StackDelta' 
+        OutputDir='Examples/bin' Type='Executable'>
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w'/>
         <IncludeList>
             <item Name='Must' Path='$(ProjectDir)' />
@@ -248,6 +253,7 @@
             <item Name='ExReach' />
             <item Name='EWPDSExReach' />
             <item Name='LiveVar' />
+            <item Name='TestMust' />
             <!-- <item Name='UninitVar' /> -->
         </DependencyList>
     </Project>
@@ -261,7 +267,7 @@
     -->
     <!-- Test 1 -->
     <Project Name='t1' RelativePath='Tests' 
-        BuildDir='Tests' OuputDir='Tests' Type='Executable' >
+        BuildDir='Tests/objects' OuputDir='Tests/bin' Type='Executable' >
 
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
@@ -278,7 +284,7 @@
 
     <!-- Test witness -->
     <Project Name='twitness' RelativePath='Tests' 
-        BuildDir='Tests' OuputDir='Tests' Type='Executable' >
+        BuildDir='Tests/objects' OuputDir='Tests/bin' Type='Executable' >
 
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
@@ -295,7 +301,7 @@
 
     <!-- Test 3 -->
     <Project Name='t3' RelativePath='Tests'
-        BuildDir='Tests' OuputDir='Tests' Type='Executable' >
+        BuildDir='Tests/objects' OuputDir='Tests/bin' Type='Executable' >
 
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
@@ -312,7 +318,7 @@
 
     <!-- Test 4 -->
     <Project Name='t4' RelativePath='Tests' 
-        BuildDir='Tests' OuputDir='Tests' Type='Executable' >
+        BuildDir='Tests/objects' OuputDir='Tests/bin' Type='Executable' >
 
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
@@ -329,7 +335,7 @@
 
     <!-- Test Prune -->
     <Project Name='tprune' RelativePath='Tests' 
-        BuildDir='Tests' OuputDir='Tests' Type='Executable' >
+        BuildDir='Tests/objects' OuputDir='Tests/bin' Type='Executable' >
 
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
@@ -346,7 +352,7 @@
 
     <!-- Test se -->
     <Project Name='tse' RelativePath='Tests' 
-        BuildDir='Tests' OuputDir='Tests' Type='Executable' >
+        BuildDir='Tests/objects' OuputDir='Tests/bin' Type='Executable' >
 
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
@@ -363,7 +369,7 @@
 
     <!-- Test se -->
     <Project Name='tTransSet' RelativePath='Tests' 
-        BuildDir='Tests' OuputDir='Tests' Type='Executable' >
+        BuildDir='Tests/objects' OuputDir='Tests/bin' Type='Executable' >
 
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
