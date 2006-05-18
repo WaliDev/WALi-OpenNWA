@@ -82,24 +82,104 @@ namespace wali
                     return kp.second;
                 }
 
-                /*!
-                 * @return const reference to list of forward rules
-                 *
-                 * @see Rule
-                 * @see std::list
-                 */
-                const std::list< rule_t > & forward() const throw() {
-                    return fwrules;
+                /*! @brief insert a rule into forwards list */
+                void insert(  rule_t r ) throw() {
+                    { // BEGIN DEBUGGING
+                        assert( r->from_state() == state() );
+                        assert( r->from_stack() == stack() );
+                    } // END DEBUGGING
+
+                    fwrules.push_back(r);
+                }
+
+                /*! @brief insert a rule into backwards list */
+                void rinsert(  rule_t r ) throw() {
+                    { // BEGIN DEBUGGING
+                        assert( r->to_state() == state() );
+                        assert( r->to_stack1() == stack() );
+                    } // END DEBUGGING
+
+                    bwrules.push_back(r);
                 }
 
                 /*!
-                 * @return const reference to list of forward rules
+                 * @return const iterator to list of forward rules
                  *
                  * @see Rule
                  * @see std::list
                  */
-                const std::list< rule_t > & backward() const throw() {
-                    return bwrules;
+                const_iterator begin() const throw() {
+                    return fwrules.begin();
+                }
+
+                /*!
+                 * @return an end iterator to list of forward rules
+                 *
+                 * @see Rule
+                 * @see std::list
+                 */
+                const_iterator end() const throw() {
+                    return fwrules.end();
+                }
+
+                /*!
+                 * @return const iterator to list of backward rules
+                 *
+                 * @see Rule
+                 * @see std::list
+                 */
+                const_iterator rbegin() const throw() {
+                    return bwrules.begin();
+                }
+
+                /*!
+                 * @return an end iterator to list of backward rules
+                 *
+                 * @see Rule
+                 * @see std::list
+                 */
+                const_iterator rend() const throw() {
+                    return bwrules.end();
+                }
+
+                /*!
+                 * @return a iterator to list of forward rules
+                 *
+                 * @see Rule
+                 * @see std::list
+                 */
+                iterator begin() throw() {
+                    return fwrules.begin();
+                }
+
+                /*!
+                 * @return an end iterator to list of forward rules
+                 *
+                 * @see Rule
+                 * @see std::list
+                 */
+                iterator end() throw() {
+                    return fwrules.end();
+                }
+
+                /*!
+                 * @return iterator to list of backward rules
+                 *
+                 * @see Rule
+                 * @see std::list
+                 */
+                iterator rbegin() throw() {
+                    return bwrules.begin();
+                }
+
+                /*!
+                 * @return an end iterator to list of backward rules
+                 *
+                 * @see Rule
+                 * @see std::list
+                 */
+                iterator rend() throw() {
+                    return bwrules.end();
                 }
 
                 /*!
@@ -119,25 +199,6 @@ namespace wali
                 std::ostream & marshall( std::ostream & o ) const;
 
             protected:
-                /*!
-                 * @return reference to list of forward rules
-                 *
-                 * @see Rule
-                 * @see std::list
-                 */
-                std::list< rule_t >& forward() throw() {
-                    return fwrules;
-                }
-
-                /*!
-                 * @return reference to list of backward rules
-                 *
-                 * @see Rule
-                 * @see std::list
-                 */
-                std::list< rule_t >& backward() throw() {
-                    return bwrules;
-                }
 
                 KeyPair kp;                     //! < pair of state and stack symbol
                 std::list< rule_t > fwrules;    //! < forward rules

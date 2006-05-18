@@ -177,9 +177,8 @@ namespace wali
 
                 // For each rule that connects a Config * to the one
                 // from the outer loop
-                for( std::list< rule_t >::iterator rit = cloc->bwrules.begin();
-                        rit != cloc->bwrules.end();
-                        rit++ )
+                Config::iterator rit = cloc->rbegin();
+                for( ; rit != cloc->rend(); rit++ )
                 {
                     rule_t r = *rit;
 
@@ -225,8 +224,8 @@ namespace wali
                 t->delta = dnew->zero();
 
                 // For each backward rule of config
-                Config::iterator bwit = config->bwrules.begin();
-                for( ; bwit != config->bwrules.end() ; bwit++ )
+                Config::iterator bwit = config->rbegin();
+                for( ; bwit != config->rend() ; bwit++ )
                 {
                     rule_t & r = *bwit;
 
@@ -368,45 +367,49 @@ namespace wali
         {
             LinkedTrans * t;
 
-            while( get_from_worklist( t ) ) {
+            while( get_from_worklist( t ) ) 
+            {
+                post( t , fa );
+            }
+        }
 
-                t->print( std::cerr << "$$$ Popped t ==> " ) << std::endl;
+        void WPDS::post( LinkedTrans * t, WFA& fa )
+        {
+            // Get config
+            Config * config = t->config;
 
-                // Get config
-                Config * config = t->config;
-                
-                // TODO : make debug stmt
-                assert( config );
+            // Get delta
+            sem_elem_t dnew = t->delta;
 
-                sem_elem_t dnew = t->delta;
-                t->delta = dnew->zero();
+            // Reset delta of t to zero to signify completion
+            // of work for that delta
+            t->delta = dnew->zero();
 
-                // For each forward rule of config
-                // Apply rule to create new transition
-                if( WALI_EPSILON != t->stack() )
-                {
-                    Config::iterator fwit = config->fwrules.begin();
-                    for( ; fwit != config->fwrules.end() ; fwit++ ) {
-                        rule_t & r = *fwit;
-                        poststar_handle_trans( t,fa,r,dnew );
-                    }
+            // For each forward rule of config
+            // Apply rule to create new transition
+            if( WALI_EPSILON != t->stack() )
+            {
+                Config::iterator fwit = config->begin();
+                for( ; fwit != config->end() ; fwit++ ) {
+                    rule_t & r = *fwit;
+                    poststar_handle_trans( t,fa,r,dnew );
                 }
-                else {
-                    // (p,eps,q) + (q,y,q') => (p,y,q')
-                    State * state = fa.getState( t->to() );
-                    State::iterator it = state->begin();
-                    for(  ; it != state->end() ; it++ )
-                    {
-                        Trans * tprime = *it;
-                        sem_elem_t wght = tprime->weight()->extend( dnew );
-                        Config * config = make_config( t->from(),tprime->stack() );
-                        update( t->from()
-                                , tprime->stack()
-                                , tprime->to()
-                                , wght
-                                , config
-                              );
-                    }
+            }
+            else {
+                // (p,eps,q) + (q,y,q') => (p,y,q')
+                State * state = fa.getState( t->to() );
+                State::iterator it = state->begin();
+                for(  ; it != state->end() ; it++ )
+                {
+                    Trans * tprime = *it;
+                    sem_elem_t wght = tprime->weight()->extend( dnew );
+                    Config * config = make_config( t->from(),tprime->stack() );
+                    update( t->from()
+                            , tprime->stack()
+                            , tprime->to()
+                            , wght
+                            , config
+                          );
                 }
             }
         }
@@ -420,7 +423,6 @@ namespace wali
         {
             wali_key_t rtstate = r->to_state();
             wali_key_t rtstack = r->to_stack1();
-
             sem_elem_t wrule_trans = delta->extend( r->se );
 
             if( r->to_stack2() == WALI_EPSILON ) {
@@ -430,12 +432,12 @@ namespace wali
 
                 // Is a rule 2 so we must generate a state
                 // and create 2 new transitions
-                // TODO: implement gen_state
                 wali_key_t gstate = gen_state( rtstate,rtstack );
 
                 Trans * tprime = update_prime( gstate, r->to_stack2(), t->to(), wrule_trans );
 
                 State * state = fa.getState( gstate );
+
                 sem_elem_t quasi = state->quasi->combine( wrule_trans );
                 state->quasi = quasi;
 
@@ -446,14 +448,6 @@ namespace wali
                 // Config * for update_prime
                 if( tprime->modified() )
                 {
-                    // BEGIN DEBUGGING
-                    {
-                        std::cerr << "[WPDS::poststar] ";
-                        std::cerr << "t' modified: ";
-                        tprime->print( std::cerr );
-                        std::cerr << ".\n  > Searching for eps trans\n";
-                    }
-                    // END DEBUGGING
 
                     WFA::eps_map_t::iterator epsit = fa.eps_map.find( tprime->from() );
                     if( epsit != fa.eps_map.end() )
@@ -471,11 +465,6 @@ namespace wali
                             Trans * teps = *tsit;
                             Config * config = make_config( teps->from(),tpstk );
                             sem_elem_t epsW = tprime->delta->extend( teps->se );
-                            // BEGIN DEBUGGING
-                            {
-                                teps->print( std::cerr << "\tFound - " ) << std::endl;
-                            }
-                            // END DEBUGGING
 
                             update( teps->from(),tpstk,tpto,
                                     epsW, config );
@@ -514,8 +503,8 @@ namespace wali
             const_iterator it = config_map().begin();
             for( ; it != config_map().end() ; it++ ) {
                 const Config *c = config_map().value( it );
-                std::list< rule_t >::const_iterator rit = c->forward().begin();
-                for( ; rit != c->forward().end() ; rit++ )
+                Config::const_iterator rit = c->begin();
+                for( ; rit != c->end() ; rit++ )
                     func( *rit );
             }
         }
@@ -525,8 +514,8 @@ namespace wali
             iterator it = config_map().begin();
             for( ; it != config_map().end() ; it++ ) {
                 Config *c = config_map().value( it );
-                std::list< rule_t >::iterator rit = c->fwrules.begin();
-                for( ; rit != c->fwrules.end() ; rit++ )
+                Config::iterator rit = c->begin();
+                for( ; rit != c->end() ; rit++ )
                     func( *rit );
             }
         }
@@ -615,8 +604,8 @@ namespace wali
                 rule_t& r )
         {
             bool rb = false;
-            std::list< rule_t >::iterator it = f->forward().begin();
-            std::list< rule_t >::iterator itEND = f->forward().end();
+            Config::iterator it = f->begin();
+            Config::iterator itEND = f->end();
 
             for( ; it != itEND; it++ )
             {
@@ -645,8 +634,8 @@ namespace wali
                 if( wrapper ) {
                     r->weight( wrapper->wrap(*r) );
                 }
-                f->forward().push_back(r);
-                t->backward().push_back(r);
+                f->insert(r);
+                t->rinsert(r);
             }
             return rb;
         }

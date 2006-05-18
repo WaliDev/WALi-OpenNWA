@@ -989,11 +989,13 @@ namespace wali
         //
         void WFA::combineTrans( Trans * told, Trans * tnew )
         {
+            /*
             { // BEGIN DEBUGGING
                 std::cerr << "[WFA::combineTrans(old,new)] ";
                 told->print( std::cerr ) << "   .+.   ";
                 tnew->print( std::cerr ) << std::endl;
             } // END DEBUGGING
+            */
             told->combine_weight( tnew->weight() );
         }
 

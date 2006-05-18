@@ -1,4 +1,5 @@
-#include "wali/wpds/WPDS.hpp"
+//#include "wali/wpds/WPDS.hpp"
+#include "wali/wpds/DebugWPDS.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/WeightMaker.hpp"
 #include "Must.hpp"
@@ -36,6 +37,8 @@ int main()
     T.addFinalState( getKey("Tacc") );
 
     wpds::WPDS pds;
+    //wpds::DebugWPDS pds;
+
     // choice, call f or not
     pds.add_rule( getKey("p"), getKey("n0"), getKey("p"), getKey("n1"), tmp->one() );
     pds.add_rule( getKey("p"), getKey("n0"), getKey("p"), getKey("n2"), tmp->one() );
@@ -46,9 +49,13 @@ int main()
 
     // f
     pds.add_rule( getKey("p"), getKey("f_enter"), getKey("p"), getKey("f1"), new Must(16,16) );
+    //pds.add_rule( getKey("p"), getKey("f_enter"), getKey("p"), getKey("f_exit"), new Must(16,16) );
+
     pds.add_rule( getKey("p"), getKey("f1"), getKey("p"), getKey("f2"), tmp->one() );
     pds.add_rule( getKey("p"), getKey("f2"), getKey("p"), getKey("f_enter"), getKey("f_exit"), tmp->one() );
     pds.add_rule( getKey("p"), getKey("f1"), getKey("p"), getKey("f_exit"), tmp->one() );
+
+    // f exit
     pds.add_rule( getKey("p"), getKey("f_exit"), getKey("p"), new Must(-16,0) );
 
     pds.print( std::cout << "+++ The PDS +++\n" ) << std::endl;

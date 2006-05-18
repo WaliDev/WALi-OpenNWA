@@ -255,6 +255,11 @@ namespace wali
                 virtual void poststarComputeFixpoint( ::wali::wfa::WFA& fa );
 
                 /*!
+                 * @brief Performs post for 1 Trans
+                 */
+                virtual void post( LinkedTrans * t, ::wali::wfa::WFA& fa );
+
+                /*!
                  * @brief helper method for poststar
                  */
                 virtual void poststar_handle_trans(

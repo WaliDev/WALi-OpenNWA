@@ -39,6 +39,7 @@
             <item Name='RuleFunctor' RelativePath='wali/wpds/RuleFunctor.cpp' />
             <item Name='LinkedTrans' RelativePath='wali/wpds/LinkedTrans.cpp' />
             <item Name='WPDS' RelativePath='wali/wpds/WPDS.cpp' />
+            <item Name='DebugWPDS' RelativePath='wali/wpds/DebugWPDS.cpp' />
             <item Name='Wrapper' RelativePath='wali/wpds/Wrapper.cpp' />
             <!-- EWPDS -->
             <item Name='EWPDS' RelativePath='wali/wpds/ewpds/EWPDS.cpp' />
@@ -93,6 +94,7 @@
             <item Name='RuleFunctor' RelativePath='wali/wpds/RuleFunctor.cpp' />
             <item Name='LinkedTrans' RelativePath='wali/wpds/LinkedTrans.cpp' />
             <item Name='WPDS' RelativePath='wali/wpds/WPDS.cpp' />
+            <item Name='DebugWPDS' RelativePath='wali/wpds/DebugWPDS.cpp' />
             <item Name='Wrapper' RelativePath='wali/wpds/Wrapper.cpp' />
             <!-- EWPDS -->
             <item Name='EWPDS' RelativePath='wali/wpds/ewpds/EWPDS.cpp' />

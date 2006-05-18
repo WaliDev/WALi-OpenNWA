@@ -23,6 +23,7 @@ namespace wali
     namespace wpds
     {
         class WPDS;
+        class DebugWPDS;
         class TransCopyLinker;
         namespace ewpds
         {
@@ -67,6 +68,7 @@ namespace wali
                 typedef wali::HashMap< Key,StateSet_t > PredHash_t;
 
                 friend class ::wali::wpds::WPDS;
+                friend class ::wali::wpds::DebugWPDS;
                 friend class ::wali::wpds::ewpds::EWPDS;
 
                 static const std::string XMLTag;
