@@ -44,14 +44,16 @@
 #include "ModuleSpace.h"
 #include "ARConfig.h"
 #include "AffineRels.h"
-
+#include <math.h>
 
 // initialization of static members
 unsigned int ModuleSpace::maxRefCount = 0xffffffff;
 
 unsigned int ModuleSpace::curMemUsage = 0;
 unsigned int ModuleSpace::maxMemUsage = 0;
-
+unsigned int ModuleSpace::matrixMult = 0;
+unsigned int ModuleSpace::msMultClock = 0;
+bool ModuleSpace::exact_equality = true;
 //
 // Access given matrix as a linear array
 //
@@ -99,6 +101,27 @@ void print_mat(Matrix &A, int n, const char *s) {
 ////////////////////////////////////////////////////
 // M E T H O D S
 ////////////////////////////////////////////////////
+
+//-----------------------------------
+// gcd(a, b)
+//----------------------------------
+inline  unsigned int GCD(unsigned int a, unsigned int b) {
+	int tmp;
+
+	//
+	// Note:
+	//  gcd(a, 0) = a
+	//  gcd(0, a) = a
+	//  gcd(0, 0) = 0
+	//
+	while(b != 0) {
+		tmp = b;
+		b = a % b;
+		a = tmp;
+	}
+
+	return a;
+}
 
 unsigned int multiplicative_inverse(unsigned int d) {
 	unsigned int xn ,t;
@@ -281,6 +304,126 @@ bool ModuleSpace::isVarConstant(unsigned int var, int &constval) {
 }
 
 //----------------------------------------------------------------
+// Compute the weakest precondition of an affine expression
+// returns the pre-"value" of that expression, and a
+// precondition "cond" for that value to hold
+// 
+// if(cond) then the value of "value" before this transformer 
+// equals the value of "in" after the transformer
+//
+// The procedure can "give up" by returning 0, meaning that
+// the precondition is "unknown". This will happen when the
+// coefficient of "x_0" (the value of "in") is even (and hence
+// there is no good way of representing that equation inside "value".
+// However, if the coeff. of x_0 divides all other coeffs (when it
+// is even), then this is done and the return value is 2.
+//
+// Return value:
+// 0 : unknown
+// 1 : exact
+// 2:  approx
+//----------------------------------------------------------------
+int ModuleSpace::expressionPrecondition(AffineRels &in, AffineRels &value, AffineRels &cond) {
+	int n = in.nrOfRels();
+	int i,j;
+
+	if(n > 1 || n == 0)
+		return 0; // There must be exactly one affine expression 
+
+	value.clear();
+	cond.clear();
+
+	AffineRels::AffRel_t a = in.getAffineRel(0);
+	if(!basisUptodate) {
+		findBasis();
+	}
+
+	// Compute M.a for each M in basis
+	MSIterator beg, end;
+	beg = basis.begin();
+	end = basis.end();
+
+#ifndef VSA_ARA_USE_CNCL_MATRICES // Not handling this for now
+#error
+#endif
+
+	MatrixSetInt intBasis; 
+
+	for(; beg != end; beg++) {
+		int *m = new int[N+1];
+		for(i=0;i<N;i++) {
+			m[i] = 0;
+			for(j=0;j<N;j++) {
+				m[i] += (*beg).m[(i*N)+j] * a[j];
+			}
+		}
+		m[N] = -1 * (*beg).m[0];
+
+		intBasis.push_back(ModularMatrixInt(m, N+1));
+	}
+	// Find basis for these affine expression
+	findBasis(&intBasis, N+1, true);
+	// Now insert into the answer
+	MSIntIterator begi, endi;
+	begi = intBasis.begin();
+	endi = intBasis.end();
+
+	AffineRels::AffRel_t to_insert_only = new AffineRels::AffRelCoeff_t[N];
+
+	int retval = 1;
+	for(; begi != endi && (retval != 0); begi++) {
+		if((*begi).m[N] == 0) {
+			memcpy(to_insert_only, (*begi).m, sizeof(int) * N);
+			cond.insert(to_insert_only);
+		} else {
+			int di = ((*begi).m[N] > 0)? (*begi).m[N] : -(*begi).m[N];
+			di = multiplicative_inverse(di >> compute_rank(di));
+			unsigned int gcdOfCoeffs = 0;
+			for(i=0;i<N+1;i++) {
+				int temp = di * (*begi).m[i];
+				gcdOfCoeffs = GCD(temp > 0 ? temp : -temp, gcdOfCoeffs);
+			}
+
+			(*begi).m[N] *= di;
+
+			if((*begi).m[N] == gcdOfCoeffs || -(*begi).m[N] == gcdOfCoeffs) { // phew
+				// Divide through by gcd (this is only safe, because we're not allowed
+				// to divide through by even numbers
+
+				int sign = ((*begi).m[N] > 0)? -1 : 1;
+				for(i=0;i<N;i++) {
+					to_insert_only[i] = sign * ((di * (*begi).m[i]) / gcdOfCoeffs);
+				}
+				value.insert(to_insert_only);
+				if(gcdOfCoeffs % 2 == 0) {
+					retval = 2;
+				}
+			} else { // give up!
+				retval = 0;
+			}
+		}
+	}
+	// cleanup
+	begi = intBasis.begin();
+	endi = intBasis.end();
+
+	for(; begi != endi; begi++) {	
+		delete [] (*begi).m;
+	}
+	intBasis.clear();
+	delete [] to_insert_only;
+
+	if(retval == 0) {
+		value.clear();
+		cond.clear();
+	}
+
+	return retval;
+}
+
+
+
+//----------------------------------------------------------------
 // Find the basis of the matrix set using Gaussian Elimination
 //----------------------------------------------------------------
 //
@@ -371,7 +514,7 @@ void ModuleSpace::findBasis(MatrixSetInt *pBasis, int vec_size, int clear_mem) {
 		beg = pBasis->begin();
 		end = pBasis->end();
 		while(beg != end) {
-			print_mat((*beg).m,N,"pBasis");
+			print_mat((*beg).m,(int)(sqrt(vec_size) + 0.5),"pBasis");
 			beg++;
 		}
 	});
@@ -450,7 +593,7 @@ void ModuleSpace::findBasis(MatrixSetInt *pBasis, int vec_size, int clear_mem) {
 		beg = pBasis->begin();
 		end = pBasis->end();
 		while(beg != end) {
-			print_mat((*beg).m,N,"pBasis");
+			print_mat((*beg).m,(int)(sqrt(vec_size) + 0.5),"pBasis");
 			beg++;
 		}
 	});
@@ -555,26 +698,6 @@ int *ModuleSpace::findNullSpace() {
 	return A;
 }
 
-//-----------------------------------
-// gcd(a, b)
-//----------------------------------
-inline  unsigned int GCD(unsigned int a, unsigned int b) {
-	int tmp;
-
-	//
-	// Note:
-	//  gcd(a, 0) = a
-	//  gcd(0, a) = a
-	//  gcd(0, 0) = 0
-	//
-	while(b != 0) {
-		tmp = b;
-		b = a % b;
-		a = tmp;
-	}
-
-	return a;
-}
 
 //-------------------------------------------------
 // Find affine relations
@@ -669,12 +792,16 @@ bool ModuleSpace::isEqual(ModuleSpace *op2) {
 	if(!op2->basisUptodate)
 		op2->findBasis();
 
-	// Cheap hack -- is unsafe but *should* work
-	// because of way equality is used
-	if(op2->moduleRank() != this->moduleRank())
-		return false;
-	else return true;
-
+	if(!exact_equality) {
+		// Cheap hack -- is unsafe but *should* work
+		// because of way equality is used
+		if(op2->moduleRank() != this->moduleRank())
+			return false;
+		else return true;
+	}
+	else {
+		return (isStrictSubspace(op2)==0);
+	}
 	// Actual equailty method -- its still just safe 
 	// and not exact. 
 
@@ -689,6 +816,8 @@ ModuleSpace *ModuleSpace::compose(ModuleSpace *op2) {
 	MSIterator thisBeg,thisEnd,op2Beg,op2End;
 	ModuleSpace *result=new ModuleSpace(N);
 
+	clock_t clkTmp = clock();
+
 	// Multiply all possible combinations of matrices from
 	// the basis set of the vector spaces
 	thisBeg = basis.begin();
@@ -698,12 +827,17 @@ ModuleSpace *ModuleSpace::compose(ModuleSpace *op2) {
 		op2Beg = op2->basis.begin();
 		op2End = op2->basis.end();
 		while(op2Beg != op2End) {
-			ModularMatrix mm(multiplyMatrices((*op2Beg).m, (*thisBeg).m), Nsq);
+			//ModularMatrix mm(multiplyMatrices((*op2Beg).m, (*thisBeg).m), Nsq);
+			int *res = multiplyMatrices((*op2Beg).m.getMatrix(), (*thisBeg).m.getMatrix());
+			ModularMatrix mm(Matrix(res), Nsq);
+			delete [] res;
 			result->basis.push_back(mm);
 			op2Beg++;
 		}
 		thisBeg++;
 	}
+
+	msMultClock += clock() - clkTmp;
 
 	//
 	// Find the basis so that we can work on a finite set always
@@ -718,6 +852,11 @@ Matrix ModuleSpace::multiplyMatrices(const Matrix& op1, const Matrix& op2) const
 	return Matrix::multiply(op1, op2);
 }
 #endif 
+
+void ModuleSpace::resetMultCount() {
+	matrixMult = 0;
+}
+
 ///////////////////////////////////////////////////////
 // Multiply two matrices
 //////////////////////////////////////////////////////
@@ -735,6 +874,7 @@ int *ModuleSpace::multiplyMatrices(const int *op1,const int *op2) const {
 			}
 		}
 	}
+	matrixMult++;
 	return multResult;
 }
 

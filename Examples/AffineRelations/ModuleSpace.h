@@ -44,7 +44,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
-#include <assert.h>
+#include <cassert>
 
 
 #define VSA_ARA_USE_CNCL_MATRICES 
@@ -216,13 +216,15 @@ struct ModularMatrixInt {
 
 };
 
+class ModularTransformer;
 //-------------------------------------------------
 //
 //-------------------------------------------------
 
 class ModuleSpace {
 
-
+	friend class ModularTransformer;
+	friend class ModularVectors;
  private:
   // Some types
   typedef std::vector<ModularMatrix>                     MatrixSet;
@@ -282,10 +284,11 @@ class ModuleSpace {
 #endif
 
   void findBasis(MatrixSet *p=0);     // Find the basis 
-  void findBasis(MatrixSetInt *pBasis, int vec_size, int clear_mem=true);
+  static void findBasis(MatrixSetInt *pBasis, int vec_size, int clear_mem=true);
 
   void findAffineRelations(AffineRels &affRels);      // Find the affine relationships that hold
   bool isVarConstant(unsigned int var, int &constval);// Find if a variable has a constant value
+  int expressionPrecondition(AffineRels &in, AffineRels &value, AffineRels &cond);
   ///////////////////////////
   // WPDS stuff
   ///////////////////////////
@@ -306,6 +309,12 @@ class ModuleSpace {
 
   static unsigned int curMemUsage;
   static unsigned int maxMemUsage;
+  static unsigned int matrixMult;
+  static unsigned int msMultClock;
+
+  static void resetMultCount();
+
+  static bool exact_equality;
  private:
   ///////////////////////////
   //Data members
