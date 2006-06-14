@@ -14,7 +14,6 @@ namespace wali
     KeySpace::~KeySpace()
     {
         clear();
-        std::cerr << "~KeySpace()...\n";
     }
 
     /*!
