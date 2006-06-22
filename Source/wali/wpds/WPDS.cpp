@@ -494,7 +494,7 @@ namespace wali
             RuleMarshaller rm(o);
             o << "<" << XMLTag << ">\n";
             for_each( rm );
-            o << "</" << XMLTag << ">";
+            o << "</" << XMLTag << ">\n";
             return o;
         }
 

@@ -566,7 +566,11 @@ namespace wali
                     for( ; tit != titEND ; tit++ )
                     {
                         Trans* t = *tit; // (q',_,q)
-                        //t->print( std::cerr << "\t++ Popped " ) << std::endl;
+
+                        { // BEGIN DEBUGGING
+                            //t->print( std::cerr << "\t++ Popped " ) << std::endl;
+                        } // END DEBUGGING
+
                         if( t->to() == q->name() ) {
 
                             sem_elem_t extended;
@@ -800,8 +804,6 @@ namespace wali
         //
         std::ostream& WFA::marshall( std::ostream& o ) const
         {
-            // TODO : add "forward" or "backward" attribute ... like
-            // o << "<WFA direction="forward">\n";
             o << "<" << XMLTag;
             switch( query ) {
                 case REVERSE:
@@ -825,7 +827,7 @@ namespace wali
             }
             TransMarshaller marsh(o);
             for_each(marsh);
-            o << "</" << XMLTag << ">";
+            o << "</" << XMLTag << ">\n";
             return o;
         }
 

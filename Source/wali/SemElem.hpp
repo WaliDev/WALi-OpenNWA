@@ -90,6 +90,13 @@ namespace wali
             //!
             virtual std::ostream& print( std::ostream & o ) const = 0;
 
+            //!
+            //! Used to print weights to XML. If this method is overrriden,
+            //! be sure to begin and end the marshalling with:
+            //!    o << "<" << SemElem::XMLTag << ">";
+            //!    [your marshalling here here];
+            //!    o << "</" << SemElem::XMLTag << ">";
+            //!
             std::ostream& marshall( std::ostream& o ) const;
 
             //!
