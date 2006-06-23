@@ -127,7 +127,7 @@ namespace wali
                 assert( WALI_EPSILON == to_stack2() );
             }
             o << ">";
-            se->marshall(o);
+            se->marshallWeight(o);
             o << "</" << XMLTag << ">";
             return o;
         }

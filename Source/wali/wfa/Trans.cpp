@@ -144,7 +144,7 @@ namespace wali
             //to 
             o << " " << XMLToTag << "='" << key2str(to()) << "'>";
             
-            weight()->marshall(o);
+            weight()->marshallWeight(o);
 
             o << "</" << XMLTag << ">";
             return o;

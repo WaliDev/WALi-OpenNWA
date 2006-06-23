@@ -10,11 +10,17 @@ namespace wali
 
     SemElem::SemElem( bool countme ) : Countable(countme) {}
 
-    std::ostream& SemElem::marshall( std::ostream& o ) const
+    std::ostream& SemElem::marshallWeight( std::ostream& o ) const
     {
         o << "<" << XMLTag << ">";
-        o << toString();
+        marshall(o);
         o << "</" << XMLTag << ">";
+        return o;
+    }
+
+    std::ostream& SemElem::marshall( std::ostream& o ) const
+    {
+        o << toString();
         return o;
     }
 

@@ -845,7 +845,7 @@ namespace wali
                 // if is final, then _final='TRUE'
                 o << " " << State::XMLFinalTag << "='TRUE'";
             }
-            getState(key)->weight()->marshall(o << ">");
+            getState(key)->weight()->marshallWeight(o << ">");
             o << "</" << State::XMLTag << ">\n";
             return o;
         }

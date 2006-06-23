@@ -47,7 +47,7 @@ namespace wali
                 Rule::f->marshall( o << "\t" ) << std::endl;
                 Rule::t->marshall( o << "\t" ) << std::endl;
                 o << "\t<Stack2 name=\"" << Rule::to_stack2() << "\"/>\n";
-                o << "\t<Weight>" << Rule::weight()->toString() << "</Weight>\n";
+                Rule::weight()->marshallWeight(o);
                 if(merge_fn().get_ptr() != NULL) {
                     o << "\t<MergeFn>" << merge_fn()->toString() << "</MergeFn>\n";
                 } else {
