@@ -234,7 +234,7 @@
     </Project>
 
     <Project Name='TestMust' RelativePath='Examples/StackDelta' 
-        OutputDir='Examples/bin' Type='Executable'>
+        BuildDir='Examples/StackDelta/objects' OutputDir='Examples/bin' Type='Executable'>
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w'/>
         <IncludeList>
             <item Name='Must' Path='$(ProjectDir)' />
@@ -249,7 +249,7 @@
     </Project>
 
     <Project Name='TestMay' RelativePath='Examples/StackDelta' 
-        OutputDir='Examples/bin' Type='Executable'>
+        BuildDir='Examples/StackDelta/objects' OutputDir='Examples/bin' Type='Executable'>
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w'/>
         <IncludeList>
             <item Name='May' Path='$(ProjectDir)' />
