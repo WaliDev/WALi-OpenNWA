@@ -2,7 +2,7 @@
 #include "wali/wpds/DebugWPDS.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/WeightMaker.hpp"
-#include "Must.hpp"
+#include "May.hpp"
 #include <iostream>
 
 /*
@@ -24,8 +24,12 @@ n2:     return 0;
 int main()
 {
     using namespace wali;
-    sem_elem_t tmp( new Must(0,0) );
+    sem_elem_t tmp( new May(0,0) );
 
+    //wpds::WPDS pds;
+    wpds::DebugWPDS pds;
+
+#if 0
     wfa::WFA S;
     S.addTrans( getKey("p"), getKey("n2"), getKey("Sacc"), tmp->one() );
     S.setInitialState( getKey("p") );
@@ -36,9 +40,6 @@ int main()
     T.setInitialState( getKey("p") );
     T.addFinalState( getKey("Tacc") );
 
-    //wpds::WPDS pds;
-    wpds::DebugWPDS pds;
-
     // choice, call f or not
     pds.add_rule( getKey("p"), getKey("n0"), getKey("p"), getKey("n1"), tmp->one() );
     pds.add_rule( getKey("p"), getKey("n0"), getKey("p"), getKey("n2"), tmp->one() );
@@ -48,9 +49,9 @@ int main()
     pds.add_rule( getKey("p"), getKey("n2"), getKey("p"), tmp->one() );
 
     // f
-    pds.add_rule( getKey("p"), getKey("f_enter"), getKey("p"), getKey("f1"), new Must(16,16) );
+    pds.add_rule( getKey("p"), getKey("f_enter"), getKey("p"), getKey("f1"), new May(16,16) );
 #if 0
-    pds.add_rule( getKey("p"), getKey("f_enter"), getKey("p"), getKey("f_exit"), new Must(16,16) );
+    pds.add_rule( getKey("p"), getKey("f_enter"), getKey("p"), getKey("f_exit"), new May(16,16) );
 #else
 
     pds.add_rule( getKey("p"), getKey("f1"), getKey("p"), getKey("f2"), tmp->one() );
@@ -59,7 +60,27 @@ int main()
 #endif
 
     // f exit
-    pds.add_rule( getKey("p"), getKey("f_exit"), getKey("p"), new Must(-16,0) );
+    pds.add_rule( getKey("p"), getKey("f_exit"), getKey("p"), new May(-16,0) );
+#else
+    wfa::WFA S;
+    S.addTrans( getKey("p"), getKey("exit"), getKey("Sacc"), tmp->one() );
+    S.setInitialState( getKey("p") );
+    S.addFinalState( getKey("Sacc") );
+
+    wfa::WFA T;
+    T.addTrans( getKey("p"), getKey("enter"), getKey("Tacc"), tmp->one() );
+    T.setInitialState( getKey("p") );
+    T.addFinalState( getKey("Tacc") );
+
+    pds.add_rule( getKey("p"), getKey("enter"), getKey("p"), getKey("exit"), new May(0,0) );
+    pds.add_rule( getKey("p"), getKey("enter"), getKey("p"), getKey("n1"), new May(8,8) );
+    pds.add_rule( getKey("p"), getKey("n2"), getKey("p"), getKey("exit"), new May(-8,0) );
+
+    // recursive call
+    pds.add_rule( getKey("p"), getKey("n1"), getKey("p"), getKey("enter"), getKey("n2"), new May(4,4) );
+    // exit
+    pds.add_rule( getKey("p"), getKey("exit"), getKey("p"), new May(-4,0) );
+#endif
 
     pds.print( std::cout << "+++ The PDS +++\n" ) << std::endl;
 

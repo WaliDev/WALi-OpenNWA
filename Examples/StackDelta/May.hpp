@@ -1,7 +1,7 @@
 #ifndef MAY_GUARD
 #define MAY_GUARD
 
-#include "wali/SemELem.hpp"
+#include "wali/SemElem.hpp"
 
 class May : public wali::SemElem
 {
@@ -14,18 +14,22 @@ class May : public wali::SemElem
 
         bool equal( const May& that ) const;
 
+        bool isZero() const;
+
+        bool isOne() const;
+
         //
         // SemElem methods
         //
-        wali::sem_elem_t one();
+        wali::sem_elem_t one() const;
 
-        wali::sem_elem_t zero();
+        wali::sem_elem_t zero() const;
 
         wali::sem_elem_t extend( wali::SemElem * rhs );
 
         wali::sem_elem_t combine( wali::SemElem * rhs );
 
-        bool equal( wali::SemElem * rhs );
+        bool equal( wali::SemElem * rhs ) const;
 
         std::ostream& print( std::ostream& o ) const;
 

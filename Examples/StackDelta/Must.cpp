@@ -31,7 +31,7 @@ wali::sem_elem_t Must::extend( wali::SemElem * rhs )
 {
     Must* that = dynamic_cast< Must* >(rhs);
     that->print( print( std::cout << "\t" ) << " X " ) << std::endl;
-    return new Must(x+that->x,std::max<int>(y,that->y));
+    return new Must(x+that->x,std::max<int>(y,(x+that->y)));
 }
 
 wali::sem_elem_t Must::combine( wali::SemElem * rhs )

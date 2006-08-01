@@ -13,16 +13,26 @@ bool May::equal( const May& that ) const
     return x == that.x && y == that.y;
 }
 
+bool May::isZero() const
+{
+    return x == INFINITY && y == INFINITY;
+}
+
+bool May::isOne() const
+{
+    return x == 0 && y == 0;
+}
+
 //
 // SemElem methods
 //
-wali::sem_elem_t May::one()
+wali::sem_elem_t May::one() const
 {
     static wali::sem_elem_t ONE( new May(0,0) );
     return ONE;
 }
 
-wali::sem_elem_t May::zero()
+wali::sem_elem_t May::zero() const
 {
     static wali::sem_elem_t ZERO( new May(INFINITY,INFINITY) );
     return ZERO;
@@ -31,14 +41,25 @@ wali::sem_elem_t May::zero()
 wali::sem_elem_t May::extend( wali::SemElem * rhs )
 {
     May* that = dynamic_cast< May* >(rhs);
-    return new May(x+that->x,std::max<int>(y,that->y));
+    return new May(x+that->x,std::max<int>(y,(x+that->y)));
 }
 
 wali::sem_elem_t May::combine( wali::SemElem * rhs )
 {
     May* that = dynamic_cast< May* >(rhs);
-    assert( x == that->x );
-    return new May(x,std::min<int>(y,that->y));
+    if( isZero() )
+        return that;
+    else if( that->isZero() )
+        return this;
+    else {
+        if( x != that->x ) {
+            print( std::cerr << "This: " << std::endl ) << std::endl;
+            that->print( std::cerr << "That: " << std::endl ) << std::endl;
+            assert(0);
+        }
+        assert( x == that->x );
+        return new May(x,std::min<int>(y,that->y));
+    }
 }
 
 bool May::equal( wali::SemElem * rhs ) const
