@@ -30,8 +30,13 @@ wali::sem_elem_t Must::zero() const
 wali::sem_elem_t Must::extend( wali::SemElem * rhs )
 {
     Must* that = dynamic_cast< Must* >(rhs);
-    that->print( print( std::cout << "\t" ) << " X " ) << std::endl;
-    return new Must(x+that->x,std::max<int>(y,(x+that->y)));
+    Must* res = new Must(x+that->x,std::max<int>(y,that->y));
+    //Must* res = Must(x+that->x,std::max<int>(y,(x+that->y)));
+    { // BEGIN DEBUGGING
+        that->print( print( std::cout << "\t" ) << " X " );
+        res->print( std::cout << "  ==  " ) << std::endl;
+    } // END DEBUGGING
+    return res;
 }
 
 wali::sem_elem_t Must::combine( wali::SemElem * rhs )
