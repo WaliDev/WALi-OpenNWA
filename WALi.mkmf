@@ -287,11 +287,11 @@
 
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
-            <item Name='Reach' Path='$(WALiDir)/Examples/Reach' />
+            <item Name='Reach' Path='$(MkmfDir)/Examples/Reach' />
         </IncludeList>
         <InputList>
             <item Name='t1' RelativePath='t1.cpp' />
-            <item Name='Reach' Path='$(WALiDir)/Examples/Reach/Reach.cpp' />
+            <item Name='Reach' Path='$(MkmfDir)/Examples/Reach/Reach.cpp' />
         </InputList>
         <DependencyList>
             <item Name='wali' />
@@ -304,11 +304,11 @@
 
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
-            <item Name='Reach' Path='$(WALiDir)/Examples/Reach' />
+            <item Name='Reach' Path='$(MkmfDir)/Examples/Reach' />
         </IncludeList>
         <InputList>
             <item Name='twitness' RelativePath='twitness.cpp' />
-            <item Name='Reach' Path='$(WALiDir)/Examples/Reach/Reach.cpp' />
+            <item Name='Reach' Path='$(MkmfDir)/Examples/Reach/Reach.cpp' />
         </InputList>
         <DependencyList>
             <item Name='wali' />
@@ -321,11 +321,11 @@
 
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
-            <item Name='Reach' Path='$(WALiDir)/Examples/Reach' />
+            <item Name='Reach' Path='$(MkmfDir)/Examples/Reach' />
         </IncludeList>
         <InputList>
             <item Name='t3' RelativePath='t3.cpp' />
-            <item Name='Reach' Path='$(WALiDir)/Examples/Reach/Reach.cpp' />
+            <item Name='Reach' Path='$(MkmfDir)/Examples/Reach/Reach.cpp' />
         </InputList>
         <DependencyList>
             <item Name='wali' />
@@ -338,11 +338,11 @@
 
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
-            <item Name='Reach' Path='$(WALiDir)/Examples/Reach' />
+            <item Name='Reach' Path='$(MkmfDir)/Examples/Reach' />
         </IncludeList>
         <InputList>
             <item Name='t4' RelativePath='t4.cpp' />
-            <item Name='Reach' Path='$(WALiDir)/Examples/Reach/Reach.cpp' />
+            <item Name='Reach' Path='$(MkmfDir)/Examples/Reach/Reach.cpp' />
         </InputList>
         <DependencyList>
             <item Name='wali' />
@@ -355,11 +355,11 @@
 
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
-            <item Name='Reach' Path='$(WALiDir)/Examples/Reach' />
+            <item Name='Reach' Path='$(MkmfDir)/Examples/Reach' />
         </IncludeList>
         <InputList>
             <item Name='tprune' RelativePath='tprune.cpp' />
-            <item Name='Reach' Path='$(WALiDir)/Examples/Reach/Reach.cpp' />
+            <item Name='Reach' Path='$(MkmfDir)/Examples/Reach/Reach.cpp' />
         </InputList>
         <DependencyList>
             <item Name='wali' />
@@ -372,11 +372,11 @@
 
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
-            <item Name='Reach' Path='$(WALiDir)/Examples/Reach' />
+            <item Name='Reach' Path='$(MkmfDir)/Examples/Reach' />
         </IncludeList>
         <InputList>
             <item Name='tse' RelativePath='tse.cpp' />
-            <item Name='Reach' Path='$(WALiDir)/Examples/Reach/Reach.cpp' />
+            <item Name='Reach' Path='$(MkmfDir)/Examples/Reach/Reach.cpp' />
         </InputList>
         <DependencyList>
             <item Name='wali' />
@@ -389,11 +389,11 @@
 
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
-            <item Name='Reach' Path='$(WALiDir)/Examples/Reach' />
+            <item Name='Reach' Path='$(MkmfDir)/Examples/Reach' />
         </IncludeList>
         <InputList>
             <item Name='tTransSet' RelativePath='tTransSet.cpp' />
-            <item Name='Reach' Path='$(WALiDir)/Examples/Reach/Reach.cpp' />
+            <item Name='Reach' Path='$(MkmfDir)/Examples/Reach/Reach.cpp' />
         </InputList>
         <DependencyList>
             <item Name='wali' />
