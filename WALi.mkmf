@@ -233,43 +233,11 @@
         </DependencyList>
     </Project>
 
-    <Project Name='TestMust' RelativePath='Examples/StackDelta' 
-        BuildDir='Examples/StackDelta/objects' OutputDir='Examples/bin' Type='Executable'>
-        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w'/>
-        <IncludeList>
-            <item Name='Must' Path='$(ProjectDir)' />
-        </IncludeList>
-        <InputList>
-            <item Name='Must' RelativePath='Must.cpp' />
-            <item Name='Test' RelativePath='TestMust.cpp' />
-        </InputList>
-        <DependencyList>
-            <item Name='wali' />
-        </DependencyList>
-    </Project>
-
-    <Project Name='TestMay' RelativePath='Examples/StackDelta' 
-        BuildDir='Examples/StackDelta/objects' OutputDir='Examples/bin' Type='Executable'>
-        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w'/>
-        <IncludeList>
-            <item Name='May' Path='$(ProjectDir)' />
-        </IncludeList>
-        <InputList>
-            <item Name='May' RelativePath='May.cpp' />
-            <item Name='Test' RelativePath='TestMay.cpp' />
-        </InputList>
-        <DependencyList>
-            <item Name='wali' />
-        </DependencyList>
-    </Project>
-
     <Project Name='examples' RelativePath='Examples' Type='Empty'>
         <DependencyList>
             <item Name='ExReach' />
             <item Name='EWPDSExReach' />
             <item Name='LiveVar' />
-            <item Name='TestMust' />
-            <item Name='TestMay' />
             <!-- <item Name='UninitVar' /> -->
         </DependencyList>
     </Project>
