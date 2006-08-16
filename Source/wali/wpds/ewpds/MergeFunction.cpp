@@ -10,6 +10,8 @@ namespace wali
     {
         namespace ewpds
         {
+            const std::string MergeFn::XMLTag("MergeFn");
+
             SemElem *MergeFn::apply_f(SemElem *w1, SemElem *w2)
             {
                 assert(w1 != NULL && w2 != NULL);

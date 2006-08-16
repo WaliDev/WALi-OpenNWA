@@ -23,6 +23,8 @@ namespace wali
             class MergeFn : public Printable, public Countable
             {
                 public:
+                    static const std::string XMLTag;
+
                     MergeFn(bool countme = true) : Countable(countme), sr_data(NULL) { }
                     MergeFn(SemElem *sr, bool countme = true) : Countable(countme), sr_data(sr) { }
                     MergeFn(sem_elem_t sr, bool countme = true) : Countable(countme), sr_data(sr) { }
