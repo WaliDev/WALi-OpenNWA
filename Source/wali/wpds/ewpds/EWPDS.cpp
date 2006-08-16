@@ -355,6 +355,12 @@ namespace wali
             WFA EWPDS::poststar( WFA & input )
             {
                 WFA fa;
+                poststar(input,fa);
+                return fa;
+            }
+
+            void EWPDS::poststar( WFA & input, WFA& fa )
+            {
                 currentOutputWFA = &fa;
                 copy_and_link_and_pair( input,fa );
 
@@ -432,7 +438,6 @@ namespace wali
                 TransPairCollapse tpc;
                 fa.for_each( tpc );
                 currentOutputWFA = 0;
-                return fa;
             }
 
             void EWPDS::poststar_handle_trans(

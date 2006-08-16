@@ -127,6 +127,8 @@ namespace wali
                      */
                     virtual WFA poststar( WFA & input );
 
+                    virtual void poststar( WFA & input, WFA& fa );
+
                     /*!
                      * This method writes the EWPDS to the passed in 
                      * std::ostream parameter. Implements Printable::print.
