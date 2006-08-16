@@ -8,14 +8,20 @@
 #include <string>
 #include <vector>
 
-class StringUtils
+namespace wali
 {
-    public:
-        static void Tokenize(
-                const std::string& str,
-                std::vector<std::string>& tokens,
-                const std::string& delimiters );
-};
+    namespace util
+    {
+        class StringUtils
+        {
+            public:
+                static void Tokenize(
+                        const std::string& str,
+                        std::vector<std::string>& tokens,
+                    const std::string& delimiters );
+        };
+    }
+}
 
 #endif  // STRING_UTILS_GUARD
 
