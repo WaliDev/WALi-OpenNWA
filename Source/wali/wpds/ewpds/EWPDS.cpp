@@ -77,7 +77,7 @@ namespace wali
 
             EWPDS::~EWPDS()
             {
-                std::cerr << "~EWPDS()\n";
+                std::cerr << "~EWPDS()" << std::endl;
                 pds_states.clear();
                 merge_rule_hash.clear();
             }
@@ -512,7 +512,7 @@ namespace wali
                 RuleMarshaller rm(o);
                 o << "<EWPDS>\n";
                 WPDS::for_each( rm );
-                o << "</EWPDS>";
+                o << "</EWPDS>" << std::endl;
                 return o;
             }
 

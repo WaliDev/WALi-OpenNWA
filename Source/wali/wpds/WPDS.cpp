@@ -71,7 +71,7 @@ namespace wali
 
         WPDS::~WPDS()
         {
-            //std::cerr << "~WPDS()\n";
+            std::cerr << "~WPDS()" << std::endl;
             assert( worklist );
             clear();
             delete worklist;
