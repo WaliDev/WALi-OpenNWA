@@ -26,6 +26,7 @@
             <item Name='IntSource' RelativePath='wali/IntSource.cpp' />
             <item Name='StringSource' RelativePath='wali/StringSource.cpp' />
             <item Name='KeyPairSource' RelativePath='wali/KeyPairSource.cpp' />
+            <item Name='StringUtils' RelativePath='wali/util/StringUtils.cpp' />
             <!-- WFA -->
             <item Name='WFA' RelativePath='wali/wfa/WFA.cpp' />
             <item Name='State' RelativePath='wali/wfa/State.cpp' />
