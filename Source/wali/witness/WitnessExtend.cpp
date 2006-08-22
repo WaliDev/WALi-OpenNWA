@@ -44,15 +44,19 @@ namespace wali
             formatDepth(o,depth);
             o << "WitnessExtend: ";
             user_se->print(o) << std::endl;
-            if( hasLeft() )
-            {
-                lchild->prettyPrint(o,depth+1);
-                if( hasRight() )
-                    rchild->prettyPrint(o,depth+1);
-            }
-            else {
-                // TODO : make debug
-                assert( !hasRight() );
+            // Dumps out to much information.
+            // TODO. Make a compile or runtime flag.
+            if( 0 ) {
+                if( hasLeft() )
+                {
+                    lchild->prettyPrint(o,depth+1);
+                    if( hasRight() )
+                        rchild->prettyPrint(o,depth+1);
+                }
+                else {
+                    // TODO : make debug
+                    assert( !hasRight() );
+                }
             }
             return o;
         }

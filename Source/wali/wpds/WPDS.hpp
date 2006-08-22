@@ -32,7 +32,6 @@ namespace wali
         class LinkedTrans;
         class RuleFunctor;
         class ConstRuleFunctor;
-        class TransCopyLinker;
         class Wrapper;
 
         /*!
@@ -43,7 +42,6 @@ namespace wali
         {
 
             public:
-                friend class TransCopyLinker;
                 static const std::string XMLTag;
 
             protected:
@@ -200,6 +198,11 @@ namespace wali
                  * @see rule_t
                  */
                 virtual void for_each( RuleFunctor &func );
+
+                /*!
+                 * Implementation of TransFunctor
+                 */
+                virtual void operator()( wali::wfa::Trans* t );
 
             protected:
 
@@ -369,11 +372,6 @@ namespace wali
                 chash_t & config_map() {
                     return configs;
                 }
-
-                /*!
-                 * Implementation of TransFunctor
-                 */
-                virtual void operator()( wali::wfa::Trans* t );
 
             private: // methods
 

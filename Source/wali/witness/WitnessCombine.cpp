@@ -5,6 +5,9 @@
 #include "wali/Common.hpp"
 #include "wali/witness/WitnessCombine.hpp"
 #include "wali/witness/Visitor.hpp"
+#include "wali/witness/VisitorDot.hpp"
+#include <iostream>
+#include <fstream>
 #include <algorithm>
 
 namespace wali
@@ -46,7 +49,20 @@ namespace wali
             else {
                 // Perform the combine here b/c both branches need the combined
                 // weight.
-                sem_elem_t combined_se = user_se->combine(that->weight());
+                sem_elem_t combined_se;
+                try {
+                    combined_se = user_se->combine(that->weight());
+                } catch (int error_code ) {
+                    std::ofstream thisStream("combine.this.dot");
+                    std::ofstream thatStream("combine.that.dot");
+                    VisitorDot d1(thisStream);
+                    accept(d1);
+                    VisitorDot d2(thatStream);
+                    that->accept(d2);
+                    thisStream.close();
+                    thatStream.close();
+                    assert(0);
+                }
 
                 // Always create a new WitnessCombine b/c cycles cause mucho problemo
                 // with ref counting.
@@ -119,11 +135,15 @@ namespace wali
             formatDepth(o,depth);
             o << "WitnessCombine: ";
             user_se->print(o) << std::endl;
-            std::list< witness_t >::const_iterator it = kids.begin();
-            std::list< witness_t >::const_iterator itEND = kids.end();
-            for( ; it != itEND ; it++ )
-            {
-                (*it)->prettyPrint(o,depth+1);
+            // Dumps out to much information.
+            // TODO. Make a compile or runtime flag.
+            if( 0 ) {
+                std::list< witness_t >::const_iterator it = kids.begin();
+                std::list< witness_t >::const_iterator itEND = kids.end();
+                for( ; it != itEND ; it++ )
+                {
+                    (*it)->prettyPrint(o,depth+1);
+                }
             }
             return o;
 

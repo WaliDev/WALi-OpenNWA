@@ -23,7 +23,6 @@ namespace wali
         class LinkedTrans;
         class RuleFunctor;
         class ConstRuleFunctor;
-        class TransCopyLinker;
         class Wrapper;
 
         namespace ewpds
@@ -121,13 +120,12 @@ namespace wali
                     /*!
                      * @brief Perform poststar reachability query
                      *
-                     * @return WFA
+                     * @param input
+                     * @param output
                      *
                      * @see WFA
                      */
-                    virtual WFA poststar( WFA & input );
-
-                    virtual void poststar( WFA & input, WFA& fa );
+                    virtual void poststar( WFA & input, WFA& output );
 
                     /*!
                      * This method writes the EWPDS to the passed in 
@@ -148,6 +146,12 @@ namespace wali
                      * @return std::ostream the EWPDS was marshalled into
                      */
                     virtual std::ostream & marshall( std::ostream & o ) const;
+
+                    /*!
+                     * Override WPDS::operator()(Trans*) for linking b/c
+                     * EWPDS uses paired weights
+                     */
+                    virtual void operator()( wali::wfa::Trans* t );
 
                     bool is_pds_state(wali_key_t k) const;
                     rule_t lookup_rule(wali_key_t to_state, wali_key_t to_stack1, wali_key_t to_stack2) const;
@@ -172,7 +176,7 @@ namespace wali
                             sem_elem_t delta
                             );
 
-                    void copy_and_link_and_pair( const WFA & in, WFA & dest );
+                    //void copy_and_link_and_pair( const WFA & in, WFA & dest );
 
                     virtual bool make_rule(
                             Config * f,

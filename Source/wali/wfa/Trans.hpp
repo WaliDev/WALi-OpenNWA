@@ -185,9 +185,6 @@ namespace wali
                     return delta;
                 }
 
-                /*!
-                 * Set the delta value for the Trans.
-                 */
                 //
                 // setters
                 //
@@ -202,6 +199,9 @@ namespace wali
                     se = w;
                 }
 
+                /*!
+                 * Set the delta value for the Trans.
+                 */
                 void setDelta( const sem_elem_t w ) {
                     delta = w;
                 }

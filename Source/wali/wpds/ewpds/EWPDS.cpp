@@ -2,6 +2,12 @@
  * @author Akash Lal
  */
 
+/*
+ * NAK: Witnesses (and wrapping) do not work w/ EWPDS.
+ *      The problem lies w/ MergeFn::apply_f(a,b)
+ * TODO:
+ *      Should be able to create a mergewrapper.
+ */
 #include "wali/Common.hpp"
 #include "wali/SemElem.hpp"
 #include "wali/Worklist.hpp"
@@ -13,6 +19,7 @@
 #include "wali/wpds/Config.hpp"
 #include "wali/wpds/RuleFunctor.hpp"
 #include "wali/wpds/LinkedTrans.hpp"
+#include "wali/wpds/Wrapper.hpp"
 #include "wali/wpds/ewpds/ERule.hpp"
 #include "wali/wpds/ewpds/EWPDS.hpp"
 #include <iostream>
@@ -29,24 +36,15 @@ namespace wali
     {  
         namespace ewpds
         {
-            class TransCopyPairLinker : public wali::wfa::ConstTransFunctor
-            {
-                public:
-                    TransCopyPairLinker( EWPDS & w, WFA & faout, Worklist<wfa::Trans> * worklist );
-                    virtual ~TransCopyPairLinker();
-                    virtual void operator()( const ::wali::wfa::Trans * t );
-
-                    EWPDS & ewpds;
-                    WFA & fa;
-                    Worklist<wfa::Trans> * worklist;
-            };
-
             class TransPairCollapse : public wali::wfa::TransFunctor
             {
                 public:
                     TransPairCollapse( ) { }
                     virtual ~TransPairCollapse() { }
-                    virtual void operator()( ::wali::wfa::Trans * t );
+                    virtual void operator()( ::wali::wfa::Trans * orig )
+                    {
+                        orig->setWeight(SEM_PAIR_COLLAPSE(orig->weight()));
+                    }
 
             };
 
@@ -175,13 +173,39 @@ namespace wali
                     rule_t &tmp = *it;
                     if( tmp->from() == f && tmp->to() == t && tmp->to_stack2() == stk2 ) {
                         rb = true;
-                        tmp->weight(tmp->weight()->combine(se));
+                        if( wrapper ) {
+                            // FIXME: Should we combine user weights at bottom
+                            // of stack?
+                            sem_elem_t combinedWeight = se->combine(wrapper->unwrap(tmp->weight()));
+                            tmp->se = combinedWeight;
+                            tmp->weight( wrapper->wrap(*tmp) );
+                            //rule_t wrapTmp =  new ERule(f,t,stk2,se,mf);
+                            //tmp->se = tmp->se->combine(wrapper->wrap(*wrapTmp));
+                        }
+                        else {
+                            tmp->weight(tmp->weight()->combine(se));
+                        }
                         r = tmp;
                         break;
                     }
                 }
                 if( !rb ) {
-                    r =  (Rule *)(new ERule(f,t,stk2,se,mf));
+                    ERule *er = new ERule(f,t,stk2,se,mf);
+                    r = er;
+                    if( wrapper ) {
+                        std::cerr << "Wrapping weight.\n";
+                        sem_elem_t wrapped = wrapper->wrap(*r);
+                        r->weight( wrapped );
+                        sem_elem_t npair;
+                        // NAK: Duplicated from ERule.cpp constructor
+                        if( stk2 == WALI_EPSILON ) {
+                            npair = new SemElemPair(wrapped, wrapped->one());
+                        }
+                        else {
+                            npair = new SemElemPair(wrapped->one(), wrapped);
+                        }
+                        er->extended_se = npair;
+                    }
                     f->insert(r);
                     t->rinsert(r);
                 }
@@ -307,6 +331,10 @@ namespace wali
                     }
                 }
 
+                // FIXME. Uncomment this like in poststar?
+                // convert back from <se,se> to se
+                //TransPairCollapse tpc;
+                //fa.for_each( tpc );
                 currentOutputWFA = 0;
                 return fa;
             }
@@ -351,18 +379,9 @@ namespace wali
                 }
             }
 
-            // TODO:
-            WFA EWPDS::poststar( WFA & input )
-            {
-                WFA fa;
-                poststar(input,fa);
-                return fa;
-            }
-
             void EWPDS::poststar( WFA & input, WFA& fa )
             {
-                currentOutputWFA = &fa;
-                copy_and_link_and_pair( input,fa );
+                setupOutput(input,fa);
 
                 // Generate midstates for each rule type two
                 r2hash_t::iterator r2it = WPDS::r2hash.begin();
@@ -399,6 +418,7 @@ namespace wali
                         Config::iterator fwit = config->begin();
                         for( ; fwit != config->end() ; fwit++ ) {
                             rule_t & r = *fwit;
+                            r->print( std::cerr << "\tMatched: " ) << std::endl;
                             poststar_handle_trans( t,fa,r,dnew );
                         }
                     }
@@ -525,41 +545,29 @@ namespace wali
             // Protected Methods
             /////////////////////////////////////////////////////////////////
 
-            //
-            // link input WFA transitions to Configs; and convert se to <se,1>
-            //
-            void EWPDS::copy_and_link_and_pair( const WFA & in, WFA & dest )
+            void EWPDS::operator()( wali::wfa::Trans * orig )
             {
-                TransCopyPairLinker linker( *this,dest,worklist );
-                in.for_each( linker );
-            }
-
-            /////////////////////////////////////////////////////////////////
-            // TransCopyPairLinker
-            /////////////////////////////////////////////////////////////////
-            TransCopyPairLinker::TransCopyPairLinker( EWPDS & w, WFA & faout, Worklist<wfa::Trans> * wl )
-                : ewpds(w),fa(faout),worklist(wl) {}
-
-            TransCopyPairLinker::~TransCopyPairLinker() {}
-
-            void TransCopyPairLinker::operator()( const Trans * orig )
-            {
-                Config *c = ewpds.make_config( orig->from(),orig->stack() );
-                LinkedTrans *t =
-                    new LinkedTrans(orig->from(),orig->stack(),orig->to(),
-                            (SemElem *)(new SemElemPair(orig->weight(), orig->weight()->one())),c);
+                Config *c = make_config( orig->from(),orig->stack() );
+                sem_elem_t se;
+                if( wrapper ) {
+                    se = wrapper->wrap(*orig);
+                }
+                else {
+                    se = orig->weight();
+                }
+                LinkedTrans *t = new LinkedTrans( orig->from()
+                        ,orig->stack()
+                        ,orig->to()
+                        , new SemElemPair(se,se->one())
+                        ,c);
 
                 // fa.addTrans takes ownership of passed in pointer
-                fa.addTrans( t );
+                currentOutputWFA->addTrans( t );
 
                 // add t to the worklist for saturation
                 worklist->put( t );
             }
 
-            void TransPairCollapse::operator()( Trans * orig )
-            {
-                orig->setWeight(SEM_PAIR_COLLAPSE(orig->weight()));
-            }
 
         } // namespace ewpds
 
