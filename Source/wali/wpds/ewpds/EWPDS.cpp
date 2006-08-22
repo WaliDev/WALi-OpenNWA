@@ -5,6 +5,7 @@
 /*
  * NAK: Witnesses (and wrapping) do not work w/ EWPDS.
  *      The problem lies w/ MergeFn::apply_f(a,b)
+ *      wpds::Wrapper deals w/ weights and not MergeFns
  * TODO:
  *      Should be able to create a mergewrapper.
  */
