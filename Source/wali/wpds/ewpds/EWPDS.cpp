@@ -193,7 +193,6 @@ namespace wali
                     ERule *er = new ERule(f,t,stk2,se,mf);
                     r = er;
                     if( wrapper ) {
-                        std::cerr << "Wrapping weight.\n";
                         sem_elem_t wrapped = wrapper->wrap(*r);
                         r->weight( wrapped );
                         sem_elem_t npair;
