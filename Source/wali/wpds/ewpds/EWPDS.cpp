@@ -331,10 +331,6 @@ namespace wali
                     }
                 }
 
-                // FIXME. Uncomment this like in poststar?
-                // convert back from <se,se> to se
-                //TransPairCollapse tpc;
-                //fa.for_each( tpc );
                 currentOutputWFA = 0;
                 return fa;
             }
