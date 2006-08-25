@@ -232,7 +232,7 @@ namespace wali
 
                     // KIDD 8/1/06
                     std::cerr << "\tCalling prestar_handle_trans  :  ";
-                    r->print( std::cout << "\tr == " ) << std::endl;
+                    r->print( std::cerr << "\tr == " ) << std::endl;
 
                     prestar_handle_trans( t,fa,r,dnew );
 

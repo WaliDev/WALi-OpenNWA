@@ -40,6 +40,8 @@ namespace wali
                     typedef HashMap< KeyTriple, rule_t > merge_rule_hash_t;
 
                 public:
+                    using WPDS::poststar;
+                    using WPDS::prestar;
                     friend class TransCopyPairLinker;
 
                 public:
