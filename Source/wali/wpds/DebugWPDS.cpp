@@ -34,6 +34,19 @@ namespace wali
         {
         }
 
+        void DebugWPDS::prestarComputeFixpoint( ::wali::wfa::WFA& fa )
+        {
+
+            LinkedTrans * t;
+
+            while( get_from_worklist( t ) ) 
+            {
+                t->print( std::cerr << "$$$ Popped t ==> " ) << std::endl;
+                // TODO insert debugger code
+                pre( t , fa );
+            }
+        }
+
         void DebugWPDS::poststarComputeFixpoint( ::wali::wfa::WFA& fa )
         {
 

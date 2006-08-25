@@ -239,6 +239,11 @@ namespace wali
                 virtual void prestarComputeFixpoint( ::wali::wfa::WFA& fa );
 
                 /*!
+                 * @brief Performs pre for 1 Trans
+                 */
+                virtual void pre( LinkedTrans * t, ::wali::wfa::WFA& fa );
+
+                /*!
                  * @brief helper method for prestar
                  */
                 virtual void prestar_handle_trans(

@@ -29,6 +29,8 @@ namespace wali
                 virtual ~DebugWPDS();
 
             protected:
+                virtual void prestarComputeFixpoint( ::wali::wfa::WFA& fa );
+
                 virtual void poststarComputeFixpoint( ::wali::wfa::WFA& fa );
 
                 virtual void post( LinkedTrans * t , ::wali::wfa::WFA& fa );

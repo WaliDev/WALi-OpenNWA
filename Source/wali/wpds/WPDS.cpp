@@ -210,67 +210,64 @@ namespace wali
 
             while( get_from_worklist( t ) )
             {
+                pre(t,fa);
+            }
+        }
 
-                // KIDD 8/1/06
-                t->print( std::cerr << "$$$ Popped t ==> " ) << std::endl;
+        void WPDS::pre( LinkedTrans* t, WFA& fa )
+        {
+            // Get config
+            Config * config = t->config;
 
-                // Get config
-                Config * config = t->config;
+            { // BEGIN DEBUGGING
+                assert( config );
+            } // END DEBUGGING
 
-                { // BEGIN DEBUGGING
-                    assert( config );
-                } // END DEBUGGING
+            sem_elem_t dnew = t->delta;
+            t->delta = dnew->zero();
 
-                sem_elem_t dnew = t->delta;
-                t->delta = dnew->zero();
+            // For each backward rule of config
+            Config::reverse_iterator bwit = config->rbegin();
+            for( ; bwit != config->rend() ; bwit++ )
+            {
+                rule_t & r = *bwit;
 
-                // For each backward rule of config
-                Config::reverse_iterator bwit = config->rbegin();
-                for( ; bwit != config->rend() ; bwit++ )
+                prestar_handle_trans( t,fa,r,dnew );
+
+            }
+
+            // check matching rule 2s 
+            r2hash_t::iterator r2it = r2hash.find( t->stack() );
+
+            // does a rule 2 exist with matching second symbol on rhs
+            if( r2it != r2hash.end() )
+            {
+                // get reference
+                std::list< rule_t > & ls = r2it->second;
+                std::list< rule_t >::iterator lsit;
+
+                // loop through list
+                for( lsit = ls.begin() ; lsit != ls.end() ; lsit++ )
                 {
-                    rule_t & r = *bwit;
+                    rule_t & r = *lsit;
 
-                    // KIDD 8/1/06
-                    std::cerr << "\tCalling prestar_handle_trans  :  ";
-                    r->print( std::cerr << "\tr == " ) << std::endl;
-
-                    prestar_handle_trans( t,fa,r,dnew );
-
-                }
-
-                // check matching rule 2s 
-                r2hash_t::iterator r2it = r2hash.find( t->stack() );
-
-                // does a rule 2 exist with matching second symbol on rhs
-                if( r2it != r2hash.end() )
-                {
-                    // get reference
-                    std::list< rule_t > & ls = r2it->second;
-                    std::list< rule_t >::iterator lsit;
-
-                    // loop through list
-                    for( lsit = ls.begin() ; lsit != ls.end() ; lsit++ )
+                    Trans tp;
+                    if( fa.find(r->to_state(),r->to_stack1(),t->from(),tp) )
                     {
-                        rule_t & r = *lsit;
+                        // f(r) * t'
+                        sem_elem_t wrtp = r->weight()->extend( tp.weight() );
 
-                        Trans tp;
-                        if( fa.find(r->to_state(),r->to_stack1(),t->from(),tp) )
-                        {
-                            // f(r) * t'
-                            sem_elem_t wrtp = r->weight()->extend( tp.weight() );
+                        // f(r) * t' * delta
+                        sem_elem_t wnew = wrtp->extend( dnew );
 
-                            // f(r) * t' * delta
-                            sem_elem_t wnew = wrtp->extend( dnew );
+                        // update
+                        update( r->from()->state()
+                                , r->from()->stack()
+                                , t->to()
+                                , wnew
+                                , r->from()
+                              );
 
-                            // update
-                            update( r->from()->state()
-                                    , r->from()->stack()
-                                    , t->to()
-                                    , wnew
-                                    , r->from()
-                                  );
-
-                        }
                     }
                 }
             }
