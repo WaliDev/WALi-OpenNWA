@@ -6,7 +6,11 @@
            Default='wali' RelativePath='.' Name='WALi'>
 
     <Project Name='wali' RelativePath='Source'
-        OutputDir='../../Library/WALi/lib' BuildDir='objects' Type='Library' >
+        InstallDir='../../Library/lib'
+        OutputDir='lib'
+        BuildDir='objects'
+        Type='Library' >
+
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
             <item Name='WALiDir' Path='$(ProjectDir)' />
@@ -62,7 +66,10 @@
     </Project>
 
     <Project Name='pgwali' RelativePath='Source'
-        OutputDir='lib' BuildDir='objects' Type='Library' >
+        InstallDir='../../Library/lib'
+        OutputDir='lib'
+        BuildDir='objects'
+        Type='Library' >
 
         <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w -O2 -pg"/>
         <IncludeList>
