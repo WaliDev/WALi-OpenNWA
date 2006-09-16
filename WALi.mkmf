@@ -1,7 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <?xml-stylesheet type='text/xsl' href='file://W:/u/k/i/kidd/research/projects/mkmf/mkmf.xsl'?>
 <mkmf xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-           xmlns='http://www.cs.wisc.edu/~kidd/mkmf/'
            xsi:schemaLocation='http://www.cs.wisc.edu/~kidd/mkmf/
            http://www.cs.wisc.edu/~kidd/mkmf/mkmf.xsd'
            Default='wali' RelativePath='.' Name='WALi'>
