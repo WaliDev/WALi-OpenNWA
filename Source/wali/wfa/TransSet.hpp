@@ -101,6 +101,8 @@ namespace wali
                     return impl.end();
                 }
 
+                size_t size() const;
+
             protected:
                 impl_t impl;
 

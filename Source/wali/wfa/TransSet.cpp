@@ -94,6 +94,10 @@ namespace wali {
             o << "}";
             return o;
         }
+
+        size_t TransSet::size() const {
+            return impl.size();
+        }
     }
 }
 /* Yo, Emacs!
