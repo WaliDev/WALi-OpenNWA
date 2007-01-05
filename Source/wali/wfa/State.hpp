@@ -132,8 +132,6 @@ namespace wali
                  */
                 bool operator()( const State* a, const State* b ) const;
 
-            protected:
-
                 TransSet& getTransSet()
                 {
                     return transSet;
