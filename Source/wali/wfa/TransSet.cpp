@@ -75,7 +75,10 @@ namespace wali {
             b = impl.insert(t).second;
             // BEGIN DEBUGGING
             // We should never insert the same transition twice
-            assert(b);
+            if( !b ) {
+                t->print( std::cerr << "\tERROR" ) << std::endl;
+                assert(b);
+            }
             // END DEBUGGING
 #endif
             return b;

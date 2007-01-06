@@ -926,13 +926,8 @@ namespace wali
                     if( epsit == eps_map.end() ) {
                         TransSet transSet;
                         epsit = eps_map.insert( tnew->to(),transSet ).first;
-                        // TODO: ERASE
-                        //trans_list_t ls;
-                        //epsit = eps_map.insert( tnew->to(),ls ).first;
                     }
                     epsit->second.insert( tnew );
-                    // TODO: ERASE
-                    //epsit->second.push_back( tnew );
                 }
             }
             else {
