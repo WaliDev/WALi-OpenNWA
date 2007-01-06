@@ -5,6 +5,11 @@
  * @author Nick Kidd
  */
 
+/*
+ * WFA::eraseState is currently broken. It does not remove the
+ * incoming Transes to the State. TODO: FIX
+ */
+
 #include "wali/Common.hpp"
 #include "wali/Printable.hpp"
 #include "wali/SemElem.hpp"

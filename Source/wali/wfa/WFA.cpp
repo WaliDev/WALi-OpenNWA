@@ -2,6 +2,11 @@
  * @author Nick Kidd
  */
 
+/*
+ * WFA::eraseState is currently broken. It does not remove the
+ * incoming Transes to the State. TODO: FIX
+ */
+
 #include "wali/Common.hpp"
 #include "wali/DefaultWorklist.hpp"
 #include "wali/wfa/WFA.hpp"
@@ -237,7 +242,8 @@ namespace wali
                 Trans* tEps = eraseTransFromEpsMap(tKp);
 
                 { // BEGIN DEBUGGING
-                    assert( tKp == tEps );
+                    if( tEps != NULL )
+                        assert( tKp == tEps );
                 } // END DEBUGGING
 
                 State* state = state_map.find(from)->second;
@@ -1174,6 +1180,7 @@ namespace wali
             // delete the memory
             //delete state;
 
+            // TODO: does not erase incoming Trans!
             return true;
         }
 
