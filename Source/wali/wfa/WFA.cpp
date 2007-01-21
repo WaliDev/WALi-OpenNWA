@@ -621,7 +621,7 @@ namespace wali
                 }
             }
             { // BEGIN DEBUGGING
-                std::cerr << "\n --- WFA::path_summary needed " << numPops << " pops\n";
+                //std::cerr << "\n --- WFA::path_summary needed " << numPops << " pops\n";
                 //std::cerr << "WFA state labels:\n";
                 //FOR_EACH_STATE( st ) {
                 //    std::cerr << "\t" << key2str(st->name()) << ": ";
