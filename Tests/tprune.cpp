@@ -6,7 +6,6 @@
 // Reachability weight domain
 // $(WaliDir)/Examples/Reach/Reach.hpp
 #include "Reach.hpp"
-
 #include <iostream>
 
 int main( int argc, char** argv )
