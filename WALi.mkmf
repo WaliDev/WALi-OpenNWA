@@ -32,6 +32,7 @@
             <item Name='KeyPairSource' RelativePath='wali/KeyPairSource.cpp' />
             <!-- util -->
             <item Name='StringUtils' RelativePath='wali/util/StringUtils.cpp' />
+            <item Name='ParseArgv' RelativePath='wali/util/ParseArgv.cpp' />
             <!-- WFA -->
             <item Name='WFA' RelativePath='wali/wfa/WFA.cpp' />
             <item Name='State' RelativePath='wali/wfa/State.cpp' />
