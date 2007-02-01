@@ -33,6 +33,7 @@
             <!-- util -->
             <item Name='StringUtils' RelativePath='wali/util/StringUtils.cpp' />
             <item Name='ParseArgv' RelativePath='wali/util/ParseArgv.cpp' />
+            <item Name='Timer' RelativePath='wali/util/Timer.cpp' />
             <!-- WFA -->
             <item Name='WFA' RelativePath='wali/wfa/WFA.cpp' />
             <item Name='State' RelativePath='wali/wfa/State.cpp' />
