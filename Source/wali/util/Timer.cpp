@@ -32,7 +32,7 @@ namespace wali {
             if (measureAndReport)
             {
                 const double difference = elapsed();
-                os << task << ": " << std::setprecision(2) << difference << " secs\n";
+                os << task << ": " << difference << " secs\n";
             }
         }
 
