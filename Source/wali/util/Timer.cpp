@@ -14,38 +14,33 @@ namespace wali {
         {
         }
 
-        double Timer::elapsed() const
-        {
-            if (measureAndReport)
-            {
-                const timeval end = now();
-                return
-                    (end.tv_sec  - start.tv_sec) +
-                    (end.tv_usec - start.tv_usec) / 1e6;
-            }
-            else
-                return 0;
-        }
-
         Timer::~Timer()
         {
             if (measureAndReport)
-            {
-                const double difference = elapsed();
-                os << task << ": " << difference << " secs\n";
-            }
+                print( os );
         }
 
-
-        timeval Timer::now()
+        double Timer::elapsed() const
         {
-            timeval result;
+            const mytime end = now();
+            clock_t t = (end.t - start.t);
+            return t * 1.0 / (double)(CLOCKS_PER_SEC);
+        }
 
-            if (measureAndReport)
-                gettimeofday(&result, 0);
-            else
-                result.tv_sec = result.tv_usec = 0;
+        std::ostream& Timer::print( std::ostream& out ) const
+        {
+            const double difference = elapsed();
+            os << task << ": " << difference << " secs\n";
+        }
 
+        std::ostream& Timer::printTime(std::ostream& out, clock_t clk ) {
+            return out << (clk * 1.0 / (double)(CLOCKS_PER_SEC));
+        }
+
+        mytime Timer::now()
+        {
+            mytime result;
+            result.t = clock();
             return result;
         }
 

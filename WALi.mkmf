@@ -53,6 +53,13 @@
             <item Name='EWPDS' RelativePath='wali/wpds/ewpds/EWPDS.cpp' />
             <item Name='ERule' RelativePath='wali/wpds/ewpds/ERule.cpp' />
             <item Name='MergeFunction' RelativePath='wali/wpds/ewpds/MergeFunction.cpp' />
+            <!-- FWPDS -->
+            <item Name='Graph' RelativePath='wali/wpds/fwpds/Graph.cpp' />
+            <item Name='InterGraph' RelativePath='wali/wpds/fwpds/InterGraph.cpp' />
+            <item Name='IntraGraph' RelativePath='wali/wpds/fwpds/IntraGraph.cpp' />
+            <item Name='LinkEval' RelativePath='wali/wpds/fwpds/LinkEval.cpp' />
+            <item Name='RegExp' RelativePath='wali/wpds/fwpds/RegExp.cpp' />
+            <item Name='SummaryGraph' RelativePath='wali/wpds/fwpds/SummaryGraph.cpp' />
             <!-- Witness -->
             <item Name='Witness' RelativePath='wali/witness/Witness.cpp' />
             <item Name='WitnessExtend' RelativePath='wali/witness/WitnessExtend.cpp' />
@@ -113,6 +120,13 @@
             <item Name='EWPDS' RelativePath='wali/wpds/ewpds/EWPDS.cpp' />
             <item Name='ERule' RelativePath='wali/wpds/ewpds/ERule.cpp' />
             <item Name='MergeFunction' RelativePath='wali/wpds/ewpds/MergeFunction.cpp' />
+            <!-- FWPDS -->
+            <item Name='Graph' RelativePath='wali/wpds/fwpds/Graph.cpp' />
+            <item Name='InterGraph' RelativePath='wali/wpds/fwpds/InterGraph.cpp' />
+            <item Name='IntraGraph' RelativePath='wali/wpds/fwpds/IntraGraph.cpp' />
+            <item Name='LinkEval' RelativePath='wali/wpds/fwpds/LinkEval.cpp' />
+            <item Name='RegExp' RelativePath='wali/wpds/fwpds/RegExp.cpp' />
+            <item Name='SummaryGraph' RelativePath='wali/wpds/fwpds/SummaryGraph.cpp' />
             <!-- Witness -->
             <item Name='Witness' RelativePath='wali/witness/Witness.cpp' />
             <item Name='WitnessExtend' RelativePath='wali/witness/WitnessExtend.cpp' />

@@ -355,6 +355,16 @@ namespace wali
                  */
                 const State* getState( Key name ) const;
 
+                /*!
+                 * @return pointer to underlying State object or NULL if
+                 * no such state exists.
+                 *
+                 * @param name the key for this State
+                 * @note This may throw an exception in the future
+                 *
+                 */
+                State * getState( Key name );
+
                 const std::set< Key >& getStates() const;
 
                 const std::set< Key >& getFinalStates() const;
@@ -373,18 +383,6 @@ namespace wali
                 /*! @brief fold tnew into told
                  */
                 virtual void combineTrans( Trans * told, Trans * tnew );
-
-                /*!
-                 * WFA::getState returns a reference to the State named
-                 * by the parameter name. If not such State exists a NULL
-                 * pointer is returned.
-                 *
-                 * @param name the key for this State
-                 * @return pointer to the State named by param name
-                 *
-                 */
-
-                State * getState( Key name );
 
                 /*!
                  * setupFixpoint clears each states markable flag and sets

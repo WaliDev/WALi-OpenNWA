@@ -149,6 +149,11 @@ namespace wali
             //!
             virtual std::pair<sem_elem_t,sem_elem_t> delta( SemElem * se );
 
+            //!
+            //! Perform the star operation (returns this^\inf)
+            //!
+            sem_elem_t star();
+
             //! Wrapper method for extend that will remove the ref_ptr
             //! to make the call to the user's code. This is just a 
             //! nice "typesafe macro" b/c sem_elem_t is used by WPDS
