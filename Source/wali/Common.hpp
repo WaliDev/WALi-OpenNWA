@@ -13,8 +13,8 @@
 namespace wali
 {
     typedef Key wali_key_t;
-    static const wali_key_t WALI_EPSILON = 0;
-    static const wali_key_t WALI_BAD_KEY = UINT_MAX;
+    static const Key WALI_EPSILON = 0;
+    static const Key WALI_BAD_KEY = UINT_MAX;
 
 } // namespace wali
 

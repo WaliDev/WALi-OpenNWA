@@ -82,41 +82,41 @@ namespace wali
             }
 
             bool EWPDS::add_rule(
-                    wali_key_t from_state,
-                    wali_key_t from_stack,
-                    wali_key_t to_state,
+                    Key from_state,
+                    Key from_stack,
+                    Key to_state,
                     sem_elem_t se )
             {
                 return add_rule(from_state,from_stack,to_state,WALI_EPSILON,WALI_EPSILON,se,(merge_fn_t)(NULL) );
             }
 
             bool EWPDS::add_rule(
-                    wali_key_t from_state,
-                    wali_key_t from_stack,
-                    wali_key_t to_state,
-                    wali_key_t to_stack1,
+                    Key from_state,
+                    Key from_stack,
+                    Key to_state,
+                    Key to_stack1,
                     sem_elem_t se )
             {
                 return add_rule(from_state,from_stack,to_state,to_stack1,WALI_EPSILON,se,(merge_fn_t)(NULL) );
             }
 
             bool EWPDS::add_rule(
-                    wali_key_t from_state,
-                    wali_key_t from_stack,
-                    wali_key_t to_state,
-                    wali_key_t to_stack1,
-                    wali_key_t to_stack2,
+                    Key from_state,
+                    Key from_stack,
+                    Key to_state,
+                    Key to_stack1,
+                    Key to_stack2,
                     sem_elem_t se )
             {
                 return add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se,(merge_fn_t)(NULL) );
             }
 
             bool EWPDS::add_rule(
-                    wali_key_t from_state,
-                    wali_key_t from_stack,
-                    wali_key_t to_state,
-                    wali_key_t to_stack1,
-                    wali_key_t to_stack2,
+                    Key from_state,
+                    Key from_stack,
+                    Key to_state,
+                    Key to_stack1,
+                    Key to_stack2,
                     sem_elem_t se,
                     merge_fn_t mf )
             {
@@ -163,7 +163,7 @@ namespace wali
             bool EWPDS::make_rule(
                     Config * f,
                     Config * t,
-                    wali_key_t stk2,
+                    Key stk2,
                     sem_elem_t se,
                     merge_fn_t mf,
                     rule_t & r )
@@ -212,13 +212,13 @@ namespace wali
                 return rb;
             }
 
-            bool EWPDS::is_pds_state(wali_key_t k) const {
+            bool EWPDS::is_pds_state(Key k) const {
                 if(pds_states.find(k) == pds_states.end())
                     return false;
                 return true;
             }
 
-            rule_t EWPDS::lookup_rule(wali_key_t to_state, wali_key_t to_stack1, wali_key_t to_stack2) const {
+            rule_t EWPDS::lookup_rule(Key to_state, Key to_stack1, Key to_stack2) const {
                 merge_rule_hash_t::const_iterator rhash_it = merge_rule_hash.find(KeyTriple(to_state,to_stack1,to_stack2));
                 if(rhash_it == merge_rule_hash.end()) {
                     return NULL;
@@ -350,8 +350,8 @@ namespace wali
                     erule_t er = (ERule *)(r.get_ptr());
                     wrule_trans = er->merge_fn()->apply_f(delta->one(), delta);
                 }
-                wali_key_t fstate = r->from()->state();
-                wali_key_t fstack = r->from()->stack();
+                Key fstate = r->from()->state();
+                Key fstack = r->from()->stack();
 
                 if( r->is_rule2() ) {
                     KeyPair kp( t->to(),r->stack2() );
@@ -388,7 +388,7 @@ namespace wali
                     for( ; rlsit != ls.end() ; rlsit++ )
                     {
                         erule_t r = (ERule *)((*rlsit).get_ptr());
-                        wali_key_t gstate = WPDS::gen_state( r->to_state(),r->to_stack1() );
+                        Key gstate = WPDS::gen_state( r->to_state(),r->to_stack1() );
                         fa.addState( gstate,r->extended_weight()->zero() );
                     }
                 }
@@ -464,8 +464,8 @@ namespace wali
                     )
             {
                 erule_t er = (ERule *)(r.get_ptr());
-                wali_key_t rtstate = r->to_state();
-                wali_key_t rtstack = r->to_stack1();
+                Key rtstate = r->to_state();
+                Key rtstack = r->to_stack1();
 
                 sem_elem_t wrule_trans = delta->extend( er->extended_weight() );
 
@@ -477,7 +477,7 @@ namespace wali
                     // Is a rule 2 so we must generate a state
                     // and create 2 new transitions
                     // TODO: implement gen_state
-                    wali_key_t gstate = gen_state( rtstate,rtstack );
+                    Key gstate = gen_state( rtstate,rtstack );
 
                     Trans * tprime = update_prime( gstate, r->to_stack2(), t->to(), wrule_trans  );
 
@@ -499,9 +499,9 @@ namespace wali
                         if( epsit != fa.eps_map.end() )
                         {
                             // tprime stack key
-                            wali_key_t tpstk = tprime->stack();
+                            Key tpstk = tprime->stack();
                             // tprime to key
-                            wali_key_t tpto = tprime->to();
+                            Key tpto = tprime->to();
                             // get epsilon list ref
                             TransSet& transSet = epsit->second;
                             // iterate

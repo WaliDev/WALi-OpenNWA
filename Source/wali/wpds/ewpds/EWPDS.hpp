@@ -55,12 +55,12 @@ namespace wali
                      * @return true if rule existed
                      *
                      * @see sem_elem_t
-                     * @see wali_key_t
+                     * @see wali::Key
                      */
                     virtual bool add_rule(
-                            wali_key_t from_state,
-                            wali_key_t from_stack,
-                            wali_key_t to_state,
+                            wali::Key from_state,
+                            wali::Key from_stack,
+                            wali::Key to_state,
                             sem_elem_t se );
 
                     /*! @brief create rule with one r.h.s. stack symbol
@@ -68,13 +68,13 @@ namespace wali
                      * @return true if rule existed
                      *
                      * @see sem_elem_t
-                     * @see wali_key_t
+                     * @see wali::Key
                      */
                     virtual bool add_rule(
-                            wali_key_t from_state,
-                            wali_key_t from_stack,
-                            wali_key_t to_state,
-                            wali_key_t to_stack1,
+                            wali::Key from_state,
+                            wali::Key from_stack,
+                            wali::Key to_state,
+                            wali::Key to_stack1,
                             sem_elem_t se );
 
                     /*! @brief create rule with two r.h.s. stack symbols
@@ -82,14 +82,14 @@ namespace wali
                      * @return true if rule existed
                      *
                      * @see sem_elem_t
-                     * @see wali_key_t
+                     * @see wali::Key
                      */
                     virtual bool add_rule(
-                            wali_key_t from_state,
-                            wali_key_t from_stack,
-                            wali_key_t to_state,
-                            wali_key_t to_stack1,
-                            wali_key_t to_stack2,
+                            wali::Key from_state,
+                            wali::Key from_stack,
+                            wali::Key to_state,
+                            wali::Key to_stack1,
+                            wali::Key to_stack2,
                             sem_elem_t se);
 
                     /*! @brief create rule with two r.h.s. stack symbols
@@ -98,14 +98,14 @@ namespace wali
                      *
                      * @see sem_elem_t
                      * @see merge_fn_t
-                     * @see wali_key_t
+                     * @see wali::Key
                      */
                     virtual bool add_rule(
-                            wali_key_t from_state,
-                            wali_key_t from_stack,
-                            wali_key_t to_state,
-                            wali_key_t to_stack1,
-                            wali_key_t to_stack2,
+                            wali::Key from_state,
+                            wali::Key from_stack,
+                            wali::Key to_state,
+                            wali::Key to_stack1,
+                            wali::Key to_stack2,
                             sem_elem_t se,
                             merge_fn_t mf);
 
@@ -155,8 +155,8 @@ namespace wali
                      */
                     virtual void operator()( wali::wfa::Trans* t );
 
-                    bool is_pds_state(wali_key_t k) const;
-                    rule_t lookup_rule(wali_key_t to_state, wali_key_t to_stack1, wali_key_t to_stack2) const;
+                    bool is_pds_state(wali::Key k) const;
+                    rule_t lookup_rule(wali::Key to_state, wali::Key to_stack1, wali::Key to_stack2) const;
                 protected:
 
                     /*!
@@ -183,13 +183,13 @@ namespace wali
                     virtual bool make_rule(
                             Config * f,
                             Config * t,
-                            wali_key_t stk2,
+                            wali::Key stk2,
                             sem_elem_t se,
                             merge_fn_t mf,
                             rule_t & r );
 
                 private:
-                    std::set<wali_key_t> pds_states; // set of PDS states
+                    std::set<wali::Key> pds_states; // set of PDS states
                     merge_rule_hash_t merge_rule_hash; // FIXME: verify correct usage of HashMap
 
             }; // class EWPDS

@@ -60,6 +60,7 @@
             <item Name='LinkEval' RelativePath='wali/wpds/fwpds/LinkEval.cpp' />
             <item Name='RegExp' RelativePath='wali/wpds/fwpds/RegExp.cpp' />
             <item Name='SummaryGraph' RelativePath='wali/wpds/fwpds/SummaryGraph.cpp' />
+            <item Name='FWPDS' RelativePath='wali/wpds/fwpds/FWPDS.cpp' />
             <!-- Witness -->
             <item Name='Witness' RelativePath='wali/witness/Witness.cpp' />
             <item Name='WitnessExtend' RelativePath='wali/witness/WitnessExtend.cpp' />

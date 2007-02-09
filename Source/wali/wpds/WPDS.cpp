@@ -96,30 +96,30 @@ namespace wali
         }
 
         bool WPDS::add_rule(
-                wali_key_t from_state,
-                wali_key_t from_stack,
-                wali_key_t to_state,
+                Key from_state,
+                Key from_stack,
+                Key to_state,
                 sem_elem_t se )
         {
             return add_rule(from_state,from_stack,to_state,WALI_EPSILON,WALI_EPSILON,se );
         }
 
         bool WPDS::add_rule(
-                wali_key_t from_state,
-                wali_key_t from_stack,
-                wali_key_t to_state,
-                wali_key_t to_stack1,
+                Key from_state,
+                Key from_stack,
+                Key to_state,
+                Key to_stack1,
                 sem_elem_t se )
         {
             return add_rule(from_state,from_stack,to_state,to_stack1,WALI_EPSILON,se );
         }
 
         bool WPDS::add_rule(
-                wali_key_t from_state,
-                wali_key_t from_stack,
-                wali_key_t to_state,
-                wali_key_t to_stack1,
-                wali_key_t to_stack2,
+                Key from_state,
+                Key from_stack,
+                Key to_state,
+                Key to_stack1,
+                Key to_stack2,
                 sem_elem_t se )
         {
             rule_t r;
@@ -355,7 +355,7 @@ namespace wali
                 for( ; rlsit != ls.end() ; rlsit++ )
                 {
                     rule_t & r = *rlsit;
-                    wali_key_t gstate = gen_state( r->to_state(),r->to_stack1() );
+                    Key gstate = gen_state( r->to_state(),r->to_stack1() );
                     fa.addState( gstate,r->weight()->zero() );
                 }
 
@@ -420,8 +420,8 @@ namespace wali
                 sem_elem_t delta
                 )
         {
-            wali_key_t rtstate = r->to_state();
-            wali_key_t rtstack = r->to_stack1();
+            Key rtstate = r->to_state();
+            Key rtstack = r->to_stack1();
             sem_elem_t wrule_trans = delta->extend( r->se );
 
             if( r->to_stack2() == WALI_EPSILON ) {
@@ -431,7 +431,7 @@ namespace wali
 
                 // Is a rule 2 so we must generate a state
                 // and create 2 new transitions
-                wali_key_t gstate = gen_state( rtstate,rtstack );
+                Key gstate = gen_state( rtstate,rtstack );
 
                 Trans * tprime = update_prime( gstate, r->to_stack2(), t->to(), wrule_trans );
 
@@ -452,9 +452,9 @@ namespace wali
                     if( epsit != fa.eps_map.end() )
                     {
                         // tprime stack key
-                        wali_key_t tpstk = tprime->stack();
+                        Key tpstk = tprime->stack();
                         // tprime to key
-                        wali_key_t tpto = tprime->to();
+                        Key tpto = tprime->to();
                         // get epsilon list ref
                         TransSet& transSet = epsit->second;
                         // iterate
@@ -476,7 +476,7 @@ namespace wali
         /*!
          * Generate's a key representing the entry point to a procedure
          */
-        wali_key_t WPDS::gen_state( wali_key_t state, wali_key_t stack )
+        Key WPDS::gen_state( Key state, Key stack )
         {
             return getKey( state,stack );
         }
@@ -528,11 +528,11 @@ namespace wali
         // the bool and a rule_t which contains a pointer to the real Rule.
         // This allows for subclasses to perform postprocessing.
         bool WPDS::add_rule(
-                wali_key_t from_state,
-                wali_key_t from_stack,
-                wali_key_t to_state,
-                wali_key_t to_stack1,
-                wali_key_t to_stack2,
+                Key from_state,
+                Key from_stack,
+                Key to_state,
+                Key to_stack1,
+                Key to_stack2,
                 sem_elem_t se,
                 rule_t& r
                 )
@@ -575,7 +575,7 @@ namespace wali
         //   in.for_each( *this );
         //}
 
-        Config * WPDS::make_config( wali_key_t state, wali_key_t stack )
+        Config * WPDS::make_config( Key state, Key stack )
         {
             Config *cf = find_config( state,stack );
             if( 0 == cf ) {
@@ -598,7 +598,7 @@ namespace wali
         bool WPDS::make_rule(
                 Config *f,
                 Config *t,
-                wali_key_t stk2,
+                Key stk2,
                 sem_elem_t se,
                 rule_t& r )
         {
@@ -639,7 +639,7 @@ namespace wali
             return rb;
         }
 
-        Config * WPDS::find_config( wali_key_t state, wali_key_t stack )
+        Config * WPDS::find_config( Key state, Key stack )
         {
             Config *cf = 0;
             KeyPair kp(state,stack);
@@ -674,9 +674,9 @@ namespace wali
          *
          */
         void WPDS::update(
-                wali_key_t from,
-                wali_key_t stack,
-                wali_key_t to,
+                Key from,
+                Key stack,
+                Key to,
                 sem_elem_t se,
                 Config * cfg )
         {
@@ -696,9 +696,9 @@ namespace wali
          * @return generated transition
          */
         LinkedTrans * WPDS::update_prime(
-                wali_key_t from,
-                wali_key_t stack,
-                wali_key_t to,
+                Key from,
+                Key stack,
+                Key to,
                 sem_elem_t se )
         {
             LinkedTrans * t = new LinkedTrans(from,stack,to,se,0);
