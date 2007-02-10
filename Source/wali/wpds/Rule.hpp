@@ -28,6 +28,10 @@ namespace wali
         {
             class EWPDS;
         }
+        namespace fwpds
+        {
+            class FWPDS;
+        }
 
         /*! @class Rule
          *
@@ -44,6 +48,7 @@ namespace wali
             public:
                 friend class WPDS;
                 friend class ewpds::EWPDS;
+                friend class fwpds::FWPDS;
                 friend class RuleWitness;
 
                 static const std::string XMLTag;

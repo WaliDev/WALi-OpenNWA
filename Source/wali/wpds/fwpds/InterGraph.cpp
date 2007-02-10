@@ -184,7 +184,7 @@ namespace wali {
                 return out;
             }
 
-            void InterGraph::addEdge(Transition src, Transition tgt, SemElem *se) {
+            void InterGraph::addEdge(Transition src, Transition tgt, wali::sem_elem_t se) {
                 int eno = intra_edgeno(src,tgt);
                 if(eno != -1) { // edge already present
                     intra_edges[eno].weight = intra_edges[eno].weight->combine(se);
@@ -199,7 +199,7 @@ namespace wali {
                 nodes[t].incoming.push_back(e);
             }
 
-            void InterGraph::addEdge(Transition src1, Transition src2, Transition tgt, SemElem *se) {
+            void InterGraph::addEdge(Transition src1, Transition src2, Transition tgt, wali::sem_elem_t se) {
                 int eno = inter_edgeno(src1,src2,tgt);
                 if(eno != -1) { // edge already present
                     inter_edges[eno].weight = inter_edges[eno].weight->combine(se);
@@ -233,7 +233,7 @@ namespace wali {
                 call_edges.push_back(call_edge_t(nodeno(src1),nodeno(src2)));
             }
 
-            void InterGraph::setSource(Transition t, SemElem *se) {
+            void InterGraph::setSource(Transition t, wali::sem_elem_t se) {
                 int n = nodeno(t);
                 nodes[n].type = promote_type(nodes[n].type, InterSource);
                 nodes[n].weight = se;

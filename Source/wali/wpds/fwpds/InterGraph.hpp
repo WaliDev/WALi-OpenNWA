@@ -140,7 +140,7 @@ namespace wali {
                     }
 
                 public:
-                    InterGraph(SemElem *s, bool e, bool pre) {
+                    InterGraph(wali::sem_elem_t s, bool e, bool pre) {
                         sem = s;
                         intra_graph_uf = NULL;
                         running_ewpds = e;
@@ -148,13 +148,13 @@ namespace wali {
                         max_scc_computed = 0;
                     }
                     ~InterGraph();
-                    void addEdge(Transition src, Transition tgt, SemElem *se);
-                    void addEdge(Transition src1, Transition src2, Transition tgt, SemElem *se);
+                    void addEdge(Transition src, Transition tgt, wali::sem_elem_t se);
+                    void addEdge(Transition src1, Transition src2, Transition tgt, wali::sem_elem_t se);
                     void addEdge(Transition src1, Transition src2, Transition tgt, ewpds::MergeFn *mf);
 
                     void addCallEdge(Transition src1, Transition src2);
 
-                    void setSource(Transition t, SemElem *se);
+                    void setSource(Transition t, wali::sem_elem_t se);
 
                     void setupInterSolution(std::list<Transition> *wt_required = NULL);
 
