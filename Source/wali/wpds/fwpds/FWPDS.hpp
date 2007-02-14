@@ -30,9 +30,11 @@ namespace wali {
 
                     virtual void poststar( ::wali::wfa::WFA& input, ::wali::wfa::WFA& fa );
 
-                    virtual void poststarComputeFixpoint( ::wali::wfa::WFA& fa );
+                    virtual InterGraph* computeInterGraph( wfa::WFA& input, wfa::WFA& output );
 
                     virtual void post(LinkedTrans* t, ::wali::wfa::WFA& fa, InterGraph& gr );
+
+                    void poststarComputerFixpoint( wfa::WFA& fa );
             }; // class FWPDS
 
         } // namespace fwpds

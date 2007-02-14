@@ -42,13 +42,14 @@ FWPDS::FWPDS( Wrapper * wrapper , Worklist<wfa::Trans> * worklist ) :
 {
 }
 
-void
-FWPDS::poststar( wfa::WFA& input, wfa::WFA& fa )
+struct FWPDSCopyBackFunctor : public wali::wfa::TransFunctor
 {
-    poststarSetupFixpoint(input,fa);
-    poststarComputeFixpoint(fa);
-    currentOutputWFA=0;
-}
+    InterGraph& gr;
+    FWPDSCopyBackFunctor(InterGraph& gr) : gr(gr) {}
+    virtual void operator()( wfa::Trans* t ) {
+        t->setWeight( gr.get_weight( Transition(t->from(),t->stack(),t->to()) ) );
+    }
+};
 
 struct FWPDSSourceFunctor : public wali::wfa::ConstTransFunctor
 {
@@ -68,6 +69,14 @@ struct FWPDSCompareFunctor : public wali::wfa::ConstTransFunctor
     }
 
     virtual void operator()( const wfa::Trans* t ) {
+        sem_elem_t wt1 = gr.get_weight(Transition(t->from(), t->stack(), t->to()));
+        sem_elem_t wt2 = t->weight();
+        if( !wt2->equal(wt1) ) {
+            iseq = false;
+            wt1->print(std::cerr) << "\n";
+            t->print(std::cerr) << "\n";
+            std::cerr << "-----------------------------\n";
+        }
     }
 
     std::ostream& print( std::ostream& out ) {
@@ -79,32 +88,68 @@ struct FWPDSCompareFunctor : public wali::wfa::ConstTransFunctor
     }
 };
 
+#define CHECK_RESULTS 1
+
 void
-FWPDS::poststarComputeFixpoint( wfa::WFA& fa )
+FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
 {
-    LinkedTrans *t;
+    InterGraph* gr = computeInterGraph(input,output);
+    {
+        FWPDSCopyBackFunctor copier( *gr );
+        util::Timer t("InterGraph -> WFA");
+        output.for_each(copier);
+    }
+    if( CHECK_RESULTS ) {
+        util::Timer t("WPDS::poststar(in,out)");
+        wfa::WFA tmpInput(input);
+        wfa::WFA tmpOutput;
+        WPDS::poststarSetupFixpoint(tmpInput,tmpOutput);
+        WPDS::poststarComputeFixpoint(tmpOutput);
+        {
+            util::Timer timer("Compare");
+            FWPDSCompareFunctor comp(*gr);
+            tmpOutput.for_each(comp);
+            comp.print(std::cout);
+        }
+    }
+    delete gr;
+}
+
+InterGraph*
+FWPDS::computeInterGraph( wfa::WFA& input, wfa::WFA& output )
+{
+    this->currentOutputWFA=0;
+    util::Timer timer("FWPDS::poststar(in,out) -> InterGraph*");
+    this->poststarSetupFixpoint(input,output);
+    LinkedTrans *t = 0;
+    InterGraph* gr = 0;
     if( get_from_worklist(t) ) {
         sem_elem_t se = t->weight();
         InterGraph* gr = new InterGraph(se,false,false);
         FWPDSSourceFunctor sources(*gr);
-        fa.for_each(sources);
-        {
-            util::Timer timer("WPDS");
+        output.for_each(sources);
 
+        { // reachability
+            util::Timer timer("FWPDS reachability");
             do {
-                post(t,fa, *gr);
+                post(t,output, *gr);
             } while( get_from_worklist(t) );
         }
-        {
-            util::Timer timer("FWPDS");
+
+        { // setup and solve
+            util::Timer timer("FWPDS - setup and solve");
             gr->setupInterSolution();
             gr->update_all_weights();
-            // TODO
-            //FWPDSCompareTransActionFunctor<T> comp(gr);
-            //ca_out.for_each(comp);
-            //comp.print(cout);
         }
     }
+    return gr;
+}
+
+void
+FWPDS::poststarComputerFixpoint( wfa::WFA& fa )
+{
+    std::cerr << "[ERROR] FWPDS::poststarComputerFixpoint called?\n";
+    assert(0);
 }
 
 void
