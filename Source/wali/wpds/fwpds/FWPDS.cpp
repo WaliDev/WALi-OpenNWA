@@ -47,7 +47,7 @@ struct FWPDSCopyBackFunctor : public wali::wfa::TransFunctor
     InterGraph& gr;
     FWPDSCopyBackFunctor(InterGraph& gr) : gr(gr) {}
     virtual void operator()( wfa::Trans* t ) {
-        t->setWeight( gr.get_weight( Transition(t->from(),t->stack(),t->to()) ) );
+        t->setWeight( gr.get_weight( Transition(*t) ) );
     }
 };
 
@@ -56,7 +56,7 @@ struct FWPDSSourceFunctor : public wali::wfa::ConstTransFunctor
     InterGraph & gr;
     FWPDSSourceFunctor( InterGraph & p ) : gr(p) {}
     virtual void operator()( const wfa::Trans* t ) {
-        gr.setSource(Transition(t->from(),t->stack(),t->to()),t->weight());
+        gr.setSource(Transition(*t),t->weight());
     }
 };
 
@@ -94,12 +94,14 @@ void
 FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
 {
     InterGraph* gr = computeInterGraph(input,output);
+    assert( gr != 0 );
     {
         FWPDSCopyBackFunctor copier( *gr );
         util::Timer t("InterGraph -> WFA");
         output.for_each(copier);
     }
     if( CHECK_RESULTS ) {
+        std::cout << "[FWPDS] verifying results.\n";
         util::Timer t("WPDS::poststar(in,out)");
         wfa::WFA tmpInput(input);
         wfa::WFA tmpOutput;
@@ -108,6 +110,8 @@ FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
         {
             util::Timer timer("Compare");
             FWPDSCompareFunctor comp(*gr);
+            output.print( std::cout << "\nFWPDS OUTPUT:\n\n" );
+            tmpOutput.print( std::cout << "\nWPDS OUTPUT:\n\n" );
             tmpOutput.for_each(comp);
             comp.print(std::cout);
         }
@@ -118,20 +122,20 @@ FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
 InterGraph*
 FWPDS::computeInterGraph( wfa::WFA& input, wfa::WFA& output )
 {
-    this->currentOutputWFA=0;
     util::Timer timer("FWPDS::poststar(in,out) -> InterGraph*");
     this->poststarSetupFixpoint(input,output);
     LinkedTrans *t = 0;
     InterGraph* gr = 0;
     if( get_from_worklist(t) ) {
         sem_elem_t se = t->weight();
-        InterGraph* gr = new InterGraph(se,false,false);
+        gr = new InterGraph(se,false,false);
         FWPDSSourceFunctor sources(*gr);
         output.for_each(sources);
 
         { // reachability
             util::Timer timer("FWPDS reachability");
             do {
+                t->print( std::cout << "Popped t => " ) << "\n";
                 post(t,output, *gr);
             } while( get_from_worklist(t) );
         }
@@ -165,7 +169,10 @@ FWPDS::post(LinkedTrans* t, wfa::WFA& fa, InterGraph& gr )
 
     // Reset delta of t to zero to signify completion
     // of work for that delta
-    //t->delta = dnew->zero();
+    //
+    // WALi uses the delta to check for modification so 
+    // this step is important
+    t->setDelta(wghtOne->zero());
 
     // For each forward rule of config
     // Apply rule to create new transition
@@ -174,14 +181,12 @@ FWPDS::post(LinkedTrans* t, wfa::WFA& fa, InterGraph& gr )
         Config::iterator fwit = config->begin();
         for( ; fwit != config->end() ; fwit++ ) {
             rule_t & r = *fwit;
-
-            // Push and step rules use fromTrans
-            Transition fromTrans(t->from(),t->stack(),t->to());
+            r->print( std::cout << "\tMatched r => " ) << "\n";
 
             // Step rule
             if( r->to_stack2() == WALI_EPSILON ) {
                 update(r->to_state(), r->to_stack1(),t->to(),wghtOne,r->to() );
-                gr.addEdge(fromTrans,
+                gr.addEdge(Transition(*t),
                         Transition(r->to_state(),r->to_stack1(),t->to()),
                         r->weight());
             }
@@ -193,12 +198,14 @@ FWPDS::post(LinkedTrans* t, wfa::WFA& fa, InterGraph& gr )
                 wfa::Trans * tprime = update_prime( gstate, r->to_stack2(), t->to(), wghtOne );
                 wfa::State* state = fa.getState(gstate);
 
+                // add (p,g',(p,g'))
+                update( r->to_state(), r->to_stack1(), gstate, wghtOne, r->to() );
                 // add source
                 gr.setSource(Transition(r->to_state(),r->to_stack1(), gstate), wghtOne);
                 // add edge (p,g,q) -> (p,g',(p,g'))
-                gr.addCallEdge(fromTrans,Transition(r->to_state(),r->to_stack1(), gstate));
+                gr.addCallEdge(Transition(*t),Transition(r->to_state(),r->to_stack1(), gstate));
                 // add edge (p,g,q) -> ((p,g'),rstk2,q)
-                gr.addEdge(fromTrans,
+                gr.addEdge(Transition(*t),
                         Transition(gstate, r->to_stack2(),t->to_state()),
                         r->weight());
 
@@ -220,8 +227,8 @@ FWPDS::post(LinkedTrans* t, wfa::WFA& fa, InterGraph& gr )
                             wpds::Config * config = make_config( teps->from(),tpstk );
                             //sem_elem_t epsW = tprime->getDelta()->extend( teps->weight() );
                             update(teps->from(),tpstk, tpto, /*epsW*/wghtOne, config );
-                            gr.addEdge(Transition(tprime->from(), tprime->stack(), tprime->to()),
-                                        Transition(teps->from(), teps->stack(), teps->to()),
+                            gr.addEdge(Transition(*tprime),
+                                        Transition(*teps),
                                         Transition(teps->from(), tprime->stack(), tprime->to()),
                                         wghtOne);
 
@@ -246,6 +253,11 @@ FWPDS::post(LinkedTrans* t, wfa::WFA& fa, InterGraph& gr )
                     , wghtOne
                     , config
                   );
+            gr.addEdge(Transition(*t),
+                    Transition(*tprime),
+                    Transition(t->from(),tprime->stack(),tprime->to()),
+                    wghtOne);
+
         }
     }
 }

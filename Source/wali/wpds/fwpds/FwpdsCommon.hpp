@@ -1,6 +1,7 @@
 #ifndef wali_wpds_fwpds_FWPDS_COMMON_H_
 #define wali_wpds_fwpds_FWPDS_COMMON_H_
 
+#include "wali/wfa/Trans.hpp"
 namespace wali {
     namespace wpds {
         namespace fwpds {
@@ -10,6 +11,7 @@ namespace wali {
                 Transition() : src(0), tgt(0), stack(0) {}
                 Transition(int s, int st, int t) : src(s), tgt(t), stack(st) {}
                 Transition(const Transition &t) : src(t.src), tgt(t.tgt), stack(t.stack) {}
+                Transition(const wali::wfa::Trans& t ) : src(t.from()), tgt(t.to()), stack(t.stack()) {}
                 bool operator == (const Transition &t) {
                     return (src == t.src && tgt == t.tgt && stack == t.stack);
                 }    

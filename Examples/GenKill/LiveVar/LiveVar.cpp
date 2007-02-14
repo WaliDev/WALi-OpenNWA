@@ -5,6 +5,7 @@ using std::string;
 #include "VarSet.hpp"
 #include "GenKillTransformer_T.hpp"
 #include "wali/wpds/WPDS.hpp"
+#include "wali/wpds/fwpds/FWPDS.hpp"
 #include "wali/wfa/WFA.hpp"
 
 /*
@@ -51,7 +52,8 @@ void print_output( const wali::wfa::Trans& goal )
 
 int main() {
 
-    wali::wpds::WPDS wpds;
+    //wali::wpds::WPDS wpds;
+    wali::wpds::fwpds::FWPDS wpds;
     wali::wfa::WFA ca0;
     std::set< wali::Key > R;
     std::set< wali::Key > B;
@@ -159,7 +161,8 @@ int main() {
     ca2.addFinalState( accepting_state );
     ca2.print( std::cout << "Before ...\n" ) << std::endl;
 
-    wali::wfa::WFA ca3 = wpds.poststar(ca2);
+    wali::wfa::WFA ca3;
+    wpds.poststar(ca2,ca3);
     ca3.print( std::cout << "After ...\n" ) << std::endl;
 
     /* PDS transitions for "consuming" the language (n12 + n17 + n6)*  */
@@ -171,33 +174,7 @@ int main() {
 
     ca3.path_summary();
     std::cout << "--- Done path_summary ---\n";
-
-#if 0
-    // for each b element of B, print (q,b,q') and its weight
-    for(std::set< wali::Key >::iterator iter = B.begin();
-            iter != B.end(); iter++ ) {
-        wali::Key b = *iter;
-        //wali::Key b = n18;
-        //wali::wfa::WFA< GenKillTransformer_T< VarSet > >::TransSetIterPair pair = ca3.match( q,b );
-        //wali::wfa::WFA< GenKillTransformer_T< VarSet > >::TransSetIter titer = pair.first;
-        wali::sem_elem_t V_b( GenKillTransformer_T< VarSet >::top() );
-        //std::cout << "BEGINNING " << key2str(b) << "---------------\n";
-        for( ; titer != pair.second; titer++ ) {
-            wali::wfa::WFA< GenKillTransformer_T< VarSet > >::catrans_t t(*titer);
-
-            //std::cout << "extending:\n\t" << ca3.state_weight(t->to_state()) << "\n\t" << t->semiring_element() << std::endl;
-
-            wpds::Semiring< GenKillTransformer_T< VarSet > >::SemiringElement tmp(
-                    s.extend( ca3.state_weight(t->to_state()),t->semiring_element() ) );
-
-            //std::cout << "combining:\n\t" << V_b << "\n\t" << tmp << std::endl;
-            V_b = V_b->combine(tmp);
-        }
-        V_b->print( std::cout << key2str(b) << ": " ) << "\n\n";
-        //std::cout << "ENDING " << key2str(b) << "---------------\n\n";
-    }
-#endif
-
+    
     return 0;
 
 } /** end of main **/

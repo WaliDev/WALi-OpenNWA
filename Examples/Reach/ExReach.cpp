@@ -23,11 +23,12 @@ fun g()
     n9: <$ g exit node $>
 
  */
-#include <wali/wpds/WPDS.hpp>
-#include <wali/wpds/Rule.hpp>
-#include <wali/wpds/Config.hpp>
-#include <wali/wfa/Trans.hpp>
-#include <wali/wfa/State.hpp>
+#include "wali/wpds/WPDS.hpp"
+#include "wali/wpds/Rule.hpp"
+#include "wali/wpds/Config.hpp"
+#include "wali/wpds/fwpds/FWPDS.hpp"
+#include "wali/wfa/Trans.hpp"
+#include "wali/wfa/State.hpp"
 #include "Reach.hpp"
 #include <string>
 #include <sstream>
@@ -35,15 +36,15 @@ fun g()
 
 void doReach()
 {
-    using wali::wali_key_t;
+    using wali::Key;
     using wali::wpds::WPDS;
     using wali::wfa::WFA;
 
     Reach* reachOne = new Reach(true);
-    WPDS myWpds;
-    wali_key_t p = wali::getKey("p");
-    wali_key_t accept = wali::getKey("accept");
-    wali_key_t n[10];
+    wali::wpds::fwpds::FWPDS myWpds;
+    Key p = wali::getKey("p");
+    Key accept = wali::getKey("accept");
+    Key n[10];
     for( int i=0 ; i < 10 ; i++ ) {
         std::stringstream ss;
         ss << "n" << i;
@@ -86,7 +87,8 @@ void doReach()
     //query.add_initial_state( p );
     //query.add_final_state( accept );
     query.print( std::cerr << "BEFORE poststar\n" ) << std::endl;
-    WFA answer = myWpds.poststar(query);
+    WFA answer;
+    myWpds.poststar(query,answer);
     answer.print( std::cerr << "\nAFTER poststar\n" ) << std::endl;
 
     // Perfor prestar query
@@ -94,35 +96,11 @@ void doReach()
     prequery.addTrans( p, n[4], accept, reachOne );
     //query.add_initial_state( p );
     //query.add_final_state( accept );
-    prequery.print( std::cerr << "BEFORE prestar\n" ) << std::endl;
-    answer = myWpds.prestar(prequery);
-    answer.print( std::cerr << "\nAFTER prestar\n" ) << std::endl;
 
-    /*
-    // Perform path summary query
-    answer.path_summary();
-    ref_ptr< Reach > pWeight = answer.state_weight( p );
-    std::cerr << "Weight on state \"p\": ";
-    pWeight->print( std::cerr ) << std::endl;
-    */
-
-
-    /*
-    // Perform reglang query
-    wpds::CA< Reach > reglang( s );
-    Reach *ignored = new Reach( true );
-
-    //manually add transitions of the regular expression
-    reglang.add( str2key("t1") , n[9] , str2key("t2") , ignored);
-    reglang.add( str2key("t2") , n[5] , str2key("t3") , ignored);
-    reglang.add_initial_state( str2key("t1") );
-    reglang.add_final_state( str2key("t3") );
-
-    // answer is the same CA from the earlier poststar example
-    ref_ptr< Reach > reglangWeight = answer.reglang_query( reglang );
-    std::cerr << "Result of reglang_query: ";
-    reglangWeight->print( std::cerr ) << std::endl;
-    */
+    // TODO - turn on once FWPDS is completed
+    //prequery.print( std::cerr << "BEFORE prestar\n" ) << std::endl;
+    //answer = myWpds.prestar(prequery);
+    //answer.print( std::cerr << "\nAFTER prestar\n" ) << std::endl;
 
 }
 
