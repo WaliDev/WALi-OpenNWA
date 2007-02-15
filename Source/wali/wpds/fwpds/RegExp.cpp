@@ -121,9 +121,9 @@ namespace wali {
                         return new RegExp(r->value->one());
                     }
                 }
-#ifdef NO_REGEXP_CACHING
+#ifndef REGEXP_CACHING
                 return new RegExp(Star, r);
-#else // NO_REGEXP_CACHING
+#else // REGEXP_CACHING
                 reg_exp_key_t rkey(Star, r);
                 reg_exp_hash_t::iterator it = reg_exp_hash.find(rkey);
                 if(it == reg_exp_hash.end()) {
@@ -134,7 +134,7 @@ namespace wali {
                 }
                 STAT(stats.hashmap_hits++);
                 return it->second;
-#endif // NO_REGEXP_CACHING
+#endif // REGEXP_CACHING
             }
 
             reg_exp_t RegExp::combine(reg_exp_t r1, reg_exp_t r2) {
@@ -145,7 +145,7 @@ namespace wali {
                 } else if(r2->type == Constant && r2->value->equal(r2->value->zero())) {
                     return r1;
                 }
-#ifdef NO_REGEXP_CACHING
+#ifndef REGEXP_CACHING
                 return new RegExp(Combine, r1, r2);
 #else
                 reg_exp_key_t rkey1(Combine, r1, r2);
@@ -166,7 +166,7 @@ namespace wali {
                 }
                 STAT(stats.hashmap_hits++);
                 return it->second;
-#endif // NO_REGEXP_CACHING
+#endif // REGEXP_CACHING
             }
 
             reg_exp_t RegExp::extend(reg_exp_t r1, reg_exp_t r2) {
@@ -184,7 +184,7 @@ namespace wali {
                 } else if(r2->type == Constant && r2->value->equal(r2->value->one())) {
                     return r1;
                 }*/
-#ifdef NO_REGEXP_CACHING
+#ifndef REGEXP_CACHING
                 return new RegExp(Extend, r1, r2);
 #else
                 reg_exp_key_t rkey(Extend, r1, r2);
@@ -197,7 +197,7 @@ namespace wali {
                 }
                 STAT(stats.hashmap_hits++);
                 return it->second;
-#endif // NO_REGEXP_CACHING
+#endif // REGEXP_CACHING
             }
 
             reg_exp_t RegExp::constant(sem_elem_t se) {
@@ -205,7 +205,7 @@ namespace wali {
                     return reg_exp_zero;
                 //if(se->equal(se->one()))
                 //    return reg_exp_one;
-#ifdef NO_REGEXP_CACHING
+#ifndef REGEXP_CACHING
                 return new RegExp(se);
 #else
                 const_reg_exp_hash_t::iterator it = const_reg_exp_hash.find(se);
@@ -215,7 +215,7 @@ namespace wali {
                     return res;
                 }
                 return it->second;
-#endif // NO_REGEXP_CACHING
+#endif // REGEXP_CACHING
             }
 
             void RegExp::init(const sem_elem_t se) {
