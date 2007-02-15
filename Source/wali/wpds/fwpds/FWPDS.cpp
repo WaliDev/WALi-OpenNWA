@@ -253,8 +253,9 @@ FWPDS::post(LinkedTrans* t, wfa::WFA& fa, InterGraph& gr )
                     , wghtOne
                     , config
                   );
-            gr.addEdge(Transition(*t),
+            gr.addEdge(
                     Transition(*tprime),
+                    Transition(*t),
                     Transition(t->from(),tprime->stack(),tprime->to()),
                     wghtOne);
 
