@@ -3,6 +3,7 @@
 #include "GenKillTransformer_T.hpp"
 #include "wali/Common.hpp"
 #include "wali/wpds/WPDS.hpp"
+#include "wali/wpds/fwpds/FWPDS.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/Trans.hpp"
 
@@ -47,7 +48,7 @@ int main()
 {
     using std::cout;
     using std::endl;
-    wali::wpds::WPDS pds;
+    wali::wpds::fwpds::FWPDS pds;
     wali::wpds::WPDS readout;
     std::set< wali::Key > R;
     std::set< wali::Key > B;
@@ -140,7 +141,8 @@ int main()
     ca1.addTrans( q, e_main, accepting_state, GenKillTransformer_T< VarSet >::id());
     ca1.addFinalState( accepting_state );
     ca1.print( std::cout << "before\n" ) << std::endl;
-    wali::wfa::WFA ca3 = pds.poststar(ca1);
+    wali::wfa::WFA ca3;
+    pds.poststar(ca1,ca3);
     ca3.print( std::cout << "after\n" ) << std::endl;
 
     /* PDS transitions for "consuming" the language (n11 + n14 + n6)*  */

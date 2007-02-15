@@ -108,9 +108,6 @@ int main() {
     wpds.add_rule(q,    x_main, q,    n8,     GenKillTransformer_T< VarSet >::id());
     wpds.add_rule(q,    n8, q,    n7,     GenKillTransformer_T< VarSet >::makeGenKillTransformer_T(mkVarSet("c"), mkVarSet("d","b")));
 
-    /******************* FOR DEBUGGING, I REMOVED P() *********************/
-    //wpds.add_rule(q,  n7,         q,      n6,     GenKillTransformer_T< VarSet >::id());
-    /******************* FOR DEBUGGING, I REMOVED P() *********************/
     wpds.add_rule(q,     n6,   q,    n4,     GenKillTransformer_T< VarSet >::id());
     wpds.add_rule(q,     n4,   q,    n3,     GenKillTransformer_T< VarSet >::makeGenKillTransformer_T(mkVarSet("c"), VarSet::EmptySet()));
 
@@ -120,36 +117,43 @@ int main() {
     wpds.add_rule(q,     n3,   q,    n2,     GenKillTransformer_T< VarSet >::id());
     wpds.add_rule(q,     n2,   q,    n1,     GenKillTransformer_T< VarSet >::makeGenKillTransformer_T(mkVarSet("b"), VarSet::EmptySet()));
     wpds.add_rule(q,     n1,   q,    e_main, GenKillTransformer_T< VarSet >::makeGenKillTransformer_T(mkVarSet("a"), VarSet::EmptySet()));
+
     /* Transitions (edges) for procedure p */
+
+    // Simple return path
     wpds.add_rule(q,     x_p,  q,     n9,    GenKillTransformer_T< VarSet >::id());
+    wpds.add_rule(q,     n9,   q,    e_p,    GenKillTransformer_T< VarSet >::id());
+    wpds.add_rule(q,     e_p,       q,     GenKillTransformer_T< VarSet >::id());
 
     wpds.add_rule(q,     x_p,  q,    n14,    GenKillTransformer_T< VarSet >::id());
     wpds.add_rule(q,     n14,  q,    n13,    GenKillTransformer_T< VarSet >::makeGenKillTransformer_T(mkVarSet("d"), mkVarSet("c")));
 
-    wpds.add_rule(q,     x_p,  q,    n19,    GenKillTransformer_T< VarSet >::id());
-    wpds.add_rule(q,     n19,  q,    n18,    GenKillTransformer_T< VarSet >::makeGenKillTransformer_T(mkVarSet("d"), mkVarSet("b")));
+    //wpds.add_rule(q,     x_p,  q,    n19,    GenKillTransformer_T< VarSet >::id());
+    //wpds.add_rule(q,     n19,  q,    n18,    GenKillTransformer_T< VarSet >::makeGenKillTransformer_T(mkVarSet("d"), mkVarSet("b")));
 
     wpds.add_rule(q,     n12,  q,    n11,    GenKillTransformer_T< VarSet >::id());
     wpds.add_rule(q,     n11,  q,    n10,    GenKillTransformer_T< VarSet >::makeGenKillTransformer_T(mkVarSet("a"), VarSet::EmptySet()));
     wpds.add_rule(q,     n10,  q,     n9,    GenKillTransformer_T< VarSet >::makeGenKillTransformer_T(mkVarSet("a"), mkVarSet("c")));
 
-    wpds.add_rule(q,     n17,  q,    n16,    GenKillTransformer_T< VarSet >::id());
-    wpds.add_rule(q,     n16,  q,    n15,    GenKillTransformer_T< VarSet >::makeGenKillTransformer_T(mkVarSet("a"), mkVarSet("a","d")));
-    wpds.add_rule(q,     n15,  q,     n9,    GenKillTransformer_T< VarSet >::makeGenKillTransformer_T(mkVarSet("b"), VarSet::EmptySet()));
+    //wpds.add_rule(q,     n17,  q,    n16,    GenKillTransformer_T< VarSet >::id());
+    //wpds.add_rule(q,     n16,  q,    n15,    GenKillTransformer_T< VarSet >::makeGenKillTransformer_T(mkVarSet("a"), mkVarSet("a","d")));
+    //wpds.add_rule(q,     n15,  q,     n9,    GenKillTransformer_T< VarSet >::makeGenKillTransformer_T(mkVarSet("b"), VarSet::EmptySet()));
 
-    wpds.add_rule(q,     n9,   q,    e_p,    GenKillTransformer_T< VarSet >::id());
 
     /* Transitions (linkage edges) for main-calls-p and return */
+    /******************* FOR DEBUGGING, REMOVE call to P() *********************/
     wpds.add_rule(q,     n7,        q,    x_p,   n6, GenKillTransformer_T< VarSet >::id());
+    //wpds.add_rule(q,  n7,         q,      n6,     GenKillTransformer_T< VarSet >::id());
+    /******************* FOR DEBUGGING, REMOVE call to P() *********************/
 
     /* Transitions (linkage edges) for p-calls-p1 and return */
-    wpds.add_rule(q,     n13,       q,    x_p,  n12, GenKillTransformer_T< VarSet >::id());
+    //wpds.add_rule(q,     n13,       q,    x_p,  n12, GenKillTransformer_T< VarSet >::id());
+    wpds.add_rule(q,     n13,       q,    n12, GenKillTransformer_T< VarSet >::id());
 
     /* Transitions (linkage edges) for p-calls-p2 and return */
-    wpds.add_rule(q,     n18,      q,     x_p,  n17, GenKillTransformer_T< VarSet >::id());
+    //wpds.add_rule(q,     n18,      q,     x_p,  n17, GenKillTransformer_T< VarSet >::id());
+    //wpds.add_rule(q,     n18,      q,     n17, GenKillTransformer_T< VarSet >::id());
 
-    /* Transitions (linkage edges) for returning from p */
-    wpds.add_rule(q,     e_p,       q,     GenKillTransformer_T< VarSet >::id());
 
 
     /* post* of <q, stack_bottom> */
