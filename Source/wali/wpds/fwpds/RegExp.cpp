@@ -203,8 +203,8 @@ namespace wali {
             reg_exp_t RegExp::constant(sem_elem_t se) {
                 if(se->equal(se->zero()))
                     return reg_exp_zero;
-                if(se->equal(se->one()))
-                    return reg_exp_one;
+                //if(se->equal(se->one()))
+                //    return reg_exp_one;
 #ifdef NO_REGEXP_CACHING
                 return new RegExp(se);
 #else
