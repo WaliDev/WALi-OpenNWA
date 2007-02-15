@@ -27,8 +27,8 @@ namespace wali {
                     FWPDS(Wrapper* wrapper);
                     FWPDS( Worklist<wfa::Trans> * worklist );
                     FWPDS( Wrapper * wrapper , Worklist<wfa::Trans> * worklist );
-
-                    virtual void poststar( ::wali::wfa::WFA& input, ::wali::wfa::WFA& fa );
+                    
+                    virtual void poststar( ::wali::wfa::WFA & input, ::wali::wfa::WFA & output );
 
                     virtual InterGraph* computeInterGraph( wfa::WFA& input, wfa::WFA& output );
 

@@ -134,16 +134,20 @@ namespace wali
         {
             formatDepth(o,depth);
             o << "WitnessCombine: ";
-            user_se->print(o) << std::endl;
+            user_se->print(o);
             // Dumps out to much information.
             // TODO. Make a compile or runtime flag.
-            if( 0 ) {
+            if( 1 ) {
+                o << std::endl;
                 std::list< witness_t >::const_iterator it = kids.begin();
                 std::list< witness_t >::const_iterator itEND = kids.end();
                 for( ; it != itEND ; it++ )
                 {
                     (*it)->prettyPrint(o,depth+1);
                 }
+            }
+            else {
+                o << "   has " << kids.size() << " children\n";
             }
             return o;
 

@@ -43,6 +43,14 @@ namespace wali
             return t;
         }
             
+        sem_elem_t WitnessTrans::extend( SemElem * se )
+        {
+            //print( std::cout << "\n\nWitnessTrans::Extend --\n\tThis: ");
+            //se->print( std::cout << "\n\tThat: ") << std::endl;
+            //assert(0);
+            return Witness::extend(se);
+        }
+
     } // namespace witness
 
 } // namespace wali

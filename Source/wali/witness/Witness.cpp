@@ -12,7 +12,11 @@ namespace wali
 {
     namespace witness
     {
-        Witness::Witness( sem_elem_t set ) : user_se(set)
+        Witness::Witness( sem_elem_t set ) : user_se(set),isEmpty(false)
+        {
+        }
+
+        Witness::Witness( sem_elem_t se, bool ie) : user_se(se),isEmpty(ie)
         {
         }
 
@@ -32,12 +36,12 @@ namespace wali
 
         sem_elem_t Witness::one() const
         {
-            return new Witness( user_se->one() );
+            return new Witness( user_se->one(),true );
         }
 
         sem_elem_t Witness::zero() const
         {
-            return new Witness( user_se->zero() );
+            return new Witness( user_se->zero(),true );
         }
 
         sem_elem_t Witness::extend( SemElem * se )
@@ -49,6 +53,12 @@ namespace wali
             {
                 std::cerr << "SemElem is \"" << typeid(se).name() << "\"\n";
                 assert( 0 );
+            }
+            if( isEmpty && user_se->equal(user_se->one()) ) {
+                return that;
+            }
+            else if( that->isEmpty && that->user_se->equal(that->user_se->one()) ) {
+                return this;
             }
             return new WitnessExtend( user_se->extend(that->user_se), this, that );
         }

@@ -56,6 +56,9 @@ struct FWPDSSourceFunctor : public wali::wfa::ConstTransFunctor
     InterGraph & gr;
     FWPDSSourceFunctor( InterGraph & p ) : gr(p) {}
     virtual void operator()( const wfa::Trans* t ) {
+
+        t->print(std::cout << "\n*********************\n  +++SetSource: ");
+        std::cout << "\n*********************\n";
         gr.setSource(Transition(*t),t->weight());
     }
 };
@@ -87,6 +90,10 @@ struct FWPDSCompareFunctor : public wali::wfa::ConstTransFunctor
         return out;
     }
 };
+
+std::ostream& graphPrintKey( int k, std::ostream& o ) {
+    return wali::printKey(o,(Key)k);
+}
 
 #define CHECK_RESULTS 1
 
@@ -129,6 +136,7 @@ FWPDS::computeInterGraph( wfa::WFA& input, wfa::WFA& output )
     if( get_from_worklist(t) ) {
         sem_elem_t se = t->weight();
         gr = new InterGraph(se,false,false);
+
         FWPDSSourceFunctor sources(*gr);
         output.for_each(sources);
 
@@ -145,6 +153,9 @@ FWPDS::computeInterGraph( wfa::WFA& input, wfa::WFA& output )
             gr->setupInterSolution();
             gr->update_all_weights();
         }
+
+        gr->print(std::cout << "THE INTERGRAPH\n",graphPrintKey);
+
     }
     return gr;
 }

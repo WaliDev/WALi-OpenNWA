@@ -119,6 +119,10 @@ namespace wali
 
             protected:
                 sem_elem_t user_se;
+                bool isEmpty;
+
+            private:
+                Witness( sem_elem_t se, bool ie );
 
         }; // class Witness
 

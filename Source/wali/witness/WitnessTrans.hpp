@@ -62,6 +62,8 @@ namespace wali
 
                 const Trans& getTrans() const;
 
+                virtual sem_elem_t extend( SemElem * se );
+
             protected:
                 Trans t;
 

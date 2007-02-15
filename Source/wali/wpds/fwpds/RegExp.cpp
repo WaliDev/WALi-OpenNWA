@@ -179,11 +179,11 @@ namespace wali {
                     return r1;
                 } else if(r2->type == Constant && r2->value->equal(r2->value->zero())) {
                     return r2;
-                } else if(r1->type == Constant && r1->value->equal(r1->value->one())) {
+                } /*else if(r1->type == Constant && r1->value->equal(r1->value->one())) {
                     return r2;
                 } else if(r2->type == Constant && r2->value->equal(r2->value->one())) {
                     return r1;
-                }
+                }*/
 #ifdef NO_REGEXP_CACHING
                 return new RegExp(Extend, r1, r2);
 #else

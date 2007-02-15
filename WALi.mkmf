@@ -219,6 +219,20 @@
         </DependencyList>
     </Project>
 
+    <Project Name='akash' RelativePath='Examples/GenKill/akash' 
+        OutputDir='Examples/bin' Type='Executable'>
+        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
+        <IncludeList>
+            <item Name='LiveVar' Path='$(ProjectDir)' />
+        </IncludeList>
+        <InputList>
+            <item Name='akash' RelativePath='akash.cpp' />
+        </InputList>
+        <DependencyList>
+            <item Name='GenKill' />
+        </DependencyList>
+    </Project>
+
     <Project Name='pgGenKill' RelativePath='Examples/GenKill'
         OutputDir='Examples/bin' BuildDir='Examples/GenKill' Type='Library'>
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -pg'/>
