@@ -2,7 +2,6 @@
  * @author Nick Kidd
  */
 
-
 #include "wali/Worklist.hpp"
 #include "wali/Common.hpp"
 #include "wali/HashMap.hpp"
@@ -55,10 +54,10 @@ struct FWPDSSourceFunctor : public wali::wfa::ConstTransFunctor
 {
     InterGraph & gr;
     FWPDSSourceFunctor( InterGraph & p ) : gr(p) {}
-    virtual void operator()( const wfa::Trans* t ) {
-
-        t->print(std::cout << "\n*********************\n  +++SetSource: ");
-        std::cout << "\n*********************\n";
+    virtual void operator()( const wfa::Trans* t ) 
+    {
+        //t->print(std::cout << "\n*********************\n  +++SetSource: ");
+        //std::cout << "\n*********************\n";
         gr.setSource(Transition(*t),t->weight());
     }
 };
@@ -117,8 +116,8 @@ FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
         {
             util::Timer timer("Compare");
             FWPDSCompareFunctor comp(*gr);
-            output.print( std::cout << "\nFWPDS OUTPUT:\n\n" );
-            tmpOutput.print( std::cout << "\nWPDS OUTPUT:\n\n" );
+            //output.print( std::cout << "\nFWPDS OUTPUT:\n\n" );
+            //tmpOutput.print( std::cout << "\nWPDS OUTPUT:\n\n" );
             tmpOutput.for_each(comp);
             comp.print(std::cout);
         }
@@ -143,7 +142,8 @@ FWPDS::computeInterGraph( wfa::WFA& input, wfa::WFA& output )
         { // reachability
             util::Timer timer("FWPDS reachability");
             do {
-                t->print( std::cout << "Popped t => " ) << "\n";
+                // NAK DEBUG
+                //t->print( std::cout << "Popped t => " ) << "\n";
                 post(t,output, *gr);
             } while( get_from_worklist(t) );
         }
@@ -154,7 +154,7 @@ FWPDS::computeInterGraph( wfa::WFA& input, wfa::WFA& output )
             gr->update_all_weights();
         }
 
-        gr->print(std::cout << "THE INTERGRAPH\n",graphPrintKey);
+        //gr->print(std::cout << "THE INTERGRAPH\n",graphPrintKey);
 
     }
     return gr;
@@ -192,7 +192,8 @@ FWPDS::post(LinkedTrans* t, wfa::WFA& fa, InterGraph& gr )
         Config::iterator fwit = config->begin();
         for( ; fwit != config->end() ; fwit++ ) {
             rule_t & r = *fwit;
-            r->print( std::cout << "\tMatched r => " ) << "\n";
+            // NAK DEBUG
+            //r->print( std::cout << "\tMatched r => " ) << "\n";
 
             // Step rule
             if( r->to_stack2() == WALI_EPSILON ) {

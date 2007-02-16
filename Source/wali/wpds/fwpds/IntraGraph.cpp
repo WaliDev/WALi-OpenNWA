@@ -919,8 +919,10 @@ namespace wali {
                 computePathSequence(nodes, nnodes, edges, nedges, path_sequence);
                 buildRegExp(path_sequence);
 
-                for( int i=0; i < nnodes; i++) {
-                    nodes[i].regexp->print(std::cout<< i << ")   ") << std::endl;
+                { // NAK DEBUGGING REGEXP
+                    //for( int i=0; i < nnodes; i++) {
+                    //    nodes[i].regexp->print(std::cout<< i << ")   ") << std::endl;
+                    //}
                 }
 
                 STAT(stats.ndom_sequence = path_sequence.size());
