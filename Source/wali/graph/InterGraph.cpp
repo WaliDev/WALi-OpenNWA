@@ -1,7 +1,9 @@
-#include "wali/wpds/fwpds/InterGraph.hpp"
-#include "wali/wpds/fwpds/IntraGraph.hpp"
-#include "wali/wpds/fwpds/RegExp.hpp"
+#include "wali/graph/InterGraph.hpp"
+#include "wali/graph/IntraGraph.hpp"
+#include "wali/graph/RegExp.hpp"
+
 #include "wali/util/Timer.hpp"
+
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
@@ -12,107 +14,107 @@
 using namespace std;
 
 namespace wali {
-    namespace wpds {
-        namespace fwpds {
 
-            UnionFind::UnionFind(int len) {
-                n = len;
-                arr = new int[n];
-                for(int i=0; i < n;i++) {
-                    arr[i] = i;
+    namespace graph {
+
+        UnionFind::UnionFind(int len) {
+            n = len;
+            arr = new int[n];
+            for(int i=0; i < n;i++) {
+                arr[i] = i;
+            }
+        }
+
+        UnionFind::~UnionFind() {
+            delete [] arr;
+            arr = NULL;
+            n = 0;
+        }
+
+        void UnionFind::reset() {
+            for(int i=0; i < n;i++) {
+                arr[i] = i;
+            }
+        }
+
+        int UnionFind::find(int a) {
+            int r = a,p;
+            while(arr[r] != r) {
+                r = arr[r];
+            }
+            // path compression
+            while(arr[a] != a) {
+                p = arr[a];
+                arr[a] = r;
+                a = p;
+            }
+            return r;
+        }
+
+        void UnionFind::takeUnion(int a, int b) {
+            int ar = find(a);
+            int br = find(b);
+            arr[ar] = br; // FIXME: Randomize this
+        }
+
+        inter_node_t promote_type(inter_node_t t1, inter_node_t t2) {
+            if(t1 == InterNone)
+                return t2;
+            if(t2 == InterNone)
+                return t1;
+            if(t1 == t2)
+                return t1;
+            return InterSourceOutNode;
+        }
+
+        bool is_source_type(inter_node_t t1) {
+            return (t1 == InterSource || t1 == InterSourceOutNode);
+        }
+
+        InterGraph::~InterGraph() {
+            for(unsigned i = 0; i < nodes.size(); i++) {
+                if(nodes[i].gr && intra_graph_uf->find(i) == (int)i) {
+                    delete nodes[i].gr;
                 }
             }
-
-            UnionFind::~UnionFind() {
-                delete [] arr;
-                arr = NULL;
-                n = 0;
+            if(intra_graph_uf) {
+                delete intra_graph_uf;
             }
+            RegExp::reset(); // FIXME: there should be a better place for this
+        }
 
-            void UnionFind::reset() {
-                for(int i=0; i < n;i++) {
-                    arr[i] = i;
+        int InterGraph::nodeno(Transition &t) {
+            TransMap::iterator it = node_number.find(t);
+            if(it == node_number.end()) {
+                node_number[t] = nodes.size();
+                nodes.push_back(GraphNode(t));
+                return (nodes.size() - 1);
+            }
+            return it->second;
+        }
+
+        bool InterGraph::exists(Transition &t) {
+            TransMap::iterator it = node_number.find(t);
+            if(it == node_number.end()) {
+                return false;
+            }
+            return true;
+        }
+
+        int InterGraph::intra_edgeno(Transition &src, Transition &tgt) {
+            int s = nodeno(src);
+            int t = nodeno(tgt);
+            std::list<int>::iterator it = nodes[s].outgoing.begin();
+            for(; it != nodes[s].outgoing.end(); it++) {
+                if(intra_edges[*it].tgt == t) {
+                    return *it;
                 }
             }
+            return -1;
+        }
 
-            int UnionFind::find(int a) {
-                int r = a,p;
-                while(arr[r] != r) {
-                    r = arr[r];
-                }
-                // path compression
-                while(arr[a] != a) {
-                    p = arr[a];
-                    arr[a] = r;
-                    a = p;
-                }
-                return r;
-            }
-
-            void UnionFind::takeUnion(int a, int b) {
-                int ar = find(a);
-                int br = find(b);
-                arr[ar] = br; // FIXME: Randomize this
-            }
-
-            inter_node_t promote_type(inter_node_t t1, inter_node_t t2) {
-                if(t1 == InterNone)
-                    return t2;
-                if(t2 == InterNone)
-                    return t1;
-                if(t1 == t2)
-                    return t1;
-                return InterSourceOutNode;
-            }
-
-            bool is_source_type(inter_node_t t1) {
-                return (t1 == InterSource || t1 == InterSourceOutNode);
-            }
-
-            InterGraph::~InterGraph() {
-                for(unsigned i = 0; i < nodes.size(); i++) {
-                    if(nodes[i].gr && intra_graph_uf->find(i) == (int)i) {
-                        delete nodes[i].gr;
-                    }
-                }
-                if(intra_graph_uf) {
-                    delete intra_graph_uf;
-                }
-                RegExp::reset(); // FIXME: there should be a better place for this
-            }
-
-            int InterGraph::nodeno(Transition &t) {
-                TransMap::iterator it = node_number.find(t);
-                if(it == node_number.end()) {
-                    node_number[t] = nodes.size();
-                    nodes.push_back(GraphNode(t));
-                    return (nodes.size() - 1);
-                }
-                return it->second;
-            }
-
-            bool InterGraph::exists(Transition &t) {
-                TransMap::iterator it = node_number.find(t);
-                if(it == node_number.end()) {
-                    return false;
-                }
-                return true;
-            }
-
-            int InterGraph::intra_edgeno(Transition &src, Transition &tgt) {
-                int s = nodeno(src);
-                int t = nodeno(tgt);
-                std::list<int>::iterator it = nodes[s].outgoing.begin();
-                for(; it != nodes[s].outgoing.end(); it++) {
-                    if(intra_edges[*it].tgt == t) {
-                        return *it;
-                    }
-                }
-                return -1;
-            }
-
-            int InterGraph::inter_edgeno(Transition &src1, Transition &src2, Transition &tgt) {
-                int s1 = nodeno(src1);
+        int InterGraph::inter_edgeno(Transition &src1, Transition &src2, Transition &tgt) {
+            int s1 = nodeno(src1);
                 int s2 = nodeno(src2);
                 int t = nodeno(tgt);
                 std::list<int>::iterator it = nodes[s2].out_hyper_edges.begin();
@@ -137,7 +139,8 @@ namespace wali {
 
             std::ostream &InterGraph::print(std::ostream &out, PRINT_OP pop) {
                 unsigned i;
-                if(1){//intra_graph_uf == NULL) {
+                if(1)//intra_graph_uf == NULL) 
+                {
                     out << "Source Transitions:\n";
                     for(i=0;i<nodes.size();i++) {
                         if(is_source_type(nodes[i].type)) {
@@ -730,8 +733,8 @@ namespace wali {
                 return r;
             }
 
-        } // namespace fwpds
 
-    } // namespace wpds
+    } // namespace graph
 
 } // namespace wali
+

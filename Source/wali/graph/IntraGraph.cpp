@@ -1,1006 +1,1009 @@
-#include "wali/wpds/fwpds/IntraGraph.hpp"
-#include "wali/wpds/fwpds/LinkEval.hpp"
 #include "wali/util/Timer.hpp"
+
+#include "wali/graph/IntraGraph.hpp"
+#include "wali/graph/LinkEval.hpp"
+
 #include <iostream>
+
 using namespace std;
 
 namespace wali {
-    namespace wpds {
-        namespace fwpds {
 
-            sem_elem_t IntraGraph::se;
+    namespace graph {
+
+        sem_elem_t IntraGraph::se;
 #ifdef STATIC_MEMORY
-            int *IntraGraph::intraGraphBuffer = 0;
-            set<int> *IntraGraph::childrenBuffer = 0;
-            reg_exp_t *IntraGraph::regBuffer = 0;
-            int IntraGraph::intraGraphBufferSize = 0;
+        int *IntraGraph::intraGraphBuffer = 0;
+        set<int> *IntraGraph::childrenBuffer = 0;
+        reg_exp_t *IntraGraph::regBuffer = 0;
+        int IntraGraph::intraGraphBufferSize = 0;
 #endif
 
 #define nodeno(a) (a.node_no)
 
-            void IntraGraph::create_node(int a) {
-                assert(a < nnodes);
-            }
+        void IntraGraph::create_node(int a) {
+            assert(a < nnodes);
+        }
 
-            void IntraGraph::create_node(Transition &t, int a) {
-                int n = nodes.size();
-                if(n <= a) nodes.resize(2*a);
-                int i;
-                for(i=nnodes;i<=a;i++) {
-                    nodes[i].set(i);
-                    nnodes++;
+        void IntraGraph::create_node(Transition &t, int a) {
+            int n = nodes.size();
+            if(n <= a) nodes.resize(2*a);
+            int i;
+            for(i=nnodes;i<=a;i++) {
+                nodes[i].set(i);
+                nnodes++;
+            }
+            nodes[a].trans = t;
+        }
+
+        int IntraGraph::edgeno(int s, int t) {
+            list<int>::iterator it = nodes[s].outgoing.begin();
+            for(; it != nodes[s].outgoing.end(); it++) {
+                if(edges[*it].tgt == t) {
+                    return *it;
                 }
-                nodes[a].trans = t;
             }
+            return -1;
+        }
 
-            int IntraGraph::edgeno(int s, int t) {
-                list<int>::iterator it = nodes[s].outgoing.begin();
-                for(; it != nodes[s].outgoing.end(); it++) {
-                    if(edges[*it].tgt == t) {
-                        return *it;
+        ostream &operator << (ostream &out, const IntraGraphStats &s) {
+            out << "Semiring combine : " << s.ncombine << "\n";
+            out << "Semiring extend : " << s.nextend << "\n";
+            out << "Semiring star : " << s.nstar << "\n";
+            out << "Nodes : " << s.nnodes << "\n";
+            out << "Edges : " << s.nedges << "\n";
+            out << "Updatable : " << s.nupdatable << "\n";
+            out << "Cutset : " << s.ncutset << "\n";
+            return out;
+        }
+
+        ostream &IntraGraph::print_trans(Transition &t, ostream &out, PRINT_OP pop) {
+            out << "(";
+            pop(t.src,out) << "(" << t.src << "),";
+            pop(t.stack,out) << "(" << t.stack << "),";
+            pop(t.tgt,out) << "(" << t.tgt << "))";
+            return out;
+        }
+
+        ostream &IntraGraph::print(ostream &out, PRINT_OP pop) {
+            int n = nedges;
+            int i;
+            out << "IntraGraph:\n";
+            for(i=0;i<nnodes;i++) {
+                if(nodes[i].outgoing.size() == 0 && nodes[i].incoming.size() == 0) {
+                    //print_trans(nodes[i].trans, out, pop);
+                    out << i << " ";
+                    out << "\n";
+                } else {
+                    //print_trans(nodes[i].trans, out, pop);
+                    out << i << " ";
+                    if(nodes[i].regexp.get_ptr() != 0) {
+                        nodes[i].regexp->reevaluate()->print(out);
+                        //nodes[i].regexp->print(out);
                     }
+                    out << "\n";
                 }
-                return -1;
             }
-
-            ostream &operator << (ostream &out, const IntraGraphStats &s) {
-                out << "Semiring combine : " << s.ncombine << "\n";
-                out << "Semiring extend : " << s.nextend << "\n";
-                out << "Semiring star : " << s.nstar << "\n";
-                out << "Nodes : " << s.nnodes << "\n";
-                out << "Edges : " << s.nedges << "\n";
-                out << "Updatable : " << s.nupdatable << "\n";
-                out << "Cutset : " << s.ncutset << "\n";
-                return out;
+            for(i=0; i < n;i++) {
+                //Transition src = nodes[edges[i].src].trans;
+                //Transition tgt = nodes[edges[i].tgt].trans;
+                //print_trans(src, out, pop);
+                out << edges[i].src << " ";
+                out << "-->";
+                out << edges[i].tgt << " ";
+                //print_trans(tgt, out, pop);
+                //edges[i].weight->print(out);
             }
+            return out;
+        }
 
-            ostream &IntraGraph::print_trans(Transition &t, ostream &out, PRINT_OP pop) {
-                out << "(";
-                pop(t.src,out) << "(" << t.src << "),";
-                pop(t.stack,out) << "(" << t.stack << "),";
-                pop(t.tgt,out) << "(" << t.tgt << "))";
-                return out;
+        void IntraGraph::resetUpdatable() {
+            vector<int>::iterator it;
+            for(it = updatable_edges.begin(); it != updatable_edges.end(); it++) {
+                RegExp::update(edges[*it].updatable_no,se->zero());
             }
+        }
 
-            ostream &IntraGraph::print(ostream &out, PRINT_OP pop) {
-                int n = nedges;
-                int i;
-                out << "IntraGraph:\n";
-                for(i=0;i<nnodes;i++) {
-                    if(nodes[i].outgoing.size() == 0 && nodes[i].incoming.size() == 0) {
-                        //print_trans(nodes[i].trans, out, pop);
-                        out << i << " ";
-                        out << "\n";
-                    } else {
-                        //print_trans(nodes[i].trans, out, pop);
-                        out << i << " ";
-                        if(nodes[i].regexp.get_ptr() != 0) {
-                            nodes[i].regexp->reevaluate()->print(out);
-                            //nodes[i].regexp->print(out);
-                        }
-                        out << "\n";
-                    }
-                }
-                for(i=0; i < n;i++) {
-                    //Transition src = nodes[edges[i].src].trans;
-                    //Transition tgt = nodes[edges[i].tgt].trans;
-                    //print_trans(src, out, pop);
-                    out << edges[i].src << " ";
-                    out << "-->";
-                    out << edges[i].tgt << " ";
-                    //print_trans(tgt, out, pop);
-                    //edges[i].weight->print(out);
-                }
-                return out;
-            }
-
-            void IntraGraph::resetUpdatable() {
-                vector<int>::iterator it;
-                for(it = updatable_edges.begin(); it != updatable_edges.end(); it++) {
-                    RegExp::update(edges[*it].updatable_no,se->zero());
+        IntraGraphStats IntraGraph::get_stats() {
+            stats.nnodes = nnodes;
+            stats.nedges = nedges;
+            stats.nupdatable = 0;
+            for(unsigned i = 0; i < (unsigned)nedges; i++) {
+                if(edges[i].updatable) {
+                    stats.nupdatable++;
                 }
             }
 
-            IntraGraphStats IntraGraph::get_stats() {
-                stats.nnodes = nnodes;
-                stats.nedges = nedges;
-                stats.nupdatable = 0;
-                for(unsigned i = 0; i < (unsigned)nedges; i++) {
-                    if(edges[i].updatable) {
-                        stats.nupdatable++;
-                    }
-                }
+            set<int> gray;
+            set<int> black;
+            set<int> cutset;
+            dfs(0,gray,black,cutset);
+            stats.ncutset = cutset.size();
+            return stats;
+        }
 
-                set<int> gray;
-                set<int> black;
-                set<int> cutset;
-                dfs(0,gray,black,cutset);
-                stats.ncutset = cutset.size();
-                return stats;
+        // return value: number of SCCs
+        int IntraGraph::SCC(vector<IntraGraphNode> &cnodes, int ncnodes, vector<IntraGraphEdge> &cedges, int ncedges) {
+            int n = ncnodes;
+            int i;
+            // reset visited
+            for(i=0;i<n;i++) {  
+                cnodes[i].visited = 0;
+                cnodes[i].scc_number = 0;
             }
 
-            // return value: number of SCCs
-            int IntraGraph::SCC(vector<IntraGraphNode> &cnodes, int ncnodes, vector<IntraGraphEdge> &cedges, int ncedges) {
-                int n = ncnodes;
-                int i;
-                // reset visited
-                for(i=0;i<n;i++) {  
-                    cnodes[i].visited = 0;
-                    cnodes[i].scc_number = 0;
-                }
-
-                typedef pair<int, list<int>::iterator> pos_t;
-                list<pos_t> stack;
-                list<int> ts;
-                // DFS(G)
-                for( i=0;i<n;i++) {
-                    if(cnodes[i].visited != 0) continue;
-                    stack.push_front(pos_t(i, cnodes[i].outgoing.begin()));
-                    while(!stack.empty()) {
-                        pos_t p = stack.front();
-                        stack.pop_front();
-                        int v = p.first;
-                        list<int>::iterator it = p.second;
-                        cnodes[v].visited = 1; // gray
-                        bool done = true;
-                        while(it != cnodes[v].outgoing.end()) {
-                            int c = cedges[*it].tgt;
-                            if(cnodes[c].visited == 1) { // gray
-                                it++;
-                            } else if(cnodes[c].visited == 2) { // black
-                                it++;
-                            } else { // white
-                                stack.push_front(pos_t(v,++it));
-                                stack.push_front(pos_t(c, cnodes[c].outgoing.begin()));
-                                done = false;
-                                break;
-                            }
-                        }
-                        if(done) {
-                            cnodes[v].visited = 2; // black
-                            ts.push_front(v);
+            typedef pair<int, list<int>::iterator> pos_t;
+            list<pos_t> stack;
+            list<int> ts;
+            // DFS(G)
+            for( i=0;i<n;i++) {
+                if(cnodes[i].visited != 0) continue;
+                stack.push_front(pos_t(i, cnodes[i].outgoing.begin()));
+                while(!stack.empty()) {
+                    pos_t p = stack.front();
+                    stack.pop_front();
+                    int v = p.first;
+                    list<int>::iterator it = p.second;
+                    cnodes[v].visited = 1; // gray
+                    bool done = true;
+                    while(it != cnodes[v].outgoing.end()) {
+                        int c = cedges[*it].tgt;
+                        if(cnodes[c].visited == 1) { // gray
+                            it++;
+                        } else if(cnodes[c].visited == 2) { // black
+                            it++;
+                        } else { // white
+                            stack.push_front(pos_t(v,++it));
+                            stack.push_front(pos_t(c, cnodes[c].outgoing.begin()));
+                            done = false;
+                            break;
                         }
                     }
-                }
-
-                for(i=0;i<n;i++) {  
-                    cnodes[i].visited = 0;
-                }
-
-                // Now ts has vertices in decreasing order of finishing time
-                // DFG(G^T)
-                list<int>::iterator nit;
-                int scc_n = 0; // First SCC has number 1
-
-                for(nit = ts.begin(); nit != ts.end(); nit++) {
-                    i = *nit;
-                    if(cnodes[i].visited != 0) continue;
-                    scc_n++;
-
-                    stack.push_front(pos_t(i, cnodes[i].incoming.begin()));
-                    while(!stack.empty()) {
-                        pos_t p = stack.front();
-                        stack.pop_front();
-                        int v = p.first;
-                        list<int>::iterator it = p.second;
-                        cnodes[v].visited = 1; // gray
-                        cnodes[v].scc_number = scc_n;
-                        bool done = true;
-                        while(it != cnodes[v].incoming.end()) {
-                            int c = cedges[*it].src;
-                            if(cnodes[c].visited == 1) { // gray
-                                it++;
-                            } else if(cnodes[c].visited == 2) { // black
-                                it++;
-                            } else { // white
-                                stack.push_front(pos_t(v,++it));
-                                stack.push_front(pos_t(c, cnodes[c].incoming.begin()));
-                                done = false;
-                                break;
-                            }
-                        }
-                        if(done) {
-                            cnodes[v].visited = 2; // black
-                        }
+                    if(done) {
+                        cnodes[v].visited = 2; // black
+                        ts.push_front(v);
                     }
                 }
-                return scc_n;
             }
 
-            // postcond: sets iscutset for all nodes
-            void IntraGraph::topSort(vector<IntraGraphNode> &cnodes, int ncnodes, vector<IntraGraphEdge> &cedges, int ncedges,
-                    list<int> &ts, vector<int> &cs, bool no_outgoing, bool no_updatable) {
-                int n = ncnodes;
-                int i;
-                // reset visited
-                for(i=0;i<n;i++) {  
-                    cnodes[i].visited = 0;
-                    cnodes[i].iscutset = false;
-                }
-                // First find a cutset
-                typedef pair<int, list<int>::iterator> pos_t;
-                list<pos_t> stack;
-                for( i=0;i<n;i++) {
-                    if(cnodes[i].visited != 0) continue;
-                    stack.push_front(pos_t(i, cnodes[i].outgoing.begin()));
-                    while(!stack.empty()) {
-                        pos_t p = stack.front();
-                        stack.pop_front();
-                        int v = p.first;
-                        list<int>::iterator it = p.second;
-                        cnodes[v].visited = 1; // gray
-                        bool done = true;
-                        while(it != cnodes[v].outgoing.end()) {
-                            int c = cedges[*it].tgt;
-                            if(no_updatable && cedges[*it].updatable) {
-                                it++;
-                                continue;
-                            }
-                            if(cnodes[c].visited == 1) { // gray
-                                cnodes[c].iscutset = true;
-                                it++;
-                            } else if(cnodes[c].visited == 2) { // black
-                                it++;
-                            } else { // white
-                                stack.push_front(pos_t(v,++it));
-                                stack.push_front(pos_t(c, cnodes[c].outgoing.begin()));
-                                done = false;
-                                break;
-                            }
-                        }
-                        if(done) {
-                            cnodes[v].visited = 2; // black
+            for(i=0;i<n;i++) {  
+                cnodes[i].visited = 0;
+            }
+
+            // Now ts has vertices in decreasing order of finishing time
+            // DFG(G^T)
+            list<int>::iterator nit;
+            int scc_n = 0; // First SCC has number 1
+
+            for(nit = ts.begin(); nit != ts.end(); nit++) {
+                i = *nit;
+                if(cnodes[i].visited != 0) continue;
+                scc_n++;
+
+                stack.push_front(pos_t(i, cnodes[i].incoming.begin()));
+                while(!stack.empty()) {
+                    pos_t p = stack.front();
+                    stack.pop_front();
+                    int v = p.first;
+                    list<int>::iterator it = p.second;
+                    cnodes[v].visited = 1; // gray
+                    cnodes[v].scc_number = scc_n;
+                    bool done = true;
+                    while(it != cnodes[v].incoming.end()) {
+                        int c = cedges[*it].src;
+                        if(cnodes[c].visited == 1) { // gray
+                            it++;
+                        } else if(cnodes[c].visited == 2) { // black
+                            it++;
+                        } else { // white
+                            stack.push_front(pos_t(v,++it));
+                            stack.push_front(pos_t(c, cnodes[c].incoming.begin()));
+                            done = false;
+                            break;
                         }
                     }
+                    if(done) {
+                        cnodes[v].visited = 2; // black
+                    }
                 }
-                // reset visited
-                for( i=0;i<n;i++) {  
-                    cnodes[i].visited = 0;
-                    if(cnodes[i].iscutset)
-                        cs.push_back(i);
-                }
-                // now do a top-sort -- cutset vertices have no incoming edges / no outgoing edges
-                // assert(cnodes[0].iscutset == false);
-                for(i = 0; i < n; i++) {
-                    if(cnodes[i].visited != 0) continue;
-                    stack.push_front(pos_t(i, cnodes[i].outgoing.begin()));
-                    while(!stack.empty()) {
-                        pos_t p = stack.front();
-                        stack.pop_front();
-                        int v = p.first;
-                        list<int>::iterator it = p.second;
-                        if(no_outgoing && cnodes[v].iscutset) {
-                            cnodes[v].visited = 2; // black
+            }
+            return scc_n;
+        }
+
+        // postcond: sets iscutset for all nodes
+        void IntraGraph::topSort(vector<IntraGraphNode> &cnodes, int ncnodes, vector<IntraGraphEdge> &cedges, int ncedges,
+                list<int> &ts, vector<int> &cs, bool no_outgoing, bool no_updatable) {
+            int n = ncnodes;
+            int i;
+            // reset visited
+            for(i=0;i<n;i++) {  
+                cnodes[i].visited = 0;
+                cnodes[i].iscutset = false;
+            }
+            // First find a cutset
+            typedef pair<int, list<int>::iterator> pos_t;
+            list<pos_t> stack;
+            for( i=0;i<n;i++) {
+                if(cnodes[i].visited != 0) continue;
+                stack.push_front(pos_t(i, cnodes[i].outgoing.begin()));
+                while(!stack.empty()) {
+                    pos_t p = stack.front();
+                    stack.pop_front();
+                    int v = p.first;
+                    list<int>::iterator it = p.second;
+                    cnodes[v].visited = 1; // gray
+                    bool done = true;
+                    while(it != cnodes[v].outgoing.end()) {
+                        int c = cedges[*it].tgt;
+                        if(no_updatable && cedges[*it].updatable) {
+                            it++;
                             continue;
                         }
-                        cnodes[v].visited = 1; // gray
-                        bool done = true;
-                        while(it != cnodes[v].outgoing.end()) {
-                            int c = cedges[*it].tgt;
-                            if(no_updatable && cedges[*it].updatable) {
-                                it++;
-                                continue;
-                            }
-                            if(!no_outgoing && cnodes[c].iscutset) {
-                                it++;
-                                continue;
-                            }
-                            if(cnodes[c].visited != 0) { // gray or black
-                                assert(cnodes[c].visited == 2); // there cannot be any back edges
-                                it++;
-                            } else { // white
-                                stack.push_front(pos_t(v,++it));
-                                stack.push_front(pos_t(c, cnodes[c].outgoing.begin()));
-                                done = false;
-                                break;
-                            }
+                        if(cnodes[c].visited == 1) { // gray
+                            cnodes[c].iscutset = true;
+                            it++;
+                        } else if(cnodes[c].visited == 2) { // black
+                            it++;
+                        } else { // white
+                            stack.push_front(pos_t(v,++it));
+                            stack.push_front(pos_t(c, cnodes[c].outgoing.begin()));
+                            done = false;
+                            break;
                         }
-                        if(done) {
-                            cnodes[v].visited = 2; // black
-                            ts.push_front(v);
+                    }
+                    if(done) {
+                        cnodes[v].visited = 2; // black
+                    }
+                }
+            }
+            // reset visited
+            for( i=0;i<n;i++) {  
+                cnodes[i].visited = 0;
+                if(cnodes[i].iscutset)
+                    cs.push_back(i);
+            }
+            // now do a top-sort -- cutset vertices have no incoming edges / no outgoing edges
+            // assert(cnodes[0].iscutset == false);
+            for(i = 0; i < n; i++) {
+                if(cnodes[i].visited != 0) continue;
+                stack.push_front(pos_t(i, cnodes[i].outgoing.begin()));
+                while(!stack.empty()) {
+                    pos_t p = stack.front();
+                    stack.pop_front();
+                    int v = p.first;
+                    list<int>::iterator it = p.second;
+                    if(no_outgoing && cnodes[v].iscutset) {
+                        cnodes[v].visited = 2; // black
+                        continue;
+                    }
+                    cnodes[v].visited = 1; // gray
+                    bool done = true;
+                    while(it != cnodes[v].outgoing.end()) {
+                        int c = cedges[*it].tgt;
+                        if(no_updatable && cedges[*it].updatable) {
+                            it++;
+                            continue;
                         }
-                    }    
+                        if(!no_outgoing && cnodes[c].iscutset) {
+                            it++;
+                            continue;
+                        }
+                        if(cnodes[c].visited != 0) { // gray or black
+                            assert(cnodes[c].visited == 2); // there cannot be any back edges
+                            it++;
+                        } else { // white
+                            stack.push_front(pos_t(v,++it));
+                            stack.push_front(pos_t(c, cnodes[c].outgoing.begin()));
+                            done = false;
+                            break;
+                        }
+                    }
+                    if(done) {
+                        cnodes[v].visited = 2; // black
+                        ts.push_front(v);
+                    }
+                }    
+            }
+        }
+
+        void IntraGraph::buildCutsetRegExp(list<int> &ts, vector<int> &cs,
+                vector<IntraGraphNode> &cnodes, int ncnodes, vector<IntraGraphEdge> &cedges, int ncedges) {
+            int m = cs.size();
+            int n = ncnodes;
+            assert(n == (int)ts.size());
+            int i,j,k,v;
+
+            reg_exp_t **temp = new reg_exp_t *[m+1];
+            for(i=0;i<m+1;i++) {
+                temp[i] = new reg_exp_t[n];
+                for(j=0;j<n;j++) {
+                    temp[i][j] = RegExp::constant(se->zero());
                 }
             }
 
-            void IntraGraph::buildCutsetRegExp(list<int> &ts, vector<int> &cs,
-                    vector<IntraGraphNode> &cnodes, int ncnodes, vector<IntraGraphEdge> &cedges, int ncedges) {
-                int m = cs.size();
-                int n = ncnodes;
-                assert(n == (int)ts.size());
-                int i,j,k,v;
-
-                reg_exp_t **temp = new reg_exp_t *[m+1];
-                for(i=0;i<m+1;i++) {
-                    temp[i] = new reg_exp_t[n];
-                    for(j=0;j<n;j++) {
-                        temp[i][j] = RegExp::constant(se->zero());
-                    }
+            // Solve for (s,_)
+            temp[m][0] = RegExp::constant(se->one());
+            list<int>::iterator it = ts.begin();
+            for(;it != ts.end(); it++) {
+                v = *it;
+                if(cnodes[v].iscutset)
+                    continue;
+                list<int>::iterator beg = cnodes[v].incoming.begin();
+                list<int>::iterator end = cnodes[v].incoming.end();
+                for(; beg != end; beg++) {
+                    temp[m][v] = RegExp::combine(temp[m][v], RegExp::extend(temp[m][cedges[*beg].src], cedges[*beg].regexp));
                 }
-
-                // Solve for (s,_)
-                temp[m][0] = RegExp::constant(se->one());
-                list<int>::iterator it = ts.begin();
-                for(;it != ts.end(); it++) {
-                    v = *it;
+            }
+            // Solve for (ci,_)
+            vector<int>::iterator it2;
+            for(i=0,it2 = cs.begin(); it2 != cs.end(); it2++,i++) {
+                list<int>::iterator beg = ts.begin();
+                list<int>::iterator end = ts.end();
+                while(*beg != *it2) {
+                    beg++;
+                }
+                temp[i][*beg] = RegExp::constant(se->one());
+                beg++;
+                for(; beg != end; beg++) {
+                    v = *beg;
                     if(cnodes[v].iscutset)
                         continue;
-                    list<int>::iterator beg = cnodes[v].incoming.begin();
-                    list<int>::iterator end = cnodes[v].incoming.end();
-                    for(; beg != end; beg++) {
-                        temp[m][v] = RegExp::combine(temp[m][v], RegExp::extend(temp[m][cedges[*beg].src], cedges[*beg].regexp));
+                    list<int>::iterator beg2 = cnodes[v].incoming.begin();
+                    list<int>::iterator end2 = cnodes[v].incoming.end();
+                    for(; beg2 != end2; beg2++) {
+                        temp[i][v] = RegExp::combine(temp[i][v], RegExp::extend(temp[i][cedges[*beg2].src], cedges[*beg2].regexp));
                     }
                 }
-                // Solve for (ci,_)
-                vector<int>::iterator it2;
-                for(i=0,it2 = cs.begin(); it2 != cs.end(); it2++,i++) {
-                    list<int>::iterator beg = ts.begin();
-                    list<int>::iterator end = ts.end();
-                    while(*beg != *it2) {
-                        beg++;
-                    }
-                    temp[i][*beg] = RegExp::constant(se->one());
-                    beg++;
-                    for(; beg != end; beg++) {
-                        v = *beg;
-                        if(cnodes[v].iscutset)
-                            continue;
-                        list<int>::iterator beg2 = cnodes[v].incoming.begin();
-                        list<int>::iterator end2 = cnodes[v].incoming.end();
-                        for(; beg2 != end2; beg2++) {
-                            temp[i][v] = RegExp::combine(temp[i][v], RegExp::extend(temp[i][cedges[*beg2].src], cedges[*beg2].regexp));
-                        }
-                    }
-                }
-
-                // Now build the regexp for (ci,cj)
-                reg_exp_t **reg = new reg_exp_t* [m];
-                for(i = 0; i < m; i++) {
-                    reg[i] = new reg_exp_t[m];
-                    for(j = 0; j < m; j++) {
-                        if(i==j) 
-                            reg[i][j] = RegExp::constant(se->one());
-                        else
-                            reg[i][j] = RegExp::constant(se->zero());
-                    }
-                }
-                for(i = 0; i < m; i++) {
-                    for(j = 0; j < m; j++) {
-                        int v = cs[j];
-                        list<int>::iterator beg = cnodes[v].incoming.begin();
-                        list<int>::iterator end = cnodes[v].incoming.end();
-                        for(; beg != end; beg++) {
-                            reg[i][j] = RegExp::combine(reg[i][j], RegExp::extend(temp[i][cedges[*beg].src], cedges[*beg].regexp));
-                        }
-                    }
-                }
-                // now solve APSP on cutsets
-                for(k=0;k<m;k++) {
-                    for(i=0;i<m;i++) {
-                        for(j=0;j<m;j++) {
-                            reg[i][j] = RegExp::combine(reg[i][j], RegExp::extend(reg[i][k], RegExp::extend(RegExp::star(reg[k][k]), reg[k][j])));
-                        }
-                    }
-                }
-
-                for(i = 0; i < m; i++) {
-                    for(j = 0; j < n; j++) {
-                        for(k = 0; k < m; k++) {
-                            temp[i][j] = RegExp::combine(temp[i][j], RegExp::extend(reg[i][k], temp[k][j]));
-                        }
-                    }
-                }
-                // correct temp[m]
-                for(i=0;i<m;i++) {
-                    v = cs[i];
-                    list<int>::iterator beg = cnodes[v].incoming.begin();
-                    list<int>::iterator end = cnodes[v].incoming.end();
-                    for(; beg != end; beg++) {
-                        temp[m][v] = RegExp::combine(temp[m][v], RegExp::extend(temp[m][cedges[*beg].src], cedges[*beg].regexp));
-                    }
-                    //temp[m][v]->print(cout) << "\n";
-                }
-
-                // initialize answer
-                for(i = 0; i < n; i++) {
-                    cnodes[i].regexp = temp[m][i]; 
-                }
-                for(i = 0; i < n; i++) {
-                    for(j=0;j<m;j++) {
-                        cnodes[i].regexp = RegExp::combine(cnodes[i].regexp, RegExp::extend(temp[m][cs[j]],temp[j][i]));
-                    }
-                }
-                // delete stuff
-
-                for(i = 0; i < m; i++) {
-                    delete [] reg[i];
-                    delete [] temp[i];
-                }
-                delete [] temp[m];
-                delete [] temp;
-                delete [] reg;
             }
 
-            // Some experimental code. Was not found to be very useful during
-            // CAV'06 experimentation.
+            // Now build the regexp for (ci,cj)
+            reg_exp_t **reg = new reg_exp_t* [m];
+            for(i = 0; i < m; i++) {
+                reg[i] = new reg_exp_t[m];
+                for(j = 0; j < m; j++) {
+                    if(i==j) 
+                        reg[i][j] = RegExp::constant(se->one());
+                    else
+                        reg[i][j] = RegExp::constant(se->zero());
+                }
+            }
+            for(i = 0; i < m; i++) {
+                for(j = 0; j < m; j++) {
+                    int v = cs[j];
+                    list<int>::iterator beg = cnodes[v].incoming.begin();
+                    list<int>::iterator end = cnodes[v].incoming.end();
+                    for(; beg != end; beg++) {
+                        reg[i][j] = RegExp::combine(reg[i][j], RegExp::extend(temp[i][cedges[*beg].src], cedges[*beg].regexp));
+                    }
+                }
+            }
+            // now solve APSP on cutsets
+            for(k=0;k<m;k++) {
+                for(i=0;i<m;i++) {
+                    for(j=0;j<m;j++) {
+                        reg[i][j] = RegExp::combine(reg[i][j], RegExp::extend(reg[i][k], RegExp::extend(RegExp::star(reg[k][k]), reg[k][j])));
+                    }
+                }
+            }
+
+            for(i = 0; i < m; i++) {
+                for(j = 0; j < n; j++) {
+                    for(k = 0; k < m; k++) {
+                        temp[i][j] = RegExp::combine(temp[i][j], RegExp::extend(reg[i][k], temp[k][j]));
+                    }
+                }
+            }
+            // correct temp[m]
+            for(i=0;i<m;i++) {
+                v = cs[i];
+                list<int>::iterator beg = cnodes[v].incoming.begin();
+                list<int>::iterator end = cnodes[v].incoming.end();
+                for(; beg != end; beg++) {
+                    temp[m][v] = RegExp::combine(temp[m][v], RegExp::extend(temp[m][cedges[*beg].src], cedges[*beg].regexp));
+                }
+                //temp[m][v]->print(cout) << "\n";
+            }
+
+            // initialize answer
+            for(i = 0; i < n; i++) {
+                cnodes[i].regexp = temp[m][i]; 
+            }
+            for(i = 0; i < n; i++) {
+                for(j=0;j<m;j++) {
+                    cnodes[i].regexp = RegExp::combine(cnodes[i].regexp, RegExp::extend(temp[m][cs[j]],temp[j][i]));
+                }
+            }
+            // delete stuff
+
+            for(i = 0; i < m; i++) {
+                delete [] reg[i];
+                delete [] temp[i];
+            }
+            delete [] temp[m];
+            delete [] temp;
+            delete [] reg;
+        }
+
+        // Some experimental code. Was not found to be very useful during
+        // CAV'06 experimentation.
 #include "Experimental.cpp"
 
-            void IntraGraph::dfs(int v, set<int> &gray, set<int> &black, set<int> &cutset) {
-                gray.insert(v);
-                list<int>::iterator ch = nodes[v].outgoing.begin();
-                for(; ch != nodes[v].outgoing.end(); ch++) {
-                    int c = edges[*ch].tgt;
-                    set<int>::iterator it = gray.find(c);
-                    if(it != gray.end()) { // child is gray
-                        cutset.insert(c);
-                        continue;
-                    }
-                    it = black.find(c);
-                    if(it != black.end()) { // child is black
-                        continue;
-                    }
-                    dfs(c,gray,black,cutset);
+        void IntraGraph::dfs(int v, set<int> &gray, set<int> &black, set<int> &cutset) {
+            gray.insert(v);
+            list<int>::iterator ch = nodes[v].outgoing.begin();
+            for(; ch != nodes[v].outgoing.end(); ch++) {
+                int c = edges[*ch].tgt;
+                set<int>::iterator it = gray.find(c);
+                if(it != gray.end()) { // child is gray
+                    cutset.insert(c);
+                    continue;
                 }
-                gray.erase(v);
-                black.insert(v);
+                it = black.find(c);
+                if(it != black.end()) { // child is black
+                    continue;
+                }
+                dfs(c,gray,black,cutset);
             }
+            gray.erase(v);
+            black.insert(v);
+        }
 
 
-            // return value: edge not present or is not updatable
-            bool IntraGraph::updateEdgeWeight(int s, int t, sem_elem_t se) {
-                int eno = edgeno(s,t);
-                if(eno == -1) return false;
-                if(edges[eno].updatable == false) return false;
-                edges[eno].weight = se;
-                RegExp::update(edges[eno].updatable_no,se);
-                return true;
+        // return value: edge not present or is not updatable
+        bool IntraGraph::updateEdgeWeight(int s, int t, sem_elem_t se) {
+            int eno = edgeno(s,t);
+            if(eno == -1) return false;
+            if(edges[eno].updatable == false) return false;
+            edges[eno].weight = se;
+            RegExp::update(edges[eno].updatable_no,se);
+            return true;
+        }
+
+        void IntraGraph::addEdge(int s, int t, sem_elem_t se, bool updatable) {
+
+            create_node(s);
+            create_node(t);
+
+            int eno = edgeno(s,t);
+
+            //    if(eno != -1) {
+            //      edges[eno].weight = edges[eno].weight->combine(se);
+            //      return;
+            //    }
+
+            int uno = 0;
+            if(updatable) {
+                uno = RegExp::getNextUpdatableNumber();
+                // create the updatable reg-exp-node
+                RegExp::updatable(uno, se);
             }
+            IntraGraphEdge ed(s,t,se,updatable,uno);
 
-            void IntraGraph::addEdge(int s, int t, sem_elem_t se, bool updatable) {
-
-                create_node(s);
-                create_node(t);
-
-                int eno = edgeno(s,t);
-
-                //    if(eno != -1) {
-                //      edges[eno].weight = edges[eno].weight->combine(se);
-                //      return;
-                //    }
-
-                int uno = 0;
+            if(eno != -1) { 
+                // Edge existed before
+                edges[eno].regexp = RegExp::combine(edges[eno].regexp, ed.regexp);
+                if(edges[eno].updatable && updatable) {
+                    cerr << "FWPDS: Warning, parallel updatable edges. Results may not be correct\n";
+                }
+                edges[eno].updatable = (edges[eno].updatable | updatable ); 
                 if(updatable) {
-                    uno = RegExp::getNextUpdatableNumber();
-                    // create the updatable reg-exp-node
-                    RegExp::updatable(uno, se);
+                    edges[eno].updatable_no = uno;
+                    updatable_edges.push_back(eno);
                 }
-                IntraGraphEdge ed(s,t,se,updatable,uno);
-
-                if(eno != -1) { 
-                    // Edge existed before
-                    edges[eno].regexp = RegExp::combine(edges[eno].regexp, ed.regexp);
-                    if(edges[eno].updatable && updatable) {
-                        cerr << "FWPDS: Warning, parallel updatable edges. Results may not be correct\n";
-                    }
-                    edges[eno].updatable = (edges[eno].updatable | updatable ); 
-                    if(updatable) {
-                        edges[eno].updatable_no = uno;
-                        updatable_edges.push_back(eno);
-                    }
-                    return;
-                }
-
-                // Create new edge
-                if(edges.size() == (unsigned)nedges) {
-                    edges.resize(2*nedges);
-                }
-                edges[nedges] = ed; // .set(s,t,se,updatable,uno);
-                nedges++;
-
-                int e = nedges - 1;
-
-                nodes[s].outgoing.push_back(e);
-                nodes[t].incoming.push_back(e);
-
-                if(updatable) {
-                    updatable_edges.push_back(e);
-                }
-
+                return;
             }
 
-            void IntraGraph::setSource(int n, sem_elem_t init_weight) {
-                create_node(n);
-                nodes[n].type = Source;
+            // Create new edge
+            if(edges.size() == (unsigned)nedges) {
+                edges.resize(2*nedges);
+            }
+            edges[nedges] = ed; // .set(s,t,se,updatable,uno);
+            nedges++;
 
-                // Create new edge
-                if(edges.size() == (unsigned)nedges) {
-                    edges.resize(2*nedges);
-                }
-                edges[nedges].set(0,n,init_weight,false);
-                nedges++;
+            int e = nedges - 1;
 
-                int e = nedges - 1;
-                nodes[0].outgoing.push_back(e);
-                nodes[n].incoming.push_back(e);
+            nodes[s].outgoing.push_back(e);
+            nodes[t].incoming.push_back(e);
+
+            if(updatable) {
+                updatable_edges.push_back(e);
             }
 
-            void IntraGraph::addCallEdge(IntraGraph *next) {
-                calls.insert(next);
+        }
+
+        void IntraGraph::setSource(int n, sem_elem_t init_weight) {
+            create_node(n);
+            nodes[n].type = Source;
+
+            // Create new edge
+            if(edges.size() == (unsigned)nedges) {
+                edges.resize(2*nedges);
             }
+            edges[nedges].set(0,n,init_weight,false);
+            nedges++;
 
-            void IntraGraph::updateWeight(int node, sem_elem_t wt) {
-                if(!(0 < node && node < nnodes)) {
-                    cout << "Invalid node:" << node << " in an IntraGraph of size " << nnodes << "\n";
-                    assert(0);
-                }
-                updates.push_back(update_t(node, wt));
+            int e = nedges - 1;
+            nodes[0].outgoing.push_back(e);
+            nodes[n].incoming.push_back(e);
+        }
+
+        void IntraGraph::addCallEdge(IntraGraph *next) {
+            calls.insert(next);
+        }
+
+        void IntraGraph::updateWeight(int node, sem_elem_t wt) {
+            if(!(0 < node && node < nnodes)) {
+                cout << "Invalid node:" << node << " in an IntraGraph of size " << nnodes << "\n";
+                assert(0);
             }
+            updates.push_back(update_t(node, wt));
+        }
 
-            void IntraGraph::addInitTransition(int node, sem_elem_t wt) {
-                assert(0 < node && node < nnodes);
-                InitTrans it(node, wt);
-                init_trans.push_back(it);
+        void IntraGraph::addInitTransition(int node, sem_elem_t wt) {
+            assert(0 < node && node < nnodes);
+            InitTrans it(node, wt);
+            init_trans.push_back(it);
+        }
+
+        void IntraGraph::addInitTransition(int node, int uno) {
+            assert(0 < node && node < nnodes);
+            InitTrans it(node, uno);
+            init_trans.push_back(it);
+        }
+
+        void IntraGraph::clearUpdates() {
+            updates.clear();
+            init_trans.clear();
+        }
+
+        void IntraGraph::solveSummarySolution(list<WTransition> &change) {
+            int i, n = nnodes, m = updates.size();
+            list<update_t>::iterator beg, end;
+            set<int>::iterator sbeg, send;
+            list<int> stack;
+
+            STAT(stats.t1 = stats.t2 = 0);
+
+            if(m == 0)
+                return;
+
+            assert(n == (int)node_weight.size());
+            assert(0 != path_sequence.size());
+
+            for(i=0;i<n;i++) {
+                node_weight[i] = se->zero();
+                nodes[i].visited = 0;
             }
-
-            void IntraGraph::addInitTransition(int node, int uno) {
-                assert(0 < node && node < nnodes);
-                InitTrans it(node, uno);
-                init_trans.push_back(it);
-            }
-
-            void IntraGraph::clearUpdates() {
-                updates.clear();
-                init_trans.clear();
-            }
-
-            void IntraGraph::solveSummarySolution(list<WTransition> &change) {
-                int i, n = nnodes, m = updates.size();
-                list<update_t>::iterator beg, end;
-                set<int>::iterator sbeg, send;
-                list<int> stack;
-
-                STAT(stats.t1 = stats.t2 = 0);
-
-                if(m == 0)
-                    return;
-
-                assert(n == (int)node_weight.size());
-                assert(0 != path_sequence.size());
-
-                for(i=0;i<n;i++) {
-                    node_weight[i] = se->zero();
-                    nodes[i].visited = 0;
-                }
 #ifdef USE_APSP
-                assert(apsp != NULL);
+            assert(apsp != NULL);
 
-                // FIXME: consider creating a new graph
+            // FIXME: consider creating a new graph
 
-                // Change the root node to reflect the updates.
+            // Change the root node to reflect the updates.
 
-                // First delete incoming edges from the root
-                list<int>::iterator it;
-                list<int> temp;
-                for(it = nodes[0].outgoing.begin(); it != nodes[0].outgoing.end(); it++) {
-                    int tgt = edges[*it].tgt;
-                    if(nodes[tgt].type == Source) {
-                        temp.push_back(*it);
-                        continue;
+            // First delete incoming edges from the root
+            list<int>::iterator it;
+            list<int> temp;
+            for(it = nodes[0].outgoing.begin(); it != nodes[0].outgoing.end(); it++) {
+                int tgt = edges[*it].tgt;
+                if(nodes[tgt].type == Source) {
+                    temp.push_back(*it);
+                    continue;
+                }
+                nodes[tgt].incoming.remove(*it); 
+            }
+            nodes[0].outgoing = temp;
+            // add new edges to updated nodes
+            beg = updates.begin();
+            end = updates.end();
+            for(; beg != end; beg++) {
+                update_t &updt = *beg;
+                addEdge(0, updt.first, updt.second);
+            }
+            // compute dominators
+            int *buffer = new int[5*nnodes];
+            set<int> *children = new set<int>[nnodes];
+            int *dom = computeDominators(nodes, nnodes, edges, nedges, buffer, children);
+            for(i=0;i<nnodes;i++) {
+                if(dom[i] != -1)
+                    children[dom[i]].insert(i);
+            }
+            //stats.nchildren = children[0].size();
+            // Construct a reduced graph between children[0]: iterate over incoming edges
+
+            vector<IntraGraphNode> sub_cnodes;
+            vector<IntraGraphEdge> sub_cedges;
+            // node -> sub_node map
+            map<int, int> sub_node_number;
+            // sub_node -> node map
+            map<int, int> node_number;
+
+            list<int>::iterator edbeg, edend;
+            sbeg = children[0].begin();
+            send = children[0].end();
+            for(; sbeg != send; sbeg++) {
+                int u = *sbeg;
+                edbeg = nodes[u].incoming.begin();
+                edend = nodes[u].incoming.end();
+                for(; edbeg != edend; edbeg++) {
+                    int v = edges[*edbeg].src;
+                    if(v == 0) continue; // tree edge
+                    // find the head
+                    while(dom[v] != dom[u]) {
+                        v = dom[v];
                     }
-                    nodes[tgt].incoming.remove(*it); 
-                }
-                nodes[0].outgoing = temp;
-                // add new edges to updated nodes
-                beg = updates.begin();
-                end = updates.end();
-                for(; beg != end; beg++) {
-                    update_t &updt = *beg;
-                    addEdge(0, updt.first, updt.second);
-                }
-                // compute dominators
-                int *buffer = new int[5*nnodes];
-                set<int> *children = new set<int>[nnodes];
-                int *dom = computeDominators(nodes, nnodes, edges, nedges, buffer, children);
-                for(i=0;i<nnodes;i++) {
-                    if(dom[i] != -1)
-                        children[dom[i]].insert(i);
-                }
-                //stats.nchildren = children[0].size();
-                // Construct a reduced graph between children[0]: iterate over incoming edges
-
-                vector<IntraGraphNode> sub_cnodes;
-                vector<IntraGraphEdge> sub_cedges;
-                // node -> sub_node map
-                map<int, int> sub_node_number;
-                // sub_node -> node map
-                map<int, int> node_number;
-
-                list<int>::iterator edbeg, edend;
-                sbeg = children[0].begin();
-                send = children[0].end();
-                for(; sbeg != send; sbeg++) {
-                    int u = *sbeg;
-                    edbeg = nodes[u].incoming.begin();
-                    edend = nodes[u].incoming.end();
-                    for(; edbeg != edend; edbeg++) {
-                        int v = edges[*edbeg].src;
-                        if(v == 0) continue; // tree edge
-                        // find the head
-                        while(dom[v] != dom[u]) {
-                            v = dom[v];
-                        }
-                        // make nodes for u and v
-                        int ut, vt, et;
-                        if(sub_node_number.find(u) == sub_node_number.end()) {
-                            ut = sub_node_number.size();
-                            sub_node_number[u] = ut;
-                            node_number[ut] = u;
-                            sub_cnodes.push_back(nodes[u]);
-                            sub_cnodes[ut].incoming.clear();
-                            sub_cnodes[ut].outgoing.clear();
-                        } else {
-                            ut = sub_node_number[u];
-                        }
-                        if(sub_node_number.find(v) == sub_node_number.end()) {
-                            vt = sub_node_number.size();
-                            sub_node_number[v] = vt;
-                            node_number[vt] = v;
-                            sub_cnodes.push_back(nodes[v]);
-                            sub_cnodes[vt].incoming.clear();
-                            sub_cnodes[vt].outgoing.clear();
-                        } else {
-                            vt = sub_node_number[v];
-                        }
-                        //sub_cedges.push_back(IntraGraphEdge(vt, ut, apsp[v][u], false));
-                        sub_cedges.push_back(IntraGraphEdge(vt, ut, apsp[v][u]->one(), false));
-                        et = sub_cedges.size() - 1;
-                        sub_cnodes[ut].incoming.push_back(et);
-                        sub_cnodes[vt].outgoing.push_back(et);
-                    }
-                }
-                vector<PathSequence> seq;
-                computePathSequence(sub_cnodes, sub_cnodes.size(), sub_cedges, sub_cedges.size(), seq);
-                //stats.nchildren_seq = seq.size();
-                // now solve
-                // First, initialize the updates
-                beg = updates.begin();
-                end = updates.end();
-                for(; beg != end; beg++) {
-                    update_t &updt = *beg;
-                    node_weight[updt.first] = updt.second;
-                }
-                // Now solve the path sequence
-                for(i=0;i<(int)seq.size();i++) {
-                    PathSequence &ps = seq[i];
-                    ps.src = node_number[ps.src];
-                    ps.tgt = node_number[ps.tgt];
-                    //sem_elem_t wt = ps.regexp->get_weight();
-                    sem_elem_t wt = apsp[ps.src][ps.tgt];
-                    if(ps.src == ps.tgt) {
-                        node_weight[ps.src] = extend(node_weight[ps.src], wt);
+                    // make nodes for u and v
+                    int ut, vt, et;
+                    if(sub_node_number.find(u) == sub_node_number.end()) {
+                        ut = sub_node_number.size();
+                        sub_node_number[u] = ut;
+                        node_number[ut] = u;
+                        sub_cnodes.push_back(nodes[u]);
+                        sub_cnodes[ut].incoming.clear();
+                        sub_cnodes[ut].outgoing.clear();
                     } else {
-                        node_weight[ps.tgt] = node_weight[ps.tgt]->combine(extend(node_weight[ps.src], wt));
+                        ut = sub_node_number[u];
                     }
+                    if(sub_node_number.find(v) == sub_node_number.end()) {
+                        vt = sub_node_number.size();
+                        sub_node_number[v] = vt;
+                        node_number[vt] = v;
+                        sub_cnodes.push_back(nodes[v]);
+                        sub_cnodes[vt].incoming.clear();
+                        sub_cnodes[vt].outgoing.clear();
+                    } else {
+                        vt = sub_node_number[v];
+                    }
+                    //sub_cedges.push_back(IntraGraphEdge(vt, ut, apsp[v][u], false));
+                    sub_cedges.push_back(IntraGraphEdge(vt, ut, apsp[v][u]->one(), false));
+                    et = sub_cedges.size() - 1;
+                    sub_cnodes[ut].incoming.push_back(et);
+                    sub_cnodes[vt].outgoing.push_back(et);
                 }
-                // Now propagate weight to the rest of the nodes
-                sbeg = children[0].begin();
-                send = children[0].end();
+            }
+            vector<PathSequence> seq;
+            computePathSequence(sub_cnodes, sub_cnodes.size(), sub_cedges, sub_cedges.size(), seq);
+            //stats.nchildren_seq = seq.size();
+            // now solve
+            // First, initialize the updates
+            beg = updates.begin();
+            end = updates.end();
+            for(; beg != end; beg++) {
+                update_t &updt = *beg;
+                node_weight[updt.first] = updt.second;
+            }
+            // Now solve the path sequence
+            for(i=0;i<(int)seq.size();i++) {
+                PathSequence &ps = seq[i];
+                ps.src = node_number[ps.src];
+                ps.tgt = node_number[ps.tgt];
+                //sem_elem_t wt = ps.regexp->get_weight();
+                sem_elem_t wt = apsp[ps.src][ps.tgt];
+                if(ps.src == ps.tgt) {
+                    node_weight[ps.src] = extend(node_weight[ps.src], wt);
+                } else {
+                    node_weight[ps.tgt] = node_weight[ps.tgt]->combine(extend(node_weight[ps.src], wt));
+                }
+            }
+            // Now propagate weight to the rest of the nodes
+            sbeg = children[0].begin();
+            send = children[0].end();
+            for(; sbeg != send; sbeg++) {
+                stack.push_back(*sbeg);
+            }
+            while(!stack.empty()) {
+                int u = stack.front();
+                stack.pop_front();
+                sbeg = children[u].begin();
+                send = children[u].end();
                 for(; sbeg != send; sbeg++) {
+                    node_weight[*sbeg] = extend(node_weight[u], apsp[u][*sbeg]);
                     stack.push_back(*sbeg);
                 }
-                while(!stack.empty()) {
-                    int u = stack.front();
-                    stack.pop_front();
-                    sbeg = children[u].begin();
-                    send = children[u].end();
-                    for(; sbeg != send; sbeg++) {
-                        node_weight[*sbeg] = extend(node_weight[u], apsp[u][*sbeg]);
-                        stack.push_back(*sbeg);
-                    }
-                }
-                delete [] buffer;
-                delete [] children;
+            }
+            delete [] buffer;
+            delete [] children;
 
 #else // !USE_APSP
 
-                clock_t start,endt;
+            clock_t start,endt;
 
-                STAT(start = clock());
+            STAT(start = clock());
 
-                beg = updates.begin();
-                end = updates.end();
-                for(; beg != end; beg++) {
-                    update_t &updt = *beg;
-                    node_weight[updt.first] = updt.second;
+            beg = updates.begin();
+            end = updates.end();
+            for(; beg != end; beg++) {
+                update_t &updt = *beg;
+                node_weight[updt.first] = updt.second;
+            }
+
+
+            STAT({
+                    endt = clock();
+                    stats.t1 = (endt-start);
+                    start = endt;
+                    });
+
+            // Solve for weights from the path sequence
+            for(i=0;i<(int)evaluated_path_sequence.size();i++) {
+                EvaluatedPathSequence &ps = evaluated_path_sequence[i];
+                //ps.regexp->get_weight()->print(cout << ps.src << " " << ps.tgt << " ") << "\n";
+                if(ps.src == ps.tgt) {
+                    node_weight[ps.src] = extend(node_weight[ps.src], ps.value);
+                } else {
+                    node_weight[ps.tgt] = node_weight[ps.tgt]->combine(extend(node_weight[ps.src], ps.value));
                 }
+            }
 
-
-                STAT({
-                        endt = clock();
-                        stats.t1 = (endt-start);
-                        start = endt;
-                        });
-
-                // Solve for weights from the path sequence
-                for(i=0;i<(int)evaluated_path_sequence.size();i++) {
-                    EvaluatedPathSequence &ps = evaluated_path_sequence[i];
-                    //ps.regexp->get_weight()->print(cout << ps.src << " " << ps.tgt << " ") << "\n";
-                    if(ps.src == ps.tgt) {
-                        node_weight[ps.src] = extend(node_weight[ps.src], ps.value);
-                    } else {
-                        node_weight[ps.tgt] = node_weight[ps.tgt]->combine(extend(node_weight[ps.src], ps.value));
-                    }
-                }
-
-                STAT({
-                        endt = clock();
-                        stats.t2 = (endt - start);
-                        start = endt;
-                        });
+            STAT({
+                    endt = clock();
+                    stats.t2 = (endt - start);
+                    start = endt;
+                    });
 
 #endif // USE_APSP
 
-                // FIXME: do a BFS instead
-                for(i=0;i<n;i++) {
-                    if(!node_weight[i]->equal(se->zero())) {
-                        change.push_back(WTransition(nodes[i].trans, node_weight[i]));
-                    }
+            // FIXME: do a BFS instead
+            for(i=0;i<n;i++) {
+                if(!node_weight[i]->equal(se->zero())) {
+                    change.push_back(WTransition(nodes[i].trans, node_weight[i]));
                 }
-
-                STAT({
-                        endt = clock();
-                        stats.t3 = (endt - start);
-                        start = endt;
-                        });
             }
 
-            void IntraGraph::solveRegSummarySolution() {
-                int i, n = nnodes, m = init_trans.size();
-                list<InitTrans>::iterator beg, end;
-                set<int>::iterator sbeg, send;
-                list<int> stack;
+            STAT({
+                    endt = clock();
+                    stats.t3 = (endt - start);
+                    start = endt;
+                    });
+        }
 
-                STAT(stats.t1 = stats.t2 = 0);
+        void IntraGraph::solveRegSummarySolution() {
+            int i, n = nnodes, m = init_trans.size();
+            list<InitTrans>::iterator beg, end;
+            set<int>::iterator sbeg, send;
+            list<int> stack;
 
-                if(m == 0)
-                    return;
+            STAT(stats.t1 = stats.t2 = 0);
 
-                assert(n == (int)node_weight.size());
-                assert(0 != path_sequence.size());
+            if(m == 0)
+                return;
 
-                for(i=0;i<n;i++) {
-                    nodes[i].regexp = NULL;
-                }
-                clock_t start,endt;
+            assert(n == (int)node_weight.size());
+            assert(0 != path_sequence.size());
 
-                STAT(start = clock());
+            for(i=0;i<n;i++) {
+                nodes[i].regexp = NULL;
+            }
+            clock_t start,endt;
 
-                // First, identify all the updatable nodes
-                beg = init_trans.begin();
-                end = init_trans.end();
-                for(; beg != end; beg++) {
-                    InitTrans &it = *beg;
+            STAT(start = clock());
 
-                    if(it.uno == -1) {
-                        if(nodes[it.node].regexp.get_ptr() == NULL) {
-                            nodes[it.node].regexp = RegExp::constant(it.wt);
-                        } else {
-                            int uno = nodes[it.node].regexp->updatableNumber();
-                            RegExp::update(uno, it.wt);
-                        }
+            // First, identify all the updatable nodes
+            beg = init_trans.begin();
+            end = init_trans.end();
+            for(; beg != end; beg++) {
+                InitTrans &it = *beg;
+
+                if(it.uno == -1) {
+                    if(nodes[it.node].regexp.get_ptr() == NULL) {
+                        nodes[it.node].regexp = RegExp::constant(it.wt);
                     } else {
-                        if(nodes[it.node].regexp.get_ptr() == NULL) {
-                            nodes[it.node].regexp = RegExp::updatable(it.uno, se->zero());
-                        } else {
-                            RegExp::update(it.uno, nodes[it.node].regexp->get_weight());
-                            nodes[it.node].regexp = RegExp::updatable(it.uno, se->zero());
-                        }
+                        int uno = nodes[it.node].regexp->updatableNumber();
+                        RegExp::update(uno, it.wt);
                     }
-                }
-
-                // Initialize rest of regexps
-                for(i=0;i<n;i++) {
-                    if(nodes[i].regexp.get_ptr() == NULL) {
-                        nodes[i].regexp = RegExp::constant(se->zero());
-                    }
-                }
-
-                STAT({
-                        endt = clock();
-                        stats.t1 = (endt-start);
-                        start = endt;
-                        });
-
-                // Solve for regexp from the path sequence
-                for(i=0;i<(int)evaluated_path_sequence.size();i++) {
-                    EvaluatedPathSequence &ps = evaluated_path_sequence[i];
-
-                    if(ps.src == ps.tgt) {
-                        nodes[ps.src].regexp = RegExp::extend(nodes[ps.src].regexp, RegExp::constant(ps.value));
+                } else {
+                    if(nodes[it.node].regexp.get_ptr() == NULL) {
+                        nodes[it.node].regexp = RegExp::updatable(it.uno, se->zero());
                     } else {
-                        nodes[ps.tgt].regexp = RegExp::combine(nodes[ps.tgt].regexp, RegExp::extend(nodes[ps.src].regexp, RegExp::constant(ps.value)));
+                        RegExp::update(it.uno, nodes[it.node].regexp->get_weight());
+                        nodes[it.node].regexp = RegExp::updatable(it.uno, se->zero());
                     }
                 }
-
-                STAT({
-                        endt = clock();
-                        stats.t2 = (endt - start);
-                        start = endt;
-                        });
-
             }
 
-            // Solve for weights of everything in the path sequence
-            void IntraGraph::setupSummarySolution() {
-                int i;
-                assert(0 != path_sequence.size());
-
-                //path_sequence.clear();
-                //computePathSequence(nodes, nnodes, edges, nedges, path_sequence);
-
-                for(i=0; i < (int)path_sequence.size(); i++) {
-                    PathSequence &ps = path_sequence[i];
-                    evaluated_path_sequence.push_back(EvaluatedPathSequence(ps.regexp->get_weight(), ps.src, ps.tgt));
+            // Initialize rest of regexps
+            for(i=0;i<n;i++) {
+                if(nodes[i].regexp.get_ptr() == NULL) {
+                    nodes[i].regexp = RegExp::constant(se->zero());
                 }
+            }
 
-                node_weight.resize(nnodes);
+            STAT({
+                    endt = clock();
+                    stats.t1 = (endt-start);
+                    start = endt;
+                    });
+
+            // Solve for regexp from the path sequence
+            for(i=0;i<(int)evaluated_path_sequence.size();i++) {
+                EvaluatedPathSequence &ps = evaluated_path_sequence[i];
+
+                if(ps.src == ps.tgt) {
+                    nodes[ps.src].regexp = RegExp::extend(nodes[ps.src].regexp, RegExp::constant(ps.value));
+                } else {
+                    nodes[ps.tgt].regexp = RegExp::combine(nodes[ps.tgt].regexp, RegExp::extend(nodes[ps.src].regexp, RegExp::constant(ps.value)));
+                }
+            }
+
+            STAT({
+                    endt = clock();
+                    stats.t2 = (endt - start);
+                    start = endt;
+                    });
+
+        }
+
+        // Solve for weights of everything in the path sequence
+        void IntraGraph::setupSummarySolution() {
+            int i;
+            assert(0 != path_sequence.size());
+
+            //path_sequence.clear();
+            //computePathSequence(nodes, nnodes, edges, nedges, path_sequence);
+
+            for(i=0; i < (int)path_sequence.size(); i++) {
+                PathSequence &ps = path_sequence[i];
+                evaluated_path_sequence.push_back(EvaluatedPathSequence(ps.regexp->get_weight(), ps.src, ps.tgt));
+            }
+
+            node_weight.resize(nnodes);
 #ifdef USE_APSP
-                int j;
-                apsp = new sem_elem_t *[nnodes];
-                for(i=0;i<nnodes;i++) {
-                    apsp[i] = new sem_elem_t[nnodes];
-                    for(j=0;j<nnodes;j++) {
-                        apsp[i][j] = se->zero();
-                    }
-                    // Solve single-source shortest path starting from node i
-                    apsp[i][i] = se->one();
-                    for(j=0;j<(int)path_sequence.size();j++) {
-                        PathSequence &ps = path_sequence[j];
-                        if(ps.src == ps.tgt) {
-                            apsp[i][ps.src] = extend(apsp[i][ps.src], ps.regexp->get_weight());
-                        } else {
-                            apsp[i][ps.tgt] = apsp[i][ps.tgt]->combine(extend(apsp[i][ps.src], ps.regexp->get_weight()));
-                        }
+            int j;
+            apsp = new sem_elem_t *[nnodes];
+            for(i=0;i<nnodes;i++) {
+                apsp[i] = new sem_elem_t[nnodes];
+                for(j=0;j<nnodes;j++) {
+                    apsp[i][j] = se->zero();
+                }
+                // Solve single-source shortest path starting from node i
+                apsp[i][i] = se->one();
+                for(j=0;j<(int)path_sequence.size();j++) {
+                    PathSequence &ps = path_sequence[j];
+                    if(ps.src == ps.tgt) {
+                        apsp[i][ps.src] = extend(apsp[i][ps.src], ps.regexp->get_weight());
+                    } else {
+                        apsp[i][ps.tgt] = apsp[i][ps.tgt]->combine(extend(apsp[i][ps.src], ps.regexp->get_weight()));
                     }
                 }
+            }
 #endif
+        }
+
+        void IntraGraph::setOutNode(int n, int inter_n) {
+            create_node(n);
+            if(nodes[n].type != OutNode) { // Avoid duplicates
+                nodes[n].type = OutNode;
+                out_nodes_intra->push_back(n);
+                out_nodes_inter->push_back(inter_n);
             }
+        }
 
-            void IntraGraph::setOutNode(int n, int inter_n) {
-                create_node(n);
-                if(nodes[n].type != OutNode) { // Avoid duplicates
-                    nodes[n].type = OutNode;
-                    out_nodes_intra->push_back(n);
-                    out_nodes_inter->push_back(inter_n);
-                }
+        sem_elem_t IntraGraph::get_weight(int nno) {
+
+            if(nodes[nno].regexp.get_ptr() == NULL) {
+                //buildCutsetRegExp(topsort_list,cutset_list,nodes,edges); 
+                vector<PathSequence> seq;
+                domRegExp(nodes,nnodes,edges,nedges,seq);
+                buildRegExp(seq);
             }
-
-            sem_elem_t IntraGraph::get_weight(int nno) {
-
-                if(nodes[nno].regexp.get_ptr() == NULL) {
-                    //buildCutsetRegExp(topsort_list,cutset_list,nodes,edges); 
-                    vector<PathSequence> seq;
-                    domRegExp(nodes,nnodes,edges,nedges,seq);
-                    buildRegExp(seq);
-                }
-                FWPDSDBGS({
-                        cout << "RegExp:";
-                        nodes[nno].regexp->print(cout) << "\n";
-                        });
-                int nevals;
-                STAT(nevals = nodes[nno].regexp->get_nevals());
-                sem_elem_t ret = nodes[nno].regexp->get_weight();
-                STAT({
-                        if(nodes[nno].regexp->get_nevals() != nevals) {
-                        stats.nget_weight++;
-                        }
-                        });
-                return ret;
-            }
+            FWPDSDBGS({
+                    cout << "RegExp:";
+                    nodes[nno].regexp->print(cout) << "\n";
+                    });
+            int nevals;
+            STAT(nevals = nodes[nno].regexp->get_nevals());
+            sem_elem_t ret = nodes[nno].regexp->get_weight();
+            STAT({
+                    if(nodes[nno].regexp->get_nevals() != nevals) {
+                    stats.nget_weight++;
+                    }
+                    });
+            return ret;
+        }
 
 
-            void IntraGraph::setupIntraSolution(bool compress_regexp) {
-                RegExp::extendDirectionBackwards(running_prestar);
-                vector<IntraGraphNode> cnodes;
-                vector<IntraGraphEdge> cedges;
-                map<int,int> orig_to_compress;
-                list<int> ts;
-                vector<int> cs;
-                list<int>::iterator nit;
+        void IntraGraph::setupIntraSolution(bool compress_regexp) {
+            RegExp::extendDirectionBackwards(running_prestar);
+            vector<IntraGraphNode> cnodes;
+            vector<IntraGraphEdge> cedges;
+            map<int,int> orig_to_compress;
+            list<int> ts;
+            vector<int> cs;
+            list<int>::iterator nit;
 
-                path_sequence.clear();
+            path_sequence.clear();
 
-                // Note: REGEXP_METHOD other than 0 and 1 may be deprecated
+            // Note: REGEXP_METHOD other than 0 and 1 may be deprecated
 #define REGEXP_METHOD 0
 
 #if REGEXP_METHOD==0
 
-                // SCC followed by Dominator version
-                computePathSequence(nodes, nnodes, edges, nedges, path_sequence);
-                buildRegExp(path_sequence);
+            // SCC followed by Dominator version
+            computePathSequence(nodes, nnodes, edges, nedges, path_sequence);
+            buildRegExp(path_sequence);
 
-                { // NAK DEBUGGING REGEXP
-                    //for( int i=0; i < nnodes; i++) {
-                    //    nodes[i].regexp->print(std::cout<< i << ")   ") << std::endl;
-                    //}
-                }
+            { // NAK DEBUGGING REGEXP
+                //for( int i=0; i < nnodes; i++) {
+                //    nodes[i].regexp->print(std::cout<< i << ")   ") << std::endl;
+                //}
+            }
 
-                STAT(stats.ndom_sequence = path_sequence.size());
-                return;
+            STAT(stats.ndom_sequence = path_sequence.size());
+            return;
 
 #elif REGEXP_METHOD==1
-                // Dominator
-                domRegExp(nodes, nnodes, edges, nedges, path_sequence);
-                buildRegExp(path_sequence);
+            // Dominator
+            domRegExp(nodes, nnodes, edges, nedges, path_sequence);
+            buildRegExp(path_sequence);
 
-                STAT(stats.ndom_sequence = path_sequence.size());
-                return;
+            STAT(stats.ndom_sequence = path_sequence.size());
+            return;
 
 #elif REGEXP_METHOD==2
 
-                // Dominator version + regexp compression and huffman-height minimization
-                domRegExp(nodes, nnodes, edges, nedges, path_sequence);
-                buildRegExp(path_sequence);
-                STAT(stats.ndom_sequence = path_sequence.size());
-                for(nit = out_nodes_intra->begin(); nit != out_nodes_intra->end(); nit++) {
-                    int nno = *nit;
-                    reg_exp_cache_t cache;
-                    reg_exp_t temp = RegExp::compress(nodes[nno].regexp, cache);
-                    cache.clear();
-                    nodes[nno].regexp = RegExp::minimize_height(temp, cache);
-                    cache.clear();
-                }
-                return;
+            // Dominator version + regexp compression and huffman-height minimization
+            domRegExp(nodes, nnodes, edges, nedges, path_sequence);
+            buildRegExp(path_sequence);
+            STAT(stats.ndom_sequence = path_sequence.size());
+            for(nit = out_nodes_intra->begin(); nit != out_nodes_intra->end(); nit++) {
+                int nno = *nit;
+                reg_exp_cache_t cache;
+                reg_exp_t temp = RegExp::compress(nodes[nno].regexp, cache);
+                cache.clear();
+                nodes[nno].regexp = RegExp::minimize_height(temp, cache);
+                cache.clear();
+            }
+            return;
 
 #elif REGEXP_METHOD==3
 
-                // Dominators with compression
-                topSort(nodes,nnodes, edges, nedges, topsort_list,cutset_list, false, false);
-                compressGraph(topsort_list,cutset_list,ts,cs,cnodes,cedges,orig_to_compress);
-                domRegExp(cnodes, cnodes.size(), cedges, cedges.size(), path_sequence);
-                buildRegExp(path_sequence);
-                STAT(stats.ndom_sequence = path_sequence.size());
-                for(nit = out_nodes_intra->begin(); nit != out_nodes_intra->end(); nit++) {
-                    int nno = *nit;
-                    nodes[nno].regexp = cnodes[orig_to_compress[nno]].regexp;
-                }
-                return;
+            // Dominators with compression
+            topSort(nodes,nnodes, edges, nedges, topsort_list,cutset_list, false, false);
+            compressGraph(topsort_list,cutset_list,ts,cs,cnodes,cedges,orig_to_compress);
+            domRegExp(cnodes, cnodes.size(), cedges, cedges.size(), path_sequence);
+            buildRegExp(path_sequence);
+            STAT(stats.ndom_sequence = path_sequence.size());
+            for(nit = out_nodes_intra->begin(); nit != out_nodes_intra->end(); nit++) {
+                int nno = *nit;
+                nodes[nno].regexp = cnodes[orig_to_compress[nno]].regexp;
+            }
+            return;
 
 #elif REGEXP_METHOD==4
 
-                // Cutset version
-                topSort(nodes,edges,topsort_list,cutset_list, false, false);
-                buildCutsetRegExp(topsort_list,cutset_list,nodes,nnodes, edges, nedges); return;
+            // Cutset version
+            topSort(nodes,edges,topsort_list,cutset_list, false, false);
+            buildCutsetRegExp(topsort_list,cutset_list,nodes,nnodes, edges, nedges); return;
 
 #elif REGEXP_METHOD==5
 
-                // Cutset with compression
-                compressGraph(topsort_list,cutset_list,ts,cs,cnodes,cedges,orig_to_compress);
-                //cout << cs.size() << "\n";
-                buildCutsetRegExp(ts,cs,cnodes,cnodes.size(), cedges, cedges.size());
+            // Cutset with compression
+            compressGraph(topsort_list,cutset_list,ts,cs,cnodes,cedges,orig_to_compress);
+            //cout << cs.size() << "\n";
+            buildCutsetRegExp(ts,cs,cnodes,cnodes.size(), cedges, cedges.size());
 
-                for(nit = out_nodes_intra->begin(); nit != out_nodes_intra->end(); nit++) {
-                    int nno = *nit;
-                    nodes[nno].regexp = cnodes[orig_to_compress[nno]].regexp;
-                }
-                return;
+            for(nit = out_nodes_intra->begin(); nit != out_nodes_intra->end(); nit++) {
+                int nno = *nit;
+                nodes[nno].regexp = cnodes[orig_to_compress[nno]].regexp;
+            }
+            return;
 
 #elif REGEXP_METHOD==6
 
-                // O(n^3) method
-                basicRegExp(compress_regexp);
+            // O(n^3) method
+            basicRegExp(compress_regexp);
 
 #endif // REGEXP_METHOD
 
-            }
+        }
 
-            sem_elem_t IntraGraph::extend(sem_elem_t w1, sem_elem_t w2) {
-                STAT(stats.nextend++);
-                if(running_prestar) {
-                    return w2->extend(w1);
-                }
-                return w1->extend(w2);
+        sem_elem_t IntraGraph::extend(sem_elem_t w1, sem_elem_t w2) {
+            STAT(stats.nextend++);
+            if(running_prestar) {
+                return w2->extend(w1);
             }
+            return w1->extend(w2);
+        }
 
             void IntraGraph::buildRegExp(vector<PathSequence> &seq) {
                 int i;
@@ -1561,6 +1564,5 @@ namespace wali {
     }
   }
 
-} // namespace fwpds
-} // namespace wpds
+} // namespace graph
 } // namespace wali

@@ -8,7 +8,9 @@
 #include "wali/Common.hpp"
 #include "wali/wpds/WPDS.hpp"
 #include "wali/wpds/Wrapper.hpp"
-#include "wali/wpds/fwpds/FwpdsCommon.hpp"
+
+#include "wali/graph/GraphCommon.hpp"
+
 namespace wali {
 
     namespace wfa {

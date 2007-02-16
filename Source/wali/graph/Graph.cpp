@@ -1,128 +1,123 @@
-#include "wali/wpds/fwpds/Graph.hpp"
+#include "wali/graph/Graph.hpp"
+
 #include <cassert>
 
 namespace wali {
 
-    namespace wpds {
+    namespace graph {
 
-        namespace fwpds {
+        struct FinishedActionFunctor : ActionFunctor {
+            list<int> &finished;
 
-            namespace graph {
+            FinishedActionFunctor(list<int> &_f) : finished(_f) { }
 
-                struct FinishedActionFunctor : ActionFunctor {
-                    list<int> &finished;
+            virtual ~FinishedActionFunctor() { }
 
-                    FinishedActionFunctor(list<int> &_f) : finished(_f) { }
+            virtual void operator() (int n) {
+                finished.push_front(n);
+            }
+        };
 
-                    virtual ~FinishedActionFunctor() { }
+        struct AssignSCCActionFunctor : ActionFunctor {
+            Graph &gr;
+            int &scc;
 
-                    virtual void operator() (int n) {
-                        finished.push_front(n);
-                    }
-                };
+            AssignSCCActionFunctor(Graph &_gr, int &_scc) : gr(_gr), scc(_scc) { }
 
-                struct AssignSCCActionFunctor : ActionFunctor {
-                    Graph &gr;
-                    int &scc;
+            virtual ~AssignSCCActionFunctor() { }
 
-                    AssignSCCActionFunctor(Graph &_gr, int &_scc) : gr(_gr), scc(_scc) { }
+            virtual void operator() (int n) {
+                gr.nodes[n].scc = scc;
+            }
+        };
 
-                    virtual ~AssignSCCActionFunctor() { }
+        int Graph::create_node(int n) {
+            if(env_to_node.find(n) == env_to_node.end()) {
+                int s = env_to_node.size();
+                env_to_node[n] = s;
+                //node_to_env[s] = n;
+                nodes.resize(s+1);
+                return s;
+            }
+            return env_to_node[n];
+        }
 
-                    virtual void operator() (int n) {
-                        gr.nodes[n].scc = scc;
-                    }
-                };
+        void Graph::addEdge(int s, int t) {
+            s = create_node(s);
+            t = create_node(t);
 
-                int Graph::create_node(int n) {
-                    if(env_to_node.find(n) == env_to_node.end()) {
-                        int s = env_to_node.size();
-                        env_to_node[n] = s;
-                        //node_to_env[s] = n;
-                        nodes.resize(s+1);
-                        return s;
-                    }
-                    return env_to_node[n];
-                }
+            nodes[s].edges[0].insert(t);
+            nodes[t].edges[1].insert(s);
+        }
 
-                void Graph::addEdge(int s, int t) {
-                    s = create_node(s);
-                    t = create_node(t);
+        // Returns the number of SCCs
+        int Graph::runSCCdecomposition() {
+            int i,n;
+            n = nodes.size();
 
-                    nodes[s].edges[0].insert(t);
-                    nodes[t].edges[1].insert(s);
-                }
+            // initialize
+            for(i=0;i<n;i++) {
+                nodes[i].visited = false;
+                nodes[i].scc = 0;
+                nodes[i].bfs = -1;
+            }
 
-                // Returns the number of SCCs
-                int Graph::runSCCdecomposition() {
-                    int i,n;
-                    n = nodes.size();
+            // Do a forward DFS and compute the finishing times
+            list<int> finished;
+            FinishedActionFunctor fin(finished);
+            for(i=0;i<n;i++) {
+                if(nodes[i].visited)
+                    continue;
+                dfs(i, 0, fin);
+            }
+            assert((int)finished.size() == n); // (would not be true if everything wasn't reachable)
 
-                    // initialize
-                    for(i=0;i<n;i++) {
-                        nodes[i].visited = false;
-                        nodes[i].scc = 0;
-                        nodes[i].bfs = -1;
-                    }
+            // clear visited
+            for(i=0;i<n;i++) {
+                nodes[i].visited = false;
+            }
 
-                    // Do a forward DFS and compute the finishing times
-                    list<int> finished;
-                    FinishedActionFunctor fin(finished);
-                    for(i=0;i<n;i++) {
-                        if(nodes[i].visited)
-                            continue;
-                        dfs(i, 0, fin);
-                    }
-                    assert((int)finished.size() == n); // (would not be true if everything wasn't reachable)
+            // Now run a backward DFS in order of decreasing finishing time
+            list<int>::iterator it;
+            int scc = 0;
+            AssignSCCActionFunctor ascc(*this, scc);
+            for(it = finished.begin(); it != finished.end(); it++) {
+                i = *it;
+                if(nodes[i].visited)
+                    continue;
+                scc++;
+                dfs(i, 1, ascc);
+            }
 
-                    // clear visited
-                    for(i=0;i<n;i++) {
-                        nodes[i].visited = false;
-                    }
+            return scc;
 
-                    // Now run a backward DFS in order of decreasing finishing time
-                    list<int>::iterator it;
-                    int scc = 0;
-                    AssignSCCActionFunctor ascc(*this, scc);
-                    for(it = finished.begin(); it != finished.end(); it++) {
-                        i = *it;
-                        if(nodes[i].visited)
-                            continue;
-                        scc++;
-                        dfs(i, 1, ascc);
-                    }
+        }
 
-                    return scc;
+        void Graph::dfs(int node, int direction, ActionFunctor &action) {
+            nodes[node].visited = true;
+            set<int>::iterator it;
+            for(it = nodes[node].edges[direction].begin(); it != nodes[node].edges[direction].end(); it++) {
+                if(!nodes[*it].visited) 
+                    dfs(*it, direction, action);
+            }
+            action(node);
+        }
 
-                }
+        int Graph::getNnodes() {
+            return nodes.size();
+        }
 
-                void Graph::dfs(int node, int direction, ActionFunctor &action) {
-                    nodes[node].visited = true;
-                    set<int>::iterator it;
-                    for(it = nodes[node].edges[direction].begin(); it != nodes[node].edges[direction].end(); it++) {
-                        if(!nodes[*it].visited) 
-                            dfs(*it, direction, action);
-                    }
-                    action(node);
-                }
+        int Graph::getSccNumber(int n) {
+            if(env_to_node.find(n) == env_to_node.end())
+                return 0;
+            return nodes[env_to_node[n]].scc;
+        }
 
-                int Graph::getNnodes() {
-                    return nodes.size();
-                }
+        int Graph::getBfsNumber(int n) {
+            assert(env_to_node.find(n) != env_to_node.end());
+            return nodes[env_to_node[n]].bfs;
+        }
 
-                int Graph::getSccNumber(int n) {
-                    if(env_to_node.find(n) == env_to_node.end())
-                        return 0;
-                    return nodes[env_to_node[n]].scc;
-                }
+    } // namespace graph
 
-                int Graph::getBfsNumber(int n) {
-                    assert(env_to_node.find(n) != env_to_node.end());
-                    return nodes[env_to_node[n]].bfs;
-                }
-
-            } // namespace graph
-
-        } // namespace fwpds
-    } // namespace wpds
 } // namespace wali

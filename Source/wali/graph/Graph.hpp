@@ -1,5 +1,5 @@
-#ifndef wali_wpds_fwpds_graph__MY_GRAPH_H_
-#define wali_wpds_fwpds_graph__MY_GRAPH_H_
+#ifndef wali_graph__MY_GRAPH_H_
+#define wali_graph__MY_GRAPH_H_
 
 #include <set>
 #include <vector>
@@ -9,63 +9,55 @@ using namespace std;
 
 namespace wali {
 
-    namespace wpds {
+    namespace graph {
 
-        namespace fwpds {
+        struct ActionFunctor {
+            ActionFunctor() { }
+            virtual ~ActionFunctor() { }
+            virtual void operator() (int n) = 0;
+        };
 
-            namespace graph {
+        class Node {
+            public:
+                set<int> edges[2]; // 0 - forward, 1 - backward
+                bool visited;
+                int scc;
+                int bfs;
+                Node() {
+                    visited = false;
+                    scc = 0;
+                    bfs = 0;
+                }
+                Node(const Node &n) : visited(n.visited), scc(n.scc), bfs(n.bfs) { 
+                    edges[0] = n.edges[0];
+                    edges[1] = n.edges[1];
+                }
+        };
 
-                struct ActionFunctor {
-                    ActionFunctor() { }
-                    virtual ~ActionFunctor() { }
-                    virtual void operator() (int n) = 0;
-                };
+        struct AssignSCCActionFunctor;
 
-                class Node {
-                    public:
-                        set<int> edges[2]; // 0 - forward, 1 - backward
-                        bool visited;
-                        int scc;
-                        int bfs;
-                        Node() {
-                            visited = false;
-                            scc = 0;
-                            bfs = 0;
-                        }
-                        Node(const Node &n) : visited(n.visited), scc(n.scc), bfs(n.bfs) { 
-                            edges[0] = n.edges[0];
-                            edges[1] = n.edges[1];
-                        }
-                };
+        class Graph {
+            friend struct AssignSCCActionFunctor;
 
-                struct AssignSCCActionFunctor;
+            vector<Node> nodes;
+            map<int, int> env_to_node;
+            //map<int, int> node_to_env;
 
-                class Graph {
-                    friend struct AssignSCCActionFunctor;
+            public:
+            void addEdge(int s, int t);
+            int runSCCdecomposition();
 
-                    vector<Node> nodes;
-                    map<int, int> env_to_node;
-                    //map<int, int> node_to_env;
+            int getNnodes();
+            int getSccNumber(int n);
+            int getBfsNumber(int n);
 
-                    public:
-                    void addEdge(int s, int t);
-                    int runSCCdecomposition();
+            private:
+            inline int create_node(int n);
+            void dfs(int node, int direction, ActionFunctor &action);
+        };
 
-                    int getNnodes();
-                    int getSccNumber(int n);
-                    int getBfsNumber(int n);
-
-                    private:
-                    inline int create_node(int n);
-                    void dfs(int node, int direction, ActionFunctor &action);
-                };
-
-            } // namespace graph
-
-        } // namespace fwpds
-
-    } // namespace wpds
+    } // namespace graph
 
 } // namespace wali
 
-#endif  // wali_wpds_fwpds_graph__MY_GRAPH_H_
+#endif  // wali_graph__MY_GRAPH_H_

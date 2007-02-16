@@ -1081,7 +1081,8 @@ sem_elem_t RegExp::evaluateRev(sem_elem_t w) {
   sem_elem_t RegExp::get_weight() {
     if(last_seen == update_count && last_change != (unsigned)-1)  // evaluate(w) sets last_change to -1
       return value;
-    if(true || !saturation_complete) {
+    // NAK
+    if(false || !saturation_complete) {
       evaluate();
       return value;
     }

@@ -18,10 +18,14 @@
 #include "wali/wpds/Rule.hpp"
 #include "wali/wpds/Config.hpp"
 #include "wali/wpds/LinkedTrans.hpp"
+
 #include "wali/wpds/fwpds/FWPDS.hpp"
-#include "wali/wpds/fwpds/InterGraph.hpp"
+
+//#include "wali/wpds/fwpds/InterGraph.hpp"
+#include "wali/graph/InterGraph.hpp"
 
 using namespace wali;
+using namespace wali::graph;
 using namespace wali::wpds::fwpds;
 
 FWPDS::FWPDS() : WPDS()
@@ -151,7 +155,8 @@ FWPDS::computeInterGraph( wfa::WFA& input, wfa::WFA& output )
         { // setup and solve
             util::Timer timer("FWPDS - setup and solve");
             gr->setupInterSolution();
-            gr->update_all_weights();
+            // THIS computes all weights
+            //gr->update_all_weights();
         }
 
         //gr->print(std::cout << "THE INTERGRAPH\n",graphPrintKey);
