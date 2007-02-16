@@ -16,7 +16,7 @@ namespace wali {
 
     namespace graph {
 
-        SummaryGraph::SummaryGraph(InterGraph *gr, /*wpds_key_t*/Key ss, InterGraph::PRINT_OP pop) {
+        SummaryGraph::SummaryGraph(InterGraph *gr, Key ss, InterGraph::PRINT_OP pop) {
             igr = gr;
             pkey = pop;
             init_state = ss;
@@ -202,22 +202,22 @@ namespace wali {
 
         };
 
-        void SummaryGraph::summaryPoststar(WFA& ca_in, WFA& ca_out) {
+        void SummaryGraph::summaryPoststar(wali::wfa::WFA& ca_in, wali::wfa::WFA& ca_out) {
             int i;
             RegExp::init(igr->sem);
 
-            typedef pair<int, /*wpds_key_t*/Key> tup;
+            typedef pair<int, Key> tup;
             std::set<tup> worklist;
 
             graph::Graph ca_gr;
-            std::map</*wpds_key_t*/Key, int> state_to_node_map;
-            std::map<int, /*wpds_key_t*/Key> node_to_state_map;
+            std::map<Key, int> state_to_node_map;
+            std::map<int, Key> node_to_state_map;
 
             const std::set<Key> states = ca_in.getStates();
             std::set<Key> state_has_eps; // states that have an incoming eps-transition
-            //std::map<Key, std::set<CATransition<SemElem> * > > state_trans_map;
+
             std::map<Key, std::set<Trans *> > state_trans_map;
-            //std::map<Key, std::set<CATransition<SemElem> * > >::iterator st_map_it;
+
             std::map<Key, std::set<Trans* > >::iterator st_map_it;
 
             Timer *timer1 = new Timer("SWPDS: Setup");
@@ -225,16 +225,15 @@ namespace wali {
             //set<wpds_key_t>::iterator set_it;
             set<Key>::iterator set_it;
             // Build a map: state -> { incoming transition }
-            // and a graph representing the CA (will use for SCC decomposition)
+            // and a graph representing the WFA (will use for SCC decomposition)
             for(set_it = states.begin(); set_it != states.end(); set_it++) {
-                //CA<SemElem>::TransListIterPair tlip = ca_in.match(*set_it);
-                //WFA::TransListIterPair tlip = ca_in.match(*set_it);
+
                 wfa::State* state = ca_in.getState(*set_it);
-                //CA<SemElem>::TransListIter tli;
+
                 wfa::State::iterator tli = state->begin();;
-                //for( ; tli != tlip.second; tli++) {
+
                 for( ; tli != state->end(); tli++) {
-                    //CA<SemElem>::catrans_t &t = *tli;
+
                     Trans* t = *tli;
                     if(t->stack() == WALI_EPSILON)
                         continue;
@@ -255,19 +254,19 @@ namespace wali {
             set<IntraGraph *> gr_set;
             set<IntraGraph *>::iterator gr_it;
             // Iterate over all states
-            for(st_map_it = state_trans_map.begin(); st_map_it != state_trans_map.end(); st_map_it++) {
-                /*wpds_key_t*/Key q = st_map_it->first;
+            for(st_map_it = state_trans_map.begin(); st_map_it != state_trans_map.end(); st_map_it++) 
+            {
+                Key q = st_map_it->first;
                 gr_set.clear();
 
-                //set<CATransition<SemElem> *> &trans_set = st_map_it->second;
                 std::set<Trans*> &trans_set = st_map_it->second;
 
-                //set<CATransition<SemElem> *>::iterator trans_it;
                 std::set<Trans*>::iterator trans_it;
 
                 // Create the set of IntraGraphs related to q
-                for(trans_it = trans_set.begin(); trans_it != trans_set.end(); trans_it++) {
-                    //CATransition<SemElem> *t = *trans_it;
+                for(trans_it = trans_set.begin(); trans_it != trans_set.end(); trans_it++) 
+                {
+
                     Trans *t = *trans_it;
 
                     int nno = stk2nodeno(t->stack());
@@ -303,8 +302,9 @@ namespace wali {
 
                 // Go through all transitions again and pass them onto the
                 // appropriate gr and create updatable node numbers
-                for(trans_it = trans_set.begin(); trans_it != trans_set.end(); trans_it++) {
-                    //CATransition<SemElem> *t = *trans_it;
+                for(trans_it = trans_set.begin(); trans_it != trans_set.end(); trans_it++) 
+                {
+
                     Trans *t = *trans_it;
 
                     int nno = stk2nodeno(t->stack());
@@ -371,7 +371,7 @@ namespace wali {
             while(!worklist.empty()) {
                 // Get a state q
                 tup top = *worklist.begin();
-                /*wpds_key_t*/Key q = top.second;
+                Key q = top.second;
                 worklist.erase(top);
                 assert(q != init_state);
 
@@ -391,22 +391,17 @@ namespace wali {
                 nodes[nno].weight = weight;
 
                 // Go through all outgoing transition of q and do eps-contraction
-                //CA<SemElem>::TransListIterPair tlip = ca_in.match(q);
-                //CA<SemElem>::TransListIterPair tlip = ca_in.match(q);
                 State* state = ca_in.getState(q);
 
-                //CA<SemElem>::TransListIter tli;
                 State::iterator tli = state->begin();
 
-                //for(tli = tlip.first; tli != tlip.second; tli++) {
                 for( ; tli != state->end(); tli++) {
 
-                    //CA<SemElem>::catrans_t &t = *tli;
                     Trans* t = *tli;
 
                     assert(t->stack() != WALI_EPSILON);
                     assert(t->to_state() != init_state);
-                    /*wpds_key_t*/Key qprime = t->to_state();
+                    Key qprime = t->to_state();
 
                     Transition tr2(init_state, t->stack(), qprime);
                     int nno2 = trans2nodeno(tr2);

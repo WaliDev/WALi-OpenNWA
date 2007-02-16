@@ -217,7 +217,7 @@ namespace wali {
                 nodes[s2].out_hyper_edges.push_back(inter_edges.size() - 1);
             }
 
-            void InterGraph::addEdge(Transition src1, Transition src2, Transition tgt, ewpds::MergeFn *mf) {
+            void InterGraph::addEdge(Transition src1, Transition src2, Transition tgt, wali::wpds::ewpds::MergeFn *mf) {
                 assert(running_ewpds);
                 int eno = inter_edgeno(src1,src2,tgt);
                 if(eno != -1 && mf == inter_edges[eno].mf.get_ptr()) { // edge already present

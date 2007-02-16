@@ -69,9 +69,9 @@ namespace wali {
             public:
                 int src1, src2, tgt;
                 sem_elem_t weight;
-                ewpds::merge_fn_t mf;
+                wali::wpds::ewpds::merge_fn_t mf;
                 HyperEdge(int s1, int s2, int t, sem_elem_t se) : src1(s1), src2(s2), tgt(t), weight(se), mf(0) {}
-                HyperEdge(int s1, int s2, int t, ewpds::merge_fn_t f) : src1(s1), src2(s2), tgt(t), weight(0), mf(f) {}
+                HyperEdge(int s1, int s2, int t, wali::wpds::ewpds::merge_fn_t f) : src1(s1), src2(s2), tgt(t), weight(0), mf(f) {}
                 HyperEdge(const HyperEdge &h) : src1(h.src1), src2(h.src2), tgt(h.tgt), weight(h.weight), mf(h.mf) {}
         };
 
@@ -150,7 +150,7 @@ namespace wali {
                 ~InterGraph();
                 void addEdge(Transition src, Transition tgt, wali::sem_elem_t se);
                 void addEdge(Transition src1, Transition src2, Transition tgt, wali::sem_elem_t se);
-                void addEdge(Transition src1, Transition src2, Transition tgt, ewpds::MergeFn *mf);
+                void addEdge(Transition src1, Transition src2, Transition tgt, wali::wpds::ewpds::MergeFn *mf);
 
                 void addCallEdge(Transition src1, Transition src2);
 

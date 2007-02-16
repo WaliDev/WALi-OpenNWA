@@ -16,12 +16,15 @@ namespace wali {
     namespace wfa {
         class WFA;
     }
+    namespace graph {
+        class InterGraph;
+    }
+
     namespace wpds {
 
         class Wrapper;
 
         namespace fwpds {
-            class InterGraph;
 
             class FWPDS : public WPDS {
                 public:
@@ -32,9 +35,9 @@ namespace wali {
                     
                     virtual void poststar( ::wali::wfa::WFA & input, ::wali::wfa::WFA & output );
 
-                    virtual InterGraph* computeInterGraph( wfa::WFA& input, wfa::WFA& output );
+                    virtual wali::graph::InterGraph* computeInterGraph( wfa::WFA& input, wfa::WFA& output );
 
-                    virtual void post(LinkedTrans* t, ::wali::wfa::WFA& fa, InterGraph& gr );
+                    virtual void post(LinkedTrans* t, ::wali::wfa::WFA& fa, wali::graph::InterGraph& gr );
 
                     void poststarComputerFixpoint( wfa::WFA& fa );
             }; // class FWPDS

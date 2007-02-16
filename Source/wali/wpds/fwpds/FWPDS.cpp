@@ -47,8 +47,8 @@ FWPDS::FWPDS( Wrapper * wrapper , Worklist<wfa::Trans> * worklist ) :
 
 struct FWPDSCopyBackFunctor : public wali::wfa::TransFunctor
 {
-    InterGraph& gr;
-    FWPDSCopyBackFunctor(InterGraph& gr) : gr(gr) {}
+    wali::graph::InterGraph& gr;
+    FWPDSCopyBackFunctor(wali::graph::InterGraph& gr) : gr(gr) {}
     virtual void operator()( wfa::Trans* t ) {
         t->setWeight( gr.get_weight( Transition(*t) ) );
     }
@@ -56,8 +56,8 @@ struct FWPDSCopyBackFunctor : public wali::wfa::TransFunctor
 
 struct FWPDSSourceFunctor : public wali::wfa::ConstTransFunctor
 {
-    InterGraph & gr;
-    FWPDSSourceFunctor( InterGraph & p ) : gr(p) {}
+    wali::graph::InterGraph & gr;
+    FWPDSSourceFunctor( wali::graph::InterGraph & p ) : gr(p) {}
     virtual void operator()( const wfa::Trans* t ) 
     {
         //t->print(std::cout << "\n*********************\n  +++SetSource: ");
@@ -68,9 +68,9 @@ struct FWPDSSourceFunctor : public wali::wfa::ConstTransFunctor
 
 struct FWPDSCompareFunctor : public wali::wfa::ConstTransFunctor
 {
-    InterGraph & gr;
+    wali::graph::InterGraph & gr;
     bool iseq;
-    FWPDSCompareFunctor( InterGraph & p ) : gr(p) {
+    FWPDSCompareFunctor( wali::graph::InterGraph & p ) : gr(p) {
         iseq = true; 
     }
 
@@ -103,7 +103,7 @@ std::ostream& graphPrintKey( int k, std::ostream& o ) {
 void
 FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
 {
-    InterGraph* gr = computeInterGraph(input,output);
+    wali::graph::InterGraph* gr = computeInterGraph(input,output);
     assert( gr != 0 );
     {
         FWPDSCopyBackFunctor copier( *gr );
@@ -129,7 +129,7 @@ FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
     delete gr;
 }
 
-InterGraph*
+wali::graph::InterGraph*
 FWPDS::computeInterGraph( wfa::WFA& input, wfa::WFA& output )
 {
     util::Timer timer("FWPDS::poststar(in,out) -> InterGraph*");
@@ -138,7 +138,7 @@ FWPDS::computeInterGraph( wfa::WFA& input, wfa::WFA& output )
     InterGraph* gr = 0;
     if( get_from_worklist(t) ) {
         sem_elem_t se = t->weight();
-        gr = new InterGraph(se,false,false);
+        gr = new wali::graph::InterGraph(se,false,false);
 
         FWPDSSourceFunctor sources(*gr);
         output.for_each(sources);

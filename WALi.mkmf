@@ -30,6 +30,13 @@
             <item Name='IntSource' RelativePath='wali/IntSource.cpp' />
             <item Name='StringSource' RelativePath='wali/StringSource.cpp' />
             <item Name='KeyPairSource' RelativePath='wali/KeyPairSource.cpp' />
+            <!-- graph -->
+            <item Name='Graph'        RelativePath='wali/graph/Graph.cpp' />
+            <item Name='InterGraph'   RelativePath='wali/graph/InterGraph.cpp' />
+            <item Name='IntraGraph'   RelativePath='wali/graph/IntraGraph.cpp' />
+            <item Name='LinkEval'     RelativePath='wali/graph/LinkEval.cpp' />
+            <item Name='RegExp'       RelativePath='wali/graph/RegExp.cpp' />
+            <item Name='SummaryGraph' RelativePath='wali/graph/SummaryGraph.cpp' />
             <!-- util -->
             <item Name='StringUtils' RelativePath='wali/util/StringUtils.cpp' />
             <item Name='ParseArgv' RelativePath='wali/util/ParseArgv.cpp' />
@@ -54,12 +61,6 @@
             <item Name='ERule' RelativePath='wali/wpds/ewpds/ERule.cpp' />
             <item Name='MergeFunction' RelativePath='wali/wpds/ewpds/MergeFunction.cpp' />
             <!-- FWPDS -->
-            <item Name='Graph' RelativePath='wali/wpds/fwpds/Graph.cpp' />
-            <item Name='InterGraph' RelativePath='wali/wpds/fwpds/InterGraph.cpp' />
-            <item Name='IntraGraph' RelativePath='wali/wpds/fwpds/IntraGraph.cpp' />
-            <item Name='LinkEval' RelativePath='wali/wpds/fwpds/LinkEval.cpp' />
-            <item Name='RegExp' RelativePath='wali/wpds/fwpds/RegExp.cpp' />
-            <item Name='SummaryGraph' RelativePath='wali/wpds/fwpds/SummaryGraph.cpp' />
             <item Name='FWPDS' RelativePath='wali/wpds/fwpds/FWPDS.cpp' />
             <!-- Witness -->
             <item Name='Witness' RelativePath='wali/witness/Witness.cpp' />
