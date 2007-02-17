@@ -103,22 +103,27 @@ std::ostream& graphPrintKey( int k, std::ostream& o ) {
 void
 FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
 {
+    util::Timer* fwpdsTimer = new util::Timer("\t[FWPDS] Total Time ");
     wali::graph::InterGraph* gr = computeInterGraph(input,output);
     assert( gr != 0 );
+    FWPDSCopyBackFunctor copier( *gr );
     {
-        FWPDSCopyBackFunctor copier( *gr );
-        util::Timer t("InterGraph -> WFA");
+        util::Timer t("\t[FWPDS] Solve all weights ");
         output.for_each(copier);
     }
+    delete fwpdsTimer;
+
     if( CHECK_RESULTS ) {
-        std::cout << "[FWPDS] verifying results.\n";
-        util::Timer t("WPDS::poststar(in,out)");
-        wfa::WFA tmpInput(input);
         wfa::WFA tmpOutput;
+        wfa::WFA tmpInput(input);
+        // run post*
+        util::Timer* wpdsTimer = new util::Timer("\t[WPDS] Total Timer ");
         WPDS::poststarSetupFixpoint(tmpInput,tmpOutput);
         WPDS::poststarComputeFixpoint(tmpOutput);
-        {
-            util::Timer timer("Compare");
+        delete wpdsTimer;
+
+        { // compare results
+            util::Timer timer("\t[(F)WPDS] Compare Results ");
             FWPDSCompareFunctor comp(*gr);
             //output.print( std::cout << "\nFWPDS OUTPUT:\n\n" );
             //tmpOutput.print( std::cout << "\nWPDS OUTPUT:\n\n" );
@@ -132,7 +137,6 @@ FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
 wali::graph::InterGraph*
 FWPDS::computeInterGraph( wfa::WFA& input, wfa::WFA& output )
 {
-    util::Timer timer("FWPDS::poststar(in,out) -> InterGraph*");
     this->poststarSetupFixpoint(input,output);
     LinkedTrans *t = 0;
     InterGraph* gr = 0;
@@ -144,7 +148,7 @@ FWPDS::computeInterGraph( wfa::WFA& input, wfa::WFA& output )
         output.for_each(sources);
 
         { // reachability
-            util::Timer timer("FWPDS reachability");
+            util::Timer timer("\tFWPDS reachability");
             do {
                 // NAK DEBUG
                 //t->print( std::cout << "Popped t => " ) << "\n";
@@ -152,13 +156,11 @@ FWPDS::computeInterGraph( wfa::WFA& input, wfa::WFA& output )
             } while( get_from_worklist(t) );
         }
 
-        { // setup and solve
-            util::Timer timer("FWPDS - setup and solve");
-            gr->setupInterSolution();
-            // THIS computes all weights
-            //gr->update_all_weights();
-        }
+        gr->setupInterSolution();
+        // THIS computes all weights
+        //gr->update_all_weights();
 
+        // This prints a lot
         //gr->print(std::cout << "THE INTERGRAPH\n",graphPrintKey);
 
     }
