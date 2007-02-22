@@ -34,7 +34,7 @@ namespace wali
     extern bool b_check_fwpds;
 
     //! @param enable turn FWPDS verification on/off
-    extern void set_verify_wpds( bool enable );
+    extern void set_verify_fwpds( bool enable );
 
     //! @return whether FWPDS reachability is to be verified
     extern bool get_verify_fwpds();

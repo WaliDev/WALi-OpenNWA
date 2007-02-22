@@ -33,7 +33,7 @@ namespace wali
     //! Default value is true
     bool b_check_fwpds = true;
 
-    void set_verify_wpds( bool enable ) {
+    void set_verify_fwpds( bool enable ) {
         b_check_fwpds = enable;
     }
 
