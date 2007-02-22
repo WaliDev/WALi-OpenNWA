@@ -25,6 +25,22 @@ namespace wali
         return tmp;
     }
 
+    //! When running pre or post* query in FWPDS,
+    //! setting this to true will also run the same
+    //! query using regular WPDS and verify the results
+    //! are the same.
+    //!
+    //! Default value is true
+    bool b_check_fwpds = true;
+
+    void set_verify_wpds( bool enable ) {
+        b_check_fwpds = enable;
+    }
+
+    bool get_verify_fwpds() {
+        return b_check_fwpds;
+    }
+
 } // namespace wali
 
 /* Yo, Emacs!

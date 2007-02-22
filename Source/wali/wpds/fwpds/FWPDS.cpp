@@ -98,8 +98,6 @@ std::ostream& graphPrintKey( int k, std::ostream& o ) {
     return wali::printKey(o,(Key)k);
 }
 
-#define CHECK_RESULTS 1
-
 void
 FWPDS::prestar( wfa::WFA& input, wfa::WFA& output )
 {
@@ -281,7 +279,7 @@ FWPDS::prestarComputeFixpoint( wfa::WFA& fa )
 bool
 FWPDS::checkResults( wfa::WFA& input, wali::graph::InterGraph* gr,bool poststar )
 {
-    if( CHECK_RESULTS ) 
+    if( wali::get_verify_fwpds() ) 
     {
         wfa::WFA tmpOutput;
         wfa::WFA tmpInput(input);
@@ -306,7 +304,7 @@ FWPDS::checkResults( wfa::WFA& input, wali::graph::InterGraph* gr,bool poststar 
             comp.print(std::cout);
         }
     }
-    *waliErr << "CONGRATS DUDE...OUTPUT MATCHED.\n";
+    *waliErr << "\t[(F)WPDS] CONGRATS DUDE...OUTPUT MATCHED.\n";
     return true;
 }
 

@@ -25,6 +25,20 @@ namespace wali
     //! @return old err ostream
     extern std::ostream* setWaliErr( std::ostream* newErr );
 
+    //! When running pre or post* query in FWPDS,
+    //! setting this to true will also run the same
+    //! query using regular WPDS and verify the results
+    //! are the same.
+    //!
+    //! Default value is true
+    extern bool b_check_fwpds;
+
+    //! @param enable turn FWPDS verification on/off
+    extern void set_verify_wpds( bool enable );
+
+    //! @return whether FWPDS reachability is to be verified
+    extern bool get_verify_fwpds();
+
 } // namespace wali
 
 /*!
