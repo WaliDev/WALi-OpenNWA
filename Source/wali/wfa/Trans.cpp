@@ -47,7 +47,7 @@ namespace wali
             {
                 // TODO : R
                 numTrans++;
-                //std::cerr << "Trans(...) : " << numTrans << std::endl;
+                //*waliErr << "Trans(...) : " << numTrans << std::endl;
             }
         }
 
@@ -63,7 +63,7 @@ namespace wali
             {
                 // TODO : R
                 numTrans++;
-                //std::cerr << "Trans(...) : " << numTrans << std::endl;
+                //*waliErr << "Trans(...) : " << numTrans << std::endl;
             }
         }
 
@@ -82,7 +82,7 @@ namespace wali
             {
                 // TODO : R
                 numTrans++;
-                //std::cerr << "Trans( const Trans& ) : " << numTrans << std::endl;
+                //*waliErr << "Trans( const Trans& ) : " << numTrans << std::endl;
             }
         }
 
@@ -91,7 +91,7 @@ namespace wali
             {
                 // TODO : R
                 numTrans--;
-                //std::cerr << "~Trans()   : " << numTrans << std::endl;
+                //*waliErr << "~Trans()   : " << numTrans << std::endl;
             }
         }
 

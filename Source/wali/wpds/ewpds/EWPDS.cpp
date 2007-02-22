@@ -76,7 +76,7 @@ namespace wali
 
             EWPDS::~EWPDS()
             {
-                std::cerr << "~EWPDS()" << std::endl;
+                *waliErr << "~EWPDS()" << std::endl;
                 pds_states.clear();
                 merge_rule_hash.clear();
             }
@@ -154,7 +154,7 @@ namespace wali
                         merge_rule_hash.insert(KeyTriple(to_state,to_stack1,to_stack2), r);
                     } else {
                         // FIXME: raise exception
-                        std::cerr << "EWPDS: Cannot give two RULE2s with same RHS\n";
+                        *waliErr << "EWPDS: Cannot give two RULE2s with same RHS\n";
                     }
                 }
                 return rb;
@@ -264,7 +264,7 @@ namespace wali
                 while( WPDS::get_from_worklist( t ) )
                 {
 
-                    t->print( std::cerr << "$$$ Popped t ==> " ) << std::endl;
+                    t->print( *waliErr << "$$$ Popped t ==> " ) << std::endl;
 
                     // Get config
                     Config * config = t->config;
@@ -281,7 +281,7 @@ namespace wali
                     {
                         rule_t & r = *bwit;
 
-                        std::cerr << "\tCalling prestar_handle_trans  :  ";
+                        *waliErr << "\tCalling prestar_handle_trans  :  ";
                         r->print( std::cout << "\tr == " ) << std::endl;
 
                         prestar_handle_trans( t,fa,r,dnew );
@@ -396,7 +396,7 @@ namespace wali
                 LinkedTrans * t;
                 while( get_from_worklist( t ) ) {
 
-                    t->print( std::cerr << "$$$ Popped t ==> " ) << std::endl;
+                    t->print( *waliErr << "$$$ Popped t ==> " ) << std::endl;
 
                     // Get config
                     Config * config = t->config;
@@ -414,7 +414,7 @@ namespace wali
                         Config::iterator fwit = config->begin();
                         for( ; fwit != config->end() ; fwit++ ) {
                             rule_t & r = *fwit;
-                            r->print( std::cerr << "\tMatched: " ) << std::endl;
+                            r->print( *waliErr << "\tMatched: " ) << std::endl;
                             poststar_handle_trans( t,fa,r,dnew );
                         }
                     }
@@ -428,8 +428,8 @@ namespace wali
                             KeySource *ks = getKeySource(t->to());
                             KeyPairSource *kps;
                             sem_elem_t wght;
-                            tprime->print(std::cerr) << "\n";
-                            dnew->print(std::cerr) << "\n";
+                            tprime->print(*waliErr) << "\n";
+                            dnew->print(*waliErr) << "\n";
                             if(0 != (kps = dynamic_cast<KeyPairSource *>(ks))) { // apply merge function
                                 // Find the rule first
                                 rule_t r = lookup_rule(kps->get_key_pair().first, kps->get_key_pair().second, tprime->stack());
@@ -492,7 +492,7 @@ namespace wali
                     // Config * for update_prime
                     if( tprime->modified() )
                     {
-                        std::cerr <<
+                        *waliErr <<
                             "[EWPDS::poststar] tprime modified...searching for eps trans\n";
 
                         WFA::eps_map_t::iterator epsit = fa.eps_map.find( tprime->to() );

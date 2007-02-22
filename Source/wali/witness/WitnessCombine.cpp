@@ -36,7 +36,7 @@ namespace wali
             if( 0 == that )
             {
                 // error checking
-                std::cerr << "SemElem is \"" << typeid(se).name() << "\"\n";
+                *waliErr << "SemElem is \"" << typeid(se).name() << "\"\n";
                 assert( 0 );
             }
 
@@ -158,7 +158,7 @@ namespace wali
         //
         void WitnessCombine::addChild( witness_t w )
         {
-            //std::cerr << "[WitnessCombine::addChild]\n";
+            //*waliErr << "[WitnessCombine::addChild]\n";
             kids.push_back( w );
         }
 

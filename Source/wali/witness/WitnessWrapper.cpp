@@ -29,7 +29,7 @@ namespace wali
             }
             else {
                 // TODO: throw an error
-                std::cerr << "[ERROR] Unwrap called on non Witness weight.\n";
+                *waliErr << "[ERROR] Unwrap called on non Witness weight.\n";
                 assert(0);
                 return 0;
             }

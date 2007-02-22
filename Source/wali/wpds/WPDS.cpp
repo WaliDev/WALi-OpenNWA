@@ -71,7 +71,7 @@ namespace wali
 
         WPDS::~WPDS()
         {
-            std::cerr << "~WPDS()" << std::endl;
+            //*waliErr << "~WPDS()" << std::endl;
             assert( worklist );
             clear();
             delete worklist;
@@ -183,7 +183,7 @@ namespace wali
                     rule_t r = *rit;
 
                     { // BEGIN DEBUGGING
-                        //r->print( std::cerr << "Adding Rule0: " ) << std::endl;
+                        //r->print( *waliErr << "Adding Rule0: " ) << std::endl;
                     } // END DEBUGGING
 
                     // Rule 0s generate a transition right away. Because
@@ -289,8 +289,8 @@ namespace wali
             {
                 KeyPair kp( t->to(),r->stack2() );
                 { // BEGIN DEBUGGING
-                    //r->print( std::cerr << "Handling Rule 2: " ) << std::endl;
-                    //std::cerr << "\t(" << key2str(kp.first) << ", " << key2str(kp.second) << ",*)\n";
+                    //r->print( *waliErr << "Handling Rule 2: " ) << std::endl;
+                    //*waliErr << "\t(" << key2str(kp.first) << ", " << key2str(kp.second) << ",*)\n";
                 } // END DEBUGGING
                 WFA::kp_map_t::iterator kpit = fa.kpmap.find( kp );
                 WFA::kp_map_t::iterator kpitEND = fa.kpmap.end();
@@ -303,9 +303,9 @@ namespace wali
                     {
                         Trans * tprime = *tsit;
                         { // BEGIN DEBUGGING
-                            //std::cerr << "\tMatched: (" << key2str(tprime->from()) << ", ";
-                            //std::cerr << key2str(tprime->stack()) << ", ";
-                            //std::cerr << key2str(tprime->to()) << ")\n";
+                            //*waliErr << "\tMatched: (" << key2str(tprime->from()) << ", ";
+                            //*waliErr << key2str(tprime->stack()) << ", ";
+                            //*waliErr << key2str(tprime->to()) << ")\n";
                         } // END DEBUGGING
                         sem_elem_t wtp = wrule_trans->extend( tprime->weight() );
                         update( fstate

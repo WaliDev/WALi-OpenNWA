@@ -21,7 +21,7 @@ namespace wali
             Countable(true),key(WALI_EPSILON),se(0),delta_se(0),quasi(0),tag(0)
         {
             { // BEGIN DEBUGGING
-                //std::cerr << "State() : " << numStates << std::endl;;
+                //*waliErr << "State() : " << numStates << std::endl;;
                 numStates++;
             } // END DEBUGGING
         }
@@ -34,7 +34,7 @@ namespace wali
             // so this is wasted work
             //quasi = W->zero();
             { // BEGIN DEBUGGING
-                //std::cerr << "State(Key,sem_elem_t): " << numStates << std::endl;;
+                //*waliErr << "State(Key,sem_elem_t): " << numStates << std::endl;;
                 numStates++;
             } // END DEBUGGING
         }
@@ -44,7 +44,7 @@ namespace wali
             { // BEGIN DEBUGGING
                 // TODO : R
                 numStates--;
-                //std::cerr << "~State()   : " << --numStates << std::endl;;
+                //*waliErr << "~State()   : " << --numStates << std::endl;;
             } // END DEBUGGING
         }
 

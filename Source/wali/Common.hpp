@@ -16,6 +16,15 @@ namespace wali
     static const Key WALI_EPSILON = 0;
     static const Key WALI_BAD_KEY = UINT_MAX;
 
+    // std::cerr is the default err stream
+    extern std::ostream* waliErr;
+
+    //! @return old err ostream
+    extern std::ostream* set_wali_err( std::ostream* newErr );
+
+    //! @return old err ostream
+    extern std::ostream* setWaliErr( std::ostream* newErr );
+
 } // namespace wali
 
 /*!

@@ -40,7 +40,7 @@ namespace wali
         WFA::WFA( query_t q ) : init_state( WALI_EPSILON ),query(q)
         {
             if( query == MAX ) {
-                std::cerr << "[WARNING] Invalid WFA::query. Resetting to INORDER.\n";
+                *waliErr << "[WARNING] Invalid WFA::query. Resetting to INORDER.\n";
                 query = INORDER;
             }
         }
@@ -221,7 +221,7 @@ namespace wali
         //
         void WFA::addTrans( Trans * t )
         {
-            //t->print( std::cerr << "\tInserting Trans" ) << std::endl;
+            //t->print( *waliErr << "\tInserting Trans" ) << std::endl;
             insert( t );
         }
 
@@ -426,8 +426,8 @@ namespace wali
             State *initFa = fa.getState(fa.getInitialState());
             if( initThis == NULL || initFa == NULL )
             {
-                std::cerr << "[ERROR - WFA::intersect] No initial state.\n";
-                std::cerr << "\tIntersection must be empty.\n";
+                *waliErr << "[ERROR - WFA::intersect] No initial state.\n";
+                *waliErr << "\tIntersection must be empty.\n";
                 return;
             }
 
@@ -540,7 +540,7 @@ namespace wali
 
                 { // BEGIN DEBUGGING
                     numPops++;
-                    //q->print( std::cerr << "  Popped: " ) << std::endl;
+                    //q->print( *waliErr << "  Popped: " ) << std::endl;
                 } // END DEBUGGING
 
                 // Get a handle on ZERO b/c we use it alot
@@ -574,7 +574,7 @@ namespace wali
                         Trans* t = *tit; // (q',_,q)
 
                         { // BEGIN DEBUGGING
-                            //t->print( std::cerr << "\t++ Popped " ) << std::endl;
+                            //t->print( *waliErr << "\t++ Popped " ) << std::endl;
                         } // END DEBUGGING
 
                         if( t->to() == q->name() ) {
@@ -595,10 +595,10 @@ namespace wali
                         newW->delta( qprime->weight() );
 
                     { // BEGIN DEBUGGING
-                        //qprime->weight()->print( std::cerr << "   oldW " << key2str(qprime->name()) ) << std::endl;
-                        //newW->print( std::cerr << "   newW " << key2str(qprime->name()) ) << std::endl;
-                        //p.first->print( std::cerr << "\t++ p.first " ) << std::endl;
-                        //p.second->print( std::cerr << "\t++ p.second " ) << std::endl;
+                        //qprime->weight()->print( *waliErr << "   oldW " << key2str(qprime->name()) ) << std::endl;
+                        //newW->print( *waliErr << "   newW " << key2str(qprime->name()) ) << std::endl;
+                        //p.first->print( *waliErr << "\t++ p.first " ) << std::endl;
+                        //p.second->print( *waliErr << "\t++ p.second " ) << std::endl;
                     } // END DEBUGGING
 
                     // Sets qprime's new weight
@@ -621,11 +621,11 @@ namespace wali
                 }
             }
             { // BEGIN DEBUGGING
-                //std::cerr << "\n --- WFA::path_summary needed " << numPops << " pops\n";
-                //std::cerr << "WFA state labels:\n";
+                //*waliErr << "\n --- WFA::path_summary needed " << numPops << " pops\n";
+                //*waliErr << "WFA state labels:\n";
                 //FOR_EACH_STATE( st ) {
-                //    std::cerr << "\t" << key2str(st->name()) << ": ";
-                //    st->weight()->print( std::cerr ) << std::endl;
+                //    *waliErr << "\t" << key2str(st->name()) << ": ";
+                //    st->weight()->print( *waliErr ) << std::endl;
                 //}
             } // END DEBUGGING
         }
@@ -728,7 +728,7 @@ namespace wali
             FOR_EACH_STATE( eraseMe ) {
                 if( eraseMe->tag != 2 ) {
                     { // BEGIN DEBUGGING
-                        //std::cerr << "Erasing State '" << key2str(eraseMe->name()) << "'\n";
+                        //*waliErr << "Erasing State '" << key2str(eraseMe->name()) << "'\n";
                     } // END DEBUGGING
                     eraseState(eraseMe);
                 }
@@ -890,9 +890,9 @@ namespace wali
             if( 0 == told )
             {
                 sem_elem_t ZERO( tnew->weight()->zero() );
-                //std::cerr << "\tAdding 'from' state'" << key2str(t->from()) << "'\n";
+                //*waliErr << "\tAdding 'from' state'" << key2str(t->from()) << "'\n";
                 addState( tnew->from(), ZERO );
-                //std::cerr << "\tAdding 'to' state '" << key2str(t->to()) << "'\n";
+                //*waliErr << "\tAdding 'to' state '" << key2str(t->to()) << "'\n";
                 addState( tnew->to(), ZERO );
 
                 if( it == kpmap.end() )
@@ -911,7 +911,7 @@ namespace wali
 
                 { // BEGIN DEBUGGING
                     if( from_stit == state_map.end() ) {
-                        tnew->print( std::cerr << "\n\n+++ WTF +++\n" ) << std::endl;
+                        tnew->print( *waliErr << "\n\n+++ WTF +++\n" ) << std::endl;
                         assert( Q.find(tnew->from()) != Q.end() );
                         assert( from_stit != state_map.end() );
                     }
@@ -940,8 +940,8 @@ namespace wali
                     delete tnew;
                 }
                 else {
-                    std::cerr << "[WARNING - WFA::insert]\n";
-                    std::cerr << "\tAttempt to insert 'Trans' already owned by WFA.\n";
+                    *waliErr << "[WARNING - WFA::insert]\n";
+                    *waliErr << "\tAttempt to insert 'Trans' already owned by WFA.\n";
                 }
             }
             return told;
@@ -994,9 +994,9 @@ namespace wali
         {
             /*
             { // BEGIN DEBUGGING
-                std::cerr << "[WFA::combineTrans(old,new)] ";
-                told->print( std::cerr ) << "   .+.   ";
-                tnew->print( std::cerr ) << std::endl;
+                *waliErr << "[WFA::combineTrans(old,new)] ";
+                told->print( *waliErr ) << "   .+.   ";
+                tnew->print( *waliErr ) << std::endl;
             } // END DEBUGGING
             */
             told->combine_weight( tnew->weight() );
@@ -1064,8 +1064,8 @@ namespace wali
                         StateSet_t stateSet;
                         predIt = preds.insert(toKey,stateSet).first;
                     }
-                    //std::cerr << "Adding '" << key2str(st->name()) << "' to pred of '";
-                    //std::cerr << key2str(toKey) << "'\n";
+                    //*waliErr << "Adding '" << key2str(st->name()) << "' to pred of '";
+                    //*waliErr << key2str(toKey) << "'\n";
                     predIt->second.insert( st );
                 }
             }
@@ -1135,9 +1135,9 @@ namespace wali
 
                 { // BEGIN DEBUGGING
                     if( tKp != NULL && tKp != stateTrans ) {
-                        std::cerr << "[ERROR] WFA::eraseState\n";
-                        tKp->print( std::cerr << "\tKpMap Trans: " ) << "\n";
-                        stateTrans->print( std::cerr << "\tState Trans: " ) << "\n";
+                        *waliErr << "[ERROR] WFA::eraseState\n";
+                        tKp->print( *waliErr << "\tKpMap Trans: " ) << "\n";
+                        stateTrans->print( *waliErr << "\tState Trans: " ) << "\n";
                         // Make sure we fail 
                         assert( tKp != NULL && stateTrans == tKp );
                     }

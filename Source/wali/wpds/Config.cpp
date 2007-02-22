@@ -16,13 +16,13 @@ namespace wali
             kp(state,stack)
         {
             numConfigs++;
-            //std::cerr << "Config(...) : " << numConfigs << std::endl;
+            //*waliErr << "Config(...) : " << numConfigs << std::endl;
         }
 
         Config::~Config()
         {
             numConfigs--;
-            //std::cerr << "~Config()   : " << numConfigs << std::endl;
+            //*waliErr << "~Config()   : " << numConfigs << std::endl;
         }
 
         std::ostream & Config::print( std::ostream & o ) const

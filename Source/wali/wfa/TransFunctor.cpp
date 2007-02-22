@@ -33,8 +33,7 @@ namespace wali
         void TransDeleter::operator()( Trans* t )
         {
             { // BEGIN DEBUGGING
-                // TODO : REMOVE
-                //t->print( std::cerr << "\tDeleting " ) << std::endl;
+                //t->print( *waliErr << "\tDeleting " ) << std::endl;
             } // END DEBUGGING
             delete t;
         }

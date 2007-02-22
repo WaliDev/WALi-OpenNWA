@@ -25,13 +25,13 @@ namespace wali
             f(f_),t(t_),stk2(stk2_),se(se_)
         {
             numRules++;
-            //std::cerr << "Rule(...) : " << numRules << std::endl;
+            //*waliErr << "Rule(...) : " << numRules << std::endl;
         }
 
         Rule::~Rule()
         {
             numRules--;
-            //std::cerr << "~Rule()   : " << numRules << std::endl;
+            //*waliErr << "~Rule()   : " << numRules << std::endl;
         }
 
         const Config & Rule::from() const { return *f; }

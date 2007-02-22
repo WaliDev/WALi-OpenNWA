@@ -33,13 +33,35 @@ namespace wali {
                     FWPDS( Worklist<wfa::Trans> * worklist );
                     FWPDS( Wrapper * wrapper , Worklist<wfa::Trans> * worklist );
                     
+                    ///////////
+                    // pre*
+                    ///////////
+                    virtual void prestar( ::wali::wfa::WFA & input, ::wali::wfa::WFA & output );
+
+                    virtual wali::graph::InterGraph* prestarComputeInterGraph( wfa::WFA& input, wfa::WFA& output );
+
+                    virtual void pre(LinkedTrans* t, ::wali::wfa::WFA& fa, wali::graph::InterGraph& gr );
+
+                    //! Should never be called!
+                    virtual void prestarComputeFixpoint( wfa::WFA& fa );
+
+                    ///////////
+                    // post*
+                    ///////////
                     virtual void poststar( ::wali::wfa::WFA & input, ::wali::wfa::WFA & output );
 
-                    virtual wali::graph::InterGraph* computeInterGraph( wfa::WFA& input, wfa::WFA& output );
+                    virtual wali::graph::InterGraph* poststarComputeInterGraph( wfa::WFA& input, wfa::WFA& output );
 
                     virtual void post(LinkedTrans* t, ::wali::wfa::WFA& fa, wali::graph::InterGraph& gr );
 
-                    void poststarComputerFixpoint( wfa::WFA& fa );
+                    //! Should never be called!
+                    virtual void poststarComputeFixpoint( wfa::WFA& fa );
+
+                    ///////////
+                    // helpers
+                    ///////////
+                    bool checkResults( wfa::WFA& input, wali::graph::InterGraph* gr,bool poststar );
+
             }; // class FWPDS
 
         } // namespace fwpds

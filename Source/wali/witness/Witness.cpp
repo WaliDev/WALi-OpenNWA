@@ -51,7 +51,7 @@ namespace wali
             Witness *that = dynamic_cast< Witness * >(se);
             if( 0 == that )
             {
-                std::cerr << "SemElem is \"" << typeid(se).name() << "\"\n";
+                *waliErr << "SemElem is \"" << typeid(se).name() << "\"\n";
                 assert( 0 );
             }
             if( isEmpty && user_se->equal(user_se->one()) ) {
@@ -72,7 +72,7 @@ namespace wali
             Witness *that = dynamic_cast< Witness * >(se);
             if( 0 == that )
             {
-                std::cerr << "SemElem is \"" << typeid(se).name() << "\"\n";
+                *waliErr << "SemElem is \"" << typeid(se).name() << "\"\n";
                 assert( 0 );
             }
 

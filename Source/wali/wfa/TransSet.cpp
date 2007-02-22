@@ -76,7 +76,7 @@ namespace wali {
             // BEGIN DEBUGGING
             // We should never insert the same transition twice
             if( !b ) {
-                t->print( std::cerr << "\tERROR" ) << std::endl;
+                t->print( *waliErr << "\tERROR" ) << std::endl;
                 assert(b);
             }
             // END DEBUGGING

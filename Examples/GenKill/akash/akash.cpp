@@ -41,11 +41,11 @@ int main()
     WFA in;
     in.setInitialState(getKey("p"));
     in.addFinalState(getKey("acc"));
-	 in.addTrans(getKey("p"),getKey("n0"),getKey("acc"),GenKillTransformer_T< VarSet >::id());
+    in.addTrans(getKey("p"),getKey("n3"),getKey("acc"),GenKillTransformer_T< VarSet >::id());
     //in.addTrans(getKey("p"),getKey("n0"),getKey("acc"),e );
 
     WFA out;
-    pds.poststar(in,out);
+    pds.prestar(in,out);
 
     out.print( std::cout ) << std::endl;
 

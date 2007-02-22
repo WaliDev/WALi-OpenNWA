@@ -28,7 +28,7 @@ namespace wali {
             public:
                 static bool measureAndReport;
 
-                Timer(const std::string &task, std::ostream& os=std::cerr);
+                Timer(const std::string &task, std::ostream& os=*waliErr);
 
                 ~Timer();
 

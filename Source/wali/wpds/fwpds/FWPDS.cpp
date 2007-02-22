@@ -79,9 +79,9 @@ struct FWPDSCompareFunctor : public wali::wfa::ConstTransFunctor
         sem_elem_t wt2 = t->weight();
         if( !wt2->equal(wt1) ) {
             iseq = false;
-            wt1->print(std::cerr) << "\n";
-            t->print(std::cerr) << "\n";
-            std::cerr << "-----------------------------\n";
+            wt1->print(*waliErr) << "\n";
+            t->print(*waliErr) << "\n";
+            *waliErr << "-----------------------------\n";
         }
     }
 
@@ -101,25 +101,200 @@ std::ostream& graphPrintKey( int k, std::ostream& o ) {
 #define CHECK_RESULTS 1
 
 void
-FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
+FWPDS::prestar( wfa::WFA& input, wfa::WFA& output )
 {
     util::Timer* fwpdsTimer = new util::Timer("\t[FWPDS] Total Time ");
-    wali::graph::InterGraph* gr = computeInterGraph(input,output);
-    assert( gr != 0 );
+    wali::graph::InterGraph* gr = prestarComputeInterGraph(input,output);
+    assert(gr != 0);
     FWPDSCopyBackFunctor copier( *gr );
     {
         util::Timer t("\t[FWPDS] Solve all weights ");
         output.for_each(copier);
     }
     delete fwpdsTimer;
+    checkResults(input,gr,false);
+    delete gr;
+}
 
-    if( CHECK_RESULTS ) {
+wali::graph::InterGraph*
+FWPDS::prestarComputeInterGraph( wfa::WFA& input, wfa::WFA& output )
+{
+    this->prestarSetupFixpoint(input,output);
+    LinkedTrans *t = 0;
+    InterGraph* gr = 0;
+    if( get_from_worklist(t) ) {
+        sem_elem_t se = t->weight();
+        gr = new wali::graph::InterGraph(se,false,true);
+
+        FWPDSSourceFunctor sources(*gr);
+        output.for_each(sources);
+
+        { // reachability
+            util::Timer timer("\tFWPDS reachability");
+            do {
+                // NAK DEBUG
+                //t->print( std::cout << "Popped t => " ) << "\n";
+                pre(t,output, *gr);
+            } while( get_from_worklist(t) );
+        }
+
+        gr->setupInterSolution();
+        // THIS computes all weights
+        //gr->update_all_weights();
+
+        // This prints a lot
+        //gr->print(std::cout << "THE INTERGRAPH\n",graphPrintKey);
+
+    }
+    return gr;
+}
+
+void 
+FWPDS::pre(LinkedTrans* t, ::wali::wfa::WFA& fa, wali::graph::InterGraph& gr )
+{
+    // Get config
+    Config * config = t->config;
+
+    { // BEGIN DEBUGGING
+        assert( config );
+    } // END DEBUGGING
+
+    sem_elem_t wghtOne = t->weight()->one();
+    //sem_elem_t dnew = t->delta;
+    //t->delta = dnew->zero();
+    t->setDelta(wghtOne->zero());
+
+    // For each backward rule of config
+    Config::reverse_iterator bwit = config->rbegin();
+    for( ; bwit != config->rend() ; bwit++ )
+    {
+        rule_t & r = *bwit;
+
+        //prestar_handle_trans( t,fa,r,dnew );
+        // inlined prestar_handle_trans
+        {
+
+            //sem_elem_t wrule_trans = r->weight()->extend( delta );
+            Key fstate = r->from()->state();
+            Key fstack = r->from()->stack();
+
+            if( r->is_rule2() )
+            {
+                KeyPair kp( t->to(),r->stack2() );
+                { // BEGIN DEBUGGING
+                    //r->print( *waliErr << "Handling Rule 2: " ) << std::endl;
+                    //*waliErr << "\t(" << key2str(kp.first) << ", " << key2str(kp.second) << ",*)\n";
+                } // END DEBUGGING
+                wali::wfa::WFA::kp_map_t::iterator kpit = fa.kpmap.find( kp );
+                wali::wfa::WFA::kp_map_t::iterator kpitEND = fa.kpmap.end();
+                wali::wfa::TransSet::iterator tsit;
+
+                if( kpit != kpitEND )
+                {
+                    wali::wfa::TransSet& transSet = kpit->second;
+                    for( tsit = transSet.begin(); tsit != transSet.end(); tsit++ )
+                    {
+                        wali::wfa::Trans * tprime = *tsit;
+                        { // BEGIN DEBUGGING
+                            //*waliErr << "\tMatched: (" << key2str(tprime->from()) << ", ";
+                            //*waliErr << key2str(tprime->stack()) << ", ";
+                            //*waliErr << key2str(tprime->to()) << ")\n";
+                        } // END DEBUGGING
+                        //sem_elem_t wtp = wrule_trans->extend( tprime->weight() );
+                        update( fstate
+                                , fstack
+                                , tprime->to()
+                                , wghtOne
+                                , r->from()
+                              );
+                        gr.addEdge(Transition(*tprime),
+                                Transition(*t),
+                                Transition(fstate,fstack,tprime->to()),
+                                r->weight());
+                    }
+                }
+            }
+            else {
+                update( fstate
+                        , fstack
+                        , t->to()
+                        , wghtOne
+                        , r->from() 
+                      );
+                gr.addEdge(Transition(*t),
+                        Transition(fstate,fstack,t->to()),
+                        r->weight());
+            }
+        }
+    }
+
+    // check matching rule 2s 
+    r2hash_t::iterator r2it = r2hash.find( t->stack() );
+
+    // does a rule 2 exist with matching second symbol on rhs
+    if( r2it != r2hash.end() )
+    {
+        // get reference
+        std::list< rule_t > & ls = r2it->second;
+        std::list< rule_t >::iterator lsit;
+
+        // loop through list
+        for( lsit = ls.begin() ; lsit != ls.end() ; lsit++ )
+        {
+            rule_t & r = *lsit;
+
+            wali::wfa::Trans tp;
+            if( fa.find(r->to_state(),r->to_stack1(),t->from(),tp) )
+            {
+                // f(r) * t'
+                //sem_elem_t wrtp = r->weight()->extend( tp.weight() );
+
+                // f(r) * t' * delta
+                //sem_elem_t wnew = wrtp->extend( dnew );
+
+                // update
+                Key fstate = r->from()->state();
+                Key fstack = r->from()->stack();
+                update( fstate
+                        , fstack
+                        , t->to()
+                        , wghtOne
+                        , r->from()
+                      );
+                gr.addEdge(Transition(*t),
+                        Transition(tp),
+                        Transition(fstate,fstack,t->to()),
+                        r->weight());
+
+            }
+        }
+    }
+}
+
+void
+FWPDS::prestarComputeFixpoint( wfa::WFA& fa )
+{
+    *waliErr << "[ERROR] FWPDS::prestarComputeFixpoint called?\n";
+    assert(0);
+}
+
+bool
+FWPDS::checkResults( wfa::WFA& input, wali::graph::InterGraph* gr,bool poststar )
+{
+    if( CHECK_RESULTS ) 
+    {
         wfa::WFA tmpOutput;
         wfa::WFA tmpInput(input);
         // run post*
         util::Timer* wpdsTimer = new util::Timer("\t[WPDS] Total Timer ");
-        WPDS::poststarSetupFixpoint(tmpInput,tmpOutput);
-        WPDS::poststarComputeFixpoint(tmpOutput);
+        if( poststar ) {
+            WPDS::poststarSetupFixpoint(tmpInput,tmpOutput);
+            WPDS::poststarComputeFixpoint(tmpOutput);
+        }
+        else {
+            WPDS::prestarSetupFixpoint(tmpInput,tmpOutput);
+            WPDS::prestarComputeFixpoint(tmpOutput);
+        }
         delete wpdsTimer;
 
         { // compare results
@@ -131,11 +306,29 @@ FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
             comp.print(std::cout);
         }
     }
+    *waliErr << "CONGRATS DUDE...OUTPUT MATCHED.\n";
+    return true;
+}
+
+void
+FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
+{
+    util::Timer* fwpdsTimer = new util::Timer("\t[FWPDS] Total Time ");
+    wali::graph::InterGraph* gr = poststarComputeInterGraph(input,output);
+    assert( gr != 0 );
+    FWPDSCopyBackFunctor copier( *gr );
+    {
+        util::Timer t("\t[FWPDS] Solve all weights ");
+        output.for_each(copier);
+    }
+    checkResults(input,gr,true);
+    delete fwpdsTimer;
+
     delete gr;
 }
 
 wali::graph::InterGraph*
-FWPDS::computeInterGraph( wfa::WFA& input, wfa::WFA& output )
+FWPDS::poststarComputeInterGraph( wfa::WFA& input, wfa::WFA& output )
 {
     this->poststarSetupFixpoint(input,output);
     LinkedTrans *t = 0;
@@ -168,9 +361,9 @@ FWPDS::computeInterGraph( wfa::WFA& input, wfa::WFA& output )
 }
 
 void
-FWPDS::poststarComputerFixpoint( wfa::WFA& fa )
+FWPDS::poststarComputeFixpoint( wfa::WFA& fa )
 {
-    std::cerr << "[ERROR] FWPDS::poststarComputerFixpoint called?\n";
+    *waliErr << "[ERROR] FWPDS::poststarComputeFixpoint called?\n";
     assert(0);
 }
 
@@ -280,9 +473,9 @@ FWPDS::post(LinkedTrans* t, wfa::WFA& fa, InterGraph& gr )
         }
     }
 }
+
 /* Yo, Emacs!
    ;;; Local Variables: ***
    ;;; tab-width: 4 ***
    ;;; End: ***
    */
-

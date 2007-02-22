@@ -41,7 +41,7 @@ namespace wali
 
             while( get_from_worklist( t ) ) 
             {
-                t->print( std::cerr << "$$$ Popped t ==> " ) << std::endl;
+                t->print( *waliErr << "$$$ Popped t ==> " ) << std::endl;
                 // TODO insert debugger code
                 pre( t , fa );
             }
@@ -54,7 +54,7 @@ namespace wali
 
             while( get_from_worklist( t ) ) 
             {
-                t->print( std::cerr << "$$$ Popped t ==> " ) << std::endl;
+                t->print( *waliErr << "$$$ Popped t ==> " ) << std::endl;
                 // TODO insert debugger code
                 post( t , fa );
             }
@@ -152,10 +152,10 @@ namespace wali
                 {
                     // BEGIN DEBUGGING
                     {
-                        std::cerr << "[WPDS::poststar] ";
-                        std::cerr << "t' modified.\n\t";
-                        tprime->print( std::cerr );
-                        std::cerr << ".\n  > Searching for eps trans\n";
+                        *waliErr << "[WPDS::poststar] ";
+                        *waliErr << "t' modified.\n\t";
+                        tprime->print( *waliErr );
+                        *waliErr << ".\n  > Searching for eps trans\n";
                     }
                     // END DEBUGGING
 
@@ -178,7 +178,7 @@ namespace wali
 
                             // BEGIN DEBUGGING
                             {
-                                teps->print( std::cerr << "\tFound - " ) << std::endl;
+                                teps->print( *waliErr << "\tFound - " ) << std::endl;
                             }
                             // END DEBUGGING
 
