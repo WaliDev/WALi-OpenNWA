@@ -105,8 +105,10 @@ namespace wali
         //
         // Override Witness::accept
         //
-        void WitnessRule::accept( Visitor& v )
+        void WitnessRule::accept( Visitor& v, bool visitOnce )
         {
+            // TODO how does marking work...need a flag maybe
+            mark();
             v.visitRule(this);
         }
 

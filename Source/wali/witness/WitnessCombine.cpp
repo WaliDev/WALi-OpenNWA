@@ -56,9 +56,9 @@ namespace wali
                     std::ofstream thisStream("combine.this.dot");
                     std::ofstream thatStream("combine.that.dot");
                     VisitorDot d1(thisStream);
-                    accept(d1);
+                    accept(d1,true);
                     VisitorDot d2(thatStream);
-                    that->accept(d2);
+                    that->accept(d2,true);
                     thisStream.close();
                     thatStream.close();
                     assert(0);
@@ -116,13 +116,18 @@ namespace wali
         //
         // Override Witness::accept
         //
-        void WitnessCombine::accept( Visitor& v )
+        void WitnessCombine::accept( Visitor& v, bool visitOnce )
         {
+            mark();
             if( v.visitCombine(this) ) {
                 std::list< witness_t >::iterator it = children().begin();
                 for( ; it != children().end(); it++ ) {
                     witness_t& child = *it;
-                    child->accept(v);
+                    // if visitOnce is false, follow the child
+                    // if child is not marked, follow the child
+                    if( !(visitOnce && child->marked()) ) {
+                        child->accept(v,visitOnce);
+                    }
                 }
             }
         }

@@ -6,6 +6,7 @@
  */
 
 #include "wali/Common.hpp"
+#include "wali/Markable.hpp"
 #include "wali/ref_ptr.hpp"
 #include "wali/SemElem.hpp"
 #include "wali/witness/Visitable.hpp"
@@ -22,7 +23,7 @@ namespace wali
         /*!
          * @class Witness
          */
-        class Witness : public SemElem, public Visitable
+        class Witness : public SemElem, public Markable, public Visitable
         {
             public:
                 Witness( sem_elem_t se );
@@ -91,7 +92,7 @@ namespace wali
                  *
                  * @see Visitor
                  */
-                virtual void accept( Visitor& v );
+                virtual void accept( Visitor& v, bool visitOnce=false );
 
                 /*!
                  * Pretty print in a DAG like structure to the ostream

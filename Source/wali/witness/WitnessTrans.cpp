@@ -24,8 +24,10 @@ namespace wali
         //
         // Override Witness::accept
         //
-        void WitnessTrans::accept( Visitor& v )
+        void WitnessTrans::accept( Visitor& v, bool visitOnce )
         {
+            // TODO how does marking work...need a flag maybe
+            mark();
             v.visitTrans(this);
         }
 

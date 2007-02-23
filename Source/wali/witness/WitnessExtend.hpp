@@ -52,7 +52,7 @@ namespace wali
                 /*!
                  * Override Witness::accept
                  */
-                virtual void accept( Visitor& v );
+                virtual void accept( Visitor& v, bool visitOnce=false );
 
                 /*!
                  * Override Witness::pretty_print

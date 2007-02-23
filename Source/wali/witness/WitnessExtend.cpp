@@ -28,13 +28,18 @@ namespace wali
         //
         // Override Witness::accept
         //
-        void WitnessExtend::accept( Visitor& v )
+        void WitnessExtend::accept( Visitor& v, bool visitOnce )
         {
+            mark();
             if( v.visitExtend(this) ) {
-                if( hasLeft() )
-                    left()->accept(v);
-                if( hasRight() )
-                    right()->accept(v);
+                if( hasLeft() ) {
+                    if( !(visitOnce && left()->marked()) )
+                        left()->accept(v,visitOnce);
+                }
+                if( hasRight() ) {
+                    if( !(visitOnce && right()->marked()) )
+                        right()->accept(v,visitOnce);
+                }
             }
         }
 

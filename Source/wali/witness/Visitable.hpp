@@ -18,7 +18,7 @@ namespace wali
             public:
                 virtual ~Visitable() {}
 
-                virtual void accept( Visitor& v ) = 0;
+                virtual void accept( Visitor& v, bool visitOnce=false ) = 0;
         };
 
     } // namespace witness

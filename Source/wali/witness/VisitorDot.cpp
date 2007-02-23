@@ -36,12 +36,16 @@ namespace wali
         bool VisitorDot::visitExtend( WitnessExtend * w )
         {
             // left child
-            Witness* left = w->left().get_ptr();
-            printEdge(w,left);
+            if( w->hasLeft() ) {
+                Witness* left = w->left().get_ptr();
+                printEdge(w,left);
+            }
 
             // right child
-            Witness* right = w->right().get_ptr();
-            printEdge(w,right);
+            if( w->hasRight() ) {
+                Witness* right = w->right().get_ptr();
+                printEdge(w,right);
+            }
 
             // this
             printNode(w, "green", "(x) " + w->weight()->toString());

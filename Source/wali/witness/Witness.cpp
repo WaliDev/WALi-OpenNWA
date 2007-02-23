@@ -136,9 +136,12 @@ namespace wali
             return prettyPrint(o,0);
         }
 
-        void Witness::accept( Visitor& v )
+        void Witness::accept( Visitor& v, bool visitOnce )
         {
-            assert(0);
+            // TODO how does marking work...need a flag maybe
+            mark();
+            //assert(0);
+            *waliErr << "[?ERROR?] Witness::accept called\n";
             v.visit( this );
         }
 
