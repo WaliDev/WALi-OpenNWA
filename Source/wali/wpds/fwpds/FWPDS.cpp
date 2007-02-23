@@ -303,8 +303,8 @@ FWPDS::checkResults( wfa::WFA& input, wali::graph::InterGraph* gr,bool poststar 
             tmpOutput.for_each(comp);
             comp.print(std::cout);
         }
+        *waliErr << "\t[(F)WPDS] CONGRATS DUDE...OUTPUT MATCHED.\n";
     }
-    *waliErr << "\t[(F)WPDS] CONGRATS DUDE...OUTPUT MATCHED.\n";
     return true;
 }
 
