@@ -19,6 +19,8 @@ namespace wali
     // std::cerr is the default err stream
     extern std::ostream* waliErr;
 
+    //! Sets error stream waliErr to param newErr
+    //! @param newErr std::ostream*
     //! @return old err ostream
     extern std::ostream* set_wali_err( std::ostream* newErr );
 
