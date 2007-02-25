@@ -42,7 +42,7 @@ namespace wali
              */
             Markable& operator=( const Markable& m );
 
-            virtual ~Markable() throw();
+            virtual ~Markable(); 
 
             /*! Mark this */
             void mark() const throw();

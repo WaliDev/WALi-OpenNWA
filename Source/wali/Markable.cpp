@@ -26,7 +26,7 @@ namespace wali
         return *this;
     }
 
-    Markable::~Markable() throw() {}
+    Markable::~Markable() {}
 
     void Markable::mark() const throw()
     {
