@@ -10,7 +10,6 @@
         OutputDir='lib'
         BuildDir='objects'
         Type='Library' >
-
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
 
         <IncludeList>
