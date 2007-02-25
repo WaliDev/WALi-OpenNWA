@@ -12,6 +12,7 @@
         Type='Library' >
 
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
+
         <IncludeList>
             <item Name='WALiDir' Path='$(ProjectDir)' />
         </IncludeList>
