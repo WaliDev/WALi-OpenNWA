@@ -45,10 +45,10 @@ namespace wali
             ~Markable() throw();
 
             /*! Mark this */
-            void mark() throw();
+            void mark() const throw();
 
             /*! Unmark this */
-            void unmark() throw();
+            void unmark() const throw();
 
             /*!
              * Check if this is marked.
@@ -59,7 +59,7 @@ namespace wali
 
         protected:
             /*! bool marker : true if "this" is marked */
-            bool marker;
+            mutable bool marker;
 
     }; // class Markable
 

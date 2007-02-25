@@ -28,12 +28,12 @@ namespace wali
 
     Markable::~Markable() throw() {}
 
-    void Markable::mark() throw()
+    void Markable::mark() const throw()
     {
         marker = true;
     }
 
-    void Markable::unmark() throw()
+    void Markable::unmark() const throw()
     {
         marker = false;
     }
