@@ -42,7 +42,7 @@ namespace wali
                 return *this;
             }
 
-            ~Countable() throw() {}
+            virtual ~Countable() throw() {}
 
     }; // class Countable
 
