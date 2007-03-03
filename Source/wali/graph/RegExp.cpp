@@ -154,20 +154,19 @@ namespace wali {
             return new RegExp(Combine, r1, r2);
 #else
             reg_exp_key_t rkey1(Combine, r1, r2);
-            reg_exp_key_t rkey2(Combine, r2, r1);
             reg_exp_hash_t::iterator it = reg_exp_hash.find(rkey1);
             if(it == reg_exp_hash.end()) {
-                reg_exp_t res = new RegExp(Combine, r1, r2);
-                reg_exp_hash.insert(rkey1, res);
                 STAT(stats.hashmap_misses++);
-                return res;
-            }
-            it = reg_exp_hash.find(rkey2);
-            if(it == reg_exp_hash.end()) {
-                reg_exp_t res = new RegExp(Combine, r1, r2);
-                reg_exp_hash.insert(rkey2, res);
-                STAT(stats.hashmap_misses++);
-                return res;
+                reg_exp_key_t rkey2(Combine, r2, r1);
+                it = reg_exp_hash.find(rkey2);
+                // NAK - fold this if underneath the upper one
+                //     - didn't make sense the other way.
+                if(it == reg_exp_hash.end()) {
+                    reg_exp_t res = new RegExp(Combine, r1, r2);
+                    reg_exp_hash.insert(rkey2, res);
+                    STAT(stats.hashmap_misses++);
+                    return res;
+                }
             }
             STAT(stats.hashmap_hits++);
             return it->second;

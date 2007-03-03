@@ -16,14 +16,10 @@ namespace wali
         class WitnessCombine : public Witness
         {
             public:
-                /*!
-                 * Passes weight to base class Witness
-                 */
+                //! Passes weight to base class Witness
                 WitnessCombine( sem_elem_t weight );
 
-                /*!
-                 * Destructor does nothing.
-                 */
+                //! Destructor does nothing.
                 virtual ~WitnessCombine();
 
                 /*!
@@ -36,19 +32,16 @@ namespace wali
                  */
                 virtual sem_elem_t combine( SemElem * se );
 
-                /*!
-                 * Override Witness::accept
-                 */
+                //! Override Witness::accept 
                 virtual void accept( Visitor& v, bool visitOnce=false );
 
-                /*!
-                 * Override Witness::pretty_print
-                 */
+                //! Override Witness::reset_marks
+                virtual void reset_marks() const;
+
+                //! Override Witness::pretty_print
                 virtual std::ostream& prettyPrint( std::ostream& o, size_t depth ) const;
 
-                /*!
-                 * Add a child to this
-                 */
+                //! Add a child to this
                 void addChild( witness_t w );
 
                 /*!
@@ -59,9 +52,7 @@ namespace wali
                  */
                 std::list< witness_t >& children();
 
-                /*!
-                 * absorb param wc's children into this
-                 */
+                //! absorb param wc's children into this
                 void absorb( WitnessCombine * wc );
 
             protected:

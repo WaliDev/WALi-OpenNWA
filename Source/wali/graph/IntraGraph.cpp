@@ -484,6 +484,10 @@ namespace wali {
                 edges[eno].regexp = RegExp::combine(edges[eno].regexp, ed.regexp);
                 if(edges[eno].updatable && updatable) {
                     cerr << "FWPDS: Warning, parallel updatable edges. Results may not be correct\n";
+                    print_trans(nodes[edges[eno].src].trans,std::cerr);
+                    std::cerr << "\n";
+                    print_trans(nodes[edges[eno].tgt].trans,std::cerr);
+                    std::cerr << "\n";
                 }
                 edges[eno].updatable = (edges[eno].updatable | updatable ); 
                 if(updatable) {

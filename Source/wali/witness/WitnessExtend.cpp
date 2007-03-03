@@ -30,14 +30,12 @@ namespace wali
         //
         void WitnessExtend::accept( Visitor& v, bool visitOnce )
         {
-            mark();
-            if( v.visitExtend(this) ) {
-                if( hasLeft() ) {
-                    if( !(visitOnce && left()->marked()) )
+            if( !marked() || !visitOnce) {
+                mark();
+                if( v.visitExtend(this) ) {
+                    if( hasLeft() )
                         left()->accept(v,visitOnce);
-                }
-                if( hasRight() ) {
-                    if( !(visitOnce && right()->marked()) )
+                    if( hasRight() )
                         right()->accept(v,visitOnce);
                 }
             }
@@ -70,6 +68,15 @@ namespace wali
                 o << "\tHas " << cnt << " children.\n";
             }
             return o;
+        }
+
+        void WitnessExtend::reset_marks() const
+        {
+            if( marked() ) {
+                unmark();
+                if( hasLeft() ) lchild->reset_marks();
+                if( hasRight() ) rchild->reset_marks();
+            }
         }
 
     } // namespace witness

@@ -85,14 +85,6 @@ namespace wali
         ///////////////////
         WitnessRule::WitnessRule( const Rule& r_t ) :
             Witness(r_t.weight()),
-            // TODO :
-            //      WitnessRule's need their own Configs if
-            //      their scope is to last beyond that of the
-            //      WPDS that created it.
-            // 
-            //fconfig(r_t->from_state(),r_t->from_stack()),
-            //tconfig(r_t->to_state(),r_t->to_stack1()),
-            //r(&fconfig,&tconfig,r_t->to_stack2,r_t->weight())
             stub(r_t)
         {
         }

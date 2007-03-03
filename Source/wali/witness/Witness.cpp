@@ -7,6 +7,7 @@
 #include "wali/witness/WitnessExtend.hpp"
 #include "wali/witness/WitnessCombine.hpp"
 #include "wali/witness/Visitor.hpp"
+#include "wali/witness/VisitorPrinter.hpp"
 
 namespace wali
 {
@@ -133,15 +134,20 @@ namespace wali
         std::ostream& Witness::print( std::ostream& o ) const
         {
             o << "\n";
-            return prettyPrint(o,0);
+            //VisitorPrinter vp(o);
+            //accept(vp,true);
+            //reset_marks();
+
+            prettyPrint(o,0);
+
+            return o;
         }
 
         void Witness::accept( Visitor& v, bool visitOnce )
         {
-            // TODO how does marking work...need a flag maybe
             mark();
             //assert(0);
-            *waliErr << "[?ERROR?] Witness::accept called\n";
+            //*waliErr << "[?ERROR?] Witness::accept called\n";
             v.visit( this );
         }
 
@@ -161,6 +167,11 @@ namespace wali
                 o << "  |";
             }
             return o;
+        }
+
+        void Witness::reset_marks() const
+        {
+            unmark();
         }
 
     }   // namespace witness

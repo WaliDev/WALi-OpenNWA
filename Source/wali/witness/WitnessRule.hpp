@@ -18,28 +18,26 @@ namespace wali
 
     namespace witness
     {
-        class RuleStub : public Printable
+        struct RuleStub : public Printable
         {
-            public:
-                RuleStub( const Rule& r );
+            RuleStub( const Rule& r );
 
-                Key from_state();
+            Key from_state();
 
-                Key from_stack();
+            Key from_stack();
 
-                Key to_state();
+            Key to_state();
 
-                Key to_stack1();
+            Key to_stack1();
 
-                Key to_stack2();
+            Key to_stack2();
 
-                sem_elem_t weight();
+            sem_elem_t weight();
 
-                std::ostream& print( std::ostream& o ) const;
+            std::ostream& print( std::ostream& o ) const;
 
-            protected:
-                Key fs,fstk,ts,tstk1,tstk2;
-                sem_elem_t se;
+            Key fs,fstk,ts,tstk1,tstk2;
+            sem_elem_t se;
         };
 
         /*!
@@ -52,33 +50,21 @@ namespace wali
         {
             public:
                 /*!
-                 * @brief WitnessRule constructor.
-                 *
-                 * The constructor copies the underlying Rule object contained
-                 * within parameter rule_t. The weight on the member variable
-                 * Rule r will be null. Reason being that the user supplied
-                 * weight is the member variable se of the parent class
-                 * Witness.
+                 * @brief constructor creates a RuleStub from a
+                 * wali::wpds::Rule.
                  *
                  * @see Witness
                  * @see Rule
-                 *
                  */
                 WitnessRule( const Rule& r );
 
-                /*!
-                 * Destructor does nothing.
-                 */
+                //! Destructor does nothing.
                 ~WitnessRule();
 
-                /*!
-                 * Override Witness::accept
-                 */
+                //! Override Witness::accept
                 virtual void accept( Visitor& v, bool visitOnce=false );
 
-                /*!
-                 * Overrides Witness::prettyPrint
-                 */
+                //! Overrides Witness::prettyPrint
                 virtual std::ostream& prettyPrint( std::ostream& o,size_t depth ) const;
 
                 RuleStub& getRuleStub();

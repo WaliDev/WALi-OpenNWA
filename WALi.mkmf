@@ -70,6 +70,7 @@
             <item Name='WitnessTrans' RelativePath='wali/witness/WitnessTrans.cpp' />
             <item Name='Visitor' RelativePath='wali/witness/Visitor.cpp' />
             <item Name='VisitorDot' RelativePath='wali/witness/VisitorDot.cpp' />
+            <item Name='VisitorPrinter' RelativePath='wali/witness/VisitorPrinter.cpp' />
             <item Name='WitnessWrapper' RelativePath='wali/witness/WitnessWrapper.cpp' />
         </InputList>
         <LibraryList>

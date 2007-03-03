@@ -81,9 +81,7 @@ namespace wali
                  */
                 virtual bool equal( SemElem * se ) const;
 
-                /*!
-                 * Print the Witness to the parameter o. 
-                 */
+                //! Print the Witness to the parameter o. 
                 virtual std::ostream& print( std::ostream& o ) const;
 
                 /*!
@@ -94,19 +92,10 @@ namespace wali
                  */
                 virtual void accept( Visitor& v, bool visitOnce=false );
 
-                /*!
-                 * Pretty print in a DAG like structure to the ostream
-                 *
-                 * TODO : The ability to output in dotty format would be nice
-                 */
+                //! Pretty print in a DAG like structure to the ostream
                 virtual std::ostream& prettyPrint( std::ostream& o, size_t depth ) const;
 
-                /*!
-                 * Prints "  |" to parameter o for each level of depth
-                 *
-                 * TODO : should "  |" be a macro, a configurable string, or a
-                 *      parameter to format_depth?
-                 */
+                //! Prints "  |" to parameter o for each level of depth
                 std::ostream& formatDepth( std::ostream& o, size_t depth ) const;
 
                 /*!
@@ -118,9 +107,12 @@ namespace wali
                  */
                 sem_elem_t weight() { return user_se; }
 
+                //! Reset all marks (recursively)
+                virtual void reset_marks() const;
+
             protected:
-                sem_elem_t user_se;
-                bool isEmpty;
+                sem_elem_t user_se; //!< The user SemElem value
+                bool isEmpty;       //!< True if type == Witness. Cheap reflection.
 
             private:
                 Witness( sem_elem_t se, bool ie );

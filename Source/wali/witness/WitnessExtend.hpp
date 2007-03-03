@@ -44,39 +44,28 @@ namespace wali
                  */
                 WitnessExtend( sem_elem_t weight, witness_t left, witness_t right );
 
-                /*!
-                 * Destructor does nothing.
-                 */
+                //! Destructor does nothing.
                 virtual ~WitnessExtend();
 
-                /*!
-                 * Override Witness::accept
-                 */
+                //! Override Witness::accept
                 virtual void accept( Visitor& v, bool visitOnce=false );
 
-                /*!
-                 * Override Witness::pretty_print
-                 */
+                //! Override Witness::reset_marks
+                virtual void reset_marks() const;
+
+                //! Override Witness::pretty_print
                 virtual std::ostream& prettyPrint( std::ostream& o, size_t depth ) const;
 
-                /*!
-                 * @return witness_t that is the left child
-                 */
+                //! @return witness_t that is the left child
                 witness_t left() { return lchild; }
 
-                /*!
-                 * @return true if the left child is valid
-                 */
+                //! @return true if the left child is valid
                 bool hasLeft() const { return !lchild.is_empty(); }
 
-                /*!
-                 * @return witness_t that is the right child
-                 */
+                //! @return witness_t that is the right child
                 witness_t right() { return rchild; }
 
-                /*!
-                 * @return true if the right child is valid
-                 */
+                //! @return true if the right child is valid
                 bool hasRight() const { return !rchild.is_empty(); }
 
             protected:

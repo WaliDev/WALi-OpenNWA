@@ -118,16 +118,26 @@ namespace wali
         //
         void WitnessCombine::accept( Visitor& v, bool visitOnce )
         {
-            mark();
-            if( v.visitCombine(this) ) {
-                std::list< witness_t >::iterator it = children().begin();
-                for( ; it != children().end(); it++ ) {
-                    witness_t& child = *it;
-                    // if visitOnce is false, follow the child
-                    // if child is not marked, follow the child
-                    if( !(visitOnce && child->marked()) ) {
+            if( !marked() || !visitOnce ) {
+                if( v.visitCombine(this) ) {
+                    std::list< witness_t >::iterator it = children().begin();
+                    for( ; it != children().end(); it++ ) {
+                        witness_t& child = *it;
                         child->accept(v,visitOnce);
                     }
+                }
+            }
+        }
+
+        //
+        // Override Witness::reset_marks
+        //
+        void WitnessCombine::reset_marks() const
+        {
+            if( marked() ) {
+                std::list< witness_t >::const_iterator it = kids.begin();
+                for( ; it != kids.end() ; it++ ) {
+                    (*it)->reset_marks();
                 }
             }
         }
@@ -182,7 +192,6 @@ namespace wali
         {
             std::copy(wc->children().begin(),wc->children().end(),std::back_inserter(kids));
         }
-
 
     } // namespace witness
 

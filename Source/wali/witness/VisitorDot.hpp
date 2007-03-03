@@ -1,9 +1,9 @@
 #ifndef witness_VISITOR_DOT_GUARD
 #define witness_VISITOR_DOT_GUARD 1
 
-/*!
- * @author Nick Kidd
- */
+//!
+//! @author Nick Kidd
+//!
 
 #include "wali/Common.hpp"
 #include "wali/ref_ptr.hpp"
@@ -15,13 +15,11 @@ namespace wali
 {
     namespace witness
     {
-        // Avoid including too many files
-        class Witness;
         typedef ref_ptr<Witness> witness_t;
 
-        /*!
-         * @class VisitorDot
-         */
+        //!
+        //! @class VisitorDot
+        //! 
         class VisitorDot : public Visitor
         {
             public:
