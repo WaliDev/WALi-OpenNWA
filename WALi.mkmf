@@ -87,6 +87,7 @@
         <IncludeList>
             <item Name='WALiDir' Path='$(ProjectDir)' />
         </IncludeList>
+
         <InputList>
             <!-- WALi -->
             <item Name='Common' RelativePath='wali/Common.cpp' />
@@ -102,8 +103,17 @@
             <item Name='IntSource' RelativePath='wali/IntSource.cpp' />
             <item Name='StringSource' RelativePath='wali/StringSource.cpp' />
             <item Name='KeyPairSource' RelativePath='wali/KeyPairSource.cpp' />
+            <!-- graph -->
+            <item Name='Graph'        RelativePath='wali/graph/Graph.cpp' />
+            <item Name='InterGraph'   RelativePath='wali/graph/InterGraph.cpp' />
+            <item Name='IntraGraph'   RelativePath='wali/graph/IntraGraph.cpp' />
+            <item Name='LinkEval'     RelativePath='wali/graph/LinkEval.cpp' />
+            <item Name='RegExp'       RelativePath='wali/graph/RegExp.cpp' />
+            <item Name='SummaryGraph' RelativePath='wali/graph/SummaryGraph.cpp' />
             <!-- util -->
             <item Name='StringUtils' RelativePath='wali/util/StringUtils.cpp' />
+            <item Name='ParseArgv' RelativePath='wali/util/ParseArgv.cpp' />
+            <item Name='Timer' RelativePath='wali/util/Timer.cpp' />
             <!-- WFA -->
             <item Name='WFA' RelativePath='wali/wfa/WFA.cpp' />
             <item Name='State' RelativePath='wali/wfa/State.cpp' />
@@ -124,12 +134,7 @@
             <item Name='ERule' RelativePath='wali/wpds/ewpds/ERule.cpp' />
             <item Name='MergeFunction' RelativePath='wali/wpds/ewpds/MergeFunction.cpp' />
             <!-- FWPDS -->
-            <item Name='Graph' RelativePath='wali/wpds/fwpds/Graph.cpp' />
-            <item Name='InterGraph' RelativePath='wali/wpds/fwpds/InterGraph.cpp' />
-            <item Name='IntraGraph' RelativePath='wali/wpds/fwpds/IntraGraph.cpp' />
-            <item Name='LinkEval' RelativePath='wali/wpds/fwpds/LinkEval.cpp' />
-            <item Name='RegExp' RelativePath='wali/wpds/fwpds/RegExp.cpp' />
-            <item Name='SummaryGraph' RelativePath='wali/wpds/fwpds/SummaryGraph.cpp' />
+            <item Name='FWPDS' RelativePath='wali/wpds/fwpds/FWPDS.cpp' />
             <!-- Witness -->
             <item Name='Witness' RelativePath='wali/witness/Witness.cpp' />
             <item Name='WitnessExtend' RelativePath='wali/witness/WitnessExtend.cpp' />
@@ -138,8 +143,10 @@
             <item Name='WitnessTrans' RelativePath='wali/witness/WitnessTrans.cpp' />
             <item Name='Visitor' RelativePath='wali/witness/Visitor.cpp' />
             <item Name='VisitorDot' RelativePath='wali/witness/VisitorDot.cpp' />
+            <item Name='VisitorPrinter' RelativePath='wali/witness/VisitorPrinter.cpp' />
             <item Name='WitnessWrapper' RelativePath='wali/witness/WitnessWrapper.cpp' />
         </InputList>
+
         <LibraryList>
         </LibraryList>
     </Project>
