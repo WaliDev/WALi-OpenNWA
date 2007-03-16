@@ -10,7 +10,7 @@
         OutputDir='lib'
         BuildDir='objects'
         Type='Library' >
-        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
+        <Compiler Name='g++' cflags='-g -W -Wall -Wformat=2 -O2'/>
 
         <IncludeList>
             <item Name='WALiDir' Path='$(ProjectDir)' />
@@ -83,7 +83,7 @@
         BuildDir='objects'
         Type='Library' >
 
-        <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -w -O2 -pg"/>
+        <Compiler Name="g++" cflags="-g -Wall -Wformat=2 -W -O2 -pg"/>
         <IncludeList>
             <item Name='WALiDir' Path='$(ProjectDir)' />
         </IncludeList>
@@ -157,7 +157,7 @@
     <!-- Reach Example -->
     <Project Name='ExReach' RelativePath='Examples/Reach'
         OutputDir='Examples/bin' BuildDir='Examples/Reach' Type='Executable' >
-        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
+        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -W -O2'/>
         <IncludeList>
             <item Name='Reach' Path='$(ProjectDir)' />
         </IncludeList>
@@ -172,7 +172,7 @@
 
     <Project Name='EWPDSExReach' RelativePath='Examples/Reach/ewpds' OutputDir='Examples/bin'
         BuildDir='Examples/Reach/ewpds' Type='Executable' >
-        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
+        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -W -O2'/>
         <IncludeList>
             <item Name='Reach' RelativePath='../' />
             <item Name='ewpdsReach' Path='$(ProjectDir)' />
@@ -188,7 +188,7 @@
 
     <Project Name='GenKill' RelativePath='Examples/GenKill'
         OutputDir='Examples/bin' BuildDir='Examples/GenKill' Type='Library'>
-        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
+        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -W -O2'/>
         <IncludeList>
             <item Name='GenKill' Path='$(ProjectDir)' />
         </IncludeList>
@@ -202,7 +202,7 @@
 
     <Project Name='LiveVar' RelativePath='Examples/GenKill/LiveVar' 
         OutputDir='Examples/bin' Type='Executable'>
-        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
+        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -W -O2'/>
         <IncludeList>
             <item Name='LiveVar' Path='$(ProjectDir)' />
         </IncludeList>
@@ -216,7 +216,7 @@
 
     <Project Name='UninitVar' RelativePath='Examples/GenKill/UninitVar' 
         OutputDir='Examples/bin' Type='Executable'>
-        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
+        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -W -O2'/>
         <IncludeList>
             <item Name='UninitVar' Path='$(ProjectDir)' />
         </IncludeList>
@@ -230,7 +230,7 @@
 
     <Project Name='akash' RelativePath='Examples/GenKill/akash' 
         OutputDir='Examples/bin' Type='Executable'>
-        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
+        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -W -O2'/>
         <IncludeList>
             <item Name='LiveVar' Path='$(ProjectDir)' />
         </IncludeList>
@@ -244,7 +244,7 @@
 
     <Project Name='pgGenKill' RelativePath='Examples/GenKill'
         OutputDir='Examples/bin' BuildDir='Examples/GenKill' Type='Library'>
-        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -pg'/>
+        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -W -pg'/>
         <IncludeList>
             <item Name='GenKill' Path='$(ProjectDir)' />
         </IncludeList>
@@ -258,7 +258,7 @@
 
     <Project Name='pgLiveVar' RelativePath='Examples/GenKill/LiveVar' 
         OutputDir='Examples/bin' Type='Executable'>
-        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -pg'/>
+        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -W -pg'/>
         <IncludeList>
             <item Name='LiveVar' Path='$(ProjectDir)' />
         </IncludeList>
@@ -272,7 +272,7 @@
 
     <Project Name='pgUninitVar' RelativePath='Examples/GenKill/UninitVar' 
         OutputDir='Examples/bin' Type='Executable'>
-        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -pg'/>
+        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -W -pg'/>
         <IncludeList>
             <item Name='UninitVar' Path='$(ProjectDir)' />
         </IncludeList>
@@ -304,7 +304,7 @@
     <Project Name='t1' RelativePath='Tests' 
         BuildDir='Tests/objects' OuputDir='Tests/bin' Type='Executable' >
 
-        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
+        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -W -O2'/>
         <IncludeList>
             <item Name='Reach' Path='$(MkmfDir)/Examples/Reach' />
         </IncludeList>
@@ -321,7 +321,7 @@
     <Project Name='twitness' RelativePath='Tests' 
         BuildDir='Tests/objects' OuputDir='Tests/bin' Type='Executable' >
 
-        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
+        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -W -O2'/>
         <IncludeList>
             <item Name='Reach' Path='$(MkmfDir)/Examples/Reach' />
         </IncludeList>
@@ -338,7 +338,7 @@
     <Project Name='t3' RelativePath='Tests'
         BuildDir='Tests/objects' OuputDir='Tests/bin' Type='Executable' >
 
-        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
+        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -W -O2'/>
         <IncludeList>
             <item Name='Reach' Path='$(MkmfDir)/Examples/Reach' />
         </IncludeList>
@@ -355,7 +355,7 @@
     <Project Name='t4' RelativePath='Tests' 
         BuildDir='Tests/objects' OuputDir='Tests/bin' Type='Executable' >
 
-        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
+        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -W -O2'/>
         <IncludeList>
             <item Name='Reach' Path='$(MkmfDir)/Examples/Reach' />
         </IncludeList>
@@ -372,7 +372,7 @@
     <Project Name='tprune' RelativePath='Tests' 
         BuildDir='Tests/objects' OuputDir='Tests/bin' Type='Executable' >
 
-        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
+        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -W -O2'/>
         <IncludeList>
             <item Name='Reach' Path='$(MkmfDir)/Examples/Reach' />
         </IncludeList>
@@ -389,7 +389,7 @@
     <Project Name='tse' RelativePath='Tests' 
         BuildDir='Tests/objects' OuputDir='Tests/bin' Type='Executable' >
 
-        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
+        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -W -O2'/>
         <IncludeList>
             <item Name='Reach' Path='$(MkmfDir)/Examples/Reach' />
         </IncludeList>
@@ -406,7 +406,7 @@
     <Project Name='tTransSet' RelativePath='Tests' 
         BuildDir='Tests/objects' OuputDir='Tests/bin' Type='Executable' >
 
-        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
+        <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -W -O2'/>
         <IncludeList>
             <item Name='Reach' Path='$(MkmfDir)/Examples/Reach' />
         </IncludeList>
