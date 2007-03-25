@@ -394,7 +394,7 @@ namespace wali {
             // I can fix this (i.e., weights for others will be available on demand), but not right now.
             void InterGraph::setupInterSolution(std::list<Transition> *wt_required) {
                 RegExp::init(sem);
-                util::Timer *timer = new util::Timer("FWPDS Saturation");
+                //util::Timer timer("FWPDS Saturation");
                 // First, find the IntraGraphs
                 int n = nodes.size();
                 int i;
@@ -505,7 +505,6 @@ namespace wali {
                 IntraGraph::clearStaticBuffer();
 #endif
 
-                delete timer;
             }
 
             std::ostream &InterGraph::print_stats(std::ostream &out) {

@@ -537,6 +537,12 @@ namespace wali
                 return o;
             }
 
+#if 0
+            void EWPDS::fpostar( wali::WFA& fa_in, wali::WFA& fa_out )
+            {
+            }
+#endif
+
             /////////////////////////////////////////////////////////////////
             // Protected Methods
             /////////////////////////////////////////////////////////////////
