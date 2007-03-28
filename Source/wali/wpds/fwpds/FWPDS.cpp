@@ -6,6 +6,7 @@
 #include "wali/Common.hpp"
 #include "wali/HashMap.hpp"
 #include "wali/SemElem.hpp"
+#include "wali/KeyPairSource.hpp"
 
 #include "wali/util/Timer.hpp"
 
@@ -28,23 +29,105 @@ using namespace wali;
 using namespace wali::graph;
 using namespace wali::wpds::fwpds;
 
-FWPDS::FWPDS() : WPDS()
+FWPDS::FWPDS() : WPDS(), is_ewpds(false)
 {
 }
 
-FWPDS::FWPDS(Wrapper* wrapper) : WPDS(wrapper) 
+FWPDS::FWPDS(Wrapper* wrapper) : WPDS(wrapper) , is_ewpds(false)
 {
 }
 
-FWPDS::FWPDS( Worklist<wfa::Trans> * worklist ) : WPDS(worklist)
+FWPDS::FWPDS( Worklist<wfa::Trans> * worklist ) : WPDS(worklist), is_ewpds(false)
 {
 }
 
 FWPDS::FWPDS( Wrapper * wrapper , Worklist<wfa::Trans> * worklist ) :
-    WPDS(wrapper,worklist)
+    WPDS(wrapper,worklist), is_ewpds(false)
 {
 }
 
+
+///////////////////////////////////////////////////////////////////
+// add_rule(...)
+
+bool FWPDS::add_rule(
+        Key from_state,
+        Key from_stack,
+        Key to_state,
+        sem_elem_t se )
+{
+    return add_rule(from_state,from_stack,to_state,WALI_EPSILON,WALI_EPSILON,se,(mfun_t)(NULL) );
+}
+
+bool FWPDS::add_rule(
+        Key from_state,
+        Key from_stack,
+        Key to_state,
+        Key to_stack1,
+        sem_elem_t se )
+{
+    return add_rule(from_state,from_stack,to_state,to_stack1,WALI_EPSILON,se,(mfun_t)(NULL) );
+}
+
+bool FWPDS::add_rule(
+        Key from_state,
+        Key from_stack,
+        Key to_state,
+        Key to_stack1,
+        Key to_stack2,
+        sem_elem_t se )
+{
+    return add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se,(mfun_t)(NULL) );
+}
+
+bool FWPDS::add_rule(
+        Key from_state,
+        Key from_stack,
+        Key to_state,
+        Key to_stack1,
+        Key to_stack2,
+        sem_elem_t se,
+        mfun_t mf )
+{
+    if( mf.is_valid() ) {
+        is_ewpds = true;
+        // TODO: use the Wrapper to create a WitnessMerge
+    }
+
+    pds_states.insert(from_state);
+    pds_states.insert(to_state);
+
+    // have parent do its work and bookkeeping
+    bool exists = WPDS::add_rule( 
+            from_state,from_stack,
+            to_state,to_stack1,to_stack2,se);
+
+    if( !exists ) {
+        if( to_stack1 != WALI_EPSILON && to_stack2 != WALI_EPSILON ) {
+            // have rule 2
+            KeyTriple trip(to_state,to_stack1,to_stack2);
+            merge_rule_hash_t::iterator it = merge_rule_hash.find(trip);
+            if( it != merge_rule_hash.end() ) {
+                merge_rule_hash.insert(trip,mf);
+            }
+            else {
+                // TODO : Fixme
+                *waliErr << "[ERROR] Cannot give two 'push rules' with same RHS.\n";
+                assert(0);
+            }
+        }
+    }
+    else {
+        // TODO : Fixme
+        if( mf.is_valid() ) {
+            *waliErr << "[ERROR] Attempt to add re-add rule with a valid merge function\n";
+        }
+    }
+    return exists;
+
+}
+
+///////////////////////////////////////////////////////////////////
 struct FWPDSCopyBackFunctor : public wali::wfa::TransFunctor
 {
     wali::graph::InterGraph& gr;
@@ -122,7 +205,7 @@ FWPDS::prestarComputeInterGraph( wfa::WFA& input, wfa::WFA& output )
     InterGraph* gr = 0;
     if( get_from_worklist(t) ) {
         sem_elem_t se = t->weight();
-        gr = new wali::graph::InterGraph(se,false,true);
+        gr = new wali::graph::InterGraph(se, is_ewpds ,true);
 
         FWPDSSourceFunctor sources(*gr);
         output.for_each(sources);
@@ -147,6 +230,29 @@ FWPDS::prestarComputeInterGraph( wfa::WFA& input, wfa::WFA& output )
     return gr;
 }
 
+bool
+FWPDS::is_pds_state( Key k ) const
+{
+    return (pds_states.find(k) != pds_states.end());
+}
+
+FWPDS::mfun_t
+FWPDS::lookup_merge( rule_t r ) const
+{
+    KeyTriple trip(r->to_state(),r->to_stack1(),r->to_stack2());
+    return lookup_merge(trip);
+}
+
+FWPDS::mfun_t
+FWPDS::lookup_merge( KeyTriple trip ) const
+{
+    merge_rule_hash_t::const_iterator it = merge_rule_hash.find(trip);
+    mfun_t mf(0);
+    if( it != merge_rule_hash.end() )
+        mf = it->second;
+    return mf;
+}
+
 void 
 FWPDS::pre(LinkedTrans* t, ::wali::wfa::WFA& fa, wali::graph::InterGraph& gr )
 {
@@ -166,7 +272,8 @@ FWPDS::pre(LinkedTrans* t, ::wali::wfa::WFA& fa, wali::graph::InterGraph& gr )
     Config::reverse_iterator bwit = config->rbegin();
     for( ; bwit != config->rend() ; bwit++ )
     {
-        rule_t & r = *bwit;
+        rule_t r = *bwit;
+        mfun_t mf = lookup_merge( r );
 
         //prestar_handle_trans( t,fa,r,dnew );
         // inlined prestar_handle_trans
@@ -205,10 +312,17 @@ FWPDS::pre(LinkedTrans* t, ::wali::wfa::WFA& fa, wali::graph::InterGraph& gr )
                                 , wghtOne
                                 , r->from()
                               );
-                        gr.addEdge(Transition(*tprime),
-                                Transition(*t),
-                                Transition(fstate,fstack,tprime->to()),
-                                r->weight());
+                        if( is_pds_state(t->to()) && mf.is_valid() )
+                            gr.addEdge(Transition(*tprime),
+                                    Transition(*t),
+                                    Transition(fstate,fstack,tprime->to()),
+                                    //r->weight(),
+                                    mf.get_ptr() );
+                        else
+                            gr.addEdge(Transition(*tprime),
+                                    Transition(*t),
+                                    Transition(fstate,fstack,tprime->to()),
+                                    r->weight() );
                     }
                 }
             }
@@ -239,17 +353,12 @@ FWPDS::pre(LinkedTrans* t, ::wali::wfa::WFA& fa, wali::graph::InterGraph& gr )
         // loop through list
         for( lsit = ls.begin() ; lsit != ls.end() ; lsit++ )
         {
-            rule_t & r = *lsit;
+            rule_t r = *lsit;
+            mfun_t mf = lookup_merge(r);
 
             wali::wfa::Trans tp;
             if( fa.find(r->to_state(),r->to_stack1(),t->from(),tp) )
             {
-                // f(r) * t'
-                //sem_elem_t wrtp = r->weight()->extend( tp.weight() );
-
-                // f(r) * t' * delta
-                //sem_elem_t wnew = wrtp->extend( dnew );
-
                 // update
                 Key fstate = r->from()->state();
                 Key fstack = r->from()->stack();
@@ -259,10 +368,18 @@ FWPDS::pre(LinkedTrans* t, ::wali::wfa::WFA& fa, wali::graph::InterGraph& gr )
                         , wghtOne
                         , r->from()
                       );
-                gr.addEdge(Transition(*t),
-                        Transition(tp),
-                        Transition(fstate,fstack,t->to()),
-                        r->weight());
+                if( mf.is_valid() && is_pds_state(t->from()) )
+                    gr.addEdge(Transition(*t),
+                            Transition(tp),
+                            Transition(fstate,fstack,t->to()),
+                            //r->weight(), 
+                            mf.get_ptr() // TODO: make InterGraph take a mfun_t
+                            );
+                else
+                    gr.addEdge(Transition(*t),
+                            Transition(tp),
+                            Transition(fstate,fstack,t->to()),
+                            r->weight());
 
             }
         }
@@ -270,7 +387,7 @@ FWPDS::pre(LinkedTrans* t, ::wali::wfa::WFA& fa, wali::graph::InterGraph& gr )
 }
 
 void
-FWPDS::prestarComputeFixpoint( wfa::WFA& fa )
+FWPDS::prestarComputeFixpoint( ATTR_UNUSED wfa::WFA& fa )
 {
     *waliErr << "[ERROR] FWPDS::prestarComputeFixpoint called?\n";
     assert(0);
@@ -333,7 +450,7 @@ FWPDS::poststarComputeInterGraph( wfa::WFA& input, wfa::WFA& output )
     InterGraph* gr = 0;
     if( get_from_worklist(t) ) {
         sem_elem_t se = t->weight();
-        gr = new wali::graph::InterGraph(se,false,false);
+        gr = new wali::graph::InterGraph( se, is_ewpds, false );
 
         FWPDSSourceFunctor sources(*gr);
         output.for_each(sources);
@@ -359,7 +476,7 @@ FWPDS::poststarComputeInterGraph( wfa::WFA& input, wfa::WFA& output )
 }
 
 void
-FWPDS::poststarComputeFixpoint( wfa::WFA& fa )
+FWPDS::poststarComputeFixpoint( ATTR_UNUSED wfa::WFA& fa )
 {
     *waliErr << "[ERROR] FWPDS::poststarComputeFixpoint called?\n";
     assert(0);
@@ -389,7 +506,7 @@ FWPDS::post(LinkedTrans* t, wfa::WFA& fa, InterGraph& gr )
     {
         Config::iterator fwit = config->begin();
         for( ; fwit != config->end() ; fwit++ ) {
-            rule_t & r = *fwit;
+            rule_t r = *fwit;
             // NAK DEBUG
             //r->print( std::cout << "\tMatched r => " ) << "\n";
 
@@ -419,6 +536,8 @@ FWPDS::post(LinkedTrans* t, wfa::WFA& fa, InterGraph& gr )
 
                 if( tprime->modified() ) {
 
+                    mfun_t mf = lookup_merge(r);
+
                     wfa::WFA::eps_map_t::iterator epsit = fa.eps_map.find( tprime->from() );
                     if( epsit != fa.eps_map.end() )
                     {
@@ -435,7 +554,15 @@ FWPDS::post(LinkedTrans* t, wfa::WFA& fa, InterGraph& gr )
                             wpds::Config * config = make_config( teps->from(),tpstk );
                             //sem_elem_t epsW = tprime->getDelta()->extend( teps->weight() );
                             update(teps->from(),tpstk, tpto, /*epsW*/wghtOne, config );
-                            gr.addEdge(Transition(*tprime),
+                            if( mf.is_valid() ) 
+                                gr.addEdge(Transition(*tprime),
+                                        Transition(*teps),
+                                        Transition(teps->from(), tprime->stack(), tprime->to()),
+                                        //wghtOne,
+                                        mf.get_ptr() //TODO: change InterGraph to use mfun_t
+                                        );
+                            else
+                                gr.addEdge(Transition(*tprime),
                                         Transition(*teps),
                                         Transition(teps->from(), tprime->stack(), tprime->to()),
                                         wghtOne);
@@ -450,21 +577,36 @@ FWPDS::post(LinkedTrans* t, wfa::WFA& fa, InterGraph& gr )
         // (p,eps,q) + (q,y,q') => (p,y,q')
         wfa::State * state = fa.getState( t->to() );
         wfa::State::iterator it = state->begin();
+        KeySource* key_src = getKeySource(t->to());
+        KeyPairSource *key_pair = dynamic_cast<KeyPairSource*>(key_src);
+
         for(  ; it != state->end() ; it++ )
         {
             wfa::Trans * tprime = *it;
-            //sem_elem_t wght = tprime->weight()->extend( dnew );
             wpds::Config * config = make_config( t->from(),tprime->stack() );
+
+            mfun_t mf(0);
+            if( 0 != key_pair ) {
+                mf = lookup_merge(KeyTriple(key_pair->first(),key_pair->second(),tprime->stack()));
+            }
+
             update( t->from()
                     , tprime->stack()
                     , tprime->to()
                     , wghtOne
                     , config
                   );
-            gr.addEdge(Transition(*tprime),
-                    Transition(*t),
-                    Transition(t->from(),tprime->stack(),tprime->to()),
-                    wghtOne);
+            if( mf.is_valid() )
+                gr.addEdge(Transition(*tprime),
+                        Transition(*t),
+                        Transition(t->from(),tprime->stack(),tprime->to()),
+                        //wghtOne,
+                        mf.get_ptr());
+            else
+                gr.addEdge(Transition(*tprime),
+                        Transition(*t),
+                        Transition(t->from(),tprime->stack(),tprime->to()),
+                        wghtOne);
 
         }
     }
