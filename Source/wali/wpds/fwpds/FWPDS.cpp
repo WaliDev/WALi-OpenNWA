@@ -128,7 +128,7 @@ FWPDS::prestarComputeInterGraph( wfa::WFA& input, wfa::WFA& output )
         output.for_each(sources);
 
         { // reachability
-            util::Timer timer("\tFWPDS reachability");
+            //util::Timer timer("\tFWPDS reachability");
             do {
                 // NAK DEBUG
                 //t->print( std::cout << "Popped t => " ) << "\n";
@@ -339,7 +339,7 @@ FWPDS::poststarComputeInterGraph( wfa::WFA& input, wfa::WFA& output )
         output.for_each(sources);
 
         { // reachability
-            util::Timer timer("\tFWPDS reachability");
+            //util::Timer timer("\tFWPDS reachability");
             do {
                 // NAK DEBUG
                 //t->print( std::cout << "Popped t => " ) << "\n";
@@ -404,9 +404,7 @@ FWPDS::post(LinkedTrans* t, wfa::WFA& fa, InterGraph& gr )
             else {
                 // TODO quasi one?
                 Key gstate = gen_state(r->to_state(),r->to_stack1());
-                // TODO Is the weight right?
                 wfa::Trans * tprime = update_prime( gstate, r->to_stack2(), t->to(), wghtOne );
-                wfa::State* state = fa.getState(gstate);
 
                 // add (p,g',(p,g'))
                 update( r->to_state(), r->to_stack1(), gstate, wghtOne, r->to() );
