@@ -64,52 +64,34 @@ namespace wali
                     assert(0);
                 }
 
-                // Always create a new WitnessCombine b/c cycles cause mucho problemo
-                // with ref counting.
-                WitnessCombine * newwc = new WitnessCombine( combined_se );
-                WitnessCombine * oldwc = dynamic_cast< WitnessCombine* >(that);
-
-                //      if that is a WitnessCombine then we might just incorporate
-                //      that's children into us. O/w incorporate us into that.
-                if( 0 != oldwc )
-                {
-                    // SemElem param (that) is already a WitnessCombine.
-                    // We have two WitnessCombines. Determine which children newwc
-                    // will get
-
-                    // if A + B == A, then A >= B in the semiring.
-                    // Use above to see if oldwc->user_se contains
-                    // this->user_se.
-                    //
-                    if( combined_se->equal( user_se ) ) {
-                        // this->user_se contains oldwc->user_se
-                        newwc->absorb(this);
-                    }
-                    else if( combined_se->equal( oldwc->user_se ) )
-                    {
-                        // oldwc->user_se contains this->user_se
-                        newwc->absorb(oldwc);
-                    }
-                    else {
-                        // neither user_se contained the other
-                        newwc->absorb(this);
-                        newwc->absorb(oldwc);
-                    }
-
+                if( combined_se->equal( this->user_se ) ) {
+                    return this;
+                }
+                else if( combined_se->equal( that->weight() ) ) {
+                    return that;
                 }
                 else {
-                    // that was not a WitnessCombine.
-                    // Check to see if we already contain that->user_se
-                    if( !user_se->equal(combined_se) )
-                    {
-                        // no containment.
-                        // Copy our children into newwc
-                        newwc->absorb(this);
-                    }
-                    // Add "that" to wc
+                    // Always create a new WitnessCombine b/c cycles cause mucho problemo
+                    // with ref counting.
+                    WitnessCombine * newwc = new WitnessCombine( combined_se );
+
+                    // TODO - NAK fix for case of common subchildren
+                    // I.e., this = +{A,B,C}
+                    //       that = +{C,D,E}
+                    //       return +{A,B,C,D,E}
+                    //
+                    //    currently returns +{this,that} which has two copies of C
+                    //
+                    //WitnessCombine * oldwc = dynamic_cast< WitnessCombine* >(that);
+                    //if( 0 != oldwc ) {
+                    //}
+                    //else {
+                    //}
+
+                    newwc->addChild(this);
                     newwc->addChild(that);
+                    return newwc;
                 }
-                return newwc;
             }
         }
 
