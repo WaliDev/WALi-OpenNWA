@@ -28,6 +28,7 @@ namespace wali
         class WitnessCombine;
         class WitnessRule;
         class WitnessTrans; 
+        class WitnessMerge;
 
         class Visitor
         {
@@ -58,6 +59,11 @@ namespace wali
                  * @return true to continue visiting children, false to stop.
                  */
                 virtual bool visitTrans( WitnessTrans * w );
+
+                //!
+                //! @return true to continue visiting children, false to stop
+                //!
+                virtual bool visitMerge( WitnessMerge * w );
 
         }; // class Visitor
 

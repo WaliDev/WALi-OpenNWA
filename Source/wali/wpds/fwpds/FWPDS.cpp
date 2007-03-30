@@ -105,6 +105,10 @@ bool FWPDS::add_rule(
     if( !exists ) {
         if( to_stack1 != WALI_EPSILON && to_stack2 != WALI_EPSILON ) {
             // have rule 2
+            if( wrapper != 0 ) {
+                // have wrapper, wrap merge fun
+                mf = wrapper->wrap(mf);
+            }
             KeyTriple trip(to_state,to_stack1,to_stack2);
             merge_rule_hash_t::iterator it = merge_rule_hash.find(trip);
             if( it != merge_rule_hash.end() ) {
