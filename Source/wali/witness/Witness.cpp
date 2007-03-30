@@ -86,39 +86,19 @@ namespace wali
 
                 // Do this here as both branches perform the combine
                 sem_elem_t combinedUserSe = user_se->combine(that->user_se);
-
-                WitnessCombine * oldwc = dynamic_cast< WitnessCombine* >(that);
-                WitnessCombine * newwc = new WitnessCombine( combinedUserSe );
-
-                // if this or wit is a WitnessCombine then we may not
-                // need to create a new WitnessCombine. There are probably
-                // tradeoffs to both
-                if( 0 != oldwc )
-                {
-                    // that is already a WitnessCombine.
-
-                    // if A + B == A, then A <= B in the semiring.
-                    // Use this fact to see if oldwc->user_se contains
-                    // this->user_se. We happen to know by the way SemElem::delta
-                    // works that the "old" weight on a transition will
-                    // be param se (or that). So lets see if combined_se
-                    // == oldwc->user_se. If so, we can ignore the weight
-                    // of 'this'.
-                    //
-                    newwc->absorb(oldwc);
-                    if( !combinedUserSe->equal( oldwc->user_se ) ) 
-                    {
-                        newwc->addChild(this);
-                    }
-                    // NO ELSE CASE b/c oldwc contains this's weight
+                if( combinedUserSe->equal(that->user_se) ) {
+                    return that;
+                }
+                else if( combinedUserSe->equal(this->user_se) ) {
+                    return this;
                 }
                 else {
-                    // Neither this nor that are of type WitnessCombine. 
-                    // Simply add this and that to newwc's children.
-                    newwc->addChild(that);
+
+                    WitnessCombine * newwc = new WitnessCombine( combinedUserSe );
                     newwc->addChild(this);
+                    newwc->addChild(that);
+                    return newwc;
                 }
-                return newwc;
             }
         }
 

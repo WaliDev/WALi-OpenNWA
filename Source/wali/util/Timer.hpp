@@ -3,7 +3,7 @@
 
 #include <iosfwd>
 #include <string>
-#include <sys/time.h>
+#include <sys/times.h>
 #include <iostream>
 //#include <cunistd>
 #include <cstdlib>
@@ -20,13 +20,10 @@ namespace wali {
 
     namespace util {
 
-        struct mytime {
-            clock_t t;
-        };
-
         class Timer : public wali::Printable {
             public:
                 static bool measureAndReport;
+                static const long TIMER_CLK_TICK;
 
                 Timer(const std::string &task, std::ostream& os=*waliErr);
 
@@ -38,10 +35,9 @@ namespace wali {
 
                 static std::ostream& printTime( std::ostream& out, clock_t clk );
 
-                static mytime now();
-
             private:
-                const mytime start;
+                const clock_t start;
+                struct tms st_tms;
                 const std::string task;
                 std::ostream& os; //!< for reporting
 
