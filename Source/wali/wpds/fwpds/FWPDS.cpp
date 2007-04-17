@@ -111,7 +111,7 @@ bool FWPDS::add_rule(
             }
             KeyTriple trip(to_state,to_stack1,to_stack2);
             merge_rule_hash_t::iterator it = merge_rule_hash.find(trip);
-            if( it != merge_rule_hash.end() ) {
+            if( it == merge_rule_hash.end() ) {
                 merge_rule_hash.insert(trip,mf);
             }
             else {
