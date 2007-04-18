@@ -400,7 +400,7 @@ FWPDS::prestarComputeFixpoint( ATTR_UNUSED wfa::WFA& fa )
 bool
 FWPDS::checkResults( wfa::WFA& input, wali::graph::InterGraph* gr,bool poststar )
 {
-    if( wali::get_verify_fwpds() ) 
+    if( wali::get_verify_fwpds() && !this->is_ewpds ) 
     {
         wfa::WFA tmpOutput;
         wfa::WFA tmpInput(input);
