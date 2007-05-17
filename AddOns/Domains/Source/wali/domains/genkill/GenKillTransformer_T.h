@@ -261,10 +261,10 @@ template< typename Set > class GenKillTransformer_T {
         // Constructor: JUNGHEE's addition
         // The constructor is private to ensure uniqueness of one, zero, and bottom
         GenKillTransformer_T(const GenKillTransformer_T& a) :
-            kill(a.k), gen(a.g), count(a.c)
+            kill(a.kill), gen(a.gen), count(0)
         {
 #if 0
-            std::cerr << "GenKillTransformer_T(" << k << ", " << g << ")" << std::endl;
+            std::cerr << "GenKillTransformer_T(" << a.kill << ", " << a.gen << ")" << std::endl;
 #endif
         }
 
