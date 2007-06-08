@@ -85,7 +85,7 @@ template< typename Set > class GenKillTransformer_T : public wali::SemElem {
             // Uses a method-static variable to avoid
             // problems with static-initialization order
             static GenKillTransformer_T* ONE =
-                new GenKillTransformer_T(Set::EmptySet(),Set::EmptySet(),1);
+                new GenKillTransformer_T(Set::EmptySet(),Set::EmptySet(),false);
             return ONE;
         }
 
@@ -102,7 +102,7 @@ template< typename Set > class GenKillTransformer_T : public wali::SemElem {
             // Uses a method-static variable to avoid
             // problems with static-initialization order
             static GenKillTransformer_T* ZERO =
-                new GenKillTransformer_T(Set::UniverseSet(),Set::EmptySet(),1);
+                new GenKillTransformer_T(Set::UniverseSet(),Set::EmptySet(),false);
             return ZERO;
         }
 
@@ -115,7 +115,7 @@ template< typename Set > class GenKillTransformer_T : public wali::SemElem {
             // Uses a method-static variable to avoid
             // problems with static-initialization order
             static GenKillTransformer_T* BOTTOM = 
-                new GenKillTransformer_T(Set::EmptySet(),Set::UniverseSet(),1);
+                new GenKillTransformer_T(Set::EmptySet(),Set::UniverseSet(),false);
             return BOTTOM;
         }
 
@@ -270,8 +270,8 @@ template< typename Set > class GenKillTransformer_T : public wali::SemElem {
 
         // Constructor
         // The constructor is private to ensure uniqueness of one, zero, and bottom
-        GenKillTransformer_T(const Set& k, const Set& g, unsigned int c=0) :
-            kill(k), gen(g), count(c)
+        GenKillTransformer_T(const Set& k, const Set& g, bool countme=true) : 
+            wali::SemElem(countme), kill(k), gen(g)
         {
 #if 0
             std::cerr << "GenKillTransformer_T(" << k << ", " << g << ")" << std::endl;
@@ -281,8 +281,6 @@ template< typename Set > class GenKillTransformer_T : public wali::SemElem {
     private: // members -----------------------------------------------------------
         Set kill, gen;   // Used to represent the function \S.(S - kill) U gen
 
-    public: // members -----------------------------------------------------------
-        unsigned int count;
 };
 
 template< typename Set >
