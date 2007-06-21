@@ -2,6 +2,7 @@
  * @author Nick Kidd
  */
 
+#include <memory>
 #include "wali/Key.hpp"
 #include "wali/KeySource.hpp"
 #include "wali/KeySpace.hpp"
@@ -25,8 +26,8 @@ namespace wali
     //
     KeySpace* getKeySpace()
     {
-        static KeySpace *keySpace = createKeySpace();
-        return keySpace;
+        static std::auto_ptr<KeySpace> keySpace(createKeySpace());
+        return keySpace.get();
     }
 
     //
