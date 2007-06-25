@@ -119,17 +119,17 @@ template< typename Set > class GenKillTransformer_T {
         GenKillTransformer_T* extend( GenKillTransformer_T* y )
         {
             // Handle special case for either argument being zero()
-            if( equal(GenKillTransformer_T::zero()) ) {
+            if( isEqual(GenKillTransformer_T::zero()) ) {
                 return GenKillTransformer_T::zero();
             }
-            else if( y->equal(GenKillTransformer_T::zero()) ) {
+            else if( y->isEqual(GenKillTransformer_T::zero()) ) {
                 return GenKillTransformer_T::zero();
             }
             // Handle special case for either argument being one().
-            if( equal(GenKillTransformer_T::one()) ) {
+            if( isEqual(GenKillTransformer_T::one()) ) {
                 return y;
             }
-            else if( y->equal(GenKillTransformer_T::one()) ) {
+            else if( y->isEqual(GenKillTransformer_T::one()) ) {
                 return this;
             }
             // Handle the general case
@@ -141,10 +141,10 @@ template< typename Set > class GenKillTransformer_T {
         GenKillTransformer_T* combine( GenKillTransformer_T* y )
         {
             // Handle special case for either argument being zero()
-            if( equal(GenKillTransformer_T::zero()) ) {
+            if( isEqual(GenKillTransformer_T::zero()) ) {
                 return y;
             }
-            else if( y->equal(GenKillTransformer_T::zero()) ) {
+            else if( y->isEqual(GenKillTransformer_T::zero()) ) {
                 return this;
             }
             // Handle the general case
@@ -166,17 +166,17 @@ template< typename Set > class GenKillTransformer_T {
         //
         // The return value r has two properties:
         // 1. r ]= x,
-        //    i.e., equal(combine(x,r), x) == true
+        //    i.e., isEqual(combine(x,r), x) == true
         // 2. y combine r = y combine a,
-        //    i.e., equal(combine(y,r), combine(y,a)) == true
+        //    i.e., isEqual(combine(y,r), combine(y,a)) == true
         //
         GenKillTransformer_T* diff( GenKillTransformer_T* y )
         {
             // Handle special case for either argument being zero
-            if( equal(GenKillTransformer_T::zero()) ) {
+            if( isEqual(GenKillTransformer_T::zero()) ) {
                 return GenKillTransformer_T::zero();
             }
-            else if( y->equal(GenKillTransformer_T::zero()) ) {
+            else if( y->isEqual(GenKillTransformer_T::zero()) ) {
                 return this;
             }
 
@@ -199,7 +199,7 @@ template< typename Set > class GenKillTransformer_T {
 
         // Zero is a special representative that must be compared
         // by address rather by its contained Gen/Kill sets.
-        bool equal(GenKillTransformer_T* y) const
+        bool isEqual(GenKillTransformer_T* y) const
         {
             if ( this == GenKillTransformer_T::zero() )
                 return y == GenKillTransformer_T::zero();
@@ -208,7 +208,7 @@ template< typename Set > class GenKillTransformer_T {
             return Set::Eq(kill,y->kill) && Set::Eq(gen,y->gen);
         }
 
-        std::ostream& print( std::ostream& o ) const
+        std::ostream& prettyPrint( std::ostream& o ) const
         {
             o << "<\\S.(S - {" << kill << "}) U {" << gen << "}>";
             return o;
