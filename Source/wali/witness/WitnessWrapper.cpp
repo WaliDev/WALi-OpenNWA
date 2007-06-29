@@ -6,6 +6,7 @@
 #include "wali/witness/WitnessWrapper.hpp"
 #include "wali/witness/WitnessTrans.hpp"
 #include "wali/witness/WitnessRule.hpp"
+#include "wali/witness/WitnessMergeFn.hpp"
 
 namespace wali
 {
@@ -19,6 +20,15 @@ namespace wali
         sem_elem_t WitnessWrapper::wrap( wpds::Rule& r )
         {
             return new WitnessRule(r);
+        }
+
+        wpds::Wrapper::merge_fn_t WitnessWrapper::wrap( merge_fn_t user_merge )
+        {
+            if( user_merge.is_valid() ) {
+                return new WitnessMergeFn(user_merge);
+            }
+            else
+                return 0;
         }
 
         sem_elem_t WitnessWrapper::unwrap( sem_elem_t se )

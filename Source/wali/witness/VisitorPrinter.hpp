@@ -33,10 +33,10 @@ namespace wali {
 
             protected:
                 std::ostream& os;
-                int depth;
+                size_t depth;
 
             private:
-                VisitorPrinter( std::ostream& os, int depth );
+                VisitorPrinter( std::ostream& os, size_t depth );
         };
 
     } // namespace witness

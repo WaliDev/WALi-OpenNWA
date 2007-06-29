@@ -26,7 +26,14 @@ namespace wali
 
             virtual std::ostream& print( std::ostream& o ) const;
 
+            // TODO: probably shouldn't be virtual
             virtual KeyPair get_key_pair() const;
+
+            // TODO: probably shouldn't be virtual
+            virtual Key first() const;
+
+            // TODO: probably shouldn't be virtual
+            virtual Key second() const;
 
         protected:
             KeyPair kp;

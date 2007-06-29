@@ -6,6 +6,7 @@
  */
 #include "wali/Common.hpp"
 #include "wali/SemElem.hpp"
+#include "wali/wpds/ewpds/MergeFunction.hpp"
 
 namespace wali
 {
@@ -34,6 +35,9 @@ namespace wali
         class Wrapper
         {
             public:
+                typedef wpds::ewpds::merge_fn_t merge_fn_t;
+
+            public:
                 Wrapper() {}
 
                 virtual ~Wrapper() {}
@@ -41,6 +45,8 @@ namespace wali
                 virtual sem_elem_t wrap( wfa::Trans& t );
 
                 virtual sem_elem_t wrap( wpds::Rule& r );
+
+                virtual merge_fn_t wrap( merge_fn_t );
 
                 virtual sem_elem_t unwrap( sem_elem_t se );
 

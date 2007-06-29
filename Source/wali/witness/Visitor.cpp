@@ -9,6 +9,7 @@
 #include "wali/witness/WitnessCombine.hpp"
 #include "wali/witness/WitnessTrans.hpp"
 #include "wali/witness/WitnessRule.hpp"
+#include "wali/witness/WitnessMerge.hpp"
 #include <iostream>
 #include <cassert>
 
@@ -43,6 +44,12 @@ namespace wali
         bool Visitor::visitTrans( WitnessTrans * w ATTR_UNUSED )
         {
             *waliErr << "[ERROR] wali::Visitor::visitTrans invoked. Aborting.\n";
+            return false;
+        }
+
+        bool Visitor::visitMerge( WitnessMerge * w ATTR_UNUSED )
+        {
+            *waliErr << "[ERROR] wali::Visitor::visitMerge invoked. Aborting.\n";
             return false;
         }
 

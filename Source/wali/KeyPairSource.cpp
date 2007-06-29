@@ -44,6 +44,16 @@ namespace wali
         return kp;
     }
 
+    Key KeyPairSource::first() const
+    {
+        return kp.first;
+    }
+
+    Key KeyPairSource::second() const
+    {
+        return kp.second;
+    }
+
 } // namespace wali
 
 /* Yo, Emacs!

@@ -29,6 +29,7 @@ namespace wali {
 
         bool VisitorPrinter::visit( Witness * w )
         {
+            return true;
         }
 
         bool VisitorPrinter::visitExtend( WitnessExtend * w )
@@ -84,7 +85,7 @@ namespace wali {
             return true;
         }
 
-        VisitorPrinter::VisitorPrinter( std::ostream& o, int d ) 
+        VisitorPrinter::VisitorPrinter( std::ostream& o, size_t d ) 
             : os(o), depth(d)
         {
         }
