@@ -24,11 +24,7 @@ namespace wali
 
         wpds::Wrapper::merge_fn_t WitnessWrapper::wrap( merge_fn_t user_merge )
         {
-            if( user_merge.is_valid() ) {
-                return new WitnessMergeFn(user_merge);
-            }
-            else
-                return 0;
+            return new WitnessMergeFn(user_merge);
         }
 
         sem_elem_t WitnessWrapper::unwrap( sem_elem_t se )

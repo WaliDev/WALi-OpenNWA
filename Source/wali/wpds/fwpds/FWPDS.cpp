@@ -105,7 +105,7 @@ bool FWPDS::add_rule(
     if( !exists ) {
         if( to_stack1 != WALI_EPSILON && to_stack2 != WALI_EPSILON ) {
             // have rule 2
-            if( wrapper != 0 ) {
+            if( wrapper != 0 && mf.is_valid() ) {
                 // have wrapper, wrap merge fun
                 mf = wrapper->wrap(mf);
             }
