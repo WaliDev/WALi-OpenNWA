@@ -239,16 +239,6 @@ template< typename Set > class GenKillTransformer_T {
             return gen;
         }
 
-        /*
-        void setKill(const Set & a) {
-            kill = a;
-        }
-
-        void setGen(const Set & a) {
-            gen = a;
-        }
-        */
-
         static std::ostream& WPDS_CALL print_static_transformers( std::ostream& o )
         {
             o << "ONE\t=\t"    << *one()    << std::endl;
