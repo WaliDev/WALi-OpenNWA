@@ -213,7 +213,7 @@ namespace wali {
             std::map<Key, int> state_to_node_map;
             std::map<int, Key> node_to_state_map;
 
-            const std::set<Key> states = ca_in.getStates();
+            std::set<Key> states = ca_in.getStates();
             std::set<Key> state_has_eps; // states that have an incoming eps-transition
 
             std::map<Key, std::set<Trans *> > state_trans_map;
@@ -222,8 +222,7 @@ namespace wali {
 
             Timer *timer1 = new Timer("SWPDS: Setup");
 
-            //set<wpds_key_t>::iterator set_it;
-            set<Key>::iterator set_it;
+            std::set<Key>::iterator set_it;
             // Build a map: state -> { incoming transition }
             // and a graph representing the WFA (will use for SCC decomposition)
             for(set_it = states.begin(); set_it != states.end(); set_it++) {
@@ -251,8 +250,8 @@ namespace wali {
             //ca.for_each(cnt);
             //assert(trans_cnt == cnt.count());
 
-            set<IntraGraph *> gr_set;
-            set<IntraGraph *>::iterator gr_it;
+			std::set<IntraGraph *> gr_set;
+			std::set<IntraGraph *>::iterator gr_it;
             // Iterate over all states
             for(st_map_it = state_trans_map.begin(); st_map_it != state_trans_map.end(); st_map_it++) 
             {
@@ -356,7 +355,7 @@ namespace wali {
             // Build the worklist
             int scc = ca_gr.runSCCdecomposition();
             cout << "SWPDS: nSCC: " << scc << "\n";
-            for(set_it = states.begin(); set_it != states.end(); set_it++) {
+			for(std::set<wali::Key>::iterator set_it = states.begin(); set_it != states.end(); set_it++) {
                 if(*set_it == init_state)
                     continue;
                 worklist.insert(tup(ca_gr.getSccNumber(*set_it), *set_it));

@@ -1321,7 +1321,7 @@ namespace wali {
     delete [] connecting_edges;
     delete [] inv_node_map;
 
-    WIN(stats.path_seq_time  += clock() - start);
+    //WIN(stats.path_seq_time  += clock() - start);
   }
 
   void IntraGraph::computePathSequenceCutset(vector<IntraGraphNode> &cnodes, int ncnodes, vector<IntraGraphEdge> &cedges, int ncedges, vector<PathSequence> &sequence) {

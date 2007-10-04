@@ -33,7 +33,7 @@ FWPDS::FWPDS() : WPDS(), is_ewpds(false)
 {
 }
 
-FWPDS::FWPDS(Wrapper* wrapper) : WPDS(wrapper) , is_ewpds(false)
+FWPDS::FWPDS(wali::wpds::Wrapper* wrapper) : WPDS(wrapper) , is_ewpds(false)
 {
 }
 
@@ -41,7 +41,7 @@ FWPDS::FWPDS( Worklist<wfa::Trans> * worklist ) : WPDS(worklist), is_ewpds(false
 {
 }
 
-FWPDS::FWPDS( Wrapper * wrapper , Worklist<wfa::Trans> * worklist ) :
+FWPDS::FWPDS( wali::wpds::Wrapper * wrapper , Worklist<wfa::Trans> * worklist ) :
     WPDS(wrapper,worklist), is_ewpds(false)
 {
 }
@@ -245,14 +245,14 @@ FWPDS::is_pds_state( Key k ) const
 }
 
 FWPDS::mfun_t
-FWPDS::lookup_merge( rule_t r ) const
+FWPDS::lookup_merge( wali::wpds::rule_t r ) const
 {
     KeyTriple trip(r->to_state(),r->to_stack1(),r->to_stack2());
     return lookup_merge(trip);
 }
 
 FWPDS::mfun_t
-FWPDS::lookup_merge( KeyTriple trip ) const
+FWPDS::lookup_merge( wali::KeyTriple trip ) const
 {
     merge_rule_hash_t::const_iterator it = merge_rule_hash.find(trip);
     mfun_t mf(0);
@@ -262,7 +262,7 @@ FWPDS::lookup_merge( KeyTriple trip ) const
 }
 
 void 
-FWPDS::pre(LinkedTrans* t, ::wali::wfa::WFA& fa, wali::graph::InterGraph& gr )
+FWPDS::pre(wali::wpds::LinkedTrans* t, ::wali::wfa::WFA& fa, wali::graph::InterGraph& gr )
 {
     // Get config
     Config * config = t->config;
@@ -491,7 +491,7 @@ FWPDS::poststarComputeFixpoint( ATTR_UNUSED wfa::WFA& fa )
 }
 
 void
-FWPDS::post(LinkedTrans* t, wfa::WFA& fa, InterGraph& gr )
+FWPDS::post(wali::wpds::LinkedTrans* t, wali::wfa::WFA& fa, wali::graph::InterGraph& gr )
 {
     // Get config
     wpds::Config * config = t->config;

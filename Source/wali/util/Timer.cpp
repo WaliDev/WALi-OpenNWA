@@ -1,37 +1,33 @@
 #include <iomanip>
 #include <iostream>
-#include <sys/times.h>
-#include <unistd.h>
-
 #include "wali/Common.hpp"
 
 #include "wali/util/Timer.hpp"
 
+#ifndef _WIN32
 clock_t sum_tms( const struct tms& t ) {
-#if 0
-    *wali::waliErr << "\tDebug Timer:\n";
-    *wali::waliErr << "\t\ttms_utime : " << t.tms_utime << "\n";
-    *wali::waliErr << "\t\ttms_stime : " << t.tms_stime << "\n";
-    *wali::waliErr << "\t\ttms_cutime : " << t.tms_cutime << "\n";
-    *wali::waliErr << "\t\ttms_cstime : " << t.tms_cstime << "\n";
-#endif
     clock_t c = t.tms_utime 
         + t.tms_stime + t.tms_cutime + t.tms_cstime;
     return c;
 }
+#endif
 
 namespace wali {
 
     namespace util {
 
         bool Timer::measureAndReport = true;
+#ifndef _WIN32
         const long Timer::TIMER_CLK_TICK = sysconf(_SC_CLK_TCK);
+#endif
 
 
         Timer::Timer(const std::string &task, std::ostream& os)
             : start(clock()), task(task), os(os)
         {
+#ifndef _WIN32
             times(&st_tms);
+#endif
         }
 
         Timer::~Timer()
@@ -43,6 +39,7 @@ namespace wali {
         double Timer::elapsed() const
         {
 
+#ifndef _WIN32
             struct tms end_tms;
             clock_t now = times(&end_tms);
             if( now == -1 ) {
@@ -53,10 +50,9 @@ namespace wali {
                 clock_t t = sum_tms(end_tms) - sum_tms(st_tms);
                 return (t * 1.0) / (double)(TIMER_CLK_TICK);
             }
-
-            //const mytime end = now();
-            //clock_t t = (end.t - start.t);
-            //return t * 1.0 / (double)(CLOCKS_PER_SEC);
+#else
+            return 0;
+#endif
         }
 
 

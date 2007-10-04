@@ -2,6 +2,7 @@
 #define wali_util_PARSE_ARG_V_GUARD
 #include <iostream>
 #include <map>
+#include <string>
 
 namespace wali
 {

@@ -60,8 +60,8 @@ namespace wali {
                 ndom_components = 0;
                 ndom_componentcutset = 0;
                 nget_weight = 0;
-                WIN(intra_saturation = inter_saturation = setup_time = 0);
-                WIN(t1 = t2 = t3 = 0);
+                //WIN(intra_saturation = inter_saturation = setup_time = 0);
+                //WIN(t1 = t2 = t3 = 0);
             }
         };
 

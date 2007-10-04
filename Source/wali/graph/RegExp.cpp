@@ -1,5 +1,6 @@
 #include "wali/graph/RegExp.hpp"
 #include "wali/graph/GraphCommon.hpp"
+#include <algorithm>
 
 namespace wali {
 
@@ -242,10 +243,10 @@ namespace wali {
         }
 
         // a = a union b
-        void my_set_union(set<int> &a, set<int> &b) {
-            set<int> c;
+		void my_set_union(std::set<int> &a, std::set<int> &b) {
+			std::set<int> c;
             insert_iterator< set<int> > ii(c, c.begin());
-            set_union(a.begin(), a.end(), b.begin(), b.end(), ii);
+			std::set_union(a.begin(), a.end(), b.begin(), b.end(), ii);
             a = c;
         }
 

@@ -3,12 +3,15 @@
 
 #include <iosfwd>
 #include <string>
-#include <sys/times.h>
 #include <iostream>
-//#include <cunistd>
 #include <cstdlib>
 #include <cstdio>
 #include "wali/Printable.hpp"
+#ifndef WIN32
+#	include <sys/times.h>
+#else
+#	include <time.h>
+#endif
 
 /*
  * @author Ben Liblit (NAK - I think)
@@ -37,7 +40,9 @@ namespace wali {
 
             private:
                 const clock_t start;
+#ifndef _WIN32
                 struct tms st_tms;
+#endif
                 const std::string task;
                 std::ostream& os; //!< for reporting
 
