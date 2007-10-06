@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="Reach-Example"
-	ProjectGUID="{534FAE8C-CEA2-464D-8B1C-58DE65E89B14}"
-	RootNamespace="Examples"
+	Name="LiveVar"
+	ProjectGUID="{3E796CD8-2656-44DA-831F-C4C3394A50F9}"
+	RootNamespace="LiveVar"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -17,8 +17,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(ProjectDir)"
+			IntermediateDirectory="$(TEMP)"
 			ConfigurationType="1"
 			CharacterSet="1"
 			>
@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(ProjectDir)\..\..\Source"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)\..\..\..\Source&quot;;&quot;$(ProjectDir)\..\..\..\Examples\GenKill\LiveVar&quot;;&quot;$(ProjectDir)\..\..\..\Examples\GenKill&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -169,8 +169,8 @@
 	</Configurations>
 	<References>
 		<ProjectReference
-			ReferencedProjectIdentifier="{1BCBFF7B-CAA9-4D8D-8B29-A55037D5E62C}"
-			RelativePathToProject=".\WALi.static.NET.vcproj"
+			ReferencedProjectIdentifier="{BF42778C-A9FD-4B04-8004-D41AAB67B92C}"
+			RelativePathToProject=".\WALi\WALi.vcproj"
 		/>
 	</References>
 	<Files>
@@ -180,11 +180,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\Examples\Reach\ExReach.cpp"
+				RelativePath="..\..\..\Examples\GenKill\LiveVar\LiveVar.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Examples\Reach\Reach.cpp"
+				RelativePath="..\..\..\Examples\GenKill\VarSet.cpp"
 				>
 			</File>
 		</Filter>
@@ -194,7 +194,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\Examples\Reach\Reach.hpp"
+				RelativePath="..\..\..\Examples\GenKill\Dictionary_T.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\Examples\GenKill\GenKillTransformer_T.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\Examples\GenKill\VarSet.hpp"
 				>
 			</File>
 		</Filter>
