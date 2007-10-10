@@ -7,14 +7,14 @@
 
     <Project Name='waliparse' 
         RelativePath='Source'
-        OutputDir='lib'
+        OutputDir='../../lib'
         BuildDir='objects' 
-        InstallDir='../../Library/lib'
+        InstallDir='../../lib'
         Type='Library' >
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
-            <item Name='WALiDir' Path='$(MkmfDir)/../../Source' />
-            <item Name='xerces-c' Path='$(MkmfDir)/ThirdParty/xerces-c/include' />
+            <item Name='WALiDir' Path='$(ProjectDir)/../../../Source' />
+            <item Name='xerces-c' Path='$(ProjectDir)/../ThirdParty/xerces-c/include' />
             <item Name='WALiParse' RelativePath='.' />
         </IncludeList>
         <InputList>
@@ -30,8 +30,8 @@
             <item Name='MergeFactory' RelativePath='wali/wpds/ewpds/MergeFactory.cpp' />
         </InputList>
         <LibraryList>
-            <item Name='wali' Path='$(HOME)/Library/lib' />
-            <item Name='xerces-c' Path='$(XERCESCROOT)/lib' />
+            <item Name='wali' Path='$(ProjectDir)/../../../lib' />
+            <item Name='xerces-c' Path='$(ProjectDir)/../ThirdParty/xerces-c/lib' />
         </LibraryList>
     </Project>
 
@@ -39,9 +39,6 @@
         BuildDir='Examples/Main' Type='Executable' >
         <Compiler Name='g++' cflags='-g -Wall -Wformat=2 -w -O2'/>
         <IncludeList>
-            <item Name='WALiDir' RelativePath='$(MkmfDir)/../../Source' />
-            <item Name='xerces-c' Path='$(XERCESCROOT)/include' />
-            <item Name='WALiParse' Path='$(MkmfDir)/Source' />
         </IncludeList>
         <InputList>
             <item Name='Main' RelativePath='Main.cpp' />
