@@ -6,7 +6,7 @@
            Default='wali' RelativePath='.' Name='WALi'>
 
     <Project Name='wali' RelativePath='Source'
-        InstallDir='../../Library/lib'
+        InstallDir='lib'
         OutputDir='lib'
         BuildDir='objects'
         Type='Library' >
