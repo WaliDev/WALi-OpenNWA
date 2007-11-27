@@ -123,7 +123,7 @@ namespace wali
             return o;
         }
 
-        void Witness::accept( Visitor& v, bool visitOnce )
+        void Witness::accept( Visitor& v, bool visitOnce ATTR_UNUSED )
         {
             mark();
             //assert(0);

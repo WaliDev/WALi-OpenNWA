@@ -192,7 +192,7 @@ namespace wali {
             }
             virtual ~CountTrans() { }
 
-            virtual  void operator()(const Trans* t) {
+            virtual  void operator()(const Trans* t ATTR_UNUSED) {
                 cnt++;
             }
 

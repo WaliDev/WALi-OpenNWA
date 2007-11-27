@@ -82,7 +82,7 @@ namespace wali
 
         void VisitorDot::printNodeName( Witness * w )
         {
-            os << "\tw" << (unsigned int)w;
+            os << "\tw" << (size_t)w;
         }
 
         void VisitorDot::printEdge( Witness * head, Witness * tail )

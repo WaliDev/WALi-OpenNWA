@@ -27,7 +27,7 @@ namespace wali {
             for( size_t i = 0; i < depth ; i++ ) os << "  |";
         }
 
-        bool VisitorPrinter::visit( Witness * w )
+        bool VisitorPrinter::visit( Witness * w ATTR_UNUSED )
         {
             return true;
         }

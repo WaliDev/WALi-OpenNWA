@@ -57,13 +57,13 @@ namespace wali {
 
         struct hash_reg_exp_key {
             size_t operator() (const reg_exp_key_t &k) const {
-                return ((unsigned)k.type ^ (unsigned)k.c1.get_ptr() ^ (unsigned)k.c2.get_ptr());
+                return ((size_t)k.type ^ (size_t)k.c1.get_ptr() ^ (size_t)k.c2.get_ptr());
             }
         };
 
         struct hash_sem_elem {
             size_t operator() (const sem_elem_t &se) const {
-                return (unsigned)se.get_ptr();
+                return (size_t)se.get_ptr();
             }
         };
 

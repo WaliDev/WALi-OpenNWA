@@ -24,7 +24,7 @@ namespace wali
         //
         // Override Witness::accept
         //
-        void WitnessTrans::accept( Visitor& v, bool visitOnce )
+        void WitnessTrans::accept( Visitor& v, bool visitOnce ATTR_UNUSED )
         {
             // TODO how does marking work...need a flag maybe
             mark();

@@ -34,7 +34,7 @@ namespace wali
      * stops the saturation process when all transitions'
      * deltas are zero.
      */
-    sem_elem_t SemElem::diff( SemElem * se )
+    sem_elem_t SemElem::diff( SemElem * se ATTR_UNUSED )
     {
         *waliErr << "[ERROR] SemElem::diff must be overridden to be used.\n";
         assert(0);
@@ -47,7 +47,7 @@ namespace wali
     }
 
     //
-    // < this + se, this - se >
+    // @return < this + se, this - se >
     //
     std::pair< sem_elem_t , sem_elem_t > SemElem::delta( SemElem * se )
     {

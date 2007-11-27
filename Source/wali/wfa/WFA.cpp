@@ -260,7 +260,6 @@ namespace wali
                 Key q
                 )
         {
-            bool eraseSuccess = false;
             state_map_t::iterator it = state_map.find(q);
             if( it == state_map.end() ) {
                 return false;
