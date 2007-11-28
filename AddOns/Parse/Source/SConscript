@@ -1,4 +1,5 @@
-# Build the library
+# Build the waliparse library
+import os
 
 Import('WaliDir')
 
@@ -15,14 +16,19 @@ waliparse_files = Split("""
 ./StrX.cpp
 """)
 
-env = Environment(
-    CPPPATH  = [
-      WaliDir + '/Source',
-      WaliDir + '/AddOns/Parse/Source',
-      WaliDir + '/AddOns/Parse/ThirdParty/xerces-c/include',
-    ],
-    CXXFLAGS = '-g -ggdb -Wall -Wformat=2 -W'
-)
+env = Environment()
+
+env['CPPPATH'] = [ 
+  os.path.join(WaliDir , 'Source'),
+  os.path.join(WaliDir,'AddOns','Parse','Source'),
+  os.path.join(WaliDir,'AddOns','Parse','ThirdParty','xerces-c','include'),
+]
+
+if 'gcc' == env['CC']:
+    env['CXXFLAGS'] = '-g -ggdb -Wall -Wformat=2 -W'
+elif 'cl' == env['CC']:
+    # Mostly copied from VS C++ 2005 Command line
+    env['CXXFLAGS'] = '/TP /errorReport:prompt /Wp64 /W4 /GR /MTd /EHsc'
 
 waliparse = env.SharedLibrary('waliparse' , waliparse_files)
 
