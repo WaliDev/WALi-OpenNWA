@@ -41,7 +41,7 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include "HashMap.h"
+#include "wali/HashMap.hpp"
 #include <limits.h>
 #include <iostream>
 
@@ -115,7 +115,7 @@ private:
 			return computeHashKey(rcm);
 		}
 	};
-	typedef wpds::HashMap<const int*, RCMatrix*, HashArr, EqArr> CnclMats;
+	typedef wali::HashMap<const int*, RCMatrix*, HashArr, EqArr> CnclMats;
 
 	static CnclMats* cnclMats;		// Canonical matrix table
 	
@@ -239,7 +239,7 @@ public:
 		}
 	};
 
-	typedef wpds::HashMap<MatrixPair, RCMatrix*, HashPair, EqPair> ProdCache;
+	typedef wali::HashMap<MatrixPair, RCMatrix*, HashPair, EqPair> ProdCache;
 	
 	static const ProdCache::size_type maxProdCacheSize;  // Max size of cache
 	static const float cacheEntryThreshold;              // Min fraction of accesses 

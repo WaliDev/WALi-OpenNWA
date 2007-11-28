@@ -1,0 +1,15 @@
+# Reachability example
+import os
+
+Import('WaliDir')
+Import('Env')
+
+ReachFiles=Split("""
+    Reach.cpp
+    ExReach.cpp
+""")
+
+ExReach = Env.Program('ExReach',ReachFiles)
+
+Env.Install(os.path.join(WaliDir,'Examples','bin'), ExReach)
+

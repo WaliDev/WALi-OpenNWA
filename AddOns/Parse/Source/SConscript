@@ -1,10 +1,17 @@
 # Build the waliparse library
 import os
 
+print "\n+++ Building waliparse library."
+
+Debug = 1
+
 Import('WaliDir')
-
-
 Import('LibInstallDir')
+
+if Debug:
+    print "+ WaliDir       : '%s'" % WaliDir
+    print "+ LibInstallDir : '%s'" % LibInstallDir 
+
 
 waliparse_files = Split("""
 ./wali/wpds/ewpds/EWpdsHandler.cpp
@@ -18,11 +25,18 @@ waliparse_files = Split("""
 
 env = Environment()
 
-env['CPPPATH'] = [ 
-  os.path.join(WaliDir , 'Source'),
-  os.path.join(WaliDir,'AddOns','Parse','Source'),
-  os.path.join(WaliDir,'AddOns','Parse','ThirdParty','xerces-c','include'),
+# Define include directories
+IncludeDirs = [
+    os.path.join(WaliDir , 'Source'),
+    os.path.join(WaliDir,'AddOns','Parse','Source'),
+    os.path.join(WaliDir,'AddOns','Parse','ThirdParty','xerces-c','include'),
 ]
+
+if Debug:
+    for i in IncludeDirs:
+        print "+ Inlude        : %s" % i
+
+env['CPPPATH'] = IncludeDirs
 
 if 'gcc' == env['CC']:
     env['CXXFLAGS'] = '-g -ggdb -Wall -Wformat=2 -W'

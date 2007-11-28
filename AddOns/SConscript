@@ -1,4 +1,3 @@
 # Build WALi library 
 
-Import('WaliDir')
-SConscript('Parse/Source/SConscript', build_dir='_build/Parse',duplicate=0)
+SConscript('Parse/SConscript')

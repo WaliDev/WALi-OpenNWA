@@ -1,8 +1,17 @@
 # Build wali library
 import os
 
+print "\n+++ Building wali library."
+
+Debug = 1
+
 Import('WaliDir')
 Import('LibInstallDir')
+
+if Debug:
+    print "+ WaliDir       : '%s'" % WaliDir
+    print "+ LibInstallDir : '%s'" % LibInstallDir 
+
 
 # `find . -name "*.cpp"`, then remove Experimental.cpp
 wali_files = Split("""
@@ -61,11 +70,15 @@ wali_files = Split("""
 
 env = Environment()
 
-print "!!!!!!!!!! WD : %s" % WaliDir
-
-env['CPPPATH'] = [ 
+IncludeDirs = [ 
   os.path.join(WaliDir , 'Source'), 
 ]
+
+if Debug:
+    for i in IncludeDirs:
+        print "+ Inlude        : %s" % i
+
+env['CPPPATH'] = IncludeDirs 
 
 if 'gcc' == env['CC']:
     env['CXXFLAGS'] = '-g -ggdb -Wall -Wformat=2 -W'

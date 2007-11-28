@@ -1,0 +1,55 @@
+# Build the example applications
+import os
+
+print "\n+++ Building WALi Examples."
+Import('WaliDir')
+Import('LibInstallDir')
+
+Env = Environment()
+
+# Include search path
+IncludeDirs = [
+    os.path.join(WaliDir, 'Source'),
+]
+Env['CPPPATH'] = IncludeDirs
+
+# Compilation flags
+if 'gcc' == Env['CC']:
+    Env['CXXFLAGS'] = '-g -ggdb -Wall -Wformat=2 -W'
+elif 'cl' == Env['CC']:
+    # Mostly copied from VS C++ 2005 Command line
+    Env['CXXFLAGS'] = '/TP /errorReport:prompt /Wp64 /W4 /GR /MTd /EHsc'
+
+# Libraries
+Libs = [ 'wali', ]
+Env['LIBS'] = Libs
+
+# Library search path
+LibDirs = [ LibInstallDir ]
+Env['LIBPATH'] = LibDirs
+
+Export('Env')
+
+ExampleDir = os.path.join(WaliDir,'Examples')
+
+# Reach example
+SConscript(
+        os.path.join(ExampleDir,'Reach','SConscript'),
+        build_dir= os.path.join('_build','Reach'),
+        duplicate=0
+        )
+
+# Affine Relations Weight Domain
+# SConscript(
+#         os.path.join(ExampleDir,'AffineRelations','SConscript'),
+#         build_dir= os.path.join('_build','AffineRelations'),
+#         duplicate=0
+#         )
+
+# GenKill examples
+SConscript(
+        os.path.join(ExampleDir,'GenKill','SConscript'),
+        build_dir= os.path.join('_build','GenKill'),
+        duplicate=0
+        )
+

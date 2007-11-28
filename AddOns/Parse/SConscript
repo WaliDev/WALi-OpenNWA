@@ -1,0 +1,5 @@
+# Build WALi library 
+
+
+SConscript('ThirdParty/SConscript')
+SConscript('Source/SConscript', build_dir='_build/Parse',duplicate=0)
