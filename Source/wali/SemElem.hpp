@@ -156,27 +156,32 @@ namespace wali
 
             /*! Wrapper method for extend that will remove the ref_ptr
              *  to make the call to the user's code. This is just a 
-             */ nice "typesafe macro" b/c sem_elem_t is used by WPDS
+             * nice "typesafe macro" b/c sem_elem_t is used by WPDS
+             */
             sem_elem_t extend( sem_elem_t se ) { return extend( se.get_ptr() ); }
 
             /*! Wrapper method for combine that will remove the ref_ptr
              *  to make the call to the user's code. This is just a 
-             */ nice "typesafe macro" b/c sem_elem_t is used by WPDS
+             * nice "typesafe macro" b/c sem_elem_t is used by WPDS
+             */
             sem_elem_t combine( sem_elem_t se ) { return combine( se.get_ptr() ); }
 
             /*! Wrapper method for equal that will remove the ref_ptr
              *  to make the call to the user's code. This is just a 
-             */ nice "typesafe macro" b/c sem_elem_t is used by WPDS
+             * nice "typesafe macro" b/c sem_elem_t is used by WPDS
+             */
             bool equal( sem_elem_t se ) const { return equal( se.get_ptr() ); }
 
             /*! Wrapper method for diff that will remove the ref_ptr
              *  to make the call to the user's code. This is just a 
-             */ nice "typesafe macro" b/c sem_elem_t is used by WPDS
+             * nice "typesafe macro" b/c sem_elem_t is used by WPDS
+             */
             sem_elem_t diff( sem_elem_t se ) { return diff( se.get_ptr() ); }
 
             /*! Wrapper method for delta that will remove the ref_ptr
              *  to make the call to the user's code. This is just a 
-             */ nice "typesafe macro" b/c sem_elem_t is used by WPDS
+             * nice "typesafe macro" b/c sem_elem_t is used by WPDS
+             */
             std::pair< sem_elem_t,sem_elem_t > delta( sem_elem_t se )
             {
                 return delta( se.get_ptr() );
