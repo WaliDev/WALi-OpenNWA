@@ -45,13 +45,15 @@ def main():
     if bits != '64bit' and bits != '32bit':
         raise NameError, bits
     s = platform.system()
-    if s == 'Linux':
-        get_xerces_linux(bits)
-    else:
-        get_xerces_win(bits)
+    if False == os.path.exists('xerces-c'):
+        if s == 'Linux':
+            get_xerces_linux(bits)
+        else:
+            get_xerces_win(bits)
 
 
-if __name__ == "__main__":
+# Work from command line or SConscript
+if __name__ in ['__main__' , 'getlibs']:
     main()
 
 #def get_xerces_py(name):

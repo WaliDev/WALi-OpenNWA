@@ -1,4 +1,3 @@
-import os
-
-os.system('get-libs.py')
+# Run the python program
+import getlibs
 
