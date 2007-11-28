@@ -1,3 +1,4 @@
+# $Id$
 # Build WALi library 
 
 import os

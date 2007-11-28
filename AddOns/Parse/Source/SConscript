@@ -1,4 +1,6 @@
 # Build the waliparse library
+# $Id$
+
 import os
 
 print "\n+++ Building waliparse library."

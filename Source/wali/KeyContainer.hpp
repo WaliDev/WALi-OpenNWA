@@ -7,7 +7,7 @@
 
 #include "wali/Common.hpp"
 #include "wali/hm_hash.hpp"
-#include <utility>          //! < provides std::pair
+#include <utility>          // provides std::pair
 
 namespace wali
 {

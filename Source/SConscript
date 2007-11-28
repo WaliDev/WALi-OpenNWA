@@ -1,4 +1,5 @@
 # Build wali library
+# $Id$
 import os
 
 print "\n+++ Building wali library."
@@ -70,15 +71,12 @@ wali_files = Split("""
 
 env = Environment()
 
-IncludeDirs = [ 
-  os.path.join(WaliDir , 'Source'), 
-]
+IncludeDirs = [ os.path.join(WaliDir , 'Source'), ]
+env['CPPPATH'] = IncludeDirs 
 
 if Debug:
     for i in IncludeDirs:
         print "+ Inlude        : %s" % i
-
-env['CPPPATH'] = IncludeDirs 
 
 if 'gcc' == env['CC']:
     env['CXXFLAGS'] = '-g -ggdb -Wall -Wformat=2 -W'
