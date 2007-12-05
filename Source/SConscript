@@ -75,8 +75,11 @@ IncludeDirs = [ os.path.join(WaliDir , 'Source'), ]
 env['CPPPATH'] = IncludeDirs 
 
 if Debug:
+    print "+ CC            : '%s'" % env['CC'] 
+    print "+ CXX           : '%s'" % env['CXX'] 
     for i in IncludeDirs:
         print "+ Inlude        : %s" % i
+
 
 if 'gcc' == env['CC']:
     env['CXXFLAGS'] = '-g -ggdb -Wall -Wformat=2 -W'
