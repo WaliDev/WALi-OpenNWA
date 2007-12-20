@@ -5,7 +5,7 @@
 #include <climits>
 #include <cassert>
 #include "common.h"
-#include "ref_ptr.h"
+#include "gtr/src/ref_ptr/ref_ptr.hpp"
 
 /*!
  * @class GenKillTransformer_T
