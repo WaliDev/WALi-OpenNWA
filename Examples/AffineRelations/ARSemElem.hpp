@@ -13,6 +13,8 @@ using wali::sem_elem_t;
 
 namespace AR {
 
+#define AR_SEMELEM_DIFF 0
+
     class ARSemElem : public wali::SemElem , public wali::WeightFactory
     {
         public:
@@ -31,7 +33,9 @@ namespace AR {
             virtual sem_elem_t extend(SemElem * se);
             virtual sem_elem_t combine(SemElem * se);
             virtual bool equal(SemElem * se) const;
+#if AR_SEMELEM_DIFF
             virtual sem_elem_t diff(SemElem * se) const;
+#endif
 
             //------------------------------------
             // output

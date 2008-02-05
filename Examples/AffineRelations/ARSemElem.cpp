@@ -35,31 +35,33 @@ namespace AR {
 
     sem_elem_t ARSemElem::extend(SemElem * se)
     {
-        ARSemElem* rhs = dynamic_cast<ARSemElem*>(se);
+        ARSemElem* rhs = static_cast<ARSemElem*>(se);
         ARSemiring* ring = rhs->impl.get_ptr();
         return new ARSemElem(impl->extend( ring ) );
     }
 
     sem_elem_t ARSemElem::combine(SemElem * se)
     {
-        ARSemElem* rhs = dynamic_cast<ARSemElem*>(se);
+        ARSemElem* rhs = static_cast<ARSemElem*>(se);
         ARSemiring* ring = rhs->impl.get_ptr();
         return new ARSemElem(impl->combine( ring ) );
     }
 
     bool ARSemElem::equal(SemElem * se) const
     {
-        ARSemElem* rhs = dynamic_cast<ARSemElem*>(se);
+        ARSemElem* rhs = static_cast<ARSemElem*>(se);
         ARSemiring* ring = rhs->impl.get_ptr();
         return impl->equal( ring );
     }
 
+#if AR_SEMELEM_DIFF
     sem_elem_t ARSemElem::diff(SemElem * se) const
     {
-        ARSemElem* rhs = dynamic_cast<ARSemElem*>(se);
+        ARSemElem* rhs = static_cast<ARSemElem*>(se);
         ARSemiring* ring = rhs->impl.get_ptr();
         return new ARSemElem(impl->diff( ring ));
     }
+#endif 
 
     //------------------------------------
     // output
