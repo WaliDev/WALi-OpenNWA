@@ -40,9 +40,9 @@
 
 #pragma warning (disable: 4786)
 
-#include "ZASSemiring.h"
-#include "VectorSpace.h"
-#include "AffineRels.h"
+#include "Semiring.hpp"
+#include "ModuleSpace.hpp"
+#include "AffineRels.hpp"
 
 //-------------------------------------------
 // For Nick's wpds implementation
@@ -50,13 +50,13 @@
 //---------------------------------------------------------------
 // semiring for wpds
 //----------------------------------------------------------------
-VSSemiring* VSSemiring::_one=new VSSemiring(new VectorSpace(AR::dim,true), 1);
-VSSemiring* VSSemiring::_zero=new VSSemiring(new VectorSpace(AR::dim), 1);
+VSSemiring* VSSemiring::_one=new VSSemiring(new ModuleSpace(AR::dim,true), 1);
+VSSemiring* VSSemiring::_zero=new VSSemiring(new ModuleSpace(AR::dim), 1);
 
 //--------------------------------------
 // Constructor
 //--------------------------------------
-VSSemiring::VSSemiring(VectorSpace *_p_vs,unsigned c):p_vs(_p_vs), count(c) {
+VSSemiring::VSSemiring(ModuleSpace *_p_vs,unsigned c):p_vs(_p_vs), count(c) {
 
 }
 
@@ -83,12 +83,12 @@ VSSemiring *VSSemiring::one() {
 //----------------------------
 //
 //----------------------------
-VectorSpace *VSSemiring::vs() {
+ModuleSpace *VSSemiring::vs() {
 	// FIXME: It is dangerous to lose control of a pointer, when it is
-	// ref counted. The safe thing would be to return "const VectorSpace*" here. 
-	// However, most of the VectorSpace functions (even queries like isEmpty()) 
+	// ref counted. The safe thing would be to return "const ModuleSpace*" here. 
+	// However, most of the ModuleSpace functions (even queries like isEmpty()) 
 	// need to invoke findBasis() that changes the object. Therefore, it is not 
-	// possible to return "const VectorSpace*" here! Be careful about how you use 
+	// possible to return "const ModuleSpace*" here! Be careful about how you use 
 	// the pointer.
 	return p_vs.get_ptr();
 }
@@ -103,14 +103,14 @@ VSSemiring *VSSemiring::extend(VSSemiring *op2) {
 		if( this == VSSemiring::_one )
 			return this;
 		else
-			return new VSSemiring(new VectorSpace(*this->p_vs));
+			return new VSSemiring(new ModuleSpace(*this->p_vs));
 	}
 
 	if(this == VSSemiring::_one) {
 		if( op2 == VSSemiring::_one )
 			return op2;
 		else
-			return new VSSemiring(new VectorSpace(*op2->p_vs));
+			return new VSSemiring(new ModuleSpace(*op2->p_vs));
 	}
 	*/
 	return new VSSemiring(op2->p_vs->compose(p_vs.get_ptr()));
@@ -125,14 +125,14 @@ VSSemiring *VSSemiring::combine(VSSemiring *op2) {
 		if( this == VSSemiring::_zero )
 			return this;
 		else
-			return new VSSemiring(new VectorSpace(*this->p_vs));
+			return new VSSemiring(new ModuleSpace(*this->p_vs));
 	}
 	
 	if( this == VSSemiring::_zero ) {
 		if( op2 == VSSemiring::_zero )
 			return op2;
 		else
-			return new VSSemiring(new VectorSpace(*op2->p_vs));
+			return new VSSemiring(new ModuleSpace(*op2->p_vs));
 	}
 	*/
 	return new VSSemiring(this->p_vs->join(op2->p_vs.get_ptr()));
@@ -149,7 +149,7 @@ VSSemiring* VSSemiring::quasiOne() const{
 //---------------------------------------------
 
 VSSemiring *VSSemiring::diff(VSSemiring *op2) const {
-	VectorSpace *diffValue=this->p_vs->diff(op2->p_vs.get_ptr());	
+	ModuleSpace* diffValue=this->p_vs->diff(op2->p_vs.get_ptr());	
 	return new VSSemiring(diffValue);
 }
 

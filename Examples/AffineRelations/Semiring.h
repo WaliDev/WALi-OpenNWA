@@ -38,8 +38,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef ara_ZASSEMIRING_GUARD
-#define ara_ZASSEMIRING_GUARD
+#ifndef ara_SEMIRING_GUARD
+#define ara_SEMIRING_GUARD
 
 #include "ModuleSpace.hpp"
 #include <iostream>
@@ -53,29 +53,29 @@
 
 namespace ara {
 
-    class VSSemiring {
+    class Semiring {
         public:
             //---------------------
             // Constructors 
             //---------------------
-            VSSemiring(ModuleSpace*,unsigned = 0);	
-            ~VSSemiring();
+            Semiring(ModuleSpace*,unsigned = 0);	
+            ~Semiring();
 
             //-----------------------------
             // semiring one and zero
             //-----------------------------
-            static VSSemiring* one();
-            static VSSemiring* zero();
+            static Semiring* one();
+            static Semiring* zero();
 
             //---------------------------------
             // semiring operations
             //---------------------------------
-            VSSemiring* extend(VSSemiring *) ;
-            VSSemiring* combine(VSSemiring *);
-            bool		equal(VSSemiring *) const;
+            Semiring* extend(Semiring *) ;
+            Semiring* combine(Semiring *);
+            bool		equal(Semiring *) const;
 
-            VSSemiring* quasiOne() const;
-            VSSemiring* diff(VSSemiring *) const;
+            Semiring* quasiOne() const;
+            Semiring* diff(Semiring *) const;
 
             //----------------------------
             // Reference count
@@ -97,13 +97,13 @@ namespace ara {
             ///
             ModuleSpace *vs();
         private:
-            static VSSemiring *_zero;
-            static VSSemiring *_one;
+            static Semiring *_zero;
+            static Semiring *_one;
             typedef ref_ptr<ModuleSpace> ModuleSpacePtr;
             ModuleSpacePtr p_vs;
 
-    }; // class VSSemiring
+    }; // class Semiring
 
 } // namespace ara
 
-#endif  // ara_ZASSEMIRING_GUARD
+#endif  // ara_SEMIRING_GUARD

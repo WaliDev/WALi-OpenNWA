@@ -5,7 +5,7 @@
  * @author Nick Kidd
  */
 
-#include "ZASSemiring.h"
+#include "ARSemiring.hpp"
 #include "wali/SemElem.hpp"
 #include "wali/WeightFactory.hpp"
 
