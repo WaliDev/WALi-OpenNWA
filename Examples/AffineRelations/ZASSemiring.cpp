@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2002-2004, Gogul Balakrishnan, 
+// Copyright (c) 2007, Gogul Balakrishnan, Akash Lal
 // University of Wisconsin, Madison.
 // All rights reserved.
 //
@@ -33,16 +33,16 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// e-mail: bgogul@cs.wisc.edu
+// e-mail: bgogul@cs.wisc.edu, akash@cs.wisc.edu
+//
 //////////////////////////////////////////////////////////////////////////////
+
+
 #pragma warning (disable: 4786)
 
 #include "ZASSemiring.h"
 #include "VectorSpace.h"
 #include "AffineRels.h"
-#include <sstream>
-#include <fstream>
-#include <iostream>
 
 //-------------------------------------------
 // For Nick's wpds implementation
@@ -56,15 +56,14 @@ VSSemiring* VSSemiring::_zero=new VSSemiring(new VectorSpace(AR::dim), 1);
 //--------------------------------------
 // Constructor
 //--------------------------------------
-VSSemiring::VSSemiring(VectorSpace *_p_vs,unsigned c):p_vs(_p_vs), count(c)
-{
+VSSemiring::VSSemiring(VectorSpace *_p_vs,unsigned c):p_vs(_p_vs), count(c) {
+
 }
 
 //--------------------------------------
 // Destructor
 //--------------------------------------
 VSSemiring::~VSSemiring() {
-	delete p_vs;
 }
 
 //-----------------------------------------
@@ -85,7 +84,13 @@ VSSemiring *VSSemiring::one() {
 //
 //----------------------------
 VectorSpace *VSSemiring::vs() {
-	return p_vs;
+	// FIXME: It is dangerous to lose control of a pointer, when it is
+	// ref counted. The safe thing would be to return "const VectorSpace*" here. 
+	// However, most of the VectorSpace functions (even queries like isEmpty()) 
+	// need to invoke findBasis() that changes the object. Therefore, it is not 
+	// possible to return "const VectorSpace*" here! Be careful about how you use 
+	// the pointer.
+	return p_vs.get_ptr();
 }
 
 //-----------------------------------------
@@ -108,7 +113,7 @@ VSSemiring *VSSemiring::extend(VSSemiring *op2) {
 			return new VSSemiring(new VectorSpace(*op2->p_vs));
 	}
 	*/
-	return new VSSemiring(op2->p_vs->compose(p_vs));
+	return new VSSemiring(op2->p_vs->compose(p_vs.get_ptr()));
 }
 
 //-----------------------------------------
@@ -130,7 +135,7 @@ VSSemiring *VSSemiring::combine(VSSemiring *op2) {
 			return new VSSemiring(new VectorSpace(*op2->p_vs));
 	}
 	*/
-	return new VSSemiring(this->p_vs->join(op2->p_vs));
+	return new VSSemiring(this->p_vs->join(op2->p_vs.get_ptr()));
 }
 
 
@@ -144,7 +149,7 @@ VSSemiring* VSSemiring::quasiOne() const{
 //---------------------------------------------
 
 VSSemiring *VSSemiring::diff(VSSemiring *op2) const {
-	VectorSpace *diffValue=this->p_vs->diff(op2->p_vs);	
+	VectorSpace *diffValue=this->p_vs->diff(op2->p_vs.get_ptr());	
 	return new VSSemiring(diffValue);
 }
 
@@ -154,7 +159,7 @@ VSSemiring *VSSemiring::diff(VSSemiring *op2) const {
 // are the two elements equal?
 //-----------------------------------------
 bool VSSemiring::equal(VSSemiring *op2) const {
-	bool isequal=p_vs->isEqual(op2->p_vs);
+	bool isequal=p_vs->isEqual(op2->p_vs.get_ptr());
 	return isequal;
 }
 
@@ -175,35 +180,4 @@ std::ostream &VSSemiring::print(std::ostream &os) const {
 	}
 	p_vs->prettyPrint(os);
 	return os;
-}
-
-VSSemiring* VSSemiring::parse_element( const char* buf )
-{
-    return one();
-/*
-
-    
-    std::string s(buf);
-    std::stringstream str(s);
-    ModuleSpace *weight = new ModuleSpace(AR::dim);
-    int mat[AR::dim * AR::dim];
-    char c;
-    do {
-        str >> c;
-        if(str.eof()) break;
-        if(c == '#') break;
-        if(c == '[') { // starting of the matrix
-            for(int i = 0; i < AR::dim * AR::dim; i++) {
-                str >> mat[i];
-            }
-            str >> c; // it should be ']'
-            if(c != ']') {
-                assert(0);
-                return 0;
-            }
-            weight->insertMatrix(mat);
-        }
-    }while(true);
-    return new VSSemiring(weight);
-    */
 }

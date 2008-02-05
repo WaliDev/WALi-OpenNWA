@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2002-2004, Thomas Reps, Gogul Balakrishnan
+// Copyright (c) 2007, Gogul Balakrishnan, Thomas Reps
 // University of Wisconsin, Madison.
 // All rights reserved.
 //
@@ -33,23 +33,42 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// e-mail: reps@cs.wisc.edu, bgogul@cs.wisc.edu
+// e-mail: bgogul@cs.wisc.edu, reps@cs.wisc.edu
+//
 //////////////////////////////////////////////////////////////////////////////
-//-----------------------------------------------------------------
+//
+// Copyright (c) 2007, an unpublished work by GrammaTech, Inc.
+// ALL RIGHTS RESERVED
+//
+// This software is furnished under a license and may be used and
+// copied only in accordance with the terms of such license and the
+// inclusion of the above copyright notice.  This software or any
+// other copies thereof may not be provided or otherwise made
+// available to any other person.  Title to and ownership of the
+// software is retained by GrammaTech, Inc.
+//
+// GrammaTech proprietary and confidential.
+//
+// Not to be redistributed or disclosed without a prior written
+// consent from GrammaTech, Inc.
+//
+//////////////////////////////////////////////////////////////////////////////
 // Dictionary implementation based on Applicative-AVL trees
 //-----------------------------------------------------------------
+
 
 #ifndef DICTIONARY_GUARD
 #define DICTIONARY_GUARD
 
-#include <assert.h>
+#include "vsa_sysdep.h" // defines VSA_IMP_TYPENAME__
 #include <limits.h>
 #include <iostream>
+
 
 #if defined(X86_PROFILE_NEW_DELETE)
 #   include <new.h>
 #   include <typeinfo.h>
-#   include "heapProfile.h"
+#   include "swyx/src/common/heap_profile.hpp"
 //  Hacks don't get much uglier than the following:
 //  - There are several different heap profiling tricks being
 //    applied (when various macros are defined).
@@ -77,7 +96,18 @@
 #   endif // !defined(new)
 #endif //defined(X86_PROFILE_NEW_DELETE)
 
+#define PER_BB_PICKLE
+#if defined(PER_BB_PICKLE) // {
+//- dictflags are currently used by:
+//  - VSApickler: one "visited" bit
+//  - VSApickler: one bit to distinguish "global" AVL nodes
+#   define DICTFLAG_VISITED 0x01
+#   define DICTFLAG_GLOBAL  0x02
+typedef unsigned char dictflags_t;
+typedef unsigned char height_t;
+#else // } if !defined(PER_BB_PICKLE) {
 typedef unsigned short height_t;
+#endif // } if !defined(PER_BB_PICKLE)
 typedef unsigned short refcount_t;
 
 static const refcount_t maxRefCount = USHRT_MAX;
@@ -86,8 +116,9 @@ template <class Key_t, class Datum_t, class KeyComp_t>
 class DictNode_T;
 
 enum STATUS { DICT_NOT_FOUND, DICT_FOUND };
-
-#include "RIntXCong.h"
+#if _MSC_VER > 1200
+   #include "RIntXCong.h"
+#endif
 
 
 //------------------------------------------------------------------------
@@ -111,6 +142,8 @@ public:
 	}
 };
 
+template <class T>
+bool dataComparator(const T& t1, const T& t2) {return t1 == t2;}
 
 
 //----------------------------------------------------------------------------
@@ -118,9 +151,7 @@ public:
 //-----------------------------------------------------------------------------
 template <class Key_t, class Datum_t, class KeyComp_t=DictComp_T<Key_t> >
 class Dictionary_T {
-	friend int keycompare(const Key_t k1, const Key_t k2);
 	friend std::ostream& operator<< (std::ostream&  out, const Dictionary_T<Key_t, Datum_t, KeyComp_t>& d);
-	friend void assign16To32(Dictionary_T<unsigned int, RIntXCong32>& lhs, const Dictionary_T<unsigned int, RIntXCong16>& rhs);
 
 public:
 
@@ -162,16 +193,44 @@ public:
 	Dictionary_T<Key_t, Datum_t, KeyComp_t> Right()		const;	// Right child
 	Dictionary_T<Key_t, Datum_t, KeyComp_t> RightMost() const;	// Rightmost child
 	height_t								Height()	const;	// Max of height of the children
-	
-	Dictionary_T<Key_t, Datum_t, KeyComp_t> 
-		Insert(const Key_t& k, const Datum_t& v) const;			// Return a dictionary obtained by inserting (k, v)
-	
+
+    // Insertion
+    Dictionary_T<Key_t, Datum_t, KeyComp_t> 
+        Insert(const Key_t& k, const Datum_t& v) const;     // Return a dictionary obtained by inserting (k, v)
+
+    Dictionary_T<Key_t, Datum_t, KeyComp_t>                 // Return a dictionary obtained by inserting (k, v)
+        InsertWithCheck(const Key_t& k, const Datum_t& v,   // after first checking if k already maps to v
+                        bool (*dataComp)(const Datum_t&d1, const Datum_t& d2) = NULL
+                       ) const;                             // (Default comparator is shallow bitwise comparison)
+
+    // Instead of calling Insert or InsertWithCheck directly,
+    // it may be useful to use one of these macros, which can
+    // then be modified to use deep vs shallow comparison,
+    // to always turn on/off checks, to add stats collection, etc.
+	//
+	// InsertWithCheck is meant to be an _optimization_ of Insert, 
+	// where if a to-be-inserted item is found to already exist 
+	// (according to the dataComp function), we bypass the log-space 
+	// cost of inserting an item into the applicative AVL tree. Using 
+	// a shallow comparison that sometimes fails to recognize deep equality 
+	// only means that on those occasions we do not perform the optimization.
+	//
+	// NOTES ON CURRENT VERSION:
+    //  - INSERT_WITH_CHECK: does *shallow* comparison (discards cf argument)
+#define INSERT_WITH_CHECK(key, val, cf) InsertWithCheck(key, val)
+    //  - INSERT_NO_CHECK: no lookup.
+#define INSERT_NO_CHECK(key, val, cf) Insert(key, val)
+
+    
 	Dictionary_T<Key_t, Datum_t, KeyComp_t> 
 		Delete(const Key_t& k) const;							// Return a dictionary obtained by deleting (k, *)
 	
 	STATUS IsKeyInDict(const Key_t& t) const;  // Is the given key in the dictionary?
 	STATUS Lookup(const Key_t& k, Datum_t& v) const;			// Search for a given k, update v
 	STATUS Lookup(const Key_t& k, Key_t& origK, Datum_t& v) const;	// Search for a given k, update origK & v
+#if defined(PER_BB_PICKLE) // {
+    dictflags_t Flags() const { return myEntries ? myEntries->flags : 0; } // Return the flags
+#endif // } defined(PER_BB_PICKLE)
 	DictNode_T<Key_t, Datum_t, KeyComp_t> *myEntries;
 
 	//----------------------------------
@@ -192,9 +251,35 @@ public:
 				return (myEntry == rhs.myEntry);
 			}
 
-			iterator():elemStack(NULL), stackPos(-1), myEntry(NULL) {
+			iterator():elemStack(NULL), stackPos(-1), myEntry(NULL), stackSize(0) {
 				
 			}
+
+			iterator(const iterator& rhs) {
+				stackSize = rhs.stackSize;
+				elemStack = new DictNode_T<Key_t, Datum_t, KeyComp_t>*[stackSize];
+				for(int i = 0; i < stackSize; ++i) {
+					elemStack[i] = rhs.elemStack[i];
+				}
+				myEntry  = rhs.myEntry;
+				stackPos = rhs.stackPos;
+			}
+
+			iterator& operator = (const iterator& rhs) {
+				// avoid self-copy
+				if(this == &rhs) return *this;
+
+				delete [] elemStack;
+				stackSize = rhs.stackSize;
+				elemStack = new DictNode_T<Key_t, Datum_t, KeyComp_t>*[stackSize];
+				for(int i = 0; i < stackSize; ++i) {
+					elemStack[i] = rhs.elemStack[i];
+				}
+				myEntry  = rhs.myEntry;
+				stackPos = rhs.stackPos;
+				return *this;
+			}
+
 
 			~iterator() {
 				if(elemStack)
@@ -229,14 +314,15 @@ public:
 		private:
 			DictNode_T<Key_t, Datum_t, KeyComp_t>*	myEntry;
 			DictNode_T<Key_t, Datum_t, KeyComp_t>**	elemStack;
-			int stackPos;
+			int stackPos; unsigned stackSize;
 
 			// Initialize the iterator with a particular stack size
 			// and the tree whose root is "root"
 			void initialize(int size, DictNode_T<Key_t, Datum_t, KeyComp_t>* root) {
 				if(elemStack)
 					delete []elemStack;
-				elemStack = new DictNode_T<Key_t, Datum_t, KeyComp_t>*[size];
+				stackSize = size;
+				elemStack = new DictNode_T<Key_t, Datum_t, KeyComp_t>*[stackSize];
 				stackLeftElems(root);
 				myEntry = pop();
 				//(STACK EAGERLY)this->operator++(0);
@@ -262,27 +348,21 @@ public:
 
 	// Iterators
 	//Dictionary_T<Key_t, Datum_t, KeyComp_t>::iterator *First() const;
-	void begin(Dictionary_T<Key_t, Datum_t, KeyComp_t>::iterator& ) const;
+	void begin(VSA_IMP_TYPENAME__ Dictionary_T<Key_t, Datum_t, KeyComp_t>::iterator& ) const;
 	inline bool IsRootShared(const Dictionary_T<Key_t, Datum_t, KeyComp_t>& rhs) const;
 	
 	// Compare two dictionaries. 
 	// Use sharing to short-cut the comparisons operations.
 	bool IsEqual(const Dictionary_T<Key_t, Datum_t, KeyComp_t>& rhs,
-				 bool (*dataComp)(const Datum_t&d1, const Datum_t& d2)) const;
+				 bool (*dataComp)(const Datum_t&d1, const Datum_t& d2) = dataComparator<Datum_t>) const;
 	
-	// Combine two dictionaries using the combine
-	// operator. 
-/*	Dictionary_T<Key_t, Datum_t, KeyComp_t> 
-		Combine(const Dictionary_T<Key_t, Datum_t, KeyComp_t>& op2,
-				Datum_t (*combineTwo)(const Datum& d1, const Datum_t& d2),
-				Datum_t (*combineOne)(const Datum& d, bool op2)
-				bool (*dataComp)(const Datum_t&d1, const Datum_t& d2)) const;
-*/
+
+	
 	bool IsEmpty() const;
 	bool IsSizeOne() const;
 	unsigned int Size() const;
- private:
 	void Print(std::ostream&  out, unsigned int depth) const;
+ private:
 	Dictionary_T<Key_t, Datum_t, KeyComp_t> Bal(const Key_t& k, 
 												const Datum_t& d, 
 												const Dictionary_T<Key_t, Datum_t, KeyComp_t>& l, 
@@ -309,15 +389,15 @@ class DictNode_T {
 //	void  operator delete[] (void*);
 #endif //defined(X86_PROFILE_NEW_DELETE)
 
-	// Junghee's add
-	//Datum_t getDatum() { return datum; };
-	//void setDatum(Datum_t d) { datum = d; };
 	unsigned int Size() const;
 
  private:
 	Key_t key;
 	Datum_t datum;
 	Dictionary_T<Key_t, Datum_t, KeyComp_t> left, right;
+#if defined(PER_BB_PICKLE) // {
+    dictflags_t flags;
+#endif // } defined(PER_BB_PICKLE)
 	height_t height;
 	refcount_t refCount;
 
@@ -447,10 +527,37 @@ Dictionary_T<Key_t, Datum_t, KeyComp_t>& Dictionary_T<Key_t, Datum_t, KeyComp_t>
 }
 
 //---------------------------------------------------
-// 
+// Insert <k,v> into dictionary, after first checking
+// whether <k,v> is already in the dictionary.
+// The third argument is the comparator for the value;
+// if it is null, a shallow bitwise comparison (with
+// memcmp) is used.
 //---------------------------------------------------
 template <class Key_t, class Datum_t, class KeyComp_t>
-Dictionary_T<Key_t, Datum_t, KeyComp_t> Dictionary_T<Key_t, Datum_t, KeyComp_t>::Insert(const Key_t& k, const Datum_t& v) const
+Dictionary_T<Key_t, Datum_t, KeyComp_t>
+    Dictionary_T<Key_t, Datum_t, KeyComp_t>::InsertWithCheck(const Key_t& k,
+                                                             const Datum_t& v,
+                                                             bool (*dataComp)(const Datum_t&d1, const Datum_t& d2)
+                                                             ) const
+{
+    Datum_t v_old;
+    if((this->Lookup(k, v_old) == DICT_FOUND)
+        && ((dataComp == NULL) ? !memcmp(&v, &v_old, sizeof(Datum_t))
+                               : (dataComp(v, v_old)))){
+        return *this;
+    }
+    return this->Insert(k,v);
+}
+
+
+//---------------------------------------------------
+// Insert <k,v> into dictionary, forcibly applying
+// the update (and rebalancing) regardless of whether
+// <k,v> is already in the dictionary.
+//---------------------------------------------------
+template <class Key_t, class Datum_t, class KeyComp_t>
+Dictionary_T<Key_t, Datum_t, KeyComp_t>
+    Dictionary_T<Key_t, Datum_t, KeyComp_t>::Insert(const Key_t& k, const Datum_t& v) const
 {
   if (myEntries == NULL)
     return Dictionary_T<Key_t, Datum_t, KeyComp_t>(k,v);
@@ -560,7 +667,7 @@ STATUS Dictionary_T<Key_t, Datum_t, KeyComp_t>::Lookup(const Key_t& k, Key_t& or
   }
   else if (temp == 0)
   {
-	origK = myEntries->key;
+    origK = myEntries->key;
     v = myEntries->datum;
     return DICT_FOUND;
   }
@@ -700,7 +807,7 @@ Dictionary_T<Key_t, Datum_t, KeyComp_t> Dictionary_T<Key_t, Datum_t, KeyComp_t>:
 // Begin
 //---------------------------------------------------
 template <class Key_t, class Datum_t, class KeyComp_t>
-void Dictionary_T<Key_t, Datum_t, KeyComp_t>::begin(Dictionary_T<Key_t, Datum_t, KeyComp_t>::iterator& iter) const {
+void Dictionary_T<Key_t, Datum_t, KeyComp_t>::begin(VSA_IMP_TYPENAME__ Dictionary_T<Key_t, Datum_t, KeyComp_t>::iterator& iter) const {
 	iter.initialize(Height(), myEntries);
 }
 
@@ -747,8 +854,8 @@ bool Dictionary_T<Key_t, Datum_t, KeyComp_t>::IsEqual(const Dictionary_T<Key_t, 
 
 		// If the trees rooted at the nodes
 		// pointed to by the iterators 
-		// are the same, skip the right tree
-		// altogether.
+		// are the same, skip each right tree
+		// completely.
 		if(thisIter.IsRootShared(rhsIter)) {
 			thisIter.advanceWORightTree();
 			rhsIter.advanceWORightTree();
@@ -779,13 +886,12 @@ bool Dictionary_T<Key_t, Datum_t, KeyComp_t>::IsEqual(const Dictionary_T<Key_t, 
 }
 
 
-
 //----------------------------------------
 // Is empty?
 //----------------------------------------
 template <class Key_t, class Datum_t, class KeyComp_t>
 bool Dictionary_T<Key_t, Datum_t, KeyComp_t>::IsEmpty() const {
-	return (myEntries == 0);
+	return (myEntries == NULL);
 }
 
 //----------------------------------------
@@ -807,22 +913,22 @@ bool Dictionary_T<Key_t, Datum_t, KeyComp_t>::IsSizeOne() const {
 template <class Key_t, class Datum_t, class KeyComp_t>
 void Dictionary_T<Key_t, Datum_t, KeyComp_t>::Print(std::ostream&  out, unsigned int depth) const
 {
-	
-  if (myEntries == NULL) {
-//	  out << "NULL" << std::endl;
-	  out << "NULL ";
-  }
-  else {
-    if (!(myEntries->left).NoEntries())
-      (myEntries->left).Print(out, depth+1);
-    for (unsigned int i = 0; i < depth; i++) out << "  ";
-//	out << "height: " << (myEntries->height) << ", key: " << (myEntries->key) << ", datum: " << (myEntries->datum) << ", refCount: " << myEntries->refCount << std::endl;
-	out << "height: " << (myEntries->height) << ", key: " << (myEntries->key) << ", datum: " << (myEntries->datum) << ", refCount: " << myEntries->refCount << " ";
+    if (myEntries == NULL) {
+        out << "NULL ";
+    }
+    else {
+        if (!(myEntries->left).NoEntries())
+            (myEntries->left).Print(out, depth+1);
+        for (unsigned int i = 0; i < depth; i++)
+            out << "  ";
+        out << "height: " << (int)(myEntries->height)
+            << ", key: " << (myEntries->key)
+            << ", datum: " << (myEntries->datum)
+            << ", refCount: " << myEntries->refCount << " ";
 
-    if (!(myEntries->right).NoEntries())
-      (myEntries->right).Print(out, depth+1);
-  }
-
+        if (!(myEntries->right).NoEntries())
+            (myEntries->right).Print(out, depth+1);
+    }
 }
 
 static int WithinOne(unsigned int i, unsigned int j)
@@ -849,7 +955,11 @@ std::ostream& operator<< (std::ostream&  out, const Dictionary_T<Key_t, Datum_t,
 //---------------------------------------------------
 template <class Key_t, class Datum_t, class KeyComp_t>
 DictNode_T<Key_t, Datum_t, KeyComp_t>::DictNode_T(Key_t k, Datum_t d, Dictionary_T<Key_t, Datum_t, KeyComp_t> l, Dictionary_T<Key_t, Datum_t, KeyComp_t> r, height_t h)
-  : key(k), datum(d), left(l), right(r), height(h), refCount(0)
+  : key(k), datum(d), left(l), right(r),
+#if defined(PER_BB_PICKLE) // {
+    flags(0),
+#endif // } defined(PER_BB_PICKLE)
+    height(h), refCount(0)
 {
 #ifdef EXPLICIT_PICKLE_REFCOUNT_FIELD_IN_DICT
     pickle_refcount = 0;
@@ -861,7 +971,11 @@ DictNode_T<Key_t, Datum_t, KeyComp_t>::DictNode_T(Key_t k, Datum_t d, Dictionary
 //---------------------------------------------------
 template <class Key_t, class Datum_t, class KeyComp_t>
 DictNode_T<Key_t, Datum_t, KeyComp_t>::DictNode_T(Key_t k, Datum_t d, Dictionary_T<Key_t, Datum_t, KeyComp_t> l, Dictionary_T<Key_t, Datum_t, KeyComp_t> r)
-  : key(k), datum(d), left(l), right(r), refCount(0)
+  : key(k), datum(d), left(l), right(r),
+#if defined(PER_BB_PICKLE) // {
+    flags(0),
+#endif // } defined(PER_BB_PICKLE)
+    refCount(0)
 {
   height_t l_height = l.Height();
   height_t r_height = r.Height();
@@ -879,7 +993,10 @@ DictNode_T<Key_t, Datum_t, KeyComp_t>::DictNode_T(Key_t k, Datum_t d)
   : key(k), 
 	datum(d), 
 	left(Dictionary_T<Key_t, Datum_t, KeyComp_t>()), 
-	right(Dictionary_T<Key_t, Datum_t, KeyComp_t>()), 
+	right(Dictionary_T<Key_t, Datum_t, KeyComp_t>()),
+#if defined(PER_BB_PICKLE) // {
+    flags(0),
+#endif // } defined(PER_BB_PICKLE)
 	height(1), 
 	refCount(0)
 {
@@ -910,6 +1027,7 @@ void* DictNode_T<Key_t, Datum_t, KeyComp_t>::operator decl_new(size_t s)
 	assert(s == sizeof(DictNode_T<Key_t, Datum_t, KeyComp_t>));
 	nHeapProfiler::getCounter(typeid(DictNode_T<Key_t, Datum_t, KeyComp_t>).name(),
 						  0).increment(1, sizeof(DictNode_T<Key_t, Datum_t, KeyComp_t>));
+	nHeapProfiler::getCounter("all_dictnodes", 0).increment(1, sizeof(DictNode_T<Key_t, Datum_t, KeyComp_t>));
 	return ::operator new(s);
 }
 #endif //defined(X86_PROFILE_NEW_DELETE)
@@ -923,6 +1041,7 @@ void  DictNode_T<Key_t, Datum_t, KeyComp_t>::operator delete(void* o)
 {
 	nHeapProfiler::getCounter(typeid(DictNode_T<Key_t, Datum_t, KeyComp_t>).name(),
 						  0).increment(-1, -sizeof(DictNode_T<Key_t, Datum_t, KeyComp_t>));
+	nHeapProfiler::getCounter("all_dictnodes", 0).increment(-1, -sizeof(DictNode_T<Key_t, Datum_t, KeyComp_t>));
 	::operator delete(o);
 }
 #endif //defined(X86_PROFILE_NEW_DELETE)

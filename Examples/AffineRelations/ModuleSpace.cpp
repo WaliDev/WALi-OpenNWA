@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2005, Akash Lal, 
+// Copyright (c) 2007, Gogul Balakrishnan, Akash Lal, Thomas Reps
 // University of Wisconsin, Madison.
 // All rights reserved.
 //
@@ -33,8 +33,11 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// e-mail: akash@cs.wisc.edu
+// e-mail: bgogul@cs.wisc.edu, akash@cs.wisc.edu, reps@cs.wisc.edu
+//
 //////////////////////////////////////////////////////////////////////////////
+
+
 #pragma warning (disable: 4786)
 #pragma warning (disable: 4005)
 #pragma warning (disable: 4099)
@@ -44,16 +47,14 @@
 #include "ModuleSpace.h"
 #include "ARConfig.h"
 #include "AffineRels.h"
+#include "MiscUtil.h"
 #include <math.h>
 
-// initialization of static members
-unsigned int ModuleSpace::maxRefCount = 0xffffffff;
 
 unsigned int ModuleSpace::curMemUsage = 0;
 unsigned int ModuleSpace::maxMemUsage = 0;
-unsigned int ModuleSpace::matrixMult = 0;
-unsigned int ModuleSpace::msMultClock = 0;
-bool ModuleSpace::exact_equality = true;
+int ModuleSpace::svd_vec_size = 0;
+
 //
 // Access given matrix as a linear array
 //
@@ -105,7 +106,7 @@ void print_mat(Matrix &A, int n, const char *s) {
 //-----------------------------------
 // gcd(a, b)
 //----------------------------------
-inline  unsigned int GCD(unsigned int a, unsigned int b) {
+inline  unsigned int _fastcall GCD(unsigned int a, unsigned int b) {
 	int tmp;
 
 	//
@@ -167,8 +168,6 @@ ModularMatrix ModuleSpace::createModularMatrix(const int *m) {
 ModuleSpace::ModuleSpace(int m, bool id) {
 	N=m;
 	Nsq = N*N;
-	ref=0;
-	satRef=false;
 	basisUptodate=true;
 	if(id) {
 		setIdspace();
@@ -183,8 +182,6 @@ ModuleSpace::ModuleSpace(const ModuleSpace& rhs) {
 
 	N = rhs.N;
 	Nsq = rhs.Nsq;
-	ref   = rhs.ref;
-	satRef = rhs.satRef;
 	basisUptodate = rhs.basisUptodate;
 
 	MSConstIterator beg, end;
@@ -422,7 +419,6 @@ int ModuleSpace::expressionPrecondition(AffineRels &in, AffineRels &value, Affin
 }
 
 
-
 //----------------------------------------------------------------
 // Find the basis of the matrix set using Gaussian Elimination
 //----------------------------------------------------------------
@@ -476,7 +472,7 @@ void ModuleSpace::findBasis(MatrixSet *pBasis) {
 	endi = intBasis.end();
 	while(begi != endi) {
 #ifdef VSA_ARA_USE_CNCL_MATRICES
-		Matrix m((*begi).m);
+		Matrix m((*begi).m, N);
 		delete [] (*begi).m;   // Matrix makes a copy for itself
 #else
 		int *m = (*begi).m;
@@ -490,6 +486,27 @@ void ModuleSpace::findBasis(MatrixSet *pBasis) {
 		basisUptodate = true;
 	}
 
+}
+
+void ModuleSpace::findBasis(std::vector<int *> &pBasis, int vec_size, int clear_mem) {
+	std::vector<int *>::iterator beg,end;
+	MSIntIterator begi, endi;
+
+	MatrixSetInt intBasis;  
+
+	beg = pBasis.begin();
+	end = pBasis.end();
+	for(; beg != end; beg++) {
+		intBasis.push_back(ModularMatrixInt(*beg, vec_size));
+	}
+	findBasis(&intBasis, vec_size, clear_mem);
+	pBasis.clear();
+
+	begi = intBasis.begin();
+	endi = intBasis.end();
+	for(;begi != endi; begi++) {
+		pBasis.push_back((*begi).m);
+	}
 }
 
 void ModuleSpace::findBasis(MatrixSetInt *pBasis, int vec_size, int clear_mem) {
@@ -514,7 +531,7 @@ void ModuleSpace::findBasis(MatrixSetInt *pBasis, int vec_size, int clear_mem) {
 		beg = pBasis->begin();
 		end = pBasis->end();
 		while(beg != end) {
-			print_mat((*beg).m,(int)(sqrt(vec_size) + 0.5),"pBasis");
+			print_mat((*beg).m,(int)(sqrt((double) vec_size) + 0.5),"pBasis");
 			beg++;
 		}
 	});
@@ -593,7 +610,7 @@ void ModuleSpace::findBasis(MatrixSetInt *pBasis, int vec_size, int clear_mem) {
 		beg = pBasis->begin();
 		end = pBasis->end();
 		while(beg != end) {
-			print_mat((*beg).m,(int)(sqrt(vec_size) + 0.5),"pBasis");
+			print_mat((*beg).m,(int)(sqrt((double) vec_size) + 0.5),"pBasis");
 			beg++;
 		}
 	});
@@ -606,7 +623,7 @@ void ModuleSpace::findBasis(MatrixSetInt *pBasis, int vec_size, int clear_mem) {
 		while(beg != pBasis->end()) {
 			if((*beg).leading_index == (unsigned) vec_size) {
 				deallocMatrix(*beg);
-				pBasis->erase(beg);
+				beg = pBasis->erase(beg);
 			} else
 				beg++;
 		}
@@ -721,7 +738,7 @@ void ModuleSpace::findAffineRelations(AffineRels &affRels) {
 		}
 	}
 	// Infeasible!
-	if(dim == AR::dim)
+	if(dim == N)
 		return;
 
 	// Insert non-zero affine relations only
@@ -773,8 +790,31 @@ ModuleSpace *ModuleSpace::join(ModuleSpace *op2) {
 	return result;
 }
 
+#ifdef ___TSL
 /////////////////////////////////////////////////
-// Are the spaces equal?
+// new = this (join) op2
+/////////////////////////////////////////////////
+ModuleSpace *ModuleSpace::join_wo_elimination(ModuleSpace *op2) {
+	MSIterator beg,end;
+	ModuleSpace *result = new ModuleSpace(N);
+	beg = basis.begin();
+	end = basis.end();
+	while(beg!=end) {
+		result->insertMatrix(*beg);
+		beg++;
+	}
+	beg = op2->basis.begin();
+	end = op2->basis.end();
+	while(beg!=end) {
+		result->insertMatrix(*beg);
+		beg++;
+	}
+	return result;
+}
+#endif
+
+/////////////////////////////////////////////////
+// Are the spaces equal? (approximate operation -- see isExactEqual)
 /////////////////////////////////////////////////
 bool ModuleSpace::isEqual(ModuleSpace *op2) {
 
@@ -792,22 +832,29 @@ bool ModuleSpace::isEqual(ModuleSpace *op2) {
 	if(!op2->basisUptodate)
 		op2->findBasis();
 
-	if(!exact_equality) {
-		// Cheap hack -- is unsafe but *should* work
-		// because of way equality is used
-		if(op2->moduleRank() != this->moduleRank())
-			return false;
-		else return true;
-	}
-	else {
-		return (isStrictSubspace(op2)==0);
-	}
+	// Cheap hack -- is unsafe but *should* work
+	// because of way equality is used
+	if(op2->moduleRank() != this->moduleRank())
+		return false;
+	else return true;
+
 	// Actual equailty method -- its still just safe 
 	// and not exact. 
 
 	return (this->isSubspace(op2) && op2->isSubspace(this));
 }
 
+/////////////////////////////////////////////////
+// Are the spaces equal? (exact operation)
+/////////////////////////////////////////////////
+bool ModuleSpace::isExactEqual(ModuleSpace *op2) {
+
+	return (isStrictSubspace(op2)==0);
+}
+
+bool ModuleSpace::isExactEqual(std::vector<const int *> &lhs, std::vector<const int *> &rhs, int vec_size) {
+	return (isStrictSubspace(lhs,rhs,vec_size) == 0);
+}
 
 //////////////////////////////////////////////////////
 // calculate new=op2 (o) this;
@@ -815,8 +862,6 @@ bool ModuleSpace::isEqual(ModuleSpace *op2) {
 ModuleSpace *ModuleSpace::compose(ModuleSpace *op2) {
 	MSIterator thisBeg,thisEnd,op2Beg,op2End;
 	ModuleSpace *result=new ModuleSpace(N);
-
-	clock_t clkTmp = clock();
 
 	// Multiply all possible combinations of matrices from
 	// the basis set of the vector spaces
@@ -827,17 +872,12 @@ ModuleSpace *ModuleSpace::compose(ModuleSpace *op2) {
 		op2Beg = op2->basis.begin();
 		op2End = op2->basis.end();
 		while(op2Beg != op2End) {
-			//ModularMatrix mm(multiplyMatrices((*op2Beg).m, (*thisBeg).m), Nsq);
-			int *res = multiplyMatrices((*op2Beg).m.getMatrix(), (*thisBeg).m.getMatrix());
-			ModularMatrix mm(Matrix(res), Nsq);
-			delete [] res;
+			ModularMatrix mm(multiplyMatrices((*op2Beg).m, (*thisBeg).m), Nsq);
 			result->basis.push_back(mm);
 			op2Beg++;
 		}
 		thisBeg++;
 	}
-
-	msMultClock += clock() - clkTmp;
 
 	//
 	// Find the basis so that we can work on a finite set always
@@ -846,17 +886,124 @@ ModuleSpace *ModuleSpace::compose(ModuleSpace *op2) {
 	return result;
 }
 
+#ifdef ___TSL
+//////////////////////////////////////////////////////
+// calculate new=op2 (o) this;
+///////////////////////////////////////////////////////
+ModuleSpace *ModuleSpace::compose_wo_elimination(ModuleSpace *op2) {
+	MSIterator thisBeg,thisEnd,op2Beg,op2End;
+	ModuleSpace *result=new ModuleSpace(N);
+
+	// Multiply all possible combinations of matrices from
+	// the basis set of the vector spaces
+	thisBeg = basis.begin();
+	thisEnd = basis.end();
+	while(thisBeg != thisEnd) {
+
+		op2Beg = op2->basis.begin();
+		op2End = op2->basis.end();
+		while(op2Beg != op2End) {
+			ModularMatrix mm(multiplyMatrices((*op2Beg).m, (*thisBeg).m), Nsq);
+			result->basis.push_back(mm);
+			op2Beg++;
+		}
+		thisBeg++;
+	}
+	return result;
+}
+#endif
+
+#ifdef ___TSL
+///////////////////////////////////////////////////////
+// calculate set_of_columns = set_of_matrix * a column;
+//    - vector<int>: column
+//    - TSL_FIXME: make this cleaner
+///////////////////////////////////////////////////////
+std::vector<std::vector<int> > ModuleSpace::multiply(std::vector<int> col) {
+	assert(col.size() == N);
+	MSIterator thisBeg,thisEnd,op2Beg,op2End;
+	std::vector<std::vector<int> > result;
+
+	std::vector<int> special;
+	// Multiply the given column to each matrix from
+	// the basis set of the vector spaces
+	thisBeg = basis.begin();
+	thisEnd = basis.end();
+	while(thisBeg != thisEnd) {
+		std::vector<int> ans;
+		Matrix m = (*thisBeg).m;
+        if(m(0,0) == 0) {
+		    for(int i=0; i<N; i++) {
+			    int sum = 0;
+			    for(int j=0; j<N; j++) {
+				    sum += col[j] * m(i, j);
+			    }
+			    ans.push_back(sum);
+		    }
+		    result.push_back(ans);
+        }
+        else {
+		    for(int i=0; i<N; i++) {
+			    int sum = 0;
+			    for(int j=0; j<N; j++) {
+				    sum += col[j] * m(i, j);
+			    }
+			    special.push_back(sum);
+		    }
+        }
+		thisBeg++;
+	}
+
+    std::vector<std::vector<int> > result2;
+    result2.push_back(special);
+    std::vector<std::vector<int> >::iterator it;
+    for(it=result.begin(); it!=result.end(); it++) {
+        result2.push_back(*it);
+    }
+
+	return result2;
+}
+
+ref_ptr<ModuleSpace> ModuleSpace::to9by9(const ref_ptr<ModuleSpace> & a) {
+    assert(a->getDimensionOfPointSpace() == 11);
+	ref_ptr<ModuleSpace> result = new ModuleSpace(9);
+
+	MSIterator thisBeg,thisEnd;
+	std::vector<int> special;
+	// Multiply the given column to each matrix from
+	// the basis set of the vector spaces
+	thisBeg = a->basis.begin();
+	thisEnd = a->basis.end();
+	while(thisBeg != thisEnd) {
+        Matrix m = (*thisBeg).m; // m must be 11 x 11
+        int* mat = new int[9*9];
+        int n = 0;
+        for(int i=0; i<11; i++) {
+            for(int j=0; j<11; j++) {
+                if(i == 1 || j == 1 || i == 10 || j == 10) {
+                    // discard NullReg32 and EIP row and column
+                }
+                else {
+                    mat[n++] = m(i,j);
+                }
+            }
+        }
+        Matrix new_m(mat, 9);
+        delete [] mat;
+        result->insertMatrix(new_m);
+        thisBeg++;
+	}
+	return result;
+}
+
+#endif
+
 
 #ifdef VSA_ARA_USE_CNCL_MATRICES
 Matrix ModuleSpace::multiplyMatrices(const Matrix& op1, const Matrix& op2) const {
 	return Matrix::multiply(op1, op2);
 }
 #endif 
-
-void ModuleSpace::resetMultCount() {
-	matrixMult = 0;
-}
-
 ///////////////////////////////////////////////////////
 // Multiply two matrices
 //////////////////////////////////////////////////////
@@ -874,7 +1021,6 @@ int *ModuleSpace::multiplyMatrices(const int *op1,const int *op2) const {
 			}
 		}
 	}
-	matrixMult++;
 	return multResult;
 }
 
@@ -894,7 +1040,7 @@ void ModuleSpace::insertMatrix(const Matrix& f) {
 	//affRelUptodate=false;
 }
 void ModuleSpace::insertMatrix(const int *f) {
-	Matrix fm = Matrix(f);
+	Matrix fm = Matrix(f, N);
 	basis.push_back(createModularMatrix(fm));
 	basisUptodate=false;
 	//affRelUptodate=false;
@@ -947,39 +1093,10 @@ void ModuleSpace::setIdspace() {
 }
 
 
-////////////////////////////////////////////
-// Increment Reference Count
-/////////////////////////////////////////
-void ModuleSpace::incRefCount() {
-	if(ref==ModuleSpace::maxRefCount) {
-		satRef=true;
-	}
-	else {
-		ref++;
-	}
-}
-
-////////////////////////////////////////////
-// Decrement Reference Count
-/////////////////////////////////////////
-unsigned int ModuleSpace::decRefCount() {
-	if(!satRef) {
-		ref--;
-	}
-	return ref;
-}
-
-////////////////////////////////////////////
-// Get Reference Count
-/////////////////////////////////////////
-unsigned int ModuleSpace::getRefCount() {
-	return ref;
-}
-
 ///////////////////////////////////////////
 //
 ///////////////////////////////////////////
-void ModuleSpace::prettyPrint(FILE *fp) {
+void ModuleSpace::prettyPrint(FILE *fp, unsigned nTabs) {
 	MSIterator beg,end;
 
 	if(!basisUptodate)
@@ -989,18 +1106,22 @@ void ModuleSpace::prettyPrint(FILE *fp) {
 	end=basis.end();
 	fprintf(fp,"\n");
 	while(beg!=end) {
+		PERFORM_INDENTATION(fp, nTabs);
 		fprintf(fp,"[ ");
 		int k=0;
 
 		for(int i=0;i<N;++i) {
+			PERFORM_INDENTATION(fp, nTabs);
 			for(int j=0;j<N;++j,++k)  {
 				fprintf(fp,"%d\t",((*beg).m)[k]);
 			}
 			fprintf(fp,"\n");
 		}
+		PERFORM_INDENTATION(fp, nTabs);
 		fprintf(fp,"] \n");
 		beg++;
 	}
+	PERFORM_INDENTATION(fp, nTabs);
 	fprintf(fp,"#");
 	fflush(fp);
 }
@@ -1022,8 +1143,8 @@ void ModuleSpace::prettyPrint(std::ostream &out) {
 		for(int i=0;i<N;++i) {
 			for(int j=0;j<N;++j,++k)  {
 				out << linearAccess((*beg).m, k);
-				out << "\t";
-				out << " ";
+				//out << "\t";
+				out << "   ";
 			}
 			out<<"\n";
 		}
@@ -1033,21 +1154,142 @@ void ModuleSpace::prettyPrint(std::ostream &out) {
 	out <<"#"<<std::endl;
 }
 
-
-
-
-//////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////
-void ModuleSpace::prettyPrintAffRels(FILE *fp,char **varNames) {   
+void ModuleSpace::printAsText(std::ostream &out) {
+	MSIterator beg,end;
 
 	if(!basisUptodate)
 		findBasis();
 
-	AffineRels affRels;
-	findAffineRelations(affRels);
-	affRels.prettyPrint(fp,varNames);
+	beg=basis.begin();
+	end=basis.end();
+
+	if(beg == end) {
+		out << "zero";
+		return;
+	}
+
+	// Find the matrix with 1 as leading entry
+	const int *oneMat = NULL;
+	for(; beg != end; beg++) {
+		const int *mat = MATRIX_PTR_OF((*beg).m);
+		if(mat[0] == 1) {
+			oneMat = mat;
+			break;
+		}
+	}
+
+	if(oneMat == NULL) {
+		out << "Cannot prettyPrint, no matrix has a leading 1\n";
+		out.flush();
+		assert(0); // can remove this assertion if there is a valid way in
+		           // which the above condition can occur
+		prettyPrint(out);
+	}
+
+	beg=basis.begin();
+	end=basis.end();
+
+	int *temp = new int[N*N];
+	bool printedLast = false;
+	bool printed = false;
+	bool r;
+	int i;
+	for(; beg != end; beg++) {
+		const int *mat = MATRIX_PTR_OF((*beg).m);
+		if(printedLast) out << " v ";
+		if(mat == oneMat) {
+			r = printMatAsText(mat, out);
+		} else {
+			for(i=0;i<N*N;i++) {
+				temp[i] = mat[i] + oneMat[i];
+			}
+			r = printMatAsText(temp,out);
+		}
+		printedLast = !r;
+		printed = printed | (!r);
+	}
+	if(!printed) out << "id";
+	delete [] temp;
 }
+
+bool ModuleSpace::printMatAsText(const int *mat, std::ostream &out) {
+	int i,j;
+	
+	// First make sure that first column is (1 0 0 0 0 ...)^t
+	assert(mat[0] == 1);
+	for(i=1;i<N;i++) {
+		assert(mat[i*N] == 0);
+	}
+
+	// Now start printing, column by column
+	bool isId = true;
+	bool printedLast = false;
+	for(j=1;j<N;j++) {
+		if(printedLast) {
+			out << " ^ ";
+		}
+		bool r = printMatColumnAsText(mat, j, out);
+		isId = r && isId;
+		printedLast = !r;
+	}
+
+	return isId;
+}
+
+bool ModuleSpace::printMatColumnAsText(const int *mat, int col, std::ostream &out) {
+	bool isId = true;
+	int i;
+	// check if column is ID
+	for(i=0;i<N && isId;i++) {
+		if(i == col) {
+			if(mat[i*N+col] != 1) isId = false;
+		} else {
+			if(mat[i*N+col] != 0) isId = false;
+		}
+	}
+
+	if(isId) return true;
+
+	out << arVarNames[col] << ":=";
+	out << mat[col];
+
+	for(i=1;i<N;i++) {
+		if(mat[i*N+col] == 0) continue;
+		out << " + ";
+		if(mat[i*N+col] != 1) out << mat[i*N+col] << "*";
+		out << arVarNames[i];
+	}
+
+	return false;
+}
+
+
+#ifdef ___TSL
+void ModuleSpace::prettyPrint_wo_elimination(std::ostream &out) {
+	MSIterator beg,end;
+
+	beg=basis.begin();
+	end=basis.end();
+
+	out << std::endl;
+	while(beg!=end) {
+		// out << "~ " ;
+		out << "[ ";
+		int k=0;
+		for(int i=0;i<N;++i) {
+			for(int j=0;j<N;++j,++k)  {
+				out << linearAccess((*beg).m, k);
+				//out << "\t";
+				out << "   ";
+			}
+			out<<"\n";
+		}
+		out<< "] \n";
+		beg++;
+	}
+	out <<"#"<<std::endl;
+}
+#endif
 
 
 //----------------------------------------------------
@@ -1095,14 +1337,38 @@ bool ModuleSpace::isSubspace(ModuleSpace *op2) {
 ///  +1 - if this > op2 || this, rhs are incomparable.
 //-------------------------------------------------------
 int ModuleSpace::isStrictSubspace(ModuleSpace *op2) {
-	if(isExactSubspace(op2)) {
-		if(op2->isExactSubspace(this))
+	
+	// Incomparable
+	if(op2->N!=this->N)
+		return false;
+
+
+	if(!basisUptodate) {
+		findBasis();
+	}
+	if(!op2->basisUptodate) {
+		op2->findBasis();
+	}
+
+	// convert into 'const int *'
+	std::vector<const int *> lhs;
+	std::vector<const int *> rhs;
+	
+	convertBasisToConstInt(lhs);
+	op2->convertBasisToConstInt(rhs);
+
+	return isStrictSubspace(lhs, rhs, Nsq);
+}
+
+// precondition: findBasis has already been called on lhs and rhs 
+int ModuleSpace::isStrictSubspace(std::vector<const int *> &lhs, std::vector<const int *> &rhs, int vec_size) {
+	if(isExactSubspace(lhs,rhs,vec_size)) {
+		if(isExactSubspace(rhs,lhs,vec_size))
 			return 0;
 		return -1;
 	}
 	return 1;
 }
-
 //--------------------------------------------------------------------
 // is NULL('this') a strict subspace of NULL('op2')? (exact operation)
 /// @return 
@@ -1124,6 +1390,25 @@ int ModuleSpace::isStrictNullSubspace(ModuleSpace *op2) {
 // is 'this' a subspace of 'op2'? (exact operation)
 //----------------------------------------------------
 bool ModuleSpace::isExactSubspace(ModuleSpace *op2) {
+	if(!basisUptodate) {
+		findBasis();
+	}
+	if(!op2->basisUptodate) {
+		op2->findBasis();
+	}
+
+	// convert into 'const int *'
+	std::vector<const int *> lhs;
+	std::vector<const int *> rhs;
+	
+	convertBasisToConstInt(lhs);
+	op2->convertBasisToConstInt(rhs);
+
+	return isExactSubspace(lhs,rhs,Nsq);
+}
+
+/*
+bool ModuleSpace::isExactSubspace(ModuleSpace *op2, int vec_size) {
 
 	if(!basisUptodate) {
 		findBasis();
@@ -1135,30 +1420,32 @@ bool ModuleSpace::isExactSubspace(ModuleSpace *op2) {
 	MSIterator beg, end;
 
 	// copy into (int*) space for modular_svd
-	int *A = new int[Nsq*Nsq];
-	int *Rinv = new int[Nsq*Nsq];
-	int *Linv = new int[Nsq*Nsq];
+	int *A = new int[vec_size*vec_size];
+	int *Rinv = new int[vec_size*vec_size];
+	int *Linv = new int[vec_size*vec_size];
 	int i,j,k;
+
+	assert(op2->basis.size() <= vec_size);
 
 	beg = op2->basis.begin();
 	end = op2->basis.end();
 	j=0;
 	while(beg != end) {
 		const int *mat = MATRIX_PTR_OF((*beg).m);
-		for(i=0;i<Nsq;i++) {
-			A[i*Nsq + j] = mat[i];
+		for(i=0;i<vec_size;i++) {
+			A[i*vec_size + j] = mat[i];
 		}
 		beg++;
 		j++;
 	}
 	// fill up the rest of A with zeros
-	for(k=j;k<Nsq;k++) {
-		for(i=0;i<Nsq;i++) {
-			A[i*Nsq + k] = 0;
+	for(k=j;k<vec_size;k++) {
+		for(i=0;i<vec_size;i++) {
+			A[i*vec_size + k] = 0;
 		}
 	}
 	// Do svd
-	modular_svd(A,Rinv,Linv,Nsq);
+	modular_svd(A,Rinv,Linv,vec_size);
     // Compute b = (Linv m) for each m in this->basis and verify
 	// rank(A_ii) <= rank(b_i)
 	bool subset = true;
@@ -1167,12 +1454,73 @@ bool ModuleSpace::isExactSubspace(ModuleSpace *op2) {
 	while(beg != end && subset) {
 		const int *mat = MATRIX_PTR_OF((*beg).m);
 		int b_i;
-		for(i=0;i<Nsq && subset;i++) {
+		for(i=0;i<vec_size && subset;i++) {
 			b_i = 0;
-			for(j=0;j<Nsq;j++) {
-				b_i += Linv[i*Nsq + j] * mat[j];
+			for(j=0;j<vec_size;j++) {
+				b_i += Linv[i*vec_size + j] * mat[j];
 			}
-			if(compute_rank(A[i*Nsq+i]) > compute_rank(b_i)) {
+			if(compute_rank(A[i*vec_size+i]) > compute_rank(b_i)) {
+				subset = false;
+			}
+		}
+		beg++;
+	}
+	delete [] A;
+	delete [] Linv;
+	delete [] Rinv;
+
+	return subset;
+
+}
+*/
+
+// lhs a subset of rhs? (vector version)
+// precondition: findBasis has already been called
+bool ModuleSpace::isExactSubspace(std::vector<const int *> &lhs, std::vector<const int *> &rhs, int vec_size) {
+
+	std::vector<const int *>::iterator beg, end;
+
+	// copy into (int*) space for modular_svd
+	int *A = new int[vec_size*vec_size];
+	int *Rinv = new int[vec_size*vec_size];
+	int *Linv = new int[vec_size*vec_size];
+	int i,j,k;
+
+	assert(rhs.size() <= vec_size);
+
+	beg = rhs.begin();
+	end = rhs.end();
+	j=0;
+	while(beg != end) {
+		const int *mat = *beg;
+		for(i=0;i<vec_size;i++) {
+			A[i*vec_size + j] = mat[i];
+		}
+		beg++;
+		j++;
+	}
+	// fill up the rest of A with zeros
+	for(k=j;k<vec_size;k++) {
+		for(i=0;i<vec_size;i++) {
+			A[i*vec_size + k] = 0;
+		}
+	}
+	// Do svd
+	modular_svd(A,Rinv,Linv,vec_size);
+    // Compute b = (Linv m) for each m in this->basis and verify
+	// rank(A_ii) <= rank(b_i)
+	bool subset = true;
+	beg = lhs.begin();
+	end = lhs.end();
+	while(beg != end && subset) {
+		const int *mat = *beg;
+		int b_i;
+		for(i=0;i<vec_size && subset;i++) {
+			b_i = 0;
+			for(j=0;j<vec_size;j++) {
+				b_i += Linv[i*vec_size + j] * mat[j];
+			}
+			if(compute_rank(A[i*vec_size+i]) > compute_rank(b_i)) {
 				subset = false;
 			}
 		}
@@ -1184,7 +1532,6 @@ bool ModuleSpace::isExactSubspace(ModuleSpace *op2) {
 
 	return subset;
 }
-
 
 //-------------------------------------------------------------
 // is NULL('this') a subspace of NULL('op2')? (exact operation)
@@ -1299,6 +1646,18 @@ ModuleSpace *ModuleSpace::diff(ModuleSpace *op2) {
 }
 */
 
+// convert basis to vector<const int *>
+void ModuleSpace::convertBasisToConstInt(std::vector<const int *> &b) {
+	MSIterator beg, end;
+	
+	beg = basis.begin();
+	end = basis.end();
+
+	for(; beg != end; beg++) {
+		b.push_back(MATRIX_PTR_OF((*beg).m));
+	}
+}
+
 // return (this - op2)
 ModuleSpace *ModuleSpace::diff(ModuleSpace *op2) {
 
@@ -1396,15 +1755,17 @@ ModuleSpace* ModuleSpace::callerSaveXform(int saveReg, int restReg) const{
 	while(beg != end) {
 		
 		// 
-		for(int i = 0; i < Nsq; ++i) {
-			tmpMat[i] = (*beg)[i];
-		}
+        {
+            for(int i = 0; i < Nsq; ++i) {
+                tmpMat[i] = (*beg)[i];
+            }
+        }
 
 		//- Set the correct save/restore 
 		//
-		for(int i = 0; i < N; ++i) {
-			tmpMat[i * N + restReg] = 0;
-		}
+        for(int i = 0; i < N; ++i) {
+            tmpMat[i * N + restReg] = 0;
+        }
 		tmpMat[saveReg * N + restReg] = 1;
 
 		result->insertMatrix(tmpMat);
@@ -1440,7 +1801,7 @@ ModuleSpace *ModuleSpace::call_site_transform(const Matrix &m1, const Matrix &m2
 		for(i=0;i<Nsq;i++) {
 			t2_val[i] = w * m2[i];
 		}
-		Matrix t2(t2_val);
+		Matrix t2(t2_val, N);
 		delete [] t2_val; // FIXME: is this correct?
 		Matrix transformed = Matrix::add(t1, t2);
 

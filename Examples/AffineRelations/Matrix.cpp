@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2002-2004, Gogul Balakrishnan, Thomas Reps
+// Copyright (c) 2007, Gogul Balakrishnan, Akash Lal, Thomas Reps
 // University of Wisconsin, Madison.
 // All rights reserved.
 //
@@ -33,21 +33,22 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// e-mail: bgogul@cs.wisc.edu, reps@cs.wisc.edu
+// e-mail: bgogul@cs.wisc.edu, akash@cs.wisc.edu, reps@cs.wisc.edu
+//
 //////////////////////////////////////////////////////////////////////////////
+
+
 #include "ARConfig.h"
 #include "Matrix.h"
-#include <assert.h>
+#include "gtr/src/gt_assert/gt_assert.h"
 #include <iostream>
 
-const int RCMatrix::N = AR::dim;
-const int RCMatrix::NbyN = N * N;
 
 //
 // Initialize the hashtable used for canoncial matrices
 //
-RCMatrix::CnclMats* RCMatrix::cnclMats = 0;//new Matrix::CnclMats(1007);
-Matrix::ProdCache* Matrix::prodCache = 0;
+RCMatrix::CnclMats* RCMatrix::cnclMats = NULL;
+Matrix::ProdCache* Matrix::prodCache = NULL;
 const float Matrix::cacheEntryThreshold = 0.90f;        // 
 const Matrix::ProdCache::size_type Matrix::maxProdCacheSize = 100000;  // Max size of cache
 MatrixPair::MatrixPairUsage_t Matrix::transAccessCnt = 1;      //
@@ -55,6 +56,7 @@ MatrixPair::MatrixPairUsage_t Matrix::transAccessCnt = 1;      //
 unsigned int Matrix::cacheHits = 0;
 unsigned int Matrix::cacheAccesses = 0;
 unsigned int Matrix::nMats = 0;
+
 
 
 
@@ -69,12 +71,12 @@ unsigned int Matrix::nMats = 0;
 //
 // Decrease ref count
 //
-void RCMatrix::decrRef()	{
+inline void RCMatrix::decrRef()	{
 	assert(count > 0);
 	count = (satRef?count:--count);
 	if(!count) {
 		if(cnclMats)
-			cnclMats->erase(mat);
+			cnclMats->erase(MatrixDimPair_t(mat, N));
 		delete this;
 	}
 }
@@ -82,7 +84,7 @@ void RCMatrix::decrRef()	{
 //
 // Increase ref count
 //
-void RCMatrix::incrRef() { 
+inline void RCMatrix::incrRef() { 
 	if(!satRef) {
 		if(count == UINT_MAX) 
 			satRef = true; 
@@ -97,16 +99,32 @@ void RCMatrix::incrRef() {
 //---------------------------------------------- 
 // Compute the haskey for a given matrix
 //----------------------------------------------
-RCMatrix::MatrixHkey_t RCMatrix::computeHashKey(const int* p) {
+RCMatrix::MatrixHkey_t RCMatrix::computeHashKey(const int* p, unsigned _N) {
 	// FIXME: this should be made better?
 	unsigned int rv;
 	int i = 0;
-	rv = 0;
+	rv = _N;
 	const int* matPtr = p;
-	for(i =0; i < RCMatrix::NbyN; ++i) {
+	unsigned NbyN = _N * _N;
+
+	// const row
+	//
+	for(i = 0; i < _N; ++i) {
 		rv = 997 * rv + *matPtr;
 		matPtr++;
 	}
+	// diagonal 
+	matPtr = p;
+	for(i = 0; i < _N; ++i) {
+		rv = 997 * rv + *matPtr;
+		matPtr += (_N + 1);
+	}
+	/*
+	for(i =0; i < NbyN; ++i) {
+		rv = 997 * rv + *matPtr;
+		matPtr++;
+	}
+	*/
   	return rv;
 }
 
@@ -119,15 +137,18 @@ RCMatrix::MatrixHkey_t RCMatrix::computeHashKey(const int* p) {
 //-------------------------------------
 // Get the canonical matrix
 //-------------------------------------
-RCMatrix* RCMatrix::getCnclMatrix(const int* p) {
-	if(!cnclMats)
+RCMatrix* RCMatrix::getCnclMatrix(const int* p, unsigned _N) {
+	if(!cnclMats) {
+		// Default settings...
 		cnclMats = new RCMatrix::CnclMats(100000);
+	}
 	// Nick's Hash
-	CnclMats::iterator it = cnclMats->find(p);
+	RCMatrix::MatrixDimPair_t pn(p, _N);
+	CnclMats::iterator it = cnclMats->find(pn);
 	// insert it if not there
 	if( it == cnclMats->end() ) {
-		RCMatrix* m = new RCMatrix( p );
-		cnclMats->insert( CnclMats::value_type( m->mat, m ) );
+		RCMatrix* m = new RCMatrix( p, _N );
+		cnclMats->insert( CnclMats::value_type( MatrixDimPair_t(m->mat, m->N), m ) );
 		m->incrRef();
 		return m;
 	}
@@ -143,11 +164,18 @@ RCMatrix* RCMatrix::getCnclMatrix(const int* p) {
 // Delete (cleanup) the table of canonical matrices
 //-------------------------------------
 void RCMatrix::deleteCnclMatrices() {
-    if(cnclMats){
-        //TODO?: iterate through and decrRef each entry in cnclMats!
+    if(cnclMats){		
         delete cnclMats;
-        cnclMats = 0;
+        cnclMats = NULL;
     }
+}
+
+void Matrix::clearCaches() {
+	RCMatrix::deleteCnclMatrices();
+	if(prodCache){
+		delete Matrix::prodCache;
+		prodCache = 0;
+	}
 }
 
 void Matrix::printMatrixStats(FILE* fp) {
@@ -176,9 +204,9 @@ void Matrix::Print(std::ostream & out) const
 {
 	int x = 0;
 	out << "[" << std::endl;
-	for(int i = 0; i < RCMatrix::N; i++) {
+	for(int i = 0; i < getDim(); i++) {
 		out << "  ";
-		for(int j = 0; j < RCMatrix::N; j++) {
+		for(int j = 0; j < getDim(); j++) {
 			out << rcmat->mat[x] << ", ";
 			x++;
 		}
@@ -193,11 +221,12 @@ void Matrix::Print(std::ostream & out) const
 //-------------------
 void Matrix::prettyPrint(FILE* fp) const
 {
+	unsigned N = getDim();
 	int x = 0;
 	fprintf(fp, "[\n");
-	for(int i = 0; i < RCMatrix::N; i++) {
+	for(int i = 0; i < N; i++) {
 		fprintf(fp, "  ");
-		for(int j = 0; j < RCMatrix::N; j++) {
+		for(int j = 0; j < N; j++) {
 			fprintf(fp, "%d, ", rcmat->mat[x]);
 			x++;
 		}
@@ -219,13 +248,13 @@ std::ostream& operator<< (std::ostream & out, const Matrix &m)
 //
 // Creates the identity matrix
 //---------------------------------
-Matrix::Matrix()
+Matrix::Matrix(unsigned N)
 {
-  int *tempMatrix = new int[RCMatrix::NbyN];
+  int *tempMatrix = new int[N * N];
 
   int *p = tempMatrix;
-  for(int i = 0; i < RCMatrix::N; i++) {
-    for(int j = 0; j < RCMatrix::N; j++) {
+  for(unsigned i = 0; i < N; i++) {
+    for(unsigned j = 0; j < N; j++) {
       if (i == j) {
         *p = 1;
       }
@@ -235,7 +264,7 @@ Matrix::Matrix()
       p++;
     }
   }
-  rcmat = RCMatrix::getCnclMatrix(tempMatrix);
+  rcmat = RCMatrix::getCnclMatrix(tempMatrix, N);
   delete tempMatrix;
   nMats++;
 }
@@ -244,9 +273,18 @@ Matrix::Matrix()
 //------------------------------------
 // Return the identity matrix
 //------------------------------------
-Matrix Matrix::mkId() {
-  static Matrix m;   // Default constructor creates the identity matrix
-  return m;
+Matrix Matrix::mkId(unsigned N) {
+    static unsigned curN = 0;
+    static Matrix* m = NULL;
+    if(curN == N) {
+        return *m;
+    }
+    curN = N;
+    delete m;
+    m = new Matrix(N);
+    return *m;
+  //static Matrix m(N);   // Default constructor creates the identity matrix
+  //return m;
 }
 
 
@@ -254,14 +292,23 @@ Matrix Matrix::mkId() {
 // Return a transposed matrix.
 // ------------------------------------
 Matrix Matrix::transpose(const Matrix& m) {
-  static int *p = new int[RCMatrix::NbyN];
-  int *q = m.rcmat->mat;
-  for (int i = 0; i < RCMatrix::N; i++) {
-    for (int j = 0; j < RCMatrix::N; j++) {
-      p[i * RCMatrix::N + j] = q[j * RCMatrix::N + i];
-    }
-  }
-  return Matrix(p);
+	unsigned N = m.getDim();
+	
+	// allocate space for result
+	static unsigned lastN = 0;
+	static int *p = NULL;
+	if(lastN < N) {
+		p = new int[N * N];
+		lastN = N;
+	}
+	
+	int *q = m.rcmat->mat;
+	for (unsigned i = 0; i < N; i++) {
+		for (unsigned j = 0; j < N; j++) {
+			p[i * N + j] = q[j * N + i];
+		}
+	}
+	return Matrix(p, N);
 }
 
 
@@ -269,39 +316,69 @@ Matrix Matrix::transpose(const Matrix& m) {
 // Add two matrices
 //-------------------
 Matrix Matrix::add(const Matrix& mat1, const Matrix& mat2) {
-  static int *result = new int[RCMatrix::NbyN];
-  int i, j;
-  for (i = 0; i < RCMatrix::N; i++) {
-    for (j = 0; j < RCMatrix::N; j++) {
-      result[i * RCMatrix::N + j] = mat1[i * RCMatrix::N + j] + mat2[i * RCMatrix::N + j];
-    }
-  }
-  return Matrix(result);
+	assert(mat1.getDim() == mat2.getDim());
+	unsigned N = mat1.getDim();
+	
+	// allocate space for result
+	static unsigned lastN = 0;
+	static int *result = NULL;
+	if(lastN < N) {
+		result = new int[N * N];
+		lastN = N;
+	}
+	
+	unsigned i, j;
+	for (i = 0; i < N; i++) {
+		for (j = 0; j < N; j++) {
+			result[i * N + j] = mat1[i * N + j] + mat2[i * N + j];
+		}
+	}
+	return Matrix(result, N);
 }
 
 //------------------------------------
 // Find the difference of two matrices
 //------------------------------------
 Matrix Matrix::subtract(const Matrix& mat1, const Matrix& mat2) {
-  static int *result = new int[RCMatrix::NbyN];
-  int i, j;
-  for (i = 0; i < RCMatrix::N; i++) {
-    for (j = 0; j < RCMatrix::N; j++) {
-      result[i * RCMatrix::N + j] = mat1[i * RCMatrix::N + j] - mat2[i * RCMatrix::N + j];
-    }
-  }
-  return Matrix(result);
+	assert(mat1.getDim() == mat2.getDim());
+	unsigned N = mat1.getDim();
+	
+	// allocate space for result
+	static unsigned lastN = 0;
+	static int *result = NULL;
+	if(lastN < N) {
+		result = new int[N * N];
+		lastN = N;
+	}
+	
+	unsigned i, j;
+	for (i = 0; i < N; i++) {
+		for (j = 0; j < N; j++) {
+			result[i * N + j] = mat1[i * N + j] - mat2[i * N + j];
+		}
+	}
+	return Matrix(result, N);
 }
 
 //------------------------
 // Multiply two matrices
 //------------------------
 Matrix Matrix::multiply(const Matrix& mat1, const Matrix& mat2) {
+	assert(mat1.getDim() == mat2.getDim());
+	
+	unsigned N = mat1.getDim();
+	
+	// allocate space for result
+	static unsigned lastN = 0;
+	static int *multResult = NULL;
+	if(lastN < N) {
+		multResult = new int[N * N];
+		lastN = N;
+	}
 
 #ifdef NO_PROD_CACHING
-	static int *multResult=new int[RCMatrix::NbyN];
-	multiplyMatrices(multResult, mat1.rcmat->mat, mat2.rcmat->mat);
-	Matrix *m = new Matrix(multResult);
+	multiplyMatrices(multResult, mat1.rcmat->mat, mat2.rcmat->mat, N);
+	Matrix *m = new Matrix(multResult, mat1.getDim());
 	return m;
 #else
 
@@ -309,7 +386,6 @@ Matrix Matrix::multiply(const Matrix& mat1, const Matrix& mat2) {
 		prodCache = new ProdCache(200000);
 	
 	
-	static int *multResult=new int[RCMatrix::NbyN];
 	cacheAccesses++;
 	
 	Matrix* m;
@@ -318,8 +394,8 @@ Matrix Matrix::multiply(const Matrix& mat1, const Matrix& mat2) {
 	// insert it if not there
 	if( it == prodCache->end() ) {
 		// Not in cache
-		multiplyMatrices(multResult, mat1.rcmat->mat, mat2.rcmat->mat);
-		m = new Matrix(multResult);
+		multiplyMatrices(multResult, mat1.rcmat->mat, mat2.rcmat->mat, N);
+		m = new Matrix(multResult, N);
 		prodCache->insert( ProdCache::value_type( pair, m->rcmat ) );
 		m->rcmat->incrRef();	// Account for the fact that rcmat is in prodCache
 		// FIXME: Need a policy to remove matrices in prodCache
@@ -370,14 +446,14 @@ Matrix Matrix::multiply(const Matrix& mat1, const Matrix& mat2) {
 //----------------------------------
 // Multiply two matrices (Helper)
 //----------------------------------
-void Matrix::multiplyMatrices(int* multResult, const int *op1,const int *op2) {
+void Matrix::multiplyMatrices(int* multResult, const int *op1,const int *op2, unsigned N) {
 	
-	int i,j,k;
-	for(i = 0; i < RCMatrix::N; ++i) {
-		for(j = 0; j < RCMatrix::N; ++j) {
-			multResult[i * RCMatrix::N + j]=0;
-			for(k = 0; k < RCMatrix::N; ++k) {
-				multResult[i * RCMatrix::N + j] += op1[i * RCMatrix::N + k] * op2[k * RCMatrix::N + j];
+	unsigned i, j, k;
+	for(i = 0; i < N; ++i) {
+		for(j = 0; j < N; ++j) {
+			multResult[i * N + j]=0;
+			for(k = 0; k < N; ++k) {
+				multResult[i * N + j] += op1[i * N + k] * op2[k * N + j];
 			}
 		}
 	}

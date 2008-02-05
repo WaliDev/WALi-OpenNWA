@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2002-2004, Gogul Balakrishnan, 
+// Copyright (c) 2007, Gogul Balakrishnan, Akash Lal
 // University of Wisconsin, Madison.
 // All rights reserved.
 //
@@ -33,12 +33,15 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// e-mail: bgogul@cs.wisc.edu
+// e-mail: bgogul@cs.wisc.edu, akash@cs.wisc.edu
+//
 //////////////////////////////////////////////////////////////////////////////
-#ifndef __Z_A_S_SEMIRING_H
-#define __Z_A_S_SEMIRING_H
 
-#include "VectorSpace.h"
+
+#ifndef ara_ZASSEMIRING_GUARD
+#define ara_ZASSEMIRING_GUARD
+
+#include "ModuleSpace.hpp"
 #include <iostream>
 
 //----------------------------------
@@ -48,48 +51,59 @@
 // Semiring class for wpds
 //-----------------------------------
 
-class VSSemiring {
-public:
-	//---------------------
-	// Constructors 
-	//---------------------
-	VSSemiring(VectorSpace *,unsigned=0);	
-	~VSSemiring();
+namespace ara {
 
-	//-----------------------------
-	// semiring one and zero
-	//-----------------------------
-	static VSSemiring *one();
-	static VSSemiring *zero();
+    class VSSemiring {
+        public:
+            //---------------------
+            // Constructors 
+            //---------------------
+            VSSemiring(ModuleSpace*,unsigned = 0);	
+            ~VSSemiring();
 
-	//---------------------------------
-	// semiring operations
-	//---------------------------------
-	VSSemiring *extend(VSSemiring *) ;
-	VSSemiring *combine(VSSemiring *);
-	bool		equal(VSSemiring *) const;
+            //-----------------------------
+            // semiring one and zero
+            //-----------------------------
+            static VSSemiring* one();
+            static VSSemiring* zero();
 
-	VSSemiring*  quasiOne() const;
-#ifdef DWPDS
-	VSSemiring *diff(VSSemiring *) const;
-#endif
-	//----------------------------
-	// Reference count
-	//-----------------------------
-	unsigned int count;
-	
-	//------------------------------------
-	// output
-	//------------------------------------
-	std::ostream & print(std::ostream &) const;
+            //---------------------------------
+            // semiring operations
+            //---------------------------------
+            VSSemiring* extend(VSSemiring *) ;
+            VSSemiring* combine(VSSemiring *);
+            bool		equal(VSSemiring *) const;
 
-	VectorSpace *vs();
+            VSSemiring* quasiOne() const;
+            VSSemiring* diff(VSSemiring *) const;
 
-    VSSemiring* parse_element( const char* buf );
-private:
-	static VSSemiring *_zero;
-	static VSSemiring *_one;
-	VectorSpace *p_vs;
-};
+            //----------------------------
+            // Reference count
+            //-----------------------------
+            RefCounter count;
 
-#endif
+            //------------------------------------
+            // output
+            //------------------------------------
+            std::ostream & print(std::ostream &) const;
+
+            /// Return the pointer 
+            /// NOTE: It is dangerous to lose control of a pointer, when it is
+            /// ref counted. The safe thing would be to return "const ModuleSpace*" here. 
+            /// However, most of the ModuleSpace functions (even queries like isEmpty()) 
+            /// need to invoke findBasis() that changes the object. Therefore, it is not 
+            /// possible to return "const ModuleSpace*" here! Be careful about how you use 
+            /// the pointer.
+            ///
+            ModuleSpace *vs();
+        private:
+            static VSSemiring *_zero;
+            static VSSemiring *_one;
+            typedef ref_ptr<ModuleSpace> ModuleSpacePtr;
+            ModuleSpacePtr p_vs;
+
+    }; // class VSSemiring
+
+} // namespace ara
+
+#endif  // ara_ZASSEMIRING_GUARD

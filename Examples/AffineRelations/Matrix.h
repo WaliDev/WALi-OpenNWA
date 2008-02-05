@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2002-2004, Gogul Balakrishnan, Thomas Reps
+// Copyright (c) 2007, Gogul Balakrishnan, Akash Lal, Thomas Reps
 // University of Wisconsin, Madison.
 // All rights reserved.
 //
@@ -33,18 +33,21 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// e-mail: bgogul@cs.wisc.edu, reps@cs.wisc.edu
+// e-mail: bgogul@cs.wisc.edu, akash@cs.wisc.edu, reps@cs.wisc.edu
+//
 //////////////////////////////////////////////////////////////////////////////
+
+
 #ifndef __MATRIX_H
 #define __MATRIX_H
 
 
-#include <assert.h>
 #include <stdio.h>
-#include "wali/HashMap.hpp"
+#include "HashMap.h"
 #include <limits.h>
 #include <iostream>
 
+#include "gtr/src/gt_assert/gt_assert.h"
 
 class Matrix;
 class MatrixPair;
@@ -53,22 +56,23 @@ class MatrixPair;
 /// Matrix w/ reference counting.
 //----------------------------------------
 class RCMatrix {
-public:
+private:
 	///
-	static const int N; // = AR::dim;
-	static const int NbyN; // = N*N;
+	unsigned N;    // = AR::dim;
+	unsigned NbyN; // = N*N;
 
+public:
 	typedef unsigned long MatrixHkey_t;
-	static MatrixHkey_t computeHashKey(const int*);		// Compute hash of the matrix
+	static MatrixHkey_t computeHashKey(const int*, unsigned _N);	// Compute hash of the matrix
 
-	void decrRef();	// Decrease ref count
-	void incrRef();	// Increase ref count
+	inline void decrRef();	// Decrease ref count
+	inline void incrRef();	// Increase ref count
 
 	const int* getMatrix() const
 		{ return mat; }
 	static unsigned getCnclTableSize() 
 		{return cnclMats->size();}
-	static RCMatrix* getCnclMatrix(const int*);		// Return the canonical matrix
+	static RCMatrix* getCnclMatrix(const int*, unsigned _N);		// Return the canonical matrix
 	static void deleteCnclMatrices();
 
 private:
@@ -82,14 +86,14 @@ private:
 
 	
 	// Constructor
-	RCMatrix(const int* _mat):count(0), satRef(false)		
-	{mat = copyIntArray( _mat ); key = computeHashKey(mat);}	
+	RCMatrix(const int* _mat, unsigned _N):count(0), satRef(false), N(_N), NbyN(_N*_N)
+	{mat = copyIntArray( _mat ); key = computeHashKey(mat, N);}	
 
 	// Destructor
 	~RCMatrix()					
 		{ if(mat) delete [] mat; }
 
-	inline static int * copyIntArray( const int *p )	
+	inline int * copyIntArray( const int *p )	
 	{			
 		int *copy = new int[NbyN];
 		for( int i=0; i < NbyN ; i++ )
@@ -97,29 +101,36 @@ private:
 		return copy;
 	}
 
+	typedef std::pair<const int*, unsigned> MatrixDimPair_t;
+
 	//
 	// Canonical matrix table
 	//
-
 	struct EqArr {
-		bool operator()(const int *l, const int *r ) const {
-			for( int i=0 ; i < NbyN ; i++ )
-				if( l[i] != r[i] )
+		bool operator()(const MatrixDimPair_t& l, const MatrixDimPair_t& r ) const {
+			// are the dimensions equal?
+			if(l.second != r.second)
+				return false;
+
+			unsigned NSq = l.second * l.second;
+			for( unsigned i = 0 ; i < NSq ; i++ )
+				if( l.first[i] != r.first[i] )
 					return false;
 			return true;
 		}
 	};
 
 	struct HashArr {
-		unsigned long operator()(const int *rcm) const {
-			return computeHashKey(rcm);
+		unsigned long operator()(const MatrixDimPair_t& rcm) const {
+			return computeHashKey(rcm.first, rcm.second);
 		}
 	};
-	typedef wali::HashMap<const int*, RCMatrix*, HashArr, EqArr> CnclMats;
+	typedef wpds::HashMap<MatrixDimPair_t, RCMatrix*, HashArr, EqArr> CnclMats;
 
 	static CnclMats* cnclMats;		// Canonical matrix table
 	
 	// Friends
+	friend struct EqArr;
 	friend class Matrix;
 	friend class MatrixPair;
 };
@@ -185,9 +196,10 @@ std::ostream& operator<< (std::ostream & out, const Matrix &m);
 // Wrapper class
 class Matrix {
 public:
-	Matrix();
-	inline explicit Matrix(const int* _mat)
-		{rcmat = RCMatrix::getCnclMatrix(_mat); nMats++;}
+	Matrix() {rcmat = NULL;}
+	Matrix(unsigned N);
+	inline explicit Matrix(const int* _mat, unsigned N)
+		{rcmat = RCMatrix::getCnclMatrix(_mat, N); nMats++;}
 	inline explicit Matrix(const Matrix* rhs) 
 		{rcmat = rhs->rcmat; rcmat->incrRef(); nMats++;}
 	inline Matrix(const Matrix& rhs) 
@@ -198,13 +210,14 @@ public:
 		{rcmat->decrRef();}
 	inline Matrix& operator= (const Matrix& rhs) 
 		{
-		  if (this != &rhs) { // watch for aliasing
-			rcmat->decrRef();
-			rcmat = rhs.rcmat;
-		    rcmat->incrRef();
-		    nMats++;
-		  }
-		  return *this;
+			if (this != &rhs) { // watch for aliasing
+				if(rcmat) 
+					rcmat->decrRef();
+				rcmat = rhs.rcmat;
+				rcmat->incrRef();
+				nMats++;
+			}
+			return *this;
 		}
 
 	inline bool operator ==(const Matrix& rhs) const	// operator ==
@@ -214,18 +227,20 @@ public:
 	inline int operator[](unsigned x) const		        // get the xth element
 		{return rcmat->mat[x];}
 	inline int operator()(unsigned r, unsigned c) const	// get the [r,c]th element
-		{return rcmat->mat[r * RCMatrix::N + c];}
+		{return rcmat->mat[r * rcmat->N + c];}
+	inline unsigned getDim() const {return rcmat->N;}
 	void Print(std::ostream & out) const;
 	void prettyPrint(FILE* fp) const;
-	static Matrix mkId();
+	static Matrix mkId(unsigned N);
 	static Matrix transpose(const Matrix& m);
 	static Matrix add(const Matrix& mat1, const Matrix& mat2);
 	static Matrix subtract(const Matrix& mat1, const Matrix& mat2);
 	static Matrix multiply(const Matrix& mat1, const Matrix& mat2);
 	static void printMatrixStats(FILE* fp);
+	static void clearCaches();
 private:
 	RCMatrix* rcmat;
-	static void multiplyMatrices(int*, const int* mat1, const int* mat2);
+	static void multiplyMatrices(int*, const int* mat1, const int* mat2, unsigned N);
 	static unsigned int cacheHits, cacheAccesses, nMats;
 public:
 	struct EqPair {
@@ -239,7 +254,7 @@ public:
 		}
 	};
 
-	typedef wali::HashMap<MatrixPair, RCMatrix*, HashPair, EqPair> ProdCache;
+	typedef wpds::HashMap<MatrixPair, RCMatrix*, HashPair, EqPair> ProdCache;
 	
 	static const ProdCache::size_type maxProdCacheSize;  // Max size of cache
 	static const float cacheEntryThreshold;              // Min fraction of accesses 
