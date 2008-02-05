@@ -81,10 +81,10 @@ ModuleSpace *read_weight(std::istream &str)
     ModuleSpace *weight = new ModuleSpace(AR::dim);
     int mat[AR::dim * AR::dim];
     char c;
-    int depth = 0;
 OUTER:
     do {
         str >> c;
+        //std::cerr << c << std::endl;
         if(str.eof()) {
             break;
         }

@@ -106,6 +106,21 @@ namespace wali
                 Key toStk1Key = getKey(toStack1.get());
                 Key toStk2Key = getKey(toStack2.get());
 
+#if 0
+                std::cerr << "(Rule\n";
+                std::cerr << "\t" << from << std::endl;
+                std::cerr << "\t" << fromStack << std::endl;
+                std::cerr << "\t" << to << std::endl;
+                if( toStack1.get() )
+                    std::cerr << "\t" << toStack1 << std::endl;
+                if( toStack2.get() )
+                    std::cerr << "\t" << toStack2 << std::endl;
+                std::cerr << "Weight >>  " << weightString << std::endl;
+                std::cerr << ")" << std::endl;
+                wali::sem_elem_t se = weightFactory.getWeight(weightString);
+                se->print( std::cerr ) << std::endl;
+#endif
+
                 pds->add_rule(fromKey
                         , fromStkKey
                         , toKey
@@ -114,16 +129,6 @@ namespace wali
                         , weightFactory.getWeight(weightString)
                         );
 
-                /*
-                std::cerr << "Rule\n";
-                std::cerr << "\t" << from << std::endl;
-                std::cerr << "\t" << fromStack << std::endl;
-                std::cerr << "\t" << to << std::endl;
-                if( toStack1.get() )
-                    std::cerr << "\t" << toStack1 << std::endl;
-                if( toStack2.get() )
-                    std::cerr << "\t" << toStack2 << std::endl;
-                    */
             }
             else {
             }

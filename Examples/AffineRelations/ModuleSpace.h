@@ -330,7 +330,7 @@ class ModuleSpace {
   ///////////////////////////
   // Helper methods
   ///////////////////////////
-  int *ModuleSpace::findNullSpace();
+  int *findNullSpace();
 #ifdef VSA_ARA_USE_CNCL_MATRICES
   Matrix multiplyMatrices(const Matrix& op1, const Matrix& op2) const;
 #endif 

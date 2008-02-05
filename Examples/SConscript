@@ -1,12 +1,13 @@
 # Build the example applications
 import os
 
-print "\n+++ Building WALi Examples."
 Import('WaliDir')
 Import('LibInstallDir')
 
+## ###############################
+## Environment
 Env = Environment()
-
+ 
 # Include search path
 IncludeDirs = [
     os.path.join(WaliDir, 'Source'),
@@ -20,11 +21,11 @@ elif 'cl' == Env['CC']:
     # Mostly copied from VS C++ 2005 Command line
     Env['CXXFLAGS'] = '/TP /errorReport:prompt /Wp64 /W4 /GR /MTd /EHsc'
 
-# Libraries
+## Libraries
 Libs = [ 'wali', ]
 Env['LIBS'] = Libs
-
-# Library search path
+ 
+## Library search path
 LibDirs = [ LibInstallDir ]
 Env['LIBPATH'] = LibDirs
 
@@ -32,10 +33,20 @@ Export('Env')
 
 ExampleDir = os.path.join(WaliDir,'Examples')
 
-# Reach example
+## ###############################
+## Reach example
 SConscript(
         os.path.join(ExampleDir,'Reach','SConscript'),
         build_dir= os.path.join('_build','Reach'),
+        duplicate=0
+        )
+
+
+## ###############################
+## GenKill examples
+SConscript(
+        os.path.join(ExampleDir,'GenKill','SConscript'),
+        build_dir= os.path.join('_build','GenKill'),
         duplicate=0
         )
 
@@ -45,11 +56,4 @@ SConscript(
 #         build_dir= os.path.join('_build','AffineRelations'),
 #         duplicate=0
 #         )
-
-# GenKill examples
-SConscript(
-        os.path.join(ExampleDir,'GenKill','SConscript'),
-        build_dir= os.path.join('_build','GenKill'),
-        duplicate=0
-        )
-
+ 
