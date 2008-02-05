@@ -41,13 +41,10 @@
 #ifndef __A_R_CONFIG_H
 #define __A_R_CONFIG_H
 
-#include "swyx/src/swyx.hpp"
-#include "gtr/src/ref_ptr/ref_ptr.hpp"
 #include <string>
 #include <vector>
 #include <algorithm>
-
-class Symbol; // SWYX Symbol
+#include "ref_ptr.h"
 
 #define arEAX   1  ///< Variable number for register eax.
 #define arEBX   2  ///< Variable number for register ebx.
@@ -70,22 +67,22 @@ class Symbol; // SWYX Symbol
 /// Number of variables for affine relations. 
 #define NVARS          (arLAST)
 
-
-/// The array of variable names for rendering affine relations.
-extern char* arVarNames[];
-
-// ClassIDs associated with the registers used in affine relations.
-// (Same order as the list of names above).
-extern int arVarClassIDs[];
-
-
 namespace AR {
+
+    /// The array of variable names for rendering affine relations.
+    extern char* arVarNames[];
+
+    // ClassIDs associated with the registers used in affine relations.
+    // (Same order as the list of names above).
+    //extern int arVarClassIDs[];
+
+
 	typedef unsigned dim_t;
 	const dim_t dim = NVARS + 1;
-	extern unsigned __int64 nVarDist[AR::dim]; ///< Distribution of the number of variables in affine relations
+	extern unsigned long long nVarDist[AR::dim]; ///< Distribution of the number of variables in affine relations
 	                                           ///< (Gives an idea of how complex the affine rels are).
 	
-	extern unsigned __int64 nDimDist[AR::dim]; ///< Distribution on the dimensionality of the vector space.
+	extern unsigned long long nDimDist[AR::dim]; ///< Distribution on the dimensionality of the vector space.
 
 	class NameSpace {
 	public:
@@ -95,13 +92,14 @@ namespace AR {
 		NameSpace(dim_t _nNames, char* _names[]);
 
 		/// copy constructor
-		NameSpace(const NameSpace& rhs):syms(rhs.syms), names(rhs.names), count(0) {}
+		NameSpace(const NameSpace& rhs) : 
+            /*syms(rhs.syms),*/ names(rhs.names), count(0) {}
 
 		/// assignment
 		NameSpace& operator =(const NameSpace& rhs) {
 			if(this == &rhs)
 				return *this;
-			syms  = rhs.syms;
+			//syms  = rhs.syms;
 			names = rhs.names;
 			return *this;
 		}
@@ -109,23 +107,23 @@ namespace AR {
 		void clear();
 
 		// Get the textual representation of sym
-		static std::string getName(Symbol* sym);
+		//static std::string getName(Symbol* sym);
 
 		// add a symbol to the namespace
-		void add(Symbol* sym);
+		//void add(Symbol* sym);
 
 		// add a name to the namespace (set corresponding symbol to NULL)
 		void add(const std::string& name);
 
 		/// Get the index for the given symbol. 
 		/// Return -1 if not found.
-		int getIndex(const Symbol* sym) const;
+		////int getIndex(const Symbol* sym) const;
 
 		/// get the index for the given name.
 		int getIndex(const std::string& name) const;
 
 		/// Get the aloc at the given index.
-		Symbol* getAloc(dim_t n) const;
+        //Symbol* getAloc(dim_t n) const;
 
 		/// Get the name of the aloc at the given index
 		std::string operator [](dim_t n) const;
@@ -134,16 +132,18 @@ namespace AR {
 		~NameSpace() {}
 
 		/// Get the dimension of the namespace;
-		dim_t getDimension() const {return names.size();}
+		dim_t getDimension() const { 
+            return names.size();
+        }
 
 		RefCounter count; // For ref_ptr class
 	private:
-		std::vector<Symbol*>     syms;
+		//std::vector<Symbol*>     syms;
 		std::vector<std::string> names;
 #if _MSC_VER > 1200
     public:
 #endif
-		static Symbol* unknownSym;
+		//static Symbol* unknownSym;
 	};
 	typedef ref_ptr<NameSpace> NameSpacePtr;
 
@@ -156,12 +156,12 @@ namespace AR {
 	const unsigned VER_NR         = 3;		
 	
 	extern unsigned whichWpdsVersion;
-#ifdef USE_AKASH_EWPDS
+#ifdef USE_EWPDS
 	extern bool constructingEWPDS;
 #endif
 
 	void initialize();
-}
+} // namespace
 
 #define VSA_RESTORE_REGS_IN_AFFREL 1
 

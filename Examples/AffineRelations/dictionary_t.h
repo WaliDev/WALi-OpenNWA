@@ -68,7 +68,6 @@
 #if defined(X86_PROFILE_NEW_DELETE)
 #   include <new.h>
 #   include <typeinfo.h>
-#   include "swyx/src/common/heap_profile.hpp"
 //  Hacks don't get much uglier than the following:
 //  - There are several different heap profiling tricks being
 //    applied (when various macros are defined).

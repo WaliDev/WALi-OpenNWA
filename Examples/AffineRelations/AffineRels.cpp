@@ -43,233 +43,236 @@
 
 
 #include <iostream>
-#include <math.h>
-#ifdef USE_AFFINERELS_CLASS_WITH_VSA
+#include <cmath>
+#if 0 //def USE_AFFINERELS_CLASS_WITH_VSA
 #	include "cmdline.h"
 #	include "wpdspp_ar_interface.h"
 #	include "wpdsBBInterface.h"
 #	include "Debug.h"
 #endif
-#include "AffineRels.h"
-#include "VectorSpace.h"
+#include "AffineRels.hpp"
+#include "ModuleSpace.hpp"
+
+namespace AR {
 
 
-
-// Idspace 
-VectorSpace *AffineRels::idspace = new VectorSpace(AR::dim, true);
+    // Idspace 
+    ModuleSpace *AffineRels::idspace = new ModuleSpace(AR::dim, true);
 
 
 #ifdef USE_AFFINERELS_CLASS_WITH_VSA
 
-void AffineRels::initAffineRelations() {
+    void AffineRels::initAffineRelations() {
 #ifdef BASIC_BLOCKS_OPTION
-	if(flag_basic_blocks)
+        if(flag_basic_blocks)
 #endif
-		initAffRelWpdspp_BB();
+            initAffRelWpdspp_BB();
 #ifdef BASIC_BLOCKS_OPTION
-	else
-		initAffRelWpdspp();
+        else
+            initAffRelWpdspp();
 #endif
-}
+    }
 
 
-//--------------------------------------------
-/// Determine the set of affine relations that
-/// hold at the given CFGnode node.
-///
-/// @param node The cfg node of interest.
-/// @return An AffineRels object that reprsents the set of affine relations.
-///
-//--------------------------------------------
-AffineRels *AffineRels::getAffineRels(nCFGnode *node) {
+    //--------------------------------------------
+    /// Determine the set of affine relations that
+    /// hold at the given CFGnode node.
+    ///
+    /// @param node The cfg node of interest.
+    /// @return An AffineRels object that reprsents the set of affine relations.
+    ///
+    //--------------------------------------------
+    AffineRels *AffineRels::getAffineRels(nCFGnode *node) {
 
 #ifdef BASIC_BLOCKS_OPTION
-	if(flag_basic_blocks)
+        if(flag_basic_blocks)
 #endif
-		return wpdsppGetAffineRels_BB(node);
+            return wpdsppGetAffineRels_BB(node);
 #ifdef BASIC_BLOCKS_OPTION
-	else
-		return wpdsppGetAffineRels(node);
+        else
+            return wpdsppGetAffineRels(node);
 #endif
-}
+    }
 
 #endif
 
-//----------------------------------
-/// Default constructor. 
-//----------------------------------
-AffineRels::AffineRels() {
-}
+    //----------------------------------
+    /// Default constructor. 
+    //----------------------------------
+    AffineRels::AffineRels() {
+    }
 
-//-------------------------------------------------------
-// 
-//-------------------------------------------------------
-AffineRels::AffineRels(VectorSpace *pVs) {
-	pVs->findAffineRelations(*this);
-}
-	
-//-------------------------------------------------------
-//
-//-------------------------------------------------------
-void AffineRels::clear() {
-	affRels.clear();
-}
+    //-------------------------------------------------------
+    // 
+    //-------------------------------------------------------
+    AffineRels::AffineRels(ModuleSpace *pVs) {
+        pVs->findAffineRelations(*this);
+    }
 
-//-------------------------------------------------------
-/// @return Number of affine relations.
-//-------------------------------------------------------
-unsigned AffineRels::nrOfRels() const {
-	return affRels.size();
-}
+    //-------------------------------------------------------
+    //
+    //-------------------------------------------------------
+    void AffineRels::clear() {
+        affRels.clear();
+    }
 
-//-------------------------------------------------------
-// copy rhs to this.
-//-------------------------------------------------------
-void AffineRels::copy(AffineRels *rhs) {
-	affRels.clear();
-	for(unsigned i=0;i<rhs->nrOfRels();++i) {
-		insert(rhs->getAffineRel(i));
-	}
-}
+    //-------------------------------------------------------
+    /// @return Number of affine relations.
+    //-------------------------------------------------------
+    unsigned AffineRels::nrOfRels() const {
+        return affRels.size();
+    }
 
-//-------------------------------------------------------
-// 	Insert an affine relation.
-//-------------------------------------------------------
-void AffineRels::insert(AffRel_t affrel) {
-	AffRel_t rel=new AffRelCoeff_t[AR::dim];
-	for(int i = 0; i < AR::dim; ++i) {
-		rel[i]=affrel[i];
-	}
-	affRels.push_back(rel);
-}
+    //-------------------------------------------------------
+    // copy rhs to this.
+    //-------------------------------------------------------
+    void AffineRels::copy(AffineRels *rhs) {
+        affRels.clear();
+        for(unsigned i=0;i<rhs->nrOfRels();++i) {
+            insert(rhs->getAffineRel(i));
+        }
+    }
 
-//-------------------------------------------------------
-/// @param relNr The index of the relation sought for.
-/// @return An array of coefficients for that 
-///  particular affine relation.
-/// @pre 0<=relNr<affRels.size()
-//-------------------------------------------------------
-AffineRels::AffRel_t AffineRels::getAffineRel(unsigned int relNr) const {
-	return affRels[relNr];
-}
+    //-------------------------------------------------------
+    // 	Insert an affine relation.
+    //-------------------------------------------------------
+    void AffineRels::insert(AffRel_t affrel) {
+        AffRel_t rel=new AffRelCoeff_t[AR::dim];
+        for(int i = 0; i < AR::dim; ++i) {
+            rel[i]=affrel[i];
+        }
+        affRels.push_back(rel);
+    }
 
-//---------------------------------------------------------
-/// @param relNr The index of the relation.
-/// @param varNr The variable number.
-/// @return Whether the coefficient of the variable is non-zero.
-/// @pre 0<=relNr<affRels.size(), 1<=varNr<=NVARS
-//---------------------------------------------------------
-bool AffineRels::hasVar(int relNr,int varNr) const{
-	AffRel_t ar = affRels[relNr];
-	return(ar[varNr]!=0);
-}
+    //-------------------------------------------------------
+    /// @param relNr The index of the relation sought for.
+    /// @return An array of coefficients for that 
+    ///  particular affine relation.
+    /// @pre 0<=relNr<affRels.size()
+    //-------------------------------------------------------
+    AffineRels::AffRel_t AffineRels::getAffineRel(unsigned int relNr) const {
+        return affRels[relNr];
+    }
 
-//-----------------------------------------
-// Does this affine relation have non-integer
-// coefficients.
-///
-/// @param relNr The relation number.
-/// @pre 0<= relNr < this->size()
-//-----------------------------------------
-bool AffineRels::hasNonIntegerCoeffs(int relNr) const{
-	
-	AffRel_t ar = affRels[relNr];
+    //---------------------------------------------------------
+    /// @param relNr The index of the relation.
+    /// @param varNr The variable number.
+    /// @return Whether the coefficient of the variable is non-zero.
+    /// @pre 0<=relNr<affRels.size(), 1<=varNr<=NVARS
+    //---------------------------------------------------------
+    bool AffineRels::hasVar(int relNr,int varNr) const{
+        AffRel_t ar = affRels[relNr];
+        return(ar[varNr]!=0);
+    }
 
-	bool hasDouble=false;
+    //-----------------------------------------
+    // Does this affine relation have non-integer
+    // coefficients.
+    ///
+    /// @param relNr The relation number.
+    /// @pre 0<= relNr < this->size()
+    //-----------------------------------------
+    bool AffineRels::hasNonIntegerCoeffs(int relNr) const{
 
-	for(unsigned varNr=0;varNr < AR::dim;++varNr) {
-		if(ceil(ar[varNr]) != ar[varNr]) {
-			hasDouble=true;
-			break;
-		}
-	}
-	return hasDouble;
-}
+        AffRel_t ar = affRels[relNr];
 
-//---------------------------------------------------------------------------
-/// The number of variables with non-zero coefficients (excludes const).
-///
-/// @param relNr The relation number.
-/// @pre 0<= relNr < this->size()
-//---------------------------------------------------------------------------
-unsigned AffineRels::nNonZeroCoeffs(int relNr) const {
-	unsigned cnt = 0;
-	AffRel_t ar = affRels[relNr];
-	for(unsigned varNr = 1;varNr < AR::dim;++varNr) {
-		if( ar[varNr] != 0) {
-			cnt++;
-		}
-	}
-	return cnt;
+        bool hasDouble=false;
 
-}
+        for(unsigned varNr=0;varNr < AR::dim;++varNr) {
+            if(ceil(ar[varNr]) != ar[varNr]) {
+                hasDouble=true;
+                break;
+            }
+        }
+        return hasDouble;
+    }
 
-//-------------------------------------------------------
-/// Destructor. 
-//-------------------------------------------------------
-AffineRels::~AffineRels() {
-	for(unsigned i=0;i<affRels.size();++i) 
-		delete [] affRels[i];
-	affRels.clear();
+    //---------------------------------------------------------------------------
+    /// The number of variables with non-zero coefficients (excludes const).
+    ///
+    /// @param relNr The relation number.
+    /// @pre 0<= relNr < this->size()
+    //---------------------------------------------------------------------------
+    unsigned AffineRels::nNonZeroCoeffs(int relNr) const {
+        unsigned cnt = 0;
+        AffRel_t ar = affRels[relNr];
+        for(unsigned varNr = 1;varNr < AR::dim;++varNr) {
+            if( ar[varNr] != 0) {
+                cnt++;
+            }
+        }
+        return cnt;
 
+    }
 
-	
-}
+    //-------------------------------------------------------
+    /// Destructor. 
+    //-------------------------------------------------------
+    AffineRels::~AffineRels() {
+        for(unsigned i=0;i<affRels.size();++i) 
+            delete [] affRels[i];
+        affRels.clear();
 
 
 
-//-------------------------------------------------------
-/// @param fp The output file.
-/// @param varNames An array of null-terminated strings
-///  that will be used as the variable names.
-//-------------------------------------------------------
-void AffineRels::prettyPrint(FILE *fp, char **varNames) const{
-	for(unsigned i=0;i<affRels.size();++i)  {
-		fprintf(fp,"%d ",affRels[i][0]);
-		for(int j=1;j<AR::dim;++j) { 
-			if(affRels[i][j]!=0)
-				fprintf(fp," + %d*%s",affRels[i][j],varNames[j]);
-		}
-		fprintf(fp,"\n");
-	}
-}
+    }
 
 
-//-------------------------------------------------------
-/// @param fp The output file.
-/// @param varNames An array of null-terminated strings
-///  that will be used as the variable names.
-//-------------------------------------------------------
-std::ostream& AffineRels::prettyPrint(std::ostream &out, char **varNames) const {
-	std::ios::fmtflags oldsettings=out.flags();
-	out.setf(std::ios::fixed, std::ios::floatfield);
-	out.precision(2);
-	for(unsigned i=0;i<affRels.size();++i)  {
-		out << affRels[i][0] << " ";
-		
-		for(int j=1;j<AR::dim;++j) {
-			if(affRels[i][j]!=0)
-				out <<" + " << affRels[i][j]<<"*" << varNames[j];
-			
-		}
-		out << std::endl;
-	}
-	out.flags(oldsettings);
-	return out;
-}
 
-//------------------------------------------------
-/// Update global stats about affine relations.
-//-------------------------------------------------
-void AffineRels::updateARStats() const{
-	//- Update the dimension distribution
-	AR::nDimDist[nrOfRels()]++;
+    //-------------------------------------------------------
+    /// @param fp The output file.
+    /// @param varNames An array of null-terminated strings
+    ///  that will be used as the variable names.
+    //-------------------------------------------------------
+    void AffineRels::prettyPrint(FILE *fp, char **varNames) const{
+        for(unsigned i=0;i<affRels.size();++i)  {
+            fprintf(fp,"%d ",affRels[i][0]);
+            for(int j=1;j<AR::dim;++j) { 
+                if(affRels[i][j]!=0)
+                    fprintf(fp," + %d*%s",affRels[i][j],varNames[j]);
+            }
+            fprintf(fp,"\n");
+        }
+    }
 
-	//- Update the number of variable distribution
-	//
-	for(unsigned i = 0; i < nrOfRels(); ++i) {
-		AR::nVarDist[nNonZeroCoeffs(i)]++;	
-	}
 
-	return;
-}
+    //-------------------------------------------------------
+    /// @param fp The output file.
+    /// @param varNames An array of null-terminated strings
+    ///  that will be used as the variable names.
+    //-------------------------------------------------------
+    std::ostream& AffineRels::prettyPrint(std::ostream &out, char **varNames) const {
+        std::ios::fmtflags oldsettings=out.flags();
+        out.setf(std::ios::fixed, std::ios::floatfield);
+        out.precision(2);
+        for(unsigned i=0;i<affRels.size();++i)  {
+            out << affRels[i][0] << " ";
+
+            for(int j=1;j<AR::dim;++j) {
+                if(affRels[i][j]!=0)
+                    out <<" + " << affRels[i][j]<<"*" << varNames[j];
+
+            }
+            out << std::endl;
+        }
+        out.flags(oldsettings);
+        return out;
+    }
+
+    //------------------------------------------------
+    /// Update global stats about affine relations.
+    //-------------------------------------------------
+    void AffineRels::updateARStats() const{
+        //- Update the dimension distribution
+        AR::nDimDist[nrOfRels()]++;
+
+        //- Update the number of variable distribution
+        //
+        for(unsigned i = 0; i < nrOfRels(); ++i) {
+            AR::nVarDist[nNonZeroCoeffs(i)]++;	
+        }
+
+        return;
+    }
+
+} // namespace AR

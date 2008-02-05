@@ -38,35 +38,34 @@
 //////////////////////////////////////////////////////////////////////////////
 
 
-#include "AffineRels.h"
-#include "ARConfig.h"
-#include "VsaMisc.h"
-#include "swyx/src/swyx.hpp"
-#include "Matrix.h"
-
-// Variable Names for use in rendering the affine relations.
-char* arVarNames[] = {"1","eax","ebx","ecx","edx","esi","edi","ebp","esp"};
-
-// ClassIDs associated with the registers used in affine relations.
-// (Same order as the list of names above).
-int arVarClassIDs[] = {0,
-                       ID_register_eax, ID_register_ebx, ID_register_ecx, ID_register_edx,
-                       ID_register_esi, ID_register_edi, ID_register_ebp, ID_register_esp};
-
-
-char* regNames[] = {"eax","ebx","ecx","edx","esi","edi","ebp","esp"};
-
-//char *arVarNames[]={"1","eax","ebx","ecx","edx","esi","edi","ebp","esp",
-//                        "eax0","ebx0","ecx0","edx0","esi0","edi0","ebp0","esp0"};
-
+#include "AffineRels.hpp"
+#include "ARConfig.hpp"
+#include "Matrix.hpp"
 
 namespace AR {
+
+    // Variable Names for use in rendering the affine relations.
+    char* arVarNames[] = {"1","eax","ebx","ecx","edx","esi","edi","ebp","esp"};
+
+    // ClassIDs associated with the registers used in affine relations.
+    // (Same order as the list of names above).
+    //int arVarClassIDs[] = {0,
+    //    ID_register_eax, ID_register_ebx, ID_register_ecx, ID_register_edx,
+    //    ID_register_esi, ID_register_edi, ID_register_ebp, ID_register_esp};
+
+
+    char* regNames[] = {"eax","ebx","ecx","edx","esi","edi","ebp","esp"};
+
+    //char *arVarNames[]={"1","eax","ebx","ecx","edx","esi","edi","ebp","esp",
+    //                        "eax0","ebx0","ecx0","edx0","esi0","edi0","ebp0","esp0"};
+
+
 	/// Distribution of the number of variables in affine relations
 	/// (Gives an idea of how complex the affine rels are).
-	unsigned __int64 nVarDist[AR::dim] = {0, 0, 0, 0, 0, 0, 0, 0, 0}; 
+	unsigned long long nVarDist[AR::dim] = {0, 0, 0, 0, 0, 0, 0, 0, 0}; 
 	                                         
 	/// Distribution on the dimensionality of the vector space.
-	unsigned __int64 nDimDist[AR::dim] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+	unsigned long long nDimDist[AR::dim] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 
 	// x86RegNames
@@ -82,55 +81,56 @@ namespace AR {
 #ifdef USE_AKASH_EWPDS
 	bool constructingEWPDS = false;
 #endif
-	Symbol* NameSpace::unknownSym = (Symbol*)1;
+    //Symbol* NameSpace::unknownSym = (Symbol*)1;
 	//---------------------------------
 	/// Default constructor.	
 	//---------------------------------
 	NameSpace::NameSpace() {
-		syms.push_back(NULL);
+        //syms.push_back(NULL);
 		names.push_back("CONST$");
 	}
 
 	void NameSpace::clear() {
-		syms.clear();
+		//syms.clear();
 		names.clear();
-		syms.push_back(NULL);
+		//syms.push_back(NULL);
 		names.push_back("CONST$");
 	}
 
 	/// constructor
 	NameSpace::NameSpace(dim_t _nNames, char* _names[]):count(0) {
-		syms.push_back(NULL);
+		//syms.push_back(NULL);
 		names.push_back("CONST$");
 		for(dim_t i = 0; i < _nNames; ++i) {
-			Symbol* sym = GlobalSymbolTable->LookupSymbol(_names[i]);
-			assert(sym);
-			syms.push_back(sym);
+			//Symbol* sym = GlobalSymbolTable->LookupSymbol(_names[i]);
+			//assert(sym);
+			//syms.push_back(sym);
 			names.push_back(_names[i]);
 		}
 	}
 
-	std::string NameSpace::getName(Symbol* sym)  {
-		std::string name(sym->GetNameNoBaseIndex());
-		if(sym->GetBaseIndex()) {
-			name += MAKE_STRING("$" << sym->GetBaseIndex());
-		}
-		return name;
-	}
-	
-	//---------------------------------
-	/// add symbol
-	//---------------------------------
-	void NameSpace::add(Symbol* sym)  {
-		assert(sym != unknownSym);		
-		// not already there?
-		if(getIndex(sym) == -1) {
-			syms.push_back(sym);
-			names.push_back(getName(sym));
-		}
-		return;
+//    std::string NameSpace::getName(Symbol* sym)  {
+//		std::string name(sym->GetNameNoBaseIndex());
+//		if(sym->GetBaseIndex()) {
+//			name += MAKE_STRING("$" << sym->GetBaseIndex());
+//		}
+//		return name;
+//	}
+//	
 
-	}
+//---------------------------------
+/// add symbol
+//---------------------------------
+//    void NameSpace::add(Symbol* sym)  {
+//		assert(sym != unknownSym);		
+//		// not already there?
+//		if(getIndex(sym) == -1) {
+//			//syms.push_back(sym);
+//			names.push_back(getName(sym));
+//		}
+//		return;
+//
+//	}
 
 	//---------------------------------
 	/// add name
@@ -138,13 +138,14 @@ namespace AR {
 	void NameSpace::add(const std::string& name)  {
 		// not already there?
 		if(getIndex(name) == -1) {
-			syms.push_back(unknownSym);
+			//syms.push_back(unknownSym);
 			names.push_back(name);
 		}
 		return;
 
 	}
 
+    /*
 	/// Get the index for the given symbol. 
 	/// Return -1 if not found.
 	int NameSpace::getIndex(const Symbol* sym) const {
@@ -158,6 +159,7 @@ namespace AR {
 		else
 			return elem - syms.begin();
 	}
+    */
 
 
 	/// Get the index for the given name.
@@ -173,11 +175,13 @@ namespace AR {
 			return elem - names.begin();
 	}
 
+    /*
 	/// Get the aloc at the given index.
 	Symbol* NameSpace::getAloc(dim_t n) const {
 		assert(n >= 0 && n < syms.size()); 
 		return syms[n];
 	}
+    */
 
 	/// Get the name of the aloc at the given index
 	std::string NameSpace::operator [](dim_t n) const {
@@ -185,4 +189,4 @@ namespace AR {
 		return names[n];
 	}
 
-}
+} // namespace AR

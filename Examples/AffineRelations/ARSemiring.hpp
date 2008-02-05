@@ -38,8 +38,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef ara_SEMIRING_GUARD
-#define ara_SEMIRING_GUARD
+#ifndef AR_ARSEMIRING_GUARD
+#define AR_ARSEMIRING_GUARD
 
 #include "ModuleSpace.hpp"
 #include <iostream>
@@ -48,34 +48,37 @@
 // For Nick's wpds implementation
 //----------------------------------
 //-----------------------------------
-// Semiring class for wpds
+// ARSemiring class for wpds
 //-----------------------------------
 
-namespace ara {
+namespace AR {
 
-    class Semiring {
+    class ARSemiring {
         public:
+            // toggle exact equality
+            static bool exact_equality;
+
             //---------------------
             // Constructors 
             //---------------------
-            Semiring(ModuleSpace*,unsigned = 0);	
-            ~Semiring();
+            ARSemiring(ModuleSpace* , unsigned = 0);	
+            ~ARSemiring();
 
             //-----------------------------
             // semiring one and zero
             //-----------------------------
-            static Semiring* one();
-            static Semiring* zero();
+            static ARSemiring* one();
+            static ARSemiring* zero();
 
             //---------------------------------
             // semiring operations
             //---------------------------------
-            Semiring* extend(Semiring *) ;
-            Semiring* combine(Semiring *);
-            bool		equal(Semiring *) const;
+            ARSemiring* extend(ARSemiring *) ;
+            ARSemiring* combine(ARSemiring *);
+            bool		equal(ARSemiring *) const;
 
-            Semiring* quasiOne() const;
-            Semiring* diff(Semiring *) const;
+            ARSemiring* quasiOne() const;
+            ARSemiring* diff(ARSemiring *) const;
 
             //----------------------------
             // Reference count
@@ -97,13 +100,13 @@ namespace ara {
             ///
             ModuleSpace *vs();
         private:
-            static Semiring *_zero;
-            static Semiring *_one;
+            static ARSemiring *_zero;
+            static ARSemiring *_one;
             typedef ref_ptr<ModuleSpace> ModuleSpacePtr;
             ModuleSpacePtr p_vs;
 
-    }; // class Semiring
+    }; // class ARSemiring
 
-} // namespace ara
+} // namespace AR
 
-#endif  // ara_SEMIRING_GUARD
+#endif  // AR_SEMIRING_GUARD
