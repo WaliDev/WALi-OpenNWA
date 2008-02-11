@@ -36,21 +36,14 @@ sem_elem_t Reach::zero() const
 sem_elem_t Reach::extend( SemElem* se )
 {
     Reach* rhs = static_cast< Reach* >(se);
-    // this and rhs are one()
-    if( isreached && rhs->isreached )
-        return one();
-    else
-        return zero();
+    return new Reach(isreached && rhs->isreached);
 }
 
 // zero is neutral for combine
 sem_elem_t Reach::combine( SemElem* se )
 {
     Reach* rhs = static_cast< Reach* >(se);
-    if( isreached || rhs->isreached )
-        return one();
-    else
-        return zero();
+    return new Reach(isreached || rhs->isreached);
 }
 
 bool Reach::equal( SemElem* se ) const
@@ -64,6 +57,9 @@ std::ostream & Reach::print( std::ostream & o ) const
     return (isreached) ? o << "ONE" : o << "ZERO";
 }
 
+sem_elem_t Reach::from_string( const std::string& s ) const {
+    return (s == "ONE") ? one() : zero();
+}
 /*
  * $Log $
  */
