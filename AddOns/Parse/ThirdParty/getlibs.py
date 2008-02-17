@@ -24,7 +24,7 @@ def xerces_setup(name):
     myrm(name+'.zip')
     myrm('xerces-c')
 
-def get_xerces_win(name):
+def get_xerces_win(bits):
     name = xerces_win32 if bits == '32bit' else xerces_win64
     xerces_setup(name)
     target = name+'.zip'
