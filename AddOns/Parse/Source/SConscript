@@ -5,7 +5,7 @@ import os
 
 print "\n+++ Building waliparse library."
 
-Debug = 1
+Debug = True
 
 Import('WaliDir')
 Import('LibInstallDir')

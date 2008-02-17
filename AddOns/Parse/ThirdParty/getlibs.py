@@ -28,7 +28,7 @@ def get_xerces_win(bits):
     name = xerces_win32 if bits == '32bit' else xerces_win64
     xerces_setup(name)
     target = name+'.zip'
-    os.system('wget %s%s' % (xerces_mirror,target))
+    os.system('curl -O %s%s' % (xerces_mirror,target))
     os.system('unzip -o %s' % target)
     os.rename(name, 'xerces-c')
 
@@ -36,7 +36,7 @@ def get_xerces_linux(bits):
     name = (xerces_linux64 , xerces_linux32)[bits == '32bit']
     xerces_setup(name)
     target = name+'.tar.gz'
-    os.system('wget %s%s' % (xerces_mirror,target))
+    os.system('curl -O %s%s' % (xerces_mirror,target))
     os.system('tar zxf %s' % target)
     os.rename(name, 'xerces-c')
 
