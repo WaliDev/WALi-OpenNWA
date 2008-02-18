@@ -1,7 +1,7 @@
 # Build the waliparse library
 # $Id$
 
-import os
+import os,platform
 
 print "\n+++ Building waliparse library."
 
@@ -9,11 +9,12 @@ Debug = True
 
 Import('WaliDir')
 Import('LibInstallDir')
+Import('MkStatic')
+Import('BaseEnv')
 
 if Debug:
     print "+ WaliDir       : '%s'" % WaliDir
     print "+ LibInstallDir : '%s'" % LibInstallDir 
-
 
 waliparse_files = Split("""
 ./wali/wpds/ewpds/EWpdsHandler.cpp
@@ -25,7 +26,7 @@ waliparse_files = Split("""
 ./StrX.cpp
 """)
 
-env = Environment()
+env = BaseEnv.Clone()
 
 # Define include directories
 IncludeDirs = [
@@ -40,13 +41,10 @@ if Debug:
 
 env['CPPPATH'] = IncludeDirs
 
-if 'gcc' == env['CC']:
-    env['CXXFLAGS'] = '-g -ggdb -Wall -Wformat=2 -W'
-elif 'cl' == env['CC']:
-    # Mostly copied from VS C++ 2005 Command line
-    env['CXXFLAGS'] = '/TP /errorReport:prompt /Wp64 /W4 /GR /MTd /EHsc'
-
-waliparse = env.SharedLibrary('waliparse' , waliparse_files)
-
-env.Install(LibInstallDir, waliparse)
+if MkStatic:
+    waliparse = env.StaticLibrary('waliparse' , waliparse_files)
+    env.Install(LibInstallDir, waliparse)
+else:
+    waliparse = env.SharedLibrary('waliparse' , waliparse_files)
+    env.Install(LibInstallDir, waliparse)
 

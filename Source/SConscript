@@ -4,10 +4,12 @@ import os
 
 print "\n+++ Building wali library."
 
-Debug = 1
+Debug = True
 
 Import('WaliDir')
 Import('LibInstallDir')
+Import('BaseEnv')
+Import('MkStatic')
 
 if Debug:
     print "+ WaliDir       : '%s'" % WaliDir
@@ -69,7 +71,7 @@ wali_files = Split("""
 ./wali/graph/IntraGraph.cpp
 """)
 
-env = Environment()
+env = BaseEnv.Clone()
 
 IncludeDirs = [ os.path.join(WaliDir , 'Source'), ]
 env['CPPPATH'] = IncludeDirs 
@@ -81,13 +83,12 @@ if Debug:
         print "+ Inlude        : %s" % i
 
 
-if 'gcc' == env['CC']:
-    env['CXXFLAGS'] = '-g -ggdb -Wall -Wformat=2 -W'
-elif 'cl' == env['CC']:
-    # Mostly copied from VS C++ 2005 Command line
-    env['CXXFLAGS'] = '/TP /errorReport:prompt /Wp64 /W4 /GR /MTd /EHsc'
-
-wali = env.SharedLibrary('wali' , wali_files)
-
-env.Install(LibInstallDir, wali)
+if MkStatic:
+    wali = env.StaticLibrary('wali' , wali_files)
+    env.Install(LibInstallDir, wali)
+    Return('wali')
+else:
+    wali = env.SharedLibrary('wali' , wali_files)
+    env.Install(LibInstallDir, wali)
+    Return('wali')
 
