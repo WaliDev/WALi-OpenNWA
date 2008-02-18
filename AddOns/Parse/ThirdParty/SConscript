@@ -1,4 +1,6 @@
 # Run the python program
 # $Id$
 import getlibs
+built = []
+Return('built')
 

@@ -8,13 +8,19 @@ GenKillFiles=[ 'VarSet.cpp' ]
 Env['CPPPATH'].append(os.path.join(WaliDir,'Examples','GenKill'))
 
 # LiveVar
-print "+++ Building GenKill/LiveVar"
+#print "+++ Build GenKill/LiveVar"
 LiveFiles = GenKillFiles + [os.path.join('LiveVar','LiveVar.cpp')]
 LiveVar = Env.Program('livevar', LiveFiles)
-Env.InstallAs(os.path.join(WaliDir,'Examples','bin','LiveVar'), LiveVar)
+lv = Env.InstallAs(os.path.join(WaliDir,'Examples','bin','LiveVar'), LiveVar)
 
 # UninitVar
-print "+++ Building GenKill/UninitVar"
+#print "+++ Build GenKill/UninitVar"
 UninitFiles = GenKillFiles + [os.path.join('UninitVar','UninitVar.cpp')]
 UninitVar = Env.Program('uninitvar', UninitFiles)
-Env.InstallAs(os.path.join(WaliDir,'Examples','bin','UninitVar'), UninitVar)
+ul = Env.InstallAs(os.path.join(WaliDir,'Examples','bin','UninitVar'), UninitVar)
+
+#built = [LiveVar,UninitVar]
+built = [lv,ul]
+
+Return('built')
+

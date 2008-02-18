@@ -2,5 +2,7 @@
 # $Id$
 
 
-SConscript('ThirdParty/SConscript')
-SConscript('Source/SConscript', build_dir='_build/Parse',duplicate=0)
+built = []
+built = built + SConscript('ThirdParty/SConscript')
+built += SConscript('Source/SConscript', build_dir='_build/Parse',duplicate=0)
+Return('built')

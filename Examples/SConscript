@@ -3,23 +3,17 @@ import os
 
 Import('WaliDir')
 Import('LibInstallDir')
+Import('BaseEnv')
 
 ## ###############################
 ## Environment
-Env = Environment()
+Env = BaseEnv.Clone()
  
 # Include search path
 IncludeDirs = [
     os.path.join(WaliDir, 'Source'),
 ]
 Env['CPPPATH'] = IncludeDirs
-
-# Compilation flags
-if 'gcc' == Env['CC']:
-    Env['CXXFLAGS'] = '-g -ggdb -Wall -Wformat=2 -W'
-elif 'cl' == Env['CC']:
-    # Mostly copied from VS C++ 2005 Command line
-    Env['CXXFLAGS'] = '/TP /errorReport:prompt /Wp64 /W4 /GR /MTd /EHsc'
 
 ## Libraries
 Libs = [ 'wali', ]
@@ -33,27 +27,31 @@ Export('Env')
 
 ExampleDir = os.path.join(WaliDir,'Examples')
 
+built = []
 ## ###############################
 ## Reach example
-SConscript(
+o = SConscript(
         os.path.join(ExampleDir,'Reach','SConscript'),
         build_dir= os.path.join('_build','Reach'),
         duplicate=0
         )
+built += o
 
 
 ## ###############################
 ## GenKill examples
-SConscript(
+o = SConscript(
         os.path.join(ExampleDir,'GenKill','SConscript'),
         build_dir= os.path.join('_build','GenKill'),
         duplicate=0
         )
+built += o
 
 # Affine Relations Weight Domain
-# SConscript(
+# o = SConscript(
 #         os.path.join(ExampleDir,'AffineRelations','SConscript'),
 #         build_dir= os.path.join('_build','AffineRelations'),
 #         duplicate=0
 #         )
- 
+# built += o
+Return('built')

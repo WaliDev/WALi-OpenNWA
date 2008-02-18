@@ -29,23 +29,28 @@ Export('BaseEnv')
 if 'help' not in COMMAND_LINE_TARGETS:
     ## ##################
     ## libwali
-    objs = []
-    objs.append(SConscript('Source/SConscript', build_dir='_build',duplicate=0))
+    built = []
+    built = built + SConscript('Source/SConscript', build_dir='_build',duplicate=0)
     
     ## ##################
     ## All
     if 'all' in COMMAND_LINE_TARGETS:
         for d in ['AddOns','Examples']:
             o = SConscript('%s/SConscript' % d)
-            objs.append(o)
-        BaseEnv.Alias('all',objs)
+            built = built + o
+        ### TODO : better printing
+        #for b in built:
+        #    print b
+        BaseEnv.Alias('all',built)
 
     ## AddOns
     else:
         if 'addons' in COMMAND_LINE_TARGETS:
-            SConscript('AddOns/SConscript')
+            built += SConscript('AddOns/SConscript')
+            BaseEnv.Alias('addons',built)
         if 'examples' in COMMAND_LINE_TARGETS:
-            SConscript('Examples/SConscript')
+            built += SConscript('Examples/SConscript')
+            BaseEnv.Alias('examples',built)
 else:
     BaseEnv.Alias('help',[])
     print """

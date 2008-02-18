@@ -11,5 +11,9 @@ ReachFiles=Split("""
 
 ExReach = Env.Program('ExReach',ReachFiles)
 
-Env.Install(os.path.join(WaliDir,'Examples','bin'), ExReach)
+i = Env.Install(os.path.join(WaliDir,'Examples','bin'), ExReach)
+
+built = [i]
+
+Return('built')
 

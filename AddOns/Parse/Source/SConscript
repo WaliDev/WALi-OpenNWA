@@ -3,9 +3,13 @@
 
 import os,platform
 
-print "\n+++ Building waliparse library."
+## TODO : turn on debugging info output
+##      - Currently broken
+Debug = False
 
-Debug = True
+if Debug:
+    print "\n+++ Build waliparse library." 
+
 
 Import('WaliDir')
 Import('LibInstallDir')
@@ -43,8 +47,12 @@ env['CPPPATH'] = IncludeDirs
 
 if MkStatic:
     waliparse = env.StaticLibrary('waliparse' , waliparse_files)
-    env.Install(LibInstallDir, waliparse)
+    i = env.Install(LibInstallDir, waliparse)
+    built = [i]
+    Return('built')
 else:
     waliparse = env.SharedLibrary('waliparse' , waliparse_files)
-    env.Install(LibInstallDir, waliparse)
+    i = env.Install(LibInstallDir, waliparse)
+    built = [i]
+    Return('built')
 
