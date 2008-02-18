@@ -2,9 +2,13 @@
 # $Id$
 import os
 
-print "\n+++ Building wali library."
+## Control output of debug <progress> information
+## TODO - if True, always outputs info whether building or not
+Debug = False
 
-Debug = True
+if Debug:
+    print "\n+++ Building wali library."
+
 
 Import('WaliDir')
 Import('LibInstallDir')
