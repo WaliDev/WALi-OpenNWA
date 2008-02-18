@@ -26,10 +26,10 @@
 
 
 \definecolor{bg-gray}{gray}{0.85}
-\makeatletter\newenvironment{cmdbox}{%
-   \begin{lrbox}{\@tempboxa}\begin{minipage}{\textwidth}}{\end{minipage}\end{lrbox}%
-   \fcolorbox{black}{bg-gray}{\usebox{\@tempboxa}}
-}\makeatother
+\makeatletter\newenvironment{cmdbox}%
+{\begin{lrbox}{\@tempboxa}\begin{minipage}{\textwidth}\small}%
+{\normalsize\end{minipage}\end{lrbox}\fcolorbox{black}{bg-gray}{\usebox{\@tempboxa}}}%
+\makeatother
 
 \usepackage{listings}
 \lstloadlanguages{[GNU]C++}
@@ -91,6 +91,7 @@ the \href{http://www.scons.org}{SCons} build tool, and the common utility
 program \verb!curl!. The following commands will download and extract the WALi
 source tree.
 
+\vspace{1em}
 \noindent
 \begin{cmdbox}
 \begin{verbatim}
@@ -99,11 +100,13 @@ $ curl -O http://www.cs.wisc.edu/wpis/wpds/wali/WALi-latest.tar.gz
 $ tar zxvf WALi-latest.tar.gz
 \end{verbatim}
 \end{cmdbox}
+\vspace{1em}
 
 \noindent  We will use the name \verb!WALiDir! to denote the top level directory of the
 WALi source tree. It is convention to define an environment variable
 \verb!$WALiDir! that holds this value.
 
+\vspace{1em}
 \noindent
 \begin{cmdbox}
 \begin{verbatim}
@@ -111,6 +114,7 @@ $ cd WALiDir
 $ scons 
 \end{verbatim}
 \end{cmdbox}
+\vspace{1em}
 
 \noindent This will compile and link the WALi library in the directory
 \verb!WALi-1.2/lib!. (For cygwin, a static library is built.) 
