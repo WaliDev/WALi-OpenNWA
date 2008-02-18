@@ -1,4 +1,4 @@
-% $Id: $ %
+% $Id$ %
 \documentclass[english,a4paper,11pt]{article}
 \usepackage{babel}
 \usepackage{amsmath,amssymb,amsthm}
@@ -9,6 +9,17 @@
 \usepackage{url}
 \usepackage{refs}
 \usepackage{color}
+\usepackage{ifpdf}
+
+\ifpdf
+\hypersetup{
+    colorlinks,
+    urlcolor=blue,
+    pdfauthor={Nicholas Kidd}
+}
+\else
+\usepackage{graphicx}
+\fi
 
 \theoremstyle{definition}
 \newtheorem{codelist}{Code Listing}[section]
@@ -49,7 +60,7 @@
 %\title{${\date{\today}}$ WPDS++ User Manual}
 \title{WALi User Manual}
 \date{\today}
-\author{ Nicholas Kidd \\ { \emph{kidd@cs.wisc.edu}} }
+\author{ Nicholas Kidd \\ { \href{mailto:kidd@cs.wisc.edu}{\nolinkurl{kidd@cs.wisc.edu}}} }
 
 \begin{document}
 
