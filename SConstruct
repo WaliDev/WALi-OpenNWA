@@ -4,7 +4,7 @@
 ## ####################################
 ## Third party users of WALi should 
 ## duplicate the setup code below.
-import os,platform,SCons,glob,re
+import os,platform
 
 WaliDir       = os.getcwd()
 LibInstallDir = os.path.join(WaliDir,'lib')
