@@ -40,7 +40,7 @@ namespace wali
             class TransPairCollapse : public wali::wfa::TransFunctor
             {
                 public:
-                    TransPairCollapse( ) { }
+			  TransPairCollapse() { }
                     virtual ~TransPairCollapse() { }
                     virtual void operator()( ::wali::wfa::Trans * orig )
                     {
@@ -76,7 +76,7 @@ namespace wali
 
             EWPDS::~EWPDS()
             {
-                *waliErr << "~EWPDS()" << std::endl;
+			  //*waliErr << "~EWPDS()" << std::endl;
                 pds_states.clear();
                 merge_rule_hash.clear();
             }
@@ -154,7 +154,7 @@ namespace wali
                         merge_rule_hash.insert(KeyTriple(to_state,to_stack1,to_stack2), r);
                     } else {
                         // FIXME: raise exception
-                        *waliErr << "EWPDS: Cannot give two RULE2s with same RHS\n";
+                        //*waliErr << "EWPDS: Cannot give two RULE2s with same RHS\n";
                     }
                 }
                 return rb;
@@ -264,7 +264,7 @@ namespace wali
                 while( WPDS::get_from_worklist( t ) )
                 {
 
-                    t->print( *waliErr << "$$$ Popped t ==> " ) << std::endl;
+				  //t->print( *waliErr << "$$$ Popped t ==> " ) << std::endl;
 
                     // Get config
                     Config * config = t->config;
@@ -281,8 +281,8 @@ namespace wali
                     {
                         rule_t & r = *bwit;
 
-                        *waliErr << "\tCalling prestar_handle_trans  :  ";
-                        r->print( std::cout << "\tr == " ) << std::endl;
+                        //*waliErr << "\tCalling prestar_handle_trans  :  ";
+                        //r->print( std::cout << "\tr == " ) << std::endl;
 
                         prestar_handle_trans( t,fa,r,dnew );
 
@@ -378,6 +378,7 @@ namespace wali
             void EWPDS::poststar( WFA & input, WFA& fa )
             {
                 setupOutput(input,fa);
+				sem_elem_t somewt; // to get a handle on some weight
 
                 // Generate midstates for each rule type two
                 r2hash_t::iterator r2it = WPDS::r2hash.begin();
@@ -393,10 +394,12 @@ namespace wali
                     }
                 }
 
+				bool first = true;
+
                 LinkedTrans * t;
                 while( get_from_worklist( t ) ) {
 
-                    t->print( *waliErr << "$$$ Popped t ==> " ) << std::endl;
+				  //t->print( *waliErr << "$$$ Popped t ==> " ) << std::endl;
 
                     // Get config
                     Config * config = t->config;
@@ -407,6 +410,11 @@ namespace wali
                     sem_elem_t dnew = t->getDelta();
                     t->setDelta( dnew->zero() );
 
+					if(first) {
+					  somewt = SEM_PAIR_COLLAPSE(dnew);
+					  first = false;
+					}
+
                     // For each forward rule of config
                     // Apply rule to create new transition
                     if( WALI_EPSILON != t->stack() )
@@ -414,7 +422,7 @@ namespace wali
                         Config::iterator fwit = config->begin();
                         for( ; fwit != config->end() ; fwit++ ) {
                             rule_t & r = *fwit;
-                            r->print( *waliErr << "\tMatched: " ) << std::endl;
+                            //r->print( *waliErr << "\tMatched: " ) << std::endl;
                             poststar_handle_trans( t,fa,r,dnew );
                         }
                     }
@@ -428,8 +436,8 @@ namespace wali
                             KeySource *ks = getKeySource(t->to());
                             KeyPairSource *kps;
                             sem_elem_t wght;
-                            tprime->print(*waliErr) << "\n";
-                            dnew->print(*waliErr) << "\n";
+                            //tprime->print(*waliErr) << "\n";
+                            //dnew->print(*waliErr) << "\n";
                             if(0 != (kps = dynamic_cast<KeyPairSource *>(ks))) { // apply merge function
                                 // Find the rule first
                                 rule_t r = lookup_rule(kps->get_key_pair().first, kps->get_key_pair().second, tprime->stack());
@@ -453,6 +461,15 @@ namespace wali
                 // convert back from <se,se> to se
                 TransPairCollapse tpc;
                 fa.for_each( tpc );
+
+				// Reset weight on states
+				const std::set<Key> &states = fa.getStates();
+				std::set<Key>::const_iterator sit;
+				for(sit = states.begin(); sit != states.end(); sit++) {
+				  State *s = fa.getState(*sit);
+				  s->weight() = somewt->zero();
+				}
+
                 currentOutputWFA = 0;
             }
 
@@ -492,8 +509,8 @@ namespace wali
                     // Config * for update_prime
                     if( tprime->modified() )
                     {
-                        *waliErr <<
-                            "[EWPDS::poststar] tprime modified...searching for eps trans\n";
+					    //*waliErr <<
+						//      "[EWPDS::poststar] tprime modified...searching for eps trans\n";
 
                         WFA::eps_map_t::iterator epsit = fa.eps_map.find( tprime->to() );
                         if( epsit != fa.eps_map.end() )

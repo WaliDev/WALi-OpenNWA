@@ -20,6 +20,9 @@ namespace wali
                     return (w1->extend(w2)).get_ptr();
                 }
                 else {
+				    // Note: Although extend is associative, do not change the
+				    // order of the following extends. This order is used by
+				    // Moped's WALi extension. 
                     return (w1->extend(sr_data->extend(w2))).get_ptr();
                 }
             }

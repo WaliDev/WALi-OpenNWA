@@ -300,6 +300,14 @@ namespace wali
                 virtual void path_summary( Worklist<State>& wl );
 
                 /*!
+                 * Performs path summary. Simply calls the path_summary with
+                 * the default Worklist provided by WALi.
+				 * Initializes the weight on the final state to wt (can be
+				 * useful for efficiency in some cases)
+                 */
+                virtual void path_summary(sem_elem_t wt);
+
+                /*!
                  * Prunes the WFA. This removes any transitions that are
                  * not in the (getInitialState(),F) chop.
                  */
@@ -346,6 +354,12 @@ namespace wali
                  * @return pointer to real transition
                  */
                 Trans * insert( Trans * tnew );
+
+                /*!
+                 * @brief Returns the set of transitions matching (p,y,?) in tset
+                 *
+				 */
+		        void match( Key p, Key y, TransSet &tset);
 
                 /*! 
                  * Create a State * for the key Key
@@ -396,6 +410,13 @@ namespace wali
                 void setupFixpoint( Worklist<State>& wl, PredHash_t& preds );
 
                 /*!
+                 * setupFixpoint clears each states markable flag and sets
+                 * the states weight to zero, and weight of final states to
+				 * wtFinal (or ONE if NULL)
+                 */
+		        void setupFixpoint( Worklist<State>& wl, PredHash_t& preds, sem_elem_t wtFinal );
+
+                /*!
                  * Erases the specified Trans(from,stack,to) from the
                  * kpmap. A null return value means no transition existed.
                  *
@@ -424,6 +445,14 @@ namespace wali
                  */
                 bool eraseState( State* state );
 
+                /*!
+                 * Performs path summary with the specified Worklist
+				 * Initializes the weight on the final state to wt (can be
+				 * useful for efficiency in some cases)
+                 */
+		        virtual void path_summary( Worklist<State>& wl, sem_elem_t wt );
+
+
             private:
 
                 //
@@ -440,6 +469,7 @@ namespace wali
                 query_t query;           //! < determine the extend order for path_summary
 
             private:
+
         };
 
     } // namespace wfa

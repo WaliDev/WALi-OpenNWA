@@ -520,17 +520,34 @@ namespace wali
             path_summary(wl);
         }
 
+        //
+        // Calls path_summary with default Worklist
+        //
+        void WFA::path_summary(sem_elem_t wt)
+        {
+            DefaultWorklist<State> wl;
+            path_summary(wl, wt);
+        }
+
+        //
+        // Computes path_summary 
+        //
+	    void WFA::path_summary(Worklist<State> &wl)
+        {
+		    sem_elem_t nullwt; // treated as ONE
+            path_summary(wl, nullwt);
+        }
 
         //
         // Computes path_summary
         //
-        void WFA::path_summary( Worklist<State>& wl )
+	    void WFA::path_summary( Worklist<State>& wl, sem_elem_t wt )
         {
             // BEGIN DEBUGGING
             int numPops = 0;
             // END DEBUGGING
             PredHash_t preds;
-            setupFixpoint( wl,preds );
+            setupFixpoint( wl,preds, wt );
             while( !wl.empty() )
             {
                 State* q = wl.get();
@@ -946,6 +963,17 @@ namespace wali
             return told;
         }
 
+	    void WFA::match( Key p, Key y, TransSet &tset) {
+		  KeyPair kp(p,y);
+		  kp_map_t::iterator it = kpmap.find(kp);
+		  if( it != kpmap.end() ) {
+			TransSet::iterator transit;
+			for(transit = it->second.begin(); transit != it->second.end(); transit++) {
+			  tset.insert(*transit);
+			}
+		  }
+		}
+
         //
         // Add a state to the state map
         //
@@ -1020,8 +1048,18 @@ namespace wali
 
         //
         // Place WFA in state ready for fixpoint
+	    // Initialize weight on final states to be st (if it is NULL, then ONE) 
         //
-        void WFA::setupFixpoint( Worklist<State>& wl, PredHash_t& preds )
+	    void WFA::setupFixpoint( Worklist<State>& wl, PredHash_t& preds) {
+		  sem_elem_t nullwt; // treated as ONE
+		  setupFixpoint(wl, preds, nullwt);
+		}
+
+        //
+        // Place WFA in state ready for fixpoint
+	    // Initialize weight on final states to be st (if it is NULL, then ONE) 
+        //
+	    void WFA::setupFixpoint( Worklist<State>& wl, PredHash_t& preds, sem_elem_t wtFinal )
         {
             state_map_t::iterator it = state_map.begin();
             state_map_t::iterator itEND = state_map.end();
@@ -1038,12 +1076,15 @@ namespace wali
                 if( first ) {
                     ONE = st->weight()->one();
                     ZERO = st->weight()->zero();
+					if(wtFinal.get_ptr() == NULL) {
+					  wtFinal = ONE;
+					}
                     first = false;
                 }
                 st->unmark();
                 if( isFinalState( st->name() ) ) {
-                    st->weight() = ONE;
-                    st->delta() = ONE;
+                    st->weight() = wtFinal;
+                    st->delta() = wtFinal;
                     wl.put( st );
                 }
                 else {
