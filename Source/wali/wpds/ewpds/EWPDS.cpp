@@ -40,7 +40,7 @@ namespace wali
             class TransPairCollapse : public wali::wfa::TransFunctor
             {
                 public:
-			  TransPairCollapse() { }
+              TransPairCollapse() { }
                     virtual ~TransPairCollapse() { }
                     virtual void operator()( ::wali::wfa::Trans * orig )
                     {
@@ -76,7 +76,7 @@ namespace wali
 
             EWPDS::~EWPDS()
             {
-			  //*waliErr << "~EWPDS()" << std::endl;
+              //*waliErr << "~EWPDS()" << std::endl;
                 pds_states.clear();
                 merge_rule_hash.clear();
             }
@@ -264,7 +264,7 @@ namespace wali
                 while( WPDS::get_from_worklist( t ) )
                 {
 
-				  //t->print( *waliErr << "$$$ Popped t ==> " ) << std::endl;
+                  //t->print( *waliErr << "$$$ Popped t ==> " ) << std::endl;
 
                     // Get config
                     Config * config = t->config;
@@ -378,7 +378,7 @@ namespace wali
             void EWPDS::poststar( WFA & input, WFA& fa )
             {
                 setupOutput(input,fa);
-				sem_elem_t somewt; // to get a handle on some weight
+                sem_elem_t somewt; // to get a handle on some weight
 
                 // Generate midstates for each rule type two
                 r2hash_t::iterator r2it = WPDS::r2hash.begin();
@@ -394,12 +394,12 @@ namespace wali
                     }
                 }
 
-				bool first = true;
+                bool first = true;
 
                 LinkedTrans * t;
                 while( get_from_worklist( t ) ) {
 
-				  //t->print( *waliErr << "$$$ Popped t ==> " ) << std::endl;
+                  //t->print( *waliErr << "$$$ Popped t ==> " ) << std::endl;
 
                     // Get config
                     Config * config = t->config;
@@ -410,10 +410,10 @@ namespace wali
                     sem_elem_t dnew = t->getDelta();
                     t->setDelta( dnew->zero() );
 
-					if(first) {
-					  somewt = SEM_PAIR_COLLAPSE(dnew);
-					  first = false;
-					}
+                    if(first) {
+                      somewt = SEM_PAIR_COLLAPSE(dnew);
+                      first = false;
+                    }
 
                     // For each forward rule of config
                     // Apply rule to create new transition
@@ -462,13 +462,13 @@ namespace wali
                 TransPairCollapse tpc;
                 fa.for_each( tpc );
 
-				// Reset weight on states
-				const std::set<Key> &states = fa.getStates();
-				std::set<Key>::const_iterator sit;
-				for(sit = states.begin(); sit != states.end(); sit++) {
-				  State *s = fa.getState(*sit);
-				  s->weight() = somewt->zero();
-				}
+                // Reset weight on states
+                const std::set<Key> &states = fa.getStates();
+                std::set<Key>::const_iterator sit;
+                for(sit = states.begin(); sit != states.end(); sit++) {
+                  State *s = fa.getState(*sit);
+                  s->weight() = somewt->zero();
+                }
 
                 currentOutputWFA = 0;
             }
@@ -509,8 +509,8 @@ namespace wali
                     // Config * for update_prime
                     if( tprime->modified() )
                     {
-					    //*waliErr <<
-						//      "[EWPDS::poststar] tprime modified...searching for eps trans\n";
+                        //*waliErr <<
+                        //      "[EWPDS::poststar] tprime modified...searching for eps trans\n";
 
                         WFA::eps_map_t::iterator epsit = fa.eps_map.find( tprime->to() );
                         if( epsit != fa.eps_map.end() )

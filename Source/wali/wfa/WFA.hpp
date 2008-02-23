@@ -302,8 +302,8 @@ namespace wali
                 /*!
                  * Performs path summary. Simply calls the path_summary with
                  * the default Worklist provided by WALi.
-				 * Initializes the weight on the final state to wt (can be
-				 * useful for efficiency in some cases)
+                 * Initializes the weight on the final state to wt (can be
+                 * useful for efficiency in some cases)
                  */
                 virtual void path_summary(sem_elem_t wt);
 
@@ -356,10 +356,12 @@ namespace wali
                 Trans * insert( Trans * tnew );
 
                 /*!
-                 * @brief Returns the set of transitions matching (p,y,?) in tset
+                 * @brief Returns a TransSet containing all 
+                 * transitions matching (p,y,?) in the WFA
                  *
-				 */
-		        void match( Key p, Key y, TransSet &tset);
+                 * @see TransSet
+                 */
+                TransSet match( Key p, Key y);
 
                 /*! 
                  * Create a State * for the key Key
@@ -412,9 +414,9 @@ namespace wali
                 /*!
                  * setupFixpoint clears each states markable flag and sets
                  * the states weight to zero, and weight of final states to
-				 * wtFinal (or ONE if NULL)
+                 * wtFinal (or ONE if NULL)
                  */
-		        void setupFixpoint( Worklist<State>& wl, PredHash_t& preds, sem_elem_t wtFinal );
+                void setupFixpoint( Worklist<State>& wl, PredHash_t& preds, sem_elem_t wtFinal );
 
                 /*!
                  * Erases the specified Trans(from,stack,to) from the
@@ -447,10 +449,10 @@ namespace wali
 
                 /*!
                  * Performs path summary with the specified Worklist
-				 * Initializes the weight on the final state to wt (can be
-				 * useful for efficiency in some cases)
+                 * Initializes the weight on the final state to wt (can be
+                 * useful for efficiency in some cases)
                  */
-		        virtual void path_summary( Worklist<State>& wl, sem_elem_t wt );
+                virtual void path_summary( Worklist<State>& wl, sem_elem_t wt );
 
 
             private:

@@ -25,7 +25,9 @@ def xerces_setup(name):
     myrm('xerces-c')
 
 def get_xerces_win(bits):
-    name = xerces_win32 if bits == '32bit' else xerces_win64
+    name =  xerces_win32 
+    if (bits == '32bit'): 
+    	name = xerces_win64
     xerces_setup(name)
     target = name+'.zip'
     os.system('curl -O %s%s' % (xerces_mirror,target))
