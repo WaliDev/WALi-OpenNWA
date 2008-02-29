@@ -16,15 +16,20 @@ namespace wali
             {
                 assert(w1 != NULL && w2 != NULL);
 
-                if(sr_data.is_empty()) {
-                    return (w1->extend(w2)).get_ptr();
+                w1->count++; w2->count++;
+                SemElem *ret;
+                {
+                  sem_elem_t w1r(w1);
+                  sem_elem_t w2r(w2);
+
+                  sem_elem_t retr = apply_f(w1r,w2r);
+
+                  ret = retr.get_ptr();
+                  ret->count++;
                 }
-                else {
-				    // Note: Although extend is associative, do not change the
-				    // order of the following extends. This order is used by
-				    // Moped's WALi extension. 
-                    return (w1->extend(sr_data->extend(w2))).get_ptr();
-                }
+                w1->count--; w2->count--;
+                ret->count--;
+                return ret;
             }
 
             sem_elem_t MergeFn::apply_f(sem_elem_t w1, sem_elem_t w2)
@@ -35,7 +40,17 @@ namespace wali
                     return w1->extend(w2);
                 }
                 else {
-                    return w1->extend(sr_data->extend(w2));
+                  // Note: Although extend is associative, do not change the
+                  // order of the following extends. This order is used by
+                  // Moped's WALi extension. 
+                  sem_elem_t ret = (w1->extend(sr_data->extend(w2)));
+
+                  // w1->print(std::cout << "w1 = ") << "\n";
+                  // sr_data->print(std::cout << "sr_data = ") << "\n";
+                  // w2->print(std::cout << "w2 = ") << "\n";
+                  // ret->print(std::cout << "ret = ") << "\n";
+
+                  return ret.get_ptr();
                 }
             }
 

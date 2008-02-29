@@ -246,6 +246,16 @@ namespace wali
                 /*!
                  * @brief helper method for prestar
                  */
+                virtual void prestar_handle_call(
+                        wfa::Trans * t1 ,
+                        wfa::Trans * t2,
+                        rule_t & r,
+                        sem_elem_t delta
+                        );
+
+                /*!
+                 * @brief helper method for prestar
+                 */
                 virtual void prestar_handle_trans(
                         LinkedTrans * t,
                         ::wali::wfa::WFA & ca  ,
@@ -266,6 +276,15 @@ namespace wali
                  * @brief Performs post for 1 Trans
                  */
                 virtual void post( LinkedTrans * t, ::wali::wfa::WFA& fa );
+
+                /*!
+                 * @brief helper method for poststar
+                 */
+                virtual void poststar_handle_eps_trans(
+                        wfa::Trans *teps, 
+                        wfa::Trans *tprime, 
+                        sem_elem_t delta
+                        );
 
                 /*!
                  * @brief helper method for poststar

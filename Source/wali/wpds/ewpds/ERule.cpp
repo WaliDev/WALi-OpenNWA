@@ -22,15 +22,25 @@ namespace wali
                     if(mf_.get_ptr() == NULL) {
                         mf = new MergeFn(se_);
                     }
-                    extended_se = (SemElem *)(new SemElemPair(se->one(), se));
+                    //extended_se = (SemElem *)(new SemElemPair(se->one(), se));
                 } else {
-                    extended_se = (SemElem *)(new SemElemPair(se, se->one()));
+                    //extended_se = (SemElem *)(new SemElemPair(se, se->one()));
                 }
             }
 
             ERule::~ERule()
             {
 
+            }
+
+            sem_elem_t ERule::extended_weight() const {
+              sem_elem_t ret;
+              if(Rule::to_stack2() == WALI_EPSILON) {
+                ret = (SemElem *)(new SemElemPair(Rule::weight(), Rule::weight()->one()));
+              } else {
+                ret = (SemElem *)(new SemElemPair(Rule::weight()->one(), Rule::weight()));
+              }
+              return ret;
             }
 
             std::ostream & ERule::print( std::ostream &o ) const

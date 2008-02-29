@@ -70,13 +70,13 @@ namespace wali
 
             typedef ref_ptr<ERule> erule_t;
 
-            EWPDS::EWPDS( Wrapper * wrapper, Worklist<wfa::Trans> * wl) : WPDS(wrapper, wl)
+          EWPDS::EWPDS( Wrapper * wrapper, Worklist<wfa::Trans> * wl) : WPDS(wrapper, wl), usePairsDuringCopy(false)
             { }
 
 
             EWPDS::~EWPDS()
             {
-              //*waliErr << "~EWPDS()" << std::endl;
+                //*waliErr << "~EWPDS()" << std::endl;
                 pds_states.clear();
                 merge_rule_hash.clear();
             }
@@ -130,15 +130,15 @@ namespace wali
                 pds_states.insert(from_state);
                 pds_states.insert(to_state);
 
-                if( to_stack1 == WALI_EPSILON )
+                rule_t r = new ERule(from,to,to_stack2,se,mf);
+                // Rule::gen_rule will create links b/w Configs and the Rule
+                bool rb = make_rule(from,to,to_stack2,se,r);
+
+                if( !rb && to_stack1 == WALI_EPSILON )
                 {
                     assert( to_stack2 == WALI_EPSILON );
                     rule_zeroes.insert( to );
                 }
-                rule_t r;
-
-                // Rule::gen_rule will create links b/w Configs and the Rule
-                bool rb = make_rule(from,to,to_stack2,se,mf,r);
 
                 // if rb is false then the rule is new
                 if( to_stack2 != WALI_EPSILON && !rb ) {
@@ -154,60 +154,8 @@ namespace wali
                         merge_rule_hash.insert(KeyTriple(to_state,to_stack1,to_stack2), r);
                     } else {
                         // FIXME: raise exception
-                        //*waliErr << "EWPDS: Cannot give two RULE2s with same RHS\n";
+                        *waliErr << "EWPDS: Cannot give two RULE2s with same RHS\n";
                     }
-                }
-                return rb;
-            }
-
-            bool EWPDS::make_rule(
-                    Config * f,
-                    Config * t,
-                    Key stk2,
-                    sem_elem_t se,
-                    merge_fn_t mf,
-                    rule_t & r )
-            {
-                bool rb = false;
-                Config::iterator it = f->begin();
-                for( ; it != f->end(); it++ ) {
-                    rule_t &tmp = *it;
-                    if( tmp->from() == f && tmp->to() == t && tmp->to_stack2() == stk2 ) {
-                        rb = true;
-                        if( wrapper ) {
-                            // FIXME: Should we combine user weights at bottom
-                            // of stack?
-                            sem_elem_t combinedWeight = se->combine(wrapper->unwrap(tmp->weight()));
-                            tmp->se = combinedWeight;
-                            tmp->weight( wrapper->wrap(*tmp) );
-                            //rule_t wrapTmp =  new ERule(f,t,stk2,se,mf);
-                            //tmp->se = tmp->se->combine(wrapper->wrap(*wrapTmp));
-                        }
-                        else {
-                            tmp->weight(tmp->weight()->combine(se));
-                        }
-                        r = tmp;
-                        break;
-                    }
-                }
-                if( !rb ) {
-                    ERule *er = new ERule(f,t,stk2,se,mf);
-                    r = er;
-                    if( wrapper ) {
-                        sem_elem_t wrapped = wrapper->wrap(*r);
-                        r->weight( wrapped );
-                        sem_elem_t npair;
-                        // NAK: Duplicated from ERule.cpp constructor
-                        if( stk2 == WALI_EPSILON ) {
-                            npair = new SemElemPair(wrapped, wrapped->one());
-                        }
-                        else {
-                            npair = new SemElemPair(wrapped->one(), wrapped);
-                        }
-                        er->extended_se = npair;
-                    }
-                    f->insert(r);
-                    t->rinsert(r);
                 }
                 return rb;
             }
@@ -226,113 +174,36 @@ namespace wali
                 return rhash_it->second;
             }
 
-            WFA EWPDS::prestar( WFA & input )
+            void EWPDS::prestar_handle_call(
+                    Trans *t1,
+                    Trans *t2,
+                    rule_t &r,
+                    sem_elem_t delta
+                    )
             {
-                WFA fa;
-                currentOutputWFA = &fa;
-                input.for_each(*this);
+                //std::cout << "Prestar_handle_call:\n";
+                //t1->print(std::cout << "t1: ") << "\n";
+                //t2->print(std::cout << "t2: ") << "\n";
+                //r->print(std::cout << "r: ") << "\n";
 
-                //
-                // do rules 0
-                // rule_zeroes contains Configs of (p,WALI_EPSILON)
-                //
-                for( std::set< Config * >::iterator it = WPDS::rule_zeroes.begin();
-                        it != WPDS::rule_zeroes.end();
-                        it++ )
-                {
-                    Config *cloc = *it;
-
-                    // For each rule that connects a Config * to the one
-                    // from the outer loop
-                    Config::reverse_iterator rit = cloc->rbegin();
-                    for( ; rit != cloc->rend(); rit++ )
-                    {
-                        rule_t r = *rit;
-
-                        // add transition for rule
-                        update( r->from_state()
-                                , r->from_stack()
-                                , r->to_state()
-                                , r->weight()
-                                , r->from()
-                              );
-                    }
+                if(!is_pds_state(t2->from())) {
+                  // f(r) * t1
+                  sem_elem_t wrtp = r->weight()->extend( t1->weight() );
+                  
+                  // f(r) * t2 * delta
+                  sem_elem_t wnew = wrtp->extend( delta );
+                  
+                  // update
+                  update( r->from()->state(), r->from()->stack(), t2->to(),
+                          wnew,r->from() );
+                } else { // apply merge function
+                  erule_t er = (ERule *)(r.get_ptr());
+                  sem_elem_t w1 = er->merge_fn()->apply_f( t1->weight()->one(), t1->weight());
+                  sem_elem_t wnew = w1->extend(delta);
+                  // update
+                  update( r->from()->state(), r->from()->stack(), t2->to(),
+                          wnew,r->from() );
                 }
-
-                LinkedTrans * t;
-
-                while( WPDS::get_from_worklist( t ) )
-                {
-
-                  //t->print( *waliErr << "$$$ Popped t ==> " ) << std::endl;
-
-                    // Get config
-                    Config * config = t->config;
-
-                    // TODO : make debug stmt
-                    assert( config );
-
-                    sem_elem_t dnew = t->getDelta();
-                    t->setDelta( dnew->zero() );
-
-                    // For each backward rule of config
-                    Config::reverse_iterator bwit = config->rbegin();
-                    for( ; bwit != config->rend() ; bwit++ )
-                    {
-                        rule_t & r = *bwit;
-
-                        //*waliErr << "\tCalling prestar_handle_trans  :  ";
-                        //r->print( std::cout << "\tr == " ) << std::endl;
-
-                        prestar_handle_trans( t,fa,r,dnew );
-
-                    }
-
-                    // check matching rule 2s 
-                    r2hash_t::iterator r2it = WPDS::r2hash.find( t->stack() );
-
-                    // does a rule 2 exist with matching second symbol on rhs
-                    if( r2it != WPDS::r2hash.end() )
-                    {
-                        // get reference
-                        std::list< rule_t > & ls = r2it->second;
-                        std::list< rule_t >::iterator lsit;
-
-                        // loop through list
-                        for( lsit = ls.begin() ; lsit != ls.end() ; lsit++ )
-                        {
-                            rule_t & r = *lsit;
-
-                            //Trans * tp = fa.lookup( r->to_state(),r->to_stack1(),t->from() );
-                            Trans tp;
-                            if( fa.find(r->to_state(),r->to_stack1(),t->from(),tp) )
-                            {
-
-                                if(!is_pds_state(t->from())) {
-                                    // f(r) * t'
-                                    sem_elem_t wrtp = r->weight()->extend( tp.weight() );
-
-                                    // f(r) * t' * delta
-                                    sem_elem_t wnew = wrtp->extend( dnew );
-
-                                    // update
-                                    update( r->from()->state(), r->from()->stack(), t->to(),
-                                            wnew,r->from() );
-                                } else { // apply merge function
-                                    erule_t er = (ERule *)(r.get_ptr());
-                                    sem_elem_t w1 = er->merge_fn()->apply_f( tp.weight()->one(), tp.weight());
-                                    sem_elem_t wnew = w1->extend(dnew);
-                                    // update
-                                    update( r->from()->state(), r->from()->stack(), t->to(),
-                                            wnew,r->from() );
-                                }
-                            }
-                        }
-                    }
-                }
-
-                currentOutputWFA = 0;
-                return fa;
             }
 
             void EWPDS::prestar_handle_trans(
@@ -342,6 +213,9 @@ namespace wali
                     sem_elem_t delta
                     )
             {
+                //std::cout << "Prestar_handle_trans:\n";
+                //t->print(std::cout << "t: ") << "\n";
+                //r->print(std::cout << "r: ") << "\n";
 
                 sem_elem_t wrule_trans;
                 if(r->stack2() == WALI_EPSILON || !is_pds_state(t->to())) {
@@ -359,7 +233,7 @@ namespace wali
                     WFA::kp_map_t::iterator kpitEND = fa.kpmap.end();
                     TransSet::iterator tsit;
 
-                    for( ; kpit != kpitEND ; kpit++ )
+                    if(kpit != kpitEND)
                     {
                         TransSet & transSet = kpit->second;
                         for( tsit = transSet.begin(); tsit != transSet.end(); tsit++ )
@@ -377,100 +251,47 @@ namespace wali
 
             void EWPDS::poststar( WFA & input, WFA& fa )
             {
-                setupOutput(input,fa);
-                sem_elem_t somewt; // to get a handle on some weight
+                usePairsDuringCopy = true;
 
-                // Generate midstates for each rule type two
-                r2hash_t::iterator r2it = WPDS::r2hash.begin();
-                for( ; r2it != r2hash.end() ; r2it++ )
-                {
-                    std::list< rule_t > & ls = r2it->second;
-                    std::list< rule_t >::iterator rlsit = ls.begin();
-                    for( ; rlsit != ls.end() ; rlsit++ )
-                    {
-                        erule_t r = (ERule *)((*rlsit).get_ptr());
-                        Key gstate = WPDS::gen_state( r->to_state(),r->to_stack1() );
-                        fa.addState( gstate,r->extended_weight()->zero() );
-                    }
-                }
+                poststarSetupFixpoint(input, fa);
+                poststarComputeFixpoint(fa);
 
-                bool first = true;
-
-                LinkedTrans * t;
-                while( get_from_worklist( t ) ) {
-
-                  //t->print( *waliErr << "$$$ Popped t ==> " ) << std::endl;
-
-                    // Get config
-                    Config * config = t->config;
-
-                    // TODO : make debug stmt
-                    assert( config );
-
-                    sem_elem_t dnew = t->getDelta();
-                    t->setDelta( dnew->zero() );
-
-                    if(first) {
-                      somewt = SEM_PAIR_COLLAPSE(dnew);
-                      first = false;
-                    }
-
-                    // For each forward rule of config
-                    // Apply rule to create new transition
-                    if( WALI_EPSILON != t->stack() )
-                    {
-                        Config::iterator fwit = config->begin();
-                        for( ; fwit != config->end() ; fwit++ ) {
-                            rule_t & r = *fwit;
-                            //r->print( *waliErr << "\tMatched: " ) << std::endl;
-                            poststar_handle_trans( t,fa,r,dnew );
-                        }
-                    }
-                    else {
-                        // (p,eps,q) + (q,y,q') => (p,y,q')
-                        State * state = fa.getState( t->to() );
-                        State::iterator it = state->begin();
-                        for(  ; it != state->end() ; it++ )
-                        {
-                            Trans * tprime = *it;
-                            KeySource *ks = getKeySource(t->to());
-                            KeyPairSource *kps;
-                            sem_elem_t wght;
-                            //tprime->print(*waliErr) << "\n";
-                            //dnew->print(*waliErr) << "\n";
-                            if(0 != (kps = dynamic_cast<KeyPairSource *>(ks))) { // apply merge function
-                                // Find the rule first
-                                rule_t r = lookup_rule(kps->get_key_pair().first, kps->get_key_pair().second, tprime->stack());
-                                assert(r.get_ptr() != NULL);
-                                erule_t er = (ERule *)(r.get_ptr());
-                                sem_elem_t w = er->merge_fn()->apply_f(SEM_PAIR_GET_FIRST(tprime->weight()), SEM_PAIR_GET_FIRST(dnew));
-                                wght = new SemElemPair(w, w->one());
-                            } else {
-                                wght = tprime->weight()->extend( dnew );
-                            }
-                            Config * config = make_config( t->from(),tprime->stack() );
-                            update( t->from()
-                                    , tprime->stack()
-                                    , tprime->to()
-                                    , wght
-                                    , config
-                                  );
-                        }
-                    }
-                }
                 // convert back from <se,se> to se
                 TransPairCollapse tpc;
                 fa.for_each( tpc );
 
-                // Reset weight on states
-                const std::set<Key> &states = fa.getStates();
-                std::set<Key>::const_iterator sit;
-                for(sit = states.begin(); sit != states.end(); sit++) {
-                  State *s = fa.getState(*sit);
-                  s->weight() = somewt->zero();
-                }
-
                 currentOutputWFA = 0;
+                usePairsDuringCopy = false;
+            }
+
+            void EWPDS::poststar_handle_eps_trans(Trans *teps, 
+                                                  Trans *tprime, 
+                                                  sem_elem_t delta)
+            {
+                KeySource *ks = getKeySource(teps->to());
+                KeyPairSource *kps;
+                sem_elem_t wght;
+                
+                // tprime->print(std::cout) << "\n";
+                // delta->print(std::cout) << "\n";
+
+                if(0 != (kps = dynamic_cast<KeyPairSource *>(ks))) { // apply merge function
+                  // Find the rule first
+                  rule_t r = lookup_rule(kps->get_key_pair().first, kps->get_key_pair().second, tprime->stack());
+                  assert(r.get_ptr() != NULL);
+                  erule_t er = (ERule *)(r.get_ptr());
+                  sem_elem_t w = er->merge_fn()->apply_f(SEM_PAIR_GET_FIRST(tprime->weight()), SEM_PAIR_GET_FIRST(delta));
+                  wght = new SemElemPair(w, w->one());
+                } else {
+                  wght = tprime->weight()->extend( delta );
+                }
+                Config * config = make_config( teps->from(),tprime->stack() );
+                update( teps->from()
+                        , tprime->stack()
+                        , tprime->to()
+                        , wght
+                        , config
+                        );
             }
 
             void EWPDS::poststar_handle_trans(
@@ -493,26 +314,37 @@ namespace wali
 
                     // Is a rule 2 so we must generate a state
                     // and create 2 new transitions
-                    // TODO: implement gen_state
                     Key gstate = gen_state( rtstate,rtstack );
 
                     Trans * tprime = update_prime( gstate, r->to_stack2(), t->to(), wrule_trans  );
 
+                    // Setup the weight for taking quasione
+                    // TODO: This does not use the diff operator because for pair we would
+                    // need it to be (delta,second) + (first,delta). Otherwise taking
+                    // an extend of the components doesn't work out
+                    sem_elem_t called_weight = SEM_PAIR_COLLAPSE(tprime->weight());
+
+                    //called_weight->print(std::cout << "called_weight = ") << "\n";
+
+                    // Take quasione
                     State * state = fa.getState( gstate );
-                    sem_elem_t quasi = state->quasi->combine( wrule_trans );
+                    // This combine operation is redundant because called_weight is
+                    // computed on the transition weight, not its delta
+                    sem_elem_t quasi = state->quasi->combine( called_weight );
                     state->quasi = quasi;
 
-                    update( rtstate, rtstack, gstate, quasi->quasi_one(), r->to() );
+                    sem_elem_t quasi_extended = new SemElemPair(quasi->quasi_one(), quasi->one());
+                    update( rtstate, rtstack, gstate, quasi_extended, r->to() );
 
                     // Trans with generated from states do not go on the worklist
                     // and there is no Config matching them so pass 0 (NULL) as the
                     // Config * for update_prime
                     if( tprime->modified() )
                     {
-                        //*waliErr <<
-                        //      "[EWPDS::poststar] tprime modified...searching for eps trans\n";
+                      //std::cout <<
+                      // "[EWPDS::poststar] tprime modified...searching for eps trans\n";
 
-                        WFA::eps_map_t::iterator epsit = fa.eps_map.find( tprime->to() );
+                        WFA::eps_map_t::iterator epsit = fa.eps_map.find( tprime->from() );
                         if( epsit != fa.eps_map.end() )
                         {
                             // tprime stack key
@@ -574,11 +406,20 @@ namespace wali
                 else {
                     se = orig->weight();
                 }
-                LinkedTrans *t = new LinkedTrans( orig->from()
+                LinkedTrans *t;
+                if(usePairsDuringCopy) {
+                  t = new LinkedTrans( orig->from()
                         ,orig->stack()
                         ,orig->to()
                         , new SemElemPair(se,se->one())
                         ,c);
+                } else {
+                  t = new LinkedTrans( orig->from()
+                        ,orig->stack()
+                        ,orig->to()
+                        ,se
+                        ,c);
+                }
 
                 // fa.addTrans takes ownership of passed in pointer
                 currentOutputWFA->addTrans( t );

@@ -216,6 +216,8 @@ namespace wali
 
         void WPDS::pre( LinkedTrans* t, WFA& fa )
         {
+            //t->print(std::cout << "Popped: ") << "\n";
+
             // Get config
             Config * config = t->config;
 
@@ -254,24 +256,34 @@ namespace wali
                     Trans tp;
                     if( fa.find(r->to_state(),r->to_stack1(),t->from(),tp) )
                     {
-                        // f(r) * t'
-                        sem_elem_t wrtp = r->weight()->extend( tp.weight() );
-
-                        // f(r) * t' * delta
-                        sem_elem_t wnew = wrtp->extend( dnew );
-
-                        // update
-                        update( r->from()->state()
-                                , r->from()->stack()
-                                , t->to()
-                                , wnew
-                                , r->from()
-                              );
-
+                        prestar_handle_call(&tp, t, r, dnew);
                     }
                 }
             }
         }
+
+        void WPDS::prestar_handle_call(
+                Trans * t1 ,
+                Trans * t2,
+                rule_t  &r,
+                sem_elem_t delta
+                )
+        {
+            // f(r) * t1
+            sem_elem_t wrtp = r->weight()->extend( t1->weight() );
+            
+            // f(r) * t2 * delta
+            sem_elem_t wnew = wrtp->extend( delta );
+
+            // update
+            update( r->from()->state()
+                    , r->from()->stack()
+                    , t2->to()
+                    , wnew
+                    , r->from()
+                    );
+        }
+
 
         void WPDS::prestar_handle_trans(
                 LinkedTrans * t ,
@@ -401,16 +413,21 @@ namespace wali
                 for(  ; it != state->end() ; it++ )
                 {
                     Trans * tprime = *it;
-                    sem_elem_t wght = tprime->weight()->extend( dnew );
-                    Config * config = make_config( t->from(),tprime->stack() );
-                    update( t->from()
-                            , tprime->stack()
-                            , tprime->to()
-                            , wght
-                            , config
-                          );
+                    poststar_handle_eps_trans(t, tprime, dnew);
                 }
             }
+        }
+
+        void WPDS::poststar_handle_eps_trans(Trans *teps, Trans *tprime, sem_elem_t delta)
+        {
+            sem_elem_t wght = tprime->weight()->extend( delta );
+            Config * config = make_config( teps->from(),tprime->stack() );
+            update( teps->from()
+                    , tprime->stack()
+                    , tprime->to()
+                    , wght
+                    , config
+                    );
         }
 
         void WPDS::poststar_handle_trans(
@@ -545,6 +562,7 @@ namespace wali
             Config *to = make_config(to_state,to_stack1);
 
             // make_rule will create links b/w Configs and the Rule
+            r = new Rule(from, to, to_stack2, se);
             bool rb = make_rule(from,to,to_stack2,se,r);
 
             // if rb is false then the rule is new
@@ -587,7 +605,8 @@ namespace wali
 
         /*!
          * Creates a rule that links two configurations.
-         * If rule exists then combines the weight
+         * If rule exists then combines the weight and drops
+         * the rule passed in.
          *
          * @return true if Rule already existed
          *
@@ -629,7 +648,6 @@ namespace wali
                 }
             }
             if( !rb ) {
-                r =  new Rule(f,t,stk2,se);
                 if( wrapper ) {
                     r->weight( wrapper->wrap(*r) );
                 }
@@ -683,6 +701,7 @@ namespace wali
             LinkedTrans * lt = new LinkedTrans(from,stack,to,se,cfg);
             Trans *t = currentOutputWFA->insert(lt);
             if( t->modified() ) {
+                //t->print(std::cout << "Adding transition: ") << "\n";
                 worklist->put( t );
             }
         }

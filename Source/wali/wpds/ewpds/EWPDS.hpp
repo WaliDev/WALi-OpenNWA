@@ -110,14 +110,9 @@ namespace wali
                             merge_fn_t mf);
 
 
-                    /*!
-                     * @brief Perform prestar reachability query
-                     *
-                     * @return WFA
-                     *
-                     * @see WFA
-                     */
-                    virtual WFA prestar( WFA & input );
+                    // Both these versions are provided for EWPDS via WPDS
+                    // void prestar( WFA & input, WFA & output );
+                    // void prestar( WFA & input);
 
                     /*!
                      * @brief Perform poststar reachability query
@@ -162,11 +157,29 @@ namespace wali
                     /*!
                      * @brief helper method for prestar
                      */
+                    void prestar_handle_call(
+                            wfa::Trans *t1,
+                            wfa::Trans *t2,
+                            rule_t &r,
+                            sem_elem_t delta
+                            );
+
+                    /*!
+                     * @brief helper method for prestar
+                     */
                     void prestar_handle_trans(
                             LinkedTrans * t,
                             WFA & ca  ,
                             rule_t & r,
                             sem_elem_t delta );
+
+                    /*!
+                     * @brief helper method for poststar
+                     */
+                    void poststar_handle_eps_trans(
+                            wfa::Trans *teps, 
+                            wfa::Trans *tprime,
+                            sem_elem_t delta);
 
                     /*!
                      * @brief helper method for poststar
@@ -180,17 +193,10 @@ namespace wali
 
                     //void copy_and_link_and_pair( const WFA & in, WFA & dest );
 
-                    virtual bool make_rule(
-                            Config * f,
-                            Config * t,
-                            wali::Key stk2,
-                            sem_elem_t se,
-                            merge_fn_t mf,
-                            rule_t & r );
-
                 private:
                     std::set<wali::Key> pds_states; // set of PDS states
                     merge_rule_hash_t merge_rule_hash; // FIXME: verify correct usage of HashMap
+                    bool usePairsDuringCopy;
 
             }; // class EWPDS
 

@@ -49,8 +49,8 @@ namespace wali
                      */
                     merge_fn_t merge_fn() const { return mf; }
 
-                    /*! @return const reference to this's Weight */
-                    const sem_elem_t extended_weight() const { return extended_se; }
+                    /*! @return reference to the extended Weight */
+                    sem_elem_t extended_weight() const;
 
                     /*!
                      *
@@ -71,7 +71,9 @@ namespace wali
 
                 private:
                     merge_fn_t mf;
-                    sem_elem_t extended_se;
+                    // AL: Removing extended_se from the class. The underlying rule weight is
+                    // sufficient, and we don't want to maintain redundant information
+                    //sem_elem_t extended_se;
 
             }; // class ERule
 
