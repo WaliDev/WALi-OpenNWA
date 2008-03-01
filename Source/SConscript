@@ -24,9 +24,16 @@ if Debug:
 wali_files = Split("""
 ./wali/StringSource.cpp
 ./wali/Common.cpp
-./wali/util/StringUtils.cpp
-./wali/util/ParseArgv.cpp
-./wali/util/Timer.cpp
+./wali/SemElemPair.cpp
+./wali/KeySpace.cpp
+./wali/TotalOrderWorklist.cpp
+./wali/SemElem.cpp
+./wali/PriorityWorklist.cpp
+./wali/Exception.cpp
+./wali/Printable.cpp
+./wali/Key.cpp
+./wali/IntSource.cpp
+./wali/Markable.cpp
 ./wali/WeightFactory.cpp
 ./wali/KeyPairSource.cpp
 ./wali/wpds/RuleFunctor.cpp
@@ -40,19 +47,12 @@ wali_files = Split("""
 ./wali/wpds/Wrapper.cpp
 ./wali/wpds/DebugWPDS.cpp
 ./wali/wpds/WPDS.cpp
-./wali/SemElemPair.cpp
-./wali/KeySpace.cpp
-./wali/TotalOrderWorklist.cpp
-./wali/SemElem.cpp
-./wali/PriorityWorklist.cpp
-./wali/Exception.cpp
 ./wali/wfa/State.cpp
 ./wali/wfa/WFA.cpp
 ./wali/wfa/Trans.cpp
 ./wali/wfa/WeightMaker.cpp
 ./wali/wfa/TransFunctor.cpp
 ./wali/wfa/TransSet.cpp
-./wali/Printable.cpp
 ./wali/witness/WitnessExtend.cpp
 ./wali/witness/WitnessWrapper.cpp
 ./wali/witness/WitnessRule.cpp
@@ -64,15 +64,20 @@ wali_files = Split("""
 ./wali/witness/Witness.cpp
 ./wali/witness/WitnessCombine.cpp
 ./wali/witness/WitnessMerge.cpp
-./wali/Key.cpp
-./wali/IntSource.cpp
-./wali/Markable.cpp
 ./wali/graph/RegExp.cpp
 ./wali/graph/SummaryGraph.cpp
 ./wali/graph/Graph.cpp
 ./wali/graph/InterGraph.cpp
 ./wali/graph/LinkEval.cpp
 ./wali/graph/IntraGraph.cpp
+./wali/regex/Concat.cpp
+./wali/regex/Regex.cpp
+./wali/regex/Root.cpp
+./wali/regex/Star.cpp
+./wali/regex/Union.cpp
+./wali/util/StringUtils.cpp
+./wali/util/ParseArgv.cpp
+./wali/util/Timer.cpp
 """)
 
 env = BaseEnv.Clone()
