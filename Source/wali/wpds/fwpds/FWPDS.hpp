@@ -3,6 +3,9 @@
 
 /*!
  * @author Nick Kidd
+ * @author Akash Lal
+ *
+ * $Id$
  */
 
 #include "wali/Common.hpp"
@@ -29,10 +32,19 @@ namespace wali {
 
         namespace fwpds {
 
+
             class FWPDS : public WPDS {
                 public:
                     typedef ewpds::merge_fn_t mfun_t;
-                    typedef HashMap< KeyTriple, mfun_t > merge_rule_hash_t;
+                    struct TaggedMergeFn : public Countable {
+                        mfun_t mf;
+                        Key state; //<! From state of rule mfun associates to
+                        Key stack; //<! From stack of rule mfun associates to
+                        TaggedMergeFn(mfun_t a,Key b, Key c) 
+                            : mf(a),state(b),stack(c) {}
+                    };
+
+                    typedef HashMap< KeyTriple, TaggedMergeFn > merge_rule_hash_t;
 
                 public:
                     FWPDS();

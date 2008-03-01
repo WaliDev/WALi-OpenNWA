@@ -1,5 +1,8 @@
 /*!
  * @author Nick Kidd
+ * @author Akash Lal
+ *
+ * $Id$
  */
 
 #include "wali/Worklist.hpp"
@@ -22,7 +25,6 @@
 
 #include "wali/wpds/fwpds/FWPDS.hpp"
 
-//#include "wali/wpds/fwpds/InterGraph.hpp"
 #include "wali/graph/InterGraph.hpp"
 
 using namespace wali;
@@ -91,7 +93,6 @@ bool FWPDS::add_rule(
 {
     if( mf.is_valid() ) {
         is_ewpds = true;
-        // TODO: use the Wrapper to create a WitnessMerge
     }
 
     pds_states.insert(from_state);
@@ -110,12 +111,14 @@ bool FWPDS::add_rule(
                 mf = wrapper->wrap(mf);
             }
             KeyTriple trip(to_state,to_stack1,to_stack2);
+            // Tag the mfun_t
+            TaggedMergeFn tmf(mf,from_state,from_stack);
             merge_rule_hash_t::iterator it = merge_rule_hash.find(trip);
             if( it == merge_rule_hash.end() ) {
-                merge_rule_hash.insert(trip,mf);
+                merge_rule_hash.insert(trip,tmf);
             }
             else {
-                if( mf.is_valid() && it->second.is_valid() ) {
+                if( mf.is_valid() && it->second.mf.is_valid() ) {
                     // TODO : Fixme
                     *waliErr << "[ERROR] Cannot give two 'push rules' with same RHS.\n";
                     *waliErr << "  (" << key2str(to_state) << " , " << key2str(to_stack1);
@@ -129,6 +132,7 @@ bool FWPDS::add_rule(
         // TODO : Fixme
         if( mf.is_valid() ) {
             *waliErr << "[ERROR] Attempt to add re-add rule with a valid merge function\n";
+            assert(0);
         }
     }
     return exists;
@@ -257,7 +261,7 @@ FWPDS::lookup_merge( wali::KeyTriple trip ) const
     merge_rule_hash_t::const_iterator it = merge_rule_hash.find(trip);
     mfun_t mf(0);
     if( it != merge_rule_hash.end() )
-        mf = it->second;
+        mf = it->second.mf;
     return mf;
 }
 
@@ -563,7 +567,13 @@ FWPDS::post(wali::wpds::LinkedTrans* t, wali::wfa::WFA& fa, wali::graph::InterGr
                             //sem_elem_t epsW = tprime->getDelta()->extend( teps->weight() );
                             update(teps->from(),tpstk, tpto, /*epsW*/wghtOne, config );
                             if( mf.is_valid() ) 
-                                gr.addEdge(Transition(*tprime),
+                                gr.addEdge(
+                                        //Transition(*tprime),
+                                        // Akash : 
+                                        //    Please verify. Commented out
+                                        //    above, and replaced with the
+                                        //    transition of the caller.
+                                        Transition(r->from_state(),r->from_stack(),tprime->to()),
                                         Transition(*teps),
                                         Transition(teps->from(), tprime->stack(), tprime->to()),
                                         //wghtOne,
@@ -594,8 +604,18 @@ FWPDS::post(wali::wpds::LinkedTrans* t, wali::wfa::WFA& fa, wali::graph::InterGr
             wpds::Config * config = make_config( t->from(),tprime->stack() );
 
             mfun_t mf(0);
+            Key caller_state = WALI_EPSILON;
+            Key caller_stack = WALI_EPSILON;
             if( 0 != key_pair ) {
-                mf = lookup_merge(KeyTriple(key_pair->first(),key_pair->second(),tprime->stack()));
+                //mf = lookup_merge(KeyTriple(key_pair->first(),key_pair->second(),tprime->stack()));
+                KeyTriple kp3(key_pair->first(),key_pair->second(),tprime->stack());
+                merge_rule_hash_t::iterator it = merge_rule_hash.find(kp3);
+                // Note : this check should always pass
+                if (it != merge_rule_hash.end()) {
+                    mf = it->second.mf;
+                    caller_state = it->second.state;
+                    caller_stack = it->second.stack;
+                }
             }
 
             update( t->from()
@@ -605,7 +625,13 @@ FWPDS::post(wali::wpds::LinkedTrans* t, wali::wfa::WFA& fa, wali::graph::InterGr
                     , config
                   );
             if( mf.is_valid() ) {
-                gr.addEdge(Transition(*tprime),
+                gr.addEdge(
+                        //Transition(*tprime),
+                        // Akash : 
+                        //    Please verify. Commented out
+                        //    above, and replaced with the
+                        //    transition of the caller.
+                        Transition(caller_state,caller_stack,tprime->to()),
                         Transition(*t),
                         Transition(t->from(),tprime->stack(),tprime->to()),
                         //wghtOne,
