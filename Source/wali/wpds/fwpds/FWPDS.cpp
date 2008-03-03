@@ -568,15 +568,9 @@ FWPDS::post(wali::wpds::LinkedTrans* t, wali::wfa::WFA& fa, wali::graph::InterGr
                             update(teps->from(),tpstk, tpto, /*epsW*/wghtOne, config );
                             if( mf.is_valid() ) 
                                 gr.addEdge(
-                                        //Transition(*tprime),
-                                        // Akash : 
-                                        //    Please verify. Commented out
-                                        //    above, and replaced with the
-                                        //    transition of the caller.
                                         Transition(r->from_state(),r->from_stack(),tprime->to()),
                                         Transition(*teps),
                                         Transition(teps->from(), tprime->stack(), tprime->to()),
-                                        //wghtOne,
                                         mf.get_ptr() //TODO: change InterGraph to use mfun_t
                                         );
                             else
@@ -626,15 +620,9 @@ FWPDS::post(wali::wpds::LinkedTrans* t, wali::wfa::WFA& fa, wali::graph::InterGr
                   );
             if( mf.is_valid() ) {
                 gr.addEdge(
-                        //Transition(*tprime),
-                        // Akash : 
-                        //    Please verify. Commented out
-                        //    above, and replaced with the
-                        //    transition of the caller.
                         Transition(caller_state,caller_stack,tprime->to()),
                         Transition(*t),
                         Transition(t->from(),tprime->stack(),tprime->to()),
-                        //wghtOne,
                         mf.get_ptr());
             }
             else {
