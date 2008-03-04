@@ -133,6 +133,7 @@ namespace wali {
                 static bool saturation_complete;
                 static bool executing_poststar;
                 static bool initialized;
+                static bool top_down_eval;
                 int nevals; // for gathering stats: no of times eval was called on this regexp
 
                 static vector<reg_exp_t> updatable_nodes;
@@ -208,6 +209,10 @@ namespace wali {
 
                 static void executingPoststar(bool f) {
                     executing_poststar = f;
+                }
+
+                static void topDownEval(bool f) {
+                    top_down_eval = f;
                 }
 
                 ostream &print(ostream &out);

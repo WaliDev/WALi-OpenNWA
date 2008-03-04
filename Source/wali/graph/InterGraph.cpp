@@ -394,7 +394,9 @@ namespace wali {
             // I can fix this (i.e., weights for others will be available on demand), but not right now.
             void InterGraph::setupInterSolution(std::list<Transition> *wt_required) {
                 RegExp::init(sem);
-                //util::Timer timer("FWPDS Saturation");
+
+                util::Timer *timer = new util::Timer("FWPDS Find Graphs");
+
                 // First, find the IntraGraphs
                 int n = nodes.size();
                 int i;
@@ -478,6 +480,9 @@ namespace wali {
                 unsigned components = SCC(gr_list, gr_sorted);
                 STAT(stats.ncomponents = components);
 
+                delete timer;
+                timer = new util::Timer("FWPDS Saturation");
+
                 // Saturate
                 if(wt_required == NULL) {
                     max_scc_required = components;
@@ -504,7 +509,7 @@ namespace wali {
 #ifdef STATIC_MEMORY
                 IntraGraph::clearStaticBuffer();
 #endif
-
+                delete timer;
             }
 
             std::ostream &InterGraph::print_stats(std::ostream &out) {

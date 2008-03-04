@@ -20,6 +20,7 @@ namespace wali
 
       namespace ewpds 
       {
+        class ERule;
         class EWPDS;
       }
     
@@ -42,7 +43,7 @@ namespace wali
 
             public:
                 friend class Rule;
-                friend class ERule;
+                friend class ewpds::ERule;
                 friend class WPDS;
                 friend class ewpds::EWPDS;
 

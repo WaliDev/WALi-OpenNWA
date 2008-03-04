@@ -18,6 +18,7 @@ namespace wali {
         bool RegExp::saturation_complete = false;
         bool RegExp::executing_poststar = true;
         bool RegExp::initialized = false;
+        bool RegExp::top_down_eval = true;
 
         reg_exp_t RegExp::updatable(node_no_t nno, sem_elem_t se) {
             if(updatable_nodes.size() > nno) {
@@ -1081,8 +1082,8 @@ namespace wali {
     sem_elem_t RegExp::get_weight() {
         if(last_seen == update_count && last_change != (unsigned)-1)  // evaluate(w) sets last_change to -1
             return value;
-        // NAK
-        if(false || !saturation_complete) {
+
+        if(!top_down_eval || !saturation_complete) {
             evaluate();
             return value;
         }

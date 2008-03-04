@@ -12,6 +12,7 @@
 #include "wali/wpds/WPDS.hpp"
 #include "wali/wpds/Wrapper.hpp"
 
+#include "wali/wpds/ewpds/EWPDS.hpp"
 #include "wali/wpds/ewpds/MergeFunction.hpp"
 
 #include "wali/graph/GraphCommon.hpp"
@@ -33,18 +34,9 @@ namespace wali {
         namespace fwpds {
 
 
-            class FWPDS : public WPDS {
+            class FWPDS : public ewpds::EWPDS {
                 public:
                     typedef ewpds::merge_fn_t mfun_t;
-                    struct TaggedMergeFn : public Countable {
-                        mfun_t mf;
-                        Key state; //<! From state of rule mfun associates to
-                        Key stack; //<! From stack of rule mfun associates to
-                        TaggedMergeFn(mfun_t a,Key b, Key c) 
-                            : mf(a),state(b),stack(c) {}
-                    };
-
-                    typedef HashMap< KeyTriple, TaggedMergeFn > merge_rule_hash_t;
 
                 public:
                     FWPDS();
@@ -55,86 +47,67 @@ namespace wali {
                     ////////////
                     // add rules
                     ////////////
-                    //! @brief create rule with no r.h.s. stack symbols
-                    //! @return true if rule existed
-                    //! @see sem_elem_t
-                    //! @see wali::Key
-                    virtual bool add_rule(
-                            wali::Key from_state,
-                            wali::Key from_stack,
-                            wali::Key to_state,
-                            sem_elem_t se );
 
-                    //! @brief create rule with one r.h.s. stack symbol
-                    //! @return true if rule existed
-                    virtual bool add_rule(
-                            wali::Key from_state,
-                            wali::Key from_stack,
-                            wali::Key to_state,
-                            wali::Key to_stack1,
-                            sem_elem_t se );
-
-                    //! @brief create rule with two r.h.s. stack symbols
-                    //! @return true if rule existed
-                    virtual bool add_rule(
-                            wali::Key from_state,
-                            wali::Key from_stack,
-                            wali::Key to_state,
-                            wali::Key to_stack1,
-                            wali::Key to_stack2,
-                            sem_elem_t se);
-
-                    //! @brief create rule with two r.h.s. stack symbols
-                    //! @return true if rule existed
-                    virtual bool add_rule(
-                            wali::Key from_state,
-                            wali::Key from_stack,
-                            wali::Key to_state,
-                            wali::Key to_stack1,
-                            wali::Key to_stack2,
-                            sem_elem_t se,
-                            mfun_t mf);
-
+                    // Inherited from EWPDS
 
                     ///////////
                     // pre*
                     ///////////
                     virtual void prestar( ::wali::wfa::WFA & input, ::wali::wfa::WFA & output );
 
-                    virtual wali::graph::InterGraph* prestarComputeInterGraph( wfa::WFA& input, wfa::WFA& output );
-
-                    virtual void pre(LinkedTrans* t, ::wali::wfa::WFA& fa, wali::graph::InterGraph& gr );
-
-                    //! Should never be called!
-                    virtual void prestarComputeFixpoint( wfa::WFA& fa );
 
                     ///////////
                     // post*
                     ///////////
                     virtual void poststar( ::wali::wfa::WFA & input, ::wali::wfa::WFA & output );
 
-                    virtual wali::graph::InterGraph* poststarComputeInterGraph( wfa::WFA& input, wfa::WFA& output );
+                    ///////////////////////
+                    // FWPDS Settings
+                    //////////////////////
 
-                    virtual void post(LinkedTrans* t, ::wali::wfa::WFA& fa, wali::graph::InterGraph& gr );
+                    /*! @brief Sets evaluation strategy for RegExp after InterGraph
+                     * saturation is complete, i.e., during the time when
+                     * transition weights are calculated. It is true by default,
+                     * but setting it to false seems to be far more efficient
+                     * while using BDD-based weight domain (Moped)
+                     */
+                    static void topDownEval(bool f);
 
-                    //! Should never be called!
-                    virtual void poststarComputeFixpoint( wfa::WFA& fa );
+              private:
+                    void prestar_handle_call(
+                            wfa::Trans *t1,
+                            wfa::Trans *t2,
+                            rule_t &r,
+                            sem_elem_t delta
+                            );
+
+                    void prestar_handle_trans(
+                            LinkedTrans * t,
+                            ::wali::wfa::WFA & ca  ,
+                            rule_t & r,
+                            sem_elem_t delta );
+
+                    void poststar_handle_eps_trans(
+                            wfa::Trans *teps, 
+                            wfa::Trans *tprime,
+                            sem_elem_t delta);
+
+                    void poststar_handle_trans(
+                            LinkedTrans * t ,
+                            ::wali::wfa::WFA & ca   ,
+                            rule_t & r,
+                            sem_elem_t delta
+                            );
 
                     ///////////
                     // helpers
                     ///////////
-                    bool checkResults( wfa::WFA& input, wali::graph::InterGraph* gr,bool poststar );
-
-                    bool is_pds_state( Key k ) const;
+                    bool checkResults( wfa::WFA& input, bool poststar );
 
                 protected:
-                    mfun_t lookup_merge( rule_t r ) const;
-                    mfun_t lookup_merge( KeyTriple trip ) const;
-
-                protected:
-                    std::set< wali::Key > pds_states; //!< set of PDS states
-                    merge_rule_hash_t merge_rule_hash; //!< map from (a,b,c) to merge_fn_t
-                    bool is_ewpds;
+                    sem_elem_t wghtOne;
+                    wali::graph::InterGraph *interGr;
+                    bool checkingPhase;
 
             }; // class FWPDS
 

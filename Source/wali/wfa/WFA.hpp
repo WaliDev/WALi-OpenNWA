@@ -178,6 +178,14 @@ namespace wali
                  */
                 query_t getQuery() const;
 
+                /*! @brief Get a weight from the WFA. This is to get hold
+                 * of the weight domain class
+                 *
+                 * @see sem_elem_t
+                 * @return a weight on some transition in the WFA
+                 */
+                virtual sem_elem_t getSomeWeight();
+
                 /*! @brief Add transition (p,g,q) to the WFA
                  *
                  * @see Key

@@ -20,126 +20,47 @@
 #include "wali/wfa/TransFunctor.hpp"
 
 #include "wali/wpds/Rule.hpp"
+#include "wali/wpds/ewpds/ERule.hpp"
 #include "wali/wpds/Config.hpp"
 #include "wali/wpds/LinkedTrans.hpp"
 
 #include "wali/wpds/fwpds/FWPDS.hpp"
 
+#include "wali/graph/RegExp.hpp"
 #include "wali/graph/InterGraph.hpp"
 
 using namespace wali;
 using namespace wali::graph;
 using namespace wali::wpds::fwpds;
+using namespace wali::wpds::ewpds;
+using wfa::Trans;
+using wfa::TransSet;
+using wfa::WFA;
+using wfa::State;
 
-FWPDS::FWPDS() : WPDS(), is_ewpds(false)
+FWPDS::FWPDS() : EWPDS(), interGr(NULL), checkingPhase(false)
 {
 }
 
-FWPDS::FWPDS(wali::wpds::Wrapper* wrapper) : WPDS(wrapper) , is_ewpds(false)
+FWPDS::FWPDS(wali::wpds::Wrapper* wrapper) : EWPDS(wrapper) , interGr(NULL), checkingPhase(false)
 {
 }
 
-FWPDS::FWPDS( Worklist<wfa::Trans> * worklist ) : WPDS(worklist), is_ewpds(false)
+FWPDS::FWPDS( Worklist<wfa::Trans> * worklist ) : EWPDS(0, worklist), interGr(NULL), checkingPhase(false)
 {
 }
 
 FWPDS::FWPDS( wali::wpds::Wrapper * wrapper , Worklist<wfa::Trans> * worklist ) :
-    WPDS(wrapper,worklist), is_ewpds(false)
+  EWPDS(wrapper,worklist), interGr(NULL), checkingPhase(false)
 {
 }
 
 
 ///////////////////////////////////////////////////////////////////
-// add_rule(...)
-
-bool FWPDS::add_rule(
-        Key from_state,
-        Key from_stack,
-        Key to_state,
-        sem_elem_t se )
-{
-    return add_rule(from_state,from_stack,to_state,WALI_EPSILON,WALI_EPSILON,se,0 );
+void FWPDS::topDownEval(bool f) {
+  wali::graph::RegExp::topDownEval(f);
 }
 
-bool FWPDS::add_rule(
-        Key from_state,
-        Key from_stack,
-        Key to_state,
-        Key to_stack1,
-        sem_elem_t se )
-{
-    return add_rule(from_state,from_stack,to_state,to_stack1,WALI_EPSILON,se,0 );
-}
-
-bool FWPDS::add_rule(
-        Key from_state,
-        Key from_stack,
-        Key to_state,
-        Key to_stack1,
-        Key to_stack2,
-        sem_elem_t se )
-{
-    return add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se,/*(mfun_t)*/0 );
-}
-
-bool FWPDS::add_rule(
-        Key from_state,
-        Key from_stack,
-        Key to_state,
-        Key to_stack1,
-        Key to_stack2,
-        sem_elem_t se,
-        mfun_t mf )
-{
-    if( mf.is_valid() ) {
-        is_ewpds = true;
-    }
-
-    pds_states.insert(from_state);
-    pds_states.insert(to_state);
-
-    // have parent do its work and bookkeeping
-    bool exists = WPDS::add_rule( 
-            from_state,from_stack,
-            to_state,to_stack1,to_stack2,se);
-
-    if( !exists ) {
-        if( to_stack1 != WALI_EPSILON && to_stack2 != WALI_EPSILON ) {
-            // have rule 2
-            if( wrapper != 0 && mf.is_valid() ) {
-                // have wrapper, wrap merge fun
-                mf = wrapper->wrap(mf);
-            }
-            KeyTriple trip(to_state,to_stack1,to_stack2);
-            // Tag the mfun_t
-            TaggedMergeFn tmf(mf,from_state,from_stack);
-            merge_rule_hash_t::iterator it = merge_rule_hash.find(trip);
-            if( it == merge_rule_hash.end() ) {
-                merge_rule_hash.insert(trip,tmf);
-            }
-            else {
-                if( mf.is_valid() && it->second.mf.is_valid() ) {
-                    // TODO : Fixme
-                    *waliErr << "[ERROR] Cannot give two 'push rules' with same RHS.\n";
-                    *waliErr << "  (" << key2str(to_state) << " , " << key2str(to_stack1);
-                    *waliErr << " , " << key2str(to_stack2) << " )\n";
-                    assert(0);
-                }
-            }
-        }
-    }
-    else {
-        // TODO : Fixme
-        if( mf.is_valid() ) {
-            *waliErr << "[ERROR] Attempt to add re-add rule with a valid merge function\n";
-            assert(0);
-        }
-    }
-    return exists;
-
-}
-
-///////////////////////////////////////////////////////////////////
 struct FWPDSCopyBackFunctor : public wali::wfa::TransFunctor
 {
     wali::graph::InterGraph& gr;
@@ -196,243 +117,178 @@ std::ostream& graphPrintKey( int k, std::ostream& o ) {
 void
 FWPDS::prestar( wfa::WFA& input, wfa::WFA& output )
 {
-    util::Timer* fwpdsTimer = new util::Timer("\t[FWPDS] Total Time ");
-    wali::graph::InterGraph* gr = prestarComputeInterGraph(input,output);
-    assert(gr != 0);
-    FWPDSCopyBackFunctor copier( *gr );
+    // Get hold of semiring element
+    sem_elem_t se = input.getSomeWeight();
+
+    // if se is NULL then input is empty
+    if(!se.is_valid()) {
+      // Get weight from rule0s
+      for(std::set<Config*>::iterator it = WPDS::rule_zeroes.begin();
+          it != rule_zeroes.end() && !se.is_valid(); it++) {
+        Config *cloc = *it;
+        Config::reverse_iterator rit = cloc->rbegin();
+        for( ; rit != cloc->rend(); rit++) {
+          rule_t r = *rit;
+          se = r->weight();
+          break;
+        }
+      }
+      if(!se.is_valid()) {
+        output.clear();
+        return;
+      }
+    }
+    // cache semiring 1
+    wghtOne = se->one();
+
+    // FIXME: Currently FWPDS always assumes that the
+    // underlying pds is a EWPDS. In the absence of
+    // merge functions, it can be treated as a WPDS.
+    // However, there is no cost benefit in using WPDS
+    // (it only saves on debugging effort)
+    interGr = new wali::graph::InterGraph(se, true, true);
+
+    // setup output
+    EWPDS::prestarSetupFixpoint(input,output);
+
+    // Input transitions become source nodes in FWPDS
+    FWPDSSourceFunctor sources(*interGr);
+    output.for_each(sources);
+
+    // Build the InterGraph using EWPDS saturation without weights
+    EWPDS::prestarComputeFixpoint(output);
+
+    // Compute summaries
+    interGr->setupInterSolution();
+
+    //interGr->print(std::cout << "THE INTERGRAPH\n",graphPrintKey);
+
+    // Copy information back from InterGraph to the
+    // output WFA. This does computation on weights
+    // to calculate the transition weights -- if 
+    // (all or part of) it had not been computed by
+    // setupInterSolution
+    FWPDSCopyBackFunctor copier( *interGr );
     {
         util::Timer t("\t[FWPDS] Solve all weights ");
         output.for_each(copier);
     }
-    delete fwpdsTimer;
-    checkResults(input,gr,false);
-    delete gr;
+
+    checkResults(input,false);
+
+    delete interGr;
+    interGr = NULL;
+    currentOutputWFA = 0;
 }
 
-wali::graph::InterGraph*
-FWPDS::prestarComputeInterGraph( wfa::WFA& input, wfa::WFA& output )
+void FWPDS::prestar_handle_call(Trans *t1,
+                                Trans *t2,
+                                rule_t &r,
+                                sem_elem_t delta 
+                                )
 {
-    this->prestarSetupFixpoint(input,output);
-    LinkedTrans *t = 0;
-    InterGraph* gr = 0;
-    if( get_from_worklist(t) ) {
-        sem_elem_t se = t->weight();
-        gr = new wali::graph::InterGraph(se, is_ewpds ,true);
+  if(checkingPhase) {
+    return EWPDS::prestar_handle_call(t1, t2, r, delta);
+  }
 
-        FWPDSSourceFunctor sources(*gr);
-        output.for_each(sources);
+  if(!is_pds_state(t2->from())) {
+    interGr->addEdge(Transition(*t2),
+                     Transition(*t1),
+                     Transition(r->from()->state(), r->from()->stack(),t2->to()),
+                     r->weight() );    
+  } else { // apply merge function
+    ERule *er = (ERule *)(r.get_ptr());
+    interGr->addEdge(Transition(*t2),
+                     Transition(*t1),
+                     Transition(r->from()->state(), r->from()->stack(),t2->to()),
+                     er->merge_fn().get_ptr() );
+  }
+  // update
+  update( r->from()->state(), r->from()->stack(), t2->to(),
+          wghtOne,r->from() );
 
-        { // reachability
-            //util::Timer timer("\tFWPDS reachability");
-            do {
-                // NAK DEBUG
-                //t->print( std::cout << "Popped t => " ) << "\n";
-                pre(t,output, *gr);
-            } while( get_from_worklist(t) );
-        }
-
-        gr->setupInterSolution();
-        // THIS computes all weights
-        //gr->update_all_weights();
-
-        // This prints a lot
-        //gr->print(std::cout << "THE INTERGRAPH\n",graphPrintKey);
-
-    }
-    return gr;
 }
+
+void FWPDS::prestar_handle_trans(
+                    LinkedTrans * t ,
+                    WFA & fa   ,
+                    rule_t & r,
+                    sem_elem_t delta 
+                    )
+{
+  //std::cout << "Prestar_handle_trans:\n";
+  //t->print(std::cout << "t: ") << "\n";
+  //r->print(std::cout << "r: ") << "\n";
+
+  if(checkingPhase)
+  {
+    return EWPDS::prestar_handle_trans(t, fa, r, delta);
+  }
+
+  Key fstate = r->from()->state();
+  Key fstack = r->from()->stack();
+  
+  if( r->is_rule2() ) {
+    KeyPair kp( t->to(),r->stack2() );
+    WFA::kp_map_t::iterator kpit = fa.kpmap.find( kp );
+    WFA::kp_map_t::iterator kpitEND = fa.kpmap.end();
+    TransSet::iterator tsit;
+    
+    if(kpit != kpitEND)
+      {
+        TransSet & transSet = kpit->second;
+        for( tsit = transSet.begin(); tsit != transSet.end(); tsit++ )
+          {
+            Trans * tprime = *tsit;
+            prestar_handle_call(t, tprime, r, delta);
+          }
+      }
+  }
+  else {
+    interGr->addEdge(Transition(*t),
+                     Transition(fstate,fstack,t->to()),
+                     r->weight());
+    update( fstate, fstack, t->to(), wghtOne, r->from() );
+  }
+}
+
 
 bool
-FWPDS::is_pds_state( Key k ) const
+FWPDS::checkResults( wfa::WFA& input, bool poststar )
 {
-    return (pds_states.find(k) != pds_states.end());
-}
-
-FWPDS::mfun_t
-FWPDS::lookup_merge( wali::wpds::rule_t r ) const
-{
-    KeyTriple trip(r->to_state(),r->to_stack1(),r->to_stack2());
-    return lookup_merge(trip);
-}
-
-FWPDS::mfun_t
-FWPDS::lookup_merge( wali::KeyTriple trip ) const
-{
-    merge_rule_hash_t::const_iterator it = merge_rule_hash.find(trip);
-    mfun_t mf(0);
-    if( it != merge_rule_hash.end() )
-        mf = it->second.mf;
-    return mf;
-}
-
-void 
-FWPDS::pre(wali::wpds::LinkedTrans* t, ::wali::wfa::WFA& fa, wali::graph::InterGraph& gr )
-{
-    // Get config
-    Config * config = t->config;
-
-    { // BEGIN DEBUGGING
-        assert( config );
-    } // END DEBUGGING
-
-    sem_elem_t wghtOne = t->weight()->one();
-    //sem_elem_t dnew = t->delta;
-    //t->delta = dnew->zero();
-    t->setDelta(wghtOne->zero());
-
-    // For each backward rule of config
-    Config::reverse_iterator bwit = config->rbegin();
-    for( ; bwit != config->rend() ; bwit++ )
+    if( wali::get_verify_fwpds() ) 
     {
-        rule_t r = *bwit;
-        mfun_t mf = lookup_merge( r );
 
-        //prestar_handle_trans( t,fa,r,dnew );
-        // inlined prestar_handle_trans
-        {
+        // set flag to use EWPDS's saturation
+        checkingPhase = true;
 
-            //sem_elem_t wrule_trans = r->weight()->extend( delta );
-            Key fstate = r->from()->state();
-            Key fstack = r->from()->stack();
-
-            if( r->is_rule2() )
-            {
-                KeyPair kp( t->to(),r->stack2() );
-                { // BEGIN DEBUGGING
-                    //r->print( *waliErr << "Handling Rule 2: " ) << std::endl;
-                    //*waliErr << "\t(" << key2str(kp.first) << ", " << key2str(kp.second) << ",*)\n";
-                } // END DEBUGGING
-                wali::wfa::WFA::kp_map_t::iterator kpit = fa.kpmap.find( kp );
-                wali::wfa::WFA::kp_map_t::iterator kpitEND = fa.kpmap.end();
-                wali::wfa::TransSet::iterator tsit;
-
-                if( kpit != kpitEND )
-                {
-                    wali::wfa::TransSet& transSet = kpit->second;
-                    for( tsit = transSet.begin(); tsit != transSet.end(); tsit++ )
-                    {
-                        wali::wfa::Trans * tprime = *tsit;
-                        { // BEGIN DEBUGGING
-                            //*waliErr << "\tMatched: (" << key2str(tprime->from()) << ", ";
-                            //*waliErr << key2str(tprime->stack()) << ", ";
-                            //*waliErr << key2str(tprime->to()) << ")\n";
-                        } // END DEBUGGING
-                        //sem_elem_t wtp = wrule_trans->extend( tprime->weight() );
-                        update( fstate
-                                , fstack
-                                , tprime->to()
-                                , wghtOne
-                                , r->from()
-                              );
-                        if( is_pds_state(t->to()) && mf.is_valid() )
-                            gr.addEdge(Transition(*tprime),
-                                    Transition(*t),
-                                    Transition(fstate,fstack,tprime->to()),
-                                    //r->weight(),
-                                    mf.get_ptr() );
-                        else
-                            gr.addEdge(Transition(*tprime),
-                                    Transition(*t),
-                                    Transition(fstate,fstack,tprime->to()),
-                                    r->weight() );
-                    }
-                }
-            }
-            else {
-                update( fstate
-                        , fstack
-                        , t->to()
-                        , wghtOne
-                        , r->from() 
-                      );
-                gr.addEdge(Transition(*t),
-                        Transition(fstate,fstack,t->to()),
-                        r->weight());
-            }
-        }
-    }
-
-    // check matching rule 2s 
-    r2hash_t::iterator r2it = r2hash.find( t->stack() );
-
-    // does a rule 2 exist with matching second symbol on rhs
-    if( r2it != r2hash.end() )
-    {
-        // get reference
-        std::list< rule_t > & ls = r2it->second;
-        std::list< rule_t >::iterator lsit;
-
-        // loop through list
-        for( lsit = ls.begin() ; lsit != ls.end() ; lsit++ )
-        {
-            rule_t r = *lsit;
-            mfun_t mf = lookup_merge(r);
-
-            wali::wfa::Trans tp;
-            if( fa.find(r->to_state(),r->to_stack1(),t->from(),tp) )
-            {
-                // update
-                Key fstate = r->from()->state();
-                Key fstack = r->from()->stack();
-                update( fstate
-                        , fstack
-                        , t->to()
-                        , wghtOne
-                        , r->from()
-                      );
-                if( mf.is_valid() && is_pds_state(t->from()) )
-                    gr.addEdge(Transition(*t),
-                            Transition(tp),
-                            Transition(fstate,fstack,t->to()),
-                            //r->weight(), 
-                            mf.get_ptr() // TODO: make InterGraph take a mfun_t
-                            );
-                else
-                    gr.addEdge(Transition(*t),
-                            Transition(tp),
-                            Transition(fstate,fstack,t->to()),
-                            r->weight());
-
-            }
-        }
-    }
-}
-
-void
-FWPDS::prestarComputeFixpoint( ATTR_UNUSED wfa::WFA& fa )
-{
-    *waliErr << "[ERROR] FWPDS::prestarComputeFixpoint called?\n";
-    assert(0);
-}
-
-bool
-FWPDS::checkResults( wfa::WFA& input, wali::graph::InterGraph* gr,bool poststar )
-{
-    if( wali::get_verify_fwpds() && !this->is_ewpds ) 
-    {
         wfa::WFA tmpOutput;
         wfa::WFA tmpInput(input);
-        // run post*
+
         util::Timer* wpdsTimer = new util::Timer("\t[WPDS] Total Timer ");
         if( poststar ) {
-            WPDS::poststarSetupFixpoint(tmpInput,tmpOutput);
-            WPDS::poststarComputeFixpoint(tmpOutput);
+            EWPDS::poststar(tmpInput, tmpOutput);
+            //WPDS::poststarSetupFixpoint(tmpInput,tmpOutput);
+            //WPDS::poststarComputeFixpoint(tmpOutput);
         }
         else {
-            WPDS::prestarSetupFixpoint(tmpInput,tmpOutput);
-            WPDS::prestarComputeFixpoint(tmpOutput);
+            EWPDS::prestar(tmpInput, tmpOutput);
+            //WPDS::prestarSetupFixpoint(tmpInput,tmpOutput);
+            //WPDS::prestarComputeFixpoint(tmpOutput);
         }
         delete wpdsTimer;
 
         { // compare results
             util::Timer timer("\t[(F)WPDS] Compare Results ");
-            FWPDSCompareFunctor comp(*gr);
+            FWPDSCompareFunctor comp(*interGr);
             //output.print( std::cout << "\nFWPDS OUTPUT:\n\n" );
             //tmpOutput.print( std::cout << "\nWPDS OUTPUT:\n\n" );
             tmpOutput.for_each(comp);
             comp.print(std::cout);
         }
         *waliErr << "\t[(F)WPDS] CONGRATS DUDE...OUTPUT MATCHED.\n";
+
+        checkingPhase = false;
     }
     return true;
 }
@@ -440,196 +296,155 @@ FWPDS::checkResults( wfa::WFA& input, wali::graph::InterGraph* gr,bool poststar 
 void
 FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
 {
-    util::Timer* fwpdsTimer = new util::Timer("\t[FWPDS] Total Time ");
-    wali::graph::InterGraph* gr = poststarComputeInterGraph(input,output);
-    assert( gr != 0 );
-    FWPDSCopyBackFunctor copier( *gr );
+    // Get hold of semiring element
+    sem_elem_t se = input.getSomeWeight();
+
+    // if se is NULL then input is empty
+    if(!se.is_valid()) {
+      output.clear();
+      return;
+    }
+    // cache semiring 1
+    wghtOne = se->one();
+
+    // FIXME: Currently FWPDS always assumes that the
+    // underlying pds is a EWPDS. In the absence of
+    // merge functions, it can be treated as a WPDS.
+    // However, there is no cost benefit in using WPDS
+    interGr = new wali::graph::InterGraph(se, true, false);
+
+    EWPDS::poststarSetupFixpoint(input,output);
+
+    // Input transitions become source nodes in FWPDS
+    FWPDSSourceFunctor sources(*interGr);
+    output.for_each(sources);
+
+    // Build the InterGraph using EWPDS saturation without weights
+    EWPDS::poststarComputeFixpoint(output);
+
+    // Compute summaries
+    interGr->setupInterSolution();
+
+    //interGr->print(std::cout << "THE INTERGRAPH\n",graphPrintKey);
+
+    // Copy information back from InterGraph to the
+    // output WFA. This does computation on weights
+    // to calculate the transition weights -- if 
+    // (all or part of) it had not been computed by
+    // setupInterSolution
+    FWPDSCopyBackFunctor copier( *interGr );
     {
         util::Timer t("\t[FWPDS] Solve all weights ");
         output.for_each(copier);
     }
-    checkResults(input,gr,true);
-    delete fwpdsTimer;
 
-    delete gr;
+    checkResults(input,true);
+
+    delete interGr;
+    interGr = NULL;
+    currentOutputWFA = 0;
 }
 
-wali::graph::InterGraph*
-FWPDS::poststarComputeInterGraph( wfa::WFA& input, wfa::WFA& output )
+void FWPDS::poststar_handle_eps_trans(Trans *teps, Trans *tprime, sem_elem_t delta) 
 {
-    this->poststarSetupFixpoint(input,output);
-    LinkedTrans *t = 0;
-    InterGraph* gr = 0;
-    if( get_from_worklist(t) ) {
-        sem_elem_t se = t->weight();
-        gr = new wali::graph::InterGraph( se, is_ewpds, false );
-
-        FWPDSSourceFunctor sources(*gr);
-        output.for_each(sources);
-
-        { // reachability
-            //util::Timer timer("\tFWPDS reachability");
-            do {
-                // NAK DEBUG
-                //t->print( std::cout << "Popped t => " ) << "\n";
-                post(t,output, *gr);
-            } while( get_from_worklist(t) );
-        }
-
-        gr->setupInterSolution();
-        // THIS computes all weights
-        //gr->update_all_weights();
-
-        // This prints a lot
-        //gr->print(std::cout << "THE INTERGRAPH\n",graphPrintKey);
-
-    }
-    return gr;
-}
-
-void
-FWPDS::poststarComputeFixpoint( ATTR_UNUSED wfa::WFA& fa )
-{
-    *waliErr << "[ERROR] FWPDS::poststarComputeFixpoint called?\n";
-    assert(0);
-}
-
-void
-FWPDS::post(wali::wpds::LinkedTrans* t, wali::wfa::WFA& fa, wali::graph::InterGraph& gr )
-{
-    // Get config
-    wpds::Config * config = t->config;
-
-    // Get delta
-    //sem_elem_t dnew = t->delta;
-    // FWPDS just uses 1
-    sem_elem_t wghtOne = t->weight()->one();
-
-    // Reset delta of t to zero to signify completion
-    // of work for that delta
-    //
-    // WALi uses the delta to check for modification so 
-    // this step is important
-    t->setDelta(wghtOne->zero());
-
-    // For each forward rule of config
-    // Apply rule to create new transition
-    if( WALI_EPSILON != t->stack() )
+    if(checkingPhase) 
     {
-        Config::iterator fwit = config->begin();
-        for( ; fwit != config->end() ; fwit++ ) {
-            rule_t r = *fwit;
-            // NAK DEBUG
-            //r->print( std::cout << "\tMatched r => " ) << "\n";
-
-            // Step rule
-            if( r->to_stack2() == WALI_EPSILON ) {
-                update(r->to_state(), r->to_stack1(),t->to(),wghtOne,r->to() );
-                gr.addEdge(Transition(*t),
-                        Transition(r->to_state(),r->to_stack1(),t->to()),
-                        r->weight());
-            }
-            // Push rule (p,g) -> (p,g',g2)
-            else {
-                // TODO quasi one?
-                Key gstate = gen_state(r->to_state(),r->to_stack1());
-                wfa::Trans * tprime = update_prime( gstate, r->to_stack2(), t->to(), wghtOne );
-
-                // add (p,g',(p,g'))
-                update( r->to_state(), r->to_stack1(), gstate, wghtOne, r->to() );
-                // add source
-                gr.setSource(Transition(r->to_state(),r->to_stack1(), gstate), wghtOne);
-                // add edge (p,g,q) -> (p,g',(p,g'))
-                gr.addCallEdge(Transition(*t),Transition(r->to_state(),r->to_stack1(), gstate));
-                // add edge (p,g,q) -> ((p,g'),rstk2,q)
-                gr.addEdge(Transition(*t),
-                        Transition(gstate, r->to_stack2(),t->to_state()),
-                        r->weight());
-
-                if( tprime->modified() ) {
-
-                    mfun_t mf = lookup_merge(r);
-
-                    wfa::WFA::eps_map_t::iterator epsit = fa.eps_map.find( tprime->from() );
-                    if( epsit != fa.eps_map.end() )
-                    {
-                        // tprime stack key
-                        Key tpstk = tprime->stack();
-                        //tprime to key
-                        Key tpto = tprime->to();
-                        // get epsilon list ref 
-                        wfa::TransSet& transSet = epsit->second;
-                        //iterate 
-                        wfa::TransSet::iterator tsit = transSet.begin();
-                        for( ; tsit != transSet.end() ; tsit++ ) { 
-                            wfa::Trans * teps = *tsit; 
-                            wpds::Config * config = make_config( teps->from(),tpstk );
-                            //sem_elem_t epsW = tprime->getDelta()->extend( teps->weight() );
-                            update(teps->from(),tpstk, tpto, /*epsW*/wghtOne, config );
-                            if( mf.is_valid() ) 
-                                gr.addEdge(
-                                        Transition(r->from_state(),r->from_stack(),tprime->to()),
-                                        Transition(*teps),
-                                        Transition(teps->from(), tprime->stack(), tprime->to()),
-                                        mf.get_ptr() //TODO: change InterGraph to use mfun_t
-                                        );
-                            else
-                                gr.addEdge(Transition(*tprime),
-                                        Transition(*teps),
-                                        Transition(teps->from(), tprime->stack(), tprime->to()),
-                                        wghtOne);
-
-                        }
-                    }
-                }
-            }
-        }
+        return EWPDS::poststar_handle_eps_trans(teps, tprime, delta);
     }
-    else {
-        // (p,eps,q) + (q,y,q') => (p,y,q')
-        wfa::State * state = fa.getState( t->to() );
-        wfa::State::iterator it = state->begin();
-        KeySource* key_src = getKeySource(t->to());
-        KeyPairSource *key_pair = dynamic_cast<KeyPairSource*>(key_src);
+    
+    KeySource *ks = getKeySource(teps->to());
+    KeyPairSource *kps = dynamic_cast<KeyPairSource *>(ks);
+    sem_elem_t wght;
+                
+    if(0 != kps) { // apply merge function
+      // Find the rule first
+      rule_t r = EWPDS::lookup_rule(kps->get_key_pair().first, kps->get_key_pair().second, tprime->stack());
+      assert(r.get_ptr() != NULL);
 
-        for(  ; it != state->end() ; it++ )
+      ERule *er = (ERule *)(r.get_ptr());
+
+      interGr->addEdge(Transition(r->from_state(), r->from_stack(), tprime->to()),
+                       Transition(*teps),
+                       Transition(teps->from(),tprime->stack(),tprime->to()),
+                       er->merge_fn().get_ptr());
+
+    } else {
+      interGr->addEdge(Transition(*tprime),
+                       Transition(*teps),
+                       Transition(teps->from(),tprime->stack(),tprime->to()),
+                       wghtOne);
+    }
+
+    Config * config = make_config( teps->from(),tprime->stack() );
+    update( teps->from()
+            , tprime->stack()
+            , tprime->to()
+            , wghtOne
+            , config
+            );
+}
+
+void FWPDS::poststar_handle_trans(LinkedTrans *t, WFA &fa, 
+                                  rule_t &r, sem_elem_t delta)
+{
+    if(checkingPhase) 
+    {
+      return EWPDS::poststar_handle_trans(t, fa, r, delta);
+    }
+
+    ERule *er = (ERule *)(r.get_ptr());
+    Key rtstate = r->to_state();
+    Key rtstack = r->to_stack1();
+
+    if( r->to_stack2() == WALI_EPSILON ) {
+      update( rtstate, rtstack, t->to(), wghtOne, r->to() );
+      interGr->addEdge(Transition(*t),
+                       Transition(rtstate,rtstack,t->to()),
+                       r->weight());
+    }
+    else {  // Push rule (p,g) -> (p,g',g2)
+
+      // Is a rule 2 so we must generate a state
+      // and create 2 new transitions
+      Key gstate = gen_state( rtstate,rtstack );
+      // Note: QuasiOne is not supported in FWPDS
+      
+      Trans * tprime = update_prime( gstate, r->to_stack2(), t->to(), wghtOne  );
+      update( rtstate, rtstack, gstate, wghtOne, r->to() );
+
+      // add source edge
+      interGr->setSource(Transition(rtstate,rtstack, gstate), wghtOne);
+      // add edge (p,g,q) -> (p,g',(p,g'))
+      interGr->addCallEdge(Transition(*t),Transition(rtstate,rtstack, gstate));
+      // add edge (p,g,q) -> ((p,g'),rstk2,q)
+      interGr->addEdge(Transition(*t),
+                       Transition(gstate, r->to_stack2(),t->to_state()),
+                       r->weight());
+      
+      if( tprime->modified() )
         {
-            wfa::Trans * tprime = *it;
-            wpds::Config * config = make_config( t->from(),tprime->stack() );
+          
+          WFA::eps_map_t::iterator epsit = fa.eps_map.find( tprime->from() );
+          if( epsit != fa.eps_map.end() )
+            {
+              // get epsilon list ref
+              TransSet& transSet = epsit->second;
+              // iterate
+              TransSet::iterator tsit = transSet.begin();
+              for( ; tsit != transSet.end() ; tsit++ )
+                {
+                  Trans * teps = *tsit;
 
-            mfun_t mf(0);
-            Key caller_state = WALI_EPSILON;
-            Key caller_stack = WALI_EPSILON;
-            if( 0 != key_pair ) {
-                //mf = lookup_merge(KeyTriple(key_pair->first(),key_pair->second(),tprime->stack()));
-                KeyTriple kp3(key_pair->first(),key_pair->second(),tprime->stack());
-                merge_rule_hash_t::iterator it = merge_rule_hash.find(kp3);
-                // Note : this check should always pass
-                if (it != merge_rule_hash.end()) {
-                    mf = it->second.mf;
-                    caller_state = it->second.state;
-                    caller_stack = it->second.stack;
+                  interGr->addEdge(Transition(*t),
+                                   Transition(*teps),
+                                   Transition(teps->from(),tprime->stack(),tprime->to()),
+                                   er->merge_fn().get_ptr());
+
+                  Config * config = make_config( teps->from(),tprime->stack() );
+                  
+                  update( teps->from(),tprime->stack(),tprime->to(),
+                          wghtOne, config );
                 }
-            }
-
-            update( t->from()
-                    , tprime->stack()
-                    , tprime->to()
-                    , wghtOne
-                    , config
-                  );
-            if( mf.is_valid() ) {
-                gr.addEdge(
-                        Transition(caller_state,caller_stack,tprime->to()),
-                        Transition(*t),
-                        Transition(t->from(),tprime->stack(),tprime->to()),
-                        mf.get_ptr());
-            }
-            else {
-                gr.addEdge(Transition(*tprime),
-                        Transition(*t),
-                        Transition(t->from(),tprime->stack(),tprime->to()),
-                        wghtOne);
             }
         }
     }

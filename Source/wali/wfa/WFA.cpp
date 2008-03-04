@@ -201,6 +201,24 @@ namespace wali
             return query;
         }
 
+        //
+        // Get some weight from the WFA, if it is non-empty 
+        // If the WFA is empty, return NULL
+        //
+        sem_elem_t WFA::getSomeWeight() {
+          sem_elem_t ret;
+          kp_map_t::iterator it = kpmap.begin();
+          while(it != kpmap.end()) {
+            TransSet &tset = it->second;
+            TransSet::iterator it2 = tset.begin();
+            if(it2 != tset.end()) {
+              return (*it2)->weight();
+            }
+            it ++;
+          }
+          return ret;
+        }
+
         //!
         // @brief add trans (p,g,q,se) to WFA
         //
