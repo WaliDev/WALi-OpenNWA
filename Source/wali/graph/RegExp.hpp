@@ -19,6 +19,23 @@
 
 using namespace std;
 
+/* RegExp usage:
+ *
+ * (1) The calls to RegExp::startSatProcess() and RegExp::stopSatProcess() must alternate.
+ * (2) RegExp::startSatProcess() must be called once before RegExps can be used.
+ * (3) The period between startSatProcess() and stopSatProcess() is available to carry out a saturation process
+ * (4) RegExp::stopSatProcess() resets the set of updatable nodes and fixes old updatable nodes to act as
+ *     constants forever. Old RegExps can still be reevaluated if they were not evaluated before
+ *     stopSatProcess was called, but once evaluated there would be no need to evaluate them again.
+ * (5) RegExp created in different startSatProcess()-stopSatProcess periods can be mixed together with the understanding
+ *     that RegExps are always used as constant and are never mutated (its hopefully enforced by the compiler ---
+ *     keep the constructors private)
+ * (6) To achieve the above, we use the static value currentSatProcess (an unsigned int) and non-static
+ *     value satProcess (also an unsigned int)
+ * (7) One can also change the semiring being used by calling startSatProcess() but then it should not be
+ *     mixed with old RegExps.
+ */
+
 namespace wali {
 
     namespace graph {
@@ -111,6 +128,13 @@ namespace wali {
         typedef wali::HashMap<reg_exp_key_t, reg_exp_t, hash_reg_exp_key, reg_exp_key_t> reg_exp_hash_t;
         typedef wali::HashMap<sem_elem_t, reg_exp_t, hash_sem_elem, sem_elem_equal> const_reg_exp_hash_t;
 
+        class RegExpSatProcess {
+          public:
+          unsigned int update_count;
+          RegExpSatProcess() : update_count(1) { }
+        };
+
+
         class RegExp {
             public:
                 unsigned int count; // for reference counting
@@ -137,7 +161,10 @@ namespace wali {
                 int nevals; // for gathering stats: no of times eval was called on this regexp
 
                 static vector<reg_exp_t> updatable_nodes;
-                static unsigned int update_count;
+
+                static vector<RegExpSatProcess> satProcesses;
+                static unsigned int currentSatProcess;
+                unsigned int satProcess;
 
                 static bool extend_backwards;
                 static reg_exp_hash_t reg_exp_hash;
@@ -159,6 +186,7 @@ namespace wali {
                     nevals = 0;
                     samechange = differentchange = 0;
                     lastchange=-1;
+                    satProcess = currentSatProcess;
                 }
                 RegExp(reg_exp_type t, const reg_exp_t r1, const reg_exp_t r2 = 0) {
                     count = 0;
@@ -182,6 +210,7 @@ namespace wali {
                     uptodate = false;
                     samechange = differentchange = 0;
                     lastchange=-1;
+                    satProcess = currentSatProcess;
                 }
                 RegExp(sem_elem_t se) {
                     type = Constant;
@@ -194,11 +223,11 @@ namespace wali {
                     nevals = 0;
                     samechange = differentchange = 0;
                     lastchange=-1;
+                    satProcess = currentSatProcess;
                 }
 
             public:
 
-                static void reset();
                 static void extendDirectionBackwards(bool b) {
                     extend_backwards = b;
                 }
@@ -220,7 +249,8 @@ namespace wali {
                 static reg_exp_t extend(reg_exp_t r1, reg_exp_t r2);
                 static reg_exp_t combine(reg_exp_t r1, reg_exp_t r2);
                 static reg_exp_t constant(sem_elem_t se);
-                static void init(const sem_elem_t se);
+                static void startSatProcess(const sem_elem_t se);
+                static void stopSatProcess();
 
                 static reg_exp_t updatable(node_no_t nno, sem_elem_t se);
                 static reg_exp_t compress(reg_exp_t r, reg_exp_cache_t &cache);

@@ -80,7 +80,6 @@ namespace wali {
             if(intra_graph_uf) {
                 delete intra_graph_uf;
             }
-            RegExp::reset(); // FIXME: there should be a better place for this
         }
 
         int InterGraph::nodeno(Transition &t) {
@@ -393,7 +392,7 @@ namespace wali {
             // If an argument is passed in then only weights on those transitions will be available
             // I can fix this (i.e., weights for others will be available on demand), but not right now.
             void InterGraph::setupInterSolution(std::list<Transition> *wt_required) {
-                RegExp::init(sem);
+                RegExp::startSatProcess(sem);
 
                 util::Timer *timer = new util::Timer("FWPDS Find Graphs");
 
@@ -503,7 +502,7 @@ namespace wali {
                     saturate(worklist,scc_n);
                 }
                 max_scc_computed = max_scc_required;
-                RegExp::saturationComplete();
+                RegExp::stopSatProcess();
                 RegExp::executingPoststar(!running_prestar);
 
 #ifdef STATIC_MEMORY

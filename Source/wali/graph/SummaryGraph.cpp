@@ -204,7 +204,7 @@ namespace wali {
 
         void SummaryGraph::summaryPoststar(wali::wfa::WFA& ca_in, wali::wfa::WFA& ca_out) {
             int i;
-            RegExp::init(igr->sem);
+            RegExp::startSatProcess(igr->sem);
 
             typedef pair<int, Key> tup;
             std::set<tup> worklist;
@@ -463,7 +463,7 @@ namespace wali {
             }
             changed_graphs.clear();
 
-            RegExp::reset();
+            RegExp::stopSatProcess();
             trans_map.clear();
             nodes.clear();
             }
