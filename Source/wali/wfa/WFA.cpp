@@ -14,7 +14,10 @@
 #include "wali/wfa/TransFunctor.hpp"
 #include "wali/wfa/Trans.hpp"
 #include "wali/wfa/WeightMaker.hpp"
+#include "wali/regex/AllRegex.hpp"
+
 #include <iostream>
+#include <vector>
 
 #define FOR_EACH_STATE(name)                                \
     State* name;                                            \
@@ -1230,6 +1233,122 @@ namespace wali
 
             // TODO: does not erase incoming Trans!
             return true;
+        }
+
+        /* @see Tarjan's paper on path expressions */
+        wali::regex::regex_t WFA::TarjanBasicRegex()
+        {
+            using namespace wali::regex;
+
+            typedef wali::HashMap<wali::Key,int> index_map_t;
+            std::vector<wali::Key> order(Q.size());
+            std::vector<regex_t> nodes(Q.size()); // holds answer
+            index_map_t index_map;
+
+            std::set<wali::Key>::iterator it = Q.begin();
+            for( int i=0; it != Q.end() ; i++, it++ ) {
+                order[i] = *it;
+                index_map.insert(*it,i);
+            }
+
+            const size_t n = order.size();
+            regex_t **P = new regex_t*[n];
+            // initialize
+            for( size_t i=0 ; i < n ; i++ ) {
+                P[i] = new regex_t[n];
+                for( size_t j=0 ; j < n ; j++ ) {
+                    P[i][j] = Regex::NIL();
+                }
+            }
+            // for e \in E, P(h(e),t(e)) := [P(h(e),t(e)) \cup e]
+            for( size_t i=0; i < n ; i++ ) {
+                wali::Key hd = order[i];
+                State* state = getState(hd);
+                TransSet::iterator it = state->begin();
+                for( ; it != state->end() ; it++ ) {
+                    Trans* t = *it;
+                    index_map_t::iterator lkup = index_map.find(t->to());
+                    assert( lkup != index_map.end() );
+                    const int tl = lkup->second;
+                    { // DEBUGGING
+                        //P[i][tl]->print( *eout << "\tOLD(" << i << "," << tl << ") : " ) << std::endl;
+                    }
+                    std::string s = wali::key2str(t->stack());
+                    //Alpha* value = cpds::make_alpha(s);
+                    P[i][tl] = Regex::COMBINE(P[i][tl],new Root(s,t->weight()));
+                    { // DEBUGGING
+                        //P[i][tl]->print( *eout << "\tP(" << i << "," << tl << ") : " ) << std::endl;
+                    }
+                }
+            }
+            // loop for v = 1 until n do
+            // construct the path sequence
+            for( size_t v = 0; v < n ; v++ ) {
+                P[v][v] = Regex::STAR(P[v][v]);
+                for( size_t u = v+1; u < n ; u++ ) {
+                    if( P[u][v]->isZero() ) continue;
+                    P[u][v] = Regex::EXTEND(P[u][v],P[v][v]);
+                    for( size_t w = v+1; w < n ; w++ ) {
+                        if( P[v][w]->isZero() ) continue;
+                        P[u][w] = Regex::COMBINE(P[u][w],Regex::EXTEND(P[u][v],P[v][w]));
+                        { // DEBUGGING
+                            //P[u][w]->print( *eout << "\tP(" << u << "," << w << ") : " ) << std::endl;
+                        }
+                    }
+                }
+            }
+
+            index_map_t::iterator lkup = index_map.find(getInitialState());
+            assert(lkup != index_map.end());
+            const int init_idx = lkup->second;
+
+            for( size_t i=0; i < n; i++) {
+                nodes[i] = Regex::NIL();
+            }
+
+            nodes[init_idx] = Regex::ID();
+
+            for( size_t u=0; u < n ; u++) {
+                for( size_t w =u; w < n ; w++) {
+                    if( w == u && P[u][u]->isOne() ) continue;
+                    if( P[u][w]->isZero() ) continue;
+                    if( u == w ) {
+                        nodes[u] = Regex::EXTEND(nodes[u],P[u][w]);
+                    }
+                    else {
+                        nodes[w] = Regex::COMBINE(nodes[w], Regex::EXTEND(nodes[u],P[u][w]));
+                    }
+                }
+            }
+            for( int u = n-1; u >= 0; u-- ) {
+                for( int w = u-1; w >=0 ; w-- ) {
+                    if( P[u][w]->isZero() ) continue;
+                    if( u == w ) {
+                        nodes[u] = Regex::EXTEND(nodes[u],P[u][w]);
+                    }
+                    else {
+                        nodes[w] = Regex::COMBINE(nodes[w],Regex::EXTEND(nodes[u],P[u][w]));
+                    }
+                }
+            }
+            // now return nodes[INDEX(getInitialState())]
+            std::set< wali::Key >::iterator fit = F.begin();
+            regex_t answer = Regex::NIL();
+            for( ; fit != F.end() ; fit++ ) {
+                wali::Key f = *fit;
+                index_map_t::iterator mit = index_map.find(f);
+                if( mit != index_map.end() ) {
+                    answer = Regex::COMBINE(answer,nodes[mit->second]);
+                }
+            }
+            for( size_t i=0; i < n ; i++ ) {
+                { // DEBUGGING
+                    //nodes[i]->print( *eout << "(" << i << ") " ) << std::endl;
+                }
+                delete[] P[i];
+            }
+            delete[] P;
+            return answer;
         }
 
     } // namespace wfa

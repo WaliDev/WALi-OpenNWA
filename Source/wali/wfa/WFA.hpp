@@ -40,6 +40,11 @@ namespace wali
         }
     }
 
+    namespace regex {
+        class Regex;
+        typedef wali::ref_ptr<Regex> regex_t;
+    }
+
     namespace wfa
     {
         class State;
@@ -462,6 +467,8 @@ namespace wali
                  */
                 virtual void path_summary( Worklist<State>& wl, sem_elem_t wt );
 
+            protected:
+                wali::regex::regex_t TarjanBasicRegex();
 
             private:
 
