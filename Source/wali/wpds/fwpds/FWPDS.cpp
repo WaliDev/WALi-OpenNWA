@@ -28,6 +28,7 @@
 
 #include "wali/graph/RegExp.hpp"
 #include "wali/graph/InterGraph.hpp"
+#include "wali/wpds/fwpds/LazyTrans.hpp"
 
 using namespace wali;
 using namespace wali::graph;
@@ -63,10 +64,12 @@ void FWPDS::topDownEval(bool f) {
 
 struct FWPDSCopyBackFunctor : public wali::wfa::TransFunctor
 {
-    wali::graph::InterGraph& gr;
-    FWPDSCopyBackFunctor(wali::graph::InterGraph& gr) : gr(gr) {}
+    ref_ptr<wali::graph::InterGraph> gr;
+    FWPDSCopyBackFunctor(ref_ptr<wali::graph::InterGraph> _gr) : gr(_gr) {}
     virtual void operator()( wfa::Trans* t ) {
-        t->setWeight( gr.get_weight( Transition(*t) ) );
+      LazyTrans *lt = static_cast<LazyTrans *> (t);
+      lt->setInterGraph(gr);
+      //t->setWeight( gr.get_weight( Transition(*t) ) );
     }
 };
 
@@ -164,19 +167,15 @@ FWPDS::prestar( wfa::WFA& input, wfa::WFA& output )
     //interGr->print(std::cout << "THE INTERGRAPH\n",graphPrintKey);
 
     // Copy information back from InterGraph to the
-    // output WFA. This does computation on weights
-    // to calculate the transition weights -- if 
-    // (all or part of) it had not been computed by
-    // setupInterSolution
-    FWPDSCopyBackFunctor copier( *interGr );
-    {
-        util::Timer t("\t[FWPDS] Solve all weights ");
-        output.for_each(copier);
-    }
+    // output WFA. This does not do computation on weights,
+    // but instead uses LazyTrans to put in "lazy" weights
+    // that are evaluated on demand.
+    FWPDSCopyBackFunctor copier( interGr );
+    output.for_each(copier);
+
 
     checkResults(input,false);
 
-    delete interGr;
     interGr = NULL;
     currentOutputWFA = 0;
 }
@@ -328,19 +327,15 @@ FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
     //interGr->print(std::cout << "THE INTERGRAPH\n",graphPrintKey);
 
     // Copy information back from InterGraph to the
-    // output WFA. This does computation on weights
-    // to calculate the transition weights -- if 
-    // (all or part of) it had not been computed by
-    // setupInterSolution
-    FWPDSCopyBackFunctor copier( *interGr );
-    {
-        util::Timer t("\t[FWPDS] Solve all weights ");
-        output.for_each(copier);
-    }
+    // output WFA. This does not do computation on weights,
+    // but instead uses LazyTrans to put in "lazy" weights
+    // that are evaluated on demand.
+    FWPDSCopyBackFunctor copier( interGr );
+    output.for_each(copier);
+
 
     checkResults(input,true);
 
-    delete interGr;
     interGr = NULL;
     currentOutputWFA = 0;
 }
@@ -449,6 +444,66 @@ void FWPDS::poststar_handle_trans(LinkedTrans *t, WFA &fa,
         }
     }
 }
+
+
+////////////////////////////////////////////
+// These guys take care of LazyTrans stuff
+////////////////////////////////////////////
+
+void FWPDS::update(
+                   Key from,
+                   Key stack,
+                   Key to,
+                   sem_elem_t se,
+                   Config * cfg )
+{
+  LazyTrans * lt = new LazyTrans(from,stack,to,se,cfg);
+  Trans *t = currentOutputWFA->insert(lt);
+  if( t->modified() ) {
+    //t->print(std::cout << "Adding transition: ") << "\n";
+    worklist->put( t );
+  }
+}
+
+wpds::LinkedTrans * FWPDS::update_prime(
+                                        Key from,
+                                        Key stack,
+                                        Key to,
+                                        sem_elem_t se )
+{
+  LazyTrans * t = new LazyTrans(from,stack,to,se,0);
+  Trans * tmp = currentOutputWFA->insert(t);
+  // TODO: Make this a debugging stmt
+  return dynamic_cast<wpds::LinkedTrans*>(tmp);
+}
+
+void FWPDS::operator()( wali::wfa::Trans * orig ) {
+  if(checkingPhase) {
+    return EWPDS::operator()(orig);
+  }
+
+  Config *c = make_config( orig->from(),orig->stack() );
+  sem_elem_t se;
+  if( wrapper ) {
+    se = wrapper->wrap(*orig);
+  }
+  else {
+    se = orig->weight();
+  }
+  LazyTrans *t;
+  t = new LazyTrans( orig->from()
+                     ,orig->stack()
+                     ,orig->to()
+                     ,se
+                     ,c);
+  
+  // fa.addTrans takes ownership of passed in pointer
+  currentOutputWFA->addTrans( t );
+
+  // add t to the worklist for saturation
+  worklist->put( t );
+}
+
 
 /* Yo, Emacs!
    ;;; Local Variables: ***

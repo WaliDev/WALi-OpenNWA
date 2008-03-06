@@ -98,6 +98,7 @@ namespace wali
                         sem_elem_t se );
 
                 Trans( const Trans & t );
+                const Trans &operator =(const Trans &t);
 
                 virtual ~Trans();
 
@@ -130,7 +131,7 @@ namespace wali
                 }
 
                 /*! @return const sem_elem_t of Trans */
-                const sem_elem_t weight() const throw() {
+                virtual const sem_elem_t weight() const throw() {
                     return se;
                 }
 
@@ -172,7 +173,7 @@ namespace wali
                 }
 
                 /*! @return sem_elem_t of Trans */
-                sem_elem_t weight() throw() {
+                virtual sem_elem_t weight() throw() {
                     return se;
                 }
 
@@ -195,7 +196,7 @@ namespace wali
                  *
                  * @param w the sem_elem_t for the new weight
                  */
-                void setWeight( sem_elem_t w ) {
+                virtual void setWeight( sem_elem_t w ) {
                     se = w;
                 }
 
@@ -206,7 +207,7 @@ namespace wali
                     delta = w;
                 }
 
-                void combine_weight( sem_elem_t w );
+                virtual void combine_weight( sem_elem_t w );
 
                 /*! @return true if param rhs is equal to this */
                 virtual bool equal( const trans_t & rhs ) const;
@@ -266,7 +267,7 @@ namespace wali
             protected:
                 KeyPair kp;
                 Key toStateKey;
-                sem_elem_t se;
+                mutable sem_elem_t se;
                 sem_elem_t delta;
 
             protected:  // vars used in Process and not relevant to Trans

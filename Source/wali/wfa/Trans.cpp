@@ -71,13 +71,17 @@ namespace wali
         // Creating a new Trans means the delta this Trans
         // knows about is actually the se of param rhs
         //
+        // There is a call to weight() to get the weight of rhs because
+        // rhs may be a LazyTrans, which requires that the weight of a transition be
+        // through a call to weight()
+        //
         Trans::Trans( const Trans & rhs ) :
             Printable(),Countable(true),Markable()
         {
             kp      = rhs.kp;
             toStateKey= rhs.toStateKey;
-            se      = rhs.se;
-            delta   = rhs.se;
+            se      = rhs.weight();
+            delta   = rhs.weight();
             status  = rhs.status;
             {
                 // TODO : R
@@ -85,6 +89,20 @@ namespace wali
                 //*waliErr << "Trans( const Trans& ) : " << numTrans << std::endl;
             }
         }
+
+      const Trans &Trans::operator =(const Trans &rhs) {
+            kp      = rhs.kp;
+            toStateKey= rhs.toStateKey;
+            se      = rhs.weight();
+            delta   = rhs.weight();
+            status  = rhs.status;
+            {
+                // TODO : R
+                numTrans++;
+                //*waliErr << "Trans( const Trans& ) : " << numTrans << std::endl;
+            }
+            return *this;
+      }
 
         Trans::~Trans()
         {
@@ -126,7 +144,7 @@ namespace wali
             printKey(o,to());
             o << " )";
 
-            o << "\t" << se->toString();
+            o << "\t" << weight()->toString();
             { // BEGIN DEBUGGING
                 // FIXME: make a debugging print
                 //o << "\tdelta: " << delta->toString();

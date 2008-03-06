@@ -220,7 +220,9 @@ namespace wali
                         Key to );
 
                 /*!
-                 * @brief erase State q and all of its transitions
+                 * @brief erase State q and all of its outgoing transitions
+                 * It does not remove incoming transitions -- that has to be
+                 * done by the client. This does not delete the state
                  *
                  * @return true if it was sucessful
                  */
@@ -327,6 +329,19 @@ namespace wali
                 virtual void prune();
 
                 /*!
+                 * Intersects the WFA with <init_state, (stk \Gamma^*)>
+                 * that essentially removes transitions and calls prune
+                 */
+                virtual void filter(Key stk);
+
+                /*!
+                 * Intersects the WFA with { <init_state, (stk \Gamma^*)> | stk
+                 * \in stkset }
+                 * This essentially removes transitions and calls prune
+                 */
+                virtual void filter(std::set<Key> &stkset);
+
+                /*!
                  * Write the WFA to the std::ostream parameter, implements
                  * Printable::print
                  *
@@ -431,6 +446,16 @@ namespace wali
                  */
                 void setupFixpoint( Worklist<State>& wl, PredHash_t& preds, sem_elem_t wtFinal );
 
+                /*!
+                 * Erases the specified Trans(from,stack,to) from the
+                 * kpmap and epsmap. A null return value means no transition existed.
+                 *
+                 * @return the Trans* that was removed from the maps
+                 */
+                Trans * eraseTransFromMaps(
+                        Key from,
+                        Key stack,
+                        Key to );
                 /*!
                  * Erases the specified Trans(from,stack,to) from the
                  * kpmap. A null return value means no transition existed.

@@ -2,11 +2,6 @@
  * @author Nick Kidd
  */
 
-/*
- * WFA::eraseState is currently broken. It does not remove the
- * incoming Transes to the State. TODO: FIX
- */
-
 #include "wali/Common.hpp"
 #include "wali/DefaultWorklist.hpp"
 #include "wali/wfa/WFA.hpp"
@@ -247,13 +242,13 @@ namespace wali
         }
 
         //
-        // Erase a trans
-        // Must remove from kpmap, eps_map, and State('from')
+        // Erase a trans from the WFA maps
+        // Returns the erased trans
         //
-        void WFA::erase(
-                Key from,
-                Key stack,
-                Key to )
+        Trans * WFA::eraseTransFromMaps(
+                                        Key from,
+                                        Key stack,
+                                        Key to )
         {
             // Remove from kpmap
             Trans* tKp = eraseTransFromKpMap(from,stack,to);
@@ -267,10 +262,27 @@ namespace wali
                         assert( tKp == tEps );
                 } // END DEBUGGING
 
-                State* state = state_map.find(from)->second;
-                state->eraseTrans(tKp);
-                delete tKp;
             }
+
+            return tKp;
+        }
+
+        //
+        // Erase a trans
+        // Must remove from kpmap, eps_map, State('from')
+        //
+        void WFA::erase(
+                Key from,
+                Key stack,
+                Key to )
+        {
+            // Remove from maps
+            Trans* t = eraseTransFromMaps(from,stack,to);
+
+            State* state = state_map.find(from)->second;
+            state->eraseTrans(t);
+
+            delete t;
         }
 
         //
@@ -773,6 +785,43 @@ namespace wali
         }
 
         //
+        // Intersect (in place) with (stk \Gamma^*)
+        //
+        void WFA::filter(Key stk) {
+          std::set<Key> stkset;
+          stkset.insert(stk);
+          filter(stkset);
+        }
+
+        //
+        // Intersect (in place) with (stk \Gamma^*)
+        //
+        void WFA::filter(std::set<Key> &stkset) {
+          // Remove outgoing transitions from the init state that do not
+          // have stack in stkset
+          State *init = getState(getInitialState());
+          State::iterator tit = init->begin();
+          State::iterator titEND = init->end();
+
+          // List of transitions to be deleted
+          std::list<Trans *> to_delete;
+          for( ; tit != titEND ; tit++ ) {
+            Trans* t = *tit; 
+            if(stkset.find(t->stack()) == stkset.end()) {
+              to_delete.push_back(t);
+            }
+          }
+          std::list<Trans *>::iterator lit;
+          for(lit = to_delete.begin(); lit != to_delete.end(); lit++) {
+            Trans *t = *lit;
+            erase(t->from(), t->stack(), t->to());
+          }
+
+          // prune
+          prune();
+        }
+
+        //
         // @brief print WFA to param o
         //
         std::ostream & WFA::print( std::ostream & o ) const
@@ -1170,7 +1219,9 @@ namespace wali
 
         //
         // Removes State state from the WFA and any transitions leading
-        // to and from state.
+        // from the state.
+        // Note: This function does not remove incoming transitions to the state -- That 
+        // has to be done by the client
         //
         bool WFA::eraseState(
                 State* state
@@ -1187,7 +1238,7 @@ namespace wali
                 //Key to = stateTrans->to();
                 //Trans* tKp = eraseTransFromKpMap( from,stack,to );
 
-                Trans* tKp = eraseTransFromKpMap(stateTrans);
+                Trans* tKp = eraseTransFromMaps(stateTrans->from(), stateTrans->stack(), stateTrans->to());
 
                 { // BEGIN DEBUGGING
                     if( tKp != NULL && tKp != stateTrans ) {
@@ -1200,14 +1251,6 @@ namespace wali
                     else {
                         // Fail if tKp == NULL
                         assert(tKp);
-                    }
-                } // END DEBUGGING
-
-                Trans* teps = eraseTransFromEpsMap(tKp);
-
-                { // BEGIN DEBUGGING
-                    if( teps != NULL ) {
-                        assert( tKp == teps );
                     }
                 } // END DEBUGGING
 
@@ -1231,7 +1274,6 @@ namespace wali
             // delete the memory
             //delete state;
 
-            // TODO: does not erase incoming Trans!
             return true;
         }
 

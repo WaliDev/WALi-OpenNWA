@@ -107,6 +107,8 @@ namespace wali {
         };
 
         class InterGraph {
+            public:
+                unsigned int count; // ref counting
             private:
                 friend class SummaryGraph;
 
@@ -146,6 +148,7 @@ namespace wali {
                     running_ewpds = e;
                     running_prestar = pre;
                     max_scc_computed = 0;
+                    count = 0;
                 }
                 ~InterGraph();
                 void addEdge(Transition src, Transition tgt, wali::sem_elem_t se);

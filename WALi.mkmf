@@ -68,6 +68,7 @@
 
             <!-- FWPDS -->
             <item Name='FWPDS' RelativePath='wali/wpds/fwpds/FWPDS.cpp' />
+            <item Name='LazyTrans' RelativePath='wali/wpds/fwpds/LazyTrans.cpp' />
 
             <!-- Witness -->
             <item Name='Witness' RelativePath='wali/witness/Witness.cpp' />
@@ -152,6 +153,7 @@
 
             <!-- FWPDS -->
             <item Name='FWPDS' RelativePath='wali/wpds/fwpds/FWPDS.cpp' />
+            <item Name='LazyTrans' RelativePath='wali/wpds/fwpds/LazyTrans.cpp' />
 
             <!-- Witness -->
             <item Name='Witness' RelativePath='wali/witness/Witness.cpp' />

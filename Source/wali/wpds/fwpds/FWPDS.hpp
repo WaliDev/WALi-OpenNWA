@@ -16,6 +16,7 @@
 #include "wali/wpds/ewpds/MergeFunction.hpp"
 
 #include "wali/graph/GraphCommon.hpp"
+#include "wali/graph/InterGraph.hpp"
 
 namespace wali {
 
@@ -99,6 +100,22 @@ namespace wali {
                             sem_elem_t delta
                             );
 
+                    void update(
+                                wali::Key from
+                                , wali::Key stack
+                                , wali::Key to
+                                , sem_elem_t se
+                                , Config * cfg
+                                );
+
+                    LinkedTrans * update_prime(
+                                               wali::Key from
+                                               , wali::Key stack
+                                               , wali::Key to
+                                               , sem_elem_t se
+                                               );
+              
+                    void operator()( wali::wfa::Trans * orig );
                     ///////////
                     // helpers
                     ///////////
@@ -106,7 +123,7 @@ namespace wali {
 
                 protected:
                     sem_elem_t wghtOne;
-                    wali::graph::InterGraph *interGr;
+                    ref_ptr<wali::graph::InterGraph> interGr;
                     bool checkingPhase;
 
             }; // class FWPDS
