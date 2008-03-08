@@ -33,6 +33,29 @@ namespace wali
             r->marshall( os << "\t" ) << "\n";
         }
 
+        /////////////////////////////////////////////////////////////////
+        // class WpdsStackSymbols
+        /////////////////////////////////////////////////////////////////
+        WpdsStackSymbols::WpdsStackSymbols( ) {}
+
+        WpdsStackSymbols::~WpdsStackSymbols() {}
+
+        void WpdsStackSymbols::operator()( const rule_t & r )
+        {
+            addPoint(r->from_stack(), gamma);
+            addPoint(r->to_stack1(), gamma);
+            addPoint(r->to_stack2(), gamma);
+            addPoint(r->to_stack2(), returnPoints);
+            if(r->to_stack2() != WALI_EPSILON) {
+              addPoint(r->to_stack1(), entryPoints);
+            }
+        }
+
+        void WpdsStackSymbols::addPoint(Key k, std::set< Key > &s) {
+          if(k != WALI_EPSILON) 
+            s.insert(k);
+        }
+
     }
 }
 

@@ -2,11 +2,12 @@
 #define wali_wpds_RULE_FUNCTOR_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nick Kidd, Akash Lal
  */
 
 #include "wali/Common.hpp"
 #include <iostream>
+#include <set>
 
 namespace wali
 {
@@ -73,6 +74,27 @@ namespace wali
 
                 virtual void operator()( const rule_t & r );
 
+        };
+
+        /*!
+         * @class WpdsStackSymbols
+         * Gets all stack symbols from the WPDS and classfies them
+         * as entry and return points, as appropriate
+         */
+        class WpdsStackSymbols : public ConstRuleFunctor
+        {
+            public:
+                std::set< Key > gamma;
+                std::set< Key > returnPoints;
+                std::set< Key > entryPoints;
+
+                WpdsStackSymbols( );
+                virtual ~WpdsStackSymbols();
+
+                virtual void operator()( const rule_t & r );
+
+            private:
+                void addPoint(Key k, std::set< Key > &s);
         };
 
 

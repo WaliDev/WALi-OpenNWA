@@ -54,6 +54,8 @@ wali_files = Split("""
 ./wali/wfa/WeightMaker.cpp
 ./wali/wfa/TransFunctor.cpp
 ./wali/wfa/TransSet.cpp
+./wali/wfa/epr/EPA.cpp
+./wali/wfa/epr/FunctionalWeight.cpp
 ./wali/witness/WitnessExtend.cpp
 ./wali/witness/WitnessWrapper.cpp
 ./wali/witness/WitnessRule.cpp
