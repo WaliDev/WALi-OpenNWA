@@ -13,7 +13,6 @@
 #include "wali/wpds/Config.hpp"
 #include "wali/wpds/Rule.hpp"
 #include "wali/wpds/RuleFunctor.hpp"
-#include "wali/wpds/LinkedTrans.hpp"
 #include "wali/wpds/Wrapper.hpp"
 #include "wali/wpds/GenKeySource.hpp"
 #include "wali/DefaultWorklist.hpp"
@@ -139,6 +138,7 @@ namespace wali
         {
             prestarSetupFixpoint(input,fa);
             prestarComputeFixpoint( fa );
+            unlinkOutput(fa);
             currentOutputWFA = 0;
         }
 
@@ -160,6 +160,20 @@ namespace wali
                 input.for_each(*this);
             }
             currentOutputWFA->setGeneration(input.getGeneration()+1);
+        }
+
+        // Sets the config field to NULL
+        class Unlinker : public wfa::TransFunctor {
+            public:
+                virtual ~Unlinker() {}
+                virtual void operator()(Trans* t) {
+                    t->setConfig(0);
+                }
+        };
+
+        void WPDS::unlinkOutput( WFA& fa) {
+            Unlinker unlinker;
+            fa.for_each(unlinker);
         }
 
         void WPDS::prestarSetupFixpoint( WFA& input, WFA& fa )
@@ -208,7 +222,7 @@ namespace wali
         void WPDS::prestarComputeFixpoint( WFA& fa )
         {
 
-            LinkedTrans * t;
+            Trans * t;
 
             while( get_from_worklist( t ) )
             {
@@ -216,19 +230,19 @@ namespace wali
             }
         }
 
-        void WPDS::pre( LinkedTrans* t, WFA& fa )
+        void WPDS::pre( Trans* t, WFA& fa )
         {
             //t->print(std::cout << "Popped: ") << "\n";
 
             // Get config
-            Config * config = t->config;
+            Config * config = t->getConfig();
 
             { // BEGIN DEBUGGING
                 assert( config );
             } // END DEBUGGING
 
-            sem_elem_t dnew = t->delta;
-            t->delta = dnew->zero();
+            sem_elem_t dnew = t->getDelta();
+            t->setDelta(dnew->zero());
 
             // For each backward rule of config
             Config::reverse_iterator bwit = config->rbegin();
@@ -288,7 +302,7 @@ namespace wali
 
 
         void WPDS::prestar_handle_trans(
-                LinkedTrans * t ,
+                Trans * t ,
                 WFA & fa   ,
                 rule_t & r,
                 sem_elem_t delta
@@ -352,6 +366,7 @@ namespace wali
         {
             poststarSetupFixpoint(input,fa);
             poststarComputeFixpoint(fa);
+            unlinkOutput(fa);
             currentOutputWFA = 0;
         }
 
@@ -378,7 +393,7 @@ namespace wali
 
         void WPDS::poststarComputeFixpoint( WFA& fa )
         {
-            LinkedTrans * t;
+            Trans * t;
 
             while( get_from_worklist( t ) ) 
             {
@@ -386,17 +401,17 @@ namespace wali
             }
         }
 
-        void WPDS::post( LinkedTrans * t, WFA& fa )
+        void WPDS::post( Trans * t, WFA& fa )
         {
             // Get config
-            Config * config = t->config;
+            Config * config = t->getConfig();
 
             // Get delta
-            sem_elem_t dnew = t->delta;
+            sem_elem_t dnew = t->getDelta();
 
             // Reset delta of t to zero to signify completion
             // of work for that delta
-            t->delta = dnew->zero();
+            t->setDelta(dnew->zero());
 
             // For each forward rule of config
             // Apply rule to create new transition
@@ -433,7 +448,7 @@ namespace wali
         }
 
         void WPDS::poststar_handle_trans(
-                LinkedTrans * t ,
+                Trans * t ,
                 WFA & fa   ,
                 rule_t & r,
                 sem_elem_t delta
@@ -676,14 +691,12 @@ namespace wali
         // Protected WPDS methods
         /////////////////////////////////////////////////////////////////
 
-        bool WPDS::get_from_worklist( LinkedTrans * & t )
+        bool WPDS::get_from_worklist( Trans * & t )
         {
             if( !worklist->empty() ) {
-                //t = (LinkedTrans *)worklist->get();
+                //t = (Trans *)worklist->get();
                 //TODO: make this a debugging statement
-                LinkedTrans *lt = dynamic_cast<LinkedTrans *>(worklist->get());
-                assert(lt);
-                t = lt;
+                t = worklist->get();
                 return true;
             }
             else {
@@ -703,9 +716,9 @@ namespace wali
                 sem_elem_t se,
                 Config * cfg )
         {
-            LinkedTrans * lt = new LinkedTrans(from,stack,to,se,cfg);
-            Trans *t = currentOutputWFA->insert(lt);
-            if( t->modified() ) {
+            Trans *t = currentOutputWFA->insert(new Trans(from,stack,to,se));
+            t->setConfig(cfg);
+            if (t->modified()) {
                 //t->print(std::cout << "Adding transition: ") << "\n";
                 worklist->put( t );
             }
@@ -719,37 +732,30 @@ namespace wali
          *
          * @return generated transition
          */
-        LinkedTrans * WPDS::update_prime(
+        Trans * WPDS::update_prime(
                 Key from,
                 Key stack,
                 Key to,
                 sem_elem_t se )
         {
-            LinkedTrans * t = new LinkedTrans(from,stack,to,se,0);
-            Trans * tmp = currentOutputWFA->insert(t);
-            // TODO: Make this a debugging stmt
-            t = dynamic_cast<LinkedTrans*>(tmp);
+            Trans * tmp = new Trans(from,stack,to,se);
+            Trans * t = currentOutputWFA->insert(tmp);
             return t;
         }
 
         /////////////////////////////////////////////////////////////////
         // Implement TransFunctor.
         // This is used to copy Transitions from the input automaton
-        // to the output. We create a LinkedTrans for fast (hopefully) indexing
-        // of rules.
+        // to the output. 
+        // This sets up the links for running saturation.
         /////////////////////////////////////////////////////////////////
-
         void WPDS::operator()( Trans * orig )
         {
             Config *c = make_config( orig->from(),orig->stack() );
-            LinkedTrans *t;
-            if( wrapper ) {
-                t = new LinkedTrans(orig->from(),orig->stack(),orig->to(),
-                        wrapper->wrap(*orig),c);
-            }
-            else {
-                t = new LinkedTrans(orig->from(),orig->stack(),orig->to(),
-                        orig->weight(),c);
+            Trans *t = orig->copy();
+            t->setConfig(c);
+            if (wrapper) {
+                t->setWeight( wrapper->wrap(*orig) );
             }
 
             // fa.addTrans takes ownership of passed in pointer

@@ -37,7 +37,7 @@ namespace wali
 
         std::ostream& GenKeySource::print( std::ostream& o ) const
         {
-            printKey(o,key) << "[g" << gen << "]";
+            printKey(o,key) << "_g" << gen;
             return o;
         }
 

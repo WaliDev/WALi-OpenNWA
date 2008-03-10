@@ -1,5 +1,4 @@
 #include "wali/wpds/DebugWPDS.hpp"
-#include "wali/wpds/LinkedTrans.hpp"
 #include "wali/wpds/Config.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/State.hpp"
@@ -37,7 +36,7 @@ namespace wali
         void DebugWPDS::prestarComputeFixpoint( ::wali::wfa::WFA& fa )
         {
 
-            LinkedTrans * t;
+            Trans * t;
 
             while( get_from_worklist( t ) ) 
             {
@@ -50,7 +49,7 @@ namespace wali
         void DebugWPDS::poststarComputeFixpoint( ::wali::wfa::WFA& fa )
         {
 
-            LinkedTrans * t;
+            Trans * t;
 
             while( get_from_worklist( t ) ) 
             {
@@ -60,11 +59,11 @@ namespace wali
             }
         }
 
-        void DebugWPDS::post( LinkedTrans * t, ::wali::wfa::WFA& fa )
+        void DebugWPDS::post( wfa::Trans * t, ::wali::wfa::WFA& fa )
         {
 
             // Get config
-            Config * config = t->config;
+            Config * config = t->getConfig();
 
             assert( config );
 
@@ -112,8 +111,8 @@ namespace wali
 
         /*
         void DebugWPDS::poststar_handle_trans(
-                LinkedTrans * t ,
-                WFA & fa   ,
+                wfa::Trans * t,
+                wfa::WFA & fa,
                 rule_t & r,
                 sem_elem_t delta
                 )

@@ -40,7 +40,7 @@ void doReach()
     using wali::wpds::WPDS;
     using wali::wfa::WFA;
 
-    Reach* reachOne = new Reach(true);
+    wali::sem_elem_t reachOne( new Reach(true) );
     //wali::wpds::WPDS myWpds;
     wali::wpds::fwpds::FWPDS myWpds;
     Key p = wali::getKey("p");

@@ -16,6 +16,10 @@
 
 namespace wali
 {
+    namespace wpds {
+        class Config;
+    }
+
     namespace wfa
     {
 
@@ -98,9 +102,12 @@ namespace wali
                         sem_elem_t se );
 
                 Trans( const Trans & t );
+
                 const Trans &operator =(const Trans &t);
 
                 virtual ~Trans();
+
+                virtual Trans* copy();
 
                 //
                 // getters (const)
@@ -190,14 +197,16 @@ namespace wali
                 // setters
                 //
                 /*!
-                 * Sets the weight of the Trans to be param w.
-                 * The Trans's status will be set to MODIFIED if
-                 * param w != this->weight()
+                 * Set weight and delta of this Trans
+                 * to be param [w].
                  *
-                 * @param w the sem_elem_t for the new weight
+                 * @param sem_elem_t for new weight and delta
+                 *
+                 * @return void
                  */
                 virtual void setWeight( sem_elem_t w ) {
                     se = w;
+                    delta = w;
                 }
 
                 /*!
@@ -207,6 +216,13 @@ namespace wali
                     delta = w;
                 }
 
+                /*!
+                 * Sets the weight of the Trans to be param w.
+                 * The Trans's status will be set to MODIFIED if
+                 * param w != this->weight(). Delta is set accordingly.
+                 *
+                 * @param w the sem_elem_t for the new weight
+                 */
                 virtual void combine_weight( sem_elem_t w );
 
                 /*! @return true if param rhs is equal to this */
@@ -264,6 +280,17 @@ namespace wali
                     return (status == MODIFIED);
                 }
 
+                /*!
+                 * @return A null pointer.
+                 */
+                wpds::Config* getConfig();
+
+                /*!
+                 * Set this Trans's Config to c.
+                 * @return void
+                 */
+                void setConfig( wpds::Config* c );
+
             protected:
                 KeyPair kp;
                 Key toStateKey;
@@ -272,6 +299,11 @@ namespace wali
 
             protected:  // vars used in Process and not relevant to Trans
                 status_t status;
+                /*!
+                 * Used by *WPDS during pre and poststar. This is guaranteed
+                 * to be NULL when not performing a reachability query.
+                 */
+                wpds::Config *config;
         };
 
     } // namespace wfa

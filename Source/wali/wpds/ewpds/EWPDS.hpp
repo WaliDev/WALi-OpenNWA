@@ -20,7 +20,6 @@ namespace wali
     {
         class Config;
         class rule_t;
-        class LinkedTrans;
         class RuleFunctor;
         class ConstRuleFunctor;
         class Wrapper;
@@ -168,7 +167,7 @@ namespace wali
                      * @brief helper method for prestar
                      */
                     virtual void prestar_handle_trans(
-                            LinkedTrans * t,
+                            wfa::Trans * t,
                             WFA & ca  ,
                             rule_t & r,
                             sem_elem_t delta );
@@ -185,7 +184,7 @@ namespace wali
                      * @brief helper method for poststar
                      */
                     virtual void poststar_handle_trans(
-                            LinkedTrans * t ,
+                            wfa::Trans * t ,
                             WFA & ca   ,
                             rule_t & r,
                             sem_elem_t delta

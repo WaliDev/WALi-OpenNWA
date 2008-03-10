@@ -6,7 +6,7 @@
  */
 
 #include "wali/Common.hpp"
-#include "wali/wpds/LinkedTrans.hpp"
+#include "wali/wfa/Trans.hpp"
 #include "wali/graph/InterGraph.hpp"
 
 namespace wali
@@ -21,7 +21,7 @@ namespace wali
             class FWPDS;
             typedef ref_ptr<wali::graph::InterGraph> intergraph_t;
 
-            class LazyTrans : public wali::wpds::LinkedTrans
+            class LazyTrans : public wali::wfa::Trans
             {
               public:
                 friend class WPDS;

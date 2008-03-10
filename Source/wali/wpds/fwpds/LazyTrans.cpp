@@ -12,19 +12,25 @@ namespace wali
         namespace fwpds
         {
 
-          LazyTrans::LazyTrans(  wali_key_t from,
-                                 wali_key_t stack,
-                                 wali_key_t to,
-                                 sem_elem_t se,
-                                 Config *config
-                                 ) : LinkedTrans(from,stack,to,se,config) {}
+            LazyTrans::LazyTrans(  wali_key_t from,
+                    wali_key_t stack,
+                    wali_key_t to,
+                    sem_elem_t se,
+                    Config *config
+                    ) : wfa::Trans(from,stack,to,se)
+            {
+                setConfig(config);
+            }
 
-          LazyTrans::LazyTrans(  wali_key_t from,
-                                 wali_key_t stack,
-                                 wali_key_t to,
-                                 intergraph_t igr,
-                                 Config *config
-                                 ) : LinkedTrans(from,stack,to,NULL,config), intergr(igr) {}
+            LazyTrans::LazyTrans(  wali_key_t from,
+                    wali_key_t stack,
+                    wali_key_t to,
+                    intergraph_t igr,
+                    Config *config
+                    ) : wfa::Trans(from,stack,to,NULL), intergr(igr) 
+            {
+                setConfig(config);
+            }
 
           void LazyTrans::compute_weight() const {
             if(!se.is_valid()) {

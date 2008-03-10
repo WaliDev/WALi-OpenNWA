@@ -42,7 +42,7 @@ namespace wali
         Trans::Trans() :
             Countable(true),
             kp(WALI_EPSILON,WALI_EPSILON), toStateKey(WALI_EPSILON),
-            se(0),delta(0),status(MODIFIED)
+            se(0),delta(0),status(MODIFIED),config(0)
         {
             {
                 // TODO : R
@@ -58,7 +58,7 @@ namespace wali
                 sem_elem_t se_ ) :
             Countable(true),
             kp(from_,stack_), toStateKey(to_),
-            se(se_), delta(se_), status(MODIFIED) 
+            se(se_), delta(se_), status(MODIFIED), config(0) 
         {
             {
                 // TODO : R
@@ -83,6 +83,7 @@ namespace wali
             se      = rhs.weight();
             delta   = rhs.weight();
             status  = rhs.status;
+            config  = rhs.config;
             {
                 // TODO : R
                 numTrans++;
@@ -96,11 +97,7 @@ namespace wali
             se      = rhs.weight();
             delta   = rhs.weight();
             status  = rhs.status;
-            {
-                // TODO : R
-                numTrans++;
-                //*waliErr << "Trans( const Trans& ) : " << numTrans << std::endl;
-            }
+            config  = rhs.config;
             return *this;
       }
 
@@ -111,6 +108,10 @@ namespace wali
                 numTrans--;
                 //*waliErr << "~Trans()   : " << numTrans << std::endl;
             }
+        }
+
+        Trans* Trans::copy() {
+            return new Trans(from(),stack(),to(),weight());
         }
 
         void Trans::combine_weight( sem_elem_t wnew )
@@ -193,6 +194,14 @@ namespace wali
                      (from() == rhs->from())
                     )
                    );
+        }
+
+        wpds::Config* Trans::getConfig() {
+            return config;
+        }
+
+        void Trans::setConfig( wpds::Config* c ) {
+            config = c;
         }
 
     } // namespace wfa

@@ -22,7 +22,6 @@
 #include "wali/wpds/Rule.hpp"
 #include "wali/wpds/ewpds/ERule.hpp"
 #include "wali/wpds/Config.hpp"
-#include "wali/wpds/LinkedTrans.hpp"
 
 #include "wali/wpds/fwpds/FWPDS.hpp"
 
@@ -209,11 +208,11 @@ void FWPDS::prestar_handle_call(Trans *t1,
 }
 
 void FWPDS::prestar_handle_trans(
-                    LinkedTrans * t ,
-                    WFA & fa   ,
-                    rule_t & r,
-                    sem_elem_t delta 
-                    )
+        Trans * t ,
+        WFA & fa   ,
+        rule_t & r,
+        sem_elem_t delta 
+        )
 {
   //std::cout << "Prestar_handle_trans:\n";
   //t->print(std::cout << "t: ") << "\n";
@@ -379,8 +378,9 @@ void FWPDS::poststar_handle_eps_trans(Trans *teps, Trans *tprime, sem_elem_t del
             );
 }
 
-void FWPDS::poststar_handle_trans(LinkedTrans *t, WFA &fa, 
-                                  rule_t &r, sem_elem_t delta)
+void FWPDS::poststar_handle_trans(
+        Trans *t, WFA &fa, 
+        rule_t &r, sem_elem_t delta)
 {
     if(checkingPhase) 
     {
@@ -460,21 +460,20 @@ void FWPDS::update(
   LazyTrans * lt = new LazyTrans(from,stack,to,se,cfg);
   Trans *t = currentOutputWFA->insert(lt);
   if( t->modified() ) {
-    //t->print(std::cout << "Adding transition: ") << "\n";
-    worklist->put( t );
+      //t->print(std::cout << "Adding transition: ") << "\n";
+      worklist->put( t );
   }
 }
 
-wpds::LinkedTrans * FWPDS::update_prime(
-                                        Key from,
-                                        Key stack,
-                                        Key to,
-                                        sem_elem_t se )
+wfa::Trans * FWPDS::update_prime(
+        Key from,
+        Key stack,
+        Key to,
+        sem_elem_t se )
 {
   LazyTrans * t = new LazyTrans(from,stack,to,se,0);
   Trans * tmp = currentOutputWFA->insert(t);
-  // TODO: Make this a debugging stmt
-  return dynamic_cast<wpds::LinkedTrans*>(tmp);
+  return tmp;
 }
 
 void FWPDS::operator()( wali::wfa::Trans * orig ) {
@@ -483,15 +482,10 @@ void FWPDS::operator()( wali::wfa::Trans * orig ) {
   }
 
   Config *c = make_config( orig->from(),orig->stack() );
-  sem_elem_t se;
-  if( wrapper ) {
-    se = wrapper->wrap(*orig);
-  }
-  else {
-    se = orig->weight();
-  }
-  LazyTrans *t;
-  t = new LazyTrans( orig->from()
+  sem_elem_t se = 
+      (wrapper == 0) ? orig->weight() : wrapper->wrap(*orig);
+
+  LazyTrans *t = new LazyTrans( orig->from()
                      ,orig->stack()
                      ,orig->to()
                      ,se

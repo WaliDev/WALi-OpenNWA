@@ -22,6 +22,7 @@ namespace wali {
 
     namespace wfa {
         class WFA;
+        class Trans;
     }
     namespace graph {
         class InterGraph;
@@ -54,13 +55,13 @@ namespace wali {
                     ///////////
                     // pre*
                     ///////////
-                    virtual void prestar( ::wali::wfa::WFA & input, ::wali::wfa::WFA & output );
+                    virtual void prestar( wfa::WFA & input, wfa::WFA & output );
 
 
                     ///////////
                     // post*
                     ///////////
-                    virtual void poststar( ::wali::wfa::WFA & input, ::wali::wfa::WFA & output );
+                    virtual void poststar( wfa::WFA & input, wfa::WFA & output );
 
                     ///////////////////////
                     // FWPDS Settings
@@ -83,8 +84,8 @@ namespace wali {
                             );
 
                     void prestar_handle_trans(
-                            LinkedTrans * t,
-                            ::wali::wfa::WFA & ca  ,
+                            wfa::Trans * t,
+                            wfa::WFA & ca  ,
                             rule_t & r,
                             sem_elem_t delta );
 
@@ -94,8 +95,8 @@ namespace wali {
                             sem_elem_t delta);
 
                     void poststar_handle_trans(
-                            LinkedTrans * t ,
-                            ::wali::wfa::WFA & ca   ,
+                            wfa::Trans * t ,
+                            wfa::WFA & ca   ,
                             rule_t & r,
                             sem_elem_t delta
                             );
@@ -108,12 +109,12 @@ namespace wali {
                                 , Config * cfg
                                 );
 
-                    LinkedTrans * update_prime(
-                                               wali::Key from
-                                               , wali::Key stack
-                                               , wali::Key to
-                                               , sem_elem_t se
-                                               );
+                    wfa::Trans * update_prime(
+                            wali::Key from
+                            , wali::Key stack
+                            , wali::Key to
+                            , sem_elem_t se
+                            );
               
                     void operator()( wali::wfa::Trans * orig );
                     ///////////

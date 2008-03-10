@@ -28,7 +28,7 @@ namespace wali
         /*! @class Config
          *
          * This class represents a Surface Configuration in the WPDS's
-         * configuration space.  I only keeps track of the state and top
+         * configuration space.  It only keeps track of the state and top
          * of stack symbol.  All of the wpds::Config's form a graph that
          * is connected forward and back by the list of Rules.
          *

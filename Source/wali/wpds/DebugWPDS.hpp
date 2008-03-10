@@ -33,16 +33,7 @@ namespace wali
 
                 virtual void poststarComputeFixpoint( ::wali::wfa::WFA& fa );
 
-                virtual void post( LinkedTrans * t , ::wali::wfa::WFA& fa );
-
-                /*
-                void poststar_handle_trans(
-                        ::wali::wpds::LinkedTrans * t ,
-                        ::wali::wfa::WFA & fa   ,
-                        ::wali::wpds::rule_t & r,
-                        ::wali::sem_elem_t delta
-                        );
-                        */
+                virtual void post( ::wali::wfa::Trans* t , ::wali::wfa::WFA& fa );
 
         };
 

@@ -24,12 +24,14 @@ Reach::~Reach()
 
 sem_elem_t Reach::one() const
 {
-    return new Reach(true);
+    static sem_elem_t O(new Reach(true));
+    return O;
 }
 
 sem_elem_t Reach::zero() const
 {
-    return new Reach(false);
+    static sem_elem_t Z(new Reach(false));
+    return Z;
 }
 
 // zero is the annihilator for extend

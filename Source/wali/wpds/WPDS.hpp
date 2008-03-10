@@ -29,7 +29,6 @@ namespace wali
 
         class Config;
         class rule_t;
-        class LinkedTrans;
         class RuleFunctor;
         class ConstRuleFunctor;
         class Wrapper;
@@ -229,6 +228,11 @@ namespace wali
                 virtual void setupOutput( ::wali::wfa::WFA& input, ::wali::wfa::WFA& fa );
 
                 /*!
+                 * @brief For each t \in fa, t->setConfig(0)
+                 */
+                virtual void unlinkOutput( ::wali::wfa::WFA& fa );
+
+                /*!
                  * @brief Gets WPDS ready for fixpoint
                  */
                 virtual void prestarSetupFixpoint( ::wali::wfa::WFA& input, ::wali::wfa::WFA& fa );
@@ -241,7 +245,7 @@ namespace wali
                 /*!
                  * @brief Performs pre for 1 Trans
                  */
-                virtual void pre( LinkedTrans * t, ::wali::wfa::WFA& fa );
+                virtual void pre( wfa::Trans * t, ::wali::wfa::WFA& fa );
 
                 /*!
                  * @brief helper method for prestar
@@ -257,7 +261,7 @@ namespace wali
                  * @brief helper method for prestar
                  */
                 virtual void prestar_handle_trans(
-                        LinkedTrans * t,
+                        wfa::Trans * t,
                         ::wali::wfa::WFA & ca  ,
                         rule_t & r,
                         sem_elem_t delta );
@@ -275,7 +279,7 @@ namespace wali
                 /*!
                  * @brief Performs post for 1 Trans
                  */
-                virtual void post( LinkedTrans * t, ::wali::wfa::WFA& fa );
+                virtual void post( wfa::Trans * t, ::wali::wfa::WFA& fa );
 
                 /*!
                  * @brief helper method for poststar
@@ -290,7 +294,7 @@ namespace wali
                  * @brief helper method for poststar
                  */
                 virtual void poststar_handle_trans(
-                        LinkedTrans * t ,
+                        wfa::Trans * t ,
                         ::wali::wfa::WFA & ca   ,
                         rule_t & r,
                         sem_elem_t delta
@@ -309,7 +313,7 @@ namespace wali
                  * @brief link input WFA transitions to Configs
                  *
                  * @see Config
-                 * @see Trans
+                 * @see wfa::Trans
                  * 
                  */
                 //virtual void copy_and_link( ::wali::wfa::WFA & in, ::wali::wfa::WFA & out );
@@ -351,10 +355,10 @@ namespace wali
 
                 /*! @brief helper method for fixpoint loop
                  *
-                 * return true if LinkedTrans was retrieved from
+                 * return true if wfa::Trans was retrieved from
                  * worklist, false if worklist is empty
                  */
-                virtual bool get_from_worklist( LinkedTrans * & );
+                virtual bool get_from_worklist( wfa::Trans * & );
 
                 /*!
                  * @brief helper function to create and link a transition
@@ -376,7 +380,7 @@ namespace wali
                  *
                  * @return generated transition
                  */
-                virtual LinkedTrans * update_prime(
+                virtual wfa::Trans * update_prime(
                         wali::Key from
                         , wali::Key stack
                         , wali::Key to

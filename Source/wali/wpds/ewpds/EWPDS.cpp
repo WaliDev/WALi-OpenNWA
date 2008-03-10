@@ -19,7 +19,6 @@
 #include "wali/wfa/TransSet.hpp"
 #include "wali/wpds/Config.hpp"
 #include "wali/wpds/RuleFunctor.hpp"
-#include "wali/wpds/LinkedTrans.hpp"
 #include "wali/wpds/Wrapper.hpp"
 #include "wali/wpds/GenKeySource.hpp"
 #include "wali/wpds/ewpds/ERule.hpp"
@@ -209,7 +208,7 @@ namespace wali
             }
 
             void EWPDS::prestar_handle_trans(
-                    LinkedTrans * t ,
+                    wfa::Trans * t ,
                     WFA & fa   ,
                     rule_t & r,
                     sem_elem_t delta
@@ -309,7 +308,7 @@ namespace wali
             }
 
             void EWPDS::poststar_handle_trans(
-                    LinkedTrans * t ,
+                    wfa::Trans * t ,
                     WFA & fa   ,
                     rule_t & r,
                     sem_elem_t delta
@@ -413,27 +412,21 @@ namespace wali
             void EWPDS::operator()( wali::wfa::Trans * orig )
             {
                 Config *c = make_config( orig->from(),orig->stack() );
-                sem_elem_t se;
-                if( wrapper ) {
-                    se = wrapper->wrap(*orig);
-                }
-                else {
-                    se = orig->weight();
-                }
-                LinkedTrans *t;
+                sem_elem_t se = (wrapper == 0) ? orig->weight() : wrapper->wrap(*orig);
+                wfa::Trans *t;
                 if(usePairsDuringCopy) {
-                  t = new LinkedTrans( orig->from()
-                        ,orig->stack()
-                        ,orig->to()
-                        , new SemElemPair(se,se->one())
-                        ,c);
-                } else {
-                  t = new LinkedTrans( orig->from()
-                        ,orig->stack()
-                        ,orig->to()
-                        ,se
-                        ,c);
+                    t = new wfa::Trans( orig->from()
+                            ,orig->stack()
+                            ,orig->to()
+                            , new SemElemPair(se,se->one()));
+                } 
+                else {
+                    t = new wfa::Trans( orig->from()
+                            ,orig->stack()
+                            ,orig->to()
+                            ,se);
                 }
+                t->setConfig(c);
 
                 // fa.addTrans takes ownership of passed in pointer
                 currentOutputWFA->addTrans( t );
