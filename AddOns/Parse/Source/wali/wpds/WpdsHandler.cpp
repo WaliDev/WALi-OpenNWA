@@ -90,9 +90,9 @@ namespace wali
             }
         }
 
-        void WpdsHandler::endElement( const XMLCh* const uri,
+        void WpdsHandler::endElement( const XMLCh* const uri ATTR_UNUSED,
                 const XMLCh* const localname,
-                const XMLCh* const qname)
+                const XMLCh* const qname ATTR_UNUSED)
         {
             using wali::Key;
             StrX who(localname);
@@ -134,7 +134,9 @@ namespace wali
             }
         }
 
-        void WpdsHandler::characters(const XMLCh* const chars, const unsigned int length)
+        void WpdsHandler::characters(
+                const XMLCh* const chars, 
+                const unsigned int length ATTR_UNUSED)
         {
             StrX part(chars);
             if( inWeight) {
@@ -146,16 +148,14 @@ namespace wali
         }
 
         void WpdsHandler::ignorableWhitespace(                               
-                const XMLCh* const chars
-                , const unsigned int length
-                )
+                const XMLCh* const chars ATTR_UNUSED, 
+                const unsigned int length ATTR_UNUSED)
         {
         }
 
         void WpdsHandler::processingInstruction(   
-                const XMLCh* const target
-                , const XMLCh* const data
-                )
+                const XMLCh* const target ATTR_UNUSED, 
+                const XMLCh* const data ATTR_UNUSED)
         {
         }
 
@@ -163,15 +163,15 @@ namespace wali
         // Default error handlers
         //////////////////////////////////////////////////
 
-        void WpdsHandler::warning(const SAXParseException& exc)
+        void WpdsHandler::warning(const SAXParseException& exc ATTR_UNUSED)
         {
         }
 
-        void WpdsHandler::error(const SAXParseException& exc)
+        void WpdsHandler::error(const SAXParseException& exc ATTR_UNUSED)
         {
         }
 
-        void WpdsHandler::fatalError(const SAXParseException& exc)
+        void WpdsHandler::fatalError(const SAXParseException& exc ATTR_UNUSED)
         {
         }
 
@@ -179,9 +179,9 @@ namespace wali
         // Helpers
         //////////////////////////////////////////////////
         void WpdsHandler::handleRule(
-                const XMLCh* const uri
-                , const XMLCh* const localname
-                , const XMLCh* const qname
+                const XMLCh* const uri ATTR_UNUSED
+                , const XMLCh* const localname ATTR_UNUSED
+                , const XMLCh* const qname ATTR_UNUSED
                 , const Attributes& attributes)
         {
             from = attributes.getValue(fromID);

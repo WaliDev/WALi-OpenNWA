@@ -45,6 +45,7 @@
 #include <assert.h>
 #include <limits.h>
 #include <iostream>
+#include "wali/Common.hpp"
 
 typedef unsigned short height_t;
 typedef unsigned short refcount_t;
@@ -84,8 +85,9 @@ public:
 //-----------------------------------------------------------------------------
 template <class Key_t, class Datum_t, class KeyComp_t=DictComp_T<Key_t> >
 class Dictionary_T {
-    friend int keycompare(const Key_t k1, const Key_t k2);
-    friend std::ostream& operator<< (std::ostream&  out, const Dictionary_T<Key_t, Datum_t, KeyComp_t>& d);
+    //friend int keycompare(const Key_t k1, const Key_t k2);
+    template <class T, class U, class V>
+    friend std::ostream& operator<< (std::ostream&  out, const Dictionary_T<T, U, V>& d);
 
 public:
 
@@ -183,7 +185,7 @@ public:
                 return (myEntry == rhs.myEntry);
             }
 
-            iterator():elemStack(NULL), stackPos(-1), myEntry(NULL) {
+            iterator() : myEntry(NULL), elemStack(NULL), stackPos(-1) {
                 
             }
 
@@ -193,7 +195,7 @@ public:
             }
 
             // Move to the next element
-            void operator ++(int dum) {
+            void operator ++(int dum ATTR_UNUSED) {
                 /// STACK EAGERLY?
                 /*
                 if((myEntry = pop())) {
@@ -683,9 +685,12 @@ height_t Dictionary_T<Key_t, Datum_t, KeyComp_t>::Height() const
 template <class Key_t, class Datum_t, class KeyComp_t>
 Dictionary_T<Key_t, Datum_t, KeyComp_t> Dictionary_T<Key_t, Datum_t, KeyComp_t>::Bal(const Key_t& k, const Datum_t& d, const Dictionary_T<Key_t, Datum_t, KeyComp_t>& l, const Dictionary_T<Key_t, Datum_t, KeyComp_t>& r) const
 {
-  if (WithinOne(l.Height(), r.Height()))
+
+  height_t lH = l.Height();
+  height_t rH = r.Height();
+  if (lH == rH || lH+1 == rH || rH+1 == lH)
     return Dictionary_T<Key_t, Datum_t, KeyComp_t>(k,d,l,r);
-  else if (l.Height() > r.Height())
+  else if (lH > rH)
   { // l.Height() >= 2
     if (l.Left().Height() >= l.Right().Height()) {
       // cout << "Single rotation at " << k << ": " << d << endl;

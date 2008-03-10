@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-using std::string;
 
 #include "VarSet.hpp"
 #include "GenKillTransformer_T.hpp"
@@ -94,10 +93,6 @@ int main() {
 
     /* States for a configuration automaton */
     wali::Key accepting_state = wali::getKey("accepting_state");
-    wali::Key q1 = wali::getKey("q1");
-    wali::Key q2 = wali::getKey("q2");
-    wali::Key q3 = wali::getKey("q3");
-    wali::Key q4 = wali::getKey("q4");
 
     /* Transition to introduce stack bottom */
     wali::Key stack_bottom = wali::getKey("stack_bottom");

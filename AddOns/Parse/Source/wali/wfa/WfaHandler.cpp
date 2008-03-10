@@ -53,9 +53,9 @@ namespace wali
         }
 
         void WfaHandler::endElement(
-                const XMLCh* const uri
+                const XMLCh* const uri ATTR_UNUSED
                 , const XMLCh* const localname
-                , const XMLCh* const qname)
+                , const XMLCh* const qname ATTR_UNUSED)
         {
             using wali::Key;
             StrX who(localname);
@@ -90,7 +90,9 @@ namespace wali
             }
         }
 
-        void WfaHandler::characters(const XMLCh* const chars, const unsigned int length)
+        void WfaHandler::characters(
+                const XMLCh* const chars, 
+                const unsigned int length ATTR_UNUSED)
         {
             StrX part(chars);
             if( inWeight) {
@@ -102,16 +104,14 @@ namespace wali
         }
 
         void WfaHandler::ignorableWhitespace(                               
-                const XMLCh* const chars
-                , const unsigned int length
-                )
+                const XMLCh* const chars ATTR_UNUSED
+                , const unsigned int length ATTR_UNUSED)
         {
         }
 
         void WfaHandler::processingInstruction(   
-                const XMLCh* const target
-                , const XMLCh* const data
-                )
+                const XMLCh* const target ATTR_UNUSED
+                , const XMLCh* const data ATTR_UNUSED)
         {
         }
 
@@ -119,10 +119,11 @@ namespace wali
         {
         }
 
-        void WfaHandler::startElement(  const   XMLCh* const    uri,
-                const   XMLCh* const    localname,
-                const   XMLCh* const    qname,
-                const   Attributes&     attributes)
+        void WfaHandler::startElement(
+                const XMLCh* const uri,
+                const XMLCh* const localname,
+                const XMLCh* const qname,
+                const Attributes&  attributes)
         {
             StrX who(localname);
             //std::cout << "Start Tag = " << who.get() << std::endl;
@@ -154,15 +155,15 @@ namespace wali
         // Default error handlers
         //////////////////////////////////////////////////
 
-        void WfaHandler::warning(const SAXParseException& exc)
+        void WfaHandler::warning(const SAXParseException& exc ATTR_UNUSED)
         {
         }
 
-        void WfaHandler::error(const SAXParseException& exc)
+        void WfaHandler::error(const SAXParseException& exc ATTR_UNUSED)
         {
         }
 
-        void WfaHandler::fatalError(const SAXParseException& exc)
+        void WfaHandler::fatalError(const SAXParseException& exc ATTR_UNUSED)
         {
         }
 
@@ -170,9 +171,9 @@ namespace wali
         // Helpers
         //////////////////////////////////////////////////
         void WfaHandler::handleTrans(
-                const XMLCh* const uri
-                , const XMLCh* const localname
-                , const XMLCh* const qname
+                const XMLCh* const uri ATTR_UNUSED
+                , const XMLCh* const localname ATTR_UNUSED
+                , const XMLCh* const qname ATTR_UNUSED
                 , const Attributes& attributes)
         {
             from = attributes.getValue(fromID);
@@ -181,9 +182,9 @@ namespace wali
         }
 
         void WfaHandler::handleState(
-                const XMLCh* const uri
-                , const XMLCh* const localname
-                , const XMLCh* const qname
+                const XMLCh* const uri ATTR_UNUSED
+                , const XMLCh* const localname ATTR_UNUSED
+                , const XMLCh* const qname ATTR_UNUSED
                 , const Attributes& attributes)
         {
 
@@ -222,9 +223,9 @@ namespace wali
         }
 
         void WfaHandler::handleWFA(
-                const XMLCh* const uri
-                , const XMLCh* const localname
-                , const XMLCh* const qname
+                const XMLCh* const uri ATTR_UNUSED
+                , const XMLCh* const localname ATTR_UNUSED
+                , const XMLCh* const qname ATTR_UNUSED
                 , const Attributes& attributes)
         {
             const XMLCh* xch = attributes.getValue(queryID);
