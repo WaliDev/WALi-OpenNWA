@@ -20,8 +20,8 @@ namespace wali
         {
 
             EWpdsHandler::EWpdsHandler( EWPDS* ep, WeightFactory& wf, MergeFactory& mf ) :
-                epds(ep),
                 WpdsHandler(wf,ep),
+                epds(ep),
                 mergeFactory(mf),
                 inMerge(false),
                 mergeString("")
