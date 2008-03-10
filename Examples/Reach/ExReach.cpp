@@ -41,6 +41,7 @@ void doReach()
     using wali::wfa::WFA;
 
     Reach* reachOne = new Reach(true);
+    //wali::wpds::WPDS myWpds;
     wali::wpds::fwpds::FWPDS myWpds;
     Key p = wali::getKey("p");
     Key accept = wali::getKey("accept");
@@ -94,13 +95,13 @@ void doReach()
     // Perfor prestar query
     WFA prequery;
     prequery.addTrans( p, n[4], accept, reachOne );
-    //query.add_initial_state( p );
-    //query.add_final_state( accept );
+    prequery.set_initial_state( p );
+    prequery.add_final_state( accept );
 
     // TODO - turn on once FWPDS is completed
-    //prequery.print( std::cerr << "BEFORE prestar\n" ) << std::endl;
-    //answer = myWpds.prestar(prequery);
-    //answer.print( std::cerr << "\nAFTER prestar\n" ) << std::endl;
+    prequery.print( std::cerr << "BEFORE prestar\n" ) << std::endl;
+    myWpds.prestar(prequery,answer);
+    answer.print( std::cerr << "\nAFTER prestar\n" ) << std::endl;
 
 }
 

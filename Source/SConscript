@@ -48,6 +48,7 @@ wali_files = Split("""
 ./wali/wpds/Wrapper.cpp
 ./wali/wpds/DebugWPDS.cpp
 ./wali/wpds/WPDS.cpp
+./wali/wpds/GenKeySource.cpp
 ./wali/wfa/State.cpp
 ./wali/wfa/WFA.cpp
 ./wali/wfa/Trans.cpp

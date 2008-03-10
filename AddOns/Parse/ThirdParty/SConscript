@@ -1,6 +1,10 @@
 # Run the python program
 # $Id$
-import getlibs
-built = []
+import getlibs, os, os.path
+
+Import('WaliDir')
+xerces = os.path.join(WaliDir,'AddOns','Parse','ThirdParty','xerces-c')
+
+built = [Dir(xerces)]
 Return('built')
 

@@ -21,6 +21,7 @@
 #include "wali/wpds/RuleFunctor.hpp"
 #include "wali/wpds/LinkedTrans.hpp"
 #include "wali/wpds/Wrapper.hpp"
+#include "wali/wpds/GenKeySource.hpp"
 #include "wali/wpds/ewpds/ERule.hpp"
 #include "wali/wpds/ewpds/EWPDS.hpp"
 #include <iostream>
@@ -268,14 +269,23 @@ namespace wali
                                                   Trans *tprime, 
                                                   sem_elem_t delta)
             {
+                // TODO Remove these checks once merge functions
+                //      get moved to the transitions and out of the
+                //      (Rule:MergeFn) map.
                 KeySource *ks = getKeySource(teps->to());
-                KeyPairSource *kps;
+                KeyPairSource *kps = dynamic_cast<KeyPairSource*>(ks);
+                if (kps == 0) {
+                    GenKeySource* gks = dynamic_cast<GenKeySource*>(ks);
+                    if (gks != 0) {
+                        kps = dynamic_cast<KeyPairSource*>(getKeySource(gks->getKey()));
+                    }
+                }
                 sem_elem_t wght;
                 
                 // tprime->print(std::cout) << "\n";
                 // delta->print(std::cout) << "\n";
 
-                if(0 != (kps = dynamic_cast<KeyPairSource *>(ks))) { // apply merge function
+                if (0 != kps) { // apply merge function
                   // Find the rule first
                   rule_t r = lookup_rule(kps->get_key_pair().first, kps->get_key_pair().second, tprime->stack());
                   assert(r.get_ptr() != NULL);

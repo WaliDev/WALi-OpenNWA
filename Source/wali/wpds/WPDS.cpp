@@ -15,6 +15,7 @@
 #include "wali/wpds/RuleFunctor.hpp"
 #include "wali/wpds/LinkedTrans.hpp"
 #include "wali/wpds/Wrapper.hpp"
+#include "wali/wpds/GenKeySource.hpp"
 #include "wali/DefaultWorklist.hpp"
 #include <iostream>
 #include <cassert>
@@ -158,6 +159,7 @@ namespace wali
                 fa.F = input.F;
                 input.for_each(*this);
             }
+            currentOutputWFA->setGeneration(input.getGeneration()+1);
         }
 
         void WPDS::prestarSetupFixpoint( WFA& input, WFA& fa )
@@ -495,7 +497,10 @@ namespace wali
          */
         Key WPDS::gen_state( Key state, Key stack )
         {
-            return getKey( state,stack );
+            return getKey(
+                    new GenKeySource(
+                        currentOutputWFA->getGeneration(),
+                        getKey(state,stack)));
         }
 
         std::ostream & WPDS::print( std::ostream & o ) const

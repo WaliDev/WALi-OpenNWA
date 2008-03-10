@@ -183,6 +183,21 @@ namespace wali
                  */
                 query_t getQuery() const;
 
+                /*!
+                 * @return The current generation
+                 *
+                 * Each WFA keeps a generation, which is
+                 * the number of times a reachability query has
+                 * been invoked on the WFA.
+                 */
+                size_t getGeneration() const;
+
+                /*!
+                 * @brief Set the generation to have the value of param g
+                 * @return void
+                 */
+                void setGeneration(size_t g);
+
                 /*! @brief Get a weight from the WFA. This is to get hold
                  * of the weight domain class
                  *
@@ -509,6 +524,7 @@ namespace wali
                 std::set< Key > F;       //! < set of final states
                 std::set< Key > Q;       //! < set of all states
                 query_t query;           //! < determine the extend order for path_summary
+                size_t generation;       //! < Each WPDS query increments the generation count.
 
             private:
 

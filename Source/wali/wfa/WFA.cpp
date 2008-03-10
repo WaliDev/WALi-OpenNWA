@@ -35,7 +35,7 @@ namespace wali
         const std::string WFA::XMLInorderTag("INORDER");
         const std::string WFA::XMLReverseTag("REVERSE");
 
-        WFA::WFA( query_t q ) : init_state( WALI_EPSILON ),query(q)
+        WFA::WFA( query_t q ) : init_state( WALI_EPSILON ),query(q),generation(0)
         {
             if( query == MAX ) {
                 *waliErr << "[WARNING] Invalid WFA::query. Resetting to INORDER.\n";
@@ -70,6 +70,7 @@ namespace wali
                 // This will populate all maps
                 TransCopier copier(*this);
                 rhs.for_each( copier );
+                generation = rhs.generation;
             }
             return *this;
         }
@@ -197,6 +198,22 @@ namespace wali
         WFA::query_t WFA::getQuery() const
         {
             return query;
+        }
+
+        //
+        // get the current generation
+        //
+        size_t WFA::getGeneration() const
+        {
+            return generation;
+        }
+
+        //
+        // Set the generation
+        //
+        void WFA::setGeneration(size_t g) 
+        {
+            generation = g;
         }
 
         //
