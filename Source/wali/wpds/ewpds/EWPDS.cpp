@@ -162,9 +162,7 @@ namespace wali
             }
 
             bool EWPDS::is_pds_state(Key k) const {
-                if(pds_states.find(k) == pds_states.end())
-                    return false;
-                return true;
+                return pds_states.find(k) != pds_states.end();
             }
 
             rule_t EWPDS::lookup_rule(Key to_state, Key to_stack1, Key to_stack2) const {
