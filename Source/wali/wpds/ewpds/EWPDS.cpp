@@ -24,6 +24,7 @@
 #include "wali/wpds/GenKeySource.hpp"
 #include "wali/wpds/ewpds/ERule.hpp"
 #include "wali/wpds/ewpds/EWPDS.hpp"
+
 #include <iostream>
 #include <cassert>
 
@@ -273,12 +274,15 @@ namespace wali
                 //      get moved to the transitions and out of the
                 //      (Rule:MergeFn) map.
                 KeySource *ks = getKeySource(teps->to());
-                KeyPairSource *kps = dynamic_cast<KeyPairSource*>(ks);
-                if (kps == 0) {
-                    GenKeySource* gks = dynamic_cast<GenKeySource*>(ks);
-                    if (gks != 0) {
-                        kps = dynamic_cast<KeyPairSource*>(getKeySource(gks->getKey()));
-                    }
+                GenKeySource* gks = dynamic_cast<GenKeySource*>(ks);
+                KeyPairSource *kps;
+                if (gks != 0) { // check gks first b/c that is what poststar generates now
+                    kps = dynamic_cast<KeyPairSource*>(getKeySource(gks->getKey()));
+                }
+                else {
+                    // this probably should not occur, unless the user
+                    // created teps himself.
+                    kps = dynamic_cast<KeyPairSource*>(ks);
                 }
                 sem_elem_t wght;
                 
