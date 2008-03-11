@@ -383,7 +383,7 @@ namespace wali
 
                 /*!
                  * update_prime does not need to take a Config b/c no Config
-                 * will match a transition taht is created here. The from state
+                 * will match a transition that is created here. The from state
                  * is not \in WFA.P. Therefore we do not need to add it to the
                  * worklist.
                  *

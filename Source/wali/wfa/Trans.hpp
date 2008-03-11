@@ -223,7 +223,7 @@ namespace wali
                  *
                  * @param w the sem_elem_t for the new weight
                  */
-                virtual void combine_weight( sem_elem_t w );
+                virtual void combineTrans( Trans* tp );
 
                 /*! @return true if param rhs is equal to this */
                 virtual bool equal( const trans_t & rhs ) const;
@@ -291,6 +291,13 @@ namespace wali
                  */
                 void setConfig( wpds::Config* c );
 
+                /*!
+                 * This is used by (E)WPDS::poststar
+                 * during epsilon-transistion contraction.
+                 * The base case is:
+                 *   this->weight()->extend(se)
+                 */
+                virtual sem_elem_t poststar_eps_closure( sem_elem_t se );
             protected:
                 KeyPair kp;
                 Key toStateKey;

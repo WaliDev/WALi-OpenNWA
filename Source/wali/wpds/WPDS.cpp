@@ -429,7 +429,7 @@ namespace wali
 
         void WPDS::poststar_handle_eps_trans(Trans *teps, Trans *tprime, sem_elem_t delta)
         {
-            sem_elem_t wght = tprime->weight()->extend( delta );
+            sem_elem_t wght = tprime->poststar_eps_closure( delta );
             Config * config = make_config( teps->from(),tprime->stack() );
             update( teps->from()
                     , tprime->stack()
@@ -448,7 +448,7 @@ namespace wali
         {
             Key rtstate = r->to_state();
             Key rtstack = r->to_stack1();
-            sem_elem_t wrule_trans = delta->extend( r->se );
+            sem_elem_t wrule_trans = delta->extend( r->weight() );
 
             if( r->to_stack2() == WALI_EPSILON ) {
                 update( rtstate, rtstack, t->to(), wrule_trans, r->to() );
@@ -487,12 +487,12 @@ namespace wali
                         TransSet::iterator tsit = transSet.begin();
                         for( ; tsit != transSet.end() ; tsit++ )
                         {
-                            Trans * teps = *tsit;
-                            Config * config = make_config( teps->from(),tpstk );
-                            sem_elem_t epsW = tprime->getDelta()->extend( teps->weight() );
+                          Trans * teps = *tsit;
+                          Config * config = make_config( teps->from(),tpstk );
+                          sem_elem_t epsW = tprime->getDelta()->extend( teps->weight() );
 
-                            update( teps->from(),tpstk,tpto,
-                                    epsW, config );
+                          update( teps->from(),tpstk,tpto,
+                              epsW, config );
                         }
                     }
                 }

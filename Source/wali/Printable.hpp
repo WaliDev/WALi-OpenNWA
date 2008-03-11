@@ -5,7 +5,6 @@
  * @author Nicholas Kidd
  */
 
-#include "wali/Common.hpp"
 #include <string>
 #include <iostream>
 
@@ -15,6 +14,12 @@ namespace wali
     /*!
      * @class Printable
      * @brief Interface defining the print method
+     *
+     * A Printable object must define a print method.
+     *
+     * The Printable class provides toString() methods
+     * for any Printable object by passing a std::ostringstream
+     * to the object's print method.
      */
     class Printable
     {

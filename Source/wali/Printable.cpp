@@ -2,7 +2,6 @@
  * @author Nick Kidd
  */
 
-#include "wali/Common.hpp"
 #include "wali/Printable.hpp"
 #include <sstream>
 

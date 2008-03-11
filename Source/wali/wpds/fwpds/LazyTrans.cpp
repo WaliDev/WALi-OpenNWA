@@ -59,9 +59,9 @@ namespace wali
             intergr = igr;
           }
 
-          void LazyTrans::combine_weight(sem_elem_t wnew) {
+          void LazyTrans::combineTrans(wfa::Trans* tp) {
             compute_weight();
-            Trans::combine_weight(wnew);
+            Trans::combineTrans(tp);
           }
 
           LazyTrans::~LazyTrans() {}

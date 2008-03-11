@@ -6,6 +6,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstdio>
+#include "wali/Common.hpp"
 #include "wali/Printable.hpp"
 #ifndef WIN32
 #	include <sys/times.h>

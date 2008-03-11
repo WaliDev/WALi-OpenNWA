@@ -39,6 +39,7 @@ wali_files = Split("""
 ./wali/wpds/RuleFunctor.cpp
 ./wali/wpds/Config.cpp
 ./wali/wpds/ewpds/ERule.cpp
+./wali/wpds/ewpds/ETrans.cpp
 ./wali/wpds/ewpds/EWPDS.cpp
 ./wali/wpds/ewpds/MergeFunction.cpp
 ./wali/wpds/Rule.cpp

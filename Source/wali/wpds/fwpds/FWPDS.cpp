@@ -54,15 +54,15 @@ void FWPDS::topDownEval(bool f) {
 
 struct FWPDSCopyBackFunctor : public wali::wfa::TransFunctor
 {
-    ref_ptr<wali::graph::InterGraph> gr;
-    FWPDSCopyBackFunctor(ref_ptr<wali::graph::InterGraph> _gr) : gr(_gr) {}
-    virtual void operator()( wfa::Trans* t ) {
-      LazyTrans *lt = static_cast<LazyTrans *> (t);
-      if (::wali::is_lazy_fwpds())
-          lt->setInterGraph(gr);
-      else
-          lt->setWeight( gr->get_weight( Transition(*t) ) );
-    }
+  ref_ptr<wali::graph::InterGraph> gr;
+  FWPDSCopyBackFunctor(ref_ptr<wali::graph::InterGraph> _gr) : gr(_gr) {}
+  virtual void operator()( wfa::Trans* t ) {
+    LazyTrans *lt = static_cast<LazyTrans *> (t);
+    if (::wali::is_lazy_fwpds())
+      lt->setInterGraph(gr);
+    else
+      lt->setWeight( gr->get_weight( Transition(*t) ) );
+  }
 };
 
 struct FWPDSSourceFunctor : public wali::wfa::ConstTransFunctor

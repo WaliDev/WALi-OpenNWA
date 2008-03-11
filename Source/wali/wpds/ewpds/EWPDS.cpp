@@ -9,49 +9,53 @@
  * TODO:
  *      Should be able to create a mergewrapper.
  */
+// ::wali
 #include "wali/Common.hpp"
 #include "wali/SemElem.hpp"
 #include "wali/Worklist.hpp"
 #include "wali/KeySource.hpp"
 #include "wali/KeyPairSource.hpp"
+// ::wali::wfa
 #include "wali/wfa/State.hpp"
 #include "wali/wfa/TransFunctor.hpp"
 #include "wali/wfa/TransSet.hpp"
+// ::wali::wpds
 #include "wali/wpds/Config.hpp"
 #include "wali/wpds/RuleFunctor.hpp"
 #include "wali/wpds/Wrapper.hpp"
 #include "wali/wpds/GenKeySource.hpp"
+// ::wali::wpds::ewpds
 #include "wali/wpds/ewpds/ERule.hpp"
 #include "wali/wpds/ewpds/EWPDS.hpp"
+#include "wali/wpds/ewpds/ETrans.hpp"
 
 #include <iostream>
 #include <cassert>
 
 // sem_elem_t -> sem_elem_t
-#define SEM_PAIR_GET_FIRST(se) (((SemElemPair *)(se.get_ptr()))->get_first())
-#define SEM_PAIR_GET_SECOND(se) (((SemElemPair *)(se.get_ptr()))->get_second())
-#define SEM_PAIR_COLLAPSE(se) (SEM_PAIR_GET_FIRST(se)->extend(SEM_PAIR_GET_SECOND(se)))
+//#define SEM_PAIR_GET_FIRST(se) (((SemElemPair *)(se.get_ptr()))->get_first())
+//#define SEM_PAIR_GET_SECOND(se) (((SemElemPair *)(se.get_ptr()))->get_second())
+//#define SEM_PAIR_COLLAPSE(se) (SEM_PAIR_GET_FIRST(se)->extend(SEM_PAIR_GET_SECOND(se)))
+#define SEM_PAIR_GET_FIRST(se) (se)
+#define SEM_PAIR_GET_SECOND(se) (se)
+#define SEM_PAIR_COLLAPSE(se) (se)
 
-namespace wali
-{
-    namespace wpds 
-    {  
-        namespace ewpds
-        {
-            class TransPairCollapse : public wali::wfa::TransFunctor
-            {
-                public:
-              TransPairCollapse() { }
-                    virtual ~TransPairCollapse() { }
-                    virtual void operator()( ::wali::wfa::Trans * orig )
-                    {
-                        orig->setWeight(SEM_PAIR_COLLAPSE(orig->weight()));
-                    }
+namespace wali {
+  namespace wpds {  
+    namespace ewpds {
+      class TransPairCollapse : public wali::wfa::TransFunctor
+      {
+        public:
+          TransPairCollapse() { }
+          virtual ~TransPairCollapse() { }
+          virtual void operator()( ::wali::wfa::Trans * orig )
+          {
+            orig->setWeight(SEM_PAIR_COLLAPSE(orig->weight()));
+          }
 
-            };
-
-        }
+      };
     }
+  }
 }
 
 
@@ -68,8 +72,6 @@ namespace wali
 
         namespace ewpds
         {
-
-            typedef ref_ptr<ERule> erule_t;
 
             EWPDS::EWPDS( Wrapper * wrapper ) : WPDS(wrapper), usePairsDuringCopy(false)
             { }
@@ -263,48 +265,6 @@ namespace wali
                 usePairsDuringCopy = false;
             }
 
-            void EWPDS::poststar_handle_eps_trans(Trans *teps, 
-                                                  Trans *tprime, 
-                                                  sem_elem_t delta)
-            {
-                // TODO Remove these checks once merge functions
-                //      get moved to the transitions and out of the
-                //      (Rule:MergeFn) map.
-                KeySource *ks = getKeySource(teps->to());
-                GenKeySource* gks = dynamic_cast<GenKeySource*>(ks);
-                KeyPairSource *kps;
-                if (gks != 0) { // check gks first b/c that is what poststar generates now
-                    kps = dynamic_cast<KeyPairSource*>(getKeySource(gks->getKey()));
-                }
-                else {
-                    // this probably should not occur, unless the user
-                    // created teps himself.
-                    kps = dynamic_cast<KeyPairSource*>(ks);
-                }
-                sem_elem_t wght;
-                
-                // tprime->print(std::cout) << "\n";
-                // delta->print(std::cout) << "\n";
-
-                if (0 != kps) { // apply merge function
-                  // Find the rule first
-                  rule_t r = lookup_rule(kps->get_key_pair().first, kps->get_key_pair().second, tprime->stack());
-                  assert(r.get_ptr() != NULL);
-                  erule_t er = (ERule *)(r.get_ptr());
-                  sem_elem_t w = er->merge_fn()->apply_f(SEM_PAIR_GET_FIRST(tprime->weight()), SEM_PAIR_GET_FIRST(delta));
-                  wght = new SemElemPair(w, w->one());
-                } else {
-                  wght = tprime->weight()->extend( delta );
-                }
-                Config * config = make_config( teps->from(),tprime->stack() );
-                update( teps->from()
-                        , tprime->stack()
-                        , tprime->to()
-                        , wght
-                        , config
-                        );
-            }
-
             void EWPDS::poststar_handle_trans(
                     wfa::Trans * t ,
                     WFA & fa   ,
@@ -312,80 +272,83 @@ namespace wali
                     sem_elem_t delta
                     )
             {
+              Key rtstate = r->to_state();
+              Key rtstack = r->to_stack1();
+              sem_elem_t wrule_trans = delta->extend(r->weight());
+
+              //sem_elem_t wrule_trans = delta->extend( er->extended_weight() );
+
+              if( r->to_stack2() == WALI_EPSILON ) {
+                //update( rtstate, rtstack, t->to(), wrule_trans, r->to() );
+                update( r->to_state(), r->to_stack1(), t->to(), wrule_trans, r->to() );
+              }
+              else {
+
                 erule_t er = (ERule *)(r.get_ptr());
-                Key rtstate = r->to_state();
-                Key rtstack = r->to_stack1();
 
-                sem_elem_t wrule_trans = delta->extend( er->extended_weight() );
+                // Is a rule 2 so we must generate a state
+                // and create 2 new transitions
+                Key gstate = gen_state( rtstate,rtstack );
 
-                if( r->to_stack2() == WALI_EPSILON ) {
-                    update( rtstate, rtstack, t->to(), wrule_trans, r->to() );
-                }
-                else {
+                Trans * tprime = Eupdate_prime( gstate, r->to_stack2(), t->to(), er, delta );
 
-                    // Is a rule 2 so we must generate a state
-                    // and create 2 new transitions
-                    Key gstate = gen_state( rtstate,rtstack );
+                // Setup the weight for taking quasione
+                // TODO: This does not use the diff operator because for pair we would
+                // need it to be (delta,second) + (first,delta). Otherwise taking
+                // an extend of the components doesn't work out
+                //sem_elem_t called_weight = SEM_PAIR_COLLAPSE(tprime->weight());
 
-                    Trans * tprime = update_prime( gstate, r->to_stack2(), t->to(), wrule_trans  );
+                //called_weight->print(std::cout << "called_weight = ") << "\n";
 
-                    // Setup the weight for taking quasione
-                    // TODO: This does not use the diff operator because for pair we would
-                    // need it to be (delta,second) + (first,delta). Otherwise taking
-                    // an extend of the components doesn't work out
-                    sem_elem_t called_weight = SEM_PAIR_COLLAPSE(tprime->weight());
+                // Take quasione
+                State * state = fa.getState( gstate );
 
-                    //called_weight->print(std::cout << "called_weight = ") << "\n";
+                // This combine operation is redundant because called_weight is
+                // computed on the transition weight, not its delta
+                //sem_elem_t quasi = state->quasi->combine( called_weight );
+                //state->quasi = quasi;
+                state->quasi = state->quasi->combine( wrule_trans );
 
-                    // Take quasione
-                    State * state = fa.getState( gstate );
-                    // This combine operation is redundant because called_weight is
-                    // computed on the transition weight, not its delta
-                    sem_elem_t quasi = state->quasi->combine( called_weight );
-                    state->quasi = quasi;
+                //sem_elem_t quasi_extended = new SemElemPair(quasi->quasi_one(), quasi->one());
+                //update( rtstate, rtstack, gstate, quasi_extended, r->to() );
+                update( rtstate, rtstack, gstate, state->quasi->quasi_one(), r->to() );
 
-                    sem_elem_t quasi_extended = new SemElemPair(quasi->quasi_one(), quasi->one());
-                    update( rtstate, rtstack, gstate, quasi_extended, r->to() );
+                // Trans with generated from states do not go on the worklist
+                // and there is no Config matching them so pass 0 (NULL) as the
+                // Config * for update_prime
+                if( tprime->modified() )
+                {
+                  //std::cout <<
+                  // "[EWPDS::poststar] tprime modified...searching for eps trans\n";
 
-                    // Trans with generated from states do not go on the worklist
-                    // and there is no Config matching them so pass 0 (NULL) as the
-                    // Config * for update_prime
-                    if( tprime->modified() )
+                  WFA::eps_map_t::iterator epsit = fa.eps_map.find( tprime->from() );
+                  if( epsit != fa.eps_map.end() )
+                  {
+                    // tprime stack key
+                    Key tpstk = tprime->stack();
+                    // tprime to key
+                    Key tpto = tprime->to();
+                    // get epsilon list ref
+                    TransSet& transSet = epsit->second;
+                    // iterate
+                    TransSet::iterator tsit = transSet.begin();
+                    for( ; tsit != transSet.end() ; tsit++ )
                     {
-                      //std::cout <<
-                      // "[EWPDS::poststar] tprime modified...searching for eps trans\n";
+                      Trans * teps = *tsit;
 
-                        WFA::eps_map_t::iterator epsit = fa.eps_map.find( tprime->from() );
-                        if( epsit != fa.eps_map.end() )
-                        {
-                            // tprime stack key
-                            Key tpstk = tprime->stack();
-                            // tprime to key
-                            Key tpto = tprime->to();
-                            // get epsilon list ref
-                            TransSet& transSet = epsit->second;
-                            // iterate
-                            TransSet::iterator tsit = transSet.begin();
-                            for( ; tsit != transSet.end() ; tsit++ )
-                            {
-                                Trans * teps = *tsit;
-                                // apply merge function
-                                sem_elem_t w = er->merge_fn()->apply_f(
-                                        SEM_PAIR_GET_FIRST(tprime->getDelta()), SEM_PAIR_GET_FIRST(teps->weight()));
-                                sem_elem_t epsW = new SemElemPair(w, w->one());
-                                Config * config = make_config( teps->from(),tpstk );
+                      Config* config = make_config( teps->from(),tpstk );
+                      sem_elem_t epsW = tprime->poststar_eps_closure( teps->weight() );
 
-                                update( teps->from(),tpstk,tpto,
-                                        epsW, config );
-                            }
-                        }
+                      update( teps->from(),tpstk,tpto, epsW, config );
                     }
+                  }
                 }
+              }
             }
 
             std::ostream & EWPDS::print( std::ostream & o ) const
             {
-                return WPDS::print(o);
+              return WPDS::print(o);
             }
 
             std::ostream & EWPDS::marshall( std::ostream & o ) const
@@ -397,12 +360,6 @@ namespace wali
                 return o;
             }
 
-#if 0
-            void EWPDS::fpostar( wali::WFA& fa_in, wali::WFA& fa_out )
-            {
-            }
-#endif
-
             /////////////////////////////////////////////////////////////////
             // Protected Methods
             /////////////////////////////////////////////////////////////////
@@ -411,24 +368,13 @@ namespace wali
             {
                 Config *c = make_config( orig->from(),orig->stack() );
                 sem_elem_t se = (wrapper == 0) ? orig->weight() : wrapper->wrap(*orig);
+
                 wfa::Trans *t;
 
-                // DO NOT put SemElemPairs on states
-                currentOutputWFA->addState(orig->from(),se->zero());
-                currentOutputWFA->addState(orig->to(),se->zero());
-
-                if(usePairsDuringCopy) {
-                    t = new wfa::Trans( orig->from()
-                            ,orig->stack()
-                            ,orig->to()
-                            , new SemElemPair(se,se->one()));
-                } 
-                else {
-                    t = new wfa::Trans( orig->from()
-                            ,orig->stack()
-                            ,orig->to()
-                            ,se);
-                }
+                t = new wfa::Trans( orig->from()
+                    ,orig->stack()
+                    ,orig->to()
+                    ,se);
                 t->setConfig(c);
 
                 // fa.addTrans takes ownership of passed in pointer
@@ -438,6 +384,22 @@ namespace wali
                 worklist->put( t );
             }
 
+            Trans* EWPDS::Eupdate_prime(
+                Key from,
+                Key stack,
+                Key to,
+                erule_t er,
+                sem_elem_t wAtCall)
+            {
+              Trans * tmp = 
+                new ETrans(
+                    from, stack, to,
+                    wAtCall,
+                    wAtCall->extend(er->weight()),
+                    er->merge_fn());
+              Trans * t = currentOutputWFA->insert(tmp);
+              return t;
+            }
 
         } // namespace ewpds
 

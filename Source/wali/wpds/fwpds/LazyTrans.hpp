@@ -43,10 +43,14 @@ namespace wali
               
                 virtual ~LazyTrans();
 
-                const sem_elem_t weight() const throw();
-                sem_elem_t weight() throw();              
-                void setWeight(sem_elem_t w);
-                void combine_weight(sem_elem_t w);
+                virtual const sem_elem_t weight() const throw();
+
+                virtual sem_elem_t weight() throw();              
+
+                virtual void setWeight(sem_elem_t w);
+
+                virtual void combineTrans( wfa::Trans* tp );
+
                 void setInterGraph(intergraph_t igr);
 
               private:

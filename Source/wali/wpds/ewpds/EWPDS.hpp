@@ -28,6 +28,9 @@ namespace wali
         {
 
             using ::wali::wfa::WFA;
+            class ERule;
+            typedef ref_ptr<ERule> erule_t;
+
 
             /*!
              * @class EWPDS
@@ -175,10 +178,12 @@ namespace wali
                     /*!
                      * @brief helper method for poststar
                      */
+                    /*
                     virtual void poststar_handle_eps_trans(
                             wfa::Trans *teps, 
                             wfa::Trans *tprime,
                             sem_elem_t delta);
+                            */
 
                     /*!
                      * @brief helper method for poststar
@@ -191,6 +196,10 @@ namespace wali
                             );
 
                     //void copy_and_link_and_pair( const WFA & in, WFA & dest );
+
+                    wfa::Trans* Eupdate_prime(
+                        Key from, Key stack, Key to,
+                        erule_t er, sem_elem_t wAtCall);
 
                 private:
                     std::set<wali::Key> pds_states; // set of PDS states

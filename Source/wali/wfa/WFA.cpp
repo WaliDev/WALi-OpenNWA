@@ -1108,7 +1108,7 @@ namespace wali
                 tnew->print( *waliErr ) << std::endl;
             } // END DEBUGGING
             */
-            told->combine_weight( tnew->weight() );
+            told->combineTrans( tnew );
         }
 
         //
