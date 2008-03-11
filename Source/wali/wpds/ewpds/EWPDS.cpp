@@ -412,6 +412,11 @@ namespace wali
                 Config *c = make_config( orig->from(),orig->stack() );
                 sem_elem_t se = (wrapper == 0) ? orig->weight() : wrapper->wrap(*orig);
                 wfa::Trans *t;
+
+                // DO NOT put SemElemPairs on states
+                currentOutputWFA->addState(orig->from(),se->zero());
+                currentOutputWFA->addState(orig->to(),se->zero());
+
                 if(usePairsDuringCopy) {
                     t = new wfa::Trans( orig->from()
                             ,orig->stack()
