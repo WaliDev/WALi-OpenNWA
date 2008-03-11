@@ -45,7 +45,7 @@ namespace wali
 
                 public:
 
-                    EWPDS( Wrapper * wrapper = 0, Worklist<wfa::Trans> * worklist = 0 );
+                    EWPDS( Wrapper * wrapper = 0 );
 
                     virtual ~EWPDS();
 

@@ -20,15 +20,6 @@ namespace wali
         {
         }
 
-        DebugWPDS::DebugWPDS( Worklist<wfa::Trans> * worklist ) : WPDS( worklist )
-        {
-        }
-
-        DebugWPDS::DebugWPDS( Wrapper * wrapper , Worklist<wfa::Trans> * worklist ) :
-            WPDS( wrapper, worklist )
-        {
-        }
-
         DebugWPDS::~DebugWPDS()
         {
         }

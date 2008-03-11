@@ -71,7 +71,7 @@ namespace wali
 
             typedef ref_ptr<ERule> erule_t;
 
-          EWPDS::EWPDS( Wrapper * wrapper, Worklist<wfa::Trans> * wl) : WPDS(wrapper, wl), usePairsDuringCopy(false)
+            EWPDS::EWPDS( Wrapper * wrapper ) : WPDS(wrapper), usePairsDuringCopy(false)
             { }
 
 

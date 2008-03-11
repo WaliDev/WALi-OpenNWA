@@ -51,30 +51,10 @@ namespace wali
         {
         }
 
-        WPDS::WPDS( Worklist<wfa::Trans> * wl ) :
-            wrapper(0), worklist(wl) ,currentOutputWFA(0)
-        {
-            if( 0 == worklist )
-                worklist = new DefaultWorklist<wfa::Trans>();
-            else
-                worklist->clear();
-        }
-
-        WPDS::WPDS( Wrapper* w, Worklist<wfa::Trans> * wl) :
-            wrapper(w) , worklist(wl) ,currentOutputWFA(0)
-        {
-            if( 0 == worklist )
-                worklist = new DefaultWorklist<wfa::Trans>();
-            else
-                worklist->clear();
-        }
-
         WPDS::~WPDS()
         {
             //*waliErr << "~WPDS()" << std::endl;
-            assert( worklist );
             clear();
-            delete worklist;
         }
 
         void WPDS::clear()
@@ -93,6 +73,18 @@ namespace wali
             rule_zeroes.clear();
             r2hash.clear();
             worklist->clear();
+        }
+
+        /*!
+         * Set the worklist used for pre and poststar queries.
+         */
+        void WPDS::setWorklist( ref_ptr< Worklist<wfa::Trans> > wl )
+        {
+            if (wl == 0) {
+                *waliErr << "[ERROR] Cannot set the worklist to NULL.\n";
+                assert(0);
+            }
+            worklist = wl;
         }
 
         bool WPDS::add_rule(

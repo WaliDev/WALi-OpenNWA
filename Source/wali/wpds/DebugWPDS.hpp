@@ -23,8 +23,6 @@ namespace wali
             public:
                 DebugWPDS();
                 DebugWPDS( Wrapper * wrapper );
-                DebugWPDS( Worklist<wfa::Trans> * worklist );
-                DebugWPDS( Wrapper * wrapper , Worklist<wfa::Trans> * worklist );
 
                 virtual ~DebugWPDS();
 

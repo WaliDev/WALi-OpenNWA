@@ -43,8 +43,6 @@ namespace wali {
                 public:
                     FWPDS();
                     FWPDS(Wrapper* wrapper);
-                    FWPDS( Worklist<wfa::Trans> * worklist );
-                    FWPDS( Wrapper * wrapper , Worklist<wfa::Trans> * worklist );
 
                     ////////////
                     // add rules

@@ -5,13 +5,19 @@
  * @author Nick Kidd
  */
 
+// ::wali
 #include "wali/Common.hpp"
 #include "wali/Printable.hpp"
 #include "wali/HashMap.hpp"
 #include "wali/KeyContainer.hpp"
 #include "wali/SemElem.hpp"
+#include "wali/Worklist.hpp"
+
+// ::wali::wfa
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/TransFunctor.hpp"
+
+// std c++
 #include <iostream>
 #include <set>
 
@@ -62,15 +68,18 @@ namespace wali
 
                 WPDS();
                 WPDS( Wrapper * wrapper );
-                WPDS( Worklist<wfa::Trans> * worklist );
-                WPDS( Wrapper * wrapper , Worklist<wfa::Trans> * worklist );
-
                 virtual ~WPDS();
 
                 /*!
                  * Clears all rules from the WPDS
                  */
                 virtual void clear();
+
+                /*!
+                 * Set the worklist used for pre and poststar queries.
+                 */
+                void setWorklist( ref_ptr< Worklist<wfa::Trans> > wl );
+
 
                 /*! @brief create rule with no r.h.s. stack symbols
                  *
@@ -405,7 +414,7 @@ namespace wali
 
             protected: // data members
                 Wrapper * wrapper;
-                Worklist<wfa::Trans> * worklist;
+                ref_ptr< Worklist<wfa::Trans> > worklist;
                 chash_t configs;
                 std::set< Config * > rule_zeroes;
                 r2hash_t r2hash;

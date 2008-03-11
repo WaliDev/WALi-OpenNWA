@@ -47,16 +47,6 @@ FWPDS::FWPDS(wali::wpds::Wrapper* wrapper) : EWPDS(wrapper) , interGr(NULL), che
 {
 }
 
-FWPDS::FWPDS( Worklist<wfa::Trans> * worklist ) : EWPDS(0, worklist), interGr(NULL), checkingPhase(false)
-{
-}
-
-FWPDS::FWPDS( wali::wpds::Wrapper * wrapper , Worklist<wfa::Trans> * worklist ) :
-  EWPDS(wrapper,worklist), interGr(NULL), checkingPhase(false)
-{
-}
-
-
 ///////////////////////////////////////////////////////////////////
 void FWPDS::topDownEval(bool f) {
   wali::graph::RegExp::topDownEval(f);
