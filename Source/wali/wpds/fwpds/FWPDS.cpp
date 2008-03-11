@@ -10,6 +10,7 @@
 #include "wali/HashMap.hpp"
 #include "wali/SemElem.hpp"
 #include "wali/KeyPairSource.hpp"
+#include "wali/wpds/GenKeySource.hpp"
 
 #include "wali/util/Timer.hpp"
 
@@ -347,7 +348,17 @@ void FWPDS::poststar_handle_eps_trans(Trans *teps, Trans *tprime, sem_elem_t del
     }
     
     KeySource *ks = getKeySource(teps->to());
-    KeyPairSource *kps = dynamic_cast<KeyPairSource *>(ks);
+    GenKeySource* gks = dynamic_cast<GenKeySource*>(ks);
+    KeyPairSource *kps;
+    if (gks != 0) { // check gks first b/c that is what poststar generates now
+      kps = dynamic_cast<KeyPairSource*>(getKeySource(gks->getKey()));
+    }
+    else {
+      // this probably should not occur, unless the user
+      // created teps himself.
+      kps = dynamic_cast<KeyPairSource*>(ks);
+    }
+
     sem_elem_t wght;
                 
     if(0 != kps) { // apply merge function
