@@ -27,19 +27,31 @@ namespace wali
     //! @return old err ostream
     extern std::ostream* setWaliErr( std::ostream* newErr );
 
-    //! When running pre or post* query in FWPDS,
-    //! setting this to true will also run the same
-    //! query using regular WPDS and verify the results
-    //! are the same.
-    //!
-    //! Default value is true
-    extern bool b_check_fwpds;
-
-    //! @param enable turn FWPDS verification on/off
+    /*!
+     * When running pre or post* query in FWPDS,
+     * setting this to true will also run the same
+     * query using regular EWPDS and verify the results
+     * are the same.
+     *
+     * @param enable turn FWPDS verification on/off
+     */
     extern void set_verify_fwpds( bool enable );
 
     //! @return whether FWPDS reachability is to be verified
     extern bool get_verify_fwpds();
+
+    /*!
+     * @brief Turn lazy weights on or off for FWPDS
+     * @return void
+     */
+    extern void set_lazy_fwpds( bool enable );
+
+    /*! 
+     * @return true if FWPDS outputs a WFA whose transitions have lazy
+     * weights.returns a lazy automaton.
+     */
+    extern bool is_lazy_fwpds();
+
 
 } // namespace wali
 

@@ -31,14 +31,41 @@ namespace wali
     //! are the same.
     //!
     //! Default value is true
-    bool b_check_fwpds = true;
+    static bool b_check_fwpds = true;
 
+    /*!
+     * @brief Turn FWPDS verification on and off.
+     * @return void
+     */
     void set_verify_fwpds( bool enable ) {
         b_check_fwpds = enable;
     }
 
+    /*! 
+     * @return true if FWPDS will verify the result
+     * of each poststar or prestar query against EWPDS.
+     */
     bool get_verify_fwpds() {
         return b_check_fwpds;
+    }
+
+    //! @brief the static variable moderating FWPDS laziness
+    static bool b_lazy_fwpds = true;
+
+    /*!
+     * @brief Turn lazy weights on or off for FWPDS
+     * @return void
+     */
+    void set_lazy_fwpds( bool enable ) {
+        b_lazy_fwpds = enable;
+    }
+
+    /*! 
+     * @return true if FWPDS outputs a WFA whose transitions have lazy
+     * weights.returns a lazy automaton.
+     */
+    bool is_lazy_fwpds() {
+        return b_lazy_fwpds;
     }
 
 } // namespace wali
