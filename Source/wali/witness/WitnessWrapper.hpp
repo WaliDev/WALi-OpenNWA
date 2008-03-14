@@ -24,7 +24,7 @@ namespace wali
 
                 virtual ~WitnessWrapper() {}
 
-                virtual sem_elem_t wrap( wfa::Trans& t );
+                virtual sem_elem_t wrap( wfa::ITrans& t );
 
                 virtual sem_elem_t wrap( wpds::Rule& r );
 

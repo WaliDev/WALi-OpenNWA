@@ -5,25 +5,38 @@
  * @author Nick Kidd
  */
 
-#include "wali/wfa/Trans.hpp"
+#include "wali/wfa/ITrans.hpp"
+#include "wali/wfa/DecoratorTrans.hpp"
 #include "wali/wpds/ewpds/MergeFunction.hpp"
+#include "wali/wpds/ewpds/ERule.hpp"
 
 namespace wali {
   namespace wpds {
     namespace ewpds {
-      class ETrans : public ::wali::wfa::Trans {
+      class ETrans : public ::wali::wfa::DecoratorTrans {
 
         public:
           ETrans(
               Key from, Key stack, Key to,
               sem_elem_t wAtCall, //!< Weight on path to the call transition
               sem_elem_t wAfterCall, //!< For call rule R, wAtCall->extend(R->weight())
-              merge_fn_t mf //!< The merge function
+              erule_t erule //!< The ERule
+              );
+
+          ETrans(
+              ITrans* d,          //!< Trans that is being decorated
+              sem_elem_t wAtCall, //!< Weight on path to the call transition
+              erule_t erule //!< The merge function
               );
 
           virtual ~ETrans();
 
-          virtual Trans* copy() const;
+          /*! @return the merge function of this ETrans */
+          merge_fn_t getMergeFn() const;
+
+          erule_t getERule() const;
+          /*! @return A <b>deep</b> copy of this */
+          virtual ITrans* copy() const;
 
           /*!
            * Override to apply the merge function, i.e.,
@@ -38,11 +51,11 @@ namespace wali {
            *
            * Note: Trans* tp should <b>always</b> be an ETrans.
            */
-          virtual void combineTrans( Trans* tp );
+          virtual void combineTrans( ITrans* tp );
 
         protected:
           sem_elem_t wAtCall;
-          merge_fn_t mf;
+          erule_t erule;
 
       }; // class ETrans
     } // namespace ewpds

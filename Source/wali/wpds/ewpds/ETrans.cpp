@@ -4,6 +4,9 @@
  */
 
 #include "wali/Common.hpp"
+
+#include "wali/wfa/Trans.hpp"
+
 #include "wali/wpds/ewpds/ETrans.hpp"
 
 namespace wali {
@@ -14,8 +17,16 @@ namespace wali {
           Key f, Key s, Key t,
           sem_elem_t wAtCall,
           sem_elem_t wAfterCall,
-          merge_fn_t merge)
-        : Trans(f,s,t,wAfterCall),wAtCall(wAtCall),mf(merge)
+          erule_t er)
+        : DecoratorTrans(new wfa::Trans(f,s,t,wAfterCall)),wAtCall(wAtCall),erule(er)
+      {
+      }
+
+      ETrans::ETrans(
+          ITrans* d,
+          sem_elem_t wAtCall,
+          erule_t er)
+        : DecoratorTrans(d),wAtCall(wAtCall),erule(er)
       {
       }
 
@@ -23,15 +34,23 @@ namespace wali {
       {
       }
 
-      wfa::Trans* ETrans::copy() const {
-        return new ETrans(from(),stack(),to(),wAtCall,weight(),mf);
+      wfa::ITrans* ETrans::copy() const {
+        return new ETrans(getDelegate()->copy(),wAtCall,erule);
+      }
+
+      merge_fn_t ETrans::getMergeFn() const {
+        return erule->merge_fn();
+      }
+
+      erule_t ETrans::getERule() const {
+        return erule;
       }
 
       sem_elem_t ETrans::poststar_eps_closure( sem_elem_t se ) {
-        return mf->apply_f(wAtCall,se);
+        return getMergeFn()->apply_f(wAtCall,se);
       }
 
-      void ETrans::combineTrans( Trans* tp )
+      void ETrans::combineTrans( ITrans* tp )
       {
         // TODO - change dynamic_cast to static_cast 
         //        When happy with impl.
@@ -40,7 +59,7 @@ namespace wali {
           // Need to update wAtCall
           wAtCall = wAtCall->combine(e->wAtCall);
         }
-        Trans::combineTrans(tp);
+        getDelegate()->combineTrans(tp);
       }
 
     } // namespace ewpds

@@ -27,11 +27,11 @@ namespace wali
                 virtual ~DebugWPDS();
 
             protected:
-                virtual void prestarComputeFixpoint( ::wali::wfa::WFA& fa );
+                virtual void prestarComputeFixpoint( wfa::WFA& fa );
 
-                virtual void poststarComputeFixpoint( ::wali::wfa::WFA& fa );
+                virtual void poststarComputeFixpoint( wfa::WFA& fa );
 
-                virtual void post( ::wali::wfa::Trans* t , ::wali::wfa::WFA& fa );
+                virtual void post( wfa::ITrans* t , wfa::WFA& fa );
 
         };
 

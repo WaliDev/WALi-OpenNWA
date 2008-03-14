@@ -28,20 +28,20 @@
 
 namespace wali
 {
-    namespace wfa
-    {
-        const std::string WFA::XMLTag("WFA");
-        const std::string WFA::XMLQueryTag("query");
-        const std::string WFA::XMLInorderTag("INORDER");
-        const std::string WFA::XMLReverseTag("REVERSE");
+  namespace wfa
+  {
+    const std::string WFA::XMLTag("WFA");
+    const std::string WFA::XMLQueryTag("query");
+    const std::string WFA::XMLInorderTag("INORDER");
+    const std::string WFA::XMLReverseTag("REVERSE");
 
-        WFA::WFA( query_t q ) : init_state( WALI_EPSILON ),query(q),generation(0)
-        {
-            if( query == MAX ) {
-                *waliErr << "[WARNING] Invalid WFA::query. Resetting to INORDER.\n";
-                query = INORDER;
-            }
-        }
+    WFA::WFA( query_t q ) : init_state( WALI_EPSILON ),query(q),generation(0)
+    {
+      if( query == MAX ) {
+        *waliErr << "[WARNING] Invalid WFA::query. Resetting to INORDER.\n";
+        query = INORDER;
+      }
+    }
 
         WFA::WFA( const WFA & rhs ) : Printable()
         {
@@ -235,8 +235,9 @@ namespace wali
         }
 
         //!
-        // @brief add trans (p,g,q,se) to WFA
-        //
+        //! @brief add trans (p,g,q,se) to WFA
+        //! Default creates a basic Trans object.
+        //!
         void WFA::addTrans(
                 Key p,
                 Key g,
@@ -247,12 +248,12 @@ namespace wali
         }
 
         //!
-        // @brief add Trans *t to WFA
-        // Takes care of adding states and calling insert. This
-        // method (actually insert) assumes ownership of the memory
-        // pointed to by the Trans* t.
-        //
-        void WFA::addTrans( Trans * t )
+        //! @brief add ITrans*t to WFA
+        //! Takes care of adding states and calling insert. This
+        //! method (actually insert) assumes ownership of the memory
+        //! pointed to by the ITrans* t.
+        //!
+        void WFA::addTrans( ITrans * t )
         {
             //t->print( *waliErr << "\tInserting Trans" ) << std::endl;
             insert( t );
@@ -262,26 +263,26 @@ namespace wali
         // Erase a trans from the WFA maps
         // Returns the erased trans
         //
-        Trans * WFA::eraseTransFromMaps(
+        ITrans * WFA::eraseTransFromMaps(
                                         Key from,
                                         Key stack,
                                         Key to )
         {
-            // Remove from kpmap
-            Trans* tKp = eraseTransFromKpMap(from,stack,to);
+          // Remove from kpmap
+          ITrans* tKp = eraseTransFromKpMap(from,stack,to);
 
-            if( tKp != NULL )
-            {
-                Trans* tEps = eraseTransFromEpsMap(tKp);
+          if( tKp != NULL )
+          {
+            ITrans* tEps = eraseTransFromEpsMap(tKp);
 
-                { // BEGIN DEBUGGING
-                    if( tEps != NULL )
-                        assert( tKp == tEps );
-                } // END DEBUGGING
+            { // BEGIN DEBUGGING
+              if( tEps != NULL )
+                assert( tKp == tEps );
+            } // END DEBUGGING
 
-            }
+          }
 
-            return tKp;
+          return tKp;
         }
 
         //
@@ -293,13 +294,13 @@ namespace wali
                 Key stack,
                 Key to )
         {
-            // Remove from maps
-            Trans* t = eraseTransFromMaps(from,stack,to);
+          // Remove from maps
+          ITrans* t = eraseTransFromMaps(from,stack,to);
 
-            State* state = state_map.find(from)->second;
-            state->eraseTrans(t);
+          State* state = state_map.find(from)->second;
+          state->eraseTrans(t);
 
-            delete t;
+          delete t;
         }
 
         //
@@ -327,81 +328,44 @@ namespace wali
                 Key q,
                 Trans & t )
         {
-            bool rc = false;
-            Trans *tret = 0;
-            KeyPair kp(p,g);
-            kp_map_t::iterator it = kpmap.find(kp);
-            if( it != kpmap.end() )
-            {
-                TransSet& transSet = it->second;
-                TransSet::iterator tsit= transSet.find(p,g,q);
-                if( tsit != transSet.end() ) {
-                    tret = *tsit;
-                }
-
-                /*
-                trans_list_t &ls = it->second;
-                trans_list_t::iterator lit = ls.begin();
-                for( ; lit != ls.end() ; lit ++ )
-                {
-                    Trans *ttmp = *lit;
-                    // already matched (p,g,*) so just
-                    // check q
-                    if( q == ttmp->to() )
-                    {
-                        tret = ttmp;
-                        break;
-                    }
-                }
-                */
+          KeyPair kp(p,g);
+          kp_map_t::iterator it = kpmap.find(kp);
+          if( it != kpmap.end() )
+          {
+            TransSet& transSet = it->second;
+            TransSet::iterator tsit= transSet.find(p,g,q);
+            if( tsit != transSet.end() ) {
+              // TODO:NAK - likely broken
+              ITrans* itrans = *tsit;
+              t = *itrans;
+              return true; // Return true b/c we found the ITrans
             }
-            if( 0 != tret ) {
-                rc = true;
-                t = *tret;
-            }
-            return rc;
+          }
+          return false;
         }
 
         void WFA::for_each( ConstTransFunctor & tf ) const
         {
-            /*
-            kp_map_t::const_iterator it = kpmap.begin();
-            kp_map_t::const_iterator itEND = kpmap.end();
-            for( ; it != itEND ; it++ )
-            {
-                const TransSet & transSet = it->second;
-                transSet.each(tf);
-            }
-            */
-            state_map_t::const_iterator it = state_map.begin();
-            state_map_t::const_iterator itEND = state_map.end();
-            for( ; it != itEND ; it++ )
-            {
-                const State* st = it->second;
-                const TransSet & transSet = st->getTransSet();
-                transSet.each(tf);
-            }
+          state_map_t::const_iterator it = state_map.begin();
+          state_map_t::const_iterator itEND = state_map.end();
+          for( ; it != itEND ; it++ )
+          {
+            const State* st = it->second;
+            const TransSet & transSet = st->getTransSet();
+            transSet.each(tf);
+          }
         }
 
         void WFA::for_each( TransFunctor& tf )
         {
-            /*
-            kp_map_t::iterator it = kpmap.begin();
-            kp_map_t::iterator itEND = kpmap.end();
-            for( ; it != itEND ; it++ )
-            {
-                TransSet & transSet = it->second;
-                transSet.each(tf);
-            }
-            */
-            state_map_t::iterator it = state_map.begin();
-            state_map_t::iterator itEND = state_map.end();
-            for( ; it != itEND ; it++ )
-            {
-                State* st = it->second;
-                TransSet & transSet = st->getTransSet();
-                transSet.each(tf);
-            }
+          state_map_t::iterator it = state_map.begin();
+          state_map_t::iterator itEND = state_map.end();
+          for( ; it != itEND ; it++ )
+          {
+            State* st = it->second;
+            TransSet & transSet = st->getTransSet();
+            transSet.each(tf);
+          }
         }
 
 
@@ -527,18 +491,18 @@ namespace wali
                 TransSet::iterator tsitEND = tsThis.end();
                 for( ; tsit != tsitEND ; tsit++ )
                 {
-                    Trans *t = *tsit;
+                  ITrans *t = *tsit;
 
                     // for each trans in (TransSet) stkit->second
                     TransSet::iterator stklsit = stkit->second.begin();
                     TransSet::iterator stklsitEND = stkit->second.end();
                     for( ; stklsit != stklsitEND ; stklsit++ )
                     {
-                        Trans *t2 = *stklsit;
+                        ITrans*t2 = *stklsit;
                         Key fromkey = getKey( t->from(),t2->from() );
                         Key tokey = getKey( t->to(),t2->to() );
                         sem_elem_t W = wmaker.make_weight(t->weight(),t2->weight());
-                        Trans* newTrans = new Trans(fromkey,t->stack(),tokey,W); 
+                        ITrans* newTrans = new Trans(fromkey,t->stack(),tokey,W); 
                         //newTrans->print( std::cout << "\tAdding Trans: " ) << std::endl;
                         dest.addTrans( newTrans );
                     }
@@ -546,28 +510,13 @@ namespace wali
             }
         }
 
-        /*
-        void WFA::do_fixpoint( Worklist& wl, FixpointLogic& logic )
-        {
-            setupFixpoint(wl,logic);
-            while( !wl.empty() )
-            {
-                State* q = wl.get();
-                sem_elem_t the_delta = q->delta();
-                q->delta() = the_delta->zero();
-
-                logic.process(q,the_delta,wl);
-            }
-        }
-        */
-
         //
         // Calls path_summary with default Worklist
         //
         void WFA::path_summary()
         {
-            DefaultWorklist<State> wl;
-            path_summary(wl);
+          DefaultWorklist<State> wl;
+          path_summary(wl);
         }
 
         //
@@ -575,8 +524,8 @@ namespace wali
         //
         void WFA::path_summary(sem_elem_t wt)
         {
-            DefaultWorklist<State> wl;
-            path_summary(wl, wt);
+          DefaultWorklist<State> wl;
+          path_summary(wl, wt);
         }
 
         //
@@ -584,8 +533,8 @@ namespace wali
         //
         void WFA::path_summary(Worklist<State> &wl)
         {
-            sem_elem_t nullwt; // treated as ONE
-            path_summary(wl, nullwt);
+          sem_elem_t nullwt; // treated as ONE
+          path_summary(wl, nullwt);
         }
 
         //
@@ -593,13 +542,13 @@ namespace wali
         //
         void WFA::path_summary( Worklist<State>& wl, sem_elem_t wt )
         {
-            // BEGIN DEBUGGING
-            int numPops = 0;
-            // END DEBUGGING
-            PredHash_t preds;
-            setupFixpoint( wl,preds, wt );
-            while( !wl.empty() )
-            {
+          // BEGIN DEBUGGING
+          int numPops = 0;
+          // END DEBUGGING
+          PredHash_t preds;
+          setupFixpoint( wl,preds, wt );
+          while( !wl.empty() )
+          {
                 State* q = wl.get();
                 sem_elem_t the_delta = q->delta();
                 q->delta() = the_delta->zero();
@@ -637,7 +586,7 @@ namespace wali
                     // For each (q',_,q)
                     for( ; tit != titEND ; tit++ )
                     {
-                        Trans* t = *tit; // (q',_,q)
+                        ITrans* t = *tit; // (q',_,q)
 
                         { // BEGIN DEBUGGING
                             //t->print( *waliErr << "\t++ Popped " ) << std::endl;
@@ -703,29 +652,29 @@ namespace wali
         void WFA::prune()
         {
 
-            DefaultWorklist<State> wl;
-            PredHash_t preds;
-            setupFixpoint( wl,preds );
-            FOR_EACH_STATE(resetState) {
-                resetState->tag = 0;
-            }
-            FOR_EACH_FINAL_STATE(finalState) {
-                finalState->tag = 1;
-            }
+          DefaultWorklist<State> wl;
+          PredHash_t preds;
+          setupFixpoint( wl,preds );
+          FOR_EACH_STATE(resetState) {
+            resetState->tag = 0;
+          }
+          FOR_EACH_FINAL_STATE(finalState) {
+            finalState->tag = 1;
+          }
 
-            // first backwards prune
-            while( !wl.empty() )
-            {
-                State* q = wl.get();
-                PredHash_t::iterator predHashIt = preds.find(q->name());
-                if( predHashIt == preds.end() ) {
-                    continue;
-                }
-                StateSet_t& stateSet = predHashIt->second;
-                StateSet_t::iterator stateIt = stateSet.begin();
-                StateSet_t::iterator stateItEND = stateSet.end();
-                //sem_elem_t ONE = q->weight()->one();
-                //sem_elem_t ZERO = q->weight()->zero();
+          // first backwards prune
+          while( !wl.empty() )
+          {
+            State* q = wl.get();
+            PredHash_t::iterator predHashIt = preds.find(q->name());
+            if( predHashIt == preds.end() ) {
+              continue;
+            }
+            StateSet_t& stateSet = predHashIt->second;
+            StateSet_t::iterator stateIt = stateSet.begin();
+            StateSet_t::iterator stateItEND = stateSet.end();
+            //sem_elem_t ONE = q->weight()->one();
+            //sem_elem_t ZERO = q->weight()->zero();
 
                 for( ; stateIt != stateItEND ; stateIt++ )
                 {
@@ -755,7 +704,7 @@ namespace wali
                 // for each (p,_,q)
                 // mark q reached
                 while( it != itEND ) {
-                    Trans* t = *it;
+                    ITrans* t = *it;
                     eraseIt = it;
                     it++;
                     State* q = getState(t->to());
@@ -821,16 +770,16 @@ namespace wali
           State::iterator titEND = init->end();
 
           // List of transitions to be deleted
-          std::list<Trans *> to_delete;
+          std::list<ITrans *> to_delete;
           for( ; tit != titEND ; tit++ ) {
-            Trans* t = *tit; 
+            ITrans* t = *tit; 
             if(stkset.find(t->stack()) == stkset.end()) {
               to_delete.push_back(t);
             }
           }
-          std::list<Trans *>::iterator lit;
+          std::list<ITrans *>::iterator lit;
           for(lit = to_delete.begin(); lit != to_delete.end(); lit++) {
-            Trans *t = *lit;
+            ITrans* t = *lit;
             erase(t->from(), t->stack(), t->to());
           }
 
@@ -963,13 +912,13 @@ namespace wali
         // Inserts tnew into the WFA. If a transition matching tnew
         // exists, tnew is deleted.
         //
-        Trans * WFA::insert( Trans * tnew )
+        ITrans* WFA::insert( ITrans* tnew )
         {
             ////
             // WFA::find code duplicated to keep
             // a handle on the kp_map_t::iterator
             ////
-            Trans * told = 0;
+            ITrans* told = 0;
             kp_map_t::iterator it = kpmap.find(tnew->keypair());
             if( it != kpmap.end() )
             {
@@ -1039,7 +988,8 @@ namespace wali
                 // wrong.
                 if( told != tnew ) {
                     // combine new into old
-                    combineTrans( told,tnew );
+
+                    told->combineTrans( tnew );
                     delete tnew;
                 }
                 else {
@@ -1097,21 +1047,6 @@ namespace wali
         ///////////////////////
 
         //
-        // This is a virtual method.
-        //
-        void WFA::combineTrans( Trans * told, Trans * tnew )
-        {
-            /*
-            { // BEGIN DEBUGGING
-                *waliErr << "[WFA::combineTrans(old,new)] ";
-                told->print( *waliErr ) << "   .+.   ";
-                tnew->print( *waliErr ) << std::endl;
-            } // END DEBUGGING
-            */
-            told->combineTrans( tnew );
-        }
-
-        //
         // Return State * corresponding to the key
         //
         State * WFA::getState( Key name )
@@ -1143,63 +1078,63 @@ namespace wali
         //
         void WFA::setupFixpoint( Worklist<State>& wl, PredHash_t& preds, sem_elem_t wtFinal )
         {
-            state_map_t::iterator it = state_map.begin();
-            state_map_t::iterator itEND = state_map.end();
-            bool first = true;
-            sem_elem_t ZERO,ONE;
-            for( ; it != itEND ; it++ )
-            {
-                // State p
-                State* st = it->second;
-                // Get a handle on ONE and ZERO.
-                // Do it here b/c we do not have a way to
-                // get the ONE and ZERO weights w/out first
-                // having a weight, i.e. st->weight()
-                if( first ) {
-                    ONE = st->weight()->one();
-                    ZERO = st->weight()->zero();
-                    if(wtFinal.get_ptr() == NULL) {
-                      wtFinal = ONE;
-                    }
-                    first = false;
-                }
-                st->unmark();
-                if( isFinalState( st->name() ) ) {
-                    st->weight() = wtFinal;
-                    st->delta() = wtFinal;
-                    wl.put( st );
-                }
-                else {
-                    st->weight() = ZERO;
-                    st->delta() = ZERO;
-                }
-
-                State::iterator stit = st->begin();
-                State::iterator stEnd = st->end();
-
-                for( ; stit != stEnd; stit++ ) {
-                    // (p,_,q)
-                    Trans* t = *stit;
-                    Key toKey = t->to();
-                    PredHash_t::iterator predIt = preds.find(toKey);
-                    if( predIt == preds.end() ) {
-                        StateSet_t stateSet;
-                        predIt = preds.insert(toKey,stateSet).first;
-                    }
-                    //*waliErr << "Adding '" << key2str(st->name()) << "' to pred of '";
-                    //*waliErr << key2str(toKey) << "'\n";
-                    predIt->second.insert( st );
-                }
+          state_map_t::iterator it = state_map.begin();
+          state_map_t::iterator itEND = state_map.end();
+          bool first = true;
+          sem_elem_t ZERO,ONE;
+          for( ; it != itEND ; it++ )
+          {
+            // State p
+            State* st = it->second;
+            // Get a handle on ONE and ZERO.
+            // Do it here b/c we do not have a way to
+            // get the ONE and ZERO weights w/out first
+            // having a weight, i.e. st->weight()
+            if( first ) {
+              ONE = st->weight()->one();
+              ZERO = st->weight()->zero();
+              if(wtFinal.get_ptr() == NULL) {
+                wtFinal = ONE;
+              }
+              first = false;
             }
+            st->unmark();
+            if( isFinalState( st->name() ) ) {
+              st->weight() = wtFinal;
+              st->delta() = wtFinal;
+              wl.put( st );
+            }
+            else {
+              st->weight() = ZERO;
+              st->delta() = ZERO;
+            }
+
+            State::iterator stit = st->begin();
+            State::iterator stEnd = st->end();
+
+            for( ; stit != stEnd; stit++ ) {
+              // (p,_,q)
+              ITrans* t = *stit;
+              Key toKey = t->to();
+              PredHash_t::iterator predIt = preds.find(toKey);
+              if( predIt == preds.end() ) {
+                StateSet_t stateSet;
+                predIt = preds.insert(toKey,stateSet).first;
+              }
+              //*waliErr << "Adding '" << key2str(st->name()) << "' to pred of '";
+              //*waliErr << key2str(toKey) << "'\n";
+              predIt->second.insert( st );
+            }
+          }
         }
 
         //
         // Removes Trans(from,stack,to) from the kpmap. Returns true
         // if the Trans was erased, i.e., the Trans existed.
         //
-        Trans* WFA::eraseTransFromKpMap(
-                Key from,
-                Key stack,
+        ITrans* WFA::eraseTransFromKpMap(
+            Key from,
+            Key stack,
                 Key to )
         {
             // ignore weight on Trans
@@ -1207,9 +1142,9 @@ namespace wali
             return eraseTransFromKpMap(&terase);
         }
 
-        Trans* WFA::eraseTransFromKpMap( Trans* terase )
+        ITrans* WFA::eraseTransFromKpMap( ITrans* terase )
         {
-            Trans* tret = NULL;
+            ITrans* tret = NULL;
             kp_map_t::iterator kpit = kpmap.find( terase->keypair() );
 
             // remove from kpmap
@@ -1219,9 +1154,9 @@ namespace wali
             return tret;
         }
 
-        Trans* WFA::eraseTransFromEpsMap( Trans* terase )
+        ITrans* WFA::eraseTransFromEpsMap( ITrans* terase )
         {
-            Trans* tret = NULL;
+            ITrans* tret = NULL;
             if( terase->stack() == WALI_EPSILON )
             {
                 // remove from epsmap
@@ -1248,14 +1183,14 @@ namespace wali
             State::iterator itEND = state->end();
             for( ; it != itEND ; it++ )
             {
-                Trans* stateTrans = *it;
+                ITrans* stateTrans = *it;
 
                 //Key from = stateTrans->from();
                 //Key stack = stateTrans->stack();
                 //Key to = stateTrans->to();
                 //Trans* tKp = eraseTransFromKpMap( from,stack,to );
 
-                Trans* tKp = eraseTransFromMaps(stateTrans->from(), stateTrans->stack(), stateTrans->to());
+                ITrans* tKp = eraseTransFromMaps(stateTrans->from(), stateTrans->stack(), stateTrans->to());
 
                 { // BEGIN DEBUGGING
                     if( tKp != NULL && tKp != stateTrans ) {
@@ -1325,7 +1260,7 @@ namespace wali
                 State* state = getState(hd);
                 TransSet::iterator it = state->begin();
                 for( ; it != state->end() ; it++ ) {
-                    Trans* t = *it;
+                    ITrans* t = *it;
                     index_map_t::iterator lkup = index_map.find(t->to());
                     assert( lkup != index_map.end() );
                     const int tl = lkup->second;

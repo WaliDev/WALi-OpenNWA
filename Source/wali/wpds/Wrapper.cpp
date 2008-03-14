@@ -4,7 +4,7 @@
 
 #include "wali/Common.hpp"
 #include "wali/wpds/Wrapper.hpp"
-#include "wali/wfa/Trans.hpp"
+#include "wali/wfa/ITrans.hpp"
 #include "wali/wpds/Rule.hpp"
 
 namespace wali
@@ -13,7 +13,7 @@ namespace wali
     namespace wpds
     {
         // default does nothing
-        sem_elem_t Wrapper::wrap( wfa::Trans& t )
+        sem_elem_t Wrapper::wrap( wfa::ITrans& t )
         {
             return t.weight();
         }

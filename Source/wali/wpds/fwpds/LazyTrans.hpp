@@ -3,72 +3,79 @@
 
 /*!
  * @author Akash Lal
+ * @author Nicholas Kidd
+ *
+ * $Id$
  */
 
 #include "wali/Common.hpp"
-#include "wali/wfa/Trans.hpp"
+
+#include "wali/wfa/DecoratorTrans.hpp"
+
 #include "wali/graph/InterGraph.hpp"
 
 namespace wali
 {
-    namespace wpds
+  namespace wpds
+  {
+    class WPDS;
+    class Config;
+
+    namespace fwpds
     {
-        class WPDS;
-        class Config;
+      class FWPDS;
+      typedef ref_ptr<wali::graph::InterGraph> intergraph_t;
 
-        namespace fwpds
-        {
-            class FWPDS;
-            typedef ref_ptr<wali::graph::InterGraph> intergraph_t;
+      class LazyTrans : public wfa::DecoratorTrans
+      {
+        public:
+          friend class WPDS;
+          friend class FWPDS;
 
-            class LazyTrans : public wali::wfa::Trans
-            {
-              public:
-                friend class WPDS;
-                friend class FWPDS;
+        public:
+          LazyTrans(  wali_key_t from,
+              wali_key_t stack,
+              wali_key_t to,
+              sem_elem_t  se,
+              Config *config
+              );
 
-              public:
-                LazyTrans(  wali_key_t from,
-                            wali_key_t stack,
-                            wali_key_t to,
-                            sem_elem_t  se,
-                            Config *config
-                            );
-                LazyTrans(  wali_key_t from,
-                            wali_key_t stack,
-                            wali_key_t to,
-                            intergraph_t igr,
-                            Config *config
-                            );
-              
-                virtual ~LazyTrans();
+          /*! TODO comments */
+          LazyTrans( wfa::ITrans* delegate );
 
-                virtual const sem_elem_t weight() const throw();
+          /*! TODO comments */
+          LazyTrans( wfa::ITrans* delegate, intergraph_t igr );
 
-                virtual sem_elem_t weight() throw();              
+          virtual ~LazyTrans();
 
-                virtual void setWeight(sem_elem_t w);
+          virtual wfa::ITrans* copy() const;
 
-                virtual void combineTrans( wfa::Trans* tp );
+          virtual const sem_elem_t weight() const throw();
 
-                void setInterGraph(intergraph_t igr);
+          virtual sem_elem_t weight() throw();              
 
-              private:
-                void compute_weight() const;
+          virtual void setWeight(sem_elem_t w);
 
-              private:
-                mutable intergraph_t intergr;
-            };
-        }
+          virtual void combineTrans( wfa::ITrans* tp );
 
-    } // namespace wpds
+          void setInterGraph(intergraph_t igr);
+
+        private:
+          void compute_weight() const;
+
+        private:
+          intergraph_t intergr;
+      };
+    }
+
+  } // namespace wpds
 
 } // namespace wali
 
 #endif  // wali_wpds_LAZY_TRANS_GUARD
 
 /* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
-*/
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
+   */

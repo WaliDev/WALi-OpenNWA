@@ -8,11 +8,9 @@
 
 namespace wali
 {
-    using wfa::Trans;
-
     namespace witness
     {
-        WitnessTrans::WitnessTrans( const Trans& t_ ) : Witness(t_.weight()),t(t_)
+        WitnessTrans::WitnessTrans( const wfa::ITrans& t_ ) : Witness(t_.weight()),t(t_)
         {
         }
 
@@ -40,7 +38,7 @@ namespace wali
             return o;
         }
 
-        const Trans& WitnessTrans::getTrans() const
+        const wfa::Trans& WitnessTrans::getTrans() const
         {
             return t;
         }

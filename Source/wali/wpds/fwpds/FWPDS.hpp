@@ -2,7 +2,7 @@
 #define wali_wpds_fwpds_FWPDS_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  * @author Akash Lal
  *
  * $Id$
@@ -20,116 +20,118 @@
 
 namespace wali {
 
-    namespace wfa {
-        class WFA;
-        class Trans;
-    }
-    namespace graph {
-        class InterGraph;
-    }
+  namespace wfa {
+    class WFA;
+    class Trans;
+  }
+  namespace graph {
+    class InterGraph;
+  }
 
-    namespace wpds {
+  namespace wpds {
 
-        class Wrapper;
-        class rule_t;
+    class Wrapper;
+    class rule_t;
 
-        namespace fwpds {
-
-
-            class FWPDS : public ewpds::EWPDS {
-                public:
-                    typedef ewpds::merge_fn_t mfun_t;
-
-                public:
-                    FWPDS();
-                    FWPDS(Wrapper* wrapper);
-
-                    ////////////
-                    // add rules
-                    ////////////
-
-                    // Inherited from EWPDS
-
-                    ///////////
-                    // pre*
-                    ///////////
-                    virtual void prestar( wfa::WFA & input, wfa::WFA & output );
+    namespace fwpds {
 
 
-                    ///////////
-                    // post*
-                    ///////////
-                    virtual void poststar( wfa::WFA & input, wfa::WFA & output );
+      class FWPDS : public ewpds::EWPDS {
+        public:
+          typedef ewpds::merge_fn_t mfun_t;
 
-                    ///////////////////////
-                    // FWPDS Settings
-                    //////////////////////
+        public:
+          FWPDS();
+          FWPDS(Wrapper* wrapper);
 
-                    /*! @brief Sets evaluation strategy for RegExp after InterGraph
-                     * saturation is complete, i.e., during the time when
-                     * transition weights are calculated. It is true by default,
-                     * but setting it to false seems to be far more efficient
-                     * while using BDD-based weight domain (Moped)
-                     */
-                    static void topDownEval(bool f);
+          ////////////
+          // add rules
+          ////////////
 
-              private:
-                    void prestar_handle_call(
-                            wfa::Trans *t1,
-                            wfa::Trans *t2,
-                            rule_t &r,
-                            sem_elem_t delta
-                            );
+          // Inherited from EWPDS
 
-                    void prestar_handle_trans(
-                            wfa::Trans * t,
-                            wfa::WFA & ca  ,
-                            rule_t & r,
-                            sem_elem_t delta );
+          ///////////
+          // pre*
+          ///////////
+          virtual void prestar( wfa::WFA & input, wfa::WFA & output );
 
-                    void poststar_handle_eps_trans(
-                            wfa::Trans *teps, 
-                            wfa::Trans *tprime,
-                            sem_elem_t delta);
 
-                    void poststar_handle_trans(
-                            wfa::Trans * t ,
-                            wfa::WFA & ca   ,
-                            rule_t & r,
-                            sem_elem_t delta
-                            );
+          ///////////
+          // post*
+          ///////////
+          virtual void poststar( wfa::WFA & input, wfa::WFA & output );
 
-                    void update(
-                                wali::Key from
-                                , wali::Key stack
-                                , wali::Key to
-                                , sem_elem_t se
-                                , Config * cfg
-                                );
+          ///////////////////////
+          // FWPDS Settings
+          //////////////////////
 
-                    wfa::Trans * update_prime(
-                            wali::Key from
-                            , wali::Key stack
-                            , wali::Key to
-                            , sem_elem_t se
-                            );
-              
-                    void operator()( wali::wfa::Trans * orig );
-                    ///////////
-                    // helpers
-                    ///////////
-                    bool checkResults( wfa::WFA& input, bool poststar );
+          /*! @brief Sets evaluation strategy for RegExp after InterGraph
+           * saturation is complete, i.e., during the time when
+           * transition weights are calculated. It is true by default,
+           * but setting it to false seems to be far more efficient
+           * while using BDD-based weight domain (Moped)
+           */
+          static void topDownEval(bool f);
 
-                protected:
-                    sem_elem_t wghtOne;
-                    ref_ptr<wali::graph::InterGraph> interGr;
-                    bool checkingPhase;
+        private:
+          void prestar_handle_call(
+              wfa::ITrans *t1,
+              wfa::ITrans *t2,
+              rule_t &r,
+              sem_elem_t delta
+              );
 
-            }; // class FWPDS
+          void prestar_handle_trans(
+              wfa::ITrans * t,
+              wfa::WFA & ca  ,
+              rule_t & r,
+              sem_elem_t delta );
 
-        } // namespace fwpds
+          void poststar_handle_eps_trans(
+              wfa::ITrans *teps, 
+              wfa::ITrans *tprime,
+              sem_elem_t delta);
 
-    } // namespace wpds
+          void poststar_handle_trans(
+              wfa::ITrans * t ,
+              wfa::WFA & ca   ,
+              rule_t & r,
+              sem_elem_t delta
+              );
+
+          void update(
+              wali::Key from
+              , wali::Key stack
+              , wali::Key to
+              , sem_elem_t se
+              , Config * cfg
+              );
+
+          wfa::ITrans * update_prime(
+              Key from, //<! Guaranteed to be a generated state
+              wfa::ITrans* call, //<! The call transition
+              rule_t r, //<! The push rule
+              sem_elem_t delta, //<! Delta change on the call transition
+              sem_elem_t wWithRule //<! delta \extends r->weight()
+              );
+
+          void operator()( wfa::ITrans * orig );
+
+          ///////////
+          // helpers
+          ///////////
+          bool checkResults( wfa::WFA& input, bool poststar );
+
+        protected:
+          sem_elem_t wghtOne;
+          ref_ptr<wali::graph::InterGraph> interGr;
+          bool checkingPhase;
+
+      }; // class FWPDS
+
+    } // namespace fwpds
+
+  } // namespace wpds
 
 } // namespace wali
 
@@ -137,7 +139,7 @@ namespace wali {
 
 /* Yo, Emacs!
    ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
+   ;;; tab-width: 2 ***
    ;;; End: ***
-*/
+   */
 

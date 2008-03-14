@@ -39,14 +39,14 @@ namespace wali
 
         WPDS::WPDS() :
             wrapper(0)
-                ,worklist( new DefaultWorklist<wfa::Trans>() )
+                ,worklist( new DefaultWorklist<wfa::ITrans>() )
                 ,currentOutputWFA(0)
         {
         }
 
         WPDS::WPDS( Wrapper * w ) :
             wrapper(w)
-                ,worklist( new DefaultWorklist<wfa::Trans>() )
+                ,worklist( new DefaultWorklist<wfa::ITrans>() )
                 ,currentOutputWFA(0)
         {
         }
@@ -78,7 +78,7 @@ namespace wali
         /*!
          * Set the worklist used for pre and poststar queries.
          */
-        void WPDS::setWorklist( ref_ptr< Worklist<wfa::Trans> > wl )
+        void WPDS::setWorklist( ref_ptr< Worklist<wfa::ITrans> > wl )
         {
             if (wl == 0) {
                 *waliErr << "[ERROR] Cannot set the worklist to NULL.\n";
@@ -158,7 +158,7 @@ namespace wali
         class Unlinker : public wfa::TransFunctor {
             public:
                 virtual ~Unlinker() {}
-                virtual void operator()(Trans* t) {
+                virtual void operator()(wfa::ITrans* t) {
                     t->setConfig(0);
                 }
         };
@@ -214,15 +214,13 @@ namespace wali
         void WPDS::prestarComputeFixpoint( WFA& fa )
         {
 
-            Trans * t;
+          wfa::ITrans * t;
 
-            while( get_from_worklist( t ) )
-            {
-                pre(t,fa);
-            }
+          while( get_from_worklist( t ) )
+            pre(t,fa);
         }
 
-        void WPDS::pre( Trans* t, WFA& fa )
+        void WPDS::pre( wfa::ITrans* t, WFA& fa )
         {
             //t->print(std::cout << "Popped: ") << "\n";
 
@@ -271,8 +269,8 @@ namespace wali
         }
 
         void WPDS::prestar_handle_call(
-                Trans * t1 ,
-                Trans * t2,
+                wfa::ITrans * t1 ,
+                wfa::ITrans * t2,
                 rule_t  &r,
                 sem_elem_t delta
                 )
@@ -294,7 +292,7 @@ namespace wali
 
 
         void WPDS::prestar_handle_trans(
-                Trans * t ,
+                wfa::ITrans* t ,
                 WFA & fa   ,
                 rule_t & r,
                 sem_elem_t delta
@@ -321,7 +319,7 @@ namespace wali
                     TransSet& transSet = kpit->second;
                     for( tsit = transSet.begin(); tsit != transSet.end(); tsit++ )
                     {
-                        Trans * tprime = *tsit;
+                        wfa::ITrans* tprime = *tsit;
                         { // BEGIN DEBUGGING
                             //*waliErr << "\tMatched: (" << key2str(tprime->from()) << ", ";
                             //*waliErr << key2str(tprime->stack()) << ", ";
@@ -385,7 +383,7 @@ namespace wali
 
         void WPDS::poststarComputeFixpoint( WFA& fa )
         {
-            Trans * t;
+            wfa::ITrans* t;
 
             while( get_from_worklist( t ) ) 
             {
@@ -393,7 +391,7 @@ namespace wali
             }
         }
 
-        void WPDS::post( Trans * t, WFA& fa )
+        void WPDS::post( wfa::ITrans* t, WFA& fa )
         {
             // Get config
             Config * config = t->getConfig();
@@ -421,13 +419,13 @@ namespace wali
                 State::iterator it = state->begin();
                 for(  ; it != state->end() ; it++ )
                 {
-                    Trans * tprime = *it;
+                    wfa::ITrans* tprime = *it;
                     poststar_handle_eps_trans(t, tprime, dnew);
                 }
             }
         }
 
-        void WPDS::poststar_handle_eps_trans(Trans *teps, Trans *tprime, sem_elem_t delta)
+        void WPDS::poststar_handle_eps_trans(wfa::ITrans *teps, wfa::ITrans*tprime, sem_elem_t delta)
         {
             sem_elem_t wght = tprime->poststar_eps_closure( delta );
             Config * config = make_config( teps->from(),tprime->stack() );
@@ -440,7 +438,7 @@ namespace wali
         }
 
         void WPDS::poststar_handle_trans(
-                Trans * t ,
+                wfa::ITrans* t ,
                 WFA & fa   ,
                 rule_t & r,
                 sem_elem_t delta
@@ -459,7 +457,8 @@ namespace wali
                 // and create 2 new transitions
                 Key gstate = gen_state( rtstate,rtstack );
 
-                Trans * tprime = update_prime( gstate, r->to_stack2(), t->to(), wrule_trans );
+                wfa::ITrans* tprime = 
+                  update_prime( gstate, t, r, delta, wrule_trans );
 
                 State * state = fa.getState( gstate );
 
@@ -487,7 +486,7 @@ namespace wali
                         TransSet::iterator tsit = transSet.begin();
                         for( ; tsit != transSet.end() ; tsit++ )
                         {
-                          Trans * teps = *tsit;
+                          wfa::ITrans* teps = *tsit;
                           Config * config = make_config( teps->from(),tpstk );
                           sem_elem_t epsW = tprime->getDelta()->extend( teps->weight() );
 
@@ -683,7 +682,7 @@ namespace wali
         // Protected WPDS methods
         /////////////////////////////////////////////////////////////////
 
-        bool WPDS::get_from_worklist( Trans * & t )
+        bool WPDS::get_from_worklist( wfa::ITrans* & t )
         {
             if( !worklist->empty() ) {
                 //t = (Trans *)worklist->get();
@@ -708,12 +707,12 @@ namespace wali
                 sem_elem_t se,
                 Config * cfg )
         {
-            Trans *t = currentOutputWFA->insert(new Trans(from,stack,to,se));
-            t->setConfig(cfg);
-            if (t->modified()) {
-                //t->print(std::cout << "Adding transition: ") << "\n";
-                worklist->put( t );
-            }
+          wfa::ITrans*t = currentOutputWFA->insert(new Trans(from,stack,to,se));
+          t->setConfig(cfg);
+          if (t->modified()) {
+            //t->print(std::cout << "Adding transition: ") << "\n";
+            worklist->put( t );
+          }
         }
 
         /*!
@@ -724,15 +723,17 @@ namespace wali
          *
          * @return generated transition
          */
-        Trans * WPDS::update_prime(
-                Key from,
-                Key stack,
-                Key to,
-                sem_elem_t se )
+        wfa::ITrans* WPDS::update_prime(
+            Key from, //<! Guaranteed to be a generated state
+            wfa::ITrans* call, //<! The call transition
+            rule_t r, //<! The push rule
+            sem_elem_t delta ATTR_UNUSED, //<! Delta change on the call transition
+            sem_elem_t wWithRule //<! delta \extends r->weight()
+            )
         {
-            Trans * tmp = new Trans(from,stack,to,se);
-            Trans * t = currentOutputWFA->insert(tmp);
-            return t;
+          wfa::ITrans* tmp = new Trans(from,r->to_stack2(),call->to(),wWithRule);
+          wfa::ITrans* t = currentOutputWFA->insert(tmp);
+          return t;
         }
 
         /////////////////////////////////////////////////////////////////
@@ -741,10 +742,10 @@ namespace wali
         // to the output. 
         // This sets up the links for running saturation.
         /////////////////////////////////////////////////////////////////
-        void WPDS::operator()( Trans * orig )
+        void WPDS::operator()( wfa::ITrans* orig )
         {
             Config *c = make_config( orig->from(),orig->stack() );
-            Trans *t = orig->copy();
+            wfa::ITrans*t = orig->copy();
             t->setConfig(c);
             if (wrapper) {
                 t->setWeight( wrapper->wrap(*orig) );

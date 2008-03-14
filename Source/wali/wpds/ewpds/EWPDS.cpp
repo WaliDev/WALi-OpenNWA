@@ -15,15 +15,20 @@
 #include "wali/Worklist.hpp"
 #include "wali/KeySource.hpp"
 #include "wali/KeyPairSource.hpp"
+
 // ::wali::wfa
+#include "wali/wfa/ITrans.hpp"
+#include "wali/wfa/Trans.hpp"
 #include "wali/wfa/State.hpp"
 #include "wali/wfa/TransFunctor.hpp"
 #include "wali/wfa/TransSet.hpp"
+
 // ::wali::wpds
 #include "wali/wpds/Config.hpp"
 #include "wali/wpds/RuleFunctor.hpp"
 #include "wali/wpds/Wrapper.hpp"
 #include "wali/wpds/GenKeySource.hpp"
+
 // ::wali::wpds::ewpds
 #include "wali/wpds/ewpds/ERule.hpp"
 #include "wali/wpds/ewpds/EWPDS.hpp"
@@ -31,14 +36,6 @@
 
 #include <iostream>
 #include <cassert>
-
-// sem_elem_t -> sem_elem_t
-//#define SEM_PAIR_GET_FIRST(se) (((SemElemPair *)(se.get_ptr()))->get_first())
-//#define SEM_PAIR_GET_SECOND(se) (((SemElemPair *)(se.get_ptr()))->get_second())
-//#define SEM_PAIR_COLLAPSE(se) (SEM_PAIR_GET_FIRST(se)->extend(SEM_PAIR_GET_SECOND(se)))
-#define SEM_PAIR_GET_FIRST(se) (se)
-#define SEM_PAIR_GET_SECOND(se) (se)
-#define SEM_PAIR_COLLAPSE(se) (se)
 
 namespace wali {
   namespace wpds {  
@@ -48,9 +45,9 @@ namespace wali {
         public:
           TransPairCollapse() { }
           virtual ~TransPairCollapse() { }
-          virtual void operator()( ::wali::wfa::Trans * orig )
+          virtual void operator()( ::wali::wfa::ITrans * orig )
           {
-            orig->setWeight(SEM_PAIR_COLLAPSE(orig->weight()));
+            orig->setWeight(orig->weight());
           }
 
       };
@@ -61,7 +58,6 @@ namespace wali {
 
 namespace wali
 {
-    using wfa::Trans;
     using wfa::TransSet;
     using wfa::WFA;
     using wfa::State;
@@ -176,8 +172,8 @@ namespace wali
             }
 
             void EWPDS::prestar_handle_call(
-                    Trans *t1,
-                    Trans *t2,
+                    wfa::ITrans* t1,
+                    wfa::ITrans* t2,
                     rule_t &r,
                     sem_elem_t delta
                     )
@@ -208,7 +204,7 @@ namespace wali
             }
 
             void EWPDS::prestar_handle_trans(
-                    wfa::Trans * t ,
+                    wfa::ITrans * t ,
                     WFA & fa   ,
                     rule_t & r,
                     sem_elem_t delta
@@ -239,7 +235,7 @@ namespace wali
                         TransSet & transSet = kpit->second;
                         for( tsit = transSet.begin(); tsit != transSet.end(); tsit++ )
                         {
-                            Trans * tprime = *tsit;
+                            wfa::ITrans* tprime = *tsit;
                             sem_elem_t wtp = wrule_trans->extend( tprime->weight() );
                             update( fstate, fstack, tprime->to(), wtp, r->from() );
                         }
@@ -266,7 +262,7 @@ namespace wali
             }
 
             void EWPDS::poststar_handle_trans(
-                    wfa::Trans * t ,
+                    wfa::ITrans * t ,
                     WFA & fa   ,
                     rule_t & r,
                     sem_elem_t delta
@@ -284,13 +280,11 @@ namespace wali
               }
               else {
 
-                erule_t er = (ERule *)(r.get_ptr());
-
                 // Is a rule 2 so we must generate a state
                 // and create 2 new transitions
                 Key gstate = gen_state( rtstate,rtstack );
 
-                Trans * tprime = Eupdate_prime( gstate, r->to_stack2(), t->to(), er, delta );
+                wfa::ITrans* tprime = update_prime( gstate, t, r, delta, wrule_trans);
 
                 // Setup the weight for taking quasione
                 // TODO: This does not use the diff operator because for pair we would
@@ -334,7 +328,7 @@ namespace wali
                     TransSet::iterator tsit = transSet.begin();
                     for( ; tsit != transSet.end() ; tsit++ )
                     {
-                      Trans * teps = *tsit;
+                      wfa::ITrans* teps = *tsit;
 
                       Config* config = make_config( teps->from(),tpstk );
                       sem_elem_t epsW = tprime->poststar_eps_closure( teps->weight() );
@@ -364,12 +358,12 @@ namespace wali
             // Protected Methods
             /////////////////////////////////////////////////////////////////
 
-            void EWPDS::operator()( wali::wfa::Trans * orig )
+            void EWPDS::operator()( wfa::ITrans * orig )
             {
                 Config *c = make_config( orig->from(),orig->stack() );
                 sem_elem_t se = (wrapper == 0) ? orig->weight() : wrapper->wrap(*orig);
 
-                wfa::Trans *t;
+                wfa::ITrans *t;
 
                 t = new wfa::Trans( orig->from()
                     ,orig->stack()
@@ -384,20 +378,25 @@ namespace wali
                 worklist->put( t );
             }
 
-            Trans* EWPDS::Eupdate_prime(
-                Key from,
-                Key stack,
-                Key to,
-                erule_t er,
-                sem_elem_t wAtCall)
+            wfa::ITrans* EWPDS::update_prime(
+                Key from, //<! Guaranteed to be a generated state
+                wfa::ITrans* call, //<! The call transition
+                rule_t r, //<! The push rule
+                sem_elem_t delta, //<! Delta change on the call transition
+                sem_elem_t wWithRule //<! delta \extends r->weight()
+                )
             {
-              Trans * tmp = 
+              //
+              // !!NOTE!!
+              // This code is copied in FWPDS::update_prime.
+              // Changes here should be reflected there.
+              //
+              ERule* er = (ERule*)r.get_ptr();
+              wfa::ITrans* tmp = 
                 new ETrans(
-                    from, stack, to,
-                    wAtCall,
-                    wAtCall->extend(er->weight()),
-                    er->merge_fn());
-              Trans * t = currentOutputWFA->insert(tmp);
+                    from, r->to_stack2(), call->to(),
+                    delta, wWithRule, er);
+              wfa::ITrans* t = currentOutputWFA->insert(tmp);
               return t;
             }
 

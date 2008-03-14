@@ -15,144 +15,144 @@
 
 namespace wali
 {
-    namespace wpds
+  namespace wpds
+  {
+    class WPDS;
+    namespace ewpds 
     {
-        class WPDS;
-        namespace ewpds 
-        {
-            class EWPDS;
-        }
+      class EWPDS;
     }
+  }
 
-    namespace wfa
+  namespace wfa
+  {
+    class CA;
+    class State;
+    //typedef State* state_t;
+    //typedef ref_ptr<State> state_t;
+
+    /*!
+     * @class State
+     *
+     * This class represents a state in a CA. It extends
+     * Markable so States can be in a Worklist for querying
+     * a WFA.
+     *
+     * @see WFA
+     * @see SemElem
+     */
+    class State : public Printable, public Markable, public Countable
     {
-        class CA;
-        class State;
-        //typedef State* state_t;
-        //typedef ref_ptr<State> state_t;
+      public: // friends
+        friend class WFA;
+        friend class wali::wpds::WPDS;
+        friend class wali::wpds::ewpds::EWPDS;
+
+      public: // typedefs
+        typedef TransSet::iterator iterator;
+        typedef TransSet::const_iterator const_iterator;
+
+      public: // static vars
+        static int numStates;
+        static const std::string XMLTag;
+        static const std::string XMLInitialTag;
+        static const std::string XMLFinalTag;
+        static const std::string XMLNameTag;
+
+      public:
+
+        State();
+
+        State( Key name, sem_elem_t W );
+
+        virtual ~State();
 
         /*!
-         * @class State
+         * overrides (implements) Printable::print method
          *
-         * This class represents a state in a CA. It extends
-         * Markable so States can be in a Worklist for querying
-         * a WFA.
+         * @param o the std::ostream this is written to
+         * @return std::ostream passed in
          *
-         * @see WFA
-         * @see SemElem
+         * @see Printable
          */
-        class State : public Printable, public Markable, public Countable
+        virtual std::ostream & print( std::ostream & o ) const;
+
+        /*!
+         * Add ITrans* t to the set of transitions that lead into this
+         * State.
+         */
+        void addTrans( ITrans* t );
+
+        /*!
+         * Return a reference to the State's weight
+         */
+        sem_elem_t& weight() {
+          return se;
+        }
+
+        const sem_elem_t& weight() const {
+          return se;
+        }
+
+        /*!
+         * Return reference to the State's delta
+         */
+        sem_elem_t& delta() {
+          return delta_se;
+        }
+
+        /*!
+         * Return the key associated with this State
+         */
+        Key name() const {
+          return key;
+        }
+
+        iterator begin()
         {
-            public: // friends
-                friend class WFA;
-                friend class wali::wpds::WPDS;
-                friend class wali::wpds::ewpds::EWPDS;
+          return transSet.begin();
+        }
 
-            public: // typedefs
-                typedef TransSet::iterator iterator;
-                typedef TransSet::const_iterator const_iterator;
+        iterator end()
+        {
+          return transSet.end();
+        }
 
-            public: // static vars
-                static int numStates;
-                static const std::string XMLTag;
-                static const std::string XMLInitialTag;
-                static const std::string XMLFinalTag;
-                static const std::string XMLNameTag;
+        bool eraseTrans(
+            Key from,
+            Key stack,
+            Key to );
 
-            public:
+        bool eraseTrans( ITrans* t );
 
-                State();
+        void clearTransSet();
 
-                State( Key name, sem_elem_t W );
+        /*!
+         * @brief Used for placing States in STL containers
+         */
+        bool operator()( const State* a, const State* b ) const;
 
-                virtual ~State();
+        TransSet& getTransSet()
+        {
+          return transSet;
+        }
 
-                /*!
-                 * overrides (implements) Printable::print method
-                 *
-                 * @param o the std::ostream this is written to
-                 * @return std::ostream passed in
-                 *
-                 * @see Printable
-                 */
-                virtual std::ostream & print( std::ostream & o ) const;
+        const TransSet& getTransSet() const
+        {
+          return transSet;
+        }
 
-                /*!
-                 * Add Trans* t to the set of transitions that lead into this
-                 * State.
-                 */
-                void addTrans( Trans * t );
+      protected:
+        Key key;
+        sem_elem_t se;
+        sem_elem_t delta_se;
+        sem_elem_t quasi;
+        TransSet transSet;
+        int tag;            //!< Used by WFA::prune
 
-                /*!
-                 * Return a reference to the State's weight
-                 */
-                sem_elem_t& weight() {
-                    return se;
-                }
+    }; //class State
 
-                const sem_elem_t& weight() const {
-                    return se;
-                }
-
-                /*!
-                 * Return reference to the State's delta
-                 */
-                sem_elem_t& delta() {
-                    return delta_se;
-                }
-
-                /*!
-                 * Return the key associated with this State
-                 */
-                Key name() const {
-                    return key;
-                }
-
-                iterator begin()
-                {
-                    return transSet.begin();
-                }
-
-                iterator end()
-                {
-                    return transSet.end();
-                }
-
-                bool eraseTrans(
-                        Key from,
-                        Key stack,
-                        Key to );
-
-                bool eraseTrans( Trans* t );
-
-                void clearTransSet();
-
-                /*!
-                 * @brief Used for placing States in STL containers
-                 */
-                bool operator()( const State* a, const State* b ) const;
-
-                TransSet& getTransSet()
-                {
-                    return transSet;
-                }
-
-                const TransSet& getTransSet() const
-                {
-                    return transSet;
-                }
-
-            protected:
-                Key key;
-                sem_elem_t se;
-                sem_elem_t delta_se;
-                sem_elem_t quasi;
-                TransSet transSet;
-                int tag;            //!< Used by WFA::prune
-
-        }; //class State
-
-    } // namespace wfa
+  } // namespace wfa
 
 } // namespace wali
 
@@ -160,6 +160,6 @@ namespace wali
 
 /* Yo, Emacs!
    ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
+   ;;; tab-width: 2 ***
    ;;; End: ***
- */
+   */

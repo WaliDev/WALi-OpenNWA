@@ -51,6 +51,7 @@ wali_files = Split("""
 ./wali/wpds/GenKeySource.cpp
 ./wali/wfa/State.cpp
 ./wali/wfa/WFA.cpp
+./wali/wfa/ITrans.cpp
 ./wali/wfa/Trans.cpp
 ./wali/wfa/WeightMaker.cpp
 ./wali/wfa/TransFunctor.cpp
@@ -69,7 +70,6 @@ wali_files = Split("""
 ./wali/witness/WitnessCombine.cpp
 ./wali/witness/WitnessMerge.cpp
 ./wali/graph/RegExp.cpp
-./wali/graph/SummaryGraph.cpp
 ./wali/graph/Graph.cpp
 ./wali/graph/InterGraph.cpp
 ./wali/graph/LinkEval.cpp

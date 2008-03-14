@@ -153,7 +153,7 @@ namespace wali {
                 ~InterGraph();
                 void addEdge(Transition src, Transition tgt, wali::sem_elem_t se);
                 void addEdge(Transition src1, Transition src2, Transition tgt, wali::sem_elem_t se);
-                void addEdge(Transition src1, Transition src2, Transition tgt, wali::wpds::ewpds::MergeFn *mf);
+                void addEdge(Transition src1, Transition src2, Transition tgt, wali::wpds::ewpds::merge_fn_t mf);
 
                 void addCallEdge(Transition src1, Transition src2);
 

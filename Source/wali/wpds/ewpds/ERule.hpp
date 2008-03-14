@@ -3,11 +3,11 @@
 
 /*
  * @author Akash Lal
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
 #include "wali/wpds/Rule.hpp"
-#include "wali/wpds/Config.hpp"
 #include "wali/wpds/ewpds/MergeFunction.hpp"
 
 //
@@ -15,71 +15,76 @@
 //
 namespace wali
 {
-    namespace wpds
+  namespace wpds
+  {
+    class Config;
+
+    namespace ewpds
     {
-        namespace ewpds
-        {
 
-            /*! @class ERule
-             *
-             * @see Rule
-             */
+      class ERule;
+      typedef ref_ptr<ERule> erule_t;
 
-            class ERule : public Rule
-            {
+      /*! @class ERule
+       *
+       * @see Rule
+       */
 
-                public:
-                    friend class EWPDS;
+      class ERule : public Rule
+      {
 
-                public: 
+        public:
+          friend class EWPDS;
 
-                    /*!
-                     * @brief constructor
-                     */
-                    ERule( Config *f, Config *t, wali_key_t s2, sem_elem_t se, merge_fn_t fn = NULL );
+        public: 
 
-                    /*!
-                     * @brief destructor
-                     */
-                    ~ERule();
+          /*!
+           * @brief constructor
+           */
+          ERule( Config *f, Config *t, wali_key_t s2, sem_elem_t se, merge_fn_t fn = NULL );
 
-                    /*!
-                     * @return Rule rhs second stack symbol or WALI_EPSILON if no such
-                     * stack sym
-                     */
-                    merge_fn_t merge_fn() const { return mf; }
+          /*!
+           * @brief destructor
+           */
+          ~ERule();
 
-                    /*! @return reference to the extended Weight */
-                    sem_elem_t extended_weight() const;
+          /*!
+           * @return Rule rhs second stack symbol or WALI_EPSILON if no such
+           * stack sym
+           */
+          merge_fn_t merge_fn() const { return mf; }
 
-                    /*!
-                     *
-                     * @param o the std::ostream this is written to
-                     * @return std::ostream passed in
-                     *
-                     * @see Printable
-                     */
-                    std::ostream & print( std::ostream &o ) const;
+          /*! @return reference to the extended Weight */
+          sem_elem_t extended_weight() const;
 
-                    /*!
-                     * marshall will write a ERule to a std::ostream. This writes
-                     * the rule in XML form.
-                     *
-                     * @return std::ostream the marshalled rule was written to.
-                     */
-                    std::ostream & marshall( std::ostream & o ) const;
+          /*!
+           *
+           * @param o the std::ostream this is written to
+           * @return std::ostream passed in
+           *
+           * @see Printable
+           */
+          std::ostream & print( std::ostream &o ) const;
 
-                private:
-                    merge_fn_t mf;
-                    // AL: Removing extended_se from the class. The underlying rule weight is
-                    // sufficient, and we don't want to maintain redundant information
-                    //sem_elem_t extended_se;
+          /*!
+           * marshall will write a ERule to a std::ostream. This writes
+           * the rule in XML form.
+           *
+           * @return std::ostream the marshalled rule was written to.
+           */
+          std::ostream & marshall( std::ostream & o ) const;
 
-            }; // class ERule
+        private:
+          merge_fn_t mf;
+          // AL: Removing extended_se from the class. The underlying rule weight is
+          // sufficient, and we don't want to maintain redundant information
+          //sem_elem_t extended_se;
 
-        } // end namespace ewpds
+      }; // class ERule
 
-    } // end namespace wpds
+    } // end namespace ewpds
+
+  } // end namespace wpds
 
 } // end namespace wali
 
@@ -89,4 +94,4 @@ namespace wali
    ;;; Local Variables: ***
    ;;; tab-width: 4 ***
    ;;; End: ***
- */
+   */

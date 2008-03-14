@@ -10,13 +10,18 @@
  * incoming Transes to the State. TODO: FIX
  */
 
+// ::wali
 #include "wali/Common.hpp"
 #include "wali/Printable.hpp"
 #include "wali/SemElem.hpp"
 #include "wali/HashMap.hpp"
 #include "wali/KeyContainer.hpp"
+
+// ::wali::wfa
 #include "wali/wfa/WeightMaker.hpp"
+#include "wali/wfa/Trans.hpp"
 #include "wali/wfa/TransSet.hpp"
+
 #include <iostream>
 #include <list>
 #include <set>
@@ -222,7 +227,7 @@ namespace wali
                  *
                  * @see wali::wfa::Trans
                  */
-                virtual void addTrans( Trans * t );
+                virtual void addTrans( ITrans * t );
 
                 /*!
                  * @brief erase Trans
@@ -396,7 +401,7 @@ namespace wali
                  *
                  * @return pointer to real transition
                  */
-                Trans * insert( Trans * tnew );
+                ITrans * insert( ITrans * tnew );
 
                 /*!
                  * @brief Returns a TransSet containing all 
@@ -444,10 +449,6 @@ namespace wali
 
             protected:
 
-                /*! @brief fold tnew into told
-                 */
-                virtual void combineTrans( Trans * told, Trans * tnew );
-
                 /*!
                  * setupFixpoint clears each states markable flag and sets
                  * the states weight to zero
@@ -467,7 +468,7 @@ namespace wali
                  *
                  * @return the Trans* that was removed from the maps
                  */
-                Trans * eraseTransFromMaps(
+                ITrans * eraseTransFromMaps(
                         Key from,
                         Key stack,
                         Key to );
@@ -477,12 +478,12 @@ namespace wali
                  *
                  * @return the Trans* that was removed from the KpMap
                  */
-                Trans* eraseTransFromKpMap(
+                ITrans* eraseTransFromKpMap(
                         Key from,
                         Key stack,
                         Key to );
 
-                Trans* eraseTransFromKpMap( Trans* terase );
+                ITrans* eraseTransFromKpMap( ITrans* terase );
 
                 /*!
                  * Erases the specified Trans(from,stack,to) from the
@@ -490,7 +491,7 @@ namespace wali
                  *
                  * @return true if a transition was erased from EpsMap
                  */
-                Trans* eraseTransFromEpsMap( Trans* terase );
+                ITrans* eraseTransFromEpsMap( ITrans* terase );
 
                 /*!
                  * Erases the State 'state' from the WFA and all transitions

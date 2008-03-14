@@ -12,161 +12,161 @@
 
 namespace wali
 {
-    namespace wfa
+  namespace wfa
+  {
+    class Trans;    //! < Needed by all (Const)TransFunctors
+    class WFA;      //! < Needed by TransCopier
+
+    /*!
+     * @class TransFunctor
+     *
+     * Pure virtual class exporting the interface used
+     * by wali::wfa::WFA::for_each. This class allows
+     * for modification of the WFA's Trans objects in place.
+     *
+     * @see Trans
+     * @see WFA
+     */
+    class TransFunctor
     {
-        class Trans;    //! < Needed by all (Const)TransFunctors
-        class WFA;      //! < Needed by TransCopier
+      public:
+        virtual ~TransFunctor() {}
 
-        /*!
-         * @class TransFunctor
-         *
-         * Pure virtual class exporting the interface used
-         * by wali::wfa::WFA::for_each. This class allows
-         * for modification of the WFA's Trans objects in place.
-         *
-         * @see Trans
-         * @see WFA
-         */
-        class TransFunctor
-        {
-            public:
-                virtual ~TransFunctor() {}
+        virtual void operator()( ITrans* t ) = 0;
+    }; // class TransFunctor
 
-                virtual void operator()( Trans * t ) = 0;
-        }; // class TransFunctor
+    /*!
+     * @class ConstTransFunctor
+     *
+     * Pure virtual class exporting the interface used by
+     * wali::wfa::WFA::for_each. This class DOES NOT ALLOW for
+     * modification of the WFA's Trans objects.
+     *
+     * @see Trans
+     * @see WFA
+     */
+    class ConstTransFunctor
+    {
+      public:
+        virtual ~ConstTransFunctor() {}
 
-        /*!
-         * @class ConstTransFunctor
-         *
-         * Pure virtual class exporting the interface used by
-         * wali::wfa::WFA::for_each. This class DOES NOT ALLOW for
-         * modification of the WFA's Trans objects.
-         *
-         * @see Trans
-         * @see WFA
-         */
-        class ConstTransFunctor
-        {
-            public:
-                virtual ~ConstTransFunctor() {}
+        virtual void operator()( const ITrans* t ) = 0;
+    }; // class ConstTransFunctor
 
-                virtual void operator()( const Trans * t ) = 0;
-        }; // class ConstTransFunctor
+    /*!
+     * @class TransPrinter
+     *
+     * Writes Transes to its std::ostream member var. Used
+     * by wali::wfa::WFA::print. Calls Trans::print( std::ostream& ).
+     *
+     * @see ConstTransFunctor
+     * @see Trans
+     * @see WFA
+     */
+    class TransPrinter : public ConstTransFunctor
+    {
+      std::ostream& o;
+      public:
+      TransPrinter( std::ostream & o_ ) : o(o_) {}
 
-        /*!
-         * @class TransPrinter
-         *
-         * Writes Transes to its std::ostream member var. Used
-         * by wali::wfa::WFA::print. Calls Trans::print( std::ostream& ).
-         *
-         * @see ConstTransFunctor
-         * @see Trans
-         * @see WFA
-         */
-        class TransPrinter : public ConstTransFunctor
-        {
-            std::ostream& o;
-            public:
-                TransPrinter( std::ostream & o_ ) : o(o_) {}
+      virtual ~TransPrinter() {}
 
-                virtual ~TransPrinter() {}
+      virtual void operator()( const ITrans* t );
+    }; // class TransPrinter
 
-                virtual void operator()( const Trans * t );
-        }; // class TransPrinter
+    /*!
+     * @class TransCopier
+     *
+     * Inserts a copy of the passed in Trans into its member
+     * var WFA. Used by WFA copy constructor and operator=.
+     *
+     * @see ConstTransFunctor
+     * @see Trans
+     * @see WFA
+     */
+    class TransCopier : public ConstTransFunctor
+    {
+      WFA & fa;
+      public:
+      TransCopier( WFA & fa_ ) : fa(fa_) {}
 
-        /*!
-         * @class TransCopier
-         *
-         * Inserts a copy of the passed in Trans into its member
-         * var WFA. Used by WFA copy constructor and operator=.
-         *
-         * @see ConstTransFunctor
-         * @see Trans
-         * @see WFA
-         */
-        class TransCopier : public ConstTransFunctor
-        {
-            WFA & fa;
-            public:
-                TransCopier( WFA & fa_ ) : fa(fa_) {}
+      virtual ~TransCopier() {}
 
-                virtual ~TransCopier() {}
+      virtual void operator()( const ITrans* t );
+    }; // class TransCopier
 
-                virtual void operator()( const Trans * t );
-        }; // class TransCopier
+    /*!
+     * @class TransDeleter
+     *
+     * Calls delete on each ITrans* object passed to it.
+     *
+     * @see TransFunctor
+     */
+    class TransDeleter : public TransFunctor
+    {
+      public:
+        virtual ~TransDeleter() {}
 
-        /*!
-         * @class TransDeleter
-         *
-         * Calls delete on each Trans* object passed to it.
-         *
-         * @see TransFunctor
-         */
-        class TransDeleter : public TransFunctor
-        {
-            public:
-                virtual ~TransDeleter() {}
+        virtual void operator()( ITrans* t );
+    }; // class TransDeleter
 
-                virtual void operator()( Trans * t );
-        }; // class TransDeleter
+    /*!
+     * @class TransDotty
+     * Prints each Trans to std::ostream in dotty format.
+     */
+    class TransDotty : public ConstTransFunctor
+    {
+      public:
+        std::ostream& o;
+        bool print_weights;
 
-        /*!
-         * @class TransDotty
-         * Prints each Trans to std::ostream in dotty format.
-         */
-        class TransDotty : public ConstTransFunctor
-        {
-            public:
-                std::ostream& o;
-                bool print_weights;
+        TransDotty( std::ostream& o, bool print_weights );
 
-                TransDotty( std::ostream& o, bool print_weights );
+        virtual ~TransDotty() {}
 
-                virtual ~TransDotty() {}
+        virtual void operator()( const ITrans* t );
+    }; // class TransDotty
 
-                virtual void operator()( const Trans * t );
-        }; // class TransDotty
+    /*!
+     * @class TransMarshaller
+     * Writes a Trans in xml format
+     */
+    class TransMarshaller : public ConstTransFunctor
+    {
+      public:
+        std::ostream& o;
 
-        /*!
-         * @class TransMarshaller
-         * Writes a Trans in xml format
-         */
-        class TransMarshaller : public ConstTransFunctor
-        {
-            public:
-                std::ostream& o;
+        TransMarshaller( std::ostream& o );
 
-                TransMarshaller( std::ostream& o );
+        virtual ~TransMarshaller() {}
 
-                virtual ~TransMarshaller() {}
+        virtual void operator()( const ITrans* t );
+    }; // class TransMarshaller
 
-                virtual void operator()( const Trans * t );
-        }; // class TransMarshaller
+    /*!
+     * @class StackHasher
+     * Hashes the transitions on their stack symbol.
+     * Used by WFA::intersect
+     */
 
-        /*!
-         * @class StackHasher
-         * Hashes the transitions on their stack symbol.
-         * Used by WFA::intersect
-         */
+    class StackHasher : public TransFunctor
+    {
+      public:
+        typedef wali::HashMap< Key , TransSet > stackmap_t;
+        typedef stackmap_t::iterator iterator;
+        stackmap_t stackmap;
 
-        class StackHasher : public TransFunctor
-        {
-            public:
-                typedef wali::HashMap< Key , TransSet > stackmap_t;
-                typedef stackmap_t::iterator iterator;
-                stackmap_t stackmap;
+        virtual ~StackHasher() {}
 
-                virtual ~StackHasher() {}
+        virtual void operator()( ITrans* t );
 
-                virtual void operator()( Trans * t );
+        iterator begin();
+        iterator end();
+        iterator find( Key k );
 
-                iterator begin();
-                iterator end();
-                iterator find( Key k );
+    }; // class StackHasher
 
-        }; // class StackHasher
-
-    } // namespace wfa
+  } // namespace wfa
 
 } // namespace wali
 
@@ -176,4 +176,4 @@ namespace wali
    ;;; Local Variables: ***
    ;;; tab-width: 4 ***
    ;;; End: ***
- */
+   */

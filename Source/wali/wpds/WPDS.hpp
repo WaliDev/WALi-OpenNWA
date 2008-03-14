@@ -27,7 +27,7 @@ namespace wali
 
     namespace wfa
     {
-        class Trans;
+        class ITrans;
     }
 
     namespace wpds
@@ -43,7 +43,7 @@ namespace wali
          * @class WPDS
          */
 
-        class WPDS : public Printable, public wali::wfa::TransFunctor
+        class WPDS : public Printable, public wfa::TransFunctor
         {
 
             public:
@@ -60,7 +60,7 @@ namespace wali
                  * the rule R1 = < s1,a > -> < s2, b c > will add R1 to 
                  * the list that is mapped to by the stack symbol c.
                  */
-                typedef HashMap< wali::Key, std::list< rule_t > > r2hash_t;
+                typedef HashMap< Key, std::list< rule_t > > r2hash_t;
 
             private:
 
@@ -78,7 +78,7 @@ namespace wali
                 /*!
                  * Set the worklist used for pre and poststar queries.
                  */
-                void setWorklist( ref_ptr< Worklist<wfa::Trans> > wl );
+                void setWorklist( ref_ptr< Worklist<wfa::ITrans> > wl );
 
 
                 /*! @brief create rule with no r.h.s. stack symbols
@@ -86,12 +86,12 @@ namespace wali
                  * @return true if rule existed
                  *
                  * @see sem_elem_t
-                 * @see wali::Key
+                 * @see Key
                  */
                 virtual bool add_rule(
-                        wali::Key from_state,
-                        wali::Key from_stack,
-                        wali::Key to_state,
+                        Key from_state,
+                        Key from_stack,
+                        Key to_state,
                         sem_elem_t se );
 
                 /*! @brief create rule with one r.h.s. stack symbol
@@ -99,13 +99,13 @@ namespace wali
                  * @return true if rule existed
                  *
                  * @see sem_elem_t
-                 * @see wali::Key
+                 * @see Key
                  */
                 virtual bool add_rule(
-                        wali::Key from_state,
-                        wali::Key from_stack,
-                        wali::Key to_state,
-                        wali::Key to_stack1,
+                        Key from_state,
+                        Key from_stack,
+                        Key to_state,
+                        Key to_stack1,
                         sem_elem_t se );
 
                 /*! @brief create rule with two r.h.s. stack symbols
@@ -113,24 +113,24 @@ namespace wali
                  * @return true if rule existed
                  *
                  * @see sem_elem_t
-                 * @see wali::Key
+                 * @see Key
                  */
                 virtual bool add_rule(
-                        wali::Key from_state,
-                        wali::Key from_stack,
-                        wali::Key to_state,
-                        wali::Key to_stack1,
-                        wali::Key to_stack2,
+                        Key from_state,
+                        Key from_stack,
+                        Key to_state,
+                        Key to_stack1,
+                        Key to_stack2,
                         sem_elem_t se );
 
                 /*!
                  * @brief Perform prestar reachability query
                  *
-                 * @return ::wali::wfa::WFA
+                 * @return wfa::WFA
                  *
-                 * @see ::wali::wfa::WFA
+                 * @see wfa::WFA
                  */
-                virtual ::wali::wfa::WFA prestar( ::wali::wfa::WFA & input );
+                virtual wfa::WFA prestar( wfa::WFA & input );
 
                 /*!
                  * @brief Perform prestar reachability query
@@ -142,18 +142,18 @@ namespace wali
                  *
                  * @return void
                  *
-                 * @see ::wali::wfa::WFA
+                 * @see wfa::WFA
                  */
-                virtual void prestar( ::wali::wfa::WFA & input, ::wali::wfa::WFA & output );
+                virtual void prestar( wfa::WFA & input, wfa::WFA & output );
 
                 /*!
                  * @brief Perform poststar reachability query
                  *
                  * @return WFA
                  *
-                 * @see ::wali::wfa::WFA
+                 * @see wfa::WFA
                  */
-                virtual ::wali::wfa::WFA poststar( ::wali::wfa::WFA & input );
+                virtual wfa::WFA poststar( wfa::WFA & input );
 
                 /*!
                  * @brief Perform poststar reachability query.
@@ -163,11 +163,11 @@ namespace wali
                  * after the query but will have no effect
                  * on the reachability query.
                  *
-                 * @return ::wali::wfa::WFA
+                 * @return wfa::WFA
                  *
-                 * @see ::wali::wfa::WFA
+                 * @see wfa::WFA
                  */
-                virtual void poststar( ::wali::wfa::WFA & input, ::wali::wfa::WFA & output );
+                virtual void poststar( wfa::WFA & input, wfa::WFA & output );
 
                 /*!
                  * This method writes the WPDS to the passed in 
@@ -210,7 +210,7 @@ namespace wali
                 /*!
                  * Implementation of TransFunctor
                  */
-                virtual void operator()( wali::wfa::Trans* t );
+                virtual void operator()( wfa::ITrans* t );
 
             protected:
 
@@ -220,48 +220,48 @@ namespace wali
                  * @return true if rule existed
                  *
                  * @see sem_elem_t
-                 * @see wali::Key
+                 * @see Key
                  */
                 virtual bool add_rule(
-                        wali::Key from_state,
-                        wali::Key from_stack,
-                        wali::Key to_state,
-                        wali::Key to_stack1,
-                        wali::Key to_stack2,
+                        Key from_state,
+                        Key from_stack,
+                        Key to_state,
+                        Key to_stack1,
+                        Key to_stack2,
                         sem_elem_t se,
                         rule_t& r );
 
                 /*!
                  * @brief copy relevant material from input WFA to output WFA
                  */
-                virtual void setupOutput( ::wali::wfa::WFA& input, ::wali::wfa::WFA& fa );
+                virtual void setupOutput( wfa::WFA& input, wfa::WFA& fa );
 
                 /*!
                  * @brief For each t \in fa, t->setConfig(0)
                  */
-                virtual void unlinkOutput( ::wali::wfa::WFA& fa );
+                virtual void unlinkOutput( wfa::WFA& fa );
 
                 /*!
                  * @brief Gets WPDS ready for fixpoint
                  */
-                virtual void prestarSetupFixpoint( ::wali::wfa::WFA& input, ::wali::wfa::WFA& fa );
+                virtual void prestarSetupFixpoint( wfa::WFA& input, wfa::WFA& fa );
 
                 /*!
                  * @brief Performs the fixpoint computation
                  */
-                virtual void prestarComputeFixpoint( ::wali::wfa::WFA& fa );
+                virtual void prestarComputeFixpoint( wfa::WFA& fa );
 
                 /*!
-                 * @brief Performs pre for 1 Trans
+                 * @brief Performs pre for 1 ITrans
                  */
-                virtual void pre( wfa::Trans * t, ::wali::wfa::WFA& fa );
+                virtual void pre( wfa::ITrans * t, wfa::WFA& fa );
 
                 /*!
                  * @brief helper method for prestar
                  */
                 virtual void prestar_handle_call(
-                        wfa::Trans * t1 ,
-                        wfa::Trans * t2,
+                        wfa::ITrans * t1 ,
+                        wfa::ITrans * t2,
                         rule_t & r,
                         sem_elem_t delta
                         );
@@ -270,32 +270,32 @@ namespace wali
                  * @brief helper method for prestar
                  */
                 virtual void prestar_handle_trans(
-                        wfa::Trans * t,
-                        ::wali::wfa::WFA & ca  ,
+                        wfa::ITrans * t,
+                        wfa::WFA & ca  ,
                         rule_t & r,
                         sem_elem_t delta );
 
                 /*!
                  * @brief Gets WPDS ready for fixpoint
                  */
-                virtual void poststarSetupFixpoint( ::wali::wfa::WFA& input, ::wali::wfa::WFA& fa );
+                virtual void poststarSetupFixpoint( wfa::WFA& input, wfa::WFA& fa );
 
                 /*!
                  * @brief Performs the fixpoint computation
                  */
-                virtual void poststarComputeFixpoint( ::wali::wfa::WFA& fa );
+                virtual void poststarComputeFixpoint( wfa::WFA& fa );
 
                 /*!
-                 * @brief Performs post for 1 Trans
+                 * @brief Performs post for 1 ITrans
                  */
-                virtual void post( wfa::Trans * t, ::wali::wfa::WFA& fa );
+                virtual void post( wfa::ITrans * t, wfa::WFA& fa );
 
                 /*!
                  * @brief helper method for poststar
                  */
                 virtual void poststar_handle_eps_trans(
-                        wfa::Trans *teps, 
-                        wfa::Trans *tprime, 
+                        wfa::ITrans *teps, 
+                        wfa::ITrans *tprime, 
                         sem_elem_t delta
                         );
 
@@ -303,8 +303,8 @@ namespace wali
                  * @brief helper method for poststar
                  */
                 virtual void poststar_handle_trans(
-                        wfa::Trans * t ,
-                        ::wali::wfa::WFA & ca   ,
+                        wfa::ITrans * t ,
+                        wfa::WFA & ca   ,
                         rule_t & r,
                         sem_elem_t delta
                         );
@@ -314,18 +314,18 @@ namespace wali
                  *
                  * gen_state is only used by poststar
                  *
-                 * @return wali::Key for new state
+                 * @return Key for new state
                  */
-                virtual wali::Key gen_state( wali::Key state, wali::Key stack );
+                virtual Key gen_state( Key state, Key stack );
 
                 /*!
                  * @brief link input WFA transitions to Configs
                  *
                  * @see Config
-                 * @see wfa::Trans
+                 * @see wfa::ITrans
                  * 
                  */
-                //virtual void copy_and_link( ::wali::wfa::WFA & in, ::wali::wfa::WFA & out );
+                //virtual void copy_and_link( wfa::WFA & in, wfa::WFA & out );
 
                 /*!
                  * Create the Config for the state and stack KeyPair.
@@ -333,7 +333,7 @@ namespace wali
                  *
                  * @return Config pointer
                  */
-                virtual Config * make_config( wali::Key state, wali::Key stack );
+                virtual Config * make_config( Key state, Key stack );
 
                 /*!
                  * Creates a rule that links two configurations.
@@ -348,7 +348,7 @@ namespace wali
                 virtual bool make_rule(
                         Config *f,
                         Config *t,
-                        wali::Key stk2,
+                        Key stk2,
                         sem_elem_t se,
                         rule_t& r );
 
@@ -360,23 +360,23 @@ namespace wali
                  * @see Config
                  * @see KeyPair
                  */
-                virtual Config * find_config( wali::Key state, wali::Key stack );
+                virtual Config * find_config( Key state, Key stack );
 
                 /*! @brief helper method for fixpoint loop
                  *
-                 * return true if wfa::Trans was retrieved from
+                 * return true if wfa::ITrans was retrieved from
                  * worklist, false if worklist is empty
                  */
-                virtual bool get_from_worklist( wfa::Trans * & );
+                virtual bool get_from_worklist( wfa::ITrans * & );
 
                 /*!
                  * @brief helper function to create and link a transition
                  *
                  */
                 virtual void update(
-                        wali::Key from
-                        , wali::Key stack
-                        , wali::Key to
+                        Key from
+                        , Key stack
+                        , Key to
                         , sem_elem_t se
                         , Config * cfg
                         );
@@ -389,12 +389,13 @@ namespace wali
                  *
                  * @return generated transition
                  */
-                virtual wfa::Trans * update_prime(
-                        wali::Key from
-                        , wali::Key stack
-                        , wali::Key to
-                        , sem_elem_t se
-                        );
+                virtual wfa::ITrans* update_prime(
+                    Key from, //<! Guaranteed to be a generated state
+                    wfa::ITrans* call, //<! The call transition
+                    rule_t r, //<! The push rule
+                    sem_elem_t delta, //<! Delta change on the call transition
+                    sem_elem_t wWithRule //<! delta \extends r->weight()
+                    );
 
                 /*!
                  * @return const chash_t reference
@@ -414,11 +415,11 @@ namespace wali
 
             protected: // data members
                 Wrapper * wrapper;
-                ref_ptr< Worklist<wfa::Trans> > worklist;
+                ref_ptr< Worklist<wfa::ITrans> > worklist;
                 chash_t configs;
                 std::set< Config * > rule_zeroes;
                 r2hash_t r2hash;
-                wali::wfa::WFA* currentOutputWFA;
+                wfa::WFA* currentOutputWFA;
 
             private:
 

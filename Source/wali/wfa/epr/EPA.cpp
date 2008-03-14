@@ -79,8 +79,8 @@ namespace wali {
         State *init_succ = 0;
         sem_elem_t init_succ_wt;
         for(transit = tset.begin(); transit != tset.end(); transit++, trans_cnt++) {
-          Trans *t = (*transit);
-          State *q = getState(t->to());
+          wfa::ITrans *t = (*transit);
+          wfa::State *q = getState(t->to());
           FunctionalWeight *fw = dynamic_cast<FunctionalWeight *> (t->weight().get_ptr());
           
           if(fw == 0) {
@@ -120,7 +120,7 @@ namespace wali {
           // propagate weight from q to its successors
           TransSet::iterator it;
           for(it = q->begin() ; it != q->end(); it ++) {
-            Trans *t = *it;
+            wfa::ITrans *t = *it;
             State* qprime = getState(t->to());
             FunctionalWeight *fw = dynamic_cast<FunctionalWeight *> (t->weight().get_ptr());
             
@@ -203,7 +203,7 @@ namespace wali {
           State *q = getState(st);
           TransSet::iterator it;
           for(it = q->begin() ; it != q->end(); it++ ) { 
-            Trans *t = *it;
+            wfa::ITrans *t = *it;
             if(bfsOrder.find(t->to()) == bfsOrder.end()) {
               workset.push_back(t->to());
             }

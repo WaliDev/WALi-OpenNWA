@@ -11,7 +11,7 @@
 namespace wali
 {
     namespace wfa {
-        class Trans;
+        class ITrans;
     }
 
     namespace wpds
@@ -42,7 +42,7 @@ namespace wali
 
                 virtual ~Wrapper() {}
 
-                virtual sem_elem_t wrap( wfa::Trans& t );
+                virtual sem_elem_t wrap( wfa::ITrans& t );
 
                 virtual sem_elem_t wrap( wpds::Rule& r );
 

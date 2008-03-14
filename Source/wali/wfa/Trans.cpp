@@ -14,33 +14,8 @@ namespace wali
 
 
     int Trans::numTrans = 0;
-    const std::string Trans::XMLTag("Trans");
-    const std::string Trans::XMLFromTag("from");
-    const std::string Trans::XMLStackTag("stack");
-    const std::string Trans::XMLToTag("to");
-
-    bool TransLT::operator()( const Trans* a, const Trans* b ) const
-    {
-      if( a->from() == b->from() ) {
-        if( a->stack() == b->stack() ) {
-          return a->to() < b->to();
-        }
-        else {
-          return a->stack() < b->stack();
-        }
-      }
-      else {
-        return a->from() < b->from();
-      }
-    }
-
-    bool TransEq::operator()( const Trans* a, const Trans* b ) const
-    {
-      return a->equal(b);
-    }
 
     Trans::Trans() :
-      Countable(true),
       kp(WALI_EPSILON,WALI_EPSILON), toStateKey(WALI_EPSILON),
       se(0),delta(0),status(MODIFIED),config(0)
     {
@@ -56,7 +31,6 @@ namespace wali
         Key stack_,
         Key to_,
         sem_elem_t se_ ) :
-      Countable(true),
       kp(from_,stack_), toStateKey(to_),
       se(se_), delta(se_), status(MODIFIED), config(0) 
     {
@@ -75,29 +49,41 @@ namespace wali
     // rhs may be a LazyTrans, which requires that the weight of a transition be
     // through a call to weight()
     //
-    Trans::Trans( const Trans & rhs ) :
-      Printable(),Countable(true),Markable()
+    Trans::Trans( const Trans & rhs ) : IMarkable(), ITrans(), Markable()
     {
-      kp      = rhs.kp;
-      toStateKey= rhs.toStateKey;
-      se      = rhs.weight();
-      delta   = rhs.weight();
-      status  = rhs.status;
-      config  = rhs.config;
-      {
-        // TODO : R
+      this->operator=(rhs);
+      { // DEBUGGING
         numTrans++;
         //*waliErr << "Trans( const Trans& ) : " << numTrans << std::endl;
       }
     }
 
-    const Trans &Trans::operator =(const Trans &rhs) {
+    Trans::Trans( const ITrans & rhs ) : IMarkable(), ITrans(), Markable()
+    {
+      this->operator=(rhs);
+      { // DEBUGGING
+        numTrans++;
+        //*waliErr << "Trans( const ITrans& ) : " << numTrans << std::endl;
+      }
+    }
+
+    Trans &Trans::operator=(const Trans &rhs) {
       kp      = rhs.kp;
       toStateKey= rhs.toStateKey;
       se      = rhs.weight();
       delta   = rhs.weight();
       status  = rhs.status;
       config  = rhs.config;
+      return *this;
+    }
+
+    Trans &Trans::operator=(const ITrans &rhs) {
+      kp         = rhs.keypair();
+      toStateKey = rhs.to();
+      se         = rhs.weight();
+      delta      = rhs.weight();
+      status     = (rhs.modified()) ? MODIFIED : SAME;
+      config     = rhs.getConfig();
       return *this;
     }
 
@@ -110,11 +96,11 @@ namespace wali
       }
     }
 
-    Trans* Trans::copy() {
+    Trans* Trans::copy() const {
       return new Trans(from(),stack(),to(),weight());
     }
 
-    void Trans::combineTrans( Trans* tp )
+    void Trans::combineTrans( ITrans* tp )
     {
       sem_elem_t wnew = tp->weight();
 
@@ -134,70 +120,7 @@ namespace wali
       status = ( delta->equal(delta->zero()) ) ? SAME : MODIFIED;
     }
 
-    std::ostream & Trans::print( std::ostream & o ) const
-    {
-      o << "( ";
-      printKey(o,from());
-      o << " , ";
-
-      printKey(o,stack());
-      o << " , ";
-
-      printKey(o,to());
-      o << " )";
-
-      o << "\t" << weight()->toString();
-      { // BEGIN DEBUGGING
-        // FIXME: make a debugging print
-        //o << "\tdelta: " << delta->toString();
-      } // END DEBUGGING
-      return o;
-    }
-
-    std::ostream& Trans::marshall( std::ostream& o ) const
-    {
-      o << "<" << XMLTag;
-      // from
-      o << " " << XMLFromTag << "='" << key2str(from()) << "'";
-      // stack
-      o << " " << XMLStackTag << "='" << key2str(stack()) << "'";
-      //to 
-      o << " " << XMLToTag << "='" << key2str(to()) << "'>";
-
-      weight()->marshallWeight(o);
-
-      o << "</" << XMLTag << ">";
-      return o;
-    }
-
-    bool Trans::equal( const trans_t & rhs ) const
-    {
-      return this->equal( rhs.get_ptr() );
-    }
-
-    bool Trans::equal( const Trans & rhs ) const
-    {
-      return ((this == &rhs) ||
-          (
-           (to() == rhs.to()) &&
-           (stack() == rhs.stack()) &&
-           (from() == rhs.from())
-          )
-          );
-    }
-
-    bool Trans::equal( const Trans * rhs ) const
-    {
-      return ((this == rhs) ||
-          (
-           (to() == rhs->to()) &&
-           (stack() == rhs->stack()) &&
-           (from() == rhs->from())
-          )
-          );
-    }
-
-    wpds::Config* Trans::getConfig() {
+    wpds::Config* Trans::getConfig() const {
       return config;
     }
 

@@ -10,66 +10,73 @@
 #include "wali/HashMap.hpp"
 #include "wali/SemElem.hpp"
 #include "wali/KeyPairSource.hpp"
-#include "wali/wpds/GenKeySource.hpp"
 
+// ::wali::util
 #include "wali/util/Timer.hpp"
 
+// ::wali::wfa
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/State.hpp"
 #include "wali/wfa/Trans.hpp"
 #include "wali/wfa/TransSet.hpp"
 #include "wali/wfa/TransFunctor.hpp"
 
-#include "wali/wpds/Rule.hpp"
-#include "wali/wpds/ewpds/ERule.hpp"
+// ::wali::wpds
 #include "wali/wpds/Config.hpp"
+#include "wali/wpds/GenKeySource.hpp"
+#include "wali/wpds/Rule.hpp"
 
+// ::wali::wpds::ewpds
+#include "wali/wpds/ewpds/ERule.hpp"
+#include "wali/wpds/ewpds/ETrans.hpp"
+
+// ::wali::wpds::fwpds
 #include "wali/wpds/fwpds/FWPDS.hpp"
+#include "wali/wpds/fwpds/LazyTrans.hpp"
 
+// ::wali::graph
 #include "wali/graph/RegExp.hpp"
 #include "wali/graph/InterGraph.hpp"
-#include "wali/wpds/fwpds/LazyTrans.hpp"
 
 using namespace wali;
 using namespace wali::graph;
 using namespace wali::wpds::fwpds;
 using namespace wali::wpds::ewpds;
-using wfa::Trans;
-using wfa::TransSet;
-using wfa::WFA;
-using wfa::State;
+
+#define FWPDS_DYN_CAST 0
 
 FWPDS::FWPDS() : EWPDS(), interGr(NULL), checkingPhase(false)
 {
 }
 
-FWPDS::FWPDS(wali::wpds::Wrapper* wrapper) : EWPDS(wrapper) , interGr(NULL), checkingPhase(false)
+FWPDS::FWPDS(wpds::Wrapper* wrapper) : EWPDS(wrapper) , interGr(NULL), checkingPhase(false)
 {
 }
 
 ///////////////////////////////////////////////////////////////////
 void FWPDS::topDownEval(bool f) {
-  wali::graph::RegExp::topDownEval(f);
+  graph::RegExp::topDownEval(f);
 }
 
-struct FWPDSCopyBackFunctor : public wali::wfa::TransFunctor
+struct FWPDSCopyBackFunctor : public wfa::TransFunctor
 {
-  ref_ptr<wali::graph::InterGraph> gr;
-  FWPDSCopyBackFunctor(ref_ptr<wali::graph::InterGraph> _gr) : gr(_gr) {}
-  virtual void operator()( wfa::Trans* t ) {
-    LazyTrans *lt = static_cast<LazyTrans *> (t);
-    if (::wali::is_lazy_fwpds())
+  ref_ptr<graph::InterGraph> gr;
+  FWPDSCopyBackFunctor(ref_ptr<graph::InterGraph> _gr) : gr(_gr) {}
+  virtual void operator()( wfa::ITrans* t ) {
+    if (wali::is_lazy_fwpds()) {
+      LazyTrans *lt = static_cast<LazyTrans *> (t);
       lt->setInterGraph(gr);
+    }
     else
-      lt->setWeight( gr->get_weight( Transition(*t) ) );
+      t->setWeight( gr->get_weight( Transition(*t) ) );
   }
 };
 
-struct FWPDSSourceFunctor : public wali::wfa::ConstTransFunctor
+struct FWPDSSourceFunctor : public wfa::ConstTransFunctor
 {
-    wali::graph::InterGraph & gr;
-    FWPDSSourceFunctor( wali::graph::InterGraph & p ) : gr(p) {}
-    virtual void operator()( const wfa::Trans* t ) 
+    graph::InterGraph & gr;
+    FWPDSSourceFunctor( graph::InterGraph & p ) : gr(p) {}
+    virtual void operator()( const wfa::ITrans* t ) 
     {
         //t->print(std::cout << "\n*********************\n  +++SetSource: ");
         //std::cout << "\n*********************\n";
@@ -77,15 +84,15 @@ struct FWPDSSourceFunctor : public wali::wfa::ConstTransFunctor
     }
 };
 
-struct FWPDSCompareFunctor : public wali::wfa::ConstTransFunctor
+struct FWPDSCompareFunctor : public wfa::ConstTransFunctor
 {
-    wali::graph::InterGraph & gr;
+    graph::InterGraph & gr;
     bool iseq;
-    FWPDSCompareFunctor( wali::graph::InterGraph & p ) : gr(p) {
+    FWPDSCompareFunctor( graph::InterGraph & p ) : gr(p) {
         iseq = true; 
     }
 
-    virtual void operator()( const wfa::Trans* t ) {
+    virtual void operator()( const wfa::ITrans* t ) {
         sem_elem_t wt1 = gr.get_weight(Transition(t->from(), t->stack(), t->to()));
         sem_elem_t wt2 = t->weight();
         if( !wt2->equal(wt1) ) {
@@ -141,7 +148,7 @@ FWPDS::prestar( wfa::WFA& input, wfa::WFA& output )
     // merge functions, it can be treated as a WPDS.
     // However, there is no cost benefit in using WPDS
     // (it only saves on debugging effort)
-    interGr = new wali::graph::InterGraph(se, true, true);
+    interGr = new graph::InterGraph(se, true, true);
 
     // setup output
     EWPDS::prestarSetupFixpoint(input,output);
@@ -172,8 +179,8 @@ FWPDS::prestar( wfa::WFA& input, wfa::WFA& output )
     currentOutputWFA = 0;
 }
 
-void FWPDS::prestar_handle_call(Trans *t1,
-                                Trans *t2,
+void FWPDS::prestar_handle_call(wfa::ITrans *t1,
+                                wfa::ITrans *t2,
                                 rule_t &r,
                                 sem_elem_t delta 
                                 )
@@ -201,8 +208,8 @@ void FWPDS::prestar_handle_call(Trans *t1,
 }
 
 void FWPDS::prestar_handle_trans(
-        Trans * t ,
-        WFA & fa   ,
+        wfa::ITrans * t ,
+        wfa::WFA & fa   ,
         rule_t & r,
         sem_elem_t delta 
         )
@@ -221,16 +228,16 @@ void FWPDS::prestar_handle_trans(
   
   if( r->is_rule2() ) {
     KeyPair kp( t->to(),r->stack2() );
-    WFA::kp_map_t::iterator kpit = fa.kpmap.find( kp );
-    WFA::kp_map_t::iterator kpitEND = fa.kpmap.end();
-    TransSet::iterator tsit;
+    wfa::WFA::kp_map_t::iterator kpit = fa.kpmap.find( kp );
+    wfa::WFA::kp_map_t::iterator kpitEND = fa.kpmap.end();
+    wfa::TransSet::iterator tsit;
     
     if(kpit != kpitEND)
       {
-        TransSet & transSet = kpit->second;
+        wfa::TransSet & transSet = kpit->second;
         for( tsit = transSet.begin(); tsit != transSet.end(); tsit++ )
           {
-            Trans * tprime = *tsit;
+           wfa::ITrans* tprime = *tsit;
             prestar_handle_call(t, tprime, r, delta);
           }
       }
@@ -302,7 +309,7 @@ FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
     // underlying pds is a EWPDS. In the absence of
     // merge functions, it can be treated as a WPDS.
     // However, there is no cost benefit in using WPDS
-    interGr = new wali::graph::InterGraph(se, true, false);
+    interGr = new graph::InterGraph(se, true, false);
 
     EWPDS::poststarSetupFixpoint(input,output);
 
@@ -332,38 +339,37 @@ FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
     currentOutputWFA = 0;
 }
 
-void FWPDS::poststar_handle_eps_trans(Trans *teps, Trans *tprime, sem_elem_t delta) 
+void FWPDS::poststar_handle_eps_trans(wfa::ITrans* teps, wfa::ITrans* tprime, sem_elem_t delta) 
 {
     if(checkingPhase) 
     {
         return EWPDS::poststar_handle_eps_trans(teps, tprime, delta);
     }
     
-    KeySource *ks = getKeySource(teps->to());
-    GenKeySource* gks = dynamic_cast<GenKeySource*>(ks);
-    KeyPairSource *kps;
-    if (gks != 0) { // check gks first b/c that is what poststar generates now
-      kps = dynamic_cast<KeyPairSource*>(getKeySource(gks->getKey()));
-    }
-    else {
-      // this probably should not occur, unless the user
-      // created teps himself.
-      kps = dynamic_cast<KeyPairSource*>(ks);
-    }
-
-    sem_elem_t wght;
-                
-    if(0 != kps) { // apply merge function
-      // Find the rule first
-      rule_t r = EWPDS::lookup_rule(kps->get_key_pair().first, kps->get_key_pair().second, tprime->stack());
-      assert(r.get_ptr() != NULL);
-
-      ERule *er = (ERule *)(r.get_ptr());
+    // These casts should never fail. However, if WALi evolves
+    // to allow for more types of transitions, then it is nice
+    // to leave this here.
+#if FWPDS_DYN_CAST
+    LazyTrans* lt = dynamic_cast<LazyTrans*>(tprime);
+    { // <DEBUG>
+      if (0 == lt) {
+        *waliErr << "[ERROR] Oops, FWPDS is broken.\n";
+        *waliErr << "    >> Expeced LazyTrans, Got >> ";
+        tprime->print(*waliErr);
+        assert(0);
+      }
+    } // </DEBUG>
+#else
+    LazyTrans* lt = static_cast<LazyTrans*>(tprime);
+#endif
+    ewpds::ETrans* etrans = dynamic_cast<ewpds::ETrans*>(lt->getDelegate());
+    if (0 != etrans) {
+      erule_t r = etrans->getERule();
 
       interGr->addEdge(Transition(r->from_state(), r->from_stack(), tprime->to()),
                        Transition(*teps),
                        Transition(teps->from(),tprime->stack(),tprime->to()),
-                       er->merge_fn().get_ptr());
+                       etrans->getMergeFn());
 
     } else {
       interGr->addEdge(Transition(*tprime),
@@ -382,71 +388,73 @@ void FWPDS::poststar_handle_eps_trans(Trans *teps, Trans *tprime, sem_elem_t del
 }
 
 void FWPDS::poststar_handle_trans(
-        Trans *t, WFA &fa, 
+        wfa::ITrans* t, wfa::WFA &fa, 
         rule_t &r, sem_elem_t delta)
 {
-    if(checkingPhase) 
-    {
-      return EWPDS::poststar_handle_trans(t, fa, r, delta);
-    }
+  if(checkingPhase) 
+  {
+    return EWPDS::poststar_handle_trans(t, fa, r, delta);
+  }
+
+  Key rtstate = r->to_state();
+  Key rtstack = r->to_stack1();
+
+  if( r->to_stack2() == WALI_EPSILON ) {
+    update( rtstate, rtstack, t->to(), wghtOne, r->to() );
+    interGr->addEdge(Transition(*t),
+        Transition(rtstate,rtstack,t->to()),
+        r->weight());
+  }
+  else {  // Push rule (p,g) -> (p,g',g2)
 
     ERule *er = (ERule *)(r.get_ptr());
-    Key rtstate = r->to_state();
-    Key rtstack = r->to_stack1();
 
-    if( r->to_stack2() == WALI_EPSILON ) {
-      update( rtstate, rtstack, t->to(), wghtOne, r->to() );
-      interGr->addEdge(Transition(*t),
-                       Transition(rtstate,rtstack,t->to()),
-                       r->weight());
-    }
-    else {  // Push rule (p,g) -> (p,g',g2)
+    // Is a rule 2 so we must generate a state
+    // and create 2 new transitions
+    Key gstate = gen_state( rtstate,rtstack );
+    // Note: QuasiOne is not supported in FWPDS
 
-      // Is a rule 2 so we must generate a state
-      // and create 2 new transitions
-      Key gstate = gen_state( rtstate,rtstack );
-      // Note: QuasiOne is not supported in FWPDS
-      
-      Trans * tprime = update_prime( gstate, r->to_stack2(), t->to(), wghtOne  );
-      update( rtstate, rtstack, gstate, wghtOne, r->to() );
+    wfa::ITrans* tprime = update_prime( gstate, t, r, delta, wghtOne);
+    update( rtstate, rtstack, gstate, wghtOne, r->to() );
 
-      // add source edge
-      interGr->setSource(Transition(rtstate,rtstack, gstate), wghtOne);
-      // add edge (p,g,q) -> (p,g',(p,g'))
-      interGr->addCallEdge(Transition(*t),Transition(rtstate,rtstack, gstate));
-      // add edge (p,g,q) -> ((p,g'),rstk2,q)
-      interGr->addEdge(Transition(*t),
-                       Transition(gstate, r->to_stack2(),t->to_state()),
-                       r->weight());
-      
-      if( tprime->modified() )
+    // add source edge
+    interGr->setSource(Transition(rtstate,rtstack, gstate), wghtOne);
+    // add edge (p,g,q) -> (p,g',(p,g'))
+    interGr->addCallEdge(Transition(*t),Transition(rtstate,rtstack, gstate));
+    // add edge (p,g,q) -> ((p,g'),rstk2,q)
+    interGr->addEdge(Transition(*t),
+        Transition(gstate, r->to_stack2(),t->to()),
+        r->weight());
+
+    if( tprime->modified() )
+    {
+
+      wfa::WFA::eps_map_t::iterator epsit = fa.eps_map.find( tprime->from() );
+      if( epsit != fa.eps_map.end() )
+      {
+        // get epsilon list ref
+        wfa::TransSet& transSet = epsit->second;
+        // iterate
+        wfa::TransSet::iterator tsit = transSet.begin();
+        for( ; tsit != transSet.end() ; tsit++ )
         {
-          
-          WFA::eps_map_t::iterator epsit = fa.eps_map.find( tprime->from() );
-          if( epsit != fa.eps_map.end() )
-            {
-              // get epsilon list ref
-              TransSet& transSet = epsit->second;
-              // iterate
-              TransSet::iterator tsit = transSet.begin();
-              for( ; tsit != transSet.end() ; tsit++ )
-                {
-                  Trans * teps = *tsit;
+          wfa::ITrans * teps = *tsit;
 
-                  interGr->addEdge(Transition(*t),
-                                   Transition(*teps),
-                                   Transition(teps->from(),tprime->stack(),tprime->to()),
-                                   er->merge_fn().get_ptr());
+          interGr->addEdge(Transition(*t),
+              Transition(*teps),
+              Transition(teps->from(),tprime->stack(),tprime->to()),
+              er->merge_fn());
 
-                  Config * config = make_config( teps->from(),tprime->stack() );
-                  
-                  update( teps->from(),tprime->stack(),tprime->to(),
-                          wghtOne, config );
-                }
-            }
+          Config * config = make_config( teps->from(),tprime->stack() );
+
+          update( teps->from(),tprime->stack(),tprime->to(),
+              wghtOne, config );
         }
+      }
     }
+  }
 }
+
 
 
 ////////////////////////////////////////////
@@ -454,32 +462,44 @@ void FWPDS::poststar_handle_trans(
 ////////////////////////////////////////////
 
 void FWPDS::update(
-                   Key from,
-                   Key stack,
-                   Key to,
-                   sem_elem_t se,
-                   Config * cfg )
+    Key from,
+    Key stack,
+    Key to,
+    sem_elem_t se,
+    Config * cfg )
 {
   LazyTrans * lt = new LazyTrans(from,stack,to,se,cfg);
-  Trans *t = currentOutputWFA->insert(lt);
+  wfa::ITrans *t = currentOutputWFA->insert(lt);
   if( t->modified() ) {
-      //t->print(std::cout << "Adding transition: ") << "\n";
-      worklist->put( t );
+    //t->print(std::cout << "Adding transition: ") << "\n";
+    worklist->put( t );
   }
 }
 
-wfa::Trans * FWPDS::update_prime(
-        Key from,
-        Key stack,
-        Key to,
-        sem_elem_t se )
+wfa::ITrans* FWPDS::update_prime(
+    Key from, //<! Guaranteed to be a generated state
+    wfa::ITrans* call, //<! The call transition
+    rule_t r, //<! The push rule
+    sem_elem_t delta, //<! Delta change on the call transition
+    sem_elem_t wWithRule //<! delta \extends r->weight()
+    )
 {
-  LazyTrans * t = new LazyTrans(from,stack,to,se,0);
-  Trans * tmp = currentOutputWFA->insert(t);
-  return tmp;
+  //
+  // !!NOTE!!
+  // This code is copied from EWPDS::update_prime.
+  // Changes here should be reflected there.
+  //
+  ERule* er = (ERule*)r.get_ptr();
+  wfa::ITrans* et = 
+    new ETrans(
+        from, r->to_stack2(), call->to(),
+        delta, wWithRule, er);
+  LazyTrans* lt = new LazyTrans(et);
+  wfa::ITrans* t = currentOutputWFA->insert(lt);
+  return t;
 }
 
-void FWPDS::operator()( wali::wfa::Trans * orig ) {
+void FWPDS::operator()( wfa::ITrans* orig ) {
   if(checkingPhase) {
     return EWPDS::operator()(orig);
   }
@@ -504,6 +524,6 @@ void FWPDS::operator()( wali::wfa::Trans * orig ) {
 
 /* Yo, Emacs!
    ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
+   ;;; tab-width: 2 ***
    ;;; End: ***
    */

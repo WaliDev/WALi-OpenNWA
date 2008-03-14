@@ -147,10 +147,10 @@ namespace wali
                     virtual std::ostream & marshall( std::ostream & o ) const;
 
                     /*!
-                     * Override WPDS::operator()(Trans*) for linking b/c
+                     * Override WPDS::operator()(ITrans*) for linking b/c
                      * EWPDS uses paired weights
                      */
-                    virtual void operator()( wali::wfa::Trans* t );
+                    virtual void operator()( wfa::ITrans* t );
 
                     bool is_pds_state(wali::Key k) const;
                     rule_t lookup_rule(wali::Key to_state, wali::Key to_stack1, wali::Key to_stack2) const;
@@ -160,8 +160,8 @@ namespace wali
                      * @brief helper method for prestar
                      */
                     virtual void prestar_handle_call(
-                            wfa::Trans *t1,
-                            wfa::Trans *t2,
+                            wfa::ITrans *t1,
+                            wfa::ITrans *t2,
                             rule_t &r,
                             sem_elem_t delta
                             );
@@ -170,7 +170,7 @@ namespace wali
                      * @brief helper method for prestar
                      */
                     virtual void prestar_handle_trans(
-                            wfa::Trans * t,
+                            wfa::ITrans * t,
                             WFA & ca  ,
                             rule_t & r,
                             sem_elem_t delta );
@@ -178,18 +178,12 @@ namespace wali
                     /*!
                      * @brief helper method for poststar
                      */
-                    /*
-                    virtual void poststar_handle_eps_trans(
-                            wfa::Trans *teps, 
-                            wfa::Trans *tprime,
-                            sem_elem_t delta);
-                            */
 
                     /*!
                      * @brief helper method for poststar
                      */
                     virtual void poststar_handle_trans(
-                            wfa::Trans * t ,
+                            wfa::ITrans * t ,
                             WFA & ca   ,
                             rule_t & r,
                             sem_elem_t delta
@@ -197,9 +191,13 @@ namespace wali
 
                     //void copy_and_link_and_pair( const WFA & in, WFA & dest );
 
-                    wfa::Trans* Eupdate_prime(
-                        Key from, Key stack, Key to,
-                        erule_t er, sem_elem_t wAtCall);
+                    virtual wfa::ITrans* update_prime(
+                        Key from, //<! Guaranteed to be a generated state
+                        wfa::ITrans* call, //<! The call transition
+                        rule_t r, //<! The push rule
+                        sem_elem_t delta, //<! Delta change on the call transition
+                        sem_elem_t wWithRule //<! delta \extends r->weight()
+                        );
 
                 private:
                     std::set<wali::Key> pds_states; // set of PDS states

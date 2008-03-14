@@ -12,7 +12,7 @@ namespace wali
 {
     namespace witness
     {
-        sem_elem_t WitnessWrapper::wrap( wfa::Trans& t )
+        sem_elem_t WitnessWrapper::wrap( wfa::ITrans& t )
         {
             return new WitnessTrans(t);
         }

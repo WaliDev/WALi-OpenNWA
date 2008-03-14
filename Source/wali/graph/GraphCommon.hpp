@@ -2,7 +2,7 @@
 #define wali_graph_GRAPH_COMMON_H_
 
 #include "wali/Common.hpp"
-#include "wali/wfa/Trans.hpp"
+#include "wali/wfa/ITrans.hpp"
 
 namespace wali {
 
@@ -14,7 +14,7 @@ namespace wali {
             Transition() : src(0), tgt(0), stack(0) {}
             Transition(int s, int st, int t) : src(s), tgt(t), stack(st) {}
             Transition(const Transition &t) : src(t.src), tgt(t.tgt), stack(t.stack) {}
-            Transition(const wali::wfa::Trans& t ) : src(t.from()), tgt(t.to()), stack(t.stack()) {}
+            Transition(const wali::wfa::ITrans& t ) : src(t.from()), tgt(t.to()), stack(t.stack()) {}
             bool operator == (const Transition &t) {
                 return (src == t.src && tgt == t.tgt && stack == t.stack);
             }    

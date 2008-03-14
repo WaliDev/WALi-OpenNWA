@@ -216,10 +216,10 @@ namespace wali {
                 nodes[s2].out_hyper_edges.push_back(inter_edges.size() - 1);
             }
 
-            void InterGraph::addEdge(Transition src1, Transition src2, Transition tgt, wali::wpds::ewpds::MergeFn *mf) {
+            void InterGraph::addEdge(Transition src1, Transition src2, Transition tgt, wali::wpds::ewpds::merge_fn_t mf) {
                 assert(running_ewpds);
                 int eno = inter_edgeno(src1,src2,tgt);
-                if(eno != -1 && mf == inter_edges[eno].mf.get_ptr()) { // edge already present
+                if(eno != -1 && mf == inter_edges[eno].mf) { // edge already present
                     return;
                 }
                 int s1 = nodeno(src1);
@@ -394,7 +394,7 @@ namespace wali {
             void InterGraph::setupInterSolution(std::list<Transition> *wt_required) {
                 RegExp::startSatProcess(sem);
 
-                util::Timer *timer = new util::Timer("FWPDS Find Graphs");
+                //util::Timer *timer = new util::Timer("FWPDS Find Graphs");
 
                 // First, find the IntraGraphs
                 int n = nodes.size();
@@ -479,8 +479,8 @@ namespace wali {
                 unsigned components = SCC(gr_list, gr_sorted);
                 STAT(stats.ncomponents = components);
 
-                delete timer;
-                timer = new util::Timer("FWPDS Saturation");
+                //delete timer;
+                //timer = new util::Timer("FWPDS Saturation");
 
                 // Saturate
                 if(wt_required == NULL) {
@@ -508,7 +508,7 @@ namespace wali {
 #ifdef STATIC_MEMORY
                 IntraGraph::clearStaticBuffer();
 #endif
-                delete timer;
+                //delete timer;
             }
 
             std::ostream &InterGraph::print_stats(std::ostream &out) {
