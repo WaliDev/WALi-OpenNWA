@@ -16,15 +16,15 @@ namespace wali {
         const std::string Regex::lblID("");
         const std::string Regex::lblNIL("$");
 
+
         regex_t Regex::ID()
         {
-            static regex_t id(new Root(lblID));
-            return id;
+          return Root::ID();
         }
+
         regex_t Regex::NIL()
         {
-            static regex_t nil( new Root(lblNIL) );
-            return nil;
+          return Root::NIL();
         }
 
         regex_t Regex::COMBINE( regex_t lhs, regex_t rhs ) 
@@ -111,33 +111,29 @@ namespace wali {
 
         bool Regex::isOne() const 
         {
-            if( this == one().get_ptr() )
-                return true;
-            else {
-                const Root* root = dynamic_cast<const Root*>(this);
-                if( root )
-                    return root->lbl == lblID;
-                else
-                    return false;
-            }
+          Root* oneRoot = (Root*)one().get_ptr();
+          if( this == oneRoot )
+            return true;
+          else {
+            const Root* root = dynamic_cast<const Root*>(this);
+            return (0 != root) && (root->lbl == oneRoot->lbl);
+          }
         }
 
         bool Regex::isZero() const 
         {
-            if( this == zero().get_ptr() )
-                return true;
-            else {
-                const Root* root = dynamic_cast<const Root*>(this);
-                if( root )
-                    return root->lbl == lblNIL;
-                else
-                    return false;
-            }
+          Root* zeroRoot = (Root*)zero().get_ptr();
+          if( this == zeroRoot )
+            return true;
+          else {
+            const Root* root = dynamic_cast<const Root*>(this);
+            return (0 != root) && (root->lbl == zeroRoot->lbl);
+          }
         }
 
         bool Regex::isConstant() const 
         {
-            return false;
+          return false;
         }
 
         wali::sem_elem_t Regex::one() const

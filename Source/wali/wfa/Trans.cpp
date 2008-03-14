@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 
+#define TRANS_COUNT_INSTANCES 1
 namespace wali
 {
   namespace wfa
@@ -19,11 +20,10 @@ namespace wali
       kp(WALI_EPSILON,WALI_EPSILON), toStateKey(WALI_EPSILON),
       se(0),delta(0),status(MODIFIED),config(0)
     {
-      {
-        // TODO : R
-        numTrans++;
-        //*waliErr << "Trans(...) : " << numTrans << std::endl;
-      }
+#if TRANS_COUNT_INSTANCES
+      numTrans++;
+      //*waliErr << "Trans(...) : " << numTrans << std::endl;
+#endif
     }
 
     Trans::Trans(
@@ -34,11 +34,10 @@ namespace wali
       kp(from_,stack_), toStateKey(to_),
       se(se_), delta(se_), status(MODIFIED), config(0) 
     {
-      {
-        // TODO : R
-        numTrans++;
-        //*waliErr << "Trans(...) : " << numTrans << std::endl;
-      }
+#if TRANS_COUNT_INSTANCES
+      numTrans++;
+      //*waliErr << "Trans(...) : " << numTrans << std::endl;
+#endif
     }
 
     //
@@ -89,11 +88,10 @@ namespace wali
 
     Trans::~Trans()
     {
-      {
-        // TODO : R
-        numTrans--;
-        //*waliErr << "~Trans()   : " << numTrans << std::endl;
-      }
+#if TRANS_COUNT_INSTANCES
+      numTrans--;
+      //*waliErr << "~Trans()   : " << numTrans << std::endl;
+#endif
     }
 
     Trans* Trans::copy() const {

@@ -5,33 +5,41 @@
  * @author Nick Kidd
  */
 
-#include <string>
+#include "wali/Common.hpp"
+
 #include "wali/regex/Regex.hpp"
 
 namespace wali {
 
-    namespace regex {
+  namespace regex {
 
-        class Root : public Regex {
+    class Root : public Regex {
 
-            public:
-                Root(const std::string& label);
-                Root(const std::string& label, wali::sem_elem_t se);
-                virtual ~Root();
+      public:
+        static regex_t make(Key k, sem_elem_t se);
+        static regex_t ID();
+        static regex_t NIL();
 
-                virtual bool isConstant() const; /*! @return true */
+      public:
+        virtual ~Root();
 
-                virtual void to_mona_recurse(std::ostream& o, const std::string& prefix ) const;
-                virtual std::ostream& print_recurse( std::ostream& o ) const;
-                virtual std::ostream& write_dot_recurse( std::ostream& o ) const;
-                virtual wali::sem_elem_t solve_recurse();
+        virtual bool isConstant() const; /*! @return true */
 
-                // doesn't override virtual void reset_marks();
-            public:
-                std::string lbl;
-        };
+        virtual void to_mona_recurse(std::ostream& o, const std::string& prefix ) const;
+        virtual std::ostream& print_recurse( std::ostream& o ) const;
+        virtual std::ostream& write_dot_recurse( std::ostream& o ) const;
+        virtual wali::sem_elem_t solve_recurse();
 
-    } // namespace regex
+      private:
+        Root(Key label);
+        Root(Key label, wali::sem_elem_t se);
+
+        // doesn't override virtual void reset_marks();
+      public:
+        const Key lbl;
+    };
+
+  } // namespace regex
 
 } // namespace wali
 
@@ -39,7 +47,7 @@ namespace wali {
 
 /* Yo, Emacs!
    ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
+   ;;; tab-width: 2 ***
    ;;; End: ***
    */
 

@@ -1,5 +1,7 @@
 /*!
  * @author Nick Kidd
+ *
+ * $Id$
  */
 
 #include "wali/Common.hpp"
@@ -578,20 +580,20 @@ namespace wali
 
             // if rb is false then the rule is new
             if( !rb ) {
-                if( to_stack1 == WALI_EPSILON )
-                {
-                    // TODO : make debug check
-                    assert( to_stack2 == WALI_EPSILON );
-                    rule_zeroes.insert( to );
+              if( to_stack1 == WALI_EPSILON )
+              {
+                // Invariant assertion.
+                assert( to_stack2 == WALI_EPSILON );
+                rule_zeroes.insert( to );
+              }
+              if( to_stack2 != WALI_EPSILON ) {
+                r2hash_t::iterator r2it = r2hash.find( to_stack2 );
+                if( r2it == r2hash.end() ) {
+                  std::list< rule_t > ls;
+                  r2it = r2hash.insert( to_stack2,ls ).first;
                 }
-                if( to_stack2 != WALI_EPSILON ) {
-                    r2hash_t::iterator r2it = r2hash.find( to_stack2 );
-                    if( r2it == r2hash.end() ) {
-                        std::list< rule_t > ls;
-                        r2it = r2hash.insert( to_stack2,ls ).first;
-                    }
-                    r2it->second.push_back( r );
-                }
+                r2it->second.push_back( r );
+              }
             }
             return rb;
         }
@@ -684,16 +686,16 @@ namespace wali
 
         bool WPDS::get_from_worklist( wfa::ITrans* & t )
         {
-            if( !worklist->empty() ) {
-                //t = (Trans *)worklist->get();
-                //TODO: make this a debugging statement
-                t = worklist->get();
-                return true;
-            }
-            else {
-                t = 0;
-                return false;
-            }
+          if( !worklist->empty() ) {
+            t = worklist->get();
+            return true;
+          }
+          else {
+            // t is a reference to a pointer so
+            // this NULLs out the pointer t.
+            t = 0;
+            return false;
+          }
         }
 
         /*!
