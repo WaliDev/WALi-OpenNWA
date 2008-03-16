@@ -14,6 +14,8 @@
 
 #include "wali/graph/InterGraph.hpp"
 
+struct FWPDSSourceFunctor;
+
 namespace wali
 {
   namespace wpds
@@ -26,12 +28,14 @@ namespace wali
       class FWPDS;
       typedef ref_ptr<wali::graph::InterGraph> intergraph_t;
 
+
       class LazyTrans : public wfa::DecoratorTrans
       {
         public:
           friend class WPDS;
           friend class FWPDS;
-
+          friend struct FWPDSSourceFunctor;
+ 
         public:
           LazyTrans(  wali_key_t from,
               wali_key_t stack,

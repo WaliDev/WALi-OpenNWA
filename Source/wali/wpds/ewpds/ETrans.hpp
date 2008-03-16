@@ -53,6 +53,7 @@ namespace wali {
            */
           virtual void combineTrans( ITrans* tp );
 
+          virtual sem_elem_t getWeightAtCall() const;
         protected:
           sem_elem_t wAtCall;
           erule_t erule;

@@ -278,6 +278,15 @@ namespace wali {
                 nodes[n].weight = se;
             }
 
+            void InterGraph::setESource(Transition t, wali::sem_elem_t wtAtCall, wali::sem_elem_t wtAfterCall) {
+                // setSource
+                int n = nodeno(t);
+                nodes[n].type = promote_type(nodes[n].type, InterSource);
+                nodes[n].weight = wtAtCall;
+                // Extra dependency
+                eHandler.addEdge(-1, n, wtAfterCall);
+            }
+
             unsigned InterGraph::SCC(list<IntraGraph *> &grlist, std::list<IntraGraph *> &grsorted) {
                 std::list<IntraGraph *>::iterator gr_it;
                 // reset visited
@@ -695,7 +704,13 @@ namespace wali {
                   // This must be a return transition
                   int nc;
                   sem_elem_t wtCallRule = eHandler.get_dependency(n, nc);
-                  sem_elem_t wt = nodes[nc].gr->get_weight(nodes[nc].intra_nodeno);
+                  sem_elem_t wt;
+                  if(nc != -1) {
+                    wt = nodes[nc].gr->get_weight(nodes[nc].intra_nodeno);
+                  } else {
+                    // ESource
+                    wt = sem->one();
+                  }
                   return wt->extend(wtCallRule);
                 }
 

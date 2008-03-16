@@ -179,6 +179,7 @@ namespace wali {
                 void addCallEdge(Transition src1, Transition src2);
 
                 void setSource(Transition t, wali::sem_elem_t se);
+                void setESource(Transition t, wali::sem_elem_t wtAtCall, wali::sem_elem_t wtAfterCall);
 
                 void setupInterSolution(std::list<Transition> *wt_required = NULL);
 

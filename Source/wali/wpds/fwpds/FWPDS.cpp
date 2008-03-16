@@ -72,15 +72,29 @@ struct FWPDSCopyBackFunctor : public wfa::TransFunctor
   }
 };
 
-struct FWPDSSourceFunctor : public wfa::ConstTransFunctor
+struct FWPDSSourceFunctor : public wfa::TransFunctor
 {
     graph::InterGraph & gr;
-    FWPDSSourceFunctor( graph::InterGraph & p ) : gr(p) {}
-    virtual void operator()( const wfa::ITrans* t ) 
+    bool post;
+
+    FWPDSSourceFunctor( graph::InterGraph & g, bool p ) : gr(g), post(p) {}
+    virtual void operator()( wfa::ITrans* t ) 
     {
         //t->print(std::cout << "\n*********************\n  +++SetSource: ");
         //std::cout << "\n*********************\n";
-        gr.setSource(Transition(*t),t->weight());
+        if(!post) {
+          gr.setSource(Transition(*t),t->weight());
+        } else {
+          //ETrans --> Esource
+          LazyTrans *lt = static_cast<LazyTrans *>(t);
+          ETrans* etrans = dynamic_cast<ETrans*>(lt->getDelegate());
+          if (0 != etrans) {
+            gr.setESource(Transition(*t), etrans->getWeightAtCall(), etrans->weight());
+          } else {
+            gr.setSource(Transition(*t), t->weight());
+          }
+        }
+
     }
 };
 
@@ -154,7 +168,7 @@ FWPDS::prestar( wfa::WFA& input, wfa::WFA& output )
     EWPDS::prestarSetupFixpoint(input,output);
 
     // Input transitions become source nodes in FWPDS
-    FWPDSSourceFunctor sources(*interGr);
+    FWPDSSourceFunctor sources(*interGr, false);
     output.for_each(sources);
 
     // Build the InterGraph using EWPDS saturation without weights
@@ -314,7 +328,7 @@ FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
     EWPDS::poststarSetupFixpoint(input,output);
 
     // Input transitions become source nodes in FWPDS
-    FWPDSSourceFunctor sources(*interGr);
+    FWPDSSourceFunctor sources(*interGr, true);
     output.for_each(sources);
 
     // Build the InterGraph using EWPDS saturation without weights

@@ -46,6 +46,10 @@ namespace wali {
         return erule;
       }
 
+      sem_elem_t ETrans::getWeightAtCall() const {
+        return wAtCall;
+      }
+
       sem_elem_t ETrans::poststar_eps_closure( sem_elem_t se ) {
         return getMergeFn()->apply_f(wAtCall,se);
       }
