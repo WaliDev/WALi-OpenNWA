@@ -42,10 +42,16 @@ namespace wali
       }
 
       wfa::ITrans* LazyTrans::copy() const {
-        if (intergr.is_valid())
-          return new LazyTrans(getDelegate()->copy(),intergr);
-        else
-          return new LazyTrans(getDelegate()->copy());
+        compute_weight();
+
+        return getDelegate()->copy();
+
+        /*
+         *        if (intergr.is_valid())
+         *          return new LazyTrans(getDelegate()->copy(),intergr);
+         *        else
+         *          return new LazyTrans(getDelegate()->copy());
+         */
       }
 
       void LazyTrans::compute_weight() const {
