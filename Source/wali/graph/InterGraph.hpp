@@ -65,6 +65,25 @@ namespace wali {
             }
         };
 
+       /* For call site to (mid-state) return site transition */
+       class CallEdgeHandler {
+
+         friend class InterGraph;
+         
+       private:
+         typedef std::pair<int, sem_elem_t> Dependency; 
+         typedef std::map<int, Dependency> CallEdgeMap;
+         
+         CallEdgeHandler() {}
+         bool exists(int ret);
+         void addEdge(int call, int ret, sem_elem_t wtCallRule);
+         sem_elem_t get_dependency(int ret, int &call);
+
+       private:
+         CallEdgeMap callEdgeMap;
+
+       };
+
         class HyperEdge {
             public:
                 int src1, src2, tgt;
@@ -128,6 +147,7 @@ namespace wali {
                 UnionFind *intra_graph_uf;
                 std::list<IntraGraph *> gr_list;
 
+                CallEdgeHandler ceHandler;
                 //map<int,IntraGraph*> intra_graph_map;
 
                 TransMap node_number;
@@ -154,6 +174,7 @@ namespace wali {
                 void addEdge(Transition src, Transition tgt, wali::sem_elem_t se);
                 void addEdge(Transition src1, Transition src2, Transition tgt, wali::sem_elem_t se);
                 void addEdge(Transition src1, Transition src2, Transition tgt, wali::wpds::ewpds::merge_fn_t mf);
+                void addCallRetEdge(Transition src, Transition tgt, wali::sem_elem_t se);
 
                 void addCallEdge(Transition src1, Transition src2);
 

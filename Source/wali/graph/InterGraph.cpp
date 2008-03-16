@@ -71,6 +71,36 @@ namespace wali {
             return (t1 == InterSource || t1 == InterSourceOutNode);
         }
 
+        void CallEdgeHandler::addEdge(int call, int ret, sem_elem_t wtCallRule) {
+          CallEdgeMap::iterator it = callEdgeMap.find(ret);
+          if(it != callEdgeMap.end()) {
+            Dependency &d = it->second;
+            d.second = d.second->combine(wtCallRule);
+          } else {
+            callEdgeMap[ret] = Dependency(call, wtCallRule);
+          }
+        }
+
+        bool CallEdgeHandler::exists(int ret) {
+          CallEdgeMap::iterator it = callEdgeMap.find(ret);
+          if(it != callEdgeMap.end()) {
+            return true;
+          }
+          return false;
+        }
+
+
+        // return NULL if no match found
+        sem_elem_t CallEdgeHandler::get_dependency(int ret, int &call) {
+          CallEdgeMap::iterator it = callEdgeMap.find(ret);
+          if(it != callEdgeMap.end()) {
+            Dependency &d = it->second;
+            call = d.first;
+            return d.second;
+          }
+          return sem_elem_t(0);
+        }
+
         InterGraph::~InterGraph() {
             for(unsigned i = 0; i < nodes.size(); i++) {
                 if(nodes[i].gr && intra_graph_uf->find(i) == (int)i) {
@@ -199,6 +229,13 @@ namespace wali {
                 int e = intra_edges.size() - 1;
                 nodes[s].outgoing.push_back(e);
                 nodes[t].incoming.push_back(e);
+            }
+
+            void InterGraph::addCallRetEdge(Transition src, Transition tgt, wali::sem_elem_t se) {
+              addEdge(src, tgt, se->one());
+              int s = nodeno(src);
+              int t = nodeno(tgt);
+              ceHandler.addEdge(s, t, se);
             }
 
             void InterGraph::addEdge(Transition src1, Transition src2, Transition tgt, wali::sem_elem_t se) {
@@ -654,6 +691,14 @@ namespace wali {
                 unsigned orig_size = nodes.size();
                 unsigned n = nodeno(t);
                 assert(orig_size == nodes.size()); // Transition t must not be a new one
+                if(ceHandler.exists(n)) {
+                  // This must be a return transition
+                  int nc;
+                  sem_elem_t wtCallRule = ceHandler.get_dependency(n, nc);
+                  sem_elem_t wt = nodes[nc].gr->get_weight(nodes[nc].intra_nodeno);
+                  return wt->extend(wtCallRule);
+                }
+
                 return nodes[n].gr->get_weight(nodes[n].intra_nodeno);
             }
 

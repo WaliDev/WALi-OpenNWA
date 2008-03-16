@@ -366,7 +366,7 @@ void FWPDS::poststar_handle_eps_trans(wfa::ITrans* teps, wfa::ITrans* tprime, se
     if (0 != etrans) {
       erule_t r = etrans->getERule();
 
-      interGr->addEdge(Transition(r->from_state(), r->from_stack(), tprime->to()),
+      interGr->addEdge(Transition(*tprime),
                        Transition(*teps),
                        Transition(teps->from(),tprime->stack(),tprime->to()),
                        etrans->getMergeFn());
@@ -402,12 +402,10 @@ void FWPDS::poststar_handle_trans(
   if( r->to_stack2() == WALI_EPSILON ) {
     update( rtstate, rtstack, t->to(), wghtOne, r->to() );
     interGr->addEdge(Transition(*t),
-        Transition(rtstate,rtstack,t->to()),
-        r->weight());
+                     Transition(rtstate,rtstack,t->to()),
+                     r->weight());
   }
   else {  // Push rule (p,g) -> (p,g',g2)
-
-    ERule *er = (ERule *)(r.get_ptr());
 
     // Is a rule 2 so we must generate a state
     // and create 2 new transitions
@@ -421,10 +419,10 @@ void FWPDS::poststar_handle_trans(
     interGr->setSource(Transition(rtstate,rtstack, gstate), wghtOne);
     // add edge (p,g,q) -> (p,g',(p,g'))
     interGr->addCallEdge(Transition(*t),Transition(rtstate,rtstack, gstate));
-    // add edge (p,g,q) -> ((p,g'),rstk2,q)
-    interGr->addEdge(Transition(*t),
-        Transition(gstate, r->to_stack2(),t->to()),
-        r->weight());
+    // add call-ret edge (p,g,q) -> ((p,g'),rstk2,q)
+    interGr->addCallRetEdge(Transition(*t),
+                            Transition(gstate, r->to_stack2(),t->to()),
+                            r->weight());
 
     if( tprime->modified() )
     {
@@ -439,16 +437,8 @@ void FWPDS::poststar_handle_trans(
         for( ; tsit != transSet.end() ; tsit++ )
         {
           wfa::ITrans * teps = *tsit;
+          poststar_handle_eps_trans(teps, tprime, delta);
 
-          interGr->addEdge(Transition(*t),
-              Transition(*teps),
-              Transition(teps->from(),tprime->stack(),tprime->to()),
-              er->merge_fn());
-
-          Config * config = make_config( teps->from(),tprime->stack() );
-
-          update( teps->from(),tprime->stack(),tprime->to(),
-              wghtOne, config );
         }
       }
     }
