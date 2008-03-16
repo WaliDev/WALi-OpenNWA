@@ -468,6 +468,10 @@ void FWPDS::update(
     sem_elem_t se,
     Config * cfg )
 {
+  if(checkingPhase) {
+    return EWPDS::update(from, stack, to, se, cfg);
+  }
+
   LazyTrans * lt = new LazyTrans(from,stack,to,se,cfg);
   wfa::ITrans *t = currentOutputWFA->insert(lt);
   if( t->modified() ) {
@@ -484,6 +488,10 @@ wfa::ITrans* FWPDS::update_prime(
     sem_elem_t wWithRule //<! delta \extends r->weight()
     )
 {
+  if(checkingPhase) {
+    return EWPDS::update_prime(from, call, r, delta, wWithRule);
+  }
+
   //
   // !!NOTE!!
   // This code is copied from EWPDS::update_prime.
