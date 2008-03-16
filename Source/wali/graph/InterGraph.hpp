@@ -66,21 +66,21 @@ namespace wali {
         };
 
        /* For call site to (mid-state) return site transition */
-       class CallEdgeHandler {
+       class ETransHandler {
 
          friend class InterGraph;
          
        private:
          typedef std::pair<int, sem_elem_t> Dependency; 
-         typedef std::map<int, Dependency> CallEdgeMap;
+         typedef std::map<int, Dependency> EdgeMap;
          
-         CallEdgeHandler() {}
+         ETransHandler() {}
          bool exists(int ret);
          void addEdge(int call, int ret, sem_elem_t wtCallRule);
          sem_elem_t get_dependency(int ret, int &call);
 
        private:
-         CallEdgeMap callEdgeMap;
+         EdgeMap edgeMap;
 
        };
 
@@ -147,7 +147,7 @@ namespace wali {
                 UnionFind *intra_graph_uf;
                 std::list<IntraGraph *> gr_list;
 
-                CallEdgeHandler ceHandler;
+                ETransHandler eHandler;
                 //map<int,IntraGraph*> intra_graph_map;
 
                 TransMap node_number;
