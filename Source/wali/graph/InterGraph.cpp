@@ -696,10 +696,20 @@ namespace wali {
             }
 
             // Must be called after saturation
+            sem_elem_t InterGraph::get_call_weight(Transition t) {
+                unsigned orig_size = nodes.size();
+                unsigned n = nodeno(t);
+                assert(orig_size == nodes.size()); // Transition t must not be a new one
+
+                return nodes[n].gr->get_weight(nodes[n].intra_nodeno);
+            }
+
             sem_elem_t InterGraph::get_weight(Transition t) {
                 unsigned orig_size = nodes.size();
                 unsigned n = nodeno(t);
                 assert(orig_size == nodes.size()); // Transition t must not be a new one
+
+                // check eHandler
                 if(eHandler.exists(n)) {
                   // This must be a return transition
                   int nc;
@@ -720,7 +730,7 @@ namespace wali {
             void InterGraph::update_all_weights() {
                 unsigned int i;
                 for(i=0;i<nodes.size();i++) {
-                    sem_elem_t w = get_weight(nodes[i].trans);
+                    sem_elem_t w = nodes[i].gr->get_weight(nodes[i].intra_nodeno);
                     nodes[i].weight = w;
                 }
             }

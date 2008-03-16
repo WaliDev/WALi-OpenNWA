@@ -14,6 +14,8 @@
 
 #include "wali/graph/InterGraph.hpp"
 
+#include "wali/wpds/ewpds/ETrans.hpp"
+
 struct FWPDSSourceFunctor;
 
 namespace wali
@@ -33,8 +35,6 @@ namespace wali
       {
         public:
           friend class WPDS;
-          friend class FWPDS;
-          friend struct FWPDSSourceFunctor;
  
         public:
           LazyTrans(  wali_key_t from,
@@ -52,6 +52,8 @@ namespace wali
 
           virtual ~LazyTrans();
 
+          virtual wali::wpds::ewpds::ETrans *getETrans();
+
           virtual wfa::ITrans* copy() const;
 
           virtual const sem_elem_t weight() const throw();
@@ -68,6 +70,9 @@ namespace wali
           void compute_weight() const;
 
         private:
+          //is the delegate an ETrans?
+          bool is_etrans; 
+
           intergraph_t intergr;
       };
     }

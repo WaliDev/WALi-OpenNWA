@@ -28,17 +28,41 @@ namespace wali
           ) : wfa::DecoratorTrans(new wfa::Trans(from,stack,to,se))
       {
         setConfig(config);
+        is_etrans = false;
       }
 
       LazyTrans::LazyTrans( wfa::ITrans* delegate )
         : DecoratorTrans(delegate), intergr(NULL)
       {
+        ewpds::ETrans *et = dynamic_cast<ewpds::ETrans *>(delegate);
+        if(et != 0) {
+          is_etrans = true;
+        } else {
+          is_etrans = false;
+        }
+
       }
 
       LazyTrans::LazyTrans( wfa::ITrans* delegate, intergraph_t g )
         : DecoratorTrans(delegate)
       {
         setInterGraph(g);
+
+        ewpds::ETrans *et = dynamic_cast<ewpds::ETrans *>(delegate);
+        if(et != 0) {
+          is_etrans = true;
+        } else {
+          is_etrans = false;
+        }
+
+      }
+
+      ewpds::ETrans *LazyTrans::getETrans() {
+        if(is_etrans) {
+          compute_weight();
+          return static_cast<ewpds::ETrans *> (getDelegate());
+        }
+        return 0;
       }
 
       wfa::ITrans* LazyTrans::copy() const {
@@ -57,6 +81,13 @@ namespace wali
       void LazyTrans::compute_weight() const {
         if(!getDelegate()->weight().is_valid()) {
           sem_elem_t val = intergr->get_weight(wali::graph::Transition(*this));
+
+          if(is_etrans) {
+            // Should also set the weight at call site
+            sem_elem_t wt = intergr->get_call_weight(wali::graph::Transition(*this));
+            ((ewpds::ETrans *) getDelegate())->setWeightAtCall(wt);
+          }
+
           // This cast is b/c of the const qualifier
           // The const qualifier is necessary b/c it is called
           // by other const methods, of which they really should

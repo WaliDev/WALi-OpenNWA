@@ -86,8 +86,8 @@ struct FWPDSSourceFunctor : public wfa::TransFunctor
           gr.setSource(Transition(*t),t->weight());
         } else {
           //ETrans --> Esource
-          LazyTrans *lt = static_cast<LazyTrans *>(t);
-          ETrans* etrans = dynamic_cast<ETrans*>(lt->getDelegate());
+          LazyTrans *lt = static_cast<LazyTrans *> (t);
+          ETrans* etrans = lt->getETrans();
           if (0 != etrans) {
             gr.setESource(Transition(*t), etrans->getWeightAtCall(), etrans->weight());
           } else {
@@ -376,7 +376,7 @@ void FWPDS::poststar_handle_eps_trans(wfa::ITrans* teps, wfa::ITrans* tprime, se
 #else
     LazyTrans* lt = static_cast<LazyTrans*>(tprime);
 #endif
-    ewpds::ETrans* etrans = dynamic_cast<ewpds::ETrans*>(lt->getDelegate());
+    ewpds::ETrans* etrans = lt->getETrans();
     if (0 != etrans) {
       erule_t r = etrans->getERule();
 
@@ -520,11 +520,10 @@ void FWPDS::operator()( wfa::ITrans* orig ) {
   sem_elem_t se = 
       (wrapper == 0) ? orig->weight() : wrapper->wrap(*orig);
 
-  LazyTrans *t = new LazyTrans( orig->from()
-                     ,orig->stack()
-                     ,orig->to()
-                     ,se
-                     ,c);
+  LazyTrans *t = new LazyTrans( orig->copy() );
+
+  t->setConfig(c);
+  t->setWeight(se);
   
   // fa.addTrans takes ownership of passed in pointer
   currentOutputWFA->addTrans( t );

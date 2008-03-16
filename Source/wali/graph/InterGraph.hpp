@@ -184,6 +184,7 @@ namespace wali {
                 void setupInterSolution(std::list<Transition> *wt_required = NULL);
 
                 sem_elem_t get_weight(Transition t);
+                sem_elem_t get_call_weight(Transition t);
 
                 void update_all_weights();
 

@@ -363,13 +363,10 @@ namespace wali
                 Config *c = make_config( orig->from(),orig->stack() );
                 sem_elem_t se = (wrapper == 0) ? orig->weight() : wrapper->wrap(*orig);
 
-                wfa::ITrans *t;
+                wfa::ITrans *t = orig->copy();
 
-                t = new wfa::Trans( orig->from()
-                    ,orig->stack()
-                    ,orig->to()
-                    ,se);
                 t->setConfig(c);
+                t->setWeight(se);
 
                 // fa.addTrans takes ownership of passed in pointer
                 currentOutputWFA->addTrans( t );

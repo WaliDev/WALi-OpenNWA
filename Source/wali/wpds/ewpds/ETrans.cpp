@@ -50,6 +50,10 @@ namespace wali {
         return wAtCall;
       }
 
+      void ETrans::setWeightAtCall(sem_elem_t wt) {
+        wAtCall = wt;
+      }
+
       sem_elem_t ETrans::poststar_eps_closure( sem_elem_t se ) {
         return getMergeFn()->apply_f(wAtCall,se);
       }
