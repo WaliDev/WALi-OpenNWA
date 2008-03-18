@@ -167,7 +167,7 @@ namespace wali {
         CacheElem::iterator it;
         for(it = errorProjCache[q].begin(); it != errorProjCache[q].end(); it++) {
           std::pair< sem_elem_t, sem_elem_t > &ce = (*it);
-          if(ce.first == w) {
+          if(ce.first->equal(w)) {
             return ce.second;
           }
         }
