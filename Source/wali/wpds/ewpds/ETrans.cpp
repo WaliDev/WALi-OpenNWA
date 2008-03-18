@@ -58,6 +58,10 @@ namespace wali {
         return getMergeFn()->apply_f(wAtCall,se);
       }
 
+      sem_elem_t ETrans::make_weight( wali::wfa::WeightMaker &wmaker, sem_elem_t se ) {
+        return wmaker.make_weight(wAtCall, weight(), getMergeFn(), se);
+      }
+
       void ETrans::combineTrans( ITrans* tp )
       {
         // TODO - change dynamic_cast to static_cast 

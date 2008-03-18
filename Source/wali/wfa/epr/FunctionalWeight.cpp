@@ -1,5 +1,7 @@
 #include "wali/wfa/epr/FunctionalWeight.hpp"
 
+using namespace wali::wpds::ewpds;
+
 namespace wali {
   namespace wfa {
     namespace epr {
@@ -7,7 +9,17 @@ namespace wali {
       FunctionalWeight::FunctionalWeight(sem_elem_t l,
                                          sem_elem_t r) : SemElem(),
                                                          left(l),
-                                                         right(r) { 
+                                                         right(r),
+                                                         mf(0) { 
+        normalize();
+      }
+
+      FunctionalWeight::FunctionalWeight(sem_elem_t l,
+                                         merge_fn_t m,
+                                         sem_elem_t r) : SemElem(),
+                                                         left(l),
+                                                         right(r),
+                                                         mf(m) { 
         normalize();
       }
 
@@ -42,6 +54,11 @@ namespace wali {
           assert(0);
         }
 
+        if(mf.is_valid() || fse->mf.is_valid()) {
+          *waliErr << "Error: Cannot take extend of FunctionalWeights when merge functions are present inside them\n";
+          assert(0);
+        }
+
         sem_elem_t l = fse->left->extend(left);
         sem_elem_t r = right->extend(fse->right);
         return new FunctionalWeight(l, r);
@@ -65,13 +82,23 @@ namespace wali {
       }
 
       sem_elem_t FunctionalWeight::apply(sem_elem_t se) {
-        return (left->extend(se))->extend(right);
+        sem_elem_t wt;
+        if(mf.is_valid()) {
+          wt = mf->apply_f(left, se);
+        } else {
+          wt = left->extend(se);
+        }
+        return wt->extend(right);
       }
 
       std::ostream &FunctionalWeight::print(std::ostream &o) const {
         o << "FunctionalWeight[";
         left->print(o);
         o << " and ";
+        if(mf.is_valid()) {
+          mf->print(o);
+          o << " and ";
+        }
         right->print(o);
         o << "]\n";
         return o;

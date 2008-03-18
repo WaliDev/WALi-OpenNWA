@@ -121,6 +121,11 @@ namespace wali
         getDelegate()->combineTrans(tp);
       }
 
+      sem_elem_t LazyTrans::make_weight( wfa::WeightMaker &wmaker, sem_elem_t se ) {
+        compute_weight();
+        return getDelegate()->make_weight(wmaker, se);
+      }
+
       LazyTrans::~LazyTrans() {}
 
     } // namespace fwpds

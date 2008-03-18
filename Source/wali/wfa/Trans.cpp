@@ -130,6 +130,10 @@ namespace wali
       return weight()->extend(se);
     }
 
+    sem_elem_t Trans::make_weight( WeightMaker &wmaker, sem_elem_t se ) {
+      return wmaker.make_weight(weight(), se);
+    }
+
   } // namespace wfa
 
 } // namespace wali

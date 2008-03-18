@@ -13,6 +13,8 @@
 #include "wali/SemElem.hpp"
 #include "wali/KeyContainer.hpp"
 
+#include "wali/wfa/WeightMaker.hpp"
+
 namespace wali
 {
   namespace wpds {
@@ -194,7 +196,13 @@ namespace wali
          */
         virtual sem_elem_t poststar_eps_closure( sem_elem_t se ) = 0;
 
-
+        /*!
+         * This is used by WFA::intersect
+         * to build weights
+         * The base case is:
+         *   wmaker.make_weight(this->weight(), se);
+         */
+        virtual sem_elem_t make_weight( WeightMaker &wmaker, sem_elem_t se ) = 0;
 
 
         //****************************************************

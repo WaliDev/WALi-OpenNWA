@@ -6,6 +6,7 @@
  */
 
 #include "wali/SemElem.hpp"
+#include "wali/wpds/ewpds/MergeFunction.hpp"
 
 namespace wali {
   namespace wfa {
@@ -26,6 +27,7 @@ namespace wali {
       public:
         //FunctionalWeight();
         FunctionalWeight(sem_elem_t l, sem_elem_t r);
+        FunctionalWeight(sem_elem_t l, wali::wpds::ewpds::merge_fn_t mf, sem_elem_t r);
         virtual ~FunctionalWeight();
 
         //////////////////////
@@ -52,7 +54,10 @@ namespace wali {
         void normalize();
 
         // The functional weight is \lambda x. (left \extend x \extend right)
+        // OR \lambda x. mf(left, x) \extend right
+
         sem_elem_t left, right;
+        wali::wpds::ewpds::merge_fn_t mf;
       };
     } // namespace epr
   } // namespace wfa

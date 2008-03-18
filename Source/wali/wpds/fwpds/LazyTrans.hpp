@@ -64,6 +64,8 @@ namespace wali
 
           virtual void combineTrans( wfa::ITrans* tp );
 
+          virtual sem_elem_t make_weight( wfa::WeightMaker &wmaker, sem_elem_t se );
+
           void setInterGraph(intergraph_t igr);
 
         private:
