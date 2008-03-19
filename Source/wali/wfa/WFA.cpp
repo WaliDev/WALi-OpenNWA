@@ -758,9 +758,13 @@ namespace wali
     // Intersect (in place) with (stk \Gamma^*)
     //
     void WFA::filter(std::set<Key> &stkset) {
+      if(kpmap.size() == 0) return;
+
       // Remove outgoing transitions from the init state that do not
       // have stack in stkset
       State *init = getState(getInitialState());
+      assert(init != 0);
+
       State::iterator tit = init->begin();
       State::iterator titEND = init->end();
 

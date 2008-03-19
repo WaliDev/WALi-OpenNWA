@@ -152,7 +152,6 @@ namespace wali
                      */
                     virtual void operator()( wfa::ITrans* t );
 
-                    bool is_pds_state(wali::Key k) const;
                     rule_t lookup_rule(wali::Key to_state, wali::Key to_stack1, wali::Key to_stack2) const;
                 protected:
 
@@ -200,7 +199,6 @@ namespace wali
                         );
 
                 private:
-                    std::set<wali::Key> pds_states; // set of PDS states
                     merge_rule_hash_t merge_rule_hash; // FIXME: verify correct usage of HashMap
                     bool usePairsDuringCopy;
 

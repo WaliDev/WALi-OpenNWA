@@ -76,7 +76,6 @@ namespace wali
             EWPDS::~EWPDS()
             {
                 //*waliErr << "~EWPDS()" << std::endl;
-                pds_states.clear();
                 merge_rule_hash.clear();
             }
 
@@ -156,11 +155,11 @@ namespace wali
                         *waliErr << "EWPDS: Cannot give two RULE2s with same RHS\n";
                     }
                 }
+                // Set up theZero weight
+                if (!theZero.is_valid() && r->weight().is_valid())
+                  theZero = r->weight()->zero();
+                
                 return rb;
-            }
-
-            bool EWPDS::is_pds_state(Key k) const {
-                return pds_states.find(k) != pds_states.end();
             }
 
             rule_t EWPDS::lookup_rule(Key to_state, Key to_stack1, Key to_stack2) const {
@@ -360,6 +359,11 @@ namespace wali
 
             void EWPDS::operator()( wfa::ITrans * orig )
             {
+                if( is_pds_state(orig->to())) {
+                  *waliErr << "WALi Error: cannot have incoming transition to a PDS state\n";
+                  assert(0);
+                }
+
                 Config *c = make_config( orig->from(),orig->stack() );
                 sem_elem_t se = (wrapper == 0) ? orig->weight() : wrapper->wrap(*orig);
 

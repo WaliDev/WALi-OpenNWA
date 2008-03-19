@@ -515,6 +515,11 @@ void FWPDS::operator()( wfa::ITrans* orig ) {
     return EWPDS::operator()(orig);
   }
 
+  if( is_pds_state(orig->to())) {
+    *waliErr << "WALi Error: cannot have incoming transition to a PDS state\n";
+    assert(0);
+  }
+
   Config *c = make_config( orig->from(),orig->stack() );
   sem_elem_t se = 
       (wrapper == 0) ? orig->weight() : wrapper->wrap(*orig);

@@ -212,6 +212,8 @@ namespace wali
                  */
                 virtual void operator()( wfa::ITrans* t );
 
+                bool is_pds_state(wali::Key k) const;
+
             protected:
 
                 /*! @brief Actually creates the rule, hanldes the mappings,
@@ -421,7 +423,8 @@ namespace wali
                 r2hash_t r2hash;
                 wfa::WFA* currentOutputWFA;
                 sem_elem_t theZero;
-
+                std::set<wali::Key> pds_states; // set of PDS states
+          
             private:
 
         };

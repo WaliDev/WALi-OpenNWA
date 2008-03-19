@@ -75,6 +75,7 @@ namespace wali
             rule_zeroes.clear();
             r2hash.clear();
             worklist->clear();
+            pds_states.clear();
         }
 
         /*!
@@ -560,6 +561,9 @@ namespace wali
             }
         }
 
+        bool WPDS::is_pds_state(Key k) const {
+          return pds_states.find(k) != pds_states.end();
+        }
 
         /////////////////////////////////////////////////////////////////
         // Protected Methods
@@ -584,6 +588,9 @@ namespace wali
             assert( to_state   != WALI_EPSILON );
             Config *from = make_config(from_state,from_stack);
             Config *to = make_config(to_state,to_stack1);
+
+            pds_states.insert(from_state);
+            pds_states.insert(to_state);
 
             // make_rule will create links b/w Configs and the Rule
             r = new Rule(from, to, to_stack2, se);
@@ -760,6 +767,11 @@ namespace wali
         /////////////////////////////////////////////////////////////////
         void WPDS::operator()( wfa::ITrans* orig )
         {
+            if( is_pds_state(orig->to())) {
+              *waliErr << "WALi Error: cannot have incoming transition to a PDS state\n";
+              assert(0);
+            }
+
             Config *c = make_config( orig->from(),orig->stack() );
             wfa::ITrans*t = orig->copy();
             t->setConfig(c);
