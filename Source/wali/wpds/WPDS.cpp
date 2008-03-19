@@ -140,7 +140,7 @@ namespace wali
         {
             currentOutputWFA = &fa;
             Key init = input.getInitialState();
-            std::set<Key> localF = input.getFinalStates();
+            std::set<Key> localF( input.getFinalStates() );
             size_t inputGeneration = input.getGeneration();
             // cannot clear if input == output
             if( &input == currentOutputWFA ) {
@@ -152,24 +152,16 @@ namespace wali
                 fa.clear();
                 input.for_each(*this);
             }
-            // Get an instance of the Zero weight if possible.
-            // Because of Wrappers, we use getSomeWeight()
-            // instead of just copying over blindly the
-            // weight of the state in the input WFA.
-            sem_elem_t someWeight = fa.getSomeWeight();
-            sem_elem_t se = (someWeight.is_valid()) 
-              ? someWeight->zero()
-              : 0;
             // Now copy over initial and final state information
             // that was stored before the clear() and adding
             // of transitions.
-            fa.addState(init,se);
+            fa.addState(init,this->theZero);
             fa.setInitialState( init );
             for (std::set<Key>::iterator cit = localF.begin();
                 cit != localF.end() ; cit++)
             {
               Key f = *cit;
-              fa.addState(f,se);
+              fa.addState(f,this->theZero);
               fa.addFinalState(f);
             }
             currentOutputWFA->setGeneration(inputGeneration+1);
@@ -614,6 +606,9 @@ namespace wali
                 r2it->second.push_back( r );
               }
             }
+            // Set up theZero weight
+            if (!theZero.is_valid() && r->weight().is_valid())
+              theZero = r->weight()->zero();
             return rb;
         }
 

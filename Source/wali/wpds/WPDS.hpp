@@ -420,6 +420,7 @@ namespace wali
                 std::set< Config * > rule_zeroes;
                 r2hash_t r2hash;
                 wfa::WFA* currentOutputWFA;
+                sem_elem_t theZero;
 
             private:
 
