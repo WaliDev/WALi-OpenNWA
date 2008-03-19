@@ -24,7 +24,9 @@ namespace wali
      ***********/
     void TransCopier::operator()( const ITrans* t )
     {
-      fa.addTrans(t->from(),t->stack(),t->to(),t->weight());
+      //fa.addTrans(t->from(),t->stack(),t->to(),t->weight());
+      ITrans *tc = t->copy();
+      fa.insert(tc);
     }
 
     /***********
