@@ -133,6 +133,9 @@ std::ostream& graphPrintKey( int k, std::ostream& o ) {
 void
 FWPDS::prestar( wfa::WFA& input, wfa::WFA& output )
 {
+    // setup output
+    EWPDS::prestarSetupFixpoint(input,output);
+
     // Get hold of semiring element
     sem_elem_t se = input.getSomeWeight();
 
@@ -150,7 +153,6 @@ FWPDS::prestar( wfa::WFA& input, wfa::WFA& output )
         }
       }
       if(!se.is_valid()) {
-        output.clear();
         return;
       }
     }
@@ -163,9 +165,6 @@ FWPDS::prestar( wfa::WFA& input, wfa::WFA& output )
     // However, there is no cost benefit in using WPDS
     // (it only saves on debugging effort)
     interGr = new graph::InterGraph(se, true, true);
-
-    // setup output
-    EWPDS::prestarSetupFixpoint(input,output);
 
     // Input transitions become source nodes in FWPDS
     FWPDSSourceFunctor sources(*interGr, false);
@@ -308,12 +307,14 @@ FWPDS::checkResults( wfa::WFA& input, bool poststar )
 void
 FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
 {
+
+    EWPDS::poststarSetupFixpoint(input,output);
+
     // Get hold of semiring element
     sem_elem_t se = input.getSomeWeight();
 
     // if se is NULL then input is empty
     if(!se.is_valid()) {
-      output.clear();
       return;
     }
     // cache semiring 1
@@ -324,8 +325,6 @@ FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
     // merge functions, it can be treated as a WPDS.
     // However, there is no cost benefit in using WPDS
     interGr = new graph::InterGraph(se, true, false);
-
-    EWPDS::poststarSetupFixpoint(input,output);
 
     // Input transitions become source nodes in FWPDS
     FWPDSSourceFunctor sources(*interGr, true);

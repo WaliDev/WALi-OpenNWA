@@ -97,6 +97,7 @@ namespace wali {
           if(order.find(s->name()) != order.end()) {
             return order[s->name()];
           }
+          //*waliErr << "StatePriorityWorlist: Priority lookup failed\n";
           return (unsigned int)(-1);
         }
 
