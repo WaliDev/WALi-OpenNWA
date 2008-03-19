@@ -29,10 +29,11 @@ namespace wali
     State::State( Key k, sem_elem_t W ) :
       Countable(true),key(k),se(W),delta_se(W),quasi(W),tag(0)
     {
-      assert( W.is_valid() );
+      if (!W.is_valid()) {
+        *waliErr << "[WARNING] wfa::State created with a NULL weight\n";
+      }
       // States are always created with a weight of Zero
       // so this is wasted work
-      //quasi = W->zero();
       { // BEGIN DEBUGGING
         //*waliErr << "State(Key,sem_elem_t): " << numStates << std::endl;;
         numStates++;

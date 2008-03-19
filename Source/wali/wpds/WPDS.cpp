@@ -139,21 +139,40 @@ namespace wali
         void WPDS::setupOutput( ::wali::wfa::WFA& input, ::wali::wfa::WFA& fa )
         {
             currentOutputWFA = &fa;
+            Key init = input.getInitialState();
+            std::set<Key> localF = input.getFinalStates();
+            size_t inputGeneration = input.getGeneration();
             // cannot clear if input == output
             if( &input == currentOutputWFA ) {
                 WFA tmp(input);
                 fa.clear();
-                fa.setInitialState( tmp.getInitialState() );
-                fa.F = tmp.F;
                 tmp.for_each(*this);
             }
             else {
                 fa.clear();
-                fa.setInitialState( input.getInitialState() );
-                fa.F = input.F;
                 input.for_each(*this);
             }
-            currentOutputWFA->setGeneration(input.getGeneration()+1);
+            // Get an instance of the Zero weight if possible.
+            // Because of Wrappers, we use getSomeWeight()
+            // instead of just copying over blindly the
+            // weight of the state in the input WFA.
+            sem_elem_t someWeight = fa.getSomeWeight();
+            sem_elem_t se = (someWeight.is_valid()) 
+              ? someWeight->zero()
+              : 0;
+            // Now copy over initial and final state information
+            // that was stored before the clear() and adding
+            // of transitions.
+            fa.addState(init,se);
+            fa.setInitialState( init );
+            for (std::set<Key>::iterator cit = localF.begin();
+                cit != localF.end() ; cit++)
+            {
+              Key f = *cit;
+              fa.addState(f,se);
+              fa.addFinalState(f);
+            }
+            currentOutputWFA->setGeneration(inputGeneration+1);
         }
 
         // Sets the config field to NULL

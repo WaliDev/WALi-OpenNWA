@@ -140,6 +140,7 @@ int main()
     wali::wfa::WFA ca1;
     ca1.addTrans( q, e_main, accepting_state, GenKillTransformer_T< VarSet >::id());
     ca1.addFinalState( accepting_state );
+    ca1.setInitialState( q );
     ca1.print( std::cout << "before\n" ) << std::endl;
     wali::wfa::WFA ca3;
     pds.poststar(ca1,ca3);

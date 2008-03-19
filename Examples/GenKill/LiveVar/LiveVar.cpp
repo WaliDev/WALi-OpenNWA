@@ -158,6 +158,7 @@ int main() {
     wali::wfa::WFA ca2;
     ca2.addTrans(q, stack_bottom, accepting_state, GenKillTransformer_T< VarSet >::id());
     ca2.addFinalState( accepting_state );
+    ca2.setInitialState( q );
     ca2.print( std::cout << "Before ...\n" ) << std::endl;
 
     wali::wfa::WFA ca3;

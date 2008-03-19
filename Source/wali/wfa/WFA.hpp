@@ -508,7 +508,15 @@ namespace wali
          */
         virtual void path_summary( Worklist<State>& wl, sem_elem_t wt );
 
-      protected:
+        /*!
+         * Computes a regular expression for the automaton.
+         * The regex, when evaluated, produces a weight
+         * that is equal to calling path_summary and then
+         * getting the weight on the initial state. I.e.,
+         * <code>
+         *  fa.getState( fa.getInitialState() )->weight();
+         * </code>
+         */
         regex::regex_t TarjanBasicRegex();
 
       private:
