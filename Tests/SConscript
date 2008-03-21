@@ -1,5 +1,6 @@
 # Build the example applications
-import os
+# $Id$
+import os,os.path
 
 Import('WaliDir')
 Import('LibInstallDir')
@@ -21,9 +22,10 @@ TestDir = os.path.join(WaliDir,'Tests')
 built = []
 
 Reach = os.path.join(WaliDir,'Examples','Reach','Reach.cpp')
-for t in ['twitness','tprune']:
+for t in ['t1','t3','t4','twitness','tprune','tTransSet']:
     print '\n+++ Building Test "%s"' % t
     exe = Env.Program('%s' % t, ['%s.cpp' % t,'%s' % Reach ])
     built.append(exe)
 
 Return('built')
+
