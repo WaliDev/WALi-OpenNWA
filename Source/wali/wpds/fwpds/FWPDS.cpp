@@ -515,7 +515,7 @@ void FWPDS::operator()( wfa::ITrans* orig ) {
     return EWPDS::operator()(orig);
   }
 
-  if( is_pds_state(orig->to())) {
+  if( is_strict() && is_pds_state(orig->to())) {
     *waliErr << "WALi Error: cannot have incoming transition to a PDS state\n";
     orig->print( *waliErr << "    " ) << std::endl;
     assert(0);

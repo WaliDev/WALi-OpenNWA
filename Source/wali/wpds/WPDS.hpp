@@ -3,6 +3,8 @@
 
 /*!
  * @author Nick Kidd
+ *
+ * $Id$
  */
 
 // ::wali
@@ -23,420 +25,426 @@
 
 namespace wali
 {
-    template< typename T > class Worklist;
+  template< typename T > class Worklist;
 
-    namespace wfa
+  namespace wfa
+  {
+    class ITrans;
+  }
+
+  namespace wpds
+  {
+
+    class Config;
+    class rule_t;
+    class RuleFunctor;
+    class ConstRuleFunctor;
+    class Wrapper;
+
+    /*!
+     * @class WPDS
+     */
+    class WPDS : public Printable, public wfa::TransFunctor
     {
-        class ITrans;
-    }
 
-    namespace wpds
-    {
+      public:
+        static const std::string XMLTag;
 
-        class Config;
-        class rule_t;
-        class RuleFunctor;
-        class ConstRuleFunctor;
-        class Wrapper;
+      protected:
+        typedef HashMap< KeyPair,Config * > chash_t;
+        typedef chash_t::iterator iterator;
+        typedef chash_t::const_iterator const_iterator;
 
         /*!
-         * @class WPDS
+         * r2hash_t is a map from key to list of rules. The key
+         * is the second RHS stack symbol of a rule. For example, 
+         * the rule R1 = < s1,a > -> < s2, b c > will add R1 to 
+         * the list that is mapped to by the stack symbol c.
          */
+        typedef HashMap< Key, std::list< rule_t > > r2hash_t;
 
-        class WPDS : public Printable, public wfa::TransFunctor
-        {
+      private:
 
-            public:
-                static const std::string XMLTag;
+      public:
 
-            protected:
-                typedef HashMap< KeyPair,Config * > chash_t;
-                typedef chash_t::iterator iterator;
-                typedef chash_t::const_iterator const_iterator;
+        WPDS();
+        WPDS( Wrapper* wrapper );
+        virtual ~WPDS();
 
-                /*!
-                 * r2hash_t is a map from key to list of rules. The key
-                 * is the second RHS stack symbol of a rule. For example, 
-                 * the rule R1 = < s1,a > -> < s2, b c > will add R1 to 
-                 * the list that is mapped to by the stack symbol c.
-                 */
-                typedef HashMap< Key, std::list< rule_t > > r2hash_t;
+        /*!
+         * Clears all rules from the WPDS
+         */
+        virtual void clear();
 
-            private:
-
-            public:
-
-                WPDS();
-                WPDS( Wrapper * wrapper );
-                virtual ~WPDS();
-
-                /*!
-                 * Clears all rules from the WPDS
-                 */
-                virtual void clear();
-
-                /*!
-                 * Set the worklist used for pre and poststar queries.
-                 */
-                void setWorklist( ref_ptr< Worklist<wfa::ITrans> > wl );
+        /*!
+         * Set the worklist used for pre and poststar queries.
+         */
+        void setWorklist( ref_ptr< Worklist<wfa::ITrans> > wl );
 
 
-                /*! @brief create rule with no r.h.s. stack symbols
-                 *
-                 * @return true if rule existed
-                 *
-                 * @see sem_elem_t
-                 * @see Key
-                 */
-                virtual bool add_rule(
-                        Key from_state,
-                        Key from_stack,
-                        Key to_state,
-                        sem_elem_t se );
+        /*!
+         * Wrap the weights on the rules.
+         * Once the a wrapper is set on the WPDS, no more rules
+         * can be added.
+         */
+        //void wrap( Wrapper * w );
 
-                /*! @brief create rule with one r.h.s. stack symbol
-                 *
-                 * @return true if rule existed
-                 *
-                 * @see sem_elem_t
-                 * @see Key
-                 */
-                virtual bool add_rule(
-                        Key from_state,
-                        Key from_stack,
-                        Key to_state,
-                        Key to_stack1,
-                        sem_elem_t se );
+        /*! @brief create rule with no r.h.s. stack symbols
+         *
+         * @return true if rule existed
+         *
+         * @see sem_elem_t
+         * @see Key
+         */
+        virtual bool add_rule(
+            Key from_state,
+            Key from_stack,
+            Key to_state,
+            sem_elem_t se );
 
-                /*! @brief create rule with two r.h.s. stack symbols
-                 *
-                 * @return true if rule existed
-                 *
-                 * @see sem_elem_t
-                 * @see Key
-                 */
-                virtual bool add_rule(
-                        Key from_state,
-                        Key from_stack,
-                        Key to_state,
-                        Key to_stack1,
-                        Key to_stack2,
-                        sem_elem_t se );
+        /*! @brief create rule with one r.h.s. stack symbol
+         *
+         * @return true if rule existed
+         *
+         * @see sem_elem_t
+         * @see Key
+         */
+        virtual bool add_rule(
+            Key from_state,
+            Key from_stack,
+            Key to_state,
+            Key to_stack1,
+            sem_elem_t se );
 
-                /*!
-                 * @brief Perform prestar reachability query
-                 *
-                 * @return wfa::WFA
-                 *
-                 * @see wfa::WFA
-                 */
-                virtual wfa::WFA prestar( wfa::WFA & input );
+        /*! @brief create rule with two r.h.s. stack symbols
+         *
+         * @return true if rule existed
+         *
+         * @see sem_elem_t
+         * @see Key
+         */
+        virtual bool add_rule(
+            Key from_state,
+            Key from_stack,
+            Key to_state,
+            Key to_stack1,
+            Key to_stack2,
+            sem_elem_t se );
 
-                /*!
-                 * @brief Perform prestar reachability query
-                 * The result of the query is stored in
-                 * the parameter WFA& output. Any transitions
-                 * in output before the query will be there
-                 * after the query but will have no effect
-                 * on the reachability query.
-                 *
-                 * @return void
-                 *
-                 * @see wfa::WFA
-                 */
-                virtual void prestar( wfa::WFA & input, wfa::WFA & output );
+        /*!
+         * @brief Perform prestar reachability query
+         *
+         * @return wfa::WFA
+         *
+         * @see wfa::WFA
+         */
+        virtual wfa::WFA prestar( wfa::WFA & input );
 
-                /*!
-                 * @brief Perform poststar reachability query
-                 *
-                 * @return WFA
-                 *
-                 * @see wfa::WFA
-                 */
-                virtual wfa::WFA poststar( wfa::WFA & input );
+        /*!
+         * @brief Perform prestar reachability query
+         * The result of the query is stored in
+         * the parameter WFA& output. Any transitions
+         * in output before the query will be there
+         * after the query but will have no effect
+         * on the reachability query.
+         *
+         * @return void
+         *
+         * @see wfa::WFA
+         */
+        virtual void prestar( wfa::WFA & input, wfa::WFA & output );
 
-                /*!
-                 * @brief Perform poststar reachability query.
-                 * The result of the query is stored in
-                 * the parameter WFA& output. Any transitions
-                 * in output before the query will be there
-                 * after the query but will have no effect
-                 * on the reachability query.
-                 *
-                 * @return wfa::WFA
-                 *
-                 * @see wfa::WFA
-                 */
-                virtual void poststar( wfa::WFA & input, wfa::WFA & output );
+        /*!
+         * @brief Perform poststar reachability query
+         *
+         * @return WFA
+         *
+         * @see wfa::WFA
+         */
+        virtual wfa::WFA poststar( wfa::WFA & input );
 
-                /*!
-                 * This method writes the WPDS to the passed in 
-                 * std::ostream parameter. Implements Printable::print.
-                 *
-                 * @param o the std::ostream this is written to
-                 * @return std::ostream this was written to
-                 *
-                 * @see Printable
-                 */
-                virtual std::ostream & print( std::ostream & o ) const;
+        /*!
+         * @brief Perform poststar reachability query.
+         * The result of the query is stored in
+         * the parameter WFA& output. Any transitions
+         * in output before the query will be there
+         * after the query but will have no effect
+         * on the reachability query.
+         *
+         * @return wfa::WFA
+         *
+         * @see wfa::WFA
+         */
+        virtual void poststar( wfa::WFA & input, wfa::WFA & output );
 
-                /*!
-                 * This method marshalls the WPDS into the passed
-                 * in std::ostream parameter.  Marshalling simply
-                 * writes the WPDS in XML form.
-                 *
-                 * @return std::ostream the WPDS was marshalled into
-                 */
-                virtual std::ostream & marshall( std::ostream & o ) const;
+        /*!
+         * This method writes the WPDS to the passed in 
+         * std::ostream parameter. Implements Printable::print.
+         *
+         * @param o the std::ostream this is written to
+         * @return std::ostream this was written to
+         *
+         * @see Printable
+         */
+        virtual std::ostream & print( std::ostream & o ) const;
 
-                /*!
-                 * @brief apply ConstRuleFunctor to each rule in WPDS
-                 *
-                 * @see ConstRuleFunctor
-                 * @see Rule
-                 * @see rule_t
-                 */
-                virtual void for_each( ConstRuleFunctor &func ) const;
+        /*!
+         * This method marshalls the WPDS into the passed
+         * in std::ostream parameter.  Marshalling simply
+         * writes the WPDS in XML form.
+         *
+         * @return std::ostream the WPDS was marshalled into
+         */
+        virtual std::ostream & marshall( std::ostream & o ) const;
 
-                /*!
-                 * @brief apply RuleFunctor to each rule in WPDS
-                 *
-                 * @see RuleFunctor
-                 * @see Rule
-                 * @see rule_t
-                 */
-                virtual void for_each( RuleFunctor &func );
+        /*!
+         * @brief apply ConstRuleFunctor to each rule in WPDS
+         *
+         * @see ConstRuleFunctor
+         * @see Rule
+         * @see rule_t
+         */
+        virtual void for_each( ConstRuleFunctor &func ) const;
 
-                /*!
-                 * Implementation of TransFunctor
-                 */
-                virtual void operator()( wfa::ITrans* t );
+        /*!
+         * @brief apply RuleFunctor to each rule in WPDS
+         *
+         * @see RuleFunctor
+         * @see Rule
+         * @see rule_t
+         */
+        virtual void for_each( RuleFunctor &func );
 
-                bool is_pds_state(wali::Key k) const;
+        /*!
+         * Implementation of TransFunctor
+         */
+        virtual void operator()( wfa::ITrans* t );
 
-            protected:
+        bool is_pds_state(wali::Key k) const;
 
-                /*! @brief Actually creates the rule, hanldes the mappings,
-                 * etc.
-                 *
-                 * @return true if rule existed
-                 *
-                 * @see sem_elem_t
-                 * @see Key
-                 */
-                virtual bool add_rule(
-                        Key from_state,
-                        Key from_stack,
-                        Key to_state,
-                        Key to_stack1,
-                        Key to_stack2,
-                        sem_elem_t se,
-                        rule_t& r );
+      protected:
 
-                /*!
-                 * @brief copy relevant material from input WFA to output WFA
-                 */
-                virtual void setupOutput( wfa::WFA& input, wfa::WFA& fa );
+        /*! @brief Actually creates the rule, hanldes the mappings,
+         * etc.
+         *
+         * @return true if rule existed
+         *
+         * @see sem_elem_t
+         * @see Key
+         */
+        virtual bool add_rule(
+            Key from_state,
+            Key from_stack,
+            Key to_state,
+            Key to_stack1,
+            Key to_stack2,
+            sem_elem_t se,
+            rule_t& r );
 
-                /*!
-                 * @brief For each t \in fa, t->setConfig(0)
-                 */
-                virtual void unlinkOutput( wfa::WFA& fa );
+        /*!
+         * @brief copy relevant material from input WFA to output WFA
+         */
+        virtual void setupOutput( wfa::WFA& input, wfa::WFA& fa );
 
-                /*!
-                 * @brief Gets WPDS ready for fixpoint
-                 */
-                virtual void prestarSetupFixpoint( wfa::WFA& input, wfa::WFA& fa );
+        /*!
+         * @brief For each t \in fa, t->setConfig(0)
+         */
+        virtual void unlinkOutput( wfa::WFA& fa );
 
-                /*!
-                 * @brief Performs the fixpoint computation
-                 */
-                virtual void prestarComputeFixpoint( wfa::WFA& fa );
+        /*!
+         * @brief Gets WPDS ready for fixpoint
+         */
+        virtual void prestarSetupFixpoint( wfa::WFA& input, wfa::WFA& fa );
 
-                /*!
-                 * @brief Performs pre for 1 ITrans
-                 */
-                virtual void pre( wfa::ITrans * t, wfa::WFA& fa );
+        /*!
+         * @brief Performs the fixpoint computation
+         */
+        virtual void prestarComputeFixpoint( wfa::WFA& fa );
 
-                /*!
-                 * @brief helper method for prestar
-                 */
-                virtual void prestar_handle_call(
-                        wfa::ITrans * t1 ,
-                        wfa::ITrans * t2,
-                        rule_t & r,
-                        sem_elem_t delta
-                        );
+        /*!
+         * @brief Performs pre for 1 ITrans
+         */
+        virtual void pre( wfa::ITrans * t, wfa::WFA& fa );
 
-                /*!
-                 * @brief helper method for prestar
-                 */
-                virtual void prestar_handle_trans(
-                        wfa::ITrans * t,
-                        wfa::WFA & ca  ,
-                        rule_t & r,
-                        sem_elem_t delta );
+        /*!
+         * @brief helper method for prestar
+         */
+        virtual void prestar_handle_call(
+            wfa::ITrans * t1 ,
+            wfa::ITrans * t2,
+            rule_t & r,
+            sem_elem_t delta
+            );
 
-                /*!
-                 * @brief Gets WPDS ready for fixpoint
-                 */
-                virtual void poststarSetupFixpoint( wfa::WFA& input, wfa::WFA& fa );
+        /*!
+         * @brief helper method for prestar
+         */
+        virtual void prestar_handle_trans(
+            wfa::ITrans * t,
+            wfa::WFA & ca  ,
+            rule_t & r,
+            sem_elem_t delta );
 
-                /*!
-                 * @brief Performs the fixpoint computation
-                 */
-                virtual void poststarComputeFixpoint( wfa::WFA& fa );
+        /*!
+         * @brief Gets WPDS ready for fixpoint
+         */
+        virtual void poststarSetupFixpoint( wfa::WFA& input, wfa::WFA& fa );
 
-                /*!
-                 * @brief Performs post for 1 ITrans
-                 */
-                virtual void post( wfa::ITrans * t, wfa::WFA& fa );
+        /*!
+         * @brief Performs the fixpoint computation
+         */
+        virtual void poststarComputeFixpoint( wfa::WFA& fa );
 
-                /*!
-                 * @brief helper method for poststar
-                 */
-                virtual void poststar_handle_eps_trans(
-                        wfa::ITrans *teps, 
-                        wfa::ITrans *tprime, 
-                        sem_elem_t delta
-                        );
+        /*!
+         * @brief Performs post for 1 ITrans
+         */
+        virtual void post( wfa::ITrans * t, wfa::WFA& fa );
 
-                /*!
-                 * @brief helper method for poststar
-                 */
-                virtual void poststar_handle_trans(
-                        wfa::ITrans * t ,
-                        wfa::WFA & ca   ,
-                        rule_t & r,
-                        sem_elem_t delta
-                        );
+        /*!
+         * @brief helper method for poststar
+         */
+        virtual void poststar_handle_eps_trans(
+            wfa::ITrans *teps, 
+            wfa::ITrans *tprime, 
+            sem_elem_t delta
+            );
 
-                /*!
-                 * @brief create a new temp state from two existing states
-                 *
-                 * gen_state is only used by poststar
-                 *
-                 * @return Key for new state
-                 */
-                virtual Key gen_state( Key state, Key stack );
+        /*!
+         * @brief helper method for poststar
+         */
+        virtual void poststar_handle_trans(
+            wfa::ITrans * t ,
+            wfa::WFA & ca   ,
+            rule_t & r,
+            sem_elem_t delta
+            );
 
-                /*!
-                 * @brief link input WFA transitions to Configs
-                 *
-                 * @see Config
-                 * @see wfa::ITrans
-                 * 
-                 */
-                //virtual void copy_and_link( wfa::WFA & in, wfa::WFA & out );
+        /*!
+         * @brief create a new temp state from two existing states
+         *
+         * gen_state is only used by poststar
+         *
+         * @return Key for new state
+         */
+        virtual Key gen_state( Key state, Key stack );
 
-                /*!
-                 * Create the Config for the state and stack KeyPair.
-                 * If the Config already exists just return that.
-                 *
-                 * @return Config pointer
-                 */
-                virtual Config * make_config( Key state, Key stack );
+        /*!
+         * @brief link input WFA transitions to Configs
+         *
+         * @see Config
+         * @see wfa::ITrans
+         * 
+         */
+        //virtual void copy_and_link( wfa::WFA & in, wfa::WFA & out );
 
-                /*!
-                 * Creates a rule that links two configurations.
-                 * If rule exists then combines the weight
-                 *
-                 * @return true if Rule already existed
-                 *
-                 * @see Config
-                 * @see sem_elem_t
-                 * @see rule_t
-                 */
-                virtual bool make_rule(
-                        Config *f,
-                        Config *t,
-                        Key stk2,
-                        sem_elem_t se,
-                        rule_t& r );
+        /*!
+         * Create the Config for the state and stack KeyPair.
+         * If the Config already exists just return that.
+         *
+         * @return Config pointer
+         */
+        virtual Config * make_config( Key state, Key stack );
 
-                /*!
-                 * Find config with KeyPair(state,stack)
-                 *
-                 * @return the Config * or 0 if it doesn't exist
-                 *
-                 * @see Config
-                 * @see KeyPair
-                 */
-                virtual Config * find_config( Key state, Key stack );
+        /*!
+         * Creates a rule that links two configurations.
+         * If rule exists then combines the weight
+         *
+         * @return true if Rule already existed
+         *
+         * @see Config
+         * @see sem_elem_t
+         * @see rule_t
+         */
+        virtual bool make_rule(
+            Config *f,
+            Config *t,
+            Key stk2,
+            sem_elem_t se,
+            rule_t& r );
 
-                /*! @brief helper method for fixpoint loop
-                 *
-                 * return true if wfa::ITrans was retrieved from
-                 * worklist, false if worklist is empty
-                 */
-                virtual bool get_from_worklist( wfa::ITrans * & );
+        /*!
+         * Find config with KeyPair(state,stack)
+         *
+         * @return the Config * or 0 if it doesn't exist
+         *
+         * @see Config
+         * @see KeyPair
+         */
+        virtual Config * find_config( Key state, Key stack );
 
-                /*!
-                 * @brief helper function to create and link a transition
-                 *
-                 */
-                virtual void update(
-                        Key from
-                        , Key stack
-                        , Key to
-                        , sem_elem_t se
-                        , Config * cfg
-                        );
+        /*! @brief helper method for fixpoint loop
+         *
+         * return true if wfa::ITrans was retrieved from
+         * worklist, false if worklist is empty
+         */
+        virtual bool get_from_worklist( wfa::ITrans * & );
 
-                /*!
-                 * update_prime does not need to take a Config b/c no Config
-                 * will match a transition that is created here. The from state
-                 * is not \in WFA.P. Therefore we do not need to add it to the
-                 * worklist.
-                 *
-                 * @return generated transition
-                 */
-                virtual wfa::ITrans* update_prime(
-                    Key from, //<! Guaranteed to be a generated state
-                    wfa::ITrans* call, //<! The call transition
-                    rule_t r, //<! The push rule
-                    sem_elem_t delta, //<! Delta change on the call transition
-                    sem_elem_t wWithRule //<! delta \extends r->weight()
-                    );
+        /*!
+         * @brief helper function to create and link a transition
+         *
+         */
+        virtual void update(
+            Key from
+            , Key stack
+            , Key to
+            , sem_elem_t se
+            , Config * cfg
+            );
 
-                /*!
-                 * @return const chash_t reference
-                 */
-                const chash_t & config_map() const {
-                    return configs;
-                }
+        /*!
+         * update_prime does not need to take a Config b/c no Config
+         * will match a transition that is created here. The from state
+         * is not \in WFA.P. Therefore we do not need to add it to the
+         * worklist.
+         *
+         * @return generated transition
+         */
+        virtual wfa::ITrans* update_prime(
+            Key from, //<! Guaranteed to be a generated state
+            wfa::ITrans* call, //<! The call transition
+            rule_t r, //<! The push rule
+            sem_elem_t delta, //<! Delta change on the call transition
+            sem_elem_t wWithRule //<! delta \extends r->weight()
+            );
 
-                /*!
-                 * @return chash_t reference
-                 */
-                chash_t & config_map() {
-                    return configs;
-                }
+        /*!
+         * @return const chash_t reference
+         */
+        const chash_t & config_map() const {
+          return configs;
+        }
 
-            private: // methods
+        /*!
+         * @return chash_t reference
+         */
+        chash_t & config_map() {
+          return configs;
+        }
 
-            protected: // data members
-                Wrapper * wrapper;
-                ref_ptr< Worklist<wfa::ITrans> > worklist;
-                chash_t configs;
-                std::set< Config * > rule_zeroes;
-                r2hash_t r2hash;
-                wfa::WFA* currentOutputWFA;
-                sem_elem_t theZero;
-                std::set<wali::Key> pds_states; // set of PDS states
-          
-            private:
+      private: // methods
 
-        };
+      protected: // data members
+        Wrapper * wrapper;
+        ref_ptr< Worklist<wfa::ITrans> > worklist;
+        chash_t configs;
+        std::set< Config * > rule_zeroes;
+        r2hash_t r2hash;
+        wfa::WFA* currentOutputWFA;
+        sem_elem_t theZero;
+        std::set<wali::Key> pds_states; // set of PDS states
 
-    } // namespace wpds
+      private:
+
+    };
+
+  } // namespace wpds
 
 } // namespace wali
 
 #endif  // wali_wpds_WPDS_GUARD
 
 /* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
-*/
+   ;;; Local Variables: ***
+   ;;; tab-width: 4 ***
+   ;;; End: ***
+   */

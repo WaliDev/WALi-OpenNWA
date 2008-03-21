@@ -1,7 +1,6 @@
 /*!
  * @author Nick Kidd
- *
- * $Id$
+ * @author Akash Lal
  */
 
 #include "wali/Common.hpp"
@@ -781,10 +780,10 @@ namespace wali
         /////////////////////////////////////////////////////////////////
         void WPDS::operator()( wfa::ITrans* orig )
         {
-          if( is_pds_state(orig->to())) {
+          if( is_strict() && is_pds_state(orig->to())) {
             *waliErr << "WALi Error: cannot have incoming transition to a PDS state\n";
             orig->print( *waliErr << "    ") << std::endl;
-            assert(0);
+            //assert(0);
           }
 
           Config* c = make_config( orig->from(),orig->stack() );
@@ -805,8 +804,7 @@ namespace wali
 
 } // namespace wali
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-*/
+/*
+ * $Id$
+ */
+

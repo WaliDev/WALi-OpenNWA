@@ -359,24 +359,24 @@ namespace wali
 
             void EWPDS::operator()( wfa::ITrans * orig )
             {
-                if( is_pds_state(orig->to())) {
-                  *waliErr << "WALi Error: cannot have incoming transition to a PDS state\n";
-                  assert(0);
-                }
+              if( is_strict() && is_pds_state(orig->to())) {
+                *waliErr << "WALi Error: cannot have incoming transition to a PDS state\n";
+                assert(0);
+              }
 
-                Config *c = make_config( orig->from(),orig->stack() );
-                sem_elem_t se = (wrapper == 0) ? orig->weight() : wrapper->wrap(*orig);
+              Config *c = make_config( orig->from(),orig->stack() );
+              sem_elem_t se = (wrapper == 0) ? orig->weight() : wrapper->wrap(*orig);
 
-                wfa::ITrans *t = orig->copy();
+              wfa::ITrans *t = orig->copy();
 
-                t->setConfig(c);
-                t->setWeight(se);
+              t->setConfig(c);
+              t->setWeight(se);
 
-                // fa.addTrans takes ownership of passed in pointer
-                currentOutputWFA->addTrans( t );
+              // fa.addTrans takes ownership of passed in pointer
+              currentOutputWFA->addTrans( t );
 
-                // add t to the worklist for saturation
-                worklist->put( t );
+              // add t to the worklist for saturation
+              worklist->put( t );
             }
 
             wfa::ITrans* EWPDS::update_prime(

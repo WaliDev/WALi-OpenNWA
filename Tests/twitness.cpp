@@ -53,10 +53,13 @@ void dot()
 
     // false branch
     pds->add_rule(p,n0,p,n2,R->one());
+    pds->add_rule(p,n0,p,n2,R->one());
     //pds->print( std::cout << "\n---- WPDS ----\n" ) << std::endl;
 
     // join point
     pds->add_rule(p,n1,p,n3,R->one());
+    pds->add_rule(p,n1,p,n3,R->one());
+    pds->add_rule(p,n2,p,n3,R->one());
     pds->add_rule(p,n2,p,n3,R->one());
 
     pds->print( std::cout << "---- WPDS ----\n" ) << std::endl;
