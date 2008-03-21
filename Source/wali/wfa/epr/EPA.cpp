@@ -108,7 +108,7 @@ namespace wali {
             return res;
           }
         }
-        
+
         // Continue processing the worklist
         while(!wl.empty()) {
           
@@ -116,7 +116,7 @@ namespace wali {
           
           sem_elem_t delta = q->delta();
           q->delta() = ZERO;
-          
+
           // propagate weight from q to its successors
           TransSet::iterator it;
           for(it = q->begin() ; it != q->end(); it ++) {
@@ -134,7 +134,7 @@ namespace wali {
             
             qprime->weight() = qprime->weight()->combine(cd.first);
             qprime->delta() = qprime->delta()->combine(cd.second);
-            
+
             // Put back into the worklist if necessary
             if( !qprime->delta()->equal(ZERO) ) {
               wl.put(qprime);

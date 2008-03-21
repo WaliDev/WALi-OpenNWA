@@ -324,6 +324,25 @@ namespace wali
         Key q,
         Trans & t )
     {
+      ITrans *itrans = find(p,g,q);
+      if(itrans != 0) {
+        t = *itrans;
+        return true;
+      }
+      return false;
+    }
+
+    //
+    // Finds Trans(p,g,q) and returns a pointer to it
+    // (null if not found)
+    // This should only be used by friend classes because
+    // it exposes a pointer to inside the WFA
+    //
+    ITrans* WFA::find( 
+                      Key p,
+                      Key g,
+                      Key q)
+    {
       KeyPair kp(p,g);
       kp_map_t::iterator it = kpmap.find(kp);
       if( it != kpmap.end() )
@@ -332,12 +351,12 @@ namespace wali
         TransSet::iterator tsit= transSet.find(p,g,q);
         if( tsit != transSet.end() ) {
           ITrans* itrans = *tsit;
-          t = *itrans;
-          return true; // Return true b/c we found the ITrans
+          return itrans;
         }
       }
-      return false;
+      return 0;
     }
+
 
     void WFA::for_each( ConstTransFunctor & tf ) const
     {

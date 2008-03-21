@@ -462,6 +462,11 @@ namespace wali
          */
         void setupFixpoint( Worklist<State>& wl, PredHash_t& preds, sem_elem_t wtFinal );
 
+        virtual ITrans * find( 
+                              Key p,
+                              Key g,
+                              Key q);
+
         /*!
          * Erases the specified Trans(from,stack,to) from the
          * kpmap and epsmap. A null return value means no transition existed.

@@ -113,18 +113,18 @@ namespace wali
 
 
                     // Both these versions are provided for EWPDS via WPDS
-                    // void prestar( WFA & input, WFA & output );
-                    // void prestar( WFA & input);
+                    // void poststar( WFA & input, WFA & output );
+                    // void poststar( WFA & input);
 
                     /*!
-                     * @brief Perform poststar reachability query
+                     * @brief Perform prestar reachability query
                      *
                      * @param input
                      * @param output
                      *
                      * @see WFA
                      */
-                    virtual void poststar( WFA & input, WFA& output );
+                    virtual void prestar( WFA & input, WFA& output );
 
                     /*!
                      * This method writes the EWPDS to the passed in 
@@ -188,7 +188,21 @@ namespace wali
                             sem_elem_t delta
                             );
 
-                    //void copy_and_link_and_pair( const WFA & in, WFA & dest );
+                    virtual void update_etrans(
+                                               Key from
+                                               , Key stack
+                                               , Key to
+                                               , sem_elem_t se
+                                               , Config * cfg
+                                               );
+              
+                    virtual void update(
+                                        Key from
+                                        , Key stack
+                                        , Key to
+                                        , sem_elem_t se
+                                        , Config * cfg
+                                        );
 
                     virtual wfa::ITrans* update_prime(
                         Key from, //<! Guaranteed to be a generated state
@@ -200,8 +214,8 @@ namespace wali
 
                 private:
                     merge_rule_hash_t merge_rule_hash; // FIXME: verify correct usage of HashMap
-                    bool usePairsDuringCopy;
-
+                protected:
+                    bool addEtrans; // Used during update()
             }; // class EWPDS
 
         } // namespace ewpds

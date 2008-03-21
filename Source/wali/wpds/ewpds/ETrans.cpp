@@ -34,6 +34,13 @@ namespace wali {
       {
       }
 
+      std::ostream& ETrans::print( std::ostream& o ) const {
+        o << "[ETRANS] ";
+        return getDelegate()->print(o);
+      }
+          
+
+
       wfa::ITrans* ETrans::copy() const {
         return new ETrans(getDelegate()->copy(),wAtCall,erule);
       }
@@ -67,7 +74,7 @@ namespace wali {
         // TODO - change dynamic_cast to static_cast 
         //        When happy with impl.
         ETrans* e = dynamic_cast<ETrans*>(tp);
-        if( e != 0) {
+        if( e != 0 && wAtCall.is_valid()) {
           // Need to update wAtCall
           wAtCall = wAtCall->combine(e->wAtCall);
         }

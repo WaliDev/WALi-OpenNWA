@@ -37,25 +37,6 @@
 #include <iostream>
 #include <cassert>
 
-namespace wali {
-  namespace wpds {  
-    namespace ewpds {
-      class TransPairCollapse : public wali::wfa::TransFunctor
-      {
-        public:
-          TransPairCollapse() { }
-          virtual ~TransPairCollapse() { }
-          virtual void operator()( ::wali::wfa::ITrans * orig )
-          {
-            orig->setWeight(orig->weight());
-          }
-
-      };
-    }
-  }
-}
-
-
 namespace wali
 {
     using wfa::TransSet;
@@ -69,7 +50,7 @@ namespace wali
         namespace ewpds
         {
 
-            EWPDS::EWPDS( Wrapper * wrapper ) : WPDS(wrapper), usePairsDuringCopy(false)
+            EWPDS::EWPDS( Wrapper * wrapper ) : WPDS(wrapper), addEtrans(false)
             { }
 
 
@@ -170,6 +151,7 @@ namespace wali
                 return rhash_it->second;
             }
 
+            // delta is the delta weight on t2
             void EWPDS::prestar_handle_call(
                     wfa::ITrans* t1,
                     wfa::ITrans* t2,
@@ -177,29 +159,42 @@ namespace wali
                     sem_elem_t delta
                     )
             {
-                //std::cout << "Prestar_handle_call:\n";
-                //t1->print(std::cout << "t1: ") << "\n";
-                //t2->print(std::cout << "t2: ") << "\n";
-                //r->print(std::cout << "r: ") << "\n";
+              //std::cout << "Prestar_handle_call:\n";
+              //t1->print(std::cout << "Trans1 = ") << "\n";
+              //t2->print(std::cout << "Trans2 = ") << "\n";
+              //delta->print(std::cout << "delta = ") << "\n";
+              //r->print(std::cout << "r = ") << "\n";
 
-                if(!is_pds_state(t2->from())) {
-                  // f(r) * t1
-                  sem_elem_t wrtp = r->weight()->extend( t1->weight() );
-                  
-                  // f(r) * t2 * delta
-                  sem_elem_t wnew = wrtp->extend( delta );
-                  
-                  // update
-                  update( r->from()->state(), r->from()->stack(), t2->to(),
-                          wnew,r->from() );
-                } else { // apply merge function
+                ETrans *et1 = dynamic_cast<ETrans *> (t1);
+                ETrans *et2 = dynamic_cast<ETrans *> (t2);
+
+                assert(!(et1 == 0 && et2 != 0));
+
+                sem_elem_t w1, wNew;
+
+                // Compute weight on the resulting transition
+                if(et1 != 0) {
                   erule_t er = (ERule *)(r.get_ptr());
-                  sem_elem_t w1 = er->merge_fn()->apply_f( t1->weight()->one(), t1->weight());
-                  sem_elem_t wnew = w1->extend(delta);
-                  // update
-                  update( r->from()->state(), r->from()->stack(), t2->to(),
-                          wnew,r->from() );
+                  w1 = er->merge_fn()->apply_f(t1->weight()->one(), t1->weight());
+                  wNew = w1->extend(delta);
+                } else {
+                  w1 = r->weight()->extend(t1->weight());
                 }
+                wNew = w1->extend(delta);
+
+                // Find the appropriate type for the resulting transition
+                if(et2 != 0) {
+                  // Create ETrans
+
+                  update_etrans( r->from()->state(), r->from()->stack(), t2->to(),
+                                 wNew,r->from() );
+
+                } else {
+                  // Create Trans
+                  update( r->from()->state(), r->from()->stack(), t2->to(),
+                          wNew,r->from() );
+                }
+
             }
 
             void EWPDS::prestar_handle_trans(
@@ -209,21 +204,35 @@ namespace wali
                     sem_elem_t delta
                     )
             {
-                //std::cout << "Prestar_handle_trans:\n";
-                //t->print(std::cout << "t: ") << "\n";
-                //r->print(std::cout << "r: ") << "\n";
+              //std::cout << "Prestar_handle_trans:\n";
+              //t->print(std::cout << "Trans = ") << "\n";
+              //delta->print(std::cout << "delta = ") << "\n";
+              //r->print(std::cout << "r = ") << "\n";
 
-                sem_elem_t wrule_trans;
-                if(r->stack2() == WALI_EPSILON || !is_pds_state(t->to())) {
-                    wrule_trans = r->weight()->extend( delta );
-                } else { // apply merge function
-                    erule_t er = (ERule *)(r.get_ptr());
-                    wrule_trans = er->merge_fn()->apply_f(delta->one(), delta);
-                }
+                ETrans *et = dynamic_cast<ETrans *>(t);
+
                 Key fstate = r->from()->state();
                 Key fstack = r->from()->stack();
 
-                if( r->is_rule2() ) {
+                sem_elem_t wrule_trans;
+                if(r->stack2() == WALI_EPSILON) {
+                    wrule_trans = r->weight()->extend( delta );
+
+                    if(et != 0) {
+                      update_etrans( fstate, fstack, t->to(), wrule_trans, r->from() );
+                    } else {
+                      update( fstate, fstack, t->to(), wrule_trans, r->from() );
+                    }
+
+                } else { 
+                    erule_t er = (ERule *)(r.get_ptr());
+
+                    if(et == 0) {
+                      wrule_trans = r->weight()->extend( delta );
+                    } else {
+                      wrule_trans = er->merge_fn()->apply_f(delta->one(), delta);
+                    }
+
                     KeyPair kp( t->to(),r->stack2() );
                     WFA::kp_map_t::iterator kpit = fa.kpmap.find( kp );
                     WFA::kp_map_t::iterator kpitEND = fa.kpmap.end();
@@ -236,29 +245,33 @@ namespace wali
                         {
                             wfa::ITrans* tprime = *tsit;
                             sem_elem_t wtp = wrule_trans->extend( tprime->weight() );
-                            update( fstate, fstack, tprime->to(), wtp, r->from() );
+
+                            ETrans *etprime = dynamic_cast<ETrans *> (tprime);
+                            if(etprime == 0) {
+                              update( fstate, fstack, tprime->to(), wtp, r->from() );
+                            } else {
+                              assert(et != 0);
+                              update_etrans( fstate, fstack, tprime->to(), wtp, r->from() );
+                            }
                         }
                     }
                 }
-                else {
-                    update( fstate, fstack, t->to(), wrule_trans, r->from() );
-                }
             }
 
-            void EWPDS::poststar( WFA & input, WFA& fa )
+
+            void EWPDS::prestar( WFA & input, WFA& fa )
             {
-                usePairsDuringCopy = true;
 
-                poststarSetupFixpoint(input, fa);
-                poststarComputeFixpoint(fa);
+                // Add ETrans when Rule0 transitions are added
+                addEtrans = true;
+                prestarSetupFixpoint(input, fa);
+                addEtrans = false;
 
-                // convert back from <se,se> to se
-                TransPairCollapse tpc;
-                fa.for_each( tpc );
-
+                prestarComputeFixpoint(fa);
+                unlinkOutput(fa);
                 currentOutputWFA = 0;
-                usePairsDuringCopy = false;
             }
+
 
             void EWPDS::poststar_handle_trans(
                     wfa::ITrans * t ,
@@ -377,6 +390,44 @@ namespace wali
 
               // add t to the worklist for saturation
               worklist->put( t );
+            }
+
+            void EWPDS::update_etrans(
+                                      Key from,
+                                      Key stack,
+                                      Key to,
+                                      sem_elem_t se,
+                                      Config * cfg
+                                      )
+            {
+
+              addEtrans = true;
+              update(from, stack, to, se, cfg);
+              addEtrans = false;
+            }
+
+            void EWPDS::update(
+                               Key from,
+                               Key stack,
+                               Key to,
+                               sem_elem_t se,
+                               Config * cfg
+                               )
+            {
+              
+              wfa::ITrans *t;
+              if(addEtrans) {
+                t = currentOutputWFA->insert(new ETrans(from, stack, to,
+                                                        0, se, 0));
+              } else {
+                t = currentOutputWFA->insert(new wfa::Trans(from, stack, to, se));
+              }
+
+              t->setConfig(cfg);
+              if (t->modified()) {
+                //t->print(std::cout << "Adding transition: ") << "\n";
+                worklist->put( t );
+              }
             }
 
             wfa::ITrans* EWPDS::update_prime(

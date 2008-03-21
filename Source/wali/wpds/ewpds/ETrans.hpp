@@ -31,6 +31,8 @@ namespace wali {
 
           virtual ~ETrans();
 
+          virtual std::ostream& print( std::ostream& o ) const;
+
           /*! @return the merge function of this ETrans */
           merge_fn_t getMergeFn() const;
 

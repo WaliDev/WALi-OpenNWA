@@ -284,10 +284,10 @@ namespace wali
                 {
                     rule_t & r = *lsit;
 
-                    Trans tp;
-                    if( fa.find(r->to_state(),r->to_stack1(),t->from(),tp) )
+                    wfa::ITrans *tp = fa.find(r->to_state(),r->to_stack1(),t->from());
+                    if(tp != 0)
                     {
-                        prestar_handle_call(&tp, t, r, dnew);
+                        prestar_handle_call(tp, t, r, dnew);
                     }
                 }
             }
@@ -741,7 +741,8 @@ namespace wali
                 Key stack,
                 Key to,
                 sem_elem_t se,
-                Config * cfg )
+                Config * cfg
+                )
         {
           wfa::ITrans*t = currentOutputWFA->insert(new Trans(from,stack,to,se));
           t->setConfig(cfg);

@@ -131,8 +131,10 @@ std::ostream& graphPrintKey( int k, std::ostream& o ) {
 
 void FWPDS::prestar( wfa::WFA& input, wfa::WFA& output )
 {
-  // setup output
-  EWPDS::prestarSetupFixpoint(input,output);
+    // setup output
+    addEtrans = true;
+    EWPDS::prestarSetupFixpoint(input,output);
+    addEtrans = false;
 
   // If theZero is invalid, then there
   // are no rules and not saturation to 
@@ -187,21 +189,54 @@ void FWPDS::prestar_handle_call(wfa::ITrans *t1,
     return EWPDS::prestar_handle_call(t1, t2, r, delta);
   }
 
-  if(!is_pds_state(t2->from())) {
+  LazyTrans *lt1 = static_cast<LazyTrans *>(t1);
+  LazyTrans *lt2 = static_cast<LazyTrans *>(t2);
+
+  ETrans *et1 = lt1->getETrans();
+  ETrans *et2 = lt2->getETrans();
+
+  assert(!(et1 == 0 && et2 != 0));
+
+  if(et1 != 0) {
+    ERule *er = (ERule *)(r.get_ptr());
     interGr->addEdge(Transition(*t2),
+<<<<<<< .mine
+                     Transition(*t1),
+                     Transition(r->from()->state(), r->from()->stack(),t2->to()),
+                     er->merge_fn().get_ptr() );
+  } else {
+=======
         Transition(*t1),
         Transition(r->from()->state(), r->from()->stack(),t2->to()),
         r->weight() );    
   } else { // apply merge function
     ERule *er = (ERule *)(r.get_ptr());
+>>>>>>> .r383
     interGr->addEdge(Transition(*t2),
+<<<<<<< .mine
+                     Transition(*t1),
+                     Transition(r->from()->state(), r->from()->stack(),t2->to()),
+                     r->weight() );    
+=======
         Transition(*t1),
         Transition(r->from()->state(), r->from()->stack(),t2->to()),
         er->merge_fn().get_ptr() );
+>>>>>>> .r383
   }
+
   // update
+<<<<<<< .mine
+  if(et2 != 0) {
+    update_etrans( r->from()->state(), r->from()->stack(), t2->to(),
+                   wghtOne,r->from() );
+  } else {
+    update( r->from()->state(), r->from()->stack(), t2->to(),
+            wghtOne,r->from() );
+  }
+=======
   update( r->from()->state(), r->from()->stack(), t2->to(),
       wghtOne,r->from() );
+>>>>>>> .r383
 
 }
 
@@ -221,6 +256,7 @@ void FWPDS::prestar_handle_trans(
     return EWPDS::prestar_handle_trans(t, fa, r, delta);
   }
 
+
   Key fstate = r->from()->state();
   Key fstack = r->from()->stack();
 
@@ -235,16 +271,34 @@ void FWPDS::prestar_handle_trans(
       wfa::TransSet & transSet = kpit->second;
       for( tsit = transSet.begin(); tsit != transSet.end(); tsit++ )
       {
+<<<<<<< .mine
+        wfa::TransSet & transSet = kpit->second;
+        for( tsit = transSet.begin(); tsit != transSet.end(); tsit++ )
+          {
+            wfa::ITrans* tprime = *tsit;
+            // Can call this function because delta is not used
+            prestar_handle_call(t, tprime, r, delta);
+          }
+=======
         wfa::ITrans* tprime = *tsit;
         prestar_handle_call(t, tprime, r, delta);
+>>>>>>> .r383
       }
     }
   }
   else {
+    LazyTrans *lt = static_cast<LazyTrans *> (t);
+    ETrans *et = lt->getETrans();
+
     interGr->addEdge(Transition(*t),
         Transition(fstate,fstack,t->to()),
         r->weight());
-    update( fstate, fstack, t->to(), wghtOne, r->from() );
+    if(et != 0) {
+      update_etrans( fstate, fstack, t->to(), wghtOne, r->from() );
+    } else {
+      update( fstate, fstack, t->to(), wghtOne, r->from() );
+    }
+
   }
 }
 
@@ -457,8 +511,17 @@ void FWPDS::update(
     return EWPDS::update(from, stack, to, se, cfg);
   }
 
-  LazyTrans * lt = new LazyTrans(from,stack,to,se,cfg);
-  wfa::ITrans *t = currentOutputWFA->insert(lt);
+  wfa::ITrans *t;
+  if(addEtrans) {
+    t = new ETrans(from, stack, to, 0, se, 0);
+  } else {
+    t = new wfa::Trans(from, stack, to, se);
+  }
+  t->setConfig(cfg);
+
+  LazyTrans * lt = new LazyTrans(t);
+  t = currentOutputWFA->insert(lt);
+
   if( t->modified() ) {
     //t->print(std::cout << "Adding transition: ") << "\n";
     worklist->put( t );
