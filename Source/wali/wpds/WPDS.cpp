@@ -29,54 +29,66 @@
 //
 namespace wali
 {
-    using wfa::Trans;
-    using wfa::TransSet;
-    using wfa::WFA;
-    using wfa::State;
+  using wfa::Trans;
+  using wfa::TransSet;
+  using wfa::WFA;
+  using wfa::State;
 
-    namespace wpds
+  namespace wpds
+  {
+
+    const std::string WPDS::XMLTag("WPDS");
+
+    WPDS::WPDS() :
+      wrapper(0),
+      worklist( new DefaultWorklist<wfa::ITrans>() ),
+      currentOutputWFA(0)
     {
+    }
 
-        const std::string WPDS::XMLTag("WPDS");
+    WPDS::WPDS( Wrapper * w ) :
+      wrapper(w),
+      worklist( new DefaultWorklist<wfa::ITrans>() ),
+      currentOutputWFA(0)
+    {
+    }
 
-        WPDS::WPDS() :
-            wrapper(0)
-                ,worklist( new DefaultWorklist<wfa::ITrans>() )
-                ,currentOutputWFA(0)
-        {
-        }
+    WPDS::~WPDS()
+    {
+      //*waliErr << "~WPDS()" << std::endl;
+      clear();
+    }
 
-        WPDS::WPDS( Wrapper * w ) :
-            wrapper(w)
-                ,worklist( new DefaultWorklist<wfa::ITrans>() )
-                ,currentOutputWFA(0)
-        {
-        }
+    void WPDS::clear()
+    {
+      /* Delete allocated Config objects */
+      chash_t::iterator cit = config_map().begin();
+      chash_t::iterator citEND = config_map().end();
 
-        WPDS::~WPDS()
-        {
-            //*waliErr << "~WPDS()" << std::endl;
-            clear();
-        }
+      for( ; cit != citEND ; cit++ )
+      {
+        Config* c = cit->second;
+        assert(c);
+        delete c;
+        cit->second = 0;
+      }
 
-        void WPDS::clear()
-        {
-            /* Delete allocated Config objects */
-            chash_t::iterator cit = config_map().begin();
-            chash_t::iterator citEND = config_map().end();
-            for( ; cit != citEND ; cit++ )
-            {
-                Config* c = cit->second;
-                delete c;
-                cit->second = 0;
-            }
-            /* clear everything */
-            config_map().clear();
-            rule_zeroes.clear();
-            r2hash.clear();
-            worklist->clear();
-            pds_states.clear();
-        }
+      /* clear everything */
+      config_map().clear();
+      //*waliErr << "  1. Cleared config_map()" << std::endl;
+
+      rule_zeroes.clear();
+      //*waliErr << "  2. Cleared rule_zeroes()" << std::endl;
+
+      r2hash.clear();
+      //*waliErr << "  3. Cleared r2hash()" << std::endl;
+
+      worklist->clear();
+      //*waliErr << "  4. Cleared worklist()" << std::endl;
+
+      pds_states.clear();
+      //*waliErr << "  5. Cleared pds_states()" << std::endl;
+    }
 
         /*!
          * Set the worklist used for pre and poststar queries.
@@ -582,59 +594,58 @@ namespace wali
                 rule_t& r
                 )
         {
-            // Every rule must have these 3 pieces defined
-            assert( from_state != WALI_EPSILON );
-            assert( from_stack != WALI_EPSILON );
-            assert( to_state   != WALI_EPSILON );
-            Config *from = make_config(from_state,from_stack);
-            Config *to = make_config(to_state,to_stack1);
+          // Every rule must have these 3 pieces defined
+          // TODO - raise an exception?
+          assert( from_state != WALI_EPSILON );
+          assert( from_stack != WALI_EPSILON );
+          assert( to_state   != WALI_EPSILON );
+          Config *from = make_config(from_state,from_stack);
+          Config *to = make_config(to_state,to_stack1);
 
-            pds_states.insert(from_state);
-            pds_states.insert(to_state);
+          // make_rule will create links b/w Configs and the Rule
+          r = new Rule(from, to, to_stack2, se);
+          bool rb = make_rule(from,to,to_stack2,se,r);
 
-            // make_rule will create links b/w Configs and the Rule
-            r = new Rule(from, to, to_stack2, se);
-            bool rb = make_rule(from,to,to_stack2,se,r);
-
-            // if rb is false then the rule is new
-            if( !rb ) {
-              if( to_stack1 == WALI_EPSILON )
-              {
-                // Invariant assertion.
-                assert( to_stack2 == WALI_EPSILON );
-                rule_zeroes.insert( to );
-              }
-              if( to_stack2 != WALI_EPSILON ) {
-                r2hash_t::iterator r2it = r2hash.find( to_stack2 );
-                if( r2it == r2hash.end() ) {
-                  std::list< rule_t > ls;
-                  r2it = r2hash.insert( to_stack2,ls ).first;
-                }
-                r2it->second.push_back( r );
-              }
+          // if rb is false then the rule is new
+          if( !rb ) {
+            if( to_stack1 == WALI_EPSILON )
+            {
+              // Invariant assertion.
+              assert( to_stack2 == WALI_EPSILON );
+              rule_zeroes.insert( to );
             }
-            // Set up theZero weight
-            if (!theZero.is_valid() && r->weight().is_valid())
-              theZero = r->weight()->zero();
-            return rb;
+            else if( to_stack2 != WALI_EPSILON ) {
+              r2hash_t::iterator r2it = r2hash.find( to_stack2 );
+              if( r2it == r2hash.end() ) {
+                std::list< rule_t > ls;
+                r2it = r2hash.insert( to_stack2,ls ).first;
+              }
+              r2it->second.push_back( r );
+            }
+          }
+          // Set up theZero weight
+          if (!theZero.is_valid() && r->weight().is_valid())
+            theZero = r->weight()->zero();
+          return rb;
         }
 
-        //
-        // link input WFA transitions to Configs
-        //
-        //void WPDS::copy_and_link( WFA & in, WFA & dest )
-        //{
-        //   in.for_each( *this );
-        //}
-
+        /*!
+         * Creates a Config if one does not already exist
+         * with KeyPair (state,stack).
+         *
+         * @return Config(state,stack)
+         */
         Config * WPDS::make_config( Key state, Key stack )
         {
-            Config *cf = find_config( state,stack );
-            if( 0 == cf ) {
-                cf = new Config(state,stack);
-                config_map().insert( KeyPair(state,stack),cf );
-            }
-            return cf;
+          Config *cf = find_config( state,stack );
+          if( 0 == cf ) {
+            cf = new Config(state,stack);
+            KeyPair kp(state,stack);
+            config_map().insert( kp,cf );
+            // Might cut down just a bit on adding states
+            pds_states.insert(state);
+          }
+          return cf;
         }
 
         /*!
@@ -655,50 +666,51 @@ namespace wali
                 sem_elem_t se,
                 rule_t& r )
         {
-            bool rb = false;
-            Config::iterator it = f->begin();
-            Config::iterator itEND = f->end();
+          bool exists = false;
+          Config::iterator it = f->begin();
+          Config::iterator itEND = f->end();
 
-            for( ; it != itEND; it++ )
+          for( ; it != itEND; it++ ) {
+            rule_t tmp = *it;
+            if( tmp->f == f && tmp->t == t && tmp->to_stack2() == stk2 )
             {
-                rule_t &tmp = *it;
-                if( tmp->f == f && tmp->t == t && tmp->to_stack2() == stk2 )
-                {
-                    rb = true;
-                    if( wrapper ) {
-                        // FIXME: Should we combine user weights at bottom
-                        // of stack?
-                        sem_elem_t combinedWeight = se->combine(wrapper->unwrap(tmp->se));
-                        tmp->se = combinedWeight;
-                        tmp->weight( wrapper->wrap(*tmp) );
-                        //rule_t wrapTmp =  new Rule(f,t,stk2,se);
-                        //tmp->se = tmp->se->combine(wrapper->wrap(*wrapTmp));
-                    }
-                    else {
-                        tmp->se = tmp->se->combine(se);
-                    }
-                    r = tmp;
-                    break;
-                }
+              exists = true;
+              if( wrapper ) {
+                // FIXME: Should we combine user weights at bottom
+                // of stack?
+                sem_elem_t combinedWeight = se->combine(wrapper->unwrap(tmp->se));
+                tmp->se = combinedWeight;
+                tmp->setWeight( wrapper->wrap(*tmp) );
+                //rule_t wrapTmp =  new Rule(f,t,stk2,se);
+                //tmp->se = tmp->se->combine(wrapper->wrap(*wrapTmp));
+              }
+              else {
+                sem_elem_t x = tmp->weight()->combine(se);
+                tmp->setWeight(x);
+              }
+              r = tmp;
+              break;
             }
-            if( !rb ) {
-                if( wrapper ) {
-                    r->weight( wrapper->wrap(*r) );
-                }
-                f->insert(r);
-                t->rinsert(r);
+          }
+          if( !exists ) {
+            if( wrapper ) {
+              r->setWeight( wrapper->wrap(*r) );
             }
-            return rb;
+            f->insert(r);
+            t->rinsert(r);
+          }
+          return exists;
         }
 
         Config * WPDS::find_config( Key state, Key stack )
         {
-            Config *cf = 0;
-            KeyPair kp(state,stack);
-            iterator it = config_map().find(kp);
-            if( it != config_map().end() )
-                cf = it->second;
-            return cf;
+          Config *cf = 0;
+          KeyPair kp(state,stack);
+          iterator it = config_map().find(kp);
+          if( it != config_map().end() ) {
+            cf = it->second;
+          }
+          return cf;
         }
 
         /////////////////////////////////////////////////////////////////
@@ -767,23 +779,23 @@ namespace wali
         /////////////////////////////////////////////////////////////////
         void WPDS::operator()( wfa::ITrans* orig )
         {
-            if( is_pds_state(orig->to())) {
-              *waliErr << "WALi Error: cannot have incoming transition to a PDS state\n";
-              assert(0);
-            }
+          if( is_pds_state(orig->to())) {
+            *waliErr << "WALi Error: cannot have incoming transition to a PDS state\n";
+            assert(0);
+          }
 
-            Config *c = make_config( orig->from(),orig->stack() );
-            wfa::ITrans*t = orig->copy();
-            t->setConfig(c);
-            if (wrapper) {
-                t->setWeight( wrapper->wrap(*orig) );
-            }
+          Config* c = make_config( orig->from(),orig->stack() );
+          wfa::ITrans* t = orig->copy();
+          t->setConfig(c);
+          if (wrapper) {
+            t->setWeight( wrapper->wrap(*orig) );
+          }
 
-            // fa.addTrans takes ownership of passed in pointer
-            currentOutputWFA->addTrans( t );
+          // fa.addTrans takes ownership of passed in pointer
+          currentOutputWFA->addTrans( t );
 
-            // add t to the worklist for saturation
-            worklist->put( t );
+          // add t to the worklist for saturation
+          worklist->put( t );
         }
 
     } // namespace wpds

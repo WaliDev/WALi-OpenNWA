@@ -117,7 +117,7 @@ namespace wali
                  * @param wnew the new weight for the rule
                  * @return void
                  */
-                void weight( sem_elem_t wnew );
+                void setWeight( sem_elem_t wnew );
 
                 /*!
                  * overrides (implements) Printable::print method

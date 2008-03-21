@@ -75,7 +75,7 @@ namespace wali
         sem_elem_t Rule::weight() { return se; }
         
         /*! sets the weight of the Rule */
-        void Rule::weight( sem_elem_t wnew )
+        void Rule::setWeight( sem_elem_t wnew )
         {
             se = wnew;
         }
