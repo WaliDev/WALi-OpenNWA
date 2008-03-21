@@ -55,6 +55,7 @@ namespace wali
           virtual wali::wpds::ewpds::ETrans *getETrans();
 
           virtual wfa::ITrans* copy() const;
+          virtual wfa::ITrans* copy(Key f, Key s, Key t) const;
 
           virtual const sem_elem_t weight() const throw();
 

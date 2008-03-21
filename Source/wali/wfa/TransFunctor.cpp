@@ -30,6 +30,37 @@ namespace wali
     }
 
     /***********
+     * TransDuplicator
+     ***********/
+    void TransDuplicator::operator()( const ITrans* t )
+    {
+      ITrans *tc;
+      std::map< Key, Key >::iterator fit, tit, eit;
+      fit = dup.find(t->from());
+      tit = dup.find(t->to());
+      eit = dup.end();
+      
+      if(fit == eit && tit == eit) {
+        tc = t->copy();
+      } else if(fit == eit && tit != eit) {
+        tc = t->copy(t->from(), t->stack(), dup[t->to()]);
+      } else if(fit != eit && tit == eit) {
+        tc = t->copy();
+        fa.insert(tc);
+
+        tc = t->copy(dup[t->from()], t->stack(), t->to());
+      } else {
+        tc = t->copy(t->from(), t->stack(), dup[t->to()]);
+        fa.insert(tc);
+
+        tc = t->copy(dup[t->from()], t->stack(), dup[t->to()]);
+      }
+
+      fa.insert(tc);
+    }
+
+
+    /***********
      * TransDeleter
      ***********/
     void TransDeleter::operator()( ITrans* t )

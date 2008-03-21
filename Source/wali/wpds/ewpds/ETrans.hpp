@@ -39,6 +39,7 @@ namespace wali {
           erule_t getERule() const;
           /*! @return A <b>deep</b> copy of this */
           virtual ITrans* copy() const;
+          virtual ITrans* copy(Key f, Key s, Key t) const;
 
           /*!
            * Override to apply the merge function, i.e.,

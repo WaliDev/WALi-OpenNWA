@@ -84,6 +84,7 @@ namespace wali
         virtual ~Trans();
 
         virtual Trans* copy() const;
+        virtual Trans* copy(Key f, Key s, Key t) const;
 
         //
         // getters (const)

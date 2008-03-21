@@ -45,6 +45,10 @@ namespace wali {
         return new ETrans(getDelegate()->copy(),wAtCall,erule);
       }
 
+      wfa::ITrans* ETrans::copy(Key f, Key s, Key t) const {
+        return new ETrans(getDelegate()->copy(f,s,t),wAtCall,erule);
+      }
+
       merge_fn_t ETrans::getMergeFn() const {
         return erule->merge_fn();
       }

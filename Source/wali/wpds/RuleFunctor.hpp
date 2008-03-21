@@ -87,6 +87,7 @@ namespace wali
                 std::set< Key > gamma;
                 std::set< Key > returnPoints;
                 std::set< Key > entryPoints;
+                std::set< Key > pdsStates;
 
                 WpdsStackSymbols( );
                 virtual ~WpdsStackSymbols();

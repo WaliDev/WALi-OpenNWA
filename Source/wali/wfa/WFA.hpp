@@ -362,6 +362,15 @@ namespace wali
         virtual void filter(std::set<Key> &stkset);
 
         /*!
+         * For every state s \in st, rename it to s'. Then add
+         * epsilon transition from s to s' and perform the
+         * epsilon closure. This uses WFA::getGeneration() to
+         * produce the renamed states.
+         * Returns the result in "output"
+         */
+        virtual void duplicateStates(std::set<Key> &st, WFA &output) const;
+
+        /*!
          * Write the WFA to the std::ostream parameter, implements
          * Printable::print
          *

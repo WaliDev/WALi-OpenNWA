@@ -10,6 +10,7 @@
 #include "wali/wfa/Trans.hpp"
 #include "wali/wfa/WeightMaker.hpp"
 #include "wali/regex/AllRegex.hpp"
+#include "wali/wpds/GenKeySource.hpp"
 
 #include <iostream>
 #include <vector>
@@ -382,6 +383,30 @@ namespace wali
       }
     }
 
+    void WFA::duplicateStates(std::set<Key> &st, WFA &output) const {
+      // Create a map from state to their renamed counterpart
+      std::map< Key, Key > dup;
+      std::set< Key >::iterator it;
+
+      for(it = st.begin(); it != st.end(); it++) {
+        Key s = *it;
+        Key sprime = getKey(new wpds::GenKeySource(getGeneration(), s));
+        dup[s] = sprime;
+      }
+
+      // Use TransDuplicator to put in the right transitions
+      TransDuplicator td(output, dup);
+      for_each(td);
+
+      // Set initial and final states in output to be the same as input
+      output.setInitialState(getInitialState());
+
+      for(it = F.begin(); it != F.end(); it++) {
+        output.addFinalState(*it);
+      }
+      // Set generation
+      output.setGeneration(getGeneration() + 1);
+    }
 
     /*!
      * Intersect this with parameter fa. This is a wrapper

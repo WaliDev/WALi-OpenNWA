@@ -69,13 +69,12 @@ namespace wali
         compute_weight();
 
         return getDelegate()->copy();
+      }
 
-        /*
-         *        if (intergr.is_valid())
-         *          return new LazyTrans(getDelegate()->copy(),intergr);
-         *        else
-         *          return new LazyTrans(getDelegate()->copy());
-         */
+      wfa::ITrans* LazyTrans::copy(Key f, Key s, Key t) const {
+        compute_weight();
+
+        return getDelegate()->copy(f,s,t);
       }
 
       void LazyTrans::compute_weight() const {

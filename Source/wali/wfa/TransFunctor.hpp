@@ -7,6 +7,7 @@
  */
 
 #include <iostream>
+#include <map>
 #include "wali/HashMap.hpp"
 #include "wali/wfa/TransSet.hpp"
 
@@ -94,6 +95,29 @@ namespace wali
 
       virtual void operator()( const ITrans* t );
     }; // class TransCopier
+
+    /*!
+     * @class TransDuplicator
+     *
+     * Used by WFA::duplicateStates
+     * Changes transition states
+     *
+     * @see ConstTransFunctor
+     * @see Trans
+     * @see WFA
+     */
+    class TransDuplicator : public ConstTransFunctor
+    {
+      WFA & fa;
+      std::map< Key, Key > &dup;
+      public:
+      TransDuplicator( WFA & fa_, std::map< Key, Key > &dup_ ) : fa(fa_), dup(dup_) {}
+
+      virtual ~TransDuplicator() {}
+
+      virtual void operator()( const ITrans* t );
+    }; // class TransDuplicator
+
 
     /*!
      * @class TransDeleter

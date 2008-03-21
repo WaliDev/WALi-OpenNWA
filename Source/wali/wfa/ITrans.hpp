@@ -76,7 +76,14 @@ namespace wali
         // Methods
         //
       public:
+        /*!
+         * @return a copy of the transition
+         */
         virtual ITrans* copy() const = 0;
+        /*!
+         * @return a copy of the transition with changed states and stack
+         */
+        virtual ITrans* copy(Key fromst, Key stk, Key tost) const = 0;
 
         //
         // getters (const)

@@ -98,6 +98,10 @@ namespace wali
       return new Trans(from(),stack(),to(),weight());
     }
 
+    Trans* Trans::copy(Key f, Key s, Key t) const {
+      return new Trans(f,s,t,weight());
+    }
+
     void Trans::combineTrans( ITrans* tp )
     {
       sem_elem_t wnew = tp->weight();
