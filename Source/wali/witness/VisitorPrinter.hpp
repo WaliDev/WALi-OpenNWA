@@ -27,6 +27,7 @@ namespace wali {
                 virtual bool visitCombine( WitnessCombine * w );
                 virtual bool visitRule( WitnessRule * w );
                 virtual bool visitTrans( WitnessTrans * w );
+                virtual bool visitMerge( WitnessMerge * w );
 
                 //! Prints "  |" to parameter o for each level of depth
                 void formatDepth() const;

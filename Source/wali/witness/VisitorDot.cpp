@@ -9,104 +9,123 @@
 #include "wali/witness/WitnessCombine.hpp"
 #include "wali/witness/WitnessRule.hpp"
 #include "wali/witness/WitnessTrans.hpp"
+#include "wali/witness/WitnessMerge.hpp"
 #include <fstream>
 
 namespace wali
 {
-    namespace witness
+  namespace witness
+  {
+    VisitorDot::VisitorDot( std::ostream& oparam ) :
+      os(oparam)
     {
-        VisitorDot::VisitorDot( std::ostream& oparam ) :
-            os(oparam)
-        {
-            os << "digraph \"VisitorDot@" << std::hex << (void*)this << std::dec;
-            os << "\" {\n";
-        }
+      os << "digraph \"VisitorDot@" << std::hex << (void*)this << std::dec;
+      os << "\" {\n";
+    }
 
-        VisitorDot::~VisitorDot()
-        {
-            os << "}\n";
-        }
+    VisitorDot::~VisitorDot()
+    {
+      os << "}\n";
+    }
 
-        bool VisitorDot::visit( Witness * w )
-        {
-            printNode(w,"red");
-            return true;
-        }
+    bool VisitorDot::visit( Witness * w )
+    {
+      printNode(w,"red");
+      return true;
+    }
 
-        bool VisitorDot::visitExtend( WitnessExtend * w )
-        {
-            // left child
-            if( w->hasLeft() ) {
-                Witness* left = w->left().get_ptr();
-                printEdge(w,left);
-            }
+    bool VisitorDot::visitExtend( WitnessExtend * w )
+    {
+      // left child
+      if( w->hasLeft() ) {
+        Witness* left = w->left().get_ptr();
+        printEdge(w,left);
+      }
 
-            // right child
-            if( w->hasRight() ) {
-                Witness* right = w->right().get_ptr();
-                printEdge(w,right);
-            }
+      // right child
+      if( w->hasRight() ) {
+        Witness* right = w->right().get_ptr();
+        printEdge(w,right);
+      }
 
-            // this
-            printNode(w, "green", "(x) " + w->weight()->toString());
-            return true;
-        }
+      // this
+      printNode(w, "green", "(x) " + w->weight()->toString());
+      return true;
+    }
 
-        bool VisitorDot::visitCombine( WitnessCombine * w )
-        {
-            std::list< witness_t >::iterator it = w->children().begin();
-            std::list< witness_t >::iterator itEND = w->children().end();
-            // each child
-            for( ; it != itEND ; it++ )
-            {
-                Witness* child = it->get_ptr();
-                printEdge(w,child);
-            }
+    bool VisitorDot::visitCombine( WitnessCombine * w )
+    {
+      std::list< witness_t >::iterator it = w->children().begin();
+      std::list< witness_t >::iterator itEND = w->children().end();
+      // each child
+      for( ; it != itEND ; it++ )
+      {
+        Witness* child = it->get_ptr();
+        printEdge(w,child);
+      }
 
-            // this
-            printNode(w, "light_blue", "(+) " + w->weight()->toString());
-            return true;
-        }
+      // this
+      printNode(w, "light_blue", "(+) " + w->weight()->toString());
+      return true;
+    }
 
-        bool VisitorDot::visitRule( WitnessRule * w )
-        {
-            printNode(w,"yellow",w->getRuleStub().toString());
-            return true;
-        }
+    bool VisitorDot::visitRule( WitnessRule * w )
+    {
+      printNode(w,"yellow",w->getRuleStub().toString());
+      return true;
+    }
 
-        bool VisitorDot::visitTrans( WitnessTrans * w )
-        {
-            printNode(w,"orange",w->getTrans().toString());
-            return true;
-        }
+    bool VisitorDot::visitTrans( WitnessTrans * w )
+    {
+      printNode(w,"orange",w->getTrans().toString());
+      return true;
+    }
 
-        void VisitorDot::printNodeName( Witness * w )
-        {
-            os << "\tw" << (size_t)w;
-        }
+    bool VisitorDot::visitMerge( WitnessMerge * w ) {
+      // left child
+      if( w->hasLeft() ) {
+        Witness* left = w->left().get_ptr();
+        printEdge(w,left);
+      }
 
-        void VisitorDot::printEdge( Witness * head, Witness * tail )
-        {
-            printNodeName( head );
-            os << " -> ";
-            printNodeName( tail );
-            os << ";\n";
-        }
+      // right child
+      if( w->hasRight() ) {
+        Witness* right = w->right().get_ptr();
+        printEdge(w,right);
+      }
 
-        void VisitorDot::printNode( Witness * w, std::string color )
-        {
-            printNode(w,color,w->weight()->toString());
-        }
+      // this
+      printNode(w, "green", "(M) " + w->weight()->toString());
+      return true;
+    }
 
-        void VisitorDot::printNode( Witness * w, std::string color, std::string label )
-        {
-            os << "\t";
-            printNodeName(w);
-            os << " [label=\"" << label;
-            os << "\",color=" << color << ",style=filled];\n";
-        }
+    void VisitorDot::printNodeName( Witness * w )
+    {
+      os << "\tw" << (size_t)w;
+    }
 
-    } // namespace witness
+    void VisitorDot::printEdge( Witness * head, Witness * tail )
+    {
+      printNodeName( head );
+      os << " -> ";
+      printNodeName( tail );
+      os << ";\n";
+    }
+
+    void VisitorDot::printNode( Witness * w, std::string color )
+    {
+      printNode(w,color,w->weight()->toString());
+    }
+
+    void VisitorDot::printNode( Witness * w, std::string color, std::string label )
+    {
+      os << "\t";
+      printNodeName(w);
+      os << " [label=\"" << label;
+      os << "\",color=" << color << ",style=filled];\n";
+    }
+
+  } // namespace witness
 
 } // namespace wali
 
@@ -114,5 +133,5 @@ namespace wali
    ;;; Local Variables: ***
    ;;; tab-width: 4 ***
    ;;; End: ***
-*/
+   */
 

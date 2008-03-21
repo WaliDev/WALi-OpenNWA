@@ -128,6 +128,10 @@ namespace wali
                     }
                     r2it->second.push_back( r );
 
+                    if (wrapper) {
+                      ERule* x = (ERule*)r.get_ptr();
+                      x->set_merge_fn( wrapper->wrap(x->merge_fn()) );
+                    }
                     merge_rule_hash_t::iterator rhash_it = merge_rule_hash.find(KeyTriple(to_state,to_stack1,to_stack2));
                     if(rhash_it == merge_rule_hash.end()) {
                         merge_rule_hash.insert(KeyTriple(to_state,to_stack1,to_stack2), r);

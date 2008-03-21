@@ -28,9 +28,10 @@
 // n1:      x
 //      else
 // n2:      y
-// n3:  ...
+// n3:  choose( call n0 , goto n4 )
+// n4: 
 //
-void TestWpds()
+void TestWpds(bool post)
 {
     using wali::wpds::WPDS;
     using wali::getKey;
@@ -51,6 +52,7 @@ void TestWpds()
     wali_key_t n1 = getKey("n1");
     wali_key_t n2 = getKey("n2");
     wali_key_t n3 = getKey("n3");
+    wali_key_t n4 = getKey("n4");
     // true branch
     pds->add_rule(p,n0,p,n1,R->one());
     pds->add_rule(p,n0,p,n1,R->one());
@@ -67,14 +69,31 @@ void TestWpds()
     pds->add_rule(p,n2,p,n3,R->one());
     pds->add_rule(p,n2,p,n3,R->one());
 
-    pds->print( std::cout << "---- WPDS ----\n" ) << std::endl;
+    // Add a recursive call
+    pds->add_rule(p,n3,p,n0,n4,R->one());
+    pds->add_rule(p,n3,p,n4,R->one());
+    pds->add_rule(p,n4,p,R->one());
+
+    if (post)
+      pds->print( std::cout << "---- WPDS ----\n" ) << std::endl;
+
     WFA fain;
     fain.setInitialState(p);
     fain.addFinalState(acc);
-    fain.addTrans(p,getKey("n0"),acc,R->one());
+    if (post) {
+      fain.addTrans(p,getKey("n0"),acc,R->one());
+    }
+    else {
+      fain.addTrans(p,getKey("n4"),acc,R->one());
+    }
     fain.print( cout << "----- WFA BEFORE -----\n" ) << std::endl;
 
-    WFA faout = pds->poststar(fain);
+    WFA faout;
+    if (post)
+      pds->poststar(fain,faout);
+    else
+      pds->prestar(fain,faout);
+
     faout.print( cout << "----- WFA AFTER -----\n" ) << std::endl;
 
     wali::wfa::Trans t;
@@ -95,7 +114,7 @@ void TestWpds()
     delete pds;
 }
 
-void TestFwpds() 
+void TestFwpds(bool post) 
 {
     using wali::wpds::fwpds::FWPDS;
     using wali::getKey;
@@ -116,6 +135,7 @@ void TestFwpds()
     wali_key_t n1 = getKey("n1");
     wali_key_t n2 = getKey("n2");
     wali_key_t n3 = getKey("n3");
+    wali_key_t n4 = getKey("n4");
     // true branch
     pds->add_rule(p,n0,p,n1,R->one());
     pds->add_rule(p,n0,p,n1,R->one());
@@ -132,15 +152,29 @@ void TestFwpds()
     pds->add_rule(p,n2,p,n3,R->one());
     pds->add_rule(p,n2,p,n3,R->one());
 
-    pds->print( std::cout << "---- WPDS ----\n" ) << std::endl;
+    // A recursive call
+    pds->add_rule(p,n3,p,n0,n4,R->one());
+    pds->add_rule(p,n3,p,n4,R->one());
+    pds->add_rule(p,n4,p,R->one());
+
+    if (post)
+      pds->print( std::cout << "---- WPDS ----\n" ) << std::endl;
     WFA fain;
     fain.setInitialState(p);
     fain.addFinalState(acc);
-    fain.addTrans(p,getKey("n0"),acc,R->one());
+    if (post) {
+      fain.addTrans(p,getKey("n0"),acc,R->one());
+    }
+    else {
+      fain.addTrans(p,getKey("n4"),acc,R->one());
+    }
     fain.print( cout << "----- WFA BEFORE -----\n" ) << std::endl;
 
     WFA faout;
-    pds->poststar(fain,faout);
+    if (post)
+      pds->poststar(fain,faout);
+    else
+      pds->prestar(fain,faout);
     faout.print( cout << "----- WFA AFTER -----\n" ) << std::endl;
 
     wali::wfa::Trans t;
@@ -163,8 +197,10 @@ void TestFwpds()
 
 int main()
 {
-  TestWpds();
-  TestFwpds();
+  TestWpds(true);
+  TestWpds(false);
+  TestFwpds(true);
+  TestFwpds(false);
   std::cerr << "# Trans     : " << wali::wfa::Trans::numTrans << std::endl;
   std::cerr << "# States    : " << wali::wfa::State::numStates << std::endl;
   std::cerr << "# Rules     : " << wali::wpds::Rule::numRules << std::endl;

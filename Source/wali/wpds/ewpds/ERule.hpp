@@ -54,6 +54,11 @@ namespace wali
            */
           merge_fn_t merge_fn() const { return mf; }
 
+          /*!
+           * @brief What do you think?
+           */
+          void set_merge_fn( merge_fn_t _mf ) { mf = _mf; }
+
           /*! @return reference to the extended Weight */
           sem_elem_t extended_weight() const;
 

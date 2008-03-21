@@ -29,7 +29,6 @@ namespace wali
                     MergeFn(SemElem *sr, bool countme = true) : Countable(countme), sr_data(sr) { }
                     MergeFn(sem_elem_t sr, bool countme = true) : Countable(countme), sr_data(sr) { }
 
-                    virtual SemElem *apply_f(SemElem *w1, SemElem *w2);
                     virtual sem_elem_t apply_f(sem_elem_t w1, sem_elem_t w2);
 
                     virtual MergeFn *parse_element(const char *s, SemElem *sem);

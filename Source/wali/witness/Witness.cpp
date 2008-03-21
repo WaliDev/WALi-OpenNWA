@@ -60,6 +60,7 @@ namespace wali
       if( 0 == that )
       {
         *waliErr << "SemElem is \"" << typeid(se).name() << "\"\n";
+        se->print( *waliErr << "   That : " ) << std::endl;
         assert( 0 );
       }
       if( isEmpty && isOne() ) {

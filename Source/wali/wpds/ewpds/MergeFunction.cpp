@@ -12,6 +12,7 @@ namespace wali
         {
             const std::string MergeFn::XMLTag("MergeFn");
 
+            /*
             SemElem *MergeFn::apply_f(SemElem *w1, SemElem *w2)
             {
                 assert(w1 != NULL && w2 != NULL);
@@ -31,6 +32,7 @@ namespace wali
                 ret->count--;
                 return ret;
             }
+            */
 
             sem_elem_t MergeFn::apply_f(sem_elem_t w1, sem_elem_t w2)
             {

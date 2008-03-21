@@ -27,14 +27,12 @@ namespace wali {
 
                 virtual ~WitnessMergeFn();
 
-                virtual SemElem * apply_f( SemElem* w1, SemElem *w2);
-
                 virtual sem_elem_t apply_f( sem_elem_t w1, sem_elem_t w2);
 
                 virtual std::ostream& print( std::ostream& o ) const;
 
             protected:
-                SemElem* priv_do_apply( SemElem* w1,SemElem* w2 );
+                sem_elem_t priv_do_apply( sem_elem_t w1,sem_elem_t w2 );
 
             protected:
                 merge_fn_t user_merge;

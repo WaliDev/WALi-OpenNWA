@@ -13,52 +13,53 @@
 
 namespace wali
 {
-    namespace witness
+  namespace witness
+  {
+    typedef ref_ptr<Witness> witness_t;
+
+    //!
+    //! @class VisitorDot
+    //! 
+    class VisitorDot : public Visitor
     {
-        typedef ref_ptr<Witness> witness_t;
+      public:
+        VisitorDot( std::ostream& o );
 
-        //!
-        //! @class VisitorDot
-        //! 
-        class VisitorDot : public Visitor
-        {
-            public:
-                VisitorDot( std::ostream& o );
+        virtual ~VisitorDot();
+        virtual bool visit( Witness * w );
+        virtual bool visitExtend( WitnessExtend * w );
+        virtual bool visitCombine( WitnessCombine * w );
+        virtual bool visitRule( WitnessRule * w );
+        virtual bool visitTrans( WitnessTrans * w );
+        virtual bool visitMerge( WitnessMerge * w );
 
-                virtual ~VisitorDot();
-                virtual bool visit( Witness * w );
-                virtual bool visitExtend( WitnessExtend * w );
-                virtual bool visitCombine( WitnessCombine * w );
-                virtual bool visitRule( WitnessRule * w );
-                virtual bool visitTrans( WitnessTrans * w );
+        //
+        // Helper functions for printing in Witness nodes
+        // in dotty format
+        //
+        void printNodeName( Witness * w );
 
-                //
-                // Helper functions for printing in Witness nodes
-                // in dotty format
-                //
-                void printNodeName( Witness * w );
+        void printEdge( Witness * head, Witness * tail );
 
-                void printEdge( Witness * head, Witness * tail );
+        void printNode( Witness * w, std::string color );
 
-                void printNode( Witness * w, std::string color );
+        void printNode( Witness * w, std::string color, std::string label );
 
-                void printNode( Witness * w, std::string color, std::string label );
+        void printNodeName( witness_t& wit ) {
+          printNodeName( wit.get_ptr() );
+        }
+        void printEdge( witness_t& h,witness_t& t ) {
+          printEdge(h.get_ptr(),t.get_ptr());
+        }
+        void printNode( witness_t& w,std::string color ) {
+          printNode( w.get_ptr(),color );
+        }
+      protected:
+        std::ostream& os;
 
-                void printNodeName( witness_t& wit ) {
-                    printNodeName( wit.get_ptr() );
-                }
-                void printEdge( witness_t& h,witness_t& t ) {
-                    printEdge(h.get_ptr(),t.get_ptr());
-                }
-                void printNode( witness_t& w,std::string color ) {
-                    printNode( w.get_ptr(),color );
-                }
-            protected:
-                std::ostream& os;
+    }; // class VisitorDot
 
-        }; // class VisitorDot
-
-    } // namespace witness
+  } // namespace witness
 
 } // namespace wali
 
@@ -68,4 +69,4 @@ namespace wali
    ;;; Local Variables: ***
    ;;; tab-width: 4 ***
    ;;; End: ***
-*/
+   */
