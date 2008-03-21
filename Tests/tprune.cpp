@@ -1,7 +1,6 @@
 /*!
  * @author Nick Kidd
  *
- * $Id$
  */
 
 #include "wali/wfa/WFA.hpp"

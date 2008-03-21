@@ -1,8 +1,6 @@
 /*!
  * @author Nick Kidd
  *
- * $Id$
- *
  * Tests printing WFA in dot format and marshalling to XML.
  */
 #include <iostream>

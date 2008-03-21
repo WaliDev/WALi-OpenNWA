@@ -209,7 +209,3 @@ int main()
   return 0;
 }
 
-/*
- * $Id$
- */
-
