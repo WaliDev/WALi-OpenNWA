@@ -58,8 +58,8 @@ void dot()
 int main()
 {
   dot();
-  std::cerr << "# Trans : " << wali::wfa::Trans::numTrans << std::endl;
-  std::cerr << "# States : " << wali::wfa::State::numStates << std::endl;
+  std::cerr << "# Trans   : " << wali::wfa::Trans::numTrans << std::endl;
+  std::cerr << "# States  : " << wali::wfa::State::numStates << std::endl;
   std::cerr << "# Reaches : " << Reach::numReaches << std::endl;
   return 0;
 }

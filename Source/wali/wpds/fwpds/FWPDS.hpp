@@ -5,7 +5,6 @@
  * @author Nicholas Kidd
  * @author Akash Lal
  *
- * $Id$
  */
 
 #include "wali/Common.hpp"
@@ -135,11 +134,9 @@ namespace wali {
 
 } // namespace wali
 
-#endif  // wali_wpds_fwpds_FWPDS_GUARD
+/*
+ * $Id$
+ */
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 2 ***
-   ;;; End: ***
-   */
+#endif  // wali_wpds_fwpds_FWPDS_GUARD
 

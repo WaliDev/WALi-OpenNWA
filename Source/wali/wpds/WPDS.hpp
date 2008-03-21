@@ -429,8 +429,22 @@ namespace wali
         chash_t configs;
         std::set< Config * > rule_zeroes;
         r2hash_t r2hash;
-        wfa::WFA* currentOutputWFA;
-        sem_elem_t theZero;
+
+        /*!
+         * Points to the output automaton during a pre or poststar
+         * query. Is NULL all other times.
+         */
+        wfa::WFA* currentOutputWFA; //!< Point
+
+        /*!
+         * theZero holds onto the semiring zero weight
+         * for this WPDS. It is set the very first time a
+         * rule is added to the WPDS.
+         * 
+         * WARNING: FWPDS relies on theZero being valid.
+         *          If you go changing theZero, fix FWPDS.
+         */
+        sem_elem_t theZero; 
         std::set<wali::Key> pds_states; // set of PDS states
 
       private:

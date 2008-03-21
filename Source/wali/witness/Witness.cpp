@@ -62,10 +62,10 @@ namespace wali
         *waliErr << "SemElem is \"" << typeid(se).name() << "\"\n";
         assert( 0 );
       }
-      if( isEmpty && user_se->equal(user_se->one()) ) {
+      if( isEmpty && isOne() ) {
         return that;
       }
-      else if( that->isEmpty && that->user_se->equal(that->user_se->one()) ) {
+      else if( that->isEmpty && that->isOne() ) {
         return this;
       }
       return new WitnessExtend( user_se->extend(that->user_se), this, that );
