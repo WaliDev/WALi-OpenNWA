@@ -1,5 +1,7 @@
 /*!
  * @author Nick Kidd
+ *
+ * $Id$
  */
 
 #include "wali/wfa/WFA.hpp"
@@ -8,40 +10,35 @@
 #include "Reach.hpp"
 #include <iostream>
 
-int main( int argc, char** argv )
+int main()
 {
-    using wali::wfa::WFA;
-    using wali::Key;
-    using wali::getKey;
-    using std::cout;
+  using wali::wfa::WFA;
+  using wali::Key;
+  using wali::getKey;
+  using std::cout;
 
-    WFA fa;
-    fa.addTrans( getKey("p"),getKey("n1"),getKey("accept"),new Reach(true) );
-    fa.setInitialState( getKey("p") );
-    fa.addFinalState( getKey("accept") );
-    fa.print( cout );
-    fa.prune();
-    fa.print( cout );
-    cout << "\n------------------------------------------------------------\n\n";
+  WFA fa;
+  fa.addTrans( getKey("p"),getKey("n1"),getKey("accept"),new Reach(true) );
+  fa.setInitialState( getKey("p") );
+  fa.addFinalState( getKey("accept") );
+  fa.print( cout );
+  fa.prune();
+  fa.print( cout );
+  cout << "\n------------------------------------------------------------\n\n";
 
-    fa.addTrans( getKey("p"),getKey("n2"),getKey("BAD"),new Reach(true) );
-    fa.print( cout );
-    fa.prune();
-    fa.print( cout );
-    cout << "\n------------------------------------------------------------\n\n";
+  fa.addTrans( getKey("p"),getKey("n2"),getKey("BAD"),new Reach(true) );
+  fa.print( cout );
+  fa.prune();
+  fa.print( cout );
+  cout << "\n------------------------------------------------------------\n\n";
 
-    fa.addTrans( getKey("p"),getKey("n2"),getKey("BAD"),new Reach(true) );
-    fa.addTrans( getKey("BAD"),getKey("n2"),getKey("BAD"),new Reach(true) );
-    fa.addTrans( getKey("BAD"),getKey("n3"),getKey("BAD2"),new Reach(true) );
-    fa.print( cout );
-    fa.prune();
-    fa.print( cout );
-    cout << "\n------------------------------------------------------------\n\n";
-    return 0;
+  fa.addTrans( getKey("p"),getKey("n2"),getKey("BAD"),new Reach(true) );
+  fa.addTrans( getKey("BAD"),getKey("n2"),getKey("BAD"),new Reach(true) );
+  fa.addTrans( getKey("BAD"),getKey("n3"),getKey("BAD2"),new Reach(true) );
+  fa.print( cout );
+  fa.prune();
+  fa.print( cout );
+  cout << "\n------------------------------------------------------------\n\n";
+  return 0;
 }
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-*/
