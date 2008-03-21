@@ -33,9 +33,7 @@ void dot()
     using wali::sem_elem_t;
     using wali::wfa::WFA;
     using std::cout;
-    sem_elem_t reach = new Reach(true);
-    sem_elem_t O = reach->one();
-    sem_elem_t Z = reach->zero();
+    sem_elem_t R = new Reach(true);
 
     
     wali::witness::WitnessWrapper* wrapper = new wali::witness::WitnessWrapper();
@@ -49,23 +47,23 @@ void dot()
     wali_key_t n2 = getKey("n2");
     wali_key_t n3 = getKey("n3");
     // true branch
-    pds->add_rule(p,n0,p,n1,reach);
-    pds->add_rule(p,n0,p,n1,reach);
+    pds->add_rule(p,n0,p,n1,R->one());
+    pds->add_rule(p,n0,p,n1,R->one());
     //pds->print( std::cout << "\n---- WPDS ----\n" ) << std::endl;
 
     // false branch
-    pds->add_rule(p,n0,p,n2,reach);
+    pds->add_rule(p,n0,p,n2,R->one());
     //pds->print( std::cout << "\n---- WPDS ----\n" ) << std::endl;
 
     // join point
-    pds->add_rule(p,n1,p,n3,reach);
-    pds->add_rule(p,n2,p,n3,reach);
+    pds->add_rule(p,n1,p,n3,R->one());
+    pds->add_rule(p,n2,p,n3,R->one());
 
     pds->print( std::cout << "---- WPDS ----\n" ) << std::endl;
     WFA fain;
     fain.setInitialState(p);
     fain.addFinalState(acc);
-    fain.addTrans(p,getKey("n0"),acc,reach);
+    fain.addTrans(p,getKey("n0"),acc,R->one());
     fain.print( cout << "----- WFA BEFORE -----\n" ) << std::endl;
 
     WFA faout = pds->poststar(fain);
