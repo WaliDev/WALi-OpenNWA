@@ -200,32 +200,17 @@ void FWPDS::prestar_handle_call(wfa::ITrans *t1,
   if(et1 != 0) {
     ERule *er = (ERule *)(r.get_ptr());
     interGr->addEdge(Transition(*t2),
-<<<<<<< .mine
                      Transition(*t1),
                      Transition(r->from()->state(), r->from()->stack(),t2->to()),
                      er->merge_fn().get_ptr() );
   } else {
-=======
-        Transition(*t1),
-        Transition(r->from()->state(), r->from()->stack(),t2->to()),
-        r->weight() );    
-  } else { // apply merge function
-    ERule *er = (ERule *)(r.get_ptr());
->>>>>>> .r383
     interGr->addEdge(Transition(*t2),
-<<<<<<< .mine
                      Transition(*t1),
                      Transition(r->from()->state(), r->from()->stack(),t2->to()),
                      r->weight() );    
-=======
-        Transition(*t1),
-        Transition(r->from()->state(), r->from()->stack(),t2->to()),
-        er->merge_fn().get_ptr() );
->>>>>>> .r383
   }
 
   // update
-<<<<<<< .mine
   if(et2 != 0) {
     update_etrans( r->from()->state(), r->from()->stack(), t2->to(),
                    wghtOne,r->from() );
@@ -233,10 +218,6 @@ void FWPDS::prestar_handle_call(wfa::ITrans *t1,
     update( r->from()->state(), r->from()->stack(), t2->to(),
             wghtOne,r->from() );
   }
-=======
-  update( r->from()->state(), r->from()->stack(), t2->to(),
-      wghtOne,r->from() );
->>>>>>> .r383
 
 }
 
@@ -271,18 +252,8 @@ void FWPDS::prestar_handle_trans(
       wfa::TransSet & transSet = kpit->second;
       for( tsit = transSet.begin(); tsit != transSet.end(); tsit++ )
       {
-<<<<<<< .mine
-        wfa::TransSet & transSet = kpit->second;
-        for( tsit = transSet.begin(); tsit != transSet.end(); tsit++ )
-          {
-            wfa::ITrans* tprime = *tsit;
-            // Can call this function because delta is not used
-            prestar_handle_call(t, tprime, r, delta);
-          }
-=======
         wfa::ITrans* tprime = *tsit;
         prestar_handle_call(t, tprime, r, delta);
->>>>>>> .r383
       }
     }
   }
