@@ -13,121 +13,118 @@
 
 namespace wali
 {
-    class Visitor;
+  class Visitor;
 
-    namespace witness
+  namespace witness
+  {
+    class Witness;
+    typedef ref_ptr< Witness > witness_t;
+
+    /*!
+     * @class Witness
+     */
+    class Witness : public SemElem, public Markable, public Visitable
     {
-        class Witness;
-        typedef ref_ptr< Witness > witness_t;
+      public:
+        static int COUNT;
+
+      public:
+        Witness( sem_elem_t se );
+
+        virtual ~Witness();
 
         /*!
-         * @class Witness
+         * Test if the Witness has user weight ZERO
          */
-        class Witness : public SemElem, public Markable, public Visitable
-        {
-            public:
-                Witness( sem_elem_t se );
+        bool isZero();
 
-                virtual ~Witness();
+        /*!
+         * Test if the Witness has user weight ONE
+         */
+        bool isOne();
 
-                /*!
-                 * Test if the Witness has user weight ZERO
-                 */
-                bool isZero();
+        /*!
+         * Returns a new Witness whose user_se is a sem_elem_t ONE
+         * element of the user's weight domain.
+         *
+         * @see SemElem
+         * @see sem_elem_t
+         */
+        virtual sem_elem_t one() const;
 
-                /*!
-                 * Test if the Witness has user weight ONE
-                 */
-                bool isOne();
+        /*!
+         * Returns a new Witness whose user_se is a sem_elem_t ZERO
+         * element of the user's weight domain.
+         *
+         * @see SemElem
+         * @see sem_elem_t
+         */
+        virtual sem_elem_t zero() const;
 
-                /*!
-                 * Returns a new Witness whose user_se is a sem_elem_t ONE
-                 * element of the user's weight domain.
-                 *
-                 * @see SemElem
-                 * @see sem_elem_t
-                 */
-                virtual sem_elem_t one() const;
+        /*!
+         * Extend the user supplied weight and create a new WitnessExtend.
+         *
+         * @see WitnessExtend
+         */
+        virtual sem_elem_t extend( SemElem * se );
 
-                /*!
-                 * Returns a new Witness whose user_se is a sem_elem_t ZERO
-                 * element of the user's weight domain.
-                 *
-                 * @see SemElem
-                 * @see sem_elem_t
-                 */
-                virtual sem_elem_t zero() const;
+        /*!
+         * Combines the user's weight and creates a WitnessCombine
+         * if parameter "se" is not already a WitnessCombine.
+         *
+         * @see SemElem
+         * @see sem_elem_t
+         * @see WitnessCombine
+         */
+        virtual sem_elem_t combine( SemElem * se );
 
-                /*!
-                 * Extend the user supplied weight and create a new WitnessExtend.
-                 *
-                 * @see WitnessExtend
-                 */
-                virtual sem_elem_t extend( SemElem * se );
+        /*!
+         * Test for equality of user supplied weight. The Witness is
+         * simply along for the ride.
+         */
+        virtual bool equal( SemElem * se ) const;
 
-                /*!
-                 * Combines the user's weight and creates a WitnessCombine
-                 * if parameter "se" is not already a WitnessCombine.
-                 *
-                 * @see SemElem
-                 * @see sem_elem_t
-                 * @see WitnessCombine
-                 */
-                virtual sem_elem_t combine( SemElem * se );
+        //! Print the Witness to the parameter o. 
+        virtual std::ostream& print( std::ostream& o ) const;
 
-                /*!
-                 * Test for equality of user supplied weight. The Witness is
-                 * simply along for the ride.
-                 */
-                virtual bool equal( SemElem * se ) const;
+        /*!
+         * Accept method allows for different behaviors to be applied to
+         * the Witness DAG.
+         *
+         * @see Visitor
+         */
+        virtual void accept( Visitor& v, bool visitOnce=false );
 
-                //! Print the Witness to the parameter o. 
-                virtual std::ostream& print( std::ostream& o ) const;
+        //! Pretty print in a DAG like structure to the ostream
+        virtual std::ostream& prettyPrint( std::ostream& o, size_t depth ) const;
 
-                /*!
-                 * Accept method allows for different behaviors to be applied to
-                 * the Witness DAG.
-                 *
-                 * @see Visitor
-                 */
-                virtual void accept( Visitor& v, bool visitOnce=false );
+        //! Prints "  |" to parameter o for each level of depth
+        std::ostream& formatDepth( std::ostream& o, size_t depth ) const;
 
-                //! Pretty print in a DAG like structure to the ostream
-                virtual std::ostream& prettyPrint( std::ostream& o, size_t depth ) const;
+        /*!
+         * Returns protected sem_elem_t se member variable that is the
+         * user supplied weight or from a computation involving the
+         * user defined semiring.
+         *
+         * @see sem_elem_t
+         */
+        sem_elem_t weight() { return user_se; }
 
-                //! Prints "  |" to parameter o for each level of depth
-                std::ostream& formatDepth( std::ostream& o, size_t depth ) const;
+        //! Reset all marks (recursively)
+        virtual void reset_marks() const;
 
-                /*!
-                 * Returns protected sem_elem_t se member variable that is the
-                 * user supplied weight or from a computation involving the
-                 * user defined semiring.
-                 *
-                 * @see sem_elem_t
-                 */
-                sem_elem_t weight() { return user_se; }
+      protected:
+        sem_elem_t user_se; //!< The user SemElem value
+        bool isEmpty;       //!< True if type == Witness. Cheap reflection.
 
-                //! Reset all marks (recursively)
-                virtual void reset_marks() const;
+      private:
+        Witness( sem_elem_t se, bool ie );
 
-            protected:
-                sem_elem_t user_se; //!< The user SemElem value
-                bool isEmpty;       //!< True if type == Witness. Cheap reflection.
+    }; // class Witness
 
-            private:
-                Witness( sem_elem_t se, bool ie );
-
-        }; // class Witness
-
-    } // namespace witness
+  } // namespace witness
 
 } // namespace wali
 
 #endif  // wali_WITNESS_GUARD
-
-/* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
-*/
 

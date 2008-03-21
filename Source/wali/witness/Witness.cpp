@@ -13,27 +13,34 @@ namespace wali
 {
     namespace witness
     {
-        Witness::Witness( sem_elem_t set ) : user_se(set),isEmpty(false)
-        {
-        }
+      int Witness::COUNT = 0;
 
-        Witness::Witness( sem_elem_t se, bool ie) : user_se(se),isEmpty(ie)
-        {
-        }
+      Witness::Witness( sem_elem_t set ) : user_se(set),isEmpty(false)
+      {
+        COUNT++;
+      }
 
-        Witness::~Witness() {}
+      Witness::Witness( sem_elem_t se, bool ie) : user_se(se),isEmpty(ie)
+      {
+        COUNT++;
+      }
 
-        // Test if the Witness has user weight ZERO
-        bool Witness::isZero()
-        {
-            return user_se->equal( user_se->zero() );
-        }
+      Witness::~Witness()
+      { 
+        COUNT--;
+      }
 
-        // Test if the Witness has user weight ONE
-        bool Witness::isOne()
-        {
-            return user_se->equal( user_se->one() );
-        }
+      // Test if the Witness has user weight ZERO
+      bool Witness::isZero()
+      {
+        return user_se->equal( user_se->zero() );
+      }
+
+      // Test if the Witness has user weight ONE
+      bool Witness::isOne()
+      {
+        return user_se->equal( user_se->one() );
+      }
 
         sem_elem_t Witness::one() const
         {

@@ -33,12 +33,15 @@ void dot()
     using wali::sem_elem_t;
     using wali::wfa::WFA;
     using std::cout;
-    Reach *reach = new Reach(true);
+    sem_elem_t reach = new Reach(true);
+    sem_elem_t O = reach->one();
+    sem_elem_t Z = reach->zero();
 
     
     wali::witness::WitnessWrapper* wrapper = new wali::witness::WitnessWrapper();
 
     WPDS* pds = new WPDS( wrapper );
+    //WPDS* pds = new WPDS( 0 );
     wali_key_t p = getKey("p");
     wali_key_t acc = getKey("acc");
     wali_key_t n0 = getKey("n0");
@@ -47,8 +50,13 @@ void dot()
     wali_key_t n3 = getKey("n3");
     // true branch
     pds->add_rule(p,n0,p,n1,reach);
+    pds->add_rule(p,n0,p,n1,reach);
+    //pds->print( std::cout << "\n---- WPDS ----\n" ) << std::endl;
+
     // false branch
     pds->add_rule(p,n0,p,n2,reach);
+    //pds->print( std::cout << "\n---- WPDS ----\n" ) << std::endl;
+
     // join point
     pds->add_rule(p,n1,p,n3,reach);
     pds->add_rule(p,n2,p,n3,reach);
@@ -84,9 +92,10 @@ void dot()
 int main()
 {
     dot();
-    std::cerr << "# Trans : " << wali::wfa::Trans::numTrans << std::endl;
-    std::cerr << "# States : " << wali::wfa::State::numStates << std::endl;
-    std::cerr << "# Reaches : " << Reach::numReaches << std::endl;
+    std::cerr << "# Trans     : " << wali::wfa::Trans::numTrans << std::endl;
+    std::cerr << "# States    : " << wali::wfa::State::numStates << std::endl;
+    std::cerr << "# Reaches   : " << Reach::numReaches << std::endl;
+    std::cerr << "# Witnesses : " << wali::witness::Witness::COUNT << std::endl;
     return 0;
 }
 

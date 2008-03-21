@@ -602,6 +602,10 @@ namespace wali
           Config *from = make_config(from_state,from_stack);
           Config *to = make_config(to_state,to_stack1);
 
+          // Mark the states as PDS states
+          pds_states.insert(from_state);
+          pds_states.insert(to_state);
+
           // make_rule will create links b/w Configs and the Rule
           r = new Rule(from, to, to_stack2, se);
           bool rb = make_rule(from,to,to_stack2,se,r);
@@ -642,8 +646,6 @@ namespace wali
             cf = new Config(state,stack);
             KeyPair kp(state,stack);
             config_map().insert( kp,cf );
-            // Might cut down just a bit on adding states
-            pds_states.insert(state);
           }
           return cf;
         }
@@ -781,6 +783,7 @@ namespace wali
         {
           if( is_pds_state(orig->to())) {
             *waliErr << "WALi Error: cannot have incoming transition to a PDS state\n";
+            orig->print( *waliErr << "    ") << std::endl;
             assert(0);
           }
 
