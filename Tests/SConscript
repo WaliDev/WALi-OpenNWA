@@ -1,0 +1,29 @@
+# Build the example applications
+import os
+
+Import('WaliDir')
+Import('LibInstallDir')
+Import('BaseEnv')
+
+## ###############################
+## Environment
+Env = BaseEnv.Clone()
+IncludeDirs = [
+    os.path.join(WaliDir, 'Source'),
+    os.path.join(WaliDir, 'Examples','Reach'),
+    ]
+Env['CPPPATH']  = IncludeDirs
+Env['LIBS']     = ['wali']
+Env['LIBPATH']  = [ LibInstallDir ]
+ 
+TestDir = os.path.join(WaliDir,'Tests')
+
+built = []
+
+Reach = os.path.join(WaliDir,'Examples','Reach','Reach.cpp')
+for t in ['twitness','tprune']:
+    print '\n+++ Building Test "%s"' % t
+    exe = Env.Program('%s' % t, ['%s.cpp' % t,'%s' % Reach ])
+    built.append(exe)
+
+Return('built')
