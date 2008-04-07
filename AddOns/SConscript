@@ -1,5 +1,2 @@
-# Build WALi library 
-# $Id$
-
 built = SConscript('Parse/SConscript')
 Return('built')

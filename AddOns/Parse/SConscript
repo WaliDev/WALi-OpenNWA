@@ -1,16 +1,18 @@
-# Build WALi library 
-# $Id$
-
 Import('BaseEnv')
 
-xerces = SConscript('ThirdParty/SConscript')
+built = []
 
-parse  = SConscript('Source/SConscript', build_dir='_build/Parse',duplicate=0)
+xerces = SConscript('ThirdParty/SConscript')
+built.append(xerces)
+
+parse = SConscript('Source/SConscript', build_dir='_build',duplicate=0)
+built.append(parse)
+
+examples = SConscript('Examples/SConscript', build_dir='_build/Examples',duplicate=0)
+built.append(examples)
 
 BaseEnv.Alias('xerces',xerces)
 
 BaseEnv.Depends(parse,'xerces')
-
-built = [xerces,parse]
 
 Return('built')
