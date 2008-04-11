@@ -105,6 +105,11 @@ namespace wali
         return getDelegate()->weight();
       }
 
+      std::ostream &LazyTrans::print(std::ostream &o) const {
+        compute_weight();
+        return getDelegate()->print(o);
+      }
+
       void LazyTrans::setWeight(sem_elem_t w) {
         intergr = NULL;
         getDelegate()->setWeight(w);
@@ -120,9 +125,14 @@ namespace wali
         getDelegate()->combineTrans(tp);
       }
 
-      sem_elem_t LazyTrans::make_weight( wfa::WeightMaker &wmaker, sem_elem_t se ) {
+      TaggedWeight LazyTrans::apply_post( TaggedWeight tw) const {
         compute_weight();
-        return getDelegate()->make_weight(wmaker, se);
+        return getDelegate()->apply_post(tw);
+      }
+
+      TaggedWeight LazyTrans::apply_pre( TaggedWeight tw) const {
+        compute_weight();
+        return getDelegate()->apply_pre(tw);
       }
 
       LazyTrans::~LazyTrans() {}

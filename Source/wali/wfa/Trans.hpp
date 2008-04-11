@@ -249,13 +249,8 @@ namespace wali
          */
         virtual sem_elem_t poststar_eps_closure( sem_elem_t se );
 
-        /*!
-         * This is used by WFA::intersect
-         * to build weights
-         * The base case is:
-         *   wmaker.make_weight(this->weight(), se);
-         */
-        virtual sem_elem_t make_weight( WeightMaker &wmaker, sem_elem_t se );
+        virtual TaggedWeight apply_post( TaggedWeight tw) const;
+        virtual TaggedWeight apply_pre( TaggedWeight tw) const;
 
       protected:
         KeyPair kp;

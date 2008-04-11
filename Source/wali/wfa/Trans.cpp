@@ -134,8 +134,12 @@ namespace wali
       return weight()->extend(se);
     }
 
-    sem_elem_t Trans::make_weight( WeightMaker &wmaker, sem_elem_t se ) {
-      return wmaker.make_weight(weight(), se);
+    TaggedWeight Trans::apply_post( TaggedWeight tw) const {
+      return TaggedWeight(weight()->extend(tw.getWeight()), tw.getTag());
+    }
+
+    TaggedWeight Trans::apply_pre( TaggedWeight tw) const {
+      return TaggedWeight(tw.getWeight()->extend(weight()), tw.getTag());
     }
 
   } // namespace wfa

@@ -10,12 +10,9 @@ namespace wali
 {
     namespace wfa
     {
-        sem_elem_t WeightMaker::make_weight( sem_elem_t lhsBeforeCall ATTR_UNUSED, 
-                                             sem_elem_t lhsAfterCall,
-                                             wali::wpds::ewpds::merge_fn_t lhsmf ATTR_UNUSED,
-                                             sem_elem_t rhs) {
-
-          return make_weight(lhsAfterCall, rhs);
+        sem_elem_t WeightMaker::make_weight( ITrans *lhs,
+                                             ITrans *rhs) {
+          return make_weight(lhs->weight(), rhs->weight());
         }
 
         sem_elem_t KeepLeft::make_weight( sem_elem_t lhs, sem_elem_t rhs ATTR_UNUSED )

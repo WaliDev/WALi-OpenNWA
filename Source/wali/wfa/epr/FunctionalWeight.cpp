@@ -6,62 +6,41 @@ namespace wali {
   namespace wfa {
     namespace epr {
 
-      FunctionalWeight::FunctionalWeight(sem_elem_t l,
-                                         sem_elem_t r) : SemElem(),
-                                                         left(l),
-                                                         right(r),
-                                                         mf(0) { 
+      FunctionalWeight::FunctionalWeight(ITrans *l, ITrans *r) : SemElem() {
+        ltrans = l->copy();
+        rtrans = r->copy();
         normalize();
+
       }
 
-      FunctionalWeight::FunctionalWeight(sem_elem_t l,
-                                         merge_fn_t m,
-                                         sem_elem_t r) : SemElem(),
-                                                         left(l),
-                                                         right(r),
-                                                         mf(m) { 
-        normalize();
+      FunctionalWeight::~FunctionalWeight() { 
+        delete ltrans;
+        delete rtrans;
       }
-
-      FunctionalWeight::~FunctionalWeight() { }
 
       // if either weight is zero, make both zero
       void FunctionalWeight::normalize() {
-        assert(left.is_valid());
-        assert(right.is_valid());
+        assert(ltrans != 0);
+        assert(rtrans != 0);
 
-        if(left->equal(left->zero())) {
-          right = left->zero();
-        } else if(right->equal(right->zero())) {
-          left = right->zero();
-        }
       }
 
 
       sem_elem_t FunctionalWeight::one() const {
-        return new FunctionalWeight(left->one(), right->one());
+        // TODO: Find a better way to do this
+        return new FunctionalWeight(ltrans, rtrans);
       }
 
       sem_elem_t FunctionalWeight::zero() const {
-        return new FunctionalWeight(left->zero(), right->zero());
+        // TODO: Find a better way to do this
+        return new FunctionalWeight(ltrans, rtrans);
       }
 
       // Extend is compose^{reversed}
-      sem_elem_t FunctionalWeight::extend(SemElem *se) {
-        FunctionalWeight *fse = dynamic_cast< FunctionalWeight * > (se);
-        if(fse == NULL) {
-          *waliErr << "Error: non-functional weight given to FunctionalWeight::extend\n";
-          assert(0);
-        }
-
-        if(mf.is_valid() || fse->mf.is_valid()) {
-          *waliErr << "Error: Cannot take extend of FunctionalWeights when merge functions are present inside them\n";
-          assert(0);
-        }
-
-        sem_elem_t l = fse->left->extend(left);
-        sem_elem_t r = right->extend(fse->right);
-        return new FunctionalWeight(l, r);
+      sem_elem_t FunctionalWeight::extend(SemElem *se ATTR_UNUSED) {
+        *waliErr << "Error: Extend called on FunctionalWeight\n";
+        assert(0);
+        return 0;
       }
 
       // combine should never be called
@@ -71,35 +50,22 @@ namespace wali {
         return NULL;
       }
 
-      bool FunctionalWeight::equal(SemElem *se) const {
-        FunctionalWeight *fse = dynamic_cast< FunctionalWeight * > (se);
-        if(fse == NULL) {
-          *waliErr << "Error: non-functional weight given to FunctionalWeight::extend\n";
-          assert(0);
-        }
-
-        return left->equal(fse->left) && right->equal(fse->right);
+      bool FunctionalWeight::equal(SemElem *se ATTR_UNUSED) const {
+        *waliErr << "Error: Equal called on FunctionalWeight\n";
+        assert(0);
+        return false;
       }
 
-      sem_elem_t FunctionalWeight::apply(sem_elem_t se) {
-        sem_elem_t wt;
-        if(mf.is_valid()) {
-          wt = mf->apply_f(left, se);
-        } else {
-          wt = left->extend(se);
-        }
-        return wt->extend(right);
+      TaggedWeight FunctionalWeight::apply(TaggedWeight tw) {
+        TaggedWeight tw1 = ltrans->apply_post(tw);
+        return rtrans->apply_pre(tw1);
       }
 
       std::ostream &FunctionalWeight::print(std::ostream &o) const {
         o << "FunctionalWeight[";
-        left->print(o);
+        ltrans->print(o);
         o << " and ";
-        if(mf.is_valid()) {
-          mf->print(o);
-          o << " and ";
-        }
-        right->print(o);
+        rtrans->print(o);
         o << "]\n";
         return o;
       }

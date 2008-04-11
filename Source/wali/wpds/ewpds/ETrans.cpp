@@ -69,8 +69,17 @@ namespace wali {
         return getMergeFn()->apply_f(wAtCall,se);
       }
 
-      sem_elem_t ETrans::make_weight( wali::wfa::WeightMaker &wmaker, sem_elem_t se ) {
-        return wmaker.make_weight(wAtCall, weight(), getMergeFn(), se);
+      TaggedWeight ETrans::apply_post( TaggedWeight tw) const {
+        if(tw.isRet()) {
+          sem_elem_t wt = getMergeFn()->apply_f(wAtCall, tw.getWeight());
+          return TaggedWeight(wt, walienum::NONE);
+        }
+        return TaggedWeight(weight()->extend(tw.getWeight()), walienum::CALL);
+      }
+
+      TaggedWeight ETrans::apply_pre( TaggedWeight tw) const {
+        assert(!tw.isCall());
+        return TaggedWeight(tw.getWeight()->extend(weight()), walienum::RETURN);
       }
 
       void ETrans::combineTrans( ITrans* tp )

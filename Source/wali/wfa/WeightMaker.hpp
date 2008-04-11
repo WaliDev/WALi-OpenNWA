@@ -7,7 +7,7 @@
 
 #include "wali/Common.hpp"
 #include "wali/SemElem.hpp"
-#include "wali/wpds/ewpds/MergeFunction.hpp"
+#include "wali/wfa/ITrans.hpp"
 
 namespace wali
 {
@@ -28,10 +28,8 @@ namespace wali
             public:
                 virtual ~WeightMaker() {}
                 virtual sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs ) = 0;
-                virtual sem_elem_t make_weight( sem_elem_t lhsBeforeCall, 
-                                                sem_elem_t lhsAfterCall, 
-                                                wali::wpds::ewpds::merge_fn_t lhsmf, 
-                                                sem_elem_t rhs);
+                virtual sem_elem_t make_weight( ITrans *lhs, ITrans *rhs);
+
         }; // WeightMaker
 
         /*!

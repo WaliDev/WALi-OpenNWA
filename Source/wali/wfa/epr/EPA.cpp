@@ -1,3 +1,4 @@
+#include "wali/TaggedWeight.hpp"
 #include "wali/wfa/State.hpp"
 #include "wali/wfa/Trans.hpp"
 #include "wali/wfa/epr/EPA.hpp"
@@ -25,6 +26,7 @@ namespace wali {
         FunctionalWeightMaker wmaker;
         post.intersect(wmaker, pre, *this);
         prune();
+        orderStatesBFS();
       }
 
       sem_elem_t EPA::apply(Key node, sem_elem_t initWeight) {
@@ -39,7 +41,6 @@ namespace wali {
         sem_elem_t ZERO = initWeight->zero();
 
         // The worklist with BFS order on states
-        orderStatesBFS();
         StatePriorityWorklist wl(bfsOrder);
 
         // First, initialize the state weights
@@ -58,7 +59,7 @@ namespace wali {
         State *init = getState( getInitialState() );
         assert(init != 0);
         
-        // This code assume that the transition
+        // This code assumes that the transition
         // (init,node,init) does not exist
         Trans temp_trans;
         if(find(init->name(), node, init->name(), temp_trans)) {
@@ -74,6 +75,8 @@ namespace wali {
           notfound++;
           return ZERO;
         }
+
+        TaggedWeight initW(initWeight, walienum::NONE);
         
         int trans_cnt = 0;
         State *init_succ = 0;
@@ -89,9 +92,11 @@ namespace wali {
           }
           
           assert(q->weight()->equal(ZERO));
-          q->weight() = fw->apply(initWeight);
+          TaggedWeight tw = fw->apply(initW);
+          q->weight() = tw.getWeight();
           q->delta() = q->weight();
-          
+          setStateTag(q, tw.getTag());
+
           wl.put(q);
           
           init_succ = q;
@@ -113,7 +118,8 @@ namespace wali {
         while(!wl.empty()) {
           
           State *q = wl.get();
-          
+          walienum::ETag qtag = getStateTag(q);
+
           sem_elem_t delta = q->delta();
           q->delta() = ZERO;
 
@@ -127,13 +133,14 @@ namespace wali {
             assert(qprime != 0 && fw != 0);  
             
             // Apply the functional weight
-            sem_elem_t newW = fw->apply(delta);
+            TaggedWeight newW = fw->apply(TaggedWeight(delta, qtag));
             
             std::pair< sem_elem_t, sem_elem_t > cd =
-              newW->delta(qprime->weight());
+              newW.getWeight()->delta(qprime->weight());
             
             qprime->weight() = qprime->weight()->combine(cd.first);
             qprime->delta() = qprime->delta()->combine(cd.second);
+            setStateTag(qprime, newW.getTag());
 
             // Put back into the worklist if necessary
             if( !qprime->delta()->equal(ZERO) ) {
@@ -157,6 +164,37 @@ namespace wali {
         }
         return ret;
         
+      }
+
+      void EPA::setStateTag(State *s, walienum::ETag et) {
+        Key sn = s->name();
+        std::map< Key, walienum::ETag >::iterator it = stateTagMap.find(sn);
+        if(it != stateTagMap.end()) {
+          if(it->second != et) {
+            // If one of the tags is NONE, then set the state tag to be NONE
+            // The other "Call" or "Ret" is collapsed because they corresponding
+            // to unbalanced Call/Ret.
+            assert(it->second == walienum::NONE || et == walienum::NONE);
+            it->second = walienum::NONE;
+
+            //*waliErr << "Error: EPA::apply trying to set two different tags for the same state\n";
+            //*waliErr << "Tag1: " << it->second << "\n";
+            //*waliErr << "Tag2: " << et << "\n";
+            //printKey(*waliErr << "State: ", sn) << "\n";
+            //assert(0);
+          }
+        }
+        stateTagMap[sn] = et;
+      }
+
+      walienum::ETag EPA::getStateTag(State *s) {
+        Key sn = s->name();
+        std::map< Key, walienum::ETag >::iterator it = stateTagMap.find(sn);
+        if(it == stateTagMap.end()) {
+          *waliErr << "Error: EPA::apply state tag not set yet\n";
+          assert(0);
+        }
+        return stateTagMap[sn];
       }
 
       // returns invalid sem_elem_t if (q,w) is not found in the cache

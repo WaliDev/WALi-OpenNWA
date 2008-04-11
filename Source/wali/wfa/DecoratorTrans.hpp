@@ -3,7 +3,6 @@
 
 /*!
  * @author Nick Kidd
- * $Id$
  */
 
 #include <iostream>
@@ -127,6 +126,13 @@ namespace wali
          */
         virtual void setDelta( const sem_elem_t w ) {
           delegate->setDelta( w );
+        }
+
+        /*!
+         * Print the transition
+         */
+        virtual std::ostream & print(std::ostream &o) const {
+          return delegate->print( o );
         }
 
         /*!

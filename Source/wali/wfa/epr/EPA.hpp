@@ -28,6 +28,7 @@ namespace wali {
         
         typedef std::list< std::pair< sem_elem_t, sem_elem_t > > CacheElem;
         std::map< Key, CacheElem > errorProjCache;
+        std::map< Key, walienum::ETag > stateTagMap;
         int nCacheHits;
         
       public:
@@ -56,6 +57,10 @@ namespace wali {
 
         // Adds ((q,w),res) to the cache
         void addToCache(Key q, sem_elem_t w, sem_elem_t res);
+
+        // Maintain a State Key -> ETag map
+        void setStateTag(State *s, walienum::ETag et);
+        walienum::ETag getStateTag(State *s);
 
         // Do a BFS on the automaton and store the BFS number
         // in bfsOrder

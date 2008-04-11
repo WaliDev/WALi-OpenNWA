@@ -540,8 +540,7 @@ namespace wali
             ITrans*t2 = *stklsit;
             Key fromkey = getKey( t->from(),t2->from() );
             Key tokey = getKey( t->to(),t2->to() );
-            //sem_elem_t W = wmaker.make_weight(t->weight(),t2->weight());
-            sem_elem_t W = t->make_weight(wmaker, t2->weight());
+            sem_elem_t W = wmaker.make_weight(t ,t2);
             ITrans* newTrans = new Trans(fromkey,t->stack(),tokey,W); 
             //newTrans->print( std::cout << "\tAdding Trans: " ) << std::endl;
             dest.addTrans( newTrans );

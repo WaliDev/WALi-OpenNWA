@@ -30,10 +30,7 @@ namespace wali {
 
         sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs );
 
-        sem_elem_t make_weight( sem_elem_t lhsBeforeCall,
-                                sem_elem_t lhsAfterCall,
-                                wali::wpds::ewpds::merge_fn_t lhsmf,
-                                sem_elem_t rhs);
+        sem_elem_t make_weight( ITrans *lhs, ITrans *rhs);
 
       }; // FunctionalWeightMaker
 

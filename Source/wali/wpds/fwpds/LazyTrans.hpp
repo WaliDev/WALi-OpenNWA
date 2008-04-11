@@ -65,9 +65,12 @@ namespace wali
 
           virtual void combineTrans( wfa::ITrans* tp );
 
-          virtual sem_elem_t make_weight( wfa::WeightMaker &wmaker, sem_elem_t se );
+          virtual TaggedWeight apply_post( TaggedWeight tw) const;
+          virtual TaggedWeight apply_pre( TaggedWeight tw) const;
 
           void setInterGraph(intergraph_t igr);
+
+          virtual std::ostream &print(std::ostream &o) const;
 
         private:
           void compute_weight() const;

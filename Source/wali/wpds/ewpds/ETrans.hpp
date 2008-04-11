@@ -48,12 +48,8 @@ namespace wali {
            */
           virtual sem_elem_t poststar_eps_closure( sem_elem_t se );
 
-          /*!
-           * Override to pass the merge function to wmaker
-           * 
-           *   >>>   wmaker.make_weight(wAtCall, mf, se)
-           */
-          virtual sem_elem_t make_weight( wali::wfa::WeightMaker &wmaker, sem_elem_t se );
+          virtual TaggedWeight apply_post( TaggedWeight tw) const;
+          virtual TaggedWeight apply_pre( TaggedWeight tw) const;
 
           /*!
            * Override Trans::combineTrans to recover
