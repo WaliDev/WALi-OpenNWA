@@ -3,6 +3,7 @@
 
 /*!
  * @author Akash Lal
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -13,38 +14,41 @@
 
 namespace wali
 {
-    namespace wpds
+  namespace wpds
+  {
+    namespace ewpds
     {
-        namespace ewpds
-        {
-            class MergeFn;
-            typedef ref_ptr< MergeFn > merge_fn_t;
+      class MergeFn;
+      typedef ref_ptr< MergeFn > merge_fn_t;
 
-            class MergeFn : public Printable, public Countable
-            {
-                public:
-                    static const std::string XMLTag;
+      class MergeFn : public Printable, public Countable
+      {
+        public:
+          static const std::string XMLTag;
 
-                    MergeFn(bool countme = true) : Countable(countme), sr_data(NULL) { }
-                    MergeFn(SemElem *sr, bool countme = true) : Countable(countme), sr_data(sr) { }
-                    MergeFn(sem_elem_t sr, bool countme = true) : Countable(countme), sr_data(sr) { }
+          //MergeFn(bool countme = true) : Countable(countme), sr_data(NULL) { }
+          //MergeFn(SemElem *sr, bool countme = true) : Countable(countme), sr_data(sr) { }
+          //MergeFn(sem_elem_t sr, bool countme = true) : Countable(countme), sr_data(sr) { }
+          MergeFn() : Countable(), sr_data(NULL) { }
+          MergeFn(SemElem *sr ) : Countable(), sr_data(sr) { }
+          MergeFn(sem_elem_t sr ) : Countable(), sr_data(sr) { }
 
-                    virtual sem_elem_t apply_f(sem_elem_t w1, sem_elem_t w2);
+          virtual sem_elem_t apply_f(sem_elem_t w1, sem_elem_t w2);
 
-                    virtual MergeFn *parse_element(const char *s, SemElem *sem);
+          virtual MergeFn *parse_element(const char *s, SemElem *sem);
 
-                    virtual std::ostream &print(std::ostream &o) const;
+          virtual std::ostream &print(std::ostream &o) const;
 
-                    virtual ~MergeFn() { }
+          virtual ~MergeFn() { }
 
-                private:
-                    sem_elem_t sr_data;
+        private:
+          sem_elem_t sr_data;
 
-            };
+      };
 
-        } // namespace ewpds
+    } // namespace ewpds
 
-    } // namespace wpds
+  } // namespace wpds
 
 } // namespacw wali
 
@@ -54,4 +58,4 @@ namespace wali
    ;;; Local Variables: ***
    ;;; tab-width: 4 ***
    ;;; End: ***
- */
+   */

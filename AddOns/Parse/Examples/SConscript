@@ -1,0 +1,38 @@
+import os,os.path
+
+Import('WaliDir')
+Import('LibInstallDir')
+Import('BaseEnv')
+
+## ###############################
+## Environment
+env = BaseEnv.Clone(
+    CPPPATH  = [
+      os.path.join(WaliDir , 'Source'),
+      os.path.join(WaliDir,'AddOns','Parse','Source'),
+      os.path.join(WaliDir,'AddOns','Parse','ThirdParty','xerces-c','include'),
+    ],
+    CXXFLAGS = '-g -ggdb -Wall -Wformat=2 -W ',
+    LIBS = [
+      'wali',
+      'waliparse',
+      'xerces-c',
+    ],
+    LIBPATH=[
+      LibInstallDir,
+      WaliDir+'/AddOns/Parse/ThirdParty/xerces-c/lib',
+    ]
+)
+
+# Used to record the tests that are built
+built = []
+
+# Reach weight domain example
+ReachFiles= Split("""
+Reach/ExMain.cpp
+Reach/Reach.cpp
+""")
+Reach = env.Program('ExMain',ReachFiles)
+built.append(Reach)
+
+Return('built')

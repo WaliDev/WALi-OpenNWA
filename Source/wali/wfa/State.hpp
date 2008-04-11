@@ -2,7 +2,7 @@
 #define wpds_STATE_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
