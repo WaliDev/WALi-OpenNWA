@@ -23,6 +23,7 @@ namespace wali {
     class WFA;
     class Trans;
   }
+
   namespace graph {
     class InterGraph;
   }
@@ -59,6 +60,7 @@ namespace wali {
           // post*
           ///////////
           virtual void poststar( wfa::WFA & input, wfa::WFA & output );
+          void poststarIGR( wfa::WFA & input, wfa::WFA & output );
 
           ///////////////////////
           // FWPDS Settings
@@ -123,7 +125,7 @@ namespace wali {
 
         protected:
           sem_elem_t wghtOne;
-          ref_ptr<wali::graph::InterGraph> interGr;
+          graph::InterGraphPtr interGr;
           bool checkingPhase;
 
       }; // class FWPDS

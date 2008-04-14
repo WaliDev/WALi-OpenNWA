@@ -43,7 +43,7 @@ namespace wali
 
       }
 
-      LazyTrans::LazyTrans( wfa::ITrans* delegate, intergraph_t g )
+      LazyTrans::LazyTrans( wfa::ITrans* delegate, graph::InterGraphPtr g )
         : DecoratorTrans(delegate)
       {
         setInterGraph(g);
@@ -115,7 +115,7 @@ namespace wali
         getDelegate()->setWeight(w);
       }
 
-      void LazyTrans::setInterGraph(intergraph_t igr) {
+      void LazyTrans::setInterGraph(graph::InterGraphPtr igr) {
         setWeight(NULL);
         intergr = igr;
       }

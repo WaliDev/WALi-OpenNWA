@@ -59,8 +59,8 @@ void FWPDS::topDownEval(bool f) {
 
 struct FWPDSCopyBackFunctor : public wfa::TransFunctor
 {
-  ref_ptr<graph::InterGraph> gr;
-  FWPDSCopyBackFunctor(ref_ptr<graph::InterGraph> _gr) : gr(_gr) {}
+  graph::InterGraphPtr gr;
+  FWPDSCopyBackFunctor(graph::InterGraphPtr _gr) : gr(_gr) {}
   virtual void operator()( wfa::ITrans* t ) {
     if (wali::is_lazy_fwpds()) {
       LazyTrans *lt = static_cast<LazyTrans *> (t);
@@ -154,7 +154,7 @@ void FWPDS::prestar( wfa::WFA& input, wfa::WFA& output )
   interGr = new graph::InterGraph(theZero, true, true);
 
   // Input transitions become source nodes in FWPDS
-  FWPDSSourceFunctor sources(*interGr, false);
+  FWPDSSourceFunctor sources(*interGr.get_ptr(), false);
   output.for_each(sources);
 
   // Build the InterGraph using EWPDS saturation without weights
@@ -313,7 +313,12 @@ bool FWPDS::checkResults( wfa::WFA& input, bool poststar )
   return true;
 }
 
-void FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
+void FWPDS::poststar( wfa::WFA& input, wfa::WFA& output ) {
+  poststarIGR(input, output);
+  interGr = NULL;
+}
+
+void FWPDS::poststarIGR( wfa::WFA& input, wfa::WFA& output )
 {
 
   EWPDS::poststarSetupFixpoint(input,output);
@@ -334,7 +339,7 @@ void FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
   interGr = new graph::InterGraph(theZero, true, false);
 
   // Input transitions become source nodes in FWPDS
-  FWPDSSourceFunctor sources(*interGr, true);
+  FWPDSSourceFunctor sources(*interGr.get_ptr(), true);
   output.for_each(sources);
 
   // Build the InterGraph using EWPDS saturation without weights
@@ -352,10 +357,8 @@ void FWPDS::poststar( wfa::WFA& input, wfa::WFA& output )
   FWPDSCopyBackFunctor copier( interGr );
   output.for_each(copier);
 
-
   checkResults(input,true);
 
-  interGr = NULL;
   currentOutputWFA = 0;
 }
 

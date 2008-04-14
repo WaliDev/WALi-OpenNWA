@@ -28,8 +28,6 @@ namespace wali
     namespace fwpds
     {
       class FWPDS;
-      typedef ref_ptr<wali::graph::InterGraph> intergraph_t;
-
 
       class LazyTrans : public wfa::DecoratorTrans
       {
@@ -48,7 +46,7 @@ namespace wali
           LazyTrans( wfa::ITrans* delegate );
 
           /*! TODO comments */
-          LazyTrans( wfa::ITrans* delegate, intergraph_t igr );
+          LazyTrans( wfa::ITrans* delegate, graph::InterGraphPtr igr );
 
           virtual ~LazyTrans();
 
@@ -68,7 +66,7 @@ namespace wali
           virtual TaggedWeight apply_post( TaggedWeight tw) const;
           virtual TaggedWeight apply_pre( TaggedWeight tw) const;
 
-          void setInterGraph(intergraph_t igr);
+          void setInterGraph(graph::InterGraphPtr igr);
 
           virtual std::ostream &print(std::ostream &o) const;
 
@@ -79,7 +77,7 @@ namespace wali
           //is the delegate an ETrans?
           bool is_etrans; 
 
-          intergraph_t intergr;
+          graph::InterGraphPtr intergr;
       };
     }
 

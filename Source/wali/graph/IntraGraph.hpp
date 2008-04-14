@@ -118,27 +118,27 @@ namespace wali {
                 }
         };
 
-        class InitTrans {
-            public:
-                int node;
-                sem_elem_t wt;
-                int uno;
-                InitTrans(int _node, int _uno) : node(_node), wt(NULL), uno(_uno) { }
-                InitTrans(int _node, sem_elem_t _wt) : node(_node), wt(_wt), uno(-1) { }
-                InitTrans(const InitTrans &it) : node(it.node), wt(it.wt), uno(it.uno) { }
-        };
-
         class InterGraph;
 
         //typedef wpds::HashMap<Transition, int, TransitionHash, TransitionEq> transition_map_t;
         typedef map<Transition, int, TransitionCmp> transition_map_t;
 
+
+        class update_t {
+        public:
+          int node;
+          sem_elem_t wt;
+          int uno;
+          update_t(int _node, int _uno) : node(_node), wt(NULL), uno(_uno) { }
+          update_t(int _node, sem_elem_t _wt) : node(_node), wt(_wt), uno(-1) { }
+          update_t(const update_t &it) : node(it.node), wt(it.wt), uno(it.uno) { }
+        };
+
         class IntraGraph {
             friend class InterGraph;
             friend class SummaryGraph;
             private:
-            typedef ostream & (*PRINT_OP)(int, ostream &);
-            typedef pair<int, sem_elem_t> update_t;
+            typedef ostream & (*PRINT_OP)(ostream &, int);
 
             vector<IntraGraphNode> nodes;
             vector<IntraGraphEdge> edges;
@@ -153,8 +153,8 @@ namespace wali {
             vector<PathSequence> path_sequence;
             vector<EvaluatedPathSequence> evaluated_path_sequence;
             list<update_t> updates;
-            list<InitTrans> init_trans;
             vector<sem_elem_t> node_weight; // To avoid memory allocation on the critical path
+            vector<sem_elem_t> node_pop_weight; // To avoid memory allocation on the critical path
             sem_elem_t **apsp;
 
             list<int> topsort_list;
@@ -173,7 +173,7 @@ namespace wali {
             static reg_exp_t *regBuffer;
             static int intraGraphBufferSize;
 #endif
-            static ostream &defaultPrintOp(int a, ostream &out) {
+            static ostream &defaultPrintOp(ostream &out, int a) {
                 out << a;
                 return out;
             }
@@ -242,9 +242,8 @@ namespace wali {
             void setOutNode(int t, int inter_t);
             void addCallEdge(IntraGraph *next);
             void updateWeight(int node, sem_elem_t wt);
-            void addInitTransition(int node, int uno);
-            void addInitTransition(int node, sem_elem_t wt);
-
+            void updateWeight(int node, int uno);
+            void assignUpdates();
             void clearUpdates();
 
             bool updateEdgeWeight(int src, int tgt, sem_elem_t se);
@@ -253,9 +252,11 @@ namespace wali {
             ostream &print(ostream &out, PRINT_OP pop = defaultPrintOp);
             static ostream &print_trans(Transition &t, ostream &out, PRINT_OP pop = defaultPrintOp);
             void resetUpdatable();
+
             void solveSummarySolution(list<WTransition> &change);
-            void solveRegSummarySolution();
+            void preSolveSummarySolution(list<WTransition> &change);
             void setupSummarySolution();
+
             private:
             //int nodeno(Transition &t);
             void create_node(Transition &t, int n);
@@ -287,6 +288,13 @@ namespace wali {
             void buildRegExp(vector<PathSequence> &seq);
             void computePathSequence(vector<IntraGraphNode> &cnodes, int, vector<IntraGraphEdge> &cedges, int, vector<PathSequence> &sequence, bool use_cutset = false);
             void computePathSequenceCutset(vector<IntraGraphNode> &cnodes, int, vector<IntraGraphEdge> &cedges, int, vector<PathSequence> &sequence);
+
+            sem_elem_t popWeight(int nno);
+            void calculatePopWeights(int eps_nno);
+
+            void solveRegSummarySolution();
+            void preSolveRegSummarySolution();
+
         };
 
     } // namespace graph

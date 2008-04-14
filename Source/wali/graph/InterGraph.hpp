@@ -4,6 +4,8 @@
 #include "wali/wpds/ewpds/MergeFunction.hpp"
 
 #include "wali/graph/GraphCommon.hpp"
+#include "wali/Countable.hpp"
+#include "wali/ref_ptr.hpp"
 
 #include <list>
 #include <vector>
@@ -69,6 +71,7 @@ namespace wali {
        class ETransHandler {
 
          friend class InterGraph;
+         friend class SummaryGraph;
          
        private:
          typedef std::pair<int, sem_elem_t> Dependency; 
@@ -125,14 +128,14 @@ namespace wali {
                 out_hyper_edges(g.out_hyper_edges), visited(g.visited) {}
         };
 
-        class InterGraph {
+      class InterGraph : public Countable {
             public:
-                unsigned int count; // ref counting
+                typedef std::ostream & (*PRINT_OP)(std::ostream &, int);
+
             private:
                 friend class SummaryGraph;
 
                 typedef std::map<Transition, int, TransitionCmp> TransMap;
-                typedef std::ostream & (*PRINT_OP)(int, std::ostream &);
                 typedef bool (*WT_CHECK)(SemElem *);
                 typedef SemElem *(*WT_CORRECT)(SemElem *);
                 typedef std::pair<int,int> tup;
@@ -156,7 +159,7 @@ namespace wali {
                 bool running_prestar;
                 InterGraphStats stats;
 
-                static std::ostream &defaultPrintOp(int a, std::ostream &out) {
+                static std::ostream &defaultPrintOp(std::ostream &out, int a) {
                     out << a;
                     return out;
                 }
@@ -227,6 +230,7 @@ namespace wali {
                 void resetSCCedges(IntraGraph *gr, unsigned int scc_number);
         };
 
+        typedef ref_ptr<InterGraph> InterGraphPtr;
     } // namespace graph
 
 } // namespace wali

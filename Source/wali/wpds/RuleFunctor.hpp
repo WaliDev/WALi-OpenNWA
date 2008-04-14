@@ -98,7 +98,6 @@ namespace wali
                 void addPoint(Key k, std::set< Key > &s);
         };
 
-
     } // end namespace wpds
 
 } // end namespace wali

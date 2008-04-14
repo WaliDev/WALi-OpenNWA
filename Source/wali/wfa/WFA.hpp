@@ -38,6 +38,7 @@ namespace wali
     namespace fwpds
     {
       class FWPDS;
+      class SWPDS;
     }
   }
 
@@ -87,6 +88,7 @@ namespace wali
         friend class ::wali::wpds::DebugWPDS;
         friend class ::wali::wpds::ewpds::EWPDS;
         friend class ::wali::wpds::fwpds::FWPDS;
+        friend class ::wali::wpds::fwpds::SWPDS;
 
         static const std::string XMLTag;
         static const std::string XMLQueryTag;

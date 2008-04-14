@@ -8,6 +8,8 @@
 #include "wali/graph/IntraGraph.hpp"
 #include "wali/graph/InterGraph.hpp"
 
+#include "wali/wpds/ewpds/ERule.hpp"
+
 namespace wali {
 
     namespace graph {
@@ -26,14 +28,18 @@ namespace wali {
                 reg_exp_t regexp;
                 int uno; // 0 if not updatable
                 sem_elem_t weight;
+
                 SummaryGraphNode() : trans(0,0,0), regexp(NULL), uno(-1),
-                weight(NULL) { }
+                                     weight(NULL) { }
+
                 SummaryGraphNode(const SummaryGraphNode &n) : trans(n.trans), regexp(n.regexp),
-                uno(n.uno), weight(n.weight) { }
+                                                              uno(n.uno), weight(n.weight) { }
+
                 SummaryGraphNode(Transition &_trans, reg_exp_t &_regexp, int _uno, sem_elem_t _weight) : trans(_trans),
-                regexp(_regexp), uno(_uno), weight(_weight) { } 
+                                                                                                         regexp(_regexp), uno(_uno), weight(_weight) { } 
+
                 SummaryGraphNode(Transition &_trans) : trans(_trans),
-                regexp(NULL), uno(-1), weight(NULL) { } 
+                                                       regexp(NULL), uno(-1), weight(NULL) { } 
         };
 
         class SummaryGraph {
@@ -41,9 +47,22 @@ namespace wali {
                 typedef wali::HashMap<int, int> StackGraphMap;
                 typedef std::map<Transition, int, TransitionCmp> TransMap;
 
-                InterGraph *igr;
-                //wpds_key_t init_state;
+                InterGraphPtr post_igr;
                 Key init_state;
+
+                // The set of procedure entry nodes
+                set<Key> procEntries;
+
+                // IntraGraph to Key for procedure entry of the procedure
+                // represented by the InraGraph
+                std::map<IntraGraph *, Key> procEntryMap;
+      
+                // Map to cache [k -> MOP(k,\epsilon)]
+                std::map<Key, sem_elem_t> popWeightMap;
+
+                // Map [Transition -> ERule used to create it]
+                std::map<Transition, wpds::ewpds::erule_t, TransitionCmp> eruleMap;
+
                 StackGraphMap stack_graph_map;
                 std::list<IntraGraph *> changed_graphs;
                 std::set<IntraGraph *> updated_graphs;
@@ -55,12 +74,23 @@ namespace wali {
                 TransMap trans_map;
 
             public:
-                SummaryGraph(InterGraph *gr, wali::Key ss, InterGraph::PRINT_OP pop = InterGraph::defaultPrintOp);
+                SummaryGraph(InterGraphPtr gr, 
+                             wali::Key ss, 
+                             set<Key> &pe, 
+                             wfa::WFA &Agrow, 
+                             InterGraph::PRINT_OP pop = InterGraph::defaultPrintOp);
+
                 ~SummaryGraph();
                 void addUpdate(Transition &t, SemElem *se);
                 void getUpdatedTransitions(std::list<WTransition> &ls);
+                void preGetUpdatedTransitions(std::list<WTransition> &ls);
                 void getMiddleTransitions(std::list<WTransition> &ls);
                 void summaryPoststar(wali::wfa::WFA& ca_in, wali::wfa::WFA& ca_out);
+
+                sem_elem_t pushWeight(Key k);
+                sem_elem_t popWeight(Key k);
+                Key getEntry(Key k);
+                bool reachable(int stk);
 
                 ostream &printStats(ostream &out);
 
@@ -68,6 +98,12 @@ namespace wali {
                 int stk2nodeno(int stk);
                 int trans2nodeno(Transition &tr);
                 int getIntraNodeNumber(Transition &tr);
+                void calculatePopWeights();
+
+                void addIntraTrans(Transition &tr, sem_elem_t wt, wfa::WFA &ca_out);
+                void addMiddleTrans(Transition &tr, sem_elem_t wt, wfa::WFA &ca_out);
+                Key changeStateGeneration(Key st, int gen);
+
         };
 
     } // namespace graph
