@@ -1,7 +1,5 @@
 /*!
- * $Id: Reach.cpp,v 1.2 2005/06/10 02:10:15 kidd Exp $
- *
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "Reach.hpp"

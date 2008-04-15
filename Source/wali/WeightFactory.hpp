@@ -2,7 +2,7 @@
 #define wali_WEIGHT_FACTORY_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -11,24 +11,18 @@
 
 namespace wali
 {
-    class WeightFactory
-    {
-        public:
-            WeightFactory();
+  class WeightFactory
+  {
+    public:
+      WeightFactory();
 
-            virtual ~WeightFactory();
+      virtual ~WeightFactory();
 
-            virtual wali::sem_elem_t getWeight( std::string& s ) = 0;
+      virtual wali::sem_elem_t getWeight( std::string s ) = 0;
 
-    }; // class WeightFactory
+  }; // class WeightFactory
 
 } // namespace wali
 
 #endif  // wali_WEIGHT_FACTORY_GUARD
-
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-*/
 

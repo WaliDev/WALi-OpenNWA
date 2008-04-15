@@ -1,5 +1,5 @@
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/MergeFnFactory.hpp"

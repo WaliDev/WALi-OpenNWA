@@ -1,5 +1,5 @@
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "Reach.hpp"
@@ -7,71 +7,66 @@
 int Reach::numReaches = 0;
 
 Reach::Reach( bool b ) :
-    isreached(b)
+  isreached(b)
 {
-    numReaches++;
-    //std::cerr << "Reach(...) :" << numReaches << std::endl;
+  numReaches++;
+  //std::cerr << "Reach(...) :" << numReaches << std::endl;
 }
 
 Reach::~Reach()
 {
-    numReaches--;
-    //std::cerr << "~Reach()   :" << numReaches << std::endl;
+  numReaches--;
+  //std::cerr << "~Reach()   :" << numReaches << std::endl;
 }
 
 sem_elem_t Reach::one() const
 {
-    return new Reach(true);
+  return new Reach(true);
 }
 
 sem_elem_t Reach::zero() const
 {
-    return new Reach(false);
+  return new Reach(false);
 }
 
 // zero is the annihilator for extend
 sem_elem_t Reach::extend( SemElem* se )
 {
-    Reach* rhs = static_cast< Reach* >(se);
-    if( isreached && rhs->isreached )
-        return one();
-    else // this and rhs are one()
-        return zero();
+  Reach* rhs = static_cast< Reach* >(se);
+  if( isreached && rhs->isreached )
+    return one();
+  else // this and rhs are one()
+    return zero();
 }
 
 // zero is neutral for combine
 sem_elem_t Reach::combine( SemElem* se )
 {
-    Reach* rhs = static_cast< Reach* >(se);
-    if( isreached || rhs->isreached )
-        return one();
-    else
-        return zero();
+  Reach* rhs = static_cast< Reach* >(se);
+  if( isreached || rhs->isreached )
+    return one();
+  else
+    return zero();
 }
 
 bool Reach::equal( SemElem* se ) const
 {
-    Reach* rhs = static_cast< Reach* >(se);
-    return ( isreached == rhs->isreached );
+  Reach* rhs = static_cast< Reach* >(se);
+  return ( isreached == rhs->isreached );
 }
 
 std::ostream & Reach::print( std::ostream & o ) const
 {
-    return (isreached) ? o << "ONE" : o << "ZERO";
+  return (isreached) ? o << "ONE" : o << "ZERO";
 }
 
-sem_elem_t Reach::getWeight( std::string& s )
+sem_elem_t Reach::getWeight( std::string s )
 {
-    if( s == "ONE" ) {
-        return one();
-    }
-    else {
-        return zero();
-    }
+  if( s == "ONE" ) {
+    return one();
+  }
+  else {
+    return zero();
+  }
 }
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
- */

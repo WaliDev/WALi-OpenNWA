@@ -2,7 +2,7 @@
 #define wali_MERGE_FN_FACTORY_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -18,7 +18,7 @@ namespace wali
 
       virtual ~MergeFnFactory();
 
-      virtual merge_fn_t getMergeFn( std::string& s ) = 0;
+      virtual wali::merge_fn_t getMergeFn( std::string s ) = 0;
 
   }; // class MergeFnFactory
 

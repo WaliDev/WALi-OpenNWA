@@ -2,10 +2,7 @@
 #define REACH_GUARD 1
 
 /*!
- * $Id: Reach.hpp,v 1.2 2005/06/10 02:10:15 kidd Exp $
- *
- * @author Nick Kidd
- * @version $Revision: 1.2 $
+ * @author Nicholas Kidd
  */
 
 #include "wali/SemElem.hpp"
@@ -16,44 +13,34 @@ using wali::sem_elem_t;
 class Reach : public wali::SemElem
 {
 
-    public:
+  public:
 
-        Reach( bool b );
+    Reach( bool b );
 
-        virtual ~Reach();
+    virtual ~Reach();
 
-        sem_elem_t one() const;
+    sem_elem_t one() const;
 
-        sem_elem_t zero() const;
+    sem_elem_t zero() const;
 
-        // zero is the annihilator for extend
-        sem_elem_t extend( SemElem* rhs );
-        
-        // zero is neutral for combine
-        sem_elem_t combine( SemElem* rhs );
-        
-        bool equal( SemElem* rhs ) const;
+    // zero is the annihilator for extend
+    sem_elem_t extend( SemElem* rhs );
 
-        std::ostream & print( std::ostream & o ) const;
+    // zero is neutral for combine
+    sem_elem_t combine( SemElem* rhs );
 
-        sem_elem_t from_string( const std::string& s ) const;
+    bool equal( SemElem* rhs ) const;
 
-        static int numReaches;
+    std::ostream & print( std::ostream & o ) const;
 
-    protected:
-        bool isreached;
+    sem_elem_t from_string( const std::string& s ) const;
+
+    static int numReaches;
+
+  protected:
+    bool isreached;
 
 };
 
 #endif	// REACH_GUARD
-
-/*
- * $Log $
- */
-
-/* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
-*/
 

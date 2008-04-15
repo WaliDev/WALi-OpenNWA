@@ -1,5 +1,5 @@
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -8,15 +8,9 @@
 namespace wali
 {
 
-    WeightFactory::WeightFactory() {}
+  WeightFactory::WeightFactory() {}
 
-    WeightFactory::~WeightFactory() {}
+  WeightFactory::~WeightFactory() {}
 
 }
-
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-*/
 
