@@ -55,6 +55,8 @@ namespace wali {
           int j = stack_graph_map[stk];
           if(post_igr->nodes[i].gr != post_igr->nodes[j].gr) {
             pkey(cerr << "SWPDS: Warning: Node belongs to multiple procedures: ", stk) << "\n";
+            multiple_proc_nodes.insert(stk);
+
             //TODO: This can be fixed. For now, we assume that this node is a terminal node, i.e.,
             //it cannot reach any node except itself. (This assumption comes because such nodes
             //are typically self loops "error: goto error".) Therefore, if the node has
@@ -512,7 +514,7 @@ namespace wali {
             tr.tgt = q;
             int nno = trans2nodeno(tr);
             if(nodes[nno].regexp.is_valid()) { 
-              assert(tr.stack == (int)WALI_EPSILON);
+              assert(tr.stack == (int)WALI_EPSILON || (multiple_proc_nodes.find(tr.stack) != multiple_proc_nodes.end()));
               // Take combine
               nodes[nno].regexp = RegExp::combine(nodes[nno].regexp, gr->nodes[i].regexp);
             } else {
@@ -731,7 +733,7 @@ namespace wali {
       GenKeySource *gks = dynamic_cast<GenKeySource *> (ks);
       if(gks == 0) return st;
 
-      return getKey( new GenKeySource(gen, getKey(gks->getKey())));
+      return getKey( new GenKeySource(gen, gks->getKey()));
     }
 
 

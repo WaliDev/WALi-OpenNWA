@@ -63,6 +63,9 @@ namespace wali {
                 // Map [Transition -> ERule used to create it]
                 std::map<Transition, wpds::ewpds::erule_t, TransitionCmp> eruleMap;
 
+                // Nodes that belong to multiple procedures
+                std::set<Key> multiple_proc_nodes;
+
                 StackGraphMap stack_graph_map;
                 std::list<IntraGraph *> changed_graphs;
                 std::set<IntraGraph *> updated_graphs;
