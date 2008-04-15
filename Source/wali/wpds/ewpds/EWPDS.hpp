@@ -1,5 +1,5 @@
 #ifndef wpds_EWPDS_GUARD
-#define wpds_EWPDS_GUARD
+#define wpds_EWPDS_GUARD 1
 
 /*!
  * @author Akash Lal
@@ -7,8 +7,8 @@
 
 #include "wali/Common.hpp"
 #include "wali/SemElemPair.hpp"
+#include "wali/MergeFn.hpp"
 #include "wali/wpds/WPDS.hpp"
-#include "wali/wpds/ewpds/MergeFunction.hpp"
 #include <set>
 
 namespace wali

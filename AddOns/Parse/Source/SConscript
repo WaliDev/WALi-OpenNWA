@@ -22,7 +22,6 @@ if Debug:
 
 waliparse_files = Split("""
 ./wali/wpds/ewpds/EWpdsHandler.cpp
-./wali/wpds/ewpds/MergeFactory.cpp
 ./wali/wpds/WpdsHandler.cpp
 ./wali/wfa/WfaHandler.cpp
 ./wali/QueryHandler.cpp

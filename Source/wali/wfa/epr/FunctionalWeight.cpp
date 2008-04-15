@@ -1,7 +1,5 @@
 #include "wali/wfa/epr/FunctionalWeight.hpp"
 
-using namespace wali::wpds::ewpds;
-
 namespace wali {
   namespace wfa {
     namespace epr {

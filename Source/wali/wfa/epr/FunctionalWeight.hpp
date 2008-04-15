@@ -1,5 +1,5 @@
-#ifndef wali_FUNCTIONAL_WEIGHT_GUARD
-#define wali_FUNCTIONAL_WEIGHT_GUARD 1
+#ifndef wali_wfa_epr_FUNCTIONAL_WEIGHT_GUARD
+#define wali_wfa_epr_FUNCTIONAL_WEIGHT_GUARD 1
 
 /*!
  * @author Akash Lal
@@ -7,7 +7,6 @@
 
 #include "wali/wfa/ITrans.hpp"
 #include "wali/SemElem.hpp"
-#include "wali/wpds/ewpds/MergeFunction.hpp"
 
 namespace wali {
   namespace wfa {
@@ -60,4 +59,4 @@ namespace wali {
   } // namespace wfa
 } // namespace wali
 
-#endif // wali_FUNCTIONAL_WEIGHT_GUARD
+#endif // wali_wfa_epr_FUNCTIONAL_WEIGHT_GUARD

@@ -12,7 +12,6 @@
 #include "wali/wpds/Wrapper.hpp"
 
 #include "wali/wpds/ewpds/EWPDS.hpp"
-#include "wali/wpds/ewpds/MergeFunction.hpp"
 
 #include "wali/graph/GraphCommon.hpp"
 #include "wali/graph/InterGraph.hpp"
@@ -37,9 +36,6 @@ namespace wali {
 
 
       class FWPDS : public ewpds::EWPDS {
-        public:
-          typedef ewpds::merge_fn_t mfun_t;
-
         public:
           FWPDS();
           FWPDS(Wrapper* wrapper);

@@ -7,8 +7,8 @@
  */
 
 #include "wali/Common.hpp"
+#include "wali/MergeFn.hpp"
 #include "wali/wpds/Rule.hpp"
-#include "wali/wpds/ewpds/MergeFunction.hpp"
 
 //
 // begin namespace wali
@@ -95,8 +95,3 @@ namespace wali
 
 #endif  // wpds_ERULE_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */

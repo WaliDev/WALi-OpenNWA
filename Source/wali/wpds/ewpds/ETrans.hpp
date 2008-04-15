@@ -5,9 +5,9 @@
  * @author Nick Kidd
  */
 
+#include "wali/MergeFn.hpp"
 #include "wali/wfa/ITrans.hpp"
 #include "wali/wfa/DecoratorTrans.hpp"
-#include "wali/wpds/ewpds/MergeFunction.hpp"
 #include "wali/wpds/ewpds/ERule.hpp"
 
 namespace wali {
@@ -18,15 +18,15 @@ namespace wali {
         public:
           ETrans(
               Key from, Key stack, Key to,
-              sem_elem_t wAtCall, //!< Weight on path to the call transition
+              sem_elem_t wAtCall,    //!< Weight on path to the call transition
               sem_elem_t wAfterCall, //!< For call rule R, wAtCall->extend(R->weight())
-              erule_t erule //!< The ERule
+              erule_t erule          //!< The ERule
               );
 
           ETrans(
               ITrans* d,          //!< Trans that is being decorated
               sem_elem_t wAtCall, //!< Weight on path to the call transition
-              erule_t erule //!< The merge function
+              erule_t erule       //!< The merge function
               );
 
           virtual ~ETrans();
@@ -80,5 +80,5 @@ namespace wali {
    ;;; Local Variables: ***
    ;;; tab-width: 2 ***
    ;;; End: ***
-*/
+   */
 

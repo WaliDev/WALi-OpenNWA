@@ -22,7 +22,7 @@ namespace wali
       return new WitnessRule(r);
     }
 
-    wpds::Wrapper::merge_fn_t WitnessWrapper::wrap( merge_fn_t user_merge )
+    merge_fn_t WitnessWrapper::wrap( merge_fn_t user_merge )
     {
       return new WitnessMergeFn(user_merge);
     }

@@ -1,11 +1,11 @@
-#ifndef wali_graph__INTER_GRAPH_H
-#define wali_graph__INTER_GRAPH_H
+#ifndef wali_graph_INTER_GRAPH_GUARD
+#define wali_graph_INTER_GRAPH_GUARD 1
 
-#include "wali/wpds/ewpds/MergeFunction.hpp"
-
-#include "wali/graph/GraphCommon.hpp"
 #include "wali/Countable.hpp"
 #include "wali/ref_ptr.hpp"
+#include "wali/MergeFn.hpp"
+
+#include "wali/graph/GraphCommon.hpp"
 
 #include <list>
 #include <vector>
@@ -91,9 +91,9 @@ namespace wali {
             public:
                 int src1, src2, tgt;
                 sem_elem_t weight;
-                wali::wpds::ewpds::merge_fn_t mf;
+                wali::merge_fn_t mf;
                 HyperEdge(int s1, int s2, int t, sem_elem_t se) : src1(s1), src2(s2), tgt(t), weight(se), mf(0) {}
-                HyperEdge(int s1, int s2, int t, wali::wpds::ewpds::merge_fn_t f) : src1(s1), src2(s2), tgt(t), weight(0), mf(f) {}
+                HyperEdge(int s1, int s2, int t, wali::merge_fn_t f) : src1(s1), src2(s2), tgt(t), weight(0), mf(f) {}
                 HyperEdge(const HyperEdge &h) : src1(h.src1), src2(h.src2), tgt(h.tgt), weight(h.weight), mf(h.mf) {}
         };
 
@@ -176,7 +176,7 @@ namespace wali {
                 ~InterGraph();
                 void addEdge(Transition src, Transition tgt, wali::sem_elem_t se);
                 void addEdge(Transition src1, Transition src2, Transition tgt, wali::sem_elem_t se);
-                void addEdge(Transition src1, Transition src2, Transition tgt, wali::wpds::ewpds::merge_fn_t mf);
+                void addEdge(Transition src1, Transition src2, Transition tgt, wali::merge_fn_t mf);
                 void addCallRetEdge(Transition src, Transition tgt, wali::sem_elem_t se);
 
                 void addCallEdge(Transition src1, Transition src2);
@@ -236,5 +236,5 @@ namespace wali {
 } // namespace wali
 
 
+#endif // wali_graph_INTER_GRAPH_GUARD 
 
-#endif // wali_graph__INTER_GRAPH_H

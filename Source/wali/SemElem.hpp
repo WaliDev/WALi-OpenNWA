@@ -105,26 +105,10 @@ namespace wali
       std::ostream& marshallWeight( std::ostream& o ) const;
 
       /*!
-       *  from_string is a user defined method for unmarshalling. The
-       *  parameter 's' will be the result of to_string() (to_string()
-       *  is defined in Printable.hpp). 
-       *  For example, the following should (must?) hold assuming
-       *  there is a user defined SemElem * bound to se:
-       *      true == se->equal( se->from_string( se->to_string() ) )
-       * 
-       *  @param s the marshalled form of a SemElem
-       *  @return SemElem unmarshalled from the param s
-       * 
-       *  @see Printable
-       */
-      //virtual sem_elem_t from_string( const std::string & s ) const = 0;
-
-      /*!
        *  Perfrom the diff operation
        *   NOTE: This method performs (this - se).  This is very
        *         important as diff is not commutative
        */
-      //virtual sem_elem_t diff( SemElem * se ) const = 0;
       virtual sem_elem_t diff( SemElem * se );
 
       /*!
@@ -154,32 +138,37 @@ namespace wali
        */
       sem_elem_t star();
 
-      /*! Wrapper method for extend that will remove the ref_ptr
-       *  to make the call to the user's code. This is just a 
+      /*! 
+       * Wrapper method for extend that will remove the ref_ptr
+       * to make the call to the user's code. This is just a 
        * nice "typesafe macro" b/c sem_elem_t is used by WPDS
        */
       sem_elem_t extend( sem_elem_t se ) { return extend( se.get_ptr() ); }
 
-      /*! Wrapper method for combine that will remove the ref_ptr
-       *  to make the call to the user's code. This is just a 
+      /*! 
+       * Wrapper method for combine that will remove the ref_ptr
+       * to make the call to the user's code. This is just a 
        * nice "typesafe macro" b/c sem_elem_t is used by WPDS
        */
       sem_elem_t combine( sem_elem_t se ) { return combine( se.get_ptr() ); }
 
-      /*! Wrapper method for equal that will remove the ref_ptr
-       *  to make the call to the user's code. This is just a 
+      /*! 
+       * Wrapper method for equal that will remove the ref_ptr
+       * to make the call to the user's code. This is just a 
        * nice "typesafe macro" b/c sem_elem_t is used by WPDS
        */
       bool equal( sem_elem_t se ) const { return equal( se.get_ptr() ); }
 
-      /*! Wrapper method for diff that will remove the ref_ptr
-       *  to make the call to the user's code. This is just a 
+      /*!
+       * Wrapper method for diff that will remove the ref_ptr
+       * to make the call to the user's code. This is just a 
        * nice "typesafe macro" b/c sem_elem_t is used by WPDS
        */
       sem_elem_t diff( sem_elem_t se ) { return diff( se.get_ptr() ); }
 
-      /*! Wrapper method for delta that will remove the ref_ptr
-       *  to make the call to the user's code. This is just a 
+      /*! 
+       * Wrapper method for delta that will remove the ref_ptr
+       * to make the call to the user's code. This is just a 
        * nice "typesafe macro" b/c sem_elem_t is used by WPDS
        */
       std::pair< sem_elem_t,sem_elem_t > delta( sem_elem_t se )

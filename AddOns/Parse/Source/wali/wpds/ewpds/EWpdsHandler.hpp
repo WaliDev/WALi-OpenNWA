@@ -1,5 +1,5 @@
-#ifndef EWPDS_HANDLER_GUARD
-#define EWPDS_HANDLER_GUARD 1
+#ifndef wali_wpds_ewpds_EWPDS_HANDLER_GUARD
+#define wali_wpds_ewpds_EWPDS_HANDLER_GUARD 1
 
 /*!
  * @author Nick Kidd
@@ -8,9 +8,8 @@
 #include "wali/Common.hpp"
 #include "wali/wpds/WpdsHandler.hpp"
 #include "wali/wpds/ewpds/EWPDS.hpp"
-#include "wali/wpds/ewpds/MergeFactory.hpp"
-#include <xercesc/sax2/DefaultHandler.hpp>
 #include "StrX.hpp"
+#include <xercesc/sax2/DefaultHandler.hpp>
 #include <string>
 
 XERCES_CPP_NAMESPACE_USE
@@ -18,81 +17,80 @@ XERCES_CPP_NAMESPACE_USE
 
 namespace wali
 {
-    class WeightFactory;
+  class WeightFactory;
+  class MergeFnFactory;
 
-    namespace wpds
+  namespace wpds
+  {
+    namespace ewpds 
     {
-        namespace ewpds 
-        {
-            class EWpdsHandler : public WpdsHandler
-            {
-                public:
-                    /*! Must pass pointer to EWPDS. It cannot be created for
-                     * you */
-                    EWpdsHandler( EWPDS* pds, WeightFactory& weightFactory, MergeFactory& mergeFactory );
+      class EWpdsHandler : public WpdsHandler
+      {
+        public:
+          /*! 
+           * Must pass pointer to EWPDS. It cannot be created for you.
+           */
+          EWpdsHandler( EWPDS* pds, 
+              WeightFactory& weightFactory, 
+              MergeFnFactory& mergeFactory );
 
-                    virtual ~EWpdsHandler();
+          virtual ~EWpdsHandler();
 
-                    //! Return the generated PDS
-                    EWPDS& get_ewpds();
+          //! Return the generated PDS
+          EWPDS& get_ewpds();
 
-                    virtual void startElement(  const   XMLCh* const    uri,
-                            const   XMLCh* const    localname,
-                            const   XMLCh* const    qname,
-                            const   Attributes&     attributes);
+          virtual void startElement(  const   XMLCh* const    uri,
+              const   XMLCh* const    localname,
+              const   XMLCh* const    qname,
+              const   Attributes&     attributes);
 
-                    virtual void endElement( const XMLCh* const uri,
-                            const XMLCh* const localname,
-                            const XMLCh* const qname);
+          virtual void endElement( const XMLCh* const uri,
+              const XMLCh* const localname,
+              const XMLCh* const qname);
 
-                    virtual void characters(const XMLCh* const chars, const unsigned int length);
+          virtual void characters(const XMLCh* const chars, const unsigned int length);
 
 
-                protected:
-                    // Aliases WpdsHandler::pds but we need
-                    // a typed EWPDS handle to pass
-                    // merge functions in
-                    EWPDS *epds;
+        protected:
+          // Aliases WpdsHandler::pds but we need
+          // a typed EWPDS handle to pass
+          // merge functions in
+          EWPDS *epds;
 
-                    MergeFactory& mergeFactory;
+          MergeFnFactory& mergeFactory;
 
-                    bool inMerge;
-                    std::string mergeString;
+          bool inMerge;
+          std::string mergeString;
 
-                    /*
-                     *  Inherited from WpdsHandler
+          /*
+           *  Inherited from WpdsHandler
 
-                     WeightFactory& weightFactory;
-                     bool inWeight;
-                     std::string weightString;
+           WeightFactory& weightFactory;
+           bool inWeight;
+           std::string weightString;
 
-                     XMLCh* fromID;
-                     XMLCh* fromStackID;
-                     XMLCh* toID;
-                     XMLCh* toStack1ID;
-                     XMLCh* toStack2ID;
+           XMLCh* fromID;
+           XMLCh* fromStackID;
+           XMLCh* toID;
+           XMLCh* toStack1ID;
+           XMLCh* toStack2ID;
 
-                     EWPDS* pds;
+           EWPDS* pds;
 
-                     StrX from;
-                     StrX fromStack;
-                     StrX to;
-                     StrX toStack1;
-                     StrX toStack2;
-                     */
+           StrX from;
+           StrX fromStack;
+           StrX to;
+           StrX toStack1;
+           StrX toStack2;
+           */
 
-            }; // class EWpdsHandler
+      }; // class EWpdsHandler
 
-        } // namespace ewpds
+    } // namespace ewpds
 
-    } // namespace wpds
+  } // namespace wpds
 
 } // namespace wali
 
-#endif  // EWPDS_HANDLER_GUARD
+#endif  // wali_wpds_ewpds_EWPDS_HANDLER_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */
