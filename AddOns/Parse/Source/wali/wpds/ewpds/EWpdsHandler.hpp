@@ -32,7 +32,7 @@ namespace wali
            */
           EWpdsHandler( EWPDS* pds, 
               WeightFactory& weightFactory, 
-              MergeFnFactory& mergeFactory );
+              MergeFnFactory* mergeFactory );
 
           virtual ~EWpdsHandler();
 
@@ -57,7 +57,7 @@ namespace wali
           // merge functions in
           EWPDS *epds;
 
-          MergeFnFactory& mergeFactory;
+          MergeFnFactory* mergeFactory;
 
           bool inMerge;
           std::string mergeString;

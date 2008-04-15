@@ -24,7 +24,7 @@ namespace wali
     namespace ewpds
     {
 
-      EWpdsHandler::EWpdsHandler( EWPDS* ep, WeightFactory& wf, MergeFnFactory& mf ) :
+      EWpdsHandler::EWpdsHandler( EWPDS* ep, WeightFactory& wf, MergeFnFactory* mf ) :
         WpdsHandler(wf,ep),
         epds(ep),
         mergeFactory(mf),
@@ -110,7 +110,7 @@ namespace wali
                 , toStk1Key
                 , toStk2Key
                 , weightFactory.getWeight(weightString)
-                , mergeFactory.getMergeFn(mergeString)
+                , mergeFactory->getMergeFn(mergeString)
                 );
           }
 

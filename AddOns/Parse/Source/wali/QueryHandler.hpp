@@ -1,15 +1,15 @@
-#ifndef QUERY_HANDLER_GUARD
-#define QUERY_HANDLER_GUARD 1
+#ifndef wali_QUERY_HANDLER_GUARD
+#define wali_QUERY_HANDLER_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 
 #include "wali/Common.hpp"
+
 #include "wali/wfa/WFA.hpp"
-#include "wali/wfa/WfaHandler.hpp"
-#include "wali/wpds/WpdsHandler.hpp"
+
 #include <xercesc/sax2/DefaultHandler.hpp>
 
 XERCES_CPP_NAMESPACE_USE
@@ -17,107 +17,113 @@ XERCES_CPP_NAMESPACE_USE
 
 namespace wali
 {
-    class WeightFactory;
+  class WeightFactory;
+  class MergeFnFactory;
 
-    class QueryHandler : public DefaultHandler
-    {
+  namespace wfa {
+    class WfaHandler;
+  }
 
-        public:
-            static const std::string XMLTag;
-            static const std::string XMLPoststarTag;
-            static const std::string XMLPrestarTag;
+  namespace wpds {
+    class WpdsHandler;
+  }
 
-        public:
-            QueryHandler( WeightFactory& weightFactory );
+  class QueryHandler : public DefaultHandler
+  {
 
-            /*!
-             * QueryHandler takes ownership of the passed in Handlers
-             * and will delete them upon exiting.
-             */
-            QueryHandler(wpds::WpdsHandler* wpdsh , wfa::WfaHandler* wfah ); 
+    public:
+      static const std::string XMLTag;
+      static const std::string XMLPoststarTag;
+      static const std::string XMLPrestarTag;
 
-            virtual ~QueryHandler();
+    public:
+      QueryHandler( WeightFactory& weightFactory,MergeFnFactory* mf=NULL );
 
-            bool queryIsPrestar() const;
+      /*!
+       * QueryHandler takes ownership of the passed in Handlers
+       * and will delete them upon exiting.
+       */
+      QueryHandler(wpds::WpdsHandler* wpdsh , wfa::WfaHandler* wfah ); 
 
-            wfa::WfaHandler& getWfaHandler();
+      virtual ~QueryHandler();
 
-            wpds::WpdsHandler& getWpdsHandler();
+      bool queryIsPrestar() const;
 
-            /*!
-             * Return reference to result of query. Only valid
-             * after performing run.
-             *
-             * @return WFA
-             * @see QueryHandler::run
-             */
-            wfa::WFA& result();
+      wfa::WfaHandler* getWfaHandler();
 
-            /*!
-             * Runs the query, i.e. prestar or poststar,
-             * and returns a reference to the resulting WFA
-             *
-             * @return WFA
-             * @see wali::wfa::WFA
-             */
-            wfa::WFA& run();
+      wpds::WpdsHandler* getWpdsHandler();
 
-            //////////////////////////////////////////////////
-            // Content handlers
-            //////////////////////////////////////////////////
-            void startDocument();
+      /*!
+       * Return reference to result of query. Only valid
+       * after performing run.
+       *
+       * @return WFA
+       * @see QueryHandler::run
+       */
+      wfa::WFA& result();
 
-            void endDocument();
+      /*!
+       * Runs the query, i.e. prestar or poststar,
+       * and returns a reference to the resulting WFA
+       *
+       * @return WFA
+       * @see wali::wfa::WFA
+       */
+      wfa::WFA& run();
 
-            void startElement(  const   XMLCh* const    uri,
-                    const   XMLCh* const    localname,
-                    const   XMLCh* const    qname,
-                    const   Attributes&     attributes);
+      //////////////////////////////////////////////////
+      // Content handlers
+      //////////////////////////////////////////////////
+      void startDocument();
 
-            void endElement( const XMLCh* const uri,
-                    const XMLCh* const localname,
-                    const XMLCh* const qname);
+      void endDocument();
 
-            void characters(const XMLCh* const chars, const unsigned int length);
+      void startElement(  const   XMLCh* const    uri,
+          const   XMLCh* const    localname,
+          const   XMLCh* const    qname,
+          const   Attributes&     attributes);
 
-            void ignorableWhitespace(                               
-                    const XMLCh* const chars
-                    , const unsigned int length
-                    );
+      void endElement( const XMLCh* const uri,
+          const XMLCh* const localname,
+          const XMLCh* const qname);
 
-            void processingInstruction(   
-                    const XMLCh* const target
-                    , const XMLCh* const data
-                    );
+      void characters(const XMLCh* const chars, const unsigned int length);
 
-            //////////////////////////////////////////////////
-            // Default error handlers
-            //////////////////////////////////////////////////
-            void warning(const SAXParseException& exc);
-            void error(const SAXParseException& exc);
-            void fatalError(const SAXParseException& exc);
+      void ignorableWhitespace(                               
+          const XMLCh* const chars
+          , const unsigned int length
+          );
+
+      void processingInstruction(   
+          const XMLCh* const target
+          , const XMLCh* const data
+          );
+
+      //////////////////////////////////////////////////
+      // Default error handlers
+      //////////////////////////////////////////////////
+      void warning(const SAXParseException& exc);
+      void error(const SAXParseException& exc);
+      void fatalError(const SAXParseException& exc);
 
 
-        protected:
-            DefaultHandler* currentHandler;
-            bool isPrestar;
-            wpds::WpdsHandler* pdsHandler;
-            wfa::WfaHandler* faHandler;
+    protected:
+      WeightFactory& wf;
+      MergeFnFactory* mf;
 
-            //! Result of the query
-            wfa::WFA fa;
+      DefaultHandler* currentHandler;
+      bool isPrestar;
+      wpds::WpdsHandler* pdsHandler;
+      wfa::WfaHandler* faHandler;
 
-            XMLCh* typeID;
+      //! Result of the query
+      wfa::WFA fa;
 
-    }; // class QueryHandler
+      XMLCh* typeID;
+
+  }; // class QueryHandler
 
 } // namespace wali
 
-#endif  // QUERY_HANDLER_GUARD
-
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
- */
+#endif  // wali_QUERY_HANDLER_GUARD
 

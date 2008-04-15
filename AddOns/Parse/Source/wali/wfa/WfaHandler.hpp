@@ -1,14 +1,18 @@
-#ifndef WFA_HANDLER_GUARD
-#define WFA_HANDLER_GUARD 1
+#ifndef wali_wfa_WFA_HANDLER_GUARD
+#define wali_wfa_WFA_HANDLER_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
-#include "wali/Common.hpp"
 #include "StrX.hpp"
+
+#include "wali/Common.hpp"
+
 #include "wali/wfa/WFA.hpp"
+
 #include <xercesc/sax2/DefaultHandler.hpp>
+
 #include <string>
 
 XERCES_CPP_NAMESPACE_USE
@@ -16,107 +20,104 @@ XERCES_CPP_NAMESPACE_USE
 namespace wali
 {
 
-    class WeightFactory;
+  class WeightFactory;
 
-    namespace wfa
+  namespace wfa
+  {
+    class WfaHandler : public DefaultHandler
     {
-        class WfaHandler : public DefaultHandler
-        {
-            public:
-                WfaHandler( WeightFactory& weightFactory );
+      public:
+        WfaHandler( WeightFactory& weightFactory );
 
-                virtual ~WfaHandler();
+        virtual ~WfaHandler();
 
-                //! Return the generated PDS
-                WFA& get();
-                
-                void endDocument();
+        //! Return reference to the WeightFactory being used
+        WeightFactory& getWeightFactory() const;
 
-                void endElement( const XMLCh* const uri,
-                        const XMLCh* const localname,
-                        const XMLCh* const qname);
+        //! Return the generated PDS
+        WFA& get();
 
-                void characters(const XMLCh* const chars, const unsigned int length);
+        void endDocument();
 
-                void ignorableWhitespace(                               
-                        const XMLCh* const chars
-                        , const unsigned int length
-                        );
+        void endElement( const XMLCh* const uri,
+            const XMLCh* const localname,
+            const XMLCh* const qname);
 
-                void processingInstruction(   
-                        const XMLCh* const target
-                        , const XMLCh* const data
-                        );
+        void characters(const XMLCh* const chars, const unsigned int length);
 
-                void startDocument();
+        void ignorableWhitespace(                               
+            const XMLCh* const chars
+            , const unsigned int length
+            );
 
-                void startElement(  const   XMLCh* const    uri,
-                        const   XMLCh* const    localname,
-                        const   XMLCh* const    qname,
-                        const   Attributes&     attributes);
+        void processingInstruction(   
+            const XMLCh* const target
+            , const XMLCh* const data
+            );
 
-                //////////////////////////////////////////////////
-                // Default error handlers
-                //////////////////////////////////////////////////
-                void warning(const SAXParseException& exc);
-                void error(const SAXParseException& exc);
-                void fatalError(const SAXParseException& exc);
+        void startDocument();
 
-                //////////////////////////////////////////////////
-                // Helpers
-                //////////////////////////////////////////////////
-                void handleTrans(
-                        const XMLCh* const uri
-                        , const XMLCh* const localname
-                        , const XMLCh* const qname
-                        , const Attributes& attributes);
+        void startElement(  const   XMLCh* const    uri,
+            const   XMLCh* const    localname,
+            const   XMLCh* const    qname,
+            const   Attributes&     attributes);
 
-                void handleState(
-                        const XMLCh* const uri
-                        , const XMLCh* const localname
-                        , const XMLCh* const qname
-                        , const Attributes& attributes);
+        //////////////////////////////////////////////////
+        // Default error handlers
+        //////////////////////////////////////////////////
+        void warning(const SAXParseException& exc);
+        void error(const SAXParseException& exc);
+        void fatalError(const SAXParseException& exc);
 
-                void handleWFA(
-                        const XMLCh* const uri
-                        , const XMLCh* const localname
-                        , const XMLCh* const qname
-                        , const Attributes& attributes);
+        //////////////////////////////////////////////////
+        // Helpers
+        //////////////////////////////////////////////////
+        void handleTrans(
+            const XMLCh* const uri
+            , const XMLCh* const localname
+            , const XMLCh* const qname
+            , const Attributes& attributes);
 
-            protected:
-                WeightFactory& weightFactory;
-                //! For getting weight strings
-                bool inWeight;
-                std::string weightString;
+        void handleState(
+            const XMLCh* const uri
+            , const XMLCh* const localname
+            , const XMLCh* const qname
+            , const Attributes& attributes);
 
-                //! for getting attrs out of rules
-                XMLCh* fromID;
-                XMLCh* stackID;
-                XMLCh* toID;
-                XMLCh* queryID;
+        void handleWFA(
+            const XMLCh* const uri
+            , const XMLCh* const localname
+            , const XMLCh* const qname
+            , const Attributes& attributes);
 
-                //! the WFA we parse
-                WFA* fa;
+      protected:
+        WeightFactory& weightFactory;
+        //! For getting weight strings
+        bool inWeight;
+        std::string weightString;
 
-                //! place holders
-                StrX from;
-                StrX stack;
-                StrX to;
-                wali::Key stateKey;
-                bool isInitial;
-                bool isFinal;
+        //! for getting attrs out of rules
+        XMLCh* fromID;
+        XMLCh* stackID;
+        XMLCh* toID;
+        XMLCh* queryID;
 
-        }; // class WfaHandler
+        //! the WFA we parse
+        WFA* fa;
 
-    } // namespace wfa
+        //! place holders
+        StrX from;
+        StrX stack;
+        StrX to;
+        wali::Key stateKey;
+        bool isInitial;
+        bool isFinal;
+
+    }; // class WfaHandler
+
+  } // namespace wfa
 
 } // namespace wali
 
-#endif  // WFA_HANDLER_GUARD
-
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-*/
+#endif  // wali_wfa_WFA_HANDLER_GUARD
 
