@@ -71,6 +71,19 @@ namespace wali
       delete t;
     }
 
+
+    /***********
+     * TransZeroWeight
+     ***********/
+    void TransZeroWeight::operator()( ITrans* t )
+    {
+      sem_elem_t wt = t->weight();
+      if(wt->equal(wt->zero())) {
+        zeroWeightTrans.insert(t);
+      }
+    }
+
+
     //////////////
     // TransDotty
     //////////////

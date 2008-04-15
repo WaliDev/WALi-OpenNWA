@@ -134,6 +134,23 @@ namespace wali
         virtual void operator()( ITrans* t );
     }; // class TransDeleter
 
+
+    /*!
+     * @class TransZeroWeight
+     *
+     * Accumulates the set of transitions with zero weight
+     *
+     * @see TransFunctor
+     */
+    class TransZeroWeight : public TransFunctor
+    {
+      public:
+        TransSet zeroWeightTrans;
+        virtual ~TransZeroWeight() {}
+
+        virtual void operator()( ITrans* t );
+    }; // class TransZeroWeight
+
     /*!
      * @class TransDotty
      * Prints each Trans to std::ostream in dotty format.
