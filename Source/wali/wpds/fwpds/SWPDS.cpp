@@ -119,6 +119,11 @@ namespace wali {
         preprocessed = true;
       }
 
+      bool SWPDS::reachable(Key k) {
+        assert(preprocessed);
+        return sgr->reachable(k);
+      }
+
       void SWPDS::poststar(wfa::WFA &ca_in, wfa::WFA &ca_out) {
 
         if(!preprocessed) {
@@ -130,10 +135,24 @@ namespace wali {
           ca_out.clear();
         }
 
-        // Needed for creating mid-states
+        // Needed for creating mid-states -- set before summaryPoststar
         ca_out.setGeneration(ca_in.getGeneration() + 1);
 
         sgr->summaryPoststar(ca_in, ca_out);
+
+        // Set other info about the output -- see WPDS::setupOutput
+        Key init = ca_in.getInitialState();
+        std::set<Key> localF( ca_in.getFinalStates() );
+
+        ca_out.addState(init,theZero);
+        ca_out.setInitialState( init );
+        for (std::set<Key>::iterator cit = localF.begin();
+             cit != localF.end() ; cit++)
+          {
+            Key f = *cit;
+            ca_out.addState(f,theZero);
+            ca_out.addFinalState(f);
+          }
 
       }
 

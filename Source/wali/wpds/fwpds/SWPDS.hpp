@@ -59,6 +59,7 @@ namespace wali {
 
         void addEntryPoint(Key e);
         void preprocess();
+        bool reachable(Key k);
 
       private:
         WpdsStackSymbols syms;
