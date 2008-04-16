@@ -54,7 +54,10 @@ namespace wali
           const   Attributes&     attributes)
       {
         StrX who(localname);
-        if( MergeFn::XMLTag == who.get() ) {
+        if (wali::wpds::ewpds::EWPDS::XMLTag == who.get()) {
+          // do nothing
+        }
+        else if (MergeFn::XMLTag == who.get()) {
           //std::cerr << "Start MergeFn\n";
           inMerge = true;
           mergeString = "";

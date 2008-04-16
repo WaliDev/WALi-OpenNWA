@@ -50,6 +50,8 @@ namespace wali
     namespace ewpds
     {
 
+      const std::string EWPDS::XMLTag("EWPDS");
+
       EWPDS::EWPDS( Wrapper * wrapper ) : WPDS(wrapper), addEtrans(false)
       { }
 
@@ -462,8 +464,3 @@ namespace wali
 
 } // namespace wali
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */

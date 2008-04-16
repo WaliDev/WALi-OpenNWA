@@ -174,6 +174,10 @@ namespace wali
         }
         currentHandler = pdsHandler;
       }
+      else if (!currentHandler) {
+        *waliErr << "[ERROR] In wali::QueryHandler, unhandled tag <> '" 
+          << who << "'" << std::endl;
+      }
       assert(currentHandler);
       currentHandler->startElement(uri,localname,qname,attributes);
     }

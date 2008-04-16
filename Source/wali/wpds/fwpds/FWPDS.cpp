@@ -44,6 +44,8 @@ using namespace wali::wpds::ewpds;
 
 #define FWPDS_DYN_CAST 0
 
+const std::string FWPDS::XMLTag("FWPDS");
+
 FWPDS::FWPDS() : EWPDS(), interGr(NULL), checkingPhase(false)
 {
 }
