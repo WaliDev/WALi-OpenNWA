@@ -2,6 +2,7 @@
 
 #include "wali/graph/IntraGraph.hpp"
 #include "wali/graph/LinkEval.hpp"
+#include "wali/graph/GraphCommon.hpp"
 
 #include <iostream>
 
@@ -767,6 +768,7 @@ namespace wali {
     sem_elem_t IntraGraph::get_weight(int nno) {
 
       if(nodes[nno].regexp.get_ptr() == NULL) {
+        assert(0);
         //buildCutsetRegExp(topsort_list,cutset_list,nodes,edges); 
         vector<PathSequence> seq;
         domRegExp(nodes,nnodes,edges,nedges,seq);
@@ -813,6 +815,10 @@ namespace wali {
         //    nodes[i].regexp->print(std::cout<< i << ")   ") << std::endl;
         //}
       }
+
+      //cout << "graph = (" << nnodes << "," << nedges << ")\n";
+      //cout << "size = " << path_sequence.size() << "\n";
+      //cout << "\n";
 
       STAT(stats.ndom_sequence = path_sequence.size());
       return;
@@ -908,6 +914,8 @@ namespace wali {
       }
     }
 
+    //Use of tree[.] is deprecated
+    // e \in tree[v] iff (v = e.tgt and e.src = dom[e.tgt])
     void IntraGraph::domRegExp(vector<IntraGraphNode> &cnodes, int ncnodes, vector<IntraGraphEdge> &cedges, int ncedges, vector<PathSequence> &sequence) {
       int n = ncnodes;
       int i;
@@ -985,7 +993,8 @@ namespace wali {
           list<int>::iterator eend = cnodes[v].incoming.end();
           for(; ebeg != eend; ebeg++) {
             w = cedges[*ebeg].src;
-            if(*ebeg == tree[v]) continue;
+            //if(*ebeg == tree[v]) continue;
+            if(w == dom[v]) continue;
             // head of e-tilde
             while(dom[w] != dom[v]) {
               w = dom[w];
@@ -1027,9 +1036,15 @@ namespace wali {
         for(; beg != end; beg++) {
           v = *beg;
           reg[v] = RegExp::constant(se->zero());
-          if(tree[v] != -1) {
-            reg[v] = RegExp::combine(reg[v], cedges[tree[v]].regexp);
+          list<int>::iterator ebeg = cnodes[v].incoming.begin();
+          list<int>::iterator eend = cnodes[v].incoming.end();
+          for(; ebeg != eend; ebeg++) {
+            if(cedges[*ebeg].src != dom[v]) continue;
+            reg[v] = RegExp::combine(reg[v], cedges[*ebeg].regexp);
           }
+          //if(tree[v] != -1) {
+          //  reg[v] = RegExp::combine(reg[v], cedges[tree[v]].regexp);
+          //}
         }
         for(j = slength; j < (int)sequence.size(); j++) {
           PathSequence &ps = sequence[j];
@@ -1053,16 +1068,21 @@ namespace wali {
       }
       // Finalize
 
-      reg_exp_t q = RegExp::constant(se->zero());
-      list<int>::iterator beg = cnodes[0].incoming.begin();
-      list<int>::iterator end = cnodes[0].incoming.end();
-      for(; beg != end; beg++) {
-        if(*beg == tree[0])
-          continue;
-        q = RegExp::combine(q, eval_and_sequence(cnodes, cedges, *beg, ancestor, sequence));
+      if(cnodes[0].incoming.size() != 0) {
+        reg_exp_t q = RegExp::constant(se->zero());
+        list<int>::iterator beg = cnodes[0].incoming.begin();
+        list<int>::iterator end = cnodes[0].incoming.end();
+
+        assert(dom[0] == -1); // node 0 has no tree edges
+        for(; beg != end; beg++) {
+          //if(*beg == tree[0])
+          //  continue;
+          q = RegExp::combine(q, eval_and_sequence(cnodes, cedges, *beg, ancestor, sequence));
+        }
+      
+        q = RegExp::star(q);
+        sequence.push_back(PathSequence(q, 0, 0));
       }
-      q = RegExp::star(q);
-      sequence.push_back(PathSequence(q, 0, 0));
 
       for(i = n-2; i >= 0; i--) {
         v = vertex[i];
