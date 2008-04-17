@@ -1,8 +1,26 @@
+# $Id $
 import os,os.path
 
 Import('WaliDir')
 Import('LibInstallDir')
 Import('BaseEnv')
+Import('MkStatic')
+
+StaticLibs = [
+  os.path.join(LibInstallDir,'libwaliparse.a'),
+  os.path.join(LibInstallDir,'libwali.a')
+  ] if MkStatic else []
+
+Libs = [
+      'wali',
+      'waliparse',
+      'xerces-c',
+    ] if not MkStatic else ['xerces-c']
+
+LibPath = [
+  LibInstallDir,
+  WaliDir+'/AddOns/Parse/ThirdParty/xerces-c/lib',
+  ] if not MkStatic else [ WaliDir+'/AddOns/Parse/ThirdParty/xerces-c/lib' ]
 
 ## ###############################
 ## Environment
@@ -13,15 +31,8 @@ env = BaseEnv.Clone(
       os.path.join(WaliDir,'AddOns','Parse','ThirdParty','xerces-c','include'),
     ],
     CXXFLAGS = '-g -ggdb -Wall -Wformat=2 -W ',
-    LIBS = [
-      'wali',
-      'waliparse',
-      'xerces-c',
-    ],
-    LIBPATH=[
-      LibInstallDir,
-      WaliDir+'/AddOns/Parse/ThirdParty/xerces-c/lib',
-    ]
+    LIBS     = Libs,
+    LIBPATH  = LibPath
 )
 
 # Used to record the tests that are built
@@ -32,7 +43,7 @@ ReachFiles= Split("""
 Reach/ExMain.cpp
 Reach/Reach.cpp
 """)
-Reach = env.Program('ExMain',ReachFiles)
+Reach = env.Program('ExMain',ReachFiles + StaticLibs)
 built.append(Reach)
 
 Return('built')

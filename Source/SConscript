@@ -1,5 +1,6 @@
+# ##################################################
 # Build wali library
-# $Id$
+
 import os
 
 ## Control output of debug <progress> information
@@ -89,9 +90,6 @@ wali_files = Split("""
 """)
 
 env = BaseEnv.Clone()
-
-IncludeDirs = [ os.path.join(WaliDir , 'Source'), ]
-env['CPPPATH'] = IncludeDirs 
 
 if Debug:
     print "+ CC            : '%s'" % env['CC'] 

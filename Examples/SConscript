@@ -9,12 +9,6 @@ Import('BaseEnv')
 ## Environment
 Env = BaseEnv.Clone()
  
-# Include search path
-IncludeDirs = [
-    os.path.join(WaliDir, 'Source'),
-]
-Env['CPPPATH'] = IncludeDirs
-
 ## Libraries
 Libs = [ 'wali', ]
 Env['LIBS'] = Libs

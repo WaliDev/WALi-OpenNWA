@@ -1,5 +1,5 @@
+# #############################
 # Build the waliparse library
-# $Id$
 
 import os,platform
 

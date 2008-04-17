@@ -1,5 +1,4 @@
-# Build the example applications
-# $Id$
+# Build the test programs 
 import os,os.path
 
 Import('WaliDir')
@@ -9,11 +8,7 @@ Import('BaseEnv')
 ## ###############################
 ## Environment
 Env = BaseEnv.Clone()
-IncludeDirs = [
-    os.path.join(WaliDir, 'Source'),
-    os.path.join(WaliDir, 'Examples','Reach'),
-    ]
-Env['CPPPATH']  = IncludeDirs
+Env['CPPPATH']  += [os.path.join(WaliDir,'Examples','Reach')]
 Env['LIBS']     = ['wali']
 Env['LIBPATH']  = [ LibInstallDir ]
  

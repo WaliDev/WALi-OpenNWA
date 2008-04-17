@@ -16,6 +16,7 @@ if 'gcc' == BaseEnv['CC']:
 elif 'cl' == BaseEnv['CC']:
     # Mostly copied from VS C++ 2005 Command line
     BaseEnv['CXXFLAGS'] = '/TP /errorReport:prompt /Wp64 /W4 /GR /MTd /EHsc'
+BaseEnv['CPPPATH'] = [ os.path.join(WaliDir , 'Source') ]
 
 Export('WaliDir')
 Export('LibInstallDir')
