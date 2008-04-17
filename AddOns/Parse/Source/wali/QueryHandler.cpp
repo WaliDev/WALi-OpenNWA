@@ -20,7 +20,7 @@
 #include "wali/wpds/ewpds/EWpdsHandler.hpp"
 
 #include "wali/wpds/fwpds/FWPDS.hpp"
-//#include "wali/wpds/ewpds/EWpdsHandler.hpp"
+#include "wali/wpds/fwpds/SWPDS.hpp"
 
 #include <xercesc/sax2/Attributes.hpp>
 
@@ -141,6 +141,10 @@ namespace wali
       const   XMLCh* const    qname,
       const   Attributes&     attributes)
   {
+    using wpds::ewpds::EWPDS;
+    using wpds::fwpds::FWPDS;
+    using wpds::fwpds::SWPDS;
+
     StrX who(localname);
     if( XMLTag == who.get() ) {
       StrX type = attributes.getValue(typeID);
@@ -169,8 +173,19 @@ namespace wali
       }
       else if (wpds::ewpds::EWPDS::XMLTag == who.get()) {
         if (pdsHandler == NULL) {
-          wpds::ewpds::EWPDS* e = new wpds::ewpds::EWPDS();
-          pdsHandler = new wpds::ewpds::EWpdsHandler(e,wf,mf);
+          pdsHandler = new wpds::ewpds::EWpdsHandler(new EWPDS(),wf,mf);
+        }
+        currentHandler = pdsHandler;
+      }
+      else if (wpds::fwpds::FWPDS::XMLTag == who.get()) {
+        if (pdsHandler == NULL) {
+          pdsHandler = new wpds::ewpds::EWpdsHandler(new FWPDS(),wf,mf);
+        }
+        currentHandler = pdsHandler;
+      }
+      else if (wpds::fwpds::SWPDS::XMLTag == who.get()) {
+        if (pdsHandler == NULL) {
+          pdsHandler = new wpds::ewpds::EWpdsHandler(new SWPDS(),wf,mf);
         }
         currentHandler = pdsHandler;
       }

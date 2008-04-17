@@ -45,6 +45,13 @@ namespace wali {
     namespace fwpds {
 
       class SWPDS : public FWPDS {
+        public:
+          /*!
+           * For parsing XML FWPDSs.
+           * @shadow wali::wpds::ewpds::EPDS::XMLTag
+           */
+          static const std::string XMLTag;
+
 
       public:
         SWPDS();

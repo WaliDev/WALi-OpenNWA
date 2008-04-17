@@ -29,6 +29,8 @@ namespace wali {
 
     namespace fwpds {
 
+      const std::string SWPDS::XMLTag("SWPDS");
+
       SWPDS::SWPDS() : FWPDS(), preprocessed(false), sgr(NULL) { }
 
       SWPDS::SWPDS(Wrapper *wrapper) : FWPDS(wrapper), preprocessed(false), sgr(NULL) { }
