@@ -356,9 +356,8 @@ namespace wali {
       return out;
     }
 
-    // TODO: The WPDS++ code has one additional trick that has not been implemented
-    // below (because its not clear if it was useful in the past). The trick is
-    // that the regexp obtain from IntraGraphs is used only the first time to
+    // One trick that was quite useful (popRegExpMap):
+    // The regexp obtained from IntraGraphs is used only the first time to
     // compute the weight on a eps-transition. After that, an APSP style regexp
     // is used. The intuition is that not all incoming transitions to a state
     // have their weight change in the pop phase. So use their weights once, and
@@ -379,8 +378,11 @@ namespace wali {
       std::set<Key> state_has_eps; // states that have an incoming eps-transition
 
       std::map<Key, std::set<ITrans *> > state_trans_map;
-
       std::map<Key, std::set<ITrans* > >::iterator st_map_it;
+
+      // ** For saturation to proceed in pop-phase style (APSP) **
+      map<Key, reg_exp_t> popRegExpMap; // state q to pop-regexp for (init, \ee, q)
+      set<Key> state_used_once; // we switch from intraq-regexp to pop-regexp after we've used the former once
 
       Timer *timer1 = new Timer("SWPDS: Setup");
 
@@ -472,7 +474,9 @@ namespace wali {
         
         // Go through all transitions again and pass them onto the
         // appropriate gr (as the starting weights) 
-        // and also create updatable node numbers
+        // and also create updatable node numbers.
+        // Also, create a pop-regexp for the eps transition
+        list<reg_exp_t> pop_regexp_list;
         for(trans_it = trans_set.begin(); trans_it != trans_set.end(); trans_it++) {
             
           ITrans *t = *trans_it;
@@ -494,13 +498,17 @@ namespace wali {
             assert(t->stack() != WALI_EPSILON);
             if(nodes[cno].uno == -1) {
               int uno = RegExp::getNextUpdatableNumber();
-              RegExp::updatable(uno, post_igr->sem->zero()); // create the updatable node (increments updatable number)
-              
+              reg_exp_t reg = RegExp::updatable(uno, post_igr->sem->zero()); // create the updatable node (increments updatable number)
+              reg = RegExp::extend(reg, RegExp::constant(popWeight(t->stack())));
+              pop_regexp_list.push_back(reg);
+
               gr->updateWeight(intra_nno, uno);
               nodes[cno].uno = uno;
             }
           }
         }
+
+        popRegExpMap[q] = RegExp::combine(pop_regexp_list);
 
         // Go through all the IntraGraphs and get regexp from them
         for(gr_it = gr_set.begin(); gr_it != gr_set.end(); gr_it++) {
@@ -555,8 +563,15 @@ namespace wali {
         int nno = trans2nodeno(tr);
         assert(nodes[nno].weight.is_valid());
 
+        sem_elem_t weight;
+        if(state_used_once.find(q) == state_used_once.end()) {
+          state_used_once.insert(q);
+          weight = nodes[nno].regexp->get_weight();
+        } else {
+          weight = nodes[nno].weight->combine(popRegExpMap[q]->get_weight());
+        }
+
         // If weight did not change from last time, continue
-        sem_elem_t weight = nodes[nno].regexp->get_weight();
         if(nodes[nno].weight->equal(weight)) 
           continue;
 

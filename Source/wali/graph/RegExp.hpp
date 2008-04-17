@@ -248,6 +248,7 @@ namespace wali {
                 static reg_exp_t star(reg_exp_t r);
                 static reg_exp_t extend(reg_exp_t r1, reg_exp_t r2);
                 static reg_exp_t combine(reg_exp_t r1, reg_exp_t r2);
+                static reg_exp_t combine(list<reg_exp_t> &ls);
                 static reg_exp_t constant(sem_elem_t se);
                 static void startSatProcess(const sem_elem_t se);
                 static void stopSatProcess();

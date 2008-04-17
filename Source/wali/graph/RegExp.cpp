@@ -185,6 +185,19 @@ namespace wali {
 #endif // REGEXP_CACHING
         }
 
+        reg_exp_t RegExp::combine(list<reg_exp_t> &ls) {
+          if(ls.size() == 0)
+            return reg_exp_zero;
+          if(ls.size() == 1)
+            return *ls.begin();
+          
+          reg_exp_t reg = new RegExp(reg_exp_zero->value);
+          reg->type = Combine;
+          reg->children = ls;
+          return reg;
+        }
+      
+
         reg_exp_t RegExp::extend(reg_exp_t r1, reg_exp_t r2) {
             if(extend_backwards) {
                 reg_exp_t tmp = r1;
