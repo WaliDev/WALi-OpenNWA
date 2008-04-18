@@ -60,7 +60,8 @@ namespace wali {
             //TODO: This can be fixed. For now, we assume that this node is a terminal node, i.e.,
             //it cannot reach any node except itself. (This assumption comes because such nodes
             //are typically self loops "error: goto error".) Therefore, if the node has
-            //other successors, they may not show up in the final automaton
+            //other successors, they may not show up in post* automaton
+            //Also, one should not run a prestar query from an automaton that has such a node.
             //assert(0);
           }
         }
@@ -231,6 +232,10 @@ namespace wali {
       return true;
     }
 
+    // Does the node stk belong to multiple procedures?
+    bool SummaryGraph::multiple_proc(int stk) {
+      return (multiple_proc_nodes.find(stk) != multiple_proc_nodes.end());
+    }
 
     SummaryGraph::~SummaryGraph() { }
 
@@ -310,6 +315,27 @@ namespace wali {
         IntraGraph *gr = *lit;
         gr->visited = false;
       }
+    }
+
+    void SummaryGraph::preAddUpdate(Transition &t, sem_elem_t wt) {
+
+      assert(t.src == (int)init_state);
+      assert(t.stack != (int)WALI_EPSILON);
+
+      int nno = getIntraNodeNumber(t);
+      if(nno == -1) {
+        pkey(cout << "SWPDS: Warning: Unreachable code (", t.stack) << ")\n";
+        return;
+      }
+
+      IntraGraph *gr = post_igr->nodes[stk2nodeno(t.stack)].gr;
+      
+      gr->updateWeight(nno, wt);
+      if(!gr->visited) {
+        gr->visited = true;
+        changed_graphs.push_back(gr);
+      }
+      updated_graphs.insert(gr);
     }
 
     void SummaryGraph::getMiddleTransitions(std::list<WTransition> &ls) {
@@ -522,7 +548,7 @@ namespace wali {
             tr.tgt = q;
             int nno = trans2nodeno(tr);
             if(nodes[nno].regexp.is_valid()) { 
-              assert(tr.stack == (int)WALI_EPSILON || (multiple_proc_nodes.find(tr.stack) != multiple_proc_nodes.end()));
+              assert(tr.stack == (int)WALI_EPSILON || multiple_proc(tr.stack));
               // Take combine
               nodes[nno].regexp = RegExp::combine(nodes[nno].regexp, gr->nodes[i].regexp);
             } else {

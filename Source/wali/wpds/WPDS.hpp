@@ -198,6 +198,14 @@ namespace wali
         virtual std::ostream & marshall( std::ostream & o ) const;
 
         /*!
+         * @brief Return the number of rules in the WPDS.
+         * Note that this function takes time O(num rules), not
+         * constant time.
+         *
+         */
+        virtual int count_rules( ) const;
+
+        /*!
          * @brief apply ConstRuleFunctor to each rule in WPDS
          *
          * @see ConstRuleFunctor

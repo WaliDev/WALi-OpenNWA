@@ -1,8 +1,15 @@
-
+#include "wali/wfa/State.hpp"
+#include "wali/wpds/ewpds/ETrans.hpp"
 #include "wali/wpds/fwpds/SWPDS.hpp"
+#include "wali/graph/GraphCommon.hpp"
+
 using namespace std;
 
 namespace wali {
+  using wfa::ITrans;
+  using graph::Transition;
+  using graph::WTransition;
+
   namespace wpds {
 
     namespace ewpds {
@@ -45,14 +52,21 @@ namespace wali {
         syms.entryPoints.insert(n);
       }
 
-      void SWPDS::prestar(wfa::WFA &input, wfa::WFA &output) {
-        if(!preprocessed) {
-          *waliErr << "SWPDS: Error: Must preprocess before running query\n";
+      // Carried over from WPDS to ensure that no rules are added after
+      // SWPDS is preprocessed
+      bool SWPDS::make_rule(
+                            Config *f,
+                            Config *t,
+                            Key stk2,
+                            sem_elem_t se,
+                            rule_t& r ) {
+
+        if(preprocessed) {
+          *waliErr << "SWPDS: Error: Cannot add rules after calling preprocess\n";
           assert(0);
         }
 
-        *waliErr << "Error: SWPDS::prestar not yet supported\n";
-        assert(0);
+        return WPDS::make_rule(f,t,stk2,se,r);
       }
 
       void SWPDS::preprocess() {
@@ -126,6 +140,11 @@ namespace wali {
         return sgr->reachable(k);
       }
 
+      bool SWPDS::multiple_proc(Key k) {
+        assert(preprocessed);
+        return sgr->multiple_proc(k);
+      }
+
       void SWPDS::poststar(wfa::WFA &ca_in, wfa::WFA &ca_out) {
 
         if(!preprocessed) {
@@ -143,6 +162,7 @@ namespace wali {
         sgr->summaryPoststar(ca_in, ca_out);
 
         // Set other info about the output -- see WPDS::setupOutput
+        ca_out.setQuery(wfa::WFA::REVERSE);
         Key init = ca_in.getInitialState();
         std::set<Key> localF( ca_in.getFinalStates() );
 
@@ -157,6 +177,165 @@ namespace wali {
           }
 
       }
+
+      //TODO: Can probably implement this like poststar, where SummaryGraph
+      //creates regexp for performing saturation. But this is OK for now.
+      void SWPDS::prestar(wfa::WFA &ca_in, wfa::WFA &ca_out) {
+        if(!preprocessed) {
+          *waliErr << "SWPDS: Error: Must preprocess before running query\n";
+          assert(0);
+        }
+
+        if(&ca_out != &ca_in) {
+          ca_out.operator=(ca_in);
+        }
+
+        Key start_state = *pds_states.begin();
+
+        // Add (init,entry,init) transitions
+        set<Key>::iterator it;
+        for(it = syms.entryPoints.begin(); it != syms.entryPoints.end(); it++) {
+          sem_elem_t se = sgr->popWeight(*it);
+          if(!se->equal(se->zero())) {
+            ca_out.insert(new ewpds::ETrans(start_state, *it, start_state, 0, se, 0));
+          }
+        }
+
+        // Run pre* with call and (\y to entry) rules
+
+        // Make WALi non-strict about transitions to a PDS state
+        bool strict = is_strict();
+        set_strict(false);
+        pre_pds.prestar(ca_out, ca_out);
+        set_strict(strict);
+
+        // Process Rule1s (IntraQ)
+        // For this, we take all transitions (start_state, *, q) for each q (!= start_state)
+        // then pass all of these to SummaryGraph, run IntraQ, get updated
+        // transitions, and add them to the automaton. If all transitions
+        // leading into q are ETrans, then the added transitions are also
+        // ETrans. If all are Trans, then added transitions are also Trans.
+        // If its a mix of Trans and ETrans, then assert(0)
+
+        std::map<Key, std::set<ITrans *> > state_trans_map;
+        std::map<Key, std::set<ITrans* > >::iterator st_map_it;
+
+        std::set<Key> states = ca_out.getStates();
+        std::set<Key>::iterator set_it;
+
+        // Build a map: state -> { incoming transition }
+        for(set_it = states.begin(); set_it != states.end(); set_it++) {
+
+          wfa::State* state = ca_out.getState(*set_it);          
+          wfa::State::iterator tli = state->begin();;
+
+          for( ; tli != state->end(); tli++) {
+
+            ITrans* t = *tli;
+
+            if(t->stack() == WALI_EPSILON)
+              continue;
+
+            // only process these transitions
+            if(!(t->from() == start_state && t->to() != start_state))
+              continue;
+ 
+            // Ignore unreachable code
+            if(!sgr->reachable(t->stack())) {
+              printKey(*waliErr << "SWPDS: Warning: Unreachable code(", t->stack()) << ")\n";
+              continue;
+            }
+
+            // pre* cannot yet handle nodes that belong to multiple procedures
+            if(sgr->multiple_proc(t->stack())) {
+              printKey(*waliErr << "SWPDS: Error: Pre* cannot yet handle nodes (", t->stack()) << ") that belong to multiple procedures\n";
+              assert(0);
+            }
+
+            state_trans_map[t->to()].insert(t);
+          }
+        }
+
+        // Iterate over all states
+        for(st_map_it = state_trans_map.begin(); st_map_it != state_trans_map.end(); st_map_it++) {
+          Key q = st_map_it->first;
+          
+          std::set<ITrans*> &trans_set = st_map_it->second;
+          std::set<ITrans*>::iterator trans_it;
+          bool state_has_etrans = false;
+          bool  first = true;
+
+          // Pass in the updates, keep track of transition type
+          for(trans_it = trans_set.begin(); trans_it != trans_set.end(); trans_it++) {
+            
+            ITrans *t = *trans_it;
+            Transition tt(*t);
+
+            sgr->preAddUpdate(tt, t->weight());
+
+            ewpds::ETrans *et = dynamic_cast<ewpds::ETrans *>(t);
+            if(first) {
+              state_has_etrans = (et != 0);
+              first = false;
+            } else {
+              assert(state_has_etrans == (et != 0));
+            }
+          }
+
+          // Get the updated transitions back and add them to ca_out
+          list<WTransition> ls;
+          list<WTransition>::iterator newit;
+          sgr->preGetUpdatedTransitions(ls);
+
+          for(newit = ls.begin(); newit != ls.end(); newit++) {
+            ITrans *t;
+
+            // Ignore return transitions created by poststar
+            // TODO: there should be a better place for this check
+            if(newit->first.src != (int)start_state) continue;
+
+            if(state_has_etrans) {
+              t = new ewpds::ETrans(newit->first.src, newit->first.stack, q, 0, newit->second, 0);
+            } else {
+              t = new wfa::Trans(newit->first.src, newit->first.stack, q, newit->second);
+            }
+
+            ca_out.insert(t);
+          }
+
+        }
+
+        // Done with IntraQ
+
+        // Add (init, *, init) transitions
+        for(it = syms.gamma.begin(); it != syms.gamma.end(); it++) {
+          if(syms.entryPoints.find(*it) != syms.entryPoints.end()) continue;
+          sem_elem_t se = sgr->popWeight(*it);
+          if(!se->equal(se->zero())) {
+            ca_out.insert(new ewpds::ETrans(start_state, *it, start_state, 0, se, 0));
+          }
+        }
+
+        // Not really needed, but if WPDS does it, so should SWPDS
+        ca_out.setGeneration(ca_in.getGeneration() + 1);
+
+        // Set other info about the output -- see WPDS::setupOutput
+        ca_out.setQuery(wfa::WFA::INORDER);
+        Key init = ca_in.getInitialState();
+        std::set<Key> localF( ca_in.getFinalStates() );
+
+        ca_out.addState(init,theZero);
+        ca_out.setInitialState( init );
+        for (std::set<Key>::iterator cit = localF.begin();
+             cit != localF.end() ; cit++)
+          {
+            Key f = *cit;
+            ca_out.addState(f,theZero);
+            ca_out.addFinalState(f);
+          }
+
+      }
+
 
       void SWPDS::nonSummaryPoststar(wfa::WFA &ca_in, wfa::WFA &ca_out) {
         FWPDS::poststar(ca_in, ca_out);

@@ -534,6 +534,7 @@ namespace wali
                         getKey(state,stack)));
         }
 
+
         std::ostream & WPDS::print( std::ostream & o ) const
         {
             RulePrinter rp(o);
@@ -548,6 +549,18 @@ namespace wali
             for_each( rm );
             o << "</" << XMLTag << ">\n";
             return o;
+        }
+
+        int WPDS::count_rules() const {
+            int cnt = 0;
+            const_iterator it = config_map().begin();
+            for( ; it != config_map().end() ; it++ ) {
+                const Config *c = config_map().value( it );
+                Config::const_iterator rit = c->begin();
+                for( ; rit != c->end() ; rit++ )
+                  cnt++;
+            }
+            return cnt;
         }
 
         void WPDS::for_each( ConstRuleFunctor &func ) const

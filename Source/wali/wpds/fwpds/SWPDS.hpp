@@ -67,6 +67,15 @@ namespace wali {
         void addEntryPoint(Key e);
         void preprocess();
         bool reachable(Key k);
+        bool multiple_proc(Key k);
+
+      private:
+        virtual bool make_rule(
+            Config *f,
+            Config *t,
+            Key stk2,
+            sem_elem_t se,
+            rule_t& r );
 
       private:
         WpdsStackSymbols syms;

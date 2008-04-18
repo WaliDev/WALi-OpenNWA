@@ -317,6 +317,13 @@ bool FWPDS::checkResults( wfa::WFA& input, bool poststar )
 
 void FWPDS::poststar( wfa::WFA& input, wfa::WFA& output ) {
   poststarIGR(input, output);
+  
+  //{
+  //  util::Timer timer("FWPDS All Weights");
+  //  interGr->update_all_weights();
+  //}
+  //interGr->print_stats(*waliErr) << "\n";
+
   interGr = NULL;
 }
 
@@ -347,8 +354,11 @@ void FWPDS::poststarIGR( wfa::WFA& input, wfa::WFA& output )
   // Build the InterGraph using EWPDS saturation without weights
   EWPDS::poststarComputeFixpoint(output);
 
-  // Compute summaries
-  interGr->setupInterSolution();
+  {
+    util::Timer timer("FWPDS Saturation");
+    // Compute summaries
+    interGr->setupInterSolution();
+  }
 
   //interGr->print(std::cout << "THE INTERGRAPH\n",graphPrintKey);
 

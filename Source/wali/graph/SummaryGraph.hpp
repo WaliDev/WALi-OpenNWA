@@ -84,7 +84,7 @@ namespace wali {
                              InterGraph::PRINT_OP pop = InterGraph::defaultPrintOp);
 
                 ~SummaryGraph();
-                void addUpdate(Transition &t, SemElem *se);
+                void preAddUpdate(Transition &t, sem_elem_t se);
                 void getUpdatedTransitions(std::list<WTransition> &ls);
                 void preGetUpdatedTransitions(std::list<WTransition> &ls);
                 void getMiddleTransitions(std::list<WTransition> &ls);
@@ -94,6 +94,7 @@ namespace wali {
                 sem_elem_t popWeight(Key k);
                 Key getEntry(Key k);
                 bool reachable(int stk);
+                bool multiple_proc(int stk);
 
                 ostream &printStats(ostream &out);
 

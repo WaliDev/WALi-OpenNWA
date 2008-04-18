@@ -662,7 +662,8 @@ namespace wali {
 
       preSolveRegSummarySolution();
 
-      for(i=0;i<n;i++) {
+      // The first node is a fake "source" node, so skip it
+      for(i=1;i<n;i++) {
         sem_elem_t wt = nodes[i].regexp->get_weight();
         if(!wt->equal(se->zero())) {
           change.push_back(WTransition(nodes[i].trans, wt));
