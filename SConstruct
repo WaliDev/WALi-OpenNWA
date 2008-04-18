@@ -23,6 +23,18 @@ Export('LibInstallDir')
 Export('MkStatic')
 Export('BaseEnv')
 
+## Setup a default environment for building executables that use WALi
+ProgEnv = BaseEnv.Clone()
+ 
+if MkStatic:
+  ProgEnv['StaticLibs'] = [os.path.join(WaliDir,'lib','libwali.a')]
+else:
+  ProgEnv['StaticLibs'] = []
+  ProgEnv['LIBS'] = ['wali']
+  ProgEnv['LIBPATH'] = [ LibInstallDir ]
+
+Export('ProgEnv')
+
 
 ## ####################################
 ## Calling of WALi SConscript files for

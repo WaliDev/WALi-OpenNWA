@@ -1,5 +1,5 @@
-#ifndef wpds_STATE_GUARD
-#define wpds_STATE_GUARD 1
+#ifndef wali_wfa_STATE_GUARD
+#define wali_wfa_STATE_GUARD 1
 
 /*!
  * @author Nicholas Kidd
@@ -64,6 +64,8 @@ namespace wali
         State();
 
         State( Key name, sem_elem_t W );
+
+        State( const State& st );
 
         virtual ~State();
 
@@ -148,7 +150,8 @@ namespace wali
         sem_elem_t delta_se;
         sem_elem_t quasi;
         TransSet transSet;
-        int tag;            //!< Used by WFA::prune
+        //!< Used by WFA::prune
+        int tag;            
 
     }; //class State
 
@@ -156,10 +159,5 @@ namespace wali
 
 } // namespace wali
 
-#endif  // wpds_STATE_GUARD
+#endif  // wali_wfa_STATE_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 2 ***
-   ;;; End: ***
-   */

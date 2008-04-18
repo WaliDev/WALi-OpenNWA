@@ -21,7 +21,7 @@ namespace wali
       Countable(),key(WALI_EPSILON),se(0),delta_se(0),quasi(0),tag(0)
     {
       { // BEGIN DEBUGGING
-        //*waliErr << "State() : " << numStates << std::endl;;
+        //print(*waliErr << "State():" << numStates) << std::endl;;
         numStates++;
       } // END DEBUGGING
     }
@@ -35,7 +35,17 @@ namespace wali
       // States are always created with a weight of Zero
       // so this is wasted work
       { // BEGIN DEBUGGING
-        //*waliErr << "State(Key,sem_elem_t): " << numStates << std::endl;;
+        //print(*waliErr << "State(k,W):" << numStates) << std::endl;;
+        numStates++;
+      } // END DEBUGGING
+    }
+
+    State::State( const State& st ) :
+      IMarkable(),Printable(),Markable(),Countable(),
+      key(st.key),se(st.se),delta_se(st.delta_se),quasi(st.quasi),tag(0)
+    {
+      { // BEGIN DEBUGGING
+        //print(*waliErr << "State(const State&):" << numStates) << std::endl;;
         numStates++;
       } // END DEBUGGING
     }
@@ -43,16 +53,18 @@ namespace wali
     State::~State()
     {
       { // BEGIN DEBUGGING
-        // TODO : R
+        //print(*waliErr << "~State():" << numStates) << std::endl;;
         numStates--;
-        //*waliErr << "~State()   : " << --numStates << std::endl;;
       } // END DEBUGGING
     }
 
     std::ostream & State::print( std::ostream & o ) const
     {
       o << "State[ name=\"" << key2str(name()) << "\" W=\"";
-      o << se->toString() << "\" ]";
+      if (se.is_valid())
+        o << se->toString() << "\" ]";
+      else
+        o << "NULL\" ]";
       return o;
     }
 
@@ -88,8 +100,3 @@ namespace wali
 
 } // namespace wali
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */

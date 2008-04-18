@@ -29,7 +29,7 @@ waliparse_files = Split("""
 ./StrX.cpp
 """)
 
-env = BaseEnv.Clone()
+Env = BaseEnv.Clone()
 
 # Define include directories
 IncludeDirs = [
@@ -42,16 +42,16 @@ if Debug:
     for i in IncludeDirs:
         print "+ Inlude        : %s" % i
 
-env['CPPPATH'] = IncludeDirs
+Env['CPPPATH'] = IncludeDirs
 
 if MkStatic:
-    waliparse = env.StaticLibrary('waliparse' , waliparse_files)
-    i = env.Install(LibInstallDir, waliparse)
+    waliparse = Env.StaticLibrary('waliparse' , waliparse_files)
+    i = Env.Install(LibInstallDir, waliparse)
     built = [i]
     Return('built')
 else:
-    waliparse = env.SharedLibrary('waliparse' , waliparse_files)
-    i = env.Install(LibInstallDir, waliparse)
+    waliparse = Env.SharedLibrary('waliparse' , waliparse_files)
+    i = Env.Install(LibInstallDir, waliparse)
     built = [i]
     Return('built')
 

@@ -2,20 +2,22 @@
 import os
 
 Import('WaliDir')
-Import('Env')
+Import('ProgEnv')
+
+Env = ProgEnv.Clone()
 
 GenKillFiles=[ 'VarSet.cpp' ]
 Env['CPPPATH'].append(os.path.join(WaliDir,'Examples','GenKill'))
 
 # LiveVar
 #print "+++ Build GenKill/LiveVar"
-LiveFiles = GenKillFiles + [os.path.join('LiveVar','LiveVar.cpp')]
+LiveFiles = GenKillFiles + [os.path.join('LiveVar','LiveVar.cpp')] + Env['StaticLibs']
 LiveVar = Env.Program('livevar', LiveFiles)
 lv = Env.InstallAs(os.path.join(WaliDir,'Examples','bin','LiveVar'), LiveVar)
 
 # UninitVar
 #print "+++ Build GenKill/UninitVar"
-UninitFiles = GenKillFiles + [os.path.join('UninitVar','UninitVar.cpp')]
+UninitFiles = GenKillFiles + [os.path.join('UninitVar','UninitVar.cpp')] + Env['StaticLibs']
 UninitVar = Env.Program('uninitvar', UninitFiles)
 ul = Env.InstallAs(os.path.join(WaliDir,'Examples','bin','UninitVar'), UninitVar)
 

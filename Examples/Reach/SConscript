@@ -2,16 +2,16 @@
 import os
 
 Import('WaliDir')
-Import('Env')
+Import('ProgEnv')
 
 ReachFiles=Split("""
     Reach.cpp
     ExReach.cpp
 """)
 
-ExReach = Env.Program('ExReach',ReachFiles)
+ExReach = ProgEnv.Program('ExReach',ReachFiles + ProgEnv['StaticLibs'])
 
-i = Env.Install(os.path.join(WaliDir,'Examples','bin'), ExReach)
+i = ProgEnv.Install(os.path.join(WaliDir,'Examples','bin'), ExReach)
 
 built = [i]
 

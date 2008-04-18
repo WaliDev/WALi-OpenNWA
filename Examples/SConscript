@@ -1,23 +1,7 @@
 # Build the example applications
-import os
+import os,os.path
 
 Import('WaliDir')
-Import('LibInstallDir')
-Import('BaseEnv')
-
-## ###############################
-## Environment
-Env = BaseEnv.Clone()
- 
-## Libraries
-Libs = [ 'wali', ]
-Env['LIBS'] = Libs
- 
-## Library search path
-LibDirs = [ LibInstallDir ]
-Env['LIBPATH'] = LibDirs
-
-Export('Env')
 
 ExampleDir = os.path.join(WaliDir,'Examples')
 
