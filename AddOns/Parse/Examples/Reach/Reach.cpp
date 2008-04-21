@@ -62,7 +62,7 @@ std::ostream & Reach::print( std::ostream & o ) const
 
 sem_elem_t Reach::getWeight( std::string s )
 {
-  if( s == "ONE" ) {
+  if( s == "ONE" || s == "" ) {
     return one();
   }
   else {

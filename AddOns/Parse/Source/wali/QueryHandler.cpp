@@ -43,6 +43,7 @@ namespace wali
     pdsHandler(NULL),
     faHandler(NULL)
   {
+    XMLPlatformUtils::Initialize();
     typeID = XMLString::transcode("type");
   }
 
@@ -54,12 +55,14 @@ namespace wali
     pdsHandler(wpdsh),
     faHandler(wfah)
   {
+    XMLPlatformUtils::Initialize();
     typeID = XMLString::transcode("type");
   }
 
   QueryHandler::~QueryHandler()
   {
     XMLString::release(&typeID);
+    XMLPlatformUtils::Terminate();
     delete pdsHandler;
     delete faHandler;
   }

@@ -6,29 +6,28 @@ Import('LibInstallDir')
 Import('BaseEnv')
 Import('MkStatic')
 
-StaticLibs = [
-  os.path.join(LibInstallDir,'libwaliparse.a'),
-  os.path.join(LibInstallDir,'libwali.a')
-  ] if MkStatic else []
+XercesPath = os.path.join(WaliDir, 'AddOns', 'Parse', 'ThirdParty', 'xerces-c')
 
-Libs = [
-      'wali',
-      'waliparse',
-      'xerces-c',
-    ] if not MkStatic else ['xerces-c']
+StaticLibs = []
+Libs       = [ 'wali', 'waliparse', 'xerces-c', ] 
+LibPath    = [ LibInstallDir, os.path.join(XercesPath,'lib'), ]
 
-LibPath = [
-  LibInstallDir,
-  WaliDir+'/AddOns/Parse/ThirdParty/xerces-c/lib',
-  ] if not MkStatic else [ WaliDir+'/AddOns/Parse/ThirdParty/xerces-c/lib' ]
+if MkStatic:
+  StaticLibs = [
+    os.path.join(LibInstallDir,'libwaliparse.a'),
+    os.path.join(LibInstallDir,'libwali.a')
+    ]
+  Libs       = ['xerces-c']
+  LibPath    = [ os.path.join(XercesPath,'lib') ]
+
 
 ## ###############################
 ## Environment
 env = BaseEnv.Clone(
     CPPPATH  = [
-      os.path.join(WaliDir , 'Source'),
-      os.path.join(WaliDir,'AddOns','Parse','Source'),
-      os.path.join(WaliDir,'AddOns','Parse','ThirdParty','xerces-c','include'),
+      os.path.join(WaliDir, 'Source'),
+      os.path.join(WaliDir, 'AddOns', 'Parse', 'Source'),
+      os.path.join(XercesPath, 'include'),
     ],
     CXXFLAGS = '-g -ggdb -Wall -Wformat=2 -W ',
     LIBS     = Libs,

@@ -19,8 +19,11 @@ namespace wali
   namespace wpds
   {
 
+    const std::string WpdsHandler::FunctionXMLTag("Function");
+
+
     WpdsHandler::WpdsHandler( WeightFactory& wf, WPDS* thePds ) :
-      weightFactory(wf), inWeight(false),pds(thePds)
+      pds(thePds), inWeight(false),weightFactory(wf)
     {
       if( NULL == pds )
         pds = new WPDS();
@@ -33,15 +36,26 @@ namespace wali
       toID = XMLString::transcode(Rule::XMLToTag.c_str());
       toStack1ID = XMLString::transcode(Rule::XMLToStack1Tag.c_str());
       toStack2ID = XMLString::transcode(Rule::XMLToStack2Tag.c_str());
+
+      // For the function information
+      nameID  = XMLString::transcode("name");
+      entryID  = XMLString::transcode("entry");
+      exitID  = XMLString::transcode("exit");
     }
 
     WpdsHandler::~WpdsHandler()
     {
+      // Rule tags
       XMLString::release(&fromID);
       XMLString::release(&fromStackID);
       XMLString::release(&toID);
       XMLString::release(&toStack1ID);
       XMLString::release(&toStack2ID);
+      // Function tags
+      XMLString::release(&nameID);
+      XMLString::release(&entryID);
+      XMLString::release(&exitID);
+
       XMLPlatformUtils::Terminate();
       if( NULL == pds ) {
         assert(false);
@@ -75,15 +89,26 @@ namespace wali
         const   Attributes&     attributes)
     {
       StrX who(localname);
-      if( Rule::XMLTag == who.get()) {
+      if (Rule::XMLTag == who.get()) {
         handleRule(uri,localname,qname,attributes);
       }
-      else if( SemElem::XMLTag == who.get() ) {
+      else if (SemElem::XMLTag == who.get()) {
         inWeight = true;
         weightString = "";
       }
-      else if( WPDS::XMLTag == who.get() ) {
+      else if (WPDS::XMLTag == who.get()) {
         // do nothing
+      }
+      else if (WpdsHandler::FunctionXMLTag == who.get()) {
+        StrX fname = attributes.getValue(nameID);
+        StrX e = attributes.getValue(entryID);
+        StrX x = attributes.getValue(exitID);
+
+        std::string sfun(fname.get());
+        std::string se(e.get());
+        metaEntry[sfun] = se;
+        std::string sx(x.get());
+        metaExit[sfun] = sx;
       }
       else {
         std::cerr << "[WARNING:WpdsHandler] Unrecognized tag.\n";
@@ -104,6 +129,9 @@ namespace wali
       StrX who(localname);
       if( SemElem::XMLTag == who.get() ) {
         inWeight = false;
+      }
+      else if (WpdsHandler::FunctionXMLTag == who.get()) {
+        // do nothing
       }
       else if( Rule::XMLTag == who.get() ) {
         Key fromKey = getKey(from.get());
