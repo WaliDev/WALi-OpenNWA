@@ -1,0 +1,8 @@
+Import('BaseEnv')
+
+built = []
+
+domains = SConscript('Source/SConscript', build_dir='_build',duplicate=0)
+built.append(domains)
+
+Return('built')
