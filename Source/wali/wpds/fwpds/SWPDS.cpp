@@ -166,13 +166,11 @@ namespace wali {
         Key init = ca_in.getInitialState();
         std::set<Key> localF( ca_in.getFinalStates() );
 
-        ca_out.addState(init,theZero);
         ca_out.setInitialState( init );
         for (std::set<Key>::iterator cit = localF.begin();
              cit != localF.end() ; cit++)
           {
             Key f = *cit;
-            ca_out.addState(f,theZero);
             ca_out.addFinalState(f);
           }
 
@@ -324,13 +322,11 @@ namespace wali {
         Key init = ca_in.getInitialState();
         std::set<Key> localF( ca_in.getFinalStates() );
 
-        ca_out.addState(init,theZero);
         ca_out.setInitialState( init );
         for (std::set<Key>::iterator cit = localF.begin();
              cit != localF.end() ; cit++)
           {
             Key f = *cit;
-            ca_out.addState(f,theZero);
             ca_out.addFinalState(f);
           }
 

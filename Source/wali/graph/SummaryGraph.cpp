@@ -425,13 +425,18 @@ namespace wali {
 
           ITrans* t = *tli;
 
+          //t->print(cout << "Considering transition: ") << "\n";
+
           // Ignore eps transitions (assume that eps-closure has been
           // performed on the input)
           if(t->stack() == WALI_EPSILON)
             continue;
 
           // Ignore unreachable code
-          if(!reachable(t->stack())) {
+          // Note that when there are calls that do not return, the corresponding
+          // return transition has a unreachable stack node, but it is important to
+          // still consider the transition
+          if(t->from() == init_state && !reachable(t->stack())) {
             pkey(cerr << "SWPDS: Warning: Unreachable code(", t->stack()) << ")\n";
             continue;
           }
@@ -442,6 +447,7 @@ namespace wali {
           state_trans_map[t->to()].insert(t);
 
           if(t->from() != init_state) {
+
             // non-init state to non-init state transitions carry over
             // unchanged to the output automaton
             ca_out.addTrans(t->copy());
@@ -468,7 +474,8 @@ namespace wali {
           ITrans *t = *trans_it;
           
           int nno = stk2nodeno(t->stack());
-          assert(nno != -1); // Because this check has already been performed
+          if(nno == -1)
+            continue;
           
           IntraGraph *gr = post_igr->nodes[nno].gr;
           gr_set.insert(gr);
@@ -508,13 +515,15 @@ namespace wali {
           ITrans *t = *trans_it;
           
           int nno = stk2nodeno(t->stack());
-          assert(nno != -1); // Because this check has already been performed
+          if(nno == -1)
+            continue;
 
           IntraGraph *gr = post_igr->nodes[nno].gr;
           Transition tr(init_state, t->stack(), q);
           int intra_nno = getIntraNodeNumber(tr);
 
-          assert(intra_nno != -1);
+          if(intra_nno == -1)
+            continue;
           
           int cno = trans2nodeno(tr);
           if(t->from() == init_state) {
@@ -695,6 +704,7 @@ namespace wali {
 
       // check the source state to see if an ETrans needs to be added
       if((Key)tr.src == init_state) {
+        //IntraGraph::print_trans(tr, cout << "Adding Intra Transition: ", pkey) << "\n";
         ca_out.addTrans(tr.src, tr.stack, tr.tgt, wt);
       } else {
         
@@ -727,6 +737,7 @@ namespace wali {
         ETrans *et = new ETrans(src, tr.stack, tr.tgt,
                                 wt, wt->extend(wtCallRule), er);
 
+        //et->print(cout << "Adding Intra Etransition: ") << "\n";
         ca_out.addTrans(et);
       }
     }
@@ -742,6 +753,7 @@ namespace wali {
 
       // check the source state to see if an ETrans needs to be added
       if((Key)tr.src == init_state) {
+        //IntraGraph::print_trans(Transition(src,tr.stack,tgt), cout << "Adding Middle Transition: ", pkey) << "\n";
         ca_out.addTrans(src, tr.stack, tgt, wt);
       } else {
         
@@ -764,6 +776,7 @@ namespace wali {
         ETrans *et = new ETrans(src, tr.stack, tgt,
                                 wt, wt->extend(wtCallRule), er);
 
+        //et->print(cout << "Adding Middle Etransition: ") << "\n";
         ca_out.addTrans(et);
       }
     }
