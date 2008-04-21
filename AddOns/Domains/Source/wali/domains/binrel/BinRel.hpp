@@ -11,6 +11,8 @@
  */
 
 #include <fdd.h>
+#include <list>
+#include <utility>
 #include "wali/ref_ptr.hpp"
 #include "wali/SemElem.hpp"
 
@@ -30,6 +32,8 @@ namespace wali {
           static bool initialize(int numVars);
 
           static binrel_t Make(int from, int to);
+
+          static binrel_t Make(const std::list< std::pair<int,int> >& input);
 
           static binrel_t Empty();
 

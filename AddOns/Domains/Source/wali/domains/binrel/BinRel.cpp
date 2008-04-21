@@ -48,7 +48,17 @@ binrel_t BinRel::Make(int from, int to) {
     std::cerr << ss.str();
     throw ss.str();
   }
-  return new BinRel( fdd_ithvar(base,from) & fdd_ithvar(base+1,to) );
+  binrel_t brel(new BinRel( fdd_ithvar(base,from) & fdd_ithvar(base+1,to) ));
+  return brel;
+}
+
+binrel_t BinRel::Make(const std::list< std::pair<int,int> >& input) {
+  std::list< std::pair<int,int> >::const_iterator it = input.begin();
+  binrel_t result = Empty();
+  for ( ; it != input.end() ; it++ ) {
+    result = result->Union(Make(it->first,it->second));
+  }
+  return result;
 }
 
 binrel_t BinRel::Empty() {
