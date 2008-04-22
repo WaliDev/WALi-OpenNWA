@@ -1,4 +1,5 @@
-# $Id $
+## ##########################
+## Build Example parser
 import os,os.path
 
 Import('WaliDir')
