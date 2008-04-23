@@ -90,13 +90,14 @@ namespace wali
   wfa::WFA& QueryHandler::run()
   {
     try {
-      if( isPrestar ) {
-        //pdsHandler.get().prestar(faHandler.get(),fa);
-        pdsHandler->get().prestar(faHandler->get(),fa);
-      }
-      else {
-        //pdsHandler.get().poststar(faHandler.get(),fa);
-        pdsHandler->get().poststar(faHandler->get(),fa);
+      // Ensure that everything parsed correctly
+      if (pdsHandler != NULL && faHandler != NULL) {
+        if( isPrestar ) {
+          pdsHandler->get().prestar(faHandler->get(),fa);
+        }
+        else {
+          pdsHandler->get().poststar(faHandler->get(),fa);
+        }
       }
     } catch(...) {
       std::cerr << "[ERROR] QueryHandler::run() caught an exception.\n";
