@@ -1,5 +1,5 @@
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  * @author Akash Lal
  *
  */
@@ -355,7 +355,8 @@ void FWPDS::poststarIGR( wfa::WFA& input, wfa::WFA& output )
   EWPDS::poststarComputeFixpoint(output);
 
   {
-    util::Timer timer("FWPDS Saturation");
+    std::string msg = (get_verify_fwpds()) ? "FWPDS Saturation" : "";
+    util::Timer timer(msg);
     // Compute summaries
     interGr->setupInterSolution();
   }
@@ -568,6 +569,3 @@ void FWPDS::operator()( wfa::ITrans* orig ) {
   worklist->put( t );
 }
 
-/*
- * $Id$
- */

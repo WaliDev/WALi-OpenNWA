@@ -22,36 +22,37 @@
  */
 namespace wali {
 
-    namespace util {
+  namespace util {
 
-        class Timer : public wali::Printable {
-            public:
-                static bool measureAndReport;
-                static const long TIMER_CLK_TICK;
+    class Timer : public wali::Printable {
+      public:
+        static bool measureAndReport;
+        static const long TIMER_CLK_TICK;
 
-                Timer(const std::string &task, std::ostream& os=*waliErr);
+        Timer(const std::string &task, std::ostream& os=*waliErr);
 
-                ~Timer();
+        ~Timer();
 
-                double elapsed() const;
+        double elapsed() const;
 
-                virtual std::ostream& print( std::ostream& out ) const;
+        virtual std::ostream& print( std::ostream& out ) const;
 
-                static std::ostream& printTime( std::ostream& out, clock_t clk );
+        static std::ostream& printTime( std::ostream& out, clock_t clk );
 
-            private:
-                const clock_t start;
+      private:
+        const clock_t start;
 #ifndef _WIN32
-                struct tms st_tms;
+        struct tms st_tms;
 #endif
-                const std::string task;
-                std::ostream& os; //!< for reporting
+        const std::string task;
+        std::ostream& os; //!< for reporting
 
-        };
+    };
 
-    } // namespace util
+  } // namespace util
 
 } // namespace wali
 
 
 #endif // wali_util_TIME_GUARD
+
