@@ -2,7 +2,7 @@
 #define wali_regex_ROOT_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -44,10 +44,4 @@ namespace wali {
 } // namespace wali
 
 #endif  // wali_regex_ROOT_GUARD
-
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 2 ***
-   ;;; End: ***
-   */
 

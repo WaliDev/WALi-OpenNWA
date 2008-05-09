@@ -2,7 +2,7 @@
 #define wali_wfa_WFA_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 // ::wali
@@ -332,6 +332,17 @@ namespace wali
         virtual void path_summary();
 
         /*!
+         * Computes a regular expression for the automaton.
+         * The regex, when evaluated, produces a weight
+         * that is equal to calling path_summary and then
+         * getting the weight on the initial state. I.e.,
+         * <code>
+         *  fa.getState( fa.getInitialState() )->weight();
+         * </code>
+         */
+        virtual regex::regex_t toRegex();
+
+        /*!
          * Performs path summary with the specified Worklist
          */
         virtual void path_summary( Worklist<State>& wl );
@@ -474,9 +485,9 @@ namespace wali
         void setupFixpoint( Worklist<State>& wl, PredHash_t& preds, sem_elem_t wtFinal );
 
         virtual ITrans * find( 
-                              Key p,
-                              Key g,
-                              Key q);
+            Key p,
+            Key g,
+            Key q);
 
         /*!
          * Erases the specified Trans(from,stack,to) from the
@@ -525,13 +536,9 @@ namespace wali
         virtual void path_summary( Worklist<State>& wl, sem_elem_t wt );
 
         /*!
-         * Computes a regular expression for the automaton.
-         * The regex, when evaluated, produces a weight
-         * that is equal to calling path_summary and then
-         * getting the weight on the initial state. I.e.,
-         * <code>
-         *  fa.getState( fa.getInitialState() )->weight();
-         * </code>
+         * Uses Tarjan's algorithm to build a regular expression
+         * for this WFA. IIRC, it is the cubic dynamic programming
+         * algorithm.
          */
         regex::regex_t TarjanBasicRegex();
 
@@ -564,8 +571,3 @@ namespace wali
 
 #endif  // wali_wfa_WFA_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */

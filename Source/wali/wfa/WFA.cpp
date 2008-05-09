@@ -558,6 +558,13 @@ namespace wali
       path_summary(wl);
     }
 
+    // 
+    // Simply delegates to the Tarjan algorithm
+    //
+    regex::regex_t WFA::toRegex() {
+      return TarjanBasicRegex();
+    }
+
     //
     // Calls path_summary with default Worklist
     //

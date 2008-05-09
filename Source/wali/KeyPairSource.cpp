@@ -1,5 +1,5 @@
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -7,57 +7,52 @@
 
 namespace wali
 {
-    KeyPairSource::KeyPairSource( wali_key_t k1, wali_key_t k2 ) : kp(k1,k2) {}
+  KeyPairSource::KeyPairSource( wali_key_t k1, wali_key_t k2 ) : kp(k1,k2) {}
 
-    KeyPairSource::KeyPairSource( const KeyPair& kp_ ) : kp(kp_) {}
+  KeyPairSource::KeyPairSource( const KeyPair& kp_ ) : kp(kp_) {}
 
-    KeyPairSource::~KeyPairSource() {}
+  KeyPairSource::~KeyPairSource() {}
 
-    bool KeyPairSource::equal( KeySource* rhs )
-    {
-        static wali::hm_equal< KeyPair > checker;
-        KeyPairSource *kpsrc = dynamic_cast< KeyPairSource* >(rhs);
-        if( 0 != kpsrc )
-            return checker(kp,kpsrc->kp);
-        else
-            return false;
-    }
+  bool KeyPairSource::equal( KeySource* rhs )
+  {
+    static wali::hm_equal< KeyPair > checker;
+    KeyPairSource *kpsrc = dynamic_cast< KeyPairSource* >(rhs);
+    if( 0 != kpsrc )
+      return checker(kp,kpsrc->kp);
+    else
+      return false;
+  }
 
-    size_t KeyPairSource::hash() const
-    {
-        static wali::hm_hash< KeyPair > hasher;
-        return hasher(kp);
-    }
+  size_t KeyPairSource::hash() const
+  {
+    static wali::hm_hash< KeyPair > hasher;
+    return hasher(kp);
+  }
 
-    std::ostream& KeyPairSource::print( std::ostream& o ) const
-    {
-        o << "( ";
-        printKey(o,kp.first);
-        o << " , ";
-        printKey(o,kp.second);
-        o << " )";
-        return o;
-    }
+  std::ostream& KeyPairSource::print( std::ostream& o ) const
+  {
+    o << "( ";
+    printKey(o,kp.first);
+    o << " , ";
+    printKey(o,kp.second);
+    o << " )";
+    return o;
+  }
 
-    KeyPair KeyPairSource::get_key_pair() const
-    {
-        return kp;
-    }
+  KeyPair KeyPairSource::get_key_pair() const
+  {
+    return kp;
+  }
 
-    Key KeyPairSource::first() const
-    {
-        return kp.first;
-    }
+  Key KeyPairSource::first() const
+  {
+    return kp.first;
+  }
 
-    Key KeyPairSource::second() const
-    {
-        return kp.second;
-    }
+  Key KeyPairSource::second() const
+  {
+    return kp.second;
+  }
 
 } // namespace wali
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-*/
