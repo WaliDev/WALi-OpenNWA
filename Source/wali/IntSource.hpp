@@ -2,7 +2,7 @@
 #define wali_INT_SOURCE_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -10,31 +10,25 @@
 
 namespace wali
 {
-    class IntSource : public KeySource
-    {
-        public:
-            IntSource( int i );
+  class IntSource : public KeySource
+  {
+    public:
+      IntSource( int i );
 
-            virtual ~IntSource();
+      virtual ~IntSource();
 
-            virtual bool equal( KeySource* rhs );
+      virtual bool equal( KeySource* rhs );
 
-            virtual size_t hash() const;
+      virtual size_t hash() const;
 
-            virtual std::ostream& print( std::ostream& o ) const;
+      virtual std::ostream& print( std::ostream& o ) const;
 
-        protected:
-            int value;
+    protected:
+      int value;
 
-    }; // class IntSource
+  }; // class IntSource
 
 } // namespace wali
 
 #endif  // wali_INT_SOURCE_GUARD
-
-/* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
-*/
 

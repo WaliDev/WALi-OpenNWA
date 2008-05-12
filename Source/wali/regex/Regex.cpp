@@ -9,10 +9,10 @@
 #include "wali/regex/Union.hpp"
 #include "wali/regex/Star.hpp"
 
-namespace wali {
-
-  namespace regex {
-
+namespace wali 
+{
+  namespace regex 
+  {
     const std::string Regex::lblID("");
     const std::string Regex::lblNIL("$");
 
@@ -223,9 +223,6 @@ namespace wali {
 
 } // namespace wali
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */
-
+/*!
+ * @version $Id$
+ */

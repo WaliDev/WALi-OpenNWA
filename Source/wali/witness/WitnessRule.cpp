@@ -1,5 +1,5 @@
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 #include "wali/Common.hpp"
 #include "wali/witness/WitnessRule.hpp"
@@ -125,3 +125,4 @@ namespace wali
 /*
  * $Id$
  */
+

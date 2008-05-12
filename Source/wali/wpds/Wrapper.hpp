@@ -2,8 +2,9 @@
 #define wali_wpds_WRAPPER_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
+
 #include "wali/Common.hpp"
 #include "wali/SemElem.hpp"
 #include "wali/MergeFn.hpp"

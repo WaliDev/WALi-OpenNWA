@@ -2,9 +2,7 @@
 #define wali_wpds_WPDS_GUARD 1
 
 /*!
- * @author Nick Kidd
- *
- * $Id$
+ * @author Nicholas Kidd
  */
 
 // ::wali
@@ -465,8 +463,3 @@ namespace wali
 
 #endif  // wali_wpds_WPDS_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */

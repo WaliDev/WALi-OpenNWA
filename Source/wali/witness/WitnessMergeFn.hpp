@@ -2,7 +2,7 @@
 #define wali_witness_WITNESS_MERGE_FN_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -10,15 +10,16 @@
 
 #include "wali/MergeFn.hpp"
 
-namespace wali {
-
-  namespace witness {
-
+namespace wali 
+{
+  namespace witness 
+  {
     class WitnessMergeFn;
 
     typedef ref_ptr<WitnessMergeFn> witness_merge_fn_t;
 
-    class WitnessMergeFn : public MergeFn {
+    class WitnessMergeFn : public MergeFn 
+    {
       public:
         WitnessMergeFn( merge_fn_t user_merge );
 

@@ -1,5 +1,5 @@
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -8,6 +8,7 @@
 #include <sstream>
 
 #define TRANS_COUNT_INSTANCES 1
+
 namespace wali
 {
   namespace wfa
@@ -146,8 +147,3 @@ namespace wali
 
 } // namespace wali
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */

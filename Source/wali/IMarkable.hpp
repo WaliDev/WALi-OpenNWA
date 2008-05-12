@@ -2,7 +2,7 @@
 #define wali_IMARKABLE_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -69,10 +69,4 @@ namespace wali
 } // namespace wali
 
 #endif  // wali_IMARKABLE_GUARD
-
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 2 ***
-   ;;; End: ***
-   */
 

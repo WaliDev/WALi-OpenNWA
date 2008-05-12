@@ -2,7 +2,7 @@
 #define wali_COMMON_GUARD 1
 
 /*
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include <climits>

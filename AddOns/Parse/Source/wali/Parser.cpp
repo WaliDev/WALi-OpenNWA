@@ -1,5 +1,5 @@
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "StrX.hpp"
@@ -14,45 +14,39 @@
 
 namespace wali
 {
-    int Parser::parse( DefaultHandler& handler, const std::string& xmlFile )
-    {
-        int rc = 0;
+  int Parser::parse( DefaultHandler& handler, const std::string& xmlFile )
+  {
+    int rc = 0;
 
-        // Create SAX XML parser
-        SAX2XMLReader* parser = XMLReaderFactory::createXMLReader();
+    // Create SAX XML parser
+    SAX2XMLReader* parser = XMLReaderFactory::createXMLReader();
 
-        try {
-            // Set handlers for content and error
-            parser->setContentHandler(&handler);
-            parser->setErrorHandler(&handler);
-            // Call SAX parser
-            parser->parse(xmlFile.c_str());
-        }
-        catch( const OutOfMemoryException&)
-        {
-            std::cout << "OutOfMemoryException" << XERCES_STD_QUALIFIER endl;
-            rc = 1;
-        }
-        catch (const XMLException& toCatch)
-        {
-            std::cout << "\nAn error occurred\n  Error: " <<
-                StrX(toCatch.getMessage())
-                << "\n" << XERCES_STD_QUALIFIER endl;
-            rc = 2;
-        }
-        catch(const SAXException& toCatch ) {
-            // Thrown if the file does not exist
-            std::cout << "[SAXException] " << StrX(toCatch.getMessage()) << std::endl;
-        }
-        if( parser )
-            delete parser;
-        return rc;
+    try {
+      // Set handlers for content and error
+      parser->setContentHandler(&handler);
+      parser->setErrorHandler(&handler);
+      // Call SAX parser
+      parser->parse(xmlFile.c_str());
     }
+    catch( const OutOfMemoryException&)
+    {
+      std::cout << "OutOfMemoryException" << XERCES_STD_QUALIFIER endl;
+      rc = 1;
+    }
+    catch (const XMLException& toCatch)
+    {
+      std::cout << "\nAn error occurred\n  Error: " <<
+        StrX(toCatch.getMessage())
+        << "\n" << XERCES_STD_QUALIFIER endl;
+      rc = 2;
+    }
+    catch(const SAXException& toCatch ) {
+      // Thrown if the file does not exist
+      std::cout << "[SAXException] " << StrX(toCatch.getMessage()) << std::endl;
+    }
+    if( parser )
+      delete parser;
+    return rc;
+  }
 }
-
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
- */
 

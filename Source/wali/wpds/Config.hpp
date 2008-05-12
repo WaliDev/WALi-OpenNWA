@@ -2,7 +2,7 @@
 #define wali_wpds_CONFIG_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include <list>
@@ -223,8 +223,3 @@ namespace wali
 
 #endif  // wali_wpds_CONFIG_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */

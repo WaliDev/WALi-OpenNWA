@@ -2,7 +2,7 @@
 #define wali_regex_ALL_REGEX_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/regex/Regex.hpp"
@@ -13,8 +13,3 @@
 
 #endif  // wali_regex_ALL_REGEX_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-*/

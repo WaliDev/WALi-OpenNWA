@@ -2,7 +2,7 @@
 #define wali_wfa_TRANS_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include <iostream>
@@ -273,8 +273,3 @@ namespace wali
 
 #endif  // wali_wfa_TRANS_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */

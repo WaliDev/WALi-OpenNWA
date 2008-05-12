@@ -2,7 +2,7 @@
 #define wali_COUNTABLE_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -23,11 +23,11 @@ namespace wali
        * is up to you to hold onto a reference to the object.
        */
       Countable() : count(0) {}
-//      Countable( bool countme=true )
-//      {
-//        if( countme ) count=0;
-//        else count=60;
-//      }
+      //      Countable( bool countme=true )
+      //      {
+      //        if( countme ) count=0;
+      //        else count=60;
+      //      }
 
       /*!
        * The copy constructor creates a new instance of
@@ -57,8 +57,3 @@ namespace wali
 
 #endif // wali_COUNTABLE_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */

@@ -8,10 +8,10 @@
 #include "wali/Markable.hpp"
 #include "wali/SemElem.hpp"
 
-namespace wali {
-
-  namespace regex {
-
+namespace wali 
+{
+  namespace regex 
+  {
     class Regex;
 
     typedef wali::ref_ptr<Regex> regex_t;

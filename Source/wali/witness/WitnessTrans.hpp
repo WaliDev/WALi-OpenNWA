@@ -2,7 +2,7 @@
 #define wali_wfa_TRANS_WITNESS_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -72,8 +72,3 @@ namespace wali
 
 #endif  // wali_wfa_TRANS_WITNESS_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */

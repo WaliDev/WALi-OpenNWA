@@ -1,5 +1,5 @@
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/wpds/LinkedTrans.hpp"
@@ -7,23 +7,18 @@
 
 namespace wali
 {
-    namespace wpds
-    {
-        LinkedTrans::LinkedTrans(  wali_key_t from,
-                wali_key_t stack,
-                wali_key_t to,
-                const sem_elem_t & se,
-                Config *config_
-                ) : Trans(from,stack,to,se),config(config_) {}
+  namespace wpds
+  {
+    LinkedTrans::LinkedTrans(  wali_key_t from,
+        wali_key_t stack,
+        wali_key_t to,
+        const sem_elem_t & se,
+        Config *config_
+        ) : Trans(from,stack,to,se),config(config_) {}
 
-        LinkedTrans::~LinkedTrans() {}
+    LinkedTrans::~LinkedTrans() {}
 
-    } // namespace wpds
+  } // namespace wpds
 
 } // namespace wali
 
-/* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
-*/

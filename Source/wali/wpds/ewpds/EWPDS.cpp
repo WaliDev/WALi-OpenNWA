@@ -2,13 +2,6 @@
  * @author Akash Lal
  */
 
-/*
- * NAK: Witnesses (and wrapping) do not work w/ EWPDS.
- *      The problem lies w/ MergeFn::apply_f(a,b)
- *      wpds::Wrapper deals w/ weights and not MergeFns
- * TODO:
- *      Should be able to create a mergewrapper.
- */
 // ::wali
 #include "wali/Common.hpp"
 #include "wali/SemElem.hpp"
@@ -140,6 +133,7 @@ namespace wali
           } else {
             // FIXME: raise exception
             *waliErr << "EWPDS: Cannot give two RULE2s with same RHS\n";
+            r->print( *waliErr << "    : " ) << std::endl;
           }
         }
         // Set up theZero weight

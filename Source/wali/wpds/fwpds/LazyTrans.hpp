@@ -5,7 +5,6 @@
  * @author Akash Lal
  * @author Nicholas Kidd
  *
- * $Id$
  */
 
 #include "wali/Common.hpp"
@@ -33,7 +32,7 @@ namespace wali
       {
         public:
           friend class WPDS;
- 
+
         public:
           LazyTrans(  wali_key_t from,
               wali_key_t stack,
@@ -87,8 +86,3 @@ namespace wali
 
 #endif  // wali_wpds_LAZY_TRANS_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */

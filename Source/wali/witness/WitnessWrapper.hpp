@@ -2,7 +2,7 @@
 #define wali_witness_WITNESS_WRAPPER_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"

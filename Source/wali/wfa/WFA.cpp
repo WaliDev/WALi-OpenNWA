@@ -1,5 +1,5 @@
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -340,9 +340,9 @@ namespace wali
     // it exposes a pointer to inside the WFA
     //
     ITrans* WFA::find( 
-                      Key p,
-                      Key g,
-                      Key q)
+        Key p,
+        Key g,
+        Key q)
     {
       KeyPair kp(p,g);
       kp_map_t::iterator it = kpmap.find(kp);
@@ -1427,8 +1427,3 @@ namespace wali
 
 } // namespace wali
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 2 ***
-   ;;; End: ***
-   */

@@ -9,12 +9,12 @@
 
 #include "wali/regex/Regex.hpp"
 
-namespace wali {
-
-  namespace regex {
-
-    class Root : public Regex {
-
+namespace wali 
+{
+  namespace regex 
+  {
+    class Root : public Regex 
+    {
       public:
         static regex_t make(Key k, sem_elem_t se);
         static regex_t ID();

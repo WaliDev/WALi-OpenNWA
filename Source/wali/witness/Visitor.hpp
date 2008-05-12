@@ -2,7 +2,7 @@
 #define wali_VISITOR_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 #include "wali/Common.hpp"
 
@@ -73,8 +73,3 @@ namespace wali
 
 #endif  // wali_VISITOR_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */

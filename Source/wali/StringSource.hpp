@@ -2,7 +2,7 @@
 #define wali_STRING_SOURCE_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -11,35 +11,29 @@
 
 namespace wali
 {
-    /*!
-     * @class StringSource
-     */
-    class StringSource : public KeySource
-    {
-        public:
-            StringSource( const char* s );
+  /*!
+   * @class StringSource
+   */
+  class StringSource : public KeySource
+  {
+    public:
+      StringSource( const char* s );
 
-            StringSource( const std::string s );
+      StringSource( const std::string s );
 
-            virtual ~StringSource();
+      virtual ~StringSource();
 
-            virtual bool equal( KeySource* rhs );
+      virtual bool equal( KeySource* rhs );
 
-            virtual size_t hash() const;
+      virtual size_t hash() const;
 
-            virtual std::ostream& print( std::ostream& o ) const;
+      virtual std::ostream& print( std::ostream& o ) const;
 
-        protected:
-            std::string s;
-    };
+    protected:
+      std::string s;
+  };
 
 } // namespace wali
 
 #endif  // wali_STRING_SOURCE_GUARD
-
-/* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
-*/
 

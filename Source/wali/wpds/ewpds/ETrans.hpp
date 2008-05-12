@@ -2,7 +2,7 @@
 #define wali_wpds_ewpds_ETRANS_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/MergeFn.hpp"
@@ -11,10 +11,13 @@
 #include "wali/wpds/ewpds/ERule.hpp"
 
 namespace wali {
-  namespace wpds {
-    namespace ewpds {
-      class ETrans : public ::wali::wfa::DecoratorTrans {
 
+  namespace wpds {
+
+    namespace ewpds {
+
+      class ETrans : public ::wali::wfa::DecoratorTrans 
+      {
         public:
           ETrans(
               Key from, Key stack, Key to,
@@ -71,14 +74,12 @@ namespace wali {
           erule_t erule;
 
       }; // class ETrans
-    } // namespace ewpds
-  } // namespace wpds
-} // namespace wali
-#endif  // wali_wpds_ewpds_ETRANS_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 2 ***
-   ;;; End: ***
-   */
+    } // namespace ewpds
+
+  } // namespace wpds
+
+} // namespace wali
+
+#endif  // wali_wpds_ewpds_ETRANS_GUARD
 

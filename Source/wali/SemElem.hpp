@@ -181,9 +181,3 @@ namespace wali
 }
 #endif  // wali_SEM_ELEM_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */
-

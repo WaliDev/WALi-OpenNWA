@@ -2,7 +2,7 @@
 #define wali_wfa_WEIGHT_MAKER_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -12,88 +12,83 @@
 namespace wali
 {
 
-    namespace wfa
+  namespace wfa
+  {
+    /*!
+     * @class WeightMaker
+     *
+     * This class defines the interface for joining the weights
+     * on WFA transitions during WFA intersection.
+     *
+     * @see wali::sem_elem_t
+     * @see wali::wfa::WFA
+     */
+    class WeightMaker
     {
-        /*!
-         * @class WeightMaker
-         *
-         * This class defines the interface for joining the weights
-         * on WFA transitions during WFA intersection.
-         *
-         * @see wali::sem_elem_t
-         * @see wali::wfa::WFA
-         */
-        class WeightMaker
-        {
-            public:
-                virtual ~WeightMaker() {}
-                virtual sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs ) = 0;
-                virtual sem_elem_t make_weight( ITrans *lhs, ITrans *rhs);
+      public:
+        virtual ~WeightMaker() {}
+        virtual sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs ) = 0;
+        virtual sem_elem_t make_weight( ITrans *lhs, ITrans *rhs);
 
-        }; // WeightMaker
+    }; // WeightMaker
 
-        /*!
-         * @class KeepLeft
-         *
-         * This class joins the weights by ignoring the second parameter
-         * (rhs).
-         *
-         * @see wali::wfa::WeightMaker
-         * @see wali::sem_elem_t
-         */
-        class KeepLeft : public WeightMaker
-        {
-            public:
-                KeepLeft() {}
-                virtual ~KeepLeft() {}
-                virtual sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs );
+    /*!
+     * @class KeepLeft
+     *
+     * This class joins the weights by ignoring the second parameter
+     * (rhs).
+     *
+     * @see wali::wfa::WeightMaker
+     * @see wali::sem_elem_t
+     */
+    class KeepLeft : public WeightMaker
+    {
+      public:
+        KeepLeft() {}
+        virtual ~KeepLeft() {}
+        virtual sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs );
 
-        }; // KeepLeft
+    }; // KeepLeft
 
-        /*!
-         * @class KeepRight
-         *
-         * This class joins the weights by ignoring the second parameter
-         * (rhs).
-         *
-         * @see wali::wfa::WeightMaker
-         * @see wali::sem_elem_t
-         */
-        class KeepRight : public WeightMaker
-        {
-            public:
-                KeepRight() {}
-                virtual ~KeepRight() {}
-                virtual sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs );
+    /*!
+     * @class KeepRight
+     *
+     * This class joins the weights by ignoring the second parameter
+     * (rhs).
+     *
+     * @see wali::wfa::WeightMaker
+     * @see wali::sem_elem_t
+     */
+    class KeepRight : public WeightMaker
+    {
+      public:
+        KeepRight() {}
+        virtual ~KeepRight() {}
+        virtual sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs );
 
-        }; // KeepRight
+    }; // KeepRight
 
-        /*!
-         * @class KeepBoth
-         *
-         * This class joins the weights by pairing them.
-         *
-         * @see wali::wfa::WeightMaker
-         * @see wali::sem_elem_t
-         * @see wali::SemElemPair
-         */
-        class KeepBoth : public WeightMaker
-        {
-            public:
-                KeepBoth() {}
-                virtual ~KeepBoth() {}
-                virtual sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs );
+    /*!
+     * @class KeepBoth
+     *
+     * This class joins the weights by pairing them.
+     *
+     * @see wali::wfa::WeightMaker
+     * @see wali::sem_elem_t
+     * @see wali::SemElemPair
+     */
+    class KeepBoth : public WeightMaker
+    {
+      public:
+        KeepBoth() {}
+        virtual ~KeepBoth() {}
+        virtual sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs );
 
-        }; // KeepBoth
+    }; // KeepBoth
 
-    } // namespace wfa
+  } // namespace wfa
 
 } // namespace wfa
 
 #endif  // wali_wfa_WEIGHT_MAKER_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
- */

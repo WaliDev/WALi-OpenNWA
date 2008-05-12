@@ -1,5 +1,5 @@
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/wfa/ITrans.hpp"
@@ -104,11 +104,7 @@ namespace wali {
     size_t TransSet::size() const {
       return impl.size();
     }
-  }
-}
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 2 ***
-   ;;; End: ***
-   */
 
+  } // namespace wfa
+
+} // namespace wali

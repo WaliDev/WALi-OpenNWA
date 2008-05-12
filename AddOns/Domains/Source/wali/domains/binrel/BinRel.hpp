@@ -16,11 +16,12 @@
 #include "wali/ref_ptr.hpp"
 #include "wali/SemElem.hpp"
 
-namespace wali {
-
-  namespace domains {
-
-    namespace binrel {
+namespace wali 
+{
+  namespace domains 
+  {
+    namespace binrel 
+    {
       class BinRel;
 
       typedef wali::ref_ptr<BinRel> binrel_t;

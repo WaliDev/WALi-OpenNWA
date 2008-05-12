@@ -2,7 +2,7 @@
 #define wali_wpds_CTRANS_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -10,37 +10,32 @@
 
 namespace wali
 {
-    namespace wpds
+  namespace wpds
+  {
+    class WPDS;
+    class Config;
+
+    class LinkedTrans : public wali::wfa::Trans
     {
-        class WPDS;
-        class Config;
+      public:
+        friend class WPDS;
 
-        class LinkedTrans : public wali::wfa::Trans
-        {
-            public:
-                friend class WPDS;
+      public:
+        LinkedTrans(  wali_key_t from,
+            wali_key_t stack,
+            wali_key_t to,
+            const sem_elem_t & se,
+            Config *config
+            );
 
-            public:
-                LinkedTrans(  wali_key_t from,
-                        wali_key_t stack,
-                        wali_key_t to,
-                        const sem_elem_t & se,
-                        Config *config
-                        );
+        virtual ~LinkedTrans();
 
-                virtual ~LinkedTrans();
+        Config *config;
+    };
 
-                Config *config;
-        };
-
-    } // namespace wpds
+  } // namespace wpds
 
 } // namespace wali
 
 #endif  // wali_wpds_CTRANS_GUARD
 
-/* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
-*/

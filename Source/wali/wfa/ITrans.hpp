@@ -2,8 +2,7 @@
 #define wali_wfa_ITRANS_GUARD 1
 
 /*!
- * @author Nick Kidd
- * $Id$
+ * @author Nicholas Kidd
  */
 
 #include <iostream>
@@ -139,7 +138,7 @@ namespace wali
          * @param sem_elem_t for new weight and delta
          *
          * @return void
-                 */
+         */
         virtual void setWeight( sem_elem_t w )  = 0;
 
         /*!
@@ -255,8 +254,3 @@ namespace wali
 
 #endif  // wali_wfa_ITRANS_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 2 ***
-   ;;; End: ***
-*/

@@ -1,5 +1,5 @@
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -7,29 +7,23 @@
 
 namespace wali
 {
-    /****
-     * class Exception
-     ****/
+  /****
+   * class Exception
+   ****/
 
-    Exception::Exception()
-        : msg( "wpds::Exception" ) {}
+  Exception::Exception()
+    : msg( "wpds::Exception" ) {}
 
-    Exception::Exception( const std::string & s )
-        : msg( s ) {}
+  Exception::Exception( const std::string & s )
+    : msg( s ) {}
 
-    Exception::~Exception() {}
+  Exception::~Exception() {}
 
-    std::ostream & Exception::print( std::ostream & o ) const
-    {
-        o << "[wpds::Exception] " << msg;
-        return o;
-    }
+  std::ostream & Exception::print( std::ostream & o ) const
+  {
+    o << "[wpds::Exception] " << msg;
+    return o;
+  }
 
 }
-
-/* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
-*/
 

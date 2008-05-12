@@ -2,7 +2,7 @@
 #define wali_wfa_DECORATOR_TRANS_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include <iostream>
@@ -15,10 +15,8 @@
 
 namespace wali
 {
-
   namespace wfa
   {
-
     /*!
      * @class DecoratorTrans
      *
@@ -239,8 +237,3 @@ namespace wali
 
 #endif  // wali_wfa_DECORATOR_TRANS_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 2 ***
-   ;;; End: ***
-*/

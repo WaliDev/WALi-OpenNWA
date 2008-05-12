@@ -2,7 +2,8 @@
 #define wali_EPA_GUARD 1
 
 /*!
- * @author Nick Kidd, Akash Lal
+ * @author Nicholas Kidd
+ * @author Akash Lal
  */
 
 #include "wali/wfa/WFA.hpp"
@@ -11,9 +12,12 @@
 #include <map>
 #include <list>
 
-namespace wali {
-  namespace wfa {
-    namespace epr {
+namespace wali 
+{
+  namespace wfa 
+  {
+    namespace epr 
+    {
 
       /*! 
        * @class EPA
@@ -21,62 +25,58 @@ namespace wali {
        */
 
       class EPA : public WFA {
-      private:
-        
-        // Store the BFS order for states <-- not updated with transition insertions
-        std::map< Key, unsigned int> bfsOrder;
-        
-        typedef std::list< std::pair< sem_elem_t, sem_elem_t > > CacheElem;
-        std::map< Key, CacheElem > errorProjCache;
-        std::map< Key, walienum::ETag > stateTagMap;
-        int nCacheHits;
-        
-      public:
-        
-        EPA( );
+        private:
 
-        ~EPA();
+          // Store the BFS order for states <-- not updated with transition insertions
+          std::map< Key, unsigned int> bfsOrder;
 
-        void clear();
+          typedef std::list< std::pair< sem_elem_t, sem_elem_t > > CacheElem;
+          std::map< Key, CacheElem > errorProjCache;
+          std::map< Key, walienum::ETag > stateTagMap;
+          int nCacheHits;
 
-        int getCacheHits();
+        public:
 
-        void buildEPA(WFA &post, WFA &pre);
+          EPA( );
 
-        // Compute the error projection weight for node with bottleneck weight initWeight
-        sem_elem_t apply(Key node, sem_elem_t initWeight);
+          ~EPA();
 
-        // Same as above, but increments notfound by 1 if the node was not found in
-        // the automaton
-        sem_elem_t apply(Key node, sem_elem_t initWeight, int &notfound);
+          void clear();
 
-      private:
+          int getCacheHits();
 
-        // returns invalid sem_elem_t if (q,w) is not found in the cache
-        sem_elem_t lookupCache(Key q, sem_elem_t w);
+          void buildEPA(WFA &post, WFA &pre);
 
-        // Adds ((q,w),res) to the cache
-        void addToCache(Key q, sem_elem_t w, sem_elem_t res);
+          // Compute the error projection weight for node with bottleneck weight initWeight
+          sem_elem_t apply(Key node, sem_elem_t initWeight);
 
-        // Maintain a State Key -> ETag map
-        void setStateTag(State *s, walienum::ETag et);
-        walienum::ETag getStateTag(State *s);
+          // Same as above, but increments notfound by 1 if the node was not found in
+          // the automaton
+          sem_elem_t apply(Key node, sem_elem_t initWeight, int &notfound);
 
-        // Do a BFS on the automaton and store the BFS number
-        // in bfsOrder
-        void orderStatesBFS();
+        private:
+
+          // returns invalid sem_elem_t if (q,w) is not found in the cache
+          sem_elem_t lookupCache(Key q, sem_elem_t w);
+
+          // Adds ((q,w),res) to the cache
+          void addToCache(Key q, sem_elem_t w, sem_elem_t res);
+
+          // Maintain a State Key -> ETag map
+          void setStateTag(State *s, walienum::ETag et);
+          walienum::ETag getStateTag(State *s);
+
+          // Do a BFS on the automaton and store the BFS number
+          // in bfsOrder
+          void orderStatesBFS();
 
       }; // class EPA
+
     } // namespace epr
+
   } // namespace wfa
+
 } // namespace wali
 
-
 #endif  // wali_EPA_GUARD
-
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-*/
 

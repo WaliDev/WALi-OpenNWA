@@ -1,5 +1,5 @@
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -9,6 +9,7 @@
 
 namespace wali
 {
+
   namespace wfa
   {
     /***********
@@ -39,7 +40,7 @@ namespace wali
       fit = dup.find(t->from());
       tit = dup.find(t->to());
       eit = dup.end();
-      
+
       if(fit == eit && tit == eit) {
         tc = t->copy();
       } else if(fit == eit && tit != eit) {
@@ -155,8 +156,3 @@ namespace wali
 
 } // namespace wali
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */

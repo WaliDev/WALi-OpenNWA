@@ -2,8 +2,9 @@
 #define wali_PARSER_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
+
 #include <string>
 #include <xercesc/sax2/DefaultHandler.hpp>
 
@@ -17,19 +18,13 @@ XERCES_CPP_NAMESPACE_USE
  */
 namespace wali
 {
-    class Parser
-    {
-        public:
-            static int parse( DefaultHandler& handler, const std::string& xmlFile );
-    };
+  class Parser
+  {
+    public:
+      static int parse( DefaultHandler& handler, const std::string& xmlFile );
+  };
 
 } // namespace wali
 
 #endif  // wali_PARSER_GUARD
-
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-*/
 

@@ -1,5 +1,5 @@
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  * $Id$
  */
 
@@ -38,7 +38,7 @@ namespace wali {
         o << "[ETRANS] ";
         return getDelegate()->print(o);
       }
-          
+
 
 
       wfa::ITrans* ETrans::copy() const {
@@ -95,12 +95,8 @@ namespace wali {
       }
 
     } // namespace ewpds
-  } // namespace wpds
-} // namespace wali
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 2 ***
-   ;;; End: ***
-*/
+  } // namespace wpds
+
+} // namespace wali
 

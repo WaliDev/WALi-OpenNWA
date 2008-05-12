@@ -2,42 +2,37 @@
 #define wali_regex_STAR_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/regex/Regex.hpp"
 
-namespace wali {
+namespace wali 
+{
+  namespace regex 
+  {
+    class Star : public Regex 
+    {
+      public:
 
-    namespace regex {
+        Star( regex_t child);
 
-        class Star : public Regex {
-            public:
+        virtual ~Star();
 
-                Star( regex_t child);
+        virtual std::ostream& print_recurse( std::ostream& o ) const;
 
-                virtual ~Star();
+        virtual void to_mona_recurse(std::ostream& o, const std::string& prefix ) const;
+        virtual std::ostream& write_dot_recurse( std::ostream& o ) const;
+        virtual wali::sem_elem_t solve_recurse();
 
-                virtual std::ostream& print_recurse( std::ostream& o ) const;
+        virtual void reset_marks() const;
+      public:
+        regex_t child;
+    };
 
-                virtual void to_mona_recurse(std::ostream& o, const std::string& prefix ) const;
-                virtual std::ostream& write_dot_recurse( std::ostream& o ) const;
-                virtual wali::sem_elem_t solve_recurse();
-
-                virtual void reset_marks() const;
-            public:
-                regex_t child;
-        };
-
-    } // namespace regex
+  } // namespace regex
 
 } // namespace wali
 
 #endif  // wali_regex_STAR_GUARD
-
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */
 

@@ -1,6 +1,6 @@
 /*!
- * @author Nick Kidd
- * $Id:$
+ * @author Nicholas Kidd
+ * $Id$
  */
 
 #include "wali/Common.hpp"
@@ -9,52 +9,47 @@
 
 namespace wali
 {
-    namespace wpds {
-        GenKeySource::GenKeySource( size_t g, Key k) : gen(g),key(k) 
-        {
-//            std::cout << "GenKeySource : ";
-//            print(std::cout);
-//            std::cout << std::endl;
-        }
+  namespace wpds {
+    GenKeySource::GenKeySource( size_t g, Key k) : gen(g),key(k) 
+    {
+      //            std::cout << "GenKeySource : ";
+      //            print(std::cout);
+      //            std::cout << std::endl;
+    }
 
-        GenKeySource::~GenKeySource() {}
+    GenKeySource::~GenKeySource() {}
 
-        bool GenKeySource::equal( KeySource* rhs )
-        {
-            GenKeySource *that = dynamic_cast< GenKeySource* >(rhs);
-            if( that != 0 )
-                return (gen == that->gen) && (key == that->key);
-            else
-                return false;
-        }
+    bool GenKeySource::equal( KeySource* rhs )
+    {
+      GenKeySource *that = dynamic_cast< GenKeySource* >(rhs);
+      if( that != 0 )
+        return (gen == that->gen) && (key == that->key);
+      else
+        return false;
+    }
 
-        size_t GenKeySource::hash() const
-        {
-            hm_hash< size_t > hasher;
-            size_t v = gen + (997*key);
-            return hasher(v);
-        }
+    size_t GenKeySource::hash() const
+    {
+      hm_hash< size_t > hasher;
+      size_t v = gen + (997*key);
+      return hasher(v);
+    }
 
-        std::ostream& GenKeySource::print( std::ostream& o ) const
-        {
-            printKey(o,key) << "_g" << gen;
-            return o;
-        }
+    std::ostream& GenKeySource::print( std::ostream& o ) const
+    {
+      printKey(o,key) << "_g" << gen;
+      return o;
+    }
 
-        size_t GenKeySource::getGeneration() const {
-            return gen;
-        }
+    size_t GenKeySource::getGeneration() const {
+      return gen;
+    }
 
-        Key GenKeySource::getKey() const {
-            return key;
-        }
+    Key GenKeySource::getKey() const {
+      return key;
+    }
 
-    } // namespace wpds
+  } // namespace wpds
 
 } // namespace wali
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */

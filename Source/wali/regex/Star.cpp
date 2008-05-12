@@ -1,14 +1,15 @@
 /*!
  * @author Nicholas Kidd
+ * @version $Id$
  */
 
 #include "wali/regex/Star.hpp"
 #include <cassert>
 
-namespace wali {
-
-  namespace regex {
-
+namespace wali 
+{
+  namespace regex 
+  {
     Star::Star( regex_t c ) : Regex(), child(c) {}
 
     Star::~Star() {}

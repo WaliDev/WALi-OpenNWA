@@ -1,13 +1,14 @@
 /*!
  * @author Nicholas Kidd
+ * @version $Id$
  */
 
 #include "wali/regex/Root.hpp"
 
-namespace wali {
-
-  namespace regex {
-
+namespace wali 
+{
+  namespace regex 
+  {
     static Key getNilKey() {
       static Key k = getKey("$");
       return k;
@@ -86,10 +87,4 @@ namespace wali {
   } // namespace regex
 
 } // namespace wali
-
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 2 ***
-   ;;; End: ***
-   */
 

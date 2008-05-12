@@ -1,5 +1,6 @@
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
+ * @version $Id$
  */
 
 #include "wali/wpds/Wrapper.hpp"
@@ -8,7 +9,6 @@
 
 namespace wali
 {
-
   namespace wpds
   {
     // default does nothing

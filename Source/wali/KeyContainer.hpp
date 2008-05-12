@@ -2,7 +2,7 @@
 #define wali_KEY_CONTAINER_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -12,106 +12,101 @@
 namespace wali
 {
 
-    static inline size_t combineKeys( Key k1, Key k2 )
+  static inline size_t combineKeys( Key k1, Key k2 )
+  {
+    return k1 + (997*k2);
+  }
+
+  /*!
+   * KeyPair
+   */
+  typedef std::pair< Key,Key > KeyPair;
+
+  /*!
+   * @class Triple
+   */
+  template< typename T,typename U,typename V > struct Triple
+  {
+    Triple() {}
+
+    Triple( T t,U u,V v )
+      : first(t),second(u),third(v) {}
+
+    Triple( const Triple & rhs )
+      : first(rhs.first), second(rhs.second), third(rhs.third) {}
+
+    Triple & operator=( const Triple & rhs )
     {
-        return k1 + (997*k2);
+      first   = rhs.first;
+      second  = rhs.second;
+      third   = rhs.third;
+      return *this;
     }
 
-    /*!
-     * KeyPair
-     */
-    typedef std::pair< Key,Key > KeyPair;
-
-    /*!
-     * @class Triple
-     */
-    template< typename T,typename U,typename V > struct Triple
+    bool operator==( const Triple & rhs ) const
     {
-        Triple() {}
+      return (
+          (first == rhs.first) &&
+          (second == rhs.second) &&
+          (third == rhs.third)
+          );
+    }
 
-        Triple( T t,U u,V v )
-            : first(t),second(u),third(v) {}
+    T first;
+    U second;
+    V third;
+  };
 
-        Triple( const Triple & rhs )
-            : first(rhs.first), second(rhs.second), third(rhs.third) {}
+  /*!
+   * KeyTriple
+   */
+  typedef Triple< Key,Key,Key > KeyTriple;
 
-        Triple & operator=( const Triple & rhs )
-        {
-            first   = rhs.first;
-            second  = rhs.second;
-            third   = rhs.third;
-            return *this;
-        }
+  template<> struct hm_hash< KeyPair >
+  {
+    hm_hash< size_t > hasher;
 
-        bool operator==( const Triple & rhs ) const
-        {
-            return (
-                    (first == rhs.first) &&
-                    (second == rhs.second) &&
-                    (third == rhs.third)
-                   );
-        }
-
-        T first;
-        U second;
-        V third;
-    };
-
-    /*!
-     * KeyTriple
-     */
-    typedef Triple< Key,Key,Key > KeyTriple;
-
-    template<> struct hm_hash< KeyPair >
+    size_t operator()( const KeyPair & kp ) const
     {
-        hm_hash< size_t > hasher;
+      return hasher( combineKeys( kp.first,kp.second ) );
+    }
 
-        size_t operator()( const KeyPair & kp ) const
-        {
-            return hasher( combineKeys( kp.first,kp.second ) );
-        }
+  };
 
-    };
-
-    template<> struct hm_equal< KeyPair >
+  template<> struct hm_equal< KeyPair >
+  {
+    bool operator()( const KeyPair& lhs,const KeyPair& rhs ) const
     {
-        bool operator()( const KeyPair& lhs,const KeyPair& rhs ) const
-        {
-            return ((lhs.first == rhs.first) && (lhs.second == rhs.second));
-        }
+      return ((lhs.first == rhs.first) && (lhs.second == rhs.second));
+    }
 
-    };
+  };
 
-    template<> struct hm_hash< KeyTriple >
+  template<> struct hm_hash< KeyTriple >
+  {
+
+    hm_hash< size_t > hasher;
+
+    size_t operator()( const KeyTriple & kt ) const
     {
+      size_t ans = combineKeys(kt.first,kt.second);
+      ans = combineKeys( ans,kt.third);
+      return hasher( ans );
+    }
 
-        hm_hash< size_t > hasher;
+  };
 
-        size_t operator()( const KeyTriple & kt ) const
-        {
-            size_t ans = combineKeys(kt.first,kt.second);
-            ans = combineKeys( ans,kt.third);
-            return hasher( ans );
-        }
+  template<> struct hm_equal< KeyTriple >
+  {
 
-    };
-
-    template<> struct hm_equal< KeyTriple >
+    bool operator()( const KeyTriple& lhs,const KeyTriple& rhs ) const
     {
+      return lhs == rhs;
+    }
 
-        bool operator()( const KeyTriple& lhs,const KeyTriple& rhs ) const
-        {
-            return lhs == rhs;
-        }
-
-    };
+  };
 
 } // namespace wali
 
 #endif  // wali_KEY_CONTAINER_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-*/

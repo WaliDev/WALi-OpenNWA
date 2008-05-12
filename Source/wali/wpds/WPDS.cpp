@@ -1,6 +1,8 @@
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  * @author Akash Lal
+ *
+ * @version $Id$
  */
 
 #include "wali/Common.hpp"

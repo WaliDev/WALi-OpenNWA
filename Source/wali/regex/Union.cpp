@@ -1,15 +1,16 @@
 /*!
  * @author Nicholas Kidd
+ * @version $Id$
  */
 
 
 #include "wali/regex/Union.hpp"
 #include <cassert>
 
-namespace wali {
-
-  namespace regex {
-
+namespace wali 
+{
+  namespace regex 
+  {
     Union::Union() : Regex() {
     }
 

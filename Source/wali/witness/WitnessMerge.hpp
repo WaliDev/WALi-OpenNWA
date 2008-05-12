@@ -2,19 +2,19 @@
 #define wali_witness_WITNESS_MERGE_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
 #include "wali/witness/Witness.hpp"
 #include "wali/witness/WitnessMergeFn.hpp"
 
-namespace wali {
-
-  namespace witness {
-
-    class WitnessMerge : public Witness {
-
+namespace wali 
+{
+  namespace witness 
+  {
+    class WitnessMerge : public Witness 
+    {
       public:
         //! Constructor bears witness to a merge function being
         //! applied to left and right with result weight

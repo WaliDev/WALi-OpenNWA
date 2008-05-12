@@ -2,7 +2,7 @@
 #define witness_VISITOR_DOT_GUARD 1
 
 //!
-//! @author Nick Kidd
+//! @author Nicholas Kidd
 //!
 
 #include "wali/Common.hpp"
@@ -65,8 +65,3 @@ namespace wali
 
 #endif  // witness_VISITOR_DOT_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */

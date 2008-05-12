@@ -2,7 +2,7 @@
 #define wali_wpds_WITNESS_RULE_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -13,74 +13,69 @@
 
 namespace wali
 {
-    using wpds::Rule;
-    using wpds::rule_t;
+  using wpds::Rule;
+  using wpds::rule_t;
 
-    namespace witness
+  namespace witness
+  {
+    struct RuleStub : public Printable
     {
-        struct RuleStub : public Printable
-        {
-            RuleStub( const Rule& r );
+      RuleStub( const Rule& r );
 
-            Key from_state();
+      Key from_state();
 
-            Key from_stack();
+      Key from_stack();
 
-            Key to_state();
+      Key to_state();
 
-            Key to_stack1();
+      Key to_stack1();
 
-            Key to_stack2();
+      Key to_stack2();
 
-            sem_elem_t weight();
+      sem_elem_t weight();
 
-            std::ostream& print( std::ostream& o ) const;
+      std::ostream& print( std::ostream& o ) const;
 
-            Key fs,fstk,ts,tstk1,tstk2;
-            sem_elem_t se;
-        };
+      Key fs,fstk,ts,tstk1,tstk2;
+      sem_elem_t se;
+    };
 
+    /*!
+     * @class WitnessRule
+     *
+     * This class bears witness to the fact that a rule was created with
+     * the supplied weight.
+     */
+    class WitnessRule : public Witness
+    {
+      public:
         /*!
-         * @class WitnessRule
+         * @brief constructor creates a RuleStub from a
+         * wali::wpds::Rule.
          *
-         * This class bears witness to the fact that a rule was created with
-         * the supplied weight.
+         * @see Witness
+         * @see Rule
          */
-        class WitnessRule : public Witness
-        {
-            public:
-                /*!
-                 * @brief constructor creates a RuleStub from a
-                 * wali::wpds::Rule.
-                 *
-                 * @see Witness
-                 * @see Rule
-                 */
-                WitnessRule( const Rule& r );
+        WitnessRule( const Rule& r );
 
-                //! Destructor does nothing.
-                ~WitnessRule();
+        //! Destructor does nothing.
+        ~WitnessRule();
 
-                //! Override Witness::accept
-                virtual void accept( Visitor& v, bool visitOnce=false );
+        //! Override Witness::accept
+        virtual void accept( Visitor& v, bool visitOnce=false );
 
-                //! Overrides Witness::prettyPrint
-                virtual std::ostream& prettyPrint( std::ostream& o,size_t depth ) const;
+        //! Overrides Witness::prettyPrint
+        virtual std::ostream& prettyPrint( std::ostream& o,size_t depth ) const;
 
-                RuleStub& getRuleStub();
+        RuleStub& getRuleStub();
 
-            protected:
-                RuleStub stub;
-        };
+      protected:
+        RuleStub stub;
+    };
 
-    } // namespace witness
+  } // namespace witness
 
 } // namespace wali
 
 #endif	// wali_wpds_WITNESS_RULE_GUARD
 
-/* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
-*/

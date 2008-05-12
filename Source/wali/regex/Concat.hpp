@@ -2,42 +2,37 @@
 #define wali_regex_CONCAT_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/regex/Regex.hpp"
 
-namespace wali {
+namespace wali 
+{
+  namespace regex 
+  {
+    class Concat : public Regex 
+    {
+      public:
+        Concat( regex_t left, regex_t right );
 
-    namespace regex {
+        virtual ~Concat();
 
-        class Concat : public Regex {
-            public:
-                Concat( regex_t left, regex_t right );
+        virtual std::ostream& print_recurse( std::ostream& o ) const;
 
-                virtual ~Concat();
+        virtual void to_mona_recurse(std::ostream& o, const std::string& prefix ) const;
+        virtual std::ostream& write_dot_recurse( std::ostream& o ) const;
+        virtual wali::sem_elem_t solve_recurse();
 
-                virtual std::ostream& print_recurse( std::ostream& o ) const;
+        virtual void reset_marks() const;
 
-                virtual void to_mona_recurse(std::ostream& o, const std::string& prefix ) const;
-                virtual std::ostream& write_dot_recurse( std::ostream& o ) const;
-                virtual wali::sem_elem_t solve_recurse();
+      public:
+        regex_t left,right;
+    };
 
-                virtual void reset_marks() const;
-
-            public:
-                regex_t left,right;
-        };
-
-    } // namespace regex
+  } // namespace regex
 
 } // namespace wali
 
 #endif  // wali_regex_CONCAT_GUARD
-
-    /* Yo, Emacs!
-       ;;; Local Variables: ***
-       ;;; tab-width: 4 ***
-       ;;; End: ***
-       */
 

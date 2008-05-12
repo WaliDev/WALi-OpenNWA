@@ -2,7 +2,7 @@
 #define wali_REF_PTR_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  * @author Evan Driscoll
  */
 

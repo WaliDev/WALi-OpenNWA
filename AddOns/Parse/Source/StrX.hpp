@@ -57,3 +57,4 @@ inline XERCES_STD_QUALIFIER ostream& operator<<(XERCES_STD_QUALIFIER ostream& ta
 }
 
 #endif // STRX_GUARD 1
+

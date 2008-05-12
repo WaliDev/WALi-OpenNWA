@@ -1,5 +1,7 @@
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
+ *
+ * @version $Id$
  */
 
 #include <sstream>

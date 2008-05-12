@@ -1,5 +1,6 @@
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
+ * @version $Id$
  */
 
 #include "wali/witness/VisitorPrinter.hpp"
@@ -110,10 +111,4 @@ namespace wali {
   } // namespace witness
 
 } // namespace wali
-
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
-   */
 

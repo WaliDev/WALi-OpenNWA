@@ -2,7 +2,7 @@
 #define wali_wpds_ewpds_EWPDS_HANDLER_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"

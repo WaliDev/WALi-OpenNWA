@@ -2,33 +2,28 @@
 #define wali_VISITABLE_GUARD 1
 
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
 
 namespace wali
 {
-    namespace witness
+  namespace witness
+  {
+    class Visitor;
+
+    class Visitable
     {
-        class Visitor;
+      public:
+        virtual ~Visitable() {}
 
-        class Visitable
-        {
-            public:
-                virtual ~Visitable() {}
+        virtual void accept( Visitor& v, bool visitOnce=false ) = 0;
+    };
 
-                virtual void accept( Visitor& v, bool visitOnce=false ) = 0;
-        };
-
-    } // namespace witness
+  } // namespace witness
 
 } // namespace wali
 
 #endif  // wali_VISITABLE_GUARD
 
-/* Yo, Emacs!
-   ;;; Local Variables: ***
-   ;;; tab-width: 4 ***
-   ;;; End: ***
- */

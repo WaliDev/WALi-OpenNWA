@@ -15,51 +15,45 @@ namespace wali
   }
 
   class TaggedWeight : public Printable {
-  public:
-    TaggedWeight(sem_elem_t w, walienum::ETag et) : weight(w), tag(et) { }
-    ~TaggedWeight() {}
+    public:
+      TaggedWeight(sem_elem_t w, walienum::ETag et) : weight(w), tag(et) { }
+      ~TaggedWeight() {}
 
-    bool isCall() {
-      return (tag == walienum::CALL);
-    }
-    
-    bool isRet() {
-      return (tag == walienum::RETURN);
-    }
-    
-    sem_elem_t getWeight() {
-      return weight;
-    }
+      bool isCall() {
+        return (tag == walienum::CALL);
+      }
 
-    walienum::ETag getTag() {
-      return tag;
-    }
+      bool isRet() {
+        return (tag == walienum::RETURN);
+      }
 
-    std::ostream &print(std::ostream &o) const {
-      o << "TaggedWeight[";
-      if(tag == walienum::CALL) {
-        o << "CALL";
-      } else if(tag == walienum::RETURN) {
-        o << "RETURN";
-      } 
-      o << ",";
-      weight->print(o);
-      o << "]\n";
-      return o;
-    }
+      sem_elem_t getWeight() {
+        return weight;
+      }
 
-  private:
-    sem_elem_t weight;
-    walienum::ETag tag;
+      walienum::ETag getTag() {
+        return tag;
+      }
+
+      std::ostream &print(std::ostream &o) const {
+        o << "TaggedWeight[";
+        if(tag == walienum::CALL) {
+          o << "CALL";
+        } else if(tag == walienum::RETURN) {
+          o << "RETURN";
+        } 
+        o << ",";
+        weight->print(o);
+        o << "]\n";
+        return o;
+      }
+
+    private:
+      sem_elem_t weight;
+      walienum::ETag tag;
   };
-  
+
 } // namespace wali
 
 #endif  // wali_TAGGED_WEIGHT_GUARD
-
-/* Yo, Emacs!
-;;; Local Variables: ***
-;;; tab-width: 4 ***
-;;; End: ***
-*/
 

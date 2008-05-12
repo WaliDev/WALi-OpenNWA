@@ -1,14 +1,16 @@
 /*!
- * @author Nick Kidd
+ * @author Nicholas Kidd
+ *
+ * @version $Id$
  */
 
 #include "wali/witness/WitnessMerge.hpp"
 #include "wali/witness/WitnessMergeFn.hpp"
 
-namespace wali {
-
-  namespace witness {
-
+namespace wali 
+{
+  namespace witness 
+  {
     // TODO: Do we need to pass a WitnessMerge down?
     WitnessMergeFn::WitnessMergeFn( merge_fn_t user_merge )
       : MergeFn(/*WitnessMerge?*/),user_merge(user_merge) 
