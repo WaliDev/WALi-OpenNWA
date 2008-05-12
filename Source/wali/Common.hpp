@@ -93,5 +93,5 @@ namespace wali
 #endif  // wali_COMMON_GUARD
 
 /* 
- * $Id$
+ * $Id: Common.hpp 417 2008-05-12 17:06:12Z kidd $
  */
