@@ -139,9 +139,5 @@ namespace wali {
 
 } // namespace wali
 
-/*
- * $Id: FWPDS.hpp 400 2008-04-16 17:39:25Z kidd $
- */
-
 #endif  // wali_wpds_fwpds_FWPDS_GUARD
 
