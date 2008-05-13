@@ -192,10 +192,6 @@
 					RelativePath="..\..\..\AddOns\Parse\Source\wali\wpds\ewpds\EWpdsHandler.cpp"
 					>
 				</File>
-				<File
-					RelativePath="..\..\..\AddOns\Parse\Source\wali\wpds\ewpds\MergeFactory.cpp"
-					>
-				</File>
 			</Filter>
 		</Filter>
 		<Filter

@@ -39,6 +39,7 @@
 
 using namespace wali;
 using namespace wali::graph;
+using namespace wali::wpds;
 using namespace wali::wpds::fwpds;
 using namespace wali::wpds::ewpds;
 

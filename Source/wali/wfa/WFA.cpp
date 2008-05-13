@@ -386,7 +386,7 @@ namespace wali
     void WFA::duplicateStates(std::set<Key> &st, WFA &output) const {
       // Create a map from state to their renamed counterpart
       std::map< Key, Key > dup;
-      std::set< Key >::iterator it;
+      std::set< Key >::const_iterator it;
 
       for(it = st.begin(); it != st.end(); it++) {
         Key s = *it;

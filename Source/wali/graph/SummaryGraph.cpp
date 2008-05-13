@@ -80,12 +80,12 @@ namespace wali {
 
       // Construct a map: ETrans -> ERule used to create it
       const set<Key> states = Agrow.getStates();
-      for(sit = states.begin(); sit != states.end(); sit++) {
+      for(set<Key>::const_iterator csit = states.begin(); csit != states.end(); csit++) {
 
         // no ETrans can be outgoing from init_state
-        if(*sit == init_state) continue;
+        if(*csit == init_state) continue;
 
-        State *q = Agrow.getState(*sit);
+        State *q = Agrow.getState(*csit);
         State::iterator transit;
 
         for(transit = q->begin(); transit != q->end(); transit++) {

@@ -154,6 +154,14 @@
 					RelativePath="..\..\..\Source\wali\wpds\fwpds\FWPDS.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\wpds\fwpds\LazyTrans.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\wpds\fwpds\SWPDS.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="wali.wpds"
@@ -164,6 +172,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\Source\wali\wpds\DebugWPDS.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\wpds\GenKeySource.cpp"
 					>
 				</File>
 				<File
@@ -190,6 +202,10 @@
 			<Filter
 				Name="wali.wfa"
 				>
+				<File
+					RelativePath="..\..\..\Source\wali\wfa\ITrans.cpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\..\Source\wali\wfa\State.cpp"
 					>
@@ -311,6 +327,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\Source\wali\MergeFn.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\MergeFnFactory.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\Source\wali\Printable.cpp"
 					>
 				</File>
@@ -367,6 +391,62 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="wali.wpds.ewpds"
+				>
+				<File
+					RelativePath="..\..\..\Source\wali\wpds\ewpds\ERule.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\wpds\ewpds\ETrans.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\wpds\ewpds\EWPDS.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="wali.regex"
+				>
+				<File
+					RelativePath="..\..\..\Source\wali\regex\Concat.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\regex\Regex.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\regex\Root.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\regex\Star.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\regex\Union.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="wali.wfa.epr"
+				>
+				<File
+					RelativePath="..\..\..\Source\wali\wfa\epr\EPA.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\wfa\epr\FunctionalWeight.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\wfa\epr\FunctionalWeightMaker.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -380,6 +460,14 @@
 					RelativePath="..\..\..\Source\wali\wpds\fwpds\FWPDS.hpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\wpds\fwpds\LazyTrans.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\wpds\fwpds\SWPDS.hpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="wali.wpds"
@@ -390,6 +478,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\Source\wali\wpds\DebugWPDS.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\wpds\GenKeySource.hpp"
 					>
 				</File>
 				<File
@@ -416,6 +508,14 @@
 			<Filter
 				Name="wali.wfa"
 				>
+				<File
+					RelativePath="..\..\..\Source\wali\wfa\DecoratorTrans.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\wfa\ITrans.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\..\Source\wali\wfa\State.hpp"
 					>
@@ -537,6 +637,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\Source\wali\IMarkable.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\Source\wali\IntSource.hpp"
 					>
 				</File>
@@ -565,6 +669,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\Source\wali\MergeFn.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\MergeFnFactory.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\Source\wali\Printable.hpp"
 					>
 				</File>
@@ -586,6 +698,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\Source\wali\StringSource.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\TaggedWeight.hpp"
 					>
 				</File>
 				<File
@@ -630,6 +746,70 @@
 				</File>
 				<File
 					RelativePath="..\..\..\Source\wali\graph\SummaryGraph.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="wali.wpds.ewpds"
+				>
+				<File
+					RelativePath="..\..\..\Source\wali\wpds\ewpds\ERule.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\wpds\ewpds\ETrans.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\wpds\ewpds\EWPDS.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="wali.regex"
+				>
+				<File
+					RelativePath="..\..\..\Source\wali\regex\AllRegex.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\regex\Concat.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\regex\Regex.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\regex\Root.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\regex\Star.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\regex\Union.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="wali.wfa.epr"
+				>
+				<File
+					RelativePath="..\..\..\Source\wali\wfa\epr\EPA.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\wfa\epr\FunctionalWeight.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\wfa\epr\FunctionalWeightMaker.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\wfa\epr\StatePriorityWorklist.hpp"
 					>
 				</File>
 			</Filter>
