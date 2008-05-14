@@ -61,13 +61,11 @@ namespace wali
       if( !marked() && !value.is_valid()) {
         mark();
         wali::sem_elem_t w1 = child->solve_recurse();
-        value = w1->one(); // start at semiring one
-        w1 = w1->extend(w1);
-        w1 = w1->combine(value);
-        while( !value->equal(w1) ) {
-          value = w1;
-          w1 = w1->extend(w1);
-          w1 = w1->combine(value);
+        value = w1->one();           // start at 1
+        w1 = w1->combine(w1->one()); // w1 + 1
+        while (!value->equal(w1)) {  // until converge
+          value = w1;                // record old value
+          w1 = w1->extend(w1);       // square
         }
       }
       return value;
