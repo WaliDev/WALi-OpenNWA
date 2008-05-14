@@ -48,9 +48,10 @@ namespace wali {
         return NULL;
       }
 
+      // This is called sometimes to check equality with zero
       bool FunctionalWeight::equal(SemElem *se ATTR_UNUSED) const {
-        *waliErr << "Error: Equal called on FunctionalWeight\n";
-        assert(0);
+        //*waliErr << "Error: Equal called on FunctionalWeight\n";
+        //assert(0);
         return false;
       }
 
