@@ -24,6 +24,7 @@ Env = BaseEnv.Clone()
 IncludeDirs = [
     os.path.join(WaliDir , 'Source'),
     os.path.join(WaliDir , 'AddOns', 'Domains' , 'Source'),
+    os.path.join(WaliDir , 'AddOns', 'Domains' , 'ThirdParty', 'include'), # for BuDDy
 ]
 
 Env['CPPPATH'] = IncludeDirs

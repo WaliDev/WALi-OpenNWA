@@ -2,7 +2,15 @@ Import('BaseEnv')
 
 built = []
 
+buddy = SConscript('ThirdParty/SConscript')
+built.append(buddy)
+
+BaseEnv.Alias('buddy',buddy)
+
 domains = SConscript('Source/SConscript', build_dir='_build',duplicate=0)
 built.append(domains)
 
+BaseEnv.Depends(domains,'buddy')
+
 Return('built')
+
