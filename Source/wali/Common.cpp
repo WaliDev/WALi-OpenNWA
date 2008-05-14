@@ -32,8 +32,8 @@ namespace wali
   //! query using regular WPDS and verify the results
   //! are the same.
   //!
-  //! Default value is true
-  static bool b_check_fwpds = true;
+  //! Default value is false
+  static bool b_check_fwpds = false;
 
   /*!
    * @brief Turn FWPDS verification on and off.
