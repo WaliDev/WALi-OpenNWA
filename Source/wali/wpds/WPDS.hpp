@@ -227,6 +227,16 @@ namespace wali
         virtual void operator()( wfa::ITrans* t );
 
         bool is_pds_state(wali::Key k) const;
+        int num_pds_states() const { return (int) pds_states.size(); }
+ 
+        /*! @brief Runs a poststar query on the following automaton
+         * to get one that represents the program CFG.
+         *
+         * Ainit = { (p, e, <p,e>) | e \in Procedure Entry Point }
+         *
+         * returns the PDS state p; a map [e -> <p,e>]; and poststar(Ainit)
+         */
+        Key constructCFG(std::set<Key> &entries, std::map<Key, Key> &entryState, wfa::WFA &cfg);
 
       protected:
 

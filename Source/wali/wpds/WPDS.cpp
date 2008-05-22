@@ -591,6 +591,51 @@ namespace wali
           return pds_states.find(k) != pds_states.end();
         }
 
+        Key WPDS::constructCFG(std::set<Key> &entries, std::map<Key, Key> &entryState, wfa::WFA &out) {
+
+          if(pds_states.size() != 1) {
+            *waliErr << "Error: constructCFG can only handle single-state PDSs\n";
+            assert(0);
+          }
+
+          Key start_state = *pds_states.begin();
+
+          // Get all WPDS symbols
+          WpdsStackSymbols syms;
+          for_each(syms);
+          
+          // Create an automaton Agrow with transitions (start_state, e, <start_state,e>)
+          // for each entry point node e.
+          wfa::WFA Agrow;
+          std::set<Key>::iterator it; 
+
+          for(it = entries.begin(); it != entries.end(); it++) {
+            syms.entryPoints.insert(*it);
+          }
+
+          // Need to get the WFA::generation correct for the mid-states so that
+          // new mid-states are not created while running poststar        
+          Agrow.setGeneration(Agrow.getGeneration() + 1);
+          currentOutputWFA = &Agrow; 
+
+          for(it = syms.entryPoints.begin(); it != syms.entryPoints.end(); it++) {
+            Key entry = *it;
+            Key estate = gen_state(start_state, entry);
+            Agrow.addTrans(start_state, entry, estate, theZero->one());
+            entryState[entry] = estate;
+          }
+          Agrow.setInitialState(start_state);
+
+          // Set the generation back to original value
+          Agrow.setGeneration(Agrow.getGeneration() - 1);
+          currentOutputWFA = 0;
+
+          // Run poststar
+          poststar(Agrow, out);
+
+          return start_state;
+        }
+
         /////////////////////////////////////////////////////////////////
         // Protected Methods
         /////////////////////////////////////////////////////////////////
