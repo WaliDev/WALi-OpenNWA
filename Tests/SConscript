@@ -18,7 +18,7 @@ Reach = os.path.join(WaliDir,'Examples','Reach','Reach.cpp')
 for t in ['t1','t3','t4','twitness','tprune','tTransSet']:
     print '\n+++ Building Test "%s"' % t
     exe = Env.Program('%s' % t, ['%s.cpp' % t,'%s' % Reach ] + Env['StaticLibs'])
-    built.append(exe)
+    built += (exe)
 
 Return('built')
 

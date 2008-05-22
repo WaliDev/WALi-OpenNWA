@@ -44,6 +44,6 @@ Reach/ExMain.cpp
 Reach/Reach.cpp
 """)
 Reach = env.Program('ExMain',ReachFiles + StaticLibs)
-built.append(Reach)
+built = Reach
 
 Return('built')

@@ -22,7 +22,7 @@ UninitVar = Env.Program('uninitvar', UninitFiles)
 ul = Env.InstallAs(os.path.join(WaliDir,'Examples','bin','UninitVar'), UninitVar)
 
 #built = [LiveVar,UninitVar]
-built = [lv,ul]
+built = lv + ul
 
 Return('built')
 

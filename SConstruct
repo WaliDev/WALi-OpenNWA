@@ -41,18 +41,13 @@ Export('ProgEnv')
 if 'help' not in COMMAND_LINE_TARGETS:
     ## ##################
     ## libwali
-    built = []
-    built = built + SConscript('Source/SConscript', build_dir='_build',duplicate=0)
+    built = SConscript('Source/SConscript', build_dir='_build',duplicate=0)
     
     ## ##################
     ## All
     if 'all' in COMMAND_LINE_TARGETS:
         for d in ['AddOns','Examples','Tests']:
-            o = SConscript('%s/SConscript' % d)
-            built = built + o
-        ### TODO : better printing
-        #for b in built:
-        #    print b
+            built += SConscript('%s/SConscript' % d)
         BaseEnv.Alias('all',built)
 
     ## AddOns

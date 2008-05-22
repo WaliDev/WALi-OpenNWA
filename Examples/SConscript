@@ -8,22 +8,20 @@ ExampleDir = os.path.join(WaliDir,'Examples')
 built = []
 ## ###############################
 ## Reach example
-o = SConscript(
+built += SConscript(
         os.path.join(ExampleDir,'Reach','SConscript'),
         build_dir= os.path.join('_build','Reach'),
         duplicate=0
         )
-built += o
 
 
 ## ###############################
 ## GenKill examples
-o = SConscript(
+built += SConscript(
         os.path.join(ExampleDir,'GenKill','SConscript'),
         build_dir= os.path.join('_build','GenKill'),
         duplicate=0
         )
-built += o
 
 # Affine Relations Weight Domain
 # o = SConscript(
@@ -33,3 +31,4 @@ built += o
 #         )
 # built += o
 Return('built')
+

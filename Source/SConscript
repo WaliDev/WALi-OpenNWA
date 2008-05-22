@@ -101,11 +101,11 @@ if Debug:
 if MkStatic:
     wali = env.StaticLibrary('wali' , wali_files)
     i = env.Install(LibInstallDir, wali)
-    built = [i]
+    built = i
     Return('built')
 else:
     wali = env.SharedLibrary('wali' , wali_files)
     i = env.Install(LibInstallDir, wali)
-    built = [i]
+    built = i
     Return('built')
 

@@ -3,16 +3,14 @@ Import('BaseEnv')
 built = []
 
 xerces = SConscript('ThirdParty/SConscript')
-built.append(xerces)
+built += xerces
 
 parse = SConscript('Source/SConscript', build_dir='_build',duplicate=0)
-built.append(parse)
+built += parse
 
 examples = SConscript('Examples/SConscript', build_dir='_build/Examples',duplicate=0)
-built.append(examples)
+built += examples
 
-BaseEnv.Alias('xerces',xerces)
-
-BaseEnv.Depends(parse,'xerces')
+BaseEnv.Depends(parse,xerces)
 
 Return('built')

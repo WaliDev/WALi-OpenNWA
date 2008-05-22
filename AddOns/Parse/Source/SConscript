@@ -47,11 +47,11 @@ Env['CPPPATH'] = IncludeDirs
 if MkStatic:
     waliparse = Env.StaticLibrary('waliparse' , waliparse_files)
     i = Env.Install(LibInstallDir, waliparse)
-    built = [i]
+    built = i
     Return('built')
 else:
     waliparse = Env.SharedLibrary('waliparse' , waliparse_files)
     i = Env.Install(LibInstallDir, waliparse)
-    built = [i]
+    built = i
     Return('built')
 

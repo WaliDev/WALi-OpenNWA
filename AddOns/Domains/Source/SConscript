@@ -32,11 +32,11 @@ Env['CPPPATH'] = IncludeDirs
 if MkStatic:
   walidomains = Env.StaticLibrary('walidomains' , walidomains_files)
   i = Env.Install(LibInstallDir, walidomains)
-  built = [i]
+  built = i
   Return('built')
 else:
   walidomains = Env.SharedLibrary('walidomains' , walidomains_files)
   i = Env.Install(LibInstallDir, walidomains)
-  built = [i]
+  built = i
   Return('built')
 
