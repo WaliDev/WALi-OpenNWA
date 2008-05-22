@@ -36,35 +36,27 @@ Export('ProgEnv')
 
 
 ## ####################################
-## Calling of WALi SConscript files for
-## building.
-if 'help' not in COMMAND_LINE_TARGETS:
-    ## ##################
-    ## libwali
-    built = SConscript('Source/SConscript', build_dir='_build',duplicate=0)
-    
-    ## ##################
-    ## All
-    if 'all' in COMMAND_LINE_TARGETS:
-        for d in ['AddOns','Examples','Tests']:
-            built += SConscript('%s/SConscript' % d)
-        BaseEnv.Alias('all',built)
+## SCons 0.98 has a problem with 
+## invoking Environment.Alias().
+## The workaround is to just build
+## everything and remove command line
+## arguments.
+ 
+## ##################
+## libwali
+built = SConscript('Source/SConscript', build_dir='_build',duplicate=0)
 
-    ## AddOns
-    else:
-        if 'addons' in COMMAND_LINE_TARGETS:
-            built += SConscript('AddOns/SConscript')
-            for b in built:
-              print b
-            BaseEnv.Alias('addons',built)
-        if 'examples' in COMMAND_LINE_TARGETS:
-            built += SConscript('Examples/SConscript')
-            BaseEnv.Alias('examples',built)
-        if 'tests' in COMMAND_LINE_TARGETS:
-            built += SConscript('Tests/SConscript')
-            BaseEnv.Alias('tests',built)
-else:
-    BaseEnv.Alias('help',[])
-    print """
-    scons [all addons examples tests]
-    """
+## ##################
+## All
+for d in ['AddOns','Examples','Tests']:
+  built += SConscript('%s/SConscript' % d)
+
+
+Help("""
+    There are no options for this build.
+    Simply typing `scons` will compile
+    and link libwali, libwaliparse, the Examples,
+    and the test programs. This can be controlled
+    by editing the list in the [for] loop that
+    is in this file on line 51.
+""")
