@@ -14,21 +14,21 @@
  * On machines where long is 64 bits, the below should
  * probably be used.
  *
+ */
 
- long longhash1(long key)
- {
- key += ~(key << 32);
- key ^= (key >>> 22);
- key += ~(key << 13);
- key ^= (key >>> 8);
- key += (key << 3);
- key ^= (key >>> 15);
- key += ~(key << 27);
- key ^= (key >>> 31);
- return key;
- }
+#undef longhash1
+#define longhash1(key)  \
+{                       \
+  key += ~(key << 32);  \
+  key ^= (key >> 22);  \
+  key += ~(key << 13);  \
+  key ^= (key >> 8);   \
+  key += (key << 3);    \
+  key ^= (key >> 15);  \
+  key += ~(key << 27);  \
+  key ^= (key >> 31);  \
+}
 
-*/
 
 #undef jenkins_mix
 #define jenkins_mix(a,b,c) \
@@ -287,7 +287,7 @@ namespace wali
   /********************/
   template<> struct hm_hash< unsigned long >
   {
-    size_t operator()( long key ) const
+    size_t operator()( unsigned long key ) const
     {
       size_t sz = key;
       primitive_type_hash( sz );
@@ -375,7 +375,83 @@ namespace wali
     }
   };
 
-} // namespace wpds
+  /********************/
+  /* long long        */
+  /********************/
+  template<> struct hm_hash< long long >
+  {
+    size_t operator()( long long key ) const
+    {
+      longhash1( key );
+      return (size_t)key;
+    }
+  };
+
+  template<> struct hm_hash< const long long >
+  {
+    size_t operator()( const long long key ) const
+    {
+      long long sz = key;
+      longhash1( sz );
+      return (size_t)sz;
+    }
+  };
+
+  template<> struct hm_equal< long long >
+  {
+    bool operator()( long long lhs , long long rhs ) const
+    {
+      return lhs == rhs;
+    }
+  };
+
+  template<> struct hm_equal< const long long >
+  {
+    bool operator()( const long long lhs , const long long rhs ) const
+    {
+      return lhs == rhs;
+    }
+  };
+
+  /**********************/
+  /* unsigned long long */
+  /**********************/
+  template<> struct hm_hash< unsigned long long >
+  {
+    size_t operator()( unsigned long long key ) const
+    {
+      longhash1( key );
+      return (size_t)key;
+    }
+  };
+
+  template<> struct hm_hash< const unsigned long long >
+  {
+    size_t operator()( const unsigned long long key ) const
+    {
+      unsigned long long sz = key;
+      longhash1( sz );
+      return (size_t)sz;
+    }
+  };
+
+  template<> struct hm_equal< unsigned long long >
+  {
+    bool operator()( unsigned long long lhs , unsigned long long rhs ) const
+    {
+      return lhs == rhs;
+    }
+  };
+
+  template<> struct hm_equal< const unsigned long long >
+  {
+    bool operator()( const unsigned long long lhs , const unsigned long long rhs ) const
+    {
+      return lhs == rhs;
+    }
+  };
+
+} // namespace wali
 
 #endif  // wali_HM_HASH_GUARD
 
