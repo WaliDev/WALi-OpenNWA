@@ -1,0 +1,8 @@
+Release 2.3
+-------------------------
+- (2008-05-21) Add SConstruct.NOALIAS to be used with SCons v > 0.96.
+   o scons -f SConstruct.NOALIAS
+   o or for more info, scons -f SConstruct.NOALIAS -h
+
+- (2008-05-21) Fix bugs in adding items to the SCons built variable
+
