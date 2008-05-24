@@ -143,6 +143,11 @@ namespace wali
       return TaggedWeight(tw.getWeight()->extend(weight()), tw.getTag());
     }
 
+    void Trans::applyWeightChanger(util::WeightChanger &wc) {
+      sem_elem_t wt = wc.change_weight(weight());
+      setWeight(wt);
+    }
+
   } // namespace wfa
 
 } // namespace wali

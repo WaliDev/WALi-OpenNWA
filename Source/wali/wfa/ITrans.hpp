@@ -13,6 +13,7 @@
 #include "wali/KeyContainer.hpp"
 
 #include "wali/TaggedWeight.hpp"
+#include "wali/util/WeightChanger.hpp"
 
 namespace wali
 {
@@ -215,6 +216,14 @@ namespace wali
          *   tw.weight \extend weight
          */
         virtual TaggedWeight apply_pre( TaggedWeight tw) const = 0;
+
+        /*!
+         * This is used by WeightChanger
+         * It applies the changer to all weights stored in the transition
+         * Base case is that it is applied to t->weight()
+         */
+        virtual void applyWeightChanger( util::WeightChanger &wc) = 0;
+
 
         //****************************************************
         //****************************************************

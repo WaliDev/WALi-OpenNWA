@@ -64,6 +64,7 @@ namespace wali
 
           virtual TaggedWeight apply_post( TaggedWeight tw) const;
           virtual TaggedWeight apply_pre( TaggedWeight tw) const;
+          virtual void applyWeightChanger(util::WeightChanger &wc);
 
           void setInterGraph(graph::InterGraphPtr igr);
 

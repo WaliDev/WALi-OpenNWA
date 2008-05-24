@@ -135,6 +135,11 @@ namespace wali
         return getDelegate()->apply_pre(tw);
       }
 
+      void LazyTrans::applyWeightChanger( util::WeightChanger &wc) {
+        compute_weight();
+        getDelegate()->applyWeightChanger(wc);
+      }
+
       LazyTrans::~LazyTrans() {}
 
     } // namespace fwpds

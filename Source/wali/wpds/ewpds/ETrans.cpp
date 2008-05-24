@@ -82,6 +82,11 @@ namespace wali {
         return TaggedWeight(tw.getWeight()->extend(weight()), walienum::RETURN);
       }
 
+      void ETrans::applyWeightChanger( util::WeightChanger &wc) {
+        setWeight(wc.change_weight(weight()));
+        setWeightAtCall(wc.change_weight(getWeightAtCall()));
+      }
+
       void ETrans::combineTrans( ITrans* tp )
       {
         // TODO - change dynamic_cast to static_cast 
