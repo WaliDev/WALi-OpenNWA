@@ -65,12 +65,14 @@ struct FWPDSCopyBackFunctor : public wfa::TransFunctor
   graph::InterGraphPtr gr;
   FWPDSCopyBackFunctor(graph::InterGraphPtr _gr) : gr(_gr) {}
   virtual void operator()( wfa::ITrans* t ) {
-    if (wali::is_lazy_fwpds()) {
-      LazyTrans *lt = static_cast<LazyTrans *> (t);
-      lt->setInterGraph(gr);
+    LazyTrans *lt = static_cast<LazyTrans *> (t);
+    lt->setInterGraph(gr);
+    
+    if (!wali::is_lazy_fwpds()) {
+      // Call to compute the weight
+      lt->weight();
     }
-    else
-      t->setWeight( gr->get_weight( Transition(*t) ) );
+    
   }
 };
 
@@ -117,6 +119,18 @@ struct FWPDSCompareFunctor : public wfa::ConstTransFunctor
       t->print(*waliErr) << "\n";
       *waliErr << "-----------------------------\n";
     }
+    const ETrans *et = dynamic_cast<const ETrans*>(t);
+    if(et != 0) {
+      wt1 = et->getWeightAtCall();
+      wt2 = gr.get_call_weight(Transition(t->from(), t->stack(), t->to()));
+      if( !wt2->equal(wt1) ) {
+        iseq = false;
+        wt1->print(*waliErr) << "\n";
+        t->print(*waliErr) << "\n";
+        *waliErr << "-----------------------------\n";
+      }
+    }
+
   }
 
   std::ostream& print( std::ostream& out ) {

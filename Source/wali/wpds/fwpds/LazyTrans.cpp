@@ -111,6 +111,12 @@ namespace wali
       }
 
       void LazyTrans::setWeight(sem_elem_t w) {
+        if(is_etrans && intergr.is_valid()) {
+          // Ensure that 
+          // etrans information inside intergr is propagated
+          sem_elem_t wt = intergr->get_call_weight(wali::graph::Transition(*this));
+          ((ewpds::ETrans *) getDelegate())->setWeightAtCall(wt);
+        }
         intergr = NULL;
         getDelegate()->setWeight(w);
       }
