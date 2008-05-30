@@ -59,7 +59,7 @@ namespace wali {
     {
       if (0 != task.length()) {
         const double difference = elapsed();
-        out << task << ": " << difference << " secs\n";
+        out << task << ": " << difference << " secs" << std::endl;
       }
       return out;
     }

@@ -1,7 +1,7 @@
 #ifndef wali_wfa_WFA_GUARD
 #define wali_wfa_WFA_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  */
 
@@ -53,7 +53,7 @@ namespace wali
     class TransFunctor;
     class ConstTransFunctor;
 
-    /*! @class WFA
+    /** @class WFA
      *
      * TODO:
      *  - Should state_map_t have type HashMap< Key , ref_ptr<State> >
@@ -67,7 +67,7 @@ namespace wali
       // Types
       //
       public:
-        /*!
+        /**
          * @enum query_t
          * query_t determines how the weights are extended
          * during path_summary. INORDER is the normal each state's
@@ -108,12 +108,12 @@ namespace wali
 
         virtual ~WFA();
 
-        /*!
+        /**
          * Remove all transitions from the WFA
          */
         virtual void clear();
 
-        /*!
+        /**
          * @brief set initial state
          *
          * A WFA has 1 initial state. This method will
@@ -124,7 +124,7 @@ namespace wali
          */
         Key set_initial_state( Key key );
 
-        /*!
+        /**
          * @brief set initial state
          *
          * A WFA has 1 initial state. This method will
@@ -135,49 +135,49 @@ namespace wali
          */
         Key setInitialState( Key key );
 
-        /*!
+        /**
          * @brief Return the initial state
          *
          * @return Key for the initial state
          */
         Key initial_state() const;
 
-        /*!
+        /**
          * @brief Return the initial state
          *
          * @return Key for the initial state
          */
         Key getInitialState() const;
 
-        /*!
+        /**
          * Test if param key is the initial state.
          *
          * @return true if key == WFA::initial_state()
          */
         bool isInitialState( Key key ) const;
 
-        /*!
+        /**
          * Add parameter key to the set of final states
          */
         void add_final_state( Key key );
 
-        /*!
+        /**
          * Add parameter key to the set of final states
          */
         void addFinalState( Key key );
 
-        /*!
+        /**
          * Return true if parameter key is a final state
          */
         bool isFinalState( Key key ) const;
 
-        /*!
+        /**
          * Set the WFA query mode.
          * @return the old query mode
          */
         query_t setQuery( query_t newQuery );
 
-        /*!
+        /**
          * @return WFA query mode
          *
          * The query mode effects how weights are extended during
@@ -187,7 +187,7 @@ namespace wali
          */
         query_t getQuery() const;
 
-        /*!
+        /**
          * @return The current generation
          *
          * Each WFA keeps a generation, which is
@@ -196,13 +196,13 @@ namespace wali
          */
         size_t getGeneration() const;
 
-        /*!
+        /**
          * @brief Set the generation to have the value of param g
          * @return void
          */
         void setGeneration(size_t g);
 
-        /*! @brief Get a weight from the WFA. This is to get hold
+        /** @brief Get a weight from the WFA. This is to get hold
          * of the weight domain class
          *
          * @see sem_elem_t
@@ -210,7 +210,7 @@ namespace wali
          */
         virtual sem_elem_t getSomeWeight();
 
-        /*! @brief Add transition (p,g,q) to the WFA
+        /** @brief Add transition (p,g,q) to the WFA
          *
          * @see Key
          * @see sem_elem_t
@@ -221,14 +221,14 @@ namespace wali
             Key q,
             sem_elem_t se );
 
-        /*!
+        /**
          * @brief Add Trans t to the WFA
          *
          * @see wali::wfa::Trans
          */
         virtual void addTrans( ITrans * t );
 
-        /*!
+        /**
          * @brief erase Trans
          *
          * Removes Trans (from,stack,to) from the WFA if it exists.
@@ -238,7 +238,7 @@ namespace wali
             Key stack,
             Key to );
 
-        /*!
+        /**
          * @brief erase State q and all of its outgoing transitions
          * It does not remove incoming transitions -- 
          * <b><i>that has to be done by the client</i></b>. 
@@ -250,7 +250,7 @@ namespace wali
          */
         virtual bool eraseState( Key q );
 
-        /*!
+        /**
          * @brief return true if transition matching (p,g,q) exists
          * and copy that transition into the ref parameter t
          *
@@ -274,17 +274,17 @@ namespace wali
             Key q,
             Trans & t );
 
-        /*!
+        /**
          * @brief invoke TransFunctor tf on each Trans
          */
         virtual void for_each( TransFunctor& tf );
 
-        /*!
+        /**
          * @brief invoke ConstTransFunctor on each Trans
          */
         virtual void for_each( ConstTransFunctor& tf ) const;
 
-        /*!
+        /**
          * Intersect this with parameter fa. This is a wrapper
          * for intersect( WeightMaker&,WFA& ) that passes
          * the WeightMaker KeepBoth.
@@ -294,7 +294,7 @@ namespace wali
          */
         virtual WFA intersect( WFA& fa );
 
-        /*!
+        /**
          * Intersect this with parameter fa. This is a wrapper
          * for intersect( WeightMaker&,WFA&,WFA& ) that passes
          * the WeightMaker KeepBoth. Result is stored in dest.
@@ -304,7 +304,7 @@ namespace wali
          */
         virtual void intersect( WFA& fa, WFA& dest );
 
-        /*!
+        /**
          * Intersect this with parameter fa and return the result
          * by value. The parameter WeightMaker determines how
          * intersection should join the weights on matching
@@ -314,7 +314,7 @@ namespace wali
          */
         WFA intersect( WeightMaker& wmaker , WFA& fa );
 
-        /*!
+        /**
          * Intersect this with parameter fa. The result is stored in
          * parameter dest. Parameter dest is cleared before any
          * results are stored. The parameter WeightMaker determines
@@ -325,29 +325,33 @@ namespace wali
          */
         virtual void intersect( WeightMaker& wmaker , WFA& fa, WFA& dest );
 
-        /*!
+        /**
          * Performs path summary. Simply calls the path_summary with
          * the default Worklist provided by WALi.
          */
         virtual void path_summary();
 
-        /*!
+        /**
          * Computes a regular expression for the automaton.
          * The regex, when evaluated, produces a weight
          * that is equal to calling path_summary and then
          * getting the weight on the initial state. I.e.,
+         *
          * <code>
-         *  fa.getState( fa.getInitialState() )->weight();
+         *      fa.toRegex().solve() 
+         *    <==>
+         *      fa.getState( fa.getInitialState() )->weight();
+         *
          * </code>
          */
         virtual regex::regex_t toRegex();
 
-        /*!
+        /**
          * Performs path summary with the specified Worklist
          */
         virtual void path_summary( Worklist<State>& wl );
 
-        /*!
+        /**
          * Performs path summary. Simply calls the path_summary with
          * the default Worklist provided by WALi.
          * Initializes the weight on the final state to wt (can be
@@ -355,26 +359,26 @@ namespace wali
          */
         virtual void path_summary(sem_elem_t wt);
 
-        /*!
+        /**
          * Prunes the WFA. This removes any transitions that are
          * not in the (getInitialState(),F) chop.
          */
         virtual void prune();
 
-        /*!
+        /**
          * Intersects the WFA with <init_state, (stk \Gamma^*)>
          * that essentially removes transitions and calls prune
          */
         virtual void filter(Key stk);
 
-        /*!
+        /**
          * Intersects the WFA with { <init_state, (stk \Gamma^*)> | stk
          * \in stkset }
          * This essentially removes transitions and calls prune
          */
         virtual void filter(std::set<Key> &stkset);
 
-        /*!
+        /**
          * For every state s \in st, rename it to s'. Then add
          * epsilon transition from s to s' and perform the
          * epsilon closure. This uses WFA::getGeneration() to
@@ -383,7 +387,7 @@ namespace wali
          */
         virtual void duplicateStates(std::set<Key> &st, WFA &output) const;
 
-        /*!
+        /**
          * Write the WFA to the std::ostream parameter, implements
          * Printable::print
          *
@@ -394,21 +398,21 @@ namespace wali
          */
         virtual std::ostream & print( std::ostream & ) const;
 
-        /*!
+        /**
          * @brief Print WFA in dot format
          */
         virtual std::ostream& print_dot(
             std::ostream& o,
             bool print_weights=false ) const;
 
-        /*!
+        /**
          * @brief marshall WFA in XML 
          */
         virtual std::ostream& marshall( std::ostream& o ) const;
 
         virtual std::ostream& marshallState( std::ostream& o, Key key ) const;
 
-        /*!
+        /**
          * @brief inserts tnew into the WFA
          *
          * This method inserts Trans * tnew into the WFA.  If a transition
@@ -425,7 +429,7 @@ namespace wali
          */
         ITrans * insert( ITrans * tnew );
 
-        /*!
+        /**
          * @brief Returns a TransSet containing all 
          * transitions matching (p,y,?) in the WFA
          *
@@ -433,12 +437,12 @@ namespace wali
          */
         TransSet match( Key p, Key y);
 
-        /*! 
+        /** 
          * Create a State * for the key Key
          */
         void addState( Key key , sem_elem_t zero );
 
-        /*!
+        /**
          * @return const pointer to underlying State object or NULL if
          * no such state exists.
          *
@@ -446,7 +450,7 @@ namespace wali
          */
         const State* getState( Key name ) const;
 
-        /*!
+        /**
          * @return pointer to underlying State object or NULL if
          * no such state exists.
          *
@@ -471,13 +475,13 @@ namespace wali
 
       protected:
 
-        /*!
+        /**
          * setupFixpoint clears each states markable flag and sets
          * the states weight to zero
          */
         void setupFixpoint( Worklist<State>& wl, PredHash_t& preds );
 
-        /*!
+        /**
          * setupFixpoint clears each states markable flag and sets
          * the states weight to zero, and weight of final states to
          * wtFinal (or ONE if NULL)
@@ -489,7 +493,7 @@ namespace wali
             Key g,
             Key q);
 
-        /*!
+        /**
          * Erases the specified Trans(from,stack,to) from the
          * kpmap and epsmap. A null return value means no transition existed.
          *
@@ -499,7 +503,7 @@ namespace wali
             Key from,
             Key stack,
             Key to );
-        /*!
+        /**
          * Erases the specified Trans(from,stack,to) from the
          * kpmap. A null return value means no transition existed.
          *
@@ -512,7 +516,7 @@ namespace wali
 
         ITrans* eraseTransFromKpMap( ITrans* terase );
 
-        /*!
+        /**
          * Erases the specified Trans(from,stack,to) from the
          * epsmap. A false return value means no transition existed.
          *
@@ -520,7 +524,7 @@ namespace wali
          */
         ITrans* eraseTransFromEpsMap( ITrans* terase );
 
-        /*!
+        /**
          * Erases the State 'state' from the WFA and all transitions
          * that go to or from the State.
          *
@@ -528,14 +532,14 @@ namespace wali
          */
         bool eraseState( State* state );
 
-        /*!
+        /**
          * Performs path summary with the specified Worklist
          * Initializes the weight on the final state to wt (can be
          * useful for efficiency in some cases)
          */
         virtual void path_summary( Worklist<State>& wl, sem_elem_t wt );
 
-        /*!
+        /**
          * Uses Tarjan's algorithm to build a regular expression
          * for this WFA. IIRC, it is the cubic dynamic programming
          * algorithm.
