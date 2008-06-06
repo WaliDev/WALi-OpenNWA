@@ -1,11 +1,11 @@
 #ifndef wali_binrel_BINREL_GUARD
 #define wali_binrel_BINREL_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  *
  * An implementation of binary relations. 
- * This class maps models the relations
+ * This class models the relations
  * using BDDs, and specifically with the BuDDy
  * BDD library.
  */
@@ -26,7 +26,8 @@ namespace wali
 
       typedef wali::ref_ptr<BinRel> binrel_t;
 
-      class BinRel : public wali::SemElem {
+      class BinRel : public wali::SemElem 
+      {
         public:
           static int getNumVars();
 
@@ -40,6 +41,13 @@ namespace wali
 
           static binrel_t Id();
 
+        public:
+          /** @see BinRel::Compose */
+          friend binrel_t operator*(binrel_t a, binrel_t b);
+          /** @see BinRel::Union */
+          friend binrel_t operator|(binrel_t a, binrel_t b);
+          /** @see BinRel::Intersect */
+          friend binrel_t operator&(binrel_t a, binrel_t b);
 
         public:
           BinRel(const BinRel& that);
@@ -49,6 +57,8 @@ namespace wali
           binrel_t Compose( binrel_t that );
 
           binrel_t Union( binrel_t that );
+
+          binrel_t Intersect( binrel_t that );
 
         public: // SemElem methods
           sem_elem_t one() const { return Id(); }
