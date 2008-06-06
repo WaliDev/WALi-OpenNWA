@@ -10,15 +10,15 @@ namespace wali
   namespace util
   {
 
-    //
-    // Takes command line arguments and splits each one on a non escaped
-    // equal sign ('=').  ie. key=value
-    // Inserts the pair (key,val) into a map.  If no equal sign is present
-    // inserts (key,"") into the map.
-    //
-    // - get* methods do not side effect their second parameter if the key
-    //      does not exist
-    //
+    /**
+     *  Takes command line arguments and splits each one on a non escaped
+     *  equal sign ('=').  ie. key=value
+     *  Inserts the pair (key,val) into a map.  If no equal sign is present
+     *  inserts (key,"") into the map.
+     * 
+     *  - get* methods do not side effect their second parameter if the key
+     *       does not exist
+     */ 
     class ParseArgv
     {
 

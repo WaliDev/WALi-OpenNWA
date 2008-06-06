@@ -104,7 +104,7 @@ namespace wali
         pds_states.insert(from_state);
         pds_states.insert(to_state);
 
-        rule_t r = new ERule(from,to,to_stack2,se,mf);
+        rule_t r(new ERule(from,to,to_stack2,se,mf));
         // Rule::gen_rule will create links b/w Configs and the Rule
         bool rb = make_rule(from,to,to_stack2,se,r);
 
