@@ -1,7 +1,7 @@
 #ifndef wali_MERGE_FN_FACTORY_GUARD
 #define wali_MERGE_FN_FACTORY_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  */
 

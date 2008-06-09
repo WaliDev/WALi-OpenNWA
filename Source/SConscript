@@ -37,6 +37,7 @@ wali_files = Split("""
 ./wali/Markable.cpp
 ./wali/WeightFactory.cpp
 ./wali/KeyPairSource.cpp
+./wali/IMergeFn.cpp
 ./wali/MergeFn.cpp
 ./wali/MergeFnFactory.cpp
 ./wali/wpds/RuleFunctor.cpp

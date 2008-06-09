@@ -34,11 +34,13 @@ namespace wali
 
       }
 
-      sem_elem_t ERule::extended_weight() const {
+      sem_elem_t ERule::extended_weight() const 
+      {
         sem_elem_t ret;
         if(Rule::to_stack2() == WALI_EPSILON) {
           ret = (SemElem *)(new SemElemPair(Rule::weight(), Rule::weight()->one()));
-        } else {
+        } 
+        else {
           ret = (SemElem *)(new SemElemPair(Rule::weight()->one(), Rule::weight()));
         }
         return ret;
@@ -61,7 +63,8 @@ namespace wali
         Rule::weight()->marshallWeight(o);
         if(merge_fn().get_ptr() != NULL) {
           o << "\t<MergeFn>" << merge_fn()->toString() << "</MergeFn>\n";
-        } else {
+        } 
+        else {
           o << "\t<MergeFn> NONE </MergeFn>\n";
         }
         o << "</ERule>";

@@ -57,7 +57,7 @@ namespace wali
         if (wali::wpds::ewpds::EWPDS::XMLTag == who.get()) {
           // do nothing
         }
-        else if (MergeFn::XMLTag == who.get()) {
+        else if (IMergeFn::XMLTag == who.get()) {
           //std::cerr << "Start MergeFn\n";
           inMerge = true;
           mergeString = "";
@@ -73,7 +73,7 @@ namespace wali
       {
         using wali::Key;
         StrX who(localname);
-        if( MergeFn::XMLTag == who.get() ) {
+        if (IMergeFn::XMLTag == who.get()) {
           //std::cerr << "Exit MergeFn\n";
           inMerge = false;
         }

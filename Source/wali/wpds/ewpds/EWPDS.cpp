@@ -1,5 +1,7 @@
-/*!
+/**
  * @author Akash Lal
+ * @author Nicholas Kidd
+ * @version $Id$
  */
 
 // ::wali
@@ -105,19 +107,70 @@ namespace wali
         pds_states.insert(to_state);
 
         rule_t r(new ERule(from,to,to_stack2,se,mf));
-        // Rule::gen_rule will create links b/w Configs and the Rule
+        // WPDS::make_rule returns [true] if the rule already
+        // existed. I.e., rb == false <--> r \notin this.
         bool rb = make_rule(from,to,to_stack2,se,r);
 
-        if( !rb && to_stack1 == WALI_EPSILON )
+        if (!rb && to_stack1 == WALI_EPSILON )
         {
           assert( to_stack2 == WALI_EPSILON );
           rule_zeroes.insert( to );
         }
 
-        // if rb is false then the rule is new
-        if( to_stack2 != WALI_EPSILON && !rb ) {
+        // Make sure the same push rule was not inserted again.
+        // This causes problems with merge functions because
+        // there isn't an interface for combining them like one
+        // would normally do with weights.
+        if (rb && to_stack2 != WALI_EPSILON) 
+        {
+          if (!mf.is_valid()) 
+          {
+            // ERule = (..keys..), W, MFun
+            ERule* erule = dynamic_cast<ERule*>(r.get_ptr());
+            assert(erule != NULL);
+            merge_fn_t rule_mf = erule->merge_fn();
+            MergeFn* mfun = dynamic_cast<MergeFn*>(erule->merge_fn().get_ptr());
+            // This is a default merge function. We can therefore combine
+            // the weights on it.
+            if (NULL != mfun)
+            {
+              // We get here if:
+              // 1. The user added push rule r_push without an IMergeFn
+              //     - Causing EWPDS to create a default MergeFn
+              // 2. The user REadded push rule r_push w/out an IMergeFn
+              //     - Though possibly w/ a different weight
+              // 
+              // This means that the user has yet to specify an IMergeFn
+              // for this push rule and thus is using it as in WPDSs. 
+              // So we fix up the default MergeFn so that it's weight
+              // is equal to the combine of the two weights annotating
+              // r_push, one for each insertion.
+              //
+              erule->set_merge_fn( new MergeFn(erule->weight()) );
+            }
+            else {
+              *waliErr << "[ERROR] EWPDS :: Cannot add again the same push rule.\n";
+              r->print( *waliErr << "    : " ) << std::endl;
+              throw r;
+            }
+          }
+          else {
+            *waliErr << "[ERROR] EWPDS :: Cannot add again the same push rule.\n";
+            r->print( *waliErr << "    : " ) << std::endl;
+            throw r;
+          }
+        }
+
+        // If rb is false then the rule is new.
+        // If there exists a rule r' = (p,c) -> (q,e,r)
+        // such that (q,e,r) is the same r.h.s. for
+        // r, then this is an error b/c merge functions
+        // are indexed by the triple (q,e,r).
+        if ( to_stack2 != WALI_EPSILON && !rb ) 
+        {
           r2hash_t::iterator r2it = r2hash.find( to_stack2 );
-          if( r2it == r2hash.end() ) {
+          if( r2it == r2hash.end() ) 
+          {
             std::list< rule_t > ls;
             r2it = r2hash.insert( to_stack2,ls ).first;
           }
@@ -128,17 +181,22 @@ namespace wali
             x->set_merge_fn( wrapper->wrap(x->merge_fn()) );
           }
           merge_rule_hash_t::iterator rhash_it = merge_rule_hash.find(KeyTriple(to_state,to_stack1,to_stack2));
-          if(rhash_it == merge_rule_hash.end()) {
+          if(rhash_it == merge_rule_hash.end()) 
+          {
             merge_rule_hash.insert(KeyTriple(to_state,to_stack1,to_stack2), r);
-          } else {
+          } 
+          else 
+          {
             // FIXME: raise exception
-            *waliErr << "EWPDS: Cannot give two RULE2s with same RHS\n";
+            *waliErr << "[ERROR] EWPDS :: Cannot give two push rules with same r.h.s.\n";
             r->print( *waliErr << "    : " ) << std::endl;
           }
         }
         // Set up theZero weight
-        if (!theZero.is_valid() && r->weight().is_valid())
+        if (!theZero.is_valid() && r->weight().is_valid()) 
+        {
           theZero = r->weight()->zero();
+        }
 
         return rb;
       }

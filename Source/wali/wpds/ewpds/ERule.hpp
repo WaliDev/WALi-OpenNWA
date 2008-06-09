@@ -1,7 +1,7 @@
 #ifndef wpds_ERULE_GUARD
 #define wpds_ERULE_GUARD
 
-/*
+/**
  * @author Akash Lal
  * @author Nicholas Kidd
  */
@@ -10,9 +10,6 @@
 #include "wali/MergeFn.hpp"
 #include "wali/wpds/Rule.hpp"
 
-//
-// begin namespace wali
-//
 namespace wali
 {
   namespace wpds
@@ -25,7 +22,7 @@ namespace wali
       class ERule;
       typedef ref_ptr<ERule> erule_t;
 
-      /*! @class ERule
+      /** @class ERule
        *
        * @see Rule
        */
@@ -38,31 +35,31 @@ namespace wali
 
         public: 
 
-          /*!
+          /**
            * @brief constructor
            */
           ERule( Config *f, Config *t, wali_key_t s2, sem_elem_t se, merge_fn_t fn = NULL );
 
-          /*!
+          /**
            * @brief destructor
            */
           ~ERule();
 
-          /*!
+          /**
            * @return Rule rhs second stack symbol or WALI_EPSILON if no such
            * stack sym
            */
           merge_fn_t merge_fn() const { return mf; }
 
-          /*!
+          /**
            * @brief What do you think?
            */
           void set_merge_fn( merge_fn_t _mf ) { mf = _mf; }
 
-          /*! @return reference to the extended Weight */
+          /** @return reference to the extended Weight */
           sem_elem_t extended_weight() const;
 
-          /*!
+          /**
            *
            * @param o the std::ostream this is written to
            * @return std::ostream passed in
@@ -71,7 +68,7 @@ namespace wali
            */
           std::ostream & print( std::ostream &o ) const;
 
-          /*!
+          /**
            * marshall will write a ERule to a std::ostream. This writes
            * the rule in XML form.
            *

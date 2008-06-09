@@ -8,19 +8,19 @@
 
 #include "wali/Common.hpp"
 #include "wali/ref_ptr.hpp"
-#include "wali/SemElem.hpp"
+#include "wali/IMergeFn.hpp"
 #include <iostream>
 
 
 namespace wali
 {
   class MergeFn;
-  typedef ref_ptr< MergeFn > merge_fn_t;
+  //typedef ref_ptr< MergeFn > merge_fn_t;
 
-  class MergeFn : public Printable, public Countable
+  class MergeFn : public IMergeFn//public Printable, public Countable
   {
     public:
-      static const std::string XMLTag;
+      //static const std::string XMLTag;
 
       MergeFn();
 

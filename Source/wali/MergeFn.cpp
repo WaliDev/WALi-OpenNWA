@@ -1,18 +1,22 @@
-/*!
+/**
  * @author Akash Lal
  * @author Nicholas Kidd
+ * @version $Id$
  */
 
 #include "wali/MergeFn.hpp"
 
 namespace wali
 {
-  const std::string MergeFn::XMLTag("MergeFn");
+  //const std::string MergeFn::XMLTag("MergeFn");
 
-  MergeFn::MergeFn() : Countable(), sr_data(NULL) { 
+  //MergeFn::MergeFn() : Countable(), sr_data(NULL) { 
+  //}
+  MergeFn::MergeFn() : IMergeFn(), sr_data(NULL) {
   }
 
-  MergeFn::MergeFn(sem_elem_t sr) : Countable(), sr_data(sr) { 
+  //MergeFn::MergeFn(sem_elem_t sr) : Countable(), sr_data(sr) { 
+  MergeFn::MergeFn(sem_elem_t sr) : IMergeFn(), sr_data(sr) { 
   }
 
   MergeFn::~MergeFn() { 
