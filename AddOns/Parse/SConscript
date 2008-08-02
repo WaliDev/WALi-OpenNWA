@@ -1,16 +1,29 @@
+## ###########################################
+## Delegates to:
+##   (  i) ThirdParty
+##   ( ii) Source
+##   (iii) Examples
+##
+## $Id$
+##
+import os , os.path
+
 Import('BaseEnv')
 
 built = []
 
-xerces = SConscript('ThirdParty/SConscript')
+xerces = SConscript(os.path.join('ThirdParty','SConscript'))
 built += xerces
 
-parse = SConscript('Source/SConscript', build_dir='_build',duplicate=0)
+parse = SConscript(os.path.join('Source','SConscript'), build_dir='_build',duplicate=0)
 built += parse
 
-examples = SConscript('Examples/SConscript', build_dir='_build/Examples',duplicate=0)
+examples = SConscript(os.path.join('Examples','SConscript'), 
+    build_dir=os.path.join('_build','Examples'),
+    duplicate=0)
 built += examples
 
 BaseEnv.Depends(parse,xerces)
 
 Return('built')
+
