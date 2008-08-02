@@ -1,6 +1,8 @@
 # Run the python program
 # $Id$
-import getlibs, os, os.path
+import get_parse_libs, os, os.path
+
+get_parse_libs.getlibs()
 
 Import('WaliDir')
 xerces = os.path.join(WaliDir,'AddOns','Parse','ThirdParty','xerces-c')

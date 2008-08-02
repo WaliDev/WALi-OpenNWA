@@ -1,5 +1,17 @@
-# Run the python program
-import getlibs
-built = []
+## ########################################
+## Runs get_domains_libs.getlibs.
+## (I.e., download and compile buddy-2.4)
+## $Id$
+##
+
+import get_domains_libs, os, os.path
+
+get_domains_libs.getlibs()
+
+Import('WaliDir')
+buddy = os.path.join(WaliDir,'AddOns','Domains','ThirdParty','buddy-2.4')
+
+built = [Dir(buddy)]
+
 Return('built')
 

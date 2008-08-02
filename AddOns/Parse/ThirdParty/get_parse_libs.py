@@ -42,7 +42,7 @@ def get_xerces_linux(bits):
     os.system('tar zxf %s' % target)
     os.rename(name, 'xerces-c')
 
-def main():
+def getlibs():
     (bits,linkage) = platform.architecture()
     if bits != '64bit' and bits != '32bit':
         raise NameError, bits
@@ -55,8 +55,8 @@ def main():
 
 
 # Work from command line or SConscript
-if __name__ in ['__main__' , 'getlibs']:
-    main()
+if __name__ in ['__main__']:
+    getlibs()
 
 #def get_xerces_py(name):
 #    xerces_setup(name)
