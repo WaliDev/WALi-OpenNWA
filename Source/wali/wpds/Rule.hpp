@@ -103,7 +103,7 @@ namespace wali
          * @return Rule rhs second stack symbol or WALI_EPSILON if no such
          * stack sym
          */
-        const wali_key_t stack2() const { return stk2; }
+        wali_key_t stack2() const { return stk2; }
 
         /*! @return const reference to this's Weight */
         const sem_elem_t& weight() const;

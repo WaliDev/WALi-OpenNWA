@@ -10,6 +10,7 @@
 #include "wali/witness/WitnessCombine.hpp"
 #include "wali/witness/Visitor.hpp"
 #include "wali/witness/VisitorPrinter.hpp"
+#include <typeinfo>
 
 namespace wali
 {

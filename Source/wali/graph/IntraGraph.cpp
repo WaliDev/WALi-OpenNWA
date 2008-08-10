@@ -66,7 +66,7 @@ namespace wali {
       return out;
     }
 
-    ostream &IntraGraph::print(ostream &out, PRINT_OP pop) {
+    ostream &IntraGraph::print(ostream &out, PRINT_OP pop ATTR_UNUSED) {
       int n = nedges;
       int i;
       out << "IntraGraph:\n";
@@ -124,7 +124,8 @@ namespace wali {
     }
 
     // return value: number of SCCs
-    int IntraGraph::SCC(vector<IntraGraphNode> &cnodes, int ncnodes, vector<IntraGraphEdge> &cedges, int ncedges) {
+    int IntraGraph::SCC(vector<IntraGraphNode> &cnodes, int ncnodes,
+			vector<IntraGraphEdge> &cedges, int ncedges ATTR_UNUSED) {
       int n = ncnodes;
       int i;
       // reset visited
@@ -212,7 +213,8 @@ namespace wali {
     }
 
     // postcond: sets iscutset for all nodes
-    void IntraGraph::topSort(vector<IntraGraphNode> &cnodes, int ncnodes, vector<IntraGraphEdge> &cedges, int ncedges,
+    void IntraGraph::topSort(vector<IntraGraphNode> &cnodes, int ncnodes,
+			     vector<IntraGraphEdge> &cedges, int ncedges ATTR_UNUSED,
                              list<int> &ts, vector<int> &cs, bool no_outgoing, bool no_updatable) {
       int n = ncnodes;
       int i;
@@ -308,7 +310,8 @@ namespace wali {
     }
 
     void IntraGraph::buildCutsetRegExp(list<int> &ts, vector<int> &cs,
-                                       vector<IntraGraphNode> &cnodes, int ncnodes, vector<IntraGraphEdge> &cedges, int ncedges) {
+                                       vector<IntraGraphNode> &cnodes, int ncnodes,
+				       vector<IntraGraphEdge> &cedges, int ncedges ATTR_UNUSED) {
       int m = cs.size();
       int n = ncnodes;
       assert(n == (int)ts.size());
@@ -779,7 +782,7 @@ namespace wali {
           cout << "RegExp:";
           nodes[nno].regexp->print(cout) << "\n";
         });
-      int nevals;
+      int nevals ATTR_UNUSED;
       STAT(nevals = nodes[nno].regexp->get_nevals());
       sem_elem_t ret = nodes[nno].regexp->get_weight();
       STAT({
@@ -791,7 +794,7 @@ namespace wali {
     }
 
 
-    void IntraGraph::setupIntraSolution(bool compress_regexp) {
+    void IntraGraph::setupIntraSolution(bool compress_regexp ATTR_UNUSED) {
       RegExp::extendDirectionBackwards(running_prestar);
       vector<IntraGraphNode> cnodes;
       vector<IntraGraphEdge> cedges;
@@ -1362,7 +1365,8 @@ namespace wali {
     }
 
     // All time spent here is in the first for-loop, and it isn't much
-    void IntraGraph::setupDomRegExp(vector<IntraGraphNode> &cnodes, int ncnodes, vector<IntraGraphEdge> &cedges, int ncedges,
+    void IntraGraph::setupDomRegExp(vector<IntraGraphNode> &cnodes ATTR_UNUSED, int ncnodes,
+				    vector<IntraGraphEdge> &cedges, int ncedges,
                                     int *dom, int *number, int *vertex, int *tree, set<int> *children) {
       int n = ncnodes;
       int m = ncedges;
@@ -1397,7 +1401,9 @@ namespace wali {
 
 
     // buffer must be of size atleast 4*ncnodes
-    int *IntraGraph::computeDominators(vector<IntraGraphNode> &cnodes, int ncnodes, vector<IntraGraphEdge> &cedges, int ncedges, int *buffer, set<int> *bucket_buffer) {
+    int *IntraGraph::computeDominators(vector<IntraGraphNode> &cnodes, int ncnodes,
+				       vector<IntraGraphEdge> &cedges, int ncedges ATTR_UNUSED,
+				       int *buffer, set<int> *bucket_buffer) {
       int n = ncnodes;
       int i,u,v,w,count;
 

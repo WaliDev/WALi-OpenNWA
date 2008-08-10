@@ -90,27 +90,27 @@ namespace wali
         // getters (const)
         //
         /*! @return const Key of from state */
-        const Key from() const throw() {
+        Key from() const throw() {
           return kp.first;
         }
 
         /*! @return const Key of from state */
-        const Key from_state() const throw() {
+        Key from_state() const throw() {
           return kp.first;
         }
 
         /*! @return const Key of stack symbol */
-        const Key stack() const throw() {
+        Key stack() const throw() {
           return kp.second;
         }
 
         /*! @return const Key of to state */
-        const Key to() const throw() {
+        Key to() const throw() {
           return toStateKey;
         }
 
         /*! @return const Key of to state */
-        const Key to_state() const throw() {
+        Key to_state() const throw() {
           return toStateKey;
         }
 

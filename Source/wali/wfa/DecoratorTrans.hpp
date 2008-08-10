@@ -44,17 +44,17 @@ namespace wali
         // getters (const)
         //
         /*! @return const Key of from state */
-        virtual const Key from() const throw() {
+        virtual Key from() const throw() {
           return delegate->from();
         }
 
         /*! @return const Key of stack symbol */
-        virtual const Key stack() const throw() {
+        virtual Key stack() const throw() {
           return delegate->stack();
         }
 
         /*! @return const Key of to state */
-        virtual const Key to() const throw() {
+        virtual Key to() const throw() {
           return delegate->to();
         }
 

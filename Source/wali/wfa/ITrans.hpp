@@ -89,13 +89,13 @@ namespace wali
         // getters (const)
         //
         /*! @return const Key of from state */
-        virtual const Key from() const throw() = 0;
+        virtual Key from() const throw() = 0;
 
         /*! @return const Key of stack symbol */
-        virtual const Key stack() const throw() = 0;
+        virtual Key stack() const throw() = 0;
 
         /*! @return const Key of to state */
-        virtual const Key to() const throw() = 0;
+        virtual Key to() const throw() = 0;
 
         /*! @return const sem_elem_t of ITrans */
         virtual const sem_elem_t weight() const throw()  = 0;
