@@ -145,6 +145,8 @@ namespace wali
               // So we fix up the default MergeFn so that it's weight
               // is equal to the combine of the two weights annotating
               // r_push, one for each insertion.
+              // (Note that the combine has already taken place in the call
+              //  to make_rule.)
               //
               erule->set_merge_fn( new MergeFn(erule->weight()) );
             }

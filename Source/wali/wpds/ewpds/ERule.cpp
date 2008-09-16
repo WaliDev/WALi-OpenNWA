@@ -1,5 +1,8 @@
-/*!
+/**
  * @author Akash Lal
+ * @author Nicholas Kidd
+ * 
+ * @version $Id$
  */
 #include "wali/Common.hpp"
 #include "wali/SemElemPair.hpp"
