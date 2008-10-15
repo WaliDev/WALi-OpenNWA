@@ -1,49 +1,37 @@
-/*!
+/**
+ * @author kidd
  * @version $Id$
  */
 
 #include "StrX.hpp"
 #include <string>
 
-StrX::StrX(const XMLCh* const toTranscode) :
-  fLocalForm(0)
+StrX::StrX(const XMLCh* const toTranscode)
 {
   // Call the private transcoding method
-  if( toTranscode )
-    fLocalForm = XMLString::transcode(toTranscode);
+  if (toTranscode) {
+    char* cstr = XMLString::transcode(toTranscode);
+    fStr = cstr;
+    XMLString::release(&cstr);
+  }
 }
 
-StrX::StrX( const StrX& rhs ) {
-  fLocalForm = strdup(rhs.get());
+StrX::StrX( const StrX& rhs ) 
+{
+  fStr = rhs.get();
 }
 
 StrX::~StrX()
 {
-  if( fLocalForm )
-    XMLString::release(&fLocalForm);
 }
-
-  StrX& StrX::operator=( const XMLCh* const toTranscode ) {
-    if( fLocalForm )
-      XMLString::release(&fLocalForm);
-    if(toTranscode)
-      fLocalForm = XMLString::transcode(toTranscode);
-    return *this;
-  }
 
 bool StrX::operator==( std::string s )
 {
-  std::string tmp(get());
-  return s == tmp;
+  return s == fStr;
 }
 
-const char* StrX::localForm() const
+std::string StrX::get() const
 {
-  return fLocalForm;
-}
-
-const char* StrX::get() const
-{
-  return fLocalForm;
+  return fStr;
 }
 

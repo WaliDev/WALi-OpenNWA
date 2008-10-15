@@ -1,7 +1,7 @@
 #ifndef wali_wfa_WFA_HANDLER_GUARD
 #define wali_wfa_WFA_HANDLER_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  */
 

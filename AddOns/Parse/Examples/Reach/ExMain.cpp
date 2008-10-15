@@ -1,5 +1,6 @@
-/*!
+/**
  * @author Nick Kidd
+ * @version $Id$
  */
 
 #include "wali/QueryHandler.hpp"
@@ -30,6 +31,7 @@ void usage() {
 
 int main( int argc, char** argv )
 {
+  XMLPlatformUtils::Initialize();
   wali::util::ParseArgv parser(argc,argv);
   if (argc == 1 || parser.exists("--help") || parser.exists("-h")) {
     usage();
@@ -46,6 +48,7 @@ int main( int argc, char** argv )
   if( parser.get("--query",fname) ) {
     rc |= parseQuery(fname);
   }
+  XMLPlatformUtils::Terminate();
   return rc;
 }
 

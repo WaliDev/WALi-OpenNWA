@@ -1,59 +1,43 @@
 #ifndef STRX_GUARD
 #define STRX_GUARD 1
 
-// ---------------------------------------------------------------------------
-//  Includes for all the program files to see
-// ---------------------------------------------------------------------------
-#include <string.h>
+/**
+ * Class to get std::string from a XMLCh* xerces-c wide char
+ * string. Based on googling.
+ *
+ * @author kidd
+ */
+
+#include <string>
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 #include <xercesc/util/TransService.hpp>
 #include <xercesc/util/XMLString.hpp>
 
 
 XERCES_CPP_NAMESPACE_USE
 
-// ---------------------------------------------------------------------------
-//  This is a simple class that lets us do easy (though not terribly efficient)
-//  trancoding of XMLCh data to local code page for display.
-// ---------------------------------------------------------------------------
 class StrX
 {
-  public :
-    // -----------------------------------------------------------------------
-    //  Constructors and Destructor
-    // -----------------------------------------------------------------------
+  public:
     StrX(const XMLCh* const toTranscode=0);
 
     StrX( const StrX& rhs ); 
 
     ~StrX();
 
-    StrX& operator=( const XMLCh* const toTranscode );
-
     bool operator==( std::string s );
 
-    // -----------------------------------------------------------------------
-    //  Getter methods
-    // -----------------------------------------------------------------------
-    const char* localForm() const;
+    std::string get() const;
 
-    const char* get() const;
-
-  private :
-    // -----------------------------------------------------------------------
-    //  Private data members
-    //
-    //  fLocalForm
-    //      This is the local code page form of the string.
-    // -----------------------------------------------------------------------
-    char*   fLocalForm;
+  private:
+    std::string fStr;
 };
 
-inline XERCES_STD_QUALIFIER ostream& operator<<(XERCES_STD_QUALIFIER ostream& target, const StrX& toDump)
+inline std::ostream& operator<<(std::ostream& o, const StrX& x)
 {
-  target << toDump.localForm();
-  return target;
+  o << x.get();
+  return o;
 }
 
 #endif // STRX_GUARD 1
