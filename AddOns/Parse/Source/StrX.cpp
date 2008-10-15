@@ -8,11 +8,15 @@
 
 StrX::StrX(const XMLCh* const toTranscode)
 {
-  // Call the private transcoding method
+  // Keep in sync w/ the below StrX::operator=(...)
   if (toTranscode) {
     char* cstr = XMLString::transcode(toTranscode);
     fStr = cstr;
     XMLString::release(&cstr);
+  }
+  else { 
+    // We treat toTranscode=NULL as assigning this.fStr=""
+    fStr = "";
   }
 }
 
@@ -23,6 +27,20 @@ StrX::StrX( const StrX& rhs )
 
 StrX::~StrX()
 {
+}
+
+StrX& StrX::operator=( const XMLCh* const toTranscode )
+{
+  // Cut-n-paste from StrX::StrX(...)
+  if (toTranscode) {
+    char* cstr = XMLString::transcode(toTranscode);
+    fStr = cstr;
+    XMLString::release(&cstr);
+  }
+  else { 
+    // We treat toTranscode=NULL as assigning this.fStr=""
+    fStr = "";
+  }
 }
 
 bool StrX::operator==( std::string s )

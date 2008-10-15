@@ -26,6 +26,8 @@ class StrX
 
     ~StrX();
 
+    StrX& operator=( const XMLCh* const toTranscode );
+
     bool operator==( std::string s );
 
     std::string get() const;
