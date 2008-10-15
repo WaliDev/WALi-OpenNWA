@@ -3,6 +3,7 @@
  */
 
 #include <cassert>
+#include <cstring>
 #include "wali/KeySpace.hpp"
 #include "wali/KeySource.hpp"
 #include "wali/StringSource.hpp"
@@ -52,7 +53,7 @@ namespace wali
    */
   wali_key_t KeySpace::getKey( const std::string& s )
   {
-    return getKey( new StringSource(s) );
+    return (s == "") ? WALI_EPSILON : getKey( new StringSource(s) );
   }
 
   /*!
@@ -61,10 +62,8 @@ namespace wali
    */
   wali_key_t KeySpace::getKey( const char* s )
   {
-    if( s )
-      return getKey( new StringSource(s) );
-    else
-      return WALI_EPSILON;
+    return ((s == NULL) || (strlen(s) == 0)) ?
+      WALI_EPSILON : getKey( new StringSource(s) );
   }
 
   /*!
