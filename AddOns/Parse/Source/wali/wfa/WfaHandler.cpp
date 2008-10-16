@@ -103,7 +103,7 @@ namespace wali
         const unsigned int length ATTR_UNUSED)
     {
       StrX part(chars);
-      if( inWeight) {
+      if (inWeight) {
         weightString += part.get();
       }
       else {

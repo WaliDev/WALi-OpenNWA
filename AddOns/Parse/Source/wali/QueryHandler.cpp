@@ -1,4 +1,4 @@
-/*!
+/**
  * @author Nicholas Kidd
  *
  * @version $Id$
@@ -150,17 +150,19 @@ namespace wali
     using wpds::ewpds::EWPDS;
     using wpds::fwpds::FWPDS;
     using wpds::fwpds::SWPDS;
+    static std::string type_errmsg = "[ERROR] Invalid Query type : ";
 
     StrX who(localname);
     if( XMLTag == who.get() ) {
       StrX type = attributes.getValue(typeID);
-      if( XMLPrestarTag == type.get() ) {
+      if (XMLPrestarTag == type.get()) {
         isPrestar = true;
       }
-      else if(XMLPoststarTag == type.get() ) {
+      else if (XMLPoststarTag == type.get()) {
         isPrestar = false;
       }
       else {
+        *waliErr << type_errmsg << who.get() << std::endl;
         assert(0);
       }
     }
@@ -255,29 +257,6 @@ namespace wali
     if( currentHandler ) {
       currentHandler->processingInstruction(target,data);
     }
-  }
-
-  //////////////////////////////////////////////////
-  // Default error handlers
-  //////////////////////////////////////////////////
-
-  void QueryHandler::warning(const SAXParseException& exc)
-  {
-    StrX msg(exc.getMessage());
-    std::cerr << "[WARNING] " << msg << std::endl;
-  }
-
-  void QueryHandler::error(const SAXParseException& exc)
-  {
-    StrX msg(exc.getMessage());
-    std::cerr << "[ERROR] " << msg << std::endl;
-  }
-
-  void QueryHandler::fatalError(const SAXParseException& exc)
-  {
-    StrX msg(exc.getMessage());
-    std::cerr << "[FATAL ERROR] " << msg << std::endl;
-    throw exc;
   }
 
   //////////////////////////////////////////////////

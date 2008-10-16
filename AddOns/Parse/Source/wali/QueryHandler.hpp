@@ -1,7 +1,7 @@
 #ifndef wali_QUERY_HANDLER_GUARD
 #define wali_QUERY_HANDLER_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  */
 
@@ -10,7 +10,7 @@
 
 #include "wali/wfa/WFA.hpp"
 
-#include <xercesc/sax2/DefaultHandler.hpp>
+#include "wali/IWaliHandler.hpp"
 
 XERCES_CPP_NAMESPACE_USE
 
@@ -28,7 +28,7 @@ namespace wali
     class WpdsHandler;
   }
 
-  class QueryHandler : public DefaultHandler
+  class QueryHandler : public IWaliHandler
   {
 
     public:
@@ -99,12 +99,6 @@ namespace wali
           , const XMLCh* const data
           );
 
-      //////////////////////////////////////////////////
-      // Default error handlers
-      //////////////////////////////////////////////////
-      void warning(const SAXParseException& exc);
-      void error(const SAXParseException& exc);
-      void fatalError(const SAXParseException& exc);
 
 
     protected:
