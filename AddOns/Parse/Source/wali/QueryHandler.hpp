@@ -47,6 +47,12 @@ namespace wali
 
       virtual ~QueryHandler();
 
+      /**
+       * @return true if this handler hanldes an XML
+       * element with tag [tag].
+       */
+      virtual bool handlesElement( std::string tag );
+
       bool queryIsPrestar() const;
 
       wfa::WfaHandler* getWfaHandler();

@@ -69,6 +69,11 @@ namespace wali
     delete faHandler;
   }
 
+  bool QueryHandler::handlesElement( std::string tag )
+  {
+    return (tag == QueryHandler::XMLTag);
+  }
+
   bool QueryHandler::queryIsPrestar() const
   {
     return isPrestar;

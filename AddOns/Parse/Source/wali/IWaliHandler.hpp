@@ -22,7 +22,7 @@ namespace wali
        * @return true if this handler hanldes an XML
        * element with tag [tag].
        */
-      virtual bool handlesElement( std::string tag) = 0;
+      virtual bool handlesElement( std::string tag ) = 0;
 
       /**
        * @retrun the string that is in the 'characters'

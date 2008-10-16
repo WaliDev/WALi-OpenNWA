@@ -26,6 +26,7 @@ waliparse_files = Split("""
 ./wali/wfa/WfaHandler.cpp
 ./wali/QueryHandler.cpp
 ./wali/Parser.cpp
+./wali/IWaliHandler.cpp
 ./StrX.cpp
 """)
 

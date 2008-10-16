@@ -3,6 +3,8 @@
  * @version $Id$
  */
 
+#include "StrX.hpp"
+
 #include "wali/Common.hpp"
 
 #include "wali/IWaliHandler.hpp"
@@ -20,7 +22,7 @@ namespace wali
   {
   }
 
-  virtual std::string getCharactersString()
+  std::string IWaliHandler::getCharactersString()
   {
     return fCharStr;
   }
@@ -80,19 +82,19 @@ namespace wali
   // Default error handlers
   //////////////////////////////////////////////////
 
-  void QueryHandler::warning(const SAXParseException& exc)
+  void IWaliHandler::warning(const SAXParseException& exc)
   {
     StrX msg(exc.getMessage());
     std::cerr << "[WARNING] " << msg << std::endl;
   }
 
-  void QueryHandler::error(const SAXParseException& exc)
+  void IWaliHandler::error(const SAXParseException& exc)
   {
     StrX msg(exc.getMessage());
     std::cerr << "[ERROR] " << msg << std::endl;
   }
 
-  void QueryHandler::fatalError(const SAXParseException& exc)
+  void IWaliHandler::fatalError(const SAXParseException& exc)
   {
     StrX msg(exc.getMessage());
     std::cerr << "[FATAL ERROR] " << msg << std::endl;
