@@ -5,21 +5,22 @@
  * @author Nicholas Kidd
  */
 
-#include "wali/IWeightHandler.hpp"
+#include "wali/IUserHandler.hpp"
 
 namespace wali
 {
-  class WeightFactoryHandler;
+  class WeightFactory;
+  class MergeFnFactory;
 
   /**
    * Class for backwards compatability with WeightFactories.
    */
-  class WeightFactoryHandler : public IWeightHandler
+  class UserFactoryHandler : public IUserHandler
   {
     public:
-      WeightFactoryHandler(WeightFactory& wf);
+      UserFactoryHandler(WeightFactory* wf,MergeFnFactory* mf);
 
-      virtual ~WeightFactoryHandler();
+      virtual ~UserFactoryHandler();
 
       /**
        * @return the weight that WeightFactory 
@@ -27,6 +28,13 @@ namespace wali
        * from : "<Weight>str</Weight>"
        */
       virtual sem_elem_t getWeight();
+
+      /**
+       * @return the merge function that MergeFnFactory
+       * parses out of the character string [str]
+       * from : "<MergeFn>str</MergeFn>
+       */
+      virtual merge_fn_t getMergeFn();
 
       /**
        * Override to catch the endElement and
@@ -39,8 +47,10 @@ namespace wali
           const XMLCh* const qname);
 
     protected:
-      WeightFactory& fWeightFactory;
-      sem_elem_t se; /** Hold the weight returned by WeightFactory for </Weight> */
+      WeightFactory* fWeightFactory;
+      MergeFnFactory* fMergeFactory;
+      sem_elem_t fWeight; /** Hold the weight returned by WeightFactory for </Weight> */
+      merge_fn_t fMergeFn; /** Hold the parsed merge_fn_t */
   };
 
 } // namespace wali
