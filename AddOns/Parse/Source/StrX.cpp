@@ -41,6 +41,7 @@ StrX& StrX::operator=( const XMLCh* const toTranscode )
     // We treat toTranscode=NULL as assigning this.fStr=""
     fStr = "";
   }
+  return *this;
 }
 
 bool StrX::operator==( std::string s )

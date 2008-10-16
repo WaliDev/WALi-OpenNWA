@@ -109,7 +109,7 @@ namespace wali
         rule_t r(new ERule(from,to,to_stack2,se,mf));
         // WPDS::make_rule returns [true] if the rule already
         // existed. I.e., rb == false <--> r \notin this.
-        bool rb = make_rule(from,to,to_stack2,se,r);
+        bool rb = make_rule(from,to,to_stack2,r);
 
         if (!rb && to_stack1 == WALI_EPSILON )
         {
@@ -180,7 +180,7 @@ namespace wali
 
           if (wrapper) {
             ERule* x = (ERule*)r.get_ptr();
-            x->set_merge_fn( wrapper->wrap(x->merge_fn()) );
+            x->set_merge_fn( wrapper->wrap(*x,x->merge_fn()) );
           }
           merge_rule_hash_t::iterator rhash_it = merge_rule_hash.find(KeyTriple(to_state,to_stack1,to_stack2));
           if(rhash_it == merge_rule_hash.end()) 

@@ -1,4 +1,4 @@
-/*!
+/**
  * @author Nicholas Kidd
  *
  * @version $Id$
@@ -90,6 +90,3 @@ namespace wali
 
 } // namespace wali
 
-/* 
- * $Id$
- */

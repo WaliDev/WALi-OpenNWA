@@ -74,7 +74,6 @@ namespace wali {
             Config *f,
             Config *t,
             Key stk2,
-            sem_elem_t se,
             rule_t& r );
 
       private:

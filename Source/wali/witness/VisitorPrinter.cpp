@@ -77,11 +77,14 @@ namespace wali {
       os << "WitnessMerge: ";
       w->weight()->print(os) << std::endl;
       VisitorPrinter vp(os,depth+1);
-      if( w->hasLeft() ) {
-        w->left()->accept(vp,true);
+      if (w->hasCaller()) {
+        w->caller()->accept(vp,true);
       }
-      if( w->hasRight() ) {
-        w->right()->accept(vp,true);
+      if (w->hasRule()) {
+        w->rule()->accept(vp,true);
+      }
+      if (w->hasCallee()) {
+        w->callee()->accept(vp,true);
       }
       // tell WitnessMerge to not visit his children
       return false;

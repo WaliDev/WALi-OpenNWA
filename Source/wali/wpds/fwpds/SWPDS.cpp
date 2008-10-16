@@ -55,18 +55,18 @@ namespace wali {
       // Carried over from WPDS to ensure that no rules are added after
       // SWPDS is preprocessed
       bool SWPDS::make_rule(
-                            Config *f,
-                            Config *t,
-                            Key stk2,
-                            sem_elem_t se,
-                            rule_t& r ) {
+          Config *f,
+          Config *t,
+          Key stk2,
+          rule_t& r ) 
+      {
 
         if(preprocessed) {
-          *waliErr << "SWPDS: Error: Cannot add rules after calling preprocess\n";
+          *waliErr << "[ERROR] SWPDS cannot add rules after calling preprocess.\n";
           assert(0);
         }
 
-        return WPDS::make_rule(f,t,stk2,se,r);
+        return WPDS::make_rule(f,t,stk2,r);
       }
 
       void SWPDS::preprocess() {

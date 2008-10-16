@@ -21,8 +21,9 @@ namespace wali
         WitnessMerge(
             sem_elem_t weight, 
             witness_merge_fn_t witness_merge_fn,
-            witness_t left, 
-            witness_t right );
+            witness_t caller,
+            witness_t rule,
+            witness_t callee );
 
         virtual ~WitnessMerge();
 
@@ -35,18 +36,23 @@ namespace wali
         //! Override Witness::pretty_print
         virtual std::ostream& prettyPrint( std::ostream& o, size_t depth ) const;
 
-        witness_t left() { return lchild; }
+        witness_t caller() { return fCaller; }
 
-        bool hasLeft() const { return lchild.is_valid(); }
+        bool hasCaller() const { return fCaller.is_valid(); }
 
-        witness_t right() { return rchild; }
+        witness_t rule() { return fRule; }
 
-        bool hasRight() const { return rchild.is_valid(); }
+        bool hasRule() const { return fRule.is_valid(); }
+
+        witness_t callee() { return fCallee; }
+
+        bool hasCallee() const { return fCallee.is_valid(); }
 
       protected:
         witness_merge_fn_t witness_merge_fn; //!< the merge function used
-        witness_t lchild; //!< left param to apply
-        witness_t rchild; //!< right param to apply
+        witness_t fCaller; //!< caller param to apply
+        witness_t fRule;   //!< calling rule
+        witness_t fCallee; //!< callee param to apply
 
     }; // class WitnessMerge
 

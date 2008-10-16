@@ -1,6 +1,8 @@
-/*!
+/**
  * @author Nicholas Kidd
  * @author Akash Lal
+ *
+ * @version $Id$
  *
  */
 

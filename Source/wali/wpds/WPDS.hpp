@@ -1,7 +1,7 @@
 #ifndef wali_wpds_WPDS_GUARD
 #define wali_wpds_WPDS_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  */
 
@@ -39,7 +39,7 @@ namespace wali
     class ConstRuleFunctor;
     class Wrapper;
 
-    /*!
+    /**
      * @class WPDS
      */
     class WPDS : public Printable, public wfa::TransFunctor
@@ -53,7 +53,7 @@ namespace wali
         typedef chash_t::iterator iterator;
         typedef chash_t::const_iterator const_iterator;
 
-        /*!
+        /**
          * r2hash_t is a map from key to list of rules. The key
          * is the second RHS stack symbol of a rule. For example, 
          * the rule R1 = < s1,a > -> < s2, b c > will add R1 to 
@@ -69,25 +69,25 @@ namespace wali
         WPDS( Wrapper* wrapper );
         virtual ~WPDS();
 
-        /*!
+        /**
          * Clears all rules from the WPDS
          */
         virtual void clear();
 
-        /*!
+        /**
          * Set the worklist used for pre and poststar queries.
          */
         void setWorklist( ref_ptr< Worklist<wfa::ITrans> > wl );
 
 
-        /*!
+        /**
          * Wrap the weights on the rules.
          * Once the a wrapper is set on the WPDS, no more rules
          * can be added.
          */
         //void wrap( Wrapper * w );
 
-        /*! @brief create rule with no r.h.s. stack symbols
+        /** @brief create rule with no r.h.s. stack symbols
          *
          * @return true if rule existed
          *
@@ -100,7 +100,7 @@ namespace wali
             Key to_state,
             sem_elem_t se );
 
-        /*! @brief create rule with one r.h.s. stack symbol
+        /** @brief create rule with one r.h.s. stack symbol
          *
          * @return true if rule existed
          *
@@ -114,7 +114,7 @@ namespace wali
             Key to_stack1,
             sem_elem_t se );
 
-        /*! @brief create rule with two r.h.s. stack symbols
+        /** @brief create rule with two r.h.s. stack symbols
          *
          * @return true if rule existed
          *
@@ -129,7 +129,7 @@ namespace wali
             Key to_stack2,
             sem_elem_t se );
 
-        /*!
+        /**
          * @brief Perform prestar reachability query
          *
          * @return wfa::WFA
@@ -138,7 +138,7 @@ namespace wali
          */
         virtual wfa::WFA prestar( wfa::WFA & input );
 
-        /*!
+        /**
          * @brief Perform prestar reachability query
          * The result of the query is stored in
          * the parameter WFA& output. Any transitions
@@ -152,7 +152,7 @@ namespace wali
          */
         virtual void prestar( wfa::WFA & input, wfa::WFA & output );
 
-        /*!
+        /**
          * @brief Perform poststar reachability query
          *
          * @return WFA
@@ -161,7 +161,7 @@ namespace wali
          */
         virtual wfa::WFA poststar( wfa::WFA & input );
 
-        /*!
+        /**
          * @brief Perform poststar reachability query.
          * The result of the query is stored in
          * the parameter WFA& output. Any transitions
@@ -175,7 +175,7 @@ namespace wali
          */
         virtual void poststar( wfa::WFA & input, wfa::WFA & output );
 
-        /*!
+        /**
          * This method writes the WPDS to the passed in 
          * std::ostream parameter. Implements Printable::print.
          *
@@ -186,7 +186,7 @@ namespace wali
          */
         virtual std::ostream & print( std::ostream & o ) const;
 
-        /*!
+        /**
          * This method marshalls the WPDS into the passed
          * in std::ostream parameter.  Marshalling simply
          * writes the WPDS in XML form.
@@ -195,7 +195,7 @@ namespace wali
          */
         virtual std::ostream & marshall( std::ostream & o ) const;
 
-        /*!
+        /**
          * @brief Return the number of rules in the WPDS.
          * Note that this function takes time O(num rules), not
          * constant time.
@@ -203,7 +203,7 @@ namespace wali
          */
         virtual int count_rules( ) const;
 
-        /*!
+        /**
          * @brief apply ConstRuleFunctor to each rule in WPDS
          *
          * @see ConstRuleFunctor
@@ -212,7 +212,7 @@ namespace wali
          */
         virtual void for_each( ConstRuleFunctor &func ) const;
 
-        /*!
+        /**
          * @brief apply RuleFunctor to each rule in WPDS
          *
          * @see RuleFunctor
@@ -221,7 +221,7 @@ namespace wali
          */
         virtual void for_each( RuleFunctor &func );
 
-        /*!
+        /**
          * Implementation of TransFunctor
          */
         virtual void operator()( wfa::ITrans* t );
@@ -229,7 +229,7 @@ namespace wali
         bool is_pds_state(wali::Key k) const;
         int num_pds_states() const { return (int) pds_states.size(); }
  
-        /*! @brief Runs a poststar query on the following automaton
+        /** @brief Runs a poststar query on the following automaton
          * to get one that represents the program CFG.
          *
          * Ainit = { (p, e, <p,e>) | e \in Procedure Entry Point }
@@ -240,7 +240,7 @@ namespace wali
 
       protected:
 
-        /*! @brief Actually creates the rule, hanldes the mappings,
+        /** @brief Actually creates the rule, hanldes the mappings,
          * etc.
          *
          * @return true if rule existed
@@ -257,32 +257,32 @@ namespace wali
             sem_elem_t se,
             rule_t& r );
 
-        /*!
+        /**
          * @brief copy relevant material from input WFA to output WFA
          */
         virtual void setupOutput( wfa::WFA& input, wfa::WFA& fa );
 
-        /*!
+        /**
          * @brief For each t \in fa, t->setConfig(0)
          */
         virtual void unlinkOutput( wfa::WFA& fa );
 
-        /*!
+        /**
          * @brief Gets WPDS ready for fixpoint
          */
         virtual void prestarSetupFixpoint( wfa::WFA& input, wfa::WFA& fa );
 
-        /*!
+        /**
          * @brief Performs the fixpoint computation
          */
         virtual void prestarComputeFixpoint( wfa::WFA& fa );
 
-        /*!
+        /**
          * @brief Performs pre for 1 ITrans
          */
         virtual void pre( wfa::ITrans * t, wfa::WFA& fa );
 
-        /*!
+        /**
          * @brief helper method for prestar
          */
         virtual void prestar_handle_call(
@@ -292,7 +292,7 @@ namespace wali
             sem_elem_t delta
             );
 
-        /*!
+        /**
          * @brief helper method for prestar
          */
         virtual void prestar_handle_trans(
@@ -301,22 +301,22 @@ namespace wali
             rule_t & r,
             sem_elem_t delta );
 
-        /*!
+        /**
          * @brief Gets WPDS ready for fixpoint
          */
         virtual void poststarSetupFixpoint( wfa::WFA& input, wfa::WFA& fa );
 
-        /*!
+        /**
          * @brief Performs the fixpoint computation
          */
         virtual void poststarComputeFixpoint( wfa::WFA& fa );
 
-        /*!
+        /**
          * @brief Performs post for 1 ITrans
          */
         virtual void post( wfa::ITrans * t, wfa::WFA& fa );
 
-        /*!
+        /**
          * @brief helper method for poststar
          */
         virtual void poststar_handle_eps_trans(
@@ -325,7 +325,7 @@ namespace wali
             sem_elem_t delta
             );
 
-        /*!
+        /**
          * @brief helper method for poststar
          */
         virtual void poststar_handle_trans(
@@ -335,7 +335,7 @@ namespace wali
             sem_elem_t delta
             );
 
-        /*!
+        /**
          * @brief create a new temp state from two existing states
          *
          * gen_state is only used by poststar
@@ -344,7 +344,7 @@ namespace wali
          */
         virtual Key gen_state( Key state, Key stack );
 
-        /*!
+        /**
          * @brief link input WFA transitions to Configs
          *
          * @see Config
@@ -353,7 +353,7 @@ namespace wali
          */
         //virtual void copy_and_link( wfa::WFA & in, wfa::WFA & out );
 
-        /*!
+        /**
          * Create the Config for the state and stack KeyPair.
          * If the Config already exists just return that.
          *
@@ -361,7 +361,7 @@ namespace wali
          */
         virtual Config * make_config( Key state, Key stack );
 
-        /*!
+        /**
          * Creates a rule that links two configurations.
          * If rule exists then combines the weight
          *
@@ -375,10 +375,9 @@ namespace wali
             Config *f,
             Config *t,
             Key stk2,
-            sem_elem_t se,
             rule_t& r );
 
-        /*!
+        /**
          * Find config with KeyPair(state,stack)
          *
          * @return the Config * or 0 if it doesn't exist
@@ -388,14 +387,14 @@ namespace wali
          */
         virtual Config * find_config( Key state, Key stack );
 
-        /*! @brief helper method for fixpoint loop
+        /** @brief helper method for fixpoint loop
          *
          * return true if wfa::ITrans was retrieved from
          * worklist, false if worklist is empty
          */
         virtual bool get_from_worklist( wfa::ITrans * & );
 
-        /*!
+        /**
          * @brief helper function to create and link a transition
          *
          */
@@ -407,7 +406,7 @@ namespace wali
             , Config * cfg
             );
 
-        /*!
+        /**
          * update_prime does not need to take a Config b/c no Config
          * will match a transition that is created here. The from state
          * is not \in WFA.P. Therefore we do not need to add it to the
@@ -423,14 +422,14 @@ namespace wali
             sem_elem_t wWithRule //<! delta \extends r->weight()
             );
 
-        /*!
+        /**
          * @return const chash_t reference
          */
         const chash_t & config_map() const {
           return configs;
         }
 
-        /*!
+        /**
          * @return chash_t reference
          */
         chash_t & config_map() {
@@ -446,13 +445,13 @@ namespace wali
         std::set< Config * > rule_zeroes;
         r2hash_t r2hash;
 
-        /*!
+        /**
          * Points to the output automaton during a pre or poststar
          * query. Is NULL all other times.
          */
         wfa::WFA* currentOutputWFA; //!< Point
 
-        /*!
+        /**
          * theZero holds onto the semiring zero weight
          * for this WPDS. It is set the very first time a
          * rule is added to the WPDS.

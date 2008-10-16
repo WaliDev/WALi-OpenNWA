@@ -15,9 +15,11 @@ namespace wali
     WitnessMerge::WitnessMerge( 
         sem_elem_t weight, 
         witness_merge_fn_t witness_merge_fn,
-        witness_t left, 
-        witness_t right ) :
-      Witness(weight), witness_merge_fn(witness_merge_fn),lchild(left),rchild(right) 
+        witness_t caller, 
+        witness_t rule, 
+        witness_t callee ) :
+      Witness(weight), witness_merge_fn(witness_merge_fn),
+      fCaller(caller),fRule(rule),fCallee(callee) 
     {
     }
 
@@ -32,10 +34,12 @@ namespace wali
       if( !marked() || !visitOnce) {
         mark();
         if( v.visitMerge(this) ) {
-          if( hasLeft() )
-            left()->accept(v,visitOnce);
-          if( hasRight() )
-            right()->accept(v,visitOnce);
+          if (hasCaller())
+            caller()->accept(v,visitOnce);
+          if (hasRule())
+            rule()->accept(v,visitOnce);
+          if( hasCallee() )
+            callee()->accept(v,visitOnce);
         }
       }
     }
@@ -50,21 +54,27 @@ namespace wali
       // Dumps out to much information.
       // TODO. Make a compile or runtime flag.
       if( 1 ) {
-        if( hasLeft() )
+        if( hasCaller() )
         {
-          lchild->prettyPrint(o,depth+1);
-          if( hasRight() )
-            rchild->prettyPrint(o,depth+1);
+          fCaller->prettyPrint(o,depth+1);
+          if (hasRule())
+            fRule->prettyPrint(o,depth+1);
+          if( hasCallee() )
+            fCallee->prettyPrint(o,depth+1);
         }
         else {
           // TODO : make debug
-          assert( !hasRight() );
+          assert( !hasCallee() );
         }
       }
       else {
         int cnt = 0;
-        if( hasLeft() ) cnt++;
-        if( hasRight() ) cnt++;
+        if (hasCaller()) 
+          cnt++;
+        if (hasRule()) 
+          cnt++;
+        if (hasCallee()) 
+          cnt++;
         o << "\tHas " << cnt << " children.\n";
       }
       return o;
@@ -74,8 +84,9 @@ namespace wali
     {
       if( marked() ) {
         unmark();
-        if( hasLeft() ) lchild->reset_marks();
-        if( hasRight() ) rchild->reset_marks();
+        if (hasCaller()) fCaller->reset_marks();
+        if (hasRule())   fRule->reset_marks();
+        if (hasCallee()) fCallee->reset_marks();
       }
     }
 

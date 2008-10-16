@@ -1,4 +1,4 @@
-/*!
+/**
  * @author Nick Kidd
  *
  * Tests Witnesses

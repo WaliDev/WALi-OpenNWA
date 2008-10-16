@@ -1,7 +1,7 @@
 #ifndef wali_witness_WITNESS_WRAPPER_GUARD
 #define wali_witness_WITNESS_WRAPPER_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  */
 
@@ -13,7 +13,7 @@ namespace wali
 {
   namespace witness
   {
-    /*!
+    /**
      * @class WitnessWrapper
      */
     class WitnessWrapper : public ::wali::wpds::Wrapper
@@ -28,7 +28,7 @@ namespace wali
 
         virtual sem_elem_t wrap( wpds::Rule& r );
 
-        virtual merge_fn_t wrap( merge_fn_t );
+        virtual merge_fn_t wrap( wpds::ewpds::ERule& r, merge_fn_t user_merge );
 
         virtual sem_elem_t unwrap( sem_elem_t se );
 

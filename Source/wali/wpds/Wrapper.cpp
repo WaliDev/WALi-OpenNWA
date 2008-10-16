@@ -1,4 +1,4 @@
-/*!
+/**
  * @author Nicholas Kidd
  * @version $Id$
  */
@@ -6,6 +6,7 @@
 #include "wali/wpds/Wrapper.hpp"
 #include "wali/wfa/ITrans.hpp"
 #include "wali/wpds/Rule.hpp"
+#include "wali/wpds/ewpds/ERule.hpp"
 
 namespace wali
 {
@@ -24,7 +25,7 @@ namespace wali
     }
 
     // default does nothing
-    merge_fn_t Wrapper::wrap( merge_fn_t user_merge )
+    merge_fn_t Wrapper::wrap( wpds::ewpds::ERule& r ATTR_UNUSED, merge_fn_t user_merge )
     {
       return user_merge;
     }

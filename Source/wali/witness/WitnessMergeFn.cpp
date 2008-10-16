@@ -1,4 +1,4 @@
-/*!
+/**
  * @author Nicholas Kidd
  *
  * @version $Id$
@@ -12,8 +12,8 @@ namespace wali
   namespace witness 
   {
     // TODO: Do we need to pass a WitnessMerge down?
-    WitnessMergeFn::WitnessMergeFn( merge_fn_t user_merge )
-      : MergeFn(/*WitnessMerge?*/),user_merge(user_merge) 
+    WitnessMergeFn::WitnessMergeFn( witness_t witness_rule, merge_fn_t user_merge )
+      : MergeFn(/*WitnessMerge?*/),witness_rule(witness_rule),user_merge(user_merge) 
     {
     }
 
@@ -48,7 +48,7 @@ namespace wali
 
       sem_elem_t user_se = user_merge->apply_f( left->weight(), right->weight());
 
-      WitnessMerge* witmerge = new WitnessMerge(user_se,this,left,right);
+      WitnessMerge* witmerge = new WitnessMerge(user_se,this,left,witness_rule,right);
       return witmerge;
     }
 

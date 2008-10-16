@@ -19,6 +19,10 @@ namespace wali
   {
     class Rule;
 
+    namespace ewpds {
+      class ERule;
+    }
+
     /*!
      * @class Wrapper
      * 
@@ -44,7 +48,18 @@ namespace wali
 
         virtual sem_elem_t wrap( wpds::Rule& r );
 
-        virtual merge_fn_t wrap( merge_fn_t );
+        /**
+         * Wrapping of a rule's weight happens before wrapping
+         * of its merge function. Thus, the weight
+         *
+         *    r->weight()
+         *    
+         * has already been wrapped. For example, see how
+         * this is handled in wali::witness::WitnessWrapper.
+         *
+         * @see wali::witness::WitnessWrapper
+         */
+        virtual merge_fn_t wrap( wpds::ewpds::ERule& r, merge_fn_t user_merge);
 
         virtual sem_elem_t unwrap( sem_elem_t se );
 

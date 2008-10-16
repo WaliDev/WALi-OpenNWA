@@ -21,11 +21,11 @@ namespace wali
     class WitnessMergeFn : public MergeFn 
     {
       public:
-        WitnessMergeFn( merge_fn_t user_merge );
+        WitnessMergeFn( witness_t witness_rule, merge_fn_t user_merge );
 
         virtual ~WitnessMergeFn();
 
-        virtual sem_elem_t apply_f( sem_elem_t w1, sem_elem_t w2);
+        virtual sem_elem_t apply_f( sem_elem_t w1, sem_elem_t w2 );
 
         virtual std::ostream& print( std::ostream& o ) const;
 
@@ -33,6 +33,7 @@ namespace wali
         sem_elem_t priv_do_apply( sem_elem_t w1,sem_elem_t w2 );
 
       protected:
+        witness_t witness_rule;
         merge_fn_t user_merge;
 
     }; // class WitnessMergeFn
