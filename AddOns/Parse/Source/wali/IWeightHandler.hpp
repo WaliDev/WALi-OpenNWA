@@ -22,13 +22,21 @@ namespace wali
 
       virtual ~IWeightHandler();
 
+      /**
+       * @return true if (str == wali::SemElem::XMLTag)
+       */
       virtual bool handlesElement( std::string str );
 
+      /**
+       * @return the sem_elem_t for the parsed weight.
+       */
+      virtual sem_elem_t getWeight() = 0;
 
   }; // class IWeightHandler
 
 
 } // namespace wali
+
 #endif  // wali_WEIGHT_HANDLER_GUARD
 
 
