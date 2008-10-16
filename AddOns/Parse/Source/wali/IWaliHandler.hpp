@@ -5,13 +5,17 @@
  * @author Nicholas Kidd
  */
 
+#include "wali/Common.hpp"
+
+#include "wali/Countable.hpp"
+
 #include <xercesc/sax2/DefaultHandler.hpp>
 
 XERCES_CPP_NAMESPACE_USE
 
 namespace wali
 {
-  class IWaliHandler : public DefaultHandler
+  class IWaliHandler : public DefaultHandler, public Countable
   {
     public:
       IWaliHandler();

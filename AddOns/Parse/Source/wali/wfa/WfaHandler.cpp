@@ -44,21 +44,28 @@ namespace wali
       delete fa;
     }
 
-    WeightFactory& WfaHandler::getWeightFactory() const {
+    bool WfaHandler::handlesElement(std::string tag)
+    {
+      return (
+          (tag == State::XMLTag) ||
+          (tag == Trans::XMLTag) ||
+          (tag == WFA::XMLTag  )
+          );
+    }
+
+    WeightFactory& WfaHandler::getWeightFactory() const 
+    {
       return weightFactory;
     }
 
-    WFA& WfaHandler::get() {
+    WFA& WfaHandler::get() 
+    {
       return *fa;
     }
 
     //////////////////////////////////////////////////
     // Parsing handlers
     //////////////////////////////////////////////////
-
-    void WfaHandler::endDocument()
-    {
-    }
 
     void WfaHandler::endElement(
         const XMLCh* const uri ATTR_UNUSED
@@ -111,22 +118,6 @@ namespace wali
       }
     }
 
-    void WfaHandler::ignorableWhitespace(                               
-        const XMLCh* const chars ATTR_UNUSED
-        , const unsigned int length ATTR_UNUSED)
-    {
-    }
-
-    void WfaHandler::processingInstruction(   
-        const XMLCh* const target ATTR_UNUSED
-        , const XMLCh* const data ATTR_UNUSED)
-    {
-    }
-
-    void WfaHandler::startDocument()
-    {
-    }
-
     void WfaHandler::startElement(
         const XMLCh* const uri,
         const XMLCh* const localname,
@@ -157,22 +148,6 @@ namespace wali
           std::cerr << "    " << lname << "\t->\t" << val << "\n";
         }
       }
-    }
-
-    //////////////////////////////////////////////////
-    // Default error handlers
-    //////////////////////////////////////////////////
-
-    void WfaHandler::warning(const SAXParseException& exc ATTR_UNUSED)
-    {
-    }
-
-    void WfaHandler::error(const SAXParseException& exc ATTR_UNUSED)
-    {
-    }
-
-    void WfaHandler::fatalError(const SAXParseException& exc ATTR_UNUSED)
-    {
     }
 
     //////////////////////////////////////////////////

@@ -24,9 +24,11 @@ waliparse_files = Split("""
 ./wali/wpds/ewpds/EWpdsHandler.cpp
 ./wali/wpds/WpdsHandler.cpp
 ./wali/wfa/WfaHandler.cpp
+./wali/IWaliHandler.cpp
+./wali/IWeightHandler.cpp
+./wali/WeightFactoryHandler.cpp
 ./wali/QueryHandler.cpp
 ./wali/Parser.cpp
-./wali/IWaliHandler.cpp
 ./StrX.cpp
 """)
 

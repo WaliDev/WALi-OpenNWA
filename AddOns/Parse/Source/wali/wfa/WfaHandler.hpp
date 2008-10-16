@@ -9,9 +9,9 @@
 
 #include "wali/Common.hpp"
 
-#include "wali/wfa/WFA.hpp"
+#include "wali/IWaliHandler.hpp"
 
-#include <xercesc/sax2/DefaultHandler.hpp>
+#include "wali/wfa/WFA.hpp"
 
 #include <string>
 
@@ -24,12 +24,22 @@ namespace wali
 
   namespace wfa
   {
-    class WfaHandler : public DefaultHandler
+    class WfaHandler : public IWaliHandler
     {
       public:
         WfaHandler( WeightFactory& weightFactory );
 
         virtual ~WfaHandler();
+
+        /**
+         * @return true if [tag] is equal to one of
+         * <ul>
+         *  <li> wali::wfa::State::XMLTag </li>
+         *  <li> wali::wfa::Trans::XMLTag </li>
+         *  <li> wali::wfa::WFA::XMLTag   </li>
+         * </ul>
+         */
+        virtual bool handlesElement(std::string tag);
 
         //! Return reference to the WeightFactory being used
         WeightFactory& getWeightFactory() const;
@@ -37,37 +47,22 @@ namespace wali
         //! Return the generated PDS
         WFA& get();
 
-        void endDocument();
-
-        void endElement( const XMLCh* const uri,
+        /////////////////////////////////////////////
+        // Handler methods                         //
+        /////////////////////////////////////////////
+        virtual void endElement( 
+            const XMLCh* const uri,
             const XMLCh* const localname,
             const XMLCh* const qname);
 
-        void characters(const XMLCh* const chars, const unsigned int length);
+        virtual void characters(const XMLCh* const chars, const unsigned int length);
 
-        void ignorableWhitespace(                               
-            const XMLCh* const chars
-            , const unsigned int length
-            );
-
-        void processingInstruction(   
-            const XMLCh* const target
-            , const XMLCh* const data
-            );
-
-        void startDocument();
-
-        void startElement(  const   XMLCh* const    uri,
+        virtual void startElement(  
+            const   XMLCh* const    uri,
             const   XMLCh* const    localname,
             const   XMLCh* const    qname,
             const   Attributes&     attributes);
 
-        //////////////////////////////////////////////////
-        // Default error handlers
-        //////////////////////////////////////////////////
-        void warning(const SAXParseException& exc);
-        void error(const SAXParseException& exc);
-        void fatalError(const SAXParseException& exc);
 
         //////////////////////////////////////////////////
         // Helpers

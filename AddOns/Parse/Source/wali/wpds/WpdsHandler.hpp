@@ -8,15 +8,12 @@
 #include "StrX.hpp"
 
 #include "wali/Common.hpp"
+#include "wali/IWaliHandler.hpp"
 
 #include "wali/wpds/WPDS.hpp"
 
 #include <string>
 #include <map>
-
-#include <xercesc/sax2/DefaultHandler.hpp>
-
-XERCES_CPP_NAMESPACE_USE
 
 namespace wali
 {
@@ -24,10 +21,10 @@ namespace wali
 
   namespace wpds
   {
-    class WpdsHandler : public DefaultHandler
+    class WpdsHandler : public IWaliHandler
     {
       public:
-        //! For starting a <Function> block
+        //! For <Function> block metadata
         static const std::string FunctionXMLTag;
         //! A map with keys and values of type std::string
         typedef std::map<std::string,std::string> SSMap;
@@ -36,6 +33,16 @@ namespace wali
         WpdsHandler( WeightFactory& weightFactory, WPDS* thePds=0 );
 
         virtual ~WpdsHandler();
+
+        /**
+         * @return true if [tag] is equal to one of
+         * <ul>
+         *  <li> wali::wpds::Rule::XMLTag                  </li>
+         *  <li> wali::wpds::WPDS::XMLTag                  </li>
+         *  <li> wali::wpds::WpdsHandler::FunctionXMLTag   </li>
+         * </ul>
+         */
+        virtual bool handlesElement(std::string tag);
 
         //! Return the generated PDS
         WPDS& get();
@@ -53,10 +60,6 @@ namespace wali
         //! @return reference to the WeightFactory
         const WeightFactory& getWeightFactory() const;
 
-        virtual void startDocument();
-
-        virtual void endDocument();
-
         virtual void startElement(  const   XMLCh* const    uri,
             const   XMLCh* const    localname,
             const   XMLCh* const    qname,
@@ -67,23 +70,6 @@ namespace wali
             const XMLCh* const qname);
 
         virtual void characters(const XMLCh* const chars, const unsigned int length);
-
-        virtual void ignorableWhitespace(                               
-            const XMLCh* const chars
-            , const unsigned int length
-            );
-
-        virtual void processingInstruction(   
-            const XMLCh* const target
-            , const XMLCh* const data
-            );
-
-        //////////////////////////////////////////////////
-        // Default error handlers
-        //////////////////////////////////////////////////
-        virtual void warning(const SAXParseException& exc);
-        virtual void error(const SAXParseException& exc);
-        virtual void fatalError(const SAXParseException& exc);
 
         //////////////////////////////////////////////////
         // Helpers

@@ -1,7 +1,7 @@
 #ifndef wali_wpds_ewpds_EWPDS_HANDLER_GUARD
 #define wali_wpds_ewpds_EWPDS_HANDLER_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  */
 
@@ -27,7 +27,7 @@ namespace wali
       class EWpdsHandler : public WpdsHandler
       {
         public:
-          /*! 
+          /** 
            * Must pass pointer to EWPDS. It cannot be created for you.
            */
           EWpdsHandler( EWPDS* pds, 

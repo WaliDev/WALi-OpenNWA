@@ -65,6 +65,15 @@ namespace wali
       delete pds;
     }
 
+    bool WpdsHandler::handlesElement(std::string tag)
+    {
+      return (
+          (tag == Rule::XMLTag) ||
+          (tag == WPDS::XMLTag) ||
+          (tag == WpdsHandler::FunctionXMLTag)
+          );
+    }
+
     WPDS& WpdsHandler::get() {
       return *pds;
     }
@@ -76,14 +85,6 @@ namespace wali
     //////////////////////////////////////////////////
     // Parsing handlers
     //////////////////////////////////////////////////
-
-    void WpdsHandler::startDocument()
-    {
-    }
-
-    void WpdsHandler::endDocument()
-    {
-    }
 
     void WpdsHandler::startElement(  const   XMLCh* const    uri,
         const   XMLCh* const    localname,
@@ -181,34 +182,6 @@ namespace wali
       else {
         //std::cerr << "Parse error?" << "\t\"" << part << "\" was seen.\n";
       }
-    }
-
-    void WpdsHandler::ignorableWhitespace(                               
-        const XMLCh* const chars ATTR_UNUSED, 
-        const unsigned int length ATTR_UNUSED)
-    {
-    }
-
-    void WpdsHandler::processingInstruction(   
-        const XMLCh* const target ATTR_UNUSED, 
-        const XMLCh* const data ATTR_UNUSED)
-    {
-    }
-
-    //////////////////////////////////////////////////
-    // Default error handlers
-    //////////////////////////////////////////////////
-
-    void WpdsHandler::warning(const SAXParseException& exc ATTR_UNUSED)
-    {
-    }
-
-    void WpdsHandler::error(const SAXParseException& exc ATTR_UNUSED)
-    {
-    }
-
-    void WpdsHandler::fatalError(const SAXParseException& exc ATTR_UNUSED)
-    {
     }
 
     //////////////////////////////////////////////////

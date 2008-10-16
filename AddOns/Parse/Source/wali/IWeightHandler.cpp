@@ -9,6 +9,14 @@
 
 namespace wali
 {
+  IWeightHandler::IWeightHandler()
+  {
+  }
+
+  IWeightHandler::~IWeightHandler()
+  {
+  }
+
   bool IWeightHandler::handlesElement( std::string str )
   {
     return (str == SemElem::XMLTag);
