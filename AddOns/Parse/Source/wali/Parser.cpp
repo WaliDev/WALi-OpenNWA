@@ -1,5 +1,6 @@
-/*!
+/**
  * @author Nicholas Kidd
+ * @version $Id$
  */
 
 #include "StrX.hpp"
@@ -14,6 +15,7 @@
 
 namespace wali
 {
+
   int Parser::parse( DefaultHandler& handler, const std::string& xmlFile )
   {
     int rc = 0;
@@ -48,5 +50,7 @@ namespace wali
       delete parser;
     return rc;
   }
-}
+
+} // namespace wali
+
 

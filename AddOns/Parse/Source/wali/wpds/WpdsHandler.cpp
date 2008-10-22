@@ -8,7 +8,7 @@
 
 #include "wali/Common.hpp"
 #include "wali/Key.hpp"
-#include "wali/WeightFactory.hpp"
+#include "wali/IUserHandler.hpp"
 
 #include "wali/wpds/Rule.hpp"
 #include "wali/wpds/WPDS.hpp"
@@ -23,9 +23,8 @@ namespace wali
 
     const std::string WpdsHandler::FunctionXMLTag("Function");
 
-
-    WpdsHandler::WpdsHandler( WeightFactory& wf, WPDS* thePds ) :
-      pds(thePds), inWeight(false),weightFactory(wf)
+    WpdsHandler::WpdsHandler( IUserHandler& user, WPDS* thePds ) :
+      pds(thePds), fUserHandler(user)
     {
       if( NULL == pds )
         pds = new WPDS();
@@ -34,14 +33,14 @@ namespace wali
       // Necessary for using transcode
       XMLPlatformUtils::Initialize();
       fromStackID = XMLString::transcode(Rule::XMLFromStackTag.c_str());
-      fromID = XMLString::transcode(Rule::XMLFromTag.c_str());
-      toID = XMLString::transcode(Rule::XMLToTag.c_str());
-      toStack1ID = XMLString::transcode(Rule::XMLToStack1Tag.c_str());
-      toStack2ID = XMLString::transcode(Rule::XMLToStack2Tag.c_str());
+      fromID      = XMLString::transcode(Rule::XMLFromTag.c_str());
+      toID        = XMLString::transcode(Rule::XMLToTag.c_str());
+      toStack1ID  = XMLString::transcode(Rule::XMLToStack1Tag.c_str());
+      toStack2ID  = XMLString::transcode(Rule::XMLToStack2Tag.c_str());
 
       // For the function information
       nameID  = XMLString::transcode("name");
-      entryID  = XMLString::transcode("entry");
+      entryID = XMLString::transcode("entry");
       exitID  = XMLString::transcode("exit");
     }
 
@@ -78,29 +77,22 @@ namespace wali
       return *pds;
     }
 
-    const WeightFactory& WpdsHandler::getWeightFactory() const {
-      return weightFactory;
-    }
-
     //////////////////////////////////////////////////
     // Parsing handlers
     //////////////////////////////////////////////////
 
-    void WpdsHandler::startElement(  const   XMLCh* const    uri,
+    void WpdsHandler::startElement(  
+        const   XMLCh* const    uri,
         const   XMLCh* const    localname,
         const   XMLCh* const    qname,
         const   Attributes&     attributes)
     {
       StrX who(localname);
-      if (Rule::XMLTag == who.get()) {
-        handleRule(uri,localname,qname,attributes);
-      }
-      else if (SemElem::XMLTag == who.get()) {
-        inWeight = true;
-        weightString = "";
-      }
-      else if (WPDS::XMLTag == who.get()) {
+      if (WPDS::XMLTag == who.get()) {
         // do nothing
+      }
+      else if (Rule::XMLTag == who.get()) {
+        handleRule(uri,localname,qname,attributes);
       }
       else if (WpdsHandler::FunctionXMLTag == who.get()) {
         StrX fname = attributes.getValue(nameID);
@@ -113,91 +105,90 @@ namespace wali
         std::string sx(x.get());
         metaExit[sfun] = sx;
       }
+      else if (fUserHandler.handlesElement(who.get())) {
+        fUserHandler.startElement(uri,localname,qname,attributes);
+      }
       else {
-        std::cerr << "[WARNING:WpdsHandler] Unrecognized tag.\n";
-        std::cerr << "  " << who << "\n";
+        *waliErr << "[ERROR] WpdsHandler::startElement - unrecognized element.\n";
+        *waliErr << "  " << who << "\n";
         for( unsigned i = 0 ; i < attributes.getLength() ; i++ ) {
           StrX lname(attributes.getLocalName(i));
           StrX val(attributes.getValue(i));
-          std::cerr << "    " << lname << "\t->\t" << val << "\n";
+          *waliErr << "    " << lname << "\t->\t" << val << "\n";
         }
+        throw who.get();
       }
     }
 
-    void WpdsHandler::endElement( const XMLCh* const uri ATTR_UNUSED,
+    void WpdsHandler::endElement( 
+        const XMLCh* const uri ATTR_UNUSED,
         const XMLCh* const localname,
         const XMLCh* const qname ATTR_UNUSED)
     {
       using wali::Key;
       StrX who(localname);
-      if( SemElem::XMLTag == who.get() ) {
-        inWeight = false;
+      if (WPDS::XMLTag == who.get()) {
+        // do nothing
       }
       else if (WpdsHandler::FunctionXMLTag == who.get()) {
         // do nothing
       }
       else if( Rule::XMLTag == who.get() ) {
-        Key fromKey = getKey(from.get());
+        Key fromKey    = getKey(from.get());
         Key fromStkKey = getKey(fromStack.get());
-        Key toKey = getKey(to.get());
-        Key toStk1Key = getKey(toStack1.get());
-        Key toStk2Key = getKey(toStack2.get());
+        Key toKey      = getKey(to.get());
+        Key toStk1Key  = getKey(toStack1.get());
+        Key toStk2Key  = getKey(toStack2.get());
 
 #if 0
-        std::cerr << "(Rule\n";
-        std::cerr << "\t" << from << std::endl;
-        std::cerr << "\t" << fromStack << std::endl;
-        std::cerr << "\t" << to << std::endl;
+        *waliErr << "(Rule\n";
+        *waliErr << "\t" << from << std::endl;
+        *waliErr << "\t" << fromStack << std::endl;
+        *waliErr << "\t" << to << std::endl;
         if( toStack1.get() )
-          std::cerr << "\t" << toStack1 << std::endl;
+          *waliErr << "\t" << toStack1 << std::endl;
         if( toStack2.get() )
-          std::cerr << "\t" << toStack2 << std::endl;
-        std::cerr << "Weight >>  " << weightString << std::endl;
-        std::cerr << ")" << std::endl;
+          *waliErr << "\t" << toStack2 << std::endl;
+        *waliErr << "Weight >>  " << weightString << std::endl;
+        *waliErr << ")" << std::endl;
         wali::sem_elem_t se = weightFactory.getWeight(weightString);
-        se->print( std::cerr ) << std::endl;
+        se->print( *waliErr ) << std::endl;
 #endif
 
-        pds->add_rule(fromKey
-            , fromStkKey
-            , toKey
-            , toStk1Key
-            , toStk2Key
-            , weightFactory.getWeight(weightString)
-            );
-
+        pds->add_rule(
+            fromKey, fromStkKey, 
+            toKey, toStk1Key, toStk2Key, 
+            fUserHandler.getWeight());
+      }
+      else if (fUserHandler.handlesElement(who.get())) {
+        fUserHandler.endElement(uri,localname,qname);
       }
       else {
+        *waliErr << "[ERROR] WpdsHandler::endElement - unrecognized element.\n";
+        *waliErr << "  " << who << "\n";
+        throw who.get();
       }
     }
 
-    void WpdsHandler::characters(
-        const XMLCh* const chars, 
-        const unsigned int length ATTR_UNUSED)
+    void WpdsHandler::characters(const XMLCh* const chars, const unsigned int length)
     {
-      StrX part(chars);
-      if( inWeight) {
-        weightString += part.get();
-      }
-      else {
-        //std::cerr << "Parse error?" << "\t\"" << part << "\" was seen.\n";
-      }
+      fUserHandler.characters(chars,length);
     }
 
     //////////////////////////////////////////////////
     // Helpers
     //////////////////////////////////////////////////
     void WpdsHandler::handleRule(
-        const XMLCh* const uri ATTR_UNUSED
-        , const XMLCh* const localname ATTR_UNUSED
-        , const XMLCh* const qname ATTR_UNUSED
-        , const Attributes& attributes)
+        const XMLCh* const uri ATTR_UNUSED, 
+        const XMLCh* const localname ATTR_UNUSED, 
+        const XMLCh* const qname ATTR_UNUSED, 
+        const Attributes& attributes)
     {
-      from = attributes.getValue(fromID);
+      from      = attributes.getValue(fromID);
       fromStack = attributes.getValue(fromStackID);
-      to = attributes.getValue(toID);
-      toStack1 = attributes.getValue(toStack1ID);
-      toStack2 = attributes.getValue(toStack2ID);
+      to        = attributes.getValue(toID);
+      toStack1  = attributes.getValue(toStack1ID);
+      toStack2  = attributes.getValue(toStack2ID);
     }
 
   } // namespace wpds

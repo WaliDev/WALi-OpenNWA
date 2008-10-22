@@ -17,8 +17,7 @@ XERCES_CPP_NAMESPACE_USE
 
 namespace wali
 {
-  class WeightFactory;
-  class MergeFnFactory;
+  class IUserHandler;
 
   namespace wfa {
     class WfaHandler;
@@ -37,13 +36,14 @@ namespace wali
       static const std::string XMLPrestarTag;
 
     public:
-      QueryHandler( WeightFactory& weightFactory,MergeFnFactory* mf=NULL );
+      //QueryHandler( WeightFactory& weightFactory,MergeFnFactory* mf=NULL );
+      QueryHandler( IUserHandler& userHandler );
 
       /*!
        * QueryHandler takes ownership of the passed in Handlers
        * and will delete them upon exiting.
        */
-      QueryHandler(wpds::WpdsHandler* wpdsh , wfa::WfaHandler* wfah ); 
+      //QueryHandler(wpds::WpdsHandler* wpdsh , wfa::WfaHandler* wfah ); 
 
       virtual ~QueryHandler();
 
@@ -96,20 +96,18 @@ namespace wali
       void characters(const XMLCh* const chars, const unsigned int length);
 
       void ignorableWhitespace(                               
-          const XMLCh* const chars
-          , const unsigned int length
+          const XMLCh* const chars, 
+          const unsigned int length
           );
 
-      void processingInstruction(   
-          const XMLCh* const target
-          , const XMLCh* const data
-          );
-
-
+      void processingInstruction( 
+          const XMLCh* const target, 
+          const XMLCh* const data);
 
     protected:
-      WeightFactory& wf;
-      MergeFnFactory* mf;
+      //WeightFactory& wf;
+      //MergeFnFactory* mf;
+      IUserHandler& fUserHandler;
 
       DefaultHandler* currentHandler;
       bool isPrestar;

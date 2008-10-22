@@ -9,6 +9,7 @@
 #include "wali/Common.hpp"
 #include "wali/Key.hpp"
 #include "wali/WeightFactory.hpp"
+#include "wali/IUserHandler.hpp"
 
 #include "wali/wfa/State.hpp"
 #include "wali/wfa/Trans.hpp"
@@ -21,16 +22,18 @@ namespace wali
   namespace wfa
   {
 
-    WfaHandler::WfaHandler( WeightFactory& wf ) :
-      weightFactory(wf), inWeight(false)
+    //WfaHandler::WfaHandler( WeightFactory& wf ) :
+    //  weightFactory(wf), inWeight(false)
+    WfaHandler::WfaHandler( IUserHandler& user ) :
+      fUserHandler(user)
     {
       fa = new WFA();
       // Initialize the XML4C2 system
       // Necessary for using transcode
       XMLPlatformUtils::Initialize();
-      fromID = XMLString::transcode(Trans::XMLFromTag.c_str());
+      fromID  = XMLString::transcode(Trans::XMLFromTag.c_str());
       stackID = XMLString::transcode(Trans::XMLStackTag.c_str());
-      toID = XMLString::transcode(Trans::XMLToTag.c_str());
+      toID    = XMLString::transcode(Trans::XMLToTag.c_str());
       queryID = XMLString::transcode(WFA::XMLQueryTag.c_str());
     }
 
@@ -53,10 +56,12 @@ namespace wali
           );
     }
 
+    /*
     WeightFactory& WfaHandler::getWeightFactory() const 
     {
       return weightFactory;
     }
+    */
 
     WFA& WfaHandler::get() 
     {
@@ -67,57 +72,6 @@ namespace wali
     // Parsing handlers
     //////////////////////////////////////////////////
 
-    void WfaHandler::endElement(
-        const XMLCh* const uri ATTR_UNUSED
-        , const XMLCh* const localname
-        , const XMLCh* const qname ATTR_UNUSED)
-    {
-      using wali::Key;
-      StrX who(localname);
-      //std::cout << "End Tag = " << who.get() << std::endl;
-      if( SemElem::XMLTag == who.get() ) {
-        inWeight = false;
-      }
-      else if( Trans::XMLTag == who.get() ) {
-        Key fromKey = getKey(from.get());
-        Key stackKey = getKey(stack.get());
-        Key toKey = getKey(to.get());
-
-        //std::cout << "Added trans\n";
-        fa->addTrans(fromKey
-            , stackKey
-            , toKey
-            , weightFactory.getWeight(weightString)
-            );
-      }
-      else if( State::XMLTag == who.get() ) {
-        //std::cout << "Added state\n";
-        fa->addState( stateKey, weightFactory.getWeight(weightString) );
-        if( isInitial )
-          fa->setInitialState(stateKey);
-        if( isFinal )
-          fa->addFinalState(stateKey);
-      }
-      else if( WFA::XMLTag == who.get() ) {
-      }
-      else {
-        std::cout << "Non matched tag? " << who.get() << std::endl;
-      }
-    }
-
-    void WfaHandler::characters(
-        const XMLCh* const chars, 
-        const unsigned int length ATTR_UNUSED)
-    {
-      StrX part(chars);
-      if (inWeight) {
-        weightString += part.get();
-      }
-      else {
-        //std::cout << "Parse error?" << "\t\"" << part << "\" was seen.\n";
-      }
-    }
-
     void WfaHandler::startElement(
         const XMLCh* const uri,
         const XMLCh* const localname,
@@ -125,54 +79,98 @@ namespace wali
         const Attributes&  attributes)
     {
       StrX who(localname);
-      //std::cout << "Start Tag = " << who.get() << std::endl;
-      if( Trans::XMLTag == who.get()) {
+      if (Trans::XMLTag == who.get()) {
         handleTrans(uri,localname,qname,attributes);
       }
-      else if( SemElem::XMLTag == who.get() ) {
-        inWeight = true;
-        weightString = "";
-      }
-      else if( State::XMLTag == who.get() ) {
+      else if (State::XMLTag == who.get()) {
         handleState(uri,localname,qname,attributes);
       }
-      else if( WFA::XMLTag == who.get() ) {
+      else if (WFA::XMLTag == who.get()) {
         handleWFA(uri,localname,qname,attributes);
       }
+      else if (fUserHandler.handlesElement(who.get())) {
+        fUserHandler.startElement(uri,localname,qname,attributes);
+      }
       else {
-        std::cerr << "[WARNING:WfaHandler] Unrecognized tag.\n";
-        std::cerr << "  " << who << "\n";
+        *waliErr << "[ERROR] WfaHandler::startElement - unrecognized element.\n";
+        *waliErr << "  " << who << "\n";
         for( unsigned i = 0 ; i < attributes.getLength() ; i++ ) {
           StrX lname(attributes.getLocalName(i));
           StrX val(attributes.getValue(i));
-          std::cerr << "    " << lname << "\t->\t" << val << "\n";
+          *waliErr << "    " << lname << "\t->\t" << val << "\n";
         }
+        throw who.get();
       }
+    }
+
+    void WfaHandler::endElement(
+        const XMLCh* const uri ATTR_UNUSED, 
+        const XMLCh* const localname, 
+        const XMLCh* const qname ATTR_UNUSED)
+    {
+      using wali::Key;
+      StrX who(localname);
+      if( Trans::XMLTag == who.get() ) 
+      {
+        Key fromKey = getKey(from.get());
+        Key stackKey = getKey(stack.get());
+        Key toKey = getKey(to.get());
+
+        //std::cout << "Added trans\n";
+        fa->addTrans(
+            fromKey, stackKey, toKey, 
+            fUserHandler.getWeight());
+      }
+      else if( State::XMLTag == who.get() ) 
+      {
+        //std::cout << "Added state\n";
+        //fa->addState( stateKey, weightFactory.getWeight(weightString) );
+        fa->addState( stateKey, fUserHandler.getWeight() );
+        if( isInitial )
+          fa->setInitialState(stateKey);
+        if( isFinal )
+          fa->addFinalState(stateKey);
+      }
+      else if( WFA::XMLTag == who.get() ) {
+      }
+      else if (fUserHandler.handlesElement(who.get())) {
+        fUserHandler.endElement(uri,localname,qname);
+      }
+      else {
+        *waliErr << "[ERROR] WfaHandler::endElement - unrecognized element: " 
+          << who.get() << std::endl;
+        throw who.get();
+      }
+    }
+
+    void WfaHandler::characters(const XMLCh* const chars, const unsigned int length)
+    {
+      fUserHandler.characters(chars,length);
     }
 
     //////////////////////////////////////////////////
     // Helpers
     //////////////////////////////////////////////////
     void WfaHandler::handleTrans(
-        const XMLCh* const uri ATTR_UNUSED
-        , const XMLCh* const localname ATTR_UNUSED
-        , const XMLCh* const qname ATTR_UNUSED
-        , const Attributes& attributes)
+        const XMLCh* const uri ATTR_UNUSED, 
+        const XMLCh* const localname ATTR_UNUSED, 
+        const XMLCh* const qname ATTR_UNUSED, 
+        const Attributes& attributes)
     {
-      from = attributes.getValue(fromID);
+      from  = attributes.getValue(fromID);
       stack = attributes.getValue(stackID);
-      to = attributes.getValue(toID);
+      to    = attributes.getValue(toID);
     }
 
     void WfaHandler::handleState(
-        const XMLCh* const uri ATTR_UNUSED
-        , const XMLCh* const localname ATTR_UNUSED
-        , const XMLCh* const qname ATTR_UNUSED
-        , const Attributes& attributes)
+        const XMLCh* const uri ATTR_UNUSED, 
+        const XMLCh* const localname ATTR_UNUSED, 
+        const XMLCh* const qname ATTR_UNUSED, 
+        const Attributes& attributes)
     {
 
-      isFinal = false;
-      isInitial = false;
+      isFinal      = false;
+      isInitial    = false;
       bool hasName = false;
 
       for( unsigned i = 0 ; i < attributes.getLength() ; i++ )
@@ -198,18 +196,19 @@ namespace wali
             isFinal = true;
         }
         else {
-          std::cout << "Parse Error.\n";
-          assert(0);
+          *waliErr << "[ERROR] WfaHandler - parse error.\n";
+          *waliErr << "        " << lname.get() << " = " << val.get() << std::endl;
+          throw lname.get();
         }
       }
       assert(hasName);
     }
 
     void WfaHandler::handleWFA(
-        const XMLCh* const uri ATTR_UNUSED
-        , const XMLCh* const localname ATTR_UNUSED
-        , const XMLCh* const qname ATTR_UNUSED
-        , const Attributes& attributes)
+        const XMLCh* const uri ATTR_UNUSED, 
+        const XMLCh* const localname ATTR_UNUSED, 
+        const XMLCh* const qname ATTR_UNUSED, 
+        const Attributes& attributes)
     {
       const XMLCh* xch = attributes.getValue(queryID);
       if( xch ) {

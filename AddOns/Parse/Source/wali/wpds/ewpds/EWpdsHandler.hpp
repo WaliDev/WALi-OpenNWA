@@ -17,8 +17,7 @@ XERCES_CPP_NAMESPACE_USE
 
 namespace wali
 {
-  class WeightFactory;
-  class MergeFnFactory;
+  class IUserHandler;
 
   namespace wpds
   {
@@ -28,27 +27,32 @@ namespace wali
       {
         public:
           /** 
-           * Must pass pointer to EWPDS. It cannot be created for you.
+           * Create EWpdsHandler. 
+           * A valie EWPDS (or subclass) must be
+           * passed to the constructor.
+           *
+           * The pds is "owned" by this handler (actually the parent
+           * class WpdsHandler), * and is deleted when the handler is deleted.
            */
-          EWpdsHandler( EWPDS* pds, 
-              WeightFactory& weightFactory, 
-              MergeFnFactory* mergeFactory );
+          EWpdsHandler( 
+              IUserHandler& uer,
+              EWPDS* pds);
 
           virtual ~EWpdsHandler();
 
-          //! Return the generated PDS
+          /** @return the parsed EWPDS */
           EWPDS& get_ewpds();
 
-          virtual void startElement(  const   XMLCh* const    uri,
+          virtual void startElement(  
+              const   XMLCh* const    uri,
               const   XMLCh* const    localname,
               const   XMLCh* const    qname,
               const   Attributes&     attributes);
 
-          virtual void endElement( const XMLCh* const uri,
+          virtual void endElement( 
+              const XMLCh* const uri,
               const XMLCh* const localname,
               const XMLCh* const qname);
-
-          virtual void characters(const XMLCh* const chars, const unsigned int length);
 
 
         protected:
@@ -56,11 +60,6 @@ namespace wali
           // a typed EWPDS handle to pass
           // merge functions in
           EWPDS *epds;
-
-          MergeFnFactory* mergeFactory;
-
-          bool inMerge;
-          std::string mergeString;
 
           /*
            *  Inherited from WpdsHandler

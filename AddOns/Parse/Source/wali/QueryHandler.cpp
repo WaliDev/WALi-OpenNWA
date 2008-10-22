@@ -11,6 +11,7 @@
 #include "wali/MergeFnFactory.hpp"
 #include "wali/QueryHandler.hpp"
 #include "wali/WeightFactory.hpp"
+#include "wali/IUserHandler.hpp"
 
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/WfaHandler.hpp"
@@ -37,6 +38,7 @@ namespace wali
   const std::string QueryHandler::XMLPoststarTag("poststar");
   const std::string QueryHandler::XMLPrestarTag("prestar");
 
+  /*
   QueryHandler::QueryHandler( WeightFactory& wf,MergeFnFactory* mf ) :
     wf(wf),
     mf(mf),
@@ -56,6 +58,17 @@ namespace wali
     isPrestar(false),
     pdsHandler(wpdsh),
     faHandler(wfah)
+  {
+    XMLPlatformUtils::Initialize();
+    typeID = XMLString::transcode("type");
+  }
+  */
+  QueryHandler::QueryHandler( IUserHandler& user ) :
+    fUserHandler(user),
+    currentHandler(NULL),
+    isPrestar(false),
+    pdsHandler(NULL),
+    faHandler(NULL)
   {
     XMLPlatformUtils::Initialize();
     typeID = XMLString::transcode("type");
@@ -123,14 +136,18 @@ namespace wali
 
   void QueryHandler::startDocument()
   {
+#if 0
     if (pdsHandler != NULL)
       pdsHandler->startDocument();
     if (faHandler != NULL)
       faHandler->startDocument();
+#endif
+    fUserHandler.startDocument();
   }
 
   void QueryHandler::endDocument()
   {
+#if 0
     static std::string perrmsg = "[ERROR] No *WPDS has been defined.";
     static std::string ferrmsg = "[ERROR] No WFA has been defined.";
     // Query must have a PDS
@@ -145,9 +162,12 @@ namespace wali
     }
     pdsHandler->endDocument();
     faHandler->endDocument();
+#endif
+    fUserHandler.endDocument();
   }
 
-  void QueryHandler::startElement(  const   XMLCh* const    uri,
+  void QueryHandler::startElement(  
+      const   XMLCh* const    uri,
       const   XMLCh* const    localname,
       const   XMLCh* const    qname,
       const   Attributes&     attributes)
@@ -158,7 +178,8 @@ namespace wali
     static std::string type_errmsg = "[ERROR] Invalid Query type : ";
 
     StrX who(localname);
-    if( XMLTag == who.get() ) {
+    if( XMLTag == who.get() ) 
+    {
       StrX type = attributes.getValue(typeID);
       if (XMLPrestarTag == type.get()) {
         isPrestar = true;
@@ -167,61 +188,69 @@ namespace wali
         isPrestar = false;
       }
       else {
-        *waliErr << type_errmsg << who.get() << std::endl;
+        *waliErr << type_errmsg << type.get() << std::endl;
         assert(0);
       }
     }
     else {
-      if (wfa::WFA::XMLTag == who.get()) {
+      // Separated here special cases QueryHandler tag
+      // b/c we want to assert that [currentHandler]
+      // is not [NULL] for all other tags.
+      if (wfa::WFA::XMLTag == who.get()) 
+      {
         if (faHandler == NULL) {
-          faHandler = new wfa::WfaHandler(wf);
+          //faHandler = new wfa::WfaHandler(wf);
+          faHandler = new wfa::WfaHandler(fUserHandler);
         }
         currentHandler = faHandler;
       }
-      else if (wpds::WPDS::XMLTag == who.get()) {
+      else if (wpds::WPDS::XMLTag == who.get()) 
+      {
         if (pdsHandler == NULL) {
-          pdsHandler = new wpds::WpdsHandler(wf);
+          pdsHandler = new wpds::WpdsHandler(fUserHandler);
         }
         currentHandler = pdsHandler;
       }
-      else if (wpds::ewpds::EWPDS::XMLTag == who.get()) {
+      else if (wpds::ewpds::EWPDS::XMLTag == who.get()) 
+      {
         if (pdsHandler == NULL) {
-          pdsHandler = new wpds::ewpds::EWpdsHandler(new EWPDS(),wf,mf);
+          pdsHandler = new wpds::ewpds::EWpdsHandler(fUserHandler,new EWPDS());
         }
         currentHandler = pdsHandler;
       }
-      else if (wpds::fwpds::FWPDS::XMLTag == who.get()) {
+      else if (wpds::fwpds::FWPDS::XMLTag == who.get()) 
+      {
         if (pdsHandler == NULL) {
-          pdsHandler = new wpds::ewpds::EWpdsHandler(new FWPDS(),wf,mf);
+          pdsHandler = new wpds::ewpds::EWpdsHandler(fUserHandler,new FWPDS());
         }
         currentHandler = pdsHandler;
       }
-      else if (wpds::fwpds::SWPDS::XMLTag == who.get()) {
+      else if (wpds::fwpds::SWPDS::XMLTag == who.get()) 
+      {
         if (pdsHandler == NULL) {
-          pdsHandler = new wpds::ewpds::EWpdsHandler(new SWPDS(),wf,mf);
+          pdsHandler = new wpds::ewpds::EWpdsHandler(fUserHandler,new SWPDS());
         }
         currentHandler = pdsHandler;
       }
-      else if (!currentHandler) {
-        *waliErr << "[ERROR] In wali::QueryHandler, unhandled tag <> '" 
+      else if (currentHandler != NULL) {
+        currentHandler->startElement(uri,localname,qname,attributes);
+      }
+      else {
+        *waliErr << "[ERROR] QueryHandler::startElement - unhandled element <> '" 
           << who << "'" << std::endl;
+        throw who.get();
       }
-      assert(currentHandler);
-      currentHandler->startElement(uri,localname,qname,attributes);
     }
   }
 
-  void QueryHandler::endElement( const XMLCh* const uri,
+  void QueryHandler::endElement( 
+      const XMLCh* const uri,
       const XMLCh* const localname,
       const XMLCh* const qname)
   {
     StrX who(localname);
     if( XMLTag == who.get() ) {
       // nothing todo
-      currentHandler = 0;
-    }
-    else if( (wfa::WFA::XMLTag == who.get()) || (wpds::WPDS::XMLTag == who.get())) {
-      currentHandler->endElement(uri,localname,qname);
       currentHandler = 0;
     }
     else {
@@ -233,7 +262,9 @@ namespace wali
   //
   // All characters should be white space
   //
-  void QueryHandler::characters(const XMLCh* const chars, const unsigned int length)
+  void QueryHandler::characters(
+      const XMLCh* const chars, 
+      const unsigned int length)
   {
     if( currentHandler ) {
       currentHandler->characters(chars,length);
@@ -241,32 +272,34 @@ namespace wali
     else {
       // do nothing. Get calls to characters for all white space 
       // b/w elements
+      IWaliHandler::characters(chars,length);
     }
   }
 
   void QueryHandler::ignorableWhitespace(                               
-      const XMLCh* const chars
-      , const unsigned int length
-      )
+      const XMLCh* const chars, 
+      const unsigned int length)
   {
     if( currentHandler ) {
       currentHandler->ignorableWhitespace(chars,length);
     }
+    else {
+      IWaliHandler::ignorableWhitespace(chars,length);
+    }
   }
 
   void QueryHandler::processingInstruction(   
-      const XMLCh* const target
-      , const XMLCh* const data
-      )
+      const XMLCh* const target, 
+      const XMLCh* const data)
   {
     if( currentHandler ) {
       currentHandler->processingInstruction(target,data);
     }
+    else {
+      IWaliHandler::processingInstruction(target,data);
+    }
   }
 
-  //////////////////////////////////////////////////
-  // Helpers
-  //////////////////////////////////////////////////
-
 } // namespace wali
+
 

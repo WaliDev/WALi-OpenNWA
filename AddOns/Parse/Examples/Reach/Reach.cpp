@@ -1,5 +1,6 @@
-/*!
+/**
  * @author Nicholas Kidd
+ * @version $Id$
  */
 
 #include "Reach.hpp"
@@ -69,4 +70,10 @@ sem_elem_t Reach::getWeight( std::string s )
     return zero();
   }
 }
+
+wali::merge_fn_t Reach::getMergeFn( std::string s )
+{
+  return new wali::MergeFn(getWeight(s));
+}
+
 

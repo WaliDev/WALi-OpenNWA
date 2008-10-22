@@ -22,14 +22,19 @@ namespace wali
   {
   }
 
-  sem_elem_t UserFactoryHandler::getWeight()
+  void UserFactoryHandler::startElement(  
+      const   XMLCh* const    uri ATTR_UNUSED,
+      const   XMLCh* const    localname,
+      const   XMLCh* const    qname ATTR_UNUSED,
+      const   Attributes&     attributes ATTR_UNUSED)
   {
-    return fWeight;
-  }
-
-  merge_fn_t UserFactoryHandler::getMergeFn()
-  {
-    return fMergeFn;
+    StrX who(localname);
+    if (!handlesElement(who.get())) {
+      *waliErr << "[ERROR] UserFactoryHandler::startElement - unhandled element.\n";
+      *waliErr << "        Element is '" << who.get() << "'" << std::endl;
+      throw who.get();
+    }
+    fCharStr = "";
   }
 
   void UserFactoryHandler::endElement(
@@ -38,9 +43,17 @@ namespace wali
       const XMLCh* const qname ATTR_UNUSED)
   {
     StrX who(localname);
+    if (!handlesElement(who.get())) {
+      *waliErr << "[ERROR] UserFactoryHandler::endElement - unhandled element.\n";
+      *waliErr << "        Element is '" << who.get() << "'" << std::endl;
+      throw who.get();
+    }
     if (who.get() == wali::SemElem::XMLTag) 
     {
-      fWeight = fWeightFactory->getWeight(getCharactersString());
+      std::string str = getCharactersString();
+      //NAKR -- debugging
+      //*waliErr << "##### Weight string == " << str << std::endl;
+      fWeight = fWeightFactory->getWeight(str);
     }
     else if (who.get() == wali::MergeFn::XMLTag) 
     {
@@ -50,6 +63,16 @@ namespace wali
       *waliErr << "[ERROR] Unhandled XML element : " << who.get() << std::endl;
       assert(0);
     }
+  }
+
+  sem_elem_t UserFactoryHandler::getWeight()
+  {
+    return fWeight;
+  }
+
+  merge_fn_t UserFactoryHandler::getMergeFn()
+  {
+    return fMergeFn;
   }
 
 }

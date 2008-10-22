@@ -1,7 +1,7 @@
 #ifndef wali_wpds_WPDS_HANDLER_GUARD
 #define wali_wpds_WPDS_HANDLER_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  */
 
@@ -17,7 +17,8 @@
 
 namespace wali
 {
-  class WeightFactory;
+  //class WeightFactory;
+  class IUserHandler;
 
   namespace wpds
   {
@@ -30,7 +31,8 @@ namespace wali
         typedef std::map<std::string,std::string> SSMap;
 
       public:
-        WpdsHandler( WeightFactory& weightFactory, WPDS* thePds=0 );
+        //WpdsHandler( WeightFactory& weightFactory, WPDS* thePds=0 );
+        WpdsHandler( IUserHandler& userHandler, WPDS* pds=0 );
 
         virtual ~WpdsHandler();
 
@@ -44,74 +46,80 @@ namespace wali
          */
         virtual bool handlesElement(std::string tag);
 
-        //! Return the generated PDS
+        /** @return the parsed WPDS */
         WPDS& get();
 
-        //! Return the map from function name to entry node/stack symbol.
+        /** @return the map from function name to entry node/stack symbol.*/
         SSMap& getEntryMapping() {
           return metaEntry;
         }
 
-        //! Return mthe map from function name to exit node/stack symbol.
+        /** @return the map from function name to exit node/stack symbol.*/
         SSMap& getExitMapping() {
           return metaExit;
         }
 
-        //! @return reference to the WeightFactory
-        const WeightFactory& getWeightFactory() const;
-
-        virtual void startElement(  const   XMLCh* const    uri,
+        virtual void startElement(  
+            const   XMLCh* const    uri,
             const   XMLCh* const    localname,
             const   XMLCh* const    qname,
             const   Attributes&     attributes);
 
-        virtual void endElement( const XMLCh* const uri,
+        virtual void endElement( 
+            const XMLCh* const uri,
             const XMLCh* const localname,
             const XMLCh* const qname);
 
+        /** 
+         * Delegate to IUserHandler.
+         * Important to do the delegationg for wali::UserFactoryHandler
+         */
         virtual void characters(const XMLCh* const chars, const unsigned int length);
 
         //////////////////////////////////////////////////
         // Helpers
         //////////////////////////////////////////////////
         virtual void handleRule(
-            const XMLCh* const uri
-            , const XMLCh* const localname
-            , const XMLCh* const qname
-            , const Attributes& attributes);
+            const XMLCh* const uri, 
+            const XMLCh* const localname, 
+            const XMLCh* const qname, 
+            const Attributes& attributes);
 
       protected:
-        //! the PDS we parse
-        WPDS* pds;
         //! For getting weight strings
-        bool inWeight;
+        //bool inWeight;
         //! Translates the "weight string" into a sem_elem_t
-        WeightFactory& weightFactory;
-        //! Holds the textual representation of a weight.
-        std::string weightString;
+        //WeightFactory& weightFactory;
+        /** Holds the textual representation of a weight. */
+        //std::string weightString;
 
+        /** The parsed WPDS */
+        WPDS* pds;
 
-        //! Tag for the from state of a rule
+        /** User defined parser for weights */
+        IUserHandler& fUserHandler;
+
+        /** Tag for the from state of a rule */
         XMLCh* fromID;
-        //! Tag for the from stack of a rule
+        /** Tag for the from stack of a rule */
         XMLCh* fromStackID;
-        //! Tag for the to state of a rule
+        /** Tag for the to state of a rule */
         XMLCh* toID;
 
-        /*!
+        /**
          * Tag for the to stack of a rule. 
          * For a push rule, this should be the entry point of a function. 
          * For a step rule, this is the next intraprocedural target.
          */
         XMLCh* toStack1ID;
 
-        /*! 
+        /** 
          * Tag for specifying the second right-hand-side stack symbol.
          * This should be the return point of a function call.
          */
         XMLCh* toStack2ID;
 
-        /*!
+        /**
          * Temporary place holders. These hold the values demarcated by
          * the *ID fields declared above.
          */
@@ -131,15 +139,15 @@ namespace wali
         //     </Function>
         //
 
-        //! For naming the Function entry
+        /** For naming the Function entry */
         XMLCh* nameID; 
-        //! For naming the Function entry
+        /** For naming the Function entry */
         XMLCh* entryID; 
-        //! For naming the Function exit
+        /** For naming the Function exit */
         XMLCh* exitID; 
-        //! map from function name to function exit
+        /** map from function name to function exit */
         SSMap metaExit;
-        //! map from function name to function exit
+        /** map from function name to function exit */
         SSMap metaEntry;
 
     }; // class WpdsHandler

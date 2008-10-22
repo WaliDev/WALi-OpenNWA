@@ -16,6 +16,6 @@
   <WFA query='INORDER'>
     <State Name='p' initial='TRUE'><Weight>ZERO</Weight></State>
     <State Name='accept' final='TRUE'><Weight>ZERO</Weight></State>
-    <Trans from='p' stack='n4' to='accept'><Weight /></Trans>
+    <Trans from='p' stack='n5' to='accept'><Weight /></Trans>
   </WFA>
 </Query>

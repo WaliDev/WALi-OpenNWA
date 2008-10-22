@@ -1,18 +1,23 @@
 #ifndef REACH_GUARD
 #define REACH_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  */
 
 #include "wali/SemElem.hpp"
+#include "wali/MergeFn.hpp"
 #include "wali/WeightFactory.hpp"
+#include "wali/MergeFnFactory.hpp"
 #include <string>
 
 using wali::SemElem;
 using wali::sem_elem_t;
 
-class Reach : public wali::SemElem, public wali::WeightFactory
+class Reach : 
+  public wali::SemElem, 
+  public wali::WeightFactory,
+  public wali::MergeFnFactory
 {
 
   public:
@@ -39,7 +44,10 @@ class Reach : public wali::SemElem, public wali::WeightFactory
     std::ostream & print( std::ostream & o ) const;
 
     // For WeightFactory
-    sem_elem_t getWeight( std::string s );
+    virtual sem_elem_t getWeight( std::string s );
+
+    // For MergeFnFactory
+    virtual wali::merge_fn_t getMergeFn( std::string s );
 
   protected:
     bool isreached;

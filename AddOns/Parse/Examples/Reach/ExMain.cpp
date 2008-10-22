@@ -3,12 +3,20 @@
  * @version $Id$
  */
 
-#include "wali/QueryHandler.hpp"
-#include "wali/wpds/WpdsHandler.hpp"
-#include "wali/wfa/WfaHandler.hpp"
-#include "wali/util/ParseArgv.hpp"
 #include "StrX.hpp"
 #include "Reach.hpp"
+
+#include "wali/Parser.hpp"
+#include "wali/QueryHandler.hpp"
+// For using old WeightFactory bindings.
+#include "wali/UserFactoryHandler.hpp"
+
+#include "wali/wfa/WfaHandler.hpp"
+
+#include "wali/wpds/WpdsHandler.hpp"
+
+#include "wali/util/ParseArgv.hpp"
+
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/util/TransService.hpp>
 #include <xercesc/sax2/SAX2XMLReader.hpp>
@@ -55,7 +63,8 @@ int main( int argc, char** argv )
 int parseWpds( std::string& xmlFile )
 {
   Reach wf(true);
-  wali::wpds::WpdsHandler handler(wf);
+  wali::UserFactoryHandler ufh(&wf,NULL);
+  wali::wpds::WpdsHandler handler(ufh);
   int rc = parseFile(handler,xmlFile);
   handler.get().print( std::cout );
   return rc;
@@ -64,7 +73,8 @@ int parseWpds( std::string& xmlFile )
 int parseWfa( std::string& xmlFile )
 {
   Reach wf(true);
-  wali::wfa::WfaHandler handler(wf);
+  wali::UserFactoryHandler ufh(&wf,NULL);
+  wali::wfa::WfaHandler handler(ufh);
   int rc = parseFile(handler,xmlFile);
   handler.get().print( std::cout );
   return rc;
@@ -73,9 +83,11 @@ int parseWfa( std::string& xmlFile )
 int parseQuery( std::string& xmlFile )
 {
   Reach wf(true);
-  wali::QueryHandler handler(wf);
+  wali::UserFactoryHandler ufh(&wf,NULL);
+  wali::QueryHandler handler(ufh);
   int rc = parseFile(handler,xmlFile);
-  if( 0 == rc ) {
+  if( 0 == rc ) 
+  {
     std::cout << "Query Result\n";
     std::cout << "----------------------------------------\n";
     handler.run().print( std::cout );

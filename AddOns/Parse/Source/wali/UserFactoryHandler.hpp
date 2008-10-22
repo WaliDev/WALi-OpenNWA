@@ -23,6 +23,25 @@ namespace wali
       virtual ~UserFactoryHandler();
 
       /**
+       * Asserts that this.handlesElement(StrX(localname).get()).
+       */
+      virtual void startElement(  const   XMLCh* const    uri,
+          const   XMLCh* const    localname,
+          const   XMLCh* const    qname,
+          const   Attributes&     attributes);
+
+      /**
+       * Override to catch the endElement and
+       * invoke
+       *
+       *   WeightFactory.getWeight( getCharactersString() )
+       */
+
+      virtual void endElement( const XMLCh* const uri,
+          const XMLCh* const localname,
+          const XMLCh* const qname);
+
+      /**
        * @return the weight that WeightFactory 
        * parses out of the character string [str]
        * from : "<Weight>str</Weight>"
@@ -35,16 +54,6 @@ namespace wali
        * from : "<MergeFn>str</MergeFn>
        */
       virtual merge_fn_t getMergeFn();
-
-      /**
-       * Override to catch the endElement and
-       * invoke
-       *
-       *   WeightFactory.getWeight( getCharactersString() )
-       */
-      virtual void endElement( const XMLCh* const uri,
-          const XMLCh* const localname,
-          const XMLCh* const qname);
 
     protected:
       WeightFactory* fWeightFactory;

@@ -20,14 +20,16 @@ XERCES_CPP_NAMESPACE_USE
 namespace wali
 {
 
-  class WeightFactory;
+  //class WeightFactory;
+  class IUserHandler;
 
   namespace wfa
   {
     class WfaHandler : public IWaliHandler
     {
       public:
-        WfaHandler( WeightFactory& weightFactory );
+        //WfaHandler( WeightFactory& weightFactory );
+        WfaHandler( IUserHandler& userHandler );
 
         virtual ~WfaHandler();
 
@@ -41,28 +43,28 @@ namespace wali
          */
         virtual bool handlesElement(std::string tag);
 
-        //! Return reference to the WeightFactory being used
-        WeightFactory& getWeightFactory() const;
-
-        //! Return the generated PDS
+        /** Return the generated PDS*/
         WFA& get();
 
         /////////////////////////////////////////////
         // Handler methods                         //
         /////////////////////////////////////////////
-        virtual void endElement( 
-            const XMLCh* const uri,
-            const XMLCh* const localname,
-            const XMLCh* const qname);
-
-        virtual void characters(const XMLCh* const chars, const unsigned int length);
-
         virtual void startElement(  
             const   XMLCh* const    uri,
             const   XMLCh* const    localname,
             const   XMLCh* const    qname,
             const   Attributes&     attributes);
 
+        virtual void endElement( 
+            const XMLCh* const uri,
+            const XMLCh* const localname,
+            const XMLCh* const qname);
+
+        /** 
+         * Delegate to IUserHandler.
+         * Important to do the delegationg for wali::UserFactoryHandler
+         */
+        void characters(const XMLCh* const chars, const unsigned int length);
 
         //////////////////////////////////////////////////
         // Helpers
@@ -86,21 +88,19 @@ namespace wali
             , const Attributes& attributes);
 
       protected:
-        WeightFactory& weightFactory;
-        //! For getting weight strings
-        bool inWeight;
-        std::string weightString;
+        /** For parsing the weight */
+        IUserHandler& fUserHandler;
 
-        //! for getting attrs out of rules
+        /** for getting attrs out of rules*/
         XMLCh* fromID;
         XMLCh* stackID;
         XMLCh* toID;
         XMLCh* queryID;
 
-        //! the WFA we parse
+        /** the WFA we parse*/
         WFA* fa;
 
-        //! place holders
+        /** place holders*/
         StrX from;
         StrX stack;
         StrX to;

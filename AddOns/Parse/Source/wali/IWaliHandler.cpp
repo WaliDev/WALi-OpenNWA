@@ -45,7 +45,7 @@ namespace wali
       const Attributes&  attributes ATTR_UNUSED)
   {
     StrX who(localname);
-    *waliErr << "[WARNING] Unhandled element : " << who.get() << std::endl;
+    *waliErr << "[WARNING] IWaliHandler::startElement unhandled element : " << who.get() << std::endl;
     fCharStr = "";
   }
 
@@ -55,7 +55,7 @@ namespace wali
       const XMLCh* const qname ATTR_UNUSED)
   {
     StrX who(localname);
-    *waliErr << "[WARNING] Unhandled element : " << who.get() << std::endl;
+    *waliErr << "[WARNING] IWaliHandler::endElement unhandled element : " << who.get() << std::endl;
   }
 
   void IWaliHandler::characters(

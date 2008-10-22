@@ -21,15 +21,15 @@ if Debug:
     print "+ LibInstallDir : '%s'" % LibInstallDir 
 
 waliparse_files = Split("""
-./wali/wpds/ewpds/EWpdsHandler.cpp
-./wali/wpds/WpdsHandler.cpp
-./wali/wfa/WfaHandler.cpp
-./wali/IWaliHandler.cpp
-./wali/IUserHandler.cpp
-./wali/UserFactoryHandler.cpp
-./wali/QueryHandler.cpp
-./wali/Parser.cpp
 ./StrX.cpp
+./wali/IUserHandler.cpp
+./wali/IWaliHandler.cpp
+./wali/Parser.cpp
+./wali/QueryHandler.cpp
+./wali/UserFactoryHandler.cpp
+./wali/wfa/WfaHandler.cpp
+./wali/wpds/WpdsHandler.cpp
+./wali/wpds/ewpds/EWpdsHandler.cpp
 """)
 
 Env = BaseEnv.Clone()

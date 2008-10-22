@@ -1,7 +1,7 @@
 #ifndef wali_MERGE_FN_GUARD
 #define wali_MERGE_FN_GUARD 1
 
-/*!
+/**
  * @author Akash Lal
  * @author Nicholas Kidd
  */
