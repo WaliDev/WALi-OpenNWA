@@ -13,12 +13,13 @@ def get_targz(base):
       os.system('%s http://pages.cs.wisc.edu/~kidd/dolby/%s' % (wget,targz))
       os.system('tar zxvf %s' % targz)
       cwd = os.getcwd()
-      # lib dir is CPDS/lib
-      libdir = os.path.join(cwd,'..','lib')
-      # bin dir is CPDS/bin
-      bindir = os.path.join(cwd,'..','bin')
-      os.system('cd %s; ./configure --prefix=%s && make -j2 && make install; cd -' % 
-          (base,cwd))
+      WALiDir = os.environ['WALiDir']
+      # lib dir is $(WALiDir)/lib
+      libdir = os.path.join(WALiDir,'lib')
+      # bin dir is $(WALiDir)/bin
+      bindir = os.path.join(WALiDir,'bin')
+      os.system('cd %s; ./configure --prefix=%s --libdir=%s --bindir=%s && make -j2 && make install; cd -' % 
+          (base,cwd,libdir,bindir))
 
 def get_buddy():
   get_targz('buddy-2.4')
