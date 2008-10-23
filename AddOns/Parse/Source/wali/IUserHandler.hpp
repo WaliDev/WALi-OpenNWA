@@ -40,6 +40,17 @@ namespace wali
        */
       virtual sem_elem_t getWeight() = 0;
 
+
+      /**
+       * EWPDSs can have push rules w/out merge functions,
+       * and will create a default wali::MergeFn as needed.
+       * The method IUserHandler::getMergeFn() is only
+       * invoked if hasMergeFn returns true.
+       *
+       * @return true if a MergeFn is specified.
+       */
+      virtual bool hasMergeFn() = 0;
+
       /**
        * This method returns a parsed merge function.
        * It will *only* be invoked if the an EWPDS or FWPDS

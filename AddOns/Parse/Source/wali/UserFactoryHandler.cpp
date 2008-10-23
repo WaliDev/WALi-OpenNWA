@@ -13,7 +13,7 @@ namespace wali
 {
 
   UserFactoryHandler::UserFactoryHandler(WeightFactory* wf,MergeFnFactory* mf)
-    : fWeightFactory(wf), fMergeFactory(mf)
+    : fWeightFactory(wf), fMergeFactory(mf), fHasMergeFn(false)
   {
     assert(fWeightFactory != NULL);
   }
@@ -34,6 +34,7 @@ namespace wali
       *waliErr << "        Element is '" << who.get() << "'" << std::endl;
       throw who.get();
     }
+    fHasMergeFn = false;
     fCharStr = "";
   }
 
@@ -57,9 +58,18 @@ namespace wali
     }
     else if (who.get() == wali::MergeFn::XMLTag) 
     {
+      if (fMergeFactory == NULL) 
+      {
+        *waliErr 
+          << "[ERROR] UserFactoryHandler::endElement - no MergeFactory given." 
+          << std::endl;
+        assert(0);
+      }
       fMergeFn = fMergeFactory->getMergeFn(getCharactersString());
+      fHasMergeFn = true;
     }
-    else {
+    else 
+    {
       *waliErr << "[ERROR] Unhandled XML element : " << who.get() << std::endl;
       assert(0);
     }
@@ -68,6 +78,14 @@ namespace wali
   sem_elem_t UserFactoryHandler::getWeight()
   {
     return fWeight;
+  }
+
+  bool UserFactoryHandler::hasMergeFn()
+  {
+    if (fMergeFactory == NULL)
+      return false;
+    else
+      return fHasMergeFn;
   }
 
   merge_fn_t UserFactoryHandler::getMergeFn()

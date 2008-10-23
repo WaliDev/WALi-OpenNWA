@@ -49,6 +49,11 @@ namespace wali
       virtual sem_elem_t getWeight();
 
       /**
+       * @return true if a MergeFn is specified
+       */
+      virtual bool hasMergeFn();
+
+      /**
        * @return the merge function that MergeFnFactory
        * parses out of the character string [str]
        * from : "<MergeFn>str</MergeFn>
@@ -58,6 +63,7 @@ namespace wali
     protected:
       WeightFactory* fWeightFactory;
       MergeFnFactory* fMergeFactory;
+      bool fHasMergeFn;   /** True if a Rule was parsed with a MergeFn */
       sem_elem_t fWeight; /** Hold the weight returned by WeightFactory for </Weight> */
       merge_fn_t fMergeFn; /** Hold the parsed merge_fn_t */
   };
