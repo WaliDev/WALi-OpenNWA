@@ -1,4 +1,4 @@
-/*!
+/**
  * @author Nicholas Kidd
  * @version $Id$
  */
@@ -66,7 +66,7 @@ namespace wali
       }
 
       // this
-      printNode(w, "light_blue", "(+) " + w->weight()->toString());
+      printNode(w, "lightblue", "(+) " + w->weight()->toString());
       return true;
     }
 
@@ -78,7 +78,7 @@ namespace wali
 
     bool VisitorDot::visitTrans( WitnessTrans * w )
     {
-      printNode(w,"orange",w->getTrans().toString());
+      printNode(w,"orangered",w->getTrans().toString());
       return true;
     }
 
@@ -102,7 +102,7 @@ namespace wali
       }
 
       // this
-      printNode(w, "green", "(M) " + w->weight()->toString());
+      printNode(w, "purple", "(M) " + w->weight()->toString());
       return true;
     }
 

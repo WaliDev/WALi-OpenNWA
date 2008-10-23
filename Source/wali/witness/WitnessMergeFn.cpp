@@ -11,9 +11,8 @@ namespace wali
 {
   namespace witness 
   {
-    // TODO: Do we need to pass a WitnessMerge down?
     WitnessMergeFn::WitnessMergeFn( witness_t witness_rule, merge_fn_t user_merge )
-      : MergeFn(/*WitnessMerge?*/),witness_rule(witness_rule),user_merge(user_merge) 
+      : MergeFn(),witness_rule(witness_rule),user_merge(user_merge) 
     {
     }
 

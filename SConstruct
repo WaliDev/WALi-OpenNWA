@@ -3,12 +3,14 @@
 ## ####################################
 ## Third party users of WALi should 
 ## duplicate the setup code below.
-import os,platform
+import os,platform,platform
 
-WaliDir       = os.getcwd()
-LibInstallDir = os.path.join(WaliDir,'lib')
-BaseEnv       = Environment()
-MkStatic      = platform.system() != 'Linux' 
+(bits,linkage) = platform.architecture()
+Is64           = (False,True)[bits == '64bit']
+WaliDir        = os.getcwd()
+LibInstallDir  = os.path.join(WaliDir,('lib','lib64')[Is64])
+BaseEnv        = Environment()
+MkStatic       = platform.system() != 'Linux' 
 
 if 'gcc' == BaseEnv['CC']:
     BaseEnv['CXXFLAGS'] = '-g -ggdb -Wall -Wformat=2 -W'
@@ -17,6 +19,7 @@ elif 'cl' == BaseEnv['CC']:
     BaseEnv['CXXFLAGS'] = '/TP /errorReport:prompt /Wp64 /W4 /GR /MTd /EHsc'
 BaseEnv['CPPPATH'] = [ os.path.join(WaliDir , 'Source') ]
 
+Export('Is64')
 Export('WaliDir')
 Export('LibInstallDir')
 Export('MkStatic')
@@ -26,7 +29,7 @@ Export('BaseEnv')
 ProgEnv = BaseEnv.Clone()
  
 if MkStatic:
-  ProgEnv['StaticLibs'] = [os.path.join(WaliDir,'lib','libwali.a')]
+  ProgEnv['StaticLibs'] = [os.path.join(LibInstallDir,'libwali.a')]
 else:
   ProgEnv['StaticLibs'] = []
   ProgEnv['LIBS'] = ['wali']

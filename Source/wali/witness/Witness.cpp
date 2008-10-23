@@ -16,6 +16,45 @@ namespace wali
 {
   namespace witness
   {
+      // struct witness_t
+    witness_t::witness_t() : Parent()
+    {
+    }
+
+    witness_t::witness_t( sem_elem_t se ) : Parent( getWitness(se) )
+    {
+    }
+
+    witness_t::witness_t( Witness* wit ) : Parent( wit )
+    {
+    }
+
+    witness_t& witness_t::operator=( sem_elem_t se )
+    {
+      Parent::operator=( getWitness(se) );
+      return *this;
+    }
+
+    witness_t& witness_t::operator=( Witness* wit )
+    {
+      Parent::operator=( wit );
+      return *this;
+    }
+
+    Witness* witness_t::getWitness( sem_elem_t se )
+    {
+      Witness* witness = dynamic_cast< Witness* >(se.get_ptr());
+      //se->print( std::cerr << "\n\t+++ " ) << std::endl;
+      if( NULL == witness ) {
+        *waliErr << "[WARNING] witness_t::getWitness - failed downcast.\n";
+        *waliErr << "          Param sem_elem_t is not a witness (line 53)." << std::endl;
+        *waliErr << "          se == ";
+        se->print(*waliErr) << std::endl;
+        assert(false);
+      }
+      return witness;
+    }
+
     int Witness::COUNT = 0;
 
     Witness::Witness( sem_elem_t set ) : user_se(set),isEmpty(false)

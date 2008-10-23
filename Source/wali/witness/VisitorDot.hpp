@@ -1,12 +1,13 @@
 #ifndef witness_VISITOR_DOT_GUARD
 #define witness_VISITOR_DOT_GUARD 1
 
-//!
-//! @author Nicholas Kidd
-//!
+/**
+ * @author Nicholas Kidd
+ */
 
 #include "wali/Common.hpp"
 #include "wali/ref_ptr.hpp"
+#include "wali/witness/Witness.hpp"
 #include "wali/witness/Visitor.hpp"
 #include <iostream>
 #include <string>
@@ -15,11 +16,9 @@ namespace wali
 {
   namespace witness
   {
-    typedef ref_ptr<Witness> witness_t;
-
-    //!
-    //! @class VisitorDot
-    //! 
+    /**
+     * @class VisitorDot
+     */ 
     class VisitorDot : public Visitor
     {
       public:

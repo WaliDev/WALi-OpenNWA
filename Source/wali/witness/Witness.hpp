@@ -18,9 +18,19 @@ namespace wali
   namespace witness
   {
     class Witness;
-    typedef ref_ptr< Witness > witness_t;
 
-    /*!
+    struct witness_t : public wali::ref_ptr< Witness > 
+    {
+      typedef wali::ref_ptr< Witness > Parent;
+      witness_t();
+      witness_t( sem_elem_t );
+      witness_t( Witness* );
+      witness_t& operator=( sem_elem_t se );
+      witness_t& operator=( Witness* alpha );
+      Witness* getWitness( sem_elem_t se );
+    };
+
+    /**
      * @class Witness
      */
     class Witness : public SemElem, public Markable, public Visitable

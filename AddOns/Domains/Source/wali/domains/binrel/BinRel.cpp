@@ -172,7 +172,7 @@ bdd BinRel::priv_id()
 {
   bdd id;
   for (int i = 0 ; i < BinRel::getNumVars() ; i++) {
-    id = id | fdd_ithvar(base,i) & fdd_ithvar(base+1,i);
+    id = id | (fdd_ithvar(base,i) & fdd_ithvar(base+1,i));
   }
   return id;
 }
