@@ -4,6 +4,12 @@ import platform
 import urllib
 import sys
 import os
+(bits,linkage) = platform.architecture()
+Is64           = (False,True)[bits == '64bit']
+WALiDir        = os.environ['WALiDir']
+LibInstallDir  = os.path.join(WALiDir,('lib','lib64')[Is64])
+BinInstallDir  = os.path.join(WALiDir,('bin','bin64')[Is64])
+XercesTgt      = ('xerces-c','xerces-c64')[Is64]
 
 xerces_master = 'http://www.apache.org/dist/xerces/c/2/binaries/'
 xerces_win32   = 'xerces-c_2_8_0-x86-windows-vc_8_0'
@@ -23,7 +29,7 @@ def myrm(name):
 
 def xerces_setup(name):
     myrm(name)
-    myrm('xerces-c')
+    myrm(XercesTgt)
 
 def get_xerces_win(bits):
     name =  (xerces3_win64,xerces3_win32)[bits == '32bit'] 
@@ -31,7 +37,7 @@ def get_xerces_win(bits):
     xerces_setup(target)
     os.system('curl -O %s%s' % (xerces3_mirror,target))
     os.system('unzip -o %s' % target)
-    os.rename(name, 'xerces-c')
+    os.rename(name, XercesTgt)
 
 def get_xerces_linux(bits):
     name = (xerces3_linux64 , xerces3_linux32)[bits == '32bit']
@@ -39,14 +45,13 @@ def get_xerces_linux(bits):
     xerces_setup(target)
     os.system('curl -O %s%s' % (xerces3_mirror,target))
     os.system('tar zxf %s' % target)
-    os.rename(name, 'xerces-c')
+    os.rename(name, XercesTgt)
 
 def getlibs():
-    (bits,linkage) = platform.architecture()
     if bits != '64bit' and bits != '32bit':
         raise NameError, bits
     s = platform.system()
-    if False == os.path.exists('xerces-c'):
+    if False == os.path.exists(XercesTgt):
         if s == 'Linux':
             get_xerces_linux(bits)
         else:

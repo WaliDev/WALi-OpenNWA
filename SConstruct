@@ -9,6 +9,7 @@ import os,platform,platform
 Is64           = (False,True)[bits == '64bit']
 WaliDir        = os.getcwd()
 LibInstallDir  = os.path.join(WaliDir,('lib','lib64')[Is64])
+BuildDir       = os.path.join(WaliDir,('_build','_build64')[Is64])
 BaseEnv        = Environment()
 MkStatic       = platform.system() != 'Linux' 
 
@@ -22,6 +23,7 @@ BaseEnv['CPPPATH'] = [ os.path.join(WaliDir , 'Source') ]
 Export('Is64')
 Export('WaliDir')
 Export('LibInstallDir')
+Export('BuildDir')
 Export('MkStatic')
 Export('BaseEnv')
 
@@ -44,7 +46,7 @@ Export('ProgEnv')
 if 'help' not in COMMAND_LINE_TARGETS:
     ## ##################
     ## libwali
-    built = SConscript('Source/SConscript', build_dir='_build',duplicate=0)
+    built = SConscript('Source/SConscript', build_dir=BuildDir,duplicate=0)
     
     ## ##################
     ## All
@@ -71,3 +73,4 @@ else:
     print """
     scons [all addons examples tests]
     """
+

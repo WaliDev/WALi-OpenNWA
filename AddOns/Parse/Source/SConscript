@@ -15,6 +15,7 @@ Import('WaliDir')
 Import('LibInstallDir')
 Import('MkStatic')
 Import('BaseEnv')
+Import('XercesDir')
 
 if Debug:
     print "+ WaliDir       : '%s'" % WaliDir
@@ -38,7 +39,7 @@ Env = BaseEnv.Clone()
 IncludeDirs = [
     os.path.join(WaliDir , 'Source'),
     os.path.join(WaliDir,'AddOns','Parse','Source'),
-    os.path.join(WaliDir,'AddOns','Parse','ThirdParty','xerces-c','include'),
+    os.path.join(WaliDir,'AddOns','Parse','ThirdParty',XercesDir,'include'),
 ]
 
 if Debug:

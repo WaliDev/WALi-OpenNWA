@@ -5,6 +5,11 @@ import urllib
 import sys
 import os
 import shutil
+(bits,linkage) = platform.architecture()
+Is64           = (False,True)[bits == '64bit']
+WALiDir        = os.environ['WALiDir']
+LibInstallDir  = os.path.join(WALiDir,('lib','lib64')[Is64])
+BinInstallDir  = os.path.join(WALiDir,('bin','bin64')[Is64])
 
 def get_targz(base):
   wget = "curl -O"
@@ -13,13 +18,9 @@ def get_targz(base):
       os.system('%s http://pages.cs.wisc.edu/~kidd/dolby/%s' % (wget,targz))
       os.system('tar zxvf %s' % targz)
       cwd = os.getcwd()
-      WALiDir = os.environ['WALiDir']
-      # lib dir is $(WALiDir)/lib
-      libdir = os.path.join(WALiDir,'lib')
-      # bin dir is $(WALiDir)/bin
       bindir = os.path.join(WALiDir,'bin')
       os.system('cd %s; ./configure --prefix=%s --libdir=%s --bindir=%s && make -j2 && make install; cd -' % 
-          (base,cwd,libdir,bindir))
+          (base,cwd,LibInstallDir,BinInstallDir))
 
 def get_buddy():
   get_targz('buddy-2.4')

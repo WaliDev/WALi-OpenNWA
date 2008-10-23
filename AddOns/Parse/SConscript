@@ -9,17 +9,24 @@
 import os , os.path
 
 Import('BaseEnv')
+Import('BuildDir')
+Import('Is64')
+XercesDir = ('xercs-c','xerces-c64')[Is64]
+Export('XercesDir')
 
 built = []
 
 xerces = SConscript(os.path.join('ThirdParty','SConscript'))
 built += xerces
 
-parse = SConscript(os.path.join('Source','SConscript'), build_dir='_build',duplicate=0)
+parse = SConscript(
+    os.path.join('Source','SConscript'), 
+    build_dir=os.path.join(BuildDir,'AddOns','Parse'),
+    duplicate=0)
 built += parse
 
 examples = SConscript(os.path.join('Examples','SConscript'), 
-    build_dir=os.path.join('_build','Examples'),
+    build_dir=os.path.join(BuildDir,'AddOns','Parse','Examples'),
     duplicate=0)
 built += examples
 

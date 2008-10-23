@@ -2,6 +2,7 @@
 import os,os.path
 
 Import('WaliDir')
+Import('BuildDir')
 
 ExampleDir = os.path.join(WaliDir,'Examples')
 
@@ -10,7 +11,7 @@ built = []
 ## Reach example
 built += SConscript(
         os.path.join(ExampleDir,'Reach','SConscript'),
-        build_dir= os.path.join('_build','Reach'),
+        build_dir= os.path.join(BuildDir,'Examples','Reach'),
         duplicate=0
         )
 
@@ -19,7 +20,7 @@ built += SConscript(
 ## GenKill examples
 built += SConscript(
         os.path.join(ExampleDir,'GenKill','SConscript'),
-        build_dir= os.path.join('_build','GenKill'),
+        build_dir= os.path.join(BuildDir,'Examples','GenKill'),
         duplicate=0
         )
 

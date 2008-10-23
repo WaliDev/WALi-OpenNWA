@@ -6,8 +6,9 @@ Import('WaliDir')
 Import('LibInstallDir')
 Import('BaseEnv')
 Import('MkStatic')
+Import('XercesDir')
 
-XercesPath = os.path.join(WaliDir, 'AddOns', 'Parse', 'ThirdParty', 'xerces-c')
+XercesPath = os.path.join(WaliDir, 'AddOns', 'Parse', 'ThirdParty', XercesDir)
 
 StaticLibs = []
 Libs       = [ 'wali', 'waliparse', 'xerces-c', ] 
@@ -47,3 +48,4 @@ Reach = env.Program('ExMain',ReachFiles + StaticLibs)
 built = Reach
 
 Return('built')
+
