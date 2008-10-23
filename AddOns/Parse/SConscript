@@ -11,7 +11,7 @@ import os , os.path
 Import('BaseEnv')
 Import('BuildDir')
 Import('Is64')
-XercesDir = ('xercs-c','xerces-c64')[Is64]
+XercesDir = ('xerces-c','xerces-c64')[Is64]
 Export('XercesDir')
 
 built = []
