@@ -2,11 +2,14 @@
 # $Id$
 import get_parse_libs, os, os.path
 
-get_parse_libs.getlibs()
-
 Import('WaliDir')
-xerces = os.path.join(WaliDir,'AddOns','Parse','ThirdParty','xerces-c')
+Import('LibInstallDir')
 
-built = [Dir(xerces)]
+(XercesDir,libs) = get_parse_libs.getlibs(LibInstallDir)
+Export('XercesDir')
+
+xerces = os.path.join(WaliDir,'AddOns','Parse','ThirdParty',XercesDir)
+
+built = [File(x) for x in libs]
 Return('built')
 

@@ -12,7 +12,7 @@ XercesPath = os.path.join(WaliDir, 'AddOns', 'Parse', 'ThirdParty', XercesDir)
 
 StaticLibs = []
 Libs       = [ 'wali', 'waliparse', 'xerces-c', ] 
-LibPath    = [ LibInstallDir, os.path.join(XercesPath,'lib'), ]
+LibPath    = [ LibInstallDir ] #, os.path.join(XercesPath,'lib'), ]
 
 if MkStatic:
   StaticLibs = [
@@ -20,7 +20,7 @@ if MkStatic:
     os.path.join(LibInstallDir,'libwali.a')
     ]
   Libs       = ['xerces-c']
-  LibPath    = [ os.path.join(XercesPath,'lib') ]
+  #LibPath    = [ os.path.join(XercesPath,'lib') ]
 
 
 ## ###############################

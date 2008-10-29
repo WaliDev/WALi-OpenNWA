@@ -11,13 +11,14 @@ import os , os.path
 Import('BaseEnv')
 Import('BuildDir')
 Import('Is64')
-XercesDir = ('xerces-c','xerces-c64')[Is64]
-Export('XercesDir')
+#XercesDir = ('xerces-c','xerces-c64')[Is64]
+#Export('XercesDir')
 
 built = []
 
 xerces = SConscript(os.path.join('ThirdParty','SConscript'))
 built += xerces
+Import('XercesDir')
 
 parse = SConscript(
     os.path.join('Source','SConscript'), 
