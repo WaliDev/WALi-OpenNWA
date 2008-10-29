@@ -6,7 +6,11 @@
 import os,platform,platform
 
 (bits,linkage) = platform.architecture()
-Is64           = (False,True)[bits == '64bit']
+## ####################
+## To distinguish 64 bit build and lib dirs,
+## enable this flag
+#Is64           = (False,True)[bits == '64bit']
+Is64           = False
 WaliDir        = os.getcwd()
 LibInstallDir  = os.path.join(WaliDir,('lib','lib64')[Is64])
 BuildDir       = os.path.join(WaliDir,('_build','_build64')[Is64])
