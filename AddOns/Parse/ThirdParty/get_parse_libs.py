@@ -45,6 +45,8 @@ def getlibs(LibInstallDir):
     os.system('curl -O %s%s' % (xrcs3_mirror,target))
     os.system('%s %s' % (('unzip -o','tar zxf')[IsLinux],target))
   cwd = os.getcwd()
+  if False == os.path.exists(LibInstallDir):
+    os.mkdir(LibInstallDir)
   for lib in os.listdir(os.path.join(name,'lib')):
     src = os.path.join(cwd,name,'lib',lib)
     dst = os.path.join(LibInstallDir,lib)
