@@ -58,7 +58,7 @@ namespace wali
        * parses out of the character string [str]
        * from : "<MergeFn>str</MergeFn>
        */
-      virtual merge_fn_t getMergeFn();
+      virtual merge_fn_t getMergeFn(sem_elem_t se);
 
     protected:
       WeightFactory* fWeightFactory;

@@ -56,9 +56,14 @@ namespace wali
        * It will *only* be invoked if the an EWPDS or FWPDS
        * is being parsed.
        *
+       * The passed in weight [se] is the weight returned
+       * by IUserHandler::getWeight(), which was parsed
+       * from the <Weight></Weight> tags that preceed
+       * the <MergeFn> tag.
+       *
        * @return the merge_fn_t for the parsed merge function.
        */
-      virtual merge_fn_t getMergeFn() = 0;
+      virtual merge_fn_t getMergeFn(sem_elem_t se) = 0;
 
   }; // class IUserHandler
 

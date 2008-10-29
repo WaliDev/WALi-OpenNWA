@@ -88,7 +88,7 @@ namespace wali
       return fHasMergeFn;
   }
 
-  merge_fn_t UserFactoryHandler::getMergeFn()
+  merge_fn_t UserFactoryHandler::getMergeFn(sem_elem_t se ATTR_UNUSED)
   {
     return fMergeFn;
   }

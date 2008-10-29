@@ -118,20 +118,19 @@ namespace wali
           else {
             //std::cerr << " . Weight S = " << weightString << std::endl;
             //std::cerr << " . Merge S = " << mergeString << std::endl;
+            sem_elem_t se = fUserHandler.getWeight();
             if (fUserHandler.hasMergeFn())
             {
               get_ewpds().add_rule(
                   fromKey, fromStkKey, 
-                  toKey, toStk1Key, toStk2Key, 
-                  fUserHandler.getWeight(), 
-                  fUserHandler.getMergeFn());
+                  toKey, toStk1Key, toStk2Key, se,
+                  fUserHandler.getMergeFn(se));
             }
             else
             {
               get_ewpds().add_rule(
                   fromKey, fromStkKey, 
-                  toKey, toStk1Key, toStk2Key, 
-                  fUserHandler.getWeight());
+                  toKey, toStk1Key, toStk2Key, se);
             }
           }
         }
