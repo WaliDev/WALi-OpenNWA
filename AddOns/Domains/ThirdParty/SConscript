@@ -6,9 +6,13 @@
 
 import get_domains_libs, os, os.path
 
-get_domains_libs.getlibs()
 
 Import('WaliDir')
+Import('LibInstallDir')
+Import('BinInstallDir')
+
+get_domains_libs.getlibs(LibInstallDir,BinInstallDir)
+
 buddy = os.path.join(WaliDir,'AddOns','Domains','ThirdParty','buddy-2.4')
 
 built = [Dir(buddy)]
