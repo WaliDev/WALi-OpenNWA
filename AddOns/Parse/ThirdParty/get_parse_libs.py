@@ -17,8 +17,8 @@ import sys
 #xerces_lin64  = 'xerces-c_2_8_0-x86_64-lin-gcc_3_4'
 
 xrcs3_mirror  = 'http://apache.cs.utah.edu/xerces/c/3/binaries/'
-xrcs3_win32   = 'xerces-c_3_0_0-x86-windows-vc_9_0'
-xrcs3_win64   = 'xerces-c_3_0_0-x86_64-windows-vc_9_0'
+xrcs3_win32   = 'xerces-c-3.0.0-x86-windows-vc-9.0'
+xrcs3_win64   = 'xerces-c-3.0.0-x86_64-windows-vc-9.0'
 xrcs3_lin32   = 'xerces-c-3.0.0-x86-linux-gcc-3.4'
 xrcs3_lin64   = 'xerces-c-3.0.0-x86_64-linux-gcc-3.4'
 
@@ -62,6 +62,6 @@ if __name__ in ['__main__']:
   if bits != '64bit' and bits != '32bit':
     raise NameError, bits
   Is64           = (False,True)[bits == '64bit']
-  getlibs(LibInstallDir)
+  getlibs(os.path.join(os.getcwd(),'lib'))
 
 
