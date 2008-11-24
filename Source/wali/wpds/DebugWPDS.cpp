@@ -13,7 +13,7 @@ namespace wali
     {
     }
 
-    DebugWPDS::DebugWPDS( Wrapper * wrapper ) : WPDS( wrapper )
+    DebugWPDS::DebugWPDS( ref_ptr<Wrapper> wrapper ) : WPDS( wrapper )
     {
     }
 

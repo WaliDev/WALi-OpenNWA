@@ -15,16 +15,20 @@
 #include "wali/graph/Graph.hpp"
 #include "wali/graph/SummaryGraph.hpp"
 
-namespace wali {
+namespace wali 
+{
 
-  namespace wfa {
+  namespace wfa 
+  {
     class WFA;
     class Trans;
   }
 
-  namespace wpds {
+  namespace wpds 
+  {
 
-    namespace ewpds {
+    namespace ewpds 
+    {
       
       /*!
        * @class CopyCallRules
@@ -42,7 +46,8 @@ namespace wali {
       };
     } // namespace ewpds
 
-    namespace fwpds {
+    namespace fwpds 
+    {
 
       class SWPDS : public FWPDS {
         public:
@@ -55,7 +60,7 @@ namespace wali {
 
       public:
         SWPDS();
-        SWPDS(Wrapper *wrapper);
+        SWPDS(ref_ptr<Wrapper> wrapper);
         virtual ~SWPDS();
 
         virtual void prestar( wfa::WFA &input, wfa::WFA &output);

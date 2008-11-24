@@ -1,11 +1,12 @@
 #ifndef wali_wpds_WRAPPER_GUARD
 #define wali_wpds_WRAPPER_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
+#include "wali/Countable.hpp"
 #include "wali/SemElem.hpp"
 #include "wali/MergeFn.hpp"
 
@@ -23,7 +24,7 @@ namespace wali
       class ERule;
     }
 
-    /*!
+    /**
      * @class Wrapper
      * 
      * This class defines the interface used to "wrap"
@@ -37,10 +38,10 @@ namespace wali
      * (i.e., the user) to take care of proper chaining. WALi assumes that
      * unwrap will return an element from the user defined weight domain.
      */
-    class Wrapper
+    class Wrapper : public Countable
     {
       public:
-        Wrapper() {}
+        Wrapper() : Countable() {}
 
         virtual ~Wrapper() {}
 

@@ -53,7 +53,7 @@ FWPDS::FWPDS() : EWPDS(), interGr(NULL), checkingPhase(false)
 {
 }
 
-FWPDS::FWPDS(wpds::Wrapper* wrapper) : EWPDS(wrapper) , interGr(NULL), checkingPhase(false)
+FWPDS::FWPDS(ref_ptr<wpds::Wrapper> wrapper) : EWPDS(wrapper) , interGr(NULL), checkingPhase(false)
 {
 }
 
@@ -572,7 +572,7 @@ void FWPDS::operator()( wfa::ITrans* orig ) {
 
   Config *c = make_config( orig->from(),orig->stack() );
   sem_elem_t se = 
-    (wrapper == 0) ? orig->weight() : wrapper->wrap(*orig);
+    (wrapper.is_valid()) ? wrapper->wrap(*orig) : orig->weight();
 
   LazyTrans *t = new LazyTrans( orig->copy() );
 

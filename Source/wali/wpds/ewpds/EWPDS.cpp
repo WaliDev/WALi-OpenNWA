@@ -47,8 +47,13 @@ namespace wali
 
       const std::string EWPDS::XMLTag("EWPDS");
 
-      EWPDS::EWPDS( Wrapper * wrapper ) : WPDS(wrapper), addEtrans(false)
-      { }
+      EWPDS::EWPDS() : WPDS(), addEtrans(false)
+      {
+      }
+
+      EWPDS::EWPDS( ref_ptr<Wrapper> wrapper ) : WPDS(wrapper), addEtrans(false)
+      { 
+      }
 
 
       EWPDS::~EWPDS()
@@ -178,7 +183,8 @@ namespace wali
           }
           r2it->second.push_back( r );
 
-          if (wrapper) {
+          if (wrapper.is_valid())
+          {
             ERule* x = (ERule*)r.get_ptr();
             x->set_merge_fn( wrapper->wrap(*x,x->merge_fn()) );
           }
@@ -438,7 +444,8 @@ namespace wali
         }
 
         Config *c = make_config( orig->from(),orig->stack() );
-        sem_elem_t se = (wrapper == 0) ? orig->weight() : wrapper->wrap(*orig);
+        sem_elem_t se = 
+          (wrapper.is_valid()) ? wrapper->wrap(*orig) : orig->weight();
 
         wfa::ITrans *t = orig->copy();
 

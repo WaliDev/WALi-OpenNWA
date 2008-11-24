@@ -172,6 +172,7 @@ namespace wali
       const   XMLCh* const    qname,
       const   Attributes&     attributes)
   {
+    using wpds::WPDS;
     using wpds::ewpds::EWPDS;
     using wpds::fwpds::FWPDS;
     using wpds::fwpds::SWPDS;
@@ -207,28 +208,36 @@ namespace wali
       else if (wpds::WPDS::XMLTag == who.get()) 
       {
         if (pdsHandler == NULL) {
-          pdsHandler = new wpds::WpdsHandler(fUserHandler);
+          pdsHandler = 
+            new wpds::WpdsHandler(
+                fUserHandler,new WPDS(fUserHandler.getWrapper()));
         }
         currentHandler = pdsHandler;
       }
       else if (wpds::ewpds::EWPDS::XMLTag == who.get()) 
       {
         if (pdsHandler == NULL) {
-          pdsHandler = new wpds::ewpds::EWpdsHandler(fUserHandler,new EWPDS());
+          pdsHandler = 
+            new wpds::ewpds::EWpdsHandler(
+                fUserHandler,new EWPDS(fUserHandler.getWrapper()));
         }
         currentHandler = pdsHandler;
       }
       else if (wpds::fwpds::FWPDS::XMLTag == who.get()) 
       {
         if (pdsHandler == NULL) {
-          pdsHandler = new wpds::ewpds::EWpdsHandler(fUserHandler,new FWPDS());
+          pdsHandler = 
+            new wpds::ewpds::EWpdsHandler(
+              fUserHandler,new FWPDS(fUserHandler.getWrapper()));
         }
         currentHandler = pdsHandler;
       }
       else if (wpds::fwpds::SWPDS::XMLTag == who.get()) 
       {
         if (pdsHandler == NULL) {
-          pdsHandler = new wpds::ewpds::EWpdsHandler(fUserHandler,new SWPDS());
+          pdsHandler = 
+            new wpds::ewpds::EWpdsHandler(
+                fUserHandler,new SWPDS(fUserHandler.getWrapper()));
         }
         currentHandler = pdsHandler;
       }

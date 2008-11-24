@@ -17,6 +17,9 @@
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/TransFunctor.hpp"
 
+// ::wali::wpds
+#include "wali/wpds/Wrapper.hpp"
+
 // std c++
 #include <iostream>
 #include <set>
@@ -37,7 +40,6 @@ namespace wali
     class rule_t;
     class RuleFunctor;
     class ConstRuleFunctor;
-    class Wrapper;
 
     /**
      * @class WPDS
@@ -66,7 +68,7 @@ namespace wali
       public:
 
         WPDS();
-        WPDS( Wrapper* wrapper );
+        WPDS( ref_ptr<Wrapper> wrapper );
         virtual ~WPDS();
 
         /**
@@ -80,15 +82,8 @@ namespace wali
         void setWorklist( ref_ptr< Worklist<wfa::ITrans> > wl );
 
 
-        /**
-         * Wrap the weights on the rules.
-         * Once the a wrapper is set on the WPDS, no more rules
-         * can be added.
-         */
-        //void wrap( Wrapper * w );
-
-        /** @brief create rule with no r.h.s. stack symbols
-         *
+        /** 
+         * @brief create rule with no r.h.s. stack symbols
          * @return true if rule existed
          *
          * @see sem_elem_t
@@ -439,7 +434,7 @@ namespace wali
       private: // methods
 
       protected: // data members
-        Wrapper * wrapper;
+        ref_ptr<Wrapper> wrapper;
         ref_ptr< Worklist<wfa::ITrans> > worklist;
         chash_t configs;
         std::set< Config * > rule_zeroes;

@@ -1,7 +1,7 @@
 #ifndef wali_wpds_fwpds_FWPDS_GUARD
 #define wali_wpds_fwpds_FWPDS_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  * @author Akash Lal
  *
@@ -32,12 +32,14 @@ namespace wali {
     class Wrapper;
     class rule_t;
 
-    namespace fwpds {
+    namespace fwpds 
+    {
 
 
-      class FWPDS : public ewpds::EWPDS {
+      class FWPDS : public ewpds::EWPDS 
+      {
         public:
-          /*!
+          /**
            * For parsing XML FWPDSs.
            * @shadow wali::wpds::ewpds::EPDS::XMLTag
            */
@@ -45,7 +47,7 @@ namespace wali {
 
         public:
           FWPDS();
-          FWPDS(Wrapper* wrapper);
+          FWPDS(ref_ptr<Wrapper> wrapper);
 
           ////////////
           // add rules
@@ -69,7 +71,7 @@ namespace wali {
           // FWPDS Settings
           //////////////////////
 
-          /*! @brief Sets evaluation strategy for RegExp after InterGraph
+          /** @brief Sets evaluation strategy for RegExp after InterGraph
            * saturation is complete, i.e., during the time when
            * transition weights are calculated. It is true by default,
            * but setting it to false seems to be far more efficient

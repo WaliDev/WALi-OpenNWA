@@ -1,7 +1,7 @@
 #ifndef wali_REF_PTR_GUARD
 #define wali_REF_PTR_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  * @author Evan Driscoll
  */
@@ -14,7 +14,7 @@
 namespace wali
 {
 
-  /*!
+  /**
    * @class ref_ptr
    * @brief A reference counting pointer class
    * @warning This class is *NOT* thread safe.
@@ -55,7 +55,7 @@ namespace wali
         acquire( rp.ptr );
       }
 
-      /*!
+      /**
        * @brief This will succeed if S is a subclass of T.
        */
       template< typename S > ref_ptr<T>( const ref_ptr<S>& rp ) {

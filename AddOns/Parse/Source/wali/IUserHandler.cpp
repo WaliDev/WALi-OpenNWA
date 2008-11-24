@@ -23,5 +23,11 @@ namespace wali
         (tag == MergeFn::XMLTag)
         );
   }
+
+  ref_ptr<wpds::Wrapper> IUserHandler::getWrapper()
+  {
+    return NULL;
+  }
+
 }
 

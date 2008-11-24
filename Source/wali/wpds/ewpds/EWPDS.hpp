@@ -1,8 +1,8 @@
 #ifndef wali_wpds_ewpds_EWPDS_GUARD
 #define wali_wpds_ewpds_EWPDS_GUARD 1
 
-/*!
- * @author Akash Lal
+/**
+ * @author Akash Lal, Nicholas Kidd
  */
 
 #include "wali/Common.hpp"
@@ -32,14 +32,14 @@ namespace wali
       typedef ref_ptr<ERule> erule_t;
 
 
-      /*!
+      /**
        * @class EWPDS
        */
 
       class EWPDS : public WPDS
       {
         public:
-          /*!
+          /**
            * For parsing XML EWPDSs.
            * @shadow wali::wpds::WPDS::XMLTag
            */
@@ -55,12 +55,13 @@ namespace wali
 
         public:
 
-          EWPDS( Wrapper * wrapper = 0 );
+          EWPDS(); 
+          EWPDS( ref_ptr<Wrapper> wrapper );
 
           virtual ~EWPDS();
 
-          /*! @brief create rule with no r.h.s. stack symbols
-           *
+          /** 
+           * @brief create rule with no r.h.s. stack symbols
            * @return true if rule existed
            *
            * @see sem_elem_t
@@ -72,8 +73,8 @@ namespace wali
               wali::Key to_state,
               sem_elem_t se );
 
-          /*! @brief create rule with one r.h.s. stack symbol
-           *
+          /** 
+           * @brief create rule with one r.h.s. stack symbol
            * @return true if rule existed
            *
            * @see sem_elem_t
@@ -86,8 +87,8 @@ namespace wali
               wali::Key to_stack1,
               sem_elem_t se );
 
-          /*! @brief create rule with two r.h.s. stack symbols
-           *
+          /** 
+           * @brief create rule with two r.h.s. stack symbols
            * @return true if rule existed
            *
            * @see sem_elem_t
@@ -101,8 +102,8 @@ namespace wali
               wali::Key to_stack2,
               sem_elem_t se);
 
-          /*! @brief create rule with two r.h.s. stack symbols
-           *
+          /** 
+           * @brief create rule with two r.h.s. stack symbols
            * @return true if rule existed
            *
            * @see sem_elem_t
@@ -123,7 +124,7 @@ namespace wali
           // void poststar( WFA & input, WFA & output );
           // void poststar( WFA & input);
 
-          /*!
+          /**
            * @brief Perform prestar reachability query
            *
            * @param input
@@ -133,7 +134,7 @@ namespace wali
            */
           virtual void prestar( WFA & input, WFA& output );
 
-          /*!
+          /**
            * This method writes the EWPDS to the passed in 
            * std::ostream parameter. Implements Printable::print.
            *
@@ -144,7 +145,7 @@ namespace wali
            */
           virtual std::ostream & print( std::ostream & o ) const;
 
-          /*!
+          /**
            * This method marshalls the EWPDS into the passed
            * in std::ostream parameter.  Marshalling simply
            * writes the EWPDS in XML form.
@@ -153,16 +154,17 @@ namespace wali
            */
           virtual std::ostream & marshall( std::ostream & o ) const;
 
-          /*!
+          /**
            * Override WPDS::operator()(ITrans*) for linking b/c
            * EWPDS uses paired weights
            */
           virtual void operator()( wfa::ITrans* t );
 
           rule_t lookup_rule(wali::Key to_state, wali::Key to_stack1, wali::Key to_stack2) const;
+
         protected:
 
-          /*!
+          /**
            * @brief helper method for prestar
            */
           virtual void prestar_handle_call(
@@ -172,7 +174,7 @@ namespace wali
               sem_elem_t delta
               );
 
-          /*!
+          /**
            * @brief helper method for prestar
            */
           virtual void prestar_handle_trans(
@@ -181,11 +183,11 @@ namespace wali
               rule_t & r,
               sem_elem_t delta );
 
-          /*!
+          /**
            * @brief helper method for poststar
            */
 
-          /*!
+          /**
            * @brief helper method for poststar
            */
           virtual void poststar_handle_trans(

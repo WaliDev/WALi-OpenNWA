@@ -47,7 +47,7 @@ namespace wali
     {
     }
 
-    WPDS::WPDS( Wrapper * w ) :
+    WPDS::WPDS( ref_ptr<Wrapper> w ) :
       wrapper(w),
       worklist( new DefaultWorklist<wfa::ITrans>() ),
       currentOutputWFA(0)
@@ -738,19 +738,11 @@ namespace wali
         if( tmp->f == f && tmp->t == t && tmp->to_stack2() == stk2 )
         {
           exists = true;
-          if( wrapper ) {
+          if( wrapper.is_valid() ) {
             // New behavior
             // Wrap the duplicate rule's weight, then combine since
             // wrapping produces a new semiring.
             r->setWeight( wrapper->wrap(*r) );
-            //tmp->setWeight( tmp->weight()->combine(r->weight()) );
-            // FIXME: Should we combine user weights at bottom
-            // of stack?
-            //sem_elem_t combinedWeight = se->combine(wrapper->unwrap(tmp->se));
-            //tmp->se = combinedWeight;
-            //tmp->setWeight( wrapper->wrap(*tmp) );
-            //rule_t wrapTmp =  new Rule(f,t,stk2,se);
-            //tmp->se = tmp->se->combine(wrapper->wrap(*wrapTmp));
           }
           sem_elem_t x = tmp->weight()->combine(r->weight());
           tmp->setWeight(x);
@@ -759,7 +751,7 @@ namespace wali
         }
       }
       if( !exists ) {
-        if( wrapper ) {
+        if( wrapper.is_valid() ) {
           r->setWeight( wrapper->wrap(*r) );
         }
         f->insert(r);
@@ -855,7 +847,7 @@ namespace wali
       Config* c = make_config( orig->from(),orig->stack() );
       wfa::ITrans* t = orig->copy();
       t->setConfig(c);
-      if (wrapper) {
+      if (wrapper.is_valid()) {
         t->setWeight( wrapper->wrap(*orig) );
       }
 

@@ -5,14 +5,17 @@
 
 using namespace std;
 
-namespace wali {
+namespace wali 
+{
   using wfa::ITrans;
   using graph::Transition;
   using graph::WTransition;
 
-  namespace wpds {
+  namespace wpds 
+  {
 
-    namespace ewpds {
+    namespace ewpds 
+    {
 
       /////////////////////////////////////////////////////////////////
       // class CopyCallRules
@@ -38,11 +41,17 @@ namespace wali {
 
       const std::string SWPDS::XMLTag("SWPDS");
 
-      SWPDS::SWPDS() : FWPDS(), preprocessed(false), sgr(NULL) { }
+      SWPDS::SWPDS() : FWPDS(), preprocessed(false), sgr(NULL) 
+      { 
+      }
 
-      SWPDS::SWPDS(Wrapper *wrapper) : FWPDS(wrapper), preprocessed(false), sgr(NULL) { }
+      SWPDS::SWPDS(ref_ptr<Wrapper> wrapper) : 
+        FWPDS(wrapper), preprocessed(false), sgr(NULL) 
+      { 
+      }
 
-      SWPDS::~SWPDS() {
+      SWPDS::~SWPDS() 
+      {
         if(sgr != NULL) {
           delete sgr;
         }

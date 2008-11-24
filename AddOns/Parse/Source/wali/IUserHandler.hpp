@@ -11,6 +11,8 @@
 
 #include "wali/IWaliHandler.hpp"
 
+#include "wali/wpds/Wrapper.hpp"
+
 namespace wali
 {
 
@@ -64,6 +66,12 @@ namespace wali
        * @return the merge_fn_t for the parsed merge function.
        */
       virtual merge_fn_t getMergeFn(sem_elem_t se) = 0;
+
+      /**
+       * Override this method if the application 
+       * users a Wrapper (e.g., WitnessWrapper).
+       */
+      virtual ref_ptr<wpds::Wrapper> getWrapper();
 
   }; // class IUserHandler
 
