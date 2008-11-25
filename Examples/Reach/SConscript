@@ -11,7 +11,11 @@ ReachFiles=Split("""
 
 ExReach = ProgEnv.Program('ExReach',ReachFiles + ProgEnv['StaticLibs'])
 
-built = ProgEnv.Install(os.path.join(WaliDir,'Examples','bin'), ExReach)
+built = [ProgEnv.Install(os.path.join(WaliDir,'Examples','bin'), ExReach)]
+
+ExReachWit = ProgEnv.Program(
+    'ExReachWit',['Reach.cpp','ExReachWit.cpp']+ProgEnv['StaticLibs'])
+built += [ProgEnv.Install(os.path.join(WaliDir,'Examples','bin'), ExReachWit)]
 
 Return('built')
 
