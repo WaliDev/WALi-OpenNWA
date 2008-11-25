@@ -7,6 +7,11 @@
 namespace wali
 {
 
+  using wfa::Trans;
+  using wfa::TransSet;
+  using wfa::WFA;
+  using wfa::State;
+
   namespace wpds
   {
     DebugWPDS::DebugWPDS() : WPDS()
@@ -98,86 +103,66 @@ namespace wali
       }
     }
 
-    /*
-       void DebugWPDS::poststar_handle_trans(
-       wfa::ITrans * t,
-       wfa::WFA & fa,
-       rule_t & r,
-       sem_elem_t delta
-       )
-       {
-       wali_key_t rtstate = r->to_state();
-       wali_key_t rtstack = r->to_stack1();
-
-       sem_elem_t wrule_trans = delta->extend( r->se );
-
-       if( r->to_stack2() == WALI_EPSILON ) {
-       update( rtstate, rtstack, t->to(), wrule_trans, r->to() );
-       }
-       else {
-
-    // Is a rule 2 so we must generate a state
-    // and create 2 new transitions
-    wali_key_t gstate = gen_state( rtstate,rtstack );
-
-    wfa::ITrans* tprime = update_prime( gstate, r->to_stack2(), t->to(), wrule_trans );
-
-    wfa::State * state = fa.getState( gstate );
-
-    { // BEGIN DEBUGGING
-    std::cout << "\t** Performing quasi\n";
-    } // END DEBUGGING
-
-    sem_elem_t quasi = state->quasi->combine( wrule_trans );
-    state->quasi = quasi;
-
-    update( rtstate, rtstack, gstate, quasi->quasi_one(), r->to() );
-
-    // Trans with generated from states do not go on the worklist
-    // and there is no Config matching them so pass 0 (NULL) as the
-    // Config * for update_prime
-    if( tprime->modified() )
+    void DebugWPDS::poststar_handle_trans(
+        wfa::ITrans * t,
+        wfa::WFA & fa,
+        rule_t & r,
+        sem_elem_t delta
+        )
     {
-    // BEGIN DEBUGGING
-    {
-     *waliErr << "[WPDS::poststar] ";
-     *waliErr << "t' modified.\n\t";
-     tprime->print( *waliErr );
-     *waliErr << ".\n  > Searching for eps trans\n";
-     }
-    // END DEBUGGING
+      Key rtstate = r->to_state();
+      Key rtstack = r->to_stack1();
+      sem_elem_t wrule_trans = delta->extend( r->weight() );
 
-    WFA::eps_map_t::iterator epsit = fa.eps_map.find( tprime->from() );
-    if( epsit != fa.eps_map.end() )
-    {
-    // tprime stack key
-    wali_key_t tpstk = tprime->stack();
-    // tprime to key
-    wali_key_t tpto = tprime->to();
-    // get epsilon list ref
-    TransSet& transSet = epsit->second;
-    // iterate
-    TransSet::iterator tsit = transSet.begin();
-    for( ; tsit != transSet.end() ; tsit++ )
-    {
-    wfa::ITrans* teps = *tsit;
-    Config * config = make_config( teps->from(),tpstk );
-    sem_elem_t epsW = tprime->delta->extend( teps->se );
+      if( r->to_stack2() == WALI_EPSILON ) {
+        update( rtstate, rtstack, t->to(), wrule_trans, r->to() );
+      }
+      else {
 
-    // BEGIN DEBUGGING
-    {
-    teps->print( *waliErr << "\tFound - " ) << std::endl;
+        // Is a rule 2 so we must generate a state
+        // and create 2 new transitions
+        Key gstate = gen_state( rtstate,rtstack );
+
+        wfa::ITrans* tprime = 
+          update_prime( gstate, t, r, delta, wrule_trans );
+
+        State * state = fa.getState( gstate );
+
+        sem_elem_t quasi = state->quasi->combine( wrule_trans );
+        state->quasi = quasi;
+
+        update( rtstate, rtstack, gstate, quasi->quasi_one(), r->to() );
+
+        // Trans with generated from states do not go on the worklist
+        // and there is no Config matching them so pass 0 (NULL) as the
+        // Config * for update_prime
+        if( tprime->modified() )
+        {
+
+          WFA::eps_map_t::iterator epsit = fa.eps_map.find( tprime->from() );
+          if( epsit != fa.eps_map.end() )
+          {
+            // tprime stack key
+            Key tpstk = tprime->stack();
+            // tprime to key
+            Key tpto = tprime->to();
+            // get epsilon list ref
+            TransSet& transSet = epsit->second;
+            // iterate
+            TransSet::iterator tsit = transSet.begin();
+            for( ; tsit != transSet.end() ; tsit++ )
+            {
+              wfa::ITrans* teps = *tsit;
+              Config * config = make_config( teps->from(),tpstk );
+              sem_elem_t epsW = tprime->getDelta()->extend( teps->weight() );
+
+              update( teps->from(),tpstk,tpto,
+                  epsW, config );
+            }
+          }
+        }
+      }
     }
-    // END DEBUGGING
-
-    update( teps->from(),tpstk,tpto,
-        epsW, config );
-  }
-  }
-  }
-  }
-  }
-  */
 
   }   // namespace wpds
 

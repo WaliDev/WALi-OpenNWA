@@ -47,6 +47,7 @@ namespace wali
 
       public:
         friend class WPDS;
+        friend class DebugWPDS;
         friend class ewpds::EWPDS;
         friend class fwpds::FWPDS;
         friend class RuleWitness;

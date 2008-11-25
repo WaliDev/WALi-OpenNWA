@@ -34,6 +34,12 @@ namespace wali
 
         virtual void post( wfa::ITrans* t , wfa::WFA& fa );
 
+        virtual void poststar_handle_trans(
+            wfa::ITrans * t ,
+            wfa::WFA & ca   ,
+            rule_t & r,
+            sem_elem_t delta);
+
     }; // class DebugWPDS
 
   } // namespace wpds

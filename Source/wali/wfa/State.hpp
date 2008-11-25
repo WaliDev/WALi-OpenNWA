@@ -18,6 +18,7 @@ namespace wali
   namespace wpds
   {
     class WPDS;
+    class DebugWPDS;
     namespace ewpds 
     {
       class EWPDS;
@@ -46,6 +47,7 @@ namespace wali
       public: // friends
         friend class WFA;
         friend class wali::wpds::WPDS;
+        friend class wali::wpds::DebugWPDS;
         friend class wali::wpds::ewpds::EWPDS;
 
       public: // typedefs
