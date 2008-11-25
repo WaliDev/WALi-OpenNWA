@@ -56,7 +56,7 @@ void doReach()
   myWpds.add_rule( p, n[8],  p, n[9], reachOne);
   myWpds.add_rule( p, n[9],  p, n[0], n[10], reachOne);
   myWpds.add_rule( p, n[10], p, n[11], reachOne);
-  myWpds.add_rule( p, n[12], p, reachOne);
+  myWpds.add_rule( p, n[11], p, reachOne);
 
   myWpds.print( std::cerr ) << std::endl;
   std::ofstream fxml( "myWpds.xml" );
