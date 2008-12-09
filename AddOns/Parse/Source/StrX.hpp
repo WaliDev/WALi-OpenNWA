@@ -10,7 +10,6 @@
 
 #include <string>
 #include <iostream>
-#include <cstdlib>
 #include <xercesc/util/TransService.hpp>
 #include <xercesc/util/XMLString.hpp>
 
