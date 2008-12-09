@@ -1,7 +1,7 @@
-#ifndef wali_wfa_WEIGHT_CHANGER_GUARD
-#define wali_wfa_WEIGHT_CHANGER_GUARD 1
+#ifndef wali_util_WEIGHT_CHANGER_GUARD
+#define wali_util_WEIGHT_CHANGER_GUARD 1
 
-/*!
+/**
  * @author Akash Lal
  */
 
@@ -13,7 +13,7 @@ namespace wali
 
   namespace util
   {
-    /*!
+    /**
      * @class WeightChanger
      *
      * Encapsulates a unary function for changing weights
@@ -32,5 +32,5 @@ namespace wali
 
 } // namespace wali
 
-#endif  // wali_wfa_WEIGHT_CHANGER_GUARD
+#endif  // wali_util_WEIGHT_CHANGER_GUARD
 
