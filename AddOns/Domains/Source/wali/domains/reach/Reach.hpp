@@ -1,7 +1,7 @@
 #ifndef wali_domains_reach_REACH_GUARD
 #define wali_domains_reach_REACH_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  */
 

@@ -1,7 +1,7 @@
 #ifndef wali_WEIGHT_FACTORY_GUARD
 #define wali_WEIGHT_FACTORY_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  */
 
