@@ -7,29 +7,12 @@ import os
 import platform
 import shutil
 import sys
+import xerces_consts
 
-
-#xerces_master   = 'http://www.apache.org/dist/xerces/c/2/binaries/'
-#
-#xerces_win32    = 'xerces-c_2_8_0-x86-windows-vc_8_0'
-#xerces_win64    = 'xerces-c_2_8_0-x86_64-windows-vc_8_0'
-#xerces_lin32  = 'xerces-c_2_8_0-x86-lin-gcc_3_4'
-#xerces_lin64  = 'xerces-c_2_8_0-x86_64-lin-gcc_3_4'
-
+name = xerces_consts.Name
+bits = xerces_consts.bits
+IsLinux = xerces_consts.IsLinux
 xrcs3_mirror  = 'http://apache.cs.utah.edu/xerces/c/3/binaries/'
-xrcs3_win32   = 'xerces-c-3.0.0-x86-windows-vc-9.0'
-xrcs3_win64   = 'xerces-c-3.0.0-x86_64-windows-vc-9.0'
-xrcs3_lin32   = 'xerces-c-3.0.0-x86-linux-gcc-3.4'
-xrcs3_lin64   = 'xerces-c-3.0.0-x86_64-linux-gcc-3.4'
-
-(bits,linkage)  = platform.architecture()
-sys             = platform.system()
-IsLinux         = sys == 'Linux'
-Is64            = bits == '32bit'
-name = (
-    ( xrcs3_win64 , xrcs3_win32 ), 
-    ( xrcs3_lin64 , xrcs3_lin32 )
-    )[IsLinux][Is64]
 
 def myrm(name):
   if os.path.isdir(name):
