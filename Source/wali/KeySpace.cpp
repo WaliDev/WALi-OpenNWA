@@ -1,5 +1,6 @@
-/*!
+/**
  * @author Nicholas Kidd
+ * @version $Id$
  */
 
 #include <cassert>
@@ -17,7 +18,7 @@ namespace wali
     clear();
   }
 
-  /*!
+  /**
    * get_key returns the unique wali_key_t associated with the
    * KeySource* ks. If no such key exists, a new wali_key_t will be
    * generated.
@@ -47,7 +48,7 @@ namespace wali
     return key;
   }
 
-  /*!
+  /**
    * Wrapper method for createing a StringSource and
    * inserting it into the KeySpace
    */
@@ -56,7 +57,7 @@ namespace wali
     return (s == "") ? WALI_EPSILON : getKey( new StringSource(s) );
   }
 
-  /*!
+  /**
    * Wrapper method for createing a StringSource and
    * inserting it into the KeySpace
    */
@@ -66,7 +67,7 @@ namespace wali
       WALI_EPSILON : getKey( new StringSource(s) );
   }
 
-  /*!
+  /**
    * Wrapper method for createing a IntSource and
    * inserting it into the KeySpace
    */
@@ -75,7 +76,7 @@ namespace wali
     return getKey( new IntSource(i) );
   }
 
-  /*!
+  /**
    * Wrapper method for createing a KeyPairSource and
    * inserting it into the KeySpace
    */
@@ -84,7 +85,7 @@ namespace wali
     return getKey( new KeyPairSource(k1,k2) );
   }
 
-  /*!
+  /**
    * getKeySource retrieves the KeySource* associated to the
    * wali_key_t key. If no such KeySource exists, then a NULL
    * pointer (0) is returned.
@@ -105,7 +106,7 @@ namespace wali
     return ksrc;
   }
 
-  /*!
+  /**
    * Reset the KeySpace. Clears all keys and deletes
    * all KeySources
    */
@@ -127,7 +128,7 @@ namespace wali
     }
   }
 
-  /*!
+  /**
    * Return the number of allocated keys
    */
   size_t KeySpace::size()
@@ -135,7 +136,7 @@ namespace wali
     return values.size();
   }
 
-  /*!
+  /**
    * Helper method that looks up the key and calls KeySource::print
    *
    * @see KeySource
@@ -152,7 +153,7 @@ namespace wali
     return o;
   }
 
-  /*!
+  /**
    * Return std::string rep of KeySource. Looks up the key and calls
    * KeySource::toString(). 
    *
