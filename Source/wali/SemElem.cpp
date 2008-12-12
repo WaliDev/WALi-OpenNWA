@@ -1,5 +1,6 @@
-/*!
+/**
  * @author Nicholas Kidd
+ * @version $Id$
  */
 
 #include "wali/SemElem.hpp"

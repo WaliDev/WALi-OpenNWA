@@ -1,7 +1,7 @@
 #ifndef wali_SEM_ELEM_GUARD
 #define wali_SEM_ELEM_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  */
 
@@ -19,14 +19,14 @@ namespace wali
    */
   class SemElem;
 
-  /*!
+  /**
    * @typedef sem_elem_t
    * Handy typedef for working with reference counted
    * SemElem objects.
    */
   typedef ref_ptr<SemElem> sem_elem_t;
 
-  /*! 
+  /** 
    * @class SemElem
    * @brief base abstract class to be subclassed by user's semiring
    *
@@ -49,69 +49,69 @@ namespace wali
 
     public:
 
-      /*!
+      /**
        *  @brief SemElem constructor
        */ 
       //explicit SemElem( bool countme = true );
       explicit SemElem();
 
-      /*!
+      /**
        *  @brief SemElem destructor is virtual and does nothing
        */
       virtual ~SemElem() {}
 
-      /*!
+      /**
        *  return the One element of the semiring
        */
       virtual sem_elem_t one() const = 0;
 
-      /*!
+      /**
        *  return the Zero element of the semiring
        */
       virtual sem_elem_t zero() const = 0;
 
-      /*!
+      /**
        *  Perform the extend operation
        */
       virtual sem_elem_t extend( SemElem * se ) = 0;
 
-      /*!
+      /**
        *  Perform the combine operation
        */
       virtual sem_elem_t combine( SemElem * se ) = 0;
 
-      /*!
+      /**
        *  Equality comparison between two semiring elements
        */
       virtual bool equal( SemElem * se ) const = 0;
 
-      /*!
+      /**
        *  Print the semiring element to the std::ostream o
        */
       virtual std::ostream& print( std::ostream & o ) const = 0;
 
-      /*!
+      /**
        *  Used to print weights to XML. Default implementation
        *  simply calls this->toString() and sends the output
        *  to the passed in ostream o.
        */
       virtual std::ostream& marshall( std::ostream& o ) const;
 
-      /*!
+      /**
        *  Used to print weights to XML. Outer wrapper that 
        *  places the appropriate tags and then calls the virtual
        *  method marshall.
        */
       std::ostream& marshallWeight( std::ostream& o ) const;
 
-      /*!
+      /**
        *  Perfrom the diff operation
        *   NOTE: This method performs (this - se).  This is very
        *         important as diff is not commutative
        */
       virtual sem_elem_t diff( SemElem * se );
 
-      /*!
+      /**
        *  Perform the quasi_one operation.
        *  Quasi one by default returns the One semiring element.
        *  If you are unsure of how to use Quasione then leave the
@@ -119,7 +119,7 @@ namespace wali
        */
       virtual sem_elem_t quasi_one() const;
 
-      /*!
+      /**
        *  Perform delta operation
        *   The delta operation is defined for the user but can be
        *   overridden to get better performance. The std::pair returned
@@ -133,40 +133,40 @@ namespace wali
        */
       virtual std::pair<sem_elem_t,sem_elem_t> delta( SemElem * se );
 
-      /*!
+      /**
        *  Perform the star operation (returns this^\inf)
        */
       sem_elem_t star();
 
-      /*! 
+      /** 
        * Wrapper method for extend that will remove the ref_ptr
        * to make the call to the user's code. This is just a 
        * nice "typesafe macro" b/c sem_elem_t is used by WPDS
        */
       sem_elem_t extend( sem_elem_t se ) { return extend( se.get_ptr() ); }
 
-      /*! 
+      /** 
        * Wrapper method for combine that will remove the ref_ptr
        * to make the call to the user's code. This is just a 
        * nice "typesafe macro" b/c sem_elem_t is used by WPDS
        */
       sem_elem_t combine( sem_elem_t se ) { return combine( se.get_ptr() ); }
 
-      /*! 
+      /** 
        * Wrapper method for equal that will remove the ref_ptr
        * to make the call to the user's code. This is just a 
        * nice "typesafe macro" b/c sem_elem_t is used by WPDS
        */
       bool equal( sem_elem_t se ) const { return equal( se.get_ptr() ); }
 
-      /*!
+      /**
        * Wrapper method for diff that will remove the ref_ptr
        * to make the call to the user's code. This is just a 
        * nice "typesafe macro" b/c sem_elem_t is used by WPDS
        */
       sem_elem_t diff( sem_elem_t se ) { return diff( se.get_ptr() ); }
 
-      /*! 
+      /** 
        * Wrapper method for delta that will remove the ref_ptr
        * to make the call to the user's code. This is just a 
        * nice "typesafe macro" b/c sem_elem_t is used by WPDS
