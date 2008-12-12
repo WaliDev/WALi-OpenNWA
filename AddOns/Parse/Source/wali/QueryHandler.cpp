@@ -17,6 +17,7 @@
 #include "wali/wfa/WfaHandler.hpp"
 
 #include "wali/wpds/WPDS.hpp"
+#include "wali/wpds/DebugWPDS.hpp"
 #include "wali/wpds/WpdsHandler.hpp"
 
 #include "wali/wpds/ewpds/EWPDS.hpp"
@@ -173,6 +174,7 @@ namespace wali
       const   Attributes&     attributes)
   {
     using wpds::WPDS;
+    using wpds::DebugWPDS;
     using wpds::ewpds::EWPDS;
     using wpds::fwpds::FWPDS;
     using wpds::fwpds::SWPDS;
@@ -211,6 +213,15 @@ namespace wali
           pdsHandler = 
             new wpds::WpdsHandler(
                 fUserHandler,new WPDS(fUserHandler.getWrapper()));
+        }
+        currentHandler = pdsHandler;
+      }
+      else if (wpds::DebugWPDS::XMLTag == who.get())
+      {
+        if (pdsHandler == NULL) {
+          pdsHandler = 
+            new wpds::WpdsHandler(
+                fUserHandler,new DebugWPDS(fUserHandler.getWrapper()));
         }
         currentHandler = pdsHandler;
       }

@@ -22,6 +22,9 @@ namespace wali
     class DebugWPDS : public WPDS
     {
       public:
+        static const std::string XMLTag;
+
+      public:
         DebugWPDS();
         DebugWPDS( ref_ptr<Wrapper> wrapper );
 

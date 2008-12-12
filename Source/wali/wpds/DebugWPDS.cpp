@@ -14,6 +14,8 @@ namespace wali
 
   namespace wpds
   {
+    const std::string DebugWPDS::XMLTag("DebugWPDS");
+
     DebugWPDS::DebugWPDS() : WPDS()
     {
     }
