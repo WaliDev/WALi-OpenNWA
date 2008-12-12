@@ -1,15 +1,62 @@
 # Run the python program
 # $Id$
-import get_parse_libs, os, os.path
+import os
+from xerces_consts import IsLinux, Name
 
 Import('WaliDir')
 Import('LibInstallDir')
 
-(XercesDir,libs) = get_parse_libs.getlibs(LibInstallDir)
+
+XercesDir = Name
 Export('XercesDir')
 
-xerces = os.path.join(WaliDir,'AddOns','Parse','ThirdParty',XercesDir)
 
-built = [File(x) for x in libs]
+# download binary distribution archive
+archive = Name + ('.zip','.tar.gz')[IsLinux]
+env = Environment(
+    archive = File(archive),
+    mirror = 'http://apache.cs.utah.edu/xerces/c/3/binaries',
+    url = '$mirror/$archive',
+    )
+if not File(archive).exists():
+    env.Execute([['curl', '--silent', '--fail', '--show-error', '--output', '$archive', '$url']])
+
+
+# unpack the archive to get the good stuff out
+if not File('README', XercesDir).exists():
+    unpack = (
+        ['unzip', '-o', '-d', '$archive.dir', '$archive'],
+        ['$TAR', '--directory', '$archive.dir', '-zxf', '$archive'],
+        )[IsLinux]
+    env.Execute([unpack])
+
+
+# copy Xerces libraries into comman WALi library area
+libraries = ['lib/libxerces-c-3.0.so', 'lib/libxerces-c.a']
+instlibs = [File(lib, XercesDir) for lib in libraries]
+Install(LibInstallDir, instlibs)
+
+# cannot use Install for symlinks due to known SCons bug:
+# <http://scons.tigris.org/issues/show_bug.cgi?id=1604>
+
+# generic symlinking action
+def symlink(target, source, env):
+    [target] = target
+    dest = source[0].read()
+    os.symlink(dest, str(target))
+
+# add shared-lib symlinks
+dest = Value('libxerces-c-3.0.so')
+real = File(dest.read(), LibInstallDir)
+target = File('libxerces-c.so', LibInstallDir)
+Command(target, [dest, real], symlink)
+
+
+# does not clean up completely due to known SCons bugs:
+# <http://scons.tigris.org/issues/show_bug.cgi?id=1706>
+# <http://scons.tigris.org/issues/show_bug.cgi?id=2095>
+Clean('.', XercesDir)
+
+
+built = []
 Return('built')
-
