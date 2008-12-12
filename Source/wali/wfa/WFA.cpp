@@ -907,7 +907,7 @@ namespace wali
           o  << ",color=green,style=filled";
         }
         else if( isFinalState(key) ) {
-          o  << ",color=light_blue,style=filled";
+          o  << ",color=lightblue,style=filled";
         }
         o << "];\n";
       }
@@ -1082,12 +1082,10 @@ namespace wali
     {
       state_map_t::const_iterator stit = state_map.find( name );
       if( stit == state_map.end() ) {
-        //throw NoSuchStateException( name );
         return NULL;
       }
       else {
         const State * state = stit->second;
-        //return *state;
         return state;
       }
     }

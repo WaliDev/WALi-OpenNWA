@@ -43,6 +43,18 @@ namespace wali
             rule_t & r,
             sem_elem_t delta);
 
+        virtual void update(
+            Key from, Key stack, Key to, 
+            sem_elem_t se, Config * cfg );
+
+        virtual wfa::ITrans* update_prime(
+            Key from, //<! Guaranteed to be a generated state
+            wfa::ITrans* call, //<! The call transition
+            rule_t r, //<! The push rule
+            sem_elem_t delta, //<! Delta change on the call transition
+            sem_elem_t wWithRule //<! delta \extends r->weight()
+            );
+
     }; // class DebugWPDS
 
   } // namespace wpds

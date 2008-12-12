@@ -394,12 +394,8 @@ namespace wali
          *
          */
         virtual void update(
-            Key from
-            , Key stack
-            , Key to
-            , sem_elem_t se
-            , Config * cfg
-            );
+            Key from, Key stack, Key to, 
+            sem_elem_t se, Config * cfg );
 
         /**
          * update_prime does not need to take a Config b/c no Config

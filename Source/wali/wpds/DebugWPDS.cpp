@@ -1,3 +1,6 @@
+#include <fstream>
+#include <sstream>
+
 #include "wali/wpds/DebugWPDS.hpp"
 #include "wali/wpds/Config.hpp"
 #include "wali/wfa/WFA.hpp"
@@ -28,7 +31,6 @@ namespace wali
     {
     }
 
-
     void DebugWPDS::prestarComputeFixpoint( wfa::WFA& fa )
     {
 
@@ -47,8 +49,16 @@ namespace wali
 
       wfa::ITrans* t;
 
+      size_t iter_cnt = 1;
       while( get_from_worklist( t ) ) 
       {
+        {
+          std::stringstream ss;
+          ss << iter_cnt << "poststar.fa.dot";
+          std::ofstream of(ss.str().c_str());
+          fa.print_dot(of,true);
+          iter_cnt++;
+        }
         t->print( *waliErr << "$$$ Popped t ==> " ) << std::endl;
         // TODO insert debugger code
         post( t , fa );
@@ -130,8 +140,10 @@ namespace wali
         wfa::ITrans* tprime = 
           update_prime( gstate, t, r, delta, wrule_trans );
 
-        State * state = fa.getState( gstate );
+        State* state = fa.getState( gstate );
 
+        state->quasi->print( std::cout << "!!PRE-quasi : " ) << std::endl;
+        wrule_trans->print( std::cout << "!!W_t : ") << std::endl;
         sem_elem_t quasi = state->quasi->combine( wrule_trans );
         state->quasi = quasi;
 
@@ -168,6 +180,34 @@ namespace wali
       }
     }
 
+    void DebugWPDS::update(
+        Key from, Key stack, Key to,
+        sem_elem_t se, Config * cfg
+        )
+    {
+      wfa::ITrans* tmp = new Trans(from,stack,to,se);
+      tmp->print( *waliErr << "  --- [DebugWPDS::update] t_gen ==" ) << std::endl;
+
+      wfa::ITrans* t = currentOutputWFA->insert(tmp);
+      t->setConfig(cfg);
+      if (t->modified()) {
+        worklist->put( t );
+      }
+    }
+
+    wfa::ITrans* DebugWPDS::update_prime(
+        Key from, //<! Guaranteed to be a generated state
+        wfa::ITrans* call, //<! The call transition
+        rule_t r, //<! The push rule
+        sem_elem_t delta ATTR_UNUSED, //<! Delta change on the call transition
+        sem_elem_t wWithRule //<! delta \extends r->weight()
+        )
+    {
+      wfa::ITrans* tmp = new Trans(from,r->to_stack2(),call->to(),wWithRule);
+      tmp->print( *waliErr << "  --- [DebugWPDS::update_prime] t_gen ==" ) << std::endl;
+      wfa::ITrans* t = currentOutputWFA->insert(tmp);
+      return t;
+    }
   }   // namespace wpds
 
 }   // namespace wali
