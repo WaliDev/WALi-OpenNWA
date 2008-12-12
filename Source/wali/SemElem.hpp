@@ -120,6 +120,14 @@ namespace wali
       virtual sem_elem_t quasi_one() const;
 
       /**
+       * When the combine of two weights is performed to 
+       * set the {quasi} value of a state, the
+       * SemElem::quasi_combine method is used.
+       * This defaults to SemElem::combine.
+       */
+      virtual sem_elem_t quasi_combine(SemElem* se);
+
+      /**
        *  Perform delta operation
        *   The delta operation is defined for the user but can be
        *   overridden to get better performance. The std::pair returned
@@ -140,31 +148,48 @@ namespace wali
 
       /** 
        * Wrapper method for extend that will remove the ref_ptr
-       * to make the call to the user's code. This is just a 
-       * nice "typesafe macro" b/c sem_elem_t is used by WPDS
+       * to make the call to the user's code. 
        */
-      sem_elem_t extend( sem_elem_t se ) { return extend( se.get_ptr() ); }
+      sem_elem_t extend( sem_elem_t se ) 
+      { 
+        return extend( se.get_ptr() ); 
+      }
 
       /** 
        * Wrapper method for combine that will remove the ref_ptr
-       * to make the call to the user's code. This is just a 
-       * nice "typesafe macro" b/c sem_elem_t is used by WPDS
+       * to make the call to the user's code. 
        */
-      sem_elem_t combine( sem_elem_t se ) { return combine( se.get_ptr() ); }
+      sem_elem_t combine( sem_elem_t se ) 
+      { 
+        return combine( se.get_ptr() ); 
+      }
 
       /** 
        * Wrapper method for equal that will remove the ref_ptr
-       * to make the call to the user's code. This is just a 
-       * nice "typesafe macro" b/c sem_elem_t is used by WPDS
+       * to make the call to the user's code. 
        */
-      bool equal( sem_elem_t se ) const { return equal( se.get_ptr() ); }
+      bool equal( sem_elem_t se ) const 
+      { 
+        return equal( se.get_ptr() ); 
+      }
 
       /**
        * Wrapper method for diff that will remove the ref_ptr
-       * to make the call to the user's code. This is just a 
-       * nice "typesafe macro" b/c sem_elem_t is used by WPDS
+       * to make the call to the user's code. 
        */
-      sem_elem_t diff( sem_elem_t se ) { return diff( se.get_ptr() ); }
+      sem_elem_t diff( sem_elem_t se ) 
+      { 
+        return diff( se.get_ptr() ); 
+      }
+
+      /**
+       * Wrapper method for quasi_combine that will remove the ref_ptr
+       * to make the call to the user's code. 
+       */
+      sem_elem_t quasi_combine( sem_elem_t se)
+      { 
+        return quasi_combine(se.get_ptr()); 
+      }
 
       /** 
        * Wrapper method for delta that will remove the ref_ptr

@@ -79,5 +79,10 @@ namespace wali
     return wn;
   }
 
+  sem_elem_t SemElem::quasi_combine(SemElem* se)
+  {
+    return combine(se);
+  }
+
 } // namespace wali
 
