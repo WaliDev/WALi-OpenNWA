@@ -114,9 +114,9 @@ namespace wali
     {
       Key rtstate = r->to_state();
       Key rtstack = r->to_stack1();
-      *waliErr << "[DebugWPDS::poststar_handle_trans] Before extend." << std::endl;
       sem_elem_t wrule_trans = delta->extend( r->weight() );
-      *waliErr << "[DebugWPDS::poststar_handle_trans] After extend." << std::endl;
+      *waliErr << "  --- [DebugWPDS::poststar_handle_trans] delta \\extend r." << std::endl;
+      wrule_trans->print( *waliErr << "   " ) << "\n  ----" << std::endl; 
 
       if( r->to_stack2() == WALI_EPSILON ) {
         update( rtstate, rtstack, t->to(), wrule_trans, r->to() );
