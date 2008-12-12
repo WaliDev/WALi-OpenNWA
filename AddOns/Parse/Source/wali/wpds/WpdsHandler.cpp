@@ -12,6 +12,7 @@
 
 #include "wali/wpds/Rule.hpp"
 #include "wali/wpds/WPDS.hpp"
+#include "wali/wpds/DebugWPDS.hpp"
 #include "wali/wpds/WpdsHandler.hpp"
 
 #include <xercesc/sax2/Attributes.hpp>
@@ -91,6 +92,11 @@ namespace wali
       if (WPDS::XMLTag == who.get()) {
         // do nothing
       }
+      else if (DebugWPDS::XMLTag == who.get())
+      {
+        // do nothing
+        *waliErr << "[INFO] Begin parsing DebugWPDS." << std::endl;
+      }
       else if (Rule::XMLTag == who.get()) {
         handleRule(uri,localname,qname,attributes);
       }
@@ -129,6 +135,11 @@ namespace wali
       StrX who(localname);
       if (WPDS::XMLTag == who.get()) {
         // do nothing
+      }
+      else if (DebugWPDS::XMLTag == who.get())
+      {
+        // do nothing
+        *waliErr << "[INFO] End parsing DebugWPDS." << std::endl; 
       }
       else if (WpdsHandler::FunctionXMLTag == who.get()) {
         // do nothing
