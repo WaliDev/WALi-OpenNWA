@@ -15,19 +15,19 @@ namespace wali
 
   SemElemPair::~SemElemPair() {}
 
-  //! return the One element of the semiring
+  // return the One element of the semiring
   sem_elem_t SemElemPair::one() const
   {
     return new SemElemPair( first->one(),second->one() );
   }
 
-  //! return the Zero element of the semiring
+  // return the Zero element of the semiring
   sem_elem_t SemElemPair::zero() const
   {
     return new SemElemPair( first->zero(),second->zero() );
   }
 
-  //! Perform the extend operation
+  // Perform the extend operation
   sem_elem_t SemElemPair::extend( SemElem * se )
   {
     // TODO : Make dynamic checks debug only?
@@ -40,7 +40,7 @@ namespace wali
     return new SemElemPair(fnew,snew);
   }
 
-  //! Perform the combine operation
+  // Perform the combine operation
   sem_elem_t SemElemPair::combine( SemElem * se )
   {
     // TODO : Make dynamic checks debug only?
@@ -53,7 +53,19 @@ namespace wali
     return new SemElemPair(fnew,snew);
   }
 
-  //! Equality comparison between two semiring elements
+  sem_elem_t SemElemPair::quasi_combine( SemElem* se )
+  {
+    // TODO : Make dynamic checks debug only?
+    //SemElemPair * that = static_cast< SemElemPair* >(se);
+    SemElemPair * that = dynamic_cast< SemElemPair* >(se);
+    assert( 0 != that );
+
+    sem_elem_t fnew = first->quasi_combine(that->first);
+    sem_elem_t snew = second->quasi_combine(that->second);
+    return new SemElemPair(fnew,snew);
+  }
+
+  // Equality comparison between two semiring elements
   bool SemElemPair::equal( SemElem * se ) const
   {
     // TODO : Make dynamic checks debug only?
@@ -66,7 +78,7 @@ namespace wali
     return feq && seq;
   }
 
-  //! Print the semiring element to the std::ostream o
+  // Print the semiring element to the std::ostream o
   std::ostream& SemElemPair::print( std::ostream & o ) const
   {
     o << "SemElemPair< ";
@@ -77,7 +89,7 @@ namespace wali
     return o;
   }
 
-  //! Perform the diff operation
+  // Perform the diff operation
   sem_elem_t SemElemPair::diff( SemElem * se )
   {
     // TODO : Make dynamic checks debug only?
@@ -90,13 +102,13 @@ namespace wali
         second->diff(that->second) );
   }
 
-  //! Perform the quasi_one operation
+  // Perform the quasi_one operation
   sem_elem_t SemElemPair::quasi_one() const
   {
     return new SemElemPair(first->quasi_one(), second->quasi_one());
   }
 
-  //! Perform the delta operation
+  // Perform the delta operation
   std::pair<sem_elem_t,sem_elem_t> SemElemPair::delta( SemElem * se )
   {
     // TODO : Make dynamic checks debug only?
