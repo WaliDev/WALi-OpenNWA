@@ -54,9 +54,13 @@ namespace wali
       {
         {
           std::stringstream ss;
-          ss << iter_cnt << "poststar.fa.dot";
+          ss << "dotty/" << iter_cnt << ".post.fa.dot";
           std::ofstream of(ss.str().c_str());
-          fa.print_dot(of,true);
+          if (of.is_open())
+          {
+            fa.print_dot(of,true);
+            of.close();
+          }
           iter_cnt++;
         }
         t->print( *waliErr << "$$$ Popped t ==> " ) << std::endl;
@@ -142,9 +146,9 @@ namespace wali
 
         State* state = fa.getState( gstate );
 
-        state->quasi->print( std::cout << "!!PRE-quasi : " ) << std::endl;
-        wrule_trans->print( std::cout << "!!W_t : ") << std::endl;
-        sem_elem_t quasi = state->quasi->combine( wrule_trans );
+        //state->quasi->print( std::cout << "!!PRE-quasi : " ) << std::endl;
+        //wrule_trans->print( std::cout << "!!W_t : ") << std::endl;
+        sem_elem_t quasi = state->quasi->quasi_combine( wrule_trans );
         state->quasi = quasi;
 
         update( rtstate, rtstack, gstate, quasi->quasi_one(), r->to() );
