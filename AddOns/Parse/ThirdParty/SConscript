@@ -15,8 +15,9 @@ Export('XercesDir')
 archive = Name + ('.zip','.tar.gz')[IsLinux]
 env = Environment(
     archive = File(archive),
-    mirror = 'http://apache.cs.utah.edu/xerces/c/3/binaries',
-    url = '$mirror/$archive',
+    mirror  = 'http://apache.cs.utah.edu/xerces/c/3/binaries',
+    # NAK - `$archive` is not compatible with external invocation of this script 
+    url     = '$mirror/%s' % archive,
     )
 if not File(archive).exists():
     env.Execute([['curl', '--silent', '--fail', '--show-error', '--output', '$archive', '$url']])
