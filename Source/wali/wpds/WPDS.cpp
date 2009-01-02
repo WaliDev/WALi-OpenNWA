@@ -492,7 +492,7 @@ namespace wali
 
         State * state = fa.getState( gstate );
 
-        sem_elem_t quasi = state->quasi->combine( wrule_trans );
+        sem_elem_t quasi = state->quasi->quasi_combine( wrule_trans );
         state->quasi = quasi;
 
         update( rtstate, rtstack, gstate, quasi->quasi_one(), r->to() );
