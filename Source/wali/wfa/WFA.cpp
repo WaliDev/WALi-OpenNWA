@@ -1360,7 +1360,21 @@ namespace wali
       }
 
       index_map_t::iterator lkup = index_map.find(getInitialState());
-      assert(lkup != index_map.end());
+      // If there are no transitions starting from the initial state,
+      // return Regex::NIL().
+      //assert(lkup != index_map.end());
+      if (lkup == index_map.end())
+      {
+        *waliErr << "[WARNING] No transitions from initial state." << std::endl;
+        for( size_t i=0; i < n ; i++ ) {
+          { // DEBUGGING
+            //nodes[i]->print( *eout << "(" << i << ") " ) << std::endl;
+          }
+          delete[] P[i];
+        }
+        delete[] P;
+        return Regex::NIL();
+      }
       const int init_idx = lkup->second;
 
       for( size_t i=0; i < n; i++) {
