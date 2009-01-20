@@ -11,6 +11,7 @@
 \usepackage{color}
 \usepackage{xspace}
 \usepackage{ifpdf}
+\usepackage[numbers,sort]{natbib}
 
 \ifpdf
 \hypersetup{
@@ -74,15 +75,15 @@
 \WALi\footnote{\WALi is short for ``Weighted Automaton Library''} is an open
 source library implementation of a Weighted Pushdown System (WPDS). WPDSs have
 been shown to be a powerful formalism for performing interprocedural dataflow
-analysis \cite{SAS:RSJ:2003,SCP:RSJM:2005,FSTTCS:RLK:2007}. (For a listing of
+analysis \citep{SAS:RSJ:2003,SCP:RSJM:2005,FSTTCS:RLK:2007}. (For a listing of
 relevant papers see \url{http://www.cs.wisc.edu/wpis/wpds}.)
 
 \section{Installation}
 \label{Se:Installation}
 \WALi has been compiled on Linux, Cygwin+Windows/XP and using
 Visual Studio 2005. In either case, one must first download the \WALi source
-tree. The latest can be found
-\href{http://www.cs.wisc.edu/wpis/wpds/wali/WALi-latest.tar.gz}{http://www.cs.wisc.edu/wpis/wpds/wali/WALi-latest.tar.gz}.
+tree. The latest can be found at
+\url{http://www.cs.wisc.edu/wpis/wpds/wali/WALi-latest.tar.gz}.
 This link will download a gzipped tar file of the \WALi source tree.
 
 \subsection{Linux and Cygwin}
@@ -237,7 +238,8 @@ $\alpha$ and $\beta$, $\alpha$ $\subseteq$ $\beta$ $\Leftrightarrow$$\alpha$ =
 std::ostream & print( std::ostream & o ) const;
 \end{verbatim}
 \verb!print! writes a semiring element to the passed in
-std::ostream parameter. It should return the same std::ostream when finished.
+\verb!std::ostream! parameter. It should return the same
+\verb!std::ostream!  when finished.
 
 
 \section{Examples}
@@ -367,7 +369,7 @@ for( int i=0 ; i < 10 ; i++ ) {
 \end{lstlisting}
 \end{codelist}
 The state and stack symbols of a WPDS rule have a type \verb!wali::Key!. A key
-is a way of identifying a state or stack symbol of the WPDS. Each key has a
+is a way of identifying a state or stack symbol of the WPDS\@. Each key has a
 unique \verb!wali::KeySource! object associated with it. Some common sources
 have been defined like \verb!wali::StringSource! and \verb!wali::IntSource!.
 User's can define their own key source by subclassing the
@@ -404,10 +406,10 @@ myWpds.add_rule( p, n[8], p, n[9], reachOne);
 myWpds.add_rule( p, n[4], p, n[6], n[5], reachOne);
 
 // f return
-myWpds.add_rule( p, n[5] , p , reachOne);
+myWpds.add_rule( p, n[5], p, reachOne);
 
 // g return
-myWpds.add_rule( p, n[9] , p , reachOne);
+myWpds.add_rule( p, n[9], p, reachOne);
 \end{lstlisting}
 \end{codelist}
 
@@ -433,7 +435,7 @@ fxml.close();
 
 \WALi allows for two types of queries, \emph{prestar} and \emph{poststar}. A
 query takes as input a WPDS and a weighted finite automaton (WFA). A query
-outputs a new annotated WFA. WFAs are represented by the class
+outputs a new annotated WFA\@. WFAs are represented by the class
 \verb!wali::wfa::WFA!. Transitions are added to the WFA class using the
 \verb!wali::wfa::WFA::addTrans! method. The following sample code computes a
 \emph{prestar} and \emph{poststar} reachability query for the pseudo code
@@ -480,6 +482,6 @@ outputs a new annotated WFA. WFAs are represented by the class
 % actually cited
 %\nocite{*}
 
-\bibliographystyle{plain}
+\bibliographystyle{plainnat}
 \bibliography{manual}
 \end{document}
