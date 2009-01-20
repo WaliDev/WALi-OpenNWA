@@ -51,7 +51,8 @@ if 'help' not in COMMAND_LINE_TARGETS:
     ## ##################
     ## libwali
     built = SConscript('Source/SConscript', build_dir=BuildDir,duplicate=0)
-    
+    built += SConscript('Doc/tex/SConscript')
+
     ## ##################
     ## All
     if 'all' in COMMAND_LINE_TARGETS:
