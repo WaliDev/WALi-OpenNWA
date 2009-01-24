@@ -1,11 +1,11 @@
 /**
  * @author Nicholas Kidd
- * @version $Id: EAH.cpp 585 2009-01-13 19:33:45Z kidd $
+ * @version $Id: EAH.cpp 611 2009-01-16 06:07:33Z kidd $
  */
 
 /**
  * Transformers implement post so that summarization of paths
- * computes the "eta" tranformer.
+ * computes the "eta" tranformer. These have no effect on q.
   
              eta([]) = (\empytset, \emptyset^k, \empytset, \emptyset^k, I0)
   eta([r1, ..., rn]) = post(eta([r1, ..., r_{n-1}]), Lab(rn)),
@@ -51,13 +51,19 @@ post((R,RH,U,AH,L),a) = (R',RH',U',AH',L'), where
                                       //  of li happens after the acquire of lj
    L' = L \cup {li}  // li is now held
    */
+/**
+ * During a phase change, the q value changes.
+ * TODO
+ */
 
 /**
  * (1) LOCKS   = number of locks in the program.
- * (2) PLYVARS = number of BDD vars in a ply.
- * (3) NUMVARS = number of used BDD vars (== PLYVARS*3).
+ * (2) Q       = number of states in the PA
+ * (3) PLYVARS = number of BDD vars in a ply.
+ * (4) NUMVARS = number of used BDD vars (== PLYVARS*3).
  *
  * Each ply contains the following information.
+ * q   : the current phase
  * [R] : 
  *    set of initially held locks that are released along a path.
  *    Size == |LOCKS|.
@@ -80,10 +86,12 @@ post((R,RH,U,AH,L),a) = (R',RH',U',AH',L'), where
  *    Size == |LOCKS|
  *
  * Thus, PLYVARS =
+ *   getln(Q)                             +
  *   3 * LOCKS ([R], [U], and [L])        +
- *   2 * (LOCKS * LOCKS) [RH and AH]      
+ *   2 * (LOCKS * LOCKS) [RH and AH]      +
+ *   ln(Q)
  */
-#define BDDBIGMEM 0
+#define BDDBIGMEM 1
 #if BDDBIGMEM
 
 // For large memory machines (i.e., >= 2GB) allocs ~1500 MB
@@ -96,6 +104,7 @@ post((R,RH,U,AH,L),a) = (R',RH',U',AH',L'), where
 #define BDDMEMSIZE 10000000
 #endif
 
+#define INTERLEAVE 1
 
 #include <iostream>
 #include <sstream>
@@ -112,7 +121,10 @@ using std::endl;
 const int EAH::MAX_LOCKS = 4;
 int EAH::BASE            = -1;
 int EAH::LOCKS           = -1;
+int EAH::Q               = -1;
+int EAH::QVARS           = -1;
 int EAH::PLYVARS         = -1;
+int EAH::NUMPLYS         = 3;
 int EAH::NUMVARS         = -1;
 bddPair* EAH::shiftright = 0;
 bddPair* EAH::shiftleft  = 0;
@@ -124,6 +136,17 @@ bdd*  EAH::R_acquires    = 0;
 bdd*  EAH::R_releases    = 0;
 bdd*  EAH::R_checker     = 0;
 
+
+int EAH::getln(int v)
+{
+  int acc = 0;
+  while( v != 1)
+  {
+    acc++;
+    v = v/2;
+  }
+  return acc;
+}
 
 bool EAH::is_initialized()
 {
@@ -137,7 +160,7 @@ static void my_error_handler(int errcode)
   throw errcode;
 }
 
-bool EAH::allocate( int num_locks )
+bool EAH::allocate( int num_locks, int theQ )
 {
   if (is_initialized())
   {
@@ -176,10 +199,14 @@ bool EAH::allocate( int num_locks )
   // End initialize BuDDy
   // ///////////////////////
 
-  LOCKS    = num_locks;                 // Set number of locks;
-  PLYVARS  = 3*LOCKS + 2*(LOCKS*LOCKS); // @see description above
-  NUMVARS  = PLYVARS * 3;               // Total number of vars
-  cout << "[INFO] EAH.        " << LOCKS << " lock(s);";
+  Q        = theQ;                      // Set Q
+  LOCKS    = num_locks;                 // Set number of locks
+  QVARS    = getln(Q);                  // Set number of QVars
+  PLYVARS  = QVARS + 3*LOCKS + 2*(LOCKS*LOCKS); // @see description above
+  NUMVARS  = PLYVARS * NUMPLYS;         // Total number of vars
+  cout << "[INFO] EAH. " << LOCKS << " lock(s); ";
+  cout << "  #Q = " << Q << ";";
+  cout << "  #QVARS = " << QVARS << ";";
   cout << "  #NUMVARS = " << NUMVARS << ";";
   cout << "  #PLYVARS = " << PLYVARS << endl;
   BASE     = bdd_extvarnum(NUMVARS);
@@ -189,9 +216,9 @@ bool EAH::allocate( int num_locks )
 bool EAH::init_vars()
 {
 
-  const int Ply1   = BASE;
-  const int Ply2   = BASE + PLYVARS;
-  const int Ply3   = BASE + (2*PLYVARS);
+  //const int Ply1   = BASE;
+  //const int Ply2   = BASE + PLYVARS;
+  //const int Ply3   = BASE + (2*PLYVARS);
   // ////////////////////////
   // Creat shiftright/shiftleft pairs
   {
@@ -200,14 +227,14 @@ bool EAH::init_vars()
     for (int i=0; i < PLYVARS; i++)
     {
       // PLY_1 -> PLY_2
-      bdd_setpair( shiftright , Ply1 + i , Ply2 + i);
+      bdd_setpair( shiftright , vidx(0,i) , vidx(1,i) ); //Ply1 + i , Ply2 + i);
       // PLY_2 -> PLY_3
-      bdd_setpair( shiftright , Ply2 + i , Ply3 + i );
+      bdd_setpair( shiftright , vidx(1,i) , vidx(2,i) ); //Ply2 + i , Ply3 + i );
 
       // PLY_2 -> PLY_1
-      bdd_setpair( shiftleft  , Ply2 + i , Ply1 + i );
+      bdd_setpair( shiftleft  , vidx(1,i) , vidx(0,i) ); //Ply2 + i , Ply1 + i );
       // PLY_3 -> PLY_2
-      bdd_setpair( shiftleft  , Ply3 + i , Ply2 + i );
+      bdd_setpair( shiftleft  , vidx(2,i) , vidx(1,i) ); //Ply3 + i , Ply2 + i );
     }
   }
 
@@ -218,7 +245,7 @@ bool EAH::init_vars()
     for (int i=0; i < PLYVARS; i++)
     {
       // PLY_3 -> PLY_2
-      bdd_setpair(shift32 , Ply3 + i , Ply2 + i);
+      bdd_setpair(shift32 , vidx(2,i) , vidx(1,i) );//Ply3 + i , Ply2 + i);
     }
   }
 
@@ -230,9 +257,9 @@ bool EAH::init_vars()
     bdd p3 = bddtrue;
     for (int i=0; i < PLYVARS; i++)
     {
-      p1 = p1 & bdd_ithvar( Ply1 + i );
-      p2 = p2 & bdd_ithvar( Ply2 + i );
-      p3 = p3 & bdd_ithvar( Ply3 + i );
+      p1 = p1 & var(0,i);
+      p2 = p2 & var(1,i);
+      p3 = p3 & var(2,i);
     }
     pply1 = new bdd(p1);
     pply2 = new bdd(p2);
@@ -242,6 +269,7 @@ bool EAH::init_vars()
   // /////////////////////////
   // create acquisition bdds
   {
+    //*waliErr << "[INFO] Building 'Acquire' relations." << endl;
     R_acquires = new bdd[LOCKS]();
     for (int l = 0 ; l < LOCKS ; l++)
       R_acquires[l] = acquire_lock(l);
@@ -250,6 +278,7 @@ bool EAH::init_vars()
   // /////////////////////////
   // create release bdds
   {
+    //*waliErr << "[INFO] Building 'Release' relations." << endl;
     R_releases = new bdd[LOCKS]();
     for (int l = 0 ; l < LOCKS ; l++)
       R_releases[l] = release_lock(l);
@@ -259,28 +288,36 @@ bool EAH::init_vars()
   // create the "checker" BDD 
   {
     bdd tmp_checker = bddfalse;
+    // Different states == invalid
+    for (int qbit=0 ; qbit < QVARS ; qbit++)
+    {
+      tmp_checker = tmp_checker |
+        (var(0,qbit) & nvar(1,qbit));
+      tmp_checker = tmp_checker |
+        (nvar(0,qbit) & var(1,qbit));
+    }
     for (int i=0; i < LOCKS ; i++)
     {
       // Disjoint sets of currently held locks
-      int i_in_L  = vn(0,get_lock_in_L(i));
-      int i_in_Lp = vn(1,get_lock_in_L(i));
-      tmp_checker = tmp_checker | (bdd_ithvar(i_in_L) & bdd_ithvar(i_in_Lp));
+      tmp_checker = tmp_checker | 
+        (var(0,get_lock_in_L(i)) & // i \in L
+         var(1,get_lock_in_L(i))); // i \in L'
 
       // For P1, let I1 = { li | li \in L1 & AH[i] = {} }
       // Check that I1 \cap U2 = {}
       // Vice versa for P2/P1. 
       bdd held_by_P1_used_by_P2 = 
-        bdd_ithvar(i_in_L) &                      // li \in L1
-        bdd_nithvar( vn(0,get_ah_start(i)+i) ) &  // li \notin AH_1[i]
-        bdd_ithvar( vn(1,get_lock_in_U(i)) );     // li \in U2
+        var(0,get_lock_in_L(i))    &  // li \in L1
+        nvar( 0,get_ah_start(i)+i) &  // li \notin AH_1[i]
+        var( 1,get_lock_in_U(i));     // li \in U2
 
       tmp_checker = tmp_checker | held_by_P1_used_by_P2;
 
       // Vice versa
       bdd held_by_P2_used_by_P1 =
-        bdd_ithvar(i_in_Lp) &                     // li \in L2
-        bdd_nithvar( vn(1,get_ah_start(i)+i) ) &  // li \notin AH_2[i]
-        bdd_ithvar( vn(0,get_lock_in_U(i)) );     // li \in U1
+        var(1,get_lock_in_L(i))    &  // li \in L2
+        nvar( 1,get_ah_start(i)+i) &  // li \notin AH_2[i]
+        var( 0,get_lock_in_U(i));     // li \in U1
 
       tmp_checker = tmp_checker | held_by_P2_used_by_P1;
 
@@ -289,31 +326,32 @@ bool EAH::init_vars()
         // ///////////////////////////
         //  Check AH sets
         // Select lock j in AH_i
-        int i_in_Aj = BASE + get_ah_start(i) + j;
+        bdd i_in_Aj = var(0 , get_ah_start(i)+j);
 
         // Select lock i in AH'_j
-        int j_in_Api = BASE + (PLYVARS + (get_ah_start(j) + i));
-        tmp_checker = tmp_checker | (bdd_ithvar(i_in_Aj) & bdd_ithvar(j_in_Api));
+        bdd j_in_Api = var(1 , get_ah_start(j) + i);
+        tmp_checker = tmp_checker | (i_in_Aj & j_in_Api);
 
         // ///////////////////////////
         //  Check RH sets
         // Select lock j in RH_i
-        int i_in_Rj = BASE + get_rh_start(i) + j;
+        bdd i_in_Rj = var(0 , get_rh_start(i) + j);
 
         // Select lock i in AH'_j
-        int j_in_Rpi = BASE + (PLYVARS + (get_rh_start(j) + i));
-        tmp_checker = tmp_checker | (bdd_ithvar(i_in_Rj) & bdd_ithvar(j_in_Rpi));
+        bdd j_in_Rpi = var(1 , get_rh_start(j)+i);
+        tmp_checker = tmp_checker | (i_in_Rj & j_in_Rpi);
       }
     }
+    //printEAH(*waliErr << "Checker\n", tmp_checker );
     R_checker = new bdd(bdd_not(tmp_checker));
-    //printEAH(*R_checker, "Checker");
+    //printEAH(*waliErr << "Checker\n", *R_checker );
   }
   return true;
 }
 
-bool EAH::initialize( int num_locks )
+bool EAH::initialize( int num_locks, int Q )
 {
-  assert( EAH::allocate(num_locks) );
+  assert( EAH::allocate(num_locks,Q) );
   assert( EAH::init_vars() );
   return true;
 }
@@ -407,21 +445,41 @@ EAH EAH::Intersect( const EAH& that ) const
   return EAH( (R & that.R) );
 }
 
-EAH EAH::Transition() const
+EAH EAH::Transition(int q1, int q2) const
 {
   static EAH T(transition());
   EAH ID = Id();
-  // [this] = (R,RH,U,AH,L) --> (R',RH',U',AH',L')
-  // Want   : (R',RH',U',AH',L') --> (0,0^k,0,0^k,L')
 
-  // (1) Quantify out ply 1
-  bdd exist_ply1 = bdd_exist(R, *pply1);
-  // (2) Shift to the left
+  // TODO put back in
+  //assert( q1 != q2 );
+  // [this] = (q1,R,RH,U,AH,L) --> (q1,R',RH',U',AH',L')
+  // Want   : (q1,R',RH',U',AH',L') --> (q2,0,0^k,0,0^k,L')
+
+  // (1) Ensure that this = (q1,...) -> (q1,...)
+  bdd Rq1p1 = q_in_ply(q1,0);
+  bdd Rq1p2 = q_in_ply(q1,1);
+  bdd pinq1 = R & Rq1p1 & Rq1p2;
+  // (2) Quantify out ply 1
+  bdd exist_ply1 = bdd_exist(pinq1, *pply1);
+  // (3) Shift to the left
   bdd shift = bdd_replace( exist_ply1,shiftleft);
-  // (3) Create (R',RH',U',AH',L') -> (R',RH',U',AH',L')
-  EAH matched = exist_ply1 & shift & ID.R;
-  // (4) Compose with T
-  return (matched * T);
+  // (4) Create (q1,R',RH',U',AH',L') -> (q1,R',RH',U',AH',L')
+  bdd matched = exist_ply1 & shift & ID.R;
+  // (5) Compose with T makes
+  //   (q1,R',RH',U',AH',L') --> (q1,0,0^k,0,0^k,L')
+  bdd R5 = compose(matched, T.R);
+  // (6) Quantify out Q in ply 2
+  bdd q_in_ply_1 = bddtrue;
+  for (int bit = 0; bit < QVARS ; bit++)
+  {
+    q_in_ply_1 = q_in_ply_1 & var(1,bit); // TODO MOVE Q
+  }
+  bdd R6 = bdd_exist(R5, q_in_ply_1);
+  // (7) insert q2 in ply 1
+  bdd Rq2 = q_in_ply(q2,1);
+  bdd R7 = R6 & Rq2;
+  //printEAH( std::cout << "!R7",R7);
+  return R7;
 
 }
 
@@ -448,21 +506,21 @@ bool EAH::Compatible( const EAH& that )
   // AH and putting lock [l] in [AH_l].
   //
   // (1) existentially quantify out PLY 1 in path1 and path 2
+  bdd quantify_ply_1_for_path1 = bdd_exist( path1.R , *pply1 );
+  bdd quantify_ply_1_for_path2 = bdd_exist( path2.R , *pply1 );
+
   // (2) Shift path 1 :: PLY 2 -> PLY1 
+  bdd path1_shiftleft = bdd_replace(quantify_ply_1_for_path1,shiftleft);
+
   // (3) Logically AND path 1 and path 2
+  bdd p1_then_p2 = path1_shiftleft & quantify_ply_1_for_path2;
+  //EAH(p1_then_p2).prettyPrint(cout, "P1 o P2");
+
   // (4) Check if solution exists.
-  EAH quantify_ply_1_for_path1 = bdd_exist( path1.R , *pply1 );
-  EAH quantify_ply_1_for_path2 = bdd_exist( path2.R , *pply1 );
-
-  EAH path1_shiftleft = bdd_replace(quantify_ply_1_for_path1.R,shiftleft);
-  //path1_shiftleft.prettyPrint(std::cout,"SHIFT< Path 1");
-
-  EAH p1_then_p2 = path1_shiftleft & quantify_ply_1_for_path2;
-  //p1_then_p2.prettyPrint(std::cout,"P1 :> P2");
-
-  EAH step2 = p1_then_p2 & EAH(*R_checker);
+  bdd R4 = p1_then_p2 & (*R_checker);
   //step2.prettyPrint(std::cout, "Step 2");
-  return (step2.R != bddfalse);
+
+  return (R4 != bddfalse);
 }
 
 EAH EAH::operator|(const EAH& that) const
@@ -504,27 +562,66 @@ bool EAH::check_lock(int lock)
   return true;
 }
 
+bool EAH::check_q( int q )
+{
+  if (!is_initialized())
+  {
+    *waliErr << "[ERROR] EAH not initialized" << endl;
+    return false;
+  }
+  else if ((q < 0) || (q >= Q))
+  {
+    *waliErr << "[ERROR] Invalid q " << q << endl;
+    return false;
+  }
+  return true;
+}
+
 std::ostream& operator<<(std::ostream& o, const EAH& eah)
 {
   eah.print(o);
   return o;
 }
 
-int EAH::vn(int ply, int v)
+int EAH::vidx_base(int base, int ply, int v)
 {
-  assert((0<=ply) && (ply < 3));
   assert((0<=v)   && (v < PLYVARS));
-  return BASE + (ply * PLYVARS) + v;
+#if INTERLEAVE
+  return base + (NUMPLYS*v) + ply;
+#else
+  return base + (ply * PLYVARS) + v;
+#endif
+}
+
+int EAH::vidx(int ply, int v)
+{
+  return vidx_base(BASE,ply,v);
+}
+
+bdd EAH::var(int ply, int v)
+{
+  int idx = vidx(ply,v);
+  return bdd_ithvar(idx);
+}
+
+bdd EAH::nvar(int ply, int v)
+{
+  int idx = vidx(ply,v);
+  return bdd_nithvar(idx);
 }
 
 /** @return the relation {} -> {} */
 bdd EAH::empty()
 {
   assert( EAH::is_initialized() );
-  bdd R = bdd_nithvar(BASE);
-  int max = BASE + PLYVARS * 2;
-  for (int i = BASE + 1 ; i < max ; i++)
-    R = R & bdd_nithvar(i);
+  static int cnt = 0;
+  cnt++;
+  assert( cnt == 1 );
+  bdd R = bddtrue;
+  for (int v = 0; v < PLYVARS ; v++)
+  {
+    R = R & nvar(0,v) & nvar(1,v);
+  }
   return R;
 }
 
@@ -532,37 +629,39 @@ bdd EAH::empty()
 bdd EAH::identity()
 {
   assert( EAH::is_initialized() );
+  static int cnt = 0;
+  cnt++;
+  assert( cnt == 1 );
+  //*waliErr << "EAH::BASE = " << EAH::BASE << endl;
   bdd R = bddtrue;
   for (int v=0; v < PLYVARS; v++)
   {
-    R = R & 
-      bdd_biimp(
-          bdd_ithvar( vn(0,v) ),
-          bdd_ithvar( vn(1,v) ) );
+    R = R & bdd_biimp( var(0,v),var(1,v) );
   }
   return R;
 }
 
-/** @return relation (R,RH,U,AH,L) -> (\empty,\empty^k,\empty,\empty^k,L) */
+/** @return relation (q,R,RH,U,AH,L) -> (q,\empty,\empty^k,\empty,\empty^k,L) */
 bdd EAH::transition()
 {
   assert( EAH::is_initialized() );
   EAH ID = Id();
   bdd R = ID.R;
+#if 0
   // Unset all vars except the last set of locks L
-  for (int v = 0 ; v < PLYVARS-LOCKS ; v++)
+  for (int v = QVARS ; v < PLYVARS-LOCKS ; v++)
   {
     R = unset( R , 1 , v );
   }
-#if 0
-  // This is a slower but more methodical way of doing the above
+#endif
+  // This a slower more methodical way of doing the above
   for (int li = 0; li < LOCKS ; li++)
   {
     // (1) l \notin R'
-    bdd li_notin_R = unset( ID.R , 1 , get_l_in_R(li) );
+    bdd li_notin_R = unset( ID.R , 1 , get_lock_in_R(li) );
     R = compose(R,li_notin_R);
     // (2) l \notin U'
-    bdd li_notinU = unset( ID.R , 1 , get_l_in_U(li) );
+    bdd li_notinU = unset( ID.R , 1 , get_lock_in_U(li) );
     R = compose(R,li_notinU);
     // (3) AH'[i] = \emptyset
     //     RH'[i] = \emptyset
@@ -574,23 +673,20 @@ bdd EAH::transition()
       R = compose( R , unset_lj_in_RHi );
     }
   }
-#endif
   return R;
 }
 
 /* Return relation R[true/(b \in ply)] */
 bdd EAH::set(bdd R, int ply, int b)
 {
-  int var = vn(ply,b);
-  bdd x = bdd_ithvar(var);
+  bdd x = var(ply,b);
   return bdd_exist(R,x) & x;
 }
 
 /* Return relation R[false/(b \in ply)] */
 bdd EAH::unset(bdd R, int ply, int b)
 {
-  int var = vn(ply,b);
-  return bdd_exist(R,bdd_ithvar(var)) & bdd_nithvar(var);
+  return bdd_exist(R,var(ply,b)) & nvar(ply,b);
 }
 
 /* Relation composition of R1 and R2 */
@@ -602,19 +698,21 @@ bdd EAH::compose(bdd R1, bdd R2)
   return bdd_replace( tmp , shift32 );
 }
 
-// A PLY is I : RH_1...RH_{LOCKS} : L : AH_0 ... AH_{LOCKS}
 int EAH::get_rh_start(int lock)
 {
-  // PLY is (R,RH,U,AH,L)
-  return (LOCKS       + // skip R
+  // PLY is (q,R,RH,U,AH,L)
+  return (
+      QVARS       + // skip q 
+      LOCKS       + // skip R
       (LOCKS * lock));  // Get start of RH[lock]
 }
 
-// A PLY is I : RH_1...RH_{LOCKS} : L : AH_0 ... AH_{LOCKS}
 int EAH::get_ah_start(int lock)
 {
-  // PLY is (R,RH,U,AH,L)
-  return (LOCKS       + // skip R
+  // PLY is (q,R,RH,U,AH,L)
+  return (
+      QVARS           + // skip q
+      LOCKS           + // skip R
       (LOCKS * LOCKS) + // skip RH
       LOCKS           + // skip U
       (LOCKS * lock));  // Get start of AH[lock]
@@ -623,29 +721,86 @@ int EAH::get_ah_start(int lock)
 int EAH::get_lock_in_L( int lock )
 {
   // Skip over I and RH_is, and add lock number
-  // PLY is (R,RH,U,AH,L)
-  return PLYVARS - LOCKS + lock;
+  // PLY is (q,R,RH,U,AH,L)
+  return (
+      QVARS           + // skip q
+      LOCKS           + // skip R
+      (LOCKS * LOCKS) + // skip RH
+      LOCKS           + // skip U
+      (LOCKS * LOCKS) + // skip AH
+      + lock
+      );  
 }
 
 int EAH::get_lock_in_R( int lock )
 {
-  return lock;
+  return 
+    QVARS + // skip q
+    lock;
 }
 
 int EAH::get_lock_in_U( int lock )
 {
-  return (LOCKS       + // skip over R
+  return (
+      QVARS           + // skip q
+      LOCKS           + // skip over R
       (LOCKS * LOCKS) + // skip over RH
       lock);
 }
 
+void EAH::print_q( int ply, bdd r)
+{
+  std::cout << "q:";
+  for( int bit = 0; bit < QVARS ; bit++)
+  {
+    bdd yes = var(ply,bit);
+    bdd no = nvar(ply,bit);
+    if ((r & yes) != bddfalse)
+    {
+      if ((r&no) != bddfalse)
+        std::cout << "*";
+      else
+        std::cout << "1";
+    }
+    else if ((r & no) != bddfalse)
+      std::cout << "0";
+  }
+  std::cout << ":";
+}
+
+/** @return bdd with bits set to represent q */
+bdd EAH::q_in_ply( int q, int ply )
+{
+  assert( check_q(q) );
+  bdd r = bddtrue;
+  int shift = q;
+  for(int bit = 0; bit < QVARS ; bit++)
+  {
+    if (shift & 0x1)
+      r = r & var(ply,bit);
+    else
+      r = r & nvar(ply,bit);
+    shift >>= 1;
+  }
+  //std::cout << "q" << q << " == ";
+  //print_q(ply,r);
+  //std::cout << std::endl;
+  return r;
+}
+
+
 bdd EAH::acquire_lock( int lock )
 {
   assert(check_lock(lock));
+  static int cnt = 0;
+  cnt++;
+  assert( cnt <= LOCKS );
   EAH ID = Id();
 
   // (1) li \notin L
-  bdd notinL = ID.R & bdd_nithvar( vn(0,get_lock_in_L(lock)));
+  bdd notinL = ID.R & nvar(0,get_lock_in_L(lock));
+  // (1') li \notin AH[i]
+  notinL = notinL & nvar(0,get_ah_start(lock)+lock);
 
   // (2) L' = L \cup {lock}
   bdd set_lock = set( notinL , 1 , get_lock_in_L(lock) );
@@ -654,7 +809,7 @@ bdd EAH::acquire_lock( int lock )
   bdd R = set_lock;
   for (int l = 0 ; l < LOCKS ; l++)
   {
-    bdd if_l_in_L = bdd_ithvar( vn( 0 , get_lock_in_L(l) ) );
+    bdd if_l_in_L = var(0,get_lock_in_L(l));
 
     bdd lock_in_AH_l = set( ID.R , 1 , get_ah_start(l)+lock );
 
@@ -671,6 +826,9 @@ bdd EAH::acquire_lock( int lock )
 bdd EAH::release_lock( int li )
 {
   assert(check_lock(li));
+  static int cnt = 0;
+  cnt++;
+  assert( cnt <= LOCKS );
   EAH ID = Id();
   // case 1: li \in AH[i]
   //   R'        = R
@@ -682,7 +840,7 @@ bdd EAH::release_lock( int li )
   //   L' = L \ {li}
   //
   // (1) li \in AH[i]
-  bdd inAHi = ID.R & bdd_ithvar( vn(0,get_ah_start(li)+li));
+  bdd inAHi = ID.R & var(0,get_ah_start(li)+li);
   // (2) U' = U \cup {li}
   bdd setU = set( inAHi, 1 , get_lock_in_U(li) );
   // (3) AH[i] == \emptyset
@@ -707,15 +865,15 @@ bdd EAH::release_lock( int li )
   //  L' = L \ {li}
   //
   // (1) li \notin AH[i]
-  bdd notinAHi = ID.R & bdd_nithvar( vn(0,get_ah_start(li)+li));
+  bdd notinAHi = ID.R & nvar(0,get_ah_start(li)+li);
   // (2) R' = R \cup {li}
   bdd set_li_in_R = set(notinAHi, 1, get_lock_in_R(li));
   // (3) RH'[i] = {li} \cup U \cup R
   bdd r3 = set_li_in_R;
   for (int l = 0 ; l < LOCKS ; l++)
   {
-    bdd if_l_in_U = bdd_ithvar( vn( 0 , get_lock_in_U(l) ) );
-    bdd if_l_in_R = bdd_ithvar( vn( 0 , get_lock_in_R(l) ) );
+    bdd if_l_in_U = var(0,get_lock_in_U(l));
+    bdd if_l_in_R = var( 0 , get_lock_in_R(l) );
     bdd l_in_RHi = set( ID.R , 1 , get_rh_start(li)+l );
     bdd add_l_to_AHi = 
       bdd_ite( 
@@ -729,7 +887,7 @@ bdd EAH::release_lock( int li )
   bdd F = compose( r3 , unset_li_in_L );
   
   // Now do the switch.
-  bdd if_li_in_AHi = bdd_ithvar( vn(0,get_ah_start(li)+li));
+  bdd if_li_in_AHi = var( 0,get_ah_start(li)+li);
   bdd R = bdd_ite( if_li_in_AHi, T, F );
   return R;
 
@@ -739,11 +897,27 @@ void EAH::printPly(char* v, int size, int ply)
 {
   using namespace std;
   std::stringstream ss;
-  assert(size == NUMVARS);
-  assert((0<=ply) && (ply < 3));
-  // for R, RH_1 , ... , RH_{LOCKS} , U , AH_1 , ... , AH_{LOCKS}, L
-  int plybegin = BASE + (ply * PLYVARS);
-  // A ply has (3+2*|LOCKS|) sets of vars of size |LOCKS|
+  // for q , R, RH_1 , ... , RH_{LOCKS} , U , AH_1 , ... , AH_{LOCKS}, L
+  // A ply has:
+  //   1. QVARS
+  //   2. (3+2*|LOCKS|) sets of vars of size |LOCKS|
+  ss << "q:";
+  for (int bit = 0; bit < QVARS; bit++)
+  {
+    switch(v[vidx(ply,bit)])
+    {
+      case -1:
+        ss << "*";
+        break;
+      case 1:
+        ss << '1';
+        break;
+      case 0:
+        ss << '0';
+        break;
+    }
+  }
+  ss << ":";
   for (int i = 0 ; i < (3+(2*LOCKS)) ; i++)
   {
     // for lock l \in [0,LOCKS)
@@ -758,7 +932,8 @@ void EAH::printPly(char* v, int size, int ply)
     }
     for (int l = 0; l < LOCKS ; l++)
     {
-      int offset = plybegin + (i*LOCKS + l);
+      int vnum = i*LOCKS + l + QVARS;
+      int offset = vidx(ply,vnum);
       assert(offset < size);
       if (v[offset]) {
         if (first)
@@ -804,7 +979,8 @@ void EAH::printEAH(std::ostream& o , bdd R, bool subID)
   EAH x(R);
   if (x.is_id())
     o << "  ID"    << endl;
-  else if (x.is_null())
+  else 
+    if (x.is_null())
     o << "  NULL"  << endl;
   else if (x.is_empty())
     o << "  EMPTY" << endl;
@@ -823,7 +999,7 @@ void EAH::printEAH(std::ostream& o , bdd R, bool subID)
       }
     }
     if (subID)
-      bdd_allsat((R - identity()),printHandler);
+      bdd_allsat((R - Id().R),printHandler);
     else
       bdd_allsat(R,printHandler);
   }

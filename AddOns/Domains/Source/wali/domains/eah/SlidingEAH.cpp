@@ -1,6 +1,6 @@
 /**
  * @author Nicholas Kidd
- * @version $Id: SlidingEAH.cpp 588 2009-01-14 17:45:58Z kidd $
+ * @version $Id: SlidingEAH.cpp 612 2009-01-16 06:13:59Z kidd $
  */
 
 #include "wali/Common.hpp"
@@ -36,14 +36,14 @@ bool SlidingEAH::is_initialized()
   return (EAH::is_initialized() && (PHASES != -1));
 }
 
-bool SlidingEAH::initialize( int locks , int phases )
+bool SlidingEAH::initialize( int locks , int phases, int Q )
 {
   if (phases < 1) {
     *waliErr << "[ERROR] Must have at least one phase." << endl << endl;
     assert(false);
     return false;
   }
-  assert( EAH::allocate(locks) );
+  assert( EAH::allocate(locks,Q) );
   PHASES = phases;
   // Set total number of plys to be 3 + (PHASES-1)
   // This allows for (PHASES-1) phase changes.
@@ -73,6 +73,7 @@ bool SlidingEAH::initialize( int locks , int phases )
       for (int i=0 ; i < EAH::PLYVARS ; i++)
       {
         // PLY_n -> PLY_{m}
+        //bdd_setpair( p  , Ply_n + i , Ply_m + i );
         bdd_setpair( p  , Ply_n + i , Ply_m + i );
       }
     }
@@ -341,7 +342,6 @@ bool SlidingEAH::Compatible( std::vector< SlidingEAH >& v )
   bdd a3 = EAH_checker;
   for (int i = 0 ; i < N ; i++)
   {
-    bdd C = bdd_exist(EAH_checker,*EAH::pply2);
     const int C_i = EAH::PLYVARS * i;
     // First shift C1j into position
     for (int j = i+1 ; j < N ; j++)
@@ -519,7 +519,7 @@ SlidingEAH SlidingEAH::operator*( const SlidingEAH& that) const
 
     // E.g., from __DRS -> __RTS
     EAH for_phaseX(masked);
-    EAH phaseX = for_phaseX.Transition();
+    EAH phaseX = for_phaseX.Transition(1,2); // TODO NEW
     { // DEBUGGING CODE
       assert( invariant_check( phaseX.R , 0 ) );
     }

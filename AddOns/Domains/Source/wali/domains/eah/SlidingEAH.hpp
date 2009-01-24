@@ -58,10 +58,12 @@ namespace wali
           static bool is_initialized();
 
           /**
-           * Initialize the SlidingEAH domain with [locks] locks
-           * and [phases] phases.
+           * Initialize the SlidingEAH domain with 
+           * [locks] locks
+           * [phases] phases
+           * [Q] states in the PA
            */
-          static bool initialize( int locks , int phases );
+          static bool initialize( int locks , int phases, int Q );
 
           /**
            * Empty Phased EAH is a vector of EAH::Empty().

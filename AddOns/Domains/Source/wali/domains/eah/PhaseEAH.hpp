@@ -1,5 +1,5 @@
-#ifndef wali_domains_eah_EAH_GUARD
-#define wali_domains_eah_EAH_GUARD 1
+#ifndef wali_domains_eah_PhaseEAH_GUARD
+#define wali_domains_eah_PhaseEAH_GUARD 1
 
 /**
  * @author Nicholas Kidd
@@ -17,8 +17,11 @@
 
  */
 
-#include "bdd.h"
 #include <iostream>
+#include <vector>
+
+#include "bdd.h"
+
 #include "wali/Common.hpp"
 
 namespace wali
@@ -27,14 +30,13 @@ namespace wali
   {
     namespace eah
     {
-      class EAH
+      class PhaseEAH
       {
         public:
-          friend class SlidingEAH;
-          friend class PhaseEAH;
+          /** Whether to do the integrity checks */
+          static bool DO_INV_CHECK;
 
-        public:
-          /** The maximum number of locks EAH can handle */
+          /** The maximum number of locks PhaseEAH can handle */
           static const int MAX_LOCKS;
 
           /** @return number of bdd vars to represent v */
@@ -43,37 +45,41 @@ namespace wali
           /** @return number of locks */
           static int get_lock_count();
           
-          /** @return true if EAH::initialize succeeded */
+          /** @return true if PhaseEAH::initialize succeeded */
           static bool is_initialized();
           
           /** 
-           * Initialize the EAH domain with [num_locks] locks.
+           * Initialize the PhaseEAH domain with [num_locks] locks.
            * [Q] is the number of states in the phase automaton.
            * @return true on success.
-           * @see EAH::allocate
-           * @see EAH::init_vars
+           * @see PhaseEAH::allocate
+           * @see PhaseEAH::init_vars
            */
-          static bool initialize( int num_locks, int Q );
+          static bool initialize( int num_locks, int phases, int Q=-1 );
 
           /** @return {} -> {} */
-          static EAH Empty();
+          static PhaseEAH Empty();
 
-          /** @return \EAH . EAH */
-          static EAH Id();
+          /** @return \PhaseEAH . PhaseEAH */
+          static PhaseEAH Id();
 
-          /** @return \EAH . false */
-          static EAH Null();
+          /** @return \PhaseEAH . false */
+          static PhaseEAH Null();
 
-          /** @return \EAH -> EAH + [lock] */
-          static EAH Acquire(int lock);
+          /** @return \PhaseEAH -> PhaseEAH + [lock] */
+          static PhaseEAH Acquire(int lock, int p=0);
 
-          /** @return \EAH -> EAH - [lock] */
-          static EAH Release(int lock);
+          /** @return \PhaseEAH -> PhaseEAH - [lock] */
+          static PhaseEAH Release(int lock, int p=0);
+
+          /** @return the Transition PhaseEAH */
+          static PhaseEAH Transition(int q1, int q2);
 
         public:
-          EAH(const EAH& that);
-          virtual ~EAH();
+          PhaseEAH(const PhaseEAH& that);
+          virtual ~PhaseEAH();
 
+          std::ostream& prettyPrint( std::ostream& o ) const;
           std::ostream& print( std::ostream& o ) const;
 
           /** Print only difference with ID */
@@ -83,7 +89,7 @@ namespace wali
               bool subID=false) const;
 
           /** @return [this] == [that]  */
-          bool is_equal(const EAH& that) const;
+          bool is_equal(const PhaseEAH& that) const;
 
           /** @return [this] == Id()    */
           bool is_id() const;
@@ -94,41 +100,35 @@ namespace wali
           /** @return [this] == Null()  */
           bool is_null() const;
 
-          /** @return composition of [this] and [that] */
-          EAH Compose( const EAH& that ) const;
-
-          /** @return intersection of [this] and [that] */
-          EAH Intersect( const EAH& that ) const;
-
-          /** @return the Transition EAH */
-          EAH Transition(int q1, int q2) const;
-
-          /** @return union of [this] and [that] */
-          EAH Union( const EAH& that ) const;
-
-          /** @return true if Compatible([this],[that]) */
-          bool Compatible( const EAH& that);
-
           /** @return Union of [this] and [that] */
-          EAH operator|(const EAH& that) const;
+          PhaseEAH operator|(const PhaseEAH& that) const;
 
           /** @return Compose of [this] and [that] */
-          EAH operator*(const EAH& that) const;
+          PhaseEAH operator*(const PhaseEAH& that) const;
 
           /** @return Intersect of [this] and [that] */
-          EAH operator&(const EAH& that) const;
+          PhaseEAH operator&(const PhaseEAH& that) const;
 
           /** @return true if [this] equals [that] */
-          bool operator==(const EAH& that) const;
+          bool operator==(const PhaseEAH& that) const;
+
+          /** 
+           * @return true if there exists a path {p1 \in t1}
+           *  and {p2 \in t2} such that Compatible(p1,p2).
+           */
+          static bool Compatible( PhaseEAH t1, PhaseEAH t2 );
+
+          /** @return true iff Compatible(p \in [v]) */
+          static bool Compatible( std::vector< PhaseEAH >& v );
 
         private: // Helper methods
-          /** Initialize buddy and allocate DxRxS vars */
-          static bool allocate( int num_locks, int Q );
+          /** Initialize buddy and allocate (phases+2)*D vars */
+          static bool allocate( int num_locks, int phases, int Q );
 
           /** 
            * Initialize the static class vars.
-           * Seperated out so that EAH::BASE could be 
-           * adjusted for SlidingEAH.
+           * Seperated out so that PhaseEAH::BASE could be 
+           * adjusted for SlidingPhaseEAH.
            */
           static bool init_vars();
 
@@ -141,6 +141,7 @@ namespace wali
           /** @return index for var [v] in ply [ply] */
           static int vidx_base(int base, int ply, int v);
           static int vidx(int ply, int v);
+          static int cidx(int N, int proc , int phase , int v);
 
           /** @return BDD for var [v] in ply [ply] */
           static bdd var(int ply, int v);
@@ -154,17 +155,11 @@ namespace wali
           /** @return the relation forall S -> S. I.e., \lam S.S */
           static bdd identity();
 
-          /** @return relation \I E L A -> L \empty L A */
-          static bdd transition();
-
           /** @return relation R[true/(b \in ply)] */
           static bdd set(bdd R, int ply, int b);
 
           /** @return relation R[false/(b \in ply)] */
           static bdd unset(bdd R, int ply, int b);
-
-          /** @return relational composition of R1 and R2 */
-          static bdd compose(bdd R1, bdd R2);
 
           /**
            * @return starting index for the set of vars
@@ -197,22 +192,16 @@ namespace wali
           static void print_q( int ply, bdd r);
           static bdd q_in_ply( int q, int ply );
 
-          /**
-           * @return bdd for acquiring lock [lock].
-           */
-          static bdd acquire_lock( int lock );
-
-          /**
-           * @return bdd for releasing lock [lock].
-           */
-          static bdd release_lock( int lock );
-
-          static void printPly(char* v, int size, int ply);
           static void printHandler(char* v, int size);
-          static void printEAH(
+          static void printPhaseEAH(
               std::ostream& o,
               bdd R,
               bool subID=false);
+
+          /** Verify integrity of PhaseEAH bdd */
+          static bool invariant_check( bdd X , int phaseX );
+
+          static void print_r_compat(char* v, int size);
 
         private: // static vars
 
@@ -221,6 +210,9 @@ namespace wali
 
           /** The number of locks in the program */
           static int LOCKS;
+
+          /** The number of phases in the program */
+          static int PHASES;
 
           /** The number of states in the PA */
           static int Q;
@@ -234,7 +226,9 @@ namespace wali
            */
           static int PLYVARS;
 
-          /** Defaults to 3. Modified by PhaseEAH */
+          /** Number of plies to represent a PhaseEAH.
+           *  Equal to PHASES + 2
+           */
           static int NUMPLYS;
 
           /** 
@@ -250,29 +244,27 @@ namespace wali
 
           /** shift plys to the left */
           static bddPair* shiftleft;
+          
+          /** Point to BDDs that select plys */
+          static bdd* ply_selectors;
+          
+          /** array of bddPairs that shift all vars left starting
+           * in ply [ply]. */ 
+          static bddPair** left_from_ply;
 
-          /** shift ply 3 to ply 2 */
-          static bddPair* shift32;
+          /** For printing a PhaseEAH, we have to
+           * pass the phase number to a static function */
+          static int kludge;
 
-          /** Pointers to BDDs denoting all vars in a ply */
-          static bdd* pply1;
-          static bdd* pply2;
-          static bdd* pply3;
+          static int N;
 
-          /** Array of BDDs for acquiring locks */
-          static bdd* R_acquires;
-
-          /** Array of BDDs for releasing locks */
-          static bdd* R_releases;
-
-          /** Pointer to BDD that checks compatability */
-          static bdd* R_checker;
-
-        private: // instance stuff
-          EAH( bdd R );
+        //private: // instance stuff
+        public: // instance stuff
+          PhaseEAH( bdd R , int phaseX );
           bdd R;
+          int phaseX;
 
-      }; // class EAH
+      }; // class PhaseEAH
 
     } // namespace eah
 
@@ -281,8 +273,8 @@ namespace wali
 } // namespace wali
 
 
-std::ostream& operator<<(std::ostream&, const wali::domains::eah::EAH& eah);
+std::ostream& operator<<(std::ostream&, const wali::domains::eah::PhaseEAH& eah);
 
-#endif  // wali_domains_eah_EAH_GUARD
+#endif  // wali_domains_eah_PhaseEAH_GUARD
 
 
