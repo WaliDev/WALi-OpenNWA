@@ -22,9 +22,9 @@
 #include <iomanip>
 #include <cassert>
 
-#include "wali/domains/eah/AH.hpp"
+#include "wali/domains/lh/AH.hpp"
 
-using namespace wali::domains::eah;
+using namespace wali::domains::lh;
 using wali::waliErr;
 
 const int AH::MAX_LOCKS = 3;

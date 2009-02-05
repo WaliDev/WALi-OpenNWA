@@ -1,6 +1,6 @@
 /**
  * @author Nicholas Kidd
- * @version $Id: PhaseEAH.cpp 617 2009-01-16 23:23:40Z kidd $
+ * @version $Id: PhaseLH.cpp 617 2009-01-16 23:23:40Z kidd $
  */
 
 /**
@@ -111,33 +111,33 @@ post((R,RH,U,AH,L),a) = (R',RH',U',AH',L'), where
 #include <iomanip>
 #include <cassert>
 
-#include "wali/domains/eah/EAH.hpp"
-#include "wali/domains/eah/PhaseEAH.hpp"
+#include "wali/domains/lh/EAH.hpp"
+#include "wali/domains/lh/PhaseLH.hpp"
 
-using namespace wali::domains::eah;
+using namespace wali::domains::lh;
 using wali::waliErr;
 using std::cout;
 using std::endl;
 
-const int PhaseEAH::MAX_LOCKS     = 4;
-bool PhaseEAH::DO_INV_CHECK       = true;
-int PhaseEAH::BASE                = -1;
-int PhaseEAH::LOCKS               = -1;
-int PhaseEAH::PHASES              = -1;
-int PhaseEAH::Q                   = -1;
-int PhaseEAH::QVARS               = -1;
-int PhaseEAH::NUMPLYS             = -1;
-int PhaseEAH::PLYVARS             = -1;
-int PhaseEAH::NUMVARS             = -1;
-bddPair* PhaseEAH::shiftright     = 0;
-bddPair* PhaseEAH::shiftleft      = 0;
-bdd* PhaseEAH::ply_selectors      = 0;
-bddPair** PhaseEAH::left_from_ply = 0;
-int PhaseEAH::kludge              = -1;
-int PhaseEAH::N                   = -1;
+const int PhaseLH::MAX_LOCKS     = 4;
+bool PhaseLH::DO_INV_CHECK       = true;
+int PhaseLH::BASE                = -1;
+int PhaseLH::LOCKS               = -1;
+int PhaseLH::PHASES              = -1;
+int PhaseLH::Q                   = -1;
+int PhaseLH::QVARS               = -1;
+int PhaseLH::NUMPLYS             = -1;
+int PhaseLH::PLYVARS             = -1;
+int PhaseLH::NUMVARS             = -1;
+bddPair* PhaseLH::shiftright     = 0;
+bddPair* PhaseLH::shiftleft      = 0;
+bdd* PhaseLH::ply_selectors      = 0;
+bddPair** PhaseLH::left_from_ply = 0;
+int PhaseLH::kludge              = -1;
+int PhaseLH::N                   = -1;
 
 
-int PhaseEAH::getln(int v)
+int PhaseLH::getln(int v)
 {
   int acc = 0;
   int orig = v;
@@ -149,7 +149,7 @@ int PhaseEAH::getln(int v)
   return (orig&0x1) ? (acc+1) : acc;
 }
 
-bool PhaseEAH::is_initialized()
+bool PhaseLH::is_initialized()
 {
   return (LOCKS != -1);
 }
@@ -157,15 +157,15 @@ bool PhaseEAH::is_initialized()
 static void my_error_handler(int errcode)
 {
 
-  *wali::waliErr << "[BuDDy ERROR] In PhaseEAH : " << bdd_errstring(errcode) << std::endl;
+  *wali::waliErr << "[BuDDy ERROR] In PhaseLH : " << bdd_errstring(errcode) << std::endl;
   throw errcode;
 }
 
-bool PhaseEAH::allocate( int num_locks, int phases , int theQ )
+bool PhaseLH::allocate( int num_locks, int phases , int theQ )
 {
   if (is_initialized())
   {
-    *waliErr << "[WARNING] PhaseEAH is already initialized." << endl;
+    *waliErr << "[WARNING] PhaseLH is already initialized." << endl;
     return false;
   }
   if (num_locks < 0)
@@ -207,7 +207,7 @@ bool PhaseEAH::allocate( int num_locks, int phases , int theQ )
   PLYVARS  = QVARS + 3*LOCKS + 2*(LOCKS*LOCKS); // @see description above
   NUMPLYS  = PHASES + 2;                // @see description above
   NUMVARS  = PLYVARS * NUMPLYS;      // Total number of vars
-  cout << "[INFO] PhaseEAH.\n";
+  cout << "[INFO] PhaseLH.\n";
   cout << "  #LOCKS   = " << LOCKS << ";\n"; 
   cout << "  #PHASES  = " << PHASES << ";\n";
   cout << "  #Q       = " << Q << ";\n";
@@ -228,7 +228,7 @@ bool PhaseEAH::allocate( int num_locks, int phases , int theQ )
   return true;
 }
 
-bool PhaseEAH::init_vars()
+bool PhaseLH::init_vars()
 {
 
   // ////////////////////////
@@ -292,56 +292,56 @@ bool PhaseEAH::init_vars()
   return true;
 }
 
-bool PhaseEAH::initialize( int num_locks, int phases, int Q )
+bool PhaseLH::initialize( int num_locks, int phases, int Q )
 {
   if (Q == -1)
     Q = phases;
-  assert( PhaseEAH::allocate(num_locks,phases,Q) );
-  assert( PhaseEAH::init_vars() );
+  assert( PhaseLH::allocate(num_locks,phases,Q) );
+  assert( PhaseLH::init_vars() );
   return true;
 }
 
-PhaseEAH::PhaseEAH( const PhaseEAH& that )
+PhaseLH::PhaseLH( const PhaseLH& that )
   : R(that.R), phaseX(that.phaseX)
 {
   invariant_check(R,phaseX);
 }
 
 
-PhaseEAH::~PhaseEAH()
+PhaseLH::~PhaseLH()
 {
 }
 
-PhaseEAH PhaseEAH::Empty()
+PhaseLH PhaseLH::Empty()
 {
   static bdd R = EAH::Empty().R;
-  return PhaseEAH( R,0 );
+  return PhaseLH( R,0 );
 }
 
-PhaseEAH PhaseEAH::Id()
+PhaseLH PhaseLH::Id()
 {
   static bdd R = EAH::Id().R;
-  return PhaseEAH(R,0);
+  return PhaseLH(R,0);
 }
 
-PhaseEAH PhaseEAH::Null()
+PhaseLH PhaseLH::Null()
 {
-  return PhaseEAH(bddfalse,0);
+  return PhaseLH(bddfalse,0);
 }
 
-PhaseEAH PhaseEAH::Acquire(int lock, int i ATTR_UNUSED)
-{
-  assert(check_lock(lock));
-  return PhaseEAH(EAH::R_acquires[lock],0);
-}
-
-PhaseEAH PhaseEAH::Release(int lock, int i ATTR_UNUSED)
+PhaseLH PhaseLH::Acquire(int lock, int i ATTR_UNUSED)
 {
   assert(check_lock(lock));
-  return PhaseEAH(EAH::R_releases[lock],0);
+  return PhaseLH(EAH::R_acquires[lock],0);
 }
 
-PhaseEAH PhaseEAH::Transition( int q1 , int q2 )
+PhaseLH PhaseLH::Release(int lock, int i ATTR_UNUSED)
+{
+  assert(check_lock(lock));
+  return PhaseLH(EAH::R_releases[lock],0);
+}
+
+PhaseLH PhaseLH::Transition( int q1 , int q2 )
 {
   // (1) Start in ply 0 and ply 1
   // (q1,R,RH,U,AH,L) -> (q1,R',RH',U',AH',L')
@@ -357,50 +357,50 @@ PhaseEAH PhaseEAH::Transition( int q1 , int q2 )
   // (4) logically and id and r3
   bdd r4 = id.R & r3;
 
-  // (5) Return PhaseEAH with 1 transition
-  return PhaseEAH(r4,1);
+  // (5) Return PhaseLH with 1 transition
+  return PhaseLH(r4,1);
 }
 
-std::ostream& PhaseEAH::prettyPrint( std::ostream& o ) const
+std::ostream& PhaseLH::prettyPrint( std::ostream& o ) const
 {
   return print(o);
 }
 
-std::ostream& PhaseEAH::print( std::ostream& o ) const
+std::ostream& PhaseLH::print( std::ostream& o ) const
 {
   assert( kludge == -1 );
   kludge = phaseX;
-  printPhaseEAH(o,R);
+  printPhaseLH(o,R);
   o << endl;
   kludge = -1;
   return o;
 }
 
-bool PhaseEAH::is_equal( const PhaseEAH& that) const
+bool PhaseLH::is_equal( const PhaseLH& that) const
 {
   return (R == that.R);
 }
 
-bool PhaseEAH::is_id() const
+bool PhaseLH::is_id() const
 {
   return is_equal(Id());
 }
 
-bool PhaseEAH::is_empty() const
+bool PhaseLH::is_empty() const
 {
   return is_equal(Empty());
 }
 
-bool PhaseEAH::is_null() const
+bool PhaseLH::is_null() const
 {
   return is_equal(Null());
 }
 
 /** @return composition of [this] and [that] */
-PhaseEAH PhaseEAH::operator*( const PhaseEAH& that ) const
+PhaseLH PhaseLH::operator*( const PhaseLH& that ) const
 {
   //bdd X = compose(R,that.R);
-  //return PhaseEAH(X);
+  //return PhaseLH(X);
   int pX = phaseX + that.phaseX;
   if (pX >= PHASES)
   {
@@ -418,14 +418,14 @@ PhaseEAH PhaseEAH::operator*( const PhaseEAH& that ) const
   {
     r1 = bdd_replace(r1,shiftright);
     accum++;
-    PhaseEAH tmp(r1,accum);
+    PhaseLH tmp(r1,accum);
   }
-  //PhaseEAH t8(r1,accum);
+  //PhaseLH t8(r1,accum);
   //t8.print(*waliErr << "R1 ~~>\n") << endl;
 
   // (2) Do the composition
   bdd r2 = bdd_relprod(R,r1,ply_selectors[target_ply]);
-  //PhaseEAH tmp(r2,phaseX+that.phaseX+1);
+  //PhaseLH tmp(r2,phaseX+that.phaseX+1);
   //tmp.print(*waliErr<< "r2:\n");
   //*waliErr << "---------------\n";
 
@@ -436,59 +436,59 @@ PhaseEAH PhaseEAH::operator*( const PhaseEAH& that ) const
   bdd r3 = bdd_replace(r2,left_from_ply[ (target_ply+1) ] );
 
   //*waliErr << "New phaseX = " << phaseX + that.phaseX << endl;
-  PhaseEAH p3( r3, (phaseX+that.phaseX) );
+  PhaseLH p3( r3, (phaseX+that.phaseX) );
   //p3.print(*waliErr<< "p3:\n");
   //*waliErr << "---------------\n";
   return p3;
 }
 
 /** @return intersection of [this] and [that] */
-PhaseEAH PhaseEAH::operator&( const PhaseEAH& that ) const
+PhaseLH PhaseLH::operator&( const PhaseLH& that ) const
 {
   if (phaseX != that.phaseX)
   {
-    std::cout << "[ Error in PhaseEAH::operator& ] Mismatched phase changes.\n";
+    std::cout << "[ Error in PhaseLH::operator& ] Mismatched phase changes.\n";
     print( std::cout << "THIS---\n" ) << std::endl;
     that.print( std::cout << "THAT---\n") << std::endl;
     assert( false );
   }
-  return PhaseEAH( (R & that.R),phaseX );
+  return PhaseLH( (R & that.R),phaseX );
 }
 
 /** @return union of [this] and [that] */
-PhaseEAH PhaseEAH::operator|( const PhaseEAH& that ) const
+PhaseLH PhaseLH::operator|( const PhaseLH& that ) const
 {
   if (phaseX != that.phaseX)
   {
-    std::cout << "[ Error in PhaseEAH::operator| ]\n";
+    std::cout << "[ Error in PhaseLH::operator| ]\n";
     print( std::cout << "THIS---\n" ) << std::endl;
     that.print( std::cout << "THAT---\n") << std::endl;
     assert( false );
   }
-  return PhaseEAH( (R | that.R),phaseX );
+  return PhaseLH( (R | that.R),phaseX );
 }
 
-bool PhaseEAH::operator==(const PhaseEAH& that) const
+bool PhaseLH::operator==(const PhaseLH& that) const
 {
   return R == that.R;
 }
 
 /** @return true if Compatible([this],[that]) */
-bool PhaseEAH::Compatible( PhaseEAH t1, PhaseEAH t2 )
+bool PhaseLH::Compatible( PhaseLH t1, PhaseLH t2 )
 {
-  std::vector<PhaseEAH> v;
+  std::vector<PhaseLH> v;
   v.push_back(t1);
   v.push_back(t2);
   return Compatible(v);
 }
 
-bool PhaseEAH::Compatible( std::vector< PhaseEAH >& v )
+bool PhaseLH::Compatible( std::vector< PhaseLH >& v )
 {
-  assert( PhaseEAH::is_initialized() );
+  assert( PhaseLH::is_initialized() );
   N = v.size();
   const int Q = PHASES;
   std::stringstream message;
-  message << "PhaseEAH::Compatible(vector< SlidingEAH >)";
+  message << "PhaseLH::Compatible(vector< SlidingEAH >)";
   message << " {N=" << N << " , Q=" << Q << "}.";
   //*waliErr << "[INFO] " << message.str() << endl;
   //wali::util::Timer t(message.str());
@@ -515,7 +515,7 @@ bool PhaseEAH::Compatible( std::vector< PhaseEAH >& v )
 
   // (2) Reorder the vars in the EAH_checker for multiple procs
   //     using cidx.
-  //int PhaseEAH::cidx(int N, int proc , int phase , int v)
+  //int PhaseLH::cidx(int N, int proc , int phase , int v)
   //*waliErr << "#######  Making PA_checker.\n";
   bdd PA_checker = EAH_checker;
   {
@@ -541,7 +541,7 @@ bool PhaseEAH::Compatible( std::vector< PhaseEAH >& v )
   // (3) Make the (C_11...C1n, ... , Cq1...Cqn )
   // 3a. Make the relation (C_11,...C_1n,__ DONT CARE )
   //     to check phase 1 for each process Pi,Pj
-  //int PhaseEAH::cidx(int N, int proc , int phase , int v)
+  //int PhaseLH::cidx(int N, int proc , int phase , int v)
   //*waliErr << "#######  Extending PA_checker to 'N' processes.\n";
   bdd a3 = PA_checker;
   for (int i = 0 ; i < N ; i++)
@@ -591,7 +591,7 @@ bool PhaseEAH::Compatible( std::vector< PhaseEAH >& v )
     assert( a3 == exist );  
   }
 
-  //int PhaseEAH::cidx(int N, int proc , int phase , int v)
+  //int PhaseLH::cidx(int N, int proc , int phase , int v)
   // 3b. Copy (C_11,...,C_1n, into the other phase positions
   //*waliErr << "#######  Duplicating PA_checker.\n";
   bdd b3 = a3;
@@ -636,11 +636,11 @@ bool PhaseEAH::Compatible( std::vector< PhaseEAH >& v )
   bdd rCompatible = b3;
   //bdd_allsat(rCompatible,print_r_compat);
 
-  // 4. Interleave the vector of PhaseEAH's's
+  // 4. Interleave the vector of PhaseLH's's
   std::vector<bdd> fromStart;
   for (size_t idx = 0 ; idx < v.size() ; idx++)
   {
-    PhaseEAH startEmpty = PhaseEAH::Empty() * v[idx];
+    PhaseLH startEmpty = PhaseLH::Empty() * v[idx];
     bdd quant_ply_1 = bdd_exist(startEmpty.R,ply_selectors[0]);
     { // DEBUGGING
       invariant_check( quant_ply_1, PHASES-1 );
@@ -663,7 +663,7 @@ bool PhaseEAH::Compatible( std::vector< PhaseEAH >& v )
     // Ignore E0 b/c it is {}
     for (int ply = 1 ; ply <= PHASES ; ply++)
     {
-      //int PhaseEAH::cidx(int N, int proc , int phase , int v)
+      //int PhaseLH::cidx(int N, int proc , int phase , int v)
       for (int pos = 0 ; pos < PLYVARS ; pos++)
       {
         const int From = vidx(ply,pos);
@@ -681,16 +681,16 @@ bool PhaseEAH::Compatible( std::vector< PhaseEAH >& v )
 }
 
 
-PhaseEAH::PhaseEAH( bdd R,int phaseX ) : R(R),phaseX(phaseX)
+PhaseLH::PhaseLH( bdd R,int phaseX ) : R(R),phaseX(phaseX)
 {
   invariant_check(R,phaseX);
 }
 
-bool PhaseEAH::check_lock(int lock)
+bool PhaseLH::check_lock(int lock)
 {
   if (!is_initialized())
   {
-    *waliErr << "[ERROR] PhaseEAH not initialized" << endl;
+    *waliErr << "[ERROR] PhaseLH not initialized" << endl;
     return false;
   }
   else if ((lock < 0) || (lock >= LOCKS))
@@ -701,11 +701,11 @@ bool PhaseEAH::check_lock(int lock)
   return true;
 }
 
-bool PhaseEAH::check_q( int q )
+bool PhaseLH::check_q( int q )
 {
   if (!is_initialized())
   {
-    *waliErr << "[ERROR] PhaseEAH not initialized" << endl;
+    *waliErr << "[ERROR] PhaseLH not initialized" << endl;
     return false;
   }
   else if ((q < 0) || (q >= Q))
@@ -716,13 +716,13 @@ bool PhaseEAH::check_q( int q )
   return true;
 }
 
-std::ostream& operator<<(std::ostream& o, const PhaseEAH& eah)
+std::ostream& operator<<(std::ostream& o, const PhaseLH& plh)
 {
-  eah.print(o);
+  plh.print(o);
   return o;
 }
 
-int PhaseEAH::vidx_base(int base, int ply, int v)
+int PhaseLH::vidx_base(int base, int ply, int v)
 {
   assert((0<=ply) && (ply < NUMPLYS));
   assert((0<=v)   && (v < PLYVARS));
@@ -733,7 +733,7 @@ int PhaseEAH::vidx_base(int base, int ply, int v)
 #endif
 }
 
-int PhaseEAH::vidx(int ply, int v)
+int PhaseLH::vidx(int ply, int v)
 {
   return vidx_base(BASE,ply,v);
 }
@@ -749,7 +749,7 @@ int PhaseEAH::vidx(int ply, int v)
 // To get to the next phase.
 //   phase index  = PLYVARS * N * phase.
 //   var   offset = v*N + proc 
-int PhaseEAH::cidx(int N, int proc , int phase , int v)
+int PhaseLH::cidx(int N, int proc , int phase , int v)
 {
   assert( (0<=v)      && (v < PLYVARS));
   assert( (0 <= proc) && (proc < N) );
@@ -761,22 +761,22 @@ int PhaseEAH::cidx(int N, int proc , int phase , int v)
 }
 
 
-bdd PhaseEAH::var(int ply, int v)
+bdd PhaseLH::var(int ply, int v)
 {
   int idx = vidx(ply,v);
   return bdd_ithvar(idx);
 }
 
-bdd PhaseEAH::nvar(int ply, int v)
+bdd PhaseLH::nvar(int ply, int v)
 {
   int idx = vidx(ply,v);
   return bdd_nithvar(idx);
 }
 
 /** @return the relation {} -> {} */
-bdd PhaseEAH::empty()
+bdd PhaseLH::empty()
 {
-  assert( PhaseEAH::is_initialized() );
+  assert( PhaseLH::is_initialized() );
   bdd R = bddtrue;
   for (int v = 0; v < PLYVARS ; v++)
   {
@@ -786,9 +786,9 @@ bdd PhaseEAH::empty()
 }
 
 /** @return the relation forall S -> S. I.e., \lam S.S */
-bdd PhaseEAH::identity()
+bdd PhaseLH::identity()
 {
-  assert( PhaseEAH::is_initialized() );
+  assert( PhaseLH::is_initialized() );
   bdd R = bddtrue;
   for (int v=0; v < PLYVARS; v++)
   {
@@ -798,44 +798,44 @@ bdd PhaseEAH::identity()
 }
 
 /* Return relation R[true/(b \in ply)] */
-bdd PhaseEAH::set(bdd R, int ply, int b)
+bdd PhaseLH::set(bdd R, int ply, int b)
 {
   bdd x = var(ply,b);
   return bdd_exist(R,x) & x;
 }
 
 /* Return relation R[false/(b \in ply)] */
-bdd PhaseEAH::unset(bdd R, int ply, int b)
+bdd PhaseLH::unset(bdd R, int ply, int b)
 {
   return bdd_exist(R,var(ply,b)) & nvar(ply,b);
 }
 
-int PhaseEAH::get_rh_start(int lock)
+int PhaseLH::get_rh_start(int lock)
 {
   return EAH::get_rh_start(lock);
 }
 
-int PhaseEAH::get_ah_start(int lock)
+int PhaseLH::get_ah_start(int lock)
 {
   return EAH::get_ah_start(lock);
 }
 
-int PhaseEAH::get_lock_in_L( int lock )
+int PhaseLH::get_lock_in_L( int lock )
 {
   return EAH::get_lock_in_L(lock);
 }
 
-int PhaseEAH::get_lock_in_R( int lock )
+int PhaseLH::get_lock_in_R( int lock )
 {
   return EAH::get_lock_in_R(lock);
 }
 
-int PhaseEAH::get_lock_in_U( int lock )
+int PhaseLH::get_lock_in_U( int lock )
 {
   return EAH::get_lock_in_U(lock);
 }
 
-void PhaseEAH::print_q( int ply, bdd r)
+void PhaseLH::print_q( int ply, bdd r)
 {
   std::cout << "q:";
   for( int bit = 0; bit < QVARS ; bit++)
@@ -856,7 +856,7 @@ void PhaseEAH::print_q( int ply, bdd r)
 }
 
 /** @return bdd with bits set to represent q */
-bdd PhaseEAH::q_in_ply( int q, int ply )
+bdd PhaseLH::q_in_ply( int q, int ply )
 {
   assert( check_q(q) );
   bdd r = bddtrue;
@@ -876,7 +876,7 @@ bdd PhaseEAH::q_in_ply( int q, int ply )
 }
 
 
-void PhaseEAH::printHandler(char* v, int size)
+void PhaseLH::printHandler(char* v, int size)
 {
   std::string indent = "  ";
   for (int ply = 0 ; ply < (kludge+2) ; ply++)
@@ -889,9 +889,9 @@ void PhaseEAH::printHandler(char* v, int size)
   cout << "    ------" << endl;
 }
 
-void PhaseEAH::printPhaseEAH(std::ostream& o , bdd R, bool subID)
+void PhaseLH::printPhaseLH(std::ostream& o , bdd R, bool subID)
 {
-  PhaseEAH x(R,0);
+  PhaseLH x(R,0);
   if (x.is_id())
     o << "  ID"    << endl;
   else if (x.is_null())
@@ -919,7 +919,7 @@ void PhaseEAH::printPhaseEAH(std::ostream& o , bdd R, bool subID)
   }
 }
 
-bool PhaseEAH::invariant_check( bdd X , int phaseX )
+bool PhaseLH::invariant_check( bdd X , int phaseX )
 {
   if (DO_INV_CHECK)
   {
@@ -939,7 +939,7 @@ bool PhaseEAH::invariant_check( bdd X , int phaseX )
 }
 
 
-void PhaseEAH::print_r_compat(char* v, int size)
+void PhaseLH::print_r_compat(char* v, int size)
 {
   std::stringstream ss;
   for (int ph = 0 ; ph < PHASES ; ph++)

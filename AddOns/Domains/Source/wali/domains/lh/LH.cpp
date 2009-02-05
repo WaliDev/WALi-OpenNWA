@@ -1,16 +1,16 @@
 /**
  * @author Nicholas Kidd
- * @version $Id: EAH.cpp 611 2009-01-16 06:07:33Z kidd $
+ * @version $Id: LH.cpp 611 2009-01-16 06:07:33Z kidd $
  */
 
 /**
  * Transformers implement post so that summarization of paths
  * computes the "eta" tranformer. These have no effect on q.
+ * For set of initially-held locks \I, \eta is defined as:
   
-             eta([]) = (\empytset, \emptyset^k, \empytset, \emptyset^k, I0)
-  eta([r1, ..., rn]) = post(eta([r1, ..., r_{n-1}]), Lab(rn)),
+            \eta([],\I)   =  (\empytset, \emptyset^k, \empytset, \emptyset^k, \I)
+  \eta([r1, ..., rn],\I)  =  post(eta([r1, ..., r_{n-1}],\I), Lab(rn)),
 
-where I0 is the set of initially-held locks.
 
 post((R,RH,U,AH,L),a) = (R',RH',U',AH',L'), where
  case a \notin {"(i", ")i"}:
@@ -111,33 +111,33 @@ post((R,RH,U,AH,L),a) = (R',RH',U',AH',L'), where
 #include <iomanip>
 #include <cassert>
 
-#include "wali/domains/eah/EAH.hpp"
+#include "wali/domains/lh/LH.hpp"
 
-using namespace wali::domains::eah;
+using namespace wali::domains::lh;
 using wali::waliErr;
 using std::cout;
 using std::endl;
 
-const int EAH::MAX_LOCKS = 4;
-int EAH::BASE            = -1;
-int EAH::LOCKS           = -1;
-int EAH::Q               = -1;
-int EAH::QVARS           = -1;
-int EAH::PLYVARS         = -1;
-int EAH::NUMPLYS         = 3;
-int EAH::NUMVARS         = -1;
-bddPair* EAH::shiftright = 0;
-bddPair* EAH::shiftleft  = 0;
-bddPair* EAH::shift32    = 0;
-bdd*  EAH::pply1         = 0;
-bdd*  EAH::pply2         = 0;
-bdd*  EAH::pply3         = 0;
-bdd*  EAH::R_acquires    = 0;
-bdd*  EAH::R_releases    = 0;
-bdd*  EAH::R_checker     = 0;
+const int LH::MAX_LOCKS = 4;
+int LH::BASE            = -1;
+int LH::LOCKS           = -1;
+int LH::Q               = -1;
+int LH::QVARS           = -1;
+int LH::PLYVARS         = -1;
+int LH::NUMPLYS         = 3;
+int LH::NUMVARS         = -1;
+bddPair* LH::shiftright = 0;
+bddPair* LH::shiftleft  = 0;
+bddPair* LH::shift32    = 0;
+bdd*  LH::pply1         = 0;
+bdd*  LH::pply2         = 0;
+bdd*  LH::pply3         = 0;
+bdd*  LH::R_acquires    = 0;
+bdd*  LH::R_releases    = 0;
+bdd*  LH::R_checker     = 0;
 
 
-int EAH::getln(int v)
+int LH::getln(int v)
 {
   int acc = 0;
   while( v != 1)
@@ -148,7 +148,7 @@ int EAH::getln(int v)
   return acc;
 }
 
-bool EAH::is_initialized()
+bool LH::is_initialized()
 {
   return (LOCKS != -1);
 }
@@ -160,11 +160,11 @@ static void my_error_handler(int errcode)
   throw errcode;
 }
 
-bool EAH::allocate( int num_locks, int theQ )
+bool LH::allocate( int num_locks, int theQ )
 {
   if (is_initialized())
   {
-    *waliErr << "[WARNING] EAH is already initialized." << endl;
+    *waliErr << "[WARNING] LH is already initialized." << endl;
     return false;
   }
   if (num_locks < 0)
@@ -204,7 +204,7 @@ bool EAH::allocate( int num_locks, int theQ )
   QVARS    = getln(Q);                  // Set number of QVars
   PLYVARS  = QVARS + 3*LOCKS + 2*(LOCKS*LOCKS); // @see description above
   NUMVARS  = PLYVARS * NUMPLYS;         // Total number of vars
-  cout << "[INFO] EAH. " << LOCKS << " lock(s); ";
+  cout << "[INFO] LH. " << LOCKS << " lock(s); ";
   cout << "  #Q = " << Q << ";";
   cout << "  #QVARS = " << QVARS << ";";
   cout << "  #NUMVARS = " << NUMVARS << ";";
@@ -213,7 +213,7 @@ bool EAH::allocate( int num_locks, int theQ )
   return true;
 }
 
-bool EAH::init_vars()
+bool LH::init_vars()
 {
 
   //const int Ply1   = BASE;
@@ -342,113 +342,113 @@ bool EAH::init_vars()
         tmp_checker = tmp_checker | (i_in_Rj & j_in_Rpi);
       }
     }
-    //printEAH(*waliErr << "Checker\n", tmp_checker );
+    //printLH(*waliErr << "Checker\n", tmp_checker );
     R_checker = new bdd(bdd_not(tmp_checker));
-    //printEAH(*waliErr << "Checker\n", *R_checker );
+    //printLH(*waliErr << "Checker\n", *R_checker );
   }
   return true;
 }
 
-bool EAH::initialize( int num_locks, int Q )
+bool LH::initialize( int num_locks, int Q )
 {
-  assert( EAH::allocate(num_locks,Q) );
-  assert( EAH::init_vars() );
+  assert( LH::allocate(num_locks,Q) );
+  assert( LH::init_vars() );
   return true;
 }
 
-EAH EAH::Empty()
+LH LH::Empty()
 {
   static bdd R = empty();
-  return EAH( R );
+  return LH( R );
 }
 
-EAH EAH::Id()
+LH LH::Id()
 {
   static bdd R = identity();
-  return EAH(R);
+  return LH(R);
 }
 
-EAH EAH::Null()
+LH LH::Null()
 {
-  return EAH(bddfalse);
+  return LH(bddfalse);
 }
 
-EAH EAH::Acquire(int lock)
-{
-  assert(check_lock(lock));
-  return EAH(R_acquires[lock]);
-}
-
-EAH EAH::Release(int lock)
+LH LH::Acquire(int lock)
 {
   assert(check_lock(lock));
-  return EAH(R_releases[lock]);
+  return LH(R_acquires[lock]);
 }
 
-EAH::EAH( const EAH& that )
+LH LH::Release(int lock)
+{
+  assert(check_lock(lock));
+  return LH(R_releases[lock]);
+}
+
+LH::LH( const LH& that )
   : R(that.R)
 {
 }
 
-EAH::~EAH()
+LH::~LH()
 {
 }
 
-std::ostream& EAH::print( std::ostream& o ) const
+std::ostream& LH::print( std::ostream& o ) const
 {
-  printEAH(o,R);
+  printLH(o,R);
   o << endl;
   return o;
 }
 
-std::ostream& EAH::prettyPrint(std::ostream& o, const std::string& name, bool subID) const
+std::ostream& LH::prettyPrint(std::ostream& o, const std::string& name, bool subID) const
 {
   // Header
   std::stringstream ss;
   ss << "[" << name;
   o << std::left << std::setw(20) << ss.str() << "] : \n";
-  printEAH(o,R,subID);
+  printLH(o,R,subID);
   o << endl;
   return o;
 }
 
-bool EAH::is_equal( const EAH& that) const
+bool LH::is_equal( const LH& that) const
 {
   return (R == that.R);
 }
 
-bool EAH::is_id() const
+bool LH::is_id() const
 {
   return is_equal(Id());
 }
 
-bool EAH::is_empty() const
+bool LH::is_empty() const
 {
   return is_equal(Empty());
 }
 
-bool EAH::is_null() const
+bool LH::is_null() const
 {
   return is_equal(Null());
 }
 
 /** @return composition of [this] and [that] */
-EAH EAH::Compose( const EAH& that ) const
+LH LH::Compose( const LH& that ) const
 {
   bdd X = compose(R,that.R);
-  return EAH(X);
+  return LH(X);
 }
 
 /** @return intersection of [this] and [that] */
-EAH EAH::Intersect( const EAH& that ) const
+LH LH::Intersect( const LH& that ) const
 {
-  return EAH( (R & that.R) );
+  return LH( (R & that.R) );
 }
 
-EAH EAH::Transition(int q1, int q2) const
+LH LH::Transition(int q1, int q2) const
 {
-  static EAH T(transition());
-  EAH ID = Id();
+  static LH T(transition());
+  LH ID = Id();
 
   // TODO put back in
   //assert( q1 != q2 );
@@ -478,24 +478,24 @@ EAH EAH::Transition(int q1, int q2) const
   // (7) insert q2 in ply 1
   bdd Rq2 = q_in_ply(q2,1);
   bdd R7 = R6 & Rq2;
-  //printEAH( std::cout << "!R7",R7);
+  //printLH( std::cout << "!R7",R7);
   return R7;
 
 }
 
 /** @return union of [this] and [that] */
-EAH EAH::Union( const EAH& that ) const
+LH LH::Union( const LH& that ) const
 {
-  return EAH( (R | that.R) );
+  return LH( (R | that.R) );
 }
 
 /** @return true if Compatible([this],[that]) */
-bool EAH::Compatible( const EAH& that )
+bool LH::Compatible( const LH& that )
 {
-  EAH path1 = Empty().Compose(*this);
+  LH path1 = Empty().Compose(*this);
   //path1.prettyPrint(std::cout,"Path 1");
 
-  EAH path2 = Empty().Compose(that);
+  LH path2 = Empty().Compose(that);
   //path2.prettyPrint(std::cout,"Path 2");
 
   // ///////////////////////////////////
@@ -514,7 +514,7 @@ bool EAH::Compatible( const EAH& that )
 
   // (3) Logically AND path 1 and path 2
   bdd p1_then_p2 = path1_shiftleft & quantify_ply_1_for_path2;
-  //EAH(p1_then_p2).prettyPrint(cout, "P1 o P2");
+  //LH(p1_then_p2).prettyPrint(cout, "P1 o P2");
 
   // (4) Check if solution exists.
   bdd R4 = p1_then_p2 & (*R_checker);
@@ -523,35 +523,35 @@ bool EAH::Compatible( const EAH& that )
   return (R4 != bddfalse);
 }
 
-EAH EAH::operator|(const EAH& that) const
+LH LH::operator|(const LH& that) const
 {
   return this->Union(that);
 }
 
-EAH EAH::operator*(const EAH& that) const
+LH LH::operator*(const LH& that) const
 {
   return this->Compose(that);
 }
 
-EAH EAH::operator&(const EAH& that) const
+LH LH::operator&(const LH& that) const
 {
   return this->Intersect(that);
 }
 
-bool EAH::operator==(const EAH& that) const
+bool LH::operator==(const LH& that) const
 {
   return R == that.R;
 }
 
-EAH::EAH( bdd R ) : R(R)
+LH::LH( bdd R ) : R(R)
 {
 }
 
-bool EAH::check_lock(int lock)
+bool LH::check_lock(int lock)
 {
   if (!is_initialized())
   {
-    *waliErr << "[ERROR] EAH not initialized" << endl;
+    *waliErr << "[ERROR] LH not initialized" << endl;
     return false;
   }
   else if ((lock < 0) || (lock >= LOCKS))
@@ -562,11 +562,11 @@ bool EAH::check_lock(int lock)
   return true;
 }
 
-bool EAH::check_q( int q )
+bool LH::check_q( int q )
 {
   if (!is_initialized())
   {
-    *waliErr << "[ERROR] EAH not initialized" << endl;
+    *waliErr << "[ERROR] LH not initialized" << endl;
     return false;
   }
   else if ((q < 0) || (q >= Q))
@@ -577,13 +577,13 @@ bool EAH::check_q( int q )
   return true;
 }
 
-std::ostream& operator<<(std::ostream& o, const EAH& eah)
+std::ostream& operator<<(std::ostream& o, const LH& lh)
 {
-  eah.print(o);
+  lh.print(o);
   return o;
 }
 
-int EAH::vidx_base(int base, int ply, int v)
+int LH::vidx_base(int base, int ply, int v)
 {
   assert((0<=v)   && (v < PLYVARS));
 #if INTERLEAVE
@@ -593,27 +593,27 @@ int EAH::vidx_base(int base, int ply, int v)
 #endif
 }
 
-int EAH::vidx(int ply, int v)
+int LH::vidx(int ply, int v)
 {
   return vidx_base(BASE,ply,v);
 }
 
-bdd EAH::var(int ply, int v)
+bdd LH::var(int ply, int v)
 {
   int idx = vidx(ply,v);
   return bdd_ithvar(idx);
 }
 
-bdd EAH::nvar(int ply, int v)
+bdd LH::nvar(int ply, int v)
 {
   int idx = vidx(ply,v);
   return bdd_nithvar(idx);
 }
 
 /** @return the relation {} -> {} */
-bdd EAH::empty()
+bdd LH::empty()
 {
-  assert( EAH::is_initialized() );
+  assert( LH::is_initialized() );
   static int cnt = 0;
   cnt++;
   assert( cnt == 1 );
@@ -626,13 +626,13 @@ bdd EAH::empty()
 }
 
 /** @return the relation forall S -> S. I.e., \lam S.S */
-bdd EAH::identity()
+bdd LH::identity()
 {
-  assert( EAH::is_initialized() );
+  assert( LH::is_initialized() );
   static int cnt = 0;
   cnt++;
   assert( cnt == 1 );
-  //*waliErr << "EAH::BASE = " << EAH::BASE << endl;
+  //*waliErr << "LH::BASE = " << LH::BASE << endl;
   bdd R = bddtrue;
   for (int v=0; v < PLYVARS; v++)
   {
@@ -642,10 +642,10 @@ bdd EAH::identity()
 }
 
 /** @return relation (q,R,RH,U,AH,L) -> (q,\empty,\empty^k,\empty,\empty^k,L) */
-bdd EAH::transition()
+bdd LH::transition()
 {
-  assert( EAH::is_initialized() );
-  EAH ID = Id();
+  assert( LH::is_initialized() );
+  LH ID = Id();
   bdd R = ID.R;
 #if 0
   // Unset all vars except the last set of locks L
@@ -677,20 +677,20 @@ bdd EAH::transition()
 }
 
 /* Return relation R[true/(b \in ply)] */
-bdd EAH::set(bdd R, int ply, int b)
+bdd LH::set(bdd R, int ply, int b)
 {
   bdd x = var(ply,b);
   return bdd_exist(R,x) & x;
 }
 
 /* Return relation R[false/(b \in ply)] */
-bdd EAH::unset(bdd R, int ply, int b)
+bdd LH::unset(bdd R, int ply, int b)
 {
   return bdd_exist(R,var(ply,b)) & nvar(ply,b);
 }
 
 /* Relation composition of R1 and R2 */
-bdd EAH::compose(bdd R1, bdd R2)
+bdd LH::compose(bdd R1, bdd R2)
 {
   bdd p2   = *pply2;
   bdd sh23 = bdd_replace( R2 , shiftright );
@@ -698,7 +698,7 @@ bdd EAH::compose(bdd R1, bdd R2)
   return bdd_replace( tmp , shift32 );
 }
 
-int EAH::get_rh_start(int lock)
+int LH::get_rh_start(int lock)
 {
   // PLY is (q,R,RH,U,AH,L)
   return (
@@ -707,7 +707,7 @@ int EAH::get_rh_start(int lock)
       (LOCKS * lock));  // Get start of RH[lock]
 }
 
-int EAH::get_ah_start(int lock)
+int LH::get_ah_start(int lock)
 {
   // PLY is (q,R,RH,U,AH,L)
   return (
@@ -718,7 +718,7 @@ int EAH::get_ah_start(int lock)
       (LOCKS * lock));  // Get start of AH[lock]
 }
 
-int EAH::get_lock_in_L( int lock )
+int LH::get_lock_in_L( int lock )
 {
   // Skip over I and RH_is, and add lock number
   // PLY is (q,R,RH,U,AH,L)
@@ -732,14 +732,14 @@ int EAH::get_lock_in_L( int lock )
       );  
 }
 
-int EAH::get_lock_in_R( int lock )
+int LH::get_lock_in_R( int lock )
 {
   return 
     QVARS + // skip q
     lock;
 }
 
-int EAH::get_lock_in_U( int lock )
+int LH::get_lock_in_U( int lock )
 {
   return (
       QVARS           + // skip q
@@ -748,7 +748,7 @@ int EAH::get_lock_in_U( int lock )
       lock);
 }
 
-void EAH::print_q( int ply, bdd r)
+void LH::print_q( int ply, bdd r)
 {
   std::cout << "q:";
   for( int bit = 0; bit < QVARS ; bit++)
@@ -769,7 +769,7 @@ void EAH::print_q( int ply, bdd r)
 }
 
 /** @return bdd with bits set to represent q */
-bdd EAH::q_in_ply( int q, int ply )
+bdd LH::q_in_ply( int q, int ply )
 {
   assert( check_q(q) );
   bdd r = bddtrue;
@@ -789,13 +789,13 @@ bdd EAH::q_in_ply( int q, int ply )
 }
 
 
-bdd EAH::acquire_lock( int lock )
+bdd LH::acquire_lock( int lock )
 {
   assert(check_lock(lock));
   static int cnt = 0;
   cnt++;
   assert( cnt <= LOCKS );
-  EAH ID = Id();
+  LH ID = Id();
 
   // (1) li \notin L
   bdd notinL = ID.R & nvar(0,get_lock_in_L(lock));
@@ -823,13 +823,13 @@ bdd EAH::acquire_lock( int lock )
   return R;
 }
 
-bdd EAH::release_lock( int li )
+bdd LH::release_lock( int li )
 {
   assert(check_lock(li));
   static int cnt = 0;
   cnt++;
   assert( cnt <= LOCKS );
-  EAH ID = Id();
+  LH ID = Id();
   // case 1: li \in AH[i]
   //   R'        = R
   //   RH'       = RH
@@ -893,7 +893,7 @@ bdd EAH::release_lock( int li )
 
 }
 
-void EAH::printPly(char* v, int size, int ply)
+void LH::printPly(char* v, int size, int ply)
 {
   using namespace std;
   std::stringstream ss;
@@ -965,7 +965,7 @@ void EAH::printPly(char* v, int size, int ply)
   cout << left << setw(30) << ss.str();
 }
 
-void EAH::printHandler(char* v, int size)
+void LH::printHandler(char* v, int size)
 {
   cout << "  ";
   printPly(v,size,0);
@@ -974,9 +974,9 @@ void EAH::printHandler(char* v, int size)
   cout << endl;
 }
 
-void EAH::printEAH(std::ostream& o , bdd R, bool subID)
+void LH::printLH(std::ostream& o , bdd R, bool subID)
 {
-  EAH x(R);
+  LH x(R);
   if (x.is_id())
     o << "  ID"    << endl;
   else 

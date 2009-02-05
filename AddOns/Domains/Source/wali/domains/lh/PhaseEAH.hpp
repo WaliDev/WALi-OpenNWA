@@ -1,20 +1,21 @@
-#ifndef wali_domains_eah_PhaseEAH_GUARD
-#define wali_domains_eah_PhaseEAH_GUARD 1
+#ifndef wali_domains_lh_PhaseLH_GUARD
+#define wali_domains_lh_PhaseLH_GUARD 1
 
 /**
  * @author Nicholas Kidd
  *
- * An Extended Acquisition History is an abstraction of a
- * path in a program. For [k] locks, a path abstraction is a 5-tuple of the form
- * (q,(R,RH,U,AH,L)), where
-    o q is a state in the PA
-    o R is the set of initially-held locks that are released along the path
-    o RH is the release-history map
-    o U is the set of locks used as "U" symbols in (U* R)^i U* (A U*)^j)
-    o AH is the acquisition-history map
-    o L is the set of locks held at the end of the path (including
-      initially-held locks that were not released)
-
+ * A Phase Lock History is a tuple of lock histories.
+ * For 
+ *   (1) \PA \A = (Q,Id,\Sigma,\delta), and 
+ *   (2) [k] locks
+ * a PhaseLH is a tuple of |PHASE| lock histories, where
+ * |PHASE| is the maximum number of phase changes in
+ * the \PA. This is a slight modification from TR-1649
+ * because \PAs are allowed to have multiple paths and
+ * multiple accepting states. That is, ignoring all
+ * self-loops, they are allowed to be DAGs with the special
+ * property that all paths from the root to a leaf node
+ * have the same length.
  */
 
 #include <iostream>
@@ -28,15 +29,15 @@ namespace wali
 {
   namespace domains
   {
-    namespace eah
+    namespace lh
     {
-      class PhaseEAH
+      class PhaseLH
       {
         public:
           /** Whether to do the integrity checks */
           static bool DO_INV_CHECK;
 
-          /** The maximum number of locks PhaseEAH can handle */
+          /** The maximum number of locks PhaseLH can handle */
           static const int MAX_LOCKS;
 
           /** @return number of bdd vars to represent v */
@@ -45,39 +46,39 @@ namespace wali
           /** @return number of locks */
           static int get_lock_count();
           
-          /** @return true if PhaseEAH::initialize succeeded */
+          /** @return true if PhaseLH::initialize succeeded */
           static bool is_initialized();
           
           /** 
-           * Initialize the PhaseEAH domain with [num_locks] locks.
+           * Initialize the PhaseLH domain with [num_locks] locks.
            * [Q] is the number of states in the phase automaton.
            * @return true on success.
-           * @see PhaseEAH::allocate
-           * @see PhaseEAH::init_vars
+           * @see PhaseLH::allocate
+           * @see PhaseLH::init_vars
            */
           static bool initialize( int num_locks, int phases, int Q=-1 );
 
           /** @return {} -> {} */
-          static PhaseEAH Empty();
+          static PhaseLH Empty();
 
-          /** @return \PhaseEAH . PhaseEAH */
-          static PhaseEAH Id();
+          /** @return \PhaseLH . PhaseLH */
+          static PhaseLH Id();
 
-          /** @return \PhaseEAH . false */
-          static PhaseEAH Null();
+          /** @return \PhaseLH . false */
+          static PhaseLH Null();
 
-          /** @return \PhaseEAH -> PhaseEAH + [lock] */
-          static PhaseEAH Acquire(int lock, int p=0);
+          /** @return \PhaseLH -> PhaseLH + [lock] */
+          static PhaseLH Acquire(int lock, int p=0);
 
-          /** @return \PhaseEAH -> PhaseEAH - [lock] */
-          static PhaseEAH Release(int lock, int p=0);
+          /** @return \PhaseLH -> PhaseLH - [lock] */
+          static PhaseLH Release(int lock, int p=0);
 
-          /** @return the Transition PhaseEAH */
-          static PhaseEAH Transition(int q1, int q2);
+          /** @return the Transition PhaseLH */
+          static PhaseLH Transition(int q1, int q2);
 
         public:
-          PhaseEAH(const PhaseEAH& that);
-          virtual ~PhaseEAH();
+          PhaseLH(const PhaseLH& that);
+          virtual ~PhaseLH();
 
           std::ostream& prettyPrint( std::ostream& o ) const;
           std::ostream& print( std::ostream& o ) const;
@@ -89,7 +90,7 @@ namespace wali
               bool subID=false) const;
 
           /** @return [this] == [that]  */
-          bool is_equal(const PhaseEAH& that) const;
+          bool is_equal(const PhaseLH& that) const;
 
           /** @return [this] == Id()    */
           bool is_id() const;
@@ -101,25 +102,25 @@ namespace wali
           bool is_null() const;
 
           /** @return Union of [this] and [that] */
-          PhaseEAH operator|(const PhaseEAH& that) const;
+          PhaseLH operator|(const PhaseLH& that) const;
 
           /** @return Compose of [this] and [that] */
-          PhaseEAH operator*(const PhaseEAH& that) const;
+          PhaseLH operator*(const PhaseLH& that) const;
 
           /** @return Intersect of [this] and [that] */
-          PhaseEAH operator&(const PhaseEAH& that) const;
+          PhaseLH operator&(const PhaseLH& that) const;
 
           /** @return true if [this] equals [that] */
-          bool operator==(const PhaseEAH& that) const;
+          bool operator==(const PhaseLH& that) const;
 
           /** 
            * @return true if there exists a path {p1 \in t1}
            *  and {p2 \in t2} such that Compatible(p1,p2).
            */
-          static bool Compatible( PhaseEAH t1, PhaseEAH t2 );
+          static bool Compatible( PhaseLH t1, PhaseLH t2 );
 
           /** @return true iff Compatible(p \in [v]) */
-          static bool Compatible( std::vector< PhaseEAH >& v );
+          static bool Compatible( std::vector< PhaseLH >& v );
 
         private: // Helper methods
           /** Initialize buddy and allocate (phases+2)*D vars */
@@ -127,8 +128,8 @@ namespace wali
 
           /** 
            * Initialize the static class vars.
-           * Seperated out so that PhaseEAH::BASE could be 
-           * adjusted for SlidingPhaseEAH.
+           * Seperated out so that PhaseLH::BASE could be 
+           * adjusted for SlidingPhaseLH.
            */
           static bool init_vars();
 
@@ -193,12 +194,12 @@ namespace wali
           static bdd q_in_ply( int q, int ply );
 
           static void printHandler(char* v, int size);
-          static void printPhaseEAH(
+          static void printPhaseLH(
               std::ostream& o,
               bdd R,
               bool subID=false);
 
-          /** Verify integrity of PhaseEAH bdd */
+          /** Verify integrity of PhaseLH bdd */
           static bool invariant_check( bdd X , int phaseX );
 
           static void print_r_compat(char* v, int size);
@@ -226,7 +227,7 @@ namespace wali
            */
           static int PLYVARS;
 
-          /** Number of plies to represent a PhaseEAH.
+          /** Number of plies to represent a PhaseLH.
            *  Equal to PHASES + 2
            */
           static int NUMPLYS;
@@ -252,7 +253,7 @@ namespace wali
            * in ply [ply]. */ 
           static bddPair** left_from_ply;
 
-          /** For printing a PhaseEAH, we have to
+          /** For printing a PhaseLH, we have to
            * pass the phase number to a static function */
           static int kludge;
 
@@ -260,21 +261,22 @@ namespace wali
 
         //private: // instance stuff
         public: // instance stuff
-          PhaseEAH( bdd R , int phaseX );
+          PhaseLH( bdd R , int phaseX );
           bdd R;
           int phaseX;
 
-      }; // class PhaseEAH
+      }; // class PhaseLH
 
-    } // namespace eah
+    } // namespace lh
 
   } // namespace domains
 
 } // namespace wali
 
 
-std::ostream& operator<<(std::ostream&, const wali::domains::eah::PhaseEAH& eah);
+std::ostream& operator<<(std::ostream&, const wali::domains::lh::PhaseLH& ph);
 
-#endif  // wali_domains_eah_PhaseEAH_GUARD
+#endif  // wali_domains_lh_PhaseLH_GUARD
+
 
 

@@ -1,19 +1,22 @@
-#ifndef wali_domains_eah_EAH_GUARD
-#define wali_domains_eah_EAH_GUARD 1
+#ifndef wali_domains_lh_LH_GUARD
+#define wali_domains_lh_LH_GUARD 1
 
 /**
  * @author Nicholas Kidd
  *
- * An Extended Acquisition History is an abstraction of a
- * path in a program. For [k] locks, a path abstraction is a 5-tuple of the form
+ * A Lock History (LH) is an abstraction of a path in a program. 
+ * For 
+ *   (1) \PA \A = (Q,Id,\Sigma,\delta), and 
+ *   (2) [k] locks
+ * an LH is a 5-tuple of the form
  * (q,(R,RH,U,AH,L)), where
-    o q is a state in the PA
-    o R is the set of initially-held locks that are released along the path
-    o RH is the release-history map
-    o U is the set of locks used as "U" symbols in (U* R)^i U* (A U*)^j)
-    o AH is the acquisition-history map
-    o L is the set of locks held at the end of the path (including
-      initially-held locks that were not released)
+    o q is a state in the \PA
+    o \R is the set of initially-held locks that are released along the path
+    o \RH is the release-history map
+    o \U is the set of locks used as "U" symbols in (U* R)^i U* (A U*)^j)
+    o \AH is the acquisition-history map
+    o \L is the set of locks held at the end of the path 
+       - (including initially-held locks that were not released)
 
  */
 
@@ -25,16 +28,15 @@ namespace wali
 {
   namespace domains
   {
-    namespace eah
+    namespace lh
     {
-      class EAH
+      class LH
       {
         public:
-          friend class SlidingEAH;
-          friend class PhaseEAH;
+          friend class PhaseLH;
 
         public:
-          /** The maximum number of locks EAH can handle */
+          /** The maximum number of locks LH can handle */
           static const int MAX_LOCKS;
 
           /** @return number of bdd vars to represent v */
@@ -43,36 +45,36 @@ namespace wali
           /** @return number of locks */
           static int get_lock_count();
           
-          /** @return true if EAH::initialize succeeded */
+          /** @return true if LH::initialize succeeded */
           static bool is_initialized();
           
           /** 
-           * Initialize the EAH domain with [num_locks] locks.
+           * Initialize the LH domain with [num_locks] locks.
            * [Q] is the number of states in the phase automaton.
            * @return true on success.
-           * @see EAH::allocate
-           * @see EAH::init_vars
+           * @see LH::allocate
+           * @see LH::init_vars
            */
           static bool initialize( int num_locks, int Q );
 
           /** @return {} -> {} */
-          static EAH Empty();
+          static LH Empty();
 
-          /** @return \EAH . EAH */
-          static EAH Id();
+          /** @return \LH . LH */
+          static LH Id();
 
-          /** @return \EAH . false */
-          static EAH Null();
+          /** @return \LH . false */
+          static LH Null();
 
-          /** @return \EAH -> EAH + [lock] */
-          static EAH Acquire(int lock);
+          /** @return \LH -> LH + [lock] */
+          static LH Acquire(int lock);
 
-          /** @return \EAH -> EAH - [lock] */
-          static EAH Release(int lock);
+          /** @return \LH -> LH - [lock] */
+          static LH Release(int lock);
 
         public:
-          EAH(const EAH& that);
-          virtual ~EAH();
+          LH(const LH& that);
+          virtual ~LH();
 
           std::ostream& print( std::ostream& o ) const;
 
@@ -83,7 +85,7 @@ namespace wali
               bool subID=false) const;
 
           /** @return [this] == [that]  */
-          bool is_equal(const EAH& that) const;
+          bool is_equal(const LH& that) const;
 
           /** @return [this] == Id()    */
           bool is_id() const;
@@ -95,31 +97,31 @@ namespace wali
           bool is_null() const;
 
           /** @return composition of [this] and [that] */
-          EAH Compose( const EAH& that ) const;
+          LH Compose( const LH& that ) const;
 
           /** @return intersection of [this] and [that] */
-          EAH Intersect( const EAH& that ) const;
+          LH Intersect( const LH& that ) const;
 
-          /** @return the Transition EAH */
-          EAH Transition(int q1, int q2) const;
+          /** @return the Transition LH */
+          LH Transition(int q1, int q2) const;
 
           /** @return union of [this] and [that] */
-          EAH Union( const EAH& that ) const;
+          LH Union( const LH& that ) const;
 
           /** @return true if Compatible([this],[that]) */
-          bool Compatible( const EAH& that);
+          bool Compatible( const LH& that);
 
           /** @return Union of [this] and [that] */
-          EAH operator|(const EAH& that) const;
+          LH operator|(const LH& that) const;
 
           /** @return Compose of [this] and [that] */
-          EAH operator*(const EAH& that) const;
+          LH operator*(const LH& that) const;
 
           /** @return Intersect of [this] and [that] */
-          EAH operator&(const EAH& that) const;
+          LH operator&(const LH& that) const;
 
           /** @return true if [this] equals [that] */
-          bool operator==(const EAH& that) const;
+          bool operator==(const LH& that) const;
 
         private: // Helper methods
           /** Initialize buddy and allocate DxRxS vars */
@@ -127,8 +129,8 @@ namespace wali
 
           /** 
            * Initialize the static class vars.
-           * Seperated out so that EAH::BASE could be 
-           * adjusted for SlidingEAH.
+           * Seperated out so that LH::BASE could be 
+           * adjusted for SlidingLH.
            */
           static bool init_vars();
 
@@ -209,7 +211,7 @@ namespace wali
 
           static void printPly(char* v, int size, int ply);
           static void printHandler(char* v, int size);
-          static void printEAH(
+          static void printLH(
               std::ostream& o,
               bdd R,
               bool subID=false);
@@ -234,7 +236,7 @@ namespace wali
            */
           static int PLYVARS;
 
-          /** Defaults to 3. Modified by PhaseEAH */
+          /** Defaults to 3. Modified by PhaseLH */
           static int NUMPLYS;
 
           /** 
@@ -269,20 +271,21 @@ namespace wali
           static bdd* R_checker;
 
         private: // instance stuff
-          EAH( bdd R );
+          LH( bdd R );
           bdd R;
 
-      }; // class EAH
+      }; // class LH
 
-    } // namespace eah
+    } // namespace lh
 
   } // namespace domains
 
 } // namespace wali
 
 
-std::ostream& operator<<(std::ostream&, const wali::domains::eah::EAH& eah);
+std::ostream& operator<<(std::ostream&, const wali::domains::lh::LH& lh);
 
-#endif  // wali_domains_eah_EAH_GUARD
+#endif  // wali_domains_lh_LH_GUARD
+
 
 
