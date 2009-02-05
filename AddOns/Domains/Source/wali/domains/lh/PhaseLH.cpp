@@ -111,7 +111,7 @@ post((R,RH,U,AH,L),a) = (R',RH',U',AH',L'), where
 #include <iomanip>
 #include <cassert>
 
-#include "wali/domains/lh/EAH.hpp"
+#include "wali/domains/lh/LH.hpp"
 #include "wali/domains/lh/PhaseLH.hpp"
 
 using namespace wali::domains::lh;
@@ -216,15 +216,15 @@ bool PhaseLH::allocate( int num_locks, int phases , int theQ )
   cout << "  #NUMPLYS = " << NUMPLYS << ";\n";
   cout << "  #NUMVARS = " << NUMVARS << ";\n";
   BASE     = bdd_extvarnum(NUMVARS);
-  // initialize EAH vars
-  EAH::BASE    = BASE;
-  EAH::PLYVARS = PLYVARS;
-  EAH::NUMPLYS = NUMPLYS;
-  EAH::NUMVARS = PLYVARS * 3;
-  EAH::LOCKS   = LOCKS;
-  EAH::Q       = Q;
-  EAH::QVARS   = QVARS;
-  EAH::init_vars();
+  // initialize LH vars
+  LH::BASE    = BASE;
+  LH::PLYVARS = PLYVARS;
+  LH::NUMPLYS = NUMPLYS;
+  LH::NUMVARS = PLYVARS * 3;
+  LH::LOCKS   = LOCKS;
+  LH::Q       = Q;
+  LH::QVARS   = QVARS;
+  LH::init_vars();
   return true;
 }
 
@@ -314,13 +314,13 @@ PhaseLH::~PhaseLH()
 
 PhaseLH PhaseLH::Empty()
 {
-  static bdd R = EAH::Empty().R;
+  static bdd R = LH::Empty().R;
   return PhaseLH( R,0 );
 }
 
 PhaseLH PhaseLH::Id()
 {
-  static bdd R = EAH::Id().R;
+  static bdd R = LH::Id().R;
   return PhaseLH(R,0);
 }
 
@@ -332,24 +332,24 @@ PhaseLH PhaseLH::Null()
 PhaseLH PhaseLH::Acquire(int lock, int i ATTR_UNUSED)
 {
   assert(check_lock(lock));
-  return PhaseLH(EAH::R_acquires[lock],0);
+  return PhaseLH(LH::R_acquires[lock],0);
 }
 
 PhaseLH PhaseLH::Release(int lock, int i ATTR_UNUSED)
 {
   assert(check_lock(lock));
-  return PhaseLH(EAH::R_releases[lock],0);
+  return PhaseLH(LH::R_releases[lock],0);
 }
 
 PhaseLH PhaseLH::Transition( int q1 , int q2 )
 {
   // (1) Start in ply 0 and ply 1
   // (q1,R,RH,U,AH,L) -> (q1,R',RH',U',AH',L')
-  EAH id = EAH::Id();
+  LH id = LH::Id();
 
-  // (2) Transition the EAH to get
+  // (2) Transition the LH to get
   //    (q1,R',RH',U',AH',L') --> (q2,0,0^k,0,0^k,L')
-  EAH t = id.Transition(q1,q2);
+  LH t = id.Transition(q1,q2);
 
   // (3) Shift t to the right
   bdd r3 = bdd_replace( t.R , shiftright );
@@ -488,17 +488,17 @@ bool PhaseLH::Compatible( std::vector< PhaseLH >& v )
   N = v.size();
   const int Q = PHASES;
   std::stringstream message;
-  message << "PhaseLH::Compatible(vector< SlidingEAH >)";
+  message << "PhaseLH::Compatible(vector< PhaseLH >)";
   message << " {N=" << N << " , Q=" << Q << "}.";
   //*waliErr << "[INFO] " << message.str() << endl;
   //wali::util::Timer t(message.str());
   // E.g., Q = 3, N = 3
   //  o v[0].R has form xyDR_
-  // Want to shuffle the SlidingEAH for each P_i
+  // Want to shuffle the PhaseLH for each P_i
   // to get:
   //   1_1 -> ... _> 1_n -> 2_1...2_n -> 3_1 -> ... -> 3_n
   //
-  // Total number of vars then is N * Q * EAH::PLYVARS
+  // Total number of vars then is N * Q * LH::PLYVARS
   int total_vars = N * PHASES * PLYVARS;
   //*waliErr << "[INFO] Have #vars " << NUMVARS << endl;
   //*waliErr << "[INFO] Need #vars " << total_vars << endl;
@@ -507,17 +507,17 @@ bool PhaseLH::Compatible( std::vector< PhaseLH >& v )
   if (extra_vars > 0)
     bdd_extvarnum(extra_vars);
   // checker will be of the form (C_11...C1n, ... , Cq1...Cqn )
-  // where Cij comes from the EAH::Compatible relation.
+  // where Cij comes from the LH::Compatible relation.
   bdd checker = bddtrue;
 
-  // (1) copy {EAH::R_checker} = {(C,C) , __DONT CARE__ }
-  bdd EAH_checker = *EAH::R_checker; // E.g., \eq __CCS
+  // (1) copy {LH::R_checker} = {(C,C) , __DONT CARE__ }
+  bdd LH_checker = *LH::R_checker; // E.g., \eq __CCS
 
-  // (2) Reorder the vars in the EAH_checker for multiple procs
+  // (2) Reorder the vars in the LH_checker for multiple procs
   //     using cidx.
   //int PhaseLH::cidx(int N, int proc , int phase , int v)
   //*waliErr << "#######  Making PA_checker.\n";
-  bdd PA_checker = EAH_checker;
+  bdd PA_checker = LH_checker;
   {
     bddPair* p = bdd_newpair();
     for (int v = 0 ; v < PLYVARS ; v++)
@@ -532,7 +532,7 @@ bool PhaseLH::Compatible( std::vector< PhaseLH >& v )
       //*waliErr << "    -- P1 : " << from << "  ->  " << to << endl;
       bdd_setpair(p, from, to );//vidx(1,v), cidx(N, 1, 0, v) );
     }
-    PA_checker = bdd_replace(EAH_checker,p);
+    PA_checker = bdd_replace(LH_checker,p);
     bdd_freepair(p);
   }
   //bdd_allsat(PA_checker,print_r_compat);
@@ -553,7 +553,7 @@ bool PhaseLH::Compatible( std::vector< PhaseLH >& v )
         continue;
       //*waliErr << "  -- Making (" << i << " , " << j << ")" << endl;
       bddPair* pair    = bdd_newpair();
-      for (int pos=0 ; pos < EAH::PLYVARS ; pos++)
+      for (int pos=0 ; pos < LH::PLYVARS ; pos++)
       {
         // ply 0 -> ply i
         int from = cidx(N,0,0,pos);
@@ -812,27 +812,27 @@ bdd PhaseLH::unset(bdd R, int ply, int b)
 
 int PhaseLH::get_rh_start(int lock)
 {
-  return EAH::get_rh_start(lock);
+  return LH::get_rh_start(lock);
 }
 
 int PhaseLH::get_ah_start(int lock)
 {
-  return EAH::get_ah_start(lock);
+  return LH::get_ah_start(lock);
 }
 
 int PhaseLH::get_lock_in_L( int lock )
 {
-  return EAH::get_lock_in_L(lock);
+  return LH::get_lock_in_L(lock);
 }
 
 int PhaseLH::get_lock_in_R( int lock )
 {
-  return EAH::get_lock_in_R(lock);
+  return LH::get_lock_in_R(lock);
 }
 
 int PhaseLH::get_lock_in_U( int lock )
 {
-  return EAH::get_lock_in_U(lock);
+  return LH::get_lock_in_U(lock);
 }
 
 void PhaseLH::print_q( int ply, bdd r)
@@ -882,7 +882,7 @@ void PhaseLH::printHandler(char* v, int size)
   for (int ply = 0 ; ply < (kludge+2) ; ply++)
   {
     cout << indent;
-    EAH::printPly(v,size,ply);
+    LH::printPly(v,size,ply);
     cout << " -->\n";
     indent = indent + "  ";
   }

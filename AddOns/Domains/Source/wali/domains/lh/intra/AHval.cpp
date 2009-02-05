@@ -20,10 +20,10 @@
 #include <iostream>
 #include <cassert>
 
-#include "wali/domains/eah/intra/AHval.hpp"
+#include "wali/domains/lh/intra/AHval.hpp"
 #include "wali/Common.hpp"
 
-using namespace wali::domains::eah::intra;
+using namespace wali::domains::lh::intra;
 
 int AHval::LOCKCNT         = -1;
 int AHval::NUMVARS         = -1;

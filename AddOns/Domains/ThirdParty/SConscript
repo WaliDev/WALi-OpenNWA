@@ -1,22 +1,28 @@
 ## ########################################
-## Runs get_domains_libs.getlibs.
-## (I.e., download and compile buddy-2.4)
 ## $Id$
-##
-
-import os
-import os.path
-import get_domains_libs
 
 
-Import('WaliDir')
+import os,platform,platform
+from glob import glob
+
 Import('LibInstallDir')
 
-get_domains_libs.getlibs(LibInstallDir)
+BuddyEnv = Environment()
 
-buddy = os.path.join(WaliDir,'AddOns','Domains','ThirdParty','buddy-2.4')
+if 'gcc' == BuddyEnv['CC']:
+    BuddyEnv['CFLAGS']   = '-g -O2'
+    BuddyEnv['CXXFLAGS'] = '-g -O2'
+elif 'cl' == BuddyEnv['CC']:
+    # Mostly copied from VS C++ 2005 Command line
+    BuddyEnv['CXXFLAGS'] = '/TP /errorReport:prompt /Wp64 /W4 /GR /MTd /EHsc'
+BuddyEnv['CPPPATH'] = [ 'src' ]
 
-built = [Dir(buddy)]
 
+SRCS = glob('buddy-2.4/src/*.c') + ['buddy-2.4/src/cppext.cxx']
+liba   = BuddyEnv.StaticLibrary('bdd' , SRCS)
+iliba  = BuddyEnv.Install(LibInstallDir, liba)
+hfiles = BuddyEnv.Install('include',glob('buddy-2.4/src/*.h'))
+
+built = [iliba,hfiles]
 Return('built')
 

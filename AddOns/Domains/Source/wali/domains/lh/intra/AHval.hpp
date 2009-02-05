@@ -1,5 +1,5 @@
-#ifndef wali_domains_eah_intra_AHval_GUARD
-#define wali_domains_eah_intra_AHval_GUARD 1
+#ifndef wali_domains_lh_intra_AHval_GUARD
+#define wali_domains_lh_intra_AHval_GUARD 1
 
 /**
  * @author Nicholas Kidd
@@ -18,7 +18,7 @@ namespace wali
 {
   namespace domains
   {
-    namespace eah
+    namespace lh
     {
       namespace intra
       {
@@ -55,15 +55,16 @@ namespace wali
 
       } // namespace intra
 
-    } // namespace eah
+    } // namespace lh
 
   } // namespace domains
 
 } // namespace wali
 
 
-std::ostream& operator<<(std::ostream&, const wali::domains::eah::intra::AHval& ah);
+std::ostream& operator<<(std::ostream&, const wali::domains::lh::intra::AHval& ah);
 
-#endif  // wali_domains_eah_intra_AHval_GUARD
+#endif  // wali_domains_lh_intra_AHval_GUARD
+
 
 

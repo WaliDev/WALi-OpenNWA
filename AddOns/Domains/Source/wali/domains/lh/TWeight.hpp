@@ -1,11 +1,12 @@
-#ifndef wali_domains_eah_TWEIGHT_GUARD
-#define wali_domains_eah_TWEIGHT_GUARD 1
+#ifndef wali_domains_lh_TWEIGHT_GUARD
+#define wali_domains_lh_TWEIGHT_GUARD 1
 
 /**
  * @author Nicholas Kidd
  *
- * Wrapper around class T that implements
- * the semiring methods of WALi.
+ * Wrapper around class T that implements the semiring methods of WALi. [T] must
+ * be PhaseLH for the moment, but TWeight will support, for example, a TensorLH
+ * when it is implemented.
  *
  */
 
@@ -18,7 +19,7 @@ namespace wali
 {
   namespace domains
   {
-    namespace eah
+    namespace lh
     {
       template<typename T> class TWeight : public wali::SemElem
       {
@@ -105,7 +106,7 @@ namespace wali
             assert(that != NULL);
             if (impl.is_null() || that->impl.is_null())
               return zero();
-            /* -- This is causing trouble with PhasedEAH
+            /* -- This is causing trouble with PhasedLH
             else if (impl.is_id())
               return se;
             else if (that->impl.is_id())
@@ -127,7 +128,7 @@ namespace wali
               return new TWeight( impl | that->impl );
           }
 
-          // Turn off quasi one for all EAH weights.
+          // Turn off quasi one for all LH weights.
           virtual wali::sem_elem_t quasi_combine( wali::SemElem * se ATTR_UNUSED)
           {
             return zero();
@@ -161,11 +162,11 @@ namespace wali
 
       }; // class TWeight
 
-    } // namespace eah
+    } // namespace lh
 
   } // namespace domains
 
 } // namespace wali
 
-#endif // wali_domains_eah_TWEIGHT_GUARD
+#endif // wali_domains_lh_TWEIGHT_GUARD
 

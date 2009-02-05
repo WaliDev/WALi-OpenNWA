@@ -17,9 +17,8 @@ Import('BaseEnv')
 walidomains_files = Split("""
 ./wali/domains/binrel/BinRel.cpp
 ./wali/domains/reach/Reach.cpp
-./wali/domains/eah/EAH.cpp
-./wali/domains/eah/PhaseEAH.cpp
-./wali/domains/eah/SlidingEAH.cpp
+./wali/domains/lh/LH.cpp
+./wali/domains/lh/PhaseLH.cpp
 """)
 
 Env = BaseEnv.Clone()
