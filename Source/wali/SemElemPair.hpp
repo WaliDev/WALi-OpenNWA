@@ -31,9 +31,6 @@ namespace wali
       /** @brief Perform the combine operation */
       virtual sem_elem_t combine( SemElem * se );
 
-      /** @brief Perform the quasi_combine operation */
-      virtual sem_elem_t quasi_combine( SemElem* se );
-
       /** @brief Equality comparison between two semiring elements */
       virtual bool equal( SemElem * se ) const;
 

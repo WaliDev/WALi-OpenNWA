@@ -53,18 +53,6 @@ namespace wali
     return new SemElemPair(fnew,snew);
   }
 
-  sem_elem_t SemElemPair::quasi_combine( SemElem* se )
-  {
-    // TODO : Make dynamic checks debug only?
-    //SemElemPair * that = static_cast< SemElemPair* >(se);
-    SemElemPair * that = dynamic_cast< SemElemPair* >(se);
-    assert( 0 != that );
-
-    sem_elem_t fnew = first->quasi_combine(that->first);
-    sem_elem_t snew = second->quasi_combine(that->second);
-    return new SemElemPair(fnew,snew);
-  }
-
   // Equality comparison between two semiring elements
   bool SemElemPair::equal( SemElem * se ) const
   {

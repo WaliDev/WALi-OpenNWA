@@ -120,14 +120,6 @@ namespace wali
       virtual sem_elem_t quasi_one() const;
 
       /**
-       * When the combine of two weights is performed to 
-       * set the {quasi} value of a state, the
-       * SemElem::quasi_combine method is used.
-       * This defaults to SemElem::combine.
-       */
-      virtual sem_elem_t quasi_combine(SemElem* se);
-
-      /**
        *  Perform delta operation
        *   The delta operation is defined for the user but can be
        *   overridden to get better performance. The std::pair returned
@@ -180,15 +172,6 @@ namespace wali
       sem_elem_t diff( sem_elem_t se ) 
       { 
         return diff( se.get_ptr() ); 
-      }
-
-      /**
-       * Wrapper method for quasi_combine that will remove the ref_ptr
-       * to make the call to the user's code. 
-       */
-      sem_elem_t quasi_combine( sem_elem_t se)
-      { 
-        return quasi_combine(se.get_ptr()); 
       }
 
       /** 

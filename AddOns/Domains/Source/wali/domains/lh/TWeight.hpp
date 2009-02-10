@@ -85,18 +85,24 @@ namespace wali
 
           ///////////////////////////////////////////////////
           // Semiring methods
-          virtual wali::sem_elem_t one() const
-          {
-            //static sem_elem_t ONE( new TWeight(T::Id()) );
-            //return ONE;
-            return new TWeight( T::Id() );
-          }
-
           virtual wali::sem_elem_t zero() const
           {
-            //static sem_elem_t ZERO( new TWeight(T::Null()) );
-            //return ZERO;
-            return new TWeight( T::Null() );
+            static sem_elem_t ZERO( new TWeight(T::Null()) );
+            return ZERO;
+            //return new TWeight( T::Null() );
+          }
+
+          virtual wali::sem_elem_t one() const
+          {
+            static sem_elem_t ONE( new TWeight(T::Id()) );
+            return ONE;
+            //return new TWeight( T::Id() );
+          }
+
+          // Turn off quasi one for all *LH weights.
+          virtual wali::sem_elem_t quasi_one()
+          {
+            return one();
           }
 
           virtual wali::sem_elem_t extend( wali::SemElem * se )
@@ -125,12 +131,6 @@ namespace wali
               return this;
             else
               return new TWeight( impl | that->impl );
-          }
-
-          // Turn off quasi one for all LH weights.
-          virtual wali::sem_elem_t quasi_combine( wali::SemElem * se ATTR_UNUSED)
-          {
-            return zero();
           }
 
           virtual bool equal( wali::SemElem * se ) const

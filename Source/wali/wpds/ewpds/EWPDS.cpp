@@ -379,11 +379,11 @@ namespace wali
           // computed on the transition weight, not its delta
           //sem_elem_t quasi = state->quasi->combine( called_weight );
           //state->quasi = quasi;
-          state->quasi = state->quasi->combine( wrule_trans );
+          state->quasi = state->quasi->combine( wrule_trans->quasi_one() );
 
           //sem_elem_t quasi_extended = new SemElemPair(quasi->quasi_one(), quasi->one());
           //update( rtstate, rtstack, gstate, quasi_extended, r->to() );
-          update( rtstate, rtstack, gstate, state->quasi->quasi_one(), r->to() );
+          update( rtstate, rtstack, gstate, state->quasi, r->to() );
 
           // Trans with generated from states do not go on the worklist
           // and there is no Config matching them so pass 0 (NULL) as the

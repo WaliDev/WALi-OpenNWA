@@ -148,10 +148,10 @@ namespace wali
 
         //state->quasi->print( std::cout << "!!PRE-quasi : " ) << std::endl;
         //wrule_trans->print( std::cout << "!!W_t : ") << std::endl;
-        sem_elem_t quasi = state->quasi->quasi_combine( wrule_trans );
+        sem_elem_t quasi = state->quasi->combine( wrule_trans->quasi_one() );
         state->quasi = quasi;
 
-        update( rtstate, rtstack, gstate, quasi->quasi_one(), r->to() );
+        update( rtstate, rtstack, gstate, quasi, r->to() );
 
         // Trans with generated from states do not go on the worklist
         // and there is no Config matching them so pass 0 (NULL) as the
