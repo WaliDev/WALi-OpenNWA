@@ -39,6 +39,9 @@ namespace wali
           static AH Acquire(int lock);
           static AH Release(int lock);
 
+          /** @return true if Compatible([a],[b]) */
+          static bool Compatible( const AH& a, const AH& b);
+
         public:
           AH(const AH& that);
           virtual ~AH();
@@ -65,9 +68,6 @@ namespace wali
 
           /** @return union of [this] and [that] */
           AH Union( const AH& that ) const;
-
-          /** @return true if Compatible([this],[that]) */
-          bool Compatible( const AH& that);
 
           /** @return Union of [this] and [that] */
           AH operator|(const AH& that);

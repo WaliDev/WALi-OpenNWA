@@ -299,13 +299,13 @@ AH AH::Union( const AH& that ) const
   return AH(R | that.R);
 }
 
-/** @return true if Compatible([this],[that]) */
-bool AH::Compatible( const AH& that )
+/** @return true if Compatible([a],[b]) */
+bool AH::Compatible( const AH& a, const AH& b )
 {
-  AH path1 = Empty().Compose(*this);
+  AH path1 = Empty().Compose(a);
   //path1.prettyPrint(std::cout,"Path 1");
 
-  AH path2 = Empty().Compose(that);
+  AH path2 = Empty().Compose(b);
   //path2.prettyPrint(std::cout,"Path 2");
 
   // ///////////////////////////////////

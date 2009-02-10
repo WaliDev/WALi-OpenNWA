@@ -113,6 +113,9 @@ namespace wali
           /** @return true if [this] equals [that] */
           bool operator==(const PhaseLH& that) const;
 
+          /** @return true if [this] != [that] */
+          bool operator!=(const PhaseLH& that) const;
+
           /** 
            * @return true if there exists a path {p1 \in t1}
            *  and {p2 \in t2} such that Compatible(p1,p2).
@@ -121,6 +124,8 @@ namespace wali
 
           /** @return true iff Compatible(p \in [v]) */
           static bool Compatible( std::vector< PhaseLH >& v );
+
+          static PhaseLH Summarize( const PhaseLH& a , const PhaseLH& b);
 
         private: // Helper methods
           /** Initialize buddy and allocate (phases+2)*D vars */
@@ -142,13 +147,17 @@ namespace wali
           /** @return index for var [v] in ply [ply] */
           static int vidx_base(int base, int ply, int v);
           static int vidx(int ply, int v);
-          static int cidx(int N, int proc , int phase , int v);
-
           /** @return BDD for var [v] in ply [ply] */
           static bdd var(int ply, int v);
-
           /** @return BDD for \not var [v] in ply [ply] */
           static bdd nvar(int ply, int v);
+
+          /** @return index for var [v] in ply [ply] DURING summarization */
+          static int sidx(int ply, int v);
+          /** @return positve var for summarization */
+          static bdd svar(int ply, int v);
+          /** @return negative var for summarization */
+          static bdd nsvar(int ply, int v);
 
           /** @return the relation {} -> {} */
           static bdd empty();
@@ -194,15 +203,35 @@ namespace wali
           static bdd q_in_ply( int q, int ply );
 
           static void printHandler(char* v, int size);
-          static void printPhaseLH(
-              std::ostream& o,
-              bdd R,
-              bool subID=false);
+          static void printPhaseLH( std::ostream& o, bdd R, bool subID=false);
 
           /** Verify integrity of PhaseLH bdd */
           static bool invariant_check( bdd X , int phaseX );
 
           static void print_r_compat(char* v, int size);
+
+          /** 
+           * Extend the vars to handle Summarization.
+           * @return bdd for quantifying out all vars for PhaseLHs [a] and [b].
+           */
+          static bdd alloc_summarize_vars();
+
+          /**
+           * @return the bddPair to unshift summary relation into PhaseLH
+           * positions.
+           */
+          static bddPair* make_unshift();
+
+          /** @return array of bdds that check-n-summary a phase */
+          static bdd* make_phsum_checks();
+
+          /** @return summarizer for phase [phase] */
+          static bdd make_phsum_for_phase(int phase);
+
+          static void print_sum(char* v, int size);
+
+          /** @deprecated */
+          static int cidx(int N, int proc , int phase , int v);
 
         private: // static vars
 

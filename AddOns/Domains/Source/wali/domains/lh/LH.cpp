@@ -490,38 +490,28 @@ LH LH::Union( const LH& that ) const
 }
 
 /** @return true if Compatible([this],[that]) */
-bool LH::Compatible( const LH& that )
+bool LH::Compatible( const LH& a, const LH& b )
 {
-  LH path1 = Empty().Compose(*this);
-  //path1.prettyPrint(std::cout,"Path 1");
-
-  LH path2 = Empty().Compose(that);
-  //path2.prettyPrint(std::cout,"Path 2");
-
-  // ///////////////////////////////////
-  // Perform test
-  //    \exists li,lj . li \in AH_j && lj \in AH_i 
-  // 
-  // Note that L \cap L' not necessary b/c of Peter's mod to definition of 
-  // AH and putting lock [l] in [AH_l].
-  //
-  // (1) existentially quantify out PLY 1 in path1 and path 2
-  bdd quantify_ply_1_for_path1 = bdd_exist( path1.R , *pply1 );
-  bdd quantify_ply_1_for_path2 = bdd_exist( path2.R , *pply1 );
-
-  // (2) Shift path 1 :: PLY 2 -> PLY1 
-  bdd path1_shiftleft = bdd_replace(quantify_ply_1_for_path1,shiftleft);
-
-  // (3) Logically AND path 1 and path 2
-  bdd p1_then_p2 = path1_shiftleft & quantify_ply_1_for_path2;
-  //LH(p1_then_p2).prettyPrint(cout, "P1 o P2");
-
-  // (4) Check if solution exists.
-  bdd R4 = p1_then_p2 & (*R_checker);
-  //step2.prettyPrint(std::cout, "Step 2");
-
-  return (R4 != bddfalse);
+  assert( LH::is_initialized() );
+  std::vector<LH> v;
+  v.push_back(a);
+  v.push_back(b);
+  return Compatible(v);
 }
+
+/** @return true if Compatible(v_1,...,v_N) */
+bool LH::Compatible( const std::vector<LH>& v )
+{
+  assert( LH::is_initialized() );
+  assert( v.size() >= 2 );
+  LH lh = Summarize(v[0],v[1]);
+  for (size_t idx = 2 ; idx < v.size() ; idx++)
+  {
+    lh = Summarize(lh,v[idx]);
+  }
+  return (lh != Null());
+}
+
 
 LH LH::operator|(const LH& that) const
 {
@@ -541,6 +531,11 @@ LH LH::operator&(const LH& that) const
 bool LH::operator==(const LH& that) const
 {
   return R == that.R;
+}
+
+bool LH::operator!=(const LH& that) const
+{
+  return R != that.R;
 }
 
 LH::LH( bdd R ) : R(R)
@@ -805,18 +800,21 @@ bdd LH::acquire_lock( int lock )
   // (2) L' = L \cup {lock}
   bdd set_lock = set( notinL , 1 , get_lock_in_L(lock) );
 
-  // (3) l \in L' --> [lock] \in AH_l
+  // (3) AH'[lock] = {lock}
+  set_lock = set( set_lock , 1 , get_ah_start(lock)+lock);
+
+  // (3) l \in AH'_l --> [lock] \in AH'_l
   bdd R = set_lock;
   for (int l = 0 ; l < LOCKS ; l++)
   {
-    bdd if_l_in_L = var(0,get_lock_in_L(l));
+    bdd if_l_in_AH2_l = var(1,get_ah_start(l)+l);
 
-    bdd lock_in_AH_l = set( ID.R , 1 , get_ah_start(l)+lock );
+    bdd lock_in_AH2_l = set( ID.R , 1 , get_ah_start(l)+lock );
 
     bdd add_lock_to_AH_l = 
       bdd_ite( 
-          if_l_in_L , 
-          lock_in_AH_l , 
+          if_l_in_AH2_l , 
+          lock_in_AH2_l , 
           ID.R);
     R = compose( R , add_lock_to_AH_l );
   }
@@ -969,8 +967,10 @@ void LH::printHandler(char* v, int size)
 {
   cout << "  ";
   printPly(v,size,0);
-  cout << "  ==>  ";
+  cout << "\n     ==>  ";
   printPly(v,size,1);
+  //cout << "\n       ==>  ";
+  //printPly(v,size,2);
   cout << endl;
 }
 
@@ -1004,4 +1004,159 @@ void LH::printLH(std::ostream& o , bdd R, bool subID)
       bdd_allsat(R,printHandler);
   }
 }
+
+/** 
+ * The relation for Compatible(LH_1,LH_2)
+ * is used to compute a yes/no answer, and
+ * has no use for the third (scratch) ply.
+ * The relation for Summarizer further restricts
+ * Compatilbe by using the third ply to "summarize"
+ * two LHs. The rules are as follows (plies are the indexes):
+ *
+ *   (1) l \in L1     &  l \notin L2 => l \in L3
+ *   (2) l \notin L1  &  l \in L2    => l \in L3
+ *   (3) r \in R1     &  r \notin R2 => r \in R3
+ *   (4) r \notin R1  &  r \in R2    => r \in R3
+ *   (5) l \in U1     |  l \in U2    => l \in U3
+ *   (6) i \in AH1[j] | i \in AH2[j] => i \in AH3[j]
+ *   (7) i \in RH1[j] | i \in RH2[j] => i \in RH3[j]
+ *   (8) j \in AH1[i] & h \in AH2[j] => h \in AH3[i]
+ *   (9) j \in RH1[i] & h \in RH2[j] => h \in RH3[i]
+ */
+bdd LH::Summarizer()
+{
+  assert( LH::is_initialized() );
+  bdd sum = *R_checker;
+  for (int q = 0; q < Q ; q++)
+  {
+    sum = bdd_ite(
+        (q_in_ply(q,0) & q_in_ply(q,1)),
+        (sum & q_in_ply(q,2)),
+        sum);
+  }
+  for (int l = 0 ; l < LOCKS; l++)
+  {
+    // (1) l \in L1 & l \notin L2 => l \in L3
+    // (2) l \notin L1 &  l \in L2    => l \in L3
+    sum = bdd_ite(
+        (
+          (var(0,get_lock_in_L(l)) & nvar(1,get_lock_in_L(l))) |
+          (nvar(0,get_lock_in_L(l)) & var(1,get_lock_in_L(l)))
+        ),
+        set(sum, 2, get_lock_in_L(l)),
+        unset(sum, 2, get_lock_in_L(l)) 
+        );
+
+    // (3) r \in R1    &  r \notin R2 => r \in R3
+    // (4) r \notin R1 &  r \in R2    => r \in R3
+    sum = bdd_ite(
+        (
+         (var(0,get_lock_in_R(l)) & nvar(1,get_lock_in_R(l))) |
+         (nvar(0,get_lock_in_R(l)) & var(1,get_lock_in_R(l)))
+        ),
+        set(sum, 2, get_lock_in_R(l)),
+        unset(sum, 2, get_lock_in_R(l))
+        );
+
+    // (5) l \in U1    |  l \in U2    => l \in U3
+    sum = bdd_ite(
+        (var(0,get_lock_in_U(l)) | var(1,get_lock_in_U(l))),
+        set(sum, 2, get_lock_in_U(l)),
+        unset(sum, 2, get_lock_in_U(l)) 
+        );
+    const int i = l;
+    for (int j = 0 ; j < LOCKS ; j++)
+    {
+      { // (6) j \in AH1[i] | j \in AH2[i] => j \in AH3[j]
+        bdd j_in_A1i = var(0 , get_ah_start(i)+j);
+        bdd j_in_A2i = var(1 , get_ah_start(i)+j);
+        sum = bdd_ite(
+            (j_in_A1i | j_in_A2i),
+            set(sum, 2, get_ah_start(i)+j),
+            unset(sum, 2, get_ah_start(i)+j)
+            );
+      }
+      { // (7) j \in RH1[i] | j \in RH2[i] => j \in RH3[j]
+        bdd j_in_R1i = var(0 , get_rh_start(i)+j);
+        bdd j_in_R2i = var(1 , get_rh_start(i)+j);
+        sum = bdd_ite(
+            (j_in_R1i | j_in_R2i),
+            set(sum, 2, get_rh_start(i)+j),
+            unset(sum, 2, get_rh_start(i)+j)
+            );
+      }
+    }
+    for (int j = 0 ; j < LOCKS ; j++)
+    {
+      // (8) j \in AH1[i] & h \in AH2[j] => h \in AH3[i]
+      // (9) j \in RH1[i] & h \in RH2[j] => h \in RH3[i]
+      bdd j_in_A1i = var(0,get_ah_start(i)+j);
+      bdd j_in_R1i = var(0,get_rh_start(i)+j);
+      for (int h = 0 ; h < LOCKS ; h++)
+      {
+        bdd h_in_A2j = var(1,get_ah_start(j)+h);
+        sum = bdd_ite(
+            (j_in_A1i & h_in_A2j),
+            set(sum, 2, get_ah_start(i)+h),
+            sum);
+        bdd h_in_R2j = var(1,get_rh_start(j)+h);
+        sum = bdd_ite(
+            (j_in_R1i & h_in_R2j),
+            set(sum, 2, get_rh_start(i)+h),
+            sum);
+      }
+    }
+  }
+  return sum;
+}
+
+/** @return Summary LH for LHs [a] and [b] */
+LH LH::Summarize( const LH& a, const LH& b )
+{
+  static bdd Rsum = Summarizer();
+
+  LH path1 = Empty().Compose(a);
+  //path1.prettyPrint(std::cout,"Path 1");
+
+  LH path2 = Empty().Compose(b);
+  //path2.prettyPrint(std::cout,"Path 2");
+
+  // ///////////////////////////////////
+  // Perform test
+  //    \exists li,lj . li \in AH_j && lj \in AH_i 
+  // 
+  // Note that L \cap L' not necessary b/c of Peter's mod to definition of 
+  // AH and putting lock [l] in [AH_l].
+  //
+  // (1) existentially quantify out PLY 1 in path1 and path 2
+  bdd quantify_ply_1_for_path1 = bdd_exist( path1.R , *pply1 );
+  bdd quantify_ply_1_for_path2 = bdd_exist( path2.R , *pply1 );
+
+  // (2) Shift path 1 :: PLY 2 -> PLY1 
+  bdd path1_shiftleft = bdd_replace(quantify_ply_1_for_path1,shiftleft);
+
+  // (3) Logically AND path 1 and path 2
+  bdd p1_then_p2 = path1_shiftleft & quantify_ply_1_for_path2;
+  //LH(p1_then_p2).prettyPrint(cout, "P1 o P2");
+
+  // (4) Check if solution exists.
+  //bdd R4 = p1_then_p2 & (*R_checker);
+  bdd R4 = p1_then_p2 & Rsum;
+  { // DEBUGGING 
+    //LH lh4(R4);
+    //lh4.prettyPrint(std::cout, "R4");
+  }
+
+  // (5) Quantify out plys 1 and 2
+  bdd R5 = bdd_exist( bdd_exist( R4,*pply1), *pply2 );
+
+  // (6) And with Empty() relation, and then shift left 1
+  bdd R6 = bdd_replace(bdd_exist((Empty().R & R5), *pply1),shiftleft);
+  LH lh6(R6);
+  { // DEBUGGING 
+    lh6.prettyPrint(std::cout, "R6");
+  }
+  return lh6;
+}
+
 

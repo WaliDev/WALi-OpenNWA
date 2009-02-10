@@ -20,8 +20,11 @@
 
  */
 
-#include "bdd.h"
 #include <iostream>
+#include <vector>
+
+#include "bdd.h"
+
 #include "wali/Common.hpp"
 
 namespace wali
@@ -72,6 +75,15 @@ namespace wali
           /** @return \LH -> LH - [lock] */
           static LH Release(int lock);
 
+          /** @return true if Compatible([a],[b]) */
+          static bool Compatible( const LH& a , const LH& b);
+
+          /** @return true if Compatible(v_1,...,v_N) */
+          static bool Compatible( const std::vector<LH>& v );
+
+          /** @return Summary LH for LHs [a] and [b] */
+          static LH Summarize( const LH& a, const LH& b );
+
         public:
           LH(const LH& that);
           virtual ~LH();
@@ -108,9 +120,6 @@ namespace wali
           /** @return union of [this] and [that] */
           LH Union( const LH& that ) const;
 
-          /** @return true if Compatible([this],[that]) */
-          bool Compatible( const LH& that);
-
           /** @return Union of [this] and [that] */
           LH operator|(const LH& that) const;
 
@@ -120,8 +129,11 @@ namespace wali
           /** @return Intersect of [this] and [that] */
           LH operator&(const LH& that) const;
 
-          /** @return true if [this] equals [that] */
+          /** @return true if [this] == [that] */
           bool operator==(const LH& that) const;
+
+          /** @return true if [this] != [that] */
+          bool operator!=(const LH& that) const;
 
         private: // Helper methods
           /** Initialize buddy and allocate DxRxS vars */
@@ -215,6 +227,26 @@ namespace wali
               std::ostream& o,
               bdd R,
               bool subID=false);
+
+          /** 
+           * The relation for Compatible(LH_1,LH_2)
+           * is used to compute a yes/no answer, and
+           * has no use for the third (scratch) ply.
+           * The relation for Summarize further restricts
+           * Compatilbe by using the third ply to "summarize"
+           * two LHs. The rules are as follows (plies are the indexes):
+           *
+           *   (1) l \in L1     &  l \notin L2 => l \in L3
+           *   (2) l \notin L1  &  l \in L2    => l \in L3
+           *   (3) r \in R1     &  r \notin R2 => r \in R3
+           *   (4) r \notin R1  &  r \in R2    => r \in R3
+           *   (5) l \in U1     |  l \in U2    => l \in U3
+           *   (6) i \in AH1[j] | i \in AH2[j] => i \in AH3[j]
+           *   (7) i \in RH1[j] | i \in RH2[j] => i \in RH3[j]
+           *   (8) j \in AH1[i] & h \in AH2[j] => h \in AH3[i]
+           *   (9) j \in RH1[i] & h \in RH2[j] => h \in RH3[i]
+           */
+          static bdd Summarizer();
 
         private: // static vars
 

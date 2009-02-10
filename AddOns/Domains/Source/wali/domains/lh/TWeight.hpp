@@ -5,9 +5,8 @@
  * @author Nicholas Kidd
  *
  * Wrapper around class T that implements the semiring methods of WALi. [T] must
- * be PhaseLH for the moment, but TWeight will support, for example, a TensorLH
+ * be LH or PhaseLH for the moment, but TWeight will support TensorLH
  * when it is implemented.
- *
  */
 
 #include "wali/Common.hpp"
