@@ -7,7 +7,6 @@
 
 \usepackage{hyperref}
 \usepackage{url}
-\usepackage{refs}
 \usepackage{color}
 \usepackage{xspace}
 \usepackage{ifpdf}
@@ -59,6 +58,9 @@
 \newcommand{\Rule}[2]{\conf{#1}\hookrightarrow\conf{#2}}
 \newcommand{\longhookrightarrow}{\lhook\joinrel\relbar\joinrel\rightarrow}
 \newcommand{\RuleA}[3]{\conf{#1}\;{\buildrel#2\over\longhookrightarrow}\conf{#3}}
+\newcommand{\sectref}[1]{\S\ref{Se:#1}}
+\newcommand{\figref}[1]{Fig.~\ref{Fi:#1}}
+\newcommand{\tableref}[1]{Tab.~\ref{Ta:#1}}
 
 %\title{${\date{\today}}$ WPDS++ User Manual}
 \title{\WALi User Manual}
