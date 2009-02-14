@@ -9,6 +9,7 @@ Import('LibInstallDir')
 
 XercesDir = Name
 Export('XercesDir')
+ThirdParty = os.path.join(WaliDir,'AddOns','Parse','ThirdParty')
 
 
 # download binary distribution archive
@@ -19,12 +20,12 @@ env = Environment(
     # NAK - `$archive` is not compatible with external invocation of this script 
     url     = '$mirror/%s' % archive,
     )
-if not File(archive).exists():
+if not File(archive,ThirdParty).exists():
     env.Execute([['curl', '--silent', '--fail', '--show-error', '--output', '$archive', '$url']])
 
 
 # unpack the archive to get the good stuff out
-if not File('README', XercesDir).exists():
+if not File('README', os.path.join(ThirdParty,XercesDir)).exists():
     unpack = (
         ['unzip', '-o', '-d', '$archive.dir', '$archive'],
         ['$TAR', '--directory', '$archive.dir', '-zxf', '$archive'],
