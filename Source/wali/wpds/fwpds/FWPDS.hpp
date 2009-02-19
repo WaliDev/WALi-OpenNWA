@@ -48,6 +48,7 @@ namespace wali {
         public:
           FWPDS();
           FWPDS(ref_ptr<Wrapper> wrapper);
+          FWPDS( const FWPDS& f );
 
           ////////////
           // add rules

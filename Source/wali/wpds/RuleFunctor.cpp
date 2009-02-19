@@ -5,6 +5,7 @@
 
 #include "wali/wpds/RuleFunctor.hpp"
 #include "wali/wpds/Rule.hpp"
+#include "wali/wpds/WPDS.hpp"
 
 namespace wali
 {
@@ -59,6 +60,20 @@ namespace wali
         s.insert(k);
     }
 
+    /////////////////////////////////////////////////////////////////
+    // class RuleCopier
+    /////////////////////////////////////////////////////////////////
+    RuleCopier::RuleCopier(WPDS& w) : w(w)
+    {
+    }
+
+    void RuleCopier::operator()( const rule_t & r)
+    {
+      w.add_rule(
+          r->from_state(), r->from_stack(),
+          r->to_state(), r->to_stack1(), r->to_stack2(),
+          r->weight());
+    }
 
   } // namespace wpds
 

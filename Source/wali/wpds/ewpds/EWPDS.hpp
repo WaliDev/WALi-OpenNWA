@@ -57,6 +57,7 @@ namespace wali
 
           EWPDS(); 
           EWPDS( ref_ptr<Wrapper> wrapper );
+          EWPDS( const EWPDS& e );
 
           virtual ~EWPDS();
 
@@ -182,10 +183,6 @@ namespace wali
               WFA & ca  ,
               rule_t & r,
               sem_elem_t delta );
-
-          /**
-           * @brief helper method for poststar
-           */
 
           /**
            * @brief helper method for poststar

@@ -54,6 +54,17 @@ namespace wali
     {
     }
 
+    WPDS::WPDS( const WPDS& w ) :
+      wali::Printable(),
+      wali::wfa::TransFunctor(),
+      wrapper(w.wrapper),
+      worklist( new DefaultWorklist<wfa::ITrans>() ),
+      currentOutputWFA(0)
+    {
+      RuleCopier rc(*this);
+      w.for_each(rc);
+    }
+
     WPDS::~WPDS()
     {
       //*waliErr << "~WPDS()" << std::endl;

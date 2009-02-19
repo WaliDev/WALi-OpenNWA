@@ -45,6 +45,23 @@ namespace wali
     namespace ewpds
     {
 
+      class ERuleCopier : public ConstRuleFunctor
+      {
+        public:
+          EWPDS& e;
+          ERuleCopier(EWPDS& e) : e(e) {}
+          virtual void operator()(const rule_t& r)
+          {
+            // TODO - can be made static_cast
+            const ERule* erule = dynamic_cast<const ERule*>(r.get_ptr());
+            assert(erule != NULL);
+            e.add_rule(
+                erule->from_state(), erule->from_stack(),
+                erule->to_state(), erule->to_stack1(), erule->to_stack2(),
+                erule->weight(), erule->merge_fn());
+          }
+      };
+
       const std::string EWPDS::XMLTag("EWPDS");
 
       EWPDS::EWPDS() : WPDS(), addEtrans(false)
@@ -55,6 +72,14 @@ namespace wali
       { 
       }
 
+
+      EWPDS::EWPDS( const EWPDS& e ) :
+        WPDS(e.wrapper),
+        addEtrans(false)
+      {
+        ERuleCopier copier(*this);
+        e.for_each(copier);
+      }
 
       EWPDS::~EWPDS()
       {

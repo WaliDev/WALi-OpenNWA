@@ -1,7 +1,7 @@
 #ifndef wali_wpds_RULE_FUNCTOR_GUARD
 #define wali_wpds_RULE_FUNCTOR_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  * @author Akash Lal
  */
@@ -14,6 +14,7 @@ namespace wali
 {
   namespace wpds
   {
+    class WPDS;
     class Rule;
     class rule_t;
 
@@ -99,6 +100,13 @@ namespace wali
         void addPoint(Key k, std::set< Key > &s);
     };
 
+    class RuleCopier : public ConstRuleFunctor
+    {
+      public:
+        WPDS& w;
+        RuleCopier(WPDS& w);
+        virtual void operator()( const rule_t & r);
+    };
   } // end namespace wpds
 
 } // end namespace wali

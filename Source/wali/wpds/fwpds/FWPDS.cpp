@@ -57,6 +57,10 @@ FWPDS::FWPDS(ref_ptr<wpds::Wrapper> wrapper) : EWPDS(wrapper) , interGr(NULL), c
 {
 }
 
+FWPDS::FWPDS( const FWPDS& f ) : EWPDS(f),interGr(NULL),checkingPhase(false)
+{
+}
+
 ///////////////////////////////////////////////////////////////////
 void FWPDS::topDownEval(bool f) {
   graph::RegExp::topDownEval(f);
@@ -150,10 +154,10 @@ std::ostream& graphPrintKey( int k, std::ostream& o ) {
 
 void FWPDS::prestar( wfa::WFA& input, wfa::WFA& output )
 {
-    // setup output
-    addEtrans = true;
-    EWPDS::prestarSetupFixpoint(input,output);
-    addEtrans = false;
+  // setup output
+  addEtrans = true;
+  EWPDS::prestarSetupFixpoint(input,output);
+  addEtrans = false;
 
   // If theZero is invalid, then there
   // are no rules and not saturation to 

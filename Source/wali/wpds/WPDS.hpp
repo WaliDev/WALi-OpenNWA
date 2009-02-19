@@ -69,6 +69,7 @@ namespace wali
 
         WPDS();
         WPDS( ref_ptr<Wrapper> wrapper );
+        WPDS( const WPDS& w );
         virtual ~WPDS();
 
         /**
