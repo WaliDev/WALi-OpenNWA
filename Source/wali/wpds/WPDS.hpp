@@ -224,6 +224,7 @@ namespace wali
 
         bool is_pds_state(wali::Key k) const;
         int num_pds_states() const { return (int) pds_states.size(); }
+        const std::set<wali::Key>& get_states() const { return pds_states; }
  
         /** @brief Runs a poststar query on the following automaton
          * to get one that represents the program CFG.
