@@ -52,6 +52,21 @@ namespace wali
       }
     }
 
+    merge_fn_t WitnessWrapper::unwrap( merge_fn_t mf )
+    {
+      WitnessMergeFn* wmf = dynamic_cast< WitnessMergeFn* >(mf.get_ptr());
+      if( 0 != wmf ) {
+        return wmf->get_user_merge();
+      }
+      else {
+        // TODO: throw an error
+        *waliErr << "[ERROR] Unwrap<merge_fn_t> called on non WitnessMergeFn weight.\n";
+        mf->print( *waliErr << "   mf: " ) << std::endl;
+        assert(0);
+        return 0;
+      }
+    }
+
   } // namespace witness
 
 } // namespace wali

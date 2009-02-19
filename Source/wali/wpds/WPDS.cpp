@@ -61,7 +61,7 @@ namespace wali
       worklist( new DefaultWorklist<wfa::ITrans>() ),
       currentOutputWFA(0)
     {
-      RuleCopier rc(*this);
+      RuleCopier rc(*this,wrapper);
       w.for_each(rc);
     }
 

@@ -51,6 +51,11 @@ namespace wali
       return witmerge;
     }
 
+    merge_fn_t WitnessMergeFn::get_user_merge()
+    {
+      return user_merge;
+    }
+
   } // namespace witness
 
 } // namespace wali

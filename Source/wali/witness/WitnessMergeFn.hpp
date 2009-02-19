@@ -29,6 +29,8 @@ namespace wali
 
         virtual std::ostream& print( std::ostream& o ) const;
 
+        merge_fn_t get_user_merge();
+
       protected:
         sem_elem_t priv_do_apply( sem_elem_t w1,sem_elem_t w2 );
 

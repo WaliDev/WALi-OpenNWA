@@ -34,7 +34,13 @@ namespace wali
     {
       return se;
     }
-  }
 
-}
+    merge_fn_t Wrapper::unwrap( merge_fn_t mf )
+    {
+      return mf;
+    }
+
+  } // namespace wpds
+
+} // namespace wali
 

@@ -63,16 +63,19 @@ namespace wali
     /////////////////////////////////////////////////////////////////
     // class RuleCopier
     /////////////////////////////////////////////////////////////////
-    RuleCopier::RuleCopier(WPDS& w) : w(w)
+    RuleCopier::RuleCopier(WPDS& w,ref_ptr<Wrapper> wr) : w(w),wrapper(wr)
     {
     }
 
     void RuleCopier::operator()( const rule_t & r)
     {
+      sem_elem_t se = r->weight();
+      if (wrapper.is_valid())
+        se = wrapper->unwrap(se);
       w.add_rule(
           r->from_state(), r->from_stack(),
           r->to_state(), r->to_stack1(), r->to_stack2(),
-          r->weight());
+          se);
     }
 
   } // namespace wpds

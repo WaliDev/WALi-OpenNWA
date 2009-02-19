@@ -32,6 +32,8 @@ namespace wali
 
         virtual sem_elem_t unwrap( sem_elem_t se );
 
+        virtual merge_fn_t unwrap( merge_fn_t mf );
+
     }; // namespace WitnessWrapper
 
   } // namespace witness

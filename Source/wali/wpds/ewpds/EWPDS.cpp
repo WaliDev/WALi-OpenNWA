@@ -49,16 +49,26 @@ namespace wali
       {
         public:
           EWPDS& e;
-          ERuleCopier(EWPDS& e) : e(e) {}
+          ref_ptr<Wrapper> wrapper;
+          ERuleCopier(EWPDS& e,ref_ptr<Wrapper> wr) : e(e),wrapper(wr) {}
           virtual void operator()(const rule_t& r)
           {
             // TODO - can be made static_cast
             const ERule* erule = dynamic_cast<const ERule*>(r.get_ptr());
             assert(erule != NULL);
+            sem_elem_t se = erule->weight();
+            merge_fn_t mf = erule->merge_fn();
+            if (wrapper.is_valid())
+            {
+              se = wrapper->unwrap(se);
+              if (r->to_stack2() != WALI_EPSILON)
+                mf = wrapper->unwrap(mf);
+            }
+
             e.add_rule(
                 erule->from_state(), erule->from_stack(),
                 erule->to_state(), erule->to_stack1(), erule->to_stack2(),
-                erule->weight(), erule->merge_fn());
+                se, mf);
           }
       };
 
@@ -77,7 +87,7 @@ namespace wali
         WPDS(e.wrapper),
         addEtrans(false)
       {
-        ERuleCopier copier(*this);
+        ERuleCopier copier(*this,wrapper);
         e.for_each(copier);
       }
 

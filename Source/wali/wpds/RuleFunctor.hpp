@@ -7,6 +7,7 @@
  */
 
 #include "wali/Common.hpp"
+#include "wali/ref_ptr.hpp"
 #include <iostream>
 #include <set>
 
@@ -15,6 +16,7 @@ namespace wali
   namespace wpds
   {
     class WPDS;
+    class Wrapper;
     class Rule;
     class rule_t;
 
@@ -104,7 +106,8 @@ namespace wali
     {
       public:
         WPDS& w;
-        RuleCopier(WPDS& w);
+        ref_ptr<Wrapper> wrapper;
+        RuleCopier(WPDS& w,ref_ptr<Wrapper>);
         virtual void operator()( const rule_t & r);
     };
   } // end namespace wpds
