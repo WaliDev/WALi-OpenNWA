@@ -208,6 +208,10 @@ template< typename Set > class GenKillTransformer_T {
             return Set::Eq(kill,y->kill) && Set::Eq(gen,y->gen);
         }
 
+        bool equal(GenKillTransformer_T* y) const {
+          return this->isEqual(y);
+        }
+
         std::ostream& prettyPrint( std::ostream& o ) const
         {
             o << "<\\S.(S - {" << kill << "}) U {" << gen << "}>";
@@ -244,6 +248,12 @@ template< typename Set > class GenKillTransformer_T {
             o << "ONE\t=\t"    << *one()    << std::endl;
             o << "ZERO\t=\t"   << *zero()   << std::endl;
             o << "BOTTOM\t=\t" << *bottom() << std::endl;
+            return o;
+        }
+
+        std::ostream& WPDS_CALL print( std::ostream& o )
+        {
+            o << "GenKillTransformer\n";
             return o;
         }
 
