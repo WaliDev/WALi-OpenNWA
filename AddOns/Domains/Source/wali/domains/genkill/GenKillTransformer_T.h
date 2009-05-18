@@ -46,28 +46,35 @@ class Set {
 
 */
 
-template< typename Set > class GenKillTransformer_T {
+#include "wali/SemElem.hpp"
+
+using wali::SemElem;
+using wali::sem_elem_t;
+
+template< typename Set > class GenKillTransformer_T : public wali::SemElem {
 
     public: // methods
+
+        sem_elem_t one() const { return MkOne(); }
+        sem_elem_t zero() const { return MkZero(); }
+        sem_elem_t bottom() const { return MkBottom(); }
 
         // A client uses makeGenKillTransformer_T to create a
         // GenKillTransformer_T instead of calling the constructor directly;
         // makeGenKillTransformer_T maintains unique representatives for the
         // special semiring values one and bottom.
-        static GenKillTransformer_T* WPDS_CALL makeGenKillTransformer_T(
-                const Set& k
-                , const Set& g )
+        static sem_elem_t makeGenKillTransformer_T(const Set& k, const Set& g )
         {
             Set k_normalized = Set::Diff(k,g);
             if (Set::Eq(k_normalized, Set::EmptySet())&& 
                     Set::Eq(g, Set::UniverseSet()))
             {
-                return GenKillTransformer_T::bottom();
+                return MkBottom();
             }
             else if (Set::Eq(k_normalized, Set::EmptySet()) && 
                     Set::Eq(g, Set::EmptySet()))
             {
-                return GenKillTransformer_T::one();
+                return MkOne();
             }
             else {
                 return new GenKillTransformer_T(k_normalized, g);
@@ -79,7 +86,7 @@ template< typename Set > class GenKillTransformer_T {
         //-------------------------------------------------
         // Semiring methods
         //-------------------------------------------------
-        static GenKillTransformer_T* WPDS_CALL one()
+        static sem_elem_t MkOne()
         {
             // Uses a method-static variable to avoid
             // problems with static-initialization order
@@ -91,7 +98,7 @@ template< typename Set > class GenKillTransformer_T {
         // Zero is a special value that doesn't map to any gen/kill pair,
         // so all we really want out of this is a unique representative.
         // The gen/kill sets with which it is initialized are arbitrary.
-        static GenKillTransformer_T* WPDS_CALL zero()
+        static sem_elem_t MkZero()
         {
             // Uses a method-static variable to avoid
             // problems with static-initialization order
@@ -100,7 +107,7 @@ template< typename Set > class GenKillTransformer_T {
             return ZERO;
         }
 
-        static GenKillTransformer_T* WPDS_CALL bottom()
+        static sem_elem_t MkBottom()
         {
             // Uses a method-static variable to avoid
             // problems with static-initialization order
@@ -116,37 +123,42 @@ template< typename Set > class GenKillTransformer_T {
         // Considering x and y as functions, x extend y = y o x,
         // where (g o f)(v) = g(f(v)).
         //
-        GenKillTransformer_T* extend( GenKillTransformer_T* y )
+        sem_elem_t extend( SemElem* _y )
         {
             // Handle special case for either argument being zero()
-            if( isEqual(GenKillTransformer_T::zero()) ) {
-                return GenKillTransformer_T::zero();
+            if( this->equal(zero()) ) {
+                return zero();
             }
-            else if( y->isEqual(GenKillTransformer_T::zero()) ) {
-                return GenKillTransformer_T::zero();
+            else if( _y->equal(zero()) ) {
+                return zero();
             }
             // Handle special case for either argument being one().
-            if( isEqual(GenKillTransformer_T::one()) ) {
-                return y;
+            if( this->equal(one()) ) {
+                return _y;//new GenKillTransformer_T(*y);
             }
-            else if( y->isEqual(GenKillTransformer_T::one()) ) {
-                return this;
+            else if( _y->equal(one()) ) {
+                return new GenKillTransformer_T(*this);
             }
+
+            const GenKillTransformer_T* y = dynamic_cast<const GenKillTransformer_T*>(_y);
+
             // Handle the general case
             Set temp_k( Set::Union( kill, y->kill ) );
             Set temp_g( Set::Union( Set::Diff2(gen,y->kill,y->gen),y->gen) );
             return makeGenKillTransformer_T( temp_k,temp_g );
         }
 
-        GenKillTransformer_T* combine( GenKillTransformer_T* y )
+        sem_elem_t combine( SemElem* _y )
         {
             // Handle special case for either argument being zero()
-            if( isEqual(GenKillTransformer_T::zero()) ) {
-                return y;
+            if( this->equal(zero()) ) {
+                return _y; //new GenKillTransformer_T(*y);
             }
-            else if( y->isEqual(GenKillTransformer_T::zero()) ) {
-                return this;
+            else if( _y->equal(zero()) ) {
+                return new GenKillTransformer_T(*this);
             }
+
+            const GenKillTransformer_T* y = dynamic_cast<const GenKillTransformer_T*>(_y);
             // Handle the general case
             Set temp_k( Set::Intersect( kill, y->kill ) );
             Set temp_g( Set::Union( gen, y->gen ) );
@@ -154,7 +166,7 @@ template< typename Set > class GenKillTransformer_T {
             return makeGenKillTransformer_T( temp_k,temp_g );
         }
 
-        GenKillTransformer_T* quasiOne() const
+        sem_elem_t quasiOne() const
         {
             return one();
         }
@@ -170,16 +182,17 @@ template< typename Set > class GenKillTransformer_T {
         // 2. y combine r = y combine a,
         //    i.e., isEqual(combine(y,r), combine(y,a)) == true
         //
-        GenKillTransformer_T* diff( GenKillTransformer_T* y )
+        sem_elem_t diff( SemElem* _y )
         {
             // Handle special case for either argument being zero
-            if( isEqual(GenKillTransformer_T::zero()) ) {
-                return GenKillTransformer_T::zero();
+            if( this->equal(zero()) ) {
+                return zero();
             }
-            else if( y->isEqual(GenKillTransformer_T::zero()) ) {
-                return this;
+            else if( _y->equal(zero()) ) {
+                return new GenKillTransformer_T(*this);
             }
 
+            const GenKillTransformer_T* y = dynamic_cast<const GenKillTransformer_T*>(_y);
             // Both *this and *y are proper (non-zero) values
 
             Set temp_k( Set::Diff(Set::UniverseSet(),Set::Diff(y->kill,kill)) );
@@ -190,7 +203,7 @@ template< typename Set > class GenKillTransformer_T {
             if (Set::Eq(temp_k, Set::UniverseSet()) && 
                 Set::Eq(temp_g, Set::EmptySet()))
             {
-                return GenKillTransformer_T::zero();
+                return zero();
             }
 
             // Handle the general case
@@ -199,23 +212,36 @@ template< typename Set > class GenKillTransformer_T {
 
         // Zero is a special representative that must be compared
         // by address rather by its contained Gen/Kill sets.
-        bool isEqual(GenKillTransformer_T* y) const
+        bool isEqual(const GenKillTransformer_T* y) const
         {
-            if ( this == GenKillTransformer_T::zero() )
-                return y == GenKillTransformer_T::zero();
-            if ( y == GenKillTransformer_T::zero() )
-                return this == GenKillTransformer_T::zero();
+            const GenKillTransformer_T* _zero = dynamic_cast<const GenKillTransformer_T*>(zero().get_ptr());
+            const GenKillTransformer_T* _one = dynamic_cast<const GenKillTransformer_T*>(one().get_ptr());
+  
+            if ( this == _one && y == _one )
+                return true;
+            if ( this == _zero && y == _zero )
+                return true;
+
             return Set::Eq(kill,y->kill) && Set::Eq(gen,y->gen);
         }
 
-        bool equal(GenKillTransformer_T* y) const {
+        bool equal(SemElem* _y) const {
+          const GenKillTransformer_T* y = dynamic_cast<const GenKillTransformer_T*>(_y);
           return this->isEqual(y);
         }
 
-        std::ostream& prettyPrint( std::ostream& o ) const
-        {
+        bool equal(sem_elem_t _y) const {
+          const GenKillTransformer_T* y = dynamic_cast<const GenKillTransformer_T*>(_y.get_ptr());
+          return this->isEqual(y);
+        }
+
+        std::ostream& print( std::ostream& o ) const {
             o << "<\\S.(S - {" << kill << "}) U {" << gen << "}>";
             return o;
+        }
+
+        std::ostream& prettyPrint( std::ostream& o ) const {
+            return this->print(o);
         }
 
         //-------------------------------------------------
@@ -223,7 +249,7 @@ template< typename Set > class GenKillTransformer_T {
         //-------------------------------------------------
 
         Set apply( const Set& input ) {
-            assert ( this != GenKillTransformer_T::zero() );
+            assert ( !(this == zero()) );
             return Set::Union( Set::Diff(input,kill),gen );
         }
 
@@ -245,9 +271,9 @@ template< typename Set > class GenKillTransformer_T {
 
         static std::ostream& WPDS_CALL print_static_transformers( std::ostream& o )
         {
-            o << "ONE\t=\t"    << *one()    << std::endl;
-            o << "ZERO\t=\t"   << *zero()   << std::endl;
-            o << "BOTTOM\t=\t" << *bottom() << std::endl;
+            o << "ONE\t=\t";    one()->print(o);  o << std::endl;
+            o << "ZERO\t=\t";   zero()->print(o); o << std::endl;
+            o << "BOTTOM\t=\t"; bottom()->print(o); o << std::endl;
             return o;
         }
 
@@ -282,7 +308,7 @@ template< typename Set > class GenKillTransformer_T {
         Set kill, gen;   // Used to represent the function \S.(S - kill) U gen
 
     public: // members -----------------------------------------------------------
-        unsigned int count;
+        RefCounter count;
 };
 
 template< typename Set >
