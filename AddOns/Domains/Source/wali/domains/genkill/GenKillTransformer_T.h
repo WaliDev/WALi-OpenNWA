@@ -304,6 +304,9 @@ template< typename Set > class GenKillTransformer_T : public wali::SemElem {
 #endif
         }
 
+    public:
+      GenKillTransformer_T() {}
+
     private: // members -----------------------------------------------------------
         Set kill, gen;   // Used to represent the function \S.(S - kill) U gen
 
