@@ -90,8 +90,10 @@ template< typename Set > class GenKillTransformer_T : public wali::SemElem {
         {
             // Uses a method-static variable to avoid
             // problems with static-initialization order
-            static GenKillTransformer_T* ONE =
-                new GenKillTransformer_T(Set::EmptySet(),Set::EmptySet(),1);
+            //static GenKillTransformer_T* ONE =
+            //    new GenKillTransformer_T(Set::EmptySet(),Set::EmptySet(),1);
+            GenKillTransformer_T* ONE =
+                new GenKillTransformer_T(Set::EmptySet(),Set::EmptySet());
             return ONE;
         }
 
@@ -102,8 +104,10 @@ template< typename Set > class GenKillTransformer_T : public wali::SemElem {
         {
             // Uses a method-static variable to avoid
             // problems with static-initialization order
-            static GenKillTransformer_T* ZERO =
-                new GenKillTransformer_T(Set::UniverseSet(),Set::EmptySet(),1);
+            //static GenKillTransformer_T* ZERO =
+            //    new GenKillTransformer_T(Set::UniverseSet(),Set::EmptySet(),1);
+            GenKillTransformer_T* ZERO =
+                new GenKillTransformer_T(Set::UniverseSet(),Set::EmptySet());
             return ZERO;
         }
 
@@ -111,8 +115,10 @@ template< typename Set > class GenKillTransformer_T : public wali::SemElem {
         {
             // Uses a method-static variable to avoid
             // problems with static-initialization order
-            static GenKillTransformer_T* BOTTOM = 
-                new GenKillTransformer_T(Set::EmptySet(),Set::UniverseSet(),1);
+            //static GenKillTransformer_T* BOTTOM = 
+            //    new GenKillTransformer_T(Set::EmptySet(),Set::UniverseSet(),1);
+            GenKillTransformer_T* BOTTOM = 
+                new GenKillTransformer_T(Set::EmptySet(),Set::UniverseSet());
             return BOTTOM;
         }
 
