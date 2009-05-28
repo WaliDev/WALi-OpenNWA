@@ -59,8 +59,8 @@ namespace wali
   }
 
   void IWaliHandler::characters(
-      const XMLCh* const chars, 
-      const unsigned int length ATTR_UNUSED)
+      const XMLCh *const chars, 
+      const XMLSize_t length ATTR_UNUSED)
   {
     StrX part(chars);
     fCharStr += part.get();
@@ -68,7 +68,7 @@ namespace wali
 
   void IWaliHandler::ignorableWhitespace(                               
       const XMLCh* const chars ATTR_UNUSED, 
-      const unsigned int length ATTR_UNUSED)
+      const XMLSize_t length ATTR_UNUSED)
   {
   }
 

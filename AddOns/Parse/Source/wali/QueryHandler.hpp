@@ -80,27 +80,27 @@ namespace wali
       //////////////////////////////////////////////////
       // Content handlers
       //////////////////////////////////////////////////
-      void startDocument();
+      virtual void startDocument();
 
-      void endDocument();
+      virtual void endDocument();
 
-      void startElement(  const   XMLCh* const    uri,
+      virtual void startElement(  const   XMLCh* const    uri,
           const   XMLCh* const    localname,
           const   XMLCh* const    qname,
           const   Attributes&     attributes);
 
-      void endElement( const XMLCh* const uri,
+      virtual void endElement( const XMLCh* const uri,
           const XMLCh* const localname,
           const XMLCh* const qname);
 
-      void characters(const XMLCh* const chars, const unsigned int length);
+      virtual void characters(const XMLCh *const chars, const XMLSize_t length);
 
-      void ignorableWhitespace(                               
+      virtual void ignorableWhitespace(                               
           const XMLCh* const chars, 
-          const unsigned int length
+          const XMLSize_t length
           );
 
-      void processingInstruction( 
+      virtual void processingInstruction( 
           const XMLCh* const target, 
           const XMLCh* const data);
 
