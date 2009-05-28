@@ -64,7 +64,7 @@ namespace wali
          * Delegate to IUserHandler.
          * Important to do the delegationg for wali::UserFactoryHandler
          */
-        void characters(const XMLCh* const chars, const unsigned int length);
+        void characters(const XMLCh* const chars, const XMLSize_t length);
 
         //////////////////////////////////////////////////
         // Helpers
