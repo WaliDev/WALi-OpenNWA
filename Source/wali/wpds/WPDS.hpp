@@ -125,6 +125,51 @@ namespace wali
             Key to_stack2,
             sem_elem_t se );
 
+        /** 
+         * @brief create rule with no r.h.s. stack symbols
+	 * @brief Replace the weight if the rule already existed
+         * @return true if rule existed
+         *
+         * @see sem_elem_t
+         * @see Key
+         */
+        virtual bool replace_rule(
+            Key from_state,
+            Key from_stack,
+            Key to_state,
+            sem_elem_t se );
+
+        /** @brief create rule with one r.h.s. stack symbol
+	 * @brief Replace the weight if the rule already existed
+         *
+         * @return true if rule existed
+         *
+         * @see sem_elem_t
+         * @see Key
+         */
+        virtual bool replace_rule(
+            Key from_state,
+            Key from_stack,
+            Key to_state,
+            Key to_stack1,
+            sem_elem_t se );
+
+        /** @brief create rule with two r.h.s. stack symbols
+	 * @brief Replace the weight if the rule already existed
+         *
+         * @return true if rule existed
+         *
+         * @see sem_elem_t
+         * @see Key
+         */
+        virtual bool replace_rule(
+            Key from_state,
+            Key from_stack,
+            Key to_state,
+            Key to_stack1,
+            Key to_stack2,
+            sem_elem_t se );
+
         /**
          * @brief Perform prestar reachability query
          *
@@ -239,6 +284,8 @@ namespace wali
 
         /** @brief Actually creates the rule, hanldes the mappings,
          * etc.
+	 * @brief Replace the weight if the rule already existed and replace_weight is set,
+	 * otherwise take a combine of the weights
          *
          * @return true if rule existed
          *
@@ -252,6 +299,7 @@ namespace wali
             Key to_stack1,
             Key to_stack2,
             sem_elem_t se,
+	    bool replace_weight,
             rule_t& r );
 
         /**
@@ -360,7 +408,8 @@ namespace wali
 
         /**
          * Creates a rule that links two configurations.
-         * If rule exists then combines the weight
+         * If rule exists then (combines the weight if replace_weight is false) or
+	 * (replace the weight if replace_weight is true)
          *
          * @return true if Rule already existed
          *
@@ -372,6 +421,7 @@ namespace wali
             Config *f,
             Config *t,
             Key stk2,
+	    bool replace_weight,
             rule_t& r );
 
         /**

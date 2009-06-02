@@ -142,7 +142,39 @@ namespace wali
         sem_elem_t se )
     {
       rule_t r;
-      bool rb = add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se,r );
+      bool rb = add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se, false, r );
+      return rb;
+    }
+
+    bool WPDS::replace_rule(
+        Key from_state,
+        Key from_stack,
+        Key to_state,
+        sem_elem_t se )
+    {
+      return replace_rule(from_state,from_stack,to_state,WALI_EPSILON,WALI_EPSILON,se );
+    }
+
+    bool WPDS::replace_rule(
+        Key from_state,
+        Key from_stack,
+        Key to_state,
+        Key to_stack1,
+        sem_elem_t se )
+    {
+      return replace_rule(from_state,from_stack,to_state,to_stack1,WALI_EPSILON,se );
+    }
+
+    bool WPDS::replace_rule(
+        Key from_state,
+        Key from_stack,
+        Key to_state,
+        Key to_stack1,
+        Key to_stack2,
+        sem_elem_t se )
+    {
+      rule_t r;
+      bool rb = add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se, true, r );
       return rb;
     }
 
@@ -657,6 +689,7 @@ namespace wali
     // Actually adds the rule. Allows for 2 return values, namely
     // the bool and a rule_t which contains a pointer to the real Rule.
     // This allows for subclasses to perform postprocessing.
+    // Replaces the weight of an existing rule if replace_weight is set.
     bool WPDS::add_rule(
         Key from_state,
         Key from_stack,
@@ -664,6 +697,7 @@ namespace wali
         Key to_stack1,
         Key to_stack2,
         sem_elem_t se,
+	bool replace_weight,
         rule_t& r
         )
     {
@@ -681,7 +715,7 @@ namespace wali
 
       // make_rule will create links b/w Configs and the Rule
       r = new Rule(from, to, to_stack2, se);
-      bool rb = make_rule(from,to,to_stack2,r);
+      bool rb = make_rule(from,to,to_stack2,replace_weight,r);
 
       // if rb is false then the rule is new
       if( !rb ) {
@@ -706,6 +740,7 @@ namespace wali
       return rb;
     }
 
+
     /**
      * Creates a Config if one does not already exist
      * with KeyPair (state,stack).
@@ -725,8 +760,9 @@ namespace wali
 
     /**
      * Creates a rule that links two configurations.
-     * If rule exists then combines the weight and drops
-     * the rule passed in.
+     * If rule exists then (combines the weight if replace_weight is false) or
+     * (replace the weight if replace_weight is true)
+     * and drops the rule passed in.
      *
      * @return true if Rule already existed
      *
@@ -738,6 +774,7 @@ namespace wali
         Config *f,
         Config *t,
         Key stk2,
+	bool replace_weight,
         rule_t& r )
     {
       bool exists = false;
@@ -755,8 +792,14 @@ namespace wali
             // wrapping produces a new semiring.
             r->setWeight( wrapper->wrap(*r) );
           }
-          sem_elem_t x = tmp->weight()->combine(r->weight());
-          tmp->setWeight(x);
+
+	  if(!replace_weight) {
+	    sem_elem_t x = tmp->weight()->combine(r->weight()); 
+	    r->setWeight(x);
+	  }
+	  // This copy operation also copies other things that might sit on the
+	  // rule (i.e., merge functions)
+          tmp->copy(r);
           r = tmp;
           break;
         }

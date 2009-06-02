@@ -115,7 +115,7 @@ namespace wali
       {
         return add_rule(from_state,from_stack,to_state,to_stack1,WALI_EPSILON,se,(merge_fn_t)(NULL) );
       }
-
+    
       bool EWPDS::add_rule(
           Key from_state,
           Key from_stack,
@@ -124,7 +124,18 @@ namespace wali
           Key to_stack2,
           sem_elem_t se )
       {
-        return add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se,(merge_fn_t)(NULL) );
+        return add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se,(merge_fn_t)(NULL), false );
+      }
+
+      bool EWPDS::replace_rule(
+          Key from_state,
+          Key from_stack,
+          Key to_state,
+          Key to_stack1,
+          Key to_stack2,
+          sem_elem_t se )
+      {
+        return add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se,(merge_fn_t)(NULL), true );
       }
 
       bool EWPDS::add_rule(
@@ -135,6 +146,31 @@ namespace wali
           Key to_stack2,
           sem_elem_t se,
           merge_fn_t mf )
+      {
+	return add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se,mf, false );
+      }
+
+      bool EWPDS::replace_rule(
+          Key from_state,
+          Key from_stack,
+          Key to_state,
+          Key to_stack1,
+          Key to_stack2,
+          sem_elem_t se,
+          merge_fn_t mf )
+      {
+	return add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se,mf,true );
+      }
+
+      bool EWPDS::add_rule(
+          Key from_state,
+          Key from_stack,
+          Key to_state,
+          Key to_stack1,
+          Key to_stack2,
+          sem_elem_t se,
+          merge_fn_t mf,
+	  bool replace_weight )
       {
         // Every rule must have these 3 pieces defined
         assert( from_state != WALI_EPSILON );
@@ -149,7 +185,7 @@ namespace wali
         rule_t r(new ERule(from,to,to_stack2,se,mf));
         // WPDS::make_rule returns [true] if the rule already
         // existed. I.e., rb == false <--> r \notin this.
-        bool rb = make_rule(from,to,to_stack2,r);
+        bool rb = make_rule(from,to,to_stack2,replace_weight,r);
 
         if (!rb && to_stack1 == WALI_EPSILON )
         {
@@ -161,7 +197,7 @@ namespace wali
         // This causes problems with merge functions because
         // there isn't an interface for combining them like one
         // would normally do with weights.
-        if (rb && to_stack2 != WALI_EPSILON) 
+        if (rb && !replace_weight && to_stack2 != WALI_EPSILON) 
         {
           if (!mf.is_valid()) 
           {

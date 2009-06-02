@@ -143,6 +143,11 @@ namespace wali
          */
         bool is_rule2() const { return (stack2() != WALI_EPSILON); }
 
+        /*!
+         * @brief Make a copy of the rule
+         */
+        virtual void copy(const rule_t r);
+
       protected:
 
         Config * from() { return f; }

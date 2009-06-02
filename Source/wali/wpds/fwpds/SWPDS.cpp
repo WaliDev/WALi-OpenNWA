@@ -67,6 +67,7 @@ namespace wali
           Config *f,
           Config *t,
           Key stk2,
+	  bool replace_weight,
           rule_t& r ) 
       {
 
@@ -75,7 +76,7 @@ namespace wali
           assert(0);
         }
 
-        return WPDS::make_rule(f,t,stk2,r);
+        return WPDS::make_rule(f,t,stk2,replace_weight,r);
       }
 
       void SWPDS::preprocess() {

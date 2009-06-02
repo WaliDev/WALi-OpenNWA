@@ -34,6 +34,17 @@ namespace wali
       //*waliErr << "~Rule()   : " << numRules << std::endl;
     }
 
+    /*!
+     * @brief Make a copy of the rule
+     */
+    void Rule::copy(const rule_t r) {
+      assert(r.is_valid());
+      f = r->f;
+      t = r->t;
+      stk2 = r->stk2;
+      se = r->se;
+    }
+
     const Config & Rule::from() const { return *f; }
 
     /*!
