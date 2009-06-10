@@ -51,6 +51,7 @@ namespace wali
         public:
           using WPDS::poststar;
           using WPDS::prestar;
+          using WPDS::replace_rule;
           friend class TransCopyPairLinker;
 
         public:
