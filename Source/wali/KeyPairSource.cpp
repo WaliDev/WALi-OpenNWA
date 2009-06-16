@@ -39,7 +39,7 @@ namespace wali
     return o;
   }
 
-  KeyPair KeyPairSource::get_key_pair() const
+  const KeyPair& KeyPairSource::get_key_pair() const
   {
     return kp;
   }

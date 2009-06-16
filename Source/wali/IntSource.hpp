@@ -23,8 +23,10 @@ namespace wali
 
       virtual std::ostream& print( std::ostream& o ) const;
 
-    protected:
-      int value;
+      int getInt() const;
+
+    private:
+      const int value;
 
   }; // class IntSource
 

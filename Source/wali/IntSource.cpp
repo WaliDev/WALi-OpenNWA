@@ -1,4 +1,4 @@
-/*!
+/**
  * @author Nicholas Kidd
  * @version $Revision$
  */
@@ -31,6 +31,11 @@ namespace wali
   std::ostream& IntSource::print( std::ostream& o ) const
   {
     return o << value;
+  }
+
+  int IntSource::getInt() const
+  {
+    return value;
   }
 
 } // namespace wali

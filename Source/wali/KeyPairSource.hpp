@@ -1,7 +1,7 @@
 #ifndef wali_KEY_PAIR_SOURCE_GUARD
 #define wali_KEY_PAIR_SOURCE_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  */
 
@@ -26,17 +26,14 @@ namespace wali
 
       virtual std::ostream& print( std::ostream& o ) const;
 
-      // TODO: probably shouldn't be virtual
-      virtual KeyPair get_key_pair() const;
+      const KeyPair& get_key_pair() const;
 
-      // TODO: probably shouldn't be virtual
-      virtual Key first() const;
+      Key first() const;
 
-      // TODO: probably shouldn't be virtual
-      virtual Key second() const;
+      Key second() const;
 
-    protected:
-      KeyPair kp;
+    private:
+      const KeyPair kp;
 
   }; // class KeyPairSource
 
