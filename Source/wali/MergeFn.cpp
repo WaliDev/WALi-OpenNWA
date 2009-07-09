@@ -44,10 +44,9 @@ namespace wali
     }
   }
 
-  // Simple pointer check
   bool MergeFn::equal(merge_fn_t mf) {
     MergeFn *amf = dynamic_cast<MergeFn *>(mf.get_ptr());
-    return (this == amf);
+    return (sr_data->equal(amf->sr_data));
   }
 
   MergeFn *MergeFn::parse_element(const char *s ATTR_UNUSED, sem_elem_t sem)

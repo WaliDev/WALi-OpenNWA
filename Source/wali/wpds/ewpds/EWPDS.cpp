@@ -245,6 +245,14 @@ namespace wali
           }
         }
 
+	// Need to wrap the merge function if the rule is new or
+	// if the rule existed before, but replace_weight was set, in
+	// which case the old wrapped merge function got replaced
+	if ( (!rb  || (rb && replace_weight)) && wrapper.is_valid() && to_stack2 != WALI_EPSILON) {
+	  ERule* x = (ERule*)r.get_ptr();
+	  x->set_merge_fn( wrapper->wrap(*x,x->merge_fn()) );
+	}
+
         // If rb is false then the rule is new.
         // If there exists a rule r' = (p,c) -> (q,e,r)
         // such that (q,e,r) is the same r.h.s. for
@@ -260,11 +268,6 @@ namespace wali
           }
           r2it->second.push_back( r );
 
-          if (wrapper.is_valid())
-          {
-            ERule* x = (ERule*)r.get_ptr();
-            x->set_merge_fn( wrapper->wrap(*x,x->merge_fn()) );
-          }
           merge_rule_hash_t::iterator rhash_it = merge_rule_hash.find(KeyTriple(to_state,to_stack1,to_stack2));
           if(rhash_it == merge_rule_hash.end()) 
           {
@@ -273,7 +276,8 @@ namespace wali
           else 
           {
             ERule* x = (ERule*)rhash_it->second.get_ptr();
-	    if(!x->merge_fn()->equal(mf)) {
+	    ERule *er = (ERule*)(r.get_ptr());
+	    if(!x->merge_fn()->equal(er->merge_fn())) {
 	      // FIXME: raise exception
 	      *waliErr << "[ERROR] EWPDS :: Cannot give two push rules with same r.h.s.\n";
 	      r->print( *waliErr << "    : " ) << std::endl;

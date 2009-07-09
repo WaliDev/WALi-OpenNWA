@@ -29,6 +29,8 @@ namespace wali
 
         virtual std::ostream& print( std::ostream& o ) const;
 
+        virtual bool equal(merge_fn_t mf);
+
         merge_fn_t get_user_merge();
 
       protected:
