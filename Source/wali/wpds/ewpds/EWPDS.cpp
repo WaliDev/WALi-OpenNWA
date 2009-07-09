@@ -233,9 +233,15 @@ namespace wali
             }
           }
           else {
-            *waliErr << "[ERROR] EWPDS :: Cannot add again the same push rule.\n";
-            r->print( *waliErr << "    : " ) << std::endl;
-            throw r;
+	    // Now lets ensure that the old merge function and the new one being
+	    // added here are the same. This is the only case we allow.
+            ERule* erule = dynamic_cast<ERule*>(r.get_ptr());
+            assert(erule != NULL);
+	    if(!mf->equal(erule->merge_fn())) {
+	      *waliErr << "[ERROR] EWPDS :: Cannot add again the same push rule.\n";
+	      r->print( *waliErr << "    : " ) << std::endl;
+	      throw r;
+	    }
           }
         }
 
@@ -266,9 +272,12 @@ namespace wali
           } 
           else 
           {
-            // FIXME: raise exception
-            *waliErr << "[ERROR] EWPDS :: Cannot give two push rules with same r.h.s.\n";
-            r->print( *waliErr << "    : " ) << std::endl;
+            ERule* x = (ERule*)rhash_it->second.get_ptr();
+	    if(!x->merge_fn()->equal(mf)) {
+	      // FIXME: raise exception
+	      *waliErr << "[ERROR] EWPDS :: Cannot give two push rules with same r.h.s.\n";
+	      r->print( *waliErr << "    : " ) << std::endl;
+	    }
           }
         }
         // Set up theZero weight

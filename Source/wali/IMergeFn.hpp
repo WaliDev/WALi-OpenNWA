@@ -39,6 +39,14 @@ namespace wali
        */
       virtual sem_elem_t apply_f(sem_elem_t w1, sem_elem_t w2) = 0;
 
+      /*  
+       * Check to see if the two merge functions are equal. This is used to resolve the
+       * case when multiple call rules with the rhs are inserted into an EWPDS. Insertion
+       * of multiple such rules is only allowed when the merge functions on them are the same.
+       * Note that this function can always returns false (in which case an exception will be thrown
+       * when multiple call rules with the same rhs are inserted).
+       */
+      virtual bool equal(merge_fn_t mf) = 0;
       //virtual MergeFn *parse_element(const char *s, sem_elem_t sem) = 0;
 
   };
