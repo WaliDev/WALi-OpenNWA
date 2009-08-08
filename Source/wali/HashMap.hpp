@@ -73,6 +73,7 @@ namespace wali
       {
         public:
           friend class HashMap< Key,Data,HashFunc,EqualFunc >;
+          friend class HashMapConstIterator< Key,Data,HashFunc,EqualFunc >;
 
         public:
           typedef HashMapIterator< Key,Data,HashFunc,EqualFunc >      iterator;
