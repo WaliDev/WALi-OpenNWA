@@ -98,7 +98,7 @@ post((R,RH,U,AH,L),a) = (R',RH',U',AH',L'), where
 //#define BDDMEMSIZE 75000000
 // 25000000 ~~ 500 MB, change the multiple to get what you need.
 #define FIVE_CENT_MB 25000000
-#define BDDMEMSIZE (FIVE_CENT_MB*2)
+#define BDDMEMSIZE (FIVE_CENT_MB*3)
 
 #else
 #define BDDMEMSIZE 10000000
@@ -120,7 +120,7 @@ using std::cout;
 using std::endl;
 
 const int PhaseLH::MAX_LOCKS     = 4;
-bool PhaseLH::DO_INV_CHECK       = true;
+bool PhaseLH::DO_INV_CHECK       = false;
 int PhaseLH::BASE                = -1;
 int PhaseLH::LOCKS               = -1;
 int PhaseLH::PHASES              = -1;

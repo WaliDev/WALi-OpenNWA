@@ -37,8 +37,19 @@ namespace wali
    * The constructor takes a boolean that turns reference counting on or
    * off. By default it is on. Please leave this as true less you know
    * you do not want the user weight objects to be garbage collected.
-   *
    * @see ref_ptr
+   *
+   * Some minimal testing is provided by
+   *
+   *   o   wali::test_semelem_impl(wali::sem_elem_t x)
+   *
+   * It performs tests such as the following:
+   *   o   0 = 0
+   *   o   1 = 1
+   *   o   x = x
+   *   o   x + 0 = x = 0 + x
+   *   o   x * 0 = 0 = 0 * x
+   *   o   x * 1 = x = 1 * x
    */
 
   class SemElem : public Printable, public Countable
@@ -185,6 +196,19 @@ namespace wali
       }
 
   };
+
+  /**
+   * Simple test method that can be used when developing
+   * a SemElem implementation. Tests include
+   *
+   *  o 0 = 0
+   *  o 1 = 1
+   *  o x = x
+   *  o x + 0 = x = 0 + x
+   *  o x * 0 = 0 = 0 * x
+   *  o x * 1 = x = 1 * x
+   */
+  void test_semelem_impl(sem_elem_t x);
 
 }
 #endif  // wali_SEM_ELEM_GUARD

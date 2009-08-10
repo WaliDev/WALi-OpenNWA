@@ -1,7 +1,7 @@
 #ifndef wali_HASH_MAP_GUARD
 #define wali_HASH_MAP_GUARD 1
 
-/*
+/**
  * @author Nicholas Kidd
  */
 
@@ -57,11 +57,11 @@ namespace wali
     Bucket *next;
   };
 
-  /*
-   * You should always use:
+  /**
+   * One should always use:
    *      HashMap< a,b,c,d >::iterator
    *              or
-   *      HashMap< a,b,c,d >::const_iterator!!
+   *      HashMap< a,b,c,d >::const_iterator
    *
    * This keeps with abstraction.
    */
@@ -115,7 +115,18 @@ namespace wali
             return this->operator++(60);
           }
 
-          HashMapIterator operator++( int );
+          HashMapIterator operator++( int )
+          {
+            bucket_type *old = bucket;
+            bucket = bucket->next;
+            if( !bucket ) {
+              size_type bktNum = hashMap->bucketFromValue( old->value );
+              while( !bucket && ++bktNum < hashMap->numBuckets ) {
+                bucket = hashMap->buckets[bktNum];
+              }
+            }
+            return *this;
+          }
 
         protected:
           bucket_type  *bucket;
@@ -127,26 +138,11 @@ namespace wali
     typename Data,
     typename HashFunc,
     typename EqualFunc >
-      HashMapIterator< Key,Data,HashFunc,EqualFunc >
-      HashMapIterator< Key,Data,HashFunc,EqualFunc >::operator++(int)
-      {
-        bucket_type *old = bucket;
-        bucket = bucket->next;
-        if( !bucket ) {
-          size_type bktNum = hashMap->bucketFromValue( old->value );
-          while( !bucket && ++bktNum < hashMap->numBuckets ) {
-            bucket = hashMap->buckets[bktNum];
-          }
-        }
-        return *this;
-      }
-
-  template< typename Key,
-    typename Data,
-    typename HashFunc,
-    typename EqualFunc >
       class HashMapConstIterator
       {
+        friend class HashMap< Key,Data,HashFunc,EqualFunc >;
+        friend class HashMapIterator< Key,Data,HashFunc,EqualFunc >;
+
         public:
           typedef HashMapIterator< Key,Data,HashFunc,EqualFunc >      iterator;
           typedef HashMapConstIterator< Key,Data,HashFunc,EqualFunc > const_iterator;
@@ -189,7 +185,18 @@ namespace wali
             return this->operator++(60);
           }
 
-          HashMapConstIterator operator++( int );
+          HashMapConstIterator operator++( int )
+          {
+            const bucket_type *old = bucket;
+            bucket = bucket->next;
+            if( !bucket ) {
+              size_type bktNum = hashMap->bucketFromValue( old->value );
+              while( !bucket && ++bktNum < hashMap->numBuckets ) {
+                bucket = hashMap->buckets[bktNum];
+              }
+            }
+            return *this;
+          }
 
         protected:
           const bucket_type  *bucket;
@@ -197,25 +204,8 @@ namespace wali
           const hashmap_type *hashMap;
       };
 
-  template< typename Key,
-    typename Data,
-    typename HashFunc,
-    typename EqualFunc >
-      HashMapConstIterator< Key,Data,HashFunc,EqualFunc >
-      HashMapConstIterator< Key,Data,HashFunc,EqualFunc >::operator++(int)
-      {
-        const bucket_type *old = bucket;
-        bucket = bucket->next;
-        if( !bucket ) {
-          size_type bktNum = hashMap->bucketFromValue( old->value );
-          while( !bucket && ++bktNum < hashMap->numBuckets ) {
-            bucket = hashMap->buckets[bktNum];
-          }
-        }
-        return *this;
-      }
 
-  /*
+  /**
    * class HashMap
    *
    * Notes:
@@ -245,9 +235,9 @@ namespace wali
 
         public:     // con/destructor
           HashMap( size_type size=47 )
-            : numValues(0),numBuckets(size)
-              , growthFactor( size * HASHMAP_GROWTH_FRACTION )
-                                                              , shrinkFactor( size * HASHMAP_SHRINK_FRACTION )
+            : numValues(0),numBuckets(size), 
+            growthFactor( size * HASHMAP_GROWTH_FRACTION ), 
+            shrinkFactor( size * HASHMAP_SHRINK_FRACTION )
         { initBuckets(); }
 
           HashMap( const HashMap& hm )
@@ -278,6 +268,7 @@ namespace wali
                 releaseBucket( tmp );
               }
             }
+            numValues = 0;
           }
 
           inline size_type size() const

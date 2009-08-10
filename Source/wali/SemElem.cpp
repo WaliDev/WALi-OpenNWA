@@ -79,5 +79,58 @@ namespace wali
     return wn;
   }
 
+
+  void test_semelem_impl(sem_elem_t x)
+  {
+    sem_elem_t z = x->zero();
+    sem_elem_t o = x->one();
+    if (z->equal(o) || o->equal(z) ) 
+    {
+      *waliErr << "[ERROR - test_semelem_impl] zero == one" << std::endl;
+      assert(false);
+    }
+    if (!z->equal(z))
+    {
+      *waliErr << "[ERROR - test_semelem_impl] zero != zero" << std::endl;
+      assert(false);
+    }
+    if (!o->equal(o))
+    {
+      *waliErr << "[ERROR - test_semelem_impl] one != one" << std::endl;
+      assert(false);
+    }
+    if (!x->equal(x))
+    {
+      *waliErr << "[ERROR - test_semelem_impl] x != x" << std::endl;
+      assert(false);
+    }
+    if (!o->equal(o->combine(z)))
+    {
+      *waliErr << "[ERROR - test_semelem_impl] one != (one + zero)" << std::endl;
+      assert(false);
+    }
+    if (!z->equal(o->extend(z)))
+    {
+      *waliErr << "[ERROR - test_semelem_impl] zero != (one * zero)" << std::endl;
+      assert(false);
+    }
+    if (!(z->extend(o)->equal( o->extend(z))))
+    {
+      *waliErr << "[ERROR - test_semelem_impl] zero*one != one*zero" << std::endl;
+      assert(false);
+    }
+    if (!(x->equal(x->combine(x))) )
+    {
+      *waliErr << "[ERROR - test_semelem_impl] x+x != x" << std::endl;
+      assert(false);
+    }
+    if (!x->equal( x->extend(o)) || !x->equal(o->extend(x)))
+    {
+      *waliErr << "[ERROR - test_semelem_impl] x != 1*x" << std::endl;
+      assert(false);
+    }
+
+  }
+
 } // namespace wali
 
