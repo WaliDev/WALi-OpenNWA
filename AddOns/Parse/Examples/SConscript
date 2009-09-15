@@ -12,15 +12,16 @@ XercesPath = os.path.join(WaliDir, 'AddOns', 'Parse', 'ThirdParty', XercesDir)
 
 StaticLibs = []
 Libs       = [ 'wali', 'waliparse', 'xerces-c', ] 
-LibPath    = [ LibInstallDir ] #, os.path.join(XercesPath,'lib'), ]
+LibPath    = [ LibInstallDir ]
 
 if MkStatic:
-  StaticLibs = [
-    os.path.join(LibInstallDir,'libwaliparse.a'),
-    os.path.join(LibInstallDir,'libwali.a')
+  	StaticLibs = [
+    	os.path.join(LibInstallDir,'libwaliparse.a'),
+    	os.path.join(LibInstallDir,'libwali.a'),
+		os.path.join(LibInstallDir,'libxerces-c.a'),
     ]
-  Libs       = ['xerces-c']
-  #LibPath    = [ os.path.join(XercesPath,'lib') ]
+	Libs = []
+	LibPath = []
 
 
 ## ###############################
@@ -31,7 +32,6 @@ env = BaseEnv.Clone(
       os.path.join(WaliDir, 'AddOns', 'Parse', 'Source'),
       os.path.join(XercesPath, 'include'),
     ],
-    CXXFLAGS = '-g -ggdb -Wall -Wformat=2 -W ',
     LIBS     = Libs,
     LIBPATH  = LibPath
 )

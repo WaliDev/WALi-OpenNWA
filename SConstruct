@@ -6,16 +6,18 @@
 import os,platform,platform
 
 (bits,linkage) = platform.architecture()
+
 ## ####################
 ## To distinguish 64 bit build and lib dirs,
 ## enable this flag
 #Is64           = (False,True)[bits == '64bit']
 Is64           = False
+Platform       = platform.system()
+MkStatic       = platform.system() == 'Windows' 
 WaliDir        = os.getcwd()
 LibInstallDir  = os.path.join(WaliDir,('lib','lib64')[Is64])
 BuildDir       = os.path.join(WaliDir,('_build','_build64')[Is64])
 BaseEnv        = Environment()
-MkStatic       = platform.system() != 'Linux' 
 
 if 'gcc' == BaseEnv['CC']:
     BaseEnv['CXXFLAGS'] = '-g -ggdb -Wall -Wformat=2 -W'
@@ -24,12 +26,22 @@ elif 'cl' == BaseEnv['CC']:
     BaseEnv['CXXFLAGS'] = '/TP /errorReport:prompt /Wp64 /W4 /GR /MTd /EHsc'
 BaseEnv['CPPPATH'] = [ os.path.join(WaliDir , 'Source') ]
 
+## Only supporting 32 bit on Darwin to not deal w/ Leopard/Snow Leopard diffs
+if 'Darwin' == Platform:
+   BaseEnv['CXXFLAGS'] += ' -m32'
+   BaseEnv.Append(LINKFLAGS='-m32 -Wl,-undefined,dynamic_lookup')
+
+# print BaseEnv.Dump('CXXFLAGS')
+print 'CXXFLAGS  =',BaseEnv.Dump('CXXFLAGS')
+print 'LINKFLAGS =',BaseEnv.Dump('LINKFLAGS')
+
 Export('Is64')
 Export('WaliDir')
 Export('LibInstallDir')
 Export('BuildDir')
 Export('MkStatic')
 Export('BaseEnv')
+Export('Platform')
 
 ## Setup a default environment for building executables that use WALi
 ProgEnv = BaseEnv.Clone()
@@ -51,7 +63,7 @@ if 'help' not in COMMAND_LINE_TARGETS:
     ## ##################
     ## libwali
     built = SConscript('Source/SConscript', build_dir=BuildDir,duplicate=0)
-    built += SConscript('Doc/tex/SConscript')
+    #built += SConscript('Doc/tex/SConscript')
 
     ## ##################
     ## All

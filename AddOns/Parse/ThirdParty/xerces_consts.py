@@ -7,18 +7,21 @@
 ## found by other apps.
 import platform
 
-xrcs3_win32   = 'xerces-c-3.0.1-x86-windows-vc-9.0'
-xrcs3_win64   = 'xerces-c-3.0.1-x86_64-windows-vc-9.0'
-xrcs3_lin32   = 'xerces-c-3.0.1-x86-linux-gcc-3.4'
-xrcs3_lin64   = 'xerces-c-3.0.1-x86_64-linux-gcc-3.4'
+Xerces = {
+    'Darwin' : ('xerces-c-3.0.1-x86-macosx-gcc-4.0',
+                'xerces-c-3.0.1-x86-macosx-gcc-4.0'),
+    'Linux' : ('xerces-c-3.0.1-x86-linux-gcc-3.4',
+               'xerces-c-3.0.1-x86_64-linux-gcc-3.4'),
+    'Windows' : ('xerces-c-3.0.1-x86-windows-vc-9.0',
+                'xerces-c-3.0.1-x86_64-windows-vc-9.0')
+    }
+
 
 (bits,linkage)  = platform.architecture()
 sys             = platform.system()
-IsLinux         = sys == 'Linux'
+IsZip           = sys == 'Windows'
 Is64            = bits == '32bit'
-Name = (
-    ( xrcs3_win64 , xrcs3_win32 ), 
-    ( xrcs3_lin64 , xrcs3_lin32 )
-    )[IsLinux][Is64]
+Name = Xerces[sys][Is64]
+
 
 
