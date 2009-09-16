@@ -20,7 +20,7 @@ Xerces = {
 (bits,linkage)  = platform.architecture()
 sys             = platform.system()
 IsZip           = sys == 'Windows'
-Is64            = bits == '32bit'
+Is64            = bits == '64bit'
 Name = Xerces[sys][Is64]
 
 
