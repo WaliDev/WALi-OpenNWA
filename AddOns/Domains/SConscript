@@ -3,10 +3,13 @@
 ## $Id$
 import os,os.path
 
+Import('Debug')
 Import('BaseEnv')
 Import('BuildDir')
-Import('Is64')
 
+if Debug:
+    print '\n+++ Entered "#/AddOns/Domains/SConscript"\n'
+    
 built = []
 
 buddy = SConscript('ThirdParty/SConscript')

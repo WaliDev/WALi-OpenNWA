@@ -3,14 +3,7 @@
 
 import os,platform
 
-## TODO : turn on debugging info output
-##      - Currently broken
-Debug = False
-
-if Debug:
-    print "\n+++ Build waliparse library." 
-
-
+Import('Debug')
 Import('WaliDir')
 Import('LibInstallDir')
 Import('MkStatic')
@@ -18,8 +11,7 @@ Import('BaseEnv')
 Import('XercesDir')
 
 if Debug:
-    print "+ WaliDir       : '%s'" % WaliDir
-    print "+ LibInstallDir : '%s'" % LibInstallDir 
+    print '\n+++ Entered "#/AddOns/Parse/Source/SConscript"\n'
 
 waliparse_files = Split("""
 ./StrX.cpp
@@ -34,19 +26,8 @@ waliparse_files = Split("""
 """)
 
 Env = BaseEnv.Clone()
-
-# Define include directories
-IncludeDirs = [
-    os.path.join(WaliDir , 'Source'),
-    os.path.join(WaliDir,'AddOns','Parse','Source'),
-    os.path.join(WaliDir,'AddOns','Parse','ThirdParty',XercesDir,'include'),
-]
-
-if Debug:
-    for i in IncludeDirs:
-        print "+ Inlude        : %s" % i
-
-Env['CPPPATH'] = IncludeDirs
+Env.Append(CPPPATH=[os.path.join(WaliDir,'AddOns','Parse','Source')])
+Env.Append(CPPPATH=[os.path.join(WaliDir,'AddOns','Parse','ThirdParty',XercesDir,'include')])
 
 if MkStatic:
     waliparse = Env.StaticLibrary('waliparse' , waliparse_files)

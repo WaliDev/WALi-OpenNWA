@@ -1,12 +1,17 @@
 # Run the python program
 # $Id$
-import os
+import os, sys
 from xerces_consts import IsZip, Name
 
+Import('Debug')
 Import('WaliDir')
 Import('LibInstallDir')
 Import('MkStatic')
+Import('Platform')
 
+if Debug:
+    print '\n+++ Entered "#/AddOns/Parse/ThirdParty/SConscript"\n'
+    
 XercesDir = Name
 Export('XercesDir')
 ThirdParty = os.path.join(WaliDir,'AddOns','Parse','ThirdParty')
@@ -32,14 +37,15 @@ if not File('README', os.path.join(ThirdParty,XercesDir)).exists():
     env.Execute([unpack])
 
 
-# copy Xerces libraries into comman WALi library area
-libraries = (
-	  ['lib/libxerces-c-3.0$SHLIBSUFFIX'],
-	  ['lib/libxerces-c.a']
-)[MkStatic]
+# copy Xerces library into common WALi library area
+library = ('lib/libxerces-c-3.0$SHLIBSUFFIX','lib/libxerces-c.a')[MkStatic]
+instlib = env.Install(LibInstallDir, env.File(library,XercesDir))
 
-instlibs = [env.File(lib, XercesDir) for lib in libraries]
-Install(LibInstallDir, instlibs)
+#print 'path  = ', instlib[0].path
+#print 'apath = ', instlib[0].abspath
+if 'Darwin' == Platform and not MkStatic:
+    env.AddPostAction(instlib,
+                      "install_name_tool -id %s %s" % (instlib[0].abspath,instlib[0].path))
 
 # cannot use Install for symlinks due to known SCons bug:
 # <http://scons.tigris.org/issues/show_bug.cgi?id=1604>
@@ -53,13 +59,14 @@ def symlink(target, source, env):
     os.symlink(dest, str(target))
 
 # add shared-lib symlinks
-dest = Value(env.subst('libxerces-c-3.0$SHLIBSUFFIX'))
-print dest.read()
-real = env.File(dest.read(), LibInstallDir)
-print real
-target = env.File('libxerces-c$SHLIBSUFFIX', LibInstallDir)
-print target
-Command(target, [dest, real], symlink)
+if not MkStatic:
+    dest = Value(env.subst('libxerces-c-3.0$SHLIBSUFFIX'))
+    #print dest.read()
+    real = env.File(dest.read(), LibInstallDir)
+    #print real
+    target = env.File('libxerces-c$SHLIBSUFFIX', LibInstallDir)
+    #print target
+    Command(target, [dest, real], symlink)
 
 
 # does not clean up completely due to known SCons bugs:
@@ -68,5 +75,5 @@ Command(target, [dest, real], symlink)
 Clean('.', XercesDir)
 
 
-built = []
+built = instlib
 Return('built')

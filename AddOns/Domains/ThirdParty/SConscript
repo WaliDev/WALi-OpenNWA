@@ -8,7 +8,7 @@ Import('BaseEnv')
 Import('LibInstallDir')
 
 BuddyEnv = BaseEnv.Clone(CPPPATH=['src'])
-BaseEnv.Append(CXXFLAGS=' -O2')
+BaseEnv.Append(CFLAGS=' -O2')
 
 
 SRCS = Glob('buddy-2.4/src/*.c') + ['buddy-2.4/src/cppext.cxx']
