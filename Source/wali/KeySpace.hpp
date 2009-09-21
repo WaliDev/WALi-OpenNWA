@@ -17,103 +17,103 @@ namespace wali
    */
   class KeySpace
   {
-    public:
-      KeySpace() {}
+  public:
+    KeySpace();
+    
+    ~KeySpace();
+    
+    /**
+     * get_key returns the unique wali::Key associated with the
+     * key_src_t ks. If no such key exists, a new wali::Key will be
+     * generated.
+     *
+     * @see KeySource
+     * @see wali::Key
+     *
+     * @param key_src_t ks for which a key is sought
+     * @return wali::Key associated with parameter KeySource
+     */
+    wali::Key getKey( key_src_t ks );
+    
+    /**
+     * Wrapper method for createing a StringSource and
+     * inserting it into the KeySpace
+     */
+    wali::Key getKey( const std::string& s );
 
-      ~KeySpace();
+    /**
+     * Wrapper method for createing a StringSource and
+     * inserting it into the KeySpace
+     */
+    wali::Key getKey( const char* s );
 
-      /**
-       * get_key returns the unique wali::Key associated with the
-       * KeySource* ks. If no such key exists, a new wali::Key will be
-       * generated.
-       *
-       * @see KeySource
-       * @see wali::Key
-       *
-       * @param KeySource* ks for which a key is sought
-       * @return wali::Key associated with parameter KeySource
-       */
-      wali::Key getKey( KeySource* ks );
+    /**
+     * Wrapper method for createing a IntSource and
+     * inserting it into the KeySpace
+     */
+    wali::Key getKey( int i );
 
-      /**
-       * Wrapper method for createing a StringSource and
-       * inserting it into the KeySpace
-       */
-      wali::Key getKey( const std::string& s );
+    /**
+     * Wrapper method for createing a KeyPairSource and
+     * inserting it into the KeySpace
+     */
+    wali::Key getKey( wali::Key k1, wali::Key k2 );
 
-      /**
-       * Wrapper method for createing a StringSource and
-       * inserting it into the KeySpace
-       */
-      wali::Key getKey( const char* s );
+    /**
+     * getKeySource retrieves the key_src_t associated to the
+     * wali::Key key. If no such KeySource exists, then a NULL
+     * pointer (0) is returned.
+     *
+     * @see KeySource
+     * @see wali::Key
+     *
+     * @param key whose correpsonding key_src_t is desired
+     * @return key_src_t associated with parameter key
+     */
+    key_src_t getKeySource( wali::Key key );
 
-      /**
-       * Wrapper method for createing a IntSource and
-       * inserting it into the KeySpace
-       */
-      wali::Key getKey( int i );
+    /**
+     * Reset the KeySpace. Clears all keys and deletes
+     * all KeySources
+     */
+    void clear();
 
-      /**
-       * Wrapper method for createing a KeyPairSource and
-       * inserting it into the KeySpace
-       */
-      wali::Key getKey( wali::Key k1, wali::Key k2 );
+    /**
+     * Return the number of allocated keys
+     */
+    size_t size();
 
-      /**
-       * getKeySource retrieves the KeySource* associated to the
-       * wali::Key key. If no such KeySource exists, then a NULL
-       * pointer (0) is returned.
-       *
-       * @see KeySource
-       * @see wali::Key
-       *
-       * @param key whose correpsonding KeySource* is desired
-       * @return KeySource* associated with parameter key
-       */
-      KeySource* getKeySource( wali::Key key );
+    /**
+     * Helper method that looks up the key and calls KeySource::print
+     *
+     * @see KeySource
+     */
+    std::ostream& printKey( std::ostream& o, wali::Key key );
 
-      /**
-       * Reset the KeySpace. Clears all keys and deletes
-       * all KeySources
-       */
-      void clear();
+    /**
+     * Return std::string rep of KeySource. Looks up the key and calls
+     * KeySource::to_string(). 
+     *
+     * @see KeySource
+     */
+    std::string key2str( wali::Key key );
 
-      /**
-       * Return the number of allocated keys
-       */
-      size_t size();
+  protected:
+    typedef wali::HashMap< key_src_t, wali::Key > ks_hash_map_t;
+    typedef std::vector< key_src_t > ks_vector_t;
 
-      /**
-       * Helper method that looks up the key and calls KeySource::print
-       *
-       * @see KeySource
-       */
-      std::ostream& printKey( std::ostream& o, wali::Key key );
+    /** 
+     * keymap maps key_src_t to wali::Key. The wali::Key is
+     * an index into the vector values
+     */
+    ks_hash_map_t keymap;
 
-      /**
-       * Return std::string rep of KeySource. Looks up the key and calls
-       * KeySource::to_string(). 
-       *
-       * @see KeySource
-       */
-      std::string key2str( wali::Key key );
-
-    protected:
-      typedef wali::HashMap< KeySource*, wali::Key > ks_hash_map_t;
-      typedef std::vector< KeySource* > ks_vector_t;
-
-      /** 
-       * keymap maps KeySource* to wali::Key. The wali::Key is
-       * an index into the vector values
-       */
-      ks_hash_map_t keymap;
-
-      /**
-       * wali::Key's are guaranteed to be unique w.r.t. this KeySpace
-       * because they are indexes into the vector values. KeySource's
-       * are retrieved by a lookup into values
-       */
-      ks_vector_t values;
+    /**
+     * wali::Key's are guaranteed to be unique w.r.t. this KeySpace
+     * because they are indexes into the vector values. KeySource's
+     * are retrieved by a lookup into values
+     */
+    ks_vector_t values;
 
   }; // class KeySpace
 

@@ -3,14 +3,14 @@
 ## ####################################
 ## Third party users of WALi should 
 ## duplicate the setup code below.
-import os,platform,platform
+import os, os.path, platform
 
 Debug = True
 
 (bits,linkage) = platform.architecture()
 
 Platform       = platform.system()
-MkStatic       = platform.system() == 'Windows' 
+MkStatic       = (Platform == 'Windows')
 WaliDir        = os.getcwd()
 LibInstallDir  = os.path.join(WaliDir,'lib')
 BuildDir       = os.path.join(WaliDir,'_build')

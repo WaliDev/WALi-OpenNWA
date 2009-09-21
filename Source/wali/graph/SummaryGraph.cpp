@@ -783,8 +783,8 @@ namespace wali {
 
 
     Key SummaryGraph::changeStateGeneration(Key st, int gen) {
-      KeySource *ks = getKeySource(st);
-      GenKeySource *gks = dynamic_cast<GenKeySource *> (ks);
+      key_src_t ks = getKeySource(st);
+      GenKeySource* gks = dynamic_cast<GenKeySource*> (ks.get_ptr());
       if(gks == 0) return st;
 
       return getKey( new GenKeySource(gen, gks->getKey()));

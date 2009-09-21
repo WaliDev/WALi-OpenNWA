@@ -5,6 +5,7 @@
 
 #include <cassert>
 #include <cstring>
+#include "wali/Common.hpp"
 #include "wali/KeySpace.hpp"
 #include "wali/KeySource.hpp"
 #include "wali/StringSource.hpp"
@@ -13,32 +14,34 @@
 
 namespace wali
 {
+
+  KeySpace::KeySpace()
+  {
+    getKey("*");
+  }
+
   KeySpace::~KeySpace()
   {
-    clear();
   }
 
   /**
    * get_key returns the unique wali_key_t associated with the
-   * KeySource* ks. If no such key exists, a new wali_key_t will be
+   * key_src_t ks. If no such key exists, a new wali_key_t will be
    * generated.
    *
    * @see KeySource
    * @see wali_key_t
    *
-   * @param KeySource* ks for which a key is sought
+   * @param key_src_t ks for which a key is sought
    * @return wali_key_t associated with parameter KeySource
    */
-  wali_key_t KeySpace::getKey( KeySource* ks )
+  wali_key_t KeySpace::getKey( key_src_t ks )
   {
     ks_hash_map_t::iterator it = keymap.find(ks);
     wali_key_t key;
     if( it != keymap.end() )
     {
       key = it->second;
-      // Reclaim the memory. KeySpace assumes ownership of
-      // all allocated memory passed to it
-      delete ks;
     }
     else {
       key = values.size();
@@ -52,7 +55,7 @@ namespace wali
    * Wrapper method for createing a StringSource and
    * inserting it into the KeySpace
    */
-  wali_key_t KeySpace::getKey( const std::string& s )
+  Key KeySpace::getKey( const std::string& s )
   {
     return (s == "") ? WALI_EPSILON : getKey( new StringSource(s) );
   }
@@ -61,7 +64,7 @@ namespace wali
    * Wrapper method for createing a StringSource and
    * inserting it into the KeySpace
    */
-  wali_key_t KeySpace::getKey( const char* s )
+  Key KeySpace::getKey( const char* s )
   {
     return ((s == NULL) || (strlen(s) == 0)) ?
       WALI_EPSILON : getKey( new StringSource(s) );
@@ -71,7 +74,7 @@ namespace wali
    * Wrapper method for createing a IntSource and
    * inserting it into the KeySpace
    */
-  wali_key_t KeySpace::getKey( int i )
+  Key KeySpace::getKey( int i )
   {
     return getKey( new IntSource(i) );
   }
@@ -80,25 +83,25 @@ namespace wali
    * Wrapper method for createing a KeyPairSource and
    * inserting it into the KeySpace
    */
-  wali_key_t KeySpace::getKey( wali_key_t k1, wali_key_t k2 )
+  Key KeySpace::getKey( Key k1, Key k2 )
   {
     return getKey( new KeyPairSource(k1,k2) );
   }
 
   /**
-   * getKeySource retrieves the KeySource* associated to the
-   * wali_key_t key. If no such KeySource exists, then a NULL
+   * getKeySource retrieves the key_src_t associated to the
+   * Key key. If no such KeySource exists, then a NULL
    * pointer (0) is returned.
    *
    * @see KeySource
-   * @see wali_key_t
+   * @see Key
    *
-   * @param key whose correpsonding KeySource* is desired
-   * @return KeySource* associated with parameter key
+   * @param key whose correpsonding key_src_t is desired
+   * @return key_src_t associated with parameter key
    */
-  KeySource* KeySpace::getKeySource( wali_key_t key )
+  key_src_t KeySpace::getKeySource( Key key )
   {
-    KeySource* ksrc = 0;
+    key_src_t ksrc = 0;
     if( key < size() )
     {
       ksrc = values[key];
@@ -113,19 +116,12 @@ namespace wali
   void KeySpace::clear()
   {
     keymap.clear();
-    ks_vector_t::iterator it = values.begin();
-    ks_vector_t::iterator itEND = values.end();
-    for( ; it != itEND ; it++ )
-    {
-      KeySource *ksrc = *it;
-      delete ksrc;
-      *it = 0;
-    }
-    values.clear();
     {
       ks_vector_t TEMP;
       TEMP.swap(values);
     }
+    assert( keymap.size() == 0 );
+    assert( values.size() == 0 );
   }
 
   /**
@@ -141,13 +137,14 @@ namespace wali
    *
    * @see KeySource
    */
-  std::ostream& KeySpace::printKey( std::ostream& o, wali_key_t key )
+  std::ostream& KeySpace::printKey( std::ostream& o, Key key )
   {
-    KeySource* ksrc = getKeySource(key);
-    if( ksrc ) {
+    key_src_t ksrc = getKeySource(key);
+    if( ksrc.is_valid() ) {
       ksrc->print(o);
     }
     else {
+      *waliErr << "[WARNING] Invalid wali::Key(" << key << ")" << std::endl;
       o << "??";
     }
     return o;
@@ -159,10 +156,10 @@ namespace wali
    *
    * @see KeySource
    */
-  std::string KeySpace::key2str( wali_key_t key )
+  std::string KeySpace::key2str( Key key )
   {
-    KeySource* ksrc = getKeySource(key);
-    if( ksrc ) {
+    key_src_t ksrc = getKeySource(key);
+    if( ksrc.is_valid() ) {
       return ksrc->toString();
     }
     else {

@@ -7,7 +7,7 @@
 
 namespace wali
 {
-  KeyPairSource::KeyPairSource( wali_key_t k1, wali_key_t k2 ) : kp(k1,k2) {}
+  KeyPairSource::KeyPairSource( Key k1, Key k2 ) : kp(k1,k2) {}
 
   KeyPairSource::KeyPairSource( const KeyPair& kp_ ) : kp(kp_) {}
 
