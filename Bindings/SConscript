@@ -1,5 +1,9 @@
+# ##################################################
+# Build python bindings 
+
 import os
 
+Import('Debug')
 Import('WaliDir')
 Import('Platform')
 Import('ProgEnv')
@@ -7,6 +11,9 @@ Import('LibInstallDir')
 Import('MkStatic')
 
 import distutils.sysconfig
+
+if Debug:
+    print '\n+++ Entered "#/Bindings/SConscript"\n'
 
 if MkStatic:
     raise Exception("Can't build bindings statically")
