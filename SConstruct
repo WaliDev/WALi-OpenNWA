@@ -247,7 +247,7 @@ if 'help' not in COMMAND_LINE_TARGETS:
     ## ##################
     ## All
     if 'all' in COMMAND_LINE_TARGETS:
-        for d in ['AddOns','Examples']:
+        for d in ['AddOns','Examples','Bindings']:
             built += SConscript('%s/SConscript' % d)
         built += SConscript('Tests/SConscript', variant_dir=os.path.join(BuildDir,'tests'), duplicate=0)
         unit_tests = SConscript('Tests/unit-tests/SConscript', variant_dir=os.path.join(BuildDir,'unit-tests'), duplicate=0)
@@ -267,9 +267,12 @@ if 'help' not in COMMAND_LINE_TARGETS:
             unit_tests = SConscript('Tests/unit-tests/SConscript', variant_dir=os.path.join(BuildDir,'unit-tests'), duplicate=0)
             built += unit_tests
             BaseEnv.Alias('tests',built)
+        if 'bindings' in COMMAND_LINE_TARGETS:
+            built += SConscript('Bindings/SConscript')
+            BaseEnv.Alias('bindings',built)
 else:
     BaseEnv.Alias('help',[])
     print """
-    scons [all addons examples tests]
+    scons [all addons examples tests bindings]
     """
 

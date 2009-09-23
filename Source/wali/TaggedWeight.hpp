@@ -16,6 +16,7 @@ namespace wali
 
   class TaggedWeight : public Printable {
     public:
+      TaggedWeight() { }
       TaggedWeight(sem_elem_t w, walienum::ETag et) : weight(w), tag(et) { }
       ~TaggedWeight() {}
 
