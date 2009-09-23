@@ -1,0 +1,29 @@
+import os
+
+Import('WaliDir')
+Import('Platform')
+Import('ProgEnv')
+Import('LibInstallDir')
+Import('MkStatic')
+
+import distutils.sysconfig
+
+if MkStatic:
+    raise Exception("Can't build bindings statically")
+else:
+    env = ProgEnv.Clone(SWIGFLAGS=['-c++', '-python'])
+    env.Append(CPPPATH=[distutils.sysconfig.get_python_inc()])
+    ## Changed to SharedLibrary b/c env.LoadableModule failed on OS X
+    ##   - Could revert back with some work to ensure that 32bit is built,
+    ##     and that the relevant flags are set for LDMODULE*
+    pythonBindings = env.SharedLibrary('wali', ['wali.i'], LIBS=['wali'], SHLIBPREFIX='_')
+    python_sitepackages_dir = os.path.join(LibInstallDir, 'python' + distutils.sysconfig.get_python_version(), 'dist-packages')
+    instlib = env.Install(python_sitepackages_dir, pythonBindings)
+    ## Must set the install path in the build .dylib on OS X
+    if 'Darwin' == Platform:
+        env.AddPostAction(instlib,
+                          "install_name_tool -id %s %s" % (instlib[0].abspath,instlib[0].path))
+    
+    instpy = env.Install(python_sitepackages_dir, env.File('wali.py'))
+    built = [instlib,instpy]
+    Return('built')

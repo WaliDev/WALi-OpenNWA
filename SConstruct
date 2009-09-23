@@ -70,7 +70,7 @@ if 'help' not in COMMAND_LINE_TARGETS:
     ## ##################
     ## All
     if 'all' in COMMAND_LINE_TARGETS:
-        for d in ['AddOns','Examples','Tests']:
+        for d in ['AddOns','Examples','Tests','Bindings']:
             built += SConscript('%s/SConscript' % d)
         BaseEnv.Alias('all',built)
 
@@ -85,9 +85,12 @@ if 'help' not in COMMAND_LINE_TARGETS:
         if 'tests' in COMMAND_LINE_TARGETS:
             built += SConscript('Tests/SConscript')
             BaseEnv.Alias('tests',built)
+        if 'bindings' in COMMAND_LINE_TARGETS:
+            built += SConscript('Bindings/SConscript')
+            BaseEnv.Alias('bindings',built)
 else:
     BaseEnv.Alias('help',[])
     print """
-    scons [all addons examples tests]
+    scons [all addons examples tests bindings]
     """
 
