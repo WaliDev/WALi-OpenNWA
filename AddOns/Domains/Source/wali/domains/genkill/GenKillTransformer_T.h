@@ -150,7 +150,8 @@ template< typename Set > class GenKillTransformer_T : public wali::SemElem {
 
             // Handle the general case
             Set temp_k( Set::Union( kill, y->kill ) );
-            Set temp_g( Set::Union( Set::Diff2(gen,y->kill,y->gen),y->gen) );
+            Set temp_g( Set::Union( Set::Diff(gen,y->kill),y->gen) );
+            //Set temp_g( Set::Union( Set::Diff2(gen,y->kill,y->gen),y->gen) );
             return makeGenKillTransformer_T( temp_k,temp_g );
         }
 
