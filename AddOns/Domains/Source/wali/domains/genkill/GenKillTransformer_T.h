@@ -65,7 +65,7 @@ template< typename Set > class GenKillTransformer_T : public wali::SemElem {
         // special semiring values one and bottom.
         static sem_elem_t makeGenKillTransformer_T(const Set& k, const Set& g )
         {
-            Set k_normalized = Set::Diff(k,g);
+            Set k_normalized = Set::Diff2(k,g); // Diff2
             if (Set::Eq(k_normalized, Set::EmptySet())&& 
                     Set::Eq(g, Set::UniverseSet()))
             {
@@ -92,8 +92,10 @@ template< typename Set > class GenKillTransformer_T : public wali::SemElem {
             // problems with static-initialization order
             //static GenKillTransformer_T* ONE =
             //    new GenKillTransformer_T(Set::EmptySet(),Set::EmptySet(),1);
+            //GenKillTransformer_T* ONE =
+            //    new GenKillTransformer_T(Set::EmptySet(),Set::EmptySet());
             GenKillTransformer_T* ONE =
-                new GenKillTransformer_T(Set::EmptySet(),Set::EmptySet());
+                new GenKillTransformer_T(Set::UniverseSet(),Set::EmptySet());
             return ONE;
         }
 
@@ -106,8 +108,10 @@ template< typename Set > class GenKillTransformer_T : public wali::SemElem {
             // problems with static-initialization order
             //static GenKillTransformer_T* ZERO =
             //    new GenKillTransformer_T(Set::UniverseSet(),Set::EmptySet(),1);
+            //GenKillTransformer_T* ZERO =
+            //    new GenKillTransformer_T(Set::UniverseSet(),Set::EmptySet());
             GenKillTransformer_T* ZERO =
-                new GenKillTransformer_T(Set::UniverseSet(),Set::EmptySet());
+                new GenKillTransformer_T(Set::EmptySet(),Set::EmptySet());
             return ZERO;
         }
 
@@ -151,7 +155,7 @@ template< typename Set > class GenKillTransformer_T : public wali::SemElem {
             // Handle the general case
             Set temp_k( Set::Union( kill, y->kill ) );
             Set temp_g( Set::Union( Set::Diff(gen,y->kill),y->gen) );
-            //Set temp_g( Set::Union( Set::Diff2(gen,y->kill,y->gen),y->gen) );
+            //Set temp_g( Set::Union( Set::Diff2(gen,y->kill),y->gen) );
             return makeGenKillTransformer_T( temp_k,temp_g );
         }
 
@@ -159,7 +163,7 @@ template< typename Set > class GenKillTransformer_T : public wali::SemElem {
         {
             // Handle special case for either argument being zero()
             if( this->equal(zero()) ) {
-                return _y; //new GenKillTransformer_T(*y);
+                return _y;
             }
             else if( _y->equal(zero()) ) {
                 return new GenKillTransformer_T(*this);
@@ -202,8 +206,8 @@ template< typename Set > class GenKillTransformer_T : public wali::SemElem {
             const GenKillTransformer_T* y = dynamic_cast<const GenKillTransformer_T*>(_y);
             // Both *this and *y are proper (non-zero) values
 
-            Set temp_k( Set::Diff(Set::UniverseSet(),Set::Diff(y->kill,kill)) );
-            Set temp_g( Set::Diff(gen,y->gen) );
+            Set temp_k( Set::Diff2(Set::UniverseSet(),Set::Diff2(y->kill,kill)) ); // Diff2
+            Set temp_g( Set::Diff(gen,y->gen) ); // Diff
 
             // Test for whether zero should be returned,
             // i.e., if *this >= *y.
