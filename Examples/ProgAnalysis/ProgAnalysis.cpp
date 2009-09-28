@@ -242,17 +242,19 @@ void ProgAnalysis::doBackwardSearch(std::vector<wali::Key> &node_stack, wali::wf
 
   // Create an automaton to accept the configuration <pds_state, node_stack>
   wali::wfa::WFA query;
-  wali::Key temp_state = wali::WALI_EPSILON; // add initialization to skip g++ warning. safe b/c of above assertion.
+  wali::Key temp_from = pds_state; 
+  wali::Key temp_to = wali::WALI_EPSILON;// add initialization to skip g++ warning. safe b/c of above assertion.
 
   for(size_t i = 0; i < node_stack.size(); i++) {
     std::stringstream ss;
     ss << "__tmp_state_" << i;
-    temp_state = wali::getKey(ss.str());
-    query.addTrans( pds_state, node_stack[i], temp_state, se->one() );
+    temp_to = wali::getKey(ss.str());
+    query.addTrans( temp_from, node_stack[i], temp_to, se->one() );
+    temp_from = temp_to;
   }
 
   query.set_initial_state( pds_state );
-  query.add_final_state( temp_state );
+  query.add_final_state( temp_to );
 
   pds->prestar(query,answer);
 }
