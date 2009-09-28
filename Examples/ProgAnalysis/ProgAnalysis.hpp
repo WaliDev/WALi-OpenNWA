@@ -2,19 +2,23 @@
  * @author Akash Lal
  */
 
-#include "Cfg.hpp"
-#include "wali/wpds/WPDS.hpp"
-#include "wali/wpds/Rule.hpp"
-#include "wali/wpds/Config.hpp"
-#include "wali/wpds/fwpds/FWPDS.hpp"
-#include "wali/wpds/fwpds/SWPDS.hpp"
-#include "wali/wfa/Trans.hpp"
-#include "wali/wfa/State.hpp"
-#include "Reach.hpp"
+#include "wali/Common.hpp"
+#include "wali/SemElem.hpp"
 #include <string>
-#include <sstream>
-#include <fstream>
+#include <list>
+#include <set>
+#include <vector>
 
+class CFG;
+class CFGNode;
+namespace wali {
+  namespace wpds {
+    class WPDS;
+  }
+  namespace wfa {
+    class WFA;
+  }
+}
 
 /* A class that illustrates how one can carry out program
  * analysis using the WALi package.

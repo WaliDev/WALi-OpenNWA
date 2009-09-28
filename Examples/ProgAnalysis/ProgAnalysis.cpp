@@ -3,6 +3,17 @@
  */
 
 #include "ProgAnalysis.hpp"
+#include "Cfg.hpp"
+#include "wali/wpds/WPDS.hpp"
+#include "wali/wpds/Rule.hpp"
+#include "wali/wpds/Config.hpp"
+#include "wali/wpds/fwpds/FWPDS.hpp"
+#include "wali/wpds/fwpds/SWPDS.hpp"
+#include "wali/wfa/Trans.hpp"
+#include "wali/wfa/State.hpp"
+
+#include <iostream>
+#include <sstream>
 
 // Constructor that initializes the pds. It takes the following arguments:
 // The CFG of the main procedure of the program.
@@ -227,14 +238,16 @@ void ProgAnalysis::doBackwardSearch(wali::Key node, wali::wfa::WFA &answer) {
 
 // Do Backward search from the set of configurations {n \Gamma^*}
 void ProgAnalysis::doBackwardSearch(std::vector<wali::Key> &node_stack, wali::wfa::WFA &answer) {
+  assert( node_stack.size() > 0 );
+
   // Create an automaton to accept the configuration <pds_state, node_stack>
   wali::wfa::WFA query;
-  wali::Key temp_state;
+  wali::Key temp_state = wali::WALI_EPSILON; // add initialization to skip g++ warning. safe b/c of above assertion.
 
-  for(int i = 0; i < node_stack.size(); i++) {
-    char tmp_buf[30];
-    sprintf(tmp_buf, "__tmp_state_%d", i);
-    temp_state = wali::getKey(tmp_buf);
+  for(size_t i = 0; i < node_stack.size(); i++) {
+    std::stringstream ss;
+    ss << "__tmp_state_" << i;
+    temp_state = wali::getKey(ss.str());
     query.addTrans( pds_state, node_stack[i], temp_state, se->one() );
   }
 
@@ -244,9 +257,9 @@ void ProgAnalysis::doBackwardSearch(std::vector<wali::Key> &node_stack, wali::wf
   pds->prestar(query,answer);
 }
 
-// Calculate MOP(main->entry, stack)
-//wali::sem_elem_t computeMOP(const std::list<CFGNode *> &st, SearchDirection d);
-
-
+int main() {
+  std::cout << "Program Analysis Example" << std::endl;
+  return 0;
+}
 
 
