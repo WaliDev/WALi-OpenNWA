@@ -1,0 +1,17 @@
+# Reachability example
+import os
+
+Import('Debug')
+Import('WaliDir')
+Import('ProgEnv')
+
+if Debug:
+    print '\n+++ Entered "#/Examples/ProgAnalysis/SConscript"\n'
+    
+ProgAnalysis = ProgEnv.Program('ProgAnalysis',
+                               ['ProgAnalysis.cpp'] + ProgEnv['StaticLibs'])
+
+built = [ProgEnv.Install(os.path.join(WaliDir,'Examples','bin'), ProgAnalysis)]
+
+Return('built')
+
