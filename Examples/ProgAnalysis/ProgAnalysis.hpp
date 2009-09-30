@@ -25,6 +25,25 @@ namespace wali {
  */
 class ProgAnalysis {
 
+public:
+  enum WpdsType { USING_WPDS, USING_EWPDS, USING_FWPDS, USING_SWPDS };
+  enum SearchDirection { USE_FORWARD_SEARCH, USE_BACKWARD_SEARCH};
+
+  // Constructor that initializes the pds. It takes the following arguments:
+  // The CFG of the main procedure of the program.
+  // The type of WPDS class to use for analysis
+  ProgAnalysis(CFG *main, WpdsType t, bool witnesses=false);
+
+  // @return [true] if [this] was created with [witnesses] set to true.
+  bool isWitnessed() const;
+
+  // Calculate MOP(main->entry, n)
+  wali::sem_elem_t computeMOP(CFGNode *n, SearchDirection d);
+
+  // Calculate MOP(main->entry, stack)
+  wali::sem_elem_t computeMOP(const std::list<CFGNode *> &st, SearchDirection d);
+
+private:
   // The Weighted Pushdown System. It is declared as a pointer so that
   // it can be initialized to any one of the several classes derived from
   // the WPDS base class. See TODO.
@@ -40,26 +59,12 @@ class ProgAnalysis {
   // a weight lying around.
   wali::sem_elem_t se;
 
-public:
-  enum WpdsType { USING_WPDS, USING_EWPDS, USING_FWPDS, USING_SWPDS };
-  enum SearchDirection { USE_FORWARD_SEARCH, USE_BACKWARD_SEARCH};
-
-private:
   // Which wpds class to use for analysis?
   WpdsType wpdsType;
 
-public:
-
-  // Constructor that initializes the pds. It takes the following arguments:
-  // The CFG of the main procedure of the program.
-  // The type of WPDS class to use for analysis
-  ProgAnalysis(CFG *main, WpdsType t);
-
-  // Calculate MOP(main->entry, n)
-  wali::sem_elem_t computeMOP(CFGNode *n, SearchDirection d);
-
-  // Calculate MOP(main->entry, stack)
-  wali::sem_elem_t computeMOP(const std::list<CFGNode *> &st, SearchDirection d);
+  // If true, then the *WPDSs will compute witnesses for a query.
+  // @see wali::witness::Witness
+  const bool b_witnesses;
 
 private:
 

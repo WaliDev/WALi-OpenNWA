@@ -9,8 +9,12 @@
 #include "wali/wpds/Config.hpp"
 #include "wali/wpds/fwpds/FWPDS.hpp"
 #include "wali/wpds/fwpds/SWPDS.hpp"
+
 #include "wali/wfa/Trans.hpp"
 #include "wali/wfa/State.hpp"
+
+#include "wali/wpds/Wrapper.hpp"
+#include "wali/witness/WitnessWrapper.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -18,28 +22,29 @@
 // Constructor that initializes the pds. It takes the following arguments:
 // The CFG of the main procedure of the program.
 // The type of WPDS class to use for analysis
-ProgAnalysis::ProgAnalysis(CFG *main, WpdsType t) {
+ProgAnalysis::ProgAnalysis(CFG *main, WpdsType t, bool witnesses) : wpdsType(t), b_witnesses(witnesses) 
+{
 
   assert(main != 0);
-  wpdsType = t;
+  wali::wpds::Wrapper* wrapper = (b_witnesses) ? new wali::witness::WitnessWrapper() : 0;
 
   // Initialize the PDS
   switch(wpdsType) {
 
   case USING_WPDS:
-    pds = new wali::wpds::WPDS;
+    pds = new wali::wpds::WPDS(wrapper);
     break;
 
   case USING_EWPDS:
-    pds = new wali::wpds::ewpds::EWPDS;
+    pds = new wali::wpds::ewpds::EWPDS(wrapper);
     break;
 
   case USING_FWPDS:
-    pds = new wali::wpds::fwpds::FWPDS;
+    pds = new wali::wpds::fwpds::FWPDS(wrapper);
     break;
 
   case USING_SWPDS:
-    pds = new wali::wpds::fwpds::SWPDS;
+    pds = new wali::wpds::fwpds::SWPDS(wrapper);
     break;
   }
 
@@ -81,6 +86,11 @@ ProgAnalysis::ProgAnalysis(CFG *main, WpdsType t) {
     spds->preprocess();
   }
 
+}
+
+bool ProgAnalysis::isWitnessed() const
+{
+  return b_witnesses;
 }
 
 /*
