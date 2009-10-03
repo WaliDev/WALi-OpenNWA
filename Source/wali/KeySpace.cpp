@@ -17,7 +17,6 @@ namespace wali
 
   KeySpace::KeySpace()
   {
-    getKey("*");
   }
 
   KeySpace::~KeySpace()
