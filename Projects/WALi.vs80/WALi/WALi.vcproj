@@ -327,6 +327,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\KeySetSource.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\Source\wali\KeySpace.cpp"
 					>
 				</File>
@@ -452,6 +456,38 @@
 				</File>
 				<File
 					RelativePath="..\..\..\Source\wali\wfa\epr\FunctionalWeightMaker.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="wali.nwp"
+				>
+				<File
+					RelativePath="..\..\..\Source\wali\nwp\NWP.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\nwp\NWPNode.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="wali.nws"
+				>
+				<File
+					RelativePath="..\..\..\Source\wali\nws\NWS.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\nws\NWSNode.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="wali.nwa"
+				>
+				<File
+					RelativePath="..\..\..\Source\wali\nwa\NWA.cpp"
 					>
 				</File>
 			</Filter>
@@ -669,6 +705,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\KeySetSource.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\Source\wali\KeySource.hpp"
 					>
 				</File>
@@ -822,6 +862,46 @@
 				</File>
 				<File
 					RelativePath="..\..\..\Source\wali\wfa\epr\StatePriorityWorklist.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="wali.nwp"
+				>
+				<File
+					RelativePath="..\..\..\Source\wali\nwp\NWP.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\nwp\NWPNode.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="wali.nws"
+				>
+				<File
+					RelativePath="..\..\..\Source\wali\nws\NWS.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\nws\NWSNode.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="wali.nwa"
+				>
+				<File
+					RelativePath="..\..\..\Source\wali\nwa\NWA.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\nwa\StateSet.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\nwa\TransSet.hpp"
 					>
 				</File>
 			</Filter>

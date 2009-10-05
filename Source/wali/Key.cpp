@@ -60,6 +60,12 @@ namespace wali
     return getKeySpace()->getKey(k1,k2);
   }
 
+  // @author Amanda Burton
+  Key getKey( std::set<Key> ks )
+  {
+    return getKeySpace()->getKey(ks);
+  }
+
   //
   // Return KeySource associated with the key k
   //

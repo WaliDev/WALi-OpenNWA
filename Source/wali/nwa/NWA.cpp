@@ -2,10 +2,8 @@
  * @author Amanda Burton
  */
 
-#include "stdafx.h"
-
 // ::wali
-#include "NWA.hpp"
+#include "wali/nwa/NWA.hpp"
 
 namespace wali
 {	
@@ -682,6 +680,7 @@ namespace wali
      * this NWA
      *
      */
+    //TODO: check this with respect to calls/returns
     NWA * NWA::star( )
     {
       NWA * newNWA = new NWA();
@@ -900,7 +899,7 @@ namespace wali
      * using PDS reachability
      * 
      */
-    /*wpds::WPDS NWA::plusWPDS( wpds::WPDS base )
+    wpds::WPDS NWA::plusWPDS( wpds::WPDS base )
     {
       wpds::WPDS result = wpds::WPDS();
       wpds::WpdsRules rules = wpds::WpdsRules();
@@ -914,8 +913,8 @@ namespace wali
         //<p,n_1> -w-> <p',n_2> in delta_1, (q,n_1,q') in delta_i
         Key sym = it->from_stack();
         //look for internal transitions in the NWA with symbol sym
-        for( std::set< KeyTriple >::iterator iit = trans.beginInternal();
-            iit != trans.endInternal(); iit++ )
+        for( std::set< KeyTriple >::iterator iit = trans->beginInternal();
+            iit != trans->endInternal(); iit++ )
         {
           if( iit->second == sym )
           {
@@ -934,8 +933,8 @@ namespace wali
         //<p,n_c> -w-> <p',e r_c> in delta_2, (q_c,n_c,q) in delta_c
         Key sym = it->from_stack();
         //look for call transitions in the NWA with symbol sym
-        for( std::set< KeyTriple >::iterator cit = trans.beginCall();
-              cit != trans.endCall(); cit++ )
+        for( std::set< KeyTriple >::iterator cit = trans->beginCall();
+              cit != trans->endCall(); cit++ )
         {
           if( cit->second == sym )
           {
@@ -955,8 +954,8 @@ namespace wali
         //<p,x> -w-> <p',*> in delta_0, (q_r,q_c,x,q) in delta_r
         Key sym = it->from_stack();
         //look for return transitions in the NWA with symbol sym
-        for( std::set< KeyQuad >::iterator rit = trans.beginReturn();
-              rit != trans.endReturn(); rit++ )
+        for( std::set< KeyQuad >::iterator rit = trans->beginReturn();
+              rit != trans->endReturn(); rit++ )
         {
           if( rit->third == sym )
           {
@@ -979,7 +978,7 @@ namespace wali
       }      
       
       return result;
-    }*/
+    }
     
     /**
      *
@@ -988,7 +987,7 @@ namespace wali
      * @return the NWA equivalent to the given PDS
      *
      */
-    /*nwa::NWA NWA::PDStoNWA(wpds::WPDS pds)
+    nwa::NWA NWA::PDStoNWA(wpds::WPDS pds)
     {
       nwa::NWA result = nwa::NWA();
       
@@ -1035,7 +1034,7 @@ namespace wali
       }
       
       return result;    
-    }*/
+    }
     
     /**
      *
@@ -1044,7 +1043,7 @@ namespace wali
      * @return the PDS equivalent to this NWA
      *
      */
-    /*wpds::WPDS NWA::NWAtoPDS(NWA nwa,SemElem wgt)
+    wpds::WPDS NWA::NWAtoPDS(NWA nwa,witness::Witness wgt)
     {
       wpds::WPDS result = wpds::WPDS();
       std::map< Key,Key > calls;
@@ -1052,8 +1051,8 @@ namespace wali
       Key program = wali::getKey("program"); 
       
       //Internal Transitions
-      for( std::set< KeyTriple >::iterator iit = nwa.trans.beginInternal();
-            iit != nwa.trans.endInternal(); iit++ )
+      for( std::set< KeyTriple >::iterator iit = nwa.trans->beginInternal();
+            iit != nwa.trans->endInternal(); iit++ )
       {
         result.add_rule(program,          //from_state
                         iit->first,       //from_stack
@@ -1063,11 +1062,11 @@ namespace wali
       }
       
       //Call Transitions
-      for( std::set< KeyTriple >::iterator cit = nwa.trans.beginCall();
-            cit != nwa.trans.endCall(); cit++ )
+      for( std::set< KeyTriple >::iterator cit = nwa.trans->beginCall();
+            cit != nwa.trans->endCall(); cit++ )
       {
-        for( std::set< KeyQuad >::iterator rit = nwa.trans.beginReturn();
-              rit != nwa.trans.endReturn(); rit++ )
+        for( std::set< KeyQuad >::iterator rit = nwa.trans->beginReturn();
+              rit != nwa.trans->endReturn(); rit++ )
           if( cit->first == rit->second )
           {
             //for each return site with cit->first as call site ...
@@ -1084,8 +1083,8 @@ namespace wali
       }
       
       //Return Transitions
-      for( std::set< KeyQuad >::iterator rit = nwa.trans.beginReturn();
-            rit != nwa.trans.endReturn(); rit++ )
+      for( std::set< KeyQuad >::iterator rit = nwa.trans->beginReturn();
+            rit != nwa.trans->endReturn(); rit++ )
       {
         Key rstate = getKey(program,rit->first); // (p,x_i)
         result.add_rule(program,          //from_state
@@ -1104,7 +1103,7 @@ namespace wali
       }
       
       return result;
-    }*/
+    }
 
     /**
      *
@@ -1257,6 +1256,7 @@ namespace wali
      * @return true if the language accepted by this NWA is empty
      *
      */
+    //TODO: determinize prior to checking paths?
     bool NWA::isEmpty( )
     {
       //An automaton with no initial states must accept only the empty
@@ -1298,6 +1298,7 @@ namespace wali
      * accepted by this NWA
      *
      */
+    //TODO: determinize prior to doing this simulation?
     bool NWA::isMember( nws::NWS word )
     {
       //Check if the NWS is just a nested word suffix
@@ -1479,7 +1480,7 @@ namespace wali
       //Nodes with no exit node match
       //  return transitions if the node is the node at the top of the nesting
       //  internal transitions otherwise
-      if( typeid(currNode) == typeid(nws::NWSCallNode) )
+      if( currNode->isCall() )
       {
         calls.push(currState);
         for( Trans::callIterator cit = trans->beginCall();

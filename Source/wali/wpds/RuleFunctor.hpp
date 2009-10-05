@@ -102,6 +102,31 @@ namespace wali
         void addPoint(Key k, std::set< Key > &s);
     };
 
+    // @author Amanda Burton
+    /**
+     * 
+     * @class WpdsRules
+     *
+     * Gets all rules from the WPDS and classifies them as
+     * push rules, pop rules, and step rules, as appropriate.
+     *
+     */
+    class WpdsRules: public ConstRuleFunctor
+    {
+      public:
+        std::set< Rule > pushRules;
+        std::set< Rule > popRules;
+        std::set< Rule > stepRules;
+        
+        WpdsRules();
+        virtual ~WpdsRules();
+        
+        virtual void operator() (const rule_t & r);
+        
+      private:
+        void addRule(Rule r, std::set< Rule > &s);
+    };
+
     class RuleCopier : public ConstRuleFunctor
     {
       public:

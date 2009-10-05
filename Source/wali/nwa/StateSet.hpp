@@ -6,9 +6,9 @@
  */
 
 // ::wali
-#include "Printable.hpp"
-#include "Key.hpp"
-#include "KeyContainer.hpp"
+#include "wali/Printable.hpp"
+#include "wali/Key.hpp"
+#include "wali/KeyContainer.hpp"
 
 // std::c++
 #include <iostream>

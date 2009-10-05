@@ -33,5 +33,10 @@ namespace wali
     return o << value;
   }
 
+  int IntSource::getInt() const
+  {
+    return value;
+  }
+
 } // namespace wali
 

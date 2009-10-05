@@ -61,6 +61,30 @@ namespace wali
     }
 
     /////////////////////////////////////////////////////////////////
+    // class WpdsRules
+    /////////////////////////////////////////////////////////////////
+    // @author Amanda Burton
+    
+    WpdsRules::WpdsRules() {}
+    
+    WpdsRules::~WpdsRules() {}
+    
+    void WpdsRules::operator() (const rule_t & r)
+    {
+      if( r->is_rule2() )
+        addRule(*r, pushRules);
+      else if( r->to_stack1() != WALI_EPSILON )
+        addRule(*r, stepRules);
+      else
+        addRule(*r, popRules);
+    }
+    
+    void WpdsRules::addRule(Rule r, std::set< Rule > &s)
+    {
+      s.insert(r);
+    }
+
+    /////////////////////////////////////////////////////////////////
     // class RuleCopier
     /////////////////////////////////////////////////////////////////
     RuleCopier::RuleCopier(WPDS& w,ref_ptr<Wrapper> wr) : w(w),wrapper(wr)

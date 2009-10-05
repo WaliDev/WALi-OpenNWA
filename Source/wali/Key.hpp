@@ -12,6 +12,7 @@
  * for acting on Keys
  */
 #include <string>
+#include <set>
 
 namespace wali
 {
@@ -47,6 +48,8 @@ namespace wali
   Key getKey( const char* s );
   Key getKey( int i );
   Key getKey( Key k1, Key k2 );
+  // @author Amanda Burton
+  Key getKey( std::set<Key> ks );
 
   /*!
    * Return KeySource associated with the key k

@@ -4,7 +4,6 @@
 
 // ::wali
 #include "wali/nwp/NWPNode.hpp"
-#include "wali/Common.hpp"
 
 namespace wali
 {	
@@ -19,7 +18,7 @@ namespace wali
     NWPNode::NWPNode( )
     {
       //WALI_EPSILON is the absence of a symbol.
-      symbol = WALI_EPSILON; 
+      symbol = wali::WALI_EPSILON; 
       prev = NULL;
       exit = NULL;
     }
@@ -47,7 +46,7 @@ namespace wali
     
     NWPNode::~NWPNode( )
     {
-      symbol = WALI_BAD_KEY;
+      symbol = wali::WALI_BAD_KEY;
       prev = NULL;
       exit = NULL;
     }
@@ -160,6 +159,47 @@ namespace wali
       this->exit = exit;
     }
 
+    /**
+     *
+     * @brief returns the nesting of the prefix at this node 
+     *
+     * @return the nesting of the prefix at this node
+     *
+     */
+    std::deque< NWPNode * > NWPNode::getNesting( )
+    {
+      return nesting;
+    }
+      
+    /**
+     *
+     * @brief sets the nesting of the prefix at this node 
+     *
+     * @param the nesting of the prefix at this node
+     *
+     */
+    void NWPNode::setNesting( std::deque< NWPNode * > nesting )
+    {
+      this->nesting = nesting;
+    }
+
+    /**
+     *
+     * @brief returns the innermost open call of the nesting
+     *
+     * @return the innermost open call of the nesting
+     *
+     */
+    NWPNode * NWPNode::currCall()
+    {
+      return nesting.back();
+    }
+    
+    //Iteration
+    NWPNode * NWPNode::operator++()
+    {
+      return prev;
+    }
     
     //Utilities
     
@@ -201,9 +241,42 @@ namespace wali
      */
     bool NWPNode::operator==( const NWPNode & other )
     {
-      return ((symbol == other.symbol) &&
-        (prev == other.prev) &&
-        (exit == other.exit));
+      //Check symbol equivalence.
+      if( symbol != other.symbol )
+        return false;
+
+      //Check prev link equivalence.
+      if( (prev == NULL) && (other.prev != NULL) )
+        return false;
+      else if( (prev != NULL) && (other.prev == NULL) )
+        return false;
+      else if( (prev != NULL) && (other.prev != NULL) )
+        if( !(*prev == *other.prev) )
+          return false;
+
+      //Check call equivalence.
+      if( (exit == NULL) && (other.exit != NULL) )
+        return false;
+      else if( (exit != NULL) && (other.exit == NULL) )
+        return false;
+      else if( (exit != NULL) && (other.exit != NULL) )
+        if( !(*exit == *other.exit) )
+          return false;
+
+      //Check nesting equivalence.
+      std::deque< NWPNode * >::iterator it = nesting.begin();
+      std::deque< NWPNode * >::const_iterator other_it = other.nesting.begin();
+      for( ; (it != nesting.end()) && (other_it != other.nesting.end()); it++, other_it++)
+      {
+        if(*it != *other_it)
+          return false;
+      } 
+      if( it != nesting.end() )
+        return false;
+      if( other_it != other.nesting.end() )
+        return false;
+
+      return true;
     }
   };
 }

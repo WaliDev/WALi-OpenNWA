@@ -131,6 +131,50 @@ namespace wali
       o << "</" << XMLTag << ">";
       return o;
     }
+    
+    // @author Amanda Burton
+        /**
+         *  TODO: fix comments
+         *  operator== is needed by std::set
+         */
+        bool Rule::operator==( Rule other ) const
+        {
+          return ( (f->state() == other.f->state())
+                    && (f->stack() == other.f->stack())
+                    && (t->state() == other.t->state())
+                    && (t->stack() == other.t->stack())
+                    && (stk2 == other.stk2)
+                    && (se == other.se) );
+        }
+        
+        /**
+         *  TODO: fix comments
+         *  operator< is needed by std::set
+         */
+        bool Rule::operator<( Rule other ) const
+        {
+          if(f->state() == other.f->state())
+          {
+            if(f->stack() == other.f->stack())
+            {
+              if(t->state() == other.t->state())
+              {
+                if(t->stack() == other.t->stack())
+                {
+                  return stk2 < other.stk2;
+                }
+                else 
+                  return t->stack() < other.t->stack();
+              }
+              else
+                return t->state() < other.t->state();
+            }
+            else
+              return f->stack() < other.f->stack();
+          }
+          else
+            return f->state() < other.f->state();
+        }
 
   } // namespace wpds
 

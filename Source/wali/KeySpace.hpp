@@ -59,6 +59,13 @@ namespace wali
        */
       wali::Key getKey( wali::Key k1, wali::Key k2 );
 
+      // @author Amanda Burton
+      /** 
+       * Wrapper method for creating a KeySetSource and
+       * inserting it into the KeySpace
+       */
+      wali::Key getKey( std::set<wali::Key> kys );
+
       /**
        * getKeySource retrieves the KeySource* associated to the
        * wali::Key key. If no such KeySource exists, then a NULL

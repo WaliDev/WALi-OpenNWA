@@ -116,7 +116,8 @@ namespace wali
 
           HashMapIterator operator++( int );
 
-        protected:
+        //protected:
+      public:
           bucket_type  *bucket;
           hashmap_type *hashMap;
 

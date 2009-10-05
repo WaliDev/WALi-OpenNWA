@@ -6,10 +6,10 @@
  */
 
 // ::wali
-#include "Printable.hpp"
-#include "Key.hpp"
-#include "KeyContainer.hpp"
-#include "StateSet.hpp"
+#include "wali/Printable.hpp"
+#include "wali/Key.hpp"
+#include "wali/KeyContainer.hpp"
+#include "wali/nwa/StateSet.hpp"
 
 // std::c++
 #include <iostream>
@@ -17,67 +17,6 @@
 
 namespace wali
 {
-
-  /**
-   * @class Quad
-   */
-  template< typename T,typename U,typename V,typename W > struct Quad
-  {
-    Quad() {}
-
-    Quad( T t,U u,V v,W w )
-      : first(t),second(u),third(v),fourth(w) {}
-
-    Quad( const Quad & other )
-      : first(other.first), second(other.second), third(other.third),
-      fourth(other.fourth) {}
-
-    Quad & operator=( const Quad & other )
-    {
-      first   = other.first;
-      second  = other.second;
-      third   = other.third;
-      fourth  = other.fourth;
-      return *this;
-    }
-
-    bool operator==( const Quad & other ) const
-    {
-      return ((first == other.first) &&
-        (second == other.second) &&
-        (third == other.third) &&
-        (fourth == other.fourth)); 
-    }
-
-    bool operator<( const Quad & other ) const
-    {
-      if( first == other.first )
-      {
-        if( second == other.second )
-        {
-          if( third == other.third )
-            return (fourth < other.fourth);
-          else
-            return (third < other.third);
-        }
-        else
-          return (second < other.second);
-      }
-      else
-        return (first < other.first );
-    }
-
-    T first;
-    U second;
-    V third;
-    W fourth;
-  };
-
-  /**
-   * KeyQuad
-   */
-  typedef Quad< Key,Key,Key,Key > KeyQuad;
-
   namespace nwa
   {
 

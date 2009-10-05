@@ -8,6 +8,7 @@
 // ::wali
 #include "wali/Printable.hpp"
 #include "wali/Key.hpp"
+#include "wali/Common.hpp"
 
 // std::c++
 #include <iostream>
@@ -177,10 +178,8 @@ namespace wali
       //
     protected:
       Key symbol;
-      //NWSNode * prev;
       NWSNode * next;
       NWSNode * exit;
-      //NWSNode * call;
     };
   }
 }

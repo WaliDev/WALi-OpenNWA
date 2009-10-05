@@ -23,6 +23,8 @@ namespace wali
 
       virtual std::ostream& print( std::ostream& o ) const;
 
+      int getInt() const;
+
     protected:
       int value;
 

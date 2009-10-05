@@ -1,4 +1,4 @@
- #ifndef wali_nwp_NWP_GUARD
+#ifndef wali_nwp_NWP_GUARD
 #define wali_nwp_NWP_GUARD 1
 
 /**
@@ -25,6 +25,8 @@ namespace wali
   
   class NWP : public Printable
     {
+      typedef NWPNode * iterator;
+      
       //
       // Methods
       //
@@ -32,8 +34,7 @@ namespace wali
     public:
       //Constructors and Destructor
       NWP( );
-      NWP( std::stack< NWPNode > st, NWPNode * trace );
-      NWP( std::vector< Key > sym, std::queue< std::pair< int,int > > nest );
+      NWP( std::vector< Key > sym, std::queue< std::pair< int,int > > nest ); 
       NWP( NWP & other );
       NWP & operator=( NWP & other );
      
@@ -41,105 +42,104 @@ namespace wali
 
 
       //Accessors
-      
-      /** 
-       *
-       * @brief provide access to the next call node in the nesting
-       *
-       * This method provides access to the call node on the top of 
-       * the nesting stack.
-       *
-       * @return the next call node in the nesting
-       *
-       */
-      NWPNode * stackTop();
-      
-      /** 
-       *
-       * @brief adds the given call node to the nesting
-       *
-       * This method pushes the given call node onto the nesting stack.
-       *
-       * @parm the call node to add to the nesting
-       *
-       */
-      void pushStack( NWPNode * call );
-      
-      /** 
-       *
-       * @brief removes the next call node from the nesting
-       *
-       * This method removes the next call node from the nesting stack.
-       *
-       */
-      void popStack();
-      
-      /** 
-       *
-       * @brief returns the current level of nesting
-       *
-       * This method returns the current level of nesting (the size of 
-       * the stack). 
-       *
-       * @return the current level of nesting
-       *
-       */
-      size_t stackSize();
 
       /** 
        *
        * @brief appends a symbol to the end of the word prefix
        *
-       * This method appends a node with the given symbol to the end 
-       * of the word prefix trace.
+       * This method appends an intraprocedural node with the 
+       * given symbol to the end of the word prefix trace.  
        *
        * @parm the symbol to add to the word prefix
+       * @return false if the prev link could not be created
        *
        */
-      void addNode( Key sym );
+      bool addIntraNode( Key sym );
+
+      /** 
+       *
+       * @brief appends a symbol to the end of the word prefix
+       *
+       * This method appends a call node with the 
+       * given symbol to the end of the word prefix trace.  
+       *
+       * @parm the symbol to add to the word prefix
+       * @return false if the prev link could not be created
+       *
+       */
+      bool addCallNode( Key sym );
       
       /** 
        *
        * @brief appends a symbol to the end of the word prefix
        *
-       * This method appends a node with the given symbol and return 
-       * node to the end of the word prefix trace.  If this node 
-       * is already a call node with a different return node, the 
-       * call/return link is not created, the node is not appended, and 
-       * false is returned.
+       * This method appends a return node with the given symbol 
+       * to the end of the word prefix trace.  
        *
        * @parm sym: the symbol to add to the word prefix
-       * @parm returnNode: the return node that is paired with this call 
-       * @return false if the call/return link could not be created
+       * @return false if any link could not be created
        *
        */
-      bool addNode( Key sym, NWPNode * returnNode );
+      bool addReturnNode( Key sym );
       
-      //TODO: addNode( NWPNode * newNode ) - this should allow for automatic
-      //update to the nesting stack if this node is a call node or return node
-      //but what should be done with a pre-existing prev pointer?
+	   /** 
+      *
+      * @brief appends a symbol to the end of the word prefix
+      *
+      * This method appends the given intraprocedural node to 
+      * the end of the word prefix trace.  If this node is already linked 
+      * with a different previous node, the prev link is not created, the node 
+      * is not appended, and false is returned.  
+      *
+      * @parm the node to add to the word prefix
+	    * @return false if the prev link could not be created
+      *
+      */
+     bool addIntraNode( NWPNode * node );
+
+     /** 
+      *
+      * @brief appends a symbol to the end of the word prefix
+      *
+      * This method appends the given call node to 
+      * the end of the word prefix trace.  If this node is already linked 
+      * with a different previous node, the prev link is not created, the node 
+      * is not appended, and false is returned.  
+      *
+      * @parm the node to add to the word prefix
+	    * @return false if the prev link could not be created
+      *
+      */
+     bool addCallNode( NWPNode * node );
+
+      /** 
+       *
+       * @brief appends a symbol to the end of the word prefix
+       *
+       * This method appends the given return node 
+       * to the end of the word prefix trace.  If this node is already
+       * linked with a different previous node, the prev link is not
+       * created, the node is not appended, and false is returned.  If
+       * there is no open call on the nesting, the call/return link is 
+       * not created, the node is not appended, and false is returned.
+       *
+       * @parm sym: the return node to add to the word prefix
+       * @return false if some link could not be created
+       *
+       */
+      bool addReturnNode( NWPNode * node );
       
       /** 
        *
-       * @brief provides access to the previous node in the word prefix
+       * @brief provides access to the end node in the word prefix
        *
-       * This method provides access to the previous node at the end 
+       * This method provides access to the node at the end 
        * of the word prefix trace.
        *
-       * @return the previous node in the word prefix
+       * @return the end node in the word prefix
        *
        */
-      NWPNode * prevNode();
-      
-      /**
-       * 
-       * @brief removes the node at the end of the word prefix
-       *
-       * This method removes the node at the end of the word prefix/undoes
-       * the last addNode().  It does not change the nesting stack.
-       *
-       */
-      void undoNode();
+      NWPNode * endNode();
       
       /** 
        *
@@ -199,29 +199,40 @@ namespace wali
        */
       bool isEmpty();
       
-      private:
+      //Iteration
+      iterator begin();
+      iterator end();      
+      
+      //Nesting
+
       /** 
        *
-       * @brief finds the call node associated with the given return node 
-       * in the word prefix
+       * @brief provide access to the next call node in the nesting
        *
-       * This method finds the call node associated with the given return 
-       * node in the word prefix.  If the given node is not the return node
-       * for any call node in the word prefix NULL is returned.
+       * This method provides access to the call node on the top of 
+       * the nesting stack.
        *
-       * @return the call node associated with the given return node, or NULL
-       * if no such node exists in the word prefix
+       * @return the next call node in the nesting
        *
        */
-      NWPNode * getCall( NWPNode * returnNode, NWPNode * currNode );
+      NWPNode * currCall();
       
+      /** 
+       *
+       * @brief returns the current level of nesting
+       *
+       * This method returns the current level of nesting (the size of 
+       * the stack). 
+       *
+       * @return the current level of nesting
+       *
+       */
+      size_t nestSize();
 
       //
       // Variables
       //
     protected:
-      std::deque< NWPNode > nesting;
-      //NWPNode * start;
       NWPNode * word;
     };
 

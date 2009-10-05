@@ -6,12 +6,15 @@
  */
 
 // ::wali
-#include "Printable.hpp"
-#include "Key.hpp"
-#include "KeyContainer.hpp"
-#include "TransSet.hpp"
-#include "NWS.hpp"
-//#include "WPDS.hpp"
+#include "wali/Printable.hpp"
+#include "wali/Key.hpp"
+#include "wali/KeyContainer.hpp"
+#include "wali/nwa/TransSet.hpp"
+#include "wali/nws/NWS.hpp"
+#include "wali/wpds/WPDS.hpp"
+#include "wali/wpds/RuleFunctor.hpp"
+#include "wali/wpds/Rule.hpp"
+#include "wali/witness/Witness.hpp"
 
 // std::c++
 #include <iostream>
@@ -675,7 +678,7 @@ namespace wali
          * using PDS reachability
          * 
          */
-        //wpds::WPDS plusWPDS( wpds::WPDS base );
+        wpds::WPDS plusWPDS( wpds::WPDS base );
     
         /**
          *
@@ -686,7 +689,7 @@ namespace wali
          * @return the NWA equivalent to the given PDS
          *
          */
-        //static nwa::NWA PDStoNWA(wpds::WPDS pds);
+        static nwa::NWA PDStoNWA(wpds::WPDS pds);
     
         /**
          *
@@ -697,7 +700,7 @@ namespace wali
          * @return the PDS equivalent to this NWA
          *
          */
-        //static wpds::WPDS NWAtoPDS(NWA nwa,SemElem wgt);
+        static wpds::WPDS NWAtoPDS(NWA nwa,witness::Witness wgt);
     
         /**
          *

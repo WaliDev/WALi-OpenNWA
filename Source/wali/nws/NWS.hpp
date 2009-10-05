@@ -1,4 +1,4 @@
- #ifndef wali_nws_NWS_GUARD
+#ifndef wali_nws_NWS_GUARD
 #define wali_nws_NWS_GUARD 1
 
 /**

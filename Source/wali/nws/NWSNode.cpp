@@ -4,7 +4,6 @@
 
 // ::wali
 #include "wali/nws/NWSNode.hpp"
-#include "wali/Common.hpp"
 
 namespace wali
 {	
@@ -19,7 +18,7 @@ namespace wali
     NWSNode::NWSNode( )
     {
       //WALI_EPSILON is the absence of a symbol.
-      symbol = WALI_EPSILON; 
+      symbol = wali::WALI_EPSILON; 
       next = NULL;
       exit = NULL;
     }
@@ -47,7 +46,7 @@ namespace wali
     
     NWSNode::~NWSNode( )
     {
-      symbol = WALI_BAD_KEY;
+      symbol = wali::WALI_BAD_KEY;
       next = NULL;
       exit = NULL;
     }

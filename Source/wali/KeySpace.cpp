@@ -10,6 +10,7 @@
 #include "wali/StringSource.hpp"
 #include "wali/IntSource.hpp"
 #include "wali/KeyPairSource.hpp"
+#include "wali/KeySetSource.hpp"
 
 namespace wali
 {
@@ -84,6 +85,13 @@ namespace wali
   {
     return getKey( new KeyPairSource(k1,k2) );
   }
+
+  // @author Amanda Burton  
+  wali_key_t KeySpace::getKey( std::set<wali_key_t> kys )
+  {
+    return getKey( new KeySetSource(kys) );
+  }
+
 
   /**
    * getKeySource retrieves the KeySource* associated to the

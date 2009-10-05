@@ -8,9 +8,11 @@
 // ::wali
 #include "wali/Printable.hpp"
 #include "wali/Key.hpp"
+#include "wali/Common.hpp"
 
 // std::c++
 #include <iostream>
+#include <deque>
 
 namespace wali
 {
@@ -138,6 +140,43 @@ namespace wali
        */
       void setExit( NWPNode * exit );
       
+      /**
+       *
+       * @brief returns the nesting of the prefix at this node 
+       *
+       * This method provides access to the nesting of the prefix at 
+       * this node.
+       *
+       * @return the nesting of the prefix at this node
+       *
+       */
+      std::deque< NWPNode * > getNesting( );
+      
+      /**
+       *
+       * @brief sets the nesting of the prefix at this node 
+       *
+       * This method records the current nesting of the prefix.
+       *
+       * @param the nesting of the prefix at this node
+       *
+       */
+      void setNesting( std::deque< NWPNode * > nesting );
+
+      /**
+       *
+       * @brief returns the innermost open call of the nesting
+       *
+       * This method returns the innermost open call of the nesting.
+       *
+       * @return the innermost open call of the nesting
+       *
+       */
+      NWPNode * currCall();
+      
+      //Iteration
+      NWPNode * operator++();
+      
       //Utilities
       
       /** 
@@ -178,9 +217,8 @@ namespace wali
     protected:
       Key symbol;
       NWPNode * prev;
-      //NWPNode * next;
       NWPNode * exit;
-      //NWPNode * call;
+      std::deque< NWPNode * > nesting;
     };
 
   }
