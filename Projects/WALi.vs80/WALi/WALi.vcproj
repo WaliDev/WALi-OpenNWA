@@ -327,8 +327,26 @@
 					>
 				</File>
 				<File
-					RelativePath=".\KeySetSource.cpp"
+					RelativePath="..\..\..\Source\wali\KeySetSource.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\..\Source\wali\KeySpace.cpp"
@@ -705,7 +723,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\KeySetSource.hpp"
+					RelativePath="..\..\..\Source\wali\KeySetSource.hpp"
 					>
 				</File>
 				<File
