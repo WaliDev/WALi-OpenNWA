@@ -28,61 +28,97 @@ namespace wali
 
       class BinRel : public wali::SemElem 
       {
-        public:
-          static int getNumVars();
+      public:
+	/** @return [int] specifying the number of variables in the domain and range of a binary relation */
+	static int getNumVars();
 
-          static bool initialize(int numVars);
+	/** 
+	    Raises an exception if v \notin [0,BinRel::getNumVars()).
+	    @return void
+	 */
+	static void check_var(int v);
 
-          static binrel_t Make(int from, int to);
+	/** 
+	    Initialize binary relations to have [numVars] in the domain and range.
+	    We sometimes refer to "Vars" as the set of all variables.
+	    The set "Vars" has the canonical representation [0,numVars).
 
-          static binrel_t Make(const std::list< std::pair<int,int> >& input);
+	    @return true on success 
+	*/
+	static bool initialize(int numVars);
 
-          static binrel_t Empty();
+	/** @return true if BinRel has been successfully initialized */
+	static bool is_initialized();
 
-          static binrel_t Id();
+	/** @return relation { [from] -> [to] } */
+	static binrel_t Make(int from, int to);
 
-        public:
-          /** @see BinRel::Compose */
-          friend binrel_t operator*(binrel_t a, binrel_t b);
-          /** @see BinRel::Union */
-          friend binrel_t operator|(binrel_t a, binrel_t b);
-          /** @see BinRel::Intersect */
-          friend binrel_t operator&(binrel_t a, binrel_t b);
+	/** @return relation { a -> b | (a,b) \in [input] } */
+	static binrel_t Make(const std::list< std::pair<int,int> >& input);
 
-        public:
-          BinRel(const BinRel& that);
+	/** @return relation {} */
+	static binrel_t Empty();
 
-          virtual ~BinRel();
+	/** @return relation { a -> a | a \in Vars } */
+	static binrel_t Id();
 
-          binrel_t Compose( binrel_t that );
+	/** @return binrel_t that implements the relation \lambda S. S + {v} */
+	static binrel_t AddVar(int v);
 
-          binrel_t Union( binrel_t that );
+	/** @return binrel_t that implements the relation \lambda S. S - {v} */
+	static binrel_t SubVar(int v);
+	
+      public:
+	/** @see BinRel::Compose */
+	friend binrel_t operator*(binrel_t a, binrel_t b);
 
-          binrel_t Intersect( binrel_t that );
+	/** @see BinRel::Union */
+	friend binrel_t operator|(binrel_t a, binrel_t b);
 
-        public: // SemElem methods
-          sem_elem_t one() const { return Id(); }
-          sem_elem_t zero() const { return Empty(); }
-          sem_elem_t combine(SemElem* se);
-          sem_elem_t extend(SemElem* se);
-          bool equal(SemElem* se) const;
-          std::ostream& print( std::ostream& o ) const;
+	/** @see BinRel::Intersect */
+	friend binrel_t operator&(binrel_t a, binrel_t b);
 
-        protected:
-          BinRel(bdd b);
+      public:
+	BinRel(const BinRel& that);
 
-        protected:
-          bdd rel;
+	virtual ~BinRel();
 
-        private:
-          static int NUMVARS;
-          static int base;
-          // D1 -> D2, and D2 -> D3
-          static bddPair* downOne;
-          // D3 -> D2
-          static bddPair* restore;
+	binrel_t Compose( binrel_t that );
 
-          static bdd priv_id();
+	binrel_t Union( binrel_t that );
+
+	binrel_t Intersect( binrel_t that );
+
+      public: // SemElem methods
+	sem_elem_t one() const { return Id(); }
+	sem_elem_t zero() const { return Empty(); }
+	
+	/** @return [this]->Union( cast<BinRel*>(se) ) */
+	sem_elem_t combine(SemElem* se);
+
+	/** @return [this]->Compose( cast<BinRel*>(se) ) */
+	sem_elem_t extend(SemElem* se);
+	
+	bool equal(SemElem* se) const;
+
+	std::ostream& print( std::ostream& o ) const;
+
+      protected:
+	BinRel(bdd b);
+
+      protected:
+	bdd rel;
+
+      private:
+	static int NUMVARS;
+	static int base;
+	// D1 -> D2, and D2 -> D3
+	static bddPair* downOne;
+	// D3 -> D2
+	static bddPair* restore;
+
+	static bdd priv_id();
+	static bdd cached_id();
       };
 
     } // namespace binrel

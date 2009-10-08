@@ -16,8 +16,22 @@ int BinRel::getNumVars()
   return NUMVARS;
 }
 
+void BinRel::check_var(int v)
+{
+  if (!is_initialized() || (v < 0) || (v >= BinRel::getNumVars())) {
+    std::stringstream ss;
+    ss << "[ERROR] Out of range [0," << BinRel::getNumVars() << ")  :  " << v << std::endl; 
+    *wali::waliErr << ss.str();
+    throw ss.str();
+  }
+}
+
 bool BinRel::initialize(int numVars) 
 {
+  if (numVars < 0) {
+    *wali::waliErr << "[ERROR] Attempt to initailize BinRel with a negative 'Vars' size : " << numVars << std::endl;
+    return false;
+  }
   if (BinRel::NUMVARS == -1) {
     BinRel::NUMVARS = numVars;
     int domains[3] = {NUMVARS,NUMVARS,NUMVARS};
@@ -35,25 +49,20 @@ bool BinRel::initialize(int numVars)
     return true;
   }
   else {
-    *wali::waliErr << "[WARNING] class BinRel is already initialized with [" << BinRel::NUMVARS << "] variables.\n";
+    *wali::waliErr << "[WARNING] class BinRel is already initialized with [" << BinRel::NUMVARS << "] variables." << std::endl;
     return false;
   }
 }
 
+bool BinRel::is_initialized()
+{
+  return BinRel::NUMVARS != -1;
+}
+
 binrel_t BinRel::Make(int from, int to) 
 {
-  if (from >= BinRel::NUMVARS) {
-    std::stringstream ss;
-    ss << "[ERROR] Out of range [0," << NUMVARS << ")  :  " << from << std::endl; 
-    std::cerr << ss.str();
-    throw ss.str();
-  }
-  if (to >= BinRel::NUMVARS) {
-    std::stringstream ss;
-    ss << "[ERROR] Out of range [0," << NUMVARS << ")  :  " << to << std::endl; 
-    std::cerr << ss.str();
-    throw ss.str();
-  }
+  check_var(from);
+  check_var(to);
   binrel_t brel(new BinRel( fdd_ithvar(base,from) & fdd_ithvar(base+1,to) ));
   return brel;
 }
@@ -76,8 +85,22 @@ binrel_t BinRel::Empty()
 
 binrel_t BinRel::Id() 
 {
-  static binrel_t X( new BinRel(priv_id()) );
+  static binrel_t X( new BinRel(cached_id()) );
   return X;
+}
+
+binrel_t BinRel::AddVar(int v)
+{
+  check_var(v);
+  bdd x = fdd_ithvar(base+1,v);
+  return new BinRel(bdd_exist(cached_id(),x) & x);
+}
+
+binrel_t BinRel::SubVar( int v )
+{
+  check_var(v);
+  bdd x = bdd_not(fdd_ithvar(base+1,v));
+  return new BinRel(bdd_exist(cached_id(),x) & x);
 }
 
 // ////////////////////////////
@@ -177,3 +200,8 @@ bdd BinRel::priv_id()
   return id;
 }
 
+bdd BinRel::cached_id()
+{
+  static bdd R = priv_id();
+  return R;
+}
