@@ -8,6 +8,22 @@
 #include <sstream>
 
 using namespace wali::domains::binrel;
+using std::endl;
+using wali::waliErr;
+
+#define BDDBIGMEM 0
+#if BDDBIGMEM
+
+// For large memory machines (i.e., >= 2GB) allocs ~1500 MB
+//#define BDDMEMSIZE 75000000
+// 25000000 ~~ 500 MB, change the multiple to get what you need.
+#define FIVE_CENT_MB 25000000
+#define BDDMEMSIZE (FIVE_CENT_MB*1)
+
+#else
+#define BDDMEMSIZE 10000000
+#endif
+
 
 // ////////////////////////////
 // static
@@ -18,40 +34,66 @@ int BinRel::getNumVars()
 
 void BinRel::check_var(int v)
 {
-  if (!is_initialized() || (v < 0) || (v >= BinRel::getNumVars())) {
+  if (!is_initialized() || (v < 0) || (v >= BinRel::getNumVars())) 
+  {
     std::stringstream ss;
-    ss << "[ERROR] Out of range [0," << BinRel::getNumVars() << ")  :  " << v << std::endl; 
-    *wali::waliErr << ss.str();
+    ss << "[ERROR] Out of range [0," << BinRel::getNumVars() << ")  :  " << v << endl; 
+    *waliErr << ss.str();
     throw ss.str();
   }
 }
 
 bool BinRel::initialize(int numVars) 
 {
-  if (numVars < 0) {
-    *wali::waliErr << "[ERROR] Attempt to initailize BinRel with a negative 'Vars' size : " << numVars << std::endl;
-    return false;
-  }
-  if (BinRel::NUMVARS == -1) {
-    BinRel::NUMVARS = numVars;
-    int domains[3] = {NUMVARS,NUMVARS,NUMVARS};
-    base = fdd_extdomain( domains,3 );
-    if (base < 0) {
-      // err msg please
-      throw base;
+    // ///////////////////////
+    // Begin initialize BuDDy
+    if (0 == bdd_isrunning())
+    {
+        int rc = bdd_init( BDDMEMSIZE,100000 );
+        if( rc < 0 ) {
+            *waliErr << "[ERROR] " << bdd_errstring(rc) << endl;
+            assert( 0 );
+        }
+        // Default is 50,000 (1 Mb),memory is cheap, so use 100,000
+        bdd_setmaxincrease(100000);
+        // TODO: bdd_error_hook( my_error_handler );
     }
-    downOne = bdd_newpair();
-    fdd_setpair(downOne, base,base+1);
-    fdd_setpair(downOne, base+1,base+2);
+    else {
+        *waliErr << "[WARNING] BuDDy already initialized." << endl;
+    }
+    // End initialize BuDDy
+    // ///////////////////////
 
-    restore = bdd_newpair();
-    fdd_setpair(restore, base+2, base+1);
-    return true;
-  }
-  else {
-    *wali::waliErr << "[WARNING] class BinRel is already initialized with [" << BinRel::NUMVARS << "] variables." << std::endl;
-    return false;
-  }
+    if (numVars < 0)
+    {
+        *waliErr << "[ERROR-BinRel initialization] Negative var set size: " << numVars << endl;
+        *waliErr << "    Aborting." << endl;
+        assert (false);
+    }
+
+    if (BinRel::NUMVARS == -1) 
+    {
+        BinRel::NUMVARS = numVars;
+        int domains[3] = {NUMVARS,NUMVARS,NUMVARS};
+        base = fdd_extdomain( domains,3 );
+        if (base < 0) 
+        {
+            *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
+            *waliErr << "    Aborting." << endl;
+            assert (false);
+        }
+        downOne = bdd_newpair();
+        fdd_setpair(downOne, base,base+1);
+        fdd_setpair(downOne, base+1,base+2);
+
+        restore = bdd_newpair();
+        fdd_setpair(restore, base+2, base+1);
+        return true;
+    }
+    else {
+        *waliErr << "[WARNING] class BinRel is already initialized with [" << BinRel::NUMVARS << "] variables.\n";
+        return false;
+    }
 }
 
 bool BinRel::is_initialized()
@@ -71,7 +113,8 @@ binrel_t BinRel::Make(const std::list< std::pair<int,int> >& input)
 {
   std::list< std::pair<int,int> >::const_iterator it = input.begin();
   binrel_t result = Empty();
-  for ( ; it != input.end() ; it++ ) {
+  for ( ; it != input.end() ; it++ ) 
+  {
     result = result->Union(Make(it->first,it->second));
   }
   return result;
@@ -148,8 +191,8 @@ static BinRel* convert(wali::SemElem* se)
 {
   BinRel* br = dynamic_cast<BinRel*>(se);
   if (br == NULL) {
-    *wali::waliErr << "[ERROR] Cannot cast to class wali::binrel::BinRel.\n";
-    se->print( *wali::waliErr << "    " ) << std::endl;
+    *waliErr << "[ERROR] Cannot cast to class wali::binrel::BinRel.\n";
+    se->print( *waliErr << "    " ) << endl;
     assert(false);
   }
   // When done with developement
@@ -193,9 +236,9 @@ bddPair* BinRel::restore = NULL;
 // BinRel.cpp local method
 bdd BinRel::priv_id() 
 {
-  bdd id;
+  bdd id = bddtrue;
   for (int i = 0 ; i < BinRel::getNumVars() ; i++) {
-    id = id | (fdd_ithvar(base,i) & fdd_ithvar(base+1,i));
+    id = id & bdd_biimp(fdd_ithvar(base,i) , fdd_ithvar(base+1,i));
   }
   return id;
 }

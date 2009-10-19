@@ -39,31 +39,6 @@ namespace wali
   const std::string QueryHandler::XMLPoststarTag("poststar");
   const std::string QueryHandler::XMLPrestarTag("prestar");
 
-  /*
-  QueryHandler::QueryHandler( WeightFactory& wf,MergeFnFactory* mf ) :
-    wf(wf),
-    mf(mf),
-    currentHandler(NULL),
-    isPrestar(false),
-    pdsHandler(NULL),
-    faHandler(NULL)
-  {
-    XMLPlatformUtils::Initialize();
-    typeID = XMLString::transcode("type");
-  }
-
-  QueryHandler::QueryHandler( wpds::WpdsHandler* wpdsh , wfa::WfaHandler* wfah ) :
-    wf(wfah->getWeightFactory()),
-    mf(NULL),
-    currentHandler(NULL),
-    isPrestar(false),
-    pdsHandler(wpdsh),
-    faHandler(wfah)
-  {
-    XMLPlatformUtils::Initialize();
-    typeID = XMLString::transcode("type");
-  }
-  */
   QueryHandler::QueryHandler( IUserHandler& user ) :
     fUserHandler(user),
     currentHandler(NULL),
