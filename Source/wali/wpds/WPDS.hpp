@@ -455,6 +455,7 @@ namespace wali
             Config *f,
             Config *t,
             Key stk2,
+
             rule_t& r );
 
         /**

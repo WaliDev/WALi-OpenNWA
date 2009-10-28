@@ -1,7 +1,7 @@
 #ifndef wali_STRING_SOURCE_GUARD
 #define wali_STRING_SOURCE_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  */
 
@@ -11,7 +11,7 @@
 
 namespace wali
 {
-  /*!
+  /**
    * @class StringSource
    */
   class StringSource : public KeySource
@@ -29,8 +29,10 @@ namespace wali
 
       virtual std::ostream& print( std::ostream& o ) const;
 
-    protected:
-      std::string s;
+      std::string getString() const;
+
+    private:
+      const std::string s;
   };
 
 } // namespace wali

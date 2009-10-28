@@ -34,7 +34,7 @@ namespace wali
       //*waliErr << "~Rule()   : " << numRules << std::endl;
     }
 
-/*!
+    /*!
      * @brief Make a copy of the rule
      */
     void Rule::copy(const rule_t r) {

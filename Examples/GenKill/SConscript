@@ -1,28 +1,32 @@
 # Reachability example
 import os
 
+Import('Debug')
 Import('WaliDir')
 Import('ProgEnv')
 
+if Debug:
+    print '\n+++ Entered "#/Examples/GenKill"\n'
+    
 Env = ProgEnv.Clone()
 
 GenKillFiles=[ 'VarSet.cpp' ]
-Env['CPPPATH'].append(os.path.join(WaliDir,'Examples','GenKill'))
+
+## Note - Be sure to use 'CPPPATH=[ <some list> ]'
+Env.Append(CPPPATH=[os.path.join(WaliDir,'Examples','GenKill')])
 
 # LiveVar
-#print "+++ Build GenKill/LiveVar"
 LiveFiles = GenKillFiles + [os.path.join('LiveVar','LiveVar.cpp')] + Env['StaticLibs']
-LiveVar = Env.Program('livevar', LiveFiles)
-lv = Env.InstallAs(os.path.join(WaliDir,'Examples','bin','LiveVar'), LiveVar)
+LiveVar = Env.Program('ExLiveVar', LiveFiles)
+lv = Env.InstallAs(os.path.join(WaliDir,'Examples','bin','ExLiveVar'), LiveVar)
 
 # UninitVar
-#print "+++ Build GenKill/UninitVar"
 UninitFiles = GenKillFiles + [os.path.join('UninitVar','UninitVar.cpp')] + Env['StaticLibs']
-UninitVar = Env.Program('uninitvar', UninitFiles)
-ul = Env.InstallAs(os.path.join(WaliDir,'Examples','bin','UninitVar'), UninitVar)
+UninitVar = Env.Program('ExUninitVar', UninitFiles)
+ul = Env.InstallAs(os.path.join(WaliDir,'Examples','bin','ExUninitVar'), UninitVar)
 
-#built = [LiveVar,UninitVar]
-built = lv + ul
+
+built = [lv, ul]
 
 Return('built')
 

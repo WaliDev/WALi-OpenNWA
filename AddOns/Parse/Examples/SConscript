@@ -2,9 +2,10 @@
 ## Build Example parser
 import os,os.path
 
+Import('Debug')
 Import('WaliDir')
 Import('LibInstallDir')
-Import('BaseEnv')
+Import('ProgEnv')
 Import('MkStatic')
 Import('XercesDir')
 
@@ -12,29 +13,25 @@ XercesPath = os.path.join(WaliDir, 'AddOns', 'Parse', 'ThirdParty', XercesDir)
 
 StaticLibs = []
 Libs       = [ 'wali', 'waliparse', 'xerces-c', ] 
-LibPath    = [ LibInstallDir ] #, os.path.join(XercesPath,'lib'), ]
+LibPath    = [ LibInstallDir ]
 
 if MkStatic:
   StaticLibs = [
     os.path.join(LibInstallDir,'libwaliparse.a'),
-    os.path.join(LibInstallDir,'libwali.a')
+		os.path.join(LibInstallDir,'libwali.a'),
+		os.path.join(LibInstallDir,'libxerces-c.a'),
     ]
-  Libs       = ['xerces-c']
-  #LibPath    = [ os.path.join(XercesPath,'lib') ]
-
-
+	Libs = []
+	LibPath = []
+	
+	
 ## ###############################
 ## Environment
-env = BaseEnv.Clone(
-    CPPPATH  = [
-      os.path.join(WaliDir, 'Source'),
-      os.path.join(WaliDir, 'AddOns', 'Parse', 'Source'),
-      os.path.join(XercesPath, 'include'),
-    ],
-    CXXFLAGS = '-g -ggdb -Wall -Wformat=2 -W ',
-    LIBS     = Libs,
-    LIBPATH  = LibPath
-)
+env = ProgEnv.Clone()
+env.Append(CPPPATH=[os.path.join(WaliDir, 'AddOns', 'Parse', 'Source')])
+env.Append(CPPPATH=[os.path.join(XercesPath, 'include')])
+env.Replace(LIBS=Libs)
+env.Replace(LIBPATH=LibPath)
 
 # Used to record the tests that are built
 built = []

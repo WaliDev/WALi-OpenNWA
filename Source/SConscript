@@ -1,24 +1,14 @@
 # ##################################################
 # Build wali library
 
-import os
+import os, re
 
-## Control output of debug <progress> information
-## TODO - if True, always outputs info whether building or not
-Debug = False
-
-if Debug:
-    print "\n+++ Building wali library."
-
-
+Import('Debug')
 Import('WaliDir')
 Import('LibInstallDir')
 Import('BaseEnv')
 Import('MkStatic')
-
-if Debug:
-    print "+ WaliDir       : '%s'" % WaliDir
-    print "+ LibInstallDir : '%s'" % LibInstallDir 
+Import('Platform')
 
 
 # `find . -name "*.cpp"`, then remove Experimental.cpp
@@ -91,12 +81,9 @@ wali_files = Split("""
 """)
 
 env = BaseEnv.Clone()
-
+        
 if Debug:
-    print "+ CC            : '%s'" % env['CC'] 
-    print "+ CXX           : '%s'" % env['CXX'] 
-    for i in IncludeDirs:
-        print "+ Inlude        : %s" % i
+    print '\n+++ Entered "#/Source/SConscript"\n'
 
 
 if MkStatic:

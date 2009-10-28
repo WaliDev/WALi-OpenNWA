@@ -79,6 +79,7 @@ namespace wali
             Config *f,
             Config *t,
             Key stk2,
+	    bool replace_weight,
             rule_t& r );
 
       private:

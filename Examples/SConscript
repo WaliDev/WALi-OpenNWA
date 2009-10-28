@@ -1,9 +1,13 @@
 # Build the example applications
 import os,os.path
 
+Import('Debug')
 Import('WaliDir')
 Import('BuildDir')
 
+if Debug:
+    print '\n+++ Entered "#/Examples/SConscript"\n'
+    
 ExampleDir = os.path.join(WaliDir,'Examples')
 
 built = []

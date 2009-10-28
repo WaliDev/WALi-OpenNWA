@@ -3,16 +3,16 @@
 
 import os,platform
 
-Debug = False
-
-if Debug:
-    print "\n+++ Build walidomains library." 
-
-
 Import('WaliDir')
 Import('LibInstallDir')
 Import('MkStatic')
 Import('BaseEnv')
+Import('Debug')
+
+if Debug:
+    print '\n+++ Entered "#/AddOns/Domains/Source/SConscript"\n'
+
+
 
 walidomains_files = Split("""
 ./wali/domains/binrel/BinRel.cpp
@@ -22,15 +22,9 @@ walidomains_files = Split("""
 """)
 
 Env = BaseEnv.Clone()
+Env.Append(CPPPATH=[os.path.join(WaliDir , 'AddOns', 'Domains' , 'Source')])
+Env.Append(CPPPATH=[os.path.join(WaliDir , 'AddOns', 'Domains' , 'ThirdParty', 'include')])
 
-# Define include directories
-IncludeDirs = [
-    os.path.join(WaliDir , 'Source'),
-    os.path.join(WaliDir , 'AddOns', 'Domains' , 'Source'),
-    os.path.join(WaliDir , 'AddOns', 'Domains' , 'ThirdParty', 'include'), # for BuDDy
-]
-
-Env['CPPPATH'] = IncludeDirs
 
 if MkStatic:
   walidomains = Env.StaticLibrary('walidomains' , walidomains_files)

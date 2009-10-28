@@ -115,7 +115,7 @@ namespace wali
       {
         return add_rule(from_state,from_stack,to_state,to_stack1,WALI_EPSILON,se,(merge_fn_t)(NULL) );
       }
-
+    
       bool EWPDS::add_rule(
           Key from_state,
           Key from_stack,
@@ -124,7 +124,18 @@ namespace wali
           Key to_stack2,
           sem_elem_t se )
       {
-        return add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se,(merge_fn_t)(NULL) );
+        return add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se,(merge_fn_t)(NULL), false );
+      }
+
+      bool EWPDS::replace_rule(
+          Key from_state,
+          Key from_stack,
+          Key to_state,
+          Key to_stack1,
+          Key to_stack2,
+          sem_elem_t se )
+      {
+        return add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se,(merge_fn_t)(NULL), true );
       }
 
       bool EWPDS::add_rule(
@@ -135,6 +146,31 @@ namespace wali
           Key to_stack2,
           sem_elem_t se,
           merge_fn_t mf )
+      {
+	return add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se,mf, false );
+      }
+
+      bool EWPDS::replace_rule(
+          Key from_state,
+          Key from_stack,
+          Key to_state,
+          Key to_stack1,
+          Key to_stack2,
+          sem_elem_t se,
+          merge_fn_t mf )
+      {
+	return add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se,mf,true );
+      }
+
+      bool EWPDS::add_rule(
+          Key from_state,
+          Key from_stack,
+          Key to_state,
+          Key to_stack1,
+          Key to_stack2,
+          sem_elem_t se,
+          merge_fn_t mf,
+	  bool replace_weight )
       {
         // Every rule must have these 3 pieces defined
         assert( from_state != WALI_EPSILON );
@@ -149,7 +185,7 @@ namespace wali
         rule_t r(new ERule(from,to,to_stack2,se,mf));
         // WPDS::make_rule returns [true] if the rule already
         // existed. I.e., rb == false <--> r \notin this.
-        bool rb = make_rule(from,to,to_stack2,r);
+        bool rb = make_rule(from,to,to_stack2,replace_weight,r);
 
         if (!rb && to_stack1 == WALI_EPSILON )
         {
@@ -161,7 +197,7 @@ namespace wali
         // This causes problems with merge functions because
         // there isn't an interface for combining them like one
         // would normally do with weights.
-        if (rb && to_stack2 != WALI_EPSILON) 
+        if (rb && !replace_weight && to_stack2 != WALI_EPSILON) 
         {
           if (!mf.is_valid()) 
           {
@@ -197,11 +233,25 @@ namespace wali
             }
           }
           else {
+	    // Now lets ensure that the old merge function and the new one being
+	    // added here are the same. This is the only case we allow.
+            ERule* erule = dynamic_cast<ERule*>(r.get_ptr());
+            assert(erule != NULL);
+	    if(!mf->equal(erule->merge_fn())) {
             *waliErr << "[ERROR] EWPDS :: Cannot add again the same push rule.\n";
             r->print( *waliErr << "    : " ) << std::endl;
             throw r;
           }
         }
+        }
+
+	// Need to wrap the merge function if the rule is new or
+	// if the rule existed before, but replace_weight was set, in
+	// which case the old wrapped merge function got replaced
+	if ( (!rb  || (rb && replace_weight)) && wrapper.is_valid() && to_stack2 != WALI_EPSILON) {
+	  ERule* x = (ERule*)r.get_ptr();
+	  x->set_merge_fn( wrapper->wrap(*x,x->merge_fn()) );
+	}
 
         // If rb is false then the rule is new.
         // If there exists a rule r' = (p,c) -> (q,e,r)
@@ -218,11 +268,6 @@ namespace wali
           }
           r2it->second.push_back( r );
 
-          if (wrapper.is_valid())
-          {
-            ERule* x = (ERule*)r.get_ptr();
-            x->set_merge_fn( wrapper->wrap(*x,x->merge_fn()) );
-          }
           merge_rule_hash_t::iterator rhash_it = merge_rule_hash.find(KeyTriple(to_state,to_stack1,to_stack2));
           if(rhash_it == merge_rule_hash.end()) 
           {
@@ -230,10 +275,14 @@ namespace wali
           } 
           else 
           {
+            ERule* x = (ERule*)rhash_it->second.get_ptr();
+	    ERule *er = (ERule*)(r.get_ptr());
+	    if(!x->merge_fn()->equal(er->merge_fn())) {
             // FIXME: raise exception
             *waliErr << "[ERROR] EWPDS :: Cannot give two push rules with same r.h.s.\n";
             r->print( *waliErr << "    : " ) << std::endl;
           }
+        }
         }
         // Set up theZero weight
         if (!theZero.is_valid() && r->weight().is_valid()) 

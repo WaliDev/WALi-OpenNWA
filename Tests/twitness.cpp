@@ -110,7 +110,6 @@ void TestWpds(bool post)
             assert(wit);
         }
     }
-    delete wrapper;
     delete pds;
 }
 
@@ -191,7 +190,6 @@ void TestFwpds(bool post)
             assert(wit);
         }
     }
-    delete wrapper;
     delete pds;
 }
 

@@ -51,6 +51,7 @@ namespace wali
         public:
           using WPDS::poststar;
           using WPDS::prestar;
+          using WPDS::replace_rule;
           friend class TransCopyPairLinker;
 
         public:
@@ -66,26 +67,26 @@ namespace wali
            * @return true if rule existed
            *
            * @see sem_elem_t
-           * @see wali::Key
-           */
+	   * @see Key
+	   */
           virtual bool add_rule(
-              wali::Key from_state,
-              wali::Key from_stack,
-              wali::Key to_state,
+              Key from_state,
+              Key from_stack,
+              Key to_state,
               sem_elem_t se );
 
-          /** 
-           * @brief create rule with one r.h.s. stack symbol
-           * @return true if rule existed
+          /** @brief create rule with one r.h.s. stack symbol
            *
-           * @see sem_elem_t
-           * @see wali::Key
-           */
+           * @return true if rule existed
+	   *
+	   * @see sem_elem_t
+	   * @see Key
+	   */
           virtual bool add_rule(
-              wali::Key from_state,
-              wali::Key from_stack,
-              wali::Key to_state,
-              wali::Key to_stack1,
+              Key from_state,
+              Key from_stack,
+              Key to_state,
+              Key to_stack1,
               sem_elem_t se );
 
           /** 
@@ -112,6 +113,38 @@ namespace wali
            * @see wali::Key
            */
           virtual bool add_rule(
+              wali::Key from_state,
+              wali::Key from_stack,
+              wali::Key to_state,
+              wali::Key to_stack1,
+              wali::Key to_stack2,
+              sem_elem_t se,
+              merge_fn_t mf);
+
+          /** 
+           * @brief create rule with two r.h.s. stack symbols
+           * @return true if rule existed
+           *
+           * @see sem_elem_t
+           * @see wali::Key
+           */
+          virtual bool replace_rule(
+              wali::Key from_state,
+              wali::Key from_stack,
+              wali::Key to_state,
+              wali::Key to_stack1,
+              wali::Key to_stack2,
+              sem_elem_t se);
+
+          /** 
+           * @brief create rule with two r.h.s. stack symbols
+           * @return true if rule existed
+           *
+           * @see sem_elem_t
+           * @see merge_fn_t
+           * @see wali::Key
+           */
+          virtual bool replace_rule(
               wali::Key from_state,
               wali::Key from_stack,
               wali::Key to_state,
@@ -164,6 +197,20 @@ namespace wali
           rule_t lookup_rule(wali::Key to_state, wali::Key to_stack1, wali::Key to_stack2) const;
 
         protected:
+
+          /**
+           * @brief Actually adds the rule
+	   */
+
+          virtual bool add_rule(
+              wali::Key from_state,
+              wali::Key from_stack,
+              wali::Key to_state,
+              wali::Key to_stack1,
+              wali::Key to_stack2,
+              sem_elem_t se,
+              merge_fn_t mf,
+	      bool replace_weight);
 
           /**
            * @brief helper method for prestar

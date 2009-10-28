@@ -25,8 +25,8 @@ namespace wali
 
       int getInt() const;
 
-    protected:
-      int value;
+    private:
+      const int value;
 
   }; // class IntSource
 

@@ -142,7 +142,7 @@ namespace wali
         sem_elem_t se )
     {
       rule_t r;
-      bool rb = add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se,r );
+      bool rb = add_rule(from_state,from_stack,to_state,to_stack1,to_stack2,se, false, r );
       return rb;
     }
 
@@ -792,6 +792,7 @@ namespace wali
       return rb;
     }
 
+
     /**
      * Creates a Config if one does not already exist
      * with KeyPair (state,stack).
@@ -866,7 +867,7 @@ namespace wali
     }
 
 
-    /**
+     /**
      * Creates a rule that links two configurations.
      * If rule exists then combines the weight and drops
      * the rule passed in.
@@ -913,6 +914,7 @@ namespace wali
       }
       return exists;
     }
+
 
     Config * WPDS::find_config( Key state, Key stack )
     {

@@ -6,31 +6,31 @@
 ##
 ## $Id$
 ##
-import os , os.path
+import os, os.path, sys
 
+Import('Debug')
 Import('BaseEnv')
 Import('BuildDir')
-Import('Is64')
-#XercesDir = ('xerces-c','xerces-c64')[Is64]
-#Export('XercesDir')
 
-built = []
+if Debug:
+    print '\n+++ Entered "#/AddOns/Parse"\n'
 
-xerces = SConscript(os.path.join('ThirdParty','SConscript'))
-built += xerces
-Import('XercesDir')
+[xerces] = SConscript(os.path.join('ThirdParty','SConscript'))
+built = [xerces]
 
-parse = SConscript(
+[parse] = SConscript(
     os.path.join('Source','SConscript'), 
     build_dir=os.path.join(BuildDir,'AddOns','Parse'),
     duplicate=0)
-built += parse
+built += [parse]
 
 examples = SConscript(os.path.join('Examples','SConscript'), 
     build_dir=os.path.join(BuildDir,'AddOns','Parse','Examples'),
     duplicate=0)
 built += examples
 
+print 'parse = ', parse
+print 'xerces= ', xerces
 BaseEnv.Depends(parse,xerces)
 
 Return('built')

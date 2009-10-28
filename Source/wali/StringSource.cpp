@@ -1,5 +1,6 @@
-/*!
+/**
  * @author Nicholas Kidd
+ * @version $Id$
  */
 
 #include "wali/StringSource.hpp"
@@ -35,5 +36,10 @@ namespace wali
     return o << s;
   }
 
+  std::string StringSource::getString() const
+  {
+    return s;
+  }
 }
+
 

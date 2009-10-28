@@ -89,7 +89,7 @@ namespace wali
           rule_t & r = *fwit;
 
           { // BEGIN DEBUGGING
-            r->print( std::cout << "\tMatched - " ) << std::endl;
+            r->print( *waliErr << "\tMatched - " ) << std::endl;
           } // END DEBUGGING
 
           poststar_handle_trans( t,fa,r,dnew );
@@ -104,7 +104,7 @@ namespace wali
           wfa::ITrans* tprime = *it;
 
           { // BEGIN DEBUGGING
-            tprime->print( std::cout << "\tMatched - " ) << std::endl;
+            tprime->print( *waliErr << "\tMatched - " ) << std::endl;
           } // END DEBUGGING
 
           sem_elem_t wght = tprime->weight()->extend( dnew );
@@ -146,8 +146,8 @@ namespace wali
 
         State* state = fa.getState( gstate );
 
-        //state->quasi->print( std::cout << "!!PRE-quasi : " ) << std::endl;
-        //wrule_trans->print( std::cout << "!!W_t : ") << std::endl;
+        //state->quasi->print( *waliErr << "!!PRE-quasi : " ) << std::endl;
+        //wrule_trans->print( *waliErr << "!!W_t : ") << std::endl;
         sem_elem_t quasi = state->quasi->combine( wrule_trans->quasi_one() );
         state->quasi = quasi;
 

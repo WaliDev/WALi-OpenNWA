@@ -45,6 +45,11 @@ namespace wali
            */
           ~ERule();
 
+  	  /*!
+	   * @brief Make a copy of the rule
+	   */
+	  virtual void copy(const rule_t r);
+
           /**
            * @return Rule rhs second stack symbol or WALI_EPSILON if no such
            * stack sym

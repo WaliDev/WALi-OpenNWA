@@ -30,6 +30,8 @@ namespace wali
 
       virtual sem_elem_t apply_f(sem_elem_t w1, sem_elem_t w2);
 
+      virtual bool equal(merge_fn_t mf);
+
       virtual MergeFn *parse_element(const char *s, sem_elem_t sem);
 
       virtual std::ostream &print(std::ostream &o) const;

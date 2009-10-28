@@ -1,4 +1,4 @@
-/*!
+/**
  * @author Nicholas Kidd
  * @version $Revision$
  */

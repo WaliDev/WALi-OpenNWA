@@ -37,6 +37,15 @@ namespace wali
 
       }
 
+      /*!
+       * @brief Make a copy of the rule
+       */
+      void ERule::copy(const rule_t r) {
+	Rule::copy(r);
+	const ERule *er = dynamic_cast<const ERule *>(r.get_ptr());
+	mf = er->mf;
+      }
+
       sem_elem_t ERule::extended_weight() const 
       {
         sem_elem_t ret;

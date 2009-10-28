@@ -50,6 +50,11 @@ namespace wali
       WitnessMerge* witmerge = new WitnessMerge(user_se,this,left,witness_rule,right);
       return witmerge;
     }
+    
+    bool WitnessMergeFn::equal(merge_fn_t mf) {
+      WitnessMergeFn *wmf = static_cast<WitnessMergeFn*>(mf.get_ptr());
+      return user_merge->equal(wmf->user_merge);
+    }
 
     merge_fn_t WitnessMergeFn::get_user_merge()
     {

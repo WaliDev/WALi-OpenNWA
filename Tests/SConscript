@@ -4,19 +4,24 @@ import os,os.path
 Import('WaliDir')
 Import('LibInstallDir')
 Import('ProgEnv')
+Import('Debug')
+
+if Debug:
+    print '\n+++ Entered "#/Tests/SConscript"\n'
 
 ## ###############################
 ## Environment
 Env = ProgEnv.Clone()
-Env['CPPPATH']  += [os.path.join(WaliDir,'Examples','Reach')]
- 
+
+## Note - Be sure to use a list when 'Append'ing to CPPPATH
+Env.Append(CPPPATH = [os.path.join(WaliDir,'Examples','Reach')])
+
 TestDir = os.path.join(WaliDir,'Tests')
 
 built = []
 
 Reach = os.path.join(WaliDir,'Examples','Reach','Reach.cpp')
 for t in ['t1','t3','t4','twitness','tprune','tTransSet']:
-    print '\n+++ Building Test "%s"' % t
     exe = Env.Program('%s' % t, ['%s.cpp' % t,'%s' % Reach ] + Env['StaticLibs'])
     built += (exe)
 
