@@ -16,14 +16,14 @@ namespace wali
     //Constructors and Destructor
     NWS::NWS( )
     {
-      nesting = std::deque< NWSNode >();
+      nesting = std::deque< NWSNode * >();
       word = NULL;
     }
     NWS::NWS( std::stack< NWSNode > nesting, NWSNode * word )
     {
       while(! nesting.empty() )
       {
-        this->nesting.push_front(nesting.top());
+        this->nesting.push_front(&nesting.top());
         nesting.pop();
       }
       
@@ -61,18 +61,18 @@ namespace wali
         this->word = &word[0];
       }
       
-      this->nesting = std::deque< NWSNode >();
+      this->nesting = std::deque< NWSNode* >();
     }
     
-    NWS::NWS( NWS & other )
+    NWS::NWS( const NWS & other )
     {
       operator=(other);
     }
-    NWS & NWS::operator=( NWS & other )
+    NWS & NWS::operator=( const NWS & other )
     {
       this->nesting.clear();
         
-      for( std::deque< NWSNode >::iterator it = other.nesting.begin();
+      for( std::deque< NWSNode * >::const_iterator it = other.nesting.begin();
             it != other.nesting.end(); it++ )
       {
         this->nesting.push_back(*it);
@@ -104,7 +104,7 @@ namespace wali
       if( nesting.empty() )
         return NULL;
       else
-        return &nesting.back();
+        return nesting.back();
     }
     
     /** 
@@ -116,7 +116,7 @@ namespace wali
      */
     void NWS::pushStack( NWSNode * exit )
     {
-      nesting.push_back(*exit);
+      nesting.push_back(exit);
     }
     
     /** 
@@ -139,6 +139,22 @@ namespace wali
     size_t NWS::stackSize()
     {
       return nesting.size();
+    }
+    
+    /**
+     *
+     */
+    NWS::iterator NWS::beginStack()
+    {
+      return nesting.begin();
+    }
+    
+    /**
+     *
+     */
+    NWS::iterator NWS::endStack()
+    {
+      return nesting.end();
     }
 
    
@@ -238,10 +254,10 @@ namespace wali
       if( node->isCall() )
       {
         NWSNode * eNode = node->exitNode();
-        nesting.push_back(*eNode);
+        nesting.push_back(eNode);
       }
       else if( !nesting.empty() )
-        if( *node == nesting.back() )
+        if( node == nesting.back() )
         {
           nesting.pop_back();
         }
@@ -262,11 +278,11 @@ namespace wali
      */
     std::ostream & NWS::print( std::ostream & o ) const
     {
-      for( std::deque< NWSNode >::const_iterator it = nesting.begin();
+      for( std::deque< NWSNode * >::const_iterator it = nesting.begin();
             it != nesting.end(); it++ )
       {
         o << "[";
-        it->print(o); 
+        (*it)->print(o); 
         o << "] ";        
       }
       if(word != NULL)
@@ -285,13 +301,13 @@ namespace wali
      * @return true if this nested word suffix and the given one are equivalent, false otherwise
      *
      */
-    bool NWS::operator==( NWS & otherNWS )
+    bool NWS::operator==( const NWS & otherNWS ) const
     {
       if( !(word == otherNWS.word)||
           (nesting.size() != otherNWS.nesting.size()) )
         return false;
         
-      for( std::deque< NWSNode >::iterator it = nesting.begin(), 
+      for( std::deque< NWSNode * >::const_iterator it = nesting.begin(), 
             oit = otherNWS.nesting.begin(); it != nesting.end();
             it++, oit++ )
       {

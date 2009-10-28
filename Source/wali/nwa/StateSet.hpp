@@ -22,7 +22,7 @@ namespace wali
     {
     
       public:
-        typedef typename T::iterator iterator;
+        typedef typename std::set<T>::iterator iterator;
     
       //
       // Methods
@@ -60,7 +60,7 @@ namespace wali
          * @return false if the state already exists in the collection
          *
          */
-        bool add(Key addState);
+        bool add(T addState);
       
         /**
          *
@@ -74,7 +74,7 @@ namespace wali
          * of states
          *
          */
-        void addAll(StateSet addStateSet);
+        void addAll(StateSet<T> addStateSet);
       
         /**
          *
@@ -91,7 +91,7 @@ namespace wali
          * collection, true otherwise.
          *
          */
-        bool remove(Key removeState);
+        bool remove(T removeState);
       
         //Utilities	
 
@@ -121,7 +121,7 @@ namespace wali
          * 'other'
          *
          */
-        bool operator==( const StateSet & other );
+        bool operator==( const StateSet<T> & other );
 
         /**
          *
@@ -175,13 +175,13 @@ namespace wali
          * states, false otherwise
          *
          */
-        bool contains( Key state );
+        bool contains( T state );
 
       //
       // Variables
       //
       protected:
-        T states;
+        std::set<T> states;
       
     };
     
@@ -193,9 +193,7 @@ namespace wali
     //Constructors and Destructor
     template <typename T> 
     StateSet<T>::StateSet( )
-    {
-      states = T();
-    }
+    {  }
     
     template <typename T> 
     StateSet<T>::StateSet( StateSet & other )
@@ -235,7 +233,7 @@ namespace wali
      *
      */
     template <typename T> 
-    bool StateSet<T>::add(Key addState)
+    bool StateSet<T>::add(T addState)
     {
       if( states.count(addState) > 0 )
         return false;
@@ -253,9 +251,9 @@ namespace wali
      *
      */
     template <typename T> 
-    void StateSet<T>::addAll(StateSet addStateSet)
+    void StateSet<T>::addAll(StateSet<T> addStateSet)
     {
-      for( T::iterator it = addStateSet.states.begin();
+      for( iterator it = addStateSet.states.begin();
             it != addStateSet.states.end(); it++ )
       {
         states.insert(*it);
@@ -273,7 +271,7 @@ namespace wali
      *
      */
     template <typename T> 
-    bool StateSet<T>::remove(Key removeState)
+    bool StateSet<T>::remove(T removeState)
     {
       if( states.count(removeState) == 0 )
         return false;
@@ -295,16 +293,13 @@ namespace wali
     std::ostream & StateSet<T>::print( std::ostream & o) const
     {
       o << "{ ";
-      T::const_iterator it = states.begin();
-      T::const_iterator itEND = states.end();
+      std::set<T>::const_iterator it = states.begin();
+      std::set<T>::const_iterator itEND = states.end();
       for( bool first=true; it != itEND ; it++,first=false )
       {
-        if(! (*it == WALI_BAD_KEY) )
-        {
-          if( !first )
-            o << ", ";
-          printKey(o,*it);
-        }
+        if( !first )
+        o << ", ";
+        it->print(o);
       }
       o << " }" << std::endl;
       return o;
@@ -321,13 +316,13 @@ namespace wali
      *
      */
     template <typename T> 
-    bool StateSet<T>::operator==( const StateSet & other )
+    bool StateSet<T>::operator==( const StateSet<T> & other )
     {
-      for( T::iterator it = states.begin(); it != states.end(); it++ )
+      for( iterator it = states.begin(); it != states.end(); it++ )
         if( other.states.count(*it) == 0 )
           return false;
           
-      for( T::const_iterator it = other.states.begin(); it != other.states.end(); it++ )
+      for( std::set<T>::const_iterator it = other.states.begin(); it != other.states.end(); it++ )
         if( states.count(*it) == 0 )
           return false;
           
@@ -387,10 +382,10 @@ namespace wali
      *
      */
     template <typename T> 
-    bool StateSet<T>::contains( Key state )
+    bool StateSet<T>::contains( T state )
     {
       return (states.count(state) >  0);
-    }  
+    }
   }
 }
 #endif

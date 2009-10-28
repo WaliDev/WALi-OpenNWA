@@ -25,6 +25,9 @@ namespace wali
 
     class NWS : public Printable
     {
+      public:
+      typedef std::deque<NWSNode *>::iterator iterator;
+    
       //
       // Methods
       //
@@ -34,8 +37,8 @@ namespace wali
       NWS( );
       NWS( std::stack< NWSNode > st, NWSNode * trace );
       NWS( std::vector< Key > sym, std::queue< std::pair< int,int > > nest );
-      NWS( NWS & other );
-      NWS & operator=( NWS & other );
+      NWS( const NWS & other );
+      NWS & operator=( const NWS & other );
      
       ~NWS( );
 
@@ -85,6 +88,16 @@ namespace wali
        *
        */
       size_t stackSize();
+      
+      /**
+       *
+       */
+      iterator beginStack();
+      
+      /**
+       *
+       */
+      iterator endStack();
 
       /** 
        *
@@ -185,7 +198,7 @@ namespace wali
        * equivalent, false otherwise
        *
        */
-      bool operator==( NWS & otherNWS );
+      bool operator==( const NWS & otherNWS ) const;
 
       //Uses
       
@@ -204,7 +217,7 @@ namespace wali
       // Variables
       //
     protected:
-      std::deque< NWSNode > nesting;
+      std::deque< NWSNode * > nesting;
       NWSNode * word;
       //NWSNode * end;
     };

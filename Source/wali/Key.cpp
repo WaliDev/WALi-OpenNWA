@@ -66,6 +66,7 @@ namespace wali
     return getKeySpace()->getKey(ks);
   }
 
+
   //
   // Return KeySource associated with the key k
   //

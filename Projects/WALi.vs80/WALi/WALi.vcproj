@@ -915,11 +915,23 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\Source\wali\nwa\State.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\Source\wali\nwa\StateSet.hpp"
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\Source\wali\nwa\Symbol.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\Source\wali\nwa\TransSet.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\nwa\WordRecConfig.hpp"
 					>
 				</File>
 			</Filter>

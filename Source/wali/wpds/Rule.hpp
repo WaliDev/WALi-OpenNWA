@@ -156,6 +156,11 @@ namespace wali
          */
         bool operator<( Rule other ) const;
 
+        /*!
+         * @brief Make a copy of the rule
+         */
+        virtual void copy(const rule_t r);
+
       protected:
 
         Config * from() { return f; }
