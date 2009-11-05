@@ -20,14 +20,17 @@ namespace wali
   namespace nwa
   {
 
-    template <typename St, typename Sym, typename T, typename U, typename V>
+    template <typename St, typename Sym, typename Call, typename Internal, typename Return>
     class TransSet : public Printable
     {
-      public:
-        typedef typename std::set<Sym>::iterator symbolIterator;
-        typedef typename T::iterator callIterator;
-        typedef typename U::iterator internalIterator;
-        typedef typename V::iterator returnIterator;
+      //TODO: update comments
+      public:        
+        typedef std::set< Call > Calls;
+        typedef std::set< Internal > Internals;
+        typedef std::set< Return > Returns;
+        typedef typename Calls::iterator callIterator;
+        typedef typename Internals::iterator internalIterator;
+        typedef typename Returns::iterator returnIterator;
       
       //
       // Methods
@@ -40,131 +43,6 @@ namespace wali
         TransSet & operator=( const TransSet & other );
 
         ~TransSet( );
-
-        //Symbol Accessors
-
-        /**
-         *
-         * @brief get all symbols in the symbol set associated with the NWA
-         *
-         * This method provides access to all symbols in the symbol set 
-         * associated with the NWA.  Note: An NWA can have an unbounded number 
-         * of symbols associated with it.
-         *
-         * @return set of all symbols associated with the NWA
-         *
-         */
-        const std::set<Sym> & getSymbols( );
-
-        /**
-         *
-         * @brief test if the given symbol is associated with the NWA
-         *
-         * This method tests whether the given symbol is in the symbol set
-         * associated with the NWA.
-         *
-         * @param the symbol to check
-         * @return true if the given symbol is associated with the NWA
-         *
-         */
-        bool isSymbol( Sym sym );
-
-        /**
-         *
-         * @brief add the given symbol to the NWA
-         *
-         * This method adds the given symbol to the symbol set associated with 
-         * the NWA.  If the symbol is already associated with the NWA, false is 
-         * returned. Otherwise, true is returned. Note: For bookkeeping purposes
-         * a transition of each kind is added to the to the transition set for 
-         * each state currently in the state set as the from state (for each pair
-         * of states currently in the state set as the from state and pred state
-         * in the case of return transitions) with the new symbol and the error
-         * state as the to state. 
-         *
-         * @param the symbol to add
-         * @return false if the symbol is already associated with the NWA, 
-         * true otherwise
-         *
-         */
-        bool addSymbol( Sym sym );
-
-        /**
-         *
-         * @brief add the given symbols to the NWA
-         *
-         * This method adds all of the given symbols to the symbol set 
-         * associated with the NWA.  Transitions of all kinds(call, internal, 
-         * and return) with the given symbol for each pair(or triple) of 
-         * states to the error state are added to the respective transition 
-         * sets.  
-         *
-         * @param the symbols to add
-         *
-         */
-        void addAllSymbols( TransSet addTransSet );
-
-        /**
-         *
-         * @brief remove the given symbol from the NWA
-         *
-         * This method checks for the given symbol in the symbol set 
-         * associated with the NWA.  It then removes the symbol from the
-         * symbol set.  Any transitions associated with the symbol to be 
-         * removed are also removed.
-         *
-         * @param the symbol to remove
-         * @return false if the symbols is not associated with the NWA
-         *
-         */
-        bool removeSymbol( Sym sym );
-
-        /**
-         *
-         * @brief remove all symbols associated with the NWA
-         *
-         * This method removes all symbols associated with the NWA except 
-         * the epsilon symbol.  It also removes all transitions associated 
-         * with the removed symbols in the NWA.
-         *
-         */
-        void clearSymbols( );
-
-        /**
-         *
-         * @brief provide access to the beginning of the symbol set
-         *
-         * This method provides access to the beginning of the symbol set
-         * associated with this transition set.
-         *
-         * @return an iterator pointing to the beginning of the symbol set
-         *
-         */
-        symbolIterator beginSymbols();
-        
-        /**
-         * 
-         * @brief provide access to the end of the symbol set
-         *
-         * This method provides access to the position one past the end
-         * of the symbol set associated with this transition set.
-         *
-         * @return an iterator pointing just past the end of the symbol set
-         *
-         */
-        symbolIterator endSymbols();
-        
-        /**
-         *
-         * @brief returns the number of symbols associated with this NWA
-         *
-         * This method returns the number of symbols associated with this
-         * NWA.  Note: The epsilon symbol is included in this count.
-         *
-         * @return the number of symbols associated with this NWA
-         *
-         */
-        size_t sizeSymbols( );
 
         //Transition Accessors
 
@@ -191,7 +69,7 @@ namespace wali
          * with the NWA
          *
          */
-        const T & getCalls();
+        const Calls & getCalls();
         
         /**
          *
@@ -205,7 +83,7 @@ namespace wali
          * with the NWA
          *
          */
-        const U & getInternals();
+        const Internals & getInternals();
         
         /**
          *
@@ -219,7 +97,7 @@ namespace wali
          * with the NWA
          *
          */
-        const V & getReturns();
+        const Returns & getReturns();
       
         /**
          *
@@ -235,7 +113,7 @@ namespace wali
          * @return false if the call transition already exists in the collection
          *
          */
-        bool addCall(KeyTriple addTrans);
+        bool addCall(Call addTrans);
         
         /**
          *
@@ -251,7 +129,7 @@ namespace wali
          * @return false if the internal transition already exists in the collection
          *
          */
-        bool addInternal(KeyTriple addTrans);
+        bool addInternal(Internal addTrans);
         
         /**
          *
@@ -268,7 +146,7 @@ namespace wali
          * @return false if the return transition already exists in the collection
          *
          */
-        bool addReturn(KeyQuad addTrans);
+        bool addReturn(Return addTrans);
       
         /**
          *
@@ -303,7 +181,7 @@ namespace wali
          * collection, true otherwise.
          *
          */
-        bool removeCall(KeyTriple removeTrans);
+        bool removeCall(Call removeTrans);
         
         /**
          *
@@ -324,7 +202,7 @@ namespace wali
          * collection, true otherwise.
          *
          */
-        bool removeInternal(KeyTriple removeTrans);
+        bool removeInternal(Internal removeTrans);
         
         /**
          *
@@ -345,7 +223,7 @@ namespace wali
          * collection, true otherwise.
          *
          */
-        bool removeReturn(KeyQuad removeTrans);
+        bool removeReturn(Return removeTrans);
                       
         /**
          *
@@ -360,7 +238,7 @@ namespace wali
          * transitions associated with the NWA
          *
          */
-        bool isCall(KeyTriple trans);
+        bool isCall(Call trans);
         
         /**
          *
@@ -375,7 +253,7 @@ namespace wali
          * transitions associated with the NWA
          *
          */
-        bool isInternal(KeyTriple trans);
+        bool isInternal(Internal trans);
         
         /**
          *
@@ -390,7 +268,7 @@ namespace wali
          * transitions associated with the NWA
          *
          */
-        bool isReturn(KeyQuad trans);              
+        bool isReturn(Return trans);              
                       
         //Utilities	
 
@@ -616,7 +494,7 @@ namespace wali
          */
         bool removeReturnTransWith( St name );
       
-      private:
+      
         /** 
          *
          * @brief removes all call transitions with the given symbol 
@@ -674,7 +552,9 @@ namespace wali
          * symbol in the collection of transitions associated with the NWA
          *
          */
-        bool callExists(Key from,Key sym);
+        bool callExists(St from,Sym sym);
+        
+        const Calls getCalls(St from,Sym sym);
         
         /**
          *
@@ -691,7 +571,9 @@ namespace wali
          * symbol in the collection of transitions associated with the NWA
          *
          */
-        bool internalExists(Key from,Key sym);
+        bool internalExists(St from,Sym sym);
+        
+        const Internals getInternals(St from,Sym sym);
         
         /**
          *
@@ -710,17 +592,18 @@ namespace wali
          * symbol in the collection of transitions associated with the NWA
          *
          */
-        bool returnExists(Key from, Key pred, Key sym);
+        bool returnExists(St from, St pred, Sym sym);
+        
+        const Returns getReturns(St from, Sym sym);
 
       //
       // Variables
       //
       
       protected: 
-        std::set<Sym> symbols;
-        T callTrans;
-        U internalTrans;
-        V returnTrans;
+        Calls callTrans;
+        Internals internalTrans;
+        Returns returnTrans;
     };
     
     //
@@ -728,31 +611,25 @@ namespace wali
     //
 
     //Constructors and Destructor
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    TransSet<St,Sym,T,U,V>::TransSet( )
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    TransSet<St,Sym,Call,Internal,Return>::TransSet( )
     {
-          
-      symbols = std::set<Sym>();
-      callTrans = T();
-      internalTrans = U();
-      returnTrans = V();
-      
-      addSymbol(Sym::getEpsilon());  
+      callTrans = Calls();
+      internalTrans = Internals();
+      returnTrans = Returns();  
     }
     
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    TransSet<St,Sym,T,U,V>::TransSet( const TransSet<St,Sym,T,U,V> & other )
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    TransSet<St,Sym,Call,Internal,Return>::TransSet( const TransSet<St,Sym,Call,Internal,Return> & other )
     {
-      symbols = other.symbols;
       callTrans = other.callTrans;
       internalTrans = other.internalTrans;
       returnTrans = other.returnTrans;
     }
     
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    TransSet<St,Sym,T,U,V> & TransSet<St,Sym,T,U,V>::operator=( const TransSet<St,Sym,T,U,V> & other )
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    TransSet<St,Sym,Call,Internal,Return> & TransSet<St,Sym,Call,Internal,Return>::operator=( const TransSet<St,Sym,Call,Internal,Return> & other )
     {
-      symbols = other.symbols;
       callTrans = other.callTrans;
       internalTrans = other.internalTrans;
       returnTrans = other.returnTrans;
@@ -760,164 +637,10 @@ namespace wali
     }
 
    
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    TransSet<St,Sym,T,U,V>::~TransSet( ) 
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    TransSet<St,Sym,Call,Internal,Return>::~TransSet( ) 
     {
       clear(); 
-    }
-    
-    //Symbol Accessors
-
-    /**
-     *
-     * @brief get all symbols in the symbol set of the NWA
-     *
-     * @return set of Key values for all symbols associated with the NWA
-     *
-     */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    const std::set<typename Sym> & TransSet<St,Sym,T,U,V>::getSymbols( )
-    {
-      return symbols;
-    }
-  
-    /**
-     *
-     * @brief test if the given symbol is a symbol of the NWA
-     *
-     * @param the symbol to check
-     * @return true if the given symbol is a symbol of the NWA
-     *
-     */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::isSymbol( Sym sym )
-    {
-        return (symbols.count(sym) >  0);
-    }
-    
-   
-    /**
-     *
-     * @brief add the given symbol to the NWA
-     *
-     * @param symbol to add
-     * @return false if the symbol is already associated with the NWA
-     *
-     */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::addSymbol( Sym sym )
-    {
-      if( symbols.count(sym) > 0 )
-        return false;
-      symbols.insert(sym);
-      return true;
-     
-    }
-    
-    
-    /**
-     *
-     * @brief add the given symbols to the NWA
-     *
-     * @param the symbols to add
-     *
-     */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    void TransSet<St,Sym,T,U,V>::addAllSymbols( TransSet<St,Sym,T,U,V> addTransSet )
-    {
-      for( iterator it = addTransSet.symbols.begin();
-            it != addTransSet.symbols.end(); it++ )
-      {
-        symbols.insert(*it);
-      }
-    }
-    
-   
-    /**
-     *
-     * @brief remove the given symbol from the NWA
-     *
-     * @param the symbol to remove
-     * @return false if the symbol is no associated with the NWA
-     *
-     */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::removeSymbol( Sym sym )
-    {
-      //Remove transitions associated with the state that was removed.
-      if( symbols.count(sym) == 0 )
-        return false;
-      else if( symbols.erase(sym) )
-      {
-        removeCallTransSym(sym);
-        removeInternalTransSym(sym);
-        removeReturnTransSym(sym);
-        
-        return true;
-      }      
-      return false;
-    }
-    
-   
-    /**
-     *
-     * @brief remove all symbols associated with the NWA
-     *
-     */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    void TransSet<St,Sym,T,U,V>::clearSymbols( )
-    {
-      symbols.clear();
-
-      //Since all symbols are being removed, all transitions are removed 
-      //as well.
-      callTrans.clear();
-      internalTrans.clear();
-      returnTrans.clear();
-      
-      //The epsilon symbol should always remain in the symbol set.
-      //This will also replace transitions with the epsilon symbol for each 
-      //state that exists in the state set to the error state .
-      addSymbol(Sym::getEpsilon());
-    }
-    
-    /**
-     *
-     * @brief provide access to the beginning of the symbol set
-     *
-     * @return an iterator pointing to the beginning of the symbol set
-     *
-     */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    typename TransSet<St,Sym,T,U,V>::symbolIterator TransSet<St,Sym,T,U,V>::beginSymbols()
-    {
-      return symbols.begin();
-    }
-    
-    /**
-     * 
-     * @brief provide access to the end of the symbol set
-     *
-     * @return an iterator pointing just past the end of the symbol set
-     *
-     */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    typename TransSet<St,Sym,T,U,V>::symbolIterator TransSet<St,Sym,T,U,V>::endSymbols()
-    {
-      return symbols.end();
-    }
-    
-    /**
-     *
-     * @brief returns the number of symbols associated with this NWA
-     *
-     * @return the number of symbols associated with this NWA
-     *
-     */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    size_t TransSet<St,Sym,T,U,V>::sizeSymbols( )
-    {
-      return symbols.size();
     }
 
     //Transition Accessors
@@ -927,11 +650,9 @@ namespace wali
      * @brief removes all transitions from this collection of transitions
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    void TransSet<St,Sym,T,U,V>::clear( )
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    void TransSet<St,Sym,Call,Internal,Return>::clear( )
     {
-      symbols.clear();
-      
       callTrans.clear();
       internalTrans.clear();
       returnTrans.clear();
@@ -946,8 +667,8 @@ namespace wali
      * with the NWA
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    const typename T & TransSet<St,Sym,T,U,V>::getCalls()
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    const typename TransSet<St,Sym,Call,Internal,Return>::Calls & TransSet<St,Sym,Call,Internal,Return>::getCalls()
     {
       return callTrans;
     }
@@ -961,8 +682,8 @@ namespace wali
      * with the NWA
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    const typename U & TransSet<St,Sym,T,U,V>::getInternals()
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    const typename TransSet<St,Sym,Call,Internal,Return>::Internals & TransSet<St,Sym,Call,Internal,Return>::getInternals()
     {
       return internalTrans;
     }
@@ -976,8 +697,8 @@ namespace wali
      * with the NWA
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    const typename V & TransSet<St,Sym,T,U,V>::getReturns()
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    const typename TransSet<St,Sym,Call,Internal,Return>::Returns & TransSet<St,Sym,Call,Internal,Return>::getReturns()
     {
       return returnTrans;
     }
@@ -990,11 +711,9 @@ namespace wali
      * @return false if the call transition already exists in the collection
      *
      */   
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::addCall(KeyTriple addTrans)
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::addCall(Call addTrans)
     {
-      if(! isSymbol(addTrans.second) )
-        addSymbol(addTrans.second);
       if( callTrans.count(addTrans) > 0 )
         return false;      
       
@@ -1011,11 +730,9 @@ namespace wali
      * @return false if the internal transition already exists in the collection
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::addInternal(KeyTriple addTrans)
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::addInternal(Internal addTrans)
     {
-      if(! isSymbol(addTrans.second) )
-        addSymbol(addTrans.second);  
       if( internalTrans.count(addTrans) > 0 )
         return false;
       internalTrans.insert(addTrans);
@@ -1031,11 +748,9 @@ namespace wali
      * @return false if the return transition already exists in the collection
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::addReturn(KeyQuad addTrans)
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::addReturn(Return addTrans)
     {
-      if(! isSymbol(addTrans.third) )
-        addSymbol(addTrans.third);
       if( returnTrans.count(addTrans) > 0 )
         return false;
       returnTrans.insert(addTrans);
@@ -1052,12 +767,9 @@ namespace wali
      * of transitions
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    void TransSet<St,Sym,T,U,V>::addAllTrans(TransSet<St,Sym,T,U,V> addTransSet)
-    {    
-      //Any symbols not in the original set of symbols must be added.
-      addAllSymbols(addTransSet);
-    
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    void TransSet<St,Sym,Call,Internal,Return>::addAllTrans(TransSet<St,Sym,Call,Internal,Return> addTransSet)
+    {   
       for( TransSet::callIterator it = addTransSet.beginCall(); 
             it != addTransSet.endCall(); it ++ )
       {
@@ -1085,8 +797,8 @@ namespace wali
      * collection, true otherwise.
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::removeCall(KeyTriple removeTrans)
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::removeCall(Call removeTrans)
     {
       if( callTrans.count(removeTrans) == 0 )
         return false;
@@ -1105,8 +817,8 @@ namespace wali
      * collection, true otherwise.
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::removeInternal(KeyTriple removeTrans)
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::removeInternal(Internal removeTrans)
     {
       if( internalTrans.count(removeTrans) == 0 )
         return false;
@@ -1125,8 +837,8 @@ namespace wali
      * collection, true otherwise.
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::removeReturn(KeyQuad removeTrans)
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::removeReturn(Return removeTrans)
     {
       if( returnTrans.count(removeTrans) == 0 )
         return false;
@@ -1145,8 +857,8 @@ namespace wali
      * transitions associated with the NWA
      *
      */   
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::isCall(KeyTriple trans)
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::isCall(Call trans)
     {
       return (callTrans.count(trans) > 0);
     }
@@ -1161,8 +873,8 @@ namespace wali
      * transitions associated with the NWA
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::isInternal(KeyTriple trans)
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::isInternal(Internal trans)
     {
       return (internalTrans.count(trans) > 0);
     }
@@ -1177,8 +889,8 @@ namespace wali
      * transitions associated with the NWA
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::isReturn(KeyQuad trans)
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::isReturn(Return trans)
     {
       return (returnTrans.count(trans) > 0);
     } 
@@ -1193,64 +905,60 @@ namespace wali
      * @return the output stream that was printed to
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    std::ostream & TransSet<St,Sym,T,U,V>::print( std::ostream & o) const
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    std::ostream & TransSet<St,Sym,Call,Internal,Return>::print( std::ostream & o) const
     {    
-      o << "Sigma: " << "{ ";
-      symbols.print(o);
-      o << " }\n";
-      
       o << "Delta_c: " << "{ ";
-      T::const_iterator cit = callTrans.begin();
-      T::const_iterator citEND = callTrans.end();
+      Calls::const_iterator cit = callTrans.begin();
+      Calls::const_iterator citEND = callTrans.end();
       for( bool first=true; cit != citEND; cit++ )
       {
         if( !first )
           o << ", ";
         o << "(";
-        printKey(o,cit->first);
+        cit->first.print(o);
         o << ", ";
-        printKey(o,cit->second);
+        cit->second.print(o);
         o << ", "; 
-        printKey(o,cit->third);
+        cit->third.print(o);
         o << ")";
         first=false;
       }
       o << " }\n";
       
       o << "Delta_i: " << "{ ";
-      U::const_iterator iit = internalTrans.begin();
-      U::const_iterator iitEND = internalTrans.end();
+      Internals::const_iterator iit = internalTrans.begin();
+      Internals::const_iterator iitEND = internalTrans.end();
       for( bool first=true; iit != iitEND; iit++ )
       {
         if( !first )
           o << ", ";
         o << "(";
-        printKey(o,iit->first);
+        iit->first.print(o);
         o << ", ";
-        printKey(o,iit->second);
+        iit->second.print(o);
         o << ", ";
-        printKey(o,iit->third);
+        iit->third.print(o);
         o << ")";
         first = false;
       }
       o << " }\n";
       
       o << "Delta_r: " << "{ ";
-      V::const_iterator rit = returnTrans.begin();
-      V::const_iterator ritEND = returnTrans.end();
+      Returns::const_iterator rit = returnTrans.begin();
+      Returns::const_iterator ritEND = returnTrans.end();
       for( bool first=true; rit != ritEND; rit++ )
       {
         if( !first )
           o << ", ";
         o << "(";
-        printKey(o,rit->first);
+        rit->first.print(o);
         o << ", ";
-        printKey(o,rit->second);
+        rit->second.print(o);
         o << ", "; 
-        printKey(o,rit->third);
+        rit->third.print(o);
         o << ", ";
-        printKey(o,rit->fourth);
+        rit->fourth.print(o);
         o << ")";
         first = false;
       }
@@ -1268,11 +976,10 @@ namespace wali
      * @return true if this TransSet is equivalent to the TransSet 'other'
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::operator==( TransSet<St,Sym,T,U,V> & other )
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::operator==( TransSet<St,Sym,Call,Internal,Return> & other )
     {
-      return (  (symbols == other.symbols) &&
-                (callTrans == other.callTrans) &&
+      return (  (callTrans == other.callTrans) &&
                 (internalTrans == other.internalTrans) &&
                 (returnTrans == other.returnTrans) );
     }
@@ -1286,8 +993,8 @@ namespace wali
      * in the collection of transitions
      *
      */    
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    typename TransSet<St,Sym,T,U,V>::callIterator TransSet<St,Sym,T,U,V>::beginCall()
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    typename TransSet<St,Sym,Call,Internal,Return>::callIterator TransSet<St,Sym,Call,Internal,Return>::beginCall()
     {
       return callTrans.begin();
     }
@@ -1301,8 +1008,8 @@ namespace wali
      * in the collection of transitions
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    typename TransSet<St,Sym,T,U,V>::internalIterator TransSet<St,Sym,T,U,V>::beginInternal()
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    typename TransSet<St,Sym,Call,Internal,Return>::internalIterator TransSet<St,Sym,Call,Internal,Return>::beginInternal()
     {
       return internalTrans.begin();
     }
@@ -1316,8 +1023,8 @@ namespace wali
      * in the collection of transitions
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    typename TransSet<St,Sym,T,U,V>::returnIterator TransSet<St,Sym,T,U,V>::beginReturn()
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    typename TransSet<St,Sym,Call,Internal,Return>::returnIterator TransSet<St,Sym,Call,Internal,Return>::beginReturn()
     {
       return returnTrans.begin();
     }
@@ -1331,8 +1038,8 @@ namespace wali
      * the collection of transitions
      *
      */    
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    typename TransSet<St,Sym,T,U,V>::callIterator TransSet<St,Sym,T,U,V>::endCall()
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    typename TransSet<St,Sym,Call,Internal,Return>::callIterator TransSet<St,Sym,Call,Internal,Return>::endCall()
     {
       return callTrans.end();
     }
@@ -1346,8 +1053,8 @@ namespace wali
      * the collection of transitions
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    typename TransSet<St,Sym,T,U,V>::internalIterator TransSet<St,Sym,T,U,V>::endInternal()
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    typename TransSet<St,Sym,Call,Internal,Return>::internalIterator TransSet<St,Sym,Call,Internal,Return>::endInternal()
     {
       return internalTrans.end();
     }
@@ -1361,8 +1068,8 @@ namespace wali
      * the collection of transitions
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    typename TransSet<St,Sym,T,U,V>::returnIterator TransSet<St,Sym,T,U,V>::endReturn()
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    typename TransSet<St,Sym,Call,Internal,Return>::returnIterator TransSet<St,Sym,Call,Internal,Return>::endReturn()
     {
       return returnTrans.end();
     }
@@ -1376,8 +1083,8 @@ namespace wali
      * assoicated with the NWA
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    size_t TransSet<St,Sym,T,U,V>::sizeCall( )
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    size_t TransSet<St,Sym,Call,Internal,Return>::sizeCall( )
     {
       return callTrans.size();
     }
@@ -1391,8 +1098,8 @@ namespace wali
      * assoicated with the NWA
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V > 
-    size_t TransSet<St,Sym,T,U,V>::sizeInternal( )
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return > 
+    size_t TransSet<St,Sym,Call,Internal,Return>::sizeInternal( )
     {
       return internalTrans.size();
     }
@@ -1406,8 +1113,8 @@ namespace wali
      * assoicated with the NWA
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    size_t TransSet<St,Sym,T,U,V>::sizeReturn( )
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    size_t TransSet<St,Sym,Call,Internal,Return>::sizeReturn( )
     {
       return returnTrans.size();
     }
@@ -1421,8 +1128,8 @@ namespace wali
      * assoicated with the NWA
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    size_t TransSet<St,Sym,T,U,V>::size( )
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    size_t TransSet<St,Sym,Call,Internal,Return>::size( )
     {
       return (sizeCall() + sizeInternal() + sizeReturn());
     }
@@ -1436,14 +1143,14 @@ namespace wali
      * @return false if no transitions were removed
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::removeCallTransWith( St name )
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::removeCallTransWith( St name )
     {
-      T removeTrans = T();
+      Calls removeTrans = Calls();
       for( callIterator cit = beginCall(); cit != endCall(); cit++ )
       {
-        if( (cit->first == name.getKey()) ||
-            (cit->third == name.getKey()) )
+        if( (cit->first == name) ||
+            (cit->third == name) )
             removeTrans.insert(*cit);
       }     
       
@@ -1465,15 +1172,15 @@ namespace wali
      * @return false if no transitions were removed
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::removeInternalTransWith( St name )
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::removeInternalTransWith( St name )
     {
-      U removeTrans = U();
+      Internals removeTrans = Internals();
       for( internalIterator iit = beginInternal();
             iit != endInternal(); iit++ )
       {
-        if( (iit->first == name.getKey()) ||
-            (iit->third == name.getKey()) )
+        if( (iit->first == name) ||
+            (iit->third == name) )
             removeTrans.insert(*iit);
       }     
       
@@ -1496,16 +1203,16 @@ namespace wali
      * @return false if no transitions were removed
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::removeReturnTransWith( St name )
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::removeReturnTransWith( St name )
     {
-      V removeTrans = V();
+      Returns removeTrans = Returns();
       for( returnIterator rit = beginReturn();
             rit != endReturn(); rit++ )
       {
-        if( (rit->first == name.getKey()) ||
-            (rit->second == name.getKey()) ||
-            (rit->fourth == name.getKey()) )
+        if( (rit->first == name) ||
+            (rit->second == name) ||
+            (rit->fourth == name) )
             removeTrans.insert(*rit);
       }     
       
@@ -1526,18 +1233,18 @@ namespace wali
      * @return false if no transitions were removed
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::removeCallTransSym(Sym sym)
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::removeCallTransSym(Sym sym)
     {
-      std::set< KeyTriple > removeTrans = std::set< KeyTriple >();
-      for( std::set< KeyTriple >::iterator cit = callTrans.begin();
+      Calls removeTrans = Calls();
+      for( callIterator cit = callTrans.begin();
             cit != callTrans.end(); cit++ )
       {
-        if( cit->second == sym.getLabelKey() )
+        if( cit->second == sym )
           removeTrans.insert(*cit);
       }     
       
-      for( std::set< KeyTriple >::iterator rit = removeTrans.begin();
+      for( callIterator rit = removeTrans.begin();
             rit != removeTrans.end(); rit++ )
       {
         callTrans.erase(*rit);
@@ -1554,18 +1261,18 @@ namespace wali
      * @return false if no transitions were removed
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::removeInternalTransSym(Sym sym)
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::removeInternalTransSym(Sym sym)
     {
-      std::set< KeyTriple > removeTrans = std::set< KeyTriple >();
-      for( std::set< KeyTriple >::iterator iit = internalTrans.begin();
+      Internals removeTrans = Internals();
+      for( internalIterator iit = internalTrans.begin();
             iit != internalTrans.end(); iit++ )
       {
-        if( iit->second == sym.getLabelKey() )
+        if( iit->second == sym )
           removeTrans.insert(*iit);
       }     
       
-      for( std::set< KeyTriple >::iterator rit = removeTrans.begin();
+      for( internalIterator rit = removeTrans.begin();
             rit != removeTrans.end(); rit++ )
       {
         internalTrans.erase(*rit);
@@ -1582,18 +1289,18 @@ namespace wali
      * @return false if no transitions were removed
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::removeReturnTransSym(Sym sym)
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::removeReturnTransSym(Sym sym)
     {
-      std::set< KeyQuad > removeTrans = std::set< KeyQuad >();
-      for( std::set< KeyQuad >::iterator rit = returnTrans.begin();
+      Returns removeTrans = Returns();
+      for( returnIterator rit = returnTrans.begin();
             rit != returnTrans.end(); rit++ )
       {
-        if( rit->third == sym.getLabelKey() )
+        if( rit->third == sym )
           removeTrans.insert(*rit);
       }     
       
-      for( std::set< KeyQuad >::iterator rit = removeTrans.begin();
+      for( returnIterator rit = removeTrans.begin();
             rit != removeTrans.end(); rit++ )
       {
         returnTrans.erase(*rit);
@@ -1613,8 +1320,8 @@ namespace wali
      * symbol in the collection of transitions associated with the NWA
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::callExists(Key from,Key sym)
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::callExists(St from,Sym sym)
     {
       for( callIterator cit = beginCall();
             cit != endCall(); cit++ )
@@ -1623,6 +1330,19 @@ namespace wali
           return true;
       }  
       return false;    
+    }
+    
+    template < typename St,typename Sym,typename Call,typename Internal,typename Return >
+    const typename TransSet<St,Sym,Call,Internal,Return>::Calls TransSet<St,Sym,Call,Internal,Return>::getCalls(St from,Sym sym)
+    {
+      Calls result;
+      for( callIterator cit = beginCall();
+            cit != endCall(); cit++ )
+      {
+        if( (cit->first == from) && (cit->second == sym) )
+          result.insert(*cit);
+      } 
+      return result;
     }
     
     /**
@@ -1636,8 +1356,8 @@ namespace wali
      * symbol in the collection of transitions associated with the NWA
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::internalExists(Key from,Key sym)
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::internalExists(St from,Sym sym)
     {
       for( internalIterator iit = beginInternal();
             iit != endInternal(); iit++ )
@@ -1646,6 +1366,19 @@ namespace wali
           return true;    
       }     
       return false;
+    }
+    
+    template < typename St,typename Sym,typename Call,typename Internal,typename Return >
+    const typename TransSet<St,Sym,Call,Internal,Return>::Internals TransSet<St,Sym,Call,Internal,Return>::getInternals(St from,Sym sym)
+    {
+      Internals result;
+      for( internalIterator iit = beginInternal();
+            iit != endInternal(); iit++ )
+      {
+        if( (iit->first == from) && (iit->second == sym) )
+          result.insert(*iit);
+      } 
+      return result;
     }
     
     /**
@@ -1661,8 +1394,8 @@ namespace wali
      * symbol in the collection of transitions associated with the NWA
      *
      */
-    template < typename St,typename Sym,typename T,typename U, typename V >
-    bool TransSet<St,Sym,T,U,V>::returnExists(Key from, Key pred, Key sym)
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::returnExists(St from, St pred, Sym sym)
     {
       for( returnIterator rit = beginReturn();
             rit != endReturn(); rit++ )
@@ -1671,7 +1404,20 @@ namespace wali
             return true;      
       }     
       return false;
-    }    
+    }   
+    
+    template < typename St,typename Sym,typename Call,typename Internal,typename Return >
+    const typename TransSet<St,Sym,Call,Internal,Return>::Returns TransSet<St,Sym,Call,Internal,Return>::getReturns(St from,Sym sym)
+    {
+      Returns result;
+      for( returnIterator rit = beginReturn();
+            rit != endReturn(); rit++ )
+      {
+        if( (rit->first == from) && (rit->third == sym) )
+          result.insert(*rit);
+      } 
+      return result;
+    } 
   }
 }
 #endif

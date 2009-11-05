@@ -29,25 +29,29 @@ namespace wali
 {
   namespace nwa
   {
-    template<typename StKey,typename Label >
+    template<typename St,typename Sym >
     class NWA : public Printable
     {
+      //TODO: update all comments
       public:
-      typedef typename StateSet<State<StKey>>::iterator stateIterator;
-      typedef StateSet<State<StKey>> States;
-      typedef std::set<Symbol<Label>> Symbols;
-      typedef std::set< KeyTriple > Calls;
-      typedef std::set< KeyTriple > Internals;
-      typedef std::set< KeyQuad > Returns;
-      typedef TransSet< State<StKey>,Symbol<Label>,Calls,Internals,Returns > Trans;
+      typedef StateSet<St> States;
+      typedef std::set<Sym> Symbols;
+      typedef typename States::iterator stateIterator;
+      typedef typename Symbols::iterator symbolIterator;
+      typedef Triple<St,Sym,St> Call;
+      typedef Triple<St,Sym,St> Internal;
+      typedef Quad<St,St,Sym,St> Return;
+      typedef TransSet< St,Sym,Call,Internal,Return > Trans;
+      typedef typename Trans::Calls Calls;
+      typedef typename Trans::Internals Internals;
+      typedef typename Trans::Returns Returns;
       typedef typename Trans::callIterator callIterator;
       typedef typename Trans::internalIterator internalIterator;
       typedef typename Trans::returnIterator returnIterator;
       
-      typedef std::pair< State<StKey>,State<StKey> > StatePair;
+      typedef std::pair< St,St > StatePair;
       typedef std::set< StatePair > StatePairSet;
-      typedef std::map< StatePairSet,State<StKey> > StateMap;
-      typedef std::stack< State<StKey>,StatePairSet > CallMap; //?? do i even use this??
+      typedef std::map< StatePairSet,St > StateMap;
           
       //
       // Methods
@@ -62,6 +66,36 @@ namespace wali
         ~NWA( );
 
         //State Accessors
+
+        /**
+         *  
+         * @brief tests whether the stuck state is a final state
+         *
+         * This method tests whether the stuck state is a final state in this
+         * NWA.  It returns true if the stuck state is final and false otherwise.
+         *
+         * @return true if the stuck state is a final state, false otherwise
+         *
+         */
+        bool isAbsentAccept();
+        
+        /**
+         * 
+         * @brief sets the stuck state to be a final state
+         *
+         * This method sets the stuck state to be a final state.
+         *
+         */
+        void acceptAbsent();
+        
+        /**
+         * 
+         * @brief sets the stuck state to be not a final state
+         *
+         * This method makes the stuck state not a final state.
+         *
+         */
+        void rejectAbsent();
 
         /**
          *
@@ -87,7 +121,7 @@ namespace wali
          * @return true if the state with the given name is a state of the NWA
          *
          */
-        bool isState( State<StKey> name ); 
+        bool isState( St name ); 
 
         /**
          *
@@ -101,7 +135,7 @@ namespace wali
          * @return false if the state already exists in the NWA
          *
          */
-        bool addState( State<StKey> name );
+        bool addState( St name );
         
         /**
          *
@@ -129,7 +163,7 @@ namespace wali
          * @return false if the state does not exist in the NWA
          *
          */
-        bool removeState( State<StKey> name );
+        bool removeState( St name );
 
         /**
          *
@@ -189,7 +223,7 @@ namespace wali
          * @return true if the state with the given name is an initial state
          *
          */
-        bool isInitialState( State<StKey> name ); 
+        bool isInitialState( St name ); 
 
         /**
          *
@@ -207,7 +241,7 @@ namespace wali
          * of the NWA
          *
          */
-        bool addInitialState( State<StKey> name );
+        bool addInitialState( St name );
         
         /**
          *
@@ -218,7 +252,7 @@ namespace wali
          * given StateSet to the initial state set associated with this
          * NWA.
          *
-         * @parm the trans set whose initial states to add to this NWA's
+         * @parm the state set whose initial states to add to this NWA's
          * initial state set
          *
          */
@@ -239,7 +273,7 @@ namespace wali
          * of the NWA
          *
          */
-        bool removeInitialState( State<StKey> name );
+        bool removeInitialState( St name );
 
         /**
          *
@@ -303,7 +337,7 @@ namespace wali
          * @return true if the state with the given name is a final state
          *
          */
-        bool isFinalState( State<StKey> name ); 
+        bool isFinalState( St name ); 
 
         /**
          *
@@ -321,7 +355,7 @@ namespace wali
          * of the NWA
          *
          */
-        bool addFinalState( State<StKey> name );
+        bool addFinalState( St name );
 
         /**
          *
@@ -336,7 +370,7 @@ namespace wali
          * final state set
          *
          */
-        void addAllFinalStates( States addStateSet); 
+        void addAllFinalStates( States addStateSet, bool accept ); 
 
         /**
          *
@@ -353,7 +387,7 @@ namespace wali
          * of the NWA
          *
          */
-        bool removeFinalState( State<StKey> name );
+        bool removeFinalState( St name );
 
         /**
          *
@@ -421,7 +455,8 @@ namespace wali
          * @brief returns the number of final states associated with this NWA
          *
          * This method returns the number of final states associated with this
-         * NWA.
+         * NWA. Note: This count does includes the stuck state if it is
+         * a final state. 
          *
          * @return the number of final states associated with this NWA
          *
@@ -441,7 +476,7 @@ namespace wali
          * @return set of all symbols associated with the NWA
          *
          */
-        const StateSet< Symbol<Label> > & getSymbols( );
+        const Symbols & getSymbols( );
 
         /**
          *
@@ -454,7 +489,7 @@ namespace wali
          * @return true if the given symbol is associated with the NWA
          *
          */
-        bool isSymbol( Symbol<Label> sym );
+        bool isSymbol( Sym sym );
 
         /**
          *
@@ -468,7 +503,19 @@ namespace wali
          * @return false if the symbol is already associated with the NWA
          *
          */
-        bool addSymbol( Symbol<Label> sym );
+        bool addSymbol( Sym sym );
+        
+        /**
+         *
+         * @brief add the given symbols to the NWA
+         *
+         * This method adds all of the given symbols to the set of symbols 
+         * associated with the NWA.  
+         *
+         * @param the symbols to add
+         *
+         */
+        void addAllSymbols( Symbols addSymbolSet);
 
         /**
          *
@@ -483,7 +530,7 @@ namespace wali
          * @return false if the symbols is not associated with the NWA
          *
          */
-        bool removeSymbol( Symbol<Label> sym );
+        bool removeSymbol( Sym sym );
 
         /**
          *
@@ -493,6 +540,42 @@ namespace wali
          *
          */
         void clearSymbols( );
+        
+        /**
+         *
+         * @brief provide access to the beginning of the symbol set
+         *
+         * This method provides access to the beginning of the symbol set
+         * associated with this transition set.
+         *
+         * @return an iterator pointing to the beginning of the symbol set
+         *
+         */
+        symbolIterator beginSymbols();
+        
+        /**
+         * 
+         * @brief provide access to the end of the symbol set
+         *
+         * This method provides access to the position one past the end
+         * of the symbol set associated with this transition set.
+         *
+         * @return an iterator pointing just past the end of the symbol set
+         *
+         */
+        symbolIterator endSymbols();
+                
+        /**
+         *
+         * @brief returns the number of symbols associated with this NWA
+         *
+         * This method returns the number of symbols associated with this
+         * NWA.  Note: The epsilon symbol is included in this count.
+         *
+         * @return the number of symbols associated with this NWA
+         *
+         */
+        size_t sizeSymbols( );
 
         //Transition Accessors
 
@@ -534,7 +617,7 @@ namespace wali
          * @return false if the call transition already exists in the NWA
          *
          */
-        bool addCallTrans( Key from, Key sym, Key to );
+        bool addCallTrans( St from, Sym sym, St to );
 
         /**
          *
@@ -548,7 +631,7 @@ namespace wali
          * @return false if the call transition already exists in the NWA
          *
          */
-        bool addCallTrans( KeyTriple * ct );
+        bool addCallTrans( Call * ct );
 
         /**
          *
@@ -565,7 +648,7 @@ namespace wali
          * @return false if the call transition does not exist in the NWA
          *
          */
-        bool removeCallTrans( Key from, Key sym, Key to );
+        bool removeCallTrans( St from, Sym sym, St to );
 
         /**
          *
@@ -578,7 +661,7 @@ namespace wali
          * @return false if the call transition does not exist in the NWA
          *
          */
-        bool removeCallTrans( KeyTriple * ct );
+        bool removeCallTrans( Call * ct );
 
         /**
          *
@@ -635,7 +718,7 @@ namespace wali
          * @return false if the internal transition already exists in the NWA
          *
          */
-        bool addInternalTrans( Key from, Key sym, Key to );
+        bool addInternalTrans( St from, Sym sym, St to );
 
         /**
          *
@@ -649,7 +732,7 @@ namespace wali
          * @return false if the internal transition already exists in the NWA
          *
          */
-        bool addInternalTrans( KeyTriple * it );
+        bool addInternalTrans( Internal * it );
 
         /**
          *
@@ -666,7 +749,7 @@ namespace wali
          * @return false if the internal transition does not exist in the NWA
          *
          */
-        bool removeInternalTrans( Key from, Key sym, Key to );
+        bool removeInternalTrans( St from, Sym sym, St to );
 
         /**
          *
@@ -680,7 +763,7 @@ namespace wali
          * @return false if the internal transition does not exist in the NWA
          *
          */
-        bool removeInternalTrans( KeyTriple * it );
+        bool removeInternalTrans( Internal * it );
 
         /**
          *
@@ -737,7 +820,7 @@ namespace wali
          * @return false if the return transition already exists in the NWA
          *
          */
-        bool addReturnTrans( Key from, Key pred, Key sym, Key to );
+        bool addReturnTrans( St from, St pred, Sym sym, St to );
 
         /**
          *
@@ -751,7 +834,7 @@ namespace wali
          * @return false if the return transition already exists in the NWA
          *
          */
-        bool addReturnTrans( KeyQuad * rt );
+        bool addReturnTrans( Return * rt );
 
         /**
          *
@@ -769,7 +852,7 @@ namespace wali
          * @return false if the return transition does not exist in the NWA
          *
          */
-        bool removeReturnTrans( Key from, Key pred, Key sym, Key to );
+        bool removeReturnTrans( St from, St pred, Sym sym, St to );
 
         /**
          *
@@ -783,7 +866,7 @@ namespace wali
          * @return false if the return transition does not exist in the NWA
          *
          */
-        bool removeReturnTrans( KeyQuad * rt );
+        bool removeReturnTrans( Return * rt );
         
         /**
          *
@@ -827,7 +910,7 @@ namespace wali
          * @return the NWA which is the union of this NWA and the NWA 'other'
          *
          */
-        NWA * unionNWA( NWA other );
+        NWA * unionNWA( NWA other );  //FIX
 
         /**
          *
@@ -844,7 +927,7 @@ namespace wali
          * 'other'
          *
          */
-        NWA * concat( NWA other );
+        NWA * concat( NWA other );  //FIX
 
         /**
          *
@@ -859,7 +942,7 @@ namespace wali
          * this NWA
          *
          */
-        NWA * star( );
+        NWA * star( );  //FIX
 
         /**
          *
@@ -885,7 +968,7 @@ namespace wali
          * @return the NWA which is the reverse of this NWA
          * 
          */
-        NWA * reverse();
+        NWA * reverse();  //FIX
 
         /**
          *
@@ -920,7 +1003,7 @@ namespace wali
          * using PDS reachability
          * 
          */
-        wpds::WPDS plusWPDS( wpds::WPDS base );
+        wpds::WPDS plusWPDS( wpds::WPDS base ); //FIX
     
         /**
          *
@@ -931,7 +1014,7 @@ namespace wali
          * @return the NWA equivalent to the given PDS
          *
          */
-        static nwa::NWA PDStoNWA(wpds::WPDS pds);
+        static nwa::NWA<St,Sym> PDStoNWA(wpds::WPDS pds); //FIX
     
         /**
          *
@@ -942,7 +1025,7 @@ namespace wali
          * @return the PDS equivalent to this NWA
          *
          */
-        static wpds::WPDS NWAtoPDS(NWA nwa,wali::sem_elem_t one);
+        static wpds::WPDS NWAtoPDS(NWA nwa,wali::sem_elem_t one); //FIX
     
         /**
          *
@@ -955,7 +1038,7 @@ namespace wali
          * @return the NWA which is a deterministed equivalent to this NWA
          *
          */
-        NWA & determinize( );
+        NWA & determinize( ); //FIX
 
         /**
          *
@@ -968,7 +1051,7 @@ namespace wali
          * @return true if the NWA is deterministic, false otherwise
          *
          */
-        bool isDeterministic( );
+        bool isDeterministic( );  //FIX
 
         /**
          *
@@ -994,7 +1077,7 @@ namespace wali
          * accepted by this NWA
          *
          */
-        bool isMember( nws::NWS word );   
+        bool isMember( nws::NWS word ); //FIX
 
         //Utilities	
 
@@ -1066,7 +1149,7 @@ namespace wali
          * to a final state, false otherwise
          *
          */
-        bool NWA::hasPath( Key currState, std::stack< Key > calls, std::set< Key > visited );
+        bool NWA::hasPath( St currState, std::stack< St > calls, std::set< St > visited );  //FIX
     
         /** 
          *
@@ -1084,7 +1167,7 @@ namespace wali
          * @return true if the simulation ends in an accepting state
          *
          */
-        bool matchWord( State<StKey> currState, std::deque<WordRecConfig<StKey>> configs );
+        bool matchWord( St currState, std::deque<WordRecConfig<St>> configs );  //FIX
         
         /**
          *
@@ -1099,7 +1182,7 @@ namespace wali
          *
          */
         std::pair<NWA,StateMap> det( NWA nWdAut, StateMap stateMap,StatePairSet currState,
-                                    std::stack<StatePairSet> callPred );
+                                    std::stack<StatePairSet> callPred );  //FIX
 
       //
       // Variables
@@ -1108,7 +1191,12 @@ namespace wali
         States states;
         States initialStates;
         States finalStates;
+        
+        Symbols symbols;
+        
         Trans * trans;
+        
+        bool absentAcceptance;
     };
     
     //
@@ -1116,29 +1204,35 @@ namespace wali
     //
 
     //Constructors and Destructor
-    template<typename StKey,typename Label >
-    NWA<StKey,Label>::NWA( )
+    template<typename St,typename Sym >
+    NWA<St,Sym>::NWA( )
     {
-      states = StateSet<State<StKey>>();      
-      initialStates = StateSet<State<StKey>>();
-      finalStates = StateSet<State<StKey>>();
+      states = States();      
+      initialStates = States();
+      finalStates = States();
+      
+      symbols = Symbols();
+      addSymbol(Sym::getEpsilon()); 
       
       trans = new Trans();
+      
+      absentAcceptance = false; //Assume stuck state is not a final state.
     }
     
-    template<typename StKey,typename Label >
-    NWA<StKey,Label>::NWA( const NWA & other )
+    template<typename St,typename Sym >
+    NWA<St,Sym>::NWA( const NWA & other )
     {
       operator=(other);
     }
     
-    template<typename StKey,typename Label >
-    NWA<StKey,Label> & NWA<StKey,Label>::operator=( const NWA & other )
+    template<typename St,typename Sym >
+    NWA<St,Sym> & NWA<St,Sym>::operator=( const NWA & other )
     {
       //Wipe any pre-existing data.
       states.clear();
       initialStates.clear();
       finalStates.clear();
+      symbols.clear();
       trans->clear();
       
       //Copy data over from 'other'
@@ -1146,24 +1240,64 @@ namespace wali
       initialStates = other.initialStates;
       finalStates = other.finalStates;
       
-      trans->addAllSymbols(*other.trans);
+      symbols = other.symbols;
+
       trans->addAllTrans(*other.trans);
+      
+      absentAcceptance = other.absentAcceptance;
       
       return *this;
     }
    
-    template<typename StKey,typename Label >
-    NWA<StKey,Label>::~NWA( )
+    template<typename St,typename Sym >
+    NWA<St,Sym>::~NWA( )
     {         
       states.clear();
       initialStates.clear();
       finalStates.clear();
+      
+      symbols.clear();
       
       trans->~Trans();    
     }
     
   
     //State Accessors
+
+    /**
+     *  
+     * @brief tests whether the stuck state is a final state
+     *
+     * @return true if the stuck state is a final state, false otherwise
+     *
+     */
+    template<typename St,typename Sym >
+    bool NWA<St,Sym>::isAbsentAccept()
+    {
+      return absentAcceptance;
+    }
+        
+    /**
+     * 
+     * @brief sets the stuck state to be a final state
+     *
+     */
+    template<typename St,typename Sym > 
+    void NWA<St,Sym>::acceptAbsent()
+    {
+      absentAcceptance = true;
+    }
+    
+    /**
+     * 
+     * @brief sets the stuck state to be not a final state
+     *
+     */
+    template<typename St,typename Sym > 
+    void NWA<St,Sym>::rejectAbsent()
+    {
+      absentAcceptance = false;
+    }
 
     //All States
     /**
@@ -1173,8 +1307,8 @@ namespace wali
      * @return set of Key values for all states associated with the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    const typename NWA<StKey,Label>::States & NWA<StKey,Label>::getStates( )
+    template<typename St,typename Sym > 
+    const typename NWA<St,Sym>::States & NWA<St,Sym>::getStates( )
     {
       return states;
     }
@@ -1187,8 +1321,8 @@ namespace wali
      * @return true if the state with the given name is a state of the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::isState( State<StKey> name )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::isState( St name )
     {
       return states.contains(name);
     }
@@ -1202,8 +1336,8 @@ namespace wali
      * @return false if the state already exists in the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::addState( State<StKey> name )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::addState( St name )
     {
       if( states.contains(name) )
         return false;
@@ -1219,8 +1353,8 @@ namespace wali
      * @param the StateSet that contains the states to add
      *
      */
-    template<typename StKey,typename Label > 
-    void NWA<StKey,Label>::addAllStates( States addStateSet)
+    template<typename St,typename Sym > 
+    void NWA<St,Sym>::addAllStates( States addStateSet)
     {
       for( stateIterator sit = addStateSet.begin();
             sit != addStateSet.end(); sit++ )
@@ -1235,8 +1369,8 @@ namespace wali
      * @return false if the state does not exist in the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::removeState( State<StKey> name )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::removeState( St name )
     {
       //Remove transitions associated with the state that was removed.
       if( states.remove(name) )
@@ -1246,6 +1380,8 @@ namespace wali
         initialStates.remove(name);
         finalStates.remove(name);
       
+        //TODO: fix this so that these functions are private and 
+        //only one removeState call is made to trans.
         trans->removeCallTransWith(name);
         trans->removeInternalTransWith(name);
         trans->removeReturnTransWith(name);
@@ -1261,12 +1397,14 @@ namespace wali
      * @brief remove all states from the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    void NWA<StKey,Label>::clearStates( )
+    template<typename St,typename Sym > 
+    void NWA<St,Sym>::clearStates( )
     {      
       initialStates.clear();
       finalStates.clear();
       states.clear();
+      
+      absentAcceptance = false; //default behavior is restored
 
       //Since all states are being removed, all transitions are removed 
       //as well.
@@ -1280,8 +1418,8 @@ namespace wali
      * @return an iterator pointing to the beginning of the state set
      *
      */
-    template<typename StKey,typename Label > 
-    typename NWA<StKey,Label>::stateIterator NWA<StKey,Label>::beginStates()
+    template<typename St,typename Sym > 
+    typename NWA<St,Sym>::stateIterator NWA<St,Sym>::beginStates()
     {
       return states.begin();
     }
@@ -1293,8 +1431,8 @@ namespace wali
      * @return an iterator pointing just past the end of the state set
      *
      */
-    template<typename StKey,typename Label > 
-    typename NWA<StKey,Label>::stateIterator NWA<StKey,Label>::endStates()
+    template<typename St,typename Sym > 
+    typename NWA<St,Sym>::stateIterator NWA<St,Sym>::endStates()
     {
       return states.end();
     }
@@ -1309,8 +1447,8 @@ namespace wali
      * the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    const typename NWA<StKey,Label>::States & NWA<StKey,Label>::getInitialState( )
+    template<typename St,typename Sym > 
+    const typename NWA<St,Sym>::States & NWA<St,Sym>::getInitialState( )
     {
       return initialStates;
     }
@@ -1323,8 +1461,8 @@ namespace wali
      * @return true if the state with the given name is an initial state
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::isInitialState( State<StKey> name )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::isInitialState( St name )
     {
       return initialStates.contains(name); 
     }
@@ -1339,8 +1477,8 @@ namespace wali
      * of the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::addInitialState( State<StKey> name )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::addInitialState( St name )
     {
       if( initialStates.size() > 0 )
         return false;
@@ -1358,8 +1496,8 @@ namespace wali
      * @param the StateSet that contains the states to add
      *
      */
-    template<typename StKey,typename Label > 
-    void NWA<StKey,Label>::addAllInitialStates( States addStateSet)
+    template<typename St,typename Sym > 
+    void NWA<St,Sym>::addAllInitialStates( States addStateSet)
     {
       if( addStateSet.size() > 0 )
         return;
@@ -1380,8 +1518,8 @@ namespace wali
      * of the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::removeInitialState( State<StKey> name ) 
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::removeInitialState( St name ) 
     {
       return initialStates.remove(name);
     }
@@ -1392,8 +1530,8 @@ namespace wali
      * @brief remove all states from the initial state set of the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    void NWA<StKey,Label>::clearInitialStates( )
+    template<typename St,typename Sym > 
+    void NWA<St,Sym>::clearInitialStates( )
     {
       initialStates.clear();
     }
@@ -1406,8 +1544,8 @@ namespace wali
      *  set
      *
      */
-    template<typename StKey,typename Label > 
-    typename NWA<StKey,Label>::stateIterator NWA<StKey,Label>::beginInitialStates()
+    template<typename St,typename Sym > 
+    typename NWA<St,Sym>::stateIterator NWA<St,Sym>::beginInitialStates()
     {
       return initialStates.begin();
     }
@@ -1420,8 +1558,8 @@ namespace wali
      * state set
      *
      */
-    template<typename StKey,typename Label > 
-    typename NWA<StKey,Label>::stateIterator NWA<StKey,Label>::endInitialStates()
+    template<typename St,typename Sym > 
+    typename NWA<St,Sym>::stateIterator NWA<St,Sym>::endInitialStates()
     {
       return initialStates.end();
     }
@@ -1436,8 +1574,8 @@ namespace wali
      * the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    const typename NWA<StKey,Label>::States & NWA<StKey,Label>::getFinalStates( )
+    template<typename St,typename Sym > 
+    const typename NWA<St,Sym>::States & NWA<St,Sym>::getFinalStates( )
     {
       return finalStates;
     }
@@ -1450,8 +1588,8 @@ namespace wali
      * @return true if the state with the given name is a final state
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::isFinalState( State<StKey> name )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::isFinalState( St name )
     {
       return finalStates.contains(name);
     }
@@ -1466,8 +1604,8 @@ namespace wali
      * of the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::addFinalState( State<StKey> name )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::addFinalState( St name )
     {
       if( !states.contains(name) )
         states.add(name);
@@ -1482,9 +1620,12 @@ namespace wali
      * @param the StateSet that contains the states to add
      *
      */
-    template<typename StKey,typename Label > 
-    void NWA<StKey,Label>::addAllFinalStates( States addStateSet)
+    template<typename St,typename Sym > 
+    void NWA<St,Sym>::addAllFinalStates( States addStateSet, bool accept )
     {
+      if( accept )
+        absentAcceptance = true;
+      
       for( stateIterator sit = addStateSet.begin();
             sit != addStateSet.end(); sit++ )
         finalStates.add(*sit);
@@ -1500,8 +1641,8 @@ namespace wali
      * of the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::removeFinalState( State<StKey> name )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::removeFinalState( St name )
     {
       return finalStates.remove(name);
     }
@@ -1512,10 +1653,12 @@ namespace wali
      * @brief remove all states from the final state set of the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    void NWA<StKey,Label>::clearFinalStates( )
+    template<typename St,typename Sym > 
+    void NWA<St,Sym>::clearFinalStates( )
     {
       finalStates.clear();
+      
+      absentAcceptance = false; //default behavior is restored
     }
     
     /**
@@ -1526,8 +1669,8 @@ namespace wali
      *  set
      *
      */
-    template<typename StKey,typename Label > 
-    typename NWA<StKey,Label>::stateIterator NWA<StKey,Label>::beginFinalStates()
+    template<typename St,typename Sym > 
+    typename NWA<St,Sym>::stateIterator NWA<St,Sym>::beginFinalStates()
     {
       return finalStates.begin();
     }
@@ -1543,8 +1686,8 @@ namespace wali
      * state set
      *
      */  
-    template<typename StKey,typename Label >   
-    typename NWA<StKey,Label>::stateIterator NWA<StKey,Label>::endFinalStates()
+    template<typename St,typename Sym >   
+    typename NWA<St,Sym>::stateIterator NWA<St,Sym>::endFinalStates()
     {
       return finalStates.end();
     }
@@ -1556,8 +1699,8 @@ namespace wali
      * @return the number of states in this collection
      *
      */
-    template<typename StKey,typename Label > 
-    size_t NWA<StKey,Label>::sizeStates( )
+    template<typename St,typename Sym > 
+    size_t NWA<St,Sym>::sizeStates( )
     {
       return states.size();
     }
@@ -1569,8 +1712,8 @@ namespace wali
      * @return the number of initial states in this collection
      *
      */
-    template<typename StKey,typename Label > 
-    size_t NWA<StKey,Label>::sizeInitialStates( )
+    template<typename St,typename Sym > 
+    size_t NWA<St,Sym>::sizeInitialStates( )
     {
       return initialStates.size();
     }
@@ -1582,10 +1725,13 @@ namespace wali
      * @return the number of final states in this collection
      *
      */
-    template<typename StKey,typename Label > 
-    size_t NWA<StKey,Label>::sizeFinalStates( )
+    template<typename St,typename Sym > 
+    size_t NWA<St,Sym>::sizeFinalStates( )
     {
-      return finalStates.size();
+      if( absentAcceptance )
+        return finalStates.size() + 1;
+      else
+        return finalStates.size();
     }   
     
     //Symbol Accessors
@@ -1597,10 +1743,10 @@ namespace wali
      * @return set of Key values for all symbols associated with the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    const StateSet<Symbol<Label>> & NWA<StKey,Label>::getSymbols( )
+    template<typename St,typename Sym > 
+    const typename NWA<St,Sym>::Symbols & NWA<St,Sym>::getSymbols( )
     {
-        return trans->getSymbols();
+        return symbols;
     }
   
     /**
@@ -1611,10 +1757,10 @@ namespace wali
      * @return true if the given symbol is a symbol of the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::isSymbol( Symbol<Label> sym )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::isSymbol( Sym sym )
     {
-      return trans->isSymbol(sym);
+      return (symbols.count(sym) >  0);
     }
    
    
@@ -1626,10 +1772,28 @@ namespace wali
      * @return false if the symbol is already associated with the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::addSymbol( Symbol<Label> sym )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::addSymbol( Sym sym )
     {
-      return trans->addSymbol(sym);
+      if( symbols.count(sym) > 0 )
+        return false;
+      symbols.insert(sym);
+      return true;
+    }
+    
+    /**
+     *
+     * @brief add the given symbols to the NWA
+     *
+     * @param the symbols to add
+     *
+     */
+    template<typename St,typename Sym > 
+    void NWA<St,Sym>::addAllSymbols( Symbols addSymbolSet)
+    {
+      for( symbolIterator sit = addSymbolSet.begin();
+            sit != addSymbolSet.end(); sit++ )
+        symbols.add(*sit);
     }
     
    
@@ -1641,10 +1805,22 @@ namespace wali
      * @return false if the symbol is no associated with the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::removeSymbol( Symbol<Label> sym )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::removeSymbol( Sym sym )
     {
-      return trans->removeSymbol(sym);
+      if( symbols.count(sym) == 0 )
+        return false;
+      else if( symbols.erase(sym) )
+      {
+        //TODO: fix this so that these functions are private and
+        //only one call to removeSymbol must be made to trans
+        trans->removeCallTransSym(sym);
+        trans->removeInternalTransSym(sym);
+        trans->removeReturnTransSym(sym);
+        
+        return true;
+      }      
+      return false;
     }
     
    
@@ -1653,13 +1829,59 @@ namespace wali
      * @brief remove all symbols associated with the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    void NWA<StKey,Label>::clearSymbols( )
+    template<typename St,typename Sym > 
+    void NWA<St,Sym>::clearSymbols( )
     {
-      trans->clearSymbols();
+      symbols.clear();
+
+      //Since all symbols are being removed, all transitions are removed 
+      //as well.
+      trans->clear();
+      
+      //The epsilon symbol should always remain in the symbol set.
+      //This will also replace transitions with the epsilon symbol for each 
+      //state that exists in the state set to the error state .
+      addSymbol(Sym::getEpsilon());
     }
     
-  
+    /**
+     *
+     * @brief provide access to the beginning of the symbol set
+     *
+     * @return an iterator pointing to the beginning of the symbol set
+     *
+     */
+    template<typename St,typename Sym >
+    typename NWA<St,Sym>::symbolIterator NWA<St,Sym>::beginSymbols()
+    {
+      return symbols.begin();
+    }
+    
+    /**
+     * 
+     * @brief provide access to the end of the symbol set
+     *
+     * @return an iterator pointing just past the end of the symbol set
+     *
+     */
+    template<typename St,typename Sym >
+    typename NWA<St,Sym>::symbolIterator NWA<St,Sym>::endSymbols()
+    {
+      return symbols.end();
+    }
+    
+    /**
+     *
+     * @brief returns the number of symbols associated with this NWA
+     *
+     * @return the number of symbols associated with this NWA
+     *
+     */
+   template<typename St,typename Sym >
+    size_t NWA<St,Sym>::sizeSymbols( )
+    {
+      return symbols.size();
+    }
   
     //Transition Accessors
 
@@ -1668,14 +1890,13 @@ namespace wali
      * @brief remove all transitions from the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    void NWA<StKey,Label>::clearTrans( )
+    template<typename St,typename Sym > 
+    void NWA<St,Sym>::clearTrans( )
     {
       trans->clear();
     }
   
   
-    //Transitions
     /**
      *
      * @brief get all call transitions in the transition set of the NWA.
@@ -1683,8 +1904,8 @@ namespace wali
      * @return set of call transitions associated with the NWA
      * 
      */
-    template<typename StKey,typename Label > 
-    const typename NWA<StKey,Label>::Calls & NWA<StKey,Label>::getCallTrans( )
+    template<typename St,typename Sym > 
+    const typename NWA<St,Sym>::Calls & NWA<St,Sym>::getCallTrans( )
     {
       return trans->getCalls();
     }
@@ -1699,14 +1920,16 @@ namespace wali
      * @return false if the call transition already exists in the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::addCallTrans( Key from, Key sym, Key to )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::addCallTrans( St from, Sym sym, St to )
     {
       if(! isState(from)
           || ! isState(to) )
         return false;
-        
-      KeyTriple ct = KeyTriple(from,sym,to);
+      if(! isSymbol(sym) )
+        addSymbol(sym);
+          
+      Call ct = Call(from,sym,to);
       return trans->addCall(ct);
     }
   
@@ -1718,12 +1941,14 @@ namespace wali
      * @return false if the call transition already exists in the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::addCallTrans( KeyTriple * ct )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::addCallTrans( Call * ct )
     {
       if(! isState(ct->first)
           || ! isState(ct->third) )
         return false;
+      if(! isSymbol(ct->second) )
+        addSymbol(ct->second);  
         
       return trans->addCall(*ct);
     }
@@ -1739,10 +1964,16 @@ namespace wali
      * @return false if the call transition does not exist in the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::removeCallTrans( Key from, Key sym, Key to )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::removeCallTrans( St from, Sym sym, St to )
     {
-      KeyTriple ct = KeyTriple(from,sym,to);
+      if(! isState(from)
+          || ! isState(to) )
+        return false;
+      if(! isSymbol(sym) )
+        return false;
+    
+      Call ct = Call(from,sym,to);
       return trans->removeCall(ct);
     }
   
@@ -1754,9 +1985,15 @@ namespace wali
      * @return false if the call transition does not exist in the NWA
      *
      */
-    template<typename StKey,typename Label> 
-    bool NWA<StKey,Label>::removeCallTrans( KeyTriple * ct )
+    template<typename St,typename Sym> 
+    bool NWA<St,Sym>::removeCallTrans( Call * ct )
     {
+      if(! isState(ct->first)
+          || ! isState(ct->third) )
+        return false;
+      if(! isSymbol(ct->second) )
+        return false;
+        
       return trans->removeCall(*ct);
     }
   
@@ -1768,8 +2005,8 @@ namespace wali
      *  set
      *
      */
-    template<typename StKey,typename Label>
-    typename NWA<StKey,Label>::callIterator NWA<StKey,Label>::beginCallTrans()
+    template<typename St,typename Sym>
+    typename NWA<St,Sym>::callIterator NWA<St,Sym>::beginCallTrans()
     {
       return trans->beginCall();
     }
@@ -1782,8 +2019,8 @@ namespace wali
      * transition set
      *
      */
-    template<typename StKey,typename Label>
-    typename NWA<StKey,Label>::callIterator NWA<StKey,Label>::endCallTrans()
+    template<typename St,typename Sym>
+    typename NWA<St,Sym>::callIterator NWA<St,Sym>::endCallTrans()
     {
       return trans->endCall();
     }
@@ -1796,8 +2033,8 @@ namespace wali
      * @return set of internal transitions associated with the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    const typename NWA<StKey,Label>::Internals & NWA<StKey,Label>::getInternalTrans( )
+    template<typename St,typename Sym > 
+    const typename NWA<St,Sym>::Internals & NWA<St,Sym>::getInternalTrans( )
     {
       return trans->getInternals();
     }
@@ -1812,14 +2049,16 @@ namespace wali
      * @return false if the internal transition already exists in the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::addInternalTrans( Key from, Key sym, Key to )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::addInternalTrans( St from, Sym sym, St to )
     {
       if(! isState(from)
           || ! isState(to) )
         return false;
+      if(! isSymbol(sym) )
+        addSymbol(sym);  
     
-      KeyTriple it = KeyTriple(from,sym,to);
+      Internal it = Internal(from,sym,to);
       return trans->addInternal(it);
     }
  
@@ -1831,12 +2070,14 @@ namespace wali
      * @return false if the internal transition already exists in the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::addInternalTrans( KeyTriple * it )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::addInternalTrans( Internal * it )
     {
       if(! isState(it->first)
           || ! isState(it->third) )
         return false;
+      if(! isSymbol(it->second) )
+        addSymbol(it->second);  
     
       return trans->addInternal(*it);
     }
@@ -1852,10 +2093,16 @@ namespace wali
      * @return false if the internal transition does not exist in the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::removeInternalTrans( Key from, Key sym, Key to )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::removeInternalTrans( St from, Sym sym, St to )
     {
-      KeyTriple it = KeyTriple(from,sym,to);
+      if(! isState(from)
+          || ! isState(to) )
+        return false;
+      if(! isSymbol(sym) )
+        return false;
+    
+      Internal it = Internal(from,sym,to);
       return trans->removeInternal(it);
     }
   
@@ -1867,9 +2114,15 @@ namespace wali
      * @return false if the internal transition does not exist in the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::removeInternalTrans( KeyTriple * it )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::removeInternalTrans( Internal * it )
     {
+      if(! isState(it->first)
+          || ! isState(it->third) )
+        return false;
+      if(! isSymbol(it->second) )
+        return false;
+        
       return trans->removeInternal(*it);
     }
   
@@ -1881,8 +2134,8 @@ namespace wali
      *  set
      *
      */
-    template<typename StKey,typename Label>
-    typename NWA<StKey,Label>::internalIterator NWA<StKey,Label>::beginInternalTrans()
+    template<typename St,typename Sym>
+    typename NWA<St,Sym>::internalIterator NWA<St,Sym>::beginInternalTrans()
     {
       return trans->beginInternal();
     }
@@ -1895,8 +2148,8 @@ namespace wali
      * transition set
      *
      */
-    template<typename StKey,typename Label>
-    typename NWA<StKey,Label>::internalIterator NWA<StKey,Label>::endInternalTrans()
+    template<typename St,typename Sym>
+    typename NWA<St,Sym>::internalIterator NWA<St,Sym>::endInternalTrans()
     {
       return trans->endInternal();
     }
@@ -1908,8 +2161,8 @@ namespace wali
      * @return set of return transitions associated with the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    const typename NWA<StKey,Label>::Returns & NWA<StKey,Label>::getReturnTrans( )
+    template<typename St,typename Sym > 
+    const typename NWA<St,Sym>::Returns & NWA<St,Sym>::getReturnTrans( )
     {
       return trans->getReturns();
     }
@@ -1925,15 +2178,17 @@ namespace wali
      * @return false if the return transition already exists in the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::addReturnTrans( Key from, Key pred, Key sym, Key to )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::addReturnTrans( St from, St pred, Sym sym, St to )
     {
       if(! isState(from)
           || ! isState(pred)
           || ! isState(to) )
         return false;
+      if(! isSymbol(sym) )
+        addSymbol(sym);  
     
-      KeyQuad rt = KeyQuad(from,pred,sym,to);
+      Return rt = Return(from,pred,sym,to);
       return trans->addReturn(rt);
     }
    
@@ -1945,13 +2200,15 @@ namespace wali
      * @return false if the return transition already exists in the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::addReturnTrans( KeyQuad * rt )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::addReturnTrans( Return * rt )
     {
       if(! isState(rt->first)
           || ! isState(rt->second)
           || ! isState(rt->fourth) )
         return false;
+      if(! isSymbol(rt->third) )
+        addSymbol(rt->third);  
         
       return trans->addReturn(*rt);
     }
@@ -1968,10 +2225,17 @@ namespace wali
      * @return false if the return transition does not exist in the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::removeReturnTrans( Key from, Key pred, Key sym, Key to )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::removeReturnTrans( St from, St pred, Sym sym, St to )
     {
-      KeyQuad rt = KeyQuad(from,pred,sym,to);
+      if(! isState(from)
+          || ! isState(pred)
+          || ! isState(to) )
+        return false;
+      if(! isSymbol(sym) )
+        return false;
+    
+      Return rt = Return(from,pred,sym,to);
       return trans->removeReturn(rt);
     }
    
@@ -1983,9 +2247,16 @@ namespace wali
      * @return false if the return transition does not exist in the NWA
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::removeReturnTrans( KeyQuad * rt )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::removeReturnTrans( Return * rt )
     {
+      if(! isState(rt->first)
+          || ! isState(rt->second)
+          || ! isState(rt->fourth) )
+        return false;
+      if(! isSymbol(rt->third) )
+        return false;
+        
       return trans->removeReturn(*rt);
     }
     
@@ -1997,8 +2268,8 @@ namespace wali
      *  set
      *
      */
-    template<typename StKey,typename Label>
-    typename NWA<StKey,Label>::returnIterator NWA<StKey,Label>::beginReturnTrans()
+    template<typename St,typename Sym>
+    typename NWA<St,Sym>::returnIterator NWA<St,Sym>::beginReturnTrans()
     {
       return trans->beginReturn();
     }
@@ -2011,8 +2282,8 @@ namespace wali
      * transition set
      *
      */
-    template<typename StKey,typename Label>
-    typename NWA<StKey,Label>::returnIterator NWA<StKey,Label>::endReturnTrans()
+    template<typename St,typename Sym>
+    typename NWA<St,Sym>::returnIterator NWA<St,Sym>::endReturnTrans()
     {
       return trans->endReturn();
     }
@@ -2028,45 +2299,55 @@ namespace wali
      * @return the NWA which is the union of this NWA and the NWA 'other'
      *
      */
-    template<typename StKey,typename Label > 
-    NWA<StKey,Label> * NWA<StKey,Label>::unionNWA( NWA<StKey,Label> other )
-    {
-      NWA<StKey,Label> * newNWA = new NWA<StKey,Label>();
+    template<typename St,typename Sym > 
+    NWA<St,Sym> * NWA<St,Sym>::unionNWA( NWA<St,Sym> other )
+    { //FIX
+      //TODO: fix this for absentAcceptance
+      NWA<St,Sym> * newNWA = new NWA<St,Sym>();
       
       //Generate new states, adding them to the state set as well as
       //to the initial state set and final state set as needed.
-      Key newKey;
-      for( StateSet<State<StKey>>::iterator fit = beginStates();
+      St newSt;
+      for( stateIterator fit = beginStates();
             fit != endStates(); fit++ )
       {
-        for( StateSet<State<StKey>>::iterator sit = other.beginStates();
+        for( stateIterator sit = other.beginStates();
               sit != other.endStates(); sit++ )
         {
-          if( (*fit == WALI_BAD_KEY) && (*sit == WALI_BAD_KEY) )
-            newKey = WALI_BAD_KEY;         
+          if( fit->intersect(*sit,&newSt) )
+          {
+            newNWA->addState(newSt);
+          
+            if( this->isInitialState(*fit) && other.isInitialState(*sit) )
+              newNWA->addInitialState(newSt);
+            if( this->isFinalState(*fit) || other.isFinalState(*sit) )
+              newNWA->addFinalState(newSt); 
+          }
           else
-            newKey = wali::getKey(fit->getKey(),sit->getKey());
-          
-          newNWA->addState(newKey);
-          
-          if( this->isInitialState(*fit) && other.isInitialState(*sit) )
-            newNWA->addInitialState(newKey);
-          if( this->isFinalState(*fit) || other.isFinalState(*sit) )
-            newNWA->addFinalState(newKey);      
+          {
+            //these nodes can't be intersected
+            //TODO: what should i do here
+          }     
         }
       }
       
       //Generate call transitions.
-      for( Trans::callIterator fcit = this->trans->beginCall();
+      for( callIterator fcit = this->trans->beginCall();
             fcit != this->trans->endCall(); fcit++ )
       {
-        for( Trans::callIterator scit = other.trans->beginCall();
+        for( callIterator scit = other.trans->beginCall();
             scit != other.trans->endCall(); scit++ )
         {
-          if( fcit->second == scit->second )
-            newNWA->addCallTrans( wali::getKey(fcit->first,scit->first),
-                                  fcit->second, 
-                                  wali::getKey(fcit->third,scit->third) );
+          Sym sym;
+          if( fcit->second->intersect(scit->second,sym) )
+          {
+            St fromSt, toSt;
+            //TODO: what should I do if these calls failed?
+            fcit->first->intersect(scit->first,&fromSt);
+            fcit->third->intersect(scit->third,&toSt);
+            
+            newNWA->addCallTrans( fromSt, sym, toSt );
+          }
         }
       }
       //Generate internal transitions.
@@ -2076,10 +2357,16 @@ namespace wali
         for( Trans::internalIterator siit = other.trans->beginInternal();
               siit != other.trans->endInternal(); siit++ )
         {
-          if( fiit->second == siit->second )
-            newNWA->addInternalTrans( wali::getKey(fiit->first,siit->first),
-                                      fiit->second, 
-                                      wali::getKey(fiit->third,siit->third) );
+          Sym sym;
+          if( fiit->second->intersect(siit->second,sym) )
+          {
+            St fromSt, toSt;
+            //TODO: what should I do if these calls failed?
+            fiit->first->intersect(siit->first,&fromSt);
+            fiit->third->intersect(siit->third,&toSt);
+            
+            newNWA->addInternalTrans( fromSt, sym, toSt );
+          }
         }
       }
       //Generate return transitions.  
@@ -2089,11 +2376,17 @@ namespace wali
         for( Trans::returnIterator srit = other.trans->beginReturn();
               srit != other.trans->endReturn(); srit++ )
         {
-          if( frit->third == srit->third )
-            newNWA->addReturnTrans( wali::getKey(frit->first,srit->first),
-                                    wali::getKey(frit->second,srit->second), 
-                                    frit->third,
-                                    wali::getKey(frit->fourth,srit->fourth) );
+          Sym sym;
+          if( frit->third->intersect(srit->third,sym) )
+          {
+            St fromSt, predSt, toSt;
+            //TODO: what should I do if these calls failed?
+            frit->first->intersect(srit->first,&fromSt);
+            frit->second->intersect(srit->second,&predSt);
+            frit->fourth->intersect(srit->fourth,&toSt);
+            
+            newNWA->addReturnTrans( fromSt, predSt, sym, toSt );
+          }
         }
       }   
       
@@ -2110,10 +2403,11 @@ namespace wali
      * 'other'
      * 
      */
-    template<typename StKey,typename Label > 
-    NWA<StKey,Label> * NWA<StKey,Label>::concat( NWA<StKey,Label> other )
-    {
-      NWA<StKey,Label> * newNWA = new NWA<StKey,Label>();
+    template<typename St,typename Sym > 
+    NWA<St,Sym> * NWA<St,Sym>::concat( NWA<St,Sym> other )
+    { //FIX
+      //TODO: fix this
+      NWA<St,Sym> * newNWA = new NWA<St,Sym>();
       
       //Join the state sets
       newNWA->addAllStates(this->states);
@@ -2136,13 +2430,17 @@ namespace wali
         for( stateIterator iit = other.beginInitialStates();
           iit != other.endInitialStates(); iit++)
         {
-          KeyTriple newTrans = KeyTriple(fit->getKey(),WALI_EPSILON,iit->getKey());
+          Internal newTrans = Internal(*fit,Sym::getEpsilon(),*iit);
           newNWA->addInternalTrans( &newTrans );
         }
       }
       
       //Final states of the new NWA are the final states of the NWA 'other'
-      newNWA->addAllFinalStates(other.finalStates);
+      newNWA->addAllFinalStates(other.finalStates, other.absentAcceptance);
+
+      //Any symbols not in the original set of symbols must be added.
+      newNWA->addAllSymbols(symbols);
+      newNWA->addAllSymbols(other.symbols);
 
       //Join the transition sets
       newNWA->trans->addAllTrans(*this->trans);
@@ -2161,15 +2459,18 @@ namespace wali
      *
      */
     //TODO: check this with respect to calls/returns
-    template<typename StKey,typename Label >
-    NWA<StKey,Label> * NWA<StKey,Label>::star( )
-    {
-      NWA<StKey,Label> * newNWA = new NWA<StKey,Label>();
+    template<typename St,typename Sym >
+    NWA<St,Sym> * NWA<St,Sym>::star( )
+    { //FIX
+      //TODO: fix this
+      NWA<St,Sym> * newNWA = new NWA<St,Sym>();
       
       //Add states.
       newNWA->addAllStates(states);
       newNWA->addAllInitialStates(initialStates);
-      newNWA->addAllFinalStates(finalStates);
+      newNWA->addAllFinalStates(finalStates,absentAcceptance);
+      
+      newNWA->addAllSymbols(symbols);
       
       //Add trans.
       newNWA->trans->addAllTrans(*this->trans);
@@ -2184,7 +2485,7 @@ namespace wali
         for( stateIterator iit = beginInitialStates();
           iit != endInitialStates(); iit++ )
         {
-          KeyTriple newTrans = KeyTriple(fit->getKey(),WALI_EPSILON,iit->getKey());
+          Internal newTrans = Internal(fit,Sym::getEpsilon(),iit);
           newNWA->addInternalTrans( &newTrans );
         }
       }
@@ -2199,10 +2500,10 @@ namespace wali
      * @return the NWA which is the complement of this NWA
      *
      */
-    template<typename StKey,typename Label > 
-    NWA<StKey,Label> * NWA<StKey,Label>::complement( )
+    template<typename St,typename Sym > 
+    NWA<St,Sym> * NWA<St,Sym>::complement( )
     {
-      NWA<StKey,Label> * newNWA = new NWA<StKey,Label>();
+      NWA<St,Sym> * newNWA = new NWA<St,Sym>();
     
       //Start with a deterministic NWA.
       if(! this->isDeterministic() )
@@ -2211,6 +2512,8 @@ namespace wali
       //The new NWA will have all the same states and initial states.
       newNWA->addAllStates(states);
       newNWA->addAllInitialStates(initialStates);
+      
+      newNWA->addAllSymbols(symbols);
       
       //The new NWA will have all the same transitions.
       newNWA->trans->addAllTrans(*this->trans);    
@@ -2230,6 +2533,10 @@ namespace wali
         if( !oldFinalStates.contains(*sit) )
           newNWA->addFinalState(*sit);
       }
+      
+      //If this NWA doesn't accept the stuck state, the complement should.
+      if( !absentAcceptance )
+        newNWA->absentAcceptance;
           
       return newNWA;
     }
@@ -2242,10 +2549,11 @@ namespace wali
      * @return the NWA which is the reverse of this NWA
      * 
      */
-    template<typename StKey,typename Label > 
-    NWA<StKey,Label> * NWA<StKey,Label>::reverse()
-    {
-      NWA<StKey,Label> * newNWA = new NWA<StKey,Label>();
+    template<typename St,typename Sym > 
+    NWA<St,Sym> * NWA<St,Sym>::reverse()
+    { //FIX
+      //TODO: fix this
+      NWA<St,Sym> * newNWA = new NWA<St,Sym>();
           
       //The states remain the same.
       newNWA->addAllStates(states);
@@ -2259,21 +2567,21 @@ namespace wali
         newNWA->addFinalState(*it);
       
       //Reverse all transitions.
-      for( Trans::internalIterator iit = this->trans->beginInternal();
+      for( internalIterator iit = this->trans->beginInternal();
             iit != this->trans->endInternal(); iit++ )
       {
         newNWA->addInternalTrans(iit->third,iit->second,iit->first);
       }         
       
-      for( Trans::returnIterator rit = this->trans->beginReturn();
+      for( returnIterator rit = this->trans->beginReturn();
             rit != this->trans->endReturn(); rit++ )
       {
         newNWA->addCallTrans(rit->third,rit->second,rit->first);
       }
-      for( Trans::callIterator cit = this->trans->beginCall();
+      for( callIterator cit = this->trans->beginCall();
             cit != this->trans->endCall(); cit++ )
       {
-        for( Trans::returnIterator rit = this->trans->beginReturn();
+        for( returnIterator rit = this->trans->beginReturn();
               rit != this->trans->endReturn(); rit++ )
         {
           if( cit->first == rit->second )
@@ -2299,45 +2607,53 @@ namespace wali
      * 'other'
      *
      */
-    template<typename StKey,typename Label > 
-    NWA<StKey,Label> * NWA<StKey,Label>::intersect( NWA<StKey,Label> other )
+    template<typename St,typename Sym> 
+    NWA<St,Sym> * NWA<St,Sym>::intersect( NWA<St,Sym> other )
     {
-      NWA<StKey,Label> * newNWA = new NWA<StKey,Label>();
+      //TODO: fix this for absentAcceptance  
+      /*  NOTE: This is not optimized and doesn't include epsilon closure or consideration of absentAcceptance.
+      NWA<St,Sym> * newNWA = new NWA<St,Sym>();
       
       //Generate new states, adding them to the state set as well as
       //to the initial state set and final state set as needed.
-      Key newKey;
-      for( StateSet<State<StKey>>::iterator fit = beginStates();
+      St newSt;
+      for( stateIterator fit = beginStates();
             fit != endStates(); fit++ )
       {
-        for( StateSet<State<StKey>>::iterator sit = other.beginStates();
+        for( stateIterator sit = other.beginStates();
               sit != other.endStates(); sit++ )
-        {
-          if( (*fit == WALI_BAD_KEY) && (*sit == WALI_BAD_KEY) )
-            newKey = WALI_BAD_KEY;         
-          else
-            newKey = wali::getKey(fit->getKey(),sit->getKey());
+        {        
+          fit->intersect(*sit,&newSt);
           
-          newNWA->addState(newKey);
+            newNWA->addState(newSt);
           
-          if( this->isInitialState(*fit) && other.isInitialState(*sit) )
-            newNWA->addInitialState(newKey);
-          if( this->isFinalState(*fit) && other.isFinalState(*sit) )
-            newNWA->addFinalState(newKey);      
+            if( this->isInitialState(*fit) && other.isInitialState(*sit) )
+              newNWA->addInitialState(newSt);
+            if( this->isFinalState(*fit) && other.isFinalState(*sit) )
+              newNWA->addFinalState(newSt); 
+          
+            //if these nodes can't be intersected
+            //TODO: what should i do 
+                   
         }
-      }
+      }     
       
       //Generate call transitions.
-      for( Trans::callIterator fcit = this->trans->beginCall();
+      for( callIterator fcit = this->trans->beginCall();
             fcit != this->trans->endCall(); fcit++ )
       {
-        for( Trans::callIterator scit = other.trans->beginCall();
+        for( callIterator scit = other.trans->beginCall();
             scit != other.trans->endCall(); scit++ )
         {
-          if( fcit->second == scit->second )
-            newNWA->addCallTrans( wali::getKey(fcit->first,scit->first),
-                                  fcit->second, 
-                                  wali::getKey(fcit->third,scit->third) );
+          Sym sym;
+          if( fcit->second->intersect(scit->second,sym) )
+          {
+            St fromSt, toSt;
+            //TODO: what should I do if these calls failed?
+            fcit->first->intersect(scit->first,&fromSt);
+            fcit->third->intersect(scit->third,&toSt);
+            
+            newNWA->addCallTrans( fromSt, sym, toSt );
         }
       }
       //Generate internal transitions.
@@ -2347,10 +2663,15 @@ namespace wali
         for( Trans::internalIterator siit = other.trans->beginInternal();
               siit != other.trans->endInternal(); siit++ )
         {
-          if( fiit->second == siit->second )
-            newNWA->addInternalTrans( wali::getKey(fiit->first,siit->first),
-                                      fiit->second, 
-                                      wali::getKey(fiit->third,siit->third) );
+          Sym sym;
+          if( fiit->second->intersect(siit->second,sym) )
+          {
+            St fromSt, toSt;
+            //TODO: what should I do if these calls failed?
+            fiit->first->intersect(siit->first,&fromSt);
+            fiit->third->intersect(siit->third,&toSt);
+            
+            newNWA->addInternalTrans( fromSt, sym, toSt );
         }
       }
       //Generate return transitions.  
@@ -2360,15 +2681,359 @@ namespace wali
         for( Trans::returnIterator srit = other.trans->beginReturn();
               srit != other.trans->endReturn(); srit++ )
         {
-          if( frit->third == srit->third )
-            newNWA->addReturnTrans( wali::getKey(frit->first,srit->first),
-                                    wali::getKey(frit->second,srit->second), 
-                                    frit->third,
-                                    wali::getKey(frit->fourth,srit->fourth) );
+          Sym sym;
+          if( frit->third->intersect(srit->third,sym) )
+          {
+            St fromSt, predSt, toSt;
+            //TODO: what should I do if these calls failed?
+            frit->first->intersect(srit->first,&fromSt);
+            frit->second->intersect(srit->second,&predSt);
+            frit->fourth->intersect(srit->fourth,&toSt);
+            
+            newNWA->addReturnTrans( fromSt, predSt, sym, toSt );
+          }
         }
       }   
       
       return newNWA;
+      */
+      
+      // TODO: acceptAbsent consideration
+      //NOTE: for now, intersect only works with NWAs that do not accept the stuck state.
+      assert(!absentAcceptance && !other.absentAcceptance);
+     
+      NWA<St,Sym> * worklistNWA = new NWA<St,Sym>();
+      
+      //If both NWAs to be intersected accept absent, the intersection should too.
+      //Otherwise, the intersection should not, so keep the default settings.
+      if( absentAcceptance && other.absentAcceptance )
+        worklistNWA.acceptAbsent();
+      
+      std::deque<Triple<St,St,St>> wList; //An element: <joinedState, thisState, otherState>
+      std::set<St> visited; //States that have been created in the intersection NWA.
+      
+      //Start the worklist with all possible initial states of the intersection NWA.
+      //NOTE: Currently this should be just one state (the join of the single initial state of each machine).
+      for( stateIterator fit = beginInitialStates();
+            fit != endInitialStates(); fit++ )
+      {
+        for( stateIterator sit = other.beginInitialStates();
+              sit != other.endInitialStates(); sit++ )
+        {
+          if( fit->intersect(*sit,&newSt) )
+          {
+            worklistNWA->addInitialState(newSt); 
+            wList.push_back(Triple<St,St,St>(newSt,*fit,*sit));
+            visited.insert(newSt);
+          }  
+        }      
+      }
+      
+      //As long as there are still transitions to consider.
+      while(! wList.empty() )
+      {
+        Triple<St,St,St> from = wList.front();
+        
+        //Epsilon closure for the nodes that we are currently considering.
+        //Check call transitions in this NWA.
+        Calls thisCalls = trans->getCalls(from.second,Sym::getEpsilon());
+        for( Calls::const_iterator cit = thisCalls.begin(); cit != thisCalls.end(); cit++ )
+        {
+          St newSt;
+          //Check intersectability of states (if false, don't add).           
+          if( cit->third->intersect(from.third,&newSt) )
+            if( visited.find(newSt) == visited.end() )
+            {
+              wList.push_back(Triple<St,St,St>(newSt,cit->third,from.third));
+              visited.insert(newSt);
+                    
+              if( isFinalState(cit->third) && other.isFinalState(from.third) )
+                worklistNWA->addFinalState(newSt);
+              else
+                worklistNWA->addState(newSt);
+            }                   
+        }
+        //Check call transitions in the NWA 'other'.
+        Calls otherCalls = other.trans->getCalls(from.third,Sym::getEpsilon());
+        for( Calls::const_iterator cit = otherCalls.begin(); cit != otherCalls.end(); cit++ )
+        {
+          St newSt;
+          //Check intersectability of states (if false, don't add).
+          if( from.second->intersect(cit->third,&newSt) )
+            if( visited.find(newSt) == visited.end() )
+            {
+              wList.push_back(Triple<St,St,St>(newSt,from.second,cit->third));
+              visited.insert(newSt);
+                 
+              if( isFinalState(from.second) && other.isFinalState(cit->third) )
+                worklistNWA->addFinalState(newSt);
+              else
+                worklistNWA->addState(newSt);
+            }
+        }
+              
+        //Check internal transitions in this NWA.
+        Internals thisInternals = trans->getInternals(from.second,Sym::getEpsilon());
+        for( Internals::const_iterator iit = thisInternals.begin(); iit != thisInternals.end(); iit++ )
+        {
+          St newSt;
+          //Check intersectability of states (if false, don't add).
+          if( iit->third->intersect(from.third,&newSt) )
+            if( visited.find(newSt) == visited.end() )
+            {
+              wList.push_back(Triple<St,St,St>(newSt,iit->third,from.third));
+              visited.insert(newSt);
+                  
+              if( isFinalState(iit->third) && other.isFinalState(from.second.second) )
+                worklistNWA->addFinalState(newSt);
+              else
+                worklistNWA->addState(newSt);
+            }
+        }     
+        
+        //Check internal transitions in the NWA 'other'.
+        Internals otherInternals = other.trans->getInternals(from.third,Sym::getEpsilon());
+        for( Internals::const_iterator iit = otherInternals.begin(); iit != otherInternals.end(); iit++ )
+        {
+          St newSt;
+          //Check intersectability of states (if false, don't add).
+          if( from.second->intersect(iit->third,&newSt) )
+            if( visited.find(newSt) == visited.end() )
+            {
+              wList.push_back(Triple<St,St,St>(newSt,from.second,iit->third));
+              visited.insert(newSt);
+                   
+              if( isFinalState(from.second) && other.isFinalState(iit->third) )
+                worklistNWA->addFinalState(newSt);
+              else
+                worklistNWA->addState(newSt);
+             }
+        }      
+              
+        //Check return transitions in this NWA.
+        Returns thisReturns = trans->getReturns(from.second,Sym::getEpsilon());
+        for( Returns::const_iterator rit = thisReturns.begin(); rit != thisReturns.end(); rit++ )
+        {
+          St newSt;
+          //Check intersectability of states (if false, don't add).
+          if( rit->fourth->intersect(from.third,&newSt) )
+            if( visited.find(newSt) == visited.end() )
+            {
+              wList.push_back(Triple<St,St,St>(newSt,rit->fourth,from.third));
+              visited.insert(newSt);
+                    
+              if( isFinalState(rit->fourth) && other.isFinalState(from.third) )
+                worklistNWA->addFinalState(newSt);
+              else
+                worklistNWA->addState(newSt);
+            } 
+        }
+        
+        //Check return transitions in the NWA 'other'.
+        Returns otherReturns = other.trans->getReturns(from.third,Sym::getEpsilon());
+        for( Returns::const_iterator rit = otherReturns.begin(); rit != otherReturns.end(); rit++ )
+        {
+          St newSt;
+          //Check intersectability of states (if false, don't add).
+          if( from.second->intersect(rit->fourth,&newSt) )
+            if( visited.find(newSt) == visited.end() )
+            {
+              wList.push_back(Triple<St,St,St>(newSt,from.second,rit->fourth));
+              visited.insert(newSt);
+                    
+              if( isFinalState(from.second) && other.isFinalState(rit->fourth) )
+                worklistNWA->addFinalState(newSt);
+              else
+                worklistNWA->addState(newSt);
+            }
+        }
+        
+        //TODO: ???? this is going to hell in a handbasket (i.e. quadratic performance is emminent)
+        //For each possible outgoing symbol/edge type.
+        for( symbolIterator fsit = symbols.begin(); fsit != symbols.end(); fsit++ )
+        {
+          if( ! *fsit == Sym::getEpsilon() )  //Symbols other than epsilon.
+          for( symbolIterator ssit = other.symbols.begin(); ssit != other.symbols.end(); ssit++ )
+          {           
+            if (! *ssit == Sym::getEpsilon() )  //Symbols other than epsilon.
+            {   
+              Sym sym;
+              //Check intersectability of edge labels.
+              if( fsit->intersect(*ssit,sym) )  //Only continue if the symbols can be intersected.
+              {
+                //Check call transitions with the desired 'from' state.
+                Calls thisCalls = trans->getCalls(from.second,*fsit);
+                Calls otherCalls = other.trans->getCalls(from.third,*ssit);  
+             
+                if( !thisCalls.empty() && !otherCalls.empty() )
+                {
+                  //there are edges to join.
+                  for( Calls::const_iterator fcit = thisCalls.begin();
+                        fcit != thisCalls.end(); fcit++ )
+                  {
+                    for( Calls::const_iterator scit = otherCalls.begin();
+                          scit != otherCalls.end(); scit++ )
+                    {
+                      St toSt;                              
+                      //Check intersectability of to states (if false, don't look further).           
+                      if( fcit->third->intersect(scit->third,&toSt) )
+                        if( visited.find(toSt) == visited.end() )
+                        {
+                          wList.push_back(Triple<St,St,St>(toSt,fcit->third,scit->third));
+                          visited.insert(toSt);
+                        }
+                      
+                      if( isFinalState(fcit->third) && other.isFinalState(scit->third) )
+                        worklistNWA->addFinalState(toSt);
+                      else
+                        worklistNWA->addState(toSt);
+                        
+                      //Add the transition to the intersection NWA.  
+                      worklistNWA->addCallTrans( from.first, sym, toSt );
+                    }              
+                  }            
+                }
+                /* NOTE: assuming absentAccept is false for both machines
+                else if( thisCalls.empty() && !otherCalls.empty() )
+                {
+                  //only this has no edges  
+                  //if this is acceptAbsent, then follow the path of otherCalls
+                  //with just the other state value for the joined state?
+                  if( isAbsentAccept() )
+                  {
+                    for( Calls::const_iterator cit = otherCalls.begin();
+                          cit != otherCalls.end(); cit++ )
+                    {
+                      if( isFinalState(cit->third) )
+                        worklistNWA->addFinalState(cit->third);
+                      else
+                        worklistNWA->addState(cit->third);
+                      worklistNWA->addCallTrans( from.first, sym, cit->third );
+                    }
+                  }
+                }
+                else if( !thisCalls.empty() && otherCalls.empty() )
+                {
+                  //only other has no edges
+                  //if other is acceptAbsent, then follow the path of thisCalls
+                  //with just the this state value for the joined state?
+                  if( other.isAbsentAccept() )
+                  {
+                  }
+                }
+                //otherwise, both have no matching edges so there is no path to follow
+                */
+              
+                //Check internal transitions with the desired 'from' state and symbol.
+                Internals thisInternals = trans->getInternals(from.second,*fsit);
+                Internals otherInternals = other.trans->getInternals(from.third,*ssit);  
+                
+                if( !thisInternals.empty() && !otherInternals.empty() )
+                {
+                  //there are edges to join.
+                  for( Internals::const_iterator fiit = thisInternals.begin();
+                        fiit != thisInternals.end(); fiit++ )
+                  {
+                    for( Internals::const_iterator siit = otherInternals.begin();
+                          siit != otherInternals.end(); siit++ )
+                    {
+                      St toSt;                              
+                      //Check intersectability of to states (if false, don't look further).           
+                      if( fiit->third->intersect(siit->third,&toSt) )
+                        if( visited.find(toSt) == visited.end() )
+                        {
+                          wList.push_back(Triple<St,St,St>(toSt,fiit->third,siit->third));
+                          visited.insert(toSt);
+                        }
+                      
+                      if( isFinalState(fiit->third) && other.isFinalState(siit->third) )
+                        worklistNWA->addFinalState(toSt);
+                      else
+                        worklistNWA->addState(toSt);
+                        
+                      //Add the transition to the intersection NWA.
+                      worklistNWA->addInternalTrans( from.first, sym, toSt );
+                    }         
+                  }            
+                }
+              
+                /* NOTE: assuming absentAccept is false for both machines
+                else if( thisInternals.empty() && !otherInternals.empty() )
+                {
+                  //only this has no edges  
+                  //if this is acceptAbsent, then follow the path of otherInternals
+                  //with a dummy value for the this state?
+                  //with just the other state value for the joined state?
+                }
+                else if( !thisInternals.empty() && otherInternals.empty() )
+                {
+                  //only other has no edges
+                  //if other is acceptAbsent, then follow the path of thisInternals
+                  //with a dummy value for the other state?
+                  //with just the this state value for the joined state?
+                }
+                //otherwise, both have no matching edges so there is no path to follow
+                */
+              
+                //Check return transitions with the desired 'from' state and symbol.
+                Returns thisReturns = trans->getReturns(from.second,*fsit);
+                Returns otherReturns = other.trans->getReturns(from.third,*ssit);  
+                
+                if( !thisReturns.empty() && !otherReturns.empty() )
+                {
+                  //there are edges to join.
+                  for( Returns::const_iterator frit = thisReturns.begin();
+                        frit != thisReturns.end(); frit++ )
+                  {
+                    for( Returns::const_iterator srit = otherReturns.begin();
+                          srit != otherReturns.end(); srit++ )
+                    {
+                      St predSt, toSt;
+                      frit->second->intersect(srit->second,&predSt);  //TODO: check that this is a viable call point in the intersected NWA.
+                      
+                      //Check intersectability of to states (if false, don't look further).    
+                      if( frit->fourth->intersect(srit->fourth,&toSt) )
+                        if( visited.find(toSt) == visited.end() )
+                        {
+                          wList.push_back(Triple<St,St,St>(toSt,frit->fourth,srit->fourth));
+                          visited.insert(toSt);
+                        }
+                      
+                      if( isFinalState(frit->third) && other.isFinalState(srit->third) )
+                        worklistNWA->addFinalState(toSt);
+                      else
+                        worklistNWA->addState(toSt);
+                        
+                      //Add the transition to the intersection NWA.  
+                      worklistNWA->addReturnTrans( from.first, predSt, sym, toSt );
+                    }            
+                  }            
+                }
+              
+                /* NOTE: assuming absentAccept is false for both machines
+                else if( thisReturns.empty() && !otherReturns.empty() )
+                {
+                  //only this has no edges  
+                  //if this is acceptAbsent, then follow the path of
+                  //otherCalls with a dummy value for the this state?
+                }
+                else if( !thisReturns.empty() && otherReturns.empty() )
+                {
+                  //only other has no edges
+                  //if other is acceptAbsent, then follow the path
+                  //of thisCalls with a dummy value for the other state?
+                }
+                //otherwise, both have no matching edges so there is no path to follow
+                */
+              }
+            }
+          }
+        }
+        
+        wList.pop_front();
+      }
+     
+      return worklistNWA;
     }
   
     //Using NWAs
@@ -2383,11 +3048,12 @@ namespace wali
      * using PDS reachability
      * 
      */
-    template<typename StKey,typename Label > 
-    wpds::WPDS NWA<StKey,Label>::plusWPDS( wpds::WPDS base )
-    {
+    template<typename St,typename Sym > 
+    wpds::WPDS NWA<St,Sym>::plusWPDS( wpds::WPDS base )
+    { //FIX
+      //TODO: how does this react to absentAcceptance & State/Symbol types
       wpds::WPDS result = wpds::WPDS();
-      wpds::WpdsRules rules = wpds::WpdsRules();
+      /*wpds::WpdsRules rules = wpds::WpdsRules();
       
       base.for_each(rules);
       
@@ -2460,7 +3126,7 @@ namespace wali
             }
           }
         }
-      }      
+      }     */ 
       
       return result;
     }
@@ -2472,13 +3138,14 @@ namespace wali
      * @return the NWA equivalent to the given PDS
      *
      */
-    template<typename StKey,typename Label > 
-    nwa::NWA<StKey,Label> NWA<StKey,Label>::PDStoNWA(wpds::WPDS pds)
-    {
-      nwa::NWA<StKey,Label> result = nwa::NWA<StKey,Label>();
+    template<typename St, typename Sym > 
+    nwa::NWA<St,Sym> NWA<St,Sym>::PDStoNWA(wpds::WPDS pds)
+    { //FIX
+      //TODO: how does this react to absentAcceptance & State/Symbol types
+      nwa::NWA<St,Sym> result = nwa::NWA<St,Sym>();
       
-      std::map<Key,Key> call_return;
-      
+      std::map<St,St> call_return;
+      /*
       wpds::WpdsRules rules = wpds::WpdsRules();
       
       pds.for_each(rules);
@@ -2518,7 +3185,7 @@ namespace wali
                                 it->from_stack(),                             //sym
                                 getKey( it->to_state(),cr_it->second ));      //to
       }
-      
+      */
       return result;    
     }
     
@@ -2529,62 +3196,71 @@ namespace wali
      * @return the PDS equivalent to this NWA
      *
      */
-    template<typename StKey,typename Label > 
-    wpds::WPDS NWA<StKey,Label>::NWAtoPDS(NWA<StKey,Label> nwa,wali::sem_elem_t one)
-    {
+    template<typename St,typename Sym> 
+    wpds::WPDS NWA<St,Sym>::NWAtoPDS(NWA<St,Sym> nwa,wali::sem_elem_t one)
+    //wpds::WPDS NWA<St,Sym>::NWAtoPDS(NWA<St,Sym> nwa,WeightMaker wm)
+    { //FIX
+      //TODO: how does this react to absentAcceptance???
+      //NOTE: assume stuck state is rejecting
       wpds::WPDS result = wpds::WPDS();
       std::map< Key,Key > calls;
       
       Key program = wali::getKey("program"); 
       
       //Internal Transitions
-      for( std::set< KeyTriple >::iterator iit = nwa.trans->beginInternal();
+      for( internalIterator iit = nwa.trans->beginInternal();
             iit != nwa.trans->endInternal(); iit++ )
-      {
-        result.add_rule(program,          //from_state
-                        iit->first,       //from_stack
-                        program,          //to_state
-                        iit->third,       //to_stack1
-                        one);       //weight      
+      {      
+        wali::sem_elem_t wgt = one;
+        //wali::sem_elem_t wgt = wm.getweight(iit->first,iit->second.getLabel(),INTRA,iit->third);
+        
+        result.add_rule(program,                    //from_state
+                        iit->first->getKey(),       //from_stack
+                        program,                    //to_state
+                        iit->third->getKey(),       //to_stack1
+                        wgt);                       //weight      
       }
       
       //Call Transitions
-      for( std::set< KeyTriple >::iterator cit = nwa.trans->beginCall();
+      for( callIterator cit = nwa.trans->beginCall();
             cit != nwa.trans->endCall(); cit++ )
       {
-        for( std::set< KeyQuad >::iterator rit = nwa.trans->beginReturn();
+        for( returnIterator rit = nwa.trans->beginReturn();
               rit != nwa.trans->endReturn(); rit++ )
           if( cit->first == rit->second )
           {
             //for each return site with cit->first as call site ...
-            Key ret = getKey(rit->fourth,rit->fourth); // (r,r)
-            calls.insert(std::pair<Key,Key>(cit->first,ret));
+            Key ret = getKey(rit->fourth->getKey(),rit->fourth->getKey()); // (r,r)
+            calls.insert(std::pair<Key,Key>(cit->first->getKey(),ret));
+            
+            wali::sem_elem_t wgt = one;
+            //wali::sem_elem_t wgt = wm.getweight(cit->first,cit->second.getLabel(),CALL_TO_ENTRY,cit->third);
             
             result.add_rule(program,          //from_state
-                            cit->first,       //from_stack
+                            cit->first->getKey(),       //from_stack
                             program,          //to_state
-                            cit->third,       //to_stack1
+                            cit->third->getKey(),       //to_stack1
                             ret,              //to_stack2
-                            one);       //weight  
+                            wgt);       //weight  
           }  
       }
       
       //Return Transitions
-      for( std::set< KeyQuad >::iterator rit = nwa.trans->beginReturn();
+      for( returnIterator rit = nwa.trans->beginReturn();
             rit != nwa.trans->endReturn(); rit++ )
       {
-        Key rstate = getKey(program,rit->first); // (p,x_i)
+        Key rstate = getKey(program,rit->first->getKey()); // (p,x_i)
         result.add_rule(program,          //from_state
-                        rit->first,       //from_stack
+                        rit->first->getKey(),       //from_stack
                         rstate,           //to_state
                         one);       //weight 
         
-        std::map<Key,Key>::iterator ret = calls.find(rit->second);
+        std::map<Key,Key>::iterator ret = calls.find(rit->second->getKey());
         if( ret != calls.end() )          
           result.add_rule(rstate,         //from_state
-                          ret->second,    //from_stack
+                          ret->second->getKey(),    //from_stack
                           program,        //to_state
-                          rit->fourth,    //to_stack
+                          rit->fourth->getKey(),    //to_stack
                           one);     //weight    
         
       }
@@ -2600,13 +3276,14 @@ namespace wali
      * @return the NWA which is a deterministed equivalent to this NWA
      *
      */
-    template<typename StKey,typename Label > 
-    NWA<StKey,Label> & NWA<StKey,Label>::determinize( )
-    {
-      std::pair<NWA<StKey,Label>,StateMap> tmp = std::pair<NWA<StKey,Label>,StateMap>();
+    template<typename St,typename Sym > 
+    NWA<St,Sym> & NWA<St,Sym>::determinize( )
+    { //FIX
+      //TODO: how does this react to absentAcceptance & State/Symbol types
+      std::pair<NWA<St,Sym>,StateMap> tmp = std::pair<NWA<St,Sym>,StateMap>();
             
       //New initial state is {(q,q) | q is an element of Q (possibly Q_in?)}
-      Key newInitialState;
+      /*Key newInitialState;
       std::set<Key> initialStateSet;
       StatePairSet initialState = StatePairSet(); 
       bool first = true;
@@ -2646,7 +3323,7 @@ namespace wali
               break;
           }
         }          
-      }
+      }*/
    
       return tmp.first;
     }
@@ -2658,9 +3335,9 @@ namespace wali
      * @return true if the NWA is deterministic, false otherwise
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::isDeterministic( )
-    {
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::isDeterministic( )
+    { //FIX
       //TODO: optimize!!!
       //An NWA is not deterministic if there is not exactly one initial state
       if( sizeInitialStates() != 1)
@@ -2669,24 +3346,24 @@ namespace wali
       //An NWA is not deterministic if there are epsilon transitions to states
       //other than the error state or if there are multiple transitions of some
       //type that are identical except for the to state.
-      for( Trans::symbolIterator it = trans->beginSymbols();
-            it != trans->endSymbols(); it++ )
+      for( symbolIterator it = symbols.begin();
+              it != symbols.end(); it++ )
       {
         for( stateIterator sit = beginStates();
               sit != endStates(); sit++ )
         {
           //Check call transitions.
           int count = 0;
-          for( Trans::callIterator cit = trans->beginCall();
+          for( callIterator cit = trans->beginCall();
                 cit != trans->endCall(); cit++ )
           {
             //Epsilon transition to a state other than the error state.
-            if( *it == wali::WALI_EPSILON )
-              if( (cit->second == it->getLabelKey()) && (cit->third != wali::WALI_BAD_KEY) )
+            if( *it == Sym::getEpsilon() )
+              if( (cit->second == it) && (cit->third->getKey() != St::getBadKey()) )
                 return false;
             //Keep a count of multiple transitions with the same from
             //state and symbol(that is not epsilon).
-            else if( (cit->first == sit->getKey()) && (cit->second == it->getLabelKey()) )
+            else if( (cit->first == sit) && (cit->second == it) )
               count++;
           }
           if( count > 1 )
@@ -2694,16 +3371,16 @@ namespace wali
           
           //Check internal transitions.
           count = 0;
-          for( Trans::internalIterator iit = trans->beginInternal();
+          for( internalIterator iit = trans->beginInternal();
                 iit != trans->endInternal(); iit++ )
           {
             //Epsilon transition to a state other than the error state.
-            if( *it == wali::WALI_EPSILON )
-              if( (iit->second == it->getLabelKey()) && (iit->third != wali::WALI_BAD_KEY) )
+            if( *it == Sym::getEpsilon() )
+              if( (iit->second == it) && (iit->third->getKey() != St::getBadKey()) )
                 return false;
             //Keep a count of multiple transitions with the same from
             //state and symbol(that is not epsilon).
-            else if( (iit->first == sit->getKey()) && (iit->second == it->getLabelKey()) )
+            else if( (iit->first == sit) && (iit->second == it) )
               count++;
           }
           if( count > 1 )
@@ -2714,18 +3391,18 @@ namespace wali
           {
             //Check return transitions.
             count = 0;
-            for( Trans::returnIterator rit = trans->beginReturn();
+            for( returnIterator rit = trans->beginReturn();
                   rit != trans->endReturn(); rit++ )
             {
               //Epsilon transition to a state other than the error state.
-              if( *it == wali::WALI_EPSILON )
-                if( (rit->third == it->getLabelKey()) && (rit->fourth != wali::WALI_BAD_KEY) )
+              if( *it == Sym::getEpsilon() )
+                if( (rit->third == it) && (rit->fourth->getKey() != St::getBadKey()) )
                   return false;
               //Keep a count of multiple transitions with the same from
               //state and symbol(that is not epsilon).
-              else if( (rit->first == sit->getKey()) &&
-                  (rit->second == pit->getKey()) &&
-                  (rit->third == it->getLabelKey()) )
+              else if( (rit->first == sit) &&
+                  (rit->second == pit) &&
+                  (rit->third == it) )
                 count++;
             }
             if( count > 1 )
@@ -2745,8 +3422,8 @@ namespace wali
      *
      */
     //TODO: determinize prior to checking paths?
-    template<typename StKey,typename Label >
-    bool NWA<StKey,Label>::isEmpty( )
+    template<typename St,typename Sym >
+    bool NWA<St,Sym>::isEmpty( )
     {
       //An automaton with no initial states must accept only the empty
       //language.
@@ -2768,11 +3445,11 @@ namespace wali
         //accepted language is not the empty language.
         if( isFinalState(*it) )
           return false;
-        std::set< Key > visited = std::set< Key >();
-        visited.insert(it->getKey());
-        if( hasPath(it->getKey(), std::stack< Key >(), visited) )
+        std::set< St > visited = std::set< St >();
+        visited.insert(*it);
+        if( hasPath(it, std::stack< St >(), visited) )
           return false;
-        visited.erase(it->getKey());
+        visited.erase(*it);
       }
       return true;
     }
@@ -2787,17 +3464,18 @@ namespace wali
      * accepted by this NWA
      *
      */
-    template<typename StKey,typename Label >
-    bool NWA<StKey,Label>::isMember( nws::NWS word )
-    {
-      std::deque<WordRecConfig<StKey>> configs;
+    template<typename St,typename Sym >
+    bool NWA<St,Sym>::isMember( nws::NWS word )
+    { //FIX
+      //TODO: how does this react to absentAcceptance
+      std::deque<WordRecConfig<St>> configs;
       
       //Add a dummy call state for each call on the word stack
       for( wali::nws::NWS::iterator it = word.beginStack();
             it != word.endStack(); it++ );
       {
-        WordRecConfig<StKey> config = WordRecConfig<StKey>(word);
-        for( StateSet<State<StKey>>::iterator sit = initialStates.begin();
+        WordRecConfig<St> config = WordRecConfig<St>(word);
+        for( stateIterator sit = initialStates.begin();
               sit != initialStates.end(); sit++ )
           config.addCallState(*sit);
         
@@ -2805,7 +3483,7 @@ namespace wali
       }
         
       //Simulate the nested word 'word' on the NWA.
-      for( StateSet<State<StKey>>::iterator sit = initialStates.begin();
+      for( stateIterator sit = initialStates.begin();
             sit != initialStates.end(); sit++ ) 
       {
         //Follow the word from here and try to match it.
@@ -2825,8 +3503,8 @@ namespace wali
      * @return the output stream that was printed to
      *
      */
-    template<typename StKey,typename Label >
-    std::ostream & NWA<StKey,Label>::print( std::ostream & o) const
+    template<typename St,typename Sym >
+    std::ostream & NWA<St,Sym>::print( std::ostream & o) const
     {
       o << "Q: ";
       states.print(o);
@@ -2836,6 +3514,21 @@ namespace wali
       
       o << "Qf: ";
       finalStates.print(o);
+      if( absentAcceptance )
+        o << "Stuck state accepted." << "\n";   //TODO: move this to stateset
+    
+      o << "Sigma: " << "{ ";
+      bool first = true;
+      for( Symbols::const_iterator sit = symbols.begin(); sit != symbols.end(); sit++ )
+      { 
+        if(! first )
+          o << ", ";
+        else
+          first = false;
+        sit->print(o);
+      }
+      o << " }\n";
+      
     
       trans->print(o);
       return o;
@@ -2849,12 +3542,14 @@ namespace wali
      * @return true if this NWA is equivalent to the NWA 'other'
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::operator==( NWA<StKey,Label> & other )
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::operator==( NWA<St,Sym> & other )
     {
       return ( (states == other.states) &&
                 (initialStates == other.initialStates) &&
                 (finalStates == other.finalStates) &&
+                (absentAcceptance == other.absentAcceptance) &&
+                (symbols == other.symbols) &&
                 (trans == other.trans) );
     }
   
@@ -2865,8 +3560,8 @@ namespace wali
      * @return the number of states associated with this NWA
      *
      */
-    template<typename StKey,typename Label > 
-    size_t NWA<StKey,Label>::numStates( )
+    template<typename St,typename Sym > 
+    size_t NWA<St,Sym>::numStates( )
     {
       return sizeStates();
     }
@@ -2880,8 +3575,8 @@ namespace wali
      * with this NWA
      *
      */
-    template<typename StKey,typename Label > 
-    size_t NWA<StKey,Label>::numTrans( )
+    template<typename St,typename Sym > 
+    size_t NWA<St,Sym>::numTrans( )
     {
       return trans->size();
     }
@@ -2898,15 +3593,16 @@ namespace wali
      * to a final state, false otherwise
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::hasPath( Key currState, std::stack< Key > calls, std::set< Key > visited )
-    {
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::hasPath( St currState, std::stack< St > calls, std::set< St > visited )
+    { //FIX
+      //TODO: absentAcceptance
       //Try each possible transition out of this state to see if a final state
       //can be reached.
       
       //First try call transitions.
       calls.push(currState);
-      for( Trans::callIterator cit = trans->beginCall();
+      for( callIterator cit = trans->beginCall();
             cit != trans->endCall(); cit++ )
       {
         //If the call starts from the current state and goes to a state not
@@ -2922,7 +3618,7 @@ namespace wali
       calls.pop();
       
       //If no call transition led to a path, try internal transitions.
-      for( Trans::internalIterator iit = trans->beginInternal();
+      for( internalIterator iit = trans->beginInternal();
             iit != trans->endInternal(); iit++ )
       {
         //If the call starts from the current state and goes to a state not
@@ -2937,9 +3633,9 @@ namespace wali
       }
       
       //If no internal transition led to a path, try return transitions.
-      Key callState = calls.top();
+      St callState = calls.top();
       calls.pop();
-      for( Trans::returnIterator rit = trans->beginReturn();
+      for( returnIterator rit = trans->beginReturn();
             rit != trans->endReturn(); rit++ )
       {
          if( (rit->first == currState) &&
@@ -2969,10 +3665,11 @@ namespace wali
      * @return true if the simulation ends in an accepting state
      *
      */
-    template<typename StKey,typename Label > 
-    bool NWA<StKey,Label>::matchWord( State<StKey> currState, std::deque<WordRecConfig<StKey>> configs )
-    {
-      WordRecConfig<StKey> config = configs.front();
+    template<typename St,typename Sym > 
+    bool NWA<St,Sym>::matchWord( St currState, std::deque<WordRecConfig<St>> configs )
+    { //FIX
+      //TODO: absentAcceptance
+      WordRecConfig<St> config = configs.front();
       configs.pop_front();  //remove this config
       
       //Base case: the word suffix has been completely processed 
@@ -3003,12 +3700,12 @@ namespace wali
       {
         config.addCallState(currState);
         
-        for( Trans::callIterator cit = trans->beginCall();
+        for( callIterator cit = trans->beginCall();
               cit != trans->endCall(); cit++ )
         {
           //If this symbol in the word can be matched, try matching
           //the rest of the word.
-          if( (cit->first == currState.getKey()) &&
+          if( (cit->first == currState) &&
               (cit->second == currNode->getSymbol()) )
           {
             configs.push_back(config);
@@ -3023,15 +3720,15 @@ namespace wali
       }
       else if( currNode == config.getCall() )
       {
-        State<StKey> callState = config.getCallState();
+        St callState = config.getCallState();
         config.removeCallState();
-        for( Trans::returnIterator rit = trans->beginReturn();
+        for( returnIterator rit = trans->beginReturn();
               rit != trans->endReturn(); rit++ )
         {
           //If this symbol in the word can be matched, try matching
           //the rest of the word.
-          if( (rit->first == currState.getKey()) &&
-              (rit->second == callState.getKey()) &&
+          if( (rit->first == currState) &&
+              (rit->second == callState) &&
               (rit->third == currNode->getSymbol()) )
           {
             configs.push_back(config);
@@ -3046,12 +3743,12 @@ namespace wali
       }
       else
       {
-        for( Trans::internalIterator iit = trans->beginInternal();
+        for( internalIterator iit = trans->beginInternal();
               iit != trans->endInternal(); iit++ )
         {
           //If this symbol in the word can be matched, try matching
           //the rest of the word.
-          if( (iit->first == currState.getKey()) &&
+          if( (iit->first == currState) &&
               (iit->second == currNode->getSymbol()) )
           {
             configs.push_back(config);
@@ -3076,17 +3773,19 @@ namespace wali
      * that is equivalent to this NWA
      *
      */
-    template<typename StKey,typename Label > 
-    std::pair<NWA<StKey,Label>,typename NWA<StKey,Label>::StateMap> NWA<StKey,Label>::det( NWA<StKey,Label> nWdAut,StateMap stateMap, StatePairSet currState,
+    template<typename St,typename Sym > 
+    std::pair<NWA<St,Sym>,typename NWA<St,Sym>::StateMap> NWA<St,Sym>::det( NWA<St,Sym> nWdAut,
+                                          StateMap stateMap, StatePairSet currState,
                                           std::stack<StatePairSet> callPred )
-    {
+    { //FIX
+      //TODO: absentAcceptance & State/Symbol type
       //Internal Transition
-      for( Trans::symbolIterator it = nWdAut.trans->beginSymbols();
-            it != nWdAut.trans->endSymbols(); it++ )
+      /*for( symbolIterator it = nWdAut.symbols.begin();
+            it != nWdAut.symbols.end(); it++ )
       {        
         StatePairSet internalTrans;
         //Find all internal transitions that use this symbol.
-        for( Trans::internalIterator iit = nWdAut.trans->beginInternal();
+        for( internalIterator iit = nWdAut.trans->beginInternal();
               iit != nWdAut.trans->endInternal(); iit++ )
         {
           //If the symbols match, make a new state pair set.
@@ -3149,6 +3848,7 @@ namespace wali
         //Add a transition.
         KeyTriple newInternalTrans = 
               KeyTriple(stateMap.find(currState)->second.getKey(),it->getLabelKey(),tmpInternalKey);
+        //TODO: check isState/isSymbol
         nWdAut.trans->addInternal(newInternalTrans);
         
         if(recurse)
@@ -3161,8 +3861,8 @@ namespace wali
            
         //Call Transition  
         //??Does this only need to be done once??      
-        for( Trans::symbolIterator it = nWdAut.trans->beginSymbols();
-              it != nWdAut.trans->endSymbols(); it++ )
+        for( symbolIterator it = nWdAut.symbols.begin();
+              it != nWdAut.symbols.end(); it++ )
         {        
           //At a call position labeled a, the summary gets reinitialized: 
           //the new state contains pairs of the form (q,q'), where (q,a,q')
@@ -3201,6 +3901,7 @@ namespace wali
           //Add a transition.
           KeyTriple newCallTrans = 
                 KeyTriple(stateMap.find(currState)->second.getKey(),it->getLabelKey(),tmpCallKey);
+          //TODO: check isState/isSymbol
           nWdAut.trans->addCall(newCallTrans);
           
           if(recurse)
@@ -3213,8 +3914,8 @@ namespace wali
         }
         
         //Return Transition
-        for( Trans::symbolIterator it = nWdAut.trans->beginSymbols();
-              it != nWdAut.trans->endSymbols(); it++ )
+        for( symbolIterator it = nWdAut.symbols.begin();
+              it != nWdAut.symbols.end(); it++ )
         { 
           //Consider a return position labeled a, and suppose S denotes the
           //current state and S' denotes the state just before the call-predecessor.
@@ -3279,6 +3980,7 @@ namespace wali
           //Add a transition.
           KeyQuad newReturnTrans = 
                 KeyQuad(stateMap.find(currState)->second.getKey(),tmpCallKey,it->getLabelKey(),tmpReturnKey);
+          //TODO: check isState/isSymbol
           nWdAut.trans->addReturn(newReturnTrans);
           
           if(recurse)
@@ -3289,9 +3991,10 @@ namespace wali
             stateMap = result.second;
           }
         }
-            
-      return std::pair<NWA<StKey,Label>,StateMap>(nWdAut,stateMap);
+         */   
+      return std::pair<NWA<St,Sym>,StateMap>(nWdAut,stateMap);
     }
+
   }
 }
 #endif
