@@ -223,7 +223,7 @@ namespace wali
          * @return true if the state with the given name is an initial state
          *
          */
-        bool isInitialState( St name ); 
+        bool isInitialState( St name ) const;
 
         /**
          *
@@ -337,7 +337,7 @@ namespace wali
          * @return true if the state with the given name is a final state
          *
          */
-        bool isFinalState( St name ); 
+        bool isFinalState( St name ) const;
 
         /**
          *
@@ -448,7 +448,7 @@ namespace wali
          * @return the number of initial states associated with this NWA
          *
          */
-        size_t sizeInitialStates( );
+        size_t sizeInitialStates( ) const;
         
         /**
          *
@@ -461,7 +461,7 @@ namespace wali
          * @return the number of final states associated with this NWA
          *
          */
-        size_t sizeFinalStates( );
+        size_t sizeFinalStates( ) const;
 
         //Symbol Accessors
 
@@ -776,7 +776,7 @@ namespace wali
          *  set
          *
          */
-        internalIterator beginInternalTrans();
+        internalIterator beginInternalTrans() const;
         
         /**
          * 
@@ -789,7 +789,7 @@ namespace wali
          * transition set
          *
          */
-        internalIterator endInternalTrans();
+        internalIterator endInternalTrans() const;
 
         /**
          *
@@ -1103,7 +1103,7 @@ namespace wali
          * @return true if this NWA is equivalent to the NWA 'other'
          *
          */
-        bool operator==( NWA & other );
+        bool operator==( const NWA & other ) const;
 
         /**
          *
@@ -1212,7 +1212,7 @@ namespace wali
       finalStates = States();
       
       symbols = Symbols();
-      addSymbol(Sym::getEpsilon()); 
+      //addSymbol(Sym::getEpsilon()); 
       
       trans = new Trans();
       
@@ -1462,7 +1462,7 @@ namespace wali
      *
      */
     template<typename St,typename Sym > 
-    bool NWA<St,Sym>::isInitialState( St name )
+    bool NWA<St,Sym>::isInitialState( St name ) const
     {
       return initialStates.contains(name); 
     }
@@ -1589,7 +1589,7 @@ namespace wali
      *
      */
     template<typename St,typename Sym > 
-    bool NWA<St,Sym>::isFinalState( St name )
+    bool NWA<St,Sym>::isFinalState( St name ) const
     {
       return finalStates.contains(name);
     }
@@ -1713,7 +1713,7 @@ namespace wali
      *
      */
     template<typename St,typename Sym > 
-    size_t NWA<St,Sym>::sizeInitialStates( )
+    size_t NWA<St,Sym>::sizeInitialStates( ) const
     {
       return initialStates.size();
     }
@@ -1726,7 +1726,7 @@ namespace wali
      *
      */
     template<typename St,typename Sym > 
-    size_t NWA<St,Sym>::sizeFinalStates( )
+    size_t NWA<St,Sym>::sizeFinalStates( ) const
     {
       if( absentAcceptance )
         return finalStates.size() + 1;
@@ -2135,7 +2135,7 @@ namespace wali
      *
      */
     template<typename St,typename Sym>
-    typename NWA<St,Sym>::internalIterator NWA<St,Sym>::beginInternalTrans()
+    typename NWA<St,Sym>::internalIterator NWA<St,Sym>::beginInternalTrans() const
     {
       return trans->beginInternal();
     }
@@ -2149,7 +2149,7 @@ namespace wali
      *
      */
     template<typename St,typename Sym>
-    typename NWA<St,Sym>::internalIterator NWA<St,Sym>::endInternalTrans()
+    typename NWA<St,Sym>::internalIterator NWA<St,Sym>::endInternalTrans() const
     {
       return trans->endInternal();
     }
@@ -3543,7 +3543,7 @@ namespace wali
      *
      */
     template<typename St,typename Sym > 
-    bool NWA<St,Sym>::operator==( NWA<St,Sym> & other )
+    bool NWA<St,Sym>::operator==( const NWA<St,Sym> & other ) const
     {
       return ( (states == other.states) &&
                 (initialStates == other.initialStates) &&
