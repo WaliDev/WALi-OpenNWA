@@ -931,6 +931,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\Source\wali\nwa\WeightGen.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\Source\wali\nwa\WordRecConfig.hpp"
 					>
 				</File>

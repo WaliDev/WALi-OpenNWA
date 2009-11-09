@@ -122,7 +122,7 @@ namespace wali
         //Join the two states.
         Key newKey = wali::getKey(stateKey,other.stateKey);  
       
-        result.setKey( newKey );
+        result.setStateKey( newKey );
       
         return true;
       }
@@ -174,6 +174,17 @@ namespace wali
     protected:
       T name;
       Key stateKey;
+      
+      /* TODO: add maps to speed up transition search
+      set<InternalTrans*> intraOutgoing;
+      set<InternalTrans*> intraIncoming;
+      set<CallTrans*> callToEntry;
+      set<CallTrans*> entryToCall;
+      set<ReturnTrans*> retToExit;
+      set<ReturnTrans*> exitToRet;
+      set<ReturnTrans*> retToCall; 
+      set<ReturnTrans*> callToRet;  
+      */
     };
     
     //Constructors

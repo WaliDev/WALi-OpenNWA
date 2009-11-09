@@ -147,7 +147,7 @@ namespace wali
        * @return true if this Symbol is equivalent to the Symbol 'other'
        *
        */
-      bool operator==( const Symbol & other );
+      bool operator==( const Symbol & other ) const;
       
       /**
        *
@@ -289,7 +289,7 @@ namespace wali
      *
      */
     template<typename T>
-    bool Symbol<T>::operator==( const Symbol & other )
+    bool Symbol<T>::operator==( const Symbol & other ) const
     {
       if( symbolKey == other.symbolKey )
         return true;

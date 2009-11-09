@@ -20,6 +20,8 @@
 #include "wali/wpds/RuleFunctor.hpp"
 #include "wali/wpds/Rule.hpp"
 
+#include "wali/nwa/WeightGen.hpp"
+
 // std::c++
 #include <iostream>
 #include <map>
@@ -1025,7 +1027,8 @@ namespace wali
          * @return the PDS equivalent to this NWA
          *
          */
-        static wpds::WPDS NWAtoPDS(NWA nwa,wali::sem_elem_t one); //FIX
+        //static wpds::WPDS NWAtoPDS(NWA nwa,wali::sem_elem_t one); 
+        static wpds::WPDS NWAtoPDS(NWA<St,Sym> nwa,WeightGen<St,Sym> wg);
     
         /**
          *
@@ -1793,7 +1796,7 @@ namespace wali
     {
       for( symbolIterator sit = addSymbolSet.begin();
             sit != addSymbolSet.end(); sit++ )
-        symbols.add(*sit);
+        symbols.insert(*sit);
     }
     
    
@@ -3197,28 +3200,35 @@ namespace wali
      *
      */
     template<typename St,typename Sym> 
-    wpds::WPDS NWA<St,Sym>::NWAtoPDS(NWA<St,Sym> nwa,wali::sem_elem_t one)
-    //wpds::WPDS NWA<St,Sym>::NWAtoPDS(NWA<St,Sym> nwa,WeightMaker wm)
+    //wpds::WPDS NWA<St,Sym>::NWAtoPDS(NWA<St,Sym> nwa,wali::sem_elem_t one)
+    wpds::WPDS NWA<St,Sym>::NWAtoPDS(NWA<St,Sym> nwa,WeightGen<St,Sym> wg)
     { //FIX
       //TODO: how does this react to absentAcceptance???
-      //NOTE: assume stuck state is rejecting
+      //NOTE: for now assume stuck state is rejecting
       wpds::WPDS result = wpds::WPDS();
       std::map< Key,Key > calls;
       
       Key program = wali::getKey("program"); 
+      wali::sem_elem_t wgt;
       
       //Internal Transitions
       for( internalIterator iit = nwa.trans->beginInternal();
             iit != nwa.trans->endInternal(); iit++ )
       {      
-        wali::sem_elem_t wgt = one;
-        //wali::sem_elem_t wgt = wm.getweight(iit->first,iit->second.getLabel(),INTRA,iit->third);
+        //(q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
+        //where the weight w depends on sigma
+         
+        //wali::sem_elem_t wgt = one;
+         wgt = wg.getWeight(iit->first,
+                            iit->second,
+                            WeightGen<St,Sym>::INTRA,
+                            iit->third);
         
-        result.add_rule(program,                    //from_state
-                        iit->first->getKey(),       //from_stack
-                        program,                    //to_state
-                        iit->third->getKey(),       //to_stack1
-                        wgt);                       //weight      
+        result.add_rule(program,                //from_state (p)
+                        iit->first.getStateKey(),   //from_stack (q)
+                        program,                //to_state (p)
+                        iit->third.getStateKey(),   //to_stack1 (q')
+                        wgt);                   //weight      
       }
       
       //Call Transitions
@@ -3230,18 +3240,27 @@ namespace wali
           if( cit->first == rit->second )
           {
             //for each return site with cit->first as call site ...
-            Key ret = getKey(rit->fourth->getKey(),rit->fourth->getKey()); // (r,r)
-            calls.insert(std::pair<Key,Key>(cit->first->getKey(),ret));
+            //Key ret = getKey(rit->fourth.getStateKey(),rit->fourth.getStateKey()); // (r,r)
+            //calls.insert(std::pair<Key,Key>(cit->first.getStateKey(),ret));
+            calls.insert(std::pair<Key,Key>(cit->first.getStateKey(),rit->fourth.getStateKey()));
             
-            wali::sem_elem_t wgt = one;
-            //wali::sem_elem_t wgt = wm.getweight(cit->first,cit->second.getLabel(),CALL_TO_ENTRY,cit->third);
+            //(q_c,sigma,q_e) in delta_c and (*,q_c,*,q_r) in delta_r goes to
+            // <p,q_c> -w-> <p,q_e r'> in delta_2 where r' = (q_r,q_r) (or q_r?)
+            // and the weight w depends on sigma
+           
+            //wali::sem_elem_t wgt = one;
+            wgt = wg.getWeight(cit->first,
+                               cit->second,
+                               WeightGen<St,Sym>::CALL_TO_ENTRY,
+                               cit->third);
             
-            result.add_rule(program,          //from_state
-                            cit->first->getKey(),       //from_stack
-                            program,          //to_state
-                            cit->third->getKey(),       //to_stack1
-                            ret,              //to_stack2
-                            wgt);       //weight  
+            result.add_rule(program,                //from_state (p)
+                            cit->first.getStateKey(),   //from_stack (q_c)
+                            program,                //to_state (p)
+                            cit->third.getStateKey(),   //to_stack1 (q_e)
+                            //ret,                    //to_stack2 (r')
+                            rit->fourth.getStateKey(),  //to_stack2 (r')
+                            wgt);                   //weight  
           }  
       }
       
@@ -3249,19 +3268,36 @@ namespace wali
       for( returnIterator rit = nwa.trans->beginReturn();
             rit != nwa.trans->endReturn(); rit++ )
       {
-        Key rstate = getKey(program,rit->first->getKey()); // (p,x_i)
-        result.add_rule(program,          //from_state
-                        rit->first->getKey(),       //from_stack
-                        rstate,           //to_state
-                        one);       //weight 
+        //(q_x,q_c,sigma,q_r) in delta_r goes to 
+        // <p,q_x> -w1-> <p_q_x,epsilon> in delta_0
+        // and <p_q_x,r'> -w2-> <p,q_r> in delta_1
+        // where p_q_x = (q_x,q_c), r' = (q_r,q_r)
+        // w1 depends on sigma, and w2 depends on ???
         
-        std::map<Key,Key>::iterator ret = calls.find(rit->second->getKey());
+        //wali::sem_elem_t wgt = one;
+        wgt = wg.getOne();
+        
+        //Key rstate = getKey(program,rit->first.getStateKey()); // (p,q_x)
+        Key rstate = getKey(rit->first.getStateKey(),rit->second.getStateKey());  //p_q_x
+        
+        result.add_rule(program,                //from_state (p)
+                        rit->first.getStateKey(),   //from_stack (q_x)
+                        rstate,                 //to_state (p_q_x == (q_x,q_c))
+                        wgt);                   //weight 
+        
+        
+        wgt = wg.getWeight(rit->first, 
+                           rit->third.getLabel(),
+                           WeightGen<St,Sym>::EXIT_TO_RET,  
+                           rit->fourth);  
+                           
+        std::map<Key,Key>::iterator ret = calls.find(rit->second.getStateKey());
         if( ret != calls.end() )          
-          result.add_rule(rstate,         //from_state
-                          ret->second->getKey(),    //from_stack
-                          program,        //to_state
-                          rit->fourth->getKey(),    //to_stack
-                          one);     //weight    
+          result.add_rule(rstate,                   //from_state (p_q_x == (q_x,q_c))
+                          ret->second,    //from_stack (r')
+                          program,                  //to_state (p)
+                          rit->fourth.getStateKey(),    //to_stack (q_r)
+                          wgt);                     //weight    
         
       }
       
