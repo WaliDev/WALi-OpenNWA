@@ -10,7 +10,7 @@
  
   namespace nwa
   {
-    template<typename St,typename Sym>
+    template<typename St,typename Sym, typename W>
     class WeightGen
     {
       public:
@@ -24,9 +24,14 @@
         //Constructors and Destructor
         WeightGen( ) { }
         
-        virtual sem_elem_t getOne();
+        W getOne() {
+          W w;
+          return w->one();
+        }
         
-        virtual sem_elem_t getWeight( St from, Sym inst, Kind kind, St to );
+        W getWeight( St from, Sym inst, Kind kind, St to ) {
+          return getOne();
+        }
     };
       
   }
