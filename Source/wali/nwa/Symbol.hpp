@@ -9,6 +9,7 @@
 #include "wali/Printable.hpp"
 #include "wali/Common.hpp"
 #include "wali/Key.hpp"
+#include "wali/KeySource.hpp"
 
 namespace wali
 {
@@ -19,6 +20,43 @@ namespace wali
     template<typename T>
     class Symbol : public Printable
     {
+    
+      //
+      // Nested Class
+      //
+      class SymbolSource : public KeySource
+      {
+        public:
+          SymbolSource( const T lbl )
+          {
+            this->lbl = lbl;
+          }
+          
+          ~SymbolSource() { }
+          
+          bool equal( KeySource * rhs )
+          {
+            SymbolSource *ssrc = dynamic_cast< SymbolSource* >(rhs);
+            if( ssrc != 0 )
+              return lbl == ssrc->lbl;
+            else
+              return false;
+          }
+          
+          size_t hash() const
+          {
+            return lbl.hash();  
+          }
+          
+          T getLabel() const
+          {
+            return lbl;
+          }
+          
+        private:
+          const T lbl;
+      };
+    
       //
       // Methods
       //
