@@ -171,7 +171,7 @@ namespace wali
       //
       // Variables
       //
-    protected:
+    public:
       T name;
       Key stateKey;
       

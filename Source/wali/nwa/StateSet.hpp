@@ -295,22 +295,22 @@ namespace wali
          * @return the number of states in this collection
          *
          */
-        size_t size( );
+        size_t size( ) const;
         
         /**
          * TODO
          */
-        size_t sizeStates( );
+        size_t sizeStates( ) const;
         
         /**
          * TODO
          */
-        size_t sizeInitialStates( );
+        size_t sizeInitialStates( ) const;
         
         /**
          * TODO
          */
-        size_t sizeFinalStates( );
+        size_t sizeFinalStates( ) const;
       
         /**
          * TODO: remove
@@ -325,7 +325,7 @@ namespace wali
          * states, false otherwise
          *
          */
-        bool contains( T state );
+        bool contains( T state ) const;
         
         /**
          * TODO
@@ -785,7 +785,7 @@ namespace wali
      *
      */
     template <typename T> 
-    size_t StateSet<T>::size( )
+    size_t StateSet<T>::size( ) const
     {
       return states.size();
     }
@@ -794,7 +794,7 @@ namespace wali
      * TODO
      */
     template <typename T> 
-    size_t StateSet<T>::sizeStates( )
+    size_t StateSet<T>::sizeStates( ) const
     {
       return states.size();
     }
@@ -803,7 +803,7 @@ namespace wali
      * TODO
      */
     template <typename T> 
-    size_t StateSet<T>::sizeInitialStates( )
+    size_t StateSet<T>::sizeInitialStates( ) const
     {
       return initialStates.size();
     }
@@ -812,7 +812,7 @@ namespace wali
      * TODO
      */
     template <typename T> 
-    size_t StateSet<T>::sizeFinalStates( )
+    size_t StateSet<T>::sizeFinalStates( ) const
     {
       return finalStates.size();
     }
@@ -828,7 +828,7 @@ namespace wali
      *
      */
     template <typename T> 
-    bool StateSet<T>::contains( T state )
+    bool StateSet<T>::contains( T state ) const
     {
       return (states.count(state) >  0);
     }
