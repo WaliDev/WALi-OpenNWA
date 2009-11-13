@@ -2208,7 +2208,7 @@ namespace wali
       
       Internal* it = new Internal(fromSt,sym,toSt);
       
-      trans->addInternal(it);
+      return trans->addInternal(it);
     }
     
     /**
