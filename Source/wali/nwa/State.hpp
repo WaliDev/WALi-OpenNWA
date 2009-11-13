@@ -30,7 +30,7 @@ namespace wali
     public:
       //Constructors and Destructor
       State( );
-      State( Key key );
+      /*State( Key key );*/
       State( T name );
       State( const State & other );
       State & operator=( const State & other );
@@ -54,7 +54,7 @@ namespace wali
        * @return the stuck state
        *
        */
-      static State<T> getStuckState();
+      /*static State<T> getStuckState();*/
       
       /**
        *  TODO: write comments
@@ -127,9 +127,8 @@ namespace wali
       //bool intersect( State other, State & result )
       {      
         //Join the two states.
-        Key newKey = wali::getKey(stateKey,other->stateKey);  
-      
-        result = State(newKey);
+       /* Key newKey = wali::getKey(stateKey,other.stateKey);  
+        result = State(newKey);*/
       
         return true;
       }
@@ -181,26 +180,32 @@ namespace wali
     protected:
       T name;
       Key stateKey;
-      static State<T> stuck;
+      //TODO removed stuck state
+      /*static State<T> stuck;*/
     };
-    
+
+    //TODO removed stuck state
+    /*
     template<typename T>
     State<T> State<T>::stuck = State<T>::State(wali::WALI_BAD_KEY);
-    
+    */
+
     //Constructors
-    template<typename T>
+    //TODO: removed stuck state
+    /*template<typename T>
     State<T>::State( )
     {
       *this = stuck;
-    }
-    
-    template<typename T>
-    State<T>::State(Key key)
-    {
-      //TODO: if( key != wali::WALI_BAD_KEY ) complain!
-      stateKey = key;
-    }
-    
+    }*/
+
+    //TODO: removed stuck state
+    //template<typename T>
+    //State<T>::State(Key key)
+    //{
+    //  //TODO: if( key != wali::WALI_BAD_KEY ) complain!
+    //  stateKey = key;
+    //}
+    //
     template<typename T>
     State<T>::State( T name )
     {
@@ -211,11 +216,12 @@ namespace wali
     template<typename T>
     State<T>::State( const State & other )
     {
-      if( other.isStuckState() )
+      //TODO: removed stuck state
+      /*if( other.isStuckState() )
       {
         *this = stuck;
       }
-      else
+      else*/
       {
         name = other.name;
         stateKey = other.stateKey;
@@ -252,11 +258,12 @@ namespace wali
     template<typename T>
     State<T> & State<T>::operator=( const State & other )
     {
-      if( other.isStuckState() )
+      //TODO removed stuck state
+      /*if( other.isStuckState() )
       {
         *this = stuck;
       }
-      else
+      else*/
       {
         name = other.name;
         stateKey = other.stateKey;
@@ -302,24 +309,25 @@ namespace wali
     }*/
     
     /**
-     *
+     * TODO: stuck state removed
      * @brief access the stuck state
      *
      * @return the stuck state
      *
      */
-    template<typename T>
+    /*template<typename T>
     State<T> State<T>::getStuckState()
     {
       return stuck;
     }
-    
+    */
     template<typename T>
     bool State<T>::isStuckState() const
     {
-      if( *this == stuck )
+      //TODO: removing stuck state handling
+     /* if( *this == stuck )
         return true;
-      else
+      else*/
         return false;
     }
     
@@ -398,8 +406,9 @@ namespace wali
     template<typename T>
     std::ostream & State<T>::print( std::ostream & o ) const
     {
-      if( !isStuckState() )
-        printKey(o,stateKey);
+      //TODO: removed stuck state
+      //if( !isStuckState() )
+      //  printKey(o,stateKey);
       return o;
     }
     
