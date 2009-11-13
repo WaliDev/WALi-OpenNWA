@@ -606,6 +606,15 @@ namespace wali
          */
         bool getSymbol( StName from, StName to, Sym &sym );
         
+
+        //Transition Accessors
+        //TODO: return true and some symbol which occurs on the edge from source to
+        //dest in sym else return false
+        /**
+         * TODO: write comments
+         */
+        bool findTrans( StName from, const Sym &sym, StName to) const;
+        
         /**
          *
          * @brief remove all transitions from the NWA
@@ -1389,14 +1398,14 @@ namespace wali
     St* NWA<St,StName,Sym>::duplicateState(StName orig,StName dup)
     {
       St* origSt = getState(orig);
-      St dupSt = St(dup);
+      St* dupStPtr = new St(dup);
       
-      states.addState(dupSt);
-      states.dupState(*origSt,dupSt);
+      states.addState(*dupStPtr);
+      states.dupState(*origSt,*dupStPtr);
 
-      trans->dupTrans(*origSt,dupSt);
+      trans->dupTrans(*origSt,*dupStPtr);
 
-      return &dupSt;
+      return dupStPtr;
     }
     
     //All States
@@ -1957,6 +1966,20 @@ namespace wali
       return trans->getSymbol(*fromSt,*toSt,sym);
     }
     
+    //TODO: return true if the symbol occurs on the edge from source to
+    //dest in sym else return false
+    /**
+     * TODO: write comments
+     */
+    template<typename St,typename StName,typename Sym >
+    bool NWA<St,StName,Sym>::findTrans( StName from, const Sym &sym, StName to) const
+    {
+      St* fromSt = getState(from);
+      St* toSt = getState(to);
+
+      return trans->findTrans(*fromSt,sym, *toSt);
+    }
+
     /**
      *
      * @brief returns the number of symbols associated with this NWA
