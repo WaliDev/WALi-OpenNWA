@@ -54,6 +54,11 @@ namespace wali
         bool getSymbol(St from, St to, Sym & sym);
 
         /**
+        * TODO
+        */
+        bool findTrans(St from, const Sym & sym, St to) const;
+
+        /**
          * TODO
          */
         std::set<St*> getReturnSites(St callSite);
@@ -741,6 +746,51 @@ namespace wali
         if( toSt == (*it)->fourth )
         {
           sym = (*it)->third;
+          return true;
+        }
+      }
+      //TODO: Q: does this count as a symbol we would like to have?
+      /*const Info::Returns pred = T_info.pred(fromSt);
+      for( Info::Returns::const_iterator it = pred.begin(); it != pred.end(); it++ )
+      {
+        if( toSt == (*it)->fourth )
+        {
+          sym = (*it)->third;
+          return true;
+        }
+      }*/
+      
+      return false;
+    }
+
+
+    /**
+     * TODO
+     */
+    template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    bool TransSet<St,Sym,Call,Internal,Return>::findTrans(St fromSt, const Sym & sym, St toSt) const
+    {
+      const Info::Internals from = T_info.from(fromSt);
+      for( Info::Internals::const_iterator it = from.begin(); it != from.end(); it++ )
+      {
+        if( toSt == (*it)->third && sym==(*it).second)
+          return true;
+      }
+      
+      const Info::Calls call = T_info.call(fromSt);
+      for( Info::Calls::const_iterator it = call.begin(); it != call.end(); it++ )
+      {
+        if( toSt == (*it)->third && sym == (*it)->second)
+        {
+          return true;
+        }
+      }
+            
+      const Info::Returns exit = T_info.exit(fromSt);
+      for( Info::Returns::const_iterator it = exit.begin(); it != exit.end(); it++ )
+      {
+        if( toSt == (*it)->fourth && sym == (*it)->third)
+        {
           return true;
         }
       }
