@@ -927,6 +927,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\Source\wali\nwa\TransInfo.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\Source\wali\nwa\TransSet.hpp"
 					>
 				</File>

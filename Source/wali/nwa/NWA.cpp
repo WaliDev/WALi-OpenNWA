@@ -23,36 +23,36 @@ int main()
   wali::nwa::State<std::string> ret = wali::nwa::State<std::string>("return");
   wali::nwa::State<std::string> end = wali::nwa::State<std::string>("end");
   
-  wali::nwa::Symbol<std::string> epsilon = wali::nwa::Symbol<std::string>::getEpsilon();
+  wali::nwa::Symbol<std::string>* epsilon = wali::nwa::Symbol<std::string>::getEpsilon();
   wali::nwa::Symbol<std::string> callInst = wali::nwa::Symbol<std::string>("callInst");
   wali::nwa::Symbol<std::string> intraInst = wali::nwa::Symbol<std::string>("intraInst");
   wali::nwa::Symbol<std::string> retInst = wali::nwa::Symbol<std::string>("retInst");
   wali::nwa::Symbol<std::string> sym;
   
-  wali::Triple<wali::nwa::State<std::string>,wali::nwa::Symbol<std::string>,
-        wali::nwa::State<std::string>> callTrans = 
-                wali::Triple<wali::nwa::State<std::string>,wali::nwa::Symbol<std::string>,
-                        wali::nwa::State<std::string>>(call,callInst,entry);
-  wali::Triple<wali::nwa::State<std::string>,wali::nwa::Symbol<std::string>,
-        wali::nwa::State<std::string>> internalTrans = 
-                wali::Triple<wali::nwa::State<std::string>,wali::nwa::Symbol<std::string>,
-                        wali::nwa::State<std::string>>(entry,intraInst,exit);
-  wali::Quad<wali::nwa::State<std::string>,wali::nwa::State<std::string>,
-      wali::nwa::Symbol<std::string>,wali::nwa::State<std::string>> returnTrans = 
-                wali::Quad<wali::nwa::State<std::string>,wali::nwa::State<std::string>,
-                      wali::nwa::Symbol<std::string>,wali::nwa::State<std::string>>(exit,call,retInst,ret);
+  wali::Triple<wali::nwa::State<std::string>*,wali::nwa::Symbol<std::string>*,
+        wali::nwa::State<std::string>*> callTrans = 
+                wali::Triple<wali::nwa::State<std::string>*,wali::nwa::Symbol<std::string>*,
+                        wali::nwa::State<std::string>*>(&call,&callInst,&entry);
+  wali::Triple<wali::nwa::State<std::string>*,wali::nwa::Symbol<std::string>*,
+        wali::nwa::State<std::string>*> internalTrans = 
+                wali::Triple<wali::nwa::State<std::string>*,wali::nwa::Symbol<std::string>*,
+                        wali::nwa::State<std::string>*>(&entry,&intraInst,&exit);
+  wali::Quad<wali::nwa::State<std::string>*,wali::nwa::State<std::string>*,
+      wali::nwa::Symbol<std::string>*,wali::nwa::State<std::string>*> returnTrans = 
+                wali::Quad<wali::nwa::State<std::string>*,wali::nwa::State<std::string>*,
+                      wali::nwa::Symbol<std::string>*,wali::nwa::State<std::string>*>(&exit,&call,&retInst,&ret);
   
   myNWA.isAbsentAccept();
   myNWA.acceptAbsent();
   myNWA.rejectAbsent();
   
-  myNWA.addInitialState(start);
-  myNWA.addState(state);
-  myNWA.addState(call);
-  myNWA.addState(entry);
-  myNWA.addState(exit);
-  myNWA.addState(ret);
-  myNWA.addFinalState(end);
+  myNWA.addInitialState(&start);
+  myNWA.addState(&state);
+  myNWA.addState(&call);
+  myNWA.addState(&entry);
+  myNWA.addState(&exit);
+  myNWA.addState(&ret);
+  myNWA.addFinalState(&end);
   
   myNWA.getState("call");
   myNWA.getStates();
@@ -62,9 +62,9 @@ int main()
   myNWA.addAllStates(wali::nwa::StateSet<wali::nwa::State<std::string>,std::string>());
   myNWA.addAllInitialStates(wali::nwa::StateSet<wali::nwa::State<std::string>,std::string>());
   myNWA.addAllFinalStates(wali::nwa::StateSet<wali::nwa::State<std::string>,std::string>(),false);
-  myNWA.isState(state);
-  myNWA.isInitialState(start);
-  myNWA.isFinalState(end);
+  myNWA.isState(&state);
+  myNWA.isInitialState(&start);
+  myNWA.isFinalState(&end);
   myNWA.beginStates();
   myNWA.endStates();
   myNWA.beginInitialStates();
@@ -78,25 +78,25 @@ int main()
   //myNWA.getSymbols();
   myNWA.isSymbol(epsilon);
   myNWA.addSymbol(epsilon);
-  myNWA.addAllSymbols(std::set<wali::nwa::Symbol<std::string>>());  
+  myNWA.addAllSymbols(std::set<wali::nwa::Symbol<std::string>*>());  
   myNWA.beginSymbols();
   myNWA.endSymbols();
   myNWA.sizeSymbols();
     
-  myNWA.addInternalTrans(start,epsilon,call);
+  myNWA.addInternalTrans(&start,epsilon,&call);
   myNWA.addInternalTrans("start",epsilon,"call");
   myNWA.addCallTrans(&callTrans);
-  myNWA.addCallTrans(call,callInst,entry);
-  myNWA.addCallTrans("call",callInst,"entry");
+  myNWA.addCallTrans(&call,&callInst,&entry);
+  myNWA.addCallTrans("call",&callInst,"entry");
   myNWA.addInternalTrans(&internalTrans);
-  myNWA.addInternalTrans(entry,intraInst,state);
-  myNWA.addInternalTrans("entry",intraInst,"state");
-  myNWA.addInternalTrans(state,intraInst,exit);
-  myNWA.addInternalTrans("state",intraInst,"exit");
+  myNWA.addInternalTrans(&entry,&intraInst,&state);
+  myNWA.addInternalTrans("entry",&intraInst,"state");
+  myNWA.addInternalTrans(&state,&intraInst,&exit);
+  myNWA.addInternalTrans("state",&intraInst,"exit");
   myNWA.addReturnTrans(&returnTrans);
-  myNWA.addReturnTrans(exit,call,retInst,ret);
-  myNWA.addReturnTrans("exit","call",retInst,"ret");
-  myNWA.addInternalTrans(ret,epsilon,end);
+  myNWA.addReturnTrans(&exit,&call,&retInst,&ret);
+  myNWA.addReturnTrans("exit","call",&retInst,"ret");
+  myNWA.addInternalTrans(&ret,epsilon,&end);
   myNWA.addInternalTrans("ret",epsilon,"end");
   myNWA.beginCallTrans();
   myNWA.endCallTrans();
@@ -120,27 +120,27 @@ int main()
   myNWA.numStates();
   myNWA.numTrans();
 
-  myNWA.removeInternalTrans(start,epsilon,call);
+  myNWA.removeInternalTrans(&start,epsilon,&call);
   myNWA.removeInternalTrans("start",epsilon,"call");
   myNWA.removeCallTrans(&callTrans);
-  myNWA.removeCallTrans(call,callInst,entry);
-  myNWA.removeCallTrans("call",callInst,"entry");
+  myNWA.removeCallTrans(&call,&callInst,&entry);
+  myNWA.removeCallTrans("call",&callInst,"entry");
   myNWA.removeInternalTrans(&internalTrans);
-  myNWA.removeInternalTrans(entry,intraInst,state);
-  myNWA.removeInternalTrans("entry",intraInst,"state");
-  myNWA.removeInternalTrans(state,intraInst,exit);
-  myNWA.removeInternalTrans("state",intraInst,"exit");
+  myNWA.removeInternalTrans(&entry,&intraInst,&state);
+  myNWA.removeInternalTrans("entry",&intraInst,"state");
+  myNWA.removeInternalTrans(&state,&intraInst,&exit);
+  myNWA.removeInternalTrans("state",&intraInst,"exit");
   myNWA.removeReturnTrans(&returnTrans);
-  myNWA.removeReturnTrans(exit,call,retInst,ret);
-  myNWA.removeReturnTrans("exit","call",retInst,"ret");
-  myNWA.removeInternalTrans(ret,epsilon,end);
+  myNWA.removeReturnTrans(&exit,&call,&retInst,&ret);
+  myNWA.removeReturnTrans("exit","call",&retInst,"ret");
+  myNWA.removeInternalTrans(&ret,epsilon,&end);
   myNWA.removeInternalTrans("ret",epsilon,"end");
-  myNWA.removeReturnTrans("exit",retInst,"ret");
-  myNWA.removeReturnTrans(exit,retInst,ret);
+  myNWA.removeReturnTrans("exit",&retInst,"ret");
+  myNWA.removeReturnTrans(&exit,&retInst,&ret);
 
-  myNWA.removeState(state);
-  myNWA.removeInitialState(start);
-  myNWA.removeFinalState(end);
+  myNWA.removeState(&state);
+  myNWA.removeInitialState(&start);
+  myNWA.removeFinalState(&end);
   myNWA.clearStates();
   myNWA.clearInitialStates();
   myNWA.clearFinalStates();

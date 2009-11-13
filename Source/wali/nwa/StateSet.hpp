@@ -104,7 +104,7 @@ namespace wali
          * @return false if the state already exists
          *
          */
-        bool addState(St addState);
+        bool addState(St* addState);
         /**
          *
          * @brief add the given initial state 
@@ -118,7 +118,7 @@ namespace wali
          * @return false if the state is already an initial state
          *
          */
-        bool addInitialState(St addInitialState);
+        bool addInitialState(St* addInitialState);
         /**
          *
          * @brief add the given final state 
@@ -132,7 +132,7 @@ namespace wali
          * @return false if the state is already a final state
          *
          */
-        bool addFinalState(St addFinalState);
+        bool addFinalState(St* addFinalState);
       
         /**
          * TODO
@@ -187,15 +187,15 @@ namespace wali
         /**
          * TODO
          */
-        bool removeState(St removeState);
+        bool removeState(St* removeState);
         /**
          * TODO
          */
-        bool removeInitialState(St removeInitialState);
+        bool removeInitialState(St* removeInitialState);
         /**
          * TODO
          */
-        bool removeFinalState(St removeFinalState);
+        bool removeFinalState(St* removeFinalState);
       
         //Utilities	
 
@@ -324,15 +324,15 @@ namespace wali
         /**
          * TODO
          */
-        bool containsState( St state ) const;
+        bool containsState( St* state ) const;
         /**
          * TODO
          */
-        bool containsInitialState( St initialState ) const;
+        bool containsInitialState( St* initialState ) const;
         /**
          * TODO
          */
-        bool containsFinalState( St finalState ) const;
+        bool containsFinalState( St* finalState ) const;
         
         /**
          * TODO
@@ -342,7 +342,7 @@ namespace wali
         /**
          * TODO
          */
-        void dupState(St orig, St dup);
+        void dupState(St* orig, St* dup);
 
         /**
          * TODO
@@ -448,28 +448,28 @@ namespace wali
      * TODO
      */ 
     template <typename St,typename StName> 
-    bool StateSet<St,StName>::addState(St addState)
+    bool StateSet<St,StName>::addState(St* addState)
     {
-      if( states.count(&addState) > 0 )
+      if( states.count(addState) > 0 )
         return false;
-      states.insert(&addState);
-      names.insert(addState.getName());
-      name_St.insert(std::pair<StName,St*>(addState.getName(),&addState));
+      states.insert(addState);
+      names.insert(addState->getName());
+      name_St.insert(std::pair<StName,St*>(addState->getName(),addState));
       return true;
     }    
     /**
      * TODO
      */
     template <typename St,typename StName> 
-    bool StateSet<St,StName>::addInitialState(St addInitialState)
+    bool StateSet<St,StName>::addInitialState(St* addInitialState)
     {
-      if( initialStates.count(&addInitialState) > 0 )
+      if( initialStates.count(addInitialState) > 0 )
         return false;
-      std::set<St*>::iterator state = states.find(&addInitialState);
+      std::set<St*>::iterator state = states.find(addInitialState);
       if( state == states.end() )
       {
         addState(addInitialState);
-        state = states.find(&addInitialState);
+        state = states.find(addInitialState);
       }
 
       initialStates.insert(*state);
@@ -479,15 +479,15 @@ namespace wali
      * TODO
      */ 
     template <typename St,typename StName> 
-    bool StateSet<St,StName>::addFinalState(St addFinalState)
+    bool StateSet<St,StName>::addFinalState(St* addFinalState)
     {
-      if( finalStates.count(&addFinalState) > 0 )
+      if( finalStates.count(addFinalState) > 0 )
         return false;
-      std::set<St*>::iterator state = states.find(&addFinalState);
+      std::set<St*>::iterator state = states.find(addFinalState);
       if( state == states.end() )
       {
         addState(addFinalState);
-        state = states.find(&addFinalState);
+        state = states.find(addFinalState);
       }
 
       finalStates.insert(*state);
@@ -520,7 +520,7 @@ namespace wali
       for( iterator it = addStateSet.states.begin();
             it != addStateSet.states.end(); it++ )
       {
-        addState(*(*it));
+        addState(*it);
       }
     }    
     /**
@@ -532,7 +532,7 @@ namespace wali
       for( iterator it = addStateSet.initialStates.begin();
             it != addStateSet.initialStates.end(); it++ )
       {
-        addInitialState(*(*it));
+        addInitialState(*it);
       }
     }
     /**
@@ -544,7 +544,7 @@ namespace wali
       for( iterator it = addStateSet.finalStates.begin();
             it != addStateSet.finalStates.end(); it++ )
       {
-        addFinalState(*(*it));
+        addFinalState(*it);
       }
     }
     
@@ -552,13 +552,13 @@ namespace wali
      * TODO
      */ 
     template <typename St,typename StName> 
-    bool StateSet<St,StName>::removeState(St removeState)
+    bool StateSet<St,StName>::removeState(St* removeState)
     {
-      if( states.count(&removeState) == 0 )
+      if( states.count(removeState) == 0 )
         return false;
-      states.erase(&removeState);
-      names.erase(removeState.getName());
-      name_St.erase(name_St.find(removeState.getName()));
+      states.erase(removeState);
+      names.erase(removeState->getName());
+      name_St.erase(name_St.find(removeState->getName()));
       //remove initial
       removeInitialState(removeState);
       //remove final
@@ -569,22 +569,22 @@ namespace wali
      * TODO
      */ 
     template <typename St,typename StName> 
-    bool StateSet<St,StName>::removeInitialState(St removeInitialState)
+    bool StateSet<St,StName>::removeInitialState(St* removeInitialState)
     {
-      if( initialStates.count(&removeInitialState) == 0 )
+      if( initialStates.count(removeInitialState) == 0 )
         return false;
-      initialStates.erase(&removeInitialState);
+      initialStates.erase(removeInitialState);
       return true;
     }    
     /**
      * TODO
      */
     template <typename St,typename StName> 
-    bool StateSet<St,StName>::removeFinalState(St removeFinalState)
+    bool StateSet<St,StName>::removeFinalState(St* removeFinalState)
     {
-      if( finalStates.count(&removeFinalState) == 0 )
+      if( finalStates.count(removeFinalState) == 0 )
         return false;
-      finalStates.erase(&removeFinalState);
+      finalStates.erase(removeFinalState);
       return true;
     }
       
@@ -759,25 +759,25 @@ namespace wali
      * TODO
      */
     template <typename St,typename StName> 
-    bool StateSet<St,StName>::containsState( St state ) const
+    bool StateSet<St,StName>::containsState( St* state ) const
     {
-      return (states.count(&state) >  0);
+      return (states.count(state) >  0);
     }    
     /**
      * TODO
      */
     template <typename St,typename StName> 
-    bool StateSet<St,StName>::containsInitialState( St initialState ) const
+    bool StateSet<St,StName>::containsInitialState( St* initialState ) const
     {
-      return (initialStates.count(&initialState) >  0);
+      return (initialStates.count(initialState) >  0);
     }    
     /**
      * TODO
      */
     template <typename St,typename StName> 
-    bool StateSet<St,StName>::containsFinalState( St finalState ) const
+    bool StateSet<St,StName>::containsFinalState( St* finalState ) const
     {
-      return (finalStates.count(&finalState) >  0);
+      return (finalStates.count(finalState) >  0);
     }
     
     /**
@@ -797,7 +797,7 @@ namespace wali
      * TODO
      */
     template <typename St,typename StName>
-    void StateSet<St,StName>::dupState(St orig, St dup)
+    void StateSet<St,StName>::dupState(St* orig, St* dup)
     {
       if( containsInitialState(orig) )
         addInitialState(dup);

@@ -37,9 +37,9 @@ namespace wali
     {
       //TODO: update all comments
       public:
-        typedef Triple<St,Sym,St> Call;
-        typedef Triple<St,Sym,St> Internal;
-        typedef Quad<St,St,Sym,St> Return;
+        typedef Triple<St*,Sym*,St*> Call;
+        typedef Triple<St*,Sym*,St*> Internal;
+        typedef Quad<St*,St*,Sym*,St*> Return;
         typedef TransSet< St,Sym,Call,Internal,Return > Trans;
         typedef typename Trans::Calls Calls;
         typedef typename Trans::Internals Internals;
@@ -48,13 +48,13 @@ namespace wali
         typedef typename Trans::internalIterator internalIterator;
         typedef typename Trans::returnIterator returnIterator;
         typedef StateSet<St,StName> States;
-        typedef std::set<Sym> Symbols;
+        typedef std::set<Sym*> Symbols;
         typedef typename States::iterator stateIterator;
         typedef typename Symbols::iterator symbolIterator;
         
-        typedef std::pair< St,St > StatePair;
+        typedef std::pair< St*,St* > StatePair;
         typedef std::set< StatePair > StatePairSet;
-        typedef std::map< StatePairSet,St > StateMap;
+        typedef std::map< StatePairSet,St* > StateMap;
         
         //
         // Methods
@@ -142,7 +142,7 @@ namespace wali
          * @return true if the state with the given name is a state of the NWA
          *
          */
-        bool isState( St name ); 
+        bool isState( St* name ); 
         
         /**
          *
@@ -156,7 +156,7 @@ namespace wali
          * @return false if the state already exists in the NWA
          *
          */
-        bool addState( St name );
+        bool addState( St* name );
         
         /**
          *
@@ -184,7 +184,7 @@ namespace wali
          * @return false if the state does not exist in the NWA
          *
          */
-        bool removeState( St name );
+        bool removeState( St* name );
         
         /**
          *
@@ -244,7 +244,7 @@ namespace wali
          * @return true if the state with the given name is an initial state
          *
          */
-        bool isInitialState( St name ) const;
+        bool isInitialState( St* name ) const;
         
         /**
          *
@@ -262,7 +262,7 @@ namespace wali
          * of the NWA
          *
          */
-        bool addInitialState( St name );
+        bool addInitialState( St* name );
         
         /**
          *
@@ -294,7 +294,7 @@ namespace wali
          * of the NWA
          *
          */
-        bool removeInitialState( St name );
+        bool removeInitialState( St* name );
         
         /**
          *
@@ -358,7 +358,7 @@ namespace wali
          * @return true if the state with the given name is a final state
          *
          */
-        bool isFinalState( St name ) const;
+        bool isFinalState( St* name ) const;
         
         /**
          *
@@ -376,7 +376,7 @@ namespace wali
          * of the NWA
          *
          */
-        bool addFinalState( St name );
+        bool addFinalState( St* name );
         
         /**
          *
@@ -408,7 +408,7 @@ namespace wali
          * of the NWA
          *
          */
-        bool removeFinalState( St name );
+        bool removeFinalState( St* name );
         
         /**
          *
@@ -510,7 +510,7 @@ namespace wali
          * @return true if the given symbol is associated with the NWA
          *
          */
-        bool isSymbol( Sym sym );
+        bool isSymbol( Sym* sym );
         
         /**
          *
@@ -524,7 +524,7 @@ namespace wali
          * @return false if the symbol is already associated with the NWA
          *
          */
-        bool addSymbol( Sym sym );
+        bool addSymbol( Sym* sym );
         
         /**
          *
@@ -551,7 +551,7 @@ namespace wali
          * @return false if the symbols is not associated with the NWA
          *
          */
-        bool removeSymbol( Sym sym );
+        bool removeSymbol( Sym* sym );
         
         /**
          *
@@ -641,7 +641,7 @@ namespace wali
         /**
          * TODO: write comments
          */
-        bool addCallTrans( StName from, Sym sym, StName to );
+        bool addCallTrans( StName from, Sym* sym, StName to );
         
         /**
          *
@@ -658,7 +658,7 @@ namespace wali
          * @return false if the call transition already exists in the NWA
          *
          */
-        bool addCallTrans( St from, Sym sym, St to );
+        bool addCallTrans( St* from, Sym* sym, St* to );
         
         /**
          *
@@ -676,7 +676,7 @@ namespace wali
         /**
          * TODO: write comments
          */
-        bool removeCallTrans( StName from, Sym sym, StName to );
+        bool removeCallTrans( StName from, Sym* sym, StName to );
         
         /**
          *
@@ -693,7 +693,7 @@ namespace wali
          * @return false if the call transition does not exist in the NWA
          *
          */
-        bool removeCallTrans( St from, Sym sym, St to );
+        bool removeCallTrans( St* from, Sym* sym, St* to );
         
         /**
          *
@@ -751,7 +751,7 @@ namespace wali
         /**
          * TODO: write comments
          */
-        bool addInternalTrans( StName from, Sym sym, StName to );
+        bool addInternalTrans( StName from, Sym* sym, StName to );
         
         /**
          *
@@ -768,7 +768,7 @@ namespace wali
          * @return false if the internal transition already exists in the NWA
          *
          */
-        bool addInternalTrans( St from, Sym sym, St to );
+        bool addInternalTrans( St* from, Sym* sym, St* to );
         
         /**
          *
@@ -787,7 +787,7 @@ namespace wali
         /**
          * TODO: write comments
          */
-        bool removeInternalTrans( StName from, Sym sym, StName to );
+        bool removeInternalTrans( StName from, Sym* sym, StName to );
         
         /**
          *
@@ -804,7 +804,7 @@ namespace wali
          * @return false if the internal transition does not exist in the NWA
          *
          */
-        bool removeInternalTrans( St from, Sym sym, St to );
+        bool removeInternalTrans( St* from, Sym* sym, St* to );
         
         /**
          *
@@ -866,7 +866,7 @@ namespace wali
         /**
          * TODO: write comments
          */
-        bool addReturnTrans( StName from, StName pred, Sym sym, StName to );
+        bool addReturnTrans( StName from, StName pred, Sym* sym, StName to );
         
         /**
          *
@@ -884,7 +884,7 @@ namespace wali
          * @return false if the return transition already exists in the NWA
          *
          */
-        bool addReturnTrans( St from, St pred, Sym sym, St to );
+        bool addReturnTrans( St* from, St* pred, Sym* sym, St* to );
         
         /**
          *
@@ -903,15 +903,15 @@ namespace wali
         /**
          * TODO: write comments
          */
-        bool removeReturnTrans( StName from, Sym sym, StName to );
+        bool removeReturnTrans( StName from, Sym* sym, StName to );
         /**
          * TODO: write comments
          */
-        bool removeReturnTrans( St from, Sym sym, St to );
+        bool removeReturnTrans( St* from, Sym* sym, St* to );
         /**
          * TODO: write comments
          */
-        bool removeReturnTrans( StName from, StName pred, Sym sym, StName to );
+        bool removeReturnTrans( StName from, StName pred, Sym* sym, StName to );
         
         /**
          *
@@ -929,7 +929,7 @@ namespace wali
          * @return false if the return transition does not exist in the NWA
          *
          */
-        bool removeReturnTrans( St from, St pred, Sym sym, St to );
+        bool removeReturnTrans( St* from, St* pred, Sym* sym, St* to );
         
         /**
          *
@@ -1400,10 +1400,10 @@ namespace wali
       St* origSt = getState(orig);
       St* dupStPtr = new St(dup);
       
-      states.addState(*dupStPtr);
-      states.dupState(*origSt,*dupStPtr);
+      states.addState(dupStPtr);
+      states.dupState(origSt,dupStPtr);
 
-      trans->dupTrans(*origSt,*dupStPtr);
+      trans->dupTrans(origSt,dupStPtr);
 
       return dupStPtr;
     }
@@ -1431,7 +1431,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::isState( St name )
+    bool NWA<St,StName,Sym>::isState( St* name )
     {
       return states.containsState(name);
     }
@@ -1446,7 +1446,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::addState( St name )
+    bool NWA<St,StName,Sym>::addState( St* name )
     {
       return states.addState(name);
     }
@@ -1473,7 +1473,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::removeState( St name )
+    bool NWA<St,StName,Sym>::removeState( St* name )
     {
       //Remove transitions associated with the state that was removed.
       if( states.removeState(name) )
@@ -1558,7 +1558,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::isInitialState( St name ) const
+    bool NWA<St,StName,Sym>::isInitialState( St* name ) const
     {
       return states.containsInitialState(name); 
     }
@@ -1574,7 +1574,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::addInitialState( St name )
+    bool NWA<St,StName,Sym>::addInitialState( St* name )
     {
       return states.addInitialState(name);
     }
@@ -1605,7 +1605,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::removeInitialState( St name ) 
+    bool NWA<St,StName,Sym>::removeInitialState( St* name ) 
     {
       return states.removeInitialState(name);
     }
@@ -1675,7 +1675,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::isFinalState( St name ) const
+    bool NWA<St,StName,Sym>::isFinalState( St* name ) const
     {
       return states.containsFinalState(name);
     }
@@ -1691,7 +1691,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::addFinalState( St name )
+    bool NWA<St,StName,Sym>::addFinalState( St* name )
     {
       return states.addFinalState(name);
     }
@@ -1724,7 +1724,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::removeFinalState( St name )
+    bool NWA<St,StName,Sym>::removeFinalState( St* name )
     {
       return states.removeFinalState(name);
     }
@@ -1840,7 +1840,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::isSymbol( Sym sym )
+    bool NWA<St,StName,Sym>::isSymbol( Sym* sym )
     {
       return (symbols.count(sym) >  0);
     }
@@ -1855,7 +1855,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::addSymbol( Sym sym )
+    bool NWA<St,StName,Sym>::addSymbol( Sym* sym )
     {
       if( symbols.count(sym) > 0 )
         return false;
@@ -1874,7 +1874,7 @@ namespace wali
     void NWA<St,StName,Sym>::addAllSymbols( Symbols addSymbolSet)
     {
       for( symbolIterator sit = addSymbolSet.begin();
-      sit != addSymbolSet.end(); sit++ )
+            sit != addSymbolSet.end(); sit++ )
         addSymbol(*sit);
     }
     
@@ -1888,7 +1888,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::removeSymbol( Sym sym )
+    bool NWA<St,StName,Sym>::removeSymbol( Sym* sym )
     {
       if( symbols.count(sym) == 0 )
         return false;
@@ -1963,7 +1963,7 @@ namespace wali
       St* fromSt = getState(from);
       St* toSt = getState(to);
 
-      return trans->getSymbol(*fromSt,*toSt,sym);
+      return trans->getSymbol(fromSt,toSt,sym);
     }
     
     //TODO: return true if the symbol occurs on the edge from source to
@@ -1977,7 +1977,7 @@ namespace wali
       St* fromSt = getState(from);
       St* toSt = getState(to);
 
-      return trans->findTrans(*fromSt,sym, *toSt);
+      return trans->findTrans(fromSt,sym, toSt);
     }
 
     /**
@@ -2024,18 +2024,18 @@ namespace wali
      * TODO: write comments
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::addCallTrans( StName from, Sym sym, StName to )
+    bool NWA<St,StName,Sym>::addCallTrans( StName from, Sym* sym, StName to )
     {
       St* fromSt = getState(from);
       St* toSt = getState(to);
       
-      if(! isState(*fromSt)
-        || ! isState(*toSt) )
+      if(! isState(fromSt)
+        || ! isState(toSt) )
         return false;
       if(! isSymbol(sym) )
         addSymbol(sym);
       
-      Call ct = Call(*fromSt,sym,*toSt);
+      Call* ct = new Call(fromSt,sym,toSt);
       
       return trans->addCall(ct);
     }
@@ -2051,7 +2051,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::addCallTrans( St from, Sym sym, St to )
+    bool NWA<St,StName,Sym>::addCallTrans( St* from, Sym* sym, St* to )
     {
       if(! isState(from)
         || ! isState(to) )
@@ -2059,7 +2059,7 @@ namespace wali
       if(! isSymbol(sym) )
         addSymbol(sym);
       
-      Call ct = Call(from,sym,to);
+      Call* ct = new Call(from,sym,to);
       
       return trans->addCall(ct);
     }
@@ -2081,25 +2081,25 @@ namespace wali
       if(! isSymbol(ct->second) )
         addSymbol(ct->second);  
       
-      return trans->addCall(*ct);
+      return trans->addCall(ct);
     }
     
     /**
      * TODO: write comments
      */
     template<typename St,typename StName,typename Sym >
-    bool NWA<St,StName,Sym>::removeCallTrans( StName from, Sym sym, StName to )
+    bool NWA<St,StName,Sym>::removeCallTrans( StName from, Sym* sym, StName to )
     {
       St* fromSt = getState(from);
       St* toSt = getState(to);
       
-      if(! isState(*fromSt)
-        || ! isState(*toSt) )
+      if(! isState(fromSt)
+        || ! isState(toSt) )
         return false;
       if(! isSymbol(sym) )
         return false;
       
-      Call ct = Call(*fromSt,sym,*toSt);
+      Call* ct = new Call(fromSt,sym,toSt);
       
       return trans->removeCall(ct);
     }
@@ -2116,7 +2116,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::removeCallTrans( St from, Sym sym, St to )
+    bool NWA<St,StName,Sym>::removeCallTrans( St* from, Sym* sym, St* to )
     {
       if(! isState(from)
         || ! isState(to) )
@@ -2124,7 +2124,7 @@ namespace wali
       if(! isSymbol(sym) )
         return false;
       
-      Call ct = Call(from,sym,to);
+      Call* ct = new Call(from,sym,to);
       
       return trans->removeCall(ct);
     }
@@ -2146,7 +2146,7 @@ namespace wali
       if(! isSymbol(ct->second) )
         return false;
       
-      return trans->removeCall(*ct);
+      return trans->removeCall(ct);
     }
     
     /**
@@ -2195,18 +2195,18 @@ namespace wali
      * TODO: write comments
      */
     template<typename St,typename StName,typename Sym >
-    bool NWA<St,StName,Sym>::addInternalTrans( StName from, Sym sym, StName to )
+    bool NWA<St,StName,Sym>::addInternalTrans( StName from, Sym* sym, StName to )
     {
       St* fromSt = getState(from);
       St* toSt = getState(to);
       
-      if(! isState(*fromSt)
-        || ! isState(*toSt) )
+      if(! isState(fromSt)
+        || ! isState(toSt) )
         return false;
       if(! isSymbol(sym) )
         addSymbol(sym);  
       
-      Internal it = Internal(*fromSt,sym,*toSt);
+      Internal* it = new Internal(fromSt,sym,toSt);
       
       trans->addInternal(it);
     }
@@ -2222,7 +2222,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::addInternalTrans( St from, Sym sym, St to )
+    bool NWA<St,StName,Sym>::addInternalTrans( St* from, Sym* sym, St* to )
     {
       if(! isState(from)
         || ! isState(to) )
@@ -2230,7 +2230,7 @@ namespace wali
       if(! isSymbol(sym) )
         addSymbol(sym);  
       
-      Internal it = Internal(from,sym,to);
+      Internal* it = new Internal(from,sym,to);
       
       return trans->addInternal(it);
     }
@@ -2252,7 +2252,7 @@ namespace wali
       if(! isSymbol(it->second) )
         addSymbol(it->second);  
       
-      return trans->addInternal(*it);
+      return trans->addInternal(it);
     }
     
     
@@ -2260,18 +2260,18 @@ namespace wali
      * TODO: write comments
      */
     template<typename St,typename StName,typename Sym >
-    bool NWA<St,StName,Sym>::removeInternalTrans( StName from, Sym sym, StName to )
+    bool NWA<St,StName,Sym>::removeInternalTrans( StName from, Sym* sym, StName to )
     {
       St* fromSt = getState(from);
       St* toSt = getState(to);
       
-      if(! isState(*fromSt)
-        || ! isState(*toSt) )
+      if(! isState(fromSt)
+        || ! isState(toSt) )
         return false;
       if(! isSymbol(sym) )
         return false;
       
-      Internal it = Internal(*fromSt,sym,*toSt);
+      Internal* it = new Internal(fromSt,sym,toSt);
       
       return trans->removeInternal(it);
     }
@@ -2288,7 +2288,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::removeInternalTrans( St from, Sym sym, St to )
+    bool NWA<St,StName,Sym>::removeInternalTrans( St* from, Sym* sym, St* to )
     {
       if(! isState(from)
         || ! isState(to) )
@@ -2296,7 +2296,7 @@ namespace wali
       if(! isSymbol(sym) )
         return false;
       
-      Internal it = Internal(from,sym,to);
+      Internal* it = new Internal(from,sym,to);
       
       return trans->removeInternal(it);
     }
@@ -2318,7 +2318,7 @@ namespace wali
       if(! isSymbol(it->second) )
         return false;
       
-      return trans->removeInternal(*it);
+      return trans->removeInternal(it);
     }
     
     /**
@@ -2369,7 +2369,7 @@ namespace wali
     std::set<StName> NWA<St,StName,Sym>::getReturnSites(StName callSite)
     {
       St* callSiteSt = getState(callSite);
-      std::set<St*> returns = trans->getReturnSites(*callSiteSt);
+      std::set<St*> returns = trans->getReturnSites(callSiteSt);
       std::set<StName> rets;
       for(std::set<St*>::iterator it = returns.begin(); it != returns.end(); it++ )
       {
@@ -2381,20 +2381,20 @@ namespace wali
      * TODO: write comments
      */
     template<typename St,typename StName,typename Sym >
-    bool NWA<St,StName,Sym>::addReturnTrans( StName from, StName pred, Sym sym, StName to )
+    bool NWA<St,StName,Sym>::addReturnTrans( StName from, StName pred, Sym* sym, StName to )
     {
       St* fromSt = getState(from);
       St* predSt = getState(pred);
       St* toSt = getState(to);
       
-      if(! isState(*fromSt)
-        || ! isState(*predSt)
-        || ! isState(*toSt) )
+      if(! isState(fromSt)
+        || ! isState(predSt)
+        || ! isState(toSt) )
         return false;
       if(! isSymbol(sym) )
         addSymbol(sym);  
       
-      Return rt = Return(*fromSt,*predSt,sym,*toSt);
+      Return* rt = new Return(fromSt,predSt,sym,toSt);
       
       return trans->addReturn(rt);
     }
@@ -2411,7 +2411,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::addReturnTrans( St from, St pred, Sym sym, St to )
+    bool NWA<St,StName,Sym>::addReturnTrans( St* from, St* pred, Sym* sym, St* to )
     {
       if(! isState(from)
         || ! isState(pred)
@@ -2420,7 +2420,7 @@ namespace wali
       if(! isSymbol(sym) )
         addSymbol(sym);  
       
-      Return rt = Return(from,pred,sym,to);
+      Return* rt = new Return(from,pred,sym,to);
       
       return trans->addReturn(rt);
     }
@@ -2443,26 +2443,26 @@ namespace wali
       if(! isSymbol(rt->third) )
         addSymbol(rt->third);  
       
-      return trans->addReturn(*rt);
+      return trans->addReturn(rt);
     }
     
     /**
      * TODO: write comments
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::removeReturnTrans( StName from, Sym sym, StName to )
+    bool NWA<St,StName,Sym>::removeReturnTrans( StName from, Sym* sym, StName to )
     {
       St* fromSt = getState(from);
       St* toSt = getState(to);
       
-      if(! isState(*fromSt)
-        || ! isState(*toSt) )
+      if(! isState(fromSt)
+        || ! isState(toSt) )
         return false;
       if(! isSymbol(sym) )
         return false;
       
       bool removed = false;
-      std::set<St*> cls = trans->getCallSites(*fromSt,*toSt);
+      std::set<St*> cls = trans->getCallSites(fromSt,toSt);
       std::set<StName> calls;
       for( std::set<St*>::iterator it = cls.begin(); it != cls.end(); it++ )
       {
@@ -2471,10 +2471,10 @@ namespace wali
       for( std::set<StName>::iterator it = calls.begin(); it != calls.end(); it++ )
       {
         St* predSt = getState(*it);
-        if(! isState(*predSt) )
+        if(! isState(predSt) )
           return false;
 
-        Return rt = Return(*fromSt,*predSt,sym,*toSt);
+        Return* rt = new Return(fromSt,predSt,sym,toSt);
       
         removed = removed || trans->removeReturn(rt);
       }
@@ -2484,7 +2484,7 @@ namespace wali
      * TODO: write comments
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::removeReturnTrans( St from, Sym sym, St to )
+    bool NWA<St,StName,Sym>::removeReturnTrans( St* from, Sym* sym, St* to )
     {
       if(! isState(from)
         || ! isState(to) )
@@ -2503,10 +2503,10 @@ namespace wali
       for( std::set<StName>::iterator it = calls.begin(); it != calls.end(); it++ )
       {
         St* predSt = getState(*it);
-        if(! isState(*predSt) )
+        if(! isState(predSt) )
           return false;
 
-        Return rt = Return(from,*predSt,sym,to);
+        Return* rt = new Return(from,predSt,sym,to);
       
         removed = removed || trans->removeReturn(rt);
       }
@@ -2516,20 +2516,20 @@ namespace wali
      * TODO: write comments
      */
     template<typename St,typename StName,typename Sym >
-    bool NWA<St,StName,Sym>::removeReturnTrans( StName from, StName pred, Sym sym, StName to )
+    bool NWA<St,StName,Sym>::removeReturnTrans( StName from, StName pred, Sym* sym, StName to )
     {
       St* fromSt = getState(from);
       St* predSt = getState(pred);
       St* toSt = getState(to);
       
-      if(! isState(*fromSt)
-        || ! isState(*predSt)
-        || ! isState(*toSt) )
+      if(! isState(fromSt)
+        || ! isState(predSt)
+        || ! isState(toSt) )
         return false;
       if(! isSymbol(sym) )
         return false;
       
-      Return rt = Return(*fromSt,*predSt,sym,*toSt);
+      Return* rt = new Return(fromSt,predSt,sym,toSt);
       
       return trans->removeReturn(rt);
     }
@@ -2547,7 +2547,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::removeReturnTrans( St from, St pred, Sym sym, St to )
+    bool NWA<St,StName,Sym>::removeReturnTrans( St* from, St* pred, Sym* sym, St* to )
     {
       if(! isState(from)
         || ! isState(pred)
@@ -2556,7 +2556,7 @@ namespace wali
       if(! isSymbol(sym) )
         return false;
       
-      Return rt = Return(from,pred,sym,to);
+      Return* rt = new Return(from,pred,sym,to);
       
       return trans->removeReturn(rt);
     }
@@ -2579,7 +2579,7 @@ namespace wali
       if(! isSymbol(rt->third) )
         return false;
       
-      return trans->removeReturn(*rt);
+      return trans->removeReturn(rt);
     }
     
     /**
@@ -2859,7 +2859,7 @@ namespace wali
             sit != endStates(); sit++ )
       {
         if( oldFinalStates.count(*sit) == 0 )
-          newNWA->addFinalState(*(*sit));
+          newNWA->addFinalState(*sit);
       }
   
       //If this NWA doesn't accept the stuck state, the complement should.
@@ -3040,8 +3040,8 @@ namespace wali
       if( absentAcceptance && other.absentAcceptance )
         worklistNWA->acceptAbsent();
       
-      std::deque<Triple<St,St,St>> wList; //An element: <joinedState, thisState, otherState>
-      std::set<St> visited; //States that have been created in the intersection NWA.
+      std::deque<Triple<St*,St*,St*>> wList; //An element: <joinedState, thisState, otherState>
+      std::set<St*> visited; //States that have been created in the intersection NWA.
       
       //Start the worklist with all possible initial states of the intersection NWA.
       //NOTE: Currently this should be just one state (the join of the single initial state of each machine).
@@ -3052,11 +3052,11 @@ namespace wali
               sit != other.endInitialStates(); sit++ )
         {
           St newSt;
-          if( (*fit)->intersect(*(*sit),newSt) )
+          if( (*fit)->intersect(*sit,newSt) )
           {
-            worklistNWA->addInitialState(newSt); 
-            wList.push_back(Triple<St,St,St>(newSt,*(*fit),*(*sit)));
-            visited.insert(newSt);
+            worklistNWA->addInitialState(&newSt); 
+            wList.push_back(Triple<St*,St*,St*>(&newSt,*fit,*sit));
+            visited.insert(&newSt);
           }  
         }      
       }
@@ -3064,7 +3064,7 @@ namespace wali
       //As long as there are still transitions to consider.
       while(! wList.empty() )
       {
-        Triple<St,St,St> from = wList.front();
+        Triple<St*,St*,St*> from = wList.front();
         
         //Epsilon closure for the nodes that we are currently considering.
         //Check call transitions in this NWA.
@@ -3073,16 +3073,16 @@ namespace wali
         {
           St newSt;
           //Check intersectability of states (if false, don't add).           
-          if( cit->third.intersect(from.third,newSt) )
-            if( visited.find(newSt) == visited.end() )  //if(! worklistNWA.isState(newSt) )
+          if( (*cit)->third->intersect(from.third,newSt) )
+            if( visited.find(&newSt) == visited.end() )  //if(! worklistNWA.isState(newSt) )
             {
-              wList.push_back(Triple<St,St,St>(newSt,cit->third,from.third));
-              visited.insert(newSt);
+              wList.push_back(Triple<St*,St*,St*>(&newSt,(*cit)->third,from.third));
+              visited.insert(&newSt);
               
-              if( isFinalState(cit->third) && other.isFinalState(from.third) )
-                worklistNWA->addFinalState(newSt);
+              if( isFinalState((*cit)->third) && other.isFinalState(from.third) )
+                worklistNWA->addFinalState(&newSt);
               else
-                worklistNWA->addState(newSt);
+                worklistNWA->addState(&newSt);
             }                   
         }
         //Check call transitions in the NWA 'other'.
@@ -3091,16 +3091,16 @@ namespace wali
         {
           St newSt;
           //Check intersectability of states (if false, don't add).
-          if( from.second.intersect(cit->third,newSt) )
-            if( visited.find(newSt) == visited.end() )
+          if( from.second->intersect((*cit)->third,newSt) )
+            if( visited.find(&newSt) == visited.end() )
             {
-              wList.push_back(Triple<St,St,St>(newSt,from.second,cit->third));
-              visited.insert(newSt);
+              wList.push_back(Triple<St*,St*,St*>(&newSt,from.second,(*cit)->third));
+              visited.insert(&newSt);
               
-              if( isFinalState(from.second) && other.isFinalState(cit->third) )
-                worklistNWA->addFinalState(newSt);
+              if( isFinalState(from.second) && other.isFinalState((*cit)->third) )
+                worklistNWA->addFinalState(&newSt);
               else
-                worklistNWA->addState(newSt);
+                worklistNWA->addState(&newSt);
             }
         }
         
@@ -3110,16 +3110,16 @@ namespace wali
         {
           St newSt;
           //Check intersectability of states (if false, don't add).
-          if( iit->third.intersect(from.third,newSt) )
-            if( visited.find(newSt) == visited.end() )
+          if( (*iit)->third->intersect(from.third,newSt) )
+            if( visited.find(&newSt) == visited.end() )
             {
-              wList.push_back(Triple<St,St,St>(newSt,iit->third,from.third));
-              visited.insert(newSt);
+              wList.push_back(Triple<St*,St*,St*>(&newSt,(*iit)->third,from.third));
+              visited.insert(&newSt);
               
-              if( isFinalState(iit->third) && other.isFinalState(from.third) )
-                worklistNWA->addFinalState(newSt);
+              if( isFinalState((*iit)->third) && other.isFinalState(from.third) )
+                worklistNWA->addFinalState(&newSt);
               else
-                worklistNWA->addState(newSt);
+                worklistNWA->addState(&newSt);
             }
         }     
         
@@ -3129,16 +3129,16 @@ namespace wali
         {
           St newSt;
           //Check intersectability of states (if false, don't add).
-          if( from.second.intersect(iit->third,newSt) )
-            if( visited.find(newSt) == visited.end() )
+          if( from.second->intersect((*iit)->third,newSt) )
+            if( visited.find(&newSt) == visited.end() )
             {
-              wList.push_back(Triple<St,St,St>(newSt,from.second,iit->third));
-              visited.insert(newSt);
+              wList.push_back(Triple<St*,St*,St*>(&newSt,from.second,(*iit)->third));
+              visited.insert(&newSt);
               
-              if( isFinalState(from.second) && other.isFinalState(iit->third) )
-                worklistNWA->addFinalState(newSt);
+              if( isFinalState(from.second) && other.isFinalState((*iit)->third) )
+                worklistNWA->addFinalState(&newSt);
               else
-                worklistNWA->addState(newSt);
+                worklistNWA->addState(&newSt);
             }
         }      
         
@@ -3148,16 +3148,16 @@ namespace wali
         {
           St newSt;
           //Check intersectability of states (if false, don't add).
-          if( rit->fourth.intersect(from.third,newSt) )
-            if( visited.find(newSt) == visited.end() )
+          if( (*rit)->fourth->intersect(from.third,newSt) )
+            if( visited.find(&newSt) == visited.end() )
             {
-              wList.push_back(Triple<St,St,St>(newSt,rit->fourth,from.third));
-              visited.insert(newSt);
+              wList.push_back(Triple<St*,St*,St*>(&newSt,(*rit)->fourth,from.third));
+              visited.insert(&newSt);
               
-              if( isFinalState(rit->fourth) && other.isFinalState(from.third) )
-                worklistNWA->addFinalState(newSt);
+              if( isFinalState((*rit)->fourth) && other.isFinalState(from.third) )
+                worklistNWA->addFinalState(&newSt);
               else
-                worklistNWA->addState(newSt);
+                worklistNWA->addState(&newSt);
             } 
         }
         
@@ -3167,16 +3167,16 @@ namespace wali
         {
           St newSt;
           //Check intersectability of states (if false, don't add).
-          if( from.second.intersect(rit->fourth,newSt) )
-            if( visited.find(newSt) == visited.end() )
+          if( from.second->intersect((*rit)->fourth,newSt) )
+            if( visited.find(&newSt) == visited.end() )
             {
-              wList.push_back(Triple<St,St,St>(newSt,from.second,rit->fourth));
-              visited.insert(newSt);
+              wList.push_back(Triple<St*,St*,St*>(&newSt,from.second,(*rit)->fourth));
+              visited.insert(&newSt);
               
-              if( isFinalState(from.second) && other.isFinalState(rit->fourth) )
-                worklistNWA->addFinalState(newSt);
+              if( isFinalState(from.second) && other.isFinalState((*rit)->fourth) )
+                worklistNWA->addFinalState(&newSt);
               else
-                worklistNWA->addState(newSt);
+                worklistNWA->addState(&newSt);
             }
         }
         
@@ -3191,7 +3191,7 @@ namespace wali
               {   
                 Sym sym;
                 //Check intersectability of edge labels.
-                if( fsit->intersect(*ssit,sym) )  //Only continue if the symbols can be intersected.
+                if( (*fsit)->intersect(*ssit,sym) )  //Only continue if the symbols can be intersected.
                 {
                   //Check call transitions with the desired 'from' state.
                   Calls thisCalls = trans->getCalls(from.second,*fsit);
@@ -3208,20 +3208,20 @@ namespace wali
                       {
                         St toSt;                              
                         //Check intersectability of to states (if false, don't look further).           
-                        if( fcit->third.intersect(scit->third,toSt) )
-                          if( visited.find(toSt) == visited.end() )
+                        if( (*fcit)->third->intersect((*scit)->third,toSt) )
+                          if( visited.find(&toSt) == visited.end() )
                           {
-                            wList.push_back(Triple<St,St,St>(toSt,fcit->third,scit->third));
-                            visited.insert(toSt);
+                            wList.push_back(Triple<St*,St*,St*>(&toSt,(*fcit)->third,(*scit)->third));
+                            visited.insert(&toSt);
                           }
                           
-                        if( isFinalState(fcit->third) && other.isFinalState(scit->third) )
-                          worklistNWA->addFinalState(toSt);
+                        if( isFinalState((*fcit)->third) && other.isFinalState((*scit)->third) )
+                          worklistNWA->addFinalState(&toSt);
                         else
-                          worklistNWA->addState(toSt);
+                          worklistNWA->addState(&toSt);
                           
                         //Add the transition to the intersection NWA.  
-                        worklistNWA->addCallTrans( from.first, sym, toSt );
+                        worklistNWA->addCallTrans( from.first, &sym, &toSt );
                       }              
                     }            
                   }
@@ -3271,20 +3271,20 @@ namespace wali
                       {
                         St toSt;                              
                         //Check intersectability of to states (if false, don't look further).           
-                        if( fiit->third.intersect(siit->third,toSt) )
-                          if( visited.find(toSt) == visited.end() )
+                        if( (*fiit)->third->intersect((*siit)->third,toSt) )
+                          if( visited.find(&toSt) == visited.end() )
                           {
-                            wList.push_back(Triple<St,St,St>(toSt,fiit->third,siit->third));
-                            visited.insert(toSt);
+                            wList.push_back(Triple<St*,St*,St*>(&toSt,(*fiit)->third,(*siit)->third));
+                            visited.insert(&toSt);
                           }
                           
-                        if( isFinalState(fiit->third) && other.isFinalState(siit->third) )
-                          worklistNWA->addFinalState(toSt);
+                        if( isFinalState((*fiit)->third) && other.isFinalState((*siit)->third) )
+                          worklistNWA->addFinalState(&toSt);
                         else
-                          worklistNWA->addState(toSt);
+                          worklistNWA->addState(&toSt);
                           
                         //Add the transition to the intersection NWA.
-                        worklistNWA->addInternalTrans( from.first, sym, toSt );
+                        worklistNWA->addInternalTrans( from.first, &sym, &toSt );
                       }         
                     }            
                   }
@@ -3321,23 +3321,23 @@ namespace wali
                             srit != otherReturns.end(); srit++ )
                       {
                         St predSt, toSt;
-                        frit->second.intersect(srit->second,predSt);  //TODO: check that this is a viable call point in the intersected NWA.
+                        (*frit)->second->intersect((*srit)->second,predSt);  //TODO: check that this is a viable call point in the intersected NWA.
                         
                         //Check intersectability of to states (if false, don't look further).    
-                        if( frit->fourth.intersect(srit->fourth,toSt) )
-                          if( visited.find(toSt) == visited.end() )
+                        if( (*frit)->fourth->intersect((*srit)->fourth,toSt) )
+                          if( visited.find(&toSt) == visited.end() )
                           {
-                            wList.push_back(Triple<St,St,St>(toSt,frit->fourth,srit->fourth));
-                            visited.insert(toSt);
+                            wList.push_back(Triple<St*,St*,St*>(&toSt,(*frit)->fourth,(*srit)->fourth));
+                            visited.insert(&toSt);
                           }
                           
-                        if( isFinalState(frit->fourth) && other.isFinalState(srit->fourth) )
-                          worklistNWA->addFinalState(toSt);
+                        if( isFinalState((*frit)->fourth) && other.isFinalState((*srit)->fourth) )
+                          worklistNWA->addFinalState(&toSt);
                         else
-                          worklistNWA->addState(toSt);
+                          worklistNWA->addState(&toSt);
                           
                         //Add the transition to the intersection NWA.  
-                        worklistNWA->addReturnTrans( from.first, predSt, sym, toSt );
+                        worklistNWA->addReturnTrans( from.first, &predSt, &sym, &toSt );
                       }            
                     }            
                   }
@@ -3547,18 +3547,18 @@ namespace wali
         //(q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
         //where the weight w depends on sigma
     
-        if( iit->second.isWild() )
-          wgt = wg.getWildWeight(iit->first,iit->third);
+        if( (*iit)->second->isWild() )
+          wgt = wg.getWildWeight(*(*iit)->first,*(*iit)->third);
         else
-          wgt = wg.getWeight(iit->first,
-                             iit->second,
+          wgt = wg.getWeight(*(*iit)->first,
+                             *(*iit)->second,
                              WeightGen<St,Sym>::INTRA,
-                             iit->third);
+                             *(*iit)->third);
     
         result.add_rule(program,                //from_state (p)
-                    iit->first.getStateKey(),   //from_stack (q)
+                    (*iit)->first->getStateKey(),   //from_stack (q)
                         program,                //to_state (p)
-                    iit->third.getStateKey(),   //to_stack1 (q')
+                    (*iit)->third->getStateKey(),   //to_stack1 (q')
                         wgt);                   //weight      
       }
   
@@ -3568,31 +3568,31 @@ namespace wali
       {
         for( returnIterator rit = nwa.trans->beginReturn();
               rit != nwa.trans->endReturn(); rit++ )
-          if( cit->first == rit->second )
+          if( (*cit)->first == (*rit)->second )
           {
             //for each return site with cit->first as call site ...
             //Key ret = getKey(rit->fourth.getStateKey(),rit->fourth.getStateKey()); // (r,r)
             //calls.insert(std::pair<Key,Key>(cit->first.getStateKey(),ret));
-            calls.insert(std::pair<Key,Key>(cit->first.getStateKey(),rit->fourth.getStateKey()));
+            calls.insert(std::pair<Key,Key>((*cit)->first->getStateKey(),(*rit)->fourth->getStateKey()));
         
             //(q_c,sigma,q_e) in delta_c and (*,q_c,*,q_r) in delta_r goes to
             // <p,q_c> -w-> <p,q_e r'> in delta_2 where r' = (q_r,q_r) (or q_r?)
             // and the weight w depends on sigma
         
-            if( cit->second.isWild() )
-              wgt = wg.getWildWeight(cit->first,cit->third);
+            if( (*cit)->second->isWild() )
+              wgt = wg.getWildWeight(*(*cit)->first,*(*cit)->third);
             else
-              wgt = wg.getWeight(cit->first,
-                                cit->second,
+              wgt = wg.getWeight(*(*cit)->first,
+                                *(*cit)->second,
                                 WeightGen<St,Sym>::CALL_TO_ENTRY,
-                                cit->third);
+                                *(*cit)->third);
         
             result.add_rule(program,                //from_state (p)
-                        cit->first.getStateKey(),   //from_stack (q_c)
+                        (*cit)->first->getStateKey(),   //from_stack (q_c)
                             program,                //to_state (p)
-                        cit->third.getStateKey(),   //to_stack1 (q_e)
+                        (*cit)->third->getStateKey(),   //to_stack1 (q_e)
                           //ret,                    //to_stack2 (r')
-                        rit->fourth.getStateKey(),  //to_stack2 (r')
+                        (*rit)->fourth->getStateKey(),  //to_stack2 (r')
                             wgt);                   //weight  
           }  
       }
@@ -3609,27 +3609,27 @@ namespace wali
     
         wgt = wg.getOne();
     
-        Key rstate = getKey(rit->first.getStateKey(),rit->second.getStateKey());  //p_q_x
+        Key rstate = getKey((*rit)->first->getStateKey(),(*rit)->second->getStateKey());  //p_q_x
     
         result.add_rule(program,                //from_state (p)
-                    rit->first.getStateKey(),   //from_stack (q_x)
+                    (*rit)->first->getStateKey(),   //from_stack (q_x)
                         rstate,                 //to_state (p_q_x == (q_x,q_c))
                         wgt);                   //weight 
     
-        if( rit->third.isWild() )
-          wgt = wg.getWildWeight(rit->first,rit->fourth);
+        if( (*rit)->third->isWild() )
+          wgt = wg.getWildWeight(*(*rit)->first,*(*rit)->fourth);
         else
-          wgt = wg.getWeight(rit->first, 
-                              rit->third.getLabel(),
+          wgt = wg.getWeight(*(*rit)->first, 
+                              *(*rit)->third,
                               WeightGen<St,Sym>::EXIT_TO_RET,  
-                              rit->fourth);  
+                              *(*rit)->fourth);  
     
-        std::map<Key,Key>::iterator ret = calls.find(rit->second.getStateKey());
+        std::map<Key,Key>::iterator ret = calls.find((*rit)->second->getStateKey());
         if( ret != calls.end() )          
           result.add_rule(rstate,                   //from_state (p_q_x == (q_x,q_c))
                           ret->second,    //from_stack (r')
                           program,                  //to_state (p)
-                      rit->fourth.getStateKey(),    //to_stack (q_r)
+                      (*rit)->fourth->getStateKey(),    //to_stack (q_r)
                           wgt);                     //weight    
     
       }
@@ -3729,15 +3729,15 @@ namespace wali
                 cit != trans->endCall(); cit++ )
           {
             //Epsilon transition 
-            if( cit->second == Sym::getEpsilon() ) 
+            if( (*cit)->second == Sym::getEpsilon() ) 
               return false;
             //Wild symbol
-            if( cit->second == Sym::getWild() )
+            if( (*cit)->second == Sym::getWild() )
               wild = true;  
             
             //Keep a count of multiple transitions with the same from
             //state and symbol(that is not epsilon).
-            else if( (cit->first == *(*sit)) && (cit->second == *it) )
+            else if( ((*cit)->first == (*sit)) && ((*cit)->second == *it) )
               count++;
           }
           if( count > 1 )
@@ -3752,15 +3752,15 @@ namespace wali
                 iit != trans->endInternal(); iit++ )
           {
             //Epsilon transition 
-            if( iit->second == Sym::getEpsilon() )
+            if( (*iit)->second == Sym::getEpsilon() )
               return false;
             //Wild symbol
-            if( iit->second == Sym::getWild() )
+            if( (*iit)->second == Sym::getWild() )
               wild = true;  
             
             //Keep a count of multiple transitions with the same from
             //state and symbol(that is not epsilon).
-            else if( (iit->first == *(*sit)) && (iit->second == *it) )
+            else if( ((*iit)->first == *sit) && ((*iit)->second == *it) )
               count++;
           }
           if( count > 1 )
@@ -3778,17 +3778,17 @@ namespace wali
                  rit != trans->endReturn(); rit++ )
             {
               //Epsilon transition to a state other than the error state.
-              if( rit->third == Sym::getEpsilon() )
+              if( (*rit)->third == Sym::getEpsilon() )
                 return false;
               //Wild symbol
-              if( rit->third == Sym::getWild() )
+              if( (*rit)->third == Sym::getWild() )
                 wild = true; 
               
               //Keep a count of multiple transitions with the same from
               //state and symbol(that is not epsilon).
-              else if( (rit->first == *(*sit)) &&
-                (rit->second == *(*pit)) &&
-                (rit->third == *it) )
+              else if( ((*rit)->first == *sit) &&
+                ((*rit)->second == *pit) &&
+                ((*rit)->third == *it) )
                 count++;
             }
             if( count > 1 )
@@ -3909,7 +3909,7 @@ namespace wali
           o << ", ";
         else
           first = false;
-        sit->print(o);
+        (*sit)->print(o);
       }
       o << " }\n";
       

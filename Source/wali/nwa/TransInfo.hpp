@@ -76,22 +76,22 @@
        */
       void addIntra(Internal* intra)
       {
-        IntraMap::iterator it = from_ITrans.find(intra->first.getStateKey());
+        IntraMap::iterator it = from_ITrans.find(intra->first->getStateKey());
         if( it == from_ITrans.end() )
         {
           Internals iTrans;
           iTrans.insert(intra);
-          from_ITrans.insert(std::pair<wali::Key,Internals>(intra->first.getStateKey(),iTrans));
+          from_ITrans.insert(std::pair<wali::Key,Internals>(intra->first->getStateKey(),iTrans));
         }
         else  
           it->second.insert(intra);
         
-        it = to_ITrans.find(intra->third.getStateKey());
+        it = to_ITrans.find(intra->third->getStateKey());
         if( it == to_ITrans.end() )
         {
           Internals iTrans;
           iTrans.insert(intra);
-          to_ITrans.insert(std::pair<wali::Key,Internals>(intra->third.getStateKey(),iTrans));
+          to_ITrans.insert(std::pair<wali::Key,Internals>(intra->third->getStateKey(),iTrans));
         }
         else
           it->second.insert(intra);       
@@ -102,14 +102,14 @@
        */
       void removeIntra(Internal* intra)
       {
-        IntraMap::iterator it = from_ITrans.find(intra->first.getStateKey());
+        IntraMap::iterator it = from_ITrans.find(intra->first->getStateKey());
         if( it != from_ITrans.end() )
         {
           it->second.erase(intra);
           if( it->second.empty() )
             from_ITrans.erase(it);
         }
-        it = to_ITrans.find(intra->third.getStateKey());
+        it = to_ITrans.find(intra->third->getStateKey());
         if( it != from_ITrans.end() )
         {
           it->second.erase(intra);
@@ -123,22 +123,22 @@
        */
       void addCall(Call* call)
       {
-        CallMap::iterator it = call_CTrans.find(call->first.getStateKey());
+        CallMap::iterator it = call_CTrans.find(call->first->getStateKey());
         if( it == call_CTrans.end() )
         {
           Calls cTrans;
           cTrans.insert(call);
-          call_CTrans.insert(std::pair<wali::Key,Calls>(call->first.getStateKey(),cTrans));
+          call_CTrans.insert(std::pair<wali::Key,Calls>(call->first->getStateKey(),cTrans));
         }
         else  
           it->second.insert(call);
         
-        it = entry_CTrans.find(call->third.getStateKey());
+        it = entry_CTrans.find(call->third->getStateKey());
         if( it == entry_CTrans.end() )
         { 
           Calls cTrans;
           cTrans.insert(call);
-          entry_CTrans.insert(std::pair<wali::Key,Calls>(call->third.getStateKey(),cTrans));
+          entry_CTrans.insert(std::pair<wali::Key,Calls>(call->third->getStateKey(),cTrans));
         }
         else
           it->second.insert(call);
@@ -148,14 +148,14 @@
        */
       void removeCall(Call* call)
       {
-        CallMap::iterator it = call_CTrans.find(call->first.getStateKey());
+        CallMap::iterator it = call_CTrans.find(call->first->getStateKey());
         if( it != call_CTrans.end() )
         {
           it->second.erase(call);
           if( it->second.empty() )
             call_CTrans.erase(it);
         }
-        it = entry_CTrans.find(call->third.getStateKey());
+        it = entry_CTrans.find(call->third->getStateKey());
         if( it != entry_CTrans.end() )
         {
           it->second.erase(call);
@@ -169,32 +169,32 @@
        */
       void addRet(Return* ret)
       {
-        RetMap::iterator it = exit_RTrans.find(ret->first.getStateKey());
+        RetMap::iterator it = exit_RTrans.find(ret->first->getStateKey());
         if( it == exit_RTrans.end() )
         {
           Returns rTrans;
           rTrans.insert(ret);
-          exit_RTrans.insert(std::pair<wali::Key,Returns>(ret->first.getStateKey(),rTrans));
+          exit_RTrans.insert(std::pair<wali::Key,Returns>(ret->first->getStateKey(),rTrans));
         }
         else  
           it->second.insert(ret);
         
-        it = pred_RTrans.find(ret->second.getStateKey());
+        it = pred_RTrans.find(ret->second->getStateKey());
         if( it == pred_RTrans.end() )
         { 
           Returns rTrans;
           rTrans.insert(ret);
-          pred_RTrans.insert(std::pair<wali::Key,Returns>(ret->second.getStateKey(),rTrans));
+          pred_RTrans.insert(std::pair<wali::Key,Returns>(ret->second->getStateKey(),rTrans));
         }
         else
           it->second.insert(ret);
           
-        it = ret_RTrans.find(ret->fourth.getStateKey());
+        it = ret_RTrans.find(ret->fourth->getStateKey());
         if( it == ret_RTrans.end() )
         { 
           Returns rTrans;
           rTrans.insert(ret);
-          ret_RTrans.insert(std::pair<wali::Key,Returns>(ret->fourth.getStateKey(),rTrans));
+          ret_RTrans.insert(std::pair<wali::Key,Returns>(ret->fourth->getStateKey(),rTrans));
         }
         else
           it->second.insert(ret);  
@@ -204,21 +204,21 @@
        */
       void removeRet(Return* ret)
       { 
-        RetMap::iterator it = exit_RTrans.find(ret->first.getStateKey());
+        RetMap::iterator it = exit_RTrans.find(ret->first->getStateKey());
         if( it != exit_RTrans.end() )
         {
           it->second.erase(ret);
           if( it->second.empty() )
             exit_RTrans.erase(it);
         }
-        it = pred_RTrans.find(ret->second.getStateKey());
+        it = pred_RTrans.find(ret->second->getStateKey());
         if( it != pred_RTrans.end() )
         {
           it->second.erase(ret);
           if( it->second.empty() )
             pred_RTrans.erase(it);
         }
-        it = ret_RTrans.find(ret->fourth.getStateKey());
+        it = ret_RTrans.find(ret->fourth->getStateKey());
         if( it != ret_RTrans.end() )
         {
           it->second.erase(ret);
@@ -227,38 +227,38 @@
         }
       }
       
-      const Internals from( St name )
+      const Internals from( St* name )
       {
-        return from_ITrans.find(name.getStateKey())->second;
+        return from_ITrans.find(name->getStateKey())->second;
       }
-      const Internals to( St name )
+      const Internals to( St* name )
       {
-        return to_ITrans.find(name.getStateKey())->second;
+        return to_ITrans.find(name->getStateKey())->second;
       } 
-      const Calls call( St name )
+      const Calls call( St* name )
       {
-        return call_CTrans.find(name.getStateKey())->second;
+        return call_CTrans.find(name->getStateKey())->second;
       }
-      const Calls entry( St name )
+      const Calls entry( St* name )
       { 
-        return entry_CTrans.find(name.getStateKey())->second;
+        return entry_CTrans.find(name->getStateKey())->second;
       }
-      const Returns exit( St name )
+      const Returns exit( St* name )
       {
-        return exit_RTrans.find(name.getStateKey())->second;
+        return exit_RTrans.find(name->getStateKey())->second;
       }
-      const Returns pred( St name )
+      const Returns pred( St* name )
       {
-        return pred_RTrans.find(name.getStateKey())->second;
+        return pred_RTrans.find(name->getStateKey())->second;
       }
-      const Returns ret( St name )
+      const Returns ret( St* name )
       {
-        return ret_RTrans.find(name.getStateKey())->second;
+        return ret_RTrans.find(name->getStateKey())->second;
       }
       
-      bool isFrom( St name )
+      bool isFrom( St* name )
       {
-        IntraMap::iterator it = from_ITrans.find(name.getStateKey());
+        IntraMap::iterator it = from_ITrans.find(name->getStateKey());
         if( it != from_ITrans.end() )
         {
           if( !(it->second.empty()) )
@@ -266,9 +266,9 @@
         }
         return false;
       }
-      bool isTo( St name )
+      bool isTo( St* name )
       {
-        IntraMap::iterator it = to_ITrans.find(name.getStateKey());
+        IntraMap::iterator it = to_ITrans.find(name->getStateKey());
         if( it != to_ITrans.end() )
         {
           if( !(it->second.empty()) )
@@ -276,9 +276,9 @@
         }
         return false;
       }
-      bool isCall( St name )
+      bool isCall( St* name )
       {
-        CallMap::iterator it = call_CTrans.find(name.getStateKey());
+        CallMap::iterator it = call_CTrans.find(name->getStateKey());
         if( it != call_CTrans.end() )
         {
           if( !(it->second.empty()) )
@@ -286,9 +286,9 @@
         }
         return false;
       }
-      bool isEntry( St name )
+      bool isEntry( St* name )
       {
-        CallMap::iterator it = entry_CTrans.find(name.getStateKey());
+        CallMap::iterator it = entry_CTrans.find(name->getStateKey());
         if( it != entry_CTrans.end() )
         {
           if( !(it->second.empty()) )
@@ -296,9 +296,9 @@
         }
         return false;
       }
-      bool isExit( St name )
+      bool isExit( St* name )
       {
-        RetMap::iterator it = exit_RTrans.find(name.getStateKey());
+        RetMap::iterator it = exit_RTrans.find(name->getStateKey());
         if( it != exit_RTrans.end() )
         {
           if( !(it->second.empty()) )
@@ -306,9 +306,9 @@
         }
         return false;
       }
-      bool isPred( St name )
+      bool isPred( St* name )
       {
-        RetMap::iterator it = pred_RTrans.find(name.getStateKey());
+        RetMap::iterator it = pred_RTrans.find(name->getStateKey());
         if( it != pred_RTrans.end() )
         {
           if( !(it->second.empty()) )
@@ -316,9 +316,9 @@
         }
         return false;
       }
-      bool isRet( St name )
+      bool isRet( St* name )
       {
-        RetMap::iterator it = ret_RTrans.find(name.getStateKey());
+        RetMap::iterator it = ret_RTrans.find(name->getStateKey());
         if( it != ret_RTrans.end() )
         {
           if( !(it->second.empty()) )

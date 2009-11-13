@@ -84,7 +84,7 @@ namespace wali
        * @return the epsilon symbol
        *
        */
-      static Symbol<T> getEpsilon();
+      static Symbol<T>* getEpsilon();
       
       /**
        *  TODO: write comments
@@ -94,7 +94,7 @@ namespace wali
       /**
        * TODO: write comments
        */
-      static Symbol<T> getWild();
+      static Symbol<T>* getWild();
       
       /**
        *  TODO: write comments
@@ -164,7 +164,7 @@ namespace wali
        * @result true if the two edges can be intersected, false otherwise
        *
        */
-      virtual bool intersect( Symbol other, Symbol & result )
+      virtual bool intersect( Symbol* other, Symbol & result )
       //bool intersect( Symbol other, Symbol & result )
       {
         //Note: When overriding this method your metric must determine an
@@ -173,15 +173,15 @@ namespace wali
       
         if( isWild() )  //If we have a wild symbol, whatever the other symbol is survives (even if it is also wild).
         {
-          result = other;
+          result = *other;
           return true;
         }
-        else if( other.isWild() ) //If the other symbol is wild, whatever this symbol is survives. 
+        else if( other->isWild() ) //If the other symbol is wild, whatever this symbol is survives. 
         {
           result = *this;
           return true;
         }
-        else if( symbolKey == other.symbolKey ) //This rule still applies for epsilons
+        else if( symbolKey == other->symbolKey ) //This rule still applies for epsilons
         {
           result = *this;
           return true;
@@ -302,9 +302,9 @@ namespace wali
      *
      */
     template<typename T>
-    Symbol<T> Symbol<T>::getEpsilon()
+    Symbol<T>* Symbol<T>::getEpsilon()
     {
-      return epsilon;
+      return &epsilon;
     }
     
     /**
@@ -323,9 +323,9 @@ namespace wali
      *  TODO: write comments
      */
     template<typename T>
-    Symbol<T> Symbol<T>::getWild()
+    Symbol<T>* Symbol<T>::getWild()
     {
-      return wild;
+      return &wild;
     }
     
     /**
