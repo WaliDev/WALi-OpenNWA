@@ -37,6 +37,8 @@ class Reach : public wali::SemElem
 
     static int numReaches;
 
+    Reach &operator=(const Reach &other);
+    
   protected:
     bool isreached;
 

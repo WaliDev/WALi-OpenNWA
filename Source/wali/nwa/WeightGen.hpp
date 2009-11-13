@@ -32,6 +32,12 @@
         }
 
         sem_elem_t getWeight( St from, Sym inst, Kind kind, St to ) {
+        //sem_elem_t getWeight( St from, Sym inst, St to ) {
+          return getOne();
+        }
+        
+        sem_elem_t getWildWeight( St from, St to )
+        { //TODO: want the default here to be bottom
           return getOne();
         }
 

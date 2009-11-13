@@ -56,6 +56,11 @@ std::ostream & Reach::print( std::ostream & o ) const
   return (isreached) ? o << "ONE" : o << "ZERO";
 }
 
+Reach &operator=(const Reach &other) {
+  isreached = other.isreached;
+  return *this;
+}
+
 sem_elem_t Reach::from_string( const std::string& s ) const {
   return (s == "ONE") ? one() : zero();
 }

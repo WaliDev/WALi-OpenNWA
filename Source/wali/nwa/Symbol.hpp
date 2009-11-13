@@ -26,6 +26,7 @@ namespace wali
       //
       class SymbolSource : public KeySource
       {
+        //TODO: write comments
         public:
           SymbolSource( const T lbl )
           {
@@ -63,7 +64,8 @@ namespace wali
 
     public:
       //Constructors and Destructor
-      Symbol( ) { }
+      Symbol( );
+      Symbol( Key key );
       Symbol( T lbl );
       Symbol( const Symbol & other );
       Symbol & operator=( const Symbol & other );
@@ -84,6 +86,20 @@ namespace wali
        */
       static Symbol<T> getEpsilon();
       
+      /**
+       *  TODO: write comments
+       */
+      bool isEpsilon() const;  
+      
+      /**
+       * TODO: write comments
+       */
+      static Symbol<T> getWild();
+      
+      /**
+       *  TODO: write comments
+       */
+      bool isWild() const;      
       
       /**
        *
@@ -102,7 +118,7 @@ namespace wali
        * @brief set the Key associated with this symbol
        *
        */
-      void setLabelKey(Key newKey);
+      //void setLabelKey(Key newKey);
       
       /** 
        *
@@ -127,7 +143,7 @@ namespace wali
        * @param the desired label for this symbol
        * 
        */
-      void setLabel( T lbl );
+      //void setLabel( T lbl );
 
 
       //Intersection of edge labels
@@ -151,7 +167,21 @@ namespace wali
       virtual bool intersect( Symbol other, Symbol & result )
       //bool intersect( Symbol other, Symbol & result )
       {
-        if( symbolKey == other.symbolKey )
+        //Note: When overriding this method your metric must determine an
+        // appropriate label, create a symbol with that label, and set result
+        // to the symbol just created.
+      
+        if( isWild() )  //If we have a wild symbol, whatever the other symbol is survives (even if it is also wild).
+        {
+          result = other;
+          return true;
+        }
+        else if( other.isWild() ) //If the other symbol is wild, whatever this symbol is survives. 
+        {
+          result = *this;
+          return true;
+        }
+        else if( symbolKey == other.symbolKey ) //This rule still applies for epsilons
         {
           result = *this;
           return true;
@@ -208,9 +238,30 @@ namespace wali
     protected:
       T lbl;
       Key symbolKey;
+      static Symbol<T> wild;
+      static Symbol<T> epsilon;
     };
     
+    template<typename T>
+    Symbol<T> Symbol<T>::wild = Symbol<T>::Symbol(wali::WALI_BAD_KEY);
+    
+    template<typename T>
+    Symbol<T> Symbol<T>::epsilon = Symbol<T>::Symbol(wali::WALI_EPSILON);
+    
     //Constructors
+    template<typename T>
+    Symbol<T>::Symbol()
+    {
+      *this = wild;
+    }
+    
+    template<typename T>
+    Symbol<T>::Symbol(Key key)
+    {
+      //TODO: if( key != wali::WALI_BAD_KEY && key != wali::WALI_EPSILON ) complain!
+      symbolKey = key;
+    }
+    
     template<typename T>
     Symbol<T>::Symbol( T lbl )
     {
@@ -221,15 +272,25 @@ namespace wali
     template<typename T>
     Symbol<T>::Symbol(const Symbol &other)
     {
-      lbl = other.lbl;
-      symbolKey = other.symbolKey;
+      if( other.isWild() )
+        *this = wild;
+      else
+      {
+        lbl = other.lbl;
+        symbolKey = other.symbolKey;
+      }
     }
     
     template<typename T>
     Symbol<T> & Symbol<T>::operator=( const Symbol & other )
     {
-      symbolKey = other.symbolKey;
-      
+      if( other.isWild() )
+        *this = wild;
+      else
+      {
+        lbl = other.lbl;
+        symbolKey = other.symbolKey;
+      }
       return *this;
     }
     
@@ -243,10 +304,40 @@ namespace wali
     template<typename T>
     Symbol<T> Symbol<T>::getEpsilon()
     {
-      Symbol<T> epsilon;
-      epsilon.setLabelKey(wali::WALI_EPSILON);
-      
       return epsilon;
+    }
+    
+    /**
+     *  TODO: write comments
+     */
+    template<typename T>
+    bool Symbol<T>::isEpsilon() const
+    {
+      if( *this == epsilon )
+        return true;
+      else
+        return false;
+    }  
+    
+    /**
+     *  TODO: write comments
+     */
+    template<typename T>
+    Symbol<T> Symbol<T>::getWild()
+    {
+      return wild;
+    }
+    
+    /**
+     *  TODO: write comments
+     */
+    template<typename T>
+    bool Symbol<T>::isWild() const
+    {
+      if( *this == wild )
+        return true;
+      else
+        return false;
     }
     
     /**
@@ -259,6 +350,7 @@ namespace wali
     template<typename T>
     Key Symbol<T>::getLabelKey()
     {
+      //TODO: Q: do we want to allow anybody to ask this question?
       return symbolKey;
     }
     
@@ -269,11 +361,11 @@ namespace wali
      * @brief set the Key associated with this symbol
      *
      */
-    template<typename T>
+    /*template<typename T>
     void Symbol<T>::setLabelKey(Key newKey)
     {
       symbolKey = newKey;
-    }
+    }*/
     
     /** 
      *
@@ -285,6 +377,7 @@ namespace wali
     template<typename T>
     typename T Symbol<T>::getLabel()
     {
+      //TODO: Q: what should wild and epsilon return from this?
       return lbl;
     }
     
@@ -295,13 +388,13 @@ namespace wali
      * @param the desired label for this symbol
      * 
      */
-    template<typename T>
+    /*template<typename T>
     void Symbol<T>::setLabel(T lbl)
     {
       //TODO: fix this to reflect templated labels
       this->lbl = lbl;
       symbolKey = wali::getKey(lbl);
-    }
+    }*/
     
     /** 
      *
@@ -314,7 +407,12 @@ namespace wali
     template<typename T>
     std::ostream & Symbol<T>::print(std::ostream &o) const
     {
-      printKey(o,symbolKey);
+      if( isWild() )
+        o << "wild";
+      else if( isEpsilon() )
+        o << "epsilon";
+      else
+        printKey(o,symbolKey);
       return o;
     }
     
@@ -329,7 +427,11 @@ namespace wali
     template<typename T>
     bool Symbol<T>::operator==( const Symbol & other ) const
     {
-      if( symbolKey == other.symbolKey )
+      if( isWild() )
+        return other.isWild();
+      else if( isEpsilon() )
+        return other.isEpsilon();
+      else if( symbolKey == other.symbolKey )
         return true;
       else
         return false;

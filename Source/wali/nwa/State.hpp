@@ -22,13 +22,15 @@ namespace wali
     template<typename T>
     class State : public Printable
     {
+           
       //
       // Methods
       //
 
     public:
       //Constructors and Destructor
-      State( ) { }
+      State( );
+      State( Key key );
       State( T name );
       State( const State & other );
       State & operator=( const State & other );
@@ -41,7 +43,7 @@ namespace wali
       /**
        *  TODO: phase this out, instead use getStuckState()?
        */
-      static Key getBadKey();
+      //static Key getBadKey();
       
       /**
        *
@@ -53,6 +55,11 @@ namespace wali
        *
        */
       static State<T> getStuckState();
+      
+      /**
+       *  TODO: write comments
+       */
+      bool isStuckState() const;
       
       /**
        *
@@ -70,7 +77,7 @@ namespace wali
        *  TODO: remove this, it isn't safe to allow!!!
        * @brief set the Key associated with this symbol
        */
-      void setStateKey(Key newKey);
+      //void setStateKey(Key newKey);
       
       /** 
        *  TODO: rename to getName()
@@ -82,7 +89,7 @@ namespace wali
        * @return the name associated with this state
        *
        */
-      T getKey( );
+      //T getKey( );
       T getName( );
       
       /** 
@@ -96,8 +103,8 @@ namespace wali
        * @param the desired name for this state
        *
        */
-      void setKey( T key );
-      void setName( T name );
+      //void setKey( T key );
+      //void setName( T name );
 
       //Intersection of states
       /**
@@ -116,13 +123,13 @@ namespace wali
        * created when it is possible to join the two states
        * @result true if the two states can be joined, false otherwise
        */
-      virtual bool intersect( State other, State & result )
+      virtual bool intersect( State other, State & result ) const
       //bool intersect( State other, State & result )
       {      
         //Join the two states.
         Key newKey = wali::getKey(stateKey,other.stateKey);  
       
-        result.setStateKey( newKey );
+        result = State(newKey);
       
         return true;
       }
@@ -171,23 +178,29 @@ namespace wali
       //
       // Variables
       //
-    public:
+    protected:
       T name;
       Key stateKey;
-      
-      /* TODO: add maps to speed up transition search
-      set<InternalTrans*> intraOutgoing;
-      set<InternalTrans*> intraIncoming;
-      set<CallTrans*> callToEntry;
-      set<CallTrans*> entryToCall;
-      set<ReturnTrans*> retToExit;
-      set<ReturnTrans*> exitToRet;
-      set<ReturnTrans*> retToCall; 
-      set<ReturnTrans*> callToRet;  
-      */
+      static State<T> stuck;
     };
     
+    template<typename T>
+    State<T> State<T>::stuck = State<T>::State(wali::WALI_BAD_KEY);
+    
     //Constructors
+    template<typename T>
+    State<T>::State( )
+    {
+      *this = stuck;
+    }
+    
+    template<typename T>
+    State<T>::State(Key key)
+    {
+      //TODO: if( key != wali::WALI_BAD_KEY ) complain!
+      stateKey = key;
+    }
+    
     template<typename T>
     State<T>::State( T name )
     {
@@ -198,27 +211,95 @@ namespace wali
     template<typename T>
     State<T>::State( const State & other )
     {
-      name = other.name;
-      stateKey = other.stateKey;
+      if( other.isStuckState() )
+      {
+        *this = stuck;
+      }
+      else
+      {
+        name = other.name;
+        stateKey = other.stateKey;
+    /*    
+        for( std::set<State<T>*>::const_iterator it = other.intraOutgoing.begin();
+              it != other.intraOutgoing.end(); it++ )
+          intraOutgoing.insert(*it);
+        for( std::set<State<T>*>::const_iterator it = other.intraIncoming.begin();
+              it != other.intraIncoming.end(); it++ )
+          intraIncoming.insert(*it);  
+     
+        for( std::set<State<T>*>::const_iterator it = other.callToEntry.begin();
+              it != other.callToEntry.end(); it++ )
+          callToEntry.insert(*it); 
+        for( std::set<State<T>*>::const_iterator it = other.entryToCall.begin();
+              it != other.entryToCall.end(); it++ )
+          entryToCall.insert(*it);  
+          
+        for( std::set<State<T>*>::const_iterator it = other.retToExit.begin();
+              it != other.retToExit.end(); it++ )
+          retToExit.insert(*it);  
+        for( std::set<State<T>*>::const_iterator it = other.exitToRet.begin();
+              it != other.exitToRet.end(); it++ )
+          exitToRet.insert(*it);  
+        for( std::set<State<T>*>::const_iterator it = other.retToCall.begin();
+              it != other.retToCall.end(); it++ )
+          retToCall.insert(*it);  
+        for( std::set<State<T>*>::const_iterator it = other.callToRet.begin();
+              it != other.callToRet.end(); it++ )
+          callToRet.insert(*it); */
+      } 
     }
     
     template<typename T>
     State<T> & State<T>::operator=( const State & other )
     {
-      name = other.name;
-      stateKey = other.stateKey;
-      
+      if( other.isStuckState() )
+      {
+        *this = stuck;
+      }
+      else
+      {
+        name = other.name;
+        stateKey = other.stateKey;
+        
+     /*   for( std::set<State<T>*>::const_iterator it = other.intraOutgoing.begin();
+              it != other.intraOutgoing.end(); it++ )
+          intraOutgoing.insert(*it);
+        for( std::set<State<T>*>::const_iterator it = other.intraIncoming.begin();
+              it != other.intraIncoming.end(); it++ )
+          intraIncoming.insert(*it);  
+     
+        for( std::set<State<T>*>::const_iterator it = other.callToEntry.begin();
+              it != other.callToEntry.end(); it++ )
+          callToEntry.insert(*it); 
+        for( std::set<State<T>*>::const_iterator it = other.entryToCall.begin();
+              it != other.entryToCall.end(); it++ )
+          entryToCall.insert(*it);  
+          
+        for( std::set<State<T>*>::const_iterator it = other.retToExit.begin();
+              it != other.retToExit.end(); it++ )
+          retToExit.insert(*it);  
+        for( std::set<State<T>*>::const_iterator it = other.exitToRet.begin();
+              it != other.exitToRet.end(); it++ )
+          exitToRet.insert(*it);  
+        for( std::set<State<T>*>::const_iterator it = other.retToCall.begin();
+              it != other.retToCall.end(); it++ )
+          retToCall.insert(*it);  
+        for( std::set<State<T>*>::const_iterator it = other.callToRet.begin();
+              it != other.callToRet.end(); it++ )
+          callToRet.insert(*it); */
+      }
+            
       return *this;
     }
          
     /**
      *  TODO: phase this out, instead use getStuckState()?
      */     
-    template<typename T>        
+    /*template<typename T>        
     Key State<T>::getBadKey()
     {
       return wali::WALI_BAD_KEY;
-    }
+    }*/
     
     /**
      *
@@ -230,10 +311,16 @@ namespace wali
     template<typename T>
     State<T> State<T>::getStuckState()
     {
-      State<T> stuck;
-      stuck.setStateKey(wali::WALI_BAD_KEY);
-       
       return stuck;
+    }
+    
+    template<typename T>
+    bool State<T>::isStuckState() const
+    {
+      if( *this == stuck )
+        return true;
+      else
+        return false;
     }
     
     /**
@@ -246,6 +333,7 @@ namespace wali
     template<typename T>
     Key State<T>::getStateKey()
     {
+      //TODO: Q: do we want to allow anybody to ask this question?
       return stateKey;
     }
     
@@ -255,11 +343,11 @@ namespace wali
      *  TODO: remove this, it isn't safe to allow!!!
      * @brief set the Key associated with this symbol
      */
-    template<typename T>
+    /*template<typename T>
     void State<T>::setStateKey(Key newKey)
     {
       stateKey = newKey;
-    }
+    }*/
     
     /** 
      *  TODO: rename to getName()
@@ -268,11 +356,11 @@ namespace wali
      * @return the name associated with this state
      *
      */
-    template<typename T>
+    /*template<typename T>
     typename T State<T>::getKey()
     {
       return name;
-    }
+    }*/
     template<typename T>
     typename T State<T>::getName()
     {
@@ -286,7 +374,7 @@ namespace wali
      * @param the desired name for this state
      *
      */
-    template<typename T>
+    /*template<typename T>
     void State<T>::setKey(T key)
     {
       this->name = name;
@@ -297,7 +385,7 @@ namespace wali
     {
       this->name = name;
       stateKey = wali::getKey(name);
-    }
+    }*/
     
     /** 
      *
@@ -310,7 +398,7 @@ namespace wali
     template<typename T>
     std::ostream & State<T>::print( std::ostream & o ) const
     {
-      if(! (stateKey == getBadKey()) )
+      if( !isStuckState() )
         printKey(o,stateKey);
       return o;
     }
@@ -326,7 +414,9 @@ namespace wali
     template<typename T>
     bool State<T>::operator==( const State & other ) const
     {
-      if( stateKey == other.stateKey )
+      if( isStuckState() )
+        return other.isStuckState();
+      else if( stateKey == other.stateKey )
         return true;
       else
         return false;
