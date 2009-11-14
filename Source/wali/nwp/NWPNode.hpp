@@ -22,15 +22,17 @@ namespace wali
   
     class NWPNode : public Printable
     {
+    public: 
+      enum Type {Call,Internal,Ret};
+      
       //
       // Methods
       //
 
     public:
       //Constructors and Destructor
-      NWPNode( );
-      NWPNode( Key sym );
-      NWPNode( Key sym, NWPNode * prev );
+      NWPNode( Key sym, Type nodeType ); //This is the last node.
+      NWPNode( Key sym, NWPNode * prev, Type nodeType );
       NWPNode & operator=( const NWPNode & otherNWPNode );
   
       ~NWPNode( );
@@ -52,17 +54,6 @@ namespace wali
       
       /** 
        *
-       * @brief sets the symbol associated with this node
-       *
-       * This method associates the given symbol with this node.
-       *
-       * @parm the new symbol for this node
-       *
-       */
-      void setSymbol( Key sym );
-
-      /** 
-       *
        * @brief tests whether this symbol is the first symbol in  
        * the word prefix
        *
@@ -73,8 +64,23 @@ namespace wali
        * prefix
        *
        */
-      bool hasPrev( );
+      bool isFirst( );
       
+      /** 
+       *
+       * @brief tests whether this is a call node
+       *
+       * This method tests whether there is a call originating at 
+       * this node in the trace of the word prefix.
+       *
+       * @return true if this node is the beginning of a function
+       * call
+       *
+       */
+      bool isCallNode( );
+      bool isRetNode();
+      bool isInternalNode();
+            
       /** 
        *
        * @brief returns the previous node in the word prefix
@@ -89,31 +95,6 @@ namespace wali
       
       /** 
        *
-       * @brief sets the previous node in the word prefix
-       * 
-       * This method connects the given node to the end of the 
-       * trace of the word prefix.
-       *
-       * @parm the node to append to the end of the word prefix
-       *
-       */
-      void setPrev( NWPNode * prev );
-
-      /** 
-       *
-       * @brief tests whether this is a call node
-       *
-       * This method tests whether there is a call originating at 
-       * this node in the trace of the word prefix.
-       *
-       * @return true if this node is the beginning of a function
-       * call
-       *
-       */
-      bool isCall( );
-      
-      /** 
-       *
        * @brief returns the return node connected to this call node 
        * in the word prefix
        *
@@ -124,21 +105,18 @@ namespace wali
        * word prefix
        *
        */
-      NWPNode * exitNode( );
+      NWPNode * callNode( );
       
-      /** 
+      /**
        *
-       * @brief sets the return node to connect to this call node 
-       * in the word prefix
-       * 
-       * This method connects the given node to this call node in the
-       * word prefix.
+       * @brief returns the innermost open call of the nesting
        *
-       * @parm the node to connect to this call node in the word 
-       * prefix
+       * This method returns the innermost open call of the nesting.
+       *
+       * @return the innermost open call of the nesting
        *
        */
-      void setExit( NWPNode * exit );
+      NWPNode * currCall();
       
       /**
        *
@@ -161,18 +139,10 @@ namespace wali
        * @param the nesting of the prefix at this node
        *
        */
-      void setNesting( std::deque< NWPNode * > nesting );
-
-      /**
-       *
-       * @brief returns the innermost open call of the nesting
-       *
-       * This method returns the innermost open call of the nesting.
-       *
-       * @return the innermost open call of the nesting
-       *
-       */
-      NWPNode * currCall();
+      void pushCall(NWPNode* call);
+      NWPNode* popCall();    
+      
+      size_t sizeNesting();  
       
       //Iteration
       NWPNode * operator++();
@@ -216,8 +186,9 @@ namespace wali
       //
     protected:
       Key symbol;
+      Type nodeType;
       NWPNode * prev;
-      NWPNode * exit;
+      NWPNode * call;
       std::deque< NWPNode * > nesting;
     };
 

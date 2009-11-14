@@ -23,7 +23,7 @@ namespace wali
   namespace nwp
   {
   
-  class NWP : public Printable
+    class NWP : public Printable
     {
       typedef NWPNode * iterator;
       
@@ -34,7 +34,7 @@ namespace wali
     public:
       //Constructors and Destructor
       NWP( );
-      NWP( std::vector< Key > sym, std::queue< std::pair< int,int > > nest ); 
+      //NWP( std::vector< Key > sym, std::queue< std::pair< int,int > > nest ); 
       NWP( NWP & other );
       NWP & operator=( NWP & other );
      
@@ -95,7 +95,7 @@ namespace wali
 	    * @return false if the prev link could not be created
       *
       */
-     bool addIntraNode( NWPNode * node );
+     //bool addIntraNode( NWPNode * node );
 
      /** 
       *
@@ -110,7 +110,7 @@ namespace wali
 	    * @return false if the prev link could not be created
       *
       */
-     bool addCallNode( NWPNode * node );
+     //bool addCallNode( NWPNode * node );
 
       /** 
        *
@@ -127,7 +127,7 @@ namespace wali
        * @return false if some link could not be created
        *
        */
-      bool addReturnNode( NWPNode * node );
+      //bool addReturnNode( NWPNode * node );
       
       /** 
        *

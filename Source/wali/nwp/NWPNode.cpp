@@ -15,31 +15,41 @@ namespace wali
     //
 
     //Constructors and Destructor
-    NWPNode::NWPNode( )
-    {
-      //WALI_EPSILON is the absence of a symbol.
-      symbol = wali::WALI_EPSILON; 
-      prev = NULL;
-      exit = NULL;
-    }
-    NWPNode::NWPNode( Key sym )
+    NWPNode::NWPNode( Key sym, Type nodeType )
     {
       symbol = sym;
+      this->nodeType = nodeType;
       prev = NULL;
-      exit = NULL;
+      call = NULL;
     }
-    NWPNode::NWPNode( Key sym, NWPNode * prev )
+    NWPNode::NWPNode( Key sym, NWPNode * prev, Type nodeType )
     {
       symbol = sym;
+      this->nodeType = nodeType;
       this->prev = prev;
-      exit = NULL;
+      nesting = prev->getNesting();
+      
+      //Add a call to the stack immediately after it is passed.
+      if( prev->isCallNode() )
+      {
+        nesting.push_back(prev);
+      }
+      
+      //Remove a call from the stack and attach it to the return node.
+      if( nodeType == Ret )
+      {
+        call = nesting.back();
+        nesting.pop_back(); 
+      }
     }
     NWPNode & NWPNode::operator=( const NWPNode & other )
     {
       symbol = other.symbol;
       
       prev = other.prev;
-      exit = other.exit;
+      call = other.call;
+      
+      nesting = other.nesting;
       
       return *this;
     }
@@ -48,7 +58,8 @@ namespace wali
     {
       symbol = wali::WALI_BAD_KEY;
       prev = NULL;
-      exit = NULL;
+      call = NULL;
+      nesting.clear();
     }
     
     
@@ -68,19 +79,6 @@ namespace wali
     
     /** 
      *
-     * @brief sets the symbol associated with this node
-     *
-     * @parm the new symbol for this node
-     *
-     */
-    void NWPNode::setSymbol( Key sym )
-    {
-      symbol = sym;
-    }
-
-    
-    /** 
-     *
      * @brief tests whether this symbol is the first symbol in  
      * the word prefix
      *
@@ -88,10 +86,31 @@ namespace wali
      * prefix
      *
      */
-    bool NWPNode::hasPrev( )
+    bool NWPNode::isFirst( )
     {
-      return !(prev == NULL);
+      return (prev == NULL);
     }   
+        
+    /** 
+     *
+     * @brief tests whether this is a call node
+     *
+     * @return true if this node is the beginning of a function
+     * call
+     *
+     */
+    bool NWPNode::isCallNode( )
+    {
+      return nodeType == Call;
+    }  
+    bool NWPNode::isRetNode( )
+    {
+      return nodeType == Ret;
+    }
+    bool NWPNode::isInternalNode( )
+    {
+      return nodeType == Internal;
+    }
     
     /** 
      *
@@ -104,33 +123,7 @@ namespace wali
     {
       return prev;
     }
-    
-    /** 
-     *
-     * @brief sets the previous node in the word prefix
-     * 
-     * @parm the node to append to the end of the word prefix
-     *
-     */
-    void NWPNode::setPrev( NWPNode * prev )
-    {
-      this->prev = prev;
-    }
-
-    
-    /** 
-     *
-     * @brief tests whether this is a call node
-     *
-     * @return true if this node is the beginning of a function
-     * call
-     *
-     */
-    bool NWPNode::isCall( )
-    {
-      return !(exit == NULL);
-    }  
-    
+        
     /** 
      *
      * @brief returns the return node connected to this call node 
@@ -140,23 +133,24 @@ namespace wali
      * word prefix
      *
      */
-    NWPNode * NWPNode::exitNode( )
+    NWPNode * NWPNode::callNode( )
     {
-      return exit;
+      return call;
     }
     
-    /** 
+    /**
      *
-     * @brief sets the return node to connect to this call node 
-     * in the word prefix
-     * 
-     * @parm the node to connect to this call node in the word 
-     * prefix
+     * @brief returns the innermost open call of the nesting
+     *
+     * @return the innermost open call of the nesting
      *
      */
-    void NWPNode::setExit( NWPNode * exit )
+    NWPNode * NWPNode::currCall()
     {
-      this->exit = exit;
+      if( nesting.empty() )
+        return NULL;
+      else
+        return nesting.back();
     }
 
     /**
@@ -171,28 +165,20 @@ namespace wali
       return nesting;
     }
       
-    /**
-     *
-     * @brief sets the nesting of the prefix at this node 
-     *
-     * @param the nesting of the prefix at this node
-     *
-     */
-    void NWPNode::setNesting( std::deque< NWPNode * > nesting )
+    void NWPNode::pushCall(NWPNode* call)
     {
-      this->nesting = nesting;
+      nesting.push_back(call);
     }
-
-    /**
-     *
-     * @brief returns the innermost open call of the nesting
-     *
-     * @return the innermost open call of the nesting
-     *
-     */
-    NWPNode * NWPNode::currCall()
+    NWPNode* NWPNode::popCall()
     {
-      return nesting.back();
+      NWPNode* call = nesting.back();
+      nesting.pop_back();
+      return call;
+    }
+    
+    size_t NWPNode::sizeNesting()
+    {
+      return nesting.size();
     }
     
     //Iteration
@@ -220,10 +206,10 @@ namespace wali
         o<<"<-";        
       }
       printKey(o,symbol);
-      if(exit != NULL)
+      if(call != NULL)
       {
         o<<"(";
-        printKey(o,exit->getSymbol());
+        printKey(o,call->getSymbol());
         o<<")";
       }
       
@@ -255,12 +241,12 @@ namespace wali
           return false;
 
       //Check call equivalence.
-      if( (exit == NULL) && (other.exit != NULL) )
+      if( (call == NULL) && (other.call != NULL) )
         return false;
-      else if( (exit != NULL) && (other.exit == NULL) )
+      else if( (call != NULL) && (other.call == NULL) )
         return false;
-      else if( (exit != NULL) && (other.exit != NULL) )
-        if( !(*exit == *other.exit) )
+      else if( (call != NULL) && (other.call != NULL) )
+        if( !(*call == *other.call) )
           return false;
 
       //Check nesting equivalence.

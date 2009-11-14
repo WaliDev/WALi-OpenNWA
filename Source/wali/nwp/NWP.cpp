@@ -20,7 +20,7 @@ namespace wali
       word = NULL;
     }
 
-    NWP::NWP( std::vector< Key > sym, std::queue< std::pair< int,int > > nest )
+   /* NWP::NWP( std::vector< Key > sym, std::queue< std::pair< int,int > > nest )
     {
       if( sym.empty() )
       {
@@ -60,7 +60,7 @@ namespace wali
         this->word = &word[word.size()-1];
       }
       
-    }
+    }*/
     
     NWP::NWP( NWP & other )
     {
@@ -94,27 +94,10 @@ namespace wali
     {
       NWPNode * node;
       if( word == NULL )
-      {
-        node = new NWPNode(sym);
-      }
-      else
-      {
-        //Make an intra node and create the prev link.
-        node = new NWPNode(sym,word);
-        if( word->isCall() )
-        {
-          //If previous node is a call, add the call to the existing nesting.
-          std::deque< NWPNode * > nest = word->getNesting();
-          nest.push_back(word);
-          node->setNesting(nest);
-        }
-        else
-        {
-          //Intraprocedural edge => nesting doesn't change.
-          node->setNesting(word->getNesting());
-        }
-      }
-        
+        node = new NWPNode(sym,NWPNode::Internal);
+      else  //Make an intra node and create the prev link.
+        node = new NWPNode(sym,word,NWPNode::Internal);
+              
       word = node;
       return true;
     }
@@ -131,29 +114,10 @@ namespace wali
     {
       NWPNode * node;
       if( word == NULL )
-      {
-        node = new NWPNode(sym);
-      }
-      else
-      {
-        //Make a call node and create the prev link.
-        node = new NWPNode(sym,word);
-        if( word->isCall() )
-        {
-          //If previous node is a call, add the call to the existing nesting.
-          std::deque< NWPNode * > nest = word->getNesting();
-          nest.push_back(word);
-          node->setNesting(nest);
-        }
-        else
-        {
-          //Intraprocedural edge => nesting doesn't change.
-          node->setNesting(word->getNesting());
-        }
-      }
-      //Set the call itself as its exit until we know the return node.
-      node->setExit(node);
-
+        node = new NWPNode(sym,NWPNode::Call);
+      else  //Make a call node and create the prev link.
+        node = new NWPNode(sym,word,NWPNode::Call);
+      
       word = node;
       return true;
     }
@@ -171,36 +135,12 @@ namespace wali
       NWPNode * node;
       if( word == NULL )
         return false;
-
-      //Make a return node and create the prev link.
-      node = new NWPNode(sym,word); 
-      std::deque< NWPNode * > nest = word->getNesting();
-
-      //If previous node is a call, add the call to the existing nesting.
-      if( word->isCall() )
-      {
-        nest.push_back(word);
-      }
-
-      //If the  nesting is empty, the return node cannot be linked in.
-      if( nest.empty() )
+      else if( nestSize() == 0 )
         return false;
-
-      NWPNode * call = nest.back();
-
-      //If the call node is already attached to a different return
-      //node, then this link cannot be made.
-      if( !( (call->exitNode() == call ) || (call->exitNode() == node) ) )
-        return false;
-
-      //Create the call/return link.
-      call->setExit(node);
-      //Update the nesting.
-      nest.pop_back();
-      node->setNesting(nest);
-
+      else //Make a return node and create the prev link.
+        node = new NWPNode(sym,word,NWPNode::Ret); 
+        
       word = node;
-      
       return true;
     }
       
@@ -212,7 +152,7 @@ namespace wali
      * @return false if the prev link could not be created
      *
      */
-    bool NWP::addIntraNode( NWPNode * node )
+   /* bool NWP::addIntraNode( NWPNode * node )
     {
       //Check that the node is not a call node.
       if( node->isCall() )
@@ -250,7 +190,7 @@ namespace wali
       word = node;
       
       return true;
-    }
+    }*/
 
    /** 
     *
@@ -260,7 +200,7 @@ namespace wali
     * @return false if the prev link could not be created
     *
     */
-   bool NWP::addCallNode( NWPNode * node )
+  /* bool NWP::addCallNode( NWPNode * node )
    {  
       if( word == NULL )
       {
@@ -298,7 +238,7 @@ namespace wali
 
       word = node;
       return true;
-   }
+   }*/
 
     /** 
      *
@@ -308,7 +248,7 @@ namespace wali
      * @return false if some link could not be created
      *
      */
-    bool NWP::addReturnNode( NWPNode * node )
+   /* bool NWP::addReturnNode( NWPNode * node )
     {
       if( word == NULL ) 
         return false;
@@ -351,7 +291,7 @@ namespace wali
       word = node;
       
       return true;
-    }
+    }*/
 
     
     /** 
@@ -380,7 +320,7 @@ namespace wali
             
       //Update end of prefix
       NWPNode * node = word;
-      if( node->hasPrev() )
+      if(! node->isFirst() )
         word = node->prevNode();
       else
         word = NULL;
@@ -477,11 +417,7 @@ namespace wali
      */
     NWPNode * NWP::currCall()
     {
-      std::deque< NWPNode * > nesting = word->getNesting();
-      if( nesting.empty() )
-        return NULL;
-      else
-        return nesting.back();
+      return word->currCall();
     }
       
     /** 
@@ -493,8 +429,7 @@ namespace wali
      */
     size_t NWP::nestSize()
     {
-      std::deque< NWPNode * > nesting = word->getNesting();
-      return nesting.size();
+      return word->sizeNesting();
     }
     
   };
