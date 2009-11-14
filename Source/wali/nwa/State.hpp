@@ -225,33 +225,6 @@ namespace wali
       {
         name = other.name;
         stateKey = other.stateKey;
-    /*    
-        for( std::set<State<T>*>::const_iterator it = other.intraOutgoing.begin();
-              it != other.intraOutgoing.end(); it++ )
-          intraOutgoing.insert(*it);
-        for( std::set<State<T>*>::const_iterator it = other.intraIncoming.begin();
-              it != other.intraIncoming.end(); it++ )
-          intraIncoming.insert(*it);  
-     
-        for( std::set<State<T>*>::const_iterator it = other.callToEntry.begin();
-              it != other.callToEntry.end(); it++ )
-          callToEntry.insert(*it); 
-        for( std::set<State<T>*>::const_iterator it = other.entryToCall.begin();
-              it != other.entryToCall.end(); it++ )
-          entryToCall.insert(*it);  
-          
-        for( std::set<State<T>*>::const_iterator it = other.retToExit.begin();
-              it != other.retToExit.end(); it++ )
-          retToExit.insert(*it);  
-        for( std::set<State<T>*>::const_iterator it = other.exitToRet.begin();
-              it != other.exitToRet.end(); it++ )
-          exitToRet.insert(*it);  
-        for( std::set<State<T>*>::const_iterator it = other.retToCall.begin();
-              it != other.retToCall.end(); it++ )
-          retToCall.insert(*it);  
-        for( std::set<State<T>*>::const_iterator it = other.callToRet.begin();
-              it != other.callToRet.end(); it++ )
-          callToRet.insert(*it); */
       } 
     }
     
@@ -267,33 +240,6 @@ namespace wali
       {
         name = other.name;
         stateKey = other.stateKey;
-        
-     /*   for( std::set<State<T>*>::const_iterator it = other.intraOutgoing.begin();
-              it != other.intraOutgoing.end(); it++ )
-          intraOutgoing.insert(*it);
-        for( std::set<State<T>*>::const_iterator it = other.intraIncoming.begin();
-              it != other.intraIncoming.end(); it++ )
-          intraIncoming.insert(*it);  
-     
-        for( std::set<State<T>*>::const_iterator it = other.callToEntry.begin();
-              it != other.callToEntry.end(); it++ )
-          callToEntry.insert(*it); 
-        for( std::set<State<T>*>::const_iterator it = other.entryToCall.begin();
-              it != other.entryToCall.end(); it++ )
-          entryToCall.insert(*it);  
-          
-        for( std::set<State<T>*>::const_iterator it = other.retToExit.begin();
-              it != other.retToExit.end(); it++ )
-          retToExit.insert(*it);  
-        for( std::set<State<T>*>::const_iterator it = other.exitToRet.begin();
-              it != other.exitToRet.end(); it++ )
-          exitToRet.insert(*it);  
-        for( std::set<State<T>*>::const_iterator it = other.retToCall.begin();
-              it != other.retToCall.end(); it++ )
-          retToCall.insert(*it);  
-        for( std::set<State<T>*>::const_iterator it = other.callToRet.begin();
-              it != other.callToRet.end(); it++ )
-          callToRet.insert(*it); */
       }
             
       return *this;

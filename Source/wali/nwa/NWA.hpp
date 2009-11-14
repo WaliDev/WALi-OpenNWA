@@ -1106,6 +1106,17 @@ namespace wali
         
         /**
          *
+         * @brief constructs the backwardsPDS equivalent to this NWA
+         *
+         * This method constructs the PDS that is equivalent to this NWA.
+         *
+         * @return the PDS equivalent to this NWA
+         *
+         */ 
+        static wpds::WPDS NWAtoBackwardsPDS(NWA<St,StName,Sym> nwa,WeightGen<St,Sym> wg);
+        
+        /**
+         *
          * @brief constructs a deterministic NWA that is equivalent to this 
          * NWA.
          *
@@ -3605,7 +3616,7 @@ namespace wali
         // <p,q_x> -w1-> <p_q_x,epsilon> in delta_0
         // and <p_q_x,r'> -w2-> <p,q_r> in delta_1
         // where p_q_x = (q_x,q_c), r' = (q_r,q_r)
-        // w1 depends on sigma, and w2 depends on ???
+        // w1 depends on one, and w2 depends on sigma
     
         wgt = wg.getOne();
     
@@ -3632,6 +3643,114 @@ namespace wali
                       (*rit)->fourth->getStateKey(),    //to_stack (q_r)
                           wgt);                     //weight    
     
+      }
+  
+      return result;
+    }
+    
+    /**
+     *
+     * @brief constructs the backwardsPDS equivalent to this NWA
+     *
+     * @return the backwards PDS equivalent to this NWA
+     *
+     */
+    template<typename St,typename StName,typename Sym > 
+    wpds::WPDS NWA<St,StName,Sym>::NWAtoBackwardsPDS(NWA<St,StName,Sym> nwa,WeightGen<St,Sym> wg)
+    {
+      //FIX
+      //TODO: how does this react to absentAcceptance???
+      //NOTE: for now assume stuck state is rejecting
+      wpds::WPDS result = wpds::WPDS();
+      std::map< Key,Key > returns;
+  
+      Key program = wali::getKey("program"); 
+      wali::sem_elem_t wgt;
+  
+      //Internal Transitions
+      for( internalIterator iit = nwa.trans->beginInternal();
+            iit != nwa.trans->endInternal(); iit++ )
+      {      
+        //(q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
+        //where the weight w depends on sigma
+    
+        if( (*iit)->second->isWild() )
+          wgt = wg.getWildWeight(*(*iit)->first,*(*iit)->third);
+        else
+          wgt = wg.getWeight(*(*iit)->first,
+                             *(*iit)->second,
+                             WeightGen<St,Sym>::INTRA,
+                             *(*iit)->third);
+    
+        result.add_rule(program,                //from_state (p)
+                    (*iit)->third->getStateKey(),   //from_stack (q)
+                        program,                //to_state (p)
+                    (*iit)->first->getStateKey(),   //to_stack1 (q')
+                        wgt);                   //weight      
+      }
+  
+      //Call Transitions TODO
+      for( callIterator cit = nwa.trans->beginCall();
+            cit != nwa.trans->endCall(); cit++ )
+      {
+        for( returnIterator rit = nwa.trans->beginReturn();
+              rit != nwa.trans->endReturn(); rit++ )
+          if( (*cit)->first == (*rit)->second )
+          {
+        
+            //(q_c,sigma,q_e) in delta_c and (q_x,q_c,*,q_r) in delta_r goes to
+            // <p,q_e> -w1-> <p_q_e,epsilon> in delta_0
+            // and <p_q_e,q_c> -w2-> <p,q_c> in delta_1
+            // where p_q_e = (q_e,q_r)
+            // w1 depends is one, and w2 depends on sigma
+      
+            wgt = wg.getOne();
+      
+            Key cstate = getKey((*cit)->third->getStateKey(),(*rit)->fourth->getStateKey());  //p_q_e
+      
+            result.add_rule(program,                //from_state (p)
+                        (*cit)->third->getStateKey(),   //from_stack (q_e)
+                            cstate,                 //to_state (p_q_e == (q_e,q_r))
+                            wgt);                   //weight 
+        
+            if( (*cit)->second->isWild() )
+              wgt = wg.getWildWeight(*(*cit)->first,*(*cit)->third);
+            else
+              wgt = wg.getWeight(*(*cit)->first, 
+                                  *(*cit)->second,
+                                  WeightGen<St,Sym>::EXIT_TO_RET,  
+                                  *(*cit)->third);  
+        
+              result.add_rule(cstate,                   //from_state (p_q_x == (q_x,q_c))
+                              (*cit)->first->getStateKey(),    //from_stack (q_c)
+                              program,                  //to_state (p)
+                          (*cit)->first->getStateKey(),    //to_stack (q_c)
+                              wgt);                     //weight    
+          }  
+      }
+  
+      //Return Transitions
+      for( returnIterator rit = nwa.trans->beginReturn();
+            rit != nwa.trans->endReturn(); rit++ )
+      {
+          //(q_x,q_c,*,q_r) in delta_r goes to
+          // <p,q_r> -w-> <p,q_x q_c> in delta_2 
+          // and the weight w depends on sigma
+        
+          if( (*rit)->third->isWild() )
+              wgt = wg.getWildWeight(*(*rit)->first,*(*rit)->fourth);
+            else
+              wgt = wg.getWeight(*(*rit)->first,
+                                *(*rit)->third,
+                                WeightGen<St,Sym>::CALL_TO_ENTRY,
+                                *(*rit)->fourth);
+        
+            result.add_rule(program,                //from_state (p)
+                        (*rit)->fourth->getStateKey(),   //from_stack (q_r)
+                            program,                //to_state (p)
+                        (*rit)->first->getStateKey(),   //to_stack1 (q_x)
+                        (*rit)->second->getStateKey(),  //to_stack2 (q_c)
+                            wgt);                   //weight      
       }
   
       return result;
