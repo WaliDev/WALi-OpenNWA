@@ -34,6 +34,9 @@ namespace wali
           
           ~SymbolSource() { }
           
+          /**
+           * TODO: write comments
+           */
           bool equal( KeySource * rhs )
           {
             SymbolSource *ssrc = dynamic_cast< SymbolSource* >(rhs);
@@ -43,15 +46,24 @@ namespace wali
               return false;
           }
           
+          /**
+           * TODO: write comments
+           */
           std::ostream& print( std::ostream& o ) const {
             return lbl.print(o);
           }
 
+          /**
+           * TODO: write comments
+           */
           size_t hash() const
           {
             return lbl.hash();  
           }
           
+          /**
+           * TODO: write comments
+           */
           T getLabel() const
           {
             return lbl;
@@ -114,7 +126,7 @@ namespace wali
        * @return the Key associated with this symbol
        *
        */
-      Key getLabelKey();
+      Key getLabelKey() const;
       
       /**
        *  TODO: remove this, it isn't safe to allow!!!
@@ -133,7 +145,7 @@ namespace wali
        * @return the label associated with this symbol
        *
        */
-      T getLabel( );
+      T getLabel( ) const;
       
       /** 
        *
@@ -352,7 +364,7 @@ namespace wali
      *
      */
     template<typename T>
-    Key Symbol<T>::getLabelKey()
+    Key Symbol<T>::getLabelKey() const
     {
       //TODO: Q: do we want to allow anybody to ask this question?
       return symbolKey;
@@ -379,7 +391,7 @@ namespace wali
      *
      */
     template<typename T>
-    typename T Symbol<T>::getLabel()
+    typename T Symbol<T>::getLabel() const
     {
       //TODO: Q: what should wild and epsilon return from this?
       return lbl;

@@ -71,7 +71,7 @@ namespace wali
        * @return the Key associated with this state
        *
        */
-      Key getStateKey();
+      Key getStateKey() const;
       
       /**
        *  TODO: remove this, it isn't safe to allow!!!
@@ -90,7 +90,7 @@ namespace wali
        *
        */
       //T getKey( );
-      T getName( );
+      T getName( ) const;
       
       /** 
        *  TODO: rename to setName( T name )
@@ -285,7 +285,7 @@ namespace wali
      *
      */
     template<typename T>
-    Key State<T>::getStateKey()
+    Key State<T>::getStateKey() const
     {
       //TODO: Q: do we want to allow anybody to ask this question?
       return stateKey;
@@ -316,7 +316,7 @@ namespace wali
       return name;
     }*/
     template<typename T>
-    typename T State<T>::getName()
+    typename T State<T>::getName() const
     {
       return name;
     }

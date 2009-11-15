@@ -58,7 +58,6 @@ class ReachGen : public wali::nwa::WeightGen<St,Sym>
 
     sem_elem_t getWeight( const St &src, const Sym &inst, Kind k, const St &tgt )
     {
-    //sem_elem_t getWeight( St src, Sym inst, St tgt ) {
       return getOne();
     }
        
@@ -171,6 +170,7 @@ int main()
   
   ReachGen<wali::nwa::State<std::string>,wali::nwa::Symbol<STR>> wg;  
   myNWA.NWAtoPDS(wg);
+  myNWA.NWAtoBackwardsPDS(wg);
 
   wali::nwa::NWA<wali::nwa::State<std::string>,std::string,wali::nwa::Symbol<STR>> otherNWA;
   wali::nwa::NWA<wali::nwa::State<std::string>,std::string,wali::nwa::Symbol<STR>> intersectNWA;

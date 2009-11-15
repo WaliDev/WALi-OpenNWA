@@ -905,6 +905,17 @@ namespace wali
          */
         //static nwa::NWA<St,StName,Sym> PDStoNWA(wpds::WPDS pds); //FIX
         
+       
+        /**
+         *  TODO: write comments
+         */ 
+        static wali::Key getProgramControlLocation();
+        
+        /**
+         *  TODO: write comments
+         */
+        static wali::Key getControlLocation(const St & first, const St & second);     
+        
         /**
          *
          * @brief constructs the PDS equivalent to this NWA
@@ -3952,6 +3963,24 @@ namespace wali
     }*/
 
     /**
+     *  TODO: write comments
+     */ 
+    template<typename St,typename StName,typename Sym >  
+    wali::Key NWA<St,StName,Sym>::getProgramControlLocation()
+    {
+      return wali::getKey("program");
+    } 
+    
+    /**
+     *  TODO: write comments
+     */
+    template<typename St,typename StName,typename Sym >  
+    wali::Key NWA<St,StName,Sym>::getControlLocation(const St & first, const St & second)
+    {
+      return getKey(first.getStateKey(),second.getStateKey());
+    }  
+
+    /**
      *
      * @brief constructs the PDS equivalent to this NWA
      *
@@ -3967,7 +3996,9 @@ namespace wali
       std::map< Key,Key > calls;
   
       //note: if you change this, make sure you modify the code in createCA as well
-      Key program = wali::getKey("program"); 
+      //Key program = wali::getKey("program"); 
+      Key program = getProgramControlLocation();
+      
       wali::sem_elem_t wgt;
   
       //Internal Transitions
@@ -4040,7 +4071,8 @@ namespace wali
         wgt = wg.getOne();
     
         //Note: if you change this, make sure you modify the code in NWPForest.createCA()
-        Key rstate = getKey((*rit)->first->getStateKey(),(*rit)->second->getStateKey());  //p_q_x
+        //Key rstate = getKey((*rit)->first->getStateKey(),(*rit)->second->getStateKey());  //p_q_x
+        Key rstate = getControlLocation(*(*rit)->first,*(*rit)->second);
     
         result.add_rule(program,                //from_state (p)
                     (*rit)->first->getStateKey(),   //from_stack (q_x)
@@ -4084,7 +4116,9 @@ namespace wali
       wpds::WPDS result = wpds::WPDS();
       std::map< Key,Key > returns;
   
-      Key program = wali::getKey("program"); 
+      //Key program = wali::getKey("program"); 
+      Key program = getProgramControlLocation();
+      
       wali::sem_elem_t wgt;
   
       //Internal Transitions
@@ -4126,7 +4160,8 @@ namespace wali
       
             wgt = wg.getOne();
       
-            Key cstate = getKey((*cit)->third->getStateKey(),(*rit)->fourth->getStateKey());  //p_q_e
+            //Key cstate = getKey((*cit)->third->getStateKey(),(*rit)->fourth->getStateKey());  //p_q_e
+            Key cstate = getControlLocation(*(*cit)->third,*(*rit)->fourth);
       
             result.add_rule(program,                //from_state (p)
                         (*cit)->third->getStateKey(),   //from_stack (q_e)
