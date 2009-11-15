@@ -11,7 +11,8 @@
   namespace nwa
   {
 
-    template<typename St,typename Sym, typename W = Reach>
+    //template<typename St,typename Sym, typename W = Reach>
+    template<typename St, typename Sym>
 
     class WeightGen
     {
@@ -27,8 +28,10 @@
         WeightGen( ) { }
         
         sem_elem_t getOne() {
-          ref_ptr<W> w;
-          return w->one();
+         // ref_ptr<W> w;
+         // return w->one();
+         assert(0); //grrr ugliness
+         return NULL;
         }
 
         sem_elem_t getWeight( St src, Sym inst, Kind kind, St tgt ) {

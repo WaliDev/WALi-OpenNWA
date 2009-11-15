@@ -8,7 +8,7 @@
 #include "wali/nwa/Symbol.hpp"
 #include "wali/Key.hpp"
 #include "wali/wfa/epr/FunctionalWeight.hpp"
-
+#include "wali/Reach.hpp"
 
 
 class STR
@@ -34,6 +34,38 @@ class STR
   
   private:
     std::string str;
+};
+
+template<typename St, typename Sym>
+class ReachGen : public wali::nwa::WeightGen<St,Sym>
+{
+  public:
+    enum Kind {INTRA, CALL_TO_ENTRY, EXIT_TO_RET, CALL_TO_RET};
+     
+    //
+    // Methods
+    //
+      
+  public:
+    //Constructors and Destructor
+    ReachGen( ) { }
+        
+    sem_elem_t getOne()
+    {
+      wali::ref_ptr<Reach> r;
+      return r->one();
+    }
+
+    sem_elem_t getWeight( St src, Sym inst, St tgt )
+    {
+    //sem_elem_t getWeight( St src, Sym inst, St tgt ) {
+      return getOne();
+    }
+       
+    sem_elem_t getWildWeight( St src, St tgt )
+    { //TODO: want the default here to be bottom
+      return getOne();
+    }
 };
 
 int main()
@@ -137,7 +169,7 @@ int main()
   
   myNWA.print(std::cout);
   
-  wali::nwa::WeightGen<wali::nwa::State<std::string>,wali::nwa::Symbol<STR>> wg;  
+  ReachGen<wali::nwa::State<std::string>,wali::nwa::Symbol<STR>> wg;  
   myNWA.NWAtoPDS(wg);
 
   wali::nwa::NWA<wali::nwa::State<std::string>,std::string,wali::nwa::Symbol<STR>> otherNWA;
