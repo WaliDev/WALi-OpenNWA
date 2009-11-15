@@ -104,15 +104,15 @@ namespace wali
         /**
          * TODO: write comments
          */
-        St* getState( StName name );
+        St* getState( StName name ) const;
         /**
          * TODO: write comments
          */
-        std::set<St*> getStates();
+        std::set<St*> getStates() const;
         /**
          * TODO: write comments
          */
-        std::set<StName> getStateNames();
+        std::set<StName> getStateNames() const;
         /**
          * TODO: write comments
          */
@@ -1382,7 +1382,7 @@ namespace wali
      * TODO: write comments
      */
     template<typename St,typename StName,typename Sym >
-    St* NWA<St,StName,Sym>::getState( StName name )
+    St* NWA<St,StName,Sym>::getState( StName name ) const
     {
       return states.getState(name);
     }
@@ -1390,7 +1390,7 @@ namespace wali
      * TODO: write comments
      */
     template<typename St,typename StName,typename Sym >
-    std::set<St*> NWA<St,StName,Sym>::getStates()
+    std::set<St*> NWA<St,StName,Sym>::getStates() const
     {
       return states.getStates();
     }
@@ -1398,7 +1398,7 @@ namespace wali
      * TODO: write comments
      */
     template<typename St,typename StName,typename Sym >
-    std::set<StName> NWA<St,StName,Sym>::getStateNames()
+    std::set<StName> NWA<St,StName,Sym>::getStateNames() const
     {
       return states.getStateNames();
     }
@@ -3548,6 +3548,7 @@ namespace wali
       wpds::WPDS result = wpds::WPDS();
       std::map< Key,Key > calls;
   
+      //note: if you change this, make sure you modify the code in createCA as well
       Key program = wali::getKey("program"); 
       wali::sem_elem_t wgt;
   
@@ -3620,6 +3621,7 @@ namespace wali
     
         wgt = wg.getOne();
     
+        //Note: if you change this, make sure you modify the code in NWPForest.createCA()
         Key rstate = getKey((*rit)->first->getStateKey(),(*rit)->second->getStateKey());  //p_q_x
     
         result.add_rule(program,                //from_state (p)

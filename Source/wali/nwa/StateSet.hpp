@@ -337,7 +337,7 @@ namespace wali
         /**
          * TODO
          */
-        St* getState( StName name );
+        St* getState( StName name ) const;
 
         /**
          * TODO
@@ -347,12 +347,12 @@ namespace wali
         /**
          * TODO
          */
-        std::set<St*> getStates();
+        std::set<St*> getStates() const;
 
         /**
          * TODO
          */
-        std::set<StName> getStateNames();
+        std::set<StName> getStateNames() const;
         
         /**
          * TODO
@@ -784,9 +784,9 @@ namespace wali
      *
      */
     template <typename St,typename StName> 
-    typename St* StateSet<St,StName>::getState( StName name )
+    typename St* StateSet<St,StName>::getState( StName name ) const
     {
-      StMap::iterator it = name_St.find(name);
+      StMap::const_iterator it = name_St.find(name);
       if( it != name_St.end() )
         return it->second;
       else
@@ -810,7 +810,7 @@ namespace wali
      * TODO
      */
     template <typename St,typename StName>
-    std::set<St*> StateSet<St,StName>::getStates()
+    std::set<St*> StateSet<St,StName>::getStates() const
     {
       return states;
     }
@@ -819,7 +819,7 @@ namespace wali
      * TODO
      */
     template <typename St,typename StName>
-    std::set<StName> StateSet<St,StName>::getStateNames()
+    std::set<StName> StateSet<St,StName>::getStateNames() const
     {
       return names;
     }
