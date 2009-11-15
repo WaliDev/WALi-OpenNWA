@@ -28,9 +28,8 @@ namespace wali
       {
         //TODO: write comments
         public:
-          SymbolSource( const T lbl )
+          SymbolSource( const T _lbl ):lbl(_lbl)
           {
-            this->lbl = lbl;
           }
           
           ~SymbolSource() { }
@@ -44,6 +43,10 @@ namespace wali
               return false;
           }
           
+          std::ostream& print( std::ostream& o ) const {
+            return lbl.print(o);
+          }
+
           size_t hash() const
           {
             return lbl.hash();  
@@ -265,8 +268,9 @@ namespace wali
     template<typename T>
     Symbol<T>::Symbol( T lbl )
     {
+      SymbolSource *s = new SymbolSource(lbl);
       this->lbl = lbl;
-      symbolKey = wali::getKey(lbl);
+      symbolKey = wali::getKey(s);
     }
     
     template<typename T>
