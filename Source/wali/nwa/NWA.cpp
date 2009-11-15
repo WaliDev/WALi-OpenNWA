@@ -56,13 +56,13 @@ class ReachGen : public wali::nwa::WeightGen<St,Sym>
       return r->one();
     }
 
-    sem_elem_t getWeight( St src, Sym inst, St tgt )
+    sem_elem_t getWeight( const St &src, const Sym &inst, Kind k, const St &tgt )
     {
     //sem_elem_t getWeight( St src, Sym inst, St tgt ) {
       return getOne();
     }
        
-    sem_elem_t getWildWeight( St src, St tgt )
+    sem_elem_t getWildWeight( const St &src, const St &tgt )
     { //TODO: want the default here to be bottom
       return getOne();
     }
