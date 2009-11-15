@@ -167,7 +167,7 @@ namespace wali
        * @result true if the two edges can be intersected, false otherwise
        *
        */
-      virtual bool intersect( Symbol* other, Symbol & result )
+      /*virtual bool intersect( Symbol* other, Symbol & result )
       //bool intersect( Symbol other, Symbol & result )
       {
         //Note: When overriding this method your metric must determine an
@@ -191,7 +191,7 @@ namespace wali
         }
         else
           return false;
-      }
+      }*/
       
       //Utilities
       

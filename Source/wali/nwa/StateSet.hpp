@@ -24,7 +24,7 @@ namespace wali
       //TODO: update comments
     
       public:
-        typedef typename std::set<St*>::iterator iterator;    
+        typedef typename std::set<St*>::const_iterator iterator;    
         typedef std::map<StName,St*> StMap;
 
       //
@@ -60,6 +60,7 @@ namespace wali
          *
          */
         void clearStates( );
+        
         /**
          *
          * @brief removes all initial states
@@ -69,6 +70,7 @@ namespace wali
          *
          */
         void clearInitialStates( );
+        
         /**
          *
          * @brief removes all final states
@@ -105,6 +107,7 @@ namespace wali
          *
          */
         bool addState(St* addState);
+        
         /**
          *
          * @brief add the given initial state 
@@ -119,6 +122,7 @@ namespace wali
          *
          */
         bool addInitialState(St* addInitialState);
+        
         /**
          *
          * @brief add the given final state 
@@ -158,10 +162,12 @@ namespace wali
          *
          */
         void addAllStates(StateSet<St,StName> addStateSet);
+        
         /**
          * TODO
          */
         void addAllInitialStates(StateSet<St,StName> addStateSet);
+        
         /**
          * TODO
          */
@@ -188,10 +194,12 @@ namespace wali
          * TODO
          */
         bool removeState(St* removeState);
+        
         /**
          * TODO
          */
         bool removeInitialState(St* removeInitialState);
+        
         /**
          * TODO
          */
@@ -244,15 +252,17 @@ namespace wali
         /**
          * TODO
          */
-        iterator beginStates();
+        iterator beginStates() const;
+        
         /**
          * TODO
          */
-        iterator beginInitialStates();
+        iterator beginInitialStates() const;
+        
         /**
          * TODO
          */
-        iterator beginFinalStates();
+        iterator beginFinalStates() const;
       
         /**
          * TODO: remove
@@ -271,15 +281,17 @@ namespace wali
         /**
          * TODO
          */
-        iterator endStates();
+        iterator endStates() const;
+        
         /**
          * TODO
          */
-        iterator endInitialStates();
+        iterator endInitialStates() const;
+        
         /**
          * TODO
          */
-        iterator endFinalStates();
+        iterator endFinalStates() const;
 
         /**
          * TODO: remove
@@ -325,10 +337,12 @@ namespace wali
          * TODO
          */
         bool containsState( St* state ) const;
+        
         /**
          * TODO
          */
         bool containsInitialState( St* initialState ) const;
+        
         /**
          * TODO
          */
@@ -427,6 +441,7 @@ namespace wali
       
       clearMap();
     }    
+    
     /**
      * TODO
      */
@@ -435,6 +450,7 @@ namespace wali
     { 
       initialStates.clear();
     }    
+    
     /**
      * TODO
      */ 
@@ -457,6 +473,7 @@ namespace wali
       name_St.insert(std::pair<StName,St*>(addState->getName(),addState));
       return true;
     }    
+    
     /**
      * TODO
      */
@@ -475,6 +492,7 @@ namespace wali
       initialStates.insert(*state);
       return true;
     }    
+    
     /**
      * TODO
      */ 
@@ -522,7 +540,8 @@ namespace wali
       {
         addState(*it);
       }
-    }    
+    }  
+      
     /**
      * TODO
      */ 
@@ -535,6 +554,7 @@ namespace wali
         addInitialState(*it);
       }
     }
+    
     /**
      * TODO
      */
@@ -564,7 +584,8 @@ namespace wali
       //remove final
       removeFinalState(removeState);
       return true;
-    }    
+    }   
+     
     /**
      * TODO
      */ 
@@ -576,6 +597,7 @@ namespace wali
       initialStates.erase(removeInitialState);
       return true;
     }    
+    
     /**
      * TODO
      */
@@ -603,8 +625,8 @@ namespace wali
     {
       o << "Q: ";
       o << "{ ";
-      std::set<St*>::const_iterator it = states.begin();
-      std::set<St*>::const_iterator itEND = states.end();
+      iterator it = states.begin();
+      iterator itEND = states.end();
       for( bool first=true; it != itEND ; it++,first=false )
       {
         if( !first )
@@ -653,27 +675,27 @@ namespace wali
     template <typename St,typename StName> 
     bool StateSet<St,StName>::operator==( const StateSet<St,StName> & other ) const
     {
-      for( std::set<St*>::const_iterator it = states.begin(); it != states.end(); it++ )
+      for( iterator it = states.begin(); it != states.end(); it++ )
         if( other.states.count(*it) == 0 )
           return false;
           
-      for( std::set<St*>::const_iterator it = other.states.begin(); it != other.states.end(); it++ )
+      for( iterator it = other.states.begin(); it != other.states.end(); it++ )
         if( states.count(*it) == 0 )
           return false;
           
-      for( std::set<St*>::const_iterator it = initialStates.begin(); it != initialStates.end(); it++ )
+      for( iterator it = initialStates.begin(); it != initialStates.end(); it++ )
         if( other.initialStates.count(*it) == 0 )
           return false;
           
-      for( std::set<St*>::const_iterator it = other.initialStates.begin(); it != other.initialStates.end(); it++ )
+      for( iterator it = other.initialStates.begin(); it != other.initialStates.end(); it++ )
         if( initialStates.count(*it) == 0 )
           return false;
           
-      for( std::set<St*>::const_iterator it = finalStates.begin(); it != finalStates.end(); it++ )
+      for( iterator it = finalStates.begin(); it != finalStates.end(); it++ )
         if( other.finalStates.count(*it) == 0 )
           return false;
           
-      for( std::set<St*>::const_iterator it = other.finalStates.begin(); it != other.finalStates.end(); it++ )
+      for( iterator it = other.finalStates.begin(); it != other.finalStates.end(); it++ )
         if( finalStates.count(*it) == 0 )
           return false;        
           
@@ -684,23 +706,25 @@ namespace wali
      * TODO
      */
     template <typename St,typename StName> 
-    typename StateSet<St,StName>::iterator StateSet<St,StName>::beginStates()
+    typename StateSet<St,StName>::iterator StateSet<St,StName>::beginStates() const
     {
       return states.begin();
-    }    
+    }   
+     
     /**
      * TODO
      */ 
     template <typename St,typename StName> 
-    typename StateSet<St,StName>::iterator StateSet<St,StName>::beginInitialStates()
+    typename StateSet<St,StName>::iterator StateSet<St,StName>::beginInitialStates() const
     {
       return initialStates.begin();
     }    
+    
     /**
      * TODO
      */
     template <typename St,typename StName> 
-    typename StateSet<St,StName>::iterator StateSet<St,StName>::beginFinalStates()
+    typename StateSet<St,StName>::iterator StateSet<St,StName>::beginFinalStates() const
     {
       return finalStates.begin();
     }
@@ -709,23 +733,25 @@ namespace wali
      * TODO
      */
     template <typename St,typename StName> 
-    typename StateSet<St,StName>::iterator StateSet<St,StName>::endStates()
+    typename StateSet<St,StName>::iterator StateSet<St,StName>::endStates() const
     {
       return states.end();
     }    
+    
     /**
      * TODO
      */
     template <typename St,typename StName> 
-    typename StateSet<St,StName>::iterator StateSet<St,StName>::endInitialStates()
+    typename StateSet<St,StName>::iterator StateSet<St,StName>::endInitialStates() const
     {
       return initialStates.end();
     }    
+    
     /**
      * TODO
      */
     template <typename St,typename StName> 
-    typename StateSet<St,StName>::iterator StateSet<St,StName>::endFinalStates()
+    typename StateSet<St,StName>::iterator StateSet<St,StName>::endFinalStates() const
     {
       return finalStates.end();
     }
@@ -737,7 +763,8 @@ namespace wali
     size_t StateSet<St,StName>::sizeStates( ) const
     {
       return states.size();
-    }    
+    }  
+      
     /**
      * TODO
      */
@@ -745,7 +772,8 @@ namespace wali
     size_t StateSet<St,StName>::sizeInitialStates( ) const
     {
       return initialStates.size();
-    }    
+    } 
+       
     /**
      * TODO
      */
@@ -762,7 +790,8 @@ namespace wali
     bool StateSet<St,StName>::containsState( St* state ) const
     {
       return (states.count(state) >  0);
-    }    
+    }   
+     
     /**
      * TODO
      */
@@ -770,7 +799,8 @@ namespace wali
     bool StateSet<St,StName>::containsInitialState( St* initialState ) const
     {
       return (initialStates.count(initialState) >  0);
-    }    
+    } 
+       
     /**
      * TODO
      */

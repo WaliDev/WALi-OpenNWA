@@ -123,15 +123,15 @@ namespace wali
        * created when it is possible to join the two states
        * @result true if the two states can be joined, false otherwise
        */
-      virtual bool intersect( State* other, State & result ) const
+      /*virtual bool intersect( State* other, State & result ) const
       //bool intersect( State other, State & result )
       {      
         //Join the two states.
-       /* Key newKey = wali::getKey(stateKey,other.stateKey);  
-        result = State(newKey);*/
+        Key newKey = wali::getKey(stateKey,other.stateKey);  
+        result = State(newKey);
       
         return true;
-      }
+      }*/
       
       //Utilities
       

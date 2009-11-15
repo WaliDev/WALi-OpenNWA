@@ -68,6 +68,7 @@ namespace wali
         
         ~NWA( );
         
+        
         //State Accessors
         
         /**
@@ -80,7 +81,7 @@ namespace wali
          * @return true if the stuck state is a final state, false otherwise
          *
          */
-        bool isAbsentAccept();
+        bool isAbsentAccept() const;
         
         /**
          * 
@@ -98,21 +99,23 @@ namespace wali
          * This method makes the stuck state not a final state.
          *
          */
-        void rejectAbsent();
-        
+        void rejectAbsent();        
         
         /**
          * TODO: write comments
          */
         St* getState( StName name ) const;
+        
         /**
          * TODO: write comments
          */
         std::set<St*> getStates() const;
+        
         /**
          * TODO: write comments
          */
         std::set<StName> getStateNames() const;
+        
         /**
          * TODO: write comments
          */
@@ -142,7 +145,7 @@ namespace wali
          * @return true if the state with the given name is a state of the NWA
          *
          */
-        bool isState( St* name ); 
+        bool isState( St* name ) const; 
         
         /**
          *
@@ -160,15 +163,15 @@ namespace wali
         
         /**
          *
-         * @brief add all the states in the given StateSet to the NWA
+         * @brief returns the number of states associated with this NWA
          *
-         * This method adds all of the given states to the state set for 
-         * the NWA.
+         * This method returns the number of states associated with this
+         * NWA. 
          *
-         * @param the StateSet that contains the states to add
+         * @return the number of states associated with this NWA
          *
          */
-        void addAllStates( States addStateSet);  //TODO: make private
+        size_t sizeStates( ) const;
         
         /**
          *
@@ -194,31 +197,7 @@ namespace wali
          *
          */
         void clearStates( );
-        
-        /**
-         *
-         * @brief provide access to the beginning of the state set
-         *
-         * This method provides access to the beginning of the state set
-         * associated with this NWA.
-         *
-         * @return an iterator pointing to the beginning of the state set
-         *
-         */
-        stateIterator beginStates();  //TODO: make private
-        
-        /**
-         * 
-         * @brief provide access to the end of the state set
-         *
-         * This method provides access to the position one past the end
-         * of the state set associated with this transition set.
-         *
-         * @return an iterator pointing just past the end of the state set
-         *
-         */
-        stateIterator endStates();  //TODO: make private
-        
+                     
         /**
          *
          * @brief get all states in the initial state set
@@ -263,22 +242,19 @@ namespace wali
          *
          */
         bool addInitialState( St* name );
-        
+                     
         /**
          *
-         * @brief adds all of the states in the given StateSet to
-         * the initial state set associated with this NWA
+         * @brief returns the number of initial states associated with this NWA
          *
-         * This method adds all of the states associated with the 
-         * given StateSet to the initial state set associated with this
-         * NWA.
+         * This method returns the number of initial states associated with 
+         * this NWA.
          *
-         * @parm the state set whose initial states to add to this NWA's
-         * initial state set
+         * @return the number of initial states associated with this NWA
          *
          */
-        void addAllInitialStates( States addStateSet); //TODO: make private
-        
+        size_t sizeInitialStates( ) const;
+                     
         /**
          *
          * @brief remove the state with the given name from the initial state 
@@ -306,33 +282,7 @@ namespace wali
          *
          */
         void clearInitialStates( );
-        
-        /**
-         *
-         * @brief provide access to the beginning of the initial state set
-         *
-         * This method provides access to the beginning of the initial state 
-         * set associated with this NWA.
-         *
-         * @return an iterator pointing to the beginning of the initial state
-         *  set
-         *
-         */
-        stateIterator beginInitialStates();  //TODO: make private
-        
-        /**
-         * 
-         * @brief provide access to the end of the initial state set
-         *
-         * This method provides access to the position one past the end
-         * of the initial state set associated with this NWA.
-         *
-         * @return an iterator pointing just past the end of the initial 
-         * state set
-         *
-         */
-        stateIterator endInitialStates();  //TODO: make private
-        
+                        
         /**
          *
          * @brief get all final states
@@ -377,22 +327,20 @@ namespace wali
          *
          */
         bool addFinalState( St* name );
-        
+                            
         /**
          *
-         * @brief adds all of the final states in the given StateSet to
-         * the final state set associated with this NWA
+         * @brief returns the number of final states associated with this NWA
          *
-         * This method adds all of the final states associated with the 
-         * given StateSet to the final state set associated with this
-         * NWA.
+         * This method returns the number of final states associated with this
+         * NWA. Note: This count does includes the stuck state if it is
+         * a final state. 
          *
-         * @parm the StateSet whose final states to add to this NWA's
-         * final state set
+         * @return the number of final states associated with this NWA
          *
          */
-        void addAllFinalStates( States addStateSet, bool accept ); //TODO: make private
-        
+        size_t sizeFinalStates( ) const;
+             
         /**
          *
          * @brief remove the state with the given name from the final state 
@@ -421,68 +369,6 @@ namespace wali
          */
         void clearFinalStates( );
         
-        /**
-         *
-         * @brief provide access to the beginning of the final state set
-         *
-         * This method provides access to the beginning of the final state 
-         * set associated with this NWA.
-         *
-         * @return an iterator pointing to the beginning of the final state
-         *  set
-         *
-         */
-        stateIterator beginFinalStates();  //TODO: make private
-        
-        /**
-         * 
-         * @brief provide access to the end of the final state set
-         *
-         * This method provides access to the position one past the end
-         * of the final state set associated with this NWA.
-         *
-         * @return an iterator pointing just past the end of the final 
-         * state set
-         *
-         */
-        stateIterator endFinalStates();  //TODO: make private
-        
-        /**
-         *
-         * @brief returns the number of states associated with this NWA
-         *
-         * This method returns the number of states associated with this
-         * NWA. 
-         *
-         * @return the number of states associated with this NWA
-         *
-         */
-        size_t sizeStates( );
-        
-        /**
-         *
-         * @brief returns the number of initial states associated with this NWA
-         *
-         * This method returns the number of initial states associated with 
-         * this NWA.
-         *
-         * @return the number of initial states associated with this NWA
-         *
-         */
-        size_t sizeInitialStates( ) const;
-        
-        /**
-         *
-         * @brief returns the number of final states associated with this NWA
-         *
-         * This method returns the number of final states associated with this
-         * NWA. Note: This count does includes the stuck state if it is
-         * a final state. 
-         *
-         * @return the number of final states associated with this NWA
-         *
-         */
-        size_t sizeFinalStates( ) const;
         
         //Symbol Accessors
         
@@ -510,7 +396,7 @@ namespace wali
          * @return true if the given symbol is associated with the NWA
          *
          */
-        bool isSymbol( Sym* sym );
+        bool isSymbol( Sym* sym ) const;
         
         /**
          *
@@ -525,19 +411,19 @@ namespace wali
          *
          */
         bool addSymbol( Sym* sym );
-        
+                      
         /**
          *
-         * @brief add the given symbols to the NWA
+         * @brief returns the number of symbols associated with this NWA
          *
-         * This method adds all of the given symbols to the set of symbols 
-         * associated with the NWA.  
+         * This method returns the number of symbols associated with this
+         * NWA.  Note: The epsilon symbol is included in this count.
          *
-         * @param the symbols to add
+         * @return the number of symbols associated with this NWA
          *
          */
-        void addAllSymbols( Symbols addSymbolSet);    //TODO: make private
-        
+        size_t sizeSymbols( ) const;
+                       
         /**
          *
          * @brief remove the given symbol from the NWA
@@ -562,54 +448,16 @@ namespace wali
          */
         void clearSymbols( );
         
-        /**
-         *
-         * @brief provide access to the beginning of the symbol set
-         *
-         * This method provides access to the beginning of the symbol set
-         * associated with this transition set.
-         *
-         * @return an iterator pointing to the beginning of the symbol set
-         *
-         */
-        symbolIterator beginSymbols();  //TODO: make private
-        
-        /**
-         * 
-         * @brief provide access to the end of the symbol set
-         *
-         * This method provides access to the position one past the end
-         * of the symbol set associated with this transition set.
-         *
-         * @return an iterator pointing just past the end of the symbol set
-         *
-         */
-        symbolIterator endSymbols();  //TODO: make private
-        
-        /**
-         *
-         * @brief returns the number of symbols associated with this NWA
-         *
-         * This method returns the number of symbols associated with this
-         * NWA.  Note: The epsilon symbol is included in this count.
-         *
-         * @return the number of symbols associated with this NWA
-         *
-         */
-        size_t sizeSymbols( );
         
         //Transition Accessors
-        //TODO: return true and some symbol which occurs on the edge from source to
-        //dest in sym else return false
+        
         /**
          * TODO: write comments
+         * return true and some symbol which occurs on the edge from source to
+         * dest in sym else return false
          */
         bool getSymbol( StName from, StName to, Sym &sym );
         
-
-        //Transition Accessors
-        //TODO: return true and some symbol which occurs on the edge from source to
-        //dest in sym else return false
         /**
          * TODO: write comments
          */
@@ -673,6 +521,7 @@ namespace wali
          *
          */
         bool addCallTrans( Call * ct );
+        
         /**
          * TODO: write comments
          */
@@ -707,33 +556,7 @@ namespace wali
          *
          */
         bool removeCallTrans( Call * ct );
-        
-        /**
-         *
-         * @brief provide access to the beginning of the call transition set
-         *
-         * This method provides access to the beginning of the call transition
-         * set associated with this NWA.
-         *
-         * @return an iterator pointing to the beginning of the call transition
-         *  set
-         *
-         */
-        callIterator beginCallTrans();  //TODO: make private
-        
-        /**
-         * 
-         * @brief provide access to the end of the call transition set
-         *
-         * This method provides access to the position one past the end
-         * of the call transition set associated with this NWA.
-         *
-         * @return an iterator pointing just past the end of the call 
-         * transition set
-         *
-         */
-        callIterator endCallTrans();  //TODO: make private
-        
+                     
         /**
          *
          * @brief get all internal transitions in the transition set of the 
@@ -819,33 +642,7 @@ namespace wali
          *
          */
         bool removeInternalTrans( Internal * it );
-        
-        /**
-         *
-         * @brief provide access to the beginning of the internal transition set
-         *
-         * This method provides access to the beginning of the internal transition
-         * set associated with this NWA.
-         *
-         * @return an iterator pointing to the beginning of the internal transition
-         *  set
-         *
-         */
-        internalIterator beginInternalTrans() const;  //TODO: make private
-        
-        /**
-         * 
-         * @brief provide access to the end of the internal transition set
-         *
-         * This method provides access to the position one past the end
-         * of the internal transition set associated with this NWA.
-         *
-         * @return an iterator pointing just past the end of the internal
-         * transition set
-         *
-         */
-        internalIterator endInternalTrans() const;  //TODO: make private
-        
+                
         /**
          *
          * @brief get all return transitions in the transition set of the NWA.
@@ -863,6 +660,7 @@ namespace wali
          * TODO: write comments
          */
         std::set<StName> getReturnSites(StName callSite);
+        
         /**
          * TODO: write comments
          */
@@ -904,10 +702,12 @@ namespace wali
          * TODO: write comments
          */
         bool removeReturnTrans( StName from, Sym* sym, StName to );
+        
         /**
          * TODO: write comments
          */
         bool removeReturnTrans( St* from, Sym* sym, St* to );
+        
         /**
          * TODO: write comments
          */
@@ -944,33 +744,8 @@ namespace wali
          *
          */
         bool removeReturnTrans( Return * rt );
-        
-        /**
-         *
-         * @brief provide access to the beginning of the return transition set
-         *
-         * This method provides access to the beginning of the return transition
-         * set associated with this NWA.
-         *
-         * @return an iterator pointing to the beginning of the return transition
-         *  set
-         *
-         */
-        returnIterator beginReturnTrans();  //TODO: make private
-        
-        /**
-         * 
-         * @brief provide access to the end of the return transition set
-         *
-         * This method provides access to the position one past the end
-         * of the return transition set associated with this NWA.
-         *
-         * @return an iterator pointing just past the end of the return 
-         * transition set
-         *
-         */
-        returnIterator endReturnTrans();  //TODO: make private
-        
+             
+                  
         //Building NWAs
         
         /**
@@ -1033,7 +808,33 @@ namespace wali
          * @return the NWA which is the complement of this NWA
          *
          */
-        NWA * complement( );
+        //NWA * complement( );
+        
+        /**
+         *
+         * @brief constructs a deterministic NWA that is equivalent to this 
+         * NWA.
+         *
+         * This method constructs a deterministic NWA that is equivalent to 
+         * this NWA.
+         *
+         * @return the NWA which is a deterministed equivalent to this NWA
+         *
+         */
+        //NWA & determinize( ); //FIX
+        
+        /**
+         *
+         * @brief tests whether the NWA is deterministic 
+         *
+         * This method tests whether the NWA is deterministic or nondeterministic.
+         * If the NWA is deterministic, true is returned.  Otherwise, false is
+         * returned.
+         *
+         * @return true if the NWA is deterministic, false otherwise
+         *
+         */
+        bool isDeterministic( );
         
         /**
          * @brief constructs the NWA which is the reverse of this NWA
@@ -1062,7 +863,18 @@ namespace wali
          * 'other'
          *	
          */
-        NWA * intersect( NWA other );
+        void intersect( NWA other, NWA & result );
+        
+        /**
+         * TODO: write comments
+         */
+        bool nodeIntersect(St* node1, St* node2, St & result );
+        
+        /**
+         * TODO: write comments
+         */
+        bool edgeIntersect(Sym* label1, Sym* label2, Sym & result );
+        
         
         //Using NWAs
         
@@ -1102,7 +914,7 @@ namespace wali
          * @return the PDS equivalent to this NWA
          *
          */ 
-        static wpds::WPDS NWAtoPDS(NWA<St,StName,Sym> nwa,WeightGen<St,Sym> wg);
+        wpds::WPDS NWAtoPDS(WeightGen<St,Sym> wg) const;
         
         /**
          *
@@ -1113,33 +925,7 @@ namespace wali
          * @return the PDS equivalent to this NWA
          *
          */ 
-        static wpds::WPDS NWAtoBackwardsPDS(NWA<St,StName,Sym> nwa,WeightGen<St,Sym> wg);
-        
-        /**
-         *
-         * @brief constructs a deterministic NWA that is equivalent to this 
-         * NWA.
-         *
-         * This method constructs a deterministic NWA that is equivalent to 
-         * this NWA.
-         *
-         * @return the NWA which is a deterministed equivalent to this NWA
-         *
-         */
-        //NWA & determinize( ); //FIX
-        
-        /**
-         *
-         * @brief tests whether the NWA is deterministic 
-         *
-         * This method tests whether the NWA is deterministic or nondeterministic.
-         * If the NWA is deterministic, true is returned.  Otherwise, false is
-         * returned.
-         *
-         * @return true if the NWA is deterministic, false otherwise
-         *
-         */
-        bool isDeterministic( );  
+        wpds::WPDS NWAtoBackwardsPDS(WeightGen<St,Sym> wg) const;  
         
         /**
          *
@@ -1192,34 +978,239 @@ namespace wali
          *
          */
         bool operator==( const NWA & other ) const;
+               
+      protected:
+        /**
+         *
+         * @brief add all the states in the given StateSet to the NWA
+         *
+         * This method adds all of the given states to the state set for 
+         * the NWA.
+         *
+         * @param the StateSet that contains the states to add
+         *
+         */
+        void addAllStates( States addStateSet);  
         
         /**
          *
-         * @brief returns the number of states associated with this NWA
+         * @brief provide access to the beginning of the state set
          *
-         * This method returns the number of states associated with this
+         * This method provides access to the beginning of the state set
+         * associated with this NWA.
+         *
+         * @return an iterator pointing to the beginning of the state set
+         *
+         */
+        stateIterator beginStates() const;  
+        
+        /**
+         * 
+         * @brief provide access to the end of the state set
+         *
+         * This method provides access to the position one past the end
+         * of the state set associated with this transition set.
+         *
+         * @return an iterator pointing just past the end of the state set
+         *
+         */
+        stateIterator endStates() const;  
+        
+        /**
+         *
+         * @brief adds all of the states in the given StateSet to
+         * the initial state set associated with this NWA
+         *
+         * This method adds all of the states associated with the 
+         * given StateSet to the initial state set associated with this
          * NWA.
          *
-         * @return the number of states associated with this NWA
+         * @parm the state set whose initial states to add to this NWA's
+         * initial state set
          *
          */
-        size_t numStates( );
+        void addAllInitialStates( States addStateSet); 
         
         /**
          *
-         * @brief returns the number of transitions (of all kinds) 
-         * associated with this NWA
+         * @brief provide access to the beginning of the initial state set
          *
-         * This method returns the number of transitions (call, internal, and
-         * return) associated with this NWA.
+         * This method provides access to the beginning of the initial state 
+         * set associated with this NWA.
          *
-         * @return the number of transitions (of all kinds) associated
-         * with this NWA
+         * @return an iterator pointing to the beginning of the initial state
+         *  set
          *
          */
-        size_t numTrans( );
+        stateIterator beginInitialStates() const;  
         
-      protected:
+        /**
+         * 
+         * @brief provide access to the end of the initial state set
+         *
+         * This method provides access to the position one past the end
+         * of the initial state set associated with this NWA.
+         *
+         * @return an iterator pointing just past the end of the initial 
+         * state set
+         *
+         */
+        stateIterator endInitialStates() const;  
+        
+        /**
+         *
+         * @brief adds all of the final states in the given StateSet to
+         * the final state set associated with this NWA
+         *
+         * This method adds all of the final states associated with the 
+         * given StateSet to the final state set associated with this
+         * NWA.
+         *
+         * @parm the StateSet whose final states to add to this NWA's
+         * final state set
+         *
+         */
+        void addAllFinalStates( States addStateSet, bool accept ); 
+        
+        /**
+         *
+         * @brief provide access to the beginning of the final state set
+         *
+         * This method provides access to the beginning of the final state 
+         * set associated with this NWA.
+         *
+         * @return an iterator pointing to the beginning of the final state
+         *  set
+         *
+         */
+        stateIterator beginFinalStates() const;  
+        
+        /**
+         * 
+         * @brief provide access to the end of the final state set
+         *
+         * This method provides access to the position one past the end
+         * of the final state set associated with this NWA.
+         *
+         * @return an iterator pointing just past the end of the final 
+         * state set
+         *
+         */
+        stateIterator endFinalStates() const;  
+        
+        /**
+         *
+         * @brief add the given symbols to the NWA
+         *
+         * This method adds all of the given symbols to the set of symbols 
+         * associated with the NWA.  
+         *
+         * @param the symbols to add
+         *
+         */
+        void addAllSymbols( Symbols addSymbolSet);    
+        
+        /**
+         *
+         * @brief provide access to the beginning of the symbol set
+         *
+         * This method provides access to the beginning of the symbol set
+         * associated with this transition set.
+         *
+         * @return an iterator pointing to the beginning of the symbol set
+         *
+         */
+        symbolIterator beginSymbols() const;  
+        
+        /**
+         * 
+         * @brief provide access to the end of the symbol set
+         *
+         * This method provides access to the position one past the end
+         * of the symbol set associated with this transition set.
+         *
+         * @return an iterator pointing just past the end of the symbol set
+         *
+         */
+        symbolIterator endSymbols() const;  
+        
+        /**
+         *
+         * @brief provide access to the beginning of the call transition set
+         *
+         * This method provides access to the beginning of the call transition
+         * set associated with this NWA.
+         *
+         * @return an iterator pointing to the beginning of the call transition
+         *  set
+         *
+         */
+        callIterator beginCallTrans() const;  
+        
+        /**
+         * 
+         * @brief provide access to the end of the call transition set
+         *
+         * This method provides access to the position one past the end
+         * of the call transition set associated with this NWA.
+         *
+         * @return an iterator pointing just past the end of the call 
+         * transition set
+         *
+         */
+        callIterator endCallTrans() const;  
+        
+        /**
+         *
+         * @brief provide access to the beginning of the internal transition set
+         *
+         * This method provides access to the beginning of the internal transition
+         * set associated with this NWA.
+         *
+         * @return an iterator pointing to the beginning of the internal transition
+         *  set
+         *
+         */
+        internalIterator beginInternalTrans() const;  
+        
+        /**
+         * 
+         * @brief provide access to the end of the internal transition set
+         *
+         * This method provides access to the position one past the end
+         * of the internal transition set associated with this NWA.
+         *
+         * @return an iterator pointing just past the end of the internal
+         * transition set
+         *
+         */
+        internalIterator endInternalTrans() const; 
+        
+        /**
+         *
+         * @brief provide access to the beginning of the return transition set
+         *
+         * This method provides access to the beginning of the return transition
+         * set associated with this NWA.
+         *
+         * @return an iterator pointing to the beginning of the return transition
+         *  set
+         *
+         */
+        returnIterator beginReturnTrans() const;  
+        
+        /**
+         * 
+         * @brief provide access to the end of the return transition set
+         *
+         * This method provides access to the position one past the end
+         * of the return transition set associated with this NWA.
+         *
+         * @return an iterator pointing just past the end of the return 
+         * transition set
+         *
+         */
+        returnIterator endReturnTrans() const;  
         
         /**
          *
@@ -1276,10 +1267,8 @@ namespace wali
         // Variables
         //
       protected:
-        States states; 
-        
-        Symbols symbols;
-        
+        States states;         
+        Symbols symbols;        
         Trans * trans;
         
         bool absentAcceptance;
@@ -1332,11 +1321,10 @@ namespace wali
     template<typename St,typename StName,typename Sym >
     NWA<St,StName,Sym>::~NWA( )
     {   
-      clearStates();      
-      
-      clearSymbols();
-      
+      clearStates();       
+      clearSymbols();      
       clearTrans();
+      
       trans->~Trans();    
     }
     
@@ -1351,7 +1339,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym >
-    bool NWA<St,StName,Sym>::isAbsentAccept()
+    bool NWA<St,StName,Sym>::isAbsentAccept() const
     {
       return absentAcceptance;
     }
@@ -1386,6 +1374,7 @@ namespace wali
     {
       return states.getState(name);
     }
+    
     /**
      * TODO: write comments
      */
@@ -1394,6 +1383,7 @@ namespace wali
     {
       return states.getStates();
     }
+    
     /**
      * TODO: write comments
      */
@@ -1402,6 +1392,7 @@ namespace wali
     {
       return states.getStateNames();
     }
+    
     /**
      * TODO: write comments
      */
@@ -1412,9 +1403,9 @@ namespace wali
       St* dupStPtr = new St(dup);
       
       states.addState(dupStPtr);
-      states.dupState(origSt,dupStPtr);
+      states.dupState(origSt,dupStPtr); //duplicate state characteristics
 
-      trans->dupTrans(origSt,dupStPtr);
+      trans->dupTrans(origSt,dupStPtr); //duplicate transitions for the original state
 
       return dupStPtr;
     }
@@ -1442,11 +1433,10 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::isState( St* name )
+    bool NWA<St,StName,Sym>::isState( St* name ) const
     {
       return states.containsState(name);
-    }
-    
+    }    
     
     /**
      *
@@ -1473,6 +1463,19 @@ namespace wali
     void NWA<St,StName,Sym>::addAllStates( States addStateSet)
     {
       states.addAllStates(addStateSet);
+    }    
+        
+    /**
+     *
+     * @brief returns the number of states in this collection
+     *
+     * @return the number of states in this collection
+     *
+     */
+    template<typename St,typename StName,typename Sym > 
+    size_t NWA<St,StName,Sym>::sizeStates( ) const
+    {
+      return states.sizeStates();
     }
     
     /**
@@ -1498,8 +1501,7 @@ namespace wali
         return true;
       }      
       return false;
-    }
-    
+    }    
     
     /**
      *
@@ -1526,7 +1528,7 @@ namespace wali
      * 
      */
     template<typename St,typename StName,typename Sym > 
-    typename NWA<St,StName,Sym>::stateIterator NWA<St,StName,Sym>::beginStates()
+    typename NWA<St,StName,Sym>::stateIterator NWA<St,StName,Sym>::beginStates() const
     {
       return states.beginStates();
     }
@@ -1539,11 +1541,10 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    typename NWA<St,StName,Sym>::stateIterator NWA<St,StName,Sym>::endStates()
+    typename NWA<St,StName,Sym>::stateIterator NWA<St,StName,Sym>::endStates() const
     {
       return states.endStates();
-    }
-    
+    }    
     
     //Initial States
     /**
@@ -1572,8 +1573,7 @@ namespace wali
     bool NWA<St,StName,Sym>::isInitialState( St* name ) const
     {
       return states.containsInitialState(name); 
-    }
-    
+    }    
     
     /**
      *
@@ -1604,6 +1604,18 @@ namespace wali
       states.addAllInitialStates(addStateSet);
     }
     
+    /**
+     *
+     * @brief returns the number of initial states in this collection
+     *
+     * @return the number of initial states in this collection
+     *
+     */
+    template<typename St,typename StName,typename Sym > 
+    size_t NWA<St,StName,Sym>::sizeInitialStates( ) const
+    {
+      return states.sizeInitialStates();
+    }
     
     /**
      *
@@ -1619,8 +1631,7 @@ namespace wali
     bool NWA<St,StName,Sym>::removeInitialState( St* name ) 
     {
       return states.removeInitialState(name);
-    }
-    
+    }    
     
     /**
      *
@@ -1642,7 +1653,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    typename NWA<St,StName,Sym>::stateIterator NWA<St,StName,Sym>::beginInitialStates()
+    typename  NWA<St,StName,Sym>::stateIterator NWA<St,StName,Sym>::beginInitialStates() const
     {
       return states.beginInitialStates();
     }
@@ -1656,11 +1667,10 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    typename NWA<St,StName,Sym>::stateIterator NWA<St,StName,Sym>::endInitialStates()
+    typename NWA<St,StName,Sym>::stateIterator NWA<St,StName,Sym>::endInitialStates() const
     {
       return states.endInitialStates();
-    }
-    
+    }    
     
     //Final States
     /**
@@ -1689,8 +1699,7 @@ namespace wali
     bool NWA<St,StName,Sym>::isFinalState( St* name ) const
     {
       return states.containsFinalState(name);
-    }
-    
+    }    
     
     /**
      *
@@ -1723,6 +1732,22 @@ namespace wali
       
       states.addAllFinalStates(addStateSet);
     }
+            
+    /**
+     *
+     * @brief returns the number of final states in this collection
+     *
+     * @return the number of final states in this collection
+     *
+     */
+    template<typename St,typename StName,typename Sym > 
+    size_t NWA<St,StName,Sym>::sizeFinalStates( ) const
+    {
+      if( absentAcceptance )
+        return states.sizeFinalStates() + 1;
+      else
+        return states.sizeFinalStates();
+    } 
     
     /**
      *
@@ -1738,8 +1763,7 @@ namespace wali
     bool NWA<St,StName,Sym>::removeFinalState( St* name )
     {
       return states.removeFinalState(name);
-    }
-    
+    }    
     
     /**
      *
@@ -1763,7 +1787,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    typename NWA<St,StName,Sym>::stateIterator NWA<St,StName,Sym>::beginFinalStates()
+    typename NWA<St,StName,Sym>::stateIterator NWA<St,StName,Sym>::beginFinalStates() const
     {
       return states.beginFinalStates();
     }
@@ -1780,52 +1804,11 @@ namespace wali
      *
      */  
     template<typename St,typename StName,typename Sym >   
-    typename NWA<St,StName,Sym>::stateIterator NWA<St,StName,Sym>::endFinalStates()
+    typename NWA<St,StName,Sym>::stateIterator NWA<St,StName,Sym>::endFinalStates() const
     {
       return states.endFinalStates();
-    }
+    }  
     
-    /**
-     *
-     * @brief returns the number of states in this collection
-     *
-     * @return the number of states in this collection
-     *
-     */
-    template<typename St,typename StName,typename Sym > 
-    size_t NWA<St,StName,Sym>::sizeStates( )
-    {
-      return states.sizeStates();
-    }
-    
-    /**
-     *
-     * @brief returns the number of initial states in this collection
-     *
-     * @return the number of initial states in this collection
-     *
-     */
-    template<typename St,typename StName,typename Sym > 
-    size_t NWA<St,StName,Sym>::sizeInitialStates( ) const
-    {
-      return states.sizeInitialStates();
-    }
-    
-    /**
-     *
-     * @brief returns the number of final states in this collection
-     *
-     * @return the number of final states in this collection
-     *
-     */
-    template<typename St,typename StName,typename Sym > 
-    size_t NWA<St,StName,Sym>::sizeFinalStates( ) const
-    {
-      if( absentAcceptance )
-        return states.sizeFinalStates() + 1;
-      else
-        return states.sizeFinalStates();
-    }   
     
     //Symbol Accessors
     
@@ -1851,11 +1834,10 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::isSymbol( Sym* sym )
+    bool NWA<St,StName,Sym>::isSymbol( Sym* sym ) const
     {
       return (symbols.count(sym) >  0);
-    }
-    
+    }    
     
     /**
      *
@@ -1889,6 +1871,18 @@ namespace wali
         addSymbol(*sit);
     }
     
+    /**
+     *
+     * @brief returns the number of symbols associated with this NWA
+     *
+     * @return the number of symbols associated with this NWA
+     *
+     */
+    template<typename St,typename StName,typename Sym >
+    size_t NWA<St,StName,Sym>::sizeSymbols( ) const
+    {
+      return symbols.size();
+    }
     
     /**
      *
@@ -1914,8 +1908,7 @@ namespace wali
         return true;
       }      
       return false;
-    }
-    
+    }    
     
     /**
      *
@@ -1945,7 +1938,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym >
-    typename NWA<St,StName,Sym>::symbolIterator NWA<St,StName,Sym>::beginSymbols()
+    typename NWA<St,StName,Sym>::symbolIterator NWA<St,StName,Sym>::beginSymbols() const
     {
       return symbols.begin();
     }
@@ -1958,15 +1951,15 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym >
-    typename NWA<St,StName,Sym>::symbolIterator NWA<St,StName,Sym>::endSymbols()
+    typename NWA<St,StName,Sym>::symbolIterator NWA<St,StName,Sym>::endSymbols() const
     {
       return symbols.end();
     }
-    
-    //TODO: return true and some symbol which occurs on the edge from source to
-    //dest in sym else return false
+           
     /**
      * TODO: write comments
+     * //return true and some symbol which occurs on the edge from source to
+     * //dest in sym else return false
      */
     template<typename St,typename StName,typename Sym >
     bool NWA<St,StName,Sym>::getSymbol( StName from, StName to, Sym &sym )
@@ -1976,9 +1969,7 @@ namespace wali
 
       return trans->getSymbol(fromSt,toSt,sym);
     }
-    
-    //TODO: return true if the symbol occurs on the edge from source to
-    //dest in sym else return false
+
     /**
      * TODO: write comments
      */
@@ -1990,19 +1981,7 @@ namespace wali
 
       return trans->findTrans(fromSt,sym, toSt);
     }
-
-    /**
-     *
-     * @brief returns the number of symbols associated with this NWA
-     *
-     * @return the number of symbols associated with this NWA
-     *
-     */
-    template<typename St,typename StName,typename Sym >
-    size_t NWA<St,StName,Sym>::sizeSymbols( )
-    {
-      return symbols.size();
-    }
+    
     
     //Transition Accessors
     
@@ -2015,8 +1994,7 @@ namespace wali
     void NWA<St,StName,Sym>::clearTrans( )
     {
       trans->clear();
-    }
-    
+    }    
     
     /**
      *
@@ -2169,7 +2147,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    typename NWA<St,StName,Sym>::callIterator NWA<St,StName,Sym>::beginCallTrans()
+    typename NWA<St,StName,Sym>::callIterator NWA<St,StName,Sym>::beginCallTrans() const
     {
       return trans->beginCall();
     }
@@ -2183,7 +2161,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    typename NWA<St,StName,Sym>::callIterator NWA<St,StName,Sym>::endCallTrans()
+    typename NWA<St,StName,Sym>::callIterator NWA<St,StName,Sym>::endCallTrans() const
     {
       return trans->endCall();
     }
@@ -2264,8 +2242,7 @@ namespace wali
         addSymbol(it->second);  
       
       return trans->addInternal(it);
-    }
-    
+    }    
     
     /**
      * TODO: write comments
@@ -2388,6 +2365,7 @@ namespace wali
       }
       return rets;
     }
+    
     /**
      * TODO: write comments
      */
@@ -2491,6 +2469,7 @@ namespace wali
       }
       return removed;
     }
+    
     /**
      * TODO: write comments
      */
@@ -2523,6 +2502,7 @@ namespace wali
       }
       return removed;
     }
+    
     /**
      * TODO: write comments
      */
@@ -2602,7 +2582,7 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    typename NWA<St,StName,Sym>::returnIterator NWA<St,StName,Sym>::beginReturnTrans()
+    typename NWA<St,StName,Sym>::returnIterator NWA<St,StName,Sym>::beginReturnTrans() const
     {
       return trans->beginReturn();
     }
@@ -2616,10 +2596,11 @@ namespace wali
      *
      */
     template<typename St,typename StName,typename Sym > 
-    typename NWA<St,StName,Sym>::returnIterator NWA<St,StName,Sym>::endReturnTrans()
+    typename NWA<St,StName,Sym>::returnIterator NWA<St,StName,Sym>::endReturnTrans() const
     {
       return trans->endReturn();
     }
+    
     
     //Building NWAs
     
@@ -2834,7 +2815,7 @@ namespace wali
      * @return the NWA which is the complement of this NWA
      *
      */
-    template<typename St,typename StName,typename Sym > 
+   /* template<typename St,typename StName,typename Sym > 
     NWA<St,StName,Sym> * NWA<St,StName,Sym>::complement( )
     {
       NWA<St,StName,Sym> * newNWA = new NWA<St,StName,Sym>();
@@ -2878,885 +2859,7 @@ namespace wali
         newNWA->absentAcceptance;
   
       return newNWA;
-    }
-
-    /**
-     * @brief constructs the NWA which is the reverse of this NWA
-     *
-     * This method constructs the NWA which is the reverse of this NWA.
-     *
-     * @return the NWA which is the reverse of this NWA
-     * 
-     */
-    /*  Note: broken
-    template<typename St,typename StName,typename Sym > 
-    NWA<St,StName,Sym> * NWA<St,StName,Sym>::reverse()
-    { //FIX
-      //TODO: fix this for absent acceptance and wild symbol
-      NWA<St,StName,Sym> * newNWA = new NWA<St,StName,Sym>();
-
-      //The states remain the same.
-      newNWA->addAllStates(states);
-  
-      //Swap the initial state set with the final state set.
-      for( stateIterator it = beginFinalStates();
-            it != endFinalStates(); it++ )
-        newNWA->addInitialState(*it);
-      for( stateIterator it = beginInitialStates();
-            it != endInitialStates(); it++ )
-        newNWA->addFinalState(*it);
-    
-      //Reverse all transitions.
-      for( internalIterator iit = this->trans->beginInternal();
-            iit != this->trans->endInternal(); iit++ )
-      {
-        newNWA->addInternalTrans(iit->third,iit->second,iit->first);
-      }         
-      
-      for( returnIterator rit = this->trans->beginReturn();
-            rit != this->trans->endReturn(); rit++ )
-      {
-        newNWA->addCallTrans(rit->third,rit->second,rit->first);
-      }
-      for( callIterator cit = this->trans->beginCall();
-            cit != this->trans->endCall(); cit++ )
-      {
-        for( returnIterator rit = this->trans->beginReturn();
-              rit != this->trans->endReturn(); rit++ )
-        {
-          if( cit->first == rit->second )
-          {
-            newNWA->addReturnTrans(cit->third,rit->first,
-            cit->second,cit->first);
-            break;
-          } 
-        }
-      }
-        
-      return newNWA;
     }*/
-
-    /**
-     *
-     * @brief constructs the NWA which is the intersection of this NWA
-     * and the NWA 'other'
-     *
-     * @param the NWA with which to perform the intersection with this
-     * NWA
-     * @return the NWA which is the intersection of this NWA and the NWA
-     * 'other'
-     *
-     */
-    template<typename St,typename StName,typename Sym >  
-    NWA<St,StName,Sym> * NWA<St,StName,Sym>::intersect( NWA<St,StName,Sym> other )
-    {
-      //TODO: fix this for absentAcceptance  
-      /*  NOTE: This is not optimized and doesn't include epsilon closure or consideration of absentAcceptance.
-      NWA<St,StName,Sym> * newNWA = new NWA<St,StName,Sym>();
-      
-      //Generate new states, adding them to the state set as well as
-      //to the initial state set and final state set as needed.
-      St newSt;
-      for( stateIterator fit = beginStates();
-            fit != endStates(); fit++ )
-      {
-        for( stateIterator sit = other.beginStates();
-              sit != other.endStates(); sit++ )
-        {        
-          fit->intersect(*sit,&newSt);
-      
-          newNWA->addState(newSt);
-        
-          if( this->isInitialState(*fit) && other.isInitialState(*sit) )
-            newNWA->addInitialState(newSt);
-          if( this->isFinalState(*fit) && other.isFinalState(*sit) )
-            newNWA->addFinalState(newSt); 
-          
-          //if these nodes can't be intersected
-          //TODO: what should i do 
-              
-        }
-      }     
-                
-      //Generate call transitions.
-      for( callIterator fcit = this->trans->beginCall();
-            fcit != this->trans->endCall(); fcit++ )
-      {
-        for( callIterator scit = other.trans->beginCall();
-              scit != other.trans->endCall(); scit++ )
-        {
-          Sym sym;
-          if( fcit->second->intersect(scit->second,sym) )
-          {
-            St fromSt, toSt;
-            //TODO: what should I do if these calls failed?
-            fcit->first->intersect(scit->first,&fromSt);
-            fcit->third->intersect(scit->third,&toSt);
-                
-            newNWA->addCallTrans( fromSt, sym, toSt );
-          }
-        }
-      }
-      //Generate internal transitions.
-      for( Trans::internalIterator fiit = this->trans->beginInternal();
-            fiit != this->trans->endInternal(); fiit++ )
-      {
-        for( Trans::internalIterator siit = other.trans->beginInternal();
-              siit != other.trans->endInternal(); siit++ )
-        {
-          Sym sym;
-          if( fiit->second->intersect(siit->second,sym) )
-          {
-            St fromSt, toSt;
-            //TODO: what should I do if these calls failed?
-            fiit->first->intersect(siit->first,&fromSt);
-            fiit->third->intersect(siit->third,&toSt);
-                
-            newNWA->addInternalTrans( fromSt, sym, toSt );
-          }
-        }
-      }
-      //Generate return transitions.  
-      for( Trans::returnIterator frit = this->trans->beginReturn();
-            frit != this->trans->endReturn(); frit++ )
-      {
-        for( Trans::returnIterator srit = other.trans->beginReturn();
-              srit != other.trans->endReturn(); srit++ )
-        {
-          Sym sym;
-          if( frit->third->intersect(srit->third,sym) )
-          {
-            St fromSt, predSt, toSt;
-            //TODO: what should I do if these calls failed?
-            frit->first->intersect(srit->first,&fromSt);
-            frit->second->intersect(srit->second,&predSt);
-            frit->fourth->intersect(srit->fourth,&toSt);
-                    
-            newNWA->addReturnTrans( fromSt, predSt, sym, toSt );
-          }
-        }
-      }   
-                       
-      return newNWA;
-      */
-      
-      // TODO: acceptAbsent consideration
-      //NOTE: for now, intersect only works with NWAs that do not accept the stuck state.
-      assert(!absentAcceptance && !other.absentAcceptance);
-      
-      NWA<St,StName,Sym> * worklistNWA = new NWA<St,StName,Sym>();
-      
-      //If both NWAs to be intersected accept absent, the intersection should too.
-      //Otherwise, the intersection should not, so keep the default settings.
-      if( absentAcceptance && other.absentAcceptance )
-        worklistNWA->acceptAbsent();
-      
-      std::deque<Triple<St*,St*,St*>> wList; //An element: <joinedState, thisState, otherState>
-      std::set<St*> visited; //States that have been created in the intersection NWA.
-      
-      //Start the worklist with all possible initial states of the intersection NWA.
-      //NOTE: Currently this should be just one state (the join of the single initial state of each machine).
-      for( stateIterator fit = beginInitialStates();
-            fit != endInitialStates(); fit++ )
-      {
-        for( stateIterator sit = other.beginInitialStates();
-              sit != other.endInitialStates(); sit++ )
-        {
-          St newSt;
-          if( (*fit)->intersect(*sit,newSt) )
-          {
-            worklistNWA->addInitialState(&newSt); 
-            wList.push_back(Triple<St*,St*,St*>(&newSt,*fit,*sit));
-            visited.insert(&newSt);
-          }  
-        }      
-      }
-      
-      //As long as there are still transitions to consider.
-      while(! wList.empty() )
-      {
-        Triple<St*,St*,St*> from = wList.front();
-        
-        //Epsilon closure for the nodes that we are currently considering.
-        //Check call transitions in this NWA.
-        Calls thisCalls = trans->getCalls(from.second,Sym::getEpsilon());
-        for( Calls::const_iterator cit = thisCalls.begin(); cit != thisCalls.end(); cit++ )
-        {
-          St newSt;
-          //Check intersectability of states (if false, don't add).           
-          if( (*cit)->third->intersect(from.third,newSt) )
-            if( visited.find(&newSt) == visited.end() )  //if(! worklistNWA.isState(newSt) )
-            {
-              wList.push_back(Triple<St*,St*,St*>(&newSt,(*cit)->third,from.third));
-              visited.insert(&newSt);
-              
-              if( isFinalState((*cit)->third) && other.isFinalState(from.third) )
-                worklistNWA->addFinalState(&newSt);
-              else
-                worklistNWA->addState(&newSt);
-            }                   
-        }
-        //Check call transitions in the NWA 'other'.
-        Calls otherCalls = other.trans->getCalls(from.third,Sym::getEpsilon());
-        for( Calls::const_iterator cit = otherCalls.begin(); cit != otherCalls.end(); cit++ )
-        {
-          St newSt;
-          //Check intersectability of states (if false, don't add).
-          if( from.second->intersect((*cit)->third,newSt) )
-            if( visited.find(&newSt) == visited.end() )
-            {
-              wList.push_back(Triple<St*,St*,St*>(&newSt,from.second,(*cit)->third));
-              visited.insert(&newSt);
-              
-              if( isFinalState(from.second) && other.isFinalState((*cit)->third) )
-                worklistNWA->addFinalState(&newSt);
-              else
-                worklistNWA->addState(&newSt);
-            }
-        }
-        
-        //Check internal transitions in this NWA.
-        Internals thisInternals = trans->getInternals(from.second,Sym::getEpsilon());
-        for( Internals::const_iterator iit = thisInternals.begin(); iit != thisInternals.end(); iit++ )
-        {
-          St newSt;
-          //Check intersectability of states (if false, don't add).
-          if( (*iit)->third->intersect(from.third,newSt) )
-            if( visited.find(&newSt) == visited.end() )
-            {
-              wList.push_back(Triple<St*,St*,St*>(&newSt,(*iit)->third,from.third));
-              visited.insert(&newSt);
-              
-              if( isFinalState((*iit)->third) && other.isFinalState(from.third) )
-                worklistNWA->addFinalState(&newSt);
-              else
-                worklistNWA->addState(&newSt);
-            }
-        }     
-        
-        //Check internal transitions in the NWA 'other'.
-        Internals otherInternals = other.trans->getInternals(from.third,Sym::getEpsilon());
-        for( Internals::const_iterator iit = otherInternals.begin(); iit != otherInternals.end(); iit++ )
-        {
-          St newSt;
-          //Check intersectability of states (if false, don't add).
-          if( from.second->intersect((*iit)->third,newSt) )
-            if( visited.find(&newSt) == visited.end() )
-            {
-              wList.push_back(Triple<St*,St*,St*>(&newSt,from.second,(*iit)->third));
-              visited.insert(&newSt);
-              
-              if( isFinalState(from.second) && other.isFinalState((*iit)->third) )
-                worklistNWA->addFinalState(&newSt);
-              else
-                worklistNWA->addState(&newSt);
-            }
-        }      
-        
-        //Check return transitions in this NWA.
-        Returns thisReturns = trans->getReturns(from.second,Sym::getEpsilon());
-        for( Returns::const_iterator rit = thisReturns.begin(); rit != thisReturns.end(); rit++ )
-        {
-          St newSt;
-          //Check intersectability of states (if false, don't add).
-          if( (*rit)->fourth->intersect(from.third,newSt) )
-            if( visited.find(&newSt) == visited.end() )
-            {
-              wList.push_back(Triple<St*,St*,St*>(&newSt,(*rit)->fourth,from.third));
-              visited.insert(&newSt);
-              
-              if( isFinalState((*rit)->fourth) && other.isFinalState(from.third) )
-                worklistNWA->addFinalState(&newSt);
-              else
-                worklistNWA->addState(&newSt);
-            } 
-        }
-        
-        //Check return transitions in the NWA 'other'.
-        Returns otherReturns = other.trans->getReturns(from.third,Sym::getEpsilon());
-        for( Returns::const_iterator rit = otherReturns.begin(); rit != otherReturns.end(); rit++ )
-        {
-          St newSt;
-          //Check intersectability of states (if false, don't add).
-          if( from.second->intersect((*rit)->fourth,newSt) )
-            if( visited.find(&newSt) == visited.end() )
-            {
-              wList.push_back(Triple<St*,St*,St*>(&newSt,from.second,(*rit)->fourth));
-              visited.insert(&newSt);
-              
-              if( isFinalState(from.second) && other.isFinalState((*rit)->fourth) )
-                worklistNWA->addFinalState(&newSt);
-              else
-                worklistNWA->addState(&newSt);
-            }
-        }
-        
-        //TODO: ???? this is going to hell in a handbasket (i.e. quadratic performance is emminent)
-        //For each possible outgoing symbol/edge type.
-        for( symbolIterator fsit = symbols.begin(); fsit != symbols.end(); fsit++ )
-        {
-          if( ! (*fsit == Sym::getEpsilon()) )  //Symbols other than epsilon.
-            for( symbolIterator ssit = other.symbols.begin(); ssit != other.symbols.end(); ssit++ )
-            {           
-              if (! (*ssit == Sym::getEpsilon()) )  //Symbols other than epsilon.
-              {   
-                Sym sym;
-                //Check intersectability of edge labels.
-                if( (*fsit)->intersect(*ssit,sym) )  //Only continue if the symbols can be intersected.
-                {
-                  //Check call transitions with the desired 'from' state.
-                  Calls thisCalls = trans->getCalls(from.second,*fsit);
-                  Calls otherCalls = other.trans->getCalls(from.third,*ssit);  
-                  
-                  if( !thisCalls.empty() && !otherCalls.empty() )
-                  {
-                    //there are edges to join.
-                    for( Calls::const_iterator fcit = thisCalls.begin();
-                          fcit != thisCalls.end(); fcit++ )
-                    {
-                      for( Calls::const_iterator scit = otherCalls.begin();
-                            scit != otherCalls.end(); scit++ )
-                      {
-                        St toSt;                              
-                        //Check intersectability of to states (if false, don't look further).           
-                        if( (*fcit)->third->intersect((*scit)->third,toSt) )
-                          if( visited.find(&toSt) == visited.end() )
-                          {
-                            wList.push_back(Triple<St*,St*,St*>(&toSt,(*fcit)->third,(*scit)->third));
-                            visited.insert(&toSt);
-                          }
-                          
-                        if( isFinalState((*fcit)->third) && other.isFinalState((*scit)->third) )
-                          worklistNWA->addFinalState(&toSt);
-                        else
-                          worklistNWA->addState(&toSt);
-                          
-                        //Add the transition to the intersection NWA.  
-                        worklistNWA->addCallTrans( from.first, &sym, &toSt );
-                      }              
-                    }            
-                  }
-                  /* NOTE: assuming absentAccept is false for both machines
-                  else if( thisCalls.empty() && !otherCalls.empty() )
-                  {
-                    //only this has no edges  
-                    //if this is acceptAbsent, then follow the path of otherCalls
-                    //with just the other state value for the joined state?
-                    if( isAbsentAccept() )
-                    {
-                      for( Calls::const_iterator cit = otherCalls.begin();
-                            cit != otherCalls.end(); cit++ )
-                      {
-                        if( isFinalState(cit->third) )
-                          worklistNWA->addFinalState(cit->third);
-                        else
-                          worklistNWA->addState(cit->third);
-                        worklistNWA->addCallTrans( from.first, sym, cit->third );
-                      }
-                    }
-                  }
-                  else if( !thisCalls.empty() && otherCalls.empty() )
-                  {
-                    //only other has no edges
-                    //if other is acceptAbsent, then follow the path of thisCalls
-                    //with just the this state value for the joined state?
-                    if( other.isAbsentAccept() )
-                    {
-                    }
-                  }
-                  //otherwise, both have no matching edges so there is no path to follow
-                  */
-                  
-                  //Check internal transitions with the desired 'from' state and symbol.
-                  Internals thisInternals = trans->getInternals(from.second,*fsit);
-                  Internals otherInternals = other.trans->getInternals(from.third,*ssit);  
-                  
-                  if( !thisInternals.empty() && !otherInternals.empty() )
-                  {
-                    //there are edges to join.
-                    for( Internals::const_iterator fiit = thisInternals.begin();
-                          fiit != thisInternals.end(); fiit++ )
-                    {
-                      for( Internals::const_iterator siit = otherInternals.begin();
-                            siit != otherInternals.end(); siit++ )
-                      {
-                        St toSt;                              
-                        //Check intersectability of to states (if false, don't look further).           
-                        if( (*fiit)->third->intersect((*siit)->third,toSt) )
-                          if( visited.find(&toSt) == visited.end() )
-                          {
-                            wList.push_back(Triple<St*,St*,St*>(&toSt,(*fiit)->third,(*siit)->third));
-                            visited.insert(&toSt);
-                          }
-                          
-                        if( isFinalState((*fiit)->third) && other.isFinalState((*siit)->third) )
-                          worklistNWA->addFinalState(&toSt);
-                        else
-                          worklistNWA->addState(&toSt);
-                          
-                        //Add the transition to the intersection NWA.
-                        worklistNWA->addInternalTrans( from.first, &sym, &toSt );
-                      }         
-                    }            
-                  }
-                  
-                  /* NOTE: assuming absentAccept is false for both machines
-                  else if( thisInternals.empty() && !otherInternals.empty() )
-                  {
-                    //only this has no edges  
-                    //if this is acceptAbsent, then follow the path of otherInternals
-                    //with a dummy value for the this state?
-                    //with just the other state value for the joined state?
-                  }
-                  else if( !thisInternals.empty() && otherInternals.empty() )
-                  {
-                    //only other has no edges
-                    //if other is acceptAbsent, then follow the path of thisInternals
-                    //with a dummy value for the other state?
-                    //with just the this state value for the joined state?
-                  }
-                  //otherwise, both have no matching edges so there is no path to follow
-                  */
-                  
-                  //Check return transitions with the desired 'from' state and symbol.
-                  Returns thisReturns = trans->getReturns(from.second,*fsit);
-                  Returns otherReturns = other.trans->getReturns(from.third,*ssit);  
-                  
-                  if( !thisReturns.empty() && !otherReturns.empty() )
-                  {
-                    //there are edges to join.
-                    for( Returns::const_iterator frit = thisReturns.begin();
-                          frit != thisReturns.end(); frit++ )
-                    {
-                      for( Returns::const_iterator srit = otherReturns.begin();
-                            srit != otherReturns.end(); srit++ )
-                      {
-                        St predSt, toSt;
-                        (*frit)->second->intersect((*srit)->second,predSt);  //TODO: check that this is a viable call point in the intersected NWA.
-                        
-                        //Check intersectability of to states (if false, don't look further).    
-                        if( (*frit)->fourth->intersect((*srit)->fourth,toSt) )
-                          if( visited.find(&toSt) == visited.end() )
-                          {
-                            wList.push_back(Triple<St*,St*,St*>(&toSt,(*frit)->fourth,(*srit)->fourth));
-                            visited.insert(&toSt);
-                          }
-                          
-                        if( isFinalState((*frit)->fourth) && other.isFinalState((*srit)->fourth) )
-                          worklistNWA->addFinalState(&toSt);
-                        else
-                          worklistNWA->addState(&toSt);
-                          
-                        //Add the transition to the intersection NWA.  
-                        worklistNWA->addReturnTrans( from.first, &predSt, &sym, &toSt );
-                      }            
-                    }            
-                  }
-                  
-                  /* NOTE: assuming absentAccept is false for both machines
-                  else if( thisReturns.empty() && !otherReturns.empty() )
-                  {
-                    //only this has no edges  
-                    //if this is acceptAbsent, then follow the path of
-                    //otherCalls with a dummy value for the this state?
-                  }
-                  else if( !thisReturns.empty() && otherReturns.empty() )
-                  {
-                    //only other has no edges
-                    //if other is acceptAbsent, then follow the path
-                    //of thisCalls with a dummy value for the other state?
-                  }
-                  //otherwise, both have no matching edges so there is no path to follow
-                  */
-              }
-            }
-          }
-        }
-        
-        wList.pop_front();
-      }
-      
-      return worklistNWA;
-    }
-    
-    //Using NWAs
-    
-    /**
-     * 
-     * @brief constructs the WPDS which is the result of the explicit NWA 
-     * plus WPDS construction from Advanced Querying for Property Checking
-     *
-     * @param the WPDS that forms the basis for the constructed WPDS
-     * @return the WPDS which can be used to perform property checking 
-     * using PDS reachability
-     * 
-     */
-    /*  Note: broken
-    template<typename St,typename StName,typename Sym > 
-    wpds::WPDS NWA<St,StName,Sym>::plusWPDS( wpds::WPDS base )
-    { //FIX
-      //TODO: how does this react to absentAcceptance & State/Symbol types & wild symbol
-      wpds::WpdsRules rules = wpds::WpdsRules();
-    
-      base.for_each(rules);
-      
-      //Step Rules:
-      for( std::set< wpds::Rule >::iterator it = rules.stepRules.begin();
-            it != rules.stepRules.end(); it++ )
-      {
-        //<p,n_1> -w-> <p',n_2> in delta_1, (q,n_1,q') in delta_i
-        Key sym = it->from_stack();
-        //look for internal transitions in the NWA with symbol sym
-        for( std::set< KeyTriple >::iterator iit = trans->beginInternal();
-              iit != trans->endInternal(); iit++ )
-        {
-          if( iit->second == sym )
-          {
-            //<(p,q),n_1> -w-> <(p',q'),n_2>
-            Key from = getKey(it->from_state(),iit->first);
-            Key to = getKey(it->to_state(),iit->third);
-            result.add_rule(from,sym,to,it->to_stack1(),it->weight());
-          }
-        }
-      }
-        
-      //Call Rules:
-      for( std::set< wpds::Rule >::iterator it = rules.pushRules.begin();
-            it != rules.pushRules.end(); it++ )
-      {
-        //<p,n_c> -w-> <p',e r_c> in delta_2, (q_c,n_c,q) in delta_c
-        Key sym = it->from_stack();
-        //look for call transitions in the NWA with symbol sym
-        for( std::set< KeyTriple >::iterator cit = trans->beginCall();
-              cit != trans->endCall(); cit++ )
-        {
-          if( cit->second == sym )
-          {
-            //<(p,q_c),n_c> -w-> <(p',q),e (r_c,q_c)>
-            Key from = getKey(it->from_state(),cit->first);
-            Key to = getKey(it->to_state(),cit->third);
-            Key stack2 = getKey(it->to_stack2(),cit->first);
-            result.add_rule(from,sym,to,it->to_stack1(),stack2,it->weight());
-          }
-        }
-      }
-          
-      //Return Rules:
-      for( std::set< wpds::Rule >::iterator it = rules.popRules.begin();
-            it != rules.popRules.end(); it++ )
-      {
-        //<p,x> -w-> <p',*> in delta_0, (q_r,q_c,x,q) in delta_r
-        Key sym = it->from_stack();
-        //look for return transitions in the NWA with symbol sym
-        for( std::set< KeyQuad >::iterator rit = trans->beginReturn();
-              rit != trans->endReturn(); rit++ )
-        {
-          if( rit->third == sym )
-          {
-            //<(p,q_r),x> -w-> <(p',q_r^x),*>
-            Key from = getKey(it->from_state(),rit->first);
-            Key to = getKey( it->to_state(),getKey(rit->first,sym) );
-            result.add_rule(from,sym,to,it->weight());
-            //For all r_c in delta_2
-            for( std::set< wpds::Rule >::iterator dit = rules.pushRules.begin();
-                  dit != rules.pushRules.end(); dit++ )
-            {
-              //<(p',q_r^x),(r_c,q_c)> -1-> <(p',q),r_c>
-              from = getKey( it->to_state(),getKey(rit->first,sym) );
-              sym = getKey(dit->to_stack2(),rit->second);
-              to = getKey(it->to_state(),rit->fourth);
-              result.add_rule(from,sym,to,dit->to_stack2(),it->weight()->one());
-            }
-          }
-        }
-      }     
-            
-      return result;
-    }*/
-    
-    /**
-     *
-     * @brief constructs the NWA equivalent to the given PDS
-     *
-     * @return the NWA equivalent to the given PDS
-     *
-     */
-    /*  Note: broken
-    template<typename St, typename Sym > 
-    nwa::NWA<St,StName,Sym> NWA<St,StName,Sym>::PDStoNWA(wpds::WPDS pds)
-    { //FIX
-      //TODO: how does this react to absentAcceptance & State/Symbol types & wild symbol
-      nwa::NWA<St,StName,Sym> result = nwa::NWA<St,StName,Sym>();
-
-      std::map<St,St> call_return;
-  
-      wpds::WpdsRules rules = wpds::WpdsRules();
-    
-      pds.for_each(rules);
-      
-      //Step Rules:
-      for( std::set< wpds::Rule >::iterator it = rules.stepRules.begin();
-            it != rules.stepRules.end(); it++ )
-      {
-        //<p,n_1> -w-> <p',n_2> in delta_1 goes to ((p,n_1),n_1,(p',n_2)) in delta_i
-        result.addInternalTrans(getKey( it->from_state(),it->from_stack() ),  //from
-                                it->from_stack(),                             //sym
-                                getKey( it->to_state(),it->to_stack1() ));    //to
-      }
-        
-      //Call Rules:
-      for( std::set< wpds::Rule >::iterator it = rules.pushRules.begin();
-            it != rules.pushRules.end(); it++ )
-      {
-        //<p,n_c> -w-> <p',e r_c> in delta_2, ((p,n_c),c,(p',e)) in delta_c
-        result.addCallTrans(getKey( it->from_state(),it->from_stack() ),      //from
-                            it->from_stack(),                                 //sym
-                            getKey( it->to_state(),it->to_stack1() ));        //to
-        //add (p,n_c) => r_c to the call-return map
-        call_return.insert(std::pair<Key,Key>(getKey( it->from_state(),it->from_stack() ),  //call
-                                              it->to_stack2()));                            //ret
-      }
-          
-      //Return Rules:
-      for( std::set< wpds::Rule >::iterator it = rules.popRules.begin();
-            it != rules.popRules.end(); it++ )
-      {
-        //<p,x> -w-> <p',*> in delta_0, ((p,x),(p,n_c),x,(p',r)) in delta_r
-        for(std::map<Key,Key>::iterator cr_it = call_return.begin(); 
-              cr_it != call_return.end(); cr_it++  )
-          result.addReturnTrans(getKey( it->from_state(),it->from_stack() ),  //from
-                                cr_it->first,                                 //pred
-                                it->from_stack(),                             //sym
-                                getKey( it->to_state(),cr_it->second ));      //to
-      }
-            
-      return result;    
-    }*/
-
-    /**
-     *
-     * @brief constructs the PDS equivalent to this NWA
-     *
-     * @return the PDS equivalent to this NWA
-     *
-     */
-    template<typename St,typename StName,typename Sym > 
-    wpds::WPDS NWA<St,StName,Sym>::NWAtoPDS(NWA<St,StName,Sym> nwa,WeightGen<St,Sym> wg)
-    { //FIX
-      //TODO: how does this react to absentAcceptance???
-      //NOTE: for now assume stuck state is rejecting
-      wpds::WPDS result = wpds::WPDS();
-      std::map< Key,Key > calls;
-  
-      //note: if you change this, make sure you modify the code in createCA as well
-      Key program = wali::getKey("program"); 
-      wali::sem_elem_t wgt;
-  
-      //Internal Transitions
-      for( internalIterator iit = nwa.trans->beginInternal();
-            iit != nwa.trans->endInternal(); iit++ )
-      {      
-        //(q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
-        //where the weight w depends on sigma
-    
-        if( (*iit)->second->isWild() )
-          wgt = wg.getWildWeight(*(*iit)->first,*(*iit)->third);
-        else
-          wgt = wg.getWeight(*(*iit)->first,
-                             *(*iit)->second,
-                             WeightGen<St,Sym>::INTRA,
-                             *(*iit)->third);
-    
-        result.add_rule(program,                //from_state (p)
-                    (*iit)->first->getStateKey(),   //from_stack (q)
-                        program,                //to_state (p)
-                    (*iit)->third->getStateKey(),   //to_stack1 (q')
-                        wgt);                   //weight      
-      }
-  
-      //Call Transitions
-      for( callIterator cit = nwa.trans->beginCall();
-            cit != nwa.trans->endCall(); cit++ )
-      {
-        for( returnIterator rit = nwa.trans->beginReturn();
-              rit != nwa.trans->endReturn(); rit++ )
-          if( (*cit)->first == (*rit)->second )
-          {
-            //for each return site with cit->first as call site ...
-            //Key ret = getKey(rit->fourth.getStateKey(),rit->fourth.getStateKey()); // (r,r)
-            //calls.insert(std::pair<Key,Key>(cit->first.getStateKey(),ret));
-            calls.insert(std::pair<Key,Key>((*cit)->first->getStateKey(),(*rit)->fourth->getStateKey()));
-        
-            //(q_c,sigma,q_e) in delta_c and (*,q_c,*,q_r) in delta_r goes to
-            // <p,q_c> -w-> <p,q_e r'> in delta_2 where r' = (q_r,q_r) (or q_r?)
-            // and the weight w depends on sigma
-        
-            if( (*cit)->second->isWild() )
-              wgt = wg.getWildWeight(*(*cit)->first,*(*cit)->third);
-            else
-              wgt = wg.getWeight(*(*cit)->first,
-                                *(*cit)->second,
-                                WeightGen<St,Sym>::CALL_TO_ENTRY,
-                                *(*cit)->third);
-        
-            result.add_rule(program,                //from_state (p)
-                        (*cit)->first->getStateKey(),   //from_stack (q_c)
-                            program,                //to_state (p)
-                        (*cit)->third->getStateKey(),   //to_stack1 (q_e)
-                          //ret,                    //to_stack2 (r')
-                        (*rit)->fourth->getStateKey(),  //to_stack2 (r')
-                            wgt);                   //weight  
-          }  
-      }
-  
-      //Return Transitions
-      for( returnIterator rit = nwa.trans->beginReturn();
-            rit != nwa.trans->endReturn(); rit++ )
-      {
-        //(q_x,q_c,sigma,q_r) in delta_r goes to 
-        // <p,q_x> -w1-> <p_q_x,epsilon> in delta_0
-        // and <p_q_x,r'> -w2-> <p,q_r> in delta_1
-        // where p_q_x = (q_x,q_c), r' = (q_r,q_r)
-        // w1 depends on one, and w2 depends on sigma
-    
-        wgt = wg.getOne();
-    
-        //Note: if you change this, make sure you modify the code in NWPForest.createCA()
-        Key rstate = getKey((*rit)->first->getStateKey(),(*rit)->second->getStateKey());  //p_q_x
-    
-        result.add_rule(program,                //from_state (p)
-                    (*rit)->first->getStateKey(),   //from_stack (q_x)
-                        rstate,                 //to_state (p_q_x == (q_x,q_c))
-                        wgt);                   //weight 
-    
-        if( (*rit)->third->isWild() )
-          wgt = wg.getWildWeight(*(*rit)->first,*(*rit)->fourth);
-        else
-          wgt = wg.getWeight(*(*rit)->first, 
-                              *(*rit)->third,
-                              WeightGen<St,Sym>::EXIT_TO_RET,  
-                              *(*rit)->fourth);  
-    
-        std::map<Key,Key>::iterator ret = calls.find((*rit)->second->getStateKey());
-        if( ret != calls.end() )          
-          result.add_rule(rstate,                   //from_state (p_q_x == (q_x,q_c))
-                          ret->second,    //from_stack (r')
-                          program,                  //to_state (p)
-                      (*rit)->fourth->getStateKey(),    //to_stack (q_r)
-                          wgt);                     //weight    
-    
-      }
-  
-      return result;
-    }
-    
-    /**
-     *
-     * @brief constructs the backwardsPDS equivalent to this NWA
-     *
-     * @return the backwards PDS equivalent to this NWA
-     *
-     */
-    template<typename St,typename StName,typename Sym > 
-    wpds::WPDS NWA<St,StName,Sym>::NWAtoBackwardsPDS(NWA<St,StName,Sym> nwa,WeightGen<St,Sym> wg)
-    {
-      //FIX
-      //TODO: how does this react to absentAcceptance???
-      //NOTE: for now assume stuck state is rejecting
-      wpds::WPDS result = wpds::WPDS();
-      std::map< Key,Key > returns;
-  
-      Key program = wali::getKey("program"); 
-      wali::sem_elem_t wgt;
-  
-      //Internal Transitions
-      for( internalIterator iit = nwa.trans->beginInternal();
-            iit != nwa.trans->endInternal(); iit++ )
-      {      
-        //(q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
-        //where the weight w depends on sigma
-    
-        if( (*iit)->second->isWild() )
-          wgt = wg.getWildWeight(*(*iit)->first,*(*iit)->third);
-        else
-          wgt = wg.getWeight(*(*iit)->first,
-                             *(*iit)->second,
-                             WeightGen<St,Sym>::INTRA,
-                             *(*iit)->third);
-    
-        result.add_rule(program,                //from_state (p)
-                    (*iit)->third->getStateKey(),   //from_stack (q)
-                        program,                //to_state (p)
-                    (*iit)->first->getStateKey(),   //to_stack1 (q')
-                        wgt);                   //weight      
-      }
-  
-      //Call Transitions TODO
-      for( callIterator cit = nwa.trans->beginCall();
-            cit != nwa.trans->endCall(); cit++ )
-      {
-        for( returnIterator rit = nwa.trans->beginReturn();
-              rit != nwa.trans->endReturn(); rit++ )
-          if( (*cit)->first == (*rit)->second )
-          {
-        
-            //(q_c,sigma,q_e) in delta_c and (q_x,q_c,*,q_r) in delta_r goes to
-            // <p,q_e> -w1-> <p_q_e,epsilon> in delta_0
-            // and <p_q_e,q_c> -w2-> <p,q_c> in delta_1
-            // where p_q_e = (q_e,q_r)
-            // w1 depends is one, and w2 depends on sigma
-      
-            wgt = wg.getOne();
-      
-            Key cstate = getKey((*cit)->third->getStateKey(),(*rit)->fourth->getStateKey());  //p_q_e
-      
-            result.add_rule(program,                //from_state (p)
-                        (*cit)->third->getStateKey(),   //from_stack (q_e)
-                            cstate,                 //to_state (p_q_e == (q_e,q_r))
-                            wgt);                   //weight 
-        
-            if( (*cit)->second->isWild() )
-              wgt = wg.getWildWeight(*(*cit)->first,*(*cit)->third);
-            else
-              wgt = wg.getWeight(*(*cit)->first, 
-                                  *(*cit)->second,
-                                  WeightGen<St,Sym>::EXIT_TO_RET,  
-                                  *(*cit)->third);  
-        
-              result.add_rule(cstate,                   //from_state (p_q_x == (q_x,q_c))
-                              (*cit)->first->getStateKey(),    //from_stack (q_c)
-                              program,                  //to_state (p)
-                          (*cit)->first->getStateKey(),    //to_stack (q_c)
-                              wgt);                     //weight    
-          }  
-      }
-  
-      //Return Transitions
-      for( returnIterator rit = nwa.trans->beginReturn();
-            rit != nwa.trans->endReturn(); rit++ )
-      {
-          //(q_x,q_c,*,q_r) in delta_r goes to
-          // <p,q_r> -w-> <p,q_x q_c> in delta_2 
-          // and the weight w depends on sigma
-        
-          if( (*rit)->third->isWild() )
-              wgt = wg.getWildWeight(*(*rit)->first,*(*rit)->fourth);
-            else
-              wgt = wg.getWeight(*(*rit)->first,
-                                *(*rit)->third,
-                                WeightGen<St,Sym>::CALL_TO_ENTRY,
-                                *(*rit)->fourth);
-        
-            result.add_rule(program,                //from_state (p)
-                        (*rit)->fourth->getStateKey(),   //from_stack (q_r)
-                            program,                //to_state (p)
-                        (*rit)->first->getStateKey(),   //to_stack1 (q_x)
-                        (*rit)->second->getStateKey(),  //to_stack2 (q_c)
-                            wgt);                   //weight      
-      }
-  
-      return result;
-    }
     
     /**
      *
@@ -3819,455 +2922,6 @@ namespace wali
       return tmp.first;
     }*/
     
-    /**
-     *
-     * @brief tests whether the NWA is deterministic 
-     *
-     * @return true if the NWA is deterministic, false otherwise
-     *
-     */
-    template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::isDeterministic( )
-    { 
-      //TODO: optimize!!!
-      //An NWA is not deterministic if there is not exactly one initial state
-      if( sizeInitialStates() != 1) 
-        return false;
-      
-      //An NWA is not deterministic if there are epsilon transitions 
-      //or if there are multiple transitions of some
-      //type that are identical except for the to state.
-      for( symbolIterator it = symbols.begin();
-            it != symbols.end(); it++ )
-      {
-        for( stateIterator sit = beginStates();
-              sit != endStates(); sit++ )
-        {
-          //Check call transitions.
-          int count = 0;
-          bool wild = false;
-          for( callIterator cit = trans->beginCall();
-                cit != trans->endCall(); cit++ )
-          {
-            //Epsilon transition 
-            if( (*cit)->second == Sym::getEpsilon() ) 
-              return false;
-            //Wild symbol
-            if( (*cit)->second == Sym::getWild() )
-              wild = true;  
-            
-            //Keep a count of multiple transitions with the same from
-            //state and symbol(that is not epsilon).
-            else if( ((*cit)->first == (*sit)) && ((*cit)->second == *it) )
-              count++;
-          }
-          if( count > 1 )
-            return false;
-          else if( wild && count > 0 )
-            return false;
-          
-          //Check internal transitions.
-          count = 0;
-          wild = false;
-          for( internalIterator iit = trans->beginInternal();
-                iit != trans->endInternal(); iit++ )
-          {
-            //Epsilon transition 
-            if( (*iit)->second == Sym::getEpsilon() )
-              return false;
-            //Wild symbol
-            if( (*iit)->second == Sym::getWild() )
-              wild = true;  
-            
-            //Keep a count of multiple transitions with the same from
-            //state and symbol(that is not epsilon).
-            else if( ((*iit)->first == *sit) && ((*iit)->second == *it) )
-              count++;
-          }
-          if( count > 1 )
-            return false;
-          else if( wild && count > 0 )
-            return false;  
-          
-          for( stateIterator pit = beginStates();
-                pit != endStates(); pit++ )
-          {
-            //Check return transitions.
-            count = 0;
-            wild = false;
-            for( returnIterator rit = trans->beginReturn();
-                 rit != trans->endReturn(); rit++ )
-            {
-              //Epsilon transition to a state other than the error state.
-              if( (*rit)->third == Sym::getEpsilon() )
-                return false;
-              //Wild symbol
-              if( (*rit)->third == Sym::getWild() )
-                wild = true; 
-              
-              //Keep a count of multiple transitions with the same from
-              //state and symbol(that is not epsilon).
-              else if( ((*rit)->first == *sit) &&
-                ((*rit)->second == *pit) &&
-                ((*rit)->third == *it) )
-                count++;
-            }
-            if( count > 1 )
-              return false;
-            else if( wild && count > 0 )
-              return false;  
-          }
-        }
-      }
-      
-      return true;
-    }
-    
-    /**
-     *
-     * @brief tests whether the language accepted by this NWA is empty
-     *
-     * @return true if the language accepted by this NWA is empty
-     *
-     */
-    /* broken
-    //TODO: determinize prior to checking paths?
-    template<typename St,typename StName,typename Sym >
-    bool NWA<St,StName,Sym>::isEmpty( )
-    {
-      //An automaton with no initial states must accept only the empty
-      //language.
-      if( sizeInitialStates() == 0 )
-        return true;
-    
-      //An automaton with no final states must accept only the empty 
-      //language.
-      if( sizeFinalStates() == 0 )
-        return true;
-      
-      //An automaton with no path from an initial state to a final state
-      //must accept only the empty language.       
-      for( stateIterator it = beginInitialStates();
-            it != endInitialStates(); it++ )
-      {
-        //If an initial state is also a final state, then
-        //the empty string is accepted.  Therefore the
-        //accepted language is not the empty language.
-        if( isFinalState(*it) )
-          return false;
-        std::set< St > visited = std::set< St >();
-        visited.insert(*it);
-        if( hasPath(it, std::stack< St >(), visited) )
-          return false;
-        visited.erase(*it);
-      }
-      return true;
-    }*/
-    
-    /**
-     *
-     * @brief tests whether the given nested word is a member of the 
-     * language accepted by this NWA
-     *
-     * @param the nested word to test
-     * @return true if the given nested word is a member of the language
-     * accepted by this NWA
-     *
-     */
-    /* broken
-    template<typename St,typename StName,typename Sym >
-    bool NWA<St,StName,Sym>::isMember( nws::NWS word )
-    { //FIX
-      //TODO: how does this react to absentAcceptance
-      std::deque<WordRecConfig<St>> configs;
-    
-      //Add a dummy call state for each call on the word stack
-      for( wali::nws::NWS::iterator it = word.beginStack();
-            it != word.endStack(); it++ );
-      {
-        WordRecConfig<St> config = WordRecConfig<St>(word);
-        for( stateIterator sit = initialStates.begin();
-              sit != initialStates.end(); sit++ )
-          config.addCallState(*sit);
-      
-        configs.push_back(config);
-      }
-        
-      //Simulate the nested word 'word' on the NWA.
-      for( stateIterator sit = initialStates.begin();
-            sit != initialStates.end(); sit++ ) 
-      {
-        //Follow the word from here and try to match it.
-        if( matchWord(*sit,configs) )
-          return true; 
-      }
-      return false;
-    }*/
-    
-    //Utilities	
-    
-    /**
-     *
-     * @brief print the NWA
-     *
-     * @param the output stream to print to
-     * @return the output stream that was printed to
-     *
-     */
-    template<typename St,typename StName,typename Sym >
-    std::ostream & NWA<St,StName,Sym>::print( std::ostream & o) const
-    {
-      states.print(o);
-      
-      if( absentAcceptance )
-        o << "Stuck state accepted." << "\n";   //TODO: move this to stateset
-      
-      o << "Sigma: " << "{ ";
-      bool first = true;
-      for( Symbols::const_iterator sit = symbols.begin(); sit != symbols.end(); sit++ )
-      { 
-        if(! first )
-          o << ", ";
-        else
-          first = false;
-        (*sit)->print(o);
-      }
-      o << " }\n";
-      
-      trans->print(o);
-      return o;
-    }
-    
-    /**
-     *
-     * @brief tests whether this NWA is equivalent to the NWA 'other'
-     *
-     * @param the NWA to compare this NWA to
-     * @return true if this NWA is equivalent to the NWA 'other'
-     *
-     */
-    template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::operator==( const NWA<St,StName,Sym> & other ) const
-    {
-      return ( (states == other.states) &&
-        (absentAcceptance == other.absentAcceptance) &&
-        (symbols == other.symbols) &&   //TODO: deeper check here?
-        (trans == other.trans) );
-    }
-    
-    /**
-     *
-     * @brief returns the number of states associated with this NWA
-     *
-     * @return the number of states associated with this NWA
-     *
-     */
-    template<typename St,typename StName,typename Sym > 
-    size_t NWA<St,StName,Sym>::numStates( )
-    {
-      return sizeStates();
-    }
-    
-    /**
-     *
-     * @brief returns the number of transitions (of all kinds) 
-     * associated with this NWA
-     *
-     * @return the number of transitions (of all kinds) associated
-     * with this NWA
-     *
-     */
-    template<typename St,typename StName,typename Sym > 
-    size_t NWA<St,StName,Sym>::numTrans( )
-    {
-      return trans->size();
-    }
-    
-    /**
-     *
-     * @brief tests whether the NWA has a path from the current state to
-     * a final state given the call stack and the set of states already visited
-     *
-     * @param currState: the state from which to start searching for a path
-     * @param calls: the stack of calls that have been made thus far
-     * @param visited: the states which have already been visited
-     * @return true if there is a path through the NWA from the current state 
-     * to a final state, false otherwise
-     *
-     */
-    /* broken
-    template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::hasPath( St currState, std::stack< St > calls, std::set< St > visited )
-    { //FIX
-      //TODO: absentAcceptance and wild symbol
-      //Try each possible transition out of this state to see if a final state
-      //can be reached.
-    
-      //First try call transitions.
-      calls.push(currState);
-      for( callIterator cit = trans->beginCall();
-            cit != trans->endCall(); cit++ )
-      {
-        //If the call starts from the current state and goes to a state not
-        //yet visited, follow the path.
-        if( (cit->first == currState) && (visited.count(cit->third) == 0) )
-        {
-          visited.insert(cit->third);
-          if( hasPath(cit->third,calls,visited) )
-            return true;
-          visited.erase(cit->third);
-        }    
-      }
-      calls.pop();
-      
-      //If no call transition led to a path, try internal transitions.
-      for( internalIterator iit = trans->beginInternal();
-            iit != trans->endInternal(); iit++ )
-      {
-        //If the call starts from the current state and goes to a state not
-        //yet visited, follow the path.
-        if( (iit->first == currState) && (visited.count(iit->third) == 0) )
-        {
-          visited.insert(iit->third);
-          if( hasPath(iit->third,calls,visited) )
-            return true;
-          visited.erase(iit->third);
-        }    
-      }
-        
-      //If no internal transition led to a path, try return transitions.
-      St callState = calls.top();
-      calls.pop();
-      for( returnIterator rit = trans->beginReturn();
-            rit != trans->endReturn(); rit++ )
-      {
-        if( (rit->first == currState) &&
-             (rit->second == callState) &&
-              (visited.count(rit->fourth) == 0) )
-        {
-          visited.insert(rit->fourth);
-          if( hasPath(rit->fourth,calls,visited) )
-            return true;
-          visited.erase(rit->fourth);
-        }    
-      }
-      calls.push(callState);      
-          
-      return false; 
-    }*/
-    
-    /** 
-     *
-     * @brief tests whether the nested word suffix is accepted by 
-     * this nested word automaton starting at the state with the
-     * given name
-     *
-     * @parm currState: the state in the nested word automaton at 
-     * which to start the simulation
-     * @parm word: the nested word suffix to match
-     * @return true if the simulation ends in an accepting state
-     *
-     */
-    /* broken
-    template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::matchWord( St currState, std::deque<WordRecConfig<St>> configs )
-    { //FIX
-      //TODO: absentAcceptance and wild symbol
-      WordRecConfig<St> config = configs.front();
-      configs.pop_front();  //remove this config
-    
-      //Base case: the word suffix has been completely processed 
-      // and acceptance is determined by whether the current
-      // state is a final state or not.
-      if( config.isEmpty() )
-      {
-        return isFinalState(currState);        
-      }
-      else if( !config.hasNext() )
-      {
-        return false;
-      }
-      
-      //Induction: the next node in the word suffix must be 
-      // processed and the current state of the automaton
-      // advanced properly.      
-      nws::NWSNode * currNode = config.getNext();
-      config.removeNext();      
-        
-      //Check for transitions that match.
-          
-      //Nodes with an exit node match call transitions
-      //Nodes with no exit node match
-      //  return transitions if the node is the node at the top of the nesting
-      //  internal transitions otherwise
-      if( currNode->isCall() )
-      {
-        config.addCallState(currState);
-            
-        for( callIterator cit = trans->beginCall();
-             cit != trans->endCall(); cit++ )
-        {
-          //If this symbol in the word can be matched, try matching
-          //the rest of the word.
-          if( (cit->first == currState) &&
-              (cit->second == currNode->getSymbol()) )
-          {
-            configs.push_back(config);
-            if( matchWord(cit->third,configs) )
-              return true;
-          }    
-        }
-        config.removeCallState();
-        //If no call transition led to a matched word, there is no
-        //accepting path through this state for the given word suffix.
-        return false;
-      }
-      else if( currNode == config.getCall() )
-      {
-        St callState = config.getCallState();
-        config.removeCallState();
-        for( returnIterator rit = trans->beginReturn();
-              rit != trans->endReturn(); rit++ )
-        {
-          //If this symbol in the word can be matched, try matching
-          //the rest of the word.
-          if( (rit->first == currState) &&
-              (rit->second == callState) &&
-              (rit->third == currNode->getSymbol()) )
-          {
-            configs.push_back(config);
-            if( matchWord(rit->fourth,configs) )
-              return true;
-          }    
-        }
-        config.addCallState(callState);
-        //If no return transition led to a matched word, there is no
-        //accepting path through this state for the given word suffix.
-        return false;
-      }
-      else
-      {
-        for( internalIterator iit = trans->beginInternal();
-              iit != trans->endInternal(); iit++ )
-        {
-          //If this symbol in the word can be matched, try matching
-          //the rest of the word.
-          if( (iit->first == currState) &&
-              (iit->second == currNode->getSymbol()) )
-          {
-            configs.push_back(config);
-            if( matchWord(iit->third,configs) )
-              return true;
-          }    
-        }
-        //If no internal transition led to a matched word, there is no
-        //accepting path through this state for the given word suffix.
-        return false;
-      }
-      return false;
-    }*/
-
-
     /**
      *
      * @brief constructs the transition table and state map for the deterministic 
@@ -4499,7 +3153,1346 @@ namespace wali
                         
       return std::pair<NWA<St,StName,Sym>,StateMap>(nWdAut,stateMap);
     }*/
+    
+    /**
+     *
+     * @brief tests whether the NWA is deterministic 
+     *
+     * @return true if the NWA is deterministic, false otherwise
+     *
+     */
+    template<typename St,typename StName,typename Sym > 
+    bool NWA<St,StName,Sym>::isDeterministic( )
+    { 
+      //TODO: optimize!!!
+      //An NWA is not deterministic if there is not exactly one initial state
+      if( sizeInitialStates() != 1) 
+        return false;
+      
+      //An NWA is not deterministic if there are epsilon transitions 
+      //or if there are multiple transitions of some
+      //type that are identical except for the to state.
+      for( symbolIterator it = symbols.begin();
+            it != symbols.end(); it++ )
+      {
+        for( stateIterator sit = beginStates();
+              sit != endStates(); sit++ )
+        {
+          //Check call transitions.
+          int count = 0;
+          bool wild = false;
+          for( callIterator cit = trans->beginCall();
+                cit != trans->endCall(); cit++ )
+          {
+            //Epsilon transition 
+            if( (*cit)->second == Sym::getEpsilon() ) 
+              return false;
+            //Wild symbol
+            if( (*cit)->second == Sym::getWild() )
+              wild = true;  
+            
+            //Keep a count of multiple transitions with the same from
+            //state and symbol(that is not epsilon).
+            else if( ((*cit)->first == (*sit)) && ((*cit)->second == *it) )
+              count++;
+          }
+          if( count > 1 )
+            return false;
+          else if( wild && count > 0 )
+            return false;
+          
+          //Check internal transitions.
+          count = 0;
+          wild = false;
+          for( internalIterator iit = trans->beginInternal();
+                iit != trans->endInternal(); iit++ )
+          {
+            //Epsilon transition 
+            if( (*iit)->second == Sym::getEpsilon() )
+              return false;
+            //Wild symbol
+            if( (*iit)->second == Sym::getWild() )
+              wild = true;  
+            
+            //Keep a count of multiple transitions with the same from
+            //state and symbol(that is not epsilon).
+            else if( ((*iit)->first == *sit) && ((*iit)->second == *it) )
+              count++;
+          }
+          if( count > 1 )
+            return false;
+          else if( wild && count > 0 )
+            return false;  
+          
+          for( stateIterator pit = beginStates();
+                pit != endStates(); pit++ )
+          {
+            //Check return transitions.
+            count = 0;
+            wild = false;
+            for( returnIterator rit = trans->beginReturn();
+                 rit != trans->endReturn(); rit++ )
+            {
+              //Epsilon transition to a state other than the error state.
+              if( (*rit)->third == Sym::getEpsilon() )
+                return false;
+              //Wild symbol
+              if( (*rit)->third == Sym::getWild() )
+                wild = true; 
+              
+              //Keep a count of multiple transitions with the same from
+              //state and symbol(that is not epsilon).
+              else if( ((*rit)->first == *sit) &&
+                ((*rit)->second == *pit) &&
+                ((*rit)->third == *it) )
+                count++;
+            }
+            if( count > 1 )
+              return false;
+            else if( wild && count > 0 )
+              return false;  
+          }
+        }
+      }
+      
+      return true;
+    }
 
+    /**
+     * @brief constructs the NWA which is the reverse of this NWA
+     *
+     * This method constructs the NWA which is the reverse of this NWA.
+     *
+     * @return the NWA which is the reverse of this NWA
+     * 
+     */
+    /*  Note: broken
+    template<typename St,typename StName,typename Sym > 
+    NWA<St,StName,Sym> * NWA<St,StName,Sym>::reverse()
+    { //FIX
+      //TODO: fix this for absent acceptance and wild symbol
+      NWA<St,StName,Sym> * newNWA = new NWA<St,StName,Sym>();
+
+      //The states remain the same.
+      newNWA->addAllStates(states);
+  
+      //Swap the initial state set with the final state set.
+      for( stateIterator it = beginFinalStates();
+            it != endFinalStates(); it++ )
+        newNWA->addInitialState(*it);
+      for( stateIterator it = beginInitialStates();
+            it != endInitialStates(); it++ )
+        newNWA->addFinalState(*it);
+    
+      //Reverse all transitions.
+      for( internalIterator iit = this->trans->beginInternal();
+            iit != this->trans->endInternal(); iit++ )
+      {
+        newNWA->addInternalTrans(iit->third,iit->second,iit->first);
+      }         
+      
+      for( returnIterator rit = this->trans->beginReturn();
+            rit != this->trans->endReturn(); rit++ )
+      {
+        newNWA->addCallTrans(rit->third,rit->second,rit->first);
+      }
+      for( callIterator cit = this->trans->beginCall();
+            cit != this->trans->endCall(); cit++ )
+      {
+        for( returnIterator rit = this->trans->beginReturn();
+              rit != this->trans->endReturn(); rit++ )
+        {
+          if( cit->first == rit->second )
+          {
+            newNWA->addReturnTrans(cit->third,rit->first,
+            cit->second,cit->first);
+            break;
+          } 
+        }
+      }
+        
+      return newNWA;
+    }*/
+
+    /**
+     *
+     * @brief constructs the NWA which is the intersection of this NWA
+     * and the NWA 'other'
+     *
+     * @param the NWA with which to perform the intersection with this
+     * NWA
+     * @return the NWA which is the intersection of this NWA and the NWA
+     * 'other'
+     *
+     */
+    template<typename St,typename StName,typename Sym >  
+    void NWA<St,StName,Sym>::intersect( NWA<St,StName,Sym> other, NWA<St,StName,Sym> &result )
+    {
+      //TODO: fix this for absentAcceptance  
+      /*  NOTE: This is not optimized and doesn't include epsilon closure or consideration of absentAcceptance.
+      NWA<St,StName,Sym> * newNWA = new NWA<St,StName,Sym>();
+      
+      //Generate new states, adding them to the state set as well as
+      //to the initial state set and final state set as needed.
+      St newSt;
+      for( stateIterator fit = beginStates();
+            fit != endStates(); fit++ )
+      {
+        for( stateIterator sit = other.beginStates();
+              sit != other.endStates(); sit++ )
+        {        
+          fit->intersect(*sit,&newSt);
+      
+          newNWA->addState(newSt);
+        
+          if( this->isInitialState(*fit) && other.isInitialState(*sit) )
+            newNWA->addInitialState(newSt);
+          if( this->isFinalState(*fit) && other.isFinalState(*sit) )
+            newNWA->addFinalState(newSt); 
+          
+          //if these nodes can't be intersected
+          //TODO: what should i do 
+              
+        }
+      }     
+                
+      //Generate call transitions.
+      for( callIterator fcit = this->trans->beginCall();
+            fcit != this->trans->endCall(); fcit++ )
+      {
+        for( callIterator scit = other.trans->beginCall();
+              scit != other.trans->endCall(); scit++ )
+        {
+          Sym sym;
+          if( fcit->second->intersect(scit->second,sym) )
+          {
+            St fromSt, toSt;
+            //TODO: what should I do if these calls failed?
+            fcit->first->intersect(scit->first,&fromSt);
+            fcit->third->intersect(scit->third,&toSt);
+                
+            newNWA->addCallTrans( fromSt, sym, toSt );
+          }
+        }
+      }
+      //Generate internal transitions.
+      for( Trans::internalIterator fiit = this->trans->beginInternal();
+            fiit != this->trans->endInternal(); fiit++ )
+      {
+        for( Trans::internalIterator siit = other.trans->beginInternal();
+              siit != other.trans->endInternal(); siit++ )
+        {
+          Sym sym;
+          if( fiit->second->intersect(siit->second,sym) )
+          {
+            St fromSt, toSt;
+            //TODO: what should I do if these calls failed?
+            fiit->first->intersect(siit->first,&fromSt);
+            fiit->third->intersect(siit->third,&toSt);
+                
+            newNWA->addInternalTrans( fromSt, sym, toSt );
+          }
+        }
+      }
+      //Generate return transitions.  
+      for( Trans::returnIterator frit = this->trans->beginReturn();
+            frit != this->trans->endReturn(); frit++ )
+      {
+        for( Trans::returnIterator srit = other.trans->beginReturn();
+              srit != other.trans->endReturn(); srit++ )
+        {
+          Sym sym;
+          if( frit->third->intersect(srit->third,sym) )
+          {
+            St fromSt, predSt, toSt;
+            //TODO: what should I do if these calls failed?
+            frit->first->intersect(srit->first,&fromSt);
+            frit->second->intersect(srit->second,&predSt);
+            frit->fourth->intersect(srit->fourth,&toSt);
+                    
+            newNWA->addReturnTrans( fromSt, predSt, sym, toSt );
+          }
+        }
+      }   
+                       
+      return newNWA;
+      */
+      
+      // TODO: acceptAbsent consideration
+      //NOTE: for now, intersect only works with NWAs that do not accept the stuck state.
+      assert(!absentAcceptance && !other.absentAcceptance);
+      
+      //If both NWAs to be intersected accept absent, the intersection should too.
+      //Otherwise, the intersection should not, so keep the default settings.
+      if( absentAcceptance && other.absentAcceptance )
+        result.acceptAbsent();
+      
+      std::deque<Triple<St*,St*,St*>> wList; //An element: <joinedState, thisState, otherState>
+      std::set<St*> visited; //States that have been created in the intersection NWA.
+      
+      //Start the worklist with all possible initial states of the intersection NWA.
+      //NOTE: Currently this should be just one state (the join of the single initial state of each machine).
+      for( stateIterator fit = beginInitialStates();
+            fit != endInitialStates(); fit++ )
+      {
+        for( stateIterator sit = other.beginInitialStates();
+              sit != other.endInitialStates(); sit++ )
+        {
+          St newSt;
+          if( result.nodeIntersect(*fit,*sit,newSt) )
+          {
+            result.addInitialState(&newSt); 
+            wList.push_back(Triple<St*,St*,St*>(&newSt,*fit,*sit));
+            visited.insert(&newSt);
+          }  
+        }      
+      }
+      
+      //As long as there are still transitions to consider.
+      while(! wList.empty() )
+      {
+        Triple<St*,St*,St*> from = wList.front();
+        
+        //Epsilon closure for the nodes that we are currently considering.
+        //Check call transitions in this NWA.
+        Calls thisCalls = trans->getCalls(from.second,Sym::getEpsilon());
+        for( Calls::const_iterator cit = thisCalls.begin(); cit != thisCalls.end(); cit++ )
+        {
+          St newSt;
+          //Check intersectability of states (if false, don't add).           
+          if( result.nodeIntersect((*cit)->third,from.third,newSt) )
+            if( visited.find(&newSt) == visited.end() ) 
+            {
+              wList.push_back(Triple<St*,St*,St*>(&newSt,(*cit)->third,from.third));
+              visited.insert(&newSt);
+              
+              if( isFinalState((*cit)->third) && other.isFinalState(from.third) )
+                result.addFinalState(&newSt);
+              else
+                result.addState(&newSt);
+            }                   
+        }
+        //Check call transitions in the NWA 'other'.
+        Calls otherCalls = other.trans->getCalls(from.third,Sym::getEpsilon());
+        for( Calls::const_iterator cit = otherCalls.begin(); cit != otherCalls.end(); cit++ )
+        {
+          St newSt;
+          //Check intersectability of states (if false, don't add).
+          if( result.nodeIntersect(from.second,(*cit)->third,newSt) )
+            if( visited.find(&newSt) == visited.end() )
+            {
+              wList.push_back(Triple<St*,St*,St*>(&newSt,from.second,(*cit)->third));
+              visited.insert(&newSt);
+              
+              if( isFinalState(from.second) && other.isFinalState((*cit)->third) )
+                result.addFinalState(&newSt);
+              else
+                result.addState(&newSt);
+            }
+        }
+        
+        //Check internal transitions in this NWA.
+        Internals thisInternals = trans->getInternals(from.second,Sym::getEpsilon());
+        for( Internals::const_iterator iit = thisInternals.begin(); iit != thisInternals.end(); iit++ )
+        {
+          St newSt;
+          //Check intersectability of states (if false, don't add).
+          if( result.nodeIntersect((*iit)->third,from.third,newSt) )
+            if( visited.find(&newSt) == visited.end() )
+            {
+              wList.push_back(Triple<St*,St*,St*>(&newSt,(*iit)->third,from.third));
+              visited.insert(&newSt);
+              
+              if( isFinalState((*iit)->third) && other.isFinalState(from.third) )
+                result.addFinalState(&newSt);
+              else
+                result.addState(&newSt);
+            }
+        }     
+        
+        //Check internal transitions in the NWA 'other'.
+        Internals otherInternals = other.trans->getInternals(from.third,Sym::getEpsilon());
+        for( Internals::const_iterator iit = otherInternals.begin(); iit != otherInternals.end(); iit++ )
+        {
+          St newSt;
+          //Check intersectability of states (if false, don't add).
+          if( result.nodeIntersect(from.second,(*iit)->third,newSt) )
+            if( visited.find(&newSt) == visited.end() )
+            {
+              wList.push_back(Triple<St*,St*,St*>(&newSt,from.second,(*iit)->third));
+              visited.insert(&newSt);
+              
+              if( isFinalState(from.second) && other.isFinalState((*iit)->third) )
+                result.addFinalState(&newSt);
+              else
+                result.addState(&newSt);
+            }
+        }      
+        
+        //Check return transitions in this NWA.
+        Returns thisReturns = trans->getReturns(from.second,Sym::getEpsilon());
+        for( Returns::const_iterator rit = thisReturns.begin(); rit != thisReturns.end(); rit++ )
+        {
+          St newSt;
+          //Check intersectability of states (if false, don't add).
+          if( result.nodeIntersect((*rit)->fourth,from.third,newSt) )
+            if( visited.find(&newSt) == visited.end() )
+            {
+              wList.push_back(Triple<St*,St*,St*>(&newSt,(*rit)->fourth,from.third));
+              visited.insert(&newSt);
+              
+              if( isFinalState((*rit)->fourth) && other.isFinalState(from.third) )
+                result.addFinalState(&newSt);
+              else
+                result.addState(&newSt);
+            } 
+        }
+        
+        //Check return transitions in the NWA 'other'.
+        Returns otherReturns = other.trans->getReturns(from.third,Sym::getEpsilon());
+        for( Returns::const_iterator rit = otherReturns.begin(); rit != otherReturns.end(); rit++ )
+        {
+          St newSt;
+          //Check intersectability of states (if false, don't add).
+          if( result.nodeIntersect(from.second,(*rit)->fourth,newSt) )
+            if( visited.find(&newSt) == visited.end() )
+            {
+              wList.push_back(Triple<St*,St*,St*>(&newSt,from.second,(*rit)->fourth));
+              visited.insert(&newSt);
+              
+              if( isFinalState(from.second) && other.isFinalState((*rit)->fourth) )
+                result.addFinalState(&newSt);
+              else
+                result.addState(&newSt);
+            }
+        }
+        
+        //TODO: ???? this is going to hell in a handbasket (i.e. quadratic performance is emminent)
+        //For each possible outgoing symbol/edge type.
+        for( symbolIterator fsit = symbols.begin(); fsit != symbols.end(); fsit++ )
+        {
+          if( ! (*fsit == Sym::getEpsilon()) )  //Symbols other than epsilon.
+            for( symbolIterator ssit = other.symbols.begin(); ssit != other.symbols.end(); ssit++ )
+            {           
+              if (! (*ssit == Sym::getEpsilon()) )  //Symbols other than epsilon.
+              {   
+                Sym sym;
+                //Check intersectability of edge labels.
+                if( result.edgeIntersect(*fsit,*ssit,sym) )  //Only continue if the symbols can be intersected.
+                {
+                  //Check call transitions with the desired 'from' state.
+                  Calls thisCalls = trans->getCalls(from.second,*fsit);
+                  Calls otherCalls = other.trans->getCalls(from.third,*ssit);  
+                  
+                  if( !thisCalls.empty() && !otherCalls.empty() )
+                  {
+                    //there are edges to join.
+                    for( Calls::const_iterator fcit = thisCalls.begin();
+                          fcit != thisCalls.end(); fcit++ )
+                    {
+                      for( Calls::const_iterator scit = otherCalls.begin();
+                            scit != otherCalls.end(); scit++ )
+                      {
+                        St toSt;                              
+                        //Check intersectability of to states (if false, don't look further).           
+                        if( result.nodeIntersect((*fcit)->third,(*scit)->third,toSt) )
+                          if( visited.find(&toSt) == visited.end() )
+                          {
+                            wList.push_back(Triple<St*,St*,St*>(&toSt,(*fcit)->third,(*scit)->third));
+                            visited.insert(&toSt);
+                          }
+                          
+                        if( isFinalState((*fcit)->third) && other.isFinalState((*scit)->third) )
+                          result.addFinalState(&toSt);
+                        else
+                          result.addState(&toSt);
+                          
+                        //Add the transition to the intersection NWA.  
+                        result.addCallTrans( from.first, &sym, &toSt );
+                      }              
+                    }            
+                  }
+                  /* NOTE: assuming absentAccept is false for both machines
+                  else if( thisCalls.empty() && !otherCalls.empty() )
+                  {
+                    //only this has no edges  
+                    //if this is acceptAbsent, then follow the path of otherCalls
+                    //with just the other state value for the joined state?
+                    if( isAbsentAccept() )
+                    {
+                      for( Calls::const_iterator cit = otherCalls.begin();
+                            cit != otherCalls.end(); cit++ )
+                      {
+                        if( isFinalState(cit->third) )
+                          worklistNWA->addFinalState(cit->third);
+                        else
+                          worklistNWA->addState(cit->third);
+                        worklistNWA->addCallTrans( from.first, sym, cit->third );
+                      }
+                    }
+                  }
+                  else if( !thisCalls.empty() && otherCalls.empty() )
+                  {
+                    //only other has no edges
+                    //if other is acceptAbsent, then follow the path of thisCalls
+                    //with just the this state value for the joined state?
+                    if( other.isAbsentAccept() )
+                    {
+                    }
+                  }
+                  //otherwise, both have no matching edges so there is no path to follow
+                  */
+                  
+                  //Check internal transitions with the desired 'from' state and symbol.
+                  Internals thisInternals = trans->getInternals(from.second,*fsit);
+                  Internals otherInternals = other.trans->getInternals(from.third,*ssit);  
+                  
+                  if( !thisInternals.empty() && !otherInternals.empty() )
+                  {
+                    //there are edges to join.
+                    for( Internals::const_iterator fiit = thisInternals.begin();
+                          fiit != thisInternals.end(); fiit++ )
+                    {
+                      for( Internals::const_iterator siit = otherInternals.begin();
+                            siit != otherInternals.end(); siit++ )
+                      {
+                        St toSt;                              
+                        //Check intersectability of to states (if false, don't look further).           
+                        if( result.nodeIntersect((*fiit)->third,(*siit)->third,toSt) )
+                          if( visited.find(&toSt) == visited.end() )
+                          {
+                            wList.push_back(Triple<St*,St*,St*>(&toSt,(*fiit)->third,(*siit)->third));
+                            visited.insert(&toSt);
+                          }
+                          
+                        if( isFinalState((*fiit)->third) && other.isFinalState((*siit)->third) )
+                          result.addFinalState(&toSt);
+                        else
+                          result.addState(&toSt);
+                          
+                        //Add the transition to the intersection NWA.
+                        result.addInternalTrans( from.first, &sym, &toSt );
+                      }         
+                    }            
+                  }
+                  
+                  /* NOTE: assuming absentAccept is false for both machines
+                  else if( thisInternals.empty() && !otherInternals.empty() )
+                  {
+                    //only this has no edges  
+                    //if this is acceptAbsent, then follow the path of otherInternals
+                    //with a dummy value for the this state?
+                    //with just the other state value for the joined state?
+                  }
+                  else if( !thisInternals.empty() && otherInternals.empty() )
+                  {
+                    //only other has no edges
+                    //if other is acceptAbsent, then follow the path of thisInternals
+                    //with a dummy value for the other state?
+                    //with just the this state value for the joined state?
+                  }
+                  //otherwise, both have no matching edges so there is no path to follow
+                  */
+                  
+                  //Check return transitions with the desired 'from' state and symbol.
+                  Returns thisReturns = trans->getReturns(from.second,*fsit);
+                  Returns otherReturns = other.trans->getReturns(from.third,*ssit);  
+                  
+                  if( !thisReturns.empty() && !otherReturns.empty() )
+                  {
+                    //there are edges to join.
+                    for( Returns::const_iterator frit = thisReturns.begin();
+                          frit != thisReturns.end(); frit++ )
+                    {
+                      for( Returns::const_iterator srit = otherReturns.begin();
+                            srit != otherReturns.end(); srit++ )
+                      {
+                        St predSt, toSt;
+                        result.nodeIntersect((*frit)->second,(*srit)->second,predSt);  //TODO: check that this is a viable call point in the intersected NWA.
+                        
+                        //Check intersectability of to states (if false, don't look further).    
+                        if( result.nodeIntersect((*frit)->fourth,(*srit)->fourth,toSt) )
+                          if( visited.find(&toSt) == visited.end() )
+                          {
+                            wList.push_back(Triple<St*,St*,St*>(&toSt,(*frit)->fourth,(*srit)->fourth));
+                            visited.insert(&toSt);
+                          }
+                          
+                        if( isFinalState((*frit)->fourth) && other.isFinalState((*srit)->fourth) )
+                          result.addFinalState(&toSt);
+                        else
+                          result.addState(&toSt);
+                          
+                        //Add the transition to the intersection NWA.  
+                        result.addReturnTrans( from.first, &predSt, &sym, &toSt );
+                      }            
+                    }            
+                  }
+                  
+                  /* NOTE: assuming absentAccept is false for both machines
+                  else if( thisReturns.empty() && !otherReturns.empty() )
+                  {
+                    //only this has no edges  
+                    //if this is acceptAbsent, then follow the path of
+                    //otherCalls with a dummy value for the this state?
+                  }
+                  else if( !thisReturns.empty() && otherReturns.empty() )
+                  {
+                    //only other has no edges
+                    //if other is acceptAbsent, then follow the path
+                    //of thisCalls with a dummy value for the other state?
+                  }
+                  //otherwise, both have no matching edges so there is no path to follow
+                  */
+              }
+            }
+          }
+        }
+        
+        wList.pop_front();
+      }
+    }
+    
+    /**
+     * TODO: write comments
+     */
+    template<typename St,typename StName,typename Sym > 
+    bool NWA<St,StName,Sym>::nodeIntersect(St* node1, St* node2, St & result )
+    {
+      //Note: When overriding this method your metric must determine whether
+      // the given states are compatible, then create a state and set result
+      // to the state just created if they are compatible.
+      result = St();
+      
+      return true;
+    }
+    
+    /**
+     * TODO: write comments
+     */
+    template<typename St,typename StName,typename Sym > 
+    bool NWA<St,StName,Sym>::edgeIntersect(Sym* label1, Sym* label2, Sym & result )
+    {
+      //Note: When overriding this method your metric must determine an
+      // appropriate label, create a symbol with that label, and set result
+      // to the symbol just created.
+      
+      if( label1->isWild() )  //If we have a wild symbol, whatever the other symbol is survives (even if it is also wild).
+      {
+        result = *label2;
+        return true;
+      }
+      else if( label2->isWild() ) //If the other symbol is wild, whatever this symbol is survives. 
+      {
+        result = *label1;
+        return true;
+      }
+      else if( label1 == label2 ) //This rule still applies for epsilons, i.e. epsilons only match epsilons
+      {
+        result = *label1;
+        return true;
+      }
+      else
+        return false;
+    }
+    
+    
+    //Using NWAs
+    
+    /**
+     * 
+     * @brief constructs the WPDS which is the result of the explicit NWA 
+     * plus WPDS construction from Advanced Querying for Property Checking
+     *
+     * @param the WPDS that forms the basis for the constructed WPDS
+     * @return the WPDS which can be used to perform property checking 
+     * using PDS reachability
+     * 
+     */
+    /*  Note: broken
+    template<typename St,typename StName,typename Sym > 
+    wpds::WPDS NWA<St,StName,Sym>::plusWPDS( wpds::WPDS base )
+    { //FIX
+      //TODO: how does this react to absentAcceptance & State/Symbol types & wild symbol
+      wpds::WpdsRules rules = wpds::WpdsRules();
+    
+      base.for_each(rules);
+      
+      //Step Rules:
+      for( std::set< wpds::Rule >::iterator it = rules.stepRules.begin();
+            it != rules.stepRules.end(); it++ )
+      {
+        //<p,n_1> -w-> <p',n_2> in delta_1, (q,n_1,q') in delta_i
+        Key sym = it->from_stack();
+        //look for internal transitions in the NWA with symbol sym
+        for( std::set< KeyTriple >::iterator iit = trans->beginInternal();
+              iit != trans->endInternal(); iit++ )
+        {
+          if( iit->second == sym )
+          {
+            //<(p,q),n_1> -w-> <(p',q'),n_2>
+            Key from = getKey(it->from_state(),iit->first);
+            Key to = getKey(it->to_state(),iit->third);
+            result.add_rule(from,sym,to,it->to_stack1(),it->weight());
+          }
+        }
+      }
+        
+      //Call Rules:
+      for( std::set< wpds::Rule >::iterator it = rules.pushRules.begin();
+            it != rules.pushRules.end(); it++ )
+      {
+        //<p,n_c> -w-> <p',e r_c> in delta_2, (q_c,n_c,q) in delta_c
+        Key sym = it->from_stack();
+        //look for call transitions in the NWA with symbol sym
+        for( std::set< KeyTriple >::iterator cit = trans->beginCall();
+              cit != trans->endCall(); cit++ )
+        {
+          if( cit->second == sym )
+          {
+            //<(p,q_c),n_c> -w-> <(p',q),e (r_c,q_c)>
+            Key from = getKey(it->from_state(),cit->first);
+            Key to = getKey(it->to_state(),cit->third);
+            Key stack2 = getKey(it->to_stack2(),cit->first);
+            result.add_rule(from,sym,to,it->to_stack1(),stack2,it->weight());
+          }
+        }
+      }
+          
+      //Return Rules:
+      for( std::set< wpds::Rule >::iterator it = rules.popRules.begin();
+            it != rules.popRules.end(); it++ )
+      {
+        //<p,x> -w-> <p',*> in delta_0, (q_r,q_c,x,q) in delta_r
+        Key sym = it->from_stack();
+        //look for return transitions in the NWA with symbol sym
+        for( std::set< KeyQuad >::iterator rit = trans->beginReturn();
+              rit != trans->endReturn(); rit++ )
+        {
+          if( rit->third == sym )
+          {
+            //<(p,q_r),x> -w-> <(p',q_r^x),*>
+            Key from = getKey(it->from_state(),rit->first);
+            Key to = getKey( it->to_state(),getKey(rit->first,sym) );
+            result.add_rule(from,sym,to,it->weight());
+            //For all r_c in delta_2
+            for( std::set< wpds::Rule >::iterator dit = rules.pushRules.begin();
+                  dit != rules.pushRules.end(); dit++ )
+            {
+              //<(p',q_r^x),(r_c,q_c)> -1-> <(p',q),r_c>
+              from = getKey( it->to_state(),getKey(rit->first,sym) );
+              sym = getKey(dit->to_stack2(),rit->second);
+              to = getKey(it->to_state(),rit->fourth);
+              result.add_rule(from,sym,to,dit->to_stack2(),it->weight()->one());
+            }
+          }
+        }
+      }     
+            
+      return result;
+    }*/
+    
+    /**
+     *
+     * @brief constructs the NWA equivalent to the given PDS
+     *
+     * @return the NWA equivalent to the given PDS
+     *
+     */
+    /*  Note: broken
+    template<typename St, typename Sym > 
+    nwa::NWA<St,StName,Sym> NWA<St,StName,Sym>::PDStoNWA(wpds::WPDS pds)
+    { //FIX
+      //TODO: how does this react to absentAcceptance & State/Symbol types & wild symbol
+      nwa::NWA<St,StName,Sym> result = nwa::NWA<St,StName,Sym>();
+
+      std::map<St,St> call_return;
+  
+      wpds::WpdsRules rules = wpds::WpdsRules();
+    
+      pds.for_each(rules);
+      
+      //Step Rules:
+      for( std::set< wpds::Rule >::iterator it = rules.stepRules.begin();
+            it != rules.stepRules.end(); it++ )
+      {
+        //<p,n_1> -w-> <p',n_2> in delta_1 goes to ((p,n_1),n_1,(p',n_2)) in delta_i
+        result.addInternalTrans(getKey( it->from_state(),it->from_stack() ),  //from
+                                it->from_stack(),                             //sym
+                                getKey( it->to_state(),it->to_stack1() ));    //to
+      }
+        
+      //Call Rules:
+      for( std::set< wpds::Rule >::iterator it = rules.pushRules.begin();
+            it != rules.pushRules.end(); it++ )
+      {
+        //<p,n_c> -w-> <p',e r_c> in delta_2, ((p,n_c),c,(p',e)) in delta_c
+        result.addCallTrans(getKey( it->from_state(),it->from_stack() ),      //from
+                            it->from_stack(),                                 //sym
+                            getKey( it->to_state(),it->to_stack1() ));        //to
+        //add (p,n_c) => r_c to the call-return map
+        call_return.insert(std::pair<Key,Key>(getKey( it->from_state(),it->from_stack() ),  //call
+                                              it->to_stack2()));                            //ret
+      }
+          
+      //Return Rules:
+      for( std::set< wpds::Rule >::iterator it = rules.popRules.begin();
+            it != rules.popRules.end(); it++ )
+      {
+        //<p,x> -w-> <p',*> in delta_0, ((p,x),(p,n_c),x,(p',r)) in delta_r
+        for(std::map<Key,Key>::iterator cr_it = call_return.begin(); 
+              cr_it != call_return.end(); cr_it++  )
+          result.addReturnTrans(getKey( it->from_state(),it->from_stack() ),  //from
+                                cr_it->first,                                 //pred
+                                it->from_stack(),                             //sym
+                                getKey( it->to_state(),cr_it->second ));      //to
+      }
+            
+      return result;    
+    }*/
+
+    /**
+     *
+     * @brief constructs the PDS equivalent to this NWA
+     *
+     * @return the PDS equivalent to this NWA
+     *
+     */
+    template<typename St,typename StName,typename Sym > 
+    wpds::WPDS NWA<St,StName,Sym>::NWAtoPDS(WeightGen<St,Sym> wg) const
+    { //FIX
+      //TODO: how does this react to absentAcceptance???
+      //NOTE: for now assume stuck state is rejecting
+      wpds::WPDS result = wpds::WPDS();
+      std::map< Key,Key > calls;
+  
+      //note: if you change this, make sure you modify the code in createCA as well
+      Key program = wali::getKey("program"); 
+      wali::sem_elem_t wgt;
+  
+      //Internal Transitions
+      for( internalIterator iit = trans->beginInternal();
+            iit != trans->endInternal(); iit++ )
+      {      
+        //(q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
+        //where the weight w depends on sigma
+    
+        if( (*iit)->second->isWild() )
+          wgt = wg.getWildWeight(*(*iit)->first,*(*iit)->third);
+        else
+          wgt = wg.getWeight(*(*iit)->first,
+                             *(*iit)->second,
+                             WeightGen<St,Sym>::INTRA,
+                             *(*iit)->third);
+    
+        result.add_rule(program,                //from_state (p)
+                    (*iit)->first->getStateKey(),   //from_stack (q)
+                        program,                //to_state (p)
+                    (*iit)->third->getStateKey(),   //to_stack1 (q')
+                        wgt);                   //weight      
+      }
+  
+      //Call Transitions
+      for( callIterator cit = trans->beginCall();
+            cit != trans->endCall(); cit++ )
+      {
+        for( returnIterator rit = trans->beginReturn();
+              rit != trans->endReturn(); rit++ )
+          if( (*cit)->first == (*rit)->second )
+          {
+            //for each return site with cit->first as call site ...
+            //Key ret = getKey(rit->fourth.getStateKey(),rit->fourth.getStateKey()); // (r,r)
+            //calls.insert(std::pair<Key,Key>(cit->first.getStateKey(),ret));
+            calls.insert(std::pair<Key,Key>((*cit)->first->getStateKey(),(*rit)->fourth->getStateKey()));
+        
+            //(q_c,sigma,q_e) in delta_c and (*,q_c,*,q_r) in delta_r goes to
+            // <p,q_c> -w-> <p,q_e r'> in delta_2 where r' = (q_r,q_r) (or q_r?)
+            // and the weight w depends on sigma
+        
+            if( (*cit)->second->isWild() )
+              wgt = wg.getWildWeight(*(*cit)->first,*(*cit)->third);
+            else
+              wgt = wg.getWeight(*(*cit)->first,
+                                *(*cit)->second,
+                                WeightGen<St,Sym>::CALL_TO_ENTRY,
+                                *(*cit)->third);
+        
+            result.add_rule(program,                //from_state (p)
+                        (*cit)->first->getStateKey(),   //from_stack (q_c)
+                            program,                //to_state (p)
+                        (*cit)->third->getStateKey(),   //to_stack1 (q_e)
+                          //ret,                    //to_stack2 (r')
+                        (*rit)->fourth->getStateKey(),  //to_stack2 (r')
+                            wgt);                   //weight  
+          }  
+      }
+  
+      //Return Transitions
+      for( returnIterator rit = trans->beginReturn();
+            rit != trans->endReturn(); rit++ )
+      {
+        //(q_x,q_c,sigma,q_r) in delta_r goes to 
+        // <p,q_x> -w1-> <p_q_x,epsilon> in delta_0
+        // and <p_q_x,r'> -w2-> <p,q_r> in delta_1
+        // where p_q_x = (q_x,q_c), r' = (q_r,q_r)
+        // w1 depends on one, and w2 depends on sigma
+    
+        wgt = wg.getOne();
+    
+        //Note: if you change this, make sure you modify the code in NWPForest.createCA()
+        Key rstate = getKey((*rit)->first->getStateKey(),(*rit)->second->getStateKey());  //p_q_x
+    
+        result.add_rule(program,                //from_state (p)
+                    (*rit)->first->getStateKey(),   //from_stack (q_x)
+                        rstate,                 //to_state (p_q_x == (q_x,q_c))
+                        wgt);                   //weight 
+    
+        if( (*rit)->third->isWild() )
+          wgt = wg.getWildWeight(*(*rit)->first,*(*rit)->fourth);
+        else
+          wgt = wg.getWeight(*(*rit)->first, 
+                              *(*rit)->third,
+                              WeightGen<St,Sym>::EXIT_TO_RET,  
+                              *(*rit)->fourth);  
+    
+        std::map<Key,Key>::iterator ret = calls.find((*rit)->second->getStateKey());
+        if( ret != calls.end() )          
+          result.add_rule(rstate,                   //from_state (p_q_x == (q_x,q_c))
+                          ret->second,    //from_stack (r')
+                          program,                  //to_state (p)
+                      (*rit)->fourth->getStateKey(),    //to_stack (q_r)
+                          wgt);                     //weight    
+    
+      }
+  
+      return result;
+    }
+    
+    /**
+     *
+     * @brief constructs the backwardsPDS equivalent to this NWA
+     *
+     * @return the backwards PDS equivalent to this NWA
+     *
+     */
+    template<typename St,typename StName,typename Sym > 
+    wpds::WPDS NWA<St,StName,Sym>::NWAtoBackwardsPDS(WeightGen<St,Sym> wg) const
+    {
+      //FIX
+      //TODO: how does this react to absentAcceptance???
+      //NOTE: for now assume stuck state is rejecting
+      wpds::WPDS result = wpds::WPDS();
+      std::map< Key,Key > returns;
+  
+      Key program = wali::getKey("program"); 
+      wali::sem_elem_t wgt;
+  
+      //Internal Transitions
+      for( internalIterator iit = trans->beginInternal();
+            iit != trans->endInternal(); iit++ )
+      {      
+        //(q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
+        //where the weight w depends on sigma
+    
+        if( (*iit)->second->isWild() )
+          wgt = wg.getWildWeight(*(*iit)->first,*(*iit)->third);
+        else
+          wgt = wg.getWeight(*(*iit)->first,
+                             *(*iit)->second,
+                             WeightGen<St,Sym>::INTRA,
+                             *(*iit)->third);
+    
+        result.add_rule(program,                //from_state (p)
+                    (*iit)->third->getStateKey(),   //from_stack (q)
+                        program,                //to_state (p)
+                    (*iit)->first->getStateKey(),   //to_stack1 (q')
+                        wgt);                   //weight      
+      }
+  
+      //Call Transitions 
+      for( callIterator cit = trans->beginCall();
+            cit != trans->endCall(); cit++ )
+      {
+        for( returnIterator rit = trans->beginReturn();
+              rit != trans->endReturn(); rit++ )
+          if( (*cit)->first == (*rit)->second )
+          {
+        
+            //(q_c,sigma,q_e) in delta_c and (q_x,q_c,*,q_r) in delta_r goes to
+            // <p,q_e> -w1-> <p_q_e,epsilon> in delta_0
+            // and <p_q_e,q_c> -w2-> <p,q_c> in delta_1
+            // where p_q_e = (q_e,q_r)
+            // w1 depends is one, and w2 depends on sigma
+      
+            wgt = wg.getOne();
+      
+            Key cstate = getKey((*cit)->third->getStateKey(),(*rit)->fourth->getStateKey());  //p_q_e
+      
+            result.add_rule(program,                //from_state (p)
+                        (*cit)->third->getStateKey(),   //from_stack (q_e)
+                            cstate,                 //to_state (p_q_e == (q_e,q_r))
+                            wgt);                   //weight 
+        
+            if( (*cit)->second->isWild() )
+              wgt = wg.getWildWeight(*(*cit)->first,*(*cit)->third);
+            else
+              wgt = wg.getWeight(*(*cit)->first, 
+                                  *(*cit)->second,
+                                  WeightGen<St,Sym>::EXIT_TO_RET,  
+                                  *(*cit)->third);  
+        
+              result.add_rule(cstate,                   //from_state (p_q_x == (q_x,q_c))
+                              (*cit)->first->getStateKey(),    //from_stack (q_c)
+                              program,                  //to_state (p)
+                          (*cit)->first->getStateKey(),    //to_stack (q_c)
+                              wgt);                     //weight    
+          }  
+      }
+  
+      //Return Transitions
+      for( returnIterator rit = trans->beginReturn();
+            rit != trans->endReturn(); rit++ )
+      {
+          //(q_x,q_c,*,q_r) in delta_r goes to
+          // <p,q_r> -w-> <p,q_x q_c> in delta_2 
+          // and the weight w depends on sigma
+        
+          if( (*rit)->third->isWild() )
+              wgt = wg.getWildWeight(*(*rit)->first,*(*rit)->fourth);
+            else
+              wgt = wg.getWeight(*(*rit)->first,
+                                *(*rit)->third,
+                                WeightGen<St,Sym>::CALL_TO_ENTRY,
+                                *(*rit)->fourth);
+        
+            result.add_rule(program,                //from_state (p)
+                        (*rit)->fourth->getStateKey(),   //from_stack (q_r)
+                            program,                //to_state (p)
+                        (*rit)->first->getStateKey(),   //to_stack1 (q_x)
+                        (*rit)->second->getStateKey(),  //to_stack2 (q_c)
+                            wgt);                   //weight      
+      }
+  
+      return result;
+    }
+    
+    
+    
+    /**
+     *
+     * @brief tests whether the language accepted by this NWA is empty
+     *
+     * @return true if the language accepted by this NWA is empty
+     *
+     */
+    /* broken
+    //TODO: determinize prior to checking paths?
+    template<typename St,typename StName,typename Sym >
+    bool NWA<St,StName,Sym>::isEmpty( )
+    {
+      //An automaton with no initial states must accept only the empty
+      //language.
+      if( sizeInitialStates() == 0 )
+        return true;
+    
+      //An automaton with no final states must accept only the empty 
+      //language.
+      if( sizeFinalStates() == 0 )
+        return true;
+      
+      //An automaton with no path from an initial state to a final state
+      //must accept only the empty language.       
+      for( stateIterator it = beginInitialStates();
+            it != endInitialStates(); it++ )
+      {
+        //If an initial state is also a final state, then
+        //the empty string is accepted.  Therefore the
+        //accepted language is not the empty language.
+        if( isFinalState(*it) )
+          return false;
+        std::set< St > visited = std::set< St >();
+        visited.insert(*it);
+        if( hasPath(it, std::stack< St >(), visited) )
+          return false;
+        visited.erase(*it);
+      }
+      return true;
+    }*/
+    
+    /**
+     *
+     * @brief tests whether the NWA has a path from the current state to
+     * a final state given the call stack and the set of states already visited
+     *
+     * @param currState: the state from which to start searching for a path
+     * @param calls: the stack of calls that have been made thus far
+     * @param visited: the states which have already been visited
+     * @return true if there is a path through the NWA from the current state 
+     * to a final state, false otherwise
+     *
+     */
+    /* broken
+    template<typename St,typename StName,typename Sym > 
+    bool NWA<St,StName,Sym>::hasPath( St currState, std::stack< St > calls, std::set< St > visited )
+    { //FIX
+      //TODO: absentAcceptance and wild symbol
+      //Try each possible transition out of this state to see if a final state
+      //can be reached.
+    
+      //First try call transitions.
+      calls.push(currState);
+      for( callIterator cit = trans->beginCall();
+            cit != trans->endCall(); cit++ )
+      {
+        //If the call starts from the current state and goes to a state not
+        //yet visited, follow the path.
+        if( (cit->first == currState) && (visited.count(cit->third) == 0) )
+        {
+          visited.insert(cit->third);
+          if( hasPath(cit->third,calls,visited) )
+            return true;
+          visited.erase(cit->third);
+        }    
+      }
+      calls.pop();
+      
+      //If no call transition led to a path, try internal transitions.
+      for( internalIterator iit = trans->beginInternal();
+            iit != trans->endInternal(); iit++ )
+      {
+        //If the call starts from the current state and goes to a state not
+        //yet visited, follow the path.
+        if( (iit->first == currState) && (visited.count(iit->third) == 0) )
+        {
+          visited.insert(iit->third);
+          if( hasPath(iit->third,calls,visited) )
+            return true;
+          visited.erase(iit->third);
+        }    
+      }
+        
+      //If no internal transition led to a path, try return transitions.
+      St callState = calls.top();
+      calls.pop();
+      for( returnIterator rit = trans->beginReturn();
+            rit != trans->endReturn(); rit++ )
+      {
+        if( (rit->first == currState) &&
+             (rit->second == callState) &&
+              (visited.count(rit->fourth) == 0) )
+        {
+          visited.insert(rit->fourth);
+          if( hasPath(rit->fourth,calls,visited) )
+            return true;
+          visited.erase(rit->fourth);
+        }    
+      }
+      calls.push(callState);      
+          
+      return false; 
+    }*/
+    
+    /**
+     *
+     * @brief tests whether the given nested word is a member of the 
+     * language accepted by this NWA
+     *
+     * @param the nested word to test
+     * @return true if the given nested word is a member of the language
+     * accepted by this NWA
+     *
+     */
+    /* broken
+    template<typename St,typename StName,typename Sym >
+    bool NWA<St,StName,Sym>::isMember( nws::NWS word )
+    { //FIX
+      //TODO: how does this react to absentAcceptance
+      std::deque<WordRecConfig<St>> configs;
+    
+      //Add a dummy call state for each call on the word stack
+      for( wali::nws::NWS::iterator it = word.beginStack();
+            it != word.endStack(); it++ );
+      {
+        WordRecConfig<St> config = WordRecConfig<St>(word);
+        for( stateIterator sit = initialStates.begin();
+              sit != initialStates.end(); sit++ )
+          config.addCallState(*sit);
+      
+        configs.push_back(config);
+      }
+        
+      //Simulate the nested word 'word' on the NWA.
+      for( stateIterator sit = initialStates.begin();
+            sit != initialStates.end(); sit++ ) 
+      {
+        //Follow the word from here and try to match it.
+        if( matchWord(*sit,configs) )
+          return true; 
+      }
+      return false;
+    }*/
+    
+    /** 
+     *
+     * @brief tests whether the nested word suffix is accepted by 
+     * this nested word automaton starting at the state with the
+     * given name
+     *
+     * @parm currState: the state in the nested word automaton at 
+     * which to start the simulation
+     * @parm word: the nested word suffix to match
+     * @return true if the simulation ends in an accepting state
+     *
+     */
+    /* broken
+    template<typename St,typename StName,typename Sym > 
+    bool NWA<St,StName,Sym>::matchWord( St currState, std::deque<WordRecConfig<St>> configs )
+    { //FIX
+      //TODO: absentAcceptance and wild symbol
+      WordRecConfig<St> config = configs.front();
+      configs.pop_front();  //remove this config
+    
+      //Base case: the word suffix has been completely processed 
+      // and acceptance is determined by whether the current
+      // state is a final state or not.
+      if( config.isEmpty() )
+      {
+        return isFinalState(currState);        
+      }
+      else if( !config.hasNext() )
+      {
+        return false;
+      }
+      
+      //Induction: the next node in the word suffix must be 
+      // processed and the current state of the automaton
+      // advanced properly.      
+      nws::NWSNode * currNode = config.getNext();
+      config.removeNext();      
+        
+      //Check for transitions that match.
+          
+      //Nodes with an exit node match call transitions
+      //Nodes with no exit node match
+      //  return transitions if the node is the node at the top of the nesting
+      //  internal transitions otherwise
+      if( currNode->isCall() )
+      {
+        config.addCallState(currState);
+            
+        for( callIterator cit = trans->beginCall();
+             cit != trans->endCall(); cit++ )
+        {
+          //If this symbol in the word can be matched, try matching
+          //the rest of the word.
+          if( (cit->first == currState) &&
+              (cit->second == currNode->getSymbol()) )
+          {
+            configs.push_back(config);
+            if( matchWord(cit->third,configs) )
+              return true;
+          }    
+        }
+        config.removeCallState();
+        //If no call transition led to a matched word, there is no
+        //accepting path through this state for the given word suffix.
+        return false;
+      }
+      else if( currNode == config.getCall() )
+      {
+        St callState = config.getCallState();
+        config.removeCallState();
+        for( returnIterator rit = trans->beginReturn();
+              rit != trans->endReturn(); rit++ )
+        {
+          //If this symbol in the word can be matched, try matching
+          //the rest of the word.
+          if( (rit->first == currState) &&
+              (rit->second == callState) &&
+              (rit->third == currNode->getSymbol()) )
+          {
+            configs.push_back(config);
+            if( matchWord(rit->fourth,configs) )
+              return true;
+          }    
+        }
+        config.addCallState(callState);
+        //If no return transition led to a matched word, there is no
+        //accepting path through this state for the given word suffix.
+        return false;
+      }
+      else
+      {
+        for( internalIterator iit = trans->beginInternal();
+              iit != trans->endInternal(); iit++ )
+        {
+          //If this symbol in the word can be matched, try matching
+          //the rest of the word.
+          if( (iit->first == currState) &&
+              (iit->second == currNode->getSymbol()) )
+          {
+            configs.push_back(config);
+            if( matchWord(iit->third,configs) )
+              return true;
+          }    
+        }
+        //If no internal transition led to a matched word, there is no
+        //accepting path through this state for the given word suffix.
+        return false;
+      }
+      return false;
+    }*/
+    
+    //Utilities	
+    
+    /**
+     *
+     * @brief print the NWA
+     *
+     * @param the output stream to print to
+     * @return the output stream that was printed to
+     *
+     */
+    template<typename St,typename StName,typename Sym >
+    std::ostream & NWA<St,StName,Sym>::print( std::ostream & o) const
+    {
+      states.print(o);
+      
+      if( absentAcceptance )
+        o << "Stuck state accepted." << "\n";   //TODO: move this to stateset
+      
+      o << "Sigma: " << "{ ";
+      bool first = true;
+      for( Symbols::const_iterator sit = symbols.begin(); sit != symbols.end(); sit++ )
+      { 
+        if(! first )
+          o << ", ";
+        else
+          first = false;
+        (*sit)->print(o);
+      }
+      o << " }\n";
+      
+      trans->print(o);
+      return o;
+    }
+    
+    /**
+     *
+     * @brief tests whether this NWA is equivalent to the NWA 'other'
+     *
+     * @param the NWA to compare this NWA to
+     * @return true if this NWA is equivalent to the NWA 'other'
+     *
+     */
+    template<typename St,typename StName,typename Sym > 
+    bool NWA<St,StName,Sym>::operator==( const NWA<St,StName,Sym> & other ) const
+    {
+      return ( (states == other.states) &&
+        (absentAcceptance == other.absentAcceptance) &&
+        (symbols == other.symbols) &&   //TODO: deeper check here?
+        (trans == other.trans) );
+    }
   }
 }
 #endif
