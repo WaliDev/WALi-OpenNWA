@@ -329,7 +329,7 @@ namespace wali
     template<typename T>
     bool Symbol<T>::isEpsilon() const
     {
-      if( *this == epsilon )
+      if( symbolKey == wali::WALI_EPSILON )
         return true;
       else
         return false;
@@ -350,7 +350,7 @@ namespace wali
     template<typename T>
     bool Symbol<T>::isWild() const
     {
-      if( *this == wild )
+      if( symbolKey == wali::WALI_BAD_KEY )
         return true;
       else
         return false;
