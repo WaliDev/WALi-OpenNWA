@@ -273,7 +273,6 @@ namespace wali
     template<typename T>
     Symbol<T>::Symbol(Key key)
     {
-      //TODO: if( key != wali::WALI_BAD_KEY && key != wali::WALI_EPSILON ) complain!
       symbolKey = key;
     }
     
@@ -288,25 +287,25 @@ namespace wali
     template<typename T>
     Symbol<T>::Symbol(const Symbol &other)
     {
-      if( other.isWild() )
-        *this = wild;
-      else
-      {
+      //if( other.isWild() )
+      //  *this = wild;
+      //else
+      //{
         lbl = other.lbl;
         symbolKey = other.symbolKey;
-      }
+      //}
     }
     
     template<typename T>
     Symbol<T> & Symbol<T>::operator=( const Symbol & other )
     {
-      if( other.isWild() )
-        *this = wild;
-      else
-      {
+      //if( other.isWild() )
+      //  *this = wild;
+      //else
+      //{
         lbl = other.lbl;
         symbolKey = other.symbolKey;
-      }
+      //}
       return *this;
     }
     
