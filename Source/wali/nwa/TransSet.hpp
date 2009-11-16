@@ -61,12 +61,12 @@ namespace wali
         /**
          * TODO
          */
-        std::set<St*> getReturnSites(St* callSite);
+        std::set<St*> getReturnSites(St* callSite) const;
 
         /**
          * TODO
          */
-        std::set<St*> getCallSites(St* exitSite, St* returnSite);
+        std::set<St*> getCallSites(St* exitSite, St* returnSite) const;
 
         /**
          * TODO
@@ -832,14 +832,14 @@ namespace wali
       const Info::Internals from = T_info.from(fromSt);
       for( Info::Internals::const_iterator it = from.begin(); it != from.end(); it++ )
       {
-        if( toSt == (*it)->third && sym==(*it).second)
+        if( toSt == (*it)->third && sym==*(*it)->second)
           return true;
       }
       
       const Info::Calls call = T_info.call(fromSt);
       for( Info::Calls::const_iterator it = call.begin(); it != call.end(); it++ )
       {
-        if( toSt == (*it)->third && sym == (*it)->second)
+        if( toSt == (*it)->third && sym == *(*it)->second)
         {
           return true;
         }
@@ -848,7 +848,7 @@ namespace wali
       const Info::Returns exit = T_info.exit(fromSt);
       for( Info::Returns::const_iterator it = exit.begin(); it != exit.end(); it++ )
       {
-        if( toSt == (*it)->fourth && sym == (*it)->third)
+        if( toSt == (*it)->fourth && sym == *(*it)->third)
         {
           return true;
         }
@@ -871,7 +871,7 @@ namespace wali
      * TODO
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    std::set<St*> TransSet<St,Sym,Call,Internal,Return>::getReturnSites(St* callSite)
+    std::set<St*> TransSet<St,Sym,Call,Internal,Return>::getReturnSites(St* callSite) const
     {
       std::set<St*> returns;
       const Info::Returns pred = T_info.pred(callSite);
@@ -886,7 +886,7 @@ namespace wali
      * TODO
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    std::set<St*> TransSet<St,Sym,Call,Internal,Return>::getCallSites(St* exitSite, St* returnSite)
+    std::set<St*> TransSet<St,Sym,Call,Internal,Return>::getCallSites(St* exitSite, St* returnSite) const
     {
       std::set<St*> calls;
       const Info::Returns exit = T_info.exit(exitSite);
