@@ -868,12 +868,12 @@ namespace wali
         /**
          * TODO: write comments
          */
-        bool nodeIntersect(St* node1, St* node2, St & result );
+        bool nodeIntersect(St* node1, St* node2, St * result );
         
         /**
          * TODO: write comments
          */
-        bool edgeIntersect(Sym* label1, Sym* label2, Sym & result );
+        bool edgeIntersect(Sym* label1, Sym* label2, Sym * result );
         
         
         //Using NWAs
@@ -3449,12 +3449,12 @@ namespace wali
         for( stateIterator sit = other.beginInitialStates();
               sit != other.endInitialStates(); sit++ )
         {
-          St newSt;
+          St * newSt;
           if( result.nodeIntersect(*fit,*sit,newSt) )
           {
-            result.addInitialState(&newSt); 
-            wList.push_back(Triple<St*,St*,St*>(&newSt,*fit,*sit));
-            visited.insert(&newSt);
+            result.addInitialState(newSt); 
+            wList.push_back(Triple<St*,St*,St*>(newSt,*fit,*sit));
+            visited.insert(newSt);
           }  
         }      
       }
@@ -3469,36 +3469,36 @@ namespace wali
         Calls thisCalls = trans->getCalls(from.second,Sym::getEpsilon());
         for( Calls::const_iterator cit = thisCalls.begin(); cit != thisCalls.end(); cit++ )
         {
-          St newSt;
+          St* newSt;
           //Check intersectability of states (if false, don't add).           
           if( result.nodeIntersect((*cit)->third,from.third,newSt) )
-            if( visited.find(&newSt) == visited.end() ) 
+            if( visited.find(newSt) == visited.end() ) 
             {
-              wList.push_back(Triple<St*,St*,St*>(&newSt,(*cit)->third,from.third));
-              visited.insert(&newSt);
+              wList.push_back(Triple<St*,St*,St*>(newSt,(*cit)->third,from.third));
+              visited.insert(newSt);
               
               if( isFinalState((*cit)->third) && other.isFinalState(from.third) )
-                result.addFinalState(&newSt);
+                result.addFinalState(newSt);
               else
-                result.addState(&newSt);
+                result.addState(newSt);
             }                   
         }
         //Check call transitions in the NWA 'other'.
         Calls otherCalls = other.trans->getCalls(from.third,Sym::getEpsilon());
         for( Calls::const_iterator cit = otherCalls.begin(); cit != otherCalls.end(); cit++ )
         {
-          St newSt;
+          St* newSt;
           //Check intersectability of states (if false, don't add).
           if( result.nodeIntersect(from.second,(*cit)->third,newSt) )
-            if( visited.find(&newSt) == visited.end() )
+            if( visited.find(newSt) == visited.end() )
             {
-              wList.push_back(Triple<St*,St*,St*>(&newSt,from.second,(*cit)->third));
-              visited.insert(&newSt);
+              wList.push_back(Triple<St*,St*,St*>(newSt,from.second,(*cit)->third));
+              visited.insert(newSt);
               
               if( isFinalState(from.second) && other.isFinalState((*cit)->third) )
-                result.addFinalState(&newSt);
+                result.addFinalState(newSt);
               else
-                result.addState(&newSt);
+                result.addState(newSt);
             }
         }
         
@@ -3506,18 +3506,18 @@ namespace wali
         Internals thisInternals = trans->getInternals(from.second,Sym::getEpsilon());
         for( Internals::const_iterator iit = thisInternals.begin(); iit != thisInternals.end(); iit++ )
         {
-          St newSt;
+          St* newSt;
           //Check intersectability of states (if false, don't add).
           if( result.nodeIntersect((*iit)->third,from.third,newSt) )
-            if( visited.find(&newSt) == visited.end() )
+            if( visited.find(newSt) == visited.end() )
             {
-              wList.push_back(Triple<St*,St*,St*>(&newSt,(*iit)->third,from.third));
-              visited.insert(&newSt);
+              wList.push_back(Triple<St*,St*,St*>(newSt,(*iit)->third,from.third));
+              visited.insert(newSt);
               
               if( isFinalState((*iit)->third) && other.isFinalState(from.third) )
-                result.addFinalState(&newSt);
+                result.addFinalState(newSt);
               else
-                result.addState(&newSt);
+                result.addState(newSt);
             }
         }     
         
@@ -3525,18 +3525,18 @@ namespace wali
         Internals otherInternals = other.trans->getInternals(from.third,Sym::getEpsilon());
         for( Internals::const_iterator iit = otherInternals.begin(); iit != otherInternals.end(); iit++ )
         {
-          St newSt;
+          St* newSt;
           //Check intersectability of states (if false, don't add).
           if( result.nodeIntersect(from.second,(*iit)->third,newSt) )
-            if( visited.find(&newSt) == visited.end() )
+            if( visited.find(newSt) == visited.end() )
             {
-              wList.push_back(Triple<St*,St*,St*>(&newSt,from.second,(*iit)->third));
-              visited.insert(&newSt);
+              wList.push_back(Triple<St*,St*,St*>(newSt,from.second,(*iit)->third));
+              visited.insert(newSt);
               
               if( isFinalState(from.second) && other.isFinalState((*iit)->third) )
-                result.addFinalState(&newSt);
+                result.addFinalState(newSt);
               else
-                result.addState(&newSt);
+                result.addState(newSt);
             }
         }      
         
@@ -3544,18 +3544,18 @@ namespace wali
         Returns thisReturns = trans->getReturns(from.second,Sym::getEpsilon());
         for( Returns::const_iterator rit = thisReturns.begin(); rit != thisReturns.end(); rit++ )
         {
-          St newSt;
+          St* newSt;
           //Check intersectability of states (if false, don't add).
           if( result.nodeIntersect((*rit)->fourth,from.third,newSt) )
-            if( visited.find(&newSt) == visited.end() )
+            if( visited.find(newSt) == visited.end() )
             {
-              wList.push_back(Triple<St*,St*,St*>(&newSt,(*rit)->fourth,from.third));
-              visited.insert(&newSt);
+              wList.push_back(Triple<St*,St*,St*>(newSt,(*rit)->fourth,from.third));
+              visited.insert(newSt);
               
               if( isFinalState((*rit)->fourth) && other.isFinalState(from.third) )
-                result.addFinalState(&newSt);
+                result.addFinalState(newSt);
               else
-                result.addState(&newSt);
+                result.addState(newSt);
             } 
         }
         
@@ -3563,18 +3563,18 @@ namespace wali
         Returns otherReturns = other.trans->getReturns(from.third,Sym::getEpsilon());
         for( Returns::const_iterator rit = otherReturns.begin(); rit != otherReturns.end(); rit++ )
         {
-          St newSt;
+          St* newSt;
           //Check intersectability of states (if false, don't add).
           if( result.nodeIntersect(from.second,(*rit)->fourth,newSt) )
-            if( visited.find(&newSt) == visited.end() )
+            if( visited.find(newSt) == visited.end() )
             {
-              wList.push_back(Triple<St*,St*,St*>(&newSt,from.second,(*rit)->fourth));
-              visited.insert(&newSt);
+              wList.push_back(Triple<St*,St*,St*>(newSt,from.second,(*rit)->fourth));
+              visited.insert(newSt);
               
               if( isFinalState(from.second) && other.isFinalState((*rit)->fourth) )
-                result.addFinalState(&newSt);
+                result.addFinalState(newSt);
               else
-                result.addState(&newSt);
+                result.addState(newSt);
             }
         }
         
@@ -3587,7 +3587,7 @@ namespace wali
             {           
               if (! (*ssit == Sym::getEpsilon()) )  //Symbols other than epsilon.
               {   
-                Sym sym;
+                Sym* sym;
                 //Check intersectability of edge labels.
                 if( result.edgeIntersect(*fsit,*ssit,sym) )  //Only continue if the symbols can be intersected.
                 {
@@ -3604,22 +3604,22 @@ namespace wali
                       for( Calls::const_iterator scit = otherCalls.begin();
                             scit != otherCalls.end(); scit++ )
                       {
-                        St toSt;                              
+                        St* toSt;                              
                         //Check intersectability of to states (if false, don't look further).           
                         if( result.nodeIntersect((*fcit)->third,(*scit)->third,toSt) )
-                          if( visited.find(&toSt) == visited.end() )
+                          if( visited.find(toSt) == visited.end() )
                           {
-                            wList.push_back(Triple<St*,St*,St*>(&toSt,(*fcit)->third,(*scit)->third));
-                            visited.insert(&toSt);
+                            wList.push_back(Triple<St*,St*,St*>(toSt,(*fcit)->third,(*scit)->third));
+                            visited.insert(toSt);
                           }
                           
                         if( isFinalState((*fcit)->third) && other.isFinalState((*scit)->third) )
-                          result.addFinalState(&toSt);
+                          result.addFinalState(toSt);
                         else
-                          result.addState(&toSt);
+                          result.addState(toSt);
                           
                         //Add the transition to the intersection NWA.  
-                        result.addCallTrans( from.first, &sym, &toSt );
+                        result.addCallTrans( from.first, sym, toSt );
                       }              
                     }            
                   }
@@ -3667,22 +3667,22 @@ namespace wali
                       for( Internals::const_iterator siit = otherInternals.begin();
                             siit != otherInternals.end(); siit++ )
                       {
-                        St toSt;                              
+                        St* toSt;                              
                         //Check intersectability of to states (if false, don't look further).           
                         if( result.nodeIntersect((*fiit)->third,(*siit)->third,toSt) )
-                          if( visited.find(&toSt) == visited.end() )
+                          if( visited.find(toSt) == visited.end() )
                           {
-                            wList.push_back(Triple<St*,St*,St*>(&toSt,(*fiit)->third,(*siit)->third));
-                            visited.insert(&toSt);
+                            wList.push_back(Triple<St*,St*,St*>(toSt,(*fiit)->third,(*siit)->third));
+                            visited.insert(toSt);
                           }
                           
                         if( isFinalState((*fiit)->third) && other.isFinalState((*siit)->third) )
-                          result.addFinalState(&toSt);
+                          result.addFinalState(toSt);
                         else
-                          result.addState(&toSt);
+                          result.addState(toSt);
                           
                         //Add the transition to the intersection NWA.
-                        result.addInternalTrans( from.first, &sym, &toSt );
+                        result.addInternalTrans( from.first, sym, toSt );
                       }         
                     }            
                   }
@@ -3718,24 +3718,24 @@ namespace wali
                       for( Returns::const_iterator srit = otherReturns.begin();
                             srit != otherReturns.end(); srit++ )
                       {
-                        St predSt, toSt;
+                        St * predSt,* toSt;
                         result.nodeIntersect((*frit)->second,(*srit)->second,predSt);  //TODO: check that this is a viable call point in the intersected NWA.
                         
                         //Check intersectability of to states (if false, don't look further).    
                         if( result.nodeIntersect((*frit)->fourth,(*srit)->fourth,toSt) )
-                          if( visited.find(&toSt) == visited.end() )
+                          if( visited.find(toSt) == visited.end() )
                           {
-                            wList.push_back(Triple<St*,St*,St*>(&toSt,(*frit)->fourth,(*srit)->fourth));
-                            visited.insert(&toSt);
+                            wList.push_back(Triple<St*,St*,St*>(toSt,(*frit)->fourth,(*srit)->fourth));
+                            visited.insert(toSt);
                           }
                           
                         if( isFinalState((*frit)->fourth) && other.isFinalState((*srit)->fourth) )
-                          result.addFinalState(&toSt);
+                          result.addFinalState(toSt);
                         else
-                          result.addState(&toSt);
+                          result.addState(toSt);
                           
                         //Add the transition to the intersection NWA.  
-                        result.addReturnTrans( from.first, &predSt, &sym, &toSt );
+                        result.addReturnTrans( from.first, predSt, sym, toSt );
                       }            
                     }            
                   }
@@ -3768,12 +3768,12 @@ namespace wali
      * TODO: write comments
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::nodeIntersect(St* node1, St* node2, St & result )
+    bool NWA<St,StName,Sym>::nodeIntersect(St* node1, St* node2, St * result )
     {
       //Note: When overriding this method your metric must determine whether
       // the given states are compatible, then create a state and set result
       // to the state just created if they are compatible.
-      result = St();
+      result = new St();
       
       return true;
     }
@@ -3782,7 +3782,7 @@ namespace wali
      * TODO: write comments
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::edgeIntersect(Sym* label1, Sym* label2, Sym & result )
+    bool NWA<St,StName,Sym>::edgeIntersect(Sym* label1, Sym* label2, Sym * result )
     {
       //Note: When overriding this method your metric must determine an
       // appropriate label, create a symbol with that label, and set result
@@ -3790,17 +3790,17 @@ namespace wali
       
       if( label1->isWild() )  //If we have a wild symbol, whatever the other symbol is survives (even if it is also wild).
       {
-        result = *label2;
+        result = label2;
         return true;
       }
       else if( label2->isWild() ) //If the other symbol is wild, whatever this symbol is survives. 
       {
-        result = *label1;
+        result = label1;
         return true;
       }
       else if( label1 == label2 ) //This rule still applies for epsilons, i.e. epsilons only match epsilons
       {
-        result = *label1;
+        result = label1;
         return true;
       }
       else
