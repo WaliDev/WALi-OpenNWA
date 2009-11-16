@@ -659,7 +659,7 @@ namespace wali
         /**
          * TODO: write comments
          */
-        std::set<StName> getReturnSites(StName callSite);
+        std::set<StName> getReturnSites(StName callSite) const;
         
         /**
          * TODO: write comments
@@ -866,14 +866,22 @@ namespace wali
         void intersect( NWA other, NWA & result );
         
         /**
+         *
+         * @brief constructs the NWA which is the intersection of this NWA
+         * and the NWA 'other'
+         * TODO: incomplete comments
+        */
+        NWA *intersect( NWA *other);
+
+        /**
          * TODO: write comments
          */
-        bool nodeIntersect(St* node1, St* node2, St * result );
+        virtual bool nodeIntersect(St* node1, St* node2, St * result );
         
         /**
          * TODO: write comments
          */
-        bool edgeIntersect(Sym* label1, Sym* label2, Sym * result );
+        virtual bool edgeIntersect(Sym* label1, Sym* label2, Sym * result );
         
         
         //Using NWAs
@@ -976,7 +984,7 @@ namespace wali
          * @return the output stream that was printed to
          *
          */
-        std::ostream & print( std::ostream & o) const;
+        virtual std::ostream & print( std::ostream & o) const;
         
         /**
          *
@@ -2365,7 +2373,7 @@ namespace wali
      * TODO: write comments
      */
     template<typename St,typename StName,typename Sym >
-    std::set<StName> NWA<St,StName,Sym>::getReturnSites(StName callSite)
+    std::set<StName> NWA<St,StName,Sym>::getReturnSites(StName callSite) const
     {
       St* callSiteSt = getState(callSite);
       std::set<St*> returns = trans->getReturnSites(callSiteSt);
@@ -3781,9 +3789,11 @@ namespace wali
       //Note: When overriding this method your metric must determine whether
       // the given states are compatible, then create a state and set result
       // to the state just created if they are compatible.
-      result = new St();
-      
-      return true;
+      //result = new St();
+      //
+      //return true;
+      result=NULL;
+      return false;
     }
     
     /**
