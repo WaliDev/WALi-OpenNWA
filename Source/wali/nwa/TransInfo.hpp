@@ -227,36 +227,36 @@
         }
       }
       
-      const Internals from( St* name )
+      const Internals from( St* name ) const
       {
         return from_ITrans.find(name->getStateKey())->second;
       }
-      const Internals to( St* name )
+      const Internals to( St* name ) const
       {
         return to_ITrans.find(name->getStateKey())->second;
       } 
-      const Calls call( St* name )
+      const Calls call( St* name ) const
       {
         return call_CTrans.find(name->getStateKey())->second;
       }
-      const Calls entry( St* name )
+      const Calls entry( St* name ) const
       { 
         return entry_CTrans.find(name->getStateKey())->second;
       }
-      const Returns exit( St* name )
+      const Returns exit( St* name ) const
       {
         return exit_RTrans.find(name->getStateKey())->second;
       }
-      const Returns pred( St* name )
+      const Returns pred( St* name )const
       {
         return pred_RTrans.find(name->getStateKey())->second;
       }
-      const Returns ret( St* name )
+      const Returns ret( St* name )const
       {
         return ret_RTrans.find(name->getStateKey())->second;
       }
       
-      bool isFrom( St* name )
+      bool isFrom( St* name ) const
       {
         IntraMap::iterator it = from_ITrans.find(name->getStateKey());
         if( it != from_ITrans.end() )
@@ -266,8 +266,8 @@
         }
         return false;
       }
-      bool isTo( St* name )
-      {
+      bool isTo( St* name ) const
+      { 
         IntraMap::iterator it = to_ITrans.find(name->getStateKey());
         if( it != to_ITrans.end() )
         {
@@ -276,7 +276,7 @@
         }
         return false;
       }
-      bool isCall( St* name )
+      bool isCall( St* name ) const
       {
         CallMap::iterator it = call_CTrans.find(name->getStateKey());
         if( it != call_CTrans.end() )
@@ -286,7 +286,7 @@
         }
         return false;
       }
-      bool isEntry( St* name )
+      bool isEntry( St* name ) const
       {
         CallMap::iterator it = entry_CTrans.find(name->getStateKey());
         if( it != entry_CTrans.end() )
@@ -296,7 +296,7 @@
         }
         return false;
       }
-      bool isExit( St* name )
+      bool isExit( St* name ) const
       {
         RetMap::iterator it = exit_RTrans.find(name->getStateKey());
         if( it != exit_RTrans.end() )
@@ -306,7 +306,7 @@
         }
         return false;
       }
-      bool isPred( St* name )
+      bool isPred( St* name ) const
       {
         RetMap::iterator it = pred_RTrans.find(name->getStateKey());
         if( it != pred_RTrans.end() )
@@ -316,7 +316,7 @@
         }
         return false;
       }
-      bool isRet( St* name )
+      bool isRet( St* name ) const
       {
         RetMap::iterator it = ret_RTrans.find(name->getStateKey());
         if( it != ret_RTrans.end() )
