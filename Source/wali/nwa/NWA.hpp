@@ -3607,19 +3607,21 @@ namespace wali
                         St* toSt;                              
                         //Check intersectability of to states (if false, don't look further).           
                         if( result.nodeIntersect((*fcit)->third,(*scit)->third,toSt) )
+                        {
                           if( visited.find(toSt) == visited.end() )
                           {
                             wList.push_back(Triple<St*,St*,St*>(toSt,(*fcit)->third,(*scit)->third));
                             visited.insert(toSt);
                           }
                           
-                        if( isFinalState((*fcit)->third) && other.isFinalState((*scit)->third) )
-                          result.addFinalState(toSt);
-                        else
-                          result.addState(toSt);
+                          if( isFinalState((*fcit)->third) && other.isFinalState((*scit)->third) )
+                            result.addFinalState(toSt);
+                          else
+                            result.addState(toSt);
                           
-                        //Add the transition to the intersection NWA.  
-                        result.addCallTrans( from.first, sym, toSt );
+                          //Add the transition to the intersection NWA.  
+                          result.addCallTrans( from.first, sym, toSt );
+                        }
                       }              
                     }            
                   }
@@ -3670,19 +3672,21 @@ namespace wali
                         St* toSt;                              
                         //Check intersectability of to states (if false, don't look further).           
                         if( result.nodeIntersect((*fiit)->third,(*siit)->third,toSt) )
+                        {
                           if( visited.find(toSt) == visited.end() )
                           {
                             wList.push_back(Triple<St*,St*,St*>(toSt,(*fiit)->third,(*siit)->third));
                             visited.insert(toSt);
                           }
                           
-                        if( isFinalState((*fiit)->third) && other.isFinalState((*siit)->third) )
-                          result.addFinalState(toSt);
-                        else
-                          result.addState(toSt);
+                          if( isFinalState((*fiit)->third) && other.isFinalState((*siit)->third) )
+                            result.addFinalState(toSt);
+                          else
+                            result.addState(toSt);
                           
-                        //Add the transition to the intersection NWA.
-                        result.addInternalTrans( from.first, sym, toSt );
+                          //Add the transition to the intersection NWA.
+                          result.addInternalTrans( from.first, sym, toSt );
+                        }
                       }         
                     }            
                   }
@@ -3719,23 +3723,27 @@ namespace wali
                             srit != otherReturns.end(); srit++ )
                       {
                         St * predSt,* toSt;
-                        result.nodeIntersect((*frit)->second,(*srit)->second,predSt);  //TODO: check that this is a viable call point in the intersected NWA.
-                        
-                        //Check intersectability of to states (if false, don't look further).    
-                        if( result.nodeIntersect((*frit)->fourth,(*srit)->fourth,toSt) )
-                          if( visited.find(toSt) == visited.end() )
+                        //Check intersectability of pred states (if false, don't look further).
+                        if( result.nodeIntersect((*frit)->second,(*srit)->second,predSt) )
+                        {
+                          //Check intersectability of to states (if false, don't look further).    
+                          if( result.nodeIntersect((*frit)->fourth,(*srit)->fourth,toSt) )
                           {
-                            wList.push_back(Triple<St*,St*,St*>(toSt,(*frit)->fourth,(*srit)->fourth));
-                            visited.insert(toSt);
+                            if( visited.find(toSt) == visited.end() )
+                            {
+                              wList.push_back(Triple<St*,St*,St*>(toSt,(*frit)->fourth,(*srit)->fourth));
+                              visited.insert(toSt);
+                            }
+                            
+                            if( isFinalState((*frit)->fourth) && other.isFinalState((*srit)->fourth) )
+                              result.addFinalState(toSt);
+                            else
+                              result.addState(toSt);
+                            
+                            //Add the transition to the intersection NWA.  
+                            result.addReturnTrans( from.first, predSt, sym, toSt );
                           }
-                          
-                        if( isFinalState((*frit)->fourth) && other.isFinalState((*srit)->fourth) )
-                          result.addFinalState(toSt);
-                        else
-                          result.addState(toSt);
-                          
-                        //Add the transition to the intersection NWA.  
-                        result.addReturnTrans( from.first, predSt, sym, toSt );
+                        }
                       }            
                     }            
                   }
