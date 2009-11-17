@@ -69,7 +69,7 @@ class ReachGen : public wali::nwa::WeightGen<St,Sym>
 
 int main()
 {
-
+#if 0
   wali::nwa::NWA<wali::nwa::State<std::string>,std::string,wali::nwa::Symbol<STR>> myNWA;
   
   wali::nwa::State<std::string> start = wali::nwa::State<std::string>("start");
@@ -209,6 +209,6 @@ int main()
   myNWA.clearSymbols();
   
   myNWA.clearTrans();
-
+#endif
   return 0;
 }
