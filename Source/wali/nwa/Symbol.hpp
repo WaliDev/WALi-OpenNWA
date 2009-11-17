@@ -99,7 +99,7 @@ namespace wali
        * @return the epsilon symbol
        *
        */
-      static Symbol<T>* getEpsilon();
+      static Symbol<T> getEpsilon();
       
       /**
        *  TODO: write comments
@@ -109,7 +109,7 @@ namespace wali
       /**
        * TODO: write comments
        */
-      static Symbol<T>* getWild();
+      static Symbol<T> getWild();
       
       /**
        *  TODO: write comments
@@ -320,10 +320,10 @@ namespace wali
      *
      */
     template<typename T>
-    Symbol<T>* Symbol<T>::getEpsilon()
+    Symbol<T> Symbol<T>::getEpsilon()
     {
       //return &epsilon;
-      return new Symbol(wali::WALI_EPSILON);
+      return Symbol(wali::WALI_EPSILON);
     }
     
     /**
@@ -342,10 +342,10 @@ namespace wali
      *  TODO: write comments
      */
     template<typename T>
-    Symbol<T>* Symbol<T>::getWild()
+    Symbol<T> Symbol<T>::getWild()
     {
       //return &wild;
-      return new Symbol(wali::WALI_BAD_KEY);
+      return Symbol(wali::WALI_BAD_KEY);
     }
     
     /**
