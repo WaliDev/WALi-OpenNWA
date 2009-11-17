@@ -3456,7 +3456,7 @@ namespace wali
     void NWA<St,StName,Sym>::intersect(const NWA<St,StName,Sym> &other, NWA<St,StName,Sym> &result ) const
     {
       assert(!absentAcceptance && !other.absentAcceptance);
-            //If both NWAs to be intersected accept absent, the intersection should too.
+      //If both NWAs to be intersected accept absent, the intersection should too.
       //Otherwise, the intersection should not, so keep the default settings.
       if( absentAcceptance && other.absentAcceptance )
         result.acceptAbsent();
@@ -3465,7 +3465,7 @@ namespace wali
       std::deque<StatePair> worklistPairs; // Pairs of states yet to be processed
       typedef std::map<StatePair, St*> PairStMap;
       PairStMap pairToStMap; /* The corresponding state in the product 
-                                             * for all intersectable pairs encountered*/
+                              * for all intersectable pairs encountered*/
 
       //Start the worklist with all possible initial states of the intersection NWA.
       //NOTE: Currently this should be just one state (the join of the single initial state of each machine).
@@ -3488,9 +3488,54 @@ namespace wali
         StatePair currpair = worklistPairs.front();
         worklistPairs.pop_front();
 
+        //Process outgoing call transitions
+        Calls thisCalls = trans->getTransCall(currpair.first);
+        Calls otherCalls = other.trans->getTransCall(currpair.second);
+        for(Calls::const_iterator fit = thisCalls.begin(); fit!=thisCalls.end(); fit++) {
+          Sym thisSym = (*fit)->second;
+          St *thisTgt = (*fit)->third;
+          for(Calls::const_iterator sit = otherCalls.begin(); sit!=otherCalls.end(); sit++) {
+            Sym otherSym = (*sit)->second;
+            // Are the symbols intersectable
+            Sym resSym;
+            if( !result.edgeIntersect(thisSym, otherSym, resSym) ) 
+              continue; // Symbols not intersectable, do nothing
+
+            St *otherTgt = (*sit)->third;
+            StatePair tgtPair(thisTgt, otherTgt);
+            
+            // This is to ensure that we don't call intersectNode multiple times on the
+            // same pair 
+            if( visitedPairs.count(tgtPair) != 0 && pairToStMap.count(tgtPair)==0)
+              continue;
+            visitedPairs.insert(tgtPair);
+
+            St *resSt;
+            // Have we seen tgtPair before?
+            if(pairToStMap.count(tgtPair)==0) { 
+              //We have not seen this pair before
+              // Are the tgt nodes intersectable?
+              if(!result.nodeIntersect(thisTgt, otherTgt, resSt)) 
+                continue;
+              // We have a new state in resSt!
+              if(this->isFinalState(thisTgt) && other.isFinalState(otherTgt))
+                result.addFinalState(resSt);
+              else
+                result.addState(resSt);
+              pairToStMap[tgtPair] = resSt;
+              worklistPairs.push_back(tgtPair);
+            } else { 
+              // we have already seen this pair before
+              resSt = pairToStMap[tgtPair];
+            }
+
+            result.addCallTrans(pairToStMap[currpair], resSym, resSt);
+          }
+        }
+
         // Process outgoing internal transitions
-        Internals thisInternals = trans->getInternalsFrom(currpair.first);
-        Internals otherInternals = other.trans->getInternalsFrom(currpair.second);
+        Internals thisInternals = trans->getTransFrom(currpair.first);
+        Internals otherInternals = other.trans->getTransFrom(currpair.second);
         for(Internals::const_iterator fit = thisInternals.begin(); fit!=thisInternals.end(); fit++) {
           Sym thisSym = (*fit)->second;
           St *thisTgt = (*fit)->third;
@@ -3532,7 +3577,82 @@ namespace wali
             result.addInternalTrans(pairToStMap[currpair], resSym, resSt);
           }
         }
+        
+        //Process outgoing return transitions
+        Returns thisReturns = trans->getTransExit(currpair.first);
+        Returns otherReturns = other.trans->getTransExit(currpair.second);
+        for(Returns::const_iterator fit = thisReturns.begin(); fit!=thisReturns.end(); fit++) {
+          St *thisPred = (*fit)->second;
+          Sym thisSym = (*fit)->third;
+          St *thisTgt = (*fit)->fourth;
+          for(Returns::const_iterator sit = otherReturns.begin(); sit!=otherReturns.end(); sit++) {
+            Sym otherSym = (*sit)->third;
+            // Are the symbols intersectable
+            Sym resSym;
+            if( !result.edgeIntersect(thisSym, otherSym, resSym) ) 
+              continue; // Symbols not intersectable, do nothing
 
+            //Predecessor
+            St *otherPred = (*sit)->second;
+            StatePair predPair(thisPred, otherPred);
+            
+            // This is to ensure that we don't call intersectNode multiple times on the
+            // same pair 
+            if( visitedPairs.count(predPair) != 0 && pairToStMap.count(predPair)==0)
+              continue;
+            visitedPairs.insert(predPair);    //Technically this should already have been seen, but just in case.
+
+            St *predSt;
+            // Have we seen tgtPair before?
+            if(pairToStMap.count(predPair)==0) { 
+              //We have not seen this pair before
+              // Are the tgt nodes intersectable?
+              if(!result.nodeIntersect(thisPred, otherPred, predSt)) 
+                continue;
+              // We have a new state in resSt!
+              if(this->isFinalState(thisPred) && other.isFinalState(otherPred))
+                result.addFinalState(predSt);
+              else
+                result.addState(predSt);
+              pairToStMap[predPair] = predSt;
+              worklistPairs.push_back(predPair);
+            } else { 
+              // we have already seen this pair before
+              predSt = pairToStMap[predPair];
+            }
+
+            //Return
+            St *otherTgt = (*sit)->fourth;
+            StatePair tgtPair(thisTgt, otherTgt);
+            
+            // This is to ensure that we don't call intersectNode multiple times on the
+            // same pair 
+            if( visitedPairs.count(tgtPair) != 0 && pairToStMap.count(tgtPair)==0)
+              continue;
+            visitedPairs.insert(tgtPair);
+
+            St *resSt;
+            // Have we seen tgtPair before?
+            if(pairToStMap.count(tgtPair)==0) { 
+              //We have not seen this pair before
+              // Are the tgt nodes intersectable?
+              if(!result.nodeIntersect(thisTgt, otherTgt, resSt)) 
+                continue;
+              // We have a new state in resSt!
+              if(this->isFinalState(thisTgt) && other.isFinalState(otherTgt))
+                result.addFinalState(resSt);
+              else
+                result.addState(resSt);
+              pairToStMap[tgtPair] = resSt;
+              worklistPairs.push_back(tgtPair);
+            } else { 
+              // we have already seen this pair before
+              resSt = pairToStMap[tgtPair];
+            }
+
+            result.addReturnTrans(pairToStMap[currpair], predSt, resSym, resSt);
+          }
+        }
 
       }// end while
 
