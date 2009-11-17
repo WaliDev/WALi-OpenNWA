@@ -933,7 +933,7 @@ namespace wali
       * @return the PDS equivalent to this NWA
       *
       */ 
-      wpds::WPDS NWAtoPDS(WeightGen<St,Sym> wg) const;
+      wpds::WPDS NWAtoPDS(WeightGen<St,Sym> &wg) const;
 
       /**
       *
@@ -944,7 +944,7 @@ namespace wali
       * @return the PDS equivalent to this NWA
       *
       */ 
-      wpds::WPDS NWAtoBackwardsPDS(WeightGen<St,Sym> wg) const;  
+      wpds::WPDS NWAtoBackwardsPDS(WeightGen<St,Sym> &wg) const;  
 
       /**
       *
@@ -4321,7 +4321,7 @@ namespace wali
     *
     */
     template<typename St,typename StName,typename Sym > 
-    wpds::WPDS NWA<St,StName,Sym>::NWAtoPDS(WeightGen<St,Sym> wg) const
+    wpds::WPDS NWA<St,StName,Sym>::NWAtoPDS(WeightGen<St,Sym> &wg) const
     { //FIX
       //TODO: how does this react to absentAcceptance???
       //NOTE: for now assume stuck state is rejecting
@@ -4441,7 +4441,7 @@ namespace wali
     *
     */
     template<typename St,typename StName,typename Sym > 
-    wpds::WPDS NWA<St,StName,Sym>::NWAtoBackwardsPDS(WeightGen<St,Sym> wg) const
+    wpds::WPDS NWA<St,StName,Sym>::NWAtoBackwardsPDS(WeightGen<St,Sym> &wg) const
     {
       //FIX
       //TODO: how does this react to absentAcceptance???
