@@ -678,6 +678,11 @@ namespace wali
          * TODO
          */
         const Internals getInternals(St* from,Sym* sym) const;
+
+        /**
+         * TODO
+         */
+        const Internals getInternalsFrom(St* from) const;
         
         /**
          *
@@ -789,7 +794,7 @@ namespace wali
       {
         if( toSt == (*it)->third )
         {
-          sym = *(*it)->second;
+          sym = (*it)->second;
           return true;
         }
       }
@@ -799,7 +804,7 @@ namespace wali
       {
         if( toSt == (*it)->third )
         {
-          sym = *(*it)->second;
+          sym = (*it)->second;
           return true;
         }
       }
@@ -809,7 +814,7 @@ namespace wali
       {
         if( toSt == (*it)->fourth )
         {
-          sym = *(*it)->third;
+          sym = (*it)->third;
           return true;
         }
       }
@@ -828,7 +833,7 @@ namespace wali
     }
 
     /**
-     * TODO
+     * TODO add comments
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::findTrans(St* fromSt, const Sym & sym, St* toSt) const
@@ -836,14 +841,14 @@ namespace wali
       const Info::Internals from = T_info.from(fromSt);
       for( Info::Internals::const_iterator it = from.begin(); it != from.end(); it++ )
       {
-        if( toSt == (*it)->third && sym==*(*it)->second)
+        if( toSt == (*it)->third && sym==(*it)->second)
           return true;
       }
       
       const Info::Calls call = T_info.call(fromSt);
       for( Info::Calls::const_iterator it = call.begin(); it != call.end(); it++ )
       {
-        if( toSt == (*it)->third && sym == *(*it)->second)
+        if( toSt == (*it)->third && sym == (*it)->second)
         {
           return true;
         }
@@ -852,7 +857,7 @@ namespace wali
       const Info::Returns exit = T_info.exit(fromSt);
       for( Info::Returns::const_iterator it = exit.begin(); it != exit.end(); it++ )
       {
-        if( toSt == (*it)->fourth && sym == *(*it)->third)
+        if( toSt == (*it)->fourth && sym == (*it)->third)
         {
           return true;
         }
@@ -1264,62 +1269,62 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     std::ostream & TransSet<St,Sym,Call,Internal,Return>::print( std::ostream & o) const
     {    
-      o << "Delta_c: " << "{ ";
+      o << "Delta_c: \n" << "{ \n";
       callIterator cit = callTrans.begin();
       callIterator citEND = callTrans.end();
       for( bool first=true; cit != citEND; cit++ )
       {
         if( !first )
-          o << ", ";
+          o << ", \n";
         o << "(";
         (*cit)->first->print(o);
         o << ", ";
-        (*cit)->second->print(o);
+        (*cit)->second.print(o);
         o << ", "; 
         (*cit)->third->print(o);
         o << ")";
         first=false;
       }
-      o << " }\n";
+      o << " \n}\n";
       
-      o << "Delta_i: " << "{ ";
+      o << "Delta_i:\n" << "{\n";
       internalIterator iit = internalTrans.begin();
       internalIterator iitEND = internalTrans.end();
       for( bool first=true; iit != iitEND; iit++ )
       {
         assert(*iit);
         if( !first )
-          o << ", ";
+          o << ", \n";
         o << "(";
         (*iit)->first->print(o);
         o << ", ";
-        (*iit)->second->print(o);
+        (*iit)->second.print(o);
         o << ", ";
         (*iit)->third->print(o);
         o << ")";
         first = false;
       }
-      o << " }\n";
+      o << " \n}\n";
       
-      o << "Delta_r: " << "{ ";
+      o << "Delta_r:\n" << "{\n";
       returnIterator rit = returnTrans.begin();
       returnIterator ritEND = returnTrans.end();
       for( bool first=true; rit != ritEND; rit++ )
       {
         if( !first )
-          o << ", ";
+          o << ",\n";
         o << "(";
         (*rit)->first->print(o);
         o << ", ";
         (*rit)->second->print(o);
         o << ", "; 
-        (*rit)->third->print(o);
+        (*rit)->third.print(o);
         o << ", ";
         (*rit)->fourth->print(o);
         o << ")";
         first = false;
       }
-      o << " }\n";
+      o << "\n}\n";
       
       return o;
     }
@@ -1905,6 +1910,23 @@ namespace wali
       return result;
     }
     
+    /*
+    TODO add comments
+    TODO could be made faster by keeping this map per state
+    */
+    template < typename St,typename Sym,typename Call,typename Internal,typename Return >
+    const typename TransSet<St,Sym,Call,Internal,Return>::Internals TransSet<St,Sym,Call,Internal,Return>::getInternalsFrom(St* from) const
+    {
+      assert(from);
+      Internals result;
+      for( internalIterator iit = beginInternal(); iit != endInternal(); iit++ )  {
+        if( ((*iit)->first == from) )
+          result.insert(*iit);
+      } 
+      return result;
+    }
+
+
     /**
      *
      * @brief test if there exists a return transition with the given from state, 
