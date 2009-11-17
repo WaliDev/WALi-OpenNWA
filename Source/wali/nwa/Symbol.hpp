@@ -64,7 +64,7 @@ namespace wali
           /**
            * TODO: write comments
            */
-          T getLabel() const
+          T getSymbol() const
           {
             return lbl;
           }
@@ -253,21 +253,22 @@ namespace wali
     protected:
       T lbl;
       Key symbolKey;
-      static Symbol<T> wild;
-      static Symbol<T> epsilon;
+      //static Symbol<T> wild;
+      //static Symbol<T> epsilon;
     };
     
-    template<typename T>
-    Symbol<T> Symbol<T>::wild = Symbol<T>::Symbol(wali::WALI_BAD_KEY);
+    //template<typename T>
+    //Symbol<T> Symbol<T>::wild = Symbol<T>::Symbol(wali::WALI_BAD_KEY);
     
-    template<typename T>
-    Symbol<T> Symbol<T>::epsilon = Symbol<T>::Symbol(wali::WALI_EPSILON);
+    //template<typename T>
+    //Symbol<T> Symbol<T>::epsilon = Symbol<T>::Symbol(wali::WALI_EPSILON);
     
     //Constructors
     template<typename T>
     Symbol<T>::Symbol()
     {
-      *this = wild;
+      //*this = wild;
+      symbolKey = wali::WALI_BAD_KEY;
     }
     
     template<typename T>
@@ -299,6 +300,8 @@ namespace wali
     template<typename T>
     Symbol<T> & Symbol<T>::operator=( const Symbol & other )
     {
+      if (this == &other)     
+        return *this;
       //if( other.isWild() )
       //  *this = wild;
       //else
@@ -319,7 +322,8 @@ namespace wali
     template<typename T>
     Symbol<T>* Symbol<T>::getEpsilon()
     {
-      return &epsilon;
+      //return &epsilon;
+      return new Symbol(wali::WALI_EPSILON);
     }
     
     /**
@@ -340,7 +344,8 @@ namespace wali
     template<typename T>
     Symbol<T>* Symbol<T>::getWild()
     {
-      return &wild;
+      //return &wild;
+      return new Symbol(wali::WALI_BAD_KEY);
     }
     
     /**

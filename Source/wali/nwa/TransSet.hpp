@@ -15,6 +15,7 @@
 // std::c++
 #include <iostream>
 #include <set>
+#include <assert.h>
 
 namespace wali
 {
@@ -742,6 +743,9 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     TransSet<St,Sym,Call,Internal,Return> & TransSet<St,Sym,Call,Internal,Return>::operator=( const TransSet<St,Sym,Call,Internal,Return> & other )
     {
+      if (this == &other)     
+        return *this;
+        
       callTrans = other.callTrans;
       internalTrans = other.internalTrans;
       returnTrans = other.returnTrans;
@@ -1040,6 +1044,8 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::addCall(Call* addTrans)
     {
+      assert(addTrans);
+      
       if( callTrans.count(addTrans) > 0 )
         return false;      
       
@@ -1060,6 +1066,8 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::addInternal(Internal* addTrans)
     {
+      assert(addTrans);
+      
       if( internalTrans.count(addTrans) > 0 )
         return false;
       
@@ -1080,6 +1088,8 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::addReturn(Return* addTrans)
     {
+      assert(addTrans);
+      
       if( returnTrans.count(addTrans) > 0 )
         return false;
         
@@ -1131,6 +1141,8 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::removeCall(Call* removeTrans)
     {
+      assert(removeTrans);
+      
       if( callTrans.count(removeTrans) == 0 )
         return false;
         
@@ -1153,6 +1165,8 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::removeInternal(Internal* removeTrans)
     {
+      assert(removeTrans);
+      
       if( internalTrans.count(removeTrans) == 0 )
         return false;
         
@@ -1175,6 +1189,8 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::removeReturn(Return* removeTrans)
     {
+      assert(removeTrans);
+      
       if( returnTrans.count(removeTrans) == 0 )
         return false;
         
@@ -1197,6 +1213,7 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::isCall(Call* trans) const
     {
+      assert(trans);      
       return (callTrans.count(trans) > 0);
     }
     
@@ -1213,6 +1230,7 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::isInternal(Internal* trans) const
     {
+      assert(trans);      
       return (internalTrans.count(trans) > 0);
     }
     
@@ -1229,6 +1247,7 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::isReturn(Return* trans) const
     {
+      assert(trans);
       return (returnTrans.count(trans) > 0);
     } 
          
@@ -1268,6 +1287,7 @@ namespace wali
       internalIterator iitEND = internalTrans.end();
       for( bool first=true; iit != iitEND; iit++ )
       {
+        assert(*iit);
         if( !first )
           o << ", ";
         o << "(";
@@ -1477,6 +1497,7 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     const std::set<Internal*> TransSet<St,Sym,Call,Internal,Return>::getTransFrom( St* name ) const
     {
+      assert(name);
       return T_info.from( name );
     }
     
@@ -1486,6 +1507,7 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     const std::set<Internal*> TransSet<St,Sym,Call,Internal,Return>::getTransTo( St* name ) const
     {
+      assert(name);
       return T_info.to( name );
     }
     
@@ -1495,6 +1517,7 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     const std::set<Call*> TransSet<St,Sym,Call,Internal,Return>::getTransCall( St* name ) const
     {
+      assert(name);
       return T_info.call( name );
     }
     
@@ -1504,6 +1527,7 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     const std::set<Call*> TransSet<St,Sym,Call,Internal,Return>::getTransEntry( St* name ) const
     {
+      assert(name);
       return T_info.entry( name );
     }
     
@@ -1513,6 +1537,7 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     const std::set<Return*> TransSet<St,Sym,Call,Internal,Return>::getTransExit( St* name ) const
     {
+      assert(name);
       return T_info.exit( name );
     }
     
@@ -1522,6 +1547,7 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     const std::set<Return*> TransSet<St,Sym,Call,Internal,Return>::getTransPred( St* name ) const
     {
+      assert(name);
       return T_info.pred( name );
     }
     
@@ -1531,6 +1557,7 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     const std::set<Return*> TransSet<St,Sym,Call,Internal,Return>::getTransRet( St* name ) const
     {
+      assert(name);
       return T_info.ret( name );
     }
     
@@ -1543,6 +1570,7 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::isFrom( St* name ) const
     {
+      assert(name);
       return T_info.isFrom( name );
     }
     
@@ -1552,6 +1580,7 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::isTo( St* name ) const
     { 
+      assert(name);
       return T_info.isTo( name );
     }
     
@@ -1561,6 +1590,7 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::isCall( St* name ) const
     {
+      assert(name);
       return T_info.isCall( name );
     }
     
@@ -1570,6 +1600,7 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::isEntry( St* name ) const
     {
+      assert(name);
       return T_info.isEntry( name );
     }
     
@@ -1579,6 +1610,7 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::isExit( St* name ) const
     {
+      assert(name);
       return T_info.isExit( name );
     }
     
@@ -1588,6 +1620,7 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::isPred( St* name ) const
     {
+      assert(name);
       return T_info.isPred( name );
     }
     
@@ -1597,6 +1630,7 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::isRet( St* name ) const
     {
+      assert(name);
       return T_info.isRet( name );
     }
       
@@ -1612,6 +1646,8 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::removeCallTransWith( St* name )
     {
+      assert(name);
+      
       Calls removeTrans = Calls();
       for( callIterator cit = beginCall(); cit != endCall(); cit++ )
       {
@@ -1641,6 +1677,8 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::removeInternalTransWith( St* name )
     {
+      assert(name);
+      
       Internals removeTrans = Internals();
       for( internalIterator iit = beginInternal();
             iit != endInternal(); iit++ )
@@ -1672,6 +1710,8 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::removeReturnTransWith( St* name )
     {
+      assert(name);
+      
       Returns removeTrans = Returns();
       for( returnIterator rit = beginReturn();
             rit != endReturn(); rit++ )
@@ -1702,6 +1742,7 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::removeCallTransSym(Sym* sym)
     {
+      assert(sym);
       Calls removeTrans = Calls();
       for( callIterator cit = callTrans.begin();
             cit != callTrans.end(); cit++ )
@@ -1730,10 +1771,12 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::removeInternalTransSym(Sym* sym)
     {
+      assert(sym);
       Internals removeTrans = Internals();
       for( internalIterator iit = internalTrans.begin();
             iit != internalTrans.end(); iit++ )
       {
+        assert(*iit); 
         if( (*iit)->second == sym )
           removeTrans.insert(*iit);
       }     
@@ -1758,6 +1801,7 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::removeReturnTransSym(Sym* sym)
     {
+      assert(sym);
       Returns removeTrans = Returns();
       for( returnIterator rit = returnTrans.begin();
             rit != returnTrans.end(); rit++ )
@@ -1789,6 +1833,8 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::callExists(St* from,Sym* sym) const
     {
+      assert(from);
+      assert(sym);
       for( callIterator cit = beginCall();
             cit != endCall(); cit++ )
       {
@@ -1804,6 +1850,8 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal,typename Return >
     const typename TransSet<St,Sym,Call,Internal,Return>::Calls TransSet<St,Sym,Call,Internal,Return>::getCalls(St* from,Sym* sym) const 
     {
+      assert(from);
+      assert(sym);
       Calls result;
       for( callIterator cit = beginCall();
             cit != endCall(); cit++ )
@@ -1828,6 +1876,8 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::internalExists(St* from,Sym* sym) const
     {
+      assert(from);
+      assert(sym);
       for( internalIterator iit = beginInternal();
             iit != endInternal(); iit++ )
       {
@@ -1843,6 +1893,8 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal,typename Return >
     const typename TransSet<St,Sym,Call,Internal,Return>::Internals TransSet<St,Sym,Call,Internal,Return>::getInternals(St* from,Sym* sym) const
     {
+      assert(from);
+      assert(sym);
       Internals result;
       for( internalIterator iit = beginInternal();
             iit != endInternal(); iit++ )
@@ -1869,6 +1921,9 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::returnExists(St* from, St* pred, Sym* sym) const
     {
+      assert(from);
+      assert(pred);
+      assert(sym);
       for( returnIterator rit = beginReturn();
             rit != endReturn(); rit++ )
       {
@@ -1884,6 +1939,8 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal,typename Return >
     const typename TransSet<St,Sym,Call,Internal,Return>::Returns TransSet<St,Sym,Call,Internal,Return>::getReturns(St* from,Sym* sym) const
     {
+      assert(from);
+      assert(sym);
       Returns result;
       for( returnIterator rit = beginReturn();
             rit != endReturn(); rit++ )

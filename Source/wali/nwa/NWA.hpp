@@ -876,12 +876,12 @@ namespace wali
         /**
          * TODO: write comments
          */
-        virtual bool nodeIntersect(St* node1, St* node2, St * result );
+        virtual bool nodeIntersect(St* node1, St* node2, St * &result );
         
         /**
          * TODO: write comments
          */
-        virtual bool edgeIntersect(Sym* label1, Sym* label2, Sym * result );
+        virtual bool edgeIntersect(Sym* label1, Sym* label2, Sym * &result );
         
         
         //Using NWAs
@@ -1314,12 +1314,22 @@ namespace wali
     template<typename St,typename StName,typename Sym >
     NWA<St,StName,Sym>::NWA( const NWA & other )
     {
-      operator=(other);
+      //Copy data over from 'other'
+      states = other.states;
+      
+      symbols = other.symbols;
+      
+      trans = other.trans;
+      
+      absentAcceptance = other.absentAcceptance;
     }
     
     template<typename St,typename StName,typename Sym >
     NWA<St,StName,Sym> & NWA<St,StName,Sym>::operator=( const NWA & other )
     {
+      if (this == &other)     
+        return *this;
+      
       //Wipe any pre-existing data.
       clearStates();
       clearSymbols();
@@ -1855,6 +1865,7 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     bool NWA<St,StName,Sym>::isSymbol( Sym* sym ) const
     {
+      assert(sym);
       return (symbols.count(sym) >  0);
     }    
     
@@ -1869,6 +1880,7 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     bool NWA<St,StName,Sym>::addSymbol( Sym* sym )
     {
+      assert(sym);
       if( symbols.count(sym) > 0 )
         return false;
       symbols.insert(sym);
@@ -1914,6 +1926,7 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     bool NWA<St,StName,Sym>::removeSymbol( Sym* sym )
     {
+      assert(sym);
       if( symbols.count(sym) == 0 )
         return false;
       else if( symbols.erase(sym) )
@@ -2037,6 +2050,10 @@ namespace wali
       St* fromSt = getState(from);
       St* toSt = getState(to);
       
+      assert(fromSt);
+      assert(sym);
+      assert(toSt);
+      
       if(! isState(fromSt)
         || ! isState(toSt) )
         return false;
@@ -2061,6 +2078,10 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     bool NWA<St,StName,Sym>::addCallTrans( St* from, Sym* sym, St* to )
     {
+      assert(from);
+      assert(sym);
+      assert(to);
+    
       if(! isState(from)
         || ! isState(to) )
         return false;
@@ -2083,6 +2104,10 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     bool NWA<St,StName,Sym>::addCallTrans( Call * ct )
     {
+      assert(ct->first);
+      assert(ct->second);
+      assert(ct->third);
+      
       if(! isState(ct->first)
         || ! isState(ct->third) )
         return false;
@@ -2100,6 +2125,10 @@ namespace wali
     {
       St* fromSt = getState(from);
       St* toSt = getState(to);
+      
+      assert(fromSt);
+      assert(sym);
+      assert(toSt);
       
       if(! isState(fromSt)
         || ! isState(toSt) )
@@ -2126,6 +2155,10 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     bool NWA<St,StName,Sym>::removeCallTrans( St* from, Sym* sym, St* to )
     {
+      assert(from);
+      assert(sym);
+      assert(to);
+    
       if(! isState(from)
         || ! isState(to) )
         return false;
@@ -2148,6 +2181,10 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     bool NWA<St,StName,Sym>::removeCallTrans( Call * ct )
     {
+      assert(ct->first);
+      assert(ct->second);
+      assert(ct->third);
+      
       if(! isState(ct->first)
         || ! isState(ct->third) )
         return false;
@@ -2208,6 +2245,10 @@ namespace wali
       St* fromSt = getState(from);
       St* toSt = getState(to);
       
+      assert(fromSt);
+      assert(sym);
+      assert(toSt);
+      
       if(! isState(fromSt)
         || ! isState(toSt) )
         return false;
@@ -2232,6 +2273,10 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     bool NWA<St,StName,Sym>::addInternalTrans( St* from, Sym* sym, St* to )
     {
+      assert(from);
+      assert(sym);
+      assert(to);
+    
       if(! isState(from)
         || ! isState(to) )
         return false;
@@ -2254,6 +2299,10 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     bool NWA<St,StName,Sym>::addInternalTrans( Internal * it )
     {
+      assert(it->first);
+      assert(it->second);
+      assert(it->third);
+    
       if(! isState(it->first)
         || ! isState(it->third) )
         return false;
@@ -2271,6 +2320,10 @@ namespace wali
     {
       St* fromSt = getState(from);
       St* toSt = getState(to);
+      
+      assert(fromSt);
+      assert(sym);
+      assert(toSt);
       
       if(! isState(fromSt)
         || ! isState(toSt) )
@@ -2297,6 +2350,10 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     bool NWA<St,StName,Sym>::removeInternalTrans( St* from, Sym* sym, St* to )
     {
+      assert(from);
+      assert(sym);
+      assert(to);
+    
       if(! isState(from)
         || ! isState(to) )
         return false;
@@ -2319,6 +2376,10 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     bool NWA<St,StName,Sym>::removeInternalTrans( Internal * it )
     {
+      assert(it->first);
+      assert(it->second);
+      assert(it->third);
+      
       if(! isState(it->first)
         || ! isState(it->third) )
         return false;
@@ -2376,6 +2437,9 @@ namespace wali
     std::set<StName> NWA<St,StName,Sym>::getReturnSites(StName callSite) const
     {
       St* callSiteSt = getState(callSite);
+      
+      assert(callSiteSt);
+      
       std::set<St*> returns = trans->getReturnSites(callSiteSt);
       std::set<StName> rets;
       for(std::set<St*>::iterator it = returns.begin(); it != returns.end(); it++ )
@@ -2394,6 +2458,11 @@ namespace wali
       St* fromSt = getState(from);
       St* predSt = getState(pred);
       St* toSt = getState(to);
+      
+      assert(fromSt);
+      assert(predSt);
+      assert(sym);
+      assert(toSt);
       
       if(! isState(fromSt)
         || ! isState(predSt)
@@ -2421,6 +2490,11 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     bool NWA<St,StName,Sym>::addReturnTrans( St* from, St* pred, Sym* sym, St* to )
     {
+      assert(from);
+      assert(pred);
+      assert(sym);
+      assert(to);
+    
       if(! isState(from)
         || ! isState(pred)
         || ! isState(to) )
@@ -2444,6 +2518,11 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     bool NWA<St,StName,Sym>::addReturnTrans( Return * rt )
     {
+      assert(rt->first);
+      assert(rt->second);
+      assert(rt->third);
+      assert(rt->fourth);
+    
       if(! isState(rt->first)
         || ! isState(rt->second)
         || ! isState(rt->fourth) )
@@ -2463,6 +2542,10 @@ namespace wali
       St* fromSt = getState(from);
       St* toSt = getState(to);
       
+      assert(fromSt);
+      assert(sym);
+      assert(toSt);
+      
       if(! isState(fromSt)
         || ! isState(toSt) )
         return false;
@@ -2479,6 +2562,9 @@ namespace wali
       for( std::set<StName>::iterator it = calls.begin(); it != calls.end(); it++ )
       {
         St* predSt = getState(*it);
+        
+        assert(predSt);
+        
         if(! isState(predSt) )
           return false;
 
@@ -2495,6 +2581,10 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     bool NWA<St,StName,Sym>::removeReturnTrans( St* from, Sym* sym, St* to )
     {
+      assert(from);
+      assert(sym);
+      assert(to);
+      
       if(! isState(from)
         || ! isState(to) )
         return false;
@@ -2512,6 +2602,9 @@ namespace wali
       for( std::set<StName>::iterator it = calls.begin(); it != calls.end(); it++ )
       {
         St* predSt = getState(*it);
+        
+        assert(predSt);
+        
         if(! isState(predSt) )
           return false;
 
@@ -2531,6 +2624,11 @@ namespace wali
       St* fromSt = getState(from);
       St* predSt = getState(pred);
       St* toSt = getState(to);
+      
+      assert(fromSt);
+      assert(predSt);
+      assert(sym);
+      assert(toSt);
       
       if(! isState(fromSt)
         || ! isState(predSt)
@@ -2559,6 +2657,11 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     bool NWA<St,StName,Sym>::removeReturnTrans( St* from, St* pred, Sym* sym, St* to )
     {
+      assert(from);
+      assert(pred);
+      assert(sym);
+      assert(to);
+      
       if(! isState(from)
         || ! isState(pred)
         || ! isState(to) )
@@ -2582,6 +2685,11 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     bool NWA<St,StName,Sym>::removeReturnTrans( Return * rt )
     {
+      assert(rt->first);
+      assert(rt->second);
+      assert(rt->third);
+      assert(rt->fourth);
+      
       if(! isState(rt->first)
         || ! isState(rt->second)
         || ! isState(rt->fourth) )
@@ -3194,6 +3302,7 @@ namespace wali
       for( symbolIterator it = symbols.begin();
             it != symbols.end(); it++ )
       {
+        assert(*it);
         for( stateIterator sit = beginStates();
               sit != endStates(); sit++ )
         {
@@ -3590,6 +3699,7 @@ namespace wali
         //For each possible outgoing symbol/edge type.
         for( symbolIterator fsit = symbols.begin(); fsit != symbols.end(); fsit++ )
         {
+          assert(*fsit);
           if( ! (*fsit == Sym::getEpsilon()) )  //Symbols other than epsilon.
             for( symbolIterator ssit = other.symbols.begin(); ssit != other.symbols.end(); ssit++ )
             {           
@@ -3784,7 +3894,7 @@ namespace wali
      * TODO: write comments
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::nodeIntersect(St* node1, St* node2, St * result )
+    bool NWA<St,StName,Sym>::nodeIntersect(St* node1, St* node2, St * &result )
     {
       //Note: When overriding this method your metric must determine whether
       // the given states are compatible, then create a state and set result
@@ -3800,7 +3910,7 @@ namespace wali
      * TODO: write comments
      */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::edgeIntersect(Sym* label1, Sym* label2, Sym * result )
+    bool NWA<St,StName,Sym>::edgeIntersect(Sym* label1, Sym* label2, Sym * &result )
     {
       //Note: When overriding this method your metric must determine an
       // appropriate label, create a symbol with that label, and set result

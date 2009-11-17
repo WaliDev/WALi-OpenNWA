@@ -50,6 +50,9 @@
       }
       TransInfo & operator=( const TransInfo & other )
       {
+        if (this == &other)     
+        return *this;
+        
         clearMaps();
         
         from_ITrans = other.from_ITrans;

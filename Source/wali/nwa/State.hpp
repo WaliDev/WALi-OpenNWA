@@ -231,6 +231,9 @@ namespace wali
     template<typename T>
     State<T> & State<T>::operator=( const State & other )
     {
+      if (this == &other)     
+        return *this;
+        
       //TODO removed stuck state
       /*if( other.isStuckState() )
       {

@@ -410,6 +410,9 @@ namespace wali
     template <typename St,typename StName> 
     StateSet<St,StName> & StateSet<St,StName>::operator=( const StateSet<St,StName> & other )
     {
+      if (this == &other)     
+        return *this;
+    
       clearStates();
       
       names = other.names;
