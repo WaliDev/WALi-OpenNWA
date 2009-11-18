@@ -10,69 +10,119 @@
 #include "wali/Common.hpp"
 #include "wali/Key.hpp"
 #include "wali/KeySource.hpp"
+#include "../../../../TSL/third_party/hash/HashSet.hpp"
 
 namespace wali
 {
 
   namespace nwa
-  {
-  
+  {  
     template<typename T>
     class Symbol : public Printable
     {
     
+      enum Type { Ordinary, Wild, Epsilon };
+    
       //
       // Nested Class
       //
-      class SymbolSource : public KeySource
-      {
-        //TODO: write comments
-        public:
-          SymbolSource( const T _lbl ):lbl(_lbl)
-          {
-          }
-          
-          ~SymbolSource() { }
-          
-          /**
-           * TODO: write comments
-           */
-          bool equal( KeySource * rhs )
-          {
-            SymbolSource *ssrc = dynamic_cast< SymbolSource* >(rhs);
-            if( ssrc != 0 )
-              return lbl == ssrc->lbl;
-            else
-              return false;
-          }
-          
-          /**
-           * TODO: write comments
-           */
-          std::ostream& print( std::ostream& o ) const {
-            return lbl.print(o);
-          }
+      //class SymbolSource : public KeySource
+      //{
+      //  //TODO: write comments
+      //  public:
+      //    SymbolSource( const T _lbl ):lbl(_lbl)
+      //    {
+      //    }
+      //    
+      //    ~SymbolSource() { }
+      //    
+      //    /**
+      //     * TODO: write comments
+      //     */
+      //    bool equal( KeySource * rhs )
+      //    {
+      //      SymbolSource *ssrc = dynamic_cast< SymbolSource* >(rhs);
+      //      if( ssrc != 0 )
+      //        return lbl == ssrc->lbl;
+      //      else
+      //        return false;
+      //    }
+      //    
+      //    /**
+      //     * TODO: write comments
+      //     */
+      //    std::ostream& print( std::ostream& o ) const {
+      //      return lbl.print(o);
+      //    }
 
-          /**
-           * TODO: write comments
-           */
-          size_t hash() const
-          {
-            return lbl.hash();  
-          }
-          
-          /**
-           * TODO: write comments
-           */
-          T getSymbol() const
-          {
-            return lbl;
-          }
-          
-        private:
-          const T lbl;
-      };
-    
+      //    /**
+      //     * TODO: write comments
+      //     */
+      //    size_t hash() const
+      //    {
+      //      return lbl.hash();  
+      //    }
+      //    
+      //    /**
+      //     * TODO: write comments
+      //     */
+      //    T getSymbol() const
+      //    {
+      //      return lbl;
+      //    }
+      //    
+      //  private:
+      //    const T lbl;
+      //};
+      
+                                                       
+    //typedef SymbolSource* ElementT;                           
+    //typedef T LookupKey;                        
+    //
+    //class HashFunc 
+    //{                                        
+    //  public:                                                 
+    //    unsigned long operator()(const ElementT & a) const 
+    //    {  
+    //      return a->hash();               
+    //    }                                                     
+    //    unsigned long operator()(const LookupKey & a) const 
+    //    { 
+    //      unsigned long key = a.hash(); 
+    //      primitive_type_hash(key);                           
+    //      return key;                                         
+    //    }                                                     
+    //};                                                      
+    //class CompareKey 
+    //{                                      
+    //  public:                                                 
+    //    bool operator()(const LookupKey & a, const ElementT & b) const 
+    //    { 
+    //      return a == b->getSymbol();
+    //    }                                                     
+    //};                                                      
+    //class EqKey 
+    //{                                           
+    //  public:                                                 
+    //    bool operator()(const ElementT & a, const ElementT & b) const { 
+    //      return a->getSymbol() == b->getSymbol();  /* symbol comparison */            
+    //    }                                                     
+    //};                                                      
+    //typedef hash::HashSet<ElementT, LookupKey, HashFunc, CompareKey, EqKey> Hash_T; 
+    //                                                            
+    //static Hash_T& hashSet() 
+    //{                              
+    //  static Hash_T * set = new Hash_T();                   
+    //  return *set;                                          
+    //}                                                                                                            
+    //
+    //static void clearHash() {                               
+    //  hashSet().clear();                                    
+    //}                                                       
+    //static void erase(SymbolSource * a) {                             
+    //  LookupKey k(a->getSymbol());                              
+    //  hashSet().erase(k);                                   
+    //}         
       //
       // Methods
       //
@@ -80,7 +130,7 @@ namespace wali
     public:
       //Constructors and Destructor
       Symbol( );
-      Symbol( Key key );
+      //Symbol( Key key );
       Symbol( T lbl );
       Symbol( const Symbol & other );
       Symbol & operator=( const Symbol & other );
@@ -99,12 +149,12 @@ namespace wali
        * @return the epsilon symbol
        *
        */
-      static Symbol<T> getEpsilon();
+      //static Symbol<T> getEpsilon();
       
       /**
        *  TODO: write comments
        */
-      bool isEpsilon() const;  
+      //bool isEpsilon() const;  
       
       /**
        * TODO: write comments
@@ -126,7 +176,7 @@ namespace wali
        * @return the Key associated with this symbol
        *
        */
-      Key getLabelKey() const;
+      //Key getLabelKey() const;
       
       /**
        *  TODO: remove this, it isn't safe to allow!!!
@@ -252,7 +302,8 @@ namespace wali
       //
     protected:
       T lbl;
-      Key symbolKey;
+      Type symbolType;
+      //Key symbolKey;
       //static Symbol<T> wild;
       //static Symbol<T> epsilon;
     };
@@ -268,21 +319,33 @@ namespace wali
     Symbol<T>::Symbol()
     {
       //*this = wild;
-      symbolKey = wali::WALI_BAD_KEY;
+      //symbolKey = wali::WALI_BAD_KEY;
+      lbl = T();
+      symbolType = Wild;
     }
     
-    template<typename T>
-    Symbol<T>::Symbol(Key key)
-    {
-      symbolKey = key;
-    }
+    //template<typename T>
+    //Symbol<T>::Symbol(Key key)
+    //{
+    //  symbolKey = key;
+    //}
     
     template<typename T>
     Symbol<T>::Symbol( T lbl )
     {
-      SymbolSource *s = new SymbolSource(lbl);
+      //SymbolSource * s;
+      //typename Hash_T::const_iterator it = hashSet().find(lbl);
+      //if(it == hashSet().end()) {                           
+      //  s = new SymbolSource(lbl);                             
+      //  hashSet().insert(s);
+      //}                                                     
+      //else {                                                
+      //  s = (*it);                                        
+      //}                                                     
+                                                                
       this->lbl = lbl;
-      symbolKey = wali::getKey(s);
+      symbolType = Ordinary;
+      //symbolKey = wali::getKey(s); 
     }
     
     template<typename T>
@@ -293,7 +356,8 @@ namespace wali
       //else
       //{
         lbl = other.lbl;
-        symbolKey = other.symbolKey;
+        symbolType = other.symbolType;
+      //  symbolKey = other.symbolKey;
       //}
     }
     
@@ -307,7 +371,8 @@ namespace wali
       //else
       //{
         lbl = other.lbl;
-        symbolKey = other.symbolKey;
+        symbolType = other.symbolType;
+      //  symbolKey = other.symbolKey;
       //}
       return *this;
     }
@@ -319,24 +384,24 @@ namespace wali
      * @return the epsilon symbol
      *
      */
-    template<typename T>
-    Symbol<T> Symbol<T>::getEpsilon()
-    {
-      //return &epsilon;
-      return Symbol(wali::WALI_EPSILON);
-    }
+    //template<typename T>
+    //Symbol<T> Symbol<T>::getEpsilon()
+    //{
+    //  //return &epsilon;
+    //  return Symbol(wali::WALI_EPSILON);
+    //}
     
     /**
      *  TODO: write comments
      */
-    template<typename T>
-    bool Symbol<T>::isEpsilon() const
-    {
-      if( symbolKey == wali::WALI_EPSILON )
-        return true;
-      else
-        return false;
-    }  
+    //template<typename T>
+    //bool Symbol<T>::isEpsilon() const
+    //{
+    //  if( symbolKey == wali::WALI_EPSILON )
+    //    return true;
+    //  else
+    //    return false;
+    //}  
     
     /**
      *  TODO: write comments
@@ -345,7 +410,8 @@ namespace wali
     Symbol<T> Symbol<T>::getWild()
     {
       //return &wild;
-      return Symbol(wali::WALI_BAD_KEY);
+      //return Symbol(wali::WALI_BAD_KEY);
+      return Symbol();
     }
     
     /**
@@ -354,10 +420,11 @@ namespace wali
     template<typename T>
     bool Symbol<T>::isWild() const
     {
-      if( symbolKey == wali::WALI_BAD_KEY )
-        return true;
-      else
-        return false;
+      //if( symbolKey == wali::WALI_BAD_KEY )
+      //  return true;
+      //else
+      //  return false;
+      return symbolType == Wild;
     }
     
     /**
@@ -367,12 +434,12 @@ namespace wali
      * @return the Key associated with this symbol
      *
      */
-    template<typename T>
-    Key Symbol<T>::getLabelKey() const
-    {
-      //TODO: Q: do we want to allow anybody to ask this question?
-      return symbolKey;
-    }
+    //template<typename T>
+    //Key Symbol<T>::getLabelKey() const
+    //{
+    //  //TODO: Q: do we want to allow anybody to ask this question?
+    //  return symbolKey;
+    //}
     
     //TODO: remove this once I figure out how to make a pair of two labels
     //have the right type?
@@ -398,6 +465,7 @@ namespace wali
     typename T Symbol<T>::getLabel() const
     {
       //TODO: Q: what should wild and epsilon return from this?
+      assert(symbolType != Wild && symbolType != Epsilon);
       return lbl;
     }
     
@@ -429,12 +497,13 @@ namespace wali
     {
       if( isWild() )
         o << "wild";
-      else if( isEpsilon() )
-        o << "epsilon";
+      //else if( isEpsilon() )
+      //  o << "epsilon";
       else
       {
-        o << symbolKey << " - ";
-        printKey(o,symbolKey);
+        //o << symbolKey << " - ";
+        //printKey(o,symbolKey);
+        lbl.print(o);
       }
       return o;
     }
@@ -452,12 +521,14 @@ namespace wali
     {
       if( isWild() )
         return other.isWild();
-      else if( isEpsilon() )
-        return other.isEpsilon();
-      else if( symbolKey == other.symbolKey )
-        return true;
-      else
-        return false;
+      else if ( other.isWild() )
+        return false;  
+      //else if( isEpsilon() )
+      //  return other.isEpsilon();
+      //else 
+      //  return ( symbolKey == other.symbolKey );
+      else 
+        return ( lbl == other.lbl );
     }
     
     /**
@@ -471,7 +542,19 @@ namespace wali
     template<typename T>
     bool Symbol<T>::operator<( const Symbol & rhs ) const
     {
-      return (symbolKey < rhs.symbolKey);  
+    if(operator==(rhs))
+    return false;
+    // invariant: not equal
+    if(isWild()) return true;
+    if(rhs.isWild() ) return false;
+    return lbl<rhs.lbl;
+      //TODO: fix this!
+      //return (symbolKey < rhs.symbolKey);  
+      //if( isWild() )    
+      //  return rhs.isWild();        
+      //else
+      //  //return true;
+      //  return lbl < rhs.lbl;
     }
   }
 }

@@ -59,7 +59,7 @@ namespace wali
       /**
        *  TODO: write comments
        */
-      bool isStuckState() const;
+      //bool isStuckState() const;
       
       /**
        *
@@ -270,15 +270,15 @@ namespace wali
       return stuck;
     }
     */
-    template<typename T>
-    bool State<T>::isStuckState() const
-    {
-      //TODO: removing stuck state handling
-     /* if( *this == stuck )
-        return true;
-      else*/
-        return false;
-    }
+    //template<typename T>
+    //bool State<T>::isStuckState() const
+    //{
+    //  //TODO: removing stuck state handling
+    // /* if( *this == stuck )
+    //    return true;
+    //  else*/
+    //    return false;
+    //}
     
     /**
      *
@@ -372,8 +372,8 @@ namespace wali
     template<typename T>
     bool State<T>::operator==( const State & other ) const
     {
-      if( isStuckState() )
-        return other.isStuckState();
+      //if( isStuckState() )
+      //  return other.isStuckState();
       else if( stateKey == other.stateKey )
         return true;
       else
