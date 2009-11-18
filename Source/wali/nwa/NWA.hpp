@@ -1076,6 +1076,12 @@ namespace wali
       */
       stateIterator endInitialStates() const;  
 
+      //TODO
+      typename std::set<StName> getFinalStates( ) const;
+
+      //TODO
+      typename StName getInitialState( ) const;
+
       /**
       *
       * @brief adds all of the final states in the given StateSet to
@@ -1710,6 +1716,21 @@ namespace wali
     * the NWA
     *
     */
+    template<typename St,typename StName,typename Sym > 
+    typename std::set<StName> NWA<St,StName,Sym>::getFinalStates( ) const
+    {
+      return states.getFinalStates();
+    }
+
+    template<typename St,typename StName,typename Sym > 
+    typename StName NWA<St,StName,Sym>::getInitialState( ) const
+    {
+      std::set<StName> sts = states.getInitialStates();
+      assert(sts.size()==1); //TODO: assume that there is a unique initial node
+      return *(sts.begin());
+    }
+
+
     /*template<typename St,typename StName,typename Sym > 
     const typename NWA<St,StName,Sym>::States & NWA<St,StName,Sym>::getFinalStates( )
     {

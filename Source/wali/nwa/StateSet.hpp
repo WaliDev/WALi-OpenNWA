@@ -348,6 +348,19 @@ namespace wali
          */
         bool containsFinalState( St* finalState ) const;
         
+        
+        /**
+         * TODO
+         */
+        std::set<StName> getFinalStates( ) const;
+
+        /**
+         * TODO
+         */
+        std::set<StName> getInitialStates( ) const;
+        
+        std::set<StName> getStateNames(const std::set<St*> &) const;
+
         /**
          * TODO
          */
@@ -812,7 +825,34 @@ namespace wali
     {
       return (finalStates.count(finalState) >  0);
     }
+        /**
+     * TODO
+     */
+    template <typename St,typename StName> 
+    std::set<StName> StateSet<St,StName>::getFinalStates( ) const
+    {
+      return getStateNames(finalStates);
+    }
     
+
+        /**
+     * TODO
+     */
+    template <typename St,typename StName> 
+    std::set<StName> StateSet<St,StName>::getInitialStates( ) const
+    {
+      return getStateNames(initialStates);
+    }
+
+    template <typename St,typename StName> 
+    std::set<StName> StateSet<St,StName>::getStateNames(const std::set<St*> &sts ) const
+    {
+      std::set<StName> names;
+      for(std::set<St*>::const_iterator it = sts.begin(); it!=sts.end(); it++) 
+        names.insert( (*it)->getName() );
+      return names;
+    }
+
     /**
      *
      */
