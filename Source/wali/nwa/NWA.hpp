@@ -520,7 +520,7 @@ namespace wali
       * @return false if the call transition already exists in the NWA
       *
       */
-      bool addCallTrans( Call * ct );
+      bool addCallTrans( const Call & ct );
 
       /**
       * TODO: write comments
@@ -555,7 +555,7 @@ namespace wali
       * @return false if the call transition does not exist in the NWA
       *
       */
-      bool removeCallTrans( Call * ct );
+      bool removeCallTrans( const Call & ct );
 
       /**
       *
@@ -605,7 +605,7 @@ namespace wali
       * @return false if the internal transition already exists in the NWA
       *
       */
-      bool addInternalTrans( Internal * it );
+      bool addInternalTrans( const Internal &it );
 
       /**
       * TODO: write comments
@@ -641,7 +641,7 @@ namespace wali
       * @return false if the internal transition does not exist in the NWA
       *
       */
-      bool removeInternalTrans( Internal * it );
+      bool removeInternalTrans( const Internal &it );
 
       /**
       *
@@ -696,7 +696,7 @@ namespace wali
       * @return false if the return transition already exists in the NWA
       *
       */
-      bool addReturnTrans( Return * rt );
+      bool addReturnTrans( const Return &rt );
 
       /**
       * TODO: write comments
@@ -743,7 +743,7 @@ namespace wali
       * @return false if the return transition does not exist in the NWA
       *
       */
-      bool removeReturnTrans( Return * rt );
+      bool removeReturnTrans( const Return &rt );
 
 
       //Building NWAs
@@ -2060,7 +2060,7 @@ namespace wali
 
       Call* ct = new Call(fromSt,sym,toSt);
 
-      return trans->addCall(ct);
+      return trans->addCall(*ct);
     }
 
     /**
@@ -2088,7 +2088,7 @@ namespace wali
 
       Call* ct = new Call(from,sym,to);
 
-      return trans->addCall(ct);
+      return trans->addCall(*ct);
     }
 
     /**
@@ -2100,7 +2100,7 @@ namespace wali
     *
     */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::addCallTrans( Call * ct )
+    bool NWA<St,StName,Sym>::addCallTrans( const Call &ct )
     {
       assert(ct->first);
       assert(ct->second);
@@ -2136,7 +2136,7 @@ namespace wali
 
       Call* ct = new Call(fromSt,sym,toSt);
 
-      return trans->removeCall(ct);
+      return trans->removeCall(*ct);
     }
 
     /**
@@ -2165,7 +2165,7 @@ namespace wali
 
       Call* ct = new Call(from,sym,to);
 
-      return trans->removeCall(ct);
+      return trans->removeCall(*ct);
     }
 
     /**
@@ -2177,7 +2177,7 @@ namespace wali
     *
     */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::removeCallTrans( Call * ct )
+    bool NWA<St,StName,Sym>::removeCallTrans( const Call &ct )
     {
       assert(ct->first);
       assert(ct->second);
@@ -2255,7 +2255,7 @@ namespace wali
 
       Internal* it = new Internal(fromSt,sym,toSt);
 
-      return trans->addInternal(it);
+      return trans->addInternal(*it);
     }
 
     /**
@@ -2283,7 +2283,7 @@ namespace wali
 
       Internal* it = new Internal(from,sym,to);
 
-      return trans->addInternal(it);
+      return trans->addInternal(*it);
     }
 
     /**
@@ -2295,7 +2295,7 @@ namespace wali
     *
     */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::addInternalTrans( Internal * it )
+    bool NWA<St,StName,Sym>::addInternalTrans( const Internal &it )
     {
       assert(it->first);
       assert(it->second);
@@ -2331,7 +2331,7 @@ namespace wali
 
       Internal* it = new Internal(fromSt,sym,toSt);
 
-      return trans->removeInternal(it);
+      return trans->removeInternal(*it);
     }
 
     /**
@@ -2360,7 +2360,7 @@ namespace wali
 
       Internal* it = new Internal(from,sym,to);
 
-      return trans->removeInternal(it);
+      return trans->removeInternal(*it);
     }
 
     /**
@@ -2372,7 +2372,7 @@ namespace wali
     *
     */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::removeInternalTrans( Internal * it )
+    bool NWA<St,StName,Sym>::removeInternalTrans(  const Internal &it )
     {
       assert(it->first);
       assert(it->second);
@@ -2471,7 +2471,7 @@ namespace wali
 
       Return* rt = new Return(fromSt,predSt,sym,toSt);
 
-      return trans->addReturn(rt);
+      return trans->addReturn(*rt);
     }
 
     /**
@@ -2502,7 +2502,7 @@ namespace wali
 
       Return* rt = new Return(from,pred,sym,to);
 
-      return trans->addReturn(rt);
+      return trans->addReturn(*rt);
     }
 
     /**
@@ -2514,7 +2514,7 @@ namespace wali
     *
     */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::addReturnTrans( Return * rt )
+    bool NWA<St,StName,Sym>::addReturnTrans( const Return &rt )
     {
       assert(rt->first);
       assert(rt->second);
@@ -2568,7 +2568,7 @@ namespace wali
 
         Return* rt = new Return(fromSt,predSt,sym,toSt);
 
-        removed = removed || trans->removeReturn(rt);
+        removed = removed || trans->removeReturn(*rt);
       }
       return removed;
     }
@@ -2608,7 +2608,7 @@ namespace wali
 
         Return* rt = new Return(from,predSt,sym,to);
 
-        removed = removed || trans->removeReturn(rt);
+        removed = removed || trans->removeReturn(*rt);
       }
       return removed;
     }
@@ -2637,7 +2637,7 @@ namespace wali
 
       Return* rt = new Return(fromSt,predSt,sym,toSt);
 
-      return trans->removeReturn(rt);
+      return trans->removeReturn(*rt);
     }
 
     /**
@@ -2669,7 +2669,7 @@ namespace wali
 
       Return* rt = new Return(from,pred,sym,to);
 
-      return trans->removeReturn(rt);
+      return trans->removeReturn(*rt);
     }
 
     /**
@@ -2681,7 +2681,7 @@ namespace wali
     *
     */
     template<typename St,typename StName,typename Sym > 
-    bool NWA<St,StName,Sym>::removeReturnTrans( Return * rt )
+    bool NWA<St,StName,Sym>::removeReturnTrans( const Return &rt )
     {
       assert(rt->first);
       assert(rt->second);
@@ -3311,15 +3311,15 @@ namespace wali
             cit != trans->endCall(); cit++ )
           {
             //Epsilon transition 
-            if( (*cit)->second == Sym::getEpsilon() ) 
+            if( (*cit).second == Sym::getEpsilon() ) 
               return false;
             //Wild symbol
-            if( (*cit)->second == Sym::getWild() )
+            if( (*cit).second == Sym::getWild() )
               wild = true;  
 
             //Keep a count of multiple transitions with the same from
             //state and symbol(that is not epsilon).
-            else if( ((*cit)->first == (*sit)) && ((*cit)->second == *it) )
+            else if( ((*cit).first == (*sit)) && ((*cit).second == *it) )
               count++;
           }
           if( count > 1 )
@@ -3334,15 +3334,15 @@ namespace wali
             iit != trans->endInternal(); iit++ )
           {
             //Epsilon transition 
-            if( (*iit)->second == Sym::getEpsilon() )
+            if( (*iit).second == Sym::getEpsilon() )
               return false;
             //Wild symbol
-            if( (*iit)->second == Sym::getWild() )
+            if( (*iit).second == Sym::getWild() )
               wild = true;  
 
             //Keep a count of multiple transitions with the same from
             //state and symbol(that is not epsilon).
-            else if( ((*iit)->first == *sit) && ((*iit)->second == *it) )
+            else if( ((*iit).first == *sit) && ((*iit).second == *it) )
               count++;
           }
           if( count > 1 )
@@ -3360,17 +3360,17 @@ namespace wali
               rit != trans->endReturn(); rit++ )
             {
               //Epsilon transition to a state other than the error state.
-              if( (*rit)->third == Sym::getEpsilon() )
+              if( (*rit).third == Sym::getEpsilon() )
                 return false;
               //Wild symbol
-              if( (*rit)->third == Sym::getWild() )
+              if( (*rit).third == Sym::getWild() )
                 wild = true; 
 
               //Keep a count of multiple transitions with the same from
               //state and symbol(that is not epsilon).
-              else if( ((*rit)->first == *sit) &&
-                ((*rit)->second == *pit) &&
-                ((*rit)->third == *it) )
+              else if( ((*rit).first == *sit) &&
+                ((*rit).second == *pit) &&
+                ((*rit).third == *it) )
                 count++;
             }
             if( count > 1 )
@@ -3492,16 +3492,16 @@ namespace wali
         Calls thisCalls = trans->getTransCall(currpair.first);
         Calls otherCalls = other.trans->getTransCall(currpair.second);
         for(Calls::const_iterator fit = thisCalls.begin(); fit!=thisCalls.end(); fit++) {
-          Sym thisSym = (*fit)->second;
-          St *thisTgt = (*fit)->third;
+          Sym thisSym = (*fit).second;
+          St *thisTgt = (*fit).third;
           for(Calls::const_iterator sit = otherCalls.begin(); sit!=otherCalls.end(); sit++) {
-            Sym otherSym = (*sit)->second;
+            Sym otherSym = (*sit).second;
             // Are the symbols intersectable
             Sym resSym;
             if( !result.edgeIntersect(thisSym, otherSym, resSym) ) 
               continue; // Symbols not intersectable, do nothing
 
-            St *otherTgt = (*sit)->third;
+            St *otherTgt = (*sit).third;
             StatePair tgtPair(thisTgt, otherTgt);
             
             // This is to ensure that we don't call intersectNode multiple times on the
@@ -3537,16 +3537,16 @@ namespace wali
         Internals thisInternals = trans->getTransFrom(currpair.first);
         Internals otherInternals = other.trans->getTransFrom(currpair.second);
         for(Internals::const_iterator fit = thisInternals.begin(); fit!=thisInternals.end(); fit++) {
-          Sym thisSym = (*fit)->second;
-          St *thisTgt = (*fit)->third;
+          Sym thisSym = (*fit).second;
+          St *thisTgt = (*fit).third;
           for(Internals::const_iterator sit = otherInternals.begin(); sit!=otherInternals.end(); sit++) {
-            Sym otherSym = (*sit)->second;
+            Sym otherSym = (*sit).second;
             // Are the symbols intersectable
             Sym resSym;
             if( !result.edgeIntersect(thisSym, otherSym, resSym) ) 
               continue; // Symbols not intersectable, do nothing
 
-            St *otherTgt = (*sit)->third;
+            St *otherTgt = (*sit).third;
             StatePair tgtPair(thisTgt, otherTgt);
             
             // This is to ensure that we don't call intersectNode multiple times on the
@@ -3582,18 +3582,18 @@ namespace wali
         Returns thisReturns = trans->getTransExit(currpair.first);
         Returns otherReturns = other.trans->getTransExit(currpair.second);
         for(Returns::const_iterator fit = thisReturns.begin(); fit!=thisReturns.end(); fit++) {
-          St *thisPred = (*fit)->second;
-          Sym thisSym = (*fit)->third;
-          St *thisTgt = (*fit)->fourth;
+          St *thisPred = (*fit).second;
+          Sym thisSym = (*fit).third;
+          St *thisTgt = (*fit).fourth;
           for(Returns::const_iterator sit = otherReturns.begin(); sit!=otherReturns.end(); sit++) {
-            Sym otherSym = (*sit)->third;
+            Sym otherSym = (*sit).third;
             // Are the symbols intersectable
             Sym resSym;
             if( !result.edgeIntersect(thisSym, otherSym, resSym) ) 
               continue; // Symbols not intersectable, do nothing
 
             //Predecessor
-            St *otherPred = (*sit)->second;
+            St *otherPred = (*sit).second;
             StatePair predPair(thisPred, otherPred);
             
             // This is to ensure that we don't call intersectNode multiple times on the
@@ -3622,7 +3622,7 @@ namespace wali
             }
 
             //Return
-            St *otherTgt = (*sit)->fourth;
+            St *otherTgt = (*sit).fourth;
             StatePair tgtPair(thisTgt, otherTgt);
             
             // This is to ensure that we don't call intersectNode multiple times on the
@@ -4341,18 +4341,18 @@ namespace wali
         //(q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
         //where the weight w depends on sigma
 
-        if( (*iit)->second.isWild() )
-          wgt = wg.getWildWeight(*(*iit)->first,*(*iit)->third);
+        if( (*iit).second.isWild() )
+          wgt = wg.getWildWeight(*(*iit).first,*(*iit).third);
         else
-          wgt = wg.getWeight(*(*iit)->first,
-          (*iit)->second,
+          wgt = wg.getWeight(*(*iit).first,
+          (*iit).second,
           WeightGen<St,Sym>::INTRA,
-          *(*iit)->third);
+          *(*iit).third);
 
         result.add_rule(program,                //from_state (p)
-          (*iit)->first->getStateKey(),   //from_stack (q)
+          (*iit).first->getStateKey(),   //from_stack (q)
           program,                //to_state (p)
-          (*iit)->third->getStateKey(),   //to_stack1 (q')
+          (*iit).third->getStateKey(),   //to_stack1 (q')
           wgt);                   //weight      
       }
 
@@ -4362,31 +4362,31 @@ namespace wali
       {
         for( returnIterator rit = trans->beginReturn();
           rit != trans->endReturn(); rit++ )
-          if( (*cit)->first == (*rit)->second )
+          if( (*cit).first == (*rit).second )
           {
             //for each return site with cit->first as call site ...
             //Key ret = getKey(rit->fourth.getStateKey(),rit->fourth.getStateKey()); // (r,r)
             //calls.insert(std::pair<Key,Key>(cit->first.getStateKey(),ret));
-            calls.insert(std::pair<Key,Key>((*cit)->first->getStateKey(),(*rit)->fourth->getStateKey()));
+            calls.insert(std::pair<Key,Key>((*cit).first->getStateKey(),(*rit).fourth->getStateKey()));
 
             //(q_c,sigma,q_e) in delta_c and (*,q_c,*,q_r) in delta_r goes to
             // <p,q_c> -w-> <p,q_e r'> in delta_2 where r' = (q_r,q_r) (or q_r?)
             // and the weight w depends on sigma
 
-            if( (*cit)->second.isWild() )
-              wgt = wg.getWildWeight(*(*cit)->first,*(*cit)->third);
+            if( (*cit).second.isWild() )
+              wgt = wg.getWildWeight(*(*cit).first,*(*cit).third);
             else
-              wgt = wg.getWeight(*(*cit)->first,
-              (*cit)->second,
+              wgt = wg.getWeight(*(*cit).first,
+              (*cit).second,
               WeightGen<St,Sym>::CALL_TO_ENTRY,
-              *(*cit)->third);
+              *(*cit).third);
 
             result.add_rule(program,                //from_state (p)
-              (*cit)->first->getStateKey(),   //from_stack (q_c)
+              (*cit).first->getStateKey(),   //from_stack (q_c)
               program,                //to_state (p)
-              (*cit)->third->getStateKey(),   //to_stack1 (q_e)
+              (*cit).third->getStateKey(),   //to_stack1 (q_e)
               //ret,                    //to_stack2 (r')
-              (*rit)->fourth->getStateKey(),  //to_stack2 (r')
+              (*rit).fourth->getStateKey(),  //to_stack2 (r')
               wgt);                   //weight  
           }  
       }
@@ -4405,27 +4405,27 @@ namespace wali
 
         //Note: if you change this, make sure you modify the code in NWPForest.createCA()
         //Key rstate = getKey((*rit)->first->getStateKey(),(*rit)->second->getStateKey());  //p_q_x
-        Key rstate = getControlLocation(*(*rit)->first,*(*rit)->second);
+        Key rstate = getControlLocation(*(*rit).first,*(*rit).second);
 
         result.add_rule(program,                //from_state (p)
-          (*rit)->first->getStateKey(),   //from_stack (q_x)
+          (*rit).first->getStateKey(),   //from_stack (q_x)
           rstate,                 //to_state (p_q_x == (q_x,q_c))
           wgt);                   //weight 
 
-        if( (*rit)->third.isWild() )
-          wgt = wg.getWildWeight(*(*rit)->first,*(*rit)->fourth);
+        if( (*rit).third.isWild() )
+          wgt = wg.getWildWeight(*(*rit).first,*(*rit).fourth);
         else
-          wgt = wg.getWeight(*(*rit)->first, 
-          (*rit)->third,
+          wgt = wg.getWeight(*(*rit).first, 
+          (*rit).third,
           WeightGen<St,Sym>::EXIT_TO_RET,  
-          *(*rit)->fourth);  
+          *(*rit).fourth);  
 
-        std::map<Key,Key>::iterator ret = calls.find((*rit)->second->getStateKey());
+        std::map<Key,Key>::iterator ret = calls.find((*rit).second->getStateKey());
         if( ret != calls.end() )          
           result.add_rule(rstate,                   //from_state (p_q_x == (q_x,q_c))
           ret->second,    //from_stack (r')
           program,                  //to_state (p)
-          (*rit)->fourth->getStateKey(),    //to_stack (q_r)
+          (*rit).fourth->getStateKey(),    //to_stack (q_r)
           wgt);                     //weight    
 
       }
@@ -4461,18 +4461,18 @@ namespace wali
         //(q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
         //where the weight w depends on sigma
 
-        if( (*iit)->second.isWild() )
-          wgt = wg.getWildWeight(*(*iit)->first,*(*iit)->third);
+        if( (*iit).second.isWild() )
+          wgt = wg.getWildWeight(*(*iit).first,*(*iit).third);
         else
-          wgt = wg.getWeight(*(*iit)->first,
-          *(*iit)->second,
+          wgt = wg.getWeight(*(*iit).first,
+          *(*iit).second,
           WeightGen<St,Sym>::INTRA,
-          *(*iit)->third);
+          *(*iit).third);
 
         result.add_rule(program,                //from_state (p)
-          (*iit)->third->getStateKey(),   //from_stack (q)
+          (*iit).third->getStateKey(),   //from_stack (q)
           program,                //to_state (p)
-          (*iit)->first->getStateKey(),   //to_stack1 (q')
+          (*iit).first->getStateKey(),   //to_stack1 (q')
           wgt);                   //weight      
       }
 
@@ -4482,7 +4482,7 @@ namespace wali
       {
         for( returnIterator rit = trans->beginReturn();
           rit != trans->endReturn(); rit++ )
-          if( (*cit)->first == (*rit)->second )
+          if( (*cit).first == (*rit).second )
           {
 
             //(q_c,sigma,q_e) in delta_c and (q_x,q_c,*,q_r) in delta_r goes to
@@ -4494,25 +4494,25 @@ namespace wali
             wgt = wg.getOne();
 
             //Key cstate = getKey((*cit)->third->getStateKey(),(*rit)->fourth->getStateKey());  //p_q_e
-            Key cstate = getControlLocation(*(*cit)->third,*(*rit)->fourth);
+            Key cstate = getControlLocation(*(*cit).third,*(*rit).fourth);
 
             result.add_rule(program,                //from_state (p)
-              (*cit)->third->getStateKey(),   //from_stack (q_e)
+              (*cit).third->getStateKey(),   //from_stack (q_e)
               cstate,                 //to_state (p_q_e == (q_e,q_r))
               wgt);                   //weight 
 
-            if( (*cit)->second.isWild() )
-              wgt = wg.getWildWeight(*(*cit)->first,*(*cit)->third);
+            if( (*cit).second.isWild() )
+              wgt = wg.getWildWeight(*(*cit).first,*(*cit).third);
             else
-              wgt = wg.getWeight(*(*cit)->first, 
-              *(*cit)->second,
+              wgt = wg.getWeight(*(*cit).first, 
+              *(*cit).second,
               WeightGen<St,Sym>::EXIT_TO_RET,  
-              *(*cit)->third);  
+              *(*cit).third);  
 
             result.add_rule(cstate,                   //from_state (p_q_x == (q_x,q_c))
-              (*cit)->first->getStateKey(),    //from_stack (q_c)
+              (*cit).first->getStateKey(),    //from_stack (q_c)
               program,                  //to_state (p)
-              (*cit)->first->getStateKey(),    //to_stack (q_c)
+              (*cit).first->getStateKey(),    //to_stack (q_c)
               wgt);                     //weight    
           }  
       }
@@ -4525,19 +4525,19 @@ namespace wali
         // <p,q_r> -w-> <p,q_x q_c> in delta_2 
         // and the weight w depends on sigma
 
-        if( (*rit)->third.isWild() )
-          wgt = wg.getWildWeight(*(*rit)->first,*(*rit)->fourth);
+        if( (*rit).third.isWild() )
+          wgt = wg.getWildWeight(*(*rit).first,*(*rit).fourth);
         else
-          wgt = wg.getWeight(*(*rit)->first,
-          *(*rit)->third,
+          wgt = wg.getWeight(*(*rit).first,
+          *(*rit).third,
           WeightGen<St,Sym>::CALL_TO_ENTRY,
-          *(*rit)->fourth);
+          *(*rit).fourth);
 
         result.add_rule(program,                //from_state (p)
-          (*rit)->fourth->getStateKey(),   //from_stack (q_r)
+          (*rit).fourth->getStateKey(),   //from_stack (q_r)
           program,                //to_state (p)
-          (*rit)->first->getStateKey(),   //to_stack1 (q_x)
-          (*rit)->second->getStateKey(),  //to_stack2 (q_c)
+          (*rit).first->getStateKey(),   //to_stack1 (q_x)
+          (*rit).second->getStateKey(),  //to_stack2 (q_c)
           wgt);                   //weight      
       }
 

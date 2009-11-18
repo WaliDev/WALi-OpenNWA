@@ -27,9 +27,9 @@ namespace wali
     {
       //TODO: update comments
       public:        
-        typedef std::set< Call* > Calls;
-        typedef std::set< Internal* > Internals;
-        typedef std::set< Return* > Returns;
+        typedef std::set< Call > Calls;
+        typedef std::set< Internal > Internals;
+        typedef std::set< Return > Returns;
         typedef typename Calls::const_iterator callIterator;
         typedef typename Internals::const_iterator internalIterator;
         typedef typename Returns::const_iterator returnIterator;
@@ -141,7 +141,7 @@ namespace wali
          * @return false if the call transition already exists in the collection
          *
          */
-        bool addCall(Call* addTrans);
+        bool addCall( const Call &addTrans);
         
         /**
          *
@@ -157,7 +157,7 @@ namespace wali
          * @return false if the internal transition already exists in the collection
          *
          */
-        bool addInternal(Internal* addTrans);
+        bool addInternal(const Internal &addTrans);
         
         /**
          *
@@ -174,7 +174,7 @@ namespace wali
          * @return false if the return transition already exists in the collection
          *
          */
-        bool addReturn(Return* addTrans);
+        bool addReturn(const Return &addTrans);
       
         /**
          *
@@ -209,7 +209,7 @@ namespace wali
          * collection, true otherwise.
          *
          */
-        bool removeCall(Call* removeTrans);
+        bool removeCall(const Call &removeTrans);
         
         /**
          *
@@ -230,7 +230,7 @@ namespace wali
          * collection, true otherwise.
          *
          */
-        bool removeInternal(Internal* removeTrans);
+        bool removeInternal(const Internal &removeTrans);
         
         /**
          *
@@ -251,7 +251,7 @@ namespace wali
          * collection, true otherwise.
          *
          */
-        bool removeReturn(Return* removeTrans);
+        bool removeReturn(const Return & removeTrans);
                       
         /**
          *
@@ -266,7 +266,7 @@ namespace wali
          * transitions associated with the NWA
          *
          */
-        bool isCall(Call* trans) const;
+        bool isCall(const Call & trans) const;
         
         /**
          *
@@ -281,7 +281,7 @@ namespace wali
          * transitions associated with the NWA
          *
          */
-        bool isInternal(Internal* trans) const;
+        bool isInternal(const Internal & trans) const;
         
         /**
          *
@@ -296,7 +296,7 @@ namespace wali
          * transitions associated with the NWA
          *
          */
-        bool isReturn(Return* trans) const;              
+        bool isReturn(const Return & trans) const;              
                     
                       
         //Utilities	
@@ -477,37 +477,37 @@ namespace wali
         /**
          * TODO
          */
-        const std::set<Internal*> getTransFrom( St* name ) const;
+        const std::set<Internal> getTransFrom( St* name ) const;
         
         /**
          * TODO
          */
-        const std::set<Internal*> getTransTo( St* name ) const;
+        const std::set<Internal> getTransTo( St* name ) const;
         
         /**
          * TODO
          */
-        const std::set<Call*> getTransCall( St* name ) const;
+        const std::set<Call> getTransCall( St* name ) const;
         
         /**
          * TODO
          */
-        const std::set<Call*> getTransEntry( St* name ) const;
+        const std::set<Call> getTransEntry( St* name ) const;
         
         /**
          * TODO
          */
-        const std::set<Return*> getTransExit( St* name ) const;
+        const std::set<Return> getTransExit( St* name ) const;
         
         /**
          * TODO
          */
-        const std::set<Return*> getTransPred( St* name ) const;
+        const std::set<Return> getTransPred( St* name ) const;
         
         /**
          * TODO
          */
-        const std::set<Return*> getTransRet( St* name ) const;
+        const std::set<Return> getTransRet( St* name ) const;
         
         /**
          * TODO
@@ -789,37 +789,37 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::getSymbol(St* fromSt, St* toSt, Sym & sym)
     {
-      const Info::Internals from = T_info.from(fromSt);
+      const Info::Internals from = T_info.fromTrans(fromSt);
       for( Info::Internals::const_iterator it = from.begin(); it != from.end(); it++ )
       {
-        if( toSt == (*it)->third )
+        if( toSt == (*it).third )
         {
-          sym = (*it)->second;
+          sym = (*it).second;
           return true;
         }
       }
       
-      const Info::Calls call = T_info.call(fromSt);
+      const Info::Calls call = T_info.callTrans(fromSt);
       for( Info::Calls::const_iterator it = call.begin(); it != call.end(); it++ )
       {
-        if( toSt == (*it)->third )
+        if( toSt == (*it).third )
         {
-          sym = (*it)->second;
+          sym = (*it).second;
           return true;
         }
       }
             
-      const Info::Returns exit = T_info.exit(fromSt);
+      const Info::Returns exit = T_info.exitTrans(fromSt);
       for( Info::Returns::const_iterator it = exit.begin(); it != exit.end(); it++ )
       {
-        if( toSt == (*it)->fourth )
+        if( toSt == (*it).fourth )
         {
-          sym = (*it)->third;
+          sym = (*it).third;
           return true;
         }
       }
       //TODO: Q: does this count as a symbol we would like to have?
-      /*const Info::Returns pred = T_info.pred(fromSt);
+      /*const Info::Returns pred = T_info.predTrans(fromSt);
       for( Info::Returns::const_iterator it = pred.begin(); it != pred.end(); it++ )
       {
         if( toSt == (*it)->fourth )
@@ -838,32 +838,32 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     bool TransSet<St,Sym,Call,Internal,Return>::findTrans(St* fromSt, const Sym & sym, St* toSt) const
     {
-      const Info::Internals from = T_info.from(fromSt);
+      const Info::Internals from = T_info.fromTrans(fromSt);
       for( Info::Internals::const_iterator it = from.begin(); it != from.end(); it++ )
       {
-        if( toSt == (*it)->third && sym==(*it)->second)
+        if( toSt == (*it).third && sym==(*it).second)
           return true;
       }
       
-      const Info::Calls call = T_info.call(fromSt);
+      const Info::Calls call = T_info.callTrans(fromSt);
       for( Info::Calls::const_iterator it = call.begin(); it != call.end(); it++ )
       {
-        if( toSt == (*it)->third && sym == (*it)->second)
+        if( toSt == (*it).third && sym == (*it).second)
         {
           return true;
         }
       }
             
-      const Info::Returns exit = T_info.exit(fromSt);
+      const Info::Returns exit = T_info.exitTrans(fromSt);
       for( Info::Returns::const_iterator it = exit.begin(); it != exit.end(); it++ )
       {
-        if( toSt == (*it)->fourth && sym == (*it)->third)
+        if( toSt == (*it).fourth && sym == (*it).third)
         {
           return true;
         }
       }
       //TODO: Q: does this count as a symbol we would like to have?
-      /*const Info::Returns pred = T_info.pred(fromSt);
+      /*const Info::Returns pred = T_info.predTrans(fromSt);
       for( Info::Returns::const_iterator it = pred.begin(); it != pred.end(); it++ )
       {
         if( toSt == (*it)->fourth )
@@ -883,10 +883,10 @@ namespace wali
     std::set<St*> TransSet<St,Sym,Call,Internal,Return>::getReturnSites(St* callSite) const
     {
       std::set<St*> returns;
-      const Info::Returns pred = T_info.pred(callSite);
+      const Info::Returns pred = T_info.predTrans(callSite);
       for( Info::Returns::const_iterator it = pred.begin(); it != pred.end(); it++ )
       {
-        returns.insert((*it)->fourth);
+        returns.insert((*it).fourth);
       }
       return returns;
     }
@@ -898,11 +898,11 @@ namespace wali
     std::set<St*> TransSet<St,Sym,Call,Internal,Return>::getCallSites(St* exitSite, St* returnSite) const
     {
       std::set<St*> calls;
-      const Info::Returns exit = T_info.exit(exitSite);
+      const Info::Returns exit = T_info.exitTrans(exitSite);
       for( Info::Returns::const_iterator it = exit.begin(); it != exit.end(); it++ )
       {
-        if( (*it)->fourth == returnSite )
-          calls.insert((*it)->first);
+        if( (*it).fourth == returnSite )
+          calls.insert((*it).first);
       }
       return calls;
     }
@@ -913,83 +913,83 @@ namespace wali
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
     void TransSet<St,Sym,Call,Internal,Return>::dupTrans(St* orig,St* dup)
     { 
-      const Info::Internals from = T_info.from(orig);
+      const Info::Internals from = T_info.fromTrans(orig);
       for( Info::Internals::const_iterator it = from.begin(); it != from.end(); it++ )
       {
-        Internal* iTrans = new Internal(dup,(*it)->second,(*it)->third);
-        addInternal(iTrans);
-        if( orig == (*it)->third )
+        Internal* iTrans = new Internal(dup,(*it).second,(*it).third);
+        addInternal(*iTrans);
+        if( orig == (*it).third )
         {
-          iTrans = new Internal(dup,(*it)->second,dup);
-          addInternal(iTrans);
+          iTrans = new Internal(dup,(*it).second,dup);
+          addInternal(*iTrans);
         }
       }
 
-      const Info::Internals to = T_info.to(orig);
+      const Info::Internals to = T_info.toTrans(orig);
       for( Info::Internals::const_iterator it = to.begin(); it != to.end(); it++ )
       {
-        Internal* iTrans = new Internal((*it)->first,(*it)->second,dup);
-        addInternal(iTrans);
+        Internal* iTrans = new Internal((*it).first,(*it).second,dup);
+        addInternal(*iTrans);
       }
       
-      const Info::Calls call = T_info.call(orig);
+      const Info::Calls call = T_info.callTrans(orig);
       for( Info::Calls::const_iterator it = call.begin(); it != call.end(); it++ )
       {
-        Call* cTrans = new Call(dup,(*it)->second,(*it)->third);
-        addCall(cTrans);
-        if( orig == (*it)->third )
+        Call* cTrans = new Call(dup,(*it).second,(*it).third);
+        addCall(*cTrans);
+        if( orig == (*it).third )
         {
-          cTrans = new Call(dup,(*it)->second,dup);
-          addCall(cTrans);
+          cTrans = new Call(dup,(*it).second,dup);
+          addCall(*cTrans);
         }
       }
       
-      const Info::Calls entry = T_info.entry(orig);
+      const Info::Calls entry = T_info.entryTrans(orig);
       for( Info::Calls::const_iterator it = entry.begin(); it != entry.end(); it++ )
       {
-        Call* cTrans = new Call((*it)->first,(*it)->second,dup);
-        addCall(cTrans);
+        Call* cTrans = new Call((*it).first,(*it).second,dup);
+        addCall(*cTrans);
       }
       
-      const Info::Returns exit = T_info.exit(orig);
+      const Info::Returns exit = T_info.exitTrans(orig);
       for( Info::Returns::const_iterator it = exit.begin(); it != exit.end(); it++ )
       {
-        Return* rTrans = new Return(dup,(*it)->second,(*it)->third,(*it)->fourth);
-        addReturn(rTrans);
-        if( orig == (*it)->second )
+        Return* rTrans = new Return(dup,(*it).second,(*it).third,(*it).fourth);
+        addReturn(*rTrans);
+        if( orig == (*it).second )
         {
-          rTrans = new Return(dup,dup,(*it)->third,(*it)->fourth);
-          addReturn(rTrans);
+          rTrans = new Return(dup,dup,(*it).third,(*it).fourth);
+          addReturn(*rTrans);
         }
-        if( orig == (*it)->fourth )
+        if( orig == (*it).fourth )
         {
-          rTrans = new Return(dup,(*it)->second,(*it)->third,dup);
-          addReturn(rTrans);
+          rTrans = new Return(dup,(*it).second,(*it).third,dup);
+          addReturn(*rTrans);
         }
-        if( orig == (*it)->second && orig == (*it)->fourth )
+        if( orig == (*it).second && orig == (*it).fourth )
         {
-          rTrans = new Return(dup,dup,(*it)->third,dup);
-          addReturn(rTrans);
+          rTrans = new Return(dup,dup,(*it).third,dup);
+          addReturn(*rTrans);
         }
       }
       
-      const Info::Returns pred = T_info.pred(orig);
+      const Info::Returns pred = T_info.predTrans(orig);
       for( Info::Returns::const_iterator it = pred.begin(); it != pred.end(); it++ )
       {
-        Return* rTrans = new Return((*it)->first,dup,(*it)->third,(*it)->fourth);
-        addReturn(rTrans);
-        if( orig == (*it)->fourth )
+        Return* rTrans = new Return((*it).first,dup,(*it).third,(*it).fourth);
+        addReturn(*rTrans);
+        if( orig == (*it).fourth )
         {
-          rTrans = new Return((*it)->first,dup,(*it)->third,dup);
-          addReturn(rTrans);
+          rTrans = new Return((*it).first,dup,(*it).third,dup);
+          addReturn(*rTrans);
         }
       }
       
-      const Info::Returns ret = T_info.ret(orig);
+      const Info::Returns ret = T_info.retTrans(orig);
       for( Info::Returns::const_iterator it = ret.begin(); it != ret.end(); it++ )
       {
-        Return* rTrans = new Return((*it)->first,(*it)->second,(*it)->third,dup);
-        addReturn(rTrans);
+        Return* rTrans = new Return((*it).first,(*it).second,(*it).third,dup);
+        addReturn(*rTrans);
       }
     }
 
@@ -1047,9 +1047,9 @@ namespace wali
      *
      */   
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    bool TransSet<St,Sym,Call,Internal,Return>::addCall(Call* addTrans)
+    bool TransSet<St,Sym,Call,Internal,Return>::addCall( const Call & addTrans)
     {
-      assert(addTrans);
+      //assert(addTrans);
       
       if( callTrans.count(addTrans) > 0 )
         return false;      
@@ -1069,9 +1069,9 @@ namespace wali
      *
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    bool TransSet<St,Sym,Call,Internal,Return>::addInternal(Internal* addTrans)
+    bool TransSet<St,Sym,Call,Internal,Return>::addInternal(const Internal & addTrans)
     {
-      assert(addTrans);
+      //assert(addTrans);
       
       if( internalTrans.count(addTrans) > 0 )
         return false;
@@ -1091,9 +1091,9 @@ namespace wali
      *
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    bool TransSet<St,Sym,Call,Internal,Return>::addReturn(Return* addTrans)
+    bool TransSet<St,Sym,Call,Internal,Return>::addReturn(const Return & addTrans)
     {
-      assert(addTrans);
+      //assert(addTrans);
       
       if( returnTrans.count(addTrans) > 0 )
         return false;
@@ -1144,9 +1144,9 @@ namespace wali
      *
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    bool TransSet<St,Sym,Call,Internal,Return>::removeCall(Call* removeTrans)
+    bool TransSet<St,Sym,Call,Internal,Return>::removeCall(const Call & removeTrans)
     {
-      assert(removeTrans);
+      //assert(removeTrans);
       
       if( callTrans.count(removeTrans) == 0 )
         return false;
@@ -1168,9 +1168,9 @@ namespace wali
      *
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    bool TransSet<St,Sym,Call,Internal,Return>::removeInternal(Internal* removeTrans)
+    bool TransSet<St,Sym,Call,Internal,Return>::removeInternal(const Internal & removeTrans)
     {
-      assert(removeTrans);
+      //assert(removeTrans);
       
       if( internalTrans.count(removeTrans) == 0 )
         return false;
@@ -1192,9 +1192,9 @@ namespace wali
      *
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    bool TransSet<St,Sym,Call,Internal,Return>::removeReturn(Return* removeTrans)
+    bool TransSet<St,Sym,Call,Internal,Return>::removeReturn(const Return & removeTrans)
     {
-      assert(removeTrans);
+      //assert(removeTrans);
       
       if( returnTrans.count(removeTrans) == 0 )
         return false;
@@ -1216,9 +1216,9 @@ namespace wali
      *
      */   
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    bool TransSet<St,Sym,Call,Internal,Return>::isCall(Call* trans) const
+    bool TransSet<St,Sym,Call,Internal,Return>::isCall(const Call &trans) const
     {
-      assert(trans);      
+      //assert(trans);      
       return (callTrans.count(trans) > 0);
     }
     
@@ -1233,9 +1233,9 @@ namespace wali
      *
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    bool TransSet<St,Sym,Call,Internal,Return>::isInternal(Internal* trans) const
+    bool TransSet<St,Sym,Call,Internal,Return>::isInternal(const Internal & trans) const
     {
-      assert(trans);      
+      //assert(trans);      
       return (internalTrans.count(trans) > 0);
     }
     
@@ -1250,9 +1250,9 @@ namespace wali
      *
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    bool TransSet<St,Sym,Call,Internal,Return>::isReturn(Return* trans) const
+    bool TransSet<St,Sym,Call,Internal,Return>::isReturn(const Return & trans) const
     {
-      assert(trans);
+      //assert(trans);
       return (returnTrans.count(trans) > 0);
     } 
          
@@ -1277,11 +1277,11 @@ namespace wali
         if( !first )
           o << ", \n";
         o << "(";
-        (*cit)->first->print(o);
+        (*cit).first->print(o);
         o << ", ";
-        (*cit)->second.print(o);
+        (*cit).second.print(o);
         o << ", "; 
-        (*cit)->third->print(o);
+        (*cit).third->print(o);
         o << ")";
         first=false;
       }
@@ -1292,15 +1292,15 @@ namespace wali
       internalIterator iitEND = internalTrans.end();
       for( bool first=true; iit != iitEND; iit++ )
       {
-        assert(*iit);
+        //assert(*iit);
         if( !first )
           o << ", \n";
         o << "(";
-        (*iit)->first->print(o);
+        (*iit).first->print(o);
         o << ", ";
-        (*iit)->second.print(o);
+        (*iit).second.print(o);
         o << ", ";
-        (*iit)->third->print(o);
+        (*iit).third->print(o);
         o << ")";
         first = false;
       }
@@ -1314,13 +1314,13 @@ namespace wali
         if( !first )
           o << ",\n";
         o << "(";
-        (*rit)->first->print(o);
+        (*rit).first->print(o);
         o << ", ";
-        (*rit)->second->print(o);
+        (*rit).second->print(o);
         o << ", "; 
-        (*rit)->third.print(o);
+        (*rit).third.print(o);
         o << ", ";
-        (*rit)->fourth->print(o);
+        (*rit).fourth->print(o);
         o << ")";
         first = false;
       }
@@ -1500,70 +1500,70 @@ namespace wali
      * TODO
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    const std::set<Internal*> TransSet<St,Sym,Call,Internal,Return>::getTransFrom( St* name ) const
+    const std::set<Internal> TransSet<St,Sym,Call,Internal,Return>::getTransFrom( St* name ) const
     {
       assert(name);
-      return T_info.from( name );
+      return T_info.fromTrans( name );
     }
     
     /**
      * TODO
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    const std::set<Internal*> TransSet<St,Sym,Call,Internal,Return>::getTransTo( St* name ) const
+    const std::set<Internal> TransSet<St,Sym,Call,Internal,Return>::getTransTo( St* name ) const
     {
       assert(name);
-      return T_info.to( name );
+      return T_info.toTrans( name );
     }
     
     /**
      * TODO
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    const std::set<Call*> TransSet<St,Sym,Call,Internal,Return>::getTransCall( St* name ) const
+    const std::set<Call> TransSet<St,Sym,Call,Internal,Return>::getTransCall( St* name ) const
     {
       assert(name);
-      return T_info.call( name );
+      return T_info.callTrans( name );
     }
     
     /**
      * TODO
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    const std::set<Call*> TransSet<St,Sym,Call,Internal,Return>::getTransEntry( St* name ) const
+    const std::set<Call> TransSet<St,Sym,Call,Internal,Return>::getTransEntry( St* name ) const
     {
       assert(name);
-      return T_info.entry( name );
+      return T_info.entryTrans( name );
     }
     
     /**
      * TODO
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    const std::set<Return*> TransSet<St,Sym,Call,Internal,Return>::getTransExit( St* name ) const
+    const std::set<Return> TransSet<St,Sym,Call,Internal,Return>::getTransExit( St* name ) const
     {
       assert(name);
-      return T_info.exit( name );
+      return T_info.exitTrans( name );
     }
     
     /**
      * TODO
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    const std::set<Return*> TransSet<St,Sym,Call,Internal,Return>::getTransPred( St* name ) const
+    const std::set<Return> TransSet<St,Sym,Call,Internal,Return>::getTransPred( St* name ) const
     {
       assert(name);
-      return T_info.pred( name );
+      return T_info.predTrans( name );
     }
     
     /**
      * TODO
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    const std::set<Return*> TransSet<St,Sym,Call,Internal,Return>::getTransRet( St* name ) const
+    const std::set<Return> TransSet<St,Sym,Call,Internal,Return>::getTransRet( St* name ) const
     {
       assert(name);
-      return T_info.ret( name );
+      return T_info.retTrans( name );
     }
     
     //Returns true if the given state is a certain kind of state, 
@@ -1656,8 +1656,8 @@ namespace wali
       Calls removeTrans = Calls();
       for( callIterator cit = beginCall(); cit != endCall(); cit++ )
       {
-        if( ((*cit)->first == name) ||
-            ((*cit)->third == name) )
+        if( ((*cit).first == name) ||
+            ((*cit).third == name) )
             removeTrans.insert(*cit);
       }     
       
@@ -1688,8 +1688,8 @@ namespace wali
       for( internalIterator iit = beginInternal();
             iit != endInternal(); iit++ )
       {
-        if( ((*iit)->first == name) ||
-            ((*iit)->third == name) )
+        if( ((*iit).first == name) ||
+            ((*iit).third == name) )
             removeTrans.insert(*iit);
       }     
       
@@ -1721,9 +1721,9 @@ namespace wali
       for( returnIterator rit = beginReturn();
             rit != endReturn(); rit++ )
       {
-        if( ((*rit)->first == name) ||
-            ((*rit)->second == name) ||
-            ((*rit)->fourth == name) )
+        if( ((*rit).first == name) ||
+            ((*rit).second == name) ||
+            ((*rit).fourth == name) )
             removeTrans.insert(*rit);
       }     
       
@@ -1752,7 +1752,7 @@ namespace wali
       for( callIterator cit = callTrans.begin();
             cit != callTrans.end(); cit++ )
       {
-        if( (*cit)->second == sym )
+        if( (*cit).second == sym )
           removeTrans.insert(*cit);
       }     
       
@@ -1782,7 +1782,7 @@ namespace wali
             iit != internalTrans.end(); iit++ )
       {
         assert(*iit); 
-        if( (*iit)->second == sym )
+        if( (*iit).second == sym )
           removeTrans.insert(*iit);
       }     
       
@@ -1811,7 +1811,7 @@ namespace wali
       for( returnIterator rit = returnTrans.begin();
             rit != returnTrans.end(); rit++ )
       {
-        if( (*rit)->third == sym )
+        if( (*rit).third == sym )
           removeTrans.insert(*rit);
       }     
       
@@ -1843,7 +1843,7 @@ namespace wali
       for( callIterator cit = beginCall();
             cit != endCall(); cit++ )
       {
-        if( (cit->first == from) && (cit->second == sym) )
+        if( (cit.first == from) && (cit.second == sym) )
           return true;
       }  
       return false;    
@@ -1861,7 +1861,7 @@ namespace wali
       for( callIterator cit = beginCall();
             cit != endCall(); cit++ )
       {
-        if( ((*cit)->first == from) && ((*cit)->second == sym) )
+        if( ((*cit).first == from) && ((*cit).second == sym) )
           result.insert(*cit);
       } 
       return result;
@@ -1886,7 +1886,7 @@ namespace wali
       for( internalIterator iit = beginInternal();
             iit != endInternal(); iit++ )
       {
-        if( (iit->first == from) && (iit->second == sym) )
+        if( (iit.first == from) && (iit.second == sym) )
           return true;    
       }     
       return false;
@@ -1904,7 +1904,7 @@ namespace wali
       for( internalIterator iit = beginInternal();
             iit != endInternal(); iit++ )
       {
-        if( ((*iit)->first == from) && ((*iit)->second == sym) )
+        if( ((*iit).first == from) && ((*iit).second == sym) )
           result.insert(*iit);
       } 
       return result;
@@ -1920,7 +1920,7 @@ namespace wali
       assert(from);
       Internals result;
       for( internalIterator iit = beginInternal(); iit != endInternal(); iit++ )  {
-        if( ((*iit)->first == from) )
+        if( ((*iit).first == from) )
           result.insert(*iit);
       } 
       return result;
@@ -1949,7 +1949,7 @@ namespace wali
       for( returnIterator rit = beginReturn();
             rit != endReturn(); rit++ )
       {
-        if( (rit->first == from) && (rit->second == pred) && (rit->third == sym) )
+        if( (rit.first == from) && (rit.second == pred) && (rit.third == sym) )
             return true;      
       }     
       return false;
@@ -1967,7 +1967,7 @@ namespace wali
       for( returnIterator rit = beginReturn();
             rit != endReturn(); rit++ )
       {
-        if( ((*rit)->first == from) && ((*rit)->third == sym) )
+        if( ((*rit).first == from) && ((*rit).third == sym) )
           result.insert(*rit);
       } 
       return result;

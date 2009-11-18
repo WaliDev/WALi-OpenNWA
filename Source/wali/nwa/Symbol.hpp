@@ -432,7 +432,10 @@ namespace wali
       else if( isEpsilon() )
         o << "epsilon";
       else
+      {
+        o << symbolKey << " - ";
         printKey(o,symbolKey);
+      }
       return o;
     }
     
