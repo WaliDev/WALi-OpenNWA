@@ -320,7 +320,7 @@ namespace wali
     {
       //*this = wild;
       //symbolKey = wali::WALI_BAD_KEY;
-      lbl = T();
+      lbl = T();  //TODO don't use this, make it null?
       symbolType = Wild;
     }
     
