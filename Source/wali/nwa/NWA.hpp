@@ -210,7 +210,8 @@ namespace wali
       * the NWA
       *
       */
-      //const States & getInitialState( );
+      //TODO: comments not in sync
+      StName getInitialState( ) const;
 
       /**
       *
@@ -295,7 +296,8 @@ namespace wali
       * the NWA
       *
       */
-      //const States & getFinalStates( );
+      //TODO: comments out of sync
+      std::set<StName> getFinalStates( ) const;
 
       /**
       *
@@ -1584,11 +1586,13 @@ namespace wali
     * the NWA
     *
     */
-    /*template<typename St,typename StName,typename Sym > 
-    const typename NWA<St,StName,Sym>::States & NWA<St,StName,Sym>::getInitialState( )
+    template<typename St,typename StName,typename Sym > 
+    StName NWA<St,StName,Sym>::getInitialState( ) const
     {
-    return states.getInitialStates();
-    }*/
+      std::set<StName> sts = states.getInitialStates();
+      assert(sts.size()==1); // Assume unique initial state
+      return *(sts.begin());
+    }
 
     /**
     *
@@ -1710,11 +1714,12 @@ namespace wali
     * the NWA
     *
     */
-    /*template<typename St,typename StName,typename Sym > 
-    const typename NWA<St,StName,Sym>::States & NWA<St,StName,Sym>::getFinalStates( )
+    //TODO: comments out of sync
+    template<typename St,typename StName,typename Sym > 
+    std::set<StName> NWA<St,StName,Sym>::getFinalStates( ) const
     {
     return states.getFinalStates();
-    }*/
+    }
 
     /**
     *
