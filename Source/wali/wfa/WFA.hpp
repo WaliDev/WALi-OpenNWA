@@ -208,7 +208,7 @@ namespace wali
          * @see sem_elem_t
          * @return a weight on some transition in the WFA
          */
-        virtual sem_elem_t getSomeWeight();
+        virtual sem_elem_t getSomeWeight() const;
 
         /** @brief Add transition (p,g,q) to the WFA
          *
