@@ -92,7 +92,11 @@ public: // methods
       //static GenKillTransformer_T* ONE =
       //    new GenKillTransformer_T(Set::UniverseSet(),Set::EmptySet(),1);
       GenKillTransformer_T* ONE =
+#ifdef __TSL_DASH
+          new GenKillTransformer_T(Set::EmptySet(),Set::EmptySet()); // FIXME
+#else
           new GenKillTransformer_T(Set::UniverseSet(),Set::EmptySet());
+#endif
       return ONE;
   }
 
@@ -106,7 +110,11 @@ public: // methods
       //static GenKillTransformer_T* ZERO =
       //    new GenKillTransformer_T(Set::EmptySet(),Set::EmptySet(),1);
       GenKillTransformer_T* ZERO =
+#ifdef __TSL_DASH
+          new GenKillTransformer_T(Set::UniverseSet(),Set::EmptySet()); // FIXME
+#else
           new GenKillTransformer_T(Set::EmptySet(),Set::EmptySet());
+#endif
       return ZERO;
   }
 
