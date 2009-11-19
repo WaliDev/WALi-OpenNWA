@@ -1076,12 +1076,6 @@ namespace wali
       */
       stateIterator endInitialStates() const;  
 
-      //TODO
-      typename std::set<StName> getFinalStates( ) const;
-
-      //TODO
-      typename StName getInitialState( ) const;
-
       /**
       *
       * @brief adds all of the final states in the given StateSet to
@@ -1716,21 +1710,6 @@ namespace wali
     * the NWA
     *
     */
-    template<typename St,typename StName,typename Sym > 
-    typename std::set<StName> NWA<St,StName,Sym>::getFinalStates( ) const
-    {
-      return states.getFinalStates();
-    }
-
-    template<typename St,typename StName,typename Sym > 
-    typename StName NWA<St,StName,Sym>::getInitialState( ) const
-    {
-      std::set<StName> sts = states.getInitialStates();
-      assert(sts.size()==1); //TODO: assume that there is a unique initial node
-      return *(sts.begin());
-    }
-
-
     /*template<typename St,typename StName,typename Sym > 
     const typename NWA<St,StName,Sym>::States & NWA<St,StName,Sym>::getFinalStates( )
     {
@@ -4486,7 +4465,7 @@ namespace wali
           wgt = wg.getWildWeight(*(*iit).first,*(*iit).third);
         else
           wgt = wg.getWeight(*(*iit).first,
-          *(*iit).second,
+          (*iit).second,
           WeightGen<St,Sym>::INTRA,
           *(*iit).third);
 
@@ -4526,7 +4505,7 @@ namespace wali
               wgt = wg.getWildWeight(*(*cit).first,*(*cit).third);
             else
               wgt = wg.getWeight(*(*cit).first, 
-              *(*cit).second,
+              (*cit).second,
               WeightGen<St,Sym>::EXIT_TO_RET,  
               *(*cit).third);  
 
@@ -4550,7 +4529,7 @@ namespace wali
           wgt = wg.getWildWeight(*(*rit).first,*(*rit).fourth);
         else
           wgt = wg.getWeight(*(*rit).first,
-          *(*rit).third,
+          (*rit).third,
           WeightGen<St,Sym>::CALL_TO_ENTRY,
           *(*rit).fourth);
 
