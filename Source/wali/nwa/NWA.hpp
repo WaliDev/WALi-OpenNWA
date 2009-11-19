@@ -1060,7 +1060,7 @@ namespace wali
       * @return an iterator pointing to the beginning of the initial state
       *  set
       *
-      */
+      */ 
       stateIterator beginInitialStates() const;  
 
       /**
