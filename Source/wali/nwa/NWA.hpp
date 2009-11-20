@@ -115,6 +115,11 @@ namespace wali
       * TODO: write comments
       */
       std::set<StName> getStateNames() const;
+      
+      /**
+       * TODO: write comments
+       */    
+      std::set<StName> getPredecessorNames( StName name ) const;
 
       /**
       * TODO: write comments
@@ -1422,6 +1427,30 @@ namespace wali
     std::set<StName> NWA<St,StName,Sym>::getStateNames() const
     {
       return states.getStateNames();
+    }
+    
+    /**
+     * TODO: write comments
+     */    
+    template<typename St,typename StName,typename Sym> 
+    std::set<StName> NWA<St,StName,Sym>::getPredecessorNames( StName name ) const
+    {
+      St* state = getState(name);
+      std::set<StName> predNames;
+      
+      for( internalIterator it = trans->getTransTo(state); it != trans->getTransTo(state); it++ )
+      {
+        predNames.insert(it->first.getName());
+      }
+      for( callIterator ct = trans->getTransEntry(state); ct != trans->getTransEntry(state); ct++ )
+      {
+        predNames.insert(it->first.getName());
+      }
+      for( returnIterator rt = trans->getTransRet(state); rt != trans->getTransRet(state); rt++ )
+      {
+        predNames.insert(it->first.getName());
+      }
+      return predNames;
     }
 
     /**
