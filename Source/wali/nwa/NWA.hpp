@@ -119,7 +119,7 @@ namespace wali
       /**
        * TODO: write comments
        */    
-      std::set<StName> getPredecessorNames( StName name ) const;
+      std::set<StName> getPredecessorNames(const StName &name ) const;
 
       /**
       * TODO: write comments
@@ -1433,22 +1433,22 @@ namespace wali
      * TODO: write comments
      */    
     template<typename St,typename StName,typename Sym> 
-    std::set<StName> NWA<St,StName,Sym>::getPredecessorNames( StName name ) const
+    std::set<StName> NWA<St,StName,Sym>::getPredecessorNames(const StName &name ) const
     {
       St* state = getState(name);
       std::set<StName> predNames;
       
-      for( internalIterator it = trans->getTransTo(state); it != trans->getTransTo(state); it++ )
+      for( internalIterator it = trans->getTransTo(state).begin(); it != trans->getTransTo(state).end(); it++ )
       {
-        predNames.insert(it->first.getName());
+        predNames.insert(it->first->getName());
       }
-      for( callIterator ct = trans->getTransEntry(state); ct != trans->getTransEntry(state); ct++ )
+      for( callIterator ct = trans->getTransEntry(state).begin(); ct != trans->getTransEntry(state).end(); ct++ )
       {
-        predNames.insert(it->first.getName());
+        predNames.insert(ct->first->getName());
       }
-      for( returnIterator rt = trans->getTransRet(state); rt != trans->getTransRet(state); rt++ )
+      for( returnIterator rt = trans->getTransRet(state).begin(); rt != trans->getTransRet(state).end(); rt++ )
       {
-        predNames.insert(it->first.getName());
+        predNames.insert(rt->first->getName());
       }
       return predNames;
     }
