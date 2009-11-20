@@ -113,7 +113,7 @@
             from_ITrans.erase(it);
         }
         it = to_ITrans.find(intra.third->getStateKey());
-        if( it != from_ITrans.end() )
+        if( it != to_ITrans.end() )
         {
           it->second.erase(intra);
           if( it->second.empty() )
