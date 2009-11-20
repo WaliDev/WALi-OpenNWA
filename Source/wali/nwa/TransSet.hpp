@@ -477,37 +477,37 @@ namespace wali
         /**
          * TODO
          */
-        const std::set<Internal> getTransFrom( St* name ) const;
+        std::set<Internal> getTransFrom( St* name ) const;
         
         /**
          * TODO
          */
-        const std::set<Internal> getTransTo( St* name ) const;
+        std::set<Internal> getTransTo( St* name ) const;
         
         /**
          * TODO
          */
-        const std::set<Call> getTransCall( St* name ) const;
+        std::set<Call> getTransCall( St* name ) const;
         
         /**
          * TODO
          */
-        const std::set<Call> getTransEntry( St* name ) const;
+        std::set<Call> getTransEntry( St* name ) const;
         
         /**
          * TODO
          */
-        const std::set<Return> getTransExit( St* name ) const;
+        std::set<Return> getTransExit( St* name ) const;
         
         /**
          * TODO
          */
-        const std::set<Return> getTransPred( St* name ) const;
+        std::set<Return> getTransPred( St* name ) const;
         
         /**
          * TODO
          */
-        const std::set<Return> getTransRet( St* name ) const;
+        std::set<Return> getTransRet( St* name ) const;
         
         /**
          * TODO
@@ -1500,7 +1500,7 @@ namespace wali
      * TODO
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    const std::set<Internal> TransSet<St,Sym,Call,Internal,Return>::getTransFrom( St* name ) const
+    std::set<Internal> TransSet<St,Sym,Call,Internal,Return>::getTransFrom( St* name ) const
     {
       assert(name);
       return T_info.fromTrans( name );
@@ -1510,7 +1510,7 @@ namespace wali
      * TODO
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    const std::set<Internal> TransSet<St,Sym,Call,Internal,Return>::getTransTo( St* name ) const
+    std::set<Internal> TransSet<St,Sym,Call,Internal,Return>::getTransTo( St* name ) const
     {
       assert(name);
       return T_info.toTrans( name );
@@ -1520,7 +1520,7 @@ namespace wali
      * TODO
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    const std::set<Call> TransSet<St,Sym,Call,Internal,Return>::getTransCall( St* name ) const
+    std::set<Call> TransSet<St,Sym,Call,Internal,Return>::getTransCall( St* name ) const
     {
       assert(name);
       return T_info.callTrans( name );
@@ -1530,7 +1530,7 @@ namespace wali
      * TODO
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    const std::set<Call> TransSet<St,Sym,Call,Internal,Return>::getTransEntry( St* name ) const
+    std::set<Call> TransSet<St,Sym,Call,Internal,Return>::getTransEntry( St* name ) const
     {
       assert(name);
       return T_info.entryTrans( name );
@@ -1540,7 +1540,7 @@ namespace wali
      * TODO
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    const std::set<Return> TransSet<St,Sym,Call,Internal,Return>::getTransExit( St* name ) const
+    std::set<Return> TransSet<St,Sym,Call,Internal,Return>::getTransExit( St* name ) const
     {
       assert(name);
       return T_info.exitTrans( name );
@@ -1550,7 +1550,7 @@ namespace wali
      * TODO
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    const std::set<Return> TransSet<St,Sym,Call,Internal,Return>::getTransPred( St* name ) const
+    std::set<Return> TransSet<St,Sym,Call,Internal,Return>::getTransPred( St* name ) const
     {
       assert(name);
       return T_info.predTrans( name );
@@ -1560,7 +1560,7 @@ namespace wali
      * TODO
      */
     template < typename St,typename Sym,typename Call,typename Internal, typename Return >
-    const std::set<Return> TransSet<St,Sym,Call,Internal,Return>::getTransRet( St* name ) const
+    std::set<Return> TransSet<St,Sym,Call,Internal,Return>::getTransRet( St* name ) const
     {
       assert(name);
       return T_info.retTrans( name );
