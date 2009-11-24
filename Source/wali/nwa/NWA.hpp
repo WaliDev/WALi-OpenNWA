@@ -120,7 +120,7 @@ namespace wali
        * TODO: write comments
        */    
       std::set<StName> getPredecessorNames(const StName &name ) const;
-
+      
       /**
       * TODO: write comments
       */
@@ -992,6 +992,11 @@ namespace wali
       *
       */
       virtual std::ostream & print( std::ostream & o) const;
+
+      /*
+      TODO
+      */
+      virtual std::ostream & print_dot( std::ostream & o) const;
 
       /**
       *
@@ -4877,6 +4882,36 @@ namespace wali
 
       trans->print(o);
       return o;
+    }
+/*
+*/
+    template<typename St,typename StName,typename Sym >
+    std::ostream & NWA<St,StName,Sym>::print_dot( std::ostream & out) const
+    {
+
+      out << "digraph \"NWA\" { \n";
+      out << "    subgraph cluster_key {\n";
+      out << "        label = \"Key\";\n";
+      out << "        style=filled;\n";
+      out << "        color=white;\n";
+      out << "        call -> entry [color=green];\n";
+      out << "        call -> return [color=blue];\n";
+      out << "        exit -> return [color=red];\n";
+      out << "    }\n";
+      // initial state
+      St *st = getState( getInitialState() );
+st->print(out << "\"") <<"\" [ style=bold ]";
+      // final states
+std::set<StName> finals = getFinalStates();
+for(std::set<StName>::const_iterator it = finals.begin(); it!=finals.end(); it++) {
+        St *st = getState( *it );
+        st->print(out << "\"") <<"\" [ peripheries=2 ]";
+      }
+      trans->print_dot(out);
+
+      out << "}\n";
+
+      return out;
     }
 
     /**
