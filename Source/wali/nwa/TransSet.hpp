@@ -1404,9 +1404,11 @@ namespace wali
       callIterator citEND = callTrans.end();
       for( bool first=true; cit != citEND; cit++ )
       {
-        (*cit).first->print(o << "\"") << "\"";
+        //(*cit).first->print(o << "\"") << "\"";
+        (*cit).first.print(o << "\"") << "\"";
         o << "->";
-        (*cit).third->print(o << "\"") << "\"";
+        //(*cit).third->print(o << "\"") << "\"";
+        (*cit).third.print(o << "\"") << "\"";
         o << "[";
         o << " label=\"";
         (*cit).second.print(o);
@@ -1422,9 +1424,11 @@ namespace wali
       internalIterator iitEND = internalTrans.end();
       for( bool first=true; iit != iitEND; iit++ )
       {
-        (*iit).first->print(o << "\"") << "\"";
+        //(*iit).first->print(o << "\"") << "\"";
+        (*iit).first.print(o << "\"") << "\"";
         o << "->";
-        (*iit).third->print(o << "\"") << "\"";
+        //(*iit).third->print(o << "\"") << "\"";
+        (*iit).third.print(o << "\"") << "\"";
         o << "[";
         o << " label=\"";
         (*iit).second.print(o);
@@ -1439,13 +1443,16 @@ namespace wali
       for( bool first=true; rit != ritEND; rit++ )
       {
         //dummy
-        o << "\"" << dec << (*rit).second->getName() << dec << ", " << (*rit).first->getName() << "\"";
+        //o << "\"" << dec << (*rit).second->getName() << dec << ", " << (*rit).first->getName() << "\"";
+        o << "\"" << dec << (*rit).second.getName() << dec << ", " << (*rit).first.getName() << "\"";
         o <<"[ shape=box ];\n";
 
         // exit to dummy
-        (*rit).first->print(o << "\"") << "\"";
+        //(*rit).first->print(o << "\"") << "\"";
+        (*rit).first.print(o << "\"") << "\"";
         o << "->";
-        o << "\"" << (*rit).second->getName() <<", " << (*rit).first->getName() << "\"";
+        //o << "\"" << (*rit).second->getName() <<", " << (*rit).first->getName() << "\"";
+        o << "\"" << (*rit).second.getName() <<", " << (*rit).first.getName() << "\"";
         o << "[";
         o << " label=\"";
         (*rit).third.print(o);
@@ -1454,17 +1461,21 @@ namespace wali
         o << "];\n";
 
         // call to dummy
-        (*rit).second->print(o << "\"") << "\"";
+        //(*rit).second->print(o << "\"") << "\"";
+        (*rit).second.print(o << "\"") << "\"";
         o << "->";
-        o << "\"" << (*rit).second->getName() <<", " << (*rit).first->getName() << "\"";
+        //o << "\"" << (*rit).second->getName() <<", " << (*rit).first->getName() << "\"";
+        o << "\"" << (*rit).second.getName() <<", " << (*rit).first.getName() << "\"";
         o << "[";
         o << " color=blue";
         o << "];\n";
 
         //dummy to ret
-        o << "\"" << (*rit).second->getName() <<", " << (*rit).first->getName() << "\"";
+        //o << "\"" << (*rit).second->getName() <<", " << (*rit).first->getName() << "\"";
+        o << "\"" << (*rit).second.getName() <<", " << (*rit).first.getName() << "\"";
         o << "->";
-        (*rit).fourth->print(o << "\"") << "\"";
+        //(*rit).fourth->print(o << "\"") << "\"";
+        (*rit).fourth.print(o << "\"") << "\"";
         o << "[ style=dotted ];\n";
 
       }

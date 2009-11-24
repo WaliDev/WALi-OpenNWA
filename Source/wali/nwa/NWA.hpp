@@ -4807,13 +4807,17 @@ namespace wali
       out << "        exit -> return [color=red];\n";
       out << "    }\n";
       // initial state
-      St *st = getState( getInitialState() );
-st->print(out << "\"") <<"\" [ style=bold ]";
+      //St *st = getState( getInitialState() );
+      St st = getState( getInitialState() );
+//st->print(out << "\"") <<"\" [ style=bold ]";
+st.print(out << "\"") <<"\" [ style=bold ]";
       // final states
 std::set<StName> finals = getFinalStates();
 for(std::set<StName>::const_iterator it = finals.begin(); it!=finals.end(); it++) {
-        St *st = getState( *it );
-        st->print(out << "\"") <<"\" [ peripheries=2 ]";
+        //St *st = getState( *it );
+        St st = getState( *it );
+        //st->print(out << "\"") <<"\" [ peripheries=2 ]";
+        st.print(out << "\"") <<"\" [ peripheries=2 ]";
       }
       trans->print_dot(out);
 
