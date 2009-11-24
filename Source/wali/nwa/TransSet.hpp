@@ -313,6 +313,10 @@ namespace wali
          *
          */
         std::ostream & print( std::ostream & o ) const;
+        /*
+        TODO
+        */
+        std::ostream & print_dot( std::ostream & o ) const;
 
         /**
          *
@@ -1328,6 +1332,86 @@ namespace wali
       
       return o;
     }
+
+    /* TODO
+    */
+ template < typename St,typename Sym,typename Call,typename Internal, typename Return >
+    std::ostream & TransSet<St,Sym,Call,Internal,Return>::print_dot( std::ostream & o) const
+    {    
+      o << "//Delta_c: \n";
+      callIterator cit = callTrans.begin();
+      callIterator citEND = callTrans.end();
+      for( bool first=true; cit != citEND; cit++ )
+      {
+        (*cit).first->print(o << "\"") << "\"";
+        o << "->";
+        (*cit).third->print(o << "\"") << "\"";
+        o << "[";
+        o << " label=\"";
+        (*cit).second.print(o);
+        o << "\"";
+        o << " color=green";
+        o << "];\n";
+        
+      }
+      o << " \n";
+      
+      o << "// Delta_i:\n" ;
+      internalIterator iit = internalTrans.begin();
+      internalIterator iitEND = internalTrans.end();
+      for( bool first=true; iit != iitEND; iit++ )
+      {
+        (*iit).first->print(o << "\"") << "\"";
+        o << "->";
+        (*iit).third->print(o << "\"") << "\"";
+        o << "[";
+        o << " label=\"";
+        (*iit).second.print(o);
+        o << "\"";
+        o << "];\n";
+      }
+      o << " \n";
+      
+      o << "// Delta_r:\n";
+      returnIterator rit = returnTrans.begin();
+      returnIterator ritEND = returnTrans.end();
+      for( bool first=true; rit != ritEND; rit++ )
+      {
+        //dummy
+        o << "\"" << dec << (*rit).second->getName() << dec << ", " << (*rit).first->getName() << "\"";
+        o <<"[ shape=box ];\n";
+
+        // exit to dummy
+        (*rit).first->print(o << "\"") << "\"";
+        o << "->";
+        o << "\"" << (*rit).second->getName() <<", " << (*rit).first->getName() << "\"";
+        o << "[";
+        o << " label=\"";
+        (*rit).third.print(o);
+        o << "\"";
+        o << " color=red";
+        o << "];\n";
+
+        // call to dummy
+        (*rit).second->print(o << "\"") << "\"";
+        o << "->";
+        o << "\"" << (*rit).second->getName() <<", " << (*rit).first->getName() << "\"";
+        o << "[";
+        o << " color=blue";
+        o << "];\n";
+
+        //dummy to ret
+        o << "\"" << (*rit).second->getName() <<", " << (*rit).first->getName() << "\"";
+        o << "->";
+        (*rit).fourth->print(o << "\"") << "\"";
+        o << "[ style=dotted ];\n";
+
+      }
+      o << "\n";
+      
+      return o;
+    }
+
 
     /**
      *
