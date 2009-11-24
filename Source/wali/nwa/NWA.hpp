@@ -1447,20 +1447,24 @@ namespace wali
     template <typename St,typename StName,typename Sym>
     std::set<StName> NWA<St,StName,Sym>::getPredecessorNames( const StName & name ) const
     {
-      St* state = getState(name);
+      //St* state = getState(name);
+      St state = getState(name);
       std::set<StName> predNames;
       
       for( internalIterator it = trans->getTransTo(state).begin(); it != trans->getTransTo(state).end(); it++ )
       {
-        predNames.insert(it->first->getName());
+        //predNames.insert(it->first->getName());
+        predNames.insert(it->first.getName());
       }
       for( callIterator ct = trans->getTransEntry(state).begin(); ct != trans->getTransEntry(state).end(); ct++ )
       {
-        predNames.insert(ct->first->getName());
+        //predNames.insert(ct->first->getName());
+        predNames.insert(ct->first.getName());
       }
       for( returnIterator rt = trans->getTransRet(state).begin(); rt != trans->getTransRet(state).end(); rt++ )
       {
-        predNames.insert(rt->first->getName());
+        //predNames.insert(rt->first->getName());
+        predNames.insert(rt->first.getName());
       }
       return predNames;
     }
