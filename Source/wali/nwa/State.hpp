@@ -12,39 +12,53 @@
 
 // ::std
 #include <utility> 
+#include <assert.h>
 
 namespace wali
 {
-
   namespace nwa
   {
-  
+    /**
+     *
+     *  This class is used to denote the states of an NWA.
+     *
+     */  
     template<typename T>
     class State : public Printable
-    {
+    {      
+      //The types of states that are possible:
+      //  Ordinary: most will by of this type
+      //  Stuck: represents the stuck state of an automaton
+      enum Type { Ordinary, Stuck };
+    
+      /**
+       *
+       * @brief constructs a stuck state 
+       *
+       */                                                                                                            
+      //static State& stuck() 
+      //{                              
+      //  static State * stuck = new State();                   
+      //  return *stuck;                                          
+      //}    
            
       //
       // Methods
       //
 
-    public:
+      public:
+      
       //Constructors and Destructor
       State( );
-      /*State( Key key );*/
       State( T name );
       State( const State & other );
       State & operator=( const State & other );
   
-      ~State( ) { }
+      virtual ~State( ) { }
 
 
       //Accessors
-      
-      /**
-       *  TODO: phase this out, instead use getStuckState()?
-       */
-      //static Key getBadKey();
-      
+        
       /**
        *
        * @brief access the stuck state
@@ -54,33 +68,33 @@ namespace wali
        * @return the stuck state
        *
        */
-      /*static State<T> getStuckState();*/
+      static State<T> getStuckState( );
       
       /**
-       *  TODO: write comments
-       */
-      //bool isStuckState() const;
-      
-      /**
+       *  
+       * @brief test whether this is the stuck state
+       * 
+       * This method determines whether this is the stuck state.
        *
+       * @return true if this is the stuck state, false otherwise
+       *
+       */
+      bool isStuckState( ) const;
+      
+      /**
+       *  TODO: Should this be allowed?
        * @brief access the Key associated with this state
        *
        * This method provides access to the wali::Key associated
-       * with this symbol.
+       * with this state.
        *
        * @return the Key associated with this state
        *
        */
-      Key getStateKey() const;
-      
-      /**
-       *  TODO: remove this, it isn't safe to allow!!!
-       * @brief set the Key associated with this symbol
-       */
-      //void setStateKey(Key newKey);
+      Key getStateKey( ) const;
       
       /** 
-       *  TODO: rename to getName()
+       *  TODO: what should stuck return from this?
        * @brief access the name associated with this state
        *
        * This method provides access to the name associated with this
@@ -89,26 +103,24 @@ namespace wali
        * @return the name associated with this state
        *
        */
-      //T getKey( );
       T getName( ) const;
       
       /** 
-       *  TODO: rename to setName( T name )
+       *  TODO: should this be allowed??? what should stuck return from this?
        * @brief set the name associated with this state
        *
        * This method sets the name associated with this state to the
        * name provided and updates the Key associated with this state
        * to reflect the change.
        *
-       * @param the desired name for this state
+       * @param - name: the desired name for this state
        *
        */
-      //void setKey( T key );
       //void setName( T name );
 
       //Intersection of states
       /**
-       *
+       *  TODO: move nodeIntersection back to here!
        * @brief creates the state that is the join of this state with the
        * given state 'other'
        *
@@ -117,31 +129,34 @@ namespace wali
        * be joined, true is returned and the resulting state is passed back
        * via the address 'result'.  Otherwise, false is returned and no
        * new state is created.
+       * Note: If some state-matching metric other than no states can be 
+       *       joined is desired(this should be always!), this method will 
+       *       need to be overridden.
        *
-       * @param other: the state to join with this state
-       * @param result: the address to use in passing back the joint state 
-       * created when it is possible to join the two states
+       * @param - other: the state to join with this state
+       * @param - result: the address to use in passing back the joint state 
+       *                created when it is possible to join the two states
        * @result true if the two states can be joined, false otherwise
        */
-      /*virtual bool intersect( State* other, State & result ) const
-      //bool intersect( State other, State & result )
+      /*virtual bool intersect( State * other, State & result ) const
       {      
-        //Join the two states.
-        Key newKey = wali::getKey(stateKey,other.stateKey);  
-        result = State(newKey);
-      
-        return true;
+        //Note: When overriding this method your metric must determine whether
+        // the given states are compatible, then create a state and set result
+        // to the state just created if they are compatible.
+        
+        result = NULL;
+        return false;
       }*/
       
       //Utilities
       
       /** 
-       *
+       *  TODO: T must have a print function
        * @brief print the State
        *
        * This method prints out the State to the output stream provided.
        *
-       * @parm the output stream to which to print the State
+       * @param - o: the output stream to which to print the State
        * @return the output stream to which the State was printed
        *
        */
@@ -154,8 +169,8 @@ namespace wali
        * This method tests the equivalence of this State and the State
        * 'other'.
        *
-       * @param the State to compare this State to
-       * @return true if this State is equivalent to the State 'other'
+       * @param - other: the State to compare this State to
+       * @return true if this State is equivalent to the State 'other', false otherwise
        *
        */
       bool operator==( const State & other ) const;
@@ -167,118 +182,97 @@ namespace wali
        *
        * This method tests whether this State is 'less than' the State 
        * 'other' in some way.  The default is to order the States based 
-       * on their key value.
+       * on the ordering of their names.
+       * Note: Stuck is less than everything.
        *
-       * @param the State to compare this State to
-       * @return true if this State is 'less than' the State 'other'.
+       * @param - rhs: the State to compare this State to
+       * @return true if this State is 'less than' the State 'other', false otherwise
        */
       bool operator<( const State & rhs ) const;
 
       //
       // Variables
       //
-    protected:
+      
+      protected:
+      
       T name;
+      Type stateType;
       Key stateKey;
-      //TODO removed stuck state
-      /*static State<T> stuck;*/
     };
 
-    //TODO removed stuck state
-    /*
-    template<typename T>
-    State<T> State<T>::stuck = State<T>::State(wali::WALI_BAD_KEY);
-    */
-
     //Constructors
-    //TODO: removed stuck state
-    /*template<typename T>
+    template <typename T>
     State<T>::State( )
     {
-      *this = stuck;
-    }*/
+      name = T();
+      stateType = Stuck;
+      stateKey = wali::WALI_EPSILON;
+    }
 
-    //TODO: removed stuck state
-    //template<typename T>
-    //State<T>::State(Key key)
-    //{
-    //  //TODO: if( key != wali::WALI_BAD_KEY ) complain!
-    //  stateKey = key;
-    //}
-    //
-    template<typename T>
+    template <typename T>
     State<T>::State( T name )
     {
       this->name = name;
+      stateType = Ordinary;
       stateKey = wali::getKey(name);
     }
     
-    template<typename T>
+    template <typename T>
     State<T>::State( const State & other )
     {
-      //TODO: removed stuck state
-      /*if( other.isStuckState() )
-      {
-        *this = stuck;
-      }
-      else*/
-      {
+      //if( other.isStuckState() )
+      //  *this = stuck;
+      //else
+      //{
         name = other.name;
+        stateType = other.stateType;
         stateKey = other.stateKey;
-      } 
+      //} 
     }
     
-    template<typename T>
+    template <typename T>
     State<T> & State<T>::operator=( const State & other )
     {
       if (this == &other)     
-        return *this;
-        
-      //TODO removed stuck state
-      /*if( other.isStuckState() )
-      {
-        *this = stuck;
-      }
-      else*/
-      {
+        return *this;        
+      //if( other.isStuckState() )
+      //  *this = stuck;
+      //else*/
+      //{
         name = other.name;
+        stateType = other.stateType;
         stateKey = other.stateKey;
-      }
-            
+      //}    
       return *this;
     }
-         
-    /**
-     *  TODO: phase this out, instead use getStuckState()?
-     */     
-    /*template<typename T>        
-    Key State<T>::getBadKey()
-    {
-      return wali::WALI_BAD_KEY;
-    }*/
     
     /**
-     * TODO: stuck state removed
+     * 
      * @brief access the stuck state
      *
      * @return the stuck state
      *
      */
-    /*template<typename T>
-    State<T> State<T>::getStuckState()
+    template <typename T>
+    State<T> State<T>::getStuckState( )
     {
-      return stuck;
+      return State();
+      //return stuck;
     }
-    */
-    //template<typename T>
-    //bool State<T>::isStuckState() const
-    //{
-    //  //TODO: removing stuck state handling
-    // /* if( *this == stuck )
-    //    return true;
-    //  else*/
-    //    return false;
-    //}
+    
+    /**
+     *  
+     * @brief test whether this is the stuck state
+     * 
+     * @return true if this is the stuck state, false otherwise
+     *
+     */
+    template <typename T>
+    bool State<T>::isStuckState( ) const
+    {
+      return stateType == Stuck;
+    }
     
     /**
      *
@@ -287,59 +281,37 @@ namespace wali
      * @return the Key associated with this state
      *
      */
-    template<typename T>
-    Key State<T>::getStateKey() const
+    template <typename T>
+    Key State<T>::getStateKey( ) const
     {
-      //TODO: Q: do we want to allow anybody to ask this question?
       return stateKey;
     }
     
-    //TODO: remove this once I figure out how to make a pair of two labels
-    //have the right type?
-    /**
-     *  TODO: remove this, it isn't safe to allow!!!
-     * @brief set the Key associated with this symbol
-     */
-    /*template<typename T>
-    void State<T>::setStateKey(Key newKey)
-    {
-      stateKey = newKey;
-    }*/
-    
     /** 
-     *  TODO: rename to getName()
+     * 
      * @brief access the name associated with this state
      *
      * @return the name associated with this state
      *
      */
-    /*template<typename T>
-    typename T State<T>::getKey()
+    template <typename T>
+    typename T State<T>::getName( ) const
     {
-      return name;
-    }*/
-    template<typename T>
-    typename T State<T>::getName() const
-    {
+      assert(stateType != Stuck);
       return name;
     }
     
     /** 
-     *  TODO: rename to setName( T name )
+     *  
      * @brief set the name associated with this state
      *
-     * @param the desired name for this state
+     * @param - name: the desired name for this state
      *
      */
-    /*template<typename T>
-    void State<T>::setKey(T key)
+    /*template <typename T>
+    void State<T>::setName( T name )
     {
-      this->name = name;
-      stateKey = wali::getKey(name);
-    }
-    template<typename T>
-    void State<T>::setName(T name)
-    {
+      assert(!isStuckState());
       this->name = name;
       stateKey = wali::getKey(name);
     }*/
@@ -348,16 +320,18 @@ namespace wali
      *
      * @brief print the State
      *
-     * @parm the output stream to which to print the State
+     * @param - o: the output stream to which to print the State
      * @return the output stream to which the State was printed
      *
      */
-    template<typename T>
+    template <typename T>
     std::ostream & State<T>::print( std::ostream & o ) const
     {
-      //TODO: removed stuck state
-      //if( !isStuckState() )
-      //  printKey(o,stateKey);
+      if( isStuckState() )
+        o << "stuck";
+      else
+        o << "non-stuck";
+      //  name.print(o);
       return o;
     }
     
@@ -365,19 +339,19 @@ namespace wali
      *
      * @brief tests whether this State is equivalent to the State 'other'.
      * 
-     * @param the State to compare this State to
-     * @return true if this State is equivalent to the State 'other'
+     * @param - other: the State to compare this State to
+     * @return true if this State is equivalent to the State 'other', false otherwise
      *
      */
-    template<typename T>
+    template <typename T>
     bool State<T>::operator==( const State & other ) const
     {
-      //if( isStuckState() )
-      //  return other.isStuckState();
-      else if( stateKey == other.stateKey )
-        return true;
-      else
+      if( isStuckState() )
+        return other.isStuckState();
+      else if( other.isStuckState() )
         return false;
+      else 
+        return ( name == other.name );
     }
 
     /**
@@ -385,13 +359,22 @@ namespace wali
      * @brief tests the relationship between this State and the State 
      * 'other'.
      *
-     * @param the State to compare this State to
-     * @return true if this State is 'less than' the State 'other'.
+     * @param - rhs: the State to compare this State to
+     * @return true if this State is 'less than' the State 'other', false otherwise
+     *
      */
-    template<typename T>
+    template <typename T>
     bool State<T>::operator<( const State & rhs ) const
     {
-      return (stateKey < rhs.stateKey);  
+      if(operator==(rhs))
+        return false;
+        
+      // invariant: not equal
+      
+      if( isStuckState() )
+        return true;
+      else
+        return ( name < rhs.name );  
     }
   }
 }
