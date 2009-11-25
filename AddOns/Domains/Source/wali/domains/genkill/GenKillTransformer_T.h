@@ -29,7 +29,7 @@ class Set {
 
         static bool Eq( const Set& x, const Set& y );
 
-        static Set DiffForGen( const Set& x, const Set& y );
+        static Set Diff( const Set& x, const Set& y );
 
         static Set Union( const Set& x, const Set& y );
 
@@ -64,7 +64,7 @@ public: // methods
   // special semiring values one and bottom.
   static sem_elem_t makeGenKillTransformer_T(const Set& k, const Set& g )
   {
-      Set k_normalized = Set::DiffForKill(k,g); 
+      Set k_normalized = Set::Diff(k,g); 
       if (Set::Eq(k_normalized, Set::EmptySet())&& 
               Set::Eq(g, Set::UniverseSet()))
       {
@@ -157,7 +157,7 @@ public: // methods
 
       // Handle the general case
       Set temp_k( Set::Union( kill, y->kill ) );
-      Set temp_g( Set::Union( Set::DiffForGen(gen,y->kill), y->gen) );
+      Set temp_g( Set::Union( Set::Diff(gen,y->kill), y->gen) );
       return makeGenKillTransformer_T( temp_k,temp_g );
   }
 
@@ -208,8 +208,8 @@ public: // methods
       const GenKillTransformer_T* y = dynamic_cast<const GenKillTransformer_T*>(_y);
       // Both *this and *y are proper (non-zero) values
 
-      Set temp_k( Set::DiffForKill(Set::UniverseSet(),Set::DiffForKill(y->kill,kill)) ); 
-      Set temp_g( Set::DiffForGen(gen,y->gen) ); 
+      Set temp_k( Set::Diff(Set::UniverseSet(),Set::Diff(y->kill,kill)) ); 
+      Set temp_g( Set::Diff(gen,y->gen) ); 
 
       // Test for whether zero should be returned,
       // i.e., if *this >= *y.
@@ -263,7 +263,7 @@ public: // methods
 
   Set apply( const Set& input ) {
       assert ( !(this == zero()) );
-      return Set::Union( Set::DiffForGen(input,kill),gen );
+      return Set::Union( Set::Diff(input,kill),gen );
   }
 
   Set& getKill() {
