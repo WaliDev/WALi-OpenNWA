@@ -8,134 +8,61 @@
 // ::wali
 #include "wali/Printable.hpp"
 #include "wali/Common.hpp"
-#include "wali/Key.hpp"
-#include "wali/KeySource.hpp"
-#include "../../../../TSL/third_party/hash/HashSet.hpp"
 
 namespace wali
 {
-
   namespace nwa
   {  
+    /**
+     *
+     *  This class is used to label the transitions of an NWA.
+     *
+     */
     template<typename T>
     class Symbol : public Printable
-    {
-    
+    {    
+      //The types of symbols that are possible:
+      //  Ordinary: most will by of this type
+      //  Wild: represents 'any' Symbol
+      //  Epsilon:  represents 'no' Symbol
       enum Type { Ordinary, Wild, Epsilon };
     
-      //
-      // Nested Class
-      //
-      //class SymbolSource : public KeySource
-      //{
-      //  //TODO: write comments
-      //  public:
-      //    SymbolSource( const T _lbl ):lbl(_lbl)
-      //    {
-      //    }
-      //    
-      //    ~SymbolSource() { }
-      //    
-      //    /**
-      //     * TODO: write comments
-      //     */
-      //    bool equal( KeySource * rhs )
-      //    {
-      //      SymbolSource *ssrc = dynamic_cast< SymbolSource* >(rhs);
-      //      if( ssrc != 0 )
-      //        return lbl == ssrc->lbl;
-      //      else
-      //        return false;
-      //    }
-      //    
-      //    /**
-      //     * TODO: write comments
-      //     */
-      //    std::ostream& print( std::ostream& o ) const {
-      //      return lbl.print(o);
-      //    }
-
-      //    /**
-      //     * TODO: write comments
-      //     */
-      //    size_t hash() const
-      //    {
-      //      return lbl.hash();  
-      //    }
-      //    
-      //    /**
-      //     * TODO: write comments
-      //     */
-      //    T getSymbol() const
-      //    {
-      //      return lbl;
-      //    }
-      //    
-      //  private:
-      //    const T lbl;
-      //};
+      /**
+       *
+       * @brief constructs a wild symbol 
+       *
+       */                                                                                                            
+      //static Symbol& wild( ) 
+      //{                              
+      //  static Symbol * wild = new Symbol(true);                   
+      //  return *wild;                                          
+      //}                                                                  
       
-                                                       
-    //typedef SymbolSource* ElementT;                           
-    //typedef T LookupKey;                        
-    //
-    //class HashFunc 
-    //{                                        
-    //  public:                                                 
-    //    unsigned long operator()(const ElementT & a) const 
-    //    {  
-    //      return a->hash();               
-    //    }                                                     
-    //    unsigned long operator()(const LookupKey & a) const 
-    //    { 
-    //      unsigned long key = a.hash(); 
-    //      primitive_type_hash(key);                           
-    //      return key;                                         
-    //    }                                                     
-    //};                                                      
-    //class CompareKey 
-    //{                                      
-    //  public:                                                 
-    //    bool operator()(const LookupKey & a, const ElementT & b) const 
-    //    { 
-    //      return a == b->getSymbol();
-    //    }                                                     
-    //};                                                      
-    //class EqKey 
-    //{                                           
-    //  public:                                                 
-    //    bool operator()(const ElementT & a, const ElementT & b) const { 
-    //      return a->getSymbol() == b->getSymbol();  /* symbol comparison */            
-    //    }                                                     
-    //};                                                      
-    //typedef hash::HashSet<ElementT, LookupKey, HashFunc, CompareKey, EqKey> Hash_T; 
-    //                                                            
-    //static Hash_T& hashSet() 
-    //{                              
-    //  static Hash_T * set = new Hash_T();                   
-    //  return *set;                                          
-    //}                                                                                                            
-    //
-    //static void clearHash() {                               
-    //  hashSet().clear();                                    
-    //}                                                       
-    //static void erase(SymbolSource * a) {                             
-    //  LookupKey k(a->getSymbol());                              
-    //  hashSet().erase(k);                                   
-    //}         
+      /**
+       *
+       * @brief constructs an epsilon symbol
+       *
+       */
+      //static Symbol& epsilon( )
+      //{
+      //  static Symbol * epsilon = new Symbol(false);
+      //  return *epsilon;
+      //}
+    
       //
       // Methods
       //
 
-    public:
+      public:
+      
       //Constructors and Destructor
       Symbol( );
-      //Symbol( Key key );
+      Symbol( bool wild );
       Symbol( T lbl );
       Symbol( const Symbol & other );
       Symbol & operator=( const Symbol & other );
   
-      ~Symbol( ) { }
+      virtual ~Symbol( ) { }
 
 
       //Accessors
@@ -149,48 +76,48 @@ namespace wali
        * @return the epsilon symbol
        *
        */
-      //static Symbol<T> getEpsilon();
+      static Symbol<T> getEpsilon( );
       
       /**
-       *  TODO: write comments
+       *  
+       * @brief test whether this is the epsilon symbol
+       * 
+       * This method determines whether this is the epsilon symbol.
+       *
+       * @return true if this is the epsilon symbol, false otherwise
+       *
        */
-      //bool isEpsilon() const;  
+      bool isEpsilon( ) const;  
       
       /**
-       * TODO: write comments
+       * 
+       * @brief access the wild symbol
+       *
+       * This method returns the wild symbol.
+       *
+       * @return the wild symbol
+       *
        */
-      static Symbol<T> getWild();
+      static Symbol<T> getWild( );
       
       /**
-       *  TODO: write comments
+       *  
+       * @brief test whether this is the wild symbol
+       *
+       * This method determines whether this is the wild symbol.
+       *
+       * @return true if this is the wild symbol, false otherwise
+       *
        */
       bool isWild() const;      
       
-      /**
-       *
-       * @brief access the Key associated with this symbol
-       *
-       * This method provides access to the wali::Key associated
-       * with this symbol.
-       * 
-       * @return the Key associated with this symbol
-       *
-       */
-      //Key getLabelKey() const;
-      
-      /**
-       *  TODO: remove this, it isn't safe to allow!!!
-       * @brief set the Key associated with this symbol
-       *
-       */
-      //void setLabelKey(Key newKey);
-      
       /** 
-       *
+       *  TODO: what should wild and epsilon return from this?
        * @brief access the label associated with this symbol
        *
        * This method provides access to the label associated with
        * this symbol.
+       * Note: This method should never be called on a wild or epsilon symbol.
        *
        * @return the label associated with this symbol
        *
@@ -198,39 +125,40 @@ namespace wali
       T getLabel( ) const;
       
       /** 
-       *
+       *  TODO: should this be allowed??? what should wild and epsilon return from this?
        * @brief set the label associated with this symbol
        *
        * This method sets the label associated with this symbol
        * to the label provided and updates the key associated
        * with this symbol to reflect the change.
        *
-       * @param the desired label for this symbol
+       * @param - lbl: the desired label for this symbol
        * 
        */
       //void setLabel( T lbl );
 
 
-      //Intersection of edge labels
+      //Intersection of symbol labels
       /**
+       *  TODO: move edgeIntersection back to here!
+       * @brief creates the symbol that is the intersection of this symbol with the 
+       *        given symbol 'other'
        *
-       * @brief creates the edge that is the intersection of this edge with the 
-       * given edge 'other'
-       *
-       * This method checks that this edge and the given edge 'other' can be 
-       * intersected and creates the resulting edge.  If these two edges can 
-       * be intersected, true is returned and the resulting edge is passed 
+       * This method checks that this symbol and the given symbol 'other' can be 
+       * intersected and creates the resulting symbol.  If these two symbols can 
+       * be intersected, true is returned and the resulting symbol is passed 
        * back via the address 'result'.  Otherwise, false is returned and no
-       * new edge is created.
+       * new symbol is created.
+       * Note: If some symbol-matching metric other than strict label equality
+       *       is desired, this method will need to be overridden.
        * 
-       * @parm other: the edge to intersect with this edge
-       * @parm result: the  address to use in passing back the joint edge created
-       * when it is possible to intersect the two edges.
-       * @result true if the two edges can be intersected, false otherwise
+       * @param - other: the symbol to intersect with this symbol
+       * @param - result: the  address to use in passing back the joint symbol created
+       *                when intersection is possible 
+       * @result true if the two symbols can be intersected, false otherwise
        *
        */
-      /*virtual bool intersect( Symbol* other, Symbol & result )
-      //bool intersect( Symbol other, Symbol & result )
+      /*virtual bool intersect( Symbol * other, Symbol & result )
       {
         //Note: When overriding this method your metric must determine an
         // appropriate label, create a symbol with that label, and set result
@@ -246,7 +174,11 @@ namespace wali
           result = *this;
           return true;
         }
-        else if( symbolKey == other->symbolKey ) //This rule still applies for epsilons
+        else if( isEpsilon() )  //If we have an epsilon, only another epsilon can match.
+        {
+          return other->isEpsilon();
+        }
+        else if( lbl == other->lbl )  //For a general symbol, the labels must be equal for the symbols to match. 
         {
           result = *this;
           return true;
@@ -263,7 +195,7 @@ namespace wali
        *
        * This method prints out the Symbol to the output stream provided.
        *
-       * @parm the output stream to which to print the Symbol
+       * @param - o: the output stream to which to print the Symbol
        * @return the output stream to which the Symbol was printed
        *
        */
@@ -276,8 +208,8 @@ namespace wali
        * This method tests the equivalence of this Symbol and the Symbol
        * 'other'.
        *
-       * @param the Symbol to compare this Symbol to
-       * @return true if this Symbol is equivalent to the Symbol 'other'
+       * @param - other: the Symbol to compare this Symbol to
+       * @return true if this Symbol is equivalent to the Symbol 'other', false otherwise
        *
        */
       bool operator==( const Symbol & other ) const;
@@ -285,14 +217,15 @@ namespace wali
       /**
        *
        * @brief tests the relationship between this Symbol and the Symbol 
-       * 'other'.
+       *        'other'.
        *
        * This method tests whether this Symbol is 'less than' the Symbol
        * 'other' in some way.  The default is to order the Symbols based
-       * on their key value.
+       * on the ordering of their labels.
+       * Note: Wild is less than everything, Epsilon is greater than everything.
        *
-       * @param the Symbol to compare this Symbol to
-       * @return true if this Symbol is 'less than' the Symbol 'other'.
+       * @param - rhs: the Symbol to compare this Symbol to
+       * @return true if this Symbol is 'less than' the Symbol 'other', false otherwise
        *
        */
       bool operator<( const Symbol & rhs ) const;
@@ -300,79 +233,66 @@ namespace wali
       //
       // Variables
       //
-    protected:
+      
+      protected:
+      
       T lbl;
       Type symbolType;
-      //Key symbolKey;
-      //static Symbol<T> wild;
-      //static Symbol<T> epsilon;
     };
-    
-    //template<typename T>
-    //Symbol<T> Symbol<T>::wild = Symbol<T>::Symbol(wali::WALI_BAD_KEY);
-    
-    //template<typename T>
-    //Symbol<T> Symbol<T>::epsilon = Symbol<T>::Symbol(wali::WALI_EPSILON);
+
     
     //Constructors
-    template<typename T>
-    Symbol<T>::Symbol()
+    template <typename T>
+    Symbol<T>::Symbol( )
     {
-      //*this = wild;
-      //symbolKey = wali::WALI_BAD_KEY;
-      lbl = T();  //TODO don't use this, make it null?
+      lbl = T(); 
       symbolType = Wild;
     }
     
-    //template<typename T>
-    //Symbol<T>::Symbol(Key key)
-    //{
-    //  symbolKey = key;
-    //}
-    
-    template<typename T>
-    Symbol<T>::Symbol( T lbl )
+    template <typename T>
+    Symbol<T>::Symbol( bool wild )
     {
-      //SymbolSource * s;
-      //typename Hash_T::const_iterator it = hashSet().find(lbl);
-      //if(it == hashSet().end()) {                           
-      //  s = new SymbolSource(lbl);                             
-      //  hashSet().insert(s);
-      //}                                                     
-      //else {                                                
-      //  s = (*it);                                        
-      //}                                                     
-                                                                
-      this->lbl = lbl;
-      symbolType = Ordinary;
-      //symbolKey = wali::getKey(s); 
+      lbl = T();
+      if( wild )
+        symbolType = Wild;
+      else
+        symbolType = Epsilon; 
     }
     
-    template<typename T>
-    Symbol<T>::Symbol(const Symbol &other)
+    template <typename T>
+    Symbol<T>::Symbol( T lbl )
+    {
+      this->lbl = lbl;
+      symbolType = Ordinary; 
+    }
+    
+    template <typename T>
+    Symbol<T>::Symbol( const Symbol & other )
     {
       //if( other.isWild() )
       //  *this = wild;
+      //else if( other.isEpsilon() )
+      //  *this = epsilon;
       //else
       //{
         lbl = other.lbl;
         symbolType = other.symbolType;
-      //  symbolKey = other.symbolKey;
       //}
     }
     
-    template<typename T>
+    template <typename T>
     Symbol<T> & Symbol<T>::operator=( const Symbol & other )
     {
-      if (this == &other)     
+      if( this == &other )     
         return *this;
       //if( other.isWild() )
       //  *this = wild;
+      //else if( other.isEpsilon() )
+      //  *this = epsilon;
       //else
       //{
         lbl = other.lbl;
         symbolType = other.symbolType;
-      //  symbolKey = other.symbolKey;
       //}
       return *this;
     }
@@ -384,75 +304,51 @@ namespace wali
      * @return the epsilon symbol
      *
      */
-    //template<typename T>
-    //Symbol<T> Symbol<T>::getEpsilon()
-    //{
-    //  //return &epsilon;
-    //  return Symbol(wali::WALI_EPSILON);
-    //}
-    
-    /**
-     *  TODO: write comments
-     */
-    //template<typename T>
-    //bool Symbol<T>::isEpsilon() const
-    //{
-    //  if( symbolKey == wali::WALI_EPSILON )
-    //    return true;
-    //  else
-    //    return false;
-    //}  
-    
-    /**
-     *  TODO: write comments
-     */
-    template<typename T>
-    Symbol<T> Symbol<T>::getWild()
+    template <typename T>
+    Symbol<T> Symbol<T>::getEpsilon( )
     {
-      //return &wild;
-      //return Symbol(wali::WALI_BAD_KEY);
+      return Symbol(false);
+      //return &epsilon;
+    }
+    
+    /**
+     *  
+     * @brief test whether this is the epsilon symbol
+     *
+     * @return true if this is the epsilon symbol, false otherwise
+     *
+     */
+    template <typename T>
+    bool Symbol<T>::isEpsilon( ) const
+    {
+      return symbolType == Epsilon;
+    }  
+    
+    /**
+     * 
+     * @brief access the wild symbol
+     *
+     * @return the wild symbol
+     *
+     */
+    template <typename T>
+    Symbol<T> Symbol<T>::getWild( )
+    {
       return Symbol();
     }
     
     /**
-     *  TODO: write comments
+     *  
+     * @brief test whether this is the wild symbol
+     *
+     * @return true if this is the wild symbol, false otherwise
+     *
      */
-    template<typename T>
-    bool Symbol<T>::isWild() const
+    template <typename T>
+    bool Symbol<T>::isWild( ) const
     {
-      //if( symbolKey == wali::WALI_BAD_KEY )
-      //  return true;
-      //else
-      //  return false;
       return symbolType == Wild;
     }
-    
-    /**
-     *
-     * @brief access the Key associated with this symbol
-     *
-     * @return the Key associated with this symbol
-     *
-     */
-    //template<typename T>
-    //Key Symbol<T>::getLabelKey() const
-    //{
-    //  //TODO: Q: do we want to allow anybody to ask this question?
-    //  return symbolKey;
-    //}
-    
-    //TODO: remove this once I figure out how to make a pair of two labels
-    //have the right type?
-    /**
-     *  TODO: remove this, it isn't a safe operation!!!
-     * @brief set the Key associated with this symbol
-     *
-     */
-    /*template<typename T>
-    void Symbol<T>::setLabelKey(Key newKey)
-    {
-      symbolKey = newKey;
-    }*/
     
     /** 
      *
@@ -461,10 +357,9 @@ namespace wali
      * @return the label associated with this symbol
      *
      */
-    template<typename T>
-    typename T Symbol<T>::getLabel() const
+    template <typename T>
+    typename T Symbol<T>::getLabel( ) const
     {
-      //TODO: Q: what should wild and epsilon return from this?
       assert(symbolType != Wild && symbolType != Epsilon);
       return lbl;
     }
@@ -473,38 +368,34 @@ namespace wali
      *
      * @brief set the label associated with this symbol
      *
-     * @param the desired label for this symbol
+     * @param - lbl: the desired label for this symbol
      * 
      */
-    /*template<typename T>
-    void Symbol<T>::setLabel(T lbl)
+    /*template <typename T>
+    void Symbol<T>::setLabel( T lbl )
     {
-      //TODO: fix this to reflect templated labels
+      assert(!isWild() && !isEpsilon());
       this->lbl = lbl;
-      symbolKey = wali::getKey(lbl);
     }*/
     
     /** 
      *
      * @brief print the Symbol
      *
-     * @parm the output stream to which to print the Symbol
+     * @param - o: the output stream to which to print the Symbol
      * @return the output stream to which the Symbol was printed
      *
      */
-    template<typename T>
-    std::ostream & Symbol<T>::print(std::ostream &o) const
+    template <typename T>
+    std::ostream & Symbol<T>::print( std::ostream & o ) const
     {
       if( isWild() )
         o << "wild";
-      //else if( isEpsilon() )
-      //  o << "epsilon";
+      else if( isEpsilon() )
+        o << "epsilon";
       else
-      {
-        //o << symbolKey << " - ";
-        //printKey(o,symbolKey);
         lbl.print(o);
-      }
+      
       return o;
     }
     
@@ -512,21 +403,21 @@ namespace wali
      *
      * @brief tests whether this Symbol is equivalent to the Symbol 'other'.
      *
-     * @param the Symbol to compare this Symbol to
-     * @return true if this Symbol is equivalent to the Symbol 'other'
+     * @param - other: the Symbol to compare this Symbol to
+     * @return true if this Symbol is equivalent to the Symbol 'other', false otherwise
      *
      */
-    template<typename T>
+    template <typename T>
     bool Symbol<T>::operator==( const Symbol & other ) const
     {
       if( isWild() )
         return other.isWild();
-      else if ( other.isWild() )
+      else if( other.isWild() )
         return false;  
-      //else if( isEpsilon() )
-      //  return other.isEpsilon();
-      //else 
-      //  return ( symbolKey == other.symbolKey );
+      else if( isEpsilon() )
+        return other.isEpsilon();
+      else if( other.isEpsilon() )
+        return false;
       else 
         return ( lbl == other.lbl );
     }
@@ -535,26 +426,29 @@ namespace wali
      *
      * @brief tests the relationship between this Symbol and the Symbol 'other'.
      *
-     * @param the Symbol to compare this Symbol to
-     * @return true if this Symbol is 'less than' the Symbol 'other'.
+     * @param - rhs: the Symbol to compare this Symbol to
+     * @return true if this Symbol is 'less than' the Symbol 'other', false otherwise
      *
      */
-    template<typename T>
+    template <typename T>
     bool Symbol<T>::operator<( const Symbol & rhs ) const
     {
-    if(operator==(rhs))
-    return false;
-    // invariant: not equal
-    if(isWild()) return true;
-    if(rhs.isWild() ) return false;
-    return lbl<rhs.lbl;
-      //TODO: fix this!
-      //return (symbolKey < rhs.symbolKey);  
-      //if( isWild() )    
-      //  return rhs.isWild();        
-      //else
-      //  //return true;
-      //  return lbl < rhs.lbl;
+      if( operator==(rhs) )
+        return false;
+        
+      // invariant: not equal
+      
+      if( isWild() ) 
+        return true;
+      if( rhs.isWild() ) 
+        return false;      
+         
+      if( rhs.isEpsilon() )
+        return true;
+      if( isEpsilon() )
+        return false;
+        
+      return lbl<rhs.lbl;
     }
   }
 }
