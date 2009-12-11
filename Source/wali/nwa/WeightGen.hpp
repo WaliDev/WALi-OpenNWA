@@ -5,8 +5,8 @@
  * @author Amanda Burton
  */
  
- namespace wali
- {
+namespace wali
+{
   namespace nwa
   {
     /**
@@ -48,7 +48,7 @@
        */
       virtual sem_elem_t getOne( ) 
       {
-        // TODO: fix this!
+        // TODO: fix this somehow!
         assert(0); //grrr ugliness 
         return NULL;
       }

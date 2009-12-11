@@ -5,6 +5,8 @@
  * @author Nicholas Kidd
  */
 
+//#define KEY
+
 #include <iostream>
 #include "wali/Common.hpp"
 #include "wali/Printable.hpp"

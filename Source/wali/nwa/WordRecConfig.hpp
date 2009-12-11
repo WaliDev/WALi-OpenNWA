@@ -17,7 +17,7 @@ namespace wali
 {
   namespace nwa
   {
-    template<typename StKey>
+    template<typename Client>
     class WordRecConfig
     {
       //
@@ -74,12 +74,12 @@ namespace wali
       /**
        *
        */
-      State<StKey> getCallState();
+      State<Client> getCallState();
       
       /**
        *
        */
-      void addCallState( State<StKey> call );
+      void addCallState( State<Client> call );
       
       /**
        *
@@ -110,33 +110,33 @@ namespace wali
       // Variables
       // 
       protected:
-        std::deque<State<StKey>> st;
+        std::deque<State<Client>> st;
         wali::nws::NWS word;
     };
     
     //Constructors and Destructor
     
-    template<typename StKey>  
-    WordRecConfig<StKey>::WordRecConfig()
+    template<typename Client>  
+    WordRecConfig<Client>::WordRecConfig()
     {
       
     }  
       
-    template<typename StKey>  
-    WordRecConfig<StKey>::WordRecConfig( wali::nws::NWS word )
+    template<typename Client>  
+    WordRecConfig<Client>::WordRecConfig( wali::nws::NWS word )
     {
       this->word = word;
     }
     
-    template<typename StKey>
-    WordRecConfig<StKey>::WordRecConfig( const WordRecConfig & other )
+    template<typename Client>
+    WordRecConfig<Client>::WordRecConfig( const WordRecConfig & other )
     {
       word = other.word;
       st = other.st;
     }
     
-    template<typename StKey>
-    WordRecConfig<StKey> & WordRecConfig<StKey>::operator=( const WordRecConfig & other )
+    template<typename Client>
+    WordRecConfig<Client> & WordRecConfig<Client>::operator=( const WordRecConfig & other )
     {
       this->word = other.word;
       this->st = other.st;
@@ -144,8 +144,8 @@ namespace wali
       return *this;
     }
     
-    template<typename StKey>
-    WordRecConfig<StKey>::~WordRecConfig()
+    template<typename Client>
+    WordRecConfig<Client>::~WordRecConfig()
     {
       st.clear();
     }
@@ -155,8 +155,8 @@ namespace wali
     /**
      *
      */
-    template<typename StKey>
-    bool WordRecConfig<StKey>::isEmpty()
+    template<typename Client>
+    bool WordRecConfig<Client>::isEmpty()
     {
       return word.isEmpty();
     }
@@ -164,8 +164,8 @@ namespace wali
     /**
      *
      */
-    template<typename StKey> 
-    bool WordRecConfig<StKey>::hasNext()
+    template<typename Client> 
+    bool WordRecConfig<Client>::hasNext()
     {
       return !(word.nextNode() == NULL);
     }
@@ -173,8 +173,8 @@ namespace wali
     /**
      *
      */
-    template<typename StKey>
-    wali::nws::NWSNode * WordRecConfig<StKey>::getNext()
+    template<typename Client>
+    wali::nws::NWSNode * WordRecConfig<Client>::getNext()
     {
       return word.nextNode();
     }
@@ -182,8 +182,8 @@ namespace wali
     /**
      *
      */
-    template<typename StKey> 
-    void WordRecConfig<StKey>::removeNext()
+    template<typename Client> 
+    void WordRecConfig<Client>::removeNext()
     {
       word.removeNode();
     }
@@ -191,8 +191,8 @@ namespace wali
     /**
      *
      */
-    template<typename StKey> 
-    wali::nws::NWSNode * WordRecConfig<StKey>::getCall()
+    template<typename Client> 
+    wali::nws::NWSNode * WordRecConfig<Client>::getCall()
     {
       return word.stackTop();
     }
@@ -200,8 +200,8 @@ namespace wali
     /** 
      *
      */
-    template<typename StKey> 
-    void WordRecConfig<StKey>::setWord( wali::nws::NWS word )
+    template<typename Client> 
+    void WordRecConfig<Client>::setWord( wali::nws::NWS word )
     {
       this->word = word;
     }
@@ -209,8 +209,8 @@ namespace wali
     /**
      *
      */
-    template<typename StKey> 
-    bool WordRecConfig<StKey>::hasCallState()
+    template<typename Client> 
+    bool WordRecConfig<Client>::hasCallState()
     {
       return !st.empty();
     }
@@ -218,8 +218,8 @@ namespace wali
     /**
      *
      */
-    template<typename StKey> 
-    State<StKey> WordRecConfig<StKey>::getCallState()
+    template<typename Client> 
+    State<Client> WordRecConfig<Client>::getCallState()
     {
       return st.back();
     }
@@ -227,8 +227,8 @@ namespace wali
     /**
      *
      */
-    template<typename StKey> 
-    void WordRecConfig<StKey>::addCallState( State<StKey> call )
+    template<typename Client> 
+    void WordRecConfig<Client>::addCallState( State<Client> call )
     {
       st.push_back(call);
     }
@@ -236,8 +236,8 @@ namespace wali
     /**
      *
      */
-    template<typename StKey> 
-    void WordRecConfig<StKey>::removeCallState()
+    template<typename Client> 
+    void WordRecConfig<Client>::removeCallState()
     {
       st.pop_back();
     }
@@ -250,14 +250,14 @@ namespace wali
      * @return the output stream to which the node was printed
      *
      */
-    template<typename StKey> 
-    std::ostream & WordRecConfig<StKey>::print( std::ostream & o ) const
+    template<typename Client> 
+    std::ostream & WordRecConfig<Client>::print( std::ostream & o ) const
     {
       word.print(o);
       
       o << "[";
       bool first = true;
-      for( std::deque<State>::const_iterator it = st.begin();
+      for( std::deque<State<Client>>::const_iterator it = st.begin();
             it != st.end(); it++ )
       {
         if( !first )
@@ -274,14 +274,14 @@ namespace wali
     /** 
      *
      */
-    template<typename StKey> 
-    bool WordRecConfig<StKey>::operator==( const WordRecConfig & other ) const
+    template<typename Client> 
+    bool WordRecConfig<Client>::operator==( const WordRecConfig & other ) const
     {
       if( word == other.word )
       {
         if( st.size() == other.st.size() )
         {
-          for( std::deque<State>::const_iterator it = st.begin(), oit = other.st.begin();
+          for( std::deque<State<Client>>::const_iterator it = st.begin(), oit = other.st.begin();
               it != st.end() && oit != other.st.end(); it++, oit++ )
           {
             if( !(*it == *oit) )
@@ -299,8 +299,8 @@ namespace wali
     /**
      *
      */
-    template<typename StKey> 
-    bool WordRecConfig<StKey>::operator <( const WordRecConfig & other ) const
+    template<typename Client> 
+    bool WordRecConfig<Client>::operator <( const WordRecConfig & other ) const
     {
       //TODO: construct a better metric for this!
       return st.size() < other.st.size();
