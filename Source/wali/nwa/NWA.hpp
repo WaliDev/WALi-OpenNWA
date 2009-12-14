@@ -3630,7 +3630,7 @@ namespace wali
 
         //Process outgoing call transitions
         Calls thisCalls = trans->getTransCall(getState(currpair.first));
-        Calls otherCalls = other.trans->getTransCall(getState(currpair.second));
+        Calls otherCalls = other.trans->getTransCall(other.getState(currpair.second));
         for(Calls::const_iterator fit = thisCalls.begin(); fit!=thisCalls.end(); fit++) {
           Sym thisSym = fit->second;
           StName thisTgt = fit->third;
@@ -3680,7 +3680,7 @@ namespace wali
 
         // Process outgoing internal transitions
         Internals thisInternals = trans->getTransFrom(getState(currpair.first));
-        Internals otherInternals = other.trans->getTransFrom(getState(currpair.second));
+        Internals otherInternals = other.trans->getTransFrom(other.getState(currpair.second));
         for(Internals::const_iterator fit = thisInternals.begin(); fit!=thisInternals.end(); fit++) {
           Sym thisSym = fit->second;
           StName thisTgt = fit->third;
@@ -3728,7 +3728,7 @@ namespace wali
         
         //Process outgoing return transitions
         Returns thisReturns = trans->getTransExit(getState(currpair.first));
-        Returns otherReturns = other.trans->getTransExit(getState(currpair.second));
+        Returns otherReturns = other.trans->getTransExit(other.getState(currpair.second));
         for(Returns::const_iterator fit = thisReturns.begin(); fit!=thisReturns.end(); fit++) {
           StName thisPred = fit->second;
           Sym thisSym = fit->third;
