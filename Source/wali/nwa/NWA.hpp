@@ -975,17 +975,27 @@ namespace wali
     /**
      * TODO: write comments
      */
-    void intersectClientInfo( StName name1, StName name2, StName result );
+    //void intersectClientInfo( StName name1, StName name2, StName result );
+    void intersectClientInfo( const St * const name1, 
+                              const St * const name2, 
+                              const StName &result );
+    /**
+     * TODO: write comments
+     */
+    //void intersectClientInfoCall( Call call1, Call call2, StName result );  
+    void intersectClientInfoCall( const St * const call1, const St * const entry1, 
+                                  const St * const call2, const St * const entry2, 
+                                  const Sym &resSym,
+                                  const StName &result );  
 
     /**
      * TODO: write comments
      */
-    void intersectClientInfoCall( Call call1, Call call2, StName result );  
-
-    /**
-     * TODO: write comments
-     */
-    void intersectClientInfoInternal( Internal internal1, Internal internal2, StName result );
+    //void intersectClientInfoInternal( Internal internal1, Internal internal2, StName result );
+    void intersectClientInfoInternal( const St *const src1, const St* const tgt1,
+                                      const St *const src2, const St* const tgt2,
+                                      const Sym &resSym,
+                                      const StName &result );
 
     /**
      * TODO: write comments
@@ -995,12 +1005,16 @@ namespace wali
     /**
      * TODO: write comments
      */
-    void intersectClientInfoReturn( Return return1, Return return2, StName result );
+    //void intersectClientInfoReturn( Return return1, Return return2, StName result );
+    void intersectClientInfoReturn( const St * const exit1, const St *const call1, const St *const ret1,
+                                    const St * const exit2, const St *const call2, const St *const ret2,
+                                    const Sym &resSym,
+                                    const StName &result );
 
       /**
        * TODO: write comments
        */
-      virtual bool nodeIntersect( StName node1, StName node2, St * & result );
+      virtual bool nodeIntersect( const St * const node1, const St * const node2, St * & result );
 
       /**
        * TODO: write comments
@@ -1111,7 +1125,7 @@ namespace wali
       /*
       TODO
       */
-      virtual std::ostream & print_dot( std::ostream & o) const;
+      virtual std::ostream & print_dot( std::ostream & o, std::string title) const;
 
       /**
        *
@@ -3597,8 +3611,8 @@ namespace wali
           St * newSt;
           StatePair sp((*fit), (*sit));
           visitedPairs.insert( sp );
-          if( result.nodeIntersect(*fit, *sit, newSt) ) {
-            result.intersectClientInfo(*fit,*sit,newSt->getName());   //Intersect initial client info.
+          if( result.nodeIntersect(getState(*fit), other.getState(*sit), newSt) ) {
+            result.intersectClientInfo( getState(*fit), other.getState(*sit), newSt->getName());   //Intersect initial client info.
             result.addInitialState( newSt ); 
             //an initial state could also be a final state.
             if(this->isFinalState(getState(*fit)) && other.isFinalState(other.getState(*sit)))
@@ -3641,7 +3655,7 @@ namespace wali
             if(pairToStMap.count(tgtPair)==0) { 
               //We have not seen this pair before
               // Are the tgt nodes intersectable?
-              if(!result.nodeIntersect(thisTgt, otherTgt, resSt)) 
+              if(!result.nodeIntersect(getState(thisTgt), other.getState(otherTgt), resSt)) 
                 continue;
               // We have a new state in resSt!
               if(this->isFinalState(getState(thisTgt)) && other.isFinalState(other.getState(otherTgt)))
@@ -3654,7 +3668,12 @@ namespace wali
               // we have already seen this pair before
               resSt = pairToStMap[tgtPair];
             }
-            result.intersectClientInfoCall(*fit,*sit,resSt->getName());   //Intersect Call Trans client info.
+            
+            //result.intersectClientInfoCall(*fit,*sit,resSt->getName());   //Intersect Call Trans client info.
+            result.intersectClientInfoCall( getState( fit->first), getState( fit->third ),
+                                            other.getState( sit->first), other.getState( sit->third ),
+                                            resSym,
+                                            resSt->getName());   //Intersect Call Trans client info.
             result.addCallTrans(pairToStMap[currpair], resSym, resSt);
           }
         }
@@ -3686,7 +3705,7 @@ namespace wali
             if(pairToStMap.count(tgtPair)==0) { 
               //We have not seen this pair before
               // Are the tgt nodes intersectable?
-              if(!result.nodeIntersect(thisTgt, otherTgt, resSt)) 
+              if(!result.nodeIntersect( getState( thisTgt ), other.getState( otherTgt ), resSt)) 
                 continue;
               // We have a new state in resSt!
               if(this->isFinalState(getState(thisTgt)) && other.isFinalState(other.getState(otherTgt)))
@@ -3699,7 +3718,10 @@ namespace wali
               // we have already seen this pair before
               resSt = pairToStMap[tgtPair];
             }
-            result.intersectClientInfoInternal(*fit,*sit,resSt->getName());   //Intersect Internal Trans client info.
+            result.intersectClientInfoInternal( getState(fit->first), getState(fit->third),
+                                                other.getState(sit->first), other.getState(sit->third),
+                                                resSym,
+                                                resSt->getName());   //Intersect Internal Trans client info.
             result.addInternalTrans(pairToStMap[currpair], resSym, resSt);
           }
         }
@@ -3764,7 +3786,7 @@ namespace wali
             if(pairToStMap.count(tgtPair)==0) { 
               //We have not seen this pair before
               // Are the tgt nodes intersectable?
-              if(!result.nodeIntersect(thisTgt, otherTgt, resSt)) 
+              if(!result.nodeIntersect( getState( thisTgt ), other.getState(otherTgt), resSt)) 
                 continue;
               // We have a new state in resSt!
               if(this->isFinalState(getState(thisTgt)) && other.isFinalState(getState(otherTgt)))
@@ -3777,7 +3799,10 @@ namespace wali
               // we have already seen this pair before
               resSt = pairToStMap[tgtPair];
             }
-            result.intersectClientInfoReturn(*fit,*sit,resSt->getName());   //Intersect Return Trans client info.
+            result.intersectClientInfoReturn( getState(fit->first), getState(fit->second), getState(fit->fourth),
+                                              other.getState(fit->first), other.getState(fit->second), other.getState(fit->fourth),
+                                              resSym,
+                                              resSt->getName());   //Intersect Return Trans client info.
             result.addReturnTrans(pairToStMap[currpair], predSt, resSym, resSt);
           }
         }
@@ -4227,7 +4252,7 @@ namespace wali
      * TODO: write comments
      */
     template <typename St,typename StName,typename Sym>
-    void NWA<St,StName,Sym>::intersectClientInfo( StName name1, StName name2, StName result ) 
+    void NWA<St,StName,Sym>::intersectClientInfo( const St * const name1, const St *name2, const StName &result ) 
     { 
       //Note: When overriding this method your metric must combine any client information associated
       // with the states associated with the given names and set the client information of result
@@ -4238,7 +4263,10 @@ namespace wali
      * TODO: write comments
      */
     template <typename St,typename StName,typename Sym>
-    void NWA<St,StName,Sym>::intersectClientInfoCall( Call call1, Call call2, StName result ) 
+    void NWA<St,StName,Sym>::intersectClientInfoCall( const St * const call1, const St * const entry1, 
+                                                      const St * const call2, const St * const entry2, 
+                                                      const Sym &resSym,
+                                                      const StName &result )
     { 
       //Note: When overriding this method your metric must combine any client information associated
       // with the target states of the two transitions and set the client information of result
@@ -4249,7 +4277,10 @@ namespace wali
      * TODO: write comments
      */
     template <typename St,typename StName,typename Sym>
-    void NWA<St,StName,Sym>::intersectClientInfoInternal( Internal internal1, Internal internal2, StName result ) 
+    void NWA<St,StName,Sym>::intersectClientInfoInternal( const St *const src1, const St* const tgt1,
+                                                          const St *const src2, const St* const tgt2,
+                                                          const Sym &resSym,
+                                                          const StName &result )
     { 
       //Note: When overriding this method your metric must combine any client information associated
       // with the target states of the two transitions and set the client information of result
@@ -4271,7 +4302,10 @@ namespace wali
      * TODO: write comments
      */
     template <typename St,typename StName,typename Sym>
-    void NWA<St,StName,Sym>::intersectClientInfoReturn( Return return1, Return return2, StName result ) 
+    void NWA<St,StName,Sym>::intersectClientInfoReturn( const St * const exit1, const St *const call1, const St *const ret1,
+                                                        const St * const exit2, const St *const call2, const St *const ret2,
+                                                        const Sym &resSym,
+                                                        const StName &result )
     { 
       //Note: When overriding this method your metric must combine any client information associated
       // with the target states of the two transitions and set the client information of result
@@ -4282,7 +4316,7 @@ namespace wali
      * TODO: write comments
      */
     template <typename St,typename StName,typename Sym>
-    bool NWA<St,StName,Sym>::nodeIntersect( StName node1, StName node2, St * & result )
+    bool NWA<St,StName,Sym>::nodeIntersect( const St * const node1, const St * const node2, St * & result )
     {
       //Note: When overriding this method your metric must determine whether
       // the given states are compatible, then create a state and set result
@@ -5073,10 +5107,11 @@ namespace wali
 /*
 */
     template<typename St,typename StName,typename Sym >
-    std::ostream & NWA<St,StName,Sym>::print_dot( std::ostream & out) const
+    std::ostream & NWA<St,StName,Sym>::print_dot( std::ostream & out, std::string title) const
     {
 
       out << "digraph \"NWA\" { \n";
+      out << "    label = \"" << title <<"\" ;\n";
       out << "    subgraph cluster_key {\n";
       out << "        label = \"Key\";\n";
       out << "        style=filled;\n";
@@ -5167,7 +5202,7 @@ for(std::set<StName>::const_iterator it = finals.begin(); it!=finals.end(); it++
       out << "\n";
 
       out << "}\n";
-
+      out.flush();
       return out;
     }
 
