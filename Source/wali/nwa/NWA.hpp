@@ -976,14 +976,14 @@ namespace wali
      * TODO: write comments
      */
     //void intersectClientInfo( StName name1, StName name2, StName result );
-    void intersectClientInfo( const St * const name1, 
+    virtual void intersectClientInfo( const St * const name1, 
                               const St * const name2, 
                               const StName &result );
     /**
      * TODO: write comments
      */
     //void intersectClientInfoCall( Call call1, Call call2, StName result );  
-    void intersectClientInfoCall( const St * const call1, const St * const entry1, 
+    virtual void intersectClientInfoCall( const St * const call1, const St * const entry1, 
                                   const St * const call2, const St * const entry2, 
                                   const Sym &resSym,
                                   const StName &result );  
@@ -992,7 +992,7 @@ namespace wali
      * TODO: write comments
      */
     //void intersectClientInfoInternal( Internal internal1, Internal internal2, StName result );
-    void intersectClientInfoInternal( const St *const src1, const St* const tgt1,
+    virtual void intersectClientInfoInternal( const St *const src1, const St* const tgt1,
                                       const St *const src2, const St* const tgt2,
                                       const Sym &resSym,
                                       const StName &result );
@@ -1006,7 +1006,7 @@ namespace wali
      * TODO: write comments
      */
     //void intersectClientInfoReturn( Return return1, Return return2, StName result );
-    void intersectClientInfoReturn( const St * const exit1, const St *const call1, const St *const ret1,
+    virtual void intersectClientInfoReturn( const St * const exit1, const St *const call1, const St *const ret1,
                                     const St * const exit2, const St *const call2, const St *const ret2,
                                     const Sym &resSym,
                                     const StName &result );
