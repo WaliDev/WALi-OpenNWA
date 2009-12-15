@@ -588,6 +588,11 @@ namespace wali
     template <typename St,typename StName> 
     void StateSet<St,StName>::clearInitialStates( )
     { 
+      for( iterator it = initialStates.begin(); it != initialStates.end(); it++ )
+      {
+        St * state = getState(*it);
+        state->unsetAsInitial();
+      }
       initialStates.clear();
     }    
     
@@ -687,6 +692,9 @@ namespace wali
       {
         addState(addInitialState);
       }
+
+      St * state = getState(addInitialState->getName());
+      state->setAsInitial( );
 
       initialStates.insert(addInitialState->getName());
       return true;
@@ -818,6 +826,10 @@ namespace wali
     {
       if( ! isInitialState(removeInitialState) )
         return false;
+
+      St * state = getState(removeInitialState->getName());
+      state->unsetAsInitial( );
+
       initialStates.erase(removeInitialState->getName());
       return true;
     }    

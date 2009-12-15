@@ -127,6 +127,9 @@ int main()
   myNWA.getPredecessorNames( "ret" );
   myNWA.duplicateState("call","call2");
 
+  assert(start.isInitial());
+  assert(!end.isInitial());
+
   myNWA.setClientInfo( "state", wali::ref_ptr<wali::nwa::ClientInfo>() );
   wali::ref_ptr<wali::nwa::ClientInfo> info = myNWA.getClientInfo( "state" );
   
@@ -192,7 +195,7 @@ int main()
   otherNWA = intersectNWA;
   otherNWA.isDeterministic();
   otherNWA.print(std::cout);
-  otherNWA.print_dot(std::cout);
+  otherNWA.print_dot(std::cout,"NWAdotfile");
 
   bool equal = myNWA.operator==(otherNWA);
   //myNWA.numStates();

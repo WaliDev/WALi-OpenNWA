@@ -150,6 +150,30 @@ namespace wali
        */
       void setClientInfo( const ClientInfoRefPtr c );
 
+      /** 
+       *
+       */
+      bool isInitial( )
+      {
+        return initial;
+      }
+
+      /**
+       *
+       */
+      void setAsInitial( )
+      {
+        initial = true;
+      }
+
+      /** 
+       *
+       */
+      void unsetAsInitial( )
+      {
+        initial = false;
+      }
+
       //Intersection of states
       /**
        *  TODO: move nodeIntersection back to here!
@@ -232,6 +256,7 @@ namespace wali
       Type stateType;
       Key stateKey;
       ref_ptr<ClientInfo> clientInfo; 
+      bool initial;
     };
 
     //Constructors
@@ -241,6 +266,7 @@ namespace wali
       name = T();
       stateType = Stuck;
       stateKey = wali::WALI_EPSILON;
+      initial = false;
     }
 
     template <typename T,typename Client>
@@ -249,6 +275,7 @@ namespace wali
       this->name = name;
       stateType = Ordinary;
       stateKey = wali::getKey(name);
+      initial = false;
     }
     /* TODO */
     template <typename T,typename Client>
@@ -261,6 +288,8 @@ namespace wali
         name = other.name;
         stateType = other.stateType;
         stateKey = other.stateKey;
+        clientInfo = other.clientInfo;
+        initial = other.initial;
       //} 
     }
     /* TODO */
@@ -276,6 +305,8 @@ namespace wali
         name = other.name;
         stateType = other.stateType;
         stateKey = other.stateKey;
+        clientInfo = other.clientInfo;
+        initial = other.initial;
       //}    
       return *this;
     }
