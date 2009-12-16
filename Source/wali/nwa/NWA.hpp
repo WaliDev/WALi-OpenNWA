@@ -1625,16 +1625,18 @@ namespace wali
     {
       St* state = getState(name);
       std::set<StName> predNames;
-      
-      for( internalIterator it = trans->getTransTo(state).begin(); it != trans->getTransTo(state).end(); it++ )
+      std::set<Internal> internalset = trans->getTransTo(state);
+      for( internalIterator it = internalset.begin(); it != internalset.end(); it++ )
       {
         predNames.insert(it->first);
       }
-      for( callIterator ct = trans->getTransEntry(state).begin(); ct != trans->getTransEntry(state).end(); ct++ )
+      std::set<Call> callset = trans->getTransEntry(state);
+      for( callIterator ct = callset.begin(); ct != callset.end(); ct++ )
       {
         predNames.insert(ct->first);
       }
-      for( returnIterator rt = trans->getTransRet(state).begin(); rt != trans->getTransRet(state).end(); rt++ )
+      std::set<Return> retset = trans->getTransRet(state);
+      for( returnIterator rt = retset.begin(); rt != retset.end(); rt++ )
       {
         predNames.insert(rt->first);
       }
@@ -6711,20 +6713,19 @@ for(std::set<StName>::const_iterator it = finals.begin(); it!=finals.end(); it++
     {
       St* state = getState(name);
       std::set<Key> predNames;
-      
-      for( internalIterator it = trans->getTransTo(*state).begin(); it != trans->getTransTo(*state).end(); it++ )
+      std::set<Internal> internalset = trans->getTransTo(*state);
+      for( internalIterator it = internalset.begin(); it != internalset.end(); it++ )
       {
-        //predNames.insert(it->first->getName());
         predNames.insert(it->first.getName());
       }
-      for( callIterator ct = trans->getTransEntry(*state).begin(); ct != trans->getTransEntry(*state).end(); ct++ )
+      std::set<Call> callset = trans->getTransEntry(*state);
+      for( callIterator ct = callset.begin(); ct != callset.end(); ct++ )
       {
-        //predNames.insert(ct->first->getName());
         predNames.insert(ct->first.getName());
       }
-      for( returnIterator rt = trans->getTransRet(*state).begin(); rt != trans->getTransRet(*state).end(); rt++ )
+      std::set<Return> retset = trans->getTransRet(*state);
+      for( returnIterator rt = retset.begin(); rt != retset.end(); rt++ )
       {
-        //predNames.insert(rt->first->getName());
         predNames.insert(rt->first.getName());
       }
       return predNames;
