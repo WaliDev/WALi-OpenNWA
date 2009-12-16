@@ -153,7 +153,7 @@ namespace wali
       /** 
        *
        */
-      bool isInitial( )
+      bool isInitial( ) const
       {
         return initial;
       }
