@@ -1113,7 +1113,7 @@ namespace wali
       for( Info::Returns::const_iterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( it->fourth == returnSite->getName() )
-          calls.insert(it->first);
+          calls.insert(it->second);
       }
       return calls;
     }
