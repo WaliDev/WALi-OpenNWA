@@ -1148,6 +1148,7 @@ namespace wali
         Internal iTrans = Internal(it->first,it->second,dup->getName());
         addInternal(iTrans);
       }
+
       //Duplicate call site call transitions.
       const Info::Calls call = T_info.callTrans(orig);
       for( Info::Calls::const_iterator it = call.begin(); it != call.end(); it++ )
