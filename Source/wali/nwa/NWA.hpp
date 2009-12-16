@@ -3800,7 +3800,7 @@ namespace wali
               resSt = pairToStMap[tgtPair];
             }
             result.intersectClientInfoReturn( getState(fit->first), getState(fit->second), getState(fit->fourth),
-                                              other.getState(fit->first), other.getState(fit->second), other.getState(fit->fourth),
+                                              other.getState(sit->first), other.getState(sit->second), other.getState(sit->fourth),
                                               resSym,
                                               resSt->getName());   //Intersect Return Trans client info.
             result.addReturnTrans(pairToStMap[currpair], predSt, resSym, resSt);
