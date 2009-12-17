@@ -186,7 +186,25 @@ namespace wali
        *
        */    
       std::set<StName> getPredecessorNames( const StName & name ) const;
-      
+
+      /**
+       * 
+       * @brief duplicates the original state, but only duplicates outgoing transitions
+       *
+       * This method assigns to the duplicate state all the state properties
+       * of the original state and duplicates all outgoing transitions of the original
+       * state for the duplicate state.  Further, any self-loop outgoing transitions
+       * that the original state are not only duplicated as self-loop transitions
+       * for the duplicate state, but the duplicate state also has transitions
+       * to the original state for each such transition.
+       *
+       * @param - orig: the name of the original state, i.e. the state to duplicate
+       * @param - dup: the name of the duplicate state
+       * @return a pointer to the newly created duplicate state
+       *
+       */
+      St* duplicateStateOutgoing( const StName & orig, const StName & dup );
+
       /**
        * 
        * @brief duplicates the original state
@@ -1641,6 +1659,30 @@ namespace wali
         predNames.insert(rt->first);
       }
       return predNames;
+    }
+
+    
+    /**
+     * 
+     * @brief duplicates the original state
+     *
+     * @param - orig: the name of the original state, i.e. the state to duplicate
+     * @param - dup: the name of the duplicate state
+     * @return a pointer to the newly created duplicate state
+     *
+     */
+    template <typename St,typename StName,typename Sym>
+    St * NWA<St,StName,Sym>::duplicateStateOutgoing( const StName & orig, const StName & dup )
+    {
+      St * origSt = getState(orig);
+      St * dupSt = new St(dup);
+
+      states.addState(dupSt);
+      states.dupState(origSt,dupSt); //duplicate state characteristics
+
+      trans->dupTransOutgoing(origSt,dupSt); //duplicate transitions for the original state
+
+      return dupSt;
     }
 
     /**

@@ -118,6 +118,19 @@ namespace wali
 
       /**
        *  
+       * @brief creates transitions for 'dup' mirroring 'orig' outgoing transitions
+       *
+       * This method creates a transition using 'dup' in the place of 'orig' for
+       * each outgoing transition involving 'orig'.  Do not duplicate selfloops.
+       *
+       * @param - orig: the state that is being duplicated
+       * @param - dup: the state that is duplicating 'orig'
+       *  
+       */
+      void dupTransOutgoing( const St * orig, const St * dup );
+
+      /**
+       *  
        * @brief creates transitions for 'dup' mirroring 'orig' transitions
        *
        * This method creates a transition using 'dup' in the place of 'orig' for
@@ -1117,6 +1130,51 @@ namespace wali
       }
       return calls;
     }
+
+  /**
+     *  
+     * @brief creates transitions for 'dup' mirroring 'orig' outgoing transitions
+     *
+     * @param - orig: the state that is being duplicated
+     * @param - dup: the state that is duplicating 'orig'
+     *  
+     */
+    template <typename St,typename Sym,typename Call,typename Internal,typename Return>
+    void TransSet<St,Sym,Call,Internal,Return>::dupTransOutgoing( const St * orig, const St * dup )
+    { 
+      //Duplicate outgoing internal transitions.
+      const Info::Internals from = T_info.fromTrans(orig);
+      for( Info::Internals::const_iterator it = from.begin(); it != from.end(); it++ )
+      {
+        Internal iTrans = Internal(dup->getName(),it->second,it->third);
+        addInternal(iTrans);
+
+      }
+      //Duplicate call site call transitions.
+      const Info::Calls call = T_info.callTrans(orig);
+      for( Info::Calls::const_iterator it = call.begin(); it != call.end(); it++ )
+      {
+        Call cTrans = Call(dup->getName(),it->second,it->third);
+        addCall(cTrans);
+
+      }
+      //Duplicate exit point return transitions.
+      const Info::Returns exit = T_info.exitTrans(orig);
+      for( Info::Returns::const_iterator it = exit.begin(); it != exit.end(); it++ )
+      {
+        Return rTrans = Return(dup->getName(),it->second,it->third,it->fourth);
+        addReturn(rTrans);
+      }
+      //Duplicate call predecessor return transitions.
+      const Info::Returns pred = T_info.predTrans(orig);
+      for( Info::Returns::const_iterator it = pred.begin(); it != pred.end(); it++ )
+      {
+        Return rTrans = Return(it->first,dup->getName(),it->third,it->fourth);
+        addReturn(rTrans);
+      }
+    }
+
+
 
     /**
      *  
