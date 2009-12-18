@@ -104,6 +104,20 @@ namespace wali
 
       /**
        * 
+       * @brief returns all return sites that correspond with the given exit and call site
+       *
+       * This method returns the set of all return sites that correspond with the
+       * given exit and call site.
+       *
+       * @param - exit: the exit whose return sites to look for
+       * @param - callSite: the call site whose return sites to look for
+       * @return the set of all return sites that correspond with the given exit and call site
+       *
+       */
+      const std::set<Return> getReturns( const St * exit, const St * callSite ) const;
+
+      /**
+       * 
        * @brief returns all call sites that correspond with the given exit - return site pair
        *
        * This method returns the set of all call sites that correspond with the given
@@ -115,6 +129,32 @@ namespace wali
        *
        */
       std::set<St> getCallSites( const St * exitSite, const St * returnSite ) const;
+
+      /**
+       * 
+       * @brief returns all entry sites that correspond with the given call site
+       *
+       * This method returns the set of all entry sites that correspond with the
+       * given call site.
+       *
+       * @param - callSite: the call site whose entry sites to look for
+       * @return the set of all entry sites that correspond with the given call site
+       *
+       */
+      const std::set<Call> getEntries( const St * callSite ) const;
+
+      /**
+       * 
+       * @brief returns all targets that correspond with the given source 
+       *
+       * This method returns the set of all targets that correspond with the 
+       * given source .
+       *
+       * @param - source: the source whose targets to look for
+       * @return the set of all targets that correspond with the given source 
+       *
+       */
+      const std::set<Internal> getTargets( const St * source ) const;
 
       /**
        *  
@@ -1111,6 +1151,28 @@ namespace wali
 
     /**
      * 
+     * @brief returns all return sites that correspond with the given exit and call site
+     *
+     * @param - exit: the exit whose return sites to look for
+     * @param - callSite: the call site whose return sites to look for
+     * @return the set of all return sites that correspond with the given call site
+     *
+     */
+    template <typename St,typename Sym,typename Call,typename Internal,typename Return>
+    const std::set<typename Return> TransSet<St,Sym,Call,Internal,Return>::getReturns( const St * exit, const St * callSite ) const
+    {
+      std::set<Return> returns;
+      const Info::Returns pred = T_info.predTrans(callSite);
+      for( Info::Returns::const_iterator it = pred.begin(); it != pred.end(); it++ )
+      {
+        if( it->first == exit->getName() )
+          returns.insert(*it);
+      }
+      return returns;
+    }
+
+    /**
+     * 
      * @brief returns all call sites that correspond with the given exit - return site pair
      *
      * @param - exitSite: the exit of the pair whose call sites to look for
@@ -1129,6 +1191,46 @@ namespace wali
           calls.insert(it->second);
       }
       return calls;
+    }
+
+    /**
+     * 
+     * @brief returns all entry sites that correspond with the given call site
+     *
+     * @param - callSite: the call site whose entry sites to look for
+     * @return the set of all entry sites that correspond with the given call site
+     *
+     */
+    template <typename St,typename Sym,typename Call,typename Internal,typename Return>
+    const std::set<typename Call> TransSet<St,Sym,Call,Internal,Return>::getEntries( const St * callSite ) const
+    {
+      std::set<Call> entries;
+      const Info::Calls cll = T_info.callTrans(callSite);
+      for( Info::Calls::const_iterator it = cll.begin(); it != cll.end(); it++ )
+      {
+        entries.insert(*it);
+      }
+      return entries;
+    }
+
+    /**
+     * 
+     * @brief returns all targets that correspond with the given source 
+     *
+     * @param - source: the source whose targets to look for
+     * @return the set of all targets that correspond with the given source 
+     *
+     */
+    template <typename St,typename Sym,typename Call,typename Internal,typename Return>
+    const std::set<typename Internal> TransSet<St,Sym,Call,Internal,Return>::getTargets( const St * source ) const
+    {
+      std::set<Internal> targets;
+      const Info::Internals src = T_info.fromTrans(source);
+      for( Info::Internals::const_iterator it = src.begin(); it != src.end(); it++ )
+      {
+        targets.insert(*it);
+      }
+      return targets;
     }
 
   /**

@@ -607,6 +607,11 @@ namespace wali
       /**
        * TODO: write comments
        */
+      const std::set<std::pair<Sym,StName>> getEntries( StName callSite ) const;
+
+      /**
+       * TODO: write comments
+       */
       bool addCallTrans( StName from, const Sym & sym, StName to );
 
       /**
@@ -688,6 +693,11 @@ namespace wali
        *
        */
       //const Internals & getInternalTrans( );
+
+      /**
+       * TODO: write comments
+       */
+      const std::set<std::pair<Sym,StName>> getTargets( StName source ) const;
 
       /**
        * TODO: write comments
@@ -778,6 +788,11 @@ namespace wali
        * TODO: write comments
        */
       std::set<StName> getReturnSites( StName callSite ) const;
+
+      /**
+       * TODO: write comments
+       */
+      const std::set<std::pair<Sym,StName>> getReturns( StName exit, StName callSite ) const;
 
       /**
        * TODO: write comments
@@ -2325,6 +2340,24 @@ namespace wali
      * TODO: write comments
      */
     template <typename St,typename StName,typename Sym>
+    const std::set<std::pair<Sym,StName>> NWA<St,StName,Sym>::getEntries( StName callSite ) const
+    {
+      St * callSiteSt = getState(callSite);
+
+      const std::set<Call> ent = trans->getEntries(callSiteSt);
+      std::set<std::pair<Sym,StName>> entries;
+      for( std::set<Call>::const_iterator it = ent.begin(); it != ent.end(); it++ )
+      {
+        entries.insert(std::pair<Sym,StName>(it->second,it->third));
+      }
+
+      return entries;
+    }
+
+    /**
+     * TODO: write comments
+     */
+    template <typename St,typename StName,typename Sym>
     bool NWA<St,StName,Sym>::addCallTrans( StName from, const Sym & sym, StName to )
     {
       St * fromSt = getState(from);
@@ -2491,6 +2524,24 @@ namespace wali
     {
       return trans->getInternals();
     }*/
+
+    /**
+     * TODO: write comments
+     */
+    template <typename St,typename StName,typename Sym>
+    const std::set<std::pair<Sym,StName>> NWA<St,StName,Sym>::getTargets( StName source ) const
+    {
+      St * sourceSt = getState(source);
+
+      const std::set<Internal> tgt = trans->getTargets(sourceSt);
+      std::set<std::pair<Sym,StName>> targets;
+      for( std::set<Internal>::const_iterator it = tgt.begin(); it != tgt.end(); it++ )
+      {
+        targets.insert(std::pair<Sym,StName>(it->second,it->third));
+      }
+
+      return targets;
+    }
 
     /**
      * TODO: write comments
@@ -2677,6 +2728,25 @@ namespace wali
         rets.insert(it->getName());
       }
       return rets;
+    }
+
+    /**
+     * TODO: write comments
+     */
+    template <typename St,typename StName,typename Sym>
+    const std::set<std::pair<Sym,StName>> NWA<St,StName,Sym>::getReturns( StName exit, StName callSite ) const
+    {
+      St * exitSt = getState(exit);
+      St * callSiteSt = getState(callSite);
+
+      const std::set<Return> ret = trans->getReturns(exitSt,callSiteSt);
+      std::set<std::pair<Sym,StName>> returns;
+      for( std::set<Return>::const_iterator it = ret.begin(); it != ret.end(); it++ )
+      {
+        returns.insert(std::pair<Sym,StName>(it->third,it->fourth));
+      }
+
+      return returns;
     }
 
     /**

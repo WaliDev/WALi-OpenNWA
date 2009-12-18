@@ -182,6 +182,10 @@ int main()
   myNWA.getSymbol("call","entry",sym);
   myNWA.findTrans("call",sym,"entry");
   myNWA.getReturnSites("call");
+
+  myNWA.getTargets("state");
+  myNWA.getEntries("call");
+  myNWA.getReturns("exit","call");
   
   myNWA.print(std::cout);
   
