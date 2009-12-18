@@ -5160,16 +5160,18 @@ namespace wali
       out << "        label = \"Key\";\n";
       out << "        style=filled;\n";
       out << "        color=white;\n";
+      out << "        dummy [shape=box];";
       out << "        call -> entry [color=green];\n";
-      out << "        call -> return [color=blue];\n";
-      out << "        exit -> return [color=red];\n";
+      out << "        call -> dummy [color=blue];\n";
+      out << "        exit -> dummy [color=red];\n";
+      out << "        dummy -> return [style=dashed];\n";
       out << "    }\n";
       // initial state
       St *st = getState( getInitialState() );
       st->print(out << "\"") <<"\" [ style=bold ]";
       // final states
-std::set<StName> finals = getFinalStates();
-for(std::set<StName>::const_iterator it = finals.begin(); it!=finals.end(); it++) {
+      std::set<StName> finals = getFinalStates();
+      for(std::set<StName>::const_iterator it = finals.begin(); it!=finals.end(); it++) {
         St *st = getState( *it );
         st->print(out << "\"") <<"\" [ peripheries=2 ]";
       }
