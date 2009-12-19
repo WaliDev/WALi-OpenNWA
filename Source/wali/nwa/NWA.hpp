@@ -3878,7 +3878,7 @@ namespace wali
               if(!result.nodeIntersect( getState( thisRet ), other.getState(otherRet), retSt)) 
                 continue;
               // We have found a new state in retSt!
-              if(this->isFinalState(getState(thisRet)) && other.isFinalState(getState(otherRet)))
+              if(this->isFinalState(getState(thisRet)) && other.isFinalState(other.getState(otherRet)))
                 result.addFinalState(retSt);
               else
                 result.addState(retSt);
@@ -3935,7 +3935,7 @@ namespace wali
               if(!result.nodeIntersect( getState( thisRet ), other.getState(otherRet), retSt)) 
                 continue;
               // We have a new state in retSt!
-              if(this->isFinalState(getState(thisRet)) && other.isFinalState(getState(otherRet)))
+              if(this->isFinalState(getState(thisRet)) && other.isFinalState(other.getState(otherRet)))
                 result.addFinalState(retSt);
               else
                 result.addState(retSt);
