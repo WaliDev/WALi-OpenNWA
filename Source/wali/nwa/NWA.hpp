@@ -3712,14 +3712,14 @@ namespace wali
       if( absentAcceptance && other.absentAcceptance )
         result.acceptAbsent();
 
-      std::set<StatePair> visitedPairs; // All the pairs of states we have ever encountered
+      std::set<StatePair> visitedPairs; // All the pairs of states we have ever encountered, whether they are intersectable or not
       std::deque<StatePair> worklistPairs; // Pairs of states yet to be processed
       typedef std::map<StatePair, St*> PairStMap;
-      PairStMap pairToStMap; /* The corresponding state in the product 
-                              * for all intersectable pairs encountered*/
+      PairStMap pairToStMap; // The corresponding state in the product 
+                             // for all intersectable pairs encountered
 
       //Start the worklist with all possible initial states of the intersection NWA.
-      //NOTE: Currently this should be just one state (the join of the single initial state of each machine).
+      //NOTE: Currently this should be just one state (the product of the single initial states of each machine).
       for( stateIterator fit = beginInitialStates(); fit != endInitialStates(); fit++ ) {
         for( stateIterator sit = other.beginInitialStates(); sit != other.endInitialStates(); sit++ ) {
           St * newSt;
@@ -3758,8 +3758,7 @@ namespace wali
             StName otherTgt = sit->third;
             StatePair tgtPair(thisTgt, otherTgt);
             
-            // This is to ensure that we don't call intersectNode multiple times on the
-            // same pair 
+            // If we have already considered tgtPair and found them to be nonintersectable, continue 
             if( visitedPairs.count(tgtPair) != 0 && pairToStMap.count(tgtPair)==0)
               continue;
             visitedPairs.insert(tgtPair);
@@ -3807,9 +3806,8 @@ namespace wali
 
             StName otherTgt = sit->third;
             StatePair tgtPair(thisTgt, otherTgt);
-            
-            // This is to ensure that we don't call intersectNode multiple times on the
-            // same pair 
+
+            // If we have already considered tgtPair and found its elements to be nonintersectable, continue 
             if( visitedPairs.count(tgtPair) != 0 && pairToStMap.count(tgtPair)==0)
               continue;
             visitedPairs.insert(tgtPair);
@@ -3840,13 +3838,14 @@ namespace wali
           }
         }
         
-        //Process outgoing return transitions
+        // Process outgoing return transitions where currpair.first and currpair.second are
+        // both exit components of the respective return transitions
         Returns thisReturns = trans->getTransExit(getState(currpair.first));
         Returns otherReturns = other.trans->getTransExit(other.getState(currpair.second));
         for(Returns::const_iterator fit = thisReturns.begin(); fit!=thisReturns.end(); fit++) {
-          StName thisPred = fit->second;
+          StName thisCall = fit->second;
           Sym thisSym = fit->third;
-          StName thisTgt = fit->fourth;
+          StName thisRet = fit->fourth;
           for(Returns::const_iterator sit = otherReturns.begin(); sit!=otherReturns.end(); sit++) {
             Sym otherSym = sit->third;
             // Are the symbols intersectable
@@ -3854,70 +3853,102 @@ namespace wali
             if( !result.edgeIntersect(thisSym, otherSym, resSym) ) 
               continue; // Symbols not intersectable, do nothing
 
-            //Predecessor
-            StName otherPred = sit->second;
-            StatePair predPair(thisPred, otherPred);
-            
-            // This is to ensure that we don't call intersectNode multiple times on the
-            // same pair 
-            if( visitedPairs.count(predPair) != 0 && pairToStMap.count(predPair)==0)
+            // Check intersectability and visited status of the respective call components
+            StName otherCall = sit->second;
+            StatePair callPair(thisCall, otherCall);  // Call components of the respective return transitions
+            // Proceed only if the pair of call components has already been visited 
+            if(visitedPairs.count(callPair) == 0)
               continue;
-            visitedPairs.insert(predPair);    //Technically this should already have been seen, but just in case.
-
-            St * predSt;
-            assert(pairToStMap.count(predPair)!=0);
-            // Have we seen tgtPair before?
-            //if(pairToStMap.count(predPair)==0) { 
-              ////We have not seen this pair before
-              //// Are the tgt nodes intersectable?
-              //if(!result.nodeIntersect(thisPred, otherPred, predSt)) 
-              //  continue;
-              //// We have a new state in resSt!
-              //            result.intersectClientInfoPred(*fit,*sit,predSt->getName());   //Intersect Return Trans client info for pred.???
-              //if(this->isFinalState(getState(thisPred)) && other.isFinalState(getState(otherPred)))
-              //  result.addFinalState(predSt);
-              //else
-              //  result.addState(predSt);
-              //pairToStMap[predPair] = predSt;
-              //worklistPairs.push_back(predPair);
-            //} else { 
-              // we have already seen this pair before
-              predSt = pairToStMap[predPair];
-            //}
-
-            //Return
-            StName otherTgt = sit->fourth;
-            StatePair tgtPair(thisTgt, otherTgt);
-            
-            // This is to ensure that we don't call intersectNode multiple times on the
-            // same pair 
-            if( visitedPairs.count(tgtPair) != 0 && pairToStMap.count(tgtPair)==0)
+            // If we have already considered callPair and found its elements to be nonintersectable, continue 
+            if( visitedPairs.count(callPair) != 0 && pairToStMap.count(callPair)==0)
               continue;
-            visitedPairs.insert(tgtPair);
+            St * callSt = pairToStMap[callPair];
 
-            St * resSt;
-            // Have we seen tgtPair before?
-            if(pairToStMap.count(tgtPair)==0) { 
-              //We have not seen this pair before
-              // Are the tgt nodes intersectable?
-              if(!result.nodeIntersect( getState( thisTgt ), other.getState(otherTgt), resSt)) 
+            // Check intersectability and visited status of the respective return components
+            StName otherRet = sit->fourth;
+            StatePair retPair(thisRet, otherRet);
+            // If we have already considered retPair and found its elements to be nonintersectable, continue 
+            if( visitedPairs.count(retPair) != 0 && pairToStMap.count(retPair)==0)
+              continue;
+            visitedPairs.insert(retPair);
+
+            St * retSt;
+            // Are the return components intersectable?
+            if(pairToStMap.count(retPair)==0) { // Don't know yet
+              if(!result.nodeIntersect( getState( thisRet ), other.getState(otherRet), retSt)) 
                 continue;
-              // We have a new state in resSt!
-              if(this->isFinalState(getState(thisTgt)) && other.isFinalState(getState(otherTgt)))
-                result.addFinalState(resSt);
+              // We have found a new state in retSt!
+              if(this->isFinalState(getState(thisRet)) && other.isFinalState(getState(otherRet)))
+                result.addFinalState(retSt);
               else
-                result.addState(resSt);
-              pairToStMap[tgtPair] = resSt;
-              worklistPairs.push_back(tgtPair);
-            } else { 
-              // we have already seen this pair before
-              resSt = pairToStMap[tgtPair];
+                result.addState(retSt);
+              pairToStMap[retPair] = retSt;
+              worklistPairs.push_back(retPair);
+            } else {  // We have already seen retPair before and its components are intersectable
+              retSt = pairToStMap[retPair];
             }
             result.intersectClientInfoReturn( getState(fit->first), getState(fit->second), getState(fit->fourth),
                                               other.getState(sit->first), other.getState(sit->second), other.getState(sit->fourth),
                                               resSym,
-                                              resSt->getName());   //Intersect Return Trans client info.
-            result.addReturnTrans(pairToStMap[currpair], predSt, resSym, resSt);
+                                              retSt->getName());   //Intersect Return Trans client info.
+            result.addReturnTrans(pairToStMap[currpair], callSt, resSym, retSt);
+          }
+        }
+
+        // Process outgoing return transitions where currpair.first and currpair.second are
+        // both call components of the respective return transitions 
+        thisReturns = trans->getTransPred(getState(currpair.first));
+        otherReturns = other.trans->getTransPred(other.getState(currpair.second));
+        for(Returns::const_iterator fit = thisReturns.begin(); fit!=thisReturns.end(); fit++) {
+          StName thisExit = fit->first;
+          Sym thisSym = fit->third;
+          StName thisRet = fit->fourth;
+          for(Returns::const_iterator sit = otherReturns.begin(); sit!=otherReturns.end(); sit++) {
+            Sym otherSym = sit->third;
+            // Are the symbols intersectable
+            Sym resSym;
+            if( !result.edgeIntersect(thisSym, otherSym, resSym) ) 
+              continue; // Symbols not intersectable, do nothing
+
+            // Check intersectability and visited status of the respective exit components
+            StName otherExit = sit->first;
+            StatePair exitPair(thisExit, otherExit);  // Exit components of the respective return transitions
+            // Proceed only if the pair of exit components has already been visited 
+            if(visitedPairs.count(exitPair) == 0)
+              continue;
+            // If we have already considered exitPair and found its elements to be nonintersectable, continue 
+            if( visitedPairs.count(exitPair) != 0 && pairToStMap.count(exitPair)==0)
+              continue;
+            St * exitSt = pairToStMap[exitPair];
+
+            // Check intersectability and visited status of the respective return components
+            StName otherRet = sit->fourth;
+            StatePair retPair(thisRet, otherRet);
+            // If we have already considered retPair and found its elements to be nonintersectable, continue 
+            if( visitedPairs.count(retPair) != 0 && pairToStMap.count(retPair)==0)
+              continue;
+            visitedPairs.insert(retPair);
+
+            St * retSt;
+            //  Are the return components intersectable?
+            if(pairToStMap.count(retPair)==0) { //Don't know yet
+              if(!result.nodeIntersect( getState( thisRet ), other.getState(otherRet), retSt)) 
+                continue;
+              // We have a new state in retSt!
+              if(this->isFinalState(getState(thisRet)) && other.isFinalState(getState(otherRet)))
+                result.addFinalState(retSt);
+              else
+                result.addState(retSt);
+              pairToStMap[retPair] = retSt;
+              worklistPairs.push_back(retPair);
+            } else { //  We have already seen retPair before and its components are intersectable
+              retSt = pairToStMap[retPair];
+            }
+            result.intersectClientInfoReturn( getState(fit->first), getState(fit->second), getState(fit->fourth),
+                                              other.getState(sit->first), other.getState(sit->second), other.getState(sit->fourth),
+                                              resSym,
+                                              retSt->getName());   //Intersect Return Trans client info.
+            result.addReturnTrans(exitSt, pairToStMap[currpair], resSym, retSt);
           }
         }
 
