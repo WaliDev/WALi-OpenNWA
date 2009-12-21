@@ -3,6 +3,7 @@
 ## ####################################
 ## Third party users of WALi should 
 ## duplicate the setup code below.
+## TODO: move setup code to an include file
 import os, os.path, platform
 
 Debug = True
