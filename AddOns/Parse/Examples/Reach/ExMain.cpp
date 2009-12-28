@@ -17,11 +17,21 @@
 
 #include "wali/util/ParseArgv.hpp"
 
+#include "wali/regex/Regex.hpp"
+
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/util/TransService.hpp>
 #include <xercesc/sax2/SAX2XMLReader.hpp>
 #include <xercesc/sax2/XMLReaderFactory.hpp>
 #include <xercesc/util/OutOfMemoryException.hpp>
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+using std::cout;
+using std::cerr;
+using std::endl;
 
 XERCES_CPP_NAMESPACE_USE
 
@@ -51,7 +61,8 @@ int main( int argc, char** argv )
     rc |= parseWpds(fname);
   }
   if( parser.get("--wfa",fname) ) {
-    rc |= parseWfa(fname);
+      cerr << "Parsing wfa file : " << fname << endl;
+      rc |= parseWfa(fname);
   }
   if( parser.get("--query",fname) ) {
     rc |= parseQuery(fname);
@@ -72,11 +83,20 @@ int parseWpds( std::string& xmlFile )
 
 int parseWfa( std::string& xmlFile )
 {
-  Reach wf(true);
-  wali::UserFactoryHandler ufh(&wf,NULL);
-  wali::wfa::WfaHandler handler(ufh);
-  int rc = parseFile(handler,xmlFile);
-  handler.get().print( std::cout );
+    Reach wf(true);
+    wali::UserFactoryHandler ufh(&wf,NULL);
+    wali::wfa::WfaHandler handler(ufh);
+    int rc = parseFile(handler,xmlFile);
+    wali::wfa::WFA& wfa=handler.get();
+    wfa.print( std::cout );
+    // Run path summary
+    wali::regex::regex_t re = wfa.toRegex();
+    std::ofstream of((xmlFile + ".dot").c_str());
+    if (of.is_open())
+    {
+        re->write_dot(of);
+        of.close();
+    }
   return rc;
 }
 
