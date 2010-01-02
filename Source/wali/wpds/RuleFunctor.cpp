@@ -52,6 +52,7 @@ namespace wali
       addPoint(r->to_stack2(), returnPoints);
       if(r->to_stack2() != WALI_EPSILON) {
         addPoint(r->to_stack1(), entryPoints);
+        addPoint(r->from_stack(), callPoints);
       }
     }
 

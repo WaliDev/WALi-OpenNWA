@@ -89,6 +89,7 @@ namespace wali
     {
       public:
         std::set< Key > gamma;
+        std::set< Key > callPoints;
         std::set< Key > returnPoints;
         std::set< Key > entryPoints;
         std::set< Key > pdsStates;
