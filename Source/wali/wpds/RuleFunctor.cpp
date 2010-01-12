@@ -48,8 +48,8 @@ namespace wali
       addPoint(r->to_state(), pdsStates);
       addPoint(r->from_stack(), gamma);
       addPoint(r->to_stack1(), gamma);
-      addPoint(r->to_stack2(), gamma);
       if(r->to_stack2() != WALI_EPSILON) {
+        addPoint(r->to_stack2(), gamma);
         addPoint(r->to_stack1(), entryPoints);
         addPoint(r->from_stack(), callPoints);
         addPoint(r->to_stack2(), returnPoints);
