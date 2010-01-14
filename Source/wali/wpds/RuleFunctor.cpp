@@ -47,7 +47,11 @@ namespace wali
       addPoint(r->from_state(), pdsStates);
       addPoint(r->to_state(), pdsStates);
       addPoint(r->from_stack(), gamma);
-      addPoint(r->to_stack1(), gamma);
+      // Is it an non-exit rule?
+      if(r->to_stack1() != WALI_EPSILON) {
+        addPoint(r->to_stack1(), gamma);
+      }
+      // Is it a call rule?
       if(r->to_stack2() != WALI_EPSILON) {
         addPoint(r->to_stack2(), gamma);
         addPoint(r->to_stack1(), entryPoints);
