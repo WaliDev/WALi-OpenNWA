@@ -4716,9 +4716,12 @@ namespace wali
       //Call Transitions
       for( callIterator cit = trans->beginCall(); cit != trans->endCall(); cit++ )
       {
+        bool hasReturn = false; //Does this call have any associated return transitions? AMB 1-15-10
         for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+        {
           if( cit->first == rit->second )
           {
+            hasReturn = true; //This call has at least one associated return transition. AMB 1-15-10
             //for each return site with cit->first as call site ...
             //Key ret = getKey(rit->fourth.getStateKey(),rit->fourth.getStateKey()); // (r,r)
             //calls.insert(std::pair<Key,Key>(cit->first.getStateKey(),ret));
@@ -4743,7 +4746,28 @@ namespace wali
                             //ret,                    //to_stack2 (r')
                             getState(rit->fourth)->getStateKey(),  //to_stack2 (r')
                             wgt);                   //weight  
-          }  
+          } 
+        }
+        if(!hasReturn) //Account for calls having no return transitions. AMB 1-15-10
+        {
+          //(q_c,sigma,q_e) in delta_c with no (*,q_c,*,*) in delta_r goes to
+          // <p,q_c> -w-> <p,q_e> in delta_1 
+          // where the weight w depends on sigma
+
+          if( cit->second.isWild() )
+            wgt = wg.getWildWeight(*getState(cit->first),*getState(cit->third));
+          else
+            wgt = wg.getWeight(*getState(cit->first),
+                                cit->second,
+                                WeightGen<St,Sym>::CALL_TO_ENTRY,
+                                *getState(cit->third));
+          
+          result.add_rule(program,                   //from_state (p)
+                          getState(cit->first)->getStateKey(),  //from_stack (q_c)
+                          program,                  //to_state (p)
+                          getState(cit->third)->getStateKey(),  //to_stack1 (q_e)
+                          wgt);
+        }
       }
 
       //Return Transitions
