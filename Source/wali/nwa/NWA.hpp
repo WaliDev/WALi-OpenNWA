@@ -1091,7 +1091,7 @@ namespace wali
       /**
        *  TODO: write comments
        */
-      static wali::Key getControlLocation( const St & first, const St & second );     
+      static wali::Key getControlLocation( const St & exit, const St & call );     
 
       /**
        *
@@ -4666,9 +4666,9 @@ namespace wali
      *  TODO: write comments
      */
     template <typename St,typename StName,typename Sym>
-    wali::Key NWA<St,StName,Sym>::getControlLocation( const St & first, const St & second )
+    wali::Key NWA<St,StName,Sym>::getControlLocation( const St & exit, const St & call )
     {
-      return getKey(first.getStateKey(),second.getStateKey());
+      return getKey(exit.getStateKey(), call.getStateKey());
     }  
 
     /**
