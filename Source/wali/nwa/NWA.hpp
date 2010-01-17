@@ -4779,7 +4779,7 @@ namespace wali
         // where p_q_x = (q_x,q_c), r' = (q_r,q_r)
         // w1 depends on one, and w2 depends on sigma
 
-        wgt = wg.getOne();
+        wgt = wg.getExitWeight( getState(rit->first)->getStateKey() ); //wg.getOne();
 
         //Note: if you change this, make sure you modify the code in NWPForest.createCA()
         //Key rstate = getKey((*rit)->first->getStateKey(),(*rit)->second->getStateKey());  //p_q_x
