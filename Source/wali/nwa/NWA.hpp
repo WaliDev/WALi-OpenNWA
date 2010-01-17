@@ -4684,7 +4684,7 @@ namespace wali
       //TODO: how does this react to absentAcceptance???
       //NOTE: for now assume stuck state is rejecting
       wpds::WPDS result = wpds::WPDS();
-      std::map< Key,Key > calls;
+      //std::map< Key,Key > calls;
 
       //note: if you change this, make sure you modify the code in createCA as well
       //Key program = wali::getKey("program"); 
@@ -4725,7 +4725,8 @@ namespace wali
             //for each return site with cit->first as call site ...
             //Key ret = getKey(rit->fourth.getStateKey(),rit->fourth.getStateKey()); // (r,r)
             //calls.insert(std::pair<Key,Key>(cit->first.getStateKey(),ret));
-            calls.insert(std::pair<Key,Key>(getState(cit->first)->getStateKey(),getState(rit->fourth)->getStateKey()));
+            
+            //calls.insert(std::pair<Key,Key>(getState(cit->first)->getStateKey(),getState(rit->fourth)->getStateKey()));
 
             //(q_c,sigma,q_e) in delta_c and (*,q_c,*,q_r) in delta_r goes to
             // <p,q_c> -w-> <p,q_e r'> in delta_2 where r' = (q_r,q_r) (or q_r?)
@@ -4798,10 +4799,10 @@ namespace wali
                               WeightGen<St,Sym>::EXIT_TO_RET,  
                               *getState(rit->fourth));  
 
-        std::map<Key,Key>::iterator ret = calls.find(getState(rit->second)->getStateKey());
-        if( ret != calls.end() )          
+        //std::map<Key,Key>::iterator ret = calls.find(getState(rit->second)->getStateKey());
+        //if( ret != calls.end() )          
           result.add_rule(rstate,                   //from_state (p_q_x == (q_x,q_c))
-                          ret->second,    //from_stack (r')
+                          getState(rit->fourth)->getStateKey(),//ret->second,    //from_stack (r')
                           program,                  //to_state (p)
                           getState(rit->fourth)->getStateKey(),    //to_stack (q_r)
                           wgt);                     //weight    
