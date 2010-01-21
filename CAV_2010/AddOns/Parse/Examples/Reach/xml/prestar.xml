@@ -1,0 +1,21 @@
+<Query type='prestar'>
+  <WPDS>
+    <Rule from='p' fromStack='n6' to='p' toStack1='n7'><Weight /></Rule>
+    <Rule from='p' fromStack='n7' to='p' toStack1='n8'><Weight /></Rule>
+    <Rule from='p' fromStack='n4' to='p' toStack1='n6' toStack2='n5'><Weight /></Rule>
+    <Rule from='p' fromStack='n8' to='p' toStack1='n9'><Weight /></Rule>
+    <Rule from='p' fromStack='n3' to='p' toStack1='n4'><Weight /></Rule>
+    <Rule from='p' fromStack='n9' to='p'><Weight /></Rule>
+    <Rule from='p' fromStack='n2' to='p' toStack1='n4'><Weight /></Rule>
+    <Rule from='p' fromStack='n1' to='p' toStack1='n2'><Weight /></Rule>
+    <Rule from='p' fromStack='n1' to='p' toStack1='n3'><Weight /></Rule>
+    <Rule from='p' fromStack='n5' to='p'><Weight /></Rule>
+    <Rule from='p' fromStack='n0' to='p' toStack1='n1'><Weight /></Rule>
+  </WPDS>
+
+  <WFA query='INORDER'>
+    <State Name='p' initial='TRUE'><Weight>ZERO</Weight></State>
+    <State Name='accept' final='TRUE'><Weight>ZERO</Weight></State>
+    <Trans from='p' stack='n5' to='accept'><Weight /></Trans>
+  </WFA>
+</Query>

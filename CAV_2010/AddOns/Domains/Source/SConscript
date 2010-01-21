@@ -1,0 +1,39 @@
+# #############################
+# Build the walidomains library
+
+import os,platform
+
+Import('WaliDir')
+Import('LibInstallDir')
+Import('MkStatic')
+Import('BaseEnv')
+Import('Debug')
+
+if Debug:
+    print '\n+++ Entered "#/AddOns/Domains/Source/SConscript"\n'
+
+
+
+walidomains_files = Split("""
+./wali/domains/binrel/BinRel.cpp
+./wali/domains/reach/Reach.cpp
+./wali/domains/lh/LH.cpp
+./wali/domains/lh/PhaseLH.cpp
+""")
+
+Env = BaseEnv.Clone()
+Env.Append(CPPPATH=[os.path.join(WaliDir , 'AddOns', 'Domains' , 'Source')])
+Env.Append(CPPPATH=[os.path.join(WaliDir , 'AddOns', 'Domains' , 'ThirdParty', 'include')])
+
+
+if MkStatic:
+  walidomains = Env.StaticLibrary('walidomains' , walidomains_files)
+  i = Env.Install(LibInstallDir, walidomains)
+  built = i
+  Return('built')
+else:
+  walidomains = Env.SharedLibrary('walidomains' , walidomains_files)
+  i = Env.Install(LibInstallDir, walidomains)
+  built = i
+  Return('built')
+

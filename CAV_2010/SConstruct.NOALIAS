@@ -1,0 +1,76 @@
+# Build WALi library 
+
+## ####################################
+## Third party users of WALi should 
+## duplicate the setup code below.
+import os,platform
+import os,platform,platform
+
+(bits,linkage) = platform.architecture()
+## ####################
+## To distinguish 64 bit build and lib dirs,
+## enable this flag
+#Is64           = (False,True)[bits == '64bit']
+Is64           = False
+WaliDir        = os.getcwd()
+LibInstallDir  = os.path.join(WaliDir,('lib','lib64')[Is64])
+BuildDir       = os.path.join(WaliDir,('_build','_build64')[Is64])
+BaseEnv        = Environment()
+MkStatic       = platform.system() != 'Linux' 
+
+if 'gcc' == BaseEnv['CC']:
+    BaseEnv['CXXFLAGS'] = '-g -ggdb -Wall -Wformat=2 -W'
+elif 'cl' == BaseEnv['CC']:
+    # Mostly copied from VS C++ 2005 Command line
+    BaseEnv['CXXFLAGS'] = '/TP /errorReport:prompt /Wp64 /W4 /GR /MTd /EHsc'
+BaseEnv['CPPPATH'] = [ os.path.join(WaliDir , 'Source') ]
+
+Export('Is64')
+Export('WaliDir')
+Export('LibInstallDir')
+Export('BuildDir')
+Export('MkStatic')
+Export('BaseEnv')
+
+## Setup a default environment for building executables that use WALi
+ProgEnv = BaseEnv.Clone()
+ 
+if MkStatic:
+  ProgEnv['StaticLibs'] = [os.path.join(LibInstallDir,'libwali.a')]
+else:
+  ProgEnv['StaticLibs'] = []
+  ProgEnv['LIBS'] = ['wali']
+  ProgEnv['LIBPATH'] = [ LibInstallDir ]
+
+Export('ProgEnv')
+
+
+## ####################################
+## SCons 0.98 has a problem with 
+## invoking Environment.Alias().
+## The workaround is to just build
+## everything and remove command line
+## arguments.
+ 
+## ##################
+## libwali
+built = SConscript(
+  'Source/SConscript', 
+  build_dir=BuildDir,
+  duplicate=0)
+
+## ##################
+## All
+for d in ['AddOns','Examples','Tests']:
+  built += SConscript('%s/SConscript' % d)
+
+
+Help("""
+    There are no options for this build.
+    Simply typing `scons -f SConstruct.NOALIAS` will compile
+    and link libwali, libwaliparse, the Examples,
+    and the test programs. This can be controlled
+    by editing the list in the [for] loop that
+    is in this file on line 54.
+""")
+

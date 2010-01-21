@@ -1,0 +1,32 @@
+# Reachability example
+import os
+
+Import('Debug')
+Import('WaliDir')
+Import('ProgEnv')
+
+if Debug:
+    print '\n+++ Entered "#/Examples/GenKill"\n'
+    
+Env = ProgEnv.Clone()
+
+GenKillFiles=[ 'VarSet.cpp' ]
+
+## Note - Be sure to use 'CPPPATH=[ <some list> ]'
+Env.Append(CPPPATH=[os.path.join(WaliDir,'Examples','GenKill')])
+
+# LiveVar
+LiveFiles = GenKillFiles + [os.path.join('LiveVar','LiveVar.cpp')] + Env['StaticLibs']
+LiveVar = Env.Program('ExLiveVar', LiveFiles)
+lv = Env.InstallAs(os.path.join(WaliDir,'Examples','bin','ExLiveVar'), LiveVar)
+
+# UninitVar
+UninitFiles = GenKillFiles + [os.path.join('UninitVar','UninitVar.cpp')] + Env['StaticLibs']
+UninitVar = Env.Program('ExUninitVar', UninitFiles)
+ul = Env.InstallAs(os.path.join(WaliDir,'Examples','bin','ExUninitVar'), UninitVar)
+
+
+built = [lv, ul]
+
+Return('built')
+

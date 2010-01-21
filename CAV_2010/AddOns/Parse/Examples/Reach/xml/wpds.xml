@@ -1,0 +1,5 @@
+<WPDS>
+  <Rule from='p' fromStack='n1' to='p' toStack1='n2'>
+    <Weight>ONE</Weight>
+  </Rule>
+</WPDS>

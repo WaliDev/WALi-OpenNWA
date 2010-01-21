@@ -1,0 +1,22 @@
+# Reachability example
+import os
+
+Import('Debug')
+Import('WaliDir')
+Import('ProgEnv')
+
+if Debug:
+    print '\n+++ Entered "#/Examples/Reach/SConscript"\n'
+    
+ExReach = ProgEnv.Program('ExReach',
+                          ['Reach.cpp','ExReachWit.cpp'] + ProgEnv['StaticLibs'])
+
+built = [ProgEnv.Install(os.path.join(WaliDir,'Examples','bin'), ExReach)]
+
+ExReachWit = ProgEnv.Program('ExReachWit',
+                             ['Reach.cpp','ExReachWit.cpp'] + ProgEnv['StaticLibs'])
+
+built += [ProgEnv.Install(os.path.join(WaliDir,'Examples','bin'), ExReachWit)]
+
+Return('built')
+

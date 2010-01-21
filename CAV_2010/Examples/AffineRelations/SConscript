@@ -1,0 +1,20 @@
+# Reachability example
+import os
+
+Import('WaliDir')
+Import('Env')
+
+Files=Split("""
+        ZASSemiring.cpp
+        Matrix.cpp
+        ModuleSpace.cpp
+        VectorSpace.cpp
+        ARConfig.cpp
+        AffineRels.cpp
+        Vss.cpp
+""")
+
+LibAR = Env.Library('AR',Files)
+
+Env.Install(os.path.join(WaliDir,'Examples','lib'), LibAR)
+

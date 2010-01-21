@@ -1,0 +1,3 @@
+built = SConscript('Parse/SConscript')
+#built += SConscript('Domains/SConscript')
+Return('built')

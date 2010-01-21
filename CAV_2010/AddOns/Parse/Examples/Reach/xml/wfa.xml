@@ -1,0 +1,10 @@
+<WFA query='INORDER'>
+  <State Name='p' initial='TRUE'><Weight>ZERO</Weight></State>
+  <State Name='acc1' final='TRUE'><Weight>ZERO</Weight></State>
+  <State Name='acc2' final='TRUE'><Weight>ZERO</Weight></State>
+  <Trans from='acc2' stack='n3' to='acc2'><Weight>ONE</Weight></Trans>
+  <Trans from='q' stack='n2' to='acc2'><Weight>ONE</Weight></Trans>
+  <Trans from='p' stack='n1' to='q'><Weight>ONE</Weight></Trans>
+  <Trans from='p' stack='n0' to='acc1'><Weight>ONE</Weight></Trans>
+  <Trans from='p' stack='n0' to='p'><Weight>ONE</Weight></Trans>
+</WFA>

@@ -1,0 +1,99 @@
+# ##################################################
+# Build wali library
+
+import os, re
+
+Import('Debug')
+Import('WaliDir')
+Import('LibInstallDir')
+Import('BaseEnv')
+Import('MkStatic')
+Import('Platform')
+
+
+# `find . -name "*.cpp"`, then remove Experimental.cpp
+wali_files = Split("""
+./wali/StringSource.cpp
+./wali/Common.cpp
+./wali/SemElemPair.cpp
+./wali/KeySpace.cpp
+./wali/TotalOrderWorklist.cpp
+./wali/SemElem.cpp
+./wali/PriorityWorklist.cpp
+./wali/Exception.cpp
+./wali/Printable.cpp
+./wali/Key.cpp
+./wali/IntSource.cpp
+./wali/Markable.cpp
+./wali/WeightFactory.cpp
+./wali/KeyPairSource.cpp
+./wali/IMergeFn.cpp
+./wali/MergeFn.cpp
+./wali/MergeFnFactory.cpp
+./wali/wpds/RuleFunctor.cpp
+./wali/wpds/Config.cpp
+./wali/wpds/ewpds/ERule.cpp
+./wali/wpds/ewpds/ETrans.cpp
+./wali/wpds/ewpds/EWPDS.cpp
+./wali/wpds/Rule.cpp
+./wali/wpds/fwpds/FWPDS.cpp
+./wali/wpds/fwpds/SWPDS.cpp
+./wali/wpds/fwpds/LazyTrans.cpp
+./wali/wpds/Wrapper.cpp
+./wali/wpds/DebugWPDS.cpp
+./wali/wpds/WPDS.cpp
+./wali/wpds/GenKeySource.cpp
+./wali/wfa/State.cpp
+./wali/wfa/WFA.cpp
+./wali/wfa/ITrans.cpp
+./wali/wfa/Trans.cpp
+./wali/wfa/WeightMaker.cpp
+./wali/wfa/TransFunctor.cpp
+./wali/wfa/TransSet.cpp
+./wali/wfa/epr/EPA.cpp
+./wali/wfa/epr/FunctionalWeight.cpp
+./wali/wfa/epr/FunctionalWeightMaker.cpp
+./wali/witness/WitnessExtend.cpp
+./wali/witness/WitnessWrapper.cpp
+./wali/witness/WitnessRule.cpp
+./wali/witness/Visitor.cpp
+./wali/witness/WitnessMergeFn.cpp
+./wali/witness/VisitorDot.cpp
+./wali/witness/WitnessTrans.cpp
+./wali/witness/VisitorPrinter.cpp
+./wali/witness/Witness.cpp
+./wali/witness/WitnessCombine.cpp
+./wali/witness/WitnessMerge.cpp
+./wali/graph/RegExp.cpp
+./wali/graph/Graph.cpp
+./wali/graph/InterGraph.cpp
+./wali/graph/LinkEval.cpp
+./wali/graph/IntraGraph.cpp
+./wali/graph/SummaryGraph.cpp
+./wali/regex/Concat.cpp
+./wali/regex/Regex.cpp
+./wali/regex/Root.cpp
+./wali/regex/Star.cpp
+./wali/regex/Union.cpp
+./wali/util/StringUtils.cpp
+./wali/util/ParseArgv.cpp
+./wali/util/Timer.cpp
+""")
+
+env = BaseEnv.Clone()
+        
+if Debug:
+    print '\n+++ Entered "#/Source/SConscript"\n'
+
+
+if MkStatic:
+    wali = env.StaticLibrary('wali' , wali_files)
+    i = env.Install(LibInstallDir, wali)
+    built = i
+    Return('built')
+else:
+    wali = env.SharedLibrary('wali' , wali_files)
+    i = env.Install(LibInstallDir, wali)
+    built = i
+    Return('built')
+

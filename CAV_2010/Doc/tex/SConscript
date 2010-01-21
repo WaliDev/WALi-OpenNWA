@@ -1,0 +1,3 @@
+Import('BaseEnv')
+built = BaseEnv.PDF('manual.tex')
+Return('built')
