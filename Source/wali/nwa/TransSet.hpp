@@ -774,45 +774,17 @@ namespace wali
       
       /** 
        *
-       * @brief removes all call transitions with the given symbol 
+       * @brief removes all transitions with the given symbol 
        *
-       * This method removes all call transitions with the given symbol. 
-       * If no call transitions exist with the given symbol false is 
+       * This method removes all transitions with the given symbol. 
+       * If no transitions exist with the given symbol false is 
        * returned.  Otherwise, true is returned.
        *
        * @param - sym: the symbol whose transitions to remove
        * @return false if no transitions were removed, true otherwise
        *
        */
-      bool removeCallTransSym( const Sym & sym );
-        
-      /** 
-       *
-       * @brief removes all internal transitions with the given symbol 
-       *
-       * This method removes all internal transitions with the given symbol. 
-       * If no internal transitions exist with the given symbol false is 
-       * returned.  Otherwise, true is returned.
-       *
-       * @param - sym: the symbol whose transitions to remove
-       * @return false if no transitions were removed, true otherwise
-       *
-       */
-      bool removeInternalTransSym( const Sym & sym );
-        
-      /** 
-       *
-       * @brief removes all return transitions with the given symbol 
-       *
-       * This method removes all return transitions with the given symbol. 
-       * If no return transitions exist with the given symbol false is 
-       * returned.  Otherwise, true is returned.
-       *
-       * @param - sym: the symbol whose transitions to remove
-       * @return false if no transitions were removed, true otherwise
-       *
-       */
-      bool removeReturnTransSym( const Sym & sym );
+      bool removeTransSym( const Sym & sym );
       
       /**
        *  TODO: use refptr<St> 
@@ -922,8 +894,9 @@ namespace wali
        */
       const Returns getReturns( St * from, Sym * sym ) const;
 
-      protected:
-        /** 
+    protected:
+
+      /** 
        *  TODO: use refptr<St> 
        * @brief removes all call transitions to or from the given state  
        *
@@ -968,6 +941,48 @@ namespace wali
        *
        */
       bool removeReturnTransWith( const St * state );    
+
+      /** 
+       *
+       * @brief removes all call transitions with the given symbol 
+       *
+       * This method removes all call transitions with the given symbol. 
+       * If no call transitions exist with the given symbol false is 
+       * returned.  Otherwise, true is returned.
+       *
+       * @param - sym: the symbol whose transitions to remove
+       * @return false if no transitions were removed, true otherwise
+       *
+       */
+      bool removeCallTransSym( const Sym & sym );
+        
+      /** 
+       *
+       * @brief removes all internal transitions with the given symbol 
+       *
+       * This method removes all internal transitions with the given symbol. 
+       * If no internal transitions exist with the given symbol false is 
+       * returned.  Otherwise, true is returned.
+       *
+       * @param - sym: the symbol whose transitions to remove
+       * @return false if no transitions were removed, true otherwise
+       *
+       */
+      bool removeInternalTransSym( const Sym & sym );
+        
+      /** 
+       *
+       * @brief removes all return transitions with the given symbol 
+       *
+       * This method removes all return transitions with the given symbol. 
+       * If no return transitions exist with the given symbol false is 
+       * returned.  Otherwise, true is returned.
+       *
+       * @param - sym: the symbol whose transitions to remove
+       * @return false if no transitions were removed, true otherwise
+       *
+       */
+      bool removeReturnTransSym( const Sym & sym );
 
       //
       // Variables
@@ -2298,6 +2313,24 @@ namespace wali
       
       return removeTrans.size() > 0;
     }
+
+    /** 
+     *
+     * @brief removes all transitions with the given symbol 
+     *
+     * @param - sym: the symbol whose transitions to remove
+     * @return false if no transitions were removed, true otherwise
+     *
+     */
+    template <typename St,typename Sym,typename Call,typename Internal,typename Return>
+    bool TransSet<St,Sym,Call,Internal,Return>::removeTransSym( const Sym & sym )
+    {
+      bool found = false;
+      found = found || removeCallTransSym(sym);
+      found = found || removeInternalTransSym(sym);
+      found = found || removeReturnTransSym(sym);
+      return found;
+    }
     
     /** 
      *
@@ -3298,49 +3331,21 @@ namespace wali
        * @return false if no transitions were removed, true otherwise
        *
        */
-      bool removeTransWith( const St * state );     
-      
+      bool removeTransWith( const St * state );   
+
       /** 
        *
-       * @brief removes all call transitions with the given symbol 
+       * @brief removes all transitions with the given symbol 
        *
-       * This method removes all call transitions with the given symbol. 
-       * If no call transitions exist with the given symbol false is 
+       * This method removes all transitions with the given symbol. 
+       * If no transitions exist with the given symbol false is 
        * returned.  Otherwise, true is returned.
        *
        * @param - sym: the symbol whose transitions to remove
        * @return false if no transitions were removed, true otherwise
        *
        */
-      bool removeCallTransSym( const Sym & sym );
-        
-      /** 
-       *
-       * @brief removes all internal transitions with the given symbol 
-       *
-       * This method removes all internal transitions with the given symbol. 
-       * If no internal transitions exist with the given symbol false is 
-       * returned.  Otherwise, true is returned.
-       *
-       * @param - sym: the symbol whose transitions to remove
-       * @return false if no transitions were removed, true otherwise
-       *
-       */
-      bool removeInternalTransSym( const Sym & sym );
-        
-      /** 
-       *
-       * @brief removes all return transitions with the given symbol 
-       *
-       * This method removes all return transitions with the given symbol. 
-       * If no return transitions exist with the given symbol false is 
-       * returned.  Otherwise, true is returned.
-       *
-       * @param - sym: the symbol whose transitions to remove
-       * @return false if no transitions were removed, true otherwise
-       *
-       */
-      bool removeReturnTransSym( const Sym & sym );
+      bool removeTransSym( const Sym & sym );
       
       /**
        *  TODO: use refptr<St>  
@@ -3451,8 +3456,9 @@ namespace wali
        */
       const Returns getReturns( St * from, Sym * sym ) const;
 
-      protected:
-        /** 
+    protected:
+    
+      /** 
        *
        * @brief removes all call transitions to or from the given state  
        *
@@ -3496,7 +3502,49 @@ namespace wali
        * @return false if no transitions were removed, true otherwise
        *
        */
-      bool removeReturnTransWith( const St & state );    
+      bool removeReturnTransWith( const St & state );  
+
+      /** 
+       *
+       * @brief removes all call transitions with the given symbol 
+       *
+       * This method removes all call transitions with the given symbol. 
+       * If no call transitions exist with the given symbol false is 
+       * returned.  Otherwise, true is returned.
+       *
+       * @param - sym: the symbol whose transitions to remove
+       * @return false if no transitions were removed, true otherwise
+       *
+       */
+      bool removeCallTransSym( const Sym & sym );
+        
+      /** 
+       *
+       * @brief removes all internal transitions with the given symbol 
+       *
+       * This method removes all internal transitions with the given symbol. 
+       * If no internal transitions exist with the given symbol false is 
+       * returned.  Otherwise, true is returned.
+       *
+       * @param - sym: the symbol whose transitions to remove
+       * @return false if no transitions were removed, true otherwise
+       *
+       */
+      bool removeInternalTransSym( const Sym & sym );
+        
+      /** 
+       *
+       * @brief removes all return transitions with the given symbol 
+       *
+       * This method removes all return transitions with the given symbol. 
+       * If no return transitions exist with the given symbol false is 
+       * returned.  Otherwise, true is returned.
+       *
+       * @param - sym: the symbol whose transitions to remove
+       * @return false if no transitions were removed, true otherwise
+       *
+       */
+      bool removeReturnTransSym( const Sym & sym );
 
       //
       // Variables
@@ -4816,6 +4864,24 @@ namespace wali
       }
       
       return removeTrans.size() > 0;
+    }
+
+   /** 
+     *
+     * @brief removes all transitions with the given symbol 
+     *
+     * @param - sym: the symbol whose transitions to remove
+     * @return false if no transitions were removed, true otherwise
+     *
+     */
+    template <typename St,typename Sym,typename Call,typename Internal,typename Return>
+    bool TransSet<St,Sym,Call,Internal,Return>::removeTransSym( const Sym & sym )
+    {
+      bool found = false;
+      found = found || removeCallTransSym(sym);
+      found = found || removeInternalTransSym(sym);
+      found = found || removeReturnTransSym(sym);
+      return found;
     }
     
     /** 

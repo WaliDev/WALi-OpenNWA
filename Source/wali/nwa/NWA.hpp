@@ -139,7 +139,7 @@ namespace wali
       void rejectAbsent( );        
 
       /**
-       *  TODO: use refptr<St>
+       *  
        * @brief provides access to the state with the given name
        *
        * This method provides access to the state with the given name via a pointer.
@@ -151,7 +151,7 @@ namespace wali
       St* getState( const StName & name ) const;
 
       /**
-       *  TODO: use refptr<St> 
+       *  
        * @brief provides access to all states in the NWA
        *
        * This method provides access to all states in pointer form.
@@ -186,7 +186,7 @@ namespace wali
       std::set<StName> getPredecessorNames( const StName & name ) const;
 
       /**
-       *  TODO: use refptr<St> 
+       *  
        * @brief duplicates the original state, but only duplicates outgoing transitions
        *
        * This method assigns to the duplicate state all the state properties of the 
@@ -204,7 +204,7 @@ namespace wali
       St* duplicateStateOutgoing( const StName & orig, const StName & dup );
 
       /**
-       *  TODO: use refptr<St> 
+       *  
        * @brief duplicates the original state
        *
        * This method assigns to the duplicate state all the state properties of the 
@@ -224,7 +224,7 @@ namespace wali
       //All States
 
       /**
-       *  TODO: use refptr<St> 
+       *   
        * @brief test if a given state is a state of this NWA
        *
        * This method tests whether the given state is in the state set of this NWA.
@@ -236,7 +236,7 @@ namespace wali
       bool isState( const St * state ) const; 
 
       /**
-       *  TODO: use refptr<St>
+       *  
        * @brief add the given state to this NWA
        *
        * This method adds the given state to the state set for this NWA.  If the state 
@@ -260,7 +260,7 @@ namespace wali
       size_t sizeStates( ) const;
 
       /**
-       *  TODO: use refptr<St> 
+       *  
        * @brief remove the given state from this NWA
        *
        * This method checks for the given state in the set of initial states, the set of 
@@ -300,7 +300,7 @@ namespace wali
       StName getInitialState( ) const;
 
       /**
-       *  TODO: use refptr<St>
+       *
        * @brief test if the given state is an initial state of this NWA
        *
        * This method tests whether the given state is in the initial state set of the NWA.
@@ -312,7 +312,7 @@ namespace wali
       bool isInitialState( const St * state ) const;
 
       /**
-       *  TODO: use refptr<St>
+       *  
        * @brief make the given state an initial state in this NWA
        *
        * This method checks for the given state in the state set of this NWA.  If the 
@@ -339,7 +339,7 @@ namespace wali
       size_t sizeInitialStates( ) const;
 
       /**
-       *  TODO: use refptr<St>
+       *
        * @brief remove the given state from the initial state set of this NWA
        *
        * This method checks for the given state in the initial state set of this NWA.  If
@@ -1708,7 +1708,7 @@ namespace wali
     }
 
     /**
-     *  TODO: use refptr<St>
+     *  
      * @brief provides access to the state with the given name
      *
      * @param - name: the name of the desired state
@@ -1722,7 +1722,7 @@ namespace wali
     }
 
     /**
-     *  TODO: use refptr<St> 
+     *  
      * @brief provides access to all states in the NWA
      *
      * @return a set of all states in pointer form
@@ -1780,7 +1780,7 @@ namespace wali
 
     
     /**
-     *  TODO: use refptr<St> 
+     * 
      * @brief duplicates the original state
      *
      * @param - orig: the name of the original state, i.e. the state to duplicate
@@ -1803,7 +1803,7 @@ namespace wali
     }
 
     /**
-     *  TODO: use refptr<St> 
+     *   
      * @brief duplicates the original state
      *
      * @param - orig: the name of the original state, i.e. the state to duplicate
@@ -1828,7 +1828,7 @@ namespace wali
     //All States
 
     /**
-     *  TODO: use refptr<St> 
+     *  
      * @brief test if a given state is a state of this NWA
      *
      * @param - state: the state to check
@@ -1842,7 +1842,7 @@ namespace wali
     }    
 
     /**
-     *  TODO: use refptr<St>
+     *  
      * @brief add the given state to this NWA
      *
      * @param - state: the state to add
@@ -1882,7 +1882,7 @@ namespace wali
     }
 
     /**
-     *  TODO: use refptr<St> 
+     *  
      * @brief remove the given state from this NWA
      *
      * @param - state: the state to remove
@@ -1967,7 +1967,7 @@ namespace wali
     }
 
     /**
-     *  TODO: use refptr<St>
+     *  
      * @brief test if the given state is an initial state of this NWA
      *
      * @param - state: the state to check
@@ -1981,7 +1981,7 @@ namespace wali
     }    
 
     /**
-     *  TODO: use refptr<St>
+     *  
      * @brief make the given state an initial state in this NWA
      *
      * @param - state: the state to add to initial state set
@@ -2022,7 +2022,7 @@ namespace wali
     }
 
     /**
-     *  TODO: use refptr<St>
+     * 
      * @brief remove the given state from the initial state set of this NWA
      *
      * @param - state: the state to remove from the initial state set
@@ -2278,12 +2278,7 @@ namespace wali
         return false;
       else if( symbols.erase(sym) )
       {
-        //TODO: fix this so that these functions are private and
-        //      only one call to removeSymbol must be made to trans
-        trans->removeCallTransSym(sym);
-        trans->removeInternalTransSym(sym);
-        trans->removeReturnTransSym(sym);
-
+        trans->removeTransSym(sym);
         return true;
       }      
       return false;
@@ -4831,19 +4826,17 @@ namespace wali
       //TODO: how does this react to absentAcceptance???
       //NOTE: for now assume stuck state is rejecting
       wpds::WPDS result = wpds::WPDS();
-      //std::map< Key,Key > calls;
 
       //note: if you change this, make sure you modify the code in createCA as well
-      //Key program = wali::getKey("program"); 
-      Key program = getProgramControlLocation();
+      Key program = getProgramControlLocation();  // = wali::getKey("program"); 
 
       wali::sem_elem_t wgt;
 
       //Internal Transitions
       for( internalIterator iit = trans->beginInternal(); iit != trans->endInternal(); iit++ )
       {      
-        //(q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
-        //where the weight w depends on sigma
+        // (q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
+        // where the weight w depends on sigma
 
         if( iit->second.isWild() )
           wgt = wg.getWildWeight(*getState(iit->first),*getState(iit->third));
@@ -4853,106 +4846,68 @@ namespace wali
                               WeightGen<St,Sym>::INTRA,
                               *getState(iit->third));
 
-        result.add_rule(program,                //from_state (p)
-                        getState(iit->first)->getStateKey(),   //from_stack (q)
-                        program,                //to_state (p)
-                        getState(iit->third)->getStateKey(),   //to_stack1 (q')
-                        wgt);                   //weight      
+        result.add_rule(program,                                //from_state (p)
+                        getState(iit->first)->getStateKey(),    //from_stack (q)
+                        program,                                //to_state (p)
+                        getState(iit->third)->getStateKey(),    //to_stack1 (q')
+                        wgt);                                   //weight      
       }
 
       //Call Transitions
       for( callIterator cit = trans->beginCall(); cit != trans->endCall(); cit++ )
-      {
-        bool hasReturn = false; //Does this call have any associated return transitions? AMB 1-15-10
-        for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
-        {
-          if( cit->first == rit->second )
-          {
-            hasReturn = true; //This call has at least one associated return transition. AMB 1-15-10
-            //for each return site with cit->first as call site ...
-            //Key ret = getKey(rit->fourth.getStateKey(),rit->fourth.getStateKey()); // (r,r)
-            //calls.insert(std::pair<Key,Key>(cit->first.getStateKey(),ret));
-            
-            //calls.insert(std::pair<Key,Key>(getState(cit->first)->getStateKey(),getState(rit->fourth)->getStateKey()));
+      {           
+        // (q_c,sigma,q_e) in delta_c goes to
+        // <p,q_c> -w-> <p,q_e q_c> in delta_2 
+        // and the weight w depends on sigma
 
-            //(q_c,sigma,q_e) in delta_c and (*,q_c,*,q_r) in delta_r goes to
-            // <p,q_c> -w-> <p,q_e r'> in delta_2 where r' = (q_r,q_r) (or q_r?)
-            // and the weight w depends on sigma
+        if( cit->second.isWild() )
+          wgt = wg.getWildWeight(*getState(cit->first),*getState(cit->third));
+        else
+          wgt = wg.getWeight(*getState(cit->first),
+                              cit->second,
+                              WeightGen<St,Sym>::CALL_TO_ENTRY,
+                              *getState(cit->third));
 
-            if( cit->second.isWild() )
-              wgt = wg.getWildWeight(*getState(cit->first),*getState(cit->third));
-            else
-              wgt = wg.getWeight(*getState(cit->first),
-                                  cit->second,
-                                  WeightGen<St,Sym>::CALL_TO_ENTRY,
-                                  *getState(cit->third));
-
-            result.add_rule(program,                //from_state (p)
-                            getState(cit->first)->getStateKey(),   //from_stack (q_c)
-                            program,                //to_state (p)
-                            getState(cit->third)->getStateKey(),   //to_stack1 (q_e)
-                            //ret,                    //to_stack2 (r')
-                            getState(rit->fourth)->getStateKey(),  //to_stack2 (r')
-                            wgt);                   //weight  
-          } 
-        }
-        if(!hasReturn) //Account for calls having no return transitions. AMB 1-15-10
-        {
-          //(q_c,sigma,q_e) in delta_c with no (*,q_c,*,*) in delta_r goes to
-          // <p,q_c> -w-> <p,q_e> in delta_1 
-          // where the weight w depends on sigma
-
-          if( cit->second.isWild() )
-            wgt = wg.getWildWeight(*getState(cit->first),*getState(cit->third));
-          else
-            wgt = wg.getWeight(*getState(cit->first),
-                                cit->second,
-                                WeightGen<St,Sym>::CALL_TO_ENTRY,
-                                *getState(cit->third));
-          
-          result.add_rule(program,                   //from_state (p)
-                          getState(cit->first)->getStateKey(),  //from_stack (q_c)
-                          program,                  //to_state (p)
-                          getState(cit->third)->getStateKey(),  //to_stack1 (q_e)
-                          wgt);
-        }
-      }
-
+        result.add_rule(program,                                //from_state (p)
+                        getState(cit->first)->getStateKey(),    //from_stack (q_c)
+                        program,                                //to_state (p)
+                        getState(cit->third)->getStateKey(),    //to_stack1 (q_e)
+                        getState(cit->first)->getStateKey(),    //to_stack2 (q_c)
+                        wgt);                                   //weight  
+      } 
+      
       //Return Transitions
       for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
       {
-        //(q_x,q_c,sigma,q_r) in delta_r goes to 
+        // (q_x,q_c,sigma,q_r) in delta_r goes to 
         // <p,q_x> -w1-> <p_q_x,epsilon> in delta_0
-        // and <p_q_x,r'> -w2-> <p,q_r> in delta_1
-        // where p_q_x = (q_x,q_c), r' = (q_r,q_r)
-        // w1 depends on one, and w2 depends on sigma
+        // and <p_q_x,q_c> -w2-> <p,q_r> in delta_1
+        // where p_q_x = (p,q_x),
+        // w1 depends on q_x, and w2 depends on sigma
 
-        wgt = wg.getExitWeight( getState(rit->first)->getStateKey() ); //wg.getOne();
+        wgt = wg.getExitWeight( getState(rit->first)->getStateKey() );  //w1
 
         //Note: if you change this, make sure you modify the code in NWPForest.createCA()
-        //Key rstate = getKey((*rit)->first->getStateKey(),(*rit)->second->getStateKey());  //p_q_x
-        Key rstate = getControlLocation(*getState(rit->first),*getState(rit->second));
+        Key rstate = getControlLocation(program,*getState(rit->first));  //p_q_x
 
-        result.add_rule(program,                //from_state (p)
-                        getState(rit->first)->getStateKey(),   //from_stack (q_x)
-                        rstate,                 //to_state (p_q_x == (q_x,q_c))
-                        wgt);                   //weight 
+        result.add_rule(program,                              //from_state (p)
+                        getState(rit->first)->getStateKey(),  //from_stack (q_x)
+                        rstate,                               //to_state (p_q_x == (p,q_x))
+                        wgt);                                 //weight (w1) 
 
         if( rit->third.isWild() )
-          wgt = wg.getWildWeight(*getState(rit->first),*getState(rit->fourth));
+          wgt = wg.getWildWeight(*getState(rit->first),*getState(rit->fourth)); //w2
         else
           wgt = wg.getWeight(*getState(rit->first), 
                               rit->third,
                               WeightGen<St,Sym>::EXIT_TO_RET,  
-                              *getState(rit->fourth));  
-
-        //std::map<Key,Key>::iterator ret = calls.find(getState(rit->second)->getStateKey());
-        //if( ret != calls.end() )          
-          result.add_rule(rstate,                   //from_state (p_q_x == (q_x,q_c))
-                          getState(rit->fourth)->getStateKey(),//ret->second,    //from_stack (r')
-                          program,                  //to_state (p)
-                          getState(rit->fourth)->getStateKey(),    //to_stack (q_r)
-                          wgt);                     //weight    
+                              *getState(rit->fourth));                          //w2
+         
+          result.add_rule(rstate,                               //from_state (p_q_x == (p,q_x))
+                          getState(rit->second)->getStateKey(), //from_stack (q_c)
+                          program,                              //to_state (p)
+                          getState(rit->fourth)->getStateKey(), //to_stack (q_r)
+                          wgt);                                 //weight (w2)    
 
       }
 
