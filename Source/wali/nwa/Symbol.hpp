@@ -131,20 +131,6 @@ namespace wali
        */
       T getLabel( ) const;
       
-      /** 
-       *  TODO: should this be allowed??? what should wild and epsilon return from this?
-       * @brief set the label associated with this symbol
-       *
-       * This method sets the label associated with this symbol
-       * to the label provided.
-       * Note: This method should never be called on a wild or epsilon symbol. 
-       *
-       * @param - lbl: the desired label for this symbol
-       * 
-       */
-      //void setLabel( T lbl );
-
-
       //Intersection of symbol labels
       /**
        *  TODO: move edgeIntersection back to here!
@@ -201,6 +187,7 @@ namespace wali
        * @brief print the Symbol
        *
        * This method prints out the Symbol to the output stream provided.
+       * Note: T must have a print function.
        *
        * @param - o: the output stream to which to print the Symbol
        * @return the output stream to which the Symbol was printed
@@ -229,7 +216,7 @@ namespace wali
        * This method tests whether this Symbol is 'less than' the Symbol
        * 'other' in some way.  The default is to order the Symbols based
        * on the ordering of their labels.
-       * Note: Wild is less than everything, Epsilon is greater than everything.
+       * Note: Wild is less than all symbols, Epsilon is greater than all symbols.
        *
        * @param - rhs: the Symbol to compare this Symbol to
        * @return true if this Symbol is 'less than' the Symbol 'other', false otherwise
@@ -272,6 +259,7 @@ namespace wali
       this->lbl = lbl;
       symbolType = Ordinary; 
     }
+
     /* TODO */
     template <typename T>
     Symbol<T>::Symbol( const Symbol & other )
@@ -286,6 +274,7 @@ namespace wali
         symbolType = other.symbolType;
       //}
     }
+
     /* TODO */
     template <typename T>
     Symbol<T> & Symbol<T>::operator=( const Symbol & other )
@@ -319,7 +308,7 @@ namespace wali
     }
     
     /**
-     *  TODO?
+     *
      * @brief test whether this is the epsilon symbol
      *
      * @return true if this is the epsilon symbol, false otherwise
@@ -345,7 +334,7 @@ namespace wali
     }
     
     /**
-     *  TODO
+     *  
      * @brief test whether this is the wild symbol
      *
      * @return true if this is the wild symbol, false otherwise
@@ -373,20 +362,6 @@ namespace wali
     
     /** 
      *
-     * @brief set the label associated with this symbol
-     *
-     * @param - lbl: the desired label for this symbol
-     * 
-     */
-    /*template <typename T>
-    void Symbol<T>::setLabel( T lbl )
-    {
-      assert(!isWild() && !isEpsilon());
-      this->lbl = lbl;
-    }*/
-    
-    /** 
-     *
      * @brief print the Symbol
      *
      * @param - o: the output stream to which to print the Symbol
@@ -402,7 +377,7 @@ namespace wali
         o << "epsilon";
       else
         lbl.print(o); 
-        //o << lbl;
+        //o << lbl; //TODO: restore this!
       
       return o;
     }
@@ -556,27 +531,14 @@ namespace wali
        *
        */
       Key getName( ) const;
-      
-      /** 
-       *  TODO: should this be allowed??? what should wild and epsilon return from this?
-       * @brief set the name associated with this symbol
-       *
-       * This method sets the name associated with this symbol
-       * to the name provided.
-       * Note: This method should never be called on a wild or epsilon symbol.
-       *
-       * @param - name: the desired name for this symbol
-       * 
-       */
-      //void setName( Key name );
-      
+            
       //Utilities
       
       /** 
        *
        * @brief print the Symbol
        *
-       * This method prints out the Symbol to the output stream provided.
+       * This method prints out the key associated with the Symbol to the output stream provided.
        *
        * @param - o: the output stream to which to print the Symbol
        * @return the output stream to which the Symbol was printed
@@ -617,7 +579,7 @@ namespace wali
        * This method tests whether this Symbol is 'less than' the Symbol
        * 'other' in some way.  The default is to order the Symbols based
        * on the ordering of their labels.
-       * Note: Wild is less than everything, Epsilon is greater than everything.
+       * Note: Wild is less than all symbols, Epsilon is greater than all symbols.
        *
        * @param - rhs: the Symbol to compare this Symbol to
        * @return true if this Symbol is 'less than' the Symbol 'other', false otherwise
@@ -645,6 +607,7 @@ namespace wali
     {
       this->name = name;
     }
+
     /* TODO */
     Symbol::Symbol( const Symbol & other )
     {
@@ -688,7 +651,7 @@ namespace wali
     }
     
     /**
-     *  TODO? 
+     *  
      * @brief test whether this is the epsilon symbol
      *
      * @return true if this is the epsilon symbol, false otherwise
@@ -714,7 +677,7 @@ namespace wali
     }
     
     /**
-     *  TODO?
+     *  TODO
      * @brief test whether this is the wild symbol
      *
      * @return true if this is the wild symbol, false otherwise
@@ -738,20 +701,6 @@ namespace wali
       assert(!isWild() && !isEpsilon());
       return name;
     }
-    
-    /** 
-     *
-     * @brief set the name associated with this symbol
-     *
-     * @param - name: the desired name for this symbol
-     * 
-     */
-    /*
-    void Symbol::setName( Key name )
-    {
-      assert(!isWild() && !isEpsilon());
-      this->name = name;
-    }*/
     
     /** 
      *

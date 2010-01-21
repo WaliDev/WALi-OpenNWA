@@ -94,7 +94,8 @@ namespace wali
        * @brief access the Key associated with this state
        *
        * This method provides access to the wali::Key associated
-       * with this state.
+       * with this state.  Note: This method should never be called
+       * on the stuck state.
        *
        * @return the Key associated with this state
        *
@@ -106,6 +107,7 @@ namespace wali
        * @brief access the name associated with this state
        *
        * This method provides access to the name associated with this
+       * state.  Note: This method should never be called on the stuck
        * state.
        *
        * @return the name associated with this state
@@ -113,19 +115,6 @@ namespace wali
        */
       T getName( ) const;
       
-      /** 
-       *  TODO: should this be allowed??? what should stuck return from this?
-       * @brief set the name associated with this state
-       *
-       * This method sets the name associated with this state to the
-       * name provided and updates the Key associated with this state
-       * to reflect the change.
-       *
-       * @param - name: the desired name for this state
-       *
-       */
-      //void setName( T name );
-
       /**
        * 
        * @brief access the client information associated with this state
@@ -151,7 +140,7 @@ namespace wali
       void setClientInfo( const ClientInfoRefPtr c );
 
       /** 
-       *
+       *  TODO: Why is this method here?  Why is there no corresponding method for final?
        */
       bool isInitial( ) const
       {
@@ -159,7 +148,7 @@ namespace wali
       }
 
       /**
-       *
+       *  TODO: Why is this method here?  It should at least be protected!
        */
       void setAsInitial( )
       {
@@ -167,7 +156,7 @@ namespace wali
       }
 
       /** 
-       *
+       *  TODO: Why is this method here?  It should at least be protected!
        */
       void unsetAsInitial( )
       {
@@ -207,10 +196,11 @@ namespace wali
       //Utilities
       
       /** 
-       *  TODO: T must have a print function
+       * 
        * @brief print the State
        *
        * This method prints out the State to the output stream provided.
+       * Note: T must have a print function.
        *
        * @param - o: the output stream to which to print the State
        * @return the output stream to which the State was printed
@@ -238,11 +228,12 @@ namespace wali
        *
        * This method tests whether this State is 'less than' the State 
        * 'other' in some way.  The default is to order the States based 
-       * on the ordering of their names.
-       * Note: Stuck is less than everything.
+       * on the ordering of their names.  
+       * Note: The stuck state is less than all other states.
        *
        * @param - rhs: the State to compare this State to
        * @return true if this State is 'less than' the State 'other', false otherwise
+       *
        */
       bool operator<( const State<T,Client> & rhs ) const;
 
@@ -263,6 +254,7 @@ namespace wali
     template <typename T,typename Client>
     State<T,Client>::State( )
     {
+      //This creates a stuck state.
       name = T();
       stateType = Stuck;
       stateKey = wali::WALI_EPSILON;
@@ -277,6 +269,7 @@ namespace wali
       stateKey = wali::getKey(name);
       initial = false;
     }
+
     /* TODO */
     template <typename T,typename Client>
     State<T,Client>::State( const State & other )
@@ -292,6 +285,7 @@ namespace wali
         initial = other.initial;
       //} 
     }
+
     /* TODO */
     template <typename T,typename Client>
     State<T,Client> & State<T,Client>::operator=( const State & other )
@@ -326,7 +320,7 @@ namespace wali
     }
     
     /**
-     *  TODO?
+     *
      * @brief test whether this is the stuck state
      * 
      * @return true if this is the stuck state, false otherwise
@@ -364,21 +358,6 @@ namespace wali
       assert(stateType != Stuck);
       return name;
     }
-    
-    /** 
-     *  
-     * @brief set the name associated with this state
-     *
-     * @param - name: the desired name for this state
-     *
-     */
-    /*template <typename T,typename Client>
-    void State<T,Client>::setName( T name )
-    {
-      assert(!isStuckState());
-      this->name = name;
-      stateKey = wali::getKey(name);
-    }*/
     
     /**
      * 
@@ -421,7 +400,7 @@ namespace wali
         o << "stuck";
       else
         o << "non-stuck " << name;
-      //  name.print(o);
+      //  name.print(o);  TODO: restore this!
       return o;
     }
     
@@ -535,18 +514,6 @@ namespace wali
        *
        */
       Key getName( ) const;
-      
-      /** 
-       *  TODO: should this be allowed??? what should stuck return from this?
-       * @brief set the name associated with this state
-       *
-       * This method sets the name associated with this state to the
-       * name provided 
-       *
-       * @param - name: the desired name for this state
-       *
-       */
-      //void setName( Key name );
 
       /**
        * 
@@ -572,12 +539,16 @@ namespace wali
        */
       void setClientInfo( const ClientInfoRefPtr c );
 
+      /* TODO: do the methods for the initial state property need to be here? */
+      /* TODO: does intersect() need to be here? */
+
       //Utilities
       
       /** 
        * @brief print the State
        *
-       * This method prints out the State to the output stream provided.
+       * This method prints out the key associated with the State to 
+       * the output stream provided.
        *
        * @param - o: the output stream to which to print the State
        * @return the output stream to which the State was printed
@@ -617,10 +588,11 @@ namespace wali
        * This method tests whether this State is 'less than' the State 
        * 'other' in some way.  The default is to order the States based 
        * on the ordering of their names.
-       * Note: Stuck is less than everything.
+       * Note: The stuck state is less than all other states.
        *
        * @param - rhs: the State to compare this State to
        * @return true if this State is 'less than' the State 'other', false otherwise
+       *
        */
       bool operator<( const State & rhs ) const;
 
@@ -632,6 +604,7 @@ namespace wali
 
       Key name;
       ref_ptr<ClientInfo> clientInfo; 
+      /* TODO: does bool initial need to be here? */
     };
 
     //Constructors
@@ -689,7 +662,7 @@ namespace wali
     }
     
     /**
-     *  TODO?
+     * 
      * @brief test whether this is the stuck state
      * 
      * @return true if this is the stuck state, false otherwise
@@ -715,21 +688,6 @@ namespace wali
       return name;
     }
     
-    /** 
-     *  
-     * @brief set the name associated with this state
-     *
-     * @param - name: the desired name for this state
-     *
-     */
-    /*
-    template<typename Client>
-    void State<Client>::setName( Key name )
-    {
-      assert(!isStuckState());
-      this->name = name;
-    }*/
-
     /**
      * 
      * @brief access the client information associated with this state

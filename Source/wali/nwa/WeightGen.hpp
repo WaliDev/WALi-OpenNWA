@@ -74,12 +74,14 @@ namespace wali
         return getOne();
       }
         
-      /* TODO 
-      */
+      /** 
+       * TODO 
+       */
       virtual sem_elem_t getExitWeight( const St & src) 
       {
         return getOne();
       }
+
       /**
        *
        * @brief computes the weight(in the desired semiring) for a rule when the symbol

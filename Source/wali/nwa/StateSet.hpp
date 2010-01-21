@@ -32,7 +32,7 @@ namespace wali
     {
       public:
         typedef typename std::set<StName>::const_iterator iterator;   
-        typedef std::map<StName,St*> StMap;   //Names to states mapping.
+        typedef std::map<StName,St*> StMap;   //Names to states mapping.  //TODO: make this a refptr<St>
 
       //
       // Methods
@@ -64,7 +64,7 @@ namespace wali
        * @brief removes all initial states
        *
        * This method removes all states from the initial state set, but
-       * does not remove them from the state set.
+       * does not remove any states from the state set.
        *
        */
       void clearInitialStates( );
@@ -74,13 +74,13 @@ namespace wali
        * @brief removes all final states
        *
        * This method removes all states from the final state set, but
-       * does not remove them from the state set.
+       * does not remove any states from the state set.
        *
        */
       void clearFinalStates( );
       
       /**
-       * 
+       *  TODO: use refptr<St>
        * @brief tests whether the given state is a member of this collection
        *
        * This method determines whether the given state is a member of
@@ -95,7 +95,7 @@ namespace wali
       bool isState( const St * state ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St> 
        * @brief tests whether the given state is an initial state of this 
        *        collection
        *
@@ -111,7 +111,7 @@ namespace wali
       bool isInitialState( const St * initialState ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St> 
        * @brief tests whether the given state is a final state of this
        *        collection
        *
@@ -127,7 +127,7 @@ namespace wali
       bool isFinalState( const St * finalState ) const;
       
       /**
-       *
+       *  TODO: use refptr<St>
        * @brief add the given state 
        *
        * This method adds the given state.  If the state already exists, 
@@ -140,7 +140,7 @@ namespace wali
       bool addState( St * state );
         
       /**
-       *
+       *  TODO: use refptr<St>
        * @brief add the given initial state 
        *
        * This method adds the given state to this collection of 
@@ -155,7 +155,7 @@ namespace wali
       bool addInitialState( St * initialState );
         
       /**
-       *
+       *  TODO: use refptr<St>
        * @brief add the given final state 
        *
        * This method adds the given state to this collection of 
@@ -221,7 +221,7 @@ namespace wali
       void addAllFinalStates( StateSet<St,StName> stateSet );
       
       /**
-       * 
+       *  TODO: use refptr<St> 
        * @brief remove the given state 
        *
        * This method removes the given state.  If the state does not
@@ -236,7 +236,7 @@ namespace wali
       bool removeState( const St * state );
         
       /**
-       * 
+       *  TODO: use refptr<St> 
        * @brief remove the given initial state
        *
        * This method removes the given initial state.  If the state
@@ -251,7 +251,7 @@ namespace wali
       bool removeInitialState( const St * initialState );
         
       /**
-       * 
+       *  TODO: use refptr<St> 
        * @brief remove the given final state
        *
        * This method removes the given final state.  If the state
@@ -371,7 +371,7 @@ namespace wali
       iterator endFinalStates( ) const;
       
       /**
-       * 
+       *  TODO: use refptr<St> 
        * @brief provides access to all states in the collection
        *
        * This method provides access to all states in this collection 
@@ -472,7 +472,7 @@ namespace wali
       size_t sizeFinalStates( ) const;     
       
       /**
-       *  
+       *  TODO: use refptr<St>  
        * @brief gives 'dup' all the state properties of 'orig'
        *
        * This method checks all the state properties (initial/final)
@@ -487,6 +487,7 @@ namespace wali
       /**
        *  TODO: make sure that the mapping is unique in it's assignment of
        *        a state to a name
+       *  TODO: use refptr<St>
        * @brief provide access to the state with the given name
        *
        * This method provides access to the state in this collection
@@ -516,7 +517,6 @@ namespace wali
       std::set<StName> states;
       std::set<StName> initialStates;  
       std::set<StName> finalStates;   
-      //std::set<StName> names; 
       StMap name_St;
     };    
     
@@ -591,7 +591,7 @@ namespace wali
       for( iterator it = initialStates.begin(); it != initialStates.end(); it++ )
       {
         St * state = getState(*it);
-        state->unsetAsInitial();
+        state->unsetAsInitial();    //TODO: Why are we doing this?
       }
       initialStates.clear();
     }    
@@ -608,7 +608,7 @@ namespace wali
     }
     
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief tests whether the given state is a member of this collection
      *
      * @param - state: the state to test
@@ -623,7 +623,7 @@ namespace wali
     } 
      
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief tests whether the given state is an initial state of this 
      *        collection
      *
@@ -639,7 +639,7 @@ namespace wali
     }
        
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief tests whether the given state is a final state of this
      *        collection
      *
@@ -655,7 +655,7 @@ namespace wali
     }
     
     /**
-     *
+     *  TODO: use refptr<St>
      * @brief add the given state 
      *
      * @param - state: the state to add 
@@ -675,7 +675,7 @@ namespace wali
     }    
     
     /**
-     *
+     *  TODO: use refptr<St>
      * @brief add the given initial state 
      *
      * @param - initialState: the initial state to add 
@@ -694,14 +694,14 @@ namespace wali
       }
 
       St * state = getState(addInitialState->getName());
-      state->setAsInitial( );
+      state->setAsInitial( ); //TODO: Why are we doing this?
 
       initialStates.insert(addInitialState->getName());
       return true;
     }    
     
     /**
-     *
+     *  TODO: use refptr<St>
      * @brief add the given final state 
      *
      * @param - finalState: the final state to add 
@@ -792,7 +792,7 @@ namespace wali
     }
     
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief remove the given state 
      *
      * @param - state: the state to remove
@@ -814,7 +814,7 @@ namespace wali
     }   
      
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief remove the given initial state
      *
      * @param - initialState: the initial state to remove
@@ -828,14 +828,14 @@ namespace wali
         return false;
 
       St * state = getState(removeInitialState->getName());
-      state->unsetAsInitial( );
+      state->unsetAsInitial( ); //TODO: Why are we doing this?
 
       initialStates.erase(removeInitialState->getName());
       return true;
     }    
     
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief remove the given final state
      *
      * @param - finalState: the final state to remove
@@ -873,7 +873,7 @@ namespace wali
       {
         if( !first )
         o << ", ";
-        ((name_St.find(*it))->second)->print(o);
+        ((name_St.find(*it))->second)->print(o);  
       }
       o << " }" << std::endl;
       
@@ -1031,7 +1031,7 @@ namespace wali
     }
     
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief provides access to all states in the collection
      *
      * @return a set containing all states in this collection
@@ -1151,7 +1151,7 @@ namespace wali
     }  
     
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief gives 'dup' all the state properties of 'orig'
      *
      * @param - orig: the state whose properties to duplicate
@@ -1171,6 +1171,7 @@ namespace wali
     /**
      *  TODO: make sure that the mapping is unique in it's assignment of
      *        a state to a name
+     *  TODO: use refptr<St>
      * @brief provide access to the state with the given name
      *
      * This method provides access to the state in this collection
@@ -1191,7 +1192,7 @@ namespace wali
     }    
     
     /**
-     * 
+     *  TODO: make this private?
      * @brief clear the state name to states map
      *
      */
@@ -1206,8 +1207,8 @@ namespace wali
     {
       public:
         typedef State<Client> St;
-        typedef typename std::set<St>::const_iterator const_iterator;
-        typedef typename std::set<St>::iterator iterator;
+        typedef typename std::set<St>::const_iterator const_iterator;   //  TODO: use refptr<St>
+        typedef typename std::set<St>::iterator iterator;               //  TODO: use refptr<St>
 
       //
       // Methods
@@ -1239,7 +1240,7 @@ namespace wali
        * @brief removes all initial states
        *
        * This method removes all states from the initial state set, but
-       * does not remove them from the state set.
+       * does not remove any states from the state set.
        *
        */
       void clearInitialStates( );
@@ -1249,13 +1250,13 @@ namespace wali
        * @brief removes all final states
        *
        * This method removes all states from the final state set, but
-       * does not remove them from the state set.
+       * does not remove any states from the state set.
        *
        */
       void clearFinalStates( );
       
       /**
-       * 
+       *  TODO: use refptr<St> 
        * @brief tests whether the given state is a member of this collection
        *
        * This method determines whether the given state is a member of
@@ -1270,7 +1271,7 @@ namespace wali
       bool isState( const St & state ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St> 
        * @brief tests whether the given state is an initial state of this 
        *        collection
        *
@@ -1286,7 +1287,7 @@ namespace wali
       bool isInitialState( const St & initialState ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St> 
        * @brief tests whether the given state is a final state of this
        *        collection
        *
@@ -1302,7 +1303,7 @@ namespace wali
       bool isFinalState( const St & finalState ) const;
       
       /**
-       *
+       *  TODO: use refptr<St>
        * @brief add the given state 
        *
        * This method adds the given state.  If the state already exists, 
@@ -1315,7 +1316,7 @@ namespace wali
       bool addState( St * state );
         
       /**
-       *
+       *  TODO: use refptr<St>
        * @brief add the given initial state 
        *
        * This method adds the given state to this collection of 
@@ -1330,7 +1331,7 @@ namespace wali
       bool addInitialState( St * initialState );
         
       /**
-       *
+       *  TODO: use refptr<St>
        * @brief add the given final state 
        *
        * This method adds the given state to this collection of 
@@ -1396,7 +1397,7 @@ namespace wali
       void addAllFinalStates( StateSet stateSet );
       
       /**
-       * 
+       *  TODO: use refptr<St> 
        * @brief remove the given state 
        *
        * This method removes the given state.  If the state does not
@@ -1426,7 +1427,7 @@ namespace wali
       bool removeInitialState( const St & initialState );
         
       /**
-       * 
+       *  TODO: use refptr<St> 
        * @brief remove the given final state
        *
        * This method removes the given final state.  If the state
@@ -1446,8 +1447,8 @@ namespace wali
        *
        * @brief print the collection of states
        *
-       * This method prints out the state set to the output stream 
-       * provided.
+       * This method prints out the keys associated with the state set to the 
+       * output stream provided.
        *
        * @param - o: the output stream to print to
        * @return the output stream that was printed to
@@ -1559,7 +1560,7 @@ namespace wali
       const_iterator endFinalStates( ) const;
       
       /**
-       * 
+       *  TODO: use refptr<St> 
        * @brief provides access to all states in the collection
        *
        * This method provides access to all states in this collection 
@@ -1660,7 +1661,7 @@ namespace wali
       size_t sizeFinalStates( ) const;     
       
       /**
-       *  
+       *  TODO: use refptr<St>  
        * @brief gives 'dup' all the state properties of 'orig'
        *
        * This method checks all the state properties (initial/final)
@@ -1675,6 +1676,7 @@ namespace wali
       /**
        *  TODO: make sure that the mapping is unique in it's assignment of
        *        a state to a name
+       *  TODO: use refptr<St>
        * @brief provide access to the state with the given name
        *
        * This method provides access to the state in this collection
@@ -1763,6 +1765,7 @@ namespace wali
     template<typename Client>
     void StateSet<Client>::clearInitialStates( )
     { 
+      //TODO: do we need to unsetAsInitial() here?
       initialStates.clear();
     }    
     
@@ -1778,7 +1781,7 @@ namespace wali
     }
     
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief tests whether the given state is a member of this collection
      *
      * @param - state: the state to test
@@ -1793,7 +1796,7 @@ namespace wali
     } 
      
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief tests whether the given state is an initial state of this 
      *        collection
      *
@@ -1809,7 +1812,7 @@ namespace wali
     }
        
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief tests whether the given state is a final state of this
      *        collection
      *
@@ -1825,7 +1828,7 @@ namespace wali
     }
     
     /**
-     *
+     *  TODO: use refptr<St>
      * @brief add the given state 
      *
      * @param - state: the state to add 
@@ -1845,7 +1848,7 @@ namespace wali
     }    
     
     /**
-     *
+     *  TODO: use refptr<St>
      * @brief add the given initial state 
      *
      * @param - initialState: the initial state to add 
@@ -1863,12 +1866,14 @@ namespace wali
         addState(addInitialState);
       }
 
+      //TODO: do we need to setAsInitial() here?
+
       initialStates.insert(*addInitialState);
       return true;
     }    
     
     /**
-     *
+     *  TODO: use refptr<St>
      * @brief add the given final state 
      *
      * @param - finalState: the final state to add 
@@ -1959,7 +1964,7 @@ namespace wali
     }
     
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief remove the given state 
      *
      * @param - state: the state to remove
@@ -1981,7 +1986,7 @@ namespace wali
     }   
      
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief remove the given initial state
      *
      * @param - initialState: the initial state to remove
@@ -1993,12 +1998,15 @@ namespace wali
     {
       if( ! isInitialState(removeInitialState) )
         return false;
+
+      //TODO: do we need to unsetAsInitial() here?
+
       initialStates.erase(removeInitialState);
       return true;
     }    
     
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief remove the given final state
      *
      * @param - finalState: the final state to remove
@@ -2247,7 +2255,7 @@ namespace wali
     }
     
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief provides access to all states in the collection
      *
      * @return a set containing all states in this collection
@@ -2362,7 +2370,7 @@ namespace wali
     }  
     
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief gives 'dup' all the state properties of 'orig'
      *
      * @param - orig: the state whose properties to duplicate
@@ -2382,6 +2390,7 @@ namespace wali
     /**
      *  TODO: make sure that the mapping is unique in it's assignment of
      *        a state to a name
+     *  TODO: use refptr<St>
      * @brief provide access to the state with the given name
      *
      * This method provides access to the state in this collection
@@ -2394,11 +2403,14 @@ namespace wali
     template<typename Client>
     typename StateSet<Client>::St * StateSet<Client>::getState( Key name ) const
     { //TODO
-      //StMap::const_iterator it = name_St.find(name);
-      //if( it != name_St.end() )
-      //  return it->second;
-      //else
-        return NULL;
+      for(iterator it = states.begin(); it != states.end(); it++ )
+      { 
+        if(it->getName() == name)
+        {
+          return &(*it);
+        }
+      }
+      return NULL;
     }    
     
 #endif

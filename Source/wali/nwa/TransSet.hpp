@@ -57,7 +57,7 @@ namespace wali
       //Transition Accessors
 
       /**
-       *  
+       *  TODO: use refptr<St>  
        * @brief finds the symbol on any transition whose source is 'from' and
        *        whose target is 'to'
        *
@@ -73,7 +73,7 @@ namespace wali
       bool getSymbol( const St * from, const St * to, Sym & sym );
 
       /**
-       * 
+       *  TODO: use refptr<St> 
        * @brief tests whether there exists a transition whose source is 'from',
        *        whose symbol is 'sym', and whose target is 'to'
        *
@@ -90,7 +90,7 @@ namespace wali
       bool findTrans( const St * from, const Sym & sym, const St * to ) const;
 
       /**
-       * 
+       *  TODO: use refptr<St> 
        * @brief returns all return sites that correspond with the given call site
        *
        * This method returns the set of all return sites that correspond with the
@@ -103,7 +103,7 @@ namespace wali
       std::set<St> getReturnSites( const St * callSite ) const;
 
       /**
-       * 
+       *  TODO: use refptr<St> 
        * @brief returns all return sites that correspond with the given exit and call site
        *
        * This method returns the set of all return sites that correspond with the
@@ -117,7 +117,7 @@ namespace wali
       const std::set<Return> getReturns( const St * exit, const St * callSite ) const;
 
       /**
-       * 
+       *  TODO: use refptr<St> 
        * @brief returns all call sites that correspond with the given exit - return site pair
        *
        * This method returns the set of all call sites that correspond with the given
@@ -131,7 +131,7 @@ namespace wali
       std::set<St> getCallSites( const St * exitSite, const St * returnSite ) const;
 
       /**
-       * 
+       *  TODO: use refptr<St> 
        * @brief returns all entry sites that correspond with the given call site
        *
        * This method returns the set of all entry sites that correspond with the
@@ -144,7 +144,7 @@ namespace wali
       const std::set<Call> getEntries( const St * callSite ) const;
 
       /**
-       * 
+       *  TODO: use refptr<St> 
        * @brief returns all targets that correspond with the given source 
        *
        * This method returns the set of all targets that correspond with the 
@@ -157,7 +157,7 @@ namespace wali
       const std::set<Internal> getTargets( const St * source ) const;
 
       /**
-       *  
+       *  TODO: use refptr<St>  
        * @brief creates transitions for 'dup' mirroring 'orig' outgoing transitions
        *
        * This method creates a transition using 'dup' in the place of 'orig' for
@@ -170,7 +170,7 @@ namespace wali
       void dupTransOutgoing( const St * orig, const St * dup );
 
       /**
-       *  
+       *  TODO: use refptr<St>  
        * @brief creates transitions for 'dup' mirroring 'orig' transitions
        *
        * This method creates a transition using 'dup' in the place of 'orig' for
@@ -563,7 +563,7 @@ namespace wali
       size_t size( ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St>  
        * @brief returns all outgoing internal transitions for the given state
        *
        * This method returns all internal transitions with the given state as
@@ -576,7 +576,7 @@ namespace wali
       std::set<Internal> getTransFrom( const St * state ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St>  
        * @brief retuans all incoming internal transitions for the given state
        *
        * This method returns all internal transitions with the given state as
@@ -589,7 +589,7 @@ namespace wali
       std::set<Internal> getTransTo( const St * state ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St>  
        * @brief returns all call transitions for the given call site
        *
        * This method returns all call transitions with the given state as
@@ -602,7 +602,7 @@ namespace wali
       std::set<Call> getTransCall( const St * state ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St>  
        * @brief returns all call transitions for the given entry point
        *
        * This method returns all call transitions with the given state as
@@ -615,7 +615,7 @@ namespace wali
       std::set<Call> getTransEntry( const St * state ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St>  
        * @brief returns all return transitions for the given exit point
        *
        * This method returns all return transitions with the given state as
@@ -628,7 +628,7 @@ namespace wali
       std::set<Return> getTransExit( const St * state ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St>  
        * @brief returns all return transitions for the given call predecessor
        *
        * This method returns all return transitions with the given state as
@@ -641,7 +641,7 @@ namespace wali
       std::set<Return> getTransPred( const St * state ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St>  
        * @brief returns all return transitions for the given return site
        *
        * This method returns all return transitions with the given state as
@@ -654,7 +654,7 @@ namespace wali
       std::set<Return> getTransRet( const St * state ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St>  
        * @brief tests whether the given state is the source of any internal 
        *        transition
        *
@@ -669,7 +669,7 @@ namespace wali
       bool isFrom( const St & state ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St>  
        * @brief tests whether the given state is the target of any internal
        *        transition
        *
@@ -684,7 +684,7 @@ namespace wali
       bool isTo( const St & state ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St>  
        * @brief tests whether the given state is the call site of any call 
        *        transition
        *
@@ -699,7 +699,7 @@ namespace wali
       bool isCall( const St & state ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St>  
        * @brief tests whether the given state is the entry point of any call
        *        transition
        *
@@ -714,7 +714,7 @@ namespace wali
       bool isEntry( const St & state ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St>  
        * @brief tests whether the given state is the exit point of any return
        *        transition
        *
@@ -729,7 +729,7 @@ namespace wali
       bool isExit( const St & state ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St>  
        * @brief tests whether the given state is the call predecessor for any
        *        return transition
        *
@@ -744,7 +744,7 @@ namespace wali
       bool isPred( const St & state ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St>  
        * @brief tests whether the given state is the return site of any return
        *        transition
        *
@@ -759,50 +759,18 @@ namespace wali
       bool isRet( const St & state ) const;
 
       /** 
+       *  TODO: use refptr<St> 
+       * @brief removes all transitions involving the given state  
        *
-       * @brief removes all call transitions to or from the given state  
-       *
-       * This method removes all call transitions to or from the given state 
-       * If no call transitions exist to or from this state false is returned.  
+       * This method removes all transitions involving the given state 
+       * If no transitions exist involving this state false is returned.  
        * Otherwise, true is returned.
        *
        * @param - state: the state whose transitions to remove
        * @return false if no transitions were removed, true otherwise
        *
        */
-      bool removeCallTransWith( const St * state );        
-      
-      /** 
-       *
-       * @brief removes all internal transitions to or from the given state
-       *
-       * This method removes all internal transitions to or from the given
-       * state.  If no internal transitions exist to or from this state, 
-       * false is returned.  Otherwise, true is returned. 
-       *
-       * @param - state: the state whose transitions to remove
-       * @return false if no transitions were removed, true otherwise
-       *
-       */
-      bool removeInternalTransWith( const St * state );
-      
-      /** 
-       *
-       * @brief removes all return transitions to or from the given state
-       *        as well as return transitions corresponding to calls from
-       *        that state
-       *
-       * This method removes all return transitions to or from the given 
-       * state as well as return transitions corresponding to calls from
-       * that state.  If no return transitions exist to or from this state,
-       * or having this state as a call predecessor, false is returned.  
-       * Otherwise, true is returned.
-       *
-       * @param - state: the state whose transitions to remove
-       * @return false if no transitions were removed, true otherwise
-       *
-       */
-      bool removeReturnTransWith( const St * state );      
+      bool removeTransWith( const St * state );   
       
       /** 
        *
@@ -847,7 +815,7 @@ namespace wali
       bool removeReturnTransSym( const Sym & sym );
       
       /**
-       *
+       *  TODO: use refptr<St> 
        * @brief test if there exists a call transition with the given from state 
        *        and symbol in this collection of transitions 
        *
@@ -863,7 +831,7 @@ namespace wali
       bool callExists( St * from, Sym * sym ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St>  
        * @brief provides access to all call transitions with the given from state
        *        and symbol in this collection of transitions
        *
@@ -878,7 +846,7 @@ namespace wali
       const Calls getCalls( St * from, Sym * sym ) const;
         
       /**
-       *
+       *  TODO: use refptr<St> 
        * @brief test if there exists an internal transition with the given from state 
        *        and symbol in this collection of transitions 
        *
@@ -894,7 +862,7 @@ namespace wali
       bool internalExists( St * from, Sym * sym ) const;
         
       /**
-       *
+       *  TODO: use refptr<St> 
        * @brief provides access to all internal transitions with the given from 
        *        state and symbol in this collection of transitions
        *
@@ -909,7 +877,7 @@ namespace wali
       const Internals getInternals( St * from, Sym * sym ) const;
 
       /**
-       * TODO this is redundant
+       *  TODO this is redundant
        * @brief provides access to all internal transitions with the given 
        *        from state in this collection of transitions
        *
@@ -923,7 +891,7 @@ namespace wali
       const Internals getInternalsFrom( St * from ) const;
         
       /**
-       *
+       *  TODO: use refptr<St> 
        * @brief test if there exists a return transition with the given from state, 
        *        predecessor state, and symbol in this collection of transitions 
        *
@@ -940,7 +908,7 @@ namespace wali
       bool returnExists( St * from, St * pred, Sym * sym ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St>  
        * @brief provides access to all return transitions with the given from
        *        state and symbol in this collection of transitions
        *
@@ -953,6 +921,53 @@ namespace wali
        *
        */
       const Returns getReturns( St * from, Sym * sym ) const;
+
+      protected:
+        /** 
+       *  TODO: use refptr<St> 
+       * @brief removes all call transitions to or from the given state  
+       *
+       * This method removes all call transitions to or from the given state 
+       * If no call transitions exist to or from this state false is returned.  
+       * Otherwise, true is returned.
+       *
+       * @param - state: the state whose transitions to remove
+       * @return false if no transitions were removed, true otherwise
+       *
+       */
+      bool removeCallTransWith( const St * state );        
+      
+      /** 
+       *  TODO: use refptr<St> 
+       * @brief removes all internal transitions to or from the given state
+       *
+       * This method removes all internal transitions to or from the given
+       * state.  If no internal transitions exist to or from this state, 
+       * false is returned.  Otherwise, true is returned. 
+       *
+       * @param - state: the state whose transitions to remove
+       * @return false if no transitions were removed, true otherwise
+       *
+       */
+      bool removeInternalTransWith( const St * state );
+      
+      /** 
+       *  TODO: use refptr<St> 
+       * @brief removes all return transitions to or from the given state
+       *        as well as return transitions corresponding to calls from
+       *        that state
+       *
+       * This method removes all return transitions to or from the given 
+       * state as well as return transitions corresponding to calls from
+       * that state.  If no return transitions exist to or from this state,
+       * or having this state as a call predecessor, false is returned.  
+       * Otherwise, true is returned.
+       *
+       * @param - state: the state whose transitions to remove
+       * @return false if no transitions were removed, true otherwise
+       *
+       */
+      bool removeReturnTransWith( const St * state );    
 
       //
       // Variables
@@ -1019,7 +1034,7 @@ namespace wali
     //Transition Accessors
 
     /**
-     *  
+     *  TODO: use refptr<St>  
      * @brief finds the symbol on any transition whose source is 'from' and
      *        whose target is 'to'
      *
@@ -1077,7 +1092,7 @@ namespace wali
     }
 
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief tests whether there exists a transition whose source is 'from',
      *        whose symbol is 'sym', and whose target is 'to'
      *
@@ -1130,7 +1145,7 @@ namespace wali
     }
 
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief returns all return sites that correspond with the given call site
      *
      * @param - callSite: the call site whose return sites to look for
@@ -1150,7 +1165,7 @@ namespace wali
     }
 
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief returns all return sites that correspond with the given exit and call site
      *
      * @param - exit: the exit whose return sites to look for
@@ -1172,7 +1187,7 @@ namespace wali
     }
 
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief returns all call sites that correspond with the given exit - return site pair
      *
      * @param - exitSite: the exit of the pair whose call sites to look for
@@ -1194,7 +1209,7 @@ namespace wali
     }
 
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief returns all entry sites that correspond with the given call site
      *
      * @param - callSite: the call site whose entry sites to look for
@@ -1214,7 +1229,7 @@ namespace wali
     }
 
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief returns all targets that correspond with the given source 
      *
      * @param - source: the source whose targets to look for
@@ -1233,8 +1248,8 @@ namespace wali
       return targets;
     }
 
-  /**
-     *  
+    /**
+     *  TODO: use refptr<St>  
      * @brief creates transitions for 'dup' mirroring 'orig' outgoing transitions
      *
      * @param - orig: the state that is being duplicated
@@ -1276,10 +1291,8 @@ namespace wali
       }
     }
 
-
-
     /**
-     *  
+     *  TODO: use refptr<St>  
      * @brief creates transitions for 'dup' mirroring 'orig' transitions
      *
      * @param - orig: the state that is being duplicated
@@ -1648,6 +1661,7 @@ namespace wali
     std::ostream & TransSet<St,Sym,Call,Internal,Return>::print( std::ostream & o ) const
     {    
       //Print call transitions.
+      //TODO: this is commented out because StName does not have a print method.
       /*o << "Delta_c: \n" << "{ \n";
       callIterator cit = callTrans.begin();
       callIterator citEND = callTrans.end();
@@ -1720,6 +1734,7 @@ namespace wali
     std::ostream & TransSet<St,Sym,Call,Internal,Return>::print_dot( std::ostream & o) const
     {    
       //Print call transitions.
+      //TODO: this is commented out because StName does not have a print method.
      /* o << "//Delta_c: \n";
       callIterator cit = callTrans.begin();
       callIterator citEND = callTrans.end();
@@ -1958,7 +1973,7 @@ namespace wali
     }
     
     /**
-     * 
+     *  TODO: use refptr<St> 
      * @brief returns all outgoing internal transitions for the given state
      *
      * @param - state: the source state
@@ -1973,7 +1988,7 @@ namespace wali
     }
     
     /**
-     * 
+     *  TODO: use refptr<St>  
      * @brief retuans all incoming internal transitions for the given state
      *
      * @param - state: the target state
@@ -1983,12 +1998,12 @@ namespace wali
     template <typename St,typename Sym,typename Call,typename Internal,typename Return>
     std::set<Internal> TransSet<St,Sym,Call,Internal,Return>::getTransTo( const St * state ) const
     {
-      //TODO getTransFrom( StName )
+      //TODO getTransTo( StName )
       return T_info.toTrans( state );
     }
     
     /**
-     * 
+     *  TODO: use refptr<St>  
      * @brief returns all call transitions for the given call site
      *
      * @param - state: the call site
@@ -1998,12 +2013,12 @@ namespace wali
     template <typename St,typename Sym,typename Call,typename Internal,typename Return>
     std::set<Call> TransSet<St,Sym,Call,Internal,Return>::getTransCall( const St * state ) const
     {
-      //TODO getTransFrom( StName )
+      //TODO getTransCall( StName )
       return T_info.callTrans( state );
     }
     
     /**
-     * 
+     *  TODO: use refptr<St>  
      * @brief returns all call transitions for the given entry point
      *
      * @param - state: the entry point
@@ -2013,12 +2028,12 @@ namespace wali
     template <typename St,typename Sym,typename Call,typename Internal,typename Return>
     std::set<Call> TransSet<St,Sym,Call,Internal,Return>::getTransEntry( const St * state ) const
     {
-      //TODO getTransFrom( StName )
+      //TODO getTransEntry( StName )
       return T_info.entryTrans( state );
     }
     
     /**
-     * 
+     *  TODO: use refptr<St>  
      * @brief returns all return transitions for the given exit point
      *
      * @param - state: the exit point
@@ -2028,12 +2043,12 @@ namespace wali
     template <typename St,typename Sym,typename Call,typename Internal,typename Return>
     std::set<Return> TransSet<St,Sym,Call,Internal,Return>::getTransExit( const St * state ) const
     {
-      //TODO getTransFrom( StName )
+      //TODO getTransExit( StName )
       return T_info.exitTrans( state );
     }
     
     /**
-     * 
+     *  TODO: use refptr<St>  
      * @brief returns all return transitions for the given call predecessor
      *
      * @param - state: the call predecessor
@@ -2043,12 +2058,12 @@ namespace wali
     template <typename St,typename Sym,typename Call,typename Internal,typename Return>
     std::set<Return> TransSet<St,Sym,Call,Internal,Return>::getTransPred( const St * state ) const
     {
-      //TODO getTransFrom( StName )
+      //TODO getTransPred( StName )
       return T_info.predTrans( state );
     }
     
     /**
-     * 
+     *  TODO: use refptr<St>  
      * @brief returns all return transitions for the given return site
      *
      * @param - state: the return site
@@ -2058,12 +2073,12 @@ namespace wali
     template <typename St,typename Sym,typename Call,typename Internal,typename Return>
     std::set<Return> TransSet<St,Sym,Call,Internal,Return>::getTransRet( const St * state ) const
     {
-      //TODO getTransFrom( StName )
+      //TODO getTransRet( StName )
       return T_info.retTrans( state );
     }
     
     /**
-     * 
+     *  TODO: use refptr<St>  
      * @brief tests whether the given state is the source of any internal 
      *        transition
      *
@@ -2079,7 +2094,7 @@ namespace wali
     }
     
     /**
-     * 
+     *  TODO: use refptr<St>  
      * @brief tests whether the given state is the target of any internal
      *        transition
      *
@@ -2095,7 +2110,7 @@ namespace wali
     }
     
     /**
-     * 
+     *  TODO: use refptr<St>  
      * @brief tests whether the given state is the call site of any call 
      *        transition
      *
@@ -2111,7 +2126,7 @@ namespace wali
     }
     
     /**
-     * 
+     *  TODO: use refptr<St>  
      * @brief tests whether the given state is the entry point of any call
      *        transition
      *
@@ -2127,7 +2142,7 @@ namespace wali
     }
     
     /**
-     * 
+     *  TODO: use refptr<St>  
      * @brief tests whether the given state is the exit point of any return
      *        transition
      *
@@ -2143,7 +2158,7 @@ namespace wali
     }
     
     /**
-     * 
+     *  TODO: use refptr<St>  
      * @brief tests whether the given state is the call predecessor for any
      *        return transition
      *
@@ -2159,7 +2174,7 @@ namespace wali
     }
     
     /**
-     * 
+     *  TODO: use refptr<St>  
      * @brief tests whether the given state is the return site of any return
      *        transition
      *
@@ -2175,7 +2190,25 @@ namespace wali
     }
       
     /** 
+     *  TODO: use refptr<St> 
+     * @brief removes all transitions involving the given state  
      *
+     * @param - state: the state whose transitions to remove
+     * @return false if no transitions were removed, true otherwise
+     *
+     */
+    template <typename St,typename Sym,typename Call,typename Internal,typename Return>
+    bool TransSet<St,Sym,Call,Internal,Return>::removeTransWith( const St * state )
+    {
+      bool found = false;
+      found = found || removeCallTransWith(state);
+      found = found || removeInternalTransWith(state);
+      found = found || removeReturnTransWith(state);
+      return found;
+    }
+
+    /** 
+     *  TODO: use refptr<St> 
      * @brief removes all call transitions to or from the given state  
      *
      * @param - state: the state whose transitions to remove
@@ -2204,7 +2237,7 @@ namespace wali
     }
   
     /** 
-     *
+     *  TODO: use refptr<St> 
      * @brief removes all internal transitions to or from the given state
      *
      * @param - state: the state whose transitions to remove
@@ -2234,7 +2267,7 @@ namespace wali
     }
   
     /** 
-     *
+     *  TODO: use refptr<St> 
      * @brief removes all return transitions to or from the given state
      *        as well as return transitions corresponding to calls from
      *        that state
@@ -2354,7 +2387,8 @@ namespace wali
     }
     
     /**
-     * TODO optimize
+     *  TODO: use refptr<St> 
+     *  TODO optimize
      * @brief test if there exists a call transition with the given from state 
      *        and symbol in this collection of transitions 
      *
@@ -2378,7 +2412,8 @@ namespace wali
     }
     
     /**
-     * TODO optimize
+     *  TODO: use refptr<St> 
+     *  TODO optimize
      * @brief provides access to all call transitions with the given from state
      *        and symbol in this collection of transitions
      *
@@ -2402,7 +2437,8 @@ namespace wali
     }
     
     /**
-     * TODO optimize
+     *  TODO: use refptr<St> 
+     *  TODO optimize
      * @brief test if there exists an internal transition with the given from state 
      *        and symbol in this collection of transitions 
      *
@@ -2426,7 +2462,8 @@ namespace wali
     }
     
     /**
-     * TODO optimize
+     *  TODO: use refptr<St> 
+     *  TODO optimize
      * @brief provides access to all internal transitions with the given from 
      *        state and symbol in this collection of transitions
      *
@@ -2450,7 +2487,7 @@ namespace wali
     }
     
     /**
-     * TODO this is redundant
+     *  TODO this is redundant
      * @brief provides access to all internal transitions with the given 
      *        from state in this collection of transitions
      *
@@ -2462,18 +2499,13 @@ namespace wali
     const typename TransSet<St,Sym,Call,Internal,Return>::Internals TransSet<St,Sym,Call,Internal,Return>::getInternalsFrom( St * from ) const
     {
       assert(from);
-      //Internals result;
-      //for( internalIterator iit = beginInternal(); iit != endInternal(); iit++ )  {
-      //  if( ((*iit).first == from) )
-      //    result.insert(*iit);
-      //} 
-      //return result;
       return fromTrans(from);
     }
 
 
     /**
-     * TODO optimize
+     *  TODO: use refptr<St> 
+     *  TODO optimize
      * @brief test if there exists a return transition with the given from state, 
      *        predecessor state, and symbol in this collection of transitions 
      *
@@ -2499,7 +2531,8 @@ namespace wali
     }   
     
     /**
-     * TODO optimize
+     *  TODO: use refptr<St> 
+     *  TODO optimize
      * @brief provides access to all return transitions with the given from
      *        state and symbol in this collection of transitions
      *
@@ -2598,6 +2631,20 @@ namespace wali
       std::set<St> getReturnSites( const St & callSite ) const;
 
       /**
+       *  
+       * @brief returns all return sites that correspond with the given exit and call site
+       *
+       * This method returns the set of all return sites that correspond with the
+       * given exit and call site.
+       *
+       * @param - exit: the exit whose return sites to look for
+       * @param - callSite: the call site whose return sites to look for
+       * @return the set of all return sites that correspond with the given exit and call site
+       *
+       */
+      const std::set<Return> getReturns( const St & exit, const St & callSite ) const;
+
+      /**
        * 
        * @brief returns all call sites that correspond with the given exit - return site pair
        *
@@ -2610,6 +2657,45 @@ namespace wali
        *
        */
       std::set<St> getCallSites( const St & exitSite, const St & returnSite ) const;
+
+      /**
+       * 
+       * @brief returns all entry sites that correspond with the given call site
+       *
+       * This method returns the set of all entry sites that correspond with the
+       * given call site.
+       *
+       * @param - callSite: the call site whose entry sites to look for
+       * @return the set of all entry sites that correspond with the given call site
+       *
+       */
+      const std::set<Call> getEntries( const St & callSite ) const;
+
+      /**
+       * 
+       * @brief returns all targets that correspond with the given source 
+       *
+       * This method returns the set of all targets that correspond with the 
+       * given source .
+       *
+       * @param - source: the source whose targets to look for
+       * @return the set of all targets that correspond with the given source 
+       *
+       */
+      const std::set<Internal> getTargets( const St & source ) const;
+
+      /**
+       *  
+       * @brief creates transitions for 'dup' mirroring 'orig' outgoing transitions
+       *
+       * This method creates a transition using 'dup' in the place of 'orig' for
+       * each outgoing transition involving 'orig'.  Do not duplicate selfloops.
+       *
+       * @param - orig: the state that is being duplicated
+       * @param - dup: the state that is duplicating 'orig'
+       *  
+       */
+      void dupTransOutgoing( const St & orig, const St & dup );
 
       /**
        *  
@@ -3201,50 +3287,18 @@ namespace wali
       bool isRet( const St & state ) const;
 
       /** 
+       *  
+       * @brief removes all transitions involving the given state  
        *
-       * @brief removes all call transitions to or from the given state  
-       *
-       * This method removes all call transitions to or from the given state 
-       * If no call transitions exist to or from this state false is returned.  
+       * This method removes all transitions involving the given state 
+       * If no transitions exist involving this state false is returned.  
        * Otherwise, true is returned.
        *
        * @param - state: the state whose transitions to remove
        * @return false if no transitions were removed, true otherwise
        *
        */
-      bool removeCallTransWith( const St & state );        
-      
-      /** 
-       *
-       * @brief removes all internal transitions to or from the given state
-       *
-       * This method removes all internal transitions to or from the given
-       * state.  If no internal transitions exist to or from this state, 
-       * false is returned.  Otherwise, true is returned. 
-       *
-       * @param - state: the state whose transitions to remove
-       * @return false if no transitions were removed, true otherwise
-       *
-       */
-      bool removeInternalTransWith( const St & state );
-      
-      /** 
-       *
-       * @brief removes all return transitions to or from the given state
-       *        as well as return transitions corresponding to calls from
-       *        that state
-       *
-       * This method removes all return transitions to or from the given 
-       * state as well as return transitions corresponding to calls from
-       * that state.  If no return transitions exist to or from this state,
-       * or having this state as a call predecessor, false is returned.  
-       * Otherwise, true is returned.
-       *
-       * @param - state: the state whose transitions to remove
-       * @return false if no transitions were removed, true otherwise
-       *
-       */
-      bool removeReturnTransWith( const St & state );      
+      bool removeTransWith( const St * state );     
       
       /** 
        *
@@ -3289,7 +3343,7 @@ namespace wali
       bool removeReturnTransSym( const Sym & sym );
       
       /**
-       *
+       *  TODO: use refptr<St>  
        * @brief test if there exists a call transition with the given from state 
        *        and symbol in this collection of transitions 
        *
@@ -3305,7 +3359,7 @@ namespace wali
       bool callExists( St * from, Sym * sym ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St>   
        * @brief provides access to all call transitions with the given from state
        *        and symbol in this collection of transitions
        *
@@ -3320,7 +3374,7 @@ namespace wali
       const Calls getCalls( St * from, Sym * sym ) const;
         
       /**
-       *
+       *  TODO: use refptr<St>  
        * @brief test if there exists an internal transition with the given from state 
        *        and symbol in this collection of transitions 
        *
@@ -3336,7 +3390,7 @@ namespace wali
       bool internalExists( St * from, Sym * sym ) const;
         
       /**
-       *
+       *  TODO: use refptr<St>  
        * @brief provides access to all internal transitions with the given from 
        *        state and symbol in this collection of transitions
        *
@@ -3351,7 +3405,8 @@ namespace wali
       const Internals getInternals( St * from, Sym * sym ) const;
 
       /**
-       * TODO this is redundant
+       *  TODO: use refptr<St>  
+       *  TODO this is redundant
        * @brief provides access to all internal transitions with the given 
        *        from state in this collection of transitions
        *
@@ -3365,7 +3420,7 @@ namespace wali
       const Internals getInternalsFrom( St * from ) const;
         
       /**
-       *
+       *  TODO: use refptr<St>  
        * @brief test if there exists a return transition with the given from state, 
        *        predecessor state, and symbol in this collection of transitions 
        *
@@ -3382,7 +3437,7 @@ namespace wali
       bool returnExists( St * from, St * pred, Sym * sym ) const;
         
       /**
-       * 
+       *  TODO: use refptr<St>   
        * @brief provides access to all return transitions with the given from
        *        state and symbol in this collection of transitions
        *
@@ -3395,6 +3450,53 @@ namespace wali
        *
        */
       const Returns getReturns( St * from, Sym * sym ) const;
+
+      protected:
+        /** 
+       *
+       * @brief removes all call transitions to or from the given state  
+       *
+       * This method removes all call transitions to or from the given state 
+       * If no call transitions exist to or from this state false is returned.  
+       * Otherwise, true is returned.
+       *
+       * @param - state: the state whose transitions to remove
+       * @return false if no transitions were removed, true otherwise
+       *
+       */
+      bool removeCallTransWith( const St & state );        
+      
+      /** 
+       *
+       * @brief removes all internal transitions to or from the given state
+       *
+       * This method removes all internal transitions to or from the given
+       * state.  If no internal transitions exist to or from this state, 
+       * false is returned.  Otherwise, true is returned. 
+       *
+       * @param - state: the state whose transitions to remove
+       * @return false if no transitions were removed, true otherwise
+       *
+       */
+      bool removeInternalTransWith( const St & state );
+      
+      /** 
+       *
+       * @brief removes all return transitions to or from the given state
+       *        as well as return transitions corresponding to calls from
+       *        that state
+       *
+       * This method removes all return transitions to or from the given 
+       * state as well as return transitions corresponding to calls from
+       * that state.  If no return transitions exist to or from this state,
+       * or having this state as a call predecessor, false is returned.  
+       * Otherwise, true is returned.
+       *
+       * @param - state: the state whose transitions to remove
+       * @return false if no transitions were removed, true otherwise
+       *
+       */
+      bool removeReturnTransWith( const St & state );    
 
       //
       // Variables
@@ -3593,6 +3695,28 @@ namespace wali
 
     /**
      * 
+     * @brief returns all return sites that correspond with the given exit and call site
+     *
+     * @param - exit: the exit whose return sites to look for
+     * @param - callSite: the call site whose return sites to look for
+     * @return the set of all return sites that correspond with the given call site
+     *
+     */
+    template <typename St,typename Sym,typename Call,typename Internal,typename Return>
+    const std::set<typename Return> TransSet<St,Sym,Call,Internal,Return>::getReturns( const St & exit, const St & callSite ) const
+    {
+      std::set<Return> returns;
+      const Info::Returns pred = T_info.predTrans(callSite);
+      for( Info::Returns::const_iterator it = pred.begin(); it != pred.end(); it++ )
+      {
+        if( it->first == exit->getName() )
+          returns.insert(*it);
+      }
+      return returns;
+    }
+
+    /**
+     * 
      * @brief returns all call sites that correspond with the given exit - return site pair
      *
      * @param - exitSite: the exit of the pair whose call sites to look for
@@ -3611,6 +3735,89 @@ namespace wali
           calls.insert(it->first);
       }
       return calls;
+    }
+
+    /**
+     * 
+     * @brief returns all entry sites that correspond with the given call site
+     *
+     * @param - callSite: the call site whose entry sites to look for
+     * @return the set of all entry sites that correspond with the given call site
+     *
+     */
+    template <typename St,typename Sym,typename Call,typename Internal,typename Return>
+    const std::set<typename Call> TransSet<St,Sym,Call,Internal,Return>::getEntries( const St & callSite ) const
+    {
+      std::set<Call> entries;
+      const Info::Calls cll = T_info.callTrans(callSite);
+      for( Info::Calls::const_iterator it = cll.begin(); it != cll.end(); it++ )
+      {
+        entries.insert(*it);
+      }
+      return entries;
+    }
+
+    /**
+     * 
+     * @brief returns all targets that correspond with the given source 
+     *
+     * @param - source: the source whose targets to look for
+     * @return the set of all targets that correspond with the given source 
+     *
+     */
+    template <typename St,typename Sym,typename Call,typename Internal,typename Return>
+    const std::set<typename Internal> TransSet<St,Sym,Call,Internal,Return>::getTargets( const St & source ) const
+    {
+      std::set<Internal> targets;
+      const Info::Internals src = T_info.fromTrans(source);
+      for( Info::Internals::const_iterator it = src.begin(); it != src.end(); it++ )
+      {
+        targets.insert(*it);
+      }
+      return targets;
+    }
+
+    /**
+     *   
+     * @brief creates transitions for 'dup' mirroring 'orig' outgoing transitions
+     *
+     * @param - orig: the state that is being duplicated
+     * @param - dup: the state that is duplicating 'orig'
+     *  
+     */
+    template <typename St,typename Sym,typename Call,typename Internal,typename Return>
+    void TransSet<St,Sym,Call,Internal,Return>::dupTransOutgoing( const St & orig, const St & dup )
+    { 
+      //Duplicate outgoing internal transitions.
+      const Info::Internals from = T_info.fromTrans(orig);
+      for( Info::Internals::const_iterator it = from.begin(); it != from.end(); it++ )
+      {
+        Internal iTrans = Internal(dup->getName(),it->second,it->third);
+        addInternal(iTrans);
+
+      }
+      //Duplicate call site call transitions.
+      const Info::Calls call = T_info.callTrans(orig);
+      for( Info::Calls::const_iterator it = call.begin(); it != call.end(); it++ )
+      {
+        Call cTrans = Call(dup->getName(),it->second,it->third);
+        addCall(cTrans);
+
+      }
+      //Duplicate exit point return transitions.
+      const Info::Returns exit = T_info.exitTrans(orig);
+      for( Info::Returns::const_iterator it = exit.begin(); it != exit.end(); it++ )
+      {
+        Return rTrans = Return(dup->getName(),it->second,it->third,it->fourth);
+        addReturn(rTrans);
+      }
+      //Duplicate call predecessor return transitions.
+      const Info::Returns pred = T_info.predTrans(orig);
+      for( Info::Returns::const_iterator it = pred.begin(); it != pred.end(); it++ )
+      {
+        Return rTrans = Return(it->first,dup->getName(),it->third,it->fourth);
+        addReturn(rTrans);
+      }
     }
 
     /**
@@ -4500,6 +4707,24 @@ namespace wali
     {
       return T_info.isRet( state );
     }
+
+    /** 
+     *  TODO: use refptr<St> 
+     * @brief removes all transitions involving the given state  
+     *
+     * @param - state: the state whose transitions to remove
+     * @return false if no transitions were removed, true otherwise
+     *
+     */
+    template <typename St,typename Sym,typename Call,typename Internal,typename Return>
+    bool TransSet<St,Sym,Call,Internal,Return>::removeTransWith( const St * state )
+    {
+      bool found = false;
+      found = found || removeCallTransWith(state);
+      found = found || removeInternalTransWith(state);
+      found = found || removeReturnTransWith(state);
+      return found;
+    }
       
     /** 
      *
@@ -4793,12 +5018,6 @@ namespace wali
     const typename TransSet<St,Sym,Call,Internal,Return>::Internals TransSet<St,Sym,Call,Internal,Return>::getInternalsFrom( St * from ) const
     {
       assert(from);
-      //Internals result;
-      //for( internalIterator iit = beginInternal(); iit != endInternal(); iit++ )  {
-      //  if( ((*iit).first == from) )
-      //    result.insert(*iit);
-      //} 
-      //return result;
       return fromTrans(*from);
     }
 

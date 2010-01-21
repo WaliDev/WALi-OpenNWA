@@ -334,7 +334,7 @@ namespace wali
        */
       const Internals toTrans( const St * name ) const
       {
-        //TODO fromTrans( StName )
+        //TODO toTrans( StName )
         IntraMap::const_iterator it = to_ITrans.find(name->getStateKey());
         if( it == to_ITrans.end() )
           return Internals();
@@ -356,7 +356,7 @@ namespace wali
        */
       const Calls callTrans( const St * name ) const
       {
-        //TODO fromTrans( StName )
+        //TODO callTrans( StName )
         CallMap::const_iterator it = call_CTrans.find(name->getStateKey());
         if( it == call_CTrans.end() )
           return Calls();
@@ -378,7 +378,7 @@ namespace wali
        */
       const Calls entryTrans( const St * name ) const
       { 
-        //TODO fromTrans( StName )
+        //TODO entryTrans( StName )
         CallMap::const_iterator it = entry_CTrans.find(name->getStateKey());
         if( it == entry_CTrans.end() )
           return Calls();
@@ -400,7 +400,7 @@ namespace wali
        */
       const Returns exitTrans( const St * name ) const
       {
-        //TODO fromTrans( StName )
+        //TODO exitTrans( StName )
         RetMap::const_iterator it = exit_RTrans.find(name->getStateKey());
         if( it == exit_RTrans.end() )
           return Returns();
@@ -422,7 +422,7 @@ namespace wali
        */
       const Returns predTrans( const St * name )const
       {
-        //TODO fromTrans( StName )
+        //TODO predTrans( StName )
         RetMap::const_iterator it = pred_RTrans.find(name->getStateKey());
         if( it == pred_RTrans.end() )
           return Returns();
@@ -444,7 +444,7 @@ namespace wali
        */
       const Returns retTrans( const St * name )const
       {
-        //TODO fromTrans( StName )
+        //TODO retTrans( StName )
         RetMap::const_iterator it = ret_RTrans.find(name->getStateKey());
         if( it == ret_RTrans.end() )
           return Returns();
