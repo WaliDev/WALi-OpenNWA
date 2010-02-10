@@ -46,7 +46,7 @@ class STR
 };
 
 template<typename St, typename Sym>
-class ReachGen : public wali::nwa::WeightGen<St,Sym>
+class ReachGen : public wali::nwa::WeightGen
 {
   public:
     enum Kind {INTRA, CALL_TO_ENTRY, EXIT_TO_RET, CALL_TO_RET};
@@ -236,143 +236,176 @@ int main()
   myNWA.clearTrans();
   otherNWA.~NWA();
 #else
-  wali::nwa::NWA<> myNWA;
+  wali::ref_ptr<wali::nwa::NWA<>> myNWA;
   
-  wali::nwa::State<> start = wali::nwa::State<>(wali::getKey("start"));
-  wali::nwa::State<> state = wali::nwa::State<>(wali::getKey("state"));
-  wali::nwa::State<> call = wali::nwa::State<>(wali::getKey("call"));
-  wali::nwa::State<> call2 = wali::nwa::State<>(wali::getKey("call2"));
-  wali::nwa::State<>  entry = wali::nwa::State<>(wali::getKey("entry"));
-  wali::nwa::State<>  exit = wali::nwa::State<>(wali::getKey("exit"));
-  wali::nwa::State<>  ret = wali::nwa::State<>(wali::getKey("return"));
-  wali::nwa::State<>  end = wali::nwa::State<>(wali::getKey("end"));
+  wali::Key start = wali::getKey("start");
+  wali::Key state = wali::getKey("state");
+  wali::Key call = wali::getKey("call");
+  wali::Key call2 = wali::getKey("call2");
+  wali::Key  entry = wali::getKey("entry");
+  wali::Key  exit = wali::getKey("exit");
+  wali::Key  ret = wali::getKey("return");
+  wali::Key  end = wali::getKey("end");
   
-  wali::nwa::Symbol<> epsilon = wali::nwa::Symbol<>::getEpsilon();
-  wali::nwa::Symbol<> callInst = wali::nwa::Symbol<>(wali::getKey("callInst"));
-  wali::nwa::Symbol<> intraInst = wali::nwa::Symbol<>(wali::getKey("intraInst"));
-  wali::nwa::Symbol<> retInst = wali::nwa::Symbol<>(wali::getKey("retInst"));
-  wali::nwa::Symbol<> sym;
+  wali::Key epsilon = wali::nwa::SymbolSet::getEpsilon();
+  wali::Key callInst = wali::getKey("callInst");
+  wali::Key intraInst = wali::getKey("intraInst");
+  wali::Key retInst = wali::getKey("retInst");
+  wali::Key sym;
   
-  wali::Triple<wali::nwa::State<>,wali::nwa::Symbol<>,wali::nwa::State<> > callTrans = 
-                wali::Triple<wali::nwa::State<> ,wali::nwa::Symbol<>,wali::nwa::State<> >(call,callInst,entry);
-  wali::Triple<wali::nwa::State<> ,wali::nwa::Symbol<>,
-        wali::nwa::State<> > internalTrans = 
-                wali::Triple<wali::nwa::State<> ,wali::nwa::Symbol<>,
-                        wali::nwa::State<> >(entry,intraInst,exit);
-  wali::Quad<wali::nwa::State<> ,wali::nwa::State<> ,
-      wali::nwa::Symbol<>,wali::nwa::State<> > returnTrans = 
-                wali::Quad<wali::nwa::State<> ,wali::nwa::State<> ,
-                      wali::nwa::Symbol<>,wali::nwa::State<> >(exit,call,retInst,ret);
+  wali::Triple<wali::Key,wali::Key,wali::Key > callTrans = 
+                wali::Triple<wali::Key ,wali::Key,wali::Key >(call,callInst,entry);
+  wali::Triple<wali::Key ,wali::Key,
+        wali::Key > internalTrans = 
+                wali::Triple<wali::Key ,wali::Key,
+                        wali::Key >(entry,intraInst,exit);
+  wali::Quad<wali::Key ,wali::Key ,
+      wali::Key,wali::Key > returnTrans = 
+                wali::Quad<wali::Key ,wali::Key ,
+                      wali::Key,wali::Key >(exit,call,retInst,ret);
   
-  myNWA.isAbsentAccept();
-  myNWA.acceptAbsent();
-  myNWA.rejectAbsent();
+  myNWA->addInitialState(start);
+  myNWA->addState(state);
+  myNWA->addState(call);
+  myNWA->addState(entry);
+  myNWA->addState(exit);
+  myNWA->addState(ret);
+  myNWA->addFinalState(end);
   
-  myNWA.addInitialState(&start);
-  myNWA.addState(&state);
-  myNWA.addState(&call);
-  myNWA.addState(&entry);
-  myNWA.addState(&exit);
-  myNWA.addState(&ret);
-  myNWA.addFinalState(&end);
+  myNWA->getStates();
+  myNWA->get_states();
+  myNWA->getInitialStates();
+  myNWA->getInitialState();
+  myNWA->getFinalStates();
+
+  myNWA->isState(state);
+  myNWA->is_nwa_state(state);
+  myNWA->isInitialState(start);
+  myNWA->isFinalState(end);
+  myNWA->sizeStates();
+  myNWA->num_nwa_states();
+  myNWA->sizeInitialStates();
+  myNWA->sizeFinalStates();
   
-  myNWA.getState(wali::getKey("call"));
-  myNWA.getStates();
-  myNWA.getStateNames();
-  myNWA.duplicateState(wali::getKey("call"),wali::getKey("call2"));
+  wali::nwa::NWA<>::ClientInfoRefPtr info = myNWA->getClientInfo(state);
+  myNWA->setClientInfo(state,info);
+
+  myNWA->getPredecessorNames(state);
+  wali::Key state1 = wali::getKey("state1");
+  myNWA->duplicateStateOutgoing(state,state1);
+  wali::Key state2 = wali::getKey("state2");
+  myNWA->duplicateState(state,state2);
   
-  //myNWA.addAllStates(wali::nwa::StateSet<wali::nwa::State ,std::string>());
-  //myNWA.addAllInitialStates(wali::nwa::StateSet<wali::nwa::State ,std::string>());
-  //myNWA.addAllFinalStates(wali::nwa::StateSet<wali::nwa::State ,std::string>(),false);
-  myNWA.isState(&state);
-  myNWA.isInitialState(&start);
-  myNWA.isFinalState(&end);
-  //myNWA.beginStates();
-  //myNWA.endStates();
-  //myNWA.beginInitialStates();
-  //myNWA.endInitialStates();
-  //myNWA.beginFinalStates();
-  //myNWA.endFinalStates();  
-  myNWA.sizeStates();
-  myNWA.sizeInitialStates();
-  myNWA.sizeFinalStates();
-  
-  //myNWA.getSymbols();
-  myNWA.isSymbol(epsilon);
-  myNWA.addSymbol(epsilon);
- //myNWA.addAllSymbols(std::set<wali::nwa::Symbol *>());  
-  //myNWA.beginSymbols();
-  //myNWA.endSymbols();
-  myNWA.sizeSymbols();
+  myNWA->getSymbols();
+  myNWA->isSymbol(epsilon);
+  myNWA->addSymbol(epsilon);  
+  myNWA->sizeSymbols();
     
-  myNWA.addInternalTrans(&start,epsilon,&call);
-  myNWA.addInternalTrans(wali::getKey("start"),epsilon,wali::getKey("call"));
-  myNWA.addCallTrans(callTrans);
-  myNWA.addCallTrans(&call,callInst,&entry);
-  myNWA.addCallTrans(wali::getKey("call"),callInst,wali::getKey("entry"));
-  myNWA.addInternalTrans(internalTrans);
-  myNWA.addInternalTrans(&entry,intraInst,&state);
-  myNWA.addInternalTrans(wali::getKey("entry"),intraInst,wali::getKey("state"));
-  myNWA.addInternalTrans(&state,intraInst,&exit);
-  myNWA.addInternalTrans(wali::getKey("state"),intraInst,wali::getKey("exit"));
-  myNWA.addReturnTrans(returnTrans);
-  myNWA.addReturnTrans(&exit,&call,retInst,&ret);
-  myNWA.addReturnTrans(wali::getKey("exit"),wali::getKey("call"),retInst,wali::getKey("ret"));
-  myNWA.addInternalTrans(&ret,epsilon,&end);
-  myNWA.addInternalTrans(wali::getKey("ret"),epsilon,wali::getKey("end"));
-  //myNWA.beginCallTrans();
-  //myNWA.endCallTrans();
-  //myNWA.beginInternalTrans();
-  //myNWA.endInternalTrans();
-  //myNWA.beginReturnTrans();
-  //myNWA.endReturnTrans();
+  myNWA->addInternalTrans(start,epsilon,call);
+  myNWA->addInternalTrans(wali::getKey("start"),epsilon,wali::getKey("call"));
+  myNWA->addCallTrans(callTrans);
+  myNWA->addCallTrans(call,callInst,entry);
+  myNWA->addCallTrans(wali::getKey("call"),callInst,wali::getKey("entry"));
+  myNWA->addInternalTrans(internalTrans);
+  myNWA->addInternalTrans(entry,intraInst,state);
+  myNWA->addInternalTrans(wali::getKey("entry"),intraInst,wali::getKey("state"));
+  myNWA->addInternalTrans(state,intraInst,exit);
+  myNWA->addInternalTrans(wali::getKey("state"),intraInst,wali::getKey("exit"));
+  myNWA->addReturnTrans(returnTrans);
+  myNWA->addReturnTrans(exit,call,retInst,ret);
+  myNWA->addReturnTrans(wali::getKey("exit"),wali::getKey("call"),retInst,wali::getKey("ret"));
+  myNWA->addInternalTrans(ret,epsilon,end);
+  myNWA->addInternalTrans(wali::getKey("ret"),epsilon,wali::getKey("end"));
   
-  myNWA.getSymbol(wali::getKey("call"),wali::getKey("entry"),sym);
-  myNWA.getReturnSites(wali::getKey("call"));
+  myNWA->getSymbol(wali::getKey("call"),wali::getKey("entry"),sym);
+  myNWA->findTrans(start,epsilon,call);
+  myNWA->findTrans(start,epsilon,state);
+  myNWA->getReturnSites(wali::getKey("call"));
+
+  myNWA->getEntries(call);
+  myNWA->getTargets(state);
+  myNWA->getReturnSites(call);
+  myNWA->getReturns(exit,call);
   
-  myNWA.print(std::cout);
+  myNWA->print(std::cout);
   
   ReachGen<wali::nwa::State<> ,wali::nwa::Symbol<>> wg;  
-  myNWA.NWAtoPDS(wg);
-  myNWA.NWAtoBackwardsPDS(wg);
+  myNWA->NWAtoPDSreturns(wg);
+  myNWA->NWAtoPDScalls(wg);
+  myNWA->NWAtoBackwardsPDSreturns(wg);
+  myNWA->NWAtoBackwardsPDScalls(wg);
+  //myNWA->plusWPDS(wpdsBase);
+  //myNWA->PDStoNWA(wpdsBase);
 
-  wali::nwa::NWA<> otherNWA;
-  wali::nwa::NWA<> intersectNWA;
-  myNWA.intersect(otherNWA,intersectNWA);
-
-  bool equal = myNWA.operator==(otherNWA);
-  //myNWA.numStates();
-  //myNWA.numTrans();
-
-  myNWA.removeInternalTrans(&start,epsilon,&call);
-  myNWA.removeInternalTrans(wali::getKey("start"),epsilon,wali::getKey("call"));
-  myNWA.removeCallTrans(callTrans);
-  myNWA.removeCallTrans(&call,callInst,&entry);
-  myNWA.removeCallTrans(wali::getKey("call"),callInst,wali::getKey("entry"));
-  myNWA.removeInternalTrans(internalTrans);
-  myNWA.removeInternalTrans(&entry,intraInst,&state);
-  myNWA.removeInternalTrans(wali::getKey("entry"),intraInst,wali::getKey("state"));
-  myNWA.removeInternalTrans(&state,intraInst,&exit);
-  myNWA.removeInternalTrans(wali::getKey("state"),intraInst,wali::getKey("exit"));
-  myNWA.removeReturnTrans(returnTrans);
-  myNWA.removeReturnTrans(&exit,&call,retInst,&ret);
-  myNWA.removeReturnTrans(wali::getKey("exit"),wali::getKey("call"),retInst,wali::getKey("ret"));
-  myNWA.removeInternalTrans(&ret,epsilon,&end);
-  myNWA.removeInternalTrans(wali::getKey("ret"),epsilon,wali::getKey("end"));
-  myNWA.removeReturnTrans(wali::getKey("exit"),retInst,wali::getKey("ret"));
-  myNWA.removeReturnTrans(&exit,retInst,&ret);
-
-  myNWA.removeState(&state);
-  myNWA.removeInitialState(&start);
-  myNWA.removeFinalState(&end);
-  myNWA.clearStates();
-  myNWA.clearInitialStates();
-  myNWA.clearFinalStates();
+  wali::nwa::NWA<> otherNWA1 = wali::nwa::NWA<>(*myNWA);
+  wali::nwa::NWA<> otherNWA2 = otherNWA1;
+  wali::ref_ptr<wali::nwa::NWA<>> otherNWA = myNWA;
+  wali::ref_ptr<wali::nwa::NWA<>> intersectNWA;
+  intersectNWA->intersect(myNWA,otherNWA);
+  wali::ref_ptr<wali::nwa::NWA<>> union_NWA;
+  union_NWA->unionNWA(myNWA,otherNWA);
+  wali::ref_ptr<wali::nwa::NWA<>> concatNWA;
+  concatNWA->concat(myNWA,otherNWA);
+  wali::ref_ptr<wali::nwa::NWA<>> reverseNWA;
+  reverseNWA->reverse(myNWA);
+  wali::ref_ptr<wali::nwa::NWA<>> starNWA;
+  starNWA->star(myNWA);
+  wali::ref_ptr<wali::nwa::NWA<>> complementNWA;
+  complementNWA->complement(myNWA);
+  wali::ref_ptr<wali::nwa::NWA<>> determinizeNWA;
+  determinizeNWA->determinize(myNWA);
+  determinizeNWA->isDeterministic();
   
-  myNWA.removeSymbol(epsilon);
-  myNWA.clearSymbols();
+  myNWA->isEmpty();
+  myNWA->isMember(wali::nws::NWS());
+  myNWA->prestar(wali::wfa::WFA(),wg);
+  myNWA->prestar(wali::wfa::WFA(),wali::wfa::WFA(),wg);
+  myNWA->poststar(wali::wfa::WFA(),wg);
+  myNWA->poststar(wali::wfa::WFA(),wali::wfa::WFA(),wg);
+
+  myNWA->print(std::cout);
+  myNWA->print_dot(std::cout,"dotfile");
+  bool equal = myNWA->operator==(*otherNWA);
+
+  myNWA->sizeStates();
+  myNWA->sizeTrans();
+  myNWA->count_rules();
+  myNWA->sizeCallTrans();
+  myNWA->sizeInternalTrans();
+  myNWA->sizeReturnTrans();
+
+  myNWA->removeInternalTrans(start,epsilon,call);
+  myNWA->removeInternalTrans(wali::getKey("start"),epsilon,wali::getKey("call"));
+  myNWA->removeCallTrans(callTrans);
+  myNWA->removeCallTrans(call,callInst,entry);
+  myNWA->removeCallTrans(wali::getKey("call"),callInst,wali::getKey("entry"));
+  myNWA->removeInternalTrans(internalTrans);
+  myNWA->removeInternalTrans(entry,intraInst,state);
+  myNWA->removeInternalTrans(wali::getKey("entry"),intraInst,wali::getKey("state"));
+  myNWA->removeInternalTrans(state,intraInst,exit);
+  myNWA->removeInternalTrans(wali::getKey("state"),intraInst,wali::getKey("exit"));
+  myNWA->removeReturnTrans(returnTrans);
+  myNWA->removeReturnTrans(exit,call,retInst,ret);
+  myNWA->removeReturnTrans(wali::getKey("exit"),wali::getKey("call"),retInst,wali::getKey("ret"));
+  myNWA->removeInternalTrans(ret,epsilon,end);
+  myNWA->removeInternalTrans(wali::getKey("ret"),epsilon,wali::getKey("end"));
+  myNWA->removeReturnTrans(wali::getKey("exit"),retInst,wali::getKey("ret"));
+  myNWA->removeReturnTrans(exit,retInst,ret);
+
+  myNWA->clearTrans();
+
+  myNWA->removeState(state);
+  myNWA->removeInitialState(start);
+  myNWA->removeFinalState(end);
+  myNWA->clearStates();
+  myNWA->clearInitialStates();
+  myNWA->clearFinalStates();
   
-  myNWA.clearTrans();
+  myNWA->removeSymbol(epsilon);
+  myNWA->clearSymbols();
+  
+  
+  otherNWA->clear();
 #endif
 
   return 0;

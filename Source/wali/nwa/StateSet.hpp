@@ -10,7 +10,8 @@
 #include "wali/Printable.hpp"
 #include "wali/Key.hpp"
 #include "wali/KeyContainer.hpp"
-#include "wali/nwa/State.hpp"
+#include "wali/ref_ptr.hpp"
+#include "wali/nwa/ClientInfo.hpp"
 
 // std::c++
 #include <iostream>
@@ -26,1189 +27,16 @@ namespace wali
      *  This class is used to keep track of the states of an NWA.
      *  
      */
-#ifndef KEY
-    template <typename St,typename StName> 
-    class StateSet : public Printable
-    {
-      public:
-        typedef typename std::set<StName>::const_iterator iterator;   
-        typedef std::map<StName,St*> StMap;   //Names to states mapping.  //TODO: make this a refptr<St>
-
-      //
-      // Methods
-      //
-
-      public:
-      
-      //Constructors and Destructor
-      StateSet( );
-      StateSet( StateSet & other );
-      StateSet & operator=( const StateSet & other );
-
-      ~StateSet( );
-
-      //State Accessors
-
-      /**
-       *
-       * @brief removes all states 
-       *
-       * This method removes all states from this collection.  It also
-       * removes all initial states and final states.
-       *
-       */
-      void clearStates( );
-        
-      /**
-       *
-       * @brief removes all initial states
-       *
-       * This method removes all states from the initial state set, but
-       * does not remove any states from the state set.
-       *
-       */
-      void clearInitialStates( );
-        
-      /**
-       *
-       * @brief removes all final states
-       *
-       * This method removes all states from the final state set, but
-       * does not remove any states from the state set.
-       *
-       */
-      void clearFinalStates( );
-      
-      /**
-       *  TODO: use refptr<St>
-       * @brief tests whether the given state is a member of this collection
-       *
-       * This method determines whether the given state is a member of
-       * this collection.  It returns true if the state is a member and
-       * false otherwise.
-       *
-       * @param - state: the state to test
-       * @return true if the state is a member of this collection of
-       *         states, false otherwise
-       *
-       */
-      bool isState( const St * state ) const;
-        
-      /**
-       *  TODO: use refptr<St> 
-       * @brief tests whether the given state is an initial state of this 
-       *        collection
-       *
-       * This method determines whether the given state is an initial state
-       * of this collection.  It returns true if the state is an initial state
-       * and false otherwise.
-       *
-       * @param - initialState: the state to test
-       * @return true if the state is an initial state of this collection,
-       *         false otherwise
-       *
-       */
-      bool isInitialState( const St * initialState ) const;
-        
-      /**
-       *  TODO: use refptr<St> 
-       * @brief tests whether the given state is a final state of this
-       *        collection
-       *
-       * This method determines whether the given state is a final state
-       * of this collection.  It returns true if the state is a final state
-       * and false otherwise.
-       *
-       * @param - finalState: the state to test
-       * @return true if the state is a final state of this collection,
-       *         false otherwise
-       *
-       */
-      bool isFinalState( const St * finalState ) const;
-      
-      /**
-       *  TODO: use refptr<St>
-       * @brief add the given state 
-       *
-       * This method adds the given state.  If the state already exists, 
-       * false is returned.  Otherwise, true is returned.
-       *
-       * @param - state: the state to add 
-       * @return false if the state already exists, true otherwise
-       *
-       */
-      bool addState( St * state );
-        
-      /**
-       *  TODO: use refptr<St>
-       * @brief add the given initial state 
-       *
-       * This method adds the given state to this collection of 
-       * states(if it does not already exist).  The given initial state
-       * is then added to the initial states.  If the state is already an
-       * initial state, false is returned.  Otherwise, true is returned.
-       *
-       * @param - initialState: the initial state to add 
-       * @return false if the state is already an initial state, true otherwise
-       *
-       */
-      bool addInitialState( St * initialState );
-        
-      /**
-       *  TODO: use refptr<St>
-       * @brief add the given final state 
-       *
-       * This method adds the given state to this collection of 
-       * states(if it does not already exist).  The given final state
-       * is then added to the final states.  If the state is already a
-       * final state, false is returned.  Otherwise, true is returned.
-       *
-       * @param - finalState: the final state to add 
-       * @return false if the state is already a final state, true otherwise
-       *
-       */
-      bool addFinalState( St * finalState );
-      
-      /**
-       * 
-       * @brief add all states in the given collection to this
-       *        collection of states
-       *
-       * This method adds all of the states in the given collection
-       * of states to this collection of states.
-       *
-       * @param - stateSet: the collection of states to add to this collection
-       *                    of states
-       *
-       */
-      void addAll( StateSet<St,StName> stateSet );
-        
-      /**
-       *
-       * @brief add all the states in the given StateSet 
-       *
-       * This method adds all of the given states to the state set.
-       *
-       * @param - stateSet: the StateSet that contains the states to add
-       *
-       */
-      void addAllStates( StateSet<St,StName> stateSet );
-        
-      /**
-       * 
-       * @brief add all the initial states in the given StateSet
-       *
-       * This method adds all of the given initial states to the
-       * initial state set (and thus to the state set if they are 
-       * not already elements of the state set).
-       *
-       * @param - stateSet: the StateSet that contains the states to add
-       *
-       */
-      void addAllInitialStates( StateSet<St,StName> stateSet );
-        
-      /**
-       * 
-       * @brief add all the final states in the given StateSet
-       *
-       * This method adds all of the given final states to the 
-       * final state set (and thus to the state set if they are 
-       * not already elements of the state set).
-       *
-       * @param - stateSet: the StateSet that contains the states to add
-       *
-       */
-      void addAllFinalStates( StateSet<St,StName> stateSet );
-      
-      /**
-       *  TODO: use refptr<St> 
-       * @brief remove the given state 
-       *
-       * This method removes the given state.  If the state does not
-       * exist, false is returned.  Otherwise, true is returned.
-       * Note: If the given state is an initial state or a final state,
-       * it is also removed from that set.
-       *
-       * @param - state: the state to remove
-       * @return false if this state does not exist, true otherwise
-       *
-       */
-      bool removeState( const St * state );
-        
-      /**
-       *  TODO: use refptr<St> 
-       * @brief remove the given initial state
-       *
-       * This method removes the given initial state.  If the state
-       * is not an initial state, false is returned.  Otherwise, true 
-       * is returned.
-       * Note: The state is not removed from the state set.
-       *
-       * @param - initialState: the initial state to remove
-       * @return false if this state is not an initial state, true otherwise
-       *  
-       */
-      bool removeInitialState( const St * initialState );
-        
-      /**
-       *  TODO: use refptr<St> 
-       * @brief remove the given final state
-       *
-       * This method removes the given final state.  If the state
-       * is not a final state, false is returned.  Otherwise, true
-       * is returned.
-       * Note: The state is not removed from the state set.
-       *
-       * @param - finalState: the final state to remove
-       * @remove false if this state is not a final state, true otherwise
-       *
-       */
-      bool removeFinalState( const St * finalState );
-      
-      //Utilities	
-
-      /**
-       *
-       * @brief print the collection of states
-       *
-       * This method prints out the state set to the output stream 
-       * provided.
-       *
-       * @param - o: the output stream to print to
-       * @return the output stream that was printed to
-       *
-       */
-      std::ostream & print( std::ostream & o ) const;
-
-      /**
-       *
-       * @brief tests whether this collection of states is equivalent 
-       *        to the collection of states 'other'
-       *
-       * This method tests the equivalence of this set of states and 
-       * the set of states 'other'.
-       *
-       * @param - other: the StateSet to compare this StateSet to
-       * @return true if this StateSet is equivalent to the StateSet 
-       *         'other'
-       *
-       */
-      bool operator==( const StateSet<St,StName> & other ) const;
-       
-      /**
-       * 
-       * @brief provides access to the states in the collection 
-       *
-       * This method provides access to the states in this collection 
-       * through an iterator.
-       *
-       * @return the starting point of an iterator through the states
-       *
-       */
-      iterator beginStates( ) const;
-        
-      /**
-       * 
-       * @brief provides access to the initial states in the collection
-       *
-       * This method provides access to the initial states in this 
-       * collection through an iterator.
-       *
-       * @return the starting point of an iterator through the initial states
-       *
-       */
-      iterator beginInitialStates( ) const;
-        
-      /**
-       *
-       * @brief provides access to the final states in the collection
-       *
-       * This method provides access to the final states in this
-       * collection through an iterator.
-       *
-       * @return the starting point of an iterator through the final states
-       *
-       */
-      iterator beginFinalStates( ) const;
-        
-      /**
-       * 
-       * @brief provides access to the states in the collection 
-       *
-       * This method provides access to the states in the collection 
-       * through an iterator.
-       *
-       * @return one place past the exit point of an iterator through 
-       *         the states
-       *
-       */
-      iterator endStates( ) const;
-        
-      /**
-       * 
-       * @brief provides access to the initial states in the collection
-       *
-       * This method provides access to the initial states in the collection
-       * through an iterator.
-       *
-       * @return one place past the exit point of an iterator through the
-       *         initial states
-       *
-       */
-      iterator endInitialStates( ) const;
-        
-      /**
-       * 
-       * @brief provides access to the final states in the collection
-       *
-       * This method provides access to the final states in the collection
-       * through an iterator.
-       *
-       * @return one place past the exit point of an iterator through the
-       *         final states
-       *
-       */
-      iterator endFinalStates( ) const;
-      
-      /**
-       *  TODO: use refptr<St> 
-       * @brief provides access to all states in the collection
-       *
-       * This method provides access to all states in this collection 
-       * in the form of a set of states.
-       *
-       * @return a set containing all states in this collection
-       *
-       */
-      std::set<St*> getStates( ) const;
-
-      /**
-       * 
-       * @brief provides access to the names of all the states in the 
-       *        collection
-       *
-       * This method provides access to the names of all the states
-       * in the collection in the form of a set of state names.
-       *
-       * @return a set containing the names of all states in the 
-       *         collection
-       *
-       */
-      std::set<StName> getStateNames( ) const;
-             
-      /**
-       * 
-       * @brief provides access to the names of all the states in the
-       *        given set of states
-       *
-       * This method provides access to the names of all the states in 
-       * the given set of states in the form of a set of state names.
-       *
-       * @param - sts: the states whose names to return
-       * @return the names correcponding to the given states
-       *
-       */
-      std::set<StName> getStateNames( const std::set<St> & sts ) const;
-     
-      /**
-       *  
-       * @brief provides access to the names of all the initial states
-       *        in the collection
-       *
-       * This method provides access to the names of all the initial
-       * states in the collection in the form of a set of state names.
-       *
-       * @return a set containing the names of all initial states in
-       *         the collection
-       *
-       */
-      std::set<StName> getInitialStateNames( ) const;
-        
-      /**
-       * 
-       * @brief provides access to the names of all final states in 
-       *        the collection
-       *
-       * This method provides access to the names of all the final 
-       * states in the collection in the form of a set of state names.
-       *
-       * @return a set containing the names of all final states in 
-       *         the collection
-       *
-       */
-      std::set<StName> getFinalStateNames( ) const;
-
-      /**
-       * 
-       * @brief returns the number of states in this collection
-       * 
-       * This method returns the number of states in this collection.
-       *
-       * @return the number of states in this collection
-       *
-       */
-      size_t sizeStates( ) const;
-      
-      /**
-       * 
-       * @brief returns the number of initial states in this collection
-       *
-       * This method returns the number of initial states in this collection.
-       *
-       * @return the number of initial states in this collection
-       *
-       */
-      size_t sizeInitialStates( ) const;
-      
-      /**
-       * 
-       * @brief returns the number of final states in this collection
-       * 
-       * This method returns the number of final states in this collection.
-       *
-       * @return the number of final states in this collection
-       *
-       */
-      size_t sizeFinalStates( ) const;     
-      
-      /**
-       *  TODO: use refptr<St>  
-       * @brief gives 'dup' all the state properties of 'orig'
-       *
-       * This method checks all the state properties (initial/final)
-       * of 'orig' and assigns the same properties to 'dup'.
-       *
-       * @param - orig: the state whose properties to duplicate
-       * @param - dup: the state whose properties are being set
-       *
-       */
-      void dupState( const St * orig, St * dup );
-
-      /**
-       *  TODO: make sure that the mapping is unique in it's assignment of
-       *        a state to a name
-       *  TODO: use refptr<St>
-       * @brief provide access to the state with the given name
-       *
-       * This method provides access to the state in this collection
-       * that has the given name.
-       *
-       * @param - name: the name of the state to retrieve
-       * @return the state that has the given name
-       *
-       */
-      St * getState( StName name ) const;
-
-      /**
-       * 
-       * @brief clear the state name to states map
-       *
-       * This method clears the map that correlates state names to states.
-       *
-       */
-      void clearMap( );
-
-      //
-      // Variables
-      //
-      
-      protected:
-              
-      std::set<StName> states;
-      std::set<StName> initialStates;  
-      std::set<StName> finalStates;   
-      StMap name_St;
-    };    
-    
-    //
-    // Methods
-    //
-
-    //Constructors and Destructor 
-    template <typename St,typename StName> 
-    StateSet<St,StName>::StateSet( )
-    {  }
-     
-    template <typename St,typename StName> 
-    StateSet<St,StName>::StateSet( StateSet & other )
-    {
-      clearStates();
-      
-      names = other.names;
-      states = other.states;
-      initialStates = other.initialStates;
-      finalStates = other.finalStates;
-      name_St = other.name_St;
-    }
-     
-    template <typename St,typename StName> 
-    StateSet<St,StName> & StateSet<St,StName>::operator=( const StateSet<St,StName> & other )
-    {
-      if (this == &other)     
-        return *this;
-    
-      clearStates();
-     
-      states = other.states;
-      initialStates = other.initialStates;
-      finalStates = other.finalStates;
-      name_St = other.name_St;
-      return *this;
-    }
-     
-    template <typename St,typename StName> 
-    StateSet<St,StName>::~StateSet( ) 
-    { 
-      clearStates();
-      clearMap();
-    }
-
-    //State Accessors
-    
-    /**
-     *
-     * @brief removes all states 
-     *
-     */
-    template <typename St,typename StName> 
-    void StateSet<St,StName>::clearStates( )
-    {
-      states.clear();
-      clearInitialStates();
-      clearFinalStates();
-      
-      clearMap();   //If there are no states, there should be anything in the map either.
-    }    
-    
-    /**
-     *
-     * @brief removes all initial states
-     *
-     */
-    template <typename St,typename StName> 
-    void StateSet<St,StName>::clearInitialStates( )
-    { 
-      for( iterator it = initialStates.begin(); it != initialStates.end(); it++ )
-      {
-        St * state = getState(*it);
-        state->unsetAsInitial();    //TODO: Why are we doing this?
-      }
-      initialStates.clear();
-    }    
-    
-    /**
-     *
-     * @brief removes all final states
-     *
-     */
-    template <typename St,typename StName> 
-    void StateSet<St,StName>::clearFinalStates( )
-    {
-      finalStates.clear();
-    }
-    
-    /**
-     *  TODO: use refptr<St> 
-     * @brief tests whether the given state is a member of this collection
-     *
-     * @param - state: the state to test
-     * @return true if the state is a member of this collection of
-     *         states, false otherwise
-     *
-     */
-    template <typename St,typename StName>
-    bool StateSet<St,StName>::isState( const St * state ) const
-    {
-      return (states.count(state->getName()) > 0);
-    } 
-     
-    /**
-     *  TODO: use refptr<St> 
-     * @brief tests whether the given state is an initial state of this 
-     *        collection
-     *
-     * @param - initialState: the state to test
-     * @return true if the state is an initial state of this collection,
-     *         false otherwise
-     *
-     */
-    template <typename St,typename StName>
-    bool StateSet<St,StName>::isInitialState( const St * initialState ) const
-    {
-      return (initialStates.count(initialState->getName()) > 0);
-    }
-       
-    /**
-     *  TODO: use refptr<St> 
-     * @brief tests whether the given state is a final state of this
-     *        collection
-     *
-     * @param - finalState: the state to test
-     * @return true if the state is a final state of this collection,
-     *         false otherwise
-     *
-     */
-    template <typename St,typename StName>
-    bool StateSet<St,StName>::isFinalState( const St * finalState ) const
-    {
-      return (finalStates.count(finalState->getName()) > 0);
-    }
-    
-    /**
-     *  TODO: use refptr<St>
-     * @brief add the given state 
-     *
-     * @param - state: the state to add 
-     * @return false if the state already exists, true otherwise
-     *
-     */
-    template <typename St,typename StName> 
-    bool StateSet<St,StName>::addState( St * addState )
-    {
-      if(isState(addState) ) 
-        return false;
-        
-      states.insert(addState->getName());
-      name_St.insert(std::pair<StName,St*>(addState->getName(),addState));
-      
-      return true;
-    }    
-    
-    /**
-     *  TODO: use refptr<St>
-     * @brief add the given initial state 
-     *
-     * @param - initialState: the initial state to add 
-     * @return false if the state is already an initial state, true otherwise
-     *
-     */
-    template <typename St,typename StName> 
-    bool StateSet<St,StName>::addInitialState( St * addInitialState )
-    {
-      if( isInitialState(addInitialState) )  
-        return false;
-        
-      if( !isState(addInitialState) )
-      {
-        addState(addInitialState);
-      }
-
-      St * state = getState(addInitialState->getName());
-      state->setAsInitial( ); //TODO: Why are we doing this?
-
-      initialStates.insert(addInitialState->getName());
-      return true;
-    }    
-    
-    /**
-     *  TODO: use refptr<St>
-     * @brief add the given final state 
-     *
-     * @param - finalState: the final state to add 
-     * @return false if the state is already a final state, true otherwise
-     *
-     */
-    template <typename St,typename StName> 
-    bool StateSet<St,StName>::addFinalState( St * addFinalState )
-    {
-      if( isFinalState(addFinalState) )  
-        return false;
-        
-      if( !isState(addFinalState) )
-      {
-        addState(addFinalState);
-      }
-
-      finalStates.insert(addFinalState->getName());
-      return true;
-    }
-      
-    /**
-     * 
-     * @brief add all states in the given collection to this
-     *        collection of states
-     *
-     * @param - stateSet: the collection of states to add to this collection
-     *                  of states
-     *
-     */
-    template <typename St,typename StName> 
-    void StateSet<St,StName>::addAll( StateSet<St,StName> addStateSet )
-    {
-      addAllStates(addStateSet);
-      addAllInitialStates(addStateSet);
-      addAllFinalStates(addStateSet);
-    }
-    
-    /**
-     *
-     * @brief add all the states in the given StateSet 
-     *
-     * @param - stateSet: the StateSet that contains the states to add
-     *
-     */
-    template <typename St,typename StName> 
-    void StateSet<St,StName>::addAllStates( StateSet<St,StName> addStateSet )
-    {
-      for( iterator it = addStateSet.states.begin();
-            it != addStateSet.states.end(); it++ )
-      {
-        addState(addStateSet.getState(*it));
-      }
-    }  
-      
-    /**
-     * 
-     * @brief add all the initial states in the given StateSet
-     *
-     * @param - stateSet: the StateSet that contains the states to add
-     *
-     */ 
-    template <typename St,typename StName> 
-    void StateSet<St,StName>::addAllInitialStates( StateSet<St,StName> addStateSet )
-    {
-      for( iterator it = addStateSet.initialStates.begin();
-            it != addStateSet.initialStates.end(); it++ )
-      {
-        addInitialState(addStateSet.getState(*it));
-      }
-    }
-    
-    /**
-     * 
-     * @brief add all the final states in the given StateSet
-     *
-     * @param - stateSet: the StateSet that contains the states to add
-     *
-     */
-    template <typename St,typename StName> 
-    void StateSet<St,StName>::addAllFinalStates( StateSet<St,StName> addStateSet )
-    {
-      for( iterator it = addStateSet.finalStates.begin();
-            it != addStateSet.finalStates.end(); it++ )
-      {
-        addFinalState(addStateSet.getState(*it));
-      }
-    }
-    
-    /**
-     *  TODO: use refptr<St> 
-     * @brief remove the given state 
-     *
-     * @param - state: the state to remove
-     * @return false if this state does not exist, true otherwise
-     *
-     */
-    template <typename St,typename StName> 
-    bool StateSet<St,StName>::removeState( const St * removeState )
-    {
-      if( ! isState(removeState) )
-        return false;
-      states.erase(removeState->getName());
-      name_St.erase(name_St.find(removeState->getName()));
-      //remove from initial state set if it exists
-      removeInitialState(removeState);
-      //remove from final state set if it exists
-      removeFinalState(removeState);
-      return true;
-    }   
-     
-    /**
-     *  TODO: use refptr<St> 
-     * @brief remove the given initial state
-     *
-     * @param - initialState: the initial state to remove
-     * @return false if this state is not an initial state, true otherwise
-     *  
-     */
-    template <typename St,typename StName> 
-    bool StateSet<St,StName>::removeInitialState( const St * removeInitialState )
-    {
-      if( ! isInitialState(removeInitialState) )
-        return false;
-
-      St * state = getState(removeInitialState->getName());
-      state->unsetAsInitial( ); //TODO: Why are we doing this?
-
-      initialStates.erase(removeInitialState->getName());
-      return true;
-    }    
-    
-    /**
-     *  TODO: use refptr<St> 
-     * @brief remove the given final state
-     *
-     * @param - finalState: the final state to remove
-     * @remove false if this state is not a final state, true otherwise
-     *
-     */
-    template <typename St,typename StName> 
-    bool StateSet<St,StName>::removeFinalState( const St * removeFinalState )
-    {
-      if( ! isFinalState(removeFinalState) )
-        return false;
-      finalStates.erase(removeFinalState->getName());
-      return true;
-    }
-      
-    //Utilities	
-
-    /**
-     *
-     * @brief print the collection of states
-     *
-     * @param - o: the output stream to print to
-     * @return the output stream that was printed to
-     *
-     */
-    template <typename St,typename StName> 
-    std::ostream & StateSet<St,StName>::print( std::ostream & o ) const
-    {
-      //Print the set of all states.
-      o << "Q: ";
-      o << "{ ";
-      iterator it = beginStates();
-      iterator itEND = endStates();
-      for( bool first=true; it != itEND ; it++,first=false )
-      {
-        if( !first )
-        o << ", ";
-        ((name_St.find(*it))->second)->print(o);  
-      }
-      o << " }" << std::endl;
-      
-      //Prints the initial states.
-      o << "Q0: ";
-      o << "{ ";
-      it = beginInitialStates();
-      itEND = endInitialStates();
-      for( bool first=true; it != itEND ; it++,first=false )
-      {
-        if( !first )
-        o << ", ";
-        ((name_St.find(*it))->second)->print(o);
-      }
-      o << " }" << std::endl;
-      
-      //Print the final states.
-      o << "Qf: ";
-      o << "{ ";
-      it = beginFinalStates();
-      itEND = endFinalStates();
-      for( bool first=true; it != itEND ; it++,first=false )
-      {
-        if( !first )
-        o << ", ";
-        ((name_St.find(*it))->second)->print(o);
-      }
-      o << " }" << std::endl;
-      
-      return o;
-    }
-
-    /**
-     *
-     * @brief tests whether this collection of states is equivalent 
-     *        to the collection of states 'other'
-     *
-     * @param - other: the StateSet to compare this StateSet to
-     * @return true if this StateSet is equivalent to the StateSet 
-     *         'other'
-     *
-     */
-    template <typename St,typename StName> 
-    bool StateSet<St,StName>::operator==( const StateSet<St,StName> & other ) const
-    {
-      //Check that the state sets are equal.
-      for( iterator it = beginStates(); it != endStates(); it++ )
-        if( other.isState(other.getState(*it)) )
-          return false;
-          
-      for( iterator it = other.beginStates(); it != other.endStates(); it++ )
-        if( isState(getState(*it)) )
-          return false;
-         
-      //Check that the initial state sets are equal.    
-      for( iterator it = beginInitialStates(); it != endInitialStates(); it++ )
-        if( other.isInitialState(other.getState(*it)) )
-          return false;
-          
-      for( iterator it = other.beginInitialStates(); it != other.endInitialStates(); it++ )
-        if( isInitialState(getState(*it)) )
-          return false;
-        
-      //Check that the final state sets are equal.    
-      for( iterator it = beginFinalStates(); it != endFinalStates(); it++ )
-        if( other.isFinalState(other.getState(*it)) )
-          return false;
-          
-      for( iterator it = other.beginFinalStates(); it != other.endFinalStates(); it++ )
-        if( isFinalState(getState(*it)) )
-          return false;        
-          
-      return true;
-    }
-    
-    /**
-     * 
-     * @brief provides access to the states in the collection 
-     *
-     * @return the starting point of an iterator through the states
-     *
-     */
-    template <typename St,typename StName> 
-    typename StateSet<St,StName>::iterator StateSet<St,StName>::beginStates( ) const
-    {
-      return states.begin();
-    }   
-     
-    /**
-     * 
-     * @brief provides access to the initial states in the collection
-     *
-     * @return the starting point of an iterator through the initial states
-     *
-     */
-    template <typename St,typename StName> 
-    typename StateSet<St,StName>::iterator StateSet<St,StName>::beginInitialStates( ) const
-    {
-      return initialStates.begin();
-    }    
-    
-    /**
-     *
-     * @brief provides access to the final states in the collection
-     *
-     * @return the starting point of an iterator through the final states
-     *
-     */
-    template <typename St,typename StName> 
-    typename StateSet<St,StName>::iterator StateSet<St,StName>::beginFinalStates( ) const
-    {
-      return finalStates.begin();
-    }
-    
-    /**
-     * 
-     * @brief provides access to the states in the collection 
-     *
-     * @return one place past the exit point of an iterator through 
-     *         the states
-     *
-     */
-    template <typename St,typename StName> 
-    typename StateSet<St,StName>::iterator StateSet<St,StName>::endStates( ) const
-    {
-      return states.end();
-    }    
-    
-    /**
-     * 
-     * @brief provides access to the initial states in the collection
-     *
-     * @return one place past the exit point of an iterator through the
-     *         initial states
-     *
-     */
-    template <typename St,typename StName> 
-    typename StateSet<St,StName>::iterator StateSet<St,StName>::endInitialStates( ) const
-    {
-      return initialStates.end();
-    }    
-    
-    /**
-     * 
-     * @brief provides access to the final states in the collection
-     *
-     * @return one place past the exit point of an iterator through the
-     *         final states
-     *
-     */
-    template <typename St,typename StName> 
-    typename StateSet<St,StName>::iterator StateSet<St,StName>::endFinalStates( ) const
-    {
-      return finalStates.end();
-    }
-    
-    /**
-     *  TODO: use refptr<St> 
-     * @brief provides access to all states in the collection
-     *
-     * @return a set containing all states in this collection
-     *
-     */
-    template <typename St,typename StName>
-    std::set<St*> StateSet<St,StName>::getStates( ) const
-    {
-      std::set<St*> result;
-      for( std::set<StName>::const_iterator it = states.begin(); it != states.end(); it++ )
-      {
-        result.insert(name_St.find(*it)->second);
-      }
-      return result;
-    }
-
-    /**
-     * 
-     * @brief provides access to the names of all the states in the 
-     *        collection
-     *
-     * @return a set containing the names of all states in the 
-     *         collection
-     *
-     */
-    template <typename St,typename StName>
-    std::set<StName> StateSet<St,StName>::getStateNames( ) const
-    {
-      return states;
-    }
-    
-    /**
-     * 
-     * @brief provides access to the names of all the states in the
-     *        given set of states
-     *
-     * @param - sts: the states whose names to return
-     * @return the names correcponding to the given states
-     *
-     */
-    template <typename St,typename StName> 
-    std::set<StName> StateSet<St,StName>::getStateNames( const std::set<St> & sts ) const
-    {
-      std::set<StName> names;
-      for(std::set<St>::const_iterator it = sts.begin(); it!=sts.end(); it++) 
-        names.insert( it->getName() );
-      return names;
-    }
-    
-    /**
-     * 
-     * @brief provides access to the names of all the initial states
-     *        in the collection
-     *
-     * @return a set containing the names of all initial states in
-     *         the collection
-     *
-     */
-    template <typename St,typename StName>
-    std::set<StName> StateSet<St,StName>::getInitialStateNames( ) const
-    {
-      return initialStates;
-    }
-       
-    /**
-     *  
-     * @brief provides access to the names of all final states in 
-     *        the collection
-     *
-     * @return a set containing the names of all final states in 
-     *         the collection
-     *
-     */
-    template <typename St,typename StName>
-    std::set<StName> StateSet<St,StName>::getFinalStateNames( ) const
-    {
-      return finalStates;
-    }
-    
-    /**
-     * 
-     * @brief returns the number of states in this collection
-     * 
-     * @return the number of states in this collection
-     *
-     */
-    template <typename St,typename StName> 
-    size_t StateSet<St,StName>::sizeStates( ) const
-    {
-      return states.size();
-    }  
-      
-    /**
-     * 
-     * @brief returns the number of initial states in this collection
-     *
-     * @return the number of initial states in this collection
-     *
-     */
-    template <typename St,typename StName> 
-    size_t StateSet<St,StName>::sizeInitialStates( ) const
-    {
-      return initialStates.size();
-    } 
-       
-    /**
-     * 
-     * @brief returns the number of final states in this collection
-     * 
-     * @return the number of final states in this collection
-     *
-     */
-    template <typename St,typename StName> 
-    size_t StateSet<St,StName>::sizeFinalStates( ) const
-    {
-      return finalStates.size();
-    }  
-    
-    /**
-     *  TODO: use refptr<St> 
-     * @brief gives 'dup' all the state properties of 'orig'
-     *
-     * @param - orig: the state whose properties to duplicate
-     * @param - dup: the state whose properties are being set
-     *
-     */
-    template <typename St,typename StName>
-    void StateSet<St,StName>::dupState( const St * orig, St * dup )
-    {
-      if( isInitialState(orig) )
-        addInitialState(dup);
-
-      if( isFinalState(orig) )
-        addFinalState(dup);
-    }
-
-    /**
-     *  TODO: make sure that the mapping is unique in it's assignment of
-     *        a state to a name
-     *  TODO: use refptr<St>
-     * @brief provide access to the state with the given name
-     *
-     * This method provides access to the state in this collection
-     * that has the given name.
-     *
-     * @param - name: the name of the state to retrieve
-     * @return the state that has the given name
-     *
-     */
-    template <typename St,typename StName> 
-    typename St * StateSet<St,StName>::getState( StName name ) const
-    {
-      StMap::const_iterator it = name_St.find(name);
-      if( it != name_St.end() )
-        return it->second;
-      else
-        return NULL;
-    }    
-    
-    /**
-     *  TODO: make this private?
-     * @brief clear the state name to states map
-     *
-     */
-    template <typename St,typename StName> 
-    void StateSet<St,StName>::clearMap( )
-    {
-      name_St.clear();
-    }
-#else  //ifdef KEY
     template<typename Client>
     class StateSet : public Printable
     {
       public:
-        typedef State<Client> St;
-        typedef typename std::set<St>::const_iterator const_iterator;   //  TODO: use refptr<St>
-        typedef typename std::set<St>::iterator iterator;               //  TODO: use refptr<St>
+        typedef Key St;
+        typedef typename std::set<St> States;
+        typedef typename States::const_iterator const_iterator;   
+        typedef typename States::iterator iterator; 
+
+        typedef ref_ptr<Client> ClientInfoRefPtr;
 
       //
       // Methods
@@ -1223,14 +51,66 @@ namespace wali
 
       ~StateSet( );
 
+      //Client Info Accessors
+
+      /**
+       * 
+       * @brief access the client information associated with the given state
+       *
+       * This method provides access to the client information associated with this state.
+       *
+       * @param - state: the state whose client information to retrieve
+       * @return the client information associated with the given state
+       *
+       */
+      ClientInfoRefPtr getClientInfo( St state );
+
+      /**
+       * Q: If the state doesn't exit should we add the state(and assign it the given info)?
+       * @brief set the client information associated with the given state
+       *
+       * This method sets the client information associated with the given state to the 
+       * client information provided.
+       * Note: If there is already some client information associated with the given 
+       *        state it is lost.
+       *
+       * @param - state: the state whose client information to set
+       * @param - c: the desired client information for this state
+       *
+       */
+      void setClientInfo( St state, const ClientInfoRefPtr c );
+
       //State Accessors
+
+      /**
+       *
+       * @brief returns the Key for the stuck state
+       *
+       * This method provides access to the Key for the stuck state.
+       *
+       * @return the Key for the stuck state
+       *
+       */
+      static St getStuckState( );
+
+      /**
+       *  
+       * @brief test whether the given state is the stuck state
+       * 
+       * This method determines whether the given state is the stuck state.
+       *
+       * @param - state: the state to test
+       * @return true if this state is the stuck state, false otherwise
+       *
+       */
+      static bool isStuckState( St state );
 
       /**
        *
        * @brief removes all states 
        *
-       * This method removes all states from this collection.  It also
-       * removes all initial states and final states.
+       * This method removes all states from this collection.  It also removes all 
+       * initial states and final states.
        *
        */
       void clearStates( );
@@ -1239,8 +119,8 @@ namespace wali
        *
        * @brief removes all initial states
        *
-       * This method removes all states from the initial state set, but
-       * does not remove any states from the state set.
+       * This method removes all states from the initial state set, but does not remove
+       * any states from the state set.
        *
        */
       void clearInitialStates( );
@@ -1249,115 +129,105 @@ namespace wali
        *
        * @brief removes all final states
        *
-       * This method removes all states from the final state set, but
-       * does not remove any states from the state set.
+       * This method removes all states from the final state set, but does not remove 
+       * any states from the state set.
        *
        */
       void clearFinalStates( );
       
       /**
-       *  TODO: use refptr<St> 
+       *
        * @brief tests whether the given state is a member of this collection
        *
-       * This method determines whether the given state is a member of
-       * this collection.  It returns true if the state is a member and
-       * false otherwise.
+       * This method determines whether the given state is a member of this collection.
+       * It returns true if the state is a member and false otherwise.
        *
        * @param - state: the state to test
-       * @return true if the state is a member of this collection of
-       *         states, false otherwise
+       * @return true if the state is a member of this collection of states
        *
        */
-      bool isState( const St & state ) const;
+      bool isState( St state ) const;
         
       /**
-       *  TODO: use refptr<St> 
-       * @brief tests whether the given state is an initial state of this 
-       *        collection
+       *   
+       * @brief tests whether the given state is an initial state of this collection
        *
-       * This method determines whether the given state is an initial state
-       * of this collection.  It returns true if the state is an initial state
-       * and false otherwise.
+       * This method determines whether the given state is an initial state of this 
+       * collection.  It returns true if the state is an initial state and false otherwise.
        *
        * @param - initialState: the state to test
-       * @return true if the state is an initial state of this collection,
-       *         false otherwise
+       * @return true if the state is an initial state of this collection, false otherwise
        *
        */
-      bool isInitialState( const St & initialState ) const;
+      bool isInitialState( St initialState ) const;
         
       /**
-       *  TODO: use refptr<St> 
-       * @brief tests whether the given state is a final state of this
-       *        collection
+       * 
+       * @brief tests whether the given state is a final state of this collection
        *
-       * This method determines whether the given state is a final state
-       * of this collection.  It returns true if the state is a final state
-       * and false otherwise.
+       * This method determines whether the given state is a final state of this
+       * collection.  It returns true if the state is a final state and false otherwise.
        *
        * @param - finalState: the state to test
-       * @return true if the state is a final state of this collection,
-       *         false otherwise
+       * @return true if the state is a final state of this collection, false otherwise
        *
        */
-      bool isFinalState( const St & finalState ) const;
+      bool isFinalState( St finalState ) const;
       
       /**
-       *  TODO: use refptr<St>
+       * 
        * @brief add the given state 
        *
-       * This method adds the given state.  If the state already exists, 
-       * false is returned.  Otherwise, true is returned.
+       * This method adds the given state.  If the state already exists, false is 
+       * returned.  Otherwise, true is returned.
        *
        * @param - state: the state to add 
        * @return false if the state already exists, true otherwise
        *
        */
-      bool addState( St * state );
+      bool addState( St state );
         
       /**
-       *  TODO: use refptr<St>
+       *
        * @brief add the given initial state 
        *
-       * This method adds the given state to this collection of 
-       * states(if it does not already exist).  The given initial state
-       * is then added to the initial states.  If the state is already an
-       * initial state, false is returned.  Otherwise, true is returned.
+       * This method adds the given state to this collection of states(if it does not
+       * already exist).  The given initial state is then added to the initial states.
+       * If the state is already an initial state, false is returned.  Otherwise, true
+       * is returned.
        *
        * @param - initialState: the initial state to add 
        * @return false if the state is already an initial state, true otherwise
        *
        */
-      bool addInitialState( St * initialState );
+      bool addInitialState( St initialState );
         
       /**
-       *  TODO: use refptr<St>
+       * 
        * @brief add the given final state 
        *
-       * This method adds the given state to this collection of 
-       * states(if it does not already exist).  The given final state
-       * is then added to the final states.  If the state is already a
-       * final state, false is returned.  Otherwise, true is returned.
+       * This method adds the given state to this collection of states(if it does not
+       * already exist).  The given final state is then added to the final states.  If 
+       * the state is already a final state, false is returned.  Otherwise, true is 
+       * returned.
        *
        * @param - finalState: the final state to add 
        * @return false if the state is already a final state, true otherwise
        *
        */
-      bool addFinalState( St * finalState );
+      bool addFinalState( St finalState );
       
       /**
        * 
-       * @brief add all states in the given collection to this
-       *        collection of states
+       * @brief add all states in the given collection to this collection of states
        *
-       * This method adds all of the states in the given collection
-       * of states to this collection of states.
+       * This method adds all of the states in the given collection of states to this
+       * collection of states.
        *
-       * @param - stateSet: the collection of states to add to this collection
-       *                    of states
+       * @param - stateSet: the collection of states to add to this collection of states
        *
        */
-      void addAll( StateSet stateSet );
+      void addAll( const StateSet<Client> & stateSet );
         
       /**
        *
@@ -1368,78 +238,74 @@ namespace wali
        * @param - stateSet: the StateSet that contains the states to add
        *
        */
-      void addAllStates( StateSet stateSet );
+      void addAllStates( const StateSet<Client> & stateSet );
         
       /**
        * 
        * @brief add all the initial states in the given StateSet
        *
-       * This method adds all of the given initial states to the
-       * initial state set (and thus to the state set if they are 
-       * not already elements of the state set).
+       * This method adds all of the given initial states to the initial state set (and
+       * thus to the state set if they are not already elements of the state set).
        *
        * @param - stateSet: the StateSet that contains the states to add
        *
        */
-      void addAllInitialStates( StateSet stateSet );
+      void addAllInitialStates( const StateSet<Client> & stateSet );
         
       /**
        * 
        * @brief add all the final states in the given StateSet
        *
-       * This method adds all of the given final states to the 
-       * final state set (and thus to the state set if they are 
-       * not already elements of the state set).
+       * This method adds all of the given final states to the final state set (and thus
+       * to the state set if they are not already elements of the state set).
        *
        * @param - stateSet: the StateSet that contains the states to add
        *
        */
-      void addAllFinalStates( StateSet stateSet );
+      void addAllFinalStates( const StateSet<Client> & stateSet );
       
       /**
-       *  TODO: use refptr<St> 
+       *  
        * @brief remove the given state 
        *
-       * This method removes the given state.  If the state does not
-       * exist, false is returned.  Otherwise, true is returned.
-       * Note: If the given state is an initial state or a final state,
-       * it is also removed from that set.
+       * This method removes the given state.  If the state does not exist, false is
+       * returned.  Otherwise, true is returned.
+       * Note: If the given state is an initial state or a final state, it is also 
+       *  removed from that set.
        *
        * @param - state: the state to remove
        * @return false if this state does not exist, true otherwise
        *
        */
-      bool removeState( const St & state );
+      bool removeState( St state );
         
       /**
        * 
        * @brief remove the given initial state
        *
-       * This method removes the given initial state.  If the state
-       * is not an initial state, false is returned.  Otherwise, true 
-       * is returned.
+       * This method removes the given initial state.  If the state is not an initial
+       * state, false is returned.  Otherwise, true is returned.
        * Note: The state is not removed from the state set.
        *
        * @param - initialState: the initial state to remove
        * @return false if this state is not an initial state, true otherwise
        *  
        */
-      bool removeInitialState( const St & initialState );
+      bool removeInitialState( St initialState );
         
       /**
-       *  TODO: use refptr<St> 
+       * 
        * @brief remove the given final state
        *
-       * This method removes the given final state.  If the state
-       * is not a final state, false is returned.  Otherwise, true
-       * is returned.
+       * This method removes the given final state.  If the state is not a final state, 
+       * false is returned.  Otherwise, true is returned.
        * Note: The state is not removed from the state set.
        *
        * @param - finalState: the final state to remove
        * @remove false if this state is not a final state, true otherwise
        *
        */
-      bool removeFinalState( const St & finalState );
+      bool removeFinalState( St finalState );
       
       //Utilities	
 
@@ -1447,8 +313,8 @@ namespace wali
        *
        * @brief print the collection of states
        *
-       * This method prints out the keys associated with the state set to the 
-       * output stream provided.
+       * This method prints out the keys associated with the state set to the output 
+       * stream provided.
        *
        * @param - o: the output stream to print to
        * @return the output stream that was printed to
@@ -1458,38 +324,23 @@ namespace wali
 
       /**
        *
-       * @brief print the names of the states in this collection 
+       * @brief tests whether this collection of states is equivalent to the collection 
+       *        of states 'other'
        *
-       * This method prints out the names of the states in this state set 
-       * to the output stream provided.
-       *
-       * @param - o: the output stream to print to
-       * @return the output stream that was printed to
-       *
-       */
-      std::ostream & printName( std::ostream & o ) const;
-
-      /**
-       *
-       * @brief tests whether this collection of states is equivalent 
-       *        to the collection of states 'other'
-       *
-       * This method tests the equivalence of this set of states and 
-       * the set of states 'other'.
+       * This method tests the equivalence of this set of states and the set of states
+       * 'other'.
        *
        * @param - other: the StateSet to compare this StateSet to
-       * @return true if this StateSet is equivalent to the StateSet 
-       *         'other'
+       * @return true if this StateSet is equivalent to the StateSet 'other'
        *
        */
-      bool operator==( const StateSet & other ) const;
+      bool operator==( const StateSet<Client> & other ) const;
        
       /**
        * 
        * @brief provides access to the states in the collection 
        *
-       * This method provides access to the states in this collection 
-       * through an iterator.
+       * This method provides access to the states in this collection through an iterator.
        *
        * @return the starting point of an iterator through the states
        *
@@ -1500,8 +351,8 @@ namespace wali
        * 
        * @brief provides access to the initial states in the collection
        *
-       * This method provides access to the initial states in this 
-       * collection through an iterator.
+       * This method provides access to the initial states in this collection through an 
+       * iterator.
        *
        * @return the starting point of an iterator through the initial states
        *
@@ -1512,8 +363,8 @@ namespace wali
        *
        * @brief provides access to the final states in the collection
        *
-       * This method provides access to the final states in this
-       * collection through an iterator.
+       * This method provides access to the final states in this collection through an 
+       * iterator.
        *
        * @return the starting point of an iterator through the final states
        *
@@ -1524,11 +375,9 @@ namespace wali
        * 
        * @brief provides access to the states in the collection 
        *
-       * This method provides access to the states in the collection 
-       * through an iterator.
+       * This method provides access to the states in the collection through an iterator.
        *
-       * @return one place past the exit point of an iterator through 
-       *         the states
+       * @return one place past the exit point of an iterator through the states
        *
        */
       const_iterator endStates( ) const;
@@ -1537,11 +386,10 @@ namespace wali
        * 
        * @brief provides access to the initial states in the collection
        *
-       * This method provides access to the initial states in the collection
-       * through an iterator.
+       * This method provides access to the initial states in the collection through an
+       * iterator.
        *
-       * @return one place past the exit point of an iterator through the
-       *         initial states
+       * @return one place past the exit point of an iterator through the initial states
        *
        */
       const_iterator endInitialStates( ) const;
@@ -1550,88 +398,57 @@ namespace wali
        * 
        * @brief provides access to the final states in the collection
        *
-       * This method provides access to the final states in the collection
-       * through an iterator.
+       * This method provides access to the final states in the collection through an
+       * iterator.
        *
-       * @return one place past the exit point of an iterator through the
-       *         final states
+       * @return one place past the exit point of an iterator through the final states
        *
        */
       const_iterator endFinalStates( ) const;
       
       /**
-       *  TODO: use refptr<St> 
+       * 
        * @brief provides access to all states in the collection
        *
-       * This method provides access to all states in this collection 
-       * in the form of a set of states.
+       * This method provides access to all states in this collection in the form of a 
+       * set of states.
        *
        * @return a set containing all states in this collection
        *
        */
-      std::set<St> getStates( ) const;
-
-      /**
-       * 
-       * @brief provides access to the names of all the states in the 
-       *        collection
-       *
-       * This method provides access to the names of all the states
-       * in the collection in the form of a set of state names.
-       *
-       * @return a set containing the names of all states in the 
-       *         collection
-       *
-       */
-      std::set<Key> getStateNames( ) const;
-             
-      /**
-       * 
-       * @brief provides access to the names of all the states in the
-       *        given set of states
-       *
-       * This method provides access to the names of all the states in 
-       * the given set of states in the form of a set of state names.
-       *
-       * @param - sts: the states whose names to return
-       * @return the names correcponding to the given states
-       *
-       */
-      std::set<Key> getStateNames( const std::set<St> & sts ) const;
+      const States & getStates( ) const;
      
       /**
        *  
-       * @brief provides access to the names of all the initial states
-       *        in the collection
+       * @brief provides access to the names of all the initial states in the collection
        *
-       * This method provides access to the names of all the initial
-       * states in the collection in the form of a set of state names.
+       * This method provides access to the names of all the initial states in the 
+       * collection in the form of a set of state names.
        *
-       * @return a set containing the names of all initial states in
-       *         the collection
+       * @return a set containing the names of all initial states in the collection
        *
        */
-      std::set<Key> getInitialStateNames( ) const;
+      const States & getInitialStates( ) const;
         
       /**
        * 
-       * @brief provides access to the names of all final states in 
-       *        the collection
+       * @brief provides access to the names of all final states in the collection
        *
-       * This method provides access to the names of all the final 
-       * states in the collection in the form of a set of state names.
+       * This method provides access to the names of all the final states in the 
+       * collection in the form of a set of state names.
        *
-       * @return a set containing the names of all final states in 
-       *         the collection
+       * @return a set containing the names of all final states in the collection
        *
        */
-      std::set<Key> getFinalStateNames( ) const;
+      const States & getFinalStates( ) const;
 
       /**
        * 
        * @brief returns the number of states in this collection
        * 
        * This method returns the number of states in this collection.
+       * Note: This will always be at least 1 as the stuck state is
+       *        always a legitimate state.
        *
        * @return the number of states in this collection
        *
@@ -1661,32 +478,17 @@ namespace wali
       size_t sizeFinalStates( ) const;     
       
       /**
-       *  TODO: use refptr<St>  
+       *
        * @brief gives 'dup' all the state properties of 'orig'
        *
-       * This method checks all the state properties (initial/final)
-       * of 'orig' and assigns the same properties to 'dup'.
+       * This method checks all the state properties (initial/final) of 'orig' and 
+       * assigns the same properties to 'dup'.
        *
        * @param - orig: the state whose properties to duplicate
        * @param - dup: the state whose properties are being set
        *
        */
-      void dupState( const St & orig, St * dup );
-
-      /**
-       *  TODO: make sure that the mapping is unique in it's assignment of
-       *        a state to a name
-       *  TODO: use refptr<St>
-       * @brief provide access to the state with the given name
-       *
-       * This method provides access to the state in this collection
-       * that has the given name.
-       *
-       * @param - name: the name of the state to retrieve
-       * @return the state that has the given name
-       *
-       */
-      St * getState( Key name ) const;
+      void dupState( St orig, St dup );
 
       //
       // Variables
@@ -1694,10 +496,11 @@ namespace wali
       
       protected:
               
-      std::set<St> states;
-      std::set<St> initialStates;  
-      std::set<St> finalStates;   
-      std::set<Key> names; 
+      States states;
+      States initialStates;  
+      States finalStates;   
+
+      std::map<St,ClientInfoRefPtr> stateInfos;
     };    
     
     //
@@ -1707,17 +510,21 @@ namespace wali
     //Constructors and Destructor 
     template<typename Client>
     StateSet<Client>::StateSet( )
-    {  }
+    { 
+      //The stuck state is always a state of the NWA.
+      addState( getStuckState() );
+    }
      
     template<typename Client>
     StateSet<Client>::StateSet( StateSet<Client> & other )
     {
       clearStates();
       
-      names = other.names;
       states = other.states;
       initialStates = other.initialStates;
       finalStates = other.finalStates;
+
+      stateInfos = other.stateInfos;
     }
      
     template<typename Client>
@@ -1728,10 +535,12 @@ namespace wali
     
       clearStates();
       
-      names = other.names;
       states = other.states;
       initialStates = other.initialStates;
       finalStates = other.finalStates;
+
+      stateInfos = other.stateInfos;
+
       return *this;
     }
      
@@ -1741,8 +550,68 @@ namespace wali
       clearStates();
     }
 
+    //Client Info Accessors
+
+    /**
+     * 
+     * @brief access the client information associated with the given state
+     *
+     * @param - state: the state whose client information to retrieve
+     * @return the client information associated with the given state
+     *
+     */
+    template<typename Client>
+    typename StateSet<Client>::ClientInfoRefPtr StateSet<Client>::getClientInfo( St state ) 
+    {
+      return stateInfos[state];   
+    }
+
+    /**
+     * 
+     * @brief set the client information associated with the given state
+     *
+     * @param - state: the state whose client information to set
+     * @param - c: the desired client information for this state
+     *
+     */
+    template<typename Client>
+    void StateSet<Client>::setClientInfo( St state, const ClientInfoRefPtr c )
+    {
+      //Check to make sure this is a valid state.
+      if( isState(state) )
+      {
+        //Update the state's info.
+        stateInfos[state] = c;
+      }
+    }
+
     //State Accessors
     
+    /**
+     *
+     * @brief returns the Key for the stuck state
+     *
+     * @return the Key for the stuck state
+     *
+     */
+    static Key getStuckState( ) 
+    {
+      return (wali::WALI_EPSILON);
+    }
+
+    /**
+     *  
+     * @brief test whether the given state is the stuck state
+     * 
+     * @param - state: the state to test
+     * @return true if this state is the stuck state, false otherwise
+     *
+     */
+    static bool isStuckState( Key state )
+    {
+      return (state == wali::WALI_EPSILON);
+    }
+
     /**
      *
      * @brief removes all states 
@@ -1751,10 +620,14 @@ namespace wali
     template<typename Client>
     void StateSet<Client>::clearStates( )
     {
-      names.clear();
       states.clear();
       clearInitialStates();
       clearFinalStates();
+
+      stateInfos.clear();
+
+      //The stuck state is always a state of the NWA.
+      addState( getStuckState() );
     }    
     
     /**
@@ -1763,9 +636,9 @@ namespace wali
      *
      */
     template<typename Client>
+    inline
     void StateSet<Client>::clearInitialStates( )
     { 
-      //TODO: do we need to unsetAsInitial() here?
       initialStates.clear();
     }    
     
@@ -1775,60 +648,59 @@ namespace wali
      *
      */
     template<typename Client>
+    inline
     void StateSet<Client>::clearFinalStates( )
     {
       finalStates.clear();
     }
     
     /**
-     *  TODO: use refptr<St> 
+     *  
      * @brief tests whether the given state is a member of this collection
      *
      * @param - state: the state to test
-     * @return true if the state is a member of this collection of
-     *         states, false otherwise
+     * @return true if the state is a member of this collection of states, false otherwise
      *
      */
     template<typename Client>
-    bool StateSet<Client>::isState( const St & state ) const
+    inline
+    bool StateSet<Client>::isState( St state ) const
     {
       return (states.count(state) > 0);
     } 
      
     /**
-     *  TODO: use refptr<St> 
-     * @brief tests whether the given state is an initial state of this 
-     *        collection
+     * 
+     * @brief tests whether the given state is an initial state of this collection
      *
      * @param - initialState: the state to test
-     * @return true if the state is an initial state of this collection,
-     *         false otherwise
+     * @return true if the state is an initial state of this collection, false otherwise
      *
      */
     template<typename Client>
-    bool StateSet<Client>::isInitialState( const St & initialState ) const
+    inline
+    bool StateSet<Client>::isInitialState( St initialState ) const
     {
       return (initialStates.count(initialState) > 0);
     }
        
     /**
-     *  TODO: use refptr<St> 
-     * @brief tests whether the given state is a final state of this
-     *        collection
+     *  
+     * @brief tests whether the given state is a final state of this collection
      *
      * @param - finalState: the state to test
-     * @return true if the state is a final state of this collection,
-     *         false otherwise
+     * @return true if the state is a final state of this collection, false otherwise
      *
      */
     template<typename Client>
-    bool StateSet<Client>::isFinalState( const St & finalState ) const
+    inline
+    bool StateSet<Client>::isFinalState( St finalState ) const
     {
       return (finalStates.count(finalState) > 0);
     }
     
     /**
-     *  TODO: use refptr<St>
+     * 
      * @brief add the given state 
      *
      * @param - state: the state to add 
@@ -1836,19 +708,19 @@ namespace wali
      *
      */
     template<typename Client>
-    bool StateSet<Client>::addState( St * addState )
+    bool StateSet<Client>::addState( St state )
     {
-      if(isState(*addState) ) 
+      if(isState(state) ) 
         return false;
         
-      states.insert(*addState);
-      names.insert(addState->getName());
+      states.insert(state);
+      //TODO: Q: Is there a null ClientInfoRefPtr that I can use here?
       
       return true;
     }    
     
     /**
-     *  TODO: use refptr<St>
+     *  
      * @brief add the given initial state 
      *
      * @param - initialState: the initial state to add 
@@ -1856,24 +728,23 @@ namespace wali
      *
      */ 
     template<typename Client>
-    bool StateSet<Client>::addInitialState( St * addInitialState )
+    bool StateSet<Client>::addInitialState( St initialState )
     {
-      if( isInitialState(*addInitialState) )  
+      if( isInitialState(initialState) )  
         return false;
         
-      if( !isState(*addInitialState) )
+      if( !isState(initialState) )
       {
-        addState(addInitialState);
+        addState(initialState);
       }
 
-      //TODO: do we need to setAsInitial() here?
+      initialStates.insert(initialState);
 
-      initialStates.insert(*addInitialState);
       return true;
     }    
     
     /**
-     *  TODO: use refptr<St>
+     * 
      * @brief add the given final state 
      *
      * @param - finalState: the final state to add 
@@ -1881,35 +752,34 @@ namespace wali
      *
      */
     template<typename Client>
-    bool StateSet<Client>::addFinalState( St * addFinalState )
+    bool StateSet<Client>::addFinalState( St finalState )
     {
-      if( isFinalState(*addFinalState) )  
+      if( isFinalState(finalState) )  
         return false;
         
-      if( !isState(*addFinalState) )
+      if( !isState(finalState) )
       {
-        addState(addFinalState);
+        addState(finalState);
       }
 
-      finalStates.insert(*addFinalState);
+      finalStates.insert(finalState);
+
       return true;
     }
       
     /**
      * 
-     * @brief add all states in the given collection to this
-     *        collection of states
+     * @brief add all states in the given collection to this collection of states
      *
-     * @param - stateSet: the collection of states to add to this collection
-     *                  of states
+     * @param - stateSet: the collection of states to add to this collection of states
      *
      */
     template<typename Client>
-    void StateSet<Client>::addAll( StateSet<Client> addStateSet )
+    void StateSet<Client>::addAll( const StateSet<Client> & stateSet )
     {
-      addAllStates(addStateSet);
-      addAllInitialStates(addStateSet);
-      addAllFinalStates(addStateSet);
+      addAllStates(stateSet);
+      addAllInitialStates(stateSet);
+      addAllFinalStates(stateSet);
     }
     
     /**
@@ -1920,12 +790,12 @@ namespace wali
      *
      */
     template<typename Client>
-    void StateSet<Client>::addAllStates( StateSet<Client> addStateSet )
+    void StateSet<Client>::addAllStates( const StateSet<Client> & stateSet )
     {
-      for( iterator it = addStateSet.states.begin();
-            it != addStateSet.states.end(); it++ )
+      for( const_iterator it = stateSet.beginStates();
+            it != stateSet.endStates(); it++ )
       {
-        addState(&(*it));
+        addState(*it);
       }
     }  
       
@@ -1937,12 +807,12 @@ namespace wali
      *
      */  
     template<typename Client>
-    void StateSet<Client>::addAllInitialStates( StateSet<Client> addStateSet )
+    void StateSet<Client>::addAllInitialStates( const StateSet<Client> & stateSet )
     {
-      for( iterator it = addStateSet.initialStates.begin();
-            it != addStateSet.initialStates.end(); it++ )
+      for( const_iterator it = stateSet.beginInitialStates();
+            it != stateSet.endInitialStates(); it++ )
       {
-        addInitialState(&(*it));
+        addInitialState(*it);
       }
     }
     
@@ -1954,17 +824,17 @@ namespace wali
      *
      */
     template<typename Client>
-    void StateSet<Client>::addAllFinalStates( StateSet<Client> addStateSet )
+    void StateSet<Client>::addAllFinalStates( const StateSet<Client> & stateSet )
     {
-      for( iterator it = addStateSet.finalStates.begin();
-            it != addStateSet.finalStates.end(); it++ )
+      for( const_iterator it = stateSet.beginFinalStates();
+            it != stateSet.endFinalStates(); it++ )
       {
-        addFinalState(&(*it));
+        addFinalState(*it);
       }
     }
     
     /**
-     *  TODO: use refptr<St> 
+     * 
      * @brief remove the given state 
      *
      * @param - state: the state to remove
@@ -1972,21 +842,26 @@ namespace wali
      *
      */
     template<typename Client>
-    bool StateSet<Client>::removeState( const St & removeState )
+    bool StateSet<Client>::removeState( St state )
     {
-      if( ! isState(removeState) )
+      //The stuck state cannot be removed.
+      if( isStuckState( state ) )
         return false;
-      states.erase(removeState);
-      names.erase(removeState.getName());
-      //remove from initial state set if it exists
-      removeInitialState(removeState);
-      //remove from final state set if it exists
-      removeFinalState(removeState);
+
+      if( ! isState(state) )
+        return false;
+      states.erase(state);
+
+      //remove from initial state set if it is an initial state
+      removeInitialState(state);
+      //remove from final state set if it is a final state
+      removeFinalState(state);
+
       return true;
     }   
      
     /**
-     *  TODO: use refptr<St> 
+     * 
      * @brief remove the given initial state
      *
      * @param - initialState: the initial state to remove
@@ -1994,19 +869,18 @@ namespace wali
      *  
      */
     template<typename Client>
-    bool StateSet<Client>::removeInitialState( const St & removeInitialState )
+    bool StateSet<Client>::removeInitialState( St initialState )
     {
-      if( ! isInitialState(removeInitialState) )
+      if( ! isInitialState(initialState) )
         return false;
 
-      //TODO: do we need to unsetAsInitial() here?
+      initialStates.erase(initialState);
 
-      initialStates.erase(removeInitialState);
       return true;
     }    
     
     /**
-     *  TODO: use refptr<St> 
+     *  
      * @brief remove the given final state
      *
      * @param - finalState: the final state to remove
@@ -2014,11 +888,13 @@ namespace wali
      *
      */
     template<typename Client>
-    bool StateSet<Client>::removeFinalState( const St & removeFinalState )
+    bool StateSet<Client>::removeFinalState( St finalState )
     {
-      if( ! isFinalState(removeFinalState) )
+      if( ! isFinalState(finalState) )
         return false;
-      finalStates.erase(removeFinalState);
+
+      finalStates.erase(finalState);
+
       return true;
     }
       
@@ -2044,7 +920,10 @@ namespace wali
       {
         if( !first )
         o << ", ";
-        it->print(o);
+        if( isStuckState(*it) )
+          o << "Stuck State";
+        else
+          printKey(o,*it);
       }
       o << " }" << std::endl;
       
@@ -2057,7 +936,10 @@ namespace wali
       {
         if( !first )
         o << ", ";
-        it->print(o);
+        if( isStuckState(*it) )
+          o << "Stuck State";
+        else
+          printKey(o,*it);
       }
       o << " }" << std::endl;
       
@@ -2070,7 +952,10 @@ namespace wali
       {
         if( !first )
         o << ", ";
-        it->print(o);
+        if( isStuckState(*it) )
+          o << "Stuck State";
+        else
+          printKey(o,*it);
       }
       o << " }" << std::endl;
       
@@ -2079,65 +964,11 @@ namespace wali
 
     /**
      *
-     * @brief print the names of the states in this collection
-     *
-     * @param - o: the output stream to print to
-     * @return the output stream that was printed to
-     *
-     */
-    template<typename Client>
-    std::ostream & StateSet<Client>::printName( std::ostream & o ) const
-    {
-      //Print the set of all states.
-      o << "Q: ";
-      o << "{ ";
-      const_iterator it = beginStates();
-      const_iterator itEND = endStates();
-      for( bool first=true; it != itEND ; it++,first=false )
-      {
-        if( !first )
-        o << ", ";
-        it->printName(o);
-      }
-      o << " }" << std::endl;
-      
-      //Prints the initial states.
-      o << "Q0: ";
-      o << "{ ";
-      it = beginInitialStates();
-      itEND = endInitialStates();
-      for( bool first=true; it != itEND ; it++,first=false )
-      {
-        if( !first )
-        o << ", ";
-        it->printName(o);
-      }
-      o << " }" << std::endl;
-      
-      //Print the final states.
-      o << "Qf: ";
-      o << "{ ";
-      it = beginFinalStates();
-      itEND = endFinalStates();
-      for( bool first=true; it != itEND ; it++,first=false )
-      {
-        if( !first )
-        o << ", ";
-        it->printName(o);
-      }
-      o << " }" << std::endl;
-      
-      return o;
-    }
-
-    /**
-     *
-     * @brief tests whether this collection of states is equivalent 
-     *        to the collection of states 'other'
+     * @brief tests whether this collection of states is equivalent to the collection 
+     *        of states 'other'
      *
      * @param - other: the StateSet to compare this StateSet to
-     * @return true if this StateSet is equivalent to the StateSet 
-     *         'other'
+     * @return true if this StateSet is equivalent to the StateSet 'other'
      *
      */
     template<typename Client>
@@ -2181,6 +1012,7 @@ namespace wali
      *
      */
     template<typename Client>
+    inline
     typename StateSet<Client>::const_iterator StateSet<Client>::beginStates( ) const
     {
       return states.begin();
@@ -2194,6 +1026,7 @@ namespace wali
      *
      */
     template<typename Client>
+    inline
     typename StateSet<Client>::const_iterator StateSet<Client>::beginInitialStates( ) const
     {
       return initialStates.begin();
@@ -2207,6 +1040,7 @@ namespace wali
      *
      */
     template<typename Client>
+    inline
     typename StateSet<Client>::const_iterator StateSet<Client>::beginFinalStates( ) const
     {
       return finalStates.begin();
@@ -2216,11 +1050,11 @@ namespace wali
      * 
      * @brief provides access to the states in the collection 
      *
-     * @return one place past the exit point of an iterator through 
-     *         the states
+     * @return one place past the exit point of an iterator through the states
      *
      */
     template<typename Client>
+    inline
     typename StateSet<Client>::const_iterator StateSet<Client>::endStates( ) const
     {
       return states.end();
@@ -2230,11 +1064,11 @@ namespace wali
      * 
      * @brief provides access to the initial states in the collection
      *
-     * @return one place past the exit point of an iterator through the
-     *         initial states
+     * @return one place past the exit point of an iterator through the initial states
      *
      */
     template<typename Client>
+    inline
     typename StateSet<Client>::const_iterator StateSet<Client>::endInitialStates( ) const
     {
       return initialStates.end();
@@ -2244,90 +1078,53 @@ namespace wali
      * 
      * @brief provides access to the final states in the collection
      *
-     * @return one place past the exit point of an iterator through the
-     *         final states
+     * @return one place past the exit point of an iterator through the final states
      *
      */
     template<typename Client>
+    inline
     typename StateSet<Client>::const_iterator StateSet<Client>::endFinalStates( ) const
     {
       return finalStates.end();
     }
     
     /**
-     *  TODO: use refptr<St> 
+     * 
      * @brief provides access to all states in the collection
      *
      * @return a set containing all states in this collection
      *
      */
     template<typename Client>
-    std::set<typename StateSet<Client>::St> StateSet<Client>::getStates( ) const
+    const typename StateSet<Client>::States & StateSet<Client>::getStates( ) const
     {
       return states;
     }
-
-    /**
-     * 
-     * @brief provides access to the names of all the states in the 
-     *        collection
-     *
-     * @return a set containing the names of all states in the 
-     *         collection
-     *
-     */
-    template<typename Client>
-    std::set<Key> StateSet<Client>::getStateNames( ) const
-    {
-      return names;
-    }
     
     /**
      * 
-     * @brief provides access to the names of all the states in the
-     *        given set of states
+     * @brief provides access to the names of all the initial states in the collection
      *
-     * @param - sts: the states whose names to return
-     * @return the names correcponding to the given states
+     * @return a set containing the names of all initial states in the collection
      *
      */
     template<typename Client>
-    std::set<Key> StateSet<Client>::getStateNames( const std::set<St> & sts ) const
+    const typename StateSet<Client>::States & StateSet<Client>::getInitialStates( ) const
     {
-      std::set<Key> names;
-      for(std::set<St>::const_iterator it = sts.begin(); it!=sts.end(); it++) 
-        names.insert( (*it).getName() );
-      return names;
-    }
-    
-    /**
-     * 
-     * @brief provides access to the names of all the initial states
-     *        in the collection
-     *
-     * @return a set containing the names of all initial states in
-     *         the collection
-     *
-     */
-    template<typename Client>
-    std::set<Key> StateSet<Client>::getInitialStateNames( ) const
-    {
-      return getStateNames(initialStates);
+      return initialStates;
     }
        
     /**
      *  
-     * @brief provides access to the names of all final states in 
-     *        the collection
+     * @brief provides access to the names of all final states in the collection
      *
-     * @return a set containing the names of all final states in 
-     *         the collection
+     * @return a set containing the names of all final states in the collection
      *
      */
     template<typename Client>
-    std::set<Key> StateSet<Client>::getFinalStateNames( ) const
+    const typename StateSet<Client>::States & StateSet<Client>::getFinalStates( ) const
     {
-      return getStateNames(finalStates);
+      return finalStates;
     }
     
     /**
@@ -2338,6 +1135,7 @@ namespace wali
      *
      */
     template<typename Client>
+    inline
     size_t StateSet<Client>::sizeStates( ) const
     {
       return states.size();
@@ -2351,6 +1149,7 @@ namespace wali
      *
      */
     template<typename Client>
+    inline
     size_t StateSet<Client>::sizeInitialStates( ) const
     {
       return initialStates.size();
@@ -2364,13 +1163,14 @@ namespace wali
      *
      */
     template<typename Client>
+    inline
     size_t StateSet<Client>::sizeFinalStates( ) const
     {
       return finalStates.size();
     }  
     
     /**
-     *  TODO: use refptr<St> 
+     * 
      * @brief gives 'dup' all the state properties of 'orig'
      *
      * @param - orig: the state whose properties to duplicate
@@ -2378,7 +1178,7 @@ namespace wali
      *
      */
     template<typename Client>
-    void StateSet<Client>::dupState( const St & orig, St * dup )
+    void StateSet<Client>::dupState( St orig, St dup )
     {
       if( isInitialState(orig) )
         addInitialState(dup);
@@ -2386,34 +1186,6 @@ namespace wali
       if( isFinalState(orig) )
         addFinalState(dup);
     }
-
-    /**
-     *  TODO: make sure that the mapping is unique in it's assignment of
-     *        a state to a name
-     *  TODO: use refptr<St>
-     * @brief provide access to the state with the given name
-     *
-     * This method provides access to the state in this collection
-     * that has the given name.
-     *
-     * @param - name: the name of the state to retrieve
-     * @return the state that has the given name
-     *
-     */
-    template<typename Client>
-    typename StateSet<Client>::St * StateSet<Client>::getState( Key name ) const
-    { //TODO
-      for(iterator it = states.begin(); it != states.end(); it++ )
-      { 
-        if(it->getName() == name)
-        {
-          return &(*it);
-        }
-      }
-      return NULL;
-    }    
-    
-#endif
   }
 }
 #endif

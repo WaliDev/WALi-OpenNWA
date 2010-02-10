@@ -11,13 +11,13 @@ namespace wali
   {
     /**
      *
-     *  This class is used in NWA::NWAtoPDS and NWA::NWAtoBackwardsPDS.
-     *  It is used to compute the weights for the rules added to the WPDS
-     *  and must be extended to incorporate the desired semiring in order 
-     *  to use either of these methods.
+     * This class is used in NWA::NWAtoPDS and NWA::NWAtoBackwardsPDS.  It is used to
+     * compute the weights for the rules added to the WPDS and must be extended to 
+     * incorporate the desired semiring in order to use either of these methods.
      *  
      */
-    template<typename St,typename Sym>
+    //TODO: do these methods need NWARefPtr to make sense?
+
     class WeightGen
     {
       public:
@@ -55,12 +55,12 @@ namespace wali
 
       /**
        *
-       * @brief computes the weight(in the desired semiring) for a rule of the 
-       *        WPDS from the given edge
+       * @brief computes the weight(in the desired semiring) for a rule of the WPDS from 
+       *        the given edge
        *
        * This method computes the weight(in the desired semiring) for a WPDS rule from 
        * the (kind) edge between 'src' and 'tgt' labeled with symbol 'sym'.
-       * Note: The kind will never be CALL_TO_RET, this case is handled by getOne().
+       * Note: The kind will never be CALL_TO_RET, this case is never needed.
        *
        * @param - src: the source of the edge
        * @param - sym: the symbol labeling the edge
@@ -69,15 +69,43 @@ namespace wali
        * @return the weight to put on the rule corresponding to the given edge
        *         
        */
-      virtual sem_elem_t getWeight( const St & src, const Sym & sym, Kind kind, const St & tgt ) 
+      virtual sem_elem_t getWeight( Key src, Key sym, Kind kind, Key tgt ) 
       {
         return getOne();
       }
         
       /** 
-       * TODO 
+       * 
+       * @brief computes the weight(in the desired semiring) for the return rule of the 
+       *        WPDS associated with the given exit
+       *
+       * This method computes the weight(in the desired semiring) for the return rule of
+       * the WPDS corresponding to the exit 'src'.
+       * Note: This value is generally the same as getOne().
+       * 
+       * @param - src: the source of the exit edge
+       * @return the weight to put on the return rule corresponding to the given exit 
+       *
        */
-      virtual sem_elem_t getExitWeight( const St & src) 
+      virtual sem_elem_t getExitWeight( Key src) 
+      {
+        return getOne();
+      }
+
+      /** 
+       * 
+       * @brief computes the weight(in the desired semiring) for the return rule of the 
+       *        backwards WPDS associated with the given entry
+       *
+       * This method computes the weight(in the desired semiring) for the return rule of
+       * the backwards WPDS corresponding to the entry 'tgt'.
+       * Note: This value is generally the same as getOne().
+       * 
+       * @param - tgt: the target of the entry edge
+       * @return the weight to put on the return rule corresponding to the given entry 
+       *
+       */
+      virtual sem_elem_t getEntryWeight( Key tgt) 
       {
         return getOne();
       }
@@ -95,7 +123,7 @@ namespace wali
        * @return the weight to put on the rule corresponding to the given edge
        *
        */
-      virtual sem_elem_t getWildWeight( const St & src, const St & tgt )
+      virtual sem_elem_t getWildWeight( Key src, Key tgt )
       { 
         return getOne();
       }

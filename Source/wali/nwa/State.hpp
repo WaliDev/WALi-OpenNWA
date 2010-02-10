@@ -93,9 +93,8 @@ namespace wali
        *  TODO: Should this be allowed?
        * @brief access the Key associated with this state
        *
-       * This method provides access to the wali::Key associated
-       * with this state.  Note: This method should never be called
-       * on the stuck state.
+       * This method provides access to the wali::Key associated with this state.
+       * Note: This method should never be called on the stuck state.
        *
        * @return the Key associated with this state
        *
@@ -106,9 +105,8 @@ namespace wali
        *  TODO: what should stuck return from this?
        * @brief access the name associated with this state
        *
-       * This method provides access to the name associated with this
-       * state.  Note: This method should never be called on the stuck
-       * state.
+       * This method provides access to the name associated with this state.
+       * Note: This method should never be called on the stuck state.
        *
        * @return the name associated with this state
        *
@@ -119,8 +117,7 @@ namespace wali
        * 
        * @brief access the client information associated with this state
        *
-       * This method provides access to the client information associated
-       * with this state.
+       * This method provides access to the client information associated with this state.
        *
        * @return the client information associated with this state
        *
@@ -131,8 +128,8 @@ namespace wali
        * 
        * @brief set the client information associated with this state
        *
-       * This method sets the client information associated with this
-       * state to the client information provided.
+       * This method sets the client information associated with this state to the client
+       * information provided.
        *
        * @param - c: the desired client information for this state
        *
@@ -148,7 +145,7 @@ namespace wali
       }
 
       /**
-       *  TODO: Why is this method here?  It should at least be protected!
+       *  TODO: Why is this method here?  It should at least be protected with only NWA able to call it!
        */
       void setAsInitial( )
       {
@@ -156,7 +153,7 @@ namespace wali
       }
 
       /** 
-       *  TODO: Why is this method here?  It should at least be protected!
+       *  TODO: Why is this method here?  It should at least be protected with only NWA able to call it!
        */
       void unsetAsInitial( )
       {
@@ -166,28 +163,27 @@ namespace wali
       //Intersection of states
       /**
        *  TODO: move nodeIntersection back to here!
-       * @brief creates the state that is the join of this state with the
-       *        given state 'other'
+       * @brief creates the state that is the join of this state with the given state 
        *
-       * This method checks that this state and the given state 'other' can 
-       * be joined and creates the resulting state.  If these two states can 
-       * be joined, true is returned and the resulting state is passed back
-       * via the address 'result'.  Otherwise, false is returned and no
-       * new state is created.
+       * This method checks that this state and the given state 'other' can be joined and
+       * creates the resulting state.  If these two states can be joined, true is returned 
+       * and the resulting state is passed back via the address 'result'.  Otherwise, 
+       * false is returned and no new state is created.
        * Note: If some state-matching metric other than no states can be 
        *       joined is desired(this should be always!), this method will 
        *       need to be overridden.
        *
        * @param - other: the state to join with this state
-       * @param - result: the address to use in passing back the joint state 
-       *                created when it is possible to join the two states
+       * @param - result: the address to use in passing back the joint state created when
+       *                  it is possible to join the two states
        * @result true if the two states can be joined, false otherwise
+       *
        */
       /*virtual bool intersect( State * other, State & result ) const
       {      
-        //Note: When overriding this method your metric must determine whether
-        // the given states are compatible, then create a state and set result
-        // to the state just created if they are compatible.
+        //Note: When overriding this method your metric must determine whether the given
+        // states are compatible, then create a state and set result to the state just 
+        // created if they are compatible.
         
         result = NULL;
         return false;
@@ -212,8 +208,7 @@ namespace wali
        *
        * @brief tests whether this State is equivalent to the State 'other'.
        * 
-       * This method tests the equivalence of this State and the State
-       * 'other'.
+       * This method tests the equivalence of this State and the State 'other'.
        *
        * @param - other: the State to compare this State to
        * @return true if this State is equivalent to the State 'other', false otherwise
@@ -223,12 +218,10 @@ namespace wali
       
       /**
        *
-       * @brief tests the relationship between this State and the State 
-       *        'other'.
+       * @brief tests the relationship between this State and the State 'other'.
        *
-       * This method tests whether this State is 'less than' the State 
-       * 'other' in some way.  The default is to order the States based 
-       * on the ordering of their names.  
+       * This method tests whether this State is 'less than' the State 'other' in some
+       * way.  The default is to order the States based on the ordering of their names.  
        * Note: The stuck state is less than all other states.
        *
        * @param - rhs: the State to compare this State to
@@ -425,8 +418,7 @@ namespace wali
 
     /**
      *
-     * @brief tests the relationship between this State and the State 
-     *        'other'.
+     * @brief tests the relationship between this State and the State 'other'.
      *
      * @param - rhs: the State to compare this State to
      * @return true if this State is 'less than' the State 'other', false otherwise
@@ -506,8 +498,7 @@ namespace wali
        *  TODO: what should stuck return from this?
        * @brief access the name associated with this state
        *
-       * This method provides access to the name associated
-       * with this state.
+       * This method provides access to the name associated with this state.
        * Note: This method should never be called on a stuck state.
        *
        * @return the name associated with this state
@@ -519,8 +510,7 @@ namespace wali
        * 
        * @brief access the client information associated with this state
        *
-       * This method provides access to the client information associated
-       * with this state.
+       * This method provides access to the client information associated with this state.
        *
        * @return the client information associated with this state
        *
@@ -531,8 +521,8 @@ namespace wali
        * 
        * @brief set the client information associated with this state
        *
-       * This method sets the client information associated with this
-       * state to the client information provided.
+       * This method sets the client information associated with this state to the client
+       * information provided.
        *
        * @param - c: the desired client information for this state
        *
@@ -547,8 +537,8 @@ namespace wali
       /** 
        * @brief print the State
        *
-       * This method prints out the key associated with the State to 
-       * the output stream provided.
+       * This method prints out the key associated with the State to the output stream 
+       * provided.
        *
        * @param - o: the output stream to which to print the State
        * @return the output stream to which the State was printed
@@ -571,8 +561,7 @@ namespace wali
        *
        * @brief tests whether this State is equivalent to the State 'other'.
        * 
-       * This method tests the equivalence of this State and the State
-       * 'other'.
+       * This method tests the equivalence of this State and the State 'other'.
        *
        * @param - other: the State to compare this State to
        * @return true if this State is equivalent to the State 'other', false otherwise
@@ -582,12 +571,10 @@ namespace wali
       
       /**
        *
-       * @brief tests the relationship between this State and the State 
-       *        'other'.
+       * @brief tests the relationship between this State and the State 'other'.
        *
-       * This method tests whether this State is 'less than' the State 
-       * 'other' in some way.  The default is to order the States based 
-       * on the ordering of their names.
+       * This method tests whether this State is 'less than' the State 'other' in some
+       * way.  The default is to order the States based on the ordering of their names.
        * Note: The stuck state is less than all other states.
        *
        * @param - rhs: the State to compare this State to
@@ -734,6 +721,7 @@ namespace wali
     }
 
     /** 
+     *
      * @brief print the name of the State
      *
      * @param - o: the output stream to which to print the State name
@@ -772,8 +760,7 @@ namespace wali
 
     /**
      *
-     * @brief tests the relationship between this State and the State 
-     *        'other'.
+     * @brief tests the relationship between this State and the State 'other'.
      *
      * @param - rhs: the State to compare this State to
      * @return true if this State is 'less than' the State 'other', false otherwise

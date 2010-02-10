@@ -911,11 +911,11 @@
 				Name="wali.nwa"
 				>
 				<File
-					RelativePath=".\ClientInfo.hpp"
+					RelativePath="..\..\..\Source\wali\nwa\ClientInfo.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Source\wali\nwa\ClientInfo.hpp"
+					RelativePath=".\ClientInfo.hpp"
 					>
 				</File>
 				<File
@@ -932,6 +932,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\Source\wali\nwa\Symbol.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\nwa\SymbolSet.hpp"
 					>
 				</File>
 				<File

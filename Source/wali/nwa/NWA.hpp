@@ -5,11 +5,15 @@
  * @author Amanda Burton
  */
 
+#define KEY
+
 // ::wali
 #include "wali/Printable.hpp"
+#include "wali/Countable.hpp"
 #include "wali/KeyContainer.hpp"
 
 #include "wali/nwa/Symbol.hpp"
+#include "wali/nwa/SymbolSet.hpp"
 #include "wali/nwa/StateSet.hpp"
 #include "wali/nwa/TransSet.hpp"
 
@@ -64,8 +68,8 @@ namespace wali
         typedef typename Symbols::iterator symbolIterator;
 
         typedef std::pair< StName,StName > StatePair;
-        //typedef std::set< StatePair > StatePairSet; TODO this belongs to a broken bit
-        //typedef std::map< StatePairSet,St* > StateMap; TODO this belongs to a broken bit
+        //typedef std::set< StatePair > StatePairSet;  this belongs to a broken bit
+        //typedef std::map< StatePairSet,St* > StateMap;  this belongs to a broken bit
 
       //
       // Methods
@@ -118,7 +122,7 @@ namespace wali
        * @return true if the stuck state is a final state, false otherwise
        *
        */
-      bool isAbsentAccept( ) const;
+      //bool isAbsentAccept( ) const;
 
       /**
        * 
@@ -127,7 +131,7 @@ namespace wali
        * This method sets the stuck state to be a final state.
        *
        */
-      void acceptAbsent( );
+      //void acceptAbsent( );
 
       /**
        * 
@@ -136,7 +140,7 @@ namespace wali
        * This method makes the stuck state not a final state.
        *
        */
-      void rejectAbsent( );        
+      //void rejectAbsent( );        
 
       /**
        *  
@@ -297,7 +301,7 @@ namespace wali
        *
        */
       std::set<StName> getInitialStates( ) const; 
-      StName getInitialState( ) const;
+      StName getInitialState( ) const;  //This hinges on the assertion that there is a unique initial state.
 
       /**
        *
@@ -553,6 +557,8 @@ namespace wali
        */
       void clearTrans( );
 
+      //Call Transitions
+
       /**
        * 
        * @brief returns the symbol/entry point pairs associated with the given call site
@@ -574,9 +580,9 @@ namespace wali
        * and adds it to the transition set for the NWA.  If the call transition already 
        * exists in the NWA, false is returned. Otherwise, true is returned.
        *
-       * @param from: the name of the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: the name of the state the edge arrives to  
+       * @param - from: the name of the state the edge departs from
+       * @param - sym: the symbol labeling the edge
+       * @param - to: the name of the state the edge arrives to  
        * @return false if the call transition already exists in the NWA
        *
        */
@@ -590,9 +596,9 @@ namespace wali
        * and adds it to the transition set for the NWA.  If the call transition already 
        * exists in the NWA, false is returned. Otherwise, true is returned.
        *
-       * @param from: the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: the state the edge arrives to  
+       * @param - from: the state the edge departs from
+       * @param - sym: the symbol labeling the edge
+       * @param - to: the state the edge arrives to  
        * @return false if the call transition already exists in the NWA
        *
        */
@@ -606,7 +612,7 @@ namespace wali
        * If the call transition already exists in the NWA, false is returned. Otherwise, 
        * true is returned.
        *
-       * @param the call transition to add
+       * @param - ct: the call transition to add
        * @return false if the call transition already exists in the NWA
        *
        */
@@ -620,9 +626,9 @@ namespace wali
        * information in the transition set. If the transition is found, it is removed
        * from the transition set and true is returned.  Otherwise, false is returned.
        *
-       * @param from: name of the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: name of the state the edge arrives to  
+       * @param - from: name of the state the edge departs from
+       * @param - sym: the symbol labeling the edge
+       * @param - to: name of the state the edge arrives to  
        * @return false if the call transition does not exist in the NWA
        *
        */
@@ -636,9 +642,9 @@ namespace wali
        * information in the transition set. If the transition is found, it is removed 
        * from the transition set and true is returned.  Otherwise, false is returned.
        *
-       * @param from: the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: the state the edge arrives to  
+       * @param - from: the state the edge departs from
+       * @param - sym: the symbol labeling the edge
+       * @param - to: the state the edge arrives to  
        * @return false if the call transition does not exist in the NWA
        *
        */
@@ -652,11 +658,13 @@ namespace wali
        * transition is found, it is removed from the transition set and true is 
        * returned.  Otherwise, false is returned.
        *
-       * @param the call transition to remove
+       * @param - ct: the call transition to remove
        * @return false if the call transition does not exist in the NWA
        *
        */
       bool removeCallTrans( const Call & ct );
+
+      //Internal Transitions
 
       /**
        * 
@@ -680,9 +688,9 @@ namespace wali
        * transition already exists in the NWA, false is returned. Otherwise, true is 
        * returned.
        *
-       * @param from: the name of the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: the name of the state the edge arrives to  
+       * @param - from: the name of the state the edge departs from
+       * @param - sym: the symbol labeling the edge
+       * @param - to: the name of the state the edge arrives to  
        * @return false if the internal transition already exists in the NWA
        *
        */
@@ -697,9 +705,9 @@ namespace wali
        * transition already exists in the NWA, false is returned. Otherwise, true is 
        * returned.
        *
-       * @param from: the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: the state the edge arrives to  
+       * @param - from: the state the edge departs from
+       * @param - sym: the symbol labeling the edge
+       * @param - to: the state the edge arrives to  
        * @return false if the internal transition already exists in the NWA
        *
        */
@@ -713,7 +721,7 @@ namespace wali
        * If the internal transition already exists in the NWA, false is returned. Otherwise, 
        * true is returned.
        *
-       * @param internal transition to add to the NWA
+       * @param - it: internal transition to add to the NWA
        * @return false if the internal transition already exists in the NWA
        *
        */
@@ -727,9 +735,9 @@ namespace wali
        * information in the transition set.  If the transition is found, it is removed 
        * from the transition set and true is returned.  Otherwise, false is returned.
        *
-       * @param from: the name of the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: the name of the state the edge arrives to  
+       * @param - from: the name of the state the edge departs from
+       * @param - sym: the symbol labeling the edge
+       * @param - to: the name of the state the edge arrives to  
        * @return false if the internal transition does not exist in the NWA
        *
        */
@@ -743,9 +751,9 @@ namespace wali
        * information in the transition set.  If the transition is found, it is removed 
        * from the transition set and true is returned.  Otherwise, false is returned.
        *
-       * @param from: the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: the state the edge arrives to  
+       * @param - from: the state the edge departs from
+       * @param - sym: the symbol labeling the edge
+       * @param - to: the state the edge arrives to  
        * @return false if the internal transition does not exist in the NWA
        *
        */
@@ -759,11 +767,13 @@ namespace wali
        * transition is found, it is removed from the transition set and true is returned.
        * Otherwise, false is returned.
        *
-       * @param the internal transition to remove
+       * @param - it: the internal transition to remove
        * @return false if the internal transition does not exist in the NWA
        *
        */
       bool removeInternalTrans( const Internal & it );
+
+      //Return Transitions
 
       /**
        * 
@@ -802,10 +812,10 @@ namespace wali
        * and adds it to the transition set for the NWA.  If the return transition already 
        * exists in the NWA, false is returned. Otherwise, true is returned.
        *
-       * @param from: the name of the state the edge departs from
-       * @param pred: the name of the state from which the call was initiated  
-       * @param sym: the symbol labeling the edge
-       * @param to: the name of the state the edge arrives to  
+       * @param - from: the name of the state the edge departs from
+       * @param - pred: the name of the state from which the call was initiated  
+       * @param - sym: the symbol labeling the edge
+       * @param - to: the name of the state the edge arrives to  
        * @return false if the return transition already exists in the NWA
        *
        */
@@ -819,10 +829,10 @@ namespace wali
        * and adds it to the transition set for the NWA. If the return transition already 
        * exists in the NWA, false is returned. Otherwise, true is returned.
        *
-       * @param from: the state the edge departs from
-       * @param pred: the state from which the call was initiated  
-       * @param sym: the symbol labeling the edge
-       * @param to: the state the edge arrives to  
+       * @param - from: the state the edge departs from
+       * @param - pred: the state from which the call was initiated  
+       * @param - sym: the symbol labeling the edge
+       * @param - to: the state the edge arrives to  
        * @return false if the return transition already exists in the NWA
        *
        */
@@ -836,7 +846,7 @@ namespace wali
        * If the return transition already exists in the NWA, false is returned. Otherwise,
        * true is returned.
        *
-       * @param return transition to add to the NWA
+       * @param - rt: return transition to add to the NWA
        * @return false if the return transition already exists in the NWA
        *
        */
@@ -846,13 +856,13 @@ namespace wali
        *
        * @brief remove a return transition from the NWA
        *
-       * This method checks for the return transition with the given edge and label
-       * information in the transition set.  If the transition is found, it is removed 
+       * This method checks for all return transitions with the given edge and label
+       * information in the transition set.  If any transitions are found, they are removed 
        * from the transition set and true is returned.  Otherwise, false is returned.
        *
-       * @param from: the name of the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: the name of the state the edge arrives to  
+       * @param - from: the name of the state the edge departs from
+       * @param - sym: the symbol labeling the edge
+       * @param - to: the name of the state the edge arrives to  
        * @return false if the return transition does not exist in the NWA
        *
        */
@@ -862,13 +872,13 @@ namespace wali
        *
        * @brief remove a return transition from the NWA
        *
-       * This method checks for the return transition with the given edge and label
-       * information in the transition set.  If the transition is found, it is removed 
+       * This method checks for all return transitions with the given edge and label
+       * information in the transition set.  If any transitions are found, they are removed 
        * from the transition set and true is returned.  Otherwise, false is returned.
        *
-       * @param from: the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: the state the edge arrives to  
+       * @param - from: the state the edge departs from
+       * @param - sym: the symbol labeling the edge
+       * @param - to: the state the edge arrives to  
        * @return false if the return transition does not exist in the NWA
        *
        */
@@ -882,10 +892,10 @@ namespace wali
        * information in the transition set. If the transition is found, it is removed 
        * from the transition set and true is returned.  Otherwise, false is returned.
        * 
-       * @param from: name of the state the edge departs from
-       * @param pred: name of the state from which the call was initiated  	   
-       * @param sym: the symbol labeling the edge
-       * @param to: name of the state the edge arrives to  
+       * @param - from: name of the state the edge departs from
+       * @param - pred: name of the state from which the call was initiated  	   
+       * @param - sym: the symbol labeling the edge
+       * @param - to: name of the state the edge arrives to  
        * @return false if the return transition does not exist in the NWA
        *
        */
@@ -899,10 +909,10 @@ namespace wali
        * information in the transition set. If the transition is found, it is removed 
        * from the transition set and true is returned.  Otherwise, false is returned.
        * 
-       * @param from: the state the edge departs from
-       * @param pred: the state from which the call was initiated  	   
-       * @param sym: the symbol labeling the edge
-       * @param to: the state the edge arrives to  
+       * @param - from: the state the edge departs from
+       * @param - pred: the state from which the call was initiated  	   
+       * @param - sym: the symbol labeling the edge
+       * @param - to: the state the edge arrives to  
        * @return false if the return transition does not exist in the NWA
        *
        */
@@ -916,7 +926,7 @@ namespace wali
        * transition is found, it is removed from the transition set and true is returned.
        * Otherwise, false is returned.
        *
-       * @param the return transition to remove
+       * @param - rt: the return transition to remove
        * @return false if the return transition does not exist in the NWA
        *
        */
@@ -1142,6 +1152,7 @@ namespace wali
        * @param - node1: the first state to intersect
        * @param - node2: the second state to intersect
        * @param - result: the state that results from performing the intersection
+       * @return true if the intersection between the given states is possible
        *
        */
       virtual bool nodeIntersect( const St * const node1, const St * const node2, St * & result );
@@ -1156,6 +1167,7 @@ namespace wali
        * @param - label1: the first symbol to intersect
        * @param - label2: the second symbol to intersect
        * @param - result: the symbol that results from performing the intersection
+       * @return true if the intersection between the given symbols is possible
        *
        */
       virtual bool edgeIntersect( const Sym & label1, const Sym & label2, Sym & result );
@@ -1170,7 +1182,7 @@ namespace wali
        * This method constructs the WPDS which allows WPDS reachability to be used to 
        * perform property checking using this NWA and the given WPDS.
        *
-       * @param the WPDS that forms the basis for the constructed WPDS
+       * @param - base: the WPDS that forms the basis for the constructed WPDS
        * @return the WPDS which can be used to perform property checking using PDS 
        *          reachability
        * 
@@ -1183,6 +1195,7 @@ namespace wali
        *
        * This method constructs the NWA that is equivalent to the given PDS.
        *
+       * @param - pds: the WPDS to be converted
        * @return the NWA equivalent to the given PDS
        *
        */
@@ -1206,6 +1219,8 @@ namespace wali
        * This method provides access to the program control location corresponding to
        * the given exit point/call site pair.
        *
+       * @param - exit: the exit point associated with the new program control location
+       * @param - call: the call site associated with the new program control location
        * @return the program control location corresponding to the given states
        *
        */
@@ -1217,6 +1232,7 @@ namespace wali
        *
        * This method constructs the PDS that is equivalent to this NWA.
        *
+       * @param - wg: the WeightGen responsible for determining the weights for PDS rules
        * @return the PDS equivalent to this NWA
        *
        */ 
@@ -1228,6 +1244,7 @@ namespace wali
        *
        * This method constructs the backwards PDS that is equivalent to this NWA.
        *
+       * @param - wg: the WeightGen responsible for determining the weights for PDS rules
        * @return the backwards PDS equivalent to this NWA
        *
        */ 
@@ -1280,6 +1297,7 @@ namespace wali
        * This method prints out the NWA in dot format to the output stream provided.
        *
        * @param - o: the output stream to print to
+       * @param - title: ??? 
        * @return the output stream that was printed to
        *
        */
@@ -1299,6 +1317,8 @@ namespace wali
 
       protected:
       
+      //States
+
       /**
        *
        * @brief add all the states in the given StateSet to the NWA
@@ -1412,6 +1432,8 @@ namespace wali
        */
       stateIterator endFinalStates( ) const;  
 
+      //Symbols
+
       /**
        *
        * @brief add the given symbols to the NWA
@@ -1447,6 +1469,8 @@ namespace wali
        *
        */
       symbolIterator endSymbols( ) const;  
+
+      //Transitions
 
       /**
        *
@@ -1520,6 +1544,8 @@ namespace wali
        */
       returnIterator endReturnTrans( ) const;  
 
+      //Auxiliary 
+
       /**
        *
        * @brief constructs the transition table and state map for the deterministic NWA 
@@ -1528,6 +1554,9 @@ namespace wali
        * This method constructs the transition table and state map for the deterministic 
        * NWA that is equivalent to this NWA.
        *
+       * @param - nWdAut: ??? 
+       * @param - currState: ??? 
+       * @param - callPred: ??? 
        * @return the transition table and state map for the deterministic NWA that is
        *          equivalent to this NWA
        *
@@ -1563,7 +1592,7 @@ namespace wali
        *
        * @param - currState: the state in the nested word automaton at which to start the 
        *                      simulation
-       * @param - configs: the nested word suffix to match  //TODO: is this right?
+       * @param - configs: the nested word suffix to match  Q: is this right?
        * @return true if the simulation ends in an accepting state
        *
        */
@@ -1579,7 +1608,7 @@ namespace wali
         Symbols symbols;        
         Trans * trans;
 
-        bool absentAcceptance;
+        //bool absentAcceptance;
     };
 
     //
@@ -1593,11 +1622,11 @@ namespace wali
       states = States();      
 
       symbols = Symbols();
-      //addSymbol(Sym::epsilon);  //TODO: restore this?
+      //addSymbol(Sym::epsilon);  //Q: restore this?
 
       trans = new Trans();
 
-      absentAcceptance = false; //Assume stuck state is not a final state.
+      //absentAcceptance = false; //Assume stuck state is not a final state.
     }
 
     template <typename St,typename StName,typename Sym>
@@ -1607,7 +1636,7 @@ namespace wali
       states = other.states;
       symbols = other.symbols;
       trans = other.trans;
-      absentAcceptance = other.absentAcceptance;
+      //absentAcceptance = other.absentAcceptance;
     }
 
     template <typename St,typename StName,typename Sym>
@@ -1625,7 +1654,7 @@ namespace wali
       states = other.states;
       symbols = other.symbols;
       trans = other.trans;
-      absentAcceptance = other.absentAcceptance;
+      //absentAcceptance = other.absentAcceptance;
 
       return *this;
     }
@@ -1679,33 +1708,33 @@ namespace wali
      * @return true if the stuck state is a final state, false otherwise
      *
      */
-    template <typename St,typename StName,typename Sym>
+    /*template <typename St,typename StName,typename Sym>
     bool NWA<St,StName,Sym>::isAbsentAccept( ) const
     {
       return absentAcceptance;
-    }
+    }*/
 
     /**
      * 
      * @brief sets the stuck state to be a final state
      *
      */
-    template <typename St,typename StName,typename Sym>
+    /*template <typename St,typename StName,typename Sym>
     void NWA<St,StName,Sym>::acceptAbsent( )
     {
       absentAcceptance = true;
-    }
+    }*/
 
     /**
      * 
      * @brief sets the stuck state to be not a final state
      *
      */
-    template <typename St,typename StName,typename Sym> 
+    /*template <typename St,typename StName,typename Sym> 
     void NWA<St,StName,Sym>::rejectAbsent( )
     {
       absentAcceptance = false;
-    }
+    }*/
 
     /**
      *  
@@ -1911,7 +1940,7 @@ namespace wali
     {      
       states.clearStates();
 
-      absentAcceptance = false; //default behavior is restored
+      //absentAcceptance = false; //default behavior is restored
 
       //Since all states are being removed, all transitions are removed as well.
       clearTrans();
@@ -2120,14 +2149,14 @@ namespace wali
      * @brief add all the states in the given StateSet to the final state set associated
      *        with this NWA
      *
-     * @param the StateSet that contains the states to add
+     * @param - addStateSet: the StateSet that contains the states to add
      *
      */
     template <typename St,typename StName,typename Sym>
-    void NWA<St,StName,Sym>::addAllFinalStates( States addStateSet, bool accept )
+    void NWA<St,StName,Sym>::addAllFinalStates( States addStateSet, bool accept ) //Q: do I still need accept?
     {
-      if( accept )
-        absentAcceptance = true;
+      //if( accept )
+      //  absentAcceptance = true;
 
       states.addAllFinalStates(addStateSet);
     }
@@ -2142,9 +2171,9 @@ namespace wali
     template <typename St,typename StName,typename Sym>
     size_t NWA<St,StName,Sym>::sizeFinalStates( ) const
     {
-      if( absentAcceptance )
-        return states.sizeFinalStates() + 1;
-      else
+      //if( absentAcceptance )
+      //  return states.sizeFinalStates() + 1;
+      //else
         return states.sizeFinalStates();
     } 
 
@@ -2172,7 +2201,7 @@ namespace wali
     {
       states.clearFinalStates();
 
-      absentAcceptance = false; //default behavior is restored
+      //absentAcceptance = false; //default behavior is restored
     }
 
     /**
@@ -2235,7 +2264,7 @@ namespace wali
     }
 
     /**
-     *  TODO: remove this?
+     *  Q: remove this?
      * @brief add the given symbols to the NWA
      *
      * @param the symbols to add
@@ -2305,7 +2334,7 @@ namespace wali
     }
 
     /**
-     *  TODO: remove this?
+     *  Q: remove this?
      * @brief provide access to the beginning of the symbol set
      *
      * @return an iterator pointing to the beginning of the symbol set
@@ -2318,7 +2347,7 @@ namespace wali
     //}
 
     /**
-     *  TODO: remove this?
+     *  Q: remove this?
      * @brief provide access to the end of the symbol set
      *
      * @return an iterator pointing just past the end of the symbol set
@@ -3092,7 +3121,6 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     NWA<St,StName,Sym> * NWA<St,StName,Sym>::unionNWA( NWA<St,StName,Sym> other )
     { //FIX
-      //TODO: fix this for absentAcceptance and wild symbol
       NWA<St,StName,Sym> * newNWA = new NWA<St,StName,Sym>();
 
       //Generate new states, adding them to the state set as well as
@@ -3194,7 +3222,6 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     NWA<St,StName,Sym> * NWA<St,StName,Sym>::concat( NWA<St,StName,Sym> other )
     { //FIX
-      //TODO: fix this for accept absent and wild symbol
       NWA<St,StName,Sym> * newNWA = new NWA<St,StName,Sym>();
 
       //Join the state sets
@@ -3248,7 +3275,6 @@ namespace wali
     template<typename St,typename StName,typename Sym >
     NWA<St,StName,Sym> * NWA<St,StName,Sym>::star( )
     { //FIX
-      //TODO: fix this for accept absent and wild symbol
       NWA<St,StName,Sym> * newNWA = new NWA<St,StName,Sym>();
 
       //Add states.
@@ -3343,7 +3369,6 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     NWA<St,StName,Sym> & NWA<St,StName,Sym>::determinize( )
     { //FIX
-      //TODO: how does this react to absentAcceptance & State/Symbol types & wild symbol
       std::pair<NWA<St,StName,Sym>,StateMap> tmp = std::pair<NWA<St,StName,Sym>,StateMap>();
 
       //New initial state is {(q,q) | q is an element of Q (possibly Q_in?)}
@@ -3407,7 +3432,6 @@ namespace wali
                                                                             StateMap stateMap, StatePairSet currState,
                                                                             std::stack<StatePairSet> callPred )
     { //FIX
-      //TODO: absentAcceptance & State/Symbol type & wild symbol
       //Internal Transition
       for( symbolIterator it = nWdAut.symbols.begin();
                           it != nWdAut.symbols.end(); it++ )
@@ -3789,11 +3813,11 @@ namespace wali
     template <typename St,typename StName,typename Sym>
     void NWA<St,StName,Sym>::intersect( const NWA<St,StName,Sym> & other, NWA<St,StName,Sym> & result ) const
     {
-      assert(!absentAcceptance && !other.absentAcceptance);
+      //assert(!absentAcceptance && !other.absentAcceptance);
       //If both NWAs to be intersected accept absent, the intersection should too.
       //Otherwise, the intersection should not, so keep the default settings.
-      if( absentAcceptance && other.absentAcceptance )
-        result.acceptAbsent();
+      //if( absentAcceptance && other.absentAcceptance )
+      //  result.acceptAbsent();
 
       std::set<StatePair> visitedPairs; // All the pairs of states we have ever encountered, whether they are intersectable or not
       std::deque<StatePair> worklistPairs; // Pairs of states yet to be processed
@@ -4039,442 +4063,6 @@ namespace wali
 
       return;
     } // end intersect
-#if 0
-    {
-      //TODO: fix this for absentAcceptance  
-      /*  NOTE: This is not optimized and doesn't include epsilon closure or consideration of absentAcceptance.
-      NWA<St,StName,Sym> * newNWA = new NWA<St,StName,Sym>();
-
-      //Generate new states, adding them to the state set as well as
-      //to the initial state set and final state set as needed.
-      St newSt;
-      for( stateIterator fit = beginStates();
-      fit != endStates(); fit++ )
-      {
-      for( stateIterator sit = other.beginStates();
-      sit != other.endStates(); sit++ )
-      {        
-      fit->intersect(*sit,&newSt);
-
-      newNWA->addState(newSt);
-
-      if( this->isInitialState(*fit) && other.isInitialState(*sit) )
-      newNWA->addInitialState(newSt);
-      if( this->isFinalState(*fit) && other.isFinalState(*sit) )
-      newNWA->addFinalState(newSt); 
-
-      //if these nodes can't be intersected
-      //TODO: what should i do 
-
-      }
-      }     
-
-      //Generate call transitions.
-      for( callIterator fcit = this->trans->beginCall();
-      fcit != this->trans->endCall(); fcit++ )
-      {
-      for( callIterator scit = other.trans->beginCall();
-      scit != other.trans->endCall(); scit++ )
-      {
-      Sym sym;
-      if( fcit->second->intersect(scit->second,sym) )
-      {
-      St fromSt, toSt;
-      //TODO: what should I do if these calls failed?
-      fcit->first->intersect(scit->first,&fromSt);
-      fcit->third->intersect(scit->third,&toSt);
-
-      newNWA->addCallTrans( fromSt, sym, toSt );
-      }
-      }
-      }
-      //Generate internal transitions.
-      for( Trans::internalIterator fiit = this->trans->beginInternal();
-      fiit != this->trans->endInternal(); fiit++ )
-      {
-      for( Trans::internalIterator siit = other.trans->beginInternal();
-      siit != other.trans->endInternal(); siit++ )
-      {
-      Sym sym;
-      if( fiit->second->intersect(siit->second,sym) )
-      {
-      St fromSt, toSt;
-      //TODO: what should I do if these calls failed?
-      fiit->first->intersect(siit->first,&fromSt);
-      fiit->third->intersect(siit->third,&toSt);
-
-      newNWA->addInternalTrans( fromSt, sym, toSt );
-      }
-      }
-      }
-      //Generate return transitions.  
-      for( Trans::returnIterator frit = this->trans->beginReturn();
-      frit != this->trans->endReturn(); frit++ )
-      {
-      for( Trans::returnIterator srit = other.trans->beginReturn();
-      srit != other.trans->endReturn(); srit++ )
-      {
-      Sym sym;
-      if( frit->third->intersect(srit->third,sym) )
-      {
-      St fromSt, predSt, toSt;
-      //TODO: what should I do if these calls failed?
-      frit->first->intersect(srit->first,&fromSt);
-      frit->second->intersect(srit->second,&predSt);
-      frit->fourth->intersect(srit->fourth,&toSt);
-
-      newNWA->addReturnTrans( fromSt, predSt, sym, toSt );
-      }
-      }
-      }   
-
-      return newNWA;
-      */
-
-      // TODO: acceptAbsent consideration
-      //NOTE: for now, intersect only works with NWAs that do not accept the stuck state.
-      assert(!absentAcceptance && !other.absentAcceptance);
-
-      //If both NWAs to be intersected accept absent, the intersection should too.
-      //Otherwise, the intersection should not, so keep the default settings.
-      if( absentAcceptance && other.absentAcceptance )
-        result.acceptAbsent();
-
-      std::deque<Triple<St*,St*,St*>> wList; //An element: <joinedState, thisState, otherState>
-      std::set<St*> visited; //States that have been created in the intersection NWA.
-
-      //Start the worklist with all possible initial states of the intersection NWA.
-      //NOTE: Currently this should be just one state (the join of the single initial state of each machine).
-      for( stateIterator fit = beginInitialStates();
-        fit != endInitialStates(); fit++ )
-      {
-        for( stateIterator sit = other.beginInitialStates();
-          sit != other.endInitialStates(); sit++ )
-        {
-          St * newSt;
-          if( result.nodeIntersect(*fit,*sit,newSt) )
-          {
-            result.addInitialState(newSt); 
-            wList.push_back(Triple<St*,St*,St*>(newSt,*fit,*sit));
-            visited.insert(newSt);
-          }  
-        }      
-      }
-
-      //As long as there are still transitions to consider.
-      while(! wList.empty() )
-      {
-        Triple<St*,St*,St*> from = wList.front();
-
-        //Epsilon closure for the nodes that we are currently considering.
-        //Check call transitions in this NWA.
-        Calls thisCalls = trans->getCalls(from.second,Sym::getEpsilon());
-        for( Calls::const_iterator cit = thisCalls.begin(); cit != thisCalls.end(); cit++ )
-        {
-          St* newSt;
-          //Check intersectability of states (if false, don't add).           
-          if( result.nodeIntersect((*cit)->third,from.third,newSt) )
-            if( visited.find(newSt) == visited.end() ) 
-            {
-              wList.push_back(Triple<St*,St*,St*>(newSt,(*cit)->third,from.third));
-              visited.insert(newSt);
-
-              if( isFinalState((*cit)->third) && other.isFinalState(from.third) )
-                result.addFinalState(newSt);
-              else
-                result.addState(newSt);
-            }                   
-        }
-        //Check call transitions in the NWA 'other'.
-        Calls otherCalls = other.trans->getCalls(from.third,Sym::getEpsilon());
-        for( Calls::const_iterator cit = otherCalls.begin(); cit != otherCalls.end(); cit++ )
-        {
-          St* newSt;
-          //Check intersectability of states (if false, don't add).
-          if( result.nodeIntersect(from.second,(*cit)->third,newSt) )
-            if( visited.find(newSt) == visited.end() )
-            {
-              wList.push_back(Triple<St*,St*,St*>(newSt,from.second,(*cit)->third));
-              visited.insert(newSt);
-
-              if( isFinalState(from.second) && other.isFinalState((*cit)->third) )
-                result.addFinalState(newSt);
-              else
-                result.addState(newSt);
-            }
-        }
-
-        //Check internal transitions in this NWA.
-        Internals thisInternals = trans->getInternals(from.second,Sym::getEpsilon());
-        for( Internals::const_iterator iit = thisInternals.begin(); iit != thisInternals.end(); iit++ )
-        {
-          St* newSt;
-          //Check intersectability of states (if false, don't add).
-          if( result.nodeIntersect((*iit)->third,from.third,newSt) )
-            if( visited.find(newSt) == visited.end() )
-            {
-              wList.push_back(Triple<St*,St*,St*>(newSt,(*iit)->third,from.third));
-              visited.insert(newSt);
-
-              if( isFinalState((*iit)->third) && other.isFinalState(from.third) )
-                result.addFinalState(newSt);
-              else
-                result.addState(newSt);
-            }
-        }     
-
-        //Check internal transitions in the NWA 'other'.
-        Internals otherInternals = other.trans->getInternals(from.third,Sym::getEpsilon());
-        for( Internals::const_iterator iit = otherInternals.begin(); iit != otherInternals.end(); iit++ )
-        {
-          St* newSt;
-          //Check intersectability of states (if false, don't add).
-          if( result.nodeIntersect(from.second,(*iit)->third,newSt) )
-            if( visited.find(newSt) == visited.end() )
-            {
-              wList.push_back(Triple<St*,St*,St*>(newSt,from.second,(*iit)->third));
-              visited.insert(newSt);
-
-              if( isFinalState(from.second) && other.isFinalState((*iit)->third) )
-                result.addFinalState(newSt);
-              else
-                result.addState(newSt);
-            }
-        }      
-
-        //Check return transitions in this NWA.
-        Returns thisReturns = trans->getReturns(from.second,Sym::getEpsilon());
-        for( Returns::const_iterator rit = thisReturns.begin(); rit != thisReturns.end(); rit++ )
-        {
-          St* newSt;
-          //Check intersectability of states (if false, don't add).
-          if( result.nodeIntersect((*rit)->fourth,from.third,newSt) )
-            if( visited.find(newSt) == visited.end() )
-            {
-              wList.push_back(Triple<St*,St*,St*>(newSt,(*rit)->fourth,from.third));
-              visited.insert(newSt);
-
-              if( isFinalState((*rit)->fourth) && other.isFinalState(from.third) )
-                result.addFinalState(newSt);
-              else
-                result.addState(newSt);
-            } 
-        }
-
-        //Check return transitions in the NWA 'other'.
-        Returns otherReturns = other.trans->getReturns(from.third,Sym::getEpsilon());
-        for( Returns::const_iterator rit = otherReturns.begin(); rit != otherReturns.end(); rit++ )
-        {
-          St* newSt;
-          //Check intersectability of states (if false, don't add).
-          if( result.nodeIntersect(from.second,(*rit)->fourth,newSt) )
-            if( visited.find(newSt) == visited.end() )
-            {
-              wList.push_back(Triple<St*,St*,St*>(newSt,from.second,(*rit)->fourth));
-              visited.insert(newSt);
-
-              if( isFinalState(from.second) && other.isFinalState((*rit)->fourth) )
-                result.addFinalState(newSt);
-              else
-                result.addState(newSt);
-            }
-        }
-
-        //TODO: ???? this is going to hell in a handbasket (i.e. quadratic performance is emminent)
-        //For each possible outgoing symbol/edge type.
-        for( symbolIterator fsit = symbols.begin(); fsit != symbols.end(); fsit++ )
-        {
-          assert(*fsit);
-          if( ! (*fsit == Sym::getEpsilon()) )  //Symbols other than epsilon.
-            for( symbolIterator ssit = other.symbols.begin(); ssit != other.symbols.end(); ssit++ )
-            {           
-              if (! (*ssit == Sym::getEpsilon()) )  //Symbols other than epsilon.
-              {   
-                Sym sym;
-                //Check intersectability of edge labels.
-                if( result.edgeIntersect(*fsit,*ssit,sym) )  //Only continue if the symbols can be intersected.
-                {
-                  //Check call transitions with the desired 'from' state.
-                  Calls thisCalls = trans->getCalls(from.second,*fsit);
-                  Calls otherCalls = other.trans->getCalls(from.third,*ssit);  
-
-                  if( !thisCalls.empty() && !otherCalls.empty() )
-                  {
-                    //there are edges to join.
-                    for( Calls::const_iterator fcit = thisCalls.begin();
-                      fcit != thisCalls.end(); fcit++ )
-                    {
-                      for( Calls::const_iterator scit = otherCalls.begin();
-                        scit != otherCalls.end(); scit++ )
-                      {
-                        St* toSt;                              
-                        //Check intersectability of to states (if false, don't look further).           
-                        if( result.nodeIntersect((*fcit)->third,(*scit)->third,toSt) )
-                        {
-                          if( visited.find(toSt) == visited.end() )
-                          {
-                            wList.push_back(Triple<St*,St*,St*>(toSt,(*fcit)->third,(*scit)->third));
-                            visited.insert(toSt);
-                          }
-
-                          if( isFinalState((*fcit)->third) && other.isFinalState((*scit)->third) )
-                            result.addFinalState(toSt);
-                          else
-                            result.addState(toSt);
-
-                          //Add the transition to the intersection NWA.  
-                          result.addCallTrans( from.first, sym, toSt );
-                        }
-                      }              
-                    }            
-                  }
-                  /* NOTE: assuming absentAccept is false for both machines
-                  else if( thisCalls.empty() && !otherCalls.empty() )
-                  {
-                  //only this has no edges  
-                  //if this is acceptAbsent, then follow the path of otherCalls
-                  //with just the other state value for the joined state?
-                  if( isAbsentAccept() )
-                  {
-                  for( Calls::const_iterator cit = otherCalls.begin();
-                  cit != otherCalls.end(); cit++ )
-                  {
-                  if( isFinalState(cit->third) )
-                  worklistNWA->addFinalState(cit->third);
-                  else
-                  worklistNWA->addState(cit->third);
-                  worklistNWA->addCallTrans( from.first, sym, cit->third );
-                  }
-                  }
-                  }
-                  else if( !thisCalls.empty() && otherCalls.empty() )
-                  {
-                  //only other has no edges
-                  //if other is acceptAbsent, then follow the path of thisCalls
-                  //with just the this state value for the joined state?
-                  if( other.isAbsentAccept() )
-                  {
-                  }
-                  }
-                  //otherwise, both have no matching edges so there is no path to follow
-                  */
-
-                  //Check internal transitions with the desired 'from' state and symbol.
-                  Internals thisInternals = trans->getInternals(from.second,*fsit);
-                  Internals otherInternals = other.trans->getInternals(from.third,*ssit);  
-
-                  if( !thisInternals.empty() && !otherInternals.empty() )
-                  {
-                    //there are edges to join.
-                    for( Internals::const_iterator fiit = thisInternals.begin();
-                      fiit != thisInternals.end(); fiit++ )
-                    {
-                      for( Internals::const_iterator siit = otherInternals.begin();
-                        siit != otherInternals.end(); siit++ )
-                      {
-                        St* toSt;                              
-                        //Check intersectability of to states (if false, don't look further).           
-                        if( result.nodeIntersect((*fiit)->third,(*siit)->third,toSt) )
-                        {
-                          if( visited.find(toSt) == visited.end() )
-                          {
-                            wList.push_back(Triple<St*,St*,St*>(toSt,(*fiit)->third,(*siit)->third));
-                            visited.insert(toSt);
-                          }
-
-                          if( isFinalState((*fiit)->third) && other.isFinalState((*siit)->third) )
-                            result.addFinalState(toSt);
-                          else
-                            result.addState(toSt);
-
-                          //Add the transition to the intersection NWA.
-                          result.addInternalTrans( from.first, sym, toSt );
-                        }
-                      }         
-                    }            
-                  }
-
-                  /* NOTE: assuming absentAccept is false for both machines
-                  else if( thisInternals.empty() && !otherInternals.empty() )
-                  {
-                  //only this has no edges  
-                  //if this is acceptAbsent, then follow the path of otherInternals
-                  //with a dummy value for the this state?
-                  //with just the other state value for the joined state?
-                  }
-                  else if( !thisInternals.empty() && otherInternals.empty() )
-                  {
-                  //only other has no edges
-                  //if other is acceptAbsent, then follow the path of thisInternals
-                  //with a dummy value for the other state?
-                  //with just the this state value for the joined state?
-                  }
-                  //otherwise, both have no matching edges so there is no path to follow
-                  */
-
-                  //Check return transitions with the desired 'from' state and symbol.
-                  Returns thisReturns = trans->getReturns(from.second,*fsit);
-                  Returns otherReturns = other.trans->getReturns(from.third,*ssit);  
-
-                  if( !thisReturns.empty() && !otherReturns.empty() )
-                  {
-                    //there are edges to join.
-                    for( Returns::const_iterator frit = thisReturns.begin();
-                      frit != thisReturns.end(); frit++ )
-                    {
-                      for( Returns::const_iterator srit = otherReturns.begin();
-                        srit != otherReturns.end(); srit++ )
-                      {
-                        St * predSt,* toSt;
-                        //Check intersectability of pred states (if false, don't look further).
-                        if( result.nodeIntersect((*frit)->second,(*srit)->second,predSt) )
-                        {
-                          //Check intersectability of to states (if false, don't look further).    
-                          if( result.nodeIntersect((*frit)->fourth,(*srit)->fourth,toSt) )
-                          {
-                            if( visited.find(toSt) == visited.end() )
-                            {
-                              wList.push_back(Triple<St*,St*,St*>(toSt,(*frit)->fourth,(*srit)->fourth));
-                              visited.insert(toSt);
-                            }
-
-                            if( isFinalState((*frit)->fourth) && other.isFinalState((*srit)->fourth) )
-                              result.addFinalState(toSt);
-                            else
-                              result.addState(toSt);
-
-                            //Add the transition to the intersection NWA.  
-                            result.addReturnTrans( from.first, predSt, sym, toSt );
-                          }
-                        }
-                      }            
-                    }            
-                  }
-
-                  /* NOTE: assuming absentAccept is false for both machines
-                  else if( thisReturns.empty() && !otherReturns.empty() )
-                  {
-                  //only this has no edges  
-                  //if this is acceptAbsent, then follow the path of
-                  //otherCalls with a dummy value for the this state?
-                  }
-                  else if( !thisReturns.empty() && otherReturns.empty() )
-                  {
-                  //only other has no edges
-                  //if other is acceptAbsent, then follow the path
-                  //of thisCalls with a dummy value for the other state?
-                  }
-                  //otherwise, both have no matching edges so there is no path to follow
-                  */
-                }
-              }
-            }
-        }
-
-        wList.pop_front();
-      }
-    }
-#endif
 
     /**
      * 
@@ -4646,7 +4234,6 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     wpds::WPDS NWA<St,StName,Sym>::plusWPDS( wpds::WPDS base )
     { //FIX
-      //TODO: how does this react to absentAcceptance & State/Symbol types & wild symbol
       wpds::WpdsRules rules = wpds::WpdsRules();
 
       base.for_each(rules);
@@ -4736,7 +4323,6 @@ namespace wali
     template<typename St, typename Sym > 
     nwa::NWA<St,StName,Sym> NWA<St,StName,Sym>::PDStoNWA(wpds::WPDS pds)
     { //FIX
-      //TODO: how does this react to absentAcceptance & State/Symbol types & wild symbol
       nwa::NWA<St,StName,Sym> result = nwa::NWA<St,StName,Sym>();
 
       std::map<St,St> call_return;
@@ -4822,9 +4408,7 @@ namespace wali
      */
     template <typename St,typename StName,typename Sym>
     wpds::WPDS NWA<St,StName,Sym>::NWAtoPDS( WeightGen<St,Sym> & wg ) const
-    { //FIX
-      //TODO: how does this react to absentAcceptance???
-      //NOTE: for now assume stuck state is rejecting
+    { 
       wpds::WPDS result = wpds::WPDS();
 
       //note: if you change this, make sure you modify the code in createCA as well
@@ -4882,8 +4466,7 @@ namespace wali
         // (q_x,q_c,sigma,q_r) in delta_r goes to 
         // <p,q_x> -w1-> <p_q_x,epsilon> in delta_0
         // and <p_q_x,q_c> -w2-> <p,q_r> in delta_1
-        // where p_q_x = (p,q_x),
-        // w1 depends on q_x, and w2 depends on sigma
+        // where p_q_x = (p,q_x), w1 depends on q_x, and w2 depends on sigma
 
         wgt = wg.getExitWeight( getState(rit->first)->getStateKey() );  //w1
 
@@ -4901,7 +4484,7 @@ namespace wali
           wgt = wg.getWeight(*getState(rit->first), 
                               rit->third,
                               WeightGen<St,Sym>::EXIT_TO_RET,  
-                              *getState(rit->fourth));                          //w2
+                              *getState(rit->fourth));          //w2
          
           result.add_rule(rstate,                               //from_state (p_q_x == (p,q_x))
                           getState(rit->second)->getStateKey(), //from_stack (q_c)
@@ -4924,14 +4507,9 @@ namespace wali
     template <typename St,typename StName,typename Sym>
     wpds::WPDS NWA<St,StName,Sym>::NWAtoBackwardsPDS( WeightGen<St,Sym> & wg ) const
     {
-      //FIX
-      //TODO: how does this react to absentAcceptance???
-      //NOTE: for now assume stuck state is rejecting
       wpds::WPDS result = wpds::WPDS();
-      std::map< Key,Key > returns;
 
-      //Key program = wali::getKey("program"); 
-      Key program = getProgramControlLocation();
+      Key program = getProgramControlLocation();  //= wali::getKey("program"); 
 
       wali::sem_elem_t wgt;
 
@@ -5078,7 +4656,6 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     bool NWA<St,StName,Sym>::hasPath( St currState, std::stack< St > calls, std::set< St > visited )
     { //FIX
-      //TODO: absentAcceptance and wild symbol
       //Try each possible transition out of this state to see if a final state
       //can be reached.
 
@@ -5149,7 +4726,6 @@ namespace wali
     template<typename St,typename StName,typename Sym >
     bool NWA<St,StName,Sym>::isMember( nws::NWS word )
     { //FIX
-      //TODO: how does this react to absentAcceptance
       std::deque<WordRecConfig<St>> configs;
 
       //Add a dummy call state for each call on the word stack
@@ -5182,7 +4758,7 @@ namespace wali
      *
      * @param - currState: the state in the nested word automaton at which to start the 
      *                      simulation
-     * @param - configs: the nested word suffix to match  //TODO: is this right?
+     * @param - configs: the nested word suffix to match  //Q: is this right?
      * @return true if the simulation ends in an accepting state
      *
      */
@@ -5190,7 +4766,6 @@ namespace wali
     template<typename St,typename StName,typename Sym > 
     bool NWA<St,StName,Sym>::matchWord( St currState, std::deque<WordRecConfig<St>> configs )
     { //FIX
-      //TODO: absentAcceptance and wild symbol
       WordRecConfig<St> config = configs.front();
       configs.pop_front();  //remove this config
 
@@ -5300,8 +4875,8 @@ namespace wali
     {
       states.print(o);
 
-      if( absentAcceptance )
-        o << "Stuck state accepted." << "\n";   //TODO: move this to stateset
+      //if( absentAcceptance )
+      //  o << "Stuck state accepted." << "\n";   //TODO: move this to stateset
 
       o << "Sigma: " << "{ ";
       bool first = true;
@@ -5498,22 +5073,30 @@ namespace wali
     bool NWA<St,StName,Sym>::operator==( const NWA<St,StName,Sym> & other ) const
     {
       return ( (states == other.states) &&
-        (absentAcceptance == other.absentAcceptance) &&
+        //(absentAcceptance == other.absentAcceptance) &&
         (symbols == other.symbols) &&   //TODO: deeper check here?
         (trans == other.trans) );
     }
 #else //ifdef KEY
-    template<typename Client = ClientInfo,typename Sym = Symbol<> >
-    class NWA : public Printable
+    template<typename Client = ClientInfo>
+    class NWA : public Printable, public Countable
     {
       public:
-        typedef State<Client> St;
-        typedef typename St::ClientInfoRefPtr ClientInfoRefPtr;
+        typedef ref_ptr<NWA> NWARefPtr;
 
-        typedef Triple<St,Sym,St> Call;       //TODO: change the St to Key?
-        typedef Triple<St,Sym,St> Internal;   //TODO: change the St to Key?
-        typedef Quad<St,St,Sym,St> Return;    //TODO: change the St to Key?
-        typedef TransSet<St,Sym,Call,Internal,Return> Trans;
+        typedef Key St;
+        typedef Key Sym;
+        typedef StateSet<Client> States;
+        typedef typename States::const_iterator stateIterator;
+        typedef typename States::ClientInfoRefPtr ClientInfoRefPtr;
+        typedef SymbolSet Symbols;
+        typedef typename Symbols::iterator symbolIterator;
+
+        typedef TransSet<St,Sym> Trans;
+        
+        typedef typename Trans::Call Call;       
+        typedef typename Trans::Internal Internal;   
+        typedef typename Trans::Return Return;          
       
         typedef typename Trans::Calls Calls;
         typedef typename Trans::Internals Internals;
@@ -5521,17 +5104,13 @@ namespace wali
       
         typedef typename Trans::callIterator callIterator;
         typedef typename Trans::internalIterator internalIterator;
-        typedef typename Trans::returnIterator returnIterator;
-      
-        typedef StateSet<Client> States;
-        typedef std::set<Sym> Symbols;
-      
-        typedef typename States::const_iterator stateIterator;
-        typedef typename Symbols::const_iterator symbolIterator;
+        typedef typename Trans::returnIterator returnIterator;        
 
-        typedef std::pair< St,St > StatePair;
-        //typedef std::set< StatePair > StatePairSet; TODO this belongs to a broken bit
-        //typedef std::map< StatePairSet,St* > StateMap; TODO this belongs to a broken bit
+        
+        typedef std::set<St> StateSet;
+        typedef std::pair<St,St> StatePair;
+        typedef std::set<StatePair> StatePairSet;
+        typedef std::map<StatePairSet,St> StateMap; 
 
       //
       // Methods
@@ -5544,6 +5123,7 @@ namespace wali
       NWA( const NWA & other );
       NWA & operator=( const NWA & other );
 
+      void clear( );
       ~NWA( );
 
       //State Accessors
@@ -5555,11 +5135,11 @@ namespace wali
        * This method provides access to the client information associated with the given 
        * state.
        *
-       * @param - name: the name of the state whose client information to retrieve
+       * @param - state: the state whose client information to retrieve
        * @return the client information associated with the given state
        *
        */
-      ClientInfoRefPtr getClientInfo( wali::Key name ) const;
+      ClientInfoRefPtr getClientInfo( St state );
 
       /**
        * 
@@ -5568,91 +5148,27 @@ namespace wali
        * This method sets the client information associated with the given state to the 
        * client information provided.
        *
-       * @param - name: the name of the state whose client information to set
+       * @param - state: the  state whose client information to set
        * @param - c: the desired client information for the given state
        *
        */
-      void setClientInfo( wali::Key name, const ClientInfoRefPtr c );
-
-      /**
-       *  
-       * @brief tests whether the stuck state is a final state
-       *
-       * This method tests whether the stuck state is a final state in this NWA.  It 
-       * returns true if the stuck state is final and false otherwise.
-       *
-       * @return true if the stuck state is a final state, false otherwise
-       *
-       */
-      bool isAbsentAccept( ) const;
-
+      void setClientInfo( St state, const ClientInfoRefPtr c );  
+     
       /**
        * 
-       * @brief sets the stuck state to be a final state
+       * @brief obtains all the states that are predecessors of the given state
        *
-       * This method sets the stuck state to be a final state.
-       *
-       */
-      void acceptAbsent( );
-
-      /**
-       * 
-       * @brief sets the stuck state to be not a final state
-       *
-       * This method makes the stuck state not a final state.
-       *
-       */
-      void rejectAbsent( );        
-
-      /**
-       *  TODO: use refptr<St>
-       * @brief provides access to the state with the given name
-       *
-       * This method provides access to the state with the given name via a pointer.
-       *
-       * @param - name: the name of the desired state
-       * @return a pointer to the desired state
-       *
-       */
-      St* getState( const Key & name ) const;
-
-      /**
-       *  TODO: use refptr<St> 
-       * @brief provides access to all states in the NWA
-       *
-       * This method provides access to all states in pointer form.
-       *
-       * @return a set of all states in pointer form
-       *
-       */
-      std::set<St*> getStates( ) const;
-
-      /**
-       * 
-       * @brief provides access to the names of all states in the NWA
-       *
-       * This method provides access to the names of all states in the NWA.
-       *
-       * @return a set of the names of all states in the NWA
-       *
-       */
-      std::set<Key> getStateNames( ) const;
-      
-      /**
-       * 
-       * @brief obtains the names of all states that are predecessors of the given state
-       *
-       * This method returns the names of all states that are predecessors of the given 
+       * This method returns all the states that are predecessors of the given 
        * state.
        *
-       * @param - name: the name of the state whose predecessors to look up
-       * @return the names of all states that are predecessors of the given state
+       * @param - state: the state of the state whose predecessors to look up
+       * @return the set of all states that are predecessors of the given state
        *
        */    
-      std::set<Key> getPredecessorNames( const Key & name ) const;
+      const std::set<St> & getPredecessorNames( St state ) const;
       
       /**
-       *  TODO: use refptr<St> 
+       *   
        * @brief duplicates the original state, but only duplicates outgoing transitions
        *
        * This method assigns to the duplicate state all the state properties of the 
@@ -5664,13 +5180,12 @@ namespace wali
        *
        * @param - orig: the name of the original state, i.e. the state to duplicate
        * @param - dup: the name of the duplicate state
-       * @return a pointer to the newly created duplicate state
        *
        */
-      St* duplicateStateOutgoing( const Key & orig, const Key & dup );
+      void duplicateStateOutgoing( St orig, St dup );
 
       /**
-       *  TODO: use refptr<St> 
+       * 
        * @brief duplicates the original state
        *
        * This method assigns to the duplicate state all the state properties of the 
@@ -5682,15 +5197,37 @@ namespace wali
        *
        * @param - orig: the name of the original state, i.e. the state to duplicate
        * @param - dup: the name of the duplicate state
-       * @return a pointer to the newly created duplicate state
        *
        */
-      St* duplicateState( const Key & orig, const Key & dup );
+      void duplicateState( St orig, St dup );
 
       //All States
 
       /**
-       *  TODO: use refptr<St> 
+       *   
+       * @brief provides access to all states in the NWA
+       *
+       * This method provides access to all states in pointer form.
+       *
+       * @return a set of all states in pointer form
+       *
+       */
+      const std::set<St> & getStates( ) const;
+      /**
+       *   
+       * @brief provides access to all states in the NWA
+       *
+       * This method provides access to all states in pointer form.
+       * Note: This method simply calls getStates( ).  It is here to make the transition
+       *        from using PDS to using NWA easier.
+       *
+       * @return a set of all states in pointer form
+       *
+       */
+      const std::set<St> & get_states( ) const;
+
+      /**
+       * 
        * @brief test if a given state is a state of this NWA
        *
        * This method tests whether the given state is in the state set of this NWA.
@@ -5699,10 +5236,23 @@ namespace wali
        * @return true if the given state is a state of this NWA
        *
        */
-      bool isState( const St * state ) const; 
+      bool isState( St state ) const; 
+      /**
+       * 
+       * @brief test if a given state is a state of this NWA
+       *
+       * This method tests whether the given state is in the state set of this NWA.
+       * Note: This method simply calls isState( state ).  It is here to make the transition
+       *        from using PDS to using NWA easier.
+       *
+       * @param - state: the state to check
+       * @return true if the given state is a state of this NWA
+       *
+       */
+      bool is_nwa_state( St state ) const;
 
      /**
-       *  TODO: use refptr<St>
+       *  
        * @brief add the given state to this NWA
        *
        * This method adds the given state to the state set for this NWA.  If the state 
@@ -5712,7 +5262,7 @@ namespace wali
        * @return false if the state already exists in the NWA, true otherwise
        *
        */
-      bool addState( St * state );
+      bool addState( St state );
 
       /**
        *
@@ -5724,9 +5274,21 @@ namespace wali
        *
        */
       size_t sizeStates( ) const;
+      /**
+       *
+       * @brief returns the number of states associated with this NWA
+       *
+       * This method returns the number of states associated with this NWA.
+       * Note: This method simply calls sizeStates( ).  It is here to make the transition
+       *        from using PDS to using NWA easier.
+       *
+       * @return the number of states associated with this NWA
+       *
+       */
+      int num_nwa_states( ) const;
 
       /**
-       *  TODO: use refptr<St> 
+       *  
        * @brief remove the given state from this NWA
        *
        * This method checks for the given state in the set of initial states, the set of 
@@ -5738,7 +5300,7 @@ namespace wali
        * @return false if the state does not exist in the NWA, true otherwise
        *
        */
-      bool removeState( St * state );
+      bool removeState( St state );
 
       /**
        *
@@ -5752,21 +5314,31 @@ namespace wali
       //Initial States
 
       /**
-       *  TODO return the set of names
-       * @brief get the names of all states in the initial state set
+       *  
+       * @brief obtain the states in the initial state set
        *
-       * This method provides access to the names of all states in the initial state set 
+       * This method provides access to the states in the initial state set 
        * of this NWA.  Note: An NWA can have an unbounded number of inital states 
        * associated with it.
        *
-       * @return set of names for all inital states associated with the NWA
+       * @return set of inital states associated with the NWA
        *
        */
-      //std::set<Key> getInitialStates( ) const; 
-      Key getInitialState( ) const;
+      const std::set<St> & getInitialStates( ) const; 
+      /**
+       *  TODO: do we still need the single initial state restriction?
+       * @brief obtain the initial state
+       *
+       * This method provides access to the initial state of this NWA.  
+       * Note: This hinges on the assertion that there is a unique initial state.
+       *
+       * @return the inital state associated with the NWA
+       *
+       */
+      St getInitialState( ) const;
 
       /**
-       *  TODO: use refptr<St>
+       * 
        * @brief test if the given state is an initial state of this NWA
        *
        * This method tests whether the given state is in the initial state set of the NWA.
@@ -5775,10 +5347,10 @@ namespace wali
        * @return true if the given state is an initial state, false otherwise
        *
        */
-      bool isInitialState( const St * state ) const;
+      bool isInitialState( St state ) const;
 
       /**
-       *  TODO: use refptr<St>
+       * 
        * @brief make the given state an initial state in this NWA
        *
        * This method checks for the given state in the state set of this NWA.  If the 
@@ -5791,7 +5363,7 @@ namespace wali
        * @return false if the state already exists in the initial state set of the NWA
        *
        */
-      bool addInitialState( St * state );
+      bool addInitialState( St state );
 
       /**
        *
@@ -5805,7 +5377,7 @@ namespace wali
       size_t sizeInitialStates( ) const;
 
       /**
-       *  TODO: use refptr<St>
+       * 
        * @brief remove the given state from the initial state set of this NWA
        *
        * This method checks for the given state in the initial state set of this NWA.  If
@@ -5817,7 +5389,7 @@ namespace wali
        * @return false if the state does not exist in the initial state set of this NWA
        *
        */
-      bool removeInitialState( St * state );
+      bool removeInitialState( St state );
 
       /**
        *
@@ -5834,16 +5406,15 @@ namespace wali
 
       /**
        *
-       * @brief get the names of all final states in this NWA
+       * @brief obtain the final states in this NWA
        *
-       * This method provides access to the names of all states in the final state set of
-       * this NWA.  
+       * This method provides access to the states in the final state set of this NWA.  
        * Note: An NWA can have an unbounded number of final states associated with it.
        *
-       * @return set of the names of all final states associated with this NWA
+       * @return set of all final states associated with this NWA
        *
        */
-      std::set<Key> getFinalStates( ) const;
+      const std::set<St> & getFinalStates( ) const;
 
       /**
        *
@@ -5855,7 +5426,7 @@ namespace wali
        * @return true if the given state is a final state
        *
        */
-      bool isFinalState( const St * state ) const;
+      bool isFinalState( St state ) const;
 
       /**
        *
@@ -5870,7 +5441,7 @@ namespace wali
        * @return false if the state already exists in the final state set of the NWA
        *
        */
-      bool addFinalState( St * state );
+      bool addFinalState( St state );
 
       /**
        * 
@@ -5896,7 +5467,7 @@ namespace wali
        * @return false if the state does not exist in the final state set of the NWA
        *
        */
-      bool removeFinalState( St * state );
+      bool removeFinalState( St state );
 
       /**
        *
@@ -5913,6 +5484,18 @@ namespace wali
 
       /**
        *
+       * @brief obtain all symbols in this NWA
+       *
+       * This method provides access to the symbols of this NWA.  
+       * Note: An NWA can have an unbounded number of symbols associated with it.
+       *
+       * @return set of all symbols associated with this NWA
+       *
+       */
+      const std::set<Sym> & getSymbols( ) const;
+
+      /**
+       *
        * @brief test if the given symbol is associated with the NWA
        *
        * This method tests whether the given symbol is in the symbol set associated with 
@@ -5922,7 +5505,7 @@ namespace wali
        * @return true if the given symbol is associated with the NWA
        *
        */
-      bool isSymbol( const Sym & sym ) const;
+      bool isSymbol( Sym sym ) const;
 
       /**
        *
@@ -5936,7 +5519,7 @@ namespace wali
        * @return false if the symbol is already associated with the NWA
        *
        */
-      bool addSymbol( const Sym & sym );
+      bool addSymbol( Sym sym );
 
       /**
        *
@@ -5962,7 +5545,7 @@ namespace wali
        * @return false if the symbols is not associated with the NWA
        *
        */
-      bool removeSymbol( const Sym & sym );
+      bool removeSymbol( Sym sym );
 
       /**
        *
@@ -5991,7 +5574,7 @@ namespace wali
        * @return true if some such transition is found, false otherwise
        *
        */
-      bool getSymbol( Key from, Key to, Sym & sym );
+      bool getSymbol( St from, St to, Sym & sym );
 
       /**
        * 
@@ -6007,7 +5590,30 @@ namespace wali
        * @return true if such a transition exists, false otherwise
        * 
        */
-      bool findTrans( Key from, const Sym & sym, Key to) const;
+      bool findTrans( St from, Sym sym, St to) const;
+
+      /**
+       *
+       * @brief returns the number of transitions associated with this NWA
+       *
+       * This method returns the number of transitions associated with this NWA.  
+       *
+       * @return the number of transitions associated with this NWA
+       *
+       */
+      size_t sizeTrans( ) const;
+      /**
+       *
+       * @brief returns the number of transitions associated with this NWA
+       *
+       * This method returns the number of transitions associated with this NWA.  
+       * Note: This method simply calls sizeTrans( ).  It is here to make the transition
+       *        from using PDS to using NWA easier.
+       *
+       * @return the number of transitions associated with this NWA
+       *
+       */
+      int count_rules( ) const;
 
       /**
        *
@@ -6019,18 +5625,7 @@ namespace wali
        */
       void clearTrans( );
 
-      /**
-       *  TODO: remove this?
-       * @brief get all call transitions in the transition set of the NWA.
-       *
-       * This method provides access to the set of call transitions associated with this 
-       * NWA.  
-       * Note: An NWA can have an unbounded number of transitions associated with it.
-       *
-       * @return set of call transitions associated with the NWA
-       *
-       */
-      //const Calls & getCallTrans( );
+      //Call Transitions
 
       /**
        * 
@@ -6039,11 +5634,11 @@ namespace wali
        * This method provides access to the symbol/entry point pairs associated with the 
        * given call site.
        *
-       * @param - callSite: the name of the call site whose symbol/entry point pairs to obtain
+       * @param - callSite: the call site whose symbol/entry point pairs to obtain
        * @return the set of symbol/entry point pairs associated with the given call site
        *
        */
-      const std::set<std::pair<Sym,Key>> getEntries( Key callSite ) const;
+      const std::set<std::pair<Sym,St>> getEntries( St callSite ) const;
 
       /**
        *
@@ -6053,29 +5648,13 @@ namespace wali
        * and adds it to the transition set for the NWA.  If the call transition already 
        * exists in the NWA, false is returned. Otherwise, true is returned.
        *
-       * @param from: the name of the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: the name of the state the edge arrives to  
+       * @param - from: the state the edge departs from
+       * @param - sym: the symbol labeling the edge
+       * @param - to: the state the edge arrives to  
        * @return false if the call transition already exists in the NWA
        *
        */
-      bool addCallTrans( Key from, const Sym & sym, Key to );
-
-      /**
-       *
-       * @brief add a call transition to the NWA
-       *
-       * This method creates a call transition with the given edge and label information 
-       * and adds it to the transition set for the NWA.  If the call transition already 
-       * exists in the NWA, false is returned. Otherwise, true is returned.
-       *
-       * @param from: the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: the state the edge arrives to  
-       * @return false if the call transition already exists in the NWA
-       *
-       */
-      bool addCallTrans( St * from, const Sym & sym, St * to );
+      bool addCallTrans( St from, Sym sym, St to );
 
       /**
        *
@@ -6085,7 +5664,7 @@ namespace wali
        * If the call transition already exists in the NWA, false is returned. Otherwise, 
        * true is returned.
        *
-       * @param the call transition to add
+       * @param - ct: the call transition to add
        * @return false if the call transition already exists in the NWA
        *
        */
@@ -6099,29 +5678,13 @@ namespace wali
        * information in the transition set. If the transition is found, it is removed
        * from the transition set and true is returned.  Otherwise, false is returned.
        *
-       * @param from: name of the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: name of the state the edge arrives to  
+       * @param - from: the state the edge departs from
+       * @param - sym: the symbol labeling the edge
+       * @param - to: the state the edge arrives to  
        * @return false if the call transition does not exist in the NWA
        *
        */
-      bool removeCallTrans( Key from, const Sym & sym, Key to );
-
-      /**
-       *
-       * @brief remove a call transition from the NWA
-       *
-       * This method checks for the call transition with the given edge and label 
-       * information in the transition set. If the transition is found, it is removed 
-       * from the transition set and true is returned.  Otherwise, false is returned.
-       *
-       * @param from: the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: the state the edge arrives to  
-       * @return false if the call transition does not exist in the NWA
-       *
-       */
-      bool removeCallTrans( St * from, const Sym & sym, St * to );
+      bool removeCallTrans( St from, Sym sym, St to );
 
       /**
        *
@@ -6131,24 +5694,24 @@ namespace wali
        * transition is found, it is removed from the transition set and true is 
        * returned.  Otherwise, false is returned.
        *
-       * @param the call transition to remove
+       * @param - ct: the call transition to remove
        * @return false if the call transition does not exist in the NWA
        *
        */
       bool removeCallTrans( const Call & ct );
 
       /**
-       *  TODO: remove this?
-       * @brief get all internal transitions in the transition set of the NWA.
        *
-       * This method provides access to the set of internal transitions associated with 
-       * this NWA.  
-       * Note: An NWA can have an unbounded number of transitions associated with it.
+       * @brief returns the number of call transitions associated with this NWA
        *
-       * @return set of internal transitions associated with the NWA
+       * This method returns the number of call transitions associated with this NWA.  
+       *
+       * @return the number of call transitions associated with this NWA
        *
        */
-      //const Internals & getInternalTrans( );
+      size_t sizeCallTrans( ) const;
+
+      //Internal Transitions
 
       /**
        * 
@@ -6157,11 +5720,11 @@ namespace wali
        * This method provides access to the symbol/target pairs associated with the given
        * source.
        *
-       * @param - source: the name of the source whose symbol/target pairs to obtain
+       * @param - source: the source whose symbol/target pairs to obtain
        * @return the set of symbol/target pairs associated with the given source
        *
        */
-      const std::set<std::pair<Sym,Key>> getTargets( Key source ) const;
+      const std::set<std::pair<Sym,St>> getTargets( St source ) const;
 
       /**
        *
@@ -6172,30 +5735,13 @@ namespace wali
        * transition already exists in the NWA, false is returned. Otherwise, true is 
        * returned.
        *
-       * @param from: the name of the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: the name of the state the edge arrives to  
+       * @param - from: the state the edge departs from
+       * @param - sym: the symbol labeling the edge
+       * @param - to: the state the edge arrives to  
        * @return false if the internal transition already exists in the NWA
        *
        */
-      bool addInternalTrans( Key from, const Sym & sym, Key to );
-
-      /**
-       *
-       * @brief add an internal transition to the NWA
-       *
-       * This method creates an internal transition with the given edge and label 
-       * information and adds it to the transition set for the NWA.  If the internal 
-       * transition already exists in the NWA, false is returned. Otherwise, true is 
-       * returned.
-       *
-       * @param from: the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: the state the edge arrives to  
-       * @return false if the internal transition already exists in the NWA
-       *
-       */
-      bool addInternalTrans( St * from, const Sym & sym, St * to );
+      bool addInternalTrans( St from, Sym sym, St to );
 
       /**
        *
@@ -6205,7 +5751,7 @@ namespace wali
        * If the internal transition already exists in the NWA, false is returned. Otherwise, 
        * true is returned.
        *
-       * @param internal transition to add to the NWA
+       * @param - it: internal transition to add to the NWA
        * @return false if the internal transition already exists in the NWA
        *
        */
@@ -6219,29 +5765,13 @@ namespace wali
        * information in the transition set.  If the transition is found, it is removed 
        * from the transition set and true is returned.  Otherwise, false is returned.
        *
-       * @param from: the name of the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: the name of the state the edge arrives to  
+       * @param - from: the state the edge departs from
+       * @param - sym: the symbol labeling the edge
+       * @param - to: the state the edge arrives to  
        * @return false if the internal transition does not exist in the NWA
        *
        */
-      bool removeInternalTrans( Key from, const Sym & sym, Key to );
-
-      /**
-       *
-       * @brief remove an internal transition from the NWA
-       *
-       * This method checks for the internal transition with the given edge and label 
-       * information in the transition set.  If the transition is found, it is removed 
-       * from the transition set and true is returned.  Otherwise, false is returned.
-       *
-       * @param from: the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: the state the edge arrives to  
-       * @return false if the internal transition does not exist in the NWA
-       *
-       */
-      bool removeInternalTrans( St * from, const Sym & sym, St * to );
+      bool removeInternalTrans( St from, Sym sym, St to );
 
       /**
        *
@@ -6251,24 +5781,24 @@ namespace wali
        * transition is found, it is removed from the transition set and true is returned.
        * Otherwise, false is returned.
        *
-       * @param the internal transition to remove
+       * @param - it: the internal transition to remove
        * @return false if the internal transition does not exist in the NWA
        *
        */
       bool removeInternalTrans( const Internal & it );
 
       /**
-       *  TODO: remove this?
-       * @brief get all return transitions in the transition set of the NWA.
        *
-       * This method provides access to the set of return transitions
-       * associated with this NWA.  Note: An NWA can have an unbounded number
-       * of transitions associated with it.
+       * @brief returns the number of internal transitions associated with this NWA
        *
-       * @return set of return transitions associated with the NWA
+       * This method returns the number of internal transitions associated with this NWA.  
+       *
+       * @return the number of internal transitions associated with this NWA
        *
        */
-      //const Returns & getReturnTrans( );
+      size_t sizeInternalTrans( ) const;
+
+      //Return Transitions
 
       /**
        * 
@@ -6277,11 +5807,11 @@ namespace wali
        * This method provides access to the return sites associated with the given
        * call site.
        *
-       * @param - callSite: the name of the call site whose return sites to obtain
+       * @param - callSite: the call site whose return sites to obtain
        * @return the set of return sites associated with the given call site
        *
        */
-      std::set<Key> getReturnSites( Key callSite ) const;
+      const std::set<St> getReturnSites( St callSite ) const;
 
       /**
        * 
@@ -6291,13 +5821,13 @@ namespace wali
        * This method provides access to the symbol/return site pairs associated with the 
        * given exit point and call site.
        *
-       * @param - exit: the name of the exit point whose symbol/return site pairs to obtain
-       * @param - callSite: the name of the call site whose symbol/return site pairs to obtain
+       * @param - exit: the exit point whose symbol/return site pairs to obtain
+       * @param - callSite: the call site whose symbol/return site pairs to obtain
        * @return the set of symbol/return site pairs associated with the given exit point 
        *          and call site
        *
        */
-      const std::set<std::pair<Sym,Key>> getReturns( Key exit, Key callSite ) const;
+      const std::set<std::pair<Sym,St>> getReturns( St exit, St callSite ) const;
 
       /**
        *
@@ -6307,31 +5837,14 @@ namespace wali
        * and adds it to the transition set for the NWA.  If the return transition already 
        * exists in the NWA, false is returned. Otherwise, true is returned.
        *
-       * @param from: the name of the state the edge departs from
-       * @param pred: the name of the state from which the call was initiated  
-       * @param sym: the symbol labeling the edge
-       * @param to: the name of the state the edge arrives to  
+       * @param - from: the state the edge departs from
+       * @param - pred: the state from which the call was initiated  
+       * @param - sym: the symbol labeling the edge
+       * @param - to: the state the edge arrives to  
        * @return false if the return transition already exists in the NWA
        *
        */
-      bool addReturnTrans( Key from, Key pred, const Sym & sym, Key to );
-
-      /**
-       *
-       * @brief add a return transition to the NWA
-       *
-       * This method creates a return transition with the given edge and label information
-       * and adds it to the transition set for the NWA. If the return transition already 
-       * exists in the NWA, false is returned. Otherwise, true is returned.
-       *
-       * @param from: the state the edge departs from
-       * @param pred: the state from which the call was initiated  
-       * @param sym: the symbol labeling the edge
-       * @param to: the state the edge arrives to  
-       * @return false if the return transition already exists in the NWA
-       *
-       */
-      bool addReturnTrans( St * from, St * pred, const Sym & sym, St * to );
+      bool addReturnTrans( St from, St pred, Sym sym, St to );
 
       /**
        *
@@ -6341,7 +5854,7 @@ namespace wali
        * If the return transition already exists in the NWA, false is returned. Otherwise,
        * true is returned.
        *
-       * @param return transition to add to the NWA
+       * @param - rt: return transition to add to the NWA
        * @return false if the return transition already exists in the NWA
        *
        */
@@ -6351,33 +5864,17 @@ namespace wali
        *
        * @brief remove a return transition from the NWA
        *
-       * This method checks for the return transition with the given edge and label
-       * information in the transition set.  If the transition is found, it is removed 
+       * This method checks for all return transitions with the given edge and label
+       * information in the transition set.  If transitions are found, they are removed 
        * from the transition set and true is returned.  Otherwise, false is returned.
        *
-       * @param from: the name of the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: the name of the state the edge arrives to  
+       * @param - from: of the state the edge departs from
+       * @param - sym: the symbol labeling the edge
+       * @param - to: the state the edge arrives to  
        * @return false if the return transition does not exist in the NWA
        *
        */
-      bool removeReturnTrans( Key from, const Sym & sym, Key to );
-
-      /**
-       *
-       * @brief remove a return transition from the NWA
-       *
-       * This method checks for the return transition with the given edge and label
-       * information in the transition set.  If the transition is found, it is removed 
-       * from the transition set and true is returned.  Otherwise, false is returned.
-       *
-       * @param from: the state the edge departs from
-       * @param sym: the symbol labeling the edge
-       * @param to: the state the edge arrives to  
-       * @return false if the return transition does not exist in the NWA
-       *
-       */
-      bool removeReturnTrans( St * from, const Sym & sym, St * to );
+      bool removeReturnTrans( St from, Sym sym, St to );
 
       /**
        *
@@ -6387,31 +5884,14 @@ namespace wali
        * information in the transition set. If the transition is found, it is removed 
        * from the transition set and true is returned.  Otherwise, false is returned.
        * 
-       * @param from: name of the state the edge departs from
-       * @param pred: name of the state from which the call was initiated  	   
-       * @param sym: the symbol labeling the edge
-       * @param to: name of the state the edge arrives to  
+       * @param - from: the state the edge departs from
+       * @param - pred: the state from which the call was initiated  	   
+       * @param - sym: the symbol labeling the edge
+       * @param - to: the state the edge arrives to  
        * @return false if the return transition does not exist in the NWA
        *
        */
-      bool removeReturnTrans( Key from, Key pred, const Sym & sym, Key to );
-
-      /**
-       *
-       * @brief remove a return transition from the NWA
-       *
-       * This method checks for the return transition with the given edge and label 
-       * information in the transition set. If the transition is found, it is removed 
-       * from the transition set and true is returned.  Otherwise, false is returned.
-       * 
-       * @param from: the state the edge departs from
-       * @param pred: the state from which the call was initiated  	   
-       * @param sym: the symbol labeling the edge
-       * @param to: the state the edge arrives to  
-       * @return false if the return transition does not exist in the NWA
-       *
-       */
-      bool removeReturnTrans( St * from, St * pred, const Sym & sym, St * to );
+      bool removeReturnTrans( St from, St pred, Sym sym, St to );
 
       /**
        *
@@ -6421,163 +5901,180 @@ namespace wali
        * transition is found, it is removed from the transition set and true is returned.
        * Otherwise, false is returned.
        *
-       * @param the return transition to remove
+       * @param - rt: the return transition to remove
        * @return false if the return transition does not exist in the NWA
        *
        */
       bool removeReturnTrans( const Return & rt );
 
+      /**
+       *
+       * @brief returns the number of return transitions associated with this NWA
+       *
+       * This method returns the number of return transitions associated with this NWA.  
+       *
+       * @return the number of return transitions associated with this NWA
+       *
+       */
+      size_t sizeReturnTrans( ) const;
+
       //Building NWAs
 
       /**
        *
-       * @brief constructs the NWA resulting from the union of this NWA and the NWA 'other'
+       * @brief constructs the NWA resulting from the union of the given NWAs 
        *
-       * This method constructs the union of this NWA and the NWA 'other' by creating a 
-       * new initial state with epsilon transitions to all initial states of the two NWAs.
-       * The resulting NWA is NOT guaranteed to be deterministic.
+       * This method constructs the union of the given NWAs by creating a new initial 
+       * state with epsilon transitions to all initial states of the two NWAs.
+       * Note: The resulting NWA is NOT guaranteed to be deterministic.
        *
-       * @param the NWA with which to union this NWA
-       * @return the NWA which is the union of this NWA and the NWA 'other'
+       * @param - first: the NWA to union with 'second'
+       * @param - second: the NWA to union with 'first'
        *
        */
-      //NWA * unionNWA( NWA other );  //FIX
+      void unionNWA( NWARefPtr first, NWARefPtr second );  
 
       /**
        *
-       * @brief constructs the NWA resulting from the concatenation of this NWA and the 
-       *        NWA 'other'
+       * @brief constructs the NWA which is the intersection of the given NWAs
        *
-       * This method constructs the concatenation of this NWA and the NWA 'other' by 
-       * adding epsilon transitions from all final states of this NWA to all initial 
-       * states of the NWA 'other'.  The resulting NWA is NOT guaranteed to be 
-       * deterministic.
+       * This method constructs the NWA which accepts only nested words that are accepted 
+       * by both 'first' and 'second'.  
+       * Note: The resulting NWA is NOT guaranteed to be deterministic.	
        *
-       * @param the NWA with which to concatenate this NWA
-       * @return the NWA which is the concatenation of this NWA and the NWA 'other'
-       *
+       * @param - first: the NWA to intersect with 'second'
+       * @param - second: the NWA to intersect with 'first'
+       *	
        */
-      //NWA * concat( NWA other );  //FIX
+      void intersect( NWARefPtr first, NWARefPtr second );
 
       /**
        *
-       * @brief constructs the NWA resulting from performing Kleene-* on this NWA
+       * @brief constructs the NWA resulting from the concatenation of the given NWAs
        *
-       * This method constructs the Kleene-* of this NWA by adding epsilon transitions 
-       * from all final states of the NWA to all initial states of the NWA.  The 
-       * resulting NWA is NOT guaranteed to be deterministic.
+       * This method constructs the concatenation of the given NWAs by adding epsilon 
+       * transitions from all final states of 'first' to all initial states of 'second'.  
+       * Note: The resulting NWA is NOT guaranteed to be deterministic.
        *
-       * @return the NWA which is the result of performing Kleene-* on this NWA
+       * @param - first: the NWA to which 'second' should be concatenated
+       * @param - second: the NWA to concatenate onto the end of 'first'
        *
        */
-      //NWA * star( );  //FIX
+      void concat( NWARefPtr first, NWARefPtr second );  
+
+      /**
+       * @brief constructs the NWA which is the reverse of the given NWA
+       *
+       * This method constructs the NWA which is the reverse of the given NWA. It reverses 
+       * internal transitions and switches call and return transitions.
+       * Note: the resulting NWA is NOT guaranteed to be deterministic.
+       *
+       * @param - first: the NWA to reverse
+       * 
+       */
+      void reverse( NWARefPtr first );  
+
+      /**
+       *
+       * @brief constructs the NWA resulting from performing Kleene-* on the given NWA
+       *
+       * This method constructs the Kleene-* of the given NWA by adding epsilon transitions 
+       * from all final states of the NWA to all initial states of the NWA.  
+       * Note: The resulting NWA is NOT guaranteed to be deterministic.
+       *
+       * @param - first: the NWA to perform the Kleene-* of
+       *
+       */
+      void star( NWARefPtr first ); 
 
       /**
        * 
-       * @brief constructs the NWA that is the complement of this NWA
+       * @brief constructs the NWA that is the complement of the given NWA
        *
-       * This method constructs the complement of this NWA by replacing the set of final 
-       * states in this NWA with the set of states that are not final in this NWA.  
+       * This method constructs the complement of the given NWA by determinizing it and
+       * then replacing the set of final states with the set of states that are not final  
        *
-       * @return the NWA which is the complement of this NWA
+       * @param - first: the NWA to perform the complement of
        *
        */
-      //NWA * complement( );
+      void complement( NWARefPtr first );
 
       /**
        *
-       * @brief constructs a deterministic NWA that is equivalent to this NWA.
+       * @brief constructs a deterministic NWA that is equivalent to the given NWA.
        *
-       * This method constructs a deterministic NWA that is equivalent to this NWA.
+       * This method constructs a deterministic NWA that is equivalent to the given NWA.
        *
-       * @return the NWA which is a deterministed equivalent to this NWA
+       * @param - nondet: the NWA to determinize
        *
        */
-      //NWA & determinize( ); //FIX
+      void determinize( NWARefPtr nondet ); 
 
       /**
        *
-       * @brief tests whether the NWA is deterministic 
+       * @brief tests whether this NWA is deterministic 
        *
-       * This method tests whether the NWA is deterministic or nondeterministic. If the 
+       * This method tests whether this NWA is deterministic or nondeterministic. If this 
        * NWA is deterministic, true is returned.  Otherwise, false is returned.
        *
-       * @return true if the NWA is deterministic, false otherwise
+       * @return true if this NWA is deterministic, false otherwise
        *
        */
       bool isDeterministic( );
-
-      /**
-       * @brief constructs the NWA which is the reverse of this NWA
-       *
-       * This method constructs the NWA which is the reverse of this NWA. It reverses 
-       * internal transitions and switches call and return transitions.
-       *
-       * @return the NWA which is the reverse of this NWA
-       * 
-       */
-      //NWA * reverse( );  //FIX
-
-      /**
-       *
-       * @brief constructs the NWA which is the intersection of this NWA and the NWA 'other'
-       *
-       * This method constructs the NWA which accepts only nested words that are accepted 
-       * by both this NWA and the NWA 'other'.  The resulting NWA is NOT guaranteed to be 
-       * deterministic.	
-       *
-       * @param - other: the NWA with which to perform the intersection with this NWA
-       * @param - result: the NWA which is the intersection of this NWA and the NWA 'other'
-       * @return the NWA which is the intersection of this NWA and the NWA 'other'
-       *	
-       */
-      void intersect( const NWA & other, NWA & result ) const;
 
       /**
        * 
        * @brief intersects client information 
        *
        * This method intersects the client information associated with the given states
-       * and assigns the resulting client information to the state with the given name.
-       * This method should only be used to intersect client information from the initial
-       * states of NWAs (all other client information intersections should use the 
+       * and returns the resulting client information.  
+       * Note: This method should only be used to intersect client information from the 
+       * initial states of NWAs (all other client information intersections should use the 
        * specialized methods below). 
        *
+       * @param - first: the NWA in which to look up the client information for 'name1'
        * @param - name1: the first state whose client information to intersect
+       * @param - second: the NWA in which to look up the client information for 'name2'
        * @param - name2: the second state whose client information to intersect
-       * @param - result: the name of the state which should recieve the computed client 
-       *                  information
+       * @param - resSt: the state which will receive the computed client information
+       * @param - result: the client information resulting from the intersection of
+       *                  'name1' and 'name2'
        *
        */
-      virtual void intersectClientInfo( const St * const name1, 
-                              const St * const name2, 
-                              const Key &result );
+      virtual void intersectClientInfo( NWARefPtr first, St name1, 
+                                        NWARefPtr second, St name2, 
+                                        St resSt, ClientInfoRefPtr result );
       /**
        * 
        * @brief intersects client information 
        *
        * This method intersects the client information associated with the states 'entry1'
        * and 'entry2' given that the transition that is being created is a call transition 
-       * with the given symbol using the information in the given states and assigns the 
-       * resulting client information to the state with the given name.
-       * This method should only be used to intersect client information for states 
+       * with the given symbol using the information in the given states and returns the 
+       * resulting client information.
+       * Note: This method should only be used to intersect client information for states 
        * immediately following a call transition.
        *
+       * @param - first: the NWA in which to look up the client information for 
+       *                'call1' and 'entry1'
        * @param - call1: the call site associated with the first entry whose client 
        *                  information to intersect
        * @param - entry1: the first entry point whose client information to intersect
+       * @param - second: the NWA in which to look up the client information for
+       *                  'call2' and 'entry2'
        * @param - call2: the call site associated with the second entry whose client
        *                  information to intersect
        * @param - entry2: the second entry point whose client information to intersect
        * @param - resSym: the symbol associated with the transition that is being created
-       * @param - result: the name of the state which should recieve the computed client 
-       *                  information
+       * @param - resSt: the state which will receive the computed client information
+       * @param - result: the client information resulting from the intersection of 
+       *                  'entry1' and 'entry2'
        *
        */
-      virtual void intersectClientInfoCall( const St * const call1, const St * const entry1, 
-                                    const St * const call2, const St * const entry2, 
-                                    const Sym &resSym,
-                                    const Key &result );  
+      virtual void intersectClientInfoCall( NWARefPtr first, St call1, St entry1, 
+                                            NWARefPtr second, St call2, St entry2, 
+                                            Sym resSym, St resSt, 
+                                            ClientInfoRefPtr result );  
 
       /**
        * 
@@ -6585,26 +6082,31 @@ namespace wali
        *
        * This method intersects the client information associated with the states 'tgt1' and
        * 'tgt2' given that the transition that is being created is an internal transition 
-       * with the given symbol using the information in the given states and assigns the 
-       * resulting client information to the state with the given name.
-       * This method should only be used to intersect client information for states 
+       * with the given symbol using the information in the given states and returns the 
+       * resulting client information.
+       * Note: This method should only be used to intersect client information for states 
        * immediately following an internal transition.
        *
+       * @param - first: the NWA in which to look up the client information for 
+       *                'src1' and 'tgt1'
        * @param - src1: the source associated with the first target whose client 
        *                  information to intersect
        * @param - tgt1: the first target whose client information to intersect
+       * @param - second: the NWA in which to look up the client information for
+       *                'src2' and 'tgt2'
        * @param - src2: the source associated with the second target whose client
        *                  information to intersect
        * @param - tgt2: the second target whose client information to intersect
        * @param - resSym: the symbol associated with the transition that is being created
-       * @param - result: the name of the state which should recieve the computed client 
-       *                  information
+       * @param - resSt: the state which will receive the computed client information
+       * @param - result: the client information resulting from the intersection of
+       *                'tgt1' and 'tgt2'
        *
        */
-      virtual void intersectClientInfoInternal( const St *const src1, const St* const tgt1,
-                                        const St *const src2, const St* const tgt2,
-                                        const Sym &resSym,
-                                        const Key &result );
+      virtual void intersectClientInfoInternal( NWARefPtr first, St src1, St tgt1, 
+                                                NWARefPtr second, St src2, St tgt2, 
+                                                Sym resSym, St resSt, 
+                                                ClientInfoRefPtr result );  
 
       /**
        * 
@@ -6612,58 +6114,67 @@ namespace wali
        *
        * This method intersects the client information associated with the states 'ret1' and
        * 'ret2' given that the transition that is being created is a return transition with
-       * the given symbol using the information in the given states and assigns the 
-       * resulting client information to the state with the given name.
-       * This method should only be used to intersect client information for states 
+       * the given symbol using the information in the given states and returns the 
+       * resulting client information.
+       * Note: This method should only be used to intersect client information for states 
        * immediately following a return transition.
        *
+       * @param - first: the NWA in which to look up the client information for 
+       *                'exit1', 'call1', and 'ret1'
        * @param - exit1: the exit point associated with the first return site whose client 
        *                  information to intersect
        * @param - call1: the call site associated with the first return site whose client
        *                  information to intersect
        * @param - ret1: the first return site whose client information to intersect
+       * @param - second: the NWA in which to look up the client information for
+       *                'exit2', 'call2', and 'ret2'
        * @param - exit2: the exit point associated with the second return site whose client
        *                  information to intersect
        * @param - call2: the call site associated with the second return site whose client
        *                  information to intersect
        * @param - ret2: the second return site whose client information to intersect
        * @param - resSym: the symbol associated with the transition that is being created
-       * @param - result: the name of the state which should recieve the computed client 
-       *                  information
+       * @param - resSt: the state which will receive the computed client information
+       * @param - result: the client information resulting from the intersection of
+       *                'ret1' and 'ret2'
        *
        */
-      virtual void intersectClientInfoReturn( const St * const exit1, const St *const call1, const St *const ret1,
-                                      const St * const exit2, const St *const call2, const St *const ret2,
-                                      const Sym &resSym,
-                                      const Key &result );
+      virtual void intersectClientInfoReturn( NWARefPtr first, St exit1, St call1, St ret1,
+                                              NWARefPtr second, St exit2, St call2, St ret2,
+                                              Sym resSym, St resSt,
+                                              ClientInfoRefPtr result );
 
       /**
        * 
        * @brief intersect states
        * 
-       * This method performs the intersection of the given states and returns the result
-       * in the reference parameter 'result'.
+       * This method determines whether the given states can be intersected and returns the result
+       * in the reference parameter 'resSt'.
        *
-       * @param - node1: the first state to intersect
-       * @param - node2: the second state to intersect
-       * @param - result: the state that results from performing the intersection
+       * @param - first: the NWA in which to look up information about 'state1'
+       * @param - state1: the first state to intersect
+       * @param - second: the NWA in which to look up information about 'state2'
+       * @param - state2: the second state to intersect
+       * @param - resSt: the state that results from performing the intersection
        *
        */
-      virtual bool nodeIntersect( const St * node1, const St * node2, St * & result );
+      virtual bool nodeIntersect( NWARefPtr first, St state1, NWARefPtr second, St state2, St & resSt );
 
       /**
        * 
        * @brief intersect symbols
        * 
        * This method performs the intersection of the given symbols and returns the result
-       * in the reference parameter 'result'.
+       * in the reference parameter 'resSym'.
        *
-       * @param - label1: the first symbol to intersect
-       * @param - label2: the second symbol to intersect
-       * @param - result: the symbol that results from performing the intersection
+       * @param - first: the NWA in which to look up information about 'sym1'
+       * @param - sym1: the first symbol to intersect
+       * @param - second: the NWA in which to look up information about 'sym2'
+       * @param - sym2: the second symbol to intersect
+       * @param - resSym: the symbol that results from performing the intersection
        *
        */
-      virtual bool edgeIntersect( const Sym & label1, const Sym & label2, Sym & result );
+      virtual bool edgeIntersect( NWARefPtr first, Sym sym1, NWARefPtr second, Sym sym2, Sym & resSym );
 
       //Using NWAs
 
@@ -6675,12 +6186,12 @@ namespace wali
        * This method constructs the WPDS which allows WPDS reachability to be used to 
        * perform property checking using this NWA and the given WPDS.
        *
-       * @param the WPDS that forms the basis for the constructed WPDS
+       * @param - base: the WPDS that forms the basis for the constructed WPDS
        * @return the WPDS which can be used to perform property checking using PDS 
        *          reachability
        * 
        */
-      //wpds::WPDS plusWPDS( wpds::WPDS base ); //FIX
+      wpds::WPDS plusWPDS( const wpds::WPDS & base ); 
 
       /**
        *
@@ -6688,10 +6199,11 @@ namespace wali
        *
        * This method constructs the NWA that is equivalent to the given PDS.
        *
+       * @param - pds: the pds to convert 
        * @return the NWA equivalent to the given PDS
        *
        */
-      //static nwa::NWA PDStoNWA( wpds::WPDS pds ); //FIX
+      void PDStoNWA( const wpds::WPDS & pds ); 
 
       /**
        *  
@@ -6711,32 +6223,64 @@ namespace wali
        * This method provides access to the program control location corresponding to
        * the given exit point/call site pair.
        *
+       * @param - exit: the exit point corresponding to this control location
+       * @param - callSite: the call site corresponding to this control location
        * @return the program control location corresponding to the given states
        *
        */
-      static wali::Key getControlLocation( const St & first, const St & second );     
+      static wali::Key getControlLocation( Key exit, Key callSite );     
 
       /**
        *
        * @brief constructs the PDS equivalent to this NWA
        *
        * This method constructs the PDS that is equivalent to this NWA.
+       * Note: This version keeps returns on the stack.
        *
+       * @param - wg: the functions to use in generating weights
        * @return the PDS equivalent to this NWA
        *
        */ 
-      wpds::WPDS NWAtoPDS( WeightGen<St,Sym> & wg ) const;
+      wpds::WPDS NWAtoPDSreturns( WeightGen & wg ) const;
 
       /**
        *
        * @brief constructs the backwards PDS equivalent to this NWA
        *
        * This method constructs the backwards PDS that is equivalent to this NWA.
+       * Note: This version keeps returns on the stack.
        *
+       * @param - wg: the functions to use in generating weights
        * @return the backwards PDS equivalent to this NWA
        *
        */ 
-      wpds::WPDS NWAtoBackwardsPDS( WeightGen<St,Sym> & wg ) const;  
+      wpds::WPDS NWAtoBackwardsPDSreturns( WeightGen & wg ) const;  
+
+      /**
+       *
+       * @brief constructs the PDS equivalent to this NWA
+       *
+       * This method constructs the PDS that is equivalent to this NWA.
+       * Note: This version keeps calls on the stack.
+       *
+       * @param - wg: the functions to use in generating weights
+       * @return the PDS equivalent to this NWA
+       *
+       */ 
+      wpds::WPDS NWAtoPDScalls( WeightGen & wg ) const;
+
+      /**
+       *
+       * @brief constructs the backwards PDS equivalent to this NWA
+       *
+       * This method constructs the backwards PDS that is equivalent to this NWA.
+       * Note: This version keeps calls on the stack.
+       *
+       * @param - wg: the functions to use in generating weights
+       * @return the backwards PDS equivalent to this NWA
+       *
+       */ 
+      wpds::WPDS NWAtoBackwardsPDScalls( WeightGen & wg ) const; 
       
       /**
        *
@@ -6747,7 +6291,7 @@ namespace wali
        * @return true if the language accepted by this NWA is empty
        *
        */
-      //bool isEmpty( );
+      bool isEmpty( );
 
       /**
        *
@@ -6762,7 +6306,65 @@ namespace wali
        *          this NWA
        *
        */
-      //bool isMember( nws::NWS word ); //FIX
+      bool isMember( nws::NWS word ); 
+
+      /**
+       *
+       * @brief perform the prestar reachability query defined by the given WFA
+       *
+       * This method performs the prestar reachability query defined by the given WFA.
+       *
+       * @param - input: the starting point of the reachability query
+       * @param - wg: the functions to use in generating weights
+       * @return the WFA resulting from performing the prestar reachability query 
+       *
+       */
+      virtual wfa::WFA prestar( wfa::WFA & input, WeightGen & wg );
+
+      /**
+       *
+       * @brief perform the prestar reachability query defined by the given WFA
+       *
+       * This method performs the prestar reachability query defined by the given WFA.
+       * The result of the query is stored in the 'output' parameter. 
+       * Note: Any transitions in output before the query will be there after the query but
+       * will have no effect on the reachability query.
+       *
+       * @param - input: the starting point of the reachability query
+       * @param - ouput: the result of performing the reachability query
+       * @param - wg: the functions to use in generating weights
+       *
+       */
+      virtual void prestar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg );
+
+      /**
+       *
+       * @brief perform the poststar reachability query defined by the given WFA
+       *
+       * This method performs the poststar reachability query defined by the given WFA.
+       *
+       * @param - input: the starting point of the reachability query
+       * @param - wg: the functions to use in generating weights
+       * @return the WFA resulting from performing the poststar reachability query
+       *
+       */
+      virtual wfa::WFA poststar( wfa::WFA & input, WeightGen & wg );
+
+      /**
+       *
+       * @brief perform the poststar reachability query defined by the given WFA
+       * 
+       * This method performs the poststar reachability query defined by the given WFA.
+       * The result of the query is stored in the 'output' parameter.
+       * Note: Any transitions in output before the query will be there after the query but
+       * will have no effect on the reachability query.
+       *
+       * @param - input: the starting point of the reachability query
+       * @param - output: the result of performing the reachability query
+       * @param - wg: the functions to use in generating weights
+       *
+       */
+      virtual void poststar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg );
 
       //Utilities	
 
@@ -6788,7 +6390,7 @@ namespace wali
        * @return the output stream that was printed to
        *
        */
-      virtual std::ostream & print_dot( std::ostream & o) const;
+      virtual std::ostream & print_dot( std::ostream & o, std::string title ) const;
 
       /**
        *
@@ -6801,6 +6403,11 @@ namespace wali
        *
        */
       bool operator==( const NWA & other ) const;
+
+      //TODO: add methods like ...
+      //virtual void for_each(ConstRuleFunctor &func) const;
+      //virtual void for_each(RuleFunctor &func) const;
+      //virtual void operator()(wfa::ITrans *t);
 
       protected:
       
@@ -6887,11 +6494,9 @@ namespace wali
        *
        * @param - addStateSet: the StateSet whose final states to add to this NWA's
        *                        final state set
-       * @param - accept: whether or not the stuck state is an accepting state in the
-       *                  state set to add
        *
        */
-      void addAllFinalStates( States addStateSet, bool accept ); 
+      void addAllFinalStates( States addStateSet ); 
 
       /**
        *
@@ -6924,7 +6529,7 @@ namespace wali
        * This method adds all of the given symbols to the set of symbols associated with
        * the NWA.  
        *
-       * @param the symbols to add
+       * @param - addSymbolSet: the symbols to add
        *
        */
       void addAllSymbols( Symbols addSymbolSet );    
@@ -7033,12 +6638,14 @@ namespace wali
        * This method constructs the transition table and state map for the deterministic 
        * NWA that is equivalent to this NWA.
        *
-       * @return the transition table and state map for the deterministic NWA that is
-       *          equivalent to this NWA
+       * @param - nondet: the NWA to determinize
+       * @param - stMap: the map of sets of 'nondet' states to states
+       * @param - currSt: the current state under consideration
+       * @param - callPred: the stack of open calls at 'currSt'
        *
        */
-      //std::pair<NWA,StateMap> det( NWA nWdAut, StateMap stateMap,StatePairSet currState,
-      //                            std::stack<StatePairSet> callPred );  //FIX
+      void det( NWARefPtr nondet, StateMap & stMap, StatePairSet currSt, 
+                std::stack<StatePairSet> callPred );  
 
       /**
        *
@@ -7055,7 +6662,7 @@ namespace wali
        *          final state, false otherwise
        *
        */
-      //bool NWA::hasPath( St currState, std::stack< St > calls, std::set< St > visited );  //FIX
+      bool NWA::hasPath( St currState, std::stack< St > calls, std::set< St > visited );  
 
       /** 
        *
@@ -7068,11 +6675,11 @@ namespace wali
        *
        * @param - currState: the state in the nested word automaton at which to start the 
        *                      simulation
-       * @param - configs: the nested word suffix to match  //TODO: is this right?
+       * @param - configs: the nested word suffix to match  //Q: is this right?
        * @return true if the simulation ends in an accepting state
        *
        */
-      //bool matchWord( St currState, std::deque<WordRecConfig<St>> configs );  //FIX
+      //bool matchWord( St currState, std::deque<WordRecConfig<St>> configs );  
 
       //
       // Variables
@@ -7083,10 +6690,3040 @@ namespace wali
         States states;         
         Symbols symbols;        
         Trans * trans;
-
-        bool absentAcceptance;
     };
-  }
+
+    //
+    // Methods
+    //
+
+    //Constructors and Destructor
+    template <typename Client>
+    NWA<Client>::NWA( )
+    {
+      states = States();
+      symbols = Symbols();
+      trans = new Trans();  //Q: why is this a pointer and not the others?
+    }
+    template <typename Client>
+    NWA<Client>::NWA( const NWA & other )
+    {
+      //Copy data over from 'other'
+      states = other.states;
+      symbols = other.symbols;
+      trans = other.trans;
+    }
+    template <typename Client>
+    NWA<Client> & NWA<Client>::operator=( const NWA & other )
+    {
+      if (this == &other)
+        return *this;
+
+      //Erase any pre-existing data.
+      clear();
+
+      //Copy data over from 'other'
+      states = other.states;
+      symbols = other.symbols;
+      trans = other.trans;
+
+      return *this;
+    }
+    
+    /**
+     *
+     * @brief erases all data from the NWA
+     *
+     * This method restore's the NWA to its default state:
+     * the stuck state with no symbols or transitions.
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::clear( )
+    {
+      clearStates();
+      clearSymbols();
+      clearTrans();
+    }
+    template <typename Client>
+    NWA<Client>::~NWA( )
+    {
+      clear();
+
+      trans->~Trans();
+    }
+
+    //State Accessors
+
+    /**
+     * 
+     * @brief access the client information associated with the given state
+     *
+     * @param - state: the state whose client information to retrieve
+     * @return the client information associated with the given state
+     *
+     */
+    template <typename Client>
+    inline
+    typename NWA<Client>::ClientInfoRefPtr NWA<Client>::getClientInfo( St state ) 
+    {
+      return states.getClientInfo(state);
+    }
+
+    /**
+     * 
+     * @brief set the client information associated with the given state
+     *
+     * @param - state: the  state whose client information to set
+     * @param - c: the desired client information for the given state
+     *
+     */
+    template <typename Client>
+    inline
+    void NWA<Client>::setClientInfo( St state, const ClientInfoRefPtr c )
+    {
+      states.setClientInfo(state,c);
+    }
+     
+    /**
+     * 
+     * @brief obtains all the states that are predecessors of the given state
+     *
+     * @param - state: the state of the state whose predecessors to look up
+     * @return the set of all states that are predecessors of the given state
+     *
+     */ 
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> & NWA<Client>::getPredecessorNames( St state ) const
+    {
+      std::set<St> * preds = new std::set<St>();
+      
+      std::set<Call> calls = trans->getTransEntry(state);
+      for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
+        preds->insert(Trans::getCallSite(*cit));
+
+      std::set<Internal> internals = trans->getTransTo(state);
+      for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
+        preds->insert(Trans::getSource(*iit));
+
+      std::set<Return> returns = trans->getTransRet(state);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+        preds->insert(Trans::getExit(*rit));
+
+      return *preds;
+    }
+      
+    /**
+     *   
+     * @brief duplicates the original state, but only duplicates outgoing transitions
+     *
+     * @param - orig: the name of the original state, i.e. the state to duplicate
+     * @param - dup: the name of the duplicate state
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::duplicateStateOutgoing( St orig, St dup )
+    {
+      states.addState(dup);
+      states.dupState(orig,dup);  //Duplicate state characteristics(initial/final).
+
+      trans->dupTransOutgoing(orig,dup);  //Duplicate outgoing transitions.
+    }
+
+    /**
+     * 
+     * @brief duplicates the original state
+     *
+     * @param - orig: the name of the original state, i.e. the state to duplicate
+     * @param - dup: the name of the duplicate state
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::duplicateState( St orig, St dup )
+    {
+      states.addState(dup);
+      states.dupState(orig,dup);  //Duplicate state characteristics(initial/final).
+
+      trans->dupTrans(orig,dup);  //Duplicate all transitions.
+    }
+
+    //All States
+
+    /**
+     *   
+     * @brief provides access to all states in the NWA
+     *
+     * @return a set of all states 
+     *
+     */
+    template <typename Client>
+    inline
+    const std::set<typename NWA<Client>::St> & NWA<Client>::getStates( ) const
+    {
+      return states.getStates();
+    }
+    /**
+     *   
+     * @brief provides access to all states in the NWA
+     *
+     * Note: This method simply calls getStates( ).  It is here to make the transition
+     *        from using PDS to using NWA easier.
+     *
+     * @return a set of all states in pointer form
+     *
+     */
+    template <typename Client>
+    inline
+    const std::set<typename NWA<Client>::St> & NWA<Client>::get_states( ) const
+    {
+      return getStates();
+    }
+
+    /**
+     * 
+     * @brief test if a given state is a state of this NWA
+     *
+     * @param - state: the state to check
+     * @return true if the given state is a state of this NWA
+     *
+     */
+    template <typename Client>
+    inline
+    bool NWA<Client>::isState( St state ) const
+    {
+      return states.isState(state);
+    }
+    /**
+     * 
+     * @brief test if a given state is a state of this NWA
+     *
+     * Note: This method simply calls isState( state ).  It is here to make the transition
+     *        from using PDS to using NWA easier.
+     *
+     * @param - state: the state to check
+     * @return true if the given state is a state of this NWA
+     *
+     */
+    template <typename Client>
+    inline
+    bool NWA<Client>::is_nwa_state( St state ) const
+    {
+      return isState(state);
+    }
+
+    /**
+     *  
+     * @brief add the given state to this NWA
+     *
+     * @param - state: the state to add
+     * @return false if the state already exists in the NWA, true otherwise
+     *
+     */
+    template <typename Client>
+    inline
+    bool NWA<Client>::addState( St state )
+    {
+      return states.addState(state);
+    }
+
+    /**
+     *
+     * @brief returns the number of states associated with this NWA
+     *
+     * @return the number of states associated with this NWA
+     *
+     */
+    template <typename Client>
+    inline
+    size_t NWA<Client>::sizeStates( ) const
+    {
+      return states.sizeStates();
+    }
+    /**
+     *
+     * @brief returns the number of states associated with this NWA
+     *
+     * Note: This method simply calls sizeStates( ).  It is here to make the transition
+     *        from using PDS to using NWA easier.
+     *
+     * @return the number of states associated with this NWA
+     *
+     */
+    template <typename Client>
+    inline
+    int NWA<Client>::num_nwa_states( ) const
+    {
+      return sizeStates();      
+    }
+
+    /**
+     *  
+     * @brief remove the given state from this NWA
+     *
+     * @param - state: the state to remove
+     * @return false if the state does not exist in the NWA, true otherwise
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::removeState( St state )
+    {
+      bool removed = states.removeState(state);
+      //Remove transitions associated with the state that was removed.
+      if( removed )
+      {
+        trans->removeTransWith(state);
+      }
+
+      return removed;
+    }
+
+    /**
+     *
+     * @brief remove all states from the NWA
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::clearStates( )
+    {
+      states.clearStates();
+
+      //Since all states are being removed, all transitions are removed as well.
+      clearTrans();
+    }
+
+    //Initial States
+
+    /**
+     *  
+     * @brief obtain the states in the initial state set
+     *
+     * @return set of inital states associated with the NWA
+     *
+     */
+    template <typename Client>
+    inline
+    const std::set<typename NWA<Client>::St> & NWA<Client>::getInitialStates( ) const
+    {
+      return states.getInitialStates();
+    }
+    /**
+     *  Q: do we still need the single initial state restriction?
+     * @brief obtain the initial state
+     *
+     * @return the inital state associated with the NWA
+     *
+     */
+    template <typename Client>
+    typename NWA<Client>::St NWA<Client>::getInitialState( ) const
+    {
+      std::set<St> sts = states.getInitialStates();
+      assert(sts.size()==1);  //Assuming unique initial state.
+      return *(sts.begin());
+    }
+
+    /**
+     * 
+     * @brief test if the given state is an initial state of this NWA
+     *
+     * @param - state: the state to check
+     * @return true if the given state is an initial state, false otherwise
+     *
+     */
+    template <typename Client>
+    inline
+    bool NWA<Client>::isInitialState( St state ) const
+    {
+      return states.isInitialState(state);
+    }
+
+    /**
+     * 
+     * @brief make the given state an initial state in this NWA
+     *
+     * @param - state: the state to add to initial state set
+     * @return false if the state already exists in the initial state set of the NWA
+     *
+     */
+    template <typename Client>
+    inline
+    bool NWA<Client>::addInitialState( St state )
+    {
+      return states.addInitialState(state);
+    }
+
+    /**
+     *
+     * @brief returns the number of initial states associated with this NWA
+     *
+     * @return the number of initial states associated with this NWA
+     *
+     */
+    template <typename Client>
+    inline
+    size_t NWA<Client>::sizeInitialStates( ) const
+    {
+      return states.sizeInitialStates();
+    }
+
+    /**
+     * 
+     * @brief remove the given state from the initial state set of this NWA
+     *
+     * @param - state: the state to remove from the initial state set
+     * @return false if the state does not exist in the initial state set of this NWA
+     *
+     */
+    template <typename Client>
+    inline
+    bool NWA<Client>::removeInitialState( St state )
+    {
+      return states.removeInitialState(state);
+    }
+
+    /**
+     *
+     * @brief remove all states from the initial state set of the NWA
+     *
+     */
+    template <typename Client>
+    inline
+    void NWA<Client>::clearInitialStates( )
+    {
+      states.clearInitialStates();
+    }
+
+    //Final States
+
+    /**
+     *
+     * @brief obtain the final states in this NWA
+     *
+     * @return set of all final states associated with this NWA
+     *
+     */
+    template <typename Client>
+    inline
+    const std::set<typename NWA<Client>::St> & NWA<Client>::getFinalStates( ) const
+    {
+      return states.getFinalStates();
+    }
+
+    /**
+     *
+     * @brief test if a state with the given name is a final state
+     *
+     * @param - state: the state to check
+     * @return true if the given state is a final state
+     *
+     */
+    template <typename Client>
+    inline
+    bool NWA<Client>::isFinalState( St state ) const
+    {
+      return states.isFinalState(state);
+    }
+
+    /**
+     *
+     * @brief make the given state a final state
+     *
+     * @param - state: the state to add to final state set
+     * @return false if the state already exists in the final state set of the NWA
+     *
+     */
+    template <typename Client>
+    inline
+    bool NWA<Client>::addFinalState( St state )
+    {
+      return states.addFinalState(state);
+    }
+
+    /**
+     * 
+     * @brief returns the number of final states associated with this NWA
+     *
+     * @return the number of final states associated with this NWA
+     *
+     */
+    template <typename Client>
+    inline
+    size_t NWA<Client>::sizeFinalStates( ) const
+    {
+      return states.sizeFinalStates();
+    }
+
+    /**
+     *
+     * @brief remove the given state from the final state set of the NWA
+     *
+     * @param - state: the state to remove from the final state set
+     * @return false if the state does not exist in the final state set of the NWA
+     *
+     */
+    template <typename Client>
+    inline
+    bool NWA<Client>::removeFinalState( St state )
+    {
+      return states.removeFinalState(state);
+    }
+
+    /**
+     *
+     * @brief remove all states from the final state set of the NWA
+     *
+     */
+    template <typename Client>
+    inline
+    void NWA<Client>::clearFinalStates( )
+    {
+      states.clearFinalStates();
+    }
+
+    //Symbol Accessors
+
+    /**
+     *
+     * @brief obtain all symbols in this NWA
+     *
+     * @return set of all symbols associated with this NWA
+     *
+     */
+    template <typename Client>
+    inline
+    const std::set<typename NWA<Client>::Sym> & NWA<Client>::getSymbols( ) const
+    {
+      return symbols.getSymbols();
+    }
+
+    /**
+     *
+     * @brief test if the given symbol is associated with the NWA
+     *
+     * @param - sym: the symbol to check
+     * @return true if the given symbol is associated with the NWA
+     *
+     */
+    template <typename Client>
+    inline
+    bool NWA<Client>::isSymbol( Sym sym ) const
+    {
+      return symbols.isSymbol(sym);
+    }
+
+    /**
+     *
+     * @brief add the given symbol to the NWA
+     *
+     * @param - sym: the symbol to add
+     * @return false if the symbol is already associated with the NWA
+     *
+     */
+    template <typename Client>
+    inline
+    bool NWA<Client>::addSymbol( Sym sym )
+    {
+      return symbols.addSymbol(sym);
+    }
+
+    /**
+     *
+     * @brief returns the number of symbols associated with this NWA
+     *
+     * Note: The epsilon symbol is included in this count.
+     *
+     * @return the number of symbols associated with this NWA
+     *
+     */
+    template <typename Client>
+    inline
+    size_t NWA<Client>::sizeSymbols( ) const
+    {
+      return symbols.sizeSymbols();
+    }
+
+    /**
+     *
+     * @brief remove the given symbol from the NWA
+     *
+     * @param - sym: the symbol to remove
+     * @return false if the symbols is not associated with the NWA
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::removeSymbol( Sym sym )
+    {
+      bool removed = symbols.removeSymbol(sym);
+      if( removed )
+      {
+        trans->removeTransSym(sym);
+      }
+      return removed;
+    }
+
+    /**
+     *
+     * @brief remove all symbols associated with the NWA
+     *
+     */
+    template <typename Client>
+    inline
+    void NWA<Client>::clearSymbols( )
+    {
+      symbols.clearSymbols();
+
+      //Since all symbols are being removed, all transitions are removed as well.
+      clearTrans();
+    }
+
+    //Transition Accessors
+
+    /**
+     * 
+     * @brief finds a symbol which occurs in a transition with the given endpoints
+     *
+     * @param - from: the source of the desired transition
+     * @param - to: the target of the desired transition
+     * @param - sym: the location in which to place any symbol labeling such a transition
+     * @return true if some such transition is found, false otherwise
+     *
+     */
+    template <typename Client>
+    inline
+    bool NWA<Client>::getSymbol( St from, St to, Sym & sym )
+    {
+      return trans->getSymbol(from,to,sym);
+    }
+
+    /**
+     * 
+     * @brief tests whether there exists a transition whose source is 'from', 
+     *        whose symbol is 'sym', and whose target is 'to'
+     *
+     * @param - from: the source of the transition
+     * @param - sym: the symbol that labels the transition
+     * @param - to: the target of the transition
+     * @return true if such a transition exists, false otherwise
+     * 
+     */
+    template <typename Client>
+    inline
+    bool NWA<Client>::findTrans( St from, Sym sym, St to) const
+    {
+      return trans->findTrans(from,sym,to);
+    }
+
+    /**
+     *
+     * @brief returns the number of transitions associated with this NWA
+     *
+     * @return the number of transitions associated with this NWA
+     *
+     */
+    template <typename Client>
+    inline
+    size_t NWA<Client>::sizeTrans( ) const
+    {
+      return trans->size();
+    }
+    /**
+     *
+     * @brief returns the number of transitions associated with this NWA
+     *
+     * Note: This method simply calls sizeTrans( ).  It is here to make the transition
+     *        from using PDS to using NWA easier.
+     *
+     * @return the number of transitions associated with this NWA
+     *
+     */
+    template <typename Client>
+    inline
+    int NWA<Client>::count_rules( ) const
+    {
+      return sizeTrans();
+    }
+
+    /**
+     *
+     * @brief remove all transitions from the NWA
+     *
+     */
+    template <typename Client>
+    inline
+    void NWA<Client>::clearTrans( )
+    {
+      trans->clear();
+    }
+
+    //Call Transitions
+
+    /**
+     * 
+     * @brief returns the symbol/entry point pairs associated with the given call site
+     *
+     * @param - callSite: the call site whose symbol/entry point pairs to obtain
+     * @return the set of symbol/entry point pairs associated with the given call site
+     *
+     */
+    template <typename Client>
+    const std::set<std::pair<typename NWA<Client>::Sym,typename NWA<Client>::St>> NWA<Client>::getEntries( St callSite ) const
+    {
+      const Calls ent = trans->getTransCall(callSite);
+      std::set<std::pair<Sym,St>> entries;
+      for( callIterator it = ent.begin(); it != ent.end(); it++ )
+      {
+        entries.insert(std::pair<Sym,St>(Trans::getCallSym(*it),Trans::getEntry(*it)));
+      }
+      return entries;
+    }
+
+    /**
+     *
+     * @brief add a call transition to the NWA
+     *
+     * @param - from: the state the edge departs from
+     * @param - sym: the symbol labeling the edge
+     * @param - to: the state the edge arrives to  
+     * @return false if the call transition already exists in the NWA
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::addCallTrans( St from, Sym sym, St to )
+    {
+      //Add the states and symbol of this transition to the appropriate sets.
+      addState(from);
+      addSymbol(sym);
+      addState(to);
+
+      return trans->addCall(from,sym,to);
+    }
+
+    /**
+     *
+     * @brief add a call transition to the NWA
+     *
+     * @param - ct: the call transition to add
+     * @return false if the call transition already exists in the NWA
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::addCallTrans( Call & ct )
+    {
+      //Add the states and symbol of this transition to the appropriate sets.
+      addState(Trans::getCallSite(ct));
+      addSymbol(Trans::getCallSym(ct));
+      addState(Trans::getEntry(ct));
+
+      return trans->addCall(ct);
+    }
+
+    /**
+     *
+     * @brief remove a call transition from the NWA
+     *
+     * @param - from: the state the edge departs from
+     * @param - sym: the symbol labeling the edge
+     * @param - to: the state the edge arrives to  
+     * @return false if the call transition does not exist in the NWA
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::removeCallTrans( St from, Sym sym, St to )
+    {
+      if(! isState(from) || ! isSymbol(sym) || ! isState(to) )
+        return false;
+
+      return trans->removeCall(from,sym,to);
+    }
+
+    /**
+     *
+     * @brief remove a call transition from the NWA
+     *
+     * @param - ct: the call transition to remove
+     * @return false if the call transition does not exist in the NWA
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::removeCallTrans( const Call & ct )
+    {
+      if(! isState(Trans::getCallSite(ct))
+        || ! isSymbol(Trans::getCallSym(ct))
+        || ! isState(Trans::getEntry(ct)) )
+        return false;
+
+      return trans->removeCall(ct);
+    }
+
+    /**
+     *
+     * @brief returns the number of call transitions associated with this NWA
+     *
+     * @return the number of call transitions associated with this NWA
+     *
+     */
+    template <typename Client>
+    inline
+    size_t NWA<Client>::sizeCallTrans( ) const
+    {
+      return trans->sizeCall();
+    }
+
+    //Internal Transitions
+
+    /**
+     * 
+     * @brief returns the symbol/target pairs associated with the given source
+     *
+     * @param - source: the source whose symbol/target pairs to obtain
+     * @return the set of symbol/target pairs associated with the given source
+     *
+     */
+    template <typename Client>
+    const std::set<std::pair<typename NWA<Client>::Sym,typename NWA<Client>::St>> NWA<Client>::getTargets( St source ) const
+    {
+      const Internals tgt = trans->getTransFrom(source);
+      std::set<std::pair<Sym,St>> targets;
+      for( internalIterator it = tgt.begin(); it != tgt.end(); it++ )
+      {
+        targets.insert(std::pair<Sym,St>(Trans::getInternalSym(*it),Trans::getTarget(*it)));
+      }
+      return targets;
+    }
+
+    /**
+     *
+     * @brief add an internal transition to the NWA
+     *
+     * @param - from: the state the edge departs from
+     * @param - sym: the symbol labeling the edge
+     * @param - to: the state the edge arrives to  
+     * @return false if the internal transition already exists in the NWA
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::addInternalTrans( St from, Sym sym, St to )
+    {
+      //Add the states and symbol of this transition to the appropriate sets.
+      addState(from);
+      addSymbol(sym);
+      addState(to);
+
+      return trans->addInternal(from,sym,to);
+    }
+
+    /**
+     *
+     * @brief add an internal transition to the NWA
+     *
+     * @param - it: internal transition to add to the NWA
+     * @return false if the internal transition already exists in the NWA
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::addInternalTrans( Internal & it )
+    {
+      //Add the states and symbol of this transition to the appropriate sets.
+      addState(Trans::getSource(it));
+      addSymbol(Trans::getInternalSym(it));
+      addState(Trans::getTarget(it));
+
+      return trans->addInternal(it);
+    }
+
+    /**
+     *
+     * @brief remove an internal transition from the NWA
+     *
+     * @param - from: the state the edge departs from
+     * @param - sym: the symbol labeling the edge
+     * @param - to: the state the edge arrives to  
+     * @return false if the internal transition does not exist in the NWA
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::removeInternalTrans( St from, Sym sym, St to )
+    {
+      if(! isState(from) || ! isSymbol(sym) || ! isState(to) )
+        return false;
+
+      return trans->removeInternal(from,sym,to);
+    }
+
+    /**
+     *
+     * @brief remove an internal transition from the NWA
+     *
+     * @param - it: the internal transition to remove
+     * @return false if the internal transition does not exist in the NWA
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::removeInternalTrans( const Internal & it )
+    {
+      if(! isState(Trans::getSource(it))
+        || ! isSymbol(Trans::getInternalSym(it))
+        || ! isState(Trans::getTarget(it)) )
+        return false;
+
+      return trans->removeInternal(it);
+    }
+
+    /**
+     *
+     * @brief returns the number of internal transitions associated with this NWA
+     *
+     * @return the number of internal transitions associated with this NWA
+     *
+     */
+    template <typename Client>
+    inline
+    size_t NWA<Client>::sizeInternalTrans( ) const
+    {
+      return trans->sizeInternal();
+    }
+
+    //Return Transitions
+
+    /**
+     * 
+     * @brief returns the return sites associated with the given call site
+     *
+     * @param - callSite: the call site whose return sites to obtain
+     * @return the set of return sites associated with the given call site
+     *
+     */
+    template <typename Client>
+    inline
+    const std::set<typename NWA<Client>::St> NWA<Client>::getReturnSites( St callSite ) const
+    {
+      return trans->getReturnSites(callSite);
+    }
+
+    /**
+     * 
+     * @brief returns the symbol/return site pairs associated with the given exit point 
+     *        and call site
+     *
+     * @param - exit: the exit point whose symbol/return site pairs to obtain
+     * @param - callSite: the call site whose symbol/return site pairs to obtain
+     * @return the set of symbol/return site pairs associated with the given exit point 
+     *          and call site
+     *
+     */
+    template <typename Client>
+    const std::set<std::pair<typename NWA<Client>::Sym,typename NWA<Client>::St>> NWA<Client>::getReturns( St exit, St callSite ) const
+    {
+      const Returns ret = trans->getTransExit(exit);
+      std::set<std::pair<Sym,St>> returns;
+      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      {
+        if( Trans::getCallSite(*it) == callSite )
+        {
+          returns.insert(std::pair<Sym,St>(Trans::getReturnSym(*it),Trans::getReturnSite(*it)));
+        }
+      }
+      return returns;
+    }
+
+    /**
+     *
+     * @brief add a return transition to the NWA
+     *
+     * @param - from: the state the edge departs from
+     * @param - pred: the state from which the call was initiated  
+     * @param - sym: the symbol labeling the edge
+     * @param - to: the state the edge arrives to  
+     * @return false if the return transition already exists in the NWA
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::addReturnTrans( St from, St pred, Sym sym, St to )
+    {
+      //Add the states and symbol of this transition to the approprite stes.
+      addState(from);
+      addState(pred);
+      addSymbol(sym);
+      addState(to);
+
+      return trans->addReturn(from,pred,sym,to);
+    }
+
+    /**
+     *
+     * @brief add a return transition to the NWA
+     *
+     * @param - rt: return transition to add to the NWA
+     * @return false if the return transition already exists in the NWA
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::addReturnTrans( Return & rt )
+    {
+      //Add the states and symbol of this transition to the appropriate sets.
+      addState(Trans::getExit(rt));
+      addState(Trans::getCallSite(rt));
+      addSymbol(Trans::getReturnSym(rt));
+      addState(Trans::getReturnSite(rt));
+
+      return trans->addReturn(rt);
+    }
+
+    /**
+     *
+     * @brief remove a return transition from the NWA
+     *
+     * @param - from: of the state the edge departs from
+     * @param - sym: the symbol labeling the edge
+     * @param - to: the state the edge arrives to  
+     * @return false if the return transition does not exist in the NWA
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::removeReturnTrans( St from, Sym sym, St to )
+    {
+      if(! isState(from) || ! isSymbol(sym) || ! isState(to) )
+        return false;
+     
+      bool removed = false;
+      const Trans::States preds = trans->getCallSites(from,to);
+      for( Trans::stateIterator it = preds.begin(); it != preds.end(); it++ )
+      {
+        if(! isState(*it) )
+          return false;
+        removed = removed || trans->removeReturn(from,*it,sym,to);
+      }
+      return removed;
+    }
+
+    /**
+     *
+     * @brief remove a return transition from the NWA
+     *
+     * @param - from: the state the edge departs from
+     * @param - pred: the state from which the call was initiated  	   
+     * @param - sym: the symbol labeling the edge
+     * @param - to: the state the edge arrives to  
+     * @return false if the return transition does not exist in the NWA
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::removeReturnTrans( St from, St pred, Sym sym, St to )
+    {
+      if(! isState(from) || ! isState(pred) || ! isSymbol(sym) || ! isState(to) )
+        return false;
+
+      return trans->removeReturn(from,pred,sym,to);
+    }
+
+    /**
+     *
+     * @brief remove a return transition from the NWA
+     *
+     * @param - rt: the return transition to remove
+     * @return false if the return transition does not exist in the NWA
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::removeReturnTrans( const Return & rt )
+    {
+      if(! isState(Trans::getExit(rt))
+        || ! isState(Trans::getCallSite(rt))
+        || ! isSymbol(Trans::getReturnSym(rt))
+        || ! isState(Trans::getReturnSite(rt)) )
+        return false;
+
+      return trans->removeReturn(rt);
+    }
+
+    /**
+     *
+     * @brief returns the number of return transitions associated with this NWA
+     *
+     * @return the number of return transitions associated with this NWA
+     *
+     */
+    template <typename Client>
+    inline
+    size_t NWA<Client>::sizeReturnTrans( ) const
+    {
+      return trans->sizeReturn();
+    }
+
+    //Building NWAs
+
+    /**
+     *
+     * @brief constructs the NWA resulting from the union of the given NWAs 
+     *
+     * @param - first: the NWA to union with 'second'
+     * @param - second: the NWA to union with 'first'
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::unionNWA( NWARefPtr first, NWARefPtr second )
+    {
+      //TODO: write this!
+    }
+
+    /**
+     *
+     * @brief constructs the NWA which is the intersection of the given NWAs
+     *
+     * @param - first: the NWA to intersect with 'second'
+     * @param - second: the NWA to intersect with 'first'
+     *	
+     */
+    template <typename Client>
+    void NWA<Client>::intersect( NWARefPtr first, NWARefPtr second ) 
+    {
+      //TODO: does this handle epsilons properly?
+      std::set<StatePair> visitedPairs; // All the pairs of states we have ever encountered.
+      std::deque<StatePair> worklistPairs; // Pairs of states yet to be processed
+      typedef std::map<StatePair, Key> PairStMap;
+      PairStMap pairToStMap; // The corresponding state in the product 
+                             // for all intersectable pairs encountered
+
+      //Start the worklist with all possible initial states of the intersection NWA.
+      //NOTE: Currently this should be just one state (the product of the single initial states of each machine).
+      for( stateIterator fit = first->beginInitialStates(); fit != first->endInitialStates(); fit++ ) {
+        for( stateIterator sit = second->beginInitialStates(); sit != second->endInitialStates(); sit++ ) {
+          St newSt;
+          StatePair sp((*fit), (*sit));
+          visitedPairs.insert( sp );
+          ClientInfoRefPtr resCI;
+          if( nodeIntersect(first, *fit, second, *sit, newSt ) ) {
+            intersectClientInfo( first, *fit, second, *sit, newSt, resCI);   //Intersect initial client info.
+            addInitialState( newSt ); 
+            //an initial state could also be a final state.
+            if(first->isFinalState(*fit) && second->isFinalState(*sit))
+                addFinalState( newSt );
+            worklistPairs.push_back( sp );
+            pairToStMap[sp] = newSt;
+          }  
+        }      
+      }
+
+      while(!worklistPairs.empty() ) 
+      {
+        StatePair currpair = worklistPairs.front();
+        worklistPairs.pop_front();
+
+        //Process outgoing call transitions
+        Calls firstCalls = first->trans->getTransCall(currpair.first);
+        Calls secondCalls = second->trans->getTransCall(currpair.second);
+        for(Calls::const_iterator fit = firstCalls.begin(); fit != firstCalls.end(); fit++) {
+          Sym firstSym = Trans::getCallSym(*fit);
+          St firstEntry = Trans::getEntry(*fit);
+          for(Calls::const_iterator sit = secondCalls.begin(); sit != secondCalls.end(); sit++) {
+            Sym secondSym = Trans::getCallSym(*sit);
+            // Are the symbols intersectable
+            Sym resSym;
+            if( !edgeIntersect( first, firstSym, second, secondSym, resSym) ) 
+              continue; // Symbols not intersectable, do nothing
+
+            St secondEntry = Trans::getEntry(*sit);
+            StatePair entryPair(firstEntry, secondEntry);
+            
+            // If we have already considered tgtPair and found them to be nonintersectable, continue 
+            if( visitedPairs.count(entryPair) != 0 && pairToStMap.count(entryPair)==0)
+              continue;
+            visitedPairs.insert(entryPair);
+
+            St resSt;
+            ClientInfoRefPtr resCI;
+            // Have we seen entryPair before?
+            if(pairToStMap.count(entryPair)==0) { 
+              //We have not seen this pair before
+              // Are the entry nodes intersectable?
+              if(!nodeIntersect( first, firstEntry, second, secondEntry, resSt )) 
+                continue;
+              // We have a new state in resSt!
+              if(first->isFinalState(firstEntry) && second->isFinalState(secondEntry))
+                addFinalState(resSt);
+              else
+                addState(resSt);
+              pairToStMap[entryPair] = resSt;
+              worklistPairs.push_back(entryPair);
+            } 
+            else 
+            { 
+              // we have already seen this pair before
+              resSt = pairToStMap[entryPair];
+            }
+            
+            intersectClientInfoCall( first, Trans::getCallSite(*fit), Trans::getEntry(*fit),
+                                     second, Trans::getCallSite(*sit), Trans::getEntry(*sit),
+                                     resSym, resSt, resCI);   //Intersect Call Trans client info.
+            addCallTrans(pairToStMap[currpair], resSym, resSt);
+          }
+        }
+
+        // Process outgoing internal transitions
+        Internals firstInternals = first->trans->getTransFrom(currpair.first);
+        Internals secondInternals = second->trans->getTransFrom(currpair.second);
+        for(Internals::const_iterator fit = firstInternals.begin(); fit != firstInternals.end(); fit++) {
+          Sym firstSym = Trans::getInternalSym(*fit);
+          St firstTgt = Trans::getTarget(*fit);
+          for(Internals::const_iterator sit = secondInternals.begin(); sit != secondInternals.end(); sit++) {
+            Sym secondSym = Trans::getInternalSym(*sit);
+            // Are the symbols intersectable
+            Sym resSym;
+            if( !edgeIntersect( first, firstSym, second, secondSym, resSym) ) 
+              continue; // Symbols not intersectable, do nothing
+
+            St secondTgt = Trans::getTarget(*sit);
+            StatePair tgtPair(firstTgt, secondTgt);
+
+            // If we have already considered tgtPair and found its elements to be nonintersectable, continue 
+            if( visitedPairs.count(tgtPair) != 0 && pairToStMap.count(tgtPair)==0)
+              continue;
+            visitedPairs.insert(tgtPair);
+
+            St resSt;
+            ClientInfoRefPtr resCI;
+            // Have we seen tgtPair before?
+            if(pairToStMap.count(tgtPair)==0) { 
+              //We have not seen this pair before
+              // Are the tgt nodes intersectable?
+              if(!nodeIntersect( first, firstTgt, second, secondTgt, resSt )) 
+                continue;
+              // We have a new state in resSt!
+              if(first->isFinalState(firstTgt) && second->isFinalState(secondTgt))
+                addFinalState(resSt);
+              else
+                addState(resSt);
+              pairToStMap[tgtPair] = resSt;
+              worklistPairs.push_back(tgtPair);
+            } 
+            else 
+            { 
+              // we have already seen this pair before
+              resSt = pairToStMap[tgtPair];
+            }
+
+            intersectClientInfoInternal( first, Trans::getSource(*fit), Trans::getTarget(*fit),
+                                          second, Trans::getSource(*sit), Trans::getTarget(*sit),
+                                          resSym, resSt, resCI );   //Intersect Internal Trans client info.
+            addInternalTrans(pairToStMap[currpair], resSym, resSt);
+          }
+        }
+        
+        // Process outgoing return transitions where currpair.first and currpair.second are
+        // both exit components of the respective return transitions
+        Returns firstReturns = first->trans->getTransExit(currpair.first);
+        Returns secondReturns = second->trans->getTransExit(currpair.second);
+        for(Returns::const_iterator fit = firstReturns.begin(); fit != firstReturns.end(); fit++) {
+          St firstCall = Trans::getCallSite(*fit);
+          Sym firstSym = Trans::getReturnSym(*fit);
+          St firstRet = Trans::getReturnSite(*fit);
+          for(Returns::const_iterator sit = secondReturns.begin(); sit != secondReturns.end(); sit++) {
+            Sym secondSym = Trans::getReturnSym(*sit);
+            // Are the symbols intersectable
+            Sym resSym;
+            if( !edgeIntersect( first, firstSym, second, secondSym, resSym ) ) 
+              continue; // Symbols not intersectable, do nothing
+
+            // Check intersectability and visited status of the respective call components
+            St secondCall = Trans::getCallSite(*sit);
+            StatePair callPair(firstCall, secondCall);  // Call components of the respective return transitions
+            // Proceed only if the pair of call components has already been visited 
+            if(visitedPairs.count(callPair) == 0)
+              continue;
+            // If we have already considered callPair and found its elements to be nonintersectable, continue 
+            if( visitedPairs.count(callPair) != 0 && pairToStMap.count(callPair)==0)
+              continue;
+            St callSt = pairToStMap[callPair];
+
+            // Check intersectability and visited status of the respective return components
+            St secondRet = Trans::getReturnSite(*sit);
+            StatePair retPair(firstRet, secondRet);
+            // If we have already considered retPair and found its elements to be nonintersectable, continue 
+            if( visitedPairs.count(retPair) != 0 && pairToStMap.count(retPair)==0)
+              continue;
+            visitedPairs.insert(retPair);
+
+            St retSt;
+            ClientInfoRefPtr resCI;
+            // Are the return components intersectable?
+            if(pairToStMap.count(retPair)==0) { // Don't know yet
+              if(!nodeIntersect( first, firstRet, second, secondRet, retSt )) 
+                continue;
+              // We have found a new state in retSt!
+              if(first->isFinalState(firstRet) && second->isFinalState(secondRet))
+                addFinalState(retSt);
+              else
+                addState(retSt);
+              pairToStMap[retPair] = retSt;
+              worklistPairs.push_back(retPair);
+            } 
+            else 
+            {  // We have already seen retPair before and its components are intersectable
+              retSt = pairToStMap[retPair];
+            }
+            
+            intersectClientInfoReturn( first, Trans::getExit(*fit), Trans::getCallSite(*fit), Trans::getReturnSite(*fit),
+                                        second, Trans::getExit(*sit), Trans::getCallSite(*sit), Trans::getReturnSite(*sit),
+                                        resSym, retSt, resCI );   //Intersect Return Trans client info.
+            addReturnTrans(pairToStMap[currpair], callSt, resSym, retSt);
+          }
+        }
+
+        // Process outgoing return transitions where currpair.first and currpair.second are
+        // both call components of the respective return transitions 
+        firstReturns = first->trans->getTransPred(currpair.first);
+        secondReturns = second->trans->getTransPred(currpair.second);
+        for(Returns::const_iterator fit = firstReturns.begin(); fit != firstReturns.end(); fit++) {
+          St firstExit = Trans::getExit(*fit);
+          Sym firstSym = Trans::getReturnSym(*fit);
+          St firstRet = Trans::getReturnSite(*fit);
+          for(Returns::const_iterator sit = secondReturns.begin(); sit != secondReturns.end(); sit++) {
+            Sym secondSym = Trans::getReturnSym(*sit);
+            // Are the symbols intersectable
+            Sym resSym;
+            if( !edgeIntersect( first, firstSym, second, secondSym, resSym ) ) 
+              continue; // Symbols not intersectable, do nothing
+
+            // Check intersectability and visited status of the respective exit components
+            St secondExit = Trans::getExit(*sit);
+            StatePair exitPair(firstExit, secondExit);  // Exit components of the respective return transitions
+            // Proceed only if the pair of exit components has already been visited 
+            if(visitedPairs.count(exitPair) == 0)
+              continue;
+            // If we have already considered exitPair and found its elements to be nonintersectable, continue 
+            if( visitedPairs.count(exitPair) != 0 && pairToStMap.count(exitPair)==0)
+              continue;
+            St exitSt = pairToStMap[exitPair];
+
+            // Check intersectability and visited status of the respective return components
+            St secondRet = Trans::getReturnSite(*sit);
+            StatePair retPair(firstRet, secondRet);
+            // If we have already considered retPair and found its elements to be nonintersectable, continue 
+            if( visitedPairs.count(retPair) != 0 && pairToStMap.count(retPair)==0)
+              continue;
+            visitedPairs.insert(retPair);
+
+            St retSt;
+            ClientInfoRefPtr resCI;
+            //  Are the return components intersectable?
+            if(pairToStMap.count(retPair)==0) { //Don't know yet
+              if(!nodeIntersect( first, firstRet, second, secondRet, retSt )) 
+                continue;
+              // We have a new state in retSt!
+              if(first->isFinalState(firstRet) && second->isFinalState(secondRet))
+                addFinalState(retSt);
+              else
+                addState(retSt);
+              pairToStMap[retPair] = retSt;
+              worklistPairs.push_back(retPair);
+            } 
+            else 
+            { //  We have already seen retPair before and its components are intersectable
+              retSt = pairToStMap[retPair];
+            }
+            
+            intersectClientInfoReturn( first, Trans::getExit(*fit), Trans::getCallSite(*fit), Trans::getReturnSite(*fit),
+                                        second, Trans::getExit(*sit), Trans::getCallSite(*sit), Trans::getReturnSite(*sit),
+                                        resSym, retSt, resCI );   //Intersect Return Trans client info.
+            addReturnTrans(exitSt, pairToStMap[currpair], resSym, retSt);
+          }
+        }
+
+      }
+    }
+
+    /**
+     *
+     * @brief constructs the NWA resulting from the concatenation of the given NWAs
+     *
+     * @param - first: the NWA to which 'second' should be concatenated
+     * @param - second: the NWA to concatenate onto the end of 'first'
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::concat( NWARefPtr first, NWARefPtr second )
+    {
+      //TODO: write this!
+    }
+
+    /**
+     * @brief constructs the NWA which is the reverse of the given NWA
+     *
+     * @param - first: the NWA to reverse
+     * 
+     */
+    template <typename Client>
+    void NWA<Client>::reverse( NWARefPtr first )
+    {
+      //TODO: write this!
+    }
+
+    /**
+     *
+     * @brief constructs the NWA resulting from performing Kleene-* on the given NWA
+     *
+     * @param - first: the NWA to perform the Kleene-* of
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::star( NWARefPtr first )
+    {
+      //TODO: write this!
+    }
+
+    /**
+     * 
+     * @brief constructs the NWA that is the complement of the given NWA
+     *
+     * @param - first: the NWA to perform the complement of
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::complement( NWARefPtr first )
+    {
+      //Start with a deterministic copy of the given NWA.
+      if(! first->isDeterministic() )
+      {
+        determinize( first );
+      }
+      else
+      {
+        addAllStates(first->states);
+        addAllInitialStates(first->states);
+        addAllFinalStates(first->states);
+        
+        addAllSymbols(first->symbols);
+
+        trans->addAllTrans(*(first->trans));
+      }
+      
+      //FinalStates = AllStates - FinalStates
+      std::set<St> oldFinalStates;
+      oldFinalStates.insert(beginFinalStates(),endFinalStates());
+
+      for( stateIterator sit = beginStates(); sit != endStates(); sit++ )
+      {
+        if( oldFinalStates.count(*sit) == 0 )
+          addFinalState(*sit);
+      }
+    }
+
+    /**
+     *
+     * @brief constructs a deterministic NWA that is equivalent to the given NWA.
+     *
+     * @param - nondet: the NWA to determinize
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::determinize( NWARefPtr nondet )
+    {
+      //If the NWA is already deterministic, we don't need to do any work.
+      if( nondet->isDeterministic() )
+      {
+        addAllStates(nondet->states);
+        addAllSymbols(nondet->symbols);
+        trans->addAllTrans(*(nondet->trans));
+
+        return;
+      }
+
+      StateMap stMap; //Keeps track of the state associated with each set of states.
+
+      //The deterministic NWAs initial state is 
+      //{(q,q) | q is an element of Q in nondeterministic NWA }
+      StateSet statesSet;
+      StatePairSet initialStateSet;
+      for( stateIterator sit = nondet->beginStates(); sit != nondet->endStates(); sit++ )
+      {
+        initialStateSet.insert( StatePair(*sit,*sit) );
+        statesSet.insert( wali::getKey(*sit,*sit) );
+      }
+
+      St initialState = wali::getKey(statesSet);
+
+      //Add the initial state to the deterministic NWA.
+      addInitialState(initialState);
+
+      //Update stateSet to state mapping.
+      stMap.insert(std::pair<StatePairSet,St>(initialStateSet,initialState));
+
+      //Perform closure steps.
+      det(nondet,stMap,initialStateSet,std::stack<StatePairSet>());
+
+      //A state is final if it contains a pair of the form (q,q') with q an element of 
+      //Q_in of the the nondeterministic NWA and q' an element of Q_f of the
+      //nondeterminisic NWA.
+      for( StateMap::iterator it = stMap.begin(); it != stMap.end(); it++ )   
+      { //Check each state of the NWA for final states.
+        for( StatePairSet::const_iterator sit = (it->first).begin(); 
+                                          sit != (it->first).end(); sit++ )  
+        {  //Check each pair composing the state.
+          if( nondet->isInitialState(sit->first) && nondet->isFinalState(sit->second) ) 
+          { //If the elements of the pair have the proper relationship in the nondeterministic NWA,
+            //this state is a final state.
+            addFinalState(it->second);
+            break;  //Move on to checking the next state.
+          }
+        }
+      }
+    }
+
+    /**
+     *
+     * @brief tests whether this NWA is deterministic 
+     *
+     * @return true if this NWA is deterministic, false otherwise
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::isDeterministic( )
+    {
+      //An NWA is not deterministic if there is not exactly one initial state
+      if( sizeInitialStates() != 1) 
+        return false;
+
+      //An NWA is not deterministic if there are epsilon transitions 
+      //or if there are multiple transitions of some
+      //type that are identical except for the to state.
+      for( symbolIterator it = symbols.beginSymbols(); it != symbols.endSymbols(); it++ )
+      {
+        for( stateIterator sit = beginStates(); sit != endStates(); sit++ )
+        {
+          //Check call transitions.
+          int count = 0;
+          bool wild = false;
+          for( callIterator cit = trans->beginCall(); cit != trans->endCall(); cit++ )
+          {
+            //Epsilon transition 
+            if( SymbolSet::isEpsilon(Trans::getCallSym(*cit)) ) 
+              return false;
+            //Wild symbol TODO: fix this!
+            if( SymbolSet::isWild(Trans::getCallSym(*cit)) )
+              wild = true;  
+
+            //Keep a count of multiple transitions with the same from
+            //state and symbol(that is not epsilon).
+            else if( (Trans::getCallSite(*cit) == (*sit)) && (Trans::getCallSym(*cit) == *it) )
+              count++;
+          }
+          if( count > 1 )
+            return false;
+          else if( wild && count > 0 )
+            return false;
+
+          //Check internal transitions.
+          count = 0;
+          wild = false;
+          for( internalIterator iit = trans->beginInternal(); iit != trans->endInternal(); iit++ )
+          {
+            //Epsilon transition 
+            if( SymbolSet::isEpsilon(Trans::getInternalSym(*iit)) )
+              return false;
+            //Wild symbol TODO: fix this!
+            if( SymbolSet::isWild(Trans::getInternalSym(*iit)) )
+              wild = true;  
+
+            //Keep a count of multiple transitions with the same from
+            //state and symbol(that is not epsilon).
+            else if( (Trans::getSource(*iit) == *sit) && (Trans::getInternalSym(*iit) == *it) )
+              count++;
+          }
+          if( count > 1 )
+            return false;
+          else if( wild && count > 0 )
+            return false;  
+
+          for( stateIterator pit = beginStates(); pit != endStates(); pit++ )
+          {
+            //Check return transitions.
+            count = 0;
+            wild = false;
+            for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+            {
+              //Epsilon transition to a state other than the error state.
+              if( SymbolSet::isEpsilon(Trans::getReturnSym(*rit)) )
+                return false;
+              //Wild symbol TODO: fix this!
+              if( SymbolSet::isWild(Trans::getReturnSym(*rit)) )
+                wild = true; 
+
+              //Keep a count of multiple transitions with the same from
+              //state and symbol(that is not epsilon).
+              else if( (Trans::getExit(*rit) == *sit) &&
+                (Trans::getCallSite(*rit) == *pit) &&
+                (Trans::getReturnSym(*rit) == *it) )
+                count++;
+            }
+            if( count > 1 )
+              return false;
+            else if( wild && count > 0 )
+              return false;  
+          }
+        }
+      }
+
+      return true;
+    }
+
+    /**
+     * 
+     * @brief intersects client information 
+     *
+     * @param - first: the NWA in which to look up the client information for 'name1'
+     * @param - name1: the first state whose client information to intersect
+     * @param - second: the NWA in which to look up the client information for 'name2'
+     * @param - name2: the second state whose client information to intersect
+     * @param - resSt: the state which will receive the computed client information
+     * @param - result: the client information resulting from the intersection of
+     *                  'name1' and 'name2'
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::intersectClientInfo( NWARefPtr first, St name1, 
+                                      NWARefPtr second, St name2, 
+                                      St resSt, ClientInfoRefPtr result )
+    {
+      //Note: When overriding this method your metric must combine any client information associated
+      // with the states associated with the given names and set the client information of result
+      // to that value.
+    }
+
+    /**
+     * 
+     * @brief intersects client information 
+     *
+     * @param - first: the NWA in which to look up the client information for 
+     *                'call1' and 'entry1'
+     * @param - call1: the call site associated with the first entry whose client 
+     *                  information to intersect
+     * @param - entry1: the first entry point whose client information to intersect
+     * @param - second: the NWA in which to look up the client information for
+     *                  'call2' and 'entry2'
+     * @param - call2: the call site associated with the second entry whose client
+     *                  information to intersect
+     * @param - entry2: the second entry point whose client information to intersect
+     * @param - resSym: the symbol associated with the transition that is being created
+     * @param - resSt: the state which will receive the computed client information
+     * @param - result: the client information resulting from the intersection of 
+     *                  'entry1' and 'entry2'
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::intersectClientInfoCall( NWARefPtr first, St call1, St entry1, 
+                                          NWARefPtr second, St call2, St entry2, 
+                                          Sym resSym, St resSt, 
+                                          ClientInfoRefPtr result )
+    {
+      //Note: When overriding this method your metric must combine any client information associated
+      // with the target states of the two transitions and set the client information of result
+      // to that value.
+    }
+
+    /**
+     * 
+     * @brief intersects client information 
+     *
+     * @param - first: the NWA in which to look up the client information for 
+     *                'src1' and 'tgt1'
+     * @param - src1: the source associated with the first target whose client 
+     *                  information to intersect
+     * @param - tgt1: the first target whose client information to intersect
+     * @param - second: the NWA in which to look up the client information for
+     *                'src2' and 'tgt2'
+     * @param - src2: the source associated with the second target whose client
+     *                  information to intersect
+     * @param - tgt2: the second target whose client information to intersect
+     * @param - resSym: the symbol associated with the transition that is being created
+     * @param - resSt: the state which will receive the computed client information
+     * @param - result: the client information resulting from the intersection of
+     *                'tgt1' and 'tgt2'
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::intersectClientInfoInternal( NWARefPtr first, St src1, St tgt1, 
+                                              NWARefPtr second, St src2, St tgt2, 
+                                              Sym resSym, St resSt, 
+                                              ClientInfoRefPtr result )
+    {
+      //Note: When overriding this method your metric must combine any client information associated
+      // with the target states of the two transitions and set the client information of result
+      // to that value.
+    }
+
+    /**
+     * 
+     * @brief intersects client information 
+     *
+     * @param - first: the NWA in which to look up the client information for 
+     *                'exit1', 'call1', and 'ret1'
+     * @param - exit1: the exit point associated with the first return site whose client 
+     *                  information to intersect
+     * @param - call1: the call site associated with the first return site whose client
+     *                  information to intersect
+     * @param - ret1: the first return site whose client information to intersect
+     * @param - second: the NWA in which to look up the client information for
+     *                'exit2', 'call2', and 'ret2'
+     * @param - exit2: the exit point associated with the second return site whose client
+     *                  information to intersect
+     * @param - call2: the call site associated with the second return site whose client
+     *                  information to intersect
+     * @param - ret2: the second return site whose client information to intersect
+     * @param - resSym: the symbol associated with the transition that is being created
+     * @param - resSt: the state which will receive the computed client information
+     * @param - result: the client information resulting from the intersection of
+     *                'ret1' and 'ret2'
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::intersectClientInfoReturn( NWARefPtr first, St exit1, St call1, St ret1,
+                                            NWARefPtr second, St exit2, St call2, St ret2,
+                                            Sym resSym, St resSt,
+                                            ClientInfoRefPtr result )
+    {
+      //Note: When overriding this method your metric must combine any client information associated
+      // with the target states of the two transitions and set the client information of result
+      // to that value.
+    }
+
+    /**
+     * 
+     * @brief intersect states
+     * 
+     * @param - first: the NWA in which to look up information about 'state1'
+     * @param - state1: the first state to intersect
+     * @param - second: the NWA in which to look up information about 'state2'
+     * @param - state2: the second state to intersect
+     * @param - resSt: the state that results from performing the intersection
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::nodeIntersect( NWARefPtr first, St state1, NWARefPtr second, St state2, St & resSt ) 
+    {
+      //Note: When overriding this method your metric must determine whether the
+      //      given states are compatible and set resSt to the appropriate state.
+
+      //Q: Should there be more to this?
+      resSt = getKey(state1,state2);
+
+      return true;
+    }
+
+    /**
+     * 
+     * @brief intersect symbols
+     * 
+     * @param - first: the NWA in which to look up information about 'sym1'
+     * @param - sym1: the first symbol to intersect
+     * @param - second: the NWA in which to look up information about 'sym2'
+     * @param - sym2: the second symbol to intersect
+     * @param - resSym: the symbol that results from performing the intersection
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::edgeIntersect( NWARefPtr first, Sym sym1, NWARefPtr second, Sym sym2, Sym & resSym )
+    {
+      //Note: When overriding this method your metric must determine whether the
+      //      given symbols are compatible and set result to the appropriate symbol.
+
+      if( sym1 == sym2 ) //This rule still applies for epsilons, i.e. epsilons only match epsilons
+      {
+        resSym = sym1;
+        return true;
+      }
+      else
+        return false;
+    }
+
+    //Using NWAs
+
+    /**
+     * 
+     * @brief constructs the WPDS which is the result of the explicit NWA plus WPDS 
+     *        construction from Advanced Querying for Property Checking
+     *
+     * @param - base: the WPDS that forms the basis for the constructed WPDS
+     * @return the WPDS which can be used to perform property checking using PDS 
+     *          reachability
+     * 
+     */
+    template <typename Client>
+    wpds::WPDS NWA<Client>::plusWPDS( const wpds::WPDS & base )
+    {
+      //TODO: write this!
+    }
+
+    /**
+     *
+     * @brief constructs the NWA equivalent to the given PDS
+     *
+     * This method constructs the NWA that is equivalent to the given PDS.
+     *
+     * @param - pds: the pds to convert 
+     * @return the NWA equivalent to the given PDS
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::PDStoNWA( const wpds::WPDS & pds )
+    {
+      //TODO: write this!
+    }
+
+    /**
+     *  
+     * @brief returns the default program control location for PDSs
+     *
+     * @return the default program control location for PDSs
+     *
+     */  
+    static wali::Key getProgramControlLocation( )
+    {
+      return getKey("program");
+    }
+
+    /**
+     *  
+     * @brief returns the program control location corresponding to the given states
+     *
+     * @param - exit: the exit point corresponding to this control location
+     * @param - callSite: the call site corresponding to this control location
+     * @return the program control location corresponding to the given states
+     *
+     */
+    static wali::Key getControlLocation( Key exit, Key callSite )
+    {
+      return getKey(exit,callSite);
+    }
+
+    /**
+     *
+     * @brief constructs the PDS equivalent to this NWA
+     *
+     * Note: This version keeps returns on the stack.
+     *
+     * @param - wg: the functions to use in generating weights
+     * @return the PDS equivalent to this NWA
+     *
+     */ 
+    template <typename Client>
+    wpds::WPDS NWA<Client>::NWAtoPDSreturns( WeightGen & wg ) const
+    {
+      wpds::WPDS result = wpds::WPDS();
+
+      Key program = getProgramControlLocation();  //= wali::getKey("program"); 
+
+      wali::sem_elem_t wgt;
+
+      //Internal Transitions
+      for( internalIterator iit = trans->beginInternal(); iit != trans->endInternal(); iit++ )
+      {      
+        //(q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
+        //where the weight w depends on sigma
+
+        //TODO: fix this with respect to wild labels
+        if( SymbolSet::isWild(Trans::getInternalSym(*iit)) )
+          wgt = wg.getWildWeight(Trans::getSource(*iit),Trans::getTarget(*iit));
+        else
+          wgt = wg.getWeight(Trans::getSource(*iit),
+                              Trans::getInternalSym(*iit),
+                              WeightGen::INTRA,
+                              Trans::getTarget(*iit));
+
+        result.add_rule(program,                                //from_state (p)
+                        Trans::getSource(*iit),                 //from_stack (q)
+                        program,                                //to_state (p)
+                        Trans::getTarget(*iit),                 //to_stack1 (q')
+                        wgt);                                   //weight      
+      }
+
+      //Call Transitions 
+      for( callIterator cit = trans->beginCall(); cit != trans->endCall(); cit++ )
+      {
+        for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+          if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
+          {
+            //(q_c,sigma,q_e) in delta_c and (q_x,q_c,*,q_r) in delta_r goes to
+            // <p,q_c> -w-> <p,q_e q_r> in delta_2 
+            // and the weight w depends on sigma
+
+            //TODO: fix this with respect to wild labels
+            if( SymbolSet::isWild(Trans::getCallSym(*cit)) )
+              wgt = wg.getWildWeight(Trans::getCallSite(*cit),Trans::getEntry(*cit));
+            else
+              wgt = wg.getWeight(Trans::getCallSite(*cit), 
+                                  Trans::getCallSym(*cit),
+                                  WeightGen::CALL_TO_ENTRY,  
+                                  Trans::getEntry(*cit));  
+
+            result.add_rule(program,                      //from_state (p)
+                            Trans::getCallSite(*cit),     //from_stack (q_c)
+                            program,                      //to_state (p)
+                            Trans::getEntry(*cit),        //to_stack1 (q_e)
+                            Trans::getReturnSite(*rit),   //to_stack2 (q_r)
+                            wgt);                         //weight      
+          }
+      }
+
+      //Return Transitions
+      for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+      {
+        //(q_x,q_c,*,q_r) in delta_r goes to
+        // <p,q_x> -w1-> <p_q_x,epsilon> in delta_0
+        // and <p_q_x,q_r> -w2-> <p,q_r> in delta_1
+        // where p_q_x = (q_x,q_c)
+        // w1 depends is one, and w2 depends on sigma
+
+        wgt = wg.getExitWeight( Trans::getExit(*rit) );  //w1
+
+        Key rstate = getControlLocation(Trans::getExit(*rit),Trans::getCallSite(*rit));    //p_q_x
+
+        result.add_rule(program,                    //from_state (p)
+                        Trans::getExit(*rit),       //from_stack (q_x)
+                        rstate,                     //to_state (p_q_x == (q_x,q_c))
+                        wgt);                       //weight (w1) 
+
+        //TODO: fix this with respect to wild labels
+        if( SymbolSet::isWild(Trans::getReturnSym(*rit)) )
+          wgt = wg.getWildWeight(Trans::getExit(*rit),Trans::getReturnSite(*rit));  //w2
+        else
+          wgt = wg.getWeight(Trans::getExit(*rit),
+                              Trans::getReturnSym(*rit),
+                              WeightGen::EXIT_TO_RET,
+                              Trans::getReturnSite(*rit));            //w2
+
+        result.add_rule(rstate,                         //from_state (p_q_x == (q_x,q_c))
+                        Trans::getReturnSite(*rit),     //from_stack (q_r)
+                        program,                        //to_state (p)
+                        Trans::getReturnSite(*rit),     //to_stack (q_r)
+                        wgt);                           //weight (w2)    
+      }  
+
+      return result;
+    }
+
+    /**
+     *
+     * @brief constructs the backwards PDS equivalent to this NWA
+     *
+     * Note: This version keeps returns on the stack.
+     *
+     * @param - wg: the functions to use in generating weights
+     * @return the backwards PDS equivalent to this NWA
+     *
+     */
+    template <typename Client>
+    wpds::WPDS NWA<Client>::NWAtoBackwardsPDSreturns( WeightGen & wg ) const
+    {
+      wpds::WPDS result = wpds::WPDS();
+
+      Key program = getProgramControlLocation();  //= wali::getKey("program"); 
+
+      wali::sem_elem_t wgt;
+
+      //Internal Transitions
+      for( internalIterator iit = trans->beginInternal(); iit != trans->endInternal(); iit++ )
+      {      
+        //(q,sigma,q') in delta_i goes to <p,q'> -w-> <p,q> in delta_1
+        //where the weight w depends on sigma
+
+        //TODO: fix this with respect to wild labels
+        if( SymbolSet::isWild(Trans::getInternalSym(*iit)) )
+          wgt = wg.getWildWeight(Trans::getSource(*iit),Trans::getTarget(*iit));
+        else
+          wgt = wg.getWeight(Trans::getSource(*iit),
+                              Trans::getInternalSym(*iit),
+                              WeightGen::INTRA,
+                              Trans::getTarget(*iit));
+
+        result.add_rule(program,                                //from_state (p)
+                        Trans::getTarget(*iit),                 //from_stack (q')
+                        program,                                //to_state (p)
+                        Trans::getSource(*iit),                 //to_stack1 (q)
+                        wgt);                                   //weight      
+      }
+
+      //Call Transitions 
+      for( callIterator cit = trans->beginCall(); cit != trans->endCall(); cit++ )
+      {
+        for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+          if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
+          {
+            //(q_c,sigma,q_e) in delta_c and (q_x,q_c,*,q_r) in delta_r goes to
+            // <p,q_e> -w1-> <p_q_e,epsilon> in delta_0
+            // and <p_q_e,q_c> -w2-> <p,q_c> in delta_1
+            // where p_q_e = (q_e,q_r)
+            // w1 depends is one, and w2 depends on sigma
+
+            wgt = wg.getEntryWeight( Trans::getEntry(*cit) );  //w1
+
+            Key cstate = getControlLocation(Trans::getEntry(*cit),Trans::getReturnSite(*rit));    //p_q_e
+
+            result.add_rule(program,                    //from_state (p)
+                            Trans::getEntry(*cit),      //from_stack (q_e)
+                            cstate,                     //to_state (p_q_e == (q_e,q_r))
+                            wgt);                       //weight 
+
+            //TODO: fix this with respect to wild labels
+            if( SymbolSet::isWild(Trans::getCallSym(*cit)) )
+              wgt = wg.getWildWeight(Trans::getCallSite(*cit),Trans::getEntry(*cit));
+            else
+              wgt = wg.getWeight(Trans::getCallSite(*cit), 
+                                  Trans::getCallSym(*cit),
+                                  WeightGen::CALL_TO_ENTRY,  
+                                  Trans::getEntry(*cit));  
+
+            result.add_rule(cstate,                         //from_state (p_q_e == (q_e,q_r))
+                            Trans::getCallSite(*cit),       //from_stack (q_c)
+                            program,                        //to_state (p)
+                            Trans::getCallSite(*cit),       //to_stack (q_c)
+                            wgt);                           //weight    
+          }  
+      }
+
+      //Return Transitions
+      for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+      {
+        //(q_x,q_c,*,q_r) in delta_r goes to
+        // <p,q_r> -w-> <p,q_x q_c> in delta_2 
+        // and the weight w depends on sigma
+
+        //TODO: fix this with respect to wild labels
+        if( SymbolSet::isWild(Trans::getReturnSym(*rit)) )
+          wgt = wg.getWildWeight(Trans::getExit(*rit),Trans::getReturnSite(*rit));
+        else
+          wgt = wg.getWeight(Trans::getExit(*rit),
+                              Trans::getReturnSym(*rit),
+                              WeightGen::EXIT_TO_RET,
+                              Trans::getReturnSite(*rit));
+
+        result.add_rule(program,                      //from_state (p)
+                        Trans::getReturnSite(*rit),   //from_stack (q_r)
+                        program,                      //to_state (p)
+                        Trans::getExit(*rit),         //to_stack1 (q_x)
+                        Trans::getCallSite(*rit),     //to_stack2 (q_c)
+                        wgt);                         //weight      
+      }
+
+      return result;
+    }
+
+    /**
+     *
+     * @brief constructs the PDS equivalent to this NWA
+     *
+     * Note: This version keeps calls on the stack.
+     *
+     * @param - wg: the functions to use in generating weights
+     * @return the PDS equivalent to this NWA
+     *
+     */ 
+    template <typename Client>
+    wpds::WPDS NWA<Client>::NWAtoPDScalls( WeightGen & wg ) const
+    {
+      wpds::WPDS result = wpds::WPDS();
+
+      Key program = getProgramControlLocation();  // = wali::getKey("program"); 
+
+      wali::sem_elem_t wgt;
+
+      //Internal Transitions
+      for( internalIterator iit = trans->beginInternal(); iit != trans->endInternal(); iit++ )
+      {  
+        // (q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
+        // where the weight w depends on sigma
+
+        //TODO: fix this with respect to wild labels
+        if( SymbolSet::isWild(Trans::getInternalSym(*iit)) )
+          wgt = wg.getWildWeight(Trans::getSource(*iit),Trans::getTarget(*iit));
+        else
+          wgt = wg.getWeight(Trans::getSource(*iit),
+                              Trans::getInternalSym(*iit),
+                              WeightGen::INTRA,
+                              Trans::getTarget(*iit) );
+
+          result.add_rule(program,                                //from_state (p)
+                          Trans::getSource(*iit),                 //from_stack (q)
+                          program,                                //to_state (p)
+                          Trans::getTarget(*iit),                 //to_stack1 (q')
+                          wgt);                                   //weight      
+      }
+
+      //Call Transitions
+      for( callIterator cit = trans->beginCall(); cit != trans->endCall(); cit++ )
+      {           
+        // (q_c,sigma,q_e) in delta_c goes to
+        // <p,q_c> -w-> <p,q_e q_c> in delta_2 
+        // and the weight w depends on sigma
+
+        //TODO: fix this with respect to wild labels
+        if( SymbolSet::isWild(Trans::getCallSym(*cit)) )
+          wgt = wg.getWildWeight(Trans::getCallSite(*cit),Trans::getEntry(*cit));
+        else
+        wgt = wg.getWeight(Trans::getCallSite(*cit),
+                            Trans::getCallSym(*cit),
+                            WeightGen::CALL_TO_ENTRY,
+                            Trans::getEntry(*cit) );
+
+        result.add_rule(program,                                //from_state (p)
+                        Trans::getCallSite(*cit),               //from_stack (q_c)
+                        program,                                //to_state (p)
+                        Trans::getEntry(*cit),                  //to_stack1 (q_e)
+                        Trans::getCallSite(*cit),               //to_stack2 (q_c)
+                        wgt);                                   //weight  
+      } 
+
+      //Return Transitions
+      for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+      {
+        // (q_x,q_c,sigma,q_r) in delta_r goes to 
+        // <p,q_x> -w1-> <p_q_x,epsilon> in delta_0
+        // and <p_q_x,q_c> -w2-> <p,q_r> in delta_1
+        // where p_q_x = (p,q_x), w1 depends on q_x, and w2 depends on sigma
+
+        wgt = wg.getExitWeight( Trans::getExit(*rit) );  //w1
+
+        //Note: if you change this, make sure you modify the code in NWPForest.createCA()
+        Key rstate = getControlLocation(program,Trans::getExit(*rit));  //p_q_x
+
+        result.add_rule(program,                              //from_state (p)
+                        Trans::getExit(*rit),                 //from_stack (q_x)
+                        rstate,                               //to_state (p_q_x == (p,q_x))
+                        wgt);                                 //weight (w1) 
+
+        //TODO: fix this with respect to wild labels
+        if( SymbolSet::isWild(Trans::getReturnSym(*rit)) )
+          wgt = wg.getWildWeight(Trans::getExit(*rit),Trans::getReturnSite(*rit)); //w2
+        else
+          wgt = wg.getWeight(Trans::getExit(*rit), 
+                              Trans::getReturnSym(*rit),
+                              WeightGen::EXIT_TO_RET,  
+                              Trans::getReturnSite(*rit));          //w2
+         
+          result.add_rule(rstate,                               //from_state (p_q_x == (p,q_x))
+                          Trans::getCallSite(*rit),             //from_stack (q_c)
+                          program,                              //to_state (p)
+                          Trans::getReturnSite(*rit),           //to_stack (q_r)
+                          wgt);                                 //weight (w2)    
+
+      }
+
+      return result;
+    }
+
+    /**
+     *
+     * @brief constructs the backwards PDS equivalent to this NWA
+     *
+     * Note: This version keeps calls on the stack.
+     *
+     * @param - wg: the functions to use in generating weights
+     * @return the backwards PDS equivalent to this NWA
+     *
+     */
+    template <typename Client>
+    wpds::WPDS NWA<Client>::NWAtoBackwardsPDScalls( WeightGen & wg ) const
+    {
+      wpds::WPDS result = wpds::WPDS();
+
+      Key program = getProgramControlLocation();  // = wali::getKey("program"); 
+
+      wali::sem_elem_t wgt;
+
+      //Internal Transitions
+      for( internalIterator iit = trans->beginInternal(); iit != trans->endInternal(); iit++ )
+      {  
+        // (q,sigma,q') in delta_i goes to <p,q'> -w-> <p,q> in delta_1
+        // where the weight w depends on sigma
+
+        //TODO: fix this with respect to wild labels
+        if( SymbolSet::isWild(Trans::getInternalSym(*iit)) )
+          wgt = wg.getWildWeight(Trans::getSource(*iit),Trans::getTarget(*iit));
+        else
+          wgt = wg.getWeight(Trans::getSource(*iit),
+                              Trans::getInternalSym(*iit),
+                              WeightGen::INTRA,
+                              Trans::getTarget(*iit) );
+
+          result.add_rule(program,                                //from_state (p)
+                          Trans::getTarget(*iit),                 //from_stack (q')
+                          program,                                //to_state (p)
+                          Trans::getSource(*iit),                 //to_stack1 (q)
+                          wgt);                                   //weight      
+      }
+
+      //Call Transitions
+      for( callIterator cit = trans->beginCall(); cit != trans->endCall(); cit++ )
+      {    
+        for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+          if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
+          {
+            // (q_c,sigma,q_e) in delta_c and (q_x,q_c,*,q_r) in delta_r goes to
+            // <p,q_e> -w1-> <p_q_e,epsilon> in delta_0
+            // and <p_q_e,q_r> -w2-> <p,q_c> in delta_1
+            // where p_q_e = (p,q_e), w1 depends on q_e, and w2 depends on sigma
+
+            wgt = wg.getEntryWeight( Trans::getEntry(*cit) );  //w1
+
+            Key cstate = getControlLocation(program,Trans::getEntry(*cit));  //p_q_e
+
+            result.add_rule(program,                                //from_state (p)
+                            Trans::getEntry(*cit),                  //from_stack (q_e)
+                            cstate,                                 //to_state (p_q_e == (p,q_e))
+                            wgt);                                   //weight (w1) 
+
+            //TODO: fix this with respect to wild labels
+            if( SymbolSet::isWild(Trans::getCallSym(*cit)) )
+              wgt = wg.getWildWeight(Trans::getCallSite(*cit),Trans::getEntry(*cit));   //w2
+            else
+              wgt = wg.getWeight(Trans::getCallSite(*cit),
+                                  Trans::getCallSym(*cit),
+                                  WeightGen::CALL_TO_ENTRY,
+                                  Trans::getEntry(*cit) );                  //w2
+
+             result.add_rule(cstate,                                //from_state (p_q_e == (p,q_e))
+                              Trans::getReturnSite(*rit),           //from_stack (q_r)
+                              program,                              //to_state (p)
+                              Trans::getCallSite(*cit),             //to_stack (q_c)
+                              wgt);                                 //weight (w2)    
+          }
+      } 
+
+      //Return Transitions
+      for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+      {
+        // (q_x,q_c,sigma,q_r) in delta_r goes to 
+        // <p,q_r> -w-> <p,q_x q_r> in delta_2 
+        // and the weight w depends on sigma
+
+        //TODO: fix this with respect to wild labels
+        if( SymbolSet::isWild(Trans::getReturnSym(*rit)) )
+          wgt = wg.getWildWeight(Trans::getExit(*rit),Trans::getReturnSite(*rit)); //w2
+        else
+          wgt = wg.getWeight(Trans::getExit(*rit), 
+                              Trans::getReturnSym(*rit),
+                              WeightGen::EXIT_TO_RET,  
+                              Trans::getReturnSite(*rit));          //w2
+         
+        result.add_rule(program,                                    //from_state (p)
+                            Trans::getReturnSite(*rit),             //from_stack (q_r)
+                            program,                                //to_state (p)
+                            Trans::getExit(*rit),                   //to_stack1 (q_x)
+                            Trans::getReturnSite(*rit),             //to_stack2 (q_r)
+                            wgt);                                   //weight  
+      }
+
+      return result;
+    }
+      
+    /**
+     *
+     * @brief tests whether the language accepted by this NWA is empty
+     *
+     * @return true if the language accepted by this NWA is empty
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::isEmpty( )
+    {
+      //An automaton with no initial states must accept only the empty language.
+      if( sizeInitialStates() == 0 )
+        return true;
+
+      //An automaton with no final states must accept only the empty language.
+      if( sizeFinalStates() == 0 )
+        return true;
+
+      //An automaton with no path from an initial state to a final state must accept only
+      //the empty language.
+      for( stateIterator it = beginInitialStates(); it != endInitialStates(); it++ )
+      {
+        //If the initial state is also a final state, then the empty string is accepted.
+        //Therefore the accepted language is not the empty language.
+        if( isFinalState(*it) )
+          return false;
+
+        //If a path is found, the automaton accepts a non-empty language.
+        std::set< St > visited = std::set< St >();
+        visited.insert(*it);
+        if( hasPath(*it, std::stack< St >(), visited) )
+          return false;
+        visited.erase(*it);
+      }
+      return true;
+    }
+
+    /**
+     *
+     * @brief tests whether the given nested word is a member of the language accepted 
+     *        by this NWA
+     *
+     * @param - word: the nested word to test
+     * @return true if the given nested word is a member of the language accepted by 
+     *          this NWA
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::isMember( nws::NWS word )
+    {
+      //TODO: write this!
+      return false;
+    }
+
+    /**
+     *
+     * @brief perform the prestar reachability query defined by the given WFA
+     *
+     * @param - input: the starting point of the reachability query
+     * @param - wg: the functions to use in generating weights
+     * @return the WFA resulting from performing the prestar reachability query 
+     *
+     */
+    template <typename Client>
+    wfa::WFA NWA<Client>::prestar( wfa::WFA & input, WeightGen & wg )
+    {
+      //TODO: Q: is this how I should do this?
+      return ((NWAtoPDScalls(wg)).prestar(input));
+    }
+
+    /**
+     *
+     * @brief perform the prestar reachability query defined by the given WFA
+     *
+     * Note: Any transitions in output before the query will be there after the query but
+     * will have no effect on the reachability query.
+     *
+     * @param - input: the starting point of the reachability query
+     * @param - ouput: the result of performing the reachability query
+     * @param - wg: the functions to use in generating weights
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::prestar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg )
+    {
+      //TODO: Q: is this how I should do this?
+      (NWAtoPDScalls(wg)).prestar(input,output);
+    }
+
+    /**
+     *
+     * @brief perform the poststar reachability query defined by the given WFA
+     *
+     * @param - input: the starting point of the reachability query
+     * @param - wg: the functions to use in generating weights
+     * @return the WFA resulting from performing the poststar reachability query
+     *
+     */
+    template <typename Client>
+    wfa::WFA NWA<Client>::poststar( wfa::WFA & input, WeightGen & wg )
+    {
+      //TODO: Q: is this how I should do this?
+      return ((NWAtoPDScalls(wg)).poststar(input));
+    }
+
+    /**
+     *
+     * @brief perform the poststar reachability query defined by the given WFA
+     * 
+     * Note: Any transitions in output before the query will be there after the query but
+     * will have no effect on the reachability query.
+     *
+     * @param - input: the starting point of the reachability query
+     * @param - output: the result of performing the reachability query
+     * @param - wg: the functions to use in generating weights
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::poststar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg )
+    {
+      //TODO: Q: is this how I should do this?
+      (NWAtoPDScalls(wg)).poststar(input,output);
+    }
+
+    //Utilities	
+
+    /**
+     *
+     * @brief print the NWA
+     *
+     * @param - o: the output stream to print to
+     * @return the output stream that was printed to
+     *
+     */
+    template <typename Client>
+    std::ostream & NWA<Client>::print( std::ostream & o ) const
+    {
+      states.print(o);
+      symbols.print(o);
+      trans->print(o);
+      return o;
+    }
+
+    /**
+     *
+     * @brief print the NWA in dot format
+     *
+     * @param - o: the output stream to print to
+     * @return the output stream that was printed to
+     *
+     */
+    template <typename Client>
+    std::ostream & NWA<Client>::print_dot( std::ostream & o, std::string title ) const
+    {
+      o << "digraph \"NWA\" { \n";
+      o << "    label = \"" << title <<"\" ;\n";
+      o << "    subgraph cluster_key {\n";
+      o << "        label = \"Key\";\n";
+      o << "        style=filled;\n";
+      o << "        color=white;\n";
+      o << "        dummy [shape=box];";
+      o << "        call -> entry [color=green];\n";
+      o << "        call -> dummy [color=blue];\n";
+      o << "        exit -> dummy [color=red];\n";
+      o << "        dummy -> return [style=dashed];\n";
+      o << "    }\n";
+
+      //initial state
+      printKey(o << "\"",getInitialState())<<"\" [ style=bold ]";
+
+      //final states
+      std::set<St> finals = getFinalStates();
+      for(std::set<St>::const_iterator it = finals.begin(); it!=finals.end(); it++) {
+        printKey(o << "\"",*it) <<"\" [ peripheries=2 ]";
+      }
+
+      //Print call transitions.
+      o << "//Delta_c: \n";
+      callIterator cit = beginCallTrans();
+      callIterator citEND = endCallTrans();
+      for( bool first=true; cit != citEND; cit++ )
+      {
+        printKey(o << "\"",Trans::getCallSite(*cit)) << "\"";
+        o << "->";
+        printKey(o << "\"",Trans::getEntry(*cit)) << "\"";
+        o << "[";
+        o << " label=\"";
+        printKey(o,Trans::getCallSym(*cit));
+        o << "\"";
+        o << " color=green";
+        o << "];\n";
+        
+      }
+      o << " \n";
+      //Print internal transitions.
+      o << "// Delta_i:\n" ;
+      internalIterator iit = beginInternalTrans();
+      internalIterator iitEND = endInternalTrans();
+      for( bool first=true; iit != iitEND; iit++ )
+      {
+        printKey(o << "\"",Trans::getSource(*iit)) << "\"";
+        o << "->";
+        printKey(o << "\"",Trans::getTarget(*iit)) << "\"";
+        o << "[";
+        o << " label=\"";
+        printKey(o,Trans::getInternalSym(*iit));
+        o << "\"";
+        o << "];\n";
+      }
+      o << " \n";
+
+      //Print return transitions.
+      o << "// Delta_r:\n";
+      returnIterator rit = beginReturnTrans();
+      returnIterator ritEND = endReturnTrans();
+      for( bool first=true; rit != ritEND; rit++ )
+      {
+        //dummy
+        o << "\"" << std::dec << Trans::getCallSite(*rit) << std::dec << ", " << Trans::getExit(*rit) << "\"";
+        o <<"[ shape=box ];\n";
+
+        // exit to dummy
+        printKey(o << "\"",Trans::getExit(*rit)) << "\"";
+        o << "->";
+        o << "\"" << Trans::getCallSite(*rit) <<", " << Trans::getExit(*rit) << "\"";
+        o << "[";
+        o << " label=\"";
+        printKey(o,Trans::getReturnSym(*rit));
+        o << "\"";
+        o << " color=red";
+        o << "];\n";
+
+        // call to dummy
+        printKey(o << "\"",Trans::getCallSite(*rit)) << "\"";
+        o << "->";
+        o << "\"" << Trans::getCallSite(*rit) <<", " << Trans::getExit(*rit) << "\"";
+        o << "[";
+        o << " color=blue";
+        o << "];\n";
+
+        //dummy to ret
+        o << "\"" << Trans::getCallSite(*rit) <<", " << Trans::getExit(*rit) << "\"";
+        o << "->";
+        printKey(o << "\"",Trans::getReturnSite(*rit)) << "\"";
+        o << "[ style=dotted ];\n";
+
+      }
+      o << "\n";
+
+      o << "}\n";
+      o.flush();
+      return o;
+    }
+
+    /**
+     *
+     * @brief tests whether this NWA is equivalent to the NWA 'other'
+     *
+     * @param - other: the NWA to compare this NWA to
+     * @return true if this NWA is equivalent to the NWA 'other'
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::operator==( const NWA & other ) const
+    {
+      return ( (states == other.states) 
+              && (symbols == other.symbols) 
+              && (trans == other.trans) );
+    }
+
+    //TODO: add methods like ...
+    //virtual void for_each(ConstRuleFunctor &func) const;
+    //virtual void for_each(RuleFunctor &func) const;
+    //virtual void operator()(wfa::ITrans *t);
+
+    /**
+     *
+     * @brief add all the states in the given StateSet to the NWA
+     *
+     * @param - addStateSet: the StateSet that contains the states to add
+     *
+     */
+    template <typename Client>
+    inline
+    void NWA<Client>::addAllStates( States addStateSet )
+    {
+      states.addAllStates(addStateSet);
+    }
+
+    /**
+     *
+     * @brief provide access to the beginning of the state set
+     *
+     * @return an iterator pointing to the beginning of the state set
+     *
+     */
+    template <typename Client>
+    inline
+    typename NWA<Client>::stateIterator NWA<Client>::beginStates( ) const
+    {
+      return states.beginStates();
+    }
+
+    /**
+     * 
+     * @brief provide access to the end of the state set
+     *
+     * @return an iterator pointing just past the end of the state set
+     *
+     */
+    template <typename Client>
+    inline
+    typename NWA<Client>::stateIterator NWA<Client>::endStates( ) const
+    {
+      return states.endStates();
+    }
+
+    /**
+     *
+     * @brief adds all of the states in the given StateSet to the initial state set 
+     *        associated with this NWA
+     *
+     * @param - addStateSet: the state set whose initial states to add to this NWA's
+     *                        initial state set
+     *
+     */
+    template <typename Client>
+    inline
+    void NWA<Client>::addAllInitialStates( States addStateSet )
+    {
+      states.addAllInitialStates(addStateSet);
+    }
+
+    /**
+     *
+     * @brief provide access to the beginning of the initial state set
+     *
+     * @return an iterator pointing to the beginning of the initial state set
+     *
+     */ 
+    template <typename Client>
+    inline
+    typename NWA<Client>::stateIterator NWA<Client>::beginInitialStates( ) const
+    {
+      return states.beginInitialStates();
+    }
+
+    /**
+     * 
+     * @brief provide access to the end of the initial state set
+     *
+     * @return an iterator pointing just past the end of the initial state set
+     *
+     */
+    template <typename Client>
+    inline
+    typename NWA<Client>::stateIterator NWA<Client>::endInitialStates( ) const
+    {
+      return states.endInitialStates();
+    }
+
+    /**
+     *
+     * @brief adds all of the final states in the given StateSet to the final state set
+     *        associated with this NWA
+     *
+     * @param - addStateSet: the StateSet whose final states to add to this NWA's
+     *                        final state set
+     *
+     */
+    template <typename Client>
+    inline
+    void NWA<Client>::addAllFinalStates( States addStateSet )
+    {
+      states.addAllFinalStates(addStateSet);
+    }
+
+    /**
+     *
+     * @brief provide access to the beginning of the final state set
+     *
+     * @return an iterator pointing to the beginning of the final state set
+     *
+     */
+    template <typename Client>
+    inline
+    typename NWA<Client>::stateIterator NWA<Client>::beginFinalStates( ) const
+    {
+      return states.beginFinalStates();
+    }
+
+    /**
+     * 
+     * @brief provide access to the end of the final state set
+     *
+     * @return an iterator pointing just past the end of the final state set
+     *
+     */
+    template <typename Client>
+    inline
+    typename NWA<Client>::stateIterator NWA<Client>::endFinalStates( ) const
+    {
+      return states.endFinalStates();
+    }
+
+    /**
+     *
+     * @brief add the given symbols to the NWA
+     *
+     * @param - addSymbolSet: the symbols to add
+     *
+     */
+    template <typename Client>
+    inline
+    void NWA<Client>::addAllSymbols( Symbols addSymbolSet )
+    {
+      symbols.addAllSymbols(addSymbolSet);
+    }
+
+    /**
+     *
+     * @brief provide access to the beginning of the symbol set
+     *
+     * @return an iterator pointing to the beginning of the symbol set
+     *
+     */
+    template <typename Client>
+    inline
+    typename NWA<Client>::symbolIterator NWA<Client>::beginSymbols( ) const
+    {
+      return symbols.beginSymbols();
+    }
+
+    /**
+     * 
+     * @brief provide access to the end of the symbol set
+     *
+     * @return an iterator pointing just past the end of the symbol set
+     *
+     */
+    template <typename Client>
+    inline
+    typename NWA<Client>::symbolIterator NWA<Client>::endSymbols( ) const
+    {
+      return symbols.endSymbols();
+    }
+
+    /**
+     *
+     * @brief provide access to the beginning of the call transition set
+     *
+     * @return an iterator pointing to the beginning of the call transition set
+     *
+     */
+    template <typename Client>
+    inline
+    typename NWA<Client>::callIterator NWA<Client>::beginCallTrans( ) const
+    {
+      return trans->beginCall();
+    }
+
+    /**
+     * 
+     * @brief provide access to the end of the call transition set
+     *
+     * @return an iterator pointing just past the end of the call transition set
+     *
+     */
+    template <typename Client>
+    inline
+    typename NWA<Client>::callIterator NWA<Client>::endCallTrans( ) const
+    {
+      return trans->endCall();
+    }
+
+    /**
+     *
+     * @brief provide access to the beginning of the internal transition set
+     *
+     * @return an iterator pointing to the beginning of the internal transition set
+     *
+     */
+    template <typename Client>
+    inline
+    typename NWA<Client>::internalIterator NWA<Client>::beginInternalTrans( ) const
+    {
+      return trans->beginInternal();
+    }
+
+    /**
+     * 
+     * @brief provide access to the end of the internal transition set
+     *
+     * @return an iterator pointing just past the end of the internal transition set
+     *
+     */
+    template <typename Client>
+    inline
+    typename NWA<Client>::internalIterator NWA<Client>::endInternalTrans( ) const
+    {
+      return trans->endInternal();
+    }
+
+    /**
+     *
+     * @brief provide access to the beginning of the return transition set
+     *
+     * @return an iterator pointing to the beginning of the return transition set
+     *
+     */
+    template <typename Client>
+    inline
+    typename NWA<Client>::returnIterator NWA<Client>::beginReturnTrans( ) const
+    {
+      return trans->beginReturn();
+    }
+
+    /**
+     * 
+     * @brief provide access to the end of the return transition set
+     *
+     * @return an iterator pointing just past the end of the return transition set
+     *
+     */
+    template <typename Client>
+    inline
+    typename NWA<Client>::returnIterator NWA<Client>::endReturnTrans( ) const
+    {
+      return trans->endReturn();
+    }
+
+    /**
+       *
+       * @brief constructs the transition table and state map for the deterministic NWA 
+       *        that is equivalent to this NWA.
+       *
+       * This method constructs the transition table and state map for the deterministic 
+       * NWA that is equivalent to this NWA.
+       *
+       * @param - nondet: the NWA to determinize
+       * @param - stMap: the map of sets of 'nondet' states to states
+       * @param - currSt: the current state under consideration
+       * @param - callPred: the stack of open calls at 'currSt'
+       *
+       */     
+    template <typename Client>
+    void  NWA<Client>::det( NWARefPtr nondet, StateMap & stMap, StatePairSet currSt, 
+                            std::stack<StatePairSet> callPred )  
+    {
+      //Internal Transisiton
+      for( symbolIterator it = nondet->beginSymbols(); it != nondet->endSymbols(); it++ )
+      {
+        Internals internalTrans;
+        //Find all internal transitions that use this symbol.
+        for( internalIterator iit = nondet->beginInternalTrans(); 
+              iit != nondet->endInternalTrans(); iit++ )
+        {
+          //If the symbols match, add this transition to the set of transitions to coalesce.
+          if( *it == Trans::getInternalSym(*iit) )
+            internalTrans.insert( *iit );
+        }
+        //At each internal position labeled a, the automaton replaces each pair (q,q') in
+        //the current state by pairs of the form (q,q'') such that (q',a,q'') is an element
+        //of delta_i.
+        StateSet internalStates;
+        StatePairSet internalStateSet;
+        for( StatePairSet::iterator sit = currSt.begin(); sit != currSt.end(); sit++ )
+        {
+          bool replaced = false;
+          for( internalIterator iit = internalTrans.begin(); iit != internalTrans.end(); iit++ )
+          {
+            if( sit->second == Trans::getSource(*iit) )
+            {
+              internalStateSet.insert( StatePair(sit->first,Trans::getTarget(*iit)) );
+              internalStates.insert( wali::getKey(sit->first,Trans::getTarget(*iit)) );
+              replaced = true;
+            }
+          }
+          if(! replaced)
+          {
+            internalStateSet.insert( *sit );
+            internalStates.insert( wali::getKey(sit->first,sit->second) );
+          }
+        }
+    
+        //We only want to add states that don't already exist.
+        St internalState;
+        if( stMap.count(internalStateSet) == 0 )
+        {
+          //Add the new key to the map.
+          internalState = wali::getKey(internalStates);
+          stMap.insert(std::pair<StatePairSet,Key>(internalStateSet,internalState));
+          addState(internalState);
+          
+          //Determinize all paths through 'nondet' starting from this new summary state.
+          det(nondet,stMap,internalStateSet,callPred);
+        }
+        else
+        {
+          internalState = (stMap.find(internalStateSet))->second;
+        }
+
+        //Add an internal transition to this state.
+        addInternalTrans(stMap.find(currSt)->second,*it,internalState);
+      }
+
+      //Call Transition
+      for( symbolIterator it = nondet->beginSymbols(); it != nondet->endSymbols(); it++ )
+      {
+        //At a call position labeled a, the summary gets reinitialized: the new state 
+        //contains pairs of the form (q,q'), where (q,a,q') is an element of delta_c.
+        StatePairSet callStateSet;
+        StateSet callStates;
+        for( callIterator cit = nondet->beginCallTrans(); cit != nondet->endCallTrans(); cit++ )
+        {
+          //If the symbols match, add this to the summary state.
+          if( *it == Trans::getCallSym(*cit) )
+          {
+            StatePair sp = StatePair(Trans::getCallSite(*cit),Trans::getEntry(*cit));
+            callStateSet.insert(sp);
+            callStates.insert(wali::getKey(sp.first,sp.second));
+          }          
+        }
+
+        //We only want to add states that don't already exist.
+        St callState;
+        if( stMap.count(callStateSet) == 0 )
+        {
+          //Add the new key to the map.
+          callState = wali::getKey(callStates);
+          stMap.insert(std::pair<StatePairSet,Key>(callStateSet,callState));
+          addState(callState);
+          
+          //Determinize all paths through 'nondet' starting from this new summary state.
+          callPred.push(currSt);
+          det(nondet,stMap,callStateSet,callPred);
+        }
+        else
+        {
+          callState = (stMap.find(callStateSet))->second;
+        }
+
+        //Add an internal transition to this state.
+        addCallTrans(stMap.find(currSt)->second,*it,callState);
+      }
+
+      //Return Transition
+      for( symbolIterator it = nondet->beginSymbols(); it != nondet->endSymbols(); it++ )
+      {
+        //Consider a return position labeled a, and suppose S denotes the current state
+        //and S' denotes the state just before the call-predecessor.  Then (q,q') belongs
+        //to the new state, provided there exist states q_1,q_2 such that (q,q_1) is an 
+        //element of S' and (q_1,q_2) is an element of S and (q_2,q_1,a,q') is an element
+        //of delta_r
+        StateSet returnStates;
+        StatePairSet returnStateSet;
+        for( returnIterator rit = nondet->beginReturnTrans(); rit != nondet->endReturnTrans(); rit++ )
+        {
+          //If the symbols match, add this to the summary state.  add this transition to the set of transitions to coalesce.
+          if( *it == Trans::getReturnSym(*rit) )
+          {
+            //S' is callPred.top(), S is currSt
+
+            //Want to find (q_1,q_2) in S given *rit = (q_2,q_1,a,q')
+            bool found = false;
+            for( StatePairSet::iterator sit = currSt.begin(); sit != currSt.end(); sit++ )
+            {
+              if( (sit->first == Trans::getCallSite(*rit)) && (sit->second == Trans::getExit(*rit)) )
+              {
+                found = true;
+                break;
+              }
+            }
+
+            if( found )
+            {
+              StatePairSet Sprime = callPred.top();
+              //Want to find (q,q_1) in S' given *rit = (q_2,q_1,a,q')
+              for( StatePairSet::iterator sit = Sprime.begin(); sit != Sprime.end(); sit++ )
+              {
+                if( sit->second == Trans::getCallSite(*rit) )
+                {
+                  StatePair sp = StatePair(sit->first,Trans::getReturnSite(*rit));
+                  returnStateSet.insert(sp);
+                  returnStates.insert(wali::getKey(sp.first,sp.second));
+                }
+              }
+            }
+          }
+        }
+
+        //We only want to add states that don't already exist.
+        St returnState;
+        if( stMap.count(returnStateSet) == 0 )
+        {
+          //Add the new key to the map.
+          returnState = wali::getKey(returnStates);
+          stMap.insert(std::pair<StatePairSet,Key>(returnStateSet,returnState));
+          addState(returnState);
+          
+          //Determinize all paths through 'nondet' starting from this new summary state.
+          callPred.pop();
+          det(nondet,stMap,returnStateSet,callPred);
+        }
+        else
+        {
+          returnState = (stMap.find(returnStateSet))->second;
+        }
+
+        //Add an internal transition to this state.
+        addCallTrans(stMap.find(currSt)->second,*it,returnState);
+      }
+    }
+
+    /**
+     *
+     * @brief tests whether the NWA has a path from the current state to a final state
+     *        given the call stack and the set of states already visited
+     *
+     * @param - currSt: the state from which to start searching for a path
+     * @param - calls: the stack of calls that have been made thus far  
+     * @param - visited: the states which have already been visited
+     * @return true if there is a path through the NWA from the current state to a 
+     *          final state, false otherwise
+     *
+     */
+    template <typename Client>
+    bool NWA<Client>::hasPath( St currSt, std::stack< St > calls, std::set< St > visited )
+    {
+      //Try each possible transition out of this state to see if a final state can be reached.
+
+      //First try call transitions.
+      calls.push(currSt);
+      for( callIterator cit = trans->beginCall(); cit != trans->endCall(); cit++ )
+      {
+        St entry = Trans::getEntry(*cit);
+        //If we can reach a final state through this transition, we have found a path.
+        if( isFinalState(entry) )
+          return true;
+        //If the call transition starts from the current state and goes to a state not 
+        //yet visited, follow the path.
+        if( (Trans::getCallSite(*cit) == currSt) && (visited.count(entry) == 0) )
+        {
+          visited.insert(entry);
+          if( hasPath(entry,calls,visited) )
+            return true;
+          visited.erase(entry);
+        }
+      }
+      calls.pop();
+
+      //If no call transition led to a path, try internal transitions.
+      for( internalIterator iit = trans->beginInternal(); iit != trans->endInternal(); iit++ )
+      {
+        St target = Trans::getTarget(*iit);
+        //If we can reach a final state through this transition, we have found a path.
+        if( isFinalState(target) )
+          return true;
+        //If the internal transition starts from the current state and goes to a state 
+        //not yet visited, follow the path.
+        if( (Trans::getSource(*iit) == currSt) && (visited.count(target) == 0) )
+        {
+          visited.insert(target);
+          if( hasPath(target,calls,visited) )
+            return true;
+          visited.erase(target);
+        }
+      }
+
+      //If no internal transition led to a path, try return transitions.
+      St callSt = calls.top();
+      calls.pop();
+      for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+      {
+        St ret = Trans::getReturnSite(*rit);
+        //If we can reach a final state through this transition, we have found a path.
+        if( isFinalState(ret) )
+          return true;
+        //If the return transition starts from the current state with the call site from
+        //the top of the call stack and goes to a state not yet visited, follow the path.
+        if( (Trans::getExit(*rit) == currSt)
+          && (Trans::getCallSite(*rit) == callSt)
+          && (visited.count(ret) == 0) )
+        {
+          visited.insert(ret);
+          if( hasPath(ret,calls,visited) )
+            return true;
+          visited.erase(ret);
+        }
+      }
+      calls.push(callSt);
+
+      return false;
+    }
+
+    /** 
+     *
+     * @brief tests whether the nested word suffix is accepted by this nested word 
+     *        automaton starting at the state with the given name
+     *
+     * @param - currState: the state in the nested word automaton at which to start the 
+     *                      simulation
+     * @param - configs: the nested word suffix to match  //TODO: is this right?
+     * @return true if the simulation ends in an accepting state
+     *
+     */
+   /* template <typename Client>
+    bool NWA<Client>::matchWord( St currState, std::deque<WordRecConfig<St>> configs )
+    {
+      //TODO: write this!
+    }*/
 #endif
   }
 }

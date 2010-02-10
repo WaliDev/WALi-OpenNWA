@@ -14,9 +14,8 @@ namespace wali
   {
     /*
      *
-     * This class is a placeholder for any additional information that
-     * you might want to associate with a state.  It must be extended for 
-     * the client's specific needs.
+     * This class is a placeholder for any additional information that you might want to
+     * associate with a state.  It must be extended for the client's specific needs.
      *
      */
     class ClientInfo : public Countable
