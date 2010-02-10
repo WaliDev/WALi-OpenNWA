@@ -1,11 +1,11 @@
 #ifndef wali_KEY_GUARD
 #define wali_KEY_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  */
 
-/*!
+/**
  * @file Key.hpp
  *
  * This file defines the interface to the WALi KeySpace and methods
@@ -13,37 +13,39 @@
  */
 #include <string>
 #include <set>
+#include "wali/ref_ptr.hpp"
 
 namespace wali
 {
-  /*!
+  /**
    * @typedef Key
    *
    * For now a Key is just an unsigned int
    */
   typedef size_t Key;
 
-  /*!
+  /**
    * Defined in KeySource.hpp
    */
   class KeySource;
+  typedef ref_ptr<KeySource> key_src_t;
 
-  /*!
+  /**
    * Defined in KeySpace.hpp
    */
   class KeySpace;
 
-  /*!
+  /**
    * This class defines the wali keyspace
    */
   KeySpace* getKeySpace();
 
-  /*!
+  /**
    * Wrapper functions.
    * Call same method of class KeySpace using
    * the wali::KeySpace object.
    */
-  Key getKey( KeySource * ks );
+  Key getKey( key_src_t ks );
   Key getKey( const std::string& s );
   Key getKey( const char* s );
   Key getKey( int i );
@@ -51,10 +53,10 @@ namespace wali
   // @author Amanda Burton
   Key getKey( std::set<Key> ks );
 
-  /*!
+  /**
    * Return KeySource associated with the key k
    */
-  KeySource* getKeySource( Key k );
+  key_src_t getKeySource( Key k );
 
   /*!
    * Prints key k to std::ostream o
@@ -63,7 +65,7 @@ namespace wali
    */
   std::ostream& printKey( std::ostream& o, Key k );
 
-  /*!
+  /**
    * Returns string representation of the key
    * Essentially performs the lookup from Key to KeySource and calls
    * KeySource::to_string

@@ -28,6 +28,11 @@ built += SConscript(
         duplicate=0
         )
 
+built += SConscript(
+        os.path.join(ExampleDir,'ProgAnalysis','SConscript'),
+        build_dir= os.path.join(BuildDir,'Examples','ProgAnalysis'),
+        duplicate=0)
+
 # Affine Relations Weight Domain
 # o = SConscript(
 #         os.path.join(ExampleDir,'AffineRelations','SConscript'),
@@ -35,5 +40,6 @@ built += SConscript(
 #         duplicate=0
 #         )
 # built += o
+
 Return('built')
 

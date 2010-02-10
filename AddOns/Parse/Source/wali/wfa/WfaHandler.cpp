@@ -22,8 +22,6 @@ namespace wali
   namespace wfa
   {
 
-    //WfaHandler::WfaHandler( WeightFactory& wf ) :
-    //  weightFactory(wf), inWeight(false)
     WfaHandler::WfaHandler( IUserHandler& user ) :
       fUserHandler(user)
     {
@@ -55,13 +53,6 @@ namespace wali
           (tag == WFA::XMLTag  )
           );
     }
-
-    /*
-    WeightFactory& WfaHandler::getWeightFactory() const 
-    {
-      return weightFactory;
-    }
-    */
 
     WFA& WfaHandler::get() 
     {

@@ -3,7 +3,12 @@
  * @version $Id$
  */
 
+#include <iostream>
 #include "Reach.hpp"
+
+using std::cerr;
+using std::cout;
+using std::endl;
 
 int Reach::numReaches = 0;
 

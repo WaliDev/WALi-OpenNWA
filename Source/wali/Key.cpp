@@ -35,7 +35,7 @@ namespace wali
   // Call same method of class KeySpace using
   // the wali::KeySpace object.
   //
-  Key getKey( KeySource * ks )
+  Key getKey( key_src_t ks )
   {
     return getKeySpace()->getKey(ks);
   }
@@ -70,7 +70,7 @@ namespace wali
   //
   // Return KeySource associated with the key k
   //
-  KeySource* getKeySource( Key k )
+  key_src_t getKeySource( Key k )
   {
     return getKeySpace()->getKeySource(k);
   }

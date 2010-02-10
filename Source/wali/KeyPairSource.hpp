@@ -14,7 +14,7 @@ namespace wali
   class KeyPairSource : public wali::KeySource
   {
     public:
-      KeyPairSource( wali_key_t k1, wali_key_t k2 );
+      KeyPairSource( Key k1, Key k2 );
 
       KeyPairSource( const KeyPair& kp );
 

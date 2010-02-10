@@ -1,7 +1,7 @@
 #ifndef wali_KEY_CONTAINER_GUARD
 #define wali_KEY_CONTAINER_GUARD 1
 
-/*!
+/**
  * @author Nicholas Kidd
  */
 
@@ -17,12 +17,12 @@ namespace wali
     return k1 + (997*k2);
   }
 
-  /*!
+  /**
    * KeyPair
    */
   typedef std::pair< Key,Key > KeyPair;
 
-  /*!
+  /**
    * @class Triple
    */
   template< typename T,typename U,typename V > struct Triple
@@ -71,7 +71,7 @@ namespace wali
     V third;
   };
 
-  /*!
+  /**
    * KeyTriple
    */
   typedef Triple< Key,Key,Key > KeyTriple;

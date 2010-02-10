@@ -1,7 +1,7 @@
 #ifndef wali_COMMON_GUARD
 #define wali_COMMON_GUARD 1
 
-/*
+/**
  * @author Nicholas Kidd
  */
 
