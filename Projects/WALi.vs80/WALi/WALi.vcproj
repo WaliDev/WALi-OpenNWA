@@ -915,10 +915,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\ClientInfo.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\Source\wali\nwa\NWA.hpp"
 					>
 				</File>

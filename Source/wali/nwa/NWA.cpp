@@ -1,7 +1,7 @@
 /**
  * @author Amanda Burton
  */
-//#define NWA_TEST
+#define NWA_TEST
 
 #ifdef NWA_TEST
 // ::wali
@@ -329,7 +329,7 @@ int main()
   
   myNWA->print(std::cout);
   
-  ReachGen<wali::nwa::State<> ,wali::nwa::Symbol<>> wg;  
+  ReachGen<wali::Key,wali::Key> wg;  
   myNWA->NWAtoPDSreturns(wg);
   myNWA->NWAtoPDScalls(wg);
   myNWA->NWAtoBackwardsPDSreturns(wg);

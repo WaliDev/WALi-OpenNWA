@@ -5090,7 +5090,7 @@ namespace wali
         typedef typename States::const_iterator stateIterator;
         typedef typename States::ClientInfoRefPtr ClientInfoRefPtr;
         typedef SymbolSet Symbols;
-        typedef typename Symbols::iterator symbolIterator;
+        typedef typename Symbols::const_iterator symbolIterator;
 
         typedef TransSet<St,Sym> Trans;
         

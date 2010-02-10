@@ -5,7 +5,6 @@
  * @author Amanda Burton
  */
 
-
 // ::wali
 #include "wali/Printable.hpp"
 #include "wali/Key.hpp"
