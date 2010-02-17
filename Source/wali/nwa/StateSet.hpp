@@ -90,7 +90,10 @@ namespace wali
        * @return the Key for the stuck state
        *
        */
-      static St getStuckState( );
+      static St getStuckState( )
+      {
+        return (wali::WALI_EPSILON);
+      };
 
       /**
        *  
@@ -102,7 +105,10 @@ namespace wali
        * @return true if this state is the stuck state, false otherwise
        *
        */
-      static bool isStuckState( St state );
+      static bool isStuckState( St state )
+      {
+        return (state == wali::WALI_EPSILON);
+      }
 
       /**
        *
@@ -585,31 +591,6 @@ namespace wali
     }
 
     //State Accessors
-    
-    /**
-     *
-     * @brief returns the Key for the stuck state
-     *
-     * @return the Key for the stuck state
-     *
-     */
-    static Key getStuckState( ) 
-    {
-      return (wali::WALI_EPSILON);
-    }
-
-    /**
-     *  
-     * @brief test whether the given state is the stuck state
-     * 
-     * @param - state: the state to test
-     * @return true if this state is the stuck state, false otherwise
-     *
-     */
-    static bool isStuckState( Key state )
-    {
-      return (state == wali::WALI_EPSILON);
-    }
 
     /**
      *

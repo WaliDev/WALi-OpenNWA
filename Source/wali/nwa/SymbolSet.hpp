@@ -40,23 +40,33 @@ namespace wali
       /**
        *  //TODO: remove this!
        */
-      static bool isWild( Sym sym );
+      static bool isWild( Sym sym )
+      {
+        return (sym == wali::WALI_BAD_KEY);
+      };
 
       /**
        *  //TODO: remove this!
        */
-      static Sym getWild( );
+      static Sym getWild( )
+      {
+        return wali::WALI_BAD_KEY;
+      }
 
       /**
        *
        * @brief returns the Key for the epsilon symbol
        *
        * This method provides access to the Key for the epsilon symbol.
+       * The epsilon symbol is the same as wali::WALI_EPSILON.
        *
        * @return the Key for the epsilon symbol
        *
        */
-      static Sym getEpsilon( );
+      static Sym getEpsilon( )
+      {
+        return wali::WALI_EPSILON;
+      };
 
       /**
        *  
@@ -68,7 +78,10 @@ namespace wali
        * @return true if this symbol is the epsilon symbol, false otherwise
        *
        */
-      static bool isEpsilon( Sym sym );
+      static bool isEpsilon( Sym sym )
+      {
+        return (sym == wali::WALI_EPSILON);
+      }
 
       /**
        *
@@ -239,49 +252,6 @@ namespace wali
     //Accessors
 
     /**
-     *  TODO: remove this!
-     */
-    static bool isWild( SymbolSet::Sym sym )
-    {
-      return (sym == wali::WALI_BAD_KEY);
-    }
-
-    /**
-     *  TODO: remove this!
-     */
-    static SymbolSet::Sym getWild( )
-    {
-      return wali::WALI_BAD_KEY;
-    }
-
-    /**
-     *
-     * @brief returns the Key for the epsilon symbol
-     *
-     * The epsilon symbol is the same as wali::WALI_EPSILON.
-     *
-     * @return the Key for the epsilon symbol
-     *
-     */
-    static SymbolSet::Sym getEpsilon( ) 
-    {
-      return wali::WALI_EPSILON;
-    }
-
-    /**
-     *  
-     * @brief test whether the given symbol is the epsilon symbol
-     * 
-     * @param - sym: the symbol to test
-     * @return true if this symbol is the epsilon symbol, false otherwise
-     *
-     */
-    static bool isEpsilon( SymbolSet::Sym sym )
-    {
-      return (sym == wali::WALI_EPSILON);
-    }
-
-    /**
      *
      * @brief provides access to all symbols 
      *
@@ -409,7 +379,7 @@ namespace wali
           first = false;
         }
 
-        if( isEpsilon(*it) )
+        if( SymbolSet::isEpsilon(*it) )
           o << "Epsilon";
         else
           printKey(o,*it);
@@ -974,7 +944,7 @@ namespace wali
             first = false;
           }
 
-          if( symbolPool.isEpsilon(*it) )
+          if( SymbolSet::isEpsilon(*it) )
             o << "Epsilon";
           else
             printKey(o,*it);
