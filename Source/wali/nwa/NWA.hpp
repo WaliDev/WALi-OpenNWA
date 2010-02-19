@@ -7817,6 +7817,20 @@ namespace wali
     void NWA<Client>::unionNWA( NWARefPtr first, NWARefPtr second )
     {
       //TODO: write this!
+
+      //Generate a new initial state.
+      //Note: This involves generating a new key.  How should this be done?
+
+      //Attach the initial state to all the initial states of the two machines
+      //with epsilon transitions.
+
+      //Copy all of the functionality of the two machines.
+
+      //Generate a new final state.
+      //Note: This involves generating a new key.  How should this be done?
+
+      //Attach the final state to all the final states of the two machines with
+      //epsilon transitions.
     }
 
     /**
@@ -8300,6 +8314,14 @@ namespace wali
     void NWA<Client>::concat( NWARefPtr first, NWARefPtr second )
     {
       //TODO: write this!
+
+      //Duplicate all of the functionality of the first machine (except the final state property).
+
+      //Duplicate all of the functionality of the second machine (except the initial state property).
+
+      //Add epsilon transitions from the final states of the first machine to the initial
+      //states of the second machine.
+
     }
 
     /**
@@ -8312,6 +8334,16 @@ namespace wali
     void NWA<Client>::reverse( NWARefPtr first )
     {
       //TODO: write this!
+
+      //Swap initial and final states.
+
+      //Duplicate internal transitions with source/target swapped.
+
+      //Duplicate return transitions as call transitions with (return,sym,exit).
+
+      //Duplicate call transitions with associated return transitions as 
+      //return transitions with (entry,return,sym,call).
+
     }
 
     /**
@@ -8451,9 +8483,6 @@ namespace wali
           bool wild = false;
           for( callIterator cit = trans->beginCall(); cit != trans->endCall(); cit++ )
           {
-            //Epsilon transition 
-            if( SymbolSet::isEpsilon(Trans::getCallSym(*cit)) ) 
-              return false;
             //Wild symbol TODO: fix this!
             if( SymbolSet::isWild(Trans::getCallSym(*cit)) )
               wild = true;  
@@ -8497,9 +8526,6 @@ namespace wali
             wild = false;
             for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
             {
-              //Epsilon transition to a state other than the error state.
-              if( SymbolSet::isEpsilon(Trans::getReturnSym(*rit)) )
-                return false;
               //Wild symbol TODO: fix this!
               if( SymbolSet::isWild(Trans::getReturnSym(*rit)) )
                 wild = true; 
@@ -8682,7 +8708,10 @@ namespace wali
       //Note: When overriding this method your metric must determine whether the
       //      given symbols are compatible and set result to the appropriate symbol.
 
-      if( sym1 == sym2 ) //This rule still applies for epsilons, i.e. epsilons only match epsilons
+      //Epsilons are treated separately in the algorithms, so epsilons match nothing.
+      if( SymbolSet::isEpsilon(sym1) || SymbolSet::isEpsilon(sym2) )
+        return false;
+      if( sym1 == sym2 ) //Symbols only match the exact same symbol (except for epsilons).
       {
         resSym = sym1;
         return true;
@@ -9763,6 +9792,8 @@ namespace wali
       //Internal Transisiton
       for( symbolIterator it = nondet->beginSymbols(); it != nondet->endSymbols(); it++ )
       {
+        if( SymbolSet::isEpsilon(*it) )
+          continue;   //We don't want to end up with epsilon symbols, they are handled differently.
         Internals internalTrans;
 
         //Find all internal transitions that use this symbol.
@@ -9790,20 +9821,13 @@ namespace wali
         StatePairSet internalStateSet;
         for( StatePairSet::iterator sit = currSt.begin(); sit != currSt.end(); sit++ )
         {
-          bool replaced = false;
           for( internalIterator iit = internalTrans.begin(); iit != internalTrans.end(); iit++ )
           {
             if( sit->second == Trans::getSource(*iit) )
             {
               internalStateSet.insert(StatePair(sit->first,Trans::getTarget(*iit)));
               internalStates.insert(wali::getKey(sit->first,Trans::getTarget(*iit)));
-              replaced = true;
             }
-          }
-          if(! replaced)
-          {
-            internalStateSet.insert(*sit);
-            internalStates.insert(wali::getKey(sit->first,sit->second));
           }
         }
     
@@ -9824,13 +9848,19 @@ namespace wali
           internalState = (stMap.find(internalStateSet))->second;
         }
 
-        //Add an internal transition to this state.
-        addInternalTrans(stMap.find(currSt)->second,*it,internalState);
+        if( stMap.find(currSt) != stMap.end() )
+        {
+          //Add an internal transition to this state.
+          addInternalTrans(stMap.find(currSt)->second,*it,internalState);
+        }
       }
 
       //Call Transition
       for( symbolIterator it = nondet->beginSymbols(); it != nondet->endSymbols(); it++ )
       {
+        if( SymbolSet::isEpsilon(*it) )
+          continue;   //No call transition will have an epsilon as a symbol, so don't waste time.
+
         //At a call position labeled a, the summary gets reinitialized: the new state 
         //contains pairs of the form (q,q'), where (q,a,q') is an element of delta_c.
         StatePairSet callStateSet;
@@ -9874,13 +9904,19 @@ namespace wali
           callState = (stMap.find(callStateSet))->second;
         }
 
-        //Add an internal transition to this state.
-        addCallTrans(stMap.find(currSt)->second,*it,callState);
+        if( stMap.find(currSt) != stMap.end() )
+        {
+          //Add a call transition to this state.
+          addCallTrans(stMap.find(currSt)->second,*it,callState);
+        }
       }
 
       //Return Transition
       for( symbolIterator it = nondet->beginSymbols(); it != nondet->endSymbols(); it++ )
       {
+        if( SymbolSet::isEpsilon(*it) )
+          continue;   //No call transition will have an epsilon as a symbol, so don't waste time.
+
         //Consider a return position labeled a, and suppose S denotes the current state
         //and S' denotes the state just before the call-predecessor.  Then (q,q') belongs
         //to the new state, provided there exist states q_1,q_2 such that (q,q_1) is an 
@@ -9888,6 +9924,7 @@ namespace wali
         //of delta_r
         StateSet returnStates;
         StatePairSet returnStateSet;
+        StatePairSet Sprime = callPred.top();
         for( returnIterator rit = nondet->beginReturnTrans(); rit != nondet->endReturnTrans(); rit++ )
         {
           //If the symbols match, add this to the summary state.  add this transition to the set of transitions to coalesce.
@@ -9907,8 +9944,7 @@ namespace wali
             }
 
             if( found )
-            {
-              StatePairSet Sprime = callPred.top();
+            {              
               //Want to find (q,q_1) in S' given *rit = (q_2,q_1,a,q')
               for( StatePairSet::iterator sit = Sprime.begin(); sit != Sprime.end(); sit++ )
               {
@@ -9951,8 +9987,11 @@ namespace wali
           returnState = (stMap.find(returnStateSet))->second;
         }
 
-        //Add an internal transition to this state.
-        addCallTrans(stMap.find(currSt)->second,*it,returnState);
+        if( (stMap.find(currSt) != stMap.end()) && (stMap.find(Sprime) != stMap.end()) )
+        {
+          //Add a return transition to this state.
+          addReturnTrans(stMap.find(currSt)->second,stMap.find(Sprime)->second,*it,returnState);
+        }
       }
     }
 
