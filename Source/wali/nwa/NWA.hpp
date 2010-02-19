@@ -5326,7 +5326,7 @@ namespace wali
        */
       const std::set<St> & getInitialStates( ) const; 
       /**
-       *  TODO: do we still need the single initial state restriction?
+       *  TODO: do we still need the single initial state restriction?  NO!!!
        * @brief obtain the initial state
        *
        * This method provides access to the initial state of this NWA.  
@@ -5335,7 +5335,7 @@ namespace wali
        * @return the inital state associated with the NWA
        *
        */
-      St getInitialState( ) const;
+      //St getInitialState( ) const;
 
       /**
        * 
@@ -7050,19 +7050,19 @@ namespace wali
       return states.getInitialStates();
     }
     /**
-     *  Q: do we still need the single initial state restriction?
+     *  Q: do we still need the single initial state restriction?   NO
      * @brief obtain the initial state
      *
      * @return the inital state associated with the NWA
      *
      */
-    template <typename Client>
-    typename NWA<Client>::St NWA<Client>::getInitialState( ) const
-    {
-      std::set<St> sts = states.getInitialStates();
-      assert(sts.size()==1);  //Assuming unique initial state.
-      return *(sts.begin());
-    }
+    //template <typename Client>
+    //typename NWA<Client>::St NWA<Client>::getInitialState( ) const
+    //{
+    //  std::set<St> sts = states.getInitialStates();
+    //  assert(sts.size()==1);  //Assuming unique initial state.
+    //  return *(sts.begin());
+    //}
 
     /**
      * 
@@ -9342,11 +9342,15 @@ namespace wali
       o << "    }\n";
 
       //initial state
-      printKey(o << "\"",getInitialState())<<"\" [ style=bold ]";
+      std::set<St> initials = getInitialStates();
+      for( std::set<St>::const_iterator it = initials.begin(); it != initials.end(); it++ )
+      {
+        printKey(o << "\"",*it)<<"\" [ style=bold ]";
+      }
 
       //final states
       std::set<St> finals = getFinalStates();
-      for(std::set<St>::const_iterator it = finals.begin(); it!=finals.end(); it++) 
+      for( std::set<St>::const_iterator it = finals.begin(); it != finals.end(); it++ ) 
       {
         printKey(o << "\"",*it) <<"\" [ peripheries=2 ]";
       }
