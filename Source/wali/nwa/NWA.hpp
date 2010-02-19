@@ -9912,85 +9912,89 @@ namespace wali
       }
 
       //Return Transition
-      for( symbolIterator it = nondet->beginSymbols(); it != nondet->endSymbols(); it++ )
+      //Only check return transitions if there is some call predecessor waiting to be checked.
+      if(! callPred.empty() )   
       {
-        if( SymbolSet::isEpsilon(*it) )
-          continue;   //No call transition will have an epsilon as a symbol, so don't waste time.
-
-        //Consider a return position labeled a, and suppose S denotes the current state
-        //and S' denotes the state just before the call-predecessor.  Then (q,q') belongs
-        //to the new state, provided there exist states q_1,q_2 such that (q,q_1) is an 
-        //element of S' and (q_1,q_2) is an element of S and (q_2,q_1,a,q') is an element
-        //of delta_r
-        StateSet returnStates;
-        StatePairSet returnStateSet;
-        StatePairSet Sprime = callPred.top();
-        for( returnIterator rit = nondet->beginReturnTrans(); rit != nondet->endReturnTrans(); rit++ )
+        for( symbolIterator it = nondet->beginSymbols(); it != nondet->endSymbols(); it++ )
         {
-          //If the symbols match, add this to the summary state.  add this transition to the set of transitions to coalesce.
-          if( *it == Trans::getReturnSym(*rit) )
+          if( SymbolSet::isEpsilon(*it) )
+            continue;   //No call transition will have an epsilon as a symbol, so don't waste time.
+
+          //Consider a return position labeled a, and suppose S denotes the current state
+          //and S' denotes the state just before the call-predecessor.  Then (q,q') belongs
+          //to the new state, provided there exist states q_1,q_2 such that (q,q_1) is an 
+          //element of S' and (q_1,q_2) is an element of S and (q_2,q_1,a,q') is an element
+          //of delta_r
+          StateSet returnStates;
+          StatePairSet returnStateSet;
+          StatePairSet Sprime = callPred.top();
+          for( returnIterator rit = nondet->beginReturnTrans(); rit != nondet->endReturnTrans(); rit++ )
           {
-            //S' is callPred.top(), S is currSt
-
-            //Want to find (q_1,q_2) in S given *rit = (q_2,q_1,a,q')
-            bool found = false;
-            for( StatePairSet::iterator sit = currSt.begin(); sit != currSt.end(); sit++ )
+            //If the symbols match, add this to the summary state.  add this transition to the set of transitions to coalesce.
+            if( *it == Trans::getReturnSym(*rit) )
             {
-              if( (sit->first == Trans::getCallSite(*rit)) && (sit->second == Trans::getExit(*rit)) )
-              {
-                found = true;
-                break;
-              }
-            }
+              //S' is callPred.top(), S is currSt
 
-            if( found )
-            {              
-              //Want to find (q,q_1) in S' given *rit = (q_2,q_1,a,q')
-              for( StatePairSet::iterator sit = Sprime.begin(); sit != Sprime.end(); sit++ )
+              //Want to find (q_1,q_2) in S given *rit = (q_2,q_1,a,q')
+              bool found = false;
+              for( StatePairSet::iterator sit = currSt.begin(); sit != currSt.end(); sit++ )
               {
-                if( sit->second == Trans::getCallSite(*rit) )
+                if( (sit->first == Trans::getCallSite(*rit)) && (sit->second == Trans::getExit(*rit)) )
                 {
-                  StatePair sp = StatePair(sit->first,Trans::getReturnSite(*rit));
-                  returnStateSet.insert(sp);
-                  returnStates.insert(wali::getKey(sp.first,sp.second));
+                  found = true;
+                  break;
+                }
+              }
 
-                  //Traverse any epsilon transitions beginning at the entry point of this call.
-                  std::set<St> newStates;
-                  epsilonClosure(&newStates,Trans::getReturnSite(*rit));
-                  for( std::set<St>::iterator eit = newStates.begin(); eit != newStates.end(); eit++ )
+              if( found )
+              {              
+                //Want to find (q,q_1) in S' given *rit = (q_2,q_1,a,q')
+                for( StatePairSet::iterator sit = Sprime.begin(); sit != Sprime.end(); sit++ )
+                {
+                  if( sit->second == Trans::getCallSite(*rit) )
                   {
-                    StatePair newSP = StatePair(sit->first,*eit);
-                    returnStateSet.insert(newSP);
-                    returnStates.insert(wali::getKey(newSP.first,newSP.second));
+                    StatePair sp = StatePair(sit->first,Trans::getReturnSite(*rit));
+                    returnStateSet.insert(sp);
+                    returnStates.insert(wali::getKey(sp.first,sp.second));
+
+                    //Traverse any epsilon transitions beginning at the entry point of this call.
+                    std::set<St> newStates;
+                    epsilonClosure(&newStates,Trans::getReturnSite(*rit));
+                    for( std::set<St>::iterator eit = newStates.begin(); eit != newStates.end(); eit++ )
+                    {
+                      StatePair newSP = StatePair(sit->first,*eit);
+                      returnStateSet.insert(newSP);
+                      returnStates.insert(wali::getKey(newSP.first,newSP.second));
+                    }
                   }
                 }
               }
             }
           }
-        }
 
-        //We only want to add states that don't already exist.
-        St returnState;
-        if( stMap.count(returnStateSet) == 0 )
-        {
-          //Add the new key to the map.
-          returnState = wali::getKey(returnStates);
-          stMap.insert(std::pair<StatePairSet,Key>(returnStateSet,returnState));
-          addState(returnState);
-          
-          //Determinize all paths through 'nondet' starting from this new summary state.
-          callPred.pop();
-          det(nondet,stMap,returnStateSet,callPred);
-        }
-        else
-        {
-          returnState = (stMap.find(returnStateSet))->second;
-        }
+          //We only want to add states that don't already exist.
+          St returnState;
+          if( stMap.count(returnStateSet) == 0 )
+          {
+            //Add the new key to the map.
+            returnState = wali::getKey(returnStates);
+            stMap.insert(std::pair<StatePairSet,Key>(returnStateSet,returnState));
+            addState(returnState);
+            
+            //Determinize all paths through 'nondet' starting from this new summary state.
+            callPred.pop();
+            det(nondet,stMap,returnStateSet,callPred);
+          }
+          else
+          {
+            returnState = (stMap.find(returnStateSet))->second;
+          }
 
-        if( (stMap.find(currSt) != stMap.end()) && (stMap.find(Sprime) != stMap.end()) )
-        {
-          //Add a return transition to this state.
-          addReturnTrans(stMap.find(currSt)->second,stMap.find(Sprime)->second,*it,returnState);
+          if( (stMap.find(currSt) != stMap.end()) && (stMap.find(Sprime) != stMap.end()) )
+          {
+            //Add a return transition to this state.
+            addReturnTrans(stMap.find(currSt)->second,stMap.find(Sprime)->second,*it,returnState);
+          }
         }
       }
     }
