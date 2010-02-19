@@ -92,24 +92,6 @@ namespace wali
         return getOne();
       }
 
-      /** 
-       * 
-       * @brief computes the weight(in the desired semiring) for the return rule of the 
-       *        backwards WPDS associated with the given entry
-       *
-       * This method computes the weight(in the desired semiring) for the return rule of
-       * the backwards WPDS corresponding to the entry 'tgt'.
-       * Note: This value is generally the same as getOne().
-       * 
-       * @param - tgt: the target of the entry edge
-       * @return the weight to put on the return rule corresponding to the given entry 
-       *
-       */
-      virtual sem_elem_t getEntryWeight( Key tgt) 
-      {
-        return getOne();
-      }
-
       /**
        *
        * @brief computes the weight(in the desired semiring) for a rule when the symbol

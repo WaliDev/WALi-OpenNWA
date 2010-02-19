@@ -118,7 +118,6 @@ int main()
   myNWA->getStates();
   myNWA->get_states();
   myNWA->getInitialStates();
-  myNWA->getInitialState();
   myNWA->getFinalStates();
 
   myNWA->isState(state);

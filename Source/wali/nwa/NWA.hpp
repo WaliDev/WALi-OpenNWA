@@ -6229,16 +6229,17 @@ namespace wali
        * @brief returns the program control location corresponding to the given states
        *
        * This method provides access to the program control location corresponding to
-       * the given exit point/call site pair.
+       * the given exit point/call site/return site triple.
        *
        * @param - exit: the exit point corresponding to this control location
        * @param - callSite: the call site corresponding to this control location
+       * @param - returnSite: the return site corresponding to this control location
        * @return the program control location corresponding to the given states
        *
        */
-      static wali::Key getControlLocation( Key exit, Key callSite )
+      static wali::Key getControlLocation( Key exit, Key callSite, Key returnSite )
       {
-        return getKey(exit,callSite);
+        return getKey(getProgramControlLocation(),getKey(exit,getKey(callSite,returnSite)));
       };
 
       /**
@@ -8781,80 +8782,80 @@ namespace wali
 
         //TODO: fix this with respect to wild labels
         if( SymbolSet::isWild(Trans::getInternalSym(*iit)) )
-          wgt = wg.getWildWeight(Trans::getSource(*iit),Trans::getTarget(*iit));
+          wgt = wg.getWildWeight(Trans::getSource(*iit),Trans::getTarget(*iit));  // w
         else
           wgt = wg.getWeight(Trans::getSource(*iit),
                               Trans::getInternalSym(*iit),
                               WeightGen::INTRA,
-                              Trans::getTarget(*iit));
+                              Trans::getTarget(*iit));          //w
 
         result.add_rule(program,                                //from_state (p)
                         Trans::getSource(*iit),                 //from_stack (q)
                         program,                                //to_state (p)
                         Trans::getTarget(*iit),                 //to_stack1 (q')
-                        wgt);                                   //weight      
+                        wgt);                                   //weight  (w)      
       }
 
       //Call Transitions 
       for( callIterator cit = trans->beginCall(); cit != trans->endCall(); cit++ )
       {
         for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+        {
           if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
           {
             //(q_c,sigma,q_e) in delta_c and (q_x,q_c,*,q_r) in delta_r goes to
-            // <p,q_c> -w-> <p,q_e q_r> in delta_2 
-            // and the weight w depends on sigma
+            // <p,q_c> -w-> <p,q_e q_r> in delta_2 and w depends on sigma
 
             //TODO: fix this with respect to wild labels
             if( SymbolSet::isWild(Trans::getCallSym(*cit)) )
-              wgt = wg.getWildWeight(Trans::getCallSite(*cit),Trans::getEntry(*cit));
+              wgt = wg.getWildWeight(Trans::getCallSite(*cit),Trans::getEntry(*cit)); // w
             else
               wgt = wg.getWeight(Trans::getCallSite(*cit), 
                                   Trans::getCallSym(*cit),
                                   WeightGen::CALL_TO_ENTRY,  
-                                  Trans::getEntry(*cit));  
+                                  Trans::getEntry(*cit)); // w   
 
             result.add_rule(program,                      //from_state (p)
                             Trans::getCallSite(*cit),     //from_stack (q_c)
                             program,                      //to_state (p)
                             Trans::getEntry(*cit),        //to_stack1 (q_e)
                             Trans::getReturnSite(*rit),   //to_stack2 (q_r)
-                            wgt);                         //weight      
+                            wgt);                         //weight  (w)    
           }
+        }
       }
 
       //Return Transitions
       for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
       {
         //(q_x,q_c,*,q_r) in delta_r goes to
-        // <p,q_x> -w1-> <p_q_x,epsilon> in delta_0
-        // and <p_q_x,q_r> -w2-> <p,q_r> in delta_1
-        // where p_q_x = (q_x,q_c)
-        // w1 depends is one, and w2 depends on sigma
-
-        wgt = wg.getExitWeight( Trans::getExit(*rit) );  //w1
-
-        Key rstate = getControlLocation(Trans::getExit(*rit),Trans::getCallSite(*rit));    //p_q_x
-
-        result.add_rule(program,                    //from_state (p)
-                        Trans::getExit(*rit),       //from_stack (q_x)
-                        rstate,                     //to_state (p_q_x == (q_x,q_c))
-                        wgt);                       //weight (w1) 
+        // <p,q_x> -w-> <p_q_xcr,epsilon> in delta_0
+        // and <p_q_xcr,q_r> -1-> <p,q_r> in delta_1
+        // where p_q_xcr = (p,q_x,q_c,q_r) and w depends on sigma
 
         //TODO: fix this with respect to wild labels
         if( SymbolSet::isWild(Trans::getReturnSym(*rit)) )
-          wgt = wg.getWildWeight(Trans::getExit(*rit),Trans::getReturnSite(*rit));  //w2
+          wgt = wg.getWildWeight(Trans::getExit(*rit),Trans::getReturnSite(*rit));  // w  
         else
           wgt = wg.getWeight(Trans::getExit(*rit),
                               Trans::getReturnSym(*rit),
                               WeightGen::EXIT_TO_RET,
-                              Trans::getReturnSite(*rit));            //w2
+                              Trans::getReturnSite(*rit));  // w            
 
-        result.add_rule(rstate,                         //from_state (p_q_x == (q_x,q_c))
+        Key rstate = getControlLocation(Trans::getExit(*rit),Trans::getCallSite(*rit),Trans::getReturnSite(*rit));    //p_q_xcr
+
+        result.add_rule(program,                    //from_state (p)
+                        Trans::getExit(*rit),       //from_stack (q_x)
+                        rstate,                     //to_state (p_q_xcr == (p,q_x,q_c,q_c))
+                        wgt);                       //weight  (w)
+
+        wgt = wg.getOne();                              // 1
+
+        result.add_rule(rstate,                         //from_state (p_q_xcr == (p,q_x,q_c,q_r))
                         Trans::getReturnSite(*rit),     //from_stack (q_r)
                         program,                        //to_state (p)
                         Trans::getReturnSite(*rit),     //to_stack (q_r)
-                        wgt);                           //weight (w2)    
+                        wgt);                           //weight  (1)   
       }  
 
       return result;
@@ -8887,18 +8888,18 @@ namespace wali
 
         //TODO: fix this with respect to wild labels
         if( SymbolSet::isWild(Trans::getInternalSym(*iit)) )
-          wgt = wg.getWildWeight(Trans::getSource(*iit),Trans::getTarget(*iit));
+          wgt = wg.getWildWeight(Trans::getSource(*iit),Trans::getTarget(*iit));  // w
         else
           wgt = wg.getWeight(Trans::getSource(*iit),
                               Trans::getInternalSym(*iit),
                               WeightGen::INTRA,
-                              Trans::getTarget(*iit));
+                              Trans::getTarget(*iit));          // w
 
         result.add_rule(program,                                //from_state (p)
                         Trans::getTarget(*iit),                 //from_stack (q')
                         program,                                //to_state (p)
                         Trans::getSource(*iit),                 //to_stack1 (q)
-                        wgt);                                   //weight      
+                        wgt);                                   //weight (w)      
       }
 
       //Call Transitions 
@@ -8908,34 +8909,33 @@ namespace wali
           if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
           {
             //(q_c,sigma,q_e) in delta_c and (q_x,q_c,*,q_r) in delta_r goes to
-            // <p,q_e> -w1-> <p_q_e,epsilon> in delta_0
-            // and <p_q_e,q_c> -w2-> <p,q_c> in delta_1
-            // where p_q_e = (q_e,q_r)
-            // w1 depends is one, and w2 depends on sigma
-
-            wgt = wg.getEntryWeight( Trans::getEntry(*cit) );  //w1
-
-            Key cstate = getControlLocation(Trans::getEntry(*cit),Trans::getReturnSite(*rit));    //p_q_e
-
-            result.add_rule(program,                    //from_state (p)
-                            Trans::getEntry(*cit),      //from_stack (q_e)
-                            cstate,                     //to_state (p_q_e == (q_e,q_r))
-                            wgt);                       //weight 
+            // <p,q_e> -w-> <p_q_erc,epsilon> in delta_0
+            // and <p_q_erc,q_c> -1-> <p,q_c> in delta_1
+            // where p_q_erc = (p,q_e,q_r,q_c) and w depends on sigma
 
             //TODO: fix this with respect to wild labels
             if( SymbolSet::isWild(Trans::getCallSym(*cit)) )
-              wgt = wg.getWildWeight(Trans::getCallSite(*cit),Trans::getEntry(*cit));
+              wgt = wg.getWildWeight(Trans::getCallSite(*cit),Trans::getEntry(*cit)); // w
             else
               wgt = wg.getWeight(Trans::getCallSite(*cit), 
                                   Trans::getCallSym(*cit),
                                   WeightGen::CALL_TO_ENTRY,  
-                                  Trans::getEntry(*cit));  
+                                  Trans::getEntry(*cit)); // w    
 
-            result.add_rule(cstate,                         //from_state (p_q_e == (q_e,q_r))
+            Key cstate = getControlLocation(Trans::getEntry(*cit),Trans::getReturnSite(*rit),Trans::getCallSite(*cit));    //p_q_erc
+
+            result.add_rule(program,                    //from_state (p)
+                            Trans::getEntry(*cit),      //from_stack (q_e)
+                            cstate,                     //to_state (p_q_erc == (p,q_e,q_r,q_c))
+                            wgt);                       //weight (w)
+
+            wgt = wg.getOne();                              // 1
+            
+            result.add_rule(cstate,                         //from_state (p_q_erc == (p,q_e,q_r,q_c))
                             Trans::getCallSite(*cit),       //from_stack (q_c)
                             program,                        //to_state (p)
                             Trans::getCallSite(*cit),       //to_stack (q_c)
-                            wgt);                           //weight    
+                            wgt);                           //weight (1)    
           }  
       }
 
@@ -8944,23 +8944,23 @@ namespace wali
       {
         //(q_x,q_c,*,q_r) in delta_r goes to
         // <p,q_r> -w-> <p,q_x q_c> in delta_2 
-        // and the weight w depends on sigma
+        // and w depends on sigma
 
         //TODO: fix this with respect to wild labels
         if( SymbolSet::isWild(Trans::getReturnSym(*rit)) )
-          wgt = wg.getWildWeight(Trans::getExit(*rit),Trans::getReturnSite(*rit));
+          wgt = wg.getWildWeight(Trans::getExit(*rit),Trans::getReturnSite(*rit));  // w
         else
           wgt = wg.getWeight(Trans::getExit(*rit),
                               Trans::getReturnSym(*rit),
                               WeightGen::EXIT_TO_RET,
-                              Trans::getReturnSite(*rit));
+                              Trans::getReturnSite(*rit));  // w
 
         result.add_rule(program,                      //from_state (p)
                         Trans::getReturnSite(*rit),   //from_stack (q_r)
                         program,                      //to_state (p)
                         Trans::getExit(*rit),         //to_stack1 (q_x)
                         Trans::getCallSite(*rit),     //to_stack2 (q_c)
-                        wgt);                         //weight      
+                        wgt);                         //weight (w)      
       }
 
       return result;
@@ -8993,18 +8993,18 @@ namespace wali
 
         //TODO: fix this with respect to wild labels
         if( SymbolSet::isWild(Trans::getInternalSym(*iit)) )
-          wgt = wg.getWildWeight(Trans::getSource(*iit),Trans::getTarget(*iit));
+          wgt = wg.getWildWeight(Trans::getSource(*iit),Trans::getTarget(*iit));  // w
         else
           wgt = wg.getWeight(Trans::getSource(*iit),
                               Trans::getInternalSym(*iit),
                               WeightGen::INTRA,
-                              Trans::getTarget(*iit) );
+                              Trans::getTarget(*iit) );           // w
 
           result.add_rule(program,                                //from_state (p)
                           Trans::getSource(*iit),                 //from_stack (q)
                           program,                                //to_state (p)
                           Trans::getTarget(*iit),                 //to_stack1 (q')
-                          wgt);                                   //weight      
+                          wgt);                                   //weight (w)      
       }
 
       //Call Transitions
@@ -9016,54 +9016,54 @@ namespace wali
 
         //TODO: fix this with respect to wild labels
         if( SymbolSet::isWild(Trans::getCallSym(*cit)) )
-          wgt = wg.getWildWeight(Trans::getCallSite(*cit),Trans::getEntry(*cit));
+          wgt = wg.getWildWeight(Trans::getCallSite(*cit),Trans::getEntry(*cit)); // w
         else
           wgt = wg.getWeight(Trans::getCallSite(*cit),
                               Trans::getCallSym(*cit),
                               WeightGen::CALL_TO_ENTRY,
-                              Trans::getEntry(*cit) );
+                              Trans::getEntry(*cit) );          // w
 
         result.add_rule(program,                                //from_state (p)
                         Trans::getCallSite(*cit),               //from_stack (q_c)
                         program,                                //to_state (p)
                         Trans::getEntry(*cit),                  //to_stack1 (q_e)
                         Trans::getCallSite(*cit),               //to_stack2 (q_c)
-                        wgt);                                   //weight  
+                        wgt);                                   //weight (w)  
       } 
 
       //Return Transitions
       for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
       {
         // (q_x,q_c,sigma,q_r) in delta_r goes to 
-        // <p,q_x> -w1-> <p_q_x,epsilon> in delta_0
-        // and <p_q_x,q_c> -w2-> <p,q_r> in delta_1
-        // where p_q_x = (p,q_x), w1 depends on q_x, and w2 depends on sigma
-
-        wgt = wg.getExitWeight(Trans::getExit(*rit));  //w1
-
-        //Note: if you change this, make sure you modify the code in NWPForest.createCA()
-        Key rstate = getControlLocation(program,Trans::getExit(*rit));  //p_q_x
-
-        result.add_rule(program,                              //from_state (p)
-                        Trans::getExit(*rit),                 //from_stack (q_x)
-                        rstate,                               //to_state (p_q_x == (p,q_x))
-                        wgt);                                 //weight (w1) 
+        // <p,q_x> -w-> <p_q_xcr,epsilon> in delta_0
+        // and <p_q_xcr,q_c> -1-> <p,q_r> in delta_1
+        // where p_q_xcr = (p,q_x,q_c,q_r), and w depends on sigma
 
         //TODO: fix this with respect to wild labels
         if( SymbolSet::isWild(Trans::getReturnSym(*rit)) )
-          wgt = wg.getWildWeight(Trans::getExit(*rit),Trans::getReturnSite(*rit)); //w2
+          wgt = wg.getWildWeight(Trans::getExit(*rit),Trans::getReturnSite(*rit));  // w 
         else
           wgt = wg.getWeight(Trans::getExit(*rit), 
                               Trans::getReturnSym(*rit),
                               WeightGen::EXIT_TO_RET,  
-                              Trans::getReturnSite(*rit));          //w2
+                              Trans::getReturnSite(*rit));    // w     
+
+        //Note: if you change this, make sure you modify the code in NWPForest.createCA()
+        Key rstate = getControlLocation(Trans::getExit(*rit),Trans::getCallSite(*rit),Trans::getReturnSite(*rit));  //p_q_xcr
+
+        result.add_rule(program,                              //from_state (p)
+                        Trans::getExit(*rit),                 //from_stack (q_x)
+                        rstate,                               //to_state (p_q_xcr == (p,q_x,q_c,q_r))
+                        wgt);                                 //weight (w)
+
+        
+        wgt = wg.getOne();                                    // 1                      
          
-        result.add_rule(rstate,                               //from_state (p_q_x == (p,q_x))
+        result.add_rule(rstate,                               //from_state (p_q_xcr == (p,q_x,q_c,q_r))
                         Trans::getCallSite(*rit),             //from_stack (q_c)
                         program,                              //to_state (p)
                         Trans::getReturnSite(*rit),           //to_stack (q_r)
-                        wgt);                                 //weight (w2)    
-
+                        wgt);                                 //weight (1)
       }
 
       return result;
@@ -9096,18 +9096,18 @@ namespace wali
 
         //TODO: fix this with respect to wild labels
         if( SymbolSet::isWild(Trans::getInternalSym(*iit)) )
-          wgt = wg.getWildWeight(Trans::getSource(*iit),Trans::getTarget(*iit));
+          wgt = wg.getWildWeight(Trans::getSource(*iit),Trans::getTarget(*iit));  // w
         else
           wgt = wg.getWeight(Trans::getSource(*iit),
                               Trans::getInternalSym(*iit),
                               WeightGen::INTRA,
-                              Trans::getTarget(*iit) );
+                              Trans::getTarget(*iit) );         // w
 
         result.add_rule(program,                                //from_state (p)
                         Trans::getTarget(*iit),                 //from_stack (q')
                         program,                                //to_state (p)
                         Trans::getSource(*iit),                 //to_stack1 (q)
-                        wgt);                                   //weight      
+                        wgt);                                   //weight (w)     
       }
 
       //Call Transitions
@@ -9117,33 +9117,33 @@ namespace wali
           if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
           {
             // (q_c,sigma,q_e) in delta_c and (q_x,q_c,*,q_r) in delta_r goes to
-            // <p,q_e> -w1-> <p_q_e,epsilon> in delta_0
-            // and <p_q_e,q_r> -w2-> <p,q_c> in delta_1
-            // where p_q_e = (p,q_e), w1 depends on q_e, and w2 depends on sigma
-
-            wgt = wg.getEntryWeight(Trans::getEntry(*cit));  //w1
-
-            Key cstate = getControlLocation(program,Trans::getEntry(*cit));  //p_q_e
-
-            result.add_rule(program,                                //from_state (p)
-                            Trans::getEntry(*cit),                  //from_stack (q_e)
-                            cstate,                                 //to_state (p_q_e == (p,q_e))
-                            wgt);                                   //weight (w1) 
-
+            // <p,q_e> -w-> <p_q_erc,epsilon> in delta_0
+            // and <p_q_erc,q_r> -1-> <p,q_c> in delta_1
+            // where p_q_erc = (p,q_e,q_r,q_c) and w depends on sigma
+            
             //TODO: fix this with respect to wild labels
             if( SymbolSet::isWild(Trans::getCallSym(*cit)) )
-              wgt = wg.getWildWeight(Trans::getCallSite(*cit),Trans::getEntry(*cit));   //w2
+              wgt = wg.getWildWeight(Trans::getCallSite(*cit),Trans::getEntry(*cit)); // w  
             else
               wgt = wg.getWeight(Trans::getCallSite(*cit),
                                   Trans::getCallSym(*cit),
                                   WeightGen::CALL_TO_ENTRY,
-                                  Trans::getEntry(*cit));                  //w2
+                                  Trans::getEntry(*cit));         // w                  
 
-            result.add_rule(cstate,                                //from_state (p_q_e == (p,q_e))
+            Key cstate = getControlLocation(Trans::getEntry(*cit),Trans::getReturnSite(*rit),Trans::getCallSite(*cit));  //p_q_erc
+
+            result.add_rule(program,                              //from_state (p)
+                            Trans::getEntry(*cit),                //from_stack (q_e)
+                            cstate,                               //to_state (p_q_erc == (p,q_e,q_r,q_c))
+                            wgt);                                 //weight (w)  
+
+            wgt = wg.getOne();                                    // 1
+
+            result.add_rule(cstate,                               //from_state (p_q_erc == (p,q_e,q_r,q_c))
                             Trans::getReturnSite(*rit),           //from_stack (q_r)
                             program,                              //to_state (p)
                             Trans::getCallSite(*cit),             //to_stack (q_c)
-                            wgt);                                 //weight (w2)    
+                            wgt);                                 //weight (1)    
           }
       } 
 
@@ -9156,19 +9156,19 @@ namespace wali
 
         //TODO: fix this with respect to wild labels
         if( SymbolSet::isWild(Trans::getReturnSym(*rit)) )
-          wgt = wg.getWildWeight(Trans::getExit(*rit),Trans::getReturnSite(*rit)); //w2
+          wgt = wg.getWildWeight(Trans::getExit(*rit),Trans::getReturnSite(*rit)); //w
         else
           wgt = wg.getWeight(Trans::getExit(*rit), 
                               Trans::getReturnSym(*rit),
                               WeightGen::EXIT_TO_RET,  
-                              Trans::getReturnSite(*rit));          //w2
+                              Trans::getReturnSite(*rit));      //w
          
-        result.add_rule(program,                                    //from_state (p)
+        result.add_rule(program,                                //from_state (p)
                         Trans::getReturnSite(*rit),             //from_stack (q_r)
                         program,                                //to_state (p)
                         Trans::getExit(*rit),                   //to_stack1 (q_x)
                         Trans::getReturnSite(*rit),             //to_stack2 (q_r)
-                        wgt);                                   //weight  
+                        wgt);                                   //weight (w)  
       }
 
       return result;
@@ -10059,27 +10059,31 @@ namespace wali
       }
 
       //If no internal transition led to a path, try return transitions.
-      St callSt = calls.top();
-      calls.pop();
-      for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+      //Only check return transitions if there is some call predecessor waiting to be checked.
+      if(! calls.empty() )
       {
-        St ret = Trans::getReturnSite(*rit);
-        //If we can reach a final state through this transition, we have found a path.
-        if( isFinalState(ret) )
-          return true;
-        //If the return transition starts from the current state with the call site from
-        //the top of the call stack and goes to a state not yet visited, follow the path.
-        if( (Trans::getExit(*rit) == currSt)
-          && (Trans::getCallSite(*rit) == callSt)
-          && (visited.count(ret) == 0) )
+        St callSt = calls.top();
+        calls.pop();
+        for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
         {
-          visited.insert(ret);
-          if( hasPath(ret,calls,visited) )
+          St ret = Trans::getReturnSite(*rit);
+          //If we can reach a final state through this transition, we have found a path.
+          if( isFinalState(ret) )
             return true;
-          visited.erase(ret);
+          //If the return transition starts from the current state with the call site from
+          //the top of the call stack and goes to a state not yet visited, follow the path.
+          if( (Trans::getExit(*rit) == currSt)
+            && (Trans::getCallSite(*rit) == callSt)
+            && (visited.count(ret) == 0) )
+          {
+            visited.insert(ret);
+            if( hasPath(ret,calls,visited) )
+              return true;
+            visited.erase(ret);
+          }
         }
+        calls.push(callSt);
       }
-      calls.push(callSt);
 
       return false;
     }
