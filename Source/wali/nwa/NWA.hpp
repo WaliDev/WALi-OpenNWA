@@ -7817,7 +7817,8 @@ namespace wali
       //Attach the initial state to all the initial states of the two machines
       //with epsilon transitions.
 
-      //Copy all of the functionality of the two machines.
+      //Copy all of the functionality of the two machines.    
+      //Note: Here's where the problems with keys come in.
 
       //Generate a new final state.
       //Note: This involves generating a new key.  How should this be done?
@@ -9775,10 +9776,14 @@ namespace wali
       for( Internals::iterator it = reachable.begin(); it != reachable.end(); it++ )
       {
         St newSt = Trans::getTarget(*it);
-        //Add a new pair.
-        newPairs->insert(newSt);
-        //Recursively explore.
-        epsilonClosure(newPairs,newSt); 
+        //Check that we haven't seen this pair already.
+        if( newPairs->count(newSt) == 0 )
+        {
+          //Add a new pair.
+          newPairs->insert(newSt);
+          //Recursively explore.
+          epsilonClosure(newPairs,newSt); 
+        }
       }
     }
 
@@ -9805,10 +9810,14 @@ namespace wali
       for( Internals::iterator it = reachable.begin(); it != reachable.end(); it++ )
       {
         StatePair newSP = StatePair(Trans::getTarget(*it),sp.second);
-        //Add a new pair.
-        newPairs->insert(newSP);
-        //Recursively explore.
-        epsilonClosure(newPairs,newSP,first,second); 
+        //Check that we haven't seen this pair already.
+        if( newPairs->count(newSP) == 0 )
+        {
+          //Add a new pair.
+          newPairs->insert(newSP);
+          //Recursively explore.
+          epsilonClosure(newPairs,newSP,first,second); 
+        }
       }
 
       //Explore epsilon transitions reachable from the second component of sp.

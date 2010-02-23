@@ -62,7 +62,7 @@ class ReachGen : public wali::nwa::WeightGen
         
     sem_elem_t getOne( )
     {
-      wali::ref_ptr<Reach> r;
+      wali::ref_ptr<Reach> r = new Reach(true);
       return r->one();
     }
 
