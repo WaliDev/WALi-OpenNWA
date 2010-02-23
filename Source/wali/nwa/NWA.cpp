@@ -45,11 +45,12 @@ class STR
     std::string str;
 };
 
-template<typename St, typename Sym>
 class ReachGen : public wali::nwa::WeightGen
 {
   public:
     enum Kind {INTRA, CALL_TO_ENTRY, EXIT_TO_RET, CALL_TO_RET};
+    typedef wali::Key St;
+    typedef wali::Key Sym;
      
     //
     // Methods
@@ -171,7 +172,7 @@ int main()
   
   myNWA->print(std::cout);
   
-  ReachGen<wali::Key,wali::Key> wg;  
+  ReachGen wg;  
   myNWA->NWAtoPDSreturns(wg);
   myNWA->NWAtoPDScalls(wg);
   myNWA->NWAtoBackwardsPDSreturns(wg);

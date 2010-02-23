@@ -5325,17 +5325,6 @@ namespace wali
        *
        */
       const std::set<St> & getInitialStates( ) const; 
-      /**
-       *  TODO: do we still need the single initial state restriction?  NO!!!
-       * @brief obtain the initial state
-       *
-       * This method provides access to the initial state of this NWA.  
-       * Note: This hinges on the assertion that there is a unique initial state.
-       *
-       * @return the inital state associated with the NWA
-       *
-       */
-      //St getInitialState( ) const;
 
       /**
        * 
@@ -7818,6 +7807,9 @@ namespace wali
     void NWA<Client>::unionNWA( NWARefPtr first, NWARefPtr second )
     {
       //TODO: write this!
+      //Q: Do we need to guarantee that there is no overlap in states between machines?
+      //    If there is overlap, then we could conceivably go through the first half of one
+      //    machine and then skip to the other machine, thereby not completing either machine.
 
       //Generate a new initial state.
       //Note: This involves generating a new key.  How should this be done?
@@ -8315,6 +8307,9 @@ namespace wali
     void NWA<Client>::concat( NWARefPtr first, NWARefPtr second )
     {
       //TODO: write this!
+      //Q: Do we need to guarantee that there is no overlap in states between machines?
+      //    If there is overlap, then we could conceivably go through the first half of one
+      //    machine and then skip to the other machine before completing the first machine.
 
       //Duplicate all of the functionality of the first machine (except the final state property).
 
@@ -8358,6 +8353,12 @@ namespace wali
     void NWA<Client>::star( NWARefPtr first )
     {
       //TODO: write this!
+
+      //Duplicate initial and final states.
+
+      //Duplicate all transitions.
+
+      //Add epsilon transitions from each final state to each initial state.
     }
 
     /**
@@ -9194,21 +9195,69 @@ namespace wali
 
       //An automaton with no path from an initial state to a final state must accept only
       //the empty language.
+      //for( stateIterator it = beginInitialStates(); it != endInitialStates(); it++ )
+      //{
+      //  //If the initial state is also a final state, then the empty string is accepted.
+      //  //Therefore the accepted language is not the empty language.
+      //  if( isFinalState(*it) )
+      //    return false;
+
+      //  //If a path is found, the automaton accepts a non-empty language.
+      //  std::set<St> visited = std::set<St>();
+      //  visited.insert(*it);
+      //  if( hasPath(*it,std::stack<St>(),visited) )
+      //    return false;
+      //  visited.erase(*it);
+      //}
+      //return true;
+
+      //Any final state reachable from an initial state shows this NWA is not empty.
+
+      //Make a WFA with transitions from initial state to final state for each 
+      //initial state of the NWA.
+      wali::wfa::WFA initials;
+      //Set up initial state.
+      wali::Key init = getKey("init");
+      initials.addState(init,Reach(true).zero());
+      initials.setInitialState(init);
+      //Set up final state.
+      wali::Key fin = getKey("fin");
+      initials.addState(fin,Reach(true).zero());
+      initials.addFinalState(fin);
+      //Add transitions.
       for( stateIterator it = beginInitialStates(); it != endInitialStates(); it++ )
       {
-        //If the initial state is also a final state, then the empty string is accepted.
-        //Therefore the accepted language is not the empty language.
-        if( isFinalState(*it) )
-          return false;
-
-        //If a path is found, the automaton accepts a non-empty language.
-        std::set<St> visited = std::set<St>();
-        visited.insert(*it);
-        if( hasPath(*it,std::stack<St>(),visited) )
-          return false;
-        visited.erase(*it);
+        initials.addTrans(init,*it,fin,Reach(true).one());
       }
-      return true;
+
+      //Perform poststar to determine reachability.
+      wali::wfa::WFA postInitials = poststar(initials,ReachGen());
+
+      //Make a WFA with transitions from initial state to final state for each
+      //final state of the NWA.
+      wali::wfa::WFA finals;
+      //Set up initial state.
+      finals.addState(init,Reach(true).zero());
+      finals.setInitialState(init);
+      //Set up final state.
+      finals.addState(fin,Reach(true).zero());
+      finals.addFinalState(fin);
+      //Add transitions.
+      for( stateIterator it = beginFinalStates(); it != endFinalStates(); it++ )
+      {
+        finals.addTrans(init,*it,fin,Reach(true).one());
+      }
+
+      //intersect poststar(initials) and finals
+      wali::wfa::WFA reachable = postInitials.intersect(finals);
+
+      //If there are no transitions in this intersection, then the NWA is empty.
+      wali::wfa::TransCounter tc = wali::wfa::TransCounter();
+      reachable.for_each( tc );
+      if( tc.getNumTrans() == 0 )
+        return true;  //There was no path from an initial state to a final state in the NWA.
+      else
+        return false; //There was a path from an initial state to a final state in the NWA.
     }
 
     /**
@@ -9240,7 +9289,6 @@ namespace wali
     template <typename Client>
     wfa::WFA NWA<Client>::prestar( wfa::WFA & input, WeightGen & wg )
     {
-      //TODO: Q: is this how I should do this?
       return ((NWAtoPDScalls(wg)).prestar(input));
     }
 
@@ -9259,7 +9307,6 @@ namespace wali
     template <typename Client>
     void NWA<Client>::prestar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg )
     {
-      //TODO: Q: is this how I should do this?
       (NWAtoPDScalls(wg)).prestar(input,output);
     }
 
@@ -9275,7 +9322,6 @@ namespace wali
     template <typename Client>
     wfa::WFA NWA<Client>::poststar( wfa::WFA & input, WeightGen & wg )
     {
-      //TODO: Q: is this how I should do this?
       return ((NWAtoPDScalls(wg)).poststar(input));
     }
 
@@ -9294,7 +9340,6 @@ namespace wali
     template <typename Client>
     void NWA<Client>::poststar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg )
     {
-      //TODO: Q: is this how I should do this?
       (NWAtoPDScalls(wg)).poststar(input,output);
     }
 
@@ -9753,7 +9798,7 @@ namespace wali
     template <typename Client>
     void NWA<Client>::epsilonClosure( std::set<StatePair> * newPairs, StatePair sp, NWARefPtr first, NWARefPtr second )
     {
-      //compute the cross produce of all states reachable from sp via epsilon transitions
+      //Compute the cross produce of all states reachable from sp via epsilon transitions.
 
       //Explore epsilon transitions reachable from the first component of sp.
       Internals reachable = first->trans->getInternals(sp.first,SymbolSet::getEpsilon());
