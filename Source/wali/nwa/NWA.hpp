@@ -6016,7 +6016,7 @@ namespace wali
       bool isDeterministic( );
 
       /**
-       * 
+       * TODO remove this
        * @brief intersects client information 
        *
        * This method intersects the client information associated with the given states
@@ -6030,13 +6030,12 @@ namespace wali
        * @param - second: the NWA in which to look up the client information for 'name2'
        * @param - name2: the second state whose client information to intersect
        * @param - resSt: the state which will receive the computed client information
-       * @param - result: the client information resulting from the intersection of
-       *                  'name1' and 'name2'
        *
        */
-      virtual void intersectClientInfo( NWARefPtr first, St name1, 
+     /* virtual void intersectClientInfo( NWARefPtr first, St name1, 
                                         NWARefPtr second, St name2, 
-                                        St resSt, ClientInfoRefPtr result );
+                                        St resSt );
+*/
 
       /**
        * 
@@ -6061,14 +6060,12 @@ namespace wali
        * @param - entry2: the second entry point whose client information to intersect
        * @param - resSym: the symbol associated with the transition that is being created
        * @param - resSt: the state which will receive the computed client information
-       * @param - result: the client information resulting from the intersection of 
-       *                  'entry1' and 'entry2'
+
        *
        */
       virtual void intersectClientInfoCall( NWARefPtr first, St call1, St entry1, 
                                             NWARefPtr second, St call2, St entry2, 
-                                            Sym resSym, St resSt, 
-                                            ClientInfoRefPtr result );  
+                                            Sym & resSym, St resSt );  
 
       /**
        * 
@@ -6093,14 +6090,11 @@ namespace wali
        * @param - tgt2: the second target whose client information to intersect
        * @param - resSym: the symbol associated with the transition that is being created
        * @param - resSt: the state which will receive the computed client information
-       * @param - result: the client information resulting from the intersection of
-       *                'tgt1' and 'tgt2'
        *
        */
       virtual void intersectClientInfoInternal( NWARefPtr first, St src1, St tgt1, 
                                                 NWARefPtr second, St src2, St tgt2, 
-                                                Sym resSym, St resSt, 
-                                                ClientInfoRefPtr result );  
+                                                Sym & resSym, St resSt );  
 
       /**
        * 
@@ -6129,14 +6123,11 @@ namespace wali
        * @param - ret2: the second return site whose client information to intersect
        * @param - resSym: the symbol associated with the transition that is being created
        * @param - resSt: the state which will receive the computed client information
-       * @param - result: the client information resulting from the intersection of
-       *                'ret1' and 'ret2'
        *
        */
       virtual void intersectClientInfoReturn( NWARefPtr first, St exit1, St call1, St ret1,
                                               NWARefPtr second, St exit2, St call2, St ret2,
-                                              Sym resSym, St resSt,
-                                              ClientInfoRefPtr result );
+                                              Sym & resSym, St resSt );
 
       /**
        * 
@@ -6150,9 +6141,11 @@ namespace wali
        * @param - second: the NWA in which to look up information about 'state2'
        * @param - state2: the second state to intersect
        * @param - resSt: the state that results from performing the intersection
+       * @param - resCI: the client info that results from performing the intersection
        *
        */
-      virtual bool nodeIntersect( NWARefPtr first, St state1, NWARefPtr second, St state2, St & resSt );
+      virtual bool nodeIntersect( NWARefPtr first, St state1, NWARefPtr second, St state2, 
+                                  St & resSt, ClientInfoRefPtr & resCI );
 
       /**
        * 
@@ -6722,7 +6715,7 @@ namespace wali
       
         States states;         
         Symbols symbols;        
-        Trans * trans;
+        Trans trans;
     };
 
     //
@@ -6735,7 +6728,7 @@ namespace wali
     {
       states = States();
       symbols = Symbols();
-      trans = new Trans();  //Q: why is this a pointer and not the others?
+      trans = Trans();  //Q: should this be a pointer for some reason?
     }
     template <typename Client>
     NWA<Client>::NWA( const NWA & other )
@@ -6782,8 +6775,6 @@ namespace wali
     NWA<Client>::~NWA( )
     {
       clear();
-
-      trans->~Trans();
     }
 
     //State Accessors
@@ -6831,15 +6822,15 @@ namespace wali
     {
       std::set<St> * preds = new std::set<St>();  //TODO: this is not a good idea, it will probably cause a memory leak!
       
-      std::set<Call> calls = trans->getTransEntry(state);
+      std::set<Call> calls = trans.getTransEntry(state);
       for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
         preds->insert(Trans::getCallSite(*cit));
 
-      std::set<Internal> internals = trans->getTransTo(state);
+      std::set<Internal> internals = trans.getTransTo(state);
       for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
         preds->insert(Trans::getSource(*iit));
 
-      std::set<Return> returns = trans->getTransRet(state);
+      std::set<Return> returns = trans.getTransRet(state);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         preds->insert(Trans::getExit(*rit));
 
@@ -6860,7 +6851,7 @@ namespace wali
       states.addState(dup);
       states.dupState(orig,dup);  //Duplicate state characteristics(initial/final).
 
-      trans->dupTransOutgoing(orig,dup);  //Duplicate outgoing transitions.
+      trans.dupTransOutgoing(orig,dup);  //Duplicate outgoing transitions.
     }
 
     /**
@@ -6877,7 +6868,7 @@ namespace wali
       states.addState(dup);
       states.dupState(orig,dup);  //Duplicate state characteristics(initial/final).
 
-      trans->dupTrans(orig,dup);  //Duplicate all transitions.
+      trans.dupTrans(orig,dup);  //Duplicate all transitions.
     }
 
     //All States
@@ -7004,7 +6995,7 @@ namespace wali
       //Remove transitions associated with the state that was removed.
       if( removed )
       {
-        trans->removeTransWith(state);
+        trans.removeTransWith(state);
       }
 
       return removed;
@@ -7039,20 +7030,6 @@ namespace wali
     {
       return states.getInitialStates();
     }
-    /**
-     *  Q: do we still need the single initial state restriction?   NO
-     * @brief obtain the initial state
-     *
-     * @return the inital state associated with the NWA
-     *
-     */
-    //template <typename Client>
-    //typename NWA<Client>::St NWA<Client>::getInitialState( ) const
-    //{
-    //  std::set<St> sts = states.getInitialStates();
-    //  assert(sts.size()==1);  //Assuming unique initial state.
-    //  return *(sts.begin());
-    //}
 
     /**
      * 
@@ -7288,7 +7265,7 @@ namespace wali
       bool removed = symbols.removeSymbol(sym);
       if( removed )
       {
-        trans->removeTransSym(sym);
+        trans.removeTransSym(sym);
       }
       return removed;
     }
@@ -7324,7 +7301,7 @@ namespace wali
     inline
     bool NWA<Client>::getSymbol( St from, St to, Sym & sym )
     {
-      return trans->getSymbol(from,to,sym);
+      return trans.getSymbol(from,to,sym);
     }
 
     /**
@@ -7342,7 +7319,7 @@ namespace wali
     inline
     bool NWA<Client>::findTrans( St from, Sym sym, St to) const
     {
-      return trans->findTrans(from,sym,to);
+      return trans.findTrans(from,sym,to);
     }
 
     /**
@@ -7356,7 +7333,7 @@ namespace wali
     inline
     size_t NWA<Client>::sizeTrans( ) const
     {
-      return trans->size();
+      return trans.size();
     }
     /**
      *
@@ -7384,7 +7361,7 @@ namespace wali
     inline
     void NWA<Client>::clearTrans( )
     {
-      trans->clear();
+      trans.clear();
     }
 
     //Call Transitions
@@ -7400,7 +7377,7 @@ namespace wali
     template <typename Client>
     const std::set<std::pair<typename NWA<Client>::Sym,typename NWA<Client>::St>> NWA<Client>::getEntries( St callSite ) const
     {
-      const Calls ent = trans->getTransCall(callSite);
+      const Calls ent = trans.getTransCall(callSite);
       std::set<std::pair<Sym,St>> entries;
       for( callIterator it = ent.begin(); it != ent.end(); it++ )
       {
@@ -7429,7 +7406,7 @@ namespace wali
       addSymbol(sym);
       addState(to);
 
-      return trans->addCall(from,sym,to);
+      return trans.addCall(from,sym,to);
     }
 
     /**
@@ -7450,7 +7427,7 @@ namespace wali
       addSymbol(Trans::getCallSym(ct));
       addState(Trans::getEntry(ct));
 
-      return trans->addCall(ct);
+      return trans.addCall(ct);
     }
 
     /**
@@ -7469,7 +7446,7 @@ namespace wali
       if(! isState(from) || ! isSymbol(sym) || ! isState(to) || Symbols::isEpsilon(sym) )
         return false;
 
-      return trans->removeCall(from,sym,to);
+      return trans.removeCall(from,sym,to);
     }
 
     /**
@@ -7489,7 +7466,7 @@ namespace wali
         || Symbols::isEpsilon(Trans::getCallSym(ct)) )
         return false;
 
-      return trans->removeCall(ct);
+      return trans.removeCall(ct);
     }
 
     /**
@@ -7503,7 +7480,7 @@ namespace wali
     inline
     size_t NWA<Client>::sizeCallTrans( ) const
     {
-      return trans->sizeCall();
+      return trans.sizeCall();
     }
 
     //Internal Transitions
@@ -7519,7 +7496,7 @@ namespace wali
     template <typename Client>
     const std::set<std::pair<typename NWA<Client>::Sym,typename NWA<Client>::St>> NWA<Client>::getTargets( St source ) const
     {
-      const Internals tgt = trans->getTransFrom(source);
+      const Internals tgt = trans.getTransFrom(source);
       std::set<std::pair<Sym,St>> targets;
       for( internalIterator it = tgt.begin(); it != tgt.end(); it++ )
       {
@@ -7546,7 +7523,7 @@ namespace wali
       addSymbol(sym);
       addState(to);
 
-      return trans->addInternal(from,sym,to);
+      return trans.addInternal(from,sym,to);
     }
 
     /**
@@ -7565,7 +7542,7 @@ namespace wali
       addSymbol(Trans::getInternalSym(it));
       addState(Trans::getTarget(it));
 
-      return trans->addInternal(it);
+      return trans.addInternal(it);
     }
 
     /**
@@ -7584,7 +7561,7 @@ namespace wali
       if(! isState(from) || ! isSymbol(sym) || ! isState(to) )
         return false;
 
-      return trans->removeInternal(from,sym,to);
+      return trans.removeInternal(from,sym,to);
     }
 
     /**
@@ -7603,7 +7580,7 @@ namespace wali
         || ! isState(Trans::getTarget(it)) )
         return false;
 
-      return trans->removeInternal(it);
+      return trans.removeInternal(it);
     }
 
     /**
@@ -7617,7 +7594,7 @@ namespace wali
     inline
     size_t NWA<Client>::sizeInternalTrans( ) const
     {
-      return trans->sizeInternal();
+      return trans.sizeInternal();
     }
 
     //Return Transitions
@@ -7634,7 +7611,7 @@ namespace wali
     inline
     const std::set<typename NWA<Client>::St> NWA<Client>::getReturnSites( St callSite ) const
     {
-      return trans->getReturnSites(callSite);
+      return trans.getReturnSites(callSite);
     }
 
     /**
@@ -7651,7 +7628,7 @@ namespace wali
     template <typename Client>
     const std::set<std::pair<typename NWA<Client>::Sym,typename NWA<Client>::St>> NWA<Client>::getReturns( St exit, St callSite ) const
     {
-      const Returns ret = trans->getTransExit(exit);
+      const Returns ret = trans.getTransExit(exit);
       std::set<std::pair<Sym,St>> returns;
       for( returnIterator it = ret.begin(); it != ret.end(); it++ )
       {
@@ -7685,7 +7662,7 @@ namespace wali
       addSymbol(sym);
       addState(to);
 
-      return trans->addReturn(from,pred,sym,to);
+      return trans.addReturn(from,pred,sym,to);
     }
 
     /**
@@ -7707,7 +7684,7 @@ namespace wali
       addSymbol(Trans::getReturnSym(rt));
       addState(Trans::getReturnSite(rt));
 
-      return trans->addReturn(rt);
+      return trans.addReturn(rt);
     }
 
     /**
@@ -7727,12 +7704,12 @@ namespace wali
         return false;
      
       bool removed = false;
-      const Trans::States preds = trans->getCallSites(from,to);
+      const Trans::States preds = trans.getCallSites(from,to);
       for( Trans::stateIterator it = preds.begin(); it != preds.end(); it++ )
       {
         if(! isState(*it) )
           return false;
-        removed = removed || trans->removeReturn(from,*it,sym,to);
+        removed = removed || trans.removeReturn(from,*it,sym,to);
       }
       return removed;
     }
@@ -7755,7 +7732,7 @@ namespace wali
         || Symbols::isEpsilon(sym) )
         return false;
 
-      return trans->removeReturn(from,pred,sym,to);
+      return trans.removeReturn(from,pred,sym,to);
     }
 
     /**
@@ -7776,7 +7753,7 @@ namespace wali
         || Symbols::isEpsilon(Trans::getReturnSym(rt)) )
         return false;
 
-      return trans->removeReturn(rt);
+      return trans.removeReturn(rt);
     }
 
     /**
@@ -7790,7 +7767,7 @@ namespace wali
     inline
     size_t NWA<Client>::sizeReturnTrans( ) const
     {
-      return trans->sizeReturn();
+      return trans.sizeReturn();
     }
 
     //Building NWAs
@@ -7807,24 +7784,25 @@ namespace wali
     void NWA<Client>::unionNWA( NWARefPtr first, NWARefPtr second )
     {
       //TODO: write this!
-      //Q: Do we need to guarantee that there is no overlap in states between machines?
+      //Q: Do we need to guarantee that there is no overlap in states between machines? YES
       //    If there is overlap, then we could conceivably go through the first half of one
       //    machine and then skip to the other machine, thereby not completing either machine.
+      //Q: How should we do this?  Use the same base algorithm as intersection?  Generate new
+      //    keys by the pairing scheme (1,k) for keys in first and (2,k) for keys in second?
+      //    Implement a check for overlapping state keys and assert that no such overlap occurs?
 
-      //Generate a new initial state.
-      //Note: This involves generating a new key.  How should this be done?
+      //Q: Is this equivalent to simply making the initial state set the union of the initial
+      //    state sets of the component machines and the final state set the union of the 
+      //    final state sets of the component machines.
 
-      //Attach the initial state to all the initial states of the two machines
-      //with epsilon transitions.
+      //Test state Key overlap.
+
+      //Copy all of the initial states.
 
       //Copy all of the functionality of the two machines.    
       //Note: Here's where the problems with keys come in.
 
-      //Generate a new final state.
-      //Note: This involves generating a new key.  How should this be done?
-
-      //Attach the final state to all the final states of the two machines with
-      //epsilon transitions.
+      //Copy all of the final states.
     }
 
     /**
@@ -7854,13 +7832,15 @@ namespace wali
           StatePair sp(*fit,*sit);
           visitedPairs.insert(sp);
           ClientInfoRefPtr resCI;
-          if( nodeIntersect(first,*fit,second,*sit,newSt) ) 
+          if( nodeIntersect(first,*fit,second,*sit,newSt,resCI) ) 
           {
-            intersectClientInfo(first,*fit,second,*sit,newSt,resCI);   //Intersect initial client info.
             addInitialState(newSt); 
             //an initial state could also be a final state.
             if(first->isFinalState(*fit) && second->isFinalState(*sit))
                 addFinalState(newSt);
+
+            //Attach client info to the newly created state.
+            states.setClientInfo(newSt,resCI);
 
             worklistPairs.push_back(sp);
             pairToStMap[sp] = newSt;
@@ -7873,18 +7853,19 @@ namespace wali
           for( std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
           {
             St st;
-            ClientInfoRefPtr CI;
             //We don't want to put this on the worklist again.
             visitedPairs.insert(*it); 
+            ClientInfoRefPtr CI;
             //Check and make sure this intersection makes sense.
-            if( nodeIntersect(first,it->first,second,it->second,st) ) 
+            if( nodeIntersect(first,it->first,second,it->second,st,CI) ) 
             {
-              //Intersect initial client info.
-              intersectClientInfo(first,it->first,second,it->second,st,CI);  
               addInitialState(st);
               //an initital state could also be a final state
               if( first->isFinalState(it->first) && second->isFinalState(it->second) )
                 addFinalState(st);
+
+              //Attach client info to the newly created state.
+              states.setClientInfo(st,CI);
 
               worklistPairs.push_back(*it);
               pairToStMap[*it] = st;
@@ -7899,8 +7880,8 @@ namespace wali
         worklistPairs.pop_front();
 
         //Process outgoing call transitions
-        Calls firstCalls = first->trans->getTransCall(currpair.first);
-        Calls secondCalls = second->trans->getTransCall(currpair.second);
+        Calls firstCalls = first->trans.getTransCall(currpair.first);
+        Calls secondCalls = second->trans.getTransCall(currpair.second);
         for( Calls::const_iterator fit = firstCalls.begin(); fit != firstCalls.end(); fit++ ) 
         {
           Sym firstSym = Trans::getCallSym(*fit);
@@ -7922,19 +7903,22 @@ namespace wali
             visitedPairs.insert(entryPair);
 
             St resSt;
-            ClientInfoRefPtr resCI;
             // Have we seen entryPair before?
             if( pairToStMap.count(entryPair) == 0 ) 
             { 
               //We have not seen this pair before
               // Are the entry nodes intersectable?
-              if(! nodeIntersect(first,firstEntry,second,secondEntry,resSt) ) 
+              ClientInfoRefPtr resCI;
+              if(! nodeIntersect(first,firstEntry,second,secondEntry,resSt,resCI) ) 
                 continue;
               // We have a new state in resSt!
               if( first->isFinalState(firstEntry) && second->isFinalState(secondEntry) )
                 addFinalState(resSt);
               else
                 addState(resSt);
+
+              //Attach client info to the newly created state.
+              states.setClientInfo(resSt,resCI);
 
               worklistPairs.push_back(entryPair);
               pairToStMap[entryPair] = resSt;
@@ -7946,7 +7930,6 @@ namespace wali
               for( std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
               {
                 St st;
-                ClientInfoRefPtr CI;
                 //If we have already considered this pair and found them nonintersectable, continue
                 if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
                   continue;
@@ -7955,12 +7938,16 @@ namespace wali
                 if( pairToStMap.count(*it) == 0 )
                 {
                   //Check and make sure this intersection makes sense.
-                  if( nodeIntersect(first,it->first,second,it->second,st) )
+                  ClientInfoRefPtr CI;
+                  if( nodeIntersect(first,it->first,second,it->second,st,CI) )
                   {
                     if( first->isFinalState(it->first) && second->isFinalState(it->second) )
                       addFinalState(st);
                     else
                       addState(st); 
+
+                    //Attach client info to the newly created state.
+                    states.setClientInfo(st,CI);
 
                     worklistPairs.push_back(*it);
                     pairToStMap[*it] = st;
@@ -7974,7 +7961,7 @@ namespace wali
                   //Add an edge that is the current call trans with collapsed epsilon internal trans.
                   intersectClientInfoCall(first,Trans::getCallSite(*fit),it->first,
                                           second,Trans::getCallSite(*sit),it->second,
-                                          resSym,st,CI);    //Intersect Call Trans client info.
+                                          resSym,st);    //Intersect Call Trans client info.
                   addCallTrans(pairToStMap[currpair],resSym,st);  
                 }
               }
@@ -7987,14 +7974,14 @@ namespace wali
             
             intersectClientInfoCall(first,Trans::getCallSite(*fit),Trans::getEntry(*fit),
                                     second,Trans::getCallSite(*sit),Trans::getEntry(*sit),
-                                    resSym,resSt,resCI);   //Intersect Call Trans client info.
+                                    resSym,resSt);   //Intersect Call Trans client info.
             addCallTrans(pairToStMap[currpair],resSym,resSt);
           }
         }
 
         // Process outgoing internal transitions
-        Internals firstInternals = first->trans->getTransFrom(currpair.first);
-        Internals secondInternals = second->trans->getTransFrom(currpair.second);
+        Internals firstInternals = first->trans.getTransFrom(currpair.first);
+        Internals secondInternals = second->trans.getTransFrom(currpair.second);
         for( Internals::const_iterator fit = firstInternals.begin(); fit != firstInternals.end(); fit++ ) 
         {
           Sym firstSym = Trans::getInternalSym(*fit);
@@ -8016,19 +8003,22 @@ namespace wali
             visitedPairs.insert(tgtPair);
 
             St resSt;
-            ClientInfoRefPtr resCI;
             // Have we seen tgtPair before?
             if( pairToStMap.count(tgtPair) == 0 ) 
             { 
               //We have not seen this pair before
               // Are the tgt nodes intersectable?
-              if(! nodeIntersect(first,firstTgt,second,secondTgt,resSt) ) 
+              ClientInfoRefPtr resCI;
+              if(! nodeIntersect(first,firstTgt,second,secondTgt,resSt,resCI) ) 
                 continue;
               // We have a new state in resSt!
               if( first->isFinalState(firstTgt) && second->isFinalState(secondTgt) )
                 addFinalState(resSt);
               else
                 addState(resSt);
+
+              //Attach client info to the newly created state.
+              states.setClientInfo(resSt,resCI);
 
               worklistPairs.push_back(tgtPair);
               pairToStMap[tgtPair] = resSt;              
@@ -8040,7 +8030,6 @@ namespace wali
               for( std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
               {
                 St st;
-                ClientInfoRefPtr CI;
                 //If we have already considered this pair and found them nonintersectable, continue
                 if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
                   continue;
@@ -8049,12 +8038,16 @@ namespace wali
                 if( pairToStMap.count(*it) == 0 )
                 {
                   //Check and make sure this intersection makes sense.
-                  if( nodeIntersect(first,it->first,second,it->second,st) )
+                  ClientInfoRefPtr CI;
+                  if( nodeIntersect(first,it->first,second,it->second,st,CI) )
                   {
                     if( first->isFinalState(it->first) && second->isFinalState(it->second) )
                       addFinalState(st);
                     else
                       addState(st); 
+
+                    //Attach client info to the newly created state.
+                    states.setClientInfo(st,CI);
 
                     worklistPairs.push_back(*it);
                     pairToStMap[*it] = st;
@@ -8069,7 +8062,7 @@ namespace wali
                 //Add an edge that is the current internal trans with collapsed epsilon internal trans.
                   intersectClientInfoInternal(first,Trans::getSource(*fit),it->first,
                                               second,Trans::getSource(*sit),it->second,
-                                              resSym, st, CI);    //Intersect Internal Trans client info.
+                                              resSym, st);    //Intersect Internal Trans client info.
                   addInternalTrans(pairToStMap[currpair],resSym,st);  
               }
             } 
@@ -8081,15 +8074,15 @@ namespace wali
 
             intersectClientInfoInternal(first,Trans::getSource(*fit),Trans::getTarget(*fit),
                                         second,Trans::getSource(*sit),Trans::getTarget(*sit),
-                                        resSym,resSt,resCI);   //Intersect Internal Trans client info.
+                                        resSym,resSt);   //Intersect Internal Trans client info.
             addInternalTrans(pairToStMap[currpair],resSym,resSt);
           }
         }
         
         // Process outgoing return transitions where currpair.first and currpair.second are
         // both exit components of the respective return transitions
-        Returns firstReturns = first->trans->getTransExit(currpair.first);
-        Returns secondReturns = second->trans->getTransExit(currpair.second);
+        Returns firstReturns = first->trans.getTransExit(currpair.first);
+        Returns secondReturns = second->trans.getTransExit(currpair.second);
         for( Returns::const_iterator fit = firstReturns.begin(); fit != firstReturns.end(); fit++ ) 
         {
           St firstCall = Trans::getCallSite(*fit);
@@ -8123,17 +8116,20 @@ namespace wali
             visitedPairs.insert(retPair);
 
             St retSt;
-            ClientInfoRefPtr resCI;
             // Are the return components intersectable?
             if( pairToStMap.count(retPair) == 0 ) 
             { // Don't know yet
-              if(! nodeIntersect(first,firstRet,second,secondRet,retSt) ) 
+              ClientInfoRefPtr retCI;
+              if(! nodeIntersect(first,firstRet,second,secondRet,retSt,retCI) ) 
                 continue;
               // We have found a new state in retSt!
               if( first->isFinalState(firstRet) && second->isFinalState(secondRet) )
                 addFinalState(retSt);
               else
                 addState(retSt);
+
+              //Attach client info to the newly created state.
+              states.setClientInfo(retSt,retCI);
 
               worklistPairs.push_back(retPair);
               pairToStMap[retPair] = retSt;
@@ -8145,7 +8141,6 @@ namespace wali
               for( std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
               {
                 St st;
-                ClientInfoRefPtr CI;
                 //If we have already considered this pair and found them nonintersectable, continue
                 if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
                   continue;
@@ -8154,12 +8149,16 @@ namespace wali
                 if( pairToStMap.count(*it) == 0 )
                 {
                   //Check and make sure this intersection makes sense.
-                  if( nodeIntersect(first,it->first,second,it->second,st) )
+                  ClientInfoRefPtr CI;
+                  if( nodeIntersect(first,it->first,second,it->second,st,CI) )
                   {
                     if( first->isFinalState(it->first) && second->isFinalState(it->second) )
                       addFinalState(st);
                     else
-                      addState(st); 
+                      addState(st);
+
+                    //Attach client info to the newly created state.
+                    states.setClientInfo(st,CI);
 
                     worklistPairs.push_back(*it);
                     pairToStMap[*it] = st;
@@ -8174,7 +8173,7 @@ namespace wali
                 //Add an edge that is the current return trans with collapsed epsilon internal trans.
                 intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),it->first,
                                           second,Trans::getExit(*sit),Trans::getCallSite(*sit),it->second,
-                                          resSym,st,CI);    //Intersect Internal Trans client info.
+                                          resSym,st);    //Intersect Internal Trans client info.
                 addReturnTrans(pairToStMap[currpair],callSt,resSym,st);  
               }
             } 
@@ -8185,15 +8184,15 @@ namespace wali
             
             intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),Trans::getReturnSite(*fit),
                                       second,Trans::getExit(*sit),Trans::getCallSite(*sit),Trans::getReturnSite(*sit),
-                                      resSym,retSt,resCI);   //Intersect Return Trans client info.
+                                      resSym,retSt);   //Intersect Return Trans client info.
             addReturnTrans(pairToStMap[currpair],callSt,resSym,retSt);
           }
         }
 
         // Process outgoing return transitions where currpair.first and currpair.second are
         // both call components of the respective return transitions 
-        firstReturns = first->trans->getTransPred(currpair.first);
-        secondReturns = second->trans->getTransPred(currpair.second);
+        firstReturns = first->trans.getTransPred(currpair.first);
+        secondReturns = second->trans.getTransPred(currpair.second);
         for( Returns::const_iterator fit = firstReturns.begin(); fit != firstReturns.end(); fit++ ) 
         {
           St firstExit = Trans::getExit(*fit);
@@ -8227,17 +8226,20 @@ namespace wali
             visitedPairs.insert(retPair);
 
             St retSt;
-            ClientInfoRefPtr resCI;
             //  Are the return components intersectable?
             if( pairToStMap.count(retPair) == 0 ) 
             { //Don't know yet
-              if(! nodeIntersect(first,firstRet,second,secondRet,retSt) ) 
+              ClientInfoRefPtr retCI;
+              if(! nodeIntersect(first,firstRet,second,secondRet,retSt,retCI) ) 
                 continue;
               // We have a new state in retSt!
               if( first->isFinalState(firstRet) && second->isFinalState(secondRet) )
                 addFinalState(retSt);
               else
                 addState(retSt);
+
+              //Attach client info to the newly created state.
+              states.setClientInfo(retSt,retCI);
 
               worklistPairs.push_back(retPair);
               pairToStMap[retPair] = retSt;
@@ -8249,7 +8251,6 @@ namespace wali
               for( std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
               {
                 St st;
-                ClientInfoRefPtr CI;
                 //If we have already considered this pair and found them nonintersectable, continue
                 if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
                   continue;
@@ -8258,12 +8259,16 @@ namespace wali
                 if( pairToStMap.count(*it) == 0 )
                 {
                   //Check and make sure this intersection makes sense.
-                  if( nodeIntersect(first,it->first,second,it->second,st) )
+                  ClientInfoRefPtr CI;
+                  if( nodeIntersect(first,it->first,second,it->second,st,CI) )
                   {
                     if( first->isFinalState(it->first) && second->isFinalState(it->second) )
                       addFinalState(st);
                     else
                       addState(st); 
+
+                    //Attach client info to the newly created state.
+                    states.setClientInfo(st,CI);
 
                     worklistPairs.push_back(*it);
                     pairToStMap[*it] = st;
@@ -8278,7 +8283,7 @@ namespace wali
                 //Add an edge that is the current return trans with collapsed epsilon internal trans.
                 intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),it->first,
                                           second,Trans::getExit(*sit),Trans::getCallSite(*sit),it->second,
-                                          resSym,st,CI);    //Intersect Internal Trans client info.
+                                          resSym,st);    //Intersect Internal Trans client info.
                 addReturnTrans(exitSt,pairToStMap[currpair],resSym,st);  
               }              
             } 
@@ -8289,7 +8294,7 @@ namespace wali
             
             intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),Trans::getReturnSite(*fit),
                                       second,Trans::getExit(*sit),Trans::getCallSite(*sit),Trans::getReturnSite(*sit),
-                                      resSym,retSt,resCI);   //Intersect Return Trans client info.
+                                      resSym,retSt);   //Intersect Return Trans client info.
             addReturnTrans(exitSt,pairToStMap[currpair],resSym,retSt);
           }
         }
@@ -8330,16 +8335,53 @@ namespace wali
     template <typename Client>
     void NWA<Client>::reverse( NWARefPtr first )
     {
-      //TODO: write this!
-
       //Swap initial and final states.
+      for( stateIterator it = first->beginInitialStates(); 
+        it != first->endInitialStates(); it++ )
+      {
+        addFinalState(*it);
+      }
+      for( stateIterator it = first->beginFinalStates(); 
+        it != first->endFinalStates(); it++ )
+      {
+        addInitialState(*it);
+      }
 
       //Duplicate internal transitions with source/target swapped.
+      for( internalIterator it = first->beginInternalTrans(); 
+        it != first->endInternalTrans(); it++ )
+      {
+        addInternalTrans(Trans::getTarget(*it),
+                          Trans::getInternalSym(*it),
+                          Trans::getSource(*it));
+      }
 
       //Duplicate return transitions as call transitions with (return,sym,exit).
+      for( returnIterator it = first->beginReturnTrans(); 
+        it != first->endReturnTrans(); it++ )
+      {
+        addCallTrans(Trans::getReturnSite(*it),
+                      Trans::getReturnSym(*it),
+                      Trans::getExit(*it));
+      }
 
       //Duplicate call transitions with associated return transitions as 
       //return transitions with (entry,return,sym,call).
+      for( callIterator cit = first->beginCallTrans(); 
+        cit != first->endCallTrans(); cit++ )
+      {
+        for( returnIterator rit = first->beginReturnTrans(); 
+          rit != first->endReturnTrans(); rit++ )
+        {
+          if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
+          {
+            addReturnTrans(Trans::getEntry(*cit),
+                            Trans::getReturnSite(*rit),
+                            Trans::getCallSym(*cit),
+                            Trans::getCallSite(*cit));
+          }
+        }
+      }
 
     }
 
@@ -8353,13 +8395,8 @@ namespace wali
     template <typename Client>
     void NWA<Client>::star( NWARefPtr first )
     {
-      //TODO: write this!
-
-      //Duplicate initial and final states.
-
-      //Duplicate all transitions.
-
-      //Add epsilon transitions from each final state to each initial state.
+      //TODO: write this!  
+      //Note: it is not as simple as it seems, check the longer alur paper for details.
     }
 
     /**
@@ -8385,7 +8422,7 @@ namespace wali
         
         addAllSymbols(first->symbols);
 
-        trans->addAllTrans(*(first->trans));
+        trans.addAllTrans(first->trans);
       }
       
       //FinalStates = AllStates - FinalStates
@@ -8484,7 +8521,7 @@ namespace wali
           //Check call transitions.
           int count = 0;
           bool wild = false;
-          for( callIterator cit = trans->beginCall(); cit != trans->endCall(); cit++ )
+          for( callIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
           {
             //Wild symbol TODO: fix this!
             if( SymbolSet::isWild(Trans::getCallSym(*cit)) )
@@ -8503,7 +8540,7 @@ namespace wali
           //Check internal transitions.
           count = 0;
           wild = false;
-          for( internalIterator iit = trans->beginInternal(); iit != trans->endInternal(); iit++ )
+          for( internalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
           {
             //Epsilon transition 
             if( SymbolSet::isEpsilon(Trans::getInternalSym(*iit)) )
@@ -8527,7 +8564,7 @@ namespace wali
             //Check return transitions.
             count = 0;
             wild = false;
-            for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+            for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
             {
               //Wild symbol TODO: fix this!
               if( SymbolSet::isWild(Trans::getReturnSym(*rit)) )
@@ -8552,7 +8589,7 @@ namespace wali
     }
 
     /**
-     * 
+     * TODO: remove this
      * @brief intersects client information 
      *
      * @param - first: the NWA in which to look up the client information for 'name1'
@@ -8560,19 +8597,17 @@ namespace wali
      * @param - second: the NWA in which to look up the client information for 'name2'
      * @param - name2: the second state whose client information to intersect
      * @param - resSt: the state which will receive the computed client information
-     * @param - result: the client information resulting from the intersection of
-     *                  'name1' and 'name2'
      *
      */
-    template <typename Client>
+    /*template <typename Client>
     void NWA<Client>::intersectClientInfo( NWARefPtr first, St name1, 
                                            NWARefPtr second, St name2, 
-                                           St resSt, ClientInfoRefPtr result )
+                                           St resSt )
     {
       //Note: When overriding this method your metric must combine any client information associated
       // with the states associated with the given names and set the client information of result
       // to that value.
-    }
+    }*/
 
     /**
      * 
@@ -8590,15 +8625,12 @@ namespace wali
      * @param - entry2: the second entry point whose client information to intersect
      * @param - resSym: the symbol associated with the transition that is being created
      * @param - resSt: the state which will receive the computed client information
-     * @param - result: the client information resulting from the intersection of 
-     *                  'entry1' and 'entry2'
      *
      */
     template <typename Client>
     void NWA<Client>::intersectClientInfoCall( NWARefPtr first, St call1, St entry1, 
                                                NWARefPtr second, St call2, St entry2, 
-                                               Sym resSym, St resSt, 
-                                               ClientInfoRefPtr result )
+                                               Sym & resSym, St resSt )
     {
       //Note: When overriding this method your metric must combine any client information associated
       // with the target states of the two transitions and set the client information of result
@@ -8628,8 +8660,7 @@ namespace wali
     template <typename Client>
     void NWA<Client>::intersectClientInfoInternal( NWARefPtr first, St src1, St tgt1, 
                                                    NWARefPtr second, St src2, St tgt2, 
-                                                   Sym resSym, St resSt, 
-                                                   ClientInfoRefPtr result )
+                                                   Sym & resSym, St resSt )
     {
       //Note: When overriding this method your metric must combine any client information associated
       // with the target states of the two transitions and set the client information of result
@@ -8663,8 +8694,7 @@ namespace wali
     template <typename Client>
     void NWA<Client>::intersectClientInfoReturn( NWARefPtr first, St exit1, St call1, St ret1,
                                                  NWARefPtr second, St exit2, St call2, St ret2,
-                                                 Sym resSym, St resSt,
-                                                 ClientInfoRefPtr result )
+                                                 Sym & resSym, St resSt )
     {
       //Note: When overriding this method your metric must combine any client information associated
       // with the target states of the two transitions and set the client information of result
@@ -8683,7 +8713,8 @@ namespace wali
      *
      */
     template <typename Client>
-    bool NWA<Client>::nodeIntersect( NWARefPtr first, St state1, NWARefPtr second, St state2, St & resSt ) 
+    bool NWA<Client>::nodeIntersect( NWARefPtr first, St state1, NWARefPtr second, St state2, 
+                                      St & resSt, ClientInfoRefPtr & resCI ) 
     {
       //Note: When overriding this method your metric must determine whether the
       //      given states are compatible and set resSt to the appropriate state.
@@ -8777,7 +8808,7 @@ namespace wali
       wali::sem_elem_t wgt;
 
       //Internal Transitions
-      for( internalIterator iit = trans->beginInternal(); iit != trans->endInternal(); iit++ )
+      for( internalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
       {      
         //(q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
         //where the weight w depends on sigma
@@ -8799,9 +8830,9 @@ namespace wali
       }
 
       //Call Transitions 
-      for( callIterator cit = trans->beginCall(); cit != trans->endCall(); cit++ )
+      for( callIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
       {
-        for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+        for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
         {
           if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
           {
@@ -8828,7 +8859,7 @@ namespace wali
       }
 
       //Return Transitions
-      for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+      for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
       {
         //(q_x,q_c,*,q_r) in delta_r goes to
         // <p,q_x> -w-> <p_q_xcr,epsilon> in delta_0
@@ -8883,7 +8914,7 @@ namespace wali
       wali::sem_elem_t wgt;
 
       //Internal Transitions
-      for( internalIterator iit = trans->beginInternal(); iit != trans->endInternal(); iit++ )
+      for( internalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
       {      
         //(q,sigma,q') in delta_i goes to <p,q'> -w-> <p,q> in delta_1
         //where the weight w depends on sigma
@@ -8905,9 +8936,9 @@ namespace wali
       }
 
       //Call Transitions 
-      for( callIterator cit = trans->beginCall(); cit != trans->endCall(); cit++ )
+      for( callIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
       {
-        for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+        for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
           if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
           {
             //(q_c,sigma,q_e) in delta_c and (q_x,q_c,*,q_r) in delta_r goes to
@@ -8942,7 +8973,7 @@ namespace wali
       }
 
       //Return Transitions
-      for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+      for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
       {
         //(q_x,q_c,*,q_r) in delta_r goes to
         // <p,q_r> -w-> <p,q_x q_c> in delta_2 
@@ -8988,7 +9019,7 @@ namespace wali
       wali::sem_elem_t wgt;
 
       //Internal Transitions
-      for( internalIterator iit = trans->beginInternal(); iit != trans->endInternal(); iit++ )
+      for( internalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
       {  
         // (q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
         // where the weight w depends on sigma
@@ -9010,7 +9041,7 @@ namespace wali
       }
 
       //Call Transitions
-      for( callIterator cit = trans->beginCall(); cit != trans->endCall(); cit++ )
+      for( callIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
       {           
         // (q_c,sigma,q_e) in delta_c goes to
         // <p,q_c> -w-> <p,q_e q_c> in delta_2 
@@ -9034,7 +9065,7 @@ namespace wali
       } 
 
       //Return Transitions
-      for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+      for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
       {
         // (q_x,q_c,sigma,q_r) in delta_r goes to 
         // <p,q_x> -w-> <p_q_xcr,epsilon> in delta_0
@@ -9091,7 +9122,7 @@ namespace wali
       wali::sem_elem_t wgt;
 
       //Internal Transitions
-      for( internalIterator iit = trans->beginInternal(); iit != trans->endInternal(); iit++ )
+      for( internalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
       {  
         // (q,sigma,q') in delta_i goes to <p,q'> -w-> <p,q> in delta_1
         // where the weight w depends on sigma
@@ -9113,9 +9144,9 @@ namespace wali
       }
 
       //Call Transitions
-      for( callIterator cit = trans->beginCall(); cit != trans->endCall(); cit++ )
+      for( callIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
       {    
-        for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+        for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
           if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
           {
             // (q_c,sigma,q_e) in delta_c and (q_x,q_c,*,q_r) in delta_r goes to
@@ -9150,7 +9181,7 @@ namespace wali
       } 
 
       //Return Transitions
-      for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+      for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
       {
         // (q_x,q_c,sigma,q_r) in delta_r goes to 
         // <p,q_r> -w-> <p,q_x q_r> in delta_2 
@@ -9194,6 +9225,13 @@ namespace wali
       if( sizeFinalStates() == 0 )
         return true;
 
+      //An automaton with an initial state that is a final state is definitely not empty.
+      for( stateIterator it = beginInitialStates(); it != endInitialStates(); it++ )
+      {
+        if( isFinalState(*it) )
+          return false;
+      }
+
       //An automaton with no path from an initial state to a final state must accept only
       //the empty language.
       //for( stateIterator it = beginInitialStates(); it != endInitialStates(); it++ )
@@ -9214,21 +9252,23 @@ namespace wali
 
       //Any final state reachable from an initial state shows this NWA is not empty.
 
+      Reach wgts = Reach(true);
+
       //Make a WFA with transitions from initial state to final state for each 
       //initial state of the NWA.
       wali::wfa::WFA initials;
       //Set up initial state.
       wali::Key init = getKey("init");
-      initials.addState(init,Reach(true).zero());
+      initials.addState(init,wgts.zero());
       initials.setInitialState(init);
       //Set up final state.
       wali::Key fin = getKey("fin");
-      initials.addState(fin,Reach(true).zero());
+      initials.addState(fin,wgts.zero());
       initials.addFinalState(fin);
       //Add transitions.
       for( stateIterator it = beginInitialStates(); it != endInitialStates(); it++ )
       {
-        initials.addTrans(init,*it,fin,Reach(true).one());
+        initials.addTrans(init,*it,fin,wgts.one());
       }
 
       //Perform poststar to determine reachability.
@@ -9238,15 +9278,15 @@ namespace wali
       //final state of the NWA.
       wali::wfa::WFA finals;
       //Set up initial state.
-      finals.addState(init,Reach(true).zero());
+      finals.addState(init,wgts.zero());
       finals.setInitialState(init);
       //Set up final state.
-      finals.addState(fin,Reach(true).zero());
+      finals.addState(fin,wgts.zero());
       finals.addFinalState(fin);
       //Add transitions.
       for( stateIterator it = beginFinalStates(); it != endFinalStates(); it++ )
       {
-        finals.addTrans(init,*it,fin,Reach(true).one());
+        finals.addTrans(init,*it,fin,wgts.one());
       }
 
       //intersect poststar(initials) and finals
@@ -9359,7 +9399,7 @@ namespace wali
     {
       states.print(o);
       symbols.print(o);
-      trans->print(o);
+      trans.print(o);
       return o;
     }
 
@@ -9682,7 +9722,7 @@ namespace wali
     inline
     typename NWA<Client>::callIterator NWA<Client>::beginCallTrans( ) const
     {
-      return trans->beginCall();
+      return trans.beginCall();
     }
 
     /**
@@ -9696,7 +9736,7 @@ namespace wali
     inline
     typename NWA<Client>::callIterator NWA<Client>::endCallTrans( ) const
     {
-      return trans->endCall();
+      return trans.endCall();
     }
 
     /**
@@ -9710,7 +9750,7 @@ namespace wali
     inline
     typename NWA<Client>::internalIterator NWA<Client>::beginInternalTrans( ) const
     {
-      return trans->beginInternal();
+      return trans.beginInternal();
     }
 
     /**
@@ -9724,7 +9764,7 @@ namespace wali
     inline
     typename NWA<Client>::internalIterator NWA<Client>::endInternalTrans( ) const
     {
-      return trans->endInternal();
+      return trans.endInternal();
     }
 
     /**
@@ -9738,7 +9778,7 @@ namespace wali
     inline
     typename NWA<Client>::returnIterator NWA<Client>::beginReturnTrans( ) const
     {
-      return trans->beginReturn();
+      return trans.beginReturn();
     }
 
     /**
@@ -9752,7 +9792,7 @@ namespace wali
     inline
     typename NWA<Client>::returnIterator NWA<Client>::endReturnTrans( ) const
     {
-      return trans->endReturn();
+      return trans.endReturn();
     }
 
     /**
@@ -9772,7 +9812,7 @@ namespace wali
     void NWA<Client>::epsilonClosure( std::set<St> * newPairs, St st )
     {
       //compute the states reachable from st via epsilon transitions
-      Internals reachable = trans->getInternals(st,SymbolSet::getEpsilon());
+      Internals reachable = trans.getInternals(st,SymbolSet::getEpsilon());
       for( Internals::iterator it = reachable.begin(); it != reachable.end(); it++ )
       {
         St newSt = Trans::getTarget(*it);
@@ -9806,7 +9846,7 @@ namespace wali
       //Compute the cross produce of all states reachable from sp via epsilon transitions.
 
       //Explore epsilon transitions reachable from the first component of sp.
-      Internals reachable = first->trans->getInternals(sp.first,SymbolSet::getEpsilon());
+      Internals reachable = first->trans.getInternals(sp.first,SymbolSet::getEpsilon());
       for( Internals::iterator it = reachable.begin(); it != reachable.end(); it++ )
       {
         StatePair newSP = StatePair(Trans::getTarget(*it),sp.second);
@@ -9821,14 +9861,18 @@ namespace wali
       }
 
       //Explore epsilon transitions reachable from the second component of sp.
-      reachable = second->trans->getInternals(sp.second,SymbolSet::getEpsilon());
+      reachable = second->trans.getInternals(sp.second,SymbolSet::getEpsilon());
       for( Internals::iterator it = reachable.begin(); it != reachable.end(); it++ )
       {
         StatePair newSP = StatePair(sp.first,Trans::getTarget(*it));
-        //Add a new pair.
-        newPairs->insert(newSP);
-        //Recursively explore.
-        epsilonClosure(newPairs,newSP,first,second);
+        //Check that we haven't seen this pair already.
+        if( newPairs->count(newSP) == 0 )
+        {
+          //Add a new pair.
+          newPairs->insert(newSP);
+          //Recursively explore.
+          epsilonClosure(newPairs,newSP,first,second);
+        }
       }
     }
 
@@ -10076,7 +10120,7 @@ namespace wali
 
       //First try call transitions.
       calls.push(currSt);
-      for( callIterator cit = trans->beginCall(); cit != trans->endCall(); cit++ )
+      for( callIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
       {
         St entry = Trans::getEntry(*cit);
         //If we can reach a final state through this transition, we have found a path.
@@ -10095,7 +10139,7 @@ namespace wali
       calls.pop();
 
       //If no call transition led to a path, try internal transitions.
-      for( internalIterator iit = trans->beginInternal(); iit != trans->endInternal(); iit++ )
+      for( internalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
       {
         St target = Trans::getTarget(*iit);
         //If we can reach a final state through this transition, we have found a path.
@@ -10118,7 +10162,7 @@ namespace wali
       {
         St callSt = calls.top();
         calls.pop();
-        for( returnIterator rit = trans->beginReturn(); rit != trans->endReturn(); rit++ )
+        for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
         {
           St ret = Trans::getReturnSite(*rit);
           //If we can reach a final state through this transition, we have found a path.

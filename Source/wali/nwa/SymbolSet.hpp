@@ -42,7 +42,7 @@ namespace wali
        */
       static bool isWild( Sym sym )
       {
-        return (sym == wali::WALI_BAD_KEY);
+        return (sym == wali::WALI_WILD);
       };
 
       /**
@@ -50,7 +50,7 @@ namespace wali
        */
       static Sym getWild( )
       {
-        return wali::WALI_BAD_KEY;
+        return wali::WALI_WILD;
       }
 
       /**
@@ -535,10 +535,21 @@ namespace wali
        * It returns true if the symbol is a member and false otherwise.
        *
        * @param - sym: the symbol to test
-       * @return true if the symbol is a member of this collection of states
+       * @return true if the symbol is a member of this collection of symbols
        *
        */
       bool containsSymbol( Sym sym ) const;
+
+      /**
+       *
+       * @brief provides access to some symbol in this collection
+       *
+       * This method provides access to some symbol in this collection.
+       *
+       * @return some symbol in this collection of symbols
+       *
+       */
+      Sym getAnySymbol( const SymbolSet & symbolPool ) const;
             
       /**
        *
@@ -799,6 +810,31 @@ namespace wali
         //syms records symbols on the edge, so
         //if the symbol is in syms, it is in the collection
         return (syms.count(sym) > 0);
+      }
+    }
+
+    /**
+     *
+     * @brief provides access to some symbol in this collection
+     *
+     * @return some symbol in this collection of symbols
+     *
+     */
+    Label::Sym Label::getAnySymbol( const SymbolSet & symbolPool ) const
+    {
+      if(neg)
+      {
+        for( const_iterator it = symbolPool.beginSymbols(); it != symbolPool.endSymbols(); it++ )
+        {
+          if( syms.find(*it) == syms.end() )
+            return *it;   //Return the first symbol in the symbolPool which  
+                          //is not in the set of symbols not on the edge.
+        }
+        return NULL;
+      }
+      else
+      {
+        return *(syms.begin());   //Return the first symbol in the set.
       }
     }
 

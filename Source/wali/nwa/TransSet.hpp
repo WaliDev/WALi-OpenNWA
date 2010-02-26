@@ -45,7 +45,7 @@ namespace wali
         typedef typename Internals::const_iterator internalIterator;
         typedef typename Returns::const_iterator returnIterator;
         
-        typedef TransInfo<St,Call,Internal,Return> Info;
+        typedef TransInfo<St,Sym> Info;
       
       //
       // Methods
@@ -77,7 +77,7 @@ namespace wali
       {
         return callTrans.first;
       }
-
+  
       /**
        *  
        * @brief access the symbol of the given call transition
@@ -221,6 +221,216 @@ namespace wali
       {
         return returnTrans.fourth;
       }
+
+#ifdef LABEL
+      /**
+       *  
+       * @brief access the call site of the given call transition
+       *
+       * This method provides access to the call site of the given call transition.
+       *
+       * @param - callTrans: the call transition whose call site to access
+       * @return the call site of the given call transition
+       *
+       */
+      inline 
+      static St getCallSite( const typename Info::Cal & callTrans ) 
+      {
+        return callTrans.first;
+      }
+      
+      /**
+       *  
+       * @brief access the symbol of the given call transition
+       *
+       * This method provides access to the symbol of the given call transition.
+       *
+       * @param - callTrans: the call transition whose symbol to access
+       * @return the symbol of the given call transition
+       *
+       */
+      inline
+      static Sym getCallSym( const typename Info::Cal & callTrans )
+      {
+        return (callTrans.second).getAnySymbol();
+      }
+
+      /**
+       *  
+       * @brief access the symbols of the given call transition
+       *
+       * This method provides access to the symbols of the given call transition.
+       *
+       * @param - callTrans: the call transition whose symbols to access
+       * @return the symbols of the given call transition
+       *
+       */
+      inline
+        static Label getCallLabel( const typename Info::Cal & callTrans )
+      {
+        return callTrans.second;
+      }
+      
+      /**
+       *  
+       * @brief access the entry point of the given call transition
+       *
+       * This method provides access to the entry point of the given call transition.
+       *
+       * @param - callTrans: the call transition whose entry point to access
+       * @return the entry point of the given call transition
+       *
+       */
+      inline
+      static St getEntry( const typename Info::Cal & callTrans ) 
+      {
+        return callTrans.third;
+      }
+
+      /**
+       *  
+       * @brief access the source of the given internal transition
+       *
+       * This method provides access to the source of the given internal transition.
+       *
+       * @param - internalTrans: the internal transition whose source to access
+       * @return the source of the given internal transition
+       * 
+       */
+      inline
+      static St getSource( const typename Info::Int & internalTrans ) 
+      {
+        return internalTrans.first;
+      }
+
+      /**
+       *  
+       * @brief access the symbol of the given internal transition
+       *
+       * This method provides access to the symbol of the given internal transition.
+       *
+       * @param - internalTrans: the internal transition whose symbol to access
+       * @return the symbol of the given internal transition
+       *
+       */
+      inline
+      static Sym getInternalSym( const typename Info::Int & internalTrans ) 
+      {
+        return (internalTrans.second).getAnySymbol();
+      }
+
+      /**
+       *  
+       * @brief access the symbols of the given internal transition
+       *
+       * This method provides access to the symbols of the given internal transition.
+       *
+       * @param - internalTrans: the internal transition whose symbols to access
+       * @return the symbols of the given internal transition
+       *
+       */
+      inline
+      static Label getInternalLabel( const typename Info::Int & internalTrans ) 
+      {
+        return internalTrans.second;
+      }
+      
+      /**
+       *  
+       * @brief access the target of the given internal transition
+       *
+       * This method provides access to the target of the given internal transition.
+       *
+       * @param - internalTrans: the internal transition whose target to access
+       * @return the target of the given internal transition
+       *
+       */
+      inline
+      static St getTarget( const typename Info::Int & internalTrans ) 
+      {
+        return internalTrans.third;
+      }
+      
+      /**
+       *  
+       * @brief access the exit point of the given return transition
+       *
+       * This method provides access to the exit point of the given return transition.
+       *
+       * @param - returnTrans: the return transition whose exit point to access
+       * @return the exit point of the given return transition
+       *
+       */
+      inline
+      static St getExit( const typename Info::Ret & returnTrans ) 
+      {
+        return returnTrans.first;
+      }      
+
+      /**
+       *  
+       * @brief access the call site of the given return transition
+       * 
+       * This method provides access to the call site of the given return transition.
+       *
+       * @param - returnTrans: the return transition whose call site to access
+       * @return the call site of the given return transition
+       *
+       */
+      inline
+      static St getCallSite( const typename Info::Ret & returnTrans ) 
+      {
+        return returnTrans.second;
+      }
+     
+      /**
+       *  
+       * @brief access the symbol of the given return transition
+       *
+       * This method provides access to the symbol of the given return transition.
+       *
+       * @param - returnTrans: the return transition whose symbol to access
+       * @return the symbol of the given return transition
+       *
+       */
+      inline
+      static Sym getReturnSym( const typename Info::Ret & returnTrans ) 
+      {
+        return (returnTrans.third).getAnySymbol();
+      }
+
+      /**
+       *  
+       * @brief access the symbol of the given return transition
+       *
+       * This method provides access to the symbol of the given return transition.
+       *
+       * @param - returnTrans: the return transition whose symbol to access
+       * @return the symbol of the given return transition
+       *
+       */
+      inline
+      static Label getReturnLabel( const typename Info::Ret & returnTrans ) 
+      {
+        return returnTrans.third;
+      }      
+
+      /**
+       *  
+       * @brief access the return site of the given return transition
+       *
+       * This method provides access to the return site of the given return transition.
+       *
+       * @param - returnTrans: the return transition whose return site to access
+       * @return the return site of the given return transition
+       *
+       */
+      inline
+      static St getReturnSite( const typename Info::Ret & returnTrans ) 
+      {
+        return returnTrans.fourth;
+      }
+#endif
 
       //Transition Accessors
 

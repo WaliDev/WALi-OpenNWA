@@ -18,6 +18,8 @@ namespace wali
     KeySpace* keySpace = new KeySpace();
     // WPDS_EPSILON == 0 == "*"
     keySpace->getKey("*");
+    // NWA_WILD == 1 == "@"
+    keySpace->getKey("@");
     return keySpace;
   }
 
