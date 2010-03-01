@@ -6034,8 +6034,7 @@ namespace wali
        */
      /* virtual void intersectClientInfo( NWARefPtr first, St name1, 
                                         NWARefPtr second, St name2, 
-                                        St resSt );
-*/
+                                        St resSt );*/
 
       /**
        * 
@@ -6065,7 +6064,7 @@ namespace wali
        */
       virtual void intersectClientInfoCall( NWARefPtr first, St call1, St entry1, 
                                             NWARefPtr second, St call2, St entry2, 
-                                            Sym & resSym, St resSt );  
+                                            Sym resSym, St resSt );  
 
       /**
        * 
@@ -6094,7 +6093,7 @@ namespace wali
        */
       virtual void intersectClientInfoInternal( NWARefPtr first, St src1, St tgt1, 
                                                 NWARefPtr second, St src2, St tgt2, 
-                                                Sym & resSym, St resSt );  
+                                                Sym resSym, St resSt );  
 
       /**
        * 
@@ -6127,7 +6126,7 @@ namespace wali
        */
       virtual void intersectClientInfoReturn( NWARefPtr first, St exit1, St call1, St ret1,
                                               NWARefPtr second, St exit2, St call2, St ret2,
-                                              Sym & resSym, St resSt );
+                                              Sym resSym, St resSt );
 
       /**
        * 
@@ -6667,11 +6666,11 @@ namespace wali
        * @param - nondet: the NWA to determinize
        * @param - stMap: the map of sets of 'nondet' states to states
        * @param - currSt: the current state under consideration
-       * @param - callPred: the stack of open calls at 'currSt'
+       * @param - callPred: the possible open calls at 'currSt'
        *
        */
       void det( NWARefPtr nondet, StateMap & stMap, StatePairSet currSt, 
-                std::stack<StatePairSet> callPred );  
+                std::map<Key,std::set<StatePairSet>> callPreds );  
 
       /**
        *
@@ -8452,15 +8451,15 @@ namespace wali
       //{(q,q) | q is an element of Q in nondeterministic NWA }
       StateSet statesSet;
       StatePairSet initialStateSet;
-      for( stateIterator sit = nondet->beginInitialStates(); 
-            sit != nondet->endInitialStates(); sit++ )
+      for( stateIterator sit = nondet->beginStates(); 
+            sit != nondet->endStates(); sit++ )
       {
         initialStateSet.insert(StatePair(*sit,*sit));
         statesSet.insert(wali::getKey(*sit,*sit));
 
         //Traverse any epsilon transitions starting at an initial state.
         std::set<St> newStates;
-        epsilonClosure(&newStates,*sit);
+        nondet->epsilonClosure(&newStates,*sit);
         for( std::set<St>::iterator it = newStates.begin(); it != newStates.end(); it++ )
         {
           initialStateSet.insert(StatePair(*sit,*it));
@@ -8477,7 +8476,9 @@ namespace wali
       stMap.insert(std::pair<StatePairSet,St>(initialStateSet,initialState));
 
       //Perform closure steps.
-      det(nondet,stMap,initialStateSet,std::stack<StatePairSet>());
+      std::map<Key,std::set<StatePairSet>> callPreds = std::map<Key,std::set<StatePairSet>>();
+      callPreds.insert(std::pair<Key,std::set<StatePairSet>>(initialState,std::set<StatePairSet>()));
+      det(nondet,stMap,initialStateSet,callPreds);
 
       //A state is final if it contains a pair of the form (q,q') with q an element of 
       //Q_in of the the nondeterministic NWA and q' an element of Q_f of the
@@ -8630,7 +8631,7 @@ namespace wali
     template <typename Client>
     void NWA<Client>::intersectClientInfoCall( NWARefPtr first, St call1, St entry1, 
                                                NWARefPtr second, St call2, St entry2, 
-                                               Sym & resSym, St resSt )
+                                               Sym resSym, St resSt )
     {
       //Note: When overriding this method your metric must combine any client information associated
       // with the target states of the two transitions and set the client information of result
@@ -8660,7 +8661,7 @@ namespace wali
     template <typename Client>
     void NWA<Client>::intersectClientInfoInternal( NWARefPtr first, St src1, St tgt1, 
                                                    NWARefPtr second, St src2, St tgt2, 
-                                                   Sym & resSym, St resSt )
+                                                   Sym resSym, St resSt )
     {
       //Note: When overriding this method your metric must combine any client information associated
       // with the target states of the two transitions and set the client information of result
@@ -8694,7 +8695,7 @@ namespace wali
     template <typename Client>
     void NWA<Client>::intersectClientInfoReturn( NWARefPtr first, St exit1, St call1, St ret1,
                                                  NWARefPtr second, St exit2, St call2, St ret2,
-                                                 Sym & resSym, St resSt )
+                                                 Sym resSym, St resSt )
     {
       //Note: When overriding this method your metric must combine any client information associated
       // with the target states of the two transitions and set the client information of result
@@ -9889,18 +9890,17 @@ namespace wali
      */     
     template <typename Client>
     void  NWA<Client>::det( NWARefPtr nondet, StateMap & stMap, StatePairSet currSt, 
-                            std::stack<StatePairSet> callPred )  
+                            std::map<Key,std::set<StatePairSet>> callPreds )  
     {
       //Internal Transisiton
       for( symbolIterator it = nondet->beginSymbols(); it != nondet->endSymbols(); it++ )
       {
         if( SymbolSet::isEpsilon(*it) )
-          continue;   //We don't want to end up with epsilon symbols, they are handled differently.
+          continue;   //We don't want to end up with epsilon symbols, they are handled with epsilonClosure.
         Internals internalTrans;
 
         //Find all internal transitions that use this symbol.
-        for( internalIterator iit = nondet->beginInternalTrans(); 
-              iit != nondet->endInternalTrans(); iit++ )
+        for( internalIterator iit = nondet->beginInternalTrans(); iit != nondet->endInternalTrans(); iit++ )
         {
           //If the symbols match, add this transition to the set of transitions to coalesce.
           if( *it == Trans::getInternalSym(*iit) )
@@ -9908,7 +9908,7 @@ namespace wali
             internalTrans.insert(*iit);
             
             std::set<St> newStates;
-            epsilonClosure(&newStates,Trans::getTarget(*iit));
+            nondet->epsilonClosure(&newStates,Trans::getTarget(*iit));
             for( std::set<St>::iterator eit = newStates.begin(); eit != newStates.end(); eit++ )
             {
               //Collapse (q,a,q') and (q',epsilon,q'') to (q,a,q'').
@@ -9939,15 +9939,39 @@ namespace wali
         {
           //Add the new key to the map.
           internalState = wali::getKey(internalStates);
+
           stMap.insert(std::pair<StatePairSet,Key>(internalStateSet,internalState));
+
+          //All call predecessors live at currSt are also live at internalState.
+          Key currState = stMap.find(currSt)->second;
+          std::set<StatePairSet> callPred = callPreds.find(currState)->second;
+          callPreds.insert(std::pair<Key,std::set<StatePairSet>>(internalState,callPred));
+
           addState(internalState);
           
           //Determinize all paths through 'nondet' starting from this new summary state.
-          det(nondet,stMap,internalStateSet,callPred);
+          det(nondet,stMap,internalStateSet,callPreds);
         }
         else
         {
           internalState = (stMap.find(internalStateSet))->second;
+
+          //All call predecessors live at currSt are also live at internalState.
+          bool newPreds = false;
+          Key currState = stMap.find(currSt)->second;
+          std::set<StatePairSet> callPred = callPreds.find(currState)->second;
+          std::set<StatePairSet> intCallPred = callPreds.find(internalState)->second;
+          for( std::set<StatePairSet>::iterator it = callPred.begin(); it != callPred.end(); it++ )
+          {
+            newPreds = newPreds || (intCallPred.insert(*it)).second;
+          }
+
+          //If anything changed, check things again so that returns will be properly computed.
+          if(newPreds)
+          {
+            //Determinize all paths through 'nondet' starting from this summary state that has new info on it.
+            det(nondet,stMap,internalStateSet,callPreds);
+          }
         }
 
         if( stMap.find(currSt) != stMap.end() )
@@ -9978,7 +10002,7 @@ namespace wali
 
             //Traverse any epsilon transitions beginning at the entry point of this call.
             std::set<St> newStates;
-            epsilonClosure(&newStates,Trans::getEntry(*cit));
+            nondet->epsilonClosure(&newStates,Trans::getEntry(*cit));
             for( std::set<St>::iterator eit = newStates.begin(); eit != newStates.end(); eit++ )
             {
               StatePair newSP = StatePair(Trans::getCallSite(*cit),*eit);
@@ -9994,16 +10018,35 @@ namespace wali
         {
           //Add the new key to the map.
           callState = wali::getKey(callStates);
+
           stMap.insert(std::pair<StatePairSet,Key>(callStateSet,callState));
+
+          //The only call predecessor live at callState is currSt.
+          Key currState = stMap.find(currSt)->second;
+          std::set<StatePairSet> callPred = std::set<StatePairSet>();
+          callPred.insert(currSt);
+          callPreds.insert(std::pair<Key,std::set<StatePairSet>>(callState,callPred));          
+
           addState(callState);
           
           //Determinize all paths through 'nondet' starting from this new summary state.
-          callPred.push(currSt);
-          det(nondet,stMap,callStateSet,callPred);
+          det(nondet,stMap,callStateSet,callPreds);  
         }
         else
         {
           callState = (stMap.find(callStateSet))->second;
+
+          //The only new call predecessor live at callState is currSt.
+          bool newPreds;
+          std::set<StatePairSet> callCallPred = callPreds.find(callState)->second;
+          newPreds = (callCallPred.insert(currSt)).second;
+
+          //If anything changed, check things again so that returns will be properly computed.
+          if(newPreds)
+          {
+            //Determinize all paths through 'nondet' starting from this summary state that has new info on it.
+            det(nondet,stMap,callStateSet,callPreds);
+          }
         }
 
         if( stMap.find(currSt) != stMap.end() )
@@ -10014,9 +10057,12 @@ namespace wali
       }
 
       //Return Transition
-      //Only check return transitions if there is some call predecessor waiting to be checked.
-      if(! callPred.empty() )   
+      //Check return transitions for each possible call predecessor.
+      Key currState = stMap.find(currSt)->second;
+      std::set<StatePairSet> retCallPreds = callPreds.find(currState)->second;
+      for( std::set<StatePairSet>::iterator spit = retCallPreds.begin(); spit != retCallPreds.end(); spit++ )
       {
+        StatePairSet Sprime = *spit;
         for( symbolIterator it = nondet->beginSymbols(); it != nondet->endSymbols(); it++ )
         {
           if( SymbolSet::isEpsilon(*it) )
@@ -10029,13 +10075,12 @@ namespace wali
           //of delta_r
           StateSet returnStates;
           StatePairSet returnStateSet;
-          StatePairSet Sprime = callPred.top();
           for( returnIterator rit = nondet->beginReturnTrans(); rit != nondet->endReturnTrans(); rit++ )
           {
             //If the symbols match, add this to the summary state.  add this transition to the set of transitions to coalesce.
             if( *it == Trans::getReturnSym(*rit) )
             {
-              //S' is callPred.top(), S is currSt
+              //S' is from callPreds, S is currSt
 
               //Want to find (q_1,q_2) in S given *rit = (q_2,q_1,a,q')
               bool found = false;
@@ -10061,7 +10106,7 @@ namespace wali
 
                     //Traverse any epsilon transitions beginning at the entry point of this call.
                     std::set<St> newStates;
-                    epsilonClosure(&newStates,Trans::getReturnSite(*rit));
+                    nondet->epsilonClosure(&newStates,Trans::getReturnSite(*rit));
                     for( std::set<St>::iterator eit = newStates.begin(); eit != newStates.end(); eit++ )
                     {
                       StatePair newSP = StatePair(sit->first,*eit);
@@ -10080,16 +10125,40 @@ namespace wali
           {
             //Add the new key to the map.
             returnState = wali::getKey(returnStates);
+
             stMap.insert(std::pair<StatePairSet,Key>(returnStateSet,returnState));
+
+            //The call preds after this return are those on the call pred that this return closes.
+            Key callState = stMap.find(Sprime)->second;
+            std::set<StatePairSet> callPred = callPreds.find(callState)->second;
+            callPreds.insert(std::pair<Key,std::set<StatePairSet>>(returnState,callPred));
+
             addState(returnState);
             
             //Determinize all paths through 'nondet' starting from this new summary state.
-            callPred.pop();
-            det(nondet,stMap,returnStateSet,callPred);
+            det(nondet,stMap,returnStateSet,callPreds);
           }
           else
           {
+            Key callState = stMap.find(Sprime)->second;
+            std::set<StatePairSet> callPred = callPreds.find(callState)->second;
+
             returnState = (stMap.find(returnStateSet))->second;
+
+            //The new call preds after this return are those on the call pred that this return closes.
+            bool newPreds = false;
+            std::set<StatePairSet> retCallPred = callPreds.find(returnState)->second;
+            for( std::set<StatePairSet>::iterator it = callPred.begin(); it != callPred.end(); it++ )
+            {
+              newPreds = newPreds || (retCallPred.insert(*it)).second;
+            }
+
+            //If anything changed, check things again so that returns will be properly computed.
+            if(newPreds)
+            {
+              //Determinize all paths through 'nondet' starting from this summary state that has new info on it.
+              det(nondet,stMap,returnStateSet,callPreds);
+            }
           }
 
           if( (stMap.find(currSt) != stMap.end()) && (stMap.find(Sprime) != stMap.end()) )
