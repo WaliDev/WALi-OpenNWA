@@ -6016,27 +6016,6 @@ namespace wali
       bool isDeterministic( );
 
       /**
-       * TODO remove this
-       * @brief intersects client information 
-       *
-       * This method intersects the client information associated with the given states
-       * and returns the resulting client information.  
-       * Note: This method should only be used to intersect client information from the 
-       * initial states of NWAs (all other client information intersections should use the 
-       * specialized methods below). 
-       *
-       * @param - first: the NWA in which to look up the client information for 'name1'
-       * @param - name1: the first state whose client information to intersect
-       * @param - second: the NWA in which to look up the client information for 'name2'
-       * @param - name2: the second state whose client information to intersect
-       * @param - resSt: the state which will receive the computed client information
-       *
-       */
-     /* virtual void intersectClientInfo( NWARefPtr first, St name1, 
-                                        NWARefPtr second, St name2, 
-                                        St resSt );*/
-
-      /**
        * 
        * @brief intersects client information 
        *
@@ -8434,6 +8413,8 @@ namespace wali
       std::set<St> oldFinalStates;
       oldFinalStates.insert(beginFinalStates(),endFinalStates());
 
+      clearFinalStates();
+
       for( stateIterator sit = beginStates(); sit != endStates(); sit++ )
       {
         if( oldFinalStates.count(*sit) == 0 )
@@ -9981,7 +9962,7 @@ namespace wali
           bool newPreds = false;
           Key currState = stMap.find(currSt)->second;
           std::set<StatePairSet> callPred = callPreds.find(currState)->second;
-          std::set<StatePairSet> intCallPred = callPreds.find(internalState)->second;
+          std::set<StatePairSet> & intCallPred = callPreds.find(internalState)->second;
           for( std::set<StatePairSet>::iterator it = callPred.begin(); it != callPred.end(); it++ )
           {
             newPreds = newPreds || (intCallPred.insert(*it)).second;
@@ -10062,7 +10043,7 @@ namespace wali
 
           //The only new call predecessor live at callState is currSt.
           bool newPreds;
-          std::set<StatePairSet> callCallPred = callPreds.find(callState)->second;
+          std::set<StatePairSet> & callCallPred = callPreds.find(callState)->second;
           newPreds = (callCallPred.insert(currSt)).second;
 
           //If anything changed, check things again so that returns will be properly computed.
@@ -10174,7 +10155,7 @@ namespace wali
 
             //The new call preds after this return are those on the call pred that this return closes.
             bool newPreds = false;
-            std::set<StatePairSet> retCallPred = callPreds.find(returnState)->second;
+            std::set<StatePairSet> & retCallPred = callPreds.find(returnState)->second;
             for( std::set<StatePairSet>::iterator it = callPred.begin(); it != callPred.end(); it++ )
             {
               newPreds = newPreds || (retCallPred.insert(*it)).second;
