@@ -6670,7 +6670,7 @@ namespace wali
        *
        */
       void det( NWARefPtr nondet, StateMap & stMap, StatePairSet currSt, 
-                std::map<Key,std::set<StatePairSet>> callPreds );  
+                std::map<Key,std::set<StatePairSet>> & callPreds );  
 
       /**
        *
@@ -7782,6 +7782,7 @@ namespace wali
     template <typename Client>
     void NWA<Client>::unionNWA( NWARefPtr first, NWARefPtr second )
     {
+      //TODO: beware of the stuck state, epsilon transitions, wild symbol
       //TODO: write this!
       //Q: Do we need to guarantee that there is no overlap in states between machines? YES
       //    If there is overlap, then we could conceivably go through the first half of one
@@ -7815,6 +7816,7 @@ namespace wali
     template <typename Client>
     void NWA<Client>::intersect( NWARefPtr first, NWARefPtr second ) 
     {
+      //TODO: beware of the stuck state, epsilon transitions, wild symbol
       std::set<StatePair> visitedPairs; // All the pairs of states we have ever encountered.
       std::deque<StatePair> worklistPairs; // Pairs of states yet to be processed
       typedef std::map<StatePair, Key> PairStMap;
@@ -8311,6 +8313,7 @@ namespace wali
     template <typename Client>
     void NWA<Client>::concat( NWARefPtr first, NWARefPtr second )
     {
+      //TODO: beware of the stuck state, epsilon transitions, the wild symbol
       //TODO: write this!
       //Q: Do we need to guarantee that there is no overlap in states between machines?
       //    If there is overlap, then we could conceivably go through the first half of one
@@ -8334,6 +8337,7 @@ namespace wali
     template <typename Client>
     void NWA<Client>::reverse( NWARefPtr first )
     {
+      //TODO: beware of the stuck state, epsilon transitions, the wild symbol
       //Swap initial and final states.
       for( stateIterator it = first->beginInitialStates(); 
         it != first->endInitialStates(); it++ )
@@ -8394,6 +8398,7 @@ namespace wali
     template <typename Client>
     void NWA<Client>::star( NWARefPtr first )
     {
+      //TODO: beware of the stuck state, epsilon transitions, the wild symbol
       //TODO: write this!  
       //Note: it is not as simple as it seems, check the longer alur paper for details.
     }
@@ -8408,6 +8413,7 @@ namespace wali
     template <typename Client>
     void NWA<Client>::complement( NWARefPtr first )
     {
+      //TODO: beware of the stuck state, epsilon transitions, the wild symbol
       //Start with a deterministic copy of the given NWA.
       if(! first->isDeterministic() )
       {
@@ -8445,6 +8451,7 @@ namespace wali
     template <typename Client>
     void NWA<Client>::determinize( NWARefPtr nondet )
     {
+      //TODO: beware of the stuck state, epsilon transitions, the wild symbol
       StateMap stMap; //Keeps track of the state associated with each set of states.
 
       //The deterministic NWAs initial state is 
@@ -8508,6 +8515,7 @@ namespace wali
     template <typename Client>
     bool NWA<Client>::isDeterministic( )
     {
+      //TODO: beware of the stuck state, epsilon transitions, the wild symbol
       //An NWA is not deterministic if there is not exactly one initial state
       if( sizeInitialStates() != 1 ) 
         return false;
@@ -9331,6 +9339,8 @@ namespace wali
     template <typename Client>
     wfa::WFA NWA<Client>::prestar( wfa::WFA & input, WeightGen & wg )
     {
+      //Q: does anything need to be done to transform the resulting WFA from the 
+      //    PDS vocab back to the NWA vocab?
       return ((NWAtoPDScalls(wg)).prestar(input));
     }
 
@@ -9349,6 +9359,8 @@ namespace wali
     template <typename Client>
     void NWA<Client>::prestar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg )
     {
+      //Q: does anything need to be done to transform the resulting WFA from the 
+      //    PDS vocab back to the NWA vocab?
       (NWAtoPDScalls(wg)).prestar(input,output);
     }
 
@@ -9364,6 +9376,8 @@ namespace wali
     template <typename Client>
     wfa::WFA NWA<Client>::poststar( wfa::WFA & input, WeightGen & wg )
     {
+      //Q: does anything need to be done to transform the resulting WFA from the 
+      //    PDS vocab back to the NWA vocab?
       return ((NWAtoPDScalls(wg)).poststar(input));
     }
 
@@ -9382,6 +9396,8 @@ namespace wali
     template <typename Client>
     void NWA<Client>::poststar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg )
     {
+      //Q: does anything need to be done to transform the resulting WFA from the 
+      //    PDS vocab back to the NWA vocab?
       (NWAtoPDScalls(wg)).poststar(input,output);
     }
 
@@ -9398,6 +9414,7 @@ namespace wali
     template <typename Client>
     std::ostream & NWA<Client>::print( std::ostream & o ) const
     {
+      //TODO: flag for explicit stuck state transition printing?
       states.print(o);
       symbols.print(o);
       trans.print(o);
@@ -9415,6 +9432,7 @@ namespace wali
     template <typename Client>
     std::ostream & NWA<Client>::print_dot( std::ostream & o, std::string title ) const
     {
+      //TODO: flag for explicit stuck state transition printing?
       o << "digraph \"NWA\" { \n";
       o << "    label = \"" << title <<"\" ;\n";
       o << "    subgraph cluster_key {\n";
@@ -9890,7 +9908,7 @@ namespace wali
      */     
     template <typename Client>
     void  NWA<Client>::det( NWARefPtr nondet, StateMap & stMap, StatePairSet currSt, 
-                            std::map<Key,std::set<StatePairSet>> callPreds )  
+                            std::map<Key,std::set<StatePairSet>> & callPreds )  
     {
       //Internal Transisiton
       for( symbolIterator it = nondet->beginSymbols(); it != nondet->endSymbols(); it++ )
@@ -9932,6 +9950,9 @@ namespace wali
             }
           }
         }
+
+        //TODO: if the state set is empty, then it goes to the stuck state, so there is no need
+        //      to explicitly add the transition.
     
         //We only want to add states that don't already exist.
         St internalState;
@@ -10011,6 +10032,9 @@ namespace wali
             }
           }          
         }
+
+        //TODO: if the state set is empty, then it goes to the stuck state, so there is no need
+        //      to explicitly add the transition.
 
         //We only want to add states that don't already exist.
         St callState;
@@ -10118,6 +10142,9 @@ namespace wali
               }
             }
           }
+
+          //TODO: if the state set is empty, then it goes to the stuck state, so there is no need
+          //      to explicitly add the transition.
 
           //We only want to add states that don't already exist.
           St returnState;
