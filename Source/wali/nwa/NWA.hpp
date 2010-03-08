@@ -7445,6 +7445,9 @@ namespace wali
 
       assert(! Symbols::isEpsilon(sym) ); //An Epsilon symbol on a call doesn't make sense.
 
+      //TODO: don't allow transitions out of the stuck state (unless they go to the stuck state)
+      //      otherwise it isn't really a stuck state
+
       //Add the states and symbol of this transition to the appropriate sets.
       addState(from);
       addSymbol(sym);
@@ -7469,6 +7472,9 @@ namespace wali
       assert(Trans::getEntry(ct) < wali::WALI_BAD_KEY);
 
       assert(! Symbols::isEpsilon(Trans::getCallSym(ct)) ); //An Epsilon symbol on a call doesn't make sense.
+
+      //TODO: don't allow transitions out of the stuck state (unless they go to the stuck state)
+      //      otherwise it isn't really a stuck state
 
       //Add the states and symbol of this transition to the appropriate sets.
       addState(Trans::getCallSite(ct));
@@ -7579,6 +7585,9 @@ namespace wali
       assert(sym < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
 
+      //TODO: don't allow transitions out of the stuck state (unless they go to the stuck state)
+      //      otherwise it isn't really a stuck state
+
       //Add the states and symbol of this transition to the appropriate sets.
       addState(from);
       addSymbol(sym);
@@ -7601,6 +7610,9 @@ namespace wali
       assert(Trans::getSource(it) < wali::WALI_BAD_KEY);
       assert(Trans::getInternalSym(it) < wali::WALI_BAD_KEY);
       assert(Trans::getTarget(it) < wali::WALI_BAD_KEY);
+
+      //TODO: don't allow transitions out of the stuck state (unless they go to the stuck state)
+      //      otherwise it isn't really a stuck state
 
       //Add the states and symbol of this transition to the appropriate sets.
       addState(Trans::getSource(it));
@@ -7738,6 +7750,9 @@ namespace wali
 
       assert(! Symbols::isEpsilon(sym) ); //An Epsilon symbol on a return doesn't make sense.
 
+      //TODO: don't allow transitions out of the stuck state (unless they go to the stuck state)
+      //      otherwise it isn't really a stuck state
+
       //Add the states and symbol of this transition to the approprite stes.
       addState(from);
       addState(pred);
@@ -7764,6 +7779,9 @@ namespace wali
       assert(Trans::getReturnSite(rt) < wali::WALI_BAD_KEY);
 
       assert(! Symbols::isEpsilon(Trans::getReturnSym(rt)) ); //An Epsilon symbol on a return doesn't make sense.
+
+      //TODO: don't allow transitions out of the stuck state (unless they go to the stuck state)
+      //      otherwise it isn't really a stuck state
 
       //Add the states and symbol of this transition to the appropriate sets.
       addState(Trans::getExit(rt));
@@ -8466,6 +8484,9 @@ namespace wali
       //Note: any (implicit) transition to the stuck state in the original machine 
       //      will be a transition out of the stuck state in the reverse machine.  
       //Q: how do I implement this?
+      //Q: if the stuck state is a final state in the initial machine, then we need  
+      //    transitions out of the stuck state in the reverse machine, but this does
+      //    not make sense (it is no longer a stuck state in this case).
 
       //Swap initial and final states.
       for( stateIterator it = first->beginInitialStates(); 

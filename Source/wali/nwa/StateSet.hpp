@@ -583,11 +583,12 @@ namespace wali
     void StateSet<Client>::setClientInfo( St state, const ClientInfoRefPtr c )
     {
       //Check to make sure this is a valid state.
-      if( isState(state) )
+      if(! isState(state) )
       {
-        //Update the state's info.
-        stateInfos[state] = c;
+        addState(state);
       }
+      //Update the state's info.
+      stateInfos[state] = c;
     }
 
     //State Accessors
