@@ -62,7 +62,7 @@ namespace wali
        * @return the client information associated with the given state
        *
        */
-      ClientInfoRefPtr getClientInfo( St state );
+      ClientInfoRefPtr getClientInfo( St state ) const;
 
       /**
        * Q: If the state doesn't exit should we add the state(and assign it the given info)?
@@ -566,9 +566,9 @@ namespace wali
      *
      */
     template<typename Client>
-    typename StateSet<Client>::ClientInfoRefPtr StateSet<Client>::getClientInfo( St state ) 
+    typename StateSet<Client>::ClientInfoRefPtr StateSet<Client>::getClientInfo( St state ) const 
     {
-      return stateInfos[state];   
+      return (stateInfos.find(state))->second;   
     }
 
     /**

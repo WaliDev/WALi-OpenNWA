@@ -45,7 +45,7 @@ class STR
     std::string str;
 };
 
-class ReachGen : public wali::nwa::WeightGen
+class ReachGen : public wali::nwa::WeightGen<>
 {
   public:
     enum Kind {INTRA, CALL_TO_ENTRY, EXIT_TO_RET, CALL_TO_RET};

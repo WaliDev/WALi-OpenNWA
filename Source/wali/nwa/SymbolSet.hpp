@@ -232,7 +232,11 @@ namespace wali
     };
 
     //Constructors
-    SymbolSet::SymbolSet( ) { }
+    SymbolSet::SymbolSet( ) 
+    { 
+      //Epsilon is always a symbol of the NWA.
+      addSymbol( getEpsilon() );
+    }
     
     SymbolSet::SymbolSet( const SymbolSet & other )
     {
@@ -352,6 +356,9 @@ namespace wali
     void SymbolSet::clearSymbols( )
     {
       symbols.clear();
+
+      //Wpsilon is always a symbol of the NWA.
+      addSymbol( getEpsilon() );
     }
 
     //Utilities

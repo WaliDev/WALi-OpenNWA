@@ -5139,7 +5139,7 @@ namespace wali
        * @return the client information associated with the given state
        *
        */
-      ClientInfoRefPtr getClientInfo( St state );
+      ClientInfoRefPtr getClientInfo( St state ) const;
 
       /**
        * 
@@ -6017,6 +6017,37 @@ namespace wali
 
       /**
        * 
+       * @brief determines whether there is any overlap in the states of the given NWAs
+       *
+       * @param - first: one of the NWAs whose states to compare
+       * @param - second: one of the NWAs whose states to compare
+       * @return true if there is some overlap in the states of the given NWAs, false otherwise
+       *
+       */
+      static bool overlap(NWARefPtr first, NWARefPtr second)
+      {
+        //Iterate through the smaller collection and do the lookup in the larger collection.
+        if( first->sizeStates() > second->sizeStates() )
+        {
+          for( stateIterator sit = second->beginStates(); sit != second->endStates(); sit++ )
+          {
+            if( first->isState(*sit) )
+              return true;
+          }
+        }
+        else
+        {
+          for( stateIterator sit = first->beginStates(); sit != first->endStates(); sit++ )
+          {
+            if( second->isState(*sit) )
+              return true;
+          }
+        }
+        return false;
+      }
+
+      /**
+       * 
        * @brief intersects client information 
        *
        * This method intersects the client information associated with the states 'entry1'
@@ -6213,7 +6244,7 @@ namespace wali
        * @return the PDS equivalent to this NWA
        *
        */ 
-      wpds::WPDS NWAtoPDSreturns( WeightGen & wg ) const;
+      wpds::WPDS NWAtoPDSreturns( WeightGen<Client> & wg ) const;
 
       /**
        *
@@ -6226,7 +6257,7 @@ namespace wali
        * @return the backwards PDS equivalent to this NWA
        *
        */ 
-      wpds::WPDS NWAtoBackwardsPDSreturns( WeightGen & wg ) const;  
+      wpds::WPDS NWAtoBackwardsPDSreturns( WeightGen<Client> & wg ) const;  
 
       /**
        *
@@ -6239,7 +6270,7 @@ namespace wali
        * @return the PDS equivalent to this NWA
        *
        */ 
-      wpds::WPDS NWAtoPDScalls( WeightGen & wg ) const;
+      wpds::WPDS NWAtoPDScalls( WeightGen<Client> & wg ) const;
 
       /**
        *
@@ -6252,7 +6283,7 @@ namespace wali
        * @return the backwards PDS equivalent to this NWA
        *
        */ 
-      wpds::WPDS NWAtoBackwardsPDScalls( WeightGen & wg ) const; 
+      wpds::WPDS NWAtoBackwardsPDScalls( WeightGen<Client> & wg ) const; 
       
       /**
        *
@@ -6291,7 +6322,7 @@ namespace wali
        * @return the WFA resulting from performing the prestar reachability query 
        *
        */
-      virtual wfa::WFA prestar( wfa::WFA & input, WeightGen & wg );
+      virtual wfa::WFA prestar( wfa::WFA & input, WeightGen<Client> & wg );
 
       /**
        *
@@ -6307,7 +6338,7 @@ namespace wali
        * @param - wg: the functions to use in generating weights
        *
        */
-      virtual void prestar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg );
+      virtual void prestar( wfa::WFA & input, wfa::WFA & output, WeightGen<Client> & wg );
 
       /**
        *
@@ -6320,7 +6351,7 @@ namespace wali
        * @return the WFA resulting from performing the poststar reachability query
        *
        */
-      virtual wfa::WFA poststar( wfa::WFA & input, WeightGen & wg );
+      virtual wfa::WFA poststar( wfa::WFA & input, WeightGen<Client> & wg );
 
       /**
        *
@@ -6336,7 +6367,7 @@ namespace wali
        * @param - wg: the functions to use in generating weights
        *
        */
-      virtual void poststar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg );
+      virtual void poststar( wfa::WFA & input, wfa::WFA & output, WeightGen<Client> & wg );
 
       //Utilities	
 
@@ -6694,6 +6725,9 @@ namespace wali
         States states;         
         Symbols symbols;        
         Trans trans;
+
+        //TODO: incrementally maintain a wpds?
+        //Q: what would the weight gen of an incrementally maintained wpds be?
     };
 
     //
@@ -6706,7 +6740,7 @@ namespace wali
     {
       states = States();
       symbols = Symbols();
-      trans = Trans();  //Q: should this be a pointer for some reason?
+      trans = Trans();  
     }
     template <typename Client>
     NWA<Client>::NWA( const NWA & other )
@@ -6767,8 +6801,9 @@ namespace wali
      */
     template <typename Client>
     inline
-    typename NWA<Client>::ClientInfoRefPtr NWA<Client>::getClientInfo( St state ) 
+    typename NWA<Client>::ClientInfoRefPtr NWA<Client>::getClientInfo( St state ) const
     {
+      assert(state < wali::WALI_BAD_KEY);
       return states.getClientInfo(state);
     }
 
@@ -6784,6 +6819,7 @@ namespace wali
     inline
     void NWA<Client>::setClientInfo( St state, const ClientInfoRefPtr c )
     {
+      assert(state < wali::WALI_BAD_KEY);
       states.setClientInfo(state,c);
     }
      
@@ -6798,6 +6834,7 @@ namespace wali
     template <typename Client>
     const std::set<typename NWA<Client>::St> & NWA<Client>::getPredecessorNames( St state ) const
     {
+      assert(state < wali::WALI_BAD_KEY);
       std::set<St> * preds = new std::set<St>();  //TODO: this is not a good idea, it will probably cause a memory leak!
       
       std::set<Call> calls = trans.getTransEntry(state);
@@ -6826,6 +6863,9 @@ namespace wali
     template <typename Client>
     void NWA<Client>::duplicateStateOutgoing( St orig, St dup )
     {
+      assert(orig < wali::WALI_BAD_KEY);
+      assert(dup < wali::WALI_BAD_KEY);
+
       states.addState(dup);
       states.dupState(orig,dup);  //Duplicate state characteristics(initial/final).
 
@@ -6843,6 +6883,9 @@ namespace wali
     template <typename Client>
     void NWA<Client>::duplicateState( St orig, St dup )
     {
+      assert(orig < wali::WALI_BAD_KEY);
+      assert(dup < wali::WALI_BAD_KEY);
+
       states.addState(dup);
       states.dupState(orig,dup);  //Duplicate state characteristics(initial/final).
 
@@ -6893,6 +6936,7 @@ namespace wali
     inline
     bool NWA<Client>::isState( St state ) const
     {
+      assert(state < wali::WALI_BAD_KEY);
       return states.isState(state);
     }
     /**
@@ -6910,6 +6954,7 @@ namespace wali
     inline
     bool NWA<Client>::is_nwa_state( St state ) const
     {
+      assert(state < wali::WALI_BAD_KEY);
       return isState(state);
     }
 
@@ -6925,6 +6970,7 @@ namespace wali
     inline
     bool NWA<Client>::addState( St state )
     {
+      assert(state < wali::WALI_BAD_KEY);
       return states.addState(state);
     }
 
@@ -6969,6 +7015,7 @@ namespace wali
     template <typename Client>
     bool NWA<Client>::removeState( St state )
     {
+      assert(state < wali::WALI_BAD_KEY);
       bool removed = states.removeState(state);
       //Remove transitions associated with the state that was removed.
       if( removed )
@@ -7021,6 +7068,7 @@ namespace wali
     inline
     bool NWA<Client>::isInitialState( St state ) const
     {
+      assert(state < wali::WALI_BAD_KEY);
       return states.isInitialState(state);
     }
 
@@ -7036,6 +7084,7 @@ namespace wali
     inline
     bool NWA<Client>::addInitialState( St state )
     {
+      assert(state < wali::WALI_BAD_KEY);
       return states.addInitialState(state);
     }
 
@@ -7065,6 +7114,7 @@ namespace wali
     inline
     bool NWA<Client>::removeInitialState( St state )
     {
+      assert(state < wali::WALI_BAD_KEY);
       return states.removeInitialState(state);
     }
 
@@ -7108,6 +7158,7 @@ namespace wali
     inline
     bool NWA<Client>::isFinalState( St state ) const
     {
+      assert(state < wali::WALI_BAD_KEY);
       return states.isFinalState(state);
     }
 
@@ -7123,6 +7174,7 @@ namespace wali
     inline
     bool NWA<Client>::addFinalState( St state )
     {
+      assert(state < wali::WALI_BAD_KEY);
       return states.addFinalState(state);
     }
 
@@ -7152,6 +7204,7 @@ namespace wali
     inline
     bool NWA<Client>::removeFinalState( St state )
     {
+      assert(state < wali::WALI_BAD_KEY);
       return states.removeFinalState(state);
     }
 
@@ -7195,6 +7248,7 @@ namespace wali
     inline
     bool NWA<Client>::isSymbol( Sym sym ) const
     {
+      assert(sym < wali::WALI_BAD_KEY);
       return symbols.isSymbol(sym);
     }
 
@@ -7210,6 +7264,7 @@ namespace wali
     inline
     bool NWA<Client>::addSymbol( Sym sym )
     {
+      assert(sym < wali::WALI_BAD_KEY);
       return symbols.addSymbol(sym);
     }
 
@@ -7240,6 +7295,7 @@ namespace wali
     template <typename Client>
     bool NWA<Client>::removeSymbol( Sym sym )
     {
+      assert(sym < wali::WALI_BAD_KEY);
       bool removed = symbols.removeSymbol(sym);
       if( removed )
       {
@@ -7279,6 +7335,8 @@ namespace wali
     inline
     bool NWA<Client>::getSymbol( St from, St to, Sym & sym )
     {
+      assert(from < wali::WALI_BAD_KEY);
+      assert(to < wali::WALI_BAD_KEY);
       return trans.getSymbol(from,to,sym);
     }
 
@@ -7297,6 +7355,9 @@ namespace wali
     inline
     bool NWA<Client>::findTrans( St from, Sym sym, St to) const
     {
+      assert(from < wali::WALI_BAD_KEY);
+      assert(sym < wali::WALI_BAD_KEY);
+      assert(to < wali::WALI_BAD_KEY);
       return trans.findTrans(from,sym,to);
     }
 
@@ -7355,6 +7416,7 @@ namespace wali
     template <typename Client>
     const std::set<std::pair<typename NWA<Client>::Sym,typename NWA<Client>::St>> NWA<Client>::getEntries( St callSite ) const
     {
+      assert(callSite < wali::WALI_BAD_KEY);
       const Calls ent = trans.getTransCall(callSite);
       std::set<std::pair<Sym,St>> entries;
       for( callIterator it = ent.begin(); it != ent.end(); it++ )
@@ -7377,6 +7439,10 @@ namespace wali
     template <typename Client>
     bool NWA<Client>::addCallTrans( St from, Sym sym, St to )
     {
+      assert(from < wali::WALI_BAD_KEY);
+      assert(sym < wali::WALI_BAD_KEY);
+      assert(to < wali::WALI_BAD_KEY);
+
       assert(! Symbols::isEpsilon(sym) ); //An Epsilon symbol on a call doesn't make sense.
 
       //Add the states and symbol of this transition to the appropriate sets.
@@ -7398,6 +7464,10 @@ namespace wali
     template <typename Client>
     bool NWA<Client>::addCallTrans( Call & ct )
     {
+      assert(Trans::getCallSite(ct) < wali::WALI_BAD_KEY);
+      assert(Trans::getCallSym(ct) < wali::WALI_BAD_KEY);
+      assert(Trans::getEntry(ct) < wali::WALI_BAD_KEY);
+
       assert(! Symbols::isEpsilon(Trans::getCallSym(ct)) ); //An Epsilon symbol on a call doesn't make sense.
 
       //Add the states and symbol of this transition to the appropriate sets.
@@ -7421,6 +7491,10 @@ namespace wali
     template <typename Client>
     bool NWA<Client>::removeCallTrans( St from, Sym sym, St to )
     {
+      assert(from < wali::WALI_BAD_KEY);
+      assert(sym < wali::WALI_BAD_KEY);
+      assert(to < wali::WALI_BAD_KEY);
+
       if(! isState(from) || ! isSymbol(sym) || ! isState(to) || Symbols::isEpsilon(sym) )
         return false;
 
@@ -7438,6 +7512,10 @@ namespace wali
     template <typename Client>
     bool NWA<Client>::removeCallTrans( const Call & ct )
     {
+      assert(Trans::getCallSite(ct) < wali::WALI_BAD_KEY);
+      assert(Trans::getCallSym(ct) < wali::WALI_BAD_KEY);
+      assert(Trans::getEntry(ct) < wali::WALI_BAD_KEY);
+
       if(! isState(Trans::getCallSite(ct))
         || ! isSymbol(Trans::getCallSym(ct))
         || ! isState(Trans::getEntry(ct)) 
@@ -7474,6 +7552,7 @@ namespace wali
     template <typename Client>
     const std::set<std::pair<typename NWA<Client>::Sym,typename NWA<Client>::St>> NWA<Client>::getTargets( St source ) const
     {
+      assert(source < wali::WALI_BAD_KEY);
       const Internals tgt = trans.getTransFrom(source);
       std::set<std::pair<Sym,St>> targets;
       for( internalIterator it = tgt.begin(); it != tgt.end(); it++ )
@@ -7496,6 +7575,10 @@ namespace wali
     template <typename Client>
     bool NWA<Client>::addInternalTrans( St from, Sym sym, St to )
     {
+      assert(from < wali::WALI_BAD_KEY);
+      assert(sym < wali::WALI_BAD_KEY);
+      assert(to < wali::WALI_BAD_KEY);
+
       //Add the states and symbol of this transition to the appropriate sets.
       addState(from);
       addSymbol(sym);
@@ -7515,6 +7598,10 @@ namespace wali
     template <typename Client>
     bool NWA<Client>::addInternalTrans( Internal & it )
     {
+      assert(Trans::getSource(it) < wali::WALI_BAD_KEY);
+      assert(Trans::getInternalSym(it) < wali::WALI_BAD_KEY);
+      assert(Trans::getTarget(it) < wali::WALI_BAD_KEY);
+
       //Add the states and symbol of this transition to the appropriate sets.
       addState(Trans::getSource(it));
       addSymbol(Trans::getInternalSym(it));
@@ -7536,6 +7623,10 @@ namespace wali
     template <typename Client>
     bool NWA<Client>::removeInternalTrans( St from, Sym sym, St to )
     {
+      assert(from < wali::WALI_BAD_KEY);
+      assert(sym < wali::WALI_BAD_KEY);
+      assert(to < wali::WALI_BAD_KEY);
+
       if(! isState(from) || ! isSymbol(sym) || ! isState(to) )
         return false;
 
@@ -7553,6 +7644,10 @@ namespace wali
     template <typename Client>
     bool NWA<Client>::removeInternalTrans( const Internal & it )
     {
+      assert(Trans::getSource(it) < wali::WALI_BAD_KEY);
+      assert(Trans::getInternalSym(it) < wali::WALI_BAD_KEY);
+      assert(Trans::getTarget(it) < wali::WALI_BAD_KEY);
+
       if(! isState(Trans::getSource(it))
         || ! isSymbol(Trans::getInternalSym(it))
         || ! isState(Trans::getTarget(it)) )
@@ -7589,6 +7684,7 @@ namespace wali
     inline
     const std::set<typename NWA<Client>::St> NWA<Client>::getReturnSites( St callSite ) const
     {
+      assert(callSite < wali::WALI_BAD_KEY);
       return trans.getReturnSites(callSite);
     }
 
@@ -7606,6 +7702,9 @@ namespace wali
     template <typename Client>
     const std::set<std::pair<typename NWA<Client>::Sym,typename NWA<Client>::St>> NWA<Client>::getReturns( St exit, St callSite ) const
     {
+      assert(exit < wali::WALI_BAD_KEY);
+      assert(callSite < wali::WALI_BAD_KEY);
+
       const Returns ret = trans.getTransExit(exit);
       std::set<std::pair<Sym,St>> returns;
       for( returnIterator it = ret.begin(); it != ret.end(); it++ )
@@ -7632,6 +7731,11 @@ namespace wali
     template <typename Client>
     bool NWA<Client>::addReturnTrans( St from, St pred, Sym sym, St to )
     {
+      assert(from < wali::WALI_BAD_KEY);
+      assert(pred < wali::WALI_BAD_KEY);
+      assert(sym < wali::WALI_BAD_KEY);
+      assert(to < wali::WALI_BAD_KEY);
+
       assert(! Symbols::isEpsilon(sym) ); //An Epsilon symbol on a return doesn't make sense.
 
       //Add the states and symbol of this transition to the approprite stes.
@@ -7654,6 +7758,11 @@ namespace wali
     template <typename Client>
     bool NWA<Client>::addReturnTrans( Return & rt )
     {
+      assert(Trans::getExit(rt) < wali::WALI_BAD_KEY);
+      assert(Trans::getCallSite(rt) < wali::WALI_BAD_KEY);
+      assert(Trans::getReturnSym(rt) < wali::WALI_BAD_KEY);
+      assert(Trans::getReturnSite(rt) < wali::WALI_BAD_KEY);
+
       assert(! Symbols::isEpsilon(Trans::getReturnSym(rt)) ); //An Epsilon symbol on a return doesn't make sense.
 
       //Add the states and symbol of this transition to the appropriate sets.
@@ -7678,6 +7787,10 @@ namespace wali
     template <typename Client>
     bool NWA<Client>::removeReturnTrans( St from, Sym sym, St to )
     {
+      assert(from < wali::WALI_BAD_KEY);
+      assert(sym < wali::WALI_BAD_KEY);
+      assert(to < wali::WALI_BAD_KEY);
+
       if(! isState(from) || ! isSymbol(sym) || ! isState(to) || Symbols::isEpsilon(sym) )
         return false;
      
@@ -7706,6 +7819,11 @@ namespace wali
     template <typename Client>
     bool NWA<Client>::removeReturnTrans( St from, St pred, Sym sym, St to )
     {
+      assert(from < wali::WALI_BAD_KEY);
+      assert(pred < wali::WALI_BAD_KEY);
+      assert(sym < wali::WALI_BAD_KEY);
+      assert(to < wali::WALI_BAD_KEY);
+
       if(! isState(from) || ! isState(pred) || ! isSymbol(sym) || ! isState(to) 
         || Symbols::isEpsilon(sym) )
         return false;
@@ -7724,6 +7842,11 @@ namespace wali
     template <typename Client>
     bool NWA<Client>::removeReturnTrans( const Return & rt )
     {
+      assert(Trans::getExit(rt) < wali::WALI_BAD_KEY);
+      assert(Trans::getCallSite(rt) < wali::WALI_BAD_KEY);
+      assert(Trans::getReturnSym(rt) < wali::WALI_BAD_KEY);
+      assert(Trans::getReturnSite(rt) < wali::WALI_BAD_KEY);
+
       if(! isState(Trans::getExit(rt))
         || ! isState(Trans::getCallSite(rt))
         || ! isSymbol(Trans::getReturnSym(rt))
@@ -7761,27 +7884,27 @@ namespace wali
     template <typename Client>
     void NWA<Client>::unionNWA( NWARefPtr first, NWARefPtr second )
     {
-      //TODO: beware of the stuck state, epsilon transitions, wild symbol
-      //TODO: write this!
-      //Q: Do we need to guarantee that there is no overlap in states between machines? YES
+      //Q: Do we need to guarantee that there is no overlap in states between machines? 
+      //A: YES
       //    If there is overlap, then we could conceivably go through the first half of one
       //    machine and then skip to the other machine, thereby not completing either machine.
       //Q: How should we do this?  Use the same base algorithm as intersection?  Generate new
       //    keys by the pairing scheme (1,k) for keys in first and (2,k) for keys in second?
       //    Implement a check for overlapping state keys and assert that no such overlap occurs?
+      //A: The last one will be easiest.
 
-      //Q: Is this equivalent to simply making the initial state set the union of the initial
-      //    state sets of the component machines and the final state set the union of the 
-      //    final state sets of the component machines.
+      //Test state Key overlap of the two NWAs.
+      assert(! overlap(first,second) );
 
-      //Test state Key overlap.
+      //Copy all of the functionality of the two machines.  
+      //States
+      states.addAll(first->states);
+      states.addAll(second->states);
 
-      //Copy all of the initial states.
-
-      //Copy all of the functionality of the two machines.    
+      //Transitions
       //Note: Here's where the problems with keys come in.
-
-      //Copy all of the final states.
+      trans.addAllTrans(first->trans);
+      trans.addAllTrans(second->trans);      
     }
 
     /**
@@ -7795,7 +7918,11 @@ namespace wali
     template <typename Client>
     void NWA<Client>::intersect( NWARefPtr first, NWARefPtr second ) 
     {
-      //TODO: beware of the stuck state, epsilon transitions, wild symbol
+      //TODO: beware the stuck state
+      //Q: do we want to make explicit transitions to the stuck state so that (m,a,m') and
+      //    (n,a,stuck) could potentially produce ( (m,n),a,(m',stuck) )?
+      //Q: should it be possible to have states like (m,stuck) for m != stuck?
+
       std::set<StatePair> visitedPairs; // All the pairs of states we have ever encountered.
       std::deque<StatePair> worklistPairs; // Pairs of states yet to be processed
       typedef std::map<StatePair, Key> PairStMap;
@@ -7803,7 +7930,6 @@ namespace wali
                              // for all intersectable pairs encountered
 
       //Start the worklist with all possible initial states of the intersection NWA.
-      //NOTE: Currently this should be just one state (the product of the single initial states of each machine).
       for( stateIterator fit = first->beginInitialStates(); fit != first->endInitialStates(); fit++ ) 
       {
         for( stateIterator sit = second->beginInitialStates(); sit != second->endInitialStates(); sit++ ) 
@@ -7900,6 +8026,7 @@ namespace wali
               //Attach client info to the newly created state.
               states.setClientInfo(resSt,resCI);
 
+              //Add this to the worklist.
               worklistPairs.push_back(entryPair);
               pairToStMap[entryPair] = resSt;
               
@@ -7929,6 +8056,7 @@ namespace wali
                     //Attach client info to the newly created state.
                     states.setClientInfo(st,CI);
 
+                    //Add this to the worklist.
                     worklistPairs.push_back(*it);
                     pairToStMap[*it] = st;
                   }
@@ -7952,6 +8080,7 @@ namespace wali
               resSt = pairToStMap[entryPair];
             }
             
+            //Add an edge that traverses the current call transition.
             intersectClientInfoCall(first,Trans::getCallSite(*fit),Trans::getEntry(*fit),
                                     second,Trans::getCallSite(*sit),Trans::getEntry(*sit),
                                     resSym,resSt);   //Intersect Call Trans client info.
@@ -8052,6 +8181,7 @@ namespace wali
               resSt = pairToStMap[tgtPair];
             }
 
+            //Add an edge that is the current internal transition.
             intersectClientInfoInternal(first,Trans::getSource(*fit),Trans::getTarget(*fit),
                                         second,Trans::getSource(*sit),Trans::getTarget(*sit),
                                         resSym,resSt);   //Intersect Internal Trans client info.
@@ -8162,6 +8292,7 @@ namespace wali
               retSt = pairToStMap[retPair];
             }
             
+            //Add an edge that is the current return transition.
             intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),Trans::getReturnSite(*fit),
                                       second,Trans::getExit(*sit),Trans::getCallSite(*sit),Trans::getReturnSite(*sit),
                                       resSym,retSt);   //Intersect Return Trans client info.
@@ -8272,6 +8403,7 @@ namespace wali
               retSt = pairToStMap[retPair];
             }
             
+            //Add an edge that is the current return transition.
             intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),Trans::getReturnSite(*fit),
                                       second,Trans::getExit(*sit),Trans::getCallSite(*sit),Trans::getReturnSite(*sit),
                                       resSym,retSt);   //Intersect Return Trans client info.
@@ -8292,19 +8424,33 @@ namespace wali
     template <typename Client>
     void NWA<Client>::concat( NWARefPtr first, NWARefPtr second )
     {
-      //TODO: beware of the stuck state, epsilon transitions, the wild symbol
-      //TODO: write this!
       //Q: Do we need to guarantee that there is no overlap in states between machines?
+      //A: YES!
       //    If there is overlap, then we could conceivably go through the first half of one
       //    machine and then skip to the other machine before completing the first machine.
 
+      //Test state Key overlap of the two NWAs.
+      assert(! overlap(first,second) );
+
       //Duplicate all of the functionality of the first machine (except the final state property).
+      states.addAllStates(first->states);
+      states.addAllInitialStates(first->states);
+      trans.addAllTrans(first->trans);
 
       //Duplicate all of the functionality of the second machine (except the initial state property).
+      states.addAllStates(second->states);
+      states.addAllFinalStates(second->states);
+      trans.addAllTrans(second->trans);
 
       //Add epsilon transitions from the final states of the first machine to the initial
       //states of the second machine.
-
+      for( stateIterator fit = first->beginFinalStates(); fit != first->endFinalStates(); fit++ )
+      {
+        for( stateIterator sit = second->beginInitialStates(); sit != second->endInitialStates(); sit++ )
+        {
+          addInternalTrans(*fit,SymbolSet::getEpsilon(),*sit);
+        }
+      }
     }
 
     /**
@@ -8316,7 +8462,11 @@ namespace wali
     template <typename Client>
     void NWA<Client>::reverse( NWARefPtr first )
     {
-      //TODO: beware of the stuck state, epsilon transitions, the wild symbol
+      //TODO: beware of the stuck state
+      //Note: any (implicit) transition to the stuck state in the original machine 
+      //      will be a transition out of the stuck state in the reverse machine.  
+      //Q: how do I implement this?
+
       //Swap initial and final states.
       for( stateIterator it = first->beginInitialStates(); 
         it != first->endInitialStates(); it++ )
@@ -8579,27 +8729,6 @@ namespace wali
     }
 
     /**
-     * TODO: remove this
-     * @brief intersects client information 
-     *
-     * @param - first: the NWA in which to look up the client information for 'name1'
-     * @param - name1: the first state whose client information to intersect
-     * @param - second: the NWA in which to look up the client information for 'name2'
-     * @param - name2: the second state whose client information to intersect
-     * @param - resSt: the state which will receive the computed client information
-     *
-     */
-    /*template <typename Client>
-    void NWA<Client>::intersectClientInfo( NWARefPtr first, St name1, 
-                                           NWARefPtr second, St name2, 
-                                           St resSt )
-    {
-      //Note: When overriding this method your metric must combine any client information associated
-      // with the states associated with the given names and set the client information of result
-      // to that value.
-    }*/
-
-    /**
      * 
      * @brief intersects client information 
      *
@@ -8789,7 +8918,7 @@ namespace wali
      *
      */ 
     template <typename Client>
-    wpds::WPDS NWA<Client>::NWAtoPDSreturns( WeightGen & wg ) const
+    wpds::WPDS NWA<Client>::NWAtoPDSreturns( WeightGen<Client> & wg ) const
     {
       wpds::WPDS result = wpds::WPDS();
 
@@ -8803,25 +8932,29 @@ namespace wali
         //(q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
         //where the weight w depends on sigma
 
-        //TODO: fix this with respect to wild labels
-        if( SymbolSet::isWild(Trans::getInternalSym(*iit)) )
-          wgt = wg.getWildWeight(Trans::getSource(*iit),Trans::getTarget(*iit));  // w
-        else
-          wgt = wg.getWeight(Trans::getSource(*iit),
-                              Trans::getInternalSym(*iit),
-                              WeightGen::INTRA,
-                              Trans::getTarget(*iit));          //w
+	    St src = Trans::getSource(*iit);
+		  St tgt = Trans::getTarget(*iit);
+      //TODO: fix this with respect to wild labels
+      if( SymbolSet::isWild(Trans::getInternalSym(*iit)) )
+		    wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
+      else
+        wgt = wg.getWeight(src, getClientInfo(src),
+                            Trans::getInternalSym(*iit),
+                            WeightGen<Client>::INTRA,
+                            tgt, getClientInfo(tgt));          //w
 
         result.add_rule(program,                                //from_state (p)
-                        Trans::getSource(*iit),                 //from_stack (q)
+                        src,									//from_stack (q)
                         program,                                //to_state (p)
-                        Trans::getTarget(*iit),                 //to_stack1 (q')
+                        tgt,									//to_stack1 (q')
                         wgt);                                   //weight  (w)      
       }
 
       //Call Transitions 
       for( callIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
       {
+        St src = Trans::getCallSite(*cit);
+		    St tgt = Trans::getEntry(*cit);
         for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
         {
           if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
@@ -8831,17 +8964,17 @@ namespace wali
 
             //TODO: fix this with respect to wild labels
             if( SymbolSet::isWild(Trans::getCallSym(*cit)) )
-              wgt = wg.getWildWeight(Trans::getCallSite(*cit),Trans::getEntry(*cit)); // w
+              wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w
             else
-              wgt = wg.getWeight(Trans::getCallSite(*cit), 
+              wgt = wg.getWeight(src, getClientInfo(src),
                                   Trans::getCallSym(*cit),
-                                  WeightGen::CALL_TO_ENTRY,  
-                                  Trans::getEntry(*cit)); // w   
+                                  WeightGen<Client>::CALL_TO_ENTRY,  
+                                  tgt, getClientInfo(tgt)); // w   
 
             result.add_rule(program,                      //from_state (p)
-                            Trans::getCallSite(*cit),     //from_stack (q_c)
+                            src,     //from_stack (q_c)
                             program,                      //to_state (p)
-                            Trans::getEntry(*cit),        //to_stack1 (q_e)
+                            tgt,        //to_stack1 (q_e)
                             Trans::getReturnSite(*rit),   //to_stack2 (q_r)
                             wgt);                         //weight  (w)    
           }
@@ -8856,29 +8989,31 @@ namespace wali
         // and <p_q_xcr,q_r> -1-> <p,q_r> in delta_1
         // where p_q_xcr = (p,q_x,q_c,q_r) and w depends on sigma
 
+        St src = Trans::getExit(*rit);
+        St tgt = Trans::getReturnSite(*rit);
         //TODO: fix this with respect to wild labels
         if( SymbolSet::isWild(Trans::getReturnSym(*rit)) )
-          wgt = wg.getWildWeight(Trans::getExit(*rit),Trans::getReturnSite(*rit));  // w  
+          wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w  
         else
-          wgt = wg.getWeight(Trans::getExit(*rit),
+          wgt = wg.getWeight(src, getClientInfo(src),
                               Trans::getReturnSym(*rit),
-                              WeightGen::EXIT_TO_RET,
-                              Trans::getReturnSite(*rit));  // w            
+                              WeightGen<Client>::EXIT_TO_RET,
+                              tgt, getClientInfo(tgt));  // w            
 
-        Key rstate = getControlLocation(Trans::getExit(*rit),Trans::getCallSite(*rit),Trans::getReturnSite(*rit));    //p_q_xcr
+        Key rstate = getControlLocation(src,Trans::getCallSite(*rit),tgt);    //p_q_xcr
 
         result.add_rule(program,                    //from_state (p)
-                        Trans::getExit(*rit),       //from_stack (q_x)
+                        src,                        //from_stack (q_x)
                         rstate,                     //to_state (p_q_xcr == (p,q_x,q_c,q_c))
                         wgt);                       //weight  (w)
 
-        wgt = wg.getOne();                              // 1
+        wgt = wg.getOne();                          // 1
 
-        result.add_rule(rstate,                         //from_state (p_q_xcr == (p,q_x,q_c,q_r))
-                        Trans::getReturnSite(*rit),     //from_stack (q_r)
-                        program,                        //to_state (p)
-                        Trans::getReturnSite(*rit),     //to_stack (q_r)
-                        wgt);                           //weight  (1)   
+        result.add_rule(rstate,                     //from_state (p_q_xcr == (p,q_x,q_c,q_r))
+                        tgt,                        //from_stack (q_r)
+                        program,                    //to_state (p)
+                        tgt,                        //to_stack (q_r)
+                        wgt);                       //weight  (1)   
       }  
 
       return result;
@@ -8895,7 +9030,7 @@ namespace wali
      *
      */
     template <typename Client>
-    wpds::WPDS NWA<Client>::NWAtoBackwardsPDSreturns( WeightGen & wg ) const
+    wpds::WPDS NWA<Client>::NWAtoBackwardsPDSreturns( WeightGen<Client> & wg ) const
     {
       wpds::WPDS result = wpds::WPDS();
 
@@ -8909,25 +9044,29 @@ namespace wali
         //(q,sigma,q') in delta_i goes to <p,q'> -w-> <p,q> in delta_1
         //where the weight w depends on sigma
 
+        St src = Trans::getSource(*iit);
+        St tgt = Trans::getTarget(*iit);
         //TODO: fix this with respect to wild labels
         if( SymbolSet::isWild(Trans::getInternalSym(*iit)) )
-          wgt = wg.getWildWeight(Trans::getSource(*iit),Trans::getTarget(*iit));  // w
+          wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
         else
-          wgt = wg.getWeight(Trans::getSource(*iit),
+          wgt = wg.getWeight(src, getClientInfo(src),
                               Trans::getInternalSym(*iit),
-                              WeightGen::INTRA,
-                              Trans::getTarget(*iit));          // w
+                              WeightGen<Client>::INTRA,
+                              tgt, getClientInfo(tgt));          // w
 
         result.add_rule(program,                                //from_state (p)
-                        Trans::getTarget(*iit),                 //from_stack (q')
+                        tgt,                                    //from_stack (q')
                         program,                                //to_state (p)
-                        Trans::getSource(*iit),                 //to_stack1 (q)
+                        src,                                    //to_stack1 (q)
                         wgt);                                   //weight (w)      
       }
 
       //Call Transitions 
       for( callIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
       {
+        St src = Trans::getCallSite(*cit);
+        St tgt = Trans::getEntry(*cit);
         for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
           if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
           {
@@ -8938,27 +9077,27 @@ namespace wali
 
             //TODO: fix this with respect to wild labels
             if( SymbolSet::isWild(Trans::getCallSym(*cit)) )
-              wgt = wg.getWildWeight(Trans::getCallSite(*cit),Trans::getEntry(*cit)); // w
+              wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w
             else
-              wgt = wg.getWeight(Trans::getCallSite(*cit), 
+              wgt = wg.getWeight(src, getClientInfo(src), 
                                   Trans::getCallSym(*cit),
-                                  WeightGen::CALL_TO_ENTRY,  
-                                  Trans::getEntry(*cit)); // w    
+                                  WeightGen<Client>::CALL_TO_ENTRY,  
+                                  tgt, getClientInfo(tgt)); // w    
 
-            Key cstate = getControlLocation(Trans::getEntry(*cit),Trans::getReturnSite(*rit),Trans::getCallSite(*cit));    //p_q_erc
+            Key cstate = getControlLocation(tgt,Trans::getReturnSite(*rit),src);    //p_q_erc
 
             result.add_rule(program,                    //from_state (p)
                             Trans::getEntry(*cit),      //from_stack (q_e)
                             cstate,                     //to_state (p_q_erc == (p,q_e,q_r,q_c))
                             wgt);                       //weight (w)
 
-            wgt = wg.getOne();                              // 1
+            wgt = wg.getOne();                          // 1
             
-            result.add_rule(cstate,                         //from_state (p_q_erc == (p,q_e,q_r,q_c))
-                            Trans::getCallSite(*cit),       //from_stack (q_c)
-                            program,                        //to_state (p)
-                            Trans::getCallSite(*cit),       //to_stack (q_c)
-                            wgt);                           //weight (1)    
+            result.add_rule(cstate,                     //from_state (p_q_erc == (p,q_e,q_r,q_c))
+                            src,                        //from_stack (q_c)
+                            program,                    //to_state (p)
+                            src,                        //to_stack (q_c)
+                            wgt);                       //weight (1)    
           }  
       }
 
@@ -8969,19 +9108,21 @@ namespace wali
         // <p,q_r> -w-> <p,q_x q_c> in delta_2 
         // and w depends on sigma
 
+        St src = Trans::getExit(*rit);
+        St tgt = Trans::getReturnSite(*rit);
         //TODO: fix this with respect to wild labels
         if( SymbolSet::isWild(Trans::getReturnSym(*rit)) )
-          wgt = wg.getWildWeight(Trans::getExit(*rit),Trans::getReturnSite(*rit));  // w
+          wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
         else
-          wgt = wg.getWeight(Trans::getExit(*rit),
+          wgt = wg.getWeight(src, getClientInfo(src),
                               Trans::getReturnSym(*rit),
-                              WeightGen::EXIT_TO_RET,
-                              Trans::getReturnSite(*rit));  // w
+                              WeightGen<Client>::EXIT_TO_RET,
+                              tgt, getClientInfo(tgt));  // w
 
         result.add_rule(program,                      //from_state (p)
-                        Trans::getReturnSite(*rit),   //from_stack (q_r)
+                        tgt,                          //from_stack (q_r)
                         program,                      //to_state (p)
-                        Trans::getExit(*rit),         //to_stack1 (q_x)
+                        src,                          //to_stack1 (q_x)
                         Trans::getCallSite(*rit),     //to_stack2 (q_c)
                         wgt);                         //weight (w)      
       }
@@ -9000,7 +9141,7 @@ namespace wali
      *
      */ 
     template <typename Client>
-    wpds::WPDS NWA<Client>::NWAtoPDScalls( WeightGen & wg ) const
+    wpds::WPDS NWA<Client>::NWAtoPDScalls( WeightGen<Client> & wg ) const
     {
       wpds::WPDS result = wpds::WPDS();
 
@@ -9014,19 +9155,21 @@ namespace wali
         // (q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
         // where the weight w depends on sigma
 
+        St src = Trans::getSource(*iit);
+        St tgt = Trans::getTarget(*iit);
         //TODO: fix this with respect to wild labels
         if( SymbolSet::isWild(Trans::getInternalSym(*iit)) )
-          wgt = wg.getWildWeight(Trans::getSource(*iit),Trans::getTarget(*iit));  // w
+          wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
         else
-          wgt = wg.getWeight(Trans::getSource(*iit),
+          wgt = wg.getWeight(src, getClientInfo(src),
                               Trans::getInternalSym(*iit),
-                              WeightGen::INTRA,
-                              Trans::getTarget(*iit) );           // w
+                              WeightGen<Client>::INTRA,
+                              tgt, getClientInfo(tgt));           // w
 
           result.add_rule(program,                                //from_state (p)
-                          Trans::getSource(*iit),                 //from_stack (q)
+                          src,                                    //from_stack (q)
                           program,                                //to_state (p)
-                          Trans::getTarget(*iit),                 //to_stack1 (q')
+                          tgt,                                    //to_stack1 (q')
                           wgt);                                   //weight (w)      
       }
 
@@ -9037,20 +9180,22 @@ namespace wali
         // <p,q_c> -w-> <p,q_e q_c> in delta_2 
         // and the weight w depends on sigma
 
+        St src = Trans::getCallSite(*cit);
+        St tgt = Trans::getEntry(*cit);
         //TODO: fix this with respect to wild labels
         if( SymbolSet::isWild(Trans::getCallSym(*cit)) )
-          wgt = wg.getWildWeight(Trans::getCallSite(*cit),Trans::getEntry(*cit)); // w
+          wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w
         else
-          wgt = wg.getWeight(Trans::getCallSite(*cit),
+          wgt = wg.getWeight(src, getClientInfo(src),
                               Trans::getCallSym(*cit),
-                              WeightGen::CALL_TO_ENTRY,
-                              Trans::getEntry(*cit) );          // w
+                              WeightGen<Client>::CALL_TO_ENTRY,
+                              tgt, getClientInfo(tgt));          // w
 
         result.add_rule(program,                                //from_state (p)
-                        Trans::getCallSite(*cit),               //from_stack (q_c)
+                        src,                                    //from_stack (q_c)
                         program,                                //to_state (p)
                         Trans::getEntry(*cit),                  //to_stack1 (q_e)
-                        Trans::getCallSite(*cit),               //to_stack2 (q_c)
+                        tgt,                                    //to_stack2 (q_c)
                         wgt);                                   //weight (w)  
       } 
 
@@ -9062,20 +9207,22 @@ namespace wali
         // and <p_q_xcr,q_c> -1-> <p,q_r> in delta_1
         // where p_q_xcr = (p,q_x,q_c,q_r), and w depends on sigma
 
+        St src = Trans::getExit(*rit);
+        St tgt = Trans::getReturnSite(*rit);
         //TODO: fix this with respect to wild labels
         if( SymbolSet::isWild(Trans::getReturnSym(*rit)) )
-          wgt = wg.getWildWeight(Trans::getExit(*rit),Trans::getReturnSite(*rit));  // w 
+          wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w 
         else
-          wgt = wg.getWeight(Trans::getExit(*rit), 
+          wgt = wg.getWeight(src, getClientInfo(src), 
                               Trans::getReturnSym(*rit),
-                              WeightGen::EXIT_TO_RET,  
-                              Trans::getReturnSite(*rit));    // w     
+                              WeightGen<Client>::EXIT_TO_RET,  
+                              tgt, getClientInfo(tgt));    // w     
 
         //Note: if you change this, make sure you modify the code in NWPForest.createCA()
-        Key rstate = getControlLocation(Trans::getExit(*rit),Trans::getCallSite(*rit),Trans::getReturnSite(*rit));  //p_q_xcr
+        Key rstate = getControlLocation(src,Trans::getCallSite(*rit),tgt);  //p_q_xcr
 
         result.add_rule(program,                              //from_state (p)
-                        Trans::getExit(*rit),                 //from_stack (q_x)
+                        src,                                  //from_stack (q_x)
                         rstate,                               //to_state (p_q_xcr == (p,q_x,q_c,q_r))
                         wgt);                                 //weight (w)
 
@@ -9085,7 +9232,7 @@ namespace wali
         result.add_rule(rstate,                               //from_state (p_q_xcr == (p,q_x,q_c,q_r))
                         Trans::getCallSite(*rit),             //from_stack (q_c)
                         program,                              //to_state (p)
-                        Trans::getReturnSite(*rit),           //to_stack (q_r)
+                        tgt,                                  //to_stack (q_r)
                         wgt);                                 //weight (1)
       }
 
@@ -9103,7 +9250,7 @@ namespace wali
      *
      */
     template <typename Client>
-    wpds::WPDS NWA<Client>::NWAtoBackwardsPDScalls( WeightGen & wg ) const
+    wpds::WPDS NWA<Client>::NWAtoBackwardsPDScalls( WeightGen<Client> & wg ) const
     {
       wpds::WPDS result = wpds::WPDS();
 
@@ -9117,25 +9264,29 @@ namespace wali
         // (q,sigma,q') in delta_i goes to <p,q'> -w-> <p,q> in delta_1
         // where the weight w depends on sigma
 
+        St src = Trans::getSource(*iit);
+        St tgt = Trans::getTarget(*iit);
         //TODO: fix this with respect to wild labels
         if( SymbolSet::isWild(Trans::getInternalSym(*iit)) )
-          wgt = wg.getWildWeight(Trans::getSource(*iit),Trans::getTarget(*iit));  // w
+          wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
         else
-          wgt = wg.getWeight(Trans::getSource(*iit),
+          wgt = wg.getWeight(src, getClientInfo(src),
                               Trans::getInternalSym(*iit),
-                              WeightGen::INTRA,
-                              Trans::getTarget(*iit) );         // w
+                              WeightGen<Client>::INTRA,
+                              tgt, getClientInfo(tgt));         // w
 
         result.add_rule(program,                                //from_state (p)
-                        Trans::getTarget(*iit),                 //from_stack (q')
+                        tgt,                                    //from_stack (q')
                         program,                                //to_state (p)
-                        Trans::getSource(*iit),                 //to_stack1 (q)
+                        src,                                    //to_stack1 (q)
                         wgt);                                   //weight (w)     
       }
 
       //Call Transitions
       for( callIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
       {    
+        St src = Trans::getCallSite(*cit);
+        St tgt = Trans::getEntry(*cit);
         for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
           if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
           {
@@ -9146,17 +9297,17 @@ namespace wali
             
             //TODO: fix this with respect to wild labels
             if( SymbolSet::isWild(Trans::getCallSym(*cit)) )
-              wgt = wg.getWildWeight(Trans::getCallSite(*cit),Trans::getEntry(*cit)); // w  
+              wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w  
             else
-              wgt = wg.getWeight(Trans::getCallSite(*cit),
+              wgt = wg.getWeight(src, getClientInfo(src),
                                   Trans::getCallSym(*cit),
-                                  WeightGen::CALL_TO_ENTRY,
-                                  Trans::getEntry(*cit));         // w                  
+                                  WeightGen<Client>::CALL_TO_ENTRY,
+                                  tgt, getClientInfo(tgt));         // w                  
 
-            Key cstate = getControlLocation(Trans::getEntry(*cit),Trans::getReturnSite(*rit),Trans::getCallSite(*cit));  //p_q_erc
+            Key cstate = getControlLocation(tgt,Trans::getReturnSite(*rit),src);  //p_q_erc
 
             result.add_rule(program,                              //from_state (p)
-                            Trans::getEntry(*cit),                //from_stack (q_e)
+                            tgt,                                  //from_stack (q_e)
                             cstate,                               //to_state (p_q_erc == (p,q_e,q_r,q_c))
                             wgt);                                 //weight (w)  
 
@@ -9165,7 +9316,7 @@ namespace wali
             result.add_rule(cstate,                               //from_state (p_q_erc == (p,q_e,q_r,q_c))
                             Trans::getReturnSite(*rit),           //from_stack (q_r)
                             program,                              //to_state (p)
-                            Trans::getCallSite(*cit),             //to_stack (q_c)
+                            src,                                  //to_stack (q_c)
                             wgt);                                 //weight (1)    
           }
       } 
@@ -9177,20 +9328,22 @@ namespace wali
         // <p,q_r> -w-> <p,q_x q_r> in delta_2 
         // and the weight w depends on sigma
 
+        St src = Trans::getExit(*rit);
+        St tgt = Trans::getReturnSite(*rit);
         //TODO: fix this with respect to wild labels
         if( SymbolSet::isWild(Trans::getReturnSym(*rit)) )
-          wgt = wg.getWildWeight(Trans::getExit(*rit),Trans::getReturnSite(*rit)); //w
+          wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); //w
         else
-          wgt = wg.getWeight(Trans::getExit(*rit), 
+          wgt = wg.getWeight(src, getClientInfo(src),
                               Trans::getReturnSym(*rit),
-                              WeightGen::EXIT_TO_RET,  
-                              Trans::getReturnSite(*rit));      //w
+                              WeightGen<Client>::EXIT_TO_RET,  
+                              tgt, getClientInfo(tgt));      //w
          
         result.add_rule(program,                                //from_state (p)
-                        Trans::getReturnSite(*rit),             //from_stack (q_r)
+                        tgt,                                    //from_stack (q_r)
                         program,                                //to_state (p)
-                        Trans::getExit(*rit),                   //to_stack1 (q_x)
-                        Trans::getReturnSite(*rit),             //to_stack2 (q_r)
+                        src,                                    //to_stack1 (q_x)
+                        tgt,                                    //to_stack2 (q_r)
                         wgt);                                   //weight (w)  
       }
 
@@ -9318,7 +9471,7 @@ namespace wali
      *
      */
     template <typename Client>
-    wfa::WFA NWA<Client>::prestar( wfa::WFA & input, WeightGen & wg )
+    wfa::WFA NWA<Client>::prestar( wfa::WFA & input, WeightGen<Client> & wg )
     {
       //Q: does anything need to be done to transform the resulting WFA from the 
       //    PDS vocab back to the NWA vocab?
@@ -9338,7 +9491,7 @@ namespace wali
      *
      */
     template <typename Client>
-    void NWA<Client>::prestar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg )
+    void NWA<Client>::prestar( wfa::WFA & input, wfa::WFA & output, WeightGen<Client> & wg )
     {
       //Q: does anything need to be done to transform the resulting WFA from the 
       //    PDS vocab back to the NWA vocab?
@@ -9355,7 +9508,7 @@ namespace wali
      *
      */
     template <typename Client>
-    wfa::WFA NWA<Client>::poststar( wfa::WFA & input, WeightGen & wg )
+    wfa::WFA NWA<Client>::poststar( wfa::WFA & input, WeightGen<Client> & wg )
     {
       //Q: does anything need to be done to transform the resulting WFA from the 
       //    PDS vocab back to the NWA vocab?
@@ -9375,7 +9528,7 @@ namespace wali
      *
      */
     template <typename Client>
-    void NWA<Client>::poststar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg )
+    void NWA<Client>::poststar( wfa::WFA & input, wfa::WFA & output, WeightGen<Client> & wg )
     {
       //Q: does anything need to be done to transform the resulting WFA from the 
       //    PDS vocab back to the NWA vocab?
