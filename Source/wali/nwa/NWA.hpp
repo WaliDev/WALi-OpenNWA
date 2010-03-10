@@ -7445,8 +7445,12 @@ namespace wali
 
       assert(! Symbols::isEpsilon(sym) ); //An Epsilon symbol on a call doesn't make sense.
 
-      //TODO: don't allow transitions out of the stuck state (unless they go to the stuck state)
-      //      otherwise it isn't really a stuck state
+      //Don't allow transitions out of the stuck state (unless they go to the stuck state --
+      //otherwise it isn't really a stuck state).
+      if( from == States::getStuckState() )
+      {
+        assert(to == States::getStuckState());
+      }
 
       //Add the states and symbol of this transition to the appropriate sets.
       addState(from);
@@ -7473,8 +7477,12 @@ namespace wali
 
       assert(! Symbols::isEpsilon(Trans::getCallSym(ct)) ); //An Epsilon symbol on a call doesn't make sense.
 
-      //TODO: don't allow transitions out of the stuck state (unless they go to the stuck state)
-      //      otherwise it isn't really a stuck state
+      //Don't allow transitions out of the stuck state (unless they go to the stuck state --
+      //otherwise it isn't really a stuck state).
+      if( Trans::getCallSite(ct) == States::getStuckState() )
+      {
+        assert(Trans::getEntry(ct) == States::getStuckState());
+      }
 
       //Add the states and symbol of this transition to the appropriate sets.
       addState(Trans::getCallSite(ct));
@@ -7585,8 +7593,12 @@ namespace wali
       assert(sym < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
 
-      //TODO: don't allow transitions out of the stuck state (unless they go to the stuck state)
-      //      otherwise it isn't really a stuck state
+      //Don't allow transitions out of the stuck state (unless they go to the stuck state --
+      //otherwise it isn't really a stuck state).
+      if( from == States::getStuckState() )
+      {
+        assert(to == States::getStuckState());
+      }
 
       //Add the states and symbol of this transition to the appropriate sets.
       addState(from);
@@ -7611,8 +7623,12 @@ namespace wali
       assert(Trans::getInternalSym(it) < wali::WALI_BAD_KEY);
       assert(Trans::getTarget(it) < wali::WALI_BAD_KEY);
 
-      //TODO: don't allow transitions out of the stuck state (unless they go to the stuck state)
-      //      otherwise it isn't really a stuck state
+      //Don't allow transitions out of the stuck state (unless they go to the stuck state --
+      //otherwise it isn't really a stuck state).
+      if( Trans::getSource(it) == States::getStuckState() )
+      {
+        assert(Trans::getTarget(it) == States::getStuckState());
+      }
 
       //Add the states and symbol of this transition to the appropriate sets.
       addState(Trans::getSource(it));
@@ -7750,8 +7766,16 @@ namespace wali
 
       assert(! Symbols::isEpsilon(sym) ); //An Epsilon symbol on a return doesn't make sense.
 
-      //TODO: don't allow transitions out of the stuck state (unless they go to the stuck state)
-      //      otherwise it isn't really a stuck state
+      //Don't allow transitions out of the stuck state (unless they go to the stuck state --
+      //otherwise it isn't really a stuck state).
+      if( from == States::getStuckState() )
+      {
+        assert(to == States::getStuckState());
+      }
+      else if( pred == States::getStuckState() )
+      {
+        assert(to == States::getStuckState());
+      }
 
       //Add the states and symbol of this transition to the approprite stes.
       addState(from);
@@ -7780,8 +7804,16 @@ namespace wali
 
       assert(! Symbols::isEpsilon(Trans::getReturnSym(rt)) ); //An Epsilon symbol on a return doesn't make sense.
 
-      //TODO: don't allow transitions out of the stuck state (unless they go to the stuck state)
-      //      otherwise it isn't really a stuck state
+      //Don't allow transitions out of the stuck state (unless they go to the stuck state --
+      //otherwise it isn't really a stuck state).
+      if( Trans::getExit(rt) == States::getStuckState() )
+      {
+        assert(Trans::getReturnSite(rt) == States::getStuckState());
+      }
+      else if( Trans::getCallSite(rt) == States::getStuckState() )
+      {
+        assert(Trans::getReturnSite(rt) == States::getStuckState());
+      }
 
       //Add the states and symbol of this transition to the appropriate sets.
       addState(Trans::getExit(rt));
@@ -8487,6 +8519,8 @@ namespace wali
       //Q: if the stuck state is a final state in the initial machine, then we need  
       //    transitions out of the stuck state in the reverse machine, but this does
       //    not make sense (it is no longer a stuck state in this case).
+      //Q: should I just not allow the reverse of a machine with a final stuck state
+      //    to be taken?
 
       //Swap initial and final states.
       for( stateIterator it = first->beginInitialStates(); 
@@ -8548,9 +8582,141 @@ namespace wali
     template <typename Client>
     void NWA<Client>::star( NWARefPtr first )
     {
-      //TODO: beware of the stuck state, epsilon transitions, the wild symbol
-      //TODO: write this!  
-      //Note: it is not as simple as it seems, check the longer alur paper for details.
+      //Somehow mark unmatched nesting edges as if they are pending (tag its state so that 
+      //at a return the states labeling the incident nesting edges are ignored).
+      St prime = wali::getKey("prime");
+
+      //The state-space of A* is Q + Q', and its initial and final states are Q0'.  
+      for( stateIterator sit = first->beginInitialStates(); 
+            sit != first->endInitialStates(); sit++ )
+      {
+        St sp = wali::getKey(*sit,prime);
+        addInitialState(sp);
+        addFinalState(sp);
+      }
+
+      //Transitions of A*:
+
+      //Internal: for each (q,a,p) in delta_i, A* gets (q,a,p) and (q',a,p') and if
+      //          p in Qf, then (q,a,r') and (q',a,r') for each r in Q0
+      for( internalIterator iit = first->beginInternalTrans();
+            iit != first->endInternalTrans(); iit++ )
+      {
+        St q = Trans::getSource(*iit);
+        Sym a = Trans::getInternalSym(*iit);
+        St p = Trans::getTarget(*iit);
+        //(q,a,p)
+        addInternalTrans(q,a,p);
+        //(q',a,p')
+        St qp = wali::getKey(q,prime);
+        St pp = wali::getKey(p,prime);
+        addInternalTrans(qp,a,pp);
+
+        //if p in Qf
+        if( first->isFinalState(p) )
+        {
+          for( stateIterator sit = first->beginInitialStates(); 
+                sit != first->endInitialStates(); sit++ )
+          {
+            St rp = wali::getKey(*sit,prime);
+            //(q,a,r')
+            addInternalTrans(q,a,rp);
+            //(q',a,r')
+            addInternalTrans(qp,a,rp);
+          }
+        }
+      }
+      //Call: for each(q,a,p) in delta_c, A* gets (q,a,p) and (q',a,p), and if p in Qf
+      //          then (q,a,r') and (q',a,r') for each r in Q0
+      for( callIterator cit = first->beginCallTrans();
+            cit != first->endCallTrans(); cit++ )
+      {
+        St q = Trans::getCallSite(*cit);
+        Sym a = Trans::getCallSym(*cit);
+        St p = Trans::getEntry(*cit);
+        //(q,a,p)
+        addCallTrans(q,a,p);
+        //(q',a,p)
+        St qp = wali::getKey(q,prime);
+        addCallTrans(qp,a,p);
+
+        //if p in Qf
+        if( first->isFinalState(p) )
+        {
+          for( stateIterator sit = first->beginInitialStates();
+                sit != first->endInitialStates(); sit++ )
+          {
+            St rp = wali::getKey(*sit,prime);
+            //(q,a,r')
+            addCallTrans(q,a,rp);
+            //(q',a,r')
+            addCallTrans(qp,a,rp);
+          }
+        }
+      }
+      //Return: for each (q,r,a,p) in delta_r, A* gets (q,r,a,p) and (q,r',a,p'), and if
+      //          p in Qf, then (q,r,a,s') and (q,r',a,s') for each s in Q0
+      //          For each (q,r,a,p) in delra_r with r in Q0, A* gets (q',s,a,p') for each
+      //          s in Q union Q' and if p in Qf, then (q',s,a,t') for each s in Q union Q' 
+      //          and t in Q0.
+      for( returnIterator rit = first->beginReturnTrans();
+            rit != first->endReturnTrans(); rit++ )
+      {
+        St q = Trans::getExit(*rit);
+        St r = Trans::getCallSite(*rit);
+        Sym a = Trans::getReturnSym(*rit);
+        St p = Trans::getReturnSite(*rit);
+        //(q,r,a,p)
+        addReturnTrans(q,r,a,p);
+        //(q,r',a,p')
+        St rp = wali::getKey(r,prime);
+        St pp = wali::getKey(p,prime);
+        addReturnTrans(q,rp,a,pp);
+
+        //if p in Qf
+        if( first->isFinalState(p) )
+        {
+          for( stateIterator sit = first->beginInitialStates();
+                sit != first->endInitialStates(); sit++ )
+          { 
+            St sp = wali::getKey(*sit,prime);
+            //(q,r,a,s')
+            addReturnTrans(q,r,a,sp);
+            //(q,r',a,s')
+            addReturnTrans(q,rp,a,sp);
+          } 
+        }
+
+        //if r in Q0
+        if( first->isInitialState(r) )
+        {
+          for( stateIterator sit = first->beginStates();
+                sit != first->endStates(); sit++ )
+          {
+            St s = *sit;
+            St qp = wali::getKey(q,prime);
+            //(q',s,a,p')
+            addReturnTrans(qp,s,a,pp);
+            //(q',s',a,p')
+            St sp = wali::getKey(s,prime);
+            addReturnTrans(qp,sp,a,pp);
+
+            //if p in Qf
+            if( first->isFinalState(p) )
+            {
+              for( stateIterator it = first->beginInitialStates();
+                    it != first->endInitialStates(); it++ )
+              {                
+                St tp = wali::getKey(*it,prime);
+                //(q',s,a,t')
+                addReturnTrans(qp,s,a,tp);
+                //(q',s',a,t')
+                addReturnTrans(qp,sp,a,tp);
+              }
+            }
+          }
+        }
+      }
     }
 
     /**
@@ -8563,7 +8729,13 @@ namespace wali
     template <typename Client>
     void NWA<Client>::complement( NWARefPtr first )
     {
-      //TODO: beware of the stuck state, epsilon transitions, the wild symbol
+      //Q: if the stuck state becomes accepting do we need to make explicit all
+      //    transitions to the stuck state?  Is there some other way of ensuring
+      //    proper function of the other functions without doing this?
+      //Note: if we make explicit all transitions to the stuck state when it is
+      //    accepting, we should remove all transitions to the stuck state when
+      //    it is no longer accepting.
+
       //Start with a deterministic copy of the given NWA.
       if(! first->isDeterministic() )
       {
@@ -8603,7 +8775,6 @@ namespace wali
     template <typename Client>
     void NWA<Client>::determinize( NWARefPtr nondet )
     {
-      //TODO: beware of the stuck state, epsilon transitions, the wild symbol
       StateMap stMap; //Keeps track of the state associated with each set of states.
 
       //The deterministic NWAs initial state is 
@@ -8667,7 +8838,6 @@ namespace wali
     template <typename Client>
     bool NWA<Client>::isDeterministic( )
     {
-      //TODO: beware of the stuck state, epsilon transitions, the wild symbol
       //An NWA is not deterministic if there is not exactly one initial state
       if( sizeInitialStates() != 1 ) 
         return false;
@@ -8885,7 +9055,18 @@ namespace wali
       //Epsilons are treated separately in the algorithms, so epsilons match nothing.
       if( SymbolSet::isEpsilon(sym1) || SymbolSet::isEpsilon(sym2) )
         return false;
-      if( sym1 == sym2 ) //Symbols only match the exact same symbol (except for epsilons).
+      //Wild symbols match everything.
+      if( SymbolSet::isWild(sym1) )
+      {
+        resSym = sym2;
+        return true;
+      }
+      if( SymbolSet::isWild(sym2) )
+      {
+        resSym = sym1;
+        return true;
+      }
+      if( sym1 == sym2 ) //Symbols only match the exact same symbol (except for epsilons and wilds).
       {
         resSym = sym1;
         return true;
@@ -9381,6 +9562,8 @@ namespace wali
     template <typename Client>
     bool NWA<Client>::isEmpty( )
     {
+      //TODO: write language inclusion using this?
+
       //An automaton with no initial states must accept only the empty language.
       if( sizeInitialStates() == 0 )
         return true;
@@ -9479,6 +9662,7 @@ namespace wali
     bool NWA<Client>::isMember( nws::NWS word )
     {
       //TODO: write this!
+      //Q: should we use language inclusion or try to walk the automata according to the word?
       return false;
     }
 
@@ -10371,11 +10555,12 @@ namespace wali
 
       //First try call transitions.
       calls.push(currSt);
+      //TODO: use getTransCall
       for( callIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
       {
         St entry = Trans::getEntry(*cit);
         //If we can reach a final state through this transition, we have found a path.
-        if( isFinalState(entry) )
+        if( (Trans::getCallSite(*cit) == currSt) && (isFinalState(entry)) )
           return true;
         //If the call transition starts from the current state and goes to a state not 
         //yet visited, follow the path.
@@ -10390,11 +10575,12 @@ namespace wali
       calls.pop();
 
       //If no call transition led to a path, try internal transitions.
+      //TODO: use getTransFrom
       for( internalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
       {
         St target = Trans::getTarget(*iit);
         //If we can reach a final state through this transition, we have found a path.
-        if( isFinalState(target) )
+        if( (Trans::getSource(*iit) == currSt) && (isFinalState(target)) )
           return true;
         //If the internal transition starts from the current state and goes to a state 
         //not yet visited, follow the path.
@@ -10413,11 +10599,14 @@ namespace wali
       {
         St callSt = calls.top();
         calls.pop();
+        //TODO: use getTransExit
         for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
         {
           St ret = Trans::getReturnSite(*rit);
           //If we can reach a final state through this transition, we have found a path.
-          if( isFinalState(ret) )
+          if( (Trans::getExit(*rit) == currSt)
+            && (Trans::getCallSite(*rit) == callSt)
+            && (isFinalState(ret)) )
             return true;
           //If the return transition starts from the current state with the call site from
           //the top of the call stack and goes to a state not yet visited, follow the path.
