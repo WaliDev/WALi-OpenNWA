@@ -200,7 +200,9 @@ int main()
   determinizeNWA->isDeterministic();
   
   myNWA->isEmpty();
-  myNWA->isMember(wali::nws::NWS());
+  wali::nwa::NWA<>::isMember(wali::nws::NWS(),myNWA);
+  wali::nwa::NWA<>::inclusion(myNWA,complementNWA);
+  wali::nwa::NWA<>::equal(otherNWA,myNWA);
   myNWA->prestar(wali::wfa::WFA(),wg);
   myNWA->prestar(wali::wfa::WFA(),wali::wfa::WFA(),wg);
   myNWA->poststar(wali::wfa::WFA(),wg);

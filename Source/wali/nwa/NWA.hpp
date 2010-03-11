@@ -6299,17 +6299,81 @@ namespace wali
       /**
        *
        * @brief tests whether the given nested word is a member of the language accepted 
-       *        by this NWA
+       *        by the given NWA
        *
        * This method tests whether the given nested word is a member of the language 
-       * accepted by this NWA.
+       * accepted by the given NWA.
        *
        * @param - word: the nested word to test
+       * @param - aut: the NWA to check the word on
        * @return true if the given nested word is a member of the language accepted by 
-       *          this NWA
+       *          the given NWA
        *
        */
-      bool isMember( nws::NWS word ); 
+      static bool isMember( nws::NWS word, NWARefPtr aut )
+      {
+        //TODO: write this!
+        //Q: should we try to walk the automata according to the word using WordRecConfig
+        //    or determinize and then step through?
+        //A: determinizing and stepping through will be easier to understand and depending
+        //    on the optimization of determinize will probably be more efficient
+
+        if( aut->isDeterministic() )
+        {
+          return simulateWord(word,aut);
+        }
+        else
+        {
+          NWARefPtr tmp(new NWA<>);
+          tmp->determinize(aut);
+
+          return simulateWord(word,tmp);
+        }
+      }
+
+      /**
+       *
+       * @brief tests whether the language of the first NWA is included in the language of 
+       *        the second NWA
+       *
+       * This method tests whether the language of the first NWA is included in the language
+       * of the second NWA.
+       *
+       * @param - first: the proposed subset
+       * @param - second: the proposed superset
+       * @return true if the language of the first NWA is included in the language of the 
+       *          second NWA, false otherwise
+       *
+       */
+      static bool inclusion( NWARefPtr first, NWARefPtr second )
+      {
+        //Check L(a1) contained in L(a2) by checking 
+        //if L(a1) intersect (complement L(a2)) is empty.
+        NWARefPtr comp(new NWA());
+        comp->complement(second);   //complement L(a2)
+        NWARefPtr inter(new NWA());
+        inter->intersect(first,comp); //L(a1) intersect (complement L(a2))
+
+        return inter->isEmpty();
+      }
+
+      /**
+       *
+       * @brief tests whether the languages of the given NWAs are equivalent
+       *
+       * This method tests the equivalence of the languages accepted by the given NWAs.
+       *
+       * @param - first: one of the NWAs whose language to test
+       * @param - second: one of the NWAs whose language to test
+       * @return true if the languages accepted by the given NWAs are equal, false otherwise
+       *
+       */
+      static bool equal( NWARefPtr first, NWARefPtr second)
+      {
+        //The languages accepted by two NWAs are equivalent if they are both contained
+        //in each other, ie L(a1) contained in L(a2) and L(a2) contained in L(a1).
+        return (inclusion(first,second) && inclusion(second,first) );
+      }
 
       /**
        *
@@ -6698,6 +6762,26 @@ namespace wali
        *
        */
       bool NWA::hasPath( St currState, std::stack< St > calls, std::set< St > visited );  
+
+      /**
+       *
+       * @brief tests whether the given nested word is a member of the language accepted 
+       *        by the given deterministic NWA
+       *
+       * This method tests whether the given nested word is a member of the language 
+       * accepted by the given deterministic NWA.
+       *
+       * @param - word: the nested word to test
+       * @param - aut: the deterministic NWA to check the word on
+       * @return true if the given nested word is a member of the language accepted by 
+       *          the given deterministic NWA
+       *
+       */
+      static bool simulateWord( nws::NWS word, NWARefPtr aut )
+      {
+        //TODO: write this
+        return false;
+      }
 
       /** 
        *
@@ -9646,24 +9730,6 @@ namespace wali
         return true;  //There was no path from an initial state to a final state in the NWA.
       else
         return false; //There was a path from an initial state to a final state in the NWA.
-    }
-
-    /**
-     *
-     * @brief tests whether the given nested word is a member of the language accepted 
-     *        by this NWA
-     *
-     * @param - word: the nested word to test
-     * @return true if the given nested word is a member of the language accepted by 
-     *          this NWA
-     *
-     */
-    template <typename Client>
-    bool NWA<Client>::isMember( nws::NWS word )
-    {
-      //TODO: write this!
-      //Q: should we use language inclusion or try to walk the automata according to the word?
-      return false;
     }
 
     /**
