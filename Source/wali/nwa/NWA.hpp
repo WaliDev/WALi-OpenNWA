@@ -6780,6 +6780,21 @@ namespace wali
       static bool simulateWord( nws::NWS word, NWARefPtr aut )
       {
         //TODO: write this
+
+        //At any given point in the traversal of the word, 
+        //drive movement through the automata by following the
+        //transition labeled with the symbol that occurs on the
+        //next NWSNode.
+
+        //If at any point we land in the stuck state, 
+        //if the stuck state is a final state,
+        //then return true
+        //else return false
+
+        //At the end of the word, if we are in a final state,
+        //then return true
+        //else return false
+
         return false;
       }
 
