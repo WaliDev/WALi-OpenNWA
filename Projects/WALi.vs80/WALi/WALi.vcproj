@@ -508,6 +508,10 @@
 					RelativePath="..\..\..\Source\wali\nwa\NWA.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\nwa\RelationOps.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -916,6 +920,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\Source\wali\nwa\NWA.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\nwa\RelationOps.hpp"
 					>
 				</File>
 				<File

@@ -90,10 +90,24 @@ namespace wali
        * @return the Key for the stuck state
        *
        */
-      static St getStuckState( )
+      inline St getStuckState( )
       {
-        return (wali::WALI_EPSILON);
+        return stuck;
       };
+
+      /**
+       *
+       * @brief sets the Key for the stuck state
+       *
+       * This method provides access to the Key for the stuck state.
+       *
+       * @param - state: the Key for the stuck state
+       *
+       */
+      inline void setStuckState( St state )
+      {
+        stuck = state;
+      }
 
       /**
        *  
@@ -105,9 +119,9 @@ namespace wali
        * @return true if this state is the stuck state, false otherwise
        *
        */
-      static bool isStuckState( St state )
+      inline bool isStuckState( St state )
       {
-        return (state == wali::WALI_EPSILON);
+        return (state == stuck);
       }
 
       /**
@@ -501,6 +515,7 @@ namespace wali
       
       protected:
               
+      St stuck;
       States states;
       States initialStates;  
       States finalStates;   
@@ -514,17 +529,14 @@ namespace wali
 
     //Constructors and Destructor 
     template<typename Client>
-    StateSet<Client>::StateSet( )
-    { 
-      //The stuck state is always a state of the NWA.
-      addState( getStuckState() );
-    }
+    StateSet<Client>::StateSet( ) { }
      
     template<typename Client>
     StateSet<Client>::StateSet( StateSet<Client> & other )
     {
       clearStates();
       
+      stuck = other.stuck;
       states = other.states;
       initialStates = other.initialStates;
       finalStates = other.finalStates;
@@ -540,6 +552,7 @@ namespace wali
     
       clearStates();
       
+      stuck = other.stuck;
       states = other.states;
       initialStates = other.initialStates;
       finalStates = other.finalStates;
@@ -568,7 +581,11 @@ namespace wali
     template<typename Client>
     typename StateSet<Client>::ClientInfoRefPtr StateSet<Client>::getClientInfo( St state ) const 
     {
-      return (stateInfos.find(state))->second;   
+      std::map<St,ClientInfoRefPtr>::const_iterator it = (stateInfos.find(state));
+      if( it == stateInfos.end() )
+        return NULL;
+      else
+        return it->second;   
     }
 
     /**
@@ -606,9 +623,6 @@ namespace wali
       clearFinalStates();
 
       stateInfos.clear();
-
-      //The stuck state is always a state of the NWA.
-      addState( getStuckState() );
     }    
     
     /**
@@ -777,6 +791,11 @@ namespace wali
             it != stateSet.endStates(); it++ )
       {
         addState(*it);
+        //Set the clientInfo of this state.
+        //TODO: check this -- if it is not right, fix star() in NWA.hpp
+        ClientInfo info = *(stateSet.getClientInfo(*it));
+        ClientInfoRefPtr ci = ClientInfoRefPtr(new ClientInfo(info));
+        setClientInfo(*it,ci);
       }
     }  
       
@@ -825,7 +844,7 @@ namespace wali
     template<typename Client>
     bool StateSet<Client>::removeState( St state )
     {
-      //The stuck state cannot be removed.
+      //The stuck state cannot be removed in this way.
       if( isStuckState( state ) )
         return false;
 
@@ -900,11 +919,9 @@ namespace wali
       for( bool first=true; it != itEND ; it++,first=false )
       {
         if( !first )
-        o << ", ";
-        if( isStuckState(*it) )
-          o << "Stuck State";
-        else
-          printKey(o,*it);
+          o << ", ";
+       
+        printKey(o,*it);
       }
       o << " }" << std::endl;
       
@@ -916,11 +933,9 @@ namespace wali
       for( bool first=true; it != itEND ; it++,first=false )
       {
         if( !first )
-        o << ", ";
-        if( isStuckState(*it) )
-          o << "Stuck State";
-        else
-          printKey(o,*it);
+          o << ", ";
+
+        printKey(o,*it);
       }
       o << " }" << std::endl;
       
@@ -932,11 +947,9 @@ namespace wali
       for( bool first=true; it != itEND ; it++,first=false )
       {
         if( !first )
-        o << ", ";
-        if( isStuckState(*it) )
-          o << "Stuck State";
-        else
-          printKey(o,*it);
+          o << ", ";
+
+        printKey(o,*it);
       }
       o << " }" << std::endl;
       
@@ -956,30 +969,33 @@ namespace wali
     bool StateSet<Client>::operator==( const StateSet<Client> & other ) const
     {
       //Check that the state sets are equal.
+      if(! (stuck == other.stuck) )
+        return false;
+
       for( const_iterator it = beginStates(); it != endStates(); it++ )
-        if( other.isState(*it) )
+        if(! other.isState(*it) )
           return false;
           
       for( const_iterator it = other.beginStates(); it != other.endStates(); it++ )
-        if( isState(*it) )
+        if(! isState(*it) )
           return false;
          
       //Check that the initial state sets are equal.    
       for( const_iterator it = beginInitialStates(); it != endInitialStates(); it++ )
-        if( other.isInitialState(*it) )
+        if(! other.isInitialState(*it) )
           return false;
           
       for( const_iterator it = other.beginInitialStates(); it != other.endInitialStates(); it++ )
-        if( isInitialState(*it) )
+        if(! isInitialState(*it) )
           return false;
         
       //Check that the final state sets are equal.    
       for( const_iterator it = beginFinalStates(); it != endFinalStates(); it++ )
-        if( other.isFinalState(*it) )
+        if(! other.isFinalState(*it) )
           return false;
           
       for( const_iterator it = other.beginFinalStates(); it != other.endFinalStates(); it++ )
-        if( isFinalState(*it) )
+        if(! isFinalState(*it) )
           return false;        
           
       return true;

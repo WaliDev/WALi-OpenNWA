@@ -45,42 +45,12 @@ class STR
     std::string str;
 };
 
-class ReachGen : public wali::nwa::WeightGen<>
-{
-  public:
-    enum Kind {INTRA, CALL_TO_ENTRY, EXIT_TO_RET, CALL_TO_RET};
-    typedef wali::Key St;
-    typedef wali::Key Sym;
-     
-    //
-    // Methods
-    //
-      
-  public:
-    //Constructors and Destructor
-    ReachGen( ) { }
-        
-    sem_elem_t getOne( )
-    {
-      wali::ref_ptr<Reach> r = new Reach(true);
-      return r->one();
-    }
-
-    sem_elem_t getWeight( const St & src, const Sym & inst, Kind k, const St & tgt )
-    {
-      return getOne();
-    }
-       
-    sem_elem_t getWildWeight( const St & src, const St & tgt )
-    { //TODO: want the default here to be bottom
-      return getOne();
-    }
-};
-
 int main()
 {
-
-  wali::ref_ptr<wali::nwa::NWA<>> myNWA;
+  wali::Key stuck = wali::getKey("stuck");
+  wali::Key stuck2 = wali::getKey("stuck2");
+  wali::ref_ptr<wali::nwa::NWA<>> myNWA = wali::ref_ptr<wali::nwa::NWA<>>();
+  myNWA->setStuckState(stuck);
   
   wali::Key start = wali::getKey("start");
   wali::Key state = wali::getKey("state");
@@ -133,7 +103,8 @@ int main()
   wali::nwa::NWA<>::ClientInfoRefPtr info = myNWA->getClientInfo(state);
   myNWA->setClientInfo(state,info);
 
-  myNWA->getPredecessorNames(state);
+  std::set<wali::Key> preds = std::set<wali::Key>();
+  myNWA->getPredecessors(state,preds);
   wali::Key state1 = wali::getKey("state1");
   myNWA->duplicateStateOutgoing(state,state1);
   wali::Key state2 = wali::getKey("state2");
@@ -172,30 +143,38 @@ int main()
   
   myNWA->print(std::cout);
   
-  ReachGen wg;  
+  wali::nwa::ReachGen<> wg;  
   myNWA->NWAtoPDSreturns(wg);
   myNWA->NWAtoPDScalls(wg);
   myNWA->NWAtoBackwardsPDSreturns(wg);
   myNWA->NWAtoBackwardsPDScalls(wg);
-  //myNWA->plusWPDS(wpdsBase);
+  wali::wpds::WPDS wpdsBase;
+  myNWA->plusWPDS(wpdsBase);
   //myNWA->PDStoNWA(wpdsBase);
 
   wali::nwa::NWA<> otherNWA1 = wali::nwa::NWA<>(*myNWA);
   wali::nwa::NWA<> otherNWA2 = otherNWA1;
   wali::ref_ptr<wali::nwa::NWA<>> otherNWA = myNWA;
-  wali::ref_ptr<wali::nwa::NWA<>> intersectNWA;
+  wali::ref_ptr<wali::nwa::NWA<>> intersectNWA = wali::ref_ptr<wali::nwa::NWA<>>();
+  intersectNWA->setStuckState(stuck2);
   intersectNWA->intersect(myNWA,otherNWA);
-  wali::ref_ptr<wali::nwa::NWA<>> union_NWA;
-  union_NWA->unionNWA(myNWA,otherNWA);
-  wali::ref_ptr<wali::nwa::NWA<>> concatNWA;
+  wali::ref_ptr<wali::nwa::NWA<>> union_NWA = wali::ref_ptr<wali::nwa::NWA<>>();
+  union_NWA->setStuckState(stuck);
+  union_NWA->unionNWA(myNWA,intersectNWA);
+  wali::ref_ptr<wali::nwa::NWA<>> concatNWA = wali::ref_ptr<wali::nwa::NWA<>>();
+  concatNWA->setStuckState(stuck);
   concatNWA->concat(myNWA,otherNWA);
-  wali::ref_ptr<wali::nwa::NWA<>> reverseNWA;
+  wali::ref_ptr<wali::nwa::NWA<>> reverseNWA = wali::ref_ptr<wali::nwa::NWA<>>();
+  reverseNWA->setStuckState(stuck);
   reverseNWA->reverse(myNWA);
-  wali::ref_ptr<wali::nwa::NWA<>> starNWA;
+  wali::ref_ptr<wali::nwa::NWA<>> starNWA = wali::ref_ptr<wali::nwa::NWA<>>();
+  starNWA->setStuckState(stuck);
   starNWA->star(myNWA);
-  wali::ref_ptr<wali::nwa::NWA<>> complementNWA;
+  wali::ref_ptr<wali::nwa::NWA<>> complementNWA = wali::ref_ptr<wali::nwa::NWA<>>();
+  complementNWA->setStuckState(stuck);
   complementNWA->complement(myNWA);
-  wali::ref_ptr<wali::nwa::NWA<>> determinizeNWA;
+  wali::ref_ptr<wali::nwa::NWA<>> determinizeNWA = wali::ref_ptr<wali::nwa::NWA<>>();
+  determinizeNWA->setStuckState(stuck);
   determinizeNWA->determinize(myNWA);
   determinizeNWA->isDeterministic();
   

@@ -19,7 +19,12 @@ namespace wali
      *
      */
     class ClientInfo : public Countable
-    { };
+    { 
+      virtual ClientInfo & operator=( const ClientInfo & other )
+      { 
+        return *this;
+      };
+    };
   }
 }
 #endif

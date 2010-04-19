@@ -30,7 +30,7 @@ namespace wali
         //  EXIT_TO_RET:  corresponds to the exit-to-return part of a Return transition in the NWA
         //  CALL_TO_RET:  corresponds to the call-to-return part of a Return transition in the NWA
         enum Kind {INTRA, CALL_TO_ENTRY, EXIT_TO_RET, CALL_TO_RET}; 
-		typedef ref_ptr<Client> ClientInfoRefPtr;
+		    typedef ref_ptr<Client> ClientInfoRefPtr;
       
       //
       // Methods
@@ -67,11 +67,11 @@ namespace wali
        * Note: The kind will never be CALL_TO_RET, this case is never needed.
        *
        * @param - src: the source of the edge
-	   * @param - srcInfo: the clientInfo associated with src
+	     * @param - srcInfo: the clientInfo associated with src
        * @param - sym: the symbol labeling the edge
        * @param - kind: the variety of edge
        * @param - tgt: the target of the edge
-	   * @param - tgtInfo: the clientInfo associated with tgt
+	     * @param - tgtInfo: the clientInfo associated with tgt
        * @return the weight to put on the rule corresponding to the given edge
        *         
        */
@@ -90,7 +90,7 @@ namespace wali
        * Note: This value is generally the same as getOne().
        * 
        * @param - src: the source of the exit edge
-	   * @param - srcInfo: the clientInfo associated with src
+	     * @param - srcInfo: the clientInfo associated with src
        * @return the weight to put on the return rule corresponding to the given exit 
        *
        */
@@ -108,9 +108,9 @@ namespace wali
        * the edge between 'src' and 'tgt' labeled with the wild symbol.
        *
        * @param - src: the source of the edge
-	   * @param - srcInfo: the clientInfo associated with src
+	     * @param - srcInfo: the clientInfo associated with src
        * @param - tgt: the target of the edge
-	   * @param - tgtInfo: the clientInfo associated with tgt
+	     * @param - tgtInfo: the clientInfo associated with tgt
        * @return the weight to put on the rule corresponding to the given edge
        *
        */
