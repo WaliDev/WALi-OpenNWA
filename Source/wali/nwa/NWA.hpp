@@ -648,8 +648,6 @@ namespace wali
        * This method checks for the given symbol in the symbol set associated with the NWA
        * and removes the symbol from the symbol set if necessary.  Any transitions 
        * associated with the symbol to be removed are also removed.
-       * Note: This method modifies (implicit) transitions, so it cannot be called on an 
-       *        NWA without a set stuck state.
        *
        * @param - sym: the symbol to remove
        * @return false if the symbols is not associated with the NWA
@@ -1287,7 +1285,7 @@ namespace wali
        *
        * This method intersects the client information associated with the states 'entry1'
        * and 'entry2' given that the transition that is being created is a call transition 
-       * with the given symbol using the information in the given states and returns the 
+       * with the given symbol using the information in the given states and sets the 
        * resulting client information.
        * Note: This method should only be used to intersect client information for states 
        *        immediately following a call transition.
@@ -1304,7 +1302,6 @@ namespace wali
        * @param - entry2: the second entry point whose client information to intersect
        * @param - resSym: the symbol associated with the transition that is being created
        * @param - resSt: the state which will receive the computed client information
-
        *
        */
       virtual void intersectClientInfoCall( NWARefPtr first, St call1, St entry1, 
@@ -1416,12 +1413,82 @@ namespace wali
        *
        * @param - nwa: the NWA in which to look up information about the states
        * @param - binRel: the states to merge
+       * @param - resSt: the state resulting from the merge
        * @param - resCI: the client info that results from performing the merge
        *
        */
-      virtual void mergeClientInfo( NWARefPtr first, 
+      virtual void mergeClientInfo( NWARefPtr nwa, 
                     typename relations::RelationTypedefs<St>::BinaryRelation const & binRel, 
                                   St resSt, ClientInfoRefPtr & resCI );
+
+      /**
+       * 
+       * @brief merges clientInfo for determinize
+       * 
+       * This method merges the client info for the given entry states given that the transition
+       * that is being created is a call transition with the given symbol using the information in 
+       * the given states and returns the result in the reference parameter 'resCI'.
+       *
+       * @param - nwa: the NWA in which to look up information about the states
+       * @param - binRelCall: the states that compose the call site for this call transition
+       * @param - binRelEntry: the states to merge that compose the entry point for this call transition
+       * @param - callSt: the call site of the transition that is being created
+       * @param - resSym: the symbol associated with the transition that is being created
+       * @param - resSt: the state resulting from the merge
+       * @param - resCI: the client info that results from performing the merge
+       *
+       */
+      virtual void mergeClientInfoCall( NWARefPtr nwa, 
+                    typename relations::RelationTypedefs<St>::BinaryRelation const & binRelCall, 
+                    typename relations::RelationTypedefs<St>::BinaryRelation const & binRelEntry,
+                                  St callSt, Sym resSym, St resSt, ClientInfoRefPtr & resCI );
+
+      /**
+       * 
+       * @brief merges clientInfo for determinize
+       * 
+       * This method merges the client info for the given target states given that the transition
+       * that is being created is an internal transition with the given symbol using the information in 
+       * the given states and returns the result in the reference parameter 'resCI'.
+       *
+       * @param - nwa: the NWA in which to look up information about the states
+       * @param - binRelSource: the states that compose the source for this internal transition
+       * @param - binRelTarget: the states to merge that compose the target for this internal transition
+       * @param - sourceSt: the source of the transition that is being created
+       * @param - resSym: the symbol associated with the transition that is being created
+       * @param - resSt: the state resulting from the merge
+       * @param - resCI: the client info that results from performing the merge
+       *
+       */
+      virtual void mergeClientInfoInternal( NWARefPtr nwa, 
+                    typename relations::RelationTypedefs<St>::BinaryRelation const & binRelSource, 
+                    typename relations::RelationTypedefs<St>::BinaryRelation const & binRelTarget,
+                                  St sourceSt, Sym resSym, St resSt, ClientInfoRefPtr & resCI );
+
+      /**
+       * 
+       * @brief merges clientInfo for determinize
+       * 
+       * This method merges the client info for the given return states given that the transition
+       * that is being created is a return transition with the given symbol using the information in 
+       * the given states and returns the result in the reference parameter 'resCI'.
+       *
+       * @param - nwa: the NWA in which to look up information about the states
+       * @param - binRelExit: the states that compose the exit point for this return transition
+       * @param - binRelCall: the states that compose the call site for this return transition
+       * @param - binRelReturn: the states to merge that compose the return site for this return transition
+       * @param - exitSt: the exit point of the transition that is being created
+       * @param - callSt: the call site of the transition that is being created
+       * @param - resSym: the symbol associated with the transition that is being created
+       * @param - resSt: the state resulting from the merge
+       * @param - resCI: the client info that results from performing the merge
+       *
+       */
+      virtual void mergeClientInfoReturn( NWARefPtr nwa, 
+                    typename relations::RelationTypedefs<St>::BinaryRelation const & binRelExit,
+                    typename relations::RelationTypedefs<St>::BinaryRelation const & binRelCall, 
+                    typename relations::RelationTypedefs<St>::BinaryRelation const & binRelReturn,
+                            St exitSt, St callSt, Sym resSym, St resSt, ClientInfoRefPtr & resCI );
 
 
       //Using NWAs
@@ -2715,9 +2782,9 @@ namespace wali
     {
       //TODO: ponder the following ...
       //Q: can a symbol be removed from an NWA without adding implicit transitions?
+      //A: yes
 
       assert(sym < wali::WALI_BAD_KEY);
-      assert(stuck);
 
       bool removed = symbols.removeSymbol(sym);
       if( removed )
@@ -4565,14 +4632,16 @@ namespace wali
         //Check each symbol individually.
         for( symbolIterator it = nondet->beginSymbols(); it != nondet->endSymbols(); it++ )
         {
-          if (Symbols::isEpsilon(*it)) continue;
+          if (Symbols::isEpsilon(*it)) continue;    //Epsilon is handled with closure.
+          if (Symbols::isWild(*it)) continue;       //Wild is matched to every symbol as we go.
 
           //Process internal transitions.
           //Compute the relation.
           BinaryRelation Ri;
           BinaryRelation Rtmpi;
           BinaryRelation Ii;
-          project_symbol_3(Ii,nondet->trans.getInternals(),*it);
+          project_symbol_3(Ii,nondet->trans.getInternals(),*it);   
+          project_symbol_3(Ii,nondet->trans.getInternals(),Symbols::getWild());   //Every symbol also matches wild.
           compose<St>(Rtmpi,R,Ii);
           compose<St>(Ri,Rtmpi,close);
           //Make a key for this state.
@@ -4585,7 +4654,7 @@ namespace wali
 
           //Adjust the client info for this state.
           ClientInfoRefPtr riCI;
-          mergeClientInfo(nondet,Ri,ri,riCI);
+          mergeClientInfoInternal(nondet,R,Ri,r,*it,ri,riCI);
           states.setClientInfo(ri,riCI);
 
           //Determine whether to add this state to the worklist.
@@ -4599,7 +4668,8 @@ namespace wali
           BinaryRelation IdClose_Delta2;
           BinaryRelation Rc;
           BinaryRelation Ic;
-          project_symbol_3(Ic,nondet->trans.getCalls(),*it);
+          project_symbol_3(Ic,nondet->trans.getCalls(),*it);  
+          project_symbol_3(Ic,nondet->trans.getCalls(),Symbols::getWild());   //Every symbol also matches wild.
           compose<St>(IdClose_Delta2, R0, Ic);
           compose<St>(Rc,IdClose_Delta2,close);
           //Make a key for this state.
@@ -4611,7 +4681,7 @@ namespace wali
 
           //Adjust the client info for this state.
           ClientInfoRefPtr rcCI;
-          mergeClientInfo(nondet,Rc,rc,rcCI);
+          mergeClientInfoCall(nondet,R,Rc,r,*it,rc,rcCI);
           states.setClientInfo(rc,rcCI);
 
           //Determine whether to add this state to the worklist.
@@ -4622,7 +4692,8 @@ namespace wali
 
           //Process return transitions.
           TernaryRelation Ir;
-          project_symbol_4(Ir,nondet->trans.getReturns(),*it);
+          project_symbol_4(Ir,nondet->trans.getReturns(),*it);    
+          project_symbol_4(Ir,nondet->trans.getReturns(),Symbols::getWild());   //Every symbol also matches wild.
           //For each possible call predecessor:
           for( std::set<BinaryRelation>::iterator rit = visited.begin();
                 rit != visited.end(); rit++ )
@@ -4642,7 +4713,7 @@ namespace wali
 
             //Adjust the client info for this state.
             ClientInfoRefPtr rrCI;
-            mergeClientInfo(nondet,Rr,rr,rrCI);
+            mergeClientInfoReturn(nondet,R,*rit,Rr,r,rc,*it,rr,rrCI);
             states.setClientInfo(rr,rrCI);
 
             //Determine whether to add this state to the worklist.
@@ -4998,6 +5069,81 @@ namespace wali
     void NWA<Client>::mergeClientInfo( NWARefPtr first, 
                   typename relations::RelationTypedefs<St>::BinaryRelation const & binRel, 
                                 St resSt, ClientInfoRefPtr & resCI )
+    {
+      //Note: When overriding this method your metric must combine any client information associated
+      //       with the states of the binary relation and set the client information of resSt to 
+      //       that value.
+    }
+
+    /**
+     * 
+     * @brief merges clientInfo for determinize
+     * 
+     * @param - nwa: the NWA in which to look up information about the states
+     * @param - binRelCall: the states that compose the call site for this call transition
+     * @param - binRelEntry: the states to merge that compose the entry point for this call transition
+     * @param - callSt: the call site of the transition that is being created
+     * @param - resSym: the symbol associated with the transition that is being created
+     * @param - resSt: the state resulting from the merge
+     * @param - resCI: the client info that results from performing the merge
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::mergeClientInfoCall( NWARefPtr nwa, 
+                  typename relations::RelationTypedefs<St>::BinaryRelation const & binRelCall, 
+                  typename relations::RelationTypedefs<St>::BinaryRelation const & binRelEntry,
+                                St callSt, Sym resSym, St resSt, ClientInfoRefPtr & resCI )
+    {
+      //Note: When overriding this method your metric must combine any client information associated
+      //       with the states of the binary relation and set the client information of resSt to 
+      //       that value.
+    }
+
+    /**
+     * 
+     * @brief merges clientInfo for determinize
+     * 
+     * @param - nwa: the NWA in which to look up information about the states
+     * @param - binRelSource: the states that compose the source for this internal transition
+     * @param - binRelTarget: the states to merge that compose the target for this internal transition
+     * @param - sourceSt: the source of the transition that is being created
+     * @param - resSym: the symbol associated with the transition that is being created
+     * @param - resSt: the state resulting from the merge
+     * @param - resCI: the client info that results from performing the merge
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::mergeClientInfoInternal( NWARefPtr nwa, 
+                  typename relations::RelationTypedefs<St>::BinaryRelation const & binRelSource, 
+                  typename relations::RelationTypedefs<St>::BinaryRelation const & binRelTarget,
+                                St sourceSt, Sym resSym, St resSt, ClientInfoRefPtr & resCI )
+    {
+      //Note: When overriding this method your metric must combine any client information associated
+      //       with the states of the binary relation and set the client information of resSt to 
+      //       that value.
+    }
+
+    /**
+     * 
+     * @brief merges clientInfo for determinize
+     * 
+     * @param - nwa: the NWA in which to look up information about the states
+     * @param - binRelExit: the states that compose the exit point for this return transition
+     * @param - binRelCall: the states that compose the call site for this return transition
+     * @param - binRelReturn: the states to merge that compose the return site for this return transition
+     * @param - exitSt: the exit point of the transition that is being created
+     * @param - callSt: the call site of the transition that is being created
+     * @param - resSym: the symbol associated with the transition that is being created
+     * @param - resSt: the state resulting from the merge
+     * @param - resCI: the client info that results from performing the merge
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::mergeClientInfoReturn( NWARefPtr nwa, 
+                  typename relations::RelationTypedefs<St>::BinaryRelation const & binRelExit,
+                  typename relations::RelationTypedefs<St>::BinaryRelation const & binRelCall, 
+                  typename relations::RelationTypedefs<St>::BinaryRelation const & binRelReturn,
+                          St exitSt, St callSt, Sym resSym, St resSt, ClientInfoRefPtr & resCI )
     {
       //Note: When overriding this method your metric must combine any client information associated
       //       with the states of the binary relation and set the client information of resSt to 
