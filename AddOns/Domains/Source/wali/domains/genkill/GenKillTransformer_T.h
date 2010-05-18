@@ -4,7 +4,7 @@
 #include <iostream>
 #include <climits>
 #include <cassert>
-#include "common.h"
+//#include "common.h"
 #include "gtr/src/ref_ptr/ref_ptr.hpp"
 
 /*!
@@ -282,7 +282,7 @@ public: // methods
       return gen;
   }
 
-  static std::ostream& WPDS_CALL print_static_transformers( std::ostream& o )
+  static std::ostream& print_static_transformers( std::ostream& o )
   {
       o << "ONE\t=\t";    one()->print(o);  o << std::endl;
       o << "ZERO\t=\t";   zero()->print(o); o << std::endl;
@@ -290,7 +290,7 @@ public: // methods
       return o;
   }
 
-  std::ostream& WPDS_CALL print( std::ostream& o )
+  std::ostream& print( std::ostream& o )
   {
       o << "GenKillTransformer\n";
       return o;
