@@ -165,13 +165,13 @@ namespace wali
       /**
        *
        *  //TODO: Handle wild appropriately.
-       *  //TODO: ponder the following ...
-       *  //Q: what is the meaning of 'wild'?  Should it represent all symbols at the time that
-       *        the wild is placed on an edge, or all symbols that exist at the time the edge
-       *        is processed for any operation?  
+       *  
+       *  //Q: what is the meaning of 'wild'?  
+       *  //A: It represents all symbols at the time that exist at the time the edge
+       *        is processed for an operation   .
        *  //Ex: Suppose we put a wild on an internal edge from '1' to '2' when sigma = {a,b,c}.
        *        Now suppose we add 'd', 'e', and 'f' to sigma.
-       *        Should trans.callExists(1,d,2) yield true or false?
+       *        Should trans.callExists(1,d,2) yield true or false?  True
        *
        * @brief returns the Key for the wild symbol
        *
@@ -648,6 +648,8 @@ namespace wali
        * This method checks for the given symbol in the symbol set associated with the NWA
        * and removes the symbol from the symbol set if necessary.  Any transitions 
        * associated with the symbol to be removed are also removed.
+       * Note: Symbols can be removed from NWAs without a stuck state because no implicit
+       *        transitions are introduced by removing a symbol.
        *
        * @param - sym: the symbol to remove
        * @return false if the symbols is not associated with the NWA
@@ -2780,10 +2782,6 @@ namespace wali
     template <typename Client>
     bool NWA<Client>::removeSymbol( Sym sym )
     {
-      //TODO: ponder the following ...
-      //Q: can a symbol be removed from an NWA without adding implicit transitions?
-      //A: yes
-
       assert(sym < wali::WALI_BAD_KEY);
 
       bool removed = symbols.removeSymbol(sym);
@@ -2811,7 +2809,7 @@ namespace wali
     }
 
     //Transition Accessors
-//Start Here!
+
     /**
      * 
      * @brief finds a symbol which occurs in a transition with the given endpoints
