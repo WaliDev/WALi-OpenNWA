@@ -12,10 +12,10 @@ std::ostream& operator << (std::ostream& os, std::pair<int,int> const & p)
 
 int main()
 {
-  //TernaryRelation<int>::iterator x;
-  //x++;
-  //++x;
-  //*x;
+  TernaryRelation<int>::iterator x;
+  x++;
+  ++x;
+  *x;
   // typedef RelationTypedefs<int>::BinaryRelation BinaryRelation;
   // typedef RelationTypedefs<int>::TernaryRelation TernaryRelation;
   // BinaryRelation br1, br2, br1_2, br4;

@@ -6,8 +6,6 @@
 #ifdef NWA_TEST
 // ::wali
 #include "wali/nwa/NWA.hpp"
-#include "wali/nwa/State.hpp"
-#include "wali/nwa/Symbol.hpp"
 #include "wali/Key.hpp"
 #include "wali/wfa/epr/FunctionalWeight.hpp"
 #include "wali/Reach.hpp"
