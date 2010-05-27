@@ -113,23 +113,25 @@ namespace wali
     };
     
     //Constructors and Destructor
-  
+    inline
     WordRecConfig::WordRecConfig()
     {
-      
     }  
-      
+
+    inline
     WordRecConfig::WordRecConfig( wali::nws::NWS word )
     {
       this->word = word;
     }
     
+    inline
     WordRecConfig::WordRecConfig( const WordRecConfig & other )
     {
       word = other.word;
       st = other.st;
     }
     
+    inline
     WordRecConfig & WordRecConfig::operator=( const WordRecConfig & other )
     {
       this->word = other.word;
@@ -138,6 +140,7 @@ namespace wali
       return *this;
     }
     
+    inline
     WordRecConfig::~WordRecConfig()
     {
       st.clear();
@@ -148,6 +151,7 @@ namespace wali
     /**
      *
      */
+    inline
     bool WordRecConfig::isEmpty()
     {
       return word.isEmpty();
@@ -156,6 +160,7 @@ namespace wali
     /**
      *
      */
+    inline
     bool WordRecConfig::hasNext()
     {
       return !(word.nextNode() == NULL);
@@ -164,6 +169,7 @@ namespace wali
     /**
      *
      */
+    inline
     wali::nws::NWSNode * WordRecConfig::getNext()
     {
       return word.nextNode();
@@ -172,6 +178,7 @@ namespace wali
     /**
      *
      */
+    inline
     void WordRecConfig::removeNext()
     {
       word.removeNode();
@@ -180,6 +187,7 @@ namespace wali
     /**
      *
      */
+    inline
     wali::nws::NWSNode * WordRecConfig::getCall()
     {
       return word.stackTop();
@@ -188,6 +196,7 @@ namespace wali
     /** 
      *
      */
+    inline
     void WordRecConfig::setWord( wali::nws::NWS word )
     {
       this->word = word;
@@ -196,6 +205,7 @@ namespace wali
     /**
      *
      */
+    inline
     bool WordRecConfig::hasCallState()
     {
       return !st.empty();
@@ -204,6 +214,7 @@ namespace wali
     /**
      *
      */
+    inline
     Key WordRecConfig::getCallState()
     {
       return st.back();
@@ -212,6 +223,7 @@ namespace wali
     /**
      *
      */
+    inline
     void WordRecConfig::addCallState( Key call )
     {
       st.push_back(call);
@@ -220,6 +232,7 @@ namespace wali
     /**
      *
      */
+    inline
     void WordRecConfig::removeCallState()
     {
       st.pop_back();
@@ -233,6 +246,7 @@ namespace wali
      * @return the output stream to which the node was printed
      *
      */
+    inline
     std::ostream & WordRecConfig::print( std::ostream & o ) const
     {
       word.print(o);
@@ -256,6 +270,7 @@ namespace wali
     /** 
      *
      */
+    inline
     bool WordRecConfig::operator==( const WordRecConfig & other ) const
     {
       if( word == other.word )
@@ -280,12 +295,12 @@ namespace wali
     /**
      *
      */
+    inline
     bool WordRecConfig::operator <( const WordRecConfig & other ) const
     {
       //TODO: construct a better metric for this!
       return st.size() < other.st.size();
     }
-    
   }
 }
 #endif

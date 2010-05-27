@@ -35,14 +35,20 @@ sem_elem_t Reach::zero() const
 sem_elem_t Reach::extend( SemElem* se )
 {
   Reach* rhs = static_cast< Reach* >(se);
-  return new Reach(isreached && rhs->isreached);
+  if (isreached && rhs->isreached)
+    return one();
+  else 
+    return zero();
 }
 
 // zero is neutral for combine
 sem_elem_t Reach::combine( SemElem* se )
 {
   Reach* rhs = static_cast< Reach* >(se);
-  return new Reach(isreached || rhs->isreached);
+  if (isreached || rhs->isreached)
+    return one();
+  else
+    return zero();
 }
 
 bool Reach::equal( SemElem* se ) const

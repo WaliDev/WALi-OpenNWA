@@ -9,7 +9,6 @@
 
 namespace wali
 {
-
   //
   // Only used here in Common.cpp
   //
@@ -82,9 +81,9 @@ namespace wali
   // Essentially performs the lookup from Key to KeySource and calls
   // KeySource::print
   //
-  std::ostream& printKey( std::ostream& o, Key k )
+  std::ostream& printKey( std::ostream& o, Key k, bool abbreviate )
   {
-    return getKeySpace()->printKey(o,k);
+    return getKeySpace()->printKey(o,k,abbreviate);
   }
 
   //

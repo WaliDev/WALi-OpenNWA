@@ -390,7 +390,7 @@ namespace wali
 
       for(it = st.begin(); it != st.end(); it++) {
         Key s = *it;
-        Key sprime = getKey(new wpds::GenKeySource(getGeneration(), s));
+        Key sprime = getKey(key_src_t(new wpds::GenKeySource(getGeneration(), s)));
         dup[s] = sprime;
       }
 

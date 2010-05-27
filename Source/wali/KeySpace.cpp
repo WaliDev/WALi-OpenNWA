@@ -3,6 +3,7 @@
  * @version $Id$
  */
 
+#include <sstream>
 #include <cassert>
 #include <cstring>
 #include "wali/Common.hpp"
@@ -144,11 +145,19 @@ namespace wali
    *
    * @see KeySource
    */
-  std::ostream& KeySpace::printKey( std::ostream& o, Key key )
+  std::ostream& KeySpace::printKey( std::ostream& o, Key key, bool abbreviate )
   {
     key_src_t ksrc = getKeySource(key);
     if( ksrc.is_valid() ) {
-      ksrc->print(o);
+      std::stringstream str;
+      ksrc->print(str);
+
+      if(str.str().length() > 20 && abbreviate) {
+        o << "[" << key << "]";
+      }
+      else {
+        o << str.str();
+      }
     }
     else {
       *waliErr << "[WARNING] Invalid wali::Key(" << key << ")" << std::endl;

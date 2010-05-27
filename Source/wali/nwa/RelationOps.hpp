@@ -195,45 +195,6 @@ namespace wali {
     };
 
 
-    /// Performs the sort of merge required for NWA return edges
-    ///
-    /// {(q, q') | (q,q1) \in r_call, (q1,q2) \in r_exit, (q2,q1,q') \in delta}
-    ///
-    /// Parameters:
-    ///   out_result: The relational composition of R1 and R2
-    ///   r_exit:     The relation at the exit node
-    ///   r_call:     The relation at the call node
-    ///   delta_r:    The return transition relation with the alphabet
-    ///               symbol projected out
-    template<typename State>
-    void
-    merge(typename RelationTypedefs<State>::BinaryRelation & out_result,
-          typename RelationTypedefs<State>::BinaryRelation const & r_exit,
-          typename RelationTypedefs<State>::BinaryRelation const & r_call,
-          typename RelationTypedefs<State>::TernaryRelation const & delta_r)
-    {
-      typedef typename set<pair<State, State> >::const_iterator Iterator;
-
-      typename RelationTypedefs<State>::BinaryRelation temp;
-
-      // Test possibilites for (call_pred, exit) in r_exit
-      for(Iterator exit_iter = r_exit.begin(); exit_iter != r_exit.end(); ++exit_iter)
-      {
-        // Test possibilities for (exit, call_pred, return_) in delta
-        typedef typename RelationTypedefs<State>::TernaryRelation::const_iterator BigIterator;
-        pair<BigIterator, BigIterator> range =
-          delta_r.equal_range(make_pair(exit_iter->second, exit_iter->first));
-        
-        for(BigIterator ret_trans = range.first; ret_trans != range.second; ++ret_trans) {
-          if(exit_iter->first == ret_trans->second && exit_iter->second == ret_trans->first) {
-            temp.insert(make_pair(exit_iter->first, ret_trans->third));
-          }
-        }
-      }
-
-      compose<State>(out_result, r_call, temp);
-    }
-
     /// Composes two binary relations
     ///
     /// { (x,z) | (x,y) \in r1,  (y,z) \in r2}
@@ -297,6 +258,46 @@ namespace wali {
           out_result.insert(make_pair(source, target));
         }
       }
+    }
+
+
+    /// Performs the sort of merge required for NWA return edges
+    ///
+    /// {(q, q') | (q,q1) \in r_call, (q1,q2) \in r_exit, (q2,q1,q') \in delta}
+    ///
+    /// Parameters:
+    ///   out_result: The relational composition of R1 and R2
+    ///   r_exit:     The relation at the exit node
+    ///   r_call:     The relation at the call node
+    ///   delta_r:    The return transition relation with the alphabet
+    ///               symbol projected out
+    template<typename State>
+    void
+    merge(typename RelationTypedefs<State>::BinaryRelation & out_result,
+          typename RelationTypedefs<State>::BinaryRelation const & r_exit,
+          typename RelationTypedefs<State>::BinaryRelation const & r_call,
+          typename RelationTypedefs<State>::TernaryRelation const & delta_r)
+    {
+      typedef typename set<pair<State, State> >::const_iterator Iterator;
+
+      typename RelationTypedefs<State>::BinaryRelation temp;
+
+      // Test possibilites for (call_pred, exit) in r_exit
+      for(Iterator exit_iter = r_exit.begin(); exit_iter != r_exit.end(); ++exit_iter)
+      {
+        // Test possibilities for (exit, call_pred, return_) in delta
+        typedef typename RelationTypedefs<State>::TernaryRelation::const_iterator BigIterator;
+        pair<BigIterator, BigIterator> range =
+          delta_r.equal_range(make_pair(exit_iter->second, exit_iter->first));
+        
+        for(BigIterator ret_trans = range.first; ret_trans != range.second; ++ret_trans) {
+          if(exit_iter->first == ret_trans->second && exit_iter->second == ret_trans->first) {
+            temp.insert(make_pair(exit_iter->first, ret_trans->third));
+          }
+        }
+      }
+
+      compose<State>(out_result, r_call, temp);
     }
 
 

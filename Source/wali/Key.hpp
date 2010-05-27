@@ -62,8 +62,13 @@ namespace wali
    * Prints key k to std::ostream o
    * Essentially performs the lookup from Key to KeySource and calls
    * KeySource::print
+   *
+   * If abbreviate is true and the string representation of the
+   * key being printed is greater than 20 characters, then the
+   * actual numeric key is printed instead.
+   *
    */
-  std::ostream& printKey( std::ostream& o, Key k );
+  std::ostream& printKey( std::ostream& o, Key k, bool abbreviate=false );
 
   /**
    * Returns string representation of the key

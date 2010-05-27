@@ -37,6 +37,27 @@ namespace wali
 
         typedef ref_ptr<Client> ClientInfoRefPtr;
 
+
+        // The following macro fakes static data declarations with
+        // initializers in a template class to work around C++ being
+        // dumb. Static data in a template class is almost useless
+        // because you have to explicitly define it for every
+        // instantiation. Instead, make a static member function that
+        // returns the value. (In this case, it's stored as a
+        // function-static variable, but this is somewhat irrelevant.
+#define DEFINE_FAKE_STATIC_DATA(name, value)    \
+        static std::string const & name() {  \
+          static std::string ret = value;    \
+          return ret;                        \
+        }
+
+        DEFINE_FAKE_STATIC_DATA(XMLFinalAttr, "final")
+        DEFINE_FAKE_STATIC_DATA(XMLInitialAttr, "initial")
+        DEFINE_FAKE_STATIC_DATA(XMLNameAttr, "name")
+        DEFINE_FAKE_STATIC_DATA(XMLStateTag, "State")
+
+#undef DEFINE_FAKE_STATIC_DATA
+
       //
       // Methods
       //
@@ -90,7 +111,7 @@ namespace wali
        * @return the Key for the stuck state
        *
        */
-      inline St getStuckState( )
+      inline St getStuckState( ) const
       {
         return stuck;
       };
@@ -579,9 +600,11 @@ namespace wali
      *
      */
     template<typename Client>
-    typename StateSet<Client>::ClientInfoRefPtr StateSet<Client>::getClientInfo( St state ) const 
+    typename StateSet<Client>::ClientInfoRefPtr
+    StateSet<Client>::getClientInfo( St state ) const 
     {
-      std::map<St,ClientInfoRefPtr>::const_iterator it = (stateInfos.find(state));
+      typedef std::map<typename StateSet::St, typename StateSet::ClientInfoRefPtr> Map;
+      typename Map::const_iterator it = (stateInfos.find(state));
       if( it == stateInfos.end() )
         return NULL;
       else
@@ -793,9 +816,11 @@ namespace wali
         addState(*it);
         //Set the clientInfo of this state.
         //TODO: check this -- if it is not right, fix star() in NWA.hpp
-        ClientInfo info = *(stateSet.getClientInfo(*it));
-        ClientInfoRefPtr ci = ClientInfoRefPtr(new ClientInfo(info));
-        setClientInfo(*it,ci);
+        if (stateSet.getClientInfo(*it) != 0) {
+          ClientInfo info = *(stateSet.getClientInfo(*it));
+          ClientInfoRefPtr ci = ClientInfoRefPtr(new ClientInfo(info));
+          setClientInfo(*it,ci);
+        }
       }
     }  
       

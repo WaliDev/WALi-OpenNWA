@@ -44,6 +44,31 @@ namespace wali
         typedef typename Calls::const_iterator callIterator;
         typedef typename Internals::const_iterator internalIterator;
         typedef typename Returns::const_iterator returnIterator;
+
+
+        // The following macro fakes static data declarations with
+        // initializers in a template class to work around C++ being
+        // dumb. Static data in a template class is almost useless
+        // because you have to explicitly define it for every
+        // instantiation. Instead, make a static member function that
+        // returns the value. (In this case, it's stored as a
+        // function-static variable, but this is somewhat irrelevant.
+#define DEFINE_FAKE_STATIC_DATA(name, value)    \
+        static std::string const & name() {  \
+          static std::string ret = value;    \
+          return ret;                        \
+        }
+
+        DEFINE_FAKE_STATIC_DATA(XMLFromAttr, "from");
+        DEFINE_FAKE_STATIC_DATA(XMLPredAttr, "call");
+        DEFINE_FAKE_STATIC_DATA(XMLSymbolAttr, "symbol");
+        DEFINE_FAKE_STATIC_DATA(XMLToAttr, "to");
+
+        DEFINE_FAKE_STATIC_DATA(InternalXMLTag, "InternalTrans");
+        DEFINE_FAKE_STATIC_DATA(CallXMLTag, "CallTrans");
+        DEFINE_FAKE_STATIC_DATA(ReturnXMLTag, "ReturnTrans");
+
+#undef DEFINE_FAKE_STATIC_DATA
         
         typedef TransInfo<St,Sym> Info;
       
@@ -1591,8 +1616,8 @@ namespace wali
     bool TransSet<St,Sym>::getSymbol( St fromSt, St toSt, Sym & sym )
     {
       //Check internal transitions.
-      const Info::Internals from = T_info.fromTrans(fromSt);
-      for( Info::internalIterator it = from.begin(); it != from.end(); it++ )
+      const typename Info::Internals from = T_info.fromTrans(fromSt);
+      for(typename Info::internalIterator it = from.begin(); it != from.end(); it++ )
       {
         if( toSt == getTarget(*it) )
         {
@@ -1601,8 +1626,8 @@ namespace wali
         }
       }
       //Check call transitions.
-      const Info::Calls call = T_info.callTrans(fromSt);
-      for( Info::callIterator it = call.begin(); it != call.end(); it++ )
+      const typename Info::Calls call = T_info.callTrans(fromSt);
+      for(typename Info::callIterator it = call.begin(); it != call.end(); it++ )
       {
         if( toSt == getEntry(*it) )
         {
@@ -1611,8 +1636,8 @@ namespace wali
         }
       }
       //Check return transitions.      
-      const Info::Returns exit = T_info.exitTrans(fromSt);
-      for( Info::returnIterator it = exit.begin(); it != exit.end(); it++ )
+      const typename Info::Returns exit = T_info.exitTrans(fromSt);
+      for(typename Info::returnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( toSt == getReturnSite(*it) )
         {
@@ -1649,15 +1674,15 @@ namespace wali
     bool TransSet<St,Sym>::findTrans( St fromSt, Sym sym, St toSt ) const
     {
       //Check internal transitions.
-      const Info::Internals from = T_info.fromTrans(fromSt);
-      for( Info::internalIterator it = from.begin(); it != from.end(); it++ )
+      const typename Info::Internals from = T_info.fromTrans(fromSt);
+      for( typename Info::internalIterator it = from.begin(); it != from.end(); it++ )
       {
         if( toSt == getTarget(*it) && sym == getInternalSym(*it) )
           return true;
       }
       //Check call transitions.
-      const Info::Calls call = T_info.callTrans(fromSt);
-      for( Info::callIterator it = call.begin(); it != call.end(); it++ )
+      const typename Info::Calls call = T_info.callTrans(fromSt);
+      for( typename Info::callIterator it = call.begin(); it != call.end(); it++ )
       {
         if( toSt == getEntry(*it) && sym == getCallSym(*it) )
         {
@@ -1665,8 +1690,8 @@ namespace wali
         }
       }
       //Check return transitions.      
-      const Info::Returns exit = T_info.exitTrans(fromSt);
-      for( Info::returnIterator it = exit.begin(); it != exit.end(); it++ )
+      const typename Info::Returns exit = T_info.exitTrans(fromSt);
+      for( typename Info::returnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( toSt == getReturnSite(*it) && sym == getReturnSym(*it) )
         {
@@ -1698,8 +1723,8 @@ namespace wali
     const typename TransSet<St,Sym>::States TransSet<St,Sym>::getReturnSites( St callSite ) const
     {
       States returns;
-      const Info::Returns pred = T_info.predTrans(callSite);
-      for( Info::returnIterator it = pred.begin(); it != pred.end(); it++ )
+      const typename Info::Returns pred = T_info.predTrans(callSite);
+      for( typename Info::returnIterator it = pred.begin(); it != pred.end(); it++ )
       {
         returns.insert(getReturnSite(*it));
       }
@@ -1719,8 +1744,8 @@ namespace wali
     const typename TransSet<St,Sym>::States & TransSet<St,Sym>::getReturnSites( St exit, St callSite ) const
     {
       States returns;
-      const Info::Returns pred = T_info.predTrans(callSite);
-      for( Info::returnIterator it = pred.begin(); it != pred.end(); it++ )
+      const typename Info::Returns pred = T_info.predTrans(callSite);
+      for( typename Info::returnIterator it = pred.begin(); it != pred.end(); it++ )
       {
         if( getExit(*it) == exit )
           returns.insert(getReturnSite(*it));
@@ -1741,8 +1766,8 @@ namespace wali
     const typename TransSet<St,Sym>::States TransSet<St,Sym>::getCallSites( St exitSite, St returnSite ) const
     {
       States calls;
-      const Info::Returns exit = T_info.exitTrans(exitSite);
-      for( Info::returnIterator it = exit.begin(); it != exit.end(); it++ )
+      const typename Info::Returns exit = T_info.exitTrans(exitSite);
+      for( typename Info::returnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( getReturnSite(*it) == returnSite )
           calls.insert(getCallSite(*it));  
@@ -1762,8 +1787,8 @@ namespace wali
     const typename TransSet<St,Sym>::States & TransSet<St,Sym>::getEntries( St callSite ) const
     {
       States entries;
-      const Info::Calls cll = T_info.callTrans(callSite);
-      for( Info::callIterator it = cll.begin(); it != cll.end(); it++ )
+      const typename Info::Calls cll = T_info.callTrans(callSite);
+      for( typename Info::callIterator it = cll.begin(); it != cll.end(); it++ )
       {
         entries.insert(getEntry(*it));
       }
@@ -1782,8 +1807,8 @@ namespace wali
     const typename TransSet<St,Sym>::States & TransSet<St,Sym>::getTargets( St source ) const
     {
       States targets;
-      const Info::Internals src = T_info.fromTrans(source);
-      for( Info::internalIterator it = src.begin(); it != src.end(); it++ )
+      const typename Info::Internals src = T_info.fromTrans(source);
+      for( typename Info::internalIterator it = src.begin(); it != src.end(); it++ )
       {
         targets.insert(getTarget(*it));
       }
@@ -1802,31 +1827,31 @@ namespace wali
     void TransSet<St,Sym>::dupTransOutgoing( St orig, St dup )
     { 
       //Duplicate outgoing internal transitions.
-      const Info::Internals from = T_info.fromTrans(orig);
-      for( Info::internalIterator it = from.begin(); it != from.end(); it++ )
+      const typename Info::Internals from = T_info.fromTrans(orig);
+      for( typename Info::internalIterator it = from.begin(); it != from.end(); it++ )
       {
         Internal iTrans = Internal(dup,getInternalSym(*it),getTarget(*it));
         addInternal(iTrans);
 
       }
       //Duplicate call site call transitions.
-      const Info::Calls call = T_info.callTrans(orig);
-      for( Info::callIterator it = call.begin(); it != call.end(); it++ )
+      const typename Info::Calls call = T_info.callTrans(orig);
+      for( typename Info::callIterator it = call.begin(); it != call.end(); it++ )
       {
         Call cTrans = Call(dup,getCallSym(*it),getEntry(*it));
         addCall(cTrans);
 
       }
       //Duplicate exit point return transitions.
-      const Info::Returns exit = T_info.exitTrans(orig);
-      for( Info::returnIterator it = exit.begin(); it != exit.end(); it++ )
+      const typename Info::Returns exit = T_info.exitTrans(orig);
+      for( typename Info::returnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         Return rTrans = Return(dup,getCallSite(*it),getReturnSym(*it),getReturnSite(*it));
         addReturn(rTrans);
       }
       //Duplicate call predecessor return transitions.
-      const Info::Returns pred = T_info.predTrans(orig);
-      for( Info::returnIterator it = pred.begin(); it != pred.end(); it++ )
+      const typename Info::Returns pred = T_info.predTrans(orig);
+      for( typename Info::returnIterator it = pred.begin(); it != pred.end(); it++ )
       {
         Return rTrans = Return(getExit(*it),dup,getReturnSym(*it),getReturnSite(*it));
         addReturn(rTrans);
@@ -1845,8 +1870,8 @@ namespace wali
     void TransSet<St,Sym>::dupTrans( St orig, St dup )
     { 
       //Duplicate outgoing internal transitions.
-      const Info::Internals from = T_info.fromTrans(orig);
-      for( Info::internalIterator it = from.begin(); it != from.end(); it++ )
+      const typename Info::Internals from = T_info.fromTrans(orig);
+      for( typename Info::internalIterator it = from.begin(); it != from.end(); it++ )
       {
         Internal* iTrans = new Internal(dup,getInternalSym(*it),getTarget(*it));
         addInternal(*iTrans);
@@ -1857,15 +1882,15 @@ namespace wali
         }
       }
       //Duplicate incoming internal transitions.
-      const Info::Internals to = T_info.toTrans(orig);
-      for( Info::internalIterator it = to.begin(); it != to.end(); it++ )
+      const typename Info::Internals to = T_info.toTrans(orig);
+      for( typename Info::internalIterator it = to.begin(); it != to.end(); it++ )
       {
         Internal* iTrans = new Internal(getSource(*it),getInternalSym(*it),dup);
         addInternal(*iTrans);
       }
       //Duplicate call site call transitions.
-      const Info::Calls call = T_info.callTrans(orig);
-      for( Info::callIterator it = call.begin(); it != call.end(); it++ )
+      const typename Info::Calls call = T_info.callTrans(orig);
+      for( typename Info::callIterator it = call.begin(); it != call.end(); it++ )
       {
         Call* cTrans = new Call(dup,getCallSym(*it),getEntry(*it));
         addCall(*cTrans);
@@ -1876,15 +1901,15 @@ namespace wali
         }
       }
       //Duplicate entry point call transitions.
-      const Info::Calls entry = T_info.entryTrans(orig);
-      for( Info::callIterator it = entry.begin(); it != entry.end(); it++ )
+      const typename Info::Calls entry = T_info.entryTrans(orig);
+      for( typename Info::callIterator it = entry.begin(); it != entry.end(); it++ )
       {
         Call* cTrans = new Call(getCallSite(*it),getCallSym(*it),dup);
         addCall(*cTrans);
       }
       //Duplicate exit point return transitions.
-      const Info::Returns exit = T_info.exitTrans(orig);
-      for( Info::returnIterator it = exit.begin(); it != exit.end(); it++ )
+      const typename Info::Returns exit = T_info.exitTrans(orig);
+      for( typename Info::returnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         Return* rTrans = new Return(dup,getCallSite(*it),getReturnSym(*it),getReturnSite(*it));
         addReturn(*rTrans);
@@ -1905,8 +1930,8 @@ namespace wali
         }
       }
       //Duplicate call predecessor return transitions.
-      const Info::Returns pred = T_info.predTrans(orig);
-      for( Info::returnIterator it = pred.begin(); it != pred.end(); it++ )
+      const typename Info::Returns pred = T_info.predTrans(orig);
+      for( typename Info::returnIterator it = pred.begin(); it != pred.end(); it++ )
       {
         Return* rTrans = new Return(getExit(*it),dup,getReturnSym(*it),getReturnSite(*it));
         addReturn(*rTrans);
@@ -1917,8 +1942,8 @@ namespace wali
         }
       }
       //Duplicate return site return transitions.
-      const Info::Returns ret = T_info.retTrans(orig);
-      for( Info::returnIterator it = ret.begin(); it != ret.end(); it++ )
+      const typename Info::Returns ret = T_info.retTrans(orig);
+      for( typename Info::returnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         Return* rTrans = new Return(getExit(*it),getCallSite(*it),getReturnSym(*it),dup);
         addReturn(*rTrans);
@@ -2107,19 +2132,19 @@ namespace wali
     void TransSet<St,Sym>::addAllTrans( TransSet<St,Sym> addTransSet )
     {   
       //Add call transitions.
-      for( TransSet<St,Sym>::callIterator it = addTransSet.beginCall(); 
+      for(typename TransSet<St,Sym>::callIterator it = addTransSet.beginCall(); 
             it != addTransSet.endCall(); it ++ )
       {
         addCall(*it);
       }
       //Add internal transitions.
-      for( TransSet<St,Sym>::internalIterator it = addTransSet.beginInternal(); 
+      for(typename TransSet<St,Sym>::internalIterator it = addTransSet.beginInternal(); 
             it != addTransSet.endInternal(); it ++ )
       {
         addInternal(*it);
       }
       //Add return transitions.
-      for( TransSet<St,Sym>::returnIterator it = addTransSet.beginReturn(); 
+      for(typename TransSet<St,Sym>::returnIterator it = addTransSet.beginReturn(); 
             it != addTransSet.endReturn(); it ++ )
       {
         addReturn(*it);
