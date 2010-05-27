@@ -38,7 +38,7 @@ if not File('README', os.path.join(ThirdParty,XercesDir)).exists():
 
 
 # copy Xerces library into common WALi library area
-library = ('lib/libxerces-c-3.0$SHLIBSUFFIX','lib/libxerces-c.a')[MkStatic]
+library = ('lib/libxerces-c-3.1$SHLIBSUFFIX','lib/libxerces-c.a')[MkStatic]
 instlib = env.Install(LibInstallDir, env.File(library,XercesDir))
 
 #print 'path  = ', instlib[0].path
@@ -60,7 +60,7 @@ def symlink(target, source, env):
 
 # add shared-lib symlinks
 if not MkStatic:
-    dest = Value(env.subst('libxerces-c-3.0$SHLIBSUFFIX'))
+    dest = Value(env.subst('libxerces-c-3.1$SHLIBSUFFIX'))
     #print dest.read()
     real = env.File(dest.read(), LibInstallDir)
     #print real
