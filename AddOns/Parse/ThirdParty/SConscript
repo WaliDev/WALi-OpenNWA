@@ -1,16 +1,19 @@
 # Run the python program
 # $Id$
 import os, sys
-from xerces_consts import IsZip, Name
+from xerces_consts import IsZip, get_name
 
 Import('Debug')
 Import('WaliDir')
 Import('LibInstallDir')
 Import('MkStatic')
 Import('Platform')
+Import('Is64')
 
 if Debug:
     print '\n+++ Entered "#/AddOns/Parse/ThirdParty/SConscript"\n'
+
+Name = get_name(Is64)
     
 XercesDir = Name
 Export('XercesDir')

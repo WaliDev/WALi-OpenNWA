@@ -8,17 +8,39 @@ import os, os.path, platform
 
 Debug = True
 
-(bits,linkage) = platform.architecture()
+#(platform_bits,linkage) = platform.architecture()
+if platform.machine() == 'i686':
+   platform_bits = 32
+elif platform.machine() == 'x86_64':
+   platform_bits = 64
+else:
+    print "Warning: Check platform_bits for machine type", platform.machine()
+    print "         Assuming 32"
+    platform_bits = 32
+
 
 Platform       = platform.system()
 MkStatic       = (Platform == 'Windows')
 WaliDir        = os.getcwd()
-LibInstallDir  = os.path.join(WaliDir,'lib')
-BuildDir       = os.path.join(WaliDir,'_build')
 BaseEnv        = Environment()
+Is64           = (platform_bits == 64)
+
+if Is64:
+    LibInstallDir  = os.path.join(WaliDir,'lib64')
+    BuildDir       = os.path.join(WaliDir,'_build64')
+else:
+    LibInstallDir  = os.path.join(WaliDir,'lib')
+    BuildDir       = os.path.join(WaliDir,'_build')
+
 
 if 'gcc' == BaseEnv['CC']:
     BaseEnv.Append(CCFLAGS='-g -ggdb -Wall -Wformat=2 -W -O')
+    if platform_bits == 64 and not Is64:
+        # If we're on a 64-bit platform but want to compile for 32.
+        # This will only happen if Is64 is changed from what it is
+        # right now (Is64 = (platform_bits == 64))
+        BaseEnv.Append(CCFLAGS='-m32')
+        BaseEnv.Append(LINKFLAGS='m32')
 elif 'cl' == BaseEnv['CC']:
     # Mostly copied from VS C++ 2005 Command line
     BaseEnv.Append(CFLAGS='/TP /errorReport:prompt /Wp64 /W4 /GR /MTd /EHsc')
@@ -26,6 +48,7 @@ BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
 
 ## Only supporting 32 bit on Darwin to not deal w/ Leopard/Snow Leopard diffs
 if 'Darwin' == Platform and not MkStatic:
+   Is64 = False
    BaseEnv.Append(CCFLAGS = '-m32')
    BaseEnv.Append(LINKFLAGS='-m32')
    BaseEnv.Append(SHLINKFLAGS='-Wl,-undefined,dynamic_lookup')
@@ -45,6 +68,7 @@ Export('BuildDir')
 Export('MkStatic')
 Export('BaseEnv')
 Export('Platform')
+Export('Is64')
 
 ## Setup a default environment for building executables that use WALi
 ProgEnv = BaseEnv.Clone()
