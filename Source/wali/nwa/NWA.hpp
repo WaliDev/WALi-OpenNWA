@@ -1546,8 +1546,11 @@ namespace wali
        *
        */  
       static wali::Key getProgramControlLocation( )
-      {   
-        return getKey("program");
+      {
+        //std::cerr << "  getProgramControlLocation entry\n";
+        wali::Key ret = getKey("program");
+        //std::cerr << "  getProgramControlLocation returning\n";
+        return ret;
       };
 
       /**
@@ -1565,11 +1568,22 @@ namespace wali
        */
       static wali::Key getControlLocation( Key exit, Key callSite, Key returnSite )
       {
-        std::string str;
+        //std::string str;
+        //str = "(" + key2str(exit) + "," + key2str(callSite) + "," + key2str(returnSite) + ")";
+        //wali::Key key = getKey(getProgramControlLocation(),getKey(str));
 
-        str = "(" + key2str(exit) + "," + key2str(callSite) + "," + key2str(returnSite) + ")";
+        std::stringstream ss;
+        ss << "(key#"  << exit << "," << callSite << "," << returnSite << ")";
+        wali::Key key = getKey(getProgramControlLocation(), getKey(ss.str()));
+        std::string str = ss.str();
 
-        return getKey(getProgramControlLocation(),getKey(str));
+        //std::cerr << "  getControlLocation(" << exit << ", " << callSite << ", " << returnSite << ") -> " << key << "\n";
+        //std::cerr << "    exit: " << key2str(exit).size() << " characters\n";
+        //std::cerr << "    callSite: " << key2str(callSite).size() << " characters\n";
+        //std::cerr << "    returnSite: " << key2str(returnSite).size() << " characters\n";
+        //std::cerr << "    ctrl: " << str.size() << " characters\n";
+
+        return key;
       };
 
       /**
@@ -4871,6 +4885,8 @@ namespace wali
         ss << "(" << key2str(mit->first) << ", " << key2str(mit->second) << ") ";
       }
 
+      //std::cerr << "makeKey -> " << ss.str().size() << " characters\n";
+
       return getKey(ss.str());
     }
 
@@ -5402,7 +5418,7 @@ namespace wali
 
       wpds::WPDS result = wpds::WPDS();
 
-      Key program = getProgramControlLocation();  //= wali::getKey("program"); 
+      Key program = getProgramControlLocation();  //= wali::getKey("program");
 
       wali::sem_elem_t wgt;
 
@@ -5516,7 +5532,7 @@ namespace wali
 
       wpds::WPDS result = wpds::WPDS();
 
-      Key program = getProgramControlLocation();  //= wali::getKey("program"); 
+      Key program = getProgramControlLocation();  //= wali::getKey("program");
 
       wali::sem_elem_t wgt;
 
@@ -5629,7 +5645,7 @@ namespace wali
 
       wpds::WPDS result = wpds::WPDS();
 
-      Key program = getProgramControlLocation();  // = wali::getKey("program"); 
+      Key program = getProgramControlLocation();  // = wali::getKey("program");
 
       wali::sem_elem_t wgt;
 
@@ -5684,8 +5700,12 @@ namespace wali
       } 
 
       //Return Transitions
+      int r_count = 0;
       for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
       {
+        ++r_count;
+          
+        //std::cerr << "Return transition #" << r_count << " of " << trans.size() << "\n";
         // (q_x,q_c,sigma,q_r) in delta_r goes to 
         // <p,q_x> -w-> <p_q_xcr,epsilon> in delta_0
         // and <p_q_xcr,q_c> -1-> <p,q_r> in delta_1
@@ -5883,8 +5903,10 @@ namespace wali
       }
 
       //Perform poststar to determine reachability.
+      //std::cerr << "Calling WPDS poststar\n";
       ReachGen<Client> reach;
       wali::wfa::WFA postInitials = poststar(initials,reach);
+      //std::cerr << "Poststar returned\n";
 
       //Make a WFA with transitions from initial state to final state for each
       //final state of the NWA.
