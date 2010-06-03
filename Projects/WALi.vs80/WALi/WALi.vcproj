@@ -664,6 +664,10 @@
 					RelativePath="..\..\..\Source\wali\nwa\NWA.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\source\wali\nwa\SymbolSet.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
