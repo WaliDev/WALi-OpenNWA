@@ -5902,12 +5902,6 @@ namespace wali
         initials.addTrans(init,*it,fin,wgts.one());
       }
 
-      //Perform poststar to determine reachability.
-      //std::cerr << "Calling WPDS poststar\n";
-      ReachGen<Client> reach;
-      wali::wfa::WFA postInitials = poststar(initials,reach);
-      //std::cerr << "Poststar returned\n";
-
       //Make a WFA with transitions from initial state to final state for each
       //final state of the NWA.
       wali::wfa::WFA finals;
@@ -5923,12 +5917,34 @@ namespace wali
         finals.addTrans(init,*it,fin,wgts.one());
       }
 
+#if 0
+      ReachGen<Client> reach;
+      //Perform poststar to determine reachability.
+      std::cerr << "Before poststar\n";
+      wali::wfa::WFA postInitials = poststar(initials,reach);
+      std::cerr << "After poststar!\n";
+
       //intersect poststar(initials) and finals
+      std::cerr << "Before intersect\n";
       wali::wfa::WFA reachable = postInitials.intersect(finals);
+      std::cerr << "After intersect!\n";
+#else
+      //Perform poststar to determine reachability.
+      ReachGen<Client> reach;
+      std::cerr << "Before prestar\n";
+      wali::wfa::WFA preFinals = prestar(finals,reach);
+      std::cerr << "After prestar!\n";
+
+      //intersect poststar(initials) and finals
+      std::cerr << "Before WFA intersect\n";
+      wali::wfa::WFA reachable = preFinals.intersect(initials);
+      std::cerr << "After WFA intersect!\n";
+#endif
 
       //If there are no transitions in this intersection, then the NWA is empty.
       wali::wfa::TransCounter tc = wali::wfa::TransCounter();
       reachable.for_each( tc );
+      
       if( tc.getNumTrans() == 0 )
         return true;  //There was no path from an initial state to a final state in the NWA.
       else
