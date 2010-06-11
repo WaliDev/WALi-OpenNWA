@@ -5695,7 +5695,7 @@ namespace wali
                         src,                                    //from_stack (q_c)
                         program,                                //to_state (p)
                         Trans::getEntry(*cit),                  //to_stack1 (q_e)
-                        tgt,                                    //to_stack2 (q_c)
+                        src,                                    //to_stack2 (q_c)
                         wgt);                                   //weight (w)  
       } 
 
@@ -5917,7 +5917,7 @@ namespace wali
         finals.addTrans(init,*it,fin,wgts.one());
       }
 
-#if 0
+#if 1
       ReachGen<Client> reach;
       //Perform poststar to determine reachability.
       std::cerr << "Before poststar\n";
