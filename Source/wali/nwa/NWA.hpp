@@ -102,7 +102,6 @@ namespace wali
         typedef typename Trans::callIterator callIterator;
         typedef typename Trans::internalIterator internalIterator;
         typedef typename Trans::returnIterator returnIterator;        
-
         
         typedef std::set<St> StateSet;
         typedef std::pair<St,St> StatePair;
@@ -705,18 +704,323 @@ namespace wali
       bool findTrans( St from, Sym sym, St to ) const;
 
       /**
+       * 
+	   * @brief obtains all the symbols that label transitions from 'source' to 'target'
+	   *
+	   * This method returns all the symbols that label transitions from 
+	   * 'source' to 'target'
+	   *
+	   * @param - source: the source of the desired transitions
+	   * @param - target: the target of the desired transitions
+	   * @return the set of symbols that label transitions from 'source' to 'target'
+	   *
+       */
+      const std::set<Sym> getSymbols( St source, St target ) const;
+
+      /**
+       * 
+	   * @brief obtains all the symbols that label transitions from 'source'
+	   *
+	   * This method returns all the symbols that label transitions from 'source'
+	   *
+	   * @param - source: the source of the desired transitions
+	   * @return the set of symbols that label transitions from 'source'
+	   *
+       */
+      const std::set<Sym> getSymbolsFrom( St source ) const;
+
+      /**
+       * 
+	   * @brief obtains all the symbols that label transitions to 'target'
+	   *
+	   * This method returns all the symbols that label transitions to 'target'
+	   *
+	   * @param - target: the target of the desired transitions
+	   * @return the set of symbols that label transitions to 'target'
+	   *
+       */
+      const std::set<Sym> getSymbolsTo( St target ) const;
+
+      /**
        *  
        * @brief obtains all the states that are predecessors of the given state
        *
        * This method returns all the states that are predecessors of the given 
        * state.
        *
-       * @param - state: the state of the state whose predecessors to look up
-       * @param - preds: the set for all states that are predecessors of the given state
+       * @param - state: the state whose predecessors to look up
+       * @param - preds: the set of all states that are predecessors of the given state
        *
        */    
       void getPredecessors( St state, std::set<St> & preds ) const;
+	  /**
+       * 
+	   * @brief obtains all the states that are predecessors of the given state
+	   *
+	   * This method returns all the states that are predecessors of the given state.
+	   *
+	   * @param - state: the state whose predecessors to look up
+	   * @return the set of all states that are predecessors of the given state
+	   *
+       */
+      const std::set<St> getPredecessors( St state ) const;
+
+      /**
+       * 
+       * @brief obtains all the states that are predecessors of the given state with 
+       *        respect to the given symbol
+       *
+       * This method returns all the states that are predecessors of the given state
+       * such that the symbol that labels a transition from each predecessor to the
+       * given state is the given symbol.
+       *
+       * @param - symbol: the symbol that should label a transition from each predecessor 
+       *                  to the given state
+       * @param - state: the state whose predecessors to look up
+       * @param - preds: the set of all states that are predecessors of the given state
+       *                  with respect to the given symbol
+       *
+       */
+      void getPredecessors( Sym symbol, St state, std::set<St> & preds ) const;
+	    /**
+       * 
+	     * @brief obtains all the states that are predecessors of the given state with
+	     *		respect to the given symbol
+	     *
+	     * This method returns all the states that are predecessors of the given state
+	     * such that the symbol that labels a transition from each predecessor to the
+	     * given state is the given symbol.
+	     *
+	     * @param - symbol: the symbol that should label a transition from each predecessor
+	     *					to the given state
+	     * @param - state: the state whose predecessors to look up
+	     * @return the set of all states that are predecessors of the given state with 
+	     *			respect to the given symbol
+	     *
+       */
+      const std::set<St> getPredecessors( Sym symbol, St state ) const;
+
+      /**
+       * 
+       * @brief obtains all the states that are successors of the given state
+       *
+       * This method returns all the states that are successors of the given state.
+       *
+       * @param - state: the state whose successors to lookup
+       * @param - succs: the set of all states that are successors of the given state
+       *
+       */
+      void getSuccessors( St state, std::set<St> & succs ) const;
+	  /**
+       * 
+	   * @brief obtains all the states that are successors of the given state
+	   *
+	   * This method returns all the states that are successors of the given state.
+	   *
+	   * @param - state: the state whose successors to look up
+	   * @return the set of all states that are successors of the given state
+	   *
+       */
+      const std::set<St> getSuccessors( St state ) const;
+
+      /**
+       * 
+       * @brief obtains all the states that are successors of the given state with
+       *        respect to the given symbol
+       *
+       * This method returns all the states that are successors of the given state
+       * such that the symbol that labels a transition from the given state to each
+       * successor is the given symbol.  
+       *
+       * @param - symbol: the symbol that should label a transition from the given 
+       *                  state to each successor
+       * @param - state: the state whose successors to look up
+       * @param - succs: the set of all states that are successors of the given state
+       *                  with respect to the given symbol
+       *
+       */
+      void getSuccessors( St state, Sym symbol, std::set<St> & succs ) const;
+	  /**
+       * 
+	   * @brief obtains all the states that are successors of the given state with
+	   *		respect to the given symbol
+	   *
+	   * This method returns all the states that are successors of the given state
+	   * such that the symbol that labels a transition from the given state to each
+	   * successor is the given symbol.
+	   *
+	   * @param - symbol: the symbol that should label a transition from the given
+	   *					state to each successor
+	   * @param - state: the state whose successors to look up
+	   * @return the set of all states that are successors of the given state
+	   *			with respect to the given symbol
+	   *
+       */
+      const std::set<St> getSuccessors( St state, Sym symbol ) const;
+
+      /**
+       * 
+	   * @brief obtains all the symbols that label return transitions whose 
+	   *		call-predecessor is 'call' and whose return site is 'ret'
+	   *
+	   * This method returns all the symbols that label return transitions
+	   * whose call-predecessor is 'call' and whose return site is 'ret'
+	   *
+	   * @param - call: the call-predecessor of the desired return transitions
+	   * @param - ret: the return site of the desired return transitions
+	   * @return the set of symbols that label return transitions whose
+	   *			call-predecessor is 'call' and whose return site is 'ret'
+	   *
+       */
+      const std::set<Sym> getCallRetSymbols( St call, St ret ) const;
+
+      /**
+       * 
+	   * @brief obtains all the symbols that label return transitions whose
+	   *		call-predecessor is 'call'
+	   *
+	   * This method returns all the symbols that label return transitions
+	   * whose call-predecessor is 'call'
+	   *
+	   * @param - call: the call-predecessor of the desired return transitions
+	   * @return the set of symbols that label return transitions whose
+	   *			call-predecessor is 'call'
+	   *
+       */
+      const std::set<Sym> getCallRetSymbolsFrom( St call ) const;
+
+      /**
+       * 
+	   * @brief obtains all the symbols that label return transitions whose
+	   *		return site is 'ret'
+	   *
+	   * This method returns all the symbols that label return transitions
+	   * whose return site is 'ret'
+	   *
+	   * @param - ret: the return site of the desired return transitions
+	   * @return the set of symbols that label return transitions whose
+	   *			return site is 'ret'
+	   *
+       */
+      const std::set<Sym> getCallRetSymbolsTo( St ret ) const;
+
+      /**
+       *  
+       * @brief obtains all the states that are call-predecessors of the given state
+       *
+       * This method returns all the states that are call-predecessors of the given 
+       * state.
+       *
+       * @param - state: the state whose call-predecessors to look up
+       * @param - preds: the set of all states that are call-predecessors of the given state
+       *
+       */ 
+      void getCallPredecessors( St state, std::set<St> & c_preds ) const;
+	  /**
+       * 
+	   * @brief obtains all the states that are call-predecessors of the given state
+	   *
+	   * This method returns all the states that are call-predecessors of the given state.
+	   *
+	   * @param - state: the state whose call-predecessors to look up
+	   * @return the set of all states that are call-predecessors of the given state
+	   *
+       */
+      const std::set<St> getCallPredecessors( St state ) const;
       
+      /**
+       * 
+       * @brief obtains all the states that are call-predecessors of the given state with 
+       *        respect to the given symbol
+       *
+       * This method returns all the states that are call-predecessors of the given state
+       * such that the symbol that labels a return transition with each call-predecessor 
+       * and the given state is the given symbol.
+       *
+       * @param - symbol: the symbol that should label a transition with each call-predecessor 
+       *                  and the given state
+       * @param - state: the state whose call-predecessors to look up
+       * @param - preds: the set of all states that are call-predecessors of the given state
+       *                  with respect to the given symbol
+       *
+       */
+      void getCallPredecessors( Sym symbol, St state, std::set<St> & c_preds ) const;
+	  /**
+       * 
+	   * @brief obtains all the states that are call-predecessors of the given state with
+	   *		respect to the given symbol
+	   *
+	   * This method returns all the states that are call-predecessors of the given state
+	   * such that the symbol that labels a return transition with each call-predecessor
+	   * and the given state is the given symbol.
+	   *
+	   * @param - symbol: the symbol that should label a transition with each call-predecessor
+	   *					and the given state
+	   * @param - state: the state whose call-predecessors to look up
+	   * @return the set of all states that are call-predecessors of the given state
+	   *			with respect to the given symbol
+	   *
+       */
+      const std::set<St> getCallPredecessors( Sym symbol, St state ) const;
+
+      /**
+       * 
+       * @brief obtains all the states that are call-successors of the given state
+       *
+       * This method returns all the states that are call-successors of the given state.
+       *
+       * @param - state: the state whose call-successors to lookup
+       * @param - succs: the set of all states that are call-successors of the given state
+       *
+       */
+      void getCallSuccessors( St state, std::set<St> & c_succs ) const;
+	  /**
+       * 
+	   * @brief obtains all the states that are call-successors of the given state
+	   *
+	   * This method returns all the states that are call-successors of the given state.
+	   *
+	   * @param - state: the state whose call-successors to look up
+	   * @return the set of all states that are call-successors of the given state
+	   *
+       */
+      const std::set<St> getCallSuccessors( St state ) const;
+
+      /**
+       * 
+       * @brief obtains all the states that are call-successors of the given state with
+       *        respect to the given symbol
+       *
+       * This method returns all the states that are call-successors of the given state
+       * such that the symbol that labels a return transition with each call-successor 
+       * and the given state is the given symbol.  
+       *
+       * @param - symbol: the symbol that should label a return transition with each call-
+       *                  successor and the given state
+       * @param - state: the state whose call-successors to look up
+       * @param - succs: the set of all states that are call-successors of the given state
+       *                  with respect to the given symbol
+       *
+       */
+      void getCallSuccessors( St state, Sym symbol, std::set<St> & c_succs ) const;
+	  /**
+       * 
+	   * @brief obtains all the states that are call-successors of the given state with 
+	   *		respect to the given symbol
+	   *
+	   * This method returns all the states that are call-successors of the given state
+	   * such that the symbol that labels a return transition with each call-successor
+	   * and the given state is the given symbol.
+	   *
+	   * @param - symbol: the symbol that should label a return transition with each call-
+	   *					successor and the given state
+	   * @param - state: the state whose call-successors to look up
+	   * @return the set of all states that are call-successors of the given state with
+	   *			respect to the given symbol
+	   *
+       */
+      const std::set<St> getCallSuccessors( St state, Sym symbol ) const;
+
       /**
        *    
        * @brief duplicates the original state, but only duplicates outgoing transitions
@@ -809,6 +1113,151 @@ namespace wali
 
       //Call Transitions
 
+      /** 
+       * 
+       * @brief returns the call site states associated with the given symbol
+       *
+       * This method provides access to the call site states associated with
+       * the given symbol.
+       *
+       * @param - symbol: the symbol whose call site states to obtain
+       * @return the set of call site states associated with the given symbol
+       *
+       */
+      const std::set<St> getCallSites_Sym( Sym symbol ) const;
+
+      /**
+       * 
+       * @brief returns the call site states associated with the given symbol
+       *        and entry point
+       *
+       * This method provides access to the call site states associated with
+       * the given symbol and entry point.
+       *
+       * @param - symbol: the symbol whose call site states to obtain
+       * @param - entryPoint: the entry point state whose call site states to
+       *                    obtain
+       * @return the set of call site states associated with the given symbol
+       *          and entry point
+       *
+       */
+      const std::set<St> getCallSites( Sym symbol, St entryPoint ) const;
+      
+      /**
+       * 
+       * @brief returns the call site/symbol pairs associated with the given 
+       *        entry point
+       *
+       * This method provides access to the call site/symbol pairs associated 
+       * with the given entry point state.
+       *
+       * @param - entryPoint: the entry point state whose call site/symbol 
+       *                      pairs to obtain
+       * @return the set of call site/symbol pairs associated with the given 
+       *          entry point
+       *
+       */
+      const std::set<std::pair<St,Sym>> getCallSites( St entryPoint ) const;
+
+	  /**
+       * 
+	   * @brief returns the call sites of all call transitions in the NWA
+	   *
+	   * This method provides access to the call sites of all call transitions
+	   * in the NWA.
+	   *
+	   * @return the set of call sites of all call transitions in the NWA
+	   *
+       */
+	  const std::set<St> getCallSites( ) const;
+
+      /**
+       * 
+       * @brief returns the symbols that label call transitions in the NWA
+       *
+       * This method provides access to the symbols that label call transitions
+       * in the NWA.
+       *
+       * @return the set of symbols that label call transitions in the NWA
+       *
+       */
+      const std::set<Sym> getCallSym( ) const;
+
+      /**
+       * 
+       * @brief returns the symbols that label the call transitions from 
+       *        'callSite' to 'entryPoint' in the NWA
+       *
+       * This method provides access to the symbols that label the call 
+       * transitions from 'callSite' to 'entryPoint' in the NWA.
+       *
+       * @param - callSite: the call site of the desired transitions
+       * @param - entryPoint: the entry point of the desired transitions
+       * @return the set of symbols that label the call transitions from
+       *          'callSite' to 'entryPoint' in the NWA
+       *
+       */
+      const std::set<Sym> getCallSym( St callSite, St entryPoint ) const;
+
+      /**
+       * 
+       * @brief returns the symbols that label the call transitions from 
+       *        'callSite' in the NWA
+       *
+       * This method provides access to the symbols that label the call 
+       * transitions from 'callSite' in the NWA.
+       *
+       * @param - callSite: the call site of the desired transitions
+       * @return the set of symbols that label the call transitions from
+       *          'callSite' in the NWA
+       *
+       */
+      const std::set<Sym> getCallSym_Call( St callSite ) const;
+
+      /**
+       * 
+       * @brief returns the symbols that label the call transitions to
+       *        'entryPoint' in the NWA
+       *
+       * This method provides access to the symbols that label the call 
+       * transitions to 'entryPoint' in the NWA.
+       *
+       * @param - entryPoint: the entry point of the desired transitions
+       * @return the set of symbols that label the call transitions to 
+       *          'entryPoint' in the NWA
+       *
+       */
+      const std::set<Sym> getCallSym_Entry( St entryPoint ) const;
+
+      /**
+       * 
+       * @brief returns the entry point states associated with the given symbol
+       *
+       * This method provides access to the entry point states associated with 
+       * the given symbol.
+       *
+       * @param - symbol: the symbol whose entry point states to obtain
+       * @return the set of entry point states associated with the given symbol
+       *
+       */
+      const std::set<Key> getEntries_Sym( Sym symbol ) const;
+      
+      /**
+       * 
+       * @brief returns the entry point states associated with the given call
+       *        site and symbol
+       *
+       * This method provides access to the entry point states assoicated with  
+       * the given call site and symbol.
+       *
+       * @param - callSite: the call site whose entry point states to obtain
+       * @param - symbol: the symbol whose entry point states to obtain
+       * @return the set of entry point states associated with the given call
+       *          site and symbol
+       *
+       */
+      const std::set<St> getEntries( St callSite, Sym symbol ) const;
+
       /**
        * 
        * @brief returns the symbol/entry point pairs associated with the given call site
@@ -821,6 +1270,18 @@ namespace wali
        *
        */
       const std::set<std::pair<Sym,St> > getEntries( St callSite ) const;
+
+	  /**
+       * 
+	   * @brief returns the entry points of all call transitions in the NWA
+	   *
+	   * This method provides access to the entry points of all call transitions
+	   * in the NWA.
+	   *
+	   * @return the set of entry points of all call transitions in the NWA
+	   *
+       */
+	  const std::set<St> getEntries( ) const;
 
       /**
        *
@@ -904,6 +1365,150 @@ namespace wali
       //Internal Transitions
 
       /**
+       *
+       * @brief returns the source states associated with the given symbol
+       *
+       * This method provides access to the source states associated with the 
+       * given symbol.
+       *
+       * @param - symbol: the symbol whose source states to obtain
+       * @return the set of source states associated with the given symbol
+       *
+       */
+      const std::set<St> getSources_Sym( Sym symbol ) const;
+
+      /**
+       * 
+       * @brief returns the source states associated with the given symbol 
+       *        and target state
+       *
+       * This method provides access to the source states associated with 
+       * the given symbol and target state.
+       *
+       * @param - symbol: the symbol whose source states to obtain
+       * @param - target: the target state whose source states to obtain
+       * @return the set of source states assoicated with the given
+       *          symbol and target state
+       *
+       */
+      const std::set<St> getSources( Sym symbol, St target ) const;
+
+      /**
+       * 
+       * @brief returns the source/symbol pairs associated with the 
+       *        given target state
+       *
+       * This method provides access to the source/symbol pairs associated
+       * with the given target state.
+       *
+       * @param - target: the target state whose source/symbol pairs to 
+       *                  obtain
+       * @return the set of source/symbol pairs associated with the given
+       *          target state
+       *
+       */
+      const std::set<std::pair<St,Sym>> getSources( St target ) const;
+
+	  /**
+       * 
+	   * @brief returns the sources of all internal transitions in the NWA
+	   *
+	   * This method provides access to the sources of all internal transitions
+	   * in the NWA.
+	   *
+	   * @return the set of sources of all internal transitions in the NWA
+	   *
+       */
+	  const std::set<St> getSources( ) const;
+
+    /**
+     * 
+     * @brief returns the symbols that label internal transitions in the NWA
+     *
+     * This method provides access to the symbols that label internal transitions
+     * in the NWA.
+     *
+     * @return the set of symbols that label internal transitions in the NWA
+     *
+     */
+    const std::set<Sym> getInternalSym( ) const;
+
+    /**
+     * 
+     * @brief returns the symbols that label internal transitions from 'source'
+     *        to 'target' in the NWA
+     *
+     * This method provides access to the symbols that label internal transitions
+     * from 'source' to 'target' in the NWA.
+     *
+     * @param - source: the source of the desired transitions
+     * @param - target: the target of the desired transitions
+     * @return the set of symbols that label internal transitions from 'source'
+     *          to 'target' in the NWA
+     *
+     */
+      const std::set<Sym> getInternalSym( St source, St target ) const;
+
+      /**
+     * 
+     * @brief returns the symbols that label internal transitions from 'source'
+     *        in the NWA
+     *
+     * This method provides access to the symbols that label internal transitions
+     * from 'source' in the NWA.
+     *
+     * @param - source: the source of the desired transitions
+     * @return the set of symbols that label internal transitions from 'source'
+     *          in the NWA
+     *
+     */
+      const std::set<Sym> getInternalSym_Source( St source ) const;
+
+      /**
+     * 
+     * @brief returns the symbols that label internal transitions 
+     *        to 'target' in the NWA
+     *
+     * This method provides access to the symbols that label internal 
+     * transitions to 'target' in the NWA.
+     *
+     * @param - target: the target of the desired transitions
+     * @return the set of symbols that label internal transitions 
+     *          to 'target' in the NWA
+     *
+     */
+      const std::set<Sym> getInternalSym_Target( St target ) const;
+
+      /**
+       * 
+       * @brief returns the target states associated with the given symbol
+       *
+       * This method provides access to the target states associated with
+       * the given symbol.
+       *
+       * @param - symbol: the symbol whose target states to obtain
+       * @return the set of target states associated with the given symbol
+       *
+       */
+      const std::set<St> getTargets_Sym( Sym symbol ) const;
+
+      /**
+       * 
+       * @brief returns the target states associated with the given source
+       *        state and symbol
+       *
+       * This method provides access to the target states associated with
+       * the given source state and symbol.
+       *
+       * @param - source: the source state whose target states to obtain
+       * @param - symbol: the symbol whose target states to obtain
+       * @return the set of target states associated with the given source
+       *          state and symbol
+       *
+       */
+      const std::set<St> getTargets( St source, Sym symbol ) const;
+
+      /**
        * 
        * @brief returns the symbol/target pairs associated with the given source
        *
@@ -915,6 +1520,18 @@ namespace wali
        *
        */
       const std::set<std::pair<Sym,St> > getTargets( St source ) const;
+
+	  /**
+       * 
+	   * @brief returns the targets of all internal transitions in the NWA
+	   *
+	   * This method provides access to the targets of all internal transitions
+	   * in the NWA.
+	   *
+	   * @return the set of targets of all internal transitions in the NWA
+	   *
+       */
+	  const std::set<St> getTargets( ) const;
 
       /**
        *
@@ -1000,6 +1617,492 @@ namespace wali
 
       /**
        * 
+       * @brief returns the exit states associated with the given symbol
+       *
+       * This method provides access to the exit states associated with
+       * the given symbol.
+       *
+       * @param - symbol: the symbol whose exit states to obtain
+       * @return the set of exit states associated with the given symbol
+       *
+       */
+      const std::set<St> getExits_Sym( Sym symbol ) const;
+
+      /**
+       * 
+       * @brief returns the exit states associated with the given call site,
+       *        symbol, and return site
+       *
+       * This method provides access to the exit states associated with the 
+       * given call site, symbol, and return site.
+       *
+       * @param - callSite: the call site state whose exit states to obtain
+       * @param - symbol: the symbol whose exit states to obtain
+       * @param - returnSite: the return site state whose exit states to obtain
+       * @return the set of exit states associated with the given call site,
+       *          symbol, and return site
+       *
+       */
+      const std::set<St> getExits( St callSite, Sym symbol, St returnSite ) const;
+
+      /**
+       * 
+       * @brief returns the exit point/symbol pairs associated with the given 
+       *        call site and return site
+       *
+       * This method provides access to the exit point/symbol pairs associated 
+       * with the given call site and return site.
+       *
+       * @param - callSite: the call site state whose exit point/symbol pairs to obtain
+       * @param - returnSite: the return site state whose exit point/symbol pairs to obtain
+       * @return the set of exit point/symbol pairs associated with the given call site 
+       *          and return site
+       *
+       */
+      const std::set<std::pair<St,Sym>> getExits( St callSite, St returnSite ) const;
+
+	  /**
+       * 
+	   * @brief returns the exit points of all return transitions in the NWA
+	   *
+	   * This method provides access to the exit points of all return transitions
+	   * in the NWA.
+	   *
+	   * @return the set of exit points of all return transitions in the NWA
+	   *
+       */
+	  const std::set<St> getExits( ) const;
+
+      /**
+       * 
+       * @brief returns the exit states associated with the given call site 
+       *        and symbol
+       * 
+       * This method provides access to the exit states associated with the 
+       * given call site and symbol.
+       *
+       * @param - callSite: the call site state whose exit states to obtain
+       * @param - symbol: the symbol whose exit states to obtain
+       * @return the set of exit states associated with the given call state
+       *          and symbol
+       *
+       */
+      const std::set<St> getExits_Call( St callSite, Sym symbol ) const;
+
+      /**
+       * 
+       * @brief returns the exit point/symbol pairs associated with the
+       *        given call site
+       *
+       * This method provides access to the exit point/symbol pairs associated
+       * with the given call site.
+       *
+       * @param - callSite: the call site state whose exit point/symbol pairs
+       *                    to obtain
+       * @return the set of exit point/symbol pairs associated with the given
+       *          call site
+       *
+       */
+      const std::set<std::pair<St,Sym>> getExits_Call( St callSite ) const;
+
+      /**
+       * 
+       * @brief returns the exit states associated with the given symbol and
+       *        return site
+       *
+       * This method provides access to the exit states associated with the
+       * given symbol and return site.
+       *
+       * @param - symbol: the symbol whose exit states to obtain
+       * @param - returnSite: the return site state whose exit states to obtain
+       * @return the set of exit states associated with the given symbol and
+       *          return site
+       *
+       */
+      const std::set<St> getExits_Ret( Sym symbol, St returnSite ) const;
+
+      /**
+       * 
+       * @brief returns the exit point/symbol pairs associated with the
+       *        given return site
+       *
+       * This method provides access to the exit point/symbol pairs associated
+       * with the given return site.
+       *
+       * @param - returnSite: the return site state whose exit point/symbol
+       *                      pairs to obtain
+       * @return the set of exit point/symbol pairs associated with the given
+       *          return site
+       *
+       */
+      const std::set<std::pair<St,Sym>> getExits_Ret( St returnSite ) const;
+
+      /**
+       * 
+       * @brief returns the call site states associated with the given symbol
+       *
+       * This method provides access to the call site states associated with
+       * the given symbol.
+       *
+       * @param - symbol: the symbol whose call site states to obtain
+       * @return the set of call site states associated with the given symbol
+       *
+       */
+      const std::set<St> getCalls_Sym( Sym symbol ) const;
+
+      /**
+       * 
+       * @brief returns the call site states associated with the given exit 
+       *        point, symbol, and return site
+       *
+       * This method provides access to the call site states associated with 
+       * the given exit point, symbol, and return site.
+       *
+       * @param - exitPoint: the exit point whose call site states to obtain
+       * @param - symbol: the symbol whose call site states to obtain
+       * @param - returnSite: the return site whose call site states to obtain
+       * @return the set of call site states assocaited with the given exit
+       *          point, symbol, and return site
+       * 
+       */
+      const std::set<St> getCalls( St exitPoint, Sym symbol, St returnSite ) const;
+
+      /**
+       * 
+       * @brief returns the call site/symbol pairs associated with the given exit 
+       *        point and return site states
+       *
+       * This method provides access to the call site/symbol pairs associated with
+       * the given exit point and return site states.
+       *
+       * @param - exitPoint: the exit point whose call site/symbol pairs to obtain
+       * @param - returnSite: the return site whose call site/symbol pairs to obtain
+       * @return the set of call site/symbol pairs associated with the given exit 
+       *          point and return site states
+       *
+       */
+      const std::set<std::pair<St,Sym>> getCalls( St exitPoint, St returnSite ) const;
+
+	  /**
+       * 
+	   * @brief returns the call sites of all return transitions in the NWA
+	   *
+	   * This method provides access to the call sites of all return transitions
+	   * in the NWA.
+	   *
+	   * @return the set of call sites of all return transitions in the NWA
+	   *
+       */
+	  const std::set<St> getCalls( ) const;
+
+      /**
+       * 
+       * @brief returns the call site states associated with the given exit point 
+       *        and symbol
+       * 
+       * This method provides access to the call site states associated with the
+       * given exit point and symbol.
+       *
+       * @param - exitPoint: the exit point whose call site states to obtain
+       * @param - symbol: the symbol whose call site states to obtain
+       * @return the set of all call sites associated with the given exit point
+       *          and symbol
+       *
+       */
+      const std::set<St> getCalls_Exit( St exitPoint, Sym symbol ) const;
+
+      /**
+       * 
+       * @brief returns the call site/symbol pairs associated with the given
+       *        exit point
+       *
+       * This method provides access to the call site/symbol pairs associated
+       * with the given exit point.
+       *
+       * @param - exitPoint: the exit point whose call site/symbol pairs to obtain
+       * @return the set of call site/symbol pairs associated with the given
+       *         exit point
+       *
+       */
+      const std::set<std::pair<St,Sym>> getCalls_Exit( St exitPoint ) const;
+
+      /**
+       * 
+       * @brief returns the call site states associated with the given symbol
+       *        and return site
+       *
+       * This method provides access to the call site states associated with
+       * the given symbol and return site.
+       *
+       * @param - symbol: the symbol whose call site states to obtain
+       * @param - returnSite: the return site whose call site states to obtain
+       * @return the set of call site states associated with the given symbol
+       *          and return site
+       *
+       */
+      const std::set<St> getCalls_Ret( Sym symbol, St returnSite ) const;
+
+      /**
+       * 
+       * @brief returns the call site/symbol pairs associated with the given
+       *        return site
+       *
+       * This method provides access to the call site/symbol pairs associated
+       * with the given return site.
+       *
+       * @param - returnSite: the return site whose call site/symbol pairs to
+       *                      obtain
+       * @return the set of all call site/symbol pairs associated with the 
+       *          given return site
+       *
+       */
+      const std::set<std::pair<St,Sym>> getCalls_Ret( St returnSite ) const;
+
+      /**
+       * 
+       * @brief returns the symbols that label return transitions in the NWA
+       *
+       * This method provides access to the symbols that label return transitions
+       * in the NWA.
+       *
+       * @return the set of symbols that label return transitions in the NWA
+       *
+       */
+      const std::set<Sym> getReturnSym( ) const;
+
+      /**
+       * 
+       * @brief returns the symbols that label return transitions from 'exitPoint'
+       *        to 'returnSite' with call-predecessor 'callSite' in the NWA
+       *
+       * This method provides access to the symbols that label return transitions
+       * from 'exitPoint' to 'returnSite' with call-predecessor 'callSite' in the NWA.
+       *
+       * @param - exitPoint: the exit point of the desired transition
+       * @param - callSite: the call site of the desired transition
+       * @param - returnSite: the return site of the desired transition
+       * @return the set of symbols that label return transitions from 'exitPoint'
+       *          to 'returnSite' with call-predecessor 'callSite' in the NWA
+       *
+       */
+      const std::set<Sym> getReturnSym( St exitPoint, St callSite, St returnSite ) const;
+
+      /**
+       * 
+       * @brief returns the symbols that label return transitions from 'exitPoint'
+       *        n the NWA
+       *
+       * This method provides access to the symbols that label return transitions
+       * from 'exitPoint' in the NWA.
+       *
+       * @param - exitPoint: the exit point of the desired transition
+       * @return the set of symbols that label return transitions from 'exitPoint'
+       *          in the NWA
+       *
+       */
+      const std::set<Sym> getReturnSym_Exit( St exitPoint ) const;
+
+      /**
+       * 
+       * @brief returns the symbols that label return transitions 
+       *        with call-predecessor 'callSite' in the NWA
+       *
+       * This method provides access to the symbols that label return transitions
+       * with call-predecessor 'callSite' in the NWA.
+       *
+       * @param - callSite: the call site of the desired transition
+       * @return the set of symbols that label return transitions 
+       *          with call-predecessor 'callSite' in the NWA
+       *
+       */
+      const std::set<Sym> getReturnSym_Call( St callSite ) const;
+
+      /**
+       * 
+       * @brief returns the symbols that label return transitions 
+       *        to 'returnSite' in the NWA
+       *
+       * This method provides access to the symbols that label return transitions
+       * to 'returnSite' in the NWA.
+       *
+       * @param - returnSite: the return site of the desired transition
+       * @return the set of symbols that label return transitions 
+       *          to 'returnSite' in the NWA
+       *
+       */
+      const std::set<Sym> getReturnSym_Ret( St returnSite ) const;
+
+      /**
+       * 
+       * @brief returns the symbols that label return transitions from 'exitPoint'
+       *        with call-predecessor 'callSite' in the NWA
+       *
+       * This method provides access to the symbols that label return transitions
+       * from 'exitPoint' with call-predecessor 'callSite' in the NWA.
+       *
+       * @param - exitPoint: the exit point of the desired transition
+       * @param - callSite: the call site of the desired transition
+       * @return the set of symbols that label return transitions from 'exitPoint'
+       *          with call-predecessor 'callSite' in the NWA
+       *
+       */
+      const std::set<Sym> getReturnSym_ExitCall( St exitPoint, St callSite ) const;
+
+      /**
+       * 
+       * @brief returns the symbols that label return transitions from 'exitPoint'
+       *        to 'returnSite' in the NWA
+       *
+       * This method provides access to the symbols that label return transitions
+       * from 'exitPoint' to 'returnSite' in the NWA.
+       *
+       * @param - exitPoint: the exit point of the desired transition
+       * @param - returnSite: the return site of the desired transition
+       * @return the set of symbols that label return transitions from 'exitPoint'
+       *          to 'returnSite' in the NWA
+       *
+       */
+      const std::set<Sym> getReturnSym_ExitRet( St exitPoint, St returnSite ) const;
+
+      /**
+       * 
+       * @brief returns the symbols that label return transitions 
+       *        to 'returnSite' with call-predecessor 'callSite' in the NWA
+       *
+       * This method provides access to the symbols that label return transitions
+       * to 'returnSite' with call-predecessor 'callSite' in the NWA.
+       *
+       * @param - callSite: the call site of the desired transition
+       * @param - returnSite: the return site of the desired transition
+       * @return the set of symbols that label return transitions 
+       *          to 'returnSite' with call-predecessor 'callSite' in the NWA
+       *
+       */
+      const std::set<Sym> getReturnSym_CallRet( St callSite, St returnSite ) const;
+
+
+      /**
+       * 
+       * @brief returns the return site states associated with the given symbol
+       *
+       * This method provides access to the return site states associated with
+       * the given symbol.
+       *
+       * @param - symbol: the symbol whose reutrn site states to obtain
+       * @return the set of return site states associated with the given symbol
+       *
+       */
+      const std::set<St> getReturns_Sym( Sym symbol ) const;
+
+      /**
+       * 
+       * @brief returns the return site states associated with the given exit 
+       *        point, call site, and symbol
+       *
+       * This method provides access to the return site states associated with
+       * the given exit point, call site, and symbol.
+       *
+       * @param - exitPoint: the exit point whose return site states to obtain
+       * @param - callSite: the call site whose return site states to obtain
+       * @param - symbol: the symbol whose return site states to obtain
+       * @return the set of return site states associated with the given exit
+       *          point, call site, and symbol
+       *
+       */
+      const std::set<St> getReturns( St exitPoint, St callSite, Sym symbol ) const;
+
+      /**
+       * 
+       * @brief returns the symbol/return site pairs associated with the given exit 
+       *        point and call site
+       *
+       * This method provides access to the symbol/return site pairs associated with  
+       * the given exit point and call site.
+       *
+       * @param - exit: the exit point whose symbol/return site pairs to obtain
+       * @param - callSite: the call site whose symbol/return site pairs to obtain
+       * @return the set of symbol/return site pairs associated with the given exit 
+       *          point and call site
+       *
+       */
+      const std::set<std::pair<Sym,St> > getReturns( St exitPoint, St callSite ) const;
+
+	  /**
+       * 
+	   * @brief returns the return sites of all return transitions in the NWA
+	   *
+	   * This method provides access to the return sites of all return transitions
+	   * in the NWA.
+	   *
+	   * @return the set of return sites of all return transitions in the NWA
+	   *
+       */
+	  const std::set<St> getReturns(  ) const;
+
+      /**
+       * 
+       * @brief returns the return site states associated with the given exit 
+       *        point and symbol
+       *
+       * This method provides access to the return site states associated with
+       * the given exit point and symbol.
+       *
+       * @param - exitPoint: the exit point whose return site states to obtain
+       * @param - symbol: the symbol whose return site states to obtain
+       * @return the set of return site states associated with the given exit
+       *         point and symbol
+       *
+       */
+      const std::set<St> getReturns_Exit( St exitPoint, Sym symbol ) const;
+
+      /**
+       * 
+       * @brief returns the symbol/return site pairs associated with the given
+       *        exit point
+       *
+       * This method provides access to the symbol/return site pairs associated
+       * with the given exit point.
+       *
+       * @param - exitPoint: the exit point whose symbol/return site pairs to obtain
+       * @return the set of symbol/return site pairs associated with the given 
+       *          exit point
+       *
+       */
+      const std::set<std::pair<Sym,St>> getReturns_Exit( St exitPoint ) const;
+
+      /**
+       * 
+       * @brief returns the return site states associated with the given call 
+       *        site and symbol
+       *
+       * This method provides access to the return site states associated with
+       * the given call site and symbol.
+       *
+       * @param - callSite: the call site whose return site states to obtain
+       * @param - symbol: the symbol whose return site states to obtain
+       * @return the set of return site states associated with the given call
+       *          site and symbol
+       *
+       */
+      const std::set<St> getReturns_Call( St callSite, Sym symbol ) const;
+
+      /**
+       * 
+       * @brief returns the symbol/return site pairs associated with the given
+       *        call site
+       *
+       * This method provides access to the symbol/return site pairs associated
+       * with the given call site.
+       *
+       * @param - callSite: the call site whose symbol/return site pairs to obtain
+       * @return the set of symbol/return site pairs associated with the given
+       *          call site
+       *
+       */
+      const std::set<std::pair<Sym,St>> getReturns_Call( St callSite ) const;
+
+      /**
+       * 
        * @brief returns the return sites associated with the given call site
        *
        * This method provides access to the return sites associated with the given
@@ -1010,22 +2113,6 @@ namespace wali
        *
        */
       const std::set<St> getReturnSites( St callSite ) const;
-
-      /**
-       * 
-       * @brief returns the symbol/return site pairs associated with the given exit point 
-       *        and call site
-       *
-       * This method provides access to the symbol/return site pairs associated with the 
-       * given exit point and call site.
-       *
-       * @param - exit: the exit point whose symbol/return site pairs to obtain
-       * @param - callSite: the call site whose symbol/return site pairs to obtain
-       * @return the set of symbol/return site pairs associated with the given exit point 
-       *          and call site
-       *
-       */
-      const std::set<std::pair<Sym,St> > getReturns( St exit, St callSite ) const;
 
       /**
        *
@@ -1133,8 +2220,8 @@ namespace wali
        *
        * @brief constructs the NWA resulting from the union of the given NWAs 
        *
-       * This method constructs the union of the given NWAs by creating a new initial 
-       * state with epsilon transitions to all initial states of the two NWAs.
+       * This method constructs the union of the given NWAs by unioning the state sets,
+       * symbols, transitions, initial state sets, and final state sets of the two NWAs.
        * Note: The resulting NWA is guaranteed NOT to be deterministic.
        * Note: This method modifies the transitions of the NWA, so it cannot be 
        *        called on a NWA with no stuck state.
@@ -1144,6 +2231,26 @@ namespace wali
        *
        */
       void unionNWA( NWARefPtr first, NWARefPtr second );  
+      /**
+       *
+       * @brief constructs the NWA resulting from the union of the given NWAs 
+       *
+       * This method constructs the union of the given NWAs by unioning the state sets,
+       * symbols, transitions, initial state sets, and final state sets of the two NWAs.
+       * Note: The resulting NWA is guaranteed NOT to be deterministic.
+       *
+       * @param - first: the NWA to union with 'second'
+       * @param - second: the NWA to union with 'first'
+       * @param - stuck: the stuck state of the NWA to be constructed
+       * @return the NWA resulting from the union of the given NWAs
+       *
+       */
+      static NWARefPtr unionNWA( NWARefPtr first, NWARefPtr second, St stuck )
+      {
+        NWARefPtr nwa = ref_ptr<NWA>(&NWA(stuck));
+        nwa->unionNWA(first,second);
+        return nwa;
+      }
 
       /**
        *
@@ -1160,6 +2267,26 @@ namespace wali
        *	
        */
       void intersect( NWARefPtr first, NWARefPtr second );
+      /**
+       *
+       * @brief constructs the NWA which is the intersection of the given NWAs
+       *
+       * This method constructs the NWA which accepts only nested words that are accepted 
+       * by both 'first' and 'second'.  
+       * Note: The resulting NWA is NOT guaranteed to be deterministic.	
+       *
+       * @param - first: the NWA to intersect with 'second'
+       * @param - second: the NWA to intersect with 'first'
+       * @param - stuck: the stuck state of the NWA to be constructed
+       * @return the NWA resulting from the intersection of the given NWAs
+       *	
+       */
+      static NWARefPtr intersect( NWARefPtr first, NWARefPtr second, St stuck )
+      {
+        NWARefPtr nwa = ref_ptr<NWA>(&NWA(stuck));
+        nwa->intersect(first,second);
+        return nwa;
+      }
 
       /**
        * @brief Detects (immediately) stuck states and removes them
@@ -1186,6 +2313,26 @@ namespace wali
        *
        */
       void concat( NWARefPtr first, NWARefPtr second );  
+      /**
+       *
+       * @brief constructs the NWA resulting from the concatenation of the given NWAs
+       *
+       * This method constructs the concatenation of the given NWAs by adding epsilon 
+       * transitions from all final states of 'first' to all initial states of 'second'.  
+       * Note: The resulting NWA is NOT guaranteed to be deterministic.
+       *
+       * @param - first: the NWA to which 'second' should be concatenated
+       * @param - second: the NWA to concatenate onto the end of 'first'
+       * @param - stuck: the stuck state of the NWA to be constructed
+       * @return the NWA resulting from the concatenation of the given NWAs
+       *
+       */
+      static NWARefPtr concat( NWARefPtr first, NWARefPtr second, St stuck )
+        {
+        NWARefPtr nwa = ref_ptr<NWA>(&NWA(stuck));
+        nwa->concat(first,second);
+        return nwa;
+      }
 
       /**
        *
@@ -1200,7 +2347,26 @@ namespace wali
        * @param - first: the NWA to reverse
        * 
        */
-      void reverse( NWARefPtr first );  
+      void reverse( NWARefPtr first );
+      /**
+       *
+       * @brief constructs the NWA which is the reverse of the given NWA
+       *
+       * This method constructs the NWA which is the reverse of the given NWA. It reverses 
+       * internal transitions and switches call and return transitions.
+       * Note: the resulting NWA is NOT guaranteed to be deterministic.
+       *
+       * @param - first: the NWA to reverse
+       * @param - stuck: the stuck state of the NWA to be constructed
+       * @return the NWA resulting from reversing the given NWA
+       * 
+       */
+      static NWARefPtr reverse( NWARefPtr first, St stuck )
+      {
+        NWARefPtr nwa = ref_ptr<NWA>(&NWA(stuck));
+        nwa->reverse(first);
+        return nwa;
+      }
 
       /**
        *
@@ -1216,6 +2382,25 @@ namespace wali
        *
        */
       void star( NWARefPtr first ); 
+      /**
+       *
+       * @brief constructs the NWA resulting from performing Kleene-* on the given NWA
+       *
+       * This method constructs the Kleene-* of the given NWA by adding epsilon transitions 
+       * from all final states of the NWA to all initial states of the NWA.  
+       * Note: The resulting NWA is NOT guaranteed to be deterministic.
+       *
+       * @param - first: the NWA to perform the Kleene-* of
+       * @param - stuck: the stuck state of the NWA to be constructed
+       * @return the NWA resulting from performing Kleene-* on the given NWA
+       *
+       */
+      static NWARefPtr star( NWARefPtr first, St stuck )
+        {
+        NWARefPtr nwa = ref_ptr<NWA>(&NWA(stuck));
+        nwa->star(first);
+        return nwa;
+      }
 
       /**
        * 
@@ -1233,6 +2418,26 @@ namespace wali
       void complement( NWARefPtr first );
 
       /**
+       * 
+       * @brief constructs the NWA that is the complement of the given NWA
+       *
+       * This method constructs the complement of the given NWA by determinizing it and
+       * then replacing the set of final states with the set of states that are not final
+       * Note: The resulting NWA is guaranteed to be deterministic.
+       *
+       * @param - first: the NWA to perform the complement of
+       * @param - stuck: the stuck state of the NWA to be constructed
+       * @return the NWA resulting from complementing the given NWA
+       *
+       */
+      static NWARefPtr complement( NWARefPtr first, St stuck )
+        {
+        NWARefPtr nwa = ref_ptr<NWA>(&NWA(stuck));
+        nwa->complement(first);
+        return nwa;
+      }
+
+      /**
        *
        * @brief constructs a deterministic NWA that is equivalent to the given NWA.
        *
@@ -1245,6 +2450,25 @@ namespace wali
        *
        */
       void determinize( NWARefPtr nondet ); 
+
+      /**
+       *
+       * @brief constructs a deterministic NWA that is equivalent to the given NWA.
+       *
+       * This method constructs a deterministic NWA that is equivalent to the given NWA.
+       * Note: The resulting NWA is guaranteed to be deterministic.
+       *
+       * @param - nondet: the NWA to determinize
+       * @param - stuck: the stuck state of the NWA to be constructed
+       * @return the NWA resulting from determinizing the given NWA
+       *
+       */
+      static NWARefPtr determinize( NWARefPtr nondet, St stuck )
+        {
+        NWARefPtr nwa = ref_ptr<NWA>(&NWA(stuck));
+        nwa->determinize(nondet);
+        return nwa;
+      }
 
       /**
        *
@@ -1397,7 +2621,7 @@ namespace wali
        * @param - resCI: the client info that results from performing the intersection
        *
        */
-      virtual bool nodeIntersect( NWARefPtr first, St state1, NWARefPtr second, St state2, 
+      virtual bool stateIntersect( NWARefPtr first, St state1, NWARefPtr second, St state2,
                                   St & resSt, ClientInfoRefPtr & resCI );
 
       /**
@@ -1414,7 +2638,8 @@ namespace wali
        * @param - resSym: the symbol that results from performing the intersection
        *
        */
-      virtual bool edgeIntersect( NWARefPtr first, Sym sym1, NWARefPtr second, Sym sym2, Sym & resSym );
+      virtual bool transitionIntersect( NWARefPtr first, Sym sym1, NWARefPtr second, Sym sym2,
+                                        Sym & resSym );
 
       /**
        * 
@@ -1523,6 +2748,28 @@ namespace wali
        * 
        */
       wpds::WPDS plusWPDS( const wpds::WPDS & base ); 
+      /**
+       * 
+       * @brief constructs the WPDS which is the result of the explicit NWA plus WPDS 
+       *        construction from Advanced Querying for Property Checking
+       *
+       * This method constructs the WPDS which allows WPDS reachability to be used to 
+       * perform property checking using this NWA and the given WPDS.
+       * Note: For now we are assuming that implicit transitions to the stuck state need to be 
+       *       realized for this construction to work.  Therefore, this method can only be called
+       *       on an NWA of type 1 and afterwards it is an NWA of type 2.
+       *
+       *
+       * @param - base: the WPDS that forms the basis for the constructed WPDS
+       * @param - nwa: the NWA to process
+       * @return the WPDS which can be used to perform property checking using PDS 
+       *          reachability
+       * 
+       */
+      static wpds::WPDS plusWPDS( const wpds::WPDS & base, NWARefPtr nwa )
+      {
+        return nwa->plusWPDS(base);
+      }
 
       /**
        *
@@ -1535,6 +2782,23 @@ namespace wali
        *
        */
       void PDStoNWA( const wpds::WPDS & pds ); 
+      /**
+       *
+       * @brief constructs the NWA equivalent to the given PDS
+       *
+       * This method constructs the NWA that is equivalent to the given PDS.
+       *
+       * @param - pds: the pds to convert
+       * @param - stuck: the stuck state of the NWA to construct
+       * @return the NWA equivalent to the given PDS
+       *
+       */
+      static NWARefPtr PDStoNWA( const wpds::WPDS & pds, St stuck )
+      {
+        NWARefPtr nwa = ref_ptr<NWA>(&NWA(stuck));
+        nwa->PDStoNWA(pds);
+        return nwa;
+      }
 
       /**
        *  
@@ -1598,6 +2862,22 @@ namespace wali
        *
        */ 
       wpds::WPDS NWAtoPDSreturns( WeightGen<Client> & wg ) const;
+      /**
+       *
+       * @brief constructs the PDS equivalent to this NWA
+       *
+       * This method constructs the PDS that is equivalent to this NWA.
+       * Note: This version keeps returns on the stack.
+       *
+       * @param - nwa: the nwa to convert
+       * @param - wg: the functions to use in generating weights
+       * @return the PDS equivalent to this NWA
+       *
+       */ 
+      static wpds::WPDS NWAtoPDSreturns( NWARefPtr nwa, WeightGen<Client> & wg )
+      {
+        return nwa->NWAtoPDSreturns(wg);
+      }
 
       /**
        *
@@ -1611,6 +2891,22 @@ namespace wali
        *
        */ 
       wpds::WPDS NWAtoBackwardsPDSreturns( WeightGen<Client> & wg ) const;  
+      /**
+       *
+       * @brief constructs the backwards PDS equivalent to this NWA
+       *
+       * This method constructs the backwards PDS that is equivalent to this NWA.
+       * Note: This version keeps returns on the stack.
+       *
+       * @param - nwa: the nwa to convert
+       * @param - wg: the functions to use in generating weights
+       * @return the backwards PDS equivalent to this NWA
+       *
+       */ 
+      static wpds::WPDS NWAtoBackwardsPDSreturns( NWARefPtr nwa, WeightGen<Client> & wg )
+      {
+        return nwa->NWAtoBackwardsPDSreturns(wg);
+      }
 
       /**
        *
@@ -1624,6 +2920,22 @@ namespace wali
        *
        */ 
       wpds::WPDS NWAtoPDScalls( WeightGen<Client> & wg ) const;
+      /**
+       *
+       * @brief constructs the PDS equivalent to this NWA
+       *
+       * This method constructs the PDS that is equivalent to this NWA.
+       * Note: This version keeps calls on the stack.
+       *
+       * @param - nwa: the nwa to convert
+       * @param - wg: the functions to use in generating weights
+       * @return the PDS equivalent to this NWA
+       *
+       */ 
+      static wpds::WPDS NWAtoPDScalls( NWARefPtr nwa, WeightGen<Client> & wg )
+      {
+        return nwa->NWAtoPDScalls(wg);
+      }
 
       /**
        *
@@ -1637,6 +2949,22 @@ namespace wali
        *
        */ 
       wpds::WPDS NWAtoBackwardsPDScalls( WeightGen<Client> & wg ) const; 
+      /**
+       *
+       * @brief constructs the backwards PDS equivalent to this NWA
+       *
+       * This method constructs the backwards PDS that is equivalent to this NWA.
+       * Note: This version keeps calls on the stack.
+       *
+       * @param - nwa: the NWA to convert
+       * @param - wg: the functions to use in generating weights
+       * @return the backwards PDS equivalent to this NWA
+       *
+       */
+      static wpds::WPDS NWAtoBackwardsPDScalls( NWARefPtr nwa, WeightGen<Client> & wg )
+      {
+        return nwa->NWAtoBackwardsPDScalls(wg);
+      }
       
       /**
        *
@@ -2870,6 +4198,119 @@ namespace wali
 
     /**
      * 
+	 * @brief obtains all the symbols that label transitions from 'source' to 'target'
+	 *
+	 * @param - source: the source of the desired transitions
+	 * @param - target: the target of the desired transitions
+	 * @return the set of symbols that label transitions from 'source' to 'target'
+	 *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getSymbols( St source, St target ) const
+    {
+      assert(source < wali::WALI_BAD_KEY);
+      assert(target < wali::WALI_BAD_KEY);
+
+      std::set<Sym> syms;
+
+      std::set<Call> calls = trans.getTransEntry(target);
+      for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
+      {
+        if( Trans::getCallSite(*cit) == source )
+          syms.insert(Trans::getCallSym(*cit));
+      }
+
+      std::set<Internal> internals = trans.getTransTo(target);
+      for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
+      {
+        if( Trans::getSource(*iit) == source )
+          syms.insert(Trans::getInternalSym(*iit));
+      }
+
+      std::set<Return> returns = trans.getTransRet(target);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      {
+        if( Trans::getExit(*rit) == source )
+          syms.insert(Trans::getReturnSym(*rit));
+      }
+
+      return syms;
+    }
+
+    /**
+     * 
+	 * @brief obtains all the symbols that label transitions from 'source'
+	 *
+	 * @param - source: the source of the desired transitions
+	 * @return the set of symbols that label transitions from 'source'
+	 *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getSymbolsFrom( St source ) const
+    {
+      assert(source < wali::WALI_BAD_KEY);
+
+      std::set<Sym> syms;
+
+      std::set<Call> calls = trans.getTransCall(source);
+      for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
+      {
+          syms.insert(Trans::getCallSym(*cit));
+      }
+
+      std::set<Internal> internals = trans.getTransFrom(source);
+      for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
+      {
+          syms.insert(Trans::getInternalSym(*iit));
+      }
+
+      std::set<Return> returns = trans.getTransExit(source);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      {
+          syms.insert(Trans::getReturnSym(*rit));
+      }
+
+      return syms;
+    }
+
+    /**
+     * 
+	 * @brief obtains all the symbols that label transitions to 'target'
+	 *
+	 * @param - target: the target of the desired transitions
+	 * @return the set of symbols that label transitions to 'target'
+	 *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getSymbolsTo( St target ) const
+    {
+      assert(target < wali::WALI_BAD_KEY);
+
+      std::set<Sym> syms;
+
+      std::set<Call> calls = trans.getTransEntry(target);
+      for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
+      {
+          syms.insert(Trans::getCallSym(*cit));
+      }
+
+      std::set<Internal> internals = trans.getTransTo(target);
+      for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
+      {
+          syms.insert(Trans::getInternalSym(*iit));
+      }
+
+      std::set<Return> returns = trans.getTransRet(target);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      {
+          syms.insert(Trans::getReturnSym(*rit));
+      }
+
+      return syms;
+    }
+
+    /**
+     * 
      * @brief obtains all the states that are predecessors of the given state
      *
      * @param - state: the state of the state whose predecessors to look up
@@ -2893,7 +4334,494 @@ namespace wali
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         preds.insert(Trans::getExit(*rit));
     }
+	/**
+     * 
+	 * @brief obtains all the states that are predecessors of the given state
+	 *
+	 * @param - state: the state whose predecessors to look up
+	 * @return the set of all states that are predecessors of the given state
+	 *
+     */
+	template <typename Client>
+  const std::set<typename NWA<Client>::St> NWA<Client>::getPredecessors( St state ) const
+    {
+      assert(state < wali::WALI_BAD_KEY);
+       
+	  std::set<St> preds;
+
+      std::set<Call> calls = trans.getTransEntry(state);
+      for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
+        preds.insert(Trans::getCallSite(*cit));
+
+      std::set<Internal> internals = trans.getTransTo(state);
+      for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
+        preds.insert(Trans::getSource(*iit));
+
+      std::set<Return> returns = trans.getTransRet(state);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+        preds.insert(Trans::getExit(*rit));
+
+	  return preds;
+    }
+
+    /**
+     * 
+     * @brief obtains all the states that are predecessors of the given state with 
+     *        respect to the given symbol
+     *
+     * @param - symbol: the symbol that should label a transition from each predecessor 
+     *                  to the given state
+     * @param - state: the state whose predecessors to look up
+     * @param - preds: the set of all states that are predecessors of the given state
+     *                  with respect to the given symbol
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::getPredecessors( Sym symbol, St state, std::set<St> & preds ) const
+    {
+      assert(state < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      std::set<Call> calls = trans.getTransEntry(state);
+      for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
+        if( symbol == Trans::getCallSym(*cit) )
+          preds.insert(Trans::getCallSite(*cit));
+
+      std::set<Internal> internals = trans.getTransTo(state);
+      for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
+        if( symbol == Trans::getInternalSym(*iit) )
+          preds.insert(Trans::getSource(*iit));
+
+      std::set<Return> returns = trans.getTransRet(state);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+        if( symbol == Trans::getReturnSym(*rit) )
+          preds.insert(Trans::getExit(*rit));
+    }
+	/**
+     * 
+	 * @brief obtains all the states that are predecessors of the given state with
+	 *		respect to the given symbol
+	 *
+	 * @param - symbol: the symbol that should label a transition from each predecessor
+	 *					to the given state
+	 * @param - state: the state whose predecessors to look up
+	 * @return the set of all states that are predecessors of the given state with 
+	 *			respect to the given symbol
+	 *
+     */
+	template <typename Client>
+  const std::set<typename NWA<Client>::St> NWA<Client>::getPredecessors( Sym symbol, St state ) const
+  {
+      assert(state < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+	  std::set<St> preds;
+
+      std::set<Call> calls = trans.getTransEntry(state);
+      for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
+        if( symbol == Trans::getCallSym(*cit) )
+          preds.insert(Trans::getCallSite(*cit));
+
+      std::set<Internal> internals = trans.getTransTo(state);
+      for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
+        if( symbol == Trans::getInternalSym(*iit) )
+          preds.insert(Trans::getSource(*iit));
+
+      std::set<Return> returns = trans.getTransRet(state);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+        if( symbol == Trans::getReturnSym(*rit) )
+          preds.insert(Trans::getExit(*rit));
+
+	    return preds;
+    }
+
+    /**
+     * 
+     * @brief obtains all the states that are successors of the given state
+     *
+     * @param - state: the state whose successors to lookup
+     * @param - succs: the set of all states that are successors of the given state
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::getSuccessors( St state, std::set<St> & succs ) const
+    {
+      assert(state < wali::WALI_BAD_KEY);
+       
+      std::set<Call> calls = trans.getTransCall(state);
+      for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
+        succs.insert(Trans::getEntry(*cit));
+
+      std::set<Internal> internals = trans.getTransFrom(state);
+      for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
+        succs.insert(Trans::getTarget(*iit));
+
+      std::set<Return> returns = trans.getTransExit(state);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+        succs.insert(Trans::getReturnSite(*rit));
+    }
+	/**
+     * 
+	 * @brief obtains all the states that are successors of the given state
+	 *
+	 * @param - state: the state whose successors to look up
+	 * @return the set of all states that are successors of the given state
+	 *
+     */
+	template <typename Client>
+  const std::set<typename NWA<Client>::St> NWA<Client>::getSuccessors( St state ) const
+    {
+      assert(state < wali::WALI_BAD_KEY);
+
+	  std::set<St> succs;
+       
+      std::set<Call> calls = trans.getTransCall(state);
+      for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
+        succs.insert(Trans::getEntry(*cit));
+
+      std::set<Internal> internals = trans.getTransFrom(state);
+      for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
+        succs.insert(Trans::getTarget(*iit));
+
+      std::set<Return> returns = trans.getTransExit(state);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+        succs.insert(Trans::getReturnSite(*rit));
+
+	  return succs;
+    }
+
+    /**
+     * 
+     * @brief obtains all the states that are successors of the given state with
+     *        respect to the given symbol
+     *
+     * @param - symbol: the symbol that should label a transition from the given 
+     *                  state to each successor
+     * @param - state: the state whose successors to look up
+     * @param - succs: the set of all states that are successors of the given state
+     *                  with respect to the given symbol
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::getSuccessors( St state, Sym symbol, std::set<St> & succs ) const
+    {
+      assert(state < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      std::set<Call> calls = trans.getTransCall(state);
+      for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
+        if( symbol == Trans::getCallSym(*cit) )
+          succs.insert(Trans::getEntry(*cit));
+
+      std::set<Internal> internals = trans.getTransFrom(state);
+      for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
+        if( symbol == Trans::getInternalSym(*iit) )
+          succs.insert(Trans::getTarget(*iit));
+
+      std::set<Return> returns = trans.getTransExit(state);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+        if( symbol == Trans::getReturnSym(*rit) )
+          succs.insert(Trans::getReturnSite(*rit));
+    }
+	/**
+     * 
+	 * @brief obtains all the states that are successors of the given state with
+	 *		respect to the given symbol
+	 *
+	 * @param - symbol: the symbol that should label a transition from the given
+	 *					state to each successor
+	 * @param - state: the state whose successors to look up
+	 * @return the set of all states that are successors of the given state
+	 *			with respect to the given symbol
+	 *
+     */
+	template <typename Client>
+  const std::set<typename NWA<Client>::St> NWA<Client>::getSuccessors( St state, Sym symbol ) const
+    {
+      assert(state < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+	  std::set<St> succs;
+
+      std::set<Call> calls = trans.getTransCall(state);
+      for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
+        if( symbol == Trans::getCallSym(*cit) )
+          succs.insert(Trans::getEntry(*cit));
+
+      std::set<Internal> internals = trans.getTransFrom(state);
+      for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
+        if( symbol == Trans::getInternalSym(*iit) )
+          succs.insert(Trans::getTarget(*iit));
+
+      std::set<Return> returns = trans.getTransExit(state);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+        if( symbol == Trans::getReturnSym(*rit) )
+          succs.insert(Trans::getReturnSite(*rit));
+
+	  return succs;
+    }
+
+	/**
+     * 
+	 * @brief obtains all the symbols that label return transitions whose 
+	 *		call-predecessor is 'call' and whose return site is 'ret'
+	 *
+	 * @param - call: the call-predecessor of the desired return transitions
+	 * @param - ret: the return site of the desired return transitions
+	 * @return the set of symbols that label return transitions whose
+	 *			call-predecessor is 'call' and whose return site is 'ret'
+	 *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getCallRetSymbols( St call, St ret ) const
+    {
+      assert(call < wali::WALI_BAD_KEY);
+      assert(ret < wali::WALI_BAD_KEY);
+
+      std::set<Sym> syms;
+
+      std::set<Return> returns = trans.getTransRet(ret);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      {
+        if( Trans::getCallSite(*rit) == call )
+          syms.insert(Trans::getReturnSym(*rit));
+      }
+
+      return syms;
+    }
+
+	/**
+     * 
+	 * @brief obtains all the symbols that label return transitions whose
+	 *		call-predecessor is 'call'
+	 *
+	 * @param - call: the call-predecessor of the desired return transitions
+	 * @return the set of symbols that label return transitions whose
+	 *			call-predecessor is 'call'
+	 *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getCallRetSymbolsFrom( St call ) const
+    {
+      assert(call < wali::WALI_BAD_KEY);
+
+      std::set<Sym> syms;
+
+      std::set<Return> returns = trans.getTransPred(call);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      {
+          syms.insert(Trans::getReturnSym(*rit));
+      }
+
+      return syms;
+    }
+
+	/**
+     * 
+	 * @brief obtains all the symbols that label return transitions whose
+	 *		return site is 'ret'
+	 *
+	 * @param - ret: the return site of the desired return transitions
+	 * @return the set of symbols that label return transitions whose
+	 *			return site is 'ret'
+	 *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getCallRetSymbolsTo( St ret ) const
+    {
+      assert(ret < wali::WALI_BAD_KEY);
+
+      std::set<Sym> syms;
+
+      std::set<Return> returns = trans.getTransRet(ret);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      {
+          syms.insert(Trans::getReturnSym(*rit));
+      }
+
+      return syms;
+    }
+
+    /**
+     *  
+     * @brief obtains all the states that are call-predecessors of the given state
+     *
+     * @param - state: the state whose call-predecessors to look up
+     * @param - preds: the set of all states that are call-predecessors of the given state
+     *
+     */ 
+    template <typename Client>
+    void NWA<Client>::getCallPredecessors( St state, std::set<St> & c_preds ) const
+    {
+      assert(state < wali::WALI_BAD_KEY);
       
+      std::set<Return> returns = trans.getTransRet(state);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+        c_preds.insert(Trans::getCallSite(*rit));
+    }
+	/**
+     * 
+	 * @brief obtains all the states that are call-predecessors of the given state
+	 *
+	 * @param - state: the state whose call-predecessors to look up
+	 * @return the set of all states that are call-predecessors of the given state
+	 *
+     */
+	template <typename Client>
+  const std::set<typename NWA<Client>::St> NWA<Client>::getCallPredecessors( St state ) const
+    {
+      assert(state < wali::WALI_BAD_KEY);
+      
+	  std::set<St> c_preds;
+
+      std::set<Return> returns = trans.getTransRet(state);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+        c_preds.insert(Trans::getCallSite(*rit));
+
+	  return c_preds;
+    }
+      
+    /**
+     * 
+     * @brief obtains all the states that are call-predecessors of the given state with 
+     *        respect to the given symbol
+     *
+     * @param - symbol: the symbol that should label a transition with each call-predecessor 
+     *                  and the given state
+     * @param - state: the state whose call-predecessors to look up
+     * @param - preds: the set of all states that are call-predecessors of the given state
+     *                  with respect to the given symbol
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::getCallPredecessors( Sym symbol, St state, std::set<St> & c_preds ) const
+    {
+      assert(state < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      std::set<Return> returns = trans.getTransRet(state);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+        if( symbol == Trans::getReturnSym(*rit) )
+          c_preds.insert(Trans::getCallSite(*rit));
+    }
+	/**
+     * 
+	 * @brief obtains all the states that are call-predecessors of the given state with
+	 *		respect to the given symbol
+	 *
+	 * @param - symbol: the symbol that should label a transition with each call-predecessor
+	 *					and the given state
+	 * @param - state: the state whose call-predecessors to look up
+	 * @return the set of all states that are call-predecessors of the given state
+	 *			with respect to the given symbol
+	 *
+     */
+	template <typename Client>
+  const std::set<typename NWA<Client>::St> NWA<Client>::getCallPredecessors( Sym symbol, St state ) const
+    {
+      assert(state < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+	  std::set<St> c_preds;
+
+      std::set<Return> returns = trans.getTransRet(state);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+        if( symbol == Trans::getReturnSym(*rit) )
+          c_preds.insert(Trans::getCallSite(*rit));
+
+	  return c_preds;
+    }
+
+    /**
+     * 
+     * @brief obtains all the states that are call-successors of the given state
+     *
+     * @param - state: the state whose call-successors to lookup
+     * @param - succs: the set of all states that are call-successors of the given state
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::getCallSuccessors( St state, std::set<St> & c_succs ) const
+    {
+      assert(state < wali::WALI_BAD_KEY);
+      
+      std::set<Return> returns = trans.getTransPred(state);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+        c_succs.insert(Trans::getReturnSite(*rit));
+    }
+	/**
+     * 
+	 * @brief obtains all the states that are call-successors of the given state
+	 *
+	 * @param - state: the state whose call-successors to look up
+	 * @return the set of all states that are call-successors of the given state
+	 *
+     */
+	template <typename Client>
+  const std::set<typename NWA<Client>::St> NWA<Client>::getCallSuccessors( St state ) const
+    {
+      assert(state < wali::WALI_BAD_KEY);
+
+	  std::set<St> c_succs;
+      
+      std::set<Return> returns = trans.getTransPred(state);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+        c_succs.insert(Trans::getReturnSite(*rit));
+
+	  return c_succs;
+    }
+
+    /**
+     * 
+     * @brief obtains all the states that are call-successors of the given state with
+     *        respect to the given symbol
+     *
+     * @param - symbol: the symbol that should label a return transition with each call-
+     *                  successor and the given state
+     * @param - state: the state whose call-successors to look up
+     * @param - succs: the set of all states that are call-successors of the given state
+     *                  with respect to the given symbol
+     *
+     */
+    template <typename Client>
+    void NWA<Client>::getCallSuccessors( St state, Sym symbol, std::set<St> & c_succs ) const
+    {
+      assert(state < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+      
+      std::set<Return> returns = trans.getTransPred(state);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+        if( symbol == Trans::getReturnSym(*rit) )
+          c_succs.insert(Trans::getReturnSite(*rit));
+    }
+	/**
+     * 
+	 * @brief obtains all the states that are call-successors of the given state with 
+	 *		respect to the given symbol
+	 *
+	 * @param - symbol: the symbol that should label a return transition with each call-
+	 *					successor and the given state
+	 * @param - state: the state whose call-successors to look up
+	 * @return the set of all states that are call-successors of the given state with
+	 *			respect to the given symbol
+	 *
+     */
+	template <typename Client>
+  const std::set<typename NWA<Client>::St> NWA<Client>::getCallSuccessors( St state, Sym symbol ) const
+    {
+      assert(state < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+	  std::set<St> c_succs;
+      
+      std::set<Return> returns = trans.getTransPred(state);
+      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+        if( symbol == Trans::getReturnSym(*rit) )
+          c_succs.insert(Trans::getReturnSite(*rit));
+
+	  return c_succs;
+    }
+
     /**
      *  
      * @brief duplicates the original state, but only duplicates outgoing transitions
@@ -2977,19 +4905,26 @@ namespace wali
             continue;
           }
 
-          if( !trans.callExists(state, symbol) )
+		  //Skip over wilds.
+		  if( symbol == SymbolSet::getWild() )
+		  {
+			  continue;
+		  }
+
+		  if( !trans.callExists(state, symbol) && !trans.callExists(state, SymbolSet::getWild()) )
           {
             addCallTrans(state, symbol, getStuckState());
           }
 
-          if( !trans.internalExists(state, symbol) )
+		  if( !trans.internalExists(state, symbol) && !trans.internalExists(state, SymbolSet::getWild()) )
           {
             addInternalTrans(state, symbol, getStuckState());
           }
 
           for( stateIterator pred = beginStates(); pred != endStates(); ++pred )
           {
-            if( returns.find(Triple<St,Sym,St>(state, *pred, symbol)) == returns.end() )
+            if( returns.find(Triple<St,Sym,St>(state, *pred, symbol)) == returns.end() 
+				&& returns.find(Triple<St,Sym,St>(state, *pred, SymbolSet::getWild())) == returns.end() )
             {
               addReturnTrans(state, *pred, symbol, getStuckState());
             }
@@ -3045,6 +4980,245 @@ namespace wali
 
     //Call Transitions
 
+    /** 
+     * 
+     * @brief returns the call site states associated with the given symbol
+     *
+     * @param - symbol: the symbol whose call site states to obtain
+     * @return the set of call site states associated with the given symbol
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getCallSites_Sym( Sym symbol ) const
+    {
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      const Calls call = trans.getCalls();
+      std::set<St> calls;
+      for( callIterator it = call.begin(); it != call.end(); it++ )
+      {
+        if( symbol == Trans::getCallSym(*it) )
+          calls.insert( Trans::getCallSite(*it) );
+      }
+      return calls;
+    }
+
+    /**
+     * 
+     * @brief returns the call site states associated with the given symbol
+     *        and entry point
+     *
+     * @param - symbol: the symbol whose call site states to obtain
+     * @param - entryPoint: the entry point state whose call site states to
+     *                    obtain
+     * @return the set of call site states associated with the given symbol
+     *          and entry point
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getCallSites( Sym symbol, St entryPoint ) const
+    {
+      assert(entryPoint < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      const Calls call = trans.getTransEntry(entryPoint);
+      std::set<St> calls;
+      for( callIterator it = call.begin(); it != call.end(); it++ )
+      {
+        if( symbol == Trans::getCallSym(*it) )
+          calls.insert( Trans::getCallSite(*it) );
+      }
+      return calls;
+    }
+      
+    /**
+     * 
+     * @brief returns the call site/symbol pairs associated with the given 
+     *        entry point
+     *
+     * @param - entryPoint: the entry point state whose call site/symbol 
+     *                      pairs to obtain
+     * @return the set of call site/symbol pairs associated with the given 
+     *          entry point
+     *
+     */
+    template <typename Client>
+    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym>> NWA<Client>::getCallSites( St entryPoint ) const
+    {
+      assert(entryPoint < wali::WALI_BAD_KEY);
+
+      const Calls call = trans.getTransEntry(entryPoint);
+      std::set<std::pair<Sym,St> > calls;
+      for( callIterator it = call.begin(); it != call.end(); it++ )
+      {
+        calls.insert( std::pair<Sym,St>(Trans::getCallSym(*it),Trans::getCallSite(*it)) );
+      }
+      return calls;
+    }
+
+	/**
+     * 
+	 * @brief returns the call sites of all call transitions in the NWA
+	 *
+	 * @return the set of call sites of all call transitions in the NWA
+	 *
+     */
+	template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getCallSites( ) const
+    {
+      const Calls call = trans.getCalls();
+      std::set<St> calls;
+      for( callIterator it = call.begin(); it != call.end(); it++ )
+      {
+        calls.insert( Trans::getCallSite(*it) );
+      }
+      return calls;
+    }
+
+    /**
+     * 
+     * @brief returns the symbols that label call transitions in the NWA
+     *
+     * @return the set of symbols that label call transitions in the NWA
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getCallSym(  ) const
+    {
+      const Calls calls = trans.getCalls();
+      std::set<Sym> syms;
+      for( callIterator it = calls.begin(); it != calls.end(); it++ )
+      {
+        syms.insert( Trans::getCallSym(*it) );
+      }
+      return syms;
+    }
+
+    /**
+     * 
+     * @brief returns the symbols that label the call transitions from 
+     *        'callSite' to 'entryPoint' in the NWA
+     *
+     * @param - callSite: the call site of the desired transitions
+     * @param - entryPoint: the entry point of the desired transitions
+     * @return the set of symbols that label the call transitions from
+     *          'callSite' to 'entryPoint' in the NWA
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getCallSym( St callSite, St entryPoint ) const
+    {
+      assert(callSite < wali::WALI_BAD_KEY);
+      assert(entryPoint < wali::WALI_BAD_KEY);
+
+      const Calls calls = trans.getTransCall(callSite);
+      std::set<Sym> syms;
+      for( callIterator it = calls.begin(); it != calls.end(); it++ )
+      {
+        if( entryPoint == Trans::getEntry(*it) )
+          syms.insert( Trans::getCallSym(*it) );
+      }
+      return syms;
+    }
+
+    /**
+     * 
+     * @brief returns the symbols that label the call transitions from 
+     *        'callSite' in the NWA
+     *
+     * @param - callSite: the call site of the desired transitions
+     * @return the set of symbols that label the call transitions from
+     *          'callSite' in the NWA
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getCallSym_Call( St callSite ) const
+    {
+      assert(callSite < wali::WALI_BAD_KEY);
+
+      const Calls calls = trans.getTransCall(callSite);
+      std::set<Sym> syms;
+      for( callIterator it = calls.begin(); it != calls.end(); it++ )
+      {
+          syms.insert( Trans::getCallSym(*it) );
+      }
+      return syms;
+    }
+
+    /**
+     * 
+     * @brief returns the symbols that label the call transitions to
+     *        'entryPoint' in the NWA
+     *
+     * @param - entryPoint: the entry point of the desired transitions
+     * @return the set of symbols that label the call transitions to
+     *          'entryPoint' in the NWA
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getCallSym_Entry( St entryPoint ) const
+    {
+      assert(entryPoint < wali::WALI_BAD_KEY);
+
+      const Calls calls = trans.getTransEntry(entryPoint);
+      std::set<Sym> syms;
+      for( callIterator it = calls.begin(); it != calls.end(); it++ )
+      {
+          syms.insert( Trans::getCallSym(*it) );
+      }
+      return syms;
+    }
+
+    /**
+     * 
+     * @brief returns the entry point states associated with the given symbol
+     *
+     * @param - symbol: the symbol whose entry point states to obtain
+     * @return the set of entry point states associated with the given symbol
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getEntries_Sym( Sym symbol ) const
+    {
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      const Calls ent = trans.getCalls();
+      std::set<St> entries;
+      for( callIterator it = ent.begin(); it != ent.end(); it++ )
+      {
+        if( symbol == Trans::getCallSym(*it) )
+          entries.insert( Trans::getEntry(*it) );
+      }
+      return entries;
+    }
+      
+    /**
+     * 
+     * @brief returns the entry point states associated with the given call
+     *        site and symbol
+     *
+     * @param - callSite: the call site whose entry point states to obtain
+     * @param - symbol: the symbol whose entry point states to obtain
+     * @return the set of entry point states associated with the given call
+     *          site and symbol
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getEntries( St callSite, Sym symbol ) const
+    {
+      assert(callSite < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      const Calls ent = trans.getTransCall(callSite);
+      std::set<St> entries;
+      for( callIterator it = ent.begin(); it != ent.end(); it++ )
+      {
+        if( symbol == Trans::getCallSym(*it) )
+          entries.insert( Trans::getEntry(*it) );
+      }
+      return entries;
+    }
+
     /**
      * 
      * @brief returns the symbol/entry point pairs associated with the given call site
@@ -3062,6 +5236,25 @@ namespace wali
       for( callIterator it = ent.begin(); it != ent.end(); it++ )
       {
         entries.insert( std::pair<Sym,St>(Trans::getCallSym(*it),Trans::getEntry(*it)) );
+      }
+      return entries;
+    }
+
+	/**
+     * 
+	 * @brief returns the entry points of all call transitions in the NWA
+	 *
+	 * @return the set of entry points of all call transitions in the NWA
+	 *
+     */
+	template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getEntries( ) const
+    {
+      const Calls call = trans.getCalls();
+      std::set<St> entries;
+      for( callIterator it = call.begin(); it != call.end(); it++ )
+      {
+        entries.insert( Trans::getEntry(*it) );
       }
       return entries;
     }
@@ -3204,6 +5397,238 @@ namespace wali
     //Internal Transitions
 
     /**
+     *
+     * @brief returns the source states associated with the given symbol
+     *
+     * @param - symbol: the symbol whose source states to obtain
+     * @return the set of source states associated with the given symbol
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getSources_Sym( Sym symbol ) const
+    {
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      const Internals src = trans.getInternals();
+      std::set<St> sources;
+      for( internalIterator it = src.begin(); it != src.end(); it++ )
+      {
+        if( symbol == Trans::getInternalSym(*it) )
+          sources.insert( Trans::getSource(*it) );
+      }
+      return sources;
+    }
+
+    /**
+     * 
+     * @brief returns the source states associated with the given symbol 
+     *        and target state
+     *
+     * @param - symbol: the symbol whose source states to obtain
+     * @param - target: the target state whose source states to obtain
+     * @return the set of source states assoicated with the given
+     *          symbol and target state
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getSources( Sym symbol, St target ) const
+    {
+      assert(target < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      const Internals src = trans.getTransTo(target);
+      std::set<St> sources;
+      for( internalIterator it = src.begin(); it != src.end(); it++ )
+      {
+        if( symbol == Trans::getInternalSym(*it) )
+          sources.insert( Trans::getSource(*it) );
+      }
+      return sources;
+    }
+
+    /**
+     * 
+     * @brief returns the source/symbol pairs associated with the 
+     *        given target state
+     *
+     * @param - target: the target state whose source/symbol pairs to 
+     *                  obtain
+     * @return the set of source/symbol pairs associated with the given
+     *          target state
+     *
+     */
+    template <typename Client>
+    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym>> NWA<Client>::getSources( St target ) const
+    {
+      assert(target < wali::WALI_BAD_KEY);
+
+      const Internals src = trans.getTransTo(target);
+      std::set<std::pair<Sym,St> > sources;
+      for( internalIterator it = src.begin(); it != src.end(); it++ )
+      {
+        sources.insert( std::pair<Sym,St>(Trans::getInternalSym(*it),Trans::getSource(*it)) );
+      }
+      return sources;
+    }
+
+	/**
+     * 
+	 * @brief returns the sources of all internal transitions in the NWA
+	 *
+	 * @return the set of sources of all internal transitions in the NWA
+	 *
+     */
+	template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getSources(  ) const
+    {
+      const Internals src = trans.getInternals();
+      std::set<St> sources;
+      for( internalIterator it = src.begin(); it != src.end(); it++ )
+      {
+        sources.insert( Trans::getSource(*it) );
+      }
+      return sources;
+    }
+
+    /**
+     * 
+     * @brief returns the symbols that label internal transitions in the NWA
+     *
+     * @return the set of symbols that label internal transitions in the NWA
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getInternalSym(  ) const
+    {
+      const Internals ints = trans.getInternals();
+      std::set<Sym> syms;
+      for( internalIterator it = ints.begin(); it != ints.end(); it++ )
+      {
+        syms.insert( Trans::getInternalSym(*it) );
+      }
+      return syms;
+    }
+
+    /**
+     * 
+     * @brief returns the symbols that label internal transitions from 'source'
+     *        to 'target' in the NWA
+     *
+     * @param - source: the source of the desired transitions
+     * @param - target: the target of the desired transitions
+     * @return the set of symbols that label internal transitions from 'source'
+     *          to 'target' in the NWA
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getInternalSym( St source, St target ) const
+    {
+      const Internals ints = trans.getTransFrom(source);
+      std::set<Sym> syms;
+      for( internalIterator it = ints.begin(); it != ints.end(); it++ )
+      {
+        if( target == Trans::getTarget(*it) )
+          syms.insert( Trans::getInternalSym(*it) );
+      }
+      return syms;
+    }
+
+    /**
+     * 
+     * @brief returns the symbols that label internal transitions from 'source'
+     *        in the NWA
+     *
+     * @param - source: the source of the desired transitions
+     * @return the set of symbols that label internal transitions from 'source'
+     *          in the NWA
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getInternalSym_Source( St source ) const
+    {
+      const Internals ints = trans.getTransFrom(source);
+      std::set<Sym> syms;
+      for( internalIterator it = ints.begin(); it != ints.end(); it++ )
+      {
+        syms.insert( Trans::getInternalSym(*it) );
+      }
+      return syms;
+    }
+
+    /**
+     * 
+     * @brief returns the symbols that label internal transitions 
+     *        to 'target' in the NWA
+     *
+     * @param - target: the target of the desired transitions
+     * @return the set of symbols that label internal transitions 
+     *          to 'target' in the NWA
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getInternalSym_Target( St target ) const
+    {
+      const Internals ints = trans.getTransTo(target);
+      std::set<Sym> syms;
+      for( internalIterator it = ints.begin(); it != ints.end(); it++ )
+      {
+        syms.insert( Trans::getInternalSym(*it) );
+      }
+      return syms;
+    }
+
+    /**
+     * 
+     * @brief returns the target states associated with the given symbol
+     *
+     * @param - symbol: the symbol whose target states to obtain
+     * @return the set of target states associated with the given symbol
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getTargets_Sym( Sym symbol ) const
+    {
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      const Internals tgt = trans.getInternals();
+      std::set<St> targets;
+      for( internalIterator it = tgt.begin(); it != tgt.end(); it++ )
+      {
+        if( symbol == Trans::getInternalSym(*it) )
+          targets.insert( Trans::getTarget(*it) );
+      }
+      return targets;
+    }
+
+    /**
+     * 
+     * @brief returns the target states associated with the given source
+     *        state and symbol
+     *
+     *
+     * @param - source: the source state whose target states to obtain
+     * @param - symbol: the symbol whose target states to obtain
+     * @return the set of target states associated with the given source
+     *          state and symbol
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getTargets( St source, Sym symbol ) const
+    {
+      assert(source < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      const Internals tgt = trans.getTransFrom(source);
+      std::set<St> targets;
+      for( internalIterator it = tgt.begin(); it != tgt.end(); it++ )
+      {
+        if( symbol == Trans::getInternalSym(*it) )
+          targets.insert( Trans::getTarget(*it) );
+      }
+      return targets;
+    }
+
+    /**
      * 
      * @brief returns the symbol/target pairs associated with the given source
      *
@@ -3220,6 +5645,25 @@ namespace wali
       for( internalIterator it = tgt.begin(); it != tgt.end(); it++ )
       {
         targets.insert( std::pair<Sym,St>(Trans::getInternalSym(*it),Trans::getTarget(*it)) );
+      }
+      return targets;
+    }
+
+	/**
+     * 
+	 * @brief returns the targets of all internal transitions in the NWA
+	 *
+	 * @return the set of targets of all internal transitions in the NWA
+	 *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getTargets(  ) const
+    {
+      const Internals tgt = trans.getInternals();
+      std::set<St> targets;
+      for( internalIterator it = tgt.begin(); it != tgt.end(); it++ )
+      {
+        targets.insert( Trans::getTarget(*it) );
       }
       return targets;
     }
@@ -3358,18 +5802,684 @@ namespace wali
 
     /**
      * 
-     * @brief returns the return sites associated with the given call site
+     * @brief returns the exit states associated with the given symbol
      *
-     * @param - callSite: the call site whose return sites to obtain
-     * @return the set of return sites associated with the given call site
+     * @param - symbol: the symbol whose exit states to obtain
+     * @return the set of exit states associated with the given symbol
      *
      */
     template <typename Client>
-    inline
-    const std::set<typename NWA<Client>::St> NWA<Client>::getReturnSites( St callSite ) const
+    const std::set<typename NWA<Client>::St> NWA<Client>::getExits_Sym( Sym symbol ) const
+    {
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      const Returns exit = trans.getReturns();
+      std::set<St> exits;
+      for( returnIterator it = exit.begin(); it != exit.end(); it++ )
+      {
+        if( symbol == Trans::getReturnSym(*it) )
+        {
+          exits.insert( Trans::getExit(*it) );
+        }
+      }
+      return exits;
+    }
+
+    /**
+     * 
+     * @brief returns the exit states associated with the given call site,
+     *        symbol, and return site
+     *
+     * @param - callSite: the call site state whose exit states to obtain
+     * @param - symbol: the symbol whose exit states to obtain
+     * @param - returnSite: the return site state whose exit states to obtain
+     * @return the set of exit states associated with the given call site,
+     *          symbol, and return site
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getExits( St callSite, Sym symbol, St returnSite ) const
     {
       assert(callSite < wali::WALI_BAD_KEY);
-      return trans.getReturnSites(callSite);
+      assert(returnSite < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      const Returns exit = trans.getTransPred(callSite);
+      std::set<St> exits;
+      for( returnIterator it = exit.begin(); it != exit.end(); it++ )
+      {
+        if( (Trans::getReturnSite(*it) == returnSite) && (symbol == Trans::getReturnSym(*it)) )
+        {
+          exits.insert( Trans::getExit(*it) );
+        }
+      }
+      return exits;
+    }
+
+    /**
+     * 
+     * @brief returns the exit point/symbol pairs associated with the given 
+     *        call site and return site
+     *
+     * @param - callSite: the call site state whose exit point/symbol pairs to obtain
+     * @param - returnSite: the return site state whose exit point/symbol pairs to obtain
+     * @return the set of exit point/symbol pairs associated with the given call site 
+     *          and return site
+     *
+     */
+    template <typename Client>
+    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym>> NWA<Client>::getExits( St callSite, St returnSite ) const
+    {
+      assert(callSite < wali::WALI_BAD_KEY);
+      assert(returnSite < wali::WALI_BAD_KEY);
+
+      const Returns exit = trans.getTransPred(callSite);
+      std::set<std::pair<St,Sym> > exits;
+      for( returnIterator it = exit.begin(); it != exit.end(); it++ )
+      {
+        if( Trans::getReturnSite(*it) == returnSite )
+        {
+          exits.insert( std::pair<St,Sym>(Trans::getExit(*it),Trans::getReturnSym(*it)) );
+        }
+      }
+      return exits;
+    }
+
+	/**
+     * 
+	 * @brief returns the exit points of all return transitions in the NWA
+	 *
+	 * @return the set of exit points of all return transitions in the NWA
+	 *
+     */
+	template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getExits( ) const
+    {
+      const Returns exit = trans.getReturns();
+      std::set<St> exits;
+      for( returnIterator it = exit.begin(); it != exit.end(); it++ )
+      {
+          exits.insert( Trans::getExit(*it) );
+      }
+      return exits;
+    }
+
+    /**
+     * 
+     * @brief returns the exit states associated with the given call site 
+     *        and symbol
+     * 
+     * @param - callSite: the call site state whose exit states to obtain
+     * @param - symbol: the symbol whose exit states to obtain
+     * @return the set of exit states associated with the given call state
+     *          and symbol
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getExits_Call( St callSite, Sym symbol ) const
+    {
+      assert(callSite < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      const Returns exit = trans.getTransPred(callSite);
+      std::set<St> exits;
+      for( returnIterator it = exit.begin(); it != exit.end(); it++ )
+      {
+        if( symbol == Trans::getReturnSym(*it) )
+          exits.insert( Trans::getExit(*it) );
+      }
+      return exits;
+    }
+
+    /**
+     * 
+     * @brief returns the exit point/symbol pairs associated with the
+     *        given call site
+     *
+     * @param - callSite: the call site state whose exit point/symbol pairs
+     *                    to obtain
+     * @return the set of exit point/symbol pairs associated with the given
+     *          call site
+     *
+     */
+    template <typename Client>
+    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym>> NWA<Client>::getExits_Call( St callSite ) const
+    {
+      assert(callSite < wali::WALI_BAD_KEY);
+
+      const Returns exit = trans.getTransPred(callSite);
+      std::set<std::pair<St,Sym> > exits;
+      for( returnIterator it = exit.begin(); it != exit.end(); it++ )
+      {
+        exits.insert( std::pair<St,Sym>(Trans::getExit(*it),Trans::getReturnSym(*it)) );
+      }
+      return exits;
+    }
+
+    /**
+     * 
+     * @brief returns the exit states associated with the given symbol and
+     *        return site
+     *
+     * @param - symbol: the symbol whose exit states to obtain
+     * @param - returnSite: the return site state whose exit states to obtain
+     * @return the set of exit states associated with the given symbol and
+     *          return site
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getExits_Ret( Sym symbol, St returnSite ) const
+    {
+      assert(returnSite < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      const Returns exit = trans.getTransRet(returnSite);
+      std::set<St> exits;
+      for( returnIterator it = exit.begin(); it != exit.end(); it++ )
+      {
+        if( symbol == Trans::getReturnSym(*it) )
+          exits.insert( Trans::getExit(*it) );
+      }
+      return exits;
+    }
+
+    /**
+     * 
+     * @brief returns the exit point/symbol pairs associated with the
+     *        given return site
+     *
+     * @param - returnSite: the return site state whose exit point/symbol
+     *                      pairs to obtain
+     * @return the set of exit point/symbol pairs associated with the given
+     *          return site
+     *
+     */
+    template <typename Client>
+    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym>> NWA<Client>::getExits_Ret( St returnSite ) const
+    {
+      assert(returnSite < wali::WALI_BAD_KEY);
+
+      const Returns exit = trans.getTransRet(returnSite);
+      std::set<std::pair<St,Sym> > exits;
+      for( returnIterator it = exit.begin(); it != exit.end(); it++ )
+      {
+        exits.insert( std::pair<St,Sym>(Trans::getExit(*it),Trans::getReturnSym(*it)) );
+      }
+      return exits;
+    }
+
+    /**
+     * 
+     * @brief returns the call site states associated with the given symbol
+     *
+     * @param - symbol: the symbol whose call site states to obtain
+     * @return the set of call site states associated with the given symbol
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getCalls_Sym( Sym symbol ) const
+    {
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      const Returns call = trans.getReturns();
+      std::set<St> calls;
+      for( returnIterator it = call.begin(); it != call.end(); it++ )
+      {
+        if( symbol == Trans::getReturnSym(*it) )
+        {
+          calls.insert( Trans::getCallSite(*it) );
+        }
+      }
+      return calls;
+    }
+
+    /**
+     * 
+     * @brief returns the call site states associated with the given exit 
+     *        point, symbol, and return site
+     *
+     * @param - exitPoint: the exit point whose call site states to obtain
+     * @param - symbol: the symbol whose call site states to obtain
+     * @param - returnSite: the return site whose call site states to obtain
+     * @return the set of call site states assocaited with the given exit
+     *          point, symbol, and return site
+     * 
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getCalls( St exitPoint, Sym symbol, St returnSite ) const
+    {
+      assert(exitPoint < wali::WALI_BAD_KEY);
+      assert(returnSite < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      const Returns call = trans.getTransExit(exitPoint);
+      std::set<St> calls;
+      for( returnIterator it = call.begin(); it != call.end(); it++ )
+      {
+        if( (Trans::getReturnSite(*it) == returnSite) &&  (symbol == Trans::getReturnSym(*it)) )
+        {
+          calls.insert( Trans::getCallSite(*it) );
+        }
+      }
+      return calls;
+    }
+
+    /**
+     * 
+     * @brief returns the call site/symbol pairs associated with the given exit 
+     *        point and return site states
+     *
+     * @param - exitPoint: the exit point whose call site/symbol pairs to obtain
+     * @param - returnSite: the return site whose call site/symbol pairs to obtain
+     * @return the set of call site/symbol pairs associated with the given exit 
+     *          point and return site states
+     *
+     */
+    template <typename Client>
+    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym>> NWA<Client>::getCalls( St exitPoint, St returnSite ) const
+    {
+      assert(exitPoint < wali::WALI_BAD_KEY);
+      assert(returnSite < wali::WALI_BAD_KEY);
+
+      const Returns call = trans.getTransExit(exitPoint);
+      std::set<std::pair<St,Sym> > calls;
+      for( returnIterator it = call.begin(); it != call.end(); it++ )
+      {
+        if( Trans::getReturnSite(*it) == returnSite )
+        {
+          calls.insert( std::pair<St,Sym>(Trans::getCallSite(*it),Trans::getReturnSym(*it)) );
+        }
+      }
+      return calls;
+    }
+
+	/**
+     * 
+	 * @brief returns the call sites of all return transitions in the NWA
+	 *
+	 * @return the set of call sites of all return transitions in the NWA
+	 *
+     */
+	template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getCalls( ) const
+    {
+      const Returns call = trans.getReturns();
+      std::set<St> calls;
+      for( returnIterator it = call.begin(); it != call.end(); it++ )
+      {
+          calls.insert( Trans::getCallSite(*it) );
+      }
+      return calls;
+    }
+
+    /**
+     * 
+     * @brief returns the call site states associated with the given exit point 
+     *        and symbol
+     * 
+     * @param - exitPoint: the exit point whose call site states to obtain
+     * @param - symbol: the symbol whose call site states to obtain
+     * @return the set of all call sites associated with the given exit point
+     *          and symbol
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getCalls_Exit( St exitPoint, Sym symbol ) const
+    {
+      assert(exitPoint < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      const Returns call = trans.getTransExit(exitPoint);
+      std::set<St> calls;
+      for( returnIterator it = call.begin(); it != call.end(); it++ )
+      {
+        if( symbol == Trans::getReturnSym(*it) )
+          calls.insert( Trans::getCallSite(*it) );
+      }
+      return calls;
+    }
+
+    /**
+     * 
+     * @brief returns the call site/symbol pairs associated with the given
+     *        exit point
+     *
+     * @param - exitPoint: the exit point whose call site/symbol pairs to obtain
+     * @return the set of call site/symbol pairs associated with the given
+     *         exit point
+     *
+     */
+    template <typename Client>
+    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym>> NWA<Client>::getCalls_Exit( St exitPoint ) const
+    {
+      assert(exitPoint < wali::WALI_BAD_KEY);
+
+      const Returns call = trans.getTransExit(exitPoint);
+      std::set<std::pair<St,Sym> > calls;
+      for( returnIterator it = call.begin(); it != call.end(); it++ )
+      {
+        calls.insert( std::pair<St,Sym>(Trans::getCallSite(*it),Trans::getReturnSym(*it)) );
+      }
+      return calls;
+    }
+
+    /**
+     * 
+     * @brief returns the call site states associated with the given symbol
+     *        and return site
+     *
+     * @param - symbol: the symbol whose call site states to obtain
+     * @param - returnSite: the return site whose call site states to obtain
+     * @return the set of call site states associated with the given symbol
+     *          and return site
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getCalls_Ret( Sym symbol, St returnSite ) const
+    {
+      assert(returnSite < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      const Returns call = trans.getTransRet(returnSite);
+      std::set<St> calls;
+      for( returnIterator it = call.begin(); it != call.end(); it++ )
+      {
+        if( symbol == Trans::getReturnSym(*it) )
+          calls.insert( Trans::getCallSite(*it) );
+      }
+      return calls;
+    }
+
+    /**
+     * 
+     * @brief returns the call site/symbol pairs associated with the given
+     *        return site
+     *
+     * @param - returnSite: the return site whose call site/symbol pairs to
+     *                      obtain
+     * @return the set of all call site/symbol pairs associated with the 
+     *          given return site
+     *
+     */
+    template <typename Client>
+    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym>> NWA<Client>::getCalls_Ret( St returnSite ) const
+    {
+      assert(returnSite < wali::WALI_BAD_KEY);
+
+      const Returns call = trans.getTransRet(returnSite);
+      std::set<std::pair<St,Sym> > calls;
+      for( returnIterator it = call.begin(); it != call.end(); it++ )
+      {
+        calls.insert( std::pair<St,Sym>(Trans::getCallSite(*it),Trans::getReturnSym(*it)) );
+      }
+      return calls;
+    }
+
+    /**
+     * 
+     * @brief returns the symbols that label return transitions in the NWA
+     *
+     * @return the set of symbols that label return transitions in the NWA
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getReturnSym(  ) const
+    {
+      const Returns rets = trans.getReturns();
+      std::set<Sym> syms;
+      for( returnIterator it = rets.begin(); it != rets.end(); it++ )
+      {
+        syms.insert( Trans::getReturnSym(*it) );
+      }
+      return syms;
+    }
+
+    /**
+     * 
+     * @brief returns the symbols that label return transitions from 'exitPoint'
+     *        to 'returnSite' with call-predecessor 'callSite' in the NWA
+     *
+     * @param - exitPoint: the exit point of the desired transition
+     * @param - callSite: the call site of the desired transition
+     * @param - returnSite: the return site of the desired transition
+     * @return the set of symbols that label return transitions from 'exitPoint'
+     *          to 'returnSite' with call-predecessor 'callSite' in the NWA
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getReturnSym( St exitPoint, St callSite, St returnSite  ) const
+      {
+      assert(exitPoint < wali::WALI_BAD_KEY);
+      assert(callSite < wali::WALI_BAD_KEY);
+      assert(returnSite < wali::WALI_BAD_KEY);
+
+      const Returns ret = trans.getTransExit(exitPoint);
+      std::set<Sym> syms;
+      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      {
+        if( (Trans::getCallSite(*it) == callSite) && (returnSite == Trans::getReturnSite(*it)) )
+        {
+          syms.insert( Trans::getReturnSym(*it) );
+        }
+      }
+      return syms;
+    }
+
+    /**
+       * 
+       * @brief returns the symbols that label return transitions from 'exitPoint'
+       *        n the NWA
+       *
+       * @param - exitPoint: the exit point of the desired transition
+       * @return the set of symbols that label return transitions from 'exitPoint'
+       *          in the NWA
+       *
+       */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getReturnSym_Exit( St exitPoint ) const
+      {
+      assert(exitPoint < wali::WALI_BAD_KEY);
+
+      const Returns ret = trans.getTransExit(exitPoint);
+      std::set<Sym> syms;
+      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      {
+        syms.insert( Trans::getReturnSym(*it) );
+      }
+      return syms;
+    }
+
+    /**
+       * 
+       * @brief returns the symbols that label return transitions 
+       *        with call-predecessor 'callSite' in the NWA
+       *
+       * @param - callSite: the call site of the desired transition
+       * @return the set of symbols that label return transitions 
+       *          with call-predecessor 'callSite' in the NWA
+       *
+       */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getReturnSym_Call( St callSite ) const
+      {
+      assert(callSite < wali::WALI_BAD_KEY);
+
+      const Returns ret = trans.getTransPred(callSite);
+      std::set<Sym> syms;
+      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      {
+        syms.insert( Trans::getReturnSym(*it) );
+      }
+      return syms;
+    }
+
+    /**
+       * 
+       * @brief returns the symbols that label return transitions 
+       *        to 'returnSite' in the NWA
+       *
+       * @param - returnSite: the return site of the desired transition
+       * @return the set of symbols that label return transitions 
+       *          to 'returnSite' in the NWA
+       *
+       */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getReturnSym_Ret( St returnSite ) const
+      {
+      assert(returnSite < wali::WALI_BAD_KEY);
+
+      const Returns ret = trans.getTransRet(returnSite);
+      std::set<Sym> syms;
+      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      {
+        syms.insert( Trans::getReturnSym(*it) );
+      }
+      return syms;
+    }
+
+    /**
+       * 
+       * @brief returns the symbols that label return transitions from 'exitPoint'
+       *        with call-predecessor 'callSite' in the NWA
+       *
+       * @param - exitPoint: the exit point of the desired transition
+       * @param - callSite: the call site of the desired transition
+       * @return the set of symbols that label return transitions from 'exitPoint'
+       *          with call-predecessor 'callSite' in the NWA
+       *
+       */
+template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getReturnSym_ExitCall( St exitPoint, St callSite  ) const
+      {
+      assert(exitPoint < wali::WALI_BAD_KEY);
+      assert(callSite < wali::WALI_BAD_KEY);
+
+      const Returns ret = trans.getTransExit(exitPoint);
+      std::set<Sym> syms;
+      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      {
+        if( (Trans::getCallSite(*it) == callSite) )
+        {
+          syms.insert( Trans::getReturnSym(*it) );
+        }
+      }
+      return syms;
+    }
+
+    /**
+       * 
+       * @brief returns the symbols that label return transitions from 'exitPoint'
+       *        to 'returnSite' in the NWA
+       *
+       * @param - exitPoint: the exit point of the desired transition
+       * @param - returnSite: the return site of the desired transition
+       * @return the set of symbols that label return transitions from 'exitPoint'
+       *          to 'returnSite' in the NWA
+       *
+       */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getReturnSym_ExitRet( St exitPoint, St returnSite  ) const
+      {
+      assert(exitPoint < wali::WALI_BAD_KEY);
+      assert(returnSite < wali::WALI_BAD_KEY);
+
+      const Returns ret = trans.getTransExit(exitPoint);
+      std::set<Sym> syms;
+      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      {
+        if( (returnSite == Trans::getReturnSite(*it)) )
+        {
+          syms.insert( Trans::getReturnSym(*it) );
+        }
+      }
+      return syms;
+    }
+
+    /**
+       * 
+       * @brief returns the symbols that label return transitions 
+       *        to 'returnSite' with call-predecessor 'callSite' in the NWA
+       *
+       * @param - callSite: the call site of the desired transition
+       * @param - returnSite: the return site of the desired transition
+       * @return the set of symbols that label return transitions 
+       *          to 'returnSite' with call-predecessor 'callSite' in the NWA
+       *
+       */
+    template <typename Client>
+    const std::set<typename NWA<Client>::Sym> NWA<Client>::getReturnSym_CallRet( St callSite, St returnSite  ) const
+      {
+      assert(callSite < wali::WALI_BAD_KEY);
+      assert(returnSite < wali::WALI_BAD_KEY);
+
+      const Returns ret = trans.getTransPred(callSite);
+      std::set<Sym> syms;
+      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      {
+        if( (returnSite == Trans::getReturnSite(*it)) )
+        {
+          syms.insert( Trans::getReturnSym(*it) );
+        }
+      }
+      return syms;
+    }
+
+
+
+    /**
+     * 
+     * @brief returns the return site states associated with the given symbol
+     *
+     * @param - symbol: the symbol whose reutrn site states to obtain
+     * @return the set of return site states associated with the given symbol
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getReturns_Sym( Sym symbol ) const
+    {
+      assert(symbol < wali::WALI_BAD_KEY);
+      
+      const Returns ret = trans.getReturns();
+      std::set<St> returns;
+      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      {
+        if( symbol == Trans::getReturnSym(*it) )
+        {
+          returns.insert( Trans::getReturnSite(*it) );
+        }
+      }
+      return returns;
+    }
+
+    /**
+     * 
+     * @brief returns the return site states associated with the given exit 
+     *        point, call site, and symbol
+     *
+     * @param - exitPoint: the exit point whose return site states to obtain
+     * @param - callSite: the call site whose return site states to obtain
+     * @param - symbol: the symbol whose return site states to obtain
+     * @return the set of return site states associated with the given exit
+     *          point, call site, and symbol
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getReturns( St exitPoint, St callSite, Sym symbol ) const
+    {
+      assert(exitPoint < wali::WALI_BAD_KEY);
+      assert(callSite < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      const Returns ret = trans.getTransExit(exitPoint);
+      std::set<St> returns;
+      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      {
+        if( (Trans::getCallSite(*it) == callSite) && (symbol == Trans::getReturnSym(*it)) )
+        {
+          returns.insert( Trans::getReturnSite(*it) );
+        }
+      }
+      return returns;
     }
 
     /**
@@ -3399,6 +6509,143 @@ namespace wali
         }
       }
       return returns;
+    }
+
+	/**
+     * 
+	 * @brief returns the return sites of all return transitions in the NWA
+	 *
+	 * @return the set of return sites of all return transitions in the NWA
+	 *
+     */
+	template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getReturns( ) const
+    {
+      const Returns ret = trans.getReturns();
+      std::set<St> returns;
+      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      {
+          returns.insert( Trans::getReturnSite(*it) );
+      }
+      return returns;
+    }
+
+    /**
+     * 
+     * @brief returns the return site states associated with the given exit 
+     *        point and symbol
+     *
+     * @param - exitPoint: the exit point whose return site states to obtain
+     * @param - symbol: the symbol whose return site states to obtain
+     * @return the set of return site states associated with the given exit
+     *         point and symbol
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getReturns_Exit( St exitPoint, Sym symbol ) const
+    {
+      assert(exitPoint < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      const Returns ret = trans.getTransExit(exitPoint);
+      std::set<St> returns;
+      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      {
+        if( symbol == Trans::getReturnSym(*it) )
+          returns.insert( Trans::getReturnSite(*it) );
+      }
+      return returns;
+    }
+
+    /**
+     * 
+     * @brief returns the symbol/return site pairs associated with the given
+     *        exit point
+     *
+     * @param - exitPoint: the exit point whose symbol/return site pairs to obtain
+     * @return the set of symbol/return site pairs associated with the given 
+     *          exit point
+     *
+     */
+    template <typename Client>
+    const std::set<std::pair<typename NWA<Client>::Sym,typename NWA<Client>::St>> NWA<Client>::getReturns_Exit( St exitPoint ) const
+    {
+      assert(exitPoint < wali::WALI_BAD_KEY);
+
+      const Returns ret = trans.getTransExit(exitPoint);
+      std::set<std::pair<Sym,St> > returns;
+      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      {
+        returns.insert( std::pair<Sym,St>(Trans::getReturnSym(*it),Trans::getReturnSite(*it)) );
+      }
+      return returns;
+    }
+
+    /**
+     * 
+     * @brief returns the return site states associated with the given call 
+     *        site and symbol
+     *
+     * @param - callSite: the call site whose return site states to obtain
+     * @param - symbol: the symbol whose return site states to obtain
+     * @return the set of return site states associated with the given call
+     *          site and symbol
+     *
+     */
+    template <typename Client>
+    const std::set<typename NWA<Client>::St> NWA<Client>::getReturns_Call( St callSite, Sym symbol ) const
+    {
+      assert(callSite < wali::WALI_BAD_KEY);
+      assert(symbol < wali::WALI_BAD_KEY);
+
+      const Returns ret = trans.getTransPred(callSite);
+      std::set<St> returns;
+      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      {
+        if( symbol == Trans::getReturnSym(*it) )
+          returns.insert( Trans::getReturnSite(*it) );
+      }
+      return returns;
+    }
+
+    /**
+     * 
+     * @brief returns the symbol/return site pairs associated with the given
+     *        call site
+     *
+     * @param - callSite: the call site whose symbol/return site pairs to obtain
+     * @return the set of symbol/return site pairs associated with the given
+     *          call site
+     *
+     */
+    template <typename Client>
+    const std::set<std::pair<typename NWA<Client>::Sym,typename NWA<Client>::St>> NWA<Client>::getReturns_Call( St callSite ) const
+    {
+      assert(callSite < wali::WALI_BAD_KEY);
+
+      const Returns ret = trans.getTransPred(callSite);
+      std::set<std::pair<Sym,St> > returns;
+      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      {
+        returns.insert( std::pair<Sym,St>(Trans::getReturnSym(*it),Trans::getReturnSite(*it)) );
+      }
+      return returns;
+    }
+
+    /**
+     * 
+     * @brief returns the return sites associated with the given call site
+     *
+     * @param - callSite: the call site whose return sites to obtain
+     * @return the set of return sites associated with the given call site
+     *
+     */
+    template <typename Client>
+    inline
+    const std::set<typename NWA<Client>::St> NWA<Client>::getReturnSites( St callSite ) const
+    {
+      assert(callSite < wali::WALI_BAD_KEY);
+      return trans.getReturnSites(callSite);
     }
 
     /**
@@ -3626,6 +6873,11 @@ namespace wali
       if(! second->isStuckState(getStuckState()) )
         assert(! second->isState(getStuckState()) );
 
+	    //Clear all states(except the stuck state) and transitions from this machine.
+      St stuckSt = getStuckState();
+	    clear();
+	    setStuckState(stuckSt);
+
       //Copy all of the functionality of the two machines.  
       //States (Initial and final state information included.)
       states.addAll(first->states);   //Note: This includes copying clientInfo information over.  
@@ -3667,6 +6919,11 @@ namespace wali
       //Make sure we can modify transitions in this machine.
       assert(stuck);
 
+	  //Clear all states(except the stuck state) and transitions from this machine.
+      St stuckSt = getStuckState();
+	  clear();
+	  setStuckState(stuckSt);
+
       std::set<StatePair> visitedPairs; // All the pairs of states we have ever encountered.
       std::deque<StatePair> worklistPairs; // Pairs of states yet to be processed
       typedef std::map<StatePair, Key> PairStMap;
@@ -3682,7 +6939,7 @@ namespace wali
           StatePair sp(*fit,*sit);
           visitedPairs.insert(sp);
           ClientInfoRefPtr resCI;
-          if( nodeIntersect(first,*fit,second,*sit,newSt,resCI) ) 
+          if( stateIntersect(first,*fit,second,*sit,newSt,resCI) ) 
           {
             addInitialState(newSt); 
             //an initial state could also be a final state.
@@ -3707,7 +6964,7 @@ namespace wali
             visitedPairs.insert(*it); 
             ClientInfoRefPtr CI;
             //Check and make sure this intersection makes sense.
-            if( nodeIntersect(first,it->first,second,it->second,st,CI) ) 
+            if( stateIntersect(first,it->first,second,it->second,st,CI) ) 
             {
               addInitialState(st);
               //an initital state could also be a final state
@@ -3742,7 +6999,7 @@ namespace wali
             Sym secondSym = Trans::getCallSym(*sit);
             // Are the symbols intersectable
             Sym resSym;
-            if(! edgeIntersect(first,firstSym,second,secondSym,resSym) ) 
+            if(! transitionIntersect(first,firstSym,second,secondSym,resSym) ) 
               continue; // Symbols not intersectable, do nothing
 
             St secondEntry = Trans::getEntry(*sit);
@@ -3760,7 +7017,7 @@ namespace wali
               //We have not seen this pair before
               // Are the entry nodes intersectable?
               ClientInfoRefPtr resCI;
-              if(! nodeIntersect(first,firstEntry,second,secondEntry,resSt,resCI) ) 
+              if(! stateIntersect(first,firstEntry,second,secondEntry,resSt,resCI) ) 
                 continue;
               // We have a new state in resSt!
               if( first->isFinalState(firstEntry) && second->isFinalState(secondEntry) )
@@ -3791,7 +7048,7 @@ namespace wali
                 {
                   //Check and make sure this intersection makes sense.
                   ClientInfoRefPtr CI;
-                  if( nodeIntersect(first,it->first,second,it->second,st,CI) )
+                  if( stateIntersect(first,it->first,second,it->second,st,CI) )
                   {
                     if( first->isFinalState(it->first) && second->isFinalState(it->second) )
                       addFinalState(st);
@@ -3845,7 +7102,7 @@ namespace wali
             Sym secondSym = Trans::getInternalSym(*sit);
             // Are the symbols intersectable
             Sym resSym;
-            if(! edgeIntersect(first,firstSym,second,secondSym,resSym) ) 
+            if(! transitionIntersect(first,firstSym,second,secondSym,resSym) ) 
               continue; // Symbols not intersectable, do nothing
 
             St secondTgt = Trans::getTarget(*sit);
@@ -3863,7 +7120,7 @@ namespace wali
               //We have not seen this pair before
               // Are the tgt nodes intersectable?
               ClientInfoRefPtr resCI;
-              if(! nodeIntersect(first,firstTgt,second,secondTgt,resSt,resCI) ) 
+              if(! stateIntersect(first,firstTgt,second,secondTgt,resSt,resCI) ) 
                 continue;
               // We have a new state in resSt!
               if( first->isFinalState(firstTgt) && second->isFinalState(secondTgt) )
@@ -3893,7 +7150,7 @@ namespace wali
                 {
                   //Check and make sure this intersection makes sense.
                   ClientInfoRefPtr CI;
-                  if( nodeIntersect(first,it->first,second,it->second,st,CI) )
+                  if( stateIntersect(first,it->first,second,it->second,st,CI) )
                   {
                     if( first->isFinalState(it->first) && second->isFinalState(it->second) )
                       addFinalState(st);
@@ -3948,7 +7205,7 @@ namespace wali
             Sym secondSym = Trans::getReturnSym(*sit);
             // Are the symbols intersectable
             Sym resSym;
-            if(! edgeIntersect(first,firstSym,second,secondSym,resSym) ) 
+            if(! transitionIntersect(first,firstSym,second,secondSym,resSym) ) 
               continue; // Symbols not intersectable, do nothing
 
             // Check intersectability and visited status of the respective call components
@@ -3975,7 +7232,7 @@ namespace wali
             if( pairToStMap.count(retPair) == 0 ) 
             { // Don't know yet
               ClientInfoRefPtr retCI;
-              if(! nodeIntersect(first,firstRet,second,secondRet,retSt,retCI) ) 
+              if(! stateIntersect(first,firstRet,second,secondRet,retSt,retCI) ) 
                 continue;
               // We have found a new state in retSt!
               if( first->isFinalState(firstRet) && second->isFinalState(secondRet) )
@@ -4005,7 +7262,7 @@ namespace wali
                 {
                   //Check and make sure this intersection makes sense.
                   ClientInfoRefPtr CI;
-                  if( nodeIntersect(first,it->first,second,it->second,st,CI) )
+                  if( stateIntersect(first,it->first,second,it->second,st,CI) )
                   {
                     if( first->isFinalState(it->first) && second->isFinalState(it->second) )
                       addFinalState(st);
@@ -4059,7 +7316,7 @@ namespace wali
             Sym secondSym = Trans::getReturnSym(*sit);
             // Are the symbols intersectable
             Sym resSym;
-            if(! edgeIntersect(first,firstSym,second,secondSym,resSym) ) 
+            if(! transitionIntersect(first,firstSym,second,secondSym,resSym) ) 
               continue; // Symbols not intersectable, do nothing
 
             // Check intersectability and visited status of the respective exit components
@@ -4086,7 +7343,7 @@ namespace wali
             if( pairToStMap.count(retPair) == 0 ) 
             { //Don't know yet
               ClientInfoRefPtr retCI;
-              if(! nodeIntersect(first,firstRet,second,secondRet,retSt,retCI) ) 
+              if(! stateIntersect(first,firstRet,second,secondRet,retSt,retCI) ) 
                 continue;
               // We have a new state in retSt!
               if( first->isFinalState(firstRet) && second->isFinalState(secondRet) )
@@ -4116,7 +7373,7 @@ namespace wali
                 {
                   //Check and make sure this intersection makes sense.
                   ClientInfoRefPtr CI;
-                  if( nodeIntersect(first,it->first,second,it->second,st,CI) )
+                  if( stateIntersect(first,it->first,second,it->second,st,CI) )
                   {
                     if( first->isFinalState(it->first) && second->isFinalState(it->second) )
                       addFinalState(st);
@@ -4263,6 +7520,11 @@ namespace wali
       if(! second->isStuckState(getStuckState()) )
         assert(! second->isState(getStuckState()) );
 
+	  //Clear all states(except the stuck state) and transitions from this machine.
+      St stuckSt = getStuckState();
+	  clear();
+	  setStuckState(stuckSt);
+
       //Duplicate all of the functionality of the first machine (except the final state property).
       states.addAllStates(first->states);   //Note: This includes copying clientInfo information over.
       states.addAllInitialStates(first->states);
@@ -4308,6 +7570,11 @@ namespace wali
       //Check that the stuck state of this NWA does not exist as a state in 'first' 
       //Note: it cannot be the stuck state of 'first' because then it would have an outgoing transition.
       assert(! first->isState(getStuckState()) );
+
+	  //Clear all states(except the stuck state) and transitions from this machine.
+      St stuckSt = getStuckState();
+	  clear();
+	  setStuckState(stuckSt);
 
       //The reverse machine has all the states of the original machine.
       states.addAllStates(first->states); //Note: This includes copying clientInfo information over. 
@@ -4386,6 +7653,11 @@ namespace wali
 
       //Make sure we can modify transitions in this machine.
       assert(stuck);
+
+	  //Clear all states(except the stuck state) and transitions from this machine.
+      St stuckSt = getStuckState();
+	  clear();
+	  setStuckState(stuckSt);
 
       //Somehow mark unmatched nesting edges as if they are pending (tag its state so that 
       //at a return the states labeling the incident nesting edges are ignored).
@@ -4587,6 +7859,11 @@ namespace wali
       //      prior to the completion of adding transitions to this machine.
       assert(! first->isState(getStuckState()) );
 
+	  //Clear all states(except the stuck state) and transitions from this machine.
+      St stuckSt = getStuckState();
+	  clear();
+	  setStuckState(stuckSt);
+
       //Start with a deterministic copy of the given NWA.
       if(! first->isDeterministic() )
       {
@@ -4640,7 +7917,12 @@ namespace wali
       //Q: what should be done with clientInfos here?
       //A: use helper methods similar to the treatment of clientInfos for intersection
 
-      // assert(stuck);
+      assert(stuck);
+
+	  //Clear all states(except the stuck state) and transitions from this machine.
+      St stuckSt = getStuckState();
+	  clear();
+	  setStuckState(stuckSt);
 
       using namespace wali::relations;
 
@@ -5090,7 +8372,7 @@ namespace wali
      *
      */
     template <typename Client>
-    bool NWA<Client>::nodeIntersect( NWARefPtr first, St state1, NWARefPtr second, St state2, 
+    bool NWA<Client>::stateIntersect( NWARefPtr first, St state1, NWARefPtr second, St state2, 
                                       St & resSt, ClientInfoRefPtr & resCI ) 
     {
       //Note: When overriding this method your metric must determine whether the
@@ -5113,7 +8395,7 @@ namespace wali
      *
      */
     template <typename Client>
-    bool NWA<Client>::edgeIntersect( NWARefPtr first, Sym sym1, NWARefPtr second, Sym sym2, Sym & resSym )
+    bool NWA<Client>::transitionIntersect( NWARefPtr first, Sym sym1, NWARefPtr second, Sym sym2, Sym & resSym )
     {
       //Note: When overriding this method your metric must determine whether the
       //      given symbols are compatible and set result to the appropriate symbol.
@@ -5355,6 +8637,11 @@ namespace wali
 
       //Make sure we can modify transitions in this machine.
       assert(stuck);
+
+	  //Clear all states(except the stuck state) and transitions from this machine.
+      St stuckSt = getStuckState();
+	  clear();
+	  setStuckState(stuckSt);
 
       std::map<St,St> call_return;
 

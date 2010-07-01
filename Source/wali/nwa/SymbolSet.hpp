@@ -48,7 +48,7 @@ namespace wali
       //Accessors
 
       /**
-       *  //TODO: remove this!
+       *
        */
       static bool isWild( Sym sym )
       {
@@ -56,7 +56,7 @@ namespace wali
       };
 
       /**
-       *  //TODO: remove this!
+       *  
        */
       static Sym getWild( )
       {

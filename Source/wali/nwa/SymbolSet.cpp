@@ -39,6 +39,8 @@ bool SymbolSet::addSymbol( Key sym )
 {
   if( isSymbol(sym) )
     return false;
+  else if(sym == wali::WALI_EPSILON || sym == wali::WALI_WILD)
+    return false;
   else
   {
     symbols.insert(sym);

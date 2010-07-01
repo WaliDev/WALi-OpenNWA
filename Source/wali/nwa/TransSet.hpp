@@ -1677,14 +1677,14 @@ namespace wali
       const typename Info::Internals from = T_info.fromTrans(fromSt);
       for( typename Info::internalIterator it = from.begin(); it != from.end(); it++ )
       {
-        if( toSt == getTarget(*it) && sym == getInternalSym(*it) )
+        if( toSt == getTarget(*it) && ( sym == getInternalSym(*it) || sym == wali::WALI_WILD ) )
           return true;
       }
       //Check call transitions.
       const typename Info::Calls call = T_info.callTrans(fromSt);
       for( typename Info::callIterator it = call.begin(); it != call.end(); it++ )
       {
-        if( toSt == getEntry(*it) && sym == getCallSym(*it) )
+        if( toSt == getEntry(*it) && ( sym == getCallSym(*it) || sym == wali::WALI_WILD ) )
         {
           return true;
         }
@@ -1693,7 +1693,7 @@ namespace wali
       const typename Info::Returns exit = T_info.exitTrans(fromSt);
       for( typename Info::returnIterator it = exit.begin(); it != exit.end(); it++ )
       {
-        if( toSt == getReturnSite(*it) && sym == getReturnSym(*it) )
+        if( toSt == getReturnSite(*it) && ( sym == getReturnSym(*it) || sym == wali::WALI_WILD ) )
         {
           return true;
         }

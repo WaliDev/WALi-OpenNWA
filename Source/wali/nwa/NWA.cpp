@@ -1,7 +1,7 @@
 /**
  * @author Amanda Burton
  */
-#define NWA_TEST
+//#define NWA_TEST
 
 #ifdef NWA_TEST
 // ::wali
@@ -103,6 +103,13 @@ int main()
 
   std::set<wali::Key> preds = std::set<wali::Key>();
   myNWA->getPredecessors(state,preds);
+  myNWA->getPredecessors(epsilon,state,preds);
+  myNWA->getSuccessors(state,preds);
+  myNWA->getSuccessors(epsilon,state,preds);
+  myNWA->getCallPredecessors(ret,preds);
+  myNWA->getCallPredecessors(epsilon,ret,preds);
+  myNWA->getCallSuccessors(call,preds);
+  myNWA->getCallSuccessors(call,epsilon,preds);
   wali::Key state1 = wali::getKey("state1");
   myNWA->duplicateStateOutgoing(state,state1);
   wali::Key state2 = wali::getKey("state2");
@@ -138,6 +145,82 @@ int main()
   myNWA->getTargets(state);
   myNWA->getReturnSites(call);
   myNWA->getReturns(exit,call);
+
+  myNWA->getSymbols(start,call);
+  myNWA->getSymbolsFrom(start);
+  myNWA->getSymbolsTo(call);
+  myNWA->getPredecessors(call);
+  myNWA->getPredecessors(epsilon,call);
+  myNWA->getSuccessors(call);
+  myNWA->getSuccessors(epsilon,call);
+  myNWA->getCallRetSymbols(call,ret);
+  myNWA->getCallRetSymbolsFrom(call);
+  myNWA->getCallRetSymbolsTo(ret);
+  myNWA->getCallPredecessors(ret);
+  myNWA->getCallPredecessors(epsilon,ret);
+  myNWA->getCallSuccessors(call);
+  myNWA->getCallSuccessors(call,epsilon);
+
+  myNWA->getCallSites_Sym(epsilon);
+  myNWA->getCallSites(epsilon,entry);
+  myNWA->getCallSites(entry);
+  myNWA->getCallSites();
+  myNWA->getCallSym();
+  myNWA->getCallSym(call,entry);
+  myNWA->getCallSym_Call(call);
+  myNWA->getCallSym_Entry(entry);
+  myNWA->getEntries_Sym(epsilon);
+  myNWA->getEntries(call,epsilon);
+  myNWA->getEntries(call);
+  myNWA->getEntries();
+
+  myNWA->getSources_Sym(epsilon);
+  myNWA->getSources(epsilon,state);
+  myNWA->getSources(state);
+  myNWA->getSources();
+  myNWA->getInternalSym();
+  myNWA->getInternalSym(entry,state);
+  myNWA->getInternalSym_Source(entry);
+  myNWA->getInternalSym_Target(state);
+  myNWA->getTargets_Sym(epsilon);
+  myNWA->getTargets(entry,epsilon);
+  myNWA->getTargets(entry);
+  myNWA->getTargets();
+
+  myNWA->getExits_Sym(epsilon);
+  myNWA->getExits(call,epsilon,ret);
+  myNWA->getExits(call,ret);
+  myNWA->getExits();
+  myNWA->getExits_Call(call,epsilon);
+  myNWA->getExits_Call(call);
+  myNWA->getExits_Ret(epsilon,ret);
+  myNWA->getExits_Ret(ret);
+  myNWA->getCalls_Sym(epsilon);
+  myNWA->getCalls(exit,epsilon,ret);
+  myNWA->getCalls(exit,ret);
+  myNWA->getCalls();
+  myNWA->getCalls_Exit(exit,epsilon);
+  myNWA->getCalls_Exit(exit);
+  myNWA->getCalls_Ret(epsilon,ret);
+  myNWA->getCalls_Ret(ret);
+  myNWA->getReturnSym();
+  myNWA->getReturnSym(exit,call,ret);
+  myNWA->getReturnSym_Exit(exit);
+  myNWA->getReturnSym_Call(call);
+  myNWA->getReturnSym_Ret(ret);
+  myNWA->getReturnSym_ExitCall(exit,call);
+  myNWA->getReturnSym_ExitRet(exit,ret);
+  myNWA->getReturnSym_CallRet(call,ret);
+  myNWA->getReturns_Sym(epsilon);
+  myNWA->getReturns(exit,call,epsilon);
+  myNWA->getReturns(exit,call);
+  myNWA->getReturns();
+  myNWA->getReturns_Exit(exit,epsilon);
+  myNWA->getReturns_Exit(exit);
+  myNWA->getReturns_Call(call,epsilon);
+  myNWA->getReturns_Call(call);
+  myNWA->getReturnSites(call);
+
   
   myNWA->print(std::cout);
   
@@ -146,9 +229,16 @@ int main()
   myNWA->NWAtoPDScalls(wg);
   myNWA->NWAtoBackwardsPDSreturns(wg);
   myNWA->NWAtoBackwardsPDScalls(wg);
+  wali::nwa::NWA<>::NWAtoPDSreturns(myNWA,wg);
+  wali::nwa::NWA<>::NWAtoPDScalls(myNWA,wg);
+  wali::nwa::NWA<>::NWAtoBackwardsPDSreturns(myNWA,wg);
+  wali::nwa::NWA<>::NWAtoBackwardsPDScalls(myNWA,wg);
+
   wali::wpds::WPDS wpdsBase;
   myNWA->plusWPDS(wpdsBase);
-  //myNWA->PDStoNWA(wpdsBase);
+  wali::nwa::NWA<>::plusWPDS(wpdsBase,myNWA);
+  myNWA->PDStoNWA(wpdsBase);
+  wali::nwa::NWA<>::PDStoNWA(wpdsBase,stuck);
 
   wali::nwa::NWA<> otherNWA1 = wali::nwa::NWA<>(*myNWA);
   wali::nwa::NWA<> otherNWA2 = otherNWA1;
@@ -175,6 +265,14 @@ int main()
   determinizeNWA->setStuckState(stuck);
   determinizeNWA->determinize(myNWA);
   determinizeNWA->isDeterministic();
+
+  wali::nwa::NWA<>::unionNWA(myNWA,intersectNWA,stuck);
+  wali::nwa::NWA<>::intersect(myNWA,otherNWA,stuck);
+  wali::nwa::NWA<>::concat(myNWA,otherNWA,stuck);
+  wali::nwa::NWA<>::reverse(myNWA,stuck);
+  wali::nwa::NWA<>::star(myNWA,stuck);
+  wali::nwa::NWA<>::complement(myNWA,stuck);
+  wali::nwa::NWA<>::determinize(myNWA,stuck);
   
   myNWA->isEmpty();
   wali::nwa::NWA<>::isMember(wali::nws::NWS(),myNWA);
