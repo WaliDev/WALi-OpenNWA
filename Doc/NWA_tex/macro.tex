@@ -1,0 +1,314 @@
+%Tom's macros
+
+%\addtolength{\topmargin}{-1.2in}       % move top margin up
+%\setlength{\textwidth}{6.0in}
+%\setlength{\oddsidemargin}{.25in}
+%\setlength{\evensidemargin}{.25in}
+%\addtolength{\textheight}{2.0in}
+
+%\setcounter{topnumber}{5}
+%\def\topfraction{0.99}
+%\def\textfraction{0.05}
+%\def\floatpagefraction{0.9}
+%\setcounter{bottomnumber}{5}
+%\def\bottomfraction{0.99}
+%\setcounter{totalnumber}{10}
+%\def\dbltopfraction{0.99}
+%\def\dblfloatpagefraction{0.8}
+%\setcounter{dbltopnumber}{5}
+
+\setcounter{topnumber}{5}
+\def\topfraction{0.99}
+\def\textfraction{0.05}
+\def\floatpagefraction{0.9}
+\setcounter{bottomnumber}{5}
+\def\bottomfraction{0.99}
+\setcounter{totalnumber}{10}
+\def\dbltopfraction{0.99}
+\def\dblfloatpagefraction{0.9}
+\setcounter{dbltopnumber}{5}
+
+\newcommand{\pre}{\mbox{{\it pre\/}}}
+\newcommand{\post}{\mbox{{\it post\/}}}
+\newcommand{\Principals}{\mbox{{\rm Principals\/}}}
+\newcommand{\Resources}{\mbox{{\rm Resources\/}}}
+\newcommand{\Pair}[1]{\langle{#1}\rangle}
+\renewcommand{\Vec}[1]{\overrightarrow{#1}}
+\newcommand{\dV}{\delta V}
+\newcommand{\dl}{\delta l}
+\newcommand{\dW}{\delta W}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% Greek and calligraphic letters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\calA}{\mathcal A}
+\newcommand{\calB}{\mathcal B}
+\newcommand{\calC}{\mathcal C}
+\newcommand{\calG}{\mathcal G}
+\newcommand{\calI}{\mathcal I}
+\newcommand{\calK}{\mathcal K}
+\newcommand{\calM}{\mathcal M}
+\newcommand{\calO}{\mathcal O}
+\newcommand{\calP}{\mathcal P}
+\newcommand{\calS}{\mathcal S}
+\newcommand{\calW}{\mathcal W}
+\newcommand{\calZ}{\mathcal Z}
+
+% \newcommand{\Zsym}{\calZ}
+% \newcommand{\Zsymb}{\calZ_\bot}
+% \newcommand{\Zsymbt}{\calZ_\bot^\top}
+\newcommand{\Zsym}{\mathbb{Z}}
+\newcommand{\Zsymb}{\Zsym_\bot}
+\newcommand{\Zsymbt}{\Zsym_\bot^\top}
+
+\newcommand{\pproc}{\textit{p}}
+\newcommand{\fproc}{\textit{f}}
+\newcommand{\pmain}{\textit{main}}
+
+\newcommand{\D}{\Delta}
+\newcommand{\E}{\mathcal{E}}
+\newcommand{\G}{\Gamma}
+\newcommand{\Gr}{\calG}
+\renewcommand{\P}{\calP}
+\newcommand{\U}{\mathcal{U}}
+\newcommand{\X}{\mathcal{X}}
+\newcommand{\W}{\calW}
+
+\renewcommand{\a}{\alpha}
+\renewcommand{\d}{\delta}
+\newcommand{\f}{\varphi}
+\newcommand{\y}{\gamma}
+
+\newcommand{\emptybox}{\square}
+\newcommand{\fullbox}{\blacksquare}
+
+
+\def\at#1{{\it AT}_{(#1)}}
+\def\propagate#1{{\it propagate}(#1)}
+\def\propagateprime#1{{\it propagate'}(#1)}
+\def\update#1#2{{\it update}(#1,#2)}
+\def\updateprime#1#2{{\it update'}(#1,#2)}
+\def\updatewitness#1#2#3#4{{\it update}(#1,#2,#3,#4)}
+\def\updatewitnessprime#1#2#3#4{{\it update'}(#1,#2,#3,#4)}
+\def\heap{{\it heap}}
+
+%%%% General use macros %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\Nseto{{\rm I\!N}_0}
+\def\prestar{{{\it pre}^*}}
+\def\poststar{{{\it post}^*}}
+\def\autlang{L}
+\def\ee{\varepsilon}
+
+\def\rel{{\it rel}}
+\def\trans{{\it trans}}
+\def\eps{{\it eps}}
+
+\def\gets{:=}
+
+%%%% fillers %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\Rightarrowfill{$\mathsurround0pt\smash\Relbar\mkern-7mu%
+  \cleaders\hbox{$\mkern-2mu\smash\Relbar\mkern-2mu$}\hfill\mkern-7mu%
+  \mathord\Rightarrow$}
+
+\def\hookarrowfill{$\smash\lhook\mkern-5mu%
+  \cleaders\hbox{$\mkern-2mu\smash\relbar\mkern-2mu$}\hfill\mkern-7mu%
+  \mathord\rightarrow$}
+
+%%%% all sorts of arrows %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\genarrow#1#2#3#4{%
+\mathrel{\smash{\setbox0=\hbox{$\scriptstyle{#1}$}%
+\mathop{\setbox1=\hbox to \wd0{#4}%
+\ht1=3pt\dp1=-2pt\box1}\limits^{#2}_{#3}}}}
+
+%%%% single arrows %%%%%%%%%%%%%%%
+
+% simple single arrow
+\def\to{\rightarrow}
+
+% single arrow with something on top
+\def\tarrow#1{\genarrow{#1\quad}{#1}{}{\rightarrowfill}}
+
+% single arrow with something below
+\def\barrow#1{\genarrow{#1\quad}{}{#1}{\rightarrowfill}}
+
+% single arrow with something on top and below
+\def\tbarrow#1#2{\genarrow{#1\quad}{#1}{#2}{\rightarrowfill}}
+
+% single arrow like before, but length is adapted to the lower inscription
+\def\tbsymarrow#1#2{\genarrow{#2\quad}{#1}{#2}{\rightarrowfill}}
+
+%%%% double arrows %%%%%%%%%%%%%%%
+
+% simple double arrow
+\newcommand{\da}{\Rightarrow}
+
+% double arrow with something on top
+\def\dtarrow#1{\genarrow{#1\quad}{#1}{}{\Rightarrowfill}}
+
+% double arrow with something below
+\def\dbarrow#1{\genarrow{#1\quad}{}{#1}{\Rightarrowfill}}
+
+%%%% hook arrows %%%%%%%%%%%%%%%%%
+
+% simple hook arrow
+\newcommand{\hra}{\hookrightarrow}
+
+% hook arrow with something on top
+\def\hooktarrow#1{\genarrow{#1\quad}{#1}{}{\hookarrowfill}}
+
+% hook arrow with something below in brackets
+\def\hookbsymarrow#1{\genarrow{#1\quad\>}{}{[#1\,]}{\hookarrowfill}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% automata relations
+
+\def\ausingle#1{\mathrel{\tarrow{#1}}}
+\def\austar#1{\mathrel{\tarrow{#1}^*}}
+\def\auplus#1{\mathrel{\tarrow{#1}^+}}
+\def\austeps#1#2{\mathrel{\tbarrow{#1}{#2}}}
+\def\ausingleindex#1#2{\mathrel{\tarrow{#1}_{#2}}}
+\def\austarindex#1#2{\mathrel{\tarrow{#1}^*_{#2}}}
+
+%%%% pushdown rules
+
+\def\tup#1{\langle#1\rangle}
+\def\pdrule#1#2{\tup{#1}\hra\tup{#2}}
+\def\apdrule#1#2{\tup{#1}\hra\{#2\}}
+\def\pdlabeledrule#1{\hooktarrow{#1}}
+\def\pdruleindex#1#2#3{\tup{#1}\hra_{#2}\tup{#3}}
+
+%%%% pushdown relations
+
+\def\pdsingle{\mathrel{\da}}
+\def\pdstar{\mathrel{\da^*}}
+\def\pdplus{\mathrel{\da^+}}
+\def\pdlabel#1{\mathrel{\dtarrow{#1}}}
+\def\pdsteps#1{\mathrel{\dbarrow{#1}}}
+\def\pdrep{\mathrel{\da^r}}
+
+\def\pdsingleindex#1{\mathrel{\da_{#1}}}
+\def\pdstarindex#1{\mathrel{\da^*_{#1}}}
+\def\pdplusindex#1{\mathrel{\da^+_{#1}}}
+\def\pdstepsindex#1#2{\mathrel{\dbarrow{#1}_{#2}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% Algorithms
+
+\newcounter{zeile}
+\newbox\kasten
+\setbox\kasten=\hbox{00}
+\let\graph=\par
+{\catcode`\[=\active\catcode`\>=\active
+\gdef\addto#1#2{$#1:=#1\cup\{#2\}$}
+\gdef\insertcombine#1#2#3{$#1 := #1~#2 \mapsto (#1(#2) \combine #3)~$}
+\gdef\for#1{[for all] $#1$ [do]}
+\gdef\addtrans{{\it add\_trans}}
+\gdef\while#1{[while] $#1$ [do]}
+\gdef\ifthen#1{[if] $#1$ [then]}
+\gdef\endif{[f{}i]}
+\gdef\od{[od]}
+\gdef\algsetsize{}
+\gdef\algo{\catcode`\~=\active
+        \catcode`\[=\active\catcode`\>=\active\setcounter{zeile}{0}
+        \def\par{\refstepcounter{zeile}\graph\noindent\kern\wd\kasten%
+                \llap{{\small\thezeile}}\quad\algsetsize}
+        \def[##1]{{\bf##1}}\def~##1~{\mathchar"405B##1\mathchar"505D}
+        \def>{\quad}\obeylines}}
+
+\newcounter{algcounter}
+\def\newalgo#1{\refstepcounter{algcounter}\thealgcounter\label{#1}}
+\def\defnewalgo#1{\refstepcounter{algcounter}\label{#1}}
+
+%%%% Theorem-like environments
+
+% \newtheorem{theorem}{Theorem}[section]
+% \newtheorem{proposition}{Proposition}[section]
+% \newtheorem{corollary}{Corollary}[section]
+% \newtheorem{lemma}{Lemma}[section]
+% \newtheorem{remark}{Remark}[section]
+% \newtheorem{notation}{Notation}[section]
+% \newtheorem{definition}{Definition}[section]
+% \newtheorem{example}{Example}[section]
+% \newtheorem{conjecture}{Conjecture}[section]
+% \newenvironment{proof}{\noindent {\bf Proof:\,}}{\hfill$\;\;\Box$\medskip}
+
+%%%% Symbols for labelling section
+
+\def\lbot{0}
+\def\ltop{1}
+\def\srZero{\overline{0}}
+\def\srOne{\overline{1}}
+\def\combine{\oplus}
+\def\extend{\otimes}
+\def\bigcomb{\bigoplus}
+\def\bigext{\bigotimes}
+\def\mopval{\delta}
+\def\witness{\omega}
+\def\pval{v}
+\def\tval{{\it val}}
+\def\lle{\sqsubseteq}
+\def\gle{\sqsupseteq}
+\def\llt{\sqsubset}
+\def\lmin{\min\nolimits_\lle}
+\def\shortest{{\it minpath}}
+\def\kderiv#1{\mathrel{\barrow{#1}}}
+
+\newcommand{\Chi}{X}
+\newcommand{\bigmeet}{\mathop\sqcap}
+\def\bigmeet{\mathop{\rule[-0.2ex]{.07em}{2.17ex}
+                \rule[1.8ex]{0.5em}{.17ex}
+                \rule[-0.2ex]{.07em}{2.17ex}}}
+% \def\bigmeet{\mathop{\mathchoice{\mbox{\rule[-1ex]{0.05em}{3.35ex}\rule[2.1ex]{0.8em}{0.1em}\rule[-1ex]{0.05em}{3.35ex}}}
+%   {\mbox{\rule[-.5ex]{0.05em}{2.25ex}\rule[1.65ex]{.55em}{0.05em}\rule[-.5ex]{0.04em}{2.25ex}}}
+%   {\mbox{\rule[-.5ex]{0.05em}{2.25ex}\rule[1.65ex]{.55em}{0.05em}\rule[-.5ex]{0.04em}{2.25ex}}}
+%   {\mbox{\rule[-.5ex]{0.05em}{2.25ex}\rule[1.65ex]{.55em}{0.05em}\rule[-.5ex]{0.04em}{2.25ex}}}
+% }}
+%\newcommand{\bigtimes}{\mathop\times}
+%\newcommand{\path}[2]{{\mathit path}(#1,#2)}
+
+\newcommand{\wnode}{{\it wnode}}
+\newcommand{\wstruc}{{\it wstruc}}
+\newcommand{\nil}{{\it nil}}
+\newcommand{\ta}{n}
+
+\def\pdstepr#1{\mathrel{\dtarrow{\langle#1\rangle}}}
+\def\pdsteprindex#1#2{\mathrel{\dtarrow{\langle#1\rangle}_{#2}}}
+\def\pdlpath#1{\mathrel{\dbarrow{#1}^\extend}}
+\def\pdlpartial#1{\mathrel{\dbarrow{#1}^\join}}
+
+% %%%%%%%%%%%
+% Nick's additions to macro(s)
+\newcommand{\conf}[1]{\langle #1 \rangle}
+\newcommand{\Rule}[2]{\conf{#1}\hookrightarrow\conf{#2}}
+\def\SigmaE{\Sigma_{\epsilon}}
+\def\dhat{\hat{\delta}}
+\def\Apost{A_{\poststar}}
+\def\deltai{\delta_{i}}
+\def\deltac{\delta_{c}}
+\def\deltar{\delta_{r}}
+\def\deltain#1{\delta_{i|#1}}
+\def\deltacn#1{\delta_{c|#1}}
+\def\deltarn#1{\delta_{r|#1}}
+\def\prefix#1#2{#1|_{#2}}
+\def\cons{\kappa}
+\def\nmain{n_{\text{main}}}
+\def\NWofRun{\textit{NWofRun}}
+\def\Runs{\textit{Runs}}
+\def\GamA{\Gamma^{\alpha}}
+\def\GamB{\Gamma^{\beta}}
+\def\Lphi{L^{\varphi}}
+\def\qerr{q_{\textit{err}}}
+\def\sqalpha{\sqsubseteq_{\alpha}}
+\def\Bool{\mathbb{B}}
+\newcommand{\PA}[0]{\P_{A}}
+\newcommand{\EffLen}[0]{\textit{EffLen}}
+\def\run{\rho}
+\def\build{\textit{build}}
+\def\flatten{\textit{flatten}}
+\def\vstep#1{v[#1]}
