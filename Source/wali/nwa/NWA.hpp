@@ -2500,16 +2500,34 @@ namespace wali
         {
           for( stateIterator sit = second->beginStates(); sit != second->endStates(); sit++ )
           {
-            if( first->isState(*sit) )
-              return true;
+            if( second->isStuckState(*sit) )
+            {
+              if( first->isState(*sit) && !(first->isStuckState(*sit)) )
+                return true;    //The overlap is not valid b/c the overlapping state is not the stuck state of both machines.
+            }
+            else
+            {
+              if( first->isState(*sit) )
+              { 
+                return true;  //The overlap is not valid b/c the overlapping state is not the stuck state of both machines.
+              }
+            }
           }
         }
         else
         {
           for( stateIterator sit = first->beginStates(); sit != first->endStates(); sit++ )
           {
-            if( second->isState(*sit) )
-              return true;
+            if( first->isStuckState(*sit) )
+            {
+              if( second->isState(*sit) && !(second->isStuckState(*sit)) )
+                return true;    //The overlap is not valid b/c the overlapping state is not the stuck state of both machines.
+            }
+            else
+            {
+              if( second->isState(*sit) )
+                return true;    //The overlap is not valid b/c the overlapping state is not the stuck state of both machines.
+            }
           }
         }
         return false;
