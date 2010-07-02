@@ -263,7 +263,7 @@ To distinguish among the different roles for states in an internal transition, $
 To construct an NWA, a constructor is invoked that creates either an empty NWA or a one-state NWA.  Thereafter, method calls are performed to \begin{inparaenum} \item add or remove states, \item add or remove symbols, \item add or remove transitions, \item set the status of certain states as initial or final, and \item combine component NWAs (via union, intersection, etc). \end{inparaenum}
 
 
-One complication arises due to stuck states.  A stuck state is a state that can never be a final state and has no outgoing transitions other than to itself.  The NWA class supports modeling NWAs with a designated stuck state; in such an NWA, there may be implicit transitions to this stuck state, whereas an NWA without a stuck state can hove only explicit transitions.  The remainder of this document uses ``stuck state'' to refer to this explicitly-designated stuck state.  This means that in an NWA without a stuck state there must exist a transition of each kind out of every state (out of every pair of states for return transitions) for every symbol.  Therefore, we distinguish between two types of NWAs: type 1 - an NWA with a stuck state, and type 2 - an NWA without a stuck state.  Each state in a type 2 NWA must be complete; that is, each state must have outgoing transitions for each symbol of the alphabet.  Operations that add or remove individual states and individual transitions would cause state-completeness to be violated, and hence are disallowed on type 2 NWAs.  If such an operation is applied to a type 2 NWA, the operation causes an assertion violation.  In NWAs of type 1, completeness is implicit: a given state has some number (possibly zero) of explicit outgoing transitions on some number of symbols; for all other symbols, for each of the three kinds of transitions, there are implicit transitions to the stuck state.  
+One complication arises due to stuck states.  A stuck state is a state that can never be a final state and has no outgoing transitions other than to itself.  The NWA class supports modeling NWAs with a designated stuck state; in such an NWA, there may be implicit transitions to this stuck state, whereas an NWA without a stuck state can hove only explicit transitions.  The remainder of this document uses ``stuck state'' to refer to this explicitly-designated stuck state.  This means that in an NWA without a stuck state there must exist a transition of each kind out of every state (out of every pair of states for return transitions) for every symbol.  Therefore, we distinguish between two types of NWAs: type 1 - an NWA with a stuck state, and type 2 - an NWA without a stuck state.  Each state in an NWA of type 2 must be complete; that is, each state must have outgoing transitions for each symbol of the alphabet.  Operations that add or remove individual states and individual transitions would cause state-completeness to be violated, and hence they are disallowed on NWAs of type 2.  If such an operation is applied to an NWA of type 2, the operation causes an assertion violation.  In NWAs of type 1, completeness is implicit: a given state has some number (possibly zero) of explicit outgoing transitions on some number of symbols; for all other symbols, for each of the three kinds of transitions, there are implicit transitions to the stuck state.  
 
 \textbf{Important Note: Due to the requirement of the completeness of an NWA of type 2, states (except the stuck state), symbols, and transitions can only be added to an NWA of type 1.}  
 
@@ -287,7 +287,7 @@ NWAs can be created in multiple ways:
 
   \item \texttt{void setStuckState( Key stuckSt )} \nopagebreak
 
-    Allows the user to specify a stuck state, \texttt{stuckSt}, thereby making an NWA of type 2 into an NWA of type 1.  The state specified must not already exist in the NWA (this guarantees that the stuck state will not be final or have any outgoing transitions).  Furthermore, because a stuck state already exists in a type 1 NWA, if this method is invoked on an NWA of type 1 it triggers an assertion violation. 
+    Allows the user to specify a stuck state, \texttt{stuckSt}, thereby making an NWA of type 2 into an NWA of type 1.  The state specified must not already exist in the NWA (this guarantees that the stuck state will not be final or have any outgoing transitions).  Furthermore, because a stuck state already exists in anNWA of type 1, if this method is invoked on an NWA of type 1 it triggers an assertion violation. 
 
   \item \texttt{void realizeImplicitTrans()} \nopagebreak
 
@@ -323,12 +323,12 @@ as seen in Figure \ref{Fig:Example1}.  This NWA is of type 1, since there is a s
 \end{figure}
 
 
-The equivalent nested word automaton of type 2 is shown in Figure \ref{Fig:Example2}.  Here $Stuck$ is just an ordinary state.  For ease of reading the lines connecting calls and returns are left out of this diagram.  In reality every return transition to $Stuck$ in Figure \ref{Fig:Example2} represents as many as 8 return transitions, one for each possible call state.  The number of transitions that each represents appears in parentheses following the symbol.  Note: If \texttt{realizeImplicitTrans} is called on the NWA in Figure \ref{Fig:Example1} the result is the NWA in Figure \ref{Fig:Example2}.
+The equivalent nested word automaton of type 2 is shown in Figure \ref{Fig:Example2}.  Here $Stuck$ is just an ordinary state.  For ease of reading the lines connecting calls and returns are left out of this diagram.  In reality every return transition to $Stuck$ in Figure \ref{Fig:Example2} represents as many as 8 return transitions, one for each possible call state, i.e., the transitions $(Start,Start,a,Stuck)$, $(Start,Call,a,Stuck)$, $(Start,Entry,a,Stuck)$, $(Start,State,a,Stuck)$, $(Start,Exit,a,Stuck)$, $(Start,Return,a,Stuck)$, $(Start,Finish,a,Stuck)$, and $(Start,Stuck,a,Stuck)$ are the return transitions from $Start$ to $Stuck$ on the symbol $a$.  The number of transitions that each represents appears in parentheses following the symbol.  Note: If \texttt{realizeImplicitTrans} is called on the NWA in Figure \ref{Fig:Example1} the result is the NWA in Figure \ref{Fig:Example2}.
 
 \begin{figure}[htb]
   \centering
     \includegraphics[width=12cm]{Figures/Figure2.eps}
-  \caption{An example of an NWA of type 2.  Note: The edge from $Entry$ to $Stuck$ labeled \{a,call,ret\} is a shorthand for three internal transitions in $\delta_i$: $(Entry,a,Stuck)$, $(Entry,call,Stuck)$, and $(Entry,ret,Stuck)$.}
+  \caption{An example of an NWA of type 2.  Note: The edge from $Entry$ to $Stuck$ labeled $\{a,call,ret\}_i$ is a shorthand for three internal transitions in $\delta_i$: $(Entry,a,Stuck)$, $(Entry,call,Stuck)$, and $(Entry,ret,Stuck)$.  Similarly, the edges labeled $\{\cdots\}_c$ are shorthand for call transitions and the edges labeled $\{\cdots\}_r$ are shorthand for return transitions.}  
   \label{Fig:Example2}
 \end{figure}
 
@@ -355,7 +355,7 @@ The NWA has the possiblility for a special state called the stuck state (recall 
 
 \end{description}
 
-States are WALi \texttt{Keys} and can be added to an NWA of type 1 individually (using \texttt{addState}, \texttt{addInitialState}, or \texttt{addFinalState}) or as a part of a transition (see Section \ref{Se:Transitions}).  Note that in NWAs of type 1, the addition of an individual state automatically introduces an implicit internal transition to the stuck state for each symbol (except meta-symbols, which will be described in greater detail in Section \ref{Se:Symbols}) in the NWA; an implicit call transition to the stuck state for each symbol (except meta-symbols) in the NWA; and two return transitions to the stuck state for each state/symbol pair (except meta-symbols) pair in the NWA, one in which the state added plays the role of the exit state and one in which the state added plays the role of the call state.  Because NWAs of type 2 have no stuck state, such transitions cannot be added automatically and thus adding a state would violate the completeness of the states of the NWA.  Therefore, \textbf{no states can be added to an NWA of type 2}. \\
+States are WALi \texttt{Keys} and can be added to an NWA of type 1 individually (using \texttt{addState}, \texttt{addInitialState}, or \texttt{addFinalState}) or as a part of a transition (see Section \ref{Se:Transitions}).  Note that in NWAs of type 1, the addition of an individual state automatically introduces an implicit internal transition to the stuck state for each symbol (except meta-symbols\footnote{meta-symbols will be described in greater detail in Section \ref{Se:Symbols}}) in the NWA; an implicit call transition to the stuck state for each symbol (except meta-symbols) in the NWA; and two return transitions to the stuck state for each state/symbol pair (except meta-symbols) pair in the NWA, one in which the state added plays the role of the exit state and one in which the state added plays the role of the call state.  Because NWAs of type 2 have no stuck state, such transitions cannot be added automatically and thus adding a state would violate the completeness of the states of the NWA.  Therefore, \textbf{no states can be added to an NWA of type 2}. \\
 
 \noindent The following operations are methods of class NWA:
 
@@ -390,7 +390,7 @@ Initial (final) states can be removed from $Q_0 $ ($Q_f$) (but not from $Q$) ind
 
   \item\texttt{void clearStates()} \nopagebreak
 
-    Removes all states from $Q$ (including the stuck state).  As a side effect, it also removes all states from $Q_0$ and $Q_f$, as well as all transitions in the NWA.  The symbols in the NWA are not affected.
+    Removes all states (including the stuck state) from $Q$, $Q_0$, and $Q_f$.  As a side effect it also removes all transitions in the NWA.  The symbols in the NWA are not affected.
 
   \item\texttt{bool removeInitialState( Key st )} \nopagebreak
 
@@ -473,7 +473,7 @@ Each state in the NWA can be associated with some client-specific information. T
 \subsection{Symbols}
 \label{Se:Symbols}
 
-The system supports two meta-symbols: \begin{inparaenum} \item \texttt{Epsilon} (\texttt{$\epsilon$}) and \item \texttt{Wild} (\texttt{*}) \end{inparaenum} which are globally available.  \texttt{Epsilon} is the `absence' of a symbol, it denotes the situation in which a transition can be traversed without matching and consuming an input symbol.  \texttt{Epsilon} symbols cannot label call or return transitions (see Section \ref{Se:Transitions}).  \texttt{Wild} is the `any' symbol, it denotes the situation in which a transition can be traversed by consuming a single input symbol of any kind.  Note: \textbf{\texttt{Epsilon} and \texttt{Wild} are not elements of $\Sigma$.} Let $\Sigma^* = \Sigma \cup \{*, \epsilon\}$.\\  
+The system supports two meta-symbols: \begin{inparaenum} \item \texttt{Epsilon} (\texttt{$\epsilon$}) and \item \texttt{Wild} (\texttt{*}) \end{inparaenum} which are globally available.  \texttt{Epsilon} is the `absence' of a symbol, it denotes the situation in which a transition can be traversed without matching and consuming an input symbol.  \texttt{Epsilon} symbols cannot label call or return transitions (see Section \ref{Se:Transitions}).  \texttt{Wild} is the `any' symbol, it denotes the situation in which a transition can be traversed by consuming a single input symbol of any kind.  Since the NWA alphabet is not fixed, the actual symbols that \texttt{Wild} stands for is fluid.  Note: \textbf{\texttt{Epsilon} and \texttt{Wild} are not elements of $\Sigma$.} Let $\Sigma^* = \Sigma \cup \{*, \epsilon\}$.\\  
 
 \noindent The following operations are methods of class NWA:
 
@@ -550,7 +550,7 @@ The status of individual symbols (i.e., existence in an NWA) can be checked for 
 
 Transitions connect a pair (or triple) of states and are labeled with symbols or meta-symbols.  There are three types of transitions in an NWA: \begin{inparaenum} \item Internal \item Call \item Return. \end{inparaenum}  An internal transition is a transition of the form $(source, sym, target)$ in which $sym$ corresponds to the symbol at an internal position in a nested word accepted by the NWA.  A call transition is a transition of the form $(callSite, sym, entryPoint)$ in which $sym$ corresponds to the symbol at a call position in a nested word accepted by the NWA.  A return transition is a transition of the form $(exitPoint, callSite, sym, returnSite)$ in which $sym$ corresponds to the symbol at a return position in a nested word accepted by the NWA.  The number of transitions of each kind associated with a deterministic NWA is bounded by the number of states and symbols in the NWA.  There can only be $(number\_of\_states)*(number\_of\_symbols)$ internal transitions, $(number\_of\_states)*(number\_of\_symbols)$ call transitions, and $(number\_of\_states)^2*(number\_of\_symbols)$ return transitions.  The number of transitions of each kind associated with a nondeterministic NWA is bounded in a slightly different way by the number of states and symbols in the NWA.  There can only be $(number\_of\_states)^2*(number\_of\_symbols)$ internal transitions, $(number\_of\_states)^2*(number\_of\_symbols)$ call transitions, and $(number\_of\_states)^3*(number\_of\_symbols)$ return transitions.
 
-Transitions can be added to an NWA of type 1 via the overloaded functions \texttt{addInternalTrans}, \texttt{addCallTrans}, and \texttt{addReturnTrans}.  Those functions can either take three \texttt{Keys} that define the transition as input, or an input of type \texttt{KeyTriple\&}.  Alternatively, the set of transitions of a state (or the set of outgoing transitions of a state) can be duplicated for another state (using \texttt{duplicateState} or \texttt{duplicateStateOutgoing}) or all implicit transitions (to the stuck state) can be added as explicit transitions (using \texttt{realizeImplicitTrans}).  As a side effect of all of these functions, if any component (state or symbol) of a transition does not already exist in the NWA it will be added to the NWA.  Thus states and symbols need not be added independently prior to adding transitions.  Note that, in NWAs of type 1, the addition of a state or symbol adds to the NWA implicit transitions to the stuck state (see Section \ref{Se:States} and Section \ref{Se:Symbols}).  Because NWAs of type 2 have no stuck state, such transitions cannot be added automatically, and thus adding a transition would violate the completeness of the states in the NWA.  Therefore, \textbf{no transitions can be added to an NWA of type 2}.  Recall that the stuck state has no outgoing transitions except to itself (see Section \ref{Se:States}).  Thus, no transition leaving the stuck state will be added to the NWA unless it is going to the stuck state as well.  Recall also that the \texttt{$\epsilon$} symbol cannot label a call transition or a return transition (see Section \ref{Se:Symbols}).  Thus, no call or return transition with a symbol of \texttt{$\epsilon$} will be added. \\
+Transitions can be added to an NWA of type 1 via the overloaded functions \texttt{addInternalTrans}, \texttt{addCallTrans}, and \texttt{addReturnTrans}.  Those functions can either take three \texttt{Keys} that define the transition as input, or an input of type \texttt{KeyTriple\&} or \texttt{KeyQuad\&}.  \texttt{KeyTriple} and \texttt{KeyQuad} are WALi data structures containing 3 and 4 \texttt{Keys}, respectively.  Alternatively, the set of transitions of a state (or the set of outgoing transitions of a state) can be duplicated for another state (using \texttt{duplicateState} or \texttt{duplicateStateOutgoing}) or all implicit transitions (to the stuck state) can be added as explicit transitions (using \texttt{realizeImplicitTrans}).  As a side effect of all of these functions, if any component (state or symbol) of a transition does not already exist in the NWA it will be added to the NWA.  Thus states and symbols need not be added independently prior to adding transitions.  Note that, in NWAs of type 1, the addition of a state or symbol adds to the NWA implicit transitions to the stuck state (see Section \ref{Se:States} and Section \ref{Se:Symbols}).  Because NWAs of type 2 have no stuck state, such transitions cannot be added automatically, and thus adding a transition would violate the completeness of the states in the NWA.  Therefore, \textbf{no transitions can be added to an NWA of type 2}.  Recall that the stuck state has no outgoing transitions except to itself (see Section \ref{Se:States}).  Thus, no transition leaving the stuck state will be added to the NWA unless it is going to the stuck state as well.  Recall also that the \texttt{$\epsilon$} symbol cannot label a call transition or a return transition (see Section \ref{Se:Symbols}).  Thus, no call or return transition with a symbol of \texttt{$\epsilon$} will be added. \\
 
 \noindent The following operations are methods of class NWA:
 
@@ -590,7 +590,7 @@ Transitions can be added to an NWA of type 1 via the overloaded functions \textt
 
   \item\texttt{void realizeImplicitTrans()} \nopagebreak
 
-    Adds all implicit transitions explicitly to the stuck state.  This should only be called on an NWA of type 1 and changes the NWA to an NWA of type 2.  Otherwise there is an assertion violation. \\
+    Adds all implicit transitions explicitly to the stuck state.  This should only be called on an NWA of type 1, and it changes the NWA to an NWA of type 2.  Otherwise there is an assertion violation. \\
 
 \end{description} 
 
@@ -702,11 +702,11 @@ The set of supported queries about an NWA's explicit transitions includes: the e
 
   \item\texttt{const std::set<Key> getSources( Key symbol, Key target )} \nopagebreak
 
-    Yields the set of all states, $source$, such that the internal transition $(source,\texttt{symbol},\texttt{target}) \in \delta_i$.
+    Yields the set of all states, $source$, such that the internal transition $(source,\texttt{symbol},\texttt{target})$ is in $\delta_i$.
 
   \item\texttt{const std::set<std::pair<Key,Key>> getSources( Key target )} \nopagebreak
 
-    Yields the set of all state/symbol pairs, $(source,sym)$, such that the internal transition $(source,sym,\texttt{target}) \in \delta_i$.
+    Yields the set of all state/symbol pairs, $(source,sym)$, such that the internal transition $(source,sym,\texttt{target})$ is in $\delta_i$.
 
   \item\texttt{const std::set<Key> getSources( )} \nopagebreak
 
@@ -718,11 +718,11 @@ The set of supported queries about an NWA's explicit transitions includes: the e
 
   \item\texttt{const std::set<Key> getTargets( Key source, Key symbol )} \nopagebreak
 
-    Yields the set of all states, $target$, such that the internal transition $(\texttt{source},\texttt{symbol},target) \in \delta_i$.
+    Yields the set of all states, $target$, such that the internal transition $(\texttt{source},\texttt{symbol},target)$ is in $\delta_i$.
 
   \item\texttt{const std::set<std::pair<Key,Key>> getTargets( Key source )} \nopagebreak
 
-    Yields the set of all symbol/state pairs, $(sym,target)$, such that the internal transition $(\texttt{source},sym,target) \in \delta_i$.
+    Yields the set of all symbol/state pairs, $(sym,target)$, such that the internal transition $(\texttt{source},sym,target)$ is in $\delta_i$.
 
   \item\texttt{const std::set<Key> getTargets( )} \nopagebreak
 
@@ -734,7 +734,7 @@ The set of supported queries about an NWA's explicit transitions includes: the e
 
   \item\texttt{const std::set<Key> getInternalSym( Key source, Key target )} \nopagebreak
 
-    Yields the set of all symbols, $symbol$, such that the internal transition $(\texttt{source},symbol,\texttt{target}) \in \delta_i$.
+    Yields the set of all symbols, $symbol$, such that the internal transition $(\texttt{source},symbol,\texttt{target})$ is in $\delta_i$.
 
   \item\texttt{const std::set<Key> getInternalSym\_Source( Key source )} \nopagebreak
 
@@ -750,11 +750,11 @@ The set of supported queries about an NWA's explicit transitions includes: the e
 
   \item\texttt{const std::set<Key> getCallSites( Key symbol, Key entryPoint )} \nopagebreak
 
-    Yields the set of all states, $callSite$, such that the call transition $(callSite,\texttt{symbol},\texttt{entryPoint}) \in \delta_c$.
+    Yields the set of all states, $callSite$, such that the call transition $(callSite,\texttt{symbol},\texttt{entryPoint})$ is in $\delta_c$.
 
-  \item\texttt{const std::set<std::pair<Key,Key>> getCallSites( Key entryPoint )} \nopagebreak
+  \item\texttt{const std::set<std::pair<Key,Key>> getCallSites( Key entryPoint )}
 
-    Yields the set of all state/symbol pairs, $(callSite,sym)$, such that $(callSite,sym,entryPoint) \in \delta_c$. 
+    Yields the set of all state/symbol pairs, $(callSite,sym)$, such that the call transition $(callSite,sym,entryPoint)$ is in $\delta_c$. 
 
   \item\texttt{const std::set<Key> getCallSites( )} \nopagebreak
 
@@ -766,11 +766,11 @@ The set of supported queries about an NWA's explicit transitions includes: the e
 
   \item\texttt{const std::set<Key> getEntries( Key callSite, Key symbol )} \nopagebreak
 
-    Yields the set of all states, $entryPoint$, such that the call transition $(\texttt{callSite},\texttt{symbol},entryPoint) \in \delta_c$.
+    Yields the set of all states, $entryPoint$, such that the call transition $(\texttt{callSite},\texttt{symbol},entryPoint)$ is in $\delta_c$.
 
   \item\texttt{const std::set<std::pair<Key,Key>> getEntries( Key callSite )} \nopagebreak
 
-    Yields the set of all symbol/state pairs, $(sym,entryPoint)$, such that the call transition $(\texttt{callSite},sym,entryPoint) \in \delta_c$.
+    Yields the set of all symbol/state pairs, $(sym,entryPoint)$, such that the call transition $(\texttt{callSite},sym,entryPoint)$ is in $\delta_c$.
 
   \item\texttt{const std::set<Key> getEntries( )} \nopagebreak
 
@@ -782,7 +782,7 @@ The set of supported queries about an NWA's explicit transitions includes: the e
 
   \item\texttt{const std::set<Key> getCallSym( Key callSite, Key entryPoint )} \nopagebreak
 
-    Yields the set of all symbols, $symbol$, such that the call transition $(\texttt{callSite},symbol,\texttt{entryPoint}) \in \delta_c$.
+    Yields the set of all symbols, $symbol$, such that the call transition $(\texttt{callSite},symbol,\texttt{entryPoint})$ is in $\delta_c$.
 
   \item\texttt{const std::set<Key> getCallSym\_Call( Key callSite )} \nopagebreak
 
@@ -798,11 +798,11 @@ The set of supported queries about an NWA's explicit transitions includes: the e
 
   \item\texttt{const std::set<Key> getExits( Key callSite, Key symbol,\\ \hspace*{3.25cm} Key returnSite )} \nopagebreak
 
-    Yields the set of all states, $exitPoint$, such that the return transition $(exitPoint,\texttt{callSite},\texttt{symbol},\texttt{returnSite}) \in \delta_r$.
+    Yields the set of all states, $exitPoint$, such that the return transition $(exitPoint,\texttt{callSite},\texttt{symbol},\texttt{returnSite})$ is in $\delta_r$.
 
   \item\texttt{const std::set<std::pair<Key,Key>> getExits( Key callSite,\\ \hspace*{3.25cm} Key returnSite )} \nopagebreak
 
-    Yields the set of all state/symbol pairs, $(exitPoint,sym)$, such that the return transition $(exitPoint,\texttt{callSite},sym,\texttt{returnSite}) \in \delta_r$.
+    Yields the set of all state/symbol pairs, $(exitPoint,sym)$, such that the return transition $(exitPoint,\texttt{callSite},sym,\texttt{returnSite})$ is in $\delta_r$.
 
   \item\texttt{const std::set<Key> getExits( )} \nopagebreak
 
@@ -830,11 +830,11 @@ The set of supported queries about an NWA's explicit transitions includes: the e
 
   \item\texttt{const std::set<Key> getCalls( Key exitPoint, Key symbol,\\ \hspace*{3.25cm} Key returnSite )} \nopagebreak
 
-    Yields the set of all states, $callSite$, such that the return transition $(\texttt{exitPoint},callSite,\texttt{symbol},\texttt{returnSite}) \in \delta_r$.
+    Yields the set of all states, $callSite$, such that the return transition $(\texttt{exitPoint},callSite,\texttt{symbol},\texttt{returnSite})$ is in $\delta_r$.
 
   \item\texttt{const std::set<std::pair<Key,Key>> getCalls( Key exitPoint,\\ \hspace*{3.25cm} Key returnSite )} \nopagebreak
 
-    Yields the set of all state/symbol pairs, $(callSite,sym)$, such that the return transition $(\texttt{exitPoint},callSite,sym,\texttt{returnSite} \in \delta_r$.
+    Yields the set of all state/symbol pairs, $(callSite,sym)$, such that the return transition $(\texttt{exitPoint},callSite,sym,\texttt{returnSite}$ is in $\delta_r$.
 
   \item\texttt{const std::set<Key> getCalls( )} \nopagebreak
 
@@ -862,11 +862,11 @@ The set of supported queries about an NWA's explicit transitions includes: the e
 
   \item\texttt{const std::set<Key> getReturns( Key exitPoint ,Key callSite,\\ \hspace*{3.25cm} Key symbol )} \nopagebreak
 
-    Yields the set of all states, $returnSite$, such that the return transition $(\texttt{exitPoint},\texttt{callSite},\texttt{symbol},returnSite) \in \delta_r$.
+    Yields the set of all states, $returnSite$, such that the return transition $(\texttt{exitPoint},\texttt{callSite},\texttt{symbol},returnSite)$ is in $\delta_r$.
 
   \item\texttt{const std::set<std::pair<Key,Key>> getReturns( Key exitPoint,\\ \hspace*{3.25cm} Key callSite )} \nopagebreak
 
-    Yields the set of all symbol/state pairs, $(sym,returnSite)$, such that the return transition $(\texttt{exitPoint},\texttt{callSite},sym,returnSite) \in \delta_r$.
+    Yields the set of all symbol/state pairs, $(sym,returnSite)$, such that the return transition $(\texttt{exitPoint},\texttt{callSite},sym,returnSite)$ is in $\delta_r$.
 
   \item\texttt{const std::set<Key> getReturns( )} \nopagebreak
 
@@ -894,7 +894,7 @@ The set of supported queries about an NWA's explicit transitions includes: the e
 
   \item\texttt{const std::set<Key> getReturnSym( \\ \hspace*{3.25cm}Key exitPoint, Key callSite, Key returnSite )} \nopagebreak
 
-    Yields the set of all symbols, $symbol$, such that the return transition $(\texttt{exitPoint},\texttt{callSite},symbol,\texttt{returnSite}) \in \delta_r$.
+    Yields the set of all symbols, $symbol$, such that the return transition $(\texttt{exitPoint},\texttt{callSite},symbol,\texttt{returnSite})$ is in $\delta_r$.
 
   \item\texttt{const std::set<Key> getReturnSym( )} \nopagebreak
 
@@ -1116,7 +1116,7 @@ Consider an example of computing the Kleene-Star of the NWA shown in Figure \ref
 
 \end{enumerate}  
 
-\noindent The NWA resulting from performing Kleene-Star on the NWA shown in Figure \ref{Fig:Star1} is shown in Figure \ref{Fig:Star2}.
+\noindent The NWA resulting from performing Kleene-Star on the NWA shown in Figure \ref{Fig:Star1} is shown in Figure \ref{Fig:Star2}.  Note: The primed states, $q'$ are constructed using \texttt{getKey($q$,getKey(prime))} where $q \in Q$ and \texttt{prime} is the string ``prime''.
 
 \begin{figure}[htbp]
   \centering
@@ -1132,7 +1132,7 @@ Consider an example of computing the Kleene-Star of the NWA shown in Figure \ref
   \label{Fig:Star2}
 \end{figure}
 
-The stuck state of the NWA on which the Kleene-Star method is called cannot appear in the component NWA or the primed version of any such state (i.e., $stuck \not\in Q \cup Q'$) unless it is the stuck state.  Client information is copied directly from the component NWA (using the \texttt{ClientInfo} copy constructor) such that for each $q \in Q$, $q$ and $q'$ have the same client information.   
+The stuck state of the NWA on which the Kleene-Star method is called cannot appear in the component NWA nor can it be the prime of any state in the NWA (i.e., $stuck \not\in Q \cup Q'$) unless it is the stuck state.  Client information is copied directly from the component NWA (using the \texttt{ClientInfo} copy constructor) such that for each $q \in Q$, $q$ and $q'$ have the same client information.   
 
 %Consider the slightly more complex example of computing the Kleene-Star of the NWA shown in Figure \ref{Fig:Star3}.  The resulting NWA is shown in Figure \ref{Fig:Star4}.
 
@@ -1188,9 +1188,9 @@ An NWA, $(Q,\Sigma,Q_0,\delta,Q_f)$, is \textbf{deterministic} iff
 
 \item For all $q \in Q$: 
   \begin{itemize}
-    \item if $(q,*,q') \in \delta_i$ then $|\{q'|(q,\sigma,q') \in \delta_i\}| = 0$; otherwise, for all $\sigma \in \Sigma - \{*\}, |\{q'|(q,\sigma,q') \in \delta_i\}| \leq 1$;
+    \item if $(q,*,q') \in \delta_i$ then $|\{q'|(q,\sigma,q') \in \delta_i\}| = 0$; otherwise, for all $\sigma \in \Sigma - \{*\}, |\{q'|(q,\sigma,q') \in \delta_i\}| \leq 1$,
 
-    \item if $(q,*,q') \in \delta_c$ then $ |\{q'|(q,\sigma,q') \in \delta_c\}| = 0$; otherwise for all $\sigma \in \Sigma - \{*\}, |\{q'|(q,\sigma,q') \in \delta_c\}| \leq 1$;  and
+    \item if $(q,*,q') \in \delta_c$ then $ |\{q'|(q,\sigma,q') \in \delta_c\}| = 0$; otherwise for all $\sigma \in \Sigma - \{*\}, |\{q'|(q,\sigma,q') \in \delta_c\}| \leq 1$,  and
 
     \item for all $q' \in Q$, if $(q,q',*,q'') \in \delta_r$ then $|\{q''|(q,q',\sigma,q'') \in \delta_r\}| = 0$; otherwise for all $\sigma \in \Sigma - \{*\}, |\{q''|(q,q',\sigma,q'') \in \delta_r\}| \leq 1$, and
   \end{itemize}
@@ -1205,7 +1205,7 @@ An NWA, $(Q,\Sigma,Q_0,\delta,Q_f)$, is \textbf{deterministic} iff
 If an NWA is not deterministic, then it is \textbf{non-deterministic}.
 \end{definition}
 
-Consider an example of determinizing a simple nondeterministic NWA, the NWA shown in Figure \ref{Fig:Det1}.  The deterministic NWA is computed by a generalization of the classical subset construction.  Instead of the states in the determinized NWA being subsets of the original NWA, states of  the determinized NWA are sets of state pairs (i.e., binary relations on states) \cite{DLT:AM2006}.  To support determinization, the library provides class \texttt{BinaryRelation}, which is a set of \texttt{Key} pairs.  The resulting NWA is shown in Figure \ref{Fig:Det2}.
+Consider an example of determinizing a simple nondeterministic NWA, the NWA shown in Figure \ref{Fig:Det1}.  The deterministic NWA is computed by a generalization of the classical subset construction.  Instead of the states in the determinized NWA being subsets of the original NWA, states of  the determinized NWA are sets of state pairs (i.e., binary relations on states) \cite{JACM:AM2009}.  To support determinization, the library provides class \texttt{BinaryRelation}, which is a set of \texttt{Key} pairs.  The resulting NWA is shown in Figure \ref{Fig:Det2}.
 
 \begin{figure}[htbp]
   \centering
@@ -1233,7 +1233,7 @@ Client information is generated through the use of the helper method \texttt{mer
 
     Computes the client information that should be associated with the given state.
 
-  \item\texttt{void mergeClientInfoInternal( ref\_ptr<NWA> first,\\ \hspace*{3.25cm} BinaryRelation const\& binRelSource,\\ \hspace*{3.25cm} BinaryRelation const\& binRelTarget,\\ \hspace*{3.25cm} Key sourceSt, Key resSym, Key resSt,\\ \hspace*{3.25cm} ref\_ptr<ClientInfo>\& resCI )} \nopagebreak
+  \item\texttt{void mergeClientInfoInternal( ref\_ptr<NWA> first,\nopagebreak \\ \hspace*{3.25cm} BinaryRelation const\& binRelSource,\nopagebreak \\ \hspace*{3.25cm} BinaryRelation const\& binRelTarget, \nopagebreak \\ \hspace*{3.25cm} Key sourceSt, Key resSym, Key resSt, \nopagebreak \\ \hspace*{3.25cm} ref\_ptr<ClientInfo>\& resCI )} \nopagebreak
 
     Alters the client information associated with \texttt{resSt} given the details of the internal transition to be added to the NWA.
 
@@ -1450,7 +1450,7 @@ An NWA can also be converted into a WPDS.  In this way it is possible to use the
 
 \end{enumerate}
 
-\noindent Consider, as an example, converting the NWA in Figure \ref{Fig:NWAtoPDS1} into a backwards flow WPDS.  The WPDS resulting from converting the PDS shown in Figure \ref{Fig:NWAtoPDS1} into a backwards flow WPDS is shown in Figure \ref{Fig:NWAtoPDS5}. \\
+\noindent Consider, as an example, converting the NWA in Figure \ref{Fig:NWAtoPDS1} into a backwards flow WPDS.  The WPDS resulting from converting the PDS shown in Figure \ref{Fig:NWAtoPDS1} into a backwards flow WPDS is shown in Figure \ref{Fig:NWAtoPDS5}.  Note: \texttt{NWAtoBackwardsPDScalls(A)} = \texttt{NWAtoPDScalls(reverse(A))}.  \\
 
 \begin{figure}[htbp]
   \centering
@@ -1612,7 +1612,7 @@ See Section \ref{Se:Determinize} for the definition of deterministic.
 
 \end{description}
 
-Class \texttt{NWS} represents nested-word suffixes, i.e., unbalanced-right nested words. Using the following methods, a nested-word suffix can be constructed and used to determine whether a specific nested word is accepted by an NWA (using \texttt{isMember}). \\
+Class \texttt{NWS} represents nested-word suffixes, i.e., unbalanced-right nested words.  In an \texttt{NWS} each position of the nested-word suffix corresponds to one \texttt{NWSNode}.  Using the following methods, a nested-word suffix can be constructed and used to determine whether a specific nested word is accepted by an NWA (using \texttt{isMember}). Note: The left-hand side of an \texttt{NWS} is referred to as the working end of the \texttt{NWS} as nodes can be added to and removed from this end only. \\
 
 \noindent The following operations are methods of class NWS:
 
@@ -1656,9 +1656,9 @@ Class \texttt{NWS} represents nested-word suffixes, i.e., unbalanced-right neste
 
 \end{description}
 
- \noindent Note that class \texttt{NWS} can also represent balanced nested words by simply having an empty nesting stack. 
+ \noindent Note that class NWS can also represent balanced nested words by simply having an empty nesting stack. 
 
-Class \texttt{NWP} represents nested-word prefixes, i.e., unbalanced-left nested words. Using the following methods, a nested-word prefix can be constructed and used. \\
+Similarly, class \texttt{NWP} represents nested-word prefixes, i.e., unbalanced-left nested words.  In an \texttt{NWP} each position of the nested-word prefix corresponds to one \texttt{NWPNode}.  Using the following methods, a nested-word prefix can be constructed and used. Note: The right-hand side of an \texttt{NWP} is referred to as the working end of the \texttt{NWP} as nodes can be added to and removed from this end only. \\
 
 \noindent The following operations are methods of class NWP:
 
