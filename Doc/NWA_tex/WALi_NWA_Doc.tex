@@ -146,7 +146,7 @@ The library supports unbalanced-left, unbalanced-right, and balanced nested-word
 \hhline{|b:=====:b|}
   \end{tabular}
 \vspace{1cm} &
-  \begin{tabular}{|| r | l | l | l | l ||}
+  \begin{tabular}{|| r || l | l | l | l ||}
 \hhline{|t:=====:t|}
     Concatenation & B & UL & UR & NW \\
 \hhline{||=#=|=|=|=||}
@@ -160,7 +160,7 @@ The library supports unbalanced-left, unbalanced-right, and balanced nested-word
 \hhline{|b:=====:b|}
   \end{tabular} \\
 \vspace{1cm}
-  \begin{tabular}{|| r | l | l | l | l ||}
+  \begin{tabular}{|| r || l | l | l | l ||}
 \hhline{|t:=====:t|}
     Union & B & UL & UR & NW \\
 \hhline{||=#=|=|=|=||}
@@ -173,7 +173,7 @@ The library supports unbalanced-left, unbalanced-right, and balanced nested-word
     NW & NW & NW & NW & NW \\
 \hhline{|b:=====:b|}
   \end{tabular} &
-  \begin{tabular}{|| r | l | l | l | l ||}
+  \begin{tabular}{|| r || l | l | l | l ||}
 \hhline{|t:=====:t|}
     Operation & B & UL & UR & NW \\
 \hhline{||=#=|=|=|=||}
@@ -1394,6 +1394,12 @@ An NWA can also be converted into a WPDS.  In this way it is possible to use the
 
 \end{description}
 
+\begin{figure}[htbp]
+  \centering
+    \includegraphics[width=12cm]{Figures/Figure23.eps}
+  \caption{An example NWA.}
+  \label{Fig:NWAtoPDS1}
+\end{figure}
 
 \noindent \textbf{1. Forwards Flow Stacking Calls} \\
 
@@ -1411,7 +1417,7 @@ An NWA can also be converted into a WPDS.  In this way it is possible to use the
 
 \noindent Consider, as an example, converting the NWA in Figure \ref{Fig:NWAtoPDS5} into a WPDS. The WPDS resulting from converting the PDS shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure \ref{Fig:NWAtoPDS4}. \\
 
-\begin{figure}[p]
+\begin{figure}[htbp]
   \centering
     \begin{description}
       \centering
@@ -1452,7 +1458,7 @@ An NWA can also be converted into a WPDS.  In this way it is possible to use the
 
 \noindent Consider, as an example, converting the NWA in Figure \ref{Fig:NWAtoPDS1} into a backwards flow WPDS.  The WPDS resulting from converting the PDS shown in Figure \ref{Fig:NWAtoPDS1} into a backwards flow WPDS is shown in Figure \ref{Fig:NWAtoPDS5}.  Note: \texttt{NWAtoBackwardsPDScalls(A)} = \texttt{NWAtoPDScalls(reverse(A))}.  \\
 
-\begin{figure}[p]
+\begin{figure}[htbp]
   \centering
     \begin{description}
       \centering
@@ -1491,16 +1497,9 @@ An NWA can also be converted into a WPDS.  In this way it is possible to use the
 
 \end{enumerate}
 
-\begin{figure}[p]
-  \centering
-    \includegraphics[width=12cm]{Figures/Figure23.eps}
-  \caption{An example NWA.}
-  \label{Fig:NWAtoPDS1}
-\end{figure}
-
 \noindent Consider, as an example, converting the NWA in Figure \ref{Fig:NWAtoPDS1} into a WPDS.  The WPDS resulting from converting the PDS shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure \ref{Fig:NWAtoPDS2}. \\
 
-\begin{figure}[p]
+\begin{figure}[htbp]
   \centering
     \begin{description}
       \centering
@@ -1540,7 +1539,7 @@ An NWA can also be converted into a WPDS.  In this way it is possible to use the
 
 \noindent Consider, as an example, converting the NWA in Figure \ref{Fig:NWAtoPDS3} into a backwards flow WPDS.  The WPDS resulting from converting the PDS shown in Figure \ref{Fig:NWAtoPDS1} into a backwards flow WPDS is shown in Figure \ref{Fig:NWAtoPDS3}. \\
 
-\begin{figure}[p]
+\begin{figure}[htbp]
   \centering
     \begin{description}
       \centering

@@ -4149,6 +4149,9 @@ namespace wali
     {
       assert(sym < wali::WALI_BAD_KEY);
 
+      if( isWild(sym) || isEpsilon(sym) )
+        return false;
+
       bool removed = symbols.removeSymbol(sym);
       if( removed )
       {
