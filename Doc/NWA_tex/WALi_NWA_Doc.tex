@@ -132,16 +132,16 @@ The library supports unbalanced-left, unbalanced-right, and balanced nested-word
 \begin{figure}[htb]
   \centering
 \begin{tabular}{c@{\hspace{1cm}}c}
-  \begin{tabular}{|| r | l | l | l | l ||}
+  \begin{tabular}{|| r || l | l | l | l ||}
 \hhline{|t:=====:t|}
     Intersection & B & UL & UR & NW \\
-\hline
+\hhline{||=#=|=|=|=||}
     B & B & B & B & B \\
-\hline
+\hhline{||-||-|-|-|-||}
     UL & B & UL & B & UL \\
- \hline
+ \hhline{||-||-|-|-|-||}
     UR & B & B & UR & UR \\
-\hline
+\hhline{||-||-|-|-|-||}
     NW & B & UL & UR & NW \\
 \hhline{|b:=====:b|}
   \end{tabular}
@@ -149,13 +149,13 @@ The library supports unbalanced-left, unbalanced-right, and balanced nested-word
   \begin{tabular}{|| r | l | l | l | l ||}
 \hhline{|t:=====:t|}
     Concatenation & B & UL & UR & NW \\
-\hline
+\hhline{||=#=|=|=|=||}
     B & B & UL & UR & NW \\
-\hline
+\hhline{||-||-|-|-|-||}
     UL & UL & UL & NW & NW \\
-\hline
+\hhline{||-||-|-|-|-||}
     UR & UR & NW & UR & NW \\
-\hline
+\hhline{||-||-|-|-|-||}
     NW & NW & NW & NW & NW \\
 \hhline{|b:=====:b|}
   \end{tabular} \\
@@ -163,24 +163,24 @@ The library supports unbalanced-left, unbalanced-right, and balanced nested-word
   \begin{tabular}{|| r | l | l | l | l ||}
 \hhline{|t:=====:t|}
     Union & B & UL & UR & NW \\
-\hline
+\hhline{||=#=|=|=|=||}
     B & B & UL & UR & NW \\
-\hline
+\hhline{||-||-|-|-|-||}
     UL & UL & UL & NW & NW \\
-\hline
+\hhline{||-||-|-|-|-||}
     UR & UR & NW & UR & NW \\
-\hline
+\hhline{||-||-|-|-|-||}
     NW & NW & NW & NW & NW \\
 \hhline{|b:=====:b|}
   \end{tabular} &
   \begin{tabular}{|| r | l | l | l | l ||}
 \hhline{|t:=====:t|}
     Operation & B & UL & UR & NW \\
-\hline
+\hhline{||=#=|=|=|=||}
     Star & B & UL & UR & NW \\
-\hline
+\hhline{||-||-|-|-|-||}
     Reverse & B & UR & UL & NW \\
-\hline
+\hhline{||-||-|-|-|-||}
     Complement & UL & UL & UR & NW \\
 \hhline{|b:=====:b|}
   \end{tabular} \\
@@ -1063,7 +1063,7 @@ It is possible to customize what states and symbols are considered equivalent by
 
 Consider the slightly more complex example of computing the intersection of the NWAs shown in Figure \ref{Fig:Intersect3}.  The resulting NWA is shown in Figure \ref{Fig:Intersect4}.  Note that a state is only made final if both of its component states were final in their respective NWAs (this can be seen in the state 'Call\_1,Dead\_End' where 'Dead\_End' was final, but 'Call\_1' was not).  
 
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
     \includegraphics[width=12cm]{Figures/Figure7a.eps}
     \includegraphics[width=12cm]{Figures/Figure7b.eps}
@@ -1071,7 +1071,7 @@ Consider the slightly more complex example of computing the intersection of the 
   \label{Fig:Intersect3}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
     \includegraphics[width=12cm]{Figures/Figure8.eps}
   \caption{The NWA resulting from the intersection of the NWAs in Figure \ref{Fig:Intersect3}.}
@@ -1083,14 +1083,14 @@ Consider the slightly more complex example of computing the intersection of the 
 
 Consider an example of computing the concatenation of two NWAs, the NWA shown in Figure \ref{Fig:Example1} and the NWA shown in Figure \ref{Fig:Concat1}.  The concatenation is constructed by combining all states and transitions of the first NWA (shown in Figure \ref{Fig:Example1}) and all states and transitions of the second NWA (shown in Figure \ref{Fig:Concat1}) then adding internal epsilon transitions from each final state of the first NWA to each initial state of the second NWA.  In the resulting NWA, the initial states are the initial states from the first NWA; the final states are the final states of the second NWA.  If the component NWAs are  $(Q_1, \Sigma_1, {Q_0}_1, \delta_1, {Q_f}_1)$ and $(Q_2, \Sigma_2, {Q_0}_2, \delta_2, {Q_f}_2)$, then the resulting NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$ where $Q = Q_1 \cup Q_2$, $\Sigma = \Sigma_1 \cup \Sigma_2$, $Q_0 = {Q_0}_1$, $\delta = \delta_1 \cup \delta_2 \cup \delta_\epsilon$ (where $\delta_\epsilon = \{(q,\epsilon,q') | q \in {Q_f}_1, q' \in {Q_0}_2\}$, and $Q_f = {Q_f}_2$ .  The NWA resulting from the concatenation of the NWA in Figure \ref{Fig:Example1} and the NWA shown in Figure \ref{Fig:Concat1} is shown in Figure \ref{Fig:Concat2}.
 
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
     \includegraphics[width=10cm]{Figures/Figure9.eps}
   \caption{Simple NWA to concatenate onto the NWA in Figure \ref{Fig:Example1}.}
   \label{Fig:Concat1}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
     \includegraphics[width=12cm]{Figures/Figure10.eps}
   \caption{The NWA resulting from the concatenation of the NWA in Figure \ref{Fig:Example1} with the NWA in Figure \ref{Fig:Concat1}.}
@@ -1118,14 +1118,14 @@ Consider an example of computing the Kleene-Star of the NWA shown in Figure \ref
 
 \noindent The NWA resulting from performing Kleene-Star on the NWA shown in Figure \ref{Fig:Star1} is shown in Figure \ref{Fig:Star2}.  Note: The primed states, $q'$ are constructed using \texttt{getKey($q$,getKey(prime))} where $q \in Q$ and \texttt{prime} is the string ``prime''.
 
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
     \includegraphics[width=10cm]{Figures/Figure11.eps}
   \caption{An NWA on which to perform Kleene-Star.}
   \label{Fig:Star1}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
     \includegraphics[width=12cm]{Figures/Figure12.eps}
   \caption{The NWA resulting from performing Kleene-Star on the NWA in Figure \ref{Fig:Star1}.}
@@ -1167,7 +1167,7 @@ If the component NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$, then the result of reve
 
 \noindent The NWA resulting from performing reverse on the NWA shown in Figure \ref{Fig:Example1} is shown in Figure \ref{Fig:Reverse1}.
  
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
     \includegraphics[width=12cm]{Figures/Figure15.eps}
   \caption{The NWA resulting from performing reverse on the NWA in Figure \ref{Fig:Example1}.}
@@ -1207,7 +1207,7 @@ If an NWA is not deterministic, then it is \textbf{non-deterministic}.
 
 Consider an example of determinizing a simple nondeterministic NWA, the NWA shown in Figure \ref{Fig:Det1}.  The deterministic NWA is computed by a generalization of the classical subset construction.  Instead of the states in the determinized NWA being subsets of the original NWA, states of  the determinized NWA are sets of state pairs (i.e., binary relations on states) \cite{JACM:AM2009}.  To support determinization, the library provides class \texttt{BinaryRelation}, which is a set of \texttt{Key} pairs.  The resulting NWA is shown in Figure \ref{Fig:Det2}.
 
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
     \includegraphics[width=12cm]{Figures/Figure16.eps}
   \caption{Simple nondeterministic NWA.}
@@ -1215,7 +1215,7 @@ Consider an example of determinizing a simple nondeterministic NWA, the NWA show
 \end{figure}
 
 
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
     \includegraphics[width=16cm]{Figures/Figure17.eps}
   \caption{The NWA resulting from determinizing the NWA in Figure \ref{Fig:Det1}.}
@@ -1268,7 +1268,7 @@ Client information is generated through the use of the helper method \texttt{mer
 
 The complement is performed by first determinizing the NWA and then complementing the final-state set of the determinized NWA.  The NWA resulting from performing the complement of the NWA shown in Figure \ref{Fig:Det1} is shown in Figure \ref{Fig:Comp1}.
 
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
     \includegraphics[width=12cm]{Figures/Figure20.eps}
   \caption{The complement of the NWA in Figure \ref{Fig:Det1} (the determinization of which is shown in Figure \ref{Fig:Det2}).}
@@ -1332,7 +1332,7 @@ The last way to build an NWA is to convert a PDS into an NWA.  The conversion is
 
 \end{enumerate}
 
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
     \begin{description}
       \centering
@@ -1356,7 +1356,7 @@ The last way to build an NWA is to convert a PDS into an NWA.  The conversion is
 
 For example, the NWA resulting from converting the PDS shown in Figure \ref{Fig:PDStoNWA1} into an NWA is shown in Figure \ref{Fig:PDStoNWA2}.
 
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
     \includegraphics[width=12cm]{Figures/Figure22.eps}
   \caption{The NWA resulting from converting the PDS in Figure \ref{Fig:PDStoNWA1} into an NWA.}
@@ -1411,7 +1411,7 @@ An NWA can also be converted into a WPDS.  In this way it is possible to use the
 
 \noindent Consider, as an example, converting the NWA in Figure \ref{Fig:NWAtoPDS5} into a WPDS. The WPDS resulting from converting the PDS shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure \ref{Fig:NWAtoPDS4}. \\
 
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
     \begin{description}
       \centering
@@ -1452,7 +1452,7 @@ An NWA can also be converted into a WPDS.  In this way it is possible to use the
 
 \noindent Consider, as an example, converting the NWA in Figure \ref{Fig:NWAtoPDS1} into a backwards flow WPDS.  The WPDS resulting from converting the PDS shown in Figure \ref{Fig:NWAtoPDS1} into a backwards flow WPDS is shown in Figure \ref{Fig:NWAtoPDS5}.  Note: \texttt{NWAtoBackwardsPDScalls(A)} = \texttt{NWAtoPDScalls(reverse(A))}.  \\
 
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
     \begin{description}
       \centering
@@ -1491,7 +1491,7 @@ An NWA can also be converted into a WPDS.  In this way it is possible to use the
 
 \end{enumerate}
 
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
     \includegraphics[width=12cm]{Figures/Figure23.eps}
   \caption{An example NWA.}
@@ -1500,7 +1500,7 @@ An NWA can also be converted into a WPDS.  In this way it is possible to use the
 
 \noindent Consider, as an example, converting the NWA in Figure \ref{Fig:NWAtoPDS1} into a WPDS.  The WPDS resulting from converting the PDS shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure \ref{Fig:NWAtoPDS2}. \\
 
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
     \begin{description}
       \centering
@@ -1540,7 +1540,7 @@ An NWA can also be converted into a WPDS.  In this way it is possible to use the
 
 \noindent Consider, as an example, converting the NWA in Figure \ref{Fig:NWAtoPDS3} into a backwards flow WPDS.  The WPDS resulting from converting the PDS shown in Figure \ref{Fig:NWAtoPDS1} into a backwards flow WPDS is shown in Figure \ref{Fig:NWAtoPDS3}. \\
 
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
     \begin{description}
       \centering
