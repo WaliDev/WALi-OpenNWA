@@ -6942,8 +6942,10 @@ template <typename Client>
 
 	  //Clear all states(except the stuck state) and transitions from this machine.
       St stuckSt = getStuckState();
+      ClientInfoRefPtr stuckStInfo = getClientInfo( stuckSt );
 	  clear();
 	  setStuckState(stuckSt);
+    setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
 
       std::set<StatePair> visitedPairs; // All the pairs of states we have ever encountered.
       std::deque<StatePair> worklistPairs; // Pairs of states yet to be processed
