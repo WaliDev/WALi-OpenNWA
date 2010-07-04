@@ -5072,7 +5072,7 @@ namespace wali
       std::set<std::pair<Sym,St> > calls;
       for( callIterator it = call.begin(); it != call.end(); it++ )
       {
-        calls.insert( std::pair<Sym,St>(Trans::getCallSym(*it),Trans::getCallSite(*it)) );
+        calls.insert( std::pair<Sym,St>(Trans::getCallSite(*it), Trans::getCallSym(*it) ) );
       }
       return calls;
     }
@@ -6896,8 +6896,11 @@ template <typename Client>
 
 	    //Clear all states(except the stuck state) and transitions from this machine.
       St stuckSt = getStuckState();
-	    clear();
-	    setStuckState(stuckSt);
+      ClientInfoRefPtr stuckStInfo = getClientInfo( stuckSt );
+      clear();
+      setStuckState(stuckSt);
+      setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
+
 
       //Copy all of the functionality of the two machines.  
       //States (Initial and final state information included.)
@@ -6943,9 +6946,9 @@ template <typename Client>
 	  //Clear all states(except the stuck state) and transitions from this machine.
       St stuckSt = getStuckState();
       ClientInfoRefPtr stuckStInfo = getClientInfo( stuckSt );
-	  clear();
-	  setStuckState(stuckSt);
-    setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
+      clear();
+      setStuckState(stuckSt);
+      setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
 
       std::set<StatePair> visitedPairs; // All the pairs of states we have ever encountered.
       std::deque<StatePair> worklistPairs; // Pairs of states yet to be processed
@@ -7545,8 +7548,10 @@ template <typename Client>
 
 	  //Clear all states(except the stuck state) and transitions from this machine.
       St stuckSt = getStuckState();
-	  clear();
-	  setStuckState(stuckSt);
+      ClientInfoRefPtr stuckStInfo = getClientInfo( stuckSt );
+      clear();
+      setStuckState(stuckSt);
+      setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
 
       //Duplicate all of the functionality of the first machine (except the final state property).
       states.addAllStates(first->states);   //Note: This includes copying clientInfo information over.
@@ -7596,8 +7601,10 @@ template <typename Client>
 
 	  //Clear all states(except the stuck state) and transitions from this machine.
       St stuckSt = getStuckState();
-	  clear();
-	  setStuckState(stuckSt);
+      ClientInfoRefPtr stuckStInfo = getClientInfo( stuckSt );
+      clear();
+      setStuckState(stuckSt);
+      setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
 
       //The reverse machine has all the states of the original machine.
       states.addAllStates(first->states); //Note: This includes copying clientInfo information over. 
@@ -7679,8 +7686,10 @@ template <typename Client>
 
 	  //Clear all states(except the stuck state) and transitions from this machine.
       St stuckSt = getStuckState();
-	  clear();
-	  setStuckState(stuckSt);
+      ClientInfoRefPtr stuckStInfo = getClientInfo( stuckSt );
+      clear();
+      setStuckState(stuckSt);
+      setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
 
       //Somehow mark unmatched nesting edges as if they are pending (tag its state so that 
       //at a return the states labeling the incident nesting edges are ignored).
@@ -7884,8 +7893,11 @@ template <typename Client>
 
 	  //Clear all states(except the stuck state) and transitions from this machine.
       St stuckSt = getStuckState();
-	  clear();
-	  setStuckState(stuckSt);
+      ClientInfoRefPtr stuckStInfo = getClientInfo( stuckSt );
+      clear();
+      setStuckState(stuckSt);
+      setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
+
 
       //Start with a deterministic copy of the given NWA.
       if(! first->isDeterministic() )
@@ -7944,8 +7956,11 @@ template <typename Client>
 
 	  //Clear all states(except the stuck state) and transitions from this machine.
       St stuckSt = getStuckState();
-	  clear();
-	  setStuckState(stuckSt);
+      ClientInfoRefPtr stuckStInfo = getClientInfo( stuckSt );
+      clear();
+      setStuckState(stuckSt);
+      setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
+
 
       using namespace wali::relations;
 
@@ -8663,8 +8678,11 @@ template <typename Client>
 
 	  //Clear all states(except the stuck state) and transitions from this machine.
       St stuckSt = getStuckState();
-	  clear();
-	  setStuckState(stuckSt);
+      ClientInfoRefPtr stuckStInfo = getClientInfo( stuckSt );
+      clear();
+      setStuckState(stuckSt);
+      setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
+
 
       std::map<St,St> call_return;
 
