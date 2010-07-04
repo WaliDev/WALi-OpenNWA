@@ -5487,7 +5487,7 @@ namespace wali
       std::set<std::pair<Sym,St> > sources;
       for( internalIterator it = src.begin(); it != src.end(); it++ )
       {
-        sources.insert( std::pair<Sym,St>(Trans::getInternalSym(*it),Trans::getSource(*it)) );
+        sources.insert( std::pair<Sym,St>(Trans::getSource(*it), Trans::getInternalSym(*it)) );
       }
       return sources;
     }
