@@ -2995,7 +2995,7 @@ namespace wali
       for( internalIterator iit = beginInternal(); iit != endInternal(); iit++ )
       {
         if( (getSource(*iit) == state) ||
-            (getSource(*iit) == state) )
+            (getTarget(*iit) == state) )
             removeTrans.insert(*iit);
       }     
       //Remove transitions.
