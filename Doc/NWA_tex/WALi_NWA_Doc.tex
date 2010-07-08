@@ -320,7 +320,7 @@ as seen in Figure \ref{Fig:Example1}.  This NWA is of type 1, since there is a s
  
 \begin{figure}[htb]
   \centering
-    \includegraphics[width=12cm]{Figures/Figure1.eps}
+    \includegraphics[width=12cm]{Figures/Figure1}
   \caption{An example of an NWA of type 1.}
   \label{Fig:Example1}
 \end{figure}
@@ -330,7 +330,7 @@ The equivalent nested word automaton of type 2 is shown in Figure \ref{Fig:Examp
 
 \begin{figure}[htb]
   \centering
-    \includegraphics[width=12cm]{Figures/Figure2.eps}
+    \includegraphics[width=12cm]{Figures/Figure2}
   \caption{An example of an NWA of type 2.  Note: The edge from $Entry$ to $Stuck$ labeled $\{a,call,ret\}_i$ is a shorthand for three internal transitions in $\delta_i$: $(Entry,a,Stuck)$, $(Entry,call,Stuck)$, and $(Entry,ret,Stuck)$.  Similarly, the edges labeled $\{\cdots\}_c$ are shorthand for call transitions and the edges labeled $\{\cdots\}_r$ are shorthand for return transitions.}  
   \label{Fig:Example2}
 \end{figure}
@@ -1002,14 +1002,14 @@ Consider an example of computing the union of two NWAs, the NWA shown in Figure 
 
 \begin{figure}[htbp]
   \centering
-    \includegraphics[width=8cm]{Figures/Figure3.eps}
+    \includegraphics[width=8cm]{Figures/Figure3}
   \caption{Simple NWA to union with the NWA in Figure \ref{Fig:Example1}.}
   \label{Fig:Union1}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
-    \includegraphics[width=12cm]{Figures/Figure4.eps}
+    \includegraphics[width=12cm]{Figures/Figure4}
   \caption{The NWA resulting from the union of the NWA in Figure \ref{Fig:Example1} and the NWA in Figure \ref{Fig:Union1}.}
   \label{Fig:Union2}
 \end{figure}
@@ -1023,14 +1023,14 @@ Consider an example of computing the intersection of two NWAs, the NWA shown in 
  
 \begin{figure}[htbp]
   \centering
-    \includegraphics[width=10cm]{Figures/Figure5.eps}
+    \includegraphics[width=10cm]{Figures/Figure5}
   \caption{Simple NWA to intersect with the NWA in Figure \ref{Fig:Example1}.}
   \label{Fig:Intersect1}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
-    \includegraphics[width=8cm]{Figures/Figure6.eps}
+    \includegraphics[width=8cm]{Figures/Figure6}
   \caption{The NWA resulting from the intersection of the NWA in Figure \ref{Fig:Example1} and the NWA in Figure \ref{Fig:Intersect1}.}
   \label{Fig:Intersect2}
 \end{figure}
@@ -1068,15 +1068,15 @@ Consider the slightly more complex example of computing the intersection of the 
 
 \begin{figure}[p]
   \centering
-    \includegraphics[width=12cm]{Figures/Figure7a.eps}
-    \includegraphics[width=12cm]{Figures/Figure7b.eps}
+    \includegraphics[width=12cm]{Figures/Figure7a}
+    \includegraphics[width=12cm]{Figures/Figure7b}
   \caption{Complex NWAs to intersect.}
   \label{Fig:Intersect3}
 \end{figure}
 
 \begin{figure}[p]
   \centering
-    \includegraphics[width=12cm]{Figures/Figure8.eps}
+    \includegraphics[width=12cm]{Figures/Figure8}
   \caption{The NWA resulting from the intersection of the NWAs in Figure \ref{Fig:Intersect3}.}
   \label{Fig:Intersect4}
 \end{figure}
@@ -1088,14 +1088,14 @@ Consider an example of computing the concatenation of two NWAs, the NWA shown in
 
 \begin{figure}[p]
   \centering
-    \includegraphics[width=10cm]{Figures/Figure9.eps}
+    \includegraphics[width=10cm]{Figures/Figure9}
   \caption{Simple NWA to concatenate onto the NWA in Figure \ref{Fig:Example1}.}
   \label{Fig:Concat1}
 \end{figure}
 
 \begin{figure}[p]
   \centering
-    \includegraphics[width=12cm]{Figures/Figure10.eps}
+    \includegraphics[width=12cm]{Figures/Figure10}
   \caption{The NWA resulting from the concatenation of the NWA in Figure \ref{Fig:Example1} with the NWA in Figure \ref{Fig:Concat1}.}
   \label{Fig:Concat2}
 \end{figure}
@@ -1123,14 +1123,14 @@ Consider an example of computing the Kleene-Star of the NWA shown in Figure \ref
 
 \begin{figure}[p]
   \centering
-    \includegraphics[width=10cm]{Figures/Figure11.eps}
+    \includegraphics[width=10cm]{Figures/Figure11}
   \caption{An NWA on which to perform Kleene-Star.}
   \label{Fig:Star1}
 \end{figure}
 
 \begin{figure}[p]
   \centering
-    \includegraphics[width=12cm]{Figures/Figure12.eps}
+    \includegraphics[width=12cm]{Figures/Figure12}
   \caption{The NWA resulting from performing Kleene-Star on the NWA in Figure \ref{Fig:Star1}.}
   \label{Fig:Star2}
 \end{figure}
@@ -1172,7 +1172,7 @@ If the component NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$, then the result of reve
  
 \begin{figure}[p]
   \centering
-    \includegraphics[width=12cm]{Figures/Figure15.eps}
+    \includegraphics[width=12cm]{Figures/Figure15}
   \caption{The NWA resulting from performing reverse on the NWA in Figure \ref{Fig:Example1}.}
   \label{Fig:Reverse1}
 \end{figure}
@@ -1212,7 +1212,7 @@ Consider an example of determinizing a simple nondeterministic NWA, the NWA show
 
 \begin{figure}[p]
   \centering
-    \includegraphics[width=12cm]{Figures/Figure16.eps}
+    \includegraphics[width=12cm]{Figures/Figure16}
   \caption{Simple nondeterministic NWA.}
   \label{Fig:Det1}
 \end{figure}
@@ -1220,7 +1220,7 @@ Consider an example of determinizing a simple nondeterministic NWA, the NWA show
 
 \begin{figure}[p]
   \centering
-    \includegraphics[width=16cm]{Figures/Figure17.eps}
+    \includegraphics[width=16cm]{Figures/Figure17}
     \caption{The NWA resulting from determinizing the NWA in Figure \ref{Fig:Det1}. As mentioned in the text, states in the determinized NWA are relations on the states in the original NWA. For example, state 1 above corresponds to the relation $\{$(Start,Stuck), (Call,Stuck), (Entry1,Stuck), (Entry2,Exit2), (State1,Stuck), (State2,Stuck), (Exit1,Stuck), (Exit2,Stuck), (Return,Stuck), (Fishish,Stuck), (Stuck,Stuck)$\}$.}
  
   \label{Fig:Det2}
@@ -1274,7 +1274,7 @@ The complement is performed by first determinizing the NWA and then complementin
 
 \begin{figure}[p]
   \centering
-    \includegraphics[width=12cm]{Figures/Figure20.eps}
+    \includegraphics[width=12cm]{Figures/Figure20}
   \caption{The complement of the NWA in Figure \ref{Fig:Det1} (the determinization of which is shown in Figure \ref{Fig:Det2}).}
   \label{Fig:Comp1}
 \end{figure}
@@ -1362,7 +1362,7 @@ For example, the NWA resulting from converting the PDS shown in Figure \ref{Fig:
 
 \begin{figure}[p]
   \centering
-    \includegraphics[width=12cm]{Figures/Figure22.eps}
+    \includegraphics[width=12cm]{Figures/Figure22}
   \caption{The NWA resulting from converting the PDS in Figure \ref{Fig:PDStoNWA1} into an NWA.}
   \label{Fig:PDStoNWA2}
 \end{figure}
@@ -1400,7 +1400,7 @@ An NWA can also be converted into a WPDS.  In this way it is possible to use the
 
 \begin{figure}[htbp]
   \centering
-    \includegraphics[width=12cm]{Figures/Figure23.eps}
+    \includegraphics[width=12cm]{Figures/Figure23}
   \caption{An example NWA.}
   \label{Fig:NWAtoPDS1}
 \end{figure}
