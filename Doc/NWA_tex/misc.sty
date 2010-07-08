@@ -1,0 +1,173 @@
+% New commands and environments
+\newcommand{\subsubsubsection}[1]{\noindent{\bf #1\ }}
+\newcommand{\Omit}[1]{}
+%%\newcommand{\QED}{\mbox{$\Box$}}
+%\newenvironment{Exa}{\begin{Example}\begin{rm}}%
+%                       {\end{rm}$\QED$\end{Example}}
+% Keywords
+
+% DESCRIPTION OF THE ABSTRACT DOMAIN
+%
+%
+\newcommand{\var}[1]{\textbf{\tt #1}}
+\newcommand{\asm}[1]{\texttt{#1}}
+\newcommand{\source}[1]{\texttt{#1}}
+\newcommand{\valset}[1]{$#1$}
+\newcommand{\MRAB}[1]{\text{\rm MRAB}[{#1}]}
+\newcommand{\NMRAB}[1]{\text{\rm NMRAB}[{#1}]}
+\newcommand{\cnt}{\text{\rm count}}
+\newcommand{\size}{\text{\rm size}}
+\newcommand{\edge}[2]{\asm{#1}$\rightarrow$\asm{#2}}
+
+%DOMAINS
+\newcommand{\SmallRange}{\text{\rm SmallRange}}
+\newcommand{\MemRgn}{\text{\sf MemRgn}}
+\newcommand{\Global}{\text{\sf Global}}
+\newcommand{\CallSites}{\text{\sf CallSites}}
+\newcommand{\Proc}{\text{\sf Proc}}
+\newcommand{\AllocMemRgn}{\text{\sf AllocMemRgn}}
+\newcommand{\Register}{\text{\sf register}}
+\newcommand{\ALoc}{\text{\sf a-loc}}
+\newcommand{\ALocR}[1]{\text{\sf a-locs{[#1]}}}
+\newcommand{\StridedInterval}{\text{\sf StridedInterval}}
+\newcommand{\ValueSet}{\text{\sf ValueSet}}
+\newcommand{\AlocEnv}{\text{\sf AlocEnv}}
+\newcommand{\AlocEnvR}[1]{\text{\sf AlocEnv{[#1]}}}
+\newcommand{\AllocAbsEnv}{\text{\sf AllocAbsEnv}}
+\newcommand{\AllocAbsEnvR}[1]{\text{\sf AllocAbsEnv[#1]}}
+\newcommand{\AbsEnv}{\text{\sf AbsEnv}}
+\newcommand{\CallString}{\text{\sf CallString}}
+\newcommand{\CallStringK}{\text{\sf CallString$_\text{k}$}}
+\newcommand{\AbsMemConfig}{\text{\sf AbsMemConfig}}
+\newcommand{\AbsMemConfigPS}{\text{\sf AbsMemConfig}^{\text{ps}}}
+\newcommand{\AbsMemConfigPSCS}{\text{\sf AbsMemConfig}^{\text{ps-cs}}}
+\newcommand{\Node}{\text{\sf Node}}
+\newcommand{\State}{\text{\sf State}}
+\newcommand{\Flag}{\text{\sf Flag}}
+\newcommand{\BoolThree}{\text{\sf Bool3}}
+\newcommand{\False}{\textsc{False}}
+\newcommand{\Maybe}{\textsc{Maybe}}
+\newcommand{\True}{\textsc{True}}
+
+%
+\newcommand{\alocEnv}{\text{\rm alocEnv}}
+\newcommand{\absEnv}{\text{\rm absEnv}}
+\newcommand{\absEnvFor}[1]{\text{\rm absEnv}_\text{#1}}
+\newcommand{\absMemConfig}{\text{\rm absMemConfig}}
+\newcommand{\absMemConfigFor}[1]{\text{\rm absMemConfig}_\text{#1}}
+\newcommand{\absMemConfigPS}{\text{\rm absMemConfig}^{\text{ps}}}
+\newcommand{\absMemConfigPSFor}[1]{\text{\rm absMemConfig}^{\text{ps}}_\text{#1}}
+
+
+\newcommand{\env}{\textit{env}}
+\newcommand{\letkw}{\mathbf{let}}
+\newcommand{\inkw}{\mathbf{in}}
+\newcommand{\select}[1]{\text{$\uparrow$}{#1}}
+\newcommand{\update}[3]{{#1}[{#2} \leftarrow {#3}]}
+
+
+
+\newenvironment{Notation}{\par{\bf Notation\/}.}{$\QED$}
+
+
+
+%\newcommand{\CXor}{\hat{\vphantom{x}}}
+\newcommand{\CXor}{\vphantom{x}^\wedge}
+
+\newcommand{\addSI}{\operatorname{\mathbf{+^\text{si}}}}
+\newcommand{\subSI}{\operatorname{\mathbf{--^\text{si}}}}
+\newcommand{\orSI}{\operatorname{\mathbf{|^\text{si}}}}
+\newcommand{\xorSI}{\operatorname{\mathbf{{\vphantom{x}^\wedge}^\textit{si}}}}
+\newcommand{\andSI}{\operatorname{\mathbf{\&^\textit{si}}}}
+\newcommand{\notSI}{\operatorname{\mathbf{\sim^\textit{si}}}}
+\newcommand{\negSI}{\operatorname{\mathbf{--_{u}^\text{si}}}}
+\newcommand{\mulSI}{\operatorname{\mathbf{\times^\textit{si}}}}
+\newcommand{\incSI}{\operatorname{\mathbf{++^\text{si}}}}
+\newcommand{\decSI}{\operatorname{\mathbf{--\,--^\text{si}}}}
+\newcommand{\joinSI}{\operatorname{\mathbf{\sqcup^\text{si}}}}
+\newcommand{\meetSI}{\operatorname{\mathbf{\sqcap^\text{si}}}}
+
+% Use of operator name in section titles cause problems!
+\newcommand{\addSIHead}{\mathbf{+^\text{si}}}
+\newcommand{\subSIHead}{\mathbf{-^\text{si}}}
+\newcommand{\orSIHead}{\mathbf{|^\text{si}}}
+\newcommand{\xorSIHead}{\mathbf{{\wedge}^\textit{si}}}
+\newcommand{\andSIHead}{\mathbf{\&^\textit{si}}}
+\newcommand{\notSIHead}{\mathbf{\sim^\textit{si}}}
+\newcommand{\negSIHead}{\mathbf{-_{u}^\text{si}}}
+\newcommand{\mulSIHead}{\mathbf{\times^\textit{si}}}
+\newcommand{\incSIHead}{\mathbf{++^\text{si}}}
+\newcommand{\decSIHead}{\mathbf{--^\text{si}}}
+\newcommand{\addVSHead}{\mathbf{+^\text{vs}}}
+\newcommand{\subVSHead}{\mathbf{-^\text{vs}}}
+\newcommand{\orVSHead}{\mathbf{|^\text{vs}}}
+\newcommand{\xorVSHead}{\mathbf{{\wedge}^\text{vs}}}
+\newcommand{\andVSHead}{\mathbf{\&^\text{vs}}}
+\newcommand{\notVSHead}{\mathbf{\sim^\text{vs}}}
+
+\newcommand{\addVS}{\operatorname{\mathbf{+^\text{vs}}}}
+\newcommand{\subVS}{\operatorname{\mathbf{--^\text{vs}}}}
+\newcommand{\orVS}{\operatorname{\mathbf{|^\text{vs}}}}
+\newcommand{\xorVS}{\operatorname{\mathbf{{\vphantom{x}^\wedge}^\text{vs}}}}
+\newcommand{\andVS}{\operatorname{\mathbf{\&^\text{vs}}}}
+\newcommand{\notVS}{\operatorname{\mathbf{\sim^\text{vs}}}}
+\newcommand{\negVS}{\operatorname{\mathbf{--_{u}^\text{vs}}}}
+\newcommand{\mulVS}{\operatorname{\mathbf{\times^\text{vs}}}}
+\newcommand{\incVS}{\operatorname{\mathbf{++^\text{vs}}}}
+\newcommand{\decVS}{\operatorname{\mathbf{--\,--^\text{vs}}}}
+
+\newcommand{\sqsubseteqVS}{\operatorname{\mathbf{\sqsubseteq^\text{vs}}}}
+\newcommand{\joinVS}{\operatorname{\mathbf{\sqcup^\text{vs}}}}
+\newcommand{\bigjoinVS}{\operatorname{\mathbf{\bigsqcup^\text{vs}}}}
+\newcommand{\meetVS}{\operatorname{\mathbf{\sqcap^\text{vs}}}}
+\newcommand{\widenVS}{\operatorname{\mathbf{\nabla^\text{vs}}}}
+\newcommand{\joinAbsEnv}{\operatorname{\mathbf{\sqcup^\text{ae}}}}
+\newcommand{\widenAbsEnv}{\operatorname{\mathbf{\nabla^\text{ae}}}}
+\newcommand{\meetAbsEnv}{\operatorname{\mathbf{\sqcap^\text{ae}}}}
+
+\newcommand{\Add}{\texttt{add}\xspace}
+\newcommand{\Sub}{\texttt{sub}\xspace}
+\newcommand{\Or}{\texttt{or}\xspace}
+\newcommand{\Xor}{\texttt{xor}\xspace}
+\newcommand{\LAnd}{\texttt{and}\xspace}
+\newcommand{\Not}{\texttt{not}\xspace}
+\newcommand{\Neg}{\texttt{neg}\xspace}
+\newcommand{\Mul}{\texttt{mul}\xspace}
+
+\newcommand{\bottomvs}{\bottom^\textit{vs}}
+\newcommand{\topvs}{\top^\textit{vs}}
+\newcommand{\Id}{\mathbf{id}}
+\newcommand{\Annihilator}{\mathbf{annihilator}}
+\newcommand{\emptysi}{\mathbf{\bottom}}
+\newcommand{\topsi}{\top^\textit{si}}
+
+\newcommand{\SIop}{\operatorname{\textit{op}^\text{si}}}
+\newcommand{\SIopOne}{\operatorname{\textit{op}^\textit{si}_{1}}}
+\newcommand{\SIopTwo}{\operatorname{\textit{op}^\textit{si}_{2}}}
+\newcommand{\VSop}{\operatorname{\textit{op}^\textit{vs}}}
+\newcommand{\VSopOne}{\operatorname{\textit{op}^\textit{vs}_{1}}}
+\newcommand{\VSopTwo}{\operatorname{\textit{op}^\textit{vs}_{2}}}
+\newcommand{\EXPop}{\operatorname{\textit{op}^\textit{exp}}}
+
+\newcommand{\SI}{\textit{SI}}
+\newcommand{\VS}{\textit{VS}}
+\newcommand{\si}[3]{\mathbf{{#1}[{#2},{#3}]}}
+\newcommand{\sising}[1]{\mathbf{{#1}}}
+\newcommand{\siv}{\textit{si}}
+\newcommand{\vsv}{\textit{vs}}
+\newcommand{\VSg}{\VS_{\textit{glob}}}
+\newcommand{\VSs}{\VS_{\textit{single}}}
+\newcommand{\VSa}{\VS_{\textit{arb}}}
+
+\newcounter{LineNumber}
+\newcommand{\beginRLineNumber}{\setcounter{LineNumber}{0}\kill}
+\newcommand{\stopRLineNumber}{}
+\newcommand{\RNum}{\'\refstepcounter{LineNumber}{\theLineNumber}}
+\newcommand{\beginLineNumber}{\setcounter{LineNumber}{0}[0]\=\+\kill}
+\newcommand{\beginLLineNumber}{\setcounter{LineNumber}{0}[00] \=\+\kill}
+\newcommand{\beginLLLineNumber}{\setcounter{LineNumber}{0}[000]\=\+\kill}
+\newcommand{\continueLLineNumber}{[00]\=\+\kill}
+\newcommand{\stopLLineNumber}{\-}
+\newcommand{\LNum}{\<\refstepcounter{LineNumber}\theLineNumber:}
+
+\renewcommand{\implies}{\Rightarrow}
