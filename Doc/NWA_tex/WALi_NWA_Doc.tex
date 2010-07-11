@@ -513,7 +513,9 @@ The system supports two meta-symbols: \begin{inparaenum} \item \texttt{Epsilon} 
 \end{description}
 
 Symbols are WALi \texttt{Keys} and can be added to an NWA of type 1 individually (using \texttt{addSymbol}) or as a part of a transition (see Section \ref{Se:Transitions}).  Note that in NWAs of type 1, the addition of a symbol adds an implicit internal transition from each state to the stuck state on the symbol being added, an implicit call transition from each state to the stuck state on the symbol being added, and an implicit return transition from each pair of states to the stuck state on the symbol being added.  Because NWAs of type 2 have no stuck state, such transitions cannot be added automatically and thus adding a symbol would violate the completeness of the states of the NWA.  Therefore, \textbf{no symbols can be added to an NWA of type 2}. \\
- 
+
+ \clearpage
+
 \noindent The following operations are methods of class NWA:
 
 \begin{description}
@@ -566,6 +568,8 @@ The status of individual symbols (i.e., existence in an NWA) can be checked for 
 Transitions connect a pair (or triple) of states and are labeled with symbols or meta-symbols.  There are three types of transitions in an NWA: \begin{inparaenum} \item Internal \item Call \item Return. \end{inparaenum}  An internal transition is a transition of the form $(source, sym, target)$ in which $sym$ corresponds to the symbol at an internal position in a nested word accepted by the NWA.  A call transition is a transition of the form $(callSite, sym, entryPoint)$ in which $sym$ corresponds to the symbol at a call position in a nested word accepted by the NWA.  A return transition is a transition of the form $(exitPoint, callSite, sym, returnSite)$ in which $sym$ corresponds to the symbol at a return position in a nested word accepted by the NWA.  The number of transitions of each kind associated with a deterministic NWA is bounded by the number of states and symbols in the NWA.  There can only be $(number\_of\_states)*(number\_of\_symbols)$ internal transitions, $(number\_of\_states)*(number\_of\_symbols)$ call transitions, and $(number\_of\_states)^2*(number\_of\_symbols)$ return transitions.  The number of transitions of each kind associated with a nondeterministic NWA is bounded in a slightly different way by the number of states and symbols in the NWA.  There can only be $(number\_of\_states)^2*(number\_of\_symbols)$ internal transitions, $(number\_of\_states)^2*(number\_of\_symbols)$ call transitions, and $(number\_of\_states)^3*(number\_of\_symbols)$ return transitions.
 
 Transitions can be added to an NWA of type 1 via the overloaded functions \texttt{addInternalTrans}, \texttt{addCallTrans}, and \texttt{addReturnTrans}.  Those functions can either take three \texttt{Keys} that define the transition as input, or an input of type \texttt{KeyTriple\&} or \texttt{KeyQuad\&}.  \texttt{KeyTriple} and \texttt{KeyQuad} are WALi data structures containing 3 and 4 \texttt{Keys}, respectively.  Alternatively, the set of transitions of a state (or the set of outgoing transitions of a state) can be duplicated for another state (using \texttt{duplicateState} or \texttt{duplicateStateOutgoing}) or all implicit transitions (to the stuck state) can be added as explicit transitions (using \texttt{realizeImplicitTrans}).  As a side effect of all of these functions, if any component (state or symbol) of a transition does not already exist in the NWA it will be added to the NWA.  Thus states and symbols need not be added independently prior to adding transitions.  Note that, in NWAs of type 1, the addition of a state or symbol adds to the NWA implicit transitions to the stuck state (see Section \ref{Se:States} and Section \ref{Se:Symbols}).  Because NWAs of type 2 have no stuck state, such transitions cannot be added automatically, and thus adding a transition would violate the completeness of the states in the NWA.  Therefore, \textbf{no transitions can be added to an NWA of type 2}.  Recall that the stuck state has no outgoing transitions except to itself (see Section \ref{Se:States}).  Thus, no transition leaving the stuck state will be added to the NWA unless it is going to the stuck state as well.  Recall also that the \texttt{$\epsilon$} symbol cannot label a call transition or a return transition (see Section \ref{Se:Symbols}).  Thus, no call or return transition with a symbol of \texttt{$\epsilon$} will be added. \\
+
+\clearpage
 
 \noindent The following operations are methods of class NWA:
 
@@ -1395,6 +1399,7 @@ An NWA can also be converted into a WPDS.  In this way it is possible to use the
 
 \texttt{WeightGen} provides an interface that you \textbf{must} implement for calculating the weights for NWA transitions which are subsequently used in calculating the weights for corresponding WPDS rules.  It allows the underlying NWA to be decoupled from the weight domain to be used.  See \cite[\S4-\S5]{wali} for details about weight domains. To convert from an NWA to a WPDS, the user must first subclass WeightGen to provide the weights for the WPDS (an instance of this subclass is passed to the WPDS-generation functions). \\ 
 
+\clearpage
 \noindent The following operations are methods of class WeightGen and are intended to be overridden:
 
 \begin{description} 
@@ -1594,6 +1599,7 @@ An NWA can also be converted into a WPDS.  In this way it is possible to use the
 
 Once an NWA is built, there are a multitude of queries that can be made, including: \begin{inparaenum} \item whether the NWA is deterministic or non-deterministic, \item language-inclusion queries, and \item reachability queries. \end{inparaenum} All of these queries can be made for an NWA of either type. \\
 
+\clearpage
 \subsection{Deterministic}
 \label{Se:Deterministic}
 
