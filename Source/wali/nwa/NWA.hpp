@@ -1157,7 +1157,7 @@ namespace wali
        *          entry point
        *
        */
-      const typename std::set<std::pair<St,Sym>> getCallSites( St entryPoint ) const;
+      const typename std::set<std::pair<St,Sym> > getCallSites( St entryPoint ) const;
 
 	  /**
        * 
@@ -1407,7 +1407,7 @@ namespace wali
        *          target state
        *
        */
-      const typename std::set<std::pair<St,Sym>> getSources( St target ) const;
+      const typename std::set<std::pair<St,Sym> > getSources( St target ) const;
 
 	  /**
        * 
@@ -1659,7 +1659,7 @@ namespace wali
        *          and return site
        *
        */
-      const typename std::set<std::pair<St,Sym>> getExits( St callSite, St returnSite ) const;
+      const typename std::set<std::pair<St,Sym> > getExits( St callSite, St returnSite ) const;
 
 	  /**
        * 
@@ -1703,7 +1703,7 @@ namespace wali
        *          call site
        *
        */
-      const typename std::set<std::pair<St,Sym>> getExits_Call( St callSite ) const;
+      const typename std::set<std::pair<St,Sym> > getExits_Call( St callSite ) const;
 
       /**
        * 
@@ -1735,7 +1735,7 @@ namespace wali
        *          return site
        *
        */
-      const typename std::set<std::pair<St,Sym>> getExits_Ret( St returnSite ) const;
+      const typename std::set<std::pair<St,Sym> > getExits_Ret( St returnSite ) const;
 
       /**
        * 
@@ -1781,7 +1781,7 @@ namespace wali
        *          point and return site states
        *
        */
-      const typename std::set<std::pair<St,Sym>> getCalls( St exitPoint, St returnSite ) const;
+      const typename std::set<std::pair<St,Sym> > getCalls( St exitPoint, St returnSite ) const;
 
 	  /**
        * 
@@ -1824,7 +1824,7 @@ namespace wali
        *         exit point
        *
        */
-      const typename std::set<std::pair<St,Sym>> getCalls_Exit( St exitPoint ) const;
+      const typename std::set<std::pair<St,Sym> > getCalls_Exit( St exitPoint ) const;
 
       /**
        * 
@@ -1856,7 +1856,7 @@ namespace wali
        *          given return site
        *
        */
-      const typename std::set<std::pair<St,Sym>> getCalls_Ret( St returnSite ) const;
+      const typename std::set<std::pair<St,Sym> > getCalls_Ret( St returnSite ) const;
 
       /**
        * 
@@ -2068,7 +2068,7 @@ namespace wali
        *          exit point
        *
        */
-      const typename std::set<std::pair<Sym,St>> getReturns_Exit( St exitPoint ) const;
+      const typename std::set<std::pair<Sym,St> > getReturns_Exit( St exitPoint ) const;
 
       /**
        * 
@@ -2099,7 +2099,7 @@ namespace wali
        *          call site
        *
        */
-      const typename std::set<std::pair<Sym,St>> getReturns_Call( St callSite ) const;
+      const typename std::set<std::pair<Sym,St> > getReturns_Call( St callSite ) const;
 
       /**
        * 
@@ -5064,7 +5064,7 @@ namespace wali
      *
      */
     template <typename Client>
-    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym>> NWA<Client>::getCallSites( St entryPoint ) const
+    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym> > NWA<Client>::getCallSites( St entryPoint ) const
     {
       assert(entryPoint < wali::WALI_BAD_KEY);
 
@@ -5479,7 +5479,7 @@ namespace wali
      *
      */
     template <typename Client>
-    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym>> NWA<Client>::getSources( St target ) const
+    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym> > NWA<Client>::getSources( St target ) const
     {
       assert(target < wali::WALI_BAD_KEY);
 
@@ -5889,7 +5889,7 @@ namespace wali
      *
      */
     template <typename Client>
-    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym>> NWA<Client>::getExits( St callSite, St returnSite ) const
+    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym> > NWA<Client>::getExits( St callSite, St returnSite ) const
     {
       assert(callSite < wali::WALI_BAD_KEY);
       assert(returnSite < wali::WALI_BAD_KEY);
@@ -5964,7 +5964,7 @@ namespace wali
      *
      */
     template <typename Client>
-    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym>> NWA<Client>::getExits_Call( St callSite ) const
+    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym> > NWA<Client>::getExits_Call( St callSite ) const
     {
       assert(callSite < wali::WALI_BAD_KEY);
 
@@ -6016,7 +6016,7 @@ namespace wali
      *
      */
     template <typename Client>
-    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym>> NWA<Client>::getExits_Ret( St returnSite ) const
+    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym> > NWA<Client>::getExits_Ret( St returnSite ) const
     {
       assert(returnSite < wali::WALI_BAD_KEY);
 
@@ -6097,7 +6097,7 @@ namespace wali
      *
      */
     template <typename Client>
-    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym>> NWA<Client>::getCalls( St exitPoint, St returnSite ) const
+    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym> > NWA<Client>::getCalls( St exitPoint, St returnSite ) const
     {
       assert(exitPoint < wali::WALI_BAD_KEY);
       assert(returnSite < wali::WALI_BAD_KEY);
@@ -6171,7 +6171,7 @@ namespace wali
      *
      */
     template <typename Client>
-    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym>> NWA<Client>::getCalls_Exit( St exitPoint ) const
+    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym> > NWA<Client>::getCalls_Exit( St exitPoint ) const
     {
       assert(exitPoint < wali::WALI_BAD_KEY);
 
@@ -6223,7 +6223,7 @@ namespace wali
      *
      */
     template <typename Client>
-    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym>> NWA<Client>::getCalls_Ret( St returnSite ) const
+    const std::set<std::pair<typename NWA<Client>::St,typename NWA<Client>::Sym> > NWA<Client>::getCalls_Ret( St returnSite ) const
     {
       assert(returnSite < wali::WALI_BAD_KEY);
 
@@ -6589,7 +6589,7 @@ template <typename Client>
      *
      */
     template <typename Client>
-    const std::set<std::pair<typename NWA<Client>::Sym,typename NWA<Client>::St>> NWA<Client>::getReturns_Exit( St exitPoint ) const
+    const std::set<std::pair<typename NWA<Client>::Sym,typename NWA<Client>::St> > NWA<Client>::getReturns_Exit( St exitPoint ) const
     {
       assert(exitPoint < wali::WALI_BAD_KEY);
 
@@ -6640,7 +6640,7 @@ template <typename Client>
      *
      */
     template <typename Client>
-    const std::set<std::pair<typename NWA<Client>::Sym,typename NWA<Client>::St>> NWA<Client>::getReturns_Call( St callSite ) const
+    const std::set<std::pair<typename NWA<Client>::Sym,typename NWA<Client>::St> > NWA<Client>::getReturns_Call( St callSite ) const
     {
       assert(callSite < wali::WALI_BAD_KEY);
 
