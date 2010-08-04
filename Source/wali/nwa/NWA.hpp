@@ -317,7 +317,7 @@ namespace wali
        * @return a set of all states
        *
        */
-      const std::set<St> & getStates( ) const;
+      const typename std::set<St> & getStates( ) const;
       /**
        *   
        * @brief provides access to all states in the NWA
@@ -329,7 +329,7 @@ namespace wali
        * @return a set of all states 
        *
        */
-      const std::set<St> & get_states( ) const;
+      const typename std::set<St> & get_states( ) const;
 
       /**
        * 
@@ -438,7 +438,7 @@ namespace wali
        * @return set of inital states associated with the NWA
        *
        */
-      const std::set<St> & getInitialStates( ) const; 
+      const typename std::set<St> & getInitialStates( ) const; 
 
       /**
        * 
@@ -517,7 +517,7 @@ namespace wali
        * @return set of all final states associated with this NWA
        *
        */
-      const std::set<St> & getFinalStates( ) const;
+      const typename std::set<St> & getFinalStates( ) const;
 
       /**
        *
@@ -596,7 +596,7 @@ namespace wali
        * @return set of all symbols associated with this NWA
        *
        */
-      const std::set<Sym> & getSymbols( ) const;
+      const typename std::set<Sym> & getSymbols( ) const;
 
       /**
        *
@@ -715,7 +715,7 @@ namespace wali
 	   * @return the set of symbols that label transitions from 'source' to 'target'
 	   *
        */
-      const std::set<Sym> getSymbols( St source, St target ) const;
+      const typename std::set<Sym> getSymbols( St source, St target ) const;
 
       /**
        * 
@@ -727,7 +727,7 @@ namespace wali
 	   * @return the set of symbols that label transitions from 'source'
 	   *
        */
-      const std::set<Sym> getSymbolsFrom( St source ) const;
+      const typename std::set<Sym> getSymbolsFrom( St source ) const;
 
       /**
        * 
@@ -739,7 +739,7 @@ namespace wali
 	   * @return the set of symbols that label transitions to 'target'
 	   *
        */
-      const std::set<Sym> getSymbolsTo( St target ) const;
+      const typename std::set<Sym> getSymbolsTo( St target ) const;
 
       /**
        *  
@@ -752,7 +752,7 @@ namespace wali
        * @param - preds: the set of all states that are predecessors of the given state
        *
        */    
-      void getPredecessors( St state, std::set<St> & preds ) const;
+      void getPredecessors( St state, typename std::set<St> & preds ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are predecessors of the given state
@@ -763,7 +763,7 @@ namespace wali
 	   * @return the set of all states that are predecessors of the given state
 	   *
        */
-      const std::set<St> getPredecessors( St state ) const;
+      const typename std::set<St> getPredecessors( St state ) const;
 
       /**
        * 
@@ -781,7 +781,7 @@ namespace wali
        *                  with respect to the given symbol
        *
        */
-      void getPredecessors( Sym symbol, St state, std::set<St> & preds ) const;
+      void getPredecessors( Sym symbol, St state, typename std::set<St> & preds ) const;
 	    /**
        * 
 	     * @brief obtains all the states that are predecessors of the given state with
@@ -798,7 +798,7 @@ namespace wali
 	     *			respect to the given symbol
 	     *
        */
-      const std::set<St> getPredecessors( Sym symbol, St state ) const;
+      const typename std::set<St> getPredecessors( Sym symbol, St state ) const;
 
       /**
        * 
@@ -810,7 +810,7 @@ namespace wali
        * @param - succs: the set of all states that are successors of the given state
        *
        */
-      void getSuccessors( St state, std::set<St> & succs ) const;
+      void getSuccessors( St state, typename std::set<St> & succs ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are successors of the given state
@@ -821,7 +821,7 @@ namespace wali
 	   * @return the set of all states that are successors of the given state
 	   *
        */
-      const std::set<St> getSuccessors( St state ) const;
+      const typename std::set<St> getSuccessors( St state ) const;
 
       /**
        * 
@@ -839,7 +839,7 @@ namespace wali
        *                  with respect to the given symbol
        *
        */
-      void getSuccessors( St state, Sym symbol, std::set<St> & succs ) const;
+      void getSuccessors( St state, Sym symbol, typename std::set<St> & succs ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are successors of the given state with
@@ -856,7 +856,7 @@ namespace wali
 	   *			with respect to the given symbol
 	   *
        */
-      const std::set<St> getSuccessors( St state, Sym symbol ) const;
+      const typename std::set<St> getSuccessors( St state, Sym symbol ) const;
 
       /**
        * 
@@ -872,7 +872,7 @@ namespace wali
 	   *			call-predecessor is 'call' and whose return site is 'ret'
 	   *
        */
-      const std::set<Sym> getCallRetSymbols( St call, St ret ) const;
+      const typename std::set<Sym> getCallRetSymbols( St call, St ret ) const;
 
       /**
        * 
@@ -887,7 +887,7 @@ namespace wali
 	   *			call-predecessor is 'call'
 	   *
        */
-      const std::set<Sym> getCallRetSymbolsFrom( St call ) const;
+      const typename std::set<Sym> getCallRetSymbolsFrom( St call ) const;
 
       /**
        * 
@@ -902,7 +902,7 @@ namespace wali
 	   *			return site is 'ret'
 	   *
        */
-      const std::set<Sym> getCallRetSymbolsTo( St ret ) const;
+      const typename std::set<Sym> getCallRetSymbolsTo( St ret ) const;
 
       /**
        *  
@@ -915,7 +915,7 @@ namespace wali
        * @param - preds: the set of all states that are call-predecessors of the given state
        *
        */ 
-      void getCallPredecessors( St state, std::set<St> & c_preds ) const;
+      void getCallPredecessors( St state, typename std::set<St> & c_preds ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are call-predecessors of the given state
@@ -926,7 +926,7 @@ namespace wali
 	   * @return the set of all states that are call-predecessors of the given state
 	   *
        */
-      const std::set<St> getCallPredecessors( St state ) const;
+      const typename std::set<St> getCallPredecessors( St state ) const;
       
       /**
        * 
@@ -944,7 +944,7 @@ namespace wali
        *                  with respect to the given symbol
        *
        */
-      void getCallPredecessors( Sym symbol, St state, std::set<St> & c_preds ) const;
+      void getCallPredecessors( Sym symbol, St state, typename std::set<St> & c_preds ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are call-predecessors of the given state with
@@ -961,7 +961,7 @@ namespace wali
 	   *			with respect to the given symbol
 	   *
        */
-      const std::set<St> getCallPredecessors( Sym symbol, St state ) const;
+      const typename std::set<St> getCallPredecessors( Sym symbol, St state ) const;
 
       /**
        * 
@@ -973,7 +973,7 @@ namespace wali
        * @param - succs: the set of all states that are call-successors of the given state
        *
        */
-      void getCallSuccessors( St state, std::set<St> & c_succs ) const;
+      void getCallSuccessors( St state, typename std::set<St> & c_succs ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are call-successors of the given state
@@ -984,7 +984,7 @@ namespace wali
 	   * @return the set of all states that are call-successors of the given state
 	   *
        */
-      const std::set<St> getCallSuccessors( St state ) const;
+      const typename std::set<St> getCallSuccessors( St state ) const;
 
       /**
        * 
@@ -1002,7 +1002,7 @@ namespace wali
        *                  with respect to the given symbol
        *
        */
-      void getCallSuccessors( St state, Sym symbol, std::set<St> & c_succs ) const;
+      void getCallSuccessors( St state, Sym symbol, typename std::set<St> & c_succs ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are call-successors of the given state with 
@@ -1019,7 +1019,7 @@ namespace wali
 	   *			respect to the given symbol
 	   *
        */
-      const std::set<St> getCallSuccessors( St state, Sym symbol ) const;
+      const typename std::set<St> getCallSuccessors( St state, Sym symbol ) const;
 
       /**
        *    
@@ -1124,7 +1124,7 @@ namespace wali
        * @return the set of call site states associated with the given symbol
        *
        */
-      const std::set<St> getCallSites_Sym( Sym symbol ) const;
+      const typename std::set<St> getCallSites_Sym( Sym symbol ) const;
 
       /**
        * 
@@ -1141,7 +1141,7 @@ namespace wali
        *          and entry point
        *
        */
-      const std::set<St> getCallSites( Sym symbol, St entryPoint ) const;
+      const typename std::set<St> getCallSites( Sym symbol, St entryPoint ) const;
       
       /**
        * 
@@ -1157,7 +1157,7 @@ namespace wali
        *          entry point
        *
        */
-      const std::set<std::pair<St,Sym>> getCallSites( St entryPoint ) const;
+      const typename std::set<std::pair<St,Sym>> getCallSites( St entryPoint ) const;
 
 	  /**
        * 
@@ -1169,7 +1169,7 @@ namespace wali
 	   * @return the set of call sites of all call transitions in the NWA
 	   *
        */
-	  const std::set<St> getCallSites( ) const;
+	  const typename std::set<St> getCallSites( ) const;
 
       /**
        * 
@@ -1181,7 +1181,7 @@ namespace wali
        * @return the set of symbols that label call transitions in the NWA
        *
        */
-      const std::set<Sym> getCallSym( ) const;
+      const typename std::set<Sym> getCallSym( ) const;
 
       /**
        * 
@@ -1197,7 +1197,7 @@ namespace wali
        *          'callSite' to 'entryPoint' in the NWA
        *
        */
-      const std::set<Sym> getCallSym( St callSite, St entryPoint ) const;
+      const typename std::set<Sym> getCallSym( St callSite, St entryPoint ) const;
 
       /**
        * 
@@ -1212,7 +1212,7 @@ namespace wali
        *          'callSite' in the NWA
        *
        */
-      const std::set<Sym> getCallSym_Call( St callSite ) const;
+      const typename std::set<Sym> getCallSym_Call( St callSite ) const;
 
       /**
        * 
@@ -1227,7 +1227,7 @@ namespace wali
        *          'entryPoint' in the NWA
        *
        */
-      const std::set<Sym> getCallSym_Entry( St entryPoint ) const;
+      const typename std::set<Sym> getCallSym_Entry( St entryPoint ) const;
 
       /**
        * 
@@ -1240,7 +1240,7 @@ namespace wali
        * @return the set of entry point states associated with the given symbol
        *
        */
-      const std::set<Key> getEntries_Sym( Sym symbol ) const;
+      const typename std::set<Key> getEntries_Sym( Sym symbol ) const;
       
       /**
        * 
@@ -1256,7 +1256,7 @@ namespace wali
        *          site and symbol
        *
        */
-      const std::set<St> getEntries( St callSite, Sym symbol ) const;
+      const typename std::set<St> getEntries( St callSite, Sym symbol ) const;
 
       /**
        * 
@@ -1269,7 +1269,7 @@ namespace wali
        * @return the set of symbol/entry point pairs associated with the given call site
        *
        */
-      const std::set<std::pair<Sym,St> > getEntries( St callSite ) const;
+      const typename std::set<std::pair<Sym,St> > getEntries( St callSite ) const;
 
 	  /**
        * 
@@ -1281,7 +1281,7 @@ namespace wali
 	   * @return the set of entry points of all call transitions in the NWA
 	   *
        */
-	  const std::set<St> getEntries( ) const;
+	  const typename std::set<St> getEntries( ) const;
 
       /**
        *
@@ -1375,7 +1375,7 @@ namespace wali
        * @return the set of source states associated with the given symbol
        *
        */
-      const std::set<St> getSources_Sym( Sym symbol ) const;
+      const typename std::set<St> getSources_Sym( Sym symbol ) const;
 
       /**
        * 
@@ -1391,7 +1391,7 @@ namespace wali
        *          symbol and target state
        *
        */
-      const std::set<St> getSources( Sym symbol, St target ) const;
+      const typename std::set<St> getSources( Sym symbol, St target ) const;
 
       /**
        * 
@@ -1407,7 +1407,7 @@ namespace wali
        *          target state
        *
        */
-      const std::set<std::pair<St,Sym>> getSources( St target ) const;
+      const typename std::set<std::pair<St,Sym>> getSources( St target ) const;
 
 	  /**
        * 
@@ -1419,7 +1419,7 @@ namespace wali
 	   * @return the set of sources of all internal transitions in the NWA
 	   *
        */
-	  const std::set<St> getSources( ) const;
+	  const typename std::set<St> getSources( ) const;
 
     /**
      * 
@@ -1431,7 +1431,7 @@ namespace wali
      * @return the set of symbols that label internal transitions in the NWA
      *
      */
-    const std::set<Sym> getInternalSym( ) const;
+    const typename std::set<Sym> getInternalSym( ) const;
 
     /**
      * 
@@ -1447,7 +1447,7 @@ namespace wali
      *          to 'target' in the NWA
      *
      */
-      const std::set<Sym> getInternalSym( St source, St target ) const;
+      const typename std::set<Sym> getInternalSym( St source, St target ) const;
 
       /**
      * 
@@ -1462,7 +1462,7 @@ namespace wali
      *          in the NWA
      *
      */
-      const std::set<Sym> getInternalSym_Source( St source ) const;
+      const typename std::set<Sym> getInternalSym_Source( St source ) const;
 
       /**
      * 
@@ -1477,7 +1477,7 @@ namespace wali
      *          to 'target' in the NWA
      *
      */
-      const std::set<Sym> getInternalSym_Target( St target ) const;
+      const typename std::set<Sym> getInternalSym_Target( St target ) const;
 
       /**
        * 
@@ -1490,7 +1490,7 @@ namespace wali
        * @return the set of target states associated with the given symbol
        *
        */
-      const std::set<St> getTargets_Sym( Sym symbol ) const;
+      const typename std::set<St> getTargets_Sym( Sym symbol ) const;
 
       /**
        * 
@@ -1506,7 +1506,7 @@ namespace wali
        *          state and symbol
        *
        */
-      const std::set<St> getTargets( St source, Sym symbol ) const;
+      const typename std::set<St> getTargets( St source, Sym symbol ) const;
 
       /**
        * 
@@ -1519,7 +1519,7 @@ namespace wali
        * @return the set of symbol/target pairs associated with the given source
        *
        */
-      const std::set<std::pair<Sym,St> > getTargets( St source ) const;
+      const typename std::set<std::pair<Sym,St> > getTargets( St source ) const;
 
 	  /**
        * 
@@ -1531,7 +1531,7 @@ namespace wali
 	   * @return the set of targets of all internal transitions in the NWA
 	   *
        */
-	  const std::set<St> getTargets( ) const;
+	  const typename std::set<St> getTargets( ) const;
 
       /**
        *
@@ -1626,7 +1626,7 @@ namespace wali
        * @return the set of exit states associated with the given symbol
        *
        */
-      const std::set<St> getExits_Sym( Sym symbol ) const;
+      const typename std::set<St> getExits_Sym( Sym symbol ) const;
 
       /**
        * 
@@ -1643,7 +1643,7 @@ namespace wali
        *          symbol, and return site
        *
        */
-      const std::set<St> getExits( St callSite, Sym symbol, St returnSite ) const;
+      const typename std::set<St> getExits( St callSite, Sym symbol, St returnSite ) const;
 
       /**
        * 
@@ -1659,7 +1659,7 @@ namespace wali
        *          and return site
        *
        */
-      const std::set<std::pair<St,Sym>> getExits( St callSite, St returnSite ) const;
+      const typename std::set<std::pair<St,Sym>> getExits( St callSite, St returnSite ) const;
 
 	  /**
        * 
@@ -1671,7 +1671,7 @@ namespace wali
 	   * @return the set of exit points of all return transitions in the NWA
 	   *
        */
-	  const std::set<St> getExits( ) const;
+	  const typename std::set<St> getExits( ) const;
 
       /**
        * 
@@ -1687,7 +1687,7 @@ namespace wali
        *          and symbol
        *
        */
-      const std::set<St> getExits_Call( St callSite, Sym symbol ) const;
+      const typename std::set<St> getExits_Call( St callSite, Sym symbol ) const;
 
       /**
        * 
@@ -1703,7 +1703,7 @@ namespace wali
        *          call site
        *
        */
-      const std::set<std::pair<St,Sym>> getExits_Call( St callSite ) const;
+      const typename std::set<std::pair<St,Sym>> getExits_Call( St callSite ) const;
 
       /**
        * 
@@ -1719,7 +1719,7 @@ namespace wali
        *          return site
        *
        */
-      const std::set<St> getExits_Ret( Sym symbol, St returnSite ) const;
+      const typename std::set<St> getExits_Ret( Sym symbol, St returnSite ) const;
 
       /**
        * 
@@ -1735,7 +1735,7 @@ namespace wali
        *          return site
        *
        */
-      const std::set<std::pair<St,Sym>> getExits_Ret( St returnSite ) const;
+      const typename std::set<std::pair<St,Sym>> getExits_Ret( St returnSite ) const;
 
       /**
        * 
@@ -1748,7 +1748,7 @@ namespace wali
        * @return the set of call site states associated with the given symbol
        *
        */
-      const std::set<St> getCalls_Sym( Sym symbol ) const;
+      const typename std::set<St> getCalls_Sym( Sym symbol ) const;
 
       /**
        * 
@@ -1765,7 +1765,7 @@ namespace wali
        *          point, symbol, and return site
        * 
        */
-      const std::set<St> getCalls( St exitPoint, Sym symbol, St returnSite ) const;
+      const typename std::set<St> getCalls( St exitPoint, Sym symbol, St returnSite ) const;
 
       /**
        * 
@@ -1781,7 +1781,7 @@ namespace wali
        *          point and return site states
        *
        */
-      const std::set<std::pair<St,Sym>> getCalls( St exitPoint, St returnSite ) const;
+      const typename std::set<std::pair<St,Sym>> getCalls( St exitPoint, St returnSite ) const;
 
 	  /**
        * 
@@ -1793,7 +1793,7 @@ namespace wali
 	   * @return the set of call sites of all return transitions in the NWA
 	   *
        */
-	  const std::set<St> getCalls( ) const;
+	  const typename std::set<St> getCalls( ) const;
 
       /**
        * 
@@ -1809,7 +1809,7 @@ namespace wali
        *          and symbol
        *
        */
-      const std::set<St> getCalls_Exit( St exitPoint, Sym symbol ) const;
+      const typename std::set<St> getCalls_Exit( St exitPoint, Sym symbol ) const;
 
       /**
        * 
@@ -1824,7 +1824,7 @@ namespace wali
        *         exit point
        *
        */
-      const std::set<std::pair<St,Sym>> getCalls_Exit( St exitPoint ) const;
+      const typename std::set<std::pair<St,Sym>> getCalls_Exit( St exitPoint ) const;
 
       /**
        * 
@@ -1840,7 +1840,7 @@ namespace wali
        *          and return site
        *
        */
-      const std::set<St> getCalls_Ret( Sym symbol, St returnSite ) const;
+      const typename std::set<St> getCalls_Ret( Sym symbol, St returnSite ) const;
 
       /**
        * 
@@ -1856,7 +1856,7 @@ namespace wali
        *          given return site
        *
        */
-      const std::set<std::pair<St,Sym>> getCalls_Ret( St returnSite ) const;
+      const typename std::set<std::pair<St,Sym>> getCalls_Ret( St returnSite ) const;
 
       /**
        * 
@@ -1868,7 +1868,7 @@ namespace wali
        * @return the set of symbols that label return transitions in the NWA
        *
        */
-      const std::set<Sym> getReturnSym( ) const;
+      const typename std::set<Sym> getReturnSym( ) const;
 
       /**
        * 
@@ -1885,7 +1885,7 @@ namespace wali
        *          to 'returnSite' with call-predecessor 'callSite' in the NWA
        *
        */
-      const std::set<Sym> getReturnSym( St exitPoint, St callSite, St returnSite ) const;
+      const typename std::set<Sym> getReturnSym( St exitPoint, St callSite, St returnSite ) const;
 
       /**
        * 
@@ -1900,7 +1900,7 @@ namespace wali
        *          in the NWA
        *
        */
-      const std::set<Sym> getReturnSym_Exit( St exitPoint ) const;
+      const typename std::set<Sym> getReturnSym_Exit( St exitPoint ) const;
 
       /**
        * 
@@ -1915,7 +1915,7 @@ namespace wali
        *          with call-predecessor 'callSite' in the NWA
        *
        */
-      const std::set<Sym> getReturnSym_Call( St callSite ) const;
+      const typename std::set<Sym> getReturnSym_Call( St callSite ) const;
 
       /**
        * 
@@ -1930,7 +1930,7 @@ namespace wali
        *          to 'returnSite' in the NWA
        *
        */
-      const std::set<Sym> getReturnSym_Ret( St returnSite ) const;
+      const typename std::set<Sym> getReturnSym_Ret( St returnSite ) const;
 
       /**
        * 
@@ -1946,7 +1946,7 @@ namespace wali
        *          with call-predecessor 'callSite' in the NWA
        *
        */
-      const std::set<Sym> getReturnSym_ExitCall( St exitPoint, St callSite ) const;
+      const typename std::set<Sym> getReturnSym_ExitCall( St exitPoint, St callSite ) const;
 
       /**
        * 
@@ -1962,7 +1962,7 @@ namespace wali
        *          to 'returnSite' in the NWA
        *
        */
-      const std::set<Sym> getReturnSym_ExitRet( St exitPoint, St returnSite ) const;
+      const typename std::set<Sym> getReturnSym_ExitRet( St exitPoint, St returnSite ) const;
 
       /**
        * 
@@ -1978,7 +1978,7 @@ namespace wali
        *          to 'returnSite' with call-predecessor 'callSite' in the NWA
        *
        */
-      const std::set<Sym> getReturnSym_CallRet( St callSite, St returnSite ) const;
+      const typename std::set<Sym> getReturnSym_CallRet( St callSite, St returnSite ) const;
 
 
       /**
@@ -1992,7 +1992,7 @@ namespace wali
        * @return the set of return site states associated with the given symbol
        *
        */
-      const std::set<St> getReturns_Sym( Sym symbol ) const;
+      const typename std::set<St> getReturns_Sym( Sym symbol ) const;
 
       /**
        * 
@@ -2009,7 +2009,7 @@ namespace wali
        *          point, call site, and symbol
        *
        */
-      const std::set<St> getReturns( St exitPoint, St callSite, Sym symbol ) const;
+      const typename std::set<St> getReturns( St exitPoint, St callSite, Sym symbol ) const;
 
       /**
        * 
@@ -2025,7 +2025,7 @@ namespace wali
        *          point and call site
        *
        */
-      const std::set<std::pair<Sym,St> > getReturns( St exitPoint, St callSite ) const;
+      const typename std::set<std::pair<Sym,St> > getReturns( St exitPoint, St callSite ) const;
 
 	  /**
        * 
@@ -2037,7 +2037,7 @@ namespace wali
 	   * @return the set of return sites of all return transitions in the NWA
 	   *
        */
-	  const std::set<St> getReturns(  ) const;
+	  const typename std::set<St> getReturns(  ) const;
 
       /**
        * 
@@ -2053,7 +2053,7 @@ namespace wali
        *         point and symbol
        *
        */
-      const std::set<St> getReturns_Exit( St exitPoint, Sym symbol ) const;
+      const typename std::set<St> getReturns_Exit( St exitPoint, Sym symbol ) const;
 
       /**
        * 
@@ -2068,7 +2068,7 @@ namespace wali
        *          exit point
        *
        */
-      const std::set<std::pair<Sym,St>> getReturns_Exit( St exitPoint ) const;
+      const typename std::set<std::pair<Sym,St>> getReturns_Exit( St exitPoint ) const;
 
       /**
        * 
@@ -2084,7 +2084,7 @@ namespace wali
        *          site and symbol
        *
        */
-      const std::set<St> getReturns_Call( St callSite, Sym symbol ) const;
+      const typename std::set<St> getReturns_Call( St callSite, Sym symbol ) const;
 
       /**
        * 
@@ -2099,7 +2099,7 @@ namespace wali
        *          call site
        *
        */
-      const std::set<std::pair<Sym,St>> getReturns_Call( St callSite ) const;
+      const typename std::set<std::pair<Sym,St>> getReturns_Call( St callSite ) const;
 
       /**
        * 
@@ -2112,7 +2112,7 @@ namespace wali
        * @return the set of return sites associated with the given call site
        *
        */
-      const std::set<St> getReturnSites( St callSite ) const;
+      const typename std::set<St> getReturnSites( St callSite ) const;
 
       /**
        *
@@ -3428,7 +3428,7 @@ namespace wali
        * @param - sp: the starting point of the closure
        *
        */
-      void epsilonClosure( std::set<St> * newPairs, St sp );
+      void epsilonClosure( typename std::set<St> * newPairs, St sp );
 
       /**
        *
@@ -3446,7 +3446,7 @@ namespace wali
        *                  component of the state pair
        *
        */
-      void epsilonClosure( std::set<StatePair> * newPairs, StatePair sp, NWARefPtr first, NWARefPtr second );
+      void epsilonClosure( typename std::set<StatePair> * newPairs, StatePair sp, NWARefPtr first, NWARefPtr second );
 
       /**
        * 
@@ -4232,23 +4232,23 @@ namespace wali
       assert(source < wali::WALI_BAD_KEY);
       assert(target < wali::WALI_BAD_KEY);
 
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
 
-      std::set<Call> calls = trans.getTransEntry(target);
+      typename std::set<Call> calls = trans.getTransEntry(target);
       for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
       {
         if( Trans::getCallSite(*cit) == source )
           syms.insert(Trans::getCallSym(*cit));
       }
 
-      std::set<Internal> internals = trans.getTransTo(target);
+      typename std::set<Internal> internals = trans.getTransTo(target);
       for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
       {
         if( Trans::getSource(*iit) == source )
           syms.insert(Trans::getInternalSym(*iit));
       }
 
-      std::set<Return> returns = trans.getTransRet(target);
+      typename std::set<Return> returns = trans.getTransRet(target);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
       {
         if( Trans::getExit(*rit) == source )
@@ -4271,21 +4271,21 @@ namespace wali
     {
       assert(source < wali::WALI_BAD_KEY);
 
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
 
-      std::set<Call> calls = trans.getTransCall(source);
+      typename std::set<Call> calls = trans.getTransCall(source);
       for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
       {
           syms.insert(Trans::getCallSym(*cit));
       }
 
-      std::set<Internal> internals = trans.getTransFrom(source);
+      typename std::set<Internal> internals = trans.getTransFrom(source);
       for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
       {
           syms.insert(Trans::getInternalSym(*iit));
       }
 
-      std::set<Return> returns = trans.getTransExit(source);
+      typename std::set<Return> returns = trans.getTransExit(source);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
       {
           syms.insert(Trans::getReturnSym(*rit));
@@ -4307,21 +4307,21 @@ namespace wali
     {
       assert(target < wali::WALI_BAD_KEY);
 
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
 
-      std::set<Call> calls = trans.getTransEntry(target);
+      typename std::set<Call> calls = trans.getTransEntry(target);
       for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
       {
           syms.insert(Trans::getCallSym(*cit));
       }
 
-      std::set<Internal> internals = trans.getTransTo(target);
+      typename std::set<Internal> internals = trans.getTransTo(target);
       for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
       {
           syms.insert(Trans::getInternalSym(*iit));
       }
 
-      std::set<Return> returns = trans.getTransRet(target);
+      typename std::set<Return> returns = trans.getTransRet(target);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
       {
           syms.insert(Trans::getReturnSym(*rit));
@@ -4339,19 +4339,19 @@ namespace wali
      *
      */ 
     template <typename Client>
-    void NWA<Client>::getPredecessors( St state, std::set<St> & preds ) const
+    void NWA<Client>::getPredecessors( St state, typename std::set<St> & preds ) const
     {
       assert(state < wali::WALI_BAD_KEY);
        
-      std::set<Call> calls = trans.getTransEntry(state);
+      typename std::set<Call> calls = trans.getTransEntry(state);
       for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
         preds.insert(Trans::getCallSite(*cit));
 
-      std::set<Internal> internals = trans.getTransTo(state);
+      typename std::set<Internal> internals = trans.getTransTo(state);
       for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
         preds.insert(Trans::getSource(*iit));
 
-      std::set<Return> returns = trans.getTransRet(state);
+      typename std::set<Return> returns = trans.getTransRet(state);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         preds.insert(Trans::getExit(*rit));
     }
@@ -4368,17 +4368,17 @@ namespace wali
     {
       assert(state < wali::WALI_BAD_KEY);
        
-	  std::set<St> preds;
+	  typename std::set<St> preds;
 
-      std::set<Call> calls = trans.getTransEntry(state);
+      typename std::set<Call> calls = trans.getTransEntry(state);
       for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
         preds.insert(Trans::getCallSite(*cit));
 
-      std::set<Internal> internals = trans.getTransTo(state);
+      typename std::set<Internal> internals = trans.getTransTo(state);
       for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
         preds.insert(Trans::getSource(*iit));
 
-      std::set<Return> returns = trans.getTransRet(state);
+      typename std::set<Return> returns = trans.getTransRet(state);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         preds.insert(Trans::getExit(*rit));
 
@@ -4398,22 +4398,22 @@ namespace wali
      *
      */
     template <typename Client>
-    void NWA<Client>::getPredecessors( Sym symbol, St state, std::set<St> & preds ) const
+    void NWA<Client>::getPredecessors( Sym symbol, St state, typename std::set<St> & preds ) const
     {
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
 
-      std::set<Call> calls = trans.getTransEntry(state);
+      typename std::set<Call> calls = trans.getTransEntry(state);
       for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
         if( symbol == Trans::getCallSym(*cit) )
           preds.insert(Trans::getCallSite(*cit));
 
-      std::set<Internal> internals = trans.getTransTo(state);
+      typename std::set<Internal> internals = trans.getTransTo(state);
       for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
         if( symbol == Trans::getInternalSym(*iit) )
           preds.insert(Trans::getSource(*iit));
 
-      std::set<Return> returns = trans.getTransRet(state);
+      typename std::set<Return> returns = trans.getTransRet(state);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         if( symbol == Trans::getReturnSym(*rit) )
           preds.insert(Trans::getExit(*rit));
@@ -4436,19 +4436,19 @@ namespace wali
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
 
-	  std::set<St> preds;
+	  typename std::set<St> preds;
 
-      std::set<Call> calls = trans.getTransEntry(state);
+      typename std::set<Call> calls = trans.getTransEntry(state);
       for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
         if( symbol == Trans::getCallSym(*cit) )
           preds.insert(Trans::getCallSite(*cit));
 
-      std::set<Internal> internals = trans.getTransTo(state);
+      typename std::set<Internal> internals = trans.getTransTo(state);
       for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
         if( symbol == Trans::getInternalSym(*iit) )
           preds.insert(Trans::getSource(*iit));
 
-      std::set<Return> returns = trans.getTransRet(state);
+      typename std::set<Return> returns = trans.getTransRet(state);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         if( symbol == Trans::getReturnSym(*rit) )
           preds.insert(Trans::getExit(*rit));
@@ -4465,19 +4465,19 @@ namespace wali
      *
      */
     template <typename Client>
-    void NWA<Client>::getSuccessors( St state, std::set<St> & succs ) const
+    void NWA<Client>::getSuccessors( St state, typename std::set<St> & succs ) const
     {
       assert(state < wali::WALI_BAD_KEY);
        
-      std::set<Call> calls = trans.getTransCall(state);
+      typename std::set<Call> calls = trans.getTransCall(state);
       for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
         succs.insert(Trans::getEntry(*cit));
 
-      std::set<Internal> internals = trans.getTransFrom(state);
+      typename std::set<Internal> internals = trans.getTransFrom(state);
       for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
         succs.insert(Trans::getTarget(*iit));
 
-      std::set<Return> returns = trans.getTransExit(state);
+      typename std::set<Return> returns = trans.getTransExit(state);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         succs.insert(Trans::getReturnSite(*rit));
     }
@@ -4494,17 +4494,17 @@ namespace wali
     {
       assert(state < wali::WALI_BAD_KEY);
 
-	  std::set<St> succs;
+	  typename std::set<St> succs;
        
-      std::set<Call> calls = trans.getTransCall(state);
+      typename std::set<Call> calls = trans.getTransCall(state);
       for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
         succs.insert(Trans::getEntry(*cit));
 
-      std::set<Internal> internals = trans.getTransFrom(state);
+      typename std::set<Internal> internals = trans.getTransFrom(state);
       for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
         succs.insert(Trans::getTarget(*iit));
 
-      std::set<Return> returns = trans.getTransExit(state);
+      typename std::set<Return> returns = trans.getTransExit(state);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         succs.insert(Trans::getReturnSite(*rit));
 
@@ -4524,22 +4524,22 @@ namespace wali
      *
      */
     template <typename Client>
-    void NWA<Client>::getSuccessors( St state, Sym symbol, std::set<St> & succs ) const
+    void NWA<Client>::getSuccessors( St state, Sym symbol, typename std::set<St> & succs ) const
     {
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
 
-      std::set<Call> calls = trans.getTransCall(state);
+      typename std::set<Call> calls = trans.getTransCall(state);
       for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
         if( symbol == Trans::getCallSym(*cit) )
           succs.insert(Trans::getEntry(*cit));
 
-      std::set<Internal> internals = trans.getTransFrom(state);
+      typename std::set<Internal> internals = trans.getTransFrom(state);
       for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
         if( symbol == Trans::getInternalSym(*iit) )
           succs.insert(Trans::getTarget(*iit));
 
-      std::set<Return> returns = trans.getTransExit(state);
+      typename std::set<Return> returns = trans.getTransExit(state);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         if( symbol == Trans::getReturnSym(*rit) )
           succs.insert(Trans::getReturnSite(*rit));
@@ -4562,19 +4562,19 @@ namespace wali
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
 
-	  std::set<St> succs;
+	  typename std::set<St> succs;
 
-      std::set<Call> calls = trans.getTransCall(state);
+      typename std::set<Call> calls = trans.getTransCall(state);
       for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
         if( symbol == Trans::getCallSym(*cit) )
           succs.insert(Trans::getEntry(*cit));
 
-      std::set<Internal> internals = trans.getTransFrom(state);
+      typename std::set<Internal> internals = trans.getTransFrom(state);
       for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
         if( symbol == Trans::getInternalSym(*iit) )
           succs.insert(Trans::getTarget(*iit));
 
-      std::set<Return> returns = trans.getTransExit(state);
+      typename std::set<Return> returns = trans.getTransExit(state);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         if( symbol == Trans::getReturnSym(*rit) )
           succs.insert(Trans::getReturnSite(*rit));
@@ -4599,9 +4599,9 @@ namespace wali
       assert(call < wali::WALI_BAD_KEY);
       assert(ret < wali::WALI_BAD_KEY);
 
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
 
-      std::set<Return> returns = trans.getTransRet(ret);
+      typename std::set<Return> returns = trans.getTransRet(ret);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
       {
         if( Trans::getCallSite(*rit) == call )
@@ -4626,9 +4626,9 @@ namespace wali
     {
       assert(call < wali::WALI_BAD_KEY);
 
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
 
-      std::set<Return> returns = trans.getTransPred(call);
+      typename std::set<Return> returns = trans.getTransPred(call);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
       {
           syms.insert(Trans::getReturnSym(*rit));
@@ -4652,9 +4652,9 @@ namespace wali
     {
       assert(ret < wali::WALI_BAD_KEY);
 
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
 
-      std::set<Return> returns = trans.getTransRet(ret);
+      typename std::set<Return> returns = trans.getTransRet(ret);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
       {
           syms.insert(Trans::getReturnSym(*rit));
@@ -4672,11 +4672,11 @@ namespace wali
      *
      */ 
     template <typename Client>
-    void NWA<Client>::getCallPredecessors( St state, std::set<St> & c_preds ) const
+    void NWA<Client>::getCallPredecessors( St state, typename std::set<St> & c_preds ) const
     {
       assert(state < wali::WALI_BAD_KEY);
       
-      std::set<Return> returns = trans.getTransRet(state);
+      typename std::set<Return> returns = trans.getTransRet(state);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         c_preds.insert(Trans::getCallSite(*rit));
     }
@@ -4693,9 +4693,9 @@ namespace wali
     {
       assert(state < wali::WALI_BAD_KEY);
       
-	  std::set<St> c_preds;
+	  typename std::set<St> c_preds;
 
-      std::set<Return> returns = trans.getTransRet(state);
+      typename std::set<Return> returns = trans.getTransRet(state);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         c_preds.insert(Trans::getCallSite(*rit));
 
@@ -4715,12 +4715,12 @@ namespace wali
      *
      */
     template <typename Client>
-    void NWA<Client>::getCallPredecessors( Sym symbol, St state, std::set<St> & c_preds ) const
+    void NWA<Client>::getCallPredecessors( Sym symbol, St state, typename std::set<St> & c_preds ) const
     {
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
 
-      std::set<Return> returns = trans.getTransRet(state);
+      typename std::set<Return> returns = trans.getTransRet(state);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         if( symbol == Trans::getReturnSym(*rit) )
           c_preds.insert(Trans::getCallSite(*rit));
@@ -4743,9 +4743,9 @@ namespace wali
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
 
-	  std::set<St> c_preds;
+	  typename std::set<St> c_preds;
 
-      std::set<Return> returns = trans.getTransRet(state);
+      typename std::set<Return> returns = trans.getTransRet(state);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         if( symbol == Trans::getReturnSym(*rit) )
           c_preds.insert(Trans::getCallSite(*rit));
@@ -4762,11 +4762,11 @@ namespace wali
      *
      */
     template <typename Client>
-    void NWA<Client>::getCallSuccessors( St state, std::set<St> & c_succs ) const
+    void NWA<Client>::getCallSuccessors( St state, typename std::set<St> & c_succs ) const
     {
       assert(state < wali::WALI_BAD_KEY);
       
-      std::set<Return> returns = trans.getTransPred(state);
+      typename std::set<Return> returns = trans.getTransPred(state);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         c_succs.insert(Trans::getReturnSite(*rit));
     }
@@ -4783,9 +4783,9 @@ namespace wali
     {
       assert(state < wali::WALI_BAD_KEY);
 
-	  std::set<St> c_succs;
+	  typename std::set<St> c_succs;
       
-      std::set<Return> returns = trans.getTransPred(state);
+      typename std::set<Return> returns = trans.getTransPred(state);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         c_succs.insert(Trans::getReturnSite(*rit));
 
@@ -4805,12 +4805,12 @@ namespace wali
      *
      */
     template <typename Client>
-    void NWA<Client>::getCallSuccessors( St state, Sym symbol, std::set<St> & c_succs ) const
+    void NWA<Client>::getCallSuccessors( St state, Sym symbol, typename std::set<St> & c_succs ) const
     {
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
       
-      std::set<Return> returns = trans.getTransPred(state);
+      typename std::set<Return> returns = trans.getTransPred(state);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         if( symbol == Trans::getReturnSym(*rit) )
           c_succs.insert(Trans::getReturnSite(*rit));
@@ -4833,9 +4833,9 @@ namespace wali
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
 
-	  std::set<St> c_succs;
+	  typename std::set<St> c_succs;
       
-      std::set<Return> returns = trans.getTransPred(state);
+      typename std::set<Return> returns = trans.getTransPred(state);
       for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         if( symbol == Trans::getReturnSym(*rit) )
           c_succs.insert(Trans::getReturnSite(*rit));
@@ -4895,7 +4895,7 @@ namespace wali
     template <typename Client>
     void NWA<Client>::realizeImplicitTrans()
     {
-      std::set<Triple<St, Sym, St> > returns;
+      typename std::set<Triple<St, Sym, St> > returns;
       for( returnIterator ret = beginReturnTrans(); ret != endReturnTrans(); ++ret) 
       {
         returns.insert(Triple<St, Sym, St>(ret->first, ret->second, ret->third));
@@ -5015,7 +5015,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Calls call = trans.getCalls();
-      std::set<St> calls;
+      typename std::set<St> calls;
       for( callIterator it = call.begin(); it != call.end(); it++ )
       {
         if( symbol == Trans::getCallSym(*it) )
@@ -5043,7 +5043,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Calls call = trans.getTransEntry(entryPoint);
-      std::set<St> calls;
+      typename std::set<St> calls;
       for( callIterator it = call.begin(); it != call.end(); it++ )
       {
         if( symbol == Trans::getCallSym(*it) )
@@ -5069,7 +5069,7 @@ namespace wali
       assert(entryPoint < wali::WALI_BAD_KEY);
 
       const Calls call = trans.getTransEntry(entryPoint);
-      std::set<std::pair<Sym,St> > calls;
+      typename std::set<std::pair<Sym,St> > calls;
       for( callIterator it = call.begin(); it != call.end(); it++ )
       {
         calls.insert( std::pair<Sym,St>(Trans::getCallSite(*it), Trans::getCallSym(*it) ) );
@@ -5088,7 +5088,7 @@ namespace wali
     const std::set<typename NWA<Client>::St> NWA<Client>::getCallSites( ) const
     {
       const Calls call = trans.getCalls();
-      std::set<St> calls;
+      typename std::set<St> calls;
       for( callIterator it = call.begin(); it != call.end(); it++ )
       {
         calls.insert( Trans::getCallSite(*it) );
@@ -5107,7 +5107,7 @@ namespace wali
     const std::set<typename NWA<Client>::Sym> NWA<Client>::getCallSym(  ) const
     {
       const Calls calls = trans.getCalls();
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
       for( callIterator it = calls.begin(); it != calls.end(); it++ )
       {
         syms.insert( Trans::getCallSym(*it) );
@@ -5133,7 +5133,7 @@ namespace wali
       assert(entryPoint < wali::WALI_BAD_KEY);
 
       const Calls calls = trans.getTransCall(callSite);
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
       for( callIterator it = calls.begin(); it != calls.end(); it++ )
       {
         if( entryPoint == Trans::getEntry(*it) )
@@ -5158,7 +5158,7 @@ namespace wali
       assert(callSite < wali::WALI_BAD_KEY);
 
       const Calls calls = trans.getTransCall(callSite);
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
       for( callIterator it = calls.begin(); it != calls.end(); it++ )
       {
           syms.insert( Trans::getCallSym(*it) );
@@ -5182,7 +5182,7 @@ namespace wali
       assert(entryPoint < wali::WALI_BAD_KEY);
 
       const Calls calls = trans.getTransEntry(entryPoint);
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
       for( callIterator it = calls.begin(); it != calls.end(); it++ )
       {
           syms.insert( Trans::getCallSym(*it) );
@@ -5204,7 +5204,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Calls ent = trans.getCalls();
-      std::set<St> entries;
+      typename std::set<St> entries;
       for( callIterator it = ent.begin(); it != ent.end(); it++ )
       {
         if( symbol == Trans::getCallSym(*it) )
@@ -5231,7 +5231,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Calls ent = trans.getTransCall(callSite);
-      std::set<St> entries;
+      typename std::set<St> entries;
       for( callIterator it = ent.begin(); it != ent.end(); it++ )
       {
         if( symbol == Trans::getCallSym(*it) )
@@ -5253,7 +5253,7 @@ namespace wali
     {
       assert(callSite < wali::WALI_BAD_KEY);
       const Calls ent = trans.getTransCall(callSite);
-      std::set<std::pair<Sym,St> > entries;
+      typename std::set<std::pair<Sym,St> > entries;
       for( callIterator it = ent.begin(); it != ent.end(); it++ )
       {
         entries.insert( std::pair<Sym,St>(Trans::getCallSym(*it),Trans::getEntry(*it)) );
@@ -5272,7 +5272,7 @@ namespace wali
     const std::set<typename NWA<Client>::St> NWA<Client>::getEntries( ) const
     {
       const Calls call = trans.getCalls();
-      std::set<St> entries;
+      typename std::set<St> entries;
       for( callIterator it = call.begin(); it != call.end(); it++ )
       {
         entries.insert( Trans::getEntry(*it) );
@@ -5431,7 +5431,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Internals src = trans.getInternals();
-      std::set<St> sources;
+      typename std::set<St> sources;
       for( internalIterator it = src.begin(); it != src.end(); it++ )
       {
         if( symbol == Trans::getInternalSym(*it) )
@@ -5458,7 +5458,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Internals src = trans.getTransTo(target);
-      std::set<St> sources;
+      typename std::set<St> sources;
       for( internalIterator it = src.begin(); it != src.end(); it++ )
       {
         if( symbol == Trans::getInternalSym(*it) )
@@ -5484,7 +5484,7 @@ namespace wali
       assert(target < wali::WALI_BAD_KEY);
 
       const Internals src = trans.getTransTo(target);
-      std::set<std::pair<Sym,St> > sources;
+      typename std::set<std::pair<Sym,St> > sources;
       for( internalIterator it = src.begin(); it != src.end(); it++ )
       {
         sources.insert( std::pair<Sym,St>(Trans::getSource(*it), Trans::getInternalSym(*it)) );
@@ -5503,7 +5503,7 @@ namespace wali
     const std::set<typename NWA<Client>::St> NWA<Client>::getSources(  ) const
     {
       const Internals src = trans.getInternals();
-      std::set<St> sources;
+      typename std::set<St> sources;
       for( internalIterator it = src.begin(); it != src.end(); it++ )
       {
         sources.insert( Trans::getSource(*it) );
@@ -5522,7 +5522,7 @@ namespace wali
     const std::set<typename NWA<Client>::Sym> NWA<Client>::getInternalSym(  ) const
     {
       const Internals ints = trans.getInternals();
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
       for( internalIterator it = ints.begin(); it != ints.end(); it++ )
       {
         syms.insert( Trans::getInternalSym(*it) );
@@ -5545,7 +5545,7 @@ namespace wali
     const std::set<typename NWA<Client>::Sym> NWA<Client>::getInternalSym( St source, St target ) const
     {
       const Internals ints = trans.getTransFrom(source);
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
       for( internalIterator it = ints.begin(); it != ints.end(); it++ )
       {
         if( target == Trans::getTarget(*it) )
@@ -5568,7 +5568,7 @@ namespace wali
     const std::set<typename NWA<Client>::Sym> NWA<Client>::getInternalSym_Source( St source ) const
     {
       const Internals ints = trans.getTransFrom(source);
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
       for( internalIterator it = ints.begin(); it != ints.end(); it++ )
       {
         syms.insert( Trans::getInternalSym(*it) );
@@ -5590,7 +5590,7 @@ namespace wali
     const std::set<typename NWA<Client>::Sym> NWA<Client>::getInternalSym_Target( St target ) const
     {
       const Internals ints = trans.getTransTo(target);
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
       for( internalIterator it = ints.begin(); it != ints.end(); it++ )
       {
         syms.insert( Trans::getInternalSym(*it) );
@@ -5612,7 +5612,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Internals tgt = trans.getInternals();
-      std::set<St> targets;
+      typename std::set<St> targets;
       for( internalIterator it = tgt.begin(); it != tgt.end(); it++ )
       {
         if( symbol == Trans::getInternalSym(*it) )
@@ -5640,7 +5640,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Internals tgt = trans.getTransFrom(source);
-      std::set<St> targets;
+      typename std::set<St> targets;
       for( internalIterator it = tgt.begin(); it != tgt.end(); it++ )
       {
         if( symbol == Trans::getInternalSym(*it) )
@@ -5662,7 +5662,7 @@ namespace wali
     {
       assert(source < wali::WALI_BAD_KEY);
       const Internals tgt = trans.getTransFrom(source);
-      std::set<std::pair<Sym,St> > targets;
+      typename std::set<std::pair<Sym,St> > targets;
       for( internalIterator it = tgt.begin(); it != tgt.end(); it++ )
       {
         targets.insert( std::pair<Sym,St>(Trans::getInternalSym(*it),Trans::getTarget(*it)) );
@@ -5681,7 +5681,7 @@ namespace wali
     const std::set<typename NWA<Client>::St> NWA<Client>::getTargets(  ) const
     {
       const Internals tgt = trans.getInternals();
-      std::set<St> targets;
+      typename std::set<St> targets;
       for( internalIterator it = tgt.begin(); it != tgt.end(); it++ )
       {
         targets.insert( Trans::getTarget(*it) );
@@ -5835,7 +5835,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns exit = trans.getReturns();
-      std::set<St> exits;
+      typename std::set<St> exits;
       for( returnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
@@ -5866,7 +5866,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns exit = trans.getTransPred(callSite);
-      std::set<St> exits;
+      typename std::set<St> exits;
       for( returnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( (Trans::getReturnSite(*it) == returnSite) && (symbol == Trans::getReturnSym(*it)) )
@@ -5895,7 +5895,7 @@ namespace wali
       assert(returnSite < wali::WALI_BAD_KEY);
 
       const Returns exit = trans.getTransPred(callSite);
-      std::set<std::pair<St,Sym> > exits;
+      typename std::set<std::pair<St,Sym> > exits;
       for( returnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( Trans::getReturnSite(*it) == returnSite )
@@ -5917,7 +5917,7 @@ namespace wali
     const std::set<typename NWA<Client>::St> NWA<Client>::getExits( ) const
     {
       const Returns exit = trans.getReturns();
-      std::set<St> exits;
+      typename std::set<St> exits;
       for( returnIterator it = exit.begin(); it != exit.end(); it++ )
       {
           exits.insert( Trans::getExit(*it) );
@@ -5943,7 +5943,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns exit = trans.getTransPred(callSite);
-      std::set<St> exits;
+      typename std::set<St> exits;
       for( returnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
@@ -5969,7 +5969,7 @@ namespace wali
       assert(callSite < wali::WALI_BAD_KEY);
 
       const Returns exit = trans.getTransPred(callSite);
-      std::set<std::pair<St,Sym> > exits;
+      typename std::set<std::pair<St,Sym> > exits;
       for( returnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         exits.insert( std::pair<St,Sym>(Trans::getExit(*it),Trans::getReturnSym(*it)) );
@@ -5995,7 +5995,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns exit = trans.getTransRet(returnSite);
-      std::set<St> exits;
+      typename std::set<St> exits;
       for( returnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
@@ -6021,7 +6021,7 @@ namespace wali
       assert(returnSite < wali::WALI_BAD_KEY);
 
       const Returns exit = trans.getTransRet(returnSite);
-      std::set<std::pair<St,Sym> > exits;
+      typename std::set<std::pair<St,Sym> > exits;
       for( returnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         exits.insert( std::pair<St,Sym>(Trans::getExit(*it),Trans::getReturnSym(*it)) );
@@ -6043,7 +6043,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns call = trans.getReturns();
-      std::set<St> calls;
+      typename std::set<St> calls;
       for( returnIterator it = call.begin(); it != call.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
@@ -6074,7 +6074,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns call = trans.getTransExit(exitPoint);
-      std::set<St> calls;
+      typename std::set<St> calls;
       for( returnIterator it = call.begin(); it != call.end(); it++ )
       {
         if( (Trans::getReturnSite(*it) == returnSite) &&  (symbol == Trans::getReturnSym(*it)) )
@@ -6103,7 +6103,7 @@ namespace wali
       assert(returnSite < wali::WALI_BAD_KEY);
 
       const Returns call = trans.getTransExit(exitPoint);
-      std::set<std::pair<St,Sym> > calls;
+      typename std::set<std::pair<St,Sym> > calls;
       for( returnIterator it = call.begin(); it != call.end(); it++ )
       {
         if( Trans::getReturnSite(*it) == returnSite )
@@ -6125,7 +6125,7 @@ namespace wali
     const std::set<typename NWA<Client>::St> NWA<Client>::getCalls( ) const
     {
       const Returns call = trans.getReturns();
-      std::set<St> calls;
+      typename std::set<St> calls;
       for( returnIterator it = call.begin(); it != call.end(); it++ )
       {
           calls.insert( Trans::getCallSite(*it) );
@@ -6151,7 +6151,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns call = trans.getTransExit(exitPoint);
-      std::set<St> calls;
+      typename std::set<St> calls;
       for( returnIterator it = call.begin(); it != call.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
@@ -6176,7 +6176,7 @@ namespace wali
       assert(exitPoint < wali::WALI_BAD_KEY);
 
       const Returns call = trans.getTransExit(exitPoint);
-      std::set<std::pair<St,Sym> > calls;
+      typename std::set<std::pair<St,Sym> > calls;
       for( returnIterator it = call.begin(); it != call.end(); it++ )
       {
         calls.insert( std::pair<St,Sym>(Trans::getCallSite(*it),Trans::getReturnSym(*it)) );
@@ -6196,13 +6196,13 @@ namespace wali
      *
      */
     template <typename Client>
-    const std::set<typename NWA<Client>::St> NWA<Client>::getCalls_Ret( Sym symbol, St returnSite ) const
+    const typename std::set<typename NWA<Client>::St> NWA<Client>::getCalls_Ret( Sym symbol, St returnSite ) const
     {
       assert(returnSite < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns call = trans.getTransRet(returnSite);
-      std::set<St> calls;
+      typename std::set<St> calls;
       for( returnIterator it = call.begin(); it != call.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
@@ -6228,7 +6228,7 @@ namespace wali
       assert(returnSite < wali::WALI_BAD_KEY);
 
       const Returns call = trans.getTransRet(returnSite);
-      std::set<std::pair<St,Sym> > calls;
+      typename std::set<std::pair<St,Sym> > calls;
       for( returnIterator it = call.begin(); it != call.end(); it++ )
       {
         calls.insert( std::pair<St,Sym>(Trans::getCallSite(*it),Trans::getReturnSym(*it)) );
@@ -6247,7 +6247,7 @@ namespace wali
     const std::set<typename NWA<Client>::Sym> NWA<Client>::getReturnSym(  ) const
     {
       const Returns rets = trans.getReturns();
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
       for( returnIterator it = rets.begin(); it != rets.end(); it++ )
       {
         syms.insert( Trans::getReturnSym(*it) );
@@ -6275,7 +6275,7 @@ namespace wali
       assert(returnSite < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransExit(exitPoint);
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
       for( returnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( (Trans::getCallSite(*it) == callSite) && (returnSite == Trans::getReturnSite(*it)) )
@@ -6302,7 +6302,7 @@ namespace wali
       assert(exitPoint < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransExit(exitPoint);
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
       for( returnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         syms.insert( Trans::getReturnSym(*it) );
@@ -6326,7 +6326,7 @@ namespace wali
       assert(callSite < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransPred(callSite);
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
       for( returnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         syms.insert( Trans::getReturnSym(*it) );
@@ -6350,7 +6350,7 @@ namespace wali
       assert(returnSite < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransRet(returnSite);
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
       for( returnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         syms.insert( Trans::getReturnSym(*it) );
@@ -6376,7 +6376,7 @@ template <typename Client>
       assert(callSite < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransExit(exitPoint);
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
       for( returnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( (Trans::getCallSite(*it) == callSite) )
@@ -6405,7 +6405,7 @@ template <typename Client>
       assert(returnSite < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransExit(exitPoint);
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
       for( returnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( (returnSite == Trans::getReturnSite(*it)) )
@@ -6434,7 +6434,7 @@ template <typename Client>
       assert(returnSite < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransPred(callSite);
-      std::set<Sym> syms;
+      typename std::set<Sym> syms;
       for( returnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( (returnSite == Trans::getReturnSite(*it)) )
@@ -6461,7 +6461,7 @@ template <typename Client>
       assert(symbol < wali::WALI_BAD_KEY);
       
       const Returns ret = trans.getReturns();
-      std::set<St> returns;
+      typename std::set<St> returns;
       for( returnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
@@ -6492,7 +6492,7 @@ template <typename Client>
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransExit(exitPoint);
-      std::set<St> returns;
+      typename std::set<St> returns;
       for( returnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( (Trans::getCallSite(*it) == callSite) && (symbol == Trans::getReturnSym(*it)) )
@@ -6521,7 +6521,7 @@ template <typename Client>
       assert(callSite < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransExit(exit);
-      std::set<std::pair<Sym,St> > returns;
+      typename std::set<std::pair<Sym,St> > returns;
       for( returnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( Trans::getCallSite(*it) == callSite )
@@ -6543,7 +6543,7 @@ template <typename Client>
     const std::set<typename NWA<Client>::St> NWA<Client>::getReturns( ) const
     {
       const Returns ret = trans.getReturns();
-      std::set<St> returns;
+      typename std::set<St> returns;
       for( returnIterator it = ret.begin(); it != ret.end(); it++ )
       {
           returns.insert( Trans::getReturnSite(*it) );
@@ -6569,7 +6569,7 @@ template <typename Client>
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransExit(exitPoint);
-      std::set<St> returns;
+      typename std::set<St> returns;
       for( returnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
@@ -6594,7 +6594,7 @@ template <typename Client>
       assert(exitPoint < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransExit(exitPoint);
-      std::set<std::pair<Sym,St> > returns;
+      typename std::set<std::pair<Sym,St> > returns;
       for( returnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         returns.insert( std::pair<Sym,St>(Trans::getReturnSym(*it),Trans::getReturnSite(*it)) );
@@ -6620,7 +6620,7 @@ template <typename Client>
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransPred(callSite);
-      std::set<St> returns;
+      typename std::set<St> returns;
       for( returnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
@@ -6645,7 +6645,7 @@ template <typename Client>
       assert(callSite < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransPred(callSite);
-      std::set<std::pair<Sym,St> > returns;
+      typename std::set<std::pair<Sym,St> > returns;
       for( returnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         returns.insert( std::pair<Sym,St>(Trans::getReturnSym(*it),Trans::getReturnSite(*it)) );
@@ -6950,7 +6950,7 @@ template <typename Client>
       setStuckState(stuckSt);
       setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
 
-      std::set<StatePair> visitedPairs; // All the pairs of states we have ever encountered.
+      typename std::set<StatePair> visitedPairs; // All the pairs of states we have ever encountered.
       std::deque<StatePair> worklistPairs; // Pairs of states yet to be processed
       typedef std::map<StatePair, Key> PairStMap;
       PairStMap pairToStMap; // The corresponding state in the product 
@@ -6980,7 +6980,7 @@ template <typename Client>
           }
 
           //perform the epsilon closure of sp
-          std::set<StatePair> newPairs;
+          typename std::set<StatePair> newPairs;
           epsilonClosure(&newPairs,sp,first,second);
           //add all new pairs to the worklist
           for( typename std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
@@ -7016,11 +7016,11 @@ template <typename Client>
         //Process outgoing call transitions
         Calls firstCalls = first->trans.getTransCall(currpair.first);
         Calls secondCalls = second->trans.getTransCall(currpair.second);
-        for( Calls::const_iterator fit = firstCalls.begin(); fit != firstCalls.end(); fit++ ) 
+        for( typename Calls::const_iterator fit = firstCalls.begin(); fit != firstCalls.end(); fit++ ) 
         {
           Sym firstSym = Trans::getCallSym(*fit);
           St firstEntry = Trans::getEntry(*fit);
-          for( Calls::const_iterator sit = secondCalls.begin(); sit != secondCalls.end(); sit++ ) 
+          for( typename Calls::const_iterator sit = secondCalls.begin(); sit != secondCalls.end(); sit++ ) 
           {
             Sym secondSym = Trans::getCallSym(*sit);
             // Are the symbols intersectable
@@ -7059,7 +7059,7 @@ template <typename Client>
               pairToStMap[entryPair] = resSt;
               
               //perform the epsilon closure of entryPair
-              std::set<StatePair> newPairs;
+              typename std::set<StatePair> newPairs;
               epsilonClosure(&newPairs,entryPair,first,second);
               //add all new pairs to the worklist
               for( typename std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
@@ -7161,7 +7161,7 @@ template <typename Client>
               pairToStMap[tgtPair] = resSt;              
               
               //perform the epsilon closure of tgtPair
-              std::set<StatePair> newPairs;
+              typename std::set<StatePair> newPairs;
               epsilonClosure(&newPairs,tgtPair,first,second);
               //add all new pairs to the worklist
               for( typename std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
@@ -7273,7 +7273,7 @@ template <typename Client>
               pairToStMap[retPair] = retSt;
               
               //perform the epsilon closure of retPair
-              std::set<StatePair> newPairs;
+              typename std::set<StatePair> newPairs;
               epsilonClosure(&newPairs,retPair,first,second);
               //add all new pairs to the worklist
               for( typename std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
@@ -7384,7 +7384,7 @@ template <typename Client>
               pairToStMap[retPair] = retSt;
               
               //perform the epsilon closure of retPair
-              std::set<StatePair> newPairs;
+              typename std::set<StatePair> newPairs;
               epsilonClosure(&newPairs,retPair,first,second);
               //add all new pairs to the worklist
               for( typename std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
@@ -7925,7 +7925,7 @@ template <typename Client>
       //A: this is always the case since the stuck state can never be a final state
       
       //FinalStates = AllStates - FinalStates
-      std::set<St> oldFinalStates;
+      typename std::set<St> oldFinalStates;
       oldFinalStates.insert(beginFinalStates(),endFinalStates());
  
       clearFinalStates();
@@ -8008,11 +8008,11 @@ template <typename Client>
       states.setClientInfo(r0,CI);
 
       //Put the initial state on the worklist.
-      std::set<BinaryRelation> wl;
+      typename std::set<BinaryRelation> wl;
       wl.insert(R0);
 
       //Keep track of all visited states.
-      std::set<BinaryRelation> visited;
+      typename std::set<BinaryRelation> visited;
       
       //Process the states on the worklist.
       while(! wl.empty() )
@@ -8098,7 +8098,7 @@ template <typename Client>
           project_symbol_4(Ir,nondet->trans.getReturns(),*it);    
           project_symbol_4(Ir,nondet->trans.getReturns(),Symbols::getWild());   //Every symbol also matches wild.
           //For each possible call predecessor:
-          for( std::set<BinaryRelation>::iterator rit = visited.begin();
+          for( typename std::set<BinaryRelation>::iterator rit = visited.begin();
                 rit != visited.end(); rit++ )
           {
             //Compute the relation.
@@ -8126,7 +8126,7 @@ template <typename Client>
             }
           }
           //For each possible exit point:
-          for( std::set<BinaryRelation>::iterator rit = visited.begin();
+          for( typename std::set<BinaryRelation>::iterator rit = visited.begin();
                 rit != visited.end(); rit++ )
           {
             //Compute the relation.
@@ -8170,7 +8170,7 @@ template <typename Client>
           }
         }
         //For each state in the deterministic maching, check whether it is a final state.
-        for( std::set<BinaryRelation>::iterator sit = visited.begin();
+        for( typename std::set<BinaryRelation>::iterator sit = visited.begin();
               sit != visited.end(); sit++ )
         {
           BinaryRelation Rtmpf;
@@ -8586,7 +8586,7 @@ template <typename Client>
       base.for_each(rules);
 
       //Step Rules:
-      for( std::set<wpds::Rule>::iterator it = rules.stepRules.begin();
+      for( typename std::set<wpds::Rule>::iterator it = rules.stepRules.begin();
             it != rules.stepRules.end(); it++ )
       {
         //<p,n_1> -w-> <p',n_2> in delta_1, (q,n_1,q') in delta_i
@@ -8606,7 +8606,7 @@ template <typename Client>
       }
 
       //Call Rules:
-      for( std::set<wpds::Rule>::iterator it = rules.pushRules.begin();
+      for( typename std::set<wpds::Rule>::iterator it = rules.pushRules.begin();
             it != rules.pushRules.end(); it++ )
       {
         //<p,n_c> -w-> <p',e r_c> in delta_3, (q_c,n_c,q) in delta_c
@@ -9399,14 +9399,14 @@ template <typename Client>
       o << "    }\n";
 
       //initial state
-      std::set<St> initials = getInitialStates();
+      typename std::set<St> initials = getInitialStates();
       for( typename std::set<St>::const_iterator it = initials.begin(); it != initials.end(); it++ )
       {
         printKey(o << "\"",*it,true)<<"\" [ style=bold ]";
       }
 
       //final states
-      std::set<St> finals = getFinalStates();
+      typename std::set<St> finals = getFinalStates();
       for( typename std::set<St>::const_iterator it = finals.begin(); it != finals.end(); it++ ) 
       {
         printKey(o << "\"",*it,true) <<"\" [ peripheries=2 ]";
@@ -9455,7 +9455,7 @@ template <typename Client>
         {
           // For each Sym, holds the set of call predecessors for which
           // (exit, pred, sym, return) is in delta_r
-          std::map<Sym, std::set<St> > returns;
+          typename std::map<Sym, std::set<St> > returns;
 
           // Populate it:
           for(returnIterator trans = beginReturnTrans(); trans != endReturnTrans(); ++trans)
