@@ -3630,27 +3630,19 @@ namespace wali
 
     //Constructors and Destructor
     template <typename Client>
-    NWA<Client>::NWA( ): Countable()
-    {
-      stuck = false;
-    }
+    NWA<Client>::NWA( ) :stuck(false) {  }
 
     template <typename Client>
-    NWA<Client>::NWA( St stuckSt ): Countable()
+    NWA<Client>::NWA( St stuckSt ) : stuck(false)
     {
-      stuck = false;  //To satisfy the assertion of setStuckState()
       setStuckState(stuckSt); 
     }
 
     template <typename Client>
-    NWA<Client>::NWA( const NWA & other ): Countable()
-    {
-      //Copy data over from 'other'
-      stuck = other.stuck;
-      states = other.states;
-      symbols = other.symbols;
-      trans = other.trans;
-    }
+    NWA<Client>::NWA( const NWA & other )
+      : stuck( other.stuck), states(other.states), symbols(other.symbols), trans(other.trans)
+    {   }
+
     template <typename Client>
     NWA<Client> & NWA<Client>::operator=( const NWA & other )
     {
