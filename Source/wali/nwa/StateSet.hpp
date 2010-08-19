@@ -66,7 +66,7 @@ namespace wali
       
       //Constructors and Destructor
       StateSet( );
-      StateSet( StateSet & other );
+      StateSet( StateSet const & other );
       StateSet & operator=( const StateSet & other );
 
       ~StateSet( );
@@ -553,7 +553,7 @@ namespace wali
     StateSet<Client>::StateSet( ) { }
      
     template<typename Client>
-    StateSet<Client>::StateSet( StateSet<Client> & other )
+    StateSet<Client>::StateSet( StateSet<Client> const & other )
     {
       clearStates();
       
@@ -944,9 +944,10 @@ namespace wali
       for( bool first=true; it != itEND ; it++,first=false )
       {
         if( !first )
-          o << ", ";
+          o << ",\n  ";
        
         printKey(o,*it);
+        o << " (=" << *it << ")";
       }
       o << " }" << std::endl;
       

@@ -2401,10 +2401,12 @@ namespace wali
           o << ", \n";
         o << "(";
         printKey(o,getCallSite(*cit));
+        o << " (=" << getCallSite(*cit) << ") ";
         o << ", ";
         printKey(o,getCallSym(*cit));
         o << ", "; 
         printKey(o,getEntry(*cit));
+        o << " (=" << getEntry(*cit) << ") ";
         o << ")";
         first=false;
       }
@@ -2419,10 +2421,12 @@ namespace wali
           o << ", \n";
         o << "(";
         printKey(o,getSource(*iit));
+        o << " (=" << getSource(*iit) << ") ";
         o << ", ";
         printKey(o,getInternalSym(*iit));
         o << ", ";
         printKey(o,getTarget(*iit));
+        o << " (=" << getTarget(*iit) << ") ";
         o << ")";
         first = false;
       }
@@ -2437,12 +2441,15 @@ namespace wali
           o << ",\n";
         o << "(";
         printKey(o,getExit(*rit));
+        o << " (=" << getExit(*rit) << ") ";
         o << ", ";
         printKey(o,getCallSite(*rit));
+        o << " (=" << getCallSite(*rit) << ") ";
         o << ", "; 
         printKey(o,getReturnSym(*rit));
         o << ", ";
         printKey(o,getReturnSite(*rit));
+        o << " (=" << getReturnSite(*rit) << ") ";
         o << ")";
         first = false;
       }
