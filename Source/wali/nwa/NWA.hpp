@@ -2465,7 +2465,7 @@ namespace wali
        */
       static NWARefPtr determinize( NWARefPtr nondet, St stuck )
         {
-        NWARefPtr nwa = ref_ptr<NWA>(&NWA(stuck));
+        NWARefPtr nwa = ref_ptr<NWA>(new NWA(stuck));
         nwa->determinize(nondet);
         return nwa;
       }
@@ -3622,6 +3622,259 @@ namespace wali
         //TODO: ponder the following ...
         //Q: should we incrementally maintain a wpds?
         //    if we did, what would the weight gen of the wpds be?
+
+    public:
+        // This is like a combined NWS/NWP but with an API that is usable
+        class NestedWord
+        {
+        public:
+            // Each position in the nested word has a symbol and a type.
+            // (Think of this more of a visibly-pushdown word.)
+            struct Position {
+                enum Type {
+                    CallType, InternalType, ReturnType
+                };
+                Sym symbol;
+                Type type;
+                
+                Position(Sym sym, Type ty) : symbol(sym), type(ty) {}
+            };
+            
+        private:
+            std::vector<Position> word;
+            
+        public:
+            typedef typename std::vector<Position>::const_iterator const_iterator;
+            
+            void append(Position p) {
+                word.push_back(p);
+            }
+                    
+            void appendCall(Sym sym)     { append(Position(sym, Position::CallType)); }
+            void appendInternal(Sym sym) { append(Position(sym, Position::InternalType)); }
+            void appendReturn(Sym sym)   { append(Position(sym, Position::ReturnType)); }
+            
+            const_iterator begin() const {
+                return word.begin();
+            }
+            
+            const_iterator end() const {
+                return word.end();
+            }
+        };
+        
+
+        struct Configuration {
+            St state;
+            std::vector<St> callPredecessors;
+            
+            Configuration(St s) : state(s) {}
+            Configuration(Configuration const & c)
+                : state(c.state)
+                , callPredecessors(c.callPredecessors) {}
+            
+            bool operator< (Configuration const & other) const {
+                if (state < other.state) return true;
+                if (state > other.state) return false;
+                if (callPredecessors.size() < other.callPredecessors.size()) return true;
+                if (callPredecessors.size() > other.callPredecessors.size()) return false;
+                
+                // Iterate in parallel over the two callPredecessors
+                for (std::vector<St>::const_iterator i = callPredecessors.begin(), j = other.callPredecessors.begin();
+                     i!=callPredecessors.end(); ++i, ++j)
+                    {
+                        assert (j!=other.callPredecessors.end());
+                        if (*i < *j) return true;
+                        if (*i > *j) return false;
+                    }
+                
+                return false;
+            }
+            
+            bool operator== (Configuration const & other) const {
+                // If neither A < B nor B < A, then A == B
+                return !(*this < other || other < *this);
+            }
+        };
+
+        bool isMemberNondet( NestedWord const & word )
+        {
+#if defined(_MSC_VER) && !defined(NDEBUG)
+            DebugBreak();
+#endif
+            
+            std::set<Configuration> nextConfigs;
+            for(stateIterator iter = beginInitialStates(); iter!=endInitialStates(); ++iter) {
+                nextConfigs.insert(Configuration(*iter));
+            }
+            
+            for(typename NestedWord::const_iterator curpos = word.begin();
+                curpos != word.end(); ++curpos)
+            {
+                // When we start this loop, 'nextConfigs' holds the *non-epsilon-closed*
+                // list of configurations we will use *this iteration*. We first compute
+                // the epsilon closure of these configurations, *then* update the variable
+                // currConfigs with the union of 'nextConfigs' and the closure. Then we
+                // can proceed with the simulation.
+                
+                // First, we take the epsilon closure of the current configuration set.
+                std::set<Configuration> closedConfigs;
+                for(typename std::set<Configuration>::const_iterator config = nextConfigs.begin();
+                    config != nextConfigs.end(); ++config)
+                 {
+                     std::set<St> closure;
+                     epsilonClosure(&closure, config->state);
+                     closure.erase(config->state);
+                     
+                     for(std::set<St>::const_iterator other = closure.begin();
+                         other != closure.end(); ++other)
+                      {
+                          Configuration c(*config);
+                          c.state = *other;
+                          closedConfigs.insert(c);
+                      }
+                 }
+                
+                // Second, we update currConfigs (so we can use nextConfigs for the next round)
+                std::set<Configuration> currConfigs;
+                std::set_union(nextConfigs.begin(), nextConfigs.end(),
+                               closedConfigs.begin(), closedConfigs.end(),
+                               std::inserter(currConfigs, currConfigs.begin()));
+                
+                // Third, we clear out nextConfigs
+                nextConfigs.clear();
+                
+#if 0
+                std::cout << "Before reading ";
+                printKey(std::cout, curpos->symbol) << " (as a " << "CIR"[curpos->type] << "):\n";
+                for(typename std::set<Configuration>::const_iterator config = currConfigs.begin();
+                    config != currConfigs.end(); ++config)
+                {
+                    std::cout << "  ";
+                    printKey(std::cout, config->state) << " [";
+                    for(int i=0; i<config->callPredecessors.size(); ++i) {
+                        printKey(std::cout, config->callPredecessors[i]) << ", ";
+                    }
+                    std::cout << "]\n";
+                }
+                {
+                    int i;
+#if !defined(NDEBUG)
+                    std::cin >> i;
+#endif
+                }
+#endif
+                
+                
+                // Do something different depending on whether the current position is
+                // a call, return, or internal symbol. But in all cases, put the possible
+                // next configurations in here:
+                if( curpos->type == NestedWord::Position::ReturnType )  {   //Denotes a return transition.
+                    // Determine the possible next configurations for each current config.
+                    // We need to look at the current state as well as the top of the 
+                    // call stack in each case.
+                    for(typename std::set<Configuration>::const_iterator config = currConfigs.begin();
+                        config != currConfigs.end(); ++config)
+                    {
+                        // Use trans.getReturns to get the matching return transitions out
+                        // of the "current" state, then separately check to see whether the
+                        // call predecessor matches.
+                        Returns rets = trans.getReturns(config->state, curpos->symbol);
+                        for( returnIterator rit = rets.begin(); rit != rets.end(); rit++ ) {
+                            if( Trans::getCallSite(*rit) == config->callPredecessors.back() ) {
+                                // Construct a new configuration that's the same as the old
+                                // configuration, except with a popped stack and new state
+                                Configuration c(*config);
+                                c.callPredecessors.pop_back();
+                                c.state = Trans::getReturnSite(*rit);
+                                nextConfigs.insert(c);
+                            }
+                        }
+                    }
+                }
+                else if( curpos->type == NestedWord::Position::CallType ) {  //Denotes a call transition.
+                    // Determine the possible next configurations for each current config.
+                    // Now we just need to look at outgoing transitions.
+                    for(typename std::set<Configuration>::const_iterator config = currConfigs.begin();
+                        config != currConfigs.end(); ++config)
+                    {
+                        Calls calls = trans.getCalls(config->state, curpos->symbol);
+                        for( callIterator cit = calls.begin(); cit != calls.end(); cit++ ) {
+                            // Construct a new configuration that's the same as the old
+                            // configuration, except with a pushed stack and new state
+                            Configuration c(*config);
+                            c.callPredecessors.push_back(config->state);
+                            c.state = Trans::getEntry(*cit);
+                            nextConfigs.insert(c);
+                        }
+                    }
+                }
+                else {   //Must be an internal transition.
+                    // Determine the possible next configurations for each current config.
+                    // Now we just need to look at outgoing transitions.
+                    for(typename std::set<Configuration>::const_iterator config = currConfigs.begin();
+                        config != currConfigs.end(); ++config)
+                    {
+                        Internals ints = trans.getInternals(config->state, curpos->symbol);
+                        for( internalIterator iit = ints.begin(); iit != ints.end(); iit++ ) {
+                            // Construct a new configuration that's the same as the old
+                            // configuration, except with a new state
+                            Configuration c(*config);
+                            c.state = Trans::getTarget(*iit);
+                            nextConfigs.insert(c);
+                        }
+                    }
+                }
+            } 
+            
+            // Just like when we started this loop, 'nextConfigs' holds the non-epsilon-closed
+            // list of configurations found after the last symbol was read. Before we check
+            // whether we wound up in an accepting state, we have to close again.
+            
+            // First, we take the epsilon closure of the current configuration set.
+            std::set<Configuration> closedConfigs;
+            for(typename std::set<Configuration>::const_iterator config = nextConfigs.begin();
+                config != nextConfigs.end(); ++config)
+            {
+                std::set<St> closure;
+                epsilonClosure(&closure, config->state);
+                closure.erase(config->state);
+                
+                for(typename std::set<St>::const_iterator other = closure.begin();
+                    other != closure.end(); ++other)
+                {
+                    Configuration c(*config);
+                    c.state = *other;
+                    closedConfigs.insert(c);
+                }
+            }
+            
+            // Second, we update currConfigs (so we can use nextConfigs for the next round)
+            std::set<Configuration> currConfigs;
+            std::set_union(nextConfigs.begin(), nextConfigs.end(),
+                           closedConfigs.begin(), closedConfigs.end(),
+                           std::inserter(currConfigs, currConfigs.begin()));
+            
+            //At the end of the word, if we are in a final state,
+            //then return true
+            for(typename std::set<Configuration>::const_iterator config = currConfigs.begin();
+                config != currConfigs.end(); ++config)
+            {
+                if (isFinalState(config->state)) {
+                    if (config->callPredecessors.size() != 0) {
+                        std::cerr << "Alert! In SimulateWordNondet, we are ending in a final state with nonempty stack!\n";
+#if defined(_MSC_VER)
+                        DebugBreak();
+#endif
+                        exit(20);
+                    }
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
     };
 
     //
@@ -7048,57 +7301,58 @@ template <typename Client>
 
               //Add this to the worklist.
               worklistPairs.push_back(entryPair);
-              pairToStMap[entryPair] = resSt;
-              
-              //perform the epsilon closure of entryPair
-              typename std::set<StatePair> newPairs;
-              epsilonClosure(&newPairs,entryPair,first,second);
-              //add all new pairs to the worklist
-              for( typename std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
-              {
-                St st;
-                //If we have already considered this pair and found them nonintersectable, continue
-                if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
-                  continue;
-                visitedPairs.insert(*it);
-                //Have we seen this pair before?
-                if( pairToStMap.count(*it) == 0 )
-                {
-                  //Check and make sure this intersection makes sense.
-                  ClientInfoRefPtr CI;
-                  if( stateIntersect(first,it->first,second,it->second,st,CI) )
-                  {
-                    if( first->isFinalState(it->first) && second->isFinalState(it->second) )
-                      addFinalState(st);
-                    else
-                      addState(st); 
-
-                    //Attach client info to the newly created state.
-                    states.setClientInfo(st,CI);
-
-                    //Add this to the worklist.
-                    worklistPairs.push_back(*it);
-                    pairToStMap[*it] = st;
-                  }
-                  else
-                  {
-                    //We have seen this pair before.
-                    st = pairToStMap[*it];
-                  }
-
-                  //Add an edge that is the current call trans with collapsed epsilon internal trans.
-                  intersectClientInfoCall(first,Trans::getCallSite(*fit),it->first,
-                                          second,Trans::getCallSite(*sit),it->second,
-                                          resSym,st);    //Intersect Call Trans client info.
-                  addCallTrans(pairToStMap[currpair],resSym,st);  
-                }
-              }
+              pairToStMap[entryPair] = resSt;           
             } 
             else 
             { 
               //We have seen this pair before.
               resSt = pairToStMap[entryPair];
             }
+
+            //perform the epsilon closure of entryPair
+            typename std::set<StatePair> newPairs;
+            epsilonClosure(&newPairs,entryPair,first,second);
+            //add all new pairs to the worklist
+            for( typename std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
+            {
+                St st;
+                //If we have already considered this pair and found them nonintersectable, continue
+                if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
+                    continue;
+                visitedPairs.insert(*it);
+                //Have we seen this pair before?
+                if( pairToStMap.count(*it) == 0 )
+                {
+                    //Check and make sure this intersection makes sense.
+                    ClientInfoRefPtr CI;
+                    if( stateIntersect(first,it->first,second,it->second,st,CI) )
+                    {
+                        if( first->isFinalState(it->first) && second->isFinalState(it->second) )
+                            addFinalState(st);
+                        else
+                            addState(st); 
+
+                        //Attach client info to the newly created state.
+                        states.setClientInfo(st,CI);
+                        
+                        //Add this to the worklist.
+                        worklistPairs.push_back(*it);
+                        pairToStMap[*it] = st;
+                    }
+                }
+                else
+                {
+                    //We have seen this pair before.
+                    st = pairToStMap[*it];
+                }
+
+                //Add an edge that is the current call trans with collapsed epsilon internal trans.
+                intersectClientInfoCall(first,Trans::getCallSite(*fit),it->first,
+                                        second,Trans::getCallSite(*sit),it->second,
+                                        resSym,st);    //Intersect Call Trans client info.
+                addCallTrans(pairToStMap[currpair],resSym,st);  
+             }
+
             
             //Add an edge that traverses the current call transition.
             intersectClientInfoCall(first,Trans::getCallSite(*fit),Trans::getEntry(*fit),
@@ -7151,55 +7405,56 @@ template <typename Client>
 
               worklistPairs.push_back(tgtPair);
               pairToStMap[tgtPair] = resSt;              
-              
-              //perform the epsilon closure of tgtPair
-              typename std::set<StatePair> newPairs;
-              epsilonClosure(&newPairs,tgtPair,first,second);
-              //add all new pairs to the worklist
-              for( typename std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
-              {
-                St st;
-                //If we have already considered this pair and found them nonintersectable, continue
-                if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
-                  continue;
-                visitedPairs.insert(*it);
-                //Have we seen this pair before?
-                if( pairToStMap.count(*it) == 0 )
-                {
-                  //Check and make sure this intersection makes sense.
-                  ClientInfoRefPtr CI;
-                  if( stateIntersect(first,it->first,second,it->second,st,CI) )
-                  {
-                    if( first->isFinalState(it->first) && second->isFinalState(it->second) )
-                      addFinalState(st);
-                    else
-                      addState(st); 
-
-                    //Attach client info to the newly created state.
-                    states.setClientInfo(st,CI);
-
-                    worklistPairs.push_back(*it);
-                    pairToStMap[*it] = st;
-                  }
-                }
-                else
-                {
-                  //We have seen this pair before.
-                  st = pairToStMap[*it];
-                }
-
-                //Add an edge that is the current internal trans with collapsed epsilon internal trans.
-                  intersectClientInfoInternal(first,Trans::getSource(*fit),it->first,
-                                              second,Trans::getSource(*sit),it->second,
-                                              resSym, st);    //Intersect Internal Trans client info.
-                  addInternalTrans(pairToStMap[currpair],resSym,st);  
-              }
             } 
             else 
             { 
               // we have already seen this pair before
               resSt = pairToStMap[tgtPair];
             }
+
+            //perform the epsilon closure of tgtPair
+            typename std::set<StatePair> newPairs;
+            epsilonClosure(&newPairs,tgtPair,first,second);
+            //add all new pairs to the worklist
+            for( typename std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
+            {
+                St st;
+                //If we have already considered this pair and found them nonintersectable, continue
+                if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
+                    continue;
+                visitedPairs.insert(*it);
+                //Have we seen this pair before?
+                if( pairToStMap.count(*it) == 0 )
+                {
+                    //Check and make sure this intersection makes sense.
+                    ClientInfoRefPtr CI;
+                    if( stateIntersect(first,it->first,second,it->second,st,CI) )
+                    {
+                        if( first->isFinalState(it->first) && second->isFinalState(it->second) )
+                            addFinalState(st);
+                        else
+                            addState(st); 
+
+                        //Attach client info to the newly created state.
+                        states.setClientInfo(st,CI);
+                        
+                        worklistPairs.push_back(*it);
+                        pairToStMap[*it] = st;
+                    }
+                }
+                else
+                {
+                    //We have seen this pair before.
+                    st = pairToStMap[*it];
+                }
+                
+                //Add an edge that is the current internal trans with collapsed epsilon internal trans.
+                intersectClientInfoInternal(first,Trans::getSource(*fit),it->first,
+                                            second,Trans::getSource(*sit),it->second,
+                                            resSym, st);    //Intersect Internal Trans client info.
+                addInternalTrans(pairToStMap[currpair],resSym,st);  
+            }
+            
 
             //Add an edge that is the current internal transition.
             intersectClientInfoInternal(first,Trans::getSource(*fit),Trans::getTarget(*fit),
@@ -7263,54 +7518,55 @@ template <typename Client>
 
               worklistPairs.push_back(retPair);
               pairToStMap[retPair] = retSt;
-              
-              //perform the epsilon closure of retPair
-              typename std::set<StatePair> newPairs;
-              epsilonClosure(&newPairs,retPair,first,second);
-              //add all new pairs to the worklist
-              for( typename std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
-              {
-                St st;
-                //If we have already considered this pair and found them nonintersectable, continue
-                if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
-                  continue;
-                visitedPairs.insert(*it);
-                //Have we seen this pair before?
-                if( pairToStMap.count(*it) == 0 )
-                {
-                  //Check and make sure this intersection makes sense.
-                  ClientInfoRefPtr CI;
-                  if( stateIntersect(first,it->first,second,it->second,st,CI) )
-                  {
-                    if( first->isFinalState(it->first) && second->isFinalState(it->second) )
-                      addFinalState(st);
-                    else
-                      addState(st);
-
-                    //Attach client info to the newly created state.
-                    states.setClientInfo(st,CI);
-
-                    worklistPairs.push_back(*it);
-                    pairToStMap[*it] = st;
-                  }
-                }
-                else
-                {
-                  //We have seen this pair before.
-                  st = pairToStMap[*it];
-                }
-
-                //Add an edge that is the current return trans with collapsed epsilon internal trans.
-                intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),it->first,
-                                          second,Trans::getExit(*sit),Trans::getCallSite(*sit),it->second,
-                                          resSym,st);    //Intersect Internal Trans client info.
-                addReturnTrans(pairToStMap[currpair],callSt,resSym,st);  
-              }
             } 
             else 
             {  // We have already seen retPair before and its components are intersectable
               retSt = pairToStMap[retPair];
             }
+
+            //perform the epsilon closure of retPair
+            typename std::set<StatePair> newPairs;
+            epsilonClosure(&newPairs,retPair,first,second);
+            //add all new pairs to the worklist
+            for( typename std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
+            {
+                St st;
+                //If we have already considered this pair and found them nonintersectable, continue
+                if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
+                    continue;
+                visitedPairs.insert(*it);
+                //Have we seen this pair before?
+                if( pairToStMap.count(*it) == 0 )
+                {
+                    //Check and make sure this intersection makes sense.
+                    ClientInfoRefPtr CI;
+                    if( stateIntersect(first,it->first,second,it->second,st,CI) )
+                    {
+                        if( first->isFinalState(it->first) && second->isFinalState(it->second) )
+                            addFinalState(st);
+                        else
+                            addState(st);
+                        
+                        //Attach client info to the newly created state.
+                        states.setClientInfo(st,CI);
+                        
+                        worklistPairs.push_back(*it);
+                        pairToStMap[*it] = st;
+                    }
+                }
+                else
+                {
+                    //We have seen this pair before.
+                    st = pairToStMap[*it];
+                }
+                
+                //Add an edge that is the current return trans with collapsed epsilon internal trans.
+                intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),it->first,
+                                          second,Trans::getExit(*sit),Trans::getCallSite(*sit),it->second,
+                                          resSym,st);    //Intersect Internal Trans client info.
+                addReturnTrans(pairToStMap[currpair],callSt,resSym,st);  
+            }
+            
             
             //Add an edge that is the current return transition.
             intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),Trans::getReturnSite(*fit),
@@ -7374,54 +7630,55 @@ template <typename Client>
 
               worklistPairs.push_back(retPair);
               pairToStMap[retPair] = retSt;
-              
-              //perform the epsilon closure of retPair
-              typename std::set<StatePair> newPairs;
-              epsilonClosure(&newPairs,retPair,first,second);
-              //add all new pairs to the worklist
-              for( typename std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
-              {
-                St st;
-                //If we have already considered this pair and found them nonintersectable, continue
-                if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
-                  continue;
-                visitedPairs.insert(*it);
-                //Have we seen this pair before?
-                if( pairToStMap.count(*it) == 0 )
-                {
-                  //Check and make sure this intersection makes sense.
-                  ClientInfoRefPtr CI;
-                  if( stateIntersect(first,it->first,second,it->second,st,CI) )
-                  {
-                    if( first->isFinalState(it->first) && second->isFinalState(it->second) )
-                      addFinalState(st);
-                    else
-                      addState(st); 
-
-                    //Attach client info to the newly created state.
-                    states.setClientInfo(st,CI);
-
-                    worklistPairs.push_back(*it);
-                    pairToStMap[*it] = st;
-                  }
-                }
-                else
-                {
-                  //We have seen this pair before.
-                  st = pairToStMap[*it];
-                }
-
-                //Add an edge that is the current return trans with collapsed epsilon internal trans.
-                intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),it->first,
-                                          second,Trans::getExit(*sit),Trans::getCallSite(*sit),it->second,
-                                          resSym,st);    //Intersect Internal Trans client info.
-                addReturnTrans(exitSt,pairToStMap[currpair],resSym,st);  
-              }              
             } 
             else 
             { //  We have already seen retPair before and its components are intersectable
               retSt = pairToStMap[retPair];
             }
+
+            //perform the epsilon closure of retPair
+            typename std::set<StatePair> newPairs;
+            epsilonClosure(&newPairs,retPair,first,second);
+            //add all new pairs to the worklist
+            for( typename std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
+            {
+                St st;
+                //If we have already considered this pair and found them nonintersectable, continue
+                if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
+                    continue;
+                visitedPairs.insert(*it);
+                //Have we seen this pair before?
+                if( pairToStMap.count(*it) == 0 )
+                {
+                    //Check and make sure this intersection makes sense.
+                    ClientInfoRefPtr CI;
+                    if( stateIntersect(first,it->first,second,it->second,st,CI) )
+                    {
+                        if( first->isFinalState(it->first) && second->isFinalState(it->second) )
+                            addFinalState(st);
+                        else
+                            addState(st); 
+                        
+                        //Attach client info to the newly created state.
+                        states.setClientInfo(st,CI);
+                        
+                        worklistPairs.push_back(*it);
+                        pairToStMap[*it] = st;
+                    }
+                }
+                else
+                {
+                    //We have seen this pair before.
+                    st = pairToStMap[*it];
+                }
+                
+                //Add an edge that is the current return trans with collapsed epsilon internal trans.
+                intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),it->first,
+                                          second,Trans::getExit(*sit),Trans::getCallSite(*sit),it->second,
+                                          resSym,st);    //Intersect Internal Trans client info.
+                addReturnTrans(exitSt,pairToStMap[currpair],resSym,st);  
+            }
+
             
             //Add an edge that is the current return transition.
             intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),Trans::getReturnSite(*fit),
@@ -7974,6 +8231,13 @@ template <typename Client>
         Id.insert(std::pair<St,St>(*sit,*sit));
       }
 
+      // Construct Id0
+      BinaryRelation Id0;
+      for( stateIterator sit = nondet->beginInitialStates(); sit != nondet->endInitialStates(); sit++ )
+      {
+          Id0.insert(std::pair<St,St>(*sit,*sit));
+      }
+      
       //Construct the epsilon closure relation for the states in nondet.
       BinaryRelation pre_close; //Collapse epsilon transitions.
       BinaryRelation Ie;   //Internal transitions with epsilon.
@@ -7983,8 +8247,8 @@ template <typename Client>
       BinaryRelation close;
       union_(close, pre_close, Id);
 
-      //The deterministic NWAs initial state is 
-      //Epsilon Closure( {(q,q) | q is an element of Q_in in nondeterministic NWA } )
+      // R0 is used later; to avoid recomputation we do it now
+      // Epsilon Closure( {(q,q) | q is an element of Q_in in nondeterministic NWA } )
       BinaryRelation R0;
       compose<St>(R0,Id,close);
 
@@ -8194,7 +8458,9 @@ template <typename Client>
       std::stringstream ss;
       for( Iterator mit = R.begin(); mit != R.end(); mit++ )
       {
-        ss << "(" << key2str(mit->first) << ", " << key2str(mit->second) << ") ";
+#define key2str(a) a
+        ss << "(" << key2str(mit->first) << ", " << key2str(mit->second) << ") "; // 
+#undef key2str
       }
 
       //std::cerr << "makeKey -> " << ss.str().size() << " characters\n";
@@ -8408,7 +8674,11 @@ template <typename Client>
       //Note: When overriding this method your metric must determine whether the
       //      given states are compatible and set resSt to the appropriate state.
 
-      resSt = getKey(state1,state2);
+      std::stringstream ss;
+      ss << "(key#"  << state1 << "," << state2 << ")";
+      resSt = getKey(ss.str());
+
+      //resSt = getKey(state1,state2);
 
       return true;
     }
