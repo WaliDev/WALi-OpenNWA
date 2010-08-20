@@ -8203,7 +8203,7 @@ template <typename Client>
 
       assert(stuck);
 
-	  //Clear all states(except the stuck state) and transitions from this machine.
+      //Clear all states(except the stuck state) and transitions from this machine.
       St stuckSt = getStuckState();
       ClientInfoRefPtr stuckStInfo = getClientInfo( stuckSt );
       clear();
@@ -8250,7 +8250,7 @@ template <typename Client>
       // R0 is used later; to avoid recomputation we do it now
       // Epsilon Closure( {(q,q) | q is an element of Q_in in nondeterministic NWA } )
       BinaryRelation R0;
-      compose<St>(R0,Id,close);
+      compose<St>(R0,Id0,close);
 
       //Make a key for this state.
       St r0 = makeKey(R0);
@@ -8265,7 +8265,7 @@ template <typename Client>
 
       //Put the initial state on the worklist.
       typename std::set<BinaryRelation> wl;
-      wl.insert(R0);
+      wl.insert(R0); // or close
 
       //Keep track of all visited states.
       typename std::set<BinaryRelation> visited;
@@ -8324,13 +8324,15 @@ template <typename Client>
 
           //Process call transitions.
           //Compute the relation.
-          BinaryRelation IdClose_Delta2;
+          //BinaryRelation IdClose_Delta2;
           BinaryRelation Rc;
           BinaryRelation Ic;
           project_symbol_3(Ic,nondet->trans.getCalls(),*it);  
           project_symbol_3(Ic,nondet->trans.getCalls(),Symbols::getWild());   //Every symbol also matches wild.
-          compose<St>(IdClose_Delta2, R0, Ic);
-          compose<St>(Rc,IdClose_Delta2,close);
+          //compose<St>(IdClose_Delta2, R0, Ic);
+          //compose<St>(Rc,IdClose_Delta2,close);
+          compose<St>(Rc,Ic,close);
+          
           //Make a key for this state.
           St rc = makeKey(Rc);
           //Add the state to the deterministic NWA.
