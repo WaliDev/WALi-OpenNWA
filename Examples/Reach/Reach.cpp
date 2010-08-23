@@ -56,7 +56,7 @@ std::ostream & Reach::print( std::ostream & o ) const
   return (isreached) ? o << "ONE" : o << "ZERO";
 }
 
-Reach &operator=(const Reach &other) {
+Reach & Reach::operator=(const Reach &other) {
   isreached = other.isreached;
   return *this;
 }
