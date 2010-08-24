@@ -1,0 +1,10 @@
+detemplatize all classes?
+dupTrans/dupTransOutgoing with regard to loops
+addAllTrans performance
+TransSet::isCall performance -- look in T_info
+also naming of isCall between transinfo and transet
+remove*TransWith performance
+const by-value returns
+remove*TransSym performance
+transset::getInternalsFrom redundant
+
