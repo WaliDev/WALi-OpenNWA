@@ -45,7 +45,7 @@ namespace wali
         
         typedef std::set<Return> Returns;
         typedef typename Returns::const_iterator returnIterator;
-#ifndef LABEL
+#if !defined(LABEL)
         typedef std::map<St,Internals> IntraMap;
         typedef std::map<St,Calls> CallMap;
         typedef std::map<St,Returns> RetMap;
@@ -54,6 +54,20 @@ namespace wali
         typedef std::map<St,Cal> CallMap;
         typedef std::map<St,Ret> RetMap;
 #endif
+
+        static Internals const & emptyInternals() {
+          static Internals r;
+          return r;
+        }
+        static Calls const & emptyCalls() {
+          static Calls c;
+          return c;
+        }
+        static Returns const & emptyReturns() {
+          static Returns r;
+          return r;
+        }
+
       //
       // Methods
       //
@@ -61,23 +75,6 @@ namespace wali
       public:
       
       //Constructors and Destructor
-      TransInfo( ) { }
-
-      TransInfo( const TransInfo & other )
-      {
-        clearMaps();
-        
-        from_ITrans = other.from_ITrans;
-        to_ITrans = other.to_ITrans;
-        
-        call_CTrans = other.call_CTrans;
-        entry_CTrans = other.entry_CTrans;
-        
-        exit_RTrans = other.exit_RTrans;
-        pred_RTrans = other.pred_RTrans;
-        ret_RTrans = other.ret_RTrans;
-      }
-
       TransInfo & operator=( const TransInfo & other )
       {
         if( this == &other )     
@@ -98,12 +95,8 @@ namespace wali
         return *this;
       }
   
-      ~TransInfo( ) 
-      {
-        clearMaps();
-      }
      
-#ifndef LABEL
+#if !defined(LABEL)
       /**
        * 
        * @brief add an internal transition to the maps
@@ -116,27 +109,8 @@ namespace wali
        */
       void addIntra( const Internal & intra )
       {
-        //Update the map for the source of the transition.
-        typename IntraMap::iterator it = from_ITrans.find(intra.first);
-        if( it == from_ITrans.end() )
-        {
-          Internals iTrans;
-          iTrans.insert(intra);
-          from_ITrans.insert(std::pair<St,Internals>(intra.first,iTrans));
-        }
-        else  
-          it->second.insert(intra);
-        
-        //Update the map for the target of the transition.
-        it = to_ITrans.find(intra.third);
-        if( it == to_ITrans.end() )
-        {
-          Internals iTrans;
-          iTrans.insert(intra);
-          to_ITrans.insert(std::pair<St,Internals>(intra.third,iTrans));
-        }
-        else
-          it->second.insert(intra);       
+        from_ITrans[intra.first].insert(intra);
+        to_ITrans[intra.third].insert(intra);
       }
       
       /**
@@ -182,27 +156,8 @@ namespace wali
        */
       void addCall( const Call & call )
       {
-        //Update the maps for the call point of the transition.
-        typename CallMap::iterator it = call_CTrans.find(call.first);
-        if( it == call_CTrans.end() )
-        {
-          Calls cTrans;
-          cTrans.insert(call);
-          call_CTrans.insert(std::pair<St,Calls>(call.first,cTrans));
-        }
-        else  
-          it->second.insert(call);
-        
-        //Update the maps for the entry point of the transition.
-        it = entry_CTrans.find(call.third);
-        if( it == entry_CTrans.end() )
-        { 
-          Calls cTrans;
-          cTrans.insert(call);
-          entry_CTrans.insert(std::pair<St,Calls>(call.third,cTrans));
-        }
-        else
-          it->second.insert(call);
+        call_CTrans[call.first].insert(call);
+        entry_CTrans[call.third].insert(call);
       }
       
       /**
@@ -248,38 +203,9 @@ namespace wali
        */
       void addRet( const Return & ret )
       {
-        //Update the maps for the exit point of the transition.
-        typename RetMap::iterator it = exit_RTrans.find(ret.first);
-        if( it == exit_RTrans.end() )
-        {
-          Returns rTrans;
-          rTrans.insert(ret);
-          exit_RTrans.insert(std::pair<St,Returns>(ret.first,rTrans));
-        }
-        else  
-          it->second.insert(ret);
-        
-        //Update the maps for the call predecessor of the transition.
-        it = pred_RTrans.find(ret.second);
-        if( it == pred_RTrans.end() )
-        { 
-          Returns rTrans;
-          rTrans.insert(ret);
-          pred_RTrans.insert(std::pair<St,Returns>(ret.second,rTrans));
-        }
-        else
-          it->second.insert(ret);
-          
-        //Update the maps for the return point of the transition.  
-        it = ret_RTrans.find(ret.fourth);
-        if( it == ret_RTrans.end() )
-        { 
-          Returns rTrans;
-          rTrans.insert(ret);
-          ret_RTrans.insert(std::pair<St,Returns>(ret.fourth,rTrans));
-        }
-        else
-          it->second.insert(ret);  
+        exit_RTrans[ret.first].insert(ret);
+        pred_RTrans[ret.second].insert(ret);
+        ret_RTrans[ret.fourth].insert(ret);
       }
       
       /**
@@ -333,11 +259,11 @@ namespace wali
        * @return a set of outgoing transitions for the given state
        *
        */
-      const Internals fromTrans( St state ) const
+      const Internals & fromTrans( St state ) const
       {
         typename IntraMap::const_iterator it = from_ITrans.find(state);
         if( it == from_ITrans.end() )
-          return Internals();
+          return emptyInternals();
         else
           return it->second;
       }
@@ -353,11 +279,11 @@ namespace wali
        * @returm a set of incoming transitions for the given state
        *
        */
-      const Internals toTrans( St state ) const
+      const Internals & toTrans( St state ) const
       {
         typename IntraMap::const_iterator it = to_ITrans.find(state);
         if( it == to_ITrans.end() )
-          return Internals();
+          return emptyInternals();
         else
           return it->second;
       } 
@@ -374,11 +300,11 @@ namespace wali
        *         the call site
        *
        */
-      const Calls callTrans( St state ) const
+      const Calls & callTrans( St state ) const
       {
         typename CallMap::const_iterator it = call_CTrans.find(state);
         if( it == call_CTrans.end() )
-          return Calls();
+          return emptyCalls();
         else
           return it->second;
       }
@@ -395,11 +321,11 @@ namespace wali
        *         the entry point
        *
        */
-      const Calls entryTrans( St state ) const
+      const Calls & entryTrans( St state ) const
       { 
         typename CallMap::const_iterator it = entry_CTrans.find(state);
         if( it == entry_CTrans.end() )
-          return Calls();
+          return emptyCalls();
         else
           return it->second;
       }
@@ -416,11 +342,11 @@ namespace wali
        *         the exit point
        *
        */
-      const Returns exitTrans( St state ) const
+      const Returns & exitTrans( St state ) const
       {
         typename RetMap::const_iterator it = exit_RTrans.find(state);
         if( it == exit_RTrans.end() )
-          return Returns();
+          return emptyReturns();
         else
           return it->second;
       }
@@ -437,11 +363,11 @@ namespace wali
        *         the call predecessor.
        *
        */
-      const Returns predTrans( St state )const
+      const Returns & predTrans( St state )const
       {
         typename RetMap::const_iterator it = pred_RTrans.find(state);
         if( it == pred_RTrans.end() )
-          return Returns();
+          return emptyReturns();
         else
           return it->second;
       }
@@ -458,11 +384,11 @@ namespace wali
        *         of the return site.
        *
        */
-      const Returns retTrans( St state )const
+      const Returns & retTrans( St state )const
       {
         typename RetMap::const_iterator it = ret_RTrans.find(state);
         if( it == ret_RTrans.end() )
-          return Returns();
+          return emptyReturns();
         else
           return it->second;
       }
@@ -481,13 +407,8 @@ namespace wali
        */
       bool isFrom( St state ) const
       {
-        typename IntraMap::iterator it = from_ITrans.find(state);
-        if( it != from_ITrans.end() )
-        {
-          if( !(it.second.empty()) )
-            return true;
-        }
-        return false;
+        Internals const & outgoing = fromTrans(state);
+        return !outgoing.empty();
       }
       
       /**
@@ -504,13 +425,8 @@ namespace wali
        */
       bool isTo( St state ) const
       { 
-        typename IntraMap::iterator it = to_ITrans.find(state);
-        if( it != to_ITrans.end() )
-        {
-          if( !(it.second.empty()) )
-            return true;
-        }
-        return false;
+        Internals const & incoming = toTrans(state);
+        return !incoming.empty();
       }
       
       /**
@@ -527,13 +443,8 @@ namespace wali
        */
       bool isCall( St state ) const
       {
-        typename CallMap::iterator it = call_CTrans.find(state);
-        if( it != call_CTrans.end() )
-        {
-          if( !(it.second.empty()) )
-            return true;
-        }
-        return false;
+        Calls const & outgoing = callTrans(state);
+        return !outgoing.empty();
       }
       
       /**
@@ -550,13 +461,8 @@ namespace wali
        */
       bool isEntry( St state ) const
       {
-        typename CallMap::iterator it = entry_CTrans.find(state);
-        if( it != entry_CTrans.end() )
-        {
-          if( !(it.second.empty()) )
-            return true;
-        }
-        return false;
+        Calls const & incoming = entryTrans(state);
+        return !incoming.empty();
       }
       
       /**
@@ -573,13 +479,8 @@ namespace wali
        */
       bool isExit( St state ) const
       {
-        typename RetMap::iterator it = exit_RTrans.find(state);
-        if( it != exit_RTrans.end() )
-        {
-          if( !(it.second.empty()) )
-            return true;
-        }
-        return false;
+        Returns const & outgoing = exitTrans(state);
+        return !outgoing.empty();
       }
       
       /**
@@ -597,13 +498,8 @@ namespace wali
        */
       bool isPred( St state ) const
       {
-        typename RetMap::iterator it = pred_RTrans.find(state);
-        if( it != pred_RTrans.end() )
-        {
-          if( !(it.second.empty()) )
-            return true;
-        }
-        return false;
+        Returns const & outgoing = predTrans(state);
+        return !outgoing.empty();
       }
       
       /**
@@ -620,13 +516,8 @@ namespace wali
        */
       bool isRet( St state ) const
       {
-        typename RetMap::iterator it = ret_RTrans.find(state);
-        if( it != ret_RTrans.end() )
-        {
-          if( !(it.second.empty()) )
-            return true;
-        }
-        return false;
+        Returns const & incoming = retTrans(state);
+        return !incoming.empty();
       }
 #else
       /**
@@ -1181,12 +1072,12 @@ namespace wali
       bool operator==( const TransInfo & other ) const
       {
         return ( (from_ITrans == other.from_ITrans) &&  
-                  (to_ITrans == other.to_ITrans) && 
-                  (call_CTrans == other.call_CTrans) &&  
-                  (entry_CTrans == other.entry_CTrans) &&  
-                  (exit_RTrans == other.exit_RTrans) && 
-                  (pred_RTrans == other.pred_RTrans) && 
-                  (ret_RTrans == other.ret_RTrans) );
+                 (to_ITrans == other.to_ITrans) && 
+                 (call_CTrans == other.call_CTrans) &&  
+                 (entry_CTrans == other.entry_CTrans) &&  
+                 (exit_RTrans == other.exit_RTrans) && 
+                 (pred_RTrans == other.pred_RTrans) && 
+                 (ret_RTrans == other.ret_RTrans) );
       }
             
       /**

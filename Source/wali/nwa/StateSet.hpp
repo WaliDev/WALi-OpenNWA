@@ -65,11 +65,7 @@ namespace wali
       public:
       
       //Constructors and Destructor
-      StateSet( );
-      StateSet( StateSet const & other );
       StateSet & operator=( const StateSet & other );
-
-      ~StateSet( );
 
       //Client Info Accessors
 
@@ -534,7 +530,7 @@ namespace wali
       // Variables
       //
       
-      protected:
+    protected:
               
       St stuck;
       States states;
@@ -548,23 +544,6 @@ namespace wali
     // Methods
     //
 
-    //Constructors and Destructor 
-    template<typename Client>
-    StateSet<Client>::StateSet( ) { }
-     
-    template<typename Client>
-    StateSet<Client>::StateSet( StateSet<Client> const & other )
-    {
-      clearStates();
-      
-      stuck = other.stuck;
-      states = other.states;
-      initialStates = other.initialStates;
-      finalStates = other.finalStates;
-
-      stateInfos = other.stateInfos;
-    }
-     
     template<typename Client>
     StateSet<Client> & StateSet<Client>::operator=( const StateSet<Client> & other )
     {
@@ -583,12 +562,6 @@ namespace wali
       return *this;
     }
      
-    template<typename Client>
-    StateSet<Client>::~StateSet( ) 
-    { 
-      clearStates();
-    }
-
     //Client Info Accessors
 
     /**
@@ -603,7 +576,7 @@ namespace wali
     typename StateSet<Client>::ClientInfoRefPtr
     StateSet<Client>::getClientInfo( St state ) const 
     {
-      typedef std::map<typename StateSet::St, typename StateSet::ClientInfoRefPtr> Map;
+      typedef std::map<St, ClientInfoRefPtr> Map;
       typename Map::const_iterator it = (stateInfos.find(state));
       if( it == stateInfos.end() )
         return NULL;
@@ -728,13 +701,9 @@ namespace wali
     template<typename Client>
     bool StateSet<Client>::addState( St state )
     {
-      if(isState(state) ) 
-        return false;
-        
-      states.insert(state);
-      //TODO: Q: Is there a null ClientInfoRefPtr that I can use here?
-      
-      return true;
+	  // If the ClientInfo is requested for the state, it will be null
+      bool inserted = states.insert(state).second;
+      return inserted;
     }    
     
     /**
@@ -748,17 +717,13 @@ namespace wali
     template<typename Client>
     bool StateSet<Client>::addInitialState( St initialState )
     {
-      if( isInitialState(initialState) )  
-        return false;
-        
-      if( !isState(initialState) )
-      {
-        addState(initialState);
+      bool inserted = initialStates.insert(initialState).second;
+      if (inserted) {
+      // It wasn't a initial state, so we might not have seen it
+          addState(initialState);
       }
-
-      initialStates.insert(initialState);
-
-      return true;
+      
+      return inserted;
     }    
     
     /**
@@ -772,17 +737,13 @@ namespace wali
     template<typename Client>
     bool StateSet<Client>::addFinalState( St finalState )
     {
-      if( isFinalState(finalState) )  
-        return false;
-        
-      if( !isState(finalState) )
-      {
-        addState(finalState);
+      bool inserted = finalStates.insert(finalState).second;
+      if (inserted) {
+        // It wasn't a final state, so we might not have seen it
+	      addState(finalState);
       }
-
-      finalStates.insert(finalState);
-
-      return true;
+      
+      return inserted;
     }
       
     /**
@@ -811,7 +772,7 @@ namespace wali
     void StateSet<Client>::addAllStates( const StateSet<Client> & stateSet )
     {
       for( const_iterator it = stateSet.beginStates();
-            it != stateSet.endStates(); it++ )
+           it != stateSet.endStates(); it++ )
       {
         addState(*it);
         //Set the clientInfo of this state.
@@ -835,7 +796,7 @@ namespace wali
     void StateSet<Client>::addAllInitialStates( const StateSet<Client> & stateSet )
     {
       for( const_iterator it = stateSet.beginInitialStates();
-            it != stateSet.endInitialStates(); it++ )
+           it != stateSet.endInitialStates(); it++ )
       {
         addInitialState(*it);
       }
@@ -852,7 +813,7 @@ namespace wali
     void StateSet<Client>::addAllFinalStates( const StateSet<Client> & stateSet )
     {
       for( const_iterator it = stateSet.beginFinalStates();
-            it != stateSet.endFinalStates(); it++ )
+           it != stateSet.endFinalStates(); it++ )
       {
         addFinalState(*it);
       }
@@ -873,16 +834,16 @@ namespace wali
       if( isStuckState( state ) )
         return false;
 
-      if( ! isState(state) )
+      size_t erased = states.erase(state);
+
+      if (erased == 0) {
         return false;
-      states.erase(state);
-
-      //remove from initial state set if it is an initial state
-      removeInitialState(state);
-      //remove from final state set if it is a final state
-      removeFinalState(state);
-
-      return true;
+      }
+      else {
+        removeInitialState(state);
+        removeFinalState(state);
+        return true;
+      }
     }   
      
     /**
@@ -896,12 +857,8 @@ namespace wali
     template<typename Client>
     bool StateSet<Client>::removeInitialState( St initialState )
     {
-      if( ! isInitialState(initialState) )
-        return false;
-
-      initialStates.erase(initialState);
-
-      return true;
+      size_t erased = initialStates.erase(initialState);
+      return erased > 0;
     }    
     
     /**
@@ -915,12 +872,8 @@ namespace wali
     template<typename Client>
     bool StateSet<Client>::removeFinalState( St finalState )
     {
-      if( ! isFinalState(finalState) )
-        return false;
-
-      finalStates.erase(finalState);
-
-      return true;
+      size_t erased = finalStates.erase(finalState);
+      return erased > 0;
     }
       
     //Utilities	
@@ -937,11 +890,11 @@ namespace wali
     std::ostream & StateSet<Client>::print( std::ostream & o ) const
     {
       //Print the set of all states.
-      o << "Q: ";
-      o << "{ ";
+      o << "Q: {\n  ";
       const_iterator it = beginStates();
       const_iterator itEND = endStates();
-      for( bool first=true; it != itEND ; it++,first=false )
+      bool first = true;
+      for(const_iterator it = beginStates(); it != endStates() ; it++, first=false )
       {
         if( !first )
           o << ",\n  ";
@@ -949,35 +902,33 @@ namespace wali
         printKey(o,*it);
         o << " (=" << *it << ")";
       }
-      o << " }" << std::endl;
+      o << "}\n" << std::endl;
       
       //Prints the initial states.
-      o << "Q0: ";
-      o << "{ ";
-      it = beginInitialStates();
-      itEND = endInitialStates();
-      for( bool first=true; it != itEND ; it++,first=false )
+      o << "Q0: {\n  ";
+      first = true;
+      for(const_iterator it = beginInitialStates(); it != endInitialStates() ; it++, first=false )
       {
         if( !first )
-          o << ", ";
+          o << ",\n  ";
 
         printKey(o,*it);
+        o << " (=" << *it << ")";
       }
-      o << " }" << std::endl;
+      o << "}\n" << std::endl;
       
       //Print the final states.
-      o << "Qf: ";
-      o << "{ ";
-      it = beginFinalStates();
-      itEND = endFinalStates();
-      for( bool first=true; it != itEND ; it++,first=false )
+      o << "Qf: {\n  ";
+      first = true;
+      for(const_iterator it = beginFinalStates(); it != endFinalStates() ; it++, first=false )
       {
         if( !first )
-          o << ", ";
+          o << ",\n  ";
 
         printKey(o,*it);
+        o << " (=" << *it << ")";
       }
-      o << " }" << std::endl;
+      o << "}" << std::endl;
       
       return o;
     }
@@ -995,35 +946,12 @@ namespace wali
     bool StateSet<Client>::operator==( const StateSet<Client> & other ) const
     {
       //Check that the state sets are equal.
-      if(! (stuck == other.stuck) )
-        return false;
+      if (stuck != other.stuck) return false;
+      if (states != other.states) return false;
+      if (initialStates != other.initialStates) return false;
+      if (finalStates != other.finalStates) return false;
 
-      for( const_iterator it = beginStates(); it != endStates(); it++ )
-        if(! other.isState(*it) )
-          return false;
-          
-      for( const_iterator it = other.beginStates(); it != other.endStates(); it++ )
-        if(! isState(*it) )
-          return false;
-         
-      //Check that the initial state sets are equal.    
-      for( const_iterator it = beginInitialStates(); it != endInitialStates(); it++ )
-        if(! other.isInitialState(*it) )
-          return false;
-          
-      for( const_iterator it = other.beginInitialStates(); it != other.endInitialStates(); it++ )
-        if(! isInitialState(*it) )
-          return false;
-        
-      //Check that the final state sets are equal.    
-      for( const_iterator it = beginFinalStates(); it != endFinalStates(); it++ )
-        if(! other.isFinalState(*it) )
-          return false;
-          
-      for( const_iterator it = other.beginFinalStates(); it != other.endFinalStates(); it++ )
-        if(! isFinalState(*it) )
-          return false;        
-          
+      // FIXME: Compare client infos as well?
       return true;
     }
     
@@ -1195,6 +1123,9 @@ namespace wali
     /**
      * 
      * @brief gives 'dup' all the state properties of 'orig'
+     *
+     * FIXME: suppose dup is final, orig is not; this won't
+     *        remove finality of dup
      *
      * @param - orig: the state whose properties to duplicate
      * @param - dup: the state whose properties are being set

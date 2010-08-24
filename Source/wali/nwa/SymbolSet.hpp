@@ -43,8 +43,6 @@ namespace wali
       SymbolSet( const SymbolSet & other );
       SymbolSet & operator=( const SymbolSet & other );
   
-      ~SymbolSet( ) { }
-
       //Accessors
 
       /**
@@ -282,7 +280,7 @@ namespace wali
     {
       symbols.clear();
 
-      //Wpsilon is always a symbol of the NWA.
+      // Epsilon is always a symbol of the NWA.
       addSymbol( getEpsilon() );
     }
 
@@ -352,8 +350,6 @@ namespace wali
       Label( const Label & other );
       Label & operator=( const Label & other );
   
-      ~Label( ) { }
-
       /**
        *
        * @brief tests whether this collection represents the wild symbol
@@ -570,17 +566,16 @@ namespace wali
     inline
     bool Label::containsSymbol( Sym sym ) const
     {
-      if(neg)
-      {
+      int count = syms.count(sym);
+      if (neg) {
         //syms records symbols not on the edge, so
         //if the symbol is not in syms, it is in the collection
-        return (syms.count(sym) == 0);
+        return count == 0;
       }
-      else
-      {
+      else {
         //syms records symbols on the edge, so
         //if the symbol is in syms, it is in the collection
-        return (syms.count(sym) > 0);
+        return count > 0;
       }
     }
 
@@ -602,7 +597,7 @@ namespace wali
       if( neg )
       {
         //syms records symbols not on the edge, so remove sym from syms
-        syms.erase(syms.find(sym));
+        syms.erase(sym);
       }
       else
       {

@@ -11,9 +11,8 @@ SymbolSet::SymbolSet( )
 }
 
 SymbolSet::SymbolSet( const SymbolSet & other )
-{
-  symbols = other.symbols;
-}
+  : symbols(other.symbols)
+{ }
 
 SymbolSet & SymbolSet::operator=( const SymbolSet & other )
 {
@@ -37,15 +36,12 @@ SymbolSet & SymbolSet::operator=( const SymbolSet & other )
  */
 bool SymbolSet::addSymbol( Key sym )
 {
-  if( isSymbol(sym) )
+  if (sym == wali::WALI_EPSILON || sym == wali::WALI_WILD) {
     return false;
-  else if(sym == wali::WALI_EPSILON || sym == wali::WALI_WILD)
-    return false;
-  else
-  {
-    symbols.insert(sym);
-    return true;
   }
+
+  bool inserted = symbols.insert(sym).second;
+  return inserted;
 }
 
 /**
@@ -55,7 +51,6 @@ bool SymbolSet::addSymbol( Key sym )
  * @param - symSet: the collection of symbols to add to this collection of symbols
  *
  */
-//inline  // TODO: remove comment -Evan
 void SymbolSet::addAllSymbols( SymbolSet symSet )
 {
   symbols.insert(symSet.symbols.begin(),symSet.symbols.end());
@@ -70,14 +65,9 @@ void SymbolSet::addAllSymbols( SymbolSet symSet )
  *
  */
 bool SymbolSet::removeSymbol( Key sym )
-{ 
-  if(! isSymbol(sym) )
-    return false;
-  else
-  {
-    symbols.erase(symbols.find(sym));
-    return true;
-  }
+{
+  size_t erased = symbols.erase(sym);
+  return erased > 0;
 }
 
 /**
@@ -87,9 +77,11 @@ bool SymbolSet::removeSymbol( Key sym )
  * @param - symSet: the collection of symbols to remove from this collection 
  *
  */
-//inline  // TODO: Remove comment -Evan
 void SymbolSet::removeAll( SymbolSet symSet )
 {
+  // FIXME: Make this not suck
+  assert(0);
+  std::exit(10);
   symbols.erase(symSet.symbols.begin(),symSet.symbols.end());
 }
 
@@ -107,16 +99,14 @@ void SymbolSet::removeAll( SymbolSet symSet )
 std::ostream & SymbolSet::print( std::ostream & o ) const
 {
  //Print the set of all symbols.
-  o << "Sigma: ";
-  o << "{ ";
+  o << "Sigma: {\n  ";
 
   bool first = true;
-  for( const_iterator it = symbols.begin(); it != symbols.end(); it++ )
+  for( const_iterator it = symbols.begin(); it != symbols.end(); it++, first = false )
   {
     if( !first )
     {
-      o << ", "; 
-      first = false;
+      o << ",\n  "; 
     }
 
     if( SymbolSet::isEpsilon(*it) )
@@ -125,7 +115,7 @@ std::ostream & SymbolSet::print( std::ostream & o ) const
       printKey(o,*it);
   }
 
-  o << " }";
+  o << "}\n";
   
   return o;
 }
@@ -141,19 +131,7 @@ std::ostream & SymbolSet::print( std::ostream & o ) const
  */
 bool SymbolSet::operator==( const SymbolSet & other ) const
 {
-  for( const_iterator it = symbols.begin(); it != symbols.end(); it++ )
-  {
-    if (! other.isSymbol(*it) )
-      return false;
-  }
-  
-  for( const_iterator it = other.symbols.begin(); it != other.symbols.end(); it++ )
-  {
-    if (! isSymbol(*it) )
-      return false;
-  }
-
-  return true;
+  return symbols == other.symbols;
 }
 
 
@@ -509,10 +487,6 @@ const std::set<Label::Sym> Label::getSymbolsNotIn( const SymbolSet & symbolPool 
     return symsNotIn;    
   }     
 }
-
-
-
-
 
 } // namespace nwa
 } // namespace wali
