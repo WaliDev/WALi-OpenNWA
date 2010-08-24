@@ -50,12 +50,7 @@ namespace wali
        * @return the One of the desired semiring
        *
        */
-      virtual sem_elem_t getOne( ) 
-      {
-        // TODO: fix this somehow!
-        assert(0); //grrr ugliness 
-        return NULL;
-      }
+      virtual sem_elem_t getOne( )  = 0;
 
       /**
        *

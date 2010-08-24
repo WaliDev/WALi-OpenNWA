@@ -24,6 +24,21 @@ namespace wali
       { 
         return *this;
       };
+
+      virtual bool operator== (ClientInfo const & other)
+      {
+        return true;
+      }
+
+      virtual ClientInfo* clone()
+      {
+        return new ClientInfo(*this);
+      }
+
+      virtual ref_ptr<ClientInfo> cloneRp()
+      {
+        return ref_ptr<ClientInfo>(clone());
+      }
     };
   }
 }
