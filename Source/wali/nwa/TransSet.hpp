@@ -470,7 +470,7 @@ namespace wali
        *         target, false otherwise
        *
        */
-      bool getSymbol( St from, St to, Sym & sym );
+      bool getSymbol( St from, St to, Sym & sym ) const;
 
       /**
        * 
@@ -1582,7 +1582,7 @@ namespace wali
      *
      */
     template <typename St,typename Sym>
-    bool TransSet<St,Sym>::getSymbol( St fromSt, St toSt, Sym & sym )
+    bool TransSet<St,Sym>::getSymbol( St fromSt, St toSt, Sym & sym ) const
     {
       //Check internal transitions.
       const typename Info::Internals & from = T_info.fromTrans(fromSt);

@@ -136,7 +136,7 @@ namespace wali
        * @return true if this state is the stuck state, false otherwise
        *
        */
-      inline bool isStuckState( St state )
+      inline bool isStuckState( St state ) const
       {
         return (state == stuck);
       }

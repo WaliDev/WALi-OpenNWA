@@ -3,7 +3,7 @@
  */
 //#define NWA_TEST
 
-#ifdef NWA_TEST
+
 // ::wali
 #include "wali/nwa/NWA.hpp"
 #include "wali/Key.hpp"
@@ -12,7 +12,22 @@
 #include "wali/ref_ptr.hpp"
 #include "wali/nwa/ClientInfo.hpp"
 
+using namespace wali::nwa;
+template StateSet<ClientInfo>;
+template TransInfo<int, int>;
+template TransInfo<int, int>;
+template NWA<ClientInfo>;
 
+int retByVal() {
+	return 5;
+}
+
+int foo() {
+	int const & v = retByVal();
+	return 0;
+}
+
+#if 0
 class STR
 {
   public:
