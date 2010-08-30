@@ -1,13 +1,14 @@
 #include <boost/function_types/parameter_types.hpp>
 #include <boost/function_types/function_arity.hpp>
-#include <boost/mpl/front.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/mpl/front.hpp>
 #include <boost/bind.hpp>
 
 
 namespace Arbitrary {
   /// "Returns" arbitrary objects of the first parameter type.
   void arbitrary(int & out, int n);
+  void arbitrary(bool & out, int /*ignored*/);
 
 
   using boost::unit_test_framework::test_suite;

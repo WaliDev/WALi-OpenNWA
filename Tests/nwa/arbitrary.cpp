@@ -1,7 +1,18 @@
 #include <cstdlib>
 
+#include "arbitrary.hpp"
 
 namespace Arbitrary {
+
+void arbitrary(bool & out, int n)
+{
+  int x;
+  do {
+    arbitrary(x, 1000);
+  } while (x == 0);
+
+  out = (x > 0);
+}
 
 // Return an int in the range [-n, n]
 void arbitrary(int & out, int n)
