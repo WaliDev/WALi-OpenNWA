@@ -111,6 +111,34 @@ void test_nwa(NwaRefPtr p)
 }
 
 
+void test_intersection(NwaRefPtr left, NwaRefPtr right, NwaRefPtr intersection, Nwa::NestedWord const & word)
+{
+  bool inLeft = left->isMemberNondet(word);
+  bool inRight = right->isMemberNondet(word);
+  bool inInter = intersection->isMemberNondet(word);
+
+  if (inLeft && inRight) {
+    BOOST_CHECK(inInter);
+  }
+  else {
+    BOOST_CHECK(!inInter);
+  }
+}
+
+
+template<typename Function>
+test_suite* binop_test_suite_given_one_nwa(Function func, int n, int size, NwaRefPtr left)
+{
+  NwaRefPtr right;
+  arbitrary(right, size);
+
+  NwaRefPtr intersection = Nwa::intersect(left, right);
+
+  return suite_of_random_tests(boost::bind(test_intersection, left, right, intersection, _1),
+                               n, size);
+}
+
+
 /// This is the equivalent of "main"
 test_suite* init_unit_test_suite(int, char** const)
 {
