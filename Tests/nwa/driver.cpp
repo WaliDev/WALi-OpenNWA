@@ -1,8 +1,9 @@
 #include <iostream>
-
-#include "boost/test/unit_test.hpp"
+#include <boost/test/unit_test.hpp>
 
 #include "wali/nwa/NWA.hpp"
+
+#include "arbitrary.hpp"
 
 using namespace std;
 using boost::unit_test_framework::test_suite;
@@ -25,6 +26,13 @@ struct example_test
 };
 
 
+/// Can do this as a free fnuction too
+void does_two_minus_one_equal_one()
+{
+  BOOST_CHECK_EQUAL(2-1, 1);
+}
+
+
 /// This is a test suite
 struct example_suite : public test_suite
 {
@@ -38,6 +46,7 @@ struct example_suite : public test_suite
 
     add(good);
     add(bad);
+    add(BOOST_TEST_CASE(does_two_minus_one_equal_one));
   }
 };
 
