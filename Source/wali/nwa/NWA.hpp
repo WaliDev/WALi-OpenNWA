@@ -3819,6 +3819,7 @@ namespace wali
 
     template <typename Client>
     NWA<Client>::NWA( St stuckSt )
+      : stuck(false)
     {
       setStuckState(stuckSt); 
     }
