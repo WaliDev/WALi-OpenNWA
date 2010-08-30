@@ -1,5 +1,6 @@
 #include <boost/function_types/parameter_types.hpp>
 #include <boost/function_types/function_arity.hpp>
+#include <boost/mpl/front.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/bind.hpp>
 
@@ -19,10 +20,10 @@ namespace Arbitrary {
   template<typename Function>
   test_suite* suite_of_random_tests(Function func, int num = 10, int size = INT_MAX)
   {
-    typedef typename boost::parameter_types<Function> parameters;
-    typedef typename boost::front<parameters>::type argument_type;
+    typedef typename boost::function_types::parameter_types<Function> parameters;
+    typedef typename boost::mpl::front<parameters>::type argument_type;
 
-    BOOST_STATIC_ASSERT(boost::function_arity<Function>::value == 1);
+    BOOST_STATIC_ASSERT(boost::function_types::function_arity<Function>::value == 1);
 
     test_suite* suite = BOOST_TEST_SUITE("Random tests");
 

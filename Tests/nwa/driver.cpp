@@ -5,58 +5,21 @@
 
 #include "arbitrary.hpp"
 
-using namespace std;
 using boost::unit_test_framework::test_suite;
 using boost::unit_test_framework::test_case;
+using Arbitrary::suite_of_random_tests;
 
 
-/// This will test stupid things; it illustrates how to write tests,
-/// at least a little. (Yes, the second test should fail.)
-struct example_test
+/// Tests whether the argument is positive. Obviously this will fail a
+/// lot of the time.
+void test_positive(int i)
 {
-  void does_one_plus_one_equal_two()
-  {
-    BOOST_CHECK_EQUAL(1+1, 2);
-  }
-
-  void does_one_minus_one_equal_one()
-  {
-    BOOST_CHECK_EQUAL(1-1, 1);
-  }
-};
-
-
-/// Can do this as a free fnuction too
-void does_two_minus_one_equal_one()
-{
-  BOOST_CHECK_EQUAL(2-1, 1);
+  BOOST_CHECK_LT(0, i);
 }
-
-
-/// This is a test suite
-struct example_suite : public test_suite
-{
-  example_suite()
-    : test_suite("Sample test suite")
-  {
-    boost::shared_ptr<example_test> tests(new example_test());
-
-    test_case* good = BOOST_CLASS_TEST_CASE(&example_test::does_one_plus_one_equal_two, tests);
-    test_case* bad = BOOST_CLASS_TEST_CASE(&example_test::does_one_minus_one_equal_one, tests);
-
-    add(good);
-    add(bad);
-    add(BOOST_TEST_CASE(does_two_minus_one_equal_one));
-  }
-};
 
 
 /// This is the equivalent of "main"
 test_suite* init_unit_test_suite(int, char** const)
 {
-  test_suite* suite = BOOST_TEST_SUITE("Suite");
-  
-  suite->add(new example_suite());
-
-  return suite;
+  return suite_of_random_tests(test_positive);
 }
