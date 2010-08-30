@@ -1,0 +1,55 @@
+# Build the test programs 
+import os,os.path
+
+Import('WaliDir')
+Import('LibInstallDir')
+Import('ProgEnv')
+Import('Debug')
+
+if Debug:
+    print '\n+++ Entered "#/Tests/nwa/SConscript"\n'
+
+## ###############################
+## Environment
+Env = ProgEnv.Clone()
+
+utf_lib = None
+
+## Note - Be sure to use a list when 'Append'ing to CPPPATH
+if "BOOST_HOME" in os.environ:
+   boost_home = os.environ["BOOST_HOME"]
+   Env.Append(CPPPATH = [boost_home],
+              LIBPATH = [os.path.join(boost_home, 'lib')])
+   utf_lib = os.path.join(boost_home, 'lib', 'libboost_unit_test_framework.a')
+
+## Note - Be sure to use a list when 'Append'ing to CPPPATH
+if "BOOST_INCLUDE" in os.environ:
+   boost_include = os.environ["BOOST_INCLUDE"]
+   Env.Append(CPPPATH = [boost_include])
+
+## Note - Be sure to use a list when 'Append'ing to CPPPATH
+if "BOOST_LIB" in os.environ:
+   boost_lib = os.environ["BOOST_LIB"]
+   Env.Append(LIBPATH = [boost_lib])
+   utf_lib = os.path.join(boost_lib, 'libboost_unit_test_framework.a')
+
+if utf_lib == None:
+   print "Well, I don't know where the library is; I'll try this and see if it works"
+   print "You might try setting BOOST_HOME (to Boost's root) or BOOST_LIB (to the lib dir)"
+   Env.Append(LIBS = ['boost_unit_test_framework'])
+
+built = []
+
+sources = Split("""
+    driver.cpp
+    arbitrary.cpp
+""")
+
+if utf_lib:
+   sources = sources + [utf_lib]
+
+exe = Env.Program('test-nwa.exe', sources + Env['StaticLibs'])
+built += (exe)
+
+Return('built')
+
