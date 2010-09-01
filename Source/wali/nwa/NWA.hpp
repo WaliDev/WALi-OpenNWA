@@ -7988,7 +7988,8 @@ template <typename Client>
 
 
       //Start with a deterministic copy of the given NWA.
-      if(! first->isDeterministic() )
+      // FIXME: keep information about whether a machine is deterministic
+      if(false) //! first->isDeterministic() )
       {
         determinize(first);   //Note: determinize() will take care of clientInfo information.
       }
@@ -8024,6 +8025,32 @@ template <typename Client>
       }
     }
 
+
+#if 0
+    template<typename T>
+    struct terrible_set_hasher
+    {
+      size_t operator() (T const & set) const {
+        return set.size();
+      }
+    };
+
+    template<typename T>
+    struct terrible_set_comparer
+    {
+      bool operator() (T const & lhs, T const & rhs) const {
+        if (lhs.size() != rhs.size()) return false;
+          
+        for (typename T::const_iterator li = lhs.begin() ; li != lhs.end() ; ++li) {
+          if (rhs.find(*li) == rhs.end()) return false;
+        }
+
+        return true;
+      }
+    };
+#endif
+      
+
     /**
      *
      * @brief constructs a deterministic NWA that is equivalent to the given NWA.
@@ -8055,6 +8082,15 @@ template <typename Client>
       typedef typename RelationTypedefs<St>::BinaryRelation BinaryRelation;
       typedef typename RelationTypedefs<St>::TernaryRelation TernaryRelation;
 
+#if 0
+      typedef typename std::tr1::unordered_set<BinaryRelation
+          , terrible_set_hasher<BinaryRelation>
+          //, terrible_set_comparer<BinaryRelation>
+          >
+          RelationSet;
+#endif
+      typedef std::set<BinaryRelation> RelationSet;
+
       NWARefPtr nondet_copy(new NWA(*nondet));
       nondet = nondet_copy;
 
@@ -8080,7 +8116,7 @@ template <typename Client>
       //Construct the epsilon closure relation for the states in nondet.
       BinaryRelation pre_close; //Collapse epsilon transitions.
       BinaryRelation Ie;   //Internal transitions with epsilon.
-      project_symbol_3(Ie,nondet->trans.getInternals(),SymbolSet::getEpsilon());   
+      project_symbol_3(Ie,nondet->trans.getInternals(),SymbolSet::getEpsilon());
       transitive_closure<St>(pre_close,Ie);
 
       BinaryRelation close;
@@ -8103,11 +8139,31 @@ template <typename Client>
       states.setClientInfo(r0,CI);
 
       //Put the initial state on the worklist.
-      typename std::set<BinaryRelation> wl;
+      RelationSet wl;
       wl.insert(R0); // or close
 
       //Keep track of all visited states.
-      typename std::set<BinaryRelation> visited;
+      RelationSet visited;
+
+      // Pre-compute some projections and stuff
+      std::map<wali::Key, BinaryRelation> callTransPerSymbol;
+      std::map<wali::Key, BinaryRelation> internalTransPerSymbol;
+      std::map<wali::Key, TernaryRelation> returnTransPerSymbol;
+
+      for( symbolIterator it = nondet->beginSymbols(); it != nondet->endSymbols(); it++ ) {
+        if (Symbols::isEpsilon(*it)) continue;    //Epsilon is handled with closure.
+        if (Symbols::isWild(*it)) continue;
+
+        project_symbol_3(internalTransPerSymbol[*it], nondet->trans.getInternals(), *it);
+        project_symbol_3(internalTransPerSymbol[*it], nondet->trans.getInternals(), Symbols::getWild());
+
+        project_symbol_3(callTransPerSymbol[*it], nondet->trans.getCalls(), *it);
+        project_symbol_3(callTransPerSymbol[*it], nondet->trans.getCalls(), Symbols::getWild());   //Every symbol also matches wild.
+
+        project_symbol_4(returnTransPerSymbol[*it], nondet->trans.getReturns(), *it);
+        project_symbol_4(returnTransPerSymbol[*it], nondet->trans.getReturns(),Symbols::getWild());   //Every symbol also matches wild.
+      }
+
       
       //Process the states on the worklist.
       while(! wl.empty() )
@@ -8137,9 +8193,23 @@ template <typename Client>
           //Compute the relation.
           BinaryRelation Ri;
           BinaryRelation Rtmpi;
-          BinaryRelation Ii;
-          project_symbol_3(Ii,nondet->trans.getInternals(),*it);   
-          project_symbol_3(Ii,nondet->trans.getInternals(),Symbols::getWild());   //Every symbol also matches wild.
+          BinaryRelation const & Ii = internalTransPerSymbol[*it];
+
+#if 0
+          BinaryRelation IiOrig;
+          project_symbol_3(IiOrig,nondet->trans.getInternals(),*it);   
+          project_symbol_3(IiOrig,nondet->trans.getInternals(),Symbols::getWild());   //Every symbol also matches wild.
+          
+          if (Ii == IiOrig) {
+            std::cout << "Ii == IiOrig holds!\n";
+          }
+          else {
+            std::cout << "***** Ii == IiOrig VIOLATED\n";
+            std::cout << "      Ii's size is " << Ii.size() << "\n";
+            std::cout << "      Orig's size is " << IiOrig.size() << "\n";
+          }
+#endif
+
           compose<St>(Rtmpi,R,Ii);
           compose<St>(Ri,Rtmpi,close);
           //Make a key for this state.
@@ -8165,9 +8235,21 @@ template <typename Client>
           //Compute the relation.
           //BinaryRelation IdClose_Delta2;
           BinaryRelation Rc;
-          BinaryRelation Ic;
-          project_symbol_3(Ic,nondet->trans.getCalls(),*it);  
-          project_symbol_3(Ic,nondet->trans.getCalls(),Symbols::getWild());   //Every symbol also matches wild.
+          BinaryRelation const & Ic = callTransPerSymbol[*it];
+
+#if 0
+          BinaryRelation IcOrig;
+          project_symbol_3(IcOrig,nondet->trans.getCalls(),*it);  
+          project_symbol_3(IcOrig,nondet->trans.getCalls(),Symbols::getWild());   //Every symbol also matches wild.
+          
+          if (Ic == IcOrig) {
+            std::cout << "Ic == IcOrig holds!\n";
+          }
+          else {
+            std::cout << "***** Ic == IcOrig VIOLATED\n";
+          }
+#endif
+
           //compose<St>(IdClose_Delta2, R0, Ic);
           //compose<St>(Rc,IdClose_Delta2,close);
           compose<St>(Rc,Ic,close);
@@ -8191,11 +8273,23 @@ template <typename Client>
           }
 
           //Process return transitions.
-          TernaryRelation Ir;
-          project_symbol_4(Ir,nondet->trans.getReturns(),*it);    
-          project_symbol_4(Ir,nondet->trans.getReturns(),Symbols::getWild());   //Every symbol also matches wild.
+          TernaryRelation const & Ir = returnTransPerSymbol[*it];
+
+#if 0
+          TernaryRelation IrOrig;
+          project_symbol_4(IrOrig,nondet->trans.getReturns(),*it);    
+          project_symbol_4(IrOrig,nondet->trans.getReturns(),Symbols::getWild());   //Every symbol also matches wild.
+
+          if (Ir == IrOrig) {
+            std::cout << "Ir == IrOrig holds!\n";
+          }
+          else {
+            std::cout << "***** Ir == IrOrig VIOLATED\n";
+          }
+#endif
+
           //For each possible call predecessor:
-          for( typename std::set<BinaryRelation>::iterator rit = visited.begin();
+          for( typename RelationSet::iterator rit = visited.begin();
                 rit != visited.end(); rit++ )
           {
             //Compute the relation.
@@ -8223,7 +8317,7 @@ template <typename Client>
             }
           }
           //For each possible exit point:
-          for( typename std::set<BinaryRelation>::iterator rit = visited.begin();
+          for( typename RelationSet::iterator rit = visited.begin();
                 rit != visited.end(); rit++ )
           {
             //Compute the relation.
@@ -8267,7 +8361,7 @@ template <typename Client>
           }
         }
         //For each state in the deterministic maching, check whether it is a final state.
-        for( typename std::set<BinaryRelation>::iterator sit = visited.begin();
+        for( typename RelationSet::iterator sit = visited.begin();
               sit != visited.end(); sit++ )
         {
           BinaryRelation Rtmpf;

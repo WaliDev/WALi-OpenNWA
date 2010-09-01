@@ -6,6 +6,8 @@
 #include <map>
 #include <set>
 
+//#include <tr1/unordered_set>
+
 #include "wali/ref_ptr.hpp"
 #include "wali/KeyContainer.hpp"
 
@@ -183,14 +185,34 @@ namespace wali {
 
         return make_pair(start, end);
       }
+
+      bool operator==(TernaryRelation const & other) const {
+        return relation2_1 == other.relation2_1;
+      }
     };
 
+
+#if 0
+    template<typename a, typename b>
+    struct pairhash {
+    private:
+      const std::tr1::hash<a> ah;
+      const std::tr1::hash<b> bh;
+    public:
+      pairhash() : ah(), bh() {}
+      size_t operator()(const std::pair<a, b> &p) const {
+        return ah(p.first) ^ bh(p.second);
+      }
+    };
+#endif
 
     /// This can be used in client code to hide the actual relation types
     template<typename State>
     struct RelationTypedefs
     {
-      typedef set<pair<State, State> > BinaryRelation;
+      // typedef std::tr1::unordered_set<pair<State, State>,
+      //                                 pairhash<State, State> > BinaryRelation;
+      typedef std::set<pair<State, State> > BinaryRelation;
       typedef TernaryRelation<State> TernaryRelation;
     };
 
@@ -209,7 +231,7 @@ namespace wali {
             typename RelationTypedefs<State>::BinaryRelation const & r1,
             typename RelationTypedefs<State>::BinaryRelation const & r2)
     {
-      typedef typename set<pair<State, State> >::const_iterator Iterator;
+      typedef typename RelationTypedefs<State>::BinaryRelation::const_iterator Iterator;
 
       std::multimap<State, State> r2_map(r2.begin(), r2.end());
       typedef typename std::multimap<State, State>::const_iterator BigIterator;
@@ -278,7 +300,7 @@ namespace wali {
           typename RelationTypedefs<State>::BinaryRelation const & r_call,
           typename RelationTypedefs<State>::TernaryRelation const & delta_r)
     {
-      typedef typename set<pair<State, State> >::const_iterator Iterator;
+      typedef typename RelationTypedefs<State>::BinaryRelation::const_iterator Iterator;
 
       typename RelationTypedefs<State>::BinaryRelation temp;
 
@@ -353,7 +375,7 @@ namespace wali {
     transitive_closure(typename RelationTypedefs<State>::BinaryRelation & out_result,
                        typename RelationTypedefs<State>::BinaryRelation const & r)
     {
-      typedef typename set<pair<State, State> >::const_iterator Iterator;
+      typedef typename RelationTypedefs<State>::BinaryRelation::const_iterator Iterator;
 
       // Find the largest state
       State largest_state = State();
@@ -433,11 +455,11 @@ namespace wali {
     ///   out_result: The intersection of r1 and r2
     ///   r1:         One binary relation on states
     ///   r2:         Another binary relation on states
-    template<typename State>
+    template<typename Relation>
     void
-    intersect(set<pair<State, State> > & out_result,
-	      set<pair<State, State> > const & r1,
-	      set<pair<State, State> > const & r2)
+    intersect(Relation & out_result,
+	      Relation const & r1,
+	      Relation const & r2)
     {
       std::set_intersection(r1.begin(), r1.end(),
                             r2.begin(), r2.end(),
@@ -451,11 +473,11 @@ namespace wali {
     ///   out_result: The union of r1 and r2
     ///   r1:         One binary relation on states
     ///   r2:         Another binary relation on states
-    template<typename State>
+    template<typename Relation>
     void
-    union_(set<pair<State, State> > & out_result,
-           set<pair<State, State> > const & r1,
-           set<pair<State, State> > const & r2)
+    union_(Relation & out_result,
+           Relation const & r1,
+           Relation const & r2)
     {
       std::set_union(r1.begin(), r1.end(),
                      r2.begin(), r2.end(),
