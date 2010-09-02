@@ -22,7 +22,7 @@
 
 #include "wali/nwa/WeightGen.hpp"
 
-#define USE_BUDDY
+//#define USE_BUDDY
 #ifdef USE_BUDDY
 #  include "wali/nwa/RelationOpsBuddy.hpp"
 #else
@@ -8068,7 +8068,13 @@ template <typename Client>
     void NWA<Client>::determinize( NWARefPtr nondet )
     {
 #ifdef USE_BUDDY
-      buddyInit();
+      wali::relations::buddyInit();
+#endif
+
+#ifdef USE_BUDDY
+#  define DECLARE(type, name)  type name(nondet->sizeStates())
+#else
+#  define DECLARE(type, name)  type name
 #endif
         
       //TODO: ponder the following ...
@@ -8110,32 +8116,36 @@ template <typename Client>
       }
 
       // Construct Id
-      BinaryRelation Id;
+      DECLARE(BinaryRelation, Id);
       for( stateIterator sit = nondet->beginStates(); sit != nondet->endStates(); sit++ )
       {
         Id.insert(std::pair<St,St>(*sit,*sit));
       }
 
       // Construct Id0
-      BinaryRelation Id0;
+      DECLARE(BinaryRelation, Id0);
       for( stateIterator sit = nondet->beginInitialStates(); sit != nondet->endInitialStates(); sit++ )
       {
           Id0.insert(std::pair<St,St>(*sit,*sit));
       }
       
       //Construct the epsilon closure relation for the states in nondet.
-      BinaryRelation pre_close; //Collapse epsilon transitions.
-      BinaryRelation Ie;   //Internal transitions with epsilon.
+      DECLARE(BinaryRelation, pre_close); //Collapse epsilon transitions.
+      DECLARE(BinaryRelation, Ie);   //Internal transitions with epsilon.
       project_symbol_3(Ie,nondet->trans.getInternals(),SymbolSet::getEpsilon());
       transitive_closure<St>(pre_close,Ie);
 
-      BinaryRelation close;
+      DECLARE(BinaryRelation, close);
       union_(close, pre_close, Id);
 
       // R0 is used later; to avoid recomputation we do it now
       // Epsilon Closure( {(q,q) | q is an element of Q_in in nondeterministic NWA } )
-      BinaryRelation R0;
+      DECLARE(BinaryRelation, R0);
+#ifdef USE_BUDDY
+      compose/*<St>*/(R0,Id0,close);
+#else
       compose<St>(R0,Id0,close);
+#endif
 
       //Make a key for this state.
       St r0 = makeKey(R0);
@@ -8201,12 +8211,12 @@ template <typename Client>
 
           //Process internal transitions.
           //Compute the relation.
-          BinaryRelation Ri;
-          BinaryRelation Rtmpi;
+          DECLARE(BinaryRelation, Ri);
+          DECLARE(BinaryRelation, Rtmpi);
           BinaryRelation const & Ii = internalTransPerSymbol[*it];
 
 #if 0
-          BinaryRelation IiOrig;
+          DECLARE(BinaryRelation, IiOrig);
           project_symbol_3(IiOrig,nondet->trans.getInternals(),*it);   
           project_symbol_3(IiOrig,nondet->trans.getInternals(),Symbols::getWild());   //Every symbol also matches wild.
           
@@ -8220,8 +8230,13 @@ template <typename Client>
           }
 #endif
 
+#ifdef USE_BUDDY
+          compose/*<St>*/(Rtmpi,R,Ii);
+          compose/*<St>*/(Ri,Rtmpi,close);
+#else
           compose<St>(Rtmpi,R,Ii);
           compose<St>(Ri,Rtmpi,close);
+#endif
           //Make a key for this state.
           St ri = makeKey(Ri);
 
@@ -8244,11 +8259,11 @@ template <typename Client>
           //Process call transitions.
           //Compute the relation.
           //BinaryRelation IdClose_Delta2;
-          BinaryRelation Rc;
+          DECLARE(BinaryRelation, Rc);
           BinaryRelation const & Ic = callTransPerSymbol[*it];
 
 #if 0
-          BinaryRelation IcOrig;
+          DECLARE(BinaryRelation, IcOrig);
           project_symbol_3(IcOrig,nondet->trans.getCalls(),*it);  
           project_symbol_3(IcOrig,nondet->trans.getCalls(),Symbols::getWild());   //Every symbol also matches wild.
           
@@ -8260,9 +8275,13 @@ template <typename Client>
           }
 #endif
 
-          //compose<St>(IdClose_Delta2, R0, Ic);
-          //compose<St>(Rc,IdClose_Delta2,close);
+          //compose/*<St>*/(IdClose_Delta2, R0, Ic);
+          //compose/*<St>*/(Rc,IdClose_Delta2,close);
+#ifdef USE_BUDDY
+          compose/*<St>*/(Rc,Ic,close);
+#else
           compose<St>(Rc,Ic,close);
+#endif
           
           //Make a key for this state.
           St rc = makeKey(Rc);
@@ -8303,10 +8322,15 @@ template <typename Client>
                 rit != visited.end(); rit++ )
           {
             //Compute the relation.
-            BinaryRelation Rr;
-            BinaryRelation Rtmpr;
+              DECLARE(BinaryRelation, Rr);
+              DECLARE(BinaryRelation, Rtmpr);
+#ifdef USE_BUDDY
+            merge/*<St>*/(Rtmpr,R,*rit,Ir);
+            compose/*<St>*/(Rr,Rtmpr,close);
+#else
             merge<St>(Rtmpr,R,*rit,Ir);
             compose<St>(Rr,Rtmpr,close);
+#endif
             //Make a key for this state and the call predecessor state.
             St rr = makeKey(Rr);
             St rc = makeKey(*rit);
@@ -8331,10 +8355,18 @@ template <typename Client>
                 rit != visited.end(); rit++ )
           {
             //Compute the relation.
-            BinaryRelation Rr;
-            BinaryRelation Rtmpr;
+              DECLARE(BinaryRelation, Rr);
+              DECLARE(BinaryRelation, Rtmpr);
+#ifdef USE_BUDDY
+            merge/*<St>*/(Rtmpr,*rit,R,Ir);
+#else
             merge<St>(Rtmpr,*rit,R,Ir);
+#endif
+#ifdef USE_BUDDY
+            compose/*<St>*/(Rr,Rtmpr,close);
+#else
             compose<St>(Rr,Rtmpr,close);
+#endif
             //Make a key for this state and the exit point state.
             St rr = makeKey(Rr);
             St re = makeKey(*rit);
@@ -8360,7 +8392,7 @@ template <typename Client>
         //Necessary components for a final state, i.e., 
         //any final state must contain one of the pairs in 
         //{(init,fin) | init is an initial state and fin is a final state}
-        BinaryRelation Rf;
+        DECLARE(BinaryRelation, Rf);
         for( stateIterator iit = nondet->beginInitialStates();
              iit != nondet->endInitialStates(); iit++ )
         {
@@ -8374,7 +8406,7 @@ template <typename Client>
         for( typename RelationSet::iterator sit = visited.begin();
               sit != visited.end(); sit++ )
         {
-          BinaryRelation Rtmpf;
+            DECLARE(BinaryRelation, Rtmpf);
           relations::intersect(Rtmpf,Rf,*sit);
           if(! Rtmpf.empty() )
           {
@@ -8383,6 +8415,7 @@ template <typename Client>
           }
         }
       }
+#undef DECLARE
     }
 
 #ifdef USE_BUDDY
@@ -8391,7 +8424,7 @@ template <typename Client>
       typename relations::RelationTypedefs<St>::BinaryRelation const & R ) const
     {
       std::stringstream ss;
-      ss << R;
+      ss << R.getBdd();
       return getKey(ss.str());
     }
 #else

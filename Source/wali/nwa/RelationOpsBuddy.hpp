@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iterator>
 #include <cassert>
+#include <utility>
 #include <map>
 #include <set>
 
@@ -99,7 +100,10 @@ namespace wali {
         /// Relations on a domain A can only be composed, merged, etc. with
         /// other relations on the domain A.
         class Domain {
+        public: // FIXME
             Component left, middle, right, extra;
+
+        private: // REMOVE ONCE THE ABOVE IS FIXED
             unsigned int _largest;
 
             bddPair* shift_LM_to_MR;
@@ -157,23 +161,23 @@ namespace wali {
                 }
             }
 
-            bddPair* shift_out_compose() {
+            bddPair* shift_out_compose() const {
                 return shift_LM_to_MR;
             }
 
-            bddPair* shift_in_compose() {
+            bddPair* shift_in_compose() const {
                 return shift_R_to_M;
             }
 
-            bddPair* shift_out_merge() {
+            bddPair* shift_out_merge() const {
                 return shift_LR_to_RE;
             }
 
-            bddPair* shift_in_merge() {
+            bddPair* shift_in_merge() const {
                 return shift_E_to_M;
             }
 
-            unsigned int largest() {
+            unsigned int largest() const {
                 return _largest;
             }
 
@@ -187,7 +191,8 @@ namespace wali {
 
         
         /// Wraps a bdd in a nice friendly package
-        class BinaryRelation {        
+        class BinaryRelation {
+        public: // FIXME
             Domain domain;
             bdd myBdd;
 
@@ -213,12 +218,26 @@ namespace wali {
                 insert(pair.first, pair.second);
             }
 
+            bool empty() const
+            {
+                return myBdd == bddfalse;
+            }
+
+            bdd getBdd() const
+            {
+                return myBdd;
+            }
+
             friend void compose(BinaryRelation &, BinaryRelation const &, BinaryRelation const &);
+            friend void intersect(BinaryRelation &, BinaryRelation const &, BinaryRelation const &);
+            friend void union_(BinaryRelation &, BinaryRelation const &, BinaryRelation const &);
+            friend void merge(BinaryRelation &, BinaryRelation const &, BinaryRelation const &, BinaryRelation const &);
         };
 
 
         /// Wraps a bdd in a nice friendly package
         class TernaryRelation {
+        public: // FIXME
             Domain domain;
             bdd myBdd;
 
@@ -253,11 +272,12 @@ namespace wali {
         template<typename State>
         struct RelationTypedefs
         {
-            typedef bdd BinaryRelation;
-            typedef bdd TernaryRelation;
+            typedef wali::relations::BinaryRelation BinaryRelation;
+            typedef wali::relations::TernaryRelation TernaryRelation;
         };
 
 
+        inline
         void buddyInit()
         {
             if (!bdd_isrunning()) {
@@ -293,9 +313,9 @@ namespace wali {
             }
 
             bdd r1_bdd = r1.myBdd;
-            bdd r2_shifted = bdd_replace(r2.bdd, r2.domain.shift_out_compose());
+            bdd r2_shifted = bdd_replace(r2.myBdd, r2.domain.shift_out_compose());
             bdd composed = bdd_relprod(r1_bdd, r2_shifted, fdd_ithset(r1.domain.middle.fdd_number));
-            out_result.bdd = bdd_replace(composed, out_result.domain.shift_in_compose());
+            out_result.myBdd = bdd_replace(composed, out_result.domain.shift_in_compose());
         }
 
         
@@ -321,7 +341,7 @@ namespace wali {
                 State target = cur_trans->third;
 
                 if(symb == alpha) {
-                    out_result.insert(make_pair(source, target));
+                    out_result.insert(std::make_pair(source, target));
                 }
             }
         }
@@ -351,19 +371,19 @@ namespace wali {
                 exit(20);
             }
 
-            bdd r1_bdd = r_call.bdd;
-            bdd r2_bdd = bdd_replace(r_exit.bdd, r_exit.domain.shift_out_compose());
-            bdd r3_bdd = bdd_replace(delta_r.bdd, r_call.domain.shift_out_merge());
+            bdd r1_bdd = r_call.myBdd;
+            bdd r2_bdd = bdd_replace(r_exit.myBdd, r_exit.domain.shift_out_compose());
+            bdd r3_bdd = bdd_replace(delta_r.myBdd, r_call.domain.shift_out_merge());
 
-            bdd middle_two = fdd_ithset(r_exit.domain.middle)
-                & fdd_ithset(r_exit.domain.right);
+            bdd middle_two = fdd_ithset(r_exit.domain.middle.fdd_number)
+                & fdd_ithset(r_exit.domain.right.fdd_number);
 
             bdd composed = bdd_appex(r1_bdd & r2_bdd,
                                      r3_bdd,
                                      bddop_and,
-                                     fdd_ithset(r1.domain.middle.fdd_number));
+                                     fdd_ithset(r_call.domain.middle.fdd_number));
             
-            out_result.bdd = bdd_replace(composed, out_result.domain.shift_in_merge());
+            out_result.myBdd = bdd_replace(composed, out_result.domain.shift_in_merge());
         }
 
 
@@ -381,7 +401,7 @@ namespace wali {
                          std::set<Quad<State, State, Symbol, State> > const & delta,
                          Symbol alpha)
         {
-            typedef typename set<Quad<State, State, Symbol, State> >::const_iterator Iterator;
+            typedef typename std::set<Quad<State, State, Symbol, State> >::const_iterator Iterator;
 
             for(Iterator cur_trans = delta.begin(); cur_trans != delta.end(); ++cur_trans)
             {
@@ -486,7 +506,7 @@ namespace wali {
                 {
                     if(matrix[source][target])
                     {
-                        out_result.insert(make_pair(source,target));
+                        out_result.insert(std::make_pair(source,target));
                     }
                 }
             } // done with 
@@ -509,7 +529,7 @@ namespace wali {
                 exit(20);
             }
 
-            out_result.bdd = r1.bdd & r2.bdd;
+            out_result.myBdd = r1.myBdd & r2.myBdd;
         }
 
 
@@ -529,7 +549,7 @@ namespace wali {
                 exit(20);
             }
 
-            out_result.bdd = r1.bdd | r2.bdd;
+            out_result.myBdd = r1.myBdd | r2.myBdd;
         }
     } // namespace relations
 } // namespace wali
