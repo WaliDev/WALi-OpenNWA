@@ -21,7 +21,13 @@
 #include "wali/wpds/Rule.hpp"
 
 #include "wali/nwa/WeightGen.hpp"
-#include "wali/nwa/RelationOps.hpp"
+
+#define USE_BUDDY
+#ifdef USE_BUDDY
+#  include "wali/nwa/RelationOpsBuddy.hpp"
+#else
+#  include "wali/nwa/RelationOps.hpp"
+#endif
 
 #include "wali/Reach.hpp"
 
@@ -8061,6 +8067,10 @@ template <typename Client>
     template <typename Client>
     void NWA<Client>::determinize( NWARefPtr nondet )
     {
+#ifdef USE_BUDDY
+      buddyInit();
+#endif
+        
       //TODO: ponder the following ...
       //Q: how do we guarantee that the stuck state is not any of the states generated here?
       
@@ -8375,6 +8385,16 @@ template <typename Client>
       }
     }
 
+#ifdef USE_BUDDY
+    template <typename Client>
+    typename NWA<Client>::St NWA<Client>::makeKey(
+      typename relations::RelationTypedefs<St>::BinaryRelation const & R ) const
+    {
+      std::stringstream ss;
+      ss << R;
+      return getKey(ss.str());
+    }
+#else
     /**
      *
      * @brief returns the state corresponding to the given binary relation
@@ -8402,6 +8422,7 @@ template <typename Client>
 
       return getKey(ss.str());
     }
+#endif
 
     /**
      *

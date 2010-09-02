@@ -1,5 +1,5 @@
-#ifndef RELATION_OPS_HPP
-#define RELATION_OPS_HPP
+#ifndef RELATION_OPS_BUDDY_HPP
+#define RELATION_OPS_BUDDY_HPP
 
 #include <algorithm>
 #include <iterator>
@@ -15,6 +15,9 @@
 namespace wali {
     namespace relations {
 
+#if 0
+        (Not used right now, but could be slightly helpful)
+        
         /// Returns floor(log_2(n))
         //
         // E.g. floorLog2(11):
@@ -45,78 +48,162 @@ namespace wali {
             }
             return log;
         }
+#endif
 
-
-        /// Given two sizes, return the FDD id numbers that should be used for
-        /// each component.
-        //
-        // It does this by looking up the given sizes (in bits) in a static map.
-        // If we haven't created a set of FDD numbers for those particular sizes yet,
-        // then create some.
-        inline
-        std::pair<int, int> getFddNumbers(unsigned int leftBits, unsigned int rightBits)
+        
+        Quad<int, int, int, int>
+        getFddNumbers(unsigned int largest)
         {
-            // Maps from a relation size to the base bdd number.
-            static std::map<std::pair<unsigned int, unsigned int>, int> fddMap;
-
-            std::pair<unsigned int, unsigned int> bits(leftBits, rightBits);
-
-            if (fddMap.find(bits) == fddMap.end()) {
-                // Make a new domain for each relation component
-                int domains[2] = {
-                    1 << leftBits - 1,  // 2^n - 1 is largest # representable in n bits
-                    1 << rightBits - 1
+            // Maps from a relation largest to the base bdd number.
+            static std::map<unsigned int, int> fddMap;
+            
+            if (fddMap.find(largest) == fddMap.end()) {
+                // Make a new domain for each relation component that we'll ever need in composition
+                int domains[4] = {
+                    largest + 1,
+                    largest + 1,
+                    largest + 1,
+                    largest + 1
                 };
-                base = fdd_extdomain(domains, 2);
-                fddMap[bits] = base;
+                int base = fdd_extdomain(domains, 4);
+                fddMap[largest] = base;
             }
 
-            int base = fddMap[bits];
+            int base = fddMap[largest];
 
-            return makepair(base, base+1);
+            return Quad<int, int, int, int>(base, base+1, base+2, base+3);
         }
 
 
         /// Private structure
         //
-        // Used for each component in a relation (e.g. domain & range)
+        // Used for each component in a relation (e.g. domain & range).
+        //
+        // This used to hold more, but was kind of neutered. Still, I like the
+        // way it makes accesses look, so I'll leave it.
         struct Component {
             int fdd_number;
-            int size;
-            int bits;
 
-            Component(int size_) {
-                size = size_;
-                bits = floorLog2(size_) + 1;
-                fdd_number = -1; // must be set elsewhere
+            bool operator== (Component rhs) const {
+                return fdd_number == rhs.fdd_number;
             }
+
+            bool operator!= (Component rhs) const {
+                return fdd_number != rhs.fdd_number;
+            }
+        };
+
+
+        /// This class represents a particular domain (set) that a given relation is over.
+        ///
+        /// Relations on a domain A can only be composed, merged, etc. with
+        /// other relations on the domain A.
+        class Domain {
+            Component left, middle, right, extra;
+            unsigned int _largest;
+
+            bddPair* shift_LM_to_MR;
+            bddPair* shift_R_to_M;
+            bddPair* shift_LR_to_RE;
+            bddPair* shift_E_to_M;
+
+        public:
+            Domain(unsigned int largest) {
+                _largest = largest;
+                
+                Quad<int, int, int, int> fdds = getFddNumbers(largest);
+                left.fdd_number = fdds.first;
+                middle.fdd_number = fdds.second;
+                right.fdd_number = fdds.third;
+                extra.fdd_number = fdds.fourth;
+
+                shift_LM_to_MR = bdd_newpair();
+                fdd_setpair(shift_LM_to_MR, left.fdd_number, middle.fdd_number);
+                fdd_setpair(shift_LM_to_MR, middle.fdd_number, right.fdd_number);
+
+                shift_R_to_M = bdd_newpair();
+                fdd_setpair(shift_R_to_M, right.fdd_number, middle.fdd_number);
+
+                shift_LR_to_RE = bdd_newpair();
+                fdd_setpair(shift_LR_to_RE, left.fdd_number, right.fdd_number);
+                fdd_setpair(shift_LR_to_RE, right.fdd_number, extra.fdd_number);
+
+                shift_E_to_M = bdd_newpair();
+                fdd_setpair(shift_E_to_M, extra.fdd_number, middle.fdd_number);
+            }
+
+            ~Domain() {
+                // TODO: replace with RAII
+                bdd_freepair(shift_LM_to_MR);
+                bdd_freepair(shift_R_to_M);
+                bdd_freepair(shift_LR_to_RE);
+                bdd_freepair(shift_E_to_M);
+            }
+
+            bool operator!= (Domain const & rhs) const {
+                return !(*this == rhs);
+            }
+
+            bool operator== (Domain const & rhs) const {
+                if (_largest == rhs._largest) {
+                    assert (left == rhs.left
+                            && middle == rhs.middle
+                            && right == rhs.right
+                            && extra == rhs.extra);
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+
+            bddPair* shift_out_compose() {
+                return shift_LM_to_MR;
+            }
+
+            bddPair* shift_in_compose() {
+                return shift_R_to_M;
+            }
+
+            bddPair* shift_out_merge() {
+                return shift_LR_to_RE;
+            }
+
+            bddPair* shift_in_merge() {
+                return shift_E_to_M;
+            }
+
+            unsigned int largest() {
+                return _largest;
+            }
+
+        private:
+            void operator= (Domain const & rhs);
+            Domain(Domain const & rhs);
+
+            friend class BinaryRelation;
+            friend class TernaryRelation;
         };
 
         
         /// Wraps a bdd in a nice friendly package
         class BinaryRelation {        
-            Component left;
-            Component right;
-
+            Domain domain;
             bdd myBdd;
 
         public:
-            BinaryRelation(unsigned int leftSize, unsigned int rightSize)
-                : left(leftSize)
-                , right(rightSize)
+            BinaryRelation(unsigned int largest)
+                : domain(largest)
                 , myBdd(bddfalse)
-            {
-                // We have to get the FDD numbers later, because both depend on both
-                pair<int, int> fdds = getFddNumbers(left.bits, right.bits);
-                left.fdd_number = fdds.first;
-                right.fdd_number = fdds.second;
-            }
-
+            {}
 
             void insert(unsigned int leftVal, unsigned int rightVal)
             {
-                bdd left_is_leftVal = fdd_ithvar(left.fdd_number, leftVal);
-                bdd right_is_rightVal = fdd_ithvar(right.fdd_number, rightVal);
+                assert(leftVal <= domain.largest());
+                assert(rightVal <= domain.largest());
+
+                bdd left_is_leftVal = fdd_ithvar(domain.left.fdd_number, leftVal);
+                bdd right_is_rightVal = fdd_ithvar(domain.right.fdd_number, rightVal);
 
                 myBdd = myBdd | (left_is_leftVal & right_is_rightVal);
             }
@@ -129,70 +216,28 @@ namespace wali {
             friend void compose(BinaryRelation &, BinaryRelation const &, BinaryRelation const &);
         };
 
-        
-
-        /// Given two sizes, return the FDD id numbers that should be used for
-        /// each component.
-        //
-        // It does this by looking up the given sizes (in bits) in a static map.
-        // If we haven't created a set of FDD numbers for those particular sizes yet,
-        // then create some.
-        inline
-        Triple<int, int, int> getFddNumbers(unsigned int leftBits,
-                                            unsigned int middleBits,
-                                            unsigned int rightBits)
-        {
-            typedef Triple<unsigned int, unsigned int, unsigned int> SizeTriple;
-            
-            // Maps from a relation size to the base bdd number.
-            static std::map<SizeTriple, int> fddMap;
-            SizeTriple bits(leftBits, middleBits, rightBits);
-
-            if (fddMap.find(bits) == fddMap.end()) {
-                // Make a new domain for each relation component
-                int domains[3] = {
-                    1 << leftBits - 1,  // 2^n - 1 is largest # representable in n bits
-                    1 << middleBits - 1,
-                    1 << rightBits - 1
-                };
-                base = fdd_extdomain(domains, 3);
-                fddMap[bits] = base;
-            }
-
-            int base = fddMap[bits];
-
-            return SizeTriple(base, base+1, base+2);
-        }
-
 
         /// Wraps a bdd in a nice friendly package
         class TernaryRelation {
-            Component left;
-            Component middle;
-            Component right;
-
+            Domain domain;
             bdd myBdd;
 
         public:
-            BinaryRelation(unsigned int leftSize, unsigned int middleSize, unsigned int rightSize)
-                : left(leftSize)
-                , middle(middleSize)
-                , right(rightSize)
+            TernaryRelation(unsigned int largest)
+                : domain(largest)
                 , myBdd(bddfalse)
-            {
-                // We have to get the FDD numbers later, because both depend on both
-                Triple<int, int, int> fdds = getFddNumbers(left.bits, middle.bits, right.bits);
-                left.fdd_number = fdds.first;
-                middle.fdd_number = fdds.second
-                right.fdd_number = fdds.third;
-            }
+            {}
 
 
             void insert(unsigned int leftVal, unsigned int middleVal, unsigned int rightVal)
             {
-                bdd left_is_leftVal = fdd_ithvar(left.fdd_number, leftVal);
-                bdd middle_is_middleVal = fdd_ithvar(middle.fdd_number, middleVal);
-                bdd right_is_rightVal = fdd_ithvar(right.fdd_number, rightVal);
+                assert(leftVal <= domain.largest());
+                assert(middleVal <= domain.largest());
+                assert(rightVal <= domain.largest());
+
+                bdd left_is_leftVal = fdd_ithvar(domain.left.fdd_number, leftVal);
+                bdd middle_is_middleVal = fdd_ithvar(domain.middle.fdd_number, middleVal);
+                bdd right_is_rightVal = fdd_ithvar(domain.right.fdd_number, rightVal);
 
                 myBdd = myBdd | (left_is_leftVal & middle_is_middleVal & right_is_rightVal);
             }
@@ -215,15 +260,17 @@ namespace wali {
 
         void buddyInit()
         {
-            const int million = 1000000;
-            int rc = bdd_init( 50*million, 100000 );
-            if( rc < 0 ) {
-                std::cerr << "[ERROR] " << bdd_errstring(rc) << endl;
-                assert( 0 );
-                exit(10);
+            if (!bdd_isrunning()) {
+                const int million = 1000000;
+                int rc = bdd_init( 50*million, 100000 );
+                if( rc < 0 ) {
+                    std::cerr << "[ERROR] " << bdd_errstring(rc) << std::endl;
+                    assert( 0 );
+                    exit(10);
+                }
+                // Default is 50,000 (1 Mb),memory is cheap, so use 100,000
+                bdd_setmaxincrease(100000);
             }
-            // Default is 50,000 (1 Mb),memory is cheap, so use 100,000
-            bdd_setmaxincrease(100000);
         }
 
 
@@ -240,17 +287,18 @@ namespace wali {
                 BinaryRelation const & r1,
                 BinaryRelation const & r2)
         {
-            if (r1.right.fdd_number != r2.left.fdd_number) {
-                std::cerr << "Error: compose (Buddy version): relations don't share an FDD\n";
+            if (r1.domain != r2.domain || out_result.domain != r1.domain) {
+                std::cerr << "Error: compose (Buddy version): relations don't share a domain\n";
                 exit(20);
             }
 
             bdd r1_bdd = r1.myBdd;
-            bdd r2_shifted = bdd_replace(that->rel, downOne);
-                
-            bdd_relprod(rel, ...,fdd_ithset(base+1));
+            bdd r2_shifted = bdd_replace(r2.bdd, r2.domain.shift_out_compose());
+            bdd composed = bdd_relprod(r1_bdd, r2_shifted, fdd_ithset(r1.domain.middle.fdd_number));
+            out_result.bdd = bdd_replace(composed, out_result.domain.shift_in_compose());
         }
 
+        
         /// Projects out the symbol in the internal and call relation
         ///
         /// {(source, target) | (source, alpha, target) \in delta}
@@ -267,17 +315,15 @@ namespace wali {
         {
             typedef typename std::set<Triple<State, Symbol, State> >::const_iterator Iterator;
 
-            for(Iterator cur_trans = delta.begin(); cur_trans != delta.end(); ++cur_trans)
-                {
-                    State source = cur_trans->first;
-                    Symbol symb = cur_trans->second;
-                    State target = cur_trans->third;
+            for(Iterator cur_trans = delta.begin(); cur_trans != delta.end(); ++cur_trans) {
+                State source = cur_trans->first;
+                Symbol symb = cur_trans->second;
+                State target = cur_trans->third;
 
-                    if(symb == alpha)
-                        {
-                            out_result.insert(make_pair(source, target));
-                        }
+                if(symb == alpha) {
+                    out_result.insert(make_pair(source, target));
                 }
+            }
         }
 
 
@@ -291,33 +337,33 @@ namespace wali {
         ///   r_call:     The relation at the call node
         ///   delta_r:    The return transition relation with the alphabet
         ///               symbol projected out
-        template<typename State>
-        void
-        merge(typename RelationTypedefs<State>::BinaryRelation & out_result,
-              typename RelationTypedefs<State>::BinaryRelation const & r_exit,
-              typename RelationTypedefs<State>::BinaryRelation const & r_call,
-              typename RelationTypedefs<State>::TernaryRelation const & delta_r)
+        inline void
+        merge(BinaryRelation & out_result,
+              BinaryRelation const & r_exit,
+              BinaryRelation const & r_call,
+              TernaryRelation const & delta_r)
         {
-            typedef typename RelationTypedefs<State>::BinaryRelation::const_iterator Iterator;
+            if (out_result.domain != r_exit.domain
+                || r_exit.domain != r_call.domain
+                || r_call.domain != delta_r.domain)
+            {
+                std::cerr << "Error: merge (Buddy version): relations don't share a domain\n";
+                exit(20);
+            }
 
-            typename RelationTypedefs<State>::BinaryRelation temp;
+            bdd r1_bdd = r_call.bdd;
+            bdd r2_bdd = bdd_replace(r_exit.bdd, r_exit.domain.shift_out_compose());
+            bdd r3_bdd = bdd_replace(delta_r.bdd, r_call.domain.shift_out_merge());
 
-            // Test possibilites for (call_pred, exit) in r_exit
-            for(Iterator exit_iter = r_exit.begin(); exit_iter != r_exit.end(); ++exit_iter)
-                {
-                    // Test possibilities for (exit, call_pred, return_) in delta
-                    typedef typename RelationTypedefs<State>::TernaryRelation::const_iterator BigIterator;
-                    pair<BigIterator, BigIterator> range =
-                        delta_r.equal_range(make_pair(exit_iter->second, exit_iter->first));
-        
-                    for(BigIterator ret_trans = range.first; ret_trans != range.second; ++ret_trans) {
-                        if(exit_iter->first == ret_trans->second && exit_iter->second == ret_trans->first) {
-                            temp.insert(make_pair(exit_iter->first, ret_trans->third));
-                        }
-                    }
-                }
+            bdd middle_two = fdd_ithset(r_exit.domain.middle)
+                & fdd_ithset(r_exit.domain.right);
 
-            compose<State>(out_result, r_call, temp);
+            bdd composed = bdd_appex(r1_bdd & r2_bdd,
+                                     r3_bdd,
+                                     bddop_and,
+                                     fdd_ithset(r1.domain.middle.fdd_number));
+            
+            out_result.bdd = bdd_replace(composed, out_result.domain.shift_in_merge());
         }
 
 
@@ -331,24 +377,24 @@ namespace wali {
         ///   alpha:      Alphabet symbol to select and project
         template<typename State, typename Symbol>
         void
-        project_symbol_4(typename RelationTypedefs<State>::TernaryRelation & out_result,
+        project_symbol_4(TernaryRelation & out_result,
                          std::set<Quad<State, State, Symbol, State> > const & delta,
                          Symbol alpha)
         {
             typedef typename set<Quad<State, State, Symbol, State> >::const_iterator Iterator;
 
             for(Iterator cur_trans = delta.begin(); cur_trans != delta.end(); ++cur_trans)
+            {
+                State source = cur_trans->first;
+                State pred = cur_trans->second;
+                Symbol symb = cur_trans->third;
+                State target = cur_trans->fourth;
+                
+                if(symb == alpha)
                 {
-                    State source = cur_trans->first;
-                    State pred = cur_trans->second;
-                    Symbol symb = cur_trans->third;
-                    State target = cur_trans->fourth;
-
-                    if(symb == alpha)
-                        {
-                            out_result.insert(Triple<State, State, State>(source, pred, target));
-                        }
+                    out_result.insert(Triple<State, State, State>(source, pred, target));
                 }
+            }
         }
 
 
@@ -378,9 +424,9 @@ namespace wali {
             // Find the largest state
             State largest_state = State();
             for(Iterator edge = r.begin(); edge != r.end(); ++edge)
-                {
-                    largest_state = biggest(largest_state, edge->first, edge->second);
-                }
+            {
+                largest_state = biggest(largest_state, edge->first, edge->second);
+            }
 
             largest_state = largest_state + 1;
 
@@ -390,19 +436,19 @@ namespace wali {
             // Set up the path matrix
             std::vector<std::deque<bool> > matrix(largest_state);
             for(size_t i = 0; i<matrix.size(); ++i)
-                {
-                    matrix[i].resize(largest_state);
-                }
+            {
+                matrix[i].resize(largest_state);
+            }
 
             for(size_t source=0; source<largest_state; ++source)
-                {
-                    matrix[source][source] = 1;
-                }
+            {
+                matrix[source][source] = 1;
+            }
        
             for(Iterator edge = r.begin(); edge != r.end(); ++edge)
-                {
-                    matrix[edge->first][edge->second] = 1;
-                }
+            {
+                matrix[edge->first][edge->second] = 1;
+            }
 
             // Now perform Floyd-Warshall alg. From Wikipedia:
             //
@@ -435,15 +481,15 @@ namespace wali {
 
             // Now go through and convert back to the multimap view
             for(size_t source=0; source<largest_state; ++source)
+            {
+                for(size_t target=0; target<largest_state; ++target)
                 {
-                    for(size_t target=0; target<largest_state; ++target)
-                        {
-                            if(matrix[source][target])
-                                {
-                                    out_result.insert(make_pair(source,target));
-                                }
-                        }
-                } // done with 
+                    if(matrix[source][target])
+                    {
+                        out_result.insert(make_pair(source,target));
+                    }
+                }
+            } // done with 
         }
 
 
@@ -453,15 +499,17 @@ namespace wali {
         ///   out_result: The intersection of r1 and r2
         ///   r1:         One binary relation on states
         ///   r2:         Another binary relation on states
-        template<typename Relation>
-        void
-        intersect(Relation & out_result,
-                  Relation const & r1,
-                  Relation const & r2)
+        inline void
+        intersect(BinaryRelation & out_result,
+                  BinaryRelation const & r1,
+                  BinaryRelation const & r2)
         {
-            std::set_intersection(r1.begin(), r1.end(),
-                                  r2.begin(), r2.end(),
-                                  std::inserter(out_result, out_result.begin()));
+            if (r1.domain != r2.domain || out_result.domain != r1.domain) {
+                std::cerr << "Error: intersect (Buddy version): relations don't share a domain\n";
+                exit(20);
+            }
+
+            out_result.bdd = r1.bdd & r2.bdd;
         }
 
 
@@ -471,15 +519,17 @@ namespace wali {
         ///   out_result: The union of r1 and r2
         ///   r1:         One binary relation on states
         ///   r2:         Another binary relation on states
-        template<typename Relation>
-        void
-        union_(Relation & out_result,
-               Relation const & r1,
-               Relation const & r2)
+        inline void
+        union_(BinaryRelation & out_result,
+               BinaryRelation const & r1,
+               BinaryRelation const & r2)
         {
-            std::set_union(r1.begin(), r1.end(),
-                           r2.begin(), r2.end(),
-                           std::inserter(out_result, out_result.begin()));
+            if (r1.domain != r2.domain || out_result.domain != r1.domain) {
+                std::cerr << "Error: intersect (Buddy version): relations don't share a domain\n";
+                exit(20);
+            }
+
+            out_result.bdd = r1.bdd | r2.bdd;
         }
     } // namespace relations
 } // namespace wali
