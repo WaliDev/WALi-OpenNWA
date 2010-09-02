@@ -394,6 +394,10 @@ namespace wali
        */
       int num_nwa_states( ) const;
 
+      int largestState() const {
+        return states.largestState();
+      }
+
       /**
        *  
        * @brief remove the given state from this NWA
@@ -8072,7 +8076,7 @@ template <typename Client>
 #endif
 
 #ifdef USE_BUDDY
-#  define DECLARE(type, name)  type name(nondet->sizeStates())
+#  define DECLARE(type, name)  type name(nondet->largestState())
 #else
 #  define DECLARE(type, name)  type name
 #endif
@@ -8189,6 +8193,12 @@ template <typename Client>
         if (Symbols::isEpsilon(*it)) continue;    //Epsilon is handled with closure.
         if (Symbols::isWild(*it)) continue;
 
+#ifdef USE_BUDDY
+        internalTransPerSymbol[*it] = BinaryRelation(nondet->largestState());
+        callTransPerSymbol[*it] = BinaryRelation(nondet->largestState());
+        returnTransPerSymbol[*it] = TernaryRelation(nondet->largestState());
+#endif
+        
         project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet->trans.getInternals(), *it);
         project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet->trans.getInternals(), Symbols::getWild());
 

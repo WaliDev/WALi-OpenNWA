@@ -490,6 +490,10 @@ namespace wali
        *
        */
       size_t sizeStates( ) const;
+
+      size_t largestState() const {
+        return *states.rbegin();
+      }
       
       /**
        * 
