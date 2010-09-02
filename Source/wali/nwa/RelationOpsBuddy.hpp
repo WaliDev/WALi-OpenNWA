@@ -8,6 +8,12 @@
 #include <map>
 #include <set>
 
+#ifndef NDEBUG
+#include <boost/type_traits/is_same.hpp>
+#include <boost/static_assert.hpp>
+#endif
+#include <boost/shared_ptr.hpp>
+
 #include <fdd.h>
 
 #include "wali/ref_ptr.hpp"
@@ -51,7 +57,7 @@ namespace wali {
         }
 #endif
 
-        
+        inline
         Quad<int, int, int, int>
         getFddNumbers(unsigned int largest)
         {
@@ -106,44 +112,40 @@ namespace wali {
         private: // REMOVE ONCE THE ABOVE IS FIXED
             unsigned int _largest;
 
-            bddPair* shift_LM_to_MR;
-            bddPair* shift_R_to_M;
-            bddPair* shift_LR_to_RE;
-            bddPair* shift_E_to_M;
+            typedef void(*pairFreer)(bddPair*);
+            boost::shared_ptr<bddPair> shift_LM_to_MR;
+            boost::shared_ptr<bddPair> shift_R_to_M;
+            boost::shared_ptr<bddPair> shift_LR_to_RE;
+            boost::shared_ptr<bddPair> shift_E_to_M;
 
         public:
-            Domain(unsigned int largest) {
+            Domain(unsigned int largest)
+                : shift_LM_to_MR(bdd_newpair(), bdd_freepair)
+                , shift_R_to_M(bdd_newpair(), bdd_freepair)
+                , shift_LR_to_RE(bdd_newpair(), bdd_freepair)
+                , shift_E_to_M(bdd_newpair(), bdd_freepair)
+            {
                 _largest = largest;
-                
-                Quad<int, int, int, int> fdds = getFddNumbers(largest);
-                left.fdd_number = fdds.first;
-                middle.fdd_number = fdds.second;
-                right.fdd_number = fdds.third;
-                extra.fdd_number = fdds.fourth;
 
-                shift_LM_to_MR = bdd_newpair();
-                fdd_setpair(shift_LM_to_MR, left.fdd_number, middle.fdd_number);
-                fdd_setpair(shift_LM_to_MR, middle.fdd_number, right.fdd_number);
-
-                shift_R_to_M = bdd_newpair();
-                fdd_setpair(shift_R_to_M, right.fdd_number, middle.fdd_number);
-
-                shift_LR_to_RE = bdd_newpair();
-                fdd_setpair(shift_LR_to_RE, left.fdd_number, right.fdd_number);
-                fdd_setpair(shift_LR_to_RE, right.fdd_number, extra.fdd_number);
-
-                shift_E_to_M = bdd_newpair();
-                fdd_setpair(shift_E_to_M, extra.fdd_number, middle.fdd_number);
+                if (largest > 0) {
+                    Quad<int, int, int, int> fdds = getFddNumbers(largest);
+                    left.fdd_number = fdds.first;
+                    middle.fdd_number = fdds.second;
+                    right.fdd_number = fdds.third;
+                    extra.fdd_number = fdds.fourth;
+                    
+                    fdd_setpair(shift_LM_to_MR.get(), left.fdd_number, middle.fdd_number);
+                    fdd_setpair(shift_LM_to_MR.get(), middle.fdd_number, right.fdd_number);
+                    
+                    fdd_setpair(shift_R_to_M.get(), right.fdd_number, middle.fdd_number);
+                    
+                    fdd_setpair(shift_LR_to_RE.get(), left.fdd_number, right.fdd_number);
+                    fdd_setpair(shift_LR_to_RE.get(), right.fdd_number, extra.fdd_number);
+                    
+                    fdd_setpair(shift_E_to_M.get(), extra.fdd_number, middle.fdd_number);
+                }
             }
-
-            ~Domain() {
-                // TODO: replace with RAII
-                bdd_freepair(shift_LM_to_MR);
-                bdd_freepair(shift_R_to_M);
-                bdd_freepair(shift_LR_to_RE);
-                bdd_freepair(shift_E_to_M);
-            }
-
+            
             bool operator!= (Domain const & rhs) const {
                 return !(*this == rhs);
             }
@@ -162,19 +164,19 @@ namespace wali {
             }
 
             bddPair* shift_out_compose() const {
-                return shift_LM_to_MR;
+                return shift_LM_to_MR.get();
             }
 
             bddPair* shift_in_compose() const {
-                return shift_R_to_M;
+                return shift_R_to_M.get();
             }
 
             bddPair* shift_out_merge() const {
-                return shift_LR_to_RE;
+                return shift_LR_to_RE.get();
             }
 
             bddPair* shift_in_merge() const {
-                return shift_E_to_M;
+                return shift_E_to_M.get();
             }
 
             unsigned int largest() const {
@@ -182,9 +184,6 @@ namespace wali {
             }
 
         private:
-            void operator= (Domain const & rhs);
-            Domain(Domain const & rhs);
-
             friend class BinaryRelation;
             friend class TernaryRelation;
         };
@@ -199,6 +198,11 @@ namespace wali {
         public:
             BinaryRelation(unsigned int largest)
                 : domain(largest)
+                , myBdd(bddfalse)
+            {}
+
+            BinaryRelation()
+                : domain(0)
                 , myBdd(bddfalse)
             {}
 
@@ -228,6 +232,10 @@ namespace wali {
                 return myBdd;
             }
 
+            bool operator== (BinaryRelation const & other) const {
+                return (myBdd == other.myBdd && domain == other.domain);
+            }
+
             friend void compose(BinaryRelation &, BinaryRelation const &, BinaryRelation const &);
             friend void intersect(BinaryRelation &, BinaryRelation const &, BinaryRelation const &);
             friend void union_(BinaryRelation &, BinaryRelation const &, BinaryRelation const &);
@@ -247,6 +255,11 @@ namespace wali {
                 , myBdd(bddfalse)
             {}
 
+            TernaryRelation()
+                : domain(0)
+                , myBdd(bddfalse)
+            {}
+
 
             void insert(unsigned int leftVal, unsigned int middleVal, unsigned int rightVal)
             {
@@ -262,6 +275,11 @@ namespace wali {
             }
 
             void insert(Triple<unsigned, unsigned, unsigned> triple)
+            {
+                insert(triple.first, triple.second, triple.third);
+            }
+
+            void insert(Triple<unsigned long, unsigned long, unsigned long> triple)
             {
                 insert(triple.first, triple.second, triple.third);
             }
@@ -327,9 +345,9 @@ namespace wali {
         ///   out_result: The relation delta restricted to alpha
         ///   delta:      Internals or calls relation
         ///   alpha:      Alphabet symbol to select and project
-        template<typename State, typename Symbol>
+        template<typename OutRelation, typename State, typename Symbol>
         void
-        project_symbol_3(typename RelationTypedefs<State>::BinaryRelation & out_result,
+        project_symbol_3(OutRelation & out_result,
                          std::set<Triple<State, Symbol, State> > const & delta,
                          Symbol alpha)
         {
@@ -434,12 +452,20 @@ namespace wali {
         /// Parameters:
         ///   out_result: The transitive closure of r
         ///   r:          The source relation
-        template<typename State>
+        template<typename Relation>
         void
-        transitive_closure(typename RelationTypedefs<State>::BinaryRelation & out_result,
-                           typename RelationTypedefs<State>::BinaryRelation const & r)
+        transitive_closure(Relation & out_result,
+                           Relation const & r)
         {
-            typedef typename RelationTypedefs<State>::BinaryRelation::const_iterator Iterator;
+            typedef typename Relation::const_iterator Iterator;
+            typedef typename Relation::value_type::first_type State;
+
+#ifndef NDEBUG
+            const bool domain_and_codomain_are_the_same =
+                boost::is_same<typename Relation::value_type::first_type,
+                               typename Relation::value_type::second_type>::value;
+            BOOST_STATIC_ASSERT(domain_and_codomain_are_the_same);
+#endif
 
             // Find the largest state
             State largest_state = State();
@@ -551,6 +577,38 @@ namespace wali {
 
             out_result.myBdd = r1.myBdd | r2.myBdd;
         }
+
+
+
+        template<typename T>
+        class VectorSet {
+            std::deque<T> items;
+
+        public:
+            typedef typename std::deque<T>::iterator iterator;
+            typedef typename std::deque<T>::const_iterator const_iterator;
+           
+            void insert(T const & item)  {
+                if (find(item) == end()) {
+                    items.push_back(item);
+                }
+            }
+
+            iterator find(T const & item) { return std::find(items.begin(), items.end(), item); }
+            const_iterator find(T const & item) const { return std::find(items.begin(), items.end(), item); }
+
+            bool empty() const { return items.empty(); }
+
+            iterator begin() { return items.begin(); }
+            const_iterator begin() const { return items.begin(); }
+
+            iterator end() { return items.end(); }
+            const_iterator end() const { return items.end(); }
+
+            void erase(iterator i) { items.erase(i); }
+            void erase(const_iterator i) { items.erase(i); }
+        };
+        
     } // namespace relations
 } // namespace wali
 

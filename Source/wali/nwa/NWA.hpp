@@ -8095,6 +8095,7 @@ template <typename Client>
 
       using namespace wali::relations;
 
+      typedef std::set<std::pair<St, St> > SetBinaryRelation;
       typedef typename RelationTypedefs<St>::BinaryRelation BinaryRelation;
       typedef typename RelationTypedefs<St>::TernaryRelation TernaryRelation;
 
@@ -8105,7 +8106,12 @@ template <typename Client>
           >
           RelationSet;
 #endif
+
+#ifdef USE_BUDDY
+      typedef VectorSet<BinaryRelation> RelationSet;
+#else
       typedef std::set<BinaryRelation> RelationSet;
+#endif
 
       NWARefPtr nondet_copy(new NWA(*nondet));
       nondet = nondet_copy;
@@ -8121,7 +8127,7 @@ template <typename Client>
       {
         Id.insert(std::pair<St,St>(*sit,*sit));
       }
-
+      
       // Construct Id0
       DECLARE(BinaryRelation, Id0);
       for( stateIterator sit = nondet->beginInitialStates(); sit != nondet->endInitialStates(); sit++ )
@@ -8130,13 +8136,22 @@ template <typename Client>
       }
       
       //Construct the epsilon closure relation for the states in nondet.
-      DECLARE(BinaryRelation, pre_close); //Collapse epsilon transitions.
-      DECLARE(BinaryRelation, Ie);   //Internal transitions with epsilon.
-      project_symbol_3(Ie,nondet->trans.getInternals(),SymbolSet::getEpsilon());
+      SetBinaryRelation pre_close; //Collapse epsilon transitions.
+      SetBinaryRelation Ie;   //Internal transitions with epsilon.
+      project_symbol_3<SetBinaryRelation>(Ie,nondet->trans.getInternals(),SymbolSet::getEpsilon());
+#ifdef USE_BUDDY
+      transitive_closure(pre_close,Ie);
+#else
       transitive_closure<St>(pre_close,Ie);
+#endif
+
+      DECLARE(BinaryRelation, bdd_pre_close);
+      for(typename SetBinaryRelation::const_iterator iter = pre_close.begin(); iter != pre_close.end(); ++iter) {
+        bdd_pre_close.insert(*iter);
+      }
 
       DECLARE(BinaryRelation, close);
-      union_(close, pre_close, Id);
+      union_(close, bdd_pre_close, Id);
 
       // R0 is used later; to avoid recomputation we do it now
       // Epsilon Closure( {(q,q) | q is an element of Q_in in nondeterministic NWA } )
@@ -8174,11 +8189,11 @@ template <typename Client>
         if (Symbols::isEpsilon(*it)) continue;    //Epsilon is handled with closure.
         if (Symbols::isWild(*it)) continue;
 
-        project_symbol_3(internalTransPerSymbol[*it], nondet->trans.getInternals(), *it);
-        project_symbol_3(internalTransPerSymbol[*it], nondet->trans.getInternals(), Symbols::getWild());
+        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet->trans.getInternals(), *it);
+        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet->trans.getInternals(), Symbols::getWild());
 
-        project_symbol_3(callTransPerSymbol[*it], nondet->trans.getCalls(), *it);
-        project_symbol_3(callTransPerSymbol[*it], nondet->trans.getCalls(), Symbols::getWild());   //Every symbol also matches wild.
+        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet->trans.getCalls(), *it);
+        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet->trans.getCalls(), Symbols::getWild());   //Every symbol also matches wild.
 
         project_symbol_4(returnTransPerSymbol[*it], nondet->trans.getReturns(), *it);
         project_symbol_4(returnTransPerSymbol[*it], nondet->trans.getReturns(),Symbols::getWild());   //Every symbol also matches wild.

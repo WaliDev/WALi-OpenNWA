@@ -261,9 +261,9 @@ namespace wali {
     ///   out_result: The relation delta restricted to alpha
     ///   delta:      Internals or calls relation
     ///   alpha:      Alphabet symbol to select and project
-    template<typename State, typename Symbol>
+    template<typename OutRelation, typename State, typename Symbol>
     void
-    project_symbol_3(typename RelationTypedefs<State>::BinaryRelation & out_result,
+    project_symbol_3(OutRelation & out_result,
                      std::set<Triple<State, Symbol, State> > const & delta,
                      Symbol alpha)
     {
