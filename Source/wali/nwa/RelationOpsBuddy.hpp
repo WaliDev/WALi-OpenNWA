@@ -21,7 +21,6 @@
 
 namespace wali {
     namespace relations {
-
 #if 0
         (Not used right now, but could be slightly helpful)
         
@@ -206,20 +205,22 @@ namespace wali {
                 , myBdd(bddfalse)
             {}
 
-            void insert(unsigned int leftVal, unsigned int rightVal)
+            bool insert(unsigned int leftVal, unsigned int rightVal)
             {
                 assert(leftVal <= domain.largest());
                 assert(rightVal <= domain.largest());
 
                 bdd left_is_leftVal = fdd_ithvar(domain.left.fdd_number, leftVal);
-                bdd right_is_rightVal = fdd_ithvar(domain.right.fdd_number, rightVal);
+                bdd right_is_rightVal = fdd_ithvar(domain.middle.fdd_number, rightVal);
 
+                bdd old = myBdd;
                 myBdd = myBdd | (left_is_leftVal & right_is_rightVal);
+                return myBdd != old;
             }
 
-            void insert(std::pair<unsigned int, unsigned int> pair)
+            bool insert(std::pair<unsigned int, unsigned int> pair)
             {
-                insert(pair.first, pair.second);
+                return insert(pair.first, pair.second);
             }
 
             bool empty() const
@@ -261,7 +262,7 @@ namespace wali {
             {}
 
 
-            void insert(unsigned int leftVal, unsigned int middleVal, unsigned int rightVal)
+            bool insert(unsigned int leftVal, unsigned int middleVal, unsigned int rightVal)
             {
                 assert(leftVal <= domain.largest());
                 assert(middleVal <= domain.largest());
@@ -271,17 +272,24 @@ namespace wali {
                 bdd middle_is_middleVal = fdd_ithvar(domain.middle.fdd_number, middleVal);
                 bdd right_is_rightVal = fdd_ithvar(domain.right.fdd_number, rightVal);
 
+                bdd old = myBdd;
                 myBdd = myBdd | (left_is_leftVal & middle_is_middleVal & right_is_rightVal);
+                return old != myBdd;
             }
 
-            void insert(Triple<unsigned, unsigned, unsigned> triple)
+            bool insert(Triple<unsigned, unsigned, unsigned> triple)
             {
-                insert(triple.first, triple.second, triple.third);
+                return insert(triple.first, triple.second, triple.third);
             }
 
-            void insert(Triple<unsigned long, unsigned long, unsigned long> triple)
+            bool insert(Triple<unsigned long, unsigned long, unsigned long> triple)
             {
-                insert(triple.first, triple.second, triple.third);
+                return insert(triple.first, triple.second, triple.third);
+            }
+
+            bdd getBdd() const
+            {
+                return myBdd;
             }
         };
 
@@ -393,13 +401,15 @@ namespace wali {
             bdd r2_bdd = bdd_replace(r_exit.myBdd, r_exit.domain.shift_out_compose());
             bdd r3_bdd = bdd_replace(delta_r.myBdd, r_call.domain.shift_out_merge());
 
-            bdd middle_two = fdd_ithset(r_exit.domain.middle.fdd_number)
-                & fdd_ithset(r_exit.domain.right.fdd_number);
+            bdd middle_two = fdd_ithset(r_exit.domain.middle.fdd_number);
+            //| fdd_ithset(r_exit.domain.right.fdd_number);
 
             bdd composed = bdd_appex(r1_bdd & r2_bdd,
                                      r3_bdd,
                                      bddop_and,
                                      fdd_ithset(r_call.domain.middle.fdd_number));
+
+            composed = bdd_exist(composed, fdd_ithset(r_exit.domain.right.fdd_number));
             
             out_result.myBdd = bdd_replace(composed, out_result.domain.shift_in_merge());
         }
@@ -430,7 +440,8 @@ namespace wali {
                 
                 if(symb == alpha)
                 {
-                    out_result.insert(Triple<State, State, State>(source, pred, target));
+                    bool added = out_result.insert(Triple<State, State, State>(source, pred, target));
+                    assert(added);
                 }
             }
         }

@@ -157,14 +157,23 @@ namespace wali {
       typedef Iterator iterator;
       typedef Iterator const_iterator;
       
-      void insert(Triple<Subject, Subject, Subject> const & tuple) {
-        relation2_1[make_pair(tuple.first, tuple.second)].insert(tuple.third);
+      bool insert(Triple<Subject, Subject, Subject> const & tuple) {
+        return relation2_1[make_pair(tuple.first, tuple.second)].insert(tuple.third).second;
       }
 
       iterator begin() { return Iterator::begin(relation2_1); }
       const_iterator begin() const { return Iterator::begin(const_cast<Map&>(relation2_1)); }
       iterator end() { return Iterator::end(relation2_1); }
       const_iterator end() const { return Iterator::end(const_cast<Map&>(relation2_1)); }
+
+      size_t size() const {
+          int ret = 0;
+          for(typename Map::const_iterator iter = relation2_1.begin();
+              iter != relation2_1.end(); ++iter) {
+              ret += iter->second.size();
+          }
+          return ret;
+      }
 
       /// Returns an iterator range that runs over all tuples where
       /// the first two coordinates match 'key'.
@@ -348,7 +357,8 @@ namespace wali {
 
         if(symb == alpha)
         {
-          out_result.insert(Triple<State, State, State>(source, pred, target));
+          bool added = out_result.insert(Triple<State, State, State>(source, pred, target));
+          assert(added);
         }
       }
     }
