@@ -25,6 +25,23 @@ WaliDir        = os.getcwd()
 BaseEnv        = Environment()
 Is64           = (platform_bits == 64)
 
+ThirtyTwoBitAliases=['32', 'x86', 'ia_32', 'ia32']
+SixtyFourBitAliases=['64', 'x64', 'x86_64', 'amd64']
+
+vars = Variables()
+vars.Add(EnumVariable('arch', 'Architecture', 'default',
+         allowed_values=ThirtyTwoBitAliases+SixtyFourBitAliases+['default']))
+tempEnviron = Environment(tools=[], variables=vars)
+arch = tempEnviron['arch']
+tempEnviron = None
+vars = None
+
+if arch in ThirtyTwoBitAliases:
+    Is64 = False
+elif arch in SixtyFourBitAliases:
+    Is64 = True
+
+
 if Is64:
     LibInstallDir  = os.path.join(WaliDir,'lib64')
     BuildDir       = os.path.join(WaliDir,'_build64')
@@ -40,7 +57,7 @@ if 'gcc' == BaseEnv['CC']:
         # This will only happen if Is64 is changed from what it is
         # right now (Is64 = (platform_bits == 64))
         BaseEnv.Append(CCFLAGS='-m32')
-        BaseEnv.Append(LINKFLAGS='m32')
+        BaseEnv.Append(LINKFLAGS='-m32')
 elif 'cl' == BaseEnv['CC']:
     # Mostly copied from VS C++ 2005 Command line
     BaseEnv.Append(CFLAGS='/TP /errorReport:prompt /Wp64 /W4 /GR /MTd /EHsc')
