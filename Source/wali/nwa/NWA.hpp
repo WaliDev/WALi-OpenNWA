@@ -24,7 +24,7 @@
 
 //#define USE_BUDDY
 #ifdef USE_BUDDY
-#  include "wali/nwa/RelationOpsBuddy.hpp"
+#  include "wali/nwa/RelationOpsPaired.hpp"
 #else
 #  include "wali/nwa/RelationOps.hpp"
 #endif
@@ -2298,7 +2298,7 @@ namespace wali
        * (It only figures this for states that have no outgoing transitions other
        * than itself; you can still have a SCC that acts as a stuck state.)
        */ 
-      //void removeImplicitTransitions();
+      void removeImplicitTransitions();
 
 
       /**
@@ -7540,7 +7540,7 @@ template <typename Client>
     }
 
 
-#if 0 // Commented out because I don't know how this interacts with the new stuck state behavior
+      //#if 0 // Commented out because I don't know how this interacts with the new stuck state behavior
     template <typename Client>
     void NWA<Client>::removeImplicitTransitions()
     {
@@ -7562,7 +7562,7 @@ template <typename Client>
       for( callIterator call = trans.beginCall(); call != trans.endCall(); ++call)
       {
         if( Trans::getCallSite(*call) != Trans::getEntry(*call)
-            && Trans::getEntry(*call) != States::getStuckState())
+            && Trans::getEntry(*call) != states.getStuckState())
         {
           stuckStates.erase(Trans::getCallSite(*call));
         }
@@ -7572,7 +7572,7 @@ template <typename Client>
            internal != trans.endInternal(); ++internal)
       {
         if( Trans::getSource(*internal) != Trans::getTarget(*internal) 
-            && Trans::getTarget(*internal) != States::getStuckState())
+            && Trans::getTarget(*internal) != states.getStuckState())
         {
           stuckStates.erase(Trans::getSource(*internal));
         }
@@ -7581,7 +7581,7 @@ template <typename Client>
       for( returnIterator ret = trans.beginReturn(); ret != trans.endReturn(); ++ret)
       {
         if( Trans::getExit(*ret) != Trans::getReturnSite(*ret) 
-            && Trans::getReturnSite(*ret) != States::getStuckState())
+            && Trans::getReturnSite(*ret) != states.getStuckState())
         {
           stuckStates.erase(Trans::getExit(*ret));
         }
@@ -7592,9 +7592,9 @@ template <typename Client>
       for( typename StateSet::iterator stuck = stuckStates.begin();
            stuck != stuckStates.end(); ++stuck)
       {
-        if( isFinalState(*stuck) == isFinalState(States::getStuckState()) )
+        if( isFinalState(*stuck) == isFinalState(states.getStuckState()) )
         {
-          if(States::isStuckState(*stuck)) {
+          if(states.isStuckState(*stuck)) {
             removeState(*stuck);
           }
           else {
@@ -7604,7 +7604,7 @@ template <typename Client>
         }
       }
     }
-#endif
+      //#endif
 
 
     /**
