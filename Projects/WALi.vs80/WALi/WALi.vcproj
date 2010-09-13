@@ -47,7 +47,7 @@
 				PreprocessorDefinitions="WIN32;_LIB"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="1"
-				RuntimeLibrary="3"
+				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=""
 				AssemblerListingLocation=".\Debug/"
