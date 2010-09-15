@@ -22,9 +22,9 @@
 
 #include "wali/nwa/WeightGen.hpp"
 
-//#define USE_BUDDY
+#define USE_BUDDY
 #ifdef USE_BUDDY
-#  include "wali/nwa/RelationOpsPaired.hpp"
+#  include "wali/nwa/RelationOpsBuddy.hpp"
 #else
 #  include "wali/nwa/RelationOps.hpp"
 #endif
@@ -85,7 +85,7 @@ namespace wali
 
         typedef Key St;
         typedef Key Sym;
-        typedef StateSet<Client> States;
+        typedef wali::nwa::StateSet<Client> States;
         typedef typename States::const_iterator stateIterator;
         typedef typename States::ClientInfoRefPtr ClientInfoRefPtr;
         typedef SymbolSet Symbols;

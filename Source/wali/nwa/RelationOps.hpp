@@ -222,7 +222,7 @@ namespace wali {
       // typedef std::tr1::unordered_set<pair<State, State>,
       //                                 pairhash<State, State> > BinaryRelation;
       typedef std::set<pair<State, State> > BinaryRelation;
-      typedef TernaryRelation<State> TernaryRelation;
+      typedef wali::relations::TernaryRelation<State> TernaryRelation;
     };
 
 
