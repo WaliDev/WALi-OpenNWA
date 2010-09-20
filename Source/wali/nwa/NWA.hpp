@@ -22,7 +22,7 @@
 
 #include "wali/nwa/WeightGen.hpp"
 
-#define USE_BUDDY
+//#define USE_BUDDY
 #ifdef USE_BUDDY
 #  include "wali/nwa/RelationOpsBuddy.hpp"
 #else
