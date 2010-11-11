@@ -13,10 +13,9 @@
 #include "wali/nwa/ClientInfo.hpp"
 
 using namespace wali::nwa;
-template StateSet<ClientInfo>;
-template TransInfo<int, int>;
-template TransInfo<int, int>;
-template NWA<ClientInfo>;
+template class StateSet<ClientInfo>;
+template class TransInfo<int, int>;
+template class NWA<ClientInfo>;
 
 int retByVal() {
 	return 5;
