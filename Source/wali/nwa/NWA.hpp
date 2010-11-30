@@ -2486,6 +2486,11 @@ namespace wali
       bool isDeterministic( );
 
       /**
+       * Delegate 
+      **/
+      void delegateStates( );
+
+      /**
        * 
        * @brief determines whether there is any overlap in the states of the given NWAs,
        *        except that the stuck state is allowed to be in both IF it is the stuck in both
@@ -8578,6 +8583,55 @@ template <typename Client>
       return true;
     }
 
+
+
+    template <typename Client>
+    void NWA<Client>::delegateStates( )
+    {
+      //for each state n1
+      //  for each state n2!=n1
+      //     if n2.info <= n1.info
+      //        n1.info = n1.info \ n2.info
+      //        for each incoming transition (m1, a, n1),
+      //            add incoming transition (m1, a, n2).
+      for( stateIterator fit = beginStates(); fit!=endStates(); fit++) {
+        St s1 = *fit;
+        ClientInfoRefPtr s1info = getClientInfo( s1 );
+        for( stateIterator sit = beginStates(); sit!= endStates(); sit++ ) {
+          St s2 = *sit;
+          if( s1 == s2 ) continue;
+          ClientInfoRefPtr s2info = getClientInfo( s2 );
+          ClientInfoRefPtr residualInfo;
+          if( s1info->subsumes( s2info, residualInfo ) ) { // s2info \subseteq s1info
+            // direct incoming transitions to s2 as well
+
+            // incoming internal transitions
+            Internals internals = trans.getTransTo( s1 );
+            for(internalIterator iit = internals.begin(); iit!=internals.end(); iit++) {
+              addInternalTrans( iit->first, iit->second, s2 );
+            }
+            // incoming call transitions
+            Calls calls = trans.getTransEntry( s1 );
+            for(callIterator cit = calls.begin(); cit!=calls.end(); cit++) {
+              addCallTrans( cit->first, cit->second, s2 );
+            }
+            // incoming return transitions
+            Returns returns = trans.getTransRet( s1 );
+            for(returnIterator rit = returns.begin(); rit!=returns.end(); rit++) {
+              addReturnTrans(rit->first, rit->second, rit->third, s2 );
+            }
+            
+            //TODO: what about return transitions with the call ??
+
+            // residuate client info
+            setClientInfo( s1, residualInfo ); //info(s1) = s1info - s2info;
+          }
+        }
+
+      }
+    
+  }
+   
     /**
      * 
      * @brief intersects client information 
