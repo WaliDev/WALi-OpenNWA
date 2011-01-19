@@ -415,7 +415,7 @@ namespace wali
        * @return false if the state does not exist in the NWA, true otherwise
        *
        */
-      bool removeState( St state );
+      virtual bool removeState( St state );
 
       /**
        *
@@ -2255,6 +2255,9 @@ namespace wali
         return nwa;
       }
 
+      //TODO: write comments
+      virtual bool isTransitionPossible( const St &src, const Sym &sym, const St &tgt);
+
       /**
        *
        * @brief constructs the NWA which is the intersection of the given NWAs
@@ -2300,6 +2303,37 @@ namespace wali
        */ 
       void removeImplicitTransitions();
 
+
+      // pruning functions
+
+      /**
+      * Removes states not reachable from any of the 'sources' states
+      * 
+      */
+      void pruneUnreachableForward(const std::set<St> & sources);
+
+      /**
+      * Removes states from which none of the 'targets' are reachable.
+      */
+      void pruneUnreachableBackward(const std::set<St> & targets);
+
+      /**
+      * Removes states not reachable from any initial state
+      * 
+      */
+      void pruneUnreachableInitial();
+
+      /**
+      * Removes states from which none of the final states are reachable.
+      */
+
+      void pruneUnreachableFinal();
+
+      /**
+      * Removes states not reachable from any initial state
+      * and from which none of the final states are reachable.
+      */
+      void chop();       
 
       /**
        *
@@ -2905,6 +2939,9 @@ namespace wali
       {
         return nwa->NWAtoBackwardsPDSreturns(wg);
       }
+
+      //TODO: comment
+      virtual bool addToPDS(const St &src, const Sym &lbl, const St &tgt) const;
 
       /**
        *
@@ -7011,6 +7048,12 @@ template <typename Client>
       trans.addAllTrans(second->trans);      
     }
 
+    template< typename Client>
+    bool NWA<Client>::isTransitionPossible( const St &src, const Sym &sym, const St &tgt) 
+    {
+      return true;
+    }
+
     /**
      *
      * @brief constructs the NWA which is the intersection of the given NWAs
@@ -7136,6 +7179,7 @@ template <typename Client>
             visitedPairs.insert(entryPair);
 
             St resSt;
+            bool newlyCreatedResSt = false;
             // Have we seen entryPair before?
             if( pairToStMap.count(entryPair) == 0 ) 
             { 
@@ -7144,6 +7188,7 @@ template <typename Client>
               ClientInfoRefPtr resCI;
               if(! stateIntersect(first,firstEntry,second,secondEntry,resSt,resCI) ) 
                 continue;
+              newlyCreatedResSt = true;
               // We have a new state in resSt!
               if( first->isFinalState(firstEntry) && second->isFinalState(secondEntry) )
                 addFinalState(resSt);
@@ -7169,6 +7214,7 @@ template <typename Client>
             //add all new pairs to the worklist
             for( typename std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
             {
+                bool newlycreated = false;
                 St st;
                 //If we have already considered this pair and found them nonintersectable, continue
                 if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
@@ -7181,6 +7227,7 @@ template <typename Client>
                     ClientInfoRefPtr CI;
                     if( stateIntersect(first,it->first,second,it->second,st,CI) )
                     {
+                        newlycreated = true;
                         if( first->isFinalState(it->first) && second->isFinalState(it->second) )
                             addFinalState(st);
                         else
@@ -7204,7 +7251,17 @@ template <typename Client>
                 intersectClientInfoCall(first,Trans::getCallSite(*fit),it->first,
                                         second,Trans::getCallSite(*sit),it->second,
                                         resSym,st);    //Intersect Call Trans client info.
-                addCallTrans(pairToStMap[currpair],resSym,st);  
+                if( isTransitionPossible( pairToStMap[currpair],resSym,st) ) {
+                  addCallTrans(pairToStMap[currpair],resSym,st);  
+                }
+                else if(newlycreated) {
+                  // transition not possible and newly created state
+                  // roll back; revert; clean up....
+                  worklistPairs.pop_back();
+                  pairToStMap.erase(*it);
+                  visitedPairs.erase(*it);
+                  removeState(st);
+                }
              }
 
             
@@ -7212,7 +7269,17 @@ template <typename Client>
             intersectClientInfoCall(first,Trans::getCallSite(*fit),Trans::getEntry(*fit),
                                     second,Trans::getCallSite(*sit),Trans::getEntry(*sit),
                                     resSym,resSt);   //Intersect Call Trans client info.
-            addCallTrans(pairToStMap[currpair],resSym,resSt);
+            if( isTransitionPossible( pairToStMap[currpair],resSym,resSt) ) {
+              addCallTrans(pairToStMap[currpair],resSym,resSt);
+            }
+            else if(newlyCreatedResSt) {
+              // transition not possible and newly created state
+              // roll back; revert; clean up....
+              worklistPairs.pop_back();
+              pairToStMap.erase(entryPair);
+              visitedPairs.erase(entryPair);
+              removeState(resSt);
+            }
           }
         }
 
@@ -7240,6 +7307,7 @@ template <typename Client>
             visitedPairs.insert(tgtPair);
 
             St resSt;
+            bool newlyCreatedResSt = false;
             // Have we seen tgtPair before?
             if( pairToStMap.count(tgtPair) == 0 ) 
             { 
@@ -7248,6 +7316,7 @@ template <typename Client>
               ClientInfoRefPtr resCI;
               if(! stateIntersect(first,firstTgt,second,secondTgt,resSt,resCI) ) 
                 continue;
+              newlyCreatedResSt = true;
               // We have a new state in resSt!
               if( first->isFinalState(firstTgt) && second->isFinalState(secondTgt) )
                 addFinalState(resSt);
@@ -7273,6 +7342,7 @@ template <typename Client>
             for( typename std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
             {
                 St st;
+                bool newlyCreatedSt = false;
                 //If we have already considered this pair and found them nonintersectable, continue
                 if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
                     continue;
@@ -7288,7 +7358,7 @@ template <typename Client>
                             addFinalState(st);
                         else
                             addState(st); 
-
+                        newlyCreatedSt = true;
                         //Attach client info to the newly created state.
                         states.setClientInfo(st,CI);
                         
@@ -7306,7 +7376,16 @@ template <typename Client>
                 intersectClientInfoInternal(first,Trans::getSource(*fit),it->first,
                                             second,Trans::getSource(*sit),it->second,
                                             resSym, st);    //Intersect Internal Trans client info.
-                addInternalTrans(pairToStMap[currpair],resSym,st);  
+                if( isTransitionPossible( pairToStMap[currpair],resSym,st) ) {
+                  addInternalTrans(pairToStMap[currpair],resSym,st);  
+                } else if( newlyCreatedSt ) {
+                  // transition not possible and newly created state
+                  // roll back; revert; clean up....
+                  worklistPairs.pop_back();
+                  pairToStMap.erase(*it);
+                  visitedPairs.erase(*it);
+                  removeState(st);
+                }
             }
             
 
@@ -7314,7 +7393,16 @@ template <typename Client>
             intersectClientInfoInternal(first,Trans::getSource(*fit),Trans::getTarget(*fit),
                                         second,Trans::getSource(*sit),Trans::getTarget(*sit),
                                         resSym,resSt);   //Intersect Internal Trans client info.
-            addInternalTrans(pairToStMap[currpair],resSym,resSt);
+            if( isTransitionPossible( pairToStMap[currpair],resSym,resSt) )  {
+              addInternalTrans(pairToStMap[currpair],resSym,resSt);
+            } else if( newlyCreatedResSt ) {
+              // transition not possible and newly created state
+              // roll back; revert; clean up....
+              worklistPairs.pop_back();
+              pairToStMap.erase(tgtPair);
+              visitedPairs.erase(tgtPair);
+              removeState(resSt);
+            }
           }
         }
         
@@ -7355,6 +7443,7 @@ template <typename Client>
             visitedPairs.insert(retPair);
 
             St retSt;
+            bool newlyCreatedRetSt = false;
             // Are the return components intersectable?
             if( pairToStMap.count(retPair) == 0 ) 
             { // Don't know yet
@@ -7362,6 +7451,7 @@ template <typename Client>
               if(! stateIntersect(first,firstRet,second,secondRet,retSt,retCI) ) 
                 continue;
               // We have found a new state in retSt!
+              newlyCreatedRetSt = true;
               if( first->isFinalState(firstRet) && second->isFinalState(secondRet) )
                 addFinalState(retSt);
               else
@@ -7385,6 +7475,7 @@ template <typename Client>
             for( typename std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
             {
                 St st;
+                bool newlyCreatedSt = false;
                 //If we have already considered this pair and found them nonintersectable, continue
                 if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
                     continue;
@@ -7400,7 +7491,7 @@ template <typename Client>
                             addFinalState(st);
                         else
                             addState(st);
-                        
+                        newlyCreatedSt = true;
                         //Attach client info to the newly created state.
                         states.setClientInfo(st,CI);
                         
@@ -7418,7 +7509,11 @@ template <typename Client>
                 intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),it->first,
                                           second,Trans::getExit(*sit),Trans::getCallSite(*sit),it->second,
                                           resSym,st);    //Intersect Internal Trans client info.
-                addReturnTrans(pairToStMap[currpair],callSt,resSym,st);  
+                if( isTransitionPossible(pairToStMap[currpair],resSym,st) ) {
+                  addReturnTrans(pairToStMap[currpair],callSt,resSym,st);  
+                } else if( newlyCreatedSt ) {
+                  removeState( st );
+                }
             }
             
             
@@ -7426,7 +7521,16 @@ template <typename Client>
             intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),Trans::getReturnSite(*fit),
                                       second,Trans::getExit(*sit),Trans::getCallSite(*sit),Trans::getReturnSite(*sit),
                                       resSym,retSt);   //Intersect Return Trans client info.
-            addReturnTrans(pairToStMap[currpair],callSt,resSym,retSt);
+            if( isTransitionPossible(pairToStMap[currpair],resSym,retSt) ) {
+              addReturnTrans(pairToStMap[currpair],callSt,resSym,retSt);
+            } else if( newlyCreatedRetSt ) {
+              // transition not possible and newly created state
+              // roll back; revert; clean up....
+              worklistPairs.pop_back();
+              pairToStMap.erase(retPair);
+              visitedPairs.erase(retPair);
+              removeState(retSt);
+            }
           }
         }
 
@@ -7467,6 +7571,7 @@ template <typename Client>
             visitedPairs.insert(retPair);
 
             St retSt;
+            bool newlyCreatedRetSt = false;
             //  Are the return components intersectable?
             if( pairToStMap.count(retPair) == 0 ) 
             { //Don't know yet
@@ -7474,6 +7579,7 @@ template <typename Client>
               if(! stateIntersect(first,firstRet,second,secondRet,retSt,retCI) ) 
                 continue;
               // We have a new state in retSt!
+              newlyCreatedRetSt = true;
               if( first->isFinalState(firstRet) && second->isFinalState(secondRet) )
                 addFinalState(retSt);
               else
@@ -7497,6 +7603,7 @@ template <typename Client>
             for( typename std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
             {
                 St st;
+                bool newlyCreatedSt = false;
                 //If we have already considered this pair and found them nonintersectable, continue
                 if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
                     continue;
@@ -7512,7 +7619,7 @@ template <typename Client>
                             addFinalState(st);
                         else
                             addState(st); 
-                        
+                        newlyCreatedSt = true;
                         //Attach client info to the newly created state.
                         states.setClientInfo(st,CI);
                         
@@ -7530,7 +7637,16 @@ template <typename Client>
                 intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),it->first,
                                           second,Trans::getExit(*sit),Trans::getCallSite(*sit),it->second,
                                           resSym,st);    //Intersect Internal Trans client info.
-                addReturnTrans(exitSt,pairToStMap[currpair],resSym,st);  
+                if( isTransitionPossible(exitSt,resSym,st) ) {
+                  addReturnTrans(exitSt,pairToStMap[currpair],resSym,st);  
+                } else if( newlyCreatedSt ) {
+                  // transition not possible and newly created state
+                  // roll back; revert; clean up....
+                  worklistPairs.pop_back();
+                  pairToStMap.erase(*it);
+                  visitedPairs.erase(*it);
+                  removeState(st);
+                }
             }
 
             
@@ -7538,7 +7654,16 @@ template <typename Client>
             intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),Trans::getReturnSite(*fit),
                                       second,Trans::getExit(*sit),Trans::getCallSite(*sit),Trans::getReturnSite(*sit),
                                       resSym,retSt);   //Intersect Return Trans client info.
-            addReturnTrans(exitSt,pairToStMap[currpair],resSym,retSt);
+            if( isTransitionPossible(exitSt,resSym,retSt) ) {
+              addReturnTrans(exitSt,pairToStMap[currpair],resSym,retSt);
+            } else if( newlyCreatedRetSt ) {
+              // transition not possible and newly created state
+              // roll back; revert; clean up....
+              worklistPairs.pop_back();
+              pairToStMap.erase(retPair);
+              visitedPairs.erase(retPair);
+              removeState(retSt);
+            }
           }
         }
       }
@@ -7611,6 +7736,148 @@ template <typename Client>
     }
       //#endif
 
+    template <typename Client>
+    void NWA<Client>::pruneUnreachableForward(const std::set<St> & sources)
+    {
+      std::deque<St> worklist(sources.begin(), sources.end());  
+      std::set<St> unreachables = getStates();
+      std::set<St> visited;
+      for( stateIterator it = sources.begin(); it!=sources.end(); it++) {
+        visited.insert(*it);
+      }   
+
+      while( ! worklist.empty() ) {
+        St src = worklist.front();
+        worklist.pop_front();
+        // book keeping
+        unreachables.erase(src);
+        // for each target
+        std::set<std::pair<Sym,St> > succs = getTargets(src);
+        for(std::set<std::pair<Sym,St> >::const_iterator it = succs.begin(); it!=succs.end(); it++) {
+          // if not visited
+          if(visited.count(it->second) == 0 ) {
+            worklist.push_back(it->second);
+            visited.insert(it->second);
+          }
+        }
+
+        // for each entry
+        succs = getEntries(src);
+        for(std::set<std::pair<Sym,St> >::const_iterator it = succs.begin(); it!=succs.end(); it++) {
+          // if not visited
+          if(visited.count(it->second) == 0 ) {
+            worklist.push_back(it->second);
+            visited.insert(it->second);
+          }
+        }
+        // for each return transition
+        const Returns & returns = trans.getReturns();
+        for( returnIterator it = returns.begin(); it != returns.end(); it++ )
+        {
+          // if src is the exit or the call
+          if( src == Trans::getExit(*it) || src == Trans::getCallSite(*it) )
+          {
+            // and if the exit and call are already visited
+            if( visited.count( Trans::getExit(*it) ) > 0 && visited.count( Trans::getCallSite(*it) ) > 0  
+              // but the return site is not visited
+              && visited.count(Trans::getReturnSite(*it) ) == 0 ) {
+
+                worklist.push_back(Trans::getReturnSite(*it) );
+                visited.insert(Trans::getReturnSite(*it));
+            }
+          }
+        }
+
+      }
+
+      for(stateIterator it = unreachables.begin(); it!=unreachables.end(); it++) {
+        removeState(*it);
+      }
+      return;
+    }
+
+       template <typename Client>
+    void NWA<Client>::pruneUnreachableBackward(const std::set<St> & targets)
+    {      
+      std::deque<St> worklist(targets.begin(), targets.end());  
+      std::set<St> unreachables = getStates();
+      std::set<St> visited;
+      for( stateIterator it = targets.begin(); it!=targets.end(); it++) {
+        visited.insert(*it);
+      }   
+
+      while( ! worklist.empty() ) {
+        St src = worklist.front();
+        worklist.pop_front();
+        // book keeping
+        unreachables.erase(src);
+        // for each source
+        std::set<std::pair<St,Sym> > succs = getSources(src);
+        for(std::set<std::pair<Sym,St> >::const_iterator it = succs.begin(); it!=succs.end(); it++) {
+          // if not visited
+          if(visited.count(it->first) == 0 ) {
+            worklist.push_back(it->first);
+            visited.insert(it->first);
+          }
+        }
+
+        // for each call successor state
+        succs = getCallSites(src);
+        for(std::set<std::pair<St,Sym> >::const_iterator it = succs.begin(); it!=succs.end(); it++) {
+          // if not visited
+          if(visited.count(it->first) == 0 ) {
+            worklist.push_back(it->first);
+            visited.insert(it->first);
+          }
+        }
+        // for each return transition
+        const Returns & returns = trans.getReturns();
+        for( returnIterator it = returns.begin(); it != returns.end(); it++ )
+        {
+          // if src is the return
+          if( src == Trans::getReturnSite(*it) )
+          {
+            // and if the exit not visited
+            if( visited.count( Trans::getExit(*it) ) == 0 ) {
+
+                worklist.push_back(Trans::getExit(*it) );
+                visited.insert(Trans::getExit(*it));
+            }
+
+            // if the call not visited
+            if( visited.count( Trans::getCallSite(*it) ) == 0 ) {
+
+                worklist.push_back(Trans::getCallSite(*it) );
+                visited.insert(Trans::getCallSite(*it));
+            }
+          }
+        }
+      }
+
+      for(stateIterator it = unreachables.begin(); it!=unreachables.end(); it++) {
+        removeState(*it);
+      }
+      return;
+
+    }
+
+    template<typename Client>
+    void NWA<Client>::pruneUnreachableInitial() {
+      pruneUnreachableForward( getInitialStates() );
+    }
+
+    template<typename Client>
+    void NWA<Client>::pruneUnreachableFinal() {
+      pruneUnreachableBackward( getFinalStates() );
+    }
+
+    template <typename Client>
+    void NWA<Client>::chop()
+    {
+      pruneUnreachableInitial();
+      pruneUnreachableFinal();
+
+    }
 
     /**
      *
@@ -9285,6 +9552,13 @@ template <typename Client>
       return result;
     }
 
+    //TODO: comment
+    template <typename Client>
+    bool NWA<Client>::addToPDS(const St &src, const Sym &lbl, const St &tgt) const 
+    {
+      return true;
+    }
+
     /**
      *
      * @brief constructs the PDS equivalent to this NWA
@@ -9315,7 +9589,9 @@ template <typename Client>
 
         St src = Trans::getSource(*iit);
         St tgt = Trans::getTarget(*iit);
-        
+        // determine whether we should add this edge to the PDS
+        // TODO: clean this interface
+        if( ! addToPDS(src, Trans::getInternalSym(*iit), tgt) ) continue;
         if( isWild(Trans::getInternalSym(*iit)) )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
         else
@@ -9341,6 +9617,10 @@ template <typename Client>
         St src = Trans::getCallSite(*cit);
         St tgt = Trans::getEntry(*cit);
         
+        // determine whether we should add this edge to the PDS
+        // TODO: clean this interface
+        if( ! addToPDS(src, Trans::getCallSym(*cit), tgt) ) continue;
+
         if( isWild(Trans::getCallSym(*cit)) )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w
         else
@@ -9372,6 +9652,10 @@ template <typename Client>
         St src = Trans::getExit(*rit);
         St tgt = Trans::getReturnSite(*rit);
         
+        // determine whether we should add this edge to the PDS
+        // TODO: clean this interface
+        if( ! addToPDS(src, Trans::getReturnSym(*rit), tgt) ) continue;
+
         if( isWild(Trans::getReturnSym(*rit)) )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w 
         else
