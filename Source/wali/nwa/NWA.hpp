@@ -7753,7 +7753,7 @@ template <typename Client>
         unreachables.erase(src);
         // for each target
         std::set<std::pair<Sym,St> > succs = getTargets(src);
-        for(std::set<std::pair<Sym,St> >::const_iterator it = succs.begin(); it!=succs.end(); it++) {
+        for(typename std::set<std::pair<Sym,St> >::const_iterator it = succs.begin(); it!=succs.end(); it++) {
           // if not visited
           if(visited.count(it->second) == 0 ) {
             worklist.push_back(it->second);
@@ -7763,7 +7763,7 @@ template <typename Client>
 
         // for each entry
         succs = getEntries(src);
-        for(std::set<std::pair<Sym,St> >::const_iterator it = succs.begin(); it!=succs.end(); it++) {
+        for(typename std::set<std::pair<Sym,St> >::const_iterator it = succs.begin(); it!=succs.end(); it++) {
           // if not visited
           if(visited.count(it->second) == 0 ) {
             worklist.push_back(it->second);
@@ -7813,7 +7813,7 @@ template <typename Client>
         unreachables.erase(src);
         // for each source
         std::set<std::pair<St,Sym> > succs = getSources(src);
-        for(std::set<std::pair<Sym,St> >::const_iterator it = succs.begin(); it!=succs.end(); it++) {
+        for(typename std::set<std::pair<Sym,St> >::const_iterator it = succs.begin(); it!=succs.end(); it++) {
           // if not visited
           if(visited.count(it->first) == 0 ) {
             worklist.push_back(it->first);
@@ -7823,7 +7823,7 @@ template <typename Client>
 
         // for each call successor state
         succs = getCallSites(src);
-        for(std::set<std::pair<St,Sym> >::const_iterator it = succs.begin(); it!=succs.end(); it++) {
+        for(typename std::set<std::pair<St,Sym> >::const_iterator it = succs.begin(); it!=succs.end(); it++) {
           // if not visited
           if(visited.count(it->first) == 0 ) {
             worklist.push_back(it->first);
