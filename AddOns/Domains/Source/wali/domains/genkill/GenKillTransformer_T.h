@@ -194,7 +194,7 @@ public: // methods
           }
       }
 
-      const GenKillTransformer_T* y = dynamic_cast<const GenKillTransformer_T*>(_y);
+      const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>(_y);
 
       Set temp_k( Set::Union( kill, y->kill ) );
       Set temp_g( Set::Union( Set::Diff(gen,y->kill), y->gen) );
@@ -221,7 +221,7 @@ public: // methods
           }
       }
 
-      const GenKillTransformer_T* y = dynamic_cast<const GenKillTransformer_T*>(_y);
+      const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>(_y);
 
       Set temp_k( Set::Intersect( kill, y->kill ) );
       Set temp_g( Set::Union( gen, y->gen ) );
@@ -264,7 +264,7 @@ public: // methods
           }
       }
 
-      const GenKillTransformer_T* y = dynamic_cast<const GenKillTransformer_T*>(_y);
+      const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>(_y);
       // Both *this and *y are proper (non-zero) values
 
       Set temp_k( Set::Diff(Set::UniverseSet(),Set::Diff(y->kill,kill)) ); 
@@ -288,12 +288,12 @@ public: // methods
   }
 
   bool equal(SemElem* _y) const {
-    const GenKillTransformer_T* y = dynamic_cast<const GenKillTransformer_T*>(_y);
+    const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>(_y);
     return this->isEqual(y);
   }
 
   bool equal(sem_elem_t _y) const {
-    const GenKillTransformer_T* y = dynamic_cast<const GenKillTransformer_T*>(_y.get_ptr());
+    const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>(_y.get_ptr());
     return this->isEqual(y);
   }
 
@@ -349,8 +349,9 @@ private: // methods -----------------------------------------------------------
 
   // Constructor for legitimate values
   GenKillTransformer_T(const Set& k, const Set& g, unsigned int c=0) :
-      kill(k), gen(g), is_zero(false), count(c)
+      wali::SemElem(), kill(k), gen(g), is_zero(false)
   {
+      count = c;
 #if 0
       std::cerr << "GenKillTransformer_T(" << k << ", " << g << ")" << std::endl;
 #endif
@@ -358,8 +359,9 @@ private: // methods -----------------------------------------------------------
 
   // Constructor for zero
   GenKillTransformer_T(unsigned int c=0) :
-      is_zero(true), count(c)
+      wali::SemElem(), is_zero(true)
   {
+      count = c;
 #if 0
       std::cerr << "GenKillTransformer_T()" << std::endl;
 #endif
@@ -369,8 +371,6 @@ private: // members -----------------------------------------------------------
   Set kill, gen;   // Used to represent the function \S.(S - kill) U gen
   bool is_zero;    // True for the zero element, False for all other values
 
-public: // members -----------------------------------------------------------
-  RefCounter count;
 };
 
 template< typename Set >
