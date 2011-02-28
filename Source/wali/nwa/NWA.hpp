@@ -2219,6 +2219,13 @@ namespace wali
 
       //Building NWAs
 
+
+      /***
+       * @brief constructs an NWA which is the projection of the given NWA to the states
+       * provided
+      */
+      void projectStates(const NWARefPtr &first, const std::set<St> &prjStates);
+
       /**
        *
        * @brief constructs the NWA resulting from the union of the given NWAs 
@@ -6993,6 +7000,44 @@ template <typename Client>
 
     //Building NWAs
 
+
+    /***
+    * @brief constructs an NWA which is the projection of the given NWA to the states
+    * provided
+    */
+    template <typename Client>
+    void NWA<Client>::projectStates(const NWARefPtr &other, const std::set<St> &prjStates)
+    {
+      //copy data from other
+      stuck = other->stuck;
+      states = other->states;
+      symbols = other->symbols;
+      trans = other->trans;
+
+      //for(typename std::set<St>::const_iterator it = prjStates.begin(); it!=prjStates.end(); it++) {
+      //  bool b = removeState(*it);
+      //  if( !b ) {
+      //    std::cout << "State not found " << *it << "\n";
+      //  }
+      //  assert(b && "State not found in projectStates");
+      //}
+      std::set<St> project_out;
+      for(stateIterator it = beginStates(); it!=endStates(); it++) {
+        if( prjStates.count(*it) == 0 && !isStuckState(*it) ) {
+          project_out.insert(*it);
+        }
+      }
+
+      for(typename std::set<St>::const_iterator it = project_out.begin();
+        it!=project_out.end(); it++ ) {
+          bool b = removeState(*it);
+          if( !b ) {
+            std::cout << "State not found " << *it << "\n";
+          }
+          assert(b && "State not found in projectStates");
+      }
+      return;
+    }
     /**
      *
      * @brief constructs the NWA resulting from the union of the given NWAs 
