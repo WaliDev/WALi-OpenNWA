@@ -280,6 +280,7 @@ namespace wali
          */
         Key constructCFG(std::set<Key> &entries, std::map<Key, Key> &entryState, wfa::WFA &cfg);
 
+        sem_elem_t get_theZero() {return theZero; }
       protected:
 
         /** @brief Actually creates the rule, hanldes the mappings,
@@ -512,7 +513,6 @@ namespace wali
         chash_t & config_map() {
           return configs;
         }
-
       private: // methods
 
       protected: // data members

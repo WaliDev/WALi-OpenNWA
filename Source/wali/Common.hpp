@@ -85,6 +85,7 @@ namespace wali
 #   define ATTR_UNUSED
 #   if _MSC_VER > 1000
 #       pragma warning(disable: 4786)
+#       pragma warning(disable: 4250)
 #   endif
 #   if !defined(_CPPRTTI)
 #       error RTTI is required by WALi.

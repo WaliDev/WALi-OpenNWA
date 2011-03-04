@@ -37,6 +37,12 @@ namespace wali
     class WFA;
     class Trans;
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4250) // 'wali::wfa::Trans' : inherits
+                              // 'wali::Markable::wali::Markable::mark'
+                              // via dominance
+#endif
     /*!
      * @class Trans
      *
@@ -278,6 +284,9 @@ namespace wali
          */
         mutable wpds::Config *config;
     };
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
   } // namespace wfa
 

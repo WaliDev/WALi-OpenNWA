@@ -40,6 +40,8 @@ namespace wali
    */
   KeySpace* getKeySpace();
 
+  void clearKeyspace();
+
   /**
    * Wrapper functions.
    * Call same method of class KeySpace using

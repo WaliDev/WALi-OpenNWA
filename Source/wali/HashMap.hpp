@@ -235,10 +235,10 @@ namespace wali
           enum enum_size_type_max { SIZE_TYPE_MAX = ULONG_MAX };
 
         public:     // con/destructor
-          HashMap( size_type size=47 )
-            : numValues(0),numBuckets(size), 
-            growthFactor( size * HASHMAP_GROWTH_FRACTION ), 
-            shrinkFactor( size * HASHMAP_SHRINK_FRACTION )
+          HashMap( size_type s=47 )
+            : numValues(0),numBuckets(s), 
+            growthFactor( s * HASHMAP_GROWTH_FRACTION ), 
+            shrinkFactor( s * HASHMAP_SHRINK_FRACTION )
         { initBuckets(); }
 
           HashMap( const HashMap& hm )
@@ -287,9 +287,9 @@ namespace wali
             return insert( pair_type(k,d) );
           }
 
-          void erase( const Key& key )
+          void erase( const Key& k )
           {
-            iterator it = find( key );
+            iterator it = find( k );
             if( it != end() )
               erase( it );
           }
@@ -395,13 +395,13 @@ namespace wali
 
         private:    // inline methods
           /*************  Get Bucket location from various objects **********/
-          inline size_type _bucketFromHash( size_type hash, size_type size ) const
+          inline size_type _bucketFromHash( size_type hash, size_type s ) const
           {
-            return hash % size;
+            return hash % s;
           }
-          inline size_type _bucketFromKey( const Key& key,size_type size ) const
+          inline size_type _bucketFromKey( const Key& k,size_type s ) const
           {
-            return _bucketFromHash( hashFunc(key),size );
+            return _bucketFromHash( hashFunc(k),s );
           }
           inline size_type _bucketFromValue( const value_type& v,size_type s ) const
           {
@@ -411,13 +411,13 @@ namespace wali
           {
             return _bucketFromHash( hash,numBuckets );
           }
-          inline size_type bucketFromKey( const Key& key ) const
+          inline size_type bucketFromKey( const Key& k ) const
           {
-            return bucketFromHash( hashFunc(key) );
+            return bucketFromHash( hashFunc(k) );
           }
-          inline size_type bucketFromValue( const value_type& value ) const
+          inline size_type bucketFromValue( const value_type& v ) const
           {
-            return bucketFromKey( value.first );
+            return bucketFromKey( v.first );
           }
 
           /************ Initialize and release buckets *************************/
@@ -426,15 +426,15 @@ namespace wali
             buckets = _makeBuckets( numBuckets );
           }
 
-          inline bucket_type **  _makeBuckets( size_type size )
+          inline bucket_type **  _makeBuckets( size_type s )
           {
 #if PI_STATS_DETAIL
-            totalHashMapnumBuckets += size;
+            totalHashMapnumBuckets += s;
 #endif /* PI_STATS_DETAIL */
-            bucket_type **bktptr = new bucket_type*[size];
-            memset(bktptr,0,sizeof(bucket_type*)*size);
-            //for(size_type s = 0;s<size;s++)
-            //bktptr[s] = 0;
+            bucket_type **bktptr = new bucket_type*[s];
+            memset(bktptr,0,sizeof(bucket_type*)*s);
+            //for(size_type i = 0;i<s;i++)
+            //bktptr[i] = 0;
             return bktptr;
           }
 
@@ -452,7 +452,7 @@ namespace wali
           }
 
         private:    // methods
-          void resize( size_type size );
+          void resize( size_type s );
 
         private:    // variables
           bucket_type **buckets;
@@ -469,11 +469,11 @@ namespace wali
     typename HashFunc,
     typename EqualFunc >
       HashMapIterator< Key,Data,HashFunc,EqualFunc >
-      HashMap< Key,Data,HashFunc,EqualFunc>::find( const Key& key )
+      HashMap< Key,Data,HashFunc,EqualFunc>::find( const Key& k )
       {
-        size_type bktNum = bucketFromKey( key );
+        size_type bktNum = bucketFromKey( k );
         for( bucket_type *bkt = buckets[bktNum]; bkt; bkt = bkt->next )
-          if( equalFunc( key,bkt->value.first) )
+          if( equalFunc( k,bkt->value.first) )
             return iterator( bkt,this );
         return end();
       }
@@ -483,11 +483,11 @@ namespace wali
     typename HashFunc,
     typename EqualFunc >
       HashMapConstIterator< Key,Data,HashFunc,EqualFunc >
-      HashMap< Key,Data,HashFunc,EqualFunc>::find( const Key& key ) const
+      HashMap< Key,Data,HashFunc,EqualFunc>::find( const Key& k ) const
       {
-        size_type bktNum = bucketFromKey( key );
+        size_type bktNum = bucketFromKey( k );
         for( bucket_type *bkt = buckets[bktNum]; bkt; bkt = bkt->next )
-          if( equalFunc( key,bkt->value.first) )
+          if( equalFunc( k,bkt->value.first) )
             return const_iterator( bkt,this );
         return end();
       }
@@ -539,18 +539,18 @@ namespace wali
     typename HashFunc,
     typename EqualFunc >
       std::pair< HashMapIterator< Key,Data,HashFunc,EqualFunc >,bool >
-      HashMap<Key,Data,HashFunc,EqualFunc>::insert( const value_type& value )
+      HashMap<Key,Data,HashFunc,EqualFunc>::insert( const value_type& v )
       {
         typedef std::pair< iterator,bool > RPair;
         resize( numValues+1 );
-        size_type bktNum = bucketFromValue( value );
+        size_type bktNum = bucketFromValue( v );
         bucket_type *bktptr = buckets[bktNum];
         for( bucket_type *tmp = bktptr; tmp ; tmp = tmp->next ) {
-          if( equalFunc( value.first,tmp->value.first ) ) {
+          if( equalFunc( v.first,tmp->value.first ) ) {
             return RPair( iterator(tmp,this),false );
           }
         }
-        bktptr = new bucket_type( value,bktptr );
+        bktptr = new bucket_type( v,bktptr );
         buckets[bktNum] = bktptr;
         numValues++;
         return RPair( iterator(bktptr,this),true );

@@ -50,7 +50,7 @@ namespace wali {
 
 } // namespace wali
 
-#ifdef WIN32
+#ifdef _WIN32
 #define WIN(stmt) do { if(1) { stmt; } }while(0)
 #else
 #define WIN(stmt) 

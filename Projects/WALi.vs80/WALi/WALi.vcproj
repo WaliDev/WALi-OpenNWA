@@ -46,7 +46,7 @@
 				AdditionalIncludeDirectories="..\..\..\Source"
 				PreprocessorDefinitions="WIN32;_LIB"
 				MinimalRebuild="false"
-				BasicRuntimeChecks="1"
+				BasicRuntimeChecks="0"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=""
@@ -110,6 +110,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="..\..\..\Source"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"

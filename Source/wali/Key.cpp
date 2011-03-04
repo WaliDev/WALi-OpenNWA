@@ -31,6 +31,11 @@ namespace wali
     return keySpace.get();
   }
 
+  void clearKeyspace()
+  {
+    getKeySpace()->clear();
+  }
+
   //
   // Wrapper functions.
   // Call same method of class KeySpace using
