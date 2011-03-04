@@ -26,14 +26,15 @@ namespace wali
      *  This class is used to keep track of the states of an NWA.
      *  
      */
-    template<typename Client>
+    
     class StateSet : public Printable
     {
       public:
+        typedef ClientInfo Client;
         typedef Key St;
-        typedef typename std::set<St> States;
-        typedef typename States::const_iterator const_iterator;   
-        typedef typename States::iterator iterator; 
+        typedef std::set<St> States;
+        typedef States::const_iterator const_iterator;   
+        typedef States::iterator iterator; 
 
         typedef ref_ptr<Client> ClientInfoRefPtr;
 
@@ -263,7 +264,7 @@ namespace wali
        * @param - stateSet: the collection of states to add to this collection of states
        *
        */
-      void addAll( const StateSet<Client> & stateSet );
+      void addAll( const StateSet & stateSet );
         
       /**
        *
@@ -274,7 +275,7 @@ namespace wali
        * @param - stateSet: the StateSet that contains the states to add
        *
        */
-      void addAllStates( const StateSet<Client> & stateSet );
+      void addAllStates( const StateSet & stateSet );
         
       /**
        * 
@@ -286,7 +287,7 @@ namespace wali
        * @param - stateSet: the StateSet that contains the states to add
        *
        */
-      void addAllInitialStates( const StateSet<Client> & stateSet );
+      void addAllInitialStates( const StateSet & stateSet );
         
       /**
        * 
@@ -298,7 +299,7 @@ namespace wali
        * @param - stateSet: the StateSet that contains the states to add
        *
        */
-      void addAllFinalStates( const StateSet<Client> & stateSet );
+      void addAllFinalStates( const StateSet & stateSet );
       
       /**
        *  
@@ -370,7 +371,7 @@ namespace wali
        * @return true if this StateSet is equivalent to the StateSet 'other'
        *
        */
-      bool operator==( const StateSet<Client> & other ) const;
+      bool operator==( const StateSet & other ) const;
        
       /**
        * 
@@ -548,8 +549,8 @@ namespace wali
     // Methods
     //
 
-    template<typename Client>
-    StateSet<Client> & StateSet<Client>::operator=( const StateSet<Client> & other )
+    
+    StateSet & StateSet::operator=( const StateSet & other )
     {
       if (this == &other)     
         return *this;
@@ -576,12 +577,12 @@ namespace wali
      * @return the client information associated with the given state
      *
      */
-    template<typename Client>
-    typename StateSet<Client>::ClientInfoRefPtr
-    StateSet<Client>::getClientInfo( St state ) const 
+    
+    StateSet::ClientInfoRefPtr
+    StateSet::getClientInfo( St state ) const 
     {
       typedef std::map<St, ClientInfoRefPtr> Map;
-      typename Map::const_iterator it = (stateInfos.find(state));
+      Map::const_iterator it = (stateInfos.find(state));
       if( it == stateInfos.end() )
         return NULL;
       else
@@ -596,8 +597,8 @@ namespace wali
      * @param - c: the desired client information for this state
      *
      */
-    template<typename Client>
-    void StateSet<Client>::setClientInfo( St state, const ClientInfoRefPtr c )
+    
+    void StateSet::setClientInfo( St state, const ClientInfoRefPtr c )
     {
       //Check to make sure this is a valid state.
       if(! isState(state) )
@@ -615,8 +616,8 @@ namespace wali
      * @brief removes all states 
      *
      */
-    template<typename Client>
-    void StateSet<Client>::clearStates( )
+    
+    void StateSet::clearStates( )
     {
       states.clear();
       clearInitialStates();
@@ -630,9 +631,9 @@ namespace wali
      * @brief removes all initial states
      *
      */
-    template<typename Client>
+    
     inline
-    void StateSet<Client>::clearInitialStates( )
+    void StateSet::clearInitialStates( )
     { 
       initialStates.clear();
     }    
@@ -642,9 +643,9 @@ namespace wali
      * @brief removes all final states
      *
      */
-    template<typename Client>
+    
     inline
-    void StateSet<Client>::clearFinalStates( )
+    void StateSet::clearFinalStates( )
     {
       finalStates.clear();
     }
@@ -657,9 +658,9 @@ namespace wali
      * @return true if the state is a member of this collection of states, false otherwise
      *
      */
-    template<typename Client>
+    
     inline
-    bool StateSet<Client>::isState( St state ) const
+    bool StateSet::isState( St state ) const
     {
       return (states.count(state) > 0);
     } 
@@ -672,9 +673,9 @@ namespace wali
      * @return true if the state is an initial state of this collection, false otherwise
      *
      */
-    template<typename Client>
+    
     inline
-    bool StateSet<Client>::isInitialState( St initialState ) const
+    bool StateSet::isInitialState( St initialState ) const
     {
       return (initialStates.count(initialState) > 0);
     }
@@ -687,9 +688,9 @@ namespace wali
      * @return true if the state is a final state of this collection, false otherwise
      *
      */
-    template<typename Client>
+    
     inline
-    bool StateSet<Client>::isFinalState( St finalState ) const
+    bool StateSet::isFinalState( St finalState ) const
     {
       return (finalStates.count(finalState) > 0);
     }
@@ -702,8 +703,8 @@ namespace wali
      * @return false if the state already exists, true otherwise
      *
      */
-    template<typename Client>
-    bool StateSet<Client>::addState( St state )
+    
+    bool StateSet::addState( St state )
     {
 	  // If the ClientInfo is requested for the state, it will be null
       bool inserted = states.insert(state).second;
@@ -718,8 +719,8 @@ namespace wali
      * @return false if the state is already an initial state, true otherwise
      *
      */ 
-    template<typename Client>
-    bool StateSet<Client>::addInitialState( St initialState )
+    
+    bool StateSet::addInitialState( St initialState )
     {
       bool inserted = initialStates.insert(initialState).second;
       if (inserted) {
@@ -738,8 +739,8 @@ namespace wali
      * @return false if the state is already a final state, true otherwise
      *
      */
-    template<typename Client>
-    bool StateSet<Client>::addFinalState( St finalState )
+    
+    bool StateSet::addFinalState( St finalState )
     {
       bool inserted = finalStates.insert(finalState).second;
       if (inserted) {
@@ -757,8 +758,8 @@ namespace wali
      * @param - stateSet: the collection of states to add to this collection of states
      *
      */
-    template<typename Client>
-    void StateSet<Client>::addAll( const StateSet<Client> & stateSet )
+    
+    void StateSet::addAll( const StateSet & stateSet )
     {
       addAllStates(stateSet);
       addAllInitialStates(stateSet);
@@ -772,8 +773,8 @@ namespace wali
      * @param - stateSet: the StateSet that contains the states to add
      *
      */
-    template<typename Client>
-    void StateSet<Client>::addAllStates( const StateSet<Client> & stateSet )
+    
+    void StateSet::addAllStates( const StateSet & stateSet )
     {
       for( const_iterator it = stateSet.beginStates();
            it != stateSet.endStates(); it++ )
@@ -796,8 +797,8 @@ namespace wali
      * @param - stateSet: the StateSet that contains the states to add
      *
      */  
-    template<typename Client>
-    void StateSet<Client>::addAllInitialStates( const StateSet<Client> & stateSet )
+    
+    void StateSet::addAllInitialStates( const StateSet & stateSet )
     {
       for( const_iterator it = stateSet.beginInitialStates();
            it != stateSet.endInitialStates(); it++ )
@@ -813,8 +814,8 @@ namespace wali
      * @param - stateSet: the StateSet that contains the states to add
      *
      */
-    template<typename Client>
-    void StateSet<Client>::addAllFinalStates( const StateSet<Client> & stateSet )
+    
+    void StateSet::addAllFinalStates( const StateSet & stateSet )
     {
       for( const_iterator it = stateSet.beginFinalStates();
            it != stateSet.endFinalStates(); it++ )
@@ -831,8 +832,8 @@ namespace wali
      * @return false if this state does not exist, true otherwise
      *
      */
-    template<typename Client>
-    bool StateSet<Client>::removeState( St state )
+    
+    bool StateSet::removeState( St state )
     {
       //The stuck state cannot be removed in this way.
       if( isStuckState( state ) )
@@ -858,8 +859,8 @@ namespace wali
      * @return false if this state is not an initial state, true otherwise
      *  
      */
-    template<typename Client>
-    bool StateSet<Client>::removeInitialState( St initialState )
+    
+    bool StateSet::removeInitialState( St initialState )
     {
       size_t erased = initialStates.erase(initialState);
       return erased > 0;
@@ -873,8 +874,8 @@ namespace wali
      * @remove false if this state is not a final state, true otherwise
      *
      */
-    template<typename Client>
-    bool StateSet<Client>::removeFinalState( St finalState )
+    
+    bool StateSet::removeFinalState( St finalState )
     {
       size_t erased = finalStates.erase(finalState);
       return erased > 0;
@@ -890,8 +891,8 @@ namespace wali
      * @return the output stream that was printed to
      *
      */
-    template<typename Client>
-    std::ostream & StateSet<Client>::print( std::ostream & o ) const
+    
+    std::ostream & StateSet::print( std::ostream & o ) const
     {
       //Print the set of all states.
       o << "Q: {\n  ";
@@ -946,8 +947,8 @@ namespace wali
      * @return true if this StateSet is equivalent to the StateSet 'other'
      *
      */
-    template<typename Client>
-    bool StateSet<Client>::operator==( const StateSet<Client> & other ) const
+    
+    bool StateSet::operator==( const StateSet & other ) const
     {
       //Check that the state sets are equal.
       if (stuck != other.stuck) return false;
@@ -966,9 +967,9 @@ namespace wali
      * @return the starting point of an iterator through the states
      *
      */
-    template<typename Client>
+    
     inline
-    typename StateSet<Client>::const_iterator StateSet<Client>::beginStates( ) const
+    StateSet::const_iterator StateSet::beginStates( ) const
     {
       return states.begin();
     }   
@@ -980,9 +981,9 @@ namespace wali
      * @return the starting point of an iterator through the initial states
      *
      */
-    template<typename Client>
+    
     inline
-    typename StateSet<Client>::const_iterator StateSet<Client>::beginInitialStates( ) const
+    StateSet::const_iterator StateSet::beginInitialStates( ) const
     {
       return initialStates.begin();
     }    
@@ -994,9 +995,9 @@ namespace wali
      * @return the starting point of an iterator through the final states
      *
      */
-    template<typename Client>
+    
     inline
-    typename StateSet<Client>::const_iterator StateSet<Client>::beginFinalStates( ) const
+    StateSet::const_iterator StateSet::beginFinalStates( ) const
     {
       return finalStates.begin();
     }
@@ -1008,9 +1009,9 @@ namespace wali
      * @return one place past the exit point of an iterator through the states
      *
      */
-    template<typename Client>
+    
     inline
-    typename StateSet<Client>::const_iterator StateSet<Client>::endStates( ) const
+    StateSet::const_iterator StateSet::endStates( ) const
     {
       return states.end();
     }    
@@ -1022,9 +1023,9 @@ namespace wali
      * @return one place past the exit point of an iterator through the initial states
      *
      */
-    template<typename Client>
+    
     inline
-    typename StateSet<Client>::const_iterator StateSet<Client>::endInitialStates( ) const
+    StateSet::const_iterator StateSet::endInitialStates( ) const
     {
       return initialStates.end();
     }    
@@ -1036,9 +1037,9 @@ namespace wali
      * @return one place past the exit point of an iterator through the final states
      *
      */
-    template<typename Client>
+    
     inline
-    typename StateSet<Client>::const_iterator StateSet<Client>::endFinalStates( ) const
+    StateSet::const_iterator StateSet::endFinalStates( ) const
     {
       return finalStates.end();
     }
@@ -1050,8 +1051,8 @@ namespace wali
      * @return a set containing all states in this collection
      *
      */
-    template<typename Client>
-    const typename StateSet<Client>::States & StateSet<Client>::getStates( ) const
+    
+    const StateSet::States & StateSet::getStates( ) const
     {
       return states;
     }
@@ -1063,8 +1064,8 @@ namespace wali
      * @return a set containing the names of all initial states in the collection
      *
      */
-    template<typename Client>
-    const typename StateSet<Client>::States & StateSet<Client>::getInitialStates( ) const
+    
+    const StateSet::States & StateSet::getInitialStates( ) const
     {
       return initialStates;
     }
@@ -1076,8 +1077,8 @@ namespace wali
      * @return a set containing the names of all final states in the collection
      *
      */
-    template<typename Client>
-    const typename StateSet<Client>::States & StateSet<Client>::getFinalStates( ) const
+    
+    const StateSet::States & StateSet::getFinalStates( ) const
     {
       return finalStates;
     }
@@ -1089,9 +1090,9 @@ namespace wali
      * @return the number of states in this collection
      *
      */
-    template<typename Client>
+    
     inline
-    size_t StateSet<Client>::sizeStates( ) const
+    size_t StateSet::sizeStates( ) const
     {
       return states.size();
     }  
@@ -1103,9 +1104,9 @@ namespace wali
      * @return the number of initial states in this collection
      *
      */
-    template<typename Client>
+    
     inline
-    size_t StateSet<Client>::sizeInitialStates( ) const
+    size_t StateSet::sizeInitialStates( ) const
     {
       return initialStates.size();
     } 
@@ -1117,9 +1118,9 @@ namespace wali
      * @return the number of final states in this collection
      *
      */
-    template<typename Client>
+    
     inline
-    size_t StateSet<Client>::sizeFinalStates( ) const
+    size_t StateSet::sizeFinalStates( ) const
     {
       return finalStates.size();
     }  
@@ -1135,8 +1136,8 @@ namespace wali
      * @param - dup: the state whose properties are being set
      *
      */
-    template<typename Client>
-    void StateSet<Client>::dupState( St orig, St dup )
+    
+    void StateSet::dupState( St orig, St dup )
     {
       if( isInitialState(orig) )
         addInitialState(dup);
