@@ -12,19 +12,7 @@
 #include "wali/ref_ptr.hpp"
 #include "wali/nwa/ClientInfo.hpp"
 
-using namespace wali::nwa;
-template class StateSet<ClientInfo>;
-template class TransInfo<int, int>;
-template class NWA<ClientInfo>;
-
-int retByVal() {
-	return 5;
-}
-
-int foo() {
-	int const & v = retByVal();
-	return 0;
-}
+int main() {}
 
 #if 0
 class STR
