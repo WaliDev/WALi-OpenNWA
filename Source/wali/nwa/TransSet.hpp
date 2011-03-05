@@ -35,13 +35,13 @@ namespace wali
         typedef std::set<St> States;
         typedef States::const_iterator stateIterator;
 
-        typedef TransInfo<St,St>::Call Call;
-        typedef TransInfo<St,St>::Internal Internal;
-        typedef TransInfo<St,St>::Return Return;
+        typedef TransInfo::Call Call;
+        typedef TransInfo::Internal Internal;
+        typedef TransInfo::Return Return;
 
-        typedef TransInfo<St,St>::Calls Calls;
-        typedef TransInfo<St,St>::Internals Internals;
-        typedef TransInfo<St,St>::Returns Returns;
+        typedef TransInfo::Calls Calls;
+        typedef TransInfo::Internals Internals;
+        typedef TransInfo::Returns Returns;
         
         typedef Calls::const_iterator callIterator;
         typedef Internals::const_iterator internalIterator;
@@ -72,7 +72,7 @@ namespace wali
 
 #undef DEFINE_FAKE_STATIC_DATA
         
-        typedef TransInfo<St,Sym> Info;
+        typedef TransInfo Info;
       
       //
       // Methods
