@@ -7,7 +7,7 @@
 import os, os.path, platform
 
 Debug = True
-DefaultEnvironment(MSVC_USE_SCRIPT=False)
+DefaultEnvironment(MSVC_USE_SCRIPT=False) # for Windows
 
 #(platform_bits,linkage) = platform.architecture()
 if platform.machine() == 'i686':
@@ -23,8 +23,7 @@ else:
 Platform       = platform.system()
 MkStatic       = (Platform == 'Windows')
 WaliDir        = os.getcwd()
-BaseEnv        = Environment(MSVC_USE_SCRIPT=False, CCFLAGS='/EHsc /DWIN32 /MD')
-BaseEnv['ENV']=os.environ
+BaseEnv        = Environment(MSVC_USE_SCRIPT=False)
 Is64           = (platform_bits == 64)
 
 ThirtyTwoBitAliases=['32', 'x86', 'ia_32', 'ia32']
@@ -62,7 +61,7 @@ if 'gcc' == BaseEnv['CC']:
         BaseEnv.Append(LINKFLAGS='-m32')
 elif 'cl' == BaseEnv['CC']:
     # Mostly copied from VS C++ 2005 Command line
-    BaseEnv.Append(CFLAGS='/TP /errorReport:prompt /Wp64 /W4 /GR /MTd /EHsc')
+    BaseEnv.Append(CFLAGS='/TP /errorReport:prompt /Wp64 /W4 /GR /MD /EHsc /DWIN32')
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
 
 ## Only supporting 32 bit on Darwin to not deal w/ Leopard/Snow Leopard diffs
