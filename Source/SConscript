@@ -85,6 +85,7 @@ wali_files = Split("""
 ./wali/nwa/StateSet.cpp
 ./wali/nwa/TransInfo.cpp
 ./wali/nwa/TransSet.cpp
+./wali/nwa/NwaParser.cpp
 ./wali/nws/NWS.cpp
 ./wali/nws/NWSNode.cpp
 """)
