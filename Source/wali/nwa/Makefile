@@ -1,6 +1,10 @@
 CXXFLAGS=-I../.. -m32 -g
 LDFLAGS=-lwali -L../../../lib -m32 -g
 
+run-tests: NwaParserTests
+	echo "Running tests:"
+	./NwaParserTests 3
+
 NwaParserTests: NwaParserMain.o wali
 	$(CXX) $(LDFLAGS) -o $@ $< $(LOADLIBES) $(LDLIBS)
 
