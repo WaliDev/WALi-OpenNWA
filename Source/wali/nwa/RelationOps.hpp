@@ -3,6 +3,8 @@
 
 #include <algorithm>
 #include <iterator>
+#include <deque>
+#include <vector>
 #include <map>
 #include <set>
 
