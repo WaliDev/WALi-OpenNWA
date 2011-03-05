@@ -41,6 +41,9 @@ namespace wali
 {
   namespace nwa
   {
+    typedef Key St;
+    typedef Key Sym;
+
     class ReachGen : public wali::nwa::WeightGen<ClientInfo>
     {
       public:
@@ -82,8 +85,6 @@ namespace wali
         typedef ClientInfo Client;
         typedef ref_ptr<NWA> NWARefPtr;
 
-        typedef Key St;
-        typedef Key Sym;
         typedef wali::nwa::StateSet States;
         typedef  States::const_iterator stateIterator;
         typedef  States::ClientInfoRefPtr ClientInfoRefPtr;

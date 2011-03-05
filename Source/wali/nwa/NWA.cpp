@@ -104,7 +104,7 @@ namespace wali
      */
     
     inline
-    const std::set< NWA::St> & NWA::getStates( ) const
+    const std::set<St> & NWA::getStates( ) const
     {
       return states.getStates();
     }
@@ -120,7 +120,7 @@ namespace wali
      */
     
     inline
-    const std::set< NWA::St> & NWA::get_states( ) const
+    const std::set<St> & NWA::get_states( ) const
     {
       return getStates();
     }
@@ -258,7 +258,7 @@ namespace wali
      */
     
     inline
-    const std::set< NWA::St> & NWA::getInitialStates( ) const
+    const std::set<St> & NWA::getInitialStates( ) const
     {
       return states.getInitialStates();
     }
@@ -348,7 +348,7 @@ namespace wali
      */
     
     inline
-    const std::set< NWA::St> & NWA::getFinalStates( ) const
+    const std::set< St> & NWA::getFinalStates( ) const
     {
       return states.getFinalStates();
     }
@@ -450,7 +450,7 @@ namespace wali
      */
     
     inline
-    const std::set< NWA::Sym> & NWA::getSymbols( ) const
+    const std::set< Sym> & NWA::getSymbols( ) const
     {
       return symbols.getSymbols();
     }
@@ -595,7 +595,7 @@ namespace wali
 	 *
      */
     
-    const std::set< NWA::Sym> NWA::getSymbols( St source, St target ) const
+    const std::set< Sym> NWA::getSymbols( St source, St target ) const
     {
       assert(source < wali::WALI_BAD_KEY);
       assert(target < wali::WALI_BAD_KEY);
@@ -635,7 +635,7 @@ namespace wali
 	 *
      */
     
-    const std::set< NWA::Sym> NWA::getSymbolsFrom( St source ) const
+    const std::set< Sym> NWA::getSymbolsFrom( St source ) const
     {
       assert(source < wali::WALI_BAD_KEY);
 
@@ -671,7 +671,7 @@ namespace wali
 	 *
      */
     
-    const std::set< NWA::Sym> NWA::getSymbolsTo( St target ) const
+    const std::set< Sym> NWA::getSymbolsTo( St target ) const
     {
       assert(target < wali::WALI_BAD_KEY);
 
@@ -732,7 +732,7 @@ namespace wali
 	   *
      */
 	  
-    const std::set< NWA::St> NWA::getPredecessors( St state ) const
+    const std::set< St> NWA::getPredecessors( St state ) const
     {
 	    std::set<St> preds;
       getPredecessors(state, preds);
@@ -785,7 +785,7 @@ namespace wali
 	   *
      */
 	  
-    const std::set< NWA::St> NWA::getPredecessors( Sym symbol, St state ) const
+    const std::set< St> NWA::getPredecessors( Sym symbol, St state ) const
     {
   	   std::set<St> preds;
       getPredecessors(symbol, state, preds);
@@ -826,7 +826,7 @@ namespace wali
 	   *
      */
 	  
-    const std::set< NWA::St> NWA::getSuccessors( St state ) const
+    const std::set< St> NWA::getSuccessors( St state ) const
     {
   	   std::set<St> succs;
       getSuccessors(state, succs);
@@ -879,7 +879,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::St> NWA::getSuccessors( St state, Sym symbol ) const
+    const std::set< St> NWA::getSuccessors( St state, Sym symbol ) const
     {
        std::set<St> succs;
       getSuccessors(state, symbol, succs);
@@ -898,7 +898,7 @@ namespace wali
 	 *
      */
     
-    const std::set< NWA::Sym> NWA::getCallRetSymbols( St call, St ret ) const
+    const std::set< Sym> NWA::getCallRetSymbols( St call, St ret ) const
     {
       assert(call < wali::WALI_BAD_KEY);
       assert(ret < wali::WALI_BAD_KEY);
@@ -926,7 +926,7 @@ namespace wali
 	 *
      */
     
-    const std::set< NWA::Sym> NWA::getCallRetSymbolsFrom( St call ) const
+    const std::set< Sym> NWA::getCallRetSymbolsFrom( St call ) const
     {
       assert(call < wali::WALI_BAD_KEY);
 
@@ -952,7 +952,7 @@ namespace wali
 	 *
      */
     
-    const std::set< NWA::Sym> NWA::getCallRetSymbolsTo( St ret ) const
+    const std::set< Sym> NWA::getCallRetSymbolsTo( St ret ) const
     {
       assert(ret < wali::WALI_BAD_KEY);
 
@@ -993,7 +993,7 @@ namespace wali
 	 *
      */
 	
-  const std::set< NWA::St> NWA::getCallPredecessors( St state ) const
+  const std::set< St> NWA::getCallPredecessors( St state ) const
     {
       assert(state < wali::WALI_BAD_KEY);
       
@@ -1038,7 +1038,7 @@ namespace wali
 	 *
      */
 	
-  const std::set< NWA::St> NWA::getCallPredecessors( Sym symbol, St state ) const
+  const std::set< St> NWA::getCallPredecessors( Sym symbol, St state ) const
     {
        std::set<St> c_preds;
       getCallPredecessors(symbol, state, c_preds);
@@ -1071,7 +1071,7 @@ namespace wali
 	 *
      */
 	
-  const std::set< NWA::St> NWA::getCallSuccessors( St state ) const
+  const std::set< St> NWA::getCallSuccessors( St state ) const
     {
        std::set<St> c_succs;
       getCallSuccessors(state, c_succs);
@@ -1114,7 +1114,7 @@ namespace wali
 	 *
      */
 	
-  const std::set< NWA::St> NWA::getCallSuccessors( St state, Sym symbol ) const
+  const std::set< St> NWA::getCallSuccessors( St state, Sym symbol ) const
     {
        std::set<St> c_succs;
       getCallSuccessors(state, symbol, c_succs);
@@ -1290,7 +1290,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::St> NWA::getCallSites_Sym( Sym symbol ) const
+    const std::set< St> NWA::getCallSites_Sym( Sym symbol ) const
     {
       assert(symbol < wali::WALI_BAD_KEY);
 
@@ -1317,7 +1317,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::St> NWA::getCallSites( Sym symbol, St entryPoint ) const
+    const std::set< St> NWA::getCallSites( Sym symbol, St entryPoint ) const
     {
       assert(entryPoint < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
@@ -1344,7 +1344,7 @@ namespace wali
      *
      */
     
-    const std::set<std::pair< NWA::St, NWA::Sym> > NWA::getCallSites( St entryPoint ) const
+    const std::set<std::pair< St, Sym> > NWA::getCallSites( St entryPoint ) const
     {
       assert(entryPoint < wali::WALI_BAD_KEY);
 
@@ -1365,7 +1365,7 @@ namespace wali
 	 *
      */
 	
-    const std::set< NWA::St> NWA::getCallSites( ) const
+    const std::set< St> NWA::getCallSites( ) const
     {
       const Calls & call = trans.getCalls();
        std::set<St> calls;
@@ -1384,7 +1384,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::Sym> NWA::getCallSym(  ) const
+    const std::set< Sym> NWA::getCallSym(  ) const
     {
       const Calls & calls = trans.getCalls();
        std::set<Sym> syms;
@@ -1407,7 +1407,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::Sym> NWA::getCallSym( St callSite, St entryPoint ) const
+    const std::set< Sym> NWA::getCallSym( St callSite, St entryPoint ) const
     {
       assert(callSite < wali::WALI_BAD_KEY);
       assert(entryPoint < wali::WALI_BAD_KEY);
@@ -1433,7 +1433,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::Sym> NWA::getCallSym_Call( St callSite ) const
+    const std::set< Sym> NWA::getCallSym_Call( St callSite ) const
     {
       assert(callSite < wali::WALI_BAD_KEY);
 
@@ -1457,7 +1457,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::Sym> NWA::getCallSym_Entry( St entryPoint ) const
+    const std::set< Sym> NWA::getCallSym_Entry( St entryPoint ) const
     {
       assert(entryPoint < wali::WALI_BAD_KEY);
 
@@ -1479,7 +1479,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::St> NWA::getEntries_Sym( Sym symbol ) const
+    const std::set< St> NWA::getEntries_Sym( Sym symbol ) const
     {
       assert(symbol < wali::WALI_BAD_KEY);
 
@@ -1505,7 +1505,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::St> NWA::getEntries( St callSite, Sym symbol ) const
+    const std::set< St> NWA::getEntries( St callSite, Sym symbol ) const
     {
       assert(callSite < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
@@ -1529,7 +1529,7 @@ namespace wali
      *
      */
     
-    const std::set<std::pair< NWA::Sym, NWA::St> > NWA::getEntries( St callSite ) const
+    const std::set<std::pair< Sym, St> > NWA::getEntries( St callSite ) const
     {
       assert(callSite < wali::WALI_BAD_KEY);
       const Calls & ent = trans.getTransCall(callSite);
@@ -1549,7 +1549,7 @@ namespace wali
 	 *
      */
 	
-    const std::set< NWA::St> NWA::getEntries( ) const
+    const std::set< St> NWA::getEntries( ) const
     {
       const Calls & call = trans.getCalls();
        std::set<St> entries;
@@ -1706,7 +1706,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::St> NWA::getSources_Sym( Sym symbol ) const
+    const std::set< St> NWA::getSources_Sym( Sym symbol ) const
     {
       assert(symbol < wali::WALI_BAD_KEY);
 
@@ -1732,7 +1732,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::St> NWA::getSources( Sym symbol, St target ) const
+    const std::set< St> NWA::getSources( Sym symbol, St target ) const
     {
       assert(target < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
@@ -1759,7 +1759,7 @@ namespace wali
      *
      */
     
-    const std::set<std::pair< NWA::St, NWA::Sym> > NWA::getSources( St target ) const
+    const std::set<std::pair< St, Sym> > NWA::getSources( St target ) const
     {
       assert(target < wali::WALI_BAD_KEY);
 
@@ -1780,7 +1780,7 @@ namespace wali
 	 *
      */
 	
-    const std::set< NWA::St> NWA::getSources(  ) const
+    const std::set< St> NWA::getSources(  ) const
     {
       const Internals & src = trans.getInternals();
        std::set<St> sources;
@@ -1799,7 +1799,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::Sym> NWA::getInternalSym(  ) const
+    const std::set< Sym> NWA::getInternalSym(  ) const
     {
       const Internals & ints = trans.getInternals();
        std::set<Sym> syms;
@@ -1822,7 +1822,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::Sym> NWA::getInternalSym( St source, St target ) const
+    const std::set< Sym> NWA::getInternalSym( St source, St target ) const
     {
       const Internals & ints = trans.getTransFrom(source);
        std::set<Sym> syms;
@@ -1845,7 +1845,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::Sym> NWA::getInternalSym_Source( St source ) const
+    const std::set< Sym> NWA::getInternalSym_Source( St source ) const
     {
       const Internals & ints = trans.getTransFrom(source);
        std::set<Sym> syms;
@@ -1867,7 +1867,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::Sym> NWA::getInternalSym_Target( St target ) const
+    const std::set< Sym> NWA::getInternalSym_Target( St target ) const
     {
       const Internals & ints = trans.getTransTo(target);
        std::set<Sym> syms;
@@ -1887,7 +1887,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::St> NWA::getTargets_Sym( Sym symbol ) const
+    const std::set< St> NWA::getTargets_Sym( Sym symbol ) const
     {
       assert(symbol < wali::WALI_BAD_KEY);
 
@@ -1914,7 +1914,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::St> NWA::getTargets( St source, Sym symbol ) const
+    const std::set< St> NWA::getTargets( St source, Sym symbol ) const
     {
       assert(source < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
@@ -1938,7 +1938,7 @@ namespace wali
      *
      */
     
-    const std::set<std::pair< NWA::Sym, NWA::St> > NWA::getTargets( St source ) const
+    const std::set<std::pair< Sym, St> > NWA::getTargets( St source ) const
     {
       assert(source < wali::WALI_BAD_KEY);
       const Internals & tgt = trans.getTransFrom(source);
@@ -1958,7 +1958,7 @@ namespace wali
 	 *
      */
     
-    const std::set< NWA::St> NWA::getTargets(  ) const
+    const std::set< St> NWA::getTargets(  ) const
     {
       const Internals & tgt = trans.getInternals();
        std::set<St> targets;
@@ -2110,7 +2110,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::St> NWA::getExits_Sym( Sym symbol ) const
+    const std::set< St> NWA::getExits_Sym( Sym symbol ) const
     {
       assert(symbol < wali::WALI_BAD_KEY);
 
@@ -2139,7 +2139,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::St> NWA::getExits( St callSite, Sym symbol, St returnSite ) const
+    const std::set< St> NWA::getExits( St callSite, Sym symbol, St returnSite ) const
     {
       assert(callSite < wali::WALI_BAD_KEY);
       assert(returnSite < wali::WALI_BAD_KEY);
@@ -2169,7 +2169,7 @@ namespace wali
      *
      */
     
-    const std::set<std::pair< NWA::St, NWA::Sym> > NWA::getExits( St callSite, St returnSite ) const
+    const std::set<std::pair< St, Sym> > NWA::getExits( St callSite, St returnSite ) const
     {
       assert(callSite < wali::WALI_BAD_KEY);
       assert(returnSite < wali::WALI_BAD_KEY);
@@ -2194,7 +2194,7 @@ namespace wali
 	 *
      */
 	
-    const std::set< NWA::St> NWA::getExits( ) const
+    const std::set< St> NWA::getExits( ) const
     {
       const Returns & exit = trans.getReturns();
        std::set<St> exits;
@@ -2217,7 +2217,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::St> NWA::getExits_Call( St callSite, Sym symbol ) const
+    const std::set< St> NWA::getExits_Call( St callSite, Sym symbol ) const
     {
       assert(callSite < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
@@ -2244,7 +2244,7 @@ namespace wali
      *
      */
     
-    const std::set<std::pair< NWA::St, NWA::Sym> > NWA::getExits_Call( St callSite ) const
+    const std::set<std::pair< St, Sym> > NWA::getExits_Call( St callSite ) const
     {
       assert(callSite < wali::WALI_BAD_KEY);
 
@@ -2269,7 +2269,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::St> NWA::getExits_Ret( Sym symbol, St returnSite ) const
+    const std::set< St> NWA::getExits_Ret( Sym symbol, St returnSite ) const
     {
       assert(returnSite < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
@@ -2296,7 +2296,7 @@ namespace wali
      *
      */
     
-    const std::set<std::pair< NWA::St, NWA::Sym> > NWA::getExits_Ret( St returnSite ) const
+    const std::set<std::pair< St, Sym> > NWA::getExits_Ret( St returnSite ) const
     {
       assert(returnSite < wali::WALI_BAD_KEY);
 
@@ -2318,7 +2318,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::St> NWA::getCalls_Sym( Sym symbol ) const
+    const std::set< St> NWA::getCalls_Sym( Sym symbol ) const
     {
       assert(symbol < wali::WALI_BAD_KEY);
 
@@ -2347,7 +2347,7 @@ namespace wali
      * 
      */
     
-    const std::set< NWA::St> NWA::getCalls( St exitPoint, Sym symbol, St returnSite ) const
+    const std::set< St> NWA::getCalls( St exitPoint, Sym symbol, St returnSite ) const
     {
       assert(exitPoint < wali::WALI_BAD_KEY);
       assert(returnSite < wali::WALI_BAD_KEY);
@@ -2377,7 +2377,7 @@ namespace wali
      *
      */
     
-    const std::set<std::pair< NWA::St, NWA::Sym> > NWA::getCalls( St exitPoint, St returnSite ) const
+    const std::set<std::pair< St, Sym> > NWA::getCalls( St exitPoint, St returnSite ) const
     {
       assert(exitPoint < wali::WALI_BAD_KEY);
       assert(returnSite < wali::WALI_BAD_KEY);
@@ -2402,7 +2402,7 @@ namespace wali
 	 *
      */
 	
-    const std::set< NWA::St> NWA::getCalls( ) const
+    const std::set< St> NWA::getCalls( ) const
     {
       const Returns call = trans.getReturns();
        std::set<St> calls;
@@ -2425,7 +2425,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::St> NWA::getCalls_Exit( St exitPoint, Sym symbol ) const
+    const std::set< St> NWA::getCalls_Exit( St exitPoint, Sym symbol ) const
     {
       assert(exitPoint < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
@@ -2451,7 +2451,7 @@ namespace wali
      *
      */
     
-    const std::set<std::pair< NWA::St, NWA::Sym> > NWA::getCalls_Exit( St exitPoint ) const
+    const std::set<std::pair< St, Sym> > NWA::getCalls_Exit( St exitPoint ) const
     {
       assert(exitPoint < wali::WALI_BAD_KEY);
 
@@ -2476,7 +2476,7 @@ namespace wali
      *
      */
     
-    const  std::set< NWA::St> NWA::getCalls_Ret( Sym symbol, St returnSite ) const
+    const  std::set< St> NWA::getCalls_Ret( Sym symbol, St returnSite ) const
     {
       assert(returnSite < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
@@ -2503,7 +2503,7 @@ namespace wali
      *
      */
     
-    const std::set<std::pair< NWA::St, NWA::Sym> > NWA::getCalls_Ret( St returnSite ) const
+    const std::set<std::pair< St, Sym> > NWA::getCalls_Ret( St returnSite ) const
     {
       assert(returnSite < wali::WALI_BAD_KEY);
 
@@ -2524,7 +2524,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::Sym> NWA::getReturnSym(  ) const
+    const std::set< Sym> NWA::getReturnSym(  ) const
     {
       const Returns rets = trans.getReturns();
        std::set<Sym> syms;
@@ -2548,7 +2548,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::Sym> NWA::getReturnSym( St exitPoint, St callSite, St returnSite  ) const
+    const std::set< Sym> NWA::getReturnSym( St exitPoint, St callSite, St returnSite  ) const
       {
       assert(exitPoint < wali::WALI_BAD_KEY);
       assert(callSite < wali::WALI_BAD_KEY);
@@ -2577,7 +2577,7 @@ namespace wali
        *
        */
     
-    const std::set< NWA::Sym> NWA::getReturnSym_Exit( St exitPoint ) const
+    const std::set< Sym> NWA::getReturnSym_Exit( St exitPoint ) const
       {
       assert(exitPoint < wali::WALI_BAD_KEY);
 
@@ -2601,7 +2601,7 @@ namespace wali
        *
        */
     
-    const std::set< NWA::Sym> NWA::getReturnSym_Call( St callSite ) const
+    const std::set< Sym> NWA::getReturnSym_Call( St callSite ) const
       {
       assert(callSite < wali::WALI_BAD_KEY);
 
@@ -2625,7 +2625,7 @@ namespace wali
        *
        */
     
-    const std::set< NWA::Sym> NWA::getReturnSym_Ret( St returnSite ) const
+    const std::set< Sym> NWA::getReturnSym_Ret( St returnSite ) const
       {
       assert(returnSite < wali::WALI_BAD_KEY);
 
@@ -2650,7 +2650,7 @@ namespace wali
        *
        */
 
-    const std::set< NWA::Sym> NWA::getReturnSym_ExitCall( St exitPoint, St callSite  ) const
+    const std::set< Sym> NWA::getReturnSym_ExitCall( St exitPoint, St callSite  ) const
       {
       assert(exitPoint < wali::WALI_BAD_KEY);
       assert(callSite < wali::WALI_BAD_KEY);
@@ -2679,7 +2679,7 @@ namespace wali
        *
        */
     
-    const std::set< NWA::Sym> NWA::getReturnSym_ExitRet( St exitPoint, St returnSite  ) const
+    const std::set< Sym> NWA::getReturnSym_ExitRet( St exitPoint, St returnSite  ) const
       {
       assert(exitPoint < wali::WALI_BAD_KEY);
       assert(returnSite < wali::WALI_BAD_KEY);
@@ -2708,7 +2708,7 @@ namespace wali
        *
        */
     
-    const std::set< NWA::Sym> NWA::getReturnSym_CallRet( St callSite, St returnSite  ) const
+    const std::set< Sym> NWA::getReturnSym_CallRet( St callSite, St returnSite  ) const
       {
       assert(callSite < wali::WALI_BAD_KEY);
       assert(returnSite < wali::WALI_BAD_KEY);
@@ -2736,7 +2736,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::St> NWA::getReturns_Sym( Sym symbol ) const
+    const std::set< St> NWA::getReturns_Sym( Sym symbol ) const
     {
       assert(symbol < wali::WALI_BAD_KEY);
       
@@ -2765,7 +2765,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::St> NWA::getReturns( St exitPoint, St callSite, Sym symbol ) const
+    const std::set< St> NWA::getReturns( St exitPoint, St callSite, Sym symbol ) const
     {
       assert(exitPoint < wali::WALI_BAD_KEY);
       assert(callSite < wali::WALI_BAD_KEY);
@@ -2795,7 +2795,7 @@ namespace wali
      *
      */
     
-    const std::set<std::pair< NWA::Sym, NWA::St> > NWA::getReturns( St exit, St callSite ) const
+    const std::set<std::pair< Sym, St> > NWA::getReturns( St exit, St callSite ) const
     {
       assert(exit < wali::WALI_BAD_KEY);
       assert(callSite < wali::WALI_BAD_KEY);
@@ -2820,7 +2820,7 @@ namespace wali
 	 *
      */
 	
-    const std::set< NWA::St> NWA::getReturns( ) const
+    const std::set< St> NWA::getReturns( ) const
     {
       const Returns ret = trans.getReturns();
        std::set<St> returns;
@@ -2843,7 +2843,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::St> NWA::getReturns_Exit( St exitPoint, Sym symbol ) const
+    const std::set< St> NWA::getReturns_Exit( St exitPoint, Sym symbol ) const
     {
       assert(exitPoint < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
@@ -2869,7 +2869,7 @@ namespace wali
      *
      */
     
-    const std::set<std::pair< NWA::Sym, NWA::St> > NWA::getReturns_Exit( St exitPoint ) const
+    const std::set<std::pair< Sym, St> > NWA::getReturns_Exit( St exitPoint ) const
     {
       assert(exitPoint < wali::WALI_BAD_KEY);
 
@@ -2894,7 +2894,7 @@ namespace wali
      *
      */
     
-    const std::set< NWA::St> NWA::getReturns_Call( St callSite, Sym symbol ) const
+    const std::set< St> NWA::getReturns_Call( St callSite, Sym symbol ) const
     {
       assert(callSite < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
@@ -2920,7 +2920,7 @@ namespace wali
      *
      */
     
-    const std::set<std::pair< NWA::Sym, NWA::St> > NWA::getReturns_Call( St callSite ) const
+    const std::set<std::pair< Sym, St> > NWA::getReturns_Call( St callSite ) const
     {
       assert(callSite < wali::WALI_BAD_KEY);
 
@@ -2943,7 +2943,7 @@ namespace wali
      */
     
     inline
-    const std::set< NWA::St> NWA::getReturnSites( St callSite ) const
+    const std::set< St> NWA::getReturnSites( St callSite ) const
     {
       assert(callSite < wali::WALI_BAD_KEY);
       return trans.getReturnSites(callSite);
@@ -4898,7 +4898,7 @@ namespace wali
 
 #ifdef USE_BUDDY
     
-     NWA::St NWA::makeKey(
+     St NWA::makeKey(
        relations::RelationTypedefs<St>::BinaryRelation const & R ) const
     {
       std::stringstream ss;
@@ -4915,7 +4915,7 @@ namespace wali
      *
      */
     
-     NWA::St NWA::makeKey(
+     St NWA::makeKey(
        relations::RelationTypedefs<St>::BinaryRelation const & R ) const
     {
       // C++ really needs C++0x's 'auto' keyword :-)
