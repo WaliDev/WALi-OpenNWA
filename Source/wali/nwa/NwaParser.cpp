@@ -369,6 +369,7 @@ typedef wali::Quad<wali::Key, wali::Key, wali::Key, wali::Key> KeyQuad;
 using wali::getKey;
 using wali::make_triple;
 using wali::make_quad;
+using wali::nwa::NWARefPtr;
 
 static
 KeyTriple
@@ -634,7 +635,7 @@ test_read_lists()
 
 static
 void
-read_sigma_block(std::istream & is)
+read_sigma_block(std::istream & is, NWARefPtr nwa)
 {
     // Read the 'Sigma:' block header, then the optional {
     read_lit(is, "Sigma:");
@@ -644,6 +645,12 @@ read_sigma_block(std::istream & is)
 
     std::vector<std::string> sigmas = read_name_list(is);
 
+    // Now insert those things into the NWA
+    for (size_t i=0; i<sigmas.size(); ++i) {
+        nwa->addSymbol(getKey(sigmas[i]));
+    }
+
+    // And eat the optional }
     if(is.peek() == '}') {
         read_lit(is, "}");
     }
@@ -652,7 +659,7 @@ read_sigma_block(std::istream & is)
 
 static
 void
-read_state_block(std::istream & is)
+read_state_block(std::istream & is, NWARefPtr nwa)
 {
     // Figure out if it's "Q:", "Q0:", or "Qf:". Read over the block
     // intro. Set the initial/final variables appropriately.
@@ -677,7 +684,21 @@ read_state_block(std::istream & is)
 
     // Actually read the list of states, then add them to the NWA.
     std::vector<std::string> states = read_name_list(is);
-    // TODO: add to NWA - Evan 3/4/11
+
+    // Now insert those things into the NWA
+    for (size_t i=0; i<states.size(); ++i) {
+        wali::Key state = wali::getKey(states[i]);
+        if (initial) {
+            nwa->addInitialState(state);
+        }
+        else if (final) {
+            nwa->addFinalState(state);
+        }
+        else {
+            nwa->addState(state);
+        }
+    }
+    
 
     // Skip over the optional } if it's present.
     if(is.peek() == '}') {
@@ -688,7 +709,7 @@ read_state_block(std::istream & is)
 
 static
 void
-read_delta_block(std::istream & is)
+read_delta_block(std::istream & is, NWARefPtr nwa)
 {
     // Figure out if it's "delta_i", "delta_c", or "delta_r". Read over the
     // block intro. Set the call/return_ variable appropriately.
@@ -716,11 +737,20 @@ read_delta_block(std::istream & is)
     // transitions or not.
     if(!return_) {
         std::vector<KeyTriple> triples = read_triple_list(is);
-        // TODO: add to NWA -Evan 3/4/11
+        for (size_t i=0; i<triples.size(); ++i) {
+            if (call) {
+                nwa->addCallTrans(triples[i]);
+            }
+            else {
+                nwa->addInternalTrans(triples[i]);
+            }
+        }
     }
     else {
         std::vector<KeyQuad> quads = read_quad_list(is);
-        // TODO: add to NWA -Evan 3/4/11
+        for (size_t i=0; i<quads.size(); ++i) {
+            nwa->addReturnTrans(quads[i]);
+        }
     }
 
     // Skip the optional } if it's present
@@ -734,6 +764,8 @@ static
 void
 test_read_blocks()
 {
+    NWARefPtr nwa = new wali::nwa::NWA(getKey("ha ha"));
+    
     // These tests call read_*_block (implicitly making sure there are no
     // exceptions or assertions), then make sure they read everything they
     // should. For the first few tests, that means reading to the
@@ -744,11 +776,11 @@ test_read_blocks()
     std::stringstream ss4("Q: { a, b }");
     std::stringstream ss5("Q: a, b ");
 
-    read_state_block(ss1);
-    read_state_block(ss2);
-    read_state_block(ss3);
-    read_state_block(ss4);
-    read_state_block(ss5);
+    read_state_block(ss1, nwa);
+    read_state_block(ss2, nwa);
+    read_state_block(ss3, nwa);
+    read_state_block(ss4, nwa);
+    read_state_block(ss5, nwa);
 
     assert(ss1.peek() == -1);
     assert(ss2.peek() == -1);
@@ -761,10 +793,10 @@ test_read_blocks()
     std::stringstream ss8("Q0: a, b Z");
     std::stringstream ss9("Sigma: a Z");
 
-    read_state_block(ss6);
-    read_state_block(ss7);
-    read_state_block(ss8);
-    read_sigma_block(ss9);
+    read_state_block(ss6, nwa);
+    read_state_block(ss7, nwa);
+    read_state_block(ss8, nwa);
+    read_sigma_block(ss9, nwa);
 
     assert(ss6.peek() == 'Z');
     assert(ss7.peek() == 'Z');
@@ -775,9 +807,9 @@ test_read_blocks()
     std::stringstream ss11("Delta_c: (a, b, c), (a, b, c) Z");
     std::stringstream ss12("Delta_r: (a, b, c, d), (a, b, c, d) Z");
 
-    read_delta_block(ss10);
-    read_delta_block(ss11);
-    read_delta_block(ss12);
+    read_delta_block(ss10, nwa);
+    read_delta_block(ss11, nwa);
+    read_delta_block(ss12, nwa);
 
     assert(ss10.peek() == 'Z');
     assert(ss11.peek() == 'Z');
@@ -797,12 +829,12 @@ test_read_blocks()
 
 static
 void
-read_block(std::istream & is)
+read_block(std::istream & is, NWARefPtr nwa)
 {
     switch (is.peek()) {
-      case 'Q': read_state_block(is); break;
-      case 'S': read_sigma_block(is); break;
-      case 'D': read_delta_block(is); break;
+      case 'Q': read_state_block(is, nwa); break;
+      case 'S': read_sigma_block(is, nwa); break;
+      case 'D': read_delta_block(is, nwa); break;
       default: {
         std::cerr << "Lookahead char: " << (char)is.peek() << "\nNext lines:\n";
         std::string s;
@@ -826,27 +858,34 @@ read_block(std::istream & is)
 namespace wali {
     namespace nwa {
 
-        void
+        NWARefPtr
         read_nwa(std::istream & is)
         {
+            // Come up with a stuck state
+            static int gen_number = 0;
+            std::stringstream ss;
+            ss << "[stuck-parse-" << gen_number << "]";
+            Key stuck = getKey(ss.str());
+
+            // Create the NWA
+            NWARefPtr nwa = new NWA(stuck);
+
+            // Skip over a bunch of stuff: opening whitespace, the optional
+            // 'nwa:', and the optional '{'
             discardws(is);
-    
-            // Skip over the 'nwa:' if present
             if (is.peek() == 'n') {
                 read_lit(is, "nwa:");
             }
-
-            // Skip over the { if present
             if (is.peek() == '{') {
                 read_lit(is, "{");
             }
 
-            // while we're not at the end of the NWA, read a block
+            // Now read in the actual NWA, until we reach the end of that spec
             while(is.peek() != -1 && is.peek() != '}') {
-                read_block(is);
+                read_block(is, nwa);
             }
 
-            // Skip over the } if present
+            // Skip over the } if that's what ended us
             if (is.peek() == '}') {
                 read_lit(is, "}");
             }

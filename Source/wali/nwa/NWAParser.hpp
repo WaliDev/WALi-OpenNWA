@@ -6,7 +6,7 @@
 
 namespace wali {
     namespace nwa {
-        extern void read_nwa(std::istream & is);
+        extern NWARefPtr read_nwa(std::istream & is);
         extern void test_all();
     }
 }
