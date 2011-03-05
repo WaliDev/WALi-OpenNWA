@@ -61,7 +61,7 @@ if 'gcc' == BaseEnv['CC']:
         BaseEnv.Append(LINKFLAGS='-m32')
 elif 'cl' == BaseEnv['CC']:
     # Mostly copied from VS C++ 2005 Command line
-    BaseEnv.Append(CFLAGS='/TP /errorReport:prompt /Wp64 /W4 /GR /MD /EHsc /DWIN32')
+    BaseEnv.Append(CFLAGS='/TP /errorReport:prompt /Wp64 /W4 /GR /MTd /EHsc /DWIN32')
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
 
 ## Only supporting 32 bit on Darwin to not deal w/ Leopard/Snow Leopard diffs
