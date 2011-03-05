@@ -96,7 +96,6 @@ namespace wali
      *
      */
     
-    inline
     void StateSet::clearInitialStates( )
     { 
       initialStates.clear();
@@ -108,7 +107,6 @@ namespace wali
      *
      */
     
-    inline
     void StateSet::clearFinalStates( )
     {
       finalStates.clear();
@@ -123,7 +121,6 @@ namespace wali
      *
      */
     
-    inline
     bool StateSet::isState( St state ) const
     {
       return (states.count(state) > 0);
@@ -138,7 +135,6 @@ namespace wali
      *
      */
     
-    inline
     bool StateSet::isInitialState( St initialState ) const
     {
       return (initialStates.count(initialState) > 0);
@@ -153,7 +149,6 @@ namespace wali
      *
      */
     
-    inline
     bool StateSet::isFinalState( St finalState ) const
     {
       return (finalStates.count(finalState) > 0);
@@ -432,7 +427,6 @@ namespace wali
      *
      */
     
-    inline
     StateSet::const_iterator StateSet::beginStates( ) const
     {
       return states.begin();
@@ -446,7 +440,6 @@ namespace wali
      *
      */
     
-    inline
     StateSet::const_iterator StateSet::beginInitialStates( ) const
     {
       return initialStates.begin();
@@ -460,7 +453,6 @@ namespace wali
      *
      */
     
-    inline
     StateSet::const_iterator StateSet::beginFinalStates( ) const
     {
       return finalStates.begin();
@@ -474,7 +466,6 @@ namespace wali
      *
      */
     
-    inline
     StateSet::const_iterator StateSet::endStates( ) const
     {
       return states.end();
@@ -488,7 +479,6 @@ namespace wali
      *
      */
     
-    inline
     StateSet::const_iterator StateSet::endInitialStates( ) const
     {
       return initialStates.end();
@@ -502,7 +492,6 @@ namespace wali
      *
      */
     
-    inline
     StateSet::const_iterator StateSet::endFinalStates( ) const
     {
       return finalStates.end();
@@ -555,7 +544,6 @@ namespace wali
      *
      */
     
-    inline
     size_t StateSet::sizeStates( ) const
     {
       return states.size();
@@ -569,7 +557,6 @@ namespace wali
      *
      */
     
-    inline
     size_t StateSet::sizeInitialStates( ) const
     {
       return initialStates.size();
@@ -583,7 +570,6 @@ namespace wali
      *
      */
     
-    inline
     size_t StateSet::sizeFinalStates( ) const
     {
       return finalStates.size();
