@@ -76,6 +76,16 @@ namespace wali
    */
   typedef Triple< Key,Key,Key > KeyTriple;
 
+  /**
+   * Return a Triple with the given types (analgous to std::make_pair)
+   */
+  template< typename T,typename U,typename V >
+  Triple<T, U, V>
+  make_triple(T const & t, U const & u, V const & v)
+  {
+    return Triple<T, U, V>(t, u, v);
+  }
+
   // @author Amanda Burton
   /**
    * @class Quad
@@ -136,6 +146,17 @@ namespace wali
    * KeyQuad
    */
   typedef Quad< Key,Key,Key,Key > KeyQuad;
+
+  /**
+   * Return a Quad with the given types (analgous to std::make_pair)
+   */
+  template< typename T,typename U,typename V,typename W >
+  Quad<T, U, V, W>
+  make_quad(T const & t, U const & u, V const & v, W const & w)
+  {
+    return Quad<T, U, V, W>(t, u, v, w);
+  }
+
 
   template<> struct hm_hash< KeyPair >
   {
