@@ -70,7 +70,6 @@ namespace wali
      *
      */
     
-    inline
      NWA::ClientInfoRefPtr NWA::getClientInfo( St state ) const
     {
       assert(state < wali::WALI_BAD_KEY);
@@ -86,7 +85,6 @@ namespace wali
      *
      */
     
-    inline
     void NWA::setClientInfo( St state, const ClientInfoRefPtr c )
     {
       assert(state < wali::WALI_BAD_KEY);
@@ -103,7 +101,6 @@ namespace wali
      *
      */
     
-    inline
     const std::set<St> & NWA::getStates( ) const
     {
       return states.getStates();
@@ -119,7 +116,6 @@ namespace wali
      *
      */
     
-    inline
     const std::set<St> & NWA::get_states( ) const
     {
       return getStates();
@@ -134,7 +130,6 @@ namespace wali
      *
      */
     
-    inline
     bool NWA::isState( St state ) const
     {
       assert(state < wali::WALI_BAD_KEY);
@@ -152,7 +147,6 @@ namespace wali
      *
      */
     
-    inline
     bool NWA::is_nwa_state( St state ) const
     {
       return isState(state);
@@ -167,7 +161,6 @@ namespace wali
      *
      */
     
-    inline
     bool NWA::addState( St state )
     {
       assert(state < wali::WALI_BAD_KEY);
@@ -183,7 +176,6 @@ namespace wali
      *
      */
     
-    inline
     size_t NWA::sizeStates( ) const
     {
       return states.sizeStates();
@@ -199,7 +191,7 @@ namespace wali
      *
      */
     
-    inline
+    
     int NWA::num_nwa_states( ) const
     {
       return sizeStates();      
@@ -257,7 +249,7 @@ namespace wali
      *
      */
     
-    inline
+    
     const std::set<St> & NWA::getInitialStates( ) const
     {
       return states.getInitialStates();
@@ -272,7 +264,7 @@ namespace wali
      *
      */
     
-    inline
+    
     bool NWA::isInitialState( St state ) const
     {
       assert(state < wali::WALI_BAD_KEY);
@@ -288,7 +280,7 @@ namespace wali
      *
      */
     
-    inline
+    
     bool NWA::addInitialState( St state )
     {
       assert(state < wali::WALI_BAD_KEY);
@@ -303,7 +295,7 @@ namespace wali
      *
      */
     
-    inline
+    
     size_t NWA::sizeInitialStates( ) const
     {
       return states.sizeInitialStates();
@@ -318,7 +310,7 @@ namespace wali
      *
      */
     
-    inline
+    
     bool NWA::removeInitialState( St state )
     {
       assert(state < wali::WALI_BAD_KEY);
@@ -331,7 +323,7 @@ namespace wali
      *
      */
     
-    inline
+    
     void NWA::clearInitialStates( )
     {
       states.clearInitialStates();
@@ -347,7 +339,7 @@ namespace wali
      *
      */
     
-    inline
+    
     const std::set< St> & NWA::getFinalStates( ) const
     {
       return states.getFinalStates();
@@ -362,7 +354,7 @@ namespace wali
      *
      */
     
-    inline
+    
     bool NWA::isFinalState( St state ) const
     {
       assert(state < wali::WALI_BAD_KEY);
@@ -378,7 +370,7 @@ namespace wali
      *
      */
     
-    inline
+    
     bool NWA::addFinalState( St state )
     {
       assert(state < wali::WALI_BAD_KEY);
@@ -405,7 +397,7 @@ namespace wali
      *
      */
     
-    inline
+    
     size_t NWA::sizeFinalStates( ) const
     {
       return states.sizeFinalStates();
@@ -420,7 +412,7 @@ namespace wali
      *
      */
     
-    inline
+    
     bool NWA::removeFinalState( St state )
     {
       assert(state < wali::WALI_BAD_KEY);
@@ -433,7 +425,7 @@ namespace wali
      *
      */
     
-    inline
+    
     void NWA::clearFinalStates( )
     {
       states.clearFinalStates();
@@ -449,7 +441,7 @@ namespace wali
      *
      */
     
-    inline
+    
     const std::set< Sym> & NWA::getSymbols( ) const
     {
       return symbols.getSymbols();
@@ -464,7 +456,7 @@ namespace wali
      *
      */
     
-    inline
+    
     bool NWA::isSymbol( Sym sym ) const
     {
       assert(sym < wali::WALI_BAD_KEY);
@@ -480,7 +472,7 @@ namespace wali
      *
      */
     
-    inline
+    
     bool NWA::addSymbol( Sym sym )
     {
       assert(sym < wali::WALI_BAD_KEY);
@@ -498,7 +490,7 @@ namespace wali
      *
      */
     
-    inline
+    
     size_t NWA::sizeSymbols( ) const
     {
       return symbols.sizeSymbols();
@@ -556,7 +548,7 @@ namespace wali
      *
      */
     
-    inline
+    
     bool NWA::getSymbol( St from, St to, Sym & sym ) const
     {
       assert(from < wali::WALI_BAD_KEY);
@@ -576,7 +568,6 @@ namespace wali
      * 
      */
     
-    inline
     bool NWA::findTrans( St from, Sym sym, St to) const
     {
       assert(from < wali::WALI_BAD_KEY);
@@ -1244,7 +1235,7 @@ namespace wali
      *
      */
     
-    inline
+    
     size_t NWA::sizeTrans( ) const
     {
       return trans.size();
@@ -1260,7 +1251,7 @@ namespace wali
      *
      */
     
-    inline
+    
     int NWA::count_rules( ) const
     {
       return sizeTrans();
@@ -1272,7 +1263,7 @@ namespace wali
      *
      */
     
-    inline
+    
     void NWA::clearTrans( )
     {
       //assert(stuck);
@@ -1689,7 +1680,7 @@ namespace wali
      *
      */
     
-    inline
+    
     size_t NWA::sizeCallTrans( ) const
     {
       return trans.sizeCall();
@@ -2093,7 +2084,7 @@ namespace wali
      *
      */
     
-    inline
+    
     size_t NWA::sizeInternalTrans( ) const
     {
       return trans.sizeInternal();
@@ -2942,7 +2933,7 @@ namespace wali
      *
      */
     
-    inline
+    
     const std::set< St> NWA::getReturnSites( St callSite ) const
     {
       assert(callSite < wali::WALI_BAD_KEY);
@@ -3129,7 +3120,7 @@ namespace wali
      *
      */
     
-    inline
+    
     size_t NWA::sizeReturnTrans( ) const
     {
       return trans.sizeReturn();
@@ -6320,7 +6311,7 @@ namespace wali
      *
      */
     
-    inline
+    
     void NWA::addAllStates( States addStateSet )
     {
       states.addAllStates(addStateSet);
@@ -6334,7 +6325,7 @@ namespace wali
      *
      */
     
-    inline
+    
      NWA::stateIterator NWA::beginStates( ) const
     {
       return states.beginStates();
@@ -6348,7 +6339,7 @@ namespace wali
      *
      */
     
-    inline
+    
      NWA::stateIterator NWA::endStates( ) const
     {
       return states.endStates();
@@ -6364,7 +6355,7 @@ namespace wali
      *
      */
     
-    inline
+    
     void NWA::addAllInitialStates( States addStateSet )
     {
       states.addAllInitialStates(addStateSet);
@@ -6378,7 +6369,7 @@ namespace wali
      *
      */ 
     
-    inline
+    
      NWA::stateIterator NWA::beginInitialStates( ) const
     {
       return states.beginInitialStates();
@@ -6392,7 +6383,7 @@ namespace wali
      *
      */
     
-    inline
+    
      NWA::stateIterator NWA::endInitialStates( ) const
     {
       return states.endInitialStates();
@@ -6408,7 +6399,7 @@ namespace wali
      *
      */
     
-    inline
+    
     void NWA::addAllFinalStates( States addStateSet )
     {
       states.addAllFinalStates(addStateSet);
@@ -6422,7 +6413,7 @@ namespace wali
      *
      */
     
-    inline
+    
      NWA::stateIterator NWA::beginFinalStates( ) const
     {
       return states.beginFinalStates();
@@ -6436,7 +6427,7 @@ namespace wali
      *
      */
     
-    inline
+    
      NWA::stateIterator NWA::endFinalStates( ) const
     {
       return states.endFinalStates();
@@ -6450,7 +6441,7 @@ namespace wali
      *
      */
     
-    inline
+    
     void NWA::addAllSymbols( Symbols addSymbolSet )
     {
       symbols.addAllSymbols(addSymbolSet);
@@ -6464,7 +6455,7 @@ namespace wali
      *
      */
     
-    inline
+    
      NWA::symbolIterator NWA::beginSymbols( ) const
     {
       return symbols.beginSymbols();
@@ -6478,7 +6469,7 @@ namespace wali
      *
      */
     
-    inline
+    
      NWA::symbolIterator NWA::endSymbols( ) const
     {
       return symbols.endSymbols();
@@ -6492,7 +6483,7 @@ namespace wali
      *
      */
     
-    inline
+    
      NWA::callIterator NWA::beginCallTrans( ) const
     {
       return trans.beginCall();
@@ -6506,7 +6497,7 @@ namespace wali
      *
      */
     
-    inline
+    
      NWA::callIterator NWA::endCallTrans( ) const
     {
       return trans.endCall();
@@ -6520,7 +6511,7 @@ namespace wali
      *
      */
     
-    inline
+    
      NWA::internalIterator NWA::beginInternalTrans( ) const
     {
       return trans.beginInternal();
@@ -6534,7 +6525,7 @@ namespace wali
      *
      */
     
-    inline
+    
      NWA::internalIterator NWA::endInternalTrans( ) const
     {
       return trans.endInternal();
@@ -6548,7 +6539,7 @@ namespace wali
      *
      */
     
-    inline
+    
      NWA::returnIterator NWA::beginReturnTrans( ) const
     {
       return trans.beginReturn();
@@ -6562,7 +6553,7 @@ namespace wali
      *
      */
     
-    inline
+    
      NWA::returnIterator NWA::endReturnTrans( ) const
     {
       return trans.endReturn();
