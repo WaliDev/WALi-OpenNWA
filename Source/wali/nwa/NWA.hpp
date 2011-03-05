@@ -91,7 +91,7 @@ namespace wali
         typedef SymbolSet Symbols;
         typedef  Symbols::const_iterator symbolIterator;
 
-        typedef TransSet<St,Sym> Trans;
+        typedef TransSet Trans;
         
         typedef  Trans::Call Call;       
         typedef  Trans::Internal Internal;   
