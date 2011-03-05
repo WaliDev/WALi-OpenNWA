@@ -1,37 +1,11 @@
-  #include <iostream>
+#include <iostream>
 #include <sstream>
 #include <vector>
 #include <cassert>
 #include <exception>
 
-#if defined(TEST_STUBS)
-#include <map>
-namespace wali {
-    typedef int Key;
-
-    int getKey(std::string const & s) {
-        static int nextKey = 100;
-        static std::map<std::string, int> m;
-
-        int key = m[s];
-        if (key == 0) {
-            m[s] = key = ++nextKey;
-        }
-        return key;
-    }
-}
-
-using wali::getKey;
-
-typedef std::pair<int, std::pair<int, int> > KeyTriple;
-typedef std::pair<int, std::pair<int, std::pair<int, int> > > KeyQuad;
-KeyTriple make_triple(int a, int b, int c) {
-    return std::make_pair(a, std::make_pair(b, c));
-}
-KeyQuad make_quad(int a, int b, int c, int d) {
-    return std::make_pair(a, std::make_pair(b, std::make_pair(c, d)));
-}
-#endif
+#include "NWA.hpp"
+#include "wali/KeyContainer.hpp"
 
 // nwa-description  ::= 'nwa:'? '{'? block+ '}'?
 // 
@@ -373,8 +347,11 @@ test_read_name()
 /// and quads of wali::Keys, not strings. Eats trailing WS.
 
 
-//typedef Triple<wali::Key, wali::Key, wali::Key> KeyTriple;
-//typedef Quad<wali::Key, wali::Key, wali::Key, wali::Key> KeyQuad;
+typedef wali::Triple<wali::Key, wali::Key, wali::Key> KeyTriple;
+typedef wali::Quad<wali::Key, wali::Key, wali::Key, wali::Key> KeyQuad;
+using wali::getKey;
+using wali::make_triple;
+using wali::make_quad;
 
 KeyTriple
 read_triple(std::istream & is)
@@ -414,30 +391,34 @@ test_read_triple_quad()
     std::stringstream ss1("(a, b, c)");
     std::stringstream ss2("(a, b, c)z");
     std::stringstream ss3("(a,b, c)(d, e, f)");
+
+    KeyTriple ans3(103, 102, 101);
     
-    assert(read_triple(ss1) == make_triple(103, 102, 101));
-    assert(read_triple(ss2) == make_triple(103, 102, 101));
-    assert(read_triple(ss3) == make_triple(103, 102, 101));
+    assert(read_triple(ss1) == ans3);
+    assert(read_triple(ss2) == ans3);
+    assert(read_triple(ss3) == ans3);
     
     std::stringstream ss4("(a (antohe), b (tnoehn), c (otnhento))z");
     std::stringstream ss5("(a (jab3,9030), b,\nc)\n}");
 
-    assert(read_triple(ss4) == make_triple(103, 102, 101));
-    assert(read_triple(ss5) == make_triple(103, 102, 101));
+    assert(read_triple(ss4) == ans3);
+    assert(read_triple(ss5) == ans3);
     
     std::stringstream ss6("(a, b, c, d)");
     std::stringstream ss7("(a, b, c, d)z");
     std::stringstream ss8("(a,b, c, d)(h, e, f)");
 
-    assert(read_quad(ss6) == make_quad(103, 102, 101, 104));
-    assert(read_quad(ss7) == make_quad(103, 102, 101, 104));
-    assert(read_quad(ss8) == make_quad(103, 102, 101, 104));
+    KeyQuad ans4(103, 102, 101, 104);
+
+    assert(read_quad(ss6) == ans4);
+    assert(read_quad(ss7) == ans4);
+    assert(read_quad(ss8) == ans4);
         
     std::stringstream ss9("(a (antohe), b (tnoehn), c (otnhento), d (otnheont349))z");
     std::stringstream ss10("(a (jab3,9030), b,\nc, d)\n}");
 
-    assert(read_quad(ss9)  == make_quad(103, 102, 101, 104));
-    assert(read_quad(ss10) == make_quad(103, 102, 101, 104));
+    assert(read_quad(ss9)  == ans4);
+    assert(read_quad(ss10) == ans4);
 }
 
 
