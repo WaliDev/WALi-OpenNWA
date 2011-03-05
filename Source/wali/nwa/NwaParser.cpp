@@ -8,7 +8,11 @@
 #include "wali/nwa/NWA.hpp"
 #include "wali/KeyContainer.hpp"
 
-
+// The grammar:
+//   There are some ambiguities that are resolved through slightly
+//   ad-hoc lookahead decisions.
+//
+//
 // nwa-description  ::= 'nwa:'? '{'? block+ '}'?
 // 
 // block  ::=  state-block     // lookahead = 'Q'
@@ -32,6 +36,7 @@
 // triple  ::=  '('  name ','  name  ','  name  ')'
 // quad  ::=  '('  name ','  name  ','  name  ','  name  ')'
 // name  ::=  token  ('(' ~')'* ')')?   // lookahead '(' means take opt
+//   ^^^ this is not very accurate right now
 // 
 // token ::=  ~(' ' | ',(')+
 //   with balenced ( )
@@ -818,119 +823,124 @@ read_block(std::istream & is)
 ///
 /// Reads in an nwa-description
 
-void
-read_nwa(std::istream & is)
-{
-    discardws(is);
+namespace wali {
+    namespace nwa {
+
+        void
+        read_nwa(std::istream & is)
+        {
+            discardws(is);
     
-    // Skip over the 'nwa:' if present
-    if (is.peek() == 'n') {
-        read_lit(is, "nwa:");
-    }
+            // Skip over the 'nwa:' if present
+            if (is.peek() == 'n') {
+                read_lit(is, "nwa:");
+            }
 
-    // Skip over the { if present
-    if (is.peek() == '{') {
-        read_lit(is, "{");
-    }
+            // Skip over the { if present
+            if (is.peek() == '{') {
+                read_lit(is, "{");
+            }
 
-    // while we're not at the end of the NWA, read a block
-    while(is.peek() != -1 && is.peek() != '}') {
-        read_block(is);
-    }
+            // while we're not at the end of the NWA, read a block
+            while(is.peek() != -1 && is.peek() != '}') {
+                read_block(is);
+            }
 
-    // Skip over the } if present
-    if (is.peek() == '}') {
-        read_lit(is, "}");
-    }
-}
+            // Skip over the } if present
+            if (is.peek() == '}') {
+                read_lit(is, "}");
+            }
+        }
 
+        
+        static
+        void
+        test_read_nwa()
+        {
+            std::string mattsNwa =
+                "Q: {" "\n"
+                "  stuck (=2)," "\n"
+                "  (key#6,3) (=16)," "\n"
+                "  (key#6,4) (=17)," "\n"
+                "  (key#7,3) (=18)," "\n"
+                "  (key#4,3) (=19)," "\n"
+                "  (key#3,3) (=20)," "\n"
+                "  (key#5,3) (=21)," "\n"
+                "  (key#9,3) (=22)," "\n"
+                "  (key#5,4) (=23)," "\n"
+                "  (key#9,4) (=24)," "\n"
+                "  (key#10,3) (=25)," "\n"
+                "  (key#10,4) (=26)}" "\n"
+                "Q0: {" "\n"
+                "  (key#6,3) (=16)," "\n"
+                "  (key#6,4) (=17)}" "\n"
+                "Qf: {" "\n"
+                "  (key#5,4) (=23)," "\n"
+                "  (key#9,4) (=24)," "\n"
+                "  (key#10,4) (=26)}" "\n"
+                "Sigma: {" "\n"
+                "  <start;0;expression>," "\n"
+                "  <start;1;body;0>," "\n"
+                "  <start;2;expression;1>," "\n"
+                "  <{#fun634}>," "\n"
+                "  <start;2;expression>}" "\n"
+                "Delta_c: {" "\n"
+                "  ((key#4,3) (=19) ,<{#fun634}>, (key#3,3) (=20) )" "\n"
+                "}" "\n"
+                "Delta_i:  {" "\n"
+                "  ((key#6,3) (=16) ,<start;0;expression>, (key#7,3) (=18) )," "\n"
+                "  ((key#6,4) (=17) ,<start;0;expression>, (key#7,3) (=18) )," "\n"
+                "  ((key#7,3) (=18) ,<start;2;expression;1>, (key#4,3) (=19) )," "\n"
+                "  ((key#9,3) (=22) ,<start;2;expression>, (key#10,3) (=25) )," "\n"
+                "  ((key#9,3) (=22) ,<start;2;expression>, (key#10,4) (=26) )," "\n"
+                "  ((key#9,4) (=24) ,<start;2;expression>, (key#10,3) (=25) )," "\n"
+                "  ((key#9,4) (=24) ,<start;2;expression>, (key#10,4) (=26) )" "\n"
+                "}" "\n"
+                "Delta_r: {" "\n"
+                "  ((key#3,3) (=20) , (key#4,3) (=19) ,<start;1;body;0>, (key#5,3) (=21) )," "\n"
+                "  ((key#3,3) (=20) , (key#4,3) (=19) ,<start;1;body;0>, (key#9,3) (=22) )," "\n"
+                "  ((key#3,3) (=20) , (key#4,3) (=19) ,<start;1;body;0>, (key#5,4) (=23) )," "\n"
+                "  ((key#3,3) (=20) , (key#4,3) (=19) ,<start;1;body;0>, (key#9,4) (=24) )" "\n"
+                "}" "\n";
 
-static
-void
-test_read_nwa()
-{
-    std::string mattsNwa =
-        "Q: {" "\n"
-        "  stuck (=2)," "\n"
-        "  (key#6,3) (=16)," "\n"
-        "  (key#6,4) (=17)," "\n"
-        "  (key#7,3) (=18)," "\n"
-        "  (key#4,3) (=19)," "\n"
-        "  (key#3,3) (=20)," "\n"
-        "  (key#5,3) (=21)," "\n"
-        "  (key#9,3) (=22)," "\n"
-        "  (key#5,4) (=23)," "\n"
-        "  (key#9,4) (=24)," "\n"
-        "  (key#10,3) (=25)," "\n"
-        "  (key#10,4) (=26)}" "\n"
-        "Q0: {" "\n"
-        "  (key#6,3) (=16)," "\n"
-        "  (key#6,4) (=17)}" "\n"
-        "Qf: {" "\n"
-        "  (key#5,4) (=23)," "\n"
-        "  (key#9,4) (=24)," "\n"
-        "  (key#10,4) (=26)}" "\n"
-        "Sigma: {" "\n"
-        "  <start;0;expression>," "\n"
-        "  <start;1;body;0>," "\n"
-        "  <start;2;expression;1>," "\n"
-        "  <{#fun634}>," "\n"
-        "  <start;2;expression>}" "\n"
-        "Delta_c: {" "\n"
-        "  ((key#4,3) (=19) ,<{#fun634}>, (key#3,3) (=20) )" "\n"
-        "}" "\n"
-        "Delta_i:  {" "\n"
-        "  ((key#6,3) (=16) ,<start;0;expression>, (key#7,3) (=18) )," "\n"
-        "  ((key#6,4) (=17) ,<start;0;expression>, (key#7,3) (=18) )," "\n"
-        "  ((key#7,3) (=18) ,<start;2;expression;1>, (key#4,3) (=19) )," "\n"
-        "  ((key#9,3) (=22) ,<start;2;expression>, (key#10,3) (=25) )," "\n"
-        "  ((key#9,3) (=22) ,<start;2;expression>, (key#10,4) (=26) )," "\n"
-        "  ((key#9,4) (=24) ,<start;2;expression>, (key#10,3) (=25) )," "\n"
-        "  ((key#9,4) (=24) ,<start;2;expression>, (key#10,4) (=26) )" "\n"
-        "}" "\n"
-        "Delta_r: {" "\n"
-        "  ((key#3,3) (=20) , (key#4,3) (=19) ,<start;1;body;0>, (key#5,3) (=21) )," "\n"
-        "  ((key#3,3) (=20) , (key#4,3) (=19) ,<start;1;body;0>, (key#9,3) (=22) )," "\n"
-        "  ((key#3,3) (=20) , (key#4,3) (=19) ,<start;1;body;0>, (key#5,4) (=23) )," "\n"
-        "  ((key#3,3) (=20) , (key#4,3) (=19) ,<start;1;body;0>, (key#9,4) (=24) )" "\n"
-        "}" "\n";
+            std::stringstream ss1(mattsNwa);
+            std::stringstream ss2("nwa: " + mattsNwa);
+            std::stringstream ss3("nwa: { " + mattsNwa + " } nwa: " + mattsNwa);
 
-    std::stringstream ss1(mattsNwa);
-    std::stringstream ss2("nwa: " + mattsNwa);
-    std::stringstream ss3("nwa: { " + mattsNwa + " } nwa: " + mattsNwa);
+            read_nwa(ss1);
+            read_nwa(ss2);
+            read_nwa(ss3);
+            read_nwa(ss3);
 
-    read_nwa(ss1);
-    read_nwa(ss2);
-    read_nwa(ss3);
-    read_nwa(ss3);
-
-    assert(ss1.peek() == -1);
-    assert(ss2.peek() == -1);
-    assert(ss3.peek() == -1);
+            assert(ss1.peek() == -1);
+            assert(ss2.peek() == -1);
+            assert(ss3.peek() == -1);
 
     
-    std::string duplicates =
-        "Q: { a }" "\n"
-        "Q: b" "\n"
-        "Delta_i: (a, b (c), c)" "\n"
-        "Delta_r: (a, b, c, d)" "\n"
-        "Delta_c: {}" "\n"
-        "Delta_i: (a, b, d)" "\n";
+            std::string duplicates =
+                "Q: { a }" "\n"
+                "Q: b" "\n"
+                "Delta_i: (a, b (c), c)" "\n"
+                "Delta_r: (a, b, c, d)" "\n"
+                "Delta_c: {}" "\n"
+                "Delta_i: (a, b, d)" "\n";
 
-    std::stringstream ss4(duplicates);
-    read_nwa(ss4);
-    assert(ss4.peek() == -1);
-}
+            std::stringstream ss4(duplicates);
+            read_nwa(ss4);
+            assert(ss4.peek() == -1);
+        }
 
 
-void
-test_all()
-{
-    test_discardws();
-    test_read_lit();
-    test_read_name();
-    test_read_triple_quad();
-    test_read_lists();
-    test_read_blocks();
-    test_read_nwa();
-}
+        void
+        test_all()
+        {
+            test_discardws();
+            test_read_lit();
+            test_read_name();
+            test_read_triple_quad();
+            test_read_lists();
+            test_read_blocks();
+            test_read_nwa();
+        }
+    } // namespace nwa
+} // namespace wali

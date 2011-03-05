@@ -4,7 +4,11 @@
 #include <iosfwd>
 #include "NWA.hpp"
 
-extern void read_nwa(std::istream & is);
-extern void test_all();
+namespace wali {
+    namespace nwa {
+        extern void read_nwa(std::istream & is);
+        extern void test_all();
+    }
+}
 
 #endif

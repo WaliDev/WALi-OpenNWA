@@ -5,7 +5,7 @@ main(int argc, char** argv)
 {
     (void)argv;
     
-    test_all();
+    wali::nwa::test_all();
 
     if (argc > 1) {
         std::cerr << "\n>> Tests good!\n";
