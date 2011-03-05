@@ -8,6 +8,7 @@
 //#define LABEL
  
 // ::wali
+#include "wali/KeyContainer.hpp"
 #include "wali/nwa/SymbolSet.hpp"
 #include "wali/Key.hpp" 
  
