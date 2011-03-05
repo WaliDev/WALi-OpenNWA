@@ -73,6 +73,10 @@ namespace wali
         }
     };
 
+
+    class NWA;
+    typedef ref_ptr<NWA> NWARefPtr;
+
     /**
      *
      * This class models nested word automata (NWA). 
@@ -83,7 +87,6 @@ namespace wali
     {
       public:
         typedef ClientInfo Client;
-        typedef ref_ptr<NWA> NWARefPtr;
 
         typedef wali::nwa::StateSet States;
         typedef  States::const_iterator stateIterator;
