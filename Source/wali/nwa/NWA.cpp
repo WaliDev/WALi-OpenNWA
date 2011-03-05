@@ -5517,7 +5517,7 @@ namespace wali
      *
      */ 
     
-    wpds::WPDS NWA::NWAtoPDSreturns( WeightGen<Client> & wg ) const
+    wpds::WPDS NWA::NWAtoPDSreturns( WeightGen & wg ) const
     {
       //TODO: beware the implicit transitions
       //Q: do we need to make all transitions explicit in order to make this correct?
@@ -5542,7 +5542,7 @@ namespace wali
       else
         wgt = wg.getWeight(src, getClientInfo(src),
                             Trans::getInternalSym(*iit),
-                            WeightGen<Client>::INTRA,
+                            WeightGen::INTRA,
                             tgt, getClientInfo(tgt));  //w
 
         result.add_rule(program,                       //from_state (p)
@@ -5569,7 +5569,7 @@ namespace wali
             else
               wgt = wg.getWeight(src, getClientInfo(src),
                                   Trans::getCallSym(*cit),
-                                  WeightGen<Client>::CALL_TO_ENTRY,  
+                                  WeightGen::CALL_TO_ENTRY,  
                                   tgt, getClientInfo(tgt)); // w   
 
             result.add_rule(program,                      //from_state (p)
@@ -5598,7 +5598,7 @@ namespace wali
         else
           wgt = wg.getWeight(src, getClientInfo(src),
                               Trans::getReturnSym(*rit),
-                              WeightGen<Client>::EXIT_TO_RET,
+                              WeightGen::EXIT_TO_RET,
                               tgt, getClientInfo(tgt));  // w            
 
         Key rstate = getControlLocation(src,Trans::getCallSite(*rit),tgt);    //p_q_xcr
@@ -5631,7 +5631,7 @@ namespace wali
      *
      */
     
-    wpds::WPDS NWA::NWAtoBackwardsPDSreturns( WeightGen<Client> & wg ) const
+    wpds::WPDS NWA::NWAtoBackwardsPDSreturns( WeightGen & wg ) const
     {
       //TODO: beware the implicit transitions
       //Q: do we need to make all transitions explicit in order to make this correct?
@@ -5656,7 +5656,7 @@ namespace wali
         else
           wgt = wg.getWeight(src, getClientInfo(src),
                               Trans::getInternalSym(*iit),
-                              WeightGen<Client>::INTRA,
+                              WeightGen::INTRA,
                               tgt, getClientInfo(tgt));          // w
 
         result.add_rule(program,                                //from_state (p)
@@ -5684,7 +5684,7 @@ namespace wali
             else
               wgt = wg.getWeight(src, getClientInfo(src), 
                                   Trans::getCallSym(*cit),
-                                  WeightGen<Client>::CALL_TO_ENTRY,  
+                                  WeightGen::CALL_TO_ENTRY,  
                                   tgt, getClientInfo(tgt)); // w    
 
             Key cstate = getControlLocation(tgt,Trans::getReturnSite(*rit),src);    //p_q_erc
@@ -5719,7 +5719,7 @@ namespace wali
         else
           wgt = wg.getWeight(src, getClientInfo(src),
                               Trans::getReturnSym(*rit),
-                              WeightGen<Client>::EXIT_TO_RET,
+                              WeightGen::EXIT_TO_RET,
                               tgt, getClientInfo(tgt));  // w
 
         result.add_rule(program,                      //from_state (p)
@@ -5751,7 +5751,7 @@ namespace wali
      *
      */ 
     
-    wpds::WPDS NWA::NWAtoPDScalls( WeightGen<Client> & wg ) const
+    wpds::WPDS NWA::NWAtoPDScalls( WeightGen & wg ) const
     {
       //TODO: beware the implicit transitions
       //Q: do we need to make all transitions explicit in order to make this correct?
@@ -5778,7 +5778,7 @@ namespace wali
         else
           wgt = wg.getWeight(src, getClientInfo(src),
                               Trans::getInternalSym(*iit),
-                              WeightGen<Client>::INTRA,
+                              WeightGen::INTRA,
                               tgt, getClientInfo(tgt));           // w
 
           result.add_rule(program,                                //from_state (p)
@@ -5807,7 +5807,7 @@ namespace wali
         else
           wgt = wg.getWeight(src, getClientInfo(src),
                               Trans::getCallSym(*cit),
-                              WeightGen<Client>::CALL_TO_ENTRY,
+                              WeightGen::CALL_TO_ENTRY,
                               tgt, getClientInfo(tgt));          // w
 
         result.add_rule(program,                                //from_state (p)
@@ -5842,7 +5842,7 @@ namespace wali
         else
           wgt = wg.getWeight(src, getClientInfo(src), 
                               Trans::getReturnSym(*rit),
-                              WeightGen<Client>::EXIT_TO_RET,  
+                              WeightGen::EXIT_TO_RET,  
                               tgt, getClientInfo(tgt));    // w     
 
         //Note: if you change this, make sure you modify the code in NWPForest.createCA()
@@ -5877,7 +5877,7 @@ namespace wali
      *
      */
     
-    wpds::WPDS NWA::NWAtoBackwardsPDScalls( WeightGen<Client> & wg ) const
+    wpds::WPDS NWA::NWAtoBackwardsPDScalls( WeightGen & wg ) const
     {
       //TODO: beware the implicit transitions
       //Q: do we need to make all transitions explicit in order to make this correct?
@@ -5902,7 +5902,7 @@ namespace wali
         else
           wgt = wg.getWeight(src, getClientInfo(src),
                               Trans::getInternalSym(*iit),
-                              WeightGen<Client>::INTRA,
+                              WeightGen::INTRA,
                               tgt, getClientInfo(tgt));         // w
 
         result.add_rule(program,                                //from_state (p)
@@ -5930,7 +5930,7 @@ namespace wali
             else
               wgt = wg.getWeight(src, getClientInfo(src),
                                   Trans::getCallSym(*cit),
-                                  WeightGen<Client>::CALL_TO_ENTRY,
+                                  WeightGen::CALL_TO_ENTRY,
                                   tgt, getClientInfo(tgt));         // w                  
 
             Key cstate = getControlLocation(tgt,Trans::getReturnSite(*rit),src);  //p_q_erc
@@ -5965,7 +5965,7 @@ namespace wali
         else
           wgt = wg.getWeight(src, getClientInfo(src),
                               Trans::getReturnSym(*rit),
-                              WeightGen<Client>::EXIT_TO_RET,  
+                              WeightGen::EXIT_TO_RET,  
                               tgt, getClientInfo(tgt));      //w
          
         result.add_rule(program,                                //from_state (p)
@@ -6084,7 +6084,7 @@ namespace wali
      *
      */
     
-    wfa::WFA NWA::prestar( wfa::WFA & input, WeightGen<Client> & wg ) const
+    wfa::WFA NWA::prestar( wfa::WFA & input, WeightGen & wg ) const
     {
       //Q: does anything need to be done to transform the resulting WFA from the 
       //    PDS vocab back to the NWA vocab?
@@ -6104,7 +6104,7 @@ namespace wali
      *
      */
     
-    void NWA::prestar( wfa::WFA & input, wfa::WFA & output, WeightGen<Client> & wg ) const
+    void NWA::prestar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg ) const
     {
       //Q: does anything need to be done to transform the resulting WFA from the 
       //    PDS vocab back to the NWA vocab?
@@ -6121,7 +6121,7 @@ namespace wali
      *
      */
     
-    wfa::WFA NWA::poststar( wfa::WFA & input, WeightGen<Client> & wg ) const
+    wfa::WFA NWA::poststar( wfa::WFA & input, WeightGen & wg ) const
     {
       //Q: does anything need to be done to transform the resulting WFA from the 
       //    PDS vocab back to the NWA vocab?
@@ -6141,7 +6141,7 @@ namespace wali
      *
      */
     
-    void NWA::poststar( wfa::WFA & input, wfa::WFA & output, WeightGen<Client> & wg ) const
+    void NWA::poststar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg ) const
     {
       //Q: does anything need to be done to transform the resulting WFA from the 
       //    PDS vocab back to the NWA vocab?

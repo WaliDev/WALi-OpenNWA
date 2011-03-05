@@ -44,7 +44,7 @@ namespace wali
     typedef Key St;
     typedef Key Sym;
 
-    class ReachGen : public wali::nwa::WeightGen<ClientInfo>
+    class ReachGen : public wali::nwa::WeightGen
     {
       public:
         enum Kind {INTRA, CALL_TO_ENTRY, EXIT_TO_RET, CALL_TO_RET};
@@ -2900,7 +2900,7 @@ namespace wali
        * @return the PDS equivalent to this NWA
        *
        */ 
-      wpds::WPDS NWAtoPDSreturns( WeightGen<Client> & wg ) const;
+      wpds::WPDS NWAtoPDSreturns( WeightGen & wg ) const;
       /**
        *
        * @brief constructs the PDS equivalent to this NWA
@@ -2913,7 +2913,7 @@ namespace wali
        * @return the PDS equivalent to this NWA
        *
        */ 
-      static wpds::WPDS NWAtoPDSreturns( NWARefPtr nwa, WeightGen<Client> & wg )
+      static wpds::WPDS NWAtoPDSreturns( NWARefPtr nwa, WeightGen & wg )
       {
         return nwa->NWAtoPDSreturns(wg);
       }
@@ -2929,7 +2929,7 @@ namespace wali
        * @return the backwards PDS equivalent to this NWA
        *
        */ 
-      wpds::WPDS NWAtoBackwardsPDSreturns( WeightGen<Client> & wg ) const;  
+      wpds::WPDS NWAtoBackwardsPDSreturns( WeightGen & wg ) const;  
       /**
        *
        * @brief constructs the backwards PDS equivalent to this NWA
@@ -2942,7 +2942,7 @@ namespace wali
        * @return the backwards PDS equivalent to this NWA
        *
        */ 
-      static wpds::WPDS NWAtoBackwardsPDSreturns( NWARefPtr nwa, WeightGen<Client> & wg )
+      static wpds::WPDS NWAtoBackwardsPDSreturns( NWARefPtr nwa, WeightGen & wg )
       {
         return nwa->NWAtoBackwardsPDSreturns(wg);
       }
@@ -2961,7 +2961,7 @@ namespace wali
        * @return the PDS equivalent to this NWA
        *
        */ 
-      wpds::WPDS NWAtoPDScalls( WeightGen<Client> & wg ) const;
+      wpds::WPDS NWAtoPDScalls( WeightGen & wg ) const;
       /**
        *
        * @brief constructs the PDS equivalent to this NWA
@@ -2974,7 +2974,7 @@ namespace wali
        * @return the PDS equivalent to this NWA
        *
        */ 
-      static wpds::WPDS NWAtoPDScalls( NWARefPtr nwa, WeightGen<Client> & wg )
+      static wpds::WPDS NWAtoPDScalls( NWARefPtr nwa, WeightGen & wg )
       {
         return nwa->NWAtoPDScalls(wg);
       }
@@ -2990,7 +2990,7 @@ namespace wali
        * @return the backwards PDS equivalent to this NWA
        *
        */ 
-      wpds::WPDS NWAtoBackwardsPDScalls( WeightGen<Client> & wg ) const; 
+      wpds::WPDS NWAtoBackwardsPDScalls( WeightGen & wg ) const; 
       /**
        *
        * @brief constructs the backwards PDS equivalent to this NWA
@@ -3003,7 +3003,7 @@ namespace wali
        * @return the backwards PDS equivalent to this NWA
        *
        */
-      static wpds::WPDS NWAtoBackwardsPDScalls( NWARefPtr nwa, WeightGen<Client> & wg )
+      static wpds::WPDS NWAtoBackwardsPDScalls( NWARefPtr nwa, WeightGen & wg )
       {
         return nwa->NWAtoBackwardsPDScalls(wg);
       }
@@ -3129,7 +3129,7 @@ namespace wali
        * @return the WFA resulting from performing the prestar reachability query 
        *
        */
-      virtual wfa::WFA prestar( wfa::WFA & input, WeightGen<Client> & wg ) const;
+      virtual wfa::WFA prestar( wfa::WFA & input, WeightGen & wg ) const;
 
       /**
        *
@@ -3145,7 +3145,7 @@ namespace wali
        * @param - wg: the functions to use in generating weights
        *
        */
-      virtual void prestar( wfa::WFA & input, wfa::WFA & output, WeightGen<Client> & wg ) const;
+      virtual void prestar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg ) const;
 
       /**
        *
@@ -3158,7 +3158,7 @@ namespace wali
        * @return the WFA resulting from performing the poststar reachability query
        *
        */
-      virtual wfa::WFA poststar( wfa::WFA & input, WeightGen<Client> & wg ) const;
+      virtual wfa::WFA poststar( wfa::WFA & input, WeightGen & wg ) const;
 
       /**
        *
@@ -3174,7 +3174,7 @@ namespace wali
        * @param - wg: the functions to use in generating weights
        *
        */
-      virtual void poststar( wfa::WFA & input, wfa::WFA & output, WeightGen<Client> & wg ) const;
+      virtual void poststar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg ) const;
 
       //Utilities	
 

@@ -19,8 +19,6 @@ namespace wali
      *  
      */
 	//TODO: we may want to split getWeight into getCallWeight/getInternalWeight/getReturnWeight
-
-	template<typename Client = ClientInfo>
     class WeightGen
     {
       public:
@@ -30,7 +28,7 @@ namespace wali
         //  EXIT_TO_RET:  corresponds to the exit-to-return part of a Return transition in the NWA
         //  CALL_TO_RET:  corresponds to the call-to-return part of a Return transition in the NWA
         enum Kind {INTRA, CALL_TO_ENTRY, EXIT_TO_RET, CALL_TO_RET}; 
-		    typedef ref_ptr<Client> ClientInfoRefPtr;
+		    typedef ref_ptr<ClientInfo> ClientInfoRefPtr;
       
       //
       // Methods
