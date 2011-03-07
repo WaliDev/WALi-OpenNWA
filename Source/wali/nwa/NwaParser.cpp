@@ -889,6 +889,8 @@ namespace wali {
             if (is.peek() == '}') {
                 read_lit(is, "}");
             }
+
+            return nwa;
         }
 
         
