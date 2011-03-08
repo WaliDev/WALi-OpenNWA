@@ -4916,7 +4916,7 @@ namespace wali
       for( Iterator mit = R.begin(); mit != R.end(); mit++ )
       {
 #define key2str(a) a
-        ss << "(" << key2str(mit->first) << ", " << key2str(mit->second) << ") "; // 
+        ss << "<" << key2str(mit->first) << "," << key2str(mit->second) << ">"; // 
 #undef key2str
       }
 
