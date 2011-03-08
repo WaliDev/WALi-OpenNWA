@@ -6168,7 +6168,7 @@ namespace wali
      *
      */
     
-    std::ostream & NWA::print_dot( std::ostream & o, std::string title ) const
+    std::ostream & NWA::print_dot( std::ostream & o, std::string title, bool abbrev ) const
     {
       //TODO: flag for explicit stuck state transition printing?
       o << "digraph \"NWA\" { \n";
@@ -6188,28 +6188,28 @@ namespace wali
        std::set<St> initials = getInitialStates();
       for(  std::set<St>::const_iterator it = initials.begin(); it != initials.end(); it++ )
       {
-        printKey(o << "\"",*it,true)<<"\" [ style=bold ]";
+        printKey(o << "\"",*it,abbrev)<<"\" [ style=bold ]";
       }
 
       //final states
        std::set<St> finals = getFinalStates();
       for(  std::set<St>::const_iterator it = finals.begin(); it != finals.end(); it++ ) 
       {
-        printKey(o << "\"",*it,true) <<"\" [ peripheries=2 ]";
+        printKey(o << "\"",*it,abbrev) <<"\" [ peripheries=2 ]";
       }
 
       //Print call transitions.
       o << "//Delta_c: \n";
       callIterator cit = beginCallTrans();
       callIterator citEND = endCallTrans();
-      for( bool first=true; cit != citEND; cit++ )
+      for( bool first=false; cit != citEND; cit++ )
       {
-        printKey(o << "\"",Trans::getCallSite(*cit),true) << "\"";
+        printKey(o << "\"",Trans::getCallSite(*cit),abbrev) << "\"";
         o << "->";
-        printKey(o << "\"",Trans::getEntry(*cit),true) << "\"";
+        printKey(o << "\"",Trans::getEntry(*cit),abbrev) << "\"";
         o << "[";
         o << " label=\"";
-        printKey(o,Trans::getCallSym(*cit),true);
+        printKey(o,Trans::getCallSym(*cit),abbrev);
         o << "\"";
         o << " color=green";
         o << "];\n";        
@@ -6219,14 +6219,14 @@ namespace wali
       o << "// Delta_i:\n" ;
       internalIterator iit = beginInternalTrans();
       internalIterator iitEND = endInternalTrans();
-      for( bool first=true; iit != iitEND; iit++ )
+      for( bool first=false; iit != iitEND; iit++ )
       {
-        printKey(o << "\"",Trans::getSource(*iit),true) << "\"";
+        printKey(o << "\"",Trans::getSource(*iit),abbrev) << "\"";
         o << "->";
-        printKey(o << "\"",Trans::getTarget(*iit),true) << "\"";
+        printKey(o << "\"",Trans::getTarget(*iit),abbrev) << "\"";
         o << "[";
         o << " label=\"";
-        printKey(o,Trans::getInternalSym(*iit),true);
+        printKey(o,Trans::getInternalSym(*iit),abbrev);
         o << "\"";
         o << "];\n";
       }
@@ -6258,18 +6258,18 @@ namespace wali
               trans != returns.end(); ++trans)
           {
             std::stringstream ss;
-            printKey(ss, trans->first,true);
+            printKey(ss, trans->first,abbrev);
             ss << ";{";
             for( std::set<St>::const_iterator prediter = trans->second.begin();
                 prediter != trans->second.end(); ++prediter)
             {
-              printKey(ss, *prediter, true) << ";";
+              printKey(ss, *prediter, abbrev) << ";";
             }
             ss << ";";
 
             // Now ss holds the label for the edge exit->return
-            printKey(o << "\"", *exitit, true) << "\" ->";
-            printKey(o << "\"", *returnit, true) << "\"";
+            printKey(o << "\"", *exitit, abbrev) << "\" ->";
+            printKey(o << "\"", *returnit, abbrev) << "\"";
             o << "[ label=\"" << ss.str() << "\" color=red];\n";
           }
         }

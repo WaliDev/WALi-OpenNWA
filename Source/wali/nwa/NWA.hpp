@@ -3203,7 +3203,7 @@ namespace wali
        * @return the output stream that was printed to
        *
        */
-      virtual std::ostream & print_dot( std::ostream & o, std::string title ) const;
+      virtual std::ostream & print_dot( std::ostream & o, std::string title, bool abbrev = true ) const;
 
       /**
        *
