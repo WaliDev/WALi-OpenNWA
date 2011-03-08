@@ -3,6 +3,8 @@
 #include <vector>
 #include <cassert>
 #include <exception>
+#include <cstdlib>
+#include <ctime>
 
 #include "wali/nwa/NWAParser.hpp"
 #include "wali/nwa/NWA.hpp"
@@ -46,11 +48,15 @@
 /// DISCARDWS
 ///
 /// Discards any whitespace (see std::isspace) that appears at the start of 'is'.
+static int lineno;
+
 static
 void
 discardws(std::istream & is)
 {
-    while (std::isspace(is.peek())) {
+    int c;
+    while (std::isspace(c = is.peek())) {
+        if (c == '\n') ++lineno;
         is.get();
     }
 }
@@ -85,11 +91,13 @@ struct CharactersDifferException : std::exception {
     int differing_pos;
     int read_char;
     const char * message;
+    int line;
 
-    CharactersDifferException(std::string const & l, int p, int c)
+    CharactersDifferException(std::string const & l, int p, int c, int li)
         : lit(l)
         , differing_pos(p)
         , read_char(c)
+        , line(li)
     {
         assert(c!=-1);
         message = err_msg();
@@ -107,7 +115,8 @@ struct CharactersDifferException : std::exception {
             ss << "CharactersDifferException when reading literal [" << lit << "]\n";
             ss << "               Read " << (char)read_char
                << " instead of " << lit[differing_pos]
-               << " at position " << differing_pos << "\n";
+               << " at position " << differing_pos
+               << " of the literal; line " << line << "\n";
 
             std::string s = ss.str();
             char * pm = new char[s.size()];
@@ -144,7 +153,7 @@ read_lit(std::istream & is, std::string const & lit)
             throw StreamTooShortException();
         }
         if (c != lit[i]) {
-            throw CharactersDifferException(lit, i, c);
+            throw CharactersDifferException(lit, i, c, lineno);
         }
     }
 
@@ -218,14 +227,14 @@ static
 bool
 is_lparen(int c)
 {
-    return c == '(' || c == '{';
+    return c == '(' || c == '{' || c == '[' || c == '<';
 }
 
 static
 bool
 is_rparen(int c)
 {
-    return c == ')' || c == '}';
+    return c == ')' || c == '}' || c == ']' || c == '>';
 }
 
 static
@@ -861,11 +870,15 @@ namespace wali {
         NWARefPtr
         read_nwa(std::istream & is)
         {
+            lineno = 0;
+            
             // Come up with a stuck state
-            static int gen_number = 0;
+            std::srand(std::time(NULL) + getpid());
+            static int gen_number = std::rand();
             std::stringstream ss;
             ss << "[stuck-parse-" << gen_number << "]";
             Key stuck = getKey(ss.str());
+
 
             // Create the NWA
             NWARefPtr nwa = new NWA(stuck);
