@@ -1,6 +1,9 @@
-CXXFLAGS=-I../.. -g
+OPENFST_DIR=../../../../openfst/openfst-1.1
+
+CXXFLAGS=-I../.. -I$(OPENFST_DIR)/src/include -g
+
 LDFLAGS=-lwali -L../../../lib64 -g
-LDFLAGS+=-lfst -L../../../../openfst/openfst-1.1/src/lib/.libs
+LDFLAGS+=-lfst -L$(OPENFST_DIR)/src/lib/.libs
 
 
 run-nwa-tests: NWA-tests

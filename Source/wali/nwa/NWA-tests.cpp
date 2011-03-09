@@ -6,14 +6,184 @@
 
 // ::wali
 #include "wali/nwa/NWA.hpp"
+#include "wali/nwa/OpenFstInterop.hpp"
 #include "wali/Key.hpp"
 #include "wali/wfa/epr/FunctionalWeight.hpp"
 #include "wali/Reach.hpp"
 #include "wali/ref_ptr.hpp"
 #include "wali/nwa/ClientInfo.hpp"
 
+using wali::getKey;
+using wali::Key;
+using wali::nwa::NWA;
+using wali::nwa::NWARefPtr;
+using wali::nwa::fst_to_nwa;
+
+NWARefPtr
+buildNwa_Alur_JACM_fig6(std::string const & name_prefix)
+{
+    // "Suppose Sigma = {0, 1}. Consider the language L of nested words 'n'
+    //  such that every subword starting at a call and ending at a matched
+    //  return contains an even number of 0-labeled positions.
+    //
+    //  That is, whenever '1 <= i <= j <= l' and 'i -> j' is a matched
+    //  call/return pair, then
+    //    | {k | i <= k <= j  and  a_k = 0} |
+    //  is even."
+    //
+    // (Clarification: the whole tagged alphabet is { (0, )0, 0, (1, )1, 1 }
+    //
+    //                             0
+    //               ___           (0 push p0      ___
+    //         1    /   \          1) pop p1      /   \  1
+    // (1 push p0  |     V         0) pop p      V     | (0 push p1 *
+    // )1 pop p0   |     q0  ---------------->  q1     | )0 pop p1 *
+    // )1 pop p     \___/    <----------------    \___/  )1 pop p
+    //                             0
+    //                             (0 push p1
+    //                             )0 pop p0
+    //                             )0 pop p
+    //
+    // BOTH q0 AND q1 ARE ACCEPTING
+    //
+    // * These transitions are marked as '(0 push p1' and ')0 pop p1' in the
+    //   figure; I think this is incorrect.
+    //
+    // "The state q0 means that the number of 0-labeled positions since the
+    //  last unmatched call is even, and state q1 means this number is
+    //  odd. Upon a call, this information is porpagated along the nesting
+    //  edge [in the heirarchical state p#], while the new linear state
+    //  reflects the parity count starting at this new call."
+
+    assert(false);
+    return NULL;
+}
+
+
+
+NWARefPtr
+buildNwa_1(std::string const & name_prefix = "",
+           std::string const & stuck = "[stuck]")
+{
+    // This is inspired by buildNwa_Alur_JACM_fig6.
+    //
+    // I want my alphabet to be
+    //  - internals  0, 1
+    //  - calls      (
+    //  -returns     )
+    //
+    // Between pairs of (, ), there should be an even number of 0s.
+    //
+    //               ___                           ___
+    //          1   /   \        0                /   \
+    //  ( push q0  |     V       ) pop q1        V     |  1          
+    //  ) pop q0   |     q0  ---------------->  q1     |
+    //              \___/    <----------------    \___/ 
+    //                           0
+    //                           ( push q1  
+    //
+    // Error transitions are any ) from q1. q0 is accepting.
+    
+    
+    NWARefPtr nwa = new NWA(getKey(stuck));
+
+    Key q0 = getKey(name_prefix + "__q0");
+    Key q1 = getKey(name_prefix + "__q1");
+    Key zero = getKey("0");
+    Key one = getKey("1");
+    Key call = getKey("(");
+    Key ret = getKey(")");
+
+    nwa->addInitialState(q0);
+    nwa->addFinalState(q0);
+
+    nwa->addInternalTrans(q0, zero, q1);
+    nwa->addInternalTrans(q1, zero, q0);
+    nwa->addInternalTrans(q0, one, q0);
+    nwa->addInternalTrans(q1, one, q1);
+
+    nwa->addCallTrans(q0, call, q0);
+    nwa->addCallTrans(q1, call, q0);
+
+    nwa->addReturnTrans(q0, q0, ret, q0);
+    nwa->addReturnTrans(q0, q1, ret, q1);
+
+    return nwa;
+}
+
+
+NWARefPtr
+build_internal_nwa(std::string const & stuck = "[stuck]")
+{
+    // This is a FSM expressed as an NWA. It accepts strings with an even
+    // number of 0s and an odd number of 1s. (EO accepts.)
+    //
+    //             0
+    // --> EE <----------> OE
+    //     ^                ^
+    //     |                |
+    //   1 |                | 1
+    //     |                |
+    //     V                V
+    //    (EO)<----------> OO
+    //             0
+
+    NWARefPtr nwa = new NWA(getKey(stuck));
+
+    Key ee = getKey("ee");
+    Key oe = getKey("oe");
+    Key eo = getKey("eo");
+    Key oo = getKey("oo");
+
+    Key zero = getKey("0");
+    Key one = getKey("1");
+
+    nwa->addInitialState(ee);
+    nwa->addFinalState(eo);
+
+    // Top horizontal arrows
+    nwa->addInternalTrans(ee, zero, oe);
+    nwa->addInternalTrans(oe, zero, ee);
+
+    // Bottom horizonal arrows
+    nwa->addInternalTrans(eo, zero, oo);
+    nwa->addInternalTrans(oo, zero, eo);
+
+    // Left vertical arrows
+    nwa->addInternalTrans(ee, one, eo);
+    nwa->addInternalTrans(eo, one, ee);
+
+    // Right vertical arrows
+    nwa->addInternalTrans(oe, one, oo);
+    nwa->addInternalTrans(oo, one, oe);
+
+    return nwa;
+}
+
+
 int main()
 {
+    NWARefPtr nwa1 = buildNwa_1("#");
+    NWARefPtr nwa2 = buildNwa_1("@");
+
+    nwa1->combineWith(nwa2);
+
+    //nwa1->print_dot(std::cout, "thingy");
+
+
+    NWARefPtr eo = build_internal_nwa();
+    fst::StdVectorFst fst = internal_only_nwa_to_fst(eo);
+    NWARefPtr eo_converted = fst_to_nwa(fst);
+
+    std::cout << "NWA eo:\n";
+    eo->print(std::cout);
+
+    std::cout << "\nNWA eo converted to an FST and back:\n";
+    eo_converted->print(std::cout);
+
+    assert (eo == eo_converted);
+    
+#if 0 // this works if you want to uncomment it
   wali::Key stuck = wali::getKey("stuck");
   wali::Key stuck2 = wali::getKey("stuck2");
   wali::ref_ptr<wali::nwa::NWA> myNWA = new wali::nwa::NWA();
@@ -192,6 +362,7 @@ int main()
 
   
   myNWA->print(std::cout);
+#endif
 
 #if 0
   wali::nwa::ReachGen wg;  
@@ -258,7 +429,8 @@ int main()
   myNWA->print_dot(std::cout,"dotfile");
   bool equal = myNWA->operator==(*otherNWA);
 #endif
-  
+
+#if 0 // can uncomment this if you uncomment stuff above
   myNWA->sizeStates();
   myNWA->sizeTrans();
   myNWA->count_rules();
@@ -297,4 +469,6 @@ int main()
   myNWA->clearSymbols();
   
   return 0;
+
+#endif
 }
