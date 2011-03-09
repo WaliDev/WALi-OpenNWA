@@ -398,7 +398,7 @@ namespace wali {
 
       largest_state = largest_state + 1;
 
-      assert(largest_state < 2000); // reasonable based on my examples
+      assert(largest_state < 3000); // reasonable based on my examples
                                     // I think
       
       // Set up the path matrix
