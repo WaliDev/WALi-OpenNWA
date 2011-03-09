@@ -12,44 +12,11 @@
 #include "wali/ref_ptr.hpp"
 #include "wali/nwa/ClientInfo.hpp"
 
-int main() {}
-
-#if 0
-class STR
-{
-  public:
-  STR() { };
-  STR( std::string st ) : str(st) { }
-  
-  size_t hash( ) const
-  {
-    return str.length();
-  } 
-  
-  std::ostream& print( std::ostream & o ) const
-  {
-    return o << str;
-  }
-  
-  bool operator==( const STR & other ) const
-  {
-    return str == other.str;
-  }
-  
-  bool operator<( const STR & other ) const
-  {
-    return str < other.str;
-  }
-  
-  private:
-    std::string str;
-};
-
 int main()
 {
   wali::Key stuck = wali::getKey("stuck");
   wali::Key stuck2 = wali::getKey("stuck2");
-  wali::ref_ptr<wali::nwa::NWA<>> myNWA = wali::ref_ptr<wali::nwa::NWA<>>();
+  wali::ref_ptr<wali::nwa::NWA> myNWA = new wali::nwa::NWA();
   myNWA->setStuckState(stuck);
   
   wali::Key start = wali::getKey("start");
@@ -100,7 +67,7 @@ int main()
   myNWA->sizeInitialStates();
   myNWA->sizeFinalStates();
   
-  wali::nwa::NWA<>::ClientInfoRefPtr info = myNWA->getClientInfo(state);
+  wali::nwa::NWA::ClientInfoRefPtr info = myNWA->getClientInfo(state);
   myNWA->setClientInfo(state,info);
 
   std::set<wali::Key> preds = std::set<wali::Key>();
@@ -225,70 +192,73 @@ int main()
 
   
   myNWA->print(std::cout);
-  
-  wali::nwa::ReachGen<> wg;  
+
+#if 0
+  wali::nwa::ReachGen wg;  
   myNWA->NWAtoPDSreturns(wg);
   myNWA->NWAtoPDScalls(wg);
   myNWA->NWAtoBackwardsPDSreturns(wg);
   myNWA->NWAtoBackwardsPDScalls(wg);
-  wali::nwa::NWA<>::NWAtoPDSreturns(myNWA,wg);
-  wali::nwa::NWA<>::NWAtoPDScalls(myNWA,wg);
-  wali::nwa::NWA<>::NWAtoBackwardsPDSreturns(myNWA,wg);
-  wali::nwa::NWA<>::NWAtoBackwardsPDScalls(myNWA,wg);
+  wali::nwa::NWA::NWAtoPDSreturns(myNWA,wg);
+  wali::nwa::NWA::NWAtoPDScalls(myNWA,wg);
+  wali::nwa::NWA::NWAtoBackwardsPDSreturns(myNWA,wg);
+  wali::nwa::NWA::NWAtoBackwardsPDScalls(myNWA,wg);
 
   wali::wpds::WPDS wpdsBase;
   myNWA->plusWPDS(wpdsBase);
-  wali::nwa::NWA<>::plusWPDS(wpdsBase,myNWA);
+  wali::nwa::NWA::plusWPDS(wpdsBase,myNWA);
   myNWA->PDStoNWA(wpdsBase);
-  wali::nwa::NWA<>::PDStoNWA(wpdsBase,stuck);
+  wali::nwa::NWA::PDStoNWA(wpdsBase,stuck);
 
-  wali::nwa::NWA<> otherNWA1 = wali::nwa::NWA<>(*myNWA);
-  wali::nwa::NWA<> otherNWA2 = otherNWA1;
-  wali::ref_ptr<wali::nwa::NWA<>> otherNWA = myNWA;
-  wali::ref_ptr<wali::nwa::NWA<>> intersectNWA = wali::ref_ptr<wali::nwa::NWA<>>();
+  wali::nwa::NWA otherNWA1(*myNWA);
+  wali::nwa::NWA otherNWA2 = otherNWA1;
+  wali::ref_ptr<wali::nwa::NWA> otherNWA = myNWA;
+  wali::ref_ptr<wali::nwa::NWA> intersectNWA = wali::ref_ptr<wali::nwa::NWA>();
   intersectNWA->setStuckState(stuck2);
   intersectNWA->intersect(myNWA,otherNWA);
-  wali::ref_ptr<wali::nwa::NWA<>> union_NWA = wali::ref_ptr<wali::nwa::NWA<>>();
+  wali::ref_ptr<wali::nwa::NWA> union_NWA = wali::ref_ptr<wali::nwa::NWA>();
   union_NWA->setStuckState(stuck);
   union_NWA->unionNWA(myNWA,intersectNWA);
-  wali::ref_ptr<wali::nwa::NWA<>> concatNWA = wali::ref_ptr<wali::nwa::NWA<>>();
+  wali::ref_ptr<wali::nwa::NWA> concatNWA = wali::ref_ptr<wali::nwa::NWA>();
   concatNWA->setStuckState(stuck);
   concatNWA->concat(myNWA,otherNWA);
-  wali::ref_ptr<wali::nwa::NWA<>> reverseNWA = wali::ref_ptr<wali::nwa::NWA<>>();
+  wali::ref_ptr<wali::nwa::NWA> reverseNWA = wali::ref_ptr<wali::nwa::NWA>();
   reverseNWA->setStuckState(stuck);
   reverseNWA->reverse(myNWA);
-  wali::ref_ptr<wali::nwa::NWA<>> starNWA = wali::ref_ptr<wali::nwa::NWA<>>();
+  wali::ref_ptr<wali::nwa::NWA> starNWA = wali::ref_ptr<wali::nwa::NWA>();
   starNWA->setStuckState(stuck);
   starNWA->star(myNWA);
-  wali::ref_ptr<wali::nwa::NWA<>> complementNWA = wali::ref_ptr<wali::nwa::NWA<>>();
+  wali::ref_ptr<wali::nwa::NWA> complementNWA = wali::ref_ptr<wali::nwa::NWA>();
   complementNWA->setStuckState(stuck);
   complementNWA->complement(myNWA);
-  wali::ref_ptr<wali::nwa::NWA<>> determinizeNWA = wali::ref_ptr<wali::nwa::NWA<>>();
+  wali::ref_ptr<wali::nwa::NWA> determinizeNWA = wali::ref_ptr<wali::nwa::NWA>();
   determinizeNWA->setStuckState(stuck);
   determinizeNWA->determinize(myNWA);
   determinizeNWA->isDeterministic();
 
-  wali::nwa::NWA<>::unionNWA(myNWA,intersectNWA,stuck);
-  wali::nwa::NWA<>::intersect(myNWA,otherNWA,stuck);
-  wali::nwa::NWA<>::concat(myNWA,otherNWA,stuck);
-  wali::nwa::NWA<>::reverse(myNWA,stuck);
-  wali::nwa::NWA<>::star(myNWA,stuck);
-  wali::nwa::NWA<>::complement(myNWA,stuck);
-  wali::nwa::NWA<>::determinize(myNWA,stuck);
-  
+  wali::nwa::NWA::unionNWA(myNWA,intersectNWA,stuck);
+  wali::nwa::NWA::intersect(myNWA,otherNWA,stuck);
+  wali::nwa::NWA::concat(myNWA,otherNWA,stuck);
+  wali::nwa::NWA::reverse(myNWA,stuck);
+  wali::nwa::NWA::star(myNWA,stuck);
+  wali::nwa::NWA::complement(myNWA,stuck);
+  wali::nwa::NWA::determinize(myNWA,stuck);
+
+  wali::wfa::WFA wfa1, wfa2a, wfa2b, wfa3, wfa4a, wfa4b;
   myNWA->isEmpty();
-  wali::nwa::NWA<>::isMember(wali::nws::NWS(),myNWA);
-  wali::nwa::NWA<>::inclusion(myNWA,complementNWA);
-  wali::nwa::NWA<>::equal(otherNWA,myNWA);
-  myNWA->prestar(wali::wfa::WFA(),wg);
-  myNWA->prestar(wali::wfa::WFA(),wali::wfa::WFA(),wg);
-  myNWA->poststar(wali::wfa::WFA(),wg);
-  myNWA->poststar(wali::wfa::WFA(),wali::wfa::WFA(),wg);
+  wali::nwa::NWA::isMember(wali::nws::NWS(),myNWA);
+  wali::nwa::NWA::inclusion(myNWA,complementNWA);
+  wali::nwa::NWA::equal(otherNWA,myNWA);
+  myNWA->prestar(wfa1, wg);
+  myNWA->prestar(wfa2a, wfa2b, wg);
+  myNWA->poststar(wfa3, wg);
+  myNWA->poststar(wfa4a, wfa4b, wg);
 
   myNWA->print(std::cout);
   myNWA->print_dot(std::cout,"dotfile");
   bool equal = myNWA->operator==(*otherNWA);
-
+#endif
+  
   myNWA->sizeStates();
   myNWA->sizeTrans();
   myNWA->count_rules();
@@ -326,8 +296,5 @@ int main()
   myNWA->removeSymbol(epsilon);
   myNWA->clearSymbols();
   
-  
-  otherNWA->clear();
   return 0;
 }
-#endif
