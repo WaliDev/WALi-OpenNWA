@@ -3867,6 +3867,8 @@ namespace wali
             return false;
         }
 
+
+        void combineWith(NWARefPtr rhs);
     };
   }
 }

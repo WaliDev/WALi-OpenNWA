@@ -6687,6 +6687,15 @@ namespace wali
 
       return os;
     }
+
+
+    void
+    NWA::combineWith(NWARefPtr rhs)
+    {
+      this->states.addAll(rhs->states);
+      this->addAllSymbols(rhs->symbols);
+      this->trans.addAllTrans(rhs->trans);
+    }
   }
 }
 
