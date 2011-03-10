@@ -3116,9 +3116,15 @@ namespace wali
        */
       static bool equal( NWARefPtr first, NWARefPtr second)
       {
+        NWARefPtr det_first = determinize(first, getKey("[stuck-3119]"));
+        NWARefPtr det_second = determinize(second, getKey("[stuck-3120]"));
+        
         //The languages accepted by two NWAs are equivalent if they are both contained
         //in each other, ie L(a1) contained in L(a2) and L(a2) contained in L(a1).
-        return (inclusion(first,second) && inclusion(second,first) );
+        bool first_in_second = inclusion(det_first,det_second);
+        bool second_in_first = inclusion(det_second,det_first);
+        std::cerr << "equal called, " << first_in_second << " and " << second_in_first << "\n";
+        return (first_in_second && second_in_first );
       }
 
       /**
