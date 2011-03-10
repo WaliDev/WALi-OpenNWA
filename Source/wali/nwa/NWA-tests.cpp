@@ -7,6 +7,7 @@
 // ::wali
 #include "wali/nwa/NWA.hpp"
 #include "wali/nwa/OpenFstInterop.hpp"
+#include "wali/nwa/ProcedureNWAs.hpp"
 #include "wali/Key.hpp"
 #include "wali/wfa/epr/FunctionalWeight.hpp"
 #include "wali/Reach.hpp"
@@ -62,8 +63,8 @@ buildNwa_Alur_JACM_fig6(std::string const & name_prefix)
 
 
 NWARefPtr
-buildNwa_1(std::string const & name_prefix = "",
-           std::string const & stuck = "[stuck]")
+buildNwa_even_zeros(std::string const & name_prefix = "",
+                    std::string const & stuck = "[stuck]")
 {
     // This is inspired by buildNwa_Alur_JACM_fig6.
     //
@@ -236,8 +237,10 @@ build_nondet_internal_nwa(std::string const & stuck = "[stuck]")
 
 int main()
 {
-    NWARefPtr nwa1 = buildNwa_1("#");
-    NWARefPtr nwa2 = buildNwa_1("@");
+    NWARefPtr nwa1 = buildNwa_even_zeros("#");
+    NWARefPtr nwa2 = buildNwa_even_zeros("@");
+    Key call_key = getKey("(");
+    Key return_key = getKey("(");
 
     nwa1->combineWith(nwa2);
 
@@ -299,7 +302,21 @@ int main()
     assert (NWA::equal(eo_nwa, eo_converted) && "Post-munging");
 
 
+    ////////////////////////////////////////
+    /// Test to make sure that assemble_nwa doesn't muck around with NWAs
+    /// that don't have any fake calls.
 
+    wali::nwa::ProcedureMap procs;
+    procs["main"] = eo_nwa;
+    procs["other"] = eo_converted;
+
+    NWARefPtr assembled = assemble_nwa(procs, call_key, return_key);
+    assert(NWA::equal(eo_nwa, assembled));
+
+    procs["main"] = buildNwa_even_zeros("#");
+
+    assembled = assemble_nwa(procs, call_key, return_key);
+    assert(NWA::equal(buildNwa_even_zeros("#"), assembled));
 
     
 #if 0 // this works if you want to uncomment it
