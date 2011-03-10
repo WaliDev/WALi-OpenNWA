@@ -13,82 +13,80 @@ using fst::StdMutableFst;
 
 namespace wali {
     namespace nwa {
-
-        struct WaliKey {
-            Key key;
-
-            WaliKey(Key k) : key(k) {}
-            bool operator== (WaliKey rhs) const { key == rhs.key; }
-            bool operator<  (WaliKey rhs) const { key <  rhs.key; }
-        };
-
-        struct FstKey {
-            StdArc::StateId key;
-
-            FstKey(Key k) : key(k) {}
-            bool operator== (FstKey rhs) const { key == rhs.key; }
-            bool operator<  (FstKey rhs) const { key <  rhs.key; }
-        };
-
-        typedef std::map<FstKey, WaliKey> fst_to_wali_key_map;
-        typedef std::map<WaliKey, FstKey> wali_to_fst_key_map;
-        typedef std::pair<fst_to_wali_key_map, wali_to_fst_key_map> fst_wali_key_maps;
-
         
-        WaliKey
+        Key
         get_wali_key(FstKey fstkey, fst_wali_key_maps const & maps)
         {
             assert(maps.first.find(fstkey) != maps.first.end());
-            return maps.first.find(fstkey)->second;
+            return maps.first.find(fstkey)->second.key;
         }
 
-        FstKey
+        StdArc::StateId
         get_fst_key(WaliKey walikey, fst_wali_key_maps const & maps)
         {
             assert(maps.second.find(walikey) != maps.second.end());
-            return maps.second.find(walikey)->second;
+            return maps.second.find(walikey)->second.key;
         }
 
-        FstKey
-        get_new_fst_key(StdMutableFst & fst, WaliKey walikey, fst_wali_key_maps & maps)
+        void
+        add_fst_state(StdMutableFst & fst, WaliKey walikey, fst_wali_key_maps & maps)
         {
-            assert(maps.second.find(walikey) != maps.second.end());
+            assert(maps.second.find(walikey) == maps.second.end());
 
             // Get a new key
-            FstKey fstkey = fst.AddState();
+            FstKey fstkey(fst.AddState());
 
             // Now add it to the maps
             maps.first.insert(std::make_pair(fstkey, walikey));
             maps.second.insert(std::make_pair(walikey, fstkey));
-            
-            return fstkey;
         }
 
            
         StdVectorFst
-        internal_only_nwa_to_fst(NWARefPtr nwa)
+        internal_only_nwa_to_fst(NWARefPtr nwa, fst_wali_key_maps * maps)
         {
             StdVectorFst retFst;
             
             StdArc::StateId initial = retFst.AddState();
             StdArc::StateId final   = retFst.AddState();
 
+            if (maps == NULL) {
+                maps = new fst_wali_key_maps();
+            }
+
+            // Add states to the FST
+            //
+            // We have to set up a mapping for each state from the Wali key
+            // to the OpenFST key. That's what this loop does (rather than do
+            // it on-the-fly; this way gives me more opportunities to write
+            // assert(...)).
+            set<St> const & states = nwa->getStates();
+            for (set<St>::const_iterator state = states.begin();
+                 state != states.end(); ++state)
+            {
+                add_fst_state(retFst, WaliKey(*state), *maps);
+            }
+
+            // Set the initial state of the FST
             assert(nwa->sizeInitialStates() == 1);
             set<St> const & initials = nwa->getInitialStates();
             for (set<St>::const_iterator initial = initials.begin();
                  initial != initials.end(); ++initial)
             {
-                retFst.SetStart(*initial);
+                WaliKey wkey(*initial);
+                retFst.SetStart(get_fst_key(wkey, *maps));
             }
 
 
+            // Set the accepting states of the FST
             assert(nwa->sizeFinalStates() == 1);
             set<St> const & finals = nwa->getFinalStates();
             for (set<St>::const_iterator final = finals.begin();
                  final != finals.end(); ++final)
             {
-                cerr << "*final is " << *final << "\n";
-                retFst.SetFinal(*final, StdArc::Weight::One());
+                WaliKey wkey(*final);
+                retFst.SetFinal(get_fst_key(wkey, *maps),
+                                StdArc::Weight::One());
             }
             
 
@@ -96,11 +94,17 @@ namespace wali {
             for (NWA::internalIterator iit = nwa->beginInternalTrans();
                  iit != nwa->endInternalTrans(); iit++)
             {
-                retFst.AddArc(iit->first,           // start state
+                WaliKey w_start(iit->first);
+                WaliKey w_target(iit->third);
+
+                StdArc::StateId fst_start = get_fst_key(w_start, *maps);
+                StdArc::StateId fst_target = get_fst_key(w_target, *maps);
+                
+                retFst.AddArc(fst_start,            // start state
                               StdArc(iit->second,   // input symbol
                                      iit->second,   // output symbol (ignored for acceptor)
                                      0,             // weight
-                                     iit->second)); // destination state
+                                     fst_target));  // destination state
             }
 
             //Call Transitions
