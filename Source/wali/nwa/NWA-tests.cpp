@@ -173,11 +173,17 @@ int main()
     wali::nwa::fst_wali_key_maps maps;
     NWARefPtr eo = build_internal_nwa();
     fst::StdVectorFst fst = internal_only_nwa_to_fst(eo, &maps);
-    NWARefPtr eo_converted = fst_to_nwa(fst, eo->getStuckState(), maps);
 
+    // Now muck around a bit with the fst
+    fst::RmEpsilon(&fst);
+    fst::StdVectorFst det_fst; // make a new one because of bad docs in openfst
+    fst::Determinize(fst, &det_fst);
+    fst::Minimize(&det_fst);
+
+    NWARefPtr eo_converted = fst_to_nwa(det_fst, eo->getStuckState(), maps);
     assert (NWA::equal(eo, eo_converted));
     
-    assert (*eo == *eo_converted);
+    //assert (*eo == *eo_converted);
     
 #if 0 // this works if you want to uncomment it
   wali::Key stuck = wali::getKey("stuck");

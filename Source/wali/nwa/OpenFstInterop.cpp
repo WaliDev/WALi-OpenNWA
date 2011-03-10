@@ -2,6 +2,8 @@
 
 #include <fst/fstlib.h>
 
+#include <sstream>
+
 
 using std::set;
 using fst::StdVectorFst;
@@ -128,8 +130,25 @@ namespace wali {
         NWARefPtr
         fst_to_nwa(StdExpandedFst const & fst,
                    Key stuck,
-                   fst_wali_key_maps const & maps)
+                   fst_wali_key_maps & maps)
         {
+            // TODO: Because of fun stuff, maps no longer corresponds to the
+            // fst. This is not appropriate for the final version: it should
+            // provide an option to do this (with a NULL ptr), but not do it
+            // by default. -Evan 3/9/11
+            maps.first.clear();
+            maps.second.clear();
+            for(StdFst::StateId i=0 ; i<fst.NumStates() ; ++i) {
+                FstKey fst_key(i);
+                std::stringstream ss;
+                ss << "__fst_to_nwa_gen__" << i;
+                WaliKey wali_key(getKey(ss.str()));
+
+                maps.first.insert(std::make_pair(fst_key, wali_key));
+            }               
+            
+
+            
             assert(NWA::getEpsilon() == 0);
             
             NWARefPtr nwa = new NWA(stuck);
