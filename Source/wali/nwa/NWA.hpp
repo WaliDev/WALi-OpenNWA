@@ -3123,7 +3123,7 @@ namespace wali
         //in each other, ie L(a1) contained in L(a2) and L(a2) contained in L(a1).
         bool first_in_second = inclusion(det_first,det_second);
         bool second_in_first = inclusion(det_second,det_first);
-        std::cerr << "equal called, " << first_in_second << " and " << second_in_first << "\n";
+
         return (first_in_second && second_in_first );
       }
 
