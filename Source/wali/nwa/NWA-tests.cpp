@@ -181,7 +181,7 @@ int main()
     std::cout << "\nNWA eo converted to an FST and back:\n";
     eo_converted->print(std::cout);
 
-    assert (eo == eo_converted);
+    assert (*eo == *eo_converted);
     
 #if 0 // this works if you want to uncomment it
   wali::Key stuck = wali::getKey("stuck");
