@@ -162,7 +162,7 @@ namespace wali {
                 // Add finalness. Aditya says (CashFST.h) "Get state i's
                 // final weight; if == Weight::Zero() => non-final" (and I
                 // think I maintain that invariant too).
-                if (fst.Final(source) == StdArc::Weight::Zero()) {
+                if (fst.Final(source) != StdArc::Weight::Zero()) {
                     nwa->addFinalState(source);
                 }
             }
