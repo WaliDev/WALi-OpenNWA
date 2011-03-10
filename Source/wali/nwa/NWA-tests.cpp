@@ -114,6 +114,112 @@ buildNwa_even_zeros(std::string const & name_prefix = "",
 
 
 NWARefPtr
+build_odd_num_groups(std::string const & name_prefix = "",
+                     std::string const & stuck = "[stuck]")
+{
+    // Accepts NWs with an odd number of () groups, each of which has an even
+    // number of 0s.
+    //
+    // q1 accepts; there is a self loop on each of q0 and q1 on 0.
+    // 
+    //
+    //            ,---.                       ,---.
+    //           /     \                     //```\\
+    //     ---> (  q0   ) XXXXX             (( q1  ))
+    //           \     / XX                  \\___//
+    //            `---'  X XX               ,'`---'
+    //             :     X   xx          ,-'    X
+    //             :        ) pop q1   ,'      XXX
+    //  ( push q0  :             xx  ,'       X X X
+    //             :               XX           X
+    //             :            ,-'  XX         X  ) pop q0
+    //             :      ( push q1    XX       X
+    //             :   :    ,'           XX     X
+    //           : : ; : ,-'               XX   X
+    //            ';'  ----                  XX X
+    //           ,---.                    \    ,---.
+    //          /     \   -----------------/  /     \
+    //         (  q2   )  /     0     0   /  (   q3  )
+    //          \     /  X___________________ \     /
+    //           `---'    \                    `---'
+
+    NWARefPtr nwa = new NWA(getKey(stuck));
+
+    Key q0 = getKey("q0");
+    Key q1 = getKey("q1");
+    Key q2 = getKey("q2");
+    Key q3 = getKey("q3");
+
+    Key zero = getKey("0");
+    Key call = getKey("(");
+    Key ret = getKey(")");
+
+    nwa->addInitialState(q0);
+    nwa->addFinalState(q1);
+
+    nwa->addInternalTrans(q2, zero, q3);
+    nwa->addInternalTrans(q3, zero, q2);
+
+    nwa->addCallTrans(q0, call, q2);
+    nwa->addCallTrans(q1, call, q2);
+    nwa->addReturnTrans(q3, q1, ret, q0);
+    nwa->addReturnTrans(q3, q0, ret, q1);
+
+    return nwa;
+}
+
+wali::nwa::ProcedureMap
+build_odd_num_groups_separate(std::string const & stuck = "[stuck]")
+{
+    // Main:
+    //           ,---.     call odd_zero  \    ,---.
+    //          /     \   -----------------/  //```\\
+    //    ---> (  q0   )  /               /  ((  q1 ))
+    //          \     /  X___________________ \\___//
+    //           `---'    \   call odd_zero    `---'
+
+    // Odd_zero:
+    //           ,---.                    \    ,---.
+    //          /     \   -----------------/  //```\\
+    //    ---> (  q2   )  /     0     0   /  ((  q3 ))
+    //          \     /  X___________________ \\___//
+    //           `---'    \                    `---'
+
+    NWARefPtr main = new NWA(getKey(stuck));
+    NWARefPtr odd_zero = new NWA(getKey(stuck));
+
+    Key q0 = getKey("q0");
+    Key q1 = getKey("q1");
+    Key q2 = getKey("q2");
+    Key q3 = getKey("q3");
+
+    Key zero = getKey("0");
+    Key call_oz = getKey("__call__odd_zero");
+ 
+    // Set up main
+    main->addInitialState(q0);
+    main->addFinalState(q1);
+    main->addInternalTrans(q0, call_oz, q1);
+    main->addInternalTrans(q1, call_oz, q0);
+
+    // Set up odd_zero
+    odd_zero->addInitialState(q2);
+    odd_zero->addFinalState(q3);
+    odd_zero->addInternalTrans(q2, zero, q3);
+    odd_zero->addInternalTrans(q3, zero, q2);
+
+
+    wali::nwa::ProcedureMap map;
+    map["main"] = main;
+    map["odd_zero"] = odd_zero;
+
+    return map;
+
+}
+
+
+
+NWARefPtr
 build_internal_nwa(std::string const & stuck = "[stuck]")
 {
     // This is a FSM expressed as an NWA. It accepts strings with an even
@@ -240,7 +346,7 @@ int main()
     NWARefPtr nwa1 = buildNwa_even_zeros("#");
     NWARefPtr nwa2 = buildNwa_even_zeros("@");
     Key call_key = getKey("(");
-    Key return_key = getKey("(");
+    Key return_key = getKey(")");
 
     nwa1->combineWith(nwa2);
 
@@ -285,8 +391,6 @@ int main()
     // Now convert it and test
     eo_converted = fst_to_nwa(eo_fst, eo_nwa->getStuckState(), maps);
 
-    std::ofstream file("nwa.dot");
-    eo_converted->print_dot(file, "foo");
     assert (NWA::equal(eo_nwa, eo_converted) && "Pre-munging");
     //assert (*eo == *eo_converted); UNCOMMENT WHEN FIX TODO ABOUT fst->nwa conversion maps
 
@@ -317,6 +421,19 @@ int main()
 
     assembled = assemble_nwa(procs, call_key, return_key);
     assert(NWA::equal(buildNwa_even_zeros("#"), assembled));
+
+
+    ///////////////////////////////////////
+    /// Test assemble_nwa
+
+    NWARefPtr baseline = build_odd_num_groups();
+
+    procs.clear();
+    procs = build_odd_num_groups_separate();
+
+    assembled = assemble_nwa(procs, call_key, return_key);
+
+    assert(NWA::equal(assembled, baseline));
 
     
 #if 0 // this works if you want to uncomment it
