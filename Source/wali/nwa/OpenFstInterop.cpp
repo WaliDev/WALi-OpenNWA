@@ -126,7 +126,9 @@ namespace wali {
 
 
         NWARefPtr
-        fst_to_nwa(StdExpandedFst const & fst, Key stuck, fst_wali_key_maps const & maps)
+        fst_to_nwa(StdExpandedFst const & fst,
+                   Key stuck,
+                   fst_wali_key_maps const & maps)
         {
             assert(NWA::getEpsilon() == 0);
             
