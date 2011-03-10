@@ -130,7 +130,8 @@ namespace wali {
         NWARefPtr
         fst_to_nwa(StdExpandedFst const & fst,
                    Key stuck,
-                   fst_wali_key_maps & maps)
+                   fst_wali_key_maps & maps,
+                   std::string node_prefix)
         {
             // TODO: Because of fun stuff, maps no longer corresponds to the
             // fst. This is not appropriate for the final version: it should
@@ -141,7 +142,7 @@ namespace wali {
             for(StdFst::StateId i=0 ; i<fst.NumStates() ; ++i) {
                 FstKey fst_key(i);
                 std::stringstream ss;
-                ss << "__fst_to_nwa_gen__" << i;
+                ss << "__fst_nwa__" << node_prefix << i;
                 WaliKey wali_key(getKey(ss.str()));
 
                 maps.first.insert(std::make_pair(fst_key, wali_key));
@@ -194,6 +195,44 @@ namespace wali {
 
             return nwa;
         }
+
+
+
+        // Converts the given NWA (which must have only internal transitions)
+        // to an OpenFST acceptor, minimizes that acceptor, then converts it
+        // back. (Unfortunately, this will destroy the state names. C'est la
+        // vie.)
+        NWARefPtr
+        minimize_internal_nwa(NWARefPtr internal_nwa,
+                              std::string node_prefix)
+        {
+            // Convert to a FSM
+            fst_wali_key_maps maps; // this is basically useless at the moment
+            StdVectorFst fsm = internal_only_nwa_to_fst(internal_nwa, &maps);
+            
+            // Minimizing consists of several steps:
+            //  o Remove epsilon transitions (during Determinize, epsilon is
+            //    treated as any other letter)
+            //  o Determinize
+            //  o Minimize
+            // None of these steps are automatic, and there are a couple
+            // styles of interfaces these functions have.
+            fst::RmEpsilon(&fsm);
+            
+            fst::StdVectorFst det_fsm; // make a new one because of bad docs in openfst
+            fst::Determinize(fsm, &det_fsm);
+            
+            fst::Minimize(&det_fsm);
+            
+            // Now convert back
+            NWARefPtr min_nwa = fst_to_nwa(det_fsm, internal_nwa->getStuckState(), maps, node_prefix);
+            
+            // This could be an expensive check, but hopefully not...
+            assert (NWA::equal(internal_nwa, min_nwa));
+            
+            return min_nwa;
+        }
+        
 
     }
 }
