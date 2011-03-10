@@ -175,12 +175,8 @@ int main()
     fst::StdVectorFst fst = internal_only_nwa_to_fst(eo, &maps);
     NWARefPtr eo_converted = fst_to_nwa(fst, eo->getStuckState(), maps);
 
-    std::cout << "NWA eo:\n";
-    eo->print(std::cout);
-
-    std::cout << "\nNWA eo converted to an FST and back:\n";
-    eo_converted->print(std::cout);
-
+    assert (NWA::equal(eo, eo_converted));
+    
     assert (*eo == *eo_converted);
     
 #if 0 // this works if you want to uncomment it
