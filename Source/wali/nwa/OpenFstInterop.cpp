@@ -139,10 +139,11 @@ namespace wali {
             // by default. -Evan 3/9/11
             maps.first.clear();
             maps.second.clear();
+            static int generation = 0;
             for(StdFst::StateId i=0 ; i<fst.NumStates() ; ++i) {
                 FstKey fst_key(i);
                 std::stringstream ss;
-                ss << "__fst_nwa__" << node_prefix << i;
+                ss << "__fst_nwa_ " << ++generation << "__" << node_prefix << i;
                 WaliKey wali_key(getKey(ss.str()));
 
                 maps.first.insert(std::make_pair(fst_key, wali_key));
