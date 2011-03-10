@@ -9,6 +9,9 @@ namespace wali {
     namespace nwa {
         extern NWARefPtr read_nwa(std::istream & is, std::string * name = NULL);
         extern void test_all();
+
+        typedef std::map<std::string, NWARefPtr> ProcedureMap;
+        extern ProcedureMap read_nwa_proc_set(std::istream & is);
     }
 }
 

@@ -15,7 +15,8 @@
 //   ad-hoc lookahead decisions.
 //
 //
-// nwa-description  ::= ('nwa' name? ':'?)? '{'? block+ '}'?   // braces are required if 'nwa' is present
+// nwa-description  ::= ('nwa' name? ':'?)? '{'? block+ '}'?
+//        // braces are required if 'nwa' is present and name is not
 // 
 // block  ::=  state-block     // lookahead = 'Q'
 //          |  sigma-block     // lookahead = 's'
@@ -844,6 +845,7 @@ read_block(std::istream & is, NWARefPtr nwa)
       case 'Q': read_state_block(is, nwa); break;
       case 'S': read_sigma_block(is, nwa); break;
       case 'D': read_delta_block(is, nwa); break;
+      case 'n': return; // we got to the end of that NWA
       default: {
         std::cerr << "Lookahead char: " << (char)is.peek() << "\nNext lines:\n";
         std::string s;
@@ -861,7 +863,7 @@ read_block(std::istream & is, NWARefPtr nwa)
 /// READ_NWA
 ///
 /// nwa-description  ::= ('nwa' name? ':'?)? '{'? block+ '}'?
-///   with an opening brace required if ('nwa' name? ':'?) is used
+///   with an opening brace required if 'nwa' is present and name is not
 ///   (and yes, there must be a space between the name and either : or {)
 ///
 /// Reads in an nwa-description
@@ -907,7 +909,7 @@ namespace wali {
             }
 
             // Now read in the actual NWA, until we reach the end of that spec
-            while(is.peek() != -1 && is.peek() != '}') {
+            while(is.peek() != -1 && is.peek() != '}' && is.peek() != 'n') {
                 read_block(is, nwa);
             }
 
@@ -917,6 +919,48 @@ namespace wali {
             }
 
             return nwa;
+        }
+
+
+        ProcedureMap
+        read_nwa_proc_set(std::istream & is)
+        {
+            discardws(is);
+            
+            ProcedureMap procs;
+
+            while(is.peek() != -1) {
+                std::string name;
+                NWARefPtr nwa = read_nwa(is, &name);
+
+                procs[name] = nwa;
+            }
+
+            return procs;
+        }
+
+        static
+        void
+        test_read_map()
+        {
+            std::string nwas =
+                "nwa main : { Q0: start_m Qf: end_m }\n"
+                "nwa foo    { Q0: start_f Qf: end_f Q: node1 }\n"
+                "nwa bar    { Q0: start_r Qf: end_r Q: node1, node2 }\n"
+                "nwa baz    { Q0: start_z Qf: end_z Q: node1, node2, node3 }\n"
+                ;
+
+            std::stringstream ss(nwas);
+
+            ProcedureMap m = read_nwa_proc_set(ss);
+
+            assert(m.size() == 4);
+
+            // Don't forget the stuck state in these counts
+            assert(m["main"]->sizeStates() == 3);
+            assert(m["foo"]->sizeStates() == 4);
+            assert(m["bar"]->sizeStates() == 5);
+            assert(m["baz"]->sizeStates() == 6);
         }
 
         
@@ -1008,6 +1052,7 @@ namespace wali {
             test_read_lists();
             test_read_blocks();
             test_read_nwa();
+            test_read_map();
         }
     } // namespace nwa
 } // namespace wali
