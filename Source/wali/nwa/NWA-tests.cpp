@@ -415,12 +415,17 @@ int main()
     procs["other"] = eo_converted;
 
     NWARefPtr assembled = assemble_nwa(procs, call_key, return_key);
+
+#if 0
+    std::ofstream f1("baseline.nwa");
+    std::ofstream f2("assembled.nwa");
+    eo_nwa->print_dot(f1, "baseline");
+    assembled->print_dot(f2, "assembled");
+    f1.close();
+    f2.close();
+#endif
+    
     assert(NWA::equal(eo_nwa, assembled));
-
-    procs["main"] = buildNwa_even_zeros("#");
-
-    assembled = assemble_nwa(procs, call_key, return_key);
-    assert(NWA::equal(buildNwa_even_zeros("#"), assembled));
 
 
     ///////////////////////////////////////
@@ -432,6 +437,13 @@ int main()
     procs = build_odd_num_groups_separate();
 
     assembled = assemble_nwa(procs, call_key, return_key);
+
+    std::ofstream f1("baseline.nwa");
+    std::ofstream f2("assembled.nwa");
+    baseline->print_dot(f1, "baseline");
+    assembled->print_dot(f2, "assembled");
+    f1.close();
+    f2.close();
 
     assert(NWA::equal(assembled, baseline));
 
