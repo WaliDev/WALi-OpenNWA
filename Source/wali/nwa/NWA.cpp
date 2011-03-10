@@ -6034,25 +6034,25 @@ namespace wali
 #if 1
       ReachGen reach;
       //Perform poststar to determine reachability.
-      std::cerr << "Before poststar\n";
+      //std::cerr << "Before poststar\n";
       wali::wfa::WFA postInitials = poststar(initials,reach);
-      std::cerr << "After poststar!\n";
+      //std::cerr << "After poststar!\n";
 
       //intersect poststar(initials) and finals
-      std::cerr << "Before intersect\n";
+      //std::cerr << "Before intersect\n";
       wali::wfa::WFA reachable = postInitials.intersect(finals);
-      std::cerr << "After intersect!\n";
+      //std::cerr << "After intersect!\n";
 #else
       //Perform poststar to determine reachability.
       ReachGen<Client> reach;
-      std::cerr << "Before prestar\n";
+      //std::cerr << "Before prestar\n";
       wali::wfa::WFA preFinals = prestar(finals,reach);
-      std::cerr << "After prestar!\n";
+      //std::cerr << "After prestar!\n";
 
       //intersect poststar(initials) and finals
-      std::cerr << "Before WFA intersect\n";
+      //std::cerr << "Before WFA intersect\n";
       wali::wfa::WFA reachable = preFinals.intersect(initials);
-      std::cerr << "After WFA intersect!\n";
+      //std::cerr << "After WFA intersect!\n";
 #endif
 
       //If there are no transitions in this intersection, then the NWA is empty.
