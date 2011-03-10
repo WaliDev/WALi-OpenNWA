@@ -9,6 +9,7 @@ using fst::StdArc;
 using fst::StateIterator;
 using fst::ArcIterator;
 using fst::StdFst;
+using fst::StdExpandedFst;
 using fst::StdMutableFst;
 
 namespace wali {
@@ -47,9 +48,6 @@ namespace wali {
         {
             StdVectorFst retFst;
             
-            StdArc::StateId initial = retFst.AddState();
-            StdArc::StateId final   = retFst.AddState();
-
             if (maps == NULL) {
                 maps = new fst_wali_key_maps();
             }
@@ -126,16 +124,20 @@ namespace wali {
 
 
         NWARefPtr
-        fst_to_nwa(StdFst const & fst, Key stuck)
+        fst_to_nwa(StdExpandedFst const & fst, Key stuck, fst_wali_key_maps const & maps)
         {
+            std::cerr << "Converting a FSM with " << fst.NumStates() << " states\n";
+            fst.Write("fsm.fsm");
+            
             NWARefPtr nwa = new NWA(stuck);
             
             typedef StateIterator<StdFst> StateIter;
             typedef ArcIterator<StdFst> ArcIter;
 
             // We need to add initial states, final states, and transitions.
-            
-            nwa->addInitialState(fst.Start());
+
+            FstKey fst_start(fst.Start());
+            nwa->addInitialState(get_wali_key(fst_start, maps));
             
             // OpenFST doesn't let you directly say "give me all
             // transitions"; all you can say is "give me the transitions
@@ -147,22 +149,23 @@ namespace wali {
             // over all states, and check if each is final. Since we have to
             // do that anyway, might as well combine those loops.
             for (StateIter state(fst); !state.Done(); state.Next()) {
-                Key source = state.Value();
+                FstKey fst_source(state.Value());
+                Key source = get_wali_key(fst_source, maps);
 
                 // Add transitions
-                for (ArcIter arciter(fst, source); !arciter.Done(); arciter.Next()) {
+                for (ArcIter arciter(fst, fst_source.key); !arciter.Done(); arciter.Next()) {
                     const StdArc &arc = arciter.Value();
-                    Key target = arc.nextstate;
+                    FstKey target(arc.nextstate);
                     Key letter = arc.ilabel;
                     
                     // Add 'source -> target'
-                    nwa->addInternalTrans(source, letter, target);
+                    nwa->addInternalTrans(source, letter, get_wali_key(target, maps));
                 }
 
                 // Add finalness. Aditya says (CashFST.h) "Get state i's
                 // final weight; if == Weight::Zero() => non-final" (and I
                 // think I maintain that invariant too).
-                if (fst.Final(source) != StdArc::Weight::Zero()) {
+                if (fst.Final(fst_source.key) != StdArc::Weight::Zero()) {
                     nwa->addFinalState(source);
                 }
             }

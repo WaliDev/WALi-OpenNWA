@@ -170,10 +170,10 @@ int main()
 
     //nwa1->print_dot(std::cout, "thingy");
 
-
+    wali::nwa::fst_wali_key_maps maps;
     NWARefPtr eo = build_internal_nwa();
-    fst::StdVectorFst fst = internal_only_nwa_to_fst(eo);
-    NWARefPtr eo_converted = fst_to_nwa(fst);
+    fst::StdVectorFst fst = internal_only_nwa_to_fst(eo, &maps);
+    NWARefPtr eo_converted = fst_to_nwa(fst, eo->getStuckState(), maps);
 
     std::cout << "NWA eo:\n";
     eo->print(std::cout);
