@@ -15,7 +15,7 @@
 //   ad-hoc lookahead decisions.
 //
 //
-// nwa-description  ::= 'nwa:'? '{'? block+ '}'?
+// nwa-description  ::= ('nwa' name? ':'?)? '{'? block+ '}'?   // braces are required if 'nwa' is present
 // 
 // block  ::=  state-block     // lookahead = 'Q'
 //          |  sigma-block     // lookahead = 's'
@@ -860,7 +860,9 @@ read_block(std::istream & is, NWARefPtr nwa)
 ////////////////////////////////////////////////////////////////////////////////
 /// READ_NWA
 ///
-/// nwa-description  ::= 'nwa:'? '{'? block+ '}'?
+/// nwa-description  ::= ('nwa' name? ':'?)? '{'? block+ '}'?
+///   with an opening brace required if ('nwa' name? ':'?) is used
+///   (and yes, there must be a space between the name and either : or {)
 ///
 /// Reads in an nwa-description
 
@@ -868,7 +870,7 @@ namespace wali {
     namespace nwa {
 
         NWARefPtr
-        read_nwa(std::istream & is)
+        read_nwa(std::istream & is, std::string * nwa_name)
         {
             lineno = 0;
             
@@ -884,10 +886,21 @@ namespace wali {
             NWARefPtr nwa = new NWA(stuck);
 
             // Skip over a bunch of stuff: opening whitespace, the optional
-            // 'nwa:', and the optional '{'
+            // 'nwa'-name-':' sequence, and the optional '{'
             discardws(is);
             if (is.peek() == 'n') {
-                read_lit(is, "nwa:");
+                read_lit(is, "nwa");
+
+                if (is.peek() != ':' && is.peek() != '{') {
+                    std::string name = read_name(is);
+                    if (nwa_name) {
+                        *nwa_name = name;
+                    }
+                }
+
+                if (is.peek() == ':') {
+                    read_lit(is, ":");
+                }
             }
             if (is.peek() == '{') {
                 read_lit(is, "{");
@@ -959,7 +972,7 @@ namespace wali {
 
             std::stringstream ss1(mattsNwa);
             std::stringstream ss2("nwa: " + mattsNwa);
-            std::stringstream ss3("nwa: { " + mattsNwa + " } nwa: " + mattsNwa);
+            std::stringstream ss3("nwa somename  { " + mattsNwa + " } nwa: " + mattsNwa);
 
             read_nwa(ss1);
             read_nwa(ss2);
