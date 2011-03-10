@@ -27,6 +27,9 @@ namespace wali {
         {
             NWARefPtr finalnwa = new NWA(getKey("[stuck-procedure-nwas-13]"));
 
+            std::map<std::string, std::set<St> > entries_map;
+            std::map<std::string, std::set<St> > exits_map;
+
             ////////
             // We will set up the states, then fix up the transitions.
             
@@ -35,35 +38,18 @@ namespace wali {
             for (ProcedureMap::const_iterator proc = procedures.begin();
                  proc != procedures.end(); ++proc)
             {
-                //NWARefPtr min = minimize_internal_nwa(proc->second);
-                NWARefPtr min = proc->second;
+                NWARefPtr min = minimize_internal_nwa(proc->second);
+                //NWARefPtr min = proc->second;
+
+                entries_map[proc->first] = min->getInitialStates();
+                exits_map[proc->first] = min->getFinalStates();
+
+                if (proc->first != "main") {
+                    min->clearInitialStates();
+                    min->clearFinalStates();
+                }
+
                 finalnwa->combineWith(min);
-            }
-
-            // Initial and final states are (just) those of main; set them up.
-            finalnwa->clearInitialStates();
-            finalnwa->clearFinalStates();
-
-            assert(procedures.find("main") != procedures.end());
-            NWARefPtr main_nwa = procedures.find("main")->second;
-            
-            std::set<St> const & main_entries = main_nwa->getInitialStates();
-            std::set<St> const & main_exits = main_nwa->getFinalStates();
-
-            // This assertion isn't needed. TODO: think about removing
-            // (rather, change to >= 1). -Evan 3/10/11
-            assert(main_entries.size() == 1);
-            
-            for (std::set<St>::const_iterator entry = main_entries.begin();
-                 entry != main_entries.end(); ++entry)
-            {
-                finalnwa->addInitialState(*entry);
-            }
-                    
-            for (std::set<St>::const_iterator exit = main_exits.begin();
-                 exit != main_exits.end(); ++exit)
-            {
-                finalnwa->addFinalState(*exit);
             }
 
 
@@ -116,10 +102,10 @@ namespace wali {
                 
                 std::string symbol = key2str(fake_call->second);
                 std::string callee_name = remove_prefix(symbol, call_prefix);
-                assert(procedures.find(callee_name) != procedures.end());
-                NWARefPtr callee = procedures.find(callee_name)->second;
-                std::set<St> const & entries = callee->getInitialStates();
-                std::set<St> const & exits = callee->getFinalStates();
+                assert(entries_map.find(callee_name) != entries_map.end());
+                assert(exits_map.find(callee_name) != exits_map.end());
+                std::set<St> const & entries = entries_map[callee_name];
+                std::set<St> const & exits = exits_map[callee_name];
 
                 // I don't think these assertions are necessary for the below
                 // to work, but they do apply in my setting. TODO: consider
