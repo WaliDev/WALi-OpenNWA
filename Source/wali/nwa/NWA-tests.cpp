@@ -161,6 +161,79 @@ build_internal_nwa(std::string const & stuck = "[stuck]")
 }
 
 
+NWARefPtr
+build_nondet_internal_nwa(std::string const & stuck = "[stuck]")
+{
+    // This is a FSM expressed as an NWA. It accepts strings with an even
+    // number of 0s and an odd number of 1s.
+    //
+    //             0
+    // --> EO' <---------> OO' ----\
+    //     ^                ^       |
+    //     |                |       |
+    //   1 |                | 1     |
+    //     |                |       |
+    //     V                V       |
+    // --> EE <----------> OE       | eps
+    //     ^                ^       |
+    //     |                |       |
+    //   1 |                | 1     |
+    //     |                |       |
+    //     V                V       |
+    //     EO <----------> OO <----/
+    //     |       0
+    // eps |
+    //     V
+    //     ACC
+
+    NWARefPtr nwa = new NWA(getKey(stuck));
+
+    Key ee = getKey("ee");
+    Key oe = getKey("oe");
+    Key eo = getKey("eo");
+    Key oo = getKey("oo");
+    Key eo2 = getKey("eo'");
+    Key oo2 = getKey("oo'");
+    Key acc = getKey("acc");
+
+    Key zero = getKey("0");
+    Key one = getKey("1");
+
+    nwa->addInitialState(ee);
+    nwa->addFinalState(eo);
+
+    // Top horizonal arrows
+    nwa->addInternalTrans(eo2, zero, oo2);
+    nwa->addInternalTrans(oo2, zero, eo2);
+
+    // Middle horizontal arrows
+    nwa->addInternalTrans(ee, zero, oe);
+    nwa->addInternalTrans(oe, zero, ee);
+
+    // Bottom horizonal arrows
+    nwa->addInternalTrans(eo, zero, oo);
+    nwa->addInternalTrans(oo, zero, eo);
+
+    // Left vertical arrows
+    nwa->addInternalTrans(ee, one, eo);
+    nwa->addInternalTrans(eo, one, ee);
+    nwa->addInternalTrans(ee, one, eo2);
+    //nwa->addInternalTrans(eo2, one, ee);
+
+    // Right vertical arrows
+    nwa->addInternalTrans(oe, one, oo);
+    nwa->addInternalTrans(oo, one, oe);
+    nwa->addInternalTrans(oe, one, oo2);
+    //nwa->addInternalTrans(oo2, one, oe);
+
+    // Epsilon transitions
+    //nwa->addInternalTrans(oo2, NWA::getEpsilon(), oo);
+    //nwa->addInternalTrans(eo, NWA::getEpsilon(), acc);
+
+    return nwa;
+}
+
+
 int main()
 {
     NWARefPtr nwa1 = buildNwa_1("#");
@@ -170,20 +243,60 @@ int main()
 
     //nwa1->print_dot(std::cout, "thingy");
 
+    //////////////////////////////////////
+    /// TESTS WITH JUST build_internal_nwa
+    
     wali::nwa::fst_wali_key_maps maps;
-    NWARefPtr eo = build_internal_nwa();
-    fst::StdVectorFst fst = internal_only_nwa_to_fst(eo, &maps);
+    NWARefPtr eo_nwa = build_internal_nwa();
+    fst::StdVectorFst eo_fst = internal_only_nwa_to_fst(eo_nwa, &maps);
 
+    // Now convert it and test
+    NWARefPtr eo_converted = fst_to_nwa(eo_fst, eo_nwa->getStuckState(), maps);
+    assert (NWA::equal(eo_nwa, eo_converted));
+    //assert (*eo == *eo_converted); UNCOMMENT WHEN FIX TODO ABOUT fst->nwa conversion maps
+
+    
     // Now muck around a bit with the fst
-    fst::RmEpsilon(&fst);
+    fst::RmEpsilon(&eo_fst);
     fst::StdVectorFst det_fst; // make a new one because of bad docs in openfst
-    fst::Determinize(fst, &det_fst);
+    fst::Determinize(eo_fst, &det_fst);
     fst::Minimize(&det_fst);
 
-    NWARefPtr eo_converted = fst_to_nwa(det_fst, eo->getStuckState(), maps);
-    assert (NWA::equal(eo, eo_converted));
+    // And convert it again
+    eo_converted = fst_to_nwa(det_fst, eo_nwa->getStuckState(), maps);
+    assert (NWA::equal(eo_nwa, eo_converted));
+
+
+    /////////////////////////////////////////
+    /// TESTS WITH build_nondet_internal_nwa
+
+    maps.first.clear();
+    maps.second.clear();
+    eo_nwa = build_nondet_internal_nwa();
+    eo_fst = internal_only_nwa_to_fst(eo_nwa, &maps);
+
+    // Now convert it and test
+    eo_converted = fst_to_nwa(eo_fst, eo_nwa->getStuckState(), maps);
+
+    std::ofstream file("nwa.dot");
+    eo_converted->print_dot(file, "foo");
+    assert (NWA::equal(eo_nwa, eo_converted) && "Pre-munging");
+    //assert (*eo == *eo_converted); UNCOMMENT WHEN FIX TODO ABOUT fst->nwa conversion maps
+
     
-    //assert (*eo == *eo_converted);
+    // Now muck around a bit with the fst
+    fst::RmEpsilon(&eo_fst);
+    fst::StdVectorFst det_fst_2; // make a new one because of bad docs in openfst
+    fst::Determinize(eo_fst, &det_fst_2);
+    fst::Minimize(&det_fst_2);
+
+    // And convert it again
+    eo_converted = fst_to_nwa(det_fst_2, eo_nwa->getStuckState(), maps);
+    assert (NWA::equal(eo_nwa, eo_converted) && "Post-munging");
+
+
+
+
     
 #if 0 // this works if you want to uncomment it
   wali::Key stuck = wali::getKey("stuck");
