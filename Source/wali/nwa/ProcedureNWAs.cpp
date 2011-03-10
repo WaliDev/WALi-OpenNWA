@@ -53,7 +53,6 @@ namespace wali {
             // This assertion isn't needed. TODO: think about removing
             // (rather, change to >= 1). -Evan 3/10/11
             assert(main_entries.size() == 1);
-            assert(main_exits.size() == 1);
             
             for (std::set<St>::const_iterator entry = main_entries.begin();
                  entry != main_entries.end(); ++entry)
@@ -128,7 +127,6 @@ namespace wali {
                 // 3/10/11 (Actually change to >= 1 instead of remove
                 // entirely.)
                 assert(entries.size() == 1);
-                assert(exits.size() == 1);
 
                 // Now add the call transition(s)
                 for (std::set<St>::const_iterator entry = entries.begin();
