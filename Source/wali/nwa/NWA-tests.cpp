@@ -267,6 +267,10 @@ int main()
     assert (NWA::equal(eo_nwa, eo_converted));
 
 
+    minimize_internal_nwa(build_internal_nwa());
+    minimize_internal_nwa(build_nondet_internal_nwa());
+
+
     /////////////////////////////////////////
     /// TESTS WITH build_nondet_internal_nwa
 
