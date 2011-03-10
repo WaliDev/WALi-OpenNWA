@@ -46,6 +46,8 @@ namespace wali {
         StdVectorFst
         internal_only_nwa_to_fst(NWARefPtr nwa, fst_wali_key_maps * maps)
         {
+            assert(NWA::getEpsilon() == 0);
+            
             StdVectorFst retFst;
             
             if (maps == NULL) {
@@ -126,8 +128,7 @@ namespace wali {
         NWARefPtr
         fst_to_nwa(StdExpandedFst const & fst, Key stuck, fst_wali_key_maps const & maps)
         {
-            std::cerr << "Converting a FSM with " << fst.NumStates() << " states\n";
-            fst.Write("fsm.fsm");
+            assert(NWA::getEpsilon() == 0);
             
             NWARefPtr nwa = new NWA(stuck);
             
