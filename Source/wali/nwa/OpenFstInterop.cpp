@@ -143,7 +143,7 @@ namespace wali {
             for(StdFst::StateId i=0 ; i<fst.NumStates() ; ++i) {
                 FstKey fst_key(i);
                 std::stringstream ss;
-                ss << "__fst_nwa_ " << ++generation << "__" << node_prefix << i;
+                ss << "__fst_nwa_" << ++generation << "__" << node_prefix << i;
                 WaliKey wali_key(getKey(ss.str()));
 
                 maps.first.insert(std::make_pair(fst_key, wali_key));
@@ -229,7 +229,7 @@ namespace wali {
             NWARefPtr min_nwa = fst_to_nwa(det_fsm, internal_nwa->getStuckState(), maps, node_prefix);
             
             // This could be an expensive check, but hopefully not...
-            assert (NWA::equal(internal_nwa, min_nwa));
+            //assert (NWA::equal(internal_nwa, min_nwa));
             
             return min_nwa;
         }
