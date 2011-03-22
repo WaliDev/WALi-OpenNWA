@@ -2530,11 +2530,6 @@ namespace wali
       bool isDeterministic( );
 
       /**
-       * Delegate 
-      **/
-      void delegateStates( );
-
-      /**
        * 
        * @brief determines whether there is any overlap in the states of the given NWAs,
        *        except that the stuck state is allowed to be in both IF it is the stuck in both
