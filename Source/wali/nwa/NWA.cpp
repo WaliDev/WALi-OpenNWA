@@ -22,7 +22,9 @@ namespace wali
 
     
     NWA::NWA( const NWA & other )
-      : stuck( other.stuck), states(other.states), symbols(other.symbols), trans(other.trans)
+      : Printable(other)
+      , Countable(other)
+      , stuck( other.stuck), states(other.states), symbols(other.symbols), trans(other.trans)
     {   }
 
     
@@ -3223,6 +3225,9 @@ namespace wali
 
     bool NWA::isTransitionPossible( const St &src, const Sym &sym, const St &tgt) 
     {
+      (void) src;
+      (void) sym;
+      (void) tgt;
       return true;
     }
 
@@ -5045,6 +5050,8 @@ namespace wali
                                                NWARefPtr second, St call2, St entry2, 
                                                Sym resSym, St resSt )
     {
+      (void) first, (void) call1, (void) entry1, (void) second;
+      (void) call2, (void) entry2, (void) resSym, (void) resSt;
       //Note: When overriding this method your metric must combine any client information associated
       // with the target states of the two transitions and set the client information of result
       // to that value.
@@ -5075,6 +5082,8 @@ namespace wali
                                                    NWARefPtr second, St src2, St tgt2, 
                                                    Sym resSym, St resSt )
     {
+      (void) first, (void) src1, (void) tgt1, (void) second, (void) src2;
+      (void) tgt2, (void) resSym, (void) resSt;
       //Note: When overriding this method your metric must combine any client information associated
       // with the target states of the two transitions and set the client information of result
       // to that value.
@@ -5109,6 +5118,8 @@ namespace wali
                                                  NWARefPtr second, St exit2, St call2, St ret2,
                                                  Sym resSym, St resSt )
     {
+      (void) first, (void) exit1, (void) call1, (void) ret1, (void) second;
+      (void) exit2, (void) call2, (void) ret2, (void) resSym, (void) resSt;
       //Note: When overriding this method your metric must combine any client information associated
       // with the target states of the two transitions and set the client information of result
       // to that value.
@@ -5129,6 +5140,8 @@ namespace wali
     bool NWA::stateIntersect( NWARefPtr first, St state1, NWARefPtr second, St state2, 
                                       St & resSt, ClientInfoRefPtr & resCI ) 
     {
+      (void) first, (void) second, (void) resCI;
+      
       //Note: When overriding this method your metric must determine whether the
       //      given states are compatible and set resSt to the appropriate state.
 
@@ -5155,6 +5168,8 @@ namespace wali
     
     bool NWA::transitionIntersect( NWARefPtr first, Sym sym1, NWARefPtr second, Sym sym2, Sym & resSym )
     {
+      (void) first, (void) second;
+      
       //Note: When overriding this method your metric must determine whether the
       //      given symbols are compatible and set result to the appropriate symbol.
 
@@ -5195,6 +5210,7 @@ namespace wali
                    relations::RelationTypedefs<St>::BinaryRelation const & binRel, 
                                 St resSt, ClientInfoRefPtr & resCI )
     {
+      (void) first, (void) binRel, (void) resSt, (void) resCI;
       //Note: When overriding this method your metric must combine any client information associated
       //       with the states of the binary relation and set the client information of resSt to 
       //       that value.
@@ -5219,6 +5235,8 @@ namespace wali
                    relations::RelationTypedefs<St>::BinaryRelation const & binRelEntry,
                                 St callSt, Sym resSym, St resSt, ClientInfoRefPtr & resCI )
     {
+      (void) nwa, (void) binRelCall, (void) binRelEntry, (void) callSt;
+      (void) resSym, (void) resSt, (void) resCI;
       //Note: When overriding this method your metric must combine any client information associated
       //       with the states of the binary relation and set the client information of resSt to 
       //       that value.
@@ -5243,6 +5261,8 @@ namespace wali
                    relations::RelationTypedefs<St>::BinaryRelation const & binRelTarget,
                                 St sourceSt, Sym resSym, St resSt, ClientInfoRefPtr & resCI )
     {
+      (void) nwa, (void) binRelSource, (void) binRelTarget, (void) sourceSt;
+      (void) resSym, (void) resSt, (void) resCI;
       //Note: When overriding this method your metric must combine any client information associated
       //       with the states of the binary relation and set the client information of resSt to 
       //       that value.
@@ -5270,6 +5290,8 @@ namespace wali
                    relations::RelationTypedefs<St>::BinaryRelation const & binRelReturn,
                           St exitSt, St callSt, Sym resSym, St resSt, ClientInfoRefPtr & resCI )
     {
+      (void) nwa, (void) binRelExit, (void) binRelCall, (void) binRelReturn;
+      (void) exitSt, (void) callSt, (void) resSym, (void) resSt, (void) resCI;
       //Note: When overriding this method your metric must combine any client information associated
       //       with the states of the binary relation and set the client information of resSt to 
       //       that value.
@@ -5679,6 +5701,7 @@ namespace wali
     
     bool NWA::addToPDS(const St &src, const Sym &lbl, const St &tgt) const 
     {
+      (void) src, (void) lbl, (void) tgt;
       return true;
     }
 
@@ -6153,7 +6176,7 @@ namespace wali
       o << "//Delta_c: \n";
       callIterator cit = beginCallTrans();
       callIterator citEND = endCallTrans();
-      for( bool first=false; cit != citEND; cit++ )
+      for(; cit != citEND; cit++ )
       {
         printKey(o << "\"",Trans::getCallSite(*cit),abbrev) << "\"";
         o << "->";
@@ -6170,7 +6193,7 @@ namespace wali
       o << "// Delta_i:\n" ;
       internalIterator iit = beginInternalTrans();
       internalIterator iitEND = endInternalTrans();
-      for( bool first=false; iit != iitEND; iit++ )
+      for(; iit != iitEND; iit++ )
       {
         printKey(o << "\"",Trans::getSource(*iit),abbrev) << "\"";
         o << "->";

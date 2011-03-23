@@ -64,11 +64,17 @@ namespace wali
 
         sem_elem_t getWeight( const St & src, const Sym & inst, Kind k, const St & tgt )
         {
+          (void) src;
+          (void) inst;
+          (void) k;
+          (void) tgt;
           return getOne();
         }
            
         sem_elem_t getWildWeight( const St & src, const St & tgt )
-        { 
+        {
+          (void) src;
+          (void) tgt;
           return getOne();
         }
     };

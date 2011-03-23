@@ -21,12 +21,14 @@ namespace wali
     class ClientInfo : public Countable
     { 
       virtual ClientInfo & operator=( const ClientInfo & other )
-      { 
+      {
+        (void) other;
         return *this;
       };
 
       virtual bool operator== (ClientInfo const & other)
       {
+        (void) other;
         return true;
       }
 
@@ -56,6 +58,8 @@ namespace wali
       **/
       virtual bool subsumes( ref_ptr<ClientInfo> other, ref_ptr<ClientInfo> & residual ) 
       {
+        (void) other;
+        (void) residual;
         return false;
       }
 

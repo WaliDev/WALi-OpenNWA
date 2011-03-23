@@ -38,6 +38,7 @@ namespace wali
       
       //Constructors and Destructor
       WeightGen( ) { }
+      virtual ~WeightGen() {}
         
       /**
        *  
@@ -70,6 +71,12 @@ namespace wali
        */
       virtual sem_elem_t getWeight( Key src, ClientInfoRefPtr srcInfo, Key sym, Kind kind, Key tgt, ClientInfoRefPtr tgtInfo ) 
       {
+        (void) src;
+        (void) srcInfo;
+        (void) sym;
+        (void) kind;
+        (void) tgt;
+        (void) tgtInfo;
         return getOne();
       }
         
@@ -89,6 +96,8 @@ namespace wali
        */
       virtual sem_elem_t getExitWeight( Key src, ClientInfoRefPtr srcInfo ) 
       {
+        (void) src;
+        (void) srcInfo;
         return getOne();
       }
 
@@ -108,7 +117,11 @@ namespace wali
        *
        */
       virtual sem_elem_t getWildWeight( Key src, ClientInfoRefPtr srcInfo, Key tgt, ClientInfoRefPtr tgtInfo )
-      { 
+      {
+        (void) src;
+        (void) srcInfo;
+        (void) tgt;
+        (void) tgtInfo;
         return getOne();
       }
     };      
