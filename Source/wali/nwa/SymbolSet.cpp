@@ -11,7 +11,8 @@ SymbolSet::SymbolSet( )
 }
 
 SymbolSet::SymbolSet( const SymbolSet & other )
-  : symbols(other.symbols)
+  : Printable(other)
+  , symbols(other.symbols)
 { }
 
 SymbolSet & SymbolSet::operator=( const SymbolSet & other )
@@ -258,7 +259,15 @@ Label::Sym Label::getAnySymbol( const SymbolSet & symbolPool ) const
         return *it;   //Return the first symbol in the symbolPool which  
                       //is not in the set of symbols not on the edge.
     }
-    return NULL;
+    // This shouldn't happen for now, because I don't know what the function
+    // should do. Maybe return a bool/Sym pair? Define an "INVALID_SYMBOL"
+    // somewhere?
+    //
+    // Regardless, 'return NULL' is NOT it, as that essentially means "return
+    // epsilon".
+    assert(false);
+    throw "SymbolSet.cpp line 262 (or thereabouts); talk to Evan.";
+    //return NULL;
   }
   else
   {
