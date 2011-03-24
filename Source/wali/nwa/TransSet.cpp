@@ -37,7 +37,7 @@ namespace wali
      *         target, false otherwise
      *
      */
-    bool TransSet::getSymbol( St fromSt, St toSt, Sym & sym ) const
+    bool TransSet::getSymbol( State fromSt, State toSt, Symbol & sym ) const
     {
       //Check internal transitions.
       const Info::Internals & from = T_info.fromTrans(fromSt);
@@ -94,7 +94,7 @@ namespace wali
      * @return true if such a transition exists, false otherwise
      * 
      */
-    bool TransSet::findTrans( St fromSt, Sym sym, St toSt ) const
+    bool TransSet::findTrans( State fromSt, Symbol sym, State toSt ) const
     {
       //Check internal transitions.
       const Info::Internals & from = T_info.fromTrans(fromSt);
@@ -142,7 +142,7 @@ namespace wali
      * @return the set of all return sites that correspond with the given call site
      *
      */
-    const TransSet::States TransSet::getReturnSites( St callSite ) const
+    const TransSet::States TransSet::getReturnSites( State callSite ) const
     {
       States returns;
       const Info::Returns & pred = T_info.predTrans(callSite);
@@ -162,7 +162,7 @@ namespace wali
      * @return the set of all return sites that correspond with the given call site
      *
      */
-    TransSet::States TransSet::getReturnSites( St exit, St callSite ) const
+    TransSet::States TransSet::getReturnSites( State exit, State callSite ) const
     {
       States returns;
       const Info::Returns & pred = T_info.predTrans(callSite);
@@ -183,7 +183,7 @@ namespace wali
      * @return the set of all call sites that correspond with the exit - return site pair
      *
      */
-    const TransSet::States TransSet::getCallSites( St exitSite, St returnSite ) const
+    const TransSet::States TransSet::getCallSites( State exitSite, State returnSite ) const
     {
       States calls;
       const Info::Returns & exit = T_info.exitTrans(exitSite);
@@ -203,7 +203,7 @@ namespace wali
      * @return the set of all entry sites that correspond with the given call site
      *
      */
-    const TransSet::States TransSet::getEntries( St callSite ) const
+    const TransSet::States TransSet::getEntries( State callSite ) const
     {
       States entries;
       const Info::Calls & cll = T_info.callTrans(callSite);
@@ -222,7 +222,7 @@ namespace wali
      * @return the set of all targets that correspond with the given source 
      *
      */
-    const TransSet::States TransSet::getTargets( St source ) const
+    const TransSet::States TransSet::getTargets( State source ) const
     {
       States targets;
       const Info::Internals & src = T_info.fromTrans(source);
@@ -241,7 +241,7 @@ namespace wali
      * @param - dup: the state that is duplicating 'orig'
      *  
      */
-    void TransSet::dupTransOutgoing( St orig, St dup )
+    void TransSet::dupTransOutgoing( State orig, State dup )
     { 
       // Duplicate outgoing internal transitions.
       const Info::Internals & from = T_info.fromTrans(orig);
@@ -288,7 +288,7 @@ namespace wali
      * @param - dup: the state that is duplicating 'orig'
      *  
      */
-    void TransSet::dupTrans( St orig, St dup )
+    void TransSet::dupTrans( State orig, State dup )
     { 
       //Duplicate outgoing internal transitions.
       const Info::Internals & from = T_info.fromTrans(orig);
@@ -446,7 +446,7 @@ namespace wali
      * @return false if the call transition already exists in the NWA
      *
      */
-    bool TransSet::addCall( St from, Sym sym, St to )
+    bool TransSet::addCall( State from, Symbol sym, State to )
     {
       Call ct = Call(from,sym,to);
       return addCall(ct);
@@ -481,7 +481,7 @@ namespace wali
      * @return false if the internal transition already exists in the NWA
      *
      */
-    bool TransSet::addInternal( St from, Sym sym, St to )
+    bool TransSet::addInternal( State from, Symbol sym, State to )
     {
       Internal it(from,sym,to);
       return addInternal(it);
@@ -517,7 +517,7 @@ namespace wali
      * @return false if the return transition already exists in the NWA
      *
      */
-    bool TransSet::addReturn( St from, St pred, Sym sym, St to )
+    bool TransSet::addReturn( State from, State pred, Symbol sym, State to )
     {
       Return rt(from,pred,sym,to);
       return addReturn(rt);
@@ -585,7 +585,7 @@ namespace wali
      * @return false if the call transition does not exist in the NWA
      *
      */
-    bool TransSet::removeCall( St from, Sym sym, St to )
+    bool TransSet::removeCall( State from, Symbol sym, State to )
     {
       Call ct(from,sym,to);
       return removeCall(ct);
@@ -621,7 +621,7 @@ namespace wali
      * @return false if the internal transition does not exist in the NWA
      *
      */
-    bool TransSet::removeInternal( St from, Sym sym, St to )
+    bool TransSet::removeInternal( State from, Symbol sym, State to )
     {
       Internal it(from,sym,to);
       return removeInternal(it);
@@ -658,7 +658,7 @@ namespace wali
      * @return false if the return transition does not exist in the NWA
      *
      */
-    bool TransSet::removeReturn( St from, St pred, Sym sym, St to )
+    bool TransSet::removeReturn( State from, State pred, Symbol sym, State to )
     {
       Return rt(from,pred,sym,to);
       return removeReturn(rt);
@@ -696,7 +696,7 @@ namespace wali
      *          transitions
      *
      */
-    bool TransSet::isCall( St from, Sym sym, St to ) const
+    bool TransSet::isCall( State from, Symbol sym, State to ) const
     {
       Call ct(from,sym,to);
       return isCall(ct);
@@ -730,7 +730,7 @@ namespace wali
      *          transitions associated with the NWA
      *
      */
-    bool TransSet::isInternal( St from, Sym sym, St to ) const
+    bool TransSet::isInternal( State from, Symbol sym, State to ) const
     {
       Internal it(from,sym,to);
       return isInternal(it);
@@ -765,7 +765,7 @@ namespace wali
      *          transitions
      *
      */
-    bool TransSet::isReturn( St from, St pred, Sym sym, St to ) const
+    bool TransSet::isReturn( State from, State pred, Symbol sym, State to ) const
     {
       Return rt(from,pred,sym,to);
       return isReturn(rt);
@@ -1111,7 +1111,7 @@ namespace wali
      * @return the set of all outgoing internal transitions for the given state
      *
      */
-    const TransSet::Internals & TransSet::getTransFrom( St state ) const
+    const TransSet::Internals & TransSet::getTransFrom( State state ) const
     {
       return T_info.fromTrans( state );
     }
@@ -1124,7 +1124,7 @@ namespace wali
      * @return the set of all incoming internal transitions for the given state
      *
      */
-    const TransSet::Internals & TransSet::getTransTo( St state ) const
+    const TransSet::Internals & TransSet::getTransTo( State state ) const
     {
       return T_info.toTrans( state );
     }
@@ -1137,7 +1137,7 @@ namespace wali
      * @return the set of all call transitions for the given call site
      *
      */
-    const TransSet::Calls & TransSet::getTransCall( St state ) const
+    const TransSet::Calls & TransSet::getTransCall( State state ) const
     {
       return T_info.callTrans( state );
     }
@@ -1150,7 +1150,7 @@ namespace wali
      * @return the set of all call transitions for the given entry point
      *
      */
-    const TransSet::Calls & TransSet::getTransEntry( St state ) const
+    const TransSet::Calls & TransSet::getTransEntry( State state ) const
     {
       return T_info.entryTrans( state );
     }
@@ -1163,7 +1163,7 @@ namespace wali
      * @return the set of all return transitions for the given exit point
      *
      */
-    const TransSet::Returns & TransSet::getTransExit( St state ) const
+    const TransSet::Returns & TransSet::getTransExit( State state ) const
     {
       return T_info.exitTrans( state );
     }
@@ -1176,7 +1176,7 @@ namespace wali
      * @return the set of all return transitions for the given call predecessor
      *
      */
-    const TransSet::Returns & TransSet::getTransPred( St state ) const
+    const TransSet::Returns & TransSet::getTransPred( State state ) const
     {
       return T_info.predTrans( state );
     }
@@ -1189,7 +1189,7 @@ namespace wali
      * @return the set of all return transitions for the given return site
      *
      */
-    const TransSet::Returns & TransSet::getTransRet( St state ) const
+    const TransSet::Returns & TransSet::getTransRet( State state ) const
     {
       return T_info.retTrans( state );
     }
@@ -1204,7 +1204,7 @@ namespace wali
      *          transition, false otherwise
      *
      */
-    bool TransSet::isFrom( St state ) const
+    bool TransSet::isFrom( State state ) const
     {
       return T_info.isFrom( state );
     }
@@ -1219,7 +1219,7 @@ namespace wali
      *          transition, false otherwise
      *
      */
-    bool TransSet::isTo( St state ) const
+    bool TransSet::isTo( State state ) const
     { 
       return T_info.isTo( state );
     }
@@ -1234,7 +1234,7 @@ namespace wali
      *          transition, false otherwise
      *
      */
-    bool TransSet::isCall( St state ) const
+    bool TransSet::isCall( State state ) const
     {
       return T_info.isCall( state );
     }
@@ -1249,7 +1249,7 @@ namespace wali
      *          transition, false otherwise
      *
      */
-    bool TransSet::isEntry( St state ) const
+    bool TransSet::isEntry( State state ) const
     {
       return T_info.isEntry( state );
     }
@@ -1264,7 +1264,7 @@ namespace wali
      *          transition, false otherwise
      *
      */
-    bool TransSet::isExit( St state ) const
+    bool TransSet::isExit( State state ) const
     {
       return T_info.isExit( state );
     }
@@ -1279,7 +1279,7 @@ namespace wali
      *          transition, false otherwise
      *
      */
-    bool TransSet::isPred( St state ) const
+    bool TransSet::isPred( State state ) const
     {
       return T_info.isPred( state );
     }
@@ -1294,7 +1294,7 @@ namespace wali
      *          transition, false otherwise
      *
      */
-    bool TransSet::isRet( St state ) const
+    bool TransSet::isRet( State state ) const
     {
       return T_info.isRet( state );
     }
@@ -1307,7 +1307,7 @@ namespace wali
      * @return false if no transitions were removed, true otherwise
      *
      */
-    bool TransSet::removeTransWith( St state )
+    bool TransSet::removeTransWith( State state )
     {
       bool foundCall = removeCallTransWith(state);
       bool foundInt = removeInternalTransWith(state);
@@ -1324,7 +1324,7 @@ namespace wali
      * @return false if no transitions were removed, true otherwise
      *
      */
-    bool TransSet::removeCallTransWith( St state )
+    bool TransSet::removeCallTransWith( State state )
     {
       Calls outgoing = T_info.callTrans(state);
       Calls incoming = T_info.entryTrans(state);
@@ -1352,7 +1352,7 @@ namespace wali
      * @return false if no transitions were removed, true otherwise
      *
      */
-    bool TransSet::removeInternalTransWith( St state )
+    bool TransSet::removeInternalTransWith( State state )
     {
       Internals outgoing = T_info.fromTrans(state);
       Internals incoming = T_info.toTrans(state);
@@ -1382,7 +1382,7 @@ namespace wali
      * @return false if no transitions were removed, true otherwise
      *
      */
-    bool TransSet::removeReturnTransWith( St state )
+    bool TransSet::removeReturnTransWith( State state )
     {
       Returns outgoing = T_info.exitTrans(state);
       Returns incoming = T_info.retTrans(state);
@@ -1416,7 +1416,7 @@ namespace wali
      * @return false if no transitions were removed, true otherwise
      *
      */
-    bool TransSet::removeTransSym( Sym sym )
+    bool TransSet::removeTransSym( Symbol sym )
     {
       bool foundCall = removeCallTransSym(sym);
       bool foundInternal = removeInternalTransSym(sym);
@@ -1432,7 +1432,7 @@ namespace wali
      * @return false if no transitions were removed, true otherwise
      *
      */
-    bool TransSet::removeCallTransSym( Sym sym )
+    bool TransSet::removeCallTransSym( Symbol sym )
     {
       Calls removeTrans;
 
@@ -1460,7 +1460,7 @@ namespace wali
      * @return false if no transitions were removed, true otherwise
      *
      */
-    bool TransSet::removeInternalTransSym( Sym sym )
+    bool TransSet::removeInternalTransSym( Symbol sym )
     {
       Internals removeTrans;
 
@@ -1488,7 +1488,7 @@ namespace wali
      * @return false if no transitions were removed, true otherwise
      *
      */
-    bool TransSet::removeReturnTransSym( Sym sym )
+    bool TransSet::removeReturnTransSym( Symbol sym )
     {
       Returns removeTrans;
 
@@ -1518,7 +1518,7 @@ namespace wali
      *          symbol in this collection of transitions 
      *
      */
-    bool TransSet::callExists( St from, Sym sym ) const
+    bool TransSet::callExists( State from, Symbol sym ) const
     {
       Calls const & outgoing = T_info.callTrans(from);
 
@@ -1540,7 +1540,7 @@ namespace wali
      * @return the set of call transitions with the given from state and symbol
      *
      */
-    const TransSet::Calls TransSet::getCalls( St from, Sym sym ) const 
+    const TransSet::Calls TransSet::getCalls( State from, Symbol sym ) const 
     {
       Calls result;
       Calls const & outgoing = T_info.callTrans(from);
@@ -1564,7 +1564,7 @@ namespace wali
      *          symbol in this collection of transitions
      *
      */
-    bool TransSet::internalExists( St from, Sym sym ) const
+    bool TransSet::internalExists( State from, Symbol sym ) const
     {
       Internals const & outgoing = T_info.fromTrans(from);
 
@@ -1586,7 +1586,7 @@ namespace wali
      * @return the set of internal transitions with the given from state and symbol
      *
      */
-    const TransSet::Internals TransSet::getInternals( St from, Sym sym ) const
+    const TransSet::Internals TransSet::getInternals( State from, Symbol sym ) const
     {
       Internals result;
       Internals const & outgoing = T_info.fromTrans(from);
@@ -1608,7 +1608,7 @@ namespace wali
      * @return the set of internal transitions with the given from state
      *
      */
-    const TransSet::Internals TransSet::getInternalsFrom( St from ) const
+    const TransSet::Internals TransSet::getInternalsFrom( State from ) const
     {
       return T_info.fromTrans(from);
     }
@@ -1626,7 +1626,7 @@ namespace wali
      *          symbol in this collection of transitions
      *
      */
-    bool TransSet::returnExists( St from, St pred, Sym sym ) const
+    bool TransSet::returnExists( State from, State pred, Symbol sym ) const
     {
       Returns const & outgoing = T_info.exitTrans(from);
 
@@ -1648,7 +1648,7 @@ namespace wali
      * @return the set of return transitions with the given from state and symbol
      *
      */
-    const TransSet::Returns TransSet::getReturns( St from, Sym sym ) const
+    const TransSet::Returns TransSet::getReturns( State from, Symbol sym ) const
     {
       Returns result;
       Returns const & outgoing = T_info.exitTrans(from);

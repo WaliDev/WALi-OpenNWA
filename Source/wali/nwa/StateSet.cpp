@@ -43,9 +43,9 @@ namespace wali
      */
     
     StateSet::ClientInfoRefPtr
-    StateSet::getClientInfo( St state ) const 
+    StateSet::getClientInfo( State state ) const 
     {
-      typedef std::map<St, ClientInfoRefPtr> Map;
+      typedef std::map<State, ClientInfoRefPtr> Map;
       Map::const_iterator it = (stateInfos.find(state));
       if( it == stateInfos.end() )
         return NULL;
@@ -62,7 +62,7 @@ namespace wali
      *
      */
     
-    void StateSet::setClientInfo( St state, const ClientInfoRefPtr c )
+    void StateSet::setClientInfo( State state, const ClientInfoRefPtr c )
     {
       //Check to make sure this is a valid state.
       if(! isState(state) )
@@ -121,7 +121,7 @@ namespace wali
      *
      */
     
-    bool StateSet::isState( St state ) const
+    bool StateSet::isState( State state ) const
     {
       return (states.count(state) > 0);
     } 
@@ -135,7 +135,7 @@ namespace wali
      *
      */
     
-    bool StateSet::isInitialState( St initialState ) const
+    bool StateSet::isInitialState( State initialState ) const
     {
       return (initialStates.count(initialState) > 0);
     }
@@ -149,7 +149,7 @@ namespace wali
      *
      */
     
-    bool StateSet::isFinalState( St finalState ) const
+    bool StateSet::isFinalState( State finalState ) const
     {
       return (finalStates.count(finalState) > 0);
     }
@@ -163,7 +163,7 @@ namespace wali
      *
      */
     
-    bool StateSet::addState( St state )
+    bool StateSet::addState( State state )
     {
 	  // If the ClientInfo is requested for the state, it will be null
       bool inserted = states.insert(state).second;
@@ -179,7 +179,7 @@ namespace wali
      *
      */ 
     
-    bool StateSet::addInitialState( St initialState )
+    bool StateSet::addInitialState( State initialState )
     {
       bool inserted = initialStates.insert(initialState).second;
       if (inserted) {
@@ -199,7 +199,7 @@ namespace wali
      *
      */
     
-    bool StateSet::addFinalState( St finalState )
+    bool StateSet::addFinalState( State finalState )
     {
       bool inserted = finalStates.insert(finalState).second;
       if (inserted) {
@@ -292,7 +292,7 @@ namespace wali
      *
      */
     
-    bool StateSet::removeState( St state )
+    bool StateSet::removeState( State state )
     {
       //The stuck state cannot be removed in this way.
       if( isStuckState( state ) )
@@ -319,7 +319,7 @@ namespace wali
      *  
      */
     
-    bool StateSet::removeInitialState( St initialState )
+    bool StateSet::removeInitialState( State initialState )
     {
       size_t erased = initialStates.erase(initialState);
       return erased > 0;
@@ -334,7 +334,7 @@ namespace wali
      *
      */
     
-    bool StateSet::removeFinalState( St finalState )
+    bool StateSet::removeFinalState( State finalState )
     {
       size_t erased = finalStates.erase(finalState);
       return erased > 0;
@@ -587,7 +587,7 @@ namespace wali
      *
      */
     
-    void StateSet::dupState( St orig, St dup )
+    void StateSet::dupState( State orig, State dup )
     {
       if( isInitialState(orig) )
         addInitialState(dup);

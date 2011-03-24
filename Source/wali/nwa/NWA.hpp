@@ -43,8 +43,6 @@ namespace wali
 {
   namespace nwa
   {
-    typedef Key St;
-    typedef Key Sym;
 
     class ReachGen : public wali::nwa::WeightGen
     {
@@ -116,8 +114,8 @@ namespace wali
         typedef  Trans::internalIterator internalIterator;
         typedef  Trans::returnIterator returnIterator;        
         
-        typedef std::set<St> StateSet;
-        typedef std::pair<St,St> StatePair;
+        typedef std::set<State> StateSet;
+        typedef std::pair<State,State> StatePair;
 
         static std::string const & XMLTag() {
           static std::string ret = "NWA";
@@ -132,7 +130,7 @@ namespace wali
       
       //Constructors and Destructor
       NWA( );
-      NWA( St stuckSt );
+      NWA( State stuckSt );
       NWA( const NWA & other );
       NWA & operator=( const NWA & other );
 
@@ -153,7 +151,7 @@ namespace wali
        * @return the Key for the epsilon symbol
        *
        */
-      static Sym getEpsilon( )
+      static Symbol getEpsilon( )
       {
         return SymbolSet::getEpsilon();
       }
@@ -167,7 +165,7 @@ namespace wali
        * @return true if this symbol is the epsilon symbol, false otherwise
        *
        */
-      static bool isEpsilon( Sym sym )
+      static bool isEpsilon( Symbol sym )
       {
         return SymbolSet::isEpsilon(sym);
       }
@@ -190,7 +188,7 @@ namespace wali
        * @return the Key for the wild symbol
        *
        */
-      static Sym getWild( )
+      static Symbol getWild( )
       {
         return SymbolSet::getWild();
       }
@@ -204,7 +202,7 @@ namespace wali
        * @return true if this symbol is the wild symbol, false otherwise
        *
        */
-      static bool isWild( Sym sym )
+      static bool isWild( Symbol sym )
       {
         return SymbolSet::isWild(sym);
       }
@@ -222,7 +220,7 @@ namespace wali
        * @return the client information associated with the given state
        *
        */
-      ClientInfoRefPtr getClientInfo( St state ) const;
+      ClientInfoRefPtr getClientInfo( State state ) const;
 
       /**
        * 
@@ -235,7 +233,7 @@ namespace wali
        * @param - c: the desired client information for the given state
        *
        */
-      void setClientInfo( St state, const ClientInfoRefPtr c );  
+      void setClientInfo( State state, const ClientInfoRefPtr c );  
      
       //All States
 
@@ -263,7 +261,7 @@ namespace wali
        * @return the Key for the stuck state
        *
        */
-      St getStuckState( ) const
+      State getStuckState( ) const
       {
         assert(stuck);
         return states.getStuckState();
@@ -281,7 +279,7 @@ namespace wali
        * @param - state: the Key for the stuck state
        *
        */
-      void setStuckState( St state )
+      void setStuckState( State state )
       {
         //TODO: ponder the following ...
         //Note: This method of handling the stuck state might be changing the meaning of an automaton.
@@ -310,7 +308,7 @@ namespace wali
        * @return true if this state is the stuck state, false otherwise
        *
        */
-      inline bool isStuckState( St state ) const
+      inline bool isStuckState( State state ) const
       {
         if(stuck)
           return states.isStuckState(state);
@@ -327,7 +325,7 @@ namespace wali
        * @return a set of all states
        *
        */
-      const  std::set<St> & getStates( ) const;
+      const  std::set<State> & getStates( ) const;
       /**
        *   
        * @brief provides access to all states in the NWA
@@ -339,7 +337,7 @@ namespace wali
        * @return a set of all states 
        *
        */
-      const  std::set<St> & get_states( ) const;
+      const  std::set<State> & get_states( ) const;
 
       /**
        * 
@@ -351,7 +349,7 @@ namespace wali
        * @return true if the given state is a state of this NWA
        *
        */
-      bool isState( St state ) const; 
+      bool isState( State state ) const; 
       /**
        * 
        * @brief test if a given state is a state of this NWA
@@ -364,7 +362,7 @@ namespace wali
        * @return true if the given state is a state of this NWA
        *
        */
-      bool is_nwa_state( St state ) const;
+      bool is_nwa_state( State state ) const;
 
      /**
        *  
@@ -379,7 +377,7 @@ namespace wali
        * @return false if the state already exists in the NWA, true otherwise
        *
        */
-      bool addState( St state );
+      bool addState( State state );
 
       /**
        *
@@ -426,7 +424,7 @@ namespace wali
        * @return false if the state does not exist in the NWA, true otherwise
        *
        */
-      virtual bool removeState( St state );
+      virtual bool removeState( State state );
 
       /**
        *
@@ -452,7 +450,7 @@ namespace wali
        * @return set of inital states associated with the NWA
        *
        */
-      const  std::set<St> & getInitialStates( ) const; 
+      const  std::set<State> & getInitialStates( ) const; 
 
       /**
        * 
@@ -464,7 +462,7 @@ namespace wali
        * @return true if the given state is an initial state, false otherwise
        *
        */
-      bool isInitialState( St state ) const;
+      bool isInitialState( State state ) const;
 
       /**
        * 
@@ -480,7 +478,7 @@ namespace wali
        * @return false if the state already exists in the initial state set of the NWA
        *
        */
-      bool addInitialState( St state );
+      bool addInitialState( State state );
 
       /**
        *
@@ -506,7 +504,7 @@ namespace wali
        * @return false if the state does not exist in the initial state set of this NWA
        *
        */
-      bool removeInitialState( St state );
+      bool removeInitialState( State state );
 
       /**
        *
@@ -531,7 +529,7 @@ namespace wali
        * @return set of all final states associated with this NWA
        *
        */
-      const  std::set<St> & getFinalStates( ) const;
+      const  std::set<State> & getFinalStates( ) const;
 
       /**
        *
@@ -543,7 +541,7 @@ namespace wali
        * @return true if the given state is a final state
        *
        */
-      bool isFinalState( St state ) const;
+      bool isFinalState( State state ) const;
 
       /**
        * 
@@ -560,7 +558,7 @@ namespace wali
        * @return false if the state already exists in the final state set of the NWA
        *
        */
-      bool addFinalState( St state );
+      bool addFinalState( State state );
 
       /**
        * 
@@ -585,7 +583,7 @@ namespace wali
        * @return false if the state does not exist in the final state set of the NWA
        *
        */
-      bool removeFinalState( St state );
+      bool removeFinalState( State state );
 
       /**
        *
@@ -610,7 +608,7 @@ namespace wali
        * @return set of all symbols associated with this NWA
        *
        */
-      const  std::set<Sym> & getSymbols( ) const;
+      const  std::set<Symbol> & getSymbols( ) const;
 
       /**
        *
@@ -623,7 +621,7 @@ namespace wali
        * @return true if the given symbol is associated with the NWA
        *
        */
-      bool isSymbol( Sym sym ) const;
+      bool isSymbol( Symbol sym ) const;
 
       /**
        *
@@ -639,7 +637,7 @@ namespace wali
        * @return false if the symbol is already associated with the NWA
        *
        */
-      bool addSymbol( Sym sym );
+      bool addSymbol( Symbol sym );
 
       /**
        *
@@ -668,7 +666,7 @@ namespace wali
        * @return false if the symbols is not associated with the NWA
        *
        */
-      bool removeSymbol( Sym sym );
+      bool removeSymbol( Symbol sym );
 
       /**
        *
@@ -699,7 +697,7 @@ namespace wali
        * @return true if some such transition is found, false otherwise
        *
        */
-      bool getSymbol( St from, St to, Sym & sym ) const;
+      bool getSymbol( State from, State to, Symbol & sym ) const;
 
       /**
        * 
@@ -715,7 +713,7 @@ namespace wali
        * @return true if such a transition exists, false otherwise
        * 
        */
-      bool findTrans( St from, Sym sym, St to ) const;
+      bool findTrans( State from, Symbol sym, State to ) const;
 
       /**
        * 
@@ -729,7 +727,7 @@ namespace wali
 	   * @return the set of symbols that label transitions from 'source' to 'target'
 	   *
        */
-      const  std::set<Sym> getSymbols( St source, St target ) const;
+      const  std::set<Symbol> getSymbols( State source, State target ) const;
 
       /**
        * 
@@ -741,7 +739,7 @@ namespace wali
 	   * @return the set of symbols that label transitions from 'source'
 	   *
        */
-      const  std::set<Sym> getSymbolsFrom( St source ) const;
+      const  std::set<Symbol> getSymbolsFrom( State source ) const;
 
       /**
        * 
@@ -753,7 +751,7 @@ namespace wali
 	   * @return the set of symbols that label transitions to 'target'
 	   *
        */
-      const  std::set<Sym> getSymbolsTo( St target ) const;
+      const  std::set<Symbol> getSymbolsTo( State target ) const;
 
       /**
        *  
@@ -766,7 +764,7 @@ namespace wali
        * @param - preds: the set of all states that are predecessors of the given state
        *
        */    
-      void getPredecessors( St state,  std::set<St> & preds ) const;
+      void getPredecessors( State state,  std::set<State> & preds ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are predecessors of the given state
@@ -777,7 +775,7 @@ namespace wali
 	   * @return the set of all states that are predecessors of the given state
 	   *
        */
-      const  std::set<St> getPredecessors( St state ) const;
+      const  std::set<State> getPredecessors( State state ) const;
 
       /**
        * 
@@ -795,7 +793,7 @@ namespace wali
        *                  with respect to the given symbol
        *
        */
-      void getPredecessors( Sym symbol, St state,  std::set<St> & preds ) const;
+      void getPredecessors( Symbol symbol, State state,  std::set<State> & preds ) const;
 	    /**
        * 
 	     * @brief obtains all the states that are predecessors of the given state with
@@ -812,7 +810,7 @@ namespace wali
 	     *			respect to the given symbol
 	     *
        */
-      const  std::set<St> getPredecessors( Sym symbol, St state ) const;
+      const  std::set<State> getPredecessors( Symbol symbol, State state ) const;
 
       /**
        * 
@@ -824,7 +822,7 @@ namespace wali
        * @param - succs: the set of all states that are successors of the given state
        *
        */
-      void getSuccessors( St state,  std::set<St> & succs ) const;
+      void getSuccessors( State state,  std::set<State> & succs ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are successors of the given state
@@ -835,7 +833,7 @@ namespace wali
 	   * @return the set of all states that are successors of the given state
 	   *
        */
-      const  std::set<St> getSuccessors( St state ) const;
+      const  std::set<State> getSuccessors( State state ) const;
 
       /**
        * 
@@ -853,7 +851,7 @@ namespace wali
        *                  with respect to the given symbol
        *
        */
-      void getSuccessors( St state, Sym symbol,  std::set<St> & succs ) const;
+      void getSuccessors( State state, Symbol symbol,  std::set<State> & succs ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are successors of the given state with
@@ -870,7 +868,7 @@ namespace wali
 	   *			with respect to the given symbol
 	   *
        */
-      const  std::set<St> getSuccessors( St state, Sym symbol ) const;
+      const  std::set<State> getSuccessors( State state, Symbol symbol ) const;
 
       /**
        * 
@@ -886,7 +884,7 @@ namespace wali
 	   *			call-predecessor is 'call' and whose return site is 'ret'
 	   *
        */
-      const  std::set<Sym> getCallRetSymbols( St call, St ret ) const;
+      const  std::set<Symbol> getCallRetSymbols( State call, State ret ) const;
 
       /**
        * 
@@ -901,7 +899,7 @@ namespace wali
 	   *			call-predecessor is 'call'
 	   *
        */
-      const  std::set<Sym> getCallRetSymbolsFrom( St call ) const;
+      const  std::set<Symbol> getCallRetSymbolsFrom( State call ) const;
 
       /**
        * 
@@ -916,7 +914,7 @@ namespace wali
 	   *			return site is 'ret'
 	   *
        */
-      const  std::set<Sym> getCallRetSymbolsTo( St ret ) const;
+      const  std::set<Symbol> getCallRetSymbolsTo( State ret ) const;
 
       /**
        *  
@@ -929,7 +927,7 @@ namespace wali
        * @param - preds: the set of all states that are call-predecessors of the given state
        *
        */ 
-      void getCallPredecessors( St state,  std::set<St> & c_preds ) const;
+      void getCallPredecessors( State state,  std::set<State> & c_preds ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are call-predecessors of the given state
@@ -940,7 +938,7 @@ namespace wali
 	   * @return the set of all states that are call-predecessors of the given state
 	   *
        */
-      const  std::set<St> getCallPredecessors( St state ) const;
+      const  std::set<State> getCallPredecessors( State state ) const;
       
       /**
        * 
@@ -958,7 +956,7 @@ namespace wali
        *                  with respect to the given symbol
        *
        */
-      void getCallPredecessors( Sym symbol, St state,  std::set<St> & c_preds ) const;
+      void getCallPredecessors( Symbol symbol, State state,  std::set<State> & c_preds ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are call-predecessors of the given state with
@@ -975,7 +973,7 @@ namespace wali
 	   *			with respect to the given symbol
 	   *
        */
-      const  std::set<St> getCallPredecessors( Sym symbol, St state ) const;
+      const  std::set<State> getCallPredecessors( Symbol symbol, State state ) const;
 
       /**
        * 
@@ -987,7 +985,7 @@ namespace wali
        * @param - succs: the set of all states that are call-successors of the given state
        *
        */
-      void getCallSuccessors( St state,  std::set<St> & c_succs ) const;
+      void getCallSuccessors( State state,  std::set<State> & c_succs ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are call-successors of the given state
@@ -998,7 +996,7 @@ namespace wali
 	   * @return the set of all states that are call-successors of the given state
 	   *
        */
-      const  std::set<St> getCallSuccessors( St state ) const;
+      const  std::set<State> getCallSuccessors( State state ) const;
 
       /**
        * 
@@ -1016,7 +1014,7 @@ namespace wali
        *                  with respect to the given symbol
        *
        */
-      void getCallSuccessors( St state, Sym symbol,  std::set<St> & c_succs ) const;
+      void getCallSuccessors( State state, Symbol symbol,  std::set<State> & c_succs ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are call-successors of the given state with 
@@ -1033,7 +1031,7 @@ namespace wali
 	   *			respect to the given symbol
 	   *
        */
-      const  std::set<St> getCallSuccessors( St state, Sym symbol ) const;
+      const  std::set<State> getCallSuccessors( State state, Symbol symbol ) const;
 
       /**
        *    
@@ -1054,7 +1052,7 @@ namespace wali
        * @param - dup: the name of the duplicate state
        *
        */
-      void duplicateStateOutgoing( St orig, St dup );
+      void duplicateStateOutgoing( State orig, State dup );
 
       /**
        * 
@@ -1075,7 +1073,7 @@ namespace wali
        * @param - dup: the name of the duplicate state
        *
        */
-      void duplicateState( St orig, St dup );
+      void duplicateState( State orig, State dup );
 
 
       /**
@@ -1138,7 +1136,7 @@ namespace wali
        * @return the set of call site states associated with the given symbol
        *
        */
-      const  std::set<St> getCallSites_Sym( Sym symbol ) const;
+      const  std::set<State> getCallSites_Sym( Symbol symbol ) const;
 
       /**
        * 
@@ -1155,7 +1153,7 @@ namespace wali
        *          and entry point
        *
        */
-      const  std::set<St> getCallSites( Sym symbol, St entryPoint ) const;
+      const  std::set<State> getCallSites( Symbol symbol, State entryPoint ) const;
       
       /**
        * 
@@ -1171,7 +1169,7 @@ namespace wali
        *          entry point
        *
        */
-      const  std::set<std::pair<St,Sym> > getCallSites( St entryPoint ) const;
+      const  std::set<std::pair<State,Symbol> > getCallSites( State entryPoint ) const;
 
 	  /**
        * 
@@ -1183,7 +1181,7 @@ namespace wali
 	   * @return the set of call sites of all call transitions in the NWA
 	   *
        */
-	  const  std::set<St> getCallSites( ) const;
+	  const  std::set<State> getCallSites( ) const;
 
       /**
        * 
@@ -1195,7 +1193,7 @@ namespace wali
        * @return the set of symbols that label call transitions in the NWA
        *
        */
-      const  std::set<Sym> getCallSym( ) const;
+      const  std::set<Symbol> getCallSym( ) const;
 
       /**
        * 
@@ -1211,7 +1209,7 @@ namespace wali
        *          'callSite' to 'entryPoint' in the NWA
        *
        */
-      const  std::set<Sym> getCallSym( St callSite, St entryPoint ) const;
+      const  std::set<Symbol> getCallSym( State callSite, State entryPoint ) const;
 
       /**
        * 
@@ -1226,7 +1224,7 @@ namespace wali
        *          'callSite' in the NWA
        *
        */
-      const  std::set<Sym> getCallSym_Call( St callSite ) const;
+      const  std::set<Symbol> getCallSym_Call( State callSite ) const;
 
       /**
        * 
@@ -1241,7 +1239,7 @@ namespace wali
        *          'entryPoint' in the NWA
        *
        */
-      const  std::set<Sym> getCallSym_Entry( St entryPoint ) const;
+      const  std::set<Symbol> getCallSym_Entry( State entryPoint ) const;
 
       /**
        * 
@@ -1254,7 +1252,7 @@ namespace wali
        * @return the set of entry point states associated with the given symbol
        *
        */
-      const  std::set<Key> getEntries_Sym( Sym symbol ) const;
+      const  std::set<Key> getEntries_Sym( Symbol symbol ) const;
       
       /**
        * 
@@ -1270,7 +1268,7 @@ namespace wali
        *          site and symbol
        *
        */
-      const  std::set<St> getEntries( St callSite, Sym symbol ) const;
+      const  std::set<State> getEntries( State callSite, Symbol symbol ) const;
 
       /**
        * 
@@ -1283,7 +1281,7 @@ namespace wali
        * @return the set of symbol/entry point pairs associated with the given call site
        *
        */
-      const  std::set<std::pair<Sym,St> > getEntries( St callSite ) const;
+      const  std::set<std::pair<Symbol,State> > getEntries( State callSite ) const;
 
 	  /**
        * 
@@ -1295,7 +1293,7 @@ namespace wali
 	   * @return the set of entry points of all call transitions in the NWA
 	   *
        */
-	  const  std::set<St> getEntries( ) const;
+	  const  std::set<State> getEntries( ) const;
 
       /**
        *
@@ -1314,7 +1312,7 @@ namespace wali
        * @return false if the call transition already exists in the NWA
        *
        */
-      bool addCallTrans( St from, Sym sym, St to );
+      bool addCallTrans( State from, Symbol sym, State to );
 
       /**
        *
@@ -1348,7 +1346,7 @@ namespace wali
        * @return false if the call transition does not exist in the NWA
        *
        */
-      bool removeCallTrans( St from, Sym sym, St to );
+      bool removeCallTrans( State from, Symbol sym, State to );
 
       /**
        *
@@ -1389,7 +1387,7 @@ namespace wali
        * @return the set of source states associated with the given symbol
        *
        */
-      const  std::set<St> getSources_Sym( Sym symbol ) const;
+      const  std::set<State> getSources_Sym( Symbol symbol ) const;
 
       /**
        * 
@@ -1405,7 +1403,7 @@ namespace wali
        *          symbol and target state
        *
        */
-      const  std::set<St> getSources( Sym symbol, St target ) const;
+      const  std::set<State> getSources( Symbol symbol, State target ) const;
 
       /**
        * 
@@ -1421,7 +1419,7 @@ namespace wali
        *          target state
        *
        */
-      const  std::set<std::pair<St,Sym> > getSources( St target ) const;
+      const  std::set<std::pair<State,Symbol> > getSources( State target ) const;
 
 	  /**
        * 
@@ -1433,7 +1431,7 @@ namespace wali
 	   * @return the set of sources of all internal transitions in the NWA
 	   *
        */
-	  const  std::set<St> getSources( ) const;
+	  const  std::set<State> getSources( ) const;
 
     /**
      * 
@@ -1445,7 +1443,7 @@ namespace wali
      * @return the set of symbols that label internal transitions in the NWA
      *
      */
-    const  std::set<Sym> getInternalSym( ) const;
+    const  std::set<Symbol> getInternalSym( ) const;
 
     /**
      * 
@@ -1461,7 +1459,7 @@ namespace wali
      *          to 'target' in the NWA
      *
      */
-      const  std::set<Sym> getInternalSym( St source, St target ) const;
+      const  std::set<Symbol> getInternalSym( State source, State target ) const;
 
       /**
      * 
@@ -1476,7 +1474,7 @@ namespace wali
      *          in the NWA
      *
      */
-      const  std::set<Sym> getInternalSym_Source( St source ) const;
+      const  std::set<Symbol> getInternalSym_Source( State source ) const;
 
       /**
      * 
@@ -1491,7 +1489,7 @@ namespace wali
      *          to 'target' in the NWA
      *
      */
-      const  std::set<Sym> getInternalSym_Target( St target ) const;
+      const  std::set<Symbol> getInternalSym_Target( State target ) const;
 
       /**
        * 
@@ -1504,7 +1502,7 @@ namespace wali
        * @return the set of target states associated with the given symbol
        *
        */
-      const  std::set<St> getTargets_Sym( Sym symbol ) const;
+      const  std::set<State> getTargets_Sym( Symbol symbol ) const;
 
       /**
        * 
@@ -1520,7 +1518,7 @@ namespace wali
        *          state and symbol
        *
        */
-      const  std::set<St> getTargets( St source, Sym symbol ) const;
+      const  std::set<State> getTargets( State source, Symbol symbol ) const;
 
       /**
        * 
@@ -1533,7 +1531,7 @@ namespace wali
        * @return the set of symbol/target pairs associated with the given source
        *
        */
-      const  std::set<std::pair<Sym,St> > getTargets( St source ) const;
+      const  std::set<std::pair<Symbol,State> > getTargets( State source ) const;
 
 	  /**
        * 
@@ -1545,7 +1543,7 @@ namespace wali
 	   * @return the set of targets of all internal transitions in the NWA
 	   *
        */
-	  const  std::set<St> getTargets( ) const;
+	  const  std::set<State> getTargets( ) const;
 
       /**
        *
@@ -1565,7 +1563,7 @@ namespace wali
        * @return false if the internal transition already exists in the NWA
        *
        */
-      bool addInternalTrans( St from, Sym sym, St to );
+      bool addInternalTrans( State from, Symbol sym, State to );
 
       /**
        *
@@ -1599,7 +1597,7 @@ namespace wali
        * @return false if the internal transition does not exist in the NWA
        *
        */
-      bool removeInternalTrans( St from, Sym sym, St to );
+      bool removeInternalTrans( State from, Symbol sym, State to );
 
       /**
        *
@@ -1640,7 +1638,7 @@ namespace wali
        * @return the set of exit states associated with the given symbol
        *
        */
-      const  std::set<St> getExits_Sym( Sym symbol ) const;
+      const  std::set<State> getExits_Sym( Symbol symbol ) const;
 
       /**
        * 
@@ -1657,7 +1655,7 @@ namespace wali
        *          symbol, and return site
        *
        */
-      const  std::set<St> getExits( St callSite, Sym symbol, St returnSite ) const;
+      const  std::set<State> getExits( State callSite, Symbol symbol, State returnSite ) const;
 
       /**
        * 
@@ -1673,7 +1671,7 @@ namespace wali
        *          and return site
        *
        */
-      const  std::set<std::pair<St,Sym> > getExits( St callSite, St returnSite ) const;
+      const  std::set<std::pair<State,Symbol> > getExits( State callSite, State returnSite ) const;
 
 	  /**
        * 
@@ -1685,7 +1683,7 @@ namespace wali
 	   * @return the set of exit points of all return transitions in the NWA
 	   *
        */
-	  const  std::set<St> getExits( ) const;
+	  const  std::set<State> getExits( ) const;
 
       /**
        * 
@@ -1701,7 +1699,7 @@ namespace wali
        *          and symbol
        *
        */
-      const  std::set<St> getExits_Call( St callSite, Sym symbol ) const;
+      const  std::set<State> getExits_Call( State callSite, Symbol symbol ) const;
 
       /**
        * 
@@ -1717,7 +1715,7 @@ namespace wali
        *          call site
        *
        */
-      const  std::set<std::pair<St,Sym> > getExits_Call( St callSite ) const;
+      const  std::set<std::pair<State,Symbol> > getExits_Call( State callSite ) const;
 
       /**
        * 
@@ -1733,7 +1731,7 @@ namespace wali
        *          return site
        *
        */
-      const  std::set<St> getExits_Ret( Sym symbol, St returnSite ) const;
+      const  std::set<State> getExits_Ret( Symbol symbol, State returnSite ) const;
 
       /**
        * 
@@ -1749,7 +1747,7 @@ namespace wali
        *          return site
        *
        */
-      const  std::set<std::pair<St,Sym> > getExits_Ret( St returnSite ) const;
+      const  std::set<std::pair<State,Symbol> > getExits_Ret( State returnSite ) const;
 
       /**
        * 
@@ -1762,7 +1760,7 @@ namespace wali
        * @return the set of call site states associated with the given symbol
        *
        */
-      const  std::set<St> getCalls_Sym( Sym symbol ) const;
+      const  std::set<State> getCalls_Sym( Symbol symbol ) const;
 
       /**
        * 
@@ -1779,7 +1777,7 @@ namespace wali
        *          point, symbol, and return site
        * 
        */
-      const  std::set<St> getCalls( St exitPoint, Sym symbol, St returnSite ) const;
+      const  std::set<State> getCalls( State exitPoint, Symbol symbol, State returnSite ) const;
 
       /**
        * 
@@ -1795,7 +1793,7 @@ namespace wali
        *          point and return site states
        *
        */
-      const  std::set<std::pair<St,Sym> > getCalls( St exitPoint, St returnSite ) const;
+      const  std::set<std::pair<State,Symbol> > getCalls( State exitPoint, State returnSite ) const;
 
 	  /**
        * 
@@ -1807,7 +1805,7 @@ namespace wali
 	   * @return the set of call sites of all return transitions in the NWA
 	   *
        */
-	  const  std::set<St> getCalls( ) const;
+	  const  std::set<State> getCalls( ) const;
 
       /**
        * 
@@ -1823,7 +1821,7 @@ namespace wali
        *          and symbol
        *
        */
-      const  std::set<St> getCalls_Exit( St exitPoint, Sym symbol ) const;
+      const  std::set<State> getCalls_Exit( State exitPoint, Symbol symbol ) const;
 
       /**
        * 
@@ -1838,7 +1836,7 @@ namespace wali
        *         exit point
        *
        */
-      const  std::set<std::pair<St,Sym> > getCalls_Exit( St exitPoint ) const;
+      const  std::set<std::pair<State,Symbol> > getCalls_Exit( State exitPoint ) const;
 
       /**
        * 
@@ -1854,7 +1852,7 @@ namespace wali
        *          and return site
        *
        */
-      const  std::set<St> getCalls_Ret( Sym symbol, St returnSite ) const;
+      const  std::set<State> getCalls_Ret( Symbol symbol, State returnSite ) const;
 
       /**
        * 
@@ -1870,7 +1868,7 @@ namespace wali
        *          given return site
        *
        */
-      const  std::set<std::pair<St,Sym> > getCalls_Ret( St returnSite ) const;
+      const  std::set<std::pair<State,Symbol> > getCalls_Ret( State returnSite ) const;
 
       /**
        * 
@@ -1882,7 +1880,7 @@ namespace wali
        * @return the set of symbols that label return transitions in the NWA
        *
        */
-      const  std::set<Sym> getReturnSym( ) const;
+      const  std::set<Symbol> getReturnSym( ) const;
 
       /**
        * 
@@ -1899,7 +1897,7 @@ namespace wali
        *          to 'returnSite' with call-predecessor 'callSite' in the NWA
        *
        */
-      const  std::set<Sym> getReturnSym( St exitPoint, St callSite, St returnSite ) const;
+      const  std::set<Symbol> getReturnSym( State exitPoint, State callSite, State returnSite ) const;
 
       /**
        * 
@@ -1914,7 +1912,7 @@ namespace wali
        *          in the NWA
        *
        */
-      const  std::set<Sym> getReturnSym_Exit( St exitPoint ) const;
+      const  std::set<Symbol> getReturnSym_Exit( State exitPoint ) const;
 
       /**
        * 
@@ -1929,7 +1927,7 @@ namespace wali
        *          with call-predecessor 'callSite' in the NWA
        *
        */
-      const  std::set<Sym> getReturnSym_Call( St callSite ) const;
+      const  std::set<Symbol> getReturnSym_Call( State callSite ) const;
 
       /**
        * 
@@ -1944,7 +1942,7 @@ namespace wali
        *          to 'returnSite' in the NWA
        *
        */
-      const  std::set<Sym> getReturnSym_Ret( St returnSite ) const;
+      const  std::set<Symbol> getReturnSym_Ret( State returnSite ) const;
 
       /**
        * 
@@ -1960,7 +1958,7 @@ namespace wali
        *          with call-predecessor 'callSite' in the NWA
        *
        */
-      const  std::set<Sym> getReturnSym_ExitCall( St exitPoint, St callSite ) const;
+      const  std::set<Symbol> getReturnSym_ExitCall( State exitPoint, State callSite ) const;
 
       /**
        * 
@@ -1976,7 +1974,7 @@ namespace wali
        *          to 'returnSite' in the NWA
        *
        */
-      const  std::set<Sym> getReturnSym_ExitRet( St exitPoint, St returnSite ) const;
+      const  std::set<Symbol> getReturnSym_ExitRet( State exitPoint, State returnSite ) const;
 
       /**
        * 
@@ -1992,7 +1990,7 @@ namespace wali
        *          to 'returnSite' with call-predecessor 'callSite' in the NWA
        *
        */
-      const  std::set<Sym> getReturnSym_CallRet( St callSite, St returnSite ) const;
+      const  std::set<Symbol> getReturnSym_CallRet( State callSite, State returnSite ) const;
 
 
       /**
@@ -2006,7 +2004,7 @@ namespace wali
        * @return the set of return site states associated with the given symbol
        *
        */
-      const  std::set<St> getReturns_Sym( Sym symbol ) const;
+      const  std::set<State> getReturns_Sym( Symbol symbol ) const;
 
       /**
        * 
@@ -2023,7 +2021,7 @@ namespace wali
        *          point, call site, and symbol
        *
        */
-      const  std::set<St> getReturns( St exitPoint, St callSite, Sym symbol ) const;
+      const  std::set<State> getReturns( State exitPoint, State callSite, Symbol symbol ) const;
 
       /**
        * 
@@ -2039,7 +2037,7 @@ namespace wali
        *          point and call site
        *
        */
-      const  std::set<std::pair<Sym,St> > getReturns( St exitPoint, St callSite ) const;
+      const  std::set<std::pair<Symbol,State> > getReturns( State exitPoint, State callSite ) const;
 
 	  /**
        * 
@@ -2051,7 +2049,7 @@ namespace wali
 	   * @return the set of return sites of all return transitions in the NWA
 	   *
        */
-	  const  std::set<St> getReturns(  ) const;
+	  const  std::set<State> getReturns(  ) const;
 
       /**
        * 
@@ -2067,7 +2065,7 @@ namespace wali
        *         point and symbol
        *
        */
-      const  std::set<St> getReturns_Exit( St exitPoint, Sym symbol ) const;
+      const  std::set<State> getReturns_Exit( State exitPoint, Symbol symbol ) const;
 
       /**
        * 
@@ -2082,7 +2080,7 @@ namespace wali
        *          exit point
        *
        */
-      const  std::set<std::pair<Sym,St> > getReturns_Exit( St exitPoint ) const;
+      const  std::set<std::pair<Symbol,State> > getReturns_Exit( State exitPoint ) const;
 
       /**
        * 
@@ -2098,7 +2096,7 @@ namespace wali
        *          site and symbol
        *
        */
-      const  std::set<St> getReturns_Call( St callSite, Sym symbol ) const;
+      const  std::set<State> getReturns_Call( State callSite, Symbol symbol ) const;
 
       /**
        * 
@@ -2113,7 +2111,7 @@ namespace wali
        *          call site
        *
        */
-      const  std::set<std::pair<Sym,St> > getReturns_Call( St callSite ) const;
+      const  std::set<std::pair<Symbol,State> > getReturns_Call( State callSite ) const;
 
       /**
        * 
@@ -2126,7 +2124,7 @@ namespace wali
        * @return the set of return sites associated with the given call site
        *
        */
-      const  std::set<St> getReturnSites( St callSite ) const;
+      const  std::set<State> getReturnSites( State callSite ) const;
 
       /**
        *
@@ -2147,7 +2145,7 @@ namespace wali
        * @return false if the return transition already exists in the NWA
        *
        */
-      bool addReturnTrans( St from, St pred, Sym sym, St to );
+      bool addReturnTrans( State from, State pred, Symbol sym, State to );
 
       /**
        *
@@ -2182,7 +2180,7 @@ namespace wali
        * @return false if the return transition does not exist in the NWA
        *
        */
-      bool removeReturnTrans( St from, Sym sym, St to );
+      bool removeReturnTrans( State from, Symbol sym, State to );
 
       /**
        *
@@ -2200,7 +2198,7 @@ namespace wali
        * @return false if the return transition does not exist in the NWA
        *
        */
-      bool removeReturnTrans( St from, St pred, Sym sym, St to );
+      bool removeReturnTrans( State from, State pred, Symbol sym, State to );
 
       /**
        *
@@ -2235,7 +2233,7 @@ namespace wali
        * @brief constructs an NWA which is the projection of the given NWA to the states
        * provided
       */
-      void projectStates(const NWARefPtr &first, const std::set<St> &prjStates);
+      void projectStates(const NWARefPtr &first, const std::set<State> &prjStates);
 
       /**
        *
@@ -2266,7 +2264,7 @@ namespace wali
        * @return the NWA resulting from the union of the given NWAs
        *
        */
-      static NWARefPtr unionNWA( NWARefPtr first, NWARefPtr second, St stuck )
+      static NWARefPtr unionNWA( NWARefPtr first, NWARefPtr second, State stuck )
       {
         NWARefPtr nwa(new NWA(stuck));
         nwa->unionNWA(first,second);
@@ -2274,7 +2272,7 @@ namespace wali
       }
 
       //TODO: write comments
-      virtual bool isTransitionPossible( const St &src, const Sym &sym, const St &tgt);
+      virtual bool isTransitionPossible( const State &src, const Symbol &sym, const State &tgt);
 
       /**
        *
@@ -2305,7 +2303,7 @@ namespace wali
        * @return the NWA resulting from the intersection of the given NWAs
        *	
        */
-      static NWARefPtr intersect( NWARefPtr first, NWARefPtr second, St stuck )
+      static NWARefPtr intersect( NWARefPtr first, NWARefPtr second, State stuck )
       {
         NWARefPtr nwa(new NWA(stuck));
         nwa->intersect(first,second);
@@ -2328,12 +2326,12 @@ namespace wali
       * Removes states not reachable from any of the 'sources' states
       * 
       */
-      void pruneUnreachableForward(const std::set<St> & sources);
+      void pruneUnreachableForward(const std::set<State> & sources);
 
       /**
       * Removes states from which none of the 'targets' are reachable.
       */
-      void pruneUnreachableBackward(const std::set<St> & targets);
+      void pruneUnreachableBackward(const std::set<State> & targets);
 
       /**
       * Removes states not reachable from any initial state
@@ -2382,7 +2380,7 @@ namespace wali
        * @return the NWA resulting from the concatenation of the given NWAs
        *
        */
-      static NWARefPtr concat( NWARefPtr first, NWARefPtr second, St stuck )
+      static NWARefPtr concat( NWARefPtr first, NWARefPtr second, State stuck )
         {
         NWARefPtr nwa(new NWA(stuck));
         nwa->concat(first,second);
@@ -2416,7 +2414,7 @@ namespace wali
        * @return the NWA resulting from reversing the given NWA
        * 
        */
-      static NWARefPtr reverse( NWARefPtr first, St stuck )
+      static NWARefPtr reverse( NWARefPtr first, State stuck )
       {
         NWARefPtr nwa(new NWA(stuck));
         nwa->reverse(first);
@@ -2450,7 +2448,7 @@ namespace wali
        * @return the NWA resulting from performing Kleene-* on the given NWA
        *
        */
-      static NWARefPtr star( NWARefPtr first, St stuck )
+      static NWARefPtr star( NWARefPtr first, State stuck )
         {
         NWARefPtr nwa(new NWA(stuck));
         nwa->star(first);
@@ -2485,7 +2483,7 @@ namespace wali
        * @return the NWA resulting from complementing the given NWA
        *
        */
-      static NWARefPtr complement( NWARefPtr first, St stuck )
+      static NWARefPtr complement( NWARefPtr first, State stuck )
         {
         NWARefPtr nwa(new NWA(stuck));
         nwa->complement(first);
@@ -2518,7 +2516,7 @@ namespace wali
        * @return the NWA resulting from determinizing the given NWA
        *
        */
-      static NWARefPtr determinize( NWARefPtr nondet, St stuck )
+      static NWARefPtr determinize( NWARefPtr nondet, State stuck )
         {
         NWARefPtr nwa(new NWA(stuck));
         nwa->determinize(nondet);
@@ -2553,7 +2551,7 @@ namespace wali
        */
       static bool overlap(NWARefPtr first, NWARefPtr second)
       {
-        std::set<St> intersection;
+        std::set<State> intersection;
         // The following line does 'intersection = first->states() intersect second->states()'
         std::set_intersection(first->beginStates(), first->endStates(),
                               second->beginStates(), second->endStates(),
@@ -2599,9 +2597,9 @@ namespace wali
        * @param - resSt: the state which will receive the computed client information
        *
        */
-      virtual void intersectClientInfoCall( NWARefPtr first, St call1, St entry1, 
-                                            NWARefPtr second, St call2, St entry2, 
-                                            Sym resSym, St resSt );  
+      virtual void intersectClientInfoCall( NWARefPtr first, State call1, State entry1, 
+                                            NWARefPtr second, State call2, State entry2, 
+                                            Symbol resSym, State resSt );  
 
       /**
        * 
@@ -2628,9 +2626,9 @@ namespace wali
        * @param - resSt: the state which will receive the computed client information
        *
        */
-      virtual void intersectClientInfoInternal( NWARefPtr first, St src1, St tgt1, 
-                                                NWARefPtr second, St src2, St tgt2, 
-                                                Sym resSym, St resSt );  
+      virtual void intersectClientInfoInternal( NWARefPtr first, State src1, State tgt1, 
+                                                NWARefPtr second, State src2, State tgt2, 
+                                                Symbol resSym, State resSt );  
 
       /**
        * 
@@ -2661,9 +2659,9 @@ namespace wali
        * @param - resSt: the state which will receive the computed client information
        *
        */
-      virtual void intersectClientInfoReturn( NWARefPtr first, St exit1, St call1, St ret1,
-                                              NWARefPtr second, St exit2, St call2, St ret2,
-                                              Sym resSym, St resSt );
+      virtual void intersectClientInfoReturn( NWARefPtr first, State exit1, State call1, State ret1,
+                                              NWARefPtr second, State exit2, State call2, State ret2,
+                                              Symbol resSym, State resSt );
 
       /**
        * 
@@ -2680,8 +2678,8 @@ namespace wali
        * @param - resCI: the client info that results from performing the intersection
        *
        */
-      virtual bool stateIntersect( NWARefPtr first, St state1, NWARefPtr second, St state2,
-                                  St & resSt, ClientInfoRefPtr & resCI );
+      virtual bool stateIntersect( NWARefPtr first, State state1, NWARefPtr second, State state2,
+                                  State & resSt, ClientInfoRefPtr & resCI );
 
       /**
        * 
@@ -2697,8 +2695,8 @@ namespace wali
        * @param - resSym: the symbol that results from performing the intersection
        *
        */
-      virtual bool transitionIntersect( NWARefPtr first, Sym sym1, NWARefPtr second, Sym sym2,
-                                        Sym & resSym );
+      virtual bool transitionIntersect( NWARefPtr first, Symbol sym1, NWARefPtr second, Symbol sym2,
+                                        Symbol & resSym );
 
       /**
        * 
@@ -2714,8 +2712,8 @@ namespace wali
        *
        */
       virtual void mergeClientInfo( NWARefPtr nwa, 
-                     relations::RelationTypedefs<St>::BinaryRelation const & binRel, 
-                                  St resSt, ClientInfoRefPtr & resCI );
+                     relations::RelationTypedefs<State>::BinaryRelation const & binRel, 
+                                  State resSt, ClientInfoRefPtr & resCI );
 
       /**
        * 
@@ -2735,9 +2733,9 @@ namespace wali
        *
        */
       virtual void mergeClientInfoCall( NWARefPtr nwa, 
-                     relations::RelationTypedefs<St>::BinaryRelation const & binRelCall, 
-                     relations::RelationTypedefs<St>::BinaryRelation const & binRelEntry,
-                                  St callSt, Sym resSym, St resSt, ClientInfoRefPtr & resCI );
+                     relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
+                     relations::RelationTypedefs<State>::BinaryRelation const & binRelEntry,
+                                  State callSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI );
 
       /**
        * 
@@ -2757,9 +2755,9 @@ namespace wali
        *
        */
       virtual void mergeClientInfoInternal( NWARefPtr nwa, 
-                     relations::RelationTypedefs<St>::BinaryRelation const & binRelSource, 
-                     relations::RelationTypedefs<St>::BinaryRelation const & binRelTarget,
-                                  St sourceSt, Sym resSym, St resSt, ClientInfoRefPtr & resCI );
+                     relations::RelationTypedefs<State>::BinaryRelation const & binRelSource, 
+                     relations::RelationTypedefs<State>::BinaryRelation const & binRelTarget,
+                                  State sourceSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI );
 
       /**
        * 
@@ -2781,10 +2779,10 @@ namespace wali
        *
        */
       virtual void mergeClientInfoReturn( NWARefPtr nwa, 
-                     relations::RelationTypedefs<St>::BinaryRelation const & binRelExit,
-                     relations::RelationTypedefs<St>::BinaryRelation const & binRelCall, 
-                     relations::RelationTypedefs<St>::BinaryRelation const & binRelReturn,
-                            St exitSt, St callSt, Sym resSym, St resSt, ClientInfoRefPtr & resCI );
+                     relations::RelationTypedefs<State>::BinaryRelation const & binRelExit,
+                     relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
+                     relations::RelationTypedefs<State>::BinaryRelation const & binRelReturn,
+                            State exitSt, State callSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI );
 
 
       //Using NWAs
@@ -2852,7 +2850,7 @@ namespace wali
        * @return the NWA equivalent to the given PDS
        *
        */
-      static NWARefPtr PDStoNWA( const wpds::WPDS & pds, St stuck )
+      static NWARefPtr PDStoNWA( const wpds::WPDS & pds, State stuck )
       {
         NWARefPtr nwa(new NWA(stuck));
         nwa->PDStoNWA(pds);
@@ -3461,7 +3459,7 @@ namespace wali
        * @param - sp: the starting point of the closure
        *
        */
-      void epsilonClosure(  std::set<St> * newPairs, St sp ) const;
+      void epsilonClosure(  std::set<State> * newPairs, State sp ) const;
 
       /**
        *
@@ -3491,7 +3489,7 @@ namespace wali
        * @return the state corresponding to the given binary relation
        *
        */
-      St makeKey(  relations::RelationTypedefs<St>::BinaryRelation const & R ) const;
+      State makeKey(  relations::RelationTypedefs<State>::BinaryRelation const & R ) const;
 
       /**
        *
@@ -3513,17 +3511,17 @@ namespace wali
         //Note: For now require that 'word' be a perfectly balanced nested word.
         assert(word.stackSize() == 0);
 
-        St currSt;                                    //Placement in the automaton
-        std::stack< St > callSites;                   //Call sites currently unmatched.
+        State currSt;                                    //Placement in the automaton
+        std::stack< State > callSites;                   //Call sites currently unmatched.
         nws::NWSNode * currNode;                      //Placement in the word
         std::stack< nws::NWSNode * > nesting;         //Exit nodes currently on the stack.
-        Sym currSym;                                  //Next symbol to follow.
+        Symbol currSym;                                  //Next symbol to follow.
 
         //Try starting at each initial state in turn. 
         for( stateIterator sit = aut->beginInitialStates(); sit != aut->endInitialStates(); sit++ )
         {
           currSt = *sit;
-          callSites = std::stack< St >();                
+          callSites = std::stack< State >();                
           currNode = word.nextNode();
           nesting = std::stack< nws::NWSNode * >();
 
@@ -3667,10 +3665,10 @@ namespace wali
             enum Type {
               CallType, InternalType, ReturnType
             };
-            Sym symbol;
+            Symbol symbol;
             Type type;
                 
-            Position(Sym sym, Type ty) : symbol(sym), type(ty) {}
+            Position(Symbol sym, Type ty) : symbol(sym), type(ty) {}
           };
             
         private:
@@ -3683,9 +3681,9 @@ namespace wali
             word.push_back(p);
           }
                     
-          void appendCall(Sym sym)     { append(Position(sym, Position::CallType)); }
-          void appendInternal(Sym sym) { append(Position(sym, Position::InternalType)); }
-          void appendReturn(Sym sym)   { append(Position(sym, Position::ReturnType)); }
+          void appendCall(Symbol sym)     { append(Position(sym, Position::CallType)); }
+          void appendInternal(Symbol sym) { append(Position(sym, Position::InternalType)); }
+          void appendReturn(Symbol sym)   { append(Position(sym, Position::ReturnType)); }
             
           const_iterator begin() const {
             return word.begin();
@@ -3698,10 +3696,10 @@ namespace wali
         
 
         struct Configuration {
-          St state;
-          std::vector<St> callPredecessors;
+          State state;
+          std::vector<State> callPredecessors;
             
-          Configuration(St s) : state(s) {}
+          Configuration(State s) : state(s) {}
           Configuration(Configuration const & c)
             : state(c.state)
             , callPredecessors(c.callPredecessors) {}
@@ -3713,7 +3711,7 @@ namespace wali
             if (callPredecessors.size() > other.callPredecessors.size()) return false;
                 
             // Iterate in parallel over the two callPredecessors
-            for (std::vector<St>::const_iterator i = callPredecessors.begin(), j = other.callPredecessors.begin();
+            for (std::vector<State>::const_iterator i = callPredecessors.begin(), j = other.callPredecessors.begin();
                  i!=callPredecessors.end(); ++i, ++j)
             {
               assert (j!=other.callPredecessors.end());
@@ -3751,10 +3749,10 @@ namespace wali
                 for( std::set<Configuration>::const_iterator config = nextConfigs.begin();
                     config != nextConfigs.end(); ++config)
                 {
-                  std::set<St> closure;
+                  std::set<State> closure;
                   epsilonClosure(&closure, config->state);
                     
-                  for(std::set<St>::const_iterator other = closure.begin();
+                  for(std::set<State>::const_iterator other = closure.begin();
                       other != closure.end(); ++other)
                   {
                     Configuration c(*config);
@@ -3840,10 +3838,10 @@ namespace wali
             for( std::set<Configuration>::const_iterator config = nextConfigs.begin();
                 config != nextConfigs.end(); ++config)
             {
-                std::set<St> closure;
+                std::set<State> closure;
                 epsilonClosure(&closure, config->state);
                 
-                for( std::set<St>::const_iterator other = closure.begin();
+                for( std::set<State>::const_iterator other = closure.begin();
                     other != closure.end(); ++other)
                 {
                     Configuration c(*config);

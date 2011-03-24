@@ -14,8 +14,14 @@ namespace wali
 {
   namespace nwa
   {
+    DEPRECATE("Use wali::nwa::State instead")
     typedef Key St;
+
+    DEPRECATE("Use wail::nwa::Symbol instead")
     typedef Key Sym;
+
+    typedef Key State;
+    typedef Key Symbol;
 
     class NWA;
     typedef ref_ptr<NWA> NWARefPtr;

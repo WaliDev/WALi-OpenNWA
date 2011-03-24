@@ -5,6 +5,8 @@
  * @author Amanda Burton
  */
 
+#include "wali/nwa/NWAFwd.hpp"
+
 // ::wali
 #include "wali/Printable.hpp"
 #include "wali/Key.hpp"
@@ -21,9 +23,6 @@ namespace wali
 {
   namespace nwa
   {
-    typedef Key St;
-    typedef Key Sym;
-    
     /**
      *
      * This class is used to keep track of the transitions of an NWA.
@@ -32,7 +31,7 @@ namespace wali
     class TransSet : public Printable
     {
       public:    
-        typedef std::set<St> States;
+        typedef std::set<State> States;
         typedef States::const_iterator stateIterator;
 
         typedef TransInfo::Call Call;
@@ -97,7 +96,7 @@ namespace wali
        *
        */
       inline 
-      static St getCallSite( const Call & callTrans ) 
+      static State getCallSite( const Call & callTrans ) 
       {
         return callTrans.first;
       }
@@ -113,7 +112,7 @@ namespace wali
        *
        */
       inline
-      static Sym getCallSym( const Call & callTrans )
+      static Symbol getCallSym( const Call & callTrans )
       {
         return callTrans.second;
       }
@@ -129,7 +128,7 @@ namespace wali
        *
        */
       inline
-      static St getEntry( const Call & callTrans ) 
+      static State getEntry( const Call & callTrans ) 
       {
         return callTrans.third;
       }
@@ -145,7 +144,7 @@ namespace wali
        * 
        */
       inline
-      static St getSource( const Internal & internalTrans ) 
+      static State getSource( const Internal & internalTrans ) 
       {
         return internalTrans.first;
       }
@@ -161,7 +160,7 @@ namespace wali
        *
        */
       inline
-      static Sym getInternalSym( const Internal & internalTrans ) 
+      static Symbol getInternalSym( const Internal & internalTrans ) 
       {
         return internalTrans.second;
       }
@@ -177,7 +176,7 @@ namespace wali
        *
        */
       inline
-      static St getTarget( const Internal & internalTrans ) 
+      static State getTarget( const Internal & internalTrans ) 
       {
         return internalTrans.third;
       }
@@ -193,7 +192,7 @@ namespace wali
        *
        */
       inline
-      static St getExit( const Return & returnTrans ) 
+      static State getExit( const Return & returnTrans ) 
       {
         return returnTrans.first;
       }
@@ -209,7 +208,7 @@ namespace wali
        *
        */
       inline
-      static St getCallSite( const Return & returnTrans ) 
+      static State getCallSite( const Return & returnTrans ) 
       {
         return returnTrans.second;
       }
@@ -225,7 +224,7 @@ namespace wali
        *
        */
       inline
-      static Sym getReturnSym( const Return & returnTrans ) 
+      static Symbol getReturnSym( const Return & returnTrans ) 
       {
         return returnTrans.third;
       }
@@ -241,7 +240,7 @@ namespace wali
        *
        */
       inline
-      static St getReturnSite( const Return & returnTrans ) 
+      static State getReturnSite( const Return & returnTrans ) 
       {
         return returnTrans.fourth;
       }
@@ -472,7 +471,7 @@ namespace wali
        *         target, false otherwise
        *
        */
-      bool getSymbol( St from, St to, Sym & sym ) const;
+      bool getSymbol( State from, State to, Symbol & sym ) const;
 
       /**
        * 
@@ -489,7 +488,7 @@ namespace wali
        * @return true if such a transition exists, false otherwise
        * 
        */
-      bool findTrans( St from, Sym sym, St to ) const;
+      bool findTrans( State from, Symbol sym, State to ) const;
 
       /**
        * 
@@ -502,7 +501,7 @@ namespace wali
        * @return the set of all return sites that correspond with the given call site
        *
        */
-      const States getReturnSites( St callSite ) const;
+      const States getReturnSites( State callSite ) const;
 
       /**
        *  
@@ -516,7 +515,7 @@ namespace wali
        * @return the set of all return sites that correspond with the given exit and call site
        *
        */
-      States getReturnSites( St exit, St callSite ) const;
+      States getReturnSites( State exit, State callSite ) const;
 
       /**
        * 
@@ -530,7 +529,7 @@ namespace wali
        * @return the set of all call sites that correspond with the exit - return site pair
        *
        */
-      const States getCallSites( St exitSite, St returnSite ) const;
+      const States getCallSites( State exitSite, State returnSite ) const;
 
       /**
        * 
@@ -543,7 +542,7 @@ namespace wali
        * @return the set of all entry sites that correspond with the given call site
        *
        */
-      const States getEntries( St callSite ) const;
+      const States getEntries( State callSite ) const;
 
       /**
        * 
@@ -556,7 +555,7 @@ namespace wali
        * @return the set of all targets that correspond with the given source 
        *
        */
-      const States getTargets( St source ) const;
+      const States getTargets( State source ) const;
 
       /**
        *  
@@ -569,7 +568,7 @@ namespace wali
        * @param - dup: the state that is duplicating 'orig'
        *  
        */
-      void dupTransOutgoing( St orig, St dup );
+      void dupTransOutgoing( State orig, State dup );
 
       /**
        *  
@@ -585,7 +584,7 @@ namespace wali
        * @param - dup: the state that is duplicating 'orig'
        *  
        */
-      void dupTrans( St orig, St dup );
+      void dupTrans( State orig, State dup );
 
       /**
        *
@@ -646,7 +645,7 @@ namespace wali
        * @return false if the call transition already exists in the NWA
        *
        */
-      bool addCall( St from, Sym sym, St to );
+      bool addCall( State from, Symbol sym, State to );
 
       /**
        *
@@ -677,7 +676,7 @@ namespace wali
        * @return false if the internal transition already exists in the NWA
        *
        */
-      bool addInternal( St from, Sym sym, St to );
+      bool addInternal( State from, Symbol sym, State to );
 
       /**
        *
@@ -708,7 +707,7 @@ namespace wali
        * @return false if the return transition already exists in the NWA
        *
        */
-      bool addReturn( St from, St pred, Sym sym, St to );
+      bool addReturn( State from, State pred, Symbol sym, State to );
 
       /**
        *
@@ -752,7 +751,7 @@ namespace wali
        * @return false if the call transition does not exist in the NWA
        *
        */
-      bool removeCall( St from, Sym sym, St to );
+      bool removeCall( State from, Symbol sym, State to );
 
       /**
        *
@@ -785,7 +784,7 @@ namespace wali
        * @return false if the internal transition does not exist in the NWA
        *
        */
-      bool removeInternal( St from, Sym sym, St to );
+      bool removeInternal( State from, Symbol sym, State to );
 
       /**
        *
@@ -819,7 +818,7 @@ namespace wali
        * @return false if the return transition does not exist in the NWA
        *
        */
-      bool removeReturn( St from, St pred, Sym sym, St to );
+      bool removeReturn( State from, State pred, Symbol sym, State to );
 
       /**
        *
@@ -853,7 +852,7 @@ namespace wali
        *          transitions
        *
        */
-      bool isCall( St from, Sym sym, St to ) const;
+      bool isCall( State from, Symbol sym, State to ) const;
 
       /**
        *
@@ -885,7 +884,7 @@ namespace wali
        *          transitions associated with the NWA
        *
        */
-      bool isInternal( St from, Sym sym, St to ) const;
+      bool isInternal( State from, Symbol sym, State to ) const;
 
       /**
        *
@@ -918,7 +917,7 @@ namespace wali
        *          transitions
        *
        */
-      bool isReturn( St from, St pred, Sym sym, St to ) const; 
+      bool isReturn( State from, State pred, Symbol sym, State to ) const; 
 
       /**
        *
@@ -1125,7 +1124,7 @@ namespace wali
        * @return the set of all outgoing internal transitions for the given state
        *
        */
-      const Internals & getTransFrom( St state ) const;
+      const Internals & getTransFrom( State state ) const;
         
       /**
        * 
@@ -1138,7 +1137,7 @@ namespace wali
        * @return the set of all incoming internal transitions for the given state
        *
        */
-      const Internals & getTransTo( St state ) const;
+      const Internals & getTransTo( State state ) const;
         
       /**
        * 
@@ -1151,7 +1150,7 @@ namespace wali
        * @return the set of all call transitions for the given call site
        *
        */
-      const Calls & getTransCall( St state ) const;
+      const Calls & getTransCall( State state ) const;
         
       /**
        * 
@@ -1164,7 +1163,7 @@ namespace wali
        * @return the set of all call transitions for the given entry point
        *
        */
-      const Calls & getTransEntry( St state ) const;
+      const Calls & getTransEntry( State state ) const;
         
       /**
        * 
@@ -1177,7 +1176,7 @@ namespace wali
        * @return the set of all return transitions for the given exit point
        *
        */
-      const Returns & getTransExit( St state ) const;
+      const Returns & getTransExit( State state ) const;
         
       /**
        * 
@@ -1190,7 +1189,7 @@ namespace wali
        * @return the set of all return transitions for the given call predecessor
        *
        */
-      const Returns & getTransPred( St state ) const;
+      const Returns & getTransPred( State state ) const;
         
       /**
        * 
@@ -1203,7 +1202,7 @@ namespace wali
        * @return the set of all return transitions for the given return site
        *
        */
-      const Returns & getTransRet( St state ) const;
+      const Returns & getTransRet( State state ) const;
         
       /**
        * 
@@ -1218,7 +1217,7 @@ namespace wali
        *          transition, false otherwise
        *
        */
-      bool isFrom( St state ) const;
+      bool isFrom( State state ) const;
         
       /**
        * 
@@ -1233,7 +1232,7 @@ namespace wali
        *          transition, false otherwise
        *
        */
-      bool isTo( St state ) const;
+      bool isTo( State state ) const;
         
       /**
        * 
@@ -1248,7 +1247,7 @@ namespace wali
        *          transition, false otherwise
        *
        */
-      bool isCall( St state ) const;
+      bool isCall( State state ) const;
         
       /**
        * 
@@ -1263,7 +1262,7 @@ namespace wali
        *          transition, false otherwise
        *
        */
-      bool isEntry( St state ) const;
+      bool isEntry( State state ) const;
         
       /**
        * 
@@ -1278,7 +1277,7 @@ namespace wali
        *          transition, false otherwise
        *
        */
-      bool isExit( St state ) const;
+      bool isExit( State state ) const;
         
       /**
        * 
@@ -1293,7 +1292,7 @@ namespace wali
        *          transition, false otherwise
        *
        */
-      bool isPred( St state ) const;
+      bool isPred( State state ) const;
         
       /**
        * 
@@ -1308,7 +1307,7 @@ namespace wali
        *          transition, false otherwise
        *
        */
-      bool isRet( St state ) const;
+      bool isRet( State state ) const;
 
       /** 
        *  
@@ -1322,7 +1321,7 @@ namespace wali
        * @return false if no transitions were removed, true otherwise
        *
        */
-      bool removeTransWith( St state );   
+      bool removeTransWith( State state );   
 
       /** 
        *
@@ -1336,7 +1335,7 @@ namespace wali
        * @return false if no transitions were removed, true otherwise
        *
        */
-      bool removeTransSym( Sym sym );
+      bool removeTransSym( Symbol sym );
       
       /**
        *   
@@ -1352,7 +1351,7 @@ namespace wali
        *          symbol in this collection of transitions 
        *
        */
-      bool callExists( St from, Sym sym ) const;
+      bool callExists( State from, Symbol sym ) const;
         
       /**
        *     
@@ -1367,7 +1366,7 @@ namespace wali
        * @return the set of call transitions with the given from state and symbol
        *
        */
-      const Calls getCalls( St from, Sym sym ) const;
+      const Calls getCalls( State from, Symbol sym ) const;
         
       /**
        *  
@@ -1383,7 +1382,7 @@ namespace wali
        *          symbol in this collection of transitions
        *
        */
-      bool internalExists( St from, Sym sym ) const;
+      bool internalExists( State from, Symbol sym ) const;
         
       /**
        *  
@@ -1398,7 +1397,7 @@ namespace wali
        * @return the set of internal transitions with the given from state and symbol
        *
        */
-      const Internals getInternals( St from, Sym sym ) const;
+      const Internals getInternals( State from, Symbol sym ) const;
 
       /**
        *  TODO this is redundant
@@ -1412,7 +1411,7 @@ namespace wali
        * @return the set of internal transitions with the given from state
        *
        */
-      const Internals getInternalsFrom( St from ) const;
+      const Internals getInternalsFrom( State from ) const;
         
       /**
        *   
@@ -1429,7 +1428,7 @@ namespace wali
        *          symbol in this collection of transitions
        *
        */
-      bool returnExists( St from, St pred, Sym sym ) const;
+      bool returnExists( State from, State pred, Symbol sym ) const;
         
       /**
        *    
@@ -1444,7 +1443,7 @@ namespace wali
        * @return the set of return transitions with the given from state and symbol
        *
        */
-      const Returns getReturns( St from, Sym sym ) const;
+      const Returns getReturns( State from, Symbol sym ) const;
 
     protected:
     
@@ -1460,7 +1459,7 @@ namespace wali
        * @return false if no transitions were removed, true otherwise
        *
        */
-      bool removeCallTransWith( St state );        
+      bool removeCallTransWith( State state );        
       
       /** 
        *
@@ -1474,7 +1473,7 @@ namespace wali
        * @return false if no transitions were removed, true otherwise
        *
        */
-      bool removeInternalTransWith( St state );
+      bool removeInternalTransWith( State state );
       
       /** 
        *
@@ -1492,7 +1491,7 @@ namespace wali
        * @return false if no transitions were removed, true otherwise
        *
        */
-      bool removeReturnTransWith( St state );  
+      bool removeReturnTransWith( State state );  
 
       /** 
        *
@@ -1506,7 +1505,7 @@ namespace wali
        * @return false if no transitions were removed, true otherwise
        *
        */
-      bool removeCallTransSym( Sym sym );
+      bool removeCallTransSym( Symbol sym );
         
       /** 
        *
@@ -1520,7 +1519,7 @@ namespace wali
        * @return false if no transitions were removed, true otherwise
        *
        */
-      bool removeInternalTransSym( Sym sym );
+      bool removeInternalTransSym( Symbol sym );
         
       /** 
        *
@@ -1534,7 +1533,7 @@ namespace wali
        * @return false if no transitions were removed, true otherwise
        *
        */
-      bool removeReturnTransSym( Sym sym );
+      bool removeReturnTransSym( Symbol sym );
 
       //
       // Variables

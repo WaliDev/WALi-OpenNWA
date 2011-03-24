@@ -5,6 +5,8 @@
  * @author Amanda Burton
  */
 
+#include "wali/nwa/NWAFwd.hpp"
+
 // ::wali
 #include "wali/Printable.hpp"
 #include "wali/Key.hpp"
@@ -31,8 +33,7 @@ namespace wali
     {
       public:
         typedef ClientInfo Client;
-        typedef Key St;
-        typedef std::set<St> States;
+        typedef std::set<State> States;
         typedef States::const_iterator const_iterator;   
         typedef States::iterator iterator; 
 
@@ -80,7 +81,7 @@ namespace wali
        * @return the client information associated with the given state
        *
        */
-      ClientInfoRefPtr getClientInfo( St state ) const;
+      ClientInfoRefPtr getClientInfo( State state ) const;
 
       /**
        * Q: If the state doesn't exit should we add the state(and assign it the given info)?
@@ -95,7 +96,7 @@ namespace wali
        * @param - c: the desired client information for this state
        *
        */
-      void setClientInfo( St state, const ClientInfoRefPtr c );
+      void setClientInfo( State state, const ClientInfoRefPtr c );
 
       //State Accessors
 
@@ -108,7 +109,7 @@ namespace wali
        * @return the Key for the stuck state
        *
        */
-      inline St getStuckState( ) const
+      inline State getStuckState( ) const
       {
         return stuck;
       };
@@ -122,7 +123,7 @@ namespace wali
        * @param - state: the Key for the stuck state
        *
        */
-      inline void setStuckState( St state )
+      inline void setStuckState( State state )
       {
         stuck = state;
       }
@@ -137,7 +138,7 @@ namespace wali
        * @return true if this state is the stuck state, false otherwise
        *
        */
-      inline bool isStuckState( St state ) const
+      inline bool isStuckState( State state ) const
       {
         return (state == stuck);
       }
@@ -183,7 +184,7 @@ namespace wali
        * @return true if the state is a member of this collection of states
        *
        */
-      bool isState( St state ) const;
+      bool isState( State state ) const;
         
       /**
        *   
@@ -196,7 +197,7 @@ namespace wali
        * @return true if the state is an initial state of this collection, false otherwise
        *
        */
-      bool isInitialState( St initialState ) const;
+      bool isInitialState( State initialState ) const;
         
       /**
        * 
@@ -209,7 +210,7 @@ namespace wali
        * @return true if the state is a final state of this collection, false otherwise
        *
        */
-      bool isFinalState( St finalState ) const;
+      bool isFinalState( State finalState ) const;
       
       /**
        * 
@@ -222,7 +223,7 @@ namespace wali
        * @return false if the state already exists, true otherwise
        *
        */
-      bool addState( St state );
+      bool addState( State state );
         
       /**
        *
@@ -237,7 +238,7 @@ namespace wali
        * @return false if the state is already an initial state, true otherwise
        *
        */
-      bool addInitialState( St initialState );
+      bool addInitialState( State initialState );
         
       /**
        * 
@@ -252,7 +253,7 @@ namespace wali
        * @return false if the state is already a final state, true otherwise
        *
        */
-      bool addFinalState( St finalState );
+      bool addFinalState( State finalState );
       
       /**
        * 
@@ -314,7 +315,7 @@ namespace wali
        * @return false if this state does not exist, true otherwise
        *
        */
-      bool removeState( St state );
+      bool removeState( State state );
         
       /**
        * 
@@ -328,7 +329,7 @@ namespace wali
        * @return false if this state is not an initial state, true otherwise
        *  
        */
-      bool removeInitialState( St initialState );
+      bool removeInitialState( State initialState );
         
       /**
        * 
@@ -342,7 +343,7 @@ namespace wali
        * @remove false if this state is not a final state, true otherwise
        *
        */
-      bool removeFinalState( St finalState );
+      bool removeFinalState( State finalState );
       
       //Utilities	
 
@@ -529,7 +530,7 @@ namespace wali
        * @param - dup: the state whose properties are being set
        *
        */
-      void dupState( St orig, St dup );
+      void dupState( State orig, State dup );
 
       //
       // Variables
@@ -537,12 +538,12 @@ namespace wali
       
     protected:
               
-      St stuck;
+      State stuck;
       States states;
       States initialStates;  
       States finalStates;   
 
-      std::map<St,ClientInfoRefPtr> stateInfos;
+      std::map<State,ClientInfoRefPtr> stateInfos;
     };    
   }
 }

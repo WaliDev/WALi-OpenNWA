@@ -6,6 +6,8 @@
  */
 
 //#define LABEL
+
+#include "wali/nwa/NWAFwd.hpp"
  
 // ::wali
 #include "wali/KeyContainer.hpp"
@@ -20,9 +22,6 @@ namespace wali
 { 
   namespace nwa
   {
-    typedef Key St;
-    typedef Key Sym;
-    
     /**
      *
      * This class is used to keep track of the maps from state to transition for an NWA.
@@ -32,13 +31,13 @@ namespace wali
     {    
       public:
 
-        typedef Triple<St,Sym,St> Internal;
-        typedef Triple<St,Sym,St> Call;
-        typedef Quad<St,St,Sym,St> Return;
+        typedef Triple<State,Symbol,State> Internal;
+        typedef Triple<State,Symbol,State> Call;
+        typedef Quad<State,State,Symbol,State> Return;
 
-        typedef Triple<St,Label,St> Int;
-        typedef Triple<St,Label,St> Cal;
-        typedef Quad<St,St,Label,St> Ret;
+        typedef Triple<State,Label,State> Int;
+        typedef Triple<State,Label,State> Cal;
+        typedef Quad<State,State,Label,State> Ret;
 
         typedef std::set<Internal> Internals;
         typedef Internals::const_iterator internalIterator;
@@ -49,9 +48,9 @@ namespace wali
         typedef std::set<Return> Returns;
         typedef Returns::const_iterator returnIterator;
 #if !defined(LABEL)
-        typedef std::map<St,Internals> IntraMap;
-        typedef std::map<St,Calls> CallMap;
-        typedef std::map<St,Returns> RetMap;
+        typedef std::map<State,Internals> IntraMap;
+        typedef std::map<State,Calls> CallMap;
+        typedef std::map<State,Returns> RetMap;
 #else
         typedef std::map<St,Int> IntraMap;
         typedef std::map<St,Cal> CallMap;
@@ -262,7 +261,7 @@ namespace wali
        * @return a set of outgoing transitions for the given state
        *
        */
-      const Internals & fromTrans( St state ) const
+      const Internals & fromTrans( State state ) const
       {
         IntraMap::const_iterator it = from_ITrans.find(state);
         if( it == from_ITrans.end() )
@@ -282,7 +281,7 @@ namespace wali
        * @returm a set of incoming transitions for the given state
        *
        */
-      const Internals & toTrans( St state ) const
+      const Internals & toTrans( State state ) const
       {
         IntraMap::const_iterator it = to_ITrans.find(state);
         if( it == to_ITrans.end() )
@@ -303,7 +302,7 @@ namespace wali
        *         the call site
        *
        */
-      const Calls & callTrans( St state ) const
+      const Calls & callTrans( State state ) const
       {
         CallMap::const_iterator it = call_CTrans.find(state);
         if( it == call_CTrans.end() )
@@ -324,7 +323,7 @@ namespace wali
        *         the entry point
        *
        */
-      const Calls & entryTrans( St state ) const
+      const Calls & entryTrans( State state ) const
       { 
         CallMap::const_iterator it = entry_CTrans.find(state);
         if( it == entry_CTrans.end() )
@@ -345,7 +344,7 @@ namespace wali
        *         the exit point
        *
        */
-      const Returns & exitTrans( St state ) const
+      const Returns & exitTrans( State state ) const
       {
         RetMap::const_iterator it = exit_RTrans.find(state);
         if( it == exit_RTrans.end() )
@@ -366,7 +365,7 @@ namespace wali
        *         the call predecessor.
        *
        */
-      const Returns & predTrans( St state )const
+      const Returns & predTrans( State state )const
       {
         RetMap::const_iterator it = pred_RTrans.find(state);
         if( it == pred_RTrans.end() )
@@ -387,7 +386,7 @@ namespace wali
        *         of the return site.
        *
        */
-      const Returns & retTrans( St state )const
+      const Returns & retTrans( State state )const
       {
         RetMap::const_iterator it = ret_RTrans.find(state);
         if( it == ret_RTrans.end() )
@@ -408,7 +407,7 @@ namespace wali
        *         false otherwise
        *
        */
-      bool isFrom( St state ) const
+      bool isFrom( State state ) const
       {
         Internals const & outgoing = fromTrans(state);
         return !outgoing.empty();
@@ -426,7 +425,7 @@ namespace wali
        *         false otherwise
        *
        */
-      bool isTo( St state ) const
+      bool isTo( State state ) const
       { 
         Internals const & incoming = toTrans(state);
         return !incoming.empty();
@@ -444,7 +443,7 @@ namespace wali
        *         false otherwise
        *
        */
-      bool isCall( St state ) const
+      bool isCall( State state ) const
       {
         Calls const & outgoing = callTrans(state);
         return !outgoing.empty();
@@ -462,7 +461,7 @@ namespace wali
        *         false otherwise
        *
        */
-      bool isEntry( St state ) const
+      bool isEntry( State state ) const
       {
         Calls const & incoming = entryTrans(state);
         return !incoming.empty();
@@ -480,7 +479,7 @@ namespace wali
        *         false otherwise
        *
        */
-      bool isExit( St state ) const
+      bool isExit( State state ) const
       {
         Returns const & outgoing = exitTrans(state);
         return !outgoing.empty();
@@ -499,7 +498,7 @@ namespace wali
        *         transition, false otherwise
        *
        */
-      bool isPred( St state ) const
+      bool isPred( State state ) const
       {
         Returns const & outgoing = predTrans(state);
         return !outgoing.empty();
@@ -517,7 +516,7 @@ namespace wali
        *         false otherwise
        *
        */
-      bool isRet( St state ) const
+      bool isRet( State state ) const
       {
         Returns const & incoming = retTrans(state);
         return !incoming.empty();
