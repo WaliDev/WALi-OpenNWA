@@ -2953,9 +2953,6 @@ namespace wali
         return nwa->NWAtoBackwardsPDSreturns(wg);
       }
 
-      //TODO: comment
-      virtual bool addToPDS(const St &src, const Sym &lbl, const St &tgt) const;
-
       /**
        *
        * @brief constructs the PDS equivalent to this NWA

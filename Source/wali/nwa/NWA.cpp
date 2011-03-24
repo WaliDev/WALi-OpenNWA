@@ -5697,14 +5697,6 @@ namespace wali
       return result;
     }
 
-    //TODO: comment
-    
-    bool NWA::addToPDS(const St &src, const Sym &lbl, const St &tgt) const 
-    {
-      (void) src, (void) lbl, (void) tgt;
-      return true;
-    }
-
     /**
      *
      * @brief constructs the PDS equivalent to this NWA
@@ -5735,9 +5727,7 @@ namespace wali
 
         St src = Trans::getSource(*iit);
         St tgt = Trans::getTarget(*iit);
-        // determine whether we should add this edge to the PDS
-        // TODO: clean this interface
-        if( ! addToPDS(src, Trans::getInternalSym(*iit), tgt) ) continue;
+
         if( isWild(Trans::getInternalSym(*iit)) )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
         else
@@ -5762,10 +5752,6 @@ namespace wali
 
         St src = Trans::getCallSite(*cit);
         St tgt = Trans::getEntry(*cit);
-        
-        // determine whether we should add this edge to the PDS
-        // TODO: clean this interface
-        if( ! addToPDS(src, Trans::getCallSym(*cit), tgt) ) continue;
 
         if( isWild(Trans::getCallSym(*cit)) )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w
@@ -5797,10 +5783,6 @@ namespace wali
 
         St src = Trans::getExit(*rit);
         St tgt = Trans::getReturnSite(*rit);
-        
-        // determine whether we should add this edge to the PDS
-        // TODO: clean this interface
-        if( ! addToPDS(src, Trans::getReturnSym(*rit), tgt) ) continue;
 
         if( isWild(Trans::getReturnSym(*rit)) )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w 
