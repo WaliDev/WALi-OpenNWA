@@ -79,7 +79,7 @@ Summary:
    Inside the class 'StateSet', deprecate the 'States' typedef. Replace it
    with a 'StateSet' typedef at namespace scope (wali::nwa).
 
-   -- COMMITTED REV 910
+   -- COMMITTED REV 912 (and 913)
    -- Move the class 'StateSet' from namespace wali::nwa to
    -- wali::nwa::details.
 
@@ -99,7 +99,7 @@ Summary:
 
 4. Rename classes 'SymbolSet', 'TransSet', and 'TransInfo'
 
-   -- COMMITTED REV 910
+   -- COMMITTED REV 912 (and 913)
    -- Move all classes into namespace 'wali::nwa::details'.
 
    Rename to 'SymbolStorage', 'TransitionStorage', and 'TransitionInfo'
