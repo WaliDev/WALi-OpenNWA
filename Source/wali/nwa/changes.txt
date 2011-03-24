@@ -84,8 +84,12 @@ Summary:
    -- wali::nwa::details.
 
    Rename it to 'StateStorage'. Rename the corresponding files to match. Fix
-   references. Create a new file 'StateSet.hpp' which gives a deprecated
-   typedef to the old (current) name.
+   references.
+
+   -- COMMITTED REV 915, though you can call static methods throguh a
+   -- deprecated typedef without a warning from GCC.
+   -- Create a new file 'StateSet.hpp' which gives a deprecated typedef to
+   -- the old (current) name.
 
    Deprecate the typedef 'NWA::States'. Add a new typedef 'StateStorage' in
    its place. Change uses of 'States' to 'StateStorage'.
@@ -105,8 +109,10 @@ Summary:
    Rename to 'SymbolStorage', 'TransitionStorage', and 'TransitionInfo'
    respectively. Rename files to match. Fix uses.
 
-   Create new headers 'SymbolSet.hpp', 'TransSet.hpp', 'TransInfo.hpp' with
-   deprecated typedefs.
+   -- COMMITTED REV 915, though you can call static methods throguh a
+   -- deprecated typedef without a warning from GCC.
+   -- Create new headers 'SymbolSet.hpp', 'TransSet.hpp', 'TransInfo.hpp'
+   -- with deprecated typedefs.
 
    In class NWA, deprecate the typedef of 'Symbols'. Replace it with one
    named 'SymbolStorage'.
