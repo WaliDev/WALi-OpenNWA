@@ -53,7 +53,7 @@ Summary:
     Functions in NWA class that take a NWARefPtr change to taking a (const?) reference
 
 
-1. -- INITIAL CHANGES COMMITTED REV 910
+1. -- INITIAL CHANGES COMMITTED REV 909
 
    -- Name change: 'St' and 'Sym' to 'State' and 'Symbol', resp.
 
