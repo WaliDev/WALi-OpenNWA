@@ -1,6 +1,8 @@
 #ifndef wali_nwa_NWA_GUARD
 #define wali_nwa_NWA_GUARD 1
 
+#include "wali/nwa/NWAFwd.hpp"
+
 /**
  * @author Amanda Burton
  */
