@@ -16,7 +16,10 @@
 namespace wali
 {
   namespace nwa
-  {  
+  {
+    namespace details
+    {
+      
     class SymbolSet : public Printable
     { 
       public:
@@ -639,6 +642,8 @@ namespace wali
         return syms.size();
       else
         return (symbolPool.sizeSymbols() - syms.size());
+    }
+
     }
   }
 }

@@ -79,10 +79,13 @@ Summary:
    Inside the class 'StateSet', deprecate the 'States' typedef. Replace it
    with a 'StateSet' typedef at namespace scope (wali::nwa).
 
-   Move the class 'StateSet' from namespace wali::nwa to
-   wali::nwa::details. Rename it to 'StateStorage'. Rename the corresponding
-   files to match. Fix references. Create a new file 'StateSet.hpp' which
-   gives a deprecated typedef to the old (current) name.
+   -- COMMITTED REV 910
+   -- Move the class 'StateSet' from namespace wali::nwa to
+   -- wali::nwa::details.
+
+   Rename it to 'StateStorage'. Rename the corresponding files to match. Fix
+   references. Create a new file 'StateSet.hpp' which gives a deprecated
+   typedef to the old (current) name.
 
    Deprecate the typedef 'NWA::States'. Add a new typedef 'StateStorage' in
    its place. Change uses of 'States' to 'StateStorage'.
@@ -96,8 +99,10 @@ Summary:
 
 4. Rename classes 'SymbolSet', 'TransSet', and 'TransInfo'
 
-   Move all classes into namespace 'wali::nwa::details'. Rename to
-   'SymbolStorage', 'TransitionStorage', and 'TransitionInfo'
+   -- COMMITTED REV 910
+   -- Move all classes into namespace 'wali::nwa::details'.
+
+   Rename to 'SymbolStorage', 'TransitionStorage', and 'TransitionInfo'
    respectively. Rename files to match. Fix uses.
 
    Create new headers 'SymbolSet.hpp', 'TransSet.hpp', 'TransInfo.hpp' with

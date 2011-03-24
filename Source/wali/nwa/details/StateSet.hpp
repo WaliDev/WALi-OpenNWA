@@ -23,6 +23,9 @@ namespace wali
 {
   namespace nwa
   {
+    namespace details
+    {
+      
     /**
      *
      *  This class is used to keep track of the states of an NWA.
@@ -544,7 +547,9 @@ namespace wali
       States finalStates;   
 
       std::map<State,ClientInfoRefPtr> stateInfos;
-    };    
+    };
+
+    }
   }
 }
 #endif

@@ -3,7 +3,10 @@
 namespace wali
 {
   namespace nwa
-  {    
+  {
+    namespace details
+    {
+    
     //
     // Methods
     //
@@ -1659,7 +1662,9 @@ namespace wali
           result.insert(*rit);
       } 
       return result;
-    } 
+    }
+
+    }
   }
 }
 

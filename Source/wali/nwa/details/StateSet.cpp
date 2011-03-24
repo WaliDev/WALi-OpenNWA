@@ -9,6 +9,10 @@ namespace wali
 {
   namespace nwa
   {
+
+    namespace details
+    {
+      
     //
     // Methods
     //
@@ -594,6 +598,8 @@ namespace wali
 
       if( isFinalState(orig) )
         addFinalState(dup);
+    }
+
     }
   }
 }

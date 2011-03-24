@@ -11,7 +11,7 @@
  
 // ::wali
 #include "wali/KeyContainer.hpp"
-#include "wali/nwa/SymbolSet.hpp"
+#include "wali/nwa/details/SymbolSet.hpp"
 #include "wali/Key.hpp" 
  
 // std::c++
@@ -22,6 +22,9 @@ namespace wali
 { 
   namespace nwa
   {
+    namespace details
+    {
+      
     /**
      *
      * This class is used to keep track of the maps from state to transition for an NWA.
@@ -1118,7 +1121,9 @@ namespace wali
       RetMap exit_RTrans;
       RetMap pred_RTrans;  
       RetMap ret_RTrans;
-    };      
+    };
+
+    }
   }
 }
 #endif

@@ -12,9 +12,9 @@
 #include "wali/Countable.hpp"
 #include "wali/KeyContainer.hpp"
 
-#include "wali/nwa/SymbolSet.hpp"
-#include "wali/nwa/StateSet.hpp"
-#include "wali/nwa/TransSet.hpp"
+#include "wali/nwa/details/SymbolSet.hpp"
+#include "wali/nwa/details/StateSet.hpp"
+#include "wali/nwa/details/TransSet.hpp"
 
 #include "wali/nws/NWS.hpp"
 
@@ -94,13 +94,13 @@ namespace wali
       public:
         typedef ClientInfo Client;
 
-        typedef wali::nwa::StateSet States;
+        typedef wali::nwa::details::StateSet States;
         typedef  States::const_iterator stateIterator;
         typedef  States::ClientInfoRefPtr ClientInfoRefPtr;
-        typedef SymbolSet Symbols;
+        typedef details::SymbolSet Symbols;
         typedef  Symbols::const_iterator symbolIterator;
 
-        typedef TransSet Trans;
+        typedef details::TransSet Trans;
         
         typedef  Trans::Call Call;       
         typedef  Trans::Internal Internal;   
@@ -153,7 +153,7 @@ namespace wali
        */
       static Symbol getEpsilon( )
       {
-        return SymbolSet::getEpsilon();
+        return Symbols::getEpsilon();
       }
       /**
        *  
@@ -167,7 +167,7 @@ namespace wali
        */
       static bool isEpsilon( Symbol sym )
       {
-        return SymbolSet::isEpsilon(sym);
+        return Symbols::isEpsilon(sym);
       }
       /**
        *
@@ -190,7 +190,7 @@ namespace wali
        */
       static Symbol getWild( )
       {
-        return SymbolSet::getWild();
+        return Symbols::getWild();
       }
       /**
        *  
@@ -204,7 +204,7 @@ namespace wali
        */
       static bool isWild( Symbol sym )
       {
-        return SymbolSet::isWild(sym);
+        return Symbols::isWild(sym);
       }
 
       //State Accessors

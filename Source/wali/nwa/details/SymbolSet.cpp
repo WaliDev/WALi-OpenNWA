@@ -2,6 +2,7 @@
 
 namespace wali {
 namespace nwa {
+namespace details {
 
 //Constructors
 SymbolSet::SymbolSet( )
@@ -497,5 +498,6 @@ const std::set<Label::Sym> Label::getSymbolsNotIn( const SymbolSet & symbolPool 
   }     
 }
 
+} // namespace details
 } // namespace nwa
 } // namespace wali

@@ -1194,23 +1194,23 @@ namespace wali
 
           // Skip over epsilons. (A) they are handled in other places and
           // (B) there's no implicit epsilon transitions to stuck anyway.
-          if( symbol == SymbolSet::getEpsilon() )
+          if( symbol == Symbols::getEpsilon() )
           {
             continue;
           }
 
           //Skip over wilds.
-          if( symbol == SymbolSet::getWild() )
+          if( symbol == Symbols::getWild() )
           {
             continue;
           }
 
-          if( !trans.callExists(state, symbol) && !trans.callExists(state, SymbolSet::getWild()) )
+          if( !trans.callExists(state, symbol) && !trans.callExists(state, Symbols::getWild()) )
           {
             addCallTrans(state, symbol, getStuckState());
           }
 
-          if( !trans.internalExists(state, symbol) && !trans.internalExists(state, SymbolSet::getWild()) )
+          if( !trans.internalExists(state, symbol) && !trans.internalExists(state, Symbols::getWild()) )
           {
             addInternalTrans(state, symbol, getStuckState());
           }
@@ -1218,7 +1218,7 @@ namespace wali
           for( stateIterator pred = beginStates(); pred != endStates(); ++pred )
           {
             if( returns.find(Triple<State,Symbol,State>(state, *pred, symbol)) == returns.end() 
-              && returns.find(Triple<State,Symbol,State>(state, *pred, SymbolSet::getWild())) == returns.end() )
+              && returns.find(Triple<State,Symbol,State>(state, *pred, Symbols::getWild())) == returns.end() )
             {
               addReturnTrans(state, *pred, symbol, getStuckState());
             }
@@ -4591,7 +4591,7 @@ namespace wali
       //Construct the epsilon closure relation for the states in nondet.
       SetBinaryRelation pre_close; //Collapse epsilon transitions.
       SetBinaryRelation Ie;   //Internal transitions with epsilon.
-      project_symbol_3<SetBinaryRelation>(Ie,nondet->trans.getInternals(),SymbolSet::getEpsilon());
+      project_symbol_3<SetBinaryRelation>(Ie,nondet->trans.getInternals(),Symbols::getEpsilon());
 #ifdef USE_BUDDY
       transitive_closure(pre_close,Ie);
 #else
@@ -6603,7 +6603,7 @@ namespace wali
 
       for(symbolIterator sym = beginSymbols(); sym != endSymbols(); ++sym)
       {
-          os << "    <" << SymbolSet::XMLSymbolTag() << " " << SymbolSet::XMLNameAttr() << "=\"" << key2str(*sym) << "\"/>\n";
+          os << "    <" << Symbols::XMLSymbolTag() << " " << Symbols::XMLNameAttr() << "=\"" << key2str(*sym) << "\"/>\n";
       }
 
       for(stateIterator state = beginStates(); state != endStates(); ++state)

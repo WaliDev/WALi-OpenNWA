@@ -11,8 +11,8 @@
 #include "wali/Printable.hpp"
 #include "wali/Key.hpp"
 #include "wali/KeyContainer.hpp"
-#include "wali/nwa/StateSet.hpp"
-#include "wali/nwa/TransInfo.hpp"
+#include "wali/nwa/details/StateSet.hpp"
+#include "wali/nwa/details/TransInfo.hpp"
 
 // std::c++
 #include <iostream>
@@ -23,6 +23,9 @@ namespace wali
 {
   namespace nwa
   {
+    namespace details
+    {
+    
     /**
      *
      * This class is used to keep track of the transitions of an NWA.
@@ -1547,6 +1550,8 @@ namespace wali
         
       Info T_info;
     };
+
+    }
   }
 }
 #endif
