@@ -4,6 +4,8 @@
 /// This file defines forward declarations for various useful NWA-related
 /// types.
 
+#include <set>
+
 #include "wali/nwa/deprecate.h"
 
 // ::wali
