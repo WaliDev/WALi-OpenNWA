@@ -95,7 +95,7 @@ Summary:
    -- Create a new file 'StateSet.hpp' which gives a deprecated typedef to
    -- the old (current) name.
 
-   -- COMMITTED REV 918
+   -- COMMITTED REV 918 (and three missed uses in one file in 925)
    -- Deprecate the typedef 'NWA::States'. Add a new typedef 'StateStorage' in
    -- its place. Change uses of 'States' to 'StateStorage'.
 

@@ -509,7 +509,7 @@ namespace wali
      *
      */
     
-    const StateStorage::States & StateStorage::getStates( ) const
+    const StateStorage::StateSet & StateStorage::getStates( ) const
     {
       return states;
     }
@@ -522,7 +522,7 @@ namespace wali
      *
      */
     
-    const StateStorage::States & StateStorage::getInitialStates( ) const
+    const StateStorage::StateSet & StateStorage::getInitialStates( ) const
     {
       return initialStates;
     }
@@ -535,7 +535,7 @@ namespace wali
      *
      */
     
-    const StateStorage::States & StateStorage::getFinalStates( ) const
+    const StateStorage::StateSet & StateStorage::getFinalStates( ) const
     {
       return finalStates;
     }
