@@ -43,13 +43,19 @@ namespace wali
         typedef Quad<State,State,Label,State> Ret;
 
         typedef std::set<Internal> Internals;
+        DEPRECATE("Use capitalized version (InternalIterator), not that you shoud be using the one from this class in the first place.")
         typedef Internals::const_iterator internalIterator;
+        typedef Internals::const_iterator InternalIterator;
         
         typedef std::set<Call> Calls;
+        DEPRECATE("Use capitalized version (CallIterator), not that you shoud be using the one from this class in the first place.")
         typedef Calls::const_iterator callIterator;
+        typedef Calls::const_iterator CallIterator;
         
         typedef std::set<Return> Returns;
+        DEPRECATE("Use capitalized version (ReturnIterator), not that you shoud be using the one from this class in the first place.")
         typedef Returns::const_iterator returnIterator;
+        typedef Returns::const_iterator ReturnIterator;
 #if !defined(LABEL)
         typedef std::map<State,Internals> IntraMap;
         typedef std::map<State,Calls> CallMap;

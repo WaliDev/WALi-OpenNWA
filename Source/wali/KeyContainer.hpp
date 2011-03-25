@@ -7,11 +7,10 @@
 
 #include "wali/Common.hpp"
 #include "wali/hm_hash.hpp"
-#include <utility>          // provides std::pair
+#include <map>          // provides std::pair
 
 namespace wali
 {
-
   static inline size_t combineKeys( Key k1, Key k2 )
   {
     return k1 + (997*k2);
@@ -209,18 +208,11 @@ namespace wali
 
     size_t operator()( const std::set<Key> & ks ) const
     {
-      size_t key;
-      bool first = true;
+      size_t key = 0;
       for( std::set<Key>::const_iterator it = ks.begin();
             it != ks.end(); it++ )
       {
-        if(first)
-        {
-          key = *it;
-          first = false;
-        }
-        else
-          key = hasher( combineKeys( key,*it ) );
+        key = hasher( combineKeys( key,*it ) );
       } 
       return key;      
     }

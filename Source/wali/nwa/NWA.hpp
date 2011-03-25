@@ -115,10 +115,17 @@ namespace wali
         typedef  Trans::Calls Calls;
         typedef  Trans::Internals Internals;
         typedef  Trans::Returns Returns;
-      
-        typedef  Trans::callIterator callIterator;
-        typedef  Trans::internalIterator internalIterator;
-        typedef  Trans::returnIterator returnIterator;        
+
+        DEPRECATE("Use capitalized version (CallIterator) instead")
+        typedef  Trans::CallIterator callIterator;
+        DEPRECATE("Use capitalized version (InternalIterator) instead")
+        typedef  Trans::InternalIterator internalIterator;
+        DEPRECATE("Use capitalized version (ReturnIterator) instead")
+        typedef  Trans::ReturnIterator returnIterator;
+
+        typedef  Trans::CallIterator CallIterator;
+        typedef  Trans::InternalIterator InternalIterator;
+        typedef  Trans::ReturnIterator ReturnIterator;
         
         typedef std::set<State> StateSet;
         typedef std::pair<State,State> StatePair;
@@ -3389,7 +3396,7 @@ namespace wali
        * @return an iterator pointing to the beginning of the call transition set
        *
        */
-      callIterator beginCallTrans( ) const;  
+      CallIterator beginCallTrans( ) const;  
 
       /**
        * 
@@ -3401,7 +3408,7 @@ namespace wali
        * @return an iterator pointing just past the end of the call transition set
        *
        */
-      callIterator endCallTrans( ) const;  
+      CallIterator endCallTrans( ) const;  
 
       /**
        *
@@ -3413,7 +3420,7 @@ namespace wali
        * @return an iterator pointing to the beginning of the internal transition set
        *
        */
-      internalIterator beginInternalTrans( ) const;  
+      InternalIterator beginInternalTrans( ) const;  
 
       /**
        * 
@@ -3425,7 +3432,7 @@ namespace wali
        * @return an iterator pointing just past the end of the internal transition set
        *
        */
-      internalIterator endInternalTrans( ) const; 
+      InternalIterator endInternalTrans( ) const; 
 
       /**
        *
@@ -3437,7 +3444,7 @@ namespace wali
        * @return an iterator pointing to the beginning of the return transition set
        *
        */
-      returnIterator beginReturnTrans( ) const;  
+      ReturnIterator beginReturnTrans( ) const;  
 
       /**
        * 
@@ -3449,7 +3456,7 @@ namespace wali
        * @return an iterator pointing just past the end of the return transition set
        *
        */
-      returnIterator endReturnTrans( ) const;  
+      ReturnIterator endReturnTrans( ) const;  
 
     protected:
 
@@ -3553,7 +3560,7 @@ namespace wali
               if( aut->trans.returnExists( currSt, callSites.top(), currSym ) )
               {
                 Returns rets = aut->trans.getReturns(currSt,currSym);
-                for( returnIterator rit = rets.begin(); rit != rets.end(); rit++ )
+                for( ReturnIterator rit = rets.begin(); rit != rets.end(); rit++ )
                 {
                   if( Trans::getCallSite(*rit) == callSites.top() )
                   {
@@ -3583,7 +3590,7 @@ namespace wali
               if( aut->trans.callExists( currSt, currSym ) )
               {
                 Calls calls = aut->trans.getCalls(currSt,currSym);
-                for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
+                for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
                 {
                   callSites.push(currSt);
                   nesting.push(currNode->exitNode());
@@ -3610,7 +3617,7 @@ namespace wali
               if( aut->trans.internalExists( currSt, currSym ) )
               {
                 Internals ints = aut->trans.getInternals(currSt,currSym);
-                for( internalIterator iit = ints.begin(); iit != ints.end(); iit++ )
+                for( InternalIterator iit = ints.begin(); iit != ints.end(); iit++ )
                 {
                   currSt = Trans::getTarget(*iit);
                   break;    //Out of the for loop.    
@@ -3788,7 +3795,7 @@ namespace wali
                         // of the "current" state, then separately check to see whether the
                         // call predecessor matches.
                         Returns rets = trans.getReturns(config->state, curpos->symbol);
-                        for( returnIterator rit = rets.begin(); rit != rets.end(); rit++ ) {
+                        for( ReturnIterator rit = rets.begin(); rit != rets.end(); rit++ ) {
                             if( Trans::getCallSite(*rit) == config->callPredecessors.back() ) {
                                 // Construct a new configuration that's the same as the old
                                 // configuration, except with a popped stack and new state
@@ -3807,7 +3814,7 @@ namespace wali
                         config != currConfigs.end(); ++config)
                     {
                         Calls calls = trans.getCalls(config->state, curpos->symbol);
-                        for( callIterator cit = calls.begin(); cit != calls.end(); cit++ ) {
+                        for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ ) {
                             // Construct a new configuration that's the same as the old
                             // configuration, except with a pushed stack and new state
                             Configuration c(*config);
@@ -3824,7 +3831,7 @@ namespace wali
                         config != currConfigs.end(); ++config)
                     {
                         Internals ints = trans.getInternals(config->state, curpos->symbol);
-                        for( internalIterator iit = ints.begin(); iit != ints.end(); iit++ ) {
+                        for( InternalIterator iit = ints.begin(); iit != ints.end(); iit++ ) {
                             // Construct a new configuration that's the same as the old
                             // configuration, except with a new state
                             Configuration c(*config);

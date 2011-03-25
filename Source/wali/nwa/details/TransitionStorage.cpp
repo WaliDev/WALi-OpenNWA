@@ -44,7 +44,7 @@ namespace wali
     {
       //Check internal transitions.
       const Info::Internals & from = T_info.fromTrans(fromSt);
-      for(Info::internalIterator it = from.begin(); it != from.end(); it++ )
+      for(Info::InternalIterator it = from.begin(); it != from.end(); it++ )
       {
         if( toSt == getTarget(*it) )
         {
@@ -54,7 +54,7 @@ namespace wali
       }
       //Check call transitions.
       const Info::Calls & call = T_info.callTrans(fromSt);
-      for(Info::callIterator it = call.begin(); it != call.end(); it++ )
+      for(Info::CallIterator it = call.begin(); it != call.end(); it++ )
       {
         if( toSt == getEntry(*it) )
         {
@@ -64,7 +64,7 @@ namespace wali
       }
       //Check return transitions.      
       const Info::Returns & exit = T_info.exitTrans(fromSt);
-      for(Info::returnIterator it = exit.begin(); it != exit.end(); it++ )
+      for(Info::ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( toSt == getReturnSite(*it) )
         {
@@ -74,7 +74,7 @@ namespace wali
       }
       //Q: does this count as a symbol we would like to have?
       /*const Info::Returns pred = T_info.predTrans(fromSt);
-      for( Info::returnIterator it = pred.begin(); it != pred.end(); it++ )
+      for( Info::ReturnIterator it = pred.begin(); it != pred.end(); it++ )
       {
         if( toSt == getReturnSite(*it) )
         {
@@ -101,14 +101,14 @@ namespace wali
     {
       //Check internal transitions.
       const Info::Internals & from = T_info.fromTrans(fromSt);
-      for( Info::internalIterator it = from.begin(); it != from.end(); it++ )
+      for( Info::InternalIterator it = from.begin(); it != from.end(); it++ )
       {
         if( toSt == getTarget(*it) && ( sym == getInternalSym(*it) || sym == wali::WALI_WILD ) )
           return true;
       }
       //Check call transitions.
       const Info::Calls & call = T_info.callTrans(fromSt);
-      for( Info::callIterator it = call.begin(); it != call.end(); it++ )
+      for( Info::CallIterator it = call.begin(); it != call.end(); it++ )
       {
         if( toSt == getEntry(*it) && ( sym == getCallSym(*it) || sym == wali::WALI_WILD ) )
         {
@@ -117,7 +117,7 @@ namespace wali
       }
       //Check return transitions.      
       const Info::Returns & exit = T_info.exitTrans(fromSt);
-      for( Info::returnIterator it = exit.begin(); it != exit.end(); it++ )
+      for( Info::ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( toSt == getReturnSite(*it) && ( sym == getReturnSym(*it) || sym == wali::WALI_WILD ) )
         {
@@ -126,7 +126,7 @@ namespace wali
       }
       //Q: does this count as a symbol we would like to have?
       /*const Info::Returns pred = T_info.predTrans(fromSt);
-      for( Info::returnIterator it = pred.begin(); it != pred.end(); it++ )
+      for( Info::ReturnIterator it = pred.begin(); it != pred.end(); it++ )
       {
         if( toSt == getReturnSite(*it) && sym == getReturnSym(*it) )
         {
@@ -149,7 +149,7 @@ namespace wali
     {
       States returns;
       const Info::Returns & pred = T_info.predTrans(callSite);
-      for( Info::returnIterator it = pred.begin(); it != pred.end(); it++ )
+      for( Info::ReturnIterator it = pred.begin(); it != pred.end(); it++ )
       {
         returns.insert(getReturnSite(*it));
       }
@@ -169,7 +169,7 @@ namespace wali
     {
       States returns;
       const Info::Returns & pred = T_info.predTrans(callSite);
-      for( Info::returnIterator it = pred.begin(); it != pred.end(); it++ )
+      for( Info::ReturnIterator it = pred.begin(); it != pred.end(); it++ )
       {
         if( getExit(*it) == exit )
           returns.insert(getReturnSite(*it));
@@ -190,7 +190,7 @@ namespace wali
     {
       States calls;
       const Info::Returns & exit = T_info.exitTrans(exitSite);
-      for( Info::returnIterator it = exit.begin(); it != exit.end(); it++ )
+      for( Info::ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( getReturnSite(*it) == returnSite )
           calls.insert(getCallSite(*it));  
@@ -210,7 +210,7 @@ namespace wali
     {
       States entries;
       const Info::Calls & cll = T_info.callTrans(callSite);
-      for( Info::callIterator it = cll.begin(); it != cll.end(); it++ )
+      for( Info::CallIterator it = cll.begin(); it != cll.end(); it++ )
       {
         entries.insert(getEntry(*it));
       }
@@ -229,7 +229,7 @@ namespace wali
     {
       States targets;
       const Info::Internals & src = T_info.fromTrans(source);
-      for( Info::internalIterator it = src.begin(); it != src.end(); it++ )
+      for( Info::InternalIterator it = src.begin(); it != src.end(); it++ )
       {
         targets.insert(getTarget(*it));
       }
@@ -248,7 +248,7 @@ namespace wali
     { 
       // Duplicate outgoing internal transitions.
       const Info::Internals & from = T_info.fromTrans(orig);
-      for( Info::internalIterator it = from.begin(); it != from.end(); it++ )
+      for( Info::InternalIterator it = from.begin(); it != from.end(); it++ )
       {
         Internal iTrans(dup,getInternalSym(*it),getTarget(*it));
         addInternal(iTrans);
@@ -256,7 +256,7 @@ namespace wali
 
       // Duplicate call site call transitions.
       const Info::Calls & call = T_info.callTrans(orig);
-      for( Info::callIterator it = call.begin(); it != call.end(); it++ )
+      for( Info::CallIterator it = call.begin(); it != call.end(); it++ )
       {
         Call cTrans(dup,getCallSym(*it),getEntry(*it));
         addCall(cTrans);
@@ -265,7 +265,7 @@ namespace wali
 
       // Duplicate exit point return transitions.
       const Info::Returns & exit = T_info.exitTrans(orig);
-      for( Info::returnIterator it = exit.begin(); it != exit.end(); it++ )
+      for( Info::ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         Return rTrans(dup,getCallSite(*it),getReturnSym(*it),getReturnSite(*it));
         addReturn(rTrans);
@@ -276,7 +276,7 @@ namespace wali
       //    want to change it without looking at uses and compensating.
       // Duplicate call predecessor return transitions.
       const Info::Returns & pred = T_info.predTrans(orig);
-      for( Info::returnIterator it = pred.begin(); it != pred.end(); it++ )
+      for( Info::ReturnIterator it = pred.begin(); it != pred.end(); it++ )
       {
         Return rTrans(getExit(*it),dup,getReturnSym(*it),getReturnSite(*it));
         addReturn(rTrans);
@@ -295,7 +295,7 @@ namespace wali
     { 
       //Duplicate outgoing internal transitions.
       const Info::Internals & from = T_info.fromTrans(orig);
-      for( Info::internalIterator it = from.begin(); it != from.end(); it++ )
+      for( Info::InternalIterator it = from.begin(); it != from.end(); it++ )
       {
         Internal iTrans(dup,getInternalSym(*it),getTarget(*it));
         addInternal(iTrans);
@@ -314,7 +314,7 @@ namespace wali
 
       //Duplicate incoming internal transitions.
       const Info::Internals & to = T_info.toTrans(orig);
-      for( Info::internalIterator it = to.begin(); it != to.end(); it++ )
+      for( Info::InternalIterator it = to.begin(); it != to.end(); it++ )
       {
         Internal iTrans(getSource(*it),getInternalSym(*it),dup);
         addInternal(iTrans);
@@ -322,7 +322,7 @@ namespace wali
 
       //Duplicate call site call transitions.
       const Info::Calls & call = T_info.callTrans(orig);
-      for( Info::callIterator it = call.begin(); it != call.end(); it++ )
+      for( Info::CallIterator it = call.begin(); it != call.end(); it++ )
       {
         Call cTrans(dup,getCallSym(*it),getEntry(*it));
         addCall(cTrans);
@@ -335,7 +335,7 @@ namespace wali
 
       //Duplicate entry point call transitions.
       const Info::Calls & entry = T_info.entryTrans(orig);
-      for( Info::callIterator it = entry.begin(); it != entry.end(); it++ )
+      for( Info::CallIterator it = entry.begin(); it != entry.end(); it++ )
       {
         Call cTrans(getCallSite(*it),getCallSym(*it),dup);
         addCall(cTrans);
@@ -343,7 +343,7 @@ namespace wali
 
       //Duplicate exit point return transitions.
       const Info::Returns & exit = T_info.exitTrans(orig);
-      for( Info::returnIterator it = exit.begin(); it != exit.end(); it++ )
+      for( Info::ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         Return rTrans(dup,getCallSite(*it),getReturnSym(*it),getReturnSite(*it));
         addReturn(rTrans);
@@ -366,7 +366,7 @@ namespace wali
 
       //Duplicate call predecessor return transitions.
       const Info::Returns & pred = T_info.predTrans(orig);
-      for( Info::returnIterator it = pred.begin(); it != pred.end(); it++ )
+      for( Info::ReturnIterator it = pred.begin(); it != pred.end(); it++ )
       {
         Return rTrans(getExit(*it),dup,getReturnSym(*it),getReturnSite(*it));
         addReturn(rTrans);
@@ -379,7 +379,7 @@ namespace wali
 
       //Duplicate return site return transitions.
       const Info::Returns & ret = T_info.retTrans(orig);
-      for( Info::returnIterator it = ret.begin(); it != ret.end(); it++ )
+      for( Info::ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         Return rTrans(getExit(*it),getCallSite(*it),getReturnSym(*it),dup);
         addReturn(rTrans);
@@ -557,21 +557,21 @@ namespace wali
     void TransitionStorage::addAllTrans( TransitionStorage addTransSet )
     {   
       //Add call transitions.
-      for(callIterator it = addTransSet.beginCall(); 
+      for(CallIterator it = addTransSet.beginCall(); 
             it != addTransSet.endCall(); it ++ )
       {
         addCall(*it);
       }
 
       //Add internal transitions.
-      for(internalIterator it = addTransSet.beginInternal(); 
+      for(InternalIterator it = addTransSet.beginInternal(); 
             it != addTransSet.endInternal(); it ++ )
       {
         addInternal(*it);
       }
 
       //Add return transitions.
-      for(returnIterator it = addTransSet.beginReturn(); 
+      for(ReturnIterator it = addTransSet.beginReturn(); 
             it != addTransSet.endReturn(); it ++ )
       {
         addReturn(*it);
@@ -805,7 +805,7 @@ namespace wali
       //Print call transitions.
       o << "Delta_c: {\n  ";
       bool first = true;
-      for( callIterator cit = callTrans.begin(); cit != callTrans.end(); cit++, first=false )
+      for( CallIterator cit = callTrans.begin(); cit != callTrans.end(); cit++, first=false )
       {
         if( !first )
           o << ", \n  ";
@@ -823,10 +823,10 @@ namespace wali
 
       //Print internal transitions.
       o << "Delta_i:  {\n  ";
-      internalIterator iit = internalTrans.begin();
-      internalIterator iitEND = internalTrans.end();
+      InternalIterator iit = internalTrans.begin();
+      InternalIterator iitEND = internalTrans.end();
       first = true;
-      for(internalIterator iit = internalTrans.begin();
+      for(InternalIterator iit = internalTrans.begin();
           iit != internalTrans.end(); iit++, first=false )
       {
         if( !first )
@@ -846,7 +846,7 @@ namespace wali
       //Print return transitions.
       o << "Delta_r: {\n  ";
       first = true;
-      for(returnIterator rit = returnTrans.begin();
+      for(ReturnIterator rit = returnTrans.begin();
           rit != returnTrans.end(); rit++, first = false )
       {
         if( !first )
@@ -884,7 +884,7 @@ namespace wali
         // it won't compile. Was never instantiated in templated version
       //Print call transitions.
       o << "//Delta_c: \n";
-      for (callIterator cit = callTrans.begin(); cit != callTrans.end(); cit++)
+      for (CallIterator cit = callTrans.begin(); cit != callTrans.end(); cit++)
       {
         cit->first.print(o << "\"") << "\"";
         o << "->";
@@ -901,7 +901,7 @@ namespace wali
       //Print internal transitions.
       o << "// Delta_i:\n" ;
 
-      for (internalIterator iit = callTrans.begin(); iit != callTrans.end(); iit++)
+      for (InternalIterator iit = callTrans.begin(); iit != callTrans.end(); iit++)
       {
         iit->first.print(o << "\"") << "\"";
         o << "->";
@@ -916,7 +916,7 @@ namespace wali
 
       //Print return transitions.
       o << "// Delta_r:\n";
-      for (returnIterator rit = returnTrans.begin(); rit != returnTrans.end(); rit++)
+      for (ReturnIterator rit = returnTrans.begin(); rit != returnTrans.end(); rit++)
       {
         //dummy
         o << "\"" << std::dec << rit->second << std::dec << ", " << rit->first << "\"";
@@ -979,7 +979,7 @@ namespace wali
      *          in the collection of transitions
      *
      */  
-    TransitionStorage::callIterator TransitionStorage::beginCall() const
+    TransitionStorage::CallIterator TransitionStorage::beginCall() const
     {
       return callTrans.begin();
     }
@@ -993,7 +993,7 @@ namespace wali
      *          in the collection of transitions
      *
      */
-    TransitionStorage::internalIterator TransitionStorage::beginInternal() const
+    TransitionStorage::InternalIterator TransitionStorage::beginInternal() const
     {
       return internalTrans.begin();
     }
@@ -1007,7 +1007,7 @@ namespace wali
      *          in the collection of transitions
      *
      */
-    TransitionStorage::returnIterator TransitionStorage::beginReturn() const
+    TransitionStorage::ReturnIterator TransitionStorage::beginReturn() const
     {
       return returnTrans.begin();
     }
@@ -1021,7 +1021,7 @@ namespace wali
      *          the collection of transitions
      *
      */
-    TransitionStorage::callIterator TransitionStorage::endCall() const
+    TransitionStorage::CallIterator TransitionStorage::endCall() const
     {
       return callTrans.end();
     }
@@ -1035,7 +1035,7 @@ namespace wali
      *          the collection of transitions
      *
      */
-    TransitionStorage::internalIterator TransitionStorage::endInternal() const
+    TransitionStorage::InternalIterator TransitionStorage::endInternal() const
     {
       return internalTrans.end();
     }
@@ -1049,7 +1049,7 @@ namespace wali
      *          the collection of transitions
      *
      */
-    TransitionStorage::returnIterator TransitionStorage::endReturn() const
+    TransitionStorage::ReturnIterator TransitionStorage::endReturn() const
     {
       return returnTrans.end();
     }
@@ -1333,13 +1333,13 @@ namespace wali
       Calls incoming = T_info.entryTrans(state);
 
       //Remove the transitions.
-      for( callIterator rit = outgoing.begin(); rit != outgoing.end(); rit++ )
+      for( CallIterator rit = outgoing.begin(); rit != outgoing.end(); rit++ )
       {
         removeCall(*rit);
       }
 
       //Remove the transitions.
-      for( callIterator rit = incoming.begin(); rit != incoming.end(); rit++ )
+      for( CallIterator rit = incoming.begin(); rit != incoming.end(); rit++ )
       {
         removeCall(*rit);
       }
@@ -1361,13 +1361,13 @@ namespace wali
       Internals incoming = T_info.toTrans(state);
 
       //Remove the transitions.
-      for( internalIterator rit = outgoing.begin(); rit != outgoing.end(); rit++ )
+      for( InternalIterator rit = outgoing.begin(); rit != outgoing.end(); rit++ )
       {
         removeInternal(*rit);
       }
 
       //Remove the transitions.
-      for( internalIterator rit = incoming.begin(); rit != incoming.end(); rit++ )
+      for( InternalIterator rit = incoming.begin(); rit != incoming.end(); rit++ )
       {
         removeInternal(*rit);
       }
@@ -1392,18 +1392,18 @@ namespace wali
       Returns predgoing = T_info.predTrans(state);
 
       //Remove the transitions.
-      for( returnIterator rit = outgoing.begin(); rit != outgoing.end(); rit++ )
+      for( ReturnIterator rit = outgoing.begin(); rit != outgoing.end(); rit++ )
       {
         removeReturn(*rit);
       }
 
       //Remove the transitions.
-      for( returnIterator rit = incoming.begin(); rit != incoming.end(); rit++ )
+      for( ReturnIterator rit = incoming.begin(); rit != incoming.end(); rit++ )
       {
         removeReturn(*rit);
       }
 
-      for( returnIterator rit = predgoing.begin(); rit != predgoing.end(); rit++ )
+      for( ReturnIterator rit = predgoing.begin(); rit != predgoing.end(); rit++ )
       {
         removeReturn(*rit);
       }
@@ -1440,14 +1440,14 @@ namespace wali
       Calls removeTrans;
 
       //Find transitions to remove.
-      for( callIterator cit = callTrans.begin(); cit != callTrans.end(); cit++ )
+      for( CallIterator cit = callTrans.begin(); cit != callTrans.end(); cit++ )
       {
         if( getCallSym(*cit) == sym )
           removeTrans.insert(*cit);
       }
 
       //Remove transitions.
-      for( callIterator rit = removeTrans.begin(); rit != removeTrans.end(); rit++ )
+      for( CallIterator rit = removeTrans.begin(); rit != removeTrans.end(); rit++ )
       {
         removeCall(*rit);
       }
@@ -1468,14 +1468,14 @@ namespace wali
       Internals removeTrans;
 
       //Find transitions to remove.
-      for( internalIterator iit = internalTrans.begin(); iit != internalTrans.end(); iit++ )
+      for( InternalIterator iit = internalTrans.begin(); iit != internalTrans.end(); iit++ )
       {
         if( getInternalSym(*iit) == sym )
           removeTrans.insert(*iit);
       }
 
       //Remove transitions.
-      for( internalIterator rit = removeTrans.begin(); rit != removeTrans.end(); rit++ )
+      for( InternalIterator rit = removeTrans.begin(); rit != removeTrans.end(); rit++ )
       {
         removeInternal(*rit);
       }
@@ -1496,14 +1496,14 @@ namespace wali
       Returns removeTrans;
 
       //Find transitions to remove.
-      for( returnIterator rit = returnTrans.begin(); rit != returnTrans.end(); rit++ )
+      for( ReturnIterator rit = returnTrans.begin(); rit != returnTrans.end(); rit++ )
       {
         if( getReturnSym(*rit) == sym )
           removeTrans.insert(*rit);
       }
 
       //Remove transitions.
-      for( returnIterator rit = removeTrans.begin(); rit != removeTrans.end(); rit++ )
+      for( ReturnIterator rit = removeTrans.begin(); rit != removeTrans.end(); rit++ )
       {
         removeReturn(*rit);
       }
@@ -1525,7 +1525,7 @@ namespace wali
     {
       Calls const & outgoing = T_info.callTrans(from);
 
-      for( callIterator cit = outgoing.begin(); cit != outgoing.end(); cit++ )
+      for( CallIterator cit = outgoing.begin(); cit != outgoing.end(); cit++ )
       {
         if( getCallSym(*cit) == sym )
           return true;
@@ -1548,7 +1548,7 @@ namespace wali
       Calls result;
       Calls const & outgoing = T_info.callTrans(from);
 
-      for( callIterator cit = outgoing.begin(); cit != outgoing.end(); cit++ )
+      for( CallIterator cit = outgoing.begin(); cit != outgoing.end(); cit++ )
       {
         if( getCallSym(*cit) == sym )
           result.insert(*cit);
@@ -1571,7 +1571,7 @@ namespace wali
     {
       Internals const & outgoing = T_info.fromTrans(from);
 
-      for( internalIterator iit = outgoing.begin(); iit != outgoing.end(); iit++ )
+      for( InternalIterator iit = outgoing.begin(); iit != outgoing.end(); iit++ )
       {
         if( getInternalSym(*iit) == sym )
           return true;    
@@ -1594,7 +1594,7 @@ namespace wali
       Internals result;
       Internals const & outgoing = T_info.fromTrans(from);
 
-      for( internalIterator iit = outgoing.begin(); iit != outgoing.end(); iit++ )
+      for( InternalIterator iit = outgoing.begin(); iit != outgoing.end(); iit++ )
       {
         if( getInternalSym(*iit) == sym )
           result.insert(*iit);
@@ -1633,7 +1633,7 @@ namespace wali
     {
       Returns const & outgoing = T_info.exitTrans(from);
 
-      for( returnIterator rit = outgoing.begin(); rit != outgoing.end(); rit++ )
+      for( ReturnIterator rit = outgoing.begin(); rit != outgoing.end(); rit++ )
       {
         if( (getCallSite(*rit) == pred) && (getReturnSym(*rit) == sym) )
             return true;      
@@ -1656,7 +1656,7 @@ namespace wali
       Returns result;
       Returns const & outgoing = T_info.exitTrans(from);
 
-      for( returnIterator rit = outgoing.begin(); rit != outgoing.end(); rit++ )
+      for( ReturnIterator rit = outgoing.begin(); rit != outgoing.end(); rit++ )
       {
         if( (getExit(*rit) == from) && (getReturnSym(*rit) == sym) )
           result.insert(*rit);

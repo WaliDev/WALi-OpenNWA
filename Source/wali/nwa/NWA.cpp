@@ -596,21 +596,21 @@ namespace wali
        std::set<Symbol> syms;
 
        std::set<Call> const & calls = trans.getTransEntry(target);
-      for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
+      for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
       {
         if( Trans::getCallSite(*cit) == source )
           syms.insert(Trans::getCallSym(*cit));
       }
 
        std::set<Internal> const & internals = trans.getTransTo(target);
-      for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
+      for( InternalIterator iit = internals.begin(); iit != internals.end(); iit++ )
       {
         if( Trans::getSource(*iit) == source )
           syms.insert(Trans::getInternalSym(*iit));
       }
 
        std::set<Return> const & returns = trans.getTransRet(target);
-      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
       {
         if( Trans::getExit(*rit) == source )
           syms.insert(Trans::getReturnSym(*rit));
@@ -635,19 +635,19 @@ namespace wali
        std::set<Symbol> syms;
 
        std::set<Call> const & calls = trans.getTransCall(source);
-      for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
+      for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
       {
           syms.insert(Trans::getCallSym(*cit));
       }
 
        std::set<Internal> const & internals = trans.getTransFrom(source);
-      for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
+      for( InternalIterator iit = internals.begin(); iit != internals.end(); iit++ )
       {
           syms.insert(Trans::getInternalSym(*iit));
       }
 
        std::set<Return> const & returns = trans.getTransExit(source);
-      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
       {
           syms.insert(Trans::getReturnSym(*rit));
       }
@@ -671,19 +671,19 @@ namespace wali
        std::set<Symbol> syms;
 
        std::set<Call> const & calls = trans.getTransEntry(target);
-      for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
+      for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
       {
           syms.insert(Trans::getCallSym(*cit));
       }
 
        std::set<Internal> const & internals = trans.getTransTo(target);
-      for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
+      for( InternalIterator iit = internals.begin(); iit != internals.end(); iit++ )
       {
           syms.insert(Trans::getInternalSym(*iit));
       }
 
        std::set<Return> const & returns = trans.getTransRet(target);
-      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
       {
           syms.insert(Trans::getReturnSym(*rit));
       }
@@ -705,15 +705,15 @@ namespace wali
       assert(state < wali::WALI_BAD_KEY);
        
        std::set<Call> const & calls = trans.getTransEntry(state);
-      for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
+      for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
         preds.insert(Trans::getCallSite(*cit));
 
        std::set<Internal> const & internals = trans.getTransTo(state);
-      for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
+      for( InternalIterator iit = internals.begin(); iit != internals.end(); iit++ )
         preds.insert(Trans::getSource(*iit));
 
        std::set<Return> const & returns = trans.getTransRet(state);
-      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         preds.insert(Trans::getExit(*rit));
     }
 	  /**
@@ -751,17 +751,17 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
        std::set<Call> const & calls = trans.getTransEntry(state);
-      for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
+      for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
         if( symbol == Trans::getCallSym(*cit) )
           preds.insert(Trans::getCallSite(*cit));
 
        std::set<Internal> const & internals = trans.getTransTo(state);
-      for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
+      for( InternalIterator iit = internals.begin(); iit != internals.end(); iit++ )
         if( symbol == Trans::getInternalSym(*iit) )
           preds.insert(Trans::getSource(*iit));
 
        std::set<Return> const & returns = trans.getTransRet(state);
-      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         if( symbol == Trans::getReturnSym(*rit) )
           preds.insert(Trans::getExit(*rit));
     }
@@ -799,15 +799,15 @@ namespace wali
       assert(state < wali::WALI_BAD_KEY);
        
        std::set<Call> const & calls = trans.getTransCall(state);
-      for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
+      for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
         succs.insert(Trans::getEntry(*cit));
 
        std::set<Internal> const & internals = trans.getTransFrom(state);
-      for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
+      for( InternalIterator iit = internals.begin(); iit != internals.end(); iit++ )
         succs.insert(Trans::getTarget(*iit));
 
        std::set<Return> const & returns = trans.getTransExit(state);
-      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         succs.insert(Trans::getReturnSite(*rit));
     }
 	  /**
@@ -845,17 +845,17 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
        std::set<Call> const & calls = trans.getTransCall(state);
-      for( callIterator cit = calls.begin(); cit != calls.end(); cit++ )
+      for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
         if( symbol == Trans::getCallSym(*cit) )
           succs.insert(Trans::getEntry(*cit));
 
        std::set<Internal> const & internals = trans.getTransFrom(state);
-      for( internalIterator iit = internals.begin(); iit != internals.end(); iit++ )
+      for( InternalIterator iit = internals.begin(); iit != internals.end(); iit++ )
         if( symbol == Trans::getInternalSym(*iit) )
           succs.insert(Trans::getTarget(*iit));
 
        std::set<Return> const & returns = trans.getTransExit(state);
-      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         if( symbol == Trans::getReturnSym(*rit) )
           succs.insert(Trans::getReturnSite(*rit));
     }
@@ -899,7 +899,7 @@ namespace wali
        std::set<Symbol> syms;
 
        std::set<Return> const & returns = trans.getTransRet(ret);
-      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
       {
         if( Trans::getCallSite(*rit) == call )
           syms.insert(Trans::getReturnSym(*rit));
@@ -926,7 +926,7 @@ namespace wali
        std::set<Symbol> syms;
 
        std::set<Return> const & returns = trans.getTransPred(call);
-      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
       {
           syms.insert(Trans::getReturnSym(*rit));
       }
@@ -952,7 +952,7 @@ namespace wali
        std::set<Symbol> syms;
 
        std::set<Return> const & returns = trans.getTransRet(ret);
-      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
       {
           syms.insert(Trans::getReturnSym(*rit));
       }
@@ -974,7 +974,7 @@ namespace wali
       assert(state < wali::WALI_BAD_KEY);
       
        std::set<Return> const & returns = trans.getTransRet(state);
-      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         c_preds.insert(Trans::getCallSite(*rit));
     }
 	/**
@@ -1014,7 +1014,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
        std::set<Return> const & returns = trans.getTransRet(state);
-      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         if( symbol == Trans::getReturnSym(*rit) )
           c_preds.insert(Trans::getCallSite(*rit));
     }
@@ -1052,7 +1052,7 @@ namespace wali
       assert(state < wali::WALI_BAD_KEY);
       
        std::set<Return> const & returns = trans.getTransPred(state);
-      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         c_succs.insert(Trans::getReturnSite(*rit));
     }
 	/**
@@ -1090,7 +1090,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
       
        std::set<Return> const & returns = trans.getTransPred(state);
-      for( returnIterator rit = returns.begin(); rit != returns.end(); rit++ )
+      for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         if( symbol == Trans::getReturnSym(*rit) )
           c_succs.insert(Trans::getReturnSite(*rit));
     }
@@ -1169,7 +1169,7 @@ namespace wali
     void NWA::realizeImplicitTrans()
     {
        std::set<Triple<State, Symbol, State> > returns;
-      for( returnIterator ret = beginReturnTrans(); ret != endReturnTrans(); ++ret) 
+      for( ReturnIterator ret = beginReturnTrans(); ret != endReturnTrans(); ++ret) 
       {
         returns.insert(Triple<State, Symbol, State>(ret->first, ret->second, ret->third));
       }
@@ -1289,7 +1289,7 @@ namespace wali
 
       const Calls & call = trans.getCalls();
        std::set<State> calls;
-      for( callIterator it = call.begin(); it != call.end(); it++ )
+      for( CallIterator it = call.begin(); it != call.end(); it++ )
       {
         if( symbol == Trans::getCallSym(*it) )
           calls.insert( Trans::getCallSite(*it) );
@@ -1317,7 +1317,7 @@ namespace wali
 
       const Calls & call = trans.getTransEntry(entryPoint);
        std::set<State> calls;
-      for( callIterator it = call.begin(); it != call.end(); it++ )
+      for( CallIterator it = call.begin(); it != call.end(); it++ )
       {
         if( symbol == Trans::getCallSym(*it) )
           calls.insert( Trans::getCallSite(*it) );
@@ -1343,7 +1343,7 @@ namespace wali
 
       const Calls & call = trans.getTransEntry(entryPoint);
        std::set<std::pair<Symbol,State> > calls;
-      for( callIterator it = call.begin(); it != call.end(); it++ )
+      for( CallIterator it = call.begin(); it != call.end(); it++ )
       {
         calls.insert( std::pair<Symbol,State>(Trans::getCallSite(*it), Trans::getCallSym(*it) ) );
       }
@@ -1362,7 +1362,7 @@ namespace wali
     {
       const Calls & call = trans.getCalls();
        std::set<State> calls;
-      for( callIterator it = call.begin(); it != call.end(); it++ )
+      for( CallIterator it = call.begin(); it != call.end(); it++ )
       {
         calls.insert( Trans::getCallSite(*it) );
       }
@@ -1381,7 +1381,7 @@ namespace wali
     {
       const Calls & calls = trans.getCalls();
        std::set<Symbol> syms;
-      for( callIterator it = calls.begin(); it != calls.end(); it++ )
+      for( CallIterator it = calls.begin(); it != calls.end(); it++ )
       {
         syms.insert( Trans::getCallSym(*it) );
       }
@@ -1407,7 +1407,7 @@ namespace wali
 
       const Calls & calls = trans.getTransCall(callSite);
        std::set<Symbol> syms;
-      for( callIterator it = calls.begin(); it != calls.end(); it++ )
+      for( CallIterator it = calls.begin(); it != calls.end(); it++ )
       {
         if( entryPoint == Trans::getEntry(*it) )
           syms.insert( Trans::getCallSym(*it) );
@@ -1432,7 +1432,7 @@ namespace wali
 
       const Calls & calls = trans.getTransCall(callSite);
        std::set<Symbol> syms;
-      for( callIterator it = calls.begin(); it != calls.end(); it++ )
+      for( CallIterator it = calls.begin(); it != calls.end(); it++ )
       {
           syms.insert( Trans::getCallSym(*it) );
       }
@@ -1456,7 +1456,7 @@ namespace wali
 
       const Calls & calls = trans.getTransEntry(entryPoint);
        std::set<Symbol> syms;
-      for( callIterator it = calls.begin(); it != calls.end(); it++ )
+      for( CallIterator it = calls.begin(); it != calls.end(); it++ )
       {
           syms.insert( Trans::getCallSym(*it) );
       }
@@ -1478,7 +1478,7 @@ namespace wali
 
       const Calls & ent = trans.getCalls();
        std::set<State> entries;
-      for( callIterator it = ent.begin(); it != ent.end(); it++ )
+      for( CallIterator it = ent.begin(); it != ent.end(); it++ )
       {
         if( symbol == Trans::getCallSym(*it) )
           entries.insert( Trans::getEntry(*it) );
@@ -1505,7 +1505,7 @@ namespace wali
 
       const Calls & ent = trans.getTransCall(callSite);
        std::set<State> entries;
-      for( callIterator it = ent.begin(); it != ent.end(); it++ )
+      for( CallIterator it = ent.begin(); it != ent.end(); it++ )
       {
         if( symbol == Trans::getCallSym(*it) )
           entries.insert( Trans::getEntry(*it) );
@@ -1527,7 +1527,7 @@ namespace wali
       assert(callSite < wali::WALI_BAD_KEY);
       const Calls & ent = trans.getTransCall(callSite);
        std::set<std::pair<Symbol,State> > entries;
-      for( callIterator it = ent.begin(); it != ent.end(); it++ )
+      for( CallIterator it = ent.begin(); it != ent.end(); it++ )
       {
         entries.insert( std::pair<Symbol,State>(Trans::getCallSym(*it),Trans::getEntry(*it)) );
       }
@@ -1546,7 +1546,7 @@ namespace wali
     {
       const Calls & call = trans.getCalls();
        std::set<State> entries;
-      for( callIterator it = call.begin(); it != call.end(); it++ )
+      for( CallIterator it = call.begin(); it != call.end(); it++ )
       {
         entries.insert( Trans::getEntry(*it) );
       }
@@ -1705,7 +1705,7 @@ namespace wali
 
       const Internals & src = trans.getInternals();
        std::set<State> sources;
-      for( internalIterator it = src.begin(); it != src.end(); it++ )
+      for( InternalIterator it = src.begin(); it != src.end(); it++ )
       {
         if( symbol == Trans::getInternalSym(*it) )
           sources.insert( Trans::getSource(*it) );
@@ -1732,7 +1732,7 @@ namespace wali
 
       const Internals & src = trans.getTransTo(target);
        std::set<State> sources;
-      for( internalIterator it = src.begin(); it != src.end(); it++ )
+      for( InternalIterator it = src.begin(); it != src.end(); it++ )
       {
         if( symbol == Trans::getInternalSym(*it) )
           sources.insert( Trans::getSource(*it) );
@@ -1758,7 +1758,7 @@ namespace wali
 
       const Internals & src = trans.getTransTo(target);
        std::set<std::pair<Symbol,State> > sources;
-      for( internalIterator it = src.begin(); it != src.end(); it++ )
+      for( InternalIterator it = src.begin(); it != src.end(); it++ )
       {
         sources.insert( std::pair<Symbol,State>(Trans::getSource(*it), Trans::getInternalSym(*it)) );
       }
@@ -1777,7 +1777,7 @@ namespace wali
     {
       const Internals & src = trans.getInternals();
        std::set<State> sources;
-      for( internalIterator it = src.begin(); it != src.end(); it++ )
+      for( InternalIterator it = src.begin(); it != src.end(); it++ )
       {
         sources.insert( Trans::getSource(*it) );
       }
@@ -1796,7 +1796,7 @@ namespace wali
     {
       const Internals & ints = trans.getInternals();
        std::set<Symbol> syms;
-      for( internalIterator it = ints.begin(); it != ints.end(); it++ )
+      for( InternalIterator it = ints.begin(); it != ints.end(); it++ )
       {
         syms.insert( Trans::getInternalSym(*it) );
       }
@@ -1819,7 +1819,7 @@ namespace wali
     {
       const Internals & ints = trans.getTransFrom(source);
        std::set<Symbol> syms;
-      for( internalIterator it = ints.begin(); it != ints.end(); it++ )
+      for( InternalIterator it = ints.begin(); it != ints.end(); it++ )
       {
         if( target == Trans::getTarget(*it) )
           syms.insert( Trans::getInternalSym(*it) );
@@ -1842,7 +1842,7 @@ namespace wali
     {
       const Internals & ints = trans.getTransFrom(source);
        std::set<Symbol> syms;
-      for( internalIterator it = ints.begin(); it != ints.end(); it++ )
+      for( InternalIterator it = ints.begin(); it != ints.end(); it++ )
       {
         syms.insert( Trans::getInternalSym(*it) );
       }
@@ -1864,7 +1864,7 @@ namespace wali
     {
       const Internals & ints = trans.getTransTo(target);
        std::set<Symbol> syms;
-      for( internalIterator it = ints.begin(); it != ints.end(); it++ )
+      for( InternalIterator it = ints.begin(); it != ints.end(); it++ )
       {
         syms.insert( Trans::getInternalSym(*it) );
       }
@@ -1886,7 +1886,7 @@ namespace wali
 
       const Internals & tgt = trans.getInternals();
        std::set<State> targets;
-      for( internalIterator it = tgt.begin(); it != tgt.end(); it++ )
+      for( InternalIterator it = tgt.begin(); it != tgt.end(); it++ )
       {
         if( symbol == Trans::getInternalSym(*it) )
           targets.insert( Trans::getTarget(*it) );
@@ -1914,7 +1914,7 @@ namespace wali
 
       const Internals & tgt = trans.getTransFrom(source);
        std::set<State> targets;
-      for( internalIterator it = tgt.begin(); it != tgt.end(); it++ )
+      for( InternalIterator it = tgt.begin(); it != tgt.end(); it++ )
       {
         if( symbol == Trans::getInternalSym(*it) )
           targets.insert( Trans::getTarget(*it) );
@@ -1936,7 +1936,7 @@ namespace wali
       assert(source < wali::WALI_BAD_KEY);
       const Internals & tgt = trans.getTransFrom(source);
        std::set<std::pair<Symbol,State> > targets;
-      for( internalIterator it = tgt.begin(); it != tgt.end(); it++ )
+      for( InternalIterator it = tgt.begin(); it != tgt.end(); it++ )
       {
         targets.insert( std::pair<Symbol,State>(Trans::getInternalSym(*it),Trans::getTarget(*it)) );
       }
@@ -1955,7 +1955,7 @@ namespace wali
     {
       const Internals & tgt = trans.getInternals();
        std::set<State> targets;
-      for( internalIterator it = tgt.begin(); it != tgt.end(); it++ )
+      for( InternalIterator it = tgt.begin(); it != tgt.end(); it++ )
       {
         targets.insert( Trans::getTarget(*it) );
       }
@@ -2109,7 +2109,7 @@ namespace wali
 
       const Returns & exit = trans.getReturns();
        std::set<State> exits;
-      for( returnIterator it = exit.begin(); it != exit.end(); it++ )
+      for( ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
         {
@@ -2140,7 +2140,7 @@ namespace wali
 
       const Returns & exit = trans.getTransPred(callSite);
        std::set<State> exits;
-      for( returnIterator it = exit.begin(); it != exit.end(); it++ )
+      for( ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( (Trans::getReturnSite(*it) == returnSite) && (symbol == Trans::getReturnSym(*it)) )
         {
@@ -2169,7 +2169,7 @@ namespace wali
 
       const Returns & exit = trans.getTransPred(callSite);
        std::set<std::pair<State,Symbol> > exits;
-      for( returnIterator it = exit.begin(); it != exit.end(); it++ )
+      for( ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( Trans::getReturnSite(*it) == returnSite )
         {
@@ -2191,7 +2191,7 @@ namespace wali
     {
       const Returns & exit = trans.getReturns();
        std::set<State> exits;
-      for( returnIterator it = exit.begin(); it != exit.end(); it++ )
+      for( ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
           exits.insert( Trans::getExit(*it) );
       }
@@ -2217,7 +2217,7 @@ namespace wali
 
       const Returns & exit = trans.getTransPred(callSite);
        std::set<State> exits;
-      for( returnIterator it = exit.begin(); it != exit.end(); it++ )
+      for( ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
           exits.insert( Trans::getExit(*it) );
@@ -2243,7 +2243,7 @@ namespace wali
 
       const Returns & exit = trans.getTransPred(callSite);
        std::set<std::pair<State,Symbol> > exits;
-      for( returnIterator it = exit.begin(); it != exit.end(); it++ )
+      for( ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         exits.insert( std::pair<State,Symbol>(Trans::getExit(*it),Trans::getReturnSym(*it)) );
       }
@@ -2269,7 +2269,7 @@ namespace wali
 
       const Returns & exit = trans.getTransRet(returnSite);
        std::set<State> exits;
-      for( returnIterator it = exit.begin(); it != exit.end(); it++ )
+      for( ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
           exits.insert( Trans::getExit(*it) );
@@ -2295,7 +2295,7 @@ namespace wali
 
       const Returns & exit = trans.getTransRet(returnSite);
        std::set<std::pair<State,Symbol> > exits;
-      for( returnIterator it = exit.begin(); it != exit.end(); it++ )
+      for( ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         exits.insert( std::pair<State,Symbol>(Trans::getExit(*it),Trans::getReturnSym(*it)) );
       }
@@ -2317,7 +2317,7 @@ namespace wali
 
       const Returns & call = trans.getReturns();
        std::set<State> calls;
-      for( returnIterator it = call.begin(); it != call.end(); it++ )
+      for( ReturnIterator it = call.begin(); it != call.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
         {
@@ -2348,7 +2348,7 @@ namespace wali
 
       const Returns call = trans.getTransExit(exitPoint);
        std::set<State> calls;
-      for( returnIterator it = call.begin(); it != call.end(); it++ )
+      for( ReturnIterator it = call.begin(); it != call.end(); it++ )
       {
         if( (Trans::getReturnSite(*it) == returnSite) &&  (symbol == Trans::getReturnSym(*it)) )
         {
@@ -2377,7 +2377,7 @@ namespace wali
 
       const Returns call = trans.getTransExit(exitPoint);
        std::set<std::pair<State,Symbol> > calls;
-      for( returnIterator it = call.begin(); it != call.end(); it++ )
+      for( ReturnIterator it = call.begin(); it != call.end(); it++ )
       {
         if( Trans::getReturnSite(*it) == returnSite )
         {
@@ -2399,7 +2399,7 @@ namespace wali
     {
       const Returns call = trans.getReturns();
        std::set<State> calls;
-      for( returnIterator it = call.begin(); it != call.end(); it++ )
+      for( ReturnIterator it = call.begin(); it != call.end(); it++ )
       {
           calls.insert( Trans::getCallSite(*it) );
       }
@@ -2425,7 +2425,7 @@ namespace wali
 
       const Returns call = trans.getTransExit(exitPoint);
        std::set<State> calls;
-      for( returnIterator it = call.begin(); it != call.end(); it++ )
+      for( ReturnIterator it = call.begin(); it != call.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
           calls.insert( Trans::getCallSite(*it) );
@@ -2450,7 +2450,7 @@ namespace wali
 
       const Returns call = trans.getTransExit(exitPoint);
        std::set<std::pair<State,Symbol> > calls;
-      for( returnIterator it = call.begin(); it != call.end(); it++ )
+      for( ReturnIterator it = call.begin(); it != call.end(); it++ )
       {
         calls.insert( std::pair<State,Symbol>(Trans::getCallSite(*it),Trans::getReturnSym(*it)) );
       }
@@ -2476,7 +2476,7 @@ namespace wali
 
       const Returns call = trans.getTransRet(returnSite);
        std::set<State> calls;
-      for( returnIterator it = call.begin(); it != call.end(); it++ )
+      for( ReturnIterator it = call.begin(); it != call.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
           calls.insert( Trans::getCallSite(*it) );
@@ -2502,7 +2502,7 @@ namespace wali
 
       const Returns call = trans.getTransRet(returnSite);
        std::set<std::pair<State,Symbol> > calls;
-      for( returnIterator it = call.begin(); it != call.end(); it++ )
+      for( ReturnIterator it = call.begin(); it != call.end(); it++ )
       {
         calls.insert( std::pair<State,Symbol>(Trans::getCallSite(*it),Trans::getReturnSym(*it)) );
       }
@@ -2521,7 +2521,7 @@ namespace wali
     {
       const Returns rets = trans.getReturns();
        std::set<Symbol> syms;
-      for( returnIterator it = rets.begin(); it != rets.end(); it++ )
+      for( ReturnIterator it = rets.begin(); it != rets.end(); it++ )
       {
         syms.insert( Trans::getReturnSym(*it) );
       }
@@ -2549,7 +2549,7 @@ namespace wali
 
       const Returns ret = trans.getTransExit(exitPoint);
        std::set<Symbol> syms;
-      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( (Trans::getCallSite(*it) == callSite) && (returnSite == Trans::getReturnSite(*it)) )
         {
@@ -2576,7 +2576,7 @@ namespace wali
 
       const Returns ret = trans.getTransExit(exitPoint);
        std::set<Symbol> syms;
-      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         syms.insert( Trans::getReturnSym(*it) );
       }
@@ -2600,7 +2600,7 @@ namespace wali
 
       const Returns ret = trans.getTransPred(callSite);
        std::set<Symbol> syms;
-      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         syms.insert( Trans::getReturnSym(*it) );
       }
@@ -2624,7 +2624,7 @@ namespace wali
 
       const Returns ret = trans.getTransRet(returnSite);
        std::set<Symbol> syms;
-      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         syms.insert( Trans::getReturnSym(*it) );
       }
@@ -2650,7 +2650,7 @@ namespace wali
 
       const Returns ret = trans.getTransExit(exitPoint);
        std::set<Symbol> syms;
-      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( (Trans::getCallSite(*it) == callSite) )
         {
@@ -2679,7 +2679,7 @@ namespace wali
 
       const Returns ret = trans.getTransExit(exitPoint);
        std::set<Symbol> syms;
-      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( (returnSite == Trans::getReturnSite(*it)) )
         {
@@ -2708,7 +2708,7 @@ namespace wali
 
       const Returns ret = trans.getTransPred(callSite);
        std::set<Symbol> syms;
-      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( (returnSite == Trans::getReturnSite(*it)) )
         {
@@ -2735,7 +2735,7 @@ namespace wali
       
       const Returns ret = trans.getReturns();
        std::set<State> returns;
-      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
         {
@@ -2766,7 +2766,7 @@ namespace wali
 
       const Returns ret = trans.getTransExit(exitPoint);
        std::set<State> returns;
-      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( (Trans::getCallSite(*it) == callSite) && (symbol == Trans::getReturnSym(*it)) )
         {
@@ -2795,7 +2795,7 @@ namespace wali
 
       const Returns ret = trans.getTransExit(exit);
        std::set<std::pair<Symbol,State> > returns;
-      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( Trans::getCallSite(*it) == callSite )
         {
@@ -2817,7 +2817,7 @@ namespace wali
     {
       const Returns ret = trans.getReturns();
        std::set<State> returns;
-      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
           returns.insert( Trans::getReturnSite(*it) );
       }
@@ -2843,7 +2843,7 @@ namespace wali
 
       const Returns ret = trans.getTransExit(exitPoint);
        std::set<State> returns;
-      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
           returns.insert( Trans::getReturnSite(*it) );
@@ -2868,7 +2868,7 @@ namespace wali
 
       const Returns ret = trans.getTransExit(exitPoint);
        std::set<std::pair<Symbol,State> > returns;
-      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         returns.insert( std::pair<Symbol,State>(Trans::getReturnSym(*it),Trans::getReturnSite(*it)) );
       }
@@ -2894,7 +2894,7 @@ namespace wali
 
       const Returns ret = trans.getTransPred(callSite);
        std::set<State> returns;
-      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
           returns.insert( Trans::getReturnSite(*it) );
@@ -2919,7 +2919,7 @@ namespace wali
 
       const Returns ret = trans.getTransPred(callSite);
        std::set<std::pair<Symbol,State> > returns;
-      for( returnIterator it = ret.begin(); it != ret.end(); it++ )
+      for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         returns.insert( std::pair<Symbol,State>(Trans::getReturnSym(*it),Trans::getReturnSite(*it)) );
       }
@@ -3866,7 +3866,7 @@ namespace wali
       // stuck state accepts.)
       StateSet stuckStates(beginStates(), endStates());
 
-      for( callIterator call = trans.beginCall(); call != trans.endCall(); ++call)
+      for( CallIterator call = trans.beginCall(); call != trans.endCall(); ++call)
       {
         if( Trans::getCallSite(*call) != Trans::getEntry(*call)
             && Trans::getEntry(*call) != states.getStuckState())
@@ -3875,7 +3875,7 @@ namespace wali
         }
       }
 
-      for( internalIterator internal = trans.beginInternal();
+      for( InternalIterator internal = trans.beginInternal();
            internal != trans.endInternal(); ++internal)
       {
         if( Trans::getSource(*internal) != Trans::getTarget(*internal) 
@@ -3885,7 +3885,7 @@ namespace wali
         }
       }
 
-      for( returnIterator ret = trans.beginReturn(); ret != trans.endReturn(); ++ret)
+      for( ReturnIterator ret = trans.beginReturn(); ret != trans.endReturn(); ++ret)
       {
         if( Trans::getExit(*ret) != Trans::getReturnSite(*ret) 
             && Trans::getReturnSite(*ret) != states.getStuckState())
@@ -3949,7 +3949,7 @@ namespace wali
         }
         // for each return transition
         const Returns & returns = trans.getReturns();
-        for( returnIterator it = returns.begin(); it != returns.end(); it++ )
+        for( ReturnIterator it = returns.begin(); it != returns.end(); it++ )
         {
           // if src is the exit or the call
           if( src == Trans::getExit(*it) || src == Trans::getCallSite(*it) )
@@ -4009,7 +4009,7 @@ namespace wali
         }
         // for each return transition
         const Returns & returns = trans.getReturns();
-        for( returnIterator it = returns.begin(); it != returns.end(); it++ )
+        for( ReturnIterator it = returns.begin(); it != returns.end(); it++ )
         {
           // if src is the return
           if( src == Trans::getReturnSite(*it) )
@@ -4172,7 +4172,7 @@ namespace wali
       }
 
       //Duplicate internal transitions with source/target swapped.
-      for( internalIterator it = first->beginInternalTrans(); 
+      for( InternalIterator it = first->beginInternalTrans(); 
         it != first->endInternalTrans(); it++ )
       {
         addInternalTrans(Trans::getTarget(*it),
@@ -4181,7 +4181,7 @@ namespace wali
       }
 
       //Duplicate return transitions as call transitions with (return,sym,exit).
-      for( returnIterator it = first->beginReturnTrans(); 
+      for( ReturnIterator it = first->beginReturnTrans(); 
         it != first->endReturnTrans(); it++ )
       {
         addCallTrans(Trans::getReturnSite(*it),
@@ -4191,10 +4191,10 @@ namespace wali
 
       //Duplicate call transitions with associated return transitions as 
       //return transitions with (entry,return,sym,call).
-      for( callIterator cit = first->beginCallTrans(); 
+      for( CallIterator cit = first->beginCallTrans(); 
         cit != first->endCallTrans(); cit++ )
       {
-        for( returnIterator rit = first->beginReturnTrans(); 
+        for( ReturnIterator rit = first->beginReturnTrans(); 
           rit != first->endReturnTrans(); rit++ )
         {
           if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
@@ -4270,7 +4270,7 @@ namespace wali
 
       //Internal: for each (q,a,p) in delta_i, A* gets (q,a,p) and (q',a,p') and if
       //          p in Qf, then (q,a,r') and (q',a,r') for each r in Q0
-      for( internalIterator iit = first->beginInternalTrans();
+      for( InternalIterator iit = first->beginInternalTrans();
             iit != first->endInternalTrans(); iit++ )
       {
         State q = Trans::getSource(*iit);
@@ -4305,7 +4305,7 @@ namespace wali
 
       //Call: for each(q,a,p) in delta_c, A* gets (q,a,p) and (q',a,p), 
       //      and if p in Qf then (q,a,r') and (q',a,r') for each r in Q0
-      for( callIterator cit = first->beginCallTrans();
+      for( CallIterator cit = first->beginCallTrans();
             cit != first->endCallTrans(); cit++ )
       {
         State q = Trans::getCallSite(*cit);
@@ -4342,7 +4342,7 @@ namespace wali
       //          For each (q,r,a,p) in delra_r with r in Q0, 
       //            A* gets (q',s,a,p') for each s in Q union Q' 
       //          and if p in Qf, then (q',s,a,t') for each s in Q union Q' and t in Q0.
-      for( returnIterator rit = first->beginReturnTrans();
+      for( ReturnIterator rit = first->beginReturnTrans();
             rit != first->endReturnTrans(); rit++ )
       {
         State q = Trans::getExit(*rit);
@@ -4946,7 +4946,7 @@ namespace wali
         return false;
       
       //An NWA is not deterministic if there are epsilon transitions. 
-      for( internalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
+      for( InternalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
       {
         if( isEpsilon(Trans::getInternalSym(*iit)) )
           return false;
@@ -4963,7 +4963,7 @@ namespace wali
           //Check call transitions.
           int count = 0;
           bool wild = false;
-          for( callIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
+          for( CallIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
           {
             //Wild symbol 
             if( isWild(Trans::getCallSym(*cit)) )
@@ -4982,7 +4982,7 @@ namespace wali
           //Check internal transitions.
           count = 0;
           wild = false;
-          for( internalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
+          for( InternalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
           {
             //Wild symbol 
             if( isWild(Trans::getInternalSym(*iit)) )
@@ -5003,7 +5003,7 @@ namespace wali
             //Check return transitions.
             count = 0;
             wild = false;
-            for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
+            for( ReturnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
             {
               //Wild symbol 
               if( isWild(Trans::getReturnSym(*rit)) )
@@ -5334,7 +5334,7 @@ namespace wali
         //<p,n_1> -w-> <p',n_2> in delta_1, (q,n_1,q') in delta_i
         Key sym = it->from_stack();
         //look for internal transitions in the NWA with symbol 'sym'
-        for( internalIterator iit = beginInternalTrans();
+        for( InternalIterator iit = beginInternalTrans();
               iit != endInternalTrans(); iit++ )
         {
           if( sym == Trans::getInternalSym(*iit) )
@@ -5354,7 +5354,7 @@ namespace wali
         //<p,n_c> -w-> <p',e r_c> in delta_3, (q_c,n_c,q) in delta_c
         Key sym = it->from_stack();
         //look for call transitions in the NWA with symbol 'sym'
-        for( callIterator cit = beginCallTrans();
+        for( CallIterator cit = beginCallTrans();
               cit != endCallTrans(); cit++ )
         {
           if( sym == Trans::getCallSym(*cit) )
@@ -5375,7 +5375,7 @@ namespace wali
         //<p,x> -w-> <p',*> in delta_0, (q_r,q_c,x,q) in delta_r
         Key sym = it->from_stack();
         //look for return transitions in the NWA with symbol 'sym'
-        for( returnIterator rit = beginReturnTrans();
+        for( ReturnIterator rit = beginReturnTrans();
               rit != endReturnTrans(); rit++ )
         {
           if( sym == Trans::getReturnSym(*rit) )
@@ -5493,7 +5493,7 @@ namespace wali
       wali::sem_elem_t wgt;
 
       //Internal Transitions
-      for( internalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
+      for( InternalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
       {      
         //(q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
         //where the weight w depends on sigma
@@ -5517,11 +5517,11 @@ namespace wali
       }
 
       //Call Transitions 
-      for( callIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
+      for( CallIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
       {
         State src = Trans::getCallSite(*cit);
 		    State tgt = Trans::getEntry(*cit);
-        for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
+        for( ReturnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
         {
           if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
           {
@@ -5547,7 +5547,7 @@ namespace wali
       }
 
       //Return Transitions
-      for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
+      for( ReturnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
       {
         //(q_x,q_c,*,q_r) in delta_r goes to
         // <p,q_x> -w-> <p_q_xcr,epsilon> in delta_0
@@ -5607,7 +5607,7 @@ namespace wali
       wali::sem_elem_t wgt;
 
       //Internal Transitions
-      for( internalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
+      for( InternalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
       {      
         //(q,sigma,q') in delta_i goes to <p,q'> -w-> <p,q> in delta_1
         //where the weight w depends on sigma
@@ -5631,11 +5631,11 @@ namespace wali
       }
 
       //Call Transitions 
-      for( callIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
+      for( CallIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
       {
         State src = Trans::getCallSite(*cit);
         State tgt = Trans::getEntry(*cit);
-        for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
+        for( ReturnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
           if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
           {
             //(q_c,sigma,q_e) in delta_c and (q_x,q_c,*,q_r) in delta_r goes to
@@ -5669,7 +5669,7 @@ namespace wali
       }
 
       //Return Transitions
-      for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
+      for( ReturnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
       {
         //(q_x,q_c,*,q_r) in delta_r goes to
         // <p,q_r> -w-> <p,q_x q_c> in delta_2 
@@ -5720,7 +5720,7 @@ namespace wali
       wali::sem_elem_t wgt;
 
       //Internal Transitions
-      for( internalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
+      for( InternalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
       {  
         // (q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
         // where the weight w depends on sigma
@@ -5744,7 +5744,7 @@ namespace wali
       }
 
       //Call Transitions
-      for( callIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
+      for( CallIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
       {           
         // (q_c,sigma,q_e) in delta_c goes to
         // <p,q_c> -w-> <p,q_e q_c> in delta_2 
@@ -5771,7 +5771,7 @@ namespace wali
 
       //Return Transitions
       int r_count = 0;
-      for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
+      for( ReturnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
       {
         ++r_count;
           
@@ -5836,7 +5836,7 @@ namespace wali
       wali::sem_elem_t wgt;
 
       //Internal Transitions
-      for( internalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
+      for( InternalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
       {  
         // (q,sigma,q') in delta_i goes to <p,q'> -w-> <p,q> in delta_1
         // where the weight w depends on sigma
@@ -5860,11 +5860,11 @@ namespace wali
       }
 
       //Call Transitions
-      for( callIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
+      for( CallIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
       {    
         State src = Trans::getCallSite(*cit);
         State tgt = Trans::getEntry(*cit);
-        for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
+        for( ReturnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
           if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
           {
             // (q_c,sigma,q_e) in delta_c and (q_x,q_c,*,q_r) in delta_r goes to
@@ -5898,7 +5898,7 @@ namespace wali
       } 
 
       //Return Transitions
-      for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
+      for( ReturnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
       {
         // (q_x,q_c,sigma,q_r) in delta_r goes to 
         // <p,q_r> -w-> <p,q_x q_r> in delta_2 
@@ -6156,8 +6156,8 @@ namespace wali
 
       //Print call transitions.
       o << "//Delta_c: \n";
-      callIterator cit = beginCallTrans();
-      callIterator citEND = endCallTrans();
+      CallIterator cit = beginCallTrans();
+      CallIterator citEND = endCallTrans();
       for(; cit != citEND; cit++ )
       {
         printKey(o << "\"",Trans::getCallSite(*cit),abbrev) << "\"";
@@ -6173,8 +6173,8 @@ namespace wali
       o << " \n";
       //Print internal transitions.
       o << "// Delta_i:\n" ;
-      internalIterator iit = beginInternalTrans();
-      internalIterator iitEND = endInternalTrans();
+      InternalIterator iit = beginInternalTrans();
+      InternalIterator iitEND = endInternalTrans();
       for(; iit != iitEND; iit++ )
       {
         printKey(o << "\"",Trans::getSource(*iit),abbrev) << "\"";
@@ -6200,7 +6200,7 @@ namespace wali
            std::map<Symbol, std::set<State> > returns;
 
           // Populate it:
-          for(returnIterator trans = beginReturnTrans(); trans != endReturnTrans(); ++trans)
+          for(ReturnIterator trans = beginReturnTrans(); trans != endReturnTrans(); ++trans)
           {
             if(*exitit == Trans::getExit(*trans)
                && *returnit == Trans::getReturnSite(*trans))
@@ -6440,7 +6440,7 @@ namespace wali
      */
     
     
-     NWA::callIterator NWA::beginCallTrans( ) const
+     NWA::CallIterator NWA::beginCallTrans( ) const
     {
       return trans.beginCall();
     }
@@ -6454,7 +6454,7 @@ namespace wali
      */
     
     
-     NWA::callIterator NWA::endCallTrans( ) const
+     NWA::CallIterator NWA::endCallTrans( ) const
     {
       return trans.endCall();
     }
@@ -6468,7 +6468,7 @@ namespace wali
      */
     
     
-     NWA::internalIterator NWA::beginInternalTrans( ) const
+     NWA::InternalIterator NWA::beginInternalTrans( ) const
     {
       return trans.beginInternal();
     }
@@ -6482,7 +6482,7 @@ namespace wali
      */
     
     
-     NWA::internalIterator NWA::endInternalTrans( ) const
+     NWA::InternalIterator NWA::endInternalTrans( ) const
     {
       return trans.endInternal();
     }
@@ -6496,7 +6496,7 @@ namespace wali
      */
     
     
-     NWA::returnIterator NWA::beginReturnTrans( ) const
+     NWA::ReturnIterator NWA::beginReturnTrans( ) const
     {
       return trans.beginReturn();
     }
@@ -6510,7 +6510,7 @@ namespace wali
      */
     
     
-     NWA::returnIterator NWA::endReturnTrans( ) const
+     NWA::ReturnIterator NWA::endReturnTrans( ) const
     {
       return trans.endReturn();
     }
@@ -6615,21 +6615,21 @@ namespace wali
           os << "/>\n";
       }
 
-      for(callIterator call = trans.beginCall(); call != trans.endCall(); ++call)
+      for(CallIterator call = trans.beginCall(); call != trans.endCall(); ++call)
       {
           os << "    <" << Trans::CallXMLTag() << " ";
           os << Trans::XMLFromAttr() <<"=\"" << key2str(call->first) << "\" ";
           os << Trans::XMLSymbolAttr() << "=\"" << key2str(call->second) << "\" ";
           os << Trans::XMLToAttr() << "=\"" << key2str(call->third) << "\"/>\n";
       }
-      for(internalIterator internal = trans.beginInternal(); internal != trans.endInternal(); ++internal)
+      for(InternalIterator internal = trans.beginInternal(); internal != trans.endInternal(); ++internal)
       {
           os << "    <" << Trans::InternalXMLTag() << " ";
           os << Trans::XMLFromAttr() <<"=\"" << key2str(internal->first) << "\" ";
           os << Trans::XMLSymbolAttr() << "=\"" << key2str(internal->second) << "\" ";
           os << Trans::XMLToAttr() << "=\"" << key2str(internal->third) << "\"/>\n";
       }
-      for(returnIterator return_ = trans.beginReturn(); return_ != trans.endReturn(); ++return_)
+      for(ReturnIterator return_ = trans.beginReturn(); return_ != trans.endReturn(); ++return_)
       {
           os << "    <" << Trans::ReturnXMLTag() << " ";
           os << Trans::XMLFromAttr() <<"=\"" << key2str(return_->first) << "\" ";

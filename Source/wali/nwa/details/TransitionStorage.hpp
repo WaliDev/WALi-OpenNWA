@@ -44,11 +44,17 @@ namespace wali
         typedef TransitionInfo::Calls Calls;
         typedef TransitionInfo::Internals Internals;
         typedef TransitionInfo::Returns Returns;
-        
+
+        DEPRECATE("Use capitalized version (CallIterator) instead. (Not that you should be using it from TransitionStorage in the first place.)")
         typedef Calls::const_iterator callIterator;
+        DEPRECATE("Use capitalized version (InternalIterator) instead. (Not that you should be using it from TransitionStorage in the first place.)")
         typedef Internals::const_iterator internalIterator;
+        DEPRECATE("Use capitalized version (ReturnIterator) instead. (Not that you should be using it from TransitionStorage in the first place.)")
         typedef Returns::const_iterator returnIterator;
 
+        typedef Calls::const_iterator CallIterator;
+        typedef Internals::const_iterator InternalIterator;
+        typedef Returns::const_iterator ReturnIterator;
 
         // The following macro fakes static data declarations with
         // initializers in a template class to work around C++ being
@@ -992,7 +998,7 @@ namespace wali
        *          in the collection of transitions
        *
        */
-      callIterator beginCall( ) const;
+      CallIterator beginCall( ) const;
         
       /**
        *
@@ -1006,7 +1012,7 @@ namespace wali
        *          in the collection of transitions
        *
        */
-      internalIterator beginInternal( ) const;
+      InternalIterator beginInternal( ) const;
        
       /**
        *
@@ -1020,7 +1026,7 @@ namespace wali
        *          in the collection of transitions
        *
        */
-      returnIterator beginReturn( ) const;
+      ReturnIterator beginReturn( ) const;
       
       /**
        *
@@ -1034,7 +1040,7 @@ namespace wali
        *          the collection of transitions
        *
        */
-      callIterator endCall( ) const;
+      CallIterator endCall( ) const;
          
       /**
        *
@@ -1048,7 +1054,7 @@ namespace wali
        *          the collection of transitions
        *
        */
-      internalIterator endInternal( ) const;
+      InternalIterator endInternal( ) const;
          
       /**
        *
@@ -1062,7 +1068,7 @@ namespace wali
        *          the collection of transitions
        *
        */
-      returnIterator endReturn( ) const;
+      ReturnIterator endReturn( ) const;
 
       /**
        *

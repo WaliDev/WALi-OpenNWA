@@ -66,6 +66,7 @@ namespace wali
 
       virtual void operator()( const ITrans* t )
       {
+        (void) t;
         numTrans++;
       }
 

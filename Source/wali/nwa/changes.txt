@@ -136,9 +136,10 @@ Summary:
 
 5. Fix iterator name capitalization.
 
-   In class 'NWA', deprecate typedefs to 'stateIterator', 'symbolIterator',
-   'callIterator', 'internalIterator', and 'returnIterator'. Replace with
-   capitalized versions of the same ('StateIterator', etc.)
+   -- COMMITTED REV 919 (also to StateStorage, TransitionStorage, and TransitionInfo)
+   -- In class 'NWA', deprecate typedefs to 'stateIterator', 'symbolIterator',
+   -- 'callIterator', 'internalIterator', and 'returnIterator'. Replace with
+   -- capitalized versions of the same ('StateIterator', etc.)
 
    LATER: Remove deprecated typedefs
 
