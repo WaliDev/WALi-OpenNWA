@@ -24,8 +24,9 @@ namespace wali
 
   namespace nwp
   {
+    class
     DEPRECATE("I don't think anyone is using this. If you are, talk to Evan.")
-    class NWP : public Printable
+    NWP : public Printable
     {
       typedef NWPNode * iterator;
       
