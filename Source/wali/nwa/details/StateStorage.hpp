@@ -36,9 +36,11 @@ namespace wali
     {
       public:
         typedef ClientInfo Client;
+        DEPRECATE("Use StateSet instead")
         typedef std::set<State> States;
-        typedef States::const_iterator const_iterator;   
-        typedef States::iterator iterator; 
+        typedef std::set<State> StateSet;
+        typedef StateSet::const_iterator const_iterator;   
+        typedef StateSet::iterator iterator; 
 
         typedef ref_ptr<Client> ClientInfoRefPtr;
 
@@ -457,7 +459,7 @@ namespace wali
        * @return a set containing all states in this collection
        *
        */
-      const States & getStates( ) const;
+      const StateSet & getStates( ) const;
      
       /**
        *  
@@ -469,7 +471,7 @@ namespace wali
        * @return a set containing the names of all initial states in the collection
        *
        */
-      const States & getInitialStates( ) const;
+      const StateSet & getInitialStates( ) const;
         
       /**
        * 
@@ -481,7 +483,7 @@ namespace wali
        * @return a set containing the names of all final states in the collection
        *
        */
-      const States & getFinalStates( ) const;
+      const StateSet & getFinalStates( ) const;
 
       /**
        * 
@@ -542,9 +544,9 @@ namespace wali
     protected:
               
       State stuck;
-      States states;
-      States initialStates;  
-      States finalStates;   
+      StateSet states;
+      StateSet initialStates;  
+      StateSet finalStates;   
 
       std::map<State,ClientInfoRefPtr> stateInfos;
     };

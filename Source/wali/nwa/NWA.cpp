@@ -1194,23 +1194,23 @@ namespace wali
 
           // Skip over epsilons. (A) they are handled in other places and
           // (B) there's no implicit epsilon transitions to stuck anyway.
-          if( symbol == Symbols::getEpsilon() )
+          if( symbol == SymbolStorage::getEpsilon() )
           {
             continue;
           }
 
           //Skip over wilds.
-          if( symbol == Symbols::getWild() )
+          if( symbol == SymbolStorage::getWild() )
           {
             continue;
           }
 
-          if( !trans.callExists(state, symbol) && !trans.callExists(state, Symbols::getWild()) )
+          if( !trans.callExists(state, symbol) && !trans.callExists(state, SymbolStorage::getWild()) )
           {
             addCallTrans(state, symbol, getStuckState());
           }
 
-          if( !trans.internalExists(state, symbol) && !trans.internalExists(state, Symbols::getWild()) )
+          if( !trans.internalExists(state, symbol) && !trans.internalExists(state, SymbolStorage::getWild()) )
           {
             addInternalTrans(state, symbol, getStuckState());
           }
@@ -1218,7 +1218,7 @@ namespace wali
           for( stateIterator pred = beginStates(); pred != endStates(); ++pred )
           {
             if( returns.find(Triple<State,Symbol,State>(state, *pred, symbol)) == returns.end() 
-              && returns.find(Triple<State,Symbol,State>(state, *pred, Symbols::getWild())) == returns.end() )
+              && returns.find(Triple<State,Symbol,State>(state, *pred, SymbolStorage::getWild())) == returns.end() )
             {
               addReturnTrans(state, *pred, symbol, getStuckState());
             }
@@ -4591,7 +4591,7 @@ namespace wali
       //Construct the epsilon closure relation for the states in nondet.
       SetBinaryRelation pre_close; //Collapse epsilon transitions.
       SetBinaryRelation Ie;   //Internal transitions with epsilon.
-      project_symbol_3<SetBinaryRelation>(Ie,nondet->trans.getInternals(),Symbols::getEpsilon());
+      project_symbol_3<SetBinaryRelation>(Ie,nondet->trans.getInternals(),SymbolStorage::getEpsilon());
 #ifdef USE_BUDDY
       transitive_closure(pre_close,Ie);
 #else
@@ -4639,8 +4639,8 @@ namespace wali
       std::map<wali::Key, TernaryRelation> returnTransPerSymbol;
 
       for( symbolIterator it = nondet->beginSymbols(); it != nondet->endSymbols(); it++ ) {
-        if (Symbols::isEpsilon(*it)) continue;    //Epsilon is handled with closure.
-        if (Symbols::isWild(*it)) continue;
+        if (SymbolStorage::isEpsilon(*it)) continue;    //Epsilon is handled with closure.
+        if (SymbolStorage::isWild(*it)) continue;
 
 #ifdef USE_BUDDY
         internalTransPerSymbol[*it] = BinaryRelation(nondet->largestState());
@@ -4649,13 +4649,13 @@ namespace wali
 #endif
         
         project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet->trans.getInternals(), *it);
-        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet->trans.getInternals(), Symbols::getWild());
+        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet->trans.getInternals(), SymbolStorage::getWild());
 
         project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet->trans.getCalls(), *it);
-        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet->trans.getCalls(), Symbols::getWild());   //Every symbol also matches wild.
+        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet->trans.getCalls(), SymbolStorage::getWild());   //Every symbol also matches wild.
 
         project_symbol_4(returnTransPerSymbol[*it], nondet->trans.getReturns(), *it);
-        project_symbol_4(returnTransPerSymbol[*it], nondet->trans.getReturns(),Symbols::getWild());   //Every symbol also matches wild.
+        project_symbol_4(returnTransPerSymbol[*it], nondet->trans.getReturns(),SymbolStorage::getWild());   //Every symbol also matches wild.
       }
 
       
@@ -4680,8 +4680,8 @@ namespace wali
         //Check each symbol individually.
         for( symbolIterator it = nondet->beginSymbols(); it != nondet->endSymbols(); it++ )
         {
-          if (Symbols::isEpsilon(*it)) continue;    //Epsilon is handled with closure.
-          if (Symbols::isWild(*it)) continue;       //Wild is matched to every symbol as we go.
+          if (SymbolStorage::isEpsilon(*it)) continue;    //Epsilon is handled with closure.
+          if (SymbolStorage::isWild(*it)) continue;       //Wild is matched to every symbol as we go.
 
           //Process internal transitions.
           //Compute the relation.
@@ -4692,7 +4692,7 @@ namespace wali
 #if 0
           DECLARE(BinaryRelation, IiOrig);
           project_symbol_3(IiOrig,nondet->trans.getInternals(),*it);   
-          project_symbol_3(IiOrig,nondet->trans.getInternals(),Symbols::getWild());   //Every symbol also matches wild.
+          project_symbol_3(IiOrig,nondet->trans.getInternals(),SymbolStorage::getWild());   //Every symbol also matches wild.
           
           if (Ii == IiOrig) {
             std::cout << "Ii == IiOrig holds!\n";
@@ -4739,7 +4739,7 @@ namespace wali
 #if 0
           DECLARE(BinaryRelation, IcOrig);
           project_symbol_3(IcOrig,nondet->trans.getCalls(),*it);  
-          project_symbol_3(IcOrig,nondet->trans.getCalls(),Symbols::getWild());   //Every symbol also matches wild.
+          project_symbol_3(IcOrig,nondet->trans.getCalls(),SymbolStorage::getWild());   //Every symbol also matches wild.
           
           if (Ic == IcOrig) {
             std::cout << "Ic == IcOrig holds!\n";
@@ -4781,7 +4781,7 @@ namespace wali
 #if 0
           TernaryRelation IrOrig;
           project_symbol_4(IrOrig,nondet->trans.getReturns(),*it);    
-          project_symbol_4(IrOrig,nondet->trans.getReturns(),Symbols::getWild());   //Every symbol also matches wild.
+          project_symbol_4(IrOrig,nondet->trans.getReturns(),SymbolStorage::getWild());   //Every symbol also matches wild.
 
           if (Ir == IrOrig) {
             std::cout << "Ir == IrOrig holds!\n";
@@ -6268,7 +6268,7 @@ namespace wali
      */
     
     
-    void NWA::addAllStates( States addStateSet )
+    void NWA::addAllStates( StateStorage addStateSet )
     {
       states.addAllStates(addStateSet);
     }
@@ -6312,7 +6312,7 @@ namespace wali
      */
     
     
-    void NWA::addAllInitialStates( States addStateSet )
+    void NWA::addAllInitialStates( StateStorage addStateSet )
     {
       states.addAllInitialStates(addStateSet);
     }
@@ -6356,7 +6356,7 @@ namespace wali
      */
     
     
-    void NWA::addAllFinalStates( States addStateSet )
+    void NWA::addAllFinalStates( StateStorage addStateSet )
     {
       states.addAllFinalStates(addStateSet);
     }
@@ -6398,7 +6398,7 @@ namespace wali
      */
     
     
-    void NWA::addAllSymbols( Symbols addSymbolSet )
+    void NWA::addAllSymbols( SymbolStorage addSymbolSet )
     {
       symbols.addAllSymbols(addSymbolSet);
     }
@@ -6603,15 +6603,15 @@ namespace wali
 
       for(symbolIterator sym = beginSymbols(); sym != endSymbols(); ++sym)
       {
-          os << "    <" << Symbols::XMLSymbolTag() << " " << Symbols::XMLNameAttr() << "=\"" << key2str(*sym) << "\"/>\n";
+          os << "    <" << SymbolStorage::XMLSymbolTag() << " " << SymbolStorage::XMLNameAttr() << "=\"" << key2str(*sym) << "\"/>\n";
       }
 
       for(stateIterator state = beginStates(); state != endStates(); ++state)
       {
-          os << "    <" << States::XMLStateTag() << " ";
-          os << States::XMLNameAttr() << "=\"" << key2str(*state) << "\"";
-          if(isInitialState(*state)) os << " " << States::XMLInitialAttr() << "=\"TRUE\"";
-          if(isFinalState(*state)) os << " " << States::XMLFinalAttr() << "=\"TRUE\"";
+          os << "    <" << StateStorage::XMLStateTag() << " ";
+          os << StateStorage::XMLNameAttr() << "=\"" << key2str(*state) << "\"";
+          if(isInitialState(*state)) os << " " << StateStorage::XMLInitialAttr() << "=\"TRUE\"";
+          if(isFinalState(*state)) os << " " << StateStorage::XMLFinalAttr() << "=\"TRUE\"";
           os << "/>\n";
       }
 

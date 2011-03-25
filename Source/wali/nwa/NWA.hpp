@@ -94,11 +94,17 @@ namespace wali
       public:
         typedef ClientInfo Client;
 
+        DEPRECATE("If you have to use this, talk to Evan.")
         typedef details::StateStorage States;
-        typedef  States::const_iterator stateIterator;
-        typedef  States::ClientInfoRefPtr ClientInfoRefPtr;
+        typedef details::StateStorage StateStorage;
+      
+        typedef  StateStorage::const_iterator stateIterator;
+      
+        typedef  StateStorage::ClientInfoRefPtr ClientInfoRefPtr;
+        DEPRECATE("If you have to use this, talk to Evan.")
         typedef details::SymbolStorage Symbols;
-        typedef  Symbols::const_iterator symbolIterator;
+        typedef details::SymbolStorage SymbolStorage;
+        typedef  SymbolStorage::const_iterator symbolIterator;
 
         typedef details::TransitionStorage Trans;
         
@@ -153,7 +159,7 @@ namespace wali
        */
       static Symbol getEpsilon( )
       {
-        return Symbols::getEpsilon();
+        return SymbolStorage::getEpsilon();
       }
       /**
        *  
@@ -167,7 +173,7 @@ namespace wali
        */
       static bool isEpsilon( Symbol sym )
       {
-        return Symbols::isEpsilon(sym);
+        return SymbolStorage::isEpsilon(sym);
       }
       /**
        *
@@ -190,7 +196,7 @@ namespace wali
        */
       static Symbol getWild( )
       {
-        return Symbols::getWild();
+        return SymbolStorage::getWild();
       }
       /**
        *  
@@ -204,7 +210,7 @@ namespace wali
        */
       static bool isWild( Symbol sym )
       {
-        return Symbols::isWild(sym);
+        return SymbolStorage::isWild(sym);
       }
 
       //State Accessors
@@ -3235,7 +3241,7 @@ namespace wali
        * @param - addStateSet: the StateSet that contains the states to add
        *
        */
-      void addAllStates( States addStateSet );  
+      void addAllStates( StateStorage addStateSet );  
 
       /**
        *
@@ -3273,7 +3279,7 @@ namespace wali
        *                        initial state set
        *
        */
-      void addAllInitialStates( States addStateSet ); 
+      void addAllInitialStates( StateStorage addStateSet ); 
 
       /**
        *
@@ -3311,7 +3317,7 @@ namespace wali
        *                        final state set
        *
        */
-      void addAllFinalStates( States addStateSet ); 
+      void addAllFinalStates( StateStorage addStateSet ); 
 
       /**
        *
@@ -3347,7 +3353,7 @@ namespace wali
        * @param - addSymbolSet: the symbols to add
        *
        */
-      void addAllSymbols( Symbols addSymbolSet );    
+      void addAllSymbols( SymbolStorage addSymbolSet );    
 
       /**
        *
@@ -3646,8 +3652,8 @@ namespace wali
       
         bool stuck;
 
-        States states;         
-        Symbols symbols;        
+        StateStorage states;         
+        SymbolStorage symbols;        
         Trans trans;
 
         //TODO: ponder the following ...
