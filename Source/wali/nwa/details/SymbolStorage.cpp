@@ -5,18 +5,18 @@ namespace nwa {
 namespace details {
 
 //Constructors
-SymbolSet::SymbolSet( )
+SymbolStorage::SymbolStorage( )
 {
   //Epsilon is always a symbol of the NWA.
   addSymbol( getEpsilon() );
 }
 
-SymbolSet::SymbolSet( const SymbolSet & other )
+SymbolStorage::SymbolStorage( const SymbolStorage & other )
   : Printable(other)
   , symbols(other.symbols)
 { }
 
-SymbolSet & SymbolSet::operator=( const SymbolSet & other )
+SymbolStorage & SymbolStorage::operator=( const SymbolStorage & other )
 {
   if( this == &other )     
     return *this;
@@ -36,7 +36,7 @@ SymbolSet & SymbolSet::operator=( const SymbolSet & other )
  * @return false if the symbol already exists, true otherwise
  *
  */
-bool SymbolSet::addSymbol( Key sym )
+bool SymbolStorage::addSymbol( Key sym )
 {
   if (sym == wali::WALI_EPSILON || sym == wali::WALI_WILD) {
     return false;
@@ -53,7 +53,7 @@ bool SymbolSet::addSymbol( Key sym )
  * @param - symSet: the collection of symbols to add to this collection of symbols
  *
  */
-void SymbolSet::addAllSymbols( SymbolSet symSet )
+void SymbolStorage::addAllSymbols( SymbolStorage symSet )
 {
   symbols.insert(symSet.symbols.begin(),symSet.symbols.end());
 }
@@ -66,7 +66,7 @@ void SymbolSet::addAllSymbols( SymbolSet symSet )
  * @return false if the symbol does not exist, true otherwise
  *
  */
-bool SymbolSet::removeSymbol( Key sym )
+bool SymbolStorage::removeSymbol( Key sym )
 {
   size_t erased = symbols.erase(sym);
   return erased > 0;
@@ -79,7 +79,7 @@ bool SymbolSet::removeSymbol( Key sym )
  * @param - symSet: the collection of symbols to remove from this collection 
  *
  */
-void SymbolSet::removeAll( SymbolSet symSet )
+void SymbolStorage::removeAll( SymbolStorage symSet )
 {
   // FIXME: Make this not suck
   assert(0);
@@ -98,7 +98,7 @@ void SymbolSet::removeAll( SymbolSet symSet )
  * @return the output stream that was printed to 
  *
  */
-std::ostream & SymbolSet::print( std::ostream & o ) const
+std::ostream & SymbolStorage::print( std::ostream & o ) const
 {
  //Print the set of all symbols.
   o << "Sigma: {\n  ";
@@ -111,7 +111,7 @@ std::ostream & SymbolSet::print( std::ostream & o ) const
       o << ",\n  "; 
     }
 
-    if( SymbolSet::isEpsilon(*it) )
+    if( SymbolStorage::isEpsilon(*it) )
       o << "Epsilon";
     else
       printKey(o,*it);
@@ -127,11 +127,11 @@ std::ostream & SymbolSet::print( std::ostream & o ) const
  * @brief tests whether this collection of symbols is equivalent to the collection
  *        of symbols 'other'
  *
- * @param - other: the SymbolSet to which to compare this SymbolSet 
- * @return true if this SymbolSet is equivalent to the SymbolSet 'other'
+ * @param - other: the SymbolStorage to which to compare this SymbolStorage 
+ * @return true if this SymbolStorage is equivalent to the SymbolStorage 'other'
  *
  */
-bool SymbolSet::operator==( const SymbolSet & other ) const
+bool SymbolStorage::operator==( const SymbolStorage & other ) const
 {
   return symbols == other.symbols;
 }
@@ -174,7 +174,7 @@ Label & Label::operator=( const Label & other )
  * @return true if this collection represents the wild symbol
  *
  */
-bool Label::isWild( const SymbolSet & symbolPool ) const
+bool Label::isWild( const SymbolStorage & symbolPool ) const
 {
   if( neg )
     return syms.empty();        //No symbols not on the edge.
@@ -213,7 +213,7 @@ void Label::makeWild( )
  * @return true if this collection represents the absence of all symbols
  *
  */
-bool Label::isAbsent( const SymbolSet & symbolPool ) const
+bool Label::isAbsent( const SymbolStorage & symbolPool ) const
 {
   if( neg )
   {
@@ -250,7 +250,7 @@ void Label::makeAbsent( )
  * @return some symbol in this collection of symbols
  *
  */
-Label::Sym Label::getAnySymbol( const SymbolSet & symbolPool ) const
+Label::Sym Label::getAnySymbol( const SymbolStorage & symbolPool ) const
 {
   if(neg)
   {
@@ -267,7 +267,7 @@ Label::Sym Label::getAnySymbol( const SymbolSet & symbolPool ) const
     // Regardless, 'return NULL' is NOT it, as that essentially means "return
     // epsilon".
     assert(false);
-    throw "SymbolSet.cpp line 262 (or thereabouts); talk to Evan.";
+    throw "SymbolStorage.cpp line 262 (or thereabouts); talk to Evan.";
     //return NULL;
   }
   else
@@ -284,7 +284,7 @@ Label::Sym Label::getAnySymbol( const SymbolSet & symbolPool ) const
  * @param - symSet: the collection of symbols to add to this collection of symbols
  *
  */
-void Label::addAll( Label lbl, const SymbolSet & symbolPool )
+void Label::addAll( Label lbl, const SymbolStorage & symbolPool )
 {
   if( lbl.neg )
   {
@@ -340,7 +340,7 @@ bool Label::removeSymbol( Sym sym )
  * @param - symSet: the collection of symbols to remove from this collection 
  *
  */
-void Label::removeAll( Label lbl, const SymbolSet & symbolPool )
+void Label::removeAll( Label lbl, const SymbolStorage & symbolPool )
 {
   if( lbl.neg )
   {        
@@ -372,7 +372,7 @@ void Label::removeAll( Label lbl, const SymbolSet & symbolPool )
  * @return the output stream that was printed to 
  *
  */
-std::ostream & Label::print( std::ostream & o, const SymbolSet & symbolPool ) const
+std::ostream & Label::print( std::ostream & o, const SymbolStorage & symbolPool ) const
 {
   if( isWild(symbolPool) )
     o << "wild";
@@ -394,7 +394,7 @@ std::ostream & Label::print( std::ostream & o, const SymbolSet & symbolPool ) co
         first = false;
       }
 
-      if( SymbolSet::isEpsilon(*it) )
+      if( SymbolStorage::isEpsilon(*it) )
         o << "Epsilon";
       else
         printKey(o,*it);
@@ -455,7 +455,7 @@ bool Label::operator==( const Label & other ) const
  * @return a set containing all symbols in this collection
  * 
  */
-const std::set<Label::Sym> Label::getSymbolsIn( const SymbolSet & symbolPool ) const
+const std::set<Label::Sym> Label::getSymbolsIn( const SymbolStorage & symbolPool ) const
 {     
   if( neg )
   { 
@@ -480,7 +480,7 @@ const std::set<Label::Sym> Label::getSymbolsIn( const SymbolSet & symbolPool ) c
  * @return a set containing all symbols not in this collection
  * 
  */
-const std::set<Label::Sym> Label::getSymbolsNotIn( const SymbolSet & symbolPool ) const
+const std::set<Label::Sym> Label::getSymbolsNotIn( const SymbolStorage & symbolPool ) const
 {      
   if( neg )
   {

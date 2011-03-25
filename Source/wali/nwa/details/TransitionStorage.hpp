@@ -1,5 +1,5 @@
-#ifndef wali_nwa_TransSet_GUARD
-#define wali_nwa_TransSet_GUARD 1
+#ifndef wali_nwa_TransitionStorage_GUARD
+#define wali_nwa_TransitionStorage_GUARD 1
 
 /**
  * @author Amanda Burton
@@ -31,19 +31,19 @@ namespace wali
      * This class is used to keep track of the transitions of an NWA.
      *
      */
-    class TransSet : public Printable
+    class TransitionStorage : public Printable
     {
       public:    
         typedef std::set<State> States;
         typedef States::const_iterator stateIterator;
 
-        typedef TransInfo::Call Call;
-        typedef TransInfo::Internal Internal;
-        typedef TransInfo::Return Return;
+        typedef TransitionInfo::Call Call;
+        typedef TransitionInfo::Internal Internal;
+        typedef TransitionInfo::Return Return;
 
-        typedef TransInfo::Calls Calls;
-        typedef TransInfo::Internals Internals;
-        typedef TransInfo::Returns Returns;
+        typedef TransitionInfo::Calls Calls;
+        typedef TransitionInfo::Internals Internals;
+        typedef TransitionInfo::Returns Returns;
         
         typedef Calls::const_iterator callIterator;
         typedef Internals::const_iterator internalIterator;
@@ -74,7 +74,7 @@ namespace wali
 
 #undef DEFINE_FAKE_STATIC_DATA
         
-        typedef TransInfo Info;
+        typedef TransitionInfo Info;
       
       //
       // Methods
@@ -83,7 +83,7 @@ namespace wali
       public:
       
       //Constructors and Destructor
-      TransSet & operator=( const TransSet & other );
+      TransitionStorage & operator=( const TransitionStorage & other );
 
       
       //Component Accessors
@@ -734,11 +734,11 @@ namespace wali
        * This method adds all of the transitions in the given collection of
        * transitions to this collection of transitions.
        *
-       * @param - addTransSet: the collection of transitions to add to this 
+       * @param - addTransitionStorage: the collection of transitions to add to this 
        *          collection of transitions
        *
        */
-      void addAllTrans( TransSet addTransSet );
+      void addAllTrans( TransitionStorage addTransitionStorage );
       
       /**
        *
@@ -974,11 +974,11 @@ namespace wali
        * This method tests the equivalence of this set of transitions and 
        * the set of transitions 'other'.
        *
-       * @param - other: the TransSet to compare this TransSet to
-       * @return true if this TransSet is equivalent to the TransSet 'other'
+       * @param - other: the TransitionStorage to compare this TransitionStorage to
+       * @return true if this TransitionStorage is equivalent to the TransitionStorage 'other'
        *
        */
-      bool operator==( const TransSet & other ) const;
+      bool operator==( const TransitionStorage & other ) const;
 
       /**
        *

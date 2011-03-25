@@ -6,6 +6,6 @@ namespace wali
   namespace nwa
   {
     DEPRECATE("Try to avoid using this class. Talk to Evan for workarounds. Use wali::nwa::details::TransitionStorage if you must.")
-    typedef details::TransSet TransSet;
+    typedef details::TransitionStorage TransSet;
   }
 }

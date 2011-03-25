@@ -18,7 +18,7 @@ namespace wali
     //
 
     
-    StateSet & StateSet::operator=( const StateSet & other )
+    StateStorage & StateStorage::operator=( const StateStorage & other )
     {
       if (this == &other)     
         return *this;
@@ -46,8 +46,8 @@ namespace wali
      *
      */
     
-    StateSet::ClientInfoRefPtr
-    StateSet::getClientInfo( State state ) const 
+    StateStorage::ClientInfoRefPtr
+    StateStorage::getClientInfo( State state ) const 
     {
       typedef std::map<State, ClientInfoRefPtr> Map;
       Map::const_iterator it = (stateInfos.find(state));
@@ -66,7 +66,7 @@ namespace wali
      *
      */
     
-    void StateSet::setClientInfo( State state, const ClientInfoRefPtr c )
+    void StateStorage::setClientInfo( State state, const ClientInfoRefPtr c )
     {
       //Check to make sure this is a valid state.
       if(! isState(state) )
@@ -85,7 +85,7 @@ namespace wali
      *
      */
     
-    void StateSet::clearStates( )
+    void StateStorage::clearStates( )
     {
       states.clear();
       clearInitialStates();
@@ -100,7 +100,7 @@ namespace wali
      *
      */
     
-    void StateSet::clearInitialStates( )
+    void StateStorage::clearInitialStates( )
     { 
       initialStates.clear();
     }    
@@ -111,7 +111,7 @@ namespace wali
      *
      */
     
-    void StateSet::clearFinalStates( )
+    void StateStorage::clearFinalStates( )
     {
       finalStates.clear();
     }
@@ -125,7 +125,7 @@ namespace wali
      *
      */
     
-    bool StateSet::isState( State state ) const
+    bool StateStorage::isState( State state ) const
     {
       return (states.count(state) > 0);
     } 
@@ -139,7 +139,7 @@ namespace wali
      *
      */
     
-    bool StateSet::isInitialState( State initialState ) const
+    bool StateStorage::isInitialState( State initialState ) const
     {
       return (initialStates.count(initialState) > 0);
     }
@@ -153,7 +153,7 @@ namespace wali
      *
      */
     
-    bool StateSet::isFinalState( State finalState ) const
+    bool StateStorage::isFinalState( State finalState ) const
     {
       return (finalStates.count(finalState) > 0);
     }
@@ -167,7 +167,7 @@ namespace wali
      *
      */
     
-    bool StateSet::addState( State state )
+    bool StateStorage::addState( State state )
     {
 	  // If the ClientInfo is requested for the state, it will be null
       bool inserted = states.insert(state).second;
@@ -183,7 +183,7 @@ namespace wali
      *
      */ 
     
-    bool StateSet::addInitialState( State initialState )
+    bool StateStorage::addInitialState( State initialState )
     {
       bool inserted = initialStates.insert(initialState).second;
       if (inserted) {
@@ -203,7 +203,7 @@ namespace wali
      *
      */
     
-    bool StateSet::addFinalState( State finalState )
+    bool StateStorage::addFinalState( State finalState )
     {
       bool inserted = finalStates.insert(finalState).second;
       if (inserted) {
@@ -222,7 +222,7 @@ namespace wali
      *
      */
     
-    void StateSet::addAll( const StateSet & stateSet )
+    void StateStorage::addAll( const StateStorage & stateSet )
     {
       addAllStates(stateSet);
       addAllInitialStates(stateSet);
@@ -231,13 +231,13 @@ namespace wali
     
     /**
      *
-     * @brief add all the states in the given StateSet 
+     * @brief add all the states in the given StateStorage 
      *
-     * @param - stateSet: the StateSet that contains the states to add
+     * @param - stateSet: the StateStorage that contains the states to add
      *
      */
     
-    void StateSet::addAllStates( const StateSet & stateSet )
+    void StateStorage::addAllStates( const StateStorage & stateSet )
     {
       for( const_iterator it = stateSet.beginStates();
            it != stateSet.endStates(); it++ )
@@ -255,13 +255,13 @@ namespace wali
       
     /**
      * 
-     * @brief add all the initial states in the given StateSet
+     * @brief add all the initial states in the given StateStorage
      *
-     * @param - stateSet: the StateSet that contains the states to add
+     * @param - stateSet: the StateStorage that contains the states to add
      *
      */  
     
-    void StateSet::addAllInitialStates( const StateSet & stateSet )
+    void StateStorage::addAllInitialStates( const StateStorage & stateSet )
     {
       for( const_iterator it = stateSet.beginInitialStates();
            it != stateSet.endInitialStates(); it++ )
@@ -272,13 +272,13 @@ namespace wali
     
     /**
      * 
-     * @brief add all the final states in the given StateSet
+     * @brief add all the final states in the given StateStorage
      *
-     * @param - stateSet: the StateSet that contains the states to add
+     * @param - stateSet: the StateStorage that contains the states to add
      *
      */
     
-    void StateSet::addAllFinalStates( const StateSet & stateSet )
+    void StateStorage::addAllFinalStates( const StateStorage & stateSet )
     {
       for( const_iterator it = stateSet.beginFinalStates();
            it != stateSet.endFinalStates(); it++ )
@@ -296,7 +296,7 @@ namespace wali
      *
      */
     
-    bool StateSet::removeState( State state )
+    bool StateStorage::removeState( State state )
     {
       //The stuck state cannot be removed in this way.
       if( isStuckState( state ) )
@@ -323,7 +323,7 @@ namespace wali
      *  
      */
     
-    bool StateSet::removeInitialState( State initialState )
+    bool StateStorage::removeInitialState( State initialState )
     {
       size_t erased = initialStates.erase(initialState);
       return erased > 0;
@@ -338,7 +338,7 @@ namespace wali
      *
      */
     
-    bool StateSet::removeFinalState( State finalState )
+    bool StateStorage::removeFinalState( State finalState )
     {
       size_t erased = finalStates.erase(finalState);
       return erased > 0;
@@ -355,7 +355,7 @@ namespace wali
      *
      */
     
-    std::ostream & StateSet::print( std::ostream & o ) const
+    std::ostream & StateStorage::print( std::ostream & o ) const
     {
       //Print the set of all states.
       o << "Q: {\n  ";
@@ -406,12 +406,12 @@ namespace wali
      * @brief tests whether this collection of states is equivalent to the collection 
      *        of states 'other'
      *
-     * @param - other: the StateSet to compare this StateSet to
-     * @return true if this StateSet is equivalent to the StateSet 'other'
+     * @param - other: the StateStorage to compare this StateStorage to
+     * @return true if this StateStorage is equivalent to the StateStorage 'other'
      *
      */
     
-    bool StateSet::operator==( const StateSet & other ) const
+    bool StateStorage::operator==( const StateStorage & other ) const
     {
       //Check that the state sets are equal.
       if (stuck != other.stuck) return false;
@@ -431,7 +431,7 @@ namespace wali
      *
      */
     
-    StateSet::const_iterator StateSet::beginStates( ) const
+    StateStorage::const_iterator StateStorage::beginStates( ) const
     {
       return states.begin();
     }   
@@ -444,7 +444,7 @@ namespace wali
      *
      */
     
-    StateSet::const_iterator StateSet::beginInitialStates( ) const
+    StateStorage::const_iterator StateStorage::beginInitialStates( ) const
     {
       return initialStates.begin();
     }    
@@ -457,7 +457,7 @@ namespace wali
      *
      */
     
-    StateSet::const_iterator StateSet::beginFinalStates( ) const
+    StateStorage::const_iterator StateStorage::beginFinalStates( ) const
     {
       return finalStates.begin();
     }
@@ -470,7 +470,7 @@ namespace wali
      *
      */
     
-    StateSet::const_iterator StateSet::endStates( ) const
+    StateStorage::const_iterator StateStorage::endStates( ) const
     {
       return states.end();
     }    
@@ -483,7 +483,7 @@ namespace wali
      *
      */
     
-    StateSet::const_iterator StateSet::endInitialStates( ) const
+    StateStorage::const_iterator StateStorage::endInitialStates( ) const
     {
       return initialStates.end();
     }    
@@ -496,7 +496,7 @@ namespace wali
      *
      */
     
-    StateSet::const_iterator StateSet::endFinalStates( ) const
+    StateStorage::const_iterator StateStorage::endFinalStates( ) const
     {
       return finalStates.end();
     }
@@ -509,7 +509,7 @@ namespace wali
      *
      */
     
-    const StateSet::States & StateSet::getStates( ) const
+    const StateStorage::States & StateStorage::getStates( ) const
     {
       return states;
     }
@@ -522,7 +522,7 @@ namespace wali
      *
      */
     
-    const StateSet::States & StateSet::getInitialStates( ) const
+    const StateStorage::States & StateStorage::getInitialStates( ) const
     {
       return initialStates;
     }
@@ -535,7 +535,7 @@ namespace wali
      *
      */
     
-    const StateSet::States & StateSet::getFinalStates( ) const
+    const StateStorage::States & StateStorage::getFinalStates( ) const
     {
       return finalStates;
     }
@@ -548,7 +548,7 @@ namespace wali
      *
      */
     
-    size_t StateSet::sizeStates( ) const
+    size_t StateStorage::sizeStates( ) const
     {
       return states.size();
     }  
@@ -561,7 +561,7 @@ namespace wali
      *
      */
     
-    size_t StateSet::sizeInitialStates( ) const
+    size_t StateStorage::sizeInitialStates( ) const
     {
       return initialStates.size();
     } 
@@ -574,7 +574,7 @@ namespace wali
      *
      */
     
-    size_t StateSet::sizeFinalStates( ) const
+    size_t StateStorage::sizeFinalStates( ) const
     {
       return finalStates.size();
     }  
@@ -591,7 +591,7 @@ namespace wali
      *
      */
     
-    void StateSet::dupState( State orig, State dup )
+    void StateStorage::dupState( State orig, State dup )
     {
       if( isInitialState(orig) )
         addInitialState(dup);

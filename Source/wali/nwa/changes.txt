@@ -83,7 +83,8 @@ Summary:
    -- Move the class 'StateSet' from namespace wali::nwa to
    -- wali::nwa::details.
 
-   Rename it to 'StateStorage'. Fix references.
+   -- COMMITTED REV 917
+   -- Rename it to 'StateStorage'. Fix references.
 
    -- COMMITTED REV 916 (and #include uses, but old class names)
    -- Rename the corresponding files to match.
@@ -108,8 +109,9 @@ Summary:
    -- COMMITTED REV 912 (and 913)
    -- Move all classes into namespace 'wali::nwa::details'.
 
-   Rename to 'SymbolStorage', 'TransitionStorage', and 'TransitionInfo'
-   respectively. Fix uses.
+   -- COMMITTED REV 917
+   -- Rename to 'SymbolStorage', 'TransitionStorage', and 'TransitionInfo'
+   -- respectively. Fix uses.
 
    -- COMMITTED REV 916 (and #include uses, but old class names)
    -- Rename files to match.

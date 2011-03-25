@@ -1,5 +1,5 @@
-#ifndef wali_nwa_TransInfo_GUARD
-#define wali_nwa_TransInfo_GUARD 1
+#ifndef wali_nwa_TransitionInfo_GUARD
+#define wali_nwa_TransitionInfo_GUARD 1
 
 /**
  * @author Amanda Burton
@@ -30,7 +30,7 @@ namespace wali
      * This class is used to keep track of the maps from state to transition for an NWA.
      *
      */
-   class TransInfo
+   class TransitionInfo
     {    
       public:
 
@@ -80,7 +80,7 @@ namespace wali
       public:
       
       //Constructors and Destructor
-      TransInfo & operator=( const TransInfo & other )
+      TransitionInfo & operator=( const TransitionInfo & other )
       {
         if( this == &other )     
           return *this;
@@ -1069,12 +1069,12 @@ namespace wali
        * This method tests the equivalence of these transition maps and the transition
        * maps in 'other'.
        *
-       * @param - other: the TransInfo to compare this TransInfo to
-       * @return true if this TransInfo is equivalent to the TransInfo
+       * @param - other: the TransitionInfo to compare this TransitionInfo to
+       * @return true if this TransitionInfo is equivalent to the TransitionInfo
        *         'other'
        *
        */
-      bool operator==( const TransInfo & other ) const
+      bool operator==( const TransitionInfo & other ) const
       {
         return ( (from_ITrans == other.from_ITrans) &&  
                  (to_ITrans == other.to_ITrans) && 

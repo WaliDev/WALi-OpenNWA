@@ -1,5 +1,5 @@
-#ifndef wali_nwa_SymbolSet_GUARD
-#define wali_nwa_SymbolSet_GUARD 1
+#ifndef wali_nwa_SymbolStorage_GUARD
+#define wali_nwa_SymbolStorage_GUARD 1
 
 /**
  * @author Amanda Burton
@@ -20,7 +20,7 @@ namespace wali
     namespace details
     {
       
-    class SymbolSet : public Printable
+    class SymbolStorage : public Printable
     { 
       public:
         typedef Key Sym;
@@ -42,9 +42,9 @@ namespace wali
 
       public:
       //Constructors and Destructor
-      SymbolSet( );
-      SymbolSet( const SymbolSet & other );
-      SymbolSet & operator=( const SymbolSet & other );
+      SymbolStorage( );
+      SymbolStorage( const SymbolStorage & other );
+      SymbolStorage & operator=( const SymbolStorage & other );
   
       //Accessors
 
@@ -141,7 +141,7 @@ namespace wali
        * @param - symSet: the collection of symbols to add to this collection of symbols
        *
        */
-      void addAllSymbols( SymbolSet symSet );
+      void addAllSymbols( SymbolStorage symSet );
 
       /** 
        *
@@ -166,7 +166,7 @@ namespace wali
        * @param - symSet: the collection of symbols to remove from this collection 
        *
        */
-      void removeAll( SymbolSet symSet );
+      void removeAll( SymbolStorage symSet );
 
       /**
        *
@@ -199,11 +199,11 @@ namespace wali
        * This method tests the equivalence of this set of symbols and the set of symbols
        * 'other'.
        *
-       * @param - other: the SymbolSet to which to compare this SymbolSet 
-       * @return true if this SymbolSet is equivalent to the SymbolSet 'other'
+       * @param - other: the SymbolStorage to which to compare this SymbolStorage 
+       * @return true if this SymbolStorage is equivalent to the SymbolStorage 'other'
        *
        */
-      bool operator==( const SymbolSet & other ) const;
+      bool operator==( const SymbolStorage & other ) const;
 
        /**
        * 
@@ -252,7 +252,7 @@ namespace wali
      * 
      */
     inline
-    const std::set<SymbolSet::Sym> & SymbolSet::getSymbols( ) const
+    const std::set<SymbolStorage::Sym> & SymbolStorage::getSymbols( ) const
     {
       return symbols;  
     }
@@ -266,7 +266,7 @@ namespace wali
      *
      */
     inline
-    bool SymbolSet::isSymbol( Sym sym ) const
+    bool SymbolStorage::isSymbol( Sym sym ) const
     {
       return (symbols.count(sym) > 0);
     }
@@ -279,7 +279,7 @@ namespace wali
      *
      */
     inline
-    void SymbolSet::clearSymbols( )
+    void SymbolStorage::clearSymbols( )
     {
       symbols.clear();
 
@@ -297,7 +297,7 @@ namespace wali
      *
      */
     inline
-    SymbolSet::const_iterator SymbolSet::beginSymbols( ) const
+    SymbolStorage::const_iterator SymbolStorage::beginSymbols( ) const
     {
       return symbols.begin();
     } 
@@ -310,7 +310,7 @@ namespace wali
      *
      */
     inline
-    SymbolSet::const_iterator SymbolSet::endSymbols( ) const
+    SymbolStorage::const_iterator SymbolStorage::endSymbols( ) const
     {
       return symbols.end();
     }    
@@ -323,7 +323,7 @@ namespace wali
      *
      */
     inline
-    size_t SymbolSet::sizeSymbols( ) const
+    size_t SymbolStorage::sizeSymbols( ) const
     {
       return symbols.size();
     }
@@ -363,7 +363,7 @@ namespace wali
        * @return true if this collection represents the wild symbol
        *
        */
-      bool isWild( const SymbolSet & symbolPool ) const;
+      bool isWild( const SymbolStorage & symbolPool ) const;
 
       /**
        *
@@ -386,7 +386,7 @@ namespace wali
        * @return true if this collection represents the absence of all symbols
        *
        */
-      bool isAbsent( const SymbolSet & symbolPool ) const;
+      bool isAbsent( const SymbolStorage & symbolPool ) const;
 
       /**
        *
@@ -420,7 +420,7 @@ namespace wali
        * @return some symbol in this collection of symbols
        *
        */
-      Sym getAnySymbol( const SymbolSet & symbolPool ) const;
+      Sym getAnySymbol( const SymbolStorage & symbolPool ) const;
             
       /**
        *
@@ -445,7 +445,7 @@ namespace wali
        * @param - symSet: the collection of symbols to add to this collection of symbols
        *
        */
-      void addAll( Label lbl, const SymbolSet & symbolPool );
+      void addAll( Label lbl, const SymbolStorage & symbolPool );
 
       /** 
        *
@@ -470,7 +470,7 @@ namespace wali
        * @param - symSet: the collection of symbols to remove from this collection 
        *
        */
-      void removeAll( Label lbl, const SymbolSet & symbolPool );
+      void removeAll( Label lbl, const SymbolStorage & symbolPool );
 
       //Utilities
       
@@ -484,7 +484,7 @@ namespace wali
        * @return the output stream that was printed to 
        *
        */
-      std::ostream & print( std::ostream & o, const SymbolSet & symbolPool ) const;
+      std::ostream & print( std::ostream & o, const SymbolStorage & symbolPool ) const;
       
       /** 
        *
@@ -494,8 +494,8 @@ namespace wali
        * This method tests the equivalence of this set of symbols and the set of symbols
        * 'other'.
        *
-       * @param - other: the SymbolSet to which to compare this SymbolSet 
-       * @return true if this SymbolSet is equivalent to the SymbolSet 'other'
+       * @param - other: the SymbolStorage to which to compare this SymbolStorage 
+       * @return true if this SymbolStorage is equivalent to the SymbolStorage 'other'
        *
        */
       bool operator==( const Label & other ) const;
@@ -510,7 +510,7 @@ namespace wali
        * @return a set containing all symbols in this collection
        * 
        */
-      const std::set<Sym> getSymbolsIn( const SymbolSet & symbolPool ) const;
+      const std::set<Sym> getSymbolsIn( const SymbolStorage & symbolPool ) const;
 
       /**
        *
@@ -522,7 +522,7 @@ namespace wali
        * @return a set containing all symbols not in this collection
        * 
        */
-      const std::set<Sym> getSymbolsNotIn( const SymbolSet & symbolPool ) const;
+      const std::set<Sym> getSymbolsNotIn( const SymbolStorage & symbolPool ) const;
 
       /**
        *
@@ -533,7 +533,7 @@ namespace wali
        * @return the number of symbols in this collection
        *
        */
-      size_t sizeSymbolsIn( const SymbolSet & symbolPool ) const;
+      size_t sizeSymbolsIn( const SymbolStorage & symbolPool ) const;
 
       /**
        *
@@ -544,7 +544,7 @@ namespace wali
        * @return the number of symbols not in this collection
        *
        */
-      size_t sizeSymbolsNotIn( const SymbolSet & symbolPool ) const;
+      size_t sizeSymbolsNotIn( const SymbolStorage & symbolPool ) const;
 
       //
       // Variables
@@ -620,7 +620,7 @@ namespace wali
      *
      */
     inline
-    size_t Label::sizeSymbolsIn( const SymbolSet & symbolPool ) const
+    size_t Label::sizeSymbolsIn( const SymbolStorage & symbolPool ) const
     {
       if( neg )
         return (symbolPool.sizeSymbols() - syms.size());
@@ -636,7 +636,7 @@ namespace wali
      *
      */
     inline
-    size_t Label::sizeSymbolsNotIn( const SymbolSet & symbolPool ) const
+    size_t Label::sizeSymbolsNotIn( const SymbolStorage & symbolPool ) const
     {
       if( neg )
         return syms.size();

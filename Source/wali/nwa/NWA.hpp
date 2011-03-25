@@ -94,13 +94,13 @@ namespace wali
       public:
         typedef ClientInfo Client;
 
-        typedef details::StateSet States;
+        typedef details::StateStorage States;
         typedef  States::const_iterator stateIterator;
         typedef  States::ClientInfoRefPtr ClientInfoRefPtr;
-        typedef details::SymbolSet Symbols;
+        typedef details::SymbolStorage Symbols;
         typedef  Symbols::const_iterator symbolIterator;
 
-        typedef details::TransSet Trans;
+        typedef details::TransitionStorage Trans;
         
         typedef  Trans::Call Call;       
         typedef  Trans::Internal Internal;   

@@ -1,5 +1,5 @@
-#ifndef wali_nwa_StateSet_GUARD
-#define wali_nwa_StateSet_GUARD 1
+#ifndef wali_nwa_StateStorage_GUARD
+#define wali_nwa_StateStorage_GUARD 1
 
 /**
  * @author Amanda Burton
@@ -32,7 +32,7 @@ namespace wali
      *  
      */
     
-    class StateSet : public Printable
+    class StateStorage : public Printable
     {
       public:
         typedef ClientInfo Client;
@@ -70,7 +70,7 @@ namespace wali
       public:
       
       //Constructors and Destructor
-      StateSet & operator=( const StateSet & other );
+      StateStorage & operator=( const StateStorage & other );
 
       //Client Info Accessors
 
@@ -268,42 +268,42 @@ namespace wali
        * @param - stateSet: the collection of states to add to this collection of states
        *
        */
-      void addAll( const StateSet & stateSet );
+      void addAll( const StateStorage & stateSet );
         
       /**
        *
-       * @brief add all the states in the given StateSet 
+       * @brief add all the states in the given StateStorage 
        *
        * This method adds all of the given states to the state set.
        *
-       * @param - stateSet: the StateSet that contains the states to add
+       * @param - stateSet: the StateStorage that contains the states to add
        *
        */
-      void addAllStates( const StateSet & stateSet );
+      void addAllStates( const StateStorage & stateSet );
         
       /**
        * 
-       * @brief add all the initial states in the given StateSet
+       * @brief add all the initial states in the given StateStorage
        *
        * This method adds all of the given initial states to the initial state set (and
        * thus to the state set if they are not already elements of the state set).
        *
-       * @param - stateSet: the StateSet that contains the states to add
+       * @param - stateSet: the StateStorage that contains the states to add
        *
        */
-      void addAllInitialStates( const StateSet & stateSet );
+      void addAllInitialStates( const StateStorage & stateSet );
         
       /**
        * 
-       * @brief add all the final states in the given StateSet
+       * @brief add all the final states in the given StateStorage
        *
        * This method adds all of the given final states to the final state set (and thus
        * to the state set if they are not already elements of the state set).
        *
-       * @param - stateSet: the StateSet that contains the states to add
+       * @param - stateSet: the StateStorage that contains the states to add
        *
        */
-      void addAllFinalStates( const StateSet & stateSet );
+      void addAllFinalStates( const StateStorage & stateSet );
       
       /**
        *  
@@ -371,11 +371,11 @@ namespace wali
        * This method tests the equivalence of this set of states and the set of states
        * 'other'.
        *
-       * @param - other: the StateSet to compare this StateSet to
-       * @return true if this StateSet is equivalent to the StateSet 'other'
+       * @param - other: the StateStorage to compare this StateStorage to
+       * @return true if this StateStorage is equivalent to the StateStorage 'other'
        *
        */
-      bool operator==( const StateSet & other ) const;
+      bool operator==( const StateStorage & other ) const;
        
       /**
        * 
