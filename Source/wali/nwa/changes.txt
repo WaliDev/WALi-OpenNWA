@@ -159,6 +159,10 @@ Summary:
    and std::set<Sym> to use StateSet and SymbolSet typedefs instead. (Will
    have to add SymbolSet typedef.)
 
+   -- Some work committed in REV 920, but I think I want to put this off until
+   -- after old StateSet and SymbolSet classes are removed in refactoring 3, stage 2.
+   
+
 
 9. Deprecate "exact" duplicate functions.
 
