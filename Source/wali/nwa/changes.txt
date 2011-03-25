@@ -179,11 +179,14 @@ Summary:
     (THESE ARE BREAKING CHANGES)
 
 
-11. Deprecate NWS/NWP-related stuff
+11. -- SOME WORK COMMITTED IN REV 924, but had to break into several stages
+    -- Deprecate class WordRecConfig, NWA::isMember, class NWP.
+    
+    LATER: Remove WordRecConfig, NWA::isMember, NWP. Deprecate NWA::simulateWord.
 
-    Deprecate those classes, WordRecConfig, NWA::isMember, NWA::simulateWord.
+    LATER: Remove NWA::simulateWord. Deprecate class NWS.
 
-    LATER: remove deprecated features
+    LATER: Remove NWS.
 
 
 12. Move class NestedWord to its own header, NestedWord.hpp.

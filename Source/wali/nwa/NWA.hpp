@@ -3051,8 +3051,10 @@ namespace wali
        *          the given NWA
        *
        */
+      DEPRECATE("I don't think anyone is using this NWS class or this method. If you disagree, talk to Evan.")
       static bool isMember( nws::NWS word, NWARefPtr aut )
       {
+
         //Q: should we try to walk the automata according to the word using WordRecConfig
         //    or determinize and then step through?
         //A: determinizing and stepping through will be easier to understand and depending

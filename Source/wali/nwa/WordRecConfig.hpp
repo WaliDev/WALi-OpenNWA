@@ -16,6 +16,8 @@ namespace wali
 {
   namespace nwa
   {
+
+    DEPRECATE("I don't think anyone is using this class. If you disagree, talk to Evan.")
     class WordRecConfig
     {
       //

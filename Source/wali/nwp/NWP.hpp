@@ -5,6 +5,8 @@
  * @author Amanda Burton
  */
 
+#include "wali/nwa/deprecate.h"
+
 // ::wali
 #include "wali/Printable.hpp"
 #include "wali/Key.hpp"
@@ -22,7 +24,7 @@ namespace wali
 
   namespace nwp
   {
-  
+    DEPRECATE("I don't think anyone is using this. If you are, talk to Evan.")
     class NWP : public Printable
     {
       typedef NWPNode * iterator;
