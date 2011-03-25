@@ -350,6 +350,7 @@ namespace wali
        * @return a set of all states 
        *
        */
+      DEPRECATE("Use NWA::getStates")
       const  StateSet & get_states( ) const;
 
       /**
@@ -375,6 +376,7 @@ namespace wali
        * @return true if the given state is a state of this NWA
        *
        */
+      DEPRECATE("Use NWA::isState");
       bool is_nwa_state( State state ) const;
 
      /**
@@ -414,6 +416,7 @@ namespace wali
        * @return the number of states associated with this NWA
        *
        */
+      DEPRECATE("Use sizeStates()");
       int num_nwa_states( ) const;
 
       int largestState() const {
@@ -1122,6 +1125,7 @@ namespace wali
        * @return the number of transitions associated with this NWA
        *
        */
+      DEPRECATE("Use sizeTrans");
       int count_rules( ) const;
 
       /**

@@ -164,10 +164,11 @@ Summary:
    
 
 
-9. Deprecate "exact" duplicate functions.
+9. -- COMMITTED REV 921
+   -- Deprecate "exact" duplicate functions.
 
-   In class 'NWA', deprecate functions 'get_states', 'is_nwa_state', and
-   'num_nwa_states', 'count_rules'.
+   -- In class 'NWA', deprecate functions 'get_states', 'is_nwa_state', and
+   -- 'num_nwa_states', 'count_rules'.
 
    LATER: Remove deprecated functions
 
