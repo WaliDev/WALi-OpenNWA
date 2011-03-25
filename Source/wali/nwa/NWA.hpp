@@ -338,7 +338,7 @@ namespace wali
        * @return a set of all states
        *
        */
-      const  std::set<State> & getStates( ) const;
+      const  StateSet & getStates( ) const;
       /**
        *   
        * @brief provides access to all states in the NWA
@@ -350,7 +350,7 @@ namespace wali
        * @return a set of all states 
        *
        */
-      const  std::set<State> & get_states( ) const;
+      const  StateSet & get_states( ) const;
 
       /**
        * 
@@ -463,7 +463,7 @@ namespace wali
        * @return set of inital states associated with the NWA
        *
        */
-      const  std::set<State> & getInitialStates( ) const; 
+      const  StateSet & getInitialStates( ) const; 
 
       /**
        * 
@@ -542,7 +542,7 @@ namespace wali
        * @return set of all final states associated with this NWA
        *
        */
-      const  std::set<State> & getFinalStates( ) const;
+      const  StateSet & getFinalStates( ) const;
 
       /**
        *
@@ -777,7 +777,7 @@ namespace wali
        * @param - preds: the set of all states that are predecessors of the given state
        *
        */    
-      void getPredecessors( State state,  std::set<State> & preds ) const;
+      void getPredecessors( State state,  StateSet & preds ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are predecessors of the given state
@@ -788,7 +788,7 @@ namespace wali
 	   * @return the set of all states that are predecessors of the given state
 	   *
        */
-      const  std::set<State> getPredecessors( State state ) const;
+      const  StateSet getPredecessors( State state ) const;
 
       /**
        * 
@@ -806,7 +806,7 @@ namespace wali
        *                  with respect to the given symbol
        *
        */
-      void getPredecessors( Symbol symbol, State state,  std::set<State> & preds ) const;
+      void getPredecessors( Symbol symbol, State state,  StateSet & preds ) const;
 	    /**
        * 
 	     * @brief obtains all the states that are predecessors of the given state with
@@ -823,7 +823,7 @@ namespace wali
 	     *			respect to the given symbol
 	     *
        */
-      const  std::set<State> getPredecessors( Symbol symbol, State state ) const;
+      const  StateSet getPredecessors( Symbol symbol, State state ) const;
 
       /**
        * 
@@ -835,7 +835,7 @@ namespace wali
        * @param - succs: the set of all states that are successors of the given state
        *
        */
-      void getSuccessors( State state,  std::set<State> & succs ) const;
+      void getSuccessors( State state,  StateSet & succs ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are successors of the given state
@@ -846,7 +846,7 @@ namespace wali
 	   * @return the set of all states that are successors of the given state
 	   *
        */
-      const  std::set<State> getSuccessors( State state ) const;
+      const  StateSet getSuccessors( State state ) const;
 
       /**
        * 
@@ -864,7 +864,7 @@ namespace wali
        *                  with respect to the given symbol
        *
        */
-      void getSuccessors( State state, Symbol symbol,  std::set<State> & succs ) const;
+      void getSuccessors( State state, Symbol symbol,  StateSet & succs ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are successors of the given state with
@@ -881,7 +881,7 @@ namespace wali
 	   *			with respect to the given symbol
 	   *
        */
-      const  std::set<State> getSuccessors( State state, Symbol symbol ) const;
+      const  StateSet getSuccessors( State state, Symbol symbol ) const;
 
       /**
        * 
@@ -940,7 +940,7 @@ namespace wali
        * @param - preds: the set of all states that are call-predecessors of the given state
        *
        */ 
-      void getCallPredecessors( State state,  std::set<State> & c_preds ) const;
+      void getCallPredecessors( State state,  StateSet & c_preds ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are call-predecessors of the given state
@@ -951,7 +951,7 @@ namespace wali
 	   * @return the set of all states that are call-predecessors of the given state
 	   *
        */
-      const  std::set<State> getCallPredecessors( State state ) const;
+      const  StateSet getCallPredecessors( State state ) const;
       
       /**
        * 
@@ -969,7 +969,7 @@ namespace wali
        *                  with respect to the given symbol
        *
        */
-      void getCallPredecessors( Symbol symbol, State state,  std::set<State> & c_preds ) const;
+      void getCallPredecessors( Symbol symbol, State state,  StateSet & c_preds ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are call-predecessors of the given state with
@@ -986,7 +986,7 @@ namespace wali
 	   *			with respect to the given symbol
 	   *
        */
-      const  std::set<State> getCallPredecessors( Symbol symbol, State state ) const;
+      const  StateSet getCallPredecessors( Symbol symbol, State state ) const;
 
       /**
        * 
@@ -998,7 +998,7 @@ namespace wali
        * @param - succs: the set of all states that are call-successors of the given state
        *
        */
-      void getCallSuccessors( State state,  std::set<State> & c_succs ) const;
+      void getCallSuccessors( State state,  StateSet & c_succs ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are call-successors of the given state
@@ -1009,7 +1009,7 @@ namespace wali
 	   * @return the set of all states that are call-successors of the given state
 	   *
        */
-      const  std::set<State> getCallSuccessors( State state ) const;
+      const  StateSet getCallSuccessors( State state ) const;
 
       /**
        * 
@@ -1027,7 +1027,7 @@ namespace wali
        *                  with respect to the given symbol
        *
        */
-      void getCallSuccessors( State state, Symbol symbol,  std::set<State> & c_succs ) const;
+      void getCallSuccessors( State state, Symbol symbol,  StateSet & c_succs ) const;
 	  /**
        * 
 	   * @brief obtains all the states that are call-successors of the given state with 
@@ -1044,7 +1044,7 @@ namespace wali
 	   *			respect to the given symbol
 	   *
        */
-      const  std::set<State> getCallSuccessors( State state, Symbol symbol ) const;
+      const  StateSet getCallSuccessors( State state, Symbol symbol ) const;
 
       /**
        *    
@@ -1149,7 +1149,7 @@ namespace wali
        * @return the set of call site states associated with the given symbol
        *
        */
-      const  std::set<State> getCallSites_Sym( Symbol symbol ) const;
+      const  StateSet getCallSites_Sym( Symbol symbol ) const;
 
       /**
        * 
@@ -1166,7 +1166,7 @@ namespace wali
        *          and entry point
        *
        */
-      const  std::set<State> getCallSites( Symbol symbol, State entryPoint ) const;
+      const  StateSet getCallSites( Symbol symbol, State entryPoint ) const;
       
       /**
        * 
@@ -1194,7 +1194,7 @@ namespace wali
 	   * @return the set of call sites of all call transitions in the NWA
 	   *
        */
-	  const  std::set<State> getCallSites( ) const;
+	  const  StateSet getCallSites( ) const;
 
       /**
        * 
@@ -1281,7 +1281,7 @@ namespace wali
        *          site and symbol
        *
        */
-      const  std::set<State> getEntries( State callSite, Symbol symbol ) const;
+      const  StateSet getEntries( State callSite, Symbol symbol ) const;
 
       /**
        * 
@@ -1306,7 +1306,7 @@ namespace wali
 	   * @return the set of entry points of all call transitions in the NWA
 	   *
        */
-	  const  std::set<State> getEntries( ) const;
+	  const  StateSet getEntries( ) const;
 
       /**
        *
@@ -1400,7 +1400,7 @@ namespace wali
        * @return the set of source states associated with the given symbol
        *
        */
-      const  std::set<State> getSources_Sym( Symbol symbol ) const;
+      const  StateSet getSources_Sym( Symbol symbol ) const;
 
       /**
        * 
@@ -1416,7 +1416,7 @@ namespace wali
        *          symbol and target state
        *
        */
-      const  std::set<State> getSources( Symbol symbol, State target ) const;
+      const  StateSet getSources( Symbol symbol, State target ) const;
 
       /**
        * 
@@ -1444,7 +1444,7 @@ namespace wali
 	   * @return the set of sources of all internal transitions in the NWA
 	   *
        */
-	  const  std::set<State> getSources( ) const;
+	  const  StateSet getSources( ) const;
 
     /**
      * 
@@ -1515,7 +1515,7 @@ namespace wali
        * @return the set of target states associated with the given symbol
        *
        */
-      const  std::set<State> getTargets_Sym( Symbol symbol ) const;
+      const  StateSet getTargets_Sym( Symbol symbol ) const;
 
       /**
        * 
@@ -1531,7 +1531,7 @@ namespace wali
        *          state and symbol
        *
        */
-      const  std::set<State> getTargets( State source, Symbol symbol ) const;
+      const  StateSet getTargets( State source, Symbol symbol ) const;
 
       /**
        * 
@@ -1556,7 +1556,7 @@ namespace wali
 	   * @return the set of targets of all internal transitions in the NWA
 	   *
        */
-	  const  std::set<State> getTargets( ) const;
+	  const  StateSet getTargets( ) const;
 
       /**
        *
@@ -1651,7 +1651,7 @@ namespace wali
        * @return the set of exit states associated with the given symbol
        *
        */
-      const  std::set<State> getExits_Sym( Symbol symbol ) const;
+      const  StateSet getExits_Sym( Symbol symbol ) const;
 
       /**
        * 
@@ -1668,7 +1668,7 @@ namespace wali
        *          symbol, and return site
        *
        */
-      const  std::set<State> getExits( State callSite, Symbol symbol, State returnSite ) const;
+      const  StateSet getExits( State callSite, Symbol symbol, State returnSite ) const;
 
       /**
        * 
@@ -1696,7 +1696,7 @@ namespace wali
 	   * @return the set of exit points of all return transitions in the NWA
 	   *
        */
-	  const  std::set<State> getExits( ) const;
+	  const  StateSet getExits( ) const;
 
       /**
        * 
@@ -1712,7 +1712,7 @@ namespace wali
        *          and symbol
        *
        */
-      const  std::set<State> getExits_Call( State callSite, Symbol symbol ) const;
+      const  StateSet getExits_Call( State callSite, Symbol symbol ) const;
 
       /**
        * 
@@ -1744,7 +1744,7 @@ namespace wali
        *          return site
        *
        */
-      const  std::set<State> getExits_Ret( Symbol symbol, State returnSite ) const;
+      const  StateSet getExits_Ret( Symbol symbol, State returnSite ) const;
 
       /**
        * 
@@ -1773,7 +1773,7 @@ namespace wali
        * @return the set of call site states associated with the given symbol
        *
        */
-      const  std::set<State> getCalls_Sym( Symbol symbol ) const;
+      const  StateSet getCalls_Sym( Symbol symbol ) const;
 
       /**
        * 
@@ -1790,7 +1790,7 @@ namespace wali
        *          point, symbol, and return site
        * 
        */
-      const  std::set<State> getCalls( State exitPoint, Symbol symbol, State returnSite ) const;
+      const  StateSet getCalls( State exitPoint, Symbol symbol, State returnSite ) const;
 
       /**
        * 
@@ -1818,7 +1818,7 @@ namespace wali
 	   * @return the set of call sites of all return transitions in the NWA
 	   *
        */
-	  const  std::set<State> getCalls( ) const;
+	  const  StateSet getCalls( ) const;
 
       /**
        * 
@@ -1834,7 +1834,7 @@ namespace wali
        *          and symbol
        *
        */
-      const  std::set<State> getCalls_Exit( State exitPoint, Symbol symbol ) const;
+      const  StateSet getCalls_Exit( State exitPoint, Symbol symbol ) const;
 
       /**
        * 
@@ -1865,7 +1865,7 @@ namespace wali
        *          and return site
        *
        */
-      const  std::set<State> getCalls_Ret( Symbol symbol, State returnSite ) const;
+      const  StateSet getCalls_Ret( Symbol symbol, State returnSite ) const;
 
       /**
        * 
@@ -2017,7 +2017,7 @@ namespace wali
        * @return the set of return site states associated with the given symbol
        *
        */
-      const  std::set<State> getReturns_Sym( Symbol symbol ) const;
+      const  StateSet getReturns_Sym( Symbol symbol ) const;
 
       /**
        * 
@@ -2034,7 +2034,7 @@ namespace wali
        *          point, call site, and symbol
        *
        */
-      const  std::set<State> getReturns( State exitPoint, State callSite, Symbol symbol ) const;
+      const  StateSet getReturns( State exitPoint, State callSite, Symbol symbol ) const;
 
       /**
        * 
@@ -2062,7 +2062,7 @@ namespace wali
 	   * @return the set of return sites of all return transitions in the NWA
 	   *
        */
-	  const  std::set<State> getReturns(  ) const;
+	  const  StateSet getReturns(  ) const;
 
       /**
        * 
@@ -2078,7 +2078,7 @@ namespace wali
        *         point and symbol
        *
        */
-      const  std::set<State> getReturns_Exit( State exitPoint, Symbol symbol ) const;
+      const  StateSet getReturns_Exit( State exitPoint, Symbol symbol ) const;
 
       /**
        * 
@@ -2109,7 +2109,7 @@ namespace wali
        *          site and symbol
        *
        */
-      const  std::set<State> getReturns_Call( State callSite, Symbol symbol ) const;
+      const  StateSet getReturns_Call( State callSite, Symbol symbol ) const;
 
       /**
        * 
@@ -2137,7 +2137,7 @@ namespace wali
        * @return the set of return sites associated with the given call site
        *
        */
-      const  std::set<State> getReturnSites( State callSite ) const;
+      const  StateSet getReturnSites( State callSite ) const;
 
       /**
        *
@@ -2246,7 +2246,7 @@ namespace wali
        * @brief constructs an NWA which is the projection of the given NWA to the states
        * provided
       */
-      void projectStates(const NWARefPtr &first, const std::set<State> &prjStates);
+      void projectStates(const NWARefPtr &first, const StateSet &prjStates);
 
       /**
        *
@@ -2339,12 +2339,12 @@ namespace wali
       * Removes states not reachable from any of the 'sources' states
       * 
       */
-      void pruneUnreachableForward(const std::set<State> & sources);
+      void pruneUnreachableForward(const StateSet & sources);
 
       /**
       * Removes states from which none of the 'targets' are reachable.
       */
-      void pruneUnreachableBackward(const std::set<State> & targets);
+      void pruneUnreachableBackward(const StateSet & targets);
 
       /**
       * Removes states not reachable from any initial state
@@ -2564,7 +2564,7 @@ namespace wali
        */
       static bool overlap(NWARefPtr first, NWARefPtr second)
       {
-        std::set<State> intersection;
+        StateSet intersection;
         // The following line does 'intersection = first->states() intersect second->states()'
         std::set_intersection(first->beginStates(), first->endStates(),
                               second->beginStates(), second->endStates(),
@@ -3472,7 +3472,7 @@ namespace wali
        * @param - sp: the starting point of the closure
        *
        */
-      void epsilonClosure(  std::set<State> * newPairs, State sp ) const;
+      void epsilonClosure(  StateSet * newPairs, State sp ) const;
 
       /**
        *
@@ -3762,10 +3762,10 @@ namespace wali
                 for( std::set<Configuration>::const_iterator config = nextConfigs.begin();
                     config != nextConfigs.end(); ++config)
                 {
-                  std::set<State> closure;
+                  StateSet closure;
                   epsilonClosure(&closure, config->state);
                     
-                  for(std::set<State>::const_iterator other = closure.begin();
+                  for(StateSet::const_iterator other = closure.begin();
                       other != closure.end(); ++other)
                   {
                     Configuration c(*config);
@@ -3851,10 +3851,10 @@ namespace wali
             for( std::set<Configuration>::const_iterator config = nextConfigs.begin();
                 config != nextConfigs.end(); ++config)
             {
-                std::set<State> closure;
+                StateSet closure;
                 epsilonClosure(&closure, config->state);
                 
-                for( std::set<State>::const_iterator other = closure.begin();
+                for( StateSet::const_iterator other = closure.begin();
                     other != closure.end(); ++other)
                 {
                     Configuration c(*config);
