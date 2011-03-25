@@ -1,4 +1,4 @@
-#include "SymbolSet.hpp"
+#include "SymbolStorage.hpp"
 
 namespace wali {
 namespace nwa {

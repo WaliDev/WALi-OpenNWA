@@ -3,7 +3,7 @@
  */
 
 // ::wali
-#include "StateSet.hpp"
+#include "StateStorage.hpp"
 
 namespace wali
 {

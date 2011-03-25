@@ -11,8 +11,8 @@
 #include "wali/Printable.hpp"
 #include "wali/Key.hpp"
 #include "wali/KeyContainer.hpp"
-#include "wali/nwa/details/StateSet.hpp"
-#include "wali/nwa/details/TransInfo.hpp"
+#include "wali/nwa/details/StateStorage.hpp"
+#include "wali/nwa/details/TransitionInfo.hpp"
 
 // std::c++
 #include <iostream>

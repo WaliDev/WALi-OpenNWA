@@ -12,9 +12,9 @@
 #include "wali/Countable.hpp"
 #include "wali/KeyContainer.hpp"
 
-#include "wali/nwa/details/SymbolSet.hpp"
-#include "wali/nwa/details/StateSet.hpp"
-#include "wali/nwa/details/TransSet.hpp"
+#include "wali/nwa/details/SymbolStorage.hpp"
+#include "wali/nwa/details/StateStorage.hpp"
+#include "wali/nwa/details/TransitionStorage.hpp"
 
 #include "wali/nws/NWS.hpp"
 
@@ -94,7 +94,7 @@ namespace wali
       public:
         typedef ClientInfo Client;
 
-        typedef wali::nwa::details::StateSet States;
+        typedef details::StateSet States;
         typedef  States::const_iterator stateIterator;
         typedef  States::ClientInfoRefPtr ClientInfoRefPtr;
         typedef details::SymbolSet Symbols;

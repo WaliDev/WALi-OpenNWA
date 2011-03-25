@@ -11,7 +11,7 @@
  
 // ::wali
 #include "wali/KeyContainer.hpp"
-#include "wali/nwa/details/SymbolSet.hpp"
+#include "wali/nwa/details/SymbolStorage.hpp"
 #include "wali/Key.hpp" 
  
 // std::c++

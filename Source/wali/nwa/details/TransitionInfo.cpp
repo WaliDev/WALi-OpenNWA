@@ -1,4 +1,4 @@
-#include "TransInfo.hpp"
+#include "TransitionInfo.hpp"
 
 namespace wali
 { 

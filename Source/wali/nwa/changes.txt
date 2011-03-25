@@ -83,8 +83,10 @@ Summary:
    -- Move the class 'StateSet' from namespace wali::nwa to
    -- wali::nwa::details.
 
-   Rename it to 'StateStorage'. Rename the corresponding files to match. Fix
-   references.
+   Rename it to 'StateStorage'. Fix references.
+
+   -- COMMITTED REV 916 (and #include uses, but old class names)
+   -- Rename the corresponding files to match.
 
    -- COMMITTED REV 915, though you can call static methods throguh a
    -- deprecated typedef without a warning from GCC.
@@ -107,7 +109,10 @@ Summary:
    -- Move all classes into namespace 'wali::nwa::details'.
 
    Rename to 'SymbolStorage', 'TransitionStorage', and 'TransitionInfo'
-   respectively. Rename files to match. Fix uses.
+   respectively. Fix uses.
+
+   -- COMMITTED REV 916 (and #include uses, but old class names)
+   -- Rename files to match.
 
    -- COMMITTED REV 915, though you can call static methods throguh a
    -- deprecated typedef without a warning from GCC.
