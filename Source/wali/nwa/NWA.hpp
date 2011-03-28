@@ -125,9 +125,10 @@ namespace wali
        * @return the Key for the epsilon symbol
        *
        */
+      DEPRECATE("Use wali::WALI_EPSILON instead")
       static Symbol getEpsilon( )
       {
-        return SymbolStorage::getEpsilon();
+        return WALI_EPSILON;
       }
       /**
        *  
@@ -139,9 +140,10 @@ namespace wali
        * @return true if this symbol is the epsilon symbol, false otherwise
        *
        */
+      DEPRECATE("Compare against wali::WALI_EPSILON instead")
       static bool isEpsilon( Symbol sym )
       {
-        return SymbolStorage::isEpsilon(sym);
+        return sym == WALI_EPSILON;
       }
       /**
        *
@@ -162,9 +164,10 @@ namespace wali
        * @return the Key for the wild symbol
        *
        */
+      DEPRECATE("Use wali::WALI_WILD instead")
       static Symbol getWild( )
       {
-        return SymbolStorage::getWild();
+        return WALI_WILD;
       }
       /**
        *  
@@ -176,9 +179,10 @@ namespace wali
        * @return true if this symbol is the wild symbol, false otherwise
        *
        */
+      DEPRECATE("Compare against wali::WALI_WILD instead")
       static bool isWild( Symbol sym )
       {
-        return SymbolStorage::isWild(sym);
+        return sym == WALI_WILD;
       }
 
       //State Accessors

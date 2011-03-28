@@ -5,6 +5,8 @@
  * @author Amanda Burton
  */
 
+#include "wali/nwa/deprecate.h"
+
 // ::wali
 #include "wali/Printable.hpp"
 #include "wali/Common.hpp"
@@ -51,6 +53,7 @@ namespace wali
       /**
        *
        */
+      DEPRECATE("Use wali::WALI_WILD instead")
       static bool isWild( Sym sym )
       {
         return (sym == wali::WALI_WILD);
@@ -59,6 +62,7 @@ namespace wali
       /**
        *  
        */
+      DEPRECATE("Use wali::WALI_WILD instead")
       static Sym getWild( )
       {
         return wali::WALI_WILD;
@@ -74,6 +78,7 @@ namespace wali
        * @return the Key for the epsilon symbol
        *
        */
+      DEPRECATE("Use wali::WALI_EPSILON instead")
       static Sym getEpsilon( )
       {
         return wali::WALI_EPSILON;
@@ -89,6 +94,7 @@ namespace wali
        * @return true if this symbol is the epsilon symbol, false otherwise
        *
        */
+      DEPRECATE("Compare against wali::WALI_EPSILON instead")
       static bool isEpsilon( Sym sym )
       {
         return (sym == wali::WALI_EPSILON);
