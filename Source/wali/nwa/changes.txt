@@ -149,11 +149,12 @@ Summary:
    (THIS IS A BREAKING CHANGE)
 
 
-7. -- COMMITTED REV 929, however, references aren't fixed, so oodles of warnings
+7. -- COMMITTED REV 929
    -- Deprecate NWA::getEpsilon, NWA::getWild, NWA::isEpsilon, NWA::isWild, and
    -- the same functions in class 'SymbolStorage'.
 
-   Fix references.   
+   -- COMMITTED REV 930
+   -- Fix references.   
 
    LATER: Remove deprecated functions
 

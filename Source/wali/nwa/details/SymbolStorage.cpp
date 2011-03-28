@@ -8,7 +8,7 @@ namespace details {
 SymbolStorage::SymbolStorage( )
 {
   //Epsilon is always a symbol of the NWA.
-  addSymbol( getEpsilon() );
+  addSymbol( WALI_EPSILON );
 }
 
 SymbolStorage::SymbolStorage( const SymbolStorage & other )
@@ -111,7 +111,7 @@ std::ostream & SymbolStorage::print( std::ostream & o ) const
       o << ",\n  "; 
     }
 
-    if( SymbolStorage::isEpsilon(*it) )
+    if( *it == WALI_EPSILON )
       o << "Epsilon";
     else
       printKey(o,*it);
@@ -394,7 +394,7 @@ std::ostream & Label::print( std::ostream & o, const SymbolStorage & symbolPool 
         first = false;
       }
 
-      if( SymbolStorage::isEpsilon(*it) )
+      if( *it == WALI_EPSILON )
         o << "Epsilon";
       else
         printKey(o,*it);

@@ -290,7 +290,7 @@ namespace wali
       symbols.clear();
 
       // Epsilon is always a symbol of the NWA.
-      addSymbol( getEpsilon() );
+      addSymbol( WALI_EPSILON );
     }
 
     //Utilities

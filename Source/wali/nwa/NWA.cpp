@@ -513,7 +513,7 @@ namespace wali
     {
       assert(sym < wali::WALI_BAD_KEY);
 
-      if( isWild(sym) || isEpsilon(sym) )
+      if( sym == WALI_WILD || sym == WALI_EPSILON )
         return false;
 
       bool removed = symbols.removeSymbol(sym);
@@ -1574,7 +1574,7 @@ namespace wali
       assert(sym < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
 
-      assert(! isEpsilon(sym) ); //An Epsilon symbol on a call doesn't make sense.
+      assert(sym != WALI_EPSILON ); //An Epsilon symbol on a call doesn't make sense.
 
       //Don't allow transitions out of the stuck state (unless they go to the stuck state --
       //otherwise it isn't really a stuck state).
@@ -1608,7 +1608,7 @@ namespace wali
       assert(Trans::getCallSym(ct) < wali::WALI_BAD_KEY);
       assert(Trans::getEntry(ct) < wali::WALI_BAD_KEY);
 
-      assert(! isEpsilon(Trans::getCallSym(ct)) ); //An Epsilon symbol on a call doesn't make sense.
+      assert( Trans::getCallSym(ct) != WALI_EPSILON ); //An Epsilon symbol on a call doesn't make sense.
 
       //Don't allow transitions out of the stuck state (unless they go to the stuck state --
       //otherwise it isn't really a stuck state).
@@ -1644,7 +1644,7 @@ namespace wali
       assert(sym < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
 
-      if(! isState(from) || ! isSymbol(sym) || ! isState(to) || isEpsilon(sym) )
+      if(! isState(from) || ! isSymbol(sym) || ! isState(to) || sym == WALI_EPSILON )
         return false;
 
       return trans.removeCall(from,sym,to);
@@ -1670,7 +1670,7 @@ namespace wali
       if(! isState(Trans::getCallSite(ct))
         || ! isSymbol(Trans::getCallSym(ct))
         || ! isState(Trans::getEntry(ct)) 
-        || isEpsilon(Trans::getCallSym(ct)) )
+        || Trans::getCallSym(ct) == WALI_EPSILON )
         return false;
 
       return trans.removeCall(ct);
@@ -2965,7 +2965,7 @@ namespace wali
       assert(sym < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
 
-      assert(! isEpsilon(sym) ); //An Epsilon symbol on a return doesn't make sense.
+      assert( sym != WALI_EPSILON ); //An Epsilon symbol on a return doesn't make sense.
 
       //Don't allow transitions out of the stuck state (unless they go to the stuck state --
       //otherwise it isn't really a stuck state).
@@ -3005,7 +3005,7 @@ namespace wali
       assert(Trans::getReturnSym(rt) < wali::WALI_BAD_KEY);
       assert(Trans::getReturnSite(rt) < wali::WALI_BAD_KEY);
 
-      assert(! isEpsilon(Trans::getReturnSym(rt)) ); //An Epsilon symbol on a return doesn't make sense.
+      assert( Trans::getReturnSym(rt) != WALI_EPSILON ); //An Epsilon symbol on a return doesn't make sense.
 
       //Don't allow transitions out of the stuck state (unless they go to the stuck state --
       //otherwise it isn't really a stuck state).
@@ -3046,7 +3046,7 @@ namespace wali
       assert(sym < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
 
-      if(! isState(from) || ! isSymbol(sym) || ! isState(to) || isEpsilon(sym) )
+      if(! isState(from) || ! isSymbol(sym) || ! isState(to) ||  sym == WALI_EPSILON )
         return false;
      
       bool removed = false;
@@ -3082,7 +3082,7 @@ namespace wali
       assert(to < wali::WALI_BAD_KEY);
 
       if(! isState(from) || ! isState(pred) || ! isSymbol(sym) || ! isState(to) 
-        || isEpsilon(sym) )
+        || sym == WALI_EPSILON )
         return false;
 
       return trans.removeReturn(from,pred,sym,to);
@@ -3110,7 +3110,7 @@ namespace wali
         || ! isState(Trans::getCallSite(rt))
         || ! isSymbol(Trans::getReturnSym(rt))
         || ! isState(Trans::getReturnSite(rt)) 
-        || isEpsilon(Trans::getReturnSym(rt)) )
+        || Trans::getReturnSym(rt) == WALI_EPSILON )
         return false;
 
       return trans.removeReturn(rt);
@@ -4641,8 +4641,8 @@ namespace wali
       std::map<wali::Key, TernaryRelation> returnTransPerSymbol;
 
       for( symbolIterator it = nondet->beginSymbols(); it != nondet->endSymbols(); it++ ) {
-        if (SymbolStorage::isEpsilon(*it)) continue;    //Epsilon is handled with closure.
-        if (SymbolStorage::isWild(*it)) continue;
+        if (*it == WALI_EPSILON) continue;    //Epsilon is handled with closure.
+        if (*it == WALI_WILD) continue;
 
 #ifdef USE_BUDDY
         internalTransPerSymbol[*it] = BinaryRelation(nondet->largestState());
@@ -4682,8 +4682,8 @@ namespace wali
         //Check each symbol individually.
         for( symbolIterator it = nondet->beginSymbols(); it != nondet->endSymbols(); it++ )
         {
-          if (SymbolStorage::isEpsilon(*it)) continue;    //Epsilon is handled with closure.
-          if (SymbolStorage::isWild(*it)) continue;       //Wild is matched to every symbol as we go.
+          if (*it == WALI_EPSILON) continue;    //Epsilon is handled with closure.
+          if (*it == WALI_WILD) continue;       //Wild is matched to every symbol as we go.
 
           //Process internal transitions.
           //Compute the relation.
@@ -4950,7 +4950,7 @@ namespace wali
       //An NWA is not deterministic if there are epsilon transitions. 
       for( InternalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
       {
-        if( isEpsilon(Trans::getInternalSym(*iit)) )
+        if( Trans::getInternalSym(*iit) == WALI_EPSILON )
           return false;
       }
       
@@ -4968,7 +4968,7 @@ namespace wali
           for( CallIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
           {
             //Wild symbol 
-            if( isWild(Trans::getCallSym(*cit)) )
+            if( Trans::getCallSym(*cit) == WALI_WILD )
               wild = true;  
 
             //Keep a count of multiple transitions with the same from
@@ -4987,7 +4987,7 @@ namespace wali
           for( InternalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
           {
             //Wild symbol 
-            if( isWild(Trans::getInternalSym(*iit)) )
+            if( Trans::getInternalSym(*iit) == WALI_WILD )
               wild = true;  
 
             //Keep a count of multiple transitions with the same from
@@ -5008,7 +5008,7 @@ namespace wali
             for( ReturnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
             {
               //Wild symbol 
-              if( isWild(Trans::getReturnSym(*rit)) )
+              if( Trans::getReturnSym(*rit) == WALI_WILD )
                 wild = true; 
 
               //Keep a count of multiple transitions with the same from
@@ -5176,15 +5176,15 @@ namespace wali
       //      given symbols are compatible and set result to the appropriate symbol.
 
       //Epsilons are treated separately in the algorithms, so epsilons match nothing.
-      if( isEpsilon(sym1) || isEpsilon(sym2) )
+      if( sym1 == WALI_EPSILON || sym2 == WALI_EPSILON )
         return false;
       //Wild symbols match everything.
-      if( isWild(sym1) )
+      if( sym1 == WALI_WILD )
       {
         resSym = sym2;
         return true;
       }
-      if( isWild(sym2) )
+      if( sym2 == WALI_WILD )
       {
         resSym = sym1;
         return true;
@@ -5503,7 +5503,7 @@ namespace wali
 	    State src = Trans::getSource(*iit);
 		  State tgt = Trans::getTarget(*iit);
       
-      if( isWild(Trans::getInternalSym(*iit)) )
+      if( Trans::getInternalSym(*iit) == WALI_WILD )
 		    wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
       else
         wgt = wg.getWeight(src, getClientInfo(src),
@@ -5530,7 +5530,7 @@ namespace wali
             //(q_c,sigma,q_e) in delta_c and (q_x,q_c,*,q_r) in delta_r goes to
             // <p,q_c> -w-> <p,q_e q_r> in delta_2 and w depends on sigma
 
-            if( isWild(Trans::getCallSym(*cit)) )
+            if( Trans::getCallSym(*cit) == WALI_WILD )
               wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w
             else
               wgt = wg.getWeight(src, getClientInfo(src),
@@ -5559,7 +5559,7 @@ namespace wali
         State src = Trans::getExit(*rit);
         State tgt = Trans::getReturnSite(*rit);
         
-        if( isWild(Trans::getReturnSym(*rit)) )
+        if( Trans::getReturnSym(*rit) == WALI_WILD )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w  
         else
           wgt = wg.getWeight(src, getClientInfo(src),
@@ -5617,7 +5617,7 @@ namespace wali
         State src = Trans::getSource(*iit);
         State tgt = Trans::getTarget(*iit);
         
-        if( isWild(Trans::getInternalSym(*iit)) )
+        if( Trans::getInternalSym(*iit) == WALI_WILD )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
         else
           wgt = wg.getWeight(src, getClientInfo(src),
@@ -5645,7 +5645,7 @@ namespace wali
             // and <p_q_erc,q_c> -1-> <p,q_c> in delta_1
             // where p_q_erc = (p,q_e,q_r,q_c) and w depends on sigma
 
-            if( isWild(Trans::getCallSym(*cit)) )
+            if( Trans::getCallSym(*cit) == WALI_WILD )
               wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w
             else
               wgt = wg.getWeight(src, getClientInfo(src), 
@@ -5680,7 +5680,7 @@ namespace wali
         State src = Trans::getExit(*rit);
         State tgt = Trans::getReturnSite(*rit);
         
-        if( isWild(Trans::getReturnSym(*rit)) )
+        if( Trans::getReturnSym(*rit) == WALI_WILD )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
         else
           wgt = wg.getWeight(src, getClientInfo(src),
@@ -5730,7 +5730,7 @@ namespace wali
         State src = Trans::getSource(*iit);
         State tgt = Trans::getTarget(*iit);
 
-        if( isWild(Trans::getInternalSym(*iit)) )
+        if( Trans::getInternalSym(*iit) == WALI_WILD )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
         else
           wgt = wg.getWeight(src, getClientInfo(src),
@@ -5755,7 +5755,7 @@ namespace wali
         State src = Trans::getCallSite(*cit);
         State tgt = Trans::getEntry(*cit);
 
-        if( isWild(Trans::getCallSym(*cit)) )
+        if( Trans::getCallSym(*cit) == WALI_WILD )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w
         else
           wgt = wg.getWeight(src, getClientInfo(src),
@@ -5786,7 +5786,7 @@ namespace wali
         State src = Trans::getExit(*rit);
         State tgt = Trans::getReturnSite(*rit);
 
-        if( isWild(Trans::getReturnSym(*rit)) )
+        if( Trans::getReturnSym(*rit) == WALI_WILD )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w 
         else
           wgt = wg.getWeight(src, getClientInfo(src), 
@@ -5846,7 +5846,7 @@ namespace wali
         State src = Trans::getSource(*iit);
         State tgt = Trans::getTarget(*iit);
         
-        if( isWild(Trans::getInternalSym(*iit)) )
+        if( Trans::getInternalSym(*iit) == WALI_WILD )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
         else
           wgt = wg.getWeight(src, getClientInfo(src),
@@ -5874,7 +5874,7 @@ namespace wali
             // and <p_q_erc,q_r> -1-> <p,q_c> in delta_1
             // where p_q_erc = (p,q_e,q_r,q_c) and w depends on sigma
             
-            if( isWild(Trans::getCallSym(*cit)) )
+            if( Trans::getCallSym(*cit) == WALI_WILD )
               wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w  
             else
               wgt = wg.getWeight(src, getClientInfo(src),
@@ -5909,7 +5909,7 @@ namespace wali
         State src = Trans::getExit(*rit);
         State tgt = Trans::getReturnSite(*rit);
 
-        if( isWild(Trans::getReturnSym(*rit)) )
+        if( Trans::getReturnSym(*rit) == WALI_WILD )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); //w
         else
           wgt = wg.getWeight(src, getClientInfo(src),
