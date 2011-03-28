@@ -64,14 +64,14 @@ Summary:
    LATER: Remove 'St' and 'Sym'.
 
 
-2. Move and clean ReachGen class.
+2. -- COMMITTED REV 928
+   -- Move and clean ReachGen class.
 
-   Move 'class ReachGen' from NWA.hpp to its own header. (I'm not quite sure
-   where. I think it's probably only used in NWA::isEmpty anyway.)
+   -- Move 'class ReachGen' from NWA.hpp to WeightGen.hpp.)
 
-   From the ReachGen class, remove the Kind enumeration (I think it's
-   unused), and the St and Sym typedefs (which will then refer to the
-   typedefs at the namespace level).
+   -- From the ReachGen class, remove the Kind enumeration (I think it's
+   -- unused), and the St and Sym typedefs (which will then refer to the
+   -- typedefs at the namespace level).
 
 
 3. Rename various things associated with StateSets.

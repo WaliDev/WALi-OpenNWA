@@ -34,8 +34,6 @@
 #  include "wali/nwa/RelationOps.hpp"
 #endif
 
-#include "wali/Reach.hpp"
-
 // std::c++
 #include <iostream>
 #include <sstream>
@@ -46,46 +44,6 @@ namespace wali
 {
   namespace nwa
   {
-
-    class ReachGen : public wali::nwa::WeightGen
-    {
-      public:
-        enum Kind {INTRA, CALL_TO_ENTRY, EXIT_TO_RET, CALL_TO_RET};
-        typedef wali::Key St;
-        typedef wali::Key Sym;
-         
-        //
-        // Methods
-        //
-          
-      public:
-        sem_elem_t getOne( )
-        {
-          static const Reach r(true);
-          return r.one();
-        }
-
-        sem_elem_t getWeight( const St & src, const Sym & inst, Kind k, const St & tgt )
-        {
-          (void) src;
-          (void) inst;
-          (void) k;
-          (void) tgt;
-          return getOne();
-        }
-           
-        sem_elem_t getWildWeight( const St & src, const St & tgt )
-        {
-          (void) src;
-          (void) tgt;
-          return getOne();
-        }
-    };
-
-
-    class NWA;
-    typedef ref_ptr<NWA> NWARefPtr;
-
     /**
      *
      * This class models nested word automata (NWA). 

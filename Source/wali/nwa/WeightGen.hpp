@@ -6,7 +6,9 @@
  */
 
 #include "wali/nwa/NWA.hpp"
- 
+#include "wali/Reach.hpp"
+
+
 namespace wali
 {
   namespace nwa
@@ -124,7 +126,41 @@ namespace wali
         (void) tgtInfo;
         return getOne();
       }
-    };      
+    };
+
+
+
+    class ReachGen : public wali::nwa::WeightGen
+    {
+      public:
+        //
+        // Methods
+        //
+          
+      public:
+        sem_elem_t getOne( )
+        {
+          static const Reach r(true);
+          return r.one();
+        }
+
+        sem_elem_t getWeight( const State & src, const Symbol & inst, Kind k, const State & tgt )
+        {
+          (void) src;
+          (void) inst;
+          (void) k;
+          (void) tgt;
+          return getOne();
+        }
+           
+        sem_elem_t getWildWeight( const State & src, const State & tgt )
+        {
+          (void) src;
+          (void) tgt;
+          return getOne();
+        }
+    };
+
   }
 }
 #endif
