@@ -1196,23 +1196,23 @@ namespace wali
 
           // Skip over epsilons. (A) they are handled in other places and
           // (B) there's no implicit epsilon transitions to stuck anyway.
-          if( symbol == SymbolStorage::getEpsilon() )
+          if( symbol == WALI_EPSILON )
           {
             continue;
           }
 
           //Skip over wilds.
-          if( symbol == SymbolStorage::getWild() )
+          if( symbol == WALI_WILD )
           {
             continue;
           }
 
-          if( !trans.callExists(state, symbol) && !trans.callExists(state, SymbolStorage::getWild()) )
+          if( !trans.callExists(state, symbol) && !trans.callExists(state, WALI_WILD) )
           {
             addCallTrans(state, symbol, getStuckState());
           }
 
-          if( !trans.internalExists(state, symbol) && !trans.internalExists(state, SymbolStorage::getWild()) )
+          if( !trans.internalExists(state, symbol) && !trans.internalExists(state, WALI_WILD) )
           {
             addInternalTrans(state, symbol, getStuckState());
           }
@@ -1220,7 +1220,7 @@ namespace wali
           for( stateIterator pred = beginStates(); pred != endStates(); ++pred )
           {
             if( returns.find(Triple<State,Symbol,State>(state, *pred, symbol)) == returns.end() 
-              && returns.find(Triple<State,Symbol,State>(state, *pred, SymbolStorage::getWild())) == returns.end() )
+              && returns.find(Triple<State,Symbol,State>(state, *pred, WALI_WILD)) == returns.end() )
             {
               addReturnTrans(state, *pred, symbol, getStuckState());
             }
@@ -4118,7 +4118,7 @@ namespace wali
       {
         for( stateIterator sit = second->beginInitialStates(); sit != second->endInitialStates(); sit++ )
         {
-          addInternalTrans(*fit,getEpsilon(),*sit);
+          addInternalTrans(*fit,WALI_EPSILON,*sit);
         }
       }
     }
@@ -4593,7 +4593,7 @@ namespace wali
       //Construct the epsilon closure relation for the states in nondet.
       SetBinaryRelation pre_close; //Collapse epsilon transitions.
       SetBinaryRelation Ie;   //Internal transitions with epsilon.
-      project_symbol_3<SetBinaryRelation>(Ie,nondet->trans.getInternals(),SymbolStorage::getEpsilon());
+      project_symbol_3<SetBinaryRelation>(Ie,nondet->trans.getInternals(), WALI_EPSILON);
 #ifdef USE_BUDDY
       transitive_closure(pre_close,Ie);
 #else
@@ -4651,13 +4651,13 @@ namespace wali
 #endif
         
         project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet->trans.getInternals(), *it);
-        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet->trans.getInternals(), SymbolStorage::getWild());
+        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet->trans.getInternals(), WALI_WILD);
 
         project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet->trans.getCalls(), *it);
-        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet->trans.getCalls(), SymbolStorage::getWild());   //Every symbol also matches wild.
+        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet->trans.getCalls(), WALI_WILD);   //Every symbol also matches wild.
 
         project_symbol_4(returnTransPerSymbol[*it], nondet->trans.getReturns(), *it);
-        project_symbol_4(returnTransPerSymbol[*it], nondet->trans.getReturns(),SymbolStorage::getWild());   //Every symbol also matches wild.
+        project_symbol_4(returnTransPerSymbol[*it], nondet->trans.getReturns(),WALI_WILD);   //Every symbol also matches wild.
       }
 
       
@@ -4694,7 +4694,7 @@ namespace wali
 #if 0
           DECLARE(BinaryRelation, IiOrig);
           project_symbol_3(IiOrig,nondet->trans.getInternals(),*it);   
-          project_symbol_3(IiOrig,nondet->trans.getInternals(),SymbolStorage::getWild());   //Every symbol also matches wild.
+          project_symbol_3(IiOrig,nondet->trans.getInternals(),WALI_WILD);   //Every symbol also matches wild.
           
           if (Ii == IiOrig) {
             std::cout << "Ii == IiOrig holds!\n";
@@ -4741,7 +4741,7 @@ namespace wali
 #if 0
           DECLARE(BinaryRelation, IcOrig);
           project_symbol_3(IcOrig,nondet->trans.getCalls(),*it);  
-          project_symbol_3(IcOrig,nondet->trans.getCalls(),SymbolStorage::getWild());   //Every symbol also matches wild.
+          project_symbol_3(IcOrig,nondet->trans.getCalls(),WALI_WILD);   //Every symbol also matches wild.
           
           if (Ic == IcOrig) {
             std::cout << "Ic == IcOrig holds!\n";
@@ -4783,7 +4783,7 @@ namespace wali
 #if 0
           TernaryRelation IrOrig;
           project_symbol_4(IrOrig,nondet->trans.getReturns(),*it);    
-          project_symbol_4(IrOrig,nondet->trans.getReturns(),SymbolStorage::getWild());   //Every symbol also matches wild.
+          project_symbol_4(IrOrig,nondet->trans.getReturns(),WALI_WILD);   //Every symbol also matches wild.
 
           if (Ir == IrOrig) {
             std::cout << "Ir == IrOrig holds!\n";
@@ -6534,7 +6534,7 @@ namespace wali
     void NWA::epsilonClosure( StateSet * newPairs, State st ) const
     {
       //compute the states reachable from st via epsilon transitions
-      Internals reachable = trans.getInternals(st,getEpsilon());
+      Internals reachable = trans.getInternals(st,WALI_EPSILON);
       for(  Internals::iterator it = reachable.begin(); it != reachable.end(); it++ )
       {
         State newSt = Trans::getTarget(*it);
@@ -6568,7 +6568,7 @@ namespace wali
       //Compute the cross produce of all states reachable from sp via epsilon transitions.
 
       //Explore epsilon transitions reachable from the first component of sp.
-      Internals reachable = first->trans.getInternals(sp.first,getEpsilon());
+      Internals reachable = first->trans.getInternals(sp.first, WALI_EPSILON);
       for(  Internals::iterator it = reachable.begin(); it != reachable.end(); it++ )
       {
         StatePair newSP = StatePair(Trans::getTarget(*it),sp.second);
@@ -6583,7 +6583,7 @@ namespace wali
       }
 
       //Explore epsilon transitions reachable from the second component of sp.
-      reachable = second->trans.getInternals(sp.second,getEpsilon());
+      reachable = second->trans.getInternals(sp.second, WALI_EPSILON);
       for(  Internals::iterator it = reachable.begin(); it != reachable.end(); it++ )
       {
         StatePair newSP = StatePair(sp.first,Trans::getTarget(*it));
