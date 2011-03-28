@@ -189,13 +189,16 @@ Summary:
     LATER: Remove NWS.
 
 
-12. Move class NestedWord to its own header, NestedWord.hpp.
+12. -- COMMITTED REV 927
 
-    Move class Configuration to NWA.cpp. Move implementation of
-    NWA::isMemberNondet to NWA.cpp.
+    -- Move class NestedWord to its own header, NestedWord.hpp. Moved
+    -- Configuration to Configuration.hpp (temp file). Added deprecated
+    -- typedefs in NWA to the new, namespace-level types.
 
-    (THESE ARE BREAKING CHANGES)
+    -- Move implementation of NWA::isMemberNondet to NWA.cpp.
 
+    LATER: Move class Configuration to NWA.cpp and remove
+           Configuration.hpp. Remove deprecated typedefs.
 
 13. Change functions in NWA which take a NWARefPtr parameter to take a
     (possibly const) reference instead. For each function, introduce an

@@ -1,4 +1,6 @@
-#include "NWA.hpp"
+#include "wali/nwa/NWA.hpp"
+#include "wali/nwa/Configuration.hpp"
+#include "wali/nwa/NestedWord.hpp"
 
 namespace wali
 {
@@ -6652,6 +6654,154 @@ namespace wali
       this->addAllSymbols(rhs->symbols);
       this->trans.addAllTrans(rhs->trans);
     }
+
+    bool
+    NWA::isMemberNondet( ::wali::nwa::NestedWord const & word ) const
+    {
+      typedef ::wali::nwa::Configuration Configuration;
+      
+      std::set<Configuration> nextConfigs;
+      for(stateIterator iter = beginInitialStates(); iter!=endInitialStates(); ++iter) {
+        nextConfigs.insert(Configuration(*iter));
+      }
+            
+      for( NestedWord::const_iterator curpos = word.begin();
+           curpos != word.end(); ++curpos)
+      {
+        // When we start this loop, 'nextConfigs' holds the
+        // *non-epsilon-closed* list of configurations we will use *this
+        // iteration*. We first compute the epsilon closure of these
+        // configurations, *then* update the variable currConfigs with the
+        // union of 'nextConfigs' and the closure. Then we can proceed with
+        // the simulation.
+        
+        // First, we take the epsilon closure of the current configuration set.
+        std::set<Configuration> currConfigs;
+        for( std::set<Configuration>::const_iterator config = nextConfigs.begin();
+             config != nextConfigs.end(); ++config)
+        {
+          StateSet closure;
+          epsilonClosure(&closure, config->state);
+          
+          for(StateSet::const_iterator other = closure.begin();
+              other != closure.end(); ++other)
+          {
+            Configuration c(*config);
+            c.state = *other;
+            currConfigs.insert(c);
+          }
+          
+          // TODO: Remove this once e-close includes the starting state
+          Configuration c(*config);
+          currConfigs.insert(c);
+        }
+        
+        // Third, we clear out nextConfigs
+        nextConfigs.clear();
+        
+        // Do something different depending on whether the current position is
+        // a call, return, or internal symbol. But in all cases, put the possible
+        // next configurations in here:
+        if( curpos->type == NestedWord::Position::ReturnType )  {   //Denotes a return transition.
+          // Determine the possible next configurations for each current config.
+          // We need to look at the current state as well as the top of the 
+          // call stack in each case.
+          for( std::set<Configuration>::const_iterator config = currConfigs.begin();
+               config != currConfigs.end(); ++config)
+            {
+              // Use trans.getReturns to get the matching return transitions out
+              // of the "current" state, then separately check to see whether the
+              // call predecessor matches.
+              Returns rets = trans.getReturns(config->state, curpos->symbol);
+              for( ReturnIterator rit = rets.begin(); rit != rets.end(); rit++ ) {
+                if( Trans::getCallSite(*rit) == config->callPredecessors.back() ) {
+                  // Construct a new configuration that's the same as the old
+                  // configuration, except with a popped stack and new state
+                  Configuration c(*config);
+                  c.callPredecessors.pop_back();
+                  c.state = Trans::getReturnSite(*rit);
+                  nextConfigs.insert(c);
+                }
+              }
+            }
+        }
+        else if( curpos->type == NestedWord::Position::CallType ) {  //Denotes a call transition.
+          // Determine the possible next configurations for each current config.
+          // Now we just need to look at outgoing transitions.
+          for( std::set<Configuration>::const_iterator config = currConfigs.begin();
+               config != currConfigs.end(); ++config)
+          {
+            Calls calls = trans.getCalls(config->state, curpos->symbol);
+            for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ ) {
+              // Construct a new configuration that's the same as the old
+              // configuration, except with a pushed stack and new state
+              Configuration c(*config);
+              c.callPredecessors.push_back(config->state);
+              c.state = Trans::getEntry(*cit);
+              nextConfigs.insert(c);
+            }
+          }
+        }
+        else {   //Must be an internal transition.
+          // Determine the possible next configurations for each current config.
+          // Now we just need to look at outgoing transitions.
+          for( std::set<Configuration>::const_iterator config = currConfigs.begin();
+               config != currConfigs.end(); ++config)
+          {
+            Internals ints = trans.getInternals(config->state, curpos->symbol);
+            for( InternalIterator iit = ints.begin(); iit != ints.end(); iit++ ) {
+              // Construct a new configuration that's the same as the old
+              // configuration, except with a new state
+              Configuration c(*config);
+              c.state = Trans::getTarget(*iit);
+              nextConfigs.insert(c);
+            }
+          }
+        }
+      } 
+            
+      // Just like when we started this loop, 'nextConfigs' holds the non-epsilon-closed
+      // list of configurations found after the last symbol was read. Before we check
+      // whether we wound up in an accepting state, we have to close again.
+            
+      // First, we take the epsilon closure of the current configuration set.
+      std::set<Configuration> currConfigs;
+      for( std::set<Configuration>::const_iterator config = nextConfigs.begin();
+           config != nextConfigs.end(); ++config)
+      {
+        StateSet closure;
+        epsilonClosure(&closure, config->state);
+                
+        for( StateSet::const_iterator other = closure.begin();
+             other != closure.end(); ++other)
+        {
+          Configuration c(*config);
+          c.state = *other;
+          currConfigs.insert(c);
+        }
+
+        // TODO: Remove this once e-close includes the starting state
+        Configuration c(*config);
+        currConfigs.insert(c);
+      }
+            
+      //At the end of the word, if we are in a final state,
+      //then return true
+      for( std::set<Configuration>::const_iterator config = currConfigs.begin();
+           config != currConfigs.end(); ++config)
+      {
+        if (isFinalState(config->state)) {
+          if (config->callPredecessors.size() != 0) {
+            std::cerr << "Alert! In SimulateWordNondet, we are ending in a final state with nonempty stack!\n";
+            exit(20);
+          }
+          return true;
+        }
+      }
+            
+      return false;
+    }
+
   }
 }
 
