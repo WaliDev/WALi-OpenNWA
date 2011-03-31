@@ -665,40 +665,26 @@
 					RelativePath="..\..\..\Source\wali\nwa\NWA.cpp"
 					>
 				</File>
-				<File
-					RelativePath="..\..\..\Source\wali\nwa\StateSet.cpp"
+				<Filter
+					Name="details"
 					>
-				</File>
-				<File
-					RelativePath="..\..\..\source\wali\nwa\SymbolSet.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\Source\wali\nwa\TransInfo.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\Source\wali\nwa\TransSet.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
+					<File
+						RelativePath="..\..\..\Source\wali\nwa\details\StateStorage.cpp"
 						>
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)\$(InputName)1.obj"
-							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
+					</File>
+					<File
+						RelativePath="..\..\..\Source\wali\nwa\details\SymbolStorage.cpp"
 						>
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)\$(InputName)1.obj"
-							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-						/>
-					</FileConfiguration>
-				</File>
+					</File>
+					<File
+						RelativePath="..\..\..\Source\wali\nwa\details\TransitionInfo.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\Source\wali\nwa\details\TransitionStorage.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1106,7 +1092,27 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\Source\wali\nwa\Configuration.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\nwa\deprecate.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\nwa\NestedWord.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\Source\wali\nwa\NWA.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\nwa\NWAFwd.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Source\wali\nwa\NWAParser.hpp"
 					>
 				</File>
 				<File
@@ -1114,15 +1120,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Source\wali\nwa\State.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\Source\wali\nwa\StateSet.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\Source\wali\nwa\Symbol.hpp"
 					>
 				</File>
 				<File
@@ -1145,6 +1143,26 @@
 					RelativePath="..\..\..\Source\wali\nwa\WordRecConfig.hpp"
 					>
 				</File>
+				<Filter
+					Name="details"
+					>
+					<File
+						RelativePath="..\..\..\Source\wali\nwa\details\StateStorage.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\Source\wali\nwa\details\SymbolStorage.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\Source\wali\nwa\details\TransitionInfo.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\Source\wali\nwa\details\TransitionStorage.hpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
