@@ -28,7 +28,7 @@ namespace wali
     class NWA;
     typedef ref_ptr<NWA> NWARefPtr;
 
-    class Configuration;
+    struct Configuration;
     class NestedWord;
   }
 }
