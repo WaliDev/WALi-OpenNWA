@@ -68,6 +68,9 @@ There are three special elements:
 Note that zero is a different element from the
 element (Univ, emptyset)
 
+The implementation maintains unique representations
+for zero
+
 */
 template< typename Set > class GenKillTransformer_T : public wali::SemElem {
 public: // methods
@@ -170,27 +173,22 @@ public: // methods
   sem_elem_t extend( SemElem* _y ) // FIXME: const: wali::SemElem::extend is not declared as const
   {
       // Handle special case for either argument being zero()
-      if( this->equal(zero()) ) {
-          return zero();
+      if( this->equal(zero()) || _y->equal(zero()) ) {
+        return zero(); // zero extend _y = zero; this extend zero = zero
       }
-      else if( _y->equal(zero()) ) {
-          return zero();
-      }
-      // Handle special case for either argument being one().
+
+      // Handle special case for either argument being one()
       if( this->equal(one()) ) {
-          return _y;
+        return _y; // one extend _y = _y
       }
       else if( _y->equal(one()) )
       {
-          if(this->equal(one())) {
-              return one();
-          }
-          else if(this->equal(bottom())) {
-              return bottom();
-          }
-          else {
-              return this;
-          }
+        return this; // this extend one = this
+      }
+
+      if( _y->equal(bottom()) )
+      {
+        return bottom();
       }
 
       const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>(_y);
@@ -205,19 +203,15 @@ public: // methods
   {
       // Handle special case for either argument being zero()
       if( this->equal(zero()) ) {
-          return _y;
+        return _y; // zero combine _y = _y
       }
-      else if( _y->equal(zero()) ) 
-      {
-          if(this->equal(one())) {
-              return one();
-          }
-          else if(this->equal(bottom())) {
-              return bottom();
-          }
-          else {
-              return this;
-          }
+      if( _y->equal(zero()) ) {
+        return this; // this combine zero = this
+      }
+
+      // Handle special case for either argument being bottom()
+      if( this->equal(bottom()) || _y->equal(bottom()) ) {
+        return bottom(); // bottom combine _y = bottom; this combine bottom = bottom 
       }
 
       const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>(_y);
@@ -246,21 +240,17 @@ public: // methods
   //
   sem_elem_t diff( SemElem* _y ) const
   {
-      // Handle special case for either argument being zero
+      // Handle special case for either argument being zero()
       if( this->equal(zero()) ) {
-          return zero();
+        return zero(); // zero - _y = zero
       }
-      else if( _y->equal(zero()) ) 
-      {
-          if(this->equal(one())) {
-              return one();
-          }
-          else if(this->equal(bottom())) {
-              return bottom();
-          }
-          else {
-              return this;
-          }
+      if( _y->equal(zero()) ) {
+        return this; // this - zero = this
+      }
+
+      // Handle special case for second argument being bottom()
+      if( _y->equal(bottom()) ) {
+        return zero(); // this - bottom = zero
       }
 
       const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>(_y);
@@ -276,10 +266,15 @@ public: // methods
   // by address rather by its contained Gen/Kill sets.
   bool isEqual(const GenKillTransformer_T* y) const
   {
-    // covers comparisons for two zeros, two ones, two bottoms, or invoking isEqual on itself 
+    // Check for identical arguments: could be two special values (i.e., two zeros,
+    // two ones, or two bottoms) or two identical instances of a non-special semiring value. 
     if(this == y) return true;
 
-    // covers cases when one of the params is zero 
+    // Return false if any argument is zero.
+    // Zero has a unique representative, and thus the return value could
+    // only be true via the preceding check for identicalness.
+    // The same approach could be taken for one and bottom, but the
+    // extra tests are not worth it.
     if(this->IsZero() || y->IsZero())
       return false;
 
