@@ -141,7 +141,8 @@ Summary:
    -- 'callIterator', 'internalIterator', and 'returnIterator'. Replace with
    -- capitalized versions of the same ('StateIterator', etc.)
 
-   LATER: Remove deprecated typedefs
+   -- LATER: COMMITTED REV 937
+   --        Remove deprecated typedefs
 
 
 6. Change NWA::XMLTag to a static const field instead of a member function.

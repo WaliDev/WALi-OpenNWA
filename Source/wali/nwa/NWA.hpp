@@ -77,13 +77,6 @@ namespace wali
         typedef  Trans::Internals Internals;
         typedef  Trans::Returns Returns;
 
-        DEPRECATE("Use capitalized version (CallIterator) instead")
-        typedef  Trans::CallIterator callIterator;
-        DEPRECATE("Use capitalized version (InternalIterator) instead")
-        typedef  Trans::InternalIterator internalIterator;
-        DEPRECATE("Use capitalized version (ReturnIterator) instead")
-        typedef  Trans::ReturnIterator returnIterator;
-
         typedef  Trans::CallIterator CallIterator;
         typedef  Trans::InternalIterator InternalIterator;
         typedef  Trans::ReturnIterator ReturnIterator;
