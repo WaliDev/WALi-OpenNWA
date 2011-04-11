@@ -224,19 +224,6 @@ namespace wali
        *
        */
       const  StateSet & getStates( ) const;
-      /**
-       *   
-       * @brief provides access to all states in the NWA
-       *
-       * This method provides access to all states.
-       * Note: This method simply calls getStates( ).  It is here to make the transition
-       *        from using PDS to using NWA easier.
-       *
-       * @return a set of all states 
-       *
-       */
-      DEPRECATE("Use NWA::getStates")
-      const  StateSet & get_states( ) const;
 
       /**
        * 
@@ -249,20 +236,6 @@ namespace wali
        *
        */
       bool isState( State state ) const; 
-      /**
-       * 
-       * @brief test if a given state is a state of this NWA
-       *
-       * This method tests whether the given state is in the state set of this NWA.
-       * Note: This method simply calls isState( state ).  It is here to make the transition
-       *        from using PDS to using NWA easier.
-       *
-       * @param - state: the state to check
-       * @return true if the given state is a state of this NWA
-       *
-       */
-      DEPRECATE("Use NWA::isState")
-      bool is_nwa_state( State state ) const;
 
      /**
        *  
@@ -290,19 +263,6 @@ namespace wali
        *
        */
       size_t sizeStates( ) const;
-      /**
-       *
-       * @brief returns the number of states associated with this NWA
-       *
-       * This method returns the number of states associated with this NWA.
-       * Note: This method simply calls sizeStates( ).  It is here to make the transition
-       *        from using PDS to using NWA easier.
-       *
-       * @return the number of states associated with this NWA
-       *
-       */
-      DEPRECATE("Use sizeStates()")
-      int num_nwa_states( ) const;
 
       int largestState() const {
         return states.largestState();
@@ -999,19 +959,6 @@ namespace wali
        *
        */
       size_t sizeTrans( ) const;
-      /**
-       *
-       * @brief returns the number of transitions associated with this NWA
-       *
-       * This method returns the number of transitions associated with this NWA.  
-       * Note: This method simply calls sizeTrans( ).  It is here to make the transition
-       *        from using PDS to using NWA easier.
-       *
-       * @return the number of transitions associated with this NWA
-       *
-       */
-      DEPRECATE("Use sizeTrans")
-      int count_rules( ) const;
 
       /**
        *

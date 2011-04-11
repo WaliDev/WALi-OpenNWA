@@ -173,14 +173,14 @@ Summary:
    -- after old StateSet and SymbolSet classes are removed in refactoring 3, stage 2.
    
 
-
-9. -- COMMITTED REV 921
-   -- Deprecate "exact" duplicate functions.
-
-   -- In class 'NWA', deprecate functions 'get_states', 'is_nwa_state', and
-   -- 'num_nwa_states', 'count_rules'.
-
-   LATER: Remove deprecated functions
+-- 9. COMMITTED REV 921
+--    Deprecate "exact" duplicate functions.
+-- 
+--    In class 'NWA', deprecate functions 'get_states', 'is_nwa_state', and
+--    'num_nwa_states', 'count_rules'.
+-- 
+--    LATER: COMMITTED REV 943
+--           Remove deprecated functions
 
 
 10. Move 'NWA::getProgramControlLocation' and 'NWA::getControlLocation'

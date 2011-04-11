@@ -109,21 +109,6 @@ namespace wali
     {
       return states.getStates();
     }
-    /**
-     *   
-     * @brief provides access to all states in the NWA
-     *
-     * Note: This method simply calls getStates( ).  It is here to make the transition
-     *        from using PDS to using NWA easier.
-     *
-     * @return a set of all states 
-     *
-     */
-    
-    const NWA::StateSet & NWA::get_states( ) const
-    {
-      return getStates();
-    }
 
     /**
      * 
@@ -138,22 +123,6 @@ namespace wali
     {
       assert(state < wali::WALI_BAD_KEY);
       return states.isState(state);
-    }
-    /**
-     * 
-     * @brief test if a given state is a state of this NWA
-     *
-     * Note: This method simply calls isState( state ).  It is here to make the transition
-     *        from using PDS to using NWA easier.
-     *
-     * @param - state: the state to check
-     * @return true if the given state is a state of this NWA
-     *
-     */
-    
-    bool NWA::is_nwa_state( State state ) const
-    {
-      return isState(state);
     }
 
     /**
@@ -195,12 +164,6 @@ namespace wali
      *
      */
     
-    
-    int NWA::num_nwa_states( ) const
-    {
-      return sizeStates();      
-    }
-
     /**
      *  
      * @brief remove the given state from this NWA
@@ -1244,30 +1207,12 @@ namespace wali
     {
       return trans.size();
     }
-    /**
-     *
-     * @brief returns the number of transitions associated with this NWA
-     *
-     * Note: This method simply calls sizeTrans( ).  It is here to make the transition
-     *        from using PDS to using NWA easier.
-     *
-     * @return the number of transitions associated with this NWA
-     *
-     */
-    
-    
-    int NWA::count_rules( ) const
-    {
-      return sizeTrans();
-    }
 
     /**
      *
      * @brief remove all transitions from the NWA
      *
      */
-    
-    
     void NWA::clearTrans( )
     {
       //assert(stuck);
