@@ -3577,13 +3577,5 @@ namespace wali
 }
 
 
-
-// TODO: remove this at end of refactoring. This is to make sure that my
-// backwards-compatibility attempts are OK.
-#include "wali/nwa/StateSet.hpp"
-#include "wali/nwa/SymbolSet.hpp"
-#include "wali/nwa/TransSet.hpp"
-#include "wali/nwa/TransInfo.hpp"
-
 #endif
 

@@ -131,7 +131,7 @@ Summary:
 --    In class NWA, deprecate the typedef of 'Symbols'. Replace it with one
 --    named 'SymbolStorage'.
 -- 
---    LATER: COMMITTED REV 939
+--    LATER: COMMITTED REV 939 (typedef and headers) and 941 (use of headers)
 --           Remove deprecated typedef and headers.
 --
 --
