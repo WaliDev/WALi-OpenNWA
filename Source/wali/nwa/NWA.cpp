@@ -1,5 +1,5 @@
 #include "wali/nwa/NWA.hpp"
-#include "wali/nwa/Configuration.hpp"
+#include "wali/nwa/details/Configuration.hpp"
 #include "wali/nwa/NestedWord.hpp"
 
 namespace wali
@@ -6603,7 +6603,7 @@ namespace wali
     bool
     NWA::isMemberNondet( ::wali::nwa::NestedWord const & word ) const
     {
-      typedef ::wali::nwa::Configuration Configuration;
+      typedef ::wali::nwa::details::Configuration Configuration;
       
       std::set<Configuration> nextConfigs;
       for(stateIterator iter = beginInitialStates(); iter!=endInitialStates(); ++iter) {
