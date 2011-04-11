@@ -55,8 +55,6 @@ namespace wali
       public:
         typedef ClientInfo Client;
 
-        DEPRECATE("If you have to use this, talk to Evan.")
-        typedef details::StateStorage States;
         typedef details::StateStorage StateStorage;
       
         typedef  StateStorage::const_iterator stateIterator;

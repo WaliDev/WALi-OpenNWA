@@ -36,8 +36,6 @@ namespace wali
     {
       public:
         typedef ClientInfo Client;
-        DEPRECATE("Use StateSet instead")
-        typedef std::set<State> States;
         typedef std::set<State> StateSet;
         typedef StateSet::const_iterator const_iterator;   
         typedef StateSet::iterator iterator; 

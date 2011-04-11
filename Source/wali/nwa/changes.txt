@@ -99,8 +99,11 @@ Summary:
    -- Deprecate the typedef 'NWA::States'. Add a new typedef 'StateStorage' in
    -- its place. Change uses of 'States' to 'StateStorage'.
 
-   LATER: Remove deprecated typedefs: 'NWA::States', 'NWA::StateSet',
-          and 'StateStorage::States', and remove the StateSet.hpp header.
+   -- LATER: COMMITTED REV 942. (StateSet.hpp was removed in 939, 941, w/ #4)
+   --        Remove deprecated typedefs: 'NWA::States', 
+   --        and 'StateStorage::States', and remove the StateSet.hpp header.
+   --        ('NWA::StateSet' was in this list but that was a mistake; see
+   --        below.)
 
    LATER: Add a typedef 'StateSet' (from std::set<State>) at namespace level
           (wali::nwa). Remove the 'StateSet' typedef in StateStorage, and let
