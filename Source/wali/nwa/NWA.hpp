@@ -2871,52 +2871,6 @@ namespace wali
 
       /**
        *
-       * @brief tests whether the given nested word is a member of the language accepted 
-       *        by the given NWA
-       *
-       * This method tests whether the given nested word is a member of the language 
-       * accepted by the given NWA.
-       *
-       * @param - word: the nested word to test
-       * @param - aut: the NWA to check the word on
-       * @return true if the given nested word is a member of the language accepted by 
-       *          the given NWA
-       *
-       */
-      DEPRECATE("I don't think anyone is using this NWS class or this method. If you disagree, talk to Evan.")
-      static bool isMember( nws::NWS word, NWARefPtr aut )
-      {
-
-        //Q: should we try to walk the automata according to the word using WordRecConfig
-        //    or determinize and then step through?
-        //A: determinizing and stepping through will be easier to understand and depending
-        //    on the optimization of determinize will probably be more efficient
-        
-        if( aut->isDeterministic() )
-        {
-          return simulateWord(word,aut);
-        }
-        else
-        {
-          //Q: what should be used as the stuck states here?
-          //A: it needs to be something no a state in 'aut' unless it is the stuck state
-          std::string s = "stuck";
-          Key ss = getKey(s);
-          while( aut->isState(ss) && !aut->isStuckState(ss) )
-          {
-            s = s + "~";
-            ss = getKey(s);
-          }
-
-          NWARefPtr tmp(new NWA(ss));
-          tmp->determinize(aut);
-
-          return simulateWord(word,tmp);
-        }
-      }
-
-      /**
-       *
        * @brief tests whether the language of the first NWA is included in the language of 
        *        the second NWA
        *
@@ -3357,6 +3311,7 @@ namespace wali
        *          the given deterministic NWA
        *
        */
+      DEPRECATE("I don't think anyone is using this NWS class or this method. If you disagree, talk to Evan.")       
       static bool simulateWord( nws::NWS word, NWARefPtr aut )
       {
         //Note: For now require that 'word' be a perfectly balanced nested word.

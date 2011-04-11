@@ -192,8 +192,9 @@ Summary:
 
 11. -- SOME WORK COMMITTED IN REV 924, but had to break into several stages
     -- Deprecate class WordRecConfig, NWA::isMember, class NWP.
-    
-    LATER: Remove WordRecConfig, NWA::isMember, NWP. Deprecate NWA::simulateWord.
+ 
+    -- LATER: COMMITED REV 945   
+    --        Remove WordRecConfig, NWA::isMember, NWP. Deprecate NWA::simulateWord.
 
     LATER: Remove NWA::simulateWord. Deprecate class NWS.
 
