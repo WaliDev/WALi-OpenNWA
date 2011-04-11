@@ -150,7 +150,8 @@ Summary:
 --           Remove deprecated typedefs
 -- 
 -- 
--- 6. Change NWA::XMLTag to a static const field instead of a member function.
+-- 6. COMMITTED REV 949
+--    Change NWA::XMLTag to a static const field instead of a member function.
 -- 
 --    (THIS IS A BREAKING CHANGE)
 -- 
