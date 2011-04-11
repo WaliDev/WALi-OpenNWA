@@ -220,25 +220,27 @@ Summary:
 --            Remove deprecated typedefs.
 
 
-13. Change functions in NWA which take a NWARefPtr parameter to take a
+13. COMMITTED REVS: 951, ...
+
+    Change functions in NWA which take a NWARefPtr parameter to take a
     (possibly const) reference instead. For each function, introduce an
     overload for the RefPtr version, and deprecate it.
 
-    Here is the list:
-      projectStates
-      unionNWA    (two overloads)
-      intersect   (two overloads)
+    Here is the list:                                     COMMITTED REV:
+      projectStates                                       951
+      unionNWA    (two overloads)                         951
+      intersect   (two overloads)                         951
       concat      (two overloads)
       reverse     (two overloads)
       star        (two overloads)
       complement  (two overloads)
       determinize (two overloads)
-      overlap
-      intersectClientInfoCall
-      intersectClientInfoInternal
-      intersectClientInfoReturn
-      stateIntersect
-      transitionIntersect
+      overlap                                             951
+      intersectClientInfoCall                             951
+      intersectClientInfoInternal                         951
+      intersectClientInfoReturn                           951
+      stateIntersect                                      951
+      transitionIntersect                                 951
       mergeClientInfo
       mergeClientInfoCall
       mergeClientInfoInternal
@@ -250,7 +252,7 @@ Summary:
       NWAtoBackwardsPDScalls   (only static version)
       inclusion
       equal
-      epsilonClosure (only one of the two overloads)
+      epsilonClosure (only one of the two overloads)      951
 
     LATER: Remove deprecated functions
 

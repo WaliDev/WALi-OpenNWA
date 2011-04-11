@@ -3085,13 +3085,13 @@ namespace wali
     * provided
     */
     
-    void NWA::projectStates(const NWARefPtr &other, const StateSet &prjStates)
+    void NWA::projectStates(const NWA & other, const StateSet &prjStates)
     {
       //copy data from other
-      stuck = other->stuck;
-      states = other->states;
-      symbols = other->symbols;
-      trans = other->trans;
+      stuck = other.stuck;
+      states = other.states;
+      symbols = other.symbols;
+      trans = other.trans;
 
       //for( std::set<St>::const_iterator it = prjStates.begin(); it!=prjStates.end(); it++) {
       //  bool b = removeState(*it);
@@ -3126,7 +3126,7 @@ namespace wali
      *
      */
     
-    void NWA::unionNWA( NWARefPtr first, NWARefPtr second )
+    void NWA::unionNWA( NWA const & first, NWA const & second )
     {
       //Q: Do we need to guarantee that there is no overlap in states between machines? 
       //A: YES
@@ -3149,10 +3149,10 @@ namespace wali
 
       //Check that the stuck state of this NWA does not exist as a state in either component machine 
       //('first' and 'second') unless it is the stuck state of that machine.
-      if(! first->isStuckState(getStuckState()) )
-        assert(! first->isState(getStuckState()) );
-      if(! second->isStuckState(getStuckState()) )
-        assert(! second->isState(getStuckState()) );
+      if(! first.isStuckState(getStuckState()) )
+        assert(! first.isState(getStuckState()) );
+      if(! second.isStuckState(getStuckState()) )
+        assert(! second.isState(getStuckState()) );
 
 	    //Clear all states(except the stuck state) and transitions from this machine.
       State stuckSt = getStuckState();
@@ -3164,12 +3164,12 @@ namespace wali
 
       //Copy all of the functionality of the two machines.  
       //States (Initial and final state information included.)
-      states.addAll(first->states);   //Note: This includes copying clientInfo information over.  
-      states.addAll(second->states);  //Note: This includes copying clientInfo information over.
+      states.addAll(first.states);   //Note: This includes copying clientInfo information over.  
+      states.addAll(second.states);  //Note: This includes copying clientInfo information over.
 
       //Transitions (Call, internal, and return.)
-      trans.addAllTrans(first->trans);
-      trans.addAllTrans(second->trans);      
+      trans.addAllTrans(first.trans);
+      trans.addAllTrans(second.trans);      
     }
 
     bool NWA::isTransitionPossible( const State &src, const Symbol &sym, const State &tgt) 
@@ -3189,7 +3189,7 @@ namespace wali
      *	
      */
     
-    void NWA::intersect( NWARefPtr first, NWARefPtr second ) 
+    void NWA::intersect( NWA const & first, NWA const & second ) 
     {
       //TODO: ponder the following ...
       //Q: how do we prevent the stuck state from being the same as any of the states that we
@@ -3225,9 +3225,9 @@ namespace wali
                              // for all intersectable pairs encountered
 
       //Start the worklist with all possible initial states of the intersection NWA.
-      for( stateIterator fit = first->beginInitialStates(); fit != first->endInitialStates(); fit++ ) 
+      for( stateIterator fit = first.beginInitialStates(); fit != first.endInitialStates(); fit++ ) 
       {
-        for( stateIterator sit = second->beginInitialStates(); sit != second->endInitialStates(); sit++ ) 
+        for( stateIterator sit = second.beginInitialStates(); sit != second.endInitialStates(); sit++ ) 
         {
           State newSt;
           StatePair sp(*fit,*sit);
@@ -3237,7 +3237,7 @@ namespace wali
           {
             addInitialState(newSt); 
             //an initial state could also be a final state.
-            if(first->isFinalState(*fit) && second->isFinalState(*sit))
+            if(first.isFinalState(*fit) && second.isFinalState(*sit))
                 addFinalState(newSt);
 
             //Attach client info to the newly created state.
@@ -3262,7 +3262,7 @@ namespace wali
             {
               addInitialState(st);
               //an initital state could also be a final state
-              if( first->isFinalState(it->first) && second->isFinalState(it->second) )
+              if( first.isFinalState(it->first) && second.isFinalState(it->second) )
                 addFinalState(st);
 
               //Attach client info to the newly created state.
@@ -3282,8 +3282,8 @@ namespace wali
         worklistPairs.pop_front();
 
         //Process outgoing call transitions
-        Calls firstCalls = first->trans.getTransCall(currpair.first);
-        Calls secondCalls = second->trans.getTransCall(currpair.second);
+        Calls firstCalls = first.trans.getTransCall(currpair.first);
+        Calls secondCalls = second.trans.getTransCall(currpair.second);
         for(  Calls::const_iterator fit = firstCalls.begin(); fit != firstCalls.end(); fit++ ) 
         {
           Symbol firstSym = Trans::getCallSym(*fit);
@@ -3316,7 +3316,7 @@ namespace wali
                 continue;
               newlyCreatedResSt = true;
               // We have a new state in resSt!
-              if( first->isFinalState(firstEntry) && second->isFinalState(secondEntry) )
+              if( first.isFinalState(firstEntry) && second.isFinalState(secondEntry) )
                 addFinalState(resSt);
               else
                 addState(resSt);
@@ -3354,7 +3354,7 @@ namespace wali
                     if( stateIntersect(first,it->first,second,it->second,st,CI) )
                     {
                         newlycreated = true;
-                        if( first->isFinalState(it->first) && second->isFinalState(it->second) )
+                        if( first.isFinalState(it->first) && second.isFinalState(it->second) )
                             addFinalState(st);
                         else
                             addState(st); 
@@ -3410,8 +3410,8 @@ namespace wali
         }
 
         // Process outgoing internal transitions
-        Internals firstInternals = first->trans.getTransFrom(currpair.first);
-        Internals secondInternals = second->trans.getTransFrom(currpair.second);
+        Internals firstInternals = first.trans.getTransFrom(currpair.first);
+        Internals secondInternals = second.trans.getTransFrom(currpair.second);
         for(  Internals::const_iterator fit = firstInternals.begin(); fit != firstInternals.end(); fit++ ) 
         {
           Symbol firstSym = Trans::getInternalSym(*fit);
@@ -3444,7 +3444,7 @@ namespace wali
                 continue;
               newlyCreatedResSt = true;
               // We have a new state in resSt!
-              if( first->isFinalState(firstTgt) && second->isFinalState(secondTgt) )
+              if( first.isFinalState(firstTgt) && second.isFinalState(secondTgt) )
                 addFinalState(resSt);
               else
                 addState(resSt);
@@ -3480,7 +3480,7 @@ namespace wali
                     ClientInfoRefPtr CI;
                     if( stateIntersect(first,it->first,second,it->second,st,CI) )
                     {
-                        if( first->isFinalState(it->first) && second->isFinalState(it->second) )
+                        if( first.isFinalState(it->first) && second.isFinalState(it->second) )
                             addFinalState(st);
                         else
                             addState(st); 
@@ -3534,8 +3534,8 @@ namespace wali
         
         // Process outgoing return transitions where currpair.first and currpair.second are
         // both exit components of the respective return transitions
-        Returns firstReturns = first->trans.getTransExit(currpair.first);
-        Returns secondReturns = second->trans.getTransExit(currpair.second);
+        Returns firstReturns = first.trans.getTransExit(currpair.first);
+        Returns secondReturns = second.trans.getTransExit(currpair.second);
         for(  Returns::const_iterator fit = firstReturns.begin(); fit != firstReturns.end(); fit++ ) 
         {
           State firstCall = Trans::getCallSite(*fit);
@@ -3578,7 +3578,7 @@ namespace wali
                 continue;
               // We have found a new state in retSt!
               newlyCreatedRetSt = true;
-              if( first->isFinalState(firstRet) && second->isFinalState(secondRet) )
+              if( first.isFinalState(firstRet) && second.isFinalState(secondRet) )
                 addFinalState(retSt);
               else
                 addState(retSt);
@@ -3613,7 +3613,7 @@ namespace wali
                     ClientInfoRefPtr CI;
                     if( stateIntersect(first,it->first,second,it->second,st,CI) )
                     {
-                        if( first->isFinalState(it->first) && second->isFinalState(it->second) )
+                        if( first.isFinalState(it->first) && second.isFinalState(it->second) )
                             addFinalState(st);
                         else
                             addState(st);
@@ -3662,8 +3662,8 @@ namespace wali
 
         // Process outgoing return transitions where currpair.first and currpair.second are
         // both call components of the respective return transitions 
-        firstReturns = first->trans.getTransPred(currpair.first);
-        secondReturns = second->trans.getTransPred(currpair.second);
+        firstReturns = first.trans.getTransPred(currpair.first);
+        secondReturns = second.trans.getTransPred(currpair.second);
         for(  Returns::const_iterator fit = firstReturns.begin(); fit != firstReturns.end(); fit++ ) 
         {
           State firstExit = Trans::getExit(*fit);
@@ -3706,7 +3706,7 @@ namespace wali
                 continue;
               // We have a new state in retSt!
               newlyCreatedRetSt = true;
-              if( first->isFinalState(firstRet) && second->isFinalState(secondRet) )
+              if( first.isFinalState(firstRet) && second.isFinalState(secondRet) )
                 addFinalState(retSt);
               else
                 addState(retSt);
@@ -3741,7 +3741,7 @@ namespace wali
                     ClientInfoRefPtr CI;
                     if( stateIntersect(first,it->first,second,it->second,st,CI) )
                     {
-                        if( first->isFinalState(it->first) && second->isFinalState(it->second) )
+                        if( first.isFinalState(it->first) && second.isFinalState(it->second) )
                             addFinalState(st);
                         else
                             addState(st); 
@@ -4033,7 +4033,7 @@ namespace wali
       assert(stuck);
 
       //Test state Key overlap of the two NWAs.
-      assert(! overlap(first,second) );
+      assert(! overlap(*first,* second) );
 
       //Check that the stuck state of this NWA does not exist as a state in either component machine 
       //('first' and 'second') unless it is the stuck state of that machine.
@@ -4995,8 +4995,8 @@ namespace wali
      *
      */
     
-    void NWA::intersectClientInfoCall( NWARefPtr first, State call1, State entry1, 
-                                               NWARefPtr second, State call2, State entry2, 
+    void NWA::intersectClientInfoCall( NWA const & first, State call1, State entry1, 
+                                               NWA const & second, State call2, State entry2, 
                                                Symbol resSym, State resSt )
     {
       (void) first, (void) call1, (void) entry1, (void) second;
@@ -5027,8 +5027,8 @@ namespace wali
      *
      */
     
-    void NWA::intersectClientInfoInternal( NWARefPtr first, State src1, State tgt1, 
-                                                   NWARefPtr second, State src2, State tgt2, 
+    void NWA::intersectClientInfoInternal( NWA const & first, State src1, State tgt1, 
+                                                   NWA const & second, State src2, State tgt2, 
                                                    Symbol resSym, State resSt )
     {
       (void) first, (void) src1, (void) tgt1, (void) second, (void) src2;
@@ -5063,8 +5063,8 @@ namespace wali
      *
      */
     
-    void NWA::intersectClientInfoReturn( NWARefPtr first, State exit1, State call1, State ret1,
-                                                 NWARefPtr second, State exit2, State call2, State ret2,
+    void NWA::intersectClientInfoReturn( NWA const & first, State exit1, State call1, State ret1,
+                                                 NWA const & second, State exit2, State call2, State ret2,
                                                  Symbol resSym, State resSt )
     {
       (void) first, (void) exit1, (void) call1, (void) ret1, (void) second;
@@ -5086,7 +5086,7 @@ namespace wali
      *
      */
     
-    bool NWA::stateIntersect( NWARefPtr first, State state1, NWARefPtr second, State state2, 
+    bool NWA::stateIntersect( NWA const & first, State state1, NWA const & second, State state2, 
                                       State & resSt, ClientInfoRefPtr & resCI ) 
     {
       (void) first, (void) second, (void) resCI;
@@ -5115,7 +5115,7 @@ namespace wali
      *
      */
     
-    bool NWA::transitionIntersect( NWARefPtr first, Symbol sym1, NWARefPtr second, Symbol sym2, Symbol & resSym )
+    bool NWA::transitionIntersect( NWA const & first, Symbol sym1, NWA const & second, Symbol sym2, Symbol & resSym )
     {
       (void) first, (void) second;
       
@@ -6510,12 +6510,12 @@ namespace wali
      *
      */
     
-    void NWA::epsilonClosure( std::set<StatePair> * newPairs, StatePair sp, NWARefPtr first, NWARefPtr second ) const
+    void NWA::epsilonClosure( std::set<StatePair> * newPairs, StatePair sp, NWA const & first, NWA const & second ) const
     {
       //Compute the cross produce of all states reachable from sp via epsilon transitions.
 
       //Explore epsilon transitions reachable from the first component of sp.
-      Internals reachable = first->trans.getInternals(sp.first, WALI_EPSILON);
+      Internals reachable = first.trans.getInternals(sp.first, WALI_EPSILON);
       for(  Internals::iterator it = reachable.begin(); it != reachable.end(); it++ )
       {
         StatePair newSP = StatePair(Trans::getTarget(*it),sp.second);
@@ -6530,7 +6530,7 @@ namespace wali
       }
 
       //Explore epsilon transitions reachable from the second component of sp.
-      reachable = second->trans.getInternals(sp.second, WALI_EPSILON);
+      reachable = second.trans.getInternals(sp.second, WALI_EPSILON);
       for(  Internals::iterator it = reachable.begin(); it != reachable.end(); it++ )
       {
         StatePair newSP = StatePair(sp.first,Trans::getTarget(*it));

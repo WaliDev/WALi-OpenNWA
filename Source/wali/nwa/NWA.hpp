@@ -2076,7 +2076,13 @@ namespace wali
        * @brief constructs an NWA which is the projection of the given NWA to the states
        * provided
       */
-      void projectStates(const NWARefPtr &first, const StateSet &prjStates);
+      void projectStates(NWA const & first, StateSet const & prjStates);
+
+      DEPRECATE("Use const NWA & version instead of NWARefPtr version")
+      void projectStates(const NWARefPtr &first, const StateSet &prjStates) {
+        projectStates(*first, prjStates);
+      }
+        
 
       /**
        *
@@ -2092,7 +2098,13 @@ namespace wali
        * @param - second: the NWA to union with 'first'
        *
        */
-      void unionNWA( NWARefPtr first, NWARefPtr second );  
+      void unionNWA( NWA const & first, NWA const & second );
+
+      DEPRECATE("Use const NWA & version instead of NWARefPtr version")
+      void unionNWA( NWARefPtr first, NWARefPtr second ) {
+        unionNWA(*first, *second);
+      }
+      
       /**
        *
        * @brief constructs the NWA resulting from the union of the given NWAs 
@@ -2107,13 +2119,18 @@ namespace wali
        * @return the NWA resulting from the union of the given NWAs
        *
        */
-      static NWARefPtr unionNWA( NWARefPtr first, NWARefPtr second, State stuck )
+      static NWARefPtr unionNWA( NWA const & first, NWA const & second, State stuck )
       {
         NWARefPtr nwa(new NWA(stuck));
         nwa->unionNWA(first,second);
         return nwa;
       }
 
+      DEPRECATE("Use const NWA & version instead of NWARefPtr version")
+      static NWARefPtr unionNWA( NWARefPtr first, NWARefPtr second, State stuck ) {
+        return unionNWA(*first, *second, stuck);
+      }
+      
       //TODO: write comments
       virtual bool isTransitionPossible( const State &src, const Symbol &sym, const State &tgt);
 
@@ -2131,7 +2148,14 @@ namespace wali
        * @param - second: the NWA to intersect with 'first'
        *	
        */
-      void intersect( NWARefPtr first, NWARefPtr second );
+      void intersect( NWA const & first, NWA const & second );
+
+      DEPRECATE("Use const NWA & version instead of NWARefPtr version")
+      void intersect( NWARefPtr first, NWARefPtr second ) {
+        intersect(*first, *second);
+      }
+
+      
       /**
        *
        * @brief constructs the NWA which is the intersection of the given NWAs
@@ -2146,11 +2170,16 @@ namespace wali
        * @return the NWA resulting from the intersection of the given NWAs
        *	
        */
-      static NWARefPtr intersect( NWARefPtr first, NWARefPtr second, State stuck )
+      static NWARefPtr intersect( NWA const & first, NWA const & second, State stuck )
       {
         NWARefPtr nwa(new NWA(stuck));
         nwa->intersect(first,second);
         return nwa;
+      }
+
+      DEPRECATE("Use const NWA & version instead of NWARefPtr version")
+      static NWARefPtr intersect( NWARefPtr first, NWARefPtr second, State stuck ) {
+        return intersect(*first, *second, stuck);
       }
 
       /**
@@ -2392,12 +2421,12 @@ namespace wali
        * @return true if there is some overlap in the states of the given NWAs, false otherwise
        *
        */
-      static bool overlap(NWARefPtr first, NWARefPtr second)
+      static bool overlap(NWA const & first, NWA const & second)
       {
         StateSet intersection;
         // The following line does 'intersection = first->states() intersect second->states()'
-        std::set_intersection(first->beginStates(), first->endStates(),
-                              second->beginStates(), second->endStates(),
+        std::set_intersection(first.beginStates(), first.endStates(),
+                              second.beginStates(), second.endStates(),
                               std::inserter(intersection, intersection.begin()));
 
         if (intersection.size() == 0) {
@@ -2408,11 +2437,15 @@ namespace wali
           // If the stuck states are equal, then they are the sole thing in
           // intersection: we will return false. If the stuck states are unequal,
           // there must be something else in intersection: return true.
-          return first->getStuckState() != second->getStuckState();
+          return first.getStuckState() != second.getStuckState();
         }
         else {
           return true;
         }
+      }
+      DEPRECATE("Use const NWA & version instead of NWARefPtr version")
+      static bool overlap(NWARefPtr first, NWARefPtr second) {
+        return overlap(*first, *second);
       }
 
       /**
@@ -2440,8 +2473,8 @@ namespace wali
        * @param - resSt: the state which will receive the computed client information
        *
        */
-      virtual void intersectClientInfoCall( NWARefPtr first, State call1, State entry1, 
-                                            NWARefPtr second, State call2, State entry2, 
+      virtual void intersectClientInfoCall( NWA const & first, State call1, State entry1, 
+                                            NWA const & second, State call2, State entry2, 
                                             Symbol resSym, State resSt );  
 
       /**
@@ -2469,8 +2502,8 @@ namespace wali
        * @param - resSt: the state which will receive the computed client information
        *
        */
-      virtual void intersectClientInfoInternal( NWARefPtr first, State src1, State tgt1, 
-                                                NWARefPtr second, State src2, State tgt2, 
+      virtual void intersectClientInfoInternal( NWA const & first, State src1, State tgt1, 
+                                                NWA const & second, State src2, State tgt2, 
                                                 Symbol resSym, State resSt );  
 
       /**
@@ -2502,8 +2535,8 @@ namespace wali
        * @param - resSt: the state which will receive the computed client information
        *
        */
-      virtual void intersectClientInfoReturn( NWARefPtr first, State exit1, State call1, State ret1,
-                                              NWARefPtr second, State exit2, State call2, State ret2,
+      virtual void intersectClientInfoReturn( NWA const & first, State exit1, State call1, State ret1,
+                                              NWA const & second, State exit2, State call2, State ret2,
                                               Symbol resSym, State resSt );
 
       /**
@@ -2521,7 +2554,7 @@ namespace wali
        * @param - resCI: the client info that results from performing the intersection
        *
        */
-      virtual bool stateIntersect( NWARefPtr first, State state1, NWARefPtr second, State state2,
+      virtual bool stateIntersect( NWA const & first, State state1, NWA const & second, State state2,
                                   State & resSt, ClientInfoRefPtr & resCI );
 
       /**
@@ -2538,7 +2571,7 @@ namespace wali
        * @param - resSym: the symbol that results from performing the intersection
        *
        */
-      virtual bool transitionIntersect( NWARefPtr first, Symbol sym1, NWARefPtr second, Symbol sym2,
+      virtual bool transitionIntersect( NWA const & first, Symbol sym1, NWA const & second, Symbol sym2,
                                         Symbol & resSym );
 
       /**
@@ -2895,7 +2928,7 @@ namespace wali
         NWARefPtr comp(new NWA(ss));
         comp->complement(second);   //complement L(a2)
         NWARefPtr inter(new NWA(ss));
-        inter->intersect(first,comp); //L(a1) intersect (complement L(a2))
+        inter->intersect(*first,*comp); //L(a1) intersect (complement L(a2))
 
         return inter->isEmpty();
       }
@@ -3276,7 +3309,7 @@ namespace wali
        *                  component of the state pair
        *
        */
-      void epsilonClosure(  std::set<StatePair> * newPairs, StatePair sp, NWARefPtr first, NWARefPtr second ) const;
+      void epsilonClosure(  std::set<StatePair> * newPairs, StatePair sp, NWA const & first, NWA const & second ) const;
 
       /**
        * 
