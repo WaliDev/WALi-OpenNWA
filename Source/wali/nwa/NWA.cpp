@@ -6,6 +6,8 @@ namespace wali
 {
   namespace nwa
   {
+    const std::string NWA::XMLTag = "XML";
+      
     //
     // Methods
     //
@@ -6546,7 +6548,7 @@ namespace wali
     
     std::ostream& NWA::marshall( std::ostream& os ) const
     {
-      os << "<" << XMLTag() << ">\n";
+      os << "<" << XMLTag << ">\n";
 
       for(symbolIterator sym = beginSymbols(); sym != endSymbols(); ++sym)
       {
@@ -6586,7 +6588,7 @@ namespace wali
       }
 
 
-      os << "</" << XMLTag() << ">\n";
+      os << "</" << XMLTag << ">\n";
 
       return os;
     }

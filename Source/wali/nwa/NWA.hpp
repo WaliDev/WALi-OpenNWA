@@ -77,10 +77,7 @@ namespace wali
         typedef std::set<State> StateSet;
         typedef std::pair<State,State> StatePair;
 
-        static std::string const & XMLTag() {
-          static std::string ret = "NWA";
-          return ret;
-        }
+        static std::string const XMLTag;
 
       //
       // Methods
