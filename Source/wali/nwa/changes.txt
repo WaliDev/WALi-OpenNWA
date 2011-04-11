@@ -234,17 +234,17 @@ Summary:
       reverse     (two overloads)                         952
       star        (two overloads)                         952
       complement  (two overloads)
-      determinize (two overloads)
+      determinize (two overloads)                         955
       overlap                                             951
       intersectClientInfoCall                             951
       intersectClientInfoInternal                         951
       intersectClientInfoReturn                           951
       stateIntersect                                      951
       transitionIntersect                                 951
-      mergeClientInfo
-      mergeClientInfoCall
-      mergeClientInfoInternal
-      mergeClientInfoReturn
+      mergeClientInfo                                     955
+      mergeClientInfoCall                                 955
+      mergeClientInfoInternal                             955
+      mergeClientInfoReturn                               955
       plusWPDS                 (only static version)
       NWAtoPDSreturns          (only static version)      953
       NWAtoBackwardsPDSreturns (only static version)      953

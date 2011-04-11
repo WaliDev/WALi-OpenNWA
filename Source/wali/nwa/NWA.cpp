@@ -4399,7 +4399,7 @@ namespace wali
       // FIXME: keep information about whether a machine is deterministic
       if(false) //! first->isDeterministic() )
       {
-        determinize(first);   //Note: determinize() will take care of clientInfo information.
+        determinize(*first);   //Note: determinize() will take care of clientInfo information.
       }
       else
       {
@@ -4467,14 +4467,14 @@ namespace wali
      *
      */
     
-    void NWA::determinize( NWARefPtr nondet )
+    void NWA::determinize( NWA const & nondet )
     {
 #ifdef USE_BUDDY
       wali::relations::buddyInit();
 #endif
 
 #ifdef USE_BUDDY
-#  define DECLARE(type, name)  type name(nondet->largestState())
+#  define DECLARE(type, name)  type name(nondet.largestState())
 #else
 #  define DECLARE(type, name)  type name
 #endif
@@ -4515,24 +4515,26 @@ namespace wali
       typedef std::set<BinaryRelation> RelationSet;
 #endif
 
-      NWARefPtr nondet_copy(new NWA(*nondet));
+#if 0
+      NWARefPtr nondet_copy(new NWA(nondet));
       nondet = nondet_copy;
 
       {
         //BlockTimer timer("Reify consumer transitions (inside determinize)");
-        nondet->realizeImplicitTrans();
+        nondet.realizeImplicitTrans();
       }
+#endif
 
       // Construct Id
       DECLARE(BinaryRelation, Id);
-      for( stateIterator sit = nondet->beginStates(); sit != nondet->endStates(); sit++ )
+      for( stateIterator sit = nondet.beginStates(); sit != nondet.endStates(); sit++ )
       {
         Id.insert(std::pair<State,State>(*sit,*sit));
       }
       
       // Construct Id0
       DECLARE(BinaryRelation, Id0);
-      for( stateIterator sit = nondet->beginInitialStates(); sit != nondet->endInitialStates(); sit++ )
+      for( stateIterator sit = nondet.beginInitialStates(); sit != nondet.endInitialStates(); sit++ )
       {
           Id0.insert(std::pair<State,State>(*sit,*sit));
       }
@@ -4540,7 +4542,7 @@ namespace wali
       //Construct the epsilon closure relation for the states in nondet.
       SetBinaryRelation pre_close; //Collapse epsilon transitions.
       SetBinaryRelation Ie;   //Internal transitions with epsilon.
-      project_symbol_3<SetBinaryRelation>(Ie,nondet->trans.getInternals(), WALI_EPSILON);
+      project_symbol_3<SetBinaryRelation>(Ie,nondet.trans.getInternals(), WALI_EPSILON);
 #ifdef USE_BUDDY
       transitive_closure(pre_close,Ie);
 #else
@@ -4587,24 +4589,24 @@ namespace wali
       std::map<wali::Key, BinaryRelation> internalTransPerSymbol;
       std::map<wali::Key, TernaryRelation> returnTransPerSymbol;
 
-      for( symbolIterator it = nondet->beginSymbols(); it != nondet->endSymbols(); it++ ) {
+      for( symbolIterator it = nondet.beginSymbols(); it != nondet.endSymbols(); it++ ) {
         if (*it == WALI_EPSILON) continue;    //Epsilon is handled with closure.
         if (*it == WALI_WILD) continue;
 
 #ifdef USE_BUDDY
-        internalTransPerSymbol[*it] = BinaryRelation(nondet->largestState());
-        callTransPerSymbol[*it] = BinaryRelation(nondet->largestState());
-        returnTransPerSymbol[*it] = TernaryRelation(nondet->largestState());
+        internalTransPerSymbol[*it] = BinaryRelation(nondet.largestState());
+        callTransPerSymbol[*it] = BinaryRelation(nondet.largestState());
+        returnTransPerSymbol[*it] = TernaryRelation(nondet.largestState());
 #endif
         
-        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet->trans.getInternals(), *it);
-        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet->trans.getInternals(), WALI_WILD);
+        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet.trans.getInternals(), *it);
+        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet.trans.getInternals(), WALI_WILD);
 
-        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet->trans.getCalls(), *it);
-        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet->trans.getCalls(), WALI_WILD);   //Every symbol also matches wild.
+        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet.trans.getCalls(), *it);
+        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet.trans.getCalls(), WALI_WILD);   //Every symbol also matches wild.
 
-        project_symbol_4(returnTransPerSymbol[*it], nondet->trans.getReturns(), *it);
-        project_symbol_4(returnTransPerSymbol[*it], nondet->trans.getReturns(),WALI_WILD);   //Every symbol also matches wild.
+        project_symbol_4(returnTransPerSymbol[*it], nondet.trans.getReturns(), *it);
+        project_symbol_4(returnTransPerSymbol[*it], nondet.trans.getReturns(),WALI_WILD);   //Every symbol also matches wild.
       }
 
       
@@ -4627,7 +4629,7 @@ namespace wali
         if( isStuckState(r) ) continue;    
         
         //Check each symbol individually.
-        for( symbolIterator it = nondet->beginSymbols(); it != nondet->endSymbols(); it++ )
+        for( symbolIterator it = nondet.beginSymbols(); it != nondet.endSymbols(); it++ )
         {
           if (*it == WALI_EPSILON) continue;    //Epsilon is handled with closure.
           if (*it == WALI_WILD) continue;       //Wild is matched to every symbol as we go.
@@ -4640,8 +4642,8 @@ namespace wali
 
 #if 0
           DECLARE(BinaryRelation, IiOrig);
-          project_symbol_3(IiOrig,nondet->trans.getInternals(),*it);   
-          project_symbol_3(IiOrig,nondet->trans.getInternals(),WALI_WILD);   //Every symbol also matches wild.
+          project_symbol_3(IiOrig,nondet.trans.getInternals(),*it);   
+          project_symbol_3(IiOrig,nondet.trans.getInternals(),WALI_WILD);   //Every symbol also matches wild.
           
           if (Ii == IiOrig) {
             std::cout << "Ii == IiOrig holds!\n";
@@ -4687,8 +4689,8 @@ namespace wali
 
 #if 0
           DECLARE(BinaryRelation, IcOrig);
-          project_symbol_3(IcOrig,nondet->trans.getCalls(),*it);  
-          project_symbol_3(IcOrig,nondet->trans.getCalls(),WALI_WILD);   //Every symbol also matches wild.
+          project_symbol_3(IcOrig,nondet.trans.getCalls(),*it);  
+          project_symbol_3(IcOrig,nondet.trans.getCalls(),WALI_WILD);   //Every symbol also matches wild.
           
           if (Ic == IcOrig) {
             std::cout << "Ic == IcOrig holds!\n";
@@ -4729,8 +4731,8 @@ namespace wali
 
 #if 0
           TernaryRelation IrOrig;
-          project_symbol_4(IrOrig,nondet->trans.getReturns(),*it);    
-          project_symbol_4(IrOrig,nondet->trans.getReturns(),WALI_WILD);   //Every symbol also matches wild.
+          project_symbol_4(IrOrig,nondet.trans.getReturns(),*it);    
+          project_symbol_4(IrOrig,nondet.trans.getReturns(),WALI_WILD);   //Every symbol also matches wild.
 
           if (Ir == IrOrig) {
             std::cout << "Ir == IrOrig holds!\n";
@@ -4816,11 +4818,11 @@ namespace wali
         //any final state must contain one of the pairs in 
         //{(init,fin) | init is an initial state and fin is a final state}
         DECLARE(BinaryRelation, Rf);
-        for( stateIterator iit = nondet->beginInitialStates();
-             iit != nondet->endInitialStates(); iit++ )
+        for( stateIterator iit = nondet.beginInitialStates();
+             iit != nondet.endInitialStates(); iit++ )
         {
-          for( stateIterator fit = nondet->beginFinalStates();
-               fit != nondet->endFinalStates(); fit++ )
+          for( stateIterator fit = nondet.beginFinalStates();
+               fit != nondet.endFinalStates(); fit++ )
           {
             Rf.insert(std::pair<State,State>(*iit,*fit));
           }
@@ -5155,7 +5157,7 @@ namespace wali
      *
      */
     
-    void NWA::mergeClientInfo( NWARefPtr first, 
+    void NWA::mergeClientInfo( NWA const & first, 
                    relations::RelationTypedefs<State>::BinaryRelation const & binRel, 
                                 State resSt, ClientInfoRefPtr & resCI )
     {
@@ -5179,7 +5181,7 @@ namespace wali
      *
      */
     
-    void NWA::mergeClientInfoCall( NWARefPtr nwa, 
+    void NWA::mergeClientInfoCall( NWA const & nwa, 
                    relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
                    relations::RelationTypedefs<State>::BinaryRelation const & binRelEntry,
                                 State callSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI )
@@ -5205,7 +5207,7 @@ namespace wali
      *
      */
     
-    void NWA::mergeClientInfoInternal( NWARefPtr nwa, 
+    void NWA::mergeClientInfoInternal( NWA const & nwa, 
                    relations::RelationTypedefs<State>::BinaryRelation const & binRelSource, 
                    relations::RelationTypedefs<State>::BinaryRelation const & binRelTarget,
                                 State sourceSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI )
@@ -5233,7 +5235,7 @@ namespace wali
      *
      */
     
-    void NWA::mergeClientInfoReturn( NWARefPtr nwa, 
+    void NWA::mergeClientInfoReturn( NWA const & nwa, 
                    relations::RelationTypedefs<State>::BinaryRelation const & binRelExit,
                    relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
                    relations::RelationTypedefs<State>::BinaryRelation const & binRelReturn,

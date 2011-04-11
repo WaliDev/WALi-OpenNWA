@@ -2409,7 +2409,13 @@ namespace wali
        * @param - nondet: the NWA to determinize
        *
        */
-      void determinize( NWARefPtr nondet ); 
+      void determinize( NWA const & nondet );
+
+      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
+      void determinize( NWARefPtr nondet )
+      {
+        determinize(*nondet);
+      }
 
       /**
        *
@@ -2423,11 +2429,17 @@ namespace wali
        * @return the NWA resulting from determinizing the given NWA
        *
        */
-      static NWARefPtr determinize( NWARefPtr nondet, State stuck )
-        {
+      static NWARefPtr determinize( NWA const & nondet, State stuck )
+      {
         NWARefPtr nwa(new NWA(stuck));
         nwa->determinize(nondet);
         return nwa;
+      }
+
+      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
+      static NWARefPtr determinize( NWARefPtr nondet, State stuck )
+      {
+        return determinize(*nondet, stuck);
       }
 
       /**
@@ -2622,7 +2634,7 @@ namespace wali
        * @param - resCI: the client info that results from performing the merge
        *
        */
-      virtual void mergeClientInfo( NWARefPtr nwa, 
+      virtual void mergeClientInfo( NWA const & nwa, 
                      relations::RelationTypedefs<State>::BinaryRelation const & binRel, 
                                   State resSt, ClientInfoRefPtr & resCI );
 
@@ -2643,7 +2655,7 @@ namespace wali
        * @param - resCI: the client info that results from performing the merge
        *
        */
-      virtual void mergeClientInfoCall( NWARefPtr nwa, 
+      virtual void mergeClientInfoCall( NWA const & nwa, 
                      relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
                      relations::RelationTypedefs<State>::BinaryRelation const & binRelEntry,
                                   State callSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI );
@@ -2665,7 +2677,7 @@ namespace wali
        * @param - resCI: the client info that results from performing the merge
        *
        */
-      virtual void mergeClientInfoInternal( NWARefPtr nwa, 
+      virtual void mergeClientInfoInternal( NWA const & nwa, 
                      relations::RelationTypedefs<State>::BinaryRelation const & binRelSource, 
                      relations::RelationTypedefs<State>::BinaryRelation const & binRelTarget,
                                   State sourceSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI );
@@ -2689,7 +2701,7 @@ namespace wali
        * @param - resCI: the client info that results from performing the merge
        *
        */
-      virtual void mergeClientInfoReturn( NWARefPtr nwa, 
+      virtual void mergeClientInfoReturn( NWA const & nwa, 
                      relations::RelationTypedefs<State>::BinaryRelation const & binRelExit,
                      relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
                      relations::RelationTypedefs<State>::BinaryRelation const & binRelReturn,
