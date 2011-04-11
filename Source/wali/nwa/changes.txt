@@ -183,12 +183,14 @@ Summary:
 -- 
 --    LATER: COMMITTED REV 943
 --           Remove deprecated functions
-
-
-10. Move 'NWA::getProgramControlLocation' and 'NWA::getControlLocation'
-    to namespace level.
-
-    (THESE ARE BREAKING CHANGES)
+-- 
+-- 
+-- 10. COMMITTED REV 958
+-- 
+--     Move 'NWA::getProgramControlLocation' and 'NWA::getControlLocation'
+--     to namespace level.
+-- 
+--     (THESE ARE BREAKING CHANGES)
 
 
 11. -- SOME WORK COMMITTED IN REV 924, but had to break into several stages
