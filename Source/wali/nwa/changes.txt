@@ -220,7 +220,7 @@ Summary:
 --            Remove deprecated typedefs.
 
 
-13. COMMITTED REVS: 951, ...
+13. COMMITTED REVS: 951--...
 
     Change functions in NWA which take a NWARefPtr parameter to take a
     (possibly const) reference instead. For each function, introduce an
@@ -246,10 +246,10 @@ Summary:
       mergeClientInfoInternal
       mergeClientInfoReturn
       plusWPDS                 (only static version)
-      NWAtoPDSreturns          (only static version)
-      NWAtoBackwardsPDSreturns (only static version)
-      NWAtoPDScalls            (only static version)
-      NWAtoBackwardsPDScalls   (only static version)
+      NWAtoPDSreturns          (only static version)      953
+      NWAtoBackwardsPDSreturns (only static version)      953
+      NWAtoPDScalls            (only static version)      953
+      NWAtoBackwardsPDScalls   (only static version)      953
       inclusion
       equal
       epsilonClosure (only one of the two overloads)      951
