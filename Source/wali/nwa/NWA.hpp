@@ -62,8 +62,6 @@ namespace wali
         typedef  StateStorage::const_iterator stateIterator;
       
         typedef  StateStorage::ClientInfoRefPtr ClientInfoRefPtr;
-        DEPRECATE("If you have to use this, talk to Evan.")
-        typedef details::SymbolStorage Symbols;
         typedef details::SymbolStorage SymbolStorage;
         typedef  SymbolStorage::const_iterator symbolIterator;
 

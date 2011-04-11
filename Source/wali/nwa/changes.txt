@@ -131,7 +131,8 @@ Summary:
    -- In class NWA, deprecate the typedef of 'Symbols'. Replace it with one
    -- named 'SymbolStorage'.
 
-   LATER: Remove deprecated typedef and headers.
+   -- LATER: COMMITTED REV 939
+   --        Remove deprecated typedef and headers.
 
 
 5. Fix iterator name capitalization.
