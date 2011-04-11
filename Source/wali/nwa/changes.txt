@@ -230,9 +230,9 @@ Summary:
       projectStates                                       951
       unionNWA    (two overloads)                         951
       intersect   (two overloads)                         951
-      concat      (two overloads)
-      reverse     (two overloads)
-      star        (two overloads)
+      concat      (two overloads)                         952
+      reverse     (two overloads)                         952
+      star        (two overloads)                         952
       complement  (two overloads)
       determinize (two overloads)
       overlap                                             951

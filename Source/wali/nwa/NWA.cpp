@@ -4014,7 +4014,7 @@ namespace wali
      *
      */
     
-    void NWA::concat( NWARefPtr first, NWARefPtr second )
+    void NWA::concat( NWA const & first, NWA const & second )
     {
       //Q: Do we need to guarantee that there is no overlap in states between machines?
       //A: YES!
@@ -4033,14 +4033,14 @@ namespace wali
       assert(stuck);
 
       //Test state Key overlap of the two NWAs.
-      assert(! overlap(*first,* second) );
+      assert(! overlap(first, second) );
 
       //Check that the stuck state of this NWA does not exist as a state in either component machine 
       //('first' and 'second') unless it is the stuck state of that machine.
-      if(! first->isStuckState(getStuckState()) )
-        assert(! first->isState(getStuckState()) );
-      if(! second->isStuckState(getStuckState()) )
-        assert(! second->isState(getStuckState()) );
+      if(! first.isStuckState(getStuckState()) )
+        assert(! first.isState(getStuckState()) );
+      if(! second.isStuckState(getStuckState()) )
+        assert(! second.isState(getStuckState()) );
 
 	  //Clear all states(except the stuck state) and transitions from this machine.
       State stuckSt = getStuckState();
@@ -4050,20 +4050,20 @@ namespace wali
       setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
 
       //Duplicate all of the functionality of the first machine (except the final state property).
-      states.addAllStates(first->states);   //Note: This includes copying clientInfo information over.
-      states.addAllInitialStates(first->states);
-      trans.addAllTrans(first->trans);
+      states.addAllStates(first.states);   //Note: This includes copying clientInfo information over.
+      states.addAllInitialStates(first.states);
+      trans.addAllTrans(first.trans);
 
       //Duplicate all of the functionality of the second machine (except the initial state property).
-      states.addAllStates(second->states);  //Note: This includes copying clientInfo information over.
-      states.addAllFinalStates(second->states);
-      trans.addAllTrans(second->trans);
+      states.addAllStates(second.states);  //Note: This includes copying clientInfo information over.
+      states.addAllFinalStates(second.states);
+      trans.addAllTrans(second.trans);
 
       //Add epsilon transitions from the final states of the first machine to the initial
       //states of the second machine.
-      for( stateIterator fit = first->beginFinalStates(); fit != first->endFinalStates(); fit++ )
+      for( stateIterator fit = first.beginFinalStates(); fit != first.endFinalStates(); fit++ )
       {
-        for( stateIterator sit = second->beginInitialStates(); sit != second->endInitialStates(); sit++ )
+        for( stateIterator sit = second.beginInitialStates(); sit != second.endInitialStates(); sit++ )
         {
           addInternalTrans(*fit,WALI_EPSILON,*sit);
         }
@@ -4077,7 +4077,7 @@ namespace wali
      * 
      */
     
-    void NWA::reverse( NWARefPtr first )
+    void NWA::reverse( NWA const & first )
     {
       //Note: (implicit) transitions to the stuck state in the original machine 
       //       cause problems in the reverse machine if the stuck state is a final state 
@@ -4093,7 +4093,7 @@ namespace wali
 
       //Check that the stuck state of this NWA does not exist as a state in 'first' 
       //Note: it cannot be the stuck state of 'first' because then it would have an outgoing transition.
-      assert(! first->isState(getStuckState()) );
+      assert(! first.isState(getStuckState()) );
 
 	  //Clear all states(except the stuck state) and transitions from this machine.
       State stuckSt = getStuckState();
@@ -4103,26 +4103,26 @@ namespace wali
       setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
 
       //The reverse machine has all the states of the original machine.
-      states.addAllStates(first->states); //Note: This includes copying clientInfo information over. 
+      states.addAllStates(first.states); //Note: This includes copying clientInfo information over. 
 
       //Swap initial and final state functionality.
       //Note: we know that this does not cause the stuck state to become a final state
       //      because the stuck state was not an initial state of the original machine 
       //      (as it was not even a state in the original machine).
-      for( stateIterator it = first->beginInitialStates(); 
-        it != first->endInitialStates(); it++ )
+      for( stateIterator it = first.beginInitialStates(); 
+        it != first.endInitialStates(); it++ )
       {
         addFinalState(*it);
       }
-      for( stateIterator it = first->beginFinalStates(); 
-        it != first->endFinalStates(); it++ )
+      for( stateIterator it = first.beginFinalStates(); 
+        it != first.endFinalStates(); it++ )
       {
         addInitialState(*it);
       }
 
       //Duplicate internal transitions with source/target swapped.
-      for( InternalIterator it = first->beginInternalTrans(); 
-        it != first->endInternalTrans(); it++ )
+      for( InternalIterator it = first.beginInternalTrans(); 
+        it != first.endInternalTrans(); it++ )
       {
         addInternalTrans(Trans::getTarget(*it),
                           Trans::getInternalSym(*it),
@@ -4130,8 +4130,8 @@ namespace wali
       }
 
       //Duplicate return transitions as call transitions with (return,sym,exit).
-      for( ReturnIterator it = first->beginReturnTrans(); 
-        it != first->endReturnTrans(); it++ )
+      for( ReturnIterator it = first.beginReturnTrans(); 
+        it != first.endReturnTrans(); it++ )
       {
         addCallTrans(Trans::getReturnSite(*it),
                       Trans::getReturnSym(*it),
@@ -4140,11 +4140,11 @@ namespace wali
 
       //Duplicate call transitions with associated return transitions as 
       //return transitions with (entry,return,sym,call).
-      for( CallIterator cit = first->beginCallTrans(); 
-        cit != first->endCallTrans(); cit++ )
+      for( CallIterator cit = first.beginCallTrans(); 
+        cit != first.endCallTrans(); cit++ )
       {
-        for( ReturnIterator rit = first->beginReturnTrans(); 
-          rit != first->endReturnTrans(); rit++ )
+        for( ReturnIterator rit = first.beginReturnTrans(); 
+          rit != first.endReturnTrans(); rit++ )
         {
           if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
           {
@@ -4166,7 +4166,7 @@ namespace wali
      *
      */
     
-    void NWA::star( NWARefPtr first )
+    void NWA::star( NWA const & first )
     {
       //TODO: ponder the following ... 
       //Q: how do we prevent the stuck state from being the same as any of the states that we
@@ -4192,8 +4192,8 @@ namespace wali
       State prime = wali::getKey("prime");
 
       //The state-space of A* is Q + Q'.
-      states.addAll(first->states); //Note: This includes copying clientInfo information over.    
-      for( stateIterator sit = first->beginStates(); sit != first->endStates(); sit++ )
+      states.addAll(first.states); //Note: This includes copying clientInfo information over.    
+      for( stateIterator sit = first.beginStates(); sit != first.endStates(); sit++ )
       {
         State sp = wali::getKey(*sit,prime);
         states.addState(sp);
@@ -4201,14 +4201,14 @@ namespace wali
         //Note: The clientInfos for the states in Q' are copies of the clientInfos for the 
         //      corresponding states from Q.
         //Set the clientInfo of this state.
-        ClientInfo info = *(first->getClientInfo(*sit));
+        ClientInfo info = *(first.getClientInfo(*sit));
         ClientInfoRefPtr ci = ClientInfoRefPtr(new ClientInfo(info));
         states.setClientInfo(sp,ci);
       }
 
       //The initial and final states of A* are Q0'. 
-      for( stateIterator sit = first->beginInitialStates(); 
-            sit != first->endInitialStates(); sit++ )
+      for( stateIterator sit = first.beginInitialStates(); 
+            sit != first.endInitialStates(); sit++ )
       {
         State sp = wali::getKey(*sit,prime);
         addInitialState(sp);
@@ -4219,8 +4219,8 @@ namespace wali
 
       //Internal: for each (q,a,p) in delta_i, A* gets (q,a,p) and (q',a,p') and if
       //          p in Qf, then (q,a,r') and (q',a,r') for each r in Q0
-      for( InternalIterator iit = first->beginInternalTrans();
-            iit != first->endInternalTrans(); iit++ )
+      for( InternalIterator iit = first.beginInternalTrans();
+            iit != first.endInternalTrans(); iit++ )
       {
         State q = Trans::getSource(*iit);
         Symbol a = Trans::getInternalSym(*iit);
@@ -4235,11 +4235,11 @@ namespace wali
         addInternalTrans(qp,a,pp);
 
         //if p in Qf
-        if( first->isFinalState(p) )
+        if( first.isFinalState(p) )
         {
           //for each r in Q0
-          for( stateIterator sit = first->beginInitialStates(); 
-                sit != first->endInitialStates(); sit++ )
+          for( stateIterator sit = first.beginInitialStates(); 
+                sit != first.endInitialStates(); sit++ )
           {
             State rp = wali::getKey(*sit,prime);
 
@@ -4254,8 +4254,8 @@ namespace wali
 
       //Call: for each(q,a,p) in delta_c, A* gets (q,a,p) and (q',a,p), 
       //      and if p in Qf then (q,a,r') and (q',a,r') for each r in Q0
-      for( CallIterator cit = first->beginCallTrans();
-            cit != first->endCallTrans(); cit++ )
+      for( CallIterator cit = first.beginCallTrans();
+            cit != first.endCallTrans(); cit++ )
       {
         State q = Trans::getCallSite(*cit);
         Symbol a = Trans::getCallSym(*cit);
@@ -4269,11 +4269,11 @@ namespace wali
         addCallTrans(qp,a,p);
 
         //if p in Qf
-        if( first->isFinalState(p) )
+        if( first.isFinalState(p) )
         {
           //for each r in Q0
-          for( stateIterator sit = first->beginInitialStates();
-                sit != first->endInitialStates(); sit++ )
+          for( stateIterator sit = first.beginInitialStates();
+                sit != first.endInitialStates(); sit++ )
           {
             State rp = wali::getKey(*sit,prime);
 
@@ -4291,8 +4291,8 @@ namespace wali
       //          For each (q,r,a,p) in delra_r with r in Q0, 
       //            A* gets (q',s,a,p') for each s in Q union Q' 
       //          and if p in Qf, then (q',s,a,t') for each s in Q union Q' and t in Q0.
-      for( ReturnIterator rit = first->beginReturnTrans();
-            rit != first->endReturnTrans(); rit++ )
+      for( ReturnIterator rit = first.beginReturnTrans();
+            rit != first.endReturnTrans(); rit++ )
       {
         State q = Trans::getExit(*rit);
         State r = Trans::getCallSite(*rit);
@@ -4308,11 +4308,11 @@ namespace wali
         addReturnTrans(q,rp,a,pp);
 
         //if p in Qf
-        if( first->isFinalState(p) )
+        if( first.isFinalState(p) )
         {
           //for each s in Q0
-          for( stateIterator sit = first->beginInitialStates();
-                sit != first->endInitialStates(); sit++ )
+          for( stateIterator sit = first.beginInitialStates();
+                sit != first.endInitialStates(); sit++ )
           { 
             State sp = wali::getKey(*sit,prime);
 
@@ -4325,11 +4325,11 @@ namespace wali
         }
 
         //if r in Q0
-        if( first->isInitialState(r) )
+        if( first.isInitialState(r) )
         {
           //for each s in Q
-          for( stateIterator sit = first->beginStates();
-                sit != first->endStates(); sit++ )
+          for( stateIterator sit = first.beginStates();
+                sit != first.endStates(); sit++ )
           {
             State s = *sit;
             State qp = wali::getKey(q,prime);
@@ -4344,11 +4344,11 @@ namespace wali
             addReturnTrans(qp,sp,a,pp);
 
             //if p in Qf
-            if( first->isFinalState(p) )
+            if( first.isFinalState(p) )
             {
               //for each t in Q0
-              for( stateIterator it = first->beginInitialStates();
-                    it != first->endInitialStates(); it++ )
+              for( stateIterator it = first.beginInitialStates();
+                    it != first.endInitialStates(); it++ )
               {                
                 State tp = wali::getKey(*it,prime);
 
