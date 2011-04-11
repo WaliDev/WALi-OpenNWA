@@ -220,39 +220,41 @@ Summary:
 --            Remove deprecated typedefs.
 
 
-13. COMMITTED REVS: 951--...
+13. COMMITTED REVS: 951--956 (including just a commit w/ just this file)
 
-    Change functions in NWA which take a NWARefPtr parameter to take a
-    (possibly const) reference instead. For each function, introduce an
-    overload for the RefPtr version, and deprecate it.
+    -- Change functions in NWA which take a NWARefPtr parameter to take a
+    -- (possibly const) reference instead. For each function, introduce an
+    -- overload for the RefPtr version, and deprecate it.
 
-    Here is the list:                                     COMMITTED REV:
-      projectStates                                       951
-      unionNWA    (two overloads)                         951
-      intersect   (two overloads)                         951
-      concat      (two overloads)                         952
-      reverse     (two overloads)                         952
-      star        (two overloads)                         952
-      complement  (two overloads)
-      determinize (two overloads)                         955
-      overlap                                             951
-      intersectClientInfoCall                             951
-      intersectClientInfoInternal                         951
-      intersectClientInfoReturn                           951
-      stateIntersect                                      951
-      transitionIntersect                                 951
-      mergeClientInfo                                     955
-      mergeClientInfoCall                                 955
-      mergeClientInfoInternal                             955
-      mergeClientInfoReturn                               955
+    -- Here is the list:                                     COMMITTED REV:
+    --   projectStates                                       951
+    --   unionNWA    (two overloads)                         951
+    --   intersect   (two overloads)                         951
+    --   concat      (two overloads)                         952
+    --   reverse     (two overloads)                         952
+    --   star        (two overloads)                         952
+    --   complement  (two overloads)                         956
+    --   determinize (two overloads)                         955
+    --   overlap                                             951
+    --   intersectClientInfoCall                             951
+    --   intersectClientInfoInternal                         951
+    --   intersectClientInfoReturn                           951
+    --   stateIntersect                                      951
+    --   transitionIntersect                                 951
+    --   mergeClientInfo                                     955
+    --   mergeClientInfoCall                                 955
+    --   mergeClientInfoInternal                             955
+    --   mergeClientInfoReturn                               955
+    --   NWAtoPDSreturns          (only static version)      953
+    --   NWAtoBackwardsPDSreturns (only static version)      953
+    --   NWAtoPDScalls            (only static version)      953
+    --   NWAtoBackwardsPDScalls   (only static version)      953
+    --   inclusion                                           956
+    --   equal                                               956
+    --   epsilonClosure (only one of the two overloads)      951
+
+    Figure out what to do about
       plusWPDS                 (only static version)
-      NWAtoPDSreturns          (only static version)      953
-      NWAtoBackwardsPDSreturns (only static version)      953
-      NWAtoPDScalls            (only static version)      953
-      NWAtoBackwardsPDScalls   (only static version)      953
-      inclusion
-      equal
-      epsilonClosure (only one of the two overloads)      951
 
     LATER: Remove deprecated functions
 

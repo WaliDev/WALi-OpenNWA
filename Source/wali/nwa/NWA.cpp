@@ -4374,7 +4374,7 @@ namespace wali
      *
      */
     
-    void NWA::complement( NWARefPtr first )
+    void NWA::complement( NWA const & first )
     {
       //Q: How should clientInfos be generated for the complemented NWA?
       //A: The clientInfos from the component machines are copied and added to the complemented NWA.
@@ -4385,7 +4385,7 @@ namespace wali
       //Check that the stuck state of this NWA does not exist as a state in 'first' 
       //Note: it cannot be the stuck state of 'first' because it is going to become a final state
       //      prior to the completion of adding transitions to this machine.
-      assert(! first->isState(getStuckState()) );
+      assert(! first.isState(getStuckState()) );
 
 	  //Clear all states(except the stuck state) and transitions from this machine.
       State stuckSt = getStuckState();
@@ -4397,15 +4397,15 @@ namespace wali
 
       //Start with a deterministic copy of the given NWA.
       // FIXME: keep information about whether a machine is deterministic
-      if(false) //! first->isDeterministic() )
+      if(false) //! first.isDeterministic() )
       {
-        determinize(*first);   //Note: determinize() will take care of clientInfo information.
+        determinize(first);   //Note: determinize() will take care of clientInfo information.
       }
       else
       {
-        states.addAll(first->states); //Note: This includes copying clientInfo information over.          
-        addAllSymbols(first->symbols);
-        trans.addAllTrans(first->trans);
+        states.addAll(first.states); //Note: This includes copying clientInfo information over.          
+        addAllSymbols(first.symbols);
+        trans.addAllTrans(first.trans);
       }
       
       //Q: If the stuck state becomes accepting do we need to make explicit all

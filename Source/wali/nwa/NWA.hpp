@@ -2375,7 +2375,14 @@ namespace wali
        * @param - first: the NWA to perform the complement of
        *
        */
-      void complement( NWARefPtr first );
+      void complement( NWA const & first );
+
+      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
+      void complement( NWARefPtr first )
+      {
+        complement(*first);
+      }
+      
 
       /**
        * 
@@ -2390,11 +2397,18 @@ namespace wali
        * @return the NWA resulting from complementing the given NWA
        *
        */
-      static NWARefPtr complement( NWARefPtr first, State stuck )
-        {
+      static NWARefPtr complement( NWA const & first, State stuck )
+      {
         NWARefPtr nwa(new NWA(stuck));
         nwa->complement(first);
         return nwa;
+      }
+
+
+      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
+      static NWARefPtr complement( NWARefPtr first, State stuck )
+      {
+        return complement(*first, stuck);
       }
 
       /**
@@ -2980,14 +2994,14 @@ namespace wali
        *          second NWA, false otherwise
        *
        */
-      static bool inclusion( NWARefPtr first, NWARefPtr second )
+      static bool inclusion( NWA const & first, NWA const & second )
       {
         //Q: what should be used as the stuck states here? 
         //A: it needs to be something not a state in 'first' and not a state in 'second' 
         //    unless it is the stuck state
         std::string s = "stuck";
         Key ss = getKey(s);
-        while( first->isState(ss) || (second->isState(ss) && !second->isStuckState(ss)) )
+        while( first.isState(ss) || (second.isState(ss) && !second.isStuckState(ss)) )
         {
           s = s + "~";
           ss = getKey(s);
@@ -2995,12 +3009,18 @@ namespace wali
 
         //Check L(a1) contained in L(a2) by checking 
         //if L(a1) intersect (complement L(a2)) is empty.
-        NWARefPtr comp(new NWA(ss));
-        comp->complement(second);   //complement L(a2)
-        NWARefPtr inter(new NWA(ss));
-        inter->intersect(*first,*comp); //L(a1) intersect (complement L(a2))
+        NWA comp(ss);
+        comp.complement(second);   //complement L(a2)
+        NWA inter(ss);
+        inter.intersect(first,comp); //L(a1) intersect (complement L(a2))
 
-        return inter->isEmpty();
+        return inter.isEmpty();
+      }
+
+      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
+      static bool inclusion( NWARefPtr first, NWARefPtr second )
+      {
+        return inclusion(*first, *second);
       }
 
       /**
@@ -3014,17 +3034,23 @@ namespace wali
        * @return true if the languages accepted by the given NWAs are equal, false otherwise
        *
        */
-      static bool equal( NWARefPtr first, NWARefPtr second)
+      static bool equal( NWA const & first, NWA const & second)
       {
         NWARefPtr det_first = determinize(first, getKey("[stuck-3119]"));
         NWARefPtr det_second = determinize(second, getKey("[stuck-3120]"));
         
         //The languages accepted by two NWAs are equivalent if they are both contained
         //in each other, ie L(a1) contained in L(a2) and L(a2) contained in L(a1).
-        bool first_in_second = inclusion(det_first,det_second);
-        bool second_in_first = inclusion(det_second,det_first);
+        bool first_in_second = inclusion(*det_first, *det_second);
+        bool second_in_first = inclusion(*det_second, *det_first);
 
         return (first_in_second && second_in_first );
+      }
+
+      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
+      static bool equal( NWARefPtr first, NWARefPtr second)
+      {
+        return equal(*first, *second);
       }
 
       /**
