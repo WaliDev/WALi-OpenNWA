@@ -2734,9 +2734,9 @@ namespace wali
        *          reachability
        * 
        */
-      static wpds::WPDS plusWPDS( const wpds::WPDS & base, NWARefPtr nwa )
+      static wpds::WPDS plusWPDS( const wpds::WPDS & base, NWA & nwa )
       {
-        return nwa->plusWPDS(base);
+        return nwa.plusWPDS(base);
       }
 
       /**
@@ -2828,11 +2828,16 @@ namespace wali
        * @return the PDS equivalent to this NWA
        *
        */ 
-      static wpds::WPDS NWAtoPDSreturns( NWARefPtr nwa, WeightGen & wg )
+      static wpds::WPDS NWAtoPDSreturns( NWA const & nwa, WeightGen & wg )
       {
-        return nwa->NWAtoPDSreturns(wg);
+        return nwa.NWAtoPDSreturns(wg);
       }
 
+      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
+      static wpds::WPDS NWAtoPDSreturns( NWARefPtr nwa, WeightGen & wg )
+      {
+        return NWAtoPDSreturns(*nwa, wg);
+      }
       /**
        *
        * @brief constructs the backwards PDS equivalent to this NWA
@@ -2857,9 +2862,15 @@ namespace wali
        * @return the backwards PDS equivalent to this NWA
        *
        */ 
+      static wpds::WPDS NWAtoBackwardsPDSreturns( NWA const & nwa, WeightGen & wg )
+      {
+        return nwa.NWAtoBackwardsPDSreturns(wg);
+      }
+
+      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
       static wpds::WPDS NWAtoBackwardsPDSreturns( NWARefPtr nwa, WeightGen & wg )
       {
-        return nwa->NWAtoBackwardsPDSreturns(wg);
+        return NWAtoBackwardsPDSreturns(*nwa, wg);
       }
 
       /**
@@ -2886,6 +2897,12 @@ namespace wali
        * @return the PDS equivalent to this NWA
        *
        */ 
+      static wpds::WPDS NWAtoPDScalls( NWA const & nwa, WeightGen & wg )
+      {
+        return nwa.NWAtoPDScalls(wg);
+      }
+
+      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
       static wpds::WPDS NWAtoPDScalls( NWARefPtr nwa, WeightGen & wg )
       {
         return nwa->NWAtoPDScalls(wg);
@@ -2915,6 +2932,12 @@ namespace wali
        * @return the backwards PDS equivalent to this NWA
        *
        */
+      static wpds::WPDS NWAtoBackwardsPDScalls( NWA const & nwa, WeightGen & wg )
+      {
+        return nwa.NWAtoBackwardsPDScalls(wg);
+      }
+
+      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
       static wpds::WPDS NWAtoBackwardsPDScalls( NWARefPtr nwa, WeightGen & wg )
       {
         return nwa->NWAtoBackwardsPDScalls(wg);
