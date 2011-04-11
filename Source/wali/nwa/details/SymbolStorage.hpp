@@ -52,56 +52,6 @@ namespace wali
 
       /**
        *
-       */
-      DEPRECATE("Use wali::WALI_WILD instead")
-      static bool isWild( Sym sym )
-      {
-        return (sym == wali::WALI_WILD);
-      };
-
-      /**
-       *  
-       */
-      DEPRECATE("Use wali::WALI_WILD instead")
-      static Sym getWild( )
-      {
-        return wali::WALI_WILD;
-      }
-
-      /**
-       *
-       * @brief returns the Key for the epsilon symbol
-       *
-       * This method provides access to the Key for the epsilon symbol.
-       * The epsilon symbol is the same as wali::WALI_EPSILON.
-       *
-       * @return the Key for the epsilon symbol
-       *
-       */
-      DEPRECATE("Use wali::WALI_EPSILON instead")
-      static Sym getEpsilon( )
-      {
-        return wali::WALI_EPSILON;
-      };
-
-      /**
-       *  
-       * @brief test whether the given symbol is the epsilon symbol
-       * 
-       * This method determines whether the given symbol is the epsilon symbol.
-       *
-       * @param - sym: the symbol to test
-       * @return true if this symbol is the epsilon symbol, false otherwise
-       *
-       */
-      DEPRECATE("Compare against wali::WALI_EPSILON instead")
-      static bool isEpsilon( Sym sym )
-      {
-        return (sym == wali::WALI_EPSILON);
-      }
-
-      /**
-       *
        * @brief provides access to all symbols 
        *
        * This method provides access to all symbols in the form of a set of symbols.

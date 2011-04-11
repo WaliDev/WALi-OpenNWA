@@ -157,7 +157,8 @@ Summary:
    -- COMMITTED REV 930
    -- Fix references.   
 
-   LATER: Remove deprecated functions
+   -- LATER: COMMITTED REV 938
+   --        Remove deprecated functions
 
 
 8. Change parameter and return types of tons of functions from std::set<St>
