@@ -53,17 +53,18 @@ Summary:
     Functions in NWA class that take a NWARefPtr change to taking a (const?) reference
 
 
-1. -- INITIAL CHANGES COMMITTED REV 909
-
-   -- Name change: 'St' and 'Sym' to 'State' and 'Symbol', resp.
-
-   -- Deprecate the 'St' and 'Sym' typedefs (in namespace wali::nwa). Create new
-   -- 'State' and 'Symbol' typedefs, and change current uses of 'St' and 'Sym'
-   -- to those.
-
-   LATER: Remove 'St' and 'Sym'.
-
-
+-- 1. INITIAL CHANGES COMMITTED REV 909
+-- 
+--    Name change: 'St' and 'Sym' to 'State' and 'Symbol', resp.
+-- 
+--    Deprecate the 'St' and 'Sym' typedefs (in namespace wali::nwa). Create new
+--    'State' and 'Symbol' typedefs, and change current uses of 'St' and 'Sym'
+--    to those.
+--
+--    LATER: COMMITTED REV 944, with the caveat that there are uses in commented-out code 
+--           Remove 'St' and 'Sym'.
+-- 
+-- 
 -- 2. COMMITTED REV 928
 --    Move and clean ReachGen class.
 -- 

@@ -4841,8 +4841,8 @@ namespace wali
 
 #ifdef USE_BUDDY
     
-     St NWA::makeKey(
-       relations::RelationTypedefs<St>::BinaryRelation const & R ) const
+    State NWA::makeKey(
+       relations::RelationTypedefs<State>::BinaryRelation const & R ) const
     {
       std::stringstream ss;
       ss << R.getBdd();
