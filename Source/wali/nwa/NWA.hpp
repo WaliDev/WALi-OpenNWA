@@ -24,9 +24,6 @@
 
 #include "wali/nwa/WeightGen.hpp"
 
-#include "wali/nwa/NestedWord.hpp"
-#include "wali/nwa/Configuration.hpp"
-
 //#define USE_BUDDY
 #ifdef USE_BUDDY
 #  include "wali/nwa/RelationOpsBuddy.hpp"
@@ -3461,13 +3458,6 @@ namespace wali
         //    if we did, what would the weight gen of the wpds be?
 
     public:
-        // This is like a combined NWS/NWP but with an API that is usable
-      DEPRECATE("Include NestedWord.hpp and use wali::nwa::NestedWord instead")
-      typedef ::wali::nwa::NestedWord NestedWord;
-
-      DEPRECATE("Talk to Evan; I didn't expect anyone to be using this. But if you must, include Configuration.hpp and use wali::nwa::Configuration instead")
-      typedef ::wali::nwa::Configuration Configuration;
-
       bool
       isMemberNondet( ::wali::nwa::NestedWord const & word ) const;
 

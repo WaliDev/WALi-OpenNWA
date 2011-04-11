@@ -210,7 +210,10 @@ Summary:
     -- Move implementation of NWA::isMemberNondet to NWA.cpp.
 
     LATER: Move class Configuration to NWA.cpp and remove
-           Configuration.hpp. Remove deprecated typedefs.
+           Configuration.hpp.
+
+    --       COMMITTED REV 947
+    --       Remove deprecated typedefs.
 
 13. Change functions in NWA which take a NWARefPtr parameter to take a
     (possibly const) reference instead. For each function, introduce an
