@@ -266,9 +266,12 @@ Summary:
     LATER: Remove deprecated functions
 
 
-14. Move epsilonClosure functions to file-static functions in NWA.cpp.
-
-    (THIS IS A BREAKING CHANGE)      
+-- 14. ABORTED, for now at least. They refer to things in the NWA itself, and it is pretty
+--     directly related.
+--
+--     Move epsilonClosure functions to file-static functions in NWA.cpp.
+--
+--     (THIS IS A BREAKING CHANGE)
 
 
 15. De-clutter NWA class interface itself. (THIS SHOULD COME AFTER #13 IS COMPLETED)
