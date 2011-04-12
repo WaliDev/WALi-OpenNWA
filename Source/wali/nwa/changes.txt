@@ -165,16 +165,15 @@ Summary:
 -- 
 --    LATER: COMMITTED REV 938
 --           Remove deprecated functions
-
-
-8. Change parameter and return types of tons of functions from std::set<St>
-   and std::set<Sym> to use StateSet and SymbolSet typedefs instead. (Will
-   have to add SymbolSet typedef.)
-
-   -- Some work committed in REV 920, but I think I want to put this off until
-   -- after old StateSet and SymbolSet classes are removed in refactoring 3, stage 2.
-   
-
+-- 
+-- 
+-- 8. COMMITTED REV 920 and 960. Lots of set<StatePair>, set<pair<...>> left though
+-- 
+--    Change parameter and return types of tons of functions from std::set<St>
+--    and std::set<Sym> to use StateSet and SymbolSet typedefs instead. (Will
+--    have to add SymbolSet typedef.)
+-- 
+-- 
 -- 9. COMMITTED REV 921
 --    Deprecate "exact" duplicate functions.
 -- 

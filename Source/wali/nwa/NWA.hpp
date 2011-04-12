@@ -74,7 +74,6 @@ namespace wali
         typedef  Trans::InternalIterator InternalIterator;
         typedef  Trans::ReturnIterator ReturnIterator;
         
-        typedef std::set<State> StateSet;
         typedef std::pair<State,State> StatePair;
 
         static std::string const XMLTag;
@@ -463,7 +462,7 @@ namespace wali
        * @return set of all symbols associated with this NWA
        *
        */
-      const  std::set<Symbol> & getSymbols( ) const;
+      const  SymbolSet & getSymbols( ) const;
 
       /**
        *
@@ -582,7 +581,7 @@ namespace wali
 	   * @return the set of symbols that label transitions from 'source' to 'target'
 	   *
        */
-      const  std::set<Symbol> getSymbols( State source, State target ) const;
+      const  SymbolSet getSymbols( State source, State target ) const;
 
       /**
        * 
@@ -594,7 +593,7 @@ namespace wali
 	   * @return the set of symbols that label transitions from 'source'
 	   *
        */
-      const  std::set<Symbol> getSymbolsFrom( State source ) const;
+      const  SymbolSet getSymbolsFrom( State source ) const;
 
       /**
        * 
@@ -606,7 +605,7 @@ namespace wali
 	   * @return the set of symbols that label transitions to 'target'
 	   *
        */
-      const  std::set<Symbol> getSymbolsTo( State target ) const;
+      const  SymbolSet getSymbolsTo( State target ) const;
 
       /**
        *  
@@ -739,7 +738,7 @@ namespace wali
 	   *			call-predecessor is 'call' and whose return site is 'ret'
 	   *
        */
-      const  std::set<Symbol> getCallRetSymbols( State call, State ret ) const;
+      const  SymbolSet getCallRetSymbols( State call, State ret ) const;
 
       /**
        * 
@@ -754,7 +753,7 @@ namespace wali
 	   *			call-predecessor is 'call'
 	   *
        */
-      const  std::set<Symbol> getCallRetSymbolsFrom( State call ) const;
+      const  SymbolSet getCallRetSymbolsFrom( State call ) const;
 
       /**
        * 
@@ -769,7 +768,7 @@ namespace wali
 	   *			return site is 'ret'
 	   *
        */
-      const  std::set<Symbol> getCallRetSymbolsTo( State ret ) const;
+      const  SymbolSet getCallRetSymbolsTo( State ret ) const;
 
       /**
        *  
@@ -1036,7 +1035,7 @@ namespace wali
        * @return the set of symbols that label call transitions in the NWA
        *
        */
-      const  std::set<Symbol> getCallSym( ) const;
+      const  SymbolSet getCallSym( ) const;
 
       /**
        * 
@@ -1052,7 +1051,7 @@ namespace wali
        *          'callSite' to 'entryPoint' in the NWA
        *
        */
-      const  std::set<Symbol> getCallSym( State callSite, State entryPoint ) const;
+      const  SymbolSet getCallSym( State callSite, State entryPoint ) const;
 
       /**
        * 
@@ -1067,7 +1066,7 @@ namespace wali
        *          'callSite' in the NWA
        *
        */
-      const  std::set<Symbol> getCallSym_Call( State callSite ) const;
+      const  SymbolSet getCallSym_Call( State callSite ) const;
 
       /**
        * 
@@ -1082,7 +1081,7 @@ namespace wali
        *          'entryPoint' in the NWA
        *
        */
-      const  std::set<Symbol> getCallSym_Entry( State entryPoint ) const;
+      const  SymbolSet getCallSym_Entry( State entryPoint ) const;
 
       /**
        * 
@@ -1095,7 +1094,7 @@ namespace wali
        * @return the set of entry point states associated with the given symbol
        *
        */
-      const  std::set<Key> getEntries_Sym( Symbol symbol ) const;
+      const  StateSet getEntries_Sym( Symbol symbol ) const;
       
       /**
        * 
@@ -1286,7 +1285,7 @@ namespace wali
      * @return the set of symbols that label internal transitions in the NWA
      *
      */
-    const  std::set<Symbol> getInternalSym( ) const;
+    const  SymbolSet getInternalSym( ) const;
 
     /**
      * 
@@ -1302,7 +1301,7 @@ namespace wali
      *          to 'target' in the NWA
      *
      */
-      const  std::set<Symbol> getInternalSym( State source, State target ) const;
+      const  SymbolSet getInternalSym( State source, State target ) const;
 
       /**
      * 
@@ -1317,7 +1316,7 @@ namespace wali
      *          in the NWA
      *
      */
-      const  std::set<Symbol> getInternalSym_Source( State source ) const;
+      const  SymbolSet getInternalSym_Source( State source ) const;
 
       /**
      * 
@@ -1332,7 +1331,7 @@ namespace wali
      *          to 'target' in the NWA
      *
      */
-      const  std::set<Symbol> getInternalSym_Target( State target ) const;
+      const  SymbolSet getInternalSym_Target( State target ) const;
 
       /**
        * 
@@ -1723,7 +1722,7 @@ namespace wali
        * @return the set of symbols that label return transitions in the NWA
        *
        */
-      const  std::set<Symbol> getReturnSym( ) const;
+      const  SymbolSet getReturnSym( ) const;
 
       /**
        * 
@@ -1740,7 +1739,7 @@ namespace wali
        *          to 'returnSite' with call-predecessor 'callSite' in the NWA
        *
        */
-      const  std::set<Symbol> getReturnSym( State exitPoint, State callSite, State returnSite ) const;
+      const  SymbolSet getReturnSym( State exitPoint, State callSite, State returnSite ) const;
 
       /**
        * 
@@ -1755,7 +1754,7 @@ namespace wali
        *          in the NWA
        *
        */
-      const  std::set<Symbol> getReturnSym_Exit( State exitPoint ) const;
+      const  SymbolSet getReturnSym_Exit( State exitPoint ) const;
 
       /**
        * 
@@ -1770,7 +1769,7 @@ namespace wali
        *          with call-predecessor 'callSite' in the NWA
        *
        */
-      const  std::set<Symbol> getReturnSym_Call( State callSite ) const;
+      const  SymbolSet getReturnSym_Call( State callSite ) const;
 
       /**
        * 
@@ -1785,7 +1784,7 @@ namespace wali
        *          to 'returnSite' in the NWA
        *
        */
-      const  std::set<Symbol> getReturnSym_Ret( State returnSite ) const;
+      const  SymbolSet getReturnSym_Ret( State returnSite ) const;
 
       /**
        * 
@@ -1801,7 +1800,7 @@ namespace wali
        *          with call-predecessor 'callSite' in the NWA
        *
        */
-      const  std::set<Symbol> getReturnSym_ExitCall( State exitPoint, State callSite ) const;
+      const  SymbolSet getReturnSym_ExitCall( State exitPoint, State callSite ) const;
 
       /**
        * 
@@ -1817,7 +1816,7 @@ namespace wali
        *          to 'returnSite' in the NWA
        *
        */
-      const  std::set<Symbol> getReturnSym_ExitRet( State exitPoint, State returnSite ) const;
+      const  SymbolSet getReturnSym_ExitRet( State exitPoint, State returnSite ) const;
 
       /**
        * 
@@ -1833,7 +1832,7 @@ namespace wali
        *          to 'returnSite' with call-predecessor 'callSite' in the NWA
        *
        */
-      const  std::set<Symbol> getReturnSym_CallRet( State callSite, State returnSite ) const;
+      const  SymbolSet getReturnSym_CallRet( State callSite, State returnSite ) const;
 
 
       /**

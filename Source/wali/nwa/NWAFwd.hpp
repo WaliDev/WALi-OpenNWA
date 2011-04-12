@@ -24,6 +24,9 @@ namespace wali
 
     struct Configuration;
     class NestedWord;
+
+    typedef std::set<State> StateSet;
+    typedef std::set<Symbol> SymbolSet;
   }
 }
   

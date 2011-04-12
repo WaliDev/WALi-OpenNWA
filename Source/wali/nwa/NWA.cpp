@@ -107,7 +107,7 @@ namespace wali
      *
      */
     
-    const NWA::StateSet & NWA::getStates( ) const
+    const StateSet & NWA::getStates( ) const
     {
       return states.getStates();
     }
@@ -219,7 +219,7 @@ namespace wali
      */
     
     
-    const NWA::StateSet & NWA::getInitialStates( ) const
+    const StateSet & NWA::getInitialStates( ) const
     {
       return states.getInitialStates();
     }
@@ -309,7 +309,7 @@ namespace wali
      */
     
     
-    const NWA::StateSet & NWA::getFinalStates( ) const
+    const StateSet & NWA::getFinalStates( ) const
     {
       return states.getFinalStates();
     }
@@ -692,7 +692,7 @@ namespace wali
 	   *
      */
 	  
-    const NWA::StateSet NWA::getPredecessors( State state ) const
+    const StateSet NWA::getPredecessors( State state ) const
     {
 	    StateSet preds;
       getPredecessors(state, preds);
