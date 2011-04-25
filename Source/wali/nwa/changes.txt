@@ -73,47 +73,48 @@ Summary:
 --    From the ReachGen class, remove the Kind enumeration (I think it's
 --    unused), and the St and Sym typedefs (which will then refer to the
 --    typedefs at the namespace level).
-
-
-3. Rename various things associated with StateSets.
-
-   -- COMMITTED REV 918
-   -- Inside the class 'StateStorage', deprecate the 'States' typedef. Replace it
-   -- with a 'StateSet' typedef in the class StateStorage.
-
-   -- COMMITTED REV 912 (and 913)
-   -- Move the class 'StateSet' from namespace wali::nwa to
-   -- wali::nwa::details.
-
-   -- COMMITTED REV 917
-   -- Rename it to 'StateStorage'. Fix references.
-
-   -- COMMITTED REV 916 (and #include uses, but old class names)
-   -- Rename the corresponding files to match.
-
-   -- COMMITTED REV 915, though you can call static methods throguh a
-   -- deprecated typedef without a warning from GCC.
-   -- Create a new file 'StateSet.hpp' which gives a deprecated typedef to
-   -- the old (current) name.
-
-   -- COMMITTED REV 918 (and three missed uses in one file in 925)
-   -- Deprecate the typedef 'NWA::States'. Add a new typedef 'StateStorage' in
-   -- its place. Change uses of 'States' to 'StateStorage'.
-
-   -- LATER: COMMITTED REV 942. (StateSet.hpp was removed in 939, 941, w/ #4)
-   --        Remove deprecated typedefs: 'NWA::States', 
-   --        and 'StateStorage::States', and remove the StateSet.hpp header.
-   --        ('NWA::StateSet' was in this list but that was a mistake; see
-   --        below.)
-
-   LATER: Add a typedef 'StateSet' (from std::set<State>) at namespace level
-          (wali::nwa). Remove the 'StateSet' typedef in StateStorage, and let
-          things fall back to the namespace-level typedef.
-
-          Deprecate the typedef 'NWA::StateSet', replacing it with the same
-          typedef at namespace scope.
-
-
+-- 
+-- 
+-- 3. Rename various things associated with StateSets.
+-- 
+--    COMMITTED REV 918
+--    Inside the class 'StateStorage', deprecate the 'States' typedef. Replace it
+--    with a 'StateSet' typedef in the class StateStorage.
+-- 
+--    COMMITTED REV 912 (and 913)
+--    Move the class 'StateSet' from namespace wali::nwa to
+--    wali::nwa::details.
+-- 
+--    COMMITTED REV 917
+--    Rename it to 'StateStorage'. Fix references.
+-- 
+--    COMMITTED REV 916 (and #include uses, but old class names)
+--    Rename the corresponding files to match.
+-- 
+--    COMMITTED REV 915, though you can call static methods throguh a
+--    deprecated typedef without a warning from GCC.
+--    Create a new file 'StateSet.hpp' which gives a deprecated typedef to
+--    the old (current) name.
+-- 
+--    COMMITTED REV 918 (and three missed uses in one file in 925)
+--    Deprecate the typedef 'NWA::States'. Add a new typedef 'StateStorage' in
+--    its place. Change uses of 'States' to 'StateStorage'.
+-- 
+--    LATER: COMMITTED REV 942. (StateSet.hpp was removed in 939, 941, w/ #4)
+--           Remove deprecated typedefs: 'NWA::States', 
+--           and 'StateStorage::States', and remove the StateSet.hpp header.
+--           ('NWA::StateSet' was in this list but that was a mistake; see
+--           below.)
+-- 
+--    LATER: COMMITTED REV 960
+--           Add a typedef 'StateSet' (from std::set<State>) at namespace level
+--           (wali::nwa). Remove the 'StateSet' typedef in StateStorage, and let
+--           things fall back to the namespace-level typedef.
+--    
+--           Deprecate the typedef 'NWA::StateSet', replacing it with the same
+--           typedef at namespace scope.
+-- 
+-- 
 -- 4. Rename classes 'SymbolSet', 'TransSet', and 'TransInfo'
 -- 
 --    COMMITTED REV 912 (and 913)

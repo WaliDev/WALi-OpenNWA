@@ -36,7 +36,6 @@ namespace wali
     {
       public:
         typedef ClientInfo Client;
-        typedef std::set<State> StateSet;
         typedef StateSet::const_iterator const_iterator;   
         typedef StateSet::iterator iterator; 
 
