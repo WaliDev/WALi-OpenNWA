@@ -6,6 +6,8 @@
  */
 
 // ::wali
+#include "wali/nwa/deprecate.h"
+
 #include "wali/Printable.hpp"
 #include "wali/Key.hpp"
 #include "wali/nws/NWSNode.hpp"
@@ -22,8 +24,10 @@ namespace wali
 
   namespace nws
   {
-
-    class NWS : public Printable
+    
+    class
+    DEPRECATE("I don't think anyone's using this. Let me know if that's not true. -Evan")
+    NWS : public Printable
     {
       public:
       typedef std::deque<NWSNode *>::iterator iterator;
