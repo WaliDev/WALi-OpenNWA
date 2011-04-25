@@ -311,23 +311,26 @@ Summary:
         NWAtoBackwardsPDScalls   (two overloads become one)
         
 
--- 16. COMMITTED REV 968, 969
---
---     Remove stuck state stuff.
---
---     (THIS SHOULD COME AT THE VERY LAST, AND THERE ARE BREAKING CHANGES)
---
---     Remove 'NWA(St stuck)' constructor, 'hasStuckState', 'getStuckState',
---     'setStuckState', 'isStuckState'. Remove the stuck state member.
---
---     Change 'realizeImplicitTransitions' so it takes a 'use this as the stuck
---     state' parameter. Do the same for any function that calls
---     realizeImplicitTransitions (currently apparently only 'determinize' and
---     'plusWPDS'.
---
---     Didn't do this:
---     LATER: Add an overload for those functions that will automatically pick a
---            stuck state for you.
+16. -- COMMITTED REV 968
+
+    -- Remove stuck state stuff.
+
+    -- (THIS SHOULD COME AT THE VERY LAST, AND THERE ARE BREAKING CHANGES)
+
+    -- Remove 'NWA(St stuck)' constructor, 'hasStuckState', 'getStuckState',
+    -- 'setStuckState', 'isStuckState'. Remove the stuck state member.
+
+    -- Change 'realizeImplicitTransitions' so it takes a 'use this as the stuck
+    -- state' parameter. Do the same for any function that calls
+    -- realizeImplicitTransitions (currently apparently only 'determinize' and
+    -- 'plusWPDS'.
+
+    Still have to figure out what to do with the static overloads... I can't
+    remove the stuck state parameter or GCC complains.
+
+    Didn't do this:
+    LATER: Add an overload for those functions that will automatically pick a
+           stuck state for you.
 
 
 17. Write generic 'query' function and supporting structures.
