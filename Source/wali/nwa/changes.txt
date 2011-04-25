@@ -221,53 +221,53 @@ Summary:
 -- 
 --            COMMITTED REV 947
 --            Remove deprecated typedefs.
-
-
-13. COMMITTED REVS: 951--956 (including just a commit w/ just this file)
-
-    -- Change functions in NWA which take a NWARefPtr parameter to take a
-    -- (possibly const) reference instead. For each function, introduce an
-    -- overload for the RefPtr version, and deprecate it.
-
-    -- Here is the list:
-    --   DEPRECATED REV 951, REMOVED 965:
-    --     projectStates
-    --     unionNWA    (two overloads)
-    --     overlap
-    --     intersect   (two overloads)
-    --  DEPRECATED AND REMOVED REV 951
-    --     intersectClientInfoCall
-    --     intersectClientInfoInternal
-    --     intersectClientInfoReturn
-    --     stateIntersect
-    --     transitionIntersect
-    --     epsilonClosure (only one of the two overloads)
-    --  DEPRECATED REV 952, REMOVED 966
-    --     concat      (two overloads)
-    --     reverse     (two overloads)
-    --     star        (two overloads)
-    --  DEPRECATED REV 953
-    --     NWAtoPDSreturns          (only static version)
-    --     NWAtoBackwardsPDSreturns (only static version)
-    --     NWAtoPDScalls            (only static version)
-    --     NWAtoBackwardsPDScalls   (only static version)
-    --  DEPRECATED REV 955
-    --     determinize (two overloads)
-    --     mergeClientInfo
-    --     mergeClientInfoCall
-    --     mergeClientInfoInternal
-    --     mergeClientInfoReturn
-    --  DEPRECATED REV 956
-    --     inclusion
-    --     equal
-    --     complement  (two overloads)
-
-    Figure out what to do about
-      plusWPDS                 (only static version)
-
-    LATER: Remove deprecated functions
-
-
+--
+--
+-- 13. COMMITTED REVS: 951--956 (including just a commit w/ just this file)
+--                     965--967 later
+--
+--     Change functions in NWA which take a NWARefPtr parameter to take a
+--     (possibly const) reference instead. For each function, introduce an
+--     overload for the RefPtr version, and deprecate it.
+--
+--     Here is the list:
+--       DEPRECATED REV 951, REMOVED 965:
+--         projectStates
+--         unionNWA    (two overloads)
+--         overlap
+--         intersect   (two overloads)
+--      DEPRECATED AND REMOVED REV 951
+--         intersectClientInfoCall
+--         intersectClientInfoInternal
+--         intersectClientInfoReturn
+--         stateIntersect
+--         transitionIntersect
+--         epsilonClosure (only one of the two overloads)
+--      DEPRECATED REV 952, REMOVED 966
+--         concat      (two overloads)
+--         reverse     (two overloads)
+--         star        (two overloads)
+--      DEPRECATED REV 953, REMOVED 967
+--         NWAtoPDSreturns          (only static version)
+--         NWAtoBackwardsPDSreturns (only static version)
+--         NWAtoPDScalls            (only static version)
+--         NWAtoBackwardsPDScalls   (only static version)
+--      DEPRECATED REV 955, REMOVED 967
+--         determinize (two overloads)
+--      DEPRECATED AND REMOVED 955
+--         mergeClientInfo
+--         mergeClientInfoCall
+--         mergeClientInfoInternal
+--         mergeClientInfoReturn
+--      DEPRECATED REV 956, REMOVED 967
+--         inclusion
+--         equal
+--         complement  (two overloads)
+--
+--     LATER: COMMITTED REVS 965-967
+--            Remove deprecated functions
+--
+--
 -- 14. ABORTED, for now at least. They refer to things in the NWA itself, and it is pretty
 --     directly related.
 --

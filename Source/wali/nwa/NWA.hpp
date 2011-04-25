@@ -2321,11 +2321,6 @@ namespace wali
        */
       void complement( NWA const & first );
 
-      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
-      void complement( NWARefPtr first )
-      {
-        complement(*first);
-      }
       
 
       /**
@@ -2349,12 +2344,6 @@ namespace wali
       }
 
 
-      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
-      static NWARefPtr complement( NWARefPtr first, State stuck )
-      {
-        return complement(*first, stuck);
-      }
-
       /**
        *
        * @brief constructs a deterministic NWA that is equivalent to the given NWA.
@@ -2369,11 +2358,6 @@ namespace wali
        */
       void determinize( NWA const & nondet );
 
-      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
-      void determinize( NWARefPtr nondet )
-      {
-        determinize(*nondet);
-      }
 
       /**
        *
@@ -2394,11 +2378,6 @@ namespace wali
         return nwa;
       }
 
-      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
-      static NWARefPtr determinize( NWARefPtr nondet, State stuck )
-      {
-        return determinize(*nondet, stuck);
-      }
 
       /**
        *
@@ -2764,11 +2743,6 @@ namespace wali
         return nwa.NWAtoPDSreturns(wg);
       }
 
-      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
-      static wpds::WPDS NWAtoPDSreturns( NWARefPtr nwa, WeightGen & wg )
-      {
-        return NWAtoPDSreturns(*nwa, wg);
-      }
       /**
        *
        * @brief constructs the backwards PDS equivalent to this NWA
@@ -2798,11 +2772,6 @@ namespace wali
         return nwa.NWAtoBackwardsPDSreturns(wg);
       }
 
-      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
-      static wpds::WPDS NWAtoBackwardsPDSreturns( NWARefPtr nwa, WeightGen & wg )
-      {
-        return NWAtoBackwardsPDSreturns(*nwa, wg);
-      }
 
       /**
        *
@@ -2833,11 +2802,6 @@ namespace wali
         return nwa.NWAtoPDScalls(wg);
       }
 
-      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
-      static wpds::WPDS NWAtoPDScalls( NWARefPtr nwa, WeightGen & wg )
-      {
-        return nwa->NWAtoPDScalls(wg);
-      }
 
       /**
        *
@@ -2868,11 +2832,6 @@ namespace wali
         return nwa.NWAtoBackwardsPDScalls(wg);
       }
 
-      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
-      static wpds::WPDS NWAtoBackwardsPDScalls( NWARefPtr nwa, WeightGen & wg )
-      {
-        return nwa->NWAtoBackwardsPDScalls(wg);
-      }
       
       /**
        *
@@ -2922,11 +2881,6 @@ namespace wali
         return inter.isEmpty();
       }
 
-      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
-      static bool inclusion( NWARefPtr first, NWARefPtr second )
-      {
-        return inclusion(*first, *second);
-      }
 
       /**
        *
@@ -2952,11 +2906,6 @@ namespace wali
         return (first_in_second && second_in_first );
       }
 
-      DEPRECATE("Use NWA const & version instead of NWARefPtr version")
-      static bool equal( NWARefPtr first, NWARefPtr second)
-      {
-        return equal(*first, *second);
-      }
 
       /**
        *
