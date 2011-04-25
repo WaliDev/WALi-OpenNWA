@@ -106,7 +106,7 @@ Summary:
 --           ('NWA::StateSet' was in this list but that was a mistake; see
 --           below.)
 -- 
---    LATER: COMMITTED REV 961
+--    LATER: COMMITTED REV 961 (& 962 to fix that number)
 --           Add a typedef 'StateSet' (from std::set<State>) at namespace level
 --           (wali::nwa). Remove the 'StateSet' typedef in StateStorage, and let
 --           things fall back to the namespace-level typedef.
@@ -199,7 +199,7 @@ Summary:
     -- LATER: COMMITED REV 945 (NWA stuff) & 946 (NWP)
     --        Remove WordRecConfig, NWA::isMember, NWP. Deprecate NWA::simulateWord.
 
-    -- LATER: COMMITTED REV 962
+    -- LATER: COMMITTED REV 963 (& 964 to fix this number)
     --        Remove NWA::simulateWord. Deprecate class NWS.
 
     LATER: Remove NWS.
