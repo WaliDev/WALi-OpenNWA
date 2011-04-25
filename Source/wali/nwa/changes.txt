@@ -230,33 +230,34 @@ Summary:
     -- overload for the RefPtr version, and deprecate it.
 
     -- Here is the list:
-    --   COMMITTED REV 951:
+    --   DEPRECATED REV 951, REMOVED 965:
     --     projectStates
     --     unionNWA    (two overloads)
     --     overlap
     --     intersect   (two overloads)
+    --  DEPRECATED AND REMOVED REV 951
     --     intersectClientInfoCall
     --     intersectClientInfoInternal
     --     intersectClientInfoReturn
     --     stateIntersect
     --     transitionIntersect
     --     epsilonClosure (only one of the two overloads)
-    --  COMMITTED REV 952
+    --  DEPRECATED REV 952
     --     concat      (two overloads)
     --     reverse     (two overloads)
     --     star        (two overloads)
-    --  COMMITTED REV 953
+    --  DEPRECATED REV 953
     --     NWAtoPDSreturns          (only static version)
     --     NWAtoBackwardsPDSreturns (only static version)
     --     NWAtoPDScalls            (only static version)
     --     NWAtoBackwardsPDScalls   (only static version)
-    --  COMMITTED REV 955
+    --  DEPRECATED REV 955
     --     determinize (two overloads)
     --     mergeClientInfo
     --     mergeClientInfoCall
     --     mergeClientInfoInternal
     --     mergeClientInfoReturn
-    --  COMMITTED REV 956
+    --  DEPRECATED REV 956
     --     inclusion
     --     equal
     --     complement  (two overloads)

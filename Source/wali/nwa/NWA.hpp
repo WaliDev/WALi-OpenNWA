@@ -16,8 +16,6 @@
 #include "wali/nwa/details/StateStorage.hpp"
 #include "wali/nwa/details/TransitionStorage.hpp"
 
-#include "wali/nws/NWS.hpp"
-
 #include "wali/wpds/WPDS.hpp"
 #include "wali/wpds/RuleFunctor.hpp"
 #include "wali/wpds/Rule.hpp"
@@ -2077,11 +2075,6 @@ namespace wali
       */
       void projectStates(NWA const & first, StateSet const & prjStates);
 
-      DEPRECATE("Use const NWA & version instead of NWARefPtr version")
-      void projectStates(const NWARefPtr &first, const StateSet &prjStates) {
-        projectStates(*first, prjStates);
-      }
-        
 
       /**
        *
@@ -2098,11 +2091,6 @@ namespace wali
        *
        */
       void unionNWA( NWA const & first, NWA const & second );
-
-      DEPRECATE("Use const NWA & version instead of NWARefPtr version")
-      void unionNWA( NWARefPtr first, NWARefPtr second ) {
-        unionNWA(*first, *second);
-      }
       
       /**
        *
@@ -2125,10 +2113,6 @@ namespace wali
         return nwa;
       }
 
-      DEPRECATE("Use const NWA & version instead of NWARefPtr version")
-      static NWARefPtr unionNWA( NWARefPtr first, NWARefPtr second, State stuck ) {
-        return unionNWA(*first, *second, stuck);
-      }
       
       //TODO: write comments
       virtual bool isTransitionPossible( const State &src, const Symbol &sym, const State &tgt);
@@ -2148,11 +2132,6 @@ namespace wali
        *	
        */
       void intersect( NWA const & first, NWA const & second );
-
-      DEPRECATE("Use const NWA & version instead of NWARefPtr version")
-      void intersect( NWARefPtr first, NWARefPtr second ) {
-        intersect(*first, *second);
-      }
 
       
       /**
@@ -2176,10 +2155,6 @@ namespace wali
         return nwa;
       }
 
-      DEPRECATE("Use const NWA & version instead of NWARefPtr version")
-      static NWARefPtr intersect( NWARefPtr first, NWARefPtr second, State stuck ) {
-        return intersect(*first, *second, stuck);
-      }
 
       /**
        * @brief Detects (immediately) stuck states and removes them
@@ -2503,11 +2478,8 @@ namespace wali
           return true;
         }
       }
-      DEPRECATE("Use const NWA & version instead of NWARefPtr version")
-      static bool overlap(NWARefPtr first, NWARefPtr second) {
-        return overlap(*first, *second);
-      }
 
+        
       /**
        * 
        * @brief intersects client information 
