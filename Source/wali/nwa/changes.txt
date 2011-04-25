@@ -242,7 +242,7 @@ Summary:
     --     stateIntersect
     --     transitionIntersect
     --     epsilonClosure (only one of the two overloads)
-    --  DEPRECATED REV 952
+    --  DEPRECATED REV 952, REMOVED 966
     --     concat      (two overloads)
     --     reverse     (two overloads)
     --     star        (two overloads)

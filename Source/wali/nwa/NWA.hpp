@@ -2213,10 +2213,6 @@ namespace wali
        */
       void concat( NWA const & first, NWA const & second );
 
-      DEPRECATE("Use const NWA & version instead of NWARefPtr version")
-      void concat( NWARefPtr first, NWARefPtr second ) {
-        concat(*first, *second);
-      }
       /**
        *
        * @brief constructs the NWA resulting from the concatenation of the given NWAs
@@ -2238,11 +2234,6 @@ namespace wali
         return nwa;
       }
 
-      DEPRECATE("Use const NWA & version instead of NWARefPtr version")
-      static NWARefPtr concat( NWARefPtr first, NWARefPtr second, State stuck )
-      {
-        return concat(*first, *second, stuck);
-      }
 
       /**
        *
@@ -2259,11 +2250,6 @@ namespace wali
        */
       void reverse( NWA const & first );
 
-      DEPRECATE("Use const NWA & version instead of NWARefPtr version")
-      void reverse( NWARefPtr first )
-      {
-        reverse(*first);
-      }
       /**
        *
        * @brief constructs the NWA which is the reverse of the given NWA
@@ -2284,12 +2270,6 @@ namespace wali
         return nwa;
       }
 
-      DEPRECATE("Use const NWA & version instead of NWARefPtr version")
-      static NWARefPtr reverse( NWARefPtr first, State stuck )
-      {
-        return reverse(*first, stuck);
-      }
-
       /**
        *
        * @brief constructs the NWA resulting from performing Kleene-* on the given NWA
@@ -2305,11 +2285,6 @@ namespace wali
        */
       void star( NWA const & first );
 
-      DEPRECATE("Use const NWA & version instead of NWARefPtr version")
-      void star( NWARefPtr first )
-      {
-        star(*first);
-      }
       /**
        *
        * @brief constructs the NWA resulting from performing Kleene-* on the given NWA
@@ -2330,11 +2305,6 @@ namespace wali
         return nwa;
       }
 
-      DEPRECATE("Use const NWA & version instead of NWARefPtr version")
-      static NWARefPtr star( NWARefPtr first, State stuck )
-      {
-        return star(*first, stuck);
-      }
 
       /**
        * 
