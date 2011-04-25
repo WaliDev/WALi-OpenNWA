@@ -106,7 +106,7 @@ Summary:
 --           ('NWA::StateSet' was in this list but that was a mistake; see
 --           below.)
 -- 
---    LATER: COMMITTED REV 960
+--    LATER: COMMITTED REV 961
 --           Add a typedef 'StateSet' (from std::set<State>) at namespace level
 --           (wali::nwa). Remove the 'StateSet' typedef in StateStorage, and let
 --           things fall back to the namespace-level typedef.
