@@ -14,21 +14,13 @@ namespace wali
 
     //Constructors and Destructor
     NWA::NWA( )
-      : stuck(false)
     { }
-
-    
-    NWA::NWA( State stuckSt )
-      : stuck(false)
-    {
-      setStuckState(stuckSt); 
-    }
 
     
     NWA::NWA( const NWA & other )
       : Printable(other)
       , Countable(other)
-      , stuck( other.stuck), states(other.states), symbols(other.symbols), trans(other.trans)
+      , states(other.states), symbols(other.symbols), trans(other.trans)
     {   }
 
     
@@ -41,7 +33,6 @@ namespace wali
       clear();
 
       //Copy data over from 'other'
-      stuck = other.stuck;
       states = other.states;
       symbols = other.symbols;
       trans = other.trans;
@@ -139,7 +130,6 @@ namespace wali
     bool NWA::addState( State state )
     {
       assert(state < wali::WALI_BAD_KEY);
-      assert(stuck);
       return states.addState(state);
     }
 
@@ -178,9 +168,6 @@ namespace wali
     bool NWA::removeState( State state )
     {
       assert(state < wali::WALI_BAD_KEY);
-      assert(stuck);
-      if( isStuckState(state) )   //Can't remove the stuck state.
-        return false;
 
       bool removed = states.removeState(state);
       //Remove transitions associated with the state that was removed.
@@ -204,8 +191,6 @@ namespace wali
 
       //Since all states are being removed, all transitions are removed as well.
       clearTrans();
-
-      stuck = false;    //The stuck state has been removed too.
     }
 
     //Initial States
@@ -343,18 +328,6 @@ namespace wali
     bool NWA::addFinalState( State state )
     {
       assert(state < wali::WALI_BAD_KEY);
-
-      //Q: should we allow the stuck state to be made final? if so, do we need to do anything special?
-      //A: No.  Yes, realize implicit transitions(removing the stuck state in the process) and allow 
-      //           the state to be made final.
-
-      //If we are trying to add the stuck state as a final state, all implicit transitions
-      //must be realized and this state can no longer be the stuck state.
-      if( isStuckState(state) )
-      {
-        realizeImplicitTrans();
-      }
-
       return states.addFinalState(state);
     }
 
@@ -445,7 +418,6 @@ namespace wali
     bool NWA::addSymbol( Symbol sym )
     {
       assert(sym < wali::WALI_BAD_KEY);
-      assert(stuck);
       return symbols.addSymbol(sym);
     }
 
@@ -497,7 +469,6 @@ namespace wali
     
     void NWA::clearSymbols( )
     {
-      //assert(stuck);
       symbols.clearSymbols();
 
       //Since all symbols are being removed, all transitions are removed as well.
@@ -1094,8 +1065,6 @@ namespace wali
     {
       assert(orig < wali::WALI_BAD_KEY);
       assert(dup < wali::WALI_BAD_KEY);
-      assert(stuck);
-      assert(!isStuckState(orig));  //Duplicating the stuck state doesn't make sense.
       assert(isState(orig));
 
       states.addState(dup);
@@ -1117,8 +1086,6 @@ namespace wali
     {
       assert(orig < wali::WALI_BAD_KEY);
       assert(dup < wali::WALI_BAD_KEY);
-      assert(stuck);
-      assert(!isStuckState(orig));  //Duplicating the stuck state doesn't make sense.
       assert(isState(orig));
 
       states.addState(dup);
@@ -1133,9 +1100,9 @@ namespace wali
      *
      */
     
-    void NWA::realizeImplicitTrans()
+    void NWA::realizeImplicitTrans(State stuck)
     {
-       std::set<Triple<State, Symbol, State> > returns;
+      std::set<Triple<State, Symbol, State> > returns;
       for( ReturnIterator ret = beginReturnTrans(); ret != endReturnTrans(); ++ret) 
       {
         returns.insert(Triple<State, Symbol, State>(ret->first, ret->second, ret->third));
@@ -1174,12 +1141,12 @@ namespace wali
 
           if( !trans.callExists(state, symbol) && !trans.callExists(state, WALI_WILD) )
           {
-            addCallTrans(state, symbol, getStuckState());
+            addCallTrans(state, symbol, stuck);
           }
 
           if( !trans.internalExists(state, symbol) && !trans.internalExists(state, WALI_WILD) )
           {
-            addInternalTrans(state, symbol, getStuckState());
+            addInternalTrans(state, symbol, stuck);
           }
 
           for( stateIterator pred = beginStates(); pred != endStates(); ++pred )
@@ -1187,13 +1154,11 @@ namespace wali
             if( returns.find(Triple<State,Symbol,State>(state, *pred, symbol)) == returns.end() 
               && returns.find(Triple<State,Symbol,State>(state, *pred, WALI_WILD)) == returns.end() )
             {
-              addReturnTrans(state, *pred, symbol, getStuckState());
+              addReturnTrans(state, *pred, symbol, stuck);
             }
           }
         } // for each symbol
       } // for each state
-
-      stuck = false;  //Since all transitions are explicit, the stuck state is reset.
     }
 
     /**
@@ -1217,7 +1182,6 @@ namespace wali
      */
     void NWA::clearTrans( )
     {
-      //assert(stuck);
       trans.clear();
     }
 
@@ -1515,20 +1479,11 @@ namespace wali
     
     bool NWA::addCallTrans( State from, Symbol sym, State to )
     {
-      assert(stuck);
-
       assert(from < wali::WALI_BAD_KEY);
       assert(sym < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
 
       assert(sym != WALI_EPSILON ); //An Epsilon symbol on a call doesn't make sense.
-
-      //Don't allow transitions out of the stuck state (unless they go to the stuck state --
-      //otherwise it isn't really a stuck state).
-      if( isStuckState(from) )
-      {
-        assert( isStuckState(to) );
-      }
 
       //Add the states and symbol of this transition to the appropriate sets.
       addState(from);
@@ -1549,20 +1504,11 @@ namespace wali
     
     bool NWA::addCallTrans( Call & ct )
     {
-      assert(stuck);
-
       assert(Trans::getCallSite(ct) < wali::WALI_BAD_KEY);
       assert(Trans::getCallSym(ct) < wali::WALI_BAD_KEY);
       assert(Trans::getEntry(ct) < wali::WALI_BAD_KEY);
 
       assert( Trans::getCallSym(ct) != WALI_EPSILON ); //An Epsilon symbol on a call doesn't make sense.
-
-      //Don't allow transitions out of the stuck state (unless they go to the stuck state --
-      //otherwise it isn't really a stuck state).
-      if( isStuckState(Trans::getCallSite(ct)) )
-      {
-        assert( isStuckState(Trans::getEntry(ct)) );
-      }
 
       //Add the states and symbol of this transition to the appropriate sets.
       addState(Trans::getCallSite(ct));
@@ -1585,8 +1531,6 @@ namespace wali
     
     bool NWA::removeCallTrans( State from, Symbol sym, State to )
     {
-      assert(stuck);
-
       assert(from < wali::WALI_BAD_KEY);
       assert(sym < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
@@ -1608,8 +1552,6 @@ namespace wali
     
     bool NWA::removeCallTrans( const Call & ct )
     {
-      assert(stuck);
-
       assert(Trans::getCallSite(ct) < wali::WALI_BAD_KEY);
       assert(Trans::getCallSym(ct) < wali::WALI_BAD_KEY);
       assert(Trans::getEntry(ct) < wali::WALI_BAD_KEY);
@@ -1924,18 +1866,9 @@ namespace wali
     
     bool NWA::addInternalTrans( State from, Symbol sym, State to )
     {
-      assert(stuck);
-
       assert(from < wali::WALI_BAD_KEY);
       assert(sym < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
-
-      //Don't allow transitions out of the stuck state (unless they go to the stuck state --
-      //otherwise it isn't really a stuck state).
-      if( isStuckState(from) )
-      {
-        assert(isStuckState(to));
-      }
 
       //Add the states and symbol of this transition to the appropriate sets.
       addState(from);
@@ -1956,18 +1889,9 @@ namespace wali
     
     bool NWA::addInternalTrans( Internal & it )
     {
-      assert(stuck);
-
       assert(Trans::getSource(it) < wali::WALI_BAD_KEY);
       assert(Trans::getInternalSym(it) < wali::WALI_BAD_KEY);
       assert(Trans::getTarget(it) < wali::WALI_BAD_KEY);
-
-      //Don't allow transitions out of the stuck state (unless they go to the stuck state --
-      //otherwise it isn't really a stuck state).
-      if( isStuckState(Trans::getSource(it)) )
-      {
-        assert( isStuckState(Trans::getTarget(it)) );
-      }
 
       //Add the states and symbol of this transition to the appropriate sets.
       addState(Trans::getSource(it));
@@ -1990,8 +1914,6 @@ namespace wali
     
     bool NWA::removeInternalTrans( State from, Symbol sym, State to )
     {
-      assert(stuck);
-
       assert(from < wali::WALI_BAD_KEY);
       assert(sym < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
@@ -2013,8 +1935,6 @@ namespace wali
     
     bool NWA::removeInternalTrans( const Internal & it )
     {
-      assert(stuck);
-
       assert(Trans::getSource(it) < wali::WALI_BAD_KEY);
       assert(Trans::getInternalSym(it) < wali::WALI_BAD_KEY);
       assert(Trans::getTarget(it) < wali::WALI_BAD_KEY);
@@ -2905,25 +2825,12 @@ namespace wali
     
     bool NWA::addReturnTrans( State from, State pred, Symbol sym, State to )
     {
-      assert(stuck);
-
       assert(from < wali::WALI_BAD_KEY);
       assert(pred < wali::WALI_BAD_KEY);
       assert(sym < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
 
       assert( sym != WALI_EPSILON ); //An Epsilon symbol on a return doesn't make sense.
-
-      //Don't allow transitions out of the stuck state (unless they go to the stuck state --
-      //otherwise it isn't really a stuck state).
-      if( isStuckState(from) )
-      {
-        assert( isStuckState(to) );
-      }
-      else if(  isStuckState(pred) )
-      {
-        assert( isStuckState(to) );
-      }
 
       //Add the states and symbol of this transition to the approprite stes.
       addState(from);
@@ -2945,25 +2852,12 @@ namespace wali
     
     bool NWA::addReturnTrans( Return & rt )
     {
-      assert(stuck);
-
       assert(Trans::getExit(rt) < wali::WALI_BAD_KEY);
       assert(Trans::getCallSite(rt) < wali::WALI_BAD_KEY);
       assert(Trans::getReturnSym(rt) < wali::WALI_BAD_KEY);
       assert(Trans::getReturnSite(rt) < wali::WALI_BAD_KEY);
 
       assert( Trans::getReturnSym(rt) != WALI_EPSILON ); //An Epsilon symbol on a return doesn't make sense.
-
-      //Don't allow transitions out of the stuck state (unless they go to the stuck state --
-      //otherwise it isn't really a stuck state).
-      if(  isStuckState(Trans::getExit(rt)) )
-      {
-        assert( isStuckState(Trans::getReturnSite(rt)));
-      }
-      else if( isStuckState(Trans::getCallSite(rt)) )
-      {
-        assert( isStuckState(Trans::getReturnSite(rt)) );
-      }
 
       //Add the states and symbol of this transition to the appropriate sets.
       addState(Trans::getExit(rt));
@@ -2987,8 +2881,6 @@ namespace wali
     
     bool NWA::removeReturnTrans( State from, Symbol sym, State to )
     {
-      assert(stuck);
-
       assert(from < wali::WALI_BAD_KEY);
       assert(sym < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
@@ -3021,8 +2913,6 @@ namespace wali
     
     bool NWA::removeReturnTrans( State from, State pred, Symbol sym, State to )
     {
-      assert(stuck);
-
       assert(from < wali::WALI_BAD_KEY);
       assert(pred < wali::WALI_BAD_KEY);
       assert(sym < wali::WALI_BAD_KEY);
@@ -3046,8 +2936,6 @@ namespace wali
     
     bool NWA::removeReturnTrans( const Return & rt )
     {
-      assert(stuck);
-
       assert(Trans::getExit(rt) < wali::WALI_BAD_KEY);
       assert(Trans::getCallSite(rt) < wali::WALI_BAD_KEY);
       assert(Trans::getReturnSym(rt) < wali::WALI_BAD_KEY);
@@ -3088,7 +2976,6 @@ namespace wali
     void NWA::projectStates(const NWA & other, const StateSet &prjStates)
     {
       //copy data from other
-      stuck = other.stuck;
       states = other.states;
       symbols = other.symbols;
       trans = other.trans;
@@ -3102,7 +2989,7 @@ namespace wali
       //}
       StateSet project_out;
       for(stateIterator it = beginStates(); it!=endStates(); it++) {
-        if( prjStates.count(*it) == 0 && !isStuckState(*it) ) {
+        if( prjStates.count(*it) == 0 ) {
           project_out.insert(*it);
         }
       }
@@ -3141,26 +3028,11 @@ namespace wali
       //Q: How should clientInfos be generated for the union NWA?
       //A: The clientInfos from the component machines are copied and added to the union NWA.
 
-      //Make sure we can modify transitions in this machine.
-      assert(stuck);
-
       //Test state Key overlap of the two NWAs.
       assert(! overlap(first,second) );
 
-      //Check that the stuck state of this NWA does not exist as a state in either component machine 
-      //('first' and 'second') unless it is the stuck state of that machine.
-      if(! first.isStuckState(getStuckState()) )
-        assert(! first.isState(getStuckState()) );
-      if(! second.isStuckState(getStuckState()) )
-        assert(! second.isState(getStuckState()) );
-
 	    //Clear all states(except the stuck state) and transitions from this machine.
-      State stuckSt = getStuckState();
-      ClientInfoRefPtr stuckStInfo = getClientInfo( stuckSt );
       clear();
-      setStuckState(stuckSt);
-      setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
-
 
       //Copy all of the functionality of the two machines.  
       //States (Initial and final state information included.)
@@ -3208,15 +3080,8 @@ namespace wali
       //A: The stuck state is never accepting in any machine, so we do not need to distinguish
       //      (m,stuck) from stuck.
 
-      //Make sure we can modify transitions in this machine.
-      assert(stuck);
-
 	  //Clear all states(except the stuck state) and transitions from this machine.
-      State stuckSt = getStuckState();
-      ClientInfoRefPtr stuckStInfo = getClientInfo( stuckSt );
       clear();
-      setStuckState(stuckSt);
-      setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
 
        std::set<StatePair> visitedPairs; // All the pairs of states we have ever encountered.
       std::deque<StatePair> worklistPairs; // Pairs of states yet to be processed
@@ -3796,12 +3661,10 @@ namespace wali
     }
 
 
-      //#if 0 // Commented out because I don't know how this interacts with the new stuck state behavior
+#if 0 // Commented out because I don't know how this interacts with the new stuck state behavior
     
     void NWA::removeImplicitTransitions()
     {
-      stuck = true;
-        
       // This proceeds in two steps: detects stuck states, then removes
       // them and transitions to them.
 
@@ -3817,8 +3680,7 @@ namespace wali
 
       for( CallIterator call = trans.beginCall(); call != trans.endCall(); ++call)
       {
-        if( Trans::getCallSite(*call) != Trans::getEntry(*call)
-            && Trans::getEntry(*call) != states.getStuckState())
+        if( Trans::getCallSite(*call) != Trans::getEntry(*call) )
         {
           stuckStates.erase(Trans::getCallSite(*call));
         }
@@ -3827,8 +3689,7 @@ namespace wali
       for( InternalIterator internal = trans.beginInternal();
            internal != trans.endInternal(); ++internal)
       {
-        if( Trans::getSource(*internal) != Trans::getTarget(*internal) 
-            && Trans::getTarget(*internal) != states.getStuckState())
+        if( Trans::getSource(*internal) != Trans::getTarget(*internal) )
         {
           stuckStates.erase(Trans::getSource(*internal));
         }
@@ -3836,8 +3697,7 @@ namespace wali
 
       for( ReturnIterator ret = trans.beginReturn(); ret != trans.endReturn(); ++ret)
       {
-        if( Trans::getExit(*ret) != Trans::getReturnSite(*ret) 
-            && Trans::getReturnSite(*ret) != states.getStuckState())
+        if( Trans::getExit(*ret) != Trans::getReturnSite(*ret) )
         {
           stuckStates.erase(Trans::getExit(*ret));
         }
@@ -3860,7 +3720,7 @@ namespace wali
         }
       }
     }
-      //#endif
+#endif
 
     
     void NWA::pruneUnreachableForward(const StateSet & sources)
@@ -4029,25 +3889,11 @@ namespace wali
       //Q: How should clientInfos be generated for the concatenated NWA?
       //A: The clientInfos from the component machines are copied and added to the concatenated NWA.
 
-      //Make sure we can modify transitions in this machine.
-      assert(stuck);
-
       //Test state Key overlap of the two NWAs.
       assert(! overlap(first, second) );
 
-      //Check that the stuck state of this NWA does not exist as a state in either component machine 
-      //('first' and 'second') unless it is the stuck state of that machine.
-      if(! first.isStuckState(getStuckState()) )
-        assert(! first.isState(getStuckState()) );
-      if(! second.isStuckState(getStuckState()) )
-        assert(! second.isState(getStuckState()) );
-
 	  //Clear all states(except the stuck state) and transitions from this machine.
-      State stuckSt = getStuckState();
-      ClientInfoRefPtr stuckStInfo = getClientInfo( stuckSt );
       clear();
-      setStuckState(stuckSt);
-      setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
 
       //Duplicate all of the functionality of the first machine (except the final state property).
       states.addAllStates(first.states);   //Note: This includes copying clientInfo information over.
@@ -4088,19 +3934,8 @@ namespace wali
       //Q: How should clientInfos be generated for the reversed NWA?
       //A: The clientInfos from the component machines are copied and added to the reversed NWA.
 
-      //Make sure we can modify transitions in this machine.
-      assert(stuck);
-
-      //Check that the stuck state of this NWA does not exist as a state in 'first' 
-      //Note: it cannot be the stuck state of 'first' because then it would have an outgoing transition.
-      assert(! first.isState(getStuckState()) );
-
 	  //Clear all states(except the stuck state) and transitions from this machine.
-      State stuckSt = getStuckState();
-      ClientInfoRefPtr stuckStInfo = getClientInfo( stuckSt );
       clear();
-      setStuckState(stuckSt);
-      setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
 
       //The reverse machine has all the states of the original machine.
       states.addAllStates(first.states); //Note: This includes copying clientInfo information over. 
@@ -4177,15 +4012,8 @@ namespace wali
       //A: The clientInfos from the component machine are copied to both the direct copies of
       //    states and the primed copies of states and added to the star NWA.
 
-      //Make sure we can modify transitions in this machine.
-      assert(stuck);
-
 	  //Clear all states(except the stuck state) and transitions from this machine.
-      State stuckSt = getStuckState();
-      ClientInfoRefPtr stuckStInfo = getClientInfo( stuckSt );
       clear();
-      setStuckState(stuckSt);
-      setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
 
       //Somehow mark unmatched nesting edges as if they are pending (tag its state so that 
       //at a return the states labeling the incident nesting edges are ignored).
@@ -4379,20 +4207,8 @@ namespace wali
       //Q: How should clientInfos be generated for the complemented NWA?
       //A: The clientInfos from the component machines are copied and added to the complemented NWA.
 
-      //Make sure we can modify transitions in this machine.
-      assert(stuck);
-
-      //Check that the stuck state of this NWA does not exist as a state in 'first' 
-      //Note: it cannot be the stuck state of 'first' because it is going to become a final state
-      //      prior to the completion of adding transitions to this machine.
-      assert(! first.isState(getStuckState()) );
-
 	  //Clear all states(except the stuck state) and transitions from this machine.
-      State stuckSt = getStuckState();
-      ClientInfoRefPtr stuckStInfo = getClientInfo( stuckSt );
       clear();
-      setStuckState(stuckSt);
-      setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
 
 
       //Start with a deterministic copy of the given NWA.
@@ -4485,14 +4301,8 @@ namespace wali
       //Q: what should be done with clientInfos here?
       //A: use helper methods similar to the treatment of clientInfos for intersection
 
-      assert(stuck);
-
       //Clear all states(except the stuck state) and transitions from this machine.
-      State stuckSt = getStuckState();
-      ClientInfoRefPtr stuckStInfo = getClientInfo( stuckSt );
       clear();
-      setStuckState(stuckSt);
-      setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
 
 
       using namespace wali::relations;
@@ -4515,34 +4325,41 @@ namespace wali
       typedef std::set<BinaryRelation> RelationSet;
 #endif
 
-#if 0
-      NWARefPtr nondet_copy(new NWA(nondet));
-      nondet = nondet_copy;
+#if 1
+      NWA nondet_copy(nondet);
 
       {
+        std::string s = "stuck";
+        Key ss = getKey(s);
+        while( nondet_copy.isState(ss) )
+        {
+          s = s + "~";
+          ss = getKey(s);
+        }
+
         //BlockTimer timer("Reify consumer transitions (inside determinize)");
-        nondet.realizeImplicitTrans();
+        nondet_copy.realizeImplicitTrans(ss);
       }
 #endif
 
       // Construct Id
       DECLARE(BinaryRelation, Id);
-      for( stateIterator sit = nondet.beginStates(); sit != nondet.endStates(); sit++ )
+      for( stateIterator sit = nondet_copy.beginStates(); sit != nondet_copy.endStates(); sit++ )
       {
         Id.insert(std::pair<State,State>(*sit,*sit));
       }
       
       // Construct Id0
       DECLARE(BinaryRelation, Id0);
-      for( stateIterator sit = nondet.beginInitialStates(); sit != nondet.endInitialStates(); sit++ )
+      for( stateIterator sit = nondet_copy.beginInitialStates(); sit != nondet_copy.endInitialStates(); sit++ )
       {
           Id0.insert(std::pair<State,State>(*sit,*sit));
       }
       
-      //Construct the epsilon closure relation for the states in nondet.
+      //Construct the epsilon closure relation for the states in nondet_copy.
       SetBinaryRelation pre_close; //Collapse epsilon transitions.
       SetBinaryRelation Ie;   //Internal transitions with epsilon.
-      project_symbol_3<SetBinaryRelation>(Ie,nondet.trans.getInternals(), WALI_EPSILON);
+      project_symbol_3<SetBinaryRelation>(Ie,nondet_copy.trans.getInternals(), WALI_EPSILON);
 #ifdef USE_BUDDY
       transitive_closure(pre_close,Ie);
 #else
@@ -4558,7 +4375,7 @@ namespace wali
       union_(close, bdd_pre_close, Id);
 
       // R0 is used later; to avoid recomputation we do it now
-      // Epsilon Closure( {(q,q) | q is an element of Q_in in nondeterministic NWA } )
+      // Epsilon Closure( {(q,q) | q is an element of Q_in in nondet_copyerministic NWA } )
       DECLARE(BinaryRelation, R0);
 #ifdef USE_BUDDY
       compose/*<St>*/(R0,Id0,close);
@@ -4574,7 +4391,7 @@ namespace wali
 
       //Set the client info for this new state.
       ClientInfoRefPtr CI;
-      mergeClientInfo(nondet,R0,r0,CI);
+      mergeClientInfo(nondet_copy,R0,r0,CI);
       states.setClientInfo(r0,CI);
 
       //Put the initial state on the worklist.
@@ -4589,24 +4406,24 @@ namespace wali
       std::map<wali::Key, BinaryRelation> internalTransPerSymbol;
       std::map<wali::Key, TernaryRelation> returnTransPerSymbol;
 
-      for( symbolIterator it = nondet.beginSymbols(); it != nondet.endSymbols(); it++ ) {
+      for( symbolIterator it = nondet_copy.beginSymbols(); it != nondet_copy.endSymbols(); it++ ) {
         if (*it == WALI_EPSILON) continue;    //Epsilon is handled with closure.
         if (*it == WALI_WILD) continue;
 
 #ifdef USE_BUDDY
-        internalTransPerSymbol[*it] = BinaryRelation(nondet.largestState());
-        callTransPerSymbol[*it] = BinaryRelation(nondet.largestState());
-        returnTransPerSymbol[*it] = TernaryRelation(nondet.largestState());
+        internalTransPerSymbol[*it] = BinaryRelation(nondet_copy.largestState());
+        callTransPerSymbol[*it] = BinaryRelation(nondet_copy.largestState());
+        returnTransPerSymbol[*it] = TernaryRelation(nondet_copy.largestState());
 #endif
         
-        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet.trans.getInternals(), *it);
-        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet.trans.getInternals(), WALI_WILD);
+        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet_copy.trans.getInternals(), *it);
+        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet_copy.trans.getInternals(), WALI_WILD);
 
-        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet.trans.getCalls(), *it);
-        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet.trans.getCalls(), WALI_WILD);   //Every symbol also matches wild.
+        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet_copy.trans.getCalls(), *it);
+        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet_copy.trans.getCalls(), WALI_WILD);   //Every symbol also matches wild.
 
-        project_symbol_4(returnTransPerSymbol[*it], nondet.trans.getReturns(), *it);
-        project_symbol_4(returnTransPerSymbol[*it], nondet.trans.getReturns(),WALI_WILD);   //Every symbol also matches wild.
+        project_symbol_4(returnTransPerSymbol[*it], nondet_copy.trans.getReturns(), *it);
+        project_symbol_4(returnTransPerSymbol[*it], nondet_copy.trans.getReturns(),WALI_WILD);   //Every symbol also matches wild.
       }
 
       
@@ -4624,12 +4441,8 @@ namespace wali
         State r = makeKey(R);
 
 
-        // Note: The clientInfo for this state was set before it was put on
-        // the worklist
-        if( isStuckState(r) ) continue;    
-        
         //Check each symbol individually.
-        for( symbolIterator it = nondet.beginSymbols(); it != nondet.endSymbols(); it++ )
+        for( symbolIterator it = nondet_copy.beginSymbols(); it != nondet_copy.endSymbols(); it++ )
         {
           if (*it == WALI_EPSILON) continue;    //Epsilon is handled with closure.
           if (*it == WALI_WILD) continue;       //Wild is matched to every symbol as we go.
@@ -4642,8 +4455,8 @@ namespace wali
 
 #if 0
           DECLARE(BinaryRelation, IiOrig);
-          project_symbol_3(IiOrig,nondet.trans.getInternals(),*it);   
-          project_symbol_3(IiOrig,nondet.trans.getInternals(),WALI_WILD);   //Every symbol also matches wild.
+          project_symbol_3(IiOrig,nondet_copy.trans.getInternals(),*it);   
+          project_symbol_3(IiOrig,nondet_copy.trans.getInternals(),WALI_WILD);   //Every symbol also matches wild.
           
           if (Ii == IiOrig) {
             std::cout << "Ii == IiOrig holds!\n";
@@ -4672,7 +4485,7 @@ namespace wali
 
           //Adjust the client info for this state.
           ClientInfoRefPtr riCI;
-          mergeClientInfoInternal(nondet,R,Ri,r,*it,ri,riCI);
+          mergeClientInfoInternal(nondet_copy,R,Ri,r,*it,ri,riCI);
           states.setClientInfo(ri,riCI);
 
           //Determine whether to add this state to the worklist.
@@ -4689,8 +4502,8 @@ namespace wali
 
 #if 0
           DECLARE(BinaryRelation, IcOrig);
-          project_symbol_3(IcOrig,nondet.trans.getCalls(),*it);  
-          project_symbol_3(IcOrig,nondet.trans.getCalls(),WALI_WILD);   //Every symbol also matches wild.
+          project_symbol_3(IcOrig,nondet_copy.trans.getCalls(),*it);  
+          project_symbol_3(IcOrig,nondet_copy.trans.getCalls(),WALI_WILD);   //Every symbol also matches wild.
           
           if (Ic == IcOrig) {
             std::cout << "Ic == IcOrig holds!\n";
@@ -4717,7 +4530,7 @@ namespace wali
 
           //Adjust the client info for this state.
           ClientInfoRefPtr rcCI;
-          mergeClientInfoCall(nondet,R,Rc,r,*it,rc,rcCI);
+          mergeClientInfoCall(nondet_copy,R,Rc,r,*it,rc,rcCI);
           states.setClientInfo(rc,rcCI);
 
           //Determine whether to add this state to the worklist.
@@ -4731,8 +4544,8 @@ namespace wali
 
 #if 0
           TernaryRelation IrOrig;
-          project_symbol_4(IrOrig,nondet.trans.getReturns(),*it);    
-          project_symbol_4(IrOrig,nondet.trans.getReturns(),WALI_WILD);   //Every symbol also matches wild.
+          project_symbol_4(IrOrig,nondet_copy.trans.getReturns(),*it);    
+          project_symbol_4(IrOrig,nondet_copy.trans.getReturns(),WALI_WILD);   //Every symbol also matches wild.
 
           if (Ir == IrOrig) {
             std::cout << "Ir == IrOrig holds!\n";
@@ -4766,7 +4579,7 @@ namespace wali
 
             //Adjust the client info for this state.
             ClientInfoRefPtr rrCI;
-            mergeClientInfoReturn(nondet,R,*rit,Rr,r,rc,*it,rr,rrCI);
+            mergeClientInfoReturn(nondet_copy,R,*rit,Rr,r,rc,*it,rr,rrCI);
             states.setClientInfo(rr,rrCI);
 
             //Determine whether to add this state to the worklist.
@@ -4802,7 +4615,7 @@ namespace wali
             
             //Adjust the client info for this state.
             ClientInfoRefPtr rrCI;
-            mergeClientInfo(nondet,Rr,rr,rrCI);
+            mergeClientInfo(nondet_copy,Rr,rr,rrCI);
             states.setClientInfo(rr,rrCI);
 
             //Determine whether to add this state to the worklist.
@@ -4818,11 +4631,11 @@ namespace wali
         //any final state must contain one of the pairs in 
         //{(init,fin) | init is an initial state and fin is a final state}
         DECLARE(BinaryRelation, Rf);
-        for( stateIterator iit = nondet.beginInitialStates();
-             iit != nondet.endInitialStates(); iit++ )
+        for( stateIterator iit = nondet_copy.beginInitialStates();
+             iit != nondet_copy.endInitialStates(); iit++ )
         {
-          for( stateIterator fit = nondet.beginFinalStates();
-               fit != nondet.endFinalStates(); fit++ )
+          for( stateIterator fit = nondet_copy.beginFinalStates();
+               fit != nondet_copy.endFinalStates(); fit++ )
           {
             Rf.insert(std::pair<State,State>(*iit,*fit));
           }
@@ -5265,12 +5078,12 @@ namespace wali
      * 
      */
     
-    wpds::WPDS NWA::plusWPDS( const wpds::WPDS & base )
+    wpds::WPDS NWA::plusWPDS( const wpds::WPDS & base, State stuckState )
     {
       //Q: do implicit transitions to the stuck state affect this result?
       //A: it changes the states that are reachable
 
-      realizeImplicitTrans();
+      realizeImplicitTrans(stuckState);
 
       wpds::WPDS result;
 
@@ -5366,15 +5179,8 @@ namespace wali
     {
       //TODO: check this!
 
-      //Make sure we can modify transitions in this machine.
-      assert(stuck);
-
 	  //Clear all states(except the stuck state) and transitions from this machine.
-      State stuckSt = getStuckState();
-      ClientInfoRefPtr stuckStInfo = getClientInfo( stuckSt );
       clear();
-      setStuckState(stuckSt);
-      setClientInfo(stuckSt, stuckStInfo ); // set the client info associated with the stuck state
 
 
       std::map<State,State> call_return;

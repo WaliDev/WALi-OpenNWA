@@ -84,7 +84,6 @@ namespace wali
       
       //Constructors and Destructor
       NWA( );
-      NWA( State stuckSt );
       NWA( const NWA & other );
       NWA & operator=( const NWA & other );
 
@@ -125,85 +124,6 @@ namespace wali
       void setClientInfo( State state, const ClientInfoRefPtr c );  
      
       //All States
-
-      /**
-       *
-       * @brief tests whether there is a stuck state set or not
-       *
-       * This method determines whether there is a stuck state set or not.
-       *
-       * @return true if there is a stuck state set, false otherwise
-       *
-       */
-      inline bool hasStuckState() const
-      {
-        return stuck;
-      }
-
-      /**
-       *
-       * @brief returns the Key for the stuck state
-       *
-       * This method provides access to the Key for the stuck state.
-       * Note: You can only call this method if you have set a stuck state.
-       *
-       * @return the Key for the stuck state
-       *
-       */
-      State getStuckState( ) const
-      {
-        assert(stuck);
-        return states.getStuckState();
-      }
-
-      /**
-       *
-       * @brief sets the Key for the stuck state
-       *
-       * This method provides access to the Key for the stuck state.
-       * Note: You can only call this method if there is not stuck state set.
-       * Note: The stuck state must not currently be a state of the NWA.
-       *        (Unless we check for final state and outgoing transitions of the state.)
-       *
-       * @param - state: the Key for the stuck state
-       *
-       */
-      void setStuckState( State state )
-      {
-        //TODO: ponder the following ...
-        //Note: This method of handling the stuck state might be changing the meaning of an automaton.
-        //      For example, suppose we complement a machine(so that the stuck state is "accepting")
-        //      then add some transition which adds a state or symbol.  This implicitly adds 
-        //      transitions to the stuck state, but these transitions will be to a non-accepting
-        //      stuck state.
-
-        //You can't set a stuck state when there already is one. (There can be only one.)
-        assert(!stuck);
-        //You can't use a state that is currently part of the NWA for the new stuck state.
-        assert(!isState(state));
-        
-        stuck = true;
-        addState(state);  //Add the state to the machine.
-        states.setStuckState(state);
-      }
-
-      /**
-       *  
-       * @brief test whether the given state is the stuck state
-       * 
-       * This method determines whether the given state is the stuck state.
-       *
-       * @param - state: the state to test
-       * @return true if this state is the stuck state, false otherwise
-       *
-       */
-      inline bool isStuckState( State state ) const
-      {
-        if(stuck)
-          return states.isStuckState(state);
-        else
-          return false;   //If there is no stuck state, then this state cannot be the stuck state.
-      }
 
       /**
        *   
@@ -938,7 +858,7 @@ namespace wali
        * Note: The NWA no longer has a stuck state after this operation is performed.
        *
        */
-      void realizeImplicitTrans();
+      void realizeImplicitTrans(State stuckState);
 
       /**
        *
@@ -2108,7 +2028,7 @@ namespace wali
        */
       static NWARefPtr unionNWA( NWA const & first, NWA const & second, State stuck )
       {
-        NWARefPtr nwa(new NWA(stuck));
+        NWARefPtr nwa(new NWA());
         nwa->unionNWA(first,second);
         return nwa;
       }
@@ -2150,7 +2070,7 @@ namespace wali
        */
       static NWARefPtr intersect( NWA const & first, NWA const & second, State stuck )
       {
-        NWARefPtr nwa(new NWA(stuck));
+        NWARefPtr nwa(new NWA());
         nwa->intersect(first,second);
         return nwa;
       }
@@ -2229,7 +2149,7 @@ namespace wali
        */
       static NWARefPtr concat( NWA const & first, NWA const & second, State stuck )
       {
-        NWARefPtr nwa(new NWA(stuck));
+        NWARefPtr nwa(new NWA());
         nwa->concat(first,second);
         return nwa;
       }
@@ -2265,7 +2185,7 @@ namespace wali
        */
       static NWARefPtr reverse( NWA const & first, State stuck )
       {
-        NWARefPtr nwa(new NWA(stuck));
+        NWARefPtr nwa(new NWA());
         nwa->reverse(first);
         return nwa;
       }
@@ -2300,7 +2220,7 @@ namespace wali
        */
       static NWARefPtr star( NWA const & first, State stuck )
       {
-        NWARefPtr nwa(new NWA(stuck));
+        NWARefPtr nwa(new NWA());
         nwa->star(first);
         return nwa;
       }
@@ -2338,7 +2258,7 @@ namespace wali
        */
       static NWARefPtr complement( NWA const & first, State stuck )
       {
-        NWARefPtr nwa(new NWA(stuck));
+        NWARefPtr nwa(new NWA());
         nwa->complement(first);
         return nwa;
       }
@@ -2373,7 +2293,7 @@ namespace wali
        */
       static NWARefPtr determinize( NWA const & nondet, State stuck )
       {
-        NWARefPtr nwa(new NWA(stuck));
+        NWARefPtr nwa(new NWA());
         nwa->determinize(nondet);
         return nwa;
       }
@@ -2416,12 +2336,6 @@ namespace wali
         if (intersection.size() == 0) {
           // No states are shared
           return false;
-        }
-        else if (intersection.size() == 1) {
-          // If the stuck states are equal, then they are the sole thing in
-          // intersection: we will return false. If the stuck states are unequal,
-          // there must be something else in intersection: return true.
-          return first.getStuckState() != second.getStuckState();
         }
         else {
           return true;
@@ -2661,7 +2575,7 @@ namespace wali
        *          reachability
        * 
        */
-      wpds::WPDS plusWPDS( const wpds::WPDS & base ); 
+      wpds::WPDS plusWPDS( const wpds::WPDS & base, State stuck ); 
       /**
        * 
        * @brief constructs the WPDS which is the result of the explicit NWA plus WPDS 
@@ -2680,9 +2594,9 @@ namespace wali
        *          reachability
        * 
        */
-      static wpds::WPDS plusWPDS( const wpds::WPDS & base, NWA & nwa )
+        static wpds::WPDS plusWPDS( const wpds::WPDS & base, NWA & nwa, State stuck )
       {
-        return nwa.plusWPDS(base);
+        return nwa.plusWPDS(base, stuck);
       }
 
       /**
@@ -2709,7 +2623,7 @@ namespace wali
        */
       static NWARefPtr PDStoNWA( const wpds::WPDS & pds, State stuck )
       {
-        NWARefPtr nwa(new NWA(stuck));
+        NWARefPtr nwa(new NWA());
         nwa->PDStoNWA(pds);
         return nwa;
       }
@@ -2860,22 +2774,11 @@ namespace wali
        */
       static bool inclusion( NWA const & first, NWA const & second )
       {
-        //Q: what should be used as the stuck states here? 
-        //A: it needs to be something not a state in 'first' and not a state in 'second' 
-        //    unless it is the stuck state
-        std::string s = "stuck";
-        Key ss = getKey(s);
-        while( first.isState(ss) || (second.isState(ss) && !second.isStuckState(ss)) )
-        {
-          s = s + "~";
-          ss = getKey(s);
-        }
-
         //Check L(a1) contained in L(a2) by checking 
         //if L(a1) intersect (complement L(a2)) is empty.
-        NWA comp(ss);
+        NWA comp;
         comp.complement(second);   //complement L(a2)
-        NWA inter(ss);
+        NWA inter;
         inter.intersect(first,comp); //L(a1) intersect (complement L(a2))
 
         return inter.isEmpty();
@@ -3279,8 +3182,6 @@ namespace wali
       
       protected:
       
-        bool stuck;
-
         StateStorage states;         
         SymbolStorage symbols;        
         Trans trans;

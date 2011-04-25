@@ -25,7 +25,6 @@ namespace wali
     
       clearStates();
       
-      stuck = other.stuck;
       states = other.states;
       initialStates = other.initialStates;
       finalStates = other.finalStates;
@@ -298,10 +297,6 @@ namespace wali
     
     bool StateStorage::removeState( State state )
     {
-      //The stuck state cannot be removed in this way.
-      if( isStuckState( state ) )
-        return false;
-
       size_t erased = states.erase(state);
 
       if (erased == 0) {
@@ -414,7 +409,6 @@ namespace wali
     bool StateStorage::operator==( const StateStorage & other ) const
     {
       //Check that the state sets are equal.
-      if (stuck != other.stuck) return false;
       if (states != other.states) return false;
       if (initialStates != other.initialStates) return false;
       if (finalStates != other.finalStates) return false;

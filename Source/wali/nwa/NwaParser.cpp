@@ -774,7 +774,7 @@ static
 void
 test_read_blocks()
 {
-    NWARefPtr nwa = new wali::nwa::NWA(getKey("ha ha"));
+    NWARefPtr nwa = new wali::nwa::NWA();
     
     // These tests call read_*_block (implicitly making sure there are no
     // exceptions or assertions), then make sure they read everything they
@@ -876,16 +876,8 @@ namespace wali {
         {
             lineno = 0;
             
-            // Come up with a stuck state
-            std::srand(std::time(NULL) + getpid());
-            static int gen_number = std::rand();
-            std::stringstream ss;
-            ss << "[stuck-parse-" << gen_number << "]";
-            Key stuck = getKey(ss.str());
-
-
             // Create the NWA
-            NWARefPtr nwa = new NWA(stuck);
+            NWARefPtr nwa = new NWA();
 
             // Skip over a bunch of stuff: opening whitespace, the optional
             // 'nwa'-name-':' sequence, and the optional '{'
@@ -956,11 +948,10 @@ namespace wali {
 
             assert(m.size() == 4);
 
-            // Don't forget the stuck state in these counts
-            assert(m["main"]->sizeStates() == 3);
-            assert(m["foo"]->sizeStates() == 4);
-            assert(m["bar"]->sizeStates() == 5);
-            assert(m["baz"]->sizeStates() == 6);
+            assert(m["main"]->sizeStates() == 2);
+            assert(m["foo"]->sizeStates() == 3);
+            assert(m["bar"]->sizeStates() == 4);
+            assert(m["baz"]->sizeStates() == 5);
         }
 
         

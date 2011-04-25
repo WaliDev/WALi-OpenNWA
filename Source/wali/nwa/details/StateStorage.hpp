@@ -102,48 +102,6 @@ namespace wali
 
       //State Accessors
 
-      /**
-       *
-       * @brief returns the Key for the stuck state
-       *
-       * This method provides access to the Key for the stuck state.
-       *
-       * @return the Key for the stuck state
-       *
-       */
-      inline State getStuckState( ) const
-      {
-        return stuck;
-      };
-
-      /**
-       *
-       * @brief sets the Key for the stuck state
-       *
-       * This method provides access to the Key for the stuck state.
-       *
-       * @param - state: the Key for the stuck state
-       *
-       */
-      inline void setStuckState( State state )
-      {
-        stuck = state;
-      }
-
-      /**
-       *  
-       * @brief test whether the given state is the stuck state
-       * 
-       * This method determines whether the given state is the stuck state.
-       *
-       * @param - state: the state to test
-       * @return true if this state is the stuck state, false otherwise
-       *
-       */
-      inline bool isStuckState( State state ) const
-      {
-        return (state == stuck);
-      }
 
       /**
        *
@@ -540,7 +498,6 @@ namespace wali
       
     protected:
               
-      State stuck;
       StateSet states;
       StateSet initialStates;  
       StateSet finalStates;   
