@@ -2028,6 +2028,7 @@ namespace wali
        */
       static NWARefPtr unionNWA( NWA const & first, NWA const & second, State stuck )
       {
+        (void) stuck;
         NWARefPtr nwa(new NWA());
         nwa->unionNWA(first,second);
         return nwa;
@@ -2070,6 +2071,7 @@ namespace wali
        */
       static NWARefPtr intersect( NWA const & first, NWA const & second, State stuck )
       {
+        (void) stuck;
         NWARefPtr nwa(new NWA());
         nwa->intersect(first,second);
         return nwa;
@@ -2149,6 +2151,7 @@ namespace wali
        */
       static NWARefPtr concat( NWA const & first, NWA const & second, State stuck )
       {
+        (void) stuck;
         NWARefPtr nwa(new NWA());
         nwa->concat(first,second);
         return nwa;
@@ -2185,6 +2188,7 @@ namespace wali
        */
       static NWARefPtr reverse( NWA const & first, State stuck )
       {
+        (void) stuck;
         NWARefPtr nwa(new NWA());
         nwa->reverse(first);
         return nwa;
@@ -2220,6 +2224,7 @@ namespace wali
        */
       static NWARefPtr star( NWA const & first, State stuck )
       {
+        (void) stuck;
         NWARefPtr nwa(new NWA());
         nwa->star(first);
         return nwa;
@@ -2258,6 +2263,7 @@ namespace wali
        */
       static NWARefPtr complement( NWA const & first, State stuck )
       {
+        (void) stuck;
         NWARefPtr nwa(new NWA());
         nwa->complement(first);
         return nwa;
@@ -2293,6 +2299,7 @@ namespace wali
        */
       static NWARefPtr determinize( NWA const & nondet, State stuck )
       {
+        (void) stuck;
         NWARefPtr nwa(new NWA());
         nwa->determinize(nondet);
         return nwa;
@@ -2652,6 +2659,7 @@ namespace wali
        */
       static NWARefPtr PDStoNWA( const wpds::WPDS & pds, State stuck )
       {
+        (void) stuck;
         NWARefPtr nwa(new NWA());
         nwa->PDStoNWA(pds);
         return nwa;
