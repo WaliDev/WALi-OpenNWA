@@ -5164,24 +5164,12 @@ namespace wali
       return result;
     }
 
-    /**
-     *
-     * @brief constructs the NWA equivalent to the given PDS
-     *
-     * This method constructs the NWA that is equivalent to the given PDS.
-     *
-     * @param - pds: the pds to convert 
-     * @return the NWA equivalent to the given PDS
-     *
-     */
     
     void NWA::PDStoNWA( const wpds::WPDS & pds )
     {
       //TODO: check this!
 
-	  //Clear all states(except the stuck state) and transitions from this machine.
       clear();
-
 
       std::map<State,State> call_return;
 
@@ -5189,33 +5177,39 @@ namespace wali
       pds.for_each(rules);
 
       //Step Rules:
+      // For each <p,n_1> -w-> <p',n_2> in delta_1,
+      // add ((p,n_1), n_1, (p',n_2)) to delta_i
       for( std::set<wpds::Rule>::iterator it = rules.stepRules.begin();
             it != rules.stepRules.end(); it++ )
       {
-        //<p,n_1> -w-> <p',n_2> in delta_1 goes to ((p,n_1),n_1,(p',n_2)) in delta_i
         addInternalTrans(getKey(it->from_state(),it->from_stack()), //from
                          it->from_stack(),                          //sym
                          getKey(it->to_state(),it->to_stack1()));   //to
       }
 
       //Call Rules:
+      // For each <p,n_c> -w-> <p',e r_c> in delta_2,
+      // add ((p,n_c), n_c, (p',e)) to delta_c, and
+      // add (p,n_c) => r_c to the call-return map 
       for( std::set<wpds::Rule>::iterator it = rules.pushRules.begin();
             it != rules.pushRules.end(); it++ )
       {
-        //<p,n_c> -w-> <p',e r_c> in delta_2, ((p,n_c),c,(p',e)) in delta_c
         addCallTrans(getKey(it->from_state(),it->from_stack()),   //from
                       it->from_stack(),                           //sym
                       getKey(it->to_state(),it->to_stack1()));    //to
-        //add (p,n_c) => r_c to the call-return map
+
         call_return.insert(std::pair<State,State>(getKey(it->from_state(),it->from_stack()),  //call
                                             it->to_stack2()));                          //ret
       }
 
-      //Return Rules:
+
+      // Return Rules:
+      // For each <p,x> -w-> <p',*> in delta_0 and
+      //          (p'',n_c) => r_c in the call-return map,
+      // add ((p,x),(p'',n_c),x,(p',r)) to delta_r 
       for( std::set<wpds::Rule>::iterator it = rules.popRules.begin();
             it != rules.popRules.end(); it++ )
       {
-        //<p,x> -w-> <p',*> in delta_0, ((p,x),(p,n_c),x,(p',r)) in delta_r
         for( std::map<State,State>::iterator cr_it = call_return.begin();
               cr_it != call_return.end(); cr_it++ )
         {
