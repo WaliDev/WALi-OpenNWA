@@ -191,20 +191,21 @@ Summary:
 --     to namespace level.
 -- 
 --     (THESE ARE BREAKING CHANGES)
-
-
-11. -- SOME WORK COMMITTED IN REV 924, but had to break into several stages
-    -- Deprecate class WordRecConfig, NWA::isMember, class NWP.
- 
-    -- LATER: COMMITED REV 945 (NWA stuff) & 946 (NWP)
-    --        Remove WordRecConfig, NWA::isMember, NWP. Deprecate NWA::simulateWord.
-
-    -- LATER: COMMITTED REV 963 (& 964 to fix this number)
-    --        Remove NWA::simulateWord. Deprecate class NWS.
-
-    LATER: Remove NWS.
-
-
+--
+--
+-- 11. SOME WORK COMMITTED IN REV 924, but had to break into several stages
+--     Deprecate class WordRecConfig, NWA::isMember, class NWP.
+-- 
+--     LATER: COMMITED REV 945 (NWA stuff) & 946 (NWP)
+--            Remove WordRecConfig, NWA::isMember, NWP. Deprecate NWA::simulateWord.
+--
+--     LATER: COMMITTED REV 963 (& 964 to fix this number)
+--            Remove NWA::simulateWord. Deprecate class NWS.
+--
+--     LATER: COMMITTED REV 970
+--            Remove NWS.
+--
+--
 -- 12. COMMITTED REV 927
 -- 
 --     Move class NestedWord to its own header, NestedWord.hpp. Moved
