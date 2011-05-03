@@ -284,13 +284,14 @@ Summary:
     function.
 
     Here is a tentative list.
-      For the namespace wali::nwa::query:
-        Virtually all functions in the "transition accessors" section of the header,
-        except duplicateStateOutgoing, duplicateState, realizeImplicitTrans, clearTrans
+      -- COMMITTED REVS 979--985 (986 with this)
+      -- For the namespace wali::nwa::query:
+      --   Virtually all functions in the "transition accessors" section of the header,
+      --   except duplicateStateOutgoing, duplicateState, realizeImplicitTrans, clearTrans
 
-        Virtually all functions in the "XXX transitions" section of the
-        header, except addXXXTrans overloads, removeXXXTrans overloads, and
-        sizeXXXTrans.
+      --   Virtually all functions in the "XXX transitions" section of the
+      --   header, except addXXXTrans overloads, removeXXXTrans overloads, and
+      --   sizeXXXTrans.
 
         overlap
 
