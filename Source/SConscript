@@ -87,6 +87,9 @@ wali_files = Split("""
 ./wali/nwa/details/TransitionStorage.cpp
 ./wali/nwa/NwaParser.cpp
 ./wali/nwa/query/transitions.cpp
+./wali/nwa/query/calls.cpp
+./wali/nwa/query/returns.cpp
+./wali/nwa/query/internals.cpp
 """)
 
 env = BaseEnv.Clone()
