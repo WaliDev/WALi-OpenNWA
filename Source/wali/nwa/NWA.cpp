@@ -2,6 +2,8 @@
 #include "wali/nwa/details/Configuration.hpp"
 #include "wali/nwa/NestedWord.hpp"
 #include "wali/nwa/query/transitions.hpp"
+#include "wali/nwa/query/calls.hpp"
+#include "wali/nwa/query/internals.hpp"
 
 namespace wali
 {
@@ -3741,7 +3743,7 @@ namespace wali
         // book keeping
         unreachables.erase(src);
         // for each target
-        std::set<std::pair<Symbol,State> > succs = getTargets(src);
+        std::set<std::pair<Symbol,State> > succs = query::getTargets(*this, src);
         for( std::set<std::pair<Symbol,State> >::const_iterator it = succs.begin(); it!=succs.end(); it++) {
           // if not visited
           if(visited.count(it->second) == 0 ) {
@@ -3751,7 +3753,7 @@ namespace wali
         }
 
         // for each entry
-        succs = getEntries(src);
+        succs = query::getEntries(*this, src);
         for( std::set<std::pair<Symbol,State> >::const_iterator it = succs.begin(); it!=succs.end(); it++) {
           // if not visited
           if(visited.count(it->second) == 0 ) {
@@ -3801,7 +3803,7 @@ namespace wali
         // book keeping
         unreachables.erase(src);
         // for each source
-        std::set<std::pair<State,Symbol> > succs = getSources(src);
+        std::set<std::pair<State,Symbol> > succs = query::getSources(*this, src);
         for( std::set<std::pair<Symbol,State> >::const_iterator it = succs.begin(); it!=succs.end(); it++) {
           // if not visited
           if(visited.count(it->first) == 0 ) {
@@ -3811,7 +3813,7 @@ namespace wali
         }
 
         // for each call successor state
-        succs = getCallSites(src);
+        succs = query::getCallSites(*this, src);
         for( std::set<std::pair<State,Symbol> >::const_iterator it = succs.begin(); it!=succs.end(); it++) {
           // if not visited
           if(visited.count(it->first) == 0 ) {

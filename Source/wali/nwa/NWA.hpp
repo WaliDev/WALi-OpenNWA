@@ -588,178 +588,35 @@ namespace wali
        *
        */
       void clearTrans( );
+      
 
       //Call Transitions
 
-      /** 
-       * 
-       * @brief returns the call site states associated with the given symbol
-       *
-       * This method provides access to the call site states associated with
-       * the given symbol.
-       *
-       * @param - symbol: the symbol whose call site states to obtain
-       * @return the set of call site states associated with the given symbol
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
       const  StateSet getCallSites_Sym( Symbol symbol ) const;
-
-      /**
-       * 
-       * @brief returns the call site states associated with the given symbol
-       *        and entry point
-       *
-       * This method provides access to the call site states associated with
-       * the given symbol and entry point.
-       *
-       * @param - symbol: the symbol whose call site states to obtain
-       * @param - entryPoint: the entry point state whose call site states to
-       *                    obtain
-       * @return the set of call site states associated with the given symbol
-       *          and entry point
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
       const  StateSet getCallSites( Symbol symbol, State entryPoint ) const;
-      
-      /**
-       * 
-       * @brief returns the call site/symbol pairs associated with the given 
-       *        entry point
-       *
-       * This method provides access to the call site/symbol pairs associated 
-       * with the given entry point state.
-       *
-       * @param - entryPoint: the entry point state whose call site/symbol 
-       *                      pairs to obtain
-       * @return the set of call site/symbol pairs associated with the given 
-       *          entry point
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
       const  std::set<std::pair<State,Symbol> > getCallSites( State entryPoint ) const;
-
-      /**
-       * 
-       * @brief returns the call sites of all call transitions in the NWA
-       *
-       * This method provides access to the call sites of all call transitions
-       * in the NWA.
-       *
-       * @return the set of call sites of all call transitions in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
       const  StateSet getCallSites( ) const;
-
-      /**
-       * 
-       * @brief returns the symbols that label call transitions in the NWA
-       *
-       * This method provides access to the symbols that label call transitions
-       * in the NWA.
-       *
-       * @return the set of symbols that label call transitions in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
       const  SymbolSet getCallSym( ) const;
-
-      /**
-       * 
-       * @brief returns the symbols that label the call transitions from 
-       *        'callSite' to 'entryPoint' in the NWA
-       *
-       * This method provides access to the symbols that label the call 
-       * transitions from 'callSite' to 'entryPoint' in the NWA.
-       *
-       * @param - callSite: the call site of the desired transitions
-       * @param - entryPoint: the entry point of the desired transitions
-       * @return the set of symbols that label the call transitions from
-       *          'callSite' to 'entryPoint' in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
       const  SymbolSet getCallSym( State callSite, State entryPoint ) const;
-
-      /**
-       * 
-       * @brief returns the symbols that label the call transitions from 
-       *        'callSite' in the NWA
-       *
-       * This method provides access to the symbols that label the call 
-       * transitions from 'callSite' in the NWA.
-       *
-       * @param - callSite: the call site of the desired transitions
-       * @return the set of symbols that label the call transitions from
-       *          'callSite' in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
       const  SymbolSet getCallSym_Call( State callSite ) const;
-
-      /**
-       * 
-       * @brief returns the symbols that label the call transitions to
-       *        'entryPoint' in the NWA
-       *
-       * This method provides access to the symbols that label the call 
-       * transitions to 'entryPoint' in the NWA.
-       *
-       * @param - entryPoint: the entry point of the desired transitions
-       * @return the set of symbols that label the call transitions to 
-       *          'entryPoint' in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
       const  SymbolSet getCallSym_Entry( State entryPoint ) const;
-
-      /**
-       * 
-       * @brief returns the entry point states associated with the given symbol
-       *
-       * This method provides access to the entry point states associated with 
-       * the given symbol.
-       *
-       * @param - symbol: the symbol whose entry point states to obtain
-       * @return the set of entry point states associated with the given symbol
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
       const  StateSet getEntries_Sym( Symbol symbol ) const;
-      
-      /**
-       * 
-       * @brief returns the entry point states associated with the given call
-       *        site and symbol
-       *
-       * This method provides access to the entry point states assoicated with  
-       * the given call site and symbol.
-       *
-       * @param - callSite: the call site whose entry point states to obtain
-       * @param - symbol: the symbol whose entry point states to obtain
-       * @return the set of entry point states associated with the given call
-       *          site and symbol
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
       const  StateSet getEntries( State callSite, Symbol symbol ) const;
-
-      /**
-       * 
-       * @brief returns the symbol/entry point pairs associated with the given call site
-       *
-       * This method provides access to the symbol/entry point pairs associated with the 
-       * given call site.
-       *
-       * @param - callSite: the call site whose symbol/entry point pairs to obtain
-       * @return the set of symbol/entry point pairs associated with the given call site
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
       const  std::set<std::pair<Symbol,State> > getEntries( State callSite ) const;
-
-      /**
-       * 
-       * @brief returns the entry points of all call transitions in the NWA
-       *
-       * This method provides access to the entry points of all call transitions
-       * in the NWA.
-       *
-       * @return the set of entry points of all call transitions in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
       const  StateSet getEntries( ) const;
+
 
       /**
        *
@@ -842,173 +699,29 @@ namespace wali
 
       //Internal Transitions
 
-      /**
-       *
-       * @brief returns the source states associated with the given symbol
-       *
-       * This method provides access to the source states associated with the 
-       * given symbol.
-       *
-       * @param - symbol: the symbol whose source states to obtain
-       * @return the set of source states associated with the given symbol
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
       const  StateSet getSources_Sym( Symbol symbol ) const;
-
-      /**
-       * 
-       * @brief returns the source states associated with the given symbol 
-       *        and target state
-       *
-       * This method provides access to the source states associated with 
-       * the given symbol and target state.
-       *
-       * @param - symbol: the symbol whose source states to obtain
-       * @param - target: the target state whose source states to obtain
-       * @return the set of source states assoicated with the given
-       *          symbol and target state
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
       const  StateSet getSources( Symbol symbol, State target ) const;
-
-      /**
-       * 
-       * @brief returns the source/symbol pairs associated with the 
-       *        given target state
-       *
-       * This method provides access to the source/symbol pairs associated
-       * with the given target state.
-       *
-       * @param - target: the target state whose source/symbol pairs to 
-       *                  obtain
-       * @return the set of source/symbol pairs associated with the given
-       *          target state
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
       const  std::set<std::pair<State,Symbol> > getSources( State target ) const;
-
-      /**
-       * 
-       * @brief returns the sources of all internal transitions in the NWA
-       *
-       * This method provides access to the sources of all internal transitions
-       * in the NWA.
-       *
-       * @return the set of sources of all internal transitions in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
       const  StateSet getSources( ) const;
-
-      /**
-       * 
-       * @brief returns the symbols that label internal transitions in the NWA
-       *
-       * This method provides access to the symbols that label internal transitions
-       * in the NWA.
-       *
-       * @return the set of symbols that label internal transitions in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
       const  SymbolSet getInternalSym( ) const;
-
-      /**
-       * 
-       * @brief returns the symbols that label internal transitions from 'source'
-       *        to 'target' in the NWA
-       *
-       * This method provides access to the symbols that label internal transitions
-       * from 'source' to 'target' in the NWA.
-       *
-       * @param - source: the source of the desired transitions
-       * @param - target: the target of the desired transitions
-       * @return the set of symbols that label internal transitions from 'source'
-       *          to 'target' in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
       const  SymbolSet getInternalSym( State source, State target ) const;
-
-      /**
-       * 
-       * @brief returns the symbols that label internal transitions from 'source'
-       *        in the NWA
-       *
-       * This method provides access to the symbols that label internal transitions
-       * from 'source' in the NWA.
-       *
-       * @param - source: the source of the desired transitions
-       * @return the set of symbols that label internal transitions from 'source'
-       *          in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
       const  SymbolSet getInternalSym_Source( State source ) const;
-
-      /**
-       * 
-       * @brief returns the symbols that label internal transitions 
-       *        to 'target' in the NWA
-       *
-       * This method provides access to the symbols that label internal 
-       * transitions to 'target' in the NWA.
-       *
-       * @param - target: the target of the desired transitions
-       * @return the set of symbols that label internal transitions 
-       *          to 'target' in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
       const  SymbolSet getInternalSym_Target( State target ) const;
-
-      /**
-       * 
-       * @brief returns the target states associated with the given symbol
-       *
-       * This method provides access to the target states associated with
-       * the given symbol.
-       *
-       * @param - symbol: the symbol whose target states to obtain
-       * @return the set of target states associated with the given symbol
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
       const  StateSet getTargets_Sym( Symbol symbol ) const;
-
-      /**
-       * 
-       * @brief returns the target states associated with the given source
-       *        state and symbol
-       *
-       * This method provides access to the target states associated with
-       * the given source state and symbol.
-       *
-       * @param - source: the source state whose target states to obtain
-       * @param - symbol: the symbol whose target states to obtain
-       * @return the set of target states associated with the given source
-       *          state and symbol
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
       const  StateSet getTargets( State source, Symbol symbol ) const;
-
-      /**
-       * 
-       * @brief returns the symbol/target pairs associated with the given source
-       *
-       * This method provides access to the symbol/target pairs associated with the given
-       * source.
-       *
-       * @param - source: the source whose symbol/target pairs to obtain
-       * @return the set of symbol/target pairs associated with the given source
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
       const  std::set<std::pair<Symbol,State> > getTargets( State source ) const;
-
-      /**
-       * 
-       * @brief returns the targets of all internal transitions in the NWA
-       *
-       * This method provides access to the targets of all internal transitions
-       * in the NWA.
-       *
-       * @return the set of targets of all internal transitions in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
       const  StateSet getTargets( ) const;
 
       /**
@@ -1093,503 +806,71 @@ namespace wali
 
       //Return Transitions
 
-      /**
-       * 
-       * @brief returns the exit states associated with the given symbol
-       *
-       * This method provides access to the exit states associated with
-       * the given symbol.
-       *
-       * @param - symbol: the symbol whose exit states to obtain
-       * @return the set of exit states associated with the given symbol
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  StateSet getExits_Sym( Symbol symbol ) const;
-
-      /**
-       * 
-       * @brief returns the exit states associated with the given call site,
-       *        symbol, and return site
-       *
-       * This method provides access to the exit states associated with the 
-       * given call site, symbol, and return site.
-       *
-       * @param - callSite: the call site state whose exit states to obtain
-       * @param - symbol: the symbol whose exit states to obtain
-       * @param - returnSite: the return site state whose exit states to obtain
-       * @return the set of exit states associated with the given call site,
-       *          symbol, and return site
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  StateSet getExits( State callSite, Symbol symbol, State returnSite ) const;
-
-      /**
-       * 
-       * @brief returns the exit point/symbol pairs associated with the given 
-       *        call site and return site
-       *
-       * This method provides access to the exit point/symbol pairs associated 
-       * with the given call site and return site.
-       *
-       * @param - callSite: the call site state whose exit point/symbol pairs to obtain
-       * @param - returnSite: the return site state whose exit point/symbol pairs to obtain
-       * @return the set of exit point/symbol pairs associated with the given call site 
-       *          and return site
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  std::set<std::pair<State,Symbol> > getExits( State callSite, State returnSite ) const;
-
-      /**
-       * 
-       * @brief returns the exit points of all return transitions in the NWA
-       *
-       * This method provides access to the exit points of all return transitions
-       * in the NWA.
-       *
-       * @return the set of exit points of all return transitions in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  StateSet getExits( ) const;
-
-      /**
-       * 
-       * @brief returns the exit states associated with the given call site 
-       *        and symbol
-       * 
-       * This method provides access to the exit states associated with the 
-       * given call site and symbol.
-       *
-       * @param - callSite: the call site state whose exit states to obtain
-       * @param - symbol: the symbol whose exit states to obtain
-       * @return the set of exit states associated with the given call state
-       *          and symbol
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  StateSet getExits_Call( State callSite, Symbol symbol ) const;
-
-      /**
-       * 
-       * @brief returns the exit point/symbol pairs associated with the
-       *        given call site
-       *
-       * This method provides access to the exit point/symbol pairs associated
-       * with the given call site.
-       *
-       * @param - callSite: the call site state whose exit point/symbol pairs
-       *                    to obtain
-       * @return the set of exit point/symbol pairs associated with the given
-       *          call site
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  std::set<std::pair<State,Symbol> > getExits_Call( State callSite ) const;
-
-      /**
-       * 
-       * @brief returns the exit states associated with the given symbol and
-       *        return site
-       *
-       * This method provides access to the exit states associated with the
-       * given symbol and return site.
-       *
-       * @param - symbol: the symbol whose exit states to obtain
-       * @param - returnSite: the return site state whose exit states to obtain
-       * @return the set of exit states associated with the given symbol and
-       *          return site
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  StateSet getExits_Ret( Symbol symbol, State returnSite ) const;
-
-      /**
-       * 
-       * @brief returns the exit point/symbol pairs associated with the
-       *        given return site
-       *
-       * This method provides access to the exit point/symbol pairs associated
-       * with the given return site.
-       *
-       * @param - returnSite: the return site state whose exit point/symbol
-       *                      pairs to obtain
-       * @return the set of exit point/symbol pairs associated with the given
-       *          return site
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  std::set<std::pair<State,Symbol> > getExits_Ret( State returnSite ) const;
-
-      /**
-       * 
-       * @brief returns the call site states associated with the given symbol
-       *
-       * This method provides access to the call site states associated with
-       * the given symbol.
-       *
-       * @param - symbol: the symbol whose call site states to obtain
-       * @return the set of call site states associated with the given symbol
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  StateSet getCalls_Sym( Symbol symbol ) const;
-
-      /**
-       * 
-       * @brief returns the call site states associated with the given exit 
-       *        point, symbol, and return site
-       *
-       * This method provides access to the call site states associated with 
-       * the given exit point, symbol, and return site.
-       *
-       * @param - exitPoint: the exit point whose call site states to obtain
-       * @param - symbol: the symbol whose call site states to obtain
-       * @param - returnSite: the return site whose call site states to obtain
-       * @return the set of call site states assocaited with the given exit
-       *          point, symbol, and return site
-       * 
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  StateSet getCalls( State exitPoint, Symbol symbol, State returnSite ) const;
-
-      /**
-       * 
-       * @brief returns the call site/symbol pairs associated with the given exit 
-       *        point and return site states
-       *
-       * This method provides access to the call site/symbol pairs associated with
-       * the given exit point and return site states.
-       *
-       * @param - exitPoint: the exit point whose call site/symbol pairs to obtain
-       * @param - returnSite: the return site whose call site/symbol pairs to obtain
-       * @return the set of call site/symbol pairs associated with the given exit 
-       *          point and return site states
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  std::set<std::pair<State,Symbol> > getCalls( State exitPoint, State returnSite ) const;
-
-      /**
-       * 
-       * @brief returns the call sites of all return transitions in the NWA
-       *
-       * This method provides access to the call sites of all return transitions
-       * in the NWA.
-       *
-       * @return the set of call sites of all return transitions in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  StateSet getCalls( ) const;
-
-      /**
-       * 
-       * @brief returns the call site states associated with the given exit point 
-       *        and symbol
-       * 
-       * This method provides access to the call site states associated with the
-       * given exit point and symbol.
-       *
-       * @param - exitPoint: the exit point whose call site states to obtain
-       * @param - symbol: the symbol whose call site states to obtain
-       * @return the set of all call sites associated with the given exit point
-       *          and symbol
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  StateSet getCalls_Exit( State exitPoint, Symbol symbol ) const;
-
-      /**
-       * 
-       * @brief returns the call site/symbol pairs associated with the given
-       *        exit point
-       *
-       * This method provides access to the call site/symbol pairs associated
-       * with the given exit point.
-       *
-       * @param - exitPoint: the exit point whose call site/symbol pairs to obtain
-       * @return the set of call site/symbol pairs associated with the given
-       *         exit point
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  std::set<std::pair<State,Symbol> > getCalls_Exit( State exitPoint ) const;
-
-      /**
-       * 
-       * @brief returns the call site states associated with the given symbol
-       *        and return site
-       *
-       * This method provides access to the call site states associated with
-       * the given symbol and return site.
-       *
-       * @param - symbol: the symbol whose call site states to obtain
-       * @param - returnSite: the return site whose call site states to obtain
-       * @return the set of call site states associated with the given symbol
-       *          and return site
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  StateSet getCalls_Ret( Symbol symbol, State returnSite ) const;
-
-      /**
-       * 
-       * @brief returns the call site/symbol pairs associated with the given
-       *        return site
-       *
-       * This method provides access to the call site/symbol pairs associated
-       * with the given return site.
-       *
-       * @param - returnSite: the return site whose call site/symbol pairs to
-       *                      obtain
-       * @return the set of all call site/symbol pairs associated with the 
-       *          given return site
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  std::set<std::pair<State,Symbol> > getCalls_Ret( State returnSite ) const;
-
-      /**
-       * 
-       * @brief returns the symbols that label return transitions in the NWA
-       *
-       * This method provides access to the symbols that label return transitions
-       * in the NWA.
-       *
-       * @return the set of symbols that label return transitions in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  SymbolSet getReturnSym( ) const;
-
-      /**
-       * 
-       * @brief returns the symbols that label return transitions from 'exitPoint'
-       *        to 'returnSite' with call-predecessor 'callSite' in the NWA
-       *
-       * This method provides access to the symbols that label return transitions
-       * from 'exitPoint' to 'returnSite' with call-predecessor 'callSite' in the NWA.
-       *
-       * @param - exitPoint: the exit point of the desired transition
-       * @param - callSite: the call site of the desired transition
-       * @param - returnSite: the return site of the desired transition
-       * @return the set of symbols that label return transitions from 'exitPoint'
-       *          to 'returnSite' with call-predecessor 'callSite' in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  SymbolSet getReturnSym( State exitPoint, State callSite, State returnSite ) const;
-
-      /**
-       * 
-       * @brief returns the symbols that label return transitions from 'exitPoint'
-       *        n the NWA
-       *
-       * This method provides access to the symbols that label return transitions
-       * from 'exitPoint' in the NWA.
-       *
-       * @param - exitPoint: the exit point of the desired transition
-       * @return the set of symbols that label return transitions from 'exitPoint'
-       *          in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  SymbolSet getReturnSym_Exit( State exitPoint ) const;
-
-      /**
-       * 
-       * @brief returns the symbols that label return transitions 
-       *        with call-predecessor 'callSite' in the NWA
-       *
-       * This method provides access to the symbols that label return transitions
-       * with call-predecessor 'callSite' in the NWA.
-       *
-       * @param - callSite: the call site of the desired transition
-       * @return the set of symbols that label return transitions 
-       *          with call-predecessor 'callSite' in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  SymbolSet getReturnSym_Call( State callSite ) const;
-
-      /**
-       * 
-       * @brief returns the symbols that label return transitions 
-       *        to 'returnSite' in the NWA
-       *
-       * This method provides access to the symbols that label return transitions
-       * to 'returnSite' in the NWA.
-       *
-       * @param - returnSite: the return site of the desired transition
-       * @return the set of symbols that label return transitions 
-       *          to 'returnSite' in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  SymbolSet getReturnSym_Ret( State returnSite ) const;
-
-      /**
-       * 
-       * @brief returns the symbols that label return transitions from 'exitPoint'
-       *        with call-predecessor 'callSite' in the NWA
-       *
-       * This method provides access to the symbols that label return transitions
-       * from 'exitPoint' with call-predecessor 'callSite' in the NWA.
-       *
-       * @param - exitPoint: the exit point of the desired transition
-       * @param - callSite: the call site of the desired transition
-       * @return the set of symbols that label return transitions from 'exitPoint'
-       *          with call-predecessor 'callSite' in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  SymbolSet getReturnSym_ExitCall( State exitPoint, State callSite ) const;
-
-      /**
-       * 
-       * @brief returns the symbols that label return transitions from 'exitPoint'
-       *        to 'returnSite' in the NWA
-       *
-       * This method provides access to the symbols that label return transitions
-       * from 'exitPoint' to 'returnSite' in the NWA.
-       *
-       * @param - exitPoint: the exit point of the desired transition
-       * @param - returnSite: the return site of the desired transition
-       * @return the set of symbols that label return transitions from 'exitPoint'
-       *          to 'returnSite' in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  SymbolSet getReturnSym_ExitRet( State exitPoint, State returnSite ) const;
-
-      /**
-       * 
-       * @brief returns the symbols that label return transitions 
-       *        to 'returnSite' with call-predecessor 'callSite' in the NWA
-       *
-       * This method provides access to the symbols that label return transitions
-       * to 'returnSite' with call-predecessor 'callSite' in the NWA.
-       *
-       * @param - callSite: the call site of the desired transition
-       * @param - returnSite: the return site of the desired transition
-       * @return the set of symbols that label return transitions 
-       *          to 'returnSite' with call-predecessor 'callSite' in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  SymbolSet getReturnSym_CallRet( State callSite, State returnSite ) const;
-
-
-      /**
-       * 
-       * @brief returns the return site states associated with the given symbol
-       *
-       * This method provides access to the return site states associated with
-       * the given symbol.
-       *
-       * @param - symbol: the symbol whose reutrn site states to obtain
-       * @return the set of return site states associated with the given symbol
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  StateSet getReturns_Sym( Symbol symbol ) const;
-
-      /**
-       * 
-       * @brief returns the return site states associated with the given exit 
-       *        point, call site, and symbol
-       *
-       * This method provides access to the return site states associated with
-       * the given exit point, call site, and symbol.
-       *
-       * @param - exitPoint: the exit point whose return site states to obtain
-       * @param - callSite: the call site whose return site states to obtain
-       * @param - symbol: the symbol whose return site states to obtain
-       * @return the set of return site states associated with the given exit
-       *          point, call site, and symbol
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  StateSet getReturns( State exitPoint, State callSite, Symbol symbol ) const;
-
-      /**
-       * 
-       * @brief returns the symbol/return site pairs associated with the given exit 
-       *        point and call site
-       *
-       * This method provides access to the symbol/return site pairs associated with  
-       * the given exit point and call site.
-       *
-       * @param - exit: the exit point whose symbol/return site pairs to obtain
-       * @param - callSite: the call site whose symbol/return site pairs to obtain
-       * @return the set of symbol/return site pairs associated with the given exit 
-       *          point and call site
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  std::set<std::pair<Symbol,State> > getReturns( State exitPoint, State callSite ) const;
-
-      /**
-       * 
-       * @brief returns the return sites of all return transitions in the NWA
-       *
-       * This method provides access to the return sites of all return transitions
-       * in the NWA.
-       *
-       * @return the set of return sites of all return transitions in the NWA
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  StateSet getReturns(  ) const;
-
-      /**
-       * 
-       * @brief returns the return site states associated with the given exit 
-       *        point and symbol
-       *
-       * This method provides access to the return site states associated with
-       * the given exit point and symbol.
-       *
-       * @param - exitPoint: the exit point whose return site states to obtain
-       * @param - symbol: the symbol whose return site states to obtain
-       * @return the set of return site states associated with the given exit
-       *         point and symbol
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  StateSet getReturns_Exit( State exitPoint, Symbol symbol ) const;
-
-      /**
-       * 
-       * @brief returns the symbol/return site pairs associated with the given
-       *        exit point
-       *
-       * This method provides access to the symbol/return site pairs associated
-       * with the given exit point.
-       *
-       * @param - exitPoint: the exit point whose symbol/return site pairs to obtain
-       * @return the set of symbol/return site pairs associated with the given 
-       *          exit point
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  std::set<std::pair<Symbol,State> > getReturns_Exit( State exitPoint ) const;
-
-      /**
-       * 
-       * @brief returns the return site states associated with the given call 
-       *        site and symbol
-       *
-       * This method provides access to the return site states associated with
-       * the given call site and symbol.
-       *
-       * @param - callSite: the call site whose return site states to obtain
-       * @param - symbol: the symbol whose return site states to obtain
-       * @return the set of return site states associated with the given call
-       *          site and symbol
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  StateSet getReturns_Call( State callSite, Symbol symbol ) const;
-
-      /**
-       * 
-       * @brief returns the symbol/return site pairs associated with the given
-       *        call site
-       *
-       * This method provides access to the symbol/return site pairs associated
-       * with the given call site.
-       *
-       * @param - callSite: the call site whose symbol/return site pairs to obtain
-       * @return the set of symbol/return site pairs associated with the given
-       *          call site
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  std::set<std::pair<Symbol,State> > getReturns_Call( State callSite ) const;
-
-      /**
-       * 
-       * @brief returns the return sites associated with the given call site
-       *
-       * This method provides access to the return sites associated with the given
-       * call site.
-       *
-       * @param - callSite: the call site whose return sites to obtain
-       * @return the set of return sites associated with the given call site
-       *
-       */
+      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
       const  StateSet getReturnSites( State callSite ) const;
 
       /**
