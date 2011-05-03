@@ -1,12 +1,25 @@
 #include "wali/nwa/NWA.hpp"
 #include "wali/nwa/query/transitions.hpp"
+#include "wali/nwa/details/TransitionStorage.hpp"
 
 namespace wali
 {
   namespace nwa
   {
     namespace query
-    //  {
+    {
+      typedef details::TransitionStorage Trans;
+      typedef  Trans::CallIterator CallIterator;
+      typedef  Trans::InternalIterator InternalIterator;
+      typedef  Trans::ReturnIterator ReturnIterator;
+      typedef  Trans::Call Call;       
+      typedef  Trans::Internal Internal;   
+      typedef  Trans::Return Return;          
+      
+      typedef  Trans::Calls Calls;
+      typedef  Trans::Internals Internals;
+      typedef  Trans::Returns Returns;
+
       
     //Transition Accessors
 
@@ -22,10 +35,12 @@ namespace wali
      */
     
     
-    bool NWA::getSymbol(NWA const & nwa, State from, State to, Symbol & sym )
+    bool getSymbol(NWA const & nwa, State from, State to, Symbol & sym )
     {
       assert(from < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
+
+      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       return trans.getSymbol(from,to,sym);
     }
 
@@ -41,11 +56,13 @@ namespace wali
      * 
      */
     
-    bool NWA::findTrans(NWA const & nwa, State from, Symbol sym, State to)
+    bool findTrans(NWA const & nwa, State from, Symbol sym, State to)
     {
       assert(from < wali::WALI_BAD_KEY);
       assert(sym < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
+      
+      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       return trans.findTrans(from,sym,to);
     }
 
@@ -59,10 +76,12 @@ namespace wali
      *
      */
     
-    const std::set< Symbol> NWA::getSymbols(NWA const & nwa, State source, State target )
+    const std::set< Symbol> getSymbols(NWA const & nwa, State source, State target )
     {
       assert(source < wali::WALI_BAD_KEY);
       assert(target < wali::WALI_BAD_KEY);
+
+      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       std::set<Symbol> syms;
 
@@ -99,9 +118,11 @@ namespace wali
      *
      */
     
-    const std::set< Symbol> NWA::getSymbolsFrom(NWA const & nwa, State source )
+    const std::set< Symbol> getSymbolsFrom(NWA const & nwa, State source )
     {
       assert(source < wali::WALI_BAD_KEY);
+
+      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       std::set<Symbol> syms;
 
@@ -135,9 +156,11 @@ namespace wali
      *
      */
     
-    const std::set< Symbol> NWA::getSymbolsTo(NWA const & nwa, State target )
+    const std::set< Symbol> getSymbolsTo(NWA const & nwa, State target )
     {
       assert(target < wali::WALI_BAD_KEY);
+
+      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       std::set<Symbol> syms;
 
@@ -171,9 +194,11 @@ namespace wali
      *
      */ 
     
-    void NWA::getPredecessors(NWA const & nwa, State state,  StateSet & preds )
+    void getPredecessors(NWA const & nwa, State state,  StateSet & preds )
     {
       assert(state < wali::WALI_BAD_KEY);
+
+      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
        
       std::set<Call> const & calls = trans.getTransEntry(state);
       for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
@@ -196,10 +221,10 @@ namespace wali
      *
      */
 	  
-    const StateSet NWA::getPredecessors(NWA const & nwa, State state )
-    {
+    const StateSet getPredecessors(NWA const & nwa, State state )
+    {   
       StateSet preds;
-      getPredecessors(state, preds);
+      getPredecessors(nwa, state, preds);
       return preds;
     }
 
@@ -216,10 +241,12 @@ namespace wali
      *
      */
     
-    void NWA::getPredecessors(NWA const & nwa, Symbol symbol, State state,  StateSet & preds )
+    void getPredecessors(NWA const & nwa, Symbol symbol, State state,  StateSet & preds )
     {
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
+
+      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       std::set<Call> const & calls = trans.getTransEntry(state);
       for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
@@ -249,10 +276,10 @@ namespace wali
      *
      */
 	  
-    const std::set< State> NWA::getPredecessors(NWA const & nwa, Symbol symbol, State state )
+    const std::set< State> getPredecessors(NWA const & nwa, Symbol symbol, State state )
     {
       StateSet preds;
-      getPredecessors(symbol, state, preds);
+      getPredecessors(nwa, symbol, state, preds);
       return preds;
     }
 
@@ -265,9 +292,11 @@ namespace wali
      *
      */
     
-    void NWA::getSuccessors(NWA const & nwa, State state,  StateSet & succs )
+    void getSuccessors(NWA const & nwa, State state,  StateSet & succs )
     {
       assert(state < wali::WALI_BAD_KEY);
+
+      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
        
       std::set<Call> const & calls = trans.getTransCall(state);
       for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
@@ -290,10 +319,10 @@ namespace wali
      *
      */
 	  
-    const std::set< State> NWA::getSuccessors(NWA const & nwa, State state )
+    const std::set< State> getSuccessors(NWA const & nwa, State state )
     {
       StateSet succs;
-      getSuccessors(state, succs);
+      getSuccessors(nwa, state, succs);
       return succs;
     }
 
@@ -310,10 +339,12 @@ namespace wali
      *
      */
     
-    void NWA::getSuccessors(NWA const & nwa, State state, Symbol symbol,  StateSet & succs )
+    void getSuccessors(NWA const & nwa, State state, Symbol symbol,  StateSet & succs )
     {
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
+
+      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       std::set<Call> const & calls = trans.getTransCall(state);
       for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
@@ -343,10 +374,10 @@ namespace wali
      *
      */
     
-    const std::set< State> NWA::getSuccessors(NWA const & nwa, State state, Symbol symbol )
+    const std::set< State> getSuccessors(NWA const & nwa, State state, Symbol symbol )
     {
       StateSet succs;
-      getSuccessors(state, symbol, succs);
+      getSuccessors(nwa, state, symbol, succs);
       return succs;
     }
 
@@ -362,10 +393,12 @@ namespace wali
      *
      */
     
-    const std::set< Symbol> NWA::getCallRetSymbols(NWA const & nwa, State call, State ret )
+    const std::set< Symbol> getCallRetSymbols(NWA const & nwa, State call, State ret )
     {
       assert(call < wali::WALI_BAD_KEY);
       assert(ret < wali::WALI_BAD_KEY);
+
+      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       std::set<Symbol> syms;
 
@@ -390,9 +423,11 @@ namespace wali
      *
      */
     
-    const std::set< Symbol> NWA::getCallRetSymbolsFrom(NWA const & nwa, State call )
+    const std::set< Symbol> getCallRetSymbolsFrom(NWA const & nwa, State call )
     {
       assert(call < wali::WALI_BAD_KEY);
+
+      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       std::set<Symbol> syms;
 
@@ -416,9 +451,11 @@ namespace wali
      *
      */
     
-    const std::set< Symbol> NWA::getCallRetSymbolsTo(NWA const & nwa, State ret )
+    const std::set< Symbol> getCallRetSymbolsTo(NWA const & nwa, State ret )
     {
       assert(ret < wali::WALI_BAD_KEY);
+
+      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       std::set<Symbol> syms;
 
@@ -440,9 +477,11 @@ namespace wali
      *
      */ 
     
-    void NWA::getCallPredecessors(NWA const & nwa, State state,  StateSet & c_preds )
+    void getCallPredecessors(NWA const & nwa, State state,  StateSet & c_preds )
     {
       assert(state < wali::WALI_BAD_KEY);
+
+      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       
       std::set<Return> const & returns = trans.getTransRet(state);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
@@ -457,12 +496,12 @@ namespace wali
      *
      */
 	
-    const std::set< State> NWA::getCallPredecessors(NWA const & nwa, State state )
+    const std::set< State> getCallPredecessors(NWA const & nwa, State state )
     {
       assert(state < wali::WALI_BAD_KEY);
-      
+
       StateSet c_preds;
-      getCallPredecessors(state, c_preds);
+      getCallPredecessors(nwa, state, c_preds);
       return c_preds;
     }
       
@@ -479,10 +518,12 @@ namespace wali
      *
      */
     
-    void NWA::getCallPredecessors(NWA const & nwa, Symbol symbol, State state,  StateSet & c_preds )
+    void getCallPredecessors(NWA const & nwa, Symbol symbol, State state,  StateSet & c_preds )
     {
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
+
+      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       std::set<Return> const & returns = trans.getTransRet(state);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
@@ -502,10 +543,10 @@ namespace wali
      *
      */
 	
-    const std::set< State> NWA::getCallPredecessors(NWA const & nwa, Symbol symbol, State state )
+    const std::set< State> getCallPredecessors(NWA const & nwa, Symbol symbol, State state )
     {
       StateSet c_preds;
-      getCallPredecessors(symbol, state, c_preds);
+      getCallPredecessors(nwa, symbol, state, c_preds);
       return c_preds;
     }
 
@@ -518,9 +559,11 @@ namespace wali
      *
      */
     
-    void NWA::getCallSuccessors(NWA const & nwa, State state,  StateSet & c_succs )
+    void getCallSuccessors(NWA const & nwa, State state,  StateSet & c_succs )
     {
       assert(state < wali::WALI_BAD_KEY);
+
+      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       
       std::set<Return> const & returns = trans.getTransPred(state);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
@@ -535,10 +578,10 @@ namespace wali
      *
      */
 	
-    const std::set< State> NWA::getCallSuccessors(NWA const & nwa, State state )
+    const std::set< State> getCallSuccessors(NWA const & nwa, State state )
     {
       StateSet c_succs;
-      getCallSuccessors(state, c_succs);
+      getCallSuccessors(nwa, state, c_succs);
       return c_succs;
     }
 
@@ -555,10 +598,12 @@ namespace wali
      *
      */
     
-    void NWA::getCallSuccessors(NWA const & nwa, State state, Symbol symbol,  StateSet & c_succs )
+    void getCallSuccessors(NWA const & nwa, State state, Symbol symbol,  StateSet & c_succs )
     {
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
+
+      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       
       std::set<Return> const & returns = trans.getTransPred(state);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
@@ -578,10 +623,10 @@ namespace wali
      *
      */
 	
-    const std::set< State> NWA::getCallSuccessors(NWA const & nwa, State state, Symbol symbol )
+    const std::set< State> getCallSuccessors(NWA const & nwa, State state, Symbol symbol )
     {
       StateSet c_succs;
-      getCallSuccessors(state, symbol, c_succs);
+      getCallSuccessors(nwa, state, symbol, c_succs);
       return c_succs;
     }
 

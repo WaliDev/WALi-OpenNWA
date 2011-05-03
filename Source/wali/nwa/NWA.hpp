@@ -453,358 +453,40 @@ namespace wali
        */
       void clearSymbols( );
 
+      
       //Transition Accessors
 
-      /**
-       * 
-       * @brief finds a symbol which occurs in a transition with the given endpoints
-       *
-       * This method checks for a transition (of any kind) with the given endpoints. If 
-       * such a transition exists true is returned and the symbol labeling that edge is
-       * placed in the reference parameter 'sym'.
-       *
-       * @param - from: the source of the desired transition
-       * @param - to: the target of the desired transition
-       * @param - sym: the location in which to place any symbol labeling such a transition
-       * @return true if some such transition is found, false otherwise
-       *
-       */
-      bool getSymbol( State from, State to, Symbol & sym ) const;
-
-      /**
-       * 
-       * @brief tests whether there exists a transition whose source is 'from', 
-       *        whose symbol is 'sym', and whose target is 'to'
-       *
-       * This method determines whether there exists a transition (internal, call, or 
-       * return) whose source is 'from', whose symbol is 'sym', and whose target is 'to'.
-       *
-       * @param - from: the source of the transition
-       * @param - sym: the symbol that labels the transition
-       * @param - to: the target of the transition
-       * @return true if such a transition exists, false otherwise
-       * 
-       */
-      bool findTrans( State from, Symbol sym, State to ) const;
-
-      /**
-       * 
-       * @brief obtains all the symbols that label transitions from 'source' to 'target'
-       *
-       * This method returns all the symbols that label transitions from 
-       * 'source' to 'target'
-       *
-       * @param - source: the source of the desired transitions
-       * @param - target: the target of the desired transitions
-       * @return the set of symbols that label transitions from 'source' to 'target'
-       *
-       */
-      const  SymbolSet getSymbols( State source, State target ) const;
-
-      /**
-       * 
-       * @brief obtains all the symbols that label transitions from 'source'
-       *
-       * This method returns all the symbols that label transitions from 'source'
-       *
-       * @param - source: the source of the desired transitions
-       * @return the set of symbols that label transitions from 'source'
-       *
-       */
-      const  SymbolSet getSymbolsFrom( State source ) const;
-
-      /**
-       * 
-       * @brief obtains all the symbols that label transitions to 'target'
-       *
-       * This method returns all the symbols that label transitions to 'target'
-       *
-       * @param - target: the target of the desired transitions
-       * @return the set of symbols that label transitions to 'target'
-       *
-       */
-      const  SymbolSet getSymbolsTo( State target ) const;
-
-      /**
-       *  
-       * @brief obtains all the states that are predecessors of the given state
-       *
-       * This method returns all the states that are predecessors of the given 
-       * state.
-       *
-       * @param - state: the state whose predecessors to look up
-       * @param - preds: the set of all states that are predecessors of the given state
-       *
-       */    
-      void getPredecessors( State state,  StateSet & preds ) const;
-      /**
-       * 
-       * @brief obtains all the states that are predecessors of the given state
-       *
-       * This method returns all the states that are predecessors of the given state.
-       *
-       * @param - state: the state whose predecessors to look up
-       * @return the set of all states that are predecessors of the given state
-       *
-       */
-      const  StateSet getPredecessors( State state ) const;
-
-      /**
-       * 
-       * @brief obtains all the states that are predecessors of the given state with 
-       *        respect to the given symbol
-       *
-       * This method returns all the states that are predecessors of the given state
-       * such that the symbol that labels a transition from each predecessor to the
-       * given state is the given symbol.
-       *
-       * @param - symbol: the symbol that should label a transition from each predecessor 
-       *                  to the given state
-       * @param - state: the state whose predecessors to look up
-       * @param - preds: the set of all states that are predecessors of the given state
-       *                  with respect to the given symbol
-       *
-       */
-      void getPredecessors( Symbol symbol, State state,  StateSet & preds ) const;
-      /**
-       * 
-       * @brief obtains all the states that are predecessors of the given state with
-       *		respect to the given symbol
-       *
-       * This method returns all the states that are predecessors of the given state
-       * such that the symbol that labels a transition from each predecessor to the
-       * given state is the given symbol.
-       *
-       * @param - symbol: the symbol that should label a transition from each predecessor
-       *					to the given state
-       * @param - state: the state whose predecessors to look up
-       * @return the set of all states that are predecessors of the given state with 
-       *			respect to the given symbol
-       *
-       */
-      const  StateSet getPredecessors( Symbol symbol, State state ) const;
-
-      /**
-       * 
-       * @brief obtains all the states that are successors of the given state
-       *
-       * This method returns all the states that are successors of the given state.
-       *
-       * @param - state: the state whose successors to lookup
-       * @param - succs: the set of all states that are successors of the given state
-       *
-       */
-      void getSuccessors( State state,  StateSet & succs ) const;
-      /**
-       * 
-       * @brief obtains all the states that are successors of the given state
-       *
-       * This method returns all the states that are successors of the given state.
-       *
-       * @param - state: the state whose successors to look up
-       * @return the set of all states that are successors of the given state
-       *
-       */
-      const  StateSet getSuccessors( State state ) const;
-
-      /**
-       * 
-       * @brief obtains all the states that are successors of the given state with
-       *        respect to the given symbol
-       *
-       * This method returns all the states that are successors of the given state
-       * such that the symbol that labels a transition from the given state to each
-       * successor is the given symbol.  
-       *
-       * @param - symbol: the symbol that should label a transition from the given 
-       *                  state to each successor
-       * @param - state: the state whose successors to look up
-       * @param - succs: the set of all states that are successors of the given state
-       *                  with respect to the given symbol
-       *
-       */
-      void getSuccessors( State state, Symbol symbol,  StateSet & succs ) const;
-      /**
-       * 
-       * @brief obtains all the states that are successors of the given state with
-       *		respect to the given symbol
-       *
-       * This method returns all the states that are successors of the given state
-       * such that the symbol that labels a transition from the given state to each
-       * successor is the given symbol.
-       *
-       * @param - symbol: the symbol that should label a transition from the given
-       *					state to each successor
-       * @param - state: the state whose successors to look up
-       * @return the set of all states that are successors of the given state
-       *			with respect to the given symbol
-       *
-       */
-      const  StateSet getSuccessors( State state, Symbol symbol ) const;
-
-      /**
-       * 
-       * @brief obtains all the symbols that label return transitions whose 
-       *		call-predecessor is 'call' and whose return site is 'ret'
-       *
-       * This method returns all the symbols that label return transitions
-       * whose call-predecessor is 'call' and whose return site is 'ret'
-       *
-       * @param - call: the call-predecessor of the desired return transitions
-       * @param - ret: the return site of the desired return transitions
-       * @return the set of symbols that label return transitions whose
-       *			call-predecessor is 'call' and whose return site is 'ret'
-       *
-       */
-      const  SymbolSet getCallRetSymbols( State call, State ret ) const;
-
-      /**
-       * 
-       * @brief obtains all the symbols that label return transitions whose
-       *		call-predecessor is 'call'
-       *
-       * This method returns all the symbols that label return transitions
-       * whose call-predecessor is 'call'
-       *
-       * @param - call: the call-predecessor of the desired return transitions
-       * @return the set of symbols that label return transitions whose
-       *			call-predecessor is 'call'
-       *
-       */
-      const  SymbolSet getCallRetSymbolsFrom( State call ) const;
-
-      /**
-       * 
-       * @brief obtains all the symbols that label return transitions whose
-       *		return site is 'ret'
-       *
-       * This method returns all the symbols that label return transitions
-       * whose return site is 'ret'
-       *
-       * @param - ret: the return site of the desired return transitions
-       * @return the set of symbols that label return transitions whose
-       *			return site is 'ret'
-       *
-       */
-      const  SymbolSet getCallRetSymbolsTo( State ret ) const;
-
-      /**
-       *  
-       * @brief obtains all the states that are call-predecessors of the given state
-       *
-       * This method returns all the states that are call-predecessors of the given 
-       * state.
-       *
-       * @param - state: the state whose call-predecessors to look up
-       * @param - preds: the set of all states that are call-predecessors of the given state
-       *
-       */ 
-      void getCallPredecessors( State state,  StateSet & c_preds ) const;
-      /**
-       * 
-       * @brief obtains all the states that are call-predecessors of the given state
-       *
-       * This method returns all the states that are call-predecessors of the given state.
-       *
-       * @param - state: the state whose call-predecessors to look up
-       * @return the set of all states that are call-predecessors of the given state
-       *
-       */
-      const  StateSet getCallPredecessors( State state ) const;
+      Trans const & _private_get_transition_storage_() const  {
+        return trans;
+      }
       
-      /**
-       * 
-       * @brief obtains all the states that are call-predecessors of the given state with 
-       *        respect to the given symbol
-       *
-       * This method returns all the states that are call-predecessors of the given state
-       * such that the symbol that labels a return transition with each call-predecessor 
-       * and the given state is the given symbol.
-       *
-       * @param - symbol: the symbol that should label a transition with each call-predecessor 
-       *                  and the given state
-       * @param - state: the state whose call-predecessors to look up
-       * @param - preds: the set of all states that are call-predecessors of the given state
-       *                  with respect to the given symbol
-       *
-       */
+
+      bool getSymbol( State from, State to, Symbol & sym ) const;
+      bool findTrans( State from, Symbol sym, State to ) const;
+      const  SymbolSet getSymbols( State source, State target ) const;
+      const  SymbolSet getSymbolsFrom( State source ) const;
+      const  SymbolSet getSymbolsTo( State target ) const;
+      void getPredecessors( State state,  StateSet & preds ) const;
+      const  StateSet getPredecessors( State state ) const;
+      void getPredecessors( Symbol symbol, State state,  StateSet & preds ) const;
+      const  StateSet getPredecessors( Symbol symbol, State state ) const;
+      void getSuccessors( State state,  StateSet & succs ) const;
+      const  StateSet getSuccessors( State state ) const;
+      void getSuccessors( State state, Symbol symbol,  StateSet & succs ) const;
+      const  StateSet getSuccessors( State state, Symbol symbol ) const;
+      const  SymbolSet getCallRetSymbols( State call, State ret ) const;
+      const  SymbolSet getCallRetSymbolsFrom( State call ) const;
+      const  SymbolSet getCallRetSymbolsTo( State ret ) const;
+      void getCallPredecessors( State state,  StateSet & c_preds ) const;
+      const  StateSet getCallPredecessors( State state ) const;
       void getCallPredecessors( Symbol symbol, State state,  StateSet & c_preds ) const;
-      /**
-       * 
-       * @brief obtains all the states that are call-predecessors of the given state with
-       *		respect to the given symbol
-       *
-       * This method returns all the states that are call-predecessors of the given state
-       * such that the symbol that labels a return transition with each call-predecessor
-       * and the given state is the given symbol.
-       *
-       * @param - symbol: the symbol that should label a transition with each call-predecessor
-       *					and the given state
-       * @param - state: the state whose call-predecessors to look up
-       * @return the set of all states that are call-predecessors of the given state
-       *			with respect to the given symbol
-       *
-       */
       const  StateSet getCallPredecessors( Symbol symbol, State state ) const;
-
-      /**
-       * 
-       * @brief obtains all the states that are call-successors of the given state
-       *
-       * This method returns all the states that are call-successors of the given state.
-       *
-       * @param - state: the state whose call-successors to lookup
-       * @param - succs: the set of all states that are call-successors of the given state
-       *
-       */
       void getCallSuccessors( State state,  StateSet & c_succs ) const;
-      /**
-       * 
-       * @brief obtains all the states that are call-successors of the given state
-       *
-       * This method returns all the states that are call-successors of the given state.
-       *
-       * @param - state: the state whose call-successors to look up
-       * @return the set of all states that are call-successors of the given state
-       *
-       */
       const  StateSet getCallSuccessors( State state ) const;
-
-      /**
-       * 
-       * @brief obtains all the states that are call-successors of the given state with
-       *        respect to the given symbol
-       *
-       * This method returns all the states that are call-successors of the given state
-       * such that the symbol that labels a return transition with each call-successor 
-       * and the given state is the given symbol.  
-       *
-       * @param - symbol: the symbol that should label a return transition with each call-
-       *                  successor and the given state
-       * @param - state: the state whose call-successors to look up
-       * @param - succs: the set of all states that are call-successors of the given state
-       *                  with respect to the given symbol
-       *
-       */
       void getCallSuccessors( State state, Symbol symbol,  StateSet & c_succs ) const;
-      /**
-       * 
-       * @brief obtains all the states that are call-successors of the given state with 
-       *		respect to the given symbol
-       *
-       * This method returns all the states that are call-successors of the given state
-       * such that the symbol that labels a return transition with each call-successor
-       * and the given state is the given symbol.
-       *
-       * @param - symbol: the symbol that should label a return transition with each call-
-       *					successor and the given state
-       * @param - state: the state whose call-successors to look up
-       * @return the set of all states that are call-successors of the given state with
-       *			respect to the given symbol
-       *
-       */
       const  StateSet getCallSuccessors( State state, Symbol symbol ) const;
 
+      
       /**
        *    
        * @brief duplicates the original state, but only duplicates outgoing transitions
