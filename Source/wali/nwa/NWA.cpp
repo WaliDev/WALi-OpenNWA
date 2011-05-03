@@ -4325,41 +4325,24 @@ namespace wali
       typedef std::set<BinaryRelation> RelationSet;
 #endif
 
-#if 1
-      NWA nondet_copy(nondet);
-
-      {
-        std::string s = "stuck";
-        Key ss = getKey(s);
-        while( nondet_copy.isState(ss) )
-        {
-          s = s + "~";
-          ss = getKey(s);
-        }
-
-        //BlockTimer timer("Reify consumer transitions (inside determinize)");
-        nondet_copy.realizeImplicitTrans(ss);
-      }
-#endif
-
       // Construct Id
       DECLARE(BinaryRelation, Id);
-      for( stateIterator sit = nondet_copy.beginStates(); sit != nondet_copy.endStates(); sit++ )
+      for( stateIterator sit = nondet.beginStates(); sit != nondet.endStates(); sit++ )
       {
         Id.insert(std::pair<State,State>(*sit,*sit));
       }
       
       // Construct Id0
       DECLARE(BinaryRelation, Id0);
-      for( stateIterator sit = nondet_copy.beginInitialStates(); sit != nondet_copy.endInitialStates(); sit++ )
+      for( stateIterator sit = nondet.beginInitialStates(); sit != nondet.endInitialStates(); sit++ )
       {
         Id0.insert(std::pair<State,State>(*sit,*sit));
       }
       
-      //Construct the epsilon closure relation for the states in nondet_copy.
+      //Construct the epsilon closure relation for the states in nondet.
       SetBinaryRelation pre_close; //Collapse epsilon transitions.
       SetBinaryRelation Ie;   //Internal transitions with epsilon.
-      project_symbol_3<SetBinaryRelation>(Ie,nondet_copy.trans.getInternals(), WALI_EPSILON);
+      project_symbol_3<SetBinaryRelation>(Ie,nondet.trans.getInternals(), WALI_EPSILON);
 #ifdef USE_BUDDY
       transitive_closure(pre_close,Ie);
 #else
@@ -4375,7 +4358,7 @@ namespace wali
       union_(close, bdd_pre_close, Id);
 
       // R0 is used later; to avoid recomputation we do it now
-      // Epsilon Closure( {(q,q) | q is an element of Q_in in nondet_copyerministic NWA } )
+      // Epsilon Closure( {(q,q) | q is an element of Q_in in nondeterministic NWA } )
       DECLARE(BinaryRelation, R0);
 #ifdef USE_BUDDY
       compose/*<St>*/(R0,Id0,close);
@@ -4391,7 +4374,7 @@ namespace wali
 
       //Set the client info for this new state.
       ClientInfoRefPtr CI;
-      mergeClientInfo(nondet_copy,R0,r0,CI);
+      mergeClientInfo(nondet,R0,r0,CI);
       states.setClientInfo(r0,CI);
 
       //Put the initial state on the worklist.
@@ -4406,24 +4389,24 @@ namespace wali
       std::map<wali::Key, BinaryRelation> internalTransPerSymbol;
       std::map<wali::Key, TernaryRelation> returnTransPerSymbol;
 
-      for( symbolIterator it = nondet_copy.beginSymbols(); it != nondet_copy.endSymbols(); it++ ) {
+      for( symbolIterator it = nondet.beginSymbols(); it != nondet.endSymbols(); it++ ) {
         if (*it == WALI_EPSILON) continue;    //Epsilon is handled with closure.
         if (*it == WALI_WILD) continue;
 
 #ifdef USE_BUDDY
-        internalTransPerSymbol[*it] = BinaryRelation(nondet_copy.largestState());
-        callTransPerSymbol[*it] = BinaryRelation(nondet_copy.largestState());
-        returnTransPerSymbol[*it] = TernaryRelation(nondet_copy.largestState());
+        internalTransPerSymbol[*it] = BinaryRelation(nondet.largestState());
+        callTransPerSymbol[*it] = BinaryRelation(nondet.largestState());
+        returnTransPerSymbol[*it] = TernaryRelation(nondet.largestState());
 #endif
         
-        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet_copy.trans.getInternals(), *it);
-        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet_copy.trans.getInternals(), WALI_WILD);
+        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet.trans.getInternals(), *it);
+        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet.trans.getInternals(), WALI_WILD);
 
-        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet_copy.trans.getCalls(), *it);
-        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet_copy.trans.getCalls(), WALI_WILD);   //Every symbol also matches wild.
+        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet.trans.getCalls(), *it);
+        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet.trans.getCalls(), WALI_WILD);   //Every symbol also matches wild.
 
-        project_symbol_4(returnTransPerSymbol[*it], nondet_copy.trans.getReturns(), *it);
-        project_symbol_4(returnTransPerSymbol[*it], nondet_copy.trans.getReturns(),WALI_WILD);   //Every symbol also matches wild.
+        project_symbol_4(returnTransPerSymbol[*it], nondet.trans.getReturns(), *it);
+        project_symbol_4(returnTransPerSymbol[*it], nondet.trans.getReturns(),WALI_WILD);   //Every symbol also matches wild.
       }
 
       
@@ -4442,7 +4425,7 @@ namespace wali
 
 
         //Check each symbol individually.
-        for( symbolIterator it = nondet_copy.beginSymbols(); it != nondet_copy.endSymbols(); it++ )
+        for( symbolIterator it = nondet.beginSymbols(); it != nondet.endSymbols(); it++ )
         {
           if (*it == WALI_EPSILON) continue;    //Epsilon is handled with closure.
           if (*it == WALI_WILD) continue;       //Wild is matched to every symbol as we go.
@@ -4455,8 +4438,8 @@ namespace wali
 
 #if 0
           DECLARE(BinaryRelation, IiOrig);
-          project_symbol_3(IiOrig,nondet_copy.trans.getInternals(),*it);   
-          project_symbol_3(IiOrig,nondet_copy.trans.getInternals(),WALI_WILD);   //Every symbol also matches wild.
+          project_symbol_3(IiOrig,nondet.trans.getInternals(),*it);   
+          project_symbol_3(IiOrig,nondet.trans.getInternals(),WALI_WILD);   //Every symbol also matches wild.
           
           if (Ii == IiOrig) {
             std::cout << "Ii == IiOrig holds!\n";
@@ -4485,7 +4468,7 @@ namespace wali
 
           //Adjust the client info for this state.
           ClientInfoRefPtr riCI;
-          mergeClientInfoInternal(nondet_copy,R,Ri,r,*it,ri,riCI);
+          mergeClientInfoInternal(nondet,R,Ri,r,*it,ri,riCI);
           states.setClientInfo(ri,riCI);
 
           //Determine whether to add this state to the worklist.
@@ -4502,8 +4485,8 @@ namespace wali
 
 #if 0
           DECLARE(BinaryRelation, IcOrig);
-          project_symbol_3(IcOrig,nondet_copy.trans.getCalls(),*it);  
-          project_symbol_3(IcOrig,nondet_copy.trans.getCalls(),WALI_WILD);   //Every symbol also matches wild.
+          project_symbol_3(IcOrig,nondet.trans.getCalls(),*it);  
+          project_symbol_3(IcOrig,nondet.trans.getCalls(),WALI_WILD);   //Every symbol also matches wild.
           
           if (Ic == IcOrig) {
             std::cout << "Ic == IcOrig holds!\n";
@@ -4530,7 +4513,7 @@ namespace wali
 
           //Adjust the client info for this state.
           ClientInfoRefPtr rcCI;
-          mergeClientInfoCall(nondet_copy,R,Rc,r,*it,rc,rcCI);
+          mergeClientInfoCall(nondet,R,Rc,r,*it,rc,rcCI);
           states.setClientInfo(rc,rcCI);
 
           //Determine whether to add this state to the worklist.
@@ -4544,8 +4527,8 @@ namespace wali
 
 #if 0
           TernaryRelation IrOrig;
-          project_symbol_4(IrOrig,nondet_copy.trans.getReturns(),*it);    
-          project_symbol_4(IrOrig,nondet_copy.trans.getReturns(),WALI_WILD);   //Every symbol also matches wild.
+          project_symbol_4(IrOrig,nondet.trans.getReturns(),*it);    
+          project_symbol_4(IrOrig,nondet.trans.getReturns(),WALI_WILD);   //Every symbol also matches wild.
 
           if (Ir == IrOrig) {
             std::cout << "Ir == IrOrig holds!\n";
@@ -4579,7 +4562,7 @@ namespace wali
 
             //Adjust the client info for this state.
             ClientInfoRefPtr rrCI;
-            mergeClientInfoReturn(nondet_copy,R,*rit,Rr,r,rc,*it,rr,rrCI);
+            mergeClientInfoReturn(nondet,R,*rit,Rr,r,rc,*it,rr,rrCI);
             states.setClientInfo(rr,rrCI);
 
             //Determine whether to add this state to the worklist.
@@ -4615,7 +4598,7 @@ namespace wali
             
             //Adjust the client info for this state.
             ClientInfoRefPtr rrCI;
-            mergeClientInfo(nondet_copy,Rr,rr,rrCI);
+            mergeClientInfo(nondet,Rr,rr,rrCI);
             states.setClientInfo(rr,rrCI);
 
             //Determine whether to add this state to the worklist.
@@ -4631,11 +4614,11 @@ namespace wali
         //any final state must contain one of the pairs in 
         //{(init,fin) | init is an initial state and fin is a final state}
         DECLARE(BinaryRelation, Rf);
-        for( stateIterator iit = nondet_copy.beginInitialStates();
-             iit != nondet_copy.endInitialStates(); iit++ )
+        for( stateIterator iit = nondet.beginInitialStates();
+             iit != nondet.endInitialStates(); iit++ )
         {
-          for( stateIterator fit = nondet_copy.beginFinalStates();
-               fit != nondet_copy.endFinalStates(); fit++ )
+          for( stateIterator fit = nondet.beginFinalStates();
+               fit != nondet.endFinalStates(); fit++ )
           {
             Rf.insert(std::pair<State,State>(*iit,*fit));
           }
