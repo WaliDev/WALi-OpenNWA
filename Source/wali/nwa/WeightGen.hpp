@@ -20,23 +20,23 @@ namespace wali
      * incorporate the desired semiring in order to use either of these methods.
      *  
      */
-	//TODO: we may want to split getWeight into getCallWeight/getInternalWeight/getReturnWeight
+    //TODO: we may want to split getWeight into getCallWeight/getInternalWeight/getReturnWeight
     class WeightGen
     {
-      public:
-        //The kinds of edges that need to be considered.
-        //  INTRA:  corresponds to an Internal transition in the NWA
-        //  CALL_TO_ENTRY:  corresponds to a Call transition in the NWA
-        //  EXIT_TO_RET:  corresponds to the exit-to-return part of a Return transition in the NWA
-        //  CALL_TO_RET:  corresponds to the call-to-return part of a Return transition in the NWA
-        enum Kind {INTRA, CALL_TO_ENTRY, EXIT_TO_RET, CALL_TO_RET}; 
-		    typedef ref_ptr<ClientInfo> ClientInfoRefPtr;
+    public:
+      //The kinds of edges that need to be considered.
+      //  INTRA:  corresponds to an Internal transition in the NWA
+      //  CALL_TO_ENTRY:  corresponds to a Call transition in the NWA
+      //  EXIT_TO_RET:  corresponds to the exit-to-return part of a Return transition in the NWA
+      //  CALL_TO_RET:  corresponds to the call-to-return part of a Return transition in the NWA
+      enum Kind {INTRA, CALL_TO_ENTRY, EXIT_TO_RET, CALL_TO_RET}; 
+      typedef ref_ptr<ClientInfo> ClientInfoRefPtr;
       
       //
       // Methods
       //
       
-      public:
+    public:
       
       //Constructors and Destructor
       WeightGen( ) { }
@@ -63,11 +63,11 @@ namespace wali
        * Note: The kind will never be CALL_TO_RET, this case is never needed.
        *
        * @param - src: the source of the edge
-	     * @param - srcInfo: the clientInfo associated with src
+       * @param - srcInfo: the clientInfo associated with src
        * @param - sym: the symbol labeling the edge
        * @param - kind: the variety of edge
        * @param - tgt: the target of the edge
-	     * @param - tgtInfo: the clientInfo associated with tgt
+       * @param - tgtInfo: the clientInfo associated with tgt
        * @return the weight to put on the rule corresponding to the given edge
        *         
        */
@@ -92,7 +92,7 @@ namespace wali
        * Note: This value is generally the same as getOne().
        * 
        * @param - src: the source of the exit edge
-	     * @param - srcInfo: the clientInfo associated with src
+       * @param - srcInfo: the clientInfo associated with src
        * @return the weight to put on the return rule corresponding to the given exit 
        *
        */
@@ -112,9 +112,9 @@ namespace wali
        * the edge between 'src' and 'tgt' labeled with the wild symbol.
        *
        * @param - src: the source of the edge
-	     * @param - srcInfo: the clientInfo associated with src
+       * @param - srcInfo: the clientInfo associated with src
        * @param - tgt: the target of the edge
-	     * @param - tgtInfo: the clientInfo associated with tgt
+       * @param - tgtInfo: the clientInfo associated with tgt
        * @return the weight to put on the rule corresponding to the given edge
        *
        */
@@ -132,35 +132,42 @@ namespace wali
 
     class ReachGen : public wali::nwa::WeightGen
     {
-      public:
-        //
-        // Methods
-        //
+    public:
+      //
+      // Methods
+      //
           
-      public:
-        sem_elem_t getOne( )
-        {
-          static const Reach r(true);
-          return r.one();
-        }
+    public:
+      sem_elem_t getOne( )
+      {
+        static const Reach r(true);
+        return r.one();
+      }
 
-        sem_elem_t getWeight( const State & src, const Symbol & inst, Kind k, const State & tgt )
-        {
-          (void) src;
-          (void) inst;
-          (void) k;
-          (void) tgt;
-          return getOne();
-        }
+      sem_elem_t getWeight( const State & src, const Symbol & inst, Kind k, const State & tgt )
+      {
+        (void) src;
+        (void) inst;
+        (void) k;
+        (void) tgt;
+        return getOne();
+      }
            
-        sem_elem_t getWildWeight( const State & src, const State & tgt )
-        {
-          (void) src;
-          (void) tgt;
-          return getOne();
-        }
+      sem_elem_t getWildWeight( const State & src, const State & tgt )
+      {
+        (void) src;
+        (void) tgt;
+        return getOne();
+      }
     };
 
   }
 }
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
+
 #endif

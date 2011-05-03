@@ -29,5 +29,11 @@ namespace wali
     typedef std::set<Symbol> SymbolSet;
   }
 }
-  
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
+
 #endif

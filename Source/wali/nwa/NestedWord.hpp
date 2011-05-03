@@ -10,7 +10,8 @@ namespace wali
     public:
       // Each position in the nested word has a symbol and a type.
       // (Think of this more of a visibly-pushdown word.)
-      struct Position {
+      struct Position
+      {
         enum Type {
           CallType, InternalType, ReturnType
         };
@@ -26,7 +27,8 @@ namespace wali
     public:
       typedef  std::vector<Position>::const_iterator const_iterator;
       
-      void append(Position p) {
+      void append(Position p)
+      {
         word.push_back(p);
       }
       
@@ -34,15 +36,24 @@ namespace wali
       void appendInternal(Symbol sym) { append(Position(sym, Position::InternalType)); }
       void appendReturn(Symbol sym)   { append(Position(sym, Position::ReturnType)); }
       
-      const_iterator begin() const {
+      const_iterator begin() const
+      {
         return word.begin();
       }
       
-      const_iterator end() const {
+      const_iterator end() const
+      {
         return word.end();
       }
     };
   }
 }
+
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
 
 #endif

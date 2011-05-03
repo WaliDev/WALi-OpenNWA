@@ -55,7 +55,7 @@ namespace wali
        * then if other->predicate implies this->predicate, then 
        * the function would return true and 
        * residual->predicate = this->predicate /\ not(other->predicate)
-      **/
+       **/
       virtual bool subsumes( ref_ptr<ClientInfo> other, ref_ptr<ClientInfo> & residual ) 
       {
         (void) other;
@@ -66,4 +66,12 @@ namespace wali
     };
   }
 }
+
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
+
 #endif

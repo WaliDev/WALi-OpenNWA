@@ -169,12 +169,12 @@ namespace wali {
       const_iterator end() const { return Iterator::end(const_cast<Map&>(relation2_1)); }
 
       size_t size() const {
-          int ret = 0;
-          for(typename Map::const_iterator iter = relation2_1.begin();
-              iter != relation2_1.end(); ++iter) {
-              ret += iter->second.size();
-          }
-          return ret;
+        int ret = 0;
+        for(typename Map::const_iterator iter = relation2_1.begin();
+            iter != relation2_1.end(); ++iter) {
+          ret += iter->second.size();
+        }
+        return ret;
       }
 
       /// Returns an iterator range that runs over all tuples where
@@ -258,7 +258,7 @@ namespace wali {
         for(BigIterator r2_iter = range.first; r2_iter != range.second; ++r2_iter)
         {
           //if(r2_iter->first == y) {
-            out_result.insert(make_pair(x, r2_iter->second));
+          out_result.insert(make_pair(x, r2_iter->second));
           //}
         }
       }
@@ -499,5 +499,11 @@ namespace wali {
   } // namespace relations
 } // namespace wali
 
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
 
 #endif

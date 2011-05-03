@@ -47,40 +47,40 @@ namespace wali
      */
     class NWA : public Printable, public Countable
     {
-      public:
-        typedef ClientInfo Client;
+    public:
+      typedef ClientInfo Client;
 
-        typedef details::StateStorage StateStorage;
+      typedef details::StateStorage StateStorage;
       
-        typedef  StateStorage::const_iterator stateIterator;
+      typedef  StateStorage::const_iterator stateIterator;
       
-        typedef  StateStorage::ClientInfoRefPtr ClientInfoRefPtr;
-        typedef details::SymbolStorage SymbolStorage;
-        typedef  SymbolStorage::const_iterator symbolIterator;
+      typedef  StateStorage::ClientInfoRefPtr ClientInfoRefPtr;
+      typedef details::SymbolStorage SymbolStorage;
+      typedef  SymbolStorage::const_iterator symbolIterator;
 
-        typedef details::TransitionStorage Trans;
+      typedef details::TransitionStorage Trans;
         
-        typedef  Trans::Call Call;       
-        typedef  Trans::Internal Internal;   
-        typedef  Trans::Return Return;          
+      typedef  Trans::Call Call;       
+      typedef  Trans::Internal Internal;   
+      typedef  Trans::Return Return;          
       
-        typedef  Trans::Calls Calls;
-        typedef  Trans::Internals Internals;
-        typedef  Trans::Returns Returns;
+      typedef  Trans::Calls Calls;
+      typedef  Trans::Internals Internals;
+      typedef  Trans::Returns Returns;
 
-        typedef  Trans::CallIterator CallIterator;
-        typedef  Trans::InternalIterator InternalIterator;
-        typedef  Trans::ReturnIterator ReturnIterator;
+      typedef  Trans::CallIterator CallIterator;
+      typedef  Trans::InternalIterator InternalIterator;
+      typedef  Trans::ReturnIterator ReturnIterator;
         
-        typedef std::pair<State,State> StatePair;
+      typedef std::pair<State,State> StatePair;
 
-        static std::string const XMLTag;
+      static std::string const XMLTag;
 
       //
       // Methods
       //
 
-      public:
+    public:
       
       //Constructors and Destructor
       NWA( );
@@ -148,7 +148,7 @@ namespace wali
        */
       bool isState( State state ) const; 
 
-     /**
+      /**
        *  
        * @brief add the given state to this NWA
        *
@@ -489,39 +489,39 @@ namespace wali
 
       /**
        * 
-	   * @brief obtains all the symbols that label transitions from 'source' to 'target'
-	   *
-	   * This method returns all the symbols that label transitions from 
-	   * 'source' to 'target'
-	   *
-	   * @param - source: the source of the desired transitions
-	   * @param - target: the target of the desired transitions
-	   * @return the set of symbols that label transitions from 'source' to 'target'
-	   *
+       * @brief obtains all the symbols that label transitions from 'source' to 'target'
+       *
+       * This method returns all the symbols that label transitions from 
+       * 'source' to 'target'
+       *
+       * @param - source: the source of the desired transitions
+       * @param - target: the target of the desired transitions
+       * @return the set of symbols that label transitions from 'source' to 'target'
+       *
        */
       const  SymbolSet getSymbols( State source, State target ) const;
 
       /**
        * 
-	   * @brief obtains all the symbols that label transitions from 'source'
-	   *
-	   * This method returns all the symbols that label transitions from 'source'
-	   *
-	   * @param - source: the source of the desired transitions
-	   * @return the set of symbols that label transitions from 'source'
-	   *
+       * @brief obtains all the symbols that label transitions from 'source'
+       *
+       * This method returns all the symbols that label transitions from 'source'
+       *
+       * @param - source: the source of the desired transitions
+       * @return the set of symbols that label transitions from 'source'
+       *
        */
       const  SymbolSet getSymbolsFrom( State source ) const;
 
       /**
        * 
-	   * @brief obtains all the symbols that label transitions to 'target'
-	   *
-	   * This method returns all the symbols that label transitions to 'target'
-	   *
-	   * @param - target: the target of the desired transitions
-	   * @return the set of symbols that label transitions to 'target'
-	   *
+       * @brief obtains all the symbols that label transitions to 'target'
+       *
+       * This method returns all the symbols that label transitions to 'target'
+       *
+       * @param - target: the target of the desired transitions
+       * @return the set of symbols that label transitions to 'target'
+       *
        */
       const  SymbolSet getSymbolsTo( State target ) const;
 
@@ -537,15 +537,15 @@ namespace wali
        *
        */    
       void getPredecessors( State state,  StateSet & preds ) const;
-	  /**
+      /**
        * 
-	   * @brief obtains all the states that are predecessors of the given state
-	   *
-	   * This method returns all the states that are predecessors of the given state.
-	   *
-	   * @param - state: the state whose predecessors to look up
-	   * @return the set of all states that are predecessors of the given state
-	   *
+       * @brief obtains all the states that are predecessors of the given state
+       *
+       * This method returns all the states that are predecessors of the given state.
+       *
+       * @param - state: the state whose predecessors to look up
+       * @return the set of all states that are predecessors of the given state
+       *
        */
       const  StateSet getPredecessors( State state ) const;
 
@@ -566,21 +566,21 @@ namespace wali
        *
        */
       void getPredecessors( Symbol symbol, State state,  StateSet & preds ) const;
-	    /**
+      /**
        * 
-	     * @brief obtains all the states that are predecessors of the given state with
-	     *		respect to the given symbol
-	     *
-	     * This method returns all the states that are predecessors of the given state
-	     * such that the symbol that labels a transition from each predecessor to the
-	     * given state is the given symbol.
-	     *
-	     * @param - symbol: the symbol that should label a transition from each predecessor
-	     *					to the given state
-	     * @param - state: the state whose predecessors to look up
-	     * @return the set of all states that are predecessors of the given state with 
-	     *			respect to the given symbol
-	     *
+       * @brief obtains all the states that are predecessors of the given state with
+       *		respect to the given symbol
+       *
+       * This method returns all the states that are predecessors of the given state
+       * such that the symbol that labels a transition from each predecessor to the
+       * given state is the given symbol.
+       *
+       * @param - symbol: the symbol that should label a transition from each predecessor
+       *					to the given state
+       * @param - state: the state whose predecessors to look up
+       * @return the set of all states that are predecessors of the given state with 
+       *			respect to the given symbol
+       *
        */
       const  StateSet getPredecessors( Symbol symbol, State state ) const;
 
@@ -595,15 +595,15 @@ namespace wali
        *
        */
       void getSuccessors( State state,  StateSet & succs ) const;
-	  /**
+      /**
        * 
-	   * @brief obtains all the states that are successors of the given state
-	   *
-	   * This method returns all the states that are successors of the given state.
-	   *
-	   * @param - state: the state whose successors to look up
-	   * @return the set of all states that are successors of the given state
-	   *
+       * @brief obtains all the states that are successors of the given state
+       *
+       * This method returns all the states that are successors of the given state.
+       *
+       * @param - state: the state whose successors to look up
+       * @return the set of all states that are successors of the given state
+       *
        */
       const  StateSet getSuccessors( State state ) const;
 
@@ -624,67 +624,67 @@ namespace wali
        *
        */
       void getSuccessors( State state, Symbol symbol,  StateSet & succs ) const;
-	  /**
+      /**
        * 
-	   * @brief obtains all the states that are successors of the given state with
-	   *		respect to the given symbol
-	   *
-	   * This method returns all the states that are successors of the given state
-	   * such that the symbol that labels a transition from the given state to each
-	   * successor is the given symbol.
-	   *
-	   * @param - symbol: the symbol that should label a transition from the given
-	   *					state to each successor
-	   * @param - state: the state whose successors to look up
-	   * @return the set of all states that are successors of the given state
-	   *			with respect to the given symbol
-	   *
+       * @brief obtains all the states that are successors of the given state with
+       *		respect to the given symbol
+       *
+       * This method returns all the states that are successors of the given state
+       * such that the symbol that labels a transition from the given state to each
+       * successor is the given symbol.
+       *
+       * @param - symbol: the symbol that should label a transition from the given
+       *					state to each successor
+       * @param - state: the state whose successors to look up
+       * @return the set of all states that are successors of the given state
+       *			with respect to the given symbol
+       *
        */
       const  StateSet getSuccessors( State state, Symbol symbol ) const;
 
       /**
        * 
-	   * @brief obtains all the symbols that label return transitions whose 
-	   *		call-predecessor is 'call' and whose return site is 'ret'
-	   *
-	   * This method returns all the symbols that label return transitions
-	   * whose call-predecessor is 'call' and whose return site is 'ret'
-	   *
-	   * @param - call: the call-predecessor of the desired return transitions
-	   * @param - ret: the return site of the desired return transitions
-	   * @return the set of symbols that label return transitions whose
-	   *			call-predecessor is 'call' and whose return site is 'ret'
-	   *
+       * @brief obtains all the symbols that label return transitions whose 
+       *		call-predecessor is 'call' and whose return site is 'ret'
+       *
+       * This method returns all the symbols that label return transitions
+       * whose call-predecessor is 'call' and whose return site is 'ret'
+       *
+       * @param - call: the call-predecessor of the desired return transitions
+       * @param - ret: the return site of the desired return transitions
+       * @return the set of symbols that label return transitions whose
+       *			call-predecessor is 'call' and whose return site is 'ret'
+       *
        */
       const  SymbolSet getCallRetSymbols( State call, State ret ) const;
 
       /**
        * 
-	   * @brief obtains all the symbols that label return transitions whose
-	   *		call-predecessor is 'call'
-	   *
-	   * This method returns all the symbols that label return transitions
-	   * whose call-predecessor is 'call'
-	   *
-	   * @param - call: the call-predecessor of the desired return transitions
-	   * @return the set of symbols that label return transitions whose
-	   *			call-predecessor is 'call'
-	   *
+       * @brief obtains all the symbols that label return transitions whose
+       *		call-predecessor is 'call'
+       *
+       * This method returns all the symbols that label return transitions
+       * whose call-predecessor is 'call'
+       *
+       * @param - call: the call-predecessor of the desired return transitions
+       * @return the set of symbols that label return transitions whose
+       *			call-predecessor is 'call'
+       *
        */
       const  SymbolSet getCallRetSymbolsFrom( State call ) const;
 
       /**
        * 
-	   * @brief obtains all the symbols that label return transitions whose
-	   *		return site is 'ret'
-	   *
-	   * This method returns all the symbols that label return transitions
-	   * whose return site is 'ret'
-	   *
-	   * @param - ret: the return site of the desired return transitions
-	   * @return the set of symbols that label return transitions whose
-	   *			return site is 'ret'
-	   *
+       * @brief obtains all the symbols that label return transitions whose
+       *		return site is 'ret'
+       *
+       * This method returns all the symbols that label return transitions
+       * whose return site is 'ret'
+       *
+       * @param - ret: the return site of the desired return transitions
+       * @return the set of symbols that label return transitions whose
+       *			return site is 'ret'
+       *
        */
       const  SymbolSet getCallRetSymbolsTo( State ret ) const;
 
@@ -700,15 +700,15 @@ namespace wali
        *
        */ 
       void getCallPredecessors( State state,  StateSet & c_preds ) const;
-	  /**
+      /**
        * 
-	   * @brief obtains all the states that are call-predecessors of the given state
-	   *
-	   * This method returns all the states that are call-predecessors of the given state.
-	   *
-	   * @param - state: the state whose call-predecessors to look up
-	   * @return the set of all states that are call-predecessors of the given state
-	   *
+       * @brief obtains all the states that are call-predecessors of the given state
+       *
+       * This method returns all the states that are call-predecessors of the given state.
+       *
+       * @param - state: the state whose call-predecessors to look up
+       * @return the set of all states that are call-predecessors of the given state
+       *
        */
       const  StateSet getCallPredecessors( State state ) const;
       
@@ -729,21 +729,21 @@ namespace wali
        *
        */
       void getCallPredecessors( Symbol symbol, State state,  StateSet & c_preds ) const;
-	  /**
+      /**
        * 
-	   * @brief obtains all the states that are call-predecessors of the given state with
-	   *		respect to the given symbol
-	   *
-	   * This method returns all the states that are call-predecessors of the given state
-	   * such that the symbol that labels a return transition with each call-predecessor
-	   * and the given state is the given symbol.
-	   *
-	   * @param - symbol: the symbol that should label a transition with each call-predecessor
-	   *					and the given state
-	   * @param - state: the state whose call-predecessors to look up
-	   * @return the set of all states that are call-predecessors of the given state
-	   *			with respect to the given symbol
-	   *
+       * @brief obtains all the states that are call-predecessors of the given state with
+       *		respect to the given symbol
+       *
+       * This method returns all the states that are call-predecessors of the given state
+       * such that the symbol that labels a return transition with each call-predecessor
+       * and the given state is the given symbol.
+       *
+       * @param - symbol: the symbol that should label a transition with each call-predecessor
+       *					and the given state
+       * @param - state: the state whose call-predecessors to look up
+       * @return the set of all states that are call-predecessors of the given state
+       *			with respect to the given symbol
+       *
        */
       const  StateSet getCallPredecessors( Symbol symbol, State state ) const;
 
@@ -758,15 +758,15 @@ namespace wali
        *
        */
       void getCallSuccessors( State state,  StateSet & c_succs ) const;
-	  /**
+      /**
        * 
-	   * @brief obtains all the states that are call-successors of the given state
-	   *
-	   * This method returns all the states that are call-successors of the given state.
-	   *
-	   * @param - state: the state whose call-successors to look up
-	   * @return the set of all states that are call-successors of the given state
-	   *
+       * @brief obtains all the states that are call-successors of the given state
+       *
+       * This method returns all the states that are call-successors of the given state.
+       *
+       * @param - state: the state whose call-successors to look up
+       * @return the set of all states that are call-successors of the given state
+       *
        */
       const  StateSet getCallSuccessors( State state ) const;
 
@@ -787,21 +787,21 @@ namespace wali
        *
        */
       void getCallSuccessors( State state, Symbol symbol,  StateSet & c_succs ) const;
-	  /**
+      /**
        * 
-	   * @brief obtains all the states that are call-successors of the given state with 
-	   *		respect to the given symbol
-	   *
-	   * This method returns all the states that are call-successors of the given state
-	   * such that the symbol that labels a return transition with each call-successor
-	   * and the given state is the given symbol.
-	   *
-	   * @param - symbol: the symbol that should label a return transition with each call-
-	   *					successor and the given state
-	   * @param - state: the state whose call-successors to look up
-	   * @return the set of all states that are call-successors of the given state with
-	   *			respect to the given symbol
-	   *
+       * @brief obtains all the states that are call-successors of the given state with 
+       *		respect to the given symbol
+       *
+       * This method returns all the states that are call-successors of the given state
+       * such that the symbol that labels a return transition with each call-successor
+       * and the given state is the given symbol.
+       *
+       * @param - symbol: the symbol that should label a return transition with each call-
+       *					successor and the given state
+       * @param - state: the state whose call-successors to look up
+       * @return the set of all states that are call-successors of the given state with
+       *			respect to the given symbol
+       *
        */
       const  StateSet getCallSuccessors( State state, Symbol symbol ) const;
 
@@ -931,17 +931,17 @@ namespace wali
        */
       const  std::set<std::pair<State,Symbol> > getCallSites( State entryPoint ) const;
 
-	  /**
+      /**
        * 
-	   * @brief returns the call sites of all call transitions in the NWA
-	   *
-	   * This method provides access to the call sites of all call transitions
-	   * in the NWA.
-	   *
-	   * @return the set of call sites of all call transitions in the NWA
-	   *
+       * @brief returns the call sites of all call transitions in the NWA
+       *
+       * This method provides access to the call sites of all call transitions
+       * in the NWA.
+       *
+       * @return the set of call sites of all call transitions in the NWA
+       *
        */
-	  const  StateSet getCallSites( ) const;
+      const  StateSet getCallSites( ) const;
 
       /**
        * 
@@ -1043,17 +1043,17 @@ namespace wali
        */
       const  std::set<std::pair<Symbol,State> > getEntries( State callSite ) const;
 
-	  /**
+      /**
        * 
-	   * @brief returns the entry points of all call transitions in the NWA
-	   *
-	   * This method provides access to the entry points of all call transitions
-	   * in the NWA.
-	   *
-	   * @return the set of entry points of all call transitions in the NWA
-	   *
+       * @brief returns the entry points of all call transitions in the NWA
+       *
+       * This method provides access to the entry points of all call transitions
+       * in the NWA.
+       *
+       * @return the set of entry points of all call transitions in the NWA
+       *
        */
-	  const  StateSet getEntries( ) const;
+      const  StateSet getEntries( ) const;
 
       /**
        *
@@ -1181,74 +1181,74 @@ namespace wali
        */
       const  std::set<std::pair<State,Symbol> > getSources( State target ) const;
 
-	  /**
+      /**
        * 
-	   * @brief returns the sources of all internal transitions in the NWA
-	   *
-	   * This method provides access to the sources of all internal transitions
-	   * in the NWA.
-	   *
-	   * @return the set of sources of all internal transitions in the NWA
-	   *
+       * @brief returns the sources of all internal transitions in the NWA
+       *
+       * This method provides access to the sources of all internal transitions
+       * in the NWA.
+       *
+       * @return the set of sources of all internal transitions in the NWA
+       *
        */
-	  const  StateSet getSources( ) const;
+      const  StateSet getSources( ) const;
 
-    /**
-     * 
-     * @brief returns the symbols that label internal transitions in the NWA
-     *
-     * This method provides access to the symbols that label internal transitions
-     * in the NWA.
-     *
-     * @return the set of symbols that label internal transitions in the NWA
-     *
-     */
-    const  SymbolSet getInternalSym( ) const;
+      /**
+       * 
+       * @brief returns the symbols that label internal transitions in the NWA
+       *
+       * This method provides access to the symbols that label internal transitions
+       * in the NWA.
+       *
+       * @return the set of symbols that label internal transitions in the NWA
+       *
+       */
+      const  SymbolSet getInternalSym( ) const;
 
-    /**
-     * 
-     * @brief returns the symbols that label internal transitions from 'source'
-     *        to 'target' in the NWA
-     *
-     * This method provides access to the symbols that label internal transitions
-     * from 'source' to 'target' in the NWA.
-     *
-     * @param - source: the source of the desired transitions
-     * @param - target: the target of the desired transitions
-     * @return the set of symbols that label internal transitions from 'source'
-     *          to 'target' in the NWA
-     *
-     */
+      /**
+       * 
+       * @brief returns the symbols that label internal transitions from 'source'
+       *        to 'target' in the NWA
+       *
+       * This method provides access to the symbols that label internal transitions
+       * from 'source' to 'target' in the NWA.
+       *
+       * @param - source: the source of the desired transitions
+       * @param - target: the target of the desired transitions
+       * @return the set of symbols that label internal transitions from 'source'
+       *          to 'target' in the NWA
+       *
+       */
       const  SymbolSet getInternalSym( State source, State target ) const;
 
       /**
-     * 
-     * @brief returns the symbols that label internal transitions from 'source'
-     *        in the NWA
-     *
-     * This method provides access to the symbols that label internal transitions
-     * from 'source' in the NWA.
-     *
-     * @param - source: the source of the desired transitions
-     * @return the set of symbols that label internal transitions from 'source'
-     *          in the NWA
-     *
-     */
+       * 
+       * @brief returns the symbols that label internal transitions from 'source'
+       *        in the NWA
+       *
+       * This method provides access to the symbols that label internal transitions
+       * from 'source' in the NWA.
+       *
+       * @param - source: the source of the desired transitions
+       * @return the set of symbols that label internal transitions from 'source'
+       *          in the NWA
+       *
+       */
       const  SymbolSet getInternalSym_Source( State source ) const;
 
       /**
-     * 
-     * @brief returns the symbols that label internal transitions 
-     *        to 'target' in the NWA
-     *
-     * This method provides access to the symbols that label internal 
-     * transitions to 'target' in the NWA.
-     *
-     * @param - target: the target of the desired transitions
-     * @return the set of symbols that label internal transitions 
-     *          to 'target' in the NWA
-     *
-     */
+       * 
+       * @brief returns the symbols that label internal transitions 
+       *        to 'target' in the NWA
+       *
+       * This method provides access to the symbols that label internal 
+       * transitions to 'target' in the NWA.
+       *
+       * @param - target: the target of the desired transitions
+       * @return the set of symbols that label internal transitions 
+       *          to 'target' in the NWA
+       *
+       */
       const  SymbolSet getInternalSym_Target( State target ) const;
 
       /**
@@ -1293,17 +1293,17 @@ namespace wali
        */
       const  std::set<std::pair<Symbol,State> > getTargets( State source ) const;
 
-	  /**
+      /**
        * 
-	   * @brief returns the targets of all internal transitions in the NWA
-	   *
-	   * This method provides access to the targets of all internal transitions
-	   * in the NWA.
-	   *
-	   * @return the set of targets of all internal transitions in the NWA
-	   *
+       * @brief returns the targets of all internal transitions in the NWA
+       *
+       * This method provides access to the targets of all internal transitions
+       * in the NWA.
+       *
+       * @return the set of targets of all internal transitions in the NWA
+       *
        */
-	  const  StateSet getTargets( ) const;
+      const  StateSet getTargets( ) const;
 
       /**
        *
@@ -1433,17 +1433,17 @@ namespace wali
        */
       const  std::set<std::pair<State,Symbol> > getExits( State callSite, State returnSite ) const;
 
-	  /**
+      /**
        * 
-	   * @brief returns the exit points of all return transitions in the NWA
-	   *
-	   * This method provides access to the exit points of all return transitions
-	   * in the NWA.
-	   *
-	   * @return the set of exit points of all return transitions in the NWA
-	   *
+       * @brief returns the exit points of all return transitions in the NWA
+       *
+       * This method provides access to the exit points of all return transitions
+       * in the NWA.
+       *
+       * @return the set of exit points of all return transitions in the NWA
+       *
        */
-	  const  StateSet getExits( ) const;
+      const  StateSet getExits( ) const;
 
       /**
        * 
@@ -1555,17 +1555,17 @@ namespace wali
        */
       const  std::set<std::pair<State,Symbol> > getCalls( State exitPoint, State returnSite ) const;
 
-	  /**
+      /**
        * 
-	   * @brief returns the call sites of all return transitions in the NWA
-	   *
-	   * This method provides access to the call sites of all return transitions
-	   * in the NWA.
-	   *
-	   * @return the set of call sites of all return transitions in the NWA
-	   *
+       * @brief returns the call sites of all return transitions in the NWA
+       *
+       * This method provides access to the call sites of all return transitions
+       * in the NWA.
+       *
+       * @return the set of call sites of all return transitions in the NWA
+       *
        */
-	  const  StateSet getCalls( ) const;
+      const  StateSet getCalls( ) const;
 
       /**
        * 
@@ -1799,17 +1799,17 @@ namespace wali
        */
       const  std::set<std::pair<Symbol,State> > getReturns( State exitPoint, State callSite ) const;
 
-	  /**
+      /**
        * 
-	   * @brief returns the return sites of all return transitions in the NWA
-	   *
-	   * This method provides access to the return sites of all return transitions
-	   * in the NWA.
-	   *
-	   * @return the set of return sites of all return transitions in the NWA
-	   *
+       * @brief returns the return sites of all return transitions in the NWA
+       *
+       * This method provides access to the return sites of all return transitions
+       * in the NWA.
+       *
+       * @return the set of return sites of all return transitions in the NWA
+       *
        */
-	  const  StateSet getReturns(  ) const;
+      const  StateSet getReturns(  ) const;
 
       /**
        * 
@@ -1992,7 +1992,7 @@ namespace wali
       /***
        * @brief constructs an NWA which is the projection of the given NWA to the states
        * provided
-      */
+       */
       void projectStates(NWA const & first, StateSet const & prjStates);
 
 
@@ -2091,32 +2091,32 @@ namespace wali
       // pruning functions
 
       /**
-      * Removes states not reachable from any of the 'sources' states
-      * 
-      */
+       * Removes states not reachable from any of the 'sources' states
+       * 
+       */
       void pruneUnreachableForward(const StateSet & sources);
 
       /**
-      * Removes states from which none of the 'targets' are reachable.
-      */
+       * Removes states from which none of the 'targets' are reachable.
+       */
       void pruneUnreachableBackward(const StateSet & targets);
 
       /**
-      * Removes states not reachable from any initial state
-      * 
-      */
+       * Removes states not reachable from any initial state
+       * 
+       */
       void pruneUnreachableInitial();
 
       /**
-      * Removes states from which none of the final states are reachable.
-      */
+       * Removes states from which none of the final states are reachable.
+       */
 
       void pruneUnreachableFinal();
 
       /**
-      * Removes states not reachable from any initial state
-      * and from which none of the final states are reachable.
-      */
+       * Removes states not reachable from any initial state
+       * and from which none of the final states are reachable.
+       */
       void chop();       
 
       /**
@@ -2457,7 +2457,7 @@ namespace wali
        *
        */
       virtual bool stateIntersect( NWA const & first, State state1, NWA const & second, State state2,
-                                  State & resSt, ClientInfoRefPtr & resCI );
+                                   State & resSt, ClientInfoRefPtr & resCI );
 
       /**
        * 
@@ -2490,8 +2490,8 @@ namespace wali
        *
        */
       virtual void mergeClientInfo( NWA const & nwa, 
-                     relations::RelationTypedefs<State>::BinaryRelation const & binRel, 
-                                  State resSt, ClientInfoRefPtr & resCI );
+                                    relations::RelationTypedefs<State>::BinaryRelation const & binRel, 
+                                    State resSt, ClientInfoRefPtr & resCI );
 
       /**
        * 
@@ -2511,9 +2511,9 @@ namespace wali
        *
        */
       virtual void mergeClientInfoCall( NWA const & nwa, 
-                     relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
-                     relations::RelationTypedefs<State>::BinaryRelation const & binRelEntry,
-                                  State callSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI );
+                                        relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
+                                        relations::RelationTypedefs<State>::BinaryRelation const & binRelEntry,
+                                        State callSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI );
 
       /**
        * 
@@ -2533,9 +2533,9 @@ namespace wali
        *
        */
       virtual void mergeClientInfoInternal( NWA const & nwa, 
-                     relations::RelationTypedefs<State>::BinaryRelation const & binRelSource, 
-                     relations::RelationTypedefs<State>::BinaryRelation const & binRelTarget,
-                                  State sourceSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI );
+                                            relations::RelationTypedefs<State>::BinaryRelation const & binRelSource, 
+                                            relations::RelationTypedefs<State>::BinaryRelation const & binRelTarget,
+                                            State sourceSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI );
 
       /**
        * 
@@ -2557,10 +2557,10 @@ namespace wali
        *
        */
       virtual void mergeClientInfoReturn( NWA const & nwa, 
-                     relations::RelationTypedefs<State>::BinaryRelation const & binRelExit,
-                     relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
-                     relations::RelationTypedefs<State>::BinaryRelation const & binRelReturn,
-                            State exitSt, State callSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI );
+                                          relations::RelationTypedefs<State>::BinaryRelation const & binRelExit,
+                                          relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
+                                          relations::RelationTypedefs<State>::BinaryRelation const & binRelReturn,
+                                          State exitSt, State callSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI );
 
 
       //Using NWAs
@@ -2601,7 +2601,7 @@ namespace wali
        *          reachability
        * 
        */
-        static wpds::WPDS plusWPDS( const wpds::WPDS & base, NWA & nwa, State stuck )
+      static wpds::WPDS plusWPDS( const wpds::WPDS & base, NWA & nwa, State stuck )
       {
         return nwa.plusWPDS(base, stuck);
       }
@@ -2948,7 +2948,7 @@ namespace wali
       //virtual void for_each(RuleFunctor &func) const;
       //virtual void operator()(wfa::ITrans *t);
 
-     /**
+      /**
        *
        * @brief add all the states in the given StateSet to the NWA
        *
@@ -3217,15 +3217,15 @@ namespace wali
       // Variables
       //
       
-      protected:
+    protected:
       
-        StateStorage states;         
-        SymbolStorage symbols;        
-        Trans trans;
+      StateStorage states;         
+      SymbolStorage symbols;        
+      Trans trans;
 
-        //TODO: ponder the following ...
-        //Q: should we incrementally maintain a wpds?
-        //    if we did, what would the weight gen of the wpds be?
+      //TODO: ponder the following ...
+      //Q: should we incrementally maintain a wpds?
+      //    if we did, what would the weight gen of the wpds be?
 
     public:
       bool
@@ -3278,6 +3278,12 @@ namespace wali
   }
 }
 
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
 
 #endif
 

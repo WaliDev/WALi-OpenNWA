@@ -67,7 +67,7 @@ namespace wali
      *
      */
     
-     NWA::ClientInfoRefPtr NWA::getClientInfo( State state ) const
+    NWA::ClientInfoRefPtr NWA::getClientInfo( State state ) const
     {
       assert(state < wali::WALI_BAD_KEY);
       return states.getClientInfo(state);
@@ -518,12 +518,12 @@ namespace wali
 
     /**
      * 
-	 * @brief obtains all the symbols that label transitions from 'source' to 'target'
-	 *
-	 * @param - source: the source of the desired transitions
-	 * @param - target: the target of the desired transitions
-	 * @return the set of symbols that label transitions from 'source' to 'target'
-	 *
+     * @brief obtains all the symbols that label transitions from 'source' to 'target'
+     *
+     * @param - source: the source of the desired transitions
+     * @param - target: the target of the desired transitions
+     * @return the set of symbols that label transitions from 'source' to 'target'
+     *
      */
     
     const std::set< Symbol> NWA::getSymbols( State source, State target ) const
@@ -531,23 +531,23 @@ namespace wali
       assert(source < wali::WALI_BAD_KEY);
       assert(target < wali::WALI_BAD_KEY);
 
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
 
-       std::set<Call> const & calls = trans.getTransEntry(target);
+      std::set<Call> const & calls = trans.getTransEntry(target);
       for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
       {
         if( Trans::getCallSite(*cit) == source )
           syms.insert(Trans::getCallSym(*cit));
       }
 
-       std::set<Internal> const & internals = trans.getTransTo(target);
+      std::set<Internal> const & internals = trans.getTransTo(target);
       for( InternalIterator iit = internals.begin(); iit != internals.end(); iit++ )
       {
         if( Trans::getSource(*iit) == source )
           syms.insert(Trans::getInternalSym(*iit));
       }
 
-       std::set<Return> const & returns = trans.getTransRet(target);
+      std::set<Return> const & returns = trans.getTransRet(target);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
       {
         if( Trans::getExit(*rit) == source )
@@ -559,35 +559,35 @@ namespace wali
 
     /**
      * 
-	 * @brief obtains all the symbols that label transitions from 'source'
-	 *
-	 * @param - source: the source of the desired transitions
-	 * @return the set of symbols that label transitions from 'source'
-	 *
+     * @brief obtains all the symbols that label transitions from 'source'
+     *
+     * @param - source: the source of the desired transitions
+     * @return the set of symbols that label transitions from 'source'
+     *
      */
     
     const std::set< Symbol> NWA::getSymbolsFrom( State source ) const
     {
       assert(source < wali::WALI_BAD_KEY);
 
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
 
-       std::set<Call> const & calls = trans.getTransCall(source);
+      std::set<Call> const & calls = trans.getTransCall(source);
       for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
       {
-          syms.insert(Trans::getCallSym(*cit));
+        syms.insert(Trans::getCallSym(*cit));
       }
 
-       std::set<Internal> const & internals = trans.getTransFrom(source);
+      std::set<Internal> const & internals = trans.getTransFrom(source);
       for( InternalIterator iit = internals.begin(); iit != internals.end(); iit++ )
       {
-          syms.insert(Trans::getInternalSym(*iit));
+        syms.insert(Trans::getInternalSym(*iit));
       }
 
-       std::set<Return> const & returns = trans.getTransExit(source);
+      std::set<Return> const & returns = trans.getTransExit(source);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
       {
-          syms.insert(Trans::getReturnSym(*rit));
+        syms.insert(Trans::getReturnSym(*rit));
       }
 
       return syms;
@@ -595,35 +595,35 @@ namespace wali
 
     /**
      * 
-	 * @brief obtains all the symbols that label transitions to 'target'
-	 *
-	 * @param - target: the target of the desired transitions
-	 * @return the set of symbols that label transitions to 'target'
-	 *
+     * @brief obtains all the symbols that label transitions to 'target'
+     *
+     * @param - target: the target of the desired transitions
+     * @return the set of symbols that label transitions to 'target'
+     *
      */
     
     const std::set< Symbol> NWA::getSymbolsTo( State target ) const
     {
       assert(target < wali::WALI_BAD_KEY);
 
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
 
-       std::set<Call> const & calls = trans.getTransEntry(target);
+      std::set<Call> const & calls = trans.getTransEntry(target);
       for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
       {
-          syms.insert(Trans::getCallSym(*cit));
+        syms.insert(Trans::getCallSym(*cit));
       }
 
-       std::set<Internal> const & internals = trans.getTransTo(target);
+      std::set<Internal> const & internals = trans.getTransTo(target);
       for( InternalIterator iit = internals.begin(); iit != internals.end(); iit++ )
       {
-          syms.insert(Trans::getInternalSym(*iit));
+        syms.insert(Trans::getInternalSym(*iit));
       }
 
-       std::set<Return> const & returns = trans.getTransRet(target);
+      std::set<Return> const & returns = trans.getTransRet(target);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
       {
-          syms.insert(Trans::getReturnSym(*rit));
+        syms.insert(Trans::getReturnSym(*rit));
       }
 
       return syms;
@@ -642,32 +642,32 @@ namespace wali
     {
       assert(state < wali::WALI_BAD_KEY);
        
-       std::set<Call> const & calls = trans.getTransEntry(state);
+      std::set<Call> const & calls = trans.getTransEntry(state);
       for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
         preds.insert(Trans::getCallSite(*cit));
 
-       std::set<Internal> const & internals = trans.getTransTo(state);
+      std::set<Internal> const & internals = trans.getTransTo(state);
       for( InternalIterator iit = internals.begin(); iit != internals.end(); iit++ )
         preds.insert(Trans::getSource(*iit));
 
-       std::set<Return> const & returns = trans.getTransRet(state);
+      std::set<Return> const & returns = trans.getTransRet(state);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         preds.insert(Trans::getExit(*rit));
     }
-	  /**
+    /**
      * 
-	   * @brief obtains all the states that are predecessors of the given state
-	   *
-	   * @param - state: the state whose predecessors to look up
-	   * @return the set of all states that are predecessors of the given state
-	   *
+     * @brief obtains all the states that are predecessors of the given state
+     *
+     * @param - state: the state whose predecessors to look up
+     * @return the set of all states that are predecessors of the given state
+     *
      */
 	  
     const StateSet NWA::getPredecessors( State state ) const
     {
-	    StateSet preds;
+      StateSet preds;
       getPredecessors(state, preds);
-	    return preds;
+      return preds;
     }
 
     /**
@@ -688,39 +688,39 @@ namespace wali
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
 
-       std::set<Call> const & calls = trans.getTransEntry(state);
+      std::set<Call> const & calls = trans.getTransEntry(state);
       for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
         if( symbol == Trans::getCallSym(*cit) )
           preds.insert(Trans::getCallSite(*cit));
 
-       std::set<Internal> const & internals = trans.getTransTo(state);
+      std::set<Internal> const & internals = trans.getTransTo(state);
       for( InternalIterator iit = internals.begin(); iit != internals.end(); iit++ )
         if( symbol == Trans::getInternalSym(*iit) )
           preds.insert(Trans::getSource(*iit));
 
-       std::set<Return> const & returns = trans.getTransRet(state);
+      std::set<Return> const & returns = trans.getTransRet(state);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         if( symbol == Trans::getReturnSym(*rit) )
           preds.insert(Trans::getExit(*rit));
     }
-	  /**
+    /**
      * 
-	   * @brief obtains all the states that are predecessors of the given state with
-	   *		respect to the given symbol
-	   *
-	   * @param - symbol: the symbol that should label a transition from each predecessor
-	   *					to the given state
-	   * @param - state: the state whose predecessors to look up
-	   * @return the set of all states that are predecessors of the given state with 
-	   *			respect to the given symbol
-	   *
+     * @brief obtains all the states that are predecessors of the given state with
+     *		respect to the given symbol
+     *
+     * @param - symbol: the symbol that should label a transition from each predecessor
+     *					to the given state
+     * @param - state: the state whose predecessors to look up
+     * @return the set of all states that are predecessors of the given state with 
+     *			respect to the given symbol
+     *
      */
 	  
     const std::set< State> NWA::getPredecessors( Symbol symbol, State state ) const
     {
-  	   StateSet preds;
+      StateSet preds;
       getPredecessors(symbol, state, preds);
-	    return preds;
+      return preds;
     }
 
     /**
@@ -736,32 +736,32 @@ namespace wali
     {
       assert(state < wali::WALI_BAD_KEY);
        
-       std::set<Call> const & calls = trans.getTransCall(state);
+      std::set<Call> const & calls = trans.getTransCall(state);
       for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
         succs.insert(Trans::getEntry(*cit));
 
-       std::set<Internal> const & internals = trans.getTransFrom(state);
+      std::set<Internal> const & internals = trans.getTransFrom(state);
       for( InternalIterator iit = internals.begin(); iit != internals.end(); iit++ )
         succs.insert(Trans::getTarget(*iit));
 
-       std::set<Return> const & returns = trans.getTransExit(state);
+      std::set<Return> const & returns = trans.getTransExit(state);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         succs.insert(Trans::getReturnSite(*rit));
     }
-	  /**
+    /**
      * 
-	   * @brief obtains all the states that are successors of the given state
-	   *
-	   * @param - state: the state whose successors to look up
-	   * @return the set of all states that are successors of the given state
-	   *
+     * @brief obtains all the states that are successors of the given state
+     *
+     * @param - state: the state whose successors to look up
+     * @return the set of all states that are successors of the given state
+     *
      */
 	  
     const std::set< State> NWA::getSuccessors( State state ) const
     {
-  	   StateSet succs;
+      StateSet succs;
       getSuccessors(state, succs);
-	    return succs;
+      return succs;
     }
 
     /**
@@ -782,26 +782,26 @@ namespace wali
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
 
-       std::set<Call> const & calls = trans.getTransCall(state);
+      std::set<Call> const & calls = trans.getTransCall(state);
       for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
         if( symbol == Trans::getCallSym(*cit) )
           succs.insert(Trans::getEntry(*cit));
 
-       std::set<Internal> const & internals = trans.getTransFrom(state);
+      std::set<Internal> const & internals = trans.getTransFrom(state);
       for( InternalIterator iit = internals.begin(); iit != internals.end(); iit++ )
         if( symbol == Trans::getInternalSym(*iit) )
           succs.insert(Trans::getTarget(*iit));
 
-       std::set<Return> const & returns = trans.getTransExit(state);
+      std::set<Return> const & returns = trans.getTransExit(state);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         if( symbol == Trans::getReturnSym(*rit) )
           succs.insert(Trans::getReturnSite(*rit));
     }
-	  /**
+    /**
      * 
      * @brief obtains all the states that are successors of the given state with
-	   *		respect to the given symbol
-	   *
+     *		respect to the given symbol
+     *
      * @param - symbol: the symbol that should label a transition from the given
      *					state to each successor
      * @param - state: the state whose successors to look up
@@ -812,21 +812,21 @@ namespace wali
     
     const std::set< State> NWA::getSuccessors( State state, Symbol symbol ) const
     {
-       StateSet succs;
+      StateSet succs;
       getSuccessors(state, symbol, succs);
       return succs;
     }
 
-	/**
+    /**
      * 
-	 * @brief obtains all the symbols that label return transitions whose 
-	 *		call-predecessor is 'call' and whose return site is 'ret'
-	 *
-	 * @param - call: the call-predecessor of the desired return transitions
-	 * @param - ret: the return site of the desired return transitions
-	 * @return the set of symbols that label return transitions whose
-	 *			call-predecessor is 'call' and whose return site is 'ret'
-	 *
+     * @brief obtains all the symbols that label return transitions whose 
+     *		call-predecessor is 'call' and whose return site is 'ret'
+     *
+     * @param - call: the call-predecessor of the desired return transitions
+     * @param - ret: the return site of the desired return transitions
+     * @return the set of symbols that label return transitions whose
+     *			call-predecessor is 'call' and whose return site is 'ret'
+     *
      */
     
     const std::set< Symbol> NWA::getCallRetSymbols( State call, State ret ) const
@@ -834,9 +834,9 @@ namespace wali
       assert(call < wali::WALI_BAD_KEY);
       assert(ret < wali::WALI_BAD_KEY);
 
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
 
-       std::set<Return> const & returns = trans.getTransRet(ret);
+      std::set<Return> const & returns = trans.getTransRet(ret);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
       {
         if( Trans::getCallSite(*rit) == call )
@@ -846,53 +846,53 @@ namespace wali
       return syms;
     }
 
-	/**
+    /**
      * 
-	 * @brief obtains all the symbols that label return transitions whose
-	 *		call-predecessor is 'call'
-	 *
-	 * @param - call: the call-predecessor of the desired return transitions
-	 * @return the set of symbols that label return transitions whose
-	 *			call-predecessor is 'call'
-	 *
+     * @brief obtains all the symbols that label return transitions whose
+     *		call-predecessor is 'call'
+     *
+     * @param - call: the call-predecessor of the desired return transitions
+     * @return the set of symbols that label return transitions whose
+     *			call-predecessor is 'call'
+     *
      */
     
     const std::set< Symbol> NWA::getCallRetSymbolsFrom( State call ) const
     {
       assert(call < wali::WALI_BAD_KEY);
 
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
 
-       std::set<Return> const & returns = trans.getTransPred(call);
+      std::set<Return> const & returns = trans.getTransPred(call);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
       {
-          syms.insert(Trans::getReturnSym(*rit));
+        syms.insert(Trans::getReturnSym(*rit));
       }
 
       return syms;
     }
 
-	/**
+    /**
      * 
-	 * @brief obtains all the symbols that label return transitions whose
-	 *		return site is 'ret'
-	 *
-	 * @param - ret: the return site of the desired return transitions
-	 * @return the set of symbols that label return transitions whose
-	 *			return site is 'ret'
-	 *
+     * @brief obtains all the symbols that label return transitions whose
+     *		return site is 'ret'
+     *
+     * @param - ret: the return site of the desired return transitions
+     * @return the set of symbols that label return transitions whose
+     *			return site is 'ret'
+     *
      */
     
     const std::set< Symbol> NWA::getCallRetSymbolsTo( State ret ) const
     {
       assert(ret < wali::WALI_BAD_KEY);
 
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
 
-       std::set<Return> const & returns = trans.getTransRet(ret);
+      std::set<Return> const & returns = trans.getTransRet(ret);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
       {
-          syms.insert(Trans::getReturnSym(*rit));
+        syms.insert(Trans::getReturnSym(*rit));
       }
 
       return syms;
@@ -911,26 +911,26 @@ namespace wali
     {
       assert(state < wali::WALI_BAD_KEY);
       
-       std::set<Return> const & returns = trans.getTransRet(state);
+      std::set<Return> const & returns = trans.getTransRet(state);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         c_preds.insert(Trans::getCallSite(*rit));
     }
-	/**
+    /**
      * 
-	 * @brief obtains all the states that are call-predecessors of the given state
-	 *
-	 * @param - state: the state whose call-predecessors to look up
-	 * @return the set of all states that are call-predecessors of the given state
-	 *
+     * @brief obtains all the states that are call-predecessors of the given state
+     *
+     * @param - state: the state whose call-predecessors to look up
+     * @return the set of all states that are call-predecessors of the given state
+     *
      */
 	
-  const std::set< State> NWA::getCallPredecessors( State state ) const
+    const std::set< State> NWA::getCallPredecessors( State state ) const
     {
       assert(state < wali::WALI_BAD_KEY);
       
-	     StateSet c_preds;
+      StateSet c_preds;
       getCallPredecessors(state, c_preds);
-	    return c_preds;
+      return c_preds;
     }
       
     /**
@@ -951,29 +951,29 @@ namespace wali
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
 
-       std::set<Return> const & returns = trans.getTransRet(state);
+      std::set<Return> const & returns = trans.getTransRet(state);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         if( symbol == Trans::getReturnSym(*rit) )
           c_preds.insert(Trans::getCallSite(*rit));
     }
-	/**
+    /**
      * 
-	 * @brief obtains all the states that are call-predecessors of the given state with
-	 *		respect to the given symbol
-	 *
-	 * @param - symbol: the symbol that should label a transition with each call-predecessor
-	 *					and the given state
-	 * @param - state: the state whose call-predecessors to look up
-	 * @return the set of all states that are call-predecessors of the given state
-	 *			with respect to the given symbol
-	 *
+     * @brief obtains all the states that are call-predecessors of the given state with
+     *		respect to the given symbol
+     *
+     * @param - symbol: the symbol that should label a transition with each call-predecessor
+     *					and the given state
+     * @param - state: the state whose call-predecessors to look up
+     * @return the set of all states that are call-predecessors of the given state
+     *			with respect to the given symbol
+     *
      */
 	
-  const std::set< State> NWA::getCallPredecessors( Symbol symbol, State state ) const
+    const std::set< State> NWA::getCallPredecessors( Symbol symbol, State state ) const
     {
-       StateSet c_preds;
+      StateSet c_preds;
       getCallPredecessors(symbol, state, c_preds);
-	    return c_preds;
+      return c_preds;
     }
 
     /**
@@ -989,24 +989,24 @@ namespace wali
     {
       assert(state < wali::WALI_BAD_KEY);
       
-       std::set<Return> const & returns = trans.getTransPred(state);
+      std::set<Return> const & returns = trans.getTransPred(state);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         c_succs.insert(Trans::getReturnSite(*rit));
     }
-	/**
+    /**
      * 
-	 * @brief obtains all the states that are call-successors of the given state
-	 *
-	 * @param - state: the state whose call-successors to look up
-	 * @return the set of all states that are call-successors of the given state
-	 *
+     * @brief obtains all the states that are call-successors of the given state
+     *
+     * @param - state: the state whose call-successors to look up
+     * @return the set of all states that are call-successors of the given state
+     *
      */
 	
-  const std::set< State> NWA::getCallSuccessors( State state ) const
+    const std::set< State> NWA::getCallSuccessors( State state ) const
     {
-       StateSet c_succs;
+      StateSet c_succs;
       getCallSuccessors(state, c_succs);
-	    return c_succs;
+      return c_succs;
     }
 
     /**
@@ -1027,29 +1027,29 @@ namespace wali
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
       
-       std::set<Return> const & returns = trans.getTransPred(state);
+      std::set<Return> const & returns = trans.getTransPred(state);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
         if( symbol == Trans::getReturnSym(*rit) )
           c_succs.insert(Trans::getReturnSite(*rit));
     }
-	/**
+    /**
      * 
-	 * @brief obtains all the states that are call-successors of the given state with 
-	 *		respect to the given symbol
-	 *
-	 * @param - symbol: the symbol that should label a return transition with each call-
-	 *					successor and the given state
-	 * @param - state: the state whose call-successors to look up
-	 * @return the set of all states that are call-successors of the given state with
-	 *			respect to the given symbol
-	 *
+     * @brief obtains all the states that are call-successors of the given state with 
+     *		respect to the given symbol
+     *
+     * @param - symbol: the symbol that should label a return transition with each call-
+     *					successor and the given state
+     * @param - state: the state whose call-successors to look up
+     * @return the set of all states that are call-successors of the given state with
+     *			respect to the given symbol
+     *
      */
 	
-  const std::set< State> NWA::getCallSuccessors( State state, Symbol symbol ) const
+    const std::set< State> NWA::getCallSuccessors( State state, Symbol symbol ) const
     {
-       StateSet c_succs;
+      StateSet c_succs;
       getCallSuccessors(state, symbol, c_succs);
-	    return c_succs;
+      return c_succs;
     }
 
     /**
@@ -1152,7 +1152,7 @@ namespace wali
           for( stateIterator pred = beginStates(); pred != endStates(); ++pred )
           {
             if( returns.find(Triple<State,Symbol,State>(state, *pred, symbol)) == returns.end() 
-              && returns.find(Triple<State,Symbol,State>(state, *pred, WALI_WILD)) == returns.end() )
+                && returns.find(Triple<State,Symbol,State>(state, *pred, WALI_WILD)) == returns.end() )
             {
               addReturnTrans(state, *pred, symbol, stuck);
             }
@@ -1201,7 +1201,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Calls & call = trans.getCalls();
-       StateSet calls;
+      StateSet calls;
       for( CallIterator it = call.begin(); it != call.end(); it++ )
       {
         if( symbol == Trans::getCallSym(*it) )
@@ -1229,7 +1229,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Calls & call = trans.getTransEntry(entryPoint);
-       StateSet calls;
+      StateSet calls;
       for( CallIterator it = call.begin(); it != call.end(); it++ )
       {
         if( symbol == Trans::getCallSym(*it) )
@@ -1255,7 +1255,7 @@ namespace wali
       assert(entryPoint < wali::WALI_BAD_KEY);
 
       const Calls & call = trans.getTransEntry(entryPoint);
-       std::set<std::pair<Symbol,State> > calls;
+      std::set<std::pair<Symbol,State> > calls;
       for( CallIterator it = call.begin(); it != call.end(); it++ )
       {
         calls.insert( std::pair<Symbol,State>(Trans::getCallSite(*it), Trans::getCallSym(*it) ) );
@@ -1263,18 +1263,18 @@ namespace wali
       return calls;
     }
 
-	/**
+    /**
      * 
-	 * @brief returns the call sites of all call transitions in the NWA
-	 *
-	 * @return the set of call sites of all call transitions in the NWA
-	 *
+     * @brief returns the call sites of all call transitions in the NWA
+     *
+     * @return the set of call sites of all call transitions in the NWA
+     *
      */
 	
     const std::set< State> NWA::getCallSites( ) const
     {
       const Calls & call = trans.getCalls();
-       StateSet calls;
+      StateSet calls;
       for( CallIterator it = call.begin(); it != call.end(); it++ )
       {
         calls.insert( Trans::getCallSite(*it) );
@@ -1293,7 +1293,7 @@ namespace wali
     const std::set< Symbol> NWA::getCallSym(  ) const
     {
       const Calls & calls = trans.getCalls();
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
       for( CallIterator it = calls.begin(); it != calls.end(); it++ )
       {
         syms.insert( Trans::getCallSym(*it) );
@@ -1319,7 +1319,7 @@ namespace wali
       assert(entryPoint < wali::WALI_BAD_KEY);
 
       const Calls & calls = trans.getTransCall(callSite);
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
       for( CallIterator it = calls.begin(); it != calls.end(); it++ )
       {
         if( entryPoint == Trans::getEntry(*it) )
@@ -1344,10 +1344,10 @@ namespace wali
       assert(callSite < wali::WALI_BAD_KEY);
 
       const Calls & calls = trans.getTransCall(callSite);
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
       for( CallIterator it = calls.begin(); it != calls.end(); it++ )
       {
-          syms.insert( Trans::getCallSym(*it) );
+        syms.insert( Trans::getCallSym(*it) );
       }
       return syms;
     }
@@ -1368,10 +1368,10 @@ namespace wali
       assert(entryPoint < wali::WALI_BAD_KEY);
 
       const Calls & calls = trans.getTransEntry(entryPoint);
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
       for( CallIterator it = calls.begin(); it != calls.end(); it++ )
       {
-          syms.insert( Trans::getCallSym(*it) );
+        syms.insert( Trans::getCallSym(*it) );
       }
       return syms;
     }
@@ -1390,7 +1390,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Calls & ent = trans.getCalls();
-       StateSet entries;
+      StateSet entries;
       for( CallIterator it = ent.begin(); it != ent.end(); it++ )
       {
         if( symbol == Trans::getCallSym(*it) )
@@ -1417,7 +1417,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Calls & ent = trans.getTransCall(callSite);
-       StateSet entries;
+      StateSet entries;
       for( CallIterator it = ent.begin(); it != ent.end(); it++ )
       {
         if( symbol == Trans::getCallSym(*it) )
@@ -1439,7 +1439,7 @@ namespace wali
     {
       assert(callSite < wali::WALI_BAD_KEY);
       const Calls & ent = trans.getTransCall(callSite);
-       std::set<std::pair<Symbol,State> > entries;
+      std::set<std::pair<Symbol,State> > entries;
       for( CallIterator it = ent.begin(); it != ent.end(); it++ )
       {
         entries.insert( std::pair<Symbol,State>(Trans::getCallSym(*it),Trans::getEntry(*it)) );
@@ -1447,18 +1447,18 @@ namespace wali
       return entries;
     }
 
-	/**
+    /**
      * 
-	 * @brief returns the entry points of all call transitions in the NWA
-	 *
-	 * @return the set of entry points of all call transitions in the NWA
-	 *
+     * @brief returns the entry points of all call transitions in the NWA
+     *
+     * @return the set of entry points of all call transitions in the NWA
+     *
      */
 	
     const std::set< State> NWA::getEntries( ) const
     {
       const Calls & call = trans.getCalls();
-       StateSet entries;
+      StateSet entries;
       for( CallIterator it = call.begin(); it != call.end(); it++ )
       {
         entries.insert( Trans::getEntry(*it) );
@@ -1557,9 +1557,9 @@ namespace wali
       assert(Trans::getEntry(ct) < wali::WALI_BAD_KEY);
 
       if(! isState(Trans::getCallSite(ct))
-        || ! isSymbol(Trans::getCallSym(ct))
-        || ! isState(Trans::getEntry(ct)) 
-        || Trans::getCallSym(ct) == WALI_EPSILON )
+         || ! isSymbol(Trans::getCallSym(ct))
+         || ! isState(Trans::getEntry(ct)) 
+         || Trans::getCallSym(ct) == WALI_EPSILON )
         return false;
 
       return trans.removeCall(ct);
@@ -1595,7 +1595,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Internals & src = trans.getInternals();
-       StateSet sources;
+      StateSet sources;
       for( InternalIterator it = src.begin(); it != src.end(); it++ )
       {
         if( symbol == Trans::getInternalSym(*it) )
@@ -1622,7 +1622,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Internals & src = trans.getTransTo(target);
-       StateSet sources;
+      StateSet sources;
       for( InternalIterator it = src.begin(); it != src.end(); it++ )
       {
         if( symbol == Trans::getInternalSym(*it) )
@@ -1648,7 +1648,7 @@ namespace wali
       assert(target < wali::WALI_BAD_KEY);
 
       const Internals & src = trans.getTransTo(target);
-       std::set<std::pair<Symbol,State> > sources;
+      std::set<std::pair<Symbol,State> > sources;
       for( InternalIterator it = src.begin(); it != src.end(); it++ )
       {
         sources.insert( std::pair<Symbol,State>(Trans::getSource(*it), Trans::getInternalSym(*it)) );
@@ -1656,18 +1656,18 @@ namespace wali
       return sources;
     }
 
-	/**
+    /**
      * 
-	 * @brief returns the sources of all internal transitions in the NWA
-	 *
-	 * @return the set of sources of all internal transitions in the NWA
-	 *
+     * @brief returns the sources of all internal transitions in the NWA
+     *
+     * @return the set of sources of all internal transitions in the NWA
+     *
      */
 	
     const std::set< State> NWA::getSources(  ) const
     {
       const Internals & src = trans.getInternals();
-       StateSet sources;
+      StateSet sources;
       for( InternalIterator it = src.begin(); it != src.end(); it++ )
       {
         sources.insert( Trans::getSource(*it) );
@@ -1686,7 +1686,7 @@ namespace wali
     const std::set< Symbol> NWA::getInternalSym(  ) const
     {
       const Internals & ints = trans.getInternals();
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
       for( InternalIterator it = ints.begin(); it != ints.end(); it++ )
       {
         syms.insert( Trans::getInternalSym(*it) );
@@ -1709,7 +1709,7 @@ namespace wali
     const std::set< Symbol> NWA::getInternalSym( State source, State target ) const
     {
       const Internals & ints = trans.getTransFrom(source);
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
       for( InternalIterator it = ints.begin(); it != ints.end(); it++ )
       {
         if( target == Trans::getTarget(*it) )
@@ -1732,7 +1732,7 @@ namespace wali
     const std::set< Symbol> NWA::getInternalSym_Source( State source ) const
     {
       const Internals & ints = trans.getTransFrom(source);
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
       for( InternalIterator it = ints.begin(); it != ints.end(); it++ )
       {
         syms.insert( Trans::getInternalSym(*it) );
@@ -1754,7 +1754,7 @@ namespace wali
     const std::set< Symbol> NWA::getInternalSym_Target( State target ) const
     {
       const Internals & ints = trans.getTransTo(target);
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
       for( InternalIterator it = ints.begin(); it != ints.end(); it++ )
       {
         syms.insert( Trans::getInternalSym(*it) );
@@ -1776,7 +1776,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Internals & tgt = trans.getInternals();
-       StateSet targets;
+      StateSet targets;
       for( InternalIterator it = tgt.begin(); it != tgt.end(); it++ )
       {
         if( symbol == Trans::getInternalSym(*it) )
@@ -1804,7 +1804,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Internals & tgt = trans.getTransFrom(source);
-       StateSet targets;
+      StateSet targets;
       for( InternalIterator it = tgt.begin(); it != tgt.end(); it++ )
       {
         if( symbol == Trans::getInternalSym(*it) )
@@ -1826,7 +1826,7 @@ namespace wali
     {
       assert(source < wali::WALI_BAD_KEY);
       const Internals & tgt = trans.getTransFrom(source);
-       std::set<std::pair<Symbol,State> > targets;
+      std::set<std::pair<Symbol,State> > targets;
       for( InternalIterator it = tgt.begin(); it != tgt.end(); it++ )
       {
         targets.insert( std::pair<Symbol,State>(Trans::getInternalSym(*it),Trans::getTarget(*it)) );
@@ -1834,18 +1834,18 @@ namespace wali
       return targets;
     }
 
-	/**
+    /**
      * 
-	 * @brief returns the targets of all internal transitions in the NWA
-	 *
-	 * @return the set of targets of all internal transitions in the NWA
-	 *
+     * @brief returns the targets of all internal transitions in the NWA
+     *
+     * @return the set of targets of all internal transitions in the NWA
+     *
      */
     
     const std::set< State> NWA::getTargets(  ) const
     {
       const Internals & tgt = trans.getInternals();
-       StateSet targets;
+      StateSet targets;
       for( InternalIterator it = tgt.begin(); it != tgt.end(); it++ )
       {
         targets.insert( Trans::getTarget(*it) );
@@ -1940,8 +1940,8 @@ namespace wali
       assert(Trans::getTarget(it) < wali::WALI_BAD_KEY);
 
       if(! isState(Trans::getSource(it))
-        || ! isSymbol(Trans::getInternalSym(it))
-        || ! isState(Trans::getTarget(it)) )
+         || ! isSymbol(Trans::getInternalSym(it))
+         || ! isState(Trans::getTarget(it)) )
         return false;
 
       return trans.removeInternal(it);
@@ -1977,7 +1977,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns & exit = trans.getReturns();
-       StateSet exits;
+      StateSet exits;
       for( ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
@@ -2008,7 +2008,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns & exit = trans.getTransPred(callSite);
-       StateSet exits;
+      StateSet exits;
       for( ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( (Trans::getReturnSite(*it) == returnSite) && (symbol == Trans::getReturnSym(*it)) )
@@ -2037,7 +2037,7 @@ namespace wali
       assert(returnSite < wali::WALI_BAD_KEY);
 
       const Returns & exit = trans.getTransPred(callSite);
-       std::set<std::pair<State,Symbol> > exits;
+      std::set<std::pair<State,Symbol> > exits;
       for( ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( Trans::getReturnSite(*it) == returnSite )
@@ -2048,21 +2048,21 @@ namespace wali
       return exits;
     }
 
-	/**
+    /**
      * 
-	 * @brief returns the exit points of all return transitions in the NWA
-	 *
-	 * @return the set of exit points of all return transitions in the NWA
-	 *
+     * @brief returns the exit points of all return transitions in the NWA
+     *
+     * @return the set of exit points of all return transitions in the NWA
+     *
      */
 	
     const std::set< State> NWA::getExits( ) const
     {
       const Returns & exit = trans.getReturns();
-       StateSet exits;
+      StateSet exits;
       for( ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
-          exits.insert( Trans::getExit(*it) );
+        exits.insert( Trans::getExit(*it) );
       }
       return exits;
     }
@@ -2085,7 +2085,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns & exit = trans.getTransPred(callSite);
-       StateSet exits;
+      StateSet exits;
       for( ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
@@ -2111,7 +2111,7 @@ namespace wali
       assert(callSite < wali::WALI_BAD_KEY);
 
       const Returns & exit = trans.getTransPred(callSite);
-       std::set<std::pair<State,Symbol> > exits;
+      std::set<std::pair<State,Symbol> > exits;
       for( ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         exits.insert( std::pair<State,Symbol>(Trans::getExit(*it),Trans::getReturnSym(*it)) );
@@ -2137,7 +2137,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns & exit = trans.getTransRet(returnSite);
-       StateSet exits;
+      StateSet exits;
       for( ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
@@ -2163,7 +2163,7 @@ namespace wali
       assert(returnSite < wali::WALI_BAD_KEY);
 
       const Returns & exit = trans.getTransRet(returnSite);
-       std::set<std::pair<State,Symbol> > exits;
+      std::set<std::pair<State,Symbol> > exits;
       for( ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
         exits.insert( std::pair<State,Symbol>(Trans::getExit(*it),Trans::getReturnSym(*it)) );
@@ -2185,7 +2185,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns & call = trans.getReturns();
-       StateSet calls;
+      StateSet calls;
       for( ReturnIterator it = call.begin(); it != call.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
@@ -2216,7 +2216,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns call = trans.getTransExit(exitPoint);
-       StateSet calls;
+      StateSet calls;
       for( ReturnIterator it = call.begin(); it != call.end(); it++ )
       {
         if( (Trans::getReturnSite(*it) == returnSite) &&  (symbol == Trans::getReturnSym(*it)) )
@@ -2245,7 +2245,7 @@ namespace wali
       assert(returnSite < wali::WALI_BAD_KEY);
 
       const Returns call = trans.getTransExit(exitPoint);
-       std::set<std::pair<State,Symbol> > calls;
+      std::set<std::pair<State,Symbol> > calls;
       for( ReturnIterator it = call.begin(); it != call.end(); it++ )
       {
         if( Trans::getReturnSite(*it) == returnSite )
@@ -2256,21 +2256,21 @@ namespace wali
       return calls;
     }
 
-	/**
+    /**
      * 
-	 * @brief returns the call sites of all return transitions in the NWA
-	 *
-	 * @return the set of call sites of all return transitions in the NWA
-	 *
+     * @brief returns the call sites of all return transitions in the NWA
+     *
+     * @return the set of call sites of all return transitions in the NWA
+     *
      */
 	
     const std::set< State> NWA::getCalls( ) const
     {
       const Returns call = trans.getReturns();
-       StateSet calls;
+      StateSet calls;
       for( ReturnIterator it = call.begin(); it != call.end(); it++ )
       {
-          calls.insert( Trans::getCallSite(*it) );
+        calls.insert( Trans::getCallSite(*it) );
       }
       return calls;
     }
@@ -2293,7 +2293,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns call = trans.getTransExit(exitPoint);
-       StateSet calls;
+      StateSet calls;
       for( ReturnIterator it = call.begin(); it != call.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
@@ -2318,7 +2318,7 @@ namespace wali
       assert(exitPoint < wali::WALI_BAD_KEY);
 
       const Returns call = trans.getTransExit(exitPoint);
-       std::set<std::pair<State,Symbol> > calls;
+      std::set<std::pair<State,Symbol> > calls;
       for( ReturnIterator it = call.begin(); it != call.end(); it++ )
       {
         calls.insert( std::pair<State,Symbol>(Trans::getCallSite(*it),Trans::getReturnSym(*it)) );
@@ -2344,7 +2344,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns call = trans.getTransRet(returnSite);
-       StateSet calls;
+      StateSet calls;
       for( ReturnIterator it = call.begin(); it != call.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
@@ -2370,7 +2370,7 @@ namespace wali
       assert(returnSite < wali::WALI_BAD_KEY);
 
       const Returns call = trans.getTransRet(returnSite);
-       std::set<std::pair<State,Symbol> > calls;
+      std::set<std::pair<State,Symbol> > calls;
       for( ReturnIterator it = call.begin(); it != call.end(); it++ )
       {
         calls.insert( std::pair<State,Symbol>(Trans::getCallSite(*it),Trans::getReturnSym(*it)) );
@@ -2389,7 +2389,7 @@ namespace wali
     const std::set< Symbol> NWA::getReturnSym(  ) const
     {
       const Returns rets = trans.getReturns();
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
       for( ReturnIterator it = rets.begin(); it != rets.end(); it++ )
       {
         syms.insert( Trans::getReturnSym(*it) );
@@ -2411,13 +2411,13 @@ namespace wali
      */
     
     const std::set< Symbol> NWA::getReturnSym( State exitPoint, State callSite, State returnSite  ) const
-      {
+    {
       assert(exitPoint < wali::WALI_BAD_KEY);
       assert(callSite < wali::WALI_BAD_KEY);
       assert(returnSite < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransExit(exitPoint);
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
       for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( (Trans::getCallSite(*it) == callSite) && (returnSite == Trans::getReturnSite(*it)) )
@@ -2429,22 +2429,22 @@ namespace wali
     }
 
     /**
-       * 
-       * @brief returns the symbols that label return transitions from 'exitPoint'
-       *        n the NWA
-       *
-       * @param - exitPoint: the exit point of the desired transition
-       * @return the set of symbols that label return transitions from 'exitPoint'
-       *          in the NWA
-       *
-       */
+     * 
+     * @brief returns the symbols that label return transitions from 'exitPoint'
+     *        n the NWA
+     *
+     * @param - exitPoint: the exit point of the desired transition
+     * @return the set of symbols that label return transitions from 'exitPoint'
+     *          in the NWA
+     *
+     */
     
     const std::set< Symbol> NWA::getReturnSym_Exit( State exitPoint ) const
-      {
+    {
       assert(exitPoint < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransExit(exitPoint);
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
       for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         syms.insert( Trans::getReturnSym(*it) );
@@ -2453,22 +2453,22 @@ namespace wali
     }
 
     /**
-       * 
-       * @brief returns the symbols that label return transitions 
-       *        with call-predecessor 'callSite' in the NWA
-       *
-       * @param - callSite: the call site of the desired transition
-       * @return the set of symbols that label return transitions 
-       *          with call-predecessor 'callSite' in the NWA
-       *
-       */
+     * 
+     * @brief returns the symbols that label return transitions 
+     *        with call-predecessor 'callSite' in the NWA
+     *
+     * @param - callSite: the call site of the desired transition
+     * @return the set of symbols that label return transitions 
+     *          with call-predecessor 'callSite' in the NWA
+     *
+     */
     
     const std::set< Symbol> NWA::getReturnSym_Call( State callSite ) const
-      {
+    {
       assert(callSite < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransPred(callSite);
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
       for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         syms.insert( Trans::getReturnSym(*it) );
@@ -2477,22 +2477,22 @@ namespace wali
     }
 
     /**
-       * 
-       * @brief returns the symbols that label return transitions 
-       *        to 'returnSite' in the NWA
-       *
-       * @param - returnSite: the return site of the desired transition
-       * @return the set of symbols that label return transitions 
-       *          to 'returnSite' in the NWA
-       *
-       */
+     * 
+     * @brief returns the symbols that label return transitions 
+     *        to 'returnSite' in the NWA
+     *
+     * @param - returnSite: the return site of the desired transition
+     * @return the set of symbols that label return transitions 
+     *          to 'returnSite' in the NWA
+     *
+     */
     
     const std::set< Symbol> NWA::getReturnSym_Ret( State returnSite ) const
-      {
+    {
       assert(returnSite < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransRet(returnSite);
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
       for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         syms.insert( Trans::getReturnSym(*it) );
@@ -2501,24 +2501,24 @@ namespace wali
     }
 
     /**
-       * 
-       * @brief returns the symbols that label return transitions from 'exitPoint'
-       *        with call-predecessor 'callSite' in the NWA
-       *
-       * @param - exitPoint: the exit point of the desired transition
-       * @param - callSite: the call site of the desired transition
-       * @return the set of symbols that label return transitions from 'exitPoint'
-       *          with call-predecessor 'callSite' in the NWA
-       *
-       */
+     * 
+     * @brief returns the symbols that label return transitions from 'exitPoint'
+     *        with call-predecessor 'callSite' in the NWA
+     *
+     * @param - exitPoint: the exit point of the desired transition
+     * @param - callSite: the call site of the desired transition
+     * @return the set of symbols that label return transitions from 'exitPoint'
+     *          with call-predecessor 'callSite' in the NWA
+     *
+     */
 
     const std::set< Symbol> NWA::getReturnSym_ExitCall( State exitPoint, State callSite  ) const
-      {
+    {
       assert(exitPoint < wali::WALI_BAD_KEY);
       assert(callSite < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransExit(exitPoint);
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
       for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( (Trans::getCallSite(*it) == callSite) )
@@ -2530,24 +2530,24 @@ namespace wali
     }
 
     /**
-       * 
-       * @brief returns the symbols that label return transitions from 'exitPoint'
-       *        to 'returnSite' in the NWA
-       *
-       * @param - exitPoint: the exit point of the desired transition
-       * @param - returnSite: the return site of the desired transition
-       * @return the set of symbols that label return transitions from 'exitPoint'
-       *          to 'returnSite' in the NWA
-       *
-       */
+     * 
+     * @brief returns the symbols that label return transitions from 'exitPoint'
+     *        to 'returnSite' in the NWA
+     *
+     * @param - exitPoint: the exit point of the desired transition
+     * @param - returnSite: the return site of the desired transition
+     * @return the set of symbols that label return transitions from 'exitPoint'
+     *          to 'returnSite' in the NWA
+     *
+     */
     
     const std::set< Symbol> NWA::getReturnSym_ExitRet( State exitPoint, State returnSite  ) const
-      {
+    {
       assert(exitPoint < wali::WALI_BAD_KEY);
       assert(returnSite < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransExit(exitPoint);
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
       for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( (returnSite == Trans::getReturnSite(*it)) )
@@ -2559,24 +2559,24 @@ namespace wali
     }
 
     /**
-       * 
-       * @brief returns the symbols that label return transitions 
-       *        to 'returnSite' with call-predecessor 'callSite' in the NWA
-       *
-       * @param - callSite: the call site of the desired transition
-       * @param - returnSite: the return site of the desired transition
-       * @return the set of symbols that label return transitions 
-       *          to 'returnSite' with call-predecessor 'callSite' in the NWA
-       *
-       */
+     * 
+     * @brief returns the symbols that label return transitions 
+     *        to 'returnSite' with call-predecessor 'callSite' in the NWA
+     *
+     * @param - callSite: the call site of the desired transition
+     * @param - returnSite: the return site of the desired transition
+     * @return the set of symbols that label return transitions 
+     *          to 'returnSite' with call-predecessor 'callSite' in the NWA
+     *
+     */
     
     const std::set< Symbol> NWA::getReturnSym_CallRet( State callSite, State returnSite  ) const
-      {
+    {
       assert(callSite < wali::WALI_BAD_KEY);
       assert(returnSite < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransPred(callSite);
-       std::set<Symbol> syms;
+      std::set<Symbol> syms;
       for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( (returnSite == Trans::getReturnSite(*it)) )
@@ -2603,7 +2603,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
       
       const Returns ret = trans.getReturns();
-       StateSet returns;
+      StateSet returns;
       for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
@@ -2634,7 +2634,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransExit(exitPoint);
-       StateSet returns;
+      StateSet returns;
       for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( (Trans::getCallSite(*it) == callSite) && (symbol == Trans::getReturnSym(*it)) )
@@ -2663,7 +2663,7 @@ namespace wali
       assert(callSite < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransExit(exit);
-       std::set<std::pair<Symbol,State> > returns;
+      std::set<std::pair<Symbol,State> > returns;
       for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( Trans::getCallSite(*it) == callSite )
@@ -2674,21 +2674,21 @@ namespace wali
       return returns;
     }
 
-	/**
+    /**
      * 
-	 * @brief returns the return sites of all return transitions in the NWA
-	 *
-	 * @return the set of return sites of all return transitions in the NWA
-	 *
+     * @brief returns the return sites of all return transitions in the NWA
+     *
+     * @return the set of return sites of all return transitions in the NWA
+     *
      */
 	
     const std::set< State> NWA::getReturns( ) const
     {
       const Returns ret = trans.getReturns();
-       StateSet returns;
+      StateSet returns;
       for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
-          returns.insert( Trans::getReturnSite(*it) );
+        returns.insert( Trans::getReturnSite(*it) );
       }
       return returns;
     }
@@ -2711,7 +2711,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransExit(exitPoint);
-       StateSet returns;
+      StateSet returns;
       for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
@@ -2736,7 +2736,7 @@ namespace wali
       assert(exitPoint < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransExit(exitPoint);
-       std::set<std::pair<Symbol,State> > returns;
+      std::set<std::pair<Symbol,State> > returns;
       for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         returns.insert( std::pair<Symbol,State>(Trans::getReturnSym(*it),Trans::getReturnSite(*it)) );
@@ -2762,7 +2762,7 @@ namespace wali
       assert(symbol < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransPred(callSite);
-       StateSet returns;
+      StateSet returns;
       for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         if( symbol == Trans::getReturnSym(*it) )
@@ -2787,7 +2787,7 @@ namespace wali
       assert(callSite < wali::WALI_BAD_KEY);
 
       const Returns ret = trans.getTransPred(callSite);
-       std::set<std::pair<Symbol,State> > returns;
+      std::set<std::pair<Symbol,State> > returns;
       for( ReturnIterator it = ret.begin(); it != ret.end(); it++ )
       {
         returns.insert( std::pair<Symbol,State>(Trans::getReturnSym(*it),Trans::getReturnSite(*it)) );
@@ -2919,7 +2919,7 @@ namespace wali
       assert(to < wali::WALI_BAD_KEY);
 
       if(! isState(from) || ! isState(pred) || ! isSymbol(sym) || ! isState(to) 
-        || sym == WALI_EPSILON )
+         || sym == WALI_EPSILON )
         return false;
 
       return trans.removeReturn(from,pred,sym,to);
@@ -2942,10 +2942,10 @@ namespace wali
       assert(Trans::getReturnSite(rt) < wali::WALI_BAD_KEY);
 
       if(! isState(Trans::getExit(rt))
-        || ! isState(Trans::getCallSite(rt))
-        || ! isSymbol(Trans::getReturnSym(rt))
-        || ! isState(Trans::getReturnSite(rt)) 
-        || Trans::getReturnSym(rt) == WALI_EPSILON )
+         || ! isState(Trans::getCallSite(rt))
+         || ! isSymbol(Trans::getReturnSym(rt))
+         || ! isState(Trans::getReturnSite(rt)) 
+         || Trans::getReturnSym(rt) == WALI_EPSILON )
         return false;
 
       return trans.removeReturn(rt);
@@ -2969,9 +2969,9 @@ namespace wali
 
 
     /***
-    * @brief constructs an NWA which is the projection of the given NWA to the states
-    * provided
-    */
+     * @brief constructs an NWA which is the projection of the given NWA to the states
+     * provided
+     */
     
     void NWA::projectStates(const NWA & other, const StateSet &prjStates)
     {
@@ -2995,12 +2995,12 @@ namespace wali
       }
 
       for( StateSet::const_iterator it = project_out.begin();
-        it!=project_out.end(); it++ ) {
-          bool b = removeState(*it);
-          if( !b ) {
-            std::cout << "State not found " << *it << "\n";
-          }
-          assert(b && "State not found in projectStates");
+           it!=project_out.end(); it++ ) {
+        bool b = removeState(*it);
+        if( !b ) {
+          std::cout << "State not found " << *it << "\n";
+        }
+        assert(b && "State not found in projectStates");
       }
       return;
     }
@@ -3031,7 +3031,7 @@ namespace wali
       //Test state Key overlap of the two NWAs.
       assert(! overlap(first,second) );
 
-	    //Clear all states(except the stuck state) and transitions from this machine.
+      //Clear all states(except the stuck state) and transitions from this machine.
       clear();
 
       //Copy all of the functionality of the two machines.  
@@ -3080,10 +3080,10 @@ namespace wali
       //A: The stuck state is never accepting in any machine, so we do not need to distinguish
       //      (m,stuck) from stuck.
 
-	  //Clear all states(except the stuck state) and transitions from this machine.
+      //Clear all states(except the stuck state) and transitions from this machine.
       clear();
 
-       std::set<StatePair> visitedPairs; // All the pairs of states we have ever encountered.
+      std::set<StatePair> visitedPairs; // All the pairs of states we have ever encountered.
       std::deque<StatePair> worklistPairs; // Pairs of states yet to be processed
       typedef std::map<StatePair, Key> PairStMap;
       PairStMap pairToStMap; // The corresponding state in the product 
@@ -3103,7 +3103,7 @@ namespace wali
             addInitialState(newSt); 
             //an initial state could also be a final state.
             if(first.isFinalState(*fit) && second.isFinalState(*sit))
-                addFinalState(newSt);
+              addFinalState(newSt);
 
             //Attach client info to the newly created state.
             states.setClientInfo(newSt,resCI);
@@ -3113,7 +3113,7 @@ namespace wali
           }
 
           //perform the epsilon closure of sp
-           std::set<StatePair> newPairs;
+          std::set<StatePair> newPairs;
           epsilonClosure(&newPairs,sp,first,second);
           //add all new pairs to the worklist
           for(  std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
@@ -3200,60 +3200,60 @@ namespace wali
             }
 
             //perform the epsilon closure of entryPair
-             std::set<StatePair> newPairs;
+            std::set<StatePair> newPairs;
             epsilonClosure(&newPairs,entryPair,first,second);
             //add all new pairs to the worklist
             for(  std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
             {
-                bool newlycreated = false;
-                State st;
-                //If we have already considered this pair and found them nonintersectable, continue
-                if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
-                    continue;
-                visitedPairs.insert(*it);
-                //Have we seen this pair before?
-                if( pairToStMap.count(*it) == 0 )
+              bool newlycreated = false;
+              State st;
+              //If we have already considered this pair and found them nonintersectable, continue
+              if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
+                continue;
+              visitedPairs.insert(*it);
+              //Have we seen this pair before?
+              if( pairToStMap.count(*it) == 0 )
+              {
+                //Check and make sure this intersection makes sense.
+                ClientInfoRefPtr CI;
+                if( stateIntersect(first,it->first,second,it->second,st,CI) )
                 {
-                    //Check and make sure this intersection makes sense.
-                    ClientInfoRefPtr CI;
-                    if( stateIntersect(first,it->first,second,it->second,st,CI) )
-                    {
-                        newlycreated = true;
-                        if( first.isFinalState(it->first) && second.isFinalState(it->second) )
-                            addFinalState(st);
-                        else
-                            addState(st); 
+                  newlycreated = true;
+                  if( first.isFinalState(it->first) && second.isFinalState(it->second) )
+                    addFinalState(st);
+                  else
+                    addState(st); 
 
-                        //Attach client info to the newly created state.
-                        states.setClientInfo(st,CI);
+                  //Attach client info to the newly created state.
+                  states.setClientInfo(st,CI);
                         
-                        //Add this to the worklist.
-                        worklistPairs.push_back(*it);
-                        pairToStMap[*it] = st;
-                    }
+                  //Add this to the worklist.
+                  worklistPairs.push_back(*it);
+                  pairToStMap[*it] = st;
                 }
-                else
-                {
-                    //We have seen this pair before.
-                    st = pairToStMap[*it];
-                }
+              }
+              else
+              {
+                //We have seen this pair before.
+                st = pairToStMap[*it];
+              }
 
-                //Add an edge that is the current call trans with collapsed epsilon internal trans.
-                intersectClientInfoCall(first,Trans::getCallSite(*fit),it->first,
-                                        second,Trans::getCallSite(*sit),it->second,
-                                        resSym,st);    //Intersect Call Trans client info.
-                if( isTransitionPossible( pairToStMap[currpair],resSym,st) ) {
-                  addCallTrans(pairToStMap[currpair],resSym,st);  
-                }
-                else if(newlycreated) {
-                  // transition not possible and newly created state
-                  // roll back; revert; clean up....
-                  worklistPairs.pop_back();
-                  pairToStMap.erase(*it);
-                  visitedPairs.erase(*it);
-                  removeState(st);
-                }
-             }
+              //Add an edge that is the current call trans with collapsed epsilon internal trans.
+              intersectClientInfoCall(first,Trans::getCallSite(*fit),it->first,
+                                      second,Trans::getCallSite(*sit),it->second,
+                                      resSym,st);    //Intersect Call Trans client info.
+              if( isTransitionPossible( pairToStMap[currpair],resSym,st) ) {
+                addCallTrans(pairToStMap[currpair],resSym,st);  
+              }
+              else if(newlycreated) {
+                // transition not possible and newly created state
+                // roll back; revert; clean up....
+                worklistPairs.pop_back();
+                pairToStMap.erase(*it);
+                visitedPairs.erase(*it);
+                removeState(st);
+              }
+            }
 
             
             //Add an edge that traverses the current call transition.
@@ -3327,56 +3327,56 @@ namespace wali
             }
 
             //perform the epsilon closure of tgtPair
-             std::set<StatePair> newPairs;
+            std::set<StatePair> newPairs;
             epsilonClosure(&newPairs,tgtPair,first,second);
             //add all new pairs to the worklist
             for(  std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
             {
-                State st;
-                bool newlyCreatedSt = false;
-                //If we have already considered this pair and found them nonintersectable, continue
-                if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
-                    continue;
-                visitedPairs.insert(*it);
-                //Have we seen this pair before?
-                if( pairToStMap.count(*it) == 0 )
+              State st;
+              bool newlyCreatedSt = false;
+              //If we have already considered this pair and found them nonintersectable, continue
+              if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
+                continue;
+              visitedPairs.insert(*it);
+              //Have we seen this pair before?
+              if( pairToStMap.count(*it) == 0 )
+              {
+                //Check and make sure this intersection makes sense.
+                ClientInfoRefPtr CI;
+                if( stateIntersect(first,it->first,second,it->second,st,CI) )
                 {
-                    //Check and make sure this intersection makes sense.
-                    ClientInfoRefPtr CI;
-                    if( stateIntersect(first,it->first,second,it->second,st,CI) )
-                    {
-                        if( first.isFinalState(it->first) && second.isFinalState(it->second) )
-                            addFinalState(st);
-                        else
-                            addState(st); 
-                        newlyCreatedSt = true;
-                        //Attach client info to the newly created state.
-                        states.setClientInfo(st,CI);
+                  if( first.isFinalState(it->first) && second.isFinalState(it->second) )
+                    addFinalState(st);
+                  else
+                    addState(st); 
+                  newlyCreatedSt = true;
+                  //Attach client info to the newly created state.
+                  states.setClientInfo(st,CI);
                         
-                        worklistPairs.push_back(*it);
-                        pairToStMap[*it] = st;
-                    }
+                  worklistPairs.push_back(*it);
+                  pairToStMap[*it] = st;
                 }
-                else
-                {
-                    //We have seen this pair before.
-                    st = pairToStMap[*it];
-                }
+              }
+              else
+              {
+                //We have seen this pair before.
+                st = pairToStMap[*it];
+              }
                 
-                //Add an edge that is the current internal trans with collapsed epsilon internal trans.
-                intersectClientInfoInternal(first,Trans::getSource(*fit),it->first,
-                                            second,Trans::getSource(*sit),it->second,
-                                            resSym, st);    //Intersect Internal Trans client info.
-                if( isTransitionPossible( pairToStMap[currpair],resSym,st) ) {
-                  addInternalTrans(pairToStMap[currpair],resSym,st);  
-                } else if( newlyCreatedSt ) {
-                  // transition not possible and newly created state
-                  // roll back; revert; clean up....
-                  worklistPairs.pop_back();
-                  pairToStMap.erase(*it);
-                  visitedPairs.erase(*it);
-                  removeState(st);
-                }
+              //Add an edge that is the current internal trans with collapsed epsilon internal trans.
+              intersectClientInfoInternal(first,Trans::getSource(*fit),it->first,
+                                          second,Trans::getSource(*sit),it->second,
+                                          resSym, st);    //Intersect Internal Trans client info.
+              if( isTransitionPossible( pairToStMap[currpair],resSym,st) ) {
+                addInternalTrans(pairToStMap[currpair],resSym,st);  
+              } else if( newlyCreatedSt ) {
+                // transition not possible and newly created state
+                // roll back; revert; clean up....
+                worklistPairs.pop_back();
+                pairToStMap.erase(*it);
+                visitedPairs.erase(*it);
+                removeState(st);
+              }
             }
             
 
@@ -3460,51 +3460,51 @@ namespace wali
             }
 
             //perform the epsilon closure of retPair
-             std::set<StatePair> newPairs;
+            std::set<StatePair> newPairs;
             epsilonClosure(&newPairs,retPair,first,second);
             //add all new pairs to the worklist
             for(  std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
             {
-                State st;
-                bool newlyCreatedSt = false;
-                //If we have already considered this pair and found them nonintersectable, continue
-                if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
-                    continue;
-                visitedPairs.insert(*it);
-                //Have we seen this pair before?
-                if( pairToStMap.count(*it) == 0 )
+              State st;
+              bool newlyCreatedSt = false;
+              //If we have already considered this pair and found them nonintersectable, continue
+              if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
+                continue;
+              visitedPairs.insert(*it);
+              //Have we seen this pair before?
+              if( pairToStMap.count(*it) == 0 )
+              {
+                //Check and make sure this intersection makes sense.
+                ClientInfoRefPtr CI;
+                if( stateIntersect(first,it->first,second,it->second,st,CI) )
                 {
-                    //Check and make sure this intersection makes sense.
-                    ClientInfoRefPtr CI;
-                    if( stateIntersect(first,it->first,second,it->second,st,CI) )
-                    {
-                        if( first.isFinalState(it->first) && second.isFinalState(it->second) )
-                            addFinalState(st);
-                        else
-                            addState(st);
-                        newlyCreatedSt = true;
-                        //Attach client info to the newly created state.
-                        states.setClientInfo(st,CI);
+                  if( first.isFinalState(it->first) && second.isFinalState(it->second) )
+                    addFinalState(st);
+                  else
+                    addState(st);
+                  newlyCreatedSt = true;
+                  //Attach client info to the newly created state.
+                  states.setClientInfo(st,CI);
                         
-                        worklistPairs.push_back(*it);
-                        pairToStMap[*it] = st;
-                    }
+                  worklistPairs.push_back(*it);
+                  pairToStMap[*it] = st;
                 }
-                else
-                {
-                    //We have seen this pair before.
-                    st = pairToStMap[*it];
-                }
+              }
+              else
+              {
+                //We have seen this pair before.
+                st = pairToStMap[*it];
+              }
                 
-                //Add an edge that is the current return trans with collapsed epsilon internal trans.
-                intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),it->first,
-                                          second,Trans::getExit(*sit),Trans::getCallSite(*sit),it->second,
-                                          resSym,st);    //Intersect Internal Trans client info.
-                if( isTransitionPossible(pairToStMap[currpair],resSym,st) ) {
-                  addReturnTrans(pairToStMap[currpair],callSt,resSym,st);  
-                } else if( newlyCreatedSt ) {
-                  removeState( st );
-                }
+              //Add an edge that is the current return trans with collapsed epsilon internal trans.
+              intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),it->first,
+                                        second,Trans::getExit(*sit),Trans::getCallSite(*sit),it->second,
+                                        resSym,st);    //Intersect Internal Trans client info.
+              if( isTransitionPossible(pairToStMap[currpair],resSym,st) ) {
+                addReturnTrans(pairToStMap[currpair],callSt,resSym,st);  
+              } else if( newlyCreatedSt ) {
+                removeState( st );
+              }
             }
             
             
@@ -3588,56 +3588,56 @@ namespace wali
             }
 
             //perform the epsilon closure of retPair
-             std::set<StatePair> newPairs;
+            std::set<StatePair> newPairs;
             epsilonClosure(&newPairs,retPair,first,second);
             //add all new pairs to the worklist
             for(  std::set<StatePair>::iterator it = newPairs.begin(); it != newPairs.end(); it++ )
             {
-                State st;
-                bool newlyCreatedSt = false;
-                //If we have already considered this pair and found them nonintersectable, continue
-                if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
-                    continue;
-                visitedPairs.insert(*it);
-                //Have we seen this pair before?
-                if( pairToStMap.count(*it) == 0 )
+              State st;
+              bool newlyCreatedSt = false;
+              //If we have already considered this pair and found them nonintersectable, continue
+              if( visitedPairs.count(*it) != 0 && pairToStMap.count(*it) == 0 )
+                continue;
+              visitedPairs.insert(*it);
+              //Have we seen this pair before?
+              if( pairToStMap.count(*it) == 0 )
+              {
+                //Check and make sure this intersection makes sense.
+                ClientInfoRefPtr CI;
+                if( stateIntersect(first,it->first,second,it->second,st,CI) )
                 {
-                    //Check and make sure this intersection makes sense.
-                    ClientInfoRefPtr CI;
-                    if( stateIntersect(first,it->first,second,it->second,st,CI) )
-                    {
-                        if( first.isFinalState(it->first) && second.isFinalState(it->second) )
-                            addFinalState(st);
-                        else
-                            addState(st); 
-                        newlyCreatedSt = true;
-                        //Attach client info to the newly created state.
-                        states.setClientInfo(st,CI);
+                  if( first.isFinalState(it->first) && second.isFinalState(it->second) )
+                    addFinalState(st);
+                  else
+                    addState(st); 
+                  newlyCreatedSt = true;
+                  //Attach client info to the newly created state.
+                  states.setClientInfo(st,CI);
                         
-                        worklistPairs.push_back(*it);
-                        pairToStMap[*it] = st;
-                    }
+                  worklistPairs.push_back(*it);
+                  pairToStMap[*it] = st;
                 }
-                else
-                {
-                    //We have seen this pair before.
-                    st = pairToStMap[*it];
-                }
+              }
+              else
+              {
+                //We have seen this pair before.
+                st = pairToStMap[*it];
+              }
                 
-                //Add an edge that is the current return trans with collapsed epsilon internal trans.
-                intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),it->first,
-                                          second,Trans::getExit(*sit),Trans::getCallSite(*sit),it->second,
-                                          resSym,st);    //Intersect Internal Trans client info.
-                if( isTransitionPossible(exitSt,resSym,st) ) {
-                  addReturnTrans(exitSt,pairToStMap[currpair],resSym,st);  
-                } else if( newlyCreatedSt ) {
-                  // transition not possible and newly created state
-                  // roll back; revert; clean up....
-                  worklistPairs.pop_back();
-                  pairToStMap.erase(*it);
-                  visitedPairs.erase(*it);
-                  removeState(st);
-                }
+              //Add an edge that is the current return trans with collapsed epsilon internal trans.
+              intersectClientInfoReturn(first,Trans::getExit(*fit),Trans::getCallSite(*fit),it->first,
+                                        second,Trans::getExit(*sit),Trans::getCallSite(*sit),it->second,
+                                        resSym,st);    //Intersect Internal Trans client info.
+              if( isTransitionPossible(exitSt,resSym,st) ) {
+                addReturnTrans(exitSt,pairToStMap[currpair],resSym,st);  
+              } else if( newlyCreatedSt ) {
+                // transition not possible and newly created state
+                // roll back; revert; clean up....
+                worklistPairs.pop_back();
+                pairToStMap.erase(*it);
+                visitedPairs.erase(*it);
+                removeState(st);
+              }
             }
 
             
@@ -3706,7 +3706,7 @@ namespace wali
       // Now we have a list of stuck states. Go through and remove each,
       // but only if the acceptingness is the same as the true stuck state.
       for(  StateSet::iterator stuck = stuckStates.begin();
-           stuck != stuckStates.end(); ++stuck)
+            stuck != stuckStates.end(); ++stuck)
       {
         if( isFinalState(*stuck) == isFinalState(states.getStuckState()) )
         {
@@ -3765,11 +3765,11 @@ namespace wali
           {
             // and if the exit and call are already visited
             if( visited.count( Trans::getExit(*it) ) > 0 && visited.count( Trans::getCallSite(*it) ) > 0  
-              // but the return site is not visited
-              && visited.count(Trans::getReturnSite(*it) ) == 0 ) {
+                // but the return site is not visited
+                && visited.count(Trans::getReturnSite(*it) ) == 0 ) {
 
-                worklist.push_back(Trans::getReturnSite(*it) );
-                visited.insert(Trans::getReturnSite(*it));
+              worklist.push_back(Trans::getReturnSite(*it) );
+              visited.insert(Trans::getReturnSite(*it));
             }
           }
         }
@@ -3826,15 +3826,15 @@ namespace wali
             // and if the exit not visited
             if( visited.count( Trans::getExit(*it) ) == 0 ) {
 
-                worklist.push_back(Trans::getExit(*it) );
-                visited.insert(Trans::getExit(*it));
+              worklist.push_back(Trans::getExit(*it) );
+              visited.insert(Trans::getExit(*it));
             }
 
             // if the call not visited
             if( visited.count( Trans::getCallSite(*it) ) == 0 ) {
 
-                worklist.push_back(Trans::getCallSite(*it) );
-                visited.insert(Trans::getCallSite(*it));
+              worklist.push_back(Trans::getCallSite(*it) );
+              visited.insert(Trans::getCallSite(*it));
             }
           }
         }
@@ -3892,7 +3892,7 @@ namespace wali
       //Test state Key overlap of the two NWAs.
       assert(! overlap(first, second) );
 
-	  //Clear all states(except the stuck state) and transitions from this machine.
+      //Clear all states(except the stuck state) and transitions from this machine.
       clear();
 
       //Duplicate all of the functionality of the first machine (except the final state property).
@@ -3934,7 +3934,7 @@ namespace wali
       //Q: How should clientInfos be generated for the reversed NWA?
       //A: The clientInfos from the component machines are copied and added to the reversed NWA.
 
-	  //Clear all states(except the stuck state) and transitions from this machine.
+      //Clear all states(except the stuck state) and transitions from this machine.
       clear();
 
       //The reverse machine has all the states of the original machine.
@@ -3945,48 +3945,48 @@ namespace wali
       //      because the stuck state was not an initial state of the original machine 
       //      (as it was not even a state in the original machine).
       for( stateIterator it = first.beginInitialStates(); 
-        it != first.endInitialStates(); it++ )
+           it != first.endInitialStates(); it++ )
       {
         addFinalState(*it);
       }
       for( stateIterator it = first.beginFinalStates(); 
-        it != first.endFinalStates(); it++ )
+           it != first.endFinalStates(); it++ )
       {
         addInitialState(*it);
       }
 
       //Duplicate internal transitions with source/target swapped.
       for( InternalIterator it = first.beginInternalTrans(); 
-        it != first.endInternalTrans(); it++ )
+           it != first.endInternalTrans(); it++ )
       {
         addInternalTrans(Trans::getTarget(*it),
-                          Trans::getInternalSym(*it),
-                          Trans::getSource(*it));
+                         Trans::getInternalSym(*it),
+                         Trans::getSource(*it));
       }
 
       //Duplicate return transitions as call transitions with (return,sym,exit).
       for( ReturnIterator it = first.beginReturnTrans(); 
-        it != first.endReturnTrans(); it++ )
+           it != first.endReturnTrans(); it++ )
       {
         addCallTrans(Trans::getReturnSite(*it),
-                      Trans::getReturnSym(*it),
-                      Trans::getExit(*it));
+                     Trans::getReturnSym(*it),
+                     Trans::getExit(*it));
       }
 
       //Duplicate call transitions with associated return transitions as 
       //return transitions with (entry,return,sym,call).
       for( CallIterator cit = first.beginCallTrans(); 
-        cit != first.endCallTrans(); cit++ )
+           cit != first.endCallTrans(); cit++ )
       {
         for( ReturnIterator rit = first.beginReturnTrans(); 
-          rit != first.endReturnTrans(); rit++ )
+             rit != first.endReturnTrans(); rit++ )
         {
           if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
           {
             addReturnTrans(Trans::getEntry(*cit),
-                            Trans::getReturnSite(*rit),
-                            Trans::getCallSym(*cit),
-                            Trans::getCallSite(*cit));
+                           Trans::getReturnSite(*rit),
+                           Trans::getCallSym(*cit),
+                           Trans::getCallSite(*cit));
           }
         }
       }
@@ -4012,7 +4012,7 @@ namespace wali
       //A: The clientInfos from the component machine are copied to both the direct copies of
       //    states and the primed copies of states and added to the star NWA.
 
-	  //Clear all states(except the stuck state) and transitions from this machine.
+      //Clear all states(except the stuck state) and transitions from this machine.
       clear();
 
       //Somehow mark unmatched nesting edges as if they are pending (tag its state so that 
@@ -4036,7 +4036,7 @@ namespace wali
 
       //The initial and final states of A* are Q0'. 
       for( stateIterator sit = first.beginInitialStates(); 
-            sit != first.endInitialStates(); sit++ )
+           sit != first.endInitialStates(); sit++ )
       {
         State sp = wali::getKey(*sit,prime);
         addInitialState(sp);
@@ -4048,7 +4048,7 @@ namespace wali
       //Internal: for each (q,a,p) in delta_i, A* gets (q,a,p) and (q',a,p') and if
       //          p in Qf, then (q,a,r') and (q',a,r') for each r in Q0
       for( InternalIterator iit = first.beginInternalTrans();
-            iit != first.endInternalTrans(); iit++ )
+           iit != first.endInternalTrans(); iit++ )
       {
         State q = Trans::getSource(*iit);
         Symbol a = Trans::getInternalSym(*iit);
@@ -4067,7 +4067,7 @@ namespace wali
         {
           //for each r in Q0
           for( stateIterator sit = first.beginInitialStates(); 
-                sit != first.endInitialStates(); sit++ )
+               sit != first.endInitialStates(); sit++ )
           {
             State rp = wali::getKey(*sit,prime);
 
@@ -4083,7 +4083,7 @@ namespace wali
       //Call: for each(q,a,p) in delta_c, A* gets (q,a,p) and (q',a,p), 
       //      and if p in Qf then (q,a,r') and (q',a,r') for each r in Q0
       for( CallIterator cit = first.beginCallTrans();
-            cit != first.endCallTrans(); cit++ )
+           cit != first.endCallTrans(); cit++ )
       {
         State q = Trans::getCallSite(*cit);
         Symbol a = Trans::getCallSym(*cit);
@@ -4101,7 +4101,7 @@ namespace wali
         {
           //for each r in Q0
           for( stateIterator sit = first.beginInitialStates();
-                sit != first.endInitialStates(); sit++ )
+               sit != first.endInitialStates(); sit++ )
           {
             State rp = wali::getKey(*sit,prime);
 
@@ -4120,7 +4120,7 @@ namespace wali
       //            A* gets (q',s,a,p') for each s in Q union Q' 
       //          and if p in Qf, then (q',s,a,t') for each s in Q union Q' and t in Q0.
       for( ReturnIterator rit = first.beginReturnTrans();
-            rit != first.endReturnTrans(); rit++ )
+           rit != first.endReturnTrans(); rit++ )
       {
         State q = Trans::getExit(*rit);
         State r = Trans::getCallSite(*rit);
@@ -4140,7 +4140,7 @@ namespace wali
         {
           //for each s in Q0
           for( stateIterator sit = first.beginInitialStates();
-                sit != first.endInitialStates(); sit++ )
+               sit != first.endInitialStates(); sit++ )
           { 
             State sp = wali::getKey(*sit,prime);
 
@@ -4157,7 +4157,7 @@ namespace wali
         {
           //for each s in Q
           for( stateIterator sit = first.beginStates();
-                sit != first.endStates(); sit++ )
+               sit != first.endStates(); sit++ )
           {
             State s = *sit;
             State qp = wali::getKey(q,prime);
@@ -4176,7 +4176,7 @@ namespace wali
             {
               //for each t in Q0
               for( stateIterator it = first.beginInitialStates();
-                    it != first.endInitialStates(); it++ )
+                   it != first.endInitialStates(); it++ )
               {                
                 State tp = wali::getKey(*it,prime);
 
@@ -4207,7 +4207,7 @@ namespace wali
       //Q: How should clientInfos be generated for the complemented NWA?
       //A: The clientInfos from the component machines are copied and added to the complemented NWA.
 
-	  //Clear all states(except the stuck state) and transitions from this machine.
+      //Clear all states(except the stuck state) and transitions from this machine.
       clear();
 
 
@@ -4238,7 +4238,7 @@ namespace wali
       //A: this is always the case since the stuck state can never be a final state
       
       //FinalStates = AllStates - FinalStates
-       StateSet oldFinalStates;
+      StateSet oldFinalStates;
       oldFinalStates.insert(beginFinalStates(),endFinalStates());
  
       clearFinalStates();
@@ -4313,10 +4313,10 @@ namespace wali
 
 #if 0
       typedef  std::tr1::unordered_set<BinaryRelation
-          , terrible_set_hasher<BinaryRelation>
-          //, terrible_set_comparer<BinaryRelation>
-          >
-          RelationSet;
+        , terrible_set_hasher<BinaryRelation>
+        //, terrible_set_comparer<BinaryRelation>
+        >
+        RelationSet;
 #endif
 
 #ifdef USE_BUDDY
@@ -4353,7 +4353,7 @@ namespace wali
       DECLARE(BinaryRelation, Id0);
       for( stateIterator sit = nondet_copy.beginInitialStates(); sit != nondet_copy.endInitialStates(); sit++ )
       {
-          Id0.insert(std::pair<State,State>(*sit,*sit));
+        Id0.insert(std::pair<State,State>(*sit,*sit));
       }
       
       //Construct the epsilon closure relation for the states in nondet_copy.
@@ -4560,8 +4560,8 @@ namespace wali
                 rit != visited.end(); rit++ )
           {
             //Compute the relation.
-              DECLARE(BinaryRelation, Rr);
-              DECLARE(BinaryRelation, Rtmpr);
+            DECLARE(BinaryRelation, Rr);
+            DECLARE(BinaryRelation, Rtmpr);
 #ifdef USE_BUDDY
             merge/*<St>*/(Rtmpr,R,*rit,Ir);
             compose/*<St>*/(Rr,Rtmpr,close);
@@ -4593,8 +4593,8 @@ namespace wali
                 rit != visited.end(); rit++ )
           {
             //Compute the relation.
-              DECLARE(BinaryRelation, Rr);
-              DECLARE(BinaryRelation, Rtmpr);
+            DECLARE(BinaryRelation, Rr);
+            DECLARE(BinaryRelation, Rtmpr);
 #ifdef USE_BUDDY
             merge/*<St>*/(Rtmpr,*rit,R,Ir);
 #else
@@ -4644,7 +4644,7 @@ namespace wali
         for(  RelationSet::iterator sit = visited.begin();
               sit != visited.end(); sit++ )
         {
-            DECLARE(BinaryRelation, Rtmpf);
+          DECLARE(BinaryRelation, Rtmpf);
           relations::intersect(Rtmpf,Rf,*sit);
           if(! Rtmpf.empty() )
           {
@@ -4659,7 +4659,7 @@ namespace wali
 #ifdef USE_BUDDY
     
     State NWA::makeKey(
-       relations::RelationTypedefs<State>::BinaryRelation const & R ) const
+      relations::RelationTypedefs<State>::BinaryRelation const & R ) const
     {
       std::stringstream ss;
       ss << R.getBdd();
@@ -4675,8 +4675,8 @@ namespace wali
      *
      */
     
-     State NWA::makeKey(
-       relations::RelationTypedefs<State>::BinaryRelation const & R ) const
+    State NWA::makeKey(
+      relations::RelationTypedefs<State>::BinaryRelation const & R ) const
     {
       // C++ really needs C++0x's 'auto' keyword :-)
       typedef  relations::RelationTypedefs<State>::BinaryRelation::const_iterator Iterator;
@@ -4811,8 +4811,8 @@ namespace wali
      */
     
     void NWA::intersectClientInfoCall( NWA const & first, State call1, State entry1, 
-                                               NWA const & second, State call2, State entry2, 
-                                               Symbol resSym, State resSt )
+                                       NWA const & second, State call2, State entry2, 
+                                       Symbol resSym, State resSt )
     {
       (void) first, (void) call1, (void) entry1, (void) second;
       (void) call2, (void) entry2, (void) resSym, (void) resSt;
@@ -4843,8 +4843,8 @@ namespace wali
      */
     
     void NWA::intersectClientInfoInternal( NWA const & first, State src1, State tgt1, 
-                                                   NWA const & second, State src2, State tgt2, 
-                                                   Symbol resSym, State resSt )
+                                           NWA const & second, State src2, State tgt2, 
+                                           Symbol resSym, State resSt )
     {
       (void) first, (void) src1, (void) tgt1, (void) second, (void) src2;
       (void) tgt2, (void) resSym, (void) resSt;
@@ -4879,8 +4879,8 @@ namespace wali
      */
     
     void NWA::intersectClientInfoReturn( NWA const & first, State exit1, State call1, State ret1,
-                                                 NWA const & second, State exit2, State call2, State ret2,
-                                                 Symbol resSym, State resSt )
+                                         NWA const & second, State exit2, State call2, State ret2,
+                                         Symbol resSym, State resSt )
     {
       (void) first, (void) exit1, (void) call1, (void) ret1, (void) second;
       (void) exit2, (void) call2, (void) ret2, (void) resSym, (void) resSt;
@@ -4902,7 +4902,7 @@ namespace wali
      */
     
     bool NWA::stateIntersect( NWA const & first, State state1, NWA const & second, State state2, 
-                                      State & resSt, ClientInfoRefPtr & resCI ) 
+                              State & resSt, ClientInfoRefPtr & resCI ) 
     {
       (void) first, (void) second, (void) resCI;
       
@@ -4971,8 +4971,8 @@ namespace wali
      */
     
     void NWA::mergeClientInfo( NWA const & first, 
-                   relations::RelationTypedefs<State>::BinaryRelation const & binRel, 
-                                State resSt, ClientInfoRefPtr & resCI )
+                               relations::RelationTypedefs<State>::BinaryRelation const & binRel, 
+                               State resSt, ClientInfoRefPtr & resCI )
     {
       (void) first, (void) binRel, (void) resSt, (void) resCI;
       //Note: When overriding this method your metric must combine any client information associated
@@ -4995,9 +4995,9 @@ namespace wali
      */
     
     void NWA::mergeClientInfoCall( NWA const & nwa, 
-                   relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
-                   relations::RelationTypedefs<State>::BinaryRelation const & binRelEntry,
-                                State callSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI )
+                                   relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
+                                   relations::RelationTypedefs<State>::BinaryRelation const & binRelEntry,
+                                   State callSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI )
     {
       (void) nwa, (void) binRelCall, (void) binRelEntry, (void) callSt;
       (void) resSym, (void) resSt, (void) resCI;
@@ -5021,9 +5021,9 @@ namespace wali
      */
     
     void NWA::mergeClientInfoInternal( NWA const & nwa, 
-                   relations::RelationTypedefs<State>::BinaryRelation const & binRelSource, 
-                   relations::RelationTypedefs<State>::BinaryRelation const & binRelTarget,
-                                State sourceSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI )
+                                       relations::RelationTypedefs<State>::BinaryRelation const & binRelSource, 
+                                       relations::RelationTypedefs<State>::BinaryRelation const & binRelTarget,
+                                       State sourceSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI )
     {
       (void) nwa, (void) binRelSource, (void) binRelTarget, (void) sourceSt;
       (void) resSym, (void) resSt, (void) resCI;
@@ -5049,10 +5049,10 @@ namespace wali
      */
     
     void NWA::mergeClientInfoReturn( NWA const & nwa, 
-                   relations::RelationTypedefs<State>::BinaryRelation const & binRelExit,
-                   relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
-                   relations::RelationTypedefs<State>::BinaryRelation const & binRelReturn,
-                          State exitSt, State callSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI )
+                                     relations::RelationTypedefs<State>::BinaryRelation const & binRelExit,
+                                     relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
+                                     relations::RelationTypedefs<State>::BinaryRelation const & binRelReturn,
+                                     State exitSt, State callSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI )
     {
       (void) nwa, (void) binRelExit, (void) binRelCall, (void) binRelReturn;
       (void) exitSt, (void) callSt, (void) resSym, (void) resSt, (void) resCI;
@@ -5099,7 +5099,7 @@ namespace wali
         Key sym = it->from_stack();
         //look for internal transitions in the NWA with symbol 'sym'
         for( InternalIterator iit = beginInternalTrans();
-              iit != endInternalTrans(); iit++ )
+             iit != endInternalTrans(); iit++ )
         {
           if( sym == Trans::getInternalSym(*iit) )
           {
@@ -5119,7 +5119,7 @@ namespace wali
         Key sym = it->from_stack();
         //look for call transitions in the NWA with symbol 'sym'
         for( CallIterator cit = beginCallTrans();
-              cit != endCallTrans(); cit++ )
+             cit != endCallTrans(); cit++ )
         {
           if( sym == Trans::getCallSym(*cit) )
           {
@@ -5134,13 +5134,13 @@ namespace wali
 
       //Return Rules:
       for( std::set<wpds::Rule>::iterator it = rules.popRules.begin();
-            it != rules.popRules.end(); it++ )
+           it != rules.popRules.end(); it++ )
       {
         //<p,x> -w-> <p',*> in delta_0, (q_r,q_c,x,q) in delta_r
         Key sym = it->from_stack();
         //look for return transitions in the NWA with symbol 'sym'
         for( ReturnIterator rit = beginReturnTrans();
-              rit != endReturnTrans(); rit++ )
+             rit != endReturnTrans(); rit++ )
         {
           if( sym == Trans::getReturnSym(*rit) )
           {
@@ -5150,7 +5150,7 @@ namespace wali
             result.add_rule(from,sym,to,it->weight());
             //For all r_c in delta_2
             for( std::set<wpds::Rule>::iterator dit = rules.pushRules.begin();
-                  dit != rules.pushRules.end(); dit++ )
+                 dit != rules.pushRules.end(); dit++ )
             {
               //<(p',q_r^x),(r_c,q_c)> -1-> <(p',q),r_c>
               from = getKey(it->to_state(),getKey(Trans::getExit(*rit),sym));
@@ -5180,7 +5180,7 @@ namespace wali
       // For each <p,n_1> -w-> <p',n_2> in delta_1,
       // add ((p,n_1), n_1, (p',n_2)) to delta_i
       for( std::set<wpds::Rule>::iterator it = rules.stepRules.begin();
-            it != rules.stepRules.end(); it++ )
+           it != rules.stepRules.end(); it++ )
       {
         addInternalTrans(getKey(it->from_state(),it->from_stack()), //from
                          it->from_stack(),                          //sym
@@ -5192,14 +5192,14 @@ namespace wali
       // add ((p,n_c), n_c, (p',e)) to delta_c, and
       // add (p,n_c) => r_c to the call-return map 
       for( std::set<wpds::Rule>::iterator it = rules.pushRules.begin();
-            it != rules.pushRules.end(); it++ )
+           it != rules.pushRules.end(); it++ )
       {
         addCallTrans(getKey(it->from_state(),it->from_stack()),   //from
-                      it->from_stack(),                           //sym
-                      getKey(it->to_state(),it->to_stack1()));    //to
+                     it->from_stack(),                           //sym
+                     getKey(it->to_state(),it->to_stack1()));    //to
 
         call_return.insert(std::pair<State,State>(getKey(it->from_state(),it->from_stack()),  //call
-                                            it->to_stack2()));                          //ret
+                                                  it->to_stack2()));                          //ret
       }
 
 
@@ -5208,15 +5208,15 @@ namespace wali
       //          (p'',n_c) => r_c in the call-return map,
       // add ((p,x),(p'',n_c),x,(p',r)) to delta_r 
       for( std::set<wpds::Rule>::iterator it = rules.popRules.begin();
-            it != rules.popRules.end(); it++ )
+           it != rules.popRules.end(); it++ )
       {
         for( std::map<State,State>::iterator cr_it = call_return.begin();
-              cr_it != call_return.end(); cr_it++ )
+             cr_it != call_return.end(); cr_it++ )
         {
           addReturnTrans(getKey(it->from_state(),it->from_stack()),   //from
-                          cr_it->first,                               //pred
-                          it->from_stack(),                           //sym
-                          getKey(it->to_state(),cr_it->second));      //to
+                         cr_it->first,                               //pred
+                         it->from_stack(),                           //sym
+                         getKey(it->to_state(),cr_it->second));      //to
         }
       }
     }
@@ -5249,16 +5249,16 @@ namespace wali
         //(q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
         //where the weight w depends on sigma
 
-	    State src = Trans::getSource(*iit);
-		  State tgt = Trans::getTarget(*iit);
+        State src = Trans::getSource(*iit);
+        State tgt = Trans::getTarget(*iit);
       
-      if( Trans::getInternalSym(*iit) == WALI_WILD )
-		    wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
-      else
-        wgt = wg.getWeight(src, getClientInfo(src),
-                            Trans::getInternalSym(*iit),
-                            WeightGen::INTRA,
-                            tgt, getClientInfo(tgt));  //w
+        if( Trans::getInternalSym(*iit) == WALI_WILD )
+          wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
+        else
+          wgt = wg.getWeight(src, getClientInfo(src),
+                             Trans::getInternalSym(*iit),
+                             WeightGen::INTRA,
+                             tgt, getClientInfo(tgt));  //w
 
         result.add_rule(program,                       //from_state (p)
                         src,									         //from_stack (q)
@@ -5271,7 +5271,7 @@ namespace wali
       for( CallIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
       {
         State src = Trans::getCallSite(*cit);
-		    State tgt = Trans::getEntry(*cit);
+        State tgt = Trans::getEntry(*cit);
         for( ReturnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
         {
           if( Trans::getCallSite(*cit) == Trans::getCallSite(*rit) )
@@ -5283,9 +5283,9 @@ namespace wali
               wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w
             else
               wgt = wg.getWeight(src, getClientInfo(src),
-                                  Trans::getCallSym(*cit),
-                                  WeightGen::CALL_TO_ENTRY,  
-                                  tgt, getClientInfo(tgt)); // w   
+                                 Trans::getCallSym(*cit),
+                                 WeightGen::CALL_TO_ENTRY,  
+                                 tgt, getClientInfo(tgt)); // w   
 
             result.add_rule(program,                      //from_state (p)
                             src,     //from_stack (q_c)
@@ -5312,9 +5312,9 @@ namespace wali
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w  
         else
           wgt = wg.getWeight(src, getClientInfo(src),
-                              Trans::getReturnSym(*rit),
-                              WeightGen::EXIT_TO_RET,
-                              tgt, getClientInfo(tgt));  // w            
+                             Trans::getReturnSym(*rit),
+                             WeightGen::EXIT_TO_RET,
+                             tgt, getClientInfo(tgt));  // w            
 
         Key rstate = getControlLocation(src,Trans::getCallSite(*rit),tgt);    //p_q_xcr
 
@@ -5370,9 +5370,9 @@ namespace wali
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
         else
           wgt = wg.getWeight(src, getClientInfo(src),
-                              Trans::getInternalSym(*iit),
-                              WeightGen::INTRA,
-                              tgt, getClientInfo(tgt));          // w
+                             Trans::getInternalSym(*iit),
+                             WeightGen::INTRA,
+                             tgt, getClientInfo(tgt));          // w
 
         result.add_rule(program,                                //from_state (p)
                         tgt,                                    //from_stack (q')
@@ -5398,9 +5398,9 @@ namespace wali
               wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w
             else
               wgt = wg.getWeight(src, getClientInfo(src), 
-                                  Trans::getCallSym(*cit),
-                                  WeightGen::CALL_TO_ENTRY,  
-                                  tgt, getClientInfo(tgt)); // w    
+                                 Trans::getCallSym(*cit),
+                                 WeightGen::CALL_TO_ENTRY,  
+                                 tgt, getClientInfo(tgt)); // w    
 
             Key cstate = getControlLocation(tgt,Trans::getReturnSite(*rit),src);    //p_q_erc
 
@@ -5433,9 +5433,9 @@ namespace wali
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
         else
           wgt = wg.getWeight(src, getClientInfo(src),
-                              Trans::getReturnSym(*rit),
-                              WeightGen::EXIT_TO_RET,
-                              tgt, getClientInfo(tgt));  // w
+                             Trans::getReturnSym(*rit),
+                             WeightGen::EXIT_TO_RET,
+                             tgt, getClientInfo(tgt));  // w
 
         result.add_rule(program,                      //from_state (p)
                         tgt,                          //from_stack (q_r)
@@ -5483,15 +5483,15 @@ namespace wali
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
         else
           wgt = wg.getWeight(src, getClientInfo(src),
-                              Trans::getInternalSym(*iit),
-                              WeightGen::INTRA,
-                              tgt, getClientInfo(tgt));           // w
+                             Trans::getInternalSym(*iit),
+                             WeightGen::INTRA,
+                             tgt, getClientInfo(tgt));           // w
 
-          result.add_rule(program,                                //from_state (p)
-                          src,                                    //from_stack (q)
-                          program,                                //to_state (p)
-                          tgt,                                    //to_stack1 (q')
-                          wgt);                                   //weight (w)      
+        result.add_rule(program,                                //from_state (p)
+                        src,                                    //from_stack (q)
+                        program,                                //to_state (p)
+                        tgt,                                    //to_stack1 (q')
+                        wgt);                                   //weight (w)      
       }
 
       //Call Transitions
@@ -5508,9 +5508,9 @@ namespace wali
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w
         else
           wgt = wg.getWeight(src, getClientInfo(src),
-                              Trans::getCallSym(*cit),
-                              WeightGen::CALL_TO_ENTRY,
-                              tgt, getClientInfo(tgt));          // w
+                             Trans::getCallSym(*cit),
+                             WeightGen::CALL_TO_ENTRY,
+                             tgt, getClientInfo(tgt));          // w
 
         result.add_rule(program,                                //from_state (p)
                         src,                                    //from_stack (q_c)
@@ -5539,9 +5539,9 @@ namespace wali
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w 
         else
           wgt = wg.getWeight(src, getClientInfo(src), 
-                              Trans::getReturnSym(*rit),
-                              WeightGen::EXIT_TO_RET,  
-                              tgt, getClientInfo(tgt));    // w     
+                             Trans::getReturnSym(*rit),
+                             WeightGen::EXIT_TO_RET,  
+                             tgt, getClientInfo(tgt));    // w     
 
         //Note: if you change this, make sure you modify the code in NWPForest.createCA()
         Key rstate = getControlLocation(src,Trans::getCallSite(*rit),tgt);  //p_q_xcr
@@ -5599,9 +5599,9 @@ namespace wali
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
         else
           wgt = wg.getWeight(src, getClientInfo(src),
-                              Trans::getInternalSym(*iit),
-                              WeightGen::INTRA,
-                              tgt, getClientInfo(tgt));         // w
+                             Trans::getInternalSym(*iit),
+                             WeightGen::INTRA,
+                             tgt, getClientInfo(tgt));         // w
 
         result.add_rule(program,                                //from_state (p)
                         tgt,                                    //from_stack (q')
@@ -5627,9 +5627,9 @@ namespace wali
               wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w  
             else
               wgt = wg.getWeight(src, getClientInfo(src),
-                                  Trans::getCallSym(*cit),
-                                  WeightGen::CALL_TO_ENTRY,
-                                  tgt, getClientInfo(tgt));         // w                  
+                                 Trans::getCallSym(*cit),
+                                 WeightGen::CALL_TO_ENTRY,
+                                 tgt, getClientInfo(tgt));         // w                  
 
             Key cstate = getControlLocation(tgt,Trans::getReturnSite(*rit),src);  //p_q_erc
 
@@ -5662,9 +5662,9 @@ namespace wali
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); //w
         else
           wgt = wg.getWeight(src, getClientInfo(src),
-                              Trans::getReturnSym(*rit),
-                              WeightGen::EXIT_TO_RET,  
-                              tgt, getClientInfo(tgt));      //w
+                             Trans::getReturnSym(*rit),
+                             WeightGen::EXIT_TO_RET,  
+                             tgt, getClientInfo(tgt));      //w
          
         result.add_rule(program,                                //from_state (p)
                         tgt,                                    //from_stack (q_r)
@@ -5892,14 +5892,14 @@ namespace wali
       o << "    }\n";
 
       //initial state
-       StateSet initials = getInitialStates();
+      StateSet initials = getInitialStates();
       for(  StateSet::const_iterator it = initials.begin(); it != initials.end(); it++ )
       {
         printKey(o << "\"",*it,abbrev)<<"\" [ style=bold ]";
       }
 
       //final states
-       StateSet finals = getFinalStates();
+      StateSet finals = getFinalStates();
       for(  StateSet::const_iterator it = finals.begin(); it != finals.end(); it++ ) 
       {
         printKey(o << "\"",*it,abbrev) <<"\" [ peripheries=2 ]";
@@ -5948,7 +5948,7 @@ namespace wali
         {
           // For each Sym, holds the set of call predecessors for which
           // (exit, pred, sym, return) is in delta_r
-           std::map<Symbol, StateSet > returns;
+          std::map<Symbol, StateSet > returns;
 
           // Populate it:
           for(ReturnIterator trans = beginReturnTrans(); trans != endReturnTrans(); ++trans)
@@ -5962,13 +5962,13 @@ namespace wali
 
           // Now add an edge for each return symbol
           for( std::map<Symbol, StateSet >::const_iterator trans = returns.begin();
-              trans != returns.end(); ++trans)
+               trans != returns.end(); ++trans)
           {
             std::stringstream ss;
             printKey(ss, trans->first,abbrev);
             ss << ";{";
             for( StateSet::const_iterator prediter = trans->second.begin();
-                prediter != trans->second.end(); ++prediter)
+                 prediter != trans->second.end(); ++prediter)
             {
               printKey(ss, *prediter, abbrev) << ";";
             }
@@ -6001,8 +6001,8 @@ namespace wali
     bool NWA::operator==( const NWA & other ) const
     {
       return ( (states == other.states) 
-              && (symbols == other.symbols) 
-              && (trans == other.trans) );
+               && (symbols == other.symbols) 
+               && (trans == other.trans) );
     }
 
     //TODO: add methods like ...
@@ -6033,7 +6033,7 @@ namespace wali
      */
     
     
-     NWA::stateIterator NWA::beginStates( ) const
+    NWA::stateIterator NWA::beginStates( ) const
     {
       return states.beginStates();
     }
@@ -6047,7 +6047,7 @@ namespace wali
      */
     
     
-     NWA::stateIterator NWA::endStates( ) const
+    NWA::stateIterator NWA::endStates( ) const
     {
       return states.endStates();
     }
@@ -6077,7 +6077,7 @@ namespace wali
      */ 
     
     
-     NWA::stateIterator NWA::beginInitialStates( ) const
+    NWA::stateIterator NWA::beginInitialStates( ) const
     {
       return states.beginInitialStates();
     }
@@ -6091,7 +6091,7 @@ namespace wali
      */
     
     
-     NWA::stateIterator NWA::endInitialStates( ) const
+    NWA::stateIterator NWA::endInitialStates( ) const
     {
       return states.endInitialStates();
     }
@@ -6121,7 +6121,7 @@ namespace wali
      */
     
     
-     NWA::stateIterator NWA::beginFinalStates( ) const
+    NWA::stateIterator NWA::beginFinalStates( ) const
     {
       return states.beginFinalStates();
     }
@@ -6135,7 +6135,7 @@ namespace wali
      */
     
     
-     NWA::stateIterator NWA::endFinalStates( ) const
+    NWA::stateIterator NWA::endFinalStates( ) const
     {
       return states.endFinalStates();
     }
@@ -6163,7 +6163,7 @@ namespace wali
      */
     
     
-     NWA::symbolIterator NWA::beginSymbols( ) const
+    NWA::symbolIterator NWA::beginSymbols( ) const
     {
       return symbols.beginSymbols();
     }
@@ -6177,7 +6177,7 @@ namespace wali
      */
     
     
-     NWA::symbolIterator NWA::endSymbols( ) const
+    NWA::symbolIterator NWA::endSymbols( ) const
     {
       return symbols.endSymbols();
     }
@@ -6191,7 +6191,7 @@ namespace wali
      */
     
     
-     NWA::CallIterator NWA::beginCallTrans( ) const
+    NWA::CallIterator NWA::beginCallTrans( ) const
     {
       return trans.beginCall();
     }
@@ -6205,7 +6205,7 @@ namespace wali
      */
     
     
-     NWA::CallIterator NWA::endCallTrans( ) const
+    NWA::CallIterator NWA::endCallTrans( ) const
     {
       return trans.endCall();
     }
@@ -6219,7 +6219,7 @@ namespace wali
      */
     
     
-     NWA::InternalIterator NWA::beginInternalTrans( ) const
+    NWA::InternalIterator NWA::beginInternalTrans( ) const
     {
       return trans.beginInternal();
     }
@@ -6233,7 +6233,7 @@ namespace wali
      */
     
     
-     NWA::InternalIterator NWA::endInternalTrans( ) const
+    NWA::InternalIterator NWA::endInternalTrans( ) const
     {
       return trans.endInternal();
     }
@@ -6247,7 +6247,7 @@ namespace wali
      */
     
     
-     NWA::ReturnIterator NWA::beginReturnTrans( ) const
+    NWA::ReturnIterator NWA::beginReturnTrans( ) const
     {
       return trans.beginReturn();
     }
@@ -6261,7 +6261,7 @@ namespace wali
      */
     
     
-     NWA::ReturnIterator NWA::endReturnTrans( ) const
+    NWA::ReturnIterator NWA::endReturnTrans( ) const
     {
       return trans.endReturn();
     }
@@ -6354,39 +6354,39 @@ namespace wali
 
       for(symbolIterator sym = beginSymbols(); sym != endSymbols(); ++sym)
       {
-          os << "    <" << SymbolStorage::XMLSymbolTag() << " " << SymbolStorage::XMLNameAttr() << "=\"" << key2str(*sym) << "\"/>\n";
+        os << "    <" << SymbolStorage::XMLSymbolTag() << " " << SymbolStorage::XMLNameAttr() << "=\"" << key2str(*sym) << "\"/>\n";
       }
 
       for(stateIterator state = beginStates(); state != endStates(); ++state)
       {
-          os << "    <" << StateStorage::XMLStateTag() << " ";
-          os << StateStorage::XMLNameAttr() << "=\"" << key2str(*state) << "\"";
-          if(isInitialState(*state)) os << " " << StateStorage::XMLInitialAttr() << "=\"TRUE\"";
-          if(isFinalState(*state)) os << " " << StateStorage::XMLFinalAttr() << "=\"TRUE\"";
-          os << "/>\n";
+        os << "    <" << StateStorage::XMLStateTag() << " ";
+        os << StateStorage::XMLNameAttr() << "=\"" << key2str(*state) << "\"";
+        if(isInitialState(*state)) os << " " << StateStorage::XMLInitialAttr() << "=\"TRUE\"";
+        if(isFinalState(*state)) os << " " << StateStorage::XMLFinalAttr() << "=\"TRUE\"";
+        os << "/>\n";
       }
 
       for(CallIterator call = trans.beginCall(); call != trans.endCall(); ++call)
       {
-          os << "    <" << Trans::CallXMLTag() << " ";
-          os << Trans::XMLFromAttr() <<"=\"" << key2str(call->first) << "\" ";
-          os << Trans::XMLSymbolAttr() << "=\"" << key2str(call->second) << "\" ";
-          os << Trans::XMLToAttr() << "=\"" << key2str(call->third) << "\"/>\n";
+        os << "    <" << Trans::CallXMLTag() << " ";
+        os << Trans::XMLFromAttr() <<"=\"" << key2str(call->first) << "\" ";
+        os << Trans::XMLSymbolAttr() << "=\"" << key2str(call->second) << "\" ";
+        os << Trans::XMLToAttr() << "=\"" << key2str(call->third) << "\"/>\n";
       }
       for(InternalIterator internal = trans.beginInternal(); internal != trans.endInternal(); ++internal)
       {
-          os << "    <" << Trans::InternalXMLTag() << " ";
-          os << Trans::XMLFromAttr() <<"=\"" << key2str(internal->first) << "\" ";
-          os << Trans::XMLSymbolAttr() << "=\"" << key2str(internal->second) << "\" ";
-          os << Trans::XMLToAttr() << "=\"" << key2str(internal->third) << "\"/>\n";
+        os << "    <" << Trans::InternalXMLTag() << " ";
+        os << Trans::XMLFromAttr() <<"=\"" << key2str(internal->first) << "\" ";
+        os << Trans::XMLSymbolAttr() << "=\"" << key2str(internal->second) << "\" ";
+        os << Trans::XMLToAttr() << "=\"" << key2str(internal->third) << "\"/>\n";
       }
       for(ReturnIterator return_ = trans.beginReturn(); return_ != trans.endReturn(); ++return_)
       {
-          os << "    <" << Trans::ReturnXMLTag() << " ";
-          os << Trans::XMLFromAttr() <<"=\"" << key2str(return_->first) << "\" ";
-          os << Trans::XMLPredAttr() <<"=\"" << key2str(return_->second) << "\" ";
-          os << Trans::XMLSymbolAttr() << "=\"" << key2str(return_->third) << "\" ";
-          os << Trans::XMLToAttr() << "=\"" << key2str(return_->fourth) << "\"/>\n";
+        os << "    <" << Trans::ReturnXMLTag() << " ";
+        os << Trans::XMLFromAttr() <<"=\"" << key2str(return_->first) << "\" ";
+        os << Trans::XMLPredAttr() <<"=\"" << key2str(return_->second) << "\" ";
+        os << Trans::XMLSymbolAttr() << "=\"" << key2str(return_->third) << "\" ";
+        os << Trans::XMLToAttr() << "=\"" << key2str(return_->fourth) << "\"/>\n";
       }
 
 
@@ -6457,22 +6457,22 @@ namespace wali
           // call stack in each case.
           for( std::set<Configuration>::const_iterator config = currConfigs.begin();
                config != currConfigs.end(); ++config)
-            {
-              // Use trans.getReturns to get the matching return transitions out
-              // of the "current" state, then separately check to see whether the
-              // call predecessor matches.
-              Returns rets = trans.getReturns(config->state, curpos->symbol);
-              for( ReturnIterator rit = rets.begin(); rit != rets.end(); rit++ ) {
-                if( Trans::getCallSite(*rit) == config->callPredecessors.back() ) {
-                  // Construct a new configuration that's the same as the old
-                  // configuration, except with a popped stack and new state
-                  Configuration c(*config);
-                  c.callPredecessors.pop_back();
-                  c.state = Trans::getReturnSite(*rit);
-                  nextConfigs.insert(c);
-                }
+          {
+            // Use trans.getReturns to get the matching return transitions out
+            // of the "current" state, then separately check to see whether the
+            // call predecessor matches.
+            Returns rets = trans.getReturns(config->state, curpos->symbol);
+            for( ReturnIterator rit = rets.begin(); rit != rets.end(); rit++ ) {
+              if( Trans::getCallSite(*rit) == config->callPredecessors.back() ) {
+                // Construct a new configuration that's the same as the old
+                // configuration, except with a popped stack and new state
+                Configuration c(*config);
+                c.callPredecessors.pop_back();
+                c.state = Trans::getReturnSite(*rit);
+                nextConfigs.insert(c);
               }
             }
+          }
         }
         else if( curpos->type == NestedWord::Position::CallType ) {  //Denotes a call transition.
           // Determine the possible next configurations for each current config.
@@ -6553,4 +6553,11 @@ namespace wali
 
   }
 }
+
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
 
