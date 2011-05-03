@@ -461,29 +461,53 @@ namespace wali
       }
       
 
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       bool getSymbol( State from, State to, Symbol & sym ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       bool findTrans( State from, Symbol sym, State to ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       const  SymbolSet getSymbols( State source, State target ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       const  SymbolSet getSymbolsFrom( State source ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       const  SymbolSet getSymbolsTo( State target ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       void getPredecessors( State state,  StateSet & preds ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       const  StateSet getPredecessors( State state ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       void getPredecessors( Symbol symbol, State state,  StateSet & preds ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       const  StateSet getPredecessors( Symbol symbol, State state ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       void getSuccessors( State state,  StateSet & succs ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       const  StateSet getSuccessors( State state ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       void getSuccessors( State state, Symbol symbol,  StateSet & succs ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       const  StateSet getSuccessors( State state, Symbol symbol ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       const  SymbolSet getCallRetSymbols( State call, State ret ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       const  SymbolSet getCallRetSymbolsFrom( State call ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       const  SymbolSet getCallRetSymbolsTo( State ret ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       void getCallPredecessors( State state,  StateSet & c_preds ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       const  StateSet getCallPredecessors( State state ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       void getCallPredecessors( Symbol symbol, State state,  StateSet & c_preds ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       const  StateSet getCallPredecessors( Symbol symbol, State state ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       void getCallSuccessors( State state,  StateSet & c_succs ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       const  StateSet getCallSuccessors( State state ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       void getCallSuccessors( State state, Symbol symbol,  StateSet & c_succs ) const;
+      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
       const  StateSet getCallSuccessors( State state, Symbol symbol ) const;
 
       

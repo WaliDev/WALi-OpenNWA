@@ -1,6 +1,7 @@
 #include "wali/nwa/NWA.hpp"
 #include "wali/nwa/details/Configuration.hpp"
 #include "wali/nwa/NestedWord.hpp"
+#include "wali/nwa/query/transitions.hpp"
 
 namespace wali
 {
@@ -475,6 +476,8 @@ namespace wali
       clearTrans();
     }
 
+
+    
     //Transition Accessors
 
     /**
@@ -666,7 +669,7 @@ namespace wali
     const StateSet NWA::getPredecessors( State state ) const
     {
       StateSet preds;
-      getPredecessors(state, preds);
+      query::getPredecessors(*this, state, preds);
       return preds;
     }
 
@@ -719,7 +722,7 @@ namespace wali
     const std::set< State> NWA::getPredecessors( Symbol symbol, State state ) const
     {
       StateSet preds;
-      getPredecessors(symbol, state, preds);
+      query::getPredecessors(*this, symbol, state, preds);
       return preds;
     }
 
@@ -760,7 +763,7 @@ namespace wali
     const std::set< State> NWA::getSuccessors( State state ) const
     {
       StateSet succs;
-      getSuccessors(state, succs);
+      query::getSuccessors(*this, state, succs);
       return succs;
     }
 
@@ -813,7 +816,7 @@ namespace wali
     const std::set< State> NWA::getSuccessors( State state, Symbol symbol ) const
     {
       StateSet succs;
-      getSuccessors(state, symbol, succs);
+      query::getSuccessors(*this, state, symbol, succs);
       return succs;
     }
 
@@ -929,7 +932,7 @@ namespace wali
       assert(state < wali::WALI_BAD_KEY);
       
       StateSet c_preds;
-      getCallPredecessors(state, c_preds);
+      query::getCallPredecessors(*this, state, c_preds);
       return c_preds;
     }
       
@@ -972,7 +975,7 @@ namespace wali
     const std::set< State> NWA::getCallPredecessors( Symbol symbol, State state ) const
     {
       StateSet c_preds;
-      getCallPredecessors(symbol, state, c_preds);
+      query::getCallPredecessors(*this, symbol, state, c_preds);
       return c_preds;
     }
 
@@ -1005,7 +1008,7 @@ namespace wali
     const std::set< State> NWA::getCallSuccessors( State state ) const
     {
       StateSet c_succs;
-      getCallSuccessors(state, c_succs);
+      query::getCallSuccessors(*this, state, c_succs);
       return c_succs;
     }
 
@@ -1048,7 +1051,7 @@ namespace wali
     const std::set< State> NWA::getCallSuccessors( State state, Symbol symbol ) const
     {
       StateSet c_succs;
-      getCallSuccessors(state, symbol, c_succs);
+      query::getCallSuccessors(*this, state, symbol, c_succs);
       return c_succs;
     }
 
