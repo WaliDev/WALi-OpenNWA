@@ -1,5 +1,5 @@
-#ifndef wali_nwa_NWA_GUARD
-#define wali_nwa_NWA_GUARD 1
+#ifndef wali_nwa_query_INTERNALS_HPP
+#define wali_nwa_query_INTERNALS_HPP
 
 #include "wali/nwa/NWAFwd.hpp"
 
@@ -68,7 +68,7 @@ namespace wali
        * @return the set of sources of all internal transitions in the NWA
        *
        */
-      extern const  StateSet getSources(NWA const & nwa, );
+      extern const  StateSet getSources(NWA const & nwa );
 
       /**
        * 
@@ -80,7 +80,7 @@ namespace wali
        * @return the set of symbols that label internal transitions in the NWA
        *
        */
-      extern const  SymbolSet getInternalSym(NWA const & nwa, );
+      extern const  SymbolSet getInternalSym(NWA const & nwa );
 
       /**
        * 
@@ -180,7 +180,7 @@ namespace wali
        * @return the set of targets of all internal transitions in the NWA
        *
        */
-      extern const  StateSet getTargets(NWA const & nwa, );      
+      extern const  StateSet getTargets(NWA const & nwa);
     }
   }
 }

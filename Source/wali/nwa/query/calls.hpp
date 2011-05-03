@@ -1,5 +1,5 @@
-#ifndef wali_nwa_NWA_GUARD
-#define wali_nwa_NWA_GUARD 1
+#ifndef wali_nwa_query_CALLS_HPP
+#define wali_nwa_query_CALLS_HPP
 
 #include "wali/nwa/NWAFwd.hpp"
 
@@ -67,7 +67,7 @@ namespace wali
        * @return the set of call sites of all call transitions in the NWA
        *
        */
-      extern const  StateSet getCallSites(NWA const & nwa, );
+      extern const  StateSet getCallSites(NWA const & nwa );
 
       /**
        * 
@@ -79,7 +79,7 @@ namespace wali
        * @return the set of symbols that label call transitions in the NWA
        *
        */
-      extern const  SymbolSet getCallSym(NWA const & nwa, );
+      extern const  SymbolSet getCallSym(NWA const & nwa );
 
       /**
        * 
@@ -179,7 +179,7 @@ namespace wali
        * @return the set of entry points of all call transitions in the NWA
        *
        */
-      extern const  StateSet getEntries(NWA const & nwa, );      
+      extern const  StateSet getEntries(NWA const & nwa );      
     }
   }
 }

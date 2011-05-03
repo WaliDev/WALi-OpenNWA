@@ -1,5 +1,5 @@
-#ifndef wali_nwa_NWA_GUARD
-#define wali_nwa_NWA_GUARD 1
+#ifndef wali_nwa_query_RETURNS_HPP
+#define wali_nwa_query_RETURNS_HPP
 
 #include "wali/nwa/NWAFwd.hpp"
 
