@@ -1047,7 +1047,7 @@ namespace wali
      *			respect to the given symbol
      *
      */
-	
+
     const std::set< State> NWA::getCallSuccessors( State state, Symbol symbol ) const
     {
       StateSet c_succs;
