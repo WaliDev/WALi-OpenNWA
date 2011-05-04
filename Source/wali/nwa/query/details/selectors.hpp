@@ -38,7 +38,6 @@ namespace wali
         /// the overload thing.)
         namespace selectors
         {
-
           /// This class selects the whole transition
           struct CallTransitionSelector
           {
