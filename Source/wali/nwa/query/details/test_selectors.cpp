@@ -4,11 +4,21 @@
 #include <cassert>
 #include <iostream>
 #include <typeinfo>
+#include <vector>
 
 using wali::Key;
 using wali::nwa::NWA;
 using namespace wali::nwa::query::details::selectors;
 using namespace wali::nwa::query::details::predicates;
+using namespace wali::nwa::query::details::filter;
+
+struct IdSelector
+{
+    typedef int type;
+    int operator()(int x) {
+        return x;
+    }
+};
 
 std::pair<Key, Key>
 make_key_pair(int a, int b)
@@ -67,6 +77,44 @@ int main(int argc, char**argv)
     assert( !makeSelectorEqualityPredicate(SymbolSelector(), 30)(i) );
     assert( !makeSelectorEqualityPredicate(SymbolSelector(), 300)(r) );
 
+
+    ///////////////////
+    // Test IteratorPairIterator
+
+    const int arr[] = {0, 1, 0, 2, 3, 4, 5, 0, 12};
+    const int arr_size = sizeof(arr)/sizeof(arr[0]);
+
+    {
+        IteratorPairIterator<const int*> ii(arr, arr+arr_size);
+
+        for (int c=0; c<arr_size; ++c) {
+            assert( !ii.atEnd() );
+            assert( *ii == arr[c] );
+            ++ii;
+        }
+        assert( ii.atEnd() );
+    }
+    
+
+    //////////////////
+    // Test FilterIterator
+
+    {
+        IteratorPairIterator<const int*> ii(arr, arr+arr_size);
+
+        int num_zeroes = 0;
+        for(FilteringIterator<IteratorPairIterator<const int*>,
+                              SelectorEqualityPredicate<IdSelector> >
+                fi(ii, makeSelectorEqualityPredicate(IdSelector(), 0));
+            !fi.atEnd(); ++fi)
+        {
+            ++num_zeroes;
+        }
+        assert( num_zeroes == 3 );
+    }
+
+        
+    
     
 
     if (argc > 1) {
@@ -75,3 +123,9 @@ int main(int argc, char**argv)
         assert(false);
     }
 }
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 4
+// End:
