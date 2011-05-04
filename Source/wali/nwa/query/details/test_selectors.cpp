@@ -1,4 +1,5 @@
 #include "wali/nwa/query/details/selectors.hpp"
+#include "wali/nwa/query/details/filters.hpp"
 
 #include <cassert>
 #include <iostream>
@@ -7,6 +8,7 @@
 using wali::Key;
 using wali::nwa::NWA;
 using namespace wali::nwa::query::details::selectors;
+using namespace wali::nwa::query::details::predicates;
 
 std::pair<Key, Key>
 make_key_pair(int a, int b)
@@ -47,6 +49,24 @@ int main(int argc, char**argv)
     assert(( PairSelector<SourceSelector, TargetSelector>()(r) == make_key_pair(100, 300) ));
 
     assert(( PairSelector<SourceSelector, CallPredecessorSelector>()(r) == make_key_pair(100, 500) ));
+
+
+    ////////////////////
+    // Test predicates
+
+    SelectorEqualityPredicate<SourceSelector> source_matcher(SourceSelector(), 1);
+    
+    assert( makeSelectorEqualityPredicate(SourceSelector(), 1)(c) );
+    assert( !makeSelectorEqualityPredicate(SourceSelector(), 0)(c) );
+
+    assert( makeSelectorEqualityPredicate(SymbolSelector(), 2)(c) );
+    assert( makeSelectorEqualityPredicate(SymbolSelector(), 20)(i) );
+    assert( makeSelectorEqualityPredicate(SymbolSelector(), 200)(r) );
+    
+    assert( !makeSelectorEqualityPredicate(SymbolSelector(), 3)(c) );
+    assert( !makeSelectorEqualityPredicate(SymbolSelector(), 30)(i) );
+    assert( !makeSelectorEqualityPredicate(SymbolSelector(), 300)(r) );
+
     
 
     if (argc > 1) {
