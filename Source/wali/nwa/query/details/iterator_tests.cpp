@@ -15,17 +15,19 @@ using namespace wali::nwa::query::details::iterators;
 
 int main(int argc, char** argv)
 {
-    cplusplus_iterator_adapter<std::vector<int>::iterator> a_begin(v.begin());
-    cplusplus_iterator_adapter<std::vector<int>::iterator> a_end(v.end());
+    cplusplus_iterator_adapter<std::vector<int>::const_iterator> a_begin(v.begin());
+    cplusplus_iterator_adapter<std::vector<int>::const_iterator> a_end(v.end());
 
     //assert(a_begin == a_end);
     
     const int* pi = arr;
-    std::vector<int>::iterator vi = v.begin();
-    iterator_base_wrapper<int> ii(a_begin);
-    iterator_base_wrapper<int> ii_end(a_end);
+    std::vector<int>::const_iterator vi = v.begin();
+    iterator_base_wrapper<int, const int&> ii(a_begin);
+    iterator_base_wrapper<int, const int&> ii_end(a_end);
+
+
     
-    iterator_base_wrapper<int> ii2 = ii;
+    iterator_base_wrapper<int, const int&> ii2 = ii;
     
 
     while(ii != ii_end) {
@@ -43,14 +45,13 @@ int main(int argc, char** argv)
 
     assert( *ii2 == arr[0] );
 
-
     //////////
 
     const int num = 5;
 
-    iterator_sequence<std::vector<int>::iterator> sequence;
-    iterator_sequence<std::vector<int>::iterator> end;
-    
+    iterator_sequence<std::vector<int>::const_iterator> sequence;
+    iterator_sequence<std::vector<int>::const_iterator> end;
+
     for(int i=0; i<num; ++i) {
         sequence.append_range(v.begin(), v.end());
     }
@@ -61,9 +62,7 @@ int main(int argc, char** argv)
             assert(*sequence == *vi);
         }
     }
-
     assert(sequence == end);
-
 
 
     if (argc > 1) {
@@ -71,5 +70,4 @@ int main(int argc, char** argv)
         std::cerr << "\n****\nThere should be an error here; this is making sure assert is enabled\n";
         assert(false);
     }
-
 }

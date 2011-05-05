@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include <boost/iterator/iterator_facade.hpp>
+#include <boost/iterator/iterator_adaptor.hpp>
 #include <boost/shared_ptr.hpp>
 
 namespace wali
@@ -24,17 +25,18 @@ namespace wali
 
           /// The following adapts any iterator with the same element type so
           /// that the iterator can be used
-          template<typename ValueType>
+          template<typename ValueType, typename ReferenceType /*= ValueType&*/>
           class iterator_base
-            : public boost::iterator_facade<iterator_base<ValueType>,
+            : public boost::iterator_facade<iterator_base<ValueType, ReferenceType>,
                                             ValueType,
-                                            boost::forward_traversal_tag>
+                                            boost::forward_traversal_tag,
+                                            ReferenceType>
           {
-          protected:
             friend class boost::iterator_core_access;
-           
+            
+          protected:
             virtual void increment() = 0;
-            virtual ValueType & dereference() const = 0;
+            virtual ReferenceType dereference() const = 0;
 
           public:
             virtual bool equal(iterator_base const & other) const = 0;
@@ -44,11 +46,13 @@ namespace wali
 
           template<typename CPlusPlusIterator>
           class cplusplus_iterator_adapter
-            : public iterator_base<typename std::iterator_traits<CPlusPlusIterator>::value_type>
+            : public iterator_base<typename std::iterator_traits<CPlusPlusIterator>::value_type,
+                                   typename std::iterator_traits<CPlusPlusIterator>::reference>
           {
           private:
             CPlusPlusIterator backing;
             typedef typename std::iterator_traits<CPlusPlusIterator>::value_type ValueType;
+            typedef typename std::iterator_traits<CPlusPlusIterator>::reference Reference;
 
           public:
             cplusplus_iterator_adapter()
@@ -68,13 +72,12 @@ namespace wali
               return new cplusplus_iterator_adapter(*this);
             }
 
-
             virtual void increment()
             {
               ++backing;
             }
 
-            virtual bool equal(iterator_base<ValueType> const & other) const
+            virtual bool equal(iterator_base<ValueType, Reference> const & other) const
             {
               const cplusplus_iterator_adapter * p =
                 dynamic_cast<cplusplus_iterator_adapter const*>(&other);
@@ -87,7 +90,7 @@ namespace wali
               }
             }
 
-            ValueType & dereference() const
+            Reference dereference() const
             {
               return *backing;
             }
@@ -95,17 +98,18 @@ namespace wali
           
 
 
-          template<typename ValueType>
+          template<typename ValueType, typename ReferenceType>
           class iterator_base_wrapper
-            : public boost::iterator_facade<iterator_base_wrapper<ValueType>,
+            : public boost::iterator_facade<iterator_base_wrapper<ValueType, ReferenceType>,
                                             ValueType,
-                                            boost::forward_traversal_tag>
+                                            boost::forward_traversal_tag,
+                                            ReferenceType>
           {
           private:
             // iterator_base_wrapper acts as the RAII class for this. I
             // really want a cloning smart pointer, but there isn't one
             // standard. So I'll do it myself.
-            iterator_base<ValueType> * backing;
+            iterator_base<ValueType, ReferenceType> * backing;
 
           public:
             iterator_base_wrapper()
@@ -116,7 +120,7 @@ namespace wali
               : backing(other.backing->clone())
             {}
 
-            explicit iterator_base_wrapper(iterator_base<ValueType> const & base)
+            explicit iterator_base_wrapper(iterator_base<ValueType, ReferenceType> const & base)
               : backing(base.clone())
             {}
 
@@ -159,7 +163,7 @@ namespace wali
               return backing->equal(*other.backing);
             }
 
-            ValueType & dereference() const
+            ReferenceType dereference() const
             {
               return **backing;
             }
@@ -170,11 +174,13 @@ namespace wali
           class iterator_sequence
             : public boost::iterator_facade<iterator_sequence<BackingIterator>,
                                             typename std::iterator_traits<BackingIterator>::value_type,
-                                            boost::forward_traversal_tag>
+                                            boost::forward_traversal_tag,
+                                            typename std::iterator_traits<BackingIterator>::reference>
           {
           public:
             typedef std::pair<BackingIterator, BackingIterator> IteratorRange;
             typedef typename std::iterator_traits<BackingIterator>::value_type ValueType;
+            typedef typename std::iterator_traits<BackingIterator>::reference Reference;
 
           private:
             boost::shared_ptr<std::deque<IteratorRange> > ranges;
@@ -195,8 +201,8 @@ namespace wali
               ++(ranges->front().first);
               dump_empty_ranges();
             }
-
-            ValueType & dereference() const
+            
+            Reference dereference() const
             {
               return *(ranges->front().first);
             }
