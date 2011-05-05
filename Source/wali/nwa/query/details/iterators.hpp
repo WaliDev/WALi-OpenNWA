@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include <boost/iterator/iterator_facade.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace wali
 {
@@ -163,7 +164,74 @@ namespace wali
               return **backing;
             }
           };
+
+
+          template <typename BackingIterator>
+          class iterator_sequence
+            : public boost::iterator_facade<iterator_sequence<BackingIterator>,
+                                            typename std::iterator_traits<BackingIterator>::value_type,
+                                            boost::forward_traversal_tag>
+          {
+          public:
+            typedef std::pair<BackingIterator, BackingIterator> IteratorRange;
+            typedef typename std::iterator_traits<BackingIterator>::value_type ValueType;
+
+          private:
+            boost::shared_ptr<std::deque<IteratorRange> > ranges;
+
+            void dump_empty_ranges()
+            {
+              while (!ranges->empty() && ranges->front().first == ranges->front().second) {
+                ranges->pop_front();
+              }
+            }
+
+          protected:
+            friend class boost::iterator_core_access;
+
+            void increment()
+            {
+              // 'current' is ranges[0].first, so increment it
+              ++(ranges->front().first);
+              dump_empty_ranges();
+            }
+
+            ValueType & dereference() const
+            {
+              return *(ranges->front().first);
+            }
+
+            bool equal(iterator_sequence const & other) const
+            {
+              if (ranges->empty() && other.ranges->empty()) {
+                return true;
+              }
+              else if (ranges->empty() && other.ranges->empty()) {
+                return false;
+              }
+              else {
+                return ranges->front().first == other.ranges->front().first;
+              }
+            }
+
+          public:
+            iterator_sequence()
+              : ranges(new std::deque<IteratorRange>())
+            {}
             
+            iterator_sequence(iterator_sequence const & other)
+              : ranges(other.ranges)
+            {}
+
+            void append_range(BackingIterator left, BackingIterator right)
+            {
+              if (left != right) {
+                ranges->push_back(IteratorRange(left, right));
+              }
+            }
+          };
+
+          
         }
       }
     }

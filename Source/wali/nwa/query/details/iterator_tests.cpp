@@ -1,7 +1,9 @@
 #include "wali/nwa/query/details/iterators.hpp"
 
+#include <iostream>
 #include <cassert>
 #include <vector>
+#include <iterator>
 
 const int arr[] = {0,1,2,3,4,5,6,7,8,9,10};
 const int size_arr = sizeof(arr)/sizeof(arr[0]);
@@ -40,6 +42,27 @@ int main(int argc, char** argv)
 
 
     assert( *ii2 == arr[0] );
+
+
+    //////////
+
+    const int num = 5;
+
+    iterator_sequence<std::vector<int>::iterator> sequence;
+    iterator_sequence<std::vector<int>::iterator> end;
+    
+    for(int i=0; i<num; ++i) {
+        sequence.append_range(v.begin(), v.end());
+    }
+
+    for(int i=0; i<num; ++i) {
+        for(std::vector<int>::const_iterator vi = v.begin(); vi != v.end(); ++vi, ++sequence) {
+            assert(sequence != end);
+            assert(*sequence == *vi);
+        }
+    }
+
+    assert(sequence == end);
 
 
 
