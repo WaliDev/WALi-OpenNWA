@@ -7,7 +7,7 @@ CXXFLAGS=-I../.. -I$(OPENFST_DIR)/src/include -g
 LDFLAGS=-lwali -L../../../lib64 -g
 #LDFLAGS+=-lfst -L$(OPENFST_DIR)/src/lib/.libs
 
-all: run-selector-tests
+all: run-iterator-tests
 
 #run-nwa-tests: NWA-tests
 #	echo "Running tests:"
@@ -21,7 +21,14 @@ run-parser-tests: NwaParserTests
 	echo "Running tests:"
 	./NwaParserTests 3
 
+run-iterator-tests: iterator-tests
+	echo "Running tests:"
+	./iterator-tests 3
+
 NwaParserTests: NwaParserMain.o wali
+	$(CXX) $(LDFLAGS) -o $@ $< $(LOADLIBES) $(LDLIBS)
+
+iterator-tests: iterator_tests.o
 	$(CXX) $(LDFLAGS) -o $@ $< $(LOADLIBES) $(LDLIBS)
 
 #NWA-tests: NWA-tests.o wali
@@ -31,6 +38,9 @@ test_selectors: test_selectors.o wali
 	$(CXX) $(LDFLAGS) -o $@ $< $(LOADLIBES) $(LDLIBS)
 
 test_selectors.o: query/details/test_selectors.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+iterator_tests.o: query/details/iterator_tests.cpp query/details/iterators.hpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 NwaParserMain.o: NwaParserMain.cpp
