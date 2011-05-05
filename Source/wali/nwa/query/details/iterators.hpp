@@ -1,5 +1,5 @@
-#ifndef wali_nwa_query_details_FILTER_HPP
-#define wali_nwa_query_details_FILTER_HPP
+#ifndef wali_nwa_query_details_ITERATORS_HPP
+#define wali_nwa_query_details_ITERATORS_HPP
 
 #include "wali/nwa/NWA.hpp"
 

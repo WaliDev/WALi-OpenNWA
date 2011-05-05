@@ -1,5 +1,6 @@
 #include "wali/nwa/query/details/selectors.hpp"
 #include "wali/nwa/query/details/filters.hpp"
+#include "wali/nwa/query/details/genesis.hpp"
 
 #include <cassert>
 #include <iostream>
