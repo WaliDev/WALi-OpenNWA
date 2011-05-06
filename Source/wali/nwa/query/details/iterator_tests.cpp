@@ -22,12 +22,12 @@ int main(int argc, char** argv)
     
     const int* pi = arr;
     std::vector<int>::const_iterator vi = v.begin();
-    iterator_base_wrapper<int, const int&> ii(a_begin);
-    iterator_base_wrapper<int, const int&> ii_end(a_end);
+    iterator_base_wrapper<const int> ii(a_begin);
+    iterator_base_wrapper<const int> ii_end(a_end);
 
 
     
-    iterator_base_wrapper<int, const int&> ii2 = ii;
+    iterator_base_wrapper<const int> ii2 = ii;
     
 
     while(ii != ii_end) {

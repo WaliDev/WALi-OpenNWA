@@ -25,7 +25,7 @@ namespace wali
 
           /// The following adapts any iterator with the same element type so
           /// that the iterator can be used
-          template<typename ValueType, typename ReferenceType /*= ValueType&*/>
+          template<typename ValueType, typename ReferenceType = ValueType &>
           class iterator_base
             : public boost::iterator_facade<iterator_base<ValueType, ReferenceType>,
                                             ValueType,
@@ -98,7 +98,7 @@ namespace wali
           
 
 
-          template<typename ValueType, typename ReferenceType>
+          template<typename ValueType, typename ReferenceType = ValueType &>
           class iterator_base_wrapper
             : public boost::iterator_facade<iterator_base_wrapper<ValueType, ReferenceType>,
                                             ValueType,
@@ -120,7 +120,8 @@ namespace wali
               : backing(other.backing->clone())
             {}
 
-            explicit iterator_base_wrapper(iterator_base<ValueType, ReferenceType> const & base)
+            template<typename V, typename R>
+            explicit iterator_base_wrapper(iterator_base<V, R> const & base)
               : backing(base.clone())
             {}
 
