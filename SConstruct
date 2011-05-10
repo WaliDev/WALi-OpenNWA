@@ -107,7 +107,7 @@ Export('ProgEnv')
 if 'help' not in COMMAND_LINE_TARGETS:
     ## ##################
     ## libwali
-    built = SConscript('Source/SConscript', build_dir=BuildDir,duplicate=0)
+    built = SConscript('Source/SConscript', variant_dir=BuildDir,duplicate=0)
     #built += SConscript('Doc/tex/SConscript')
 
     ## ##################
