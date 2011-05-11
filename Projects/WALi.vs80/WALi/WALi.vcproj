@@ -661,6 +661,26 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="query"
+					>
+					<File
+						RelativePath="..\..\..\Source\wali\nwa\query\calls.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\Source\wali\nwa\query\internals.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\Source\wali\nwa\query\returns.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\Source\wali\nwa\query\transitions.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1112,6 +1132,26 @@
 					</File>
 					<File
 						RelativePath="..\..\..\Source\wali\nwa\details\TransitionStorage.hpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="query"
+					>
+					<File
+						RelativePath="..\..\..\Source\wali\nwa\query\calls.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\Source\wali\nwa\query\internals.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\Source\wali\nwa\query\returns.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\Source\wali\nwa\query\transitions.hpp"
 						>
 					</File>
 				</Filter>
