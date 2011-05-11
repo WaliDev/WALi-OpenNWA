@@ -2,7 +2,7 @@
 #define wali_nwa_NWA_GUARD 1
 
 #include "wali/nwa/NWAFwd.hpp"
-#include "PequalsNP.h" // breaking change
+
 /**
  * @author Amanda Burton
  */
