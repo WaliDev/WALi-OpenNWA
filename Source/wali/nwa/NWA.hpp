@@ -1,3 +1,6 @@
+
+WOW THIS WILL NEVER COMPILE WHY ARE YOU DOING THIS
+
 #ifndef wali_nwa_NWA_GUARD
 #define wali_nwa_NWA_GUARD 1
 
