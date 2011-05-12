@@ -1,3 +1,6 @@
+
+ao,netudhatnoqeduhtnao
+
 # Build WALi library 
 
 ## ####################################
@@ -63,6 +66,7 @@ elif 'cl' == BaseEnv['CC']:
     # Mostly copied from VS C++ 2005 Command line
     BaseEnv.Append(CFLAGS='/TP /errorReport:prompt /Wp64 /W4 /GR /MTd /EHsc /DWIN32')
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
+BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source', 'ThirdParty', 'IteratorTypeErasure')])
 
 ## Only supporting 32 bit on Darwin to not deal w/ Leopard/Snow Leopard diffs
 if 'Darwin' == Platform and not MkStatic:
