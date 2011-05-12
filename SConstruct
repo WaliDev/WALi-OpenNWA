@@ -1,6 +1,3 @@
-
-ao,netudhatnoqeduhtnao
-
 # Build WALi library 
 
 ## ####################################
