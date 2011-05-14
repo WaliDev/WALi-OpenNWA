@@ -67,7 +67,7 @@ namespace wali
        * @return the set of exit points of all return transitions in the NWA
        *
        */
-      extern const  StateSet getExits(NWA const & nwa, );
+      extern const  StateSet getExits(NWA const & nwa );
 
       /**
        * 
@@ -189,7 +189,7 @@ namespace wali
        * @return the set of call sites of all return transitions in the NWA
        *
        */
-      extern const  StateSet getCalls(NWA const & nwa, );
+      extern const  StateSet getCalls(NWA const & nwa );
 
       /**
        * 
@@ -264,7 +264,7 @@ namespace wali
        * @return the set of symbols that label return transitions in the NWA
        *
        */
-      extern const  SymbolSet getReturnSym(NWA const & nwa, );
+      extern const  SymbolSet getReturnSym(NWA const & nwa );
 
       /**
        * 
@@ -433,7 +433,7 @@ namespace wali
        * @return the set of return sites of all return transitions in the NWA
        *
        */
-      extern const  StateSet getReturns(NWA const & nwa,  );
+      extern const  StateSet getReturns(NWA const & nwa );
 
       /**
        * 
