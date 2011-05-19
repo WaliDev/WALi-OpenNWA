@@ -33,7 +33,7 @@ namespace wali {
     internal_only_nwa_to_fst(NWARefPtr nwa, fst_wali_key_maps * maps = NULL);
 
     NWARefPtr
-    fst_to_nwa(fst::StdExpandedFst const & fst, Key stuck, fst_wali_key_maps & maps, std::string node_prefix = "");
+    fst_to_nwa(fst::StdExpandedFst const & fst, fst_wali_key_maps & maps, std::string node_prefix = "");
 
     NWARefPtr
     minimize_internal_nwa(NWARefPtr internal_nwa, std::string node_prefix = "");

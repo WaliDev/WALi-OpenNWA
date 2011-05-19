@@ -25,10 +25,10 @@ namespace wali {
     NWARefPtr
     assemble_nwa(ProcedureMap const & procedures, Key call_key, Key return_key)
     {
-      NWARefPtr finalnwa = new NWA(getKey("[stuck-procedure-nwas-13]"));
+      NWARefPtr finalnwa = new NWA();
 
-      std::map<std::string, std::set<St> > entries_map;
-      std::map<std::string, std::set<St> > exits_map;
+      std::map<std::string, std::set<State> > entries_map;
+      std::map<std::string, std::set<State> > exits_map;
 
       ////////
       // We will set up the states, then fix up the transitions.
@@ -60,7 +60,7 @@ namespace wali {
       // are the transitions we will replace.
       NWA::Internals fake_call_transitions;
             
-      for (NWA::internalIterator trans=finalnwa->beginInternalTrans();
+      for (NWA::InternalIterator trans=finalnwa->beginInternalTrans();
            trans != finalnwa->endInternalTrans(); ++trans)
       {
         std::string symbol = key2str(trans->second);
@@ -104,8 +104,8 @@ namespace wali {
         std::string callee_name = remove_prefix(symbol, call_prefix);
         assert(entries_map.find(callee_name) != entries_map.end());
         assert(exits_map.find(callee_name) != exits_map.end());
-        std::set<St> const & entries = entries_map[callee_name];
-        std::set<St> const & exits = exits_map[callee_name];
+        std::set<State> const & entries = entries_map[callee_name];
+        std::set<State> const & exits = exits_map[callee_name];
 
         // I don't think these assertions are necessary for the below
         // to work, but they do apply in my setting. TODO: consider
@@ -115,14 +115,14 @@ namespace wali {
         assert(entries.size() == 1);
 
         // Now add the call transition(s)
-        for (std::set<St>::const_iterator entry = entries.begin();
+        for (std::set<State>::const_iterator entry = entries.begin();
              entry != entries.end(); ++entry)
         {
           finalnwa->addCallTrans(call_site, call_key, *entry);
         }
 
         // Now add the return transition(s)
-        for (std::set<St>::const_iterator exit = exits.begin();
+        for (std::set<State>::const_iterator exit = exits.begin();
              exit != exits.end(); ++exit)
         {
           finalnwa->addReturnTrans(*exit, call_site, return_key, return_site);

@@ -48,7 +48,7 @@ namespace wali {
     StdVectorFst
     internal_only_nwa_to_fst(NWARefPtr nwa, fst_wali_key_maps * maps)
     {
-      assert(NWA::getEpsilon() == 0);
+      assert(WALI_EPSILON == 0);
             
       StdVectorFst retFst;
             
@@ -62,8 +62,8 @@ namespace wali {
       // to the OpenFST key. That's what this loop does (rather than do
       // it on-the-fly; this way gives me more opportunities to write
       // assert(...)).
-      set<St> const & states = nwa->getStates();
-      for (set<St>::const_iterator state = states.begin();
+      set<State> const & states = nwa->getStates();
+      for (set<State>::const_iterator state = states.begin();
            state != states.end(); ++state)
       {
         add_fst_state(retFst, WaliKey(*state), *maps);
@@ -71,8 +71,8 @@ namespace wali {
 
       // Set the initial state of the FST
       assert(nwa->sizeInitialStates() == 1);
-      set<St> const & initials = nwa->getInitialStates();
-      for (set<St>::const_iterator initial = initials.begin();
+      set<State> const & initials = nwa->getInitialStates();
+      for (set<State>::const_iterator initial = initials.begin();
            initial != initials.end(); ++initial)
       {
         WaliKey wkey(*initial);
@@ -82,8 +82,8 @@ namespace wali {
 
       // Set the accepting states of the FST
       assert(nwa->sizeFinalStates() == 1);
-      set<St> const & finals = nwa->getFinalStates();
-      for (set<St>::const_iterator final = finals.begin();
+      set<State> const & finals = nwa->getFinalStates();
+      for (set<State>::const_iterator final = finals.begin();
            final != finals.end(); ++final)
       {
         WaliKey wkey(*final);
@@ -93,7 +93,7 @@ namespace wali {
             
 
       //Internal Transitions
-      for (NWA::internalIterator iit = nwa->beginInternalTrans();
+      for (NWA::InternalIterator iit = nwa->beginInternalTrans();
            iit != nwa->endInternalTrans(); iit++)
       {
         WaliKey w_start(iit->first);
@@ -110,14 +110,14 @@ namespace wali {
       }
 
       //Call Transitions
-      for (NWA::callIterator iit = nwa->beginCallTrans();
+      for (NWA::CallIterator iit = nwa->beginCallTrans();
            iit != nwa->endCallTrans(); iit++)
       {
         assert(false && "Trying to convert an NWA with call transitions to a FSM");
       }
 
       //Return Transitions
-      for (NWA::returnIterator iit = nwa->beginReturnTrans();
+      for (NWA::ReturnIterator iit = nwa->beginReturnTrans();
            iit != nwa->endReturnTrans(); iit++)
       {
         assert(false && "Trying to convert an NWA with return transitions to a FSM");
@@ -129,7 +129,6 @@ namespace wali {
 
     NWARefPtr
     fst_to_nwa(StdExpandedFst const & fst,
-               Key stuck,
                fst_wali_key_maps & maps,
                std::string node_prefix)
     {
@@ -151,9 +150,9 @@ namespace wali {
             
 
             
-      assert(NWA::getEpsilon() == 0);
+      assert(WALI_EPSILON == 0);
             
-      NWARefPtr nwa = new NWA(stuck);
+      NWARefPtr nwa = new NWA();
             
       typedef StateIterator<StdFst> StateIter;
       typedef ArcIterator<StdFst> ArcIter;
@@ -226,7 +225,7 @@ namespace wali {
       fst::Minimize(&det_fsm);
             
       // Now convert back
-      NWARefPtr min_nwa = fst_to_nwa(det_fsm, internal_nwa->getStuckState(), maps, node_prefix);
+      NWARefPtr min_nwa = fst_to_nwa(det_fsm, maps, node_prefix);
             
       // This could be an expensive check, but hopefully not...
       //assert (NWA::equal(internal_nwa, min_nwa));
