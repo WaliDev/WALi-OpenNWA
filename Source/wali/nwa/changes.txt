@@ -1,0 +1,352 @@
+The unmarked actions in each proposal would be done immediately. The actions
+marked "LATER" would occur after both us and Matt Fredrickson has things
+compiling cleanly.
+
+Theoretically, except for the changes marked "LATER" or explicitly as a
+breaking change, none of these should affect existing usage. (Most have one
+of those aspects, but in almost all cases it's a LATER change, meaning that
+there will be warning before complier errors take over. In the common case
+there is a deprecation step, but for a couple changes the effort to do the
+deprecation step isn't worth it.)
+
+
+Summary:
+  Moves:
+    ReachGen to (another header)
+    StateSet to details::StateStorage
+    SymbolSet to details::SymbolStorage
+    TransSet to details::TransitionStorage
+    TransInfo to details::TransitionInfo
+    NestedWord to NestedWord.hpp
+    epsilonClosure functions from NWA class to NWA.cpp only
+    Many functions from the NWA class become free functions
+    Stuck state handling will be revamped
+
+  Deletions:
+    class NWA:
+      getEpsilon, getWild, isEpsilon, isWild
+      is_nwa_state, get_states, num_nwa_states, count_rules
+      isMember, simulateWord
+
+    class SymbolStorage (nee SymbolSet):
+      getEpsilon, getWild, isEpsilon, isWild
+
+    class NWS (whole thing)
+    class NWP (whole thing)
+
+  Renames:
+    Namespace wali::nwa:
+      St  -> State
+      Sym -> Symbol
+
+    class NWA:
+      States       -> StateStorage
+      StateSet     -> [same name, but at namespace scope]
+      blahIterator -> BlahIterator [for blah = call, return, internal, symbol, state]
+
+    class details::StateStorage (nee StateSet):
+      States   -> StateSet [at 'nwa' namespace scope]
+
+  Other:
+    NWA::XMLTag will be a const static field instead of function
+    Use typedef names in place of explicit 'std::set<St>' and 'std::set<Sym>'
+    Functions in NWA class that take a NWARefPtr change to taking a (const?) reference
+
+
+-- 1. INITIAL CHANGES COMMITTED REV 909
+-- 
+--    Name change: 'St' and 'Sym' to 'State' and 'Symbol', resp.
+-- 
+--    Deprecate the 'St' and 'Sym' typedefs (in namespace wali::nwa). Create new
+--    'State' and 'Symbol' typedefs, and change current uses of 'St' and 'Sym'
+--    to those.
+--
+--    LATER: COMMITTED REV 944, with the caveat that there are uses in commented-out code 
+--           Remove 'St' and 'Sym'.
+-- 
+-- 
+-- 2. COMMITTED REV 928
+--    Move and clean ReachGen class.
+-- 
+--    Move 'class ReachGen' from NWA.hpp to WeightGen.hpp.)
+-- 
+--    From the ReachGen class, remove the Kind enumeration (I think it's
+--    unused), and the St and Sym typedefs (which will then refer to the
+--    typedefs at the namespace level).
+-- 
+-- 
+-- 3. Rename various things associated with StateSets.
+-- 
+--    COMMITTED REV 918
+--    Inside the class 'StateStorage', deprecate the 'States' typedef. Replace it
+--    with a 'StateSet' typedef in the class StateStorage.
+-- 
+--    COMMITTED REV 912 (and 913)
+--    Move the class 'StateSet' from namespace wali::nwa to
+--    wali::nwa::details.
+-- 
+--    COMMITTED REV 917
+--    Rename it to 'StateStorage'. Fix references.
+-- 
+--    COMMITTED REV 916 (and #include uses, but old class names)
+--    Rename the corresponding files to match.
+-- 
+--    COMMITTED REV 915, though you can call static methods throguh a
+--    deprecated typedef without a warning from GCC.
+--    Create a new file 'StateSet.hpp' which gives a deprecated typedef to
+--    the old (current) name.
+-- 
+--    COMMITTED REV 918 (and three missed uses in one file in 925)
+--    Deprecate the typedef 'NWA::States'. Add a new typedef 'StateStorage' in
+--    its place. Change uses of 'States' to 'StateStorage'.
+-- 
+--    LATER: COMMITTED REV 942. (StateSet.hpp was removed in 939, 941, w/ #4)
+--           Remove deprecated typedefs: 'NWA::States', 
+--           and 'StateStorage::States', and remove the StateSet.hpp header.
+--           ('NWA::StateSet' was in this list but that was a mistake; see
+--           below.)
+-- 
+--    LATER: COMMITTED REV 961 (& 962 to fix that number)
+--           Add a typedef 'StateSet' (from std::set<State>) at namespace level
+--           (wali::nwa). Remove the 'StateSet' typedef in StateStorage, and let
+--           things fall back to the namespace-level typedef.
+--    
+--           Deprecate the typedef 'NWA::StateSet', replacing it with the same
+--           typedef at namespace scope.
+-- 
+-- 
+-- 4. Rename classes 'SymbolSet', 'TransSet', and 'TransInfo'
+-- 
+--    COMMITTED REV 912 (and 913)
+--    Move all classes into namespace 'wali::nwa::details'.
+-- 
+--    COMMITTED REV 917
+--    Rename to 'SymbolStorage', 'TransitionStorage', and 'TransitionInfo'
+--    respectively. Fix uses.
+-- 
+--    COMMITTED REV 916 (and #include uses, but old class names)
+--    Rename files to match.
+-- 
+--    COMMITTED REV 915, though you can call static methods throguh a
+--    deprecated typedef without a warning from GCC.
+--    Create new headers 'SymbolSet.hpp', 'TransSet.hpp', 'TransInfo.hpp'
+--    with deprecated typedefs.
+-- 
+--    COMMITTED REV 918
+--    In class NWA, deprecate the typedef of 'Symbols'. Replace it with one
+--    named 'SymbolStorage'.
+-- 
+--    LATER: COMMITTED REV 939 (typedef and headers) and 941 (use of headers)
+--           Remove deprecated typedef and headers.
+--
+--
+-- 5. Fix iterator name capitalization.
+-- 
+--    COMMITTED REV 919 (also to StateStorage, TransitionStorage, and TransitionInfo)
+--    In class 'NWA', deprecate typedefs to 'stateIterator', 'symbolIterator',
+--    'callIterator', 'internalIterator', and 'returnIterator'. Replace with
+--    capitalized versions of the same ('StateIterator', etc.)
+-- 
+--    LATER: COMMITTED REV 937
+--           Remove deprecated typedefs
+-- 
+-- 
+-- 6. COMMITTED REV 949
+--    Change NWA::XMLTag to a static const field instead of a member function.
+-- 
+--    (THIS IS A BREAKING CHANGE)
+-- 
+-- 
+-- 7. COMMITTED REV 929
+--    Deprecate NWA::getEpsilon, NWA::getWild, NWA::isEpsilon, NWA::isWild, and
+--    the same functions in class 'SymbolStorage'.
+-- 
+--    COMMITTED REV 930
+--    Fix references.   
+-- 
+--    LATER: COMMITTED REV 938
+--           Remove deprecated functions
+-- 
+-- 
+-- 8. COMMITTED REV 920 and 960. Lots of set<StatePair>, set<pair<...>> left though
+-- 
+--    Change parameter and return types of tons of functions from std::set<St>
+--    and std::set<Sym> to use StateSet and SymbolSet typedefs instead. (Will
+--    have to add SymbolSet typedef.)
+-- 
+-- 
+-- 9. COMMITTED REV 921
+--    Deprecate "exact" duplicate functions.
+-- 
+--    In class 'NWA', deprecate functions 'get_states', 'is_nwa_state', and
+--    'num_nwa_states', 'count_rules'.
+-- 
+--    LATER: COMMITTED REV 943
+--           Remove deprecated functions
+-- 
+-- 
+-- 10. COMMITTED REV 958
+-- 
+--     Move 'NWA::getProgramControlLocation' and 'NWA::getControlLocation'
+--     to namespace level.
+-- 
+--     (THESE ARE BREAKING CHANGES)
+--
+--
+-- 11. SOME WORK COMMITTED IN REV 924, but had to break into several stages
+--     Deprecate class WordRecConfig, NWA::isMember, class NWP.
+-- 
+--     LATER: COMMITED REV 945 (NWA stuff) & 946 (NWP)
+--            Remove WordRecConfig, NWA::isMember, NWP. Deprecate NWA::simulateWord.
+--
+--     LATER: COMMITTED REV 963 (& 964 to fix this number)
+--            Remove NWA::simulateWord. Deprecate class NWS.
+--
+--     LATER: COMMITTED REV 970
+--            Remove NWS.
+--
+--
+-- 12. COMMITTED REV 927
+-- 
+--     Move class NestedWord to its own header, NestedWord.hpp. Moved
+--     Configuration to Configuration.hpp (temp file). Added deprecated
+--     typedefs in NWA to the new, namespace-level types.
+-- 
+--     Move implementation of NWA::isMemberNondet to NWA.cpp.
+-- 
+--     LATER: COMMITTED REV 948
+--            Move configuration.hpp to details/.
+-- 
+--            (Changed from "move class Configuration to NWA.cpp and remove
+--            Configuration.hpp.")
+-- 
+--            COMMITTED REV 947
+--            Remove deprecated typedefs.
+--
+--
+-- 13. COMMITTED REVS: 951--956 (including just a commit w/ just this file)
+--                     965--967 later
+--
+--     Change functions in NWA which take a NWARefPtr parameter to take a
+--     (possibly const) reference instead. For each function, introduce an
+--     overload for the RefPtr version, and deprecate it.
+--
+--     Here is the list:
+--       DEPRECATED REV 951, REMOVED 965:
+--         projectStates
+--         unionNWA    (two overloads)
+--         overlap
+--         intersect   (two overloads)
+--      DEPRECATED AND REMOVED REV 951
+--         intersectClientInfoCall
+--         intersectClientInfoInternal
+--         intersectClientInfoReturn
+--         stateIntersect
+--         transitionIntersect
+--         epsilonClosure (only one of the two overloads)
+--      DEPRECATED REV 952, REMOVED 966
+--         concat      (two overloads)
+--         reverse     (two overloads)
+--         star        (two overloads)
+--      DEPRECATED REV 953, REMOVED 967
+--         NWAtoPDSreturns          (only static version)
+--         NWAtoBackwardsPDSreturns (only static version)
+--         NWAtoPDScalls            (only static version)
+--         NWAtoBackwardsPDScalls   (only static version)
+--      DEPRECATED REV 955, REMOVED 967
+--         determinize (two overloads)
+--      DEPRECATED AND REMOVED 955
+--         mergeClientInfo
+--         mergeClientInfoCall
+--         mergeClientInfoInternal
+--         mergeClientInfoReturn
+--      DEPRECATED REV 956, REMOVED 967
+--         inclusion
+--         equal
+--         complement  (two overloads)
+--
+--     LATER: COMMITTED REVS 965-967
+--            Remove deprecated functions
+--
+--
+-- 14. ABORTED, for now at least. They refer to things in the NWA itself, and it is pretty
+--     directly related.
+--
+--     Move epsilonClosure functions to file-static functions in NWA.cpp.
+--
+--     (THIS IS A BREAKING CHANGE)
+
+
+15. De-clutter NWA class interface itself. (THIS SHOULD COME AFTER #13 IS COMPLETED)
+
+    Remove several functions from the class NWA to free functions. For each
+    function, copy it to the given place and leave a deprecated "redirection"
+    function.
+
+    Here is a tentative list.
+      -- COMMITTED REVS 979--985 (986 with this)
+      -- For the namespace wali::nwa::query:
+      --   Virtually all functions in the "transition accessors" section of the header,
+      --   except duplicateStateOutgoing, duplicateState, realizeImplicitTrans, clearTrans
+
+      --   Virtually all functions in the "XXX transitions" section of the
+      --   header, except addXXXTrans overloads, removeXXXTrans overloads, and
+      --   sizeXXXTrans.
+
+        overlap
+
+      For the namespace wali::nwa::construct:
+        unionNWA  (two overloads)
+        intersect (two overloads)
+        concat
+        reverse
+        star
+        complement
+        determinize
+
+      For the namespace wali::nwa::nwa_pds:
+        plusWPDS (two overloads become one)
+        PDStoNWA (two overloads)
+        NWAtoPDSreturns          (two overloads become one)
+        NWAtoBackwardsPDSreturns (two overloads become one)
+        NWAtoPDScalls            (two overloads become one)
+        NWAtoBackwardsPDScalls   (two overloads become one)
+        
+
+16. -- COMMITTED REV 968
+
+    -- Remove stuck state stuff.
+
+    -- (THIS SHOULD COME AT THE VERY LAST, AND THERE ARE BREAKING CHANGES)
+
+    -- Remove 'NWA(St stuck)' constructor, 'hasStuckState', 'getStuckState',
+    -- 'setStuckState', 'isStuckState'. Remove the stuck state member.
+
+    -- Change 'realizeImplicitTransitions' so it takes a 'use this as the stuck
+    -- state' parameter. Do the same for any function that calls
+    -- realizeImplicitTransitions (currently apparently only 'determinize' and
+    -- 'plusWPDS'.
+
+    Still have to figure out what to do with the static overloads... I can't
+    remove the stuck state parameter or GCC complains.
+
+    Didn't do this:
+    LATER: Add an overload for those functions that will automatically pick a
+           stuck state for you.
+
+
+17. Write generic 'query' function and supporting structures.
+
+
+18. Get counterexample-producing isEmpty from Matt F.
+
+
+19. Misc stuff
+
+    largestState needs commented or removed or something. So does
+    addToPDS. combineWith and isMemberNondet both need
+    commented. pruneUnreachable* and chop should probably be
+    better-commented. Possibly some of these should move out of the class.
+
+    Figure out whether the get weight functions in WeightGen should be pure
+    virtual.
