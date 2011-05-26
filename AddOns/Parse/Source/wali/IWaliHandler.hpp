@@ -50,11 +50,11 @@ namespace wali
           const XMLCh* const localname,
           const XMLCh* const qname);
 
-      virtual void characters(const XMLCh* const chars, const unsigned int length);
+      virtual void characters(const XMLCh *const chars, const XMLSize_t length);
 
       virtual void ignorableWhitespace(                               
           const XMLCh* const chars, 
-          const unsigned int length
+          const XMLSize_t length
           );
 
       virtual void processingInstruction(   

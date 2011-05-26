@@ -259,7 +259,7 @@ namespace wali
   //
   void QueryHandler::characters(
       const XMLCh* const chars, 
-      const unsigned int length)
+      const XMLSize_t length)
   {
     if( currentHandler ) {
       currentHandler->characters(chars,length);
@@ -273,7 +273,7 @@ namespace wali
 
   void QueryHandler::ignorableWhitespace(                               
       const XMLCh* const chars, 
-      const unsigned int length)
+      const XMLSize_t length)
   {
     if( currentHandler ) {
       currentHandler->ignorableWhitespace(chars,length);

@@ -181,7 +181,7 @@ namespace wali
       }
     }
 
-    void WpdsHandler::characters(const XMLCh* const chars, const unsigned int length)
+    void WpdsHandler::characters(const XMLCh *const chars, const XMLSize_t length)
     {
       fUserHandler.characters(chars,length);
     }
