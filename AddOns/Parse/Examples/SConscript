@@ -21,8 +21,8 @@ if MkStatic:
 		os.path.join(LibInstallDir,'libwali.a'),
 		os.path.join(LibInstallDir,'libxerces-c.a'),
 		]
-	Libs = []
-	LibPath = []
+  Libs = []
+  LibPath = []
 	
 	
 ## ###############################
