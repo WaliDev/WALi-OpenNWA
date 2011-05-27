@@ -11,12 +11,14 @@ Import('MkStatic')
 Import('Platform')
 
 
-# `find . -name "*.cpp"`, then remove Experimental.cpp
+# `find . -name "*.cpp"`, then remove Experimental.cpp, NWA.cpp, RelationOps.cpp
 wali_files = Split("""
+./wali/Reach.cpp
 ./wali/StringSource.cpp
 ./wali/Common.cpp
 ./wali/SemElemPair.cpp
 ./wali/KeySpace.cpp
+./wali/KeySetSource.cpp
 ./wali/TotalOrderWorklist.cpp
 ./wali/SemElem.cpp
 ./wali/PriorityWorklist.cpp
@@ -78,6 +80,16 @@ wali_files = Split("""
 ./wali/util/StringUtils.cpp
 ./wali/util/ParseArgv.cpp
 ./wali/util/Timer.cpp
+./wali/nwa/NWA.cpp
+./wali/nwa/details/SymbolStorage.cpp
+./wali/nwa/details/StateStorage.cpp
+./wali/nwa/details/TransitionInfo.cpp
+./wali/nwa/details/TransitionStorage.cpp
+./wali/nwa/NwaParser.cpp
+./wali/nwa/query/transitions.cpp
+./wali/nwa/query/calls.cpp
+./wali/nwa/query/returns.cpp
+./wali/nwa/query/internals.cpp
 """)
 
 env = BaseEnv.Clone()

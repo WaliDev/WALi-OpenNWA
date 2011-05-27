@@ -12,6 +12,7 @@
  * for acting on Keys
  */
 #include <string>
+#include <set>
 #include "wali/ref_ptr.hpp"
 
 namespace wali
@@ -39,6 +40,8 @@ namespace wali
    */
   KeySpace* getKeySpace();
 
+  void clearKeyspace();
+
   /**
    * Wrapper functions.
    * Call same method of class KeySpace using
@@ -49,6 +52,8 @@ namespace wali
   Key getKey( const char* s );
   Key getKey( int i );
   Key getKey( Key k1, Key k2 );
+  // @author Amanda Burton
+  Key getKey( std::set<Key> ks );
 
   /**
    * Return KeySource associated with the key k
@@ -59,8 +64,13 @@ namespace wali
    * Prints key k to std::ostream o
    * Essentially performs the lookup from Key to KeySource and calls
    * KeySource::print
+   *
+   * If abbreviate is true and the string representation of the
+   * key being printed is greater than 20 characters, then the
+   * actual numeric key is printed instead.
+   *
    */
-  std::ostream& printKey( std::ostream& o, Key k );
+  std::ostream& printKey( std::ostream& o, Key k, bool abbreviate=false );
 
   /**
    * Returns string representation of the key

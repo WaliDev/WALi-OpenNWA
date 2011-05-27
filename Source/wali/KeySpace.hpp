@@ -83,12 +83,23 @@ namespace wali
      */
     size_t size();
 
+    // @author Amanda Burton
+    /** 
+     * Wrapper method for creating a KeySetSource and
+     * inserting it into the KeySpace
+     */
+    wali::Key getKey( std::set<wali::Key> kys );
+
     /**
      * Helper method that looks up the key and calls KeySource::print
      *
+     * If abbreviate is true and the string representation of the
+     * key being printed is greater than 20 characters, then the
+     * actual numeric key is printed instead.
+     *
      * @see KeySource
      */
-    std::ostream& printKey( std::ostream& o, wali::Key key );
+    std::ostream& printKey( std::ostream& o, wali::Key key, bool abbreviate=false );
 
     /**
      * Return std::string rep of KeySource. Looks up the key and calls

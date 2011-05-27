@@ -8,7 +8,7 @@
 #include <cstdio>
 #include "wali/Common.hpp"
 #include "wali/Printable.hpp"
-#ifndef WIN32
+#ifndef _WIN32
 #	include <sys/times.h>
 #else
 #	include <time.h>

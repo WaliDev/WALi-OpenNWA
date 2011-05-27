@@ -3,6 +3,7 @@
  * @version $Id$
  */
 
+#include <sstream>
 #include <cassert>
 #include <cstring>
 #include "wali/Common.hpp"
@@ -11,6 +12,7 @@
 #include "wali/StringSource.hpp"
 #include "wali/IntSource.hpp"
 #include "wali/KeyPairSource.hpp"
+#include "wali/KeySetSource.hpp"
 
 namespace wali
 {
@@ -87,6 +89,13 @@ namespace wali
     return getKey( new KeyPairSource(k1,k2) );
   }
 
+  // @author Amanda Burton  
+  wali_key_t KeySpace::getKey( std::set<wali_key_t> kys )
+  {
+    return getKey( new KeySetSource(kys) );
+  }
+
+
   /**
    * getKeySource retrieves the key_src_t associated to the
    * Key key. If no such KeySource exists, then a NULL
@@ -136,11 +145,19 @@ namespace wali
    *
    * @see KeySource
    */
-  std::ostream& KeySpace::printKey( std::ostream& o, Key key )
+  std::ostream& KeySpace::printKey( std::ostream& o, Key key, bool abbreviate )
   {
     key_src_t ksrc = getKeySource(key);
     if( ksrc.is_valid() ) {
-      ksrc->print(o);
+      std::stringstream str;
+      ksrc->print(str);
+
+      if(str.str().length() > 20 && abbreviate) {
+        o << "[" << key << "]";
+      }
+      else {
+        o << str.str();
+      }
     }
     else {
       *waliErr << "[WARNING] Invalid wali::Key(" << key << ")" << std::endl;

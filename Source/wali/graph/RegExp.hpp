@@ -13,7 +13,7 @@
 
 #include "wali/graph/GraphCommon.hpp"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <time.h>
 #endif
 

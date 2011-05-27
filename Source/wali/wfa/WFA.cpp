@@ -217,12 +217,12 @@ namespace wali
     // Get some weight from the WFA, if it is non-empty 
     // If the WFA is empty, return NULL
     //
-    sem_elem_t WFA::getSomeWeight() {
+    sem_elem_t WFA::getSomeWeight() const{
       sem_elem_t ret;
-      kp_map_t::iterator it = kpmap.begin();
+      kp_map_t::const_iterator it = kpmap.begin();
       while(it != kpmap.end()) {
-        TransSet &tset = it->second;
-        TransSet::iterator it2 = tset.begin();
+        const TransSet &tset = it->second;
+        TransSet::const_iterator it2 = tset.begin();
         if(it2 != tset.end()) {
           return (*it2)->weight();
         }
@@ -390,7 +390,7 @@ namespace wali
 
       for(it = st.begin(); it != st.end(); it++) {
         Key s = *it;
-        Key sprime = getKey(new wpds::GenKeySource(getGeneration(), s));
+        Key sprime = getKey(key_src_t(new wpds::GenKeySource(getGeneration(), s)));
         dup[s] = sprime;
       }
 

@@ -54,6 +54,28 @@ namespace wali
         virtual void operator()( const ITrans* t ) = 0;
     }; // class ConstTransFunctor
 
+    /** 
+     *
+     */
+    class TransCounter : public wali::wfa::ConstTransFunctor
+    {
+      int numTrans;
+    public:
+      TransCounter( ) : numTrans(0) {}
+      virtual ~TransCounter() {}
+
+      virtual void operator()( const ITrans* t )
+      {
+        (void) t;
+        numTrans++;
+      }
+
+      int getNumTrans( )
+      {
+        return numTrans;
+      }
+    };
+
     /*!
      * @class TransPrinter
      *

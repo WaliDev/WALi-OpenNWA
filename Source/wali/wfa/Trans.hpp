@@ -1,6 +1,7 @@
 #ifndef wali_wfa_TRANS_GUARD
 #define wali_wfa_TRANS_GUARD 1
 
+
 /*!
  * @author Nicholas Kidd
  */
@@ -13,6 +14,16 @@
 #include "wali/SemElem.hpp"
 #include "wali/KeyContainer.hpp"
 #include "wali/wfa/ITrans.hpp"
+
+
+// Disable
+//   warning C4250: 'wali::wfa::Trans' : inherits 'wali::Markable::wali::Markable::mark' via dominance
+// for MSVC
+#if defined(_MSC_VER)
+#  pragma warning(push)
+#  pragma warning(disable: 4250)
+#endif
+
 
 namespace wali
 {
@@ -271,6 +282,12 @@ namespace wali
   } // namespace wfa
 
 } // namespace wali
+
+
+// Restore the warning state
+#if defined(_MSC_VER)
+#  pragma warning(pop)
+#endif
 
 #endif  // wali_wfa_TRANS_GUARD
 

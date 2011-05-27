@@ -14,6 +14,7 @@ namespace wali
 {
   typedef Key wali_key_t;
   static const Key WALI_EPSILON = 0;
+  static const Key WALI_WILD = 1;
   static const Key WALI_BAD_KEY = UINT_MAX;
 
   // std::cerr is the default err stream
@@ -84,6 +85,7 @@ namespace wali
 #   define ATTR_UNUSED
 #   if _MSC_VER > 1000
 #       pragma warning(disable: 4786)
+#       pragma warning(disable: 4250)
 #   endif
 #   if !defined(_CPPRTTI)
 #       error RTTI is required by WALi.

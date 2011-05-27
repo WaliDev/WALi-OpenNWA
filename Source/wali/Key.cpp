@@ -9,7 +9,6 @@
 
 namespace wali
 {
-
   //
   // Only used here in Common.cpp
   //
@@ -18,6 +17,8 @@ namespace wali
     KeySpace* keySpace = new KeySpace();
     // WPDS_EPSILON == 0 == "*"
     keySpace->getKey("*");
+    // NWA_WILD == 1 == "@"
+    keySpace->getKey("@");
     return keySpace;
   }
 
@@ -28,6 +29,11 @@ namespace wali
   {
     static std::auto_ptr<KeySpace> keySpace(createKeySpace());
     return keySpace.get();
+  }
+
+  void clearKeyspace()
+  {
+    getKeySpace()->clear();
   }
 
   //
@@ -60,6 +66,13 @@ namespace wali
     return getKeySpace()->getKey(k1,k2);
   }
 
+  // @author Amanda Burton
+  Key getKey( std::set<Key> ks )
+  {
+    return getKeySpace()->getKey(ks);
+  }
+
+
   //
   // Return KeySource associated with the key k
   //
@@ -73,9 +86,9 @@ namespace wali
   // Essentially performs the lookup from Key to KeySource and calls
   // KeySource::print
   //
-  std::ostream& printKey( std::ostream& o, Key k )
+  std::ostream& printKey( std::ostream& o, Key k, bool abbreviate )
   {
-    return getKeySpace()->printKey(o,k);
+    return getKeySpace()->printKey(o,k,abbreviate);
   }
 
   //

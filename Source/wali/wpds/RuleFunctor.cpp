@@ -47,17 +47,46 @@ namespace wali
       addPoint(r->from_state(), pdsStates);
       addPoint(r->to_state(), pdsStates);
       addPoint(r->from_stack(), gamma);
-      addPoint(r->to_stack1(), gamma);
-      addPoint(r->to_stack2(), gamma);
-      addPoint(r->to_stack2(), returnPoints);
+      // Is it an non-exit rule?
+      if(r->to_stack1() != WALI_EPSILON) {
+        addPoint(r->to_stack1(), gamma);
+      }
+      // Is it a call rule?
       if(r->to_stack2() != WALI_EPSILON) {
+        addPoint(r->to_stack2(), gamma);
         addPoint(r->to_stack1(), entryPoints);
+        addPoint(r->from_stack(), callPoints);
+        addPoint(r->to_stack2(), returnPoints);
       }
     }
 
     void WpdsStackSymbols::addPoint(Key k, std::set< Key > &s) {
       if(k != WALI_EPSILON) 
         s.insert(k);
+    }
+
+    /////////////////////////////////////////////////////////////////
+    // class WpdsRules
+    /////////////////////////////////////////////////////////////////
+    // @author Amanda Burton
+    
+    WpdsRules::WpdsRules() {}
+    
+    WpdsRules::~WpdsRules() {}
+    
+    void WpdsRules::operator() (const rule_t & r)
+    {
+      if( r->is_rule2() )
+        addRule(*r, pushRules);
+      else if( r->to_stack1() != WALI_EPSILON )
+        addRule(*r, stepRules);
+      else
+        addRule(*r, popRules);
+    }
+    
+    void WpdsRules::addRule(Rule r, std::set< Rule > &s)
+    {
+      s.insert(r);
     }
 
     /////////////////////////////////////////////////////////////////

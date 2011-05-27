@@ -10,6 +10,7 @@
 #include <fstream>
 #include <algorithm>
 #include <typeinfo>
+#include <iterator>
 
 namespace wali
 {

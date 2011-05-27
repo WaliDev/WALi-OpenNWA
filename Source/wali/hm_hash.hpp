@@ -75,7 +75,7 @@ namespace wali
    * to the STL.
    */
 
-  template< typename T > struct hm_hash {};
+  template< typename T > struct hm_hash { };
   template< typename T > struct hm_equal {};
 
   /*

@@ -7,6 +7,7 @@
 import os, os.path, platform
 
 Debug = True
+DefaultEnvironment(MSVC_USE_SCRIPT=False) # for Windows
 
 #(platform_bits,linkage) = platform.architecture()
 if platform.machine() == 'i686':
@@ -22,8 +23,25 @@ else:
 Platform       = platform.system()
 MkStatic       = (Platform == 'Windows')
 WaliDir        = os.getcwd()
-BaseEnv        = Environment()
+BaseEnv        = Environment(MSVC_USE_SCRIPT=False)
 Is64           = (platform_bits == 64)
+
+ThirtyTwoBitAliases=['32', 'x86', 'ia_32', 'ia32']
+SixtyFourBitAliases=['64', 'x64', 'x86_64', 'amd64']
+
+vars = Variables()
+vars.Add(EnumVariable('arch', 'Architecture', 'default',
+         allowed_values=ThirtyTwoBitAliases+SixtyFourBitAliases+['default']))
+tempEnviron = Environment(tools=[], variables=vars)
+arch = tempEnviron['arch']
+tempEnviron = None
+vars = None
+
+if arch in ThirtyTwoBitAliases:
+    Is64 = False
+elif arch in SixtyFourBitAliases:
+    Is64 = True
+
 
 if Is64:
     LibInstallDir  = os.path.join(WaliDir,'lib64')
@@ -34,16 +52,17 @@ else:
 
 
 if 'gcc' == BaseEnv['CC']:
-    BaseEnv.Append(CCFLAGS='-g -ggdb -Wall -Wformat=2 -W -O')
+    BaseEnv.Append(CCFLAGS='-g -ggdb -Wall -Wformat=2 -W -O2')
     if platform_bits == 64 and not Is64:
         # If we're on a 64-bit platform but want to compile for 32.
         # This will only happen if Is64 is changed from what it is
         # right now (Is64 = (platform_bits == 64))
         BaseEnv.Append(CCFLAGS='-m32')
-        BaseEnv.Append(LINKFLAGS='m32')
+        BaseEnv.Append(LINKFLAGS='-m32')
 elif 'cl' == BaseEnv['CC']:
     # Mostly copied from VS C++ 2005 Command line
     BaseEnv.Append(CFLAGS='/TP /errorReport:prompt /Wp64 /W4 /GR /MTd /EHsc')
+BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
 
 ## Only supporting 32 bit on Darwin to not deal w/ Leopard/Snow Leopard diffs
@@ -89,7 +108,7 @@ Export('ProgEnv')
 if 'help' not in COMMAND_LINE_TARGETS:
     ## ##################
     ## libwali
-    built = SConscript('Source/SConscript', build_dir=BuildDir,duplicate=0)
+    built = SConscript('Source/SConscript', variant_dir=BuildDir,duplicate=0)
     #built += SConscript('Doc/tex/SConscript')
 
     ## ##################

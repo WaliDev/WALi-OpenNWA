@@ -143,6 +143,19 @@ namespace wali
          */
         bool is_rule2() const { return (stack2() != WALI_EPSILON); }
 
+        // @author Amanda Burton
+        /**
+         *  TODO: fix comments
+         *  operator== is needed by std::set
+         */
+        bool operator==( Rule other ) const;
+        
+        /**
+         *  TODO: fix comments
+         *  operator< is needed by std::set
+         */
+        bool operator<( Rule other ) const;
+
         /*!
          * @brief Make a copy of the rule
          */

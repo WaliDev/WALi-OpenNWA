@@ -146,7 +146,7 @@ namespace wali
       return rb;
     }
 
-    bool WPDS::replace_rule(
+        bool WPDS::replace_rule(
         Key from_state,
         Key from_stack,
         Key to_state,
@@ -686,7 +686,7 @@ namespace wali
     // Protected Methods
     /////////////////////////////////////////////////////////////////
 
-    // Actually adds the rule. Allows for 2 return values, namely
+// Actually adds the rule. Allows for 2 return values, namely
     // the bool and a rule_t which contains a pointer to the real Rule.
     // This allows for subclasses to perform postprocessing.
     // Replaces the weight of an existing rule if replace_weight is set.
@@ -740,6 +740,58 @@ namespace wali
       return rb;
     }
 
+    // Actually adds the rule. Allows for 2 return values, namely
+    // the bool and a rule_t which contains a pointer to the real Rule.
+    // This allows for subclasses to perform postprocessing.
+    bool WPDS::add_rule(
+        Key from_state,
+        Key from_stack,
+        Key to_state,
+        Key to_stack1,
+        Key to_stack2,
+        sem_elem_t se,
+        rule_t& r
+        )
+    {
+      // Every rule must have these 3 pieces defined
+      // TODO - raise an exception?
+      assert( from_state != WALI_EPSILON );
+      assert( from_stack != WALI_EPSILON );
+      assert( to_state   != WALI_EPSILON );
+      Config *from = make_config(from_state,from_stack);
+      Config *to = make_config(to_state,to_stack1);
+
+      // Mark the states as PDS states
+      pds_states.insert(from_state);
+      pds_states.insert(to_state);
+
+      // make_rule will create links b/w Configs and the Rule
+      r = new Rule(from, to, to_stack2, se);
+      bool rb = make_rule(from,to,to_stack2,r);
+
+      // if rb is false then the rule is new
+      if( !rb ) {
+        if( to_stack1 == WALI_EPSILON )
+        {
+          // Invariant assertion.
+          assert( to_stack2 == WALI_EPSILON );
+          rule_zeroes.insert( to );
+        }
+        else if( to_stack2 != WALI_EPSILON ) {
+          r2hash_t::iterator r2it = r2hash.find( to_stack2 );
+          if( r2it == r2hash.end() ) {
+            std::list< rule_t > ls;
+            r2it = r2hash.insert( to_stack2,ls ).first;
+          }
+          r2it->second.push_back( r );
+        }
+      }
+      // Set up theZero weight
+      if (!theZero.is_valid() && r->weight().is_valid())
+        theZero = r->weight()->zero();
+      return rb;
+    }
+
 
     /**
      * Creates a Config if one does not already exist
@@ -758,7 +810,7 @@ namespace wali
       return cf;
     }
 
-    /**
+/**
      * Creates a rule that links two configurations.
      * If rule exists then (combines the weight if replace_weight is false) or
      * (replace the weight if replace_weight is true)
@@ -813,6 +865,56 @@ namespace wali
       }
       return exists;
     }
+
+
+     /**
+     * Creates a rule that links two configurations.
+     * If rule exists then combines the weight and drops
+     * the rule passed in.
+     *
+     * @return true if Rule already existed
+     *
+     * @see Config
+     * @see sem_elem_t
+     * @see rule_t
+     */
+    bool WPDS::make_rule(
+        Config *f,
+        Config *t,
+        Key stk2,
+        rule_t& r )
+    {
+      bool exists = false;
+      Config::iterator it = f->begin();
+      Config::iterator itEND = f->end();
+
+      for( ; it != itEND; it++ ) {
+        rule_t tmp = *it;
+        if( tmp->f == f && tmp->t == t && tmp->to_stack2() == stk2 )
+        {
+          exists = true;
+          if( wrapper.is_valid() ) {
+            // New behavior
+            // Wrap the duplicate rule's weight, then combine since
+            // wrapping produces a new semiring.
+            r->setWeight( wrapper->wrap(*r) );
+          }
+          sem_elem_t x = tmp->weight()->combine(r->weight());
+          tmp->setWeight(x);
+          r = tmp;
+          break;
+        }
+      }
+      if( !exists ) {
+        if( wrapper.is_valid() ) {
+          r->setWeight( wrapper->wrap(*r) );
+        }
+        f->insert(r);
+        t->rinsert(r);
+      }
+      return exists;
+    }
+
 
     Config * WPDS::find_config( Key state, Key stack )
     {

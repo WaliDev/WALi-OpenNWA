@@ -280,6 +280,7 @@ namespace wali
          */
         Key constructCFG(std::set<Key> &entries, std::map<Key, Key> &entryState, wfa::WFA &cfg);
 
+        sem_elem_t get_theZero() {return theZero; }
       protected:
 
         /** @brief Actually creates the rule, hanldes the mappings,
@@ -300,6 +301,23 @@ namespace wali
             Key to_stack2,
             sem_elem_t se,
 	    bool replace_weight,
+            rule_t& r );
+
+        /** @brief Actually creates the rule, hanldes the mappings,
+         * etc.
+         *
+         * @return true if rule existed
+         *
+         * @see sem_elem_t
+         * @see Key
+         */
+        virtual bool add_rule(
+            Key from_state,
+            Key from_stack,
+            Key to_state,
+            Key to_stack1,
+            Key to_stack2,
+            sem_elem_t se,
             rule_t& r );
 
         /**
@@ -425,6 +443,23 @@ namespace wali
             rule_t& r );
 
         /**
+         * Creates a rule that links two configurations.
+         * If rule exists then combines the weight
+         *
+         * @return true if Rule already existed
+         *
+         * @see Config
+         * @see sem_elem_t
+         * @see rule_t
+         */
+        virtual bool make_rule(
+            Config *f,
+            Config *t,
+            Key stk2,
+
+            rule_t& r );
+
+        /**
          * Find config with KeyPair(state,stack)
          *
          * @return the Config * or 0 if it doesn't exist
@@ -478,7 +513,6 @@ namespace wali
         chash_t & config_map() {
           return configs;
         }
-
       private: // methods
 
       protected: // data members
