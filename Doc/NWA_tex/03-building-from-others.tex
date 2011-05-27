@@ -1,25 +1,34 @@
 \section{Building NWAs from other NWAs}
 \label{Se:Building NWAs}
 
-NWAs do not need to be built state-by-state and transition-by-transition, they can also be built by performing language-theoretic operations over component NWAs. These operations include: union, intersection, concatenation, reversal, Kleene-star, complement, and determinize. The library supports two interfaces to the Boolean operations.  In one, each operation returns a \texttt{ref\_ptr<NWA>} to a freshly-built NWA.  In the other, each operation transforms the NWA on which it was called. \\
+NWAs do not need to be built state-by-state and transition-by-transition,
+they can also be built by performing language-theoretic operations over
+component NWAs. These operations include: union, intersection, concatenation,
+reversal, Kleene-star, complement, and determinize. The library supports two
+interfaces to the Boolean operations.  In one, each operation returns a
+\texttt{ref\_ptr<NWA>} to a freshly-built NWA.  In the other, each operation
+transforms the NWA on which it was called. \\
 
 \noindent The following operations are methods of class NWA:
 
 \begin{description}
 
-  \item\texttt{static ref\_ptr<NWA> unionNWA( ref\_ptr<NWA> first, \\ \hspace*{3.25cm} ref\_ptr<NWA> second, Key stuck )} \nopagebreak
+  \item\texttt{static ref\_ptr<NWA> unionNWA( ref\_ptr<NWA> first,
+    \\ \hspace*{3.25cm} ref\_ptr<NWA> second, Key stuck )} \nopagebreak
 
     The result is the union of the NWAs \texttt{first} and \texttt{second}.
     The stuck state of the resulting NWA is \texttt{stuck}.  See Section
     \ref{Se:Union}.
 
-  \item\texttt{static ref\_ptr<NWA> intersect( ref\_ptr<NWA> first, \\ \hspace*{3.25cm} ref\_ptr<NWA> second, Key stuck )} \nopagebreak
+  \item\texttt{static ref\_ptr<NWA> intersect( ref\_ptr<NWA> first,
+    \\ \hspace*{3.25cm} ref\_ptr<NWA> second, Key stuck )} \nopagebreak
 
     The result is the intersection of the NWAs \texttt{first} and
     \texttt{second}.  The stuck state of the resulting NWA is \texttt{stuck}.
     See Section \ref{Se:Intersection}.
 
-  \item\texttt{static ref\_ptr<NWA> concat( ref\_ptr<NWA> first, \\ \hspace*{3.25cm} ref\_ptr<NWA> second, Key stuck )} \nopagebreak
+  \item\texttt{static ref\_ptr<NWA> concat( ref\_ptr<NWA> first,
+    \\ \hspace*{3.25cm} ref\_ptr<NWA> second, Key stuck )} \nopagebreak
 
     The result is the concatenation of the NWAs \texttt{first} and
     \texttt{second}.  The stuck state of the resulting NWA is \texttt{stuck}.
@@ -137,7 +146,8 @@ resulting NWA is nondeterministic (because it has multiple initial states).
 \begin{figure}[htbp]
   \centering
     \includegraphics[width=12cm]{Figures/Figure4}
-  \caption{The NWA resulting from the union of the NWA in Figure \ref{Fig:Example1} and the NWA in Figure \ref{Fig:Union1}.}
+  \caption{The NWA resulting from the union of the NWA in Figure
+    \ref{Fig:Example1} and the NWA in Figure \ref{Fig:Union1}.}
   \label{Fig:Union2}
 \end{figure}
 
@@ -177,7 +187,8 @@ Figure \ref{Fig:Intersect2}.
 \begin{figure}[htbp]
   \centering
     \includegraphics[width=8cm]{Figures/Figure6}
-  \caption{The NWA resulting from the intersection of the NWA in Figure \ref{Fig:Example1} and the NWA in Figure \ref{Fig:Intersect1}.}
+  \caption{The NWA resulting from the intersection of the NWA in Figure
+    \ref{Fig:Example1} and the NWA in Figure \ref{Fig:Intersect1}.}
   \label{Fig:Intersect2}
 \end{figure}
 
@@ -213,39 +224,54 @@ called (as appropriate) to update the \texttt{ClientInfo} associated with the
 target state of the transition being added. \\
 
 \goodbreak
-\noindent The following operations are methods of class NWA and are intended to be overridden to customize behavior:
+\noindent The following operations are methods of class NWA and are intended
+to be overridden to customize behavior:
 
 \begin{description}
 
-  \item\texttt{bool stateIntersect( ref\_ptr<NWA> first, Key state1,\\ \hspace*{3.25cm} ref\_ptr<NWA> second,Key state2,\\ \hspace*{3.25cm} Key\& resSt, ref\_ptr<ClientInfo>\& resCI )} \nopagebreak
+  \item\texttt{bool stateIntersect( ref\_ptr<NWA> first, Key
+    state1,\\ \hspace*{3.25cm} ref\_ptr<NWA> second,Key
+    state2,\\ \hspace*{3.25cm} Key\& resSt, ref\_ptr<ClientInfo>\& resCI )}
+    \nopagebreak
 
     Determines whether the given states are considered to be equivalent for
     the purposes of intersection and, if so, creates the combined state,
     together with the client information that should be associated with the
     combined state and returns true.  Otherwise, returns false.
     
-  \item\texttt{bool transitionIntersect( ref\_ptr<NWA> first, Key sym1,\\ \hspace*{3.25cm} ref\_ptr<NWA> second, Key sym2,\\ \hspace*{3.25cm} Key\& resSym )} \nopagebreak
+  \item\texttt{bool transitionIntersect( ref\_ptr<NWA> first, Key
+    sym1,\\ \hspace*{3.25cm} ref\_ptr<NWA> second, Key
+    sym2,\\ \hspace*{3.25cm} Key\& resSym )} \nopagebreak
 
     Determines whether the given symbols are considered to be equivalent for
     the purposes of intersection and, if so, computes the symbol which should
     be associated with the combined transition and returns true.  Otherwise,
     returns false.
 
-  \item\texttt{void intersectClientInfoInternal( \\ \hspace*{3.25cm} ref\_ptr<NWA> first, Key src1, Key tgt1,\\ \hspace*{3.25cm} ref\_ptr<NWA> second, Key src2, Key tgt2,\\ \hspace*{3.25cm} Key resSym, Key resSt )} \nopagebreak
+  \item\texttt{void intersectClientInfoInternal( \\ \hspace*{3.25cm}
+    ref\_ptr<NWA> first, Key src1, Key tgt1,\\ \hspace*{3.25cm} ref\_ptr<NWA>
+    second, Key src2, Key tgt2,\\ \hspace*{3.25cm} Key resSym, Key resSt )}
+    \nopagebreak
 
     Alters the client information associated with \texttt{resSt} given the
     sources and targets (as well as access to the client information
     associated with each state) of the two internal transitions that are
     being intersected.
 
-  \item\texttt{void intersectClientInfoCall( \\ \hspace*{3.25cm} ref\_ptr<NWA> first ,Key call1, Key entry1,\\ \hspace*{3.25cm} ref\_ptr<NWA> second, Key call2, Key entry2,\\ \hspace*{3.25cm} Key resSym, Key resSt )} \nopagebreak
+  \item\texttt{void intersectClientInfoCall( \\ \hspace*{3.25cm}
+    ref\_ptr<NWA> first ,Key call1, Key entry1,\\ \hspace*{3.25cm}
+    ref\_ptr<NWA> second, Key call2, Key entry2,\\ \hspace*{3.25cm} Key
+    resSym, Key resSt )} \nopagebreak
 
     Alters the client information associated with \texttt{resSt} given the
     call sites and entry points (as well as access to the client information
     associated with each state) of the two call transitions that are being
     intersected.
 
-  \item\texttt{void intersectClientInfoReturn( \\ \hspace*{1.75cm} ref\_ptr<NWA> first, Key exit1, Key call1, Key ret1,\\ \hspace*{1.75cm} ref\_ptr<NWA> second, Key exit2, Key call2, Key ret2,\\ \hspace*{1.75cm} Key resSym, Key resSt )} \nopagebreak
+  \item\texttt{void intersectClientInfoReturn( \\ \hspace*{1.75cm}
+    ref\_ptr<NWA> first, Key exit1, Key call1, Key ret1,\\ \hspace*{1.75cm}
+    ref\_ptr<NWA> second, Key exit2, Key call2, Key ret2,\\ \hspace*{1.75cm}
+    Key resSym, Key resSt )} \nopagebreak
 
     Alters the client information assoicated with \texttt{resSt} given the
     exit point, call site, and return site (as well as access to the client
@@ -255,7 +281,12 @@ target state of the transition being added. \\
 \end{description}
 
 
-Consider the slightly more complex example of computing the intersection of the NWAs shown in Figure \ref{Fig:Intersect3}.  The resulting NWA is shown in Figure \ref{Fig:Intersect4}.  Note that a state is only made final if both of its component states were final in their respective NWAs (this can be seen in the state 'Call\_1,Dead\_End' where 'Dead\_End' was final, but 'Call\_1' was not).  
+Consider the slightly more complex example of computing the intersection of
+the NWAs shown in Figure \ref{Fig:Intersect3}.  The resulting NWA is shown in
+Figure \ref{Fig:Intersect4}.  Note that a state is only made final if both of
+its component states were final in their respective NWAs (this can be seen in
+the state 'Call\_1,Dead\_End' where 'Dead\_End' was final, but 'Call\_1' was
+not).
 
 \begin{figure}[p]
   \centering
