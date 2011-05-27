@@ -4,52 +4,10 @@
 \subsection{States}
 \label{Se:States}
 
-The NWA has the possiblility for a special state called the stuck state
-(recall that an NWA of type 1 has a stuck state).  The stuck state is a state
-that can never be a final state and has no outgoing transitions except to
-itself and, to reduce the size of the transition sets of the NWA, has
-implicit incoming transitions.  Any transition to the stuck state, i.e., any
-internal transition in which the target is the stuck state, any call
-transition in which the entry state is the stuck state, or any return
-transition in which the return state is the stuck state, need not be
-explicitly specified (this occurs only in an NWA of type 1).  In addition, no
-transition can leave the stuck state unless it is going to the stuck state as
-well (see Section \ref{Se:Transitions}). \\
-
-\goodbreak
-\noindent The following operations are methods of class NWA:
-
-\begin{description}
-
-  \item\texttt{Key getStuckState()} \nopagebreak
-
-    Allows the user to access the \texttt{Key} for the stuck state.  This
-    method should not be called on an NWA of type 2 because there is no stuck
-    state to retrieve; otherwise there is an assertion violation.
-
-  \item\texttt{bool isStuckState( Key st )} \nopagebreak
-
-    Tests whether the given \texttt{Key}, \texttt{st}, is the stuck state's
-    \texttt{Key}.  If yes, returns true.  Otherwise, returns false.  If
-    called on an NWA of type 2, returns false. \\
-
-\end{description}
-
-States are WALi \texttt{Keys} and can be added to an NWA of type 1
+States are WALi \texttt{Keys} and can be added to an NWA
 individually (using \texttt{addState}, \texttt{addInitialState}, or
 \texttt{addFinalState}) or as a part of a transition (see Section
-\ref{Se:Transitions}).  Note that in NWAs of type 1, the addition of an
-individual state automatically introduces an implicit internal transition to
-the stuck state for each symbol (except meta-symbols\footnote{meta-symbols
-  will be described in greater detail in Section \ref{Se:Symbols}}) in the
-NWA; an implicit call transition to the stuck state for each symbol (except
-meta-symbols) in the NWA; and two return transitions to the stuck state for
-each state/symbol pair (except meta-symbols) pair in the NWA, one in which
-the state added plays the role of the exit state and one in which the state
-added plays the role of the call state.  Because NWAs of type 2 have no stuck
-state, such transitions cannot be added automatically and thus adding a state
-would violate the completeness of the states of the NWA.  Therefore,
-\textbf{no states can be added to an NWA of type 2}. \\
+\ref{Se:Transitions}).  
 
 \noindent The following operations are methods of class NWA:
 
@@ -58,46 +16,31 @@ would violate the completeness of the states of the NWA.  Therefore,
   \item\texttt{bool addState( Key st )} \nopagebreak
 
     Adds the given state, \texttt{st}, to $Q$.  Returns false if state
-    \texttt{st} already exists in the NWA, otherwise returns true.  This
-    method should not be called on an NWA of type 2, otherwise there is an
-    assertion violation.
+    \texttt{st} already exists in the NWA, otherwise returns true.
 
   \item\texttt{bool addInitialState( Key st )} \nopagebreak
 
     Adds the given state, \texttt{st}, to $Q_0 $ (and also to $Q$ if
     \texttt{st} $\not\in Q$).  Returns false if state \texttt{st} already
-    exists in $Q_0$, otherwise returns true.  This method should not be
-    called on an NWA of type 2, otherwise there is an assertion violation.
+    exists in $Q_0$, otherwise returns true.
 
   \item\texttt{bool addFinalState( Key st )} \nopagebreak
 
     Adds the given state, \texttt{st}, to $Q_f$ (and also to $Q$ if
     \texttt{st} $\not\in Q$).  Returns false if state \texttt{st} already
-    exists in $Q_f$, otherwise returns true.  If \texttt{st} is the NWA's
-    stuck state, then the NWA is automatically transformed to one of type 2
-    (by materializing all the implicit transitions) prior to making
-    \texttt{st} a final state.  This method should not be called on an NWA of
-    type 2, otherwise there is an assertion violation. \\
+    exists in $Q_f$, otherwise returns true.
 
 \end{description}
 
 
 States can be removed from an NWA individually (using \texttt{removeState})
-or by clearing the state set of the NWA.  Note that in NWAs of type 1, the
-removal of an individual state automatically eliminates all transitions for
-each internal transition that has the state being removed as the target, each
-call transition that has the state being removed as the entry state, and each
-return transition that has the state being removed as the return state or
-call state.  Transitions that are removed are redirected to the stuck state
-as implicit transitions.  Because NWAs of type 2 have no stuck state, such
-transitions cannot be added automatically and thus removing a state would
-violate the completeness of the states of the NWA.  Therefore, \textbf{no
-  states can be removed from an NWA of type 2}.
+or by clearing the state set of the NWA. 
+Removing an individual state automatically eliminates all transitions that
+state participates in.
 
 Initial (final) states can be removed from $Q_0 $ ($Q_f$) (but not from $Q$)
 individually (using \texttt{removeInitialState}, \texttt{removeFinalState})
-or by clearing the initial (final) state set of the NWA.  These operations
-can be performed on NWAs of both types. \\
+or by clearing the initial (final) state set of the NWA.
 
 \noindent The following operations are methods of class NWA:
 
@@ -108,16 +51,13 @@ can be performed on NWAs of both types. \\
     Removes the given state, \texttt{st}, from $Q$ (and also removes
     \texttt{st} from $Q_0$ if \texttt{st} $\in Q_0$ and removes \texttt{st}
     from $Q_f$ if \texttt{st} $\in Q_f$).  Returns false if state \texttt{st}
-    did not exist in the NWA, otherwise returns true. This method cannot
-    remove the stuck state from the NWA, because that would create implicit
-    transitions to nowhere.  Any transitions (internal, call, and return)
-    associated with \texttt{st} are also removed from the NWA.  This method
-    should not be called on an NWA of type 2, otherwise there is an assertion
-    violation.
+    did not exist in the NWA, otherwise returns true. 
+    Any transitions (internal, call, and return)
+    associated with \texttt{st} are also removed from the NWA.
 
   \item\texttt{void clearStates()} \nopagebreak
 
-    Removes all states (including the stuck state) from $Q$, $Q_0$, and
+    Removes all states from $Q$, $Q_0$, and
     $Q_f$.  As a side effect it also removes all transitions in the NWA.  The
     symbols in the NWA are not affected.
 
@@ -146,12 +86,12 @@ can be performed on NWAs of both types. \\
 \end{description}
 
 The status of individual states (i.e., existence in an NWA, in the initial
-state set, or in the final state set) can be checked for an NWA of either
-type (using \texttt{isState}/\texttt{is\_nwa\_state},
-\texttt{isInitialState}, and \texttt{isFinalState}).  In addition, states,
+state set, or in the final state set) can be checked
+using \texttt{isState},
+\texttt{isInitialState}, and \texttt{isFinalState}.  In addition, states,
 initial states, and final states can be requested and examined as collections
-(using \texttt{getStates}/\texttt{get\_states}, \texttt{getInitialStates},
-\texttt{getFinalStates}, \texttt{sizeStates}/\texttt{num\_nwa\_states},
+(using \texttt{getStates}, \texttt{getInitialStates},
+\texttt{getFinalStates}, \texttt{sizeStates},
 \texttt{sizeInitialStates}, and \texttt{sizeFinalStates}). \\
 
 \noindent The following operations are methods of class NWA:
@@ -176,7 +116,7 @@ initial states, and final states can be requested and examined as collections
   \item\texttt{const set<Key>\& getStates() const} \nopagebreak
 
     Returns a \texttt{set} consisting of the \texttt{Keys} of all states in
-    the NWA (including the stuck state).
+    the NWA.
 
   \item\texttt{const set<Key>\& getInitialStates() const} \nopagebreak
 
@@ -190,8 +130,7 @@ initial states, and final states can be requested and examined as collections
 
   \item\texttt{size\_t sizeStates() const} \nopagebreak
 
-    Yields the number of states in the NWA.  If the NWA is of type 1, this
-    count includes the stuck state.
+    Yields the number of states in the NWA.
 
   \item\texttt{size\_t sizeInitialStates() const} \nopagebreak
 
@@ -245,7 +184,7 @@ symbol.  \texttt{Epsilon} symbols cannot label call or return transitions
 denotes the situation in which a transition can be traversed by consuming a
 single input symbol of any kind.  Since the NWA alphabet is not fixed, the
 actual symbols that \texttt{Wild} stands for is fluid.  Note:
-\textbf{\texttt{Epsilon} and \texttt{Wild} are not elements of $\Sigma$.} Let
+\textbf{\texttt{Epsilon} and \texttt{Wild} are not explicit elements of $\Sigma$.} Let
 $\Sigma^* = \Sigma \cup \{*, \epsilon\}$.\\
 
 \noindent The following operations are methods of class NWA:
@@ -276,17 +215,9 @@ $\Sigma^* = \Sigma \cup \{*, \epsilon\}$.\\
 
 \end{description}
 
-Symbols are WALi \texttt{Keys} and can be added to an NWA of type 1
+Symbols are WALi \texttt{Keys} and can be added to an NWA
 individually (using \texttt{addSymbol}) or as a part of a transition (see
-Section \ref{Se:Transitions}).  Note that in NWAs of type 1, the addition of
-a symbol adds an implicit internal transition from each state to the stuck
-state on the symbol being added, an implicit call transition from each state
-to the stuck state on the symbol being added, and an implicit return
-transition from each pair of states to the stuck state on the symbol being
-added.  Because NWAs of type 2 have no stuck state, such transitions cannot
-be added automatically and thus adding a symbol would violate the
-completeness of the states of the NWA.  Therefore, \textbf{no symbols can be
-  added to an NWA of type 2}. \\
+Section \ref{Se:Transitions}).
 
  \clearpage
 
@@ -300,12 +231,11 @@ completeness of the states of the NWA.  Therefore, \textbf{no symbols can be
     symbol \texttt{sym} already exists in the NWA, otherwise returns true.
     Note: \texttt{Wild} and \texttt{Epsilon} are meta-symbol, not symbols of
     the alphabet, so if \texttt{sym} is the \texttt{Key} for either of these
-    a failure code of false is returned.  This method should not be called on
-    an NWA of type 2, otherwise there is an assertion violation. \\
+    a failure code of false is returned.
 
 \end{description}
 
-Symbols can be removed from an NWA of either type individually (using
+Symbols can be removed from an NWA individually (using
 \texttt{removeSymbol}) or by clearing the alphabet of the NWA (using
 \texttt{clearSymbols}).  Note that the removal of a symbol removes all
 internal, call, and return transitions having that symbol (both implicit and
@@ -334,7 +264,7 @@ the NWA. \\
 \end{description}
 
 The status of individual symbols (i.e., existence in an NWA) can be checked
-for an NWA of either type (using \texttt{isSymbol}).  In addition, symbols
+for an NWA (using \texttt{isSymbol}).  In addition, symbols
 can be requested and examined as a collection (using \texttt{getSymbols} and
 \texttt{sizeSymbols}). \\
 
@@ -389,7 +319,7 @@ internal transitions, $(number\_of\_states)^2*(number\_of\_symbols)$ call
 transitions, and $(number\_of\_states)^3*(number\_of\_symbols)$ return
 transitions.
 
-Transitions can be added to an NWA of type 1 via the overloaded functions
+Transitions can be added to an NWA via the overloaded functions
 \texttt{addInternalTrans}, \texttt{addCallTrans}, and
 \texttt{addReturnTrans}.  Those functions can either take three \texttt{Keys}
 that define the transition as input, or an input of type \texttt{KeyTriple\&}
@@ -397,21 +327,11 @@ or \texttt{KeyQuad\&}.  \texttt{KeyTriple} and \texttt{KeyQuad} are WALi data
 structures containing 3 and 4 \texttt{Keys}, respectively.  Alternatively,
 the set of transitions of a state (or the set of outgoing transitions of a
 state) can be duplicated for another state (using \texttt{duplicateState} or
-\texttt{duplicateStateOutgoing}) or all implicit transitions (to the stuck
-state) can be added as explicit transitions (using
+\texttt{duplicateStateOutgoing}) or the transition relation can be made total (using
 \texttt{realizeImplicitTrans}).  As a side effect of all of these functions,
 if any component (state or symbol) of a transition does not already exist in
-the NWA it will be added to the NWA.  Thus states and symbols need not be
-added independently prior to adding transitions.  Note that, in NWAs of type
-1, the addition of a state or symbol adds to the NWA implicit transitions to
-the stuck state (see Section \ref{Se:States} and Section \ref{Se:Symbols}).
-Because NWAs of type 2 have no stuck state, such transitions cannot be added
-automatically, and thus adding a transition would violate the completeness of
-the states in the NWA.  Therefore, \textbf{no transitions can be added to an
-  NWA of type 2}.  Recall that the stuck state has no outgoing transitions
-except to itself (see Section \ref{Se:States}).  Thus, no transition leaving
-the stuck state will be added to the NWA unless it is going to the stuck
-state as well.  Recall also that the \texttt{$\epsilon$} symbol cannot label
+the NWA it will be added to the NWA. 
+Recall also that the \texttt{$\epsilon$} symbol cannot label
 a call transition or a return transition (see Section \ref{Se:Symbols}).
 Thus, no call or return transition with a symbol of \texttt{$\epsilon$} will
 be added. \\
@@ -430,8 +350,7 @@ be added. \\
     true.  In addition, \texttt{source} and \texttt{target} are added as
     states (if $\texttt{source} \not\in Q$ and $\texttt{target} \not\in Q$,
     respectively) and \texttt{sym} is added as a symbol (if $\texttt{sym}
-    \not\in \Sigma^*$).  This method should not be called on an NWA of type
-    2, otherwise there is an assertion violation.
+    \not\in \Sigma^*$).
 
   \item\texttt{bool addInternalTrans( KeyTriple\& intTrans )} \nopagebreak
 
@@ -440,9 +359,7 @@ be added. \\
     the NWA, otherwise returns true.  In addition, the states of
     \texttt{intTrans} are added as states of the NWA (if not already states
     in the NWA) and the symbol of \texttt{intTrans} is added as a symbol of
-    the NWA (if not a meta-symbol or already a symbol in the NWA).  This
-    method should not be called on an NWA of type 2, otherwise there is an
-    assertion violation.
+    the NWA (if not a meta-symbol or already a symbol in the NWA).
 
   \item\texttt{bool addCallTrans( Key callSite, Key sym, Key entryPoint )} \nopagebreak
 
@@ -452,9 +369,7 @@ be added. \\
     returns true.  In addition, \texttt{callSite} and \texttt{entryPoint} are
     added as states of the NWA (if $\texttt{callSite} \not\in Q$ and
     $\texttt{entryPoint} \not\in Q$, respectively) and \texttt{sym} is added
-    as a symbol of the NWA (if $\texttt{sym} \not\in \Sigma^*$).  This method
-    should not be called on an NWA of type 2, otherwise there is an assertion
-    violation.
+    as a symbol of the NWA (if $\texttt{sym} \not\in \Sigma^*$).
 
   \item\texttt{bool addCallTrans( KeyTriple\& callTrans )} \nopagebreak
 
@@ -463,9 +378,7 @@ be added. \\
     the NWA, otherwise returns true.  In addition, the states of
     \texttt{callTrans} are added as states of the NWA (if not already states
     in the NWA) and the symbol of \texttt{callTrans} is added as a symbol of
-    the NWA (if not a meta-symbol or already a symbol in the NWA).  This
-    method should not be called on an NWA of type 2, otherwise there is an
-    assertion violation.
+    the NWA (if not a meta-symbol or already a symbol in the NWA).
 
   \item\texttt{bool addReturnTrans( Key exitPoint, Key
     callSite,\\ \hspace*{3.25cm} Key sym, Key returnSite )} \nopagebreak
@@ -477,8 +390,7 @@ be added. \\
     \texttt{callSite}, and \texttt{returnSite} are added as states of the NWA
     (if $\texttt{exitPoint} \not\in Q$, $\texttt{callSite} \not\in Q$, and
     $\texttt{returnSite} \not\in Q$, respectively) and \texttt{sym} is added
-    as a symbol (if $\texttt{sym} \not\in \Sigma^*$).  This method should not
-    be called on an NWA of type 2, otherwise there is an assertion violation.
+    as a symbol (if $\texttt{sym} \not\in \Sigma^*$).
 
   \item\texttt{bool addReturnTrans( KeyQuad\& retTrans )} \nopagebreak
 
@@ -487,8 +399,7 @@ be added. \\
     the NWA, otherwise returns true.  In addition, the states of
     \texttt{retTrans} are added as states (if not already states in the NWA)
     and the symbol of \texttt{retTrans} is added as a symbol (if not a
-    meta-symbol or already a symbol in the NWA).  This method should not be
-    called on an NWA of type 2, otherwise there is an assertion violation.
+    meta-symbol or already a symbol in the NWA).
 
   \item\texttt{void duplicateState( Key orig, Key dup )} \nopagebreak
 
@@ -507,9 +418,7 @@ be added. \\
     $(\texttt{orig},\texttt{dup},a,\texttt{orig})$,
     $(\texttt{dup},\texttt{orig},a,\texttt{dup})$,
     $(\texttt{dup},\texttt{orig},a,\texttt{orig})$, and
-    $(\texttt{orig},\texttt{orig},a,\texttt{dup})$ are added.  This method
-    should not be called on an NWA of type 2, otherwise there is an assertion
-    violation.
+    $(\texttt{orig},\texttt{orig},a,\texttt{dup})$ are added.
 
   \item\texttt{void duplicateStateOutgoing( Key orig, Key dup )} \nopagebreak
 
@@ -525,30 +434,27 @@ be added. \\
     then the transitions $(\texttt{dup},\texttt{dup},a,\texttt{dup})$,
     $(\texttt{dup},\texttt{dup},a,\texttt{orig})$,
     $(\texttt{dup},\texttt{orig},a,\texttt{dup})$, and
-    $(\texttt{dup},\texttt{orig},a,\texttt{orig})$ are added.  This method
-    should not be called on an NWA of type 2, otherwise there is an assertion
-    violation.
+    $(\texttt{dup},\texttt{orig},a,\texttt{orig})$ are added.
 
-  \item\texttt{void realizeImplicitTrans()} \nopagebreak
+  \item\texttt{void realizeImplicitTrans(State stuck)} \nopagebreak
 
-    Adds all implicit transitions explicitly to the stuck state.  This should
-    only be called on an NWA of type 1, and it changes the NWA to an NWA of
-    type 2.  Otherwise there is an assertion violation. \\
+    Makes the transition relation ``at least total.''
+    Adds the state \texttt{stuck} to the machine (if not already present),
+    then for any source state and symbol pair that does not have at least one
+    transition, adds a transition to \texttt{stuck}. It does the same for
+    call transitions and return transitions (with an additional ``for each
+    call predecessor'' in that case).
+
+    Note that if the machine was nondeterministic, it will still be
+    nondeterministic after this call.
 
 \end{description} 
 
-Transitions can be removed from an NWA of type 1 individually or by
+Transitions can be removed from an NWA individually or by
 specifying component parts (using \texttt{removeInternalTrans},
 \texttt{removeCallTrans}, or \texttt{removeReturnTrans}), by clearing all
 transitions from the NWA, or as a side effect of removing a state or symbol
 from the NWA (see Section \ref{Se:States} and Section \ref{Se:Symbols}).
-Note that, in NWAs of type 1, the removal of a transition will add an
-implicit transition with the same source/call-state/exit- and call- states,
-the same symbol, and the stuck state as the target/entry-state/return-state.
-Because NWAs of type 2 have no stuck state, such transitions cannot be added
-automatically, and thus removing a transition would violate the completeness
-of the states in the NWA.  Therefore, \textbf{no transitions can be removed
-  from an NWA of type 2}. \\
 
 \noindent The following operations are methods of class NWA:
 
@@ -560,16 +466,13 @@ of the states in the NWA.  Therefore, \textbf{no transitions can be removed
     $(\texttt{source},\texttt{sym},\texttt{target})$ from the NWA (if
     $(\texttt{source},\texttt{sym},\texttt{target}) \in \delta_i$).  Returns
     false if this transition did not exist in the NWA, otherwise returns
-    true.  This method should not be called on an NWA of type 2, otherwise
-    there is an assertion violation.
+    true.
 
   \item\texttt{bool removeInternalTrans( KeyTriple\& intTrans )} \nopagebreak 
 
     Removes an internal transition from the NWA for the triple specified by
     \texttt{intTrans} (if \texttt{intTrans} $\in \delta_i$).  Returns false
     if this transition did not exist in the NWA, otherwise returns true.
-    This method should not be called on an NWA of type 2, otherwise there is
-    an assertion violation.
 
   \item\texttt{bool removeCallTrans( Key callSite, Key sym, Key entryPoint )} \nopagebreak
 
@@ -577,16 +480,13 @@ of the states in the NWA.  Therefore, \textbf{no transitions can be removed
     $(\texttt{callSite},\texttt{sym},\texttt{entryPoint})$ from the NWA (if
     $(\texttt{callSite},\texttt{sym},\texttt{entryPoint}) \in \delta_c$).
     Returns false if this transition did not exist in the NWA, otherwise
-    returns true.  This method should not be called on an NWA of type 2,
-    otherwise there is an assertion violation.
+    returns true.
  
   \item\texttt{bool removeCallTrans( KeyTriple\& callTrans )} \nopagebreak
 
     Removes a call transition from the NWA for the triple specified by
     \texttt{callTrans} (if \texttt{callTrans} $\in \delta_c$).  Returns false
     if this transition did not exist in the NWA, otherwise returns true.
-    This method should not be called on an NWA of type 2, otherwise there is
-    an assertion violation.
 
   \item\texttt{bool removeReturnTrans( Key exitPoint, Key
     callSite,\\ \hspace*{3.25cm} Key sym, Key returnSite )} \nopagebreak
@@ -596,8 +496,7 @@ of the states in the NWA.  Therefore, \textbf{no transitions can be removed
     from the NWA (if
     $(\texttt{exitPoint},\texttt{callSite},\texttt{sym},\texttt{returnSite})
     \in \delta_r$).  Returns false if this transition did not exist in the
-    NWA, otherwise returns true.  This method should not be called on an NWA
-    of type 2, otherwise there is an assertion violation.
+    NWA, otherwise returns true.
 
   \item\texttt{bool removeReturnTrans( Key exitPoint, Key sym, Key returnSite )} \nopagebreak
 
@@ -606,16 +505,13 @@ of the states in the NWA.  Therefore, \textbf{no transitions can be removed
     \in Q$ from the NWA (if
     $(\texttt{exitPoint},st,\texttt{sym},\texttt{returnSite}) \in \delta_r$).
     Returns false if this transition did not exist in the NWA, otherwise
-    returns true.  This method should not be called on an NWA of type 2,
-    otherwise there is an assertion violation.
+    returns true.
 
   \item\texttt{bool removeReturnTrans( KeyQuad\& retTrans )} \nopagebreak
 
     Removes a return transition from the NWA for the quadruple specified by
     \texttt{retTrans} (if \texttt{retTrans} $\in \delta_r$).  Returns false
     if this transition did not exist in the NWA, otherwise returns true.
-    This method should not be called on an NWA of type 2, otherwise there is
-    an assertion violation.
 
   \item\texttt{void clearTrans()} \nopagebreak
 
