@@ -14,47 +14,46 @@ transforms the NWA on which it was called. \\
 \begin{description}
 
   \item\texttt{static ref\_ptr<NWA> unionNWA( ref\_ptr<NWA> first,
-    \\ \hspace*{3.25cm} ref\_ptr<NWA> second, Key stuck )} \nopagebreak
+    \\ \hspace*{3.25cm} ref\_ptr<NWA> second )} \nopagebreak
 
     The result is the union of the NWAs \texttt{first} and \texttt{second}.
-    The stuck state of the resulting NWA is \texttt{stuck}.  See Section
+    See Section
     \ref{Se:Union}.
 
   \item\texttt{static ref\_ptr<NWA> intersect( ref\_ptr<NWA> first,
-    \\ \hspace*{3.25cm} ref\_ptr<NWA> second, Key stuck )} \nopagebreak
+    \\ \hspace*{3.25cm} ref\_ptr<NWA> second )} \nopagebreak
 
     The result is the intersection of the NWAs \texttt{first} and
-    \texttt{second}.  The stuck state of the resulting NWA is \texttt{stuck}.
+    \texttt{second}.
     See Section \ref{Se:Intersection}.
 
   \item\texttt{static ref\_ptr<NWA> concat( ref\_ptr<NWA> first,
-    \\ \hspace*{3.25cm} ref\_ptr<NWA> second, Key stuck )} \nopagebreak
+    \\ \hspace*{3.25cm} ref\_ptr<NWA> second )} \nopagebreak
 
     The result is the concatenation of the NWAs \texttt{first} and
-    \texttt{second}.  The stuck state of the resulting NWA is \texttt{stuck}.
+    \texttt{second}.
     See Section \ref{Se:Concatenation}.
 
-  \item\texttt{static ref\_ptr<NWA> star( ref\_ptr<NWA> first, Key stuck )} \nopagebreak
+  \item\texttt{static ref\_ptr<NWA> star( ref\_ptr<NWA> first )} \nopagebreak
 
-    The result is the Kleene-Star of the NWA \texttt{first}.  The stuck state
-    of the resulting NWA is \texttt{stuck}.  See Section \ref{Se:Star}.
+    The result is the Kleene-Star of the NWA \texttt{first}. See Section
+    \ref{Se:Star}.
 
-  \item\texttt{static ref\_ptr<NWA> reverse( ref\_ptr<NWA> first, Key stuck )} \nopagebreak
+  \item\texttt{static ref\_ptr<NWA> reverse( ref\_ptr<NWA> first )} \nopagebreak
 
     The result is the NWA which accepts the reverse of each nested word
-    accepted by the NWA \texttt{first}.  The stuck state of the resulting NWA
-    is \texttt{stuck}.  See Section \ref{Se:Reverse}.
+    accepted by the NWA \texttt{first}. See Section \ref{Se:Reverse}.
 
-  \item\texttt{static ref\_ptr<NWA> determinize( ref\_ptr<NWA> nondet, Key stuck )} \nopagebreak
+  \item\texttt{static ref\_ptr<NWA> determinize( ref\_ptr<NWA> nondet )} \nopagebreak
 
     The result is the deterministic NWA that is equivalent to the NWA
-    \texttt{nondet}.  The stuck state of the resulting NWA is \texttt{stuck}.
+    \texttt{nondet}.
     See Section \ref{Se:Determinize}.
 
-  \item\texttt{static ref\_ptr<NWA> complement( ref\_ptr<NWA> first, Key stuck )} \nopagebreak
+  \item\texttt{static ref\_ptr<NWA> complement( ref\_ptr<NWA> first )} \nopagebreak
 
     The result is the NWA which is the complement of the NWA \texttt{first}.
-    The stuck state of the resulting NWA is \texttt{stuck}.  See Section
+    See Section
     \ref{Se:Complement}.
 
   \item\texttt{void unionNWA( ref\_ptr<NWA> first, ref\_ptr<NWA> second )} \nopagebreak
@@ -62,63 +61,55 @@ transforms the NWA on which it was called. \\
     This operation is an instance method; the NWA referred to by
     \texttt{this} is transformed into the NWA resulting from the union of the
     NWAs \texttt{first} and \texttt{second}.  See Section \ref{Se:Union}.
-    This method should not be called on an NWA of type 2, otherwise there is
-    an assertion violation.  Typical sequence of operations: construct A with
-    a stuck state; A.unionNWA(B,C);
+    Typical sequence of operations: construct A;
+    A.unionNWA(B,C);
 
  \item\texttt{void intersect( ref\_ptr<NWA> first, ref\_ptr<NWA> second )} \nopagebreak
 
     This operation is an instance method; the NWA referred to by
     \texttt{this} is transformed into the NWA resulting from the intersection
     of the NWAs \texttt{first} and \texttt{second}.  See Section
-    \ref{Se:Intersection}.  This method should not be called on an NWA of
-    type 2, otherwise there is an assertion violation.  Typical sequence of
-    operations: construct A with a stuck state; A.intersect(B,C);
+    \ref{Se:Intersection}.  Typical sequence of
+    operations: construct A; A.intersect(B,C);
 
   \item\texttt{void concat( ref\_ptr<NWA> first, ref\_ptr<NWA> second )} \nopagebreak
 
     This operation is an instance method; the NWA referred to by
     \texttt{this} is transformed into the NWA resulting from concatenating
     the NWAs \texttt{first} and \texttt{second}.  See Section
-    \ref{Se:Concatenation}.  This method should not be called on an NWA of
-    type 2, otherwise there is an assertion violation.  Typical sequence of
-    operations: construct A with a stuck state; A.concat(B,C);
+    \ref{Se:Concatenation}.  Typical sequence of
+    operations: construct A; A.concat(B,C);
 
   \item\texttt{void star( ref\_ptr<NWA> first )} \nopagebreak
 
     This operation is an instance method; the NWA referred to by
     \texttt{this} is transformed into the NWA resulting from performing the
     Kleene-Star operation on the NWA \texttt{first}.  See Section
-    \ref{Se:Star}.  This method should not be called on an NWA of type 2,
-    otherwise there is an assertion violation.  Typical sequence of
-    operations: construct A with a stuck state; A.star(B);
+    \ref{Se:Star}.  Typical sequence of
+    operations: construct A; A.star(B);
 
   \item\texttt{void reverse( ref\_ptr<NWA> first )} \nopagebreak
 
     This operation is an instance method; the NWA referred to by
     \texttt{this} is transformed into the NWA which accepts the reverse of
     each nested word accepted by the NWA \texttt{first}.  See Section
-    \ref{Se:Reverse}.  This method should not be called on an NWA of type 2,
-    otherwise there is an assertion violation.  Typical sequence of
-    operations: construct A with a stuck state; A.reverse(B);
+    \ref{Se:Reverse}.  Typical sequence of
+    operations: construct A; A.reverse(B);
 
   \item\texttt{void determinize( ref\_ptr<NWA> nondet )} \nopagebreak
 
     This operation is an instance method; the NWA referred to by
     \texttt{this} is transformed into the deterministic NWA that is
     equivalent to the NWA \texttt{nondet}.  See Section \ref{Se:Determinize}.
-    This method should not be called on an NWA of type 2, otherwise there is
-    an assertion violation.  Typical sequence of operations: construct A with
-    a stuck state; A.determinize(B);
+    Typical sequence of operations: construct A;
+    A.determinize(B);
 
   \item\texttt{void complement( ref\_ptr<NWA> first )} \nopagebreak
 
     This operation is an instance method; the NWA referred to by
     \texttt{this} is transformed into the NWA resulting from complementing
-    the NWA \texttt{first}.  See Section \ref{Se:Complement}.  This method
-    should not be called on an NWA of type 2, otherwise there is an assertion
-    violation.  Typical sequence of operations: construct Awith a stuck
-    state; A.complement(B);
+    the NWA \texttt{first}.  See Section \ref{Se:Complement}.
+    Typical sequence of operations: construct A; A.complement(B);
 
 \end{description}
 
@@ -151,11 +142,9 @@ resulting NWA is nondeterministic (because it has multiple initial states).
   \label{Fig:Union2}
 \end{figure}
 
-The stuck state of the resulting NWA cannot appear in either of the component
-NWAs, except as a stuck state.  Furthermore, to construct the union of two
-NWAs, the state sets of the NWAs cannot overlap (except by the stuck state),
-i.e. $Q_1 \cap Q_2 = \emptyset$ or $Q_1 \cap Q_2 = Stuck$, where $Stuck$ is
-the stuck state of both NWAs. Client information is copied directly from the
+To construct the union of two
+NWAs, the state sets of the NWAs cannot overlap,
+i.e. $Q_1 \cap Q_2 = \emptyset$. Client information is copied directly from the
 component NWAs using the \texttt{ClientInfo} copy constructor.
 
 
@@ -339,12 +328,10 @@ Figure \ref{Fig:Concat2}.
   \label{Fig:Concat2}
 \end{figure}
 
-The stuck state of the NWA on which the concat method is called cannot appear
-in either of the component NWAs xcept as a stuck state.  Furthermore, in
+In
 order to construct the concatenation of two NWAs, the state sets of the NWAs
-cannot overlap (except by the stuck state), i.e. $Q_1 \cap Q_2 = \emptyset$
-or $Q_1 \cap Q_2 = Stuck$, where $Stuck$ is the stuck state of both
-NWAs. Client information is copied directly from the component NWAs using the
+cannot overlap, i.e. $Q_1 \cap Q_2 = \emptyset$
+Client information is copied directly from the component NWAs using the
 \texttt{ClientInfo} copy constructor.
 
 \subsection{Kleene-Star}
@@ -397,10 +384,7 @@ $q \in Q$ and \texttt{prime} is the string ``prime''.
   \label{Fig:Star2}
 \end{figure}
 
-\goodbreak The stuck state of the NWA on which the Kleene-Star method is
-called cannot appear in the component NWA nor can it be the prime of any
-state in the NWA (i.e., $stuck \not\in Q \cup Q'$) unless it is the stuck
-state.  Client information is copied directly from the component NWA (using
+\goodbreak Client information is copied directly from the component NWA (using
 the \texttt{ClientInfo} copy constructor) such that for each $q \in Q$, $q$
 and $q'$ have the same client information.
 
@@ -450,8 +434,7 @@ Figure \ref{Fig:Example1} is shown in Figure \ref{Fig:Reverse1}.
   \label{Fig:Reverse1}
 \end{figure}
 
-The stuck state of the NWA on which the reverse method is called cannot be
-any state in the component NWA (including the stuck state).  Client
+Client
 information is copied directly from the component NWA using the
 \texttt{ClientInfo} copy constructor.
 
@@ -614,9 +597,7 @@ shown in Figure \ref{Fig:Comp1}.
   \label{Fig:Comp1}
 \end{figure}
 
-Because all non-final states (including the stuck state) become final states
-in the process of complementation, all implicit transitions are materialized
-and the resulting NWA is of type 2.  Client information is copied directly
+Client information is copied directly
 from the determinization of the component NWA using the \texttt{ClientInfo}
 copy constructor.
 
