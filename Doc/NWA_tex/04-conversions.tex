@@ -21,14 +21,12 @@ a WPDS.  \textbf{However, the construction of an NWA from a WPDS is not the
 
     This operation is an instance method; the NWA referred to by
     \texttt{this} is converted to the NWA that is equivalent to the given
-    PDS.  This method should not be called on an NWA of type 2, otherwise
-    there is an assertion violation.  Typical sequence of operations:
+    PDS.  Typical sequence of operations:
     construct A; A.PDStoNWA(pds);
 
-  \item\texttt{static ref\_ptr<NWA> PDStoNWA( const WPDS\& pds, Key stuck )} \nopagebreak
+  \item\texttt{static ref\_ptr<NWA> PDStoNWA( const WPDS\& pds )} \nopagebreak
 
-    Constructs and returns the NWA that is equivalent to the given PDS,
-    having the stuck state \texttt{stuck}.
+    Constructs and returns the NWA that is equivalent to the given PDS.
 
   \item\texttt{WPDS NWAtoPDScalls( WeightGen<Client>\& wg ) const} \nopagebreak
 
@@ -425,8 +423,7 @@ WPDS is shown in Figure \ref{Fig:NWAtoPDS3}. \\
 Once an NWA is built, there are a multitude of queries that can be made,
 including: \begin{inparaenum} \item whether the NWA is deterministic or
   non-deterministic, \item language-inclusion queries, and \item reachability
-  queries. \end{inparaenum} All of these queries can be made for an NWA of
-either type. \\
+  queries. \end{inparaenum}
 
 \clearpage
 \subsection{Deterministic}
