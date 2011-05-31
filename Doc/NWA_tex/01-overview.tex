@@ -1,15 +1,18 @@
 \section{Nested-Word Automata and Overview of the Library's Organization}
 \label{Se:Nested Word Automata}
 
-WALi-NWA is a library for constructing, querying, and operating on nested-word automata.  It
-is implemented in C++.
+WALi-NWA is a library for constructing, querying, and operating on
+nested-word automata.  It is implemented in C++.  The NWA portions of WALi
+are largely logically separate from the rest of WALi, but WALi-NWA does use
+facilities provided by WALi and inter-operates with WALi's pushdown system
+(PDS) code.
 
 \subsection{Nested Words and Nested-Word Automata}
-\label{Se:Def}
+%\label{Se:Def}
 
 Nested-word automata (NWAs)~\cite{DLT:AM2006,JACM:AM09} are a generalization
 of finite-state automata that can capture the matched-parenthesis structure
-that is exibited by, for example, opening and closing tags in XML and the
+that is exhibited by, for example, opening and closing tags in XML and the
 call/return structure exhibited by execution traces in multi-procedure
 programs. Their languages represent somewhat of a middle-ground between
 standard regular languages and context-free languages. Nested-word languages
@@ -22,216 +25,144 @@ they are closed under complementation and intersection. However, they are not
 directly comparable to languages of linear words, as the call/return
 structure is an explicit part of each word of a nested-word language.
 
-\begin{definition}
-  A \textsl{nested word} $(w,\rightsquigarrow)$ over alphabet $\Sigma$ is an
-  ordinary (linear) word $w \in \Sigma^*$ of length $|w|$ together with a
-  \textsl{nesting relation} $\rightsquigarrow$.
+We assume the reader is familiar with the definition of nested words and
+nested-word automata; if not, \TODO{appendix A} provides a definition and
+Alur et al~\cite{DLT:AM2006,JACM:AM09} describe them in detail. Our
+implementation corresponds to the definition from the DLT 2006
+paper~\cite{DLT:AM2006}; relative to followup work, this definition removes
+the distinction between the machine's linear and hierarchical states, and on
+a call always stacks the source state. (In the JACM 2009 presentation of the
+work~\cite{JACM:AM09}, this would be called a ``weakly-hierarchical'' NWA.)
 
-  The relation $\rightsquigarrow$ is a collection of edges (over the
-  positions in $w$) that do not cross. Formally, $\rightsquigarrow \subseteq$
-  $\{-\infty, 1, 2, \ldots, |w| \} \times \{1, 2, \ldots, |w|, +\infty\}$
-  such that:
-  \begin{itemize}
-    \item
-      Nesting edges only go forward: if $i \rightsquigarrow j$ then $i < j$.
-    \item
-      No two edges share a position: for $1 \leq i \leq |w|$, there is at
-      most one $j$ such that $i \rightsquigarrow j$ or $j \rightsquigarrow
-      i$.
-    \item
-      Edges do not cross: if $i \rightsquigarrow j$ and $i' \rightsquigarrow
-      j'$, then one cannot have $i < i' \leq j < j'$.
-  \end{itemize}
-
-  When $i \rightsquigarrow j$ holds, for $1 \leq i \leq |w|$, $i$ is called a
-  \textsl{call} position. If $i \rightsquigarrow +\infty$, then $i$ is a
-  \textsl{pending call}; otherwise $i$ is a \textsl{matched call}, and the
-  (unique) position $j$ such that $i \rightsquigarrow j$ is called its
-  \textsl{return successor}. (Note that these terms refer to positions within
-  $w$ rather than the symbol.)
-
-  Similarly, when $i \rightsquigarrow j$ holds, for $1 \leq j \leq |w|$, $j$
-  is a \textsl{return} position. If $-\infty \rightsquigarrow j$, then $j$ is
-  a \textsl{pending return}, otherwise $j$ is a \textsl{matched return}, and
-  the (unique) position $i$ such that $i \rightsquigarrow j$ is called its
-  \textsl{call predecessor}.
-
-  A position $1 \leq i \leq |w|$ that is neither a call nor a return is an
-  \textsl{internal} position.
-
-  A nested word is \textsl{balanced} if it has no pending calls
-  or returns.  A nested word is \textsl{unbalanced-left} (or a
-  \textsl{nested-word prefix}) if it has pending returns, and it is
-  \textsl{unbalanced-right} (or a \textsl{nested-word suffix})
-  if it has no pending calls.
-
-\end{definition}
-
-\TODO{Uh, what does this mean?}
-The library supports unbalanced-left, unbalanced-right, and balanced
-nested words, but has no direct support for general nested words.  For the
-effects of boolean operations on the four kinds of nested-words see Figure
-\ref{Fig:Ops}.
-
-\begin{figure}[htb]
-  \centering
-\begin{tabular}{c@{\hspace{1cm}}c}
-  \begin{tabular}{|| r || l | l | l | l ||}
-\hhline{|t:=====:t|}
-    Intersection & B & UL & UR & NW \\
-\hhline{||=#=|=|=|=||}
-    B & B & B & B & B \\
-\hhline{||-||-|-|-|-||}
-    UL & B & UL & B & UL \\
- \hhline{||-||-|-|-|-||}
-    UR & B & B & UR & UR \\
-\hhline{||-||-|-|-|-||}
-    NW & B & UL & UR & NW \\
-\hhline{|b:=====:b|}
-  \end{tabular}
-\vspace{1cm} &
-  \begin{tabular}{|| r || l | l | l | l ||}
-\hhline{|t:=====:t|}
-    Concatenation & B & UL & UR & NW \\
-\hhline{||=#=|=|=|=||}
-    B & B & UL & UR & NW \\
-\hhline{||-||-|-|-|-||}
-    UL & UL & UL & NW & NW \\
-\hhline{||-||-|-|-|-||}
-    UR & UR & NW & UR & NW \\
-\hhline{||-||-|-|-|-||}
-    NW & NW & NW & NW & NW \\
-\hhline{|b:=====:b|}
-  \end{tabular} \\
-\vspace{1cm}
-  \begin{tabular}{|| r || l | l | l | l ||}
-\hhline{|t:=====:t|}
-    Union & B & UL & UR & NW \\
-\hhline{||=#=|=|=|=||}
-    B & B & UL & UR & NW \\
-\hhline{||-||-|-|-|-||}
-    UL & UL & UL & NW & NW \\
-\hhline{||-||-|-|-|-||}
-    UR & UR & NW & UR & NW \\
-\hhline{||-||-|-|-|-||}
-    NW & NW & NW & NW & NW \\
-\hhline{|b:=====:b|}
-  \end{tabular} &
-  \begin{tabular}{|| r || l | l | l | l ||}
-\hhline{|t:=====:t|}
-    Operation & B & UL & UR & NW \\
-\hhline{||=#=|=|=|=||}
-    Star & B & UL & UR & NW \\
-\hhline{||-||-|-|-|-||}
-    Reverse & B & UR & UL & NW \\
-\hhline{||-||-|-|-|-||}
-    Complement & UL & UL & UR & NW \\
-\hhline{|b:=====:b|}
-  \end{tabular} \\
-\end{tabular}
-  \caption{Table of Operations on Nested Words. Note: B = balanced nested-word, UR = unbalanced-right nested-word, UL = unbalanced-left nested-word, NW = nested-word}
-  \label{Fig:Ops}
-\end{figure}
+Finally, the terminology used in the interface of the package is geared
+toward program analysis, so we use terms such as ``call site'' and ``return
+site'' to refer to states of the NWA even though they take on different
+meanings in different contexts.
 
 
-\begin{definition}
-  \label{De:NWA}
+\subsection{Library overview}
 
-  A \textsl{nested-word language} is any set of nested words; such a language
-  is a \textsl{regular nested-word language} if it is accepted by a NWA as
-  defined below.
+The core of the NWA library is in the namespace \texttt{wali::nwa}. It
+consists of the classes \texttt{NestedWord}, \texttt{NWA},
+\texttt{ClientInfo}, and \texttt{WeightGen}.
 
+There are three sub-namespaces that provide functions for operating on NWAs:
+\texttt{wali::nwa::query}, \texttt{wali::nwa::construct}, and
+\texttt{wali::nwa::nwa\_pds}.
 
-  A \textsl{nested-word automaton} (NWA) $A$ is a 5-tuple $(Q, \Sigma, Q_0,
-  \delta, F)$, where $Q$ is a finite set of states, $\Sigma$ is a finite
-  alphabet, $Q_0 \subseteq Q$ is the initial state, $F \subseteq Q$ is a set of
-  final states, and $\delta$ is a transition relation. The transition
-  relation $\delta$ consists of three components, $(\delta_c, \delta_i,
-  \delta_r)$, where:
-  \begin{itemize}
-    \item
-      $\delta_i: (Q \times \Sigma) \times Q$ is the transition relation for
-      internal positions of the input word.
-    \item
-      $\delta_c: (Q \times \Sigma) \times Q$ is the transition relation for
-      call positions.
-    \item
-      $\delta_r: (Q \times Q \times \Sigma) \times Q$ is the transition
-      relation for return positions.
-  \end{itemize}
+Finally, there are some operations and classes provided by WALi that the NWA
+portion of the library uses. This mostly consists of the key-handling code,
+but can also include the WPDS portions of the library.
 
-  Starting from a state in $Q_0$, an NWA $A$ reads a nested word $(w,\rightsquigarrow)$
-  from left to right, and performs transitions according to the current input
-  symbol and $\rightsquigarrow$.  If $A$ is in state $q$ when reading input
-  symbol $\sigma$ at position $i$ in $w$, and $i$ is an internal (resp, call)
-  position in $\rightsquigarrow$, $A$ makes a transition to a state $q'$ (if
-  one is available) such that $(q,\sigma,q')\in\delta_i$ (resp,
-  $(q,\sigma,q')\in\delta_c$).  If $i$ is a return position, let $k$ be the
-  call predecessor of $i$ (so $k \rightsquigarrow i$) and $q_c$ be the state
-  $A$ was in just before the transition it made on the $k^{\textrm{th}}$
-  symbol; $A$ changes to a state $q'$ such that $(q,q_c,\sigma,q')
-  \in\delta_r$. If there is a computation of $A$ on input
-  $(w,\rightsquigarrow)$ that terminates in a state $q\in F$, then $A$
-  accepts $(w,\rightsquigarrow)$.
+\subsubsection{NWA core classes}
 
-  NWAs can be either deterministic or nondeterministic, and these types have
-  equivalent power.
-\end{definition}
-
-
-To distinguish among the different roles for states in an internal
-transition $(q,\sigma,q')$, we say that $q$ is the source and $q'$ is the
-target.  Similarly, to distinguish among the roles for states in a call
-transition $(q_c,\sigma,q_e)$, we say that $q_c$ is the call state and $q_e$
-is the entry state. To distinguish among the roles for states in a return
-transition $(q_x,q_c,\sigma,q_r)$, we say that $q_x$ is the exit state,
-$q_c$ is the call state (or call predecessor), and $q_r$ is the return state.
-
-
-\subsection{Classes}
-\label{Se:Classes}
+These types live in namespace \texttt{wali::nwa}:
 
 \begin{description}
+  \item\texttt{NestedWord} This class models a single nested word. (It can be
+    balanced or unbalanced.) To use, include \texttt{wali/nwa/NestedWord.hpp}.
+  \item\texttt{NWA} Models nested-word automata themselves. To use, include
+    \texttt{wali/nwa/NWA.hpp}, or \texttt{wali/nwa/NWAFwd.hpp} if a
+    definition is not needed.
+  \item\texttt{NWARefPtr} is a typedef of \texttt{ref\_ptr$<$NWA$>$} (see
+    below). This is defined in \texttt{wali/nwa/NWAFwd.hpp}.
+  \item\texttt{State} and \texttt{Symbol} are both typedefs of
+    \texttt{wali::Key} (see below). Both are defined in
+    \texttt{wali/nwa/NWAFwd.hpp}.
+  \item\texttt{StateSet} and \texttt{SymbolSet} are typdefs of
+    \texttt{std::set}s of the corresponding type. Both are defined in
+    \texttt{wali/nwa/NWAFwd.hpp}. (Client code should not depend on this
+    fact; it could change to be an \texttt{unordered\_map} or other similar
+    container.) These are also defined in \texttt{wali/nwa/NWAFwd.hpp}.
+  \item\texttt{ClientInfo} This class holds client-specific information that
+    is associated with a state. Client code can subclass ClientInfo and use
+    members of the \texttt{NWA} class to attach instances to states. To use,
+    include \texttt{wali/nwa/ClientInfo.hpp}.
+  \item\texttt{WeightGen} This abstract class describes how to assign weights
+    to transitions of the NWA, and is used both when converting an NWA to a
+    PDS and when doing prestar/poststar queries on the NWA directly. To use,
+    include \texttt{wali/nwa/WeightGen.hpp}.
+\end{description}
 
-\item NWA \nopagebreak
 
-  Models nested-word automata.  This is the main class of the WALi-NWA package.
+\subsubsection{NWA free functions}
 
-\item NestedWord \nopagebreak
+The library provides a large number of free functions for operating on
+NWAs. These are partitioned into the following namespaces (include paths are
+relative to the \texttt{Source} directory):
 
-  This class models a single nested word. (It can be balanced or unbalanced.)
+\begin{description}
+  \item\texttt{wali::nwa::query} This namespace provides functions for
+    querying an automaton. The kinds of functions in this namespace are:
+    \begin{itemize}
+      \item A large quantity of functions that query transitions of
+        the NWA, returning information about one of the states or the symbol
+        in transitions that meet some criteria. (For example, ``give me all
+        states that appear as the target state of an internal transition with
+        this source state.'')
+      \item prestar and poststar functions on an NWA
+      \item Determining whether two NWAs have any states in common
+      \item Determining whether the languages of two NWAs are equal, or if
+        one is a subset of the other
+      \item Determining whether the language of an NWA is empty
+      \item Determining whether a \texttt{NestedWord} is a member of the
+        language of an NWA
+      \item Determining whether an \texttt{NWA} is deterministic
+    \end{itemize}
+  \item\texttt{wali::nwa::construct} This namespace provides functions for
+    constructing an NWA. Functions in this namespace are standard,
+    language-theoretic operations such as intersection, union, concatenation,
+    Kleene star, and reversing.
+  \item\texttt{wali::nwa::nwa\_pds} This namespace provides functions for
+    converting between NWAs and PDSs, and related functions. (Note that
+    construction of an NWA from a PDS is in this namespace, not in
+    \texttt{construct}.)
+\end{description}
 
-\item ClientInfo \nopagebreak
 
-  Additional information that can be attached to NWA states. Clients of the
-  NWA library can subclass ClientInfo and attach instances to states in the
-  automaton.
+\subsubsection{Generic WALi}
 
-\item WeightGen \nopagebreak
+The NWA library uses these portions of the standard WALi library. Unless
+otherwise specified, they are in namespace \texttt{wali}. See \cite{wali}.
 
-  Weight-generation algorithms for the NWA to WPDS conversion and prestar and
-  poststar reachability queries.
+\begin{description}
+  \item\texttt{ref\_ptr$<$T$>$} This is a reference-counted intrusive smart
+    pointer template.
+  \item\texttt{Key} This is a unique identifier for states and symbols in an
+    NWA or NestedWord. It is actually a typedef of an integer, though client
+    code should not depend on this fact. Note that the use of keys for both
+    states and symbols means that they can be confused from a types
+    perspective, so use caution that this does not happen. See \cite{wali}.
+  \item\texttt{getKey(...)} This function produces a key from some input. If
+    the input has not been seen before, it returns a new key; if it has, then
+    it returns the same key as before. (One can think of this as translating
+    whatever unique identifier is known by the client code to the
+    \texttt{Key} needed by WALi.) Versions of this function are provided for
+    the following types:
+    \begin{itemize}
+      \item \texttt{std::string const \&}
+      \item \texttt{char *}
+      \item \texttt{int}
+      \item \texttt{std::set<Key> const \&}
+      \item \texttt{key, Key} (this is a two-argument version of
+        \texttt{getKey})
+      \item \texttt{key\_src\_t}
+    \end{itemize}
 
-\item Key \nopagebreak
-
-  This is a unique idenitifier for states and symbols in an NWA or
-  NestedWord; it is actually a typedef of an integer, though client code
-  should not depend on this fact. See \cite{wali}.
-
-\item WPDS \nopagebreak
-
-  Models weighted pushdown systems.  See \cite{wali}.
-
-\item WFA \nopagebreak
-
-  Models weighted finite automata.  See \cite{wali}.
-
-\item ref\_ptr$<$T$>$ \nopagebreak
-
-  An (intrusive) reference-counting smart pointer template.  See \cite{wali}.
-  WALi-NWA provides a typedef of ref\_ptr$<$NWA$>$ called NWARefPtr. Several
-  functions in the library's interface use this typedef.
-
+    The final overload, for \texttt{key\_src\_t}, is a \texttt{ref\_ptr} to a
+    \texttt{KeySource} object. \texttt{KeySource} is an abstract class which
+    client code can subclass to provide a translation to \texttt{Key}s for
+    arbitrary types.
+  \item\texttt{key2str} Is a inverse of \texttt{getKey}, except that it
+    always returns a string representation. If the key was created with the
+    \texttt{getKey(std::string const \&)} overload in the first place, this
+    returns a copy of the original string.
+  \item\texttt{wali::wfa::WFA} This is a weighted finite automaton. It is
+    used in NWA poststar and prestar queries in much the same manner as in
+    WPDS poststar and prestar queries.
+  \item\texttt{wali::wpds::WPDS} This is a weighted pushdown system. NWAs use
+    WPDSs behind the scenes when doing poststar and prestar queries, and the
+    library provides conversion routines between the two automata types.
 \end{description}
 
 
