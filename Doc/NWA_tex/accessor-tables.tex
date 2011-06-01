@@ -1,14 +1,15 @@
-\newcolumntype{x}[1]{p{#1}}
+%\newcolumntype{x}[1]{p{#1}}
 \newcommand{\RP}{\tnote{1}} %"returns pair"
 
-\setlength{\extrarowheight}{2pt}
+\setlength{\extrarowheight}{4pt}
 
-\begin{sidewaystable}
-%\begin{sideways}
+\newgeometry{bottom=0.75in,top=0.75in}
+
+\begin{sidewaystable}\sffamily
 \begin{threeparttable}
-\begin{tabular}{x{1in}x{1in}|x{2.2in}x{2.2in}x{2in}}
+\begin{tabular}{p{1in}p{1in}|@{\hspace{0.1in}}p{2.2in}p{2.2in}p{2in}}
 \toprule\toprule
-\multicolumn{2}{c|}{What you know} & \multicolumn{3}{c}{What you want}                                                                 \tabularnewline
+\multicolumn{2}{c|@{\hspace{0.1in}}}{\textsl{What you know}} & \multicolumn{3}{c}{\textsl{What you want}}                                                                 \tabularnewline
  this...        & ... and this      &    sources                    &   symbols                          &    targets                     \tabularnewline
 \midrule
 \midrule %-------------------------------------------------------------------------------------------------------------------------------
@@ -23,21 +24,21 @@
   target        &  (nothing)        & getPredecessors(Key tgt)      &  (none)                            &   ---                          \tabularnewline
 \bottomrule\bottomrule
 \end{tabular}
-%\end{sideways}
 \caption{Query functions for all transitions. For return transitions, the
-  ``source'' is the exit node; nothing involving call predecessors appears in
-  this sidewaystable. A table entry of ``---'' means that square doesn't make
-  sense.}
+  ``source'' is the first component of the transition; nothing involving call
+  predecessors (the second component) appears in this sidewaystable. A table
+  entry of ``---'' means that square does not make sense. These functions are
+  in the namespace \texttt{wali::nwa::query}; include the
+  file \texttt{wali/nwa/query/transitions.hpp}.}
 \end{threeparttable}
 \label{Ta:query-all-transitions}
 \end{sidewaystable}
 
-\begin{sidewaystable}
+\begin{sidewaystable}\sffamily
 \begin{threeparttable}
-%\begin{sideways}
-\begin{tabular}{x{1in}x{1in}|x{2.2in}x{2.2in}x{2in}}
+\begin{tabular}{p{1in}p{1in}|@{\hspace{0.1in}}p{2.2in}p{2.2in}p{2in}}
 \toprule\toprule
-\multicolumn{2}{c|}{What you know} & \multicolumn{3}{c}{What you want}                                                                 \tabularnewline
+\multicolumn{2}{c|@{\hspace{0.1in}}}{\textsl{What you know}} & \multicolumn{3}{c}{\textsl{What you want}}                                                                 \tabularnewline
  this...        & ... and this      &    sources                    &   symbols                          &    targets                     \tabularnewline
 \midrule
 \midrule %-------------------------------------------------------------------------------------------------------------------------------
@@ -58,17 +59,17 @@
 \begin{tablenotes}
   \item[1] Returns a set of pairs (either source/symbol or symbol/target).
 \end{tablenotes}
-%\end{sideways}
-\caption{Query functions for internal transitions.}
+\caption{Query functions for internal transitions. A table entry of ``---'' means that square doesn't make
+  sense. These functions are in the namespace \texttt{wali::nwa::query};
+  include the file \texttt{wali/nwa/query/internals.hpp}.}
 \end{threeparttable}
 \end{sidewaystable}
 
-\begin{sidewaystable}
+\begin{sidewaystable}\sffamily
 \begin{threeparttable}
-%\begin{sideways}
-\begin{tabular}{x{1in}x{1in}|x{2.2in}x{2.2in}x{2in}}
+\begin{tabular}{p{1in}p{1in}|@{\hspace{0.1in}}p{2.2in}p{2.2in}p{2in}}
 \toprule\toprule
-\multicolumn{2}{c|}{What you know} & \multicolumn{3}{c}{What you want}                                                                 \tabularnewline
+\multicolumn{2}{c|@{\hspace{0.1in}}}{\textsl{What you know}} & \multicolumn{3}{c}{\textsl{What you want}}                                                                 \tabularnewline
  this...        & ... and this      &    call sites                   &   symbols                          &    entries                     \tabularnewline
 \midrule
 \midrule %-------------------------------------------------------------------------------------------------------------------------------
@@ -89,19 +90,21 @@
 \begin{tablenotes}
   \item[1] Returns a set of pairs (either call site/symbol or symbol/entry).
 \end{tablenotes}
-%\end{sideways}
-\caption{Query functions for call transitions.}
+\caption{Query functions for call transitions. The ``call site'' is the source of the transition (and uses the argument 
+  name \texttt{call}), and the ``entry'' of the transition is the target (and
+  uses the argument name \texttt{ent}). These functions are in the
+  namespace \texttt{wali::nwa::query}; include the
+  file \texttt{wali/nwa/query/calls.hpp}.}
 \end{threeparttable}
 \end{sidewaystable}
 
-\newgeometry{bottom=0.7in}
 \begin{sidewaystable}\footnotesize\sffamily
 \begin{threeparttable}
-%\begin{sideways}
-\begin{tabular}{x{0.6in}x{0.65in}x{0.6in}|x{1.9in}x{1.9in}x{1.9in}x{2in}}
+\begin{tabular}{p{0.6in}p{0.65in}p{0.6in}|@{\hspace{0.1in}}p{1.75in}p{1.9in}p{1.9in}p{2in}}
 \toprule\toprule
-\multicolumn{3}{c|}{What you know}  & \multicolumn{3}{c}{What you want}                                                                                                                                                \tabularnewline
- this...        & and this ...      &  and this     &   exit sites                  &  call predecessors                    &  symbols                                   &  return sites                               \tabularnewline
+\multicolumn{3}{c|@{\hspace{0.1in}}}{\textsl{What you know}}  & \multicolumn{4}{c}{\textsl{What you want}}                                                                                                                                                \tabularnewline
+ this...  & and this ...  & and this & exit sites & call predecessors &
+ symbols & return sites \tabularnewline
 \midrule
 \midrule %--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  (nothing)      &  (nothing)        &  (nothing)    & getExits()                    &  getCalls()                           &  getReturnSym()                            &  getReturns()                               \tabularnewline
@@ -151,8 +154,14 @@
 \begin{tablenotes}
   \item[1] Returns a set of pairs (a symbol with one of the states).
 \end{tablenotes}
-%\end{sideways}
-\caption{Query functions for call transitions.}
+\caption{Query functions for call transitions. The ``exit site'' is the source of the transition
+  (the first component) and uses the argument name \texttt{x} in this table;
+  the ``call predecessor'' is the second component and uses the argument
+  name \texttt{c}; the symbol is the third component uses the argument
+  name \texttt{s}; the ``return site'' is the fourth component and uses the
+  argument name \texttt{r}.  These functions are in the
+  namespace \texttt{wali::nwa::query}; include the
+  file \texttt{wali/nwa/query/returns.hpp}.}
 \end{threeparttable}
 \end{sidewaystable}
 \restoregeometry
