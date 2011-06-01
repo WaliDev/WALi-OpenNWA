@@ -27,6 +27,68 @@ The following functions are related to construction:
 \end{description}
 
 
+\newgeometry{bottom=0.70in,top=0.70in}
+\begin{sidewaystable}\sffamily\footnotesize
+\begin{threeparttable}
+\begin{tabular}{p{0.75in}p{1.55in}p{1.6in}p{1.35in}p{1.27in}p{1.2in}p{1.5in}}
+\toprule
+                 &  add\tnote{1}                            &  remove\tnote{1}                          &  check membership\tnote{3} &  count                &  clear                     &  get\tnote{4}                 \\
+\hline\hline %---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+states           &  addState(State st)                      &  removeState(State st)                    &  isState(State st)         &  sizeStates()         &  clearStates()\tnote{5}    &  getStates() or \newline
+                                                                                                                                                                                             \{begin,end\}States()        \\
+initial \newline
+states           &  addInitialState(State st)               &  removeInitialState(State st)             &  isInitialState(State st)  &  sizeInitialStates()  &  clearInitialStates()      &  getInitialStates() or \newline
+                                                                                                                                                                                             \{begin,end\}InitialStates() \\
+final
+\newline  states &  addFinalState(State st)                 &  removeFinalState(State st)               &  isFinalState(State)       &  sizeFinalStates()    &  clearFinalStates()        &  getFinalStates() or \newline
+                                                                                                                                                                                             \{begin,end\}FinalStates()    \\
+\hline %---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+symbols          &  addSymbol(Symbol sym)                   &  removeSymbol(Symbol sym)                 &  isSymbol(Symbol sym)      &  sizeSymbols()        &  clearSymbols()\tnote{5}   &  getSymbols() or \newline
+                                                                                                                                                                                             \{begin,end\}Symbols()        \\
+\hline %---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+all \newline
+transitions      &  ---                                     &  ---                                      &  ---                       &  sizeTrans()          &  cleanTrans()              &  ---                           \\
+internal \newline
+transitions      &  addInternalTrans(\phantom{.}...\tnote{6}\phantom{a})
+                                                            &  removeInternalTrans(\phantom{.}...\tnote{6}\phantom{a})
+                                                                                                        &  ---                       &  sizeInternalTrans()  &  ---                       &  \{begin,end\}internalTrans()  \\
+call \newline
+transitions      &  addCallTrans(\phantom{.}...\tnote{6}\phantom{a})
+                                                            &  removeCallTrans(\phantom{.}...\tnote{6}\phantom{a})
+                                                                                                        &  ---                       &  sizeCallTrans()      &  ---                       &  \{begin,end\}callTrans()      \\
+return \newline
+transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
+                                                            &  removeReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
+                                                                                                        &  ---                       &  sizeReturnTrans()  &  ---                       &  \{begin,end\}returnTrans()\\
+\hline
+\end{tabular}
+\begin{tablenotes}
+  \item[1] These functions return a \texttt{bool} indicating whether the item
+    was added/removed.
+  \item[3] These functions return a \texttt{bool} with the natural
+    interpretation.
+  \item[4] The functions listed as, e.g., ``\{begin,end\}States()'' is a pair
+    of functions each of which returns an iterator. The type of that iterator
+    depends on the function, but is either a \texttt{NWA::StateIterator},
+    \texttt{NWA::SymbolIterator}, \texttt{NWA::CallIterator},
+    \texttt{NWA::InternalIterator}, or \texttt{NWA::ReturnIterator}. All are
+    actually const iterators. The other functions (``get\textsl{Kind}()'')
+    return a \texttt{StateSet} or \texttt{SymbolSet} as appropriate.
+  \item[5] These functions also remove all transitions.
+  \item[6] There are two overloads of each of these functions. The first
+    takes each element of the transition tuple individually,
+    e.g. \texttt{addInternalTrans(State src, State sym, State tgt)}. The
+    second takes a (constant reference to a) \texttt{NWA::Internal},
+    \texttt{NWA::Call}, or \texttt{NWA::Return} object (as
+    appropriate). (These are typedefs of a \texttt{Triple} or \texttt{Quad}
+    of the appropriate type.)
+\end{tablenotes}
+\caption{Table of several functions for accessing and maniuplating elements
+  of NWAs. All are members of the \texttt{NWA} class.}
+\end{threeparttable}
+\end{sidewaystable}
+\restoregeometry
+
 
 \subsection{States}
 \label{Se:States}

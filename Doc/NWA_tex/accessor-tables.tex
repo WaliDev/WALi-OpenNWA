@@ -131,7 +131,7 @@
                                                                                                                                getReturns\_Call(Key c)\RP\ or \newline
                                                                                                                                getExits\_Call(Key c)\RP                  &  getReturnSites(Key c) or \newline
                                                                                                                                                                             getCallSuccessors(Key c) or \newline
-                                                                                                                                                                            getReturns\_Call-2(Key c)\RP               \tabularnewline
+                                                                                                                                                                            getReturns\_Call(Key c)\RP                 \tabularnewline
                 \cline{2-7} %-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
                 &  symbol           &  (nothing)    & getExits\_Call(Key c, Key s)  &   ---                                 &        ---                                 &  getCallSuccessors(Key c, Key s) \newline
                                                                                                                                                                             or getReturns\_Call(Key c, Key s)          \tabularnewline
@@ -152,7 +152,7 @@
 \bottomrule\bottomrule
 \end{tabular}
 \begin{tablenotes}
-  \item[1] Returns a set of pairs (a symbol with one of the states).
+  \item[1] Returns a set of pairs (a symbol with one of the states, in the order of the raw transition).
 \end{tablenotes}
 \caption{Query functions for call transitions. The ``exit site'' is the source of the transition
   (the first component) and uses the argument name \texttt{x} in this table;
