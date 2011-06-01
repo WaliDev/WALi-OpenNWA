@@ -1034,7 +1034,7 @@ namespace wali {
 
 
     void
-    test_all()
+    parser_test_all()
     {
       test_discardws();
       test_read_lit();
