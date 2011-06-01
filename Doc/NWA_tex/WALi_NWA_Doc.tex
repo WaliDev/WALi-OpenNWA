@@ -34,6 +34,8 @@
 \usepackage{hyperref}
 \usepackage[all]{hypcap}
 
+\usepackage{threeparttable}
+
 \usepackage{misc}
 
 %\usepackage{ulem} % for strike out
@@ -92,6 +94,23 @@
   {%
     \end{oldthebibliography}%
   }
+
+
+%% Modified from http://anthony.liekens.net/index.php/LaTeX/MultipleFootnoteReferences
+%% (I inserted the 'Footnote:' prefix)
+%%
+%% Use like:
+%%    \footnoteremember{myfootnote}{This is my footnote}
+%%    \footnoterecall{myfootnote}
+\newcommand{\footnoteremember}[2]{
+  \footnote{#2}
+  \newcounter{Footnote:#1}
+  \setcounter{Footnote:#1}{\value{footnote}}
+}
+\newcommand{\footnoterecall}[1]{
+  \footnotemark[\value{Footnote:#1}]
+}
+
 
 \sloppy
 \begin{document}

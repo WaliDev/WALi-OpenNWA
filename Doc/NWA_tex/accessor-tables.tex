@@ -1,34 +1,39 @@
 \newcolumntype{x}[1]{p{#1}}
+\newcommand{\RP}{\tnote{1}} %"returns pair"
 
 \setlength{\extrarowheight}{2pt}
 
 \begin{sidewaystable}
 %\begin{sideways}
+\begin{threeparttable}
 \begin{tabular}{x{1in}x{1in}|x{2.2in}x{2.2in}x{2in}}
 \toprule\toprule
 \multicolumn{2}{c|}{What you know} & \multicolumn{3}{c}{What you want}                                                                 \tabularnewline
  this...        & ... and this      &    sources                    &   symbols                          &    targets                     \tabularnewline
 \midrule
 \midrule %-------------------------------------------------------------------------------------------------------------------------------
-  source        &  (nothing)        &      ---                      &                                    &  getSuccessors(Key src)           \tabularnewline
+  source        &  (nothing)        &      ---                      &  (none)                            &  getSuccessors(Key src)           \tabularnewline
                 &  symbol           &      ---                      &        ---                         &  getSuccessors(Key src, Key sym)  \tabularnewline
                 &  target           &      ---                      &  getSymbol(Key src, Key tgt,\newline
-                                                                         \phantom{getSymbol(}Key\& sym)  &   ---                          \tabularnewline
+                                                                       \phantom{getSymbol(}Key\& sym)    &   ---                          \tabularnewline
 \midrule %-------------------------------------------------------------------------------------------------------------------------------
-  symbol        &  (nothing)        &                               &        ---                         &                                \tabularnewline
+  symbol        &  (nothing)        &                               &        ---                         &   (none)                       \tabularnewline
                 &  target           & getPredecessors(Key sym, Key tgt) &    ---                         &   ---                          \tabularnewline
 \midrule %-------------------------------------------------------------------------------------------------------------------------------
-  target        &  (nothing)        & getPredecessors(Key tgt)      &                                    &   ---                          \tabularnewline
+  target        &  (nothing)        & getPredecessors(Key tgt)      &  (none)                            &   ---                          \tabularnewline
 \bottomrule\bottomrule
 \end{tabular}
 %\end{sideways}
-\caption{Query functions for all transitions.}% For return transitions, the
-%  ``source'' is the exit node; nothing involving call predecessors appears in
-%  this sidewaystable.}
+\caption{Query functions for all transitions. For return transitions, the
+  ``source'' is the exit node; nothing involving call predecessors appears in
+  this sidewaystable. A table entry of ``---'' means that square doesn't make
+  sense.}
+\end{threeparttable}
 \label{Ta:query-all-transitions}
 \end{sidewaystable}
 
 \begin{sidewaystable}
+\begin{threeparttable}
 %\begin{sideways}
 \begin{tabular}{x{1in}x{1in}|x{2.2in}x{2.2in}x{2in}}
 \toprule\toprule
@@ -38,23 +43,28 @@
 \midrule %-------------------------------------------------------------------------------------------------------------------------------
  (nothing)      &  (nothing)        & getSources()                  &  getInternalSym()                  &  getTargets()                  \tabularnewline
 \midrule %-------------------------------------------------------------------------------------------------------------------------------
-  source        &  (nothing)        &      ---                      &  getTargets(Key src) or \newline
-                                                                       getInternalSym\_Source(Key src)   &  getTargets(Key src)           \tabularnewline
+  source        &  (nothing)        &      ---                      &  getInternalSym\_Source(Key src) \newline
+                                                                       or getTargets(Key src)\RP         &  getTargets(Key src)\RP        \tabularnewline
                 &  symbol           &      ---                      &        ---                         &  getTargets(Key src, Key sym)  \tabularnewline
                 &  target           &      ---                      &  getInternalSym(Key src, Key tgt)  &   ---                          \tabularnewline
 \midrule %-------------------------------------------------------------------------------------------------------------------------------
   symbol        &  (nothing)        & getSources\_Sym(Key sym)      &        ---                         &  getTargets\_Sym(Key sym)      \tabularnewline
                 &  target           & getSources(Key sym, Key tgt)  &        ---                         &   ---                          \tabularnewline
 \midrule %-------------------------------------------------------------------------------------------------------------------------------
-  target        &  (nothing)        & getSources(Key tgt)           &  getSources(Key tgt) or \newline
-                                                                       getInternalSym\_Target(Key tgt)   &   ---                          \tabularnewline
+  target        &  (nothing)        & getSources(Key tgt)\RP        &  getInternalSym\_Target(Key tgt) \newline
+                                                                       or getSources(Key tgt)\RP         &   ---                          \tabularnewline
 \bottomrule\bottomrule
 \end{tabular}
+\begin{tablenotes}
+  \item[1] Returns a set of pairs (either source/symbol or symbol/target).
+\end{tablenotes}
 %\end{sideways}
 \caption{Query functions for internal transitions.}
+\end{threeparttable}
 \end{sidewaystable}
 
 \begin{sidewaystable}
+\begin{threeparttable}
 %\begin{sideways}
 \begin{tabular}{x{1in}x{1in}|x{2.2in}x{2.2in}x{2in}}
 \toprule\toprule
@@ -64,63 +74,69 @@
 \midrule %-------------------------------------------------------------------------------------------------------------------------------
  (nothing)      &  (nothing)        & getCallSites()                  &  getCallSym()                      &  getEntries()                  \tabularnewline
 \midrule %-------------------------------------------------------------------------------------------------------------------------------
- call site      &  (nothing)        &      ---                        &  getEntries(Key call) or \newline
-                                                                         getCallSym\_Call(Key call)        &  getEntries(Key call)          \tabularnewline
+ call site      &  (nothing)        &      ---                        &  getCallSym\_Call(Key call) \newline
+                                                                         or getEntries(Key call)\RP        &  getEntries(Key call)\RP       \tabularnewline
                 &  symbol           &      ---                        &        ---                         &  getEntries(Key call, Key sym) \tabularnewline
                 &  target           &      ---                        &  getCallSym(Key call, Key ent)     &   ---                          \tabularnewline
 \midrule %-------------------------------------------------------------------------------------------------------------------------------
   symbol        &  (nothing)        & getCallSites\_Sym(Key sym)      &        ---                         &  getEntries\_Sym(Key sym)      \tabularnewline
                 &  target           & getCallSites(Key sym, Key ent)  &        ---                         &   ---                          \tabularnewline
 \midrule %-------------------------------------------------------------------------------------------------------------------------------
-  target        &  (nothing)        & getCallSites(Key ent)           &  getCallSites(Key ent) or \newline
-                                                                         getCallSym\_Entry(Key ent)        &   ---                          \tabularnewline
+  entry         &  (nothing)        & getCallSites(Key ent)\RP        &  getCallSym\_Entry(Key ent) \newline
+                                                                         or getCallSites(Key ent)\RP       &   ---                          \tabularnewline
 \bottomrule\bottomrule
 \end{tabular}
+\begin{tablenotes}
+  \item[1] Returns a set of pairs (either call site/symbol or symbol/entry).
+\end{tablenotes}
 %\end{sideways}
 \caption{Query functions for call transitions.}
+\end{threeparttable}
 \end{sidewaystable}
 
 \newgeometry{bottom=0.7in}
 \begin{sidewaystable}\footnotesize
-
+\begin{threeparttable}
 %\begin{sideways}
-\begin{tabular}{x{0.6in}x{0.6in}x{0.6in}|x{1.9in}x{1.9in}x{1.9in}x{2in}}
+\begin{tabular}{x{0.6in}x{0.65in}x{0.6in}|x{1.9in}x{1.9in}x{1.9in}x{2in}}
 \toprule\toprule
 \multicolumn{3}{c|}{What you know}  & \multicolumn{3}{c}{What you want}                                                                                                                                                \tabularnewline
- this...        & ... and this ...  & ... and this  &   exit sites                         &  call predecessors             &  symbols                                   &  return sites                               \tabularnewline
+ this...        & and this ...      &  and this     &   exit sites                  &  call predecessors                    &  symbols                                   &  return sites                               \tabularnewline
 \midrule
 \midrule %--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- (nothing)      &  (nothing)        &  (nothing)    & getExits()                           &  getCalls()                    &  getReturnSym()                            &  getReturns()                               \tabularnewline
+ (nothing)      &  (nothing)        &  (nothing)    & getExits()                    &  getCalls()                           &  getReturnSym()                            &  getReturns()                               \tabularnewline
 \midrule %--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- exit site      &  (nothing)        &  (nothing)    &      ---                             &  getCalls\_Exit(Key x)         &  getReturnSym\_Exit(Key x) or \newline
-                                                                                                                               getReturns\_Exit(Key x) or \newline
-                                                                                                                               getCalls\_Exit(Key x)                     &  getReturns\_Exit(Key x)                    \tabularnewline
+ exit site      &  (nothing)        &  (nothing)    &      ---                      &  getCalls\_Exit(Key x)\RP             &  getReturnSym\_Exit(Key x) or \newline
+                                                                                                                               getReturns\_Exit(Key x)\RP\ or \newline
+                                                                                                                               getCalls\_Exit(Key x)\RP                  &  getReturns\_Exit(Key x)\RP                 \tabularnewline
                 \cline{2-7} %-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-                &  call pred        &  (nothing)    &      ---                             &    ---                         &  getReturnSym\_ExitCall(Key x, \newline
-                                                                                                                               \phantom{GetReturnSym\_ExitCall(}Key c) \newline
-                                                                                                                               or getReturns(Key x, Key c)               &  getReturns(Key call, Key c)                \tabularnewline
+                &  call pred        &  (nothing)    &      ---                      &    ---                                &  getReturnSym\_ExitCall(Key x, \newline
+                                                                                                                               \phantom{getReturnSym\_ExitCall(}Key c) \newline
+                                                                                                                               or getReturns(Key x, Key c)\RP            &  getReturns(Key call, Key c)\RP             \tabularnewline
                 &                   &  symbol       &      ---                      &    ---                                &        ---                                 &  getReturns(Key call, Key c, Key s)         \tabularnewline
                 &                   &  return       &      ---                      &    ---                                &  getReturnSym(Key x, Key call, \newline
-                                                                                                                               \phantom{GetReturnSym(}Key s)             &    ---                                      \tabularnewline
+                                                                                                                               \phantom{getReturnSym(}Key s)             &    ---                                      \tabularnewline
                 \cline{2-7} %-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
                 &  symbol           &  (nothing)    &      ---                      &  getCalls\_Exit(Key x, Key s)         &        ---                                 &  getReturns\_Exit(Key x, Key s              \tabularnewline
                 &                   &  return       &      ---                      &  getCalls(Key x, Key s, Key r)        &        ---                                 &  getEntries(Key call, Key s)                \tabularnewline
                 \cline{2-7} %-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-                &  return site      &  (nothing)    &      ---                      &  getCalls(Key x, Key r)               &  getReturnSym\_ExitRet(Key x, Key r) \newline
-                                                                                                                               or getCalls(Key x, Key r)                 &   ---                                       \tabularnewline
+                &  return site      &  (nothing)    &      ---                      &  getCalls(Key x, Key r)\RP            &  getReturnSym\_ExitRet(Key x, \newline
+                                                                                                                               \phantom{getReturnSym\_ExitRet(}Key r) \newline
+                                                                                                                               or getCalls(Key x, Key r)\RP              &   ---                                       \tabularnewline
 \midrule %-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- call pred      &  (nothing)        &  (nothing)    & getExits\_Call(Key c)         &   ---                                 &  getReturnSym\_Call(Key c) or \newline
-                                                                                                                                    getReturns\_Call(Key c) or \newline
-                                                                                                                                    getExits\_Call(Key c)                &  getReturnSites(Key c) or \newline
+ call pred      &  (nothing)        &  (nothing)    & getExits\_Call(Key c)\RP      &   ---                                 &  getReturnSym\_Call(Key c) or \newline
+                                                                                                                               getReturns\_Call(Key c)\RP\ or \newline
+                                                                                                                               getExits\_Call(Key c)\RP                  &  getReturnSites(Key c) or \newline
                                                                                                                                                                             getCallSuccessors(Key c) or \newline
-                                                                                                                                                                            getReturns\_Call-2...                      \tabularnewline
+                                                                                                                                                                            getReturns\_Call-2(Key c)\RP               \tabularnewline
                 \cline{2-7} %-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
                 &  symbol           &  (nothing)    & getExits\_Call(Key c, Key s)  &   ---                                 &        ---                                 &  getCallSuccessors(Key c, Key s) \newline
-                                                                                                                                                                                   or getReturns\_Call(Key c, Key s)   \tabularnewline
+                                                                                                                                                                            or getReturns\_Call(Key c, Key s)          \tabularnewline
                 &                   &  return       & getExits(Key c, Key s, Key r) &   ---                                 &        ---                                 &    ---                                      \tabularnewline
                 \cline{2-7} %-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-                &  return site      &  (nothing)    & getExits(Key c, Key r)        &   ---                                 &  getReturnSym\_CallRet(Key c, Key r) \newline
-                                                                                                                               or getExits(Key c, Key r)                 &   ---                                       \tabularnewline
+                &  return site      &  (nothing)    & getExits(Key c, Key r)\RP     &   ---                                 &  getReturnSym\_CallRet(Key c, \newline
+                                                                                                                               \phantom{getReturnSym\_CallRet(}Key r) \newline
+                                                                                                                               or getExits(Key c, Key r)\RP              &   ---                                       \tabularnewline
 \midrule %--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  symbol         &  (nothing)        &  (nothing)    & getExits\_Sym(Key c)          &  getCalls\_Sym(Key c)                 &   ---                                      &  getReturns\_Sym(Key s)                     \tabularnewline
                 \cline{2-7} %-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -128,11 +144,15 @@
                                                                                        or getCalls\_Ret(Key s, Key c)       &   ---                                      &   ---                                       \tabularnewline
 \midrule %--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  return site    &  (nothing)         & (nothing)    & getExits\_Ret(Key r)          &  getCallPredecessors(Key r) \newline
-                                                                                       or getCalls\_Ret(Key r)              &  getReturnSym\_Ret(Key r) or \newline
-                                                                                                                               getCalls\_Ret(Key r)                      &   ---                                       \tabularnewline
+                                                                                       or getCalls\_Ret(Key r)\RP           &  getReturnSym\_Ret(Key r) or \newline
+                                                                                                                               getCalls\_Ret(Key r)\RP                   &   ---                                       \tabularnewline
 \bottomrule\bottomrule
 \end{tabular}
+\begin{tablenotes}
+  \item[1] Returns a set of pairs (a symbol with one of the states).
+\end{tablenotes}
 %\end{sideways}
 \caption{Query functions for call transitions.}
+\end{threeparttable}
 \end{sidewaystable}
 \restoregeometry
