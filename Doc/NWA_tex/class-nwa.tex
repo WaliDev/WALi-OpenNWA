@@ -1,0 +1,1022 @@
+\section{The NWA class}
+
+\subsection{Construction, copying, and assignment}
+\label{Se:Construction}
+
+The NWA provides two constructors, the default constructor and the copy
+constructor. The default constructor creates an empty NWA. Thereafter, 
+client code can \begin{inparaenum} \item add or remove states, \item add or remove
+symbols, \item add or remove transitions, \item set the status of certain
+  states as initial or final, and \item combine component NWAs (via union,
+  intersection, etc). \end{inparaenum}
+
+
+The following functions are related to construction:
+\begin{description}
+  \item \texttt{NWA::NWA()}) constructs an empty NWA
+
+  \item \texttt{NWA::NWA(NWA const \& other)} Copies \texttt{other}; the
+    automata will not share structure
+
+  \item \texttt{NWA::operator=(NWA const \& other)} Assigns \texttt{other} to \texttt{this};
+    the automata will not share structure.
+
+  \item \texttt{NWA::clear()} \nopagebreak
+    Removes all states, symbols, and transitions from the NWA.
+
+\end{description}
+
+
+
+\subsection{States}
+\label{Se:States}
+
+States are WALi \texttt{Keys} and can be added to an NWA
+individually (using \texttt{addState}, \texttt{addInitialState}, or
+\texttt{addFinalState}) or as a part of a transition (see Section
+\ref{Se:Transitions}).  
+
+\noindent The following operations are methods of class NWA:
+
+\begin{description}
+
+  \item\texttt{bool addState( Key st )} \nopagebreak
+
+    Adds the given state, \texttt{st}, to $Q$.  Returns false if state
+    \texttt{st} already exists in the NWA, otherwise returns true.
+
+  \item\texttt{bool addInitialState( Key st )} \nopagebreak
+
+    Adds the given state, \texttt{st}, to $Q_0 $ (and also to $Q$ if
+    \texttt{st} $\not\in Q$).  Returns false if state \texttt{st} already
+    exists in $Q_0$, otherwise returns true.
+
+  \item\texttt{bool addFinalState( Key st )} \nopagebreak
+
+    Adds the given state, \texttt{st}, to $Q_f$ (and also to $Q$ if
+    \texttt{st} $\not\in Q$).  Returns false if state \texttt{st} already
+    exists in $Q_f$, otherwise returns true.
+
+\end{description}
+
+
+States can be removed from an NWA individually (using \texttt{removeState})
+or by clearing the state set of the NWA. 
+Removing an individual state automatically eliminates all transitions that
+state participates in.
+
+Initial (final) states can be removed from $Q_0 $ ($Q_f$) (but not from $Q$)
+individually (using \texttt{removeInitialState}, \texttt{removeFinalState})
+or by clearing the initial (final) state set of the NWA.
+
+\noindent The following operations are methods of class NWA:
+
+\begin{description}
+
+  \item\texttt{bool removeState( Key st )} \nopagebreak
+
+    Removes the given state, \texttt{st}, from $Q$ (and also removes
+    \texttt{st} from $Q_0$ if \texttt{st} $\in Q_0$ and removes \texttt{st}
+    from $Q_f$ if \texttt{st} $\in Q_f$).  Returns false if state \texttt{st}
+    did not exist in the NWA, otherwise returns true. 
+    Any transitions (internal, call, and return)
+    associated with \texttt{st} are also removed from the NWA.
+
+  \item\texttt{void clearStates()} \nopagebreak
+
+    Removes all states from $Q$, $Q_0$, and
+    $Q_f$.  As a side effect it also removes all transitions in the NWA.  The
+    symbols in the NWA are not affected.
+
+  \item\texttt{bool removeInitialState( Key st )} \nopagebreak
+
+    Removes the given state, \texttt{st}, from $Q_0$ (but not from $Q$ or
+    $Q_f$).  Returns false if state \texttt{st} did not exist in $Q_0$,
+    otherwise returns true.  Nothing else in the NWA is altered.
+
+  \item\texttt{void clearInitialStates()} \nopagebreak
+
+    Removes all states from $Q_0$ (but not from $Q$ or $Q_f$).  Nothing else
+    in the NWA is altered.
+
+  \item\texttt{bool removeFinalState( Key st )} \nopagebreak
+
+    Removes the given state, \texttt{st}, from $Q_f$ (but not from $Q$ or
+    $Q_0$).  Returns false if state \texttt{st} did not exist in $Q_f$,
+    otherwise returns true.  Nothing else in the NWA is altered.
+
+  \item\texttt{void clearFinalStates()} \nopagebreak
+
+    Removes all states from $Q_f$ (but not from $Q$ or $Q_0$).  Nothing else
+    in the NWA is altered. \\
+
+\end{description}
+
+The status of individual states (i.e., existence in an NWA, in the initial
+state set, or in the final state set) can be checked
+using \texttt{isState},
+\texttt{isInitialState}, and \texttt{isFinalState}.  In addition, states,
+initial states, and final states can be requested and examined as collections
+(using \texttt{getStates}, \texttt{getInitialStates},
+\texttt{getFinalStates}, \texttt{sizeStates},
+\texttt{sizeInitialStates}, and \texttt{sizeFinalStates}). \\
+
+\noindent The following operations are methods of class NWA:
+
+\begin{description}
+
+  \item\texttt{bool isState( Key st ) const} \nopagebreak
+
+    Tests whether the given \texttt{Key}, \texttt{st}, is a state in the NWA.
+    If yes, returns true.  Otherwise, returns false.
+
+  \item\texttt{bool isInitialState( Key st ) const} \nopagebreak
+
+    Tests whether the given \texttt{Key}, \texttt{st}, is an initial state in
+    the NWA.  If yes, returns true.  Otherwise, returns false.
+
+  \item\texttt{bool isFinalState( Key st ) const} \nopagebreak
+
+    Tests whether the given \texttt{Key}, \texttt{st}, is a final state in
+    the NWA.  If yes, returns true.  Otherwise, returns false.
+
+  \item\texttt{const set<Key>\& getStates() const} \nopagebreak
+
+    Returns a \texttt{set} consisting of the \texttt{Keys} of all states in
+    the NWA.
+
+  \item\texttt{const set<Key>\& getInitialStates() const} \nopagebreak
+
+    Returns a \texttt{set} consisting of the \texttt{Keys} of all initial
+    states in the NWA.
+
+  \item\texttt{const set<Key>\& getFinalStates() const} \nopagebreak
+
+    Returns a \texttt{set} consisting of the \texttt{Keys} of all final
+    states in the NWA.
+
+  \item\texttt{size\_t sizeStates() const} \nopagebreak
+
+    Yields the number of states in the NWA.
+
+  \item\texttt{size\_t sizeInitialStates() const} \nopagebreak
+
+    Yields the number of initial states in the NWA.
+
+  \item\texttt{size\_t sizeFinalStates() const} \nopagebreak
+
+    Yields the number of final states in the NWA. \\
+
+\end{description}
+
+Each state in the NWA can be associated with some client-specific
+information. To utilize this functionality, the user must create a subclass
+of the \texttt{ClientInfo} class (making sure to supply a copy constructor
+for the subclass).  In addition, the helper methods for intersection and
+determinization in the \texttt{NWA} class
+(\texttt{intersectClientInfoInternal}, \texttt{mergeClientInfoInternal},
+etc.) must be over-ridden (see Section \ref{Se:Intersection} and Section
+\ref{Se:Determinize}).  Client information can then be associated with each
+state in the NWA (using \texttt{setClientInfo}) and accessed given the
+associated state (using \texttt{getClientInfo}).  For details on automatic
+generation of client information in NWA operations, see Section
+\ref{Se:Building NWAs}. \\
+
+\noindent The following operations are methods of class NWA:
+
+\begin{description}
+
+  \item\texttt{ref\_ptr<ClientInfo> getClientInfo( Key st ) const} \nopagebreak
+
+    Allows the user to access the client-specific information associated with
+    the given state, \texttt{st}.
+
+  \item\texttt{void setClientInfo( Key st, const ref\_ptr<ClientInfo> ci )} \nopagebreak
+
+    Allows the user to specify the client-specific information, \texttt{ci},
+    associated with the given state, \texttt{st}. \\
+
+\end{description}
+
+\subsection{Symbols}
+\label{Se:Symbols}
+
+The system supports two meta-symbols: \begin{inparaenum} \item
+  \texttt{Epsilon} (\texttt{$\epsilon$}) and \item \texttt{Wild}
+  (\texttt{*}) \end{inparaenum} which are globally available.
+\texttt{Epsilon} is the `absence' of a symbol, it denotes the situation in
+which a transition can be traversed without matching and consuming an input
+symbol.  \texttt{Epsilon} symbols cannot label call or return transitions
+(see Section \ref{Se:Transitions}).  \texttt{Wild} is the `any' symbol, it
+denotes the situation in which a transition can be traversed by consuming a
+single input symbol of any kind.  Since the NWA alphabet is not fixed, the
+actual symbols that \texttt{Wild} stands for is fluid.  Note:
+\textbf{\texttt{Epsilon} and \texttt{Wild} are not explicit elements of $\Sigma$.} Let
+$\Sigma^* = \Sigma \cup \{*, \epsilon\}$.\\
+
+\noindent The following operations are methods of class NWA:
+
+\begin{description}
+
+  \item\texttt{Key getEpsilon()} \nopagebreak
+
+    Allows the user to access the \texttt{Key} for the \texttt{Epsilon}
+    meta-symbol.
+
+  \item\texttt{bool isEpsilon( Key sym )} \nopagebreak
+
+    Tests whether the given \texttt{Key}, \texttt{sym}, is the \texttt{Key}
+    for the \texttt{Epsilon} meta-symbol.  If yes, returns true.  Otherwise,
+    returns false.
+
+  \item\texttt{Key getWild()} \nopagebreak
+
+    Allows the user to access the \texttt{Key} for the \texttt{Wild}
+    meta-symbol.
+
+  \item\texttt{bool isWild( Key sym )} \nopagebreak
+ 
+    Tests whether the given \texttt{Key}, \texttt{sym}, is the \texttt{Key}
+    for the \texttt{Wild} meta-symbol. If yes, returns true.  Otherwise,
+    returns false. \\
+
+\end{description}
+
+Symbols are WALi \texttt{Keys} and can be added to an NWA
+individually (using \texttt{addSymbol}) or as a part of a transition (see
+Section \ref{Se:Transitions}).
+
+ \clearpage
+
+\noindent The following operations are methods of class NWA:
+
+\begin{description}
+
+  \item\texttt{bool addSymbol( Key sym )} \nopagebreak
+
+    Adds the given symbol, \texttt{sym}, to $\Sigma$.  Returns false if
+    symbol \texttt{sym} already exists in the NWA, otherwise returns true.
+    Note: \texttt{Wild} and \texttt{Epsilon} are meta-symbol, not symbols of
+    the alphabet, so if \texttt{sym} is the \texttt{Key} for either of these
+    a failure code of false is returned.
+
+\end{description}
+
+Symbols can be removed from an NWA individually (using
+\texttt{removeSymbol}) or by clearing the alphabet of the NWA (using
+\texttt{clearSymbols}).  Note that the removal of a symbol removes all
+internal, call, and return transitions having that symbol (both implicit and
+explicit) from each state, thus preserving the completeness of the states of
+the NWA. \\
+
+\noindent The following operations are methods of class NWA:
+
+\begin{description}
+
+  \item\texttt{bool removeSymbol( Key sym )} \nopagebreak
+
+    Removes the given symbol, \texttt{sym}, from $\Sigma$.  Returns false if
+    symbol \texttt{sym} did not already exist in the NWA, otherwise returns
+    true.  Any transitions associated with this symbol are also removed, but
+    no states are altered.  Note: \texttt{Wild} and \texttt{Epsilon} are
+    meta-symbols, not symbols of the alphabet, so if \texttt{sym} is the
+    \texttt{Key} for either of these a failure code of false is returned and
+    no transitions are removed.
+
+  \item\texttt{void clearSymbols()} \nopagebreak
+
+    Removes all symbols from $\Sigma$.  As a side effect it also removes all
+    transitions in the NWA.  The state set is unaffected. \\
+
+\end{description}
+
+The status of individual symbols (i.e., existence in an NWA) can be checked
+for an NWA (using \texttt{isSymbol}).  In addition, symbols
+can be requested and examined as a collection (using \texttt{getSymbols} and
+\texttt{sizeSymbols}). \\
+
+\noindent The following operations are methods of class NWA:
+
+\begin{description}
+
+  \item\texttt{bool isSymbol( Key sym ) const} \nopagebreak
+
+    Tests whether the given \texttt{Key}, \texttt{sym}, is a symbol in the
+    NWA.  If yes, returns true.  Otherwise, returns false.  Note:
+    \texttt{Wild} and \texttt{Epsilon} are meta-symbols, not symbols of the
+    alphabet, so if \texttt{sym} is the \texttt{Key} for either of these,
+    false is returned.
+
+  \item\texttt{const set<Key>\& getSymbols() const} \nopagebreak
+
+    Returns a \texttt{set} consisting of the \texttt{Keys} of all symbols in
+    the NWA.  Note this does not include meta-symbols.
+
+  \item\texttt{size\_t sizeSymbols() const} \nopagebreak
+
+    Yields the number of symbols in the NWA.  This count does not include the
+    meta-symbols \texttt{$\epsilon$} and \texttt{*} even if they have been
+    used in transitions added to the NWA. \\
+
+\end{description}
+
+\subsection{Transitions}
+\label{Se:Transitions}
+
+Transitions connect a pair (or triple) of states and are labeled with symbols
+or meta-symbols.  There are three types of transitions in an
+NWA: \begin{inparaenum} \item Internal \item Call \item
+  Return. \end{inparaenum} An internal transition is a transition of the form
+$(source, sym, target)$ in which $sym$ corresponds to the symbol at an
+internal position in a nested word accepted by the NWA.  A call transition is
+a transition of the form $(callSite, sym, entryPoint)$ in which $sym$
+corresponds to the symbol at a call position in a nested word accepted by the
+NWA.  A return transition is a transition of the form $(exitPoint, callSite,
+sym, returnSite)$ in which $sym$ corresponds to the symbol at a return
+position in a nested word accepted by the NWA.  The number of transitions of
+each kind associated with a deterministic NWA is bounded by the number of
+states and symbols in the NWA.  There can only be
+$(number\_of\_states)*(number\_of\_symbols)$ internal transitions,
+$(number\_of\_states)*(number\_of\_symbols)$ call transitions, and
+$(number\_of\_states)^2*(number\_of\_symbols)$ return transitions.  The
+number of transitions of each kind associated with a nondeterministic NWA is
+bounded in a slightly different way by the number of states and symbols in
+the NWA.  There can only be $(number\_of\_states)^2*(number\_of\_symbols)$
+internal transitions, $(number\_of\_states)^2*(number\_of\_symbols)$ call
+transitions, and $(number\_of\_states)^3*(number\_of\_symbols)$ return
+transitions.
+
+Transitions can be added to an NWA via the overloaded functions
+\texttt{addInternalTrans}, \texttt{addCallTrans}, and
+\texttt{addReturnTrans}.  Those functions can either take three \texttt{Keys}
+that define the transition as input, or an input of type \texttt{KeyTriple\&}
+or \texttt{KeyQuad\&}.  \texttt{KeyTriple} and \texttt{KeyQuad} are WALi data
+structures containing 3 and 4 \texttt{Keys}, respectively.  Alternatively,
+the set of transitions of a state (or the set of outgoing transitions of a
+state) can be duplicated for another state (using \texttt{duplicateState} or
+\texttt{duplicateStateOutgoing}) or the transition relation can be made total (using
+\texttt{realizeImplicitTrans}).  As a side effect of all of these functions,
+if any component (state or symbol) of a transition does not already exist in
+the NWA it will be added to the NWA. 
+Recall also that the \texttt{$\epsilon$} symbol cannot label
+a call transition or a return transition (see Section \ref{Se:Symbols}).
+Thus, no call or return transition with a symbol of \texttt{$\epsilon$} will
+be added. \\
+
+\clearpage
+
+\noindent The following operations are methods of class NWA:
+
+\begin{description}
+
+  \item\texttt{bool addInternalTrans( Key source, Key sym, Key target )} \nopagebreak
+
+    Adds the internal transition
+    $(\texttt{source},\texttt{sym},\texttt{target})$ to the NWA.  Returns
+    false if this transition already exists in the NWA, otherwise returns
+    true.  In addition, \texttt{source} and \texttt{target} are added as
+    states (if $\texttt{source} \not\in Q$ and $\texttt{target} \not\in Q$,
+    respectively) and \texttt{sym} is added as a symbol (if $\texttt{sym}
+    \not\in \Sigma^*$).
+
+  \item\texttt{bool addInternalTrans( KeyTriple\& intTrans )} \nopagebreak
+
+    Adds an internal transition to the NWA for the triple specified by
+    \texttt{intTrans}.  Returns false if this transition already exists in
+    the NWA, otherwise returns true.  In addition, the states of
+    \texttt{intTrans} are added as states of the NWA (if not already states
+    in the NWA) and the symbol of \texttt{intTrans} is added as a symbol of
+    the NWA (if not a meta-symbol or already a symbol in the NWA).
+
+  \item\texttt{bool addCallTrans( Key callSite, Key sym, Key entryPoint )} \nopagebreak
+
+    Adds the call transition
+    $(\texttt{callSite},\texttt{sym},\texttt{entryPoint})$ to the NWA.
+    Returns false if this transition already exists in the NWA, otherwise
+    returns true.  In addition, \texttt{callSite} and \texttt{entryPoint} are
+    added as states of the NWA (if $\texttt{callSite} \not\in Q$ and
+    $\texttt{entryPoint} \not\in Q$, respectively) and \texttt{sym} is added
+    as a symbol of the NWA (if $\texttt{sym} \not\in \Sigma^*$).
+
+  \item\texttt{bool addCallTrans( KeyTriple\& callTrans )} \nopagebreak
+
+    Adds a call transition to the NWA for the triple specified by
+    \texttt{callTrans}.  Returns false if this transition already exists in
+    the NWA, otherwise returns true.  In addition, the states of
+    \texttt{callTrans} are added as states of the NWA (if not already states
+    in the NWA) and the symbol of \texttt{callTrans} is added as a symbol of
+    the NWA (if not a meta-symbol or already a symbol in the NWA).
+
+  \item\texttt{bool addReturnTrans( Key exitPoint, Key
+    callSite,\\ \hspace*{3.25cm} Key sym, Key returnSite )} \nopagebreak
+
+    Adds the return transition
+    $(\texttt{exitPoint},\texttt{callSite},\texttt{sym},\texttt{returnSite})$
+    to the NWA.  Returns false if this transition already exists in the NWA,
+    otherwise returns true.  In addition, \texttt{exitPoint},
+    \texttt{callSite}, and \texttt{returnSite} are added as states of the NWA
+    (if $\texttt{exitPoint} \not\in Q$, $\texttt{callSite} \not\in Q$, and
+    $\texttt{returnSite} \not\in Q$, respectively) and \texttt{sym} is added
+    as a symbol (if $\texttt{sym} \not\in \Sigma^*$).
+
+  \item\texttt{bool addReturnTrans( KeyQuad\& retTrans )} \nopagebreak
+
+    Adds a return transition to the NWA for the 4-tuple specified by
+    \texttt{retTrans}.  Returns false if this transition already exists in
+    the NWA, otherwise returns true.  In addition, the states of
+    \texttt{retTrans} are added as states (if not already states in the NWA)
+    and the symbol of \texttt{retTrans} is added as a symbol (if not a
+    meta-symbol or already a symbol in the NWA).
+
+  \item\texttt{void duplicateState( Key orig, Key dup )} \nopagebreak
+
+    Duplicates all the transitions containing the state \texttt{orig} and
+    adds the transitions to the NWA with \texttt{orig} replaced by
+    \texttt{dup}.  Self-loops are duplicated by adding a transition for all
+    possible combinations of some occurrence of \texttt{orig} replaced by
+    \texttt{dup}, i.e., if $(\texttt{orig},a,\texttt{orig})$ is an internal
+    (or call) transition, then the transitions
+    $(\texttt{dup},a,\texttt{dup})$, $(\texttt{dup},a,\texttt{orig})$, and
+    $(\texttt{orig},a,\texttt{dup})$ are added and if
+    $(\texttt{orig},\texttt{orig},a,\texttt{orig})$ is a return transition,
+    then the transitions $(\texttt{dup},\texttt{dup},a,\texttt{dup})$,
+    $(\texttt{dup},\texttt{dup},a,\texttt{orig})$,
+    $(\texttt{orig},\texttt{dup},a,\texttt{dup})$,
+    $(\texttt{orig},\texttt{dup},a,\texttt{orig})$,
+    $(\texttt{dup},\texttt{orig},a,\texttt{dup})$,
+    $(\texttt{dup},\texttt{orig},a,\texttt{orig})$, and
+    $(\texttt{orig},\texttt{orig},a,\texttt{dup})$ are added.
+
+  \item\texttt{void duplicateStateOutgoing( Key orig, Key dup )} \nopagebreak
+
+    Duplicates all the transitions originating from \texttt{orig} and adds
+    the transitions to the NWA with \texttt{orig} replaced by \texttt{dup}.
+    Self-loops are duplicated by adding a transition for all possible
+    combinations of some occurrence of \texttt{orig} replaced by \texttt{dup}
+    while maintaining that the transitions are outgoing from \texttt{dup},
+    i.e., if $(\texttt{orig},a,\texttt{orig})$ is an internal (or call)
+    transition, then the transitions $(\texttt{dup},a,\texttt{dup})$ and
+    $(\texttt{dup},a,\texttt{orig})$ are added and if
+    $(\texttt{orig},\texttt{orig},a,\texttt{orig})$ is a return transition,
+    then the transitions $(\texttt{dup},\texttt{dup},a,\texttt{dup})$,
+    $(\texttt{dup},\texttt{dup},a,\texttt{orig})$,
+    $(\texttt{dup},\texttt{orig},a,\texttt{dup})$, and
+    $(\texttt{dup},\texttt{orig},a,\texttt{orig})$ are added.
+
+  \item\texttt{void realizeImplicitTrans(State stuck)} \nopagebreak
+
+    Makes the transition relation ``at least total.''
+    Adds the state \texttt{stuck} to the machine (if not already present),
+    then for any source state and symbol pair that does not have at least one
+    transition, adds a transition to \texttt{stuck}. It does the same for
+    call transitions and return transitions (with an additional ``for each
+    call predecessor'' in that case).
+
+    Note that if the machine was nondeterministic, it will still be
+    nondeterministic after this call.
+
+\end{description} 
+
+Transitions can be removed from an NWA individually or by
+specifying component parts (using \texttt{removeInternalTrans},
+\texttt{removeCallTrans}, or \texttt{removeReturnTrans}), by clearing all
+transitions from the NWA, or as a side effect of removing a state or symbol
+from the NWA (see Section \ref{Se:States} and Section \ref{Se:Symbols}).
+
+\noindent The following operations are methods of class NWA:
+
+\begin{description}
+
+  \item\texttt{bool removeInternalTrans( Key source, Key sym, Key target )} \nopagebreak
+
+    Removes the internal transition
+    $(\texttt{source},\texttt{sym},\texttt{target})$ from the NWA (if
+    $(\texttt{source},\texttt{sym},\texttt{target}) \in \delta_i$).  Returns
+    false if this transition did not exist in the NWA, otherwise returns
+    true.
+
+  \item\texttt{bool removeInternalTrans( KeyTriple\& intTrans )} \nopagebreak 
+
+    Removes an internal transition from the NWA for the triple specified by
+    \texttt{intTrans} (if \texttt{intTrans} $\in \delta_i$).  Returns false
+    if this transition did not exist in the NWA, otherwise returns true.
+
+  \item\texttt{bool removeCallTrans( Key callSite, Key sym, Key entryPoint )} \nopagebreak
+
+    Removes the call transition
+    $(\texttt{callSite},\texttt{sym},\texttt{entryPoint})$ from the NWA (if
+    $(\texttt{callSite},\texttt{sym},\texttt{entryPoint}) \in \delta_c$).
+    Returns false if this transition did not exist in the NWA, otherwise
+    returns true.
+ 
+  \item\texttt{bool removeCallTrans( KeyTriple\& callTrans )} \nopagebreak
+
+    Removes a call transition from the NWA for the triple specified by
+    \texttt{callTrans} (if \texttt{callTrans} $\in \delta_c$).  Returns false
+    if this transition did not exist in the NWA, otherwise returns true.
+
+  \item\texttt{bool removeReturnTrans( Key exitPoint, Key
+    callSite,\\ \hspace*{3.25cm} Key sym, Key returnSite )} \nopagebreak
+
+    Removes the return transition
+    $(\texttt{exitPoint},\texttt{callSite},\texttt{sym},\texttt{returnSite})$
+    from the NWA (if
+    $(\texttt{exitPoint},\texttt{callSite},\texttt{sym},\texttt{returnSite})
+    \in \delta_r$).  Returns false if this transition did not exist in the
+    NWA, otherwise returns true.
+
+  \item\texttt{bool removeReturnTrans( Key exitPoint, Key sym, Key returnSite )} \nopagebreak
+
+    Removes the return transitions
+    $(\texttt{exitPoint},st,\texttt{sym},\texttt{returnSite})$ for all \\$st
+    \in Q$ from the NWA (if
+    $(\texttt{exitPoint},st,\texttt{sym},\texttt{returnSite}) \in \delta_r$).
+    Returns false if this transition did not exist in the NWA, otherwise
+    returns true.
+
+  \item\texttt{bool removeReturnTrans( KeyQuad\& retTrans )} \nopagebreak
+
+    Removes a return transition from the NWA for the quadruple specified by
+    \texttt{retTrans} (if \texttt{retTrans} $\in \delta_r$).  Returns false
+    if this transition did not exist in the NWA, otherwise returns true.
+
+  \item\texttt{void clearTrans()} \nopagebreak
+
+    Removes all transitions from the NWA, but does not remove any states or
+    symbols. \\
+
+\end{description}
+
+The set of supported queries about an NWA's explicit transitions includes:
+the existence of a specified transition, the number of (internal, call,
+return, or total) transitions in the NWA, the set of states that are
+predecessors (sources of internal transitions, call states of call
+transitions, or exit states of return transitions) of a given state by some
+transition, the set of states that are call-predecessors of a given state by
+some return transition, the set of states that are successors (targets of
+internal transitions, entry states of call transitions, or return states of
+return transitions) of a given state by some transition, the set of states
+that are successors of a given call-predecessor (return states) by some
+return transition, the set of symbol/state pairs for which there exist
+internal transitions with a particular source, the set of symbol/state pairs
+for which there exist call transitions with a particular call state, the set
+of symbol/state pairs for which there exist return transitions with a
+particular exit state and call state, the set of sources that are associated
+with a given target, the set of targets that are associated with a given
+source, the set of call states that are associated with a given entry state,
+the set of entry states that are associated with a given call state, the set
+of exit states that are associated with a given call state, the set of exit
+states that are associated with a given return state, the set of call states
+that are associated with a given exit state, the set of call states that are
+associated with a given return state, the set of return states that are
+associated with a given exit state, the set of return states that are
+associated with a given call state, etc.  Many of these functions are
+available in a version that restricts the symbol. \\
+
+\noindent The following operations are methods of class NWA:
+
+\begin{description}
+
+  \item\texttt{bool findTrans( Key from, Key sym, Key to )} \nopagebreak
+
+    Tests whether there exists an internal transition
+    $(\texttt{from},\texttt{sym},\texttt{to}) \in \delta_i$, a call
+    transition $(\texttt{from},\texttt{sym},\texttt{to}) \in \delta_c$, or a
+    return transition $(\texttt{from},st,\texttt{sym},\texttt{to}) \in
+    \delta_r$ for some $st \in Q$.
+
+  \item\texttt{bool getSymbol( Key from, Key to, Key\& sym )} \nopagebreak
+
+    Tests whether there exists an internal transition
+    $(\texttt{from},\alpha,\texttt{to}) \in \delta_i$ for some $\alpha \in
+    \Sigma^*$, a call transition $(\texttt{from},\alpha,\texttt{to}) \in
+    \delta_c$ for some $\alpha \in \Sigma \cup \{*\}$, or a return transition
+    $(\texttt{from},st,\alpha,\texttt{to}) \in \delta_r$ for some $st \in Q$
+    and some $\alpha \in \Sigma \cup \{*\}$.  In addition, the $\alpha$ for
+    the first such transition found is stored in the reference parameter
+    \texttt{sym}.
+
+  \item\texttt{size\_t sizeInternalTrans()} \nopagebreak
+
+    Yields the number of explicit internal transitions in the NWA.
+
+  \item\texttt{size\_t sizeCallTrans()} \nopagebreak
+
+    Yields the number of explicit call transitions in the NWA.
+
+  \item\texttt{size\_t sizeReturnTrans()} \nopagebreak
+
+    Yields the number of explicit return transitions in the NWA.
+
+  \item\texttt{size\_t sizeTrans()} \nopagebreak
+
+    Yields the total number of explicit transitions (internal, call, and
+    return) in the NWA.
+
+  \item\texttt{const std::set<Key> getPredecessors( Key state )} \nopagebreak
+
+    Yields all states that are predecessors of a given state by some
+    transition; i.e., for each internal transition,
+    $(source,sym,\texttt{state})$, $source$ is added to the set of
+    predecessors, for each call transition, $(callSite,sym,\texttt{state})$,
+    $callSite$ is added to the set of predecessors, and for each return
+    transition, $(exitPoint,callSite,sym,\texttt{state})$, $exitPoint$ is
+    added to the set of predecessors.
+
+  \item\texttt{const std::set<Key> getPredecessors( Key symbol, Key state )} \nopagebreak
+
+    Yields all states that are predecessors of a given state by some
+    transition having the given symbol; i.e., for each internal transition,
+    $(source,\texttt{symbol},\texttt{state})$, $source$ is added to the set
+    of predecessors, for each call transition,
+    $(callSite,\texttt{symbol},\texttt{state})$, $callSite$ is added to the
+    set of predecessors, and for each return transition,
+    $(exitPoint,callSite,\texttt{symbol},\texttt{state})$, $exitPoint$ is
+    added to the set of predecessors.
+
+  \item\texttt{const std::set<Key> getSuccessors( Key state )} \nopagebreak
+
+    Yields all states that are successors of a given state by some
+    transition; i.e., for each internal transition,
+    $(\texttt{state},sym,target)$, $target$ is added to the set of
+    successors, for each call transition, $(\texttt{state},sym,entryPoint)$,
+    $entryPoint$ is added to the set of successors, and for each return
+    transition, $(\texttt{state},callSite,sym,returnSite)$, $returnSite$ is
+    added to the set of successors.
+
+  \item\texttt{const std::set<Key> getSuccessors( Key state, Key symbol )} \nopagebreak
+
+    Yields all states that are successors of a given state by some transition
+    having the given symbol; i.e., for each internal transition,
+    $(\texttt{state},\texttt{symbol},target)$, $target$ is added to the set
+    of successors, for each call transition,
+    $(\texttt{state},\texttt{symbol},entryPoint)$, $entryPoint$ is added to
+    the set of successors, and for each return transition,
+    $(\texttt{state},callSite,\texttt{symbol},returnSite)$, $returnSite$ is
+    added to the set of successors.
+
+  \item\texttt{const std::set<Key> getCallPredecessors( Key state )} \nopagebreak
+
+    Yields all states that are call-predecessors of a given state by some
+    return transition; i.e., for each return transition,
+    $(exitPoint,callSite,sym,\texttt{state})$, $callSite$ is added to the set
+    of call predecessors.
+
+  \item\texttt{const std::set<Key> getCallPredecessors( Key symbol, Key state )} \nopagebreak
+
+    Yields all states that are call-predecessors of a given state by some
+    return transition having the given symbol; i.e., for each return
+    transition, $(exitPoint,callSite,\texttt{symbol},\texttt{state})$,
+    $callSite$ is added to the set of call predecessors.
+
+  \item\texttt{const std::set<Key> getCallSuccessors( Key state )} \nopagebreak
+
+    Yields all states that are call-successors of a given state by some
+    return transition; i.e., for each return transition,
+    $(exitPoint,\texttt{state},sym,returnSite)$, $returnSite$ is added to the
+    set of call successors.
+
+  \item\texttt{const std::set<Key> getCallSuccessors( Key state, Key symbol )} \nopagebreak
+
+    Yields all states that are call-successors of a given state by some
+    return transition having the given symbol; i.e., for each return
+    transition, $(exitPoint,\texttt{state},\texttt{symbol},returnSite)$,
+    $returnSite$ is added to the set of call successors.
+
+  \item\texttt{const std::set<Key> getSources\_Sym( Key symbol )} \nopagebreak
+
+    Yields the set of all states, $source$, such that the internal transition
+    $(source,\texttt{symbol},target)$ is in $\delta_i$ for some $target \in
+    Q$.
+
+  \item\texttt{const std::set<Key> getSources( Key symbol, Key target )} \nopagebreak
+
+    Yields the set of all states, $source$, such that the internal transition
+    $(source,\texttt{symbol},\texttt{target})$ is in $\delta_i$.
+
+  \item\texttt{const std::set<std::pair<Key,Key>> getSources( Key target )} \nopagebreak
+
+    Yields the set of all state/symbol pairs, $(source,sym)$, such that the
+    internal transition $(source,sym,\texttt{target})$ is in $\delta_i$.
+
+  \item\texttt{const std::set<Key> getSources( )} \nopagebreak
+
+    Yields the set of all states, $source$, such that the internal transition
+    $(source,symbol,target)$ is in $\delta_i$ for some $symbol \in \Sigma$
+    and $target \in Q$.
+
+  \item\texttt{const std::set<Key> getTargets\_Sym( Key symbol )} \nopagebreak
+
+    Yields the set of all states, $target$, such that the internal transition
+    $(source,\texttt{symbol},target)$ is in $\delta_i$ for some $source \in
+    Q$.
+
+  \item\texttt{const std::set<Key> getTargets( Key source, Key symbol )} \nopagebreak
+
+    Yields the set of all states, $target$, such that the internal transition
+    $(\texttt{source},\texttt{symbol},target)$ is in $\delta_i$.
+
+  \item\texttt{const std::set<std::pair<Key,Key>> getTargets( Key source )} \nopagebreak
+
+    Yields the set of all symbol/state pairs, $(sym,target)$, such that the
+    internal transition $(\texttt{source},sym,target)$ is in $\delta_i$.
+
+  \item\texttt{const std::set<Key> getTargets( )} \nopagebreak
+
+    Yields the set of all states, $target$, such that the internal transition
+    $(source,symbol,target)$ is in $\delta_i$ for some $source \in Q$ and
+    $symbol \in \Sigma$.
+
+  \item\texttt{const std::set<Key> getInternalSym( )} \nopagebreak
+
+    Yields the set of all symbols, $symbol$, such that the internal
+    transition $(source,symbol,target)$ is in $\delta_i$ for some $source \in
+    Q$ and $target \in Q$.
+
+  \item\texttt{const std::set<Key> getInternalSym( Key source, Key target )} \nopagebreak
+
+    Yields the set of all symbols, $symbol$, such that the internal
+    transition $(\texttt{source},symbol,\texttt{target})$ is in $\delta_i$.
+
+  \item\texttt{const std::set<Key> getInternalSym\_Source( Key source )} \nopagebreak
+
+    Yields the set of all symbols, $symbol$, such that the internal
+    transition $(\texttt{source},symbol,target)$ is in $\delta_i$ for some
+    $target \in Q$.
+
+  \item\texttt{const std::set<Key> getInternalSym\_Target( Key target )} \nopagebreak
+
+    Yields the set of all symbols, $symbol$, such that the internal
+    transition $(source,symbol,\texttt{target})$ is in $\delta_i$ for some
+    $source \in Q$.
+
+  \item\texttt{const std::set<Key> getCallSites\_Sym( Key symbol )} \nopagebreak
+
+    Yields the set of all states, $callSite$, such that the call transition
+    $(callSite,\texttt{symbol},entryPoint)$ is in $\delta_c$ for some
+    $entryPoint \in Q$.
+
+  \item\texttt{const std::set<Key> getCallSites( Key symbol, Key entryPoint )} \nopagebreak
+
+    Yields the set of all states, $callSite$, such that the call transition
+    $(callSite,\texttt{symbol},\texttt{entryPoint})$ is in $\delta_c$.
+
+  \item\texttt{const std::set<std::pair<Key,Key>> getCallSites( Key entryPoint )}
+
+    Yields the set of all state/symbol pairs, $(callSite,sym)$, such that the
+    call transition $(callSite,sym,entryPoint)$ is in $\delta_c$.
+
+  \item\texttt{const std::set<Key> getCallSites( )} \nopagebreak
+
+    Yields the set of all states, $callSite$, such that
+    $(callSite,symbol,entryPoint)$ is in $\delta_c$ for some $symbol \in
+    \Sigma$ and $entryPoint \in Q$.
+
+  \item\texttt{const std::set<Key> getEntries\_Sym( Key symbol )} \nopagebreak
+
+    Yields the set of all states, $entryPoint$, such that
+    $(callSite,\texttt{symbol},entryPoint)$ is in $\delta_c$ for some
+    $callSite \in Q$.
+
+  \item\texttt{const std::set<Key> getEntries( Key callSite, Key symbol )} \nopagebreak
+
+    Yields the set of all states, $entryPoint$, such that the call transition
+    $(\texttt{callSite},\texttt{symbol},entryPoint)$ is in $\delta_c$.
+
+  \item\texttt{const std::set<std::pair<Key,Key>> getEntries( Key callSite )} \nopagebreak
+
+    Yields the set of all symbol/state pairs, $(sym,entryPoint)$, such that
+    the call transition $(\texttt{callSite},sym,entryPoint)$ is in
+    $\delta_c$.
+
+  \item\texttt{const std::set<Key> getEntries( )} \nopagebreak
+
+    Yields the set of all states, $entryPoint$, such that the call transition
+    $(callSite,symbol,entryPoint)$ is in $\delta_c$ for some $callSite \in Q$
+    and $symbol \in \Sigma$.
+
+  \item\texttt{const std::set<Key> getCallSym( )} \nopagebreak
+
+    Yields the set of all symbols, $symbol$, such that the call transition
+    $(callSite,symbol,entryPoint)$ is in $\delta_c$ for some $callSite \in Q$
+    and $entryPoint \in Q$.
+
+  \item\texttt{const std::set<Key> getCallSym( Key callSite, Key entryPoint )} \nopagebreak
+
+    Yields the set of all symbols, $symbol$, such that the call transition
+    $(\texttt{callSite},symbol,\texttt{entryPoint})$ is in $\delta_c$.
+
+  \item\texttt{const std::set<Key> getCallSym\_Call( Key callSite )} \nopagebreak
+
+    Yields the set of all symbols, $symbol$, such that the call transition
+    $(\texttt{callSite},symbol,entryPoint)$ is in $\delta_c$ for some
+    $entryPoint \in Q$.
+
+  \item\texttt{const std::set<Key> getCallSym\_Entry( Key entryPoint )} \nopagebreak
+
+    Yields the set of all symbols, $symbol$, such that the call transition
+    $(callSite,symbol,\texttt{entryPoint})$ is in $\delta_c$ for some
+    $callSite \in Q$.
+
+  \item\texttt{const std::set<Key> getExits\_Sym( Key symbol )} \nopagebreak
+
+    Yields the set of all states, $exitPoint$, such that the return
+    transition $(exitPoint,callSite,\texttt{symbol},returnSite)$ is in
+    $\delta_r$ for some $callSite \in Q$ and $returnSite \in Q$.
+
+  \item\texttt{const std::set<Key> getExits( Key callSite, Key symbol,\\ \hspace*{3.25cm} Key returnSite )} \nopagebreak
+
+    Yields the set of all states, $exitPoint$, such that the return
+    transition
+    $(exitPoint,\texttt{callSite},\texttt{symbol},\texttt{returnSite})$ is in
+    $\delta_r$.
+
+  \item\texttt{const std::set<std::pair<Key,Key>> getExits( Key callSite,\\ \hspace*{3.25cm} Key returnSite )} \nopagebreak
+
+    Yields the set of all state/symbol pairs, $(exitPoint,sym)$, such that
+    the return transition
+    $(exitPoint,\texttt{callSite},sym,\texttt{returnSite})$ is in $\delta_r$.
+
+  \item\texttt{const std::set<Key> getExits( )} \nopagebreak
+
+    Yields the set of all states, $exitPoint$, such that the return
+    transition $(exitPoint,callSite,symbol,returnSite)$ is in $\delta_r$ for
+    some $callSite \in Q$, $symbol \in \Sigma$, and $returnSite \in Q$.
+
+  \item\texttt{const std::set<Key> getExits\_Call( Key callSite, Key symbol )} \nopagebreak
+
+    Yields the set of all states, $exitPoint$, such that the return
+    transition $(exitPoint,\texttt{callSite},\texttt{symbol},returnSite)$ is
+    in $\delta_r$ for some $returnSite \in Q$.
+
+  \item\texttt{const std::set<std::pair<Key,Key>> getExits\_Call( Key callSite )} \nopagebreak
+
+    Yields the set of all state/symbol pairs, $(exitPoint,sym)$, such that
+    the return transition $(exitPoint,\texttt{callSite},sym,returnSite)$ is
+    in $\delta_r$ for some $returnSite \in Q$.
+
+  \item\texttt{const std::set<Key> getExits\_Ret( Key symbol, Key returnSite )} \nopagebreak
+
+    Yields the set of all states, $exitPoint$, such that the return
+    transition $(exitPoint,callSite,\texttt{symbol},\texttt{returnSite})$ is
+    in $\delta_r$ for some $callSite \in Q$.
+
+  \item\texttt{const std::set<std::pair<Key,Key>> getExits\_Ret( Key returnSite )} \nopagebreak
+
+    Yields the set of all state/symbol pairs, $(exitPoint,sym)$, such that
+    the return transition $(exitPoint,callSite,sym,\texttt{returnSite})$ is
+    in $\delta_r$ for some $callSite \in Q$.
+
+  \item\texttt{const std::set<Key> getCalls\_Sym( Key symbol )} \nopagebreak
+
+    Yields the set of all states, $callSite$, such that the return transition
+    $(exitPoint,callSite,\texttt{symbol},returnSite)$ is in $\delta_r$ for
+    some $exitPoint \in Q$ and $returnSite \in Q$.
+
+  \item\texttt{const std::set<Key> getCalls( Key exitPoint, Key symbol,\\ \hspace*{3.25cm} Key returnSite )} \nopagebreak
+
+    Yields the set of all states, $callSite$, such that the return transition
+    $(\texttt{exitPoint},callSite,\texttt{symbol},\texttt{returnSite})$ is in
+    $\delta_r$.
+
+  \item\texttt{const std::set<std::pair<Key,Key>> getCalls( Key exitPoint,\\ \hspace*{3.25cm} Key returnSite )} \nopagebreak
+
+    Yields the set of all state/symbol pairs, $(callSite,sym)$, such that the
+    return transition $(\texttt{exitPoint},callSite,sym,\texttt{returnSite}$
+    is in $\delta_r$.
+
+  \item\texttt{const std::set<Key> getCalls( )} \nopagebreak
+
+    Yields the set of all states, $callSite$, such that the return transition
+    $(exitPoint,callSite,symbol,returnSite)$ is in $\delta_r$ for some
+    $exitPoint \in Q$, $symbol \in \Sigma$, and $returnSite \in Q$.
+
+  \item\texttt{const std::set<Key> getCalls\_Exit( Key exitPoint, Key symbol )} \nopagebreak
+
+    Yields the set of all states, $callSite$, such that the return transition
+    $(\texttt{exitPoint},callSite,\texttt{symbol},returnSite)$ is in
+    $\delta_r$ for some $returnSite \in Q$.
+
+  \item\texttt{const std::set<std::pair<Key,Key>> getCalls\_Exit( Key exitPoint )} \nopagebreak
+
+    Yields the set of all state/symbol pairs, $(callSite,sym)$, such that the
+    return transition $(\texttt{exitPoint},callSite,sym,returnSite)$ is in
+    $\delta_r$ for some $returnSite \in Q$.
+
+  \item\texttt{const std::set<Key> getCalls\_Ret( Key symbol, Key returnSite )} \nopagebreak
+
+    Yields the set of all states, $callSite$, such that the return transition
+    $(exitPoint,callSite,\texttt{symbol},\texttt{returnSite}$ is in
+    $\delta_r$ for some $exitPoint \in Q$.
+
+  \item\texttt{const std::set<std::pair<Key,Key>> getCalls\_Ret( Key returnSite )} \nopagebreak
+
+    Yields the set of all state/symbol pairs, $(callSite,sym)$, such that the
+    return transition $(exitPoint,callSite,sym,\texttt{returnSite}$ is in
+    $\delta_r$ for some $exitPoint \in Q$.
+
+  \item\texttt{const std::set<Key> getReturns\_Sym( Key symbol )} \nopagebreak
+
+    Yields the set of all states, $returnSite$, such that the return
+    transition $(exitPoint,callSite,\texttt{symbol},returnSite)$ is in
+    $\delta_r$ for some $exitPoint \in Q$ and $callSite \in Q$.
+
+  \item\texttt{const std::set<Key> getReturns( Key exitPoint ,Key callSite,\\ \hspace*{3.25cm} Key symbol )} \nopagebreak
+
+    Yields the set of all states, $returnSite$, such that the return
+    transition
+    $(\texttt{exitPoint},\texttt{callSite},\texttt{symbol},returnSite)$ is in
+    $\delta_r$.
+
+  \item\texttt{const std::set<std::pair<Key,Key>> getReturns( Key exitPoint,\\ \hspace*{3.25cm} Key callSite )} \nopagebreak
+
+    Yields the set of all symbol/state pairs, $(sym,returnSite)$, such that
+    the return transition
+    $(\texttt{exitPoint},\texttt{callSite},sym,returnSite)$ is in $\delta_r$.
+
+  \item\texttt{const std::set<Key> getReturns( )} \nopagebreak
+
+    Yields the set of all states, $returnSite$, such that the return
+    transition $(exitPoint,callSite,symbol,returnSite)$ is in $\delta_r$ for
+    some $exitPoint \in Q$, $callSite \in Q$, and $symbol \in \Sigma$.
+
+  \item\texttt{const std::set<Key> getReturns\_Exit( Key exitPoint, Key symbol )} \nopagebreak
+
+    Yields the set of all states, $returnSite$, such that the return
+    transition $(\texttt{exitPoint},callSite,\texttt{symbol},returnSite)$ is
+    in $\delta_r$ for some $callSite \in Q$.
+
+  \item\texttt{const std::set<std::pair<Key,Key>> \\getReturns\_Exit( Key exitPoint )} \nopagebreak
+
+    Yields the set of all symbol/state pairs, $(sym,returnSite)$, such that
+    the return transition $(\texttt{exitPoint},callSite,sym,returnSite)$ is
+    in $\delta_r$ for some $callSite \in Q$.
+
+  \item\texttt{const std::set<Key> getReturns\_Call( Key callSite, Key symbol )} \nopagebreak
+
+    Yields the set of all states, $returnSite$, such that the return
+    transition $(exitPoint,\texttt{callSite},\texttt{symbol},returnSite)$ is
+    in $\delta_r$ for some $exitPoint \in Q$.
+
+  \item\texttt{const std::set<std::pair<Key,Key>> getReturns\_Call( \\ \hspace*{3.25cm} Key callSite )} \nopagebreak
+
+    Yields the set of all symbol/state pairs, $(sym,returnSite)$, such that
+    the return transition $(exitPoint,\texttt{callsite},sym,returnSite)$ is
+    in $\delta_r$ for some $exitPoint \in Q$.
+
+  \item\texttt{const std::set<Key> getReturnSites( Key callSite )} \nopagebreak
+
+    Yields the set of all states, $returnSite$, such that the return
+    transition $(exitPoint,\texttt{callSite},sym,returnSite)$ is in
+    $\delta_r$ for some $exitPoint \in Q$ and $sym \in \Sigma$.
+
+  \item\texttt{const std::set<Key> getReturnSym( \\ \hspace*{3.25cm}Key exitPoint, Key callSite, Key returnSite )} \nopagebreak
+
+    Yields the set of all symbols, $symbol$, such that the return transition
+    $(\texttt{exitPoint},\texttt{callSite},symbol,\texttt{returnSite})$ is in
+    $\delta_r$.
+
+  \item\texttt{const std::set<Key> getReturnSym( )} \nopagebreak
+
+    Yields the set of all symbols, $symbol$, such that the return transition
+    $(exitPoint,callSite,symbol,returnSite)$ is in $\delta_r$ for some
+    $exitPoint \in Q$, $callSite \in Q$, and $returnSite \in Q$.
+
+  \item\texttt{const std::set<Key> getReturnSym\_Exit( Key exitPoint )} \nopagebreak
+
+    Yields the set of all symbols, $symbol$, such that the return transition
+    $(\texttt{exitPoint},callSite,symbol,returnSite)$ is in $\delta_r$ for
+    some $callSite \in Q$ and $returnSite \in Q$.
+
+  \item\texttt{const std::set<Key> getReturnSym\_Call( Key callSite )} \nopagebreak
+
+    Yields the set of all symbols, $symbol$, such that the return transition
+    $(exitPoint,\texttt{callSite},symbol,returnSite)$ is in $\delta_r$ for
+    some $exitPoint \in Q$ and $returnSite \in Q$.
+
+  \item\texttt{const std::set<Key> getReturnSym\_Ret( Key returnSite )} \nopagebreak
+
+    Yields the set of all symbols, $symbol$, such that the return transition
+    $(exitPoint,callSite,symbol,\texttt{returnSite})$ is in $\delta_r$ for
+    some $exitPoint \in Q$ and $callSite \in Q$.
+
+  \item\texttt{const std::set<Key> getReturnSym\_ExitCall( \\ \hspace*{3.25cm} Key exitPoint, Key callSite )} \nopagebreak
+
+    Yields the set of all symbols, $symbol$, such that the return transition
+    $(\texttt{exitPoint}\texttt{callSite},symbol,returnSite)$ is in
+    $\delta_r$ for some $returnSite \in Q$.
+
+  \item\texttt{const std::set<Key> getReturnSym\_ExitRet( \\ \hspace*{3.25cm} Key exitPoint, Key returnSite )} \nopagebreak
+
+    Yields the set of all symbols, $symbol$, such that the return transition
+    $(\texttt{exitPoint},callSite,symbol,\texttt{returnSite})$ is in
+    $\delta_r$ for some $callSite \in Q$.
+
+  \item\texttt{const std::set<Key> getReturnSym\_CallRet( \\ \hspace*{3.25cm} Key callSite, Key returnSite )} \nopagebreak
+
+    Yields the set of all symbols, $symbol$, such that the return transition
+    $(exitPoint,\texttt{callSite},symbol,\texttt{returnSite})$ is in
+    $\delta_r$ for some $exitPoint \in Q$. \\
+
+\end{description}
+

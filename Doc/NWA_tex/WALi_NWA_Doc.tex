@@ -20,14 +20,16 @@
 \usepackage{hhline}
 \usepackage{refs}
 % \usepackage{graph}
- \usepackage{changebar}
-% \usepackage{multirow}
-% \usepackage{array}
+\usepackage{changebar}
+\usepackage{multirow}
+\usepackage{array}
 % \usepackage{wrapfig}
-% \usepackage{rotating}
-% \usepackage{color}
+\usepackage[counterclockwise]{rotating}
+\usepackage{color}
+\usepackage{arydshln}
 % \usepackage{algorithmic}
 \usepackage{paralist}
+\usepackage{geometry}
 
 \usepackage{hyperref}
 \usepackage[all]{hypcap}
@@ -73,6 +75,10 @@
 
 \newcommand{\bottom}{\bot}
 
+\newcommand{\toprule}{\hline}
+\newcommand{\midrule}{\hline}
+\newcommand{\bottomrule}{\hline}
+
 
 %%%%%%%%%%%%%%%%%%%
 
@@ -117,7 +123,8 @@ reflect the views of NSF, ONR, ARL, and AFRL.
 
 
 
-\input{01-overview}
+\input{accessor-tables}
+\input{class-nwa}
 \input{02-building-from-scratch}
 \input{03-building-from-others}
 \input{04-conversions}
