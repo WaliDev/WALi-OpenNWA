@@ -1,13 +1,13 @@
 The NWA library contains an experimental parser for descriptions of
 NWAs. The format is described below, and matches the result of calling
-\texttt{NWA::print(std::ostream &)} provided that the result of
+\texttt{NWA::print(std::ostream \&)} provided that the result of
 calling \texttt{key2str} on the state and symbol keys produces strings
 that match the description of \textsl{actual-names} in this grammar.
 
 There are two functions which parse NWA descriptions:
 \begin{itemize}
-  \item\texttt{NWARefPtr read\_nwa(std::istream &, std::string * name = NULL)}
-  \item\texttt{std::map$<$std::string, NWARefPtr$>$ read\_nwa\_proc\_set(std::istream &)}
+  \item\texttt{NWARefPtr read\_nwa(std::istream \&, std::string * name = NULL)}
+  \item\texttt{std::map$<$std::string, NWARefPtr$>$ read\_nwa\_proc\_set(std::istream \&)}
 \end{itemize}
 A stream may contain descriptions of one or more automata; the first
 function reads one, and the second function reads all.  (The return
@@ -110,9 +110,9 @@ A transition block can be for internal, call, or return transitions,
 denoted by the block headers \textsl{delta\_i}, \textsl{delta\_c}, and
 \textsl{delta\_r}, respectively.
  
-  delta-block  ::=  'delta_i:'  '{'?  triple-list  '}'?
-                 |  'delta_c:'  '{'?  triple-list  '}'?
-                 |  'delta_r:'  '{'?  quad-list    '}'?
+  delta-block  ::=  'delta\_i:'  '{'?  triple-list  '}'?
+                 |  'delta\_c:'  '{'?  triple-list  '}'?
+                 |  'delta\_r:'  '{'?  quad-list    '}'?
 
 The bodies in each case are simply a comma-separated list of triples
 or quads:
