@@ -1,0 +1,169 @@
+The NWA library contains an experimental parser for descriptions of
+NWAs. The format is described below, and matches the result of calling
+\texttt{NWA::print(std::ostream &)} provided that the result of
+calling \texttt{key2str} on the state and symbol keys produces strings
+that match the description of \textsl{actual-names} in this grammar.
+
+There are two functions which parse NWA descriptions:
+\begin{itemize}
+  \item\texttt{NWARefPtr read\_nwa(std::istream &, std::string * name = NULL)}
+  \item\texttt{std::map$<$std::string, NWARefPtr$>$ read\_nwa\_proc\_set(std::istream &)}
+\end{itemize}
+A stream may contain descriptions of one or more automata; the first
+function reads one, and the second function reads all.  (The return
+type of the second function has a typedef name of
+\texttt{ProcedureMap}.)
+
+The former function reads the first description of an NWA from the
+input string and returns it. Descriptions specify an optional name of
+an NWA; if one is specified and \texttt{name} is non-null, then the
+name is stored in the string pointed to by \texttt{name}.
+
+The second function reads the entire input stream. It returns a map
+from the name of each automaton specification to the parsed NWA. (This
+form was originally created to read NWAs for an entire program, witch
+each procedure in a separate NWA. The name of each NWA was the name of
+the procedure in the original program.)
+
+\section{NWA description format}
+
+This section describes the grammar of the file format.
+
+\textsl{Note:} Some characteristics in the following have the
+following as part of their description: ``you should not depend on
+this.'' In such cases, we reserve the right to change this behavior in
+future versions and to not feel bad about it.
+
+\textsl{Note:} This is experimental code; in particular, the
+error-handling in it is basically non-existent. We detect when the
+input doesn't match the grammar, but we signal such input failures
+with assertion violations. In a future version of the library, we will
+report errors more gracefully, almost certainly through exceptions.
+
+\textsl{Note:} The NWA parser has unit tests embedded in the code. (It
+does not use any unit test framework.) These tests can be run by
+calling \texttt{wali::nwa::parser\_test\_all}. The file
+\texttt{NwaParserMain.cpp} is a short program that does this.
+
+
+The grammar for an NWA is as follows. In order to accept a couple
+slightly different output formats we have used in the past, there are
+some choices in whether braces are present and other aspects.
+
+
+A single input stream can contain either a single NWA (just a series
+of blocks) or multiple NWAs. If you would like to describe multiple
+NWAs, each individual starts with the literal \textsl{nwa}.
+
+  nwa-description  ::= ('nwa' name? ':'?)? '{'? block+ '}'?
+
+ \textsl{Braces are required if 'nwa' is present and the name is not}
+ to distinguish the first block header (\textsl{Q:}, \textsl{Q0:}, or
+ \textsl{Qf:}) from the name of the NWA.
+
+An NWA is a sequence of blocks; each block specifies one or more
+states, symbols, or transitions.
+
+  block  ::=  state-block     // lookahead = 'Q'
+           |  sigma-block     // lookahead = 's'
+           |  delta-block     // lookahead = 'd'
+
+Blocks of the same type can be repeated; e.g. it is perfectly fine to
+specify all transitions in one block, one block per transition, or
+anywhere in between. The ``block header'' specifies what kind of block
+it is, and the body is a comma-separated list of whatever entity the
+block header specifies (e.g. states). The body may be surrounded by
+curly braces, but they are not required unless the body is empty.
+
+If a block specifies states, it can specify just that a state is
+present, an initial state, or an accepting state; these are denoted by
+the block headers \textsl{Q:}, \textsl{Q0:}, and \textsl{Qf:}
+respectively.
+ 
+  state-block  ::=  'Q:'   '{'?  name-list  '}'?
+                 |  'Q0:'  '{'?  name-list  '}'?
+                 |  'Qf:'  '{'?  name-list  '}'?
+
+(It is not necessary to explicitly list all states; if a state is
+listed in a transition, it is implicitly added to the machine if
+needed. Thus it is quite possible to have a machine description with
+no \textsl{Q:} blocks.)
+
+A name-list is simply a comma-separate list of names of states.
+
+  name-list ::=  (name (','  name)*)?
+
+Recall that If the list is empty, it must be followed by a \textsl{\}}
+(or EOF) to distinguish the next block header from the name of a
+state.
+
+The grammar for \textsl{name} will be specified below.
+
+
+Symbol blocks are just like name blocks, except they specify symbol
+names. The block header is simply 'sigma'.
+
+  sigma-block  ::=  'sigma:'  '{'?  name-list  '}'?
+
+
+A transition block can be for internal, call, or return transitions,
+denoted by the block headers \textsl{delta\_i}, \textsl{delta\_c}, and
+\textsl{delta\_r}, respectively.
+ 
+  delta-block  ::=  'delta_i:'  '{'?  triple-list  '}'?
+                 |  'delta_c:'  '{'?  triple-list  '}'?
+                 |  'delta_r:'  '{'?  quad-list    '}'?
+
+The bodies in each case are simply a comma-separated list of triples
+or quads:
+
+  triple-list ::=  (triple  (','  triple)*)?
+  quad-list   ::=  (quad  (','  quad)*)?
+
+and each triple (resp., quad) is a 3-tuple (4-tuple) of names:
+
+  triple  ::=  '('  name ','  name  ','  name  ')'
+  quad  ::=  '('  name ','  name  ','  name  ','  name  ')'
+
+
+All that remains is to define the grammar for `name'. Because the
+format grew organically and we wished to keep compatibility with
+existing log files (which could previously not be automatically parsed
+but which we could look at), the `name' terminal is a bit convoluted.
+
+The name consists of the \textsl{actual} name of the state or symbol
+in question, followed by an optional parenthesis-delimited token which
+is ignored. (In some of our output, the name is the result of
+\texttt{key2str} and the optional token is the actual numeric value of
+the key.)
+
+  name  ::=  actual-name  dummy-token?
+
+The actual-name portion generally behaves like a standard-programming
+language identifier, but with one important difference: it can contain
+balanced parentheses, and \textsl{any} characters are allowed within a
+set of parentheses. (We actually allow a larger set of characters than
+is typical, but you should not depend on this. Surround your names
+with parentheses if you use ``special'' characters.)
+
+We can now define the effective grammar. A `unit' is a letter or
+parenthesis group.
+
+  actual-name  ::=  unit+
+
+  unit  ::=  normal-char  |  paren-group
+
+  normal-char ::=  character other than whitespace, ',', or a paren
+
+(\texttt{std::isspace} is used to determine whether a character is
+  whitespace.)
+
+  left-paren   ::=  '(' | '\{' | '[' | '$<$'
+  right-paren  ::=  ')' | '\}' | ']' | '$>$'
+  non-paren  ::=  a character other than any of the above
+
+  paren-group ::=  left-paren  (non-paren | paren-group)*  right-paren
+
+(Finally, we do not currently demand that the \textsl{types} of parens
+  match up: e.g. \textsl{(1, 2, 3]} is a valid name. You should not
+    depend on this feature.)
