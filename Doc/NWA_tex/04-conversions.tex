@@ -3,9 +3,28 @@
 
 
 It is possible to both convert from a WALi WPDS to an NWA and from an NWA to
-a WPDS.  \textbf{However, the construction of an NWA from a WPDS is not the
-  inverse of constructing a WPDS from an NWA, i.e., one cannot perform the
-  two conversions in sequence and obtain the identity conversion.} \\
+a WPDS.  However, the construction of an NWA from a WPDS is not the inverse
+of constructing a WPDS from an NWA, i.e., one cannot perform the two
+conversions in sequence and obtain the identity conversion.
+
+At a high level, these operations work by making the NWA track both the state
+of the PDS and it's top-of-stack symbol. A PDS rule of the form $\langle
+p,q_1 \rangle \hookrightarrow \langle p,q_2 \rangle$ leaves the stack height
+unchanged, and thus is associated with an internal NWA transition; in this
+case, that transition goes from the state $(p,q_1)$ to $(p,q_2)$. The symbol
+of a transition is associated with the top-of-stack symbol of the source
+state, so in this example, the symbol labeling that transition would be
+$q_1$. PDS push rules correspond to NWA call transitions, and PDS pop rules
+correspond to NWA return transitions.
+
+(This association is strongly informed by our uses of both PDSs and NWAs in
+program analysis. It is common for PDSs to have just one state, $p$, and to
+use the top-of-stack symbol to track the ``current'' program point. Pushing
+something onto the stack corresponds to a call, and popping corresponds to a
+return. For NWAs, we use the states themselves to track the current program
+point. Furthermore, in our uses the labels on edges have been an identifier
+for the program point the edge emanates from.)
+
 
 \noindent The following operations are methods of class NWA:
 
@@ -58,25 +77,26 @@ a WPDS.  \textbf{However, the construction of an NWA from a WPDS is not the
 
 \end{description}
 
+
 \subsection{PDS to NWA}
 \label{Se:PDStoNWA}
 
-The last way to build an NWA is to convert a PDS into an NWA.  The conversion
-is performed by:
+The \texttt{PDStoNWA} functions convert a PDS into an NWA in a manner
+faithful to the association suggested in the introduction to this section.
 
+Formally, the conversion proceeds as follows:
 \begin{enumerate}
 
 \item For each $\langle p,q \rangle \hookrightarrow \langle p',q' \rangle \in
-  \Delta_1$ in the PDS, adding $( (p,q), q, (p',q') )$ to $\delta_i$ of the
-  NWA.
+  \Delta_1$ in the PDS, we add $( (p,q), q, (p',q') )$ to the NWA's $\delta_i$
 
 \item For each $\langle p,q_c \rangle \hookrightarrow \langle
-  p',q_e \hspace{.1cm} q_r \rangle \in \Delta_2$ in the PDS, adding $(
-  (p,q_c), q_c, (p',q_e) )$ to $\delta_c$ of the NWA.
+  p',q_e \hspace{.1cm} q_r \rangle \in \Delta_2$ in the PDS, we add $(
+  (p,q_c), q_c, (p',q_e) )$ to the NWA's $\delta_c$
 
 \item For each $\langle p'',q_x \rangle \hookrightarrow \langle p''',\epsilon
-  \rangle \in \Delta_0$ in the PDS, adding $( (p'',q_x), (p,q_c), q_x,
-  (p''',q_r) )$ to $\delta_r$ of the NWA for all $(q_c,q_r)$ pairs such that
+  \rangle \in \Delta_0$ in the PDS, we add $( (p'',q_x), (p,q_c), q_x,
+  (p''',q_r) )$ to the NWA's $\delta_r$ for all $(q_c,q_r)$ pairs such that
   $\langle p,q_c \rangle \hookrightarrow \langle p',q_e \hspace{.1cm} q_r
   \rangle \in \Delta_2$.
 
@@ -116,6 +136,7 @@ For example, the NWA resulting from converting the PDS shown in Figure
 
 The client information for all states in the resulting NWA are set to \texttt{null}.
 
+
 \subsection{NWA to PDS}
 \label{Se:NWAtoPDS}
 
@@ -128,28 +149,22 @@ conversion: \begin{inparaenum} \item forward flow with call states on the
   the stack. \end{inparaenum} All four variations use \texttt{WeightGen} to
 determine weights for WPDS rules.
 
-\texttt{WeightGen} provides an interface that you \textbf{must} implement for
+\texttt{WeightGen} provides an abstract class that client code must implement for
 calculating the weights for NWA transitions which are subsequently used in
 calculating the weights for corresponding WPDS rules.  It allows the
-underlying NWA to be decoupled from the weight domain to be used.  See
-\cite[\S4-\S5]{wali} for details about weight domains. To convert from an NWA
-to a WPDS, the user must first subclass WeightGen to provide the weights for
-the WPDS (an instance of this subclass is passed to the WPDS-generation
-functions). \\
+underlying NWA to be decoupled from the weight domain used in the PDS.  See
+\cite[\S4-\S5]{wali} for details about weight domains.
 
-\clearpage
+
 \noindent The following operations are methods of class WeightGen and are intended to be overridden:
 
 \begin{description} 
-
   \item \texttt{sem\_elem\_t getOne()}  \nopagebreak
-
     Returns an instance of the $\bar{1}$ element of the weight domain.
 
   \item \texttt{sem\_elem\_t getWeight( Key source, ref\_ptr<ClientInfo> sourceInfo, \\  
                               \hspace*{3.25cm} Key symbol, Kind k, \\
                               \hspace*{3.25cm} Key target, ref\_ptr<ClientInfo> targetInfo )}  \nopagebreak
-
     Computes and returns the weight (in the desired semiring) for a
     (\texttt{kind}) NWA transition from \texttt{source} to \texttt{target}
     labeled with symbol \texttt{symbol}.
@@ -157,12 +172,16 @@ functions). \\
   \item \texttt{sem\_elem\_t getWildWeight( \\
                               \hspace*{3.25cm} Key source, ref\_ptr<ClientInfo> sourceInfo, \\
                               \hspace*{3.25cm} Key target, ref\_ptr<ClientInfo> targetInfo )}  \nopagebreak
-
     Computes and returns the weight (in the desired semiring) for an NWA
     transition from \texttt{source} to \texttt{target} labeled with the
     meta-symbol \texttt{*}. \\
-
 \end{description}
+
+(By default, \texttt{getWeight} and \texttt{getWildWeight} return the result
+of a call to \texttt{getOne}, so the only function that absolutely needs to be
+overridden is \texttt{getOne}. This is pure virtual in \texttt{WeightGen}, so
+the compiler will not let you ignore this responsibility.)
+
 
 \begin{figure}[htbp]
   \centering
@@ -171,7 +190,7 @@ functions). \\
   \label{Fig:NWAtoPDS1}
 \end{figure}
 
-\noindent \textbf{1. Forwards Flow Stacking Calls} \\
+\subsubsection{1. Forwards Flow Stacking Calls}
 
 \noindent The conversion is performed by:
 
@@ -231,7 +250,7 @@ shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
   \label{Fig:NWAtoPDS4}
 \end{figure}
 
-\noindent \textbf{2. Backwards Flow Stacking Calls} \\
+\subsubsection{2. Backwards Flow Stacking Calls}
 
 \noindent The conversion is performed by:
 
@@ -292,7 +311,7 @@ WPDS is shown in Figure \ref{Fig:NWAtoPDS5}.  Note:
   \label{Fig:NWAtoPDS5}
 \end{figure}
 
-\noindent \textbf{3. Forwards Flow Stacking Returns} \\
+\subsubsection{3. Forwards Flow Stacking Returns}
 
 \noindent The conversion is performed by:
 
@@ -354,7 +373,7 @@ shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
   \label{Fig:NWAtoPDS2}
 \end{figure}
 
-\noindent \textbf{4. Backwards Flow Stacking Returns} \\
+\subsubsection{4. Backwards Flow Stacking Returns}
 
 \noindent The conversion is performed by:
 
@@ -475,120 +494,6 @@ See Section \ref{Se:Determinize} for the definition of deterministic.
 
 \end{description}
 
-Class \texttt{NWS} represents nested-word suffixes, i.e., unbalanced-right
-nested words.  In an \texttt{NWS} each position of the nested-word suffix
-corresponds to one \texttt{NWSNode}.  Using the following methods, a
-nested-word suffix can be constructed and used to determine whether a
-specific nested word is accepted by an NWA (using \texttt{isMember}). Note:
-The left-hand side of an \texttt{NWS} is referred to as the working end of
-the \texttt{NWS} as nodes can be added to and removed from this end only. \\
-
-\noindent The following operations are methods of class NWS:
-
-\begin{description}
-
-  \item\texttt{NWSNode * stackTop( ) } \nopagebreak
-
-    Returns the \texttt{NWSNode} at the top of the nesting stack.
-
-  \item\texttt{void pushStack( NWSNode * exit )} \nopagebreak
-
-    Adds \texttt{exit} to the top of the nesting stack.
-
-  \item\texttt{void popStack( ) } \nopagebreak
-
-    Removes the next return node from the nesting stack.
-
-  \item\texttt{size\_t stackSize( ) } \nopagebreak
-
-    Returns the current level of nesting at the working end of the NWS.
-
-  \item\texttt{void addNode( Key sym ) } \nopagebreak
-
-    Appends an \texttt{NWSNode} with the symbol \texttt{sym} to the working
-    end of the NWS.
-
-  \item\texttt{bool addNode( Key sym, NWSNode * returnNode ) } \nopagebreak
-
-     Appends an \texttt{NWSNode} with the symbol \texttt{sym} and return node
-     \texttt{returnNode} to the working end of the NWS.  If this
-     \texttt{NWSNode} is already a call node with a different return node,
-     the call/return link is not created, the \texttt{NWSNode} is not
-     appended, and false is returned.
-
-  \item\texttt{NWSNode * nextNode( ) } \nopagebreak
-
-    Returns the \texttt{NWSNode} at the working end of the NWS.
-
-  \item\texttt{NWSNode * removeNode( ) } \nopagebreak
-
-    Removes the \texttt{NWSNode} at the working end of the NWS, adds any
-    newly opened nesting to the nesting stack, and returns the
-    \texttt{NWSNode} that was removed from the nested-word suffix.
-
-  \item\texttt{bool isEmpty( ) } \nopagebreak
-
-    Tests whether this nested-word suffix is empty (returns true if empty,
-    false otherwise). \\
-
-\end{description}
-
- \noindent Note that class NWS can also represent balanced nested words by
- simply having an empty nesting stack.
-
-Similarly, class \texttt{NWP} represents nested-word prefixes, i.e.,
-unbalanced-left nested words.  In an \texttt{NWP} each position of the
-nested-word prefix corresponds to one \texttt{NWPNode}.  Using the following
-methods, a nested-word prefix can be constructed and used. Note: The
-right-hand side of an \texttt{NWP} is referred to as the working end of the
-\texttt{NWP} as nodes can be added to and removed from this end only. \\
-
-\noindent The following operations are methods of class NWP:
-
-\begin{description}
-
-  \item\texttt{NWPNode * currCall( ) } \nopagebreak
-
-    Returns the \texttt{NWPNode} at the top of the nesting stack.
-
-  \item\texttt{size\_t nestSize( ) } \nopagebreak
-
-    Returns the current level of nesting at the working end of the NWP.
-
-  \item\texttt{bool addIntraNode( Key sym ) } \nopagebreak
-
-    Appends an \texttt{NWPNode} with the symbol \texttt{sym} to the working
-    end of the NWP.
-
-  \item\texttt{bool addCallNode( Key sym ) } \nopagebreak
-
-    Appends an \texttt{NWPNode} with the symbol \texttt{sym} to the working
-    end of the NWP and adds that \texttt{NWPNode} to the nesting stack.
-
-  \item\texttt{bool addReturnNode( Key sym ) } \nopagebreak
-
-    Appends an \texttt{NWPNode} with the symbol \texttt{sym} to the working
-    end of the NWP and removes the \texttt{NWPNode} from the top of the
-    nesting stack.
-
-  \item\texttt{NWPNode * endNode( ) } \nopagebreak
-
-    Returns the \texttt{NWPNode} at the working end of the NWP.
-
-  \item\texttt{NWPNode * removeNode( ) } \nopagebreak
-
-    Removes the \texttt{NWPNode} at the working end of the NWP and returns
-    the \texttt{NWPNode} that was removed from the nested-word prefix.
-
-  \item\texttt{bool isEmpty( ) } \nopagebreak
-    
-    Tests whether this nested-word prefix is empty (returns true if empty,
-    false otherwise). \\
-
-\end{description}
-
- \noindent Note that class \texttt{NWP} can also represent balanced nested
- words by simply having an empty nesting stack.
 
 \subsection{Reachability}
 \label{Se:Reachability}

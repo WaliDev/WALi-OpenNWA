@@ -2,14 +2,15 @@
 \label{Se:Building NWAs}
 
 NWAs do not need to be built state-by-state and transition-by-transition,
-they can also be built by performing language-theoretic operations over
-component NWAs. These operations include: union, intersection, concatenation,
-reversal, Kleene-star, complement, and determinize. The library supports two
-interfaces to the Boolean operations.  In one, each operation returns a
-\texttt{ref\_ptr<NWA>} to a freshly-built NWA.  In the other, each operation
-transforms the NWA on which it was called. \\
+they can also be built by performing language-theoretic operations with
+other NWAs. The supported operations are union, intersection, concatenation,
+reversal, Kleene star, complement, and determinization.
 
-\noindent The following operations are methods of class NWA:
+The library supports two interfaces to each of these functions. In one, the
+operation allocates an NWA with \texttt{new}, performs the construction, and
+returns a \texttt{ref\_ptr} to the result.  In the other, the operation takes
+a reference to an NWA, clears it, and constructs the result in-place.
+
 
 \begin{description}
 
@@ -117,15 +118,13 @@ transforms the NWA on which it was called. \\
 \label{Se:Union}
 Consider an example of computing the union of two NWAs, the NWA shown in
 Figure \ref{Fig:Example1} and the NWA shown in Figure \ref{Fig:Union1}.  The
-union is constructed by combining all functionality of both component NWAs.
-If the component NWAs are $(Q_1, \Sigma_1, {Q_0}_1, \delta_1, {Q_f}_1)$ and
-$(Q_2, \Sigma_2, {Q_0}_2, \delta_2, {Q_f}_2)$, then the resulting NWA is $(Q,
-\Sigma, Q_0, \delta, Q_f)$ where $Q = Q_1 \cup Q_2$, $\Sigma = \Sigma_1 \cup
-\Sigma_2$, $Q_0 = {Q_0}_1 \cup {Q_0}_2$, $\delta = \delta_1 \cup \delta_2$,
-and $Q_f = {Q_f}_1 \cup {Q_f}_2$ .  The NWA resulting from the union of the
+union of the NWAs is constructed by taking the component-wise union. (In
+particular, it does \textsl{not} do the cross-product construction, and will
+\textsl{always} produce a nondeterministic automaton as a result as long as
+both machines have at least one initial state.)
+The NWA resulting from the union of the
 NWA shown in Figure \ref{Fig:Example1} and the NWA shown in Figure
-\ref{Fig:Union1} is shown in Figure \ref{Fig:Union2}.  Note that the
-resulting NWA is nondeterministic (because it has multiple initial states).
+\ref{Fig:Union1} is shown in Figure \ref{Fig:Union2}.
 
 \begin{figure}[htbp]
   \centering
@@ -144,26 +143,29 @@ resulting NWA is nondeterministic (because it has multiple initial states).
 
 To construct the union of two
 NWAs, the state sets of the NWAs cannot overlap,
-i.e. $Q_1 \cap Q_2 = \emptyset$. Client information is copied directly from the
-component NWAs using the \texttt{ClientInfo} copy constructor.
+i.e. $Q_1 \cap Q_2 = \emptyset$. \textsl{Client code should not depend on
+  this condition being checked} or any particular behavior occurring if it
+does not hold. (Currently the condition is checked in an assertion.)
+
+Client information is copied directly from the original NWAs using
+\texttt{ClientInfo::clone()}.
 
 
 \subsection{Intersection}
 \label{Se:Intersection}
 
-Consider an example of computing the intersection of two NWAs, the NWA shown
-in Figure \ref{Fig:Example1} and the NWA shown in Figure
-\ref{Fig:Intersect1}.  The intersection is constructed by traversing both
-component NWAs starting at the initial states and incrementally adding
-transitions for each pair of ``intersectable'' transitions that are
-encountered.  Transitions are ``intersectable'' when \begin{inparaenum} \item
-  the transitions are the same kind (internal, call, or return), \item the
-  symbols of the transitions are identical,\footnote{Strictly speaking, the
-    symbols do not have to be identical when the meta-symbols $\epsilon$ and
-    $*$ are involved.  In addition, the client has the flexibility to change
-    how identity of symbols is handled by overriding the method
-    transitionIntersect.} and \item the states at each position in the
-  transitions can be joined. \end{inparaenum} The resulting NWA is shown in
+The intersection of two NWAs is computed in the standard cross-product
+fashion, except using a worklist algorithm to only compute those states that
+are reachable.
+
+The intersection is constructed by traversing the original NWAs starting at
+the initial states and incrementally adding transitions for each pair of
+``intersectable'' transitions that are encountered. By default, transitions
+are ``intersectable'' when the transitions are the same kind (internal, call,
+or return) and the symbols on the edge are identical (or at least one is wild
+or epsilon).
+
+The resulting NWA is shown in
 Figure \ref{Fig:Intersect2}.
  
 \begin{figure}[htbp]
@@ -181,17 +183,28 @@ Figure \ref{Fig:Intersect2}.
   \label{Fig:Intersect2}
 \end{figure}
 
-It is possible to customize what states and symbols are considered equivalent
-by overriding the \texttt{stateIntersect} and \texttt{transitionIntersect}
-methods.  The default behavior of \texttt{stateIntersect} is that any two
-states can be intersected, the resulting state to add is labeled with a
+It is possible to customize what symbols are considered equivalent by
+overriding the \texttt{transitionIntersect} function in a subclass of
+\texttt{NWA}. In addition, it is possible to impose additional constraints on
+what states can be combined by overriding \texttt{stateIntersect}. Both
+functions also produce the result of the intersection:
+\texttt{transitionIntersect} produces the symbol that will be used on the
+resulting edge, and \texttt{stateIntersect} produces the state that will be
+used as the target.
+
+The default behavior of
+\texttt{transitionIntersect} is that two transitions are intersectable if
+neither symbol is epsilon and either the symbols are the same or at least one of
+the symbols is a wild. (Epsilon transitions are dealt with in
+\texttt{intersect} itself. If you override \texttt{transitionIntersect}, it
+should return \texttt{false} if either input is epsilon.)
+
+The default behavior of \texttt{stateIntersect} is that any two
+states can be combined, the resulting state is labeled with a
 \texttt{Key} that is uniquely generated from the pair of the \texttt{Keys} of
 the two states under consideration, and the client information associated
-with the resulting state is \texttt{null}.  The default behavior of
-\texttt{transitionIntersect} is that two transitions are intersectable if the
-symbols that label the transitions are not \texttt{epsilon}
-(\texttt{$\epsilon$}) and either the symbols are the same or at least one of
-the symbols is a \texttt{wild} (\texttt{*}).
+with the resulting state is \texttt{null}.
+
 
 Client information is generated by the helper method \texttt{stateIntersect},
 but can be altered through the use of the helper methods
@@ -200,17 +213,7 @@ but can be altered through the use of the helper methods
 \texttt{intersect} as transitions of the three different kinds involving the
 associated state are added.  The default behavior of these three functions is
 to perform no changes to the \texttt{ClientInfo}.  These methods can be
-overridden to specify alternative behaviors.
-
-As intersection is performed, and the transitions of the component NWAs are
-traversed, \texttt{transitionIntersect} is called to determine whether a
-transition should be added to the resulting NWA.  If so,
-\texttt{stateIntersect} is called to determine whether the target states of
-the transitions in question can be joined.  Finally, if a transition is going
-to be added to the resulting NWA, \texttt{intersectClientInfoInternal},
-\texttt{intersectClientInfoCall}, or \texttt{intersectClientInfoReturn} is
-called (as appropriate) to update the \texttt{ClientInfo} associated with the
-target state of the transition being added. \\
+overridden in subclasses to specify alternative behaviors.
 
 \goodbreak
 \noindent The following operations are methods of class NWA and are intended
@@ -218,24 +221,25 @@ to be overridden to customize behavior:
 
 \begin{description}
 
-  \item\texttt{bool stateIntersect( ref\_ptr<NWA> first, Key
-    state1,\\ \hspace*{3.25cm} ref\_ptr<NWA> second,Key
-    state2,\\ \hspace*{3.25cm} Key\& resSt, ref\_ptr<ClientInfo>\& resCI )}
+  \item\texttt{bool stateIntersect( ref\_ptr<NWA> first, Key state1,\\ 
+                   \hspace*{3.25cm} ref\_ptr<NWA> second, Key state2,\\
+                   \hspace*{3.25cm} Key\& resSt, ref\_ptr<ClientInfo>\& resCI )}
     \nopagebreak
 
-    Determines whether the given states are considered to be equivalent for
-    the purposes of intersection and, if so, creates the combined state,
-    together with the client information that should be associated with the
-    combined state and returns true.  Otherwise, returns false.
-    
+    Determines whether the given states can be combined and,
+    if so, creates the combined state. If the two states are incompatable,
+    returns \texttt{false}. If the two states are compatable, it computes the
+    key of the combined state (storing it in \texttt{resSt} and the client
+    information (storing it in \texttt{resCI}), then returns \texttt{true}.
+
   \item\texttt{bool transitionIntersect( ref\_ptr<NWA> first, Key
     sym1,\\ \hspace*{3.25cm} ref\_ptr<NWA> second, Key
     sym2,\\ \hspace*{3.25cm} Key\& resSym )} \nopagebreak
 
     Determines whether the given symbols are considered to be equivalent for
-    the purposes of intersection and, if so, computes the symbol which should
-    be associated with the combined transition and returns true.  Otherwise,
-    returns false.
+    the purposes of intersection. If so, it computes the symbol which should
+    be associated with the combined transition (storing it in
+    \texttt{resSym}) and returns true. If not, returns false.
 
   \item\texttt{void intersectClientInfoInternal( \\ \hspace*{3.25cm}
     ref\_ptr<NWA> first, Key src1, Key tgt1,\\ \hspace*{3.25cm} ref\_ptr<NWA>
@@ -272,10 +276,7 @@ to be overridden to customize behavior:
 
 Consider the slightly more complex example of computing the intersection of
 the NWAs shown in Figure \ref{Fig:Intersect3}.  The resulting NWA is shown in
-Figure \ref{Fig:Intersect4}.  Note that a state is only made final if both of
-its component states were final in their respective NWAs (this can be seen in
-the state 'Call\_1,Dead\_End' where 'Dead\_End' was final, but 'Call\_1' was
-not).
+Figure \ref{Fig:Intersect4}.
 
 \begin{figure}[p]
   \centering
@@ -292,6 +293,8 @@ not).
   \label{Fig:Intersect4}
 \end{figure}
 
+
+
 \subsection{Concatenation}
 \label{Se:Concatenation}
 
@@ -303,7 +306,7 @@ transitions of the second NWA (shown in Figure \ref{Fig:Concat1}) then adding
 internal epsilon transitions from each final state of the first NWA to each
 initial state of the second NWA.  In the resulting NWA, the initial states
 are the initial states from the first NWA; the final states are the final
-states of the second NWA.  If the component NWAs are $(Q_1, \Sigma_1,
+states of the second NWA.  If the original NWAs are $(Q_1, \Sigma_1,
 {Q_0}_1, \delta_1, {Q_f}_1)$ and $(Q_2, \Sigma_2, {Q_0}_2, \delta_2,
 {Q_f}_2)$, then the resulting NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$ where $Q
 = Q_1 \cup Q_2$, $\Sigma = \Sigma_1 \cup \Sigma_2$, $Q_0 = {Q_0}_1$, $\delta
@@ -312,6 +315,13 @@ states of the second NWA.  If the component NWAs are $(Q_1, \Sigma_1,
 The NWA resulting from the concatenation of the NWA in Figure
 \ref{Fig:Example1} and the NWA shown in Figure \ref{Fig:Concat1} is shown in
 Figure \ref{Fig:Concat2}.
+
+In
+order to construct the concatenation of two NWAs, the state sets of the NWAs
+cannot overlap, i.e. $Q_1 \cap Q_2 = \emptyset$
+Client information is copied directly from the original NWAs using
+\texttt{ClientInfo::clone()}.
+
 
 \begin{figure}[p]
   \centering
@@ -328,17 +338,12 @@ Figure \ref{Fig:Concat2}.
   \label{Fig:Concat2}
 \end{figure}
 
-In
-order to construct the concatenation of two NWAs, the state sets of the NWAs
-cannot overlap, i.e. $Q_1 \cap Q_2 = \emptyset$
-Client information is copied directly from the component NWAs using the
-\texttt{ClientInfo} copy constructor.
 
 \subsection{Kleene-Star}
 \label{Se:Star}
 
 Consider an example of computing the Kleene-Star of the NWA shown in Figure
-\ref{Fig:Star1}.  If the component NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$,
+\ref{Fig:Star1}.  If the original NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$,
 then the result of performing Kleene-Star on that NWA is $(Q \cup Q', \Sigma,
 Q_0', \delta', Q_0')$ where $Q' = \{q' | q \in Q\}$ and $\delta' =
 \{\delta_i',\delta_c',\delta_r'\}$ such that
@@ -384,8 +389,8 @@ $q \in Q$ and \texttt{prime} is the string ``prime''.
   \label{Fig:Star2}
 \end{figure}
 
-\goodbreak Client information is copied directly from the component NWA (using
-the \texttt{ClientInfo} copy constructor) such that for each $q \in Q$, $q$
+\goodbreak Client information is copied directly from the original NWA (using
+\texttt{ClientInfo::clone()}) such that for each $q \in Q$, $q$
 and $q'$ have the same client information.
 
 %Consider the slightly more complex example of computing the Kleene-Star of the NWA shown in Figure \ref{Fig:Star3}.  The resulting NWA is shown in Figure \ref{Fig:Star4}.
@@ -407,7 +412,7 @@ and $q'$ have the same client information.
 \subsection{Reverse}
 \label{Se:Reverse}
 
-If the component NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$, then the result of
+If the original NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$, then the result of
 reversing that NWA is $(Q, \Sigma, Q_0, \delta_{rev}, Q_f)$ such that
 
 \begin{enumerate}
@@ -435,8 +440,8 @@ Figure \ref{Fig:Example1} is shown in Figure \ref{Fig:Reverse1}.
 \end{figure}
 
 Client
-information is copied directly from the component NWA using the
-\texttt{ClientInfo} copy constructor.
+information is copied directly from the original NWA using
+\texttt{ClientInfo::clone()}.
 
 \subsection{Determinize}
 \label{Se:Determinize}
@@ -598,6 +603,6 @@ shown in Figure \ref{Fig:Comp1}.
 \end{figure}
 
 Client information is copied directly
-from the determinization of the component NWA using the \texttt{ClientInfo}
-copy constructor.
+from the determinization of the original NWA using \texttt{ClientInfo::clone()}.
+
 
