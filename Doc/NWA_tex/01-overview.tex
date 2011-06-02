@@ -46,7 +46,7 @@ The core of the NWA library is in the namespace \texttt{wali::nwa}. It
 includes of the classes \texttt{NestedWord}, \texttt{NWA}, and others.
 
 There are also a large number of free functions that operate on NWAs. These
-are divided into 3 sub-namespaces:
+are divided into three sub-namespaces:
 \texttt{wali::nwa::query}, \texttt{wali::nwa::construct}, and
 \texttt{wali::nwa::nwa\_pds}.
 
@@ -65,6 +65,7 @@ These types live in namespace \texttt{wali::nwa}:
   \item\texttt{NestedWord} Models a single nested word. (It can be
     balanced or unbalanced.) To use, include \texttt{wali/nwa/NestedWord.hpp}.
   \item\texttt{NWA} Models nested-word automata themselves. To use, include
+    \texttt{wali/nwa/NestedWord.hpp}. See \sectref{class-nested-word}.
     \texttt{wali/nwa/NWA.hpp}, or \texttt{wali/nwa/NWAFwd.hpp} if a
     definition is not needed. See \sectref{NWA-class}.
   \item\texttt{NWARefPtr} is a typedef of \texttt{ref\_ptr$<$NWA$>$} (see

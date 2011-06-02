@@ -1,0 +1,50 @@
+\section{The \texttt{NestedWord} class}
+\label{Se:class-nested-word}
+
+The class \texttt{wali::nwa::NestedWord} is very simple. It provides support for
+building nested words and iterating over their lengths; currently there
+is no support for modifying them.
+
+The representation used by this class is closer to that of a word in a
+visibly-pushdown language~\cite{JACM:AM09}. It holds the linear contents of
+a word, but does not store the nesting relation explicitly. Instead, each
+position in the word is annotated with whether it is an internal, call, or
+return position. The nesting relation is induced by the matchings between
+calls and returns.
+
+A position in the word is represented by the nested structure
+\texttt{NestedWord::Position}; \texttt{Position} itself declares an
+enumeration \texttt{Type} which is either \texttt{CallType},
+\texttt{InternalType}, or \texttt{ReturnType}.
+A \texttt{Position} object has two (public) fields: \texttt{Symbol symbol}
+and \texttt{Position::Type type}; these hold the symbol at that position and
+the type of the position.
+
+
+The \texttt{NestedWord} class has just six functions:
+\begin{description}
+  \item\texttt{appendInternal(Symbol s)}
+  \item\texttt{appendCall(Symbol s)}
+  \item\texttt{appendReturn(Symbol s)}
+    These append the symbol \texttt{s} to the linear word, and annotate that
+    position as an internal, call, or return position, respectively.
+  \item\texttt{append(Position p)}
+    Appends \texttt{p} to the word.
+  \item\texttt{begin()}
+  \item\texttt{end()}
+    These return a \texttt{NestedWord::const\_iterator} to the start or end
+    of the nested word. The type returned by dereferencing these iterators is
+    a \texttt{Position} object. (There is no non-const version of these
+    functions.)
+\end{description}
+
+The only operation the library currently supports on \texttt{NestedWord}s,
+besides building them, is to query a \texttt{NWA} object to test whether the
+nested word is in the NWA's language. This is done through the following
+function:
+\begin{description}
+  \item\texttt{bool NWA::isMemberNondet(NestedWord const \& word ) const}
+    Returns \texttt{true} if \texttt{word} is a member of the NWA's language,
+    and \texttt{false} otherwise.
+\end{description}
+
