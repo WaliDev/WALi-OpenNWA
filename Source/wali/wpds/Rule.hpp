@@ -136,7 +136,7 @@ namespace wali
          *
          * @return std::ostream the marshalled rule was written to.
          */
-        std::ostream& marshall( std::ostream & o ) const;
+        virtual std::ostream& marshall( std::ostream & o ) const;
 
         /*!
          * @return true if this rule has 2 rhs stack symbols
