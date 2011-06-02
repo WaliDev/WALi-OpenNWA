@@ -1,6 +1,48 @@
-The NWA library contains an experimental parser for descriptions of
+\section{NWA serialization}
+
+It is possible to serialize an NWA in two different supported
+formats.
+
+The first is a description language of our own creation, described in
+most of the rest of this section. We also provide a parser, with minor
+caveats, for this format. The grammar the parser uses is defined
+formally in \sectref{nwa-grammar}.
+
+The second is output in Graphviz Dot format. The output is
+natural. The color of an edge denotes the type of a transition: black
+edges are internal transitions, green edges are call transitions, and
+red edges are return transitions. Return transitions are labeled with
+both the symbol for that transition and the call predecessor. (The
+result of each Dot graph includes a key as a reminder for what the
+colors mean.) Because it is possible to wind up with extremely long
+key names (especially in a determinized NWA) that can essentially
+destroy any ability of Dot to render useful output, by default any
+state names longer than 20 characters are replaced by the numerical
+value; this behavior can be changed however.
+
+There is a member function which produces both types of output:
+\begin{description}
+  \item\texttt{std::ostream\& NWA::print(std::ostream \& stream) const}
+    Writes the custom output described in this section
+    to \texttt{stream}, returning \texttt{stream}.
+    (This method is actually inherited from
+    the \texttt{wali::Printable} abstract class.)
+
+  \item\texttt{std::ostream\& NWA::print\_dot(std::ostream \& stream,
+    std::string const \& name, bool abbreviate = true)} Outputs a Dot
+    description of the NWA to the given stream. The name of the graph
+    (\textsl{digraph "blah" \{...}) is given
+    by \texttt{name}. Finally, if \texttt{abbreviate} is set
+    to \texttt{false}, the abbreviation step above for state names is
+    not done. Use this freedom at your peril.
+\end{description}
+
+\subsection{Parser}
+\label{Se:parser}
+
+The NWA library contains a semi-experimental parser for descriptions of
 NWAs. The format is described below, and matches the result of calling
-\texttt{NWA::print(std::ostream \&)} provided that the result of
+\texttt{NWA::print(std::ostream \&)}, provided that the result of
 calling \texttt{key2str} on the state and symbol keys produces strings
 that match the description of \textsl{actual-names} in this grammar.
 
@@ -25,7 +67,72 @@ form was originally created to read NWAs for an entire program, witch
 each procedure in a separate NWA. The name of each NWA was the name of
 the procedure in the original program.)
 
-\section{NWA description format}
+\subsection{Examples}
+
+The following are examples of the NWA serialization format, showing
+both the general form and some of the flexibilities in what precise
+format is accepted.
+
+Exa:nwa-simple
+ Q: { a }
+ Q: b
+ Delta\_i: (a, b (c), c)
+ Delta\_i: (a, b, d)
+ Delta\_r: (a, b, c, d)
+ Delta\_c: {}
+
+
+Exa:nwa-from-mattf
+ Q: {
+   (key#6,3) (=16),
+   (key#6,4) (=17),
+   (key#7,3) (=18),
+   (key#4,3) (=19),
+   (key#3,3) (=20),
+   (key#5,3) (=21),
+   (key#9,3) (=22),
+   (key#5,4) (=23),
+   (key#9,4) (=24),
+   (key#10,3) (=25),
+   (key#10,4) (=26)
+ }
+ Q0: {
+   (key#6,3) (=16),
+   (key#6,4) (=17)
+ }
+ Qf: {
+   (key#5,4) (=23),
+   (key#9,4) (=24),
+   (key#10,4) (=26)
+ }
+ Sigma: {
+   <start;0;expression>,
+   <start;1;body;0>,
+   <start;2;expression;1>,
+   <{#fun634}>,
+   <start;2;expression>
+ }
+ Delta\_c: {
+   ((key#4,3) (=19) ,<{#fun634}>, (key#3,3) (=20) )
+ }
+ Delta\_i:  {
+   ((key#6,3) (=16) ,<start;0;expression>, (key#7,3) (=18) ),
+   ((key#6,4) (=17) ,<start;0;expression>, (key#7,3) (=18) ),
+   ((key#7,3) (=18) ,<start;2;expression;1>, (key#4,3) (=19) ),
+   ((key#9,3) (=22) ,<start;2;expression>, (key#10,3) (=25) ),
+   ((key#9,3) (=22) ,<start;2;expression>, (key#10,4) (=26) ),
+   ((key#9,4) (=24) ,<start;2;expression>, (key#10,3) (=25) ),
+   ((key#9,4) (=24) ,<start;2;expression>, (key#10,4) (=26) )
+ }
+ Delta\_r: {
+   ((key#3,3) (=20) , (key#4,3) (=19) ,<start;1;body;0>, (key#5,3) (=21) ),
+   ((key#3,3) (=20) , (key#4,3) (=19) ,<start;1;body;0>, (key#9,3) (=22) ),
+   ((key#3,3) (=20) , (key#4,3) (=19) ,<start;1;body;0>, (key#5,4) (=23) ),
+   ((key#3,3) (=20) , (key#4,3) (=19) ,<start;1;body;0>, (key#9,4) (=24) )
+ }
+
+\subsection{NWA description format}
+\label{Se:nwa-grammar}
 
 This section describes the grammar of the file format.
 
@@ -57,19 +164,21 @@ NWAs, each individual starts with the literal \textsl{nwa}.
 
   nwa-description  ::= ('nwa' name? ':'?)? '{'? block+ '}'?
 
- \textsl{Braces are required if 'nwa' is present and the name is not}
- to distinguish the first block header (\textsl{Q:}, \textsl{Q0:}, or
- \textsl{Qf:}) from the name of the NWA.
+textsl{Braces are required if 'nwa' is present and the name is absent}
+ in order to
+ distinguish the first block header (\textsl{Q:}, \textsl{Q0:},
+ or \textsl{Qf:}) from the name of the NWA.
 
 An NWA is a sequence of blocks; each block specifies one or more
 states, symbols, or transitions.
 
-  block  ::=  state-block     // lookahead = 'Q'
-           |  sigma-block     // lookahead = 's'
-           |  delta-block     // lookahead = 'd'
+  block  ::=  state-block
+           |  sigma-block
+           |  delta-block
 
 Blocks of the same type can be repeated; e.g. it is perfectly fine to
-specify all transitions in one block, one block per transition, or
+specify all transitions in one block (as in \exref{nwa-from-mattf},
+one block per transition (as in \exref{nwa-simple}), or
 anywhere in between. The ``block header'' specifies what kind of block
 it is, and the body is a comma-separated list of whatever entity the
 block header specifies (e.g. states). The body may be surrounded by
