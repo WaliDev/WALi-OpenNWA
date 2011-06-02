@@ -12,8 +12,8 @@ facilities provided by WALi and inter-operates with WALi's pushdown system
 
 Nested-word automata (NWAs)~\cite{DLT:AM2006,JACM:AM09} are a generalization
 of finite-state automata that can capture the matched-parenthesis structure
-that is exhibited by, for example, opening and closing tags in XML and the
-call/return structure exhibited by execution traces in multi-procedure
+that is exhibited by, for example, opening and closing tags in XML, and the
+call/return structure in execution traces in multi-procedure
 programs. Their languages represent somewhat of a middle-ground between
 standard regular languages and context-free languages. Nested-word languages
 retain the call/return structure mentioned above, which makes them a
@@ -23,16 +23,16 @@ associated matching structure). However, they also retain all the closure
 properties that makes standard regular languages attractive; in particular,
 they are closed under complementation and intersection. However, they are not
 directly comparable to languages of linear words, as the call/return
-structure is an explicit part of each word of a nested-word language.
+structure is an explicit part of each nested word.
 
 We assume the reader is familiar with the definition of nested words and
 nested-word automata; if not, \TODO{appendix A} provides a definition and
 Alur et al~\cite{DLT:AM2006,JACM:AM09} describe them in detail. Our
 implementation corresponds to the definition from the DLT 2006
-paper~\cite{DLT:AM2006}; relative to followup work, this definition removes
+paper~\cite{DLT:AM2006}; relative to followup work~\cite{JACM:AM09}, this definition removes
 the distinction between the machine's linear and hierarchical states, and on
 a call always stacks the source state. (In the JACM 2009 presentation of the
-work~\cite{JACM:AM09}, this would be called a ``weakly-hierarchical'' NWA.)
+work, this would be called a ``weakly-hierarchical'' NWA.)
 
 Finally, the terminology used in the interface of the package is geared
 toward program analysis, so we use terms such as ``call site'' and ``return
@@ -43,10 +43,10 @@ meanings in different contexts.
 \subsection{Library overview}
 
 The core of the NWA library is in the namespace \texttt{wali::nwa}. It
-consists of the classes \texttt{NestedWord}, \texttt{NWA},
-\texttt{ClientInfo}, and \texttt{WeightGen}.
+includes of the classes \texttt{NestedWord}, \texttt{NWA}, and others.
 
-There are three sub-namespaces that provide functions for operating on NWAs:
+There are also a large number of free functions that operate on NWAs. These
+are divided into 3 sub-namespaces:
 \texttt{wali::nwa::query}, \texttt{wali::nwa::construct}, and
 \texttt{wali::nwa::nwa\_pds}.
 
@@ -54,16 +54,19 @@ Finally, there are some operations and classes provided by WALi that the NWA
 portion of the library uses. This mostly consists of the key-handling code,
 but can also include the WPDS portions of the library.
 
+Through out this document, include paths are relative to the \texttt{Source}
+directory from the WALi distribution.
+
 \subsubsection{NWA core classes}
 
 These types live in namespace \texttt{wali::nwa}:
 
 \begin{description}
-  \item\texttt{NestedWord} This class models a single nested word. (It can be
+  \item\texttt{NestedWord} Models a single nested word. (It can be
     balanced or unbalanced.) To use, include \texttt{wali/nwa/NestedWord.hpp}.
   \item\texttt{NWA} Models nested-word automata themselves. To use, include
     \texttt{wali/nwa/NWA.hpp}, or \texttt{wali/nwa/NWAFwd.hpp} if a
-    definition is not needed.
+    definition is not needed. See \sectref{NWA-class}.
   \item\texttt{NWARefPtr} is a typedef of \texttt{ref\_ptr$<$NWA$>$} (see
     below). This is defined in \texttt{wali/nwa/NWAFwd.hpp}.
   \item\texttt{State} and \texttt{Symbol} are both typedefs of
@@ -75,21 +78,20 @@ These types live in namespace \texttt{wali::nwa}:
     fact; it could change to be an \texttt{unordered\_map} or other similar
     container.) These are also defined in \texttt{wali/nwa/NWAFwd.hpp}.
   \item\texttt{ClientInfo} This class holds client-specific information that
-    is associated with a state. Client code can subclass ClientInfo and use
+    is associated with a state. Client code can subclass \texttt{ClientInfo} and use
     members of the \texttt{NWA} class to attach instances to states. To use,
-    include \texttt{wali/nwa/ClientInfo.hpp}.
+    include \texttt{wali/nwa/ClientInfo.hpp}. See \sectref{client-info}.
   \item\texttt{WeightGen} This abstract class describes how to assign weights
     to transitions of the NWA, and is used both when converting an NWA to a
     PDS and when doing prestar/poststar queries on the NWA directly. To use,
-    include \texttt{wali/nwa/WeightGen.hpp}.
+    include \texttt{wali/nwa/WeightGen.hpp}. See \sectref{NWAtoPDS}.
 \end{description}
 
 
 \subsubsection{NWA free functions}
 
 The library provides a large number of free functions for operating on
-NWAs. These are partitioned into the following namespaces (include paths are
-relative to the \texttt{Source} directory):
+NWAs. These are partitioned into the following namespaces:
 
 \begin{description}
   \item\texttt{wali::nwa::query} This namespace provides functions for
