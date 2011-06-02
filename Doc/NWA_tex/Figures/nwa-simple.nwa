@@ -1,0 +1,6 @@
+ Q: { a }
+ Q: b
+ Delta_i: (a, b (c), c)
+ Delta_i: (a, b, d)
+ Delta_r: (a, b, c, d)
+ Delta_c: {}

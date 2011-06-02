@@ -1,0 +1,47 @@
+ Q: {
+   (key#6,3) (=16),
+   (key#6,4) (=17),
+   (key#7,3) (=18),
+   (key#4,3) (=19),
+   (key#3,3) (=20),
+   (key#5,3) (=21),
+   (key#9,3) (=22),
+   (key#5,4) (=23),
+   (key#9,4) (=24),
+   (key#10,3) (=25),
+   (key#10,4) (=26)
+ }
+ Q0: {
+   (key#6,3) (=16),
+   (key#6,4) (=17)
+ }
+ Qf: {
+   (key#5,4) (=23),
+   (key#9,4) (=24),
+   (key#10,4) (=26)
+ }
+ Sigma: {
+   <start;0;expression>,
+   <start;1;body;0>,
+   <start;2;expression;1>,
+   <{#fun634}>,
+   <start;2;expression>
+ }
+ Delta_c: {
+   ((key#4,3) (=19) ,<{#fun634}>, (key#3,3) (=20) )
+ }
+ Delta_i:  {
+   ((key#6,3) (=16) ,<start;0;expression>, (key#7,3) (=18) ),
+   ((key#6,4) (=17) ,<start;0;expression>, (key#7,3) (=18) ),
+   ((key#7,3) (=18) ,<start;2;expression;1>, (key#4,3) (=19) ),
+   ((key#9,3) (=22) ,<start;2;expression>, (key#10,3) (=25) ),
+   ((key#9,3) (=22) ,<start;2;expression>, (key#10,4) (=26) ),
+   ((key#9,4) (=24) ,<start;2;expression>, (key#10,3) (=25) ),
+   ((key#9,4) (=24) ,<start;2;expression>, (key#10,4) (=26) )
+ }
+ Delta_r: {
+   ((key#3,3) (=20) , (key#4,3) (=19) ,<start;1;body;0>, (key#5,3) (=21) ),
+   ((key#3,3) (=20) , (key#4,3) (=19) ,<start;1;body;0>, (key#9,3) (=22) ),
+   ((key#3,3) (=20) , (key#4,3) (=19) ,<start;1;body;0>, (key#5,4) (=23) ),
+   ((key#3,3) (=20) , (key#4,3) (=19) ,<start;1;body;0>, (key#9,4) (=24) )
+ }
