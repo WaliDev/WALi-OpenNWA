@@ -69,7 +69,7 @@ particular, it does \textsl{not} do the cross-product construction, and will
 \textsl{always} produce a nondeterministic automaton as a result as long as
 both machines have at least one initial state.)
 
-As an example, \figref{Union2} illustrates the union of \figref{Exampl1} and
+As an example, \figref{Union2} illustrates the union of \figref{Example1} and
 \figref{Union1}.
 
 
@@ -77,23 +77,23 @@ As an example, \figref{Union2} illustrates the union of \figref{Exampl1} and
   \centering
     \includegraphics[width=12cm]{Figures/Figure1}
   \caption{An example of an NWA of type 1.}
-  \label{Fig:Example1}
+  \label{Fi:Example1}
 \end{figure}
 
 
 \begin{figure}[htbp]
   \centering
     \includegraphics[width=8cm]{Figures/Figure3}
-  \caption{Simple NWA to union with the NWA in Figure \ref{Fig:Example1}.}
-  \label{Fig:Union1}
+  \caption{Simple NWA to union with the NWA in Figure \ref{Fi:Example1}.}
+  \label{Fi:Union1}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
     \includegraphics[width=12cm]{Figures/Figure4}
   \caption{The NWA resulting from the union of the NWA in Figure
-    \ref{Fig:Example1} and the NWA in Figure \ref{Fig:Union1}.}
-  \label{Fig:Union2}
+    \ref{Fi:Example1} and the NWA in Figure \ref{Fi:Union1}.}
+  \label{Fi:Union2}
 \end{figure}
 
 To construct the union of two
@@ -126,16 +126,16 @@ or epsilon).
 \begin{figure}[htbp]
   \centering
     \includegraphics[width=10cm]{Figures/Figure5}
-  \caption{Simple NWA to intersect with the NWA in Figure \ref{Fig:Example1}.}
-  \label{Fig:Intersect1}
+  \caption{Simple NWA to intersect with the NWA in Figure \ref{Fi:Example1}.}
+  \label{Fi:Intersect1}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
     \includegraphics[width=8cm]{Figures/Figure6}
   \caption{The NWA resulting from the intersection of the NWA in Figure
-    \ref{Fig:Example1} and the NWA in Figure \ref{Fig:Intersect1}.}
-  \label{Fig:Intersect2}
+    \ref{Fi:Example1} and the NWA in Figure \ref{Fi:Intersect1}.}
+  \label{Fi:Intersect2}
 \end{figure}
 
 It is possible to customize what symbols are considered equivalent by
@@ -217,22 +217,22 @@ to be overridden to customize behavior:
 
 
 Consider the slightly more complex example of computing the intersection of
-the NWAs shown in Figure \ref{Fig:Intersect3}.  The resulting NWA is shown in
-Figure \ref{Fig:Intersect4}.
+the NWAs shown in Figure \ref{Fi:Intersect3}.  The resulting NWA is shown in
+Figure \ref{Fi:Intersect4}.
 
 \begin{figure}[p]
   \centering
     \includegraphics[width=12cm]{Figures/Figure7a}
     \includegraphics[width=12cm]{Figures/Figure7b}
   \caption{Complex NWAs to intersect.}
-  \label{Fig:Intersect3}
+  \label{Fi:Intersect3}
 \end{figure}
 
 \begin{figure}[p]
   \centering
     \includegraphics[width=12cm]{Figures/Figure8}
-  \caption{The NWA resulting from the intersection of the NWAs in Figure \ref{Fig:Intersect3}.}
-  \label{Fig:Intersect4}
+  \caption{The NWA resulting from the intersection of the NWAs in Figure \ref{Fi:Intersect3}.}
+  \label{Fi:Intersect4}
 \end{figure}
 
 
@@ -252,8 +252,8 @@ states of the second NWA. % If the original NWAs are $(Q_1, \Sigma_1,
 %= \delta_1 \cup \delta_2 \cup \delta_\epsilon$ (where $\delta_\epsilon =
 %\{(q,\epsilon,q') | q \in {Q_f}_1, q' \in {Q_0}_2\}$, and $Q_f = {Q_f}_2$ .
 %The NWA resulting from the concatenation of the NWA in Figure
-%\ref{Fig:Example1} and the NWA shown in Figure \ref{Fig:Concat1} is shown in
-%Figure \ref{Fig:Concat2}.
+%\ref{Fi:Example1} and the NWA shown in Figure \ref{Fi:Concat1} is shown in
+%Figure \ref{Fi:Concat2}.
 
 In
 order to construct the concatenation of two NWAs, the state sets of the NWAs
@@ -269,16 +269,16 @@ Client information is copied directly from the original NWAs using
 \begin{figure}[p]
   \centering
     \includegraphics[width=10cm]{Figures/Figure9}
-  \caption{Simple NWA to concatenate onto the NWA in Figure \ref{Fig:Example1}.}
-  \label{Fig:Concat1}
+  \caption{Simple NWA to concatenate onto the NWA in Figure \ref{Fi:Example1}.}
+  \label{Fi:Concat1}
 \end{figure}
 
 \begin{figure}[p]
   \centering
     \includegraphics[width=12cm]{Figures/Figure10}
   \caption{The NWA resulting from the concatenation of the NWA in Figure
-    \ref{Fig:Example1} with the NWA in Figure \ref{Fig:Concat1}.}
-  \label{Fig:Concat2}
+    \ref{Fi:Example1} with the NWA in Figure \ref{Fi:Concat1}.}
+  \label{Fi:Concat2}
 \end{figure}
 
 
@@ -313,7 +313,7 @@ Q_0', \delta', Q_0')$ where $Q' = \{q' | q \in Q\}$ and $\delta' =
 \end{enumerate}  
 
 \noindent The NWA resulting from performing Kleene-Star on the NWA shown in
-\figref{Fig:Star1} is shown in \figref{Fig:Star2}.  Note: The primed
+\figref{Star1} is shown in \figref{Star2}.  Note: The primed
 states, $q'$ are constructed using \texttt{getKey($q$,getKey("prime"))} for
 $q \in Q$.
 
@@ -321,34 +321,34 @@ $q \in Q$.
   \centering
     \includegraphics[width=10cm]{Figures/Figure11}
   \caption{An NWA on which to perform Kleene-Star.}
-  \label{Fig:Star1}
+  \label{Fi:Star1}
 \end{figure}
 
 \begin{figure}[p]
   \centering
     \includegraphics[width=12cm]{Figures/Figure12}
-  \caption{The NWA resulting from performing Kleene-Star on the NWA in Figure \ref{Fig:Star1}.}
-  \label{Fig:Star2}
+  \caption{The NWA resulting from performing Kleene-Star on the NWA in Figure \ref{Fi:Star1}.}
+  \label{Fi:Star2}
 \end{figure}
 
 \goodbreak Client information is copied directly from the original NWA (using
 \texttt{ClientInfo::clone()}) such that for each $q \in Q$, $q$
 and $q'$ have the same client information.
 
-%Consider the slightly more complex example of computing the Kleene-Star of the NWA shown in Figure \ref{Fig:Star3}.  The resulting NWA is shown in Figure \ref{Fig:Star4}.
+%Consider the slightly more complex example of computing the Kleene-Star of the NWA shown in Figure \ref{Fi:Star3}.  The resulting NWA is shown in Figure \ref{Fi:Star4}.
 
 %\begin{figure}[htbp]
 %  \centering
 %    \includegraphics[angle=270,width=10cm]{Figures/Figure13.pdf}
 %  \caption{Complex NWA on which to perform Kleene-Star.}
-%  \label{Fig:Star3}
+%  \label{Fi:Star3}
 %\end{figure}
 
 %\begin{figure}[htbp]
 %  \centering
 %    \includegraphics[angle=270,width=12cm]{Figures/Figure14.pdf}
-%  \caption{The NWA resulting from performing Kleene-Star on the NWA in Figure \ref{Fig:Star3}.}
-%  \label{Fig:Star4}
+%  \caption{The NWA resulting from performing Kleene-Star on the NWA in Figure \ref{Fi:Star3}.}
+%  \label{Fi:Star4}
 %\end{figure}
 
 \subsection{Reverse}
@@ -372,13 +372,13 @@ reversing that NWA is $(Q, \Sigma, Q_0, \delta_{rev}, Q_f)$ such that
 \end{enumerate}
 
 \noindent The NWA resulting from performing reverse on the NWA shown in
-Figure \ref{Fig:Example1} is shown in Figure \ref{Fig:Reverse1}.
+Figure \ref{Fi:Example1} is shown in Figure \ref{Fi:Reverse1}.
  
 \begin{figure}[p]
   \centering
     \includegraphics[width=12cm]{Figures/Figure15}
-  \caption{The NWA resulting from performing reverse on the NWA in Figure \ref{Fig:Example1}.}
-  \label{Fig:Reverse1}
+  \caption{The NWA resulting from performing reverse on the NWA in Figure \ref{Fi:Example1}.}
+  \label{Fi:Reverse1}
 \end{figure}
 
 Client
@@ -425,8 +425,11 @@ Determinizing an NWA operates like a
 generalization of the classical subset construction.  Instead of the states
 in the determinized NWA being subsets of the original NWA, states of the
 determinized NWA are sets of state pairs (i.e., binary relations on states)
-\cite{JACM:AM2009}.  To support determinization, the library provides class
-\texttt{BinaryRelation}, which is a set of \texttt{Key} pairs. 
+\cite{JACM:AM2009}.  To support determinization, the library provides a
+typedef of \texttt{std::set$<$pair$<$State, State$>>$} as 
+\texttt{NWA::BinaryRelation}. See also \texttt{wali/nwa/RelationOps.hpp}.
+
+%There is very experimental support for using the BuDDY
 
 
 The result of determinizing the automaton in \figref{Det1} is shown in
@@ -436,7 +439,7 @@ The result of determinizing the automaton in \figref{Det1} is shown in
   \centering
     \includegraphics[width=12cm]{Figures/Figure16}
   \caption{Simple nondeterministic NWA.}
-  \label{Fig:Det1}
+  \label{Fi:Det1}
 \end{figure}
 
 
@@ -444,14 +447,14 @@ The result of determinizing the automaton in \figref{Det1} is shown in
   \centering
     \includegraphics[width=16cm]{Figures/Figure17}
     \caption{The NWA resulting from determinizing the NWA in Figure
-      \ref{Fig:Det1}. As mentioned in the text, states in the determinized
+      \ref{Fi:Det1}. As mentioned in the text, states in the determinized
       NWA are relations on the states in the original NWA. For example, state
       1 above corresponds to the relation $\{$(Start,Stuck), (Call,Stuck),
       (Entry1,Stuck), (Entry2,Exit2), (State1,Stuck), (State2,Stuck),
       (Exit1,Stuck), (Exit2,Stuck), (Return,Stuck), (Fishish,Stuck),
       (Stuck,Stuck)$\}$.}
  
-  \label{Fig:Det2}
+  \label{Fi:Det2}
 \end{figure}
 
 
@@ -507,20 +510,20 @@ customize the behavior of determinization.
 
 \end{description}
 
-%Consider the slightly more complex determinization of the NWA shown in Figure \ref{Fig:Det3}.  The resulting NWA is shown in Figure \ref{Fig:Det4}.
+%Consider the slightly more complex determinization of the NWA shown in Figure \ref{Fi:Det3}.  The resulting NWA is shown in Figure \ref{Fi:Det4}.
 
 %\begin{figure}[htbp]
 %  \centering
 %    \includegraphics[angle=270,width=12cm]{Figures/Figure18.pdf}
 %  \caption{Complex nondeterministic NWA.}
-%  \label{Fig:Det3}
+%  \label{Fi:Det3}
 %\end{figure}
 
 %\begin{figure}[htbp]
 %  \centering
 %    \includegraphics[angle=270,width=12cm]{Figures/Figure19.pdf}
-%  \caption{The NWA resulting from determinizing the NWA in Figure \ref{Fig:Det3}.}
-%  \label{Fig:Det4}
+%  \caption{The NWA resulting from determinizing the NWA in Figure \ref{Fi:Det3}.}
+%  \label{Fi:Det4}
 %\end{figure}
 
 \subsection{Complement}
@@ -528,15 +531,15 @@ customize the behavior of determinization.
 
 The complement is performed by first determinizing the NWA and then
 complementing the final-state set of the determinized NWA.  The NWA resulting
-from performing the complement of the NWA shown in Figure \ref{Fig:Det1} is
-shown in Figure \ref{Fig:Comp1}.
+from performing the complement of the NWA shown in Figure \ref{Fi:Det1} is
+shown in Figure \ref{Fi:Comp1}.
 
 \begin{figure}[p]
   \centering
     \includegraphics[width=12cm]{Figures/Figure20}
-  \caption{The complement of the NWA in Figure \ref{Fig:Det1} (the
-    determinization of which is shown in Figure \ref{Fig:Det2}).}
-  \label{Fig:Comp1}
+  \caption{The complement of the NWA in Figure \ref{Fi:Det1} (the
+    determinization of which is shown in Figure \ref{Fi:Det2}).}
+  \label{Fi:Comp1}
 \end{figure}
 
 Client information is copied directly
