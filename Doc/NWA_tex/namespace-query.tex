@@ -1,6 +1,19 @@
 \section{The \texttt{wali::nwa::query} namespace}
 \label{Se:namespace-query}
 
+The \texttt{wali::nwa::query} namespace provides functions related to
+querying the structure of an automaton itself as well as various questions
+based on its language.
+
+In this section, we first discuss how to retrieve information from an
+automaton's transitions (\sectref{query-transitions}) then move on to other
+queries about an automaton proper (e.g. whether it is deterministic;
+\sectref{query-automaton}). Following that, we discuss queries about the
+\textsl{language} of an automaton (\sectref{query-language}).
+
+
+\subsection{Querying information from an automaton's transitions}
+\label{Se:query-transitions}
 The \texttt{wali::nwa::query} namespace provides a large number of functions
 for retrieving information about an \texttt{NWA}'s transitions. The questions
 answered by these functions are of the form ``what are all symbols that
@@ -39,8 +52,6 @@ a \texttt{std::set$<$std::pair$<$State,Symbol$>>$}, which contains the
 information we desire, but is likely to be less convenient to
 use. (The \texttt{State} component of each pair is the exit site, which is
 where the function name \texttt{getExits} comes from.)
-
-
 
 
 
@@ -215,3 +226,7 @@ where the function name \texttt{getExits} comes from.)
 \end{threeparttable}
 \end{sidewaystable}
 \restoregeometry
+
+
+\subsection{Querying other physical aspects of an automaton}
+\label{Se:query-automaton}

@@ -102,7 +102,7 @@ NWAs. These are partitioned into the following namespaces:
         the NWA, returning information about one of the states or the symbol
         in transitions that meet some criteria. (For example, ``give me all
         states that appear as the target state of an internal transition with
-        this source state.'')
+        this source state.'') See \sectref{query-transitions}.
       \item prestar and poststar functions on an NWA
       \item Determining whether two NWAs have any states in common
       \item Determining whether the languages of two NWAs are equal, or if
@@ -112,6 +112,7 @@ NWAs. These are partitioned into the following namespaces:
         language of an NWA
       \item Determining whether an \texttt{NWA} is deterministic
     \end{itemize}
+    
   \item\texttt{wali::nwa::construct} This namespace provides functions for
     constructing an NWA. Functions in this namespace are standard,
     language-theoretic operations such as intersection, union, concatenation,
