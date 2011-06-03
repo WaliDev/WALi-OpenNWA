@@ -1,7 +1,7 @@
 \section{Nested-Word Automata and Overview of the Library's Organization}
-\label{Se:Def}
+\label{App:nwa-definition}
 
-Nested-word automata (NWAs)~\cite{DLT:AM2006,JACM:AM09} are a generalization
+Nested-word automata (NWAs)~\cite{DLT:AM2006,JACM:AM2009} are a generalization
 of finite-state automata that can capture the matched-parenthesis structure
 that is exibited by, for example, opening and closing tags in XML and the
 call/return structure exhibited by execution traces in multi-procedure
@@ -37,29 +37,34 @@ structure is an explicit part of each word of a nested-word language.
       j'$, then one cannot have $i < i' \leq j < j'$.
   \end{itemize}
 
-  When $i \rightsquigarrow j$ holds, for $1 \leq i \leq |w|$, $i$ is called a
-  \textsl{call} position. If $i \rightsquigarrow +\infty$, then $i$ is a
-  \textsl{pending call}; otherwise $i$ is a \textsl{matched call}, and the
-  (unique) position $j$ such that $i \rightsquigarrow j$ is called its
-  \textsl{return successor}. (Note that these terms refer to positions within
-  $w$ rather than the symbol.)
-
-  Similarly, when $i \rightsquigarrow j$ holds, for $1 \leq j \leq |w|$, $j$
-  is a \textsl{return} position. If $-\infty \rightsquigarrow j$, then $j$ is
-  a \textsl{pending return}, otherwise $j$ is a \textsl{matched return}, and
-  the (unique) position $i$ such that $i \rightsquigarrow j$ is called its
-  \textsl{call predecessor}.
-
-  A position $1 \leq i \leq |w|$ that is neither a call nor a return is an
-  \textsl{internal} position.
-
-  A nested word is \textsl{balanced} if it has no pending calls
-  or returns.  A nested word is \textsl{unbalanced-left} (or a
-  \textsl{nested-word prefix}) if it has pending returns, and it is
-  \textsl{unbalanced-right} (or a \textsl{nested-word suffix})
-  if it has no pending calls.
-
+  A \textsl{nested-word language} is any set of nested words; such a language
+  is a \textsl{regular nested-word language} if it is accepted by an NWA as
+  defined below.
 \end{definition}
+
+When $i \rightsquigarrow j$ holds, for $1 \leq i \leq |w|$, $i$ is called a
+\textsl{call} position. If $i \rightsquigarrow +\infty$, then $i$ is a
+\textsl{pending call}; otherwise $i$ is a \textsl{matched call}, and the
+(unique) position $j$ such that $i \rightsquigarrow j$ is called its
+\textsl{return successor}. (Note that these terms refer to positions within
+$w$ rather than the symbol.)
+
+Similarly, when $i \rightsquigarrow j$ holds, for $1 \leq j \leq |w|$, $j$
+is a \textsl{return} position. If $-\infty \rightsquigarrow j$, then $j$ is
+a \textsl{pending return}, otherwise $j$ is a \textsl{matched return}, and
+the (unique) position $i$ such that $i \rightsquigarrow j$ is called its
+\textsl{call predecessor}.
+
+A position $1 \leq i \leq |w|$ that is neither a call nor a return is an
+\textsl{internal} position.
+
+A nested word is \textsl{balanced} if it has no pending calls
+or returns.  A nested word is \textsl{unbalanced-left} (or a
+\textsl{nested-word prefix}) if it has pending returns, and it is
+\textsl{unbalanced-right} (or a \textsl{nested-word suffix})
+if it has no pending calls.
+
+
 
 \TODO{Uh, what does this mean?}
 The library supports unbalanced-left, unbalanced-right, and balanced
@@ -70,11 +75,6 @@ effects of boolean operations on the four kinds of nested-words see Figure
 
 \begin{definition}
   \label{De:NWA}
-
-  A \textsl{nested-word language} is any set of nested words; such a language
-  is a \textsl{regular nested-word language} if it is accepted by a NWA as
-  defined below.
-
 
   A \textsl{nested-word automaton} (NWA) $A$ is a 5-tuple $(Q, \Sigma, Q_0,
   \delta, F)$, where $Q$ is a finite set of states, $\Sigma$ is a finite
