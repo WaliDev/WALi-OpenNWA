@@ -1,9 +1,10 @@
-\section{Conversions}
+\section{Conversions between PDS and NWA (or ``The
+  \texttt{wali::nwa::nwa\_pds} namespace)}
 \label{Se:Conversions}
 
 
-It is possible to both convert from a WALi WPDS to an NWA and from an NWA to
-a WPDS.  However, the construction of an NWA from a WPDS is not the inverse
+It is possible to both convert from a WALi WPDS to an NWA and vice versa.
+However, the construction of an NWA from a WPDS is not the inverse
 of constructing a WPDS from an NWA, i.e., one cannot perform the two
 conversions in sequence and obtain the identity conversion.
 
@@ -22,59 +23,36 @@ program analysis. It is common for PDSs to have just one state, $p$, and to
 use the top-of-stack symbol to track the ``current'' program point. Pushing
 something onto the stack corresponds to a call, and popping corresponds to a
 return. For NWAs, we use the states themselves to track the current program
-point. Furthermore, in our uses the labels on edges have been an identifier
+point. Furthermore, in our uses the label on an edge has been an identifier
 for the program point the edge emanates from.)
 
 
-\noindent The following operations are methods of class NWA:
+The following functions are in the namespace \texttt{wali::nwa::nwa\_pds} and
+are declared in the header \texttt{wali/nwa/nwa\_pds/conversions.hpp}.
+
 
 \begin{description}
 
-  \item\texttt{WPDS plusWPDS( const WPDS\& base )} \nopagebreak
+  \item\texttt{WPDS plusWPDS( NWA const \& nwa, const WPDS\& base )} \nopagebreak
 
-    This operation is an instance method.  It returns the WPDS that is the
-    product of the NWA referred to by \texttt{this} and the given WPDS
+    This returns the WPDS that is the
+    product of \texttt{nwa} and the given WPDS
     \cite{advancedquerying}.
 
-  \item\texttt{void PDStoNWA( const WPDS\& pds )} \nopagebreak
+  \item\texttt{void PDStoNWA( NWA \& out, const WPDS\& pds )} \nopagebreak
+  \item\texttt{NWARefPtr PDStoNWA( NWA const \& nwa, const WPDS\& pds )} \nopagebreak
+    Converts \texttt{pds} to an NWA and either stores the result in
+    \texttt{nwa} or returns it.
 
-    This operation is an instance method; the NWA referred to by
-    \texttt{this} is converted to the NWA that is equivalent to the given
-    PDS.  Typical sequence of operations:
-    construct A; A.PDStoNWA(pds);
 
-  \item\texttt{static ref\_ptr<NWA> PDStoNWA( const WPDS\& pds )} \nopagebreak
-
-    Constructs and returns the NWA that is equivalent to the given PDS.
-
-  \item\texttt{WPDS NWAtoPDScalls( WeightGen<Client>\& wg ) const} \nopagebreak
-
-    This operation is an instance method.  It constructs the WPDS that keeps
-    call states on the stack that is equivalent to the NWA referred to by
-    \texttt{this}.  It uses \texttt{wg} to determine weights for WPDS rules
-    (see Section \ref{Se:NWAtoPDS}).
-
-  \item\texttt{WPDS NWAtoBackwardsPDScalls( WeightGen<Client>\& wg ) const} \nopagebreak
-
-    This operation is an instance method.  It constructs the backwards WPDS
-    that keeps call states on the stack that is equivalent to the NWA
-    referred to by \texttt{this}.  It uses \texttt{wg} to determine weights
-    for WPDS rules (see Section \ref{Se:NWAtoPDS}).
-
-  \item\texttt{WPDS NWAtoPDSreturns( WeightGen<Client>\& wg ) const} \nopagebreak
-
-    This operation is an instance method.  It constructs the WPDS that keeps
-    return states on the stack thatis equivalent to the NWA referred to by
-    \texttt{this}.  It uses \texttt{wg} to determine weights for WPDS rules
-    (see Section \ref{Se:NWAtoPDS}).  (Deprecated)
-
-  \item\texttt{WPDS NWAtoBackwardsPDSreturns( WeightGen<Client>\& wg ) const} \nopagebreak
-
-    This operation is an instance method.  It constructs the backwards WPDS
-    that keeps return states on the stack that is equivalent to the NWA
-    referred to by \texttt{this}.  It uses \texttt{wg} to determine weights
-    for WPDS rules (see Section \ref{Se:NWAtoPDS}).  (Deprecated) \\
-
+  \item\texttt{WPDS NWAtoPDScalls( NWA const \& nwa, WeightGen<Client>\& wg ) const} \nopagebreak
+  \item\texttt{WPDS NWAtoBackwardsPDScalls( NWA const \& nwa, WeightGen<Client>\& wg )} \nopagebreak
+  \item\texttt{WPDS NWAtoPDSreturns( NWA const \& nwa, WeightGen<Client>\& wg ) const} \nopagebreak
+  \item\texttt{WPDS NWAtoBackwardsPDSreturns( NWA const \& nwa, WeightGen<Client>\& wg )} \nopagebreak
+    Constructs the WPDS that is equivalent to \texttt{nwa} using the
+    appropriate method (backwards or forwards flow, and stacking calls or
+    stacking returns), returning the result. Uses \texttt{wg} to determine
+    weights for the WPDS's transitions.
 \end{description}
 
 
@@ -435,92 +413,3 @@ WPDS is shown in Figure \ref{Fig:NWAtoPDS3}. \\
 \end{figure}
 
 
-\section{Queries}
-\label{Se:Queries}
-
-
-Once an NWA is built, there are a multitude of queries that can be made,
-including: \begin{inparaenum} \item whether the NWA is deterministic or
-  non-deterministic, \item language-inclusion queries, and \item reachability
-  queries. \end{inparaenum}
-
-\clearpage
-\subsection{Deterministic}
-\label{Se:Deterministic}
-
-See Section \ref{Se:Determinize} for the definition of deterministic.
-
-\noindent The following operations are methods of class NWA:
-
-\begin{description}
-
-  \item\texttt{bool isDeterministic( )} \nopagebreak
-
-    Determines whether the NWA is deterministic (returns \texttt{true}) or
-    non-deterministic (returns \texttt{false}).  If the NWA is not
-    deterministic, it can be determinized using \texttt{determinize} (see
-    Section \ref{Se:Determinize}). \\
-
-\end{description}
-
-\subsection{Language Inclusion}
-\label{Se:Language}
-
-\noindent The following operations are methods of class NWA:
-
-\begin{description}
-
-  \item\texttt{bool isEmpty( )} \nopagebreak
-
-    Determines whether the language accepted by this NWA is empty (returns
-    \texttt{true}) or non-empty (returns \texttt{false}).
-
-  \item\texttt{static bool isMember( NWS word, ref\_ptr<NWA> aut )} \nopagebreak
-
-    Determines whether the given nested word is a member of the language
-    accepted by the given NWA (returns \texttt{true}) or not (returns
-    \texttt{false}).
-
-  \item\texttt{static bool inclusion( ref\_ptr<NWA> first, ref\_ptr<NWA> second )} \nopagebreak
-
-    Determines whether the language accepted by the first NWA is included in
-    the language accepted by the second NWA (returns \texttt{true}) or not
-    (returns \texttt{false}).
-
-  \item\texttt{static bool equal( ref\_ptr<NWA> first, ref\_ptr<NWA> second )} \nopagebreak
-
-    Determines whether the languages accepted by the given NWAs are equal
-    (returns \texttt{true}) or not (returns \texttt{false}). \\
-
-\end{description}
-
-
-\subsection{Reachability}
-\label{Se:Reachability}
-
-\noindent The following operations are methods of class NWA:
-
-\begin{description}
-
-  \item\texttt{WFA prestar( WFA\& input, WeightGen<Client>\& wg )} \nopagebreak
-
-    Performs the prestar reachability query defined by the given WFA \cite{wali}.
-  
-  \item\texttt{void prestar( WFA\& input, WFA\& output, WeightGen<Client>\& wg )} \nopagebreak
-
-    Performs the prestar reachability query defined by the given WFA \cite{wali}.
-
-  \item\texttt{WFA poststar( WFA\& input, WeightGen<Client>\& wg )} \nopagebreak
-
-    Performs the poststar reachability query defined by the given WFA \cite{wali}.
-
-  \item\texttt{void poststar( WFA\& input, WFA\& output, WeightGen<Client>\& wg )} \nopagebreak
-
-    Performs the poststar reachability query defined by the given WFA \cite{wali}. \\
-
-\end{description}  
-
-For the \texttt{prestar} (or \texttt{poststar}) reachability query,
-\texttt{NWAtoPDScalls} is used to create a WPDS on which the WALi
-\texttt{prestar} (or \texttt{poststar}) method is called.  For details about
-\texttt{WeightGen} and \texttt{NWAtoPDScalls} see Section \ref{Se:NWAtoPDS}.

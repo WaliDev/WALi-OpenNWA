@@ -2,30 +2,14 @@
 \label{Se:Nested Word Automata}
 
 WALi-NWA is a library for constructing, querying, and operating on
-nested-word automata.  It is implemented in C++.  The NWA portions of WALi
+nested-word automata.  It is a portion of the WALi library, which provides
+types and operations for weighted automata.
+It is implemented in C++.  The NWA portions of WALi
 are largely logically separate from the rest of WALi, but WALi-NWA does use
 facilities provided by WALi and inter-operates with WALi's pushdown system
 (PDS) code.
 
-\subsection{Nested Words and Nested-Word Automata}
-%\label{Se:Def}
-
-Nested-word automata (NWAs)~\cite{DLT:AM2006,JACM:AM2009} are a generalization
-of finite-state automata that can capture the matched-parenthesis structure
-that is exhibited by, for example, opening and closing tags in XML, and the
-call/return structure in execution traces in multi-procedure
-programs. Their languages represent somewhat of a middle-ground between
-standard regular languages and context-free languages. Nested-word languages
-retain the call/return structure mentioned above, which makes them a
-refinement of standard regular languages. For instance, there is an NWA that
-accepts exactly the language of properly-balanced parentheses (with the
-associated matching structure). However, they also retain all the closure
-properties that makes standard regular languages attractive; in particular,
-they are closed under complementation and intersection. However, they are not
-directly comparable to languages of linear words, as the call/return
-structure is an explicit part of each nested word.
-
-We assume the reader is familiar with the definition of nested words and
+We assume the reader is familiar with nested words and
 nested-word automata; if not, \appref{nwa-definition} provides a definition and
 Alur et al~\cite{DLT:AM2006,JACM:AM2009} describe them in detail. Our
 implementation corresponds to the definition from the DLT 2006
@@ -43,9 +27,9 @@ meanings in different contexts.
 \subsection{Library overview}
 
 The core of the NWA library is in the namespace \texttt{wali::nwa}. It
-includes of the classes \texttt{NestedWord}, \texttt{NWA}, and others.
+includes the classes \texttt{NestedWord}, \texttt{NWA}, and others.
 
-There are also a large number of free functions that operate on NWAs. These
+There are a large number of free functions that operate on NWAs. These
 are divided into three sub-namespaces:
 \texttt{wali::nwa::query}, \texttt{wali::nwa::construct}, and
 \texttt{wali::nwa::nwa\_pds}.
@@ -64,8 +48,7 @@ These types live in namespace \texttt{wali::nwa}:
 \begin{description}
   \item\texttt{NestedWord} Models a single nested word. (It can be
     balanced or unbalanced.) To use, include \texttt{wali/nwa/NestedWord.hpp}.
-  \item\texttt{NWA} Models nested-word automata themselves. To use, include
-    \texttt{wali/nwa/NestedWord.hpp}. See \sectref{class-nested-word}.
+  \item\texttt{NWA} Models a nested-word automaton. To use, include
     \texttt{wali/nwa/NWA.hpp}, or \texttt{wali/nwa/NWAFwd.hpp} if a
     definition is not needed. See \sectref{NWA-class}.
   \item\texttt{NWARefPtr} is a typedef of \texttt{ref\_ptr$<$NWA$>$} (see
@@ -80,7 +63,7 @@ These types live in namespace \texttt{wali::nwa}:
     container.) These are also defined in \texttt{wali/nwa/NWAFwd.hpp}.
   \item\texttt{ClientInfo} This class holds client-specific information that
     is associated with a state. Client code can subclass \texttt{ClientInfo} and use
-    members of the \texttt{NWA} class to attach instances to states. To use,
+    functions of the \texttt{NWA} class to attach instances to states. To use,
     include \texttt{wali/nwa/ClientInfo.hpp}. See \sectref{client-info}.
   \item\texttt{WeightGen} This abstract class describes how to assign weights
     to transitions of the NWA, and is used both when converting an NWA to a
@@ -98,7 +81,7 @@ NWAs. These are partitioned into the following namespaces:
   \item\texttt{wali::nwa::query} This namespace provides functions for
     querying an automaton. The kinds of functions in this namespace are:
     \begin{itemize}
-      \item A large quantity of functions that query transitions of
+      \item Functions that query transitions of
         the NWA, returning information about one of the states or the symbol
         in transitions that meet some criteria. (For example, ``give me all
         states that appear as the target state of an internal transition with
@@ -138,7 +121,7 @@ otherwise specified, they are in namespace \texttt{wali}. See \cite{wali}.
     pointer template.
   \item\texttt{Key} This is a unique identifier for states and symbols in an
     NWA or NestedWord. It is actually a typedef of an integer, though client
-    code should not depend on this fact. Note that the use of keys for both
+    code should not depend on this precise type. \textsl{Note:} the use of keys for both
     states and symbols means that they can be confused from a types
     perspective, so use caution that this does not happen. See \cite{wali}.
   \item\texttt{getKey(...)} This function produces a key from some input. If
@@ -152,7 +135,7 @@ otherwise specified, they are in namespace \texttt{wali}. See \cite{wali}.
       \item \texttt{char *}
       \item \texttt{int}
       \item \texttt{std::set<Key> const \&}
-      \item \texttt{key, Key} (this is a two-argument version of
+      \item \texttt{Key, Key} (this is a two-argument version of
         \texttt{getKey})
       \item \texttt{key\_src\_t}
     \end{itemize}

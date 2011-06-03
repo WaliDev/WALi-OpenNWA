@@ -14,10 +14,10 @@ symbols, \item add or remove transitions, \item set the status of certain
 
 The following functions are related to construction:
 \begin{description}
-  \item \texttt{NWA::NWA()}) constructs an empty NWA
+  \item \texttt{NWA::NWA()} constructs an empty NWA.
 
   \item \texttt{NWA::NWA(NWA const \& other)} Copies \texttt{other}; the
-    automata will not share structure
+    automata will not share structure.
 
   \item \texttt{NWA::operator=(NWA const \& other)} Assigns \texttt{other} to \texttt{this};
     the automata will not share structure.
@@ -112,7 +112,7 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
     appropriate). (These are typedefs of a \texttt{Triple} or \texttt{Quad}
     of the appropriate type.)
 \end{tablenotes}
-\caption{Table of several functions for accessing and maniuplating elements
+\caption{Table of functions for accessing and maniuplating elements
   of NWAs. All are members of the \texttt{NWA} class. \TODO{Fix footnote
     numbering}}
 \label{Ta:simple-functions}
@@ -140,9 +140,10 @@ denotes the situation in which a transition can be traversed without matching
 and consuming an input symbol.  Epsilon symbols cannot label call or return
 transitions. \texttt{WALI\_WILD} is the `any' symbol; matches a single input
 symbol of any kind.  Since the NWA alphabet is not fixed, the actual symbols
-that \texttt{WALI\_WILD} stands for is fluid.  Note:
-\textbf{\texttt{WALI\_EPSILON} and \texttt{WALI\_WILD} are not explicit
-  elements of $\Sigma$.}
+that \texttt{WALI\_WILD} stands for is fluid.  \textsl{Note:}
+\texttt{WALI\_EPSILON} and \texttt{WALI\_WILD} are not explicit
+elements of $\Sigma$; see \tableref{simple-functions}, footnote 2. \TODO{Fix
+  footnote ref after modifying those in-table.}
 
 
 
@@ -169,8 +170,8 @@ programmer must be wary of aliasing and lifetime considerations.
 
 In addition, you may wish to subclass \texttt{NWA} itself. There are several
 virtual helper functions that are called during intersection and
-determinization to compute the client info for the resulting automaton. These
-can be overriden to customize the behavior. (This is a lightweight instance
+determinization to compute the client info for the resulting automaton; These
+can be overriden to customize the behavior. (This is an instance
 of the ``template method'' design pattern.)
 
 The list of these helper methods is:
@@ -183,7 +184,7 @@ The list of these helper methods is:
   \item \texttt{mergeClientInfoCall}
   \item \texttt{mergeClientInfoReturn}
 \end{itemize}
-(The first 3 are used by intersection, and the remaining 4 by
+(The first three are used by intersection, and the remaining four by
 determinization.) In addition, \texttt{stateIntersect} and
 \texttt{transitionIntersect} can further customize the behavior of
 intersection, including computation of client
@@ -233,11 +234,10 @@ intersection and determinization, and discuss these functions further.
   \item\texttt{void realizeImplicitTrans(State stuck)} \nopagebreak
 
     Makes the transition relation ``at least total.''
-    Adds the state \texttt{stuck} to the machine (if not already present),
-    then for any source state and symbol pair that does not have at least one
+    For any source state and symbol pair that does not have at least one
     transition, adds a transition to \texttt{stuck}. It does the same for
     call transitions and return transitions (with an additional ``for each
-    call predecessor'' in that case).
+    call predecessor'' for returns).
 
     Note that if the machine was nondeterministic, it will still be
     nondeterministic after this call.

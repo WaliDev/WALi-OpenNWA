@@ -7,8 +7,8 @@ based on its language.
 
 In this section, we first discuss how to retrieve information from an
 automaton's transitions (\sectref{query-transitions}) then move on to other
-queries about an automaton proper (e.g. whether it is deterministic;
-\sectref{query-automaton}). Following that, we discuss queries about the
+queries about an automaton proper.
+Following that, we discuss queries about the
 \textsl{language} of an automaton (\sectref{query-language}).
 
 
@@ -29,7 +29,7 @@ Tabs.~\ref{Ta:query-all-transitions}--\ref{Ta:query-return-transitions}
 provide a quick-lookup of the functions.
 
 The tables do not have \textsl{all} the information one needs to know in
-order to call them, and the names use some shorthand; but they provide enough
+order to call them, and the entries use some shorthand; but they provide enough
 information the specifics can be
 looked up in the header or Doxygen documentation. The caption of each table
 gives the header that contains the functions listed. In the interest of
@@ -40,18 +40,18 @@ anyway.) Almost all functions return a \texttt{StateSet}, \texttt{SymbolSet},
 or a \texttt{std::set} of pairs of a state and a symbol. (Those that return a
 set of pairs are marked specially.)
 
-To use the table to answer the question above, we first look at the table for
-return transitions (\tableref{query-return-transitions}). We know the call
-predecessor and return site, so we find the corresponding row in the table
-(fourth from the bottom). We want to know all the symbols, so we look at the
-symbol column. We see there are two choices: \texttt{getReturnSym\_CallRet}
-and \texttt{getExits}. By looking at \texttt{returns.hpp} or Doxygen
-documentation, we can see that the former returns a \texttt{SymbolSet}, which
-is what we want. The latter returns
-a \texttt{std::set$<$std::pair$<$State,Symbol$>>$}, which contains the
-information we desire, but is likely to be less convenient to
-use. (The \texttt{State} component of each pair is the exit site, which is
-where the function name \texttt{getExits} comes from.)
+%To use the table to answer the question above, we first look at the table for
+%return transitions (\tableref{query-return-transitions}). We know the call
+%predecessor and return site, so we find the corresponding row in the table
+%(fourth from the bottom). We want to know all the symbols, so we look at the
+%symbol column. We see there are two choices: \texttt{getReturnSym\_CallRet}
+%and \texttt{getExits}. By looking at \texttt{returns.hpp} or Doxygen
+%documentation, we can see that the former returns a \texttt{SymbolSet}, which
+%is what we want. The latter returns
+%a \texttt{std::set$<$std::pair$<$State,Symbol$>>$}, which contains the
+%information we desire, but is likely to be less convenient to
+%use. (The \texttt{State} component of each pair is the exit site, which is
+%where the function name \texttt{getExits} comes from.)
 
 
 
@@ -80,7 +80,7 @@ where the function name \texttt{getExits} comes from.)
   target        &  (nothing)        & getPredecessors(nwa, tgt)     &  (none)                            &   ---                          \tabularnewline
 \bottomrule\bottomrule
 \end{tabular}
-\caption{Query functions for all transitions. These functions are
+\caption{\textbf{Query functions for all transitions.} These functions are
   in the namespace \texttt{wali::nwa::query}; include the
   file \texttt{wali/nwa/query/transitions.hpp}. For return transitions, the
   ``source'' is the first component of the transition; nothing involving call
@@ -115,7 +115,7 @@ where the function name \texttt{getExits} comes from.)
 \begin{tablenotes}
   \item[1] Returns a set of pairs (either source/symbol or symbol/target).
 \end{tablenotes}
-\caption{Query functions for internal transitions. 
+\caption{\textbf{Query functions for internal transitions.}
   These functions are in the namespace \texttt{wali::nwa::query};
   include the file \texttt{wali/nwa/query/internals.hpp}.
   A table entry of ``---'' means that square does not make
@@ -149,7 +149,7 @@ where the function name \texttt{getExits} comes from.)
 \begin{tablenotes}
   \item[1] Returns a set of pairs (either call site/symbol or symbol/entry).
 \end{tablenotes}
-\caption{Query functions for call transitions. These functions are in the
+\caption{\textbf{Query functions for call transitions.} These functions are in the
   namespace \texttt{wali::nwa::query}; include the
   file \texttt{wali/nwa/query/calls.hpp}. The ``call site'' is the source of the transition (and uses the argument 
   name \texttt{call}), and the ``entry'' of the transition is the target (and
@@ -214,14 +214,14 @@ where the function name \texttt{getExits} comes from.)
 \begin{tablenotes}
   \item[1] Returns a set of pairs (a symbol with one of the states, in the order of the raw transition).
 \end{tablenotes}
-\caption{Query functions for call transitions. These functions are in the
+\caption{\textbf{Query functions for call transitions.} These functions are in the
   namespace \texttt{wali::nwa::query}; include the
   file \texttt{wali/nwa/query/returns.hpp}.   The ``exit site'' is the source of the transition
-  (the first component) and uses the argument name \texttt{x} in this table;
+  (the first component) and uses the argument name \texttt{exit} in this table;
   the ``call predecessor'' is the second component and uses the argument
-  name \texttt{c}; the symbol is the third component uses the argument
-  name \texttt{s}; the ``return site'' is the fourth component and uses the
-  argument name \texttt{r}. }
+  name \texttt{call}; the symbol is the third component uses the argument
+  name \texttt{sym}; the ``return site'' is the fourth component and uses the
+  argument name \texttt{ret}. }
 \label{Ta:query-return-transitions}
 \end{threeparttable}
 \end{sidewaystable}

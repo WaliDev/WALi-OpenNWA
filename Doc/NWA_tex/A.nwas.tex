@@ -3,8 +3,8 @@
 
 Nested-word automata (NWAs)~\cite{DLT:AM2006,JACM:AM2009} are a generalization
 of finite-state automata that can capture the matched-parenthesis structure
-that is exibited by, for example, opening and closing tags in XML and the
-call/return structure exhibited by execution traces in multi-procedure
+that is exhibited by, for example, opening and closing tags in XML, and the
+call/return structure in execution traces in multi-procedure
 programs. Their languages represent somewhat of a middle-ground between
 standard regular languages and context-free languages. Nested-word languages
 retain the call/return structure mentioned above, which makes them a
@@ -14,7 +14,7 @@ associated matching structure). However, they also retain all the closure
 properties that makes standard regular languages attractive; in particular,
 they are closed under complementation and intersection. However, they are not
 directly comparable to languages of linear words, as the call/return
-structure is an explicit part of each word of a nested-word language.
+structure is an explicit part of each nested word.
 
 \begin{definition}
   A \textsl{nested word} $(w,\rightsquigarrow)$ over alphabet $\Sigma$ is an
@@ -29,7 +29,9 @@ structure is an explicit part of each word of a nested-word language.
     \item
       Nesting edges only go forward: if $i \rightsquigarrow j$ then $i < j$.
     \item
-      No two edges share a position: for $1 \leq i \leq |w|$, there is at
+      No two edges share a position unless one is $\plusminus\infty$: for $1
+      \leq i \leq |w|$, either $i=\plusminus\infty$, $j=\plusminus\infty$, or
+      there is at
       most one $j$ such that $i \rightsquigarrow j$ or $j \rightsquigarrow
       i$.
     \item
@@ -60,17 +62,13 @@ A position $1 \leq i \leq |w|$ that is neither a call nor a return is an
 
 A nested word is \textsl{balanced} if it has no pending calls
 or returns.  A nested word is \textsl{unbalanced-left} (or a
-\textsl{nested-word prefix}) if it has pending returns, and it is
+\textsl{nested-word prefix}) if it has only pending calls, and it is
 \textsl{unbalanced-right} (or a \textsl{nested-word suffix})
-if it has no pending calls.
+if it has only pending returns. (It is a general nested word otherwise.)
 
 
-
-\TODO{Uh, what does this mean?}
-The library supports unbalanced-left, unbalanced-right, and balanced
-nested words, but has no direct support for general nested words.  For the
-effects of boolean operations on the four kinds of nested-words see \TODO{removed table}%Figure
-%\ref{Fig:Ops}.
+The library supports balanced and unbalanced-left nested words, but not
+unbalanced-right.
 
 
 \begin{definition}
