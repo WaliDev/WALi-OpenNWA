@@ -38,13 +38,9 @@ The \texttt{NestedWord} class has just six functions:
     functions.)
 \end{description}
 
-The only operation the library currently supports on \texttt{NestedWord}s,
-besides building them, is to query a \texttt{NWA} object to test whether the
-nested word is in the NWA's language. This is done through the following
-function:
-\begin{description}
-  \item\texttt{bool NWA::isMemberNondet(NestedWord const \& word ) const}
-    Returns \texttt{true} if \texttt{word} is a member of the NWA's language,
-    and \texttt{false} otherwise.
-\end{description}
+The only operation the library currently supports on
+\texttt{NestedWord}s, besides building them, is to check whether a
+nested word is in an NWA's language. This is done by the function
+\texttt{wali::nwa::query::languageContains}; see
+\sectref{query-language}.
 
