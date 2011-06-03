@@ -32,7 +32,8 @@ includes the classes \texttt{NestedWord}, \texttt{NWA}, and others.
 There are a large number of free functions that operate on NWAs. These
 are divided into three sub-namespaces:
 \texttt{wali::nwa::query}, \texttt{wali::nwa::construct}, and
-\texttt{wali::nwa::nwa\_pds}.
+\texttt{wali::nwa::nwa\_pds}. There is also an experimental parser in
+\texttt{wali::nwa}.
 
 Finally, there are some operations and classes provided by WALi that the NWA
 portion of the library uses. This mostly consists of the key-handling code,
@@ -46,26 +47,28 @@ directory from the WALi distribution.
 These types live in namespace \texttt{wali::nwa}:
 
 \begin{description}
-  \item\texttt{NestedWord} Models a single nested word. (It can be
+  \item[\texttt{NestedWord}] Models a single nested word. (It can be
     balanced or unbalanced.) To use, include \texttt{wali/nwa/NestedWord.hpp}.
-  \item\texttt{NWA} Models a nested-word automaton. To use, include
+  \item[\texttt{NWA}] Models a nested-word automaton. To use, include
     \texttt{wali/nwa/NWA.hpp}, or \texttt{wali/nwa/NWAFwd.hpp} if a
-    definition is not needed. See \sectref{NWA-class}.
-  \item\texttt{NWARefPtr} is a typedef of \texttt{ref\_ptr$<$NWA$>$} (see
+    definition is not needed. See
+    \sectref{NWA-class}. (\sectref{serialization} also discusses a couple
+    functions related to serializing an NWA.)
+  \item[\texttt{NWARefPtr}] is a typedef of \texttt{ref\_ptr$<$NWA$>$} (see
     below). This is defined in \texttt{wali/nwa/NWAFwd.hpp}.
-  \item\texttt{State} and \texttt{Symbol} are both typedefs of
+  \item[\texttt{State}] and \texttt{Symbol} are both typedefs of
     \texttt{wali::Key} (see below). Both are defined in
     \texttt{wali/nwa/NWAFwd.hpp}.
-  \item\texttt{StateSet} and \texttt{SymbolSet} are typdefs of
+  \item[\texttt{StateSet}] and \texttt{SymbolSet} are typdefs of
     \texttt{std::set}s of the corresponding type. Both are defined in
     \texttt{wali/nwa/NWAFwd.hpp}. (Client code should not depend on this
     fact; it could change to be an \texttt{unordered\_map} or other similar
     container.) These are also defined in \texttt{wali/nwa/NWAFwd.hpp}.
-  \item\texttt{ClientInfo} This class holds client-specific information that
+  \item[\texttt{ClientInfo}] This class holds client-specific information that
     is associated with a state. Client code can subclass \texttt{ClientInfo} and use
     functions of the \texttt{NWA} class to attach instances to states. To use,
     include \texttt{wali/nwa/ClientInfo.hpp}. See \sectref{client-info}.
-  \item\texttt{WeightGen} This abstract class describes how to assign weights
+  \item[\texttt{WeightGen}] This abstract class describes how to assign weights
     to transitions of the NWA, and is used both when converting an NWA to a
     PDS and when doing prestar/poststar queries on the NWA directly. To use,
     include \texttt{wali/nwa/WeightGen.hpp}. See \sectref{NWAtoPDS}.
@@ -78,7 +81,7 @@ The library provides a large number of free functions for operating on
 NWAs. These are partitioned into the following namespaces:
 
 \begin{description}
-  \item\texttt{wali::nwa::query} This namespace provides functions for
+  \item[\texttt{wali::nwa::query}] This namespace provides functions for
     querying an automaton. The kinds of functions in this namespace are:
     \begin{itemize}
       \item Functions that query transitions of
@@ -100,14 +103,17 @@ NWAs. These are partitioned into the following namespaces:
         \sectref{query-language}.
     \end{itemize}
     
-  \item\texttt{wali::nwa::construct} This namespace provides functions for
+  \item[\texttt{wali::nwa::construct}] This namespace provides functions for
     constructing an NWA. Functions in this namespace are standard,
     language-theoretic operations such as intersection, union, concatenation,
     Kleene star, and reversing. See \sectref{Building NWAs}.
-  \item\texttt{wali::nwa::nwa\_pds} This namespace provides functions for
+  \item[\texttt{wali::nwa::nwa\_pds}] This namespace provides functions for
     converting between NWAs and PDSs, and related functions. (Note that
     construction of an NWA from a PDS is in this namespace, not in
     \texttt{construct}.) See \sectref{Conversions}.
+  \item[\texttt{wali::nwa}] This namespace, in addition to the items already
+    discussed, provides an experimental parser for a serialization format of
+    NWAs. See \sectref{serialization}.
 \end{description}
 
 
@@ -117,14 +123,15 @@ The NWA library uses these portions of the standard WALi library. Unless
 otherwise specified, they are in namespace \texttt{wali}. See \cite{wali}.
 
 \begin{description}
-  \item\texttt{ref\_ptr$<$T$>$} This is a reference-counted intrusive smart
-    pointer template.
-  \item\texttt{Key} This is a unique identifier for states and symbols in an
+  \item[\texttt{ref\_ptr$<$T$>$}] This is a reference-counted intrusive smart
+    pointer template. Defined in \texttt{wali/ref\_ptr.hpp}.
+  \item[\texttt{Key}] This is a unique identifier for states and symbols in an
     NWA or NestedWord. It is actually a typedef of an integer, though client
     code should not depend on this precise type. \textsl{Note:} the use of keys for both
     states and symbols means that they can be confused from a types
-    perspective, so use caution that this does not happen. See \cite{wali}.
-  \item\texttt{getKey(...)} This function produces a key from some input. If
+    perspective, so use caution that this does not happen. Declared in
+    \texttt{wali/Key.hpp}.
+  \item[\texttt{getKey(...)}] This function produces a key from some input. If
     the input has not been seen before, it returns a new key; if it has, then
     it returns the same key as before. (One can think of this as translating
     whatever unique identifier is known by the client code to the
@@ -144,16 +151,20 @@ otherwise specified, they are in namespace \texttt{wali}. See \cite{wali}.
     \texttt{KeySource} object. \texttt{KeySource} is an abstract class which
     client code can subclass to provide a translation to \texttt{Key}s for
     arbitrary types.
-  \item\texttt{key2str} Is a inverse of \texttt{getKey}, except that it
+
+    All overloads are declared in \texttt{wali/Key.hpp}.
+  \item[\texttt{key2str}] Is a inverse of \texttt{getKey}, except that it
     always returns a string representation. If the key was created with the
     \texttt{getKey(std::string const \&)} overload in the first place, this
-    returns a copy of the original string.
-  \item\texttt{wali::wfa::WFA} This is a weighted finite automaton. It is
+    returns a copy of the original string.  Declared in
+    \texttt{wali/Key.hpp}.
+  \item[\texttt{wali::wfa::WFA}] This is a weighted finite automaton. It is
     used in NWA poststar and prestar queries in much the same manner as in
-    WPDS poststar and prestar queries.
-  \item\texttt{wali::wpds::WPDS} This is a weighted pushdown system. NWAs use
+    WPDS poststar and prestar queries. Defined in \texttt{wali/wfa/WFA.hpp}.
+  \item[\texttt{wali::wpds::WPDS}] This is a weighted pushdown system. NWAs use
     WPDSs behind the scenes when doing poststar and prestar queries, and the
-    library provides conversion routines between the two automata types.
+    library provides conversion routines between the two automata
+    types. Defined in \texttt{wali/wpds/WPDS.hpp}.
 \end{description}
 
 

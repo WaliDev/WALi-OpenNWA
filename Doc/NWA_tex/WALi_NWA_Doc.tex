@@ -39,6 +39,7 @@
 
 \usepackage{misc}
 
+
 \usepackage[maxfloats=40]{morefloats}
 
 %\usepackage{ulem} % for strike out
@@ -54,6 +55,9 @@
 \def\dblfloatpagefraction{0.9}
 \setcounter{dbltopnumber}{5}
 
+\newlength{\defaultlabelsep}
+\setlength{\defaultlabelsep}{\labelsep}
+
 \usepackage{tweaklist}
 % this sets the spacings in the itemize environment
 \renewcommand{\itemhook}{\setlength{\topsep}{0pt}%
@@ -67,10 +71,12 @@
   \setlength{\parsep}{0ex}%
 }
 
+
 % this sets the spacings in the description environment
 \renewcommand{\descripthook}{\setlength{\topsep}{0pt}%
   \setlength{\itemsep}{0pt}%
   \setlength{\parsep}{0ex}%
+  \setlength{\labelsep}{\textwidth}%
 }
 
 
@@ -83,6 +89,8 @@
 \newcommand{\toprule}{\hline}
 \newcommand{\midrule}{\hline}
 \newcommand{\bottomrule}{\hline}
+
+%\setdescription{labelsep=\textwidth}
 
 
 %%%%%%%%%%%%%%%%%%%
