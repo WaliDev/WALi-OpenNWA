@@ -10,7 +10,7 @@ facilities provided by WALi and inter-operates with WALi's pushdown system
 \subsection{Nested Words and Nested-Word Automata}
 %\label{Se:Def}
 
-Nested-word automata (NWAs)~\cite{DLT:AM2006,JACM:AM09} are a generalization
+Nested-word automata (NWAs)~\cite{DLT:AM2006,JACM:AM2009} are a generalization
 of finite-state automata that can capture the matched-parenthesis structure
 that is exhibited by, for example, opening and closing tags in XML, and the
 call/return structure in execution traces in multi-procedure
@@ -27,9 +27,9 @@ structure is an explicit part of each nested word.
 
 We assume the reader is familiar with the definition of nested words and
 nested-word automata; if not, \TODO{appendix A} provides a definition and
-Alur et al~\cite{DLT:AM2006,JACM:AM09} describe them in detail. Our
+Alur et al~\cite{DLT:AM2006,JACM:AM2009} describe them in detail. Our
 implementation corresponds to the definition from the DLT 2006
-paper~\cite{DLT:AM2006}; relative to followup work~\cite{JACM:AM09}, this definition removes
+paper~\cite{DLT:AM2006}; relative to followup work~\cite{JACM:AM2009}, this definition removes
 the distinction between the machine's linear and hierarchical states, and on
 a call always stacks the source state. (In the JACM 2009 presentation of the
 work, this would be called a ``weakly-hierarchical'' NWA.)
@@ -104,9 +104,9 @@ NWAs. These are partitioned into the following namespaces:
         states that appear as the target state of an internal transition with
         this source state.'') See \sectref{query-transitions}.
       \item Determining whether two NWAs have any states in
-        common. See \sectref{query-automata}.
+        common. See \sectref{query-automaton}.
       \item Determining whether an \texttt{NWA} is deterministic. See
-        \sectref{query-automata}.
+        \sectref{query-automaton}.
       \item Determining whether a \texttt{NestedWord} is a member of the
         language of an NWA. See \sectref{query-language}.
       \item Determining whether the language of an NWA is empty. See
