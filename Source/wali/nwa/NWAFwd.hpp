@@ -16,16 +16,37 @@ namespace wali
 {
   namespace nwa
   {
+    /// Globally (within a process) unique ID of a state
+    ///
     typedef Key State;
+    /// Globally (within a process) unique ID of a symbol
+    ///
     typedef Key Symbol;
 
-    class NWA;
-    typedef ref_ptr<NWA> NWARefPtr;
 
+    // Forward decl
+    class NWA;
+
+    /// A reference-counted smart pointer to an NWA
+    ///
+    typedef ref_ptr<NWA> NWARefPtr;
+    
     struct Configuration;
+
+    // Forward decl
     class NestedWord;
 
+    /// A set of States.
+    ///
+    /// (Do not depend on the details of std::set; the type could
+    /// change to an unordered_set or other type with a similar
+    /// interface in future versions.)
     typedef std::set<State> StateSet;
+    /// A set of Symbols
+    ///
+    /// (Do not depend on the details of std::set; the type could
+    /// change to an unordered_set or other type with a similar
+    /// interface in future versions.)
     typedef std::set<Symbol> SymbolSet;
   }
 }

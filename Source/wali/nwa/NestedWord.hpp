@@ -5,19 +5,42 @@ namespace wali
 {
   namespace nwa
   {
+    /// This class represents a single nested word.
+    ///
+    /// The word can be unbalanced left or unbalanced right, even
+    /// though our NWAs do not have support for unbalanced-right
+    /// words.
+    ///
+    /// The representation used by this class is closer to that of a
+    /// word in a visibly-pushdown language. It holds the linear
+    /// contents of a word, but does not store the nesting relation
+    /// explicitly. Instead, each position in the word is annotated
+    /// with whether it is an internal, call, or return position. The
+    /// nesting relation is induced by the matchings between calls and
+    /// returns.
     class NestedWord
     {
     public:
-      // Each position in the nested word has a symbol and a type.
-      // (Think of this more of a visibly-pushdown word.)
+      /// Each position in the nested word has a symbol and a type.
+      ///
       struct Position
       {
+	/// The type of a position: either a call position, internal
+	/// position, or return position.
         enum Type {
           CallType, InternalType, ReturnType
         };
+
+	/// The symbol at this position
+	///
         Symbol symbol;
+
+	/// The type (call/internal/return) of this position
+	///
         Type type;
         
+	/// Constructs a Position object with the given symbol and
+	/// type
         Position(Symbol sym, Type ty) : symbol(sym), type(ty) {}
       };
       
@@ -25,22 +48,39 @@ namespace wali
       std::vector<Position> word;
       
     public:
-      typedef  std::vector<Position>::const_iterator const_iterator;
+      /// An iterator to allow traversal through the word. (Don't
+      /// depend on this concrete type specifically, but I guarantee
+      /// it will be a random access iterator.)
+      typedef std::vector<Position>::const_iterator const_iterator;
       
+      /// Appends the position 'p' (symbol & type) to the end of this
+      /// nested word
       void append(Position p)
       {
         word.push_back(p);
       }
-      
+
+
+      /// Appends the given symbol to the end of this nested word in a
+      /// call position.
       void appendCall(Symbol sym)     { append(Position(sym, Position::CallType)); }
+      /// Appends the given symbol to the end of this nested word in an
+      /// internal position.
       void appendInternal(Symbol sym) { append(Position(sym, Position::InternalType)); }
+      /// Appends the given symbol to the end of this nested word in a
+      /// return position.
       void appendReturn(Symbol sym)   { append(Position(sym, Position::ReturnType)); }
-      
+
+
+      /// Returns an iterator to the first position in this nested
+      /// word.
       const_iterator begin() const
       {
         return word.begin();
       }
       
+      /// Returns an iterator to one position past the end of this
+      /// nested word.
       const_iterator end() const
       {
         return word.end();

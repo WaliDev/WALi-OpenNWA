@@ -2,6 +2,7 @@
 #define wali_nwa_DEPRECATE_H
 
 // Define the DEPRECATE macro
+
 #if defined(__GNUC__)
 #  define TEMP_GCC_VERSION (__GNUC__*10000 + __GNUC_MINOR__*100 + __GNUC_PATCHLEVEL__)
 #  if TEMP_GCC_VERSION > 40500 // if at least 4.5
@@ -15,7 +16,8 @@
 #  warning I do not know how to deprecate something with your compiler
 #endif
 
-// Define macros to turn on and off deprecation
+// Define macros to turn on and off deprecation. Uh, I don't think
+// these really work right now.
 #if defined(__GNUC__)
 #  define TEMP_GCC_VERSION (__GNUC__*10000 + __GNUC_MINOR__*100 + __GNUC_PATCHLEVEL__)
 #  if TEMP_GCC_VERSION > 40600 // if at least 4.6

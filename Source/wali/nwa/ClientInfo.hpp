@@ -20,23 +20,31 @@ namespace wali
      */
     class ClientInfo : public Countable
     { 
+      /// Assigns 'other' to this ClientInfo object.
+      ///
       virtual ClientInfo & operator=( const ClientInfo & other )
       {
         (void) other;
         return *this;
       };
 
+      /// Compares 'this' to 'other'
+      ///
       virtual bool operator== (ClientInfo const & other)
       {
         (void) other;
         return true;
       }
 
+      /// Allocates and returns a new ClientInfo object that is a copy
+      /// of this one.
       virtual ClientInfo* clone()
       {
         return new ClientInfo(*this);
       }
 
+      /// Clones this ClientInfo object and returns a ref_ptr to it
+      /// instead of a normal pointer.
       virtual ref_ptr<ClientInfo> cloneRp()
       {
         return ref_ptr<ClientInfo>(clone());

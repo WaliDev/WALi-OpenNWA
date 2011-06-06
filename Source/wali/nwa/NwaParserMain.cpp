@@ -1,3 +1,5 @@
+// Just run the unit tests from NwaParser.cpp.
+
 #include "NWAParser.hpp"
 
 int
