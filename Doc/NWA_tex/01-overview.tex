@@ -18,10 +18,15 @@ the distinction between the machine's linear and hierarchical states, and on
 a call always stacks the source state. (In the JACM 2009 presentation of the
 work, this would be called a ``weakly-hierarchical'' NWA.)
 
-Finally, the terminology used in the interface of the package is geared
+The terminology used in the interface of the package is geared
 toward program analysis, so we use terms such as ``call site'' and ``return
 site'' to refer to states of the NWA even though they take on different
 meanings in different contexts.
+
+The NWAs in this library have support for balanced and unbalanced-left nested
+words only, and does not provide support for any words with pending
+returns. (That is, we support balanced words and nested-word prefixes, but
+not nested-word suffixes or general nested words.)
 
 
 
@@ -48,8 +53,11 @@ directory from the WALi distribution.
 These types live in namespace \texttt{wali::nwa}:
 
 \begin{description}
-  \item[\texttt{NestedWord}] Models a single nested word. (It can be
-    balanced or unbalanced.) To use, include \texttt{wali/nwa/NestedWord.hpp}.
+  \item[\texttt{NestedWord}] Models a single nested word. Currently the only
+    operation that can be performed using one is to check whether a
+    \texttt{NestedWord} is a member of an \texttt{NWA}'s language. (The word can be
+    balanced or unbalanced, but bear in mind that our automata do not support
+    pending returns.) To use, include \texttt{wali/nwa/NestedWord.hpp}.
   \item[\texttt{NWA}] Models a nested-word automaton. To use, include
     \texttt{wali/nwa/NWA.hpp}, or \texttt{wali/nwa/NWAFwd.hpp} if a
     definition is not needed. See

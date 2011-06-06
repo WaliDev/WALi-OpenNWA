@@ -9,7 +9,10 @@ reversal, Kleene star, complement, and determinization.
 The library supports two interfaces to each of these operations. In one, the
 operation allocates an NWA with \texttt{new}, performs the construction, and
 returns a \texttt{NWARefPtr} to the result.  In the other, the operation takes
-a reference to an NWA, clears it, and constructs the result in-place.
+a reference to an NWA, clears it, and constructs the result in-place. The
+first form is usually more convenient to use, and creates a mini language for
+set expressions; the second form makes it possible to store the result of an
+operation in a subclass of \texttt{NWA}.
 
 Each of these functions is in the namespace \texttt{wali::nwa::construct}:
 
@@ -60,6 +63,15 @@ Each of these functions is in the namespace \texttt{wali::nwa::construct}:
     See Section
     \ref{Se:Complement}.
 \end{description}
+
+As mentioned above, these functions create a small language of set
+expressions. For instance, to compute an automaton \texttt{M} whose language
+is $\texttt{A} \cup (\texttt{B} \cap \texttt{C})*$ (where \texttt{A},
+\texttt{B}, and \texttt{C} are \texttt{NWARefPtr}s), one can write
+\begin{center}
+  \texttt{NWARefPtr M = unionNWA(*A, *star(*intersect(*B, *C)))}
+\end{center}
+
 
 \subsection{Union}
 \label{Se:Union}
@@ -414,11 +426,11 @@ An NWA, $(Q,\Sigma,Q_0,\delta,Q_f)$, is \textbf{deterministic} iff
       |\{q'|(q,\sigma,q') \in \delta_i\}| \leq 1$,
 
     \item if $(q,*,q') \in \delta_c$ then $ |\{q'|(q,\sigma,q') \in
-      \delta_c\}| = 0$; otherwise for all $\sigma \in \Sigma - \{*\},
+      \delta_c\}| = 0$; otherwise, for all $\sigma \in \Sigma - \{*\},
       |\{q'|(q,\sigma,q') \in \delta_c\}| \leq 1$, and
 
     \item for all $q' \in Q$, if $(q,q',*,q'') \in \delta_r$ then
-      $|\{q''|(q,q',\sigma,q'') \in \delta_r\}| = 0$; otherwise for all
+      $|\{q''|(q,q',\sigma,q'') \in \delta_r\}| = 0$; otherwise, for all
       $\sigma \in \Sigma - \{*\}, |\{q''|(q,q',\sigma,q'') \in \delta_r\}|
       \leq 1$, and
   \end{itemize}
