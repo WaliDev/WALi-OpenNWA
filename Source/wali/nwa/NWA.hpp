@@ -87,6 +87,10 @@ namespace wali
       NWA( const NWA & other );
       NWA & operator=( const NWA & other );
 
+
+      /**
+       * @brief Removes all states, symbols, and transitions from this NWA
+       */
       void clear( );
 
       /**
@@ -126,12 +130,9 @@ namespace wali
       //All States
 
       /**
-       *   
-       * @brief provides access to all states in the NWA
+       * @brief Returns the set of states in the NWA
        *
-       * This method provides access to all states.
-       *
-       * @return a set of all states
+       * @return A set of all states
        *
        */
       const  StateSet & getStates( ) const;
@@ -154,8 +155,6 @@ namespace wali
        *
        * This method adds the given state to the state set for this NWA.  If the state 
        * already exists in the NWA, false is returned.  Otherwise, true is returned.
-       * Note: This method modifies transitions, so it cannot be called on an NWA without
-       *        a set stuck state.
        *
        * @param - state: the state to add
        * @return false if the state already exists in the NWA, true otherwise
@@ -175,9 +174,16 @@ namespace wali
        */
       size_t sizeStates( ) const;
 
+
+      /**
+       * @brief Returns the largest state ID in the automaton
+       *
+       * @return the largest state ID in the automaton
+       */
       int largestState() const {
         return states.largestState();
       }
+
 
       /**
        *  
@@ -187,10 +193,6 @@ namespace wali
        * final states, and the set of states in this NWA.  It then removes the state from 
        * any set that contained it.  Any transitions to or from the state to be removed 
        * are also removed.
-       * Note: The stuck state cannot be removed in this manner, only by clearing all states
-       *        or realizing all implicit transitions.
-       * Note: This method modifies transitions, so it cannot be called on an NWA without
-       *        a set stuck state.
        *
        * @param - state: the state to remove
        * @return false if the state does not exist in the NWA, true otherwise
@@ -203,9 +205,6 @@ namespace wali
        * @brief remove all states from the NWA
        *
        * This method removes all states and transitions from the NWA.
-       * Note: This makes the NWA one without a stuck state, so a new
-       *      stuck state must be added before transitions can be added.
-       *
        */
       void clearStates( );
 
@@ -323,8 +322,6 @@ namespace wali
        * does not exist, it is added to the state set of the NWA.  The given state is then
        * added to the set of final states for the NWA.  If the state already exists in the
        * final state set of the NWA, false is returned.  Otherwise, true is returned.
-       * Note: If 'state' is the stuck state, then all implicit transitions are realized
-       *        (removing the stuck state property from 'state') prior to making 'state' final.
        *
        * @param - state: the state to add to final state set
        * @return false if the state already exists in the final state set of the NWA
@@ -402,8 +399,6 @@ namespace wali
        * This method adds the given symbol to the symbol set associated with the NWA. If 
        * the symbol is already associated with the NWA, false is returned. Otherwise, 
        * true is returned.
-       * Note: This method modifies (implicit) transitions, so it cannot be called on an 
-       *        NWA without a set stuck state.
        *
        * @param - sym: the symbol to add
        * @return false if the symbol is already associated with the NWA
@@ -415,9 +410,9 @@ namespace wali
        *
        * @brief returns the number of symbols associated with this NWA
        *
-       * This method returns the number of symbols associated with this NWA.  
-       * Note: The wild symbol is included in this count if there are any transitions
-       *        labled with the wild symbol in the NWA.
+       * This method returns the number of symbols associated with this NWA.
+       * Note: Neither WALI_EPSILON nor WALI_WILD are included in this count
+       *       regardless of whether they are used to label any transitions!
        *
        * @return the number of symbols associated with this NWA
        *
@@ -431,8 +426,6 @@ namespace wali
        * This method checks for the given symbol in the symbol set associated with the NWA
        * and removes the symbol from the symbol set if necessary.  Any transitions 
        * associated with the symbol to be removed are also removed.
-       * Note: Symbols can be removed from NWAs without a stuck state because no implicit
-       *        transitions are introduced by removing a symbol.
        *
        * @param - sym: the symbol to remove
        * @return false if the symbols is not associated with the NWA
@@ -441,21 +434,20 @@ namespace wali
       bool removeSymbol( Symbol sym );
 
       /**
-       *
        * @brief remove all symbols associated with the NWA
        *
        * This method removes all symbols associated with the NWA.  It also removes all 
        * transitions associated with the NWA as there can be no transitions without at 
        * least one symbol.
-       * Note: This method modifies (implicit) transitions, so it cannot be called on an 
-       *        NWA without a set stuck state.
-       *
        */
       void clearSymbols( );
 
       
       //Transition Accessors
 
+      /// Please don't call this, in case that's not evident from the
+      /// name. It's const, so you won't break the NWA, but I make no
+      /// guarantees it'll be around in future versions.
       Trans const & _private_get_transition_storage_() const  {
         return trans;
       }
@@ -521,10 +513,6 @@ namespace wali
        * original state are not only duplicated as self-loop transitions for the duplicate 
        * state, but the duplicate state also has transitions to the original state for 
        * each such transition. 
-       * Note: This method modifies transitions, so it cannot be called on an NWA without
-       *        a set stuck state.
-       * Note: It doesn't make sense to duplicate the stuck state as there can only be 
-       *        one stuck state set in a given machine.
        *
        * @param - orig: the name of the original state, i.e. the state to duplicate
        * @param - dup: the name of the duplicate state
@@ -542,10 +530,6 @@ namespace wali
        * not only duplicated as self-loop transitions for the duplicate state, but the 
        * duplicate state also has transitions to and from the original state for each 
        * such transition.
-       * Note: This method modifies transitions, so it cannot be called on an NWA without
-       *        a set stuck state.
-       * Note: It doesn't make sense to duplicate the stuck state as there can only be
-       *        one stuck state set in a given machine.
        *
        * @param - orig: the name of the original state, i.e. the state to duplicate
        * @param - dup: the name of the duplicate state
@@ -558,10 +542,11 @@ namespace wali
        *  
        * @brief realizes all implicit transitions in the NWA
        *
-       * This method makes explicit all transitions in the NWA by adding transitions to the stuck
-       * state for each state/symbol(excluding epsilon) pair for which no outgoing edge(one of each 
-       * kind-call,internal,return) from that state is labeled with that symbol.
-       * Note: The NWA no longer has a stuck state after this operation is performed.
+       * This method makes explicit all transitions in the NWA by adding the
+       * given stuckState (if necessary) then any transitions to the stuck
+       * state for each state/symbol(excluding epsilon) pair for which no
+       * outgoing edge(one of each kind-call,internal,return) from that state
+       * is labeled with that symbol.
        *
        */
       void realizeImplicitTrans(State stuckState);
@@ -626,8 +611,6 @@ namespace wali
        * and adds it to the transition set for the NWA.  If the call transition already 
        * exists in the NWA, false is returned. Otherwise, true is returned.
        * Note: 'sym' cannot be Epsilon
-       * Note: 'from' cannot be the stuck state unless 'to' is as well
-       * Note: Transitions cannot be modified if there is no stuck state.
        *
        * @param - from: the state the edge departs from
        * @param - sym: the symbol labeling the edge
@@ -645,8 +628,6 @@ namespace wali
        * If the call transition already exists in the NWA, false is returned. Otherwise, 
        * true is returned.
        * Note: the symbol cannot be Epsilon
-       * Note: the from state cannot be the stuck state unless the to state is as well
-       * Note: Transitions cannot be modified if there is no stuck state.
        *
        * @param - ct: the call transition to add
        * @return false if the call transition already exists in the NWA
@@ -661,7 +642,6 @@ namespace wali
        * This method checks for the call transition with the given edge and label 
        * information in the transition set. If the transition is found, it is removed
        * from the transition set and true is returned.  Otherwise, false is returned.
-       * Note: Transitions cannot be modified if there is no stuck state.
        *
        * @param - from: the state the edge departs from
        * @param - sym: the symbol labeling the edge
@@ -678,7 +658,6 @@ namespace wali
        * This method checks for the call transition in the transition set. If the 
        * transition is found, it is removed from the transition set and true is 
        * returned.  Otherwise, false is returned.
-       * Note: Transitions cannot be modified if there is no stuck state.
        *
        * @param - ct: the call transition to remove
        * @return false if the call transition does not exist in the NWA
@@ -733,8 +712,6 @@ namespace wali
        * transition already exists in the NWA, false is returned. Otherwise, true is 
        * returned.
        * Note: 'from' cannot be the stuck state unless 'to' is as well
-       * Note: epsilon transitions to the stuck state make no sense
-       * Note: Transitions cannot be modified if there is no stuck state.
        *
        * @param - from: the state the edge departs from
        * @param - sym: the symbol labeling the edge
@@ -752,8 +729,6 @@ namespace wali
        * If the internal transition already exists in the NWA, false is returned. Otherwise, 
        * true is returned.
        * Note: the from state cannot be the stuck state unless the to state is as well
-       * Note: epsilon transitions to the stuck state make no sense
-       * Note: Transitions cannot be modified if there is no stuck state.
        *
        * @param - it: internal transition to add to the NWA
        * @return false if the internal transition already exists in the NWA
@@ -768,7 +743,6 @@ namespace wali
        * This method checks for the internal transition with the given edge and label
        * information in the transition set.  If the transition is found, it is removed 
        * from the transition set and true is returned.  Otherwise, false is returned.
-       * Note: Transitions cannot be modified if there is no stuck state.
        *
        * @param - from: the state the edge departs from
        * @param - sym: the symbol labeling the edge
@@ -785,7 +759,6 @@ namespace wali
        * This method checks for the internal transition in the transition set. If the 
        * transition is found, it is removed from the transition set and true is returned.
        * Otherwise, false is returned.
-       * Note: Transitions cannot be modified if there is no stuck state.
        *
        * @param - it: the internal transition to remove
        * @return false if the internal transition does not exist in the NWA
@@ -881,9 +854,6 @@ namespace wali
        * and adds it to the transition set for the NWA.  If the return transition already 
        * exists in the NWA, false is returned. Otherwise, true is returned.
        * Note: 'sym' cannot be Epsilon
-       * Note: 'from' cannot be the stuck state unless 'to' is as well
-       * Note: 'pred' cannot be the stuck state unless 'to' is as well
-       * Note: Transitions cannot be modified if there is no stuck state.
        *
        * @param - from: the state the edge departs from
        * @param - pred: the state from which the call was initiated  
@@ -902,9 +872,6 @@ namespace wali
        * If the return transition already exists in the NWA, false is returned. Otherwise,
        * true is returned.
        * Note: the symbol cannot be Epsilon
-       * Note: the from state cannot be the stuck state unless the to state is as well
-       * Note: the call predecessor state cannot be the stuck state unless the to state is as well
-       * Note: Transitions cannot be modified if there is no stuck state.
        *
        * @param - rt: return transition to add to the NWA
        * @return false if the return transition already exists in the NWA
@@ -919,7 +886,6 @@ namespace wali
        * This method checks for all return transitions with the given edge and label
        * information in the transition set.  If transitions are found, they are removed 
        * from the transition set and true is returned.  Otherwise, false is returned.
-       * Note: Transitions cannot be modified if there is no stuck state.
        *
        * @param - from: of the state the edge departs from
        * @param - sym: the symbol labeling the edge
@@ -936,7 +902,6 @@ namespace wali
        * This method checks for the return transition with the given edge and label 
        * information in the transition set. If the transition is found, it is removed 
        * from the transition set and true is returned.  Otherwise, false is returned.
-       * Note: Transitions cannot be modified if there is no stuck state.
        * 
        * @param - from: the state the edge departs from
        * @param - pred: the state from which the call was initiated  	   
@@ -954,7 +919,6 @@ namespace wali
        * This method checks for the return transition in the transition set. If the 
        * transition is found, it is removed from the transition set and true is returned.
        * Otherwise, false is returned.
-       * Note: Transitions cannot be modified if there is no stuck state.
        *
        * @param - rt: the return transition to remove
        * @return false if the return transition does not exist in the NWA
@@ -990,8 +954,6 @@ namespace wali
        * This method constructs the union of the given NWAs by unioning the state sets,
        * symbols, transitions, initial state sets, and final state sets of the two NWAs.
        * Note: The resulting NWA is guaranteed NOT to be deterministic.
-       * Note: This method modifies the transitions of the NWA, so it cannot be 
-       *        called on a NWA with no stuck state.
        *
        * @param - first: the NWA to union with 'second'
        * @param - second: the NWA to union with 'first'
@@ -1032,8 +994,6 @@ namespace wali
        * This method constructs the NWA which accepts only nested words that are accepted 
        * by both 'first' and 'second'.  
        * Note: The resulting NWA is NOT guaranteed to be deterministic.	
-       * Note: This method modifies the transitions of the NWA, so it cannot be 
-       *        called on a NWA with no stuck state.
        *
        * @param - first: the NWA to intersect with 'second'
        * @param - second: the NWA to intersect with 'first'
@@ -1113,8 +1073,6 @@ namespace wali
        * This method constructs the concatenation of the given NWAs by adding epsilon 
        * transitions from all final states of 'first' to all initial states of 'second'.  
        * Note: The resulting NWA is NOT guaranteed to be deterministic.
-       * Note: This method modifies the transitions of the NWA, so it cannot be 
-       *        called on a NWA with no stuck state.
        *
        * @param - first: the NWA to which 'second' should be concatenated
        * @param - second: the NWA to concatenate onto the end of 'first'
@@ -1132,7 +1090,7 @@ namespace wali
        *
        * @param - first: the NWA to which 'second' should be concatenated
        * @param - second: the NWA to concatenate onto the end of 'first'
-       * @param - stuck: the stuck state of the NWA to be constructed
+       * @param - stuck: dummy parameter
        * @return the NWA resulting from the concatenation of the given NWAs
        *
        */
@@ -1152,8 +1110,6 @@ namespace wali
        * This method constructs the NWA which is the reverse of the given NWA. It reverses 
        * internal transitions and switches call and return transitions.
        * Note: the resulting NWA is NOT guaranteed to be deterministic.
-       * Note: This method modifies the transitions of the NWA, so it cannot be 
-       *        called on a NWA with no stuck state.
        *
        * @param - first: the NWA to reverse
        * 
@@ -1169,7 +1125,7 @@ namespace wali
        * Note: the resulting NWA is NOT guaranteed to be deterministic.
        *
        * @param - first: the NWA to reverse
-       * @param - stuck: the stuck state of the NWA to be constructed
+       * @param - stuck: dummy parameter
        * @return the NWA resulting from reversing the given NWA
        * 
        */
@@ -1188,8 +1144,6 @@ namespace wali
        * This method constructs the Kleene-* of the given NWA by adding epsilon transitions 
        * from all final states of the NWA to all initial states of the NWA.  
        * Note: The resulting NWA is NOT guaranteed to be deterministic.
-       * Note: This method modifies the transitions of the NWA, so it cannot be 
-       *        called on a NWA with no stuck state.
        *
        * @param - first: the NWA to perform the Kleene-* of
        *
@@ -1205,7 +1159,7 @@ namespace wali
        * Note: The resulting NWA is NOT guaranteed to be deterministic.
        *
        * @param - first: the NWA to perform the Kleene-* of
-       * @param - stuck: the stuck state of the NWA to be constructed
+       * @param - stuck: dummy parameter
        * @return the NWA resulting from performing Kleene-* on the given NWA
        *
        */
@@ -1225,8 +1179,6 @@ namespace wali
        * This method constructs the complement of the given NWA by determinizing it and
        * then replacing the set of final states with the set of states that are not final
        * Note: The resulting NWA is guaranteed to be deterministic.
-       * Note: This method modifies the transitions of the NWA, so it cannot be 
-       *        called on a NWA with no stuck state.
        *
        * @param - first: the NWA to perform the complement of
        *
@@ -1244,7 +1196,7 @@ namespace wali
        * Note: The resulting NWA is guaranteed to be deterministic.
        *
        * @param - first: the NWA to perform the complement of
-       * @param - stuck: the stuck state of the NWA to be constructed
+       * @param - stuck: dummy parameter
        * @return the NWA resulting from complementing the given NWA
        *
        */
@@ -1263,8 +1215,6 @@ namespace wali
        *
        * This method constructs a deterministic NWA that is equivalent to the given NWA.
        * Note: The resulting NWA is guaranteed to be deterministic.
-       * Note: This method modifies the transitions of the NWA, so it cannot be 
-       *        called on a NWA with no stuck state.
        *
        * @param - nondet: the NWA to determinize
        *
@@ -1280,7 +1230,7 @@ namespace wali
        * Note: The resulting NWA is guaranteed to be deterministic.
        *
        * @param - nondet: the NWA to determinize
-       * @param - stuck: the stuck state of the NWA to be constructed
+       * @param - stuck: dummy parameter
        * @return the NWA resulting from determinizing the given NWA
        *
        */
@@ -1307,12 +1257,11 @@ namespace wali
 
       /**
        * 
-       * @brief determines whether there is any overlap in the states of the given NWAs,
-       *        except that the stuck state is allowed to be in both IF it is the stuck in both
+       * @brief determines whether there is any overlap in the states of the given NWAs
        *
        * This method tests whether there is any overlap in the states of the given NWAs.
        *
-       *   first->states()  intersect  second->states()  =  {first->stuck()}  intersect  {second->stuck()}
+       *   first->states()  intersect  second->states()  = {]
        *
        * @param - first: one of the NWAs whose states to compare
        * @param - second: one of the NWAs whose states to compare
@@ -1633,6 +1582,7 @@ namespace wali
        *
        */
       void PDStoNWA( const wpds::WPDS & pds ); 
+
       /**
        *
        * @brief constructs the NWA equivalent to the given PDS
@@ -1640,7 +1590,7 @@ namespace wali
        * This method constructs the NWA that is equivalent to the given PDS.
        *
        * @param - pds: the pds to convert
-       * @param - stuck: the stuck state of the NWA to construct
+       * @param - stuck: dummy parameter
        * @return the NWA equivalent to the given PDS
        *
        */
@@ -1664,6 +1614,7 @@ namespace wali
        *
        */ 
       wpds::WPDS NWAtoPDSreturns( WeightGen & wg ) const;
+      
       /**
        *
        * @brief constructs the PDS equivalent to this NWA
@@ -1692,7 +1643,8 @@ namespace wali
        * @return the backwards PDS equivalent to this NWA
        *
        */ 
-      wpds::WPDS NWAtoBackwardsPDSreturns( WeightGen & wg ) const;  
+      wpds::WPDS NWAtoBackwardsPDSreturns( WeightGen & wg ) const;
+      
       /**
        *
        * @brief constructs the backwards PDS equivalent to this NWA
@@ -1723,6 +1675,7 @@ namespace wali
        *
        */ 
       wpds::WPDS NWAtoPDScalls( WeightGen & wg ) const;
+      
       /**
        *
        * @brief constructs the PDS equivalent to this NWA
@@ -1752,7 +1705,8 @@ namespace wali
        * @return the backwards PDS equivalent to this NWA
        *
        */ 
-      wpds::WPDS NWAtoBackwardsPDScalls( WeightGen & wg ) const; 
+      wpds::WPDS NWAtoBackwardsPDScalls( WeightGen & wg ) const;
+      
       /**
        *
        * @brief constructs the backwards PDS equivalent to this NWA
@@ -1782,8 +1736,8 @@ namespace wali
        */
       bool isEmpty( ) const;
 
+      
       /**
-       *
        * @brief tests whether the language of the first NWA is included in the language of 
        *        the second NWA
        *
@@ -1811,7 +1765,7 @@ namespace wali
 
       /**
        *
-       * @brief tests whether the languages of the given NWAs are equivalent
+       * @brief tests whether the languages of the given NWAs are equal
        *
        * This method tests the equivalence of the languages accepted by the given NWAs.
        *
@@ -2215,9 +2169,17 @@ namespace wali
       //    if we did, what would the weight gen of the wpds be?
 
     public:
+      /// @brief Determines whether word is in the language of the given NWA.
+      ///
+      /// @returns true if 'word' is in L(this), and false otherwise.
       bool
       isMemberNondet( ::wali::nwa::NestedWord const & word ) const;
 
+
+      /// @brief Adds all states, symbols, and transitions from 'rhs' to 'this'.
+      ///
+      /// This is like unionNWA(), except that it doesn't modify the initial
+      /// or accepting states.
       void combineWith(NWARefPtr rhs);
     };
 
