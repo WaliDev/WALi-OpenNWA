@@ -1,78 +1,26 @@
-from summary import ERROR, WARNING, MESSAGE
-import compilers
+Import('ProgEnv')
 
-Import('env')
-env = env.Clone()
-
-# Set CCFLAGS and LINKFLAGS
-
-if env['CC']=='gcc':
-    cc = compilers.GCC()
-elif env['CC']=='cl':
-    cc = compilers.MSVC()
-else:
-    WARNING('Unknown compiler; will have incorrect CCFLAG settings')
-
-#cc.set_flag(compilers.warnings.VERY_HIGH)
-cc.set_flag(compilers.warnings.HIGH)
-cc.set_flag(compilers.debugging.ON)
-cc.set_flag(compilers.language.CXX)
-
-#cc.set_define('GOOGLE_GLOG_DLL_DECL', '')
+env = ProgEnv.Clone()
 
 
-env['CCFLAGS'] = cc.get_cflags()
-env['LINKFLAGS'] = cc.get_linkflags()
-
-env.Append(CPPPATH=['#/src', '#/third-party/wali/Source'],
-           LIBS="wali",
-           LIBPATH='#/third-party/wali/lib64')
-
-#env.Append(LIBS=[glog_name, wali_name, waliparse_name, 'xerces-c', buddy_name, ],
-#           LIBPATH=[glog_lib,
-#                    wali_lib,
-#                    'third-party/wali/AddOns/Parse/ThirdParty/xerces-c-3.1.1-x86-linux-gcc-3.4/lib',
-#                    '/u/d/r/driscoll/.local/lib',
-#                    '/u/d/r/driscoll/.local/64/lib',
-#                    buddy_lib],
-#           CPPPATH=[glog_include,
-#                    '#/third-party/wali/Source',
-#                    '#/third-party/wali/AddOns/Parse/Source',
-#                    '#/third-party/wali/AddOns/Parse/ThirdParty/xerces-c-64/include',
-#                    '#/third-party/buddy-2.4/src'])
+#pnwas=env.Object('ProcedureNWAs.o', 'ProcedureNWAs.cpp')
+#fst=env.Object('OpenFstInterop.o', 'OpenFstInterop.cpp')
 
 
-if env['CC']=='cl':
-    env['LINKFLAGS'] += '/LTCG /STACK:0x2000000'
-    env['CCFLAGS'] += ' /MD /O2 /GL'
+built = [
+    #env.Program('ffe_fsm_to_nwa.exe', ['ffe_fsm_to_nwa.cpp'])
+    env.Program('print-dot.exe', ['print-dot.cpp']),
+    #env.Program('enrich.exe', ['enrich.cpp', '#/src/enrich_nwa_calls.cpp']),
+    env.Program('synch-alphabet.exe', ['synch-alphabet.cpp']),
+    env.Program('determinize.exe', ['determinize.cpp']),
+    env.Program('complement.exe', ['complement.cpp']),
+    env.Program('intersect.exe', ['intersect.cpp']),
+    env.Program('is-empty.exe', ['is-empty.cpp']),
+    env.Program('is-member.exe', ['is-member.cpp']),
+    #env.Program('join-procedures.exe', ['join-procedures.cpp', pnwas, fst])
+]
 
-# Add our header and library paths
-
-#env.Append(LIBS=['libglog_static',
-#                 'WALi',
-#		 'Parse',
-#		 ],
-#           LIBPATH=['#/third-party/glog-0.3.0/x64/Release',
-#                    '#/third-party/wali/Projects/WALi.vs80/x64/release'],
-#           CPPPATH=['#/third-party/glog-0.3.0/src/windows',
-#                    '#/third-party/wali/Source',
-#                    '#/third-party/wali/AddOns/Parse/Source',
-#                    '#/third-party/wali/AddOns/Parse/ThirdParty/xerces-c-64/include'])
-
-
-#env.Program('ffe_fsm_to_nwa.exe', ['ffe_fsm_to_nwa.cpp'])
-env.Program('print-dot.exe', ['print-dot.cpp'])
-env.Program('enrich.exe', ['enrich.cpp', '#/src/enrich_nwa_calls.cpp'])
-env.Program('synch-alphabet.exe', ['synch-alphabet.cpp'])
-env.Program('determinize.exe', ['determinize.cpp'])
-env.Program('complement.exe', ['complement.cpp'])
-env.Program('intersect.exe', ['intersect.cpp'])
-env.Program('is-empty.exe', ['is-empty.cpp'])
-env.Program('is-member.exe', ['is-member.cpp'])
-
-pnwas=env.Object('ProcedureNWAs.o', '../third-party/wali/Source/wali/nwa/ProcedureNWAs.cpp')
-fst=env.Object('OpenFstInterop.o', '../third-party/wali/Source/wali/nwa/OpenFstInterop.cpp')
-env.Program('join-procedures.exe', ['join-procedures.cpp', pnwas, fst])
+Return('built')
 
 # Yo emacs!
 # Local Variables:

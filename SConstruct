@@ -45,9 +45,11 @@ elif arch in SixtyFourBitAliases:
 
 if Is64:
     LibInstallDir  = os.path.join(WaliDir,'lib64')
+    BinInstallDir  = os.path.join(WaliDir,'bin64')
     BuildDir       = os.path.join(WaliDir,'_build64')
 else:
     LibInstallDir  = os.path.join(WaliDir,'lib')
+    BinInstallDir  = os.path.join(WaliDir,'bin')
     BuildDir       = os.path.join(WaliDir,'_build')
 
 
@@ -83,6 +85,7 @@ if Debug:
 Export('Debug')
 Export('WaliDir')
 Export('LibInstallDir')
+Export('BinInstallDir')
 Export('BuildDir')
 Export('MkStatic')
 Export('BaseEnv')
@@ -108,7 +111,8 @@ Export('ProgEnv')
 if 'help' not in COMMAND_LINE_TARGETS:
     ## ##################
     ## libwali
-    built = SConscript('Source/SConscript', variant_dir=BuildDir,duplicate=0)
+    built = SConscript('Source/SConscript', variant_dir=os.path.join(BuildDir,'lib'), duplicate=0)
+    #built += SConscript('Source/bin/SConscript', variant_dir=os.path.join(BuildDir,'bin'), duplicate=0)
     #built += SConscript('Doc/tex/SConscript')
 
     ## ##################
