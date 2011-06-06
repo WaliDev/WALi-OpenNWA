@@ -452,55 +452,6 @@ namespace wali
       }
       
 
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      bool getSymbol( State from, State to, Symbol & sym ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      bool findTrans( State from, Symbol sym, State to ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      const  SymbolSet getSymbols( State source, State target ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      const  SymbolSet getSymbolsFrom( State source ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      const  SymbolSet getSymbolsTo( State target ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      void getPredecessors( State state,  StateSet & preds ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      const  StateSet getPredecessors( State state ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      void getPredecessors( Symbol symbol, State state,  StateSet & preds ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      const  StateSet getPredecessors( Symbol symbol, State state ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      void getSuccessors( State state,  StateSet & succs ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      const  StateSet getSuccessors( State state ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      void getSuccessors( State state, Symbol symbol,  StateSet & succs ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      const  StateSet getSuccessors( State state, Symbol symbol ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      const  SymbolSet getCallRetSymbols( State call, State ret ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      const  SymbolSet getCallRetSymbolsFrom( State call ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      const  SymbolSet getCallRetSymbolsTo( State ret ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      void getCallPredecessors( State state,  StateSet & c_preds ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      const  StateSet getCallPredecessors( State state ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      void getCallPredecessors( Symbol symbol, State state,  StateSet & c_preds ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      const  StateSet getCallPredecessors( Symbol symbol, State state ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      void getCallSuccessors( State state,  StateSet & c_succs ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      const  StateSet getCallSuccessors( State state ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      void getCallSuccessors( State state, Symbol symbol,  StateSet & c_succs ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/transitions.hpp")
-      const  StateSet getCallSuccessors( State state, Symbol symbol ) const;
-
       
       /**
        *    
@@ -573,32 +524,6 @@ namespace wali
       
 
       //Call Transitions
-
-      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
-      const  StateSet getCallSites_Sym( Symbol symbol ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
-      const  StateSet getCallSites( Symbol symbol, State entryPoint ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
-      const  std::set<std::pair<State,Symbol> > getCallSites( State entryPoint ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
-      const  StateSet getCallSites( ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
-      const  SymbolSet getCallSym( ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
-      const  SymbolSet getCallSym( State callSite, State entryPoint ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
-      const  SymbolSet getCallSym_Call( State callSite ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
-      const  SymbolSet getCallSym_Entry( State entryPoint ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
-      const  StateSet getEntries_Sym( Symbol symbol ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
-      const  StateSet getEntries( State callSite, Symbol symbol ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
-      const  std::set<std::pair<Symbol,State> > getEntries( State callSite ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/calls.hpp")
-      const  StateSet getEntries( ) const;
-
 
       /**
        *
@@ -675,31 +600,6 @@ namespace wali
 
       //Internal Transitions
 
-      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
-      const  StateSet getSources_Sym( Symbol symbol ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
-      const  StateSet getSources( Symbol symbol, State target ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
-      const  std::set<std::pair<State,Symbol> > getSources( State target ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
-      const  StateSet getSources( ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
-      const  SymbolSet getInternalSym( ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
-      const  SymbolSet getInternalSym( State source, State target ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
-      const  SymbolSet getInternalSym_Source( State source ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
-      const  SymbolSet getInternalSym_Target( State target ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
-      const  StateSet getTargets_Sym( Symbol symbol ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
-      const  StateSet getTargets( State source, Symbol symbol ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
-      const  std::set<std::pair<Symbol,State> > getTargets( State source ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/internals.hpp")
-      const  StateSet getTargets( ) const;
-
       /**
        *
        * @brief add an internal transition to the NWA
@@ -774,72 +674,6 @@ namespace wali
 
       //Return Transitions
 
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  StateSet getExits_Sym( Symbol symbol ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  StateSet getExits( State callSite, Symbol symbol, State returnSite ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  std::set<std::pair<State,Symbol> > getExits( State callSite, State returnSite ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  StateSet getExits( ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  StateSet getExits_Call( State callSite, Symbol symbol ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  std::set<std::pair<State,Symbol> > getExits_Call( State callSite ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  StateSet getExits_Ret( Symbol symbol, State returnSite ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  std::set<std::pair<State,Symbol> > getExits_Ret( State returnSite ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  StateSet getCalls_Sym( Symbol symbol ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  StateSet getCalls( State exitPoint, Symbol symbol, State returnSite ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  std::set<std::pair<State,Symbol> > getCalls( State exitPoint, State returnSite ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  StateSet getCalls( ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  StateSet getCalls_Exit( State exitPoint, Symbol symbol ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  std::set<std::pair<State,Symbol> > getCalls_Exit( State exitPoint ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  StateSet getCalls_Ret( Symbol symbol, State returnSite ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  std::set<std::pair<State,Symbol> > getCalls_Ret( State returnSite ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  SymbolSet getReturnSym( ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  SymbolSet getReturnSym( State exitPoint, State callSite, State returnSite ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  SymbolSet getReturnSym_Exit( State exitPoint ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  SymbolSet getReturnSym_Call( State callSite ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  SymbolSet getReturnSym_Ret( State returnSite ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  SymbolSet getReturnSym_ExitCall( State exitPoint, State callSite ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  SymbolSet getReturnSym_ExitRet( State exitPoint, State returnSite ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  SymbolSet getReturnSym_CallRet( State callSite, State returnSite ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  StateSet getReturns_Sym( Symbol symbol ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  StateSet getReturns( State exitPoint, State callSite, Symbol symbol ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  std::set<std::pair<Symbol,State> > getReturns( State exitPoint, State callSite ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  StateSet getReturns(  ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  StateSet getReturns_Exit( State exitPoint, Symbol symbol ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  std::set<std::pair<Symbol,State> > getReturns_Exit( State exitPoint ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  StateSet getReturns_Call( State callSite, Symbol symbol ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  std::set<std::pair<Symbol,State> > getReturns_Call( State callSite ) const;
-      DEPRECATE("Use free function version in wali/nwa/query/returns.hpp")
-      const  StateSet getReturnSites( State callSite ) const;
 
       /**
        *
