@@ -167,7 +167,6 @@ namespace wali
        * @brief returns the number of states associated with this NWA
        *
        * This method returns the number of states associated with this NWA. 
-       * Note: This count does include the stuck state if there is one.
        *
        * @return the number of states associated with this NWA
        *
@@ -568,8 +567,6 @@ namespace wali
        *
        * This method removes all transitions from the NWA.  It does not remove any states
        * or symbols from the NWA.
-       * Note: This method modifies (implicit) transitions, so it cannot be called on an 
-       *        NWA with no stuck state.
        *
        */
       void clearTrans( );
@@ -711,7 +708,6 @@ namespace wali
        * information and adds it to the transition set for the NWA.  If the internal 
        * transition already exists in the NWA, false is returned. Otherwise, true is 
        * returned.
-       * Note: 'from' cannot be the stuck state unless 'to' is as well
        *
        * @param - from: the state the edge departs from
        * @param - sym: the symbol labeling the edge
@@ -728,7 +724,6 @@ namespace wali
        * This method adds the given internal transition to the transition set for the NWA.
        * If the internal transition already exists in the NWA, false is returned. Otherwise, 
        * true is returned.
-       * Note: the from state cannot be the stuck state unless the to state is as well
        *
        * @param - it: internal transition to add to the NWA
        * @return false if the internal transition already exists in the NWA
@@ -971,7 +966,7 @@ namespace wali
        *
        * @param - first: the NWA to union with 'second'
        * @param - second: the NWA to union with 'first'
-       * @param - stuck: the stuck state of the NWA to be constructed
+       * @param - stuck: dummy variable
        * @return the NWA resulting from the union of the given NWAs
        *
        */
@@ -1012,7 +1007,7 @@ namespace wali
        *
        * @param - first: the NWA to intersect with 'second'
        * @param - second: the NWA to intersect with 'first'
-       * @param - stuck: the stuck state of the NWA to be constructed
+       * @param - stuck: dummy variable
        * @return the NWA resulting from the intersection of the given NWAs
        *	
        */
@@ -1508,15 +1503,10 @@ namespace wali
        *
        * This method constructs the WPDS which allows WPDS reachability to be used to 
        * perform property checking using this NWA and the given WPDS.
-       * Note: For now we are assuming that implicit transitions to the stuck state need to be 
-       *       realized for this construction to work.  Therefore, this method can only be called
-       *       on an NWA of type 1 and afterwards it is an NWA of type 2.
-       *
        *
        * @param - base: the WPDS that forms the basis for the constructed WPDS
        * @return the WPDS which can be used to perform property checking using PDS 
        *          reachability
-       * 
        */
       wpds::WPDS plusWPDS( const wpds::WPDS & base, State stuck ); 
       /**
@@ -1526,16 +1516,11 @@ namespace wali
        *
        * This method constructs the WPDS which allows WPDS reachability to be used to 
        * perform property checking using this NWA and the given WPDS.
-       * Note: For now we are assuming that implicit transitions to the stuck state need to be 
-       *       realized for this construction to work.  Therefore, this method can only be called
-       *       on an NWA of type 1 and afterwards it is an NWA of type 2.
-       *
        *
        * @param - base: the WPDS that forms the basis for the constructed WPDS
        * @param - nwa: the NWA to process
        * @return the WPDS which can be used to perform property checking using PDS 
        *          reachability
-       * 
        */
       static wpds::WPDS plusWPDS( const wpds::WPDS & base, NWA & nwa, State stuck )
       {
