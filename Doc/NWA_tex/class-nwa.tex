@@ -37,10 +37,10 @@ Counting each kind of transition separately, this gives 7 kinds of
 
 For each kind of entity, there are \texttt{NWA} member functions to add and
 remove a single entity, check whether a particular entity is in the
-automaton, count the number of entities of a particular type, removing all
-entities of a particular type, and retrieving the set of entities in the
+automaton, count the number of entities of a particular type, remove all
+entities of a particular type, and retrieve the set of entities in the
 NWA. In addition, there are member functions for counting and clearing all
-transitions, regardless of of the type.
+transitions, regardless of the type.
 
 The names of these functions are very regular, but
 \tableref{simple-functions} gives a list.
@@ -65,7 +65,7 @@ symbols\tnote{2} &  addSymbol(Symbol sym)                   &  removeSymbol(Symb
                                                                                                                                                                                              \{begin,end\}Symbols()         \\
 \hline %---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 all \newline
-transitions      &  ---                                     &  findTrans(State s1, Symbol sym, State s2)&  ---                       &  sizeTrans()          &  cleanTrans()              &  ---                           \\
+transitions      &  ---                                     &  findTrans(State s1, Symbol sym, State s2)&  ---                       &  sizeTrans()          &  clearTrans()              &  ---                           \\
 internal \newline
 transitions      &  addInternalTrans(\phantom{.}...\tnote{6}\phantom{a})
                                                             &  removeInternalTrans(\phantom{.}...\tnote{6}\phantom{a})
@@ -94,8 +94,8 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
     epsilon or wild.
   \item[3] These functions return a \texttt{bool} with the natural
     interpretation.
-  \item[4] The functions listed as, e.g., ``\{begin,end\}States()'' is a pair
-    of functions each of which returns an iterator. The type of that iterator
+  \item[4] The entries of the form, e.g., ``\{begin,end\}States()'' denote a pair
+    of functions, each of which returns an iterator. The type of that iterator
     depends on the function, but is either a \texttt{NWA::StateIterator},
     \texttt{NWA::SymbolIterator}, \texttt{NWA::CallIterator},
     \texttt{NWA::InternalIterator}, or \texttt{NWA::ReturnIterator}. All are
@@ -106,13 +106,13 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
     clears all transitions.)
   \item[6] There are two overloads of each of these functions. The first
     takes each element of the transition tuple individually,
-    e.g. \texttt{addInternalTrans(State src, State sym, State tgt)}. The
-    second takes a (constant reference to a) \texttt{NWA::Internal},
+    e.g., \texttt{addInternalTrans(State src, State sym, State tgt)}. The
+    second takes a (constant reference to an) \texttt{NWA::Internal},
     \texttt{NWA::Call}, or \texttt{NWA::Return} object (as
     appropriate). (These are typedefs of a \texttt{Triple} or \texttt{Quad}
     of the appropriate type.)
 \end{tablenotes}
-\caption{Table of functions for accessing and maniuplating elements
+\caption{Table of functions for accessing and manipulating elements
   of NWAs. All are members of the \texttt{NWA} class. \TODO{Fix footnote
     numbering}}
 \label{Ta:simple-functions}
@@ -129,7 +129,7 @@ does not cause rippling effects, however.)
 Adding a transition implicitly adds the states and symbol involved in that
 transition if they are not already present; hence it is not necessary to
 explicitly add all states and symbols before adding transitions. (It is quite
-reasonable to simply add accepting states, add final states, and add
+reasonable to build an NWA by just adding initial states, final states, and
 transitions.)
 
 
@@ -138,8 +138,8 @@ The system supports two meta-symbols: \texttt{wali::WALI\_EPSILON}
 \texttt{WALI\_EPSILON} is the standard $\epsilon$ from automata theory; it
 denotes the situation in which a transition can be traversed without matching
 and consuming an input symbol.  Epsilon symbols cannot label call or return
-transitions. \texttt{WALI\_WILD} is the `any' symbol; matches a single input
-symbol of any kind.  Since the NWA alphabet is not fixed, the actual symbols
+transitions. \texttt{WALI\_WILD} is the `any' symbol; it matches a single input
+symbol of any kind.  Because the NWA alphabet is not fixed, the actual symbols
 that \texttt{WALI\_WILD} stands for is fluid.  \textsl{Note:}
 \texttt{WALI\_EPSILON} and \texttt{WALI\_WILD} are not explicit
 elements of $\Sigma$; see \tableref{simple-functions}, footnote 2. \TODO{Fix
@@ -157,15 +157,16 @@ information. To utilize this functionality, client code must subclass
 Once done, client information can be attached or retrieved using the
 following two functions (both members of \texttt{NWA}):
 \begin{description}
-  \item\texttt{ref\_ptr<ClientInfo> getClientInfo( Key st ) const} \nopagebreak
+  \item[\texttt{ref\_ptr<ClientInfo> getClientInfo( Key st ) const}]
     Allows the user to access the client-specific information associated with
     the given state, \texttt{st}.
-  \item\texttt{void setClientInfo( Key st, ref\_ptr<ClientInfo> ci )} \nopagebreak
+  \item[\texttt{void setClientInfo( Key st, ref\_ptr<ClientInfo> ci )}]
     Allows the user to specify the client-specific information, \texttt{ci},
     associated with the given state, \texttt{st}. \\
 \end{description}
 Client information is tracked through the use of \texttt{ref\_ptr}s, so the
-programmer must be wary of aliasing and lifetime considerations.
+programmer must consider the standard aliasing and lifetime considerations
+imposed by using smart pointers.
 
 
 In addition, you may wish to subclass \texttt{NWA} itself. There are several

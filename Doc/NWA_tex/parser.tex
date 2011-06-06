@@ -1,12 +1,18 @@
 \section{NWA serialization}
 \label{Se:serialization}
 
+\newenvironment{grammar}{\begin{equation*}\begin{array}{lrl}}{\end{array}\end{equation*}}
+\newcommand{\nonterm}[1]{\ensuremath{\langle}\textit{#1}\ensuremath{\rangle}}
+\newcommand{\term}[1]{\textrm`\texttt{#1}\textrm'}
+\newcommand{\cfgsp}{\ \ }
+
+
 It is possible to serialize an NWA in two different supported
 formats.
 
 The first is a description language of our own creation, described in
-most of the rest of this section. We also provide a parser, with minor
-caveats, for this format. The grammar the parser uses is defined
+most of the rest of this section. We also provide a parser for this format,
+with minor caveats. The grammar that the parser uses is defined
 formally in \sectref{nwa-grammar}.
 
 The second is output in Graphviz Dot format. The output is
@@ -14,27 +20,27 @@ natural. The color of an edge denotes the type of a transition: black
 edges are internal transitions, green edges are call transitions, and
 red edges are return transitions. Return transitions are labeled with
 both the symbol for that transition and the call predecessor. (The
-result of each Dot graph includes a key as a reminder for what the
+result of each Dot graph includes a key as a reminder of what the
 colors mean.) Because it is possible to wind up with extremely long
 key names (especially in a determinized NWA) that can essentially
-destroy any ability of Dot to render useful output, by default any
+destroy the ability of Dot to render useful output, by default any
 state names longer than 20 characters are replaced by the numerical
 value; this behavior can be changed however.
 
-There is a member function which produces both types of output:
+There is a member function to produce each type of output:
 \begin{description}
-  \item\texttt{std::ostream\& NWA::print(std::ostream \& stream) const}
+  \item[\texttt{std::ostream\& NWA::print(std::ostream \& stream) const}]
     Writes the custom output described in this section
     to \texttt{stream}, returning \texttt{stream}.
     (This method is actually inherited from
     the \texttt{wali::Printable} abstract class.)
 
-  \item\texttt{std::ostream\& NWA::print\_dot(std::ostream \& stream,
-    std::string const \& name, bool abbreviate = true)} Outputs a Dot
-    description of the NWA to the given stream. The name of the graph
-    (\textsl{digraph "blah" \{...}) is given
-    by \texttt{name}. Finally, if \texttt{abbreviate} is set
-    to \texttt{false}, the abbreviation step above for state names is
+  \item[\texttt{std::ostream\& NWA::print\_dot(ostream \& os,
+    std::string const \& n, bool abbrev = true)}] Outputs a Dot
+    description of the NWA to the stream \texttt{os}, returning \texttt{os}.
+    The name of the graph (\texttt{digraph "n" \{...\}}) is given
+    by \texttt{n}. Finally, if \texttt{abbrev} is set
+    to \texttt{false}, the aforementioned abbreviation step above for state names is
     not done. Use this freedom at your peril.
 \end{description}
 
@@ -45,22 +51,22 @@ The NWA library contains a semi-experimental parser for descriptions of
 NWAs. The format is described below, and matches the result of calling
 \texttt{NWA::print(std::ostream \&)}, provided that the result of
 calling \texttt{key2str} on the state and symbol keys produces strings
-that match the description of \textsl{actual-names} in this grammar.
+that match the description of \nonterm{actual-names} in this grammar.
 
 \textsl{Note:} This is experimental code; in particular, the
 error-handling in it is basically non-existent. We detect when the
-input doesn't match the grammar, but we signal such input failures
+input does not match the grammar, but we signal such input failures
 with assertion violations. In a future version of the library, we will
 report errors more gracefully, almost certainly through exceptions.
 
-There are two functions which parse NWA descriptions:
+There are two functions that parse NWA descriptions:
 \begin{itemize}
   \item\texttt{NWARefPtr read\_nwa(std::istream \&, std::string * name = NULL)}
   \item\texttt{std::map$<$std::string, NWARefPtr$>$ read\_nwa\_proc\_set(std::istream \&)}
 \end{itemize}
 A stream may contain descriptions of one or more automata; the first
-function reads one, and the second function reads all.  (The return
-type of the second function has a typedef name of
+function reads a single description, and the second function reads all.  (The return
+type of the second function is \texttt{typedef}ed to the name
 \texttt{ProcedureMap}.)
 
 The former function reads the first description of an NWA from the
@@ -70,7 +76,7 @@ name is stored in the string pointed to by \texttt{name}.
 
 The second function reads the entire input stream. It returns a map
 from the name of each automaton specification to the parsed NWA. (This
-form was originally created to read NWAs for an entire program, witch
+form was originally created to read NWAs for an entire program formatted with
 each procedure in a separate NWA. The name of each NWA was the name of
 the procedure in the original program.)
 
@@ -85,7 +91,7 @@ format is accepted.
   \begin{tabular}{|p{1.75in}|}
     \verbatiminput{Figures/nwa-simple.nwa}
   \end{tabular}
-  \caption{A simple NWA example}
+  \caption{A simple NWA example. \TODO{Remove vertical rules}}
   \label{Fi:nwa-simple}
 \end{figure}
 
@@ -94,7 +100,7 @@ format is accepted.
   \begin{tabular}{|p{5.5in}|}
     \verbatiminput{Figures/nwa-mattf.nwa}
   \end{tabular}
-  \caption {A more complex NWA}
+  \caption {A more complex NWA. \TODO{Remove vertical rules}}
   \label{Fi:nwa-mattf}
 \end{figure}
 
@@ -104,29 +110,25 @@ format is accepted.
 This section describes the grammar of the file format.
 
 \textsl{Note:} Some characteristics in the following have the
-following as part of their description: ``you should not depend on
+following as part of their description: ``you should not rely on
 this.'' In such cases, we reserve the right to change this behavior in
 future versions and to not feel bad about it.
 
 \textsl{Note:} The NWA parser has unit tests embedded in the code. (It
-does not use any unit test framework.) These tests can be run by
+does not use any unit-test framework.) These tests can be run by
 calling \texttt{wali::nwa::parser\_test\_all}. The file
 \texttt{NwaParserMain.cpp} is a short program that does this.
 
 
-The grammar for an NWA is as follows. In order to accept a couple
+The grammar for an NWA is as follows. In order to accept a couple of
 slightly different output formats we have used in the past, there are
 some choices in whether braces are present and other aspects.
 
 
 A single input stream can contain either a single NWA (just a series
 of blocks) or multiple NWAs. If you would like to describe multiple
-NWAs, each individual starts with the literal \textsl{nwa}.
+NWAs, each individual starts with the literal \texttt{nwa}.
 
-\newenvironment{grammar}{\begin{equation*}\begin{array}{lrl}}{\end{array}\end{equation*}}
-\newcommand{\nonterm}[1]{\ensuremath{\langle}\textit{#1}\ensuremath{\rangle}}
-\newcommand{\term}[1]{\textrm`\texttt{#1}\textrm'}
-\newcommand{\cfgsp}{\ \ }
 
 \begin{grammar}
   \nonterm{nwa-description} & ::= & \left(\term{nwa}\cfgsp\nonterm{name}?\cfgsp\term{:}?\right)?\cfgsp\term{\{}?\cfgsp\nonterm{block}{+}\cfgsp\term{\}}?
@@ -134,8 +136,8 @@ NWAs, each individual starts with the literal \textsl{nwa}.
 
 \textsl{Braces are required if 'nwa' is present and the name is absent}
  in order to
- distinguish the first block header (\textsl{Q:}, \textsl{Q0:},
- or \textsl{Qf:}) from the name of the NWA.
+ distinguish the first block header (\texttt{Q:}, \texttt{Q0:},
+ or \texttt{Qf:}) from the name of the NWA.
 
 An NWA is a sequence of blocks; each block specifies one or more
 states, symbols, or transitions.
@@ -147,16 +149,16 @@ states, symbols, or transitions.
 \end{grammar}
 
 Blocks of the same type can be repeated; e.g. it is perfectly fine to
-specify all transitions in one block (as in \figref{nwa-mattf},
+specify all transitions in one block (as in \figref{nwa-mattf}),
 one block per transition (as in \figref{nwa-simple}), or
-anywhere in between. The ``block header'' specifies what kind of block
+any mixture. The ``block header'' specifies what kind of block
 it is, and the body is a comma-separated list of whatever entity the
-block header specifies (e.g. states). The body may be surrounded by
+block header specifies (e.g., states). The body may be surrounded by
 curly braces, but they are not required unless the body is empty.
 
 If a block specifies states, it can specify just that a state is
 present, an initial state, or an accepting state; these are denoted by
-the block headers \textsl{Q:}, \textsl{Q0:}, and \textsl{Qf:}
+the block headers \texttt{Q:}, \texttt{Q0:}, and \texttt{Qf:},
 respectively.
  
 \begin{grammar}
@@ -166,9 +168,9 @@ respectively.
 \end{grammar}
 
 (It is not necessary to explicitly list all states; if a state is
-listed in a transition, it is implicitly added to the machine if
-needed. Thus it is quite possible to have a machine description with
-no \textsl{Q:} blocks.)
+listed in a transition, it is implicitly added to the machine as
+needed. Thus, it is quite possible to have a machine description with
+no \texttt{Q:} blocks.)
 
 A name-list is simply a comma-separate list of names of states.
 
@@ -176,14 +178,14 @@ A name-list is simply a comma-separate list of names of states.
   \nonterm{name-list} & ::= & (\nonterm{name}\cfgsp (\term{,}\cfgsp  \nonterm{name})*)?
 \end{grammar}
 
-Recall that If the list is empty, it must be followed by a \textsl{\}}
+Recall that if the list is empty, it must be followed by a \texttt{\}}
 (or EOF) to distinguish the next block header from the name of a
 state.
 
-The grammar for \textsl{name} will be specified below.
+The grammar for \nonterm{name} will be specified below.
 
 
-Symbol blocks are just like name blocks, except they specify symbol
+Symbol blocks are just like name blocks, except that they specify symbol
 names. The block header is simply 'sigma'.
 
 \begin{grammar}
@@ -191,8 +193,8 @@ names. The block header is simply 'sigma'.
 \end{grammar}
 
 A transition block can be for internal, call, or return transitions,
-denoted by the block headers \textsl{delta\_i}, \textsl{delta\_c}, and
-\textsl{delta\_r}, respectively.
+denoted by the block headers \texttt{delta\_i}, \texttt{delta\_c}, and
+\texttt{delta\_r}, respectively.
  
 \begin{grammar}
   \nonterm{delta-block} & ::= & \term{delta\_i:}\cfgsp  \term{\{}?\cfgsp  \nonterm{triple-list}\cfgsp  \term{\}}? \\
@@ -221,8 +223,8 @@ format grew organically and we wished to keep compatibility with
 existing log files (which could previously not be automatically parsed
 but which we could look at), the `name' terminal is a bit convoluted.
 
-The name consists of the \textsl{actual} name of the state or symbol
-in question, followed by an optional parenthesis-delimited token which
+The name consists of the actual name of the state or symbol
+in question, followed by an optional parenthesis-delimited token that
 is ignored. (In some of our output, the name is the result of
 \texttt{key2str} and the optional token is the actual numeric value of
 the key.)
@@ -231,11 +233,12 @@ the key.)
   \nonterm{name} & ::= &  \nonterm{actual-name}\cfgsp  \nonterm{dummy-token}?
 \end{grammar}
 
-The $\nonterm{actual-name}$ portion generally behaves like a standard-programming
-language identifier, but with one important difference: it can contain
+The $\nonterm{actual-name}$ portion generally behaves like a standard
+programming-language identifier, but with one important difference: it can
+contain
 balanced parentheses, and \textsl{any} characters are allowed within a
 set of parentheses. (We actually allow a larger set of characters than
-is typical, but you should not depend on this. Surround your names
+is typical, but you should not rely on this. Surround your names
 with parentheses if you use ``special'' characters.)
 
 We can now define the effective grammar. A `unit' is a letter or
@@ -262,5 +265,5 @@ parenthesis group.
 \end{grammar}
 
 (Finally, we do not currently demand that the \textsl{types} of parens
-  match up: e.g. \texttt{(1, 2, 3]} is a valid name. You should not
-    depend on this feature.)
+  match up: e.g., \texttt{(1, 2, 3]} is a valid name. You should not
+    rely on this feature.)

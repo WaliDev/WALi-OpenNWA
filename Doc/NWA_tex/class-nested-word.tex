@@ -14,7 +14,7 @@ calls and returns.
 
 A position in the word is represented by the (nested) structure
 \texttt{NestedWord::Position}. \texttt{Position} itself declares an
-enumeration \texttt{Type} which is one of \texttt{CallType},
+enumeration \texttt{Type}, which has the possible values \texttt{CallType},
 \texttt{InternalType}, or \texttt{ReturnType}.
 A \texttt{Position} object has two (public) fields: \texttt{Symbol symbol}
 and \texttt{Position::Type type}; these hold the symbol at that position and
@@ -23,15 +23,12 @@ the type of the position.
 
 The \texttt{NestedWord} class has just six functions:
 \begin{description}
-  \item\texttt{appendInternal(Symbol s)}
-  \item\texttt{appendCall(Symbol s)}
-  \item\texttt{appendReturn(Symbol s)}
+  \item[\texttt{appendInternal(Symbol s)}, \texttt{appendCall(Symbol s)}, and \texttt{appendReturn(Symbol s)}]
     These append the symbol \texttt{s} to the linear word, and annotate that
     position as an internal, call, or return position, respectively.
-  \item\texttt{append(Position p)}
+  \item[\texttt{append(Position p)}]
     Appends \texttt{p} to the word.
-  \item\texttt{begin()}
-  \item\texttt{end()}
+  \item[\texttt{begin()} and \texttt{end()}]
     These return a \texttt{NestedWord::const\_iterator} to the start or end
     of the nested word. The type returned by dereferencing these iterators is
     a \texttt{Position} object. (There is no non-const version of these

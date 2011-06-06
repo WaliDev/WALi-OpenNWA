@@ -3,13 +3,13 @@
 \label{Se:Conversions}
 
 
-It is possible to both convert from a WALi WPDS to an NWA and vice versa.
+It is possible to convert a WALi WPDS to an NWA and vice versa.
 However, the construction of an NWA from a WPDS is not the inverse
 of constructing a WPDS from an NWA, i.e., one cannot perform the two
 conversions in sequence and obtain the identity conversion.
 
 At a high level, these operations work by making the NWA track both the state
-of the PDS and it's top-of-stack symbol. A PDS rule of the form $\langle
+of the PDS and its top-of-stack symbol. A PDS rule of the form $\langle
 p,q_1 \rangle \hookrightarrow \langle p,q_2 \rangle$ leaves the stack height
 unchanged, and thus is associated with an internal NWA transition; in this
 case, that transition goes from the state $(p,q_1)$ to $(p,q_2)$. The symbol

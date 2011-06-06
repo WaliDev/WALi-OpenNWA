@@ -2,8 +2,7 @@
 \label{Se:namespace-query}
 
 The \texttt{wali::nwa::query} namespace provides functions related to
-querying the structure of an automaton itself as well as various questions
-based on its language.
+querying both the structure and language of an automaton.
 
 In this section, we first discuss how to retrieve information from an
 automaton's transitions (\sectref{query-transitions}) then move on to other
@@ -12,11 +11,11 @@ Following that, we discuss queries about the
 \textsl{language} of an automaton (\sectref{query-language}).
 
 
-\subsection{Querying information from an automaton's transitions}
+\subsection{Querying information about an automaton's transitions}
 \label{Se:query-transitions}
 The \texttt{wali::nwa::query} namespace provides a large number of functions
 for retrieving information about an \texttt{NWA}'s transitions. The questions
-answered by these functions are of the form ``what are all symbols that
+answered by these functions are of the form, e.g., ``what are all symbols that
 appear on a return transition where the call predecessor state is \texttt{s1}
 and the return site state is \texttt{s1}?''
 
@@ -26,16 +25,16 @@ these functions have regular patterns based on the information that is
 known and desired, but the rules for producing the names are perhaps not as
 simple as they could be. Because of this,
 Tabs.~\ref{Ta:query-all-transitions}--\ref{Ta:query-return-transitions}
-provide a quick-lookup of the functions.
+provide a quick reference for the functions.
 
 The tables do not have \textsl{all} the information one needs to know in
-order to call them, and the entries use some shorthand; but they provide enough
-information the specifics can be
+order to call them, and the entries use some shorthands; but they provide enough
+information for specifics to be
 looked up in the header or Doxygen documentation. The caption of each table
 gives the header that contains the functions listed. In the interest of
 space, the types of the function arguments are omitted, but they are likely to
 be what you expect. (The number of arguments is also always sufficient to
-uniquely identify the function since all types are just \texttt{wali::Key}s
+uniquely identify the function because all types are just \texttt{wali::Key}s
 anyway.) Almost all functions return a \texttt{StateSet}, \texttt{SymbolSet},
 or a \texttt{std::set} of pairs of a state and a symbol. (Those that return a
 set of pairs are marked specially.)
@@ -84,8 +83,8 @@ set of pairs are marked specially.)
   in the namespace \texttt{wali::nwa::query}; include the
   file \texttt{wali/nwa/query/transitions.hpp}. For return transitions, the
   ``source'' is the first component of the transition; nothing involving call
-  predecessors (the second component) appears in this sidewaystable. A table
-  entry of ``---'' means that square does not make sense. }
+  predecessors (the second component of return transitions) appears in this table. A table
+  entry of ``---'' means that the combination of arguments does not make sense. }
 \end{threeparttable}
 \label{Ta:query-all-transitions}
 \end{sidewaystable}
@@ -118,10 +117,10 @@ set of pairs are marked specially.)
 \caption{\textbf{Query functions for internal transitions.}
   These functions are in the namespace \texttt{wali::nwa::query};
   include the file \texttt{wali/nwa/query/internals.hpp}.
-  A table entry of ``---'' means that square does not make
+  A table entry of ``---'' means that combinations of arguments does not make
   sense.}
-\label{Ta:query-internal-transitions}
 \end{threeparttable}
+\label{Ta:query-internal-transitions}
 \end{sidewaystable}
 
 \begin{sidewaystable}\sffamily
@@ -154,8 +153,8 @@ set of pairs are marked specially.)
   file \texttt{wali/nwa/query/calls.hpp}. The ``call site'' is the source of the transition (and uses the argument 
   name \texttt{call}), and the ``entry'' of the transition is the target (and
   uses the argument name \texttt{ent}). }
-\label{Ta:query-call-transitions}
 \end{threeparttable}
+\label{Ta:query-call-transitions}
 \end{sidewaystable}
 
 \begin{sidewaystable}\footnotesize\sffamily
@@ -214,16 +213,16 @@ set of pairs are marked specially.)
 \begin{tablenotes}
   \item[1] Returns a set of pairs (a symbol with one of the states, in the order of the raw transition).
 \end{tablenotes}
-\caption{\textbf{Query functions for call transitions.} These functions are in the
+\caption{\textbf{Query functions for return transitions.} These functions are in the
   namespace \texttt{wali::nwa::query}; include the
   file \texttt{wali/nwa/query/returns.hpp}.   The ``exit site'' is the source of the transition
   (the first component) and uses the argument name \texttt{exit} in this table;
   the ``call predecessor'' is the second component and uses the argument
-  name \texttt{call}; the symbol is the third component uses the argument
+  name \texttt{call}; the symbol is the third component and uses the argument
   name \texttt{sym}; the ``return site'' is the fourth component and uses the
   argument name \texttt{ret}. }
-\label{Ta:query-return-transitions}
 \end{threeparttable}
+\label{Ta:query-return-transitions}
 \end{sidewaystable}
 \restoregeometry
 
@@ -240,19 +239,17 @@ These functions are declared in the header
 namespace \texttt{wali::nwa::query}).
 
 \begin{description}
-  \item\texttt{bool isDeterministic(NWA const \& nwa)}
+  \item[\texttt{bool isDeterministic(NWA const \& nwa)}]
     Computes whether the given NWA is deterministic and returns the
     result. \textit{Warning:} The result is not cached in the NWA, and
     as presently-implemented, this function is very
     inefficient. Improvements to this will come in a later version of
     the library.
-  \item\texttt{bool statesOverlap(NWA const \& a, NWA const \& b)}
+  \item[\texttt{bool statesOverlap(NWA const \& a, NWA const \& b)}]
     Comptuers whether the two NWAs share any states and returns the
     result.
 \end{description}
 
-\TODO{Should I even put isDeterministic() in there? I think it's
-  pretty bad. I could fix it, but I'd like to get this out.}
 
 \subsection{Querying properties of an automaton's language}
 \label{Se:query-language}
@@ -265,17 +262,17 @@ The functions that perform standard language-theoretic queries are
 located in namespace \texttt{wali::nwa::query} and are declared in
 \texttt{wali/nwa/query/language.hpp}. They are:
 \begin{description}
-  \item\texttt{bool languageContains(NWA const \& nwa, Nested Word
-    const \& word)} Computes whether \texttt{word} is a member of
+  \item[\texttt{bool languageContains(NWA const \& nwa, Nested Word
+    const \& word)}] Computes whether \texttt{word} is a member of
     \texttt{nwa}'s language, and returns the result. (It simulates the
-    NWA in a nondeterministic fashion, so there is no determinization
-    done.)
-  \item\texttt{bool languageIsEmpty(NWA const \& nwa)} Computes
+    NWA in a nondeterministic fashion; the NWA is not determinized to answer
+    this query.)
+  \item[\texttt{bool languageIsEmpty(NWA const \& nwa)}] Computes
     whether the NWA's language is empty, and returns the result.
-  \item\texttt{bool languageSubsetEq(NWA const \& left, NWA const \& right)}
+  \item[\texttt{bool languageSubsetEq(NWA const \& left, NWA const \& right)}]
     Computes whether $L(\texttt{left}) \subseteq L(\texttt{right})$
     and returns the result.
-  \item\texttt{bool languageEquals(NWA const \& left, NWA const \& right)} 
+  \item[\texttt{bool languageEquals(NWA const \& left, NWA const \& right)}]
     Equivalent to \texttt{languageSubsetEq(left, right) \&\&
     languageSubsetEq(right, left)}
 \end{description}
@@ -283,7 +280,7 @@ located in namespace \texttt{wali::nwa::query} and are declared in
 Finally, there are functions for performing a poststar and prestar
 query on an NWA. These work by converting the NWA to a WPDS (see
 \sectref{Conversions} and, in particular, \sectref{NWAtoPDS}) using
-\texttt{NWAtoPDScalls} then running the query on the PDS.
+the function \texttt{NWAtoPDScalls} then running the query on the PDS.
 
 There are two variants of each. One returns the WFA that results from
 the query, and the other stores the WFA in an output parameter. The
@@ -293,13 +290,13 @@ The functions that perform poststar and prestar are in the namespace
 \texttt{wali::nwa::query} and are declared in the header
 \texttt{wali/nwa/query/weighted.hpp}. They are:
 \begin{description}
-  \item\texttt{WFA prestar( NWA const \& nwa, WFA \& input, WeightGen \& wg )}
-  \item\texttt{void prestar( NWA const \& nwa, WFA \& input, WFA \& output, WeightGen \& wg )}
+  \item[\texttt{WFA prestar( NWA const \& nwa, WFA \& input, WeightGen \& wg )}]
+  \item[\texttt{void prestar( NWA const \& nwa, WFA \& input, WFA \& output, WeightGen \& wg )}]
     Computes the prestar of the configurations specified by
     \texttt{input}, using the weights generated by \texttt{wg}. Either
     returns the result or stores it in the parameter \texttt{output}.
-  \item\texttt{WFA poststar( NWA const \& nwa, WFA \& input, WeightGen \& wg )}
-  \item\texttt{void poststar( NWA const \& nwa, WFA \& input, WFA \& output, WeightGen \& wg )}
+  \item[\texttt{WFA poststar( NWA const \& nwa, WFA \& input, WeightGen \& wg )}]
+  \item[\texttt{void poststar( NWA const \& nwa, WFA \& input, WFA \& output, WeightGen \& wg )}]
     Computes the poststar of the configurations specified by
     \texttt{input}, using the weights generated by \texttt{wg}. Either
     returns the result or stores it in the parameter \texttt{output}.

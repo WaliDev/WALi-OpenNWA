@@ -15,46 +15,46 @@ Each of these functions is in the namespace \texttt{wali::nwa::construct}:
 
 \begin{description}
 
-  \item\texttt{NWARefPtr unionNWA( NWA const \& a, NWA const \& b )}
-  \item\texttt{void unionNWA( NWA \& out, NWA const \& a, NWA const \& b )}
+  \item[\texttt{NWARefPtr unionNWA( NWA const \& a, NWA const \& b )}]
+  \item[\texttt{void unionNWA( NWA \& out, NWA const \& a, NWA const \& b )}]
     Computes the union of the NWAs \texttt{a} and \texttt{b},
     either returning the result or storing it in \texttt{out}.
     See Section
     \ref{Se:Union}.
 
-  \item\texttt{NWARefPtr intersect( NWA const \& a, NWA const \& b )}
-  \item\texttt{void intersect( NWA \& out, NWA const \& a, NWA const \& b )}
+  \item[\texttt{NWARefPtr intersect( NWA const \& a, NWA const \& b )}]
+  \item[\texttt{void intersect( NWA \& out, NWA const \& a, NWA const \& b )}]
     Computes the intersection of the NWAs \texttt{a} and \texttt{b},
     either returning the result or storing it in \texttt{out}.
     See Section \ref{Se:Intersection}.
 
-  \item\texttt{NWARefPtr concat( NWA const \& left, NWA const \& right )}
-  \item\texttt{void concat( NWA \& out, NWA const \& left, NWA const \& right )}
+  \item[\texttt{NWARefPtr concat( NWA const \& left, NWA const \& right )}]
+  \item[\texttt{void concat( NWA \& out, NWA const \& left, NWA const \& right )}]
     Computes the concatenation of the NWAs \texttt{left} and
     \texttt{right}, either returning the result or storing it in
     \texttt{out}.
     See Section \ref{Se:Concatenation}.
 
-  \item\texttt{NWARefPtr star( NWA const \& orig )}
-  \item\texttt{void star( NWA \& out, NWA const \& orig )}
+  \item[\texttt{NWARefPtr star( NWA const \& orig )}]
+  \item[\texttt{void star( NWA \& out, NWA const \& orig )}]
     Computes the Kleene-Star of the NWA \texttt{orig}, either
     returning the result or storing it in \texttt{out}. See Section
     \ref{Se:Star}.
 
-  \item\texttt{NWARefPtr reverse( NWA const \& orig )}
-  \item\texttt{void reverse( NWA \& out, NWA const \& orig )}
-    Computes the NWA which accepts the reverse of each nested word
+  \item[\texttt{NWARefPtr reverse( NWA const \& orig )}]
+  \item[\texttt{void reverse( NWA \& out, NWA const \& orig )}]
+    Computes the NWA that accepts the reverse of each nested word
     accepted by the NWA \texttt{orig}, either returning the result or
     storing it in \texttt{out}. See Section \ref{Se:Reverse}.
 
-  \item\texttt{NWARefPtr determinize( NWA const \& orig )}
-  \item\texttt{NWARefPtr determinize( NWA \& out, NWA const \& orig )}
+  \item[\texttt{NWARefPtr determinize( NWA const \& orig )}]
+  \item[\texttt{NWARefPtr determinize( NWA \& out, NWA const \& orig )}]
     Computes a determinization of \texttt{orig}, either returning the
     result or storing it in \texttt{out}.
     See Section \ref{Se:Determinize}.
 
-  \item\texttt{NWARefPtr complement( NWA const \& orig )}
-  \item\texttt{void complement( NWA \& out, NWA const \& orig )}
+  \item[\texttt{NWARefPtr complement( NWA const \& orig )}]
+  \item[\texttt{void complement( NWA \& out, NWA const \& orig )}]
     Computes the complement of the determinization of \texttt{orig},
     either returning the result or storing it in \texttt{out}.
     See Section
@@ -63,11 +63,22 @@ Each of these functions is in the namespace \texttt{wali::nwa::construct}:
 
 \subsection{Union}
 \label{Se:Union}
-The
-union of the NWAs is constructed by taking the component-wise union. (In
-particular, it does \textsl{not} do the cross-product construction, and will
+The union of two NWAs is constructed by taking the union of each of the
+components of the NWAs. (In
+particular, it does \textsl{not} do a cross-product construction, and will
 \textsl{always} produce a nondeterministic automaton as a result as long as
 both machines have at least one initial state.)
+
+Formally, given $N$ and $M$ such that
+\begin{itemize}
+ \item $N = (Q_N, \Sigma_N, Q_{0,N}, \delta_N, F_N)$
+ \item $M = (Q_M, \Sigma_M, Q_{0,M}, \delta_M, F_M)$
+\end{itemize}
+then the union is computed as follows:
+\begin{itemize}
+ \item $N \cup M = (Q_N \cup Q_M, \Sigma_N \cup \Sigma_M, Q_{0,N} \cup
+   Q_{0,M}, \delta_N \cup \delta_M, F_N \cup F_M)$
+\end{itemize}
 
 As an example, \figref{Union2} illustrates the union of \figref{Example1} and
 \figref{Union1}.
@@ -96,9 +107,8 @@ As an example, \figref{Union2} illustrates the union of \figref{Example1} and
   \label{Fi:Union2}
 \end{figure}
 
-To construct the union of two
-NWAs, the state sets of the NWAs cannot overlap,
-i.e. $Q_1 \cap Q_2 = \emptyset$. \textsl{Client code should not depend on
+The state sets of the NWAs must not overlap,
+i.e., $Q_1 \cap Q_2 = \emptyset$. \textsl{Client code should not rely on
   this condition being checked} or any particular behavior occurring if it
 does not hold. (Currently the condition is checked in an assertion.)
 
@@ -110,7 +120,7 @@ Client information is copied directly from the original NWAs using
 \label{Se:Intersection}
 
 The intersection of two NWAs is computed in the standard cross-product
-fashion, except using a worklist algorithm to only compute those states that
+fashion, using a worklist algorithm to only compute those states that
 are reachable.
 
 The algorithm traverses the original NWAs starting at
@@ -176,9 +186,9 @@ to be overridden to customize behavior:
 
 \begin{description}
 
-  \item\texttt{bool stateIntersect( NWA const \& first, Key state1,\\ 
+  \item[\texttt{bool stateIntersect( NWA const \& first, Key state1,\\ 
                    \hspace*{3.25cm} NWA const \& second, Key state2,\\
-                   \hspace*{3.25cm} Key\& resSt, ref\_ptr<ClientInfo>\& resCI )}
+                   \hspace*{3.25cm} Key\& resSt, ref\_ptr<ClientInfo>\& resCI )}]
     \nopagebreak
 
     Determines whether the given states can be combined and,
@@ -187,27 +197,27 @@ to be overridden to customize behavior:
     key of the combined state (storing it in \texttt{resSt} and the client
     information (storing it in \texttt{resCI}), then returns \texttt{true}.
 
-  \item\texttt{bool transitionIntersect( NWA const \& first, Key
+  \item[\texttt{bool transitionIntersect( NWA const \& first, Key
     sym1,\\ \hspace*{3.25cm} NWA const \& second, Key
-    sym2,\\ \hspace*{3.25cm} Key\& resSym )} \nopagebreak
+    sym2,\\ \hspace*{3.25cm} Key\& resSym )}] \nopagebreak
 
     Determines whether the given symbols are considered to be equivalent for
-    the purposes of intersection. If so, it computes the symbol which should
+    the purposes of intersection. If so, it computes the symbol that should
     be associated with the combined transition (storing it in
     \texttt{resSym}) and returns true. If not, returns false.
 
-  \item\texttt{void intersectClientInfoInternal( \\ \hspace*{3.25cm}
+  \item[\texttt{void intersectClientInfoInternal( \\ \hspace*{3.25cm}
     NWA const \& first, Key src1, Key tgt1,\\ \hspace*{3.25cm} NWA const \&
-    second, Key src2, Key tgt2,\\ \hspace*{3.25cm} Key resSym, Key resSt )}
+    second, Key src2, Key tgt2,\\ \hspace*{3.25cm} Key resSym, Key resSt )}]
     \nopagebreak
-  \item\texttt{void intersectClientInfoCall( \\ \hspace*{3.25cm}
+  \item[\texttt{void intersectClientInfoCall( \\ \hspace*{3.25cm}
     NWA const \& first ,Key call1, Key entry1,\\ \hspace*{3.25cm}
     NWA const \& second, Key call2, Key entry2,\\ \hspace*{3.25cm} Key
-    resSym, Key resSt )} \nopagebreak
-  \item\texttt{void intersectClientInfoReturn( \\ \hspace*{1.75cm}
+    resSym, Key resSt )}] \nopagebreak
+  \item[\texttt{void intersectClientInfoReturn( \\ \hspace*{1.75cm}
     NWA const \& first, Key exit1, Key call1, Key ret1,\\ \hspace*{1.75cm}
     NWA const \& second, Key exit2, Key call2, Key ret2,\\ \hspace*{1.75cm}
-    Key resSym, Key resSt )}
+    Key resSym, Key resSt )}]
 
     Alters the client information assoicated with \texttt{resSt} given the
     endpoints of the transition just added (as well as access to the client
@@ -255,9 +265,11 @@ states of the second NWA. % If the original NWAs are $(Q_1, \Sigma_1,
 %\ref{Fi:Example1} and the NWA shown in Figure \ref{Fi:Concat1} is shown in
 %Figure \ref{Fi:Concat2}.
 
-In
-order to construct the concatenation of two NWAs, the state sets of the NWAs
-cannot overlap, i.e. $Q_1 \cap Q_2 = \emptyset$
+%The state sets of the NWAs must not overlap,
+%i.e., $Q_1 \cap Q_2 = \emptyset$. \textsl{Client code should not rely on
+%  this condition being checked} or any particular behavior occurring if it
+%does not hold. (Currently the condition is checked in an assertion.)
+
 Client information is copied directly from the original NWAs using
 \texttt{ClientInfo::clone()}.
 
@@ -480,28 +492,28 @@ customize the behavior of determinization.
 
 \begin{description}
 
-  \item\texttt{void mergeClientInfo( NWA const \& first,\\ \hspace*{3.25cm}
+  \item[\texttt{void mergeClientInfo( NWA const \& first,\\ \hspace*{3.25cm}
     BinaryRelation const\& binRel,\\ \hspace*{3.25cm} St resSt,
-    ref\_ptr<ClientInfo>\& resCI )} \nopagebreak
+    ref\_ptr<ClientInfo>\& resCI )}] \nopagebreak
 
     Computes the client information that should be associated with the given state.
 
-  \item\texttt{void mergeClientInfoInternal( NWA const \& first,\nopagebreak
+  \item[\texttt{void mergeClientInfoInternal( NWA const \& first,\nopagebreak
     \\ \hspace*{3.25cm} BinaryRelation const\& binRelSource,\nopagebreak
     \\ \hspace*{3.25cm} BinaryRelation const\& binRelTarget, \nopagebreak
     \\ \hspace*{3.25cm} Key sourceSt, Key resSym, Key resSt, \nopagebreak
-    \\ \hspace*{3.25cm} ref\_ptr<ClientInfo>\& resCI )} \nopagebreak
-  \item\texttt{void mergeClientInfoCall( NWA const \&
+    \\ \hspace*{3.25cm} ref\_ptr<ClientInfo>\& resCI )}] \nopagebreak
+  \item[\texttt{void mergeClientInfoCall( NWA const \&
     first,\\ \hspace*{3.25cm} BinaryRelation const\&
     binRelCall,\\ \hspace*{3.25cm} BinaryRelation const\&
     binRelEntry,\\ \hspace*{3.25cm} Key callSt, Key resSym, Key
-    resSt,\\ \hspace*{3.25cm} ref\_ptr<ClientInfo>\& resCI )} \nopagebreak
-  \item\texttt{void mergeClientInfoReturn( NWA const \&
+    resSt,\\ \hspace*{3.25cm} ref\_ptr<ClientInfo>\& resCI )}] \nopagebreak
+  \item[\texttt{void mergeClientInfoReturn( NWA const \&
     first,\\ \hspace*{3.25cm} BinaryRelation const\&
     binRelExit,\\ \hspace*{3.25cm} BinaryRelation const\&
     binRelCall,\\ \hspace*{3.25cm} BinaryRelation const\&
     binRelReturn,\\ \hspace*{3.25cm} Key exitSt, Key callSt, Key
-    resSym,\\ \hspace*{3.25cm} Key resSt, ref\_ptr<ClientInfo>\& resCI )}
+    resSym,\\ \hspace*{3.25cm} Key resSt, ref\_ptr<ClientInfo>\& resCI )}]
     \nopagebreak
 
     Alters the client information associated with \texttt{resSt} given
