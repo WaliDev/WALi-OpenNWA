@@ -55,6 +55,7 @@ namespace wali
         try {
           combined_se = user_se->combine(that->weight());
         } catch (int error_code ) {
+          (void) error_code;
           std::ofstream thisStream("combine.this.dot");
           std::ofstream thatStream("combine.that.dot");
           VisitorDot d1(thisStream);
@@ -136,18 +137,17 @@ namespace wali
       user_se->print(o);
       // Dumps out to much information.
       // TODO. Make a compile or runtime flag.
-      if( 1 ) {
-        o << std::endl;
-        std::list< witness_t >::const_iterator it = kids.begin();
-        std::list< witness_t >::const_iterator itEND = kids.end();
-        for( ; it != itEND ; it++ )
-        {
-          (*it)->prettyPrint(o,depth+1);
-        }
+#if 1
+      o << std::endl;
+      std::list< witness_t >::const_iterator it = kids.begin();
+      std::list< witness_t >::const_iterator itEND = kids.end();
+      for( ; it != itEND ; it++ )
+      {
+        (*it)->prettyPrint(o,depth+1);
       }
-      else {
-        o << "   has " << kids.size() << " children\n";
-      }
+#else
+      o << "   has " << kids.size() << " children\n";
+#endif
       return o;
 
     }

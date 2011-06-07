@@ -34,7 +34,7 @@ namespace wali {
             if(updatable_nodes.size() > nno) {
               return updatable_nodes[nno];
             }
-            for(unsigned i = updatable_nodes.size(); i < nno; i++) {
+            for(size_t i = updatable_nodes.size(); i < nno; i++) {
               updatable_nodes.push_back(new RegExp(i,se->zero()));
             }
             updatable_nodes.push_back(new RegExp(nno, se));
@@ -900,11 +900,13 @@ namespace wali {
                 if(it != eval_map.end()) {
                     return it->second;
                 } else { 
+#if 0
                     if(false && last_change != (unsigned)-1) {// "value" is available
                         ret = w->extend(value);
                         eval_map[w] = ret;
                         return ret;
                     }
+#endif
                 }
             } else {
                 eval_map.clear();
@@ -964,11 +966,13 @@ namespace wali {
             if(it != eval_map.end()) {
                 return it->second;
             } else { 
+#if 0
                 if(false && last_change != (unsigned)-1) {// "value" is available
                     ret = w->extend(value);
                     eval_map[w] = ret;
                     return ret;
                 }
+#endif
             }
         } else {
             eval_map.clear();
@@ -1056,12 +1060,14 @@ namespace wali {
         }
         if(executing_poststar) {
             return evaluate(value->one());
-        } 
+        }
         // Executing prestar
         evaluate();
         return value;
+#if 0
         // EvaluateRev does not seem to do a better job than evaluate()
         return evaluateRev(value->one());
+#endif
     }
 
     void RegExp::evaluate() {

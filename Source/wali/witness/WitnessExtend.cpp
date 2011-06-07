@@ -49,24 +49,23 @@ namespace wali
       user_se->print(o) << std::endl;
       // Dumps out to much information.
       // TODO. Make a compile or runtime flag.
-      if( 1 ) {
-        if( hasLeft() )
-        {
-          lchild->prettyPrint(o,depth+1);
-          if( hasRight() )
-            rchild->prettyPrint(o,depth+1);
-        }
-        else {
-          // TODO : make debug
-          assert( !hasRight() );
-        }
+#if 1
+      if( hasLeft() )
+      {
+        lchild->prettyPrint(o,depth+1);
+        if( hasRight() )
+          rchild->prettyPrint(o,depth+1);
       }
       else {
-        int cnt = 0;
-        if( hasLeft() ) cnt++;
-        if( hasRight() ) cnt++;
-        o << "\tHas " << cnt << " children.\n";
+        // TODO : make debug
+        assert( !hasRight() );
       }
+#else
+      int cnt = 0;
+      if( hasLeft() ) cnt++;
+      if( hasRight() ) cnt++;
+      o << "\tHas " << cnt << " children.\n";
+#endif
       return o;
     }
 

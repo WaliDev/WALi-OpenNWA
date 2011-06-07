@@ -31,6 +31,7 @@ namespace wali {
 
     bool VisitorPrinter::visit( Witness * w ATTR_UNUSED )
     {
+      (void) w;
       return true;
     }
 
@@ -55,17 +56,16 @@ namespace wali {
       formatDepth();
       os << "WitnessCombine: ";
       w->weight()->print(os) << std::endl;
-      if( 1 ) {
-        VisitorPrinter vp(os,depth+1);
-        std::list< witness_t >::iterator it = w->children().begin();
-        for( ; it != w->children().end() ; it++ ) {
-          witness_t child = *it;
-          child->accept(vp,true);
-        }
+#if 1
+      VisitorPrinter vp(os,depth+1);
+      std::list< witness_t >::iterator it = w->children().begin();
+      for( ; it != w->children().end() ; it++ ) {
+        witness_t child = *it;
+        child->accept(vp,true);
       }
-      else {
-        os << "   has " << w->children().size() << " children\n";
-      }
+#else
+    os << "   has " << w->children().size() << " children\n";
+#endif
       // tell WitnessCombine to not visit his children
       return false;
 

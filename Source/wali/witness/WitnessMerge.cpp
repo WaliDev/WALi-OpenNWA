@@ -54,30 +54,29 @@ namespace wali
       user_se->print(o) << std::endl;
       // Dumps out to much information.
       // TODO. Make a compile or runtime flag.
-      if( 1 ) {
-        if( hasCaller() )
-        {
-          fCaller->prettyPrint(o,depth+1);
-          if (hasRule())
-            fRule->prettyPrint(o,depth+1);
-          if( hasCallee() )
-            fCallee->prettyPrint(o,depth+1);
-        }
-        else {
-          // TODO : make debug
-          assert( !hasCallee() );
-        }
+#if 1
+      if( hasCaller() )
+      {
+        fCaller->prettyPrint(o,depth+1);
+        if (hasRule())
+          fRule->prettyPrint(o,depth+1);
+        if( hasCallee() )
+          fCallee->prettyPrint(o,depth+1);
       }
       else {
-        int cnt = 0;
-        if (hasCaller()) 
-          cnt++;
-        if (hasRule()) 
-          cnt++;
-        if (hasCallee()) 
-          cnt++;
-        o << "\tHas " << cnt << " children.\n";
+        // TODO : make debug
+        assert( !hasCallee() );
       }
+#else
+      int cnt = 0;
+      if (hasCaller()) 
+        cnt++;
+      if (hasRule()) 
+        cnt++;
+      if (hasCallee()) 
+        cnt++;
+      o << "\tHas " << cnt << " children.\n";
+#endif
       return o;
     }
 
