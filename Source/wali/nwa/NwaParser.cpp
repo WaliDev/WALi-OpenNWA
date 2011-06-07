@@ -5,6 +5,7 @@
 #include <exception>
 #include <cstdlib>
 #include <ctime>
+#include <cctype>
 
 #include "wali/nwa/NWAParser.hpp"
 #include "wali/nwa/NWA.hpp"

@@ -1,6 +1,7 @@
 #include "wali/graph/RegExp.hpp"
 #include "wali/graph/GraphCommon.hpp"
 #include <algorithm>
+#include <iterator>
 
 namespace wali {
 
