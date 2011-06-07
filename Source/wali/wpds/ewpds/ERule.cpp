@@ -68,18 +68,32 @@ namespace wali
 
       std::ostream & ERule::marshall( std::ostream & o ) const
       {
-        o << "<ERule>\n";
-        Rule::f->marshall( o << "\t" ) << std::endl;
-        Rule::t->marshall( o << "\t" ) << std::endl;
-        o << "\t<Stack2 name=\"" << Rule::to_stack2() << "\"/>\n";
-        Rule::weight()->marshallWeight(o);
+        o << "<" << XMLTag << " ";
+        o << XMLFromTag << "='" << key2str(from_state()) << "' ";
+        o << XMLFromStackTag << "='" << key2str(from_stack()) << "' ";
+        o << XMLToTag << "='" << key2str(to_state()) << "'";
+
+        // Check optional stack symbols
+        if( WALI_EPSILON != to_stack1() ) {
+          o << " " << XMLToStack1Tag << "='" << key2str(to_stack1()) << "'";
+          if( WALI_EPSILON != to_stack2() ) {
+            o << " " << XMLToStack2Tag << "='" << key2str(to_stack2()) << "'";
+          }
+        }
+        else {
+          // sanity check
+          assert( WALI_EPSILON == to_stack2() );
+        }
+        o << ">";
+        se->marshallWeight(o);
         if(merge_fn().get_ptr() != NULL) {
           o << "\t<MergeFn>" << merge_fn()->toString() << "</MergeFn>\n";
         } 
         else {
           o << "\t<MergeFn> NONE </MergeFn>\n";
         }
-        o << "</ERule>";
+
+        o << "</" << XMLTag << ">";
         return o;
       }
 
