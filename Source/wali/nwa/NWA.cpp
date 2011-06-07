@@ -2587,15 +2587,15 @@ namespace wali
 #endif
             //Make a key for this state and the call predecessor state.
             State rr = makeKey(Rr);
-            State rc = makeKey(*rit);
+            State rc2 = makeKey(*rit);
             //Add the state to the deterministic NWA.
             addState(rr);
             //Add the transition to the deterministic NWA.
-            addReturnTrans(r,rc,*it,rr);
+            addReturnTrans(r,rc2,*it,rr);
 
             //Adjust the client info for this state.
             ClientInfoRefPtr rrCI;
-            mergeClientInfoReturn(nondet,R,*rit,Rr,r,rc,*it,rr,rrCI);
+            mergeClientInfoReturn(nondet,R,*rit,Rr,r,rc2,*it,rr,rrCI);
             states.setClientInfo(rr,rrCI);
 
             //Determine whether to add this state to the worklist.
@@ -2741,7 +2741,7 @@ namespace wali
         for( stateIterator sit = beginStates(); sit != endStates(); sit++ )
         {
           //Check call transitions.
-          int count = 0;
+          int count_found = 0;
           bool wild = false;
           for( CallIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
           {
@@ -2752,15 +2752,15 @@ namespace wali
             //Keep a count of multiple transitions with the same from
             //state and symbol(that is not epsilon).
             else if( (Trans::getCallSite(*cit) == (*sit)) && (Trans::getCallSym(*cit) == *it) )
-              count++;
+              count_found++;
           }
-          if( count > 1 )
+          if( count_found > 1 )
             return false;
-          else if( wild && count > 0 )
+          else if( wild && count_found > 0 )
             return false;
 
           //Check internal transitions.
-          count = 0;
+          count_found = 0;
           wild = false;
           for( InternalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
           {
@@ -2771,17 +2771,17 @@ namespace wali
             //Keep a count of multiple transitions with the same from
             //state and symbol(that is not epsilon).
             else if( (Trans::getSource(*iit) == *sit) && (Trans::getInternalSym(*iit) == *it) )
-              count++;
+              count_found++;
           }
-          if( count > 1 )
+          if( count_found > 1 )
             return false;
-          else if( wild && count > 0 )
+          else if( wild && count_found > 0 )
             return false;  
 
           for( stateIterator pit = beginStates(); pit != endStates(); pit++ )
           {
             //Check return transitions.
-            count = 0;
+            count_found = 0;
             wild = false;
             for( ReturnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
             {
@@ -2794,11 +2794,11 @@ namespace wali
               else if( (Trans::getExit(*rit) == *sit) 
                        && (Trans::getCallSite(*rit) == *pit) 
                        && (Trans::getReturnSym(*rit) == *it) )
-                count++;
+                count_found++;
             }
-            if( count > 1 )
+            if( count_found > 1 )
               return false;
-            else if( wild && count > 0 )
+            else if( wild && count_found > 0 )
               return false;  
           }
         }
@@ -3967,24 +3967,24 @@ namespace wali
           std::map<Symbol, StateSet > returns;
 
           // Populate it:
-          for(ReturnIterator trans = beginReturnTrans(); trans != endReturnTrans(); ++trans)
+          for(ReturnIterator cur_trans = beginReturnTrans(); cur_trans != endReturnTrans(); ++cur_trans)
           {
-            if(*exitit == Trans::getExit(*trans)
-               && *returnit == Trans::getReturnSite(*trans))
+            if(*exitit == Trans::getExit(*cur_trans)
+               && *returnit == Trans::getReturnSite(*cur_trans))
             {
-              returns[Trans::getReturnSym(*trans)].insert(Trans::getCallSite(*trans));
+              returns[Trans::getReturnSym(*cur_trans)].insert(Trans::getCallSite(*cur_trans));
             }
           }
 
           // Now add an edge for each return symbol
-          for( std::map<Symbol, StateSet >::const_iterator trans = returns.begin();
-               trans != returns.end(); ++trans)
+          for( std::map<Symbol, StateSet >::const_iterator cur_trans = returns.begin();
+               cur_trans != returns.end(); ++cur_trans)
           {
             std::stringstream ss;
-            printKey(ss, trans->first,abbrev);
+            printKey(ss, cur_trans->first,abbrev);
             ss << ";{";
-            for( StateSet::const_iterator prediter = trans->second.begin();
-                 prediter != trans->second.end(); ++prediter)
+            for( StateSet::const_iterator prediter = cur_trans->second.begin();
+                 prediter != cur_trans->second.end(); ++prediter)
             {
               printKey(ss, *prediter, abbrev) << ";";
             }

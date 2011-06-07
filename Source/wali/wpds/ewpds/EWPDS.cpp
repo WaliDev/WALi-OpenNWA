@@ -50,7 +50,7 @@ namespace wali
         public:
           EWPDS& e;
           ref_ptr<Wrapper> wrapper;
-          ERuleCopier(EWPDS& e,ref_ptr<Wrapper> wr) : e(e),wrapper(wr) {}
+          ERuleCopier(EWPDS& ewpds,ref_ptr<Wrapper> wr) : e(ewpds),wrapper(wr) {}
           virtual void operator()(const rule_t& r)
           {
             // TODO - can be made static_cast
@@ -78,7 +78,7 @@ namespace wali
       {
       }
 
-      EWPDS::EWPDS( ref_ptr<Wrapper> wrapper ) : WPDS(wrapper), addEtrans(false)
+      EWPDS::EWPDS( ref_ptr<Wrapper> wr ) : WPDS(wr), addEtrans(false)
       { 
       }
 

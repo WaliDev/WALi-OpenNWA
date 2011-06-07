@@ -22,8 +22,8 @@ namespace wali {
 #endif
 
 
-    Timer::Timer(const std::string &task, std::ostream& os)
-      : start(clock()), task(task), os(os)
+    Timer::Timer(const std::string &task_desc, std::ostream& stream)
+      : start(clock()), task(task_desc), os(stream)
     {
 #ifndef _WIN32
       times(&st_tms);

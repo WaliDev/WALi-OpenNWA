@@ -131,8 +131,8 @@ namespace wali
       config = c;
     }
 
-    sem_elem_t Trans::poststar_eps_closure( sem_elem_t se ) {
-      return weight()->extend(se);
+    sem_elem_t Trans::poststar_eps_closure( sem_elem_t the_se ) {
+      return weight()->extend(the_se);
     }
 
     TaggedWeight Trans::apply_post( TaggedWeight tw) const {

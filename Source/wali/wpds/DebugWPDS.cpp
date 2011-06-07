@@ -23,7 +23,7 @@ namespace wali
     {
     }
 
-    DebugWPDS::DebugWPDS( ref_ptr<Wrapper> wrapper ) : WPDS( wrapper )
+    DebugWPDS::DebugWPDS( ref_ptr<Wrapper> wr ) : WPDS( wr )
     {
     }
 
@@ -108,12 +108,12 @@ namespace wali
           } // END DEBUGGING
 
           sem_elem_t wght = tprime->weight()->extend( dnew );
-          Config * config = make_config( t->from(),tprime->stack() );
+          Config * new_config = make_config( t->from(),tprime->stack() );
           update( t->from()
               , tprime->stack()
               , tprime->to()
               , wght
-              , config
+              , new_config
               );
         }
       }

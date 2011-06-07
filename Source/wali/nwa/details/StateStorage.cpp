@@ -354,8 +354,6 @@ namespace wali
     {
       //Print the set of all states.
       o << "Q: {\n  ";
-      const_iterator it = beginStates();
-      const_iterator itEND = endStates();
       bool first = true;
       for(const_iterator it = beginStates(); it != endStates() ; it++, first=false )
       {

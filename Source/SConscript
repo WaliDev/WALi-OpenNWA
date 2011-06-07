@@ -12,7 +12,7 @@ Import('Platform')
 
 
 # `find . -name "*.cpp"`, then remove Experimental.cpp, NWA.cpp, RelationOps.cpp
-wali_files = Split("""
+nice_files = Split("""
 ./wali/Reach.cpp
 ./wali/StringSource.cpp
 ./wali/Common.cpp
@@ -70,8 +70,6 @@ wali_files = Split("""
 ./wali/graph/Graph.cpp
 ./wali/graph/InterGraph.cpp
 ./wali/graph/LinkEval.cpp
-./wali/graph/IntraGraph.cpp
-./wali/graph/SummaryGraph.cpp
 ./wali/regex/Concat.cpp
 ./wali/regex/Regex.cpp
 ./wali/regex/Root.cpp
@@ -92,10 +90,29 @@ wali_files = Split("""
 ./wali/nwa/query/internals.cpp
 """)
 
+naughty_files = Split("""
+    ./wali/graph/IntraGraph.cpp
+    ./wali/graph/SummaryGraph.cpp
+""")
+
+
+
+
 env = BaseEnv.Clone()
         
 if Debug:
     print '\n+++ Entered "#/Source/SConscript"\n'
+
+
+# Build these separately so we can use fewer warning flags
+if MkStatic:
+    naughty_objs = [env.StaticObject(naughty_file, WARNING_FLAGS='') for naughty_file in naughty_files]
+else:
+    naughty_objs = [env.SharedObject(naughty_file, WARNING_FLAGS='') for naughty_file in naughty_files]
+
+
+wali_files = nice_files + naughty_objs
+
 
 
 if MkStatic:

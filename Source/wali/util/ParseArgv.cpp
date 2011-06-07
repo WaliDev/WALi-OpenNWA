@@ -43,10 +43,10 @@ ParseArgv::exists( const std::string &key ) const
   return (m.find(key) != m.end());
 }
 
-#if DBGPAV
-#define PINS(i,t,v) std::cout << "idx : " << i << " Inserting ( " << t << " , " << v << " )\n";
+#if defined(DBGPAV) && DBGPAV
+#  define PINS(i,t,v) std::cout << "idx : " << i << " Inserting ( " << t << " , " << v << " )\n";
 #else
-#define PINS(i,t,v)
+#  define PINS(i,t,v)
 #endif
 //
 //  Simply look for equal signs in the strings;

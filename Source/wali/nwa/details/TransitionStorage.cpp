@@ -823,8 +823,6 @@ namespace wali
 
       //Print internal transitions.
       o << "Delta_i:  {\n  ";
-      InternalIterator iit = internalTrans.begin();
-      InternalIterator iitEND = internalTrans.end();
       first = true;
       for(InternalIterator iit = internalTrans.begin();
           iit != internalTrans.end(); iit++, first=false )

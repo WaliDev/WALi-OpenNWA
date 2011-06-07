@@ -45,8 +45,8 @@ namespace wali
       { 
       }
 
-      SWPDS::SWPDS(ref_ptr<Wrapper> wrapper) : 
-        FWPDS(wrapper), preprocessed(false), sgr(NULL) 
+      SWPDS::SWPDS(ref_ptr<Wrapper> wr) : 
+        FWPDS(wr), preprocessed(false), sgr(NULL) 
       { 
       }
 

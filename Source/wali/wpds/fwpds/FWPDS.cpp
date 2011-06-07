@@ -53,7 +53,7 @@ FWPDS::FWPDS() : EWPDS(), interGr(NULL), checkingPhase(false)
 {
 }
 
-FWPDS::FWPDS(ref_ptr<wpds::Wrapper> wrapper) : EWPDS(wrapper) , interGr(NULL), checkingPhase(false)
+FWPDS::FWPDS(ref_ptr<wpds::Wrapper> wr) : EWPDS(wr) , interGr(NULL), checkingPhase(false)
 {
 }
 
@@ -297,7 +297,7 @@ void FWPDS::prestar_handle_trans(
 }
 
 
-bool FWPDS::checkResults( wfa::WFA& input, bool poststar )
+bool FWPDS::checkResults( wfa::WFA& input, bool do_poststar )
 {
   if( wali::get_verify_fwpds() ) 
   {
@@ -309,7 +309,7 @@ bool FWPDS::checkResults( wfa::WFA& input, bool poststar )
     wfa::WFA tmpInput(input);
 
     util::Timer* wpdsTimer = new util::Timer("\t[WPDS] Total Timer ");
-    if( poststar ) {
+    if( do_poststar ) {
       EWPDS::poststar(tmpInput, tmpOutput);
       //WPDS::poststarSetupFixpoint(tmpInput,tmpOutput);
       //WPDS::poststarComputeFixpoint(tmpOutput);

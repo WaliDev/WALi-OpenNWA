@@ -19,8 +19,8 @@ namespace wali
     //
     // Pass weight to base class Witness
     //
-    WitnessCombine::WitnessCombine( sem_elem_t weight ) :
-      Witness( weight ) {}
+    WitnessCombine::WitnessCombine( sem_elem_t the_weight ) :
+      Witness( the_weight ) {}
 
     //
     // Destructor does nothing.

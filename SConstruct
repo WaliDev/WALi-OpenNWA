@@ -54,7 +54,12 @@ else:
 
 
 if 'gcc' == BaseEnv['CC']:
-    BaseEnv.Append(CCFLAGS='-g -ggdb -Wall -Wformat=2 -W -O2')
+    # -Waddress -Wlogical-op
+
+    # -Wcast-qual 
+    BaseEnv.Append(CCFLAGS='-g -ggdb -Wall -Wextra -Werror $WARNING_FLAGS -fdiagnostics-show-option -O2')
+    BaseEnv.Append(WARNING_FLAGS='-Wformat=2 -Winit-self -Wunused -Wfloat-equal -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wwrite-strings -Wconversion')
+
     if platform_bits == 64 and not Is64:
         # If we're on a 64-bit platform but want to compile for 32.
         # This will only happen if Is64 is changed from what it is

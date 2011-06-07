@@ -15,18 +15,18 @@ namespace wali {
 
       ETrans::ETrans(
           Key f, Key s, Key t,
-          sem_elem_t wAtCall,
+          sem_elem_t weightAtCall,
           sem_elem_t wAfterCall,
           erule_t er)
-        : DecoratorTrans(new wfa::Trans(f,s,t,wAfterCall)),wAtCall(wAtCall),erule(er)
+        : DecoratorTrans(new wfa::Trans(f,s,t,wAfterCall)),wAtCall(weightAtCall),erule(er)
       {
       }
 
       ETrans::ETrans(
           ITrans* d,
-          sem_elem_t wAtCall,
+          sem_elem_t weightAtCall,
           erule_t er)
-        : DecoratorTrans(d),wAtCall(wAtCall),erule(er)
+        : DecoratorTrans(d),wAtCall(weightAtCall),erule(er)
       {
       }
 

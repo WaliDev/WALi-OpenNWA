@@ -20,21 +20,22 @@ namespace wali
     namespace fwpds
     {
 
-      LazyTrans::LazyTrans(  wali_key_t from,
-          wali_key_t stack,
-          wali_key_t to,
+      LazyTrans::LazyTrans(  wali_key_t the_from,
+          wali_key_t the_stack,
+          wali_key_t the_to,
           sem_elem_t se,
           Config *config
-          ) : wfa::DecoratorTrans(new wfa::Trans(from,stack,to,se))
+          )
+        : wfa::DecoratorTrans(new wfa::Trans(the_from,the_stack,the_to,se))
       {
         setConfig(config);
         is_etrans = false;
       }
 
-      LazyTrans::LazyTrans( wfa::ITrans* delegate )
-        : DecoratorTrans(delegate), intergr(NULL)
+      LazyTrans::LazyTrans( wfa::ITrans* the_delegate )
+        : DecoratorTrans(the_delegate), intergr(NULL)
       {
-        ewpds::ETrans *et = dynamic_cast<ewpds::ETrans *>(delegate);
+        ewpds::ETrans *et = dynamic_cast<ewpds::ETrans *>(the_delegate);
         if(et != 0) {
           is_etrans = true;
         } else {
@@ -43,12 +44,12 @@ namespace wali
 
       }
 
-      LazyTrans::LazyTrans( wfa::ITrans* delegate, graph::InterGraphPtr g )
-        : DecoratorTrans(delegate)
+      LazyTrans::LazyTrans( wfa::ITrans* the_delegate, graph::InterGraphPtr g )
+        : DecoratorTrans(the_delegate)
       {
         setInterGraph(g);
 
-        ewpds::ETrans *et = dynamic_cast<ewpds::ETrans *>(delegate);
+        ewpds::ETrans *et = dynamic_cast<ewpds::ETrans *>(the_delegate);
         if(et != 0) {
           is_etrans = true;
         } else {

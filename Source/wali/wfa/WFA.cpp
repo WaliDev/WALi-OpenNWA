@@ -1299,10 +1299,12 @@ namespace wali
       std::vector<regex_t> nodes(Q.size()); // holds answer
       index_map_t index_map;
 
-      std::set<wali::Key>::iterator it = Q.begin();
-      for( int i=0; it != Q.end() ; i++, it++ ) {
-        order[i] = *it;
-        index_map.insert(*it,i);
+      {
+        std::set<wali::Key>::iterator it = Q.begin();
+        for( int i=0; it != Q.end() ; i++, it++ ) {
+          order[i] = *it;
+          index_map.insert(*it,i);
+        }
       }
 
       const size_t n = order.size();

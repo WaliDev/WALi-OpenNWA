@@ -14,13 +14,13 @@ namespace wali
   {
     // weight == merge->apply_f(left,right)
     WitnessMerge::WitnessMerge( 
-        sem_elem_t weight, 
-        witness_merge_fn_t witness_merge_fn,
-        witness_t caller, 
-        witness_t rule, 
-        witness_t callee ) :
-      Witness(weight), witness_merge_fn(witness_merge_fn),
-      fCaller(caller),fRule(rule),fCallee(callee) 
+        sem_elem_t the_weight, 
+        witness_merge_fn_t the_witness_merge_fn,
+        witness_t the_caller, 
+        witness_t the_rule, 
+        witness_t the_callee ) :
+      Witness(the_weight), witness_merge_fn(the_witness_merge_fn),
+      fCaller(the_caller),fRule(the_rule),fCallee(the_callee) 
     {
     }
 

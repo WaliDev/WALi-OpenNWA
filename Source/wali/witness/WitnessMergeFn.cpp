@@ -11,8 +11,8 @@ namespace wali
 {
   namespace witness 
   {
-    WitnessMergeFn::WitnessMergeFn( witness_t witness_rule, merge_fn_t user_merge )
-      : MergeFn(),witness_rule(witness_rule),user_merge(user_merge) 
+    WitnessMergeFn::WitnessMergeFn( witness_t the_witness_rule, merge_fn_t the_user_merge )
+      : MergeFn(),witness_rule(the_witness_rule),user_merge(the_user_merge) 
     {
     }
 

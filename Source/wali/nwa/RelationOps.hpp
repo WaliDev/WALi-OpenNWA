@@ -192,9 +192,9 @@ namespace wali {
         }
 
         Iterator start(store_iter, next_map);
-        Iterator end(next_map, next_map);
+        Iterator finish(next_map, next_map);
 
-        return make_pair(start, end);
+        return make_pair(start, finish);
       }
 
       bool operator==(TernaryRelation const & other) const {

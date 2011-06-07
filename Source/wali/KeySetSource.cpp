@@ -6,9 +6,9 @@
 
 namespace wali
 {
-  KeySetSource::KeySetSource( std::set<Key> kys ) 
+  KeySetSource::KeySetSource( std::set<Key> key_set ) 
   {
-    this->kys = kys;
+    kys = key_set;
   }
 
   KeySetSource::~KeySetSource() {}

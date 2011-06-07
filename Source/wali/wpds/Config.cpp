@@ -14,8 +14,8 @@ namespace wali
 
     int Config::numConfigs = 0;
 
-    Config::Config( wali_key_t state, wali_key_t stack ) :
-      kp(state,stack)
+    Config::Config( wali_key_t the_state, wali_key_t the_stack ) :
+      kp(the_state,the_stack)
     {
       numConfigs++;
       //*waliErr << "Config(...) : " << numConfigs << std::endl;

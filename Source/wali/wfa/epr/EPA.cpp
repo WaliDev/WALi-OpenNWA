@@ -43,17 +43,19 @@ namespace wali {
         // The worklist with BFS order on states
         StatePriorityWorklist wl(bfsOrder);
 
-        // First, initialize the state weights
-        state_map_t::iterator it = state_map.begin();
-        state_map_t::iterator itEND = state_map.end();
-
-        for(; it != itEND; it++) {
-          State *st = it->second;
+        {
+          // First, initialize the state weights
+          state_map_t::iterator it = state_map.begin();
+          state_map_t::iterator itEND = state_map.end();
           
-          st->unmark();
-          st->weight() = ZERO;
-          st->delta() = ZERO;
-          
+          for(; it != itEND; it++) {
+            State *st = it->second;
+            
+            st->unmark();
+            st->weight() = ZERO;
+            st->delta() = ZERO;
+            
+          }
         }
 
         State *init = getState( getInitialState() );

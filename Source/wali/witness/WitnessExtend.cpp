@@ -11,16 +11,16 @@ namespace wali
   namespace witness
   {
     // weight == came from where?
-    WitnessExtend::WitnessExtend( sem_elem_t weight ) :
-      Witness(weight),lchild(0),rchild(0) {}
+    WitnessExtend::WitnessExtend( sem_elem_t the_weight ) :
+      Witness(the_weight),lchild(0),rchild(0) {}
 
-    // weight == left
-    WitnessExtend::WitnessExtend( sem_elem_t weight, witness_t left ) :
-      Witness(weight),lchild(left),rchild(0) {}
+    // weight == left-Wcast-qual 
+    WitnessExtend::WitnessExtend( sem_elem_t the_weight, witness_t the_left ) :
+      Witness(the_weight),lchild(the_left),rchild(0) {}
 
     // weight == left->extend( right )
-    WitnessExtend::WitnessExtend( sem_elem_t weight, witness_t left, witness_t right ) :
-      Witness(weight),lchild(left),rchild(right) {}
+    WitnessExtend::WitnessExtend( sem_elem_t the_weight, witness_t the_left, witness_t the_right ) :
+      Witness(the_weight),lchild(the_left),rchild(the_right) {}
 
     // virtual destructor
     WitnessExtend::~WitnessExtend() {}
