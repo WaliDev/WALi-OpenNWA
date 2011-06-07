@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <fstream>
 
-#include "nwa.hpp"
+#include "wali/nwa/NWA.hpp"
 
 //#include <boost/program_options/options_description.hpp>
 //#include <boost/program_options/positional_options.hpp>
@@ -70,8 +70,8 @@ int main(int argc, char** argv)
     wali::Key call_key = wali::getKey("call-sym");
     wali::Key ret_key = wali::getKey("return-sym");
 
-    Nwa::ProcedureMap procs = Nwa::read_nwa_proc_set(infile);
-    Nwa::Nwa_RefPtr nwa = Nwa::assemble_nwa(procs, call_key, ret_key);
+    wali::nwa::ProcedureMap procs = wali::nwa::read_nwa_proc_set(infile);
+    wali::nwa::NWARefPtr nwa = wali::nwa::assemble_nwa(procs, call_key, ret_key);
     nwa->print(outfile);
 }
 

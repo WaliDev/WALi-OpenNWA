@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <fstream>
 
-#include "nwa.hpp"
+#include "wali/nwa/NWA.hpp"
 
 //#include <boost/program_options/options_description.hpp>
 //#include <boost/program_options/positional_options.hpp>
@@ -73,11 +73,11 @@ int main(int argc, char** argv)
         exit(3);
     }
 
-    Nwa::Nwa_RefPtr base_nwa = Nwa::read_nwa(infile);
-    Nwa::Nwa_RefPtr alpha_nwa = Nwa::read_nwa(alphafile);
+    wali::nwa::NWARefPtr base_nwa = wali::nwa::read_nwa(infile);
+    wali::nwa::NWARefPtr alpha_nwa = wali::nwa::read_nwa(alphafile);
 
-    std::set<Nwa::Sym> const & symbols = alpha_nwa->getSymbols();
-    for(std::set<Nwa::Sym>::const_iterator symb = symbols.begin();
+    std::set<wali::nwa::Sym> const & symbols = alpha_nwa->getSymbols();
+    for(std::set<wali::nwa::Sym>::const_iterator symb = symbols.begin();
         symb != symbols.end(); ++symb)
     {
         base_nwa->addSymbol(*symb);

@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <fstream>
 
-#include "nwa.hpp"
+#include "wali/nwa/NWA.hpp"
 
 //#include <boost/program_options/options_description.hpp>
 //#include <boost/program_options/positional_options.hpp>
@@ -73,10 +73,10 @@ int main(int argc, char** argv)
         exit(3);
     }
 
-    Nwa::Nwa_RefPtr nwa1 = Nwa::read_nwa(infile1);
-    Nwa::Nwa_RefPtr nwa2 = Nwa::read_nwa(infile2);
+    wali::nwa::NWARefPtr nwa1 = wali::nwa::read_nwa(infile1);
+    wali::nwa::NWARefPtr nwa2 = wali::nwa::read_nwa(infile2);
     
-    Nwa::Nwa_RefPtr inter = new Nwa::NWA();
+    wali::nwa::NWARefPtr inter = new wali::nwa::NWA();
     inter->intersect(*nwa1, *nwa2);
     inter->print(outfile);
 }

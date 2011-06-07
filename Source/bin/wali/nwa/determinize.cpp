@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <fstream>
 
-#include "nwa.hpp"
+#include "wali/nwa/NWA.hpp"
 
 //#include <boost/program_options/options_description.hpp>
 //#include <boost/program_options/positional_options.hpp>
@@ -68,8 +68,8 @@ int main(int argc, char** argv)
     }
 
 
-    Nwa::Nwa_RefPtr nwa = Nwa::read_nwa(infile);
-    Nwa::Nwa_RefPtr det = new Nwa::NWA();
+    wali::nwa::NWARefPtr nwa = wali::nwa::read_nwa(infile);
+    wali::nwa::NWARefPtr det = new wali::nwa::NWA();
     det->determinize(*nwa);
     det->print(outfile);
 }

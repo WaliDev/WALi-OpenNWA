@@ -5,7 +5,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "nwa.hpp"
+#include "wali/nwa/NWA.hpp"
 
 //#include <boost/program_options/options_description.hpp>
 //#include <boost/program_options/positional_options.hpp>
@@ -62,7 +62,7 @@ int main(int argc, char** argv)
         exit(2);
     }
 
-    Nwa::NestedWord nw;
+    wali::nwa::NestedWord nw;
 
     std::stringstream ss(argv[2]);
     std::string s;
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
         }
     }
 
-    Nwa::Nwa_RefPtr nwa = Nwa::read_nwa(infile);
+    wali::nwa::NWARefPtr nwa = wali::nwa::read_nwa(infile);
     if (nwa->isMemberNondet(nw)) {
         cout << "THE NWA CONTAINS THE GIVEN STRING\n";
     }

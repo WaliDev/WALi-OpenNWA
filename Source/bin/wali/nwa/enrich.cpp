@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <fstream>
 
-#include "nwa.hpp"
+#include "wali/nwa/NWA.hpp"
 #include "enrich_nwa_calls.hpp"
 
 //#include <boost/program_options/options_description.hpp>
@@ -71,8 +71,8 @@ int main(int argc, char** argv)
     wali::Key call_key = wali::getKey("call-sym");
     wali::Key ret_key = wali::getKey("return-sym");
     
-    Nwa::Nwa_RefPtr nwa = Nwa::read_nwa(infile);
-    Nwa::Nwa_RefPtr enriched =
+    wali::nwa::NWARefPtr nwa = wali::nwa::read_nwa(infile);
+    wali::nwa::NWARefPtr enriched =
         enrich_nwa_with_inter_edges(*nwa, call_key, ret_key);
 
     enriched->print(outfile);

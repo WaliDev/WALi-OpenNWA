@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <fstream>
 
-#include "nwa.hpp"
+#include "wali/nwa/NWA.hpp"
 
 //#include <boost/program_options/options_description.hpp>
 //#include <boost/program_options/positional_options.hpp>
@@ -61,7 +61,7 @@ int main(int argc, char** argv)
         exit(2);
     }
 
-    Nwa::Nwa_RefPtr nwa = Nwa::read_nwa(infile);
+    wali::nwa::NWARefPtr nwa = wali::nwa::read_nwa(infile);
     if (nwa->isEmpty()) {
         cout << "THE NWA IS EMPTY\n";
     }
