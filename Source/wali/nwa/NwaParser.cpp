@@ -127,6 +127,7 @@ struct CharactersDifferException : std::exception {
       return pm;
     }
     catch (std::exception const & e) {
+      (void) e;
       return "[CharactersDifferException: cannot allocate memory]\n";
     }
   }
@@ -148,7 +149,7 @@ read_lit(std::istream & is, std::string const & lit)
 {
   // Read |lit| characters
   for (size_t i=0; i<lit.size(); ++i) {
-    char c = is.get();
+    int c = is.get();
 
     if (!is.good()) {
       // Probably got to EOF
@@ -181,6 +182,7 @@ test_read_lit()
     read_lit(empty, query);
   }
   catch(StreamTooShortException const & e) {
+    (void) e;
     exn = true;
   }
   assert(exn);
@@ -190,6 +192,7 @@ test_read_lit()
     read_lit(short_, query);
   }
   catch(StreamTooShortException const & e) {
+    (void) e;
     exn = true;
   }
   assert(exn);
@@ -206,6 +209,7 @@ test_read_lit()
     read_lit(differ, query);
   }
   catch(CharactersDifferException const & e) {
+    (void) e;
     exn = true;
   }
   assert(exn);

@@ -28,7 +28,10 @@ namespace wali
        * The copy constructor creates a new instance of
        * Countable, therefore its "count" is initialized to 0.
        */
-      Countable( const Countable& c ATTR_UNUSED ) : count(0) {}
+      Countable( const Countable& c ATTR_UNUSED ) : count(0)
+      {
+        (void) c;
+      }
 
       /**
        * Countable::operator= does not modify "this's" count.
@@ -38,6 +41,7 @@ namespace wali
        */
       Countable& operator=( const Countable& c ATTR_UNUSED ) throw()
       {
+        (void) c;
         return *this;
       }
 

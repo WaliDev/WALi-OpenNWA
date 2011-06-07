@@ -525,7 +525,7 @@ namespace wali
     inline
     bool Label::containsSymbol( Sym sym ) const
     {
-      int count = syms.count(sym);
+      size_t count = syms.count(sym);
       if (neg) {
         //syms records symbols not on the edge, so
         //if the symbol is not in syms, it is in the collection

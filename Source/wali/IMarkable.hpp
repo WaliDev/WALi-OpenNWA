@@ -38,7 +38,10 @@ namespace wali
        *
        * @param m is ignored
        */
-      IMarkable( const IMarkable& m ATTR_UNUSED ) {}
+      IMarkable( const IMarkable& m ATTR_UNUSED )
+      {
+        (void) m;
+      }
 
       /*!
        * IMarkable::operator= has no effect b/c IMarkable has no fields.
@@ -46,7 +49,11 @@ namespace wali
        * This is because IMarkable specifies that state may only
        * be changed via the mark and unmark operations.
        */
-      IMarkable& operator=( const IMarkable& m ATTR_UNUSED ) { return *this; }
+      IMarkable& operator=( const IMarkable& m ATTR_UNUSED )
+      {
+        (void) m;
+        return *this;
+      }
 
       /*! Destructor does noting */
       virtual ~IMarkable() {}

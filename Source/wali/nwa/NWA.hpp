@@ -179,7 +179,7 @@ namespace wali
        *
        * @return the largest state ID in the automaton
        */
-      int largestState() const {
+      State largestState() const {
         return states.largestState();
       }
 
