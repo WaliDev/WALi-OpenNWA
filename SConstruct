@@ -100,7 +100,8 @@ if MkStatic:
 else:
   ProgEnv['StaticLibs'] = []
   ProgEnv.Append(LIBS = ['wali'])
-  ProgEnv.Append(LIBPATH =  LibInstallDir )
+  ProgEnv.Append(LIBPATH = LibInstallDir )
+  ProgEnv.Append(RPATH = LibInstallDir )
 
 Export('ProgEnv')
 
