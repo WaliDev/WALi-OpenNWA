@@ -28,6 +28,9 @@ words only, and does not provide support for any words with pending
 returns. (That is, we support balanced words and nested-word prefixes, but
 not nested-word suffixes or general nested words.)
 
+The WALi library is available from
+\url{http://www.cs.wisc.edu/wpis/wpds/download.php}. This document describes
+the NWA portion of version 4.0.
 
 
 \subsection{Library overview}
@@ -57,7 +60,8 @@ These types live in namespace \texttt{wali::nwa}:
     operation that can be performed using one is to check whether a
     \texttt{NestedWord} is a member of an \texttt{NWA}'s language. (The word can be
     balanced or unbalanced, but bear in mind that our automata do not support
-    pending returns.) To use, include \texttt{wali/nwa/NestedWord.hpp}.
+    pending returns, so a word containing one is not very useful.) To use,
+    include \texttt{wali/nwa/NestedWord.hpp}.
   \item[\texttt{NWA}] Models a nested-word automaton. To use, include
     \texttt{wali/nwa/NWA.hpp}, or \texttt{wali/nwa/NWAFwd.hpp} if a
     definition is not needed. See
@@ -108,7 +112,7 @@ NWAs. These are partitioned into the following namespaces:
         \sectref{query-language}.
       \item Determining whether the languages of two NWAs are equal, or if
         one is a subset of the other. See \sectref{query-language}.
-      \item prestar and poststar functions on an NWA. See
+      \item prestar and poststar operations on an NWA. See
         \sectref{query-language}.
     \end{itemize}
     

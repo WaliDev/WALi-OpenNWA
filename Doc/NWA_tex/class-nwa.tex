@@ -5,11 +5,9 @@
 \label{Se:Construction}
 
 The NWA provides two constructors, the default constructor and the copy
-constructor. The default constructor creates an empty NWA. Thereafter, 
-client code can \begin{inparaenum} \item add or remove states, \item add or remove
-symbols, \item add or remove transitions, \item set the status of certain
-  states as initial or final, and \item combine component NWAs (via union,
-  intersection, etc). \end{inparaenum}
+constructor. The default constructor creates an empty NWA. Thereafter,
+client code can add or remove states, add or remove symbols, add or remove
+transitions, and set the status of certain states as initial or final.
 
 
 The following functions are related to construction:
@@ -82,8 +80,10 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
 \end{tabular}
 \begin{tablenotes}
   \item[1] These functions return a \texttt{bool} indicating whether the item
-    was added/removed. In addition, adding a transition implicitly adds all
+    was added/removed. Adding a transition implicitly adds all
     states and symbols in that transition if they are not already present.
+    Removing a state or symbol removes all transitions the removed item was a
+    part of.
   \item[2] \texttt{WALI\_EPSILON} and \texttt{WALI\_WILD} are not explicit
     members of the symbol set. This has the following consequences (for
     \texttt{s} as epsilon or wild): \texttt{addSymbol(s)} and
@@ -123,8 +123,8 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
 The only potential difficulties are in the interactions between the
 functions. Naturally, removing a state or a symbol also removes all
 transitions involving it; hence, clearing all states or clearing all symbols
-also clears all transitions. (Removing an initial state or final state
-does not cause rippling effects, however.)
+also clears all transitions. (Calling \texttt{removeInitialState} or \texttt{removeFinalState}
+does not cause ripple effects, however.)
 
 Adding a transition implicitly adds the states and symbol involved in that
 transition if they are not already present; hence it is not necessary to
