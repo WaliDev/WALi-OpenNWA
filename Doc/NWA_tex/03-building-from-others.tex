@@ -309,32 +309,50 @@ Client information is copied directly from the original NWAs using
 \subsection{Kleene-Star}
 \label{Se:Star}
 
+\begin{changebar}
 If the original NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$,
-then the result of performing Kleene-Star on that NWA is $(Q \cup Q', \Sigma,
-Q_0', \delta', Q_0')$ where $Q' = \{q' | q \in Q\}$ and $\delta' =
-\{\delta_i',\delta_c',\delta_r'\}$ such that
+then the result of performing Kleene-Star on that NWA is $(Q', \Sigma,
+Q_0', \delta', Q_0')$ where $\delta' =
+\{\delta_i',\delta_c',\delta_r'\}$ using the following rules:
 
-\begin{enumerate} 
+\begin{mathpar}
+{\inferrule*[left=\textsc{States}]
+         {q \in Q}
+  { q \in Q' \\ q' \in Q'}
+} \\
+\and
+{\inferrule*[left=\textsc{Internal}]
+             {(q,a,p) \in \delta_i }
+  { (q,a,p) \in  \delta_i' \\ (q',a,p') \in \delta_i'}
+}
+\and
+{\inferrule*
+  {(q,a,p) \in \delta_i \\ p \in Q_f \\ r \in  Q_0}
+  {(q,a,r') \in \delta_i'\\ (q',a,r') \in \delta_i' }
+}
+\and
+{\inferrule*[left=\textsc{Call}]
+           { (q,a,p) \in \delta_c  }
+  { (q,a,p) \in  \delta_c' \\ (q',a,p) \in \delta_c'   }
+}
+\and
+{\inferrule*
+    { (q,a,p) \in \delta_c \\ p \in Q_f \\ r \in Q_0 }
+  { (q,a,r') \in \delta_c'\\ (q',a,r') \in \delta_c' }
+}
+\and
+{\inferrule*[left=\textsc{Return}]
+              { (q,r,a,p) \in \delta_r }
+  {(q,r,a,p) \in  \delta_r' \\ (q,r',a,p') \in \delta_r' }
+}
+\and
+{\inferrule*
+  { (q,a,p) \in \delta_c \\ p \in Q_f \\  r \in Q_0}
+  {(q,r,a,s') \in \delta_r' \\ (q,r',a,s') \in \delta_r'  }
+}
+\end{mathpar}
 
-\item For all $(q,a,p) \in \delta_i$, the result NWA has $(q,a,p) \in
-  \delta_i'$ and $(q',a,p') \in \delta_i'$, and if $p \in Q_f$, then
-  $(q,a,r') \in \delta_i'$ and $(q',a,r') \in \delta_i'$ for each $r \in
-  Q_0$,
-
-\item For all $(q,a,p) \in \delta_c$, the result NWA has $(q,a,p) \in
-  \delta_c'$ and $(q',a,p) \in \delta_c'$, and if $p \in Q_f$, then $(q,a,r')
-  \in \delta_c'$ and $(q',a,r') \in \delta_c'$ for each $r \in Q_0$,
-
-\item For all $(q,r,a,p) \in \delta_r$, the result NWA has $(q,r,a,p) \in
-  \delta_r'$ and $(q,r',a,p') \in \delta_r'$, and if $p \in Q_f$, then
-  $(q,r,a,s') \in \delta_r'$ and $(q,r',a,s') \in \delta_r'$ for each $s \in
-  Q_0$, and
-
-\item For all $(q,r,a,p) \in \delta_r$ with $r \in Q_0$, the result NWA has
-  $(q',s,a,p') \in \delta_r'$ for each $s \in Q \cup Q'$, and if $p \in Q_f$,
-  then $(q',s,a,t') \in \delta_r'$ for each $s \in Q \cup Q'$ and $t \in Q_0$
-
-\end{enumerate}  
+\end{changebar}
 
 \noindent The NWA resulting from performing Kleene-Star on the NWA shown in
 \figref{Star1} is shown in \figref{Star2}.  Note: The primed
@@ -378,22 +396,29 @@ and $q'$ have the same client information.
 \subsection{Reverse}
 \label{Se:Reverse}
 
+\begin{changebar}
+
 If the original NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$, then the result of
-reversing that NWA is $(Q, \Sigma, Q_0, \delta_{rev}, Q_f)$ such that
+reversing that NWA is $(Q, \Sigma, Q_0, \delta_{rev}, Q_f)$ obtained using
+the following rules:
 
-\begin{enumerate}
-
-\item For all $(q,\sigma,q') \in \delta_i$, the result NWA has $(q',\sigma,q)
-  \in {\delta_{rev}}_i$
-
-\item For all $(q_c,\sigma,q_e) \in \delta_c$, the result NWA has
-  $(q_e,\sigma,q_c) \in {\delta_{rev}}_c$
-
-\item For all $(q_x,q_c,\sigma,q_r) \in \delta_r$ and $(q_c,\sigma,q_e) \in
-  \delta_c$ (where the $q_c$s are the same), the result NWA has
-  $(q_r,q_e,\sigma,q_x) \in {\delta_{rev}}_r$
-
-\end{enumerate}
+\begin{mathpar}
+{\inferrule*[left=\textsc{Internal}]
+     { (q,\sigma,q') \in \delta_i  }
+  { (q',\sigma,q)  \in {\delta_{rev}}_i }
+} 
+\and
+{\inferrule*[left=\textsc{Call}]
+       { (q_c,\sigma,q_e) \in \delta_c }
+  { (q_e,\sigma,q_c) \in {\delta_{rev}}_c }
+}
+\and
+{\inferrule*[left=\textsc{Return}]
+  { (q_x,q_c,\sigma,q_r) \in \delta_r  \\ (q_c,\sigma,q_e) \in  \delta_c }
+  { (q_r,q_e,\sigma,q_x) \in {\delta_{rev}}_r }
+}
+\end{mathpar}
+\end{changebar}
 
 \noindent The NWA resulting from performing reverse on the NWA shown in
 Figure \ref{Fi:Example1} is shown in Figure \ref{Fi:Reverse1}.
