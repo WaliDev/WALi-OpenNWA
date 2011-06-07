@@ -1,4 +1,4 @@
-\section{Conversions between PDS and NWA (or ``The
+\section{Conversions beween PDS and NWA (or ``The
   \texttt{wali::nwa::nwa\_pds} namespace)}
 \label{Se:Conversions}
 
@@ -55,6 +55,14 @@ are declared in the header \texttt{wali/nwa/nwa\_pds/conversions.hpp}.
     weights for the WPDS's transitions.
 \end{description}
 
+\begin{changebar}
+For the rest of the section assume that we have a PDS $(P, \Gamma, \Delta )$ 
+where $\Delta = (\Delta_0, \Delta_1, \Delta_2)$ and a 
+NWA $(Q, \Sigma,
+Q_0, \delta, Q_f)$ where $\delta =
+\{\delta_i,\delta_c,\delta_r\}$.
+
+\end{changebar}
 
 \subsection{PDS to NWA}
 \label{Se:PDStoNWA}
@@ -62,23 +70,40 @@ are declared in the header \texttt{wali/nwa/nwa\_pds/conversions.hpp}.
 The \texttt{PDStoNWA} functions convert a PDS into an NWA in a manner
 faithful to the association suggested in the introduction to this section.
 
-Formally, the conversion proceeds as follows:
-\begin{enumerate}
+\begin{changebar}
+Given a PDS the corresponding NWA is constructed using the following rules:
 
-\item For each $\langle p,q \rangle \hookrightarrow \langle p',q' \rangle \in
-  \Delta_1$ in the PDS, we add $( (p,q), q, (p',q') )$ to the NWA's $\delta_i$
+\begin{mathpar}
+{\inferrule*[left=\textsc{States}]
+  { p \in P \\ q \in \Gamma }
+  { (p,q) \in Q }
+}
+\and
+{\inferrule*[left=\textsc{Alphabet}]
+  { q \in \Gamma }
+  { q \in \Sigma } 
+}
+\and 
+\\
+{\inferrule*[left=\textsc{Internal}]
+  { \langle p,q \rangle \hookrightarrow \langle p',q' \rangle \in  \Delta_1 }
+  { ( (p,q), q, (p',q') ) \in \delta_i  }
+}
+\and
+{\inferrule*[left=\textsc{Call}]
+  { \langle p,q_c \rangle \hookrightarrow \langle  p',q_e \hspace{.1cm} q_r \rangle \in \Delta_2 }
+  { ( (p,q_c), q_c, (p',q_e) ) \in \delta_c }
+} 
+\and
+{\inferrule*[left=\textsc{Return}]
+  { \langle p'',q_x \rangle \hookrightarrow \langle p''',\epsilon  \rangle \in \Delta_0 \\
+     \langle p,q_c \rangle \hookrightarrow \langle p',q_e \hspace{.1cm} q_r  \rangle \in \Delta_2 }
+  { ( (p'',q_x), (p,q_c), q_x, (p''',q_r) ) \in \delta_r }
+}
+\end{mathpar}
 
-\item For each $\langle p,q_c \rangle \hookrightarrow \langle
-  p',q_e \hspace{.1cm} q_r \rangle \in \Delta_2$ in the PDS, we add $(
-  (p,q_c), q_c, (p',q_e) )$ to the NWA's $\delta_c$
-
-\item For each $\langle p'',q_x \rangle \hookrightarrow \langle p''',\epsilon
-  \rangle \in \Delta_0$ in the PDS, we add $( (p'',q_x), (p,q_c), q_x,
-  (p''',q_r) )$ to the NWA's $\delta_r$ for all $(q_c,q_r)$ pairs such that
-  $\langle p,q_c \rangle \hookrightarrow \langle p',q_e \hspace{.1cm} q_r
-  \rangle \in \Delta_2$.
-
-\end{enumerate}
+Note that $Q_0$ and $Q_f$ are empty.
+\end{changebar}
 
 \begin{figure}[p]
   \centering
@@ -172,6 +197,43 @@ the compiler will not let you ignore this responsibility.)
 
 \noindent The conversion is performed by:
 
+\begin{changebar}
+
+\begin{mathpar}
+{\inferrule*[left=\textsc{States}]
+  { }
+  {p \in P}
+}
+\and 
+{\inferrule*
+  { (q_x,q_c,\sigma,q_r) \in \delta_r }
+  { p_{q_x} \in P }
+}
+\and
+{\inferrule*
+  { q \in Q }
+  { q \in \Gamma }
+}
+\and \\
+{\inferrule*[left=\textsc{Internal}]
+  { (q,\sigma,q') \in \delta_i }
+  { \langle p,q \rangle \hookrightarrow \langle p,q' \rangle \in \Delta_1 }
+}
+\and
+{\inferrule*[left=\textsc{Call}]
+  { (q_c,\sigma, q_e) \in \delta_c }
+  {  \langle p,q_c \rangle \hookrightarrow \langle p, q_e \hspace{.1cm} q_c \rangle\in \Delta_2 }
+}
+\and
+{\inferrule*[left=\textsc{Return}]
+  { (q_x,q_c,\sigma,q_r) \in \delta_r }
+  { \langle p,q_x \rangle \hookrightarrow \langle p_{q_x},\epsilon \rangle \in \Delta_0 \\
+   \langle p_{q_x},q_c \rangle \hookrightarrow \langle p,q_r \rangle\in \Delta_1  }
+}
+
+\end{mathpar}
+\end{changebar}
+
 \begin{enumerate}
 
 \item For each $(q,\sigma,q')$ $\in \delta_i$ in the NWA, adding $\langle p,q
@@ -231,6 +293,43 @@ shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
 \subsubsection{2. Backwards Flow Stacking Calls}
 
 \noindent The conversion is performed by:
+
+\begin{changebar}
+
+\begin{mathpar}
+{\inferrule*[left=\textsc{States}]
+  { }
+  {p \in P}
+}
+\and 
+{\inferrule*
+  { (q_c,\sigma,q_e) \in \delta_c }
+  { p_{q_e} \in P }
+}
+\and
+{\inferrule*
+  { q \in Q }
+  { q \in \Gamma }
+}
+\and \\
+{\inferrule*[left=\textsc{Internal}]
+  { (q,\sigma,q') \in \delta_i }
+  { \langle p,q' \rangle \hookrightarrow \langle p,q \rangle \in \Delta_1 }
+}
+\and  
+{\inferrule*[left=\textsc{Call}]
+  { (q_c,\sigma, q_e) \in \delta_c \\ (q_x,q_c,\gamma,q_r) \in \delta_r }
+  { \langle p,q_e \rangle \hookrightarrow \langle p_{q_e},\epsilon \rangle \in \Delta_0 \\
+    \langle p_{q_e},q_r \rangle \hookrightarrow \langle p,q_c  \rangle \in \Delta_1 }
+}
+\and
+{\inferrule*[left=\textsc{Return}]
+  { (q_x,q_c,\sigma,q_r) \in \delta_r }
+  {  \langle p,q_r \rangle \hookrightarrow \langle p,q_x \hspace{.1cm} q_r
+  \rangle \in \Delta_2 }
+}
+\end{mathpar}
+\end{changebar}
 
 \begin{enumerate}
 
@@ -293,6 +392,41 @@ WPDS is shown in Figure \ref{Fig:NWAtoPDS5}.  Note:
 
 \noindent The conversion is performed by:
 
+\begin{changebar}
+\begin{mathpar}
+{\inferrule*[left=\textsc{States}]
+  { }
+  {p \in P}
+}
+\and 
+{\inferrule*
+  { (q_x,q_c,\sigma,q_r) \in \delta_r }
+  { p_{q_x} \in P }
+}
+\and
+{\inferrule*
+  { q \in Q }
+  { q \in \Gamma }
+}
+\and \\
+{\inferrule*[left=\textsc{Internal}]
+  { (q,\sigma,q') \in \delta_i }
+  { \langle p,q  \rangle \hookrightarrow \langle p,q' \rangle \in \Delta_1 }
+}
+\and
+{\inferrule*[left=\textsc{Call}]
+  { (q_c,\sigma, q_e) \in \delta_c \\ (q_x,q_c,\gamma,q_r) \in \delta_r }
+  { \langle p,q_c \rangle \hookrightarrow  \langle p, q_e \hspace{.1cm} q_r \rangle \in \Delta_2 }
+}
+\and 
+{\inferrule*[left=\textsc{Return}]
+  { (q_x,q_c,\sigma,q_r) \in \delta_r }
+  { \langle p,q_x \rangle \hookrightarrow \langle p_{q_x},\epsilon \rangle \in  \Delta_0 \\
+    \langle  p_{q_x},q_r \rangle \hookrightarrow \langle p,q_r \rangle \in \Delta_1 }
+}
+\end{mathpar}
+\end{changebar}
+
 \begin{enumerate}
 
 \item For each $(q,\sigma,q')$ $\in \delta_i$ in the NWA, adding $\langle p,q
@@ -316,7 +450,7 @@ WPDS is shown in Figure \ref{Fig:NWAtoPDS5}.  Note:
   p_{q_x},q_r \rangle \hookrightarrow \langle p,q_r \rangle$ to $\Delta_1$ of
   the WPDS (with weight
   \texttt{wg.getWeight($q_x$,$CI_{q_x}$,$\sigma$,EXIT\_TO\_RET,$q_r$,$CI_{q_r}$)}
-  or texttt{wg.getWildWeight($q_x$,$CI_{q_x}$,$q_r$,$CI_{q_r}$)}, depending
+  or \texttt{wg.getWildWeight($q_x$,$CI_{q_x}$,$q_r$,$CI_{q_r}$)}, depending
   on $\sigma$).
 
 \end{enumerate}
@@ -354,6 +488,43 @@ shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
 \subsubsection{4. Backwards Flow Stacking Returns}
 
 \noindent The conversion is performed by:
+
+\begin{changebar}
+
+\begin{mathpar}
+{\inferrule*[left=\textsc{States}]
+  { }
+  {p \in P}
+}
+\and 
+{\inferrule*
+  { (q_c,\sigma,q_e) \in \delta_c }
+  { p_{q_e} \in P }
+}
+\and
+{\inferrule*
+  { q \in Q }
+  { q \in \Gamma }
+}
+\and \\
+{\inferrule*[left=\textsc{Internal}]
+  { (q,\sigma,q') \in \delta_i }
+  { \langle  p,q' \rangle \hookrightarrow \langle p,q \rangle \in \Delta_1 }
+}
+\and
+{\inferrule*[left=\textsc{Call}]
+  { (q_c,\sigma, q_e) \in \delta_c }
+  { \langle  p,q_e \rangle \hookrightarrow \langle p_{q_e},\epsilon \rangle \in \Delta_0 \\
+    \langle  p_{q_e},q_c \rangle \hookrightarrow \langle p,q_c \rangle \in \Delta_1  }
+}
+\and 
+{\inferrule*[left=\textsc{Return}]
+  { (q_x,q_c,\sigma,q_r) \in \delta_r }
+  { \langle p,q_r \rangle \hookrightarrow \langle p,q_x \hspace{.1cm} q_c  \rangle \in \Delta_2 }
+}
+\end{mathpar}
+
+\end{changebar}
 
 \begin{enumerate}
 
