@@ -112,7 +112,7 @@ if 'help' not in COMMAND_LINE_TARGETS:
     ## ##################
     ## libwali
     built = SConscript('Source/SConscript', variant_dir=os.path.join(BuildDir,'lib'), duplicate=0)
-    #built += SConscript('Source/bin/SConscript', variant_dir=os.path.join(BuildDir,'bin'), duplicate=0)
+    built += SConscript('Source/bin/SConscript', variant_dir=os.path.join(BuildDir,'bin'), duplicate=0)
     #built += SConscript('Doc/tex/SConscript')
 
     ## ##################
