@@ -7,13 +7,6 @@
 #include "wali/nwa/NWA.hpp"
 #include "enrich_nwa_calls.hpp"
 
-//#include <boost/program_options/options_description.hpp>
-//#include <boost/program_options/positional_options.hpp>
-//#include <boost/program_options/variables_map.hpp>
-//#include <boost/program_options/parsers.hpp>
-
-//namespace po = boost::program_options;
-
 using std::vector;
 using std::string;
 using std::ifstream;
