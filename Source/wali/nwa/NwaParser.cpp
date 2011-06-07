@@ -488,7 +488,7 @@ read_list(std::istream & is,  UnitType (*unitParser)(std::istream & is))
   std::vector<UnitType> ret;
   if (is.peek() == '}' || is.peek() == -1) return ret;
     
-  while(true) {
+  for(;;) {
     // Parse the current NONTERM
     ret.push_back(unitParser(is));
 

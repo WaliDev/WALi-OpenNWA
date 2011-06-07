@@ -1368,6 +1368,8 @@ namespace wali {
     void IntraGraph::setupDomRegExp(vector<IntraGraphNode> &cnodes ATTR_UNUSED, int ncnodes,
 				    vector<IntraGraphEdge> &cedges, int ncedges,
                                     int *dom, int *number, int *vertex, int *tree, set<int> *children) {
+      (void) cnodes;
+
       int n = ncnodes;
       int m = ncedges;
       int i,count;
@@ -1404,6 +1406,8 @@ namespace wali {
     int *IntraGraph::computeDominators(vector<IntraGraphNode> &cnodes, int ncnodes,
 				       vector<IntraGraphEdge> &cedges, int ncedges ATTR_UNUSED,
 				       int *buffer, set<int> *bucket_buffer) {
+      (void) ncedges;
+
       int n = ncnodes;
       int i,u,v,w,count;
 

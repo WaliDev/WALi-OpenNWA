@@ -27,6 +27,7 @@ namespace wali
     // default does nothing
     merge_fn_t Wrapper::wrap( wpds::ewpds::ERule& r ATTR_UNUSED, merge_fn_t user_merge )
     {
+      (void) r;
       return user_merge;
     }
 

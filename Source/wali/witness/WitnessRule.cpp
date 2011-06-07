@@ -100,6 +100,7 @@ namespace wali
     void WitnessRule::accept( Visitor& v, bool visitOnce ATTR_UNUSED )
     {
       // TODO how does marking work...need a flag maybe
+      (void) visitOnce;
       mark();
       v.visitRule(this);
     }

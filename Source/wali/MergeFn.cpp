@@ -51,6 +51,7 @@ namespace wali
 
   MergeFn *MergeFn::parse_element(const char *s ATTR_UNUSED, sem_elem_t sem)
   {
+    (void) s;
     return new MergeFn(sem);
   }
 

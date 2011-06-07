@@ -36,6 +36,7 @@ namespace wali {
 
       // Extend is compose^{reversed}
       sem_elem_t FunctionalWeight::extend(SemElem *se ATTR_UNUSED) {
+        (void) se;
         *waliErr << "Error: Extend called on FunctionalWeight\n";
         assert(0);
         return 0;
@@ -43,6 +44,7 @@ namespace wali {
 
       // combine should never be called
       sem_elem_t FunctionalWeight::combine(SemElem *se ATTR_UNUSED) {
+        (void) se;
         *waliErr << "Error: Combine called on FunctionalWeight\n";
         assert(0);
         return NULL;
@@ -52,6 +54,7 @@ namespace wali {
       bool FunctionalWeight::equal(SemElem *se ATTR_UNUSED) const {
         //*waliErr << "Error: Equal called on FunctionalWeight\n";
         //assert(0);
+        (void) se;
         return false;
       }
 

@@ -38,6 +38,7 @@ namespace wali
    */
   sem_elem_t SemElem::diff( SemElem * se ATTR_UNUSED )
   {
+    (void) se;
     *waliErr << "[ERROR] SemElem::diff must be overridden to be used.\n";
     assert(0);
     return 0;
