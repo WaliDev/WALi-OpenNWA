@@ -6,6 +6,8 @@
 #include <sstream>
 
 #include "wali/nwa/NWA.hpp"
+#include "wali/nwa/NestedWord.hpp"
+#include "wali/nwa/NWAParser.hpp"
 
 //#include <boost/program_options/options_description.hpp>
 //#include <boost/program_options/positional_options.hpp>
