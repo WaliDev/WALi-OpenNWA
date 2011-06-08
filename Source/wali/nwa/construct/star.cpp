@@ -7,7 +7,8 @@ namespace wali
     namespace construct
     {
       
-
+    }
+    
     /**
      *
      * @brief constructs the NWA resulting from performing Kleene-* on the given NWA
@@ -16,7 +17,7 @@ namespace wali
      *
      */
     
-    void NWA::star( NWA const & first )
+    void NWA::_private_star_( NWA const & first )
     {
       //TODO: ponder the following ... 
       //Q: how do we prevent the stuck state from being the same as any of the states that we
@@ -210,7 +211,6 @@ namespace wali
     }
 
       
-    }
   }
 }
 

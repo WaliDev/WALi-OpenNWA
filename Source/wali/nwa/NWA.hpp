@@ -29,6 +29,7 @@
 #include "wali/nwa/construct/determinize.hpp"
 #include "wali/nwa/construct/intersect.hpp"
 #include "wali/nwa/construct/reverse.hpp"
+#include "wali/nwa/construct/star.hpp"
 
 
 
@@ -887,38 +888,13 @@ namespace wali
         return construct::reverse(first);
       }
 
-      /**
-       *
-       * @brief constructs the NWA resulting from performing Kleene-* on the given NWA
-       *
-       * This method constructs the Kleene-* of the given NWA by adding epsilon transitions 
-       * from all final states of the NWA to all initial states of the NWA.  
-       * Note: The resulting NWA is NOT guaranteed to be deterministic.
-       *
-       * @param - first: the NWA to perform the Kleene-* of
-       *
-       */
-      void star( NWA const & first );
-
-      /**
-       *
-       * @brief constructs the NWA resulting from performing Kleene-* on the given NWA
-       *
-       * This method constructs the Kleene-* of the given NWA by adding epsilon transitions 
-       * from all final states of the NWA to all initial states of the NWA.  
-       * Note: The resulting NWA is NOT guaranteed to be deterministic.
-       *
-       * @param - first: the NWA to perform the Kleene-* of
-       * @param - stuck: dummy parameter
-       * @return the NWA resulting from performing Kleene-* on the given NWA
-       *
-       */
-      static NWARefPtr star( NWA const & first, State stuck )
-      {
+      void _private_star_( NWA const & first );
+      void star( NWA const & first ) {
+        construct::star(*this, first);
+      }
+      static NWARefPtr star( NWA const & first, State stuck ) {
         (void) stuck;
-        NWARefPtr nwa(new NWA());
-        nwa->star(first);
-        return nwa;
+        return construct::star(first);
       }
 
 
