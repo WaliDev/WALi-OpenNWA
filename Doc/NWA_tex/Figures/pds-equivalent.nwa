@@ -20,6 +20,6 @@ Delta_c: {
 }
 
 Delta_r: {
-  ((p,x), (p,c1), x, (p,r1))
+  ((p,x), (p,c1), x, (p,r1)),
   ((p,x), (p,c2), x, (p,r2))
 }
