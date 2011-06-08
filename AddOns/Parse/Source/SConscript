@@ -26,6 +26,10 @@ waliparse_files = Split("""
 """)
 
 Env = BaseEnv.Clone()
+
+Env['WARNING_FLAGS'] = Env['WARNING_FLAGS'].replace('-Wundef', '')
+Env['WARNING_FLAGS'] = Env['WARNING_FLAGS'].replace('-Wshadow', '')
+
 Env.Append(CPPPATH=[os.path.join(WaliDir,'AddOns','Parse','Source')])
 Env.Append(CPPPATH=[os.path.join(WaliDir,'AddOns','Parse','ThirdParty',XercesDir,'include')])
 

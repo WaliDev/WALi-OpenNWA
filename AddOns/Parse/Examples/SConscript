@@ -30,8 +30,13 @@ if MkStatic:
 env = ProgEnv.Clone()
 env.Append(CPPPATH=[os.path.join(WaliDir, 'AddOns', 'Parse', 'Source')])
 env.Append(CPPPATH=[os.path.join(XercesPath, 'include')])
+
 env.Replace(LIBS=Libs)
 env.Replace(LIBPATH=LibPath)
+
+env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
+env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wshadow', '')
+
 
 # Used to record the tests that are built
 built = []

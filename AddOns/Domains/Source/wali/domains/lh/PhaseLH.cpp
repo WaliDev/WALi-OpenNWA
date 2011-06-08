@@ -292,11 +292,11 @@ bool PhaseLH::init_vars()
   return true;
 }
 
-bool PhaseLH::initialize( int num_locks, int phases, int Q )
+bool PhaseLH::initialize( int num_locks, int phases, int the_Q )
 {
-  if (Q == -1)
-    Q = phases;
-  assert( PhaseLH::allocate(num_locks,phases,Q) );
+  if (the_Q == -1)
+    the_Q = phases;
+  assert( PhaseLH::allocate(num_locks,phases,the_Q) );
   assert( PhaseLH::init_vars() );
   return true;
 }
@@ -805,9 +805,9 @@ PhaseLH PhaseLH::Summarize( const PhaseLH& a , const PhaseLH& b)
   return PhaseLH( R6 , a.phaseX );
 }
 
-PhaseLH::PhaseLH( bdd R,int phaseX ) : R(R),phaseX(phaseX)
+PhaseLH::PhaseLH( bdd the_R,int the_phaseX ) : R(R),phaseX(the_phaseX)
 {
-  invariant_check(R,phaseX);
+  invariant_check(the_R,the_phaseX);
 }
 
 bool PhaseLH::check_lock(int lock)
@@ -1517,14 +1517,14 @@ void PhaseLH::print_sum(char* v, int size)
 // To get to the next phase.
 //   phase index  = PLYVARS * N * phase.
 //   var   offset = v*N + proc 
-int PhaseLH::cidx(int N, int proc , int phase , int v)
+int PhaseLH::cidx(int the_N, int proc , int phase , int v)
 {
   assert( (0<=v)      && (v < PLYVARS));
-  assert( (0 <= proc) && (proc < N) );
+  assert( (0 <= proc) && (proc < the_N) );
   assert( (0 <= phase) && (phase < PHASES) );
   return 
     BASE + 
-    (PLYVARS*N*phase) + // Skip to correct phase
-    (N*v) + proc;     // handle interleaving
+    (PLYVARS*the_N*phase) + // Skip to correct phase
+    (the_N*v) + proc;     // handle interleaving
 }
 

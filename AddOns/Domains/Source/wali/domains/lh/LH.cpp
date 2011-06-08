@@ -349,9 +349,9 @@ bool LH::init_vars()
   return true;
 }
 
-bool LH::initialize( int num_locks, int Q )
+bool LH::initialize( int num_locks, int the_Q )
 {
-  assert( LH::allocate(num_locks,Q) );
+  assert( LH::allocate(num_locks,the_Q) );
   assert( LH::init_vars() );
   return true;
 }
@@ -538,7 +538,7 @@ bool LH::operator!=(const LH& that) const
   return R != that.R;
 }
 
-LH::LH( bdd R ) : R(R)
+LH::LH( bdd the_R ) : R(the_R)
 {
 }
 

@@ -10,6 +10,8 @@ Import('LibInstallDir')
 BuddyEnv = BaseEnv.Clone(CPPPATH=['src'])
 BaseEnv.Append(CFLAGS=' -O2')
 
+BuddyEnv['WARNING_FLAGS'] = BuddyEnv['WARNING_FLAGS'].replace('-Wconversion', '')
+BuddyEnv['WARNING_FLAGS'] = BuddyEnv['WARNING_FLAGS'].replace('-Werror', '')
 
 SRCS = Glob('buddy-2.4/src/*.c') + ['buddy-2.4/src/cppext.cxx']
 liba   = BuddyEnv.StaticLibrary('bdd' , SRCS)
