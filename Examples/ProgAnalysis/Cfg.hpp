@@ -48,6 +48,7 @@ class CFGNode {
   // Return the set of outgoing edges
   //std::set<CFGEdge *> getOutgoingEdges() = 0;
 
+  virtual ~CFGNode() {}
 };
 
 // Abstract class denoting a CFG edge
@@ -91,6 +92,8 @@ public:
   // Return the merge function associated with the edge. This is only
   // invoked for call edges.
   virtual wali::merge_fn_t getMergeFn() const = 0;
+
+  virtual ~CFGEdge() {}
 };
 
 // Abstract class for denoting a CFG. We assume that a CFG has a 
@@ -115,6 +118,8 @@ public:
 
   // Return the set of all CFG edges contained in this CFG
   virtual const std::set<CFGEdge *> & getEdges() const = 0;
+
+  virtual ~CFG() {}
 };
 
 #endif // _WALI_CFG_HPP_

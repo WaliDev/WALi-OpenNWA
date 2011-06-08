@@ -845,7 +845,7 @@ void Dictionary_T<Key_t, Datum_t, KeyComp_t>::Print(std::ostream&  out, unsigned
 
 }
 
-static int WithinOne(unsigned int i, unsigned int j)
+inline int WithinOne(unsigned int i, unsigned int j)
 {
   return(i==j || i+1==j || j+1==i);
 }

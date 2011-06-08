@@ -48,8 +48,13 @@ sources = Split("""
 if utf_lib:
    sources = sources + [utf_lib]
 
-exe = Env.Program('test-nwa.exe', sources + Env['StaticLibs'])
-built += (exe)
+
+## Commented out because this is really old
+
+#exe = Env.Program('test-nwa.exe', sources + Env['StaticLibs'])
+#built += (exe)
+
+built = []
 
 Return('built')
 
