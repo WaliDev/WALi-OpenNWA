@@ -7,6 +7,8 @@
 #include "wali/nwa/NWA.hpp"
 #include "wali/nwa/NWAParser.hpp"
 
+#include "wali/nwa/construct/constructions.hpp"
+
 using std::string;
 using std::ifstream;
 using std::ofstream;
@@ -14,6 +16,10 @@ using std::cout;
 using std::cerr;
 using std::endl;
 using std::exit;
+
+using wali::nwa::NWARefPtr;
+using wali::nwa::read_nwa;
+using wali::nwa::construct::CONSTRUCTION_FUNCTION;
 
 int main(int argc, char** argv)
 {
@@ -41,12 +47,12 @@ int main(int argc, char** argv)
         exit(3);
     }
 
-    wali::nwa::NWARefPtr nwa1 = wali::nwa::read_nwa(infile1);
-    wali::nwa::NWARefPtr nwa2 = wali::nwa::read_nwa(infile2);
+    NWARefPtr nwa1 = read_nwa(infile1);
+    NWARefPtr nwa2 = read_nwa(infile2);
     
-    wali::nwa::NWARefPtr inter = new wali::nwa::NWA();
-    inter->intersect(*nwa1, *nwa2);
-    inter->print(outfile);
+    NWARefPtr result = CONSTRUCTION_FUNCTION(*nwa1, *nwa2);
+
+    result->print(outfile);
 }
 
 

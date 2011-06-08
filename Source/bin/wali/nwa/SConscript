@@ -4,14 +4,36 @@ Import('BinInstallDir')
 env = ProgEnv.Clone()
 
 
-built = []
-#    env.Program('print-dot.exe', ['print-dot.cpp']),
-#    env.Program('determinize.exe', ['determinize.cpp']),
-#    env.Program('complement.exe', ['complement.cpp']),
-#    env.Program('intersect.exe', ['intersect.cpp']),
-#    env.Program('is-empty.exe', ['is-empty.cpp']),
-#    env.Program('is-member.exe', ['is-member.cpp']),
-#]
+def _ProgramTarget(env, command, function, source):
+    if function == None:
+        function = command
+    assert 'CPPDEFINES' not in env
+    obj = env.Object('nwa-%s' % command, source,
+                     CPPDEFINES={'CONSTRUCTION_FUNCTION': function})
+    prg = env.Program('nwa-%s.exe' % command, obj)
+    return prg
+
+def SingleProgramTarget(env, command, function=None):
+    return _ProgramTarget(env, command, function, 'single-nwa-command.cpp')
+
+def DoubleProgramTarget(env, command, function=None):
+    return _ProgramTarget(env, command, function, 'double-nwa-command.cpp')
+
+
+built = [
+    env.Program('nwa-print-dot.exe', ['print-dot.cpp']),
+    env.Program('nwa-is-empty.exe', ['is-empty.cpp']),
+    env.Program('nwa-is-member.exe', ['is-member.cpp']),
+
+    DoubleProgramTarget(env, 'intersect'),
+    DoubleProgramTarget(env, 'union', 'unionNWA'),
+    DoubleProgramTarget(env, 'concatenate'),
+
+    SingleProgramTarget(env, 'star'),
+    SingleProgramTarget(env, 'complement'),
+    SingleProgramTarget(env, 'determinize'),
+    SingleProgramTarget(env, 'reverse'),
+]
 
 i = env.Install(BinInstallDir, built)
 

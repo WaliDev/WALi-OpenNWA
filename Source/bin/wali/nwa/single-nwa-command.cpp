@@ -7,6 +7,8 @@
 #include "wali/nwa/NWA.hpp"
 #include "wali/nwa/NWAParser.hpp"
 
+#include "wali/nwa/construct/constructions.hpp"
+
 using std::string;
 using std::ifstream;
 using std::ofstream;
@@ -14,6 +16,10 @@ using std::cout;
 using std::cerr;
 using std::endl;
 using std::exit;
+
+using wali::nwa::NWARefPtr;
+using wali::nwa::read_nwa;
+using wali::nwa::construct::CONSTRUCTION_FUNCTION;
 
 int main(int argc, char** argv)
 {
@@ -35,11 +41,11 @@ int main(int argc, char** argv)
         exit(3);
     }
 
-
-    wali::nwa::NWARefPtr nwa = wali::nwa::read_nwa(infile);
-    wali::nwa::NWARefPtr det = new wali::nwa::NWA();
-    det->determinize(*nwa);
-    det->print(outfile);
+    NWARefPtr nwa = read_nwa(infile);
+    
+    NWARefPtr out = CONSTRUCTION_FUNCTION(*nwa);
+    
+    out->print(outfile);
 }
 
 
