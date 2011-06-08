@@ -1,0 +1,49 @@
+
+\begin{tikzpicture}[>=latex,line join=bevel,]
+  \pgfsetlinewidth{1bp}
+%%
+\pgfsetcolor{black}
+  % Edge: (key#2,2) -> (key#4,4)
+  \draw [->] (36.873bp,26.098bp) .. controls (39.113bp,35.919bp) and (42.28bp,49.808bp)  .. (47.223bp,71.48bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (51.912bp,41.808bp) node {a};
+  % Edge: (key#4,4) -> (key#8,8)
+  \pgfsetcolor{green}
+  \draw [->] (49.792bp,96.549bp) .. controls (49.569bp,106.57bp) and (49.251bp,120.88bp)  .. (48.754bp,143.27bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (64.387bp,114.76bp) node {call};
+  % Edge: (key#8,8) -> (key#6,9)
+  \draw [->] (46.947bp,168.99bp) .. controls (45.763bp,178.97bp) and (44.087bp,193.08bp)  .. (41.472bp,215.11bp);
+  \draw (55.811bp,187.99bp) node {b};
+  % Node: (key#2,2)
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw [very thick] (34bp,14bp) ellipse (33bp and 13bp);
+  \draw (34bp,13.5bp) node {(key\#2,2)};
+\end{scope}
+  % Node: (key#4,4)
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (50bp,84bp) ellipse (33bp and 13bp);
+  \draw (50.071bp,83.969bp) node {(key\#4,4)};
+\end{scope}
+  % Node: (key#6,9)
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (40bp,228bp) ellipse (33bp and 13bp);
+  \draw (39.966bp,227.8bp) node {(key\#6,9)};
+\end{scope}
+  % Node: (key#8,8)
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (48bp,156bp) ellipse (33bp and 13bp);
+  \draw (48.467bp,156.19bp) node {(key\#8,8)};
+\end{scope}
+%
+\end{tikzpicture}

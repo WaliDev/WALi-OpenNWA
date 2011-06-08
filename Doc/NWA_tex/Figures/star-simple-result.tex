@@ -1,0 +1,113 @@
+
+\begin{tikzpicture}[>=latex,line join=bevel,]
+  \pgfsetlinewidth{1bp}
+%%
+\pgfsetcolor{black}
+  % Edge: Begin -> Entry
+  \pgfsetcolor{green}
+  \draw [->] (297.02bp,219.66bp) .. controls (296.35bp,208.57bp) and (295.32bp,191.68bp)  .. (293.9bp,168.11bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (310.76bp,198.88bp) node {call};
+  % Edge: ( Begin , prime ) -> Entry
+  \pgfsetcolor{green}
+  \draw [->] (257.91bp,124.05bp) .. controls (263.21bp,128.88bp) and (269.07bp,134.22bp)  .. (281.92bp,145.93bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (278.19bp,118.6bp) node {call};
+  % Edge: Exit -> ( End , prime )
+  \pgfsetcolor{red}
+  \draw [->] (307.55bp,72.129bp) .. controls (301.02bp,62.266bp) and (290.92bp,46.992bp)  .. (277.06bp,26.025bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (313.11bp,42.317bp) node {ret: ( Begin , prime ), };
+  % Edge: ( Exit , prime ) -> ( Begin , prime )
+  \pgfsetcolor{red}
+  \draw [->] (204.83bp,56.611bp) .. controls (210.11bp,64.228bp) and (217.07bp,74.265bp)  .. (229.33bp,91.942bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (232.14bp,58.042bp) node {ret: Begin, End, Entry, Exit, ( Begin , prime ), ( End , prime ), ( Entry , prime ), ( Exit , prime ), };
+  % Edge: ( Entry , prime ) -> ( Exit , prime )
+  \draw [->] (153.72bp,29.197bp) .. controls (155.36bp,29.778bp) and (157.03bp,30.368bp)  .. (168.24bp,34.331bp);
+  \draw (154.21bp,41.078bp) node {a};
+  % Edge: ( Exit , prime ) -> ( End , prime )
+  \pgfsetcolor{red}
+  \draw [->] (221.21bp,33.661bp) .. controls (225.59bp,31.805bp) and (230.21bp,29.845bp)  .. (244.02bp,23.994bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (222bp,14.783bp) node {ret: Begin, End, Entry, Exit, ( Begin , prime ), ( End , prime ), ( Entry , prime ), ( Exit , prime ), };
+  % Edge: Exit -> ( Begin , prime )
+  \pgfsetcolor{red}
+  \draw [->] (297.57bp,88.205bp) .. controls (293.75bp,89.563bp) and (289.52bp,91.069bp)  .. (275.38bp,96.094bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (286.35bp,74.417bp) node {ret: Begin, ( Begin , prime ), };
+  % Edge: Exit -> End
+  \pgfsetcolor{red}
+  \draw [->] (332.72bp,77.716bp) .. controls (340.39bp,75.822bp) and (349.52bp,73.567bp)  .. (368.17bp,68.963bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (342.48bp,60.566bp) node {ret: Begin, };
+  % Edge: Entry -> Exit
+  \draw [->] (296.47bp,144.64bp) .. controls (299.65bp,133.49bp) and (304.53bp,116.36bp)  .. (311.19bp,93.025bp);
+  \draw (291.43bp,120.76bp) node {a};
+  % Node: Begin
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw [very thick] (298bp,231bp) ellipse (23bp and 12bp);
+  \draw (297.73bp,231.41bp) node {Begin};
+\end{scope}
+  % Node: End
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (391bp,63bp) ellipse (20bp and 11bp);
+  \draw (391bp,63bp) ellipse (24bp and 15bp);
+  \draw (390.54bp,63.438bp) node {End};
+\end{scope}
+  % Node: ( Exit , prime )
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (196bp,44bp) ellipse (45bp and 13bp);
+  \draw (196.25bp,44.239bp) node {( Exit , prime )};
+\end{scope}
+  % Node: ( Entry , prime )
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (125bp,19bp) ellipse (48bp and 13bp);
+  \draw (125.24bp,19.128bp) node {( Entry , prime )};
+\end{scope}
+  % Node: ( Begin , prime )
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw [very thick] (241bp,108bp) ellipse (48bp and 13bp);
+  \draw [very thick] (241bp,108bp) ellipse (52bp and 17bp);
+  \draw (240.74bp,108.4bp) node {( Begin , prime )};
+\end{scope}
+  % Node: Exit
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (314bp,82bp) ellipse (20bp and 11bp);
+  \draw (314.26bp,82.277bp) node {Exit};
+\end{scope}
+  % Node: Entry
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (293bp,156bp) ellipse (24bp and 12bp);
+  \draw (293.18bp,156.19bp) node {Entry};
+\end{scope}
+  % Node: ( End , prime )
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (269bp,14bp) ellipse (44bp and 13bp);
+  \draw (268.78bp,13.5bp) node {( End , prime )};
+\end{scope}
+%
+\end{tikzpicture}
