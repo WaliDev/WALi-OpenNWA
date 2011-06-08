@@ -25,9 +25,11 @@
 
 // TODO: remove these after removing deprecated stuff
 #include "wali/nwa/construct/complement.hpp"
+#include "wali/nwa/construct/concatenate.hpp"
 #include "wali/nwa/construct/determinize.hpp"
 #include "wali/nwa/construct/intersect.hpp"
-#include "wali/nwa/construct/concatenate.hpp"
+#include "wali/nwa/construct/reverse.hpp"
+
 
 
 //#define USE_BUDDY
@@ -877,38 +879,12 @@ namespace wali
       }
 
 
-      /**
-       *
-       * @brief constructs the NWA which is the reverse of the given NWA
-       *
-       * This method constructs the NWA which is the reverse of the given NWA. It reverses 
-       * internal transitions and switches call and return transitions.
-       * Note: the resulting NWA is NOT guaranteed to be deterministic.
-       *
-       * @param - first: the NWA to reverse
-       * 
-       */
-      void reverse( NWA const & first );
-
-      /**
-       *
-       * @brief constructs the NWA which is the reverse of the given NWA
-       *
-       * This method constructs the NWA which is the reverse of the given NWA. It reverses 
-       * internal transitions and switches call and return transitions.
-       * Note: the resulting NWA is NOT guaranteed to be deterministic.
-       *
-       * @param - first: the NWA to reverse
-       * @param - stuck: dummy parameter
-       * @return the NWA resulting from reversing the given NWA
-       * 
-       */
-      static NWARefPtr reverse( NWA const & first, State stuck )
-      {
+      void reverse( NWA const & first ) {
+        construct::reverse(*this, first);
+      }
+      static NWARefPtr reverse( NWA const & first, State stuck ) {
         (void) stuck;
-        NWARefPtr nwa(new NWA());
-        nwa->reverse(first);
-        return nwa;
+        return construct::reverse(first);
       }
 
       /**
