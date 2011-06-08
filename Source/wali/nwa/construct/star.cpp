@@ -57,9 +57,10 @@ namespace wali
         //Note: The clientInfos for the states in Q' are copies of the clientInfos for the 
         //      corresponding states from Q.
         //Set the clientInfo of this state.
-        ClientInfo info = *(first.getClientInfo(*sit));
-        ClientInfoRefPtr ci = ClientInfoRefPtr(new ClientInfo(info));
-        states.setClientInfo(sp,ci);
+        ClientInfoRefPtr ci = first.getClientInfo(*sit);
+        if (ci.is_valid()) {
+          states.setClientInfo(sp, ci->cloneRp());
+        }
       }
 
       //The initial and final states of A* are Q0'. 
