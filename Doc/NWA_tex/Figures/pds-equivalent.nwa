@@ -1,6 +1,3 @@
-Q0: (p,main)
-Qf: (p,exit)
-
 Delta_i: {
   ((p,main), main, (p,q1)),
   ((p,q1), q1, (p,c1)),
