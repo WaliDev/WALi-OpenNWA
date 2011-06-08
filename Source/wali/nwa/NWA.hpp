@@ -22,6 +22,11 @@
 
 #include "wali/nwa/WeightGen.hpp"
 
+
+// TODO: remove these after removing deprecated stuff
+#include "wali/nwa/construct/determinize.hpp"
+
+
 //#define USE_BUDDY
 #ifdef USE_BUDDY
 #  include "wali/nwa/RelationOpsBuddy.hpp"
@@ -1038,31 +1043,12 @@ namespace wali
       }
 
 
-      /**
-       *
-       * @brief constructs a deterministic NWA that is equivalent to the given NWA.
-       *
-       * This method constructs a deterministic NWA that is equivalent to the given NWA.
-       * Note: The resulting NWA is guaranteed to be deterministic.
-       *
-       * @param - nondet: the NWA to determinize
-       *
-       */
-      void determinize( NWA const & nondet );
+      void _private_determinize_( NWA const & nondet );
 
+      void determinize( NWA const & nondet ) {
+        construct::determinize(*this, nondet);
+      }
 
-      /**
-       *
-       * @brief constructs a deterministic NWA that is equivalent to the given NWA.
-       *
-       * This method constructs a deterministic NWA that is equivalent to the given NWA.
-       * Note: The resulting NWA is guaranteed to be deterministic.
-       *
-       * @param - nondet: the NWA to determinize
-       * @param - stuck: dummy parameter
-       * @return the NWA resulting from determinizing the given NWA
-       *
-       */
       static NWARefPtr determinize( NWA const & nondet, State stuck )
       {
         (void) stuck;

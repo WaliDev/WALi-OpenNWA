@@ -6,6 +6,23 @@ namespace wali
   {
     namespace construct
     {
+      
+      void determinize(NWA & out, NWA const & source)
+      {
+        out._private_determinize_(source);
+      }
+
+
+      NWARefPtr determinize( NWA const & nondet )
+      {
+        NWARefPtr nwa( new NWA());
+        determinize(*nwa, nondet);
+        return nwa;
+      }
+
+      
+    }
+    
 
 #if 0
     template< T>
@@ -40,7 +57,7 @@ namespace wali
      *
      */
     
-    void NWA::determinize( NWA const & nondet )
+    void NWA::_private_determinize_( NWA const & nondet )
     {
 #ifdef USE_BUDDY
       wali::relations::buddyInit();
@@ -436,7 +453,7 @@ namespace wali
 #endif
 
       
-    }
+
   }
 }
 
