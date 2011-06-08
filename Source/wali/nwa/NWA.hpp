@@ -24,6 +24,7 @@
 
 
 // TODO: remove these after removing deprecated stuff
+#include "wali/nwa/construct/complement.hpp"
 #include "wali/nwa/construct/determinize.hpp"
 #include "wali/nwa/construct/intersect.hpp"
 
@@ -971,43 +972,13 @@ namespace wali
       }
 
 
-      /**
-       * 
-       * @brief constructs the NWA that is the complement of the given NWA
-       *
-       * This method constructs the complement of the given NWA by determinizing it and
-       * then replacing the set of final states with the set of states that are not final
-       * Note: The resulting NWA is guaranteed to be deterministic.
-       *
-       * @param - first: the NWA to perform the complement of
-       *
-       */
-      void complement( NWA const & first );
-
-      
-
-      /**
-       * 
-       * @brief constructs the NWA that is the complement of the given NWA
-       *
-       * This method constructs the complement of the given NWA by determinizing it and
-       * then replacing the set of final states with the set of states that are not final
-       * Note: The resulting NWA is guaranteed to be deterministic.
-       *
-       * @param - first: the NWA to perform the complement of
-       * @param - stuck: dummy parameter
-       * @return the NWA resulting from complementing the given NWA
-       *
-       */
-      static NWARefPtr complement( NWA const & first, State stuck )
-      {
-        (void) stuck;
-        NWARefPtr nwa(new NWA());
-        nwa->complement(first);
-        return nwa;
+      void complement( NWA const & first ) {
+        construct::complement(*this, first);
       }
-
-
+      static NWARefPtr complement( NWA const & first, State stuck ) {
+        (void) stuck;
+        return construct::complement(first);
+      }
 
       void _private_determinize_( NWA const & nondet );
       void determinize( NWA const & nondet ) {
@@ -1018,7 +989,6 @@ namespace wali
         return construct::determinize(nondet);
       }
 
-      
       void _private_intersect_( NWA const & first, NWA const & second );
       void intersect( NWA const & first, NWA const & second ) {
         construct::intersect(*this, first, second);
