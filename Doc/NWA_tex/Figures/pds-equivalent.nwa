@@ -1,0 +1,25 @@
+Q0: (p,main)
+Qf: (p,exit)
+
+Delta_i: {
+  ((p,main), main, (p,q1)),
+  ((p,q1), q1, (p,c1)),
+  ((p,e), e, (p,q2)),
+  ((p,q2), q2, (p,q3)),
+  ((p,q3), q3, (p,x)),
+  ((p,r1), r1, (p,q4)),
+  ((p,q4), q4, (p,q5)),
+  ((p,q5), q5, (p,c2)),
+  ((p,r2), r2, (p,q6)),
+  ((p,q6), q6, (p,exit))
+}
+
+Delta_c: {
+  ((p,c1), c1, (p,e)),
+  ((p,c2), c2, (p,e))
+}
+
+Delta_r: {
+  ((p,x), (p,c1), x, (p,r1))
+  ((p,x), (p,c2), x, (p,r2))
+}

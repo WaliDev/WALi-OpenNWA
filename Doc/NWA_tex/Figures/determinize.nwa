@@ -1,0 +1,21 @@
+Q0: Start
+Qf: Finish
+
+Delta_i: {
+  (Start, a, Call),
+  (Entry1, b, State1),
+  (State1, b, Exit1),
+  (Entry2, a, State2),
+  (State2, a, Exit2),
+  (Return, a, Finish)
+}
+
+Delta_c: {
+  (Call, call, Entry1),
+  (Call, call, Entry2)
+}
+
+Delta_r: {
+  (Exit1, Entry1, ret, Return),
+  (Exit2, Entry2, ret, Return)
+}

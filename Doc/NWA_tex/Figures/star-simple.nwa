@@ -1,0 +1,6 @@
+Q0: Begin
+Qf: End
+
+Delta_c: (Begin, call, Entry)
+Delta_i: (Entry, a, Exit)
+Delta_r: (Exit, Begin, ret, End)

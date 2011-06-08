@@ -1,0 +1,9 @@
+Q0: Begin
+Qf: End
+
+Delta_i: {
+  (Begin, a, State2),
+  (State2, b, State3),
+  (State3, b, State4),
+  (State4, a, End)
+}
