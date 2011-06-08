@@ -25,6 +25,7 @@
 
 // TODO: remove these after removing deprecated stuff
 #include "wali/nwa/construct/determinize.hpp"
+#include "wali/nwa/construct/intersect.hpp"
 
 
 //#define USE_BUDDY
@@ -821,43 +822,7 @@ namespace wali
       //TODO: write comments
       virtual bool isTransitionPossible( const State &src, const Symbol &sym, const State &tgt);
 
-      /**
-       *
-       * @brief constructs the NWA which is the intersection of the given NWAs
-       *
-       * This method constructs the NWA which accepts only nested words that are accepted 
-       * by both 'first' and 'second'.  
-       * Note: The resulting NWA is NOT guaranteed to be deterministic.	
-       *
-       * @param - first: the NWA to intersect with 'second'
-       * @param - second: the NWA to intersect with 'first'
-       *	
-       */
-      void intersect( NWA const & first, NWA const & second );
-
       
-      /**
-       *
-       * @brief constructs the NWA which is the intersection of the given NWAs
-       *
-       * This method constructs the NWA which accepts only nested words that are accepted 
-       * by both 'first' and 'second'.  
-       * Note: The resulting NWA is NOT guaranteed to be deterministic.	
-       *
-       * @param - first: the NWA to intersect with 'second'
-       * @param - second: the NWA to intersect with 'first'
-       * @param - stuck: dummy variable
-       * @return the NWA resulting from the intersection of the given NWAs
-       *	
-       */
-      static NWARefPtr intersect( NWA const & first, NWA const & second, State stuck )
-      {
-        (void) stuck;
-        NWARefPtr nwa(new NWA());
-        nwa->intersect(first,second);
-        return nwa;
-      }
-
 
       /**
        * @brief Detects (immediately) stuck states and removes them
@@ -1043,20 +1008,26 @@ namespace wali
       }
 
 
-      void _private_determinize_( NWA const & nondet );
 
+      void _private_determinize_( NWA const & nondet );
       void determinize( NWA const & nondet ) {
         construct::determinize(*this, nondet);
       }
-
-      static NWARefPtr determinize( NWA const & nondet, State stuck )
-      {
+      static NWARefPtr determinize( NWA const & nondet, State stuck ) {
         (void) stuck;
-        NWARefPtr nwa(new NWA());
-        nwa->determinize(nondet);
-        return nwa;
+        return construct::determinize(nondet);
       }
 
+      
+      void _private_intersect_( NWA const & first, NWA const & second );
+      void intersect( NWA const & first, NWA const & second ) {
+        construct::intersect(*this, first, second);
+      }
+      static NWARefPtr intersect( NWA const & first, NWA const & second, State stuck ) {
+        (void) stuck;
+        return construct::intersect(first, second);
+      }
+      
 
       /**
        *
