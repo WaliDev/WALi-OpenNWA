@@ -4413,11 +4413,11 @@ namespace wali
 
 
     void
-    NWA::combineWith(NWARefPtr rhs)
+    NWA::combineWith(NWA const & rhs)
     {
-      this->states.addAll(rhs->states);
-      this->addAllSymbols(rhs->symbols);
-      this->trans.addAllTrans(rhs->trans);
+      this->states.addAll(rhs.states);
+      this->addAllSymbols(rhs.symbols);
+      this->trans.addAllTrans(rhs.trans);
     }
 
     bool

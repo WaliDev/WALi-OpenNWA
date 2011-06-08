@@ -1999,7 +1999,7 @@ namespace wali
       ///
       /// This is like unionNWA(), except that it doesn't modify the initial
       /// or accepting states.
-      void combineWith(NWARefPtr rhs);
+      void combineWith(NWA const & rhs);
     };
 
 
