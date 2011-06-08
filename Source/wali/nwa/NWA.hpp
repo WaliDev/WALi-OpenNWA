@@ -30,7 +30,7 @@
 #include "wali/nwa/construct/intersect.hpp"
 #include "wali/nwa/construct/reverse.hpp"
 #include "wali/nwa/construct/star.hpp"
-
+#include "wali/nwa/construct/union.hpp"
 
 
 //#define USE_BUDDY
@@ -787,42 +787,6 @@ namespace wali
       void projectStates(NWA const & first, StateSet const & prjStates);
 
 
-      /**
-       *
-       * @brief constructs the NWA resulting from the union of the given NWAs 
-       *
-       * This method constructs the union of the given NWAs by unioning the state sets,
-       * symbols, transitions, initial state sets, and final state sets of the two NWAs.
-       * Note: The resulting NWA is guaranteed NOT to be deterministic.
-       *
-       * @param - first: the NWA to union with 'second'
-       * @param - second: the NWA to union with 'first'
-       *
-       */
-      void unionNWA( NWA const & first, NWA const & second );
-      
-      /**
-       *
-       * @brief constructs the NWA resulting from the union of the given NWAs 
-       *
-       * This method constructs the union of the given NWAs by unioning the state sets,
-       * symbols, transitions, initial state sets, and final state sets of the two NWAs.
-       * Note: The resulting NWA is guaranteed NOT to be deterministic.
-       *
-       * @param - first: the NWA to union with 'second'
-       * @param - second: the NWA to union with 'first'
-       * @param - stuck: dummy variable
-       * @return the NWA resulting from the union of the given NWAs
-       *
-       */
-      static NWARefPtr unionNWA( NWA const & first, NWA const & second, State stuck )
-      {
-        (void) stuck;
-        NWARefPtr nwa(new NWA());
-        nwa->unionNWA(first,second);
-        return nwa;
-      }
-
       
       //TODO: write comments
       virtual bool isTransitionPossible( const State &src, const Symbol &sym, const State &tgt);
@@ -869,6 +833,16 @@ namespace wali
        * and from which none of the final states are reachable.
        */
       void chop();       
+
+
+
+      void unionNWA( NWA const & first, NWA const & second ) {
+        construct::unionNWA(*this, first, second);
+      }
+      static NWARefPtr unionNWA( NWA const & first, NWA const & second, State stuck ) {
+        (void) stuck;
+        return construct::unionNWA(first, second);
+      }
 
 
       void concat( NWA const & first, NWA const & second ) {
