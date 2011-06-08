@@ -4,22 +4,14 @@ Import('BinInstallDir')
 env = ProgEnv.Clone()
 
 
-#pnwas=env.Object('ProcedureNWAs.o', 'ProcedureNWAs.cpp')
-#fst=env.Object('OpenFstInterop.o', 'OpenFstInterop.cpp')
-
-
-built = [
-    #env.Program('ffe_fsm_to_nwa.exe', ['ffe_fsm_to_nwa.cpp'])
-    env.Program('print-dot.exe', ['print-dot.cpp']),
-    #env.Program('enrich.exe', ['enrich.cpp', '#/src/enrich_nwa_calls.cpp']),
-    env.Program('synch-alphabet.exe', ['synch-alphabet.cpp']),
-    env.Program('determinize.exe', ['determinize.cpp']),
-    env.Program('complement.exe', ['complement.cpp']),
-    env.Program('intersect.exe', ['intersect.cpp']),
-    env.Program('is-empty.exe', ['is-empty.cpp']),
-    env.Program('is-member.exe', ['is-member.cpp']),
-    #env.Program('join-procedures.exe', ['join-procedures.cpp', pnwas, fst])
-]
+built = []
+#    env.Program('print-dot.exe', ['print-dot.cpp']),
+#    env.Program('determinize.exe', ['determinize.cpp']),
+#    env.Program('complement.exe', ['complement.cpp']),
+#    env.Program('intersect.exe', ['intersect.cpp']),
+#    env.Program('is-empty.exe', ['is-empty.cpp']),
+#    env.Program('is-member.exe', ['is-member.cpp']),
+#]
 
 i = env.Install(BinInstallDir, built)
 
