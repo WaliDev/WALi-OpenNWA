@@ -27,6 +27,7 @@
 #include "wali/nwa/construct/complement.hpp"
 #include "wali/nwa/construct/determinize.hpp"
 #include "wali/nwa/construct/intersect.hpp"
+#include "wali/nwa/construct/concatenate.hpp"
 
 
 //#define USE_BUDDY
@@ -866,40 +867,13 @@ namespace wali
        */
       void chop();       
 
-      /**
-       *
-       * @brief constructs the NWA resulting from the concatenation of the given NWAs
-       *
-       * This method constructs the concatenation of the given NWAs by adding epsilon 
-       * transitions from all final states of 'first' to all initial states of 'second'.  
-       * Note: The resulting NWA is NOT guaranteed to be deterministic.
-       *
-       * @param - first: the NWA to which 'second' should be concatenated
-       * @param - second: the NWA to concatenate onto the end of 'first'
-       *
-       */
-      void concat( NWA const & first, NWA const & second );
 
-      /**
-       *
-       * @brief constructs the NWA resulting from the concatenation of the given NWAs
-       *
-       * This method constructs the concatenation of the given NWAs by adding epsilon 
-       * transitions from all final states of 'first' to all initial states of 'second'.  
-       * Note: The resulting NWA is NOT guaranteed to be deterministic.
-       *
-       * @param - first: the NWA to which 'second' should be concatenated
-       * @param - second: the NWA to concatenate onto the end of 'first'
-       * @param - stuck: dummy parameter
-       * @return the NWA resulting from the concatenation of the given NWAs
-       *
-       */
-      static NWARefPtr concat( NWA const & first, NWA const & second, State stuck )
-      {
+      void concat( NWA const & first, NWA const & second ) {
+        construct::concatenate(*this, first, second);
+      }
+      static NWARefPtr concat( NWA const & first, NWA const & second, State stuck ) {
         (void) stuck;
-        NWARefPtr nwa(new NWA());
-        nwa->concat(first,second);
-        return nwa;
+        return construct::concatenate(first, second);
       }
 
 
