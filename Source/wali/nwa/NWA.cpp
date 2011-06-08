@@ -2442,6 +2442,7 @@ namespace wali
     {
       //TODO: flag for explicit stuck state transition printing?
       o << "digraph \"NWA\" { \n";
+#if 0
       o << "    label = \"" << title <<"\" ;\n";
       o << "    subgraph cluster_key {\n";
       o << "        label = \"Key\";\n";
@@ -2453,6 +2454,9 @@ namespace wali
       o << "        exit -> dummy [color=red];\n";
       o << "        dummy -> return [style=dashed];\n";
       o << "    }\n";
+#else
+      (void) title;
+#endif
 
       //initial state
       StateSet initials = getInitialStates();
@@ -2529,13 +2533,12 @@ namespace wali
           {
             std::stringstream ss;
             printKey(ss, cur_trans->first,abbrev);
-            ss << ";{";
+            ss << ": ";
             for( StateSet::const_iterator prediter = cur_trans->second.begin();
                  prediter != cur_trans->second.end(); ++prediter)
             {
-              printKey(ss, *prediter, abbrev) << ";";
+              printKey(ss, *prediter, abbrev) << ", ";
             }
-            ss << ";";
 
             // Now ss holds the label for the edge exit->return
             printKey(o << "\"", *exitit, abbrev) << "\" ->";
