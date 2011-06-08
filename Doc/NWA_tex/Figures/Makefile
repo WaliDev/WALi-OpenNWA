@@ -22,7 +22,9 @@ FILES=figure-1                      \
       concat-other                  \
       concat-result                 \
       star-simple                   \
+      star-simple-result            \
       star-complex                  \
+      star-complex-result           \
       reverse-of-figure-1           \
       determinize                   \
       determinize-result            \
