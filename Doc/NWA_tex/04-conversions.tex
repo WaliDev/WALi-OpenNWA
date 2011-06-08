@@ -200,7 +200,7 @@ the compiler will not let you ignore this responsibility.)
 \begin{changebar}
 
 \begin{mathpar}
-\mprset{flushleft}
+
 {\inferrule*%%[left=\textsc{States}]
   { }
   {p \in P}
@@ -232,28 +232,25 @@ the compiler will not let you ignore this responsibility.)
    \langle p_{q_x},q_c \rangle \stackrel{w_3}{\hookrightarrow} \langle p,q_r \rangle\in \Delta_1  }
 }
 \end{mathpar}
-\[ \text{where }
-w_0 = \begin{cases}
+\begin{align*}
+\text{where }
+w_0 & = \begin{cases}
         \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
         \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{*} \\
         \mathtt{wg.getWeight}(q_x,CI_{q_x},\sigma,\mathtt{EXIT\_TO\_RET},q_r,CI_{q_r}), & \text{otherwise}
-      \end{cases} 
-\]
-\[
-w_1 = \begin{cases}
+      \end{cases}  \\
+w_1 &= \begin{cases}
          \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
          \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{*} \\
          \mathtt{wg.getWeight}(q,CI_q,\sigma,\mathtt{INTRA},q',CI_{q'}), & \text{otherwise}
-      \end{cases}
-\]
-\[ 
-w_2 = \begin{cases}
+      \end{cases} \\
+w_2 &= \begin{cases}
          \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
          \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{*} \\
          \mathtt{wg.getWeight}(q_c,CI_{q_c},\sigma,\mathtt{CALL\_TO\_ENTRY},q_e,CI_{q_e}), & \text{otherwise}
-      \end{cases}
-\]
-\[  w_3 = \mathtt{wg.getOne}() \]
+      \end{cases} \\
+w_3 &= \mathtt{wg.getOne}() 
+\end{align*}
 \end{changebar}
 
 \noindent Consider, as an example, converting the NWA in Figure
@@ -325,30 +322,25 @@ shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
   \rangle \in \Delta_2 }
 }
 \end{mathpar}
-\[\text{where }
-w_0 = \begin{cases}
+\begin{align*}
+\text{where }
+w_0 &= \begin{cases}
            \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
            \mathtt{wg.getWildWeight}(q_c,CI_{q_c},q_e,CI_{q_e}), & \text{if } \sigma = \text{*} \\
            \mathtt{wg.getWeight}(q_c,CI_{q_c},\sigma,CALL\_TO\_ENTRY,q_e,CI_{q_e}), & \text{otherwise}
-      \end{cases}
-\]
-\[
-w_1 = \begin{cases}
+      \end{cases} \\
+w_1 &= \begin{cases}
            \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
            \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{*} \\
            \mathtt{wg.getWeight}(q,CI_q,\sigma,INTRA,q',CI_{q'}), & \text{otherwise}
-       \end{cases}
-\]
-\[
-w_2 = \begin{cases}
+       \end{cases} \\
+w_2 &= \begin{cases}
           \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
           \mathtt{wg.getWildWeight}(q_x,CI_{q_x},q_r,CI_{q_r}), & \text{if } \sigma = \text{*} \\
           \mathtt{wg.getWeight}(q_x,CI_{q_x},\sigma,EXIT\_TO\_RET,q_r,CI_{q_r}), & \text{otherwise}
-      \end{cases}
-\]
-\[
-w_3 = \mathtt{wg.getOne}()
-\]
+      \end{cases} \\
+w_3 &= \mathtt{wg.getOne}()
+\end{align*}
 
 
 \end{changebar}
