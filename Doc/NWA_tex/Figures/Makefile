@@ -1,4 +1,4 @@
-BINDIR=../../../bin
+BINDIR=../../../bin64
 
 PRINTDOT=$(BINDIR)/nwa-print-dot.exe
 UNION=$(BINDIR)/nwa-union.exe
