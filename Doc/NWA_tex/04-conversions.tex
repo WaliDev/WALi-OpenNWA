@@ -200,7 +200,8 @@ the compiler will not let you ignore this responsibility.)
 \begin{changebar}
 
 \begin{mathpar}
-{\inferrule*[left=\textsc{States}]
+\mprset{flushleft}
+{\inferrule*%%[left=\textsc{States}]
   { }
   {p \in P}
 }
@@ -214,51 +215,46 @@ the compiler will not let you ignore this responsibility.)
   { q \in Q }
   { q \in \Gamma }
 }
-\and \\
-{\inferrule*[left=\textsc{Internal}]
+\and 
+{\inferrule*%%[left=\textsc{Internal}]
   { (q,\sigma,q') \in \delta_i }
-  { \langle p,q \rangle \hookrightarrow \langle p,q' \rangle \in \Delta_1 }
+  { \langle p,q \rangle \stackrel{w_1}{\hookrightarrow} \langle p,q' \rangle \in \Delta_1 }
 }
 \and
-{\inferrule*[left=\textsc{Call}]
+{\inferrule*%%[left=\textsc{Call}]
   { (q_c,\sigma, q_e) \in \delta_c }
-  {  \langle p,q_c \rangle \hookrightarrow \langle p, q_e \hspace{.1cm} q_c \rangle\in \Delta_2 }
+  {  \langle p,q_c \rangle \stackrel{w_2}{\hookrightarrow} \langle p, q_e \hspace{.1cm} q_c \rangle\in \Delta_2 }
 }
 \and
-{\inferrule*[left=\textsc{Return}]
+{\inferrule*%%[left=\textsc{Return}]
   { (q_x,q_c,\sigma,q_r) \in \delta_r }
-  { \langle p,q_x \rangle \hookrightarrow \langle p_{q_x},\epsilon \rangle \in \Delta_0 \\
-   \langle p_{q_x},q_c \rangle \hookrightarrow \langle p,q_r \rangle\in \Delta_1  }
+  { \langle p,q_x \rangle \stackrel{w_0}{\hookrightarrow} \langle p_{q_x},\epsilon \rangle \in \Delta_0 \\
+   \langle p_{q_x},q_c \rangle \stackrel{w_3}{\hookrightarrow} \langle p,q_r \rangle\in \Delta_1  }
 }
-
 \end{mathpar}
+
+\[
+\text{where }
+w_1 = \begin{cases}
+  \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
+  \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{*} \\
+  \mathtt{wg.getWeight}(q,CI_q,\sigma,\mathtt{INTRA},q',CI_{q'}), & \text{otherwise}
+\end{cases}
+\]
+\[ w_2 = \begin{cases}
+  \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
+  \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{*} \\
+  \mathtt{wg.getWeight}(q_c,CI_{q_c},\sigma,\mathtt{CALL\_TO\_ENTRY},q_e,CI_{q_e}), & \text{otherwise}
+\end{cases}
+\]
+\[ w_0 = \begin{cases}
+  \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
+  \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{*} \\
+  \mathtt{wg.getWeight}(q_x,CI_{q_x},\sigma,\mathtt{EXIT\_TO\_RET},q_r,CI_{q_r}), & \text{otherwise}
+\end{cases} 
+\]
+\[  w_3 = \mathtt{wg.getOne}() \]
 \end{changebar}
-
-\begin{enumerate}
-
-\item For each $(q,\sigma,q')$ $\in \delta_i$ in the NWA, adding $\langle p,q
-  \rangle \hookrightarrow \langle p,q' \rangle$ to $\Delta_1$ of the WPDS
-  (with weight
-  \texttt{wg.getWeight($q$,$CI_q$,$\sigma$,INTRA,$q'$,$CI_{q'}$}) or
-  \texttt{wg.getWildWeight($q$,$CI_q$,$q'$,$CI_{q'}$)}, depending on
-  $\sigma$).
-
-\item For each $(q_c,\sigma, q_e)$ $\in \delta_c$ in the NWA, adding $\langle
-  p,q_c \rangle \hookrightarrow \langle p, q_e \hspace{.1cm} q_c \rangle$ to
-  $\Delta_2$ of the WPDS (with weight
-  \texttt{wg.getWeight($q_c$,$CI_{q_c}$,$\sigma$,CALL\_TO\_ENTRY,$q_e$,$CI_{q_e}$)}
-  or \texttt{wg.getWildWeight($q_c$,$CI_{q_c}$,$q_e$,$CI_{q_e}$)}, depending
-  on $\sigma$).
-
-\item For each $(q_x,q_c,\sigma,q_r)$ $\in \delta_r$ in the NWA, adding
-  $\langle p,q_x \rangle \hookrightarrow \langle p_{q_x},\epsilon \rangle$ to
-  $\Delta_0$ of the WPDS (with weight
-  \texttt{wg.getWeight($q_x$,$CI_{q_x}$,$\sigma$,EXIT\_TO\_RET,$q_r$,$CI_{q_r}$)}
-  or \texttt{wg.getWildWeight($q_x$,$CI_{q_x}$,$q_r$,$CI_{q_r}$)}, depending
-  on $\sigma$) and $\langle p_{q_x},q_c \rangle \hookrightarrow \langle p,q_r
-  \rangle$ to $\Delta_1$ of the WPDS (with weight \texttt{wg.getOne()}).
-
-\end{enumerate}
 
 \noindent Consider, as an example, converting the NWA in Figure
 \ref{Fig:NWAtoPDS5} into a WPDS. The WPDS resulting from converting the PDS
@@ -297,7 +293,7 @@ shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
 \begin{changebar}
 
 \begin{mathpar}
-{\inferrule*[left=\textsc{States}]
+{\inferrule*%%[left=\textsc{States}]
   { }
   {p \in P}
 }
@@ -311,51 +307,51 @@ shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
   { q \in Q }
   { q \in \Gamma }
 }
-\and \\
-{\inferrule*[left=\textsc{Internal}]
+\and 
+{\inferrule*%%[left=\textsc{Internal}]
   { (q,\sigma,q') \in \delta_i }
-  { \langle p,q' \rangle \hookrightarrow \langle p,q \rangle \in \Delta_1 }
+  { \langle p,q' \rangle \stackrel{w_1}{\hookrightarrow} \langle p,q \rangle \in \Delta_1 }
 }
 \and  
-{\inferrule*[left=\textsc{Call}]
+{\inferrule*%%[left=\textsc{Call}]
   { (q_c,\sigma, q_e) \in \delta_c \\ (q_x,q_c,\gamma,q_r) \in \delta_r }
-  { \langle p,q_e \rangle \hookrightarrow \langle p_{q_e},\epsilon \rangle \in \Delta_0 \\
-    \langle p_{q_e},q_r \rangle \hookrightarrow \langle p,q_c  \rangle \in \Delta_1 }
+  { \langle p,q_e \rangle \stackrel{w_0}{\hookrightarrow} \langle p_{q_e},\epsilon \rangle \in \Delta_0 \\
+    \langle p_{q_e},q_r \rangle \stackrel{w_3}{\hookrightarrow} \langle p,q_c  \rangle \in \Delta_1 }
 }
 \and
-{\inferrule*[left=\textsc{Return}]
+{\inferrule*%%[left=\textsc{Return}]
   { (q_x,q_c,\sigma,q_r) \in \delta_r }
-  {  \langle p,q_r \rangle \hookrightarrow \langle p,q_x \hspace{.1cm} q_r
+  {  \langle p,q_r \rangle \stackrel{w_2}{\hookrightarrow} \langle p,q_x \hspace{.1cm} q_r
   \rangle \in \Delta_2 }
 }
 \end{mathpar}
+\[\text{where }
+w_1 = \begin{cases}
+           \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
+           \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{*} \\
+           \mathtt{wg.getWeight}(q,CI_q,\sigma,INTRA,q',CI_{q'}), & \text{otherwise}
+       \end{cases}
+\]
+\[
+w_0 = \begin{cases}
+           \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
+           \mathtt{wg.getWildWeight}(q_c,CI_{q_c},q_e,CI_{q_e}), & \text{if } \sigma = \text{*} \\
+           \mathtt{wg.getWeight}(q_c,CI_{q_c},\sigma,CALL\_TO\_ENTRY,q_e,CI_{q_e}), & \text{otherwise}
+      \end{cases}
+\]
+\[
+w_3 = \mathtt{wg.getOne}()
+\]
+\[
+w_2 = \begin{cases}
+          \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
+          \mathtt{wg.getWildWeight}(q_x,CI_{q_x},q_r,CI_{q_r}), & \text{if } \sigma = \text{*} \\
+          \mathtt{wg.getWeight}(q_x,CI_{q_x},\sigma,EXIT\_TO\_RET,q_r,CI_{q_r}), & \text{otherwise}
+      \end{cases}
+\]
+
+
 \end{changebar}
-
-\begin{enumerate}
-
-\item For each $(q,\sigma,q')$ $\in \delta_i$ in the NWA, adding $\langle
-  p,q' \rangle \hookrightarrow \langle p,q \rangle$ to $\Delta_1$ of the WPDS
-  (with weight
-  \texttt{wg.getWeight($q$,$CI_q$,$\sigma$,INTRA,$q'$,$CI_{q'}$}) or
-  \texttt{wg.getWildWeight($q$,$CI_q$,$q'$,$CI_{q'}$)}, depending on
-  $\sigma$).
-
-\item For each $(q_c,\sigma, q_e)$ $\in \delta_c$ and $(q_x,q_c,\gamma,q_r)$
-  $\in \delta_r$ in the NWA, adding $\langle p,q_e \rangle \hookrightarrow
-  \langle p_{q_e},\epsilon \rangle$ to $\Delta_0$ of the WPDS (with weight
-  \texttt{wg.getWeight($q_c$,$CI_{q_c}$,$\sigma$,CALL\_TO\_ENTRY,$q_e$,$CI_{q_e}$)}
-  or \texttt{wg.getWildWeight($q_c$,$CI_{q_c}$,$q_e$,$CI_{q_e}$)}, depending
-  on $\sigma$) and $\langle p_{q_e},q_r \rangle \hookrightarrow \langle p,q_c
-  \rangle$ to $\Delta_1$ of the WPDS (with weight \texttt{wg.getOne()} ).
-
-\item For each $(q_x,q_c,\sigma,q_r) \in \delta_r$ in the NWA, adding
-  $\langle p,q_r \rangle \hookrightarrow \langle p,q_x \hspace{.1cm} q_r
-  \rangle$ to $\Delta_2$ of the WPDS (with weight
-  \texttt{wg.getWeight($q_x$,$CI_{q_x}$,$\sigma$,EXIT\_TO\_RET,$q_r$,$CI_{q_r}$)}
-  or \texttt{wg.getWildWeight($q_x$,$CI_{q_x}$,$q_r$,$CI_{q_r}$)}, depending
-  on $\sigma$).
-
-\end{enumerate}
 
 \noindent Consider, as an example, converting the NWA in Figure
 \ref{Fig:NWAtoPDS1} into a backwards flow WPDS.  The WPDS resulting from
