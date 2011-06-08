@@ -151,7 +151,11 @@ reflect the views of NSF, ONR, ARL, and AFRL.
 \input{macros}% Created by Tom, taken from FSTTCS submission
 
 \newcommand{\TODO}[1]{\mbox{\bf [TODO #1]}}
+
+\let\realincludegraphics\includegraphics
 \renewcommand{\includegraphics}[2][Whatever]{}
+
+\newcommand{\nwaimage}[2][]{\realincludegraphics[#1]{#2}}
 
 \input{01-overview}
 \input{class-nested-word}
