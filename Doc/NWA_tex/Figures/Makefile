@@ -10,6 +10,7 @@ DETERMINIZE=$(BINDIR)/nwa-determinize.exe
 COMPLEMENT=$(BINDIR)/nwa-complement.exe
 
 DOT=dot
+DOT2TEX=~/stow/dot2tex-2.8.7/bin/dot2tex
 
 FILES=figure-1                      \
       union-other                   \
@@ -32,7 +33,7 @@ FILES=figure-1                      \
       pds-equivalent
 
 
-all: $(addsuffix .png,$(FILES))
+all: $(addsuffix .png,$(FILES))  $(addsuffix .tex,$(FILES))
 
 %.dot: %.nwa
 	$(PRINTDOT) -o $@ $<
@@ -40,6 +41,9 @@ all: $(addsuffix .png,$(FILES))
 %.png: %.dot
 	$(DOT) -Tpng -o $@ $<
 
+%.tex: %.dot
+	$(DOT2TEX) --preproc --usepdflatex --nominsize --prog neato $< | $(DOT2TEX) -o $@ --figonly --nominsize --prog neato
+	#--autosize --t raw
 
 union-result.nwa: figure-1.nwa union-other.nwa
 	$(UNION) -o $@ $^
