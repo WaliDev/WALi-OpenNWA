@@ -8,7 +8,13 @@ namespace wali
     namespace construct
     {
 
-
+      NWARefPtr complement( NWA const & source )
+      {
+        NWARefPtr nwa( new NWA());
+        complement(*nwa, source);
+        return nwa;
+      }
+      
       /**
        * 
        * @brief constructs the NWA that is the complement of the given NWA

@@ -6,6 +6,18 @@ namespace wali
   {
     namespace construct
     {
+
+      void star(NWA & out, NWA const & source)
+      {
+        out._private_star_(source);
+      }
+
+      NWARefPtr star( NWA const & source )
+      {
+        NWARefPtr nwa( new NWA());
+        star(*nwa, source);
+        return nwa;
+      }
       
     }
     

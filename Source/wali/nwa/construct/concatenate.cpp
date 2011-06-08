@@ -7,6 +7,12 @@ namespace wali
     namespace construct
     {
       
+      NWARefPtr concatenate( NWA const & first, NWA const & second )
+      {
+        NWARefPtr nwa( new NWA());
+        concatenate(*nwa, first, second);
+        return nwa;
+      }
 
     /**
      *

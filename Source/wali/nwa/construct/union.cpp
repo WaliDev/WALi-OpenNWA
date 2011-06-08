@@ -6,6 +6,14 @@ namespace wali
   {
     namespace construct
     {
+
+      NWARefPtr unionNWA( NWA const & first, NWA const & second )
+      {
+        NWARefPtr nwa( new NWA());
+        unionNWA(*nwa, first, second);
+        return nwa;
+      }
+
       
     /**
      *

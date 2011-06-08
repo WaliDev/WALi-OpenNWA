@@ -6,7 +6,14 @@ namespace wali
   {
     namespace construct
     {
-      
+
+      NWARefPtr reverse( NWA const & source )
+      {
+        NWARefPtr nwa( new NWA());
+        reverse(*nwa, source);
+        return nwa;
+      }
+
     /**
      * @brief constructs the NWA which is the reverse of the given NWA
      *
