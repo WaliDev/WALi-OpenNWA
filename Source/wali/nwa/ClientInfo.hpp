@@ -36,6 +36,7 @@ namespace wali
         return true;
       }
 
+    public:
       /// Allocates and returns a new ClientInfo object that is a copy
       /// of this one.
       virtual ClientInfo* clone()
