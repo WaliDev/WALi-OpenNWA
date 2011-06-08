@@ -15,7 +15,7 @@ namespace wali
      * @param - second: the NWA to union with 'first'
      *
      */
-    void NWA::unionNWA( NWA const & first, NWA const & second )
+    void unionNWA( NWA & out, NWA const & first, NWA const & second )
     {
       //Q: Do we need to guarantee that there is no overlap in states between machines? 
       //A: YES
@@ -31,19 +31,30 @@ namespace wali
       //A: The clientInfos from the component machines are copied and added to the union NWA.
 
       //Test state Key overlap of the two NWAs.
-      assert(! overlap(first,second) );
+      assert(! NWA::overlap(first,second) );
 
       //Clear all states(except the stuck state) and transitions from this machine.
-      clear();
+      out.clear();
 
       //Copy all of the functionality of the two machines.  
-      //States (Initial and final state information included.)
-      states.addAll(first.states);   //Note: This includes copying clientInfo information over.  
-      states.addAll(second.states);  //Note: This includes copying clientInfo information over.
+      out = first;
+      out.combineWith(second);
 
-      //Transitions (Call, internal, and return.)
-      trans.addAllTrans(first.trans);
-      trans.addAllTrans(second.trans);      
+      // Now we have something with the combined states, symbols, and
+      // transitions from the two machines. It has the initial and final
+      // states of the 'first' machine, but lacks the initial and final
+      // states of the 'second' machine. So we need to add those.
+      for (NWA::stateIterator initial = second.beginInitialStates();
+           initial != second.endInitialStates(); ++initial)
+      {
+        out.addInitialState(*initial);
+      }
+
+      for (NWA::stateIterator final = second.beginFinalStates();
+           final != second.endFinalStates(); ++final)
+      {
+        out.addFinalState(*final);
+      }
     }
 
     }

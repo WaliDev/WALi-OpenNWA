@@ -16,7 +16,7 @@ namespace wali
      * @param - second: the NWA to concatenate onto the end of 'first'
      *
      */
-    void NWA::concat( NWA const & first, NWA const & second )
+    void concatenate( NWA & out, NWA const & first, NWA const & second )
     {
       //Q: Do we need to guarantee that there is no overlap in states between machines?
       //A: YES!
@@ -31,28 +31,39 @@ namespace wali
       //A: The clientInfos from the component machines are copied and added to the concatenated NWA.
 
       //Test state Key overlap of the two NWAs.
-      assert(! overlap(first, second) );
+      assert(! NWA::overlap(first, second) );
 
       //Clear all states(except the stuck state) and transitions from this machine.
-      clear();
+      out.clear();
 
       //Duplicate all of the functionality of the first machine (except the final state property).
-      states.addAllStates(first.states);   //Note: This includes copying clientInfo information over.
-      states.addAllInitialStates(first.states);
-      trans.addAllTrans(first.trans);
+      out = first;
+      out.clearFinalStates();
 
       //Duplicate all of the functionality of the second machine (except the initial state property).
-      states.addAllStates(second.states);  //Note: This includes copying clientInfo information over.
-      states.addAllFinalStates(second.states);
-      trans.addAllTrans(second.trans);
+      out.combineWith(second);
 
-      //Add epsilon transitions from the final states of the first machine to the initial
-      //states of the second machine.
-      for( stateIterator fit = first.beginFinalStates(); fit != first.endFinalStates(); fit++ )
+
+      // Now we have both machines combined. We need to set the final states
+      // of the combined machine to be the final states of the second
+      // machine, then add epsilon transitions from the final states of the
+      // first to the final states of the second.
+
+      // First step: set final states.
+      for (NWA::stateIterator final = second.beginFinalStates();
+           final != second.endFinalStates(); ++final)
       {
-        for( stateIterator sit = second.beginInitialStates(); sit != second.endInitialStates(); sit++ )
+        out.addFinalState(*final);
+      }
+      
+      // Second step: add transitions from the first machine to the second
+      for( NWA::stateIterator fit = first.beginFinalStates();
+           fit != first.endFinalStates(); fit++ )
+      {
+        for( NWA::stateIterator sit = second.beginInitialStates();
+             sit != second.endInitialStates(); sit++ )
         {
-          addInternalTrans(*fit,WALI_EPSILON,*sit);
+          out.addInternalTrans(*fit, WALI_EPSILON, *sit);
         }
       }
     }

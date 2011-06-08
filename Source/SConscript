@@ -88,6 +88,10 @@ nice_files = Split("""
 ./wali/nwa/query/calls.cpp
 ./wali/nwa/query/returns.cpp
 ./wali/nwa/query/internals.cpp
+./wali/nwa/construct/complement.cpp
+./wali/nwa/construct/concatenate.cpp
+./wali/nwa/construct/reverse.cpp
+./wali/nwa/construct/union.cpp
 """)
 
 naughty_files = Split("""
