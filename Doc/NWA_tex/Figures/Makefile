@@ -1,6 +1,15 @@
 BINDIR=../../../bin
 
-PRINTDOT=$(BINDIR)/print-dot.exe
+PRINTDOT=$(BINDIR)/nwa-print-dot.exe
+UNION=$(BINDIR)/nwa-union.exe
+INTERSECT=$(BINDIR)/nwa-intersect.exe
+CONCAT=$(BINDIR)/nwa-concatenate.exe
+STAR=$(BINDIR)/nwa-star.exe
+REVERSE=$(BINDIR)/nwa-reverse.exe
+DETERMINIZE=$(BINDIR)/nwa-determinize.exe
+COMPLEMENT=$(BINDIR)/nwa-complement.exe
+
+DOT=dot
 
 FILES=figure-1                      \
       union-other                   \
@@ -21,7 +30,7 @@ FILES=figure-1                      \
       pds-equivalent
 
 
-all: figure-1.png union-other.png union-result.png
+all: $(addsuffix .png,$(FILES))
 
 %.dot: %.nwa
 	$(PRINTDOT) -o $@ $<
@@ -31,11 +40,26 @@ all: figure-1.png union-other.png union-result.png
 
 
 union-result.nwa: figure-1.nwa union-other.nwa
+	$(UNION) -o $@ $^
+
 intersection-simple-result.nwa: figure-1.nwa intersection-simple-other.nwa
-intersection-complex-result.nwa: intersection-complex-first.nwa ntersection-complex-second.nwa
+	$(INTERSECT) -o $@ $^
+intersection-complex-result.nwa: intersection-complex-first.nwa intersection-complex-second.nwa
+	$(INTERSECT) -o $@ $^
+
 concat-result.nwa: figure-1.nwa concat-other.nwa
+	$(CONCAT) -o $@ $^
+
 star-simple-result.nwa: star-simple.nwa
+	$(STAR) -o $@ $^
 star-complex-result.nwa: star-complex.nwa
+	$(STAR) -o $@ $^
+
 reverse-of-figure-1.nwa: figure-1.nwa
+	$(REVERSE) -o $@ $^
+
 determinize-result.nwa: determinize.nwa
+	$(DETERMINIZE) -o $@ $^
+
 complement-of-determinize.nwa: determinize.nwa
+	$(COMPLEMENT) -o $@ $^
