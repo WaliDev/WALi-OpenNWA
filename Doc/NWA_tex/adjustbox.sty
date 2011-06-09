@@ -1,0 +1,134 @@
+%%
+%% This is file `adjustbox.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% adjustbox.dtx  (with options: `package')
+%% 
+%% Copyright (C) 2011 by Martin Scharrer <martin@scharrer-online.de>
+%% 
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either version 1.3c
+%% of this license or (at your option) any later version.
+%% The latest version of this license is in
+%% 
+%%    http://www.latex-project.org/lppl.txt
+%% 
+%% and version 1.3c or later is part of all distributions of LaTeX
+%% version 2008/05/04 or later.
+%% 
+%% This work has the LPPL maintenance status `maintained'.
+%% 
+%% The Current Maintainer of this work is Martin Scharrer.
+%% 
+%% This work consists of the files adjustbox.dtx, adjustbox.ins
+%% and the derived file adjustbox.sty.
+%% 
+\ProvidesPackage{adjustbox}
+  [2011/03/20 v0.3 Adjusting TeX boxes (trim, clip, ...)]
+\RequirePackage{graphicx}[1999/02/16]
+\RequirePackage{pgf}
+\newcommand\clipbox{%
+    \begingroup
+    \def\adjustbox@name{clipbox}%
+    \@ifstar
+        {\adjustbox@{clip,viewport=}}%
+        {\adjustbox@{clip,trim=}}%
+}
+\def\endclipbox{%
+    \endadjustbox
+}
+\newenvironment{clipbox*}
+    {\begin{clipbox}*}
+    {\end{clipbox}}
+\newcommand\trimbox{%
+    \begingroup
+    \def\adjustbox@name{trimbox}%
+    \@ifstar
+        {\adjustbox@{viewport=}}%
+        {\adjustbox@{trim=}}%
+}
+\def\endtrimbox{%
+    \endadjustbox
+}
+\newenvironment{trimbox*}
+    {\begin{trimbox}*}
+    {\end{trimbox}}
+\newcommand\adjustbox{%
+    \begingroup
+    \def\adjustbox@name{adjustbox}%
+    \adjustbox@{}%
+}
+\def\endadjustbox{%
+    \unskip
+    \egroup
+    \color@endgroup
+    \egroup
+    \adjustbox@@
+}
+\def\adjustbox@#1#2{%
+    \def\adjustbox@setkeys{\setkeys{Gin}{#1#2}}%
+    \ifx\@currenvir\adjustbox@name
+        \edef\@currenvir{\@currenvir\noexpand\empty}%
+        \def\next{%
+            \setbox\@tempboxa\hbox\bgroup
+                \color@setgroup\bgroup
+                \ignorespaces
+        }%
+    \else
+        \def\next{%
+            \setbox\@tempboxa\hbox\bgroup%0
+                \color@setgroup\bgroup%
+                \aftergroup\color@endgroup
+                \aftergroup\egroup%
+                \aftergroup\adjustbox@@
+                \@ifnextchar\bgroup
+                    {\let\@let@token=}%
+                    {\adjust@box}%
+        }%
+    \fi
+    \next
+}
+\def\adjust@box#1{%
+    #1\egroup
+}
+\def\adjustbox@@{%
+    \def\width{\wd\@tempboxa}%
+    \def\height{\ht\@tempboxa}%
+    \def\depth{\dp\@tempboxa}%
+    \@tempdimc=\ht\@tempboxa
+    \advance\@tempdimc by \dp\@tempboxa\relax
+    \def\totalheight{\@tempdimc}%
+    \def\pgfmathresultunitscale{1bp}%
+    \let\pgfmathpostparse\pgfmathscaleresult
+    \let\Gin@defaultbp\pgfmathsetmacro
+    \let\setlength\pgfmathsetlength
+    \@tempswatrue
+    \toks@{{\adjustbox@@@}}%
+    \adjustbox@setkeys
+    \Gin@esetsize
+    \the\toks@
+    \endgroup
+}
+\def\adjustbox@@@{%
+    \def\Gin@llx{0}%
+    \Gin@defaultbp\Gin@lly{+-\dp\@tempboxa}%
+    \Gin@defaultbp\Gin@urx{+\wd\@tempboxa}%
+    \Gin@defaultbp\Gin@ury{+\ht\@tempboxa}%
+    \Gin@viewport@code
+    \begin{pgfpicture}%
+        \pgfpathmoveto{\pgfqpoint{\Gin@llx pt}{\Gin@lly pt}}%
+        \pgfpathlineto{\pgfqpoint{\Gin@urx pt}{\Gin@lly pt}}%
+        \pgfpathlineto{\pgfqpoint{\Gin@urx pt}{\Gin@ury pt}}%
+        \pgfpathlineto{\pgfqpoint{\Gin@llx pt}{\Gin@ury pt}}%
+        \pgfpathclose
+        \expandafter\pgfusepath\ifGin@clip{clip}\else{use as bounding box}\fi\relax
+        \pgfset{inner sep=\z@,outer sep=\z@}%
+        \pgfnode{rectangle}{base west}{\box\@tempboxa}{ADJUSTBOX@NODE}{}%
+        \pgfsetbaselinepointnow{\pgfpointanchor{ADJUSTBOX@NODE}{base}}%
+    \end{pgfpicture}%
+}
+\endinput
+%%
+%% End of file `adjustbox.sty'.
