@@ -87,6 +87,8 @@ namespace wali
         
       typedef std::pair<State,State> StatePair;
 
+      typedef relations::RelationTypedefs<State>::BinaryRelation BinaryRelation;
+
       static std::string const XMLTag;
 
       // }}}
@@ -1112,7 +1114,7 @@ namespace wali
        *
        */
       virtual void mergeClientInfo( NWA const & nwa, 
-                                    relations::RelationTypedefs<State>::BinaryRelation const & binRel, 
+                                    BinaryRelation const & binRel, 
                                     State resSt, ClientInfoRefPtr & resCI );
 
       /**
@@ -1133,8 +1135,8 @@ namespace wali
        *
        */
       virtual void mergeClientInfoCall( NWA const & nwa, 
-                                        relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
-                                        relations::RelationTypedefs<State>::BinaryRelation const & binRelEntry,
+                                        BinaryRelation const & binRelCall, 
+                                        BinaryRelation const & binRelEntry,
                                         State callSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI );
 
       /**
@@ -1155,8 +1157,8 @@ namespace wali
        *
        */
       virtual void mergeClientInfoInternal( NWA const & nwa, 
-                                            relations::RelationTypedefs<State>::BinaryRelation const & binRelSource, 
-                                            relations::RelationTypedefs<State>::BinaryRelation const & binRelTarget,
+                                            BinaryRelation const & binRelSource, 
+                                            BinaryRelation const & binRelTarget,
                                             State sourceSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI );
 
       /**
@@ -1179,9 +1181,9 @@ namespace wali
        *
        */
       virtual void mergeClientInfoReturn( NWA const & nwa, 
-                                          relations::RelationTypedefs<State>::BinaryRelation const & binRelExit,
-                                          relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
-                                          relations::RelationTypedefs<State>::BinaryRelation const & binRelReturn,
+                                          BinaryRelation const & binRelExit,
+                                          BinaryRelation const & binRelCall, 
+                                          BinaryRelation const & binRelReturn,
                                           State exitSt, State callSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI );
 
       // }}}
@@ -1752,7 +1754,7 @@ namespace wali
        * @return the state corresponding to the given binary relation
        *
        */
-      State makeKey(  relations::RelationTypedefs<State>::BinaryRelation const & R ) const;
+      State makeKey(  BinaryRelation const & R ) const;
 
       //
       // Variables

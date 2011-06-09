@@ -82,7 +82,6 @@ namespace wali
       using namespace wali::relations;
 
       typedef std::set<std::pair<State, State> > SetBinaryRelation;
-      typedef  RelationTypedefs<State>::BinaryRelation BinaryRelation;
       typedef  RelationTypedefs<State>::TernaryRelation TernaryRelation;
 
 #if 0
