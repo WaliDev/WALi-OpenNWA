@@ -1,4 +1,7 @@
 #include "wali/nwa/NWA.hpp"
+#include "wali/nwa/details/TransitionStorage.hpp"
+
+using wali::nwa::details::TransitionStorage;
 
 namespace wali
 {
@@ -55,18 +58,18 @@ namespace wali
         for( NWA::InternalIterator it = first.beginInternalTrans(); 
              it != first.endInternalTrans(); it++ )
         {
-          out.addInternalTrans(NWA::Trans::getTarget(*it),
-                               NWA::Trans::getInternalSym(*it),
-                               NWA::Trans::getSource(*it));
+          out.addInternalTrans(TransitionStorage::getTarget(*it),
+                               TransitionStorage::getInternalSym(*it),
+                               TransitionStorage::getSource(*it));
         }
 
         //Duplicate return transitions as call transitions with (return,sym,exit).
         for( NWA::ReturnIterator it = first.beginReturnTrans(); 
              it != first.endReturnTrans(); it++ )
         {
-          out.addCallTrans(NWA::Trans::getReturnSite(*it),
-                           NWA::Trans::getReturnSym(*it),
-                           NWA::Trans::getExit(*it));
+          out.addCallTrans(TransitionStorage::getReturnSite(*it),
+                           TransitionStorage::getReturnSym(*it),
+                           TransitionStorage::getExit(*it));
         }
 
         //Duplicate call transitions with associated return transitions as 
@@ -77,12 +80,12 @@ namespace wali
           for( NWA::ReturnIterator rit = first.beginReturnTrans(); 
                rit != first.endReturnTrans(); rit++ )
           {
-            if( NWA::Trans::getCallSite(*cit) == NWA::Trans::getCallSite(*rit) )
+            if( TransitionStorage::getCallSite(*cit) == TransitionStorage::getCallSite(*rit) )
             {
-              out.addReturnTrans(NWA::Trans::getEntry(*cit),
-                                 NWA::Trans::getReturnSite(*rit),
-                                 NWA::Trans::getCallSym(*cit),
-                                 NWA::Trans::getCallSite(*cit));
+              out.addReturnTrans(TransitionStorage::getEntry(*cit),
+                                 TransitionStorage::getReturnSite(*rit),
+                                 TransitionStorage::getCallSym(*cit),
+                                 TransitionStorage::getCallSite(*cit));
             }
           }
         }

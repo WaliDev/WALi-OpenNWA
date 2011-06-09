@@ -552,7 +552,7 @@ namespace wali
       {
         State state = *stit;
 
-        for( symbolIterator symit = beginSymbols(); symit != endSymbols(); ++symit )
+        for( SymbolIterator symit = beginSymbols(); symit != endSymbols(); ++symit )
         {
           Symbol symbol = *symit;
 
@@ -1283,7 +1283,7 @@ namespace wali
       //An NWA is not deterministic if there are multiple transitions of some
       //type that are identical except for the to state.
       //For each state/symbol pair check that <= 1 transition leaves the state with that symbol.
-      for( symbolIterator it = symbols.beginSymbols(); it != symbols.endSymbols(); it++ )
+      for( SymbolIterator it = symbols.beginSymbols(); it != symbols.endSymbols(); it++ )
       {
         for( StateIterator sit = beginStates(); sit != endStates(); sit++ )
         {
@@ -2274,7 +2274,7 @@ namespace wali
      */
     
     
-    NWA::symbolIterator NWA::beginSymbols( ) const
+    NWA::SymbolIterator NWA::beginSymbols( ) const
     {
       return symbols.beginSymbols();
     }
@@ -2288,7 +2288,7 @@ namespace wali
      */
     
     
-    NWA::symbolIterator NWA::endSymbols( ) const
+    NWA::SymbolIterator NWA::endSymbols( ) const
     {
       return symbols.endSymbols();
     }
@@ -2463,7 +2463,7 @@ namespace wali
     {
       os << "<" << XMLTag << ">\n";
 
-      for(symbolIterator sym = beginSymbols(); sym != endSymbols(); ++sym)
+      for(SymbolIterator sym = beginSymbols(); sym != endSymbols(); ++sym)
       {
         os << "    <" << SymbolStorage::XMLSymbolTag() << " " << SymbolStorage::XMLNameAttr() << "=\"" << key2str(*sym) << "\"/>\n";
       }

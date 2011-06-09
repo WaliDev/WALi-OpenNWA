@@ -58,23 +58,28 @@ namespace wali
      */
     class NWA : public Printable, public Countable
     {
+    private:
+      typedef ClientInfo Client;
+      typedef details::StateStorage StateStorage;
+      typedef details::SymbolStorage SymbolStorage;
+      typedef details::TransitionStorage Trans;
+      typedef std::pair<State,State> StatePair;
+
+      static std::string const XMLTag;
+      
     public:
       // {{{ Typedefs
-      
-      typedef ClientInfo Client;
 
-      typedef details::StateStorage StateStorage;
+      typedef StateStorage::ClientInfoRefPtr ClientInfoRefPtr;
 
       DEPRECATE("Use (capital-S) StateIterator")
       typedef StateStorage::const_iterator stateIterator;
       typedef StateStorage::const_iterator StateIterator;
       
-      typedef StateStorage::ClientInfoRefPtr ClientInfoRefPtr;
-      typedef details::SymbolStorage SymbolStorage;
+      //DEPRECATE("Use (capital-S) SymbolIterator")
       typedef SymbolStorage::const_iterator symbolIterator;
+      typedef SymbolStorage::const_iterator SymbolIterator;
 
-      typedef details::TransitionStorage Trans;
-        
       typedef  Trans::Call Call;       
       typedef  Trans::Internal Internal;   
       typedef  Trans::Return Return;          
@@ -87,11 +92,8 @@ namespace wali
       typedef  Trans::InternalIterator InternalIterator;
       typedef  Trans::ReturnIterator ReturnIterator;
         
-      typedef std::pair<State,State> StatePair;
 
       typedef relations::RelationTypedefs<State>::BinaryRelation BinaryRelation;
-
-      static std::string const XMLTag;
 
       // }}}
 
@@ -1624,7 +1626,7 @@ namespace wali
        * @return an iterator pointing to the beginning of the symbol set
        *
        */
-      symbolIterator beginSymbols( ) const;  
+      SymbolIterator beginSymbols( ) const;  
 
       /**
        * 
@@ -1636,7 +1638,7 @@ namespace wali
        * @return an iterator pointing just past the end of the symbol set
        *
        */
-      symbolIterator endSymbols( ) const;  
+      SymbolIterator endSymbols( ) const;  
 
       /**
        *
