@@ -59,6 +59,8 @@ namespace wali
     class NWA : public Printable, public Countable
     {
     public:
+      // {{{ Typedefs
+      
       typedef ClientInfo Client;
 
       typedef details::StateStorage StateStorage;
@@ -86,6 +88,8 @@ namespace wali
       typedef std::pair<State,State> StatePair;
 
       static std::string const XMLTag;
+
+      // }}}
 
       //
       // Methods
@@ -139,6 +143,8 @@ namespace wali
       void setClientInfo( State state, const ClientInfoRefPtr c );  
      
       //All States
+
+      // {{{ Query & Mutate States
 
       /**
        * @brief Returns the set of states in the NWA
@@ -218,7 +224,10 @@ namespace wali
        */
       void clearStates( );
 
-      //Initial States
+      // }}}
+      
+
+      // {{{ Query & Mutate Initial States
 
       /**
        *  
@@ -298,7 +307,9 @@ namespace wali
        */
       void clearInitialStates( );
 
-      //Final States
+      // }}}
+
+      // {{{ Query and Mutate Final States
 
       /**
        *
@@ -375,7 +386,9 @@ namespace wali
        */
       void clearFinalStates( );
 
-      //Symbol Accessors
+      // }}}
+
+      // {{{ Query and Mutate Symbols
 
       /**
        *
@@ -452,8 +465,9 @@ namespace wali
        */
       void clearSymbols( );
 
+      // }}}
+
       
-      //Transition Accessors
 
       /// Please don't call this, in case that's not evident from the
       /// name. It's const, so you won't break the NWA, but I make no
@@ -463,7 +477,6 @@ namespace wali
       }
       
 
-      
       /**
        *    
        * @brief duplicates the original state, but only duplicates outgoing transitions
@@ -534,7 +547,7 @@ namespace wali
       void clearTrans( );
       
 
-      //Call Transitions
+      // {{{ Query and Mutate Call Transitions
 
       /**
        *
@@ -609,7 +622,9 @@ namespace wali
        */
       size_t sizeCallTrans( ) const;
 
-      //Internal Transitions
+      // }}}
+
+      // {{{ Query and Mutate Internal Transitions
 
       /**
        *
@@ -683,7 +698,9 @@ namespace wali
        */
       size_t sizeInternalTrans( ) const;
 
-      //Return Transitions
+      // }}}
+
+      // {{{ Query and Mutate Return Transitions
 
 
       /**
@@ -777,6 +794,9 @@ namespace wali
        */
       size_t sizeReturnTrans( ) const;
 
+      // }}}
+      
+
       //Building NWAs
 
 
@@ -835,6 +855,7 @@ namespace wali
       void chop();       
 
 
+      // {{{ Deprecated construction functions (& private cheater functions)
 
       void unionNWA( NWA const & first, NWA const & second ) {
         construct::unionNWA(*this, first, second);
@@ -897,6 +918,8 @@ namespace wali
         (void) stuck;
         return construct::intersect(first, second);
       }
+
+      // }}}
       
 
       /**
@@ -941,7 +964,10 @@ namespace wali
         }
       }
 
-        
+
+
+      // {{{ intersection callbacks
+      
       /**
        * 
        * @brief intersects client information 
@@ -1068,6 +1094,10 @@ namespace wali
       virtual bool transitionIntersect( NWA const & first, Symbol sym1, NWA const & second, Symbol sym2,
                                         Symbol & resSym );
 
+      // }}}
+      
+      // {{{ determinization callbacks
+
       /**
        * 
        * @brief merges clientInfo for determinize
@@ -1153,6 +1183,8 @@ namespace wali
                                           relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
                                           relations::RelationTypedefs<State>::BinaryRelation const & binRelReturn,
                                           State exitSt, State callSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI );
+
+      // }}}
 
 
       //Using NWAs
@@ -1249,6 +1281,7 @@ namespace wali
       }
 
 
+      // {{{ deprecated nwa_pds functions (and cheater functions)
       wpds::WPDS _private_NwaToPdsReturns_( WeightGen & wg ) const;
       wpds::WPDS NWAtoPDSreturns( WeightGen & wg ) const {
 	return nwa_pds::NWAToPDSReturns(*this, wg);
@@ -1282,6 +1315,8 @@ namespace wali
       static wpds::WPDS NWAtoBackwardsPDScalls( NWA const & nwa, WeightGen & wg ) {
         return nwa_pds::NWAToBackwardsPDSCalls(nwa, wg);
       }
+
+      // }}}
 
       
       /**
@@ -1461,6 +1496,49 @@ namespace wali
 
       /**
        *
+       * @brief adds all of the states in the given StateSet to the initial state set 
+       *        associated with this NWA
+       *
+       * This method adds all of the states associated with the given StateSet to the 
+       * initial state set associated with this NWA.
+       *
+       * @param - addStateSet: the state set whose initial states to add to this NWA's
+       *                        initial state set
+       *
+       */
+      void addAllInitialStates( StateStorage addStateSet ); 
+
+      /**
+       *
+       * @brief adds all of the final states in the given StateSet to the final state set
+       *        associated with this NWA
+       *
+       * This method adds all of the final states associated with the given StateSet to 
+       * the final state set associated with this NWA.
+       *
+       * @param - addStateSet: the StateSet whose final states to add to this NWA's
+       *                        final state set
+       *
+       */
+      void addAllFinalStates( StateStorage addStateSet ); 
+
+      /**
+       *
+       * @brief add the given symbols to the NWA
+       *
+       * This method adds all of the given symbols to the set of symbols associated with
+       * the NWA.  
+       *
+       * @param - addSymbolSet: the symbols to add
+       *
+       */
+      void addAllSymbols( SymbolStorage addSymbolSet );    
+
+
+      // {{{ Iterator functions
+      
+      /**
+       *
        * @brief provide access to the beginning of the state set
        *
        * This method provides access to the beginning of the state set associated with 
@@ -1482,20 +1560,6 @@ namespace wali
        *
        */
       stateIterator endStates( ) const;  
-
-      /**
-       *
-       * @brief adds all of the states in the given StateSet to the initial state set 
-       *        associated with this NWA
-       *
-       * This method adds all of the states associated with the given StateSet to the 
-       * initial state set associated with this NWA.
-       *
-       * @param - addStateSet: the state set whose initial states to add to this NWA's
-       *                        initial state set
-       *
-       */
-      void addAllInitialStates( StateStorage addStateSet ); 
 
       /**
        *
@@ -1521,19 +1585,6 @@ namespace wali
        */
       stateIterator endInitialStates( ) const;  
 
-      /**
-       *
-       * @brief adds all of the final states in the given StateSet to the final state set
-       *        associated with this NWA
-       *
-       * This method adds all of the final states associated with the given StateSet to 
-       * the final state set associated with this NWA.
-       *
-       * @param - addStateSet: the StateSet whose final states to add to this NWA's
-       *                        final state set
-       *
-       */
-      void addAllFinalStates( StateStorage addStateSet ); 
 
       /**
        *
@@ -1558,18 +1609,6 @@ namespace wali
        *
        */
       stateIterator endFinalStates( ) const;  
-
-      /**
-       *
-       * @brief add the given symbols to the NWA
-       *
-       * This method adds all of the given symbols to the set of symbols associated with
-       * the NWA.  
-       *
-       * @param - addSymbolSet: the symbols to add
-       *
-       */
-      void addAllSymbols( SymbolStorage addSymbolSet );    
 
       /**
        *
@@ -1665,7 +1704,9 @@ namespace wali
        * @return an iterator pointing just past the end of the return transition set
        *
        */
-      ReturnIterator endReturnTrans( ) const;  
+      ReturnIterator endReturnTrans( ) const;
+
+      // }}}
 
     protected:
 
