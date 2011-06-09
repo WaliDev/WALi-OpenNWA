@@ -162,7 +162,7 @@ namespace wali
       std::map<wali::Key, BinaryRelation> internalTransPerSymbol;
       std::map<wali::Key, TernaryRelation> returnTransPerSymbol;
 
-      for( symbolIterator it = nondet.beginSymbols(); it != nondet.endSymbols(); it++ ) {
+      for( SymbolIterator it = nondet.beginSymbols(); it != nondet.endSymbols(); it++ ) {
         if (*it == WALI_EPSILON) continue;    //Epsilon is handled with closure.
         if (*it == WALI_WILD) continue;
 
@@ -198,7 +198,7 @@ namespace wali
 
 
         //Check each symbol individually.
-        for( symbolIterator it = nondet.beginSymbols(); it != nondet.endSymbols(); it++ )
+        for( SymbolIterator it = nondet.beginSymbols(); it != nondet.endSymbols(); it++ )
         {
           if (*it == WALI_EPSILON) continue;    //Epsilon is handled with closure.
           if (*it == WALI_WILD) continue;       //Wild is matched to every symbol as we go.

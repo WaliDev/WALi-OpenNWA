@@ -76,7 +76,7 @@ namespace wali
       typedef StateStorage::const_iterator stateIterator;
       typedef StateStorage::const_iterator StateIterator;
       
-      //DEPRECATE("Use (capital-S) SymbolIterator")
+      DEPRECATE("Use (capital-S) SymbolIterator")
       typedef SymbolStorage::const_iterator symbolIterator;
       typedef SymbolStorage::const_iterator SymbolIterator;
 
