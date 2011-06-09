@@ -66,54 +66,105 @@ namespace wali
       typedef std::pair<State,State> StatePair;
 
       static std::string const XMLTag;
+
       
     public:
       // {{{ Typedefs
 
+      ///
+      /// @brief ref_ptr to a ClientInfo object
       typedef StateStorage::ClientInfoRefPtr ClientInfoRefPtr;
 
       DEPRECATE("Use (capital-S) StateIterator")
       typedef StateStorage::const_iterator stateIterator;
+      /// @brief Iterator for traversing a set of states
+      ///
+      /// Dereferences to a 'State'. (This is used for the set of states, set
+      /// of initial states, and set of accepting states.)
       typedef StateStorage::const_iterator StateIterator;
       
       DEPRECATE("Use (capital-S) SymbolIterator")
       typedef SymbolStorage::const_iterator symbolIterator;
+      ///
+      /// @brief Iterator for traversing the set of symbols. Dereferences to a 'Symbol'
       typedef SymbolStorage::const_iterator SymbolIterator;
 
-      typedef  Trans::Call Call;       
-      typedef  Trans::Internal Internal;   
-      typedef  Trans::Return Return;          
+
+      /// @brief Represents a call transition
+      ///
+      /// Has the following fields:
+      ///    Call::first    The call site (a State)
+      ///    Call::second   The symbol (a Symbol)
+      ///    Call::third    The entry (a State)
+      typedef Trans::Call Call;
       
-      typedef  Trans::Calls Calls;
-      typedef  Trans::Internals Internals;
-      typedef  Trans::Returns Returns;
+      /// @brief Represents an internal transition
+      ///
+      /// Has the following fields:
+      ///    Internal::first    The source state (a State)
+      ///    Internal::second   The symbol (a Symbol)
+      ///    Internal::third    The target state (a State)
+      typedef Trans::Internal Internal;
+      
+      /// @brief Represents a return transition
+      ///
+      /// Has the following fields:
+      ///    Return::first    The exit site (a State)
+      ///    Return::second   The call predecessor (a State)
+      ///    Return::third    The symbol (a Symbol)
+      ///    Return::fourth   The return site (a State)
+      typedef Trans::Return Return;          
+      
+      typedef Trans::Calls Calls;
+      typedef Trans::Internals Internals;
+      typedef Trans::Returns Returns;
 
-      typedef  Trans::CallIterator CallIterator;
-      typedef  Trans::InternalIterator InternalIterator;
-      typedef  Trans::ReturnIterator ReturnIterator;
-        
+      ///
+      /// @brief Iterator to a set of calls. Dereferences to a 'Call'.
+      typedef Trans::CallIterator CallIterator;
+      ///
+      /// @brief Iterator to a set of internals. Dereferences to an 'Internal'
+      typedef Trans::InternalIterator InternalIterator;
+      ///
+      /// @brief Iterator to a set of returns. Dereferences to a 'Return'
+      typedef Trans::ReturnIterator ReturnIterator;
 
+
+      /// @brief Represents a binary relation on states
+      ///
+      /// There are a couple possibilities for a concrete type for this,
+      /// depending on whether you are using the (very experimental) BuDDY
+      /// support or just std::maps. See the appropriate version of
+      /// RelationOps.hpp.
       typedef relations::RelationTypedefs<State>::BinaryRelation BinaryRelation;
 
       // }}}
 
-      //
-      // Methods
-      //
+
 
     public:
-      
-      //Constructors and Destructor
-      NWA( );
-      NWA( const NWA & other );
-      NWA & operator=( const NWA & other );
 
+
+      ///
+      /// @brief Constructs an empty NWA
+      NWA( );
+
+      /// @brief Copies 'other'. Does not share structure.
+      ///
+      /// Will clone the client info objects. TODO-RELEASE
+      NWA( const NWA & other );
+
+      /// @brief Assigns 'other' to this NWA. Does not share structure.
+      ///
+      /// Will clone the client info objects. TODO-RELEASE
+      NWA & operator=( const NWA & other );
 
       /**
        * @brief Removes all states, symbols, and transitions from this NWA
        */
       void clear( );
 
+      
       /**
        * Marshalls the NWA as XML to the output stream os
        */
@@ -148,86 +199,65 @@ namespace wali
        */
       void setClientInfo( State state, const ClientInfoRefPtr c );  
      
-      //All States
 
+      
+      //////////////////////////////
       // {{{ Query & Mutate States
 
-      /**
-       * @brief Returns the set of states in the NWA
-       *
-       * @return A set of all states
-       *
-       */
-      const  StateSet & getStates( ) const;
+      /// @brief Returns the set of states in the NWA
+      ///
+      /// @return The set of all states
+      const StateSet & getStates( ) const;
 
-      /**
-       * 
-       * @brief test if a given state is a state of this NWA
-       *
-       * This method tests whether the given state is in the state set of this NWA.
-       *
-       * @param - state: the state to check
-       * @return true if the given state is a state of this NWA
-       *
-       */
+      /// @brief Tests if a given state is in this NWA
+      ///
+      /// @param - state: the state to check
+      /// @return true if the given state is a member of this NWA
       bool isState( State state ) const; 
 
-      /**
-       *  
-       * @brief add the given state to this NWA
-       *
-       * This method adds the given state to the state set for this NWA.  If the state 
-       * already exists in the NWA, false is returned.  Otherwise, true is returned.
-       *
-       * @param - state: the state to add
-       * @return false if the state already exists in the NWA, true otherwise
-       *
-       */
+      /// @brief Adds the given state to this NWA
+      ///
+      /// If the state is already a member of this NWA. returns false.
+      /// Otherwise, returns true.
+      ///
+      /// @param - state: the state to add
+      /// @return 'false' if the state already exists in the NWA, 'true' otherwise
       bool addState( State state );
 
-      /**
-       *
-       * @brief returns the number of states associated with this NWA
-       *
-       * This method returns the number of states associated with this NWA. 
-       *
-       * @return the number of states associated with this NWA
-       *
-       */
+      /// @brief Returns the number of states in this NWA
+      ///
+      /// Foo bar
+      ///
+      /// @return the number of states in this NWA
       size_t sizeStates( ) const;
 
-
-      /**
-       * @brief Returns the largest state ID in the automaton
-       *
-       * @return the largest state ID in the automaton
-       */
+      /// @brief Returns the largest state ID in the automaton
+      ///
+      /// @return the largest state ID in the automaton
       State largestState() const {
         return states.largestState();
       }
 
-
-      /**
-       *  
-       * @brief remove the given state from this NWA
-       *
-       * This method checks for the given state in the set of initial states, the set of 
-       * final states, and the set of states in this NWA.  It then removes the state from 
-       * any set that contained it.  Any transitions to or from the state to be removed 
-       * are also removed.
-       *
-       * @param - state: the state to remove
-       * @return false if the state does not exist in the NWA, true otherwise
-       *
-       */
+      /// @brief Removes the given state from this NWA along with any
+      ///        associated transitions.
+      ///
+      ///
+      /// This removes 'state' from the set of initial and final states as
+      /// well as the set of all states. It also removes any transitions (of
+      /// any type) with 'state' as a component.
+      ///
+      /// If 'state' is not present, this command is a no-op (except for the
+      /// return value). The return value indicates whether the state was
+      /// actually removed.
+      ///
+      /// @param - state: the state to remove
+      /// @return false if the state did not exist in the NWA, true otherwise
       virtual bool removeState( State state );
 
-      /**
-       *
-       * @brief remove all states from the NWA
-       *
-       * This method removes all states and transitions from the NWA.
-       */
+      
+      /// @brief remove all states and transitions from the NWA
+      ///
+      /// This method removes all states and transitions from the NWA.
       void clearStates( );
 
       // }}}
@@ -235,240 +265,195 @@ namespace wali
 
       // {{{ Query & Mutate Initial States
 
-      /**
-       *  
-       * @brief obtain the states in the initial state set
-       *
-       * This method provides access to the states in the initial state set 
-       * of this NWA.  Note: An NWA can have an unbounded number of inital states 
-       * associated with it.
-       *
-       * @return set of inital states associated with the NWA
-       *
-       */
-      const  StateSet & getInitialStates( ) const; 
+      /// @brief Returns the set of initial states
+      ///
+      /// (Note: An NWA can have an unbounded number of inital states.)
+      ///
+      /// @return the set of inital states associated with the NWA
+      const StateSet & getInitialStates( ) const; 
 
       /**
-       * 
        * @brief test if the given state is an initial state of this NWA
-       *
-       * This method tests whether the given state is in the initial state set of the NWA.
        *
        * @param - state: the state to check
        * @return true if the given state is an initial state, false otherwise
-       *
        */
       bool isInitialState( State state ) const;
 
-      /**
-       * 
-       * @brief make the given state an initial state in this NWA
-       *
-       * This method checks for the given state in the state set of this NWA.  If the 
-       * state does not exist, it is added to the state set of the NWA.  The given state 
-       * is then added to the set of initial states for the NWA.  If the state already 
-       * exists in the intial state set of the NWA, false is returned.  Otherwise, true
-       * is returned.
-       *
-       * @param - state: the state to add to initial state set
-       * @return false if the state already exists in the initial state set of the NWA
-       *
-       */
+      /// @brief Makes the given state an initial state in this NWA (adding
+      ///        it to the NWA if necessary).
+      ///
+      /// This method checks whether 'state' is in the state set of this NWA.
+      /// If the state is not present, it is added to the automaton.  In
+      /// either case, the given state is then added to the set of initial
+      /// states for the NWA.
+      ///
+      /// Returns whether the state was added to the set of initial
+      /// states. (The return value is 'true' if it was not already an
+      /// initial state regardless of whether it needed to be added to the
+      /// machine or not.)
+      ///
+      /// @param - state: the state to add to initial state set
+      /// @return false if the state already exists in the initial state set of the NWA
       bool addInitialState( State state );
 
-      /**
-       *
-       * @brief returns the number of initial states associated with this NWA
-       *
-       * This method returns the number of initial states associated with this NWA.
-       *
-       * @return the number of initial states associated with this NWA
-       *
-       */
+      /// @brief Returns the number of initial states in this NWA
+      ///
+      /// @return the number of initial states in this NWA
       size_t sizeInitialStates( ) const;
 
-      /**
-       * 
-       * @brief remove the given state from the initial state set of this NWA
-       *
-       * This method checks for the given state in the initial state set of this NWA.  If
-       * the state exists, it is removed from the initial state set (but not from the set 
-       * of all states of the NWA).  
-       * Note: This method does not remove any transitions from the NWA.
-       *
-       * @param - state: the state to remove from the initial state set
-       * @return false if the state does not exist in the initial state set of this NWA
-       *
-       */
+      /// @brief Removes the given state from the set of initial states.
+      ///
+      /// If 'state' is not already an initial state, this function is a
+      /// no-op (except for the return value), even if 'state' is not in the
+      /// NWA at all.
+      ///
+      /// The return value indicates whether 'state' was an initial state.
+      ///
+      /// (This method does not remove any transitions from the NWA, nor does
+      /// it remove the state from the NWA entirely.)
+      ///
+      /// @param - state: the state to remove from the initial state set
+      /// @return false if the state does not exist in the initial state set of this NWA
       bool removeInitialState( State state );
 
-      /**
-       *
-       * @brief remove all states from the initial state set of the NWA
-       *
-       * This method removes all states from the initial state set of the NWA, but does 
-       * not remove the them from the set of all states of the NWA.  
-       * Note: This method does not remove any transitions from the NWA.
-       *
-       */
+      /// @brief Clears the set of initial states
+      ///
+      /// (This function does not remove any states or transitions from the
+      /// automaton, it just affects the set of initial states.)
       void clearInitialStates( );
 
       // }}}
 
       // {{{ Query and Mutate Final States
 
-      /**
-       *
-       * @brief obtain the final states in this NWA
-       *
-       * This method provides access to the states in the final state set of this NWA.  
-       * Note: An NWA can have an unbounded number of final states associated with it.
-       *
-       * @return set of all final states associated with this NWA
-       *
-       */
+      /// @brief Returns the set of final states
+      ///
+      /// (Note: An NWA can have an unbounded number of inital states.)
+      ///
+      /// @return the set of inital states associated with the NWA
       const  StateSet & getFinalStates( ) const;
 
       /**
-       *
        * @brief test if a state with the given name is a final state
        *
-       * This method tests whether the given state is in the final state set of the NWA.
+       * This method tests whether the given state is in the final state set
+       * of the NWA.
        *
        * @param - state: the state to check
        * @return true if the given state is a final state
-       *
        */
       bool isFinalState( State state ) const;
 
-      /**
-       * 
-       * @brief make the given state a final state
-       *
-       * This method checks for the given state in the state set of the NWA.  If the state
-       * does not exist, it is added to the state set of the NWA.  The given state is then
-       * added to the set of final states for the NWA.  If the state already exists in the
-       * final state set of the NWA, false is returned.  Otherwise, true is returned.
-       *
-       * @param - state: the state to add to final state set
-       * @return false if the state already exists in the final state set of the NWA
-       *
-       */
+      /// @brief Makes the given state an final state in this NWA (adding
+      ///        it to the NWA if necessary).
+      ///
+      /// This method checks whether 'state' is in the state set of this NWA.
+      /// If the state is not present, it is added to the automaton.  In
+      /// either case, the given state is then added to the set of final
+      /// states for the NWA.
+      ///
+      /// Returns whether the state was added to the set of final
+      /// states. (The return value is 'true' if it was not already a final
+      /// state regardless of whether it needed to be added to the machine or
+      /// not.)
+      ///
+      /// @param - state: the state to add to final state set
+      /// @return false if the state already exists in the final state set of the NWA
       bool addFinalState( State state );
 
-      /**
-       * 
-       * @brief returns the number of final states associated with this NWA
-       *
-       * This method returns the number of final states associated with this NWA. 
-       *
-       * @return the number of final states associated with this NWA
-       *
-       */
+      /// @brief Returns the number of final states in this NWA
+      ///
+      /// @return the number of final states in this NWA
       size_t sizeFinalStates( ) const;
 
-      /**
-       *
-       * @brief remove the given state from the final state set of the NWA
-       *
-       * This method checks for the given state in the final state set of the NWA.  If the
-       * state exists, it is removed from the final state set (but not from the set of all
-       * states of the NWA). This method does not remove any transitions from the NWA.
-       *
-       * @param - state: the state to remove from the final state set
-       * @return false if the state does not exist in the final state set of the NWA
-       *
-       */
+      /// @brief Removes the given state from the set of final states.
+      ///
+      /// If 'state' is not already an final state, this function is a
+      /// no-op (except for the return value), even if 'state' is not in the
+      /// NWA at all.
+      ///
+      /// The return value indicates whether 'state' was an final state.
+      ///
+      /// (This method does not remove any transitions from the NWA, nor does
+      /// it remove the state from the NWA entirely.)
+      ///
+      /// @param - state: the state to remove from the final state set
+      /// @return false if the state does not exist in the final state set of this NWA
       bool removeFinalState( State state );
 
-      /**
-       *
-       * @brief remove all states from the final state set of the NWA
-       *
-       * This method removes all States from the final state set of the NWA, but does not 
-       * remove the them from the set of all states of the NWA.  This method does not 
-       * remove any transitions from the NWA.
-       *
-       */
+      /// @brief Clears the set of final states
+      ///
+      /// (This function does not remove any states or transitions from the
+      /// automaton, it just affects the set of final states.)
       void clearFinalStates( );
 
       // }}}
 
+
       // {{{ Query and Mutate Symbols
 
-      /**
-       *
-       * @brief obtain all symbols in this NWA
-       *
-       * This method provides access to the symbols of this NWA.  
-       * Note: An NWA can have an unbounded number of symbols associated with it.
-       *
-       * @return set of all symbols associated with this NWA
-       *
-       */
+      /// @brief Returns the set of (non-epsilon, non-wild) symbols in this NWA.
+      ///
+      /// Note: Not all symbols need to be used on a transition. (This
+      /// function will still return them.)
+      ///
+      /// @return set of all symbols in this NWA
       const  SymbolSet & getSymbols( ) const;
 
-      /**
-       *
-       * @brief test if the given symbol is associated with the NWA
-       *
-       * This method tests whether the given symbol is in the symbol set associated with 
-       * the NWA.
-       *
-       * @param - sym: the symbol to check
-       * @return true if the given symbol is associated with the NWA
-       *
-       */
+      /// @brief Tests whether the given symbol is a member the NWA.
+      ///
+      /// This returns 'false' for WALI_EPSILON and WALI_WILD, even if they
+      /// are used on a transition.
+      ///
+      /// @param - sym: the symbol to check
+      /// @return true if the given symbol is associated with the NWA
       bool isSymbol( Symbol sym ) const;
 
-      /**
-       *
-       * @brief add the given symbol to the NWA
-       *
-       * This method adds the given symbol to the symbol set associated with the NWA. If 
-       * the symbol is already associated with the NWA, false is returned. Otherwise, 
-       * true is returned.
-       *
-       * @param - sym: the symbol to add
-       * @return false if the symbol is already associated with the NWA
-       *
-       */
+      /// @brief Adds the given symbol to the NWA.
+      ///
+      /// If 'sym' is already present in the NWA, this function is a
+      /// no-op. It is also a no-op if 'sym' is either 'WALI_EPSILON' or
+      /// 'WALI_WILD'.
+      ///
+      /// The return value indicates whether 'sym' was added.
+      ///
+      /// @param - sym: the symbol to add
+      /// @return false if the symbol is already associated with the NWA
       bool addSymbol( Symbol sym );
 
-      /**
-       *
-       * @brief returns the number of symbols associated with this NWA
-       *
-       * This method returns the number of symbols associated with this NWA.
-       * Note: Neither WALI_EPSILON nor WALI_WILD are included in this count
-       *       regardless of whether they are used to label any transitions!
-       *
-       * @return the number of symbols associated with this NWA
-       *
-       */
+      /// @brief Returns the number of symbols in this NWA (excluding epsilon
+      ///        and wild).
+      ///
+      /// Symbols in the automaton are counted regardless of whether they are
+      /// used to label any transitions. Neither 'WALI_EPSILON' nor
+      /// 'WALI_WILD' are included in this count at all, regardless of
+      /// whether they are used to label transitions or not.
+      ///
+      /// @return The number of symbols in this NWA
       size_t sizeSymbols( ) const;
 
-      /**
-       *
-       * @brief remove the given symbol from the NWA
-       *
-       * This method checks for the given symbol in the symbol set associated with the NWA
-       * and removes the symbol from the symbol set if necessary.  Any transitions 
-       * associated with the symbol to be removed are also removed.
-       *
-       * @param - sym: the symbol to remove
-       * @return false if the symbols is not associated with the NWA
-       *
-       */
+      /// @brief Remove the given symbol from the NWA along with any
+      ///        associated transitions.
+      ///
+      /// Removes 'sym' from the symbol set of the NWA as well as any
+      /// transitions that have 'sym' as the symbol component.
+      ///
+      /// If 'sym' is not present, this command is a no-op; the return value
+      /// indicates whether this was the case.
+      ///
+      /// @param - sym: the symbol to remove
+      /// @return false if the symbols was not in the NWA
       bool removeSymbol( Symbol sym );
 
-      /**
-       * @brief remove all symbols associated with the NWA
-       *
-       * This method removes all symbols associated with the NWA.  It also removes all 
-       * transitions associated with the NWA as there can be no transitions without at 
-       * least one symbol.
-       */
+      /// @brief Remove all symbols and transitions from the NWA
+      ///
+      /// This method removes all symbols and all transitions from the
+      /// NWA. It does not touch any states.
+      ///
+      /// (Note: this also removes all transitions labeled with
+      /// 'WALI_EPSILON' and 'WALI_WILD' even though this perhaps needn't be
+      /// the case.)
       void clearSymbols( );
 
       // }}}
@@ -531,276 +516,205 @@ namespace wali
        */
       void realizeImplicitTrans(State stuckState);
 
-      /**
-       *
-       * @brief returns the number of transitions associated with this NWA
-       *
-       * This method returns the number of transitions associated with this NWA.  
-       *
-       * @return the number of transitions associated with this NWA
-       *
-       */
+      
+      /// @brief Returns the number of transitions in this NWA (regardless of
+      ///        type).
+      ///
+      /// @return the number of transitions in this NWA
       size_t sizeTrans( ) const;
 
-      /**
-       *
-       * @brief remove all transitions from the NWA
-       *
-       * This method removes all transitions from the NWA.  It does not remove any states
-       * or symbols from the NWA.
-       *
-       */
+      /// @brief Removes all transitions from this NWA.
+      ///
+      /// This function does not remove any states or symbols.
       void clearTrans( );
       
 
-      // {{{ Query and Mutate Call Transitions
+      // {{{ Query and Mutate Internal Transitions
 
-      /**
-       *
-       * @brief add a call transition to the NWA
-       *
-       * This method creates a call transition with the given edge and label information 
-       * and adds it to the transition set for the NWA.  If the call transition already 
-       * exists in the NWA, false is returned. Otherwise, true is returned.
-       * Note: 'sym' cannot be Epsilon
-       *
-       * @param - from: the state the edge departs from
-       * @param - sym: the symbol labeling the edge
-       * @param - to: the state the edge arrives to  
-       * @return false if the call transition already exists in the NWA
-       *
-       */
-      bool addCallTrans( State from, Symbol sym, State to );
+      /// @brief Adds a internal transition to the NWA.
+      ///
+      /// If the internal transition is already present, this function is a
+      /// no-op (other than the return value). The return value indicates
+      /// whether the transition was successfully added.
+      ///
+      /// Note: 'sym' cannot be WALI_EPSILON.
+      ///
+      /// @param - from: the state the edge departs from
+      /// @param - sym: the symbol labeling the edge
+      /// @param - to: the state the edge arrives to  
+      /// @return false if the internal transition already exists in the NWA
+      bool addInternalTrans( State from, Symbol sym, State to );
 
-      /**
-       *
-       * @brief add a call transition to the NWA
-       *
-       * This method adds the given call transition to the transition set  for the NWA.
-       * If the call transition already exists in the NWA, false is returned. Otherwise, 
-       * true is returned.
-       * Note: the symbol cannot be Epsilon
-       *
-       * @param - ct: the call transition to add
-       * @return false if the call transition already exists in the NWA
-       *
-       */
-      bool addCallTrans( Call & ct );
+      /// @brief Adds a internal transition to the NWA.
+      ///
+      /// If the internal transition is already present, this function is a
+      /// no-op (other than the return value). The return value indicates
+      /// whether the transition was successfully added.
+      ///
+      /// @param - ct: the internal transition to add
+      /// @return false if the internal transition already exists in the NWA
+      bool addInternalTrans( Internal & ct );
 
-      /**
-       *
-       * @brief remove a call transition from the NWA
-       *
-       * This method checks for the call transition with the given edge and label 
-       * information in the transition set. If the transition is found, it is removed
-       * from the transition set and true is returned.  Otherwise, false is returned.
-       *
-       * @param - from: the state the edge departs from
-       * @param - sym: the symbol labeling the edge
-       * @param - to: the state the edge arrives to  
-       * @return false if the call transition does not exist in the NWA
-       *
-       */
-      bool removeCallTrans( State from, Symbol sym, State to );
+      /// @brief Removes the given internal transition from the NWA.
+      ///
+      /// Removes the specified internal transition from the NWA, if
+      /// present. If it was not present, this function is a no-op (apart
+      /// from the return value). The return value indicates whether the
+      /// transition was successfully removed.
+      ///
+      /// @param - from: the state the edge departs from
+      /// @param - sym: the symbol labeling the edge
+      /// @param - to: the state the edge arrives to  
+      /// @return false if the internal transition does not exist in the NWA
+      bool removeInternalTrans( State from, Symbol sym, State to );
 
-      /**
-       *
-       * @brief remove a call transition from the NWA
-       *
-       * This method checks for the call transition in the transition set. If the 
-       * transition is found, it is removed from the transition set and true is 
-       * returned.  Otherwise, false is returned.
-       *
-       * @param - ct: the call transition to remove
-       * @return false if the call transition does not exist in the NWA
-       *
-       */
-      bool removeCallTrans( const Call & ct );
+      /// @brief Removes the given internal transition from the NWA.
+      ///
+      /// Removes the specified internal transition from the NWA, if
+      /// present. If it was not present, this function is a no-op (apart
+      /// from the return value). The return value indicates whether the
+      /// transition was successfully removed.
+      ///
+      /// @param - ct: the internal transition to remove
+      /// @return false if the internal transition does not exist in the NWA
+      bool removeInternalTrans( const Internal & ct );
 
-      /**
-       *
-       * @brief returns the number of call transitions associated with this NWA
-       *
-       * This method returns the number of call transitions associated with this NWA.  
-       *
-       * @return the number of call transitions associated with this NWA
-       *
-       */
-      size_t sizeCallTrans( ) const;
+      /// @brief Returns the number of internal transitions in this NWA
+      ///
+      /// @return the number of internal transitions in this NWA
+      size_t sizeInternalTrans( ) const;
 
       // }}}
 
-      // {{{ Query and Mutate Internal Transitions
 
-      /**
-       *
-       * @brief add an internal transition to the NWA
-       *
-       * This method creates an internal transition with the given edge and label 
-       * information and adds it to the transition set for the NWA.  If the internal 
-       * transition already exists in the NWA, false is returned. Otherwise, true is 
-       * returned.
-       *
-       * @param - from: the state the edge departs from
-       * @param - sym: the symbol labeling the edge
-       * @param - to: the state the edge arrives to  
-       * @return false if the internal transition already exists in the NWA
-       *
-       */
-      bool addInternalTrans( State from, Symbol sym, State to );
+      // {{{ Query and Mutate Call Transitions
 
-      /**
-       *
-       * @brief add an internal transition to the NWA
-       *
-       * This method adds the given internal transition to the transition set for the NWA.
-       * If the internal transition already exists in the NWA, false is returned. Otherwise, 
-       * true is returned.
-       *
-       * @param - it: internal transition to add to the NWA
-       * @return false if the internal transition already exists in the NWA
-       *
-       */
-      bool addInternalTrans( Internal & it );
+      /// @brief Adds a call transition to the NWA.
+      ///
+      /// If the call transition is already present, this function is a no-op
+      /// (other than the return value). The return value indicates whether
+      /// the transition was successfully added.
+      ///
+      /// Note: 'sym' cannot be WALI_EPSILON.
+      ///
+      /// @param - call: the state the edge departs from
+      /// @param - sym: the symbol labeling the edge
+      /// @param - entry: the state the edge arrives to  
+      /// @return false if the call transition already exists in the NWA
+      bool addCallTrans( State call, Symbol sym, State entry );
 
-      /**
-       *
-       * @brief remove an internal transition from the NWA
-       *
-       * This method checks for the internal transition with the given edge and label
-       * information in the transition set.  If the transition is found, it is removed 
-       * from the transition set and true is returned.  Otherwise, false is returned.
-       *
-       * @param - from: the state the edge departs from
-       * @param - sym: the symbol labeling the edge
-       * @param - to: the state the edge arrives to  
-       * @return false if the internal transition does not exist in the NWA
-       *
-       */
-      bool removeInternalTrans( State from, Symbol sym, State to );
+      /// @brief Adds a call transition to the NWA.
+      ///
+      /// If the call transition is already present, this function is a no-op
+      /// (other than the return value). The return value indicates whether
+      /// the transition was successfully added.
+      ///
+      /// @param - ct: the call transition to add
+      /// @return false if the call transition already exists in the NWA
+      bool addCallTrans( Call & ct );
 
-      /**
-       *
-       * @brief remove an internal transition from the NWA
-       *
-       * This method checks for the internal transition in the transition set. If the 
-       * transition is found, it is removed from the transition set and true is returned.
-       * Otherwise, false is returned.
-       *
-       * @param - it: the internal transition to remove
-       * @return false if the internal transition does not exist in the NWA
-       *
-       */
-      bool removeInternalTrans( const Internal & it );
+      /// @brief Removes the given call transition from the NWA.
+      ///
+      /// Removes the specified call transition from the NWA, if present. If
+      /// it was not present, this function is a no-op (apart from the return
+      /// value). The return value indicates whether the transition was
+      /// successfully removed.
+      ///
+      /// @param - call: the state the edge departs from
+      /// @param - sym: the symbol labeling the edge
+      /// @param - entry: the state the edge arrives to  
+      /// @return false if the call transition does not exist in the NWA
+      bool removeCallTrans( State call, Symbol sym, State entry );
 
-      /**
-       *
-       * @brief returns the number of internal transitions associated with this NWA
-       *
-       * This method returns the number of internal transitions associated with this NWA.  
-       *
-       * @return the number of internal transitions associated with this NWA
-       *
-       */
-      size_t sizeInternalTrans( ) const;
+      /// @brief Removes the given call transition from the NWA.
+      ///
+      /// Removes the specified call transition from the NWA, if present. If
+      /// it was not present, this function is a no-op (apart from the return
+      /// value). The return value indicates whether the transition was
+      /// successfully removed.
+      ///
+      /// @param - ct: the call transition to remove
+      /// @return false if the call transition does not exist in the NWA
+      bool removeCallTrans( const Call & ct );
+
+      /// @brief Returns the number of call transitions in this NWA
+      ///
+      /// @return the number of call transitions in this NWA
+      size_t sizeCallTrans( ) const;
 
       // }}}
 
       // {{{ Query and Mutate Return Transitions
 
+      /// @brief Adds a return transition to the NWA.
+      ///
+      /// If the return transition is already present, this function is a
+      /// no-op (other than the return value). The return value indicates
+      /// whether the transition was successfully added.
+      ///
+      /// Note: 'sym' cannot be WALI_EPSILON.
+      ///
+      /// @param - exit: the state the edge departs from
+      /// @param - sym: the symbol labeling the edge
+      /// @param - ret: the state the edge arrives to  
+      /// @return false if the return transition already exists in the NWA
+      bool addReturnTrans( State exit, State pred, Symbol sym, State ret );
 
-      /**
-       *
-       * @brief add a return transition to the NWA
-       *
-       * This method creates a return transition with the given edge and label information 
-       * and adds it to the transition set for the NWA.  If the return transition already 
-       * exists in the NWA, false is returned. Otherwise, true is returned.
-       * Note: 'sym' cannot be Epsilon
-       *
-       * @param - from: the state the edge departs from
-       * @param - pred: the state from which the call was initiated  
-       * @param - sym: the symbol labeling the edge
-       * @param - to: the state the edge arrives to  
-       * @return false if the return transition already exists in the NWA
-       *
-       */
-      bool addReturnTrans( State from, State pred, Symbol sym, State to );
+      /// @brief Adds a return transition to the NWA.
+      ///
+      /// If the return transition is already present, this function is a
+      /// no-op (other than the return value). The return value indicates
+      /// whether the transition was successfully added.
+      ///
+      /// @param - ct: the return transition to add
+      /// @return false if the return transition already exists in the NWA
+      bool addReturnTrans( Return & ct );
 
-      /**
-       *
-       * @brief add a return transition to the NWA
-       *
-       * This method adds the given return transition to the transition set for the NWA. 
-       * If the return transition already exists in the NWA, false is returned. Otherwise,
-       * true is returned.
-       * Note: the symbol cannot be Epsilon
-       *
-       * @param - rt: return transition to add to the NWA
-       * @return false if the return transition already exists in the NWA
-       *
-       */
-      bool addReturnTrans( Return & rt );
+      /// @brief Removes (possibly multiple) matching return transition from
+      ///        the NWA.
+      ///
+      /// Removes any return transition in the NWA with the given 'exit'
+      /// state, symbol, and 'ret'urn state. If none were present, this
+      /// function is a no-op (apart from the return value). The return value
+      /// indicates whether any transition was successfully removed.
+      ///
+      /// @param - exit: the state the edge departs from
+      /// @param - sym: the symbol labeling the edge
+      /// @param - to: the state the edge arrives to  
+      /// @return false if the return transition does not exist in the NWA
+      bool removeReturnTrans( State exit, Symbol sym, State ret );
 
-      /**
-       *
-       * @brief remove a return transition from the NWA
-       *
-       * This method checks for all return transitions with the given edge and label
-       * information in the transition set.  If transitions are found, they are removed 
-       * from the transition set and true is returned.  Otherwise, false is returned.
-       *
-       * @param - from: of the state the edge departs from
-       * @param - sym: the symbol labeling the edge
-       * @param - to: the state the edge arrives to  
-       * @return false if the return transition does not exist in the NWA
-       *
-       */
-      bool removeReturnTrans( State from, Symbol sym, State to );
+      /// @brief Removes the given return transition from the NWA.
+      ///
+      /// Removes the specified return transition from the NWA, if
+      /// present. If it was not present, this function is a no-op (apart
+      /// from the return value). The return value indicates whether the
+      /// transition was successfully removed.
+      ///
+      /// @param - exit: the state the edge departs from
+      /// @param - sym: the symbol labeling the edge
+      /// @param - to: the state the edge arrives to  
+      /// @return false if the return transition does not exist in the NWA
+      bool removeReturnTrans( State exit, State pred, Symbol sym, State ret );
 
-      /**
-       *
-       * @brief remove a return transition from the NWA
-       *
-       * This method checks for the return transition with the given edge and label 
-       * information in the transition set. If the transition is found, it is removed 
-       * from the transition set and true is returned.  Otherwise, false is returned.
-       * 
-       * @param - from: the state the edge departs from
-       * @param - pred: the state from which the call was initiated  	   
-       * @param - sym: the symbol labeling the edge
-       * @param - to: the state the edge arrives to  
-       * @return false if the return transition does not exist in the NWA
-       *
-       */
-      bool removeReturnTrans( State from, State pred, Symbol sym, State to );
+      /// @brief Removes the given return transition from the NWA.
+      ///
+      /// Removes the specified return transition from the NWA, if
+      /// present. If it was not present, this function is a no-op (apart
+      /// from the return value). The return value indicates whether the
+      /// transition was successfully removed.
+      ///
+      /// @param - ct: the return transition to remove
+      /// @return false if the return transition does not exist in the NWA
+      bool removeReturnTrans( const Return & ct );
 
-      /**
-       *
-       * @brief remove a return transition from the NWA
-       *
-       * This method checks for the return transition in the transition set. If the 
-       * transition is found, it is removed from the transition set and true is returned.
-       * Otherwise, false is returned.
-       *
-       * @param - rt: the return transition to remove
-       * @return false if the return transition does not exist in the NWA
-       *
-       */
-      bool removeReturnTrans( const Return & rt );
-
-      /**
-       *
-       * @brief returns the number of return transitions associated with this NWA
-       *
-       * This method returns the number of return transitions associated with this NWA.  
-       *
-       * @return the number of return transitions associated with this NWA
-       *
-       */
+      /// @brief Returns the number of return transitions in this NWA
+      ///
+      /// @return the number of return transitions in this NWA
       size_t sizeReturnTrans( ) const;
 
       // }}}
+
       
 
       //Building NWAs
@@ -975,15 +889,20 @@ namespace wali
       // {{{ intersection callbacks
       
       /**
-       * 
-       * @brief intersects client information 
+       * @brief Intersects client information for the target of a call
+       *        transition.
        *
        * This method intersects the client information associated with the states 'entry1'
        * and 'entry2' given that the transition that is being created is a call transition 
        * with the given symbol using the information in the given states and sets the 
        * resulting client information.
+       *
        * Note: This method should only be used to intersect client information for states 
        *        immediately following a call transition.
+       *
+       * This function is called during the exceution of
+       * 'construct::intersect'. (This is an instance of the "template
+       * method" design pattern.)
        *
        * @param - first: the NWA in which to look up the client information for 
        *                'call1' and 'entry1'
@@ -997,7 +916,6 @@ namespace wali
        * @param - entry2: the second entry point whose client information to intersect
        * @param - resSym: the symbol associated with the transition that is being created
        * @param - resSt: the state which will receive the computed client information
-       *
        */
       virtual void intersectClientInfoCall( NWA const & first, State call1, State entry1, 
                                             NWA const & second, State call2, State entry2, 
@@ -1005,7 +923,8 @@ namespace wali
 
       /**
        * 
-       * @brief intersects client information 
+       * @brief Intersects client information for the target of an internal
+       *        transition.
        *
        * This method intersects the client information associated with the states 'tgt1' and
        * 'tgt2' given that the transition that is being created is an internal transition 
@@ -1013,6 +932,10 @@ namespace wali
        * resulting client information.
        * Note: This method should only be used to intersect client information for states 
        *        immediately following an internal transition.
+       *
+       * This function is called during the exceution of
+       * 'construct::intersect'. (This is an instance of the "template
+       * method" design pattern.)
        *
        * @param - first: the NWA in which to look up the client information for 
        *                'src1' and 'tgt1'
@@ -1034,7 +957,8 @@ namespace wali
 
       /**
        * 
-       * @brief intersects client information 
+       * @brief Intersects client information for the target of a return
+       *        transition.
        *
        * This method intersects the client information associated with the states 'ret1' and
        * 'ret2' given that the transition that is being created is a return transition with
@@ -1042,6 +966,10 @@ namespace wali
        * resulting client information.
        * Note: This method should only be used to intersect client information for states 
        *        immediately following a return transition.
+       *
+       * This function is called during the exceution of
+       * 'construct::intersect'. (This is an instance of the "template
+       * method" design pattern.)
        *
        * @param - first: the NWA in which to look up the client information for 
        *                'exit1', 'call1', and 'ret1'
@@ -1067,10 +995,14 @@ namespace wali
 
       /**
        * 
-       * @brief intersect states
+       * @brief Intersect states
        * 
        * This method determines whether the given states can be intersected and returns the result
        * in the reference parameter 'resSt'.
+       *
+       * This function is called during the exceution of
+       * 'construct::intersect'. (This is an instance of the "template
+       * method" design pattern.)
        *
        * @param - first: the NWA in which to look up information about 'state1'
        * @param - state1: the first state to intersect
@@ -1085,10 +1017,14 @@ namespace wali
 
       /**
        * 
-       * @brief intersect symbols
+       * @brief Intersect symbols
        * 
        * This method performs the intersection of the given symbols and returns the result
        * in the reference parameter 'resSym'.
+       *
+       * This function is called during the exceution of
+       * 'construct::intersect'. (This is an instance of the "template
+       * method" design pattern.)
        *
        * @param - first: the NWA in which to look up information about 'sym1'
        * @param - sym1: the first symbol to intersect
@@ -1106,10 +1042,14 @@ namespace wali
 
       /**
        * 
-       * @brief merges clientInfo for determinize
+       * @brief Merges clientInfo for determinize
        * 
        * This method merges the client info for the given states and returns the result in the 
        * reference parameter 'resCI'.
+       *
+       * This function is called during the exceution of
+       * 'construct::determinize'. (This is an instance of the "template
+       * method" design pattern.)
        *
        * @param - nwa: the NWA in which to look up information about the states
        * @param - binRel: the states to merge
@@ -1123,7 +1063,8 @@ namespace wali
 
       /**
        * 
-       * @brief merges clientInfo for determinize
+       * @brief Merges clientInfo for determinize for the target of a call
+       *        transition.
        * 
        * This method merges the client info for the given entry states given that the transition
        * that is being created is a call transition with the given symbol using the information in 
@@ -1145,11 +1086,16 @@ namespace wali
 
       /**
        * 
-       * @brief merges clientInfo for determinize
+       * @brief Merges clientInfo for determinize for the target of an
+       *        internal transition.
        * 
        * This method merges the client info for the given target states given that the transition
        * that is being created is an internal transition with the given symbol using the information in 
        * the given states and returns the result in the reference parameter 'resCI'.
+       *
+       * This function is called during the exceution of
+       * 'construct::determinize'. (This is an instance of the "template
+       * method" design pattern.)
        *
        * @param - nwa: the NWA in which to look up information about the states
        * @param - binRelSource: the states that compose the source for this internal transition
@@ -1167,11 +1113,16 @@ namespace wali
 
       /**
        * 
-       * @brief merges clientInfo for determinize
+       * @brief Merges clientInfo for determinize for the target of a return
+       *        transition.
        * 
        * This method merges the client info for the given return states given that the transition
        * that is being created is a return transition with the given symbol using the information in 
        * the given states and returns the result in the reference parameter 'resCI'.
+       *
+       * This function is called during the exceution of
+       * 'construct::determinize'. (This is an instance of the "template
+       * method" design pattern.)
        *
        * @param - nwa: the NWA in which to look up information about the states
        * @param - binRelExit: the states that compose the exit point for this return transition
