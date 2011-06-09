@@ -31,7 +31,7 @@
 #include "wali/nwa/construct/reverse.hpp"
 #include "wali/nwa/construct/star.hpp"
 #include "wali/nwa/construct/union.hpp"
-
+#include "wali/nwa/nwa_pds/NWAToPDS.hpp"
 
 //#define USE_BUDDY
 #ifdef USE_BUDDY
@@ -1248,126 +1248,39 @@ namespace wali
         return nwa;
       }
 
-      /**
-       *
-       * @brief constructs the PDS equivalent to this NWA
-       *
-       * This method constructs the PDS that is equivalent to this NWA.
-       * Note: This version keeps returns on the stack.
-       *
-       * @param - wg: the functions to use in generating weights
-       * @return the PDS equivalent to this NWA
-       *
-       */ 
-      wpds::WPDS NWAtoPDSreturns( WeightGen & wg ) const;
-      
-      /**
-       *
-       * @brief constructs the PDS equivalent to this NWA
-       *
-       * This method constructs the PDS that is equivalent to this NWA.
-       * Note: This version keeps returns on the stack.
-       *
-       * @param - nwa: the nwa to convert
-       * @param - wg: the functions to use in generating weights
-       * @return the PDS equivalent to this NWA
-       *
-       */ 
-      static wpds::WPDS NWAtoPDSreturns( NWA const & nwa, WeightGen & wg )
-      {
-        return nwa.NWAtoPDSreturns(wg);
+
+      wpds::WPDS _private_NwaToPdsReturns_( WeightGen & wg ) const;
+      wpds::WPDS NWAtoPDSreturns( WeightGen & wg ) const {
+	return nwa_pds::NWAToPDSReturns(*this, wg);
+      }
+      static wpds::WPDS NWAtoPDSreturns( NWA const & nwa, WeightGen & wg ) {
+        return nwa_pds::NWAToPDSReturns(nwa, wg);
       }
 
-      /**
-       *
-       * @brief constructs the backwards PDS equivalent to this NWA
-       *
-       * This method constructs the backwards PDS that is equivalent to this NWA.
-       * Note: This version keeps returns on the stack.
-       *
-       * @param - wg: the functions to use in generating weights
-       * @return the backwards PDS equivalent to this NWA
-       *
-       */ 
-      wpds::WPDS NWAtoBackwardsPDSreturns( WeightGen & wg ) const;
-      
-      /**
-       *
-       * @brief constructs the backwards PDS equivalent to this NWA
-       *
-       * This method constructs the backwards PDS that is equivalent to this NWA.
-       * Note: This version keeps returns on the stack.
-       *
-       * @param - nwa: the nwa to convert
-       * @param - wg: the functions to use in generating weights
-       * @return the backwards PDS equivalent to this NWA
-       *
-       */ 
-      static wpds::WPDS NWAtoBackwardsPDSreturns( NWA const & nwa, WeightGen & wg )
-      {
-        return nwa.NWAtoBackwardsPDSreturns(wg);
+      wpds::WPDS _private_NwaToBackwardsPdsReturns_( WeightGen & wg ) const;
+      wpds::WPDS NWAtoBackwardsPDSreturns( WeightGen & wg ) const {
+	return nwa_pds::NWAToBackwardsPDSReturns(*this, wg);
+      }
+      static wpds::WPDS NWAtoBackwardsPDSreturns( NWA const & nwa, WeightGen & wg ) {
+        return nwa_pds::NWAToBackwardsPDSReturns(nwa, wg);
       }
 
 
-      /**
-       *
-       * @brief constructs the PDS equivalent to this NWA
-       *
-       * This method constructs the PDS that is equivalent to this NWA.
-       * Note: This version keeps calls on the stack.
-       *
-       * @param - wg: the functions to use in generating weights
-       * @return the PDS equivalent to this NWA
-       *
-       */ 
-      wpds::WPDS NWAtoPDScalls( WeightGen & wg ) const;
-      
-      /**
-       *
-       * @brief constructs the PDS equivalent to this NWA
-       *
-       * This method constructs the PDS that is equivalent to this NWA.
-       * Note: This version keeps calls on the stack.
-       *
-       * @param - nwa: the nwa to convert
-       * @param - wg: the functions to use in generating weights
-       * @return the PDS equivalent to this NWA
-       *
-       */ 
-      static wpds::WPDS NWAtoPDScalls( NWA const & nwa, WeightGen & wg )
-      {
-        return nwa.NWAtoPDScalls(wg);
+      wpds::WPDS _private_NwaToPdsCalls_( WeightGen & wg ) const;
+      wpds::WPDS NWAtoPDScalls( WeightGen & wg ) const {
+	return nwa_pds::NWAToPDSCalls(*this, wg);
+      }
+      static wpds::WPDS NWAtoPDScalls( NWA const & nwa, WeightGen & wg ) {
+        return nwa_pds::NWAToPDSCalls(nwa, wg);
       }
 
 
-      /**
-       *
-       * @brief constructs the backwards PDS equivalent to this NWA
-       *
-       * This method constructs the backwards PDS that is equivalent to this NWA.
-       * Note: This version keeps calls on the stack.
-       *
-       * @param - wg: the functions to use in generating weights
-       * @return the backwards PDS equivalent to this NWA
-       *
-       */ 
-      wpds::WPDS NWAtoBackwardsPDScalls( WeightGen & wg ) const;
-      
-      /**
-       *
-       * @brief constructs the backwards PDS equivalent to this NWA
-       *
-       * This method constructs the backwards PDS that is equivalent to this NWA.
-       * Note: This version keeps calls on the stack.
-       *
-       * @param - nwa: the NWA to convert
-       * @param - wg: the functions to use in generating weights
-       * @return the backwards PDS equivalent to this NWA
-       *
-       */
-      static wpds::WPDS NWAtoBackwardsPDScalls( NWA const & nwa, WeightGen & wg )
-      {
-        return nwa.NWAtoBackwardsPDScalls(wg);
+      wpds::WPDS _private_NwaToBackwardsPdsCalls_( WeightGen & wg ) const;
+      wpds::WPDS NWAtoBackwardsPDScalls( WeightGen & wg ) const {
+	return nwa_pds::NWAToBackwardsPDSCalls(*this, wg);
+      }
+      static wpds::WPDS NWAtoBackwardsPDScalls( NWA const & nwa, WeightGen & wg ) {
+        return nwa_pds::NWAToBackwardsPDSCalls(nwa, wg);
       }
 
       

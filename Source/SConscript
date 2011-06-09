@@ -95,6 +95,7 @@ nice_files = Split("""
 ./wali/nwa/construct/determinize.cpp
 ./wali/nwa/construct/intersect.cpp
 ./wali/nwa/construct/star.cpp
+./wali/nwa/nwa_pds/NWAToPDS.cpp
 """)
 
 naughty_files = Split("""
