@@ -52,13 +52,13 @@ namespace wali
         // transitions from the two machines. It has the initial and final
         // states of the 'first' machine, but lacks the initial and final
         // states of the 'second' machine. So we need to add those.
-        for (NWA::stateIterator initial = second.beginInitialStates();
+        for (NWA::StateIterator initial = second.beginInitialStates();
              initial != second.endInitialStates(); ++initial)
         {
           out.addInitialState(*initial);
         }
 
-        for (NWA::stateIterator final = second.beginFinalStates();
+        for (NWA::StateIterator final = second.beginFinalStates();
              final != second.endFinalStates(); ++final)
         {
           out.addFinalState(*final);

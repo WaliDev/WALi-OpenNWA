@@ -100,14 +100,14 @@ namespace wali
 
       // Construct Id
       DECLARE(BinaryRelation, Id);
-      for( stateIterator sit = nondet.beginStates(); sit != nondet.endStates(); sit++ )
+      for( StateIterator sit = nondet.beginStates(); sit != nondet.endStates(); sit++ )
       {
         Id.insert(std::pair<State,State>(*sit,*sit));
       }
       
       // Construct Id0
       DECLARE(BinaryRelation, Id0);
-      for( stateIterator sit = nondet.beginInitialStates(); sit != nondet.endInitialStates(); sit++ )
+      for( StateIterator sit = nondet.beginInitialStates(); sit != nondet.endInitialStates(); sit++ )
       {
         Id0.insert(std::pair<State,State>(*sit,*sit));
       }
@@ -387,10 +387,10 @@ namespace wali
         //any final state must contain one of the pairs in 
         //{(init,fin) | init is an initial state and fin is a final state}
         DECLARE(BinaryRelation, Rf);
-        for( stateIterator iit = nondet.beginInitialStates();
+        for( StateIterator iit = nondet.beginInitialStates();
              iit != nondet.endInitialStates(); iit++ )
         {
-          for( stateIterator fit = nondet.beginFinalStates();
+          for( StateIterator fit = nondet.beginFinalStates();
                fit != nondet.endFinalStates(); fit++ )
           {
             Rf.insert(std::pair<State,State>(*iit,*fit));

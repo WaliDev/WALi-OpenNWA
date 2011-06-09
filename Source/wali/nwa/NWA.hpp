@@ -64,12 +64,14 @@ namespace wali
       typedef ClientInfo Client;
 
       typedef details::StateStorage StateStorage;
+
+      DEPRECATE("Use (capital-S) StateIterator")
+      typedef StateStorage::const_iterator stateIterator;
+      typedef StateStorage::const_iterator StateIterator;
       
-      typedef  StateStorage::const_iterator stateIterator;
-      
-      typedef  StateStorage::ClientInfoRefPtr ClientInfoRefPtr;
+      typedef StateStorage::ClientInfoRefPtr ClientInfoRefPtr;
       typedef details::SymbolStorage SymbolStorage;
-      typedef  SymbolStorage::const_iterator symbolIterator;
+      typedef SymbolStorage::const_iterator symbolIterator;
 
       typedef details::TransitionStorage Trans;
         
@@ -1549,7 +1551,7 @@ namespace wali
        * @return an iterator pointing to the beginning of the state set
        *
        */
-      stateIterator beginStates( ) const;  
+      StateIterator beginStates( ) const;  
 
       /**
        * 
@@ -1561,7 +1563,7 @@ namespace wali
        * @return an iterator pointing just past the end of the state set
        *
        */
-      stateIterator endStates( ) const;  
+      StateIterator endStates( ) const;  
 
       /**
        *
@@ -1573,7 +1575,7 @@ namespace wali
        * @return an iterator pointing to the beginning of the initial state set
        *
        */ 
-      stateIterator beginInitialStates( ) const;  
+      StateIterator beginInitialStates( ) const;  
 
       /**
        * 
@@ -1585,7 +1587,7 @@ namespace wali
        * @return an iterator pointing just past the end of the initial state set
        *
        */
-      stateIterator endInitialStates( ) const;  
+      StateIterator endInitialStates( ) const;  
 
 
       /**
@@ -1598,7 +1600,7 @@ namespace wali
        * @return an iterator pointing to the beginning of the final state set
        *
        */
-      stateIterator beginFinalStates( ) const;  
+      StateIterator beginFinalStates( ) const;  
 
       /**
        * 
@@ -1610,7 +1612,7 @@ namespace wali
        * @return an iterator pointing just past the end of the final state set
        *
        */
-      stateIterator endFinalStates( ) const;  
+      StateIterator endFinalStates( ) const;  
 
       /**
        *

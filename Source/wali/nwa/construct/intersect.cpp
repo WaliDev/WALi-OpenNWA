@@ -57,9 +57,9 @@ namespace wali
                              // for all intersectable pairs encountered
 
       //Start the worklist with all possible initial states of the intersection NWA.
-      for( stateIterator fit = first.beginInitialStates(); fit != first.endInitialStates(); fit++ ) 
+      for( StateIterator fit = first.beginInitialStates(); fit != first.endInitialStates(); fit++ ) 
       {
-        for( stateIterator sit = second.beginInitialStates(); sit != second.endInitialStates(); sit++ ) 
+        for( StateIterator sit = second.beginInitialStates(); sit != second.endInitialStates(); sit++ ) 
         {
           State newSt;
           StatePair sp(*fit,*sit);

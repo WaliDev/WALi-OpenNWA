@@ -49,7 +49,7 @@ namespace wali
 
       //The state-space of A* is Q + Q'.
       states.addAll(first.states); //Note: This includes copying clientInfo information over.    
-      for( stateIterator sit = first.beginStates(); sit != first.endStates(); sit++ )
+      for( StateIterator sit = first.beginStates(); sit != first.endStates(); sit++ )
       {
         State sp = wali::getKey(*sit,prime);
         states.addState(sp);
@@ -64,7 +64,7 @@ namespace wali
       }
 
       //The initial and final states of A* are Q0'. 
-      for( stateIterator sit = first.beginInitialStates(); 
+      for( StateIterator sit = first.beginInitialStates(); 
            sit != first.endInitialStates(); sit++ )
       {
         State sp = wali::getKey(*sit,prime);
@@ -95,7 +95,7 @@ namespace wali
         if( first.isFinalState(p) )
         {
           //for each r in Q0
-          for( stateIterator sit = first.beginInitialStates(); 
+          for( StateIterator sit = first.beginInitialStates(); 
                sit != first.endInitialStates(); sit++ )
           {
             State rp = wali::getKey(*sit,prime);
@@ -129,7 +129,7 @@ namespace wali
         if( first.isFinalState(p) )
         {
           //for each r in Q0
-          for( stateIterator sit = first.beginInitialStates();
+          for( StateIterator sit = first.beginInitialStates();
                sit != first.endInitialStates(); sit++ )
           {
             State rp = wali::getKey(*sit,prime);
@@ -168,7 +168,7 @@ namespace wali
         if( first.isFinalState(p) )
         {
           //for each s in Q0
-          for( stateIterator sit = first.beginInitialStates();
+          for( StateIterator sit = first.beginInitialStates();
                sit != first.endInitialStates(); sit++ )
           { 
             State sp = wali::getKey(*sit,prime);
@@ -185,7 +185,7 @@ namespace wali
         if( first.isInitialState(r) )
         {
           //for each s in Q
-          for( stateIterator sit = first.beginStates();
+          for( StateIterator sit = first.beginStates();
                sit != first.endStates(); sit++ )
           {
             State s = *sit;
@@ -204,7 +204,7 @@ namespace wali
             if( first.isFinalState(p) )
             {
               //for each t in Q0
-              for( stateIterator it = first.beginInitialStates();
+              for( StateIterator it = first.beginInitialStates();
                    it != first.endInitialStates(); it++ )
               {                
                 State tp = wali::getKey(*it,prime);

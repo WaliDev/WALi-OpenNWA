@@ -56,17 +56,17 @@ namespace wali
         // first to the final states of the second.
 
         // First step: set final states.
-        for (NWA::stateIterator final = second.beginFinalStates();
+        for (NWA::StateIterator final = second.beginFinalStates();
              final != second.endFinalStates(); ++final)
         {
           out.addFinalState(*final);
         }
       
         // Second step: add transitions from the first machine to the second
-        for( NWA::stateIterator fit = first.beginFinalStates();
+        for( NWA::StateIterator fit = first.beginFinalStates();
              fit != first.endFinalStates(); fit++ )
         {
-          for( NWA::stateIterator sit = second.beginInitialStates();
+          for( NWA::StateIterator sit = second.beginInitialStates();
                sit != second.endInitialStates(); sit++ )
           {
             out.addInternalTrans(*fit, WALI_EPSILON, *sit);

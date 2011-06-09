@@ -548,7 +548,7 @@ namespace wali
       //   from every other state and add any that don't exist
       // - Also in the implementation, we don't have a "for every kind of
       //   transition" loop; the three types are done one after the other
-      for( stateIterator stit = beginStates(); stit != endStates(); ++stit )
+      for( StateIterator stit = beginStates(); stit != endStates(); ++stit )
       {
         State state = *stit;
 
@@ -579,7 +579,7 @@ namespace wali
             addInternalTrans(state, symbol, stuck);
           }
 
-          for( stateIterator pred = beginStates(); pred != endStates(); ++pred )
+          for( StateIterator pred = beginStates(); pred != endStates(); ++pred )
           {
             if( returns.find(Triple<State,Symbol,State>(state, *pred, symbol)) == returns.end() 
                 && returns.find(Triple<State,Symbol,State>(state, *pred, WALI_WILD)) == returns.end() )
@@ -923,7 +923,7 @@ namespace wali
      
       bool removed = false;
       const Trans::States preds = trans.getCallSites(from,to);
-      for( Trans::stateIterator it = preds.begin(); it != preds.end(); it++ )
+      for( Trans::StateIterator it = preds.begin(); it != preds.end(); it++ )
       {
         if(! isState(*it) )
           return false;
@@ -1021,7 +1021,7 @@ namespace wali
       //  assert(b && "State not found in projectStates");
       //}
       StateSet project_out;
-      for(stateIterator it = beginStates(); it!=endStates(); it++) {
+      for(StateIterator it = beginStates(); it!=endStates(); it++) {
         if( prjStates.count(*it) == 0 ) {
           project_out.insert(*it);
         }
@@ -1116,7 +1116,7 @@ namespace wali
       std::deque<State> worklist(sources.begin(), sources.end());  
       StateSet unreachables = getStates();
       StateSet visited;
-      for( stateIterator it = sources.begin(); it!=sources.end(); it++) {
+      for( StateIterator it = sources.begin(); it!=sources.end(); it++) {
         visited.insert(*it);
       }   
 
@@ -1164,7 +1164,7 @@ namespace wali
 
       }
 
-      for(stateIterator it = unreachables.begin(); it!=unreachables.end(); it++) {
+      for(StateIterator it = unreachables.begin(); it!=unreachables.end(); it++) {
         removeState(*it);
       }
       return;
@@ -1176,7 +1176,7 @@ namespace wali
       std::deque<State> worklist(targets.begin(), targets.end());  
       StateSet unreachables = getStates();
       StateSet visited;
-      for( stateIterator it = targets.begin(); it!=targets.end(); it++) {
+      for( StateIterator it = targets.begin(); it!=targets.end(); it++) {
         visited.insert(*it);
       }   
 
@@ -1228,7 +1228,7 @@ namespace wali
         }
       }
 
-      for(stateIterator it = unreachables.begin(); it!=unreachables.end(); it++) {
+      for(StateIterator it = unreachables.begin(); it!=unreachables.end(); it++) {
         removeState(*it);
       }
       return;
@@ -1285,7 +1285,7 @@ namespace wali
       //For each state/symbol pair check that <= 1 transition leaves the state with that symbol.
       for( symbolIterator it = symbols.beginSymbols(); it != symbols.endSymbols(); it++ )
       {
-        for( stateIterator sit = beginStates(); sit != endStates(); sit++ )
+        for( StateIterator sit = beginStates(); sit != endStates(); sit++ )
         {
           //Check call transitions.
           int count_found = 0;
@@ -1325,7 +1325,7 @@ namespace wali
           else if( wild && count_found > 0 )
             return false;  
 
-          for( stateIterator pit = beginStates(); pit != endStates(); pit++ )
+          for( StateIterator pit = beginStates(); pit != endStates(); pit++ )
           {
             //Check return transitions.
             count_found = 0;
@@ -1804,7 +1804,7 @@ namespace wali
         return true;
 
       //An automaton with an initial state that is a final state is definitely not empty.
-      for( stateIterator it = beginInitialStates(); it != endInitialStates(); it++ )
+      for( StateIterator it = beginInitialStates(); it != endInitialStates(); it++ )
       {
         if( isFinalState(*it) )
           return false;
@@ -1826,7 +1826,7 @@ namespace wali
       initials.addState(fin,wgts.zero());
       initials.addFinalState(fin);
       //Add transitions.
-      for( stateIterator it = beginInitialStates(); it != endInitialStates(); it++ )
+      for( StateIterator it = beginInitialStates(); it != endInitialStates(); it++ )
       {
         initials.addTrans(init,*it,fin,wgts.one());
       }
@@ -1841,7 +1841,7 @@ namespace wali
       finals.addState(fin,wgts.zero());
       finals.addFinalState(fin);
       //Add transitions.
-      for( stateIterator it = beginFinalStates(); it != endFinalStates(); it++ )
+      for( StateIterator it = beginFinalStates(); it != endFinalStates(); it++ )
       {
         finals.addTrans(init,*it,fin,wgts.one());
       }
@@ -2054,9 +2054,9 @@ namespace wali
 
       //Print return transitions. (This is so dumbly done)
       o << "// Delta_r:\n";
-      for(stateIterator exitit = beginStates(); exitit != endStates(); ++exitit)
+      for(StateIterator exitit = beginStates(); exitit != endStates(); ++exitit)
       {
-        for(stateIterator returnit = beginStates(); returnit != endStates(); ++returnit)
+        for(StateIterator returnit = beginStates(); returnit != endStates(); ++returnit)
         {
           // For each Sym, holds the set of call predecessors for which
           // (exit, pred, sym, return) is in delta_r
@@ -2144,7 +2144,7 @@ namespace wali
      */
     
     
-    NWA::stateIterator NWA::beginStates( ) const
+    NWA::StateIterator NWA::beginStates( ) const
     {
       return states.beginStates();
     }
@@ -2158,7 +2158,7 @@ namespace wali
      */
     
     
-    NWA::stateIterator NWA::endStates( ) const
+    NWA::StateIterator NWA::endStates( ) const
     {
       return states.endStates();
     }
@@ -2188,7 +2188,7 @@ namespace wali
      */ 
     
     
-    NWA::stateIterator NWA::beginInitialStates( ) const
+    NWA::StateIterator NWA::beginInitialStates( ) const
     {
       return states.beginInitialStates();
     }
@@ -2202,7 +2202,7 @@ namespace wali
      */
     
     
-    NWA::stateIterator NWA::endInitialStates( ) const
+    NWA::StateIterator NWA::endInitialStates( ) const
     {
       return states.endInitialStates();
     }
@@ -2232,7 +2232,7 @@ namespace wali
      */
     
     
-    NWA::stateIterator NWA::beginFinalStates( ) const
+    NWA::StateIterator NWA::beginFinalStates( ) const
     {
       return states.beginFinalStates();
     }
@@ -2246,7 +2246,7 @@ namespace wali
      */
     
     
-    NWA::stateIterator NWA::endFinalStates( ) const
+    NWA::StateIterator NWA::endFinalStates( ) const
     {
       return states.endFinalStates();
     }
@@ -2468,7 +2468,7 @@ namespace wali
         os << "    <" << SymbolStorage::XMLSymbolTag() << " " << SymbolStorage::XMLNameAttr() << "=\"" << key2str(*sym) << "\"/>\n";
       }
 
-      for(stateIterator state = beginStates(); state != endStates(); ++state)
+      for(StateIterator state = beginStates(); state != endStates(); ++state)
       {
         os << "    <" << StateStorage::XMLStateTag() << " ";
         os << StateStorage::XMLNameAttr() << "=\"" << key2str(*state) << "\"";
@@ -2521,7 +2521,7 @@ namespace wali
       typedef ::wali::nwa::details::Configuration Configuration;
       
       std::set<Configuration> nextConfigs;
-      for(stateIterator iter = beginInitialStates(); iter!=endInitialStates(); ++iter) {
+      for(StateIterator iter = beginInitialStates(); iter!=endInitialStates(); ++iter) {
         nextConfigs.insert(Configuration(*iter));
       }
             

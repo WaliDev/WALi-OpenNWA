@@ -35,7 +35,10 @@ namespace wali
     {
       public:    
         typedef std::set<State> States;
+
+        DEPRECATE("Use (captial-S) StateIterator, not that you should be using this one anyway")
         typedef States::const_iterator stateIterator;
+        typedef States::const_iterator StateIterator;
 
         typedef TransitionInfo::Call Call;
         typedef TransitionInfo::Internal Internal;

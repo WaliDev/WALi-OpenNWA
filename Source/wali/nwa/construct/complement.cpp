@@ -46,7 +46,7 @@ namespace wali
         //FinalStates = AllStates - FinalStates
         StateSet oldFinalStates(out.beginFinalStates(), out.endFinalStates());
         out.clearFinalStates();
-        for( NWA::stateIterator sit = out.beginStates(); sit != out.endStates(); sit++ )
+        for( NWA::StateIterator sit = out.beginStates(); sit != out.endStates(); sit++ )
         {
           if( oldFinalStates.count(*sit) == 0 )
             out.addFinalState(*sit);

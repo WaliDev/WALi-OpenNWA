@@ -31,7 +31,7 @@ namespace wali
 
         //The reverse machine has all the states of the original machine.
         // FIXME-RELEASE: copy clientinfo. Or figure out how to do this.
-        for (NWA::stateIterator state = first.beginStates();
+        for (NWA::StateIterator state = first.beginStates();
              state != first.endStates(); ++state)
         {
           out.addState(*state);
@@ -39,12 +39,12 @@ namespace wali
           
 
         //Swap initial and final state functionality.
-        for( NWA::stateIterator it = first.beginInitialStates(); 
+        for( NWA::StateIterator it = first.beginInitialStates(); 
              it != first.endInitialStates(); it++ )
         {
           out.addFinalState(*it);
         }
-        for( NWA::stateIterator it = first.beginFinalStates(); 
+        for( NWA::StateIterator it = first.beginFinalStates(); 
              it != first.endFinalStates(); it++ )
         {
           out.addInitialState(*it);
