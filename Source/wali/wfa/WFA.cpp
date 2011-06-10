@@ -882,6 +882,17 @@ namespace wali
 
       TransPrinter printer( o );
       for_each( printer );
+
+      o << "\nWeights on states: \n";
+      state_map_t::const_iterator sit = state_map.begin();
+      state_map_t::const_iterator sitEND = state_map.end();
+      for(; sit != sitEND; sit++)
+      {
+        o << key2str( sit->first ) << ": \n";
+        sit->second->weight()->print( o );
+        o << "\n";
+      }
+
       return o;
     }
 
