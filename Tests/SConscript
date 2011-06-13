@@ -25,9 +25,7 @@ for t in ['t1','t3','t4','twitness','tprune','tTransSet']:
     exe = Env.Program('%s' % t, ['%s.cpp' % t,'%s' % Reach ] + Env['StaticLibs'])
     built += (exe)
 
-nwa_built = SConscript('nwa/SConscript')
-
-built = built + nwa_built
+#nwa_built = SConscript('nwa/SConscript')
 
 Return('built')
 
