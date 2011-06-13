@@ -43,6 +43,15 @@ namespace wali
                 //         (  q2   )  /     0     0   /  (   q3  )
                 //          \     /  X___________________ \     /
                 //           `---'    \                    `---'
+                //             :
+                //           : : :  epsilon, wild (internal, call, and return)
+                //            ':'
+                //           ,---.
+                //          /     \.
+                //         ( dummy )
+                //          \     /
+                //           `---'
+
                 Key q0 = getKey("q0");
                 Key q1 = getKey("q1");
                 Key q2 = getKey("q2");
@@ -62,6 +71,12 @@ namespace wali
                 nwa.addCallTrans(q1, call, q2);
                 nwa.addReturnTrans(q3, q1, ret, q0);
                 nwa.addReturnTrans(q3, q0, ret, q1);
+
+                Key dummy = getKey("dummy");
+                nwa.addInternalTrans(q2, WALI_EPSILON, dummy);
+                nwa.addInternalTrans(q2, WALI_WILD, dummy);
+                nwa.addCallTrans(q2, WALI_WILD, dummy);
+                nwa.addReturnTrans(q2, q2, WALI_WILD, dummy);
             }
         };
         
@@ -107,6 +122,8 @@ namespace wali
         }
 
 
+        /// Adds stuff to 'copy' and makes sure it doesn't change
+        /// 'reference'.
         void expect_nwas_are_physically_different(NWA const & reference, NWA & copy)
         {
             State state = getKey("additional state");
@@ -159,11 +176,11 @@ namespace wali
             NWA empty;
             NWA also_empty = empty;
 
-            expect_nwa_is_empty(empty);
+            expect_nwa_is_empty(also_empty);
         }
         
         //  - Test that a copy of a non-empty NWA has all the same states
-        TEST(wali$nwa$NWA$NWA$$copy, copyOfNonemptyAutomatonIsSame)
+        TEST(wali$nwa$NWA$NWA$$copy, copyOfNonemptyNwaIsSame)
         {
             OddNumEvenGroupsNwa fixture;
             NWA copy = fixture.nwa;
@@ -173,7 +190,7 @@ namespace wali
         
         //  - Test that the NWAs do not share structure (changing one doesn't
         //    change the other)
-        TEST(wali$nwa$NWA$NWA$$copy, copyOfNonemptyAutomatonDoesNotShareState)
+        TEST(wali$nwa$NWA$NWA$$copy, copyOfNonemptyNwaDoesNotShareState)
         {
             OddNumEvenGroupsNwa fixture;
             NWA copy = fixture.nwa;
@@ -182,24 +199,110 @@ namespace wali
         }
 
         //  - Test that client information is equal but not shared
+        TEST(wali$nwa$NWA$NWA$$copy, clientInformationIsCloned)
+        {
+            // TODO: tests (also add to assignment test)
+        }
         
         
         // operator= (NWA const & other)
         //  - Same questions as NWA(NWA const &)
-        //  - Start with non-empty NWA
+        TEST(wali$nwa$NWA$operatorEquals, copyOfEmptyNwaIsEmpty)
+        {
+            NWA empty, also_empty;
+            also_empty = empty;
+
+            expect_nwa_is_empty(also_empty);
+        }
+
+        TEST(wali$nwa$NWA$operatorEquals, copyOfNonemptyNwaIsSame)
+        {
+            OddNumEvenGroupsNwa fixture;
+            NWA copy;
+            copy = fixture.nwa;
+
+            expect_nwas_are_equal(fixture.nwa, copy);
+        }
+        
+        TEST(wali$nwa$NWA$operatorEquals, copyOfNonemptyNwaDoesNotShareState)
+        {
+            OddNumEvenGroupsNwa fixture;
+            NWA copy;
+            copy = fixture.nwa;
+
+            expect_nwas_are_physically_different(fixture.nwa, copy);
+        }
+
         //  - Test self assignment
-        // 
+        TEST(wali$nwa$NWA$operatorEquals, selfAssignmentDoesNotDestroyNwa)
+        {
+            OddNumEvenGroupsNwa fixture;
+            NWA copy = fixture.nwa;
+
+            copy = copy;
+
+            expect_nwas_are_equal(fixture.nwa, copy);
+        }
+
+        TEST(wali$nwa$NWA$operatorEquals, selfAssignmentDoesNotCopy)
+        {
+            OddNumEvenGroupsNwa fixture;
+            NWA copy = fixture.nwa;
+
+            NWA::StateIterator
+                states = copy.beginStates(),
+                initials = copy.beginInitialStates(),
+                finals = copy.beginFinalStates();
+
+            NWA::SymbolIterator symbols = copy.beginSymbols();
+
+            NWA::InternalIterator internals = copy.beginInternalTrans();
+            NWA::CallIterator calls = copy.beginCallTrans();
+            NWA::ReturnIterator returns = copy.beginReturnTrans();
+
+            copy = copy;
+
+            EXPECT_EQ(states, copy.beginStates());
+            EXPECT_EQ(initials, copy.beginInitialStates());
+            EXPECT_EQ(finals, copy.beginFinalStates());
+            EXPECT_EQ(symbols, copy.beginSymbols());
+            EXPECT_EQ(internals, copy.beginInternalTrans());
+            EXPECT_EQ(calls, copy.beginCallTrans());
+            EXPECT_EQ(returns, copy.beginReturnTrans());
+        }
+
+        
+
         // clear ()
         //  - From an NWA that has states, initial states, accepting states, symbols,
         //    and transitions of all three kinds (each of which transitions with a
         //    real symbol, epsilon, and wild), calling clear() removes everything.
-        // 
+        TEST(wali$nwa$NWA$clear, clearingEmptyGivesEmpty)
+        {
+            NWA empty;
+            empty.clear();
+
+            expect_nwa_is_empty(empty);
+        }
+
+        TEST(wali$nwa$NWA$clear, clearingNonEmptyGivesEmpty)
+        {
+            OddNumEvenGroupsNwa fixture;
+            fixture.nwa.clear();
+
+            expect_nwa_is_empty(fixture.nwa);
+        }
+
+
         // getClientInfo()/setClientInfo()
-        //  - Check that getting and setting client info returns the same thing as
-        //    before.
-        //  - Also try adding states and removing unrelated states between the calls.
-        // 
-        // 
+        //  - Check that getting and setting client info returns the same
+        //    thing as before.
+        //  - Also try adding states and removing unrelated states between
+        //  - the calls.
+
+        // TODO: write tests
+        
+        
         // For XXX in each of States, InitialStates, FinalStates, InternalTrans,
         // CallTrans, ReturnTrans:
         // 
@@ -209,11 +312,53 @@ namespace wali
         // 
         //     - For getSymbols(), check in an automaton that uses epsilon and wild on
         //       transitions. Make sure that neither is present in the given set.
-        //     - For getSymbols(), 
-        // 
+        TEST(wali$nwa$NWA$getSymbols, epsilonAndWildAreNotPresent)
+        {
+            NWA nwa;
+            Key q = getKey('q');
+            nwa.addInternalTrans(q, WALI_EPSILON, q);
+            nwa.addInternalTrans(q, WALI_WILD, q);
+
+            // Sanity check
+            EXPECT_EQ(2u, nwa.sizeInternalTrans());
+
+            // Actual check (see checkSizeOfEmptyIsConsistent below)
+            EXPECT_EQ(0u, nwa.sizeSymbols());
+        }
+
+        
         //   sizeXXX()
         //     - Make sure this agrees with the size of getXXX()
-        // 
+        void expect_size_consistent_with_range(NWA const & nwa)
+        {
+#define CHECK_CONSISTENCY(Attribute)                                             \
+            EXPECT_EQ(nwa.size##Attribute(),                                     \
+                      static_cast<size_t>(std::distance(nwa.begin##Attribute(),  \
+                                                        nwa.end##Attribute())))
+            
+            CHECK_CONSISTENCY(States);
+            CHECK_CONSISTENCY(InitialStates);
+            CHECK_CONSISTENCY(FinalStates);
+            CHECK_CONSISTENCY(Symbols);
+            CHECK_CONSISTENCY(InternalTrans);
+            CHECK_CONSISTENCY(CallTrans);
+            CHECK_CONSISTENCY(ReturnTrans);
+#undef CHECK_CONSISTENCY
+        }
+        
+        TEST(wali$nwa$NWA$getXXX, checkSizeConsistentForEmptyNwa)
+        {
+            NWA empty;
+            expect_size_consistent_with_range(empty);
+        }
+
+        TEST(wali$nwa$NWA$getXXX, checkSizeConsistentForBigNwa)
+        {
+            OddNumEvenGroupsNwa fixture;
+            expect_size_consistent_with_range(fixture.nwa);
+        }
+
+
         //   isXXX()
         //     - Check if an XXX is a member of the empty NWA
         //     - Add unrelated items of each type; check.
