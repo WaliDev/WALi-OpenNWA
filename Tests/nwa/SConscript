@@ -20,6 +20,7 @@ env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
 test_files = Split("""
     test.cpp
     NWA-tests.cpp
+    fixtures.cpp
     """)
 
 built = env.Program('nwa-test', test_files)
