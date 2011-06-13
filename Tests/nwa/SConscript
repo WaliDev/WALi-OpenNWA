@@ -17,7 +17,12 @@ env.AppendUnique(LIBS=[gtest_lib, 'pthread'])
 env.AppendUnique(CPPPATH=gtest_include)
 env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
 
-built = env.Program('nwa-test', 'test.cpp')
+test_files = Split("""
+    test.cpp
+    NWA-tests.cpp
+    """)
+
+built = env.Program('nwa-test', test_files)
 
 Return('built')
 
