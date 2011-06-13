@@ -138,6 +138,7 @@ if 'help' not in COMMAND_LINE_TARGETS:
             BaseEnv.Alias('examples',built)
         if 'tests' in COMMAND_LINE_TARGETS:
             built += SConscript('Tests/SConscript')
+            built += SConscript('Tests/nwa/SConscript')
             BaseEnv.Alias('tests',built)
 else:
     BaseEnv.Alias('help',[])
