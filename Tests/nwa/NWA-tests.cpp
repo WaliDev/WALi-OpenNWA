@@ -9,12 +9,74 @@ namespace wali
         //////////////////////////////////
         // Supporting stuff
 
+        class SomeElements
+        {
+        public:
+            State state, state2, state3;
+            Symbol symbol;
+            NWA::Internal internal;
+            NWA::Call call;
+            NWA::Return ret;
+
+            SomeElements()
+                : state(getKey("some state"))
+                , state2(getKey("another state"))
+                , state3(getKey("a third state"))
+                , symbol(getKey("a symbol!"))
+                , internal(state, symbol, state2)
+                , call(state, symbol, state2)
+                , ret(state, state3, symbol, state2)
+            {}
+
+            static void add_to_nwa(NWA * nwa) {
+                SomeElements elements;
+                
+                nwa->addInitialState(elements.state);
+                nwa->addFinalState(elements.state2);
+                
+                nwa->addInternalTrans(elements.internal);
+                nwa->addCallTrans(elements.call);
+                nwa->addReturnTrans(elements.ret);
+            }
+
+            static void expect_not_present(NWA const & nwa) {
+                SomeElements elements;
+                
+                EXPECT_FALSE(nwa.isState(elements.state));
+                EXPECT_FALSE(nwa.isInitialState(elements.state));
+                EXPECT_FALSE(nwa.isFinalState(elements.state));
+                EXPECT_FALSE(nwa.isSymbol(elements.state));
+                
+                // Should always be true
+                EXPECT_FALSE(nwa.isSymbol(WALI_EPSILON));
+                EXPECT_FALSE(nwa.isSymbol(WALI_WILD));
+            }
+
+            static void expect_present(NWA const & nwa) {
+                SomeElements elements;
+                
+                EXPECT_TRUE(nwa.isState(elements.state));
+                EXPECT_TRUE(nwa.isInitialState(elements.state));
+                EXPECT_TRUE(nwa.isFinalState(elements.state));
+                EXPECT_TRUE(nwa.isSymbol(elements.state));
+                
+                // Should always be true
+                EXPECT_FALSE(nwa.isSymbol(WALI_EPSILON));
+                EXPECT_FALSE(nwa.isSymbol(WALI_WILD));
+            }
+        };
+        
+
         class OddNumEvenGroupsNwa
         {
         public:
-            NWA nwa; 
-            
+            NWA nwa;
+
             OddNumEvenGroupsNwa() {
+                build_nwa(&nwa);
+            }
+            
+            static void build_nwa(NWA * nwa) {
                 // From NWA-tests.cpp in Source/wali/nwa if you want to trace
                 // history.
                 
@@ -61,22 +123,22 @@ namespace wali
                 Key call = getKey("(");
                 Key ret = getKey(")");
                 
-                nwa.addInitialState(q0);
-                nwa.addFinalState(q1);
+                nwa->addInitialState(q0);
+                nwa->addFinalState(q1);
                 
-                nwa.addInternalTrans(q2, zero, q3);
-                nwa.addInternalTrans(q3, zero, q2);
+                nwa->addInternalTrans(q2, zero, q3);
+                nwa->addInternalTrans(q3, zero, q2);
                 
-                nwa.addCallTrans(q0, call, q2);
-                nwa.addCallTrans(q1, call, q2);
-                nwa.addReturnTrans(q3, q1, ret, q0);
-                nwa.addReturnTrans(q3, q0, ret, q1);
+                nwa->addCallTrans(q0, call, q2);
+                nwa->addCallTrans(q1, call, q2);
+                nwa->addReturnTrans(q3, q1, ret, q0);
+                nwa->addReturnTrans(q3, q0, ret, q1);
 
                 Key dummy = getKey("dummy");
-                nwa.addInternalTrans(q2, WALI_EPSILON, dummy);
-                nwa.addInternalTrans(q2, WALI_WILD, dummy);
-                nwa.addCallTrans(q2, WALI_WILD, dummy);
-                nwa.addReturnTrans(q2, q2, WALI_WILD, dummy);
+                nwa->addInternalTrans(q2, WALI_EPSILON, dummy);
+                nwa->addInternalTrans(q2, WALI_WILD, dummy);
+                nwa->addCallTrans(q2, WALI_WILD, dummy);
+                nwa->addReturnTrans(q2, q2, WALI_WILD, dummy);
             }
         };
         
@@ -156,6 +218,63 @@ namespace wali
             EXPECT_EQ(copy.sizeReturnTrans(), reference.sizeReturnTrans() + 1);
         }
 
+
+        void add_to_states_and_check(NWA nwa, State state)
+        {
+            size_t original_size_trans = nwa.sizeTrans();
+            
+            EXPECT_TRUE(nwa.addState(state));
+
+            EXPECT_TRUE(nwa.isState(state));
+            EXPECT_FALSE(nwa.isInitialState(state));
+            EXPECT_FALSE(nwa.isFinalState(state));
+            EXPECT_FALSE(nwa.isSymbol(state));
+
+            EXPECT_EQ(original_size_trans, nwa.sizeTrans());
+        }
+        
+        void add_to_initial_states_and_check(NWA nwa, State state)
+        {
+            size_t original_size_trans = nwa.sizeTrans();
+            
+            EXPECT_TRUE(nwa.addInitialState(state));
+
+            EXPECT_TRUE(nwa.isState(state));
+            EXPECT_TRUE(nwa.isInitialState(state));
+            EXPECT_FALSE(nwa.isFinalState(state));
+            EXPECT_FALSE(nwa.isSymbol(state));
+
+            EXPECT_EQ(original_size_trans, nwa.sizeTrans());
+        }
+
+        void add_to_final_states_and_check(NWA nwa, State state)
+        {
+            size_t original_size_trans = nwa.sizeTrans();
+            
+            EXPECT_TRUE(nwa.addFinalState(state));
+
+            EXPECT_TRUE(nwa.isState(state));
+            EXPECT_FALSE(nwa.isInitialState(state));
+            EXPECT_TRUE(nwa.isFinalState(state));
+            EXPECT_FALSE(nwa.isSymbol(state));
+
+            EXPECT_EQ(original_size_trans, nwa.sizeTrans());
+        }
+        
+        void add_to_symbols_and_check(NWA nwa, Symbol symbol)
+        {
+            size_t original_size_trans = nwa.sizeTrans();
+            
+            EXPECT_TRUE(nwa.addSymbol(symbol));
+
+            EXPECT_FALSE(nwa.isState(symbol));
+            EXPECT_FALSE(nwa.isInitialState(symbol));
+            EXPECT_FALSE(nwa.isFinalState(symbol));
+            EXPECT_TRUE(nwa.isSymbol(symbol));
+
+            EXPECT_EQ(original_size_trans, nwa.sizeTrans());
+        }
+        
         
         /////////////////////////////////
         // Now begin the actual tests
@@ -359,17 +478,99 @@ namespace wali
         }
 
 
-        //   isXXX()
-        //     - Check if an XXX is a member of the empty NWA
+        //   isXXX() and addXXX() for states and symbols
+        //
+        //     - Check if an XXX is a member of the empty NWA       
+        TEST(wali$nwa$NWA$isXXX, checkNothingMemberOfEmpty)
+        {
+            NWA empty;
+            SomeElements::expect_not_present(empty);
+        }
+
         //     - Add unrelated items of each type; check.
+        TEST(wali$nwa$NWA$isXXX, checkNothingMemberOfStuff)
+        {
+            OddNumEvenGroupsNwa fixture;
+            SomeElements::expect_not_present(fixture.nwa);
+        }
+
+        
         //     - Add item being checked to an empty NWA; check
-        //     - Add both unrelated and checked item, then more unrelated items; check
+        //     - Check that adding an XXX adds it to the set returned by
+        //       getXXX and returns true       
+        TEST(wali$nwa$NWA$isState$$and$addState, addToEmptyAndCheck)
+        {
+            NWA empty;
+            SomeElements e;
+
+            add_to_states_and_check(empty, e.state);
+        }
+        
+        TEST(wali$nwa$NWA$isInitialState$$and$addInitialState, addToEmptyAndCheck)
+        {
+            NWA empty;
+            SomeElements e;
+
+            add_to_initial_states_and_check(empty, e.state);
+        }
+
+        TEST(wali$nwa$NWA$isFinalState$$and$addFinalState, addToEmptyAndCheck)
+        {
+            NWA empty;
+            SomeElements e;
+
+            add_to_final_states_and_check(empty, e.state);
+        }
+
+        TEST(wali$nwa$NWA$isSymbol$$and$addSymbol, addToEmptyAndCheck)
+        {
+            NWA empty;
+            SomeElements e;
+
+            add_to_symbols_and_check(empty, e.symbol);
+        }
+
+        
+        //     - Add both unrelated and checked item, then more unrelated
+        //       items; check. (I'm not doing the "then more
+        //       unrelated". TODO?)
+        TEST(wali$nwa$NWA$isState$$and$addState, addToBusyAndCheck)
+        {
+            OddNumEvenGroupsNwa fixture;
+            SomeElements e;
+
+            add_to_states_and_check(fixture.nwa, e.state);
+        }
+        
+        TEST(wali$nwa$NWA$isInitialState$$and$addInitialState, addToBusyAndCheck)
+        {
+            OddNumEvenGroupsNwa fixture;
+            SomeElements e;
+
+            add_to_initial_states_and_check(fixture.nwa, e.state);
+        }
+
+        TEST(wali$nwa$NWA$isFinalState$$and$addFinalState, addToBusyAndCheck)
+        {
+            OddNumEvenGroupsNwa fixture;
+            SomeElements e;
+
+            add_to_final_states_and_check(fixture.nwa, e.state);
+        }
+
+        TEST(wali$nwa$NWA$isSymbol$$and$addSymbol, addToBusyAndCheck)
+        {
+            OddNumEvenGroupsNwa fixture;
+            SomeElements e;
+
+            add_to_symbols_and_check(fixture.nwa, e.symbol);
+        }
+
+        
         //     - For isSymbol(), make sure epsilon and wild return false both when they
         //       are used in transitions and not.
         // 
         //   addXXX()
-        //     - Check that adding an XXX adds it to the set returned by getXXX and
-        //       returns true
         //     - Check that adding it again leaves the return from getXXX unchanged,
         //       and returns false
         //     - Check that the sets that should not be modified are not modified.
