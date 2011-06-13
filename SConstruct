@@ -7,7 +7,7 @@
 import os, os.path, platform
 
 Debug = True
-DefaultEnvironment(MSVC_USE_SCRIPT=False) # for Windows
+#DefaultEnvironment(MSVC_USE_SCRIPT=False) # for Windows
 
 #(platform_bits,linkage) = platform.architecture()
 if platform.machine() == 'i686':
@@ -23,7 +23,7 @@ else:
 Platform       = platform.system()
 MkStatic       = (Platform == 'Windows')
 WaliDir        = os.getcwd()
-BaseEnv        = Environment(MSVC_USE_SCRIPT=False)
+BaseEnv        = Environment() #MSVC_USE_SCRIPT=False)
 Is64           = (platform_bits == 64)
 
 ThirtyTwoBitAliases=['32', 'x86', 'ia_32', 'ia32']
@@ -68,7 +68,7 @@ if 'gcc' == BaseEnv['CC']:
         BaseEnv.Append(LINKFLAGS='-m32')
 elif 'cl' == BaseEnv['CC']:
     # Mostly copied from VS C++ 2005 Command line
-    BaseEnv.Append(CFLAGS='/TP /errorReport:prompt /Wp64 /W4 /GR /MTd /EHsc')
+    BaseEnv.Append(CCFLAGS='/TP /errorReport:prompt /W4 /wd4512 /GR /MTd /EHsc')
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
 
@@ -104,9 +104,9 @@ if MkStatic:
   ProgEnv['StaticLibs'] = [os.path.join(LibInstallDir,'libwali.a')]
 else:
   ProgEnv['StaticLibs'] = []
-  ProgEnv.Append(LIBS = ['wali'])
-  ProgEnv.Append(LIBPATH = LibInstallDir )
   ProgEnv.Append(RPATH = LibInstallDir )
+ProgEnv.Append(LIBS = ['wali'])
+ProgEnv.Append(LIBPATH = LibInstallDir )
 
 Export('ProgEnv')
 
