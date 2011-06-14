@@ -13,7 +13,10 @@ if Debug:
 
 env = ProgEnv.Clone()
 
-env.AppendUnique(LIBS=[gtest_lib, 'pthread'])
+if 'cl' != env['CC']:
+    env.AppendUnique(LIBS=[gtest_lib, 'pthread'])
+else:
+    env.AppendUnique(LIBS=[gtest_lib])
 env.AppendUnique(CPPPATH=[gtest_include, WaliDir])
 env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
 
