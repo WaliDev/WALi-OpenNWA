@@ -14,7 +14,7 @@ if Debug:
 env = ProgEnv.Clone()
 
 env.AppendUnique(LIBS=[gtest_lib, 'pthread'])
-env.AppendUnique(CPPPATH=gtest_include)
+env.AppendUnique(CPPPATH=[gtest_include, WaliDir])
 env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
 
 test_files = Split("""
@@ -22,6 +22,7 @@ test_files = Split("""
     NWA-tests.cpp
     fixtures.cpp
     class-NWA/supporting.cpp
+    class-NWA/construction-assignment.cpp
     """)
 
 built = env.Program('nwa-test', test_files)
