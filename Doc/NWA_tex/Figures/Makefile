@@ -10,7 +10,7 @@ DETERMINIZE=$(BINDIR)/nwa-determinize.exe
 COMPLEMENT=$(BINDIR)/nwa-complement.exe
 
 DOT=dot
-DOT2TEX=~/stow/dot2tex-2.8.7/bin/dot2tex
+DOT2TEX=dot2tex
 
 FILES=figure-1                      \
       union-other                   \
