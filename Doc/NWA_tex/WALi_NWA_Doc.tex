@@ -48,6 +48,8 @@
 
 \usepackage{adjustbox}
 \usepackage{expdlist}
+\usepackage{etoolbox}
+\usepackage{settobox}
 %\usepackage{ulem} % for strike out
 
 \setcounter{topnumber}{5}
@@ -161,8 +163,31 @@ reflect the views of NSF, ONR, ARL, and AFRL.
 \renewcommand{\includegraphics}[2][Whatever]{}
 
 %\newcommand{\nwaimage}[2][]{\realincludegraphics[#1]{#2}}
+\newsavebox{\thenwaimagebox}
+\newlength{\thenwaimagewidth}
+\newlength{\thenwaimageheight}
+
 \newcommand{\nwaimage}[2][]{%
-  \adjustbox{width=\textwidth,height=\textheight,keepaspectratio=true}{\input{#2}}%
+  \sbox{\thenwaimagebox}{\input{#2}}%
+  \settoboxwidth{\thenwaimagewidth}{\thenwaimagebox}%
+  \settoboxheight{\thenwaimageheight}{\thenwaimagebox}%
+  %
+  % If (width < textwidth) && (height < textheight)
+  %    don't resize
+  % else
+  %    do resize
+  %
+  % except split this up for easier latexing
+  %
+  \ifdimless{\thenwaimagewidth}{\textwidth}{%
+    \ifdimless{\thenwaimageheight}{\textheight}{%
+      \usebox{\thenwaimagebox}%
+    }{%
+      \adjustbox{width=\textwidth,height=\textheight,keepaspectratio=true}{\usebox{\thenwaimagebox}}%
+    }%
+  }{%
+    \adjustbox{width=\textwidth,height=\textheight,keepaspectratio=true}{\usebox{\thenwaimagebox}}%
+  }%
 }
 
 \newenvironment{functionlist}%
