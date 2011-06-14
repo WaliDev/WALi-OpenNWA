@@ -124,7 +124,7 @@ namespace wali
             nwa->addInternalTrans(q2, WALI_EPSILON, dummy);
             nwa->addInternalTrans(q2, WALI_WILD, dummy);
             nwa->addCallTrans(q2, WALI_WILD, dummy);
-            nwa->addReturnTrans(q2, q2, WALI_WILD, dummy);
+            nwa->addReturnTrans(q2, q1, WALI_WILD, dummy);
         }
         
         const State OddNumEvenGroupsNwa::q0 = getKey("q0");

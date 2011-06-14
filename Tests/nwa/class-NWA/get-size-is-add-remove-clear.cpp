@@ -428,76 +428,161 @@ namespace wali
             expect_nwas_are_equal(fixture.nwa, nwa);
         }
 
-        TEST(wali$nwa$NWA$removeXXX, removingItemWhenThereIsMoreThanOneOfThatKindShouldLeaveTheOthers)
+        TEST(wali$nwa$NWA$removeXXX, removingItemWhenThereIsMoreThanOneOfThatKindLeavesTheOthers)
         {
             // TODO: this test doesn't really test that the right transitions
             // were removed.
             
-            typedef OddNumEvenGroupsNwa TheNwa;
             OddNumEvenGroupsNwa fixture;
             NWA nwa = fixture.nwa;
 
             // We'll add a couple more for good fun
-            ASSERT_TRUE(nwa.addInitialState(TheNwa::q2));
-            ASSERT_TRUE(nwa.addFinalState(TheNwa::q0));
+            ASSERT_TRUE(nwa.addInitialState(fixture.q2));
+            ASSERT_TRUE(nwa.addFinalState(fixture.q0));
 
             // TheNwa transitions first
             EXPECT_EQ(4u, nwa.sizeInternalTrans());
-            EXPECT_TRUE(nwa.removeInternalTrans(TheNwa::q2, TheNwa::zero, TheNwa::q3));
+            EXPECT_TRUE(nwa.removeInternalTrans(fixture.q2, fixture.zero, fixture.q3));
             EXPECT_EQ(3u, nwa.sizeInternalTrans());
-            EXPECT_TRUE(nwa.removeInternalTrans(TheNwa::q2, WALI_EPSILON, TheNwa::dummy));
+            EXPECT_TRUE(nwa.removeInternalTrans(fixture.q2, WALI_EPSILON, fixture.dummy));
             EXPECT_EQ(2u, nwa.sizeInternalTrans());
 
             EXPECT_EQ(3u, nwa.sizeCallTrans());
-            EXPECT_TRUE(nwa.removeCallTrans(TheNwa::q0, TheNwa::call, TheNwa::q2));
+            EXPECT_TRUE(nwa.removeCallTrans(fixture.q0, fixture.call, fixture.q2));
             EXPECT_EQ(2u, nwa.sizeCallTrans());
 
             EXPECT_EQ(3u, nwa.sizeReturnTrans());
-            EXPECT_TRUE(nwa.removeReturnTrans(TheNwa::q3, TheNwa::q1, TheNwa::ret, TheNwa::q0));
+            EXPECT_TRUE(nwa.removeReturnTrans(fixture.q3, fixture.q1, fixture.ret, fixture.q0));
             EXPECT_EQ(2u, nwa.sizeReturnTrans());
 
             // Symbols
             EXPECT_EQ(3u, nwa.sizeSymbols());
-            EXPECT_TRUE(nwa.removeSymbol(TheNwa::zero)); // **
+            EXPECT_TRUE(nwa.removeSymbol(fixture.zero)); // **
             EXPECT_EQ(2u, nwa.sizeSymbols());
-            EXPECT_TRUE(nwa.removeSymbol(TheNwa::call)); // **
+            EXPECT_TRUE(nwa.removeSymbol(fixture.call)); // **
             EXPECT_EQ(1u, nwa.sizeSymbols());
 
-            EXPECT_FALSE(nwa.isSymbol(TheNwa::zero));
-            EXPECT_FALSE(nwa.isSymbol(TheNwa::call));
-            EXPECT_TRUE(nwa.isSymbol(TheNwa::ret));
+            EXPECT_FALSE(nwa.isSymbol(fixture.zero));
+            EXPECT_FALSE(nwa.isSymbol(fixture.call));
+            EXPECT_TRUE(nwa.isSymbol(fixture.ret));
 
             // Initial states
             EXPECT_EQ(2u, nwa.sizeInitialStates());
             EXPECT_EQ(2u, nwa.sizeFinalStates());
             
-            EXPECT_TRUE(nwa.removeInitialState(TheNwa::q0)); // **
+            EXPECT_TRUE(nwa.removeInitialState(fixture.q0)); // **
             
             EXPECT_EQ(1u, nwa.sizeInitialStates());
             EXPECT_EQ(2u, nwa.sizeFinalStates());
 
             // Final states          
-            EXPECT_TRUE(nwa.removeFinalState(TheNwa::q1)); // **
+            EXPECT_TRUE(nwa.removeFinalState(fixture.q1)); // **
             EXPECT_EQ(1u, nwa.sizeInitialStates());
             EXPECT_EQ(1u, nwa.sizeFinalStates());
 
-            EXPECT_TRUE(nwa.isInitialState(TheNwa::q2));
-            EXPECT_TRUE(nwa.isFinalState(TheNwa::q0));
+            EXPECT_TRUE(nwa.isInitialState(fixture.q2));
+            EXPECT_TRUE(nwa.isFinalState(fixture.q0));
 
             // States
             EXPECT_EQ(5u, nwa.sizeStates());
-            EXPECT_TRUE(nwa.removeState(TheNwa::dummy)); // **
+            EXPECT_TRUE(nwa.removeState(fixture.dummy)); // **
             EXPECT_EQ(4u, nwa.sizeStates());
-            EXPECT_FALSE(nwa.isState(TheNwa::dummy));
+            EXPECT_FALSE(nwa.isState(fixture.dummy));
         }
         
         //     - In each case, check that sets that shouldn't change are not modified.
-        // 
-        //     - For removeState(), try from automaton in which the state is and is not
-        //       involved in any transitions. Make sure you get the state in all
-        //       applicable coordinates: source/target of internal, call/entry of call,
-        //       and exit/pred/return of return.
-        //     - For removeState(), try from automaton in which the symbol is and is not
+        //
+        // This has kinda been done all along...
+
+        //     - For removeState(), make sure that removing a state that is
+        //       an initial and/or final state works correctly
+        TEST(wali$nwa$NWA$removeState, removingAStateRemovesFromInitialsAndFinals)
+        {
+            OddNumEvenGroupsNwa fixture;
+
+            ASSERT_TRUE(fixture.nwa.addInitialState(fixture.q2)); // q0 and q2 are inital
+            ASSERT_TRUE(fixture.nwa.addFinalState(fixture.q0)); // q1 and q1 are accepting
+            ASSERT_EQ(2u, fixture.nwa.sizeInitialStates());
+            ASSERT_EQ(2u, fixture.nwa.sizeFinalStates());
+
+            // Remove just an initial state
+            EXPECT_TRUE(fixture.nwa.removeState(fixture.q2));
+            EXPECT_EQ(1u, fixture.nwa.sizeInitialStates());
+            EXPECT_EQ(2u, fixture.nwa.sizeFinalStates());
+
+            // Remove just a accepting state
+            EXPECT_TRUE(fixture.nwa.removeState(fixture.q1));
+            EXPECT_EQ(1u, fixture.nwa.sizeInitialStates());
+            EXPECT_EQ(1u, fixture.nwa.sizeFinalStates());
+
+            // Remove a state that is both initial and accepting
+            EXPECT_TRUE(fixture.nwa.removeState(fixture.q0));
+            EXPECT_EQ(0u, fixture.nwa.sizeInitialStates());
+            EXPECT_EQ(0u, fixture.nwa.sizeFinalStates());
+        }
+
+        //     - For removeState(), try from automaton in which the state is
+        //       and is not involved in any transitions. Make sure you get
+        //       the state in all applicable coordinates: source/target of
+        //       internal, call/entry of call, and exit/pred/return of
+        //       return.
+        TEST(wali$nwa$NWA$removeState, removingAStateRemovesAssociatedTransitions)
+        {
+            OddNumEvenGroupsNwa fixture;
+
+            // Add some extra stuff so we can distinguish removing stuff from
+            // clearing transitions.
+            ASSERT_TRUE(fixture.nwa.addInternalTrans(fixture.q0, WALI_EPSILON, fixture.q1));
+            ASSERT_TRUE(fixture.nwa.addInternalTrans(fixture.q0, fixture.zero, fixture.q1));
+            ASSERT_TRUE(fixture.nwa.addCallTrans(fixture.q0, fixture.call, fixture.q1));
+
+            // Add one transition to get q2 as the predecessor of a return
+            // and one to get it as the target of a return
+            ASSERT_TRUE(fixture.nwa.addReturnTrans(fixture.q0, fixture.q2, fixture.zero, fixture.q3));
+            ASSERT_TRUE(fixture.nwa.addReturnTrans(fixture.q0, fixture.q1, fixture.zero, fixture.q2));
+
+            ASSERT_EQ(6u, fixture.nwa.sizeInternalTrans());
+            ASSERT_EQ(4u, fixture.nwa.sizeCallTrans());
+            ASSERT_EQ(5u, fixture.nwa.sizeReturnTrans());
+
+            // This removes transitions where q2 is the:
+            //
+            // Internal: source      (q2 ---> q3 on zero, and q2 ---> dummy on epsilon and wild)
+            //           target      (q3 ---> q2 on zero)
+            // Call:     source      (q2 ---> dummy)
+            //           target      (q0 ---> q2 on call, q1 ---> q2 on call)
+            // Return:   source      (q2 ---> dummy on ret (q1 pred))
+            //           predecessor (q0 ---> q3 on zero (q2 pred); this was added here)
+            //           target      (q0 ---> q2 on zero (q1 pred); this was added here)
+            EXPECT_TRUE(fixture.nwa.removeState(fixture.q2));
+
+            // We removed 4 internal, 3 call, and 3 return transitions
+            EXPECT_EQ(2u, fixture.nwa.sizeInternalTrans());
+            EXPECT_EQ(1u, fixture.nwa.sizeCallTrans());
+            EXPECT_EQ(2u, fixture.nwa.sizeReturnTrans());
+
+            
+            ///////
+            // 'dummy' is no longer involved in any transitions. Removing it
+            // should not change anything except the set of states. We'll
+            // test this by making a copy of the current NWA, then removing
+            // 'dummy' and reinserting it.
+            NWA copy = fixture.nwa;
+            
+            EXPECT_TRUE(fixture.nwa.removeState(fixture.dummy));
+
+            // Some extra checks...
+            EXPECT_EQ(2u, fixture.nwa.sizeInternalTrans());
+            EXPECT_EQ(1u, fixture.nwa.sizeCallTrans());
+            EXPECT_EQ(2u, fixture.nwa.sizeReturnTrans());
+
+            // Reinsert dummy
+            EXPECT_TRUE(fixture.nwa.addState(fixture.dummy));
+            expect_nwas_are_equal(copy, fixture.nwa);
+        }
+
+        
+        //     - For removeSymbol(), try from automaton in which the symbol is and is not
         //       involved in any transtions. Test all three kinds of transitions.
         // 
         //   clearXXX()
