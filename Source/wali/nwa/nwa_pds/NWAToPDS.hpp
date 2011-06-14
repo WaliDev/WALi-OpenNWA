@@ -18,7 +18,7 @@ namespace wali
        * @return the PDS equivalent to this NWA
        *
        */ 
-      extern wpds::WPDS NWAToPDSReturns( NWA const & nwa, WeightGen & wg );
+      extern wpds::WPDS NWAToPDSReturns( NWA const & nwa, WeightGen const & wg );
 
       
       /**
@@ -32,7 +32,7 @@ namespace wali
        * @return the backwards PDS equivalent to this NWA
        *
        */ 
-      extern wpds::WPDS NWAToPDSCalls( NWA const & nwa, WeightGen & wg );
+      extern wpds::WPDS NWAToPDSCalls( NWA const & nwa, WeightGen const & wg );
 
 
       /**
@@ -46,7 +46,7 @@ namespace wali
        * @return the PDS equivalent to this NWA
        *
        */ 
-      extern wpds::WPDS NWAToBackwardsPDSReturns( NWA const & nwa, WeightGen & wg );
+      extern wpds::WPDS NWAToBackwardsPDSReturns( NWA const & nwa, WeightGen const & wg );
 
       /**
        *
@@ -59,7 +59,7 @@ namespace wali
        * @return the backwards PDS equivalent to this NWA
        *
        */ 
-      extern wpds::WPDS NWAToBackwardsPDSCalls( NWA const & nwa, WeightGen & wg );
+      extern wpds::WPDS NWAToBackwardsPDSCalls( NWA const & nwa, WeightGen const & wg );
 
     }
   }

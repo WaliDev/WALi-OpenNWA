@@ -1892,7 +1892,7 @@ namespace wali
      *
      */
     
-    wfa::WFA NWA::prestar( wfa::WFA & input, WeightGen & wg ) const
+    wfa::WFA NWA::prestar( wfa::WFA & input, WeightGen const & wg ) const
     {
       //Q: does anything need to be done to transform the resulting WFA from the 
       //    PDS vocab back to the NWA vocab?
@@ -1912,7 +1912,7 @@ namespace wali
      *
      */
     
-    void NWA::prestar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg ) const
+    void NWA::prestar( wfa::WFA & input, wfa::WFA & output, WeightGen const & wg ) const
     {
       //Q: does anything need to be done to transform the resulting WFA from the 
       //    PDS vocab back to the NWA vocab?
@@ -1929,7 +1929,7 @@ namespace wali
      *
      */
     
-    wfa::WFA NWA::poststar( wfa::WFA & input, WeightGen & wg ) const
+    wfa::WFA NWA::poststar( wfa::WFA & input, WeightGen const & wg ) const
     {
       //Q: does anything need to be done to transform the resulting WFA from the 
       //    PDS vocab back to the NWA vocab?
@@ -1949,7 +1949,7 @@ namespace wali
      *
      */
     
-    void NWA::poststar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg ) const
+    void NWA::poststar( wfa::WFA & input, wfa::WFA & output, WeightGen const & wg ) const
     {
       //Q: does anything need to be done to transform the resulting WFA from the 
       //    PDS vocab back to the NWA vocab?

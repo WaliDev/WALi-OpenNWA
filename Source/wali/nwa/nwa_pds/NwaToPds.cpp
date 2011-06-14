@@ -6,22 +6,22 @@ namespace wali
   {
     namespace nwa_pds
     {
-      wpds::WPDS NWAToPDSReturns( NWA const & nwa, WeightGen & wg )
+      wpds::WPDS NWAToPDSReturns( NWA const & nwa, WeightGen const & wg )
       {
 	return nwa._private_NwaToPdsReturns_(wg);
       }
 
-      wpds::WPDS NWAToPDSCalls( NWA const & nwa, WeightGen & wg )
+      wpds::WPDS NWAToPDSCalls( NWA const & nwa, WeightGen const & wg )
       {
 	return nwa._private_NwaToPdsCalls_(wg);
       }
 
-      wpds::WPDS NWAToBackwardsPDSReturns( NWA const & nwa, WeightGen & wg )
+      wpds::WPDS NWAToBackwardsPDSReturns( NWA const & nwa, WeightGen const & wg )
       {
 	return nwa._private_NwaToBackwardsPdsReturns_(wg);
       }
 
-      wpds::WPDS NWAToBackwardsPDSCalls( NWA const & nwa, WeightGen & wg )
+      wpds::WPDS NWAToBackwardsPDSCalls( NWA const & nwa, WeightGen const & wg )
       {
 	return nwa._private_NwaToBackwardsPdsCalls_(wg);
       }
@@ -29,7 +29,7 @@ namespace wali
 
 
     // constructs the PDS equivalent to this NWA, stacking returns
-    wpds::WPDS NWA::_private_NwaToPdsReturns_( WeightGen & wg ) const
+    wpds::WPDS NWA::_private_NwaToPdsReturns_( WeightGen const & wg ) const
     {
       //TODO: beware the implicit transitions
       //Q: do we need to make all transitions explicit in order to make this correct?
@@ -134,7 +134,7 @@ namespace wali
 
 
     // constructs the backwards PDS equivalent to this NWA, stacking returns
-    wpds::WPDS NWA::_private_NwaToBackwardsPdsReturns_( WeightGen & wg ) const
+    wpds::WPDS NWA::_private_NwaToBackwardsPdsReturns_( WeightGen const & wg ) const
     {
       //TODO: beware the implicit transitions
       //Q: do we need to make all transitions explicit in order to make this correct?
@@ -238,7 +238,7 @@ namespace wali
 
 
     // constructs the PDS equivalent to this NWA, stacking calls
-    wpds::WPDS NWA::_private_NwaToPdsCalls_( WeightGen & wg ) const
+    wpds::WPDS NWA::_private_NwaToPdsCalls_( WeightGen const & wg ) const
     {
       //TODO: beware the implicit transitions
       //Q: do we need to make all transitions explicit in order to make this correct?
@@ -345,7 +345,7 @@ namespace wali
 
 
     // constructs the backwards PDS equivalent to this NWA, stacking calls
-    wpds::WPDS NWA::_private_NwaToBackwardsPdsCalls_( WeightGen & wg ) const
+    wpds::WPDS NWA::_private_NwaToBackwardsPdsCalls_( WeightGen const & wg ) const
     {
       //TODO: beware the implicit transitions
       //Q: do we need to make all transitions explicit in order to make this correct?

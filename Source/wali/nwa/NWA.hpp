@@ -1239,37 +1239,37 @@ namespace wali
 
 
       // {{{ deprecated nwa_pds functions (and cheater functions)
-      wpds::WPDS _private_NwaToPdsReturns_( WeightGen & wg ) const;
-      wpds::WPDS NWAtoPDSreturns( WeightGen & wg ) const {
+      wpds::WPDS _private_NwaToPdsReturns_( WeightGen const & wg ) const;
+      wpds::WPDS NWAtoPDSreturns( WeightGen const & wg ) const {
 	return nwa_pds::NWAToPDSReturns(*this, wg);
       }
-      static wpds::WPDS NWAtoPDSreturns( NWA const & nwa, WeightGen & wg ) {
+      static wpds::WPDS NWAtoPDSreturns( NWA const & nwa, WeightGen const & wg ) {
         return nwa_pds::NWAToPDSReturns(nwa, wg);
       }
 
-      wpds::WPDS _private_NwaToBackwardsPdsReturns_( WeightGen & wg ) const;
-      wpds::WPDS NWAtoBackwardsPDSreturns( WeightGen & wg ) const {
+      wpds::WPDS _private_NwaToBackwardsPdsReturns_( WeightGen const & wg ) const;
+      wpds::WPDS NWAtoBackwardsPDSreturns( WeightGen const & wg ) const {
 	return nwa_pds::NWAToBackwardsPDSReturns(*this, wg);
       }
-      static wpds::WPDS NWAtoBackwardsPDSreturns( NWA const & nwa, WeightGen & wg ) {
+      static wpds::WPDS NWAtoBackwardsPDSreturns( NWA const & nwa, WeightGen const & wg ) {
         return nwa_pds::NWAToBackwardsPDSReturns(nwa, wg);
       }
 
 
-      wpds::WPDS _private_NwaToPdsCalls_( WeightGen & wg ) const;
-      wpds::WPDS NWAtoPDScalls( WeightGen & wg ) const {
+      wpds::WPDS _private_NwaToPdsCalls_( WeightGen const & wg ) const;
+      wpds::WPDS NWAtoPDScalls( WeightGen const & wg ) const {
 	return nwa_pds::NWAToPDSCalls(*this, wg);
       }
-      static wpds::WPDS NWAtoPDScalls( NWA const & nwa, WeightGen & wg ) {
+      static wpds::WPDS NWAtoPDScalls( NWA const & nwa, WeightGen const & wg ) {
         return nwa_pds::NWAToPDSCalls(nwa, wg);
       }
 
 
-      wpds::WPDS _private_NwaToBackwardsPdsCalls_( WeightGen & wg ) const;
-      wpds::WPDS NWAtoBackwardsPDScalls( WeightGen & wg ) const {
+      wpds::WPDS _private_NwaToBackwardsPdsCalls_( WeightGen const & wg ) const;
+      wpds::WPDS NWAtoBackwardsPDScalls( WeightGen const & wg ) const {
 	return nwa_pds::NWAToBackwardsPDSCalls(*this, wg);
       }
-      static wpds::WPDS NWAtoBackwardsPDScalls( NWA const & nwa, WeightGen & wg ) {
+      static wpds::WPDS NWAtoBackwardsPDScalls( NWA const & nwa, WeightGen const & wg ) {
         return nwa_pds::NWAToBackwardsPDSCalls(nwa, wg);
       }
 
@@ -1350,7 +1350,7 @@ namespace wali
        * @return the WFA resulting from performing the prestar reachability query 
        *
        */
-      virtual wfa::WFA prestar( wfa::WFA & input, WeightGen & wg ) const;
+      virtual wfa::WFA prestar( wfa::WFA & input, WeightGen const & wg ) const;
 
       /**
        *
@@ -1366,7 +1366,7 @@ namespace wali
        * @param - wg: the functions to use in generating weights
        *
        */
-      virtual void prestar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg ) const;
+      virtual void prestar( wfa::WFA & input, wfa::WFA & output, WeightGen const & wg ) const;
 
       /**
        *
@@ -1379,7 +1379,7 @@ namespace wali
        * @return the WFA resulting from performing the poststar reachability query
        *
        */
-      virtual wfa::WFA poststar( wfa::WFA & input, WeightGen & wg ) const;
+      virtual wfa::WFA poststar( wfa::WFA & input, WeightGen const & wg ) const;
 
       /**
        *
@@ -1395,7 +1395,7 @@ namespace wali
        * @param - wg: the functions to use in generating weights
        *
        */
-      virtual void poststar( wfa::WFA & input, wfa::WFA & output, WeightGen & wg ) const;
+      virtual void poststar( wfa::WFA & input, wfa::WFA & output, WeightGen const & wg ) const;
 
       //Utilities	
 

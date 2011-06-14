@@ -51,7 +51,7 @@ namespace wali
        * @return the One of the desired semiring
        *
        */
-      virtual sem_elem_t getOne( )  = 0;
+      virtual sem_elem_t getOne( ) const  = 0;
 
       /**
        *
@@ -71,7 +71,7 @@ namespace wali
        * @return the weight to put on the rule corresponding to the given edge
        *         
        */
-      virtual sem_elem_t getWeight( Key src, ClientInfoRefPtr srcInfo, Key sym, Kind kind, Key tgt, ClientInfoRefPtr tgtInfo ) 
+      virtual sem_elem_t getWeight( Key src, ClientInfoRefPtr srcInfo, Key sym, Kind kind, Key tgt, ClientInfoRefPtr tgtInfo ) const
       {
         (void) src;
         (void) srcInfo;
@@ -96,7 +96,7 @@ namespace wali
        * @return the weight to put on the return rule corresponding to the given exit 
        *
        */
-      virtual sem_elem_t getExitWeight( Key src, ClientInfoRefPtr srcInfo ) 
+      virtual sem_elem_t getExitWeight( Key src, ClientInfoRefPtr srcInfo ) const
       {
         (void) src;
         (void) srcInfo;
@@ -118,7 +118,7 @@ namespace wali
        * @return the weight to put on the rule corresponding to the given edge
        *
        */
-      virtual sem_elem_t getWildWeight( Key src, ClientInfoRefPtr srcInfo, Key tgt, ClientInfoRefPtr tgtInfo )
+      virtual sem_elem_t getWildWeight( Key src, ClientInfoRefPtr srcInfo, Key tgt, ClientInfoRefPtr tgtInfo ) const
       {
         (void) src;
         (void) srcInfo;
@@ -138,13 +138,13 @@ namespace wali
       //
           
     public:
-      sem_elem_t getOne( )
+      sem_elem_t getOne( ) const
       {
         static const Reach r(true);
         return r.one();
       }
 
-      sem_elem_t getWeight( const State & src, const Symbol & inst, Kind k, const State & tgt )
+      sem_elem_t getWeight( const State & src, const Symbol & inst, Kind k, const State & tgt ) const
       {
         (void) src;
         (void) inst;
@@ -153,7 +153,7 @@ namespace wali
         return getOne();
       }
            
-      sem_elem_t getWildWeight( const State & src, const State & tgt )
+      sem_elem_t getWildWeight( const State & src, const State & tgt ) const
       {
         (void) src;
         (void) tgt;
