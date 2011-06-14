@@ -690,13 +690,128 @@ namespace wali
 					true, true, true); // transitions
 	}
 
+        //     - For clearStates(), make sure initial/accepting states and
+        //       transitions have all been cleared too.
+	TEST(wali$nwa$NWA$clearStates, checkClearingAndPersisting)
+	{
+	    OddNumEvenGroupsNwa fixture;
+	    NWA nwa = fixture.nwa;
 
+	    nwa.clearStates();
 
-        // 
-        //     - For clearStates(), make sure initial/accepting states and transitions
-        //       have all been cleared too.
+	    // Check changes
+	    EXPECT_EQ(0u, nwa.sizeStates());
+            EXPECT_EQ(0u, nwa.sizeInitialStates());
+            EXPECT_EQ(0u, nwa.sizeFinalStates());
+            EXPECT_EQ(0u, nwa.sizeTrans());
+            EXPECT_EQ(0u, nwa.sizeInternalTrans());
+            EXPECT_EQ(0u, nwa.sizeCallTrans());
+            EXPECT_EQ(0u, nwa.sizeReturnTrans());
+
+	    // Check preservation: only initials should have changed
+	    expect_nwas_nearly_the_same(fixture.nwa, nwa,
+					false, false, false,  // states
+					true,                 // symbols
+					false, false, false); // transitions
+	}
+
+	TEST(wali$nwa$NWA$clearSymbols, checkClearingAndPersisting)
+	{
+	    OddNumEvenGroupsNwa fixture;
+	    NWA nwa = fixture.nwa;
+
+	    nwa.clearSymbols();
+
+	    // Check changes
+            EXPECT_EQ(0u, nwa.sizeSymbols());
+            EXPECT_EQ(0u, nwa.sizeTrans());
+            EXPECT_EQ(0u, nwa.sizeInternalTrans());
+            EXPECT_EQ(0u, nwa.sizeCallTrans());
+            EXPECT_EQ(0u, nwa.sizeReturnTrans());
+
+	    // Check preservation: only initials should have changed
+	    expect_nwas_nearly_the_same(fixture.nwa, nwa,
+					true, true, true,     // states
+					false,                // symbols
+					false, false, false); // transitions
+	}
+
         //     - For clearSymbols(), make sure transitions are all clear too.
+	TEST(wali$nwa$NWA$clearTrans, checkClearingAndPersisting)
+	{
+	    OddNumEvenGroupsNwa fixture;
+	    NWA nwa = fixture.nwa;
 
+	    nwa.clearTrans();
+
+	    // Check changes
+            EXPECT_EQ(0u, nwa.sizeTrans());
+            EXPECT_EQ(0u, nwa.sizeInternalTrans());
+            EXPECT_EQ(0u, nwa.sizeCallTrans());
+            EXPECT_EQ(0u, nwa.sizeReturnTrans());
+
+	    // Check preservation: only initials should have changed
+	    expect_nwas_nearly_the_same(fixture.nwa, nwa,
+					true, true, true,     // states
+					true,                 // symbols
+					false, false, false); // transitions
+	}
+
+#if 0   // We don't have these functions right now, but here are some tests
+        // in case we one day do.
+        
+        TEST(wali$nwa$NWA$clearInternalTrans, checkClearingAndPersisting)
+	{
+	    OddNumEvenGroupsNwa fixture;
+	    NWA nwa = fixture.nwa;
+
+	    nwa.clearInternalTrans();
+
+	    // Check changes
+            EXPECT_EQ(0u, nwa.sizeInternalTrans());
+
+	    // Check preservation: only initials should have changed
+	    expect_nwas_nearly_the_same(fixture.nwa, nwa,
+					true, true, true,   // states
+					true,               // symbols
+					false, true, true); // transitions
+	}
+
+        TEST(wali$nwa$NWA$clearCallTrans, checkClearingAndPersisting)
+	{
+	    OddNumEvenGroupsNwa fixture;
+	    NWA nwa = fixture.nwa;
+
+	    nwa.clearCallTrans();
+
+	    // Check changes
+            EXPECT_EQ(0u, nwa.sizeCallTrans());
+
+	    // Check preservation: only initials should have changed
+	    expect_nwas_nearly_the_same(fixture.nwa, nwa,
+					true, true, true,   // states
+					true,               // symbols
+					true, false, true); // transitions
+	}
+        
+        TEST(wali$nwa$NWA$clearReturnTrans, checkClearingAndPersisting)
+	{
+	    OddNumEvenGroupsNwa fixture;
+	    NWA nwa = fixture.nwa;
+
+	    nwa.clearReturnTrans();
+
+	    // Check changes
+            EXPECT_EQ(0u, nwa.sizeReturnTrans());
+
+	    // Check preservation: only initials should have changed
+	    expect_nwas_nearly_the_same(fixture.nwa, nwa,
+					true, true, true,   // states
+					true,               // symbols
+					true, true, false); // transitions
+	}
+#endif
+        
         
         // TODO: transition functions. In particular:
         //
