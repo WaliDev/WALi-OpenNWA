@@ -13,62 +13,94 @@ namespace wali
         // Supporting stuff
 
         
-        void add_to_states_and_check(NWA nwa, State state)
+        /// All of these functions add 'state' to 'nwa', and checks that it
+        /// is present in the appropriate sets and only those sets. (Symbol
+        /// does the same with 'symbol'.) 'expect_addition' controls whether
+        /// the state should be added.
+
+        void
+        add_to_states_and_check(NWA * nwa, State state, bool expect_addition)
         {
-            size_t original_size_trans = nwa.sizeTrans();
+            size_t original_size_trans = nwa->sizeTrans();
             
-            EXPECT_TRUE(nwa.addState(state));
+            EXPECT_EQ(expect_addition, nwa->addState(state));
 
-            EXPECT_TRUE(nwa.isState(state));
-            EXPECT_FALSE(nwa.isInitialState(state));
-            EXPECT_FALSE(nwa.isFinalState(state));
-            EXPECT_FALSE(nwa.isSymbol(state));
+            EXPECT_TRUE(nwa->isState(state));
+            EXPECT_FALSE(nwa->isInitialState(state));
+            EXPECT_FALSE(nwa->isFinalState(state));
+            EXPECT_FALSE(nwa->isSymbol(state));
 
-            EXPECT_EQ(original_size_trans, nwa.sizeTrans());
+            EXPECT_EQ(original_size_trans, nwa->sizeTrans());
         }
         
-        void add_to_initial_states_and_check(NWA nwa, State state)
+        void
+        add_to_initial_states_and_check(NWA * nwa, State state, bool expect_addition)
         {
-            size_t original_size_trans = nwa.sizeTrans();
+            size_t original_size_trans = nwa->sizeTrans();
             
-            EXPECT_TRUE(nwa.addInitialState(state));
+            EXPECT_EQ(expect_addition, nwa->addInitialState(state));
 
-            EXPECT_TRUE(nwa.isState(state));
-            EXPECT_TRUE(nwa.isInitialState(state));
-            EXPECT_FALSE(nwa.isFinalState(state));
-            EXPECT_FALSE(nwa.isSymbol(state));
+            EXPECT_TRUE(nwa->isState(state));
+            EXPECT_TRUE(nwa->isInitialState(state));
+            EXPECT_FALSE(nwa->isFinalState(state));
+            EXPECT_FALSE(nwa->isSymbol(state));
 
-            EXPECT_EQ(original_size_trans, nwa.sizeTrans());
+            EXPECT_EQ(original_size_trans, nwa->sizeTrans());
         }
 
-        void add_to_final_states_and_check(NWA nwa, State state)
+        void
+        add_to_final_states_and_check(NWA * nwa, State state, bool expect_addition)
         {
-            size_t original_size_trans = nwa.sizeTrans();
+            size_t original_size_trans = nwa->sizeTrans();
             
-            EXPECT_TRUE(nwa.addFinalState(state));
+            EXPECT_EQ(expect_addition, nwa->addFinalState(state));
 
-            EXPECT_TRUE(nwa.isState(state));
-            EXPECT_FALSE(nwa.isInitialState(state));
-            EXPECT_TRUE(nwa.isFinalState(state));
-            EXPECT_FALSE(nwa.isSymbol(state));
+            EXPECT_TRUE(nwa->isState(state));
+            EXPECT_FALSE(nwa->isInitialState(state));
+            EXPECT_TRUE(nwa->isFinalState(state));
+            EXPECT_FALSE(nwa->isSymbol(state));
 
-            EXPECT_EQ(original_size_trans, nwa.sizeTrans());
-        }
-        
-        void add_to_symbols_and_check(NWA nwa, Symbol symbol)
-        {
-            size_t original_size_trans = nwa.sizeTrans();
-            
-            EXPECT_TRUE(nwa.addSymbol(symbol));
-
-            EXPECT_FALSE(nwa.isState(symbol));
-            EXPECT_FALSE(nwa.isInitialState(symbol));
-            EXPECT_FALSE(nwa.isFinalState(symbol));
-            EXPECT_TRUE(nwa.isSymbol(symbol));
-
-            EXPECT_EQ(original_size_trans, nwa.sizeTrans());
+            EXPECT_EQ(original_size_trans, nwa->sizeTrans());
         }
         
+        void
+        add_to_symbols_and_check(NWA * nwa, Symbol symbol, bool expect_addition)
+        {
+            size_t original_size_trans = nwa->sizeTrans();
+            
+            EXPECT_EQ(expect_addition, nwa->addSymbol(symbol));
+
+            EXPECT_FALSE(nwa->isState(symbol));
+            EXPECT_FALSE(nwa->isInitialState(symbol));
+            EXPECT_FALSE(nwa->isFinalState(symbol));
+            EXPECT_TRUE(nwa->isSymbol(symbol));
+
+            EXPECT_EQ(original_size_trans, nwa->sizeTrans());
+        }
+        
+
+        /// Checks that, in 'nwa', the sizes returned by 'sizeBlah()' is the
+        /// same as the number of elements between 'beginBlah()' and
+        /// 'endBlah()'.
+        void expect_size_consistent_with_range(NWA const & nwa)
+        {
+#define CHECK_CONSISTENCY(Attribute)                                             \
+            EXPECT_EQ(nwa.size##Attribute(),                                     \
+                      static_cast<size_t>(std::distance(nwa.begin##Attribute(),  \
+                                                        nwa.end##Attribute())))
+            
+            CHECK_CONSISTENCY(States);
+            CHECK_CONSISTENCY(InitialStates);
+            CHECK_CONSISTENCY(FinalStates);
+            CHECK_CONSISTENCY(Symbols);
+            CHECK_CONSISTENCY(InternalTrans);
+            CHECK_CONSISTENCY(CallTrans);
+            CHECK_CONSISTENCY(ReturnTrans);
+#undef CHECK_CONSISTENCY
+        }
+
+
+
         
         /////////////////////////////////
         // Now begin the actual tests
@@ -97,26 +129,10 @@ namespace wali
             EXPECT_EQ(0u, nwa.sizeSymbols());
         }
 
-        
+
+        //////////////////
         //   sizeXXX()
-        //     - Make sure this agrees with the size of getXXX()
-        void expect_size_consistent_with_range(NWA const & nwa)
-        {
-#define CHECK_CONSISTENCY(Attribute)                                             \
-            EXPECT_EQ(nwa.size##Attribute(),                                     \
-                      static_cast<size_t>(std::distance(nwa.begin##Attribute(),  \
-                                                        nwa.end##Attribute())))
-            
-            CHECK_CONSISTENCY(States);
-            CHECK_CONSISTENCY(InitialStates);
-            CHECK_CONSISTENCY(FinalStates);
-            CHECK_CONSISTENCY(Symbols);
-            CHECK_CONSISTENCY(InternalTrans);
-            CHECK_CONSISTENCY(CallTrans);
-            CHECK_CONSISTENCY(ReturnTrans);
-#undef CHECK_CONSISTENCY
-        }
-        
+        //     - Make sure this agrees with the size of getXXX()       
         TEST(wali$nwa$NWA$getXXX, checkSizeConsistentForEmptyNwa)
         {
             NWA empty;
@@ -130,6 +146,7 @@ namespace wali
         }
 
 
+        //////////////////
         //   isXXX() and addXXX() for states and symbols
         //
         //     - Check if an XXX is a member of the empty NWA       
@@ -154,32 +171,28 @@ namespace wali
         {
             NWA empty;
             SomeElements e;
-
-            add_to_states_and_check(empty, e.state);
+            add_to_states_and_check(&empty, e.state, true);
         }
         
         TEST(wali$nwa$NWA$isInitialState$$and$addInitialState, addToEmptyAndCheck)
         {
             NWA empty;
             SomeElements e;
-
-            add_to_initial_states_and_check(empty, e.state);
+            add_to_initial_states_and_check(&empty, e.state, true);
         }
 
         TEST(wali$nwa$NWA$isFinalState$$and$addFinalState, addToEmptyAndCheck)
         {
             NWA empty;
             SomeElements e;
-
-            add_to_final_states_and_check(empty, e.state);
+            add_to_final_states_and_check(&empty, e.state, true);
         }
 
         TEST(wali$nwa$NWA$isSymbol$$and$addSymbol, addToEmptyAndCheck)
         {
             NWA empty;
             SomeElements e;
-
-            add_to_symbols_and_check(empty, e.symbol);
+            add_to_symbols_and_check(&empty, e.symbol, true);
         }
 
         
@@ -190,41 +203,41 @@ namespace wali
         {
             OddNumEvenGroupsNwa fixture;
             SomeElements e;
-
-            add_to_states_and_check(fixture.nwa, e.state);
+            add_to_states_and_check(&fixture.nwa, e.state, true);
         }
         
         TEST(wali$nwa$NWA$isInitialState$$and$addInitialState, addToBusyAndCheck)
         {
             OddNumEvenGroupsNwa fixture;
             SomeElements e;
-
-            add_to_initial_states_and_check(fixture.nwa, e.state);
+            add_to_initial_states_and_check(&fixture.nwa, e.state, true);
         }
 
         TEST(wali$nwa$NWA$isFinalState$$and$addFinalState, addToBusyAndCheck)
         {
             OddNumEvenGroupsNwa fixture;
             SomeElements e;
-
-            add_to_final_states_and_check(fixture.nwa, e.state);
+            add_to_final_states_and_check(&fixture.nwa, e.state, true);
         }
 
         TEST(wali$nwa$NWA$isSymbol$$and$addSymbol, addToBusyAndCheck)
         {
             OddNumEvenGroupsNwa fixture;
             SomeElements e;
-
-            add_to_symbols_and_check(fixture.nwa, e.symbol);
+            add_to_symbols_and_check(&fixture.nwa, e.symbol, true);
         }
 
         
         //     - For isSymbol(), make sure epsilon and wild return false both when they
         //       are used in transitions and not.
-        // 
+        // This is done inline with the above
+        
+
         //   addXXX()
-        //     - Check that adding it again leaves the return from getXXX unchanged,
-        //       and returns false
+        //     - Check that adding it again leaves the return from getXXX
+        //       unchanged, and returns false
+
+        
         //     - Check that the sets that should not be modified are not modified.
         // 
         //     - For addInitialState and addFinalState, try from both the situation where
