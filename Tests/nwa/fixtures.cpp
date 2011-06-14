@@ -109,15 +109,6 @@ namespace wali
             //          \     /
             //           `---'
 
-            Key q0 = getKey("q0");
-            Key q1 = getKey("q1");
-            Key q2 = getKey("q2");
-            Key q3 = getKey("q3");
-                
-            Key zero = getKey("0");
-            Key call = getKey("(");
-            Key ret = getKey(")");
-                
             nwa->addInitialState(q0);
             nwa->addFinalState(q1);
                 
@@ -129,13 +120,22 @@ namespace wali
             nwa->addReturnTrans(q3, q1, ret, q0);
             nwa->addReturnTrans(q3, q0, ret, q1);
 
-            Key dummy = getKey("dummy");
+
             nwa->addInternalTrans(q2, WALI_EPSILON, dummy);
             nwa->addInternalTrans(q2, WALI_WILD, dummy);
             nwa->addCallTrans(q2, WALI_WILD, dummy);
             nwa->addReturnTrans(q2, q2, WALI_WILD, dummy);
         }
         
+        const State OddNumEvenGroupsNwa::q0 = getKey("q0");
+        const State OddNumEvenGroupsNwa::q1 = getKey("q1");
+        const State OddNumEvenGroupsNwa::q2 = getKey("q2");
+        const State OddNumEvenGroupsNwa::q3 = getKey("q3");
+        const State OddNumEvenGroupsNwa::dummy = getKey("dummy");
+        
+        const Symbol OddNumEvenGroupsNwa::zero = getKey("0");
+        const Symbol OddNumEvenGroupsNwa::call = getKey("(");
+        const Symbol OddNumEvenGroupsNwa::ret = getKey(")");
         
     }
 }

@@ -236,24 +236,179 @@ namespace wali
         //   addXXX()
         //     - Check that adding it again leaves the return from getXXX
         //       unchanged, and returns false
+        TEST(wali$nwa$NWA$addState, addTwiceToEmptyAndCheck)
+        {
+            NWA nwa;
+            SomeElements e;
+            add_to_states_and_check(&nwa, e.state, true);
+
+            NWA copy = nwa;
+            add_to_states_and_check(&nwa, e.state, false);
+            
+            expect_nwas_are_equal(nwa, copy);
+        }
+        
+        TEST(wali$nwa$NWA$addInitialState, addTwiceToEmptyAndCheck)
+        {
+            NWA nwa;
+            SomeElements e;
+            add_to_initial_states_and_check(&nwa, e.state, true);
+
+            NWA copy = nwa;
+            add_to_initial_states_and_check(&nwa, e.state, false);
+
+            expect_nwas_are_equal(nwa, copy);
+        }
+
+        TEST(wali$nwa$NWA$addFinalState, addTwiceToNwaAndCheck)
+        {
+            NWA nwa;
+            SomeElements e;
+            add_to_final_states_and_check(&nwa, e.state, true);
+
+            NWA copy = nwa;
+            add_to_final_states_and_check(&nwa, e.state, false);
+
+            expect_nwas_are_equal(nwa, copy);
+        }
+
+        TEST(wali$nwa$NWA$addSymbol, addTwiceToEmptyAndCheck)
+        {
+            NWA nwa;
+            SomeElements e;
+            add_to_symbols_and_check(&nwa, e.symbol, true);
+
+            NWA copy = nwa;
+            add_to_symbols_and_check(&nwa, e.symbol, false);
+
+            expect_nwas_are_equal(nwa, copy);
+        }
 
         
-        //     - Check that the sets that should not be modified are not modified.
-        // 
-        //     - For addInitialState and addFinalState, try from both the situation where
-        //       the state was and wasn't present in the NWA at all. If they weren't 
-        //       present, check that they are after the addition.
+        //     - Check that the sets that should not be modified are not
+        //       modified.
+        //
+        // Done inline, mostly. (I don't check that transitions are unmodified.)
+
+        
+        //     - For addInitialState and addFinalState, try from both the
+        //       situation where the state was and wasn't present in the NWA
+        //       at all. If they weren't present, check that they are after
+        //       the addition.
+        //
+        // The above checks the situation where it was not present, and
+        // checks that it was added.
+        TEST(wali$nwa$NWA$addInitialState, addInitialStateOfAStateAlreadyPresent)
+        {
+            NWA nwa;
+            SomeElements e;
+            EXPECT_TRUE(nwa.addState(e.state));
+
+            // Sanity checks; these should hold from above
+            EXPECT_TRUE(nwa.isState(e.state));
+            EXPECT_FALSE(nwa.isInitialState(e.state));
+
+            // ** Now the real thing. Add two initial states.
+            EXPECT_TRUE(nwa.addInitialState(e.state));
+            EXPECT_TRUE(nwa.addInitialState(e.state2));
+
+            // ** Make sure both are initial states
+            EXPECT_TRUE(nwa.isInitialState(e.state));
+            EXPECT_TRUE(nwa.isInitialState(e.state2));
+
+            EXPECT_EQ(2u, nwa.sizeInitialStates());
+        }
+        
+
         //     - For addSymbol(), make sure adding epsilon or wild returns false even if
         //       they are the first things done
-        //     - For addYYYTrans, try from the situation where the states and symbol are
-        //       and are not present. If they were not, check that they are after the
-        //       addition.
-        //     - For addYYYTrans, add more than one transition with the given source/sym,
-        //       source/tgt, and sym/tgt.
-        // 
+        TEST(wali$nwa$NWA$addSymbol, addingEpsilonOrWildShouldFail)
+        {
+            NWA nwa;
+
+            EXPECT_FALSE(nwa.addSymbol(WALI_EPSILON));
+            EXPECT_FALSE(nwa.addSymbol(WALI_WILD));
+        }
+
+        
         //   removeXXX()
-        //     - Try from empty automaton, one containing given item, one not containing
-        //       given item. Check correct value is returned.
+        //     - Try from empty automaton, one containing given item, one not
+        //       containing given item. Check correct value is returned.
+        TEST(wali$nwa$NWA$removeXXX, removingFromEmptyShouldFail)
+        {
+            NWA nwa;
+            SomeElements e;
+
+            EXPECT_FALSE(nwa.removeState(e.state));
+            EXPECT_FALSE(nwa.removeInitialState(e.state));
+            EXPECT_FALSE(nwa.removeFinalState(e.state));
+            EXPECT_FALSE(nwa.removeSymbol(e.symbol));
+            EXPECT_FALSE(nwa.removeInternalTrans(e.internal));
+            EXPECT_FALSE(nwa.removeCallTrans(e.call));
+            EXPECT_FALSE(nwa.removeReturnTrans(e.ret));
+        }
+
+        TEST(wali$nwa$NWA$removeXXX, removingSingleItemsShouldLeaveEmpty)
+        {
+            NWA nwa;
+            SomeElements e;
+            SomeElements::add_to_nwa(&nwa);
+
+            // Couple sanity checks to make sure the SomeElements NWA is what
+            // I think it is.
+            ASSERT_TRUE(nwa.isInitialState(e.state));
+            ASSERT_TRUE(nwa.isFinalState(e.state2));
+
+            // Have to remove transitions first so they don't remove states
+            EXPECT_TRUE(nwa.removeInternalTrans(e.internal));
+            EXPECT_EQ(0u, nwa.sizeInternalTrans());
+            EXPECT_EQ(1u, nwa.sizeCallTrans());
+            EXPECT_EQ(1u, nwa.sizeReturnTrans());
+
+            EXPECT_TRUE(nwa.removeCallTrans(e.call));
+            EXPECT_EQ(0u, nwa.sizeInternalTrans());
+            EXPECT_EQ(0u, nwa.sizeCallTrans());
+            EXPECT_EQ(1u, nwa.sizeReturnTrans());
+
+            EXPECT_TRUE(nwa.removeReturnTrans(e.ret));
+            EXPECT_EQ(0u, nwa.sizeInternalTrans());
+            EXPECT_EQ(0u, nwa.sizeCallTrans());
+            EXPECT_EQ(0u, nwa.sizeReturnTrans());
+
+            // Check up on stuff.
+            EXPECT_EQ(0u, nwa.sizeTrans());
+            EXPECT_EQ(1u, nwa.sizeSymbols());
+            EXPECT_EQ(1u, nwa.sizeInitialStates());
+            EXPECT_EQ(1u, nwa.sizeFinalStates());
+            EXPECT_EQ(3u, nwa.sizeStates());
+
+            // Remove symbol
+            EXPECT_TRUE(nwa.removeSymbol(e.symbol));
+            EXPECT_EQ(0u, nwa.sizeSymbols());
+
+            // Have to remove initial and final first so removing a state
+            // doesn't disturb anything. 
+            EXPECT_TRUE(nwa.removeInitialState(e.state));
+            EXPECT_EQ(0u, nwa.sizeInitialStates());
+            EXPECT_EQ(1u, nwa.sizeFinalStates());
+            EXPECT_EQ(3u, nwa.sizeStates());
+
+            EXPECT_TRUE(nwa.removeFinalState(e.state2));
+            EXPECT_EQ(0u, nwa.sizeInitialStates());
+            EXPECT_EQ(0u, nwa.sizeFinalStates());
+            EXPECT_EQ(3u, nwa.sizeStates());
+
+            EXPECT_TRUE(nwa.removeState(e.state));
+            EXPECT_EQ(2u, nwa.sizeStates());
+            
+            EXPECT_TRUE(nwa.removeState(e.state2));
+            EXPECT_EQ(1u, nwa.sizeStates());
+
+            EXPECT_TRUE(nwa.removeState(e.state3));
+
+            expect_nwa_is_empty(nwa);
+        }
+        
         //     - In each case, check that sets that shouldn't change are not modified.
         // 
         //     - For removeState(), try from automaton in which the state is and is not
@@ -271,5 +426,14 @@ namespace wali
         //       have all been cleared too.
         //     - For clearSymbols(), make sure transitions are all clear too.
 
+        
+        // TODO: transition functions. In particular:
+        //
+        //     - For addYYYTrans, try from the situation where the states and symbol are
+        //       and are not present. If they were not, check that they are after the
+        //       addition.
+        //     - For addYYYTrans, add more than one transition with the given source/sym,
+        //       source/tgt, and sym/tgt.
+        // 
     }
 }

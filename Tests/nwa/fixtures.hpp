@@ -34,6 +34,9 @@ namespace wali
             OddNumEvenGroupsNwa();
             
             static void build_nwa(NWA * nwa);
+
+            static const State q0, q1, q2, q3, dummy;
+            static const Symbol call, ret, zero;
             
             // From NWA-tests.cpp in Source/wali/nwa if you want to trace
             // history.
