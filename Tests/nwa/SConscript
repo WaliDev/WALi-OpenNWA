@@ -21,6 +21,7 @@ test_files = Split("""
     test.cpp
     NWA-tests.cpp
     fixtures.cpp
+    class-NWA/supporting.cpp
     """)
 
 built = env.Program('nwa-test', test_files)
