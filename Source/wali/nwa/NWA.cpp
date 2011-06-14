@@ -799,7 +799,9 @@ namespace wali
       assert(sym < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
 
-      if(! isState(from) || ! isSymbol(sym) || ! isState(to) )
+      if(! isState(from)
+         || (! isSymbol(sym) && sym != WALI_EPSILON && sym != WALI_WILD)
+         || ! isState(to) )
         return false;
 
       return trans.removeInternal(from,sym,to);
