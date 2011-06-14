@@ -2,8 +2,8 @@
 
 #include "wali/nwa/NWA.hpp"
 
-#include "Tests/nwa/fixtures.hpp"
-#include "Tests/nwa/class-NWA/supporting.hpp"
+#include "Tests/nwa/Source/fixtures.hpp"
+#include "Tests/nwa/Source/class-NWA/supporting.hpp"
 
 namespace wali
 {

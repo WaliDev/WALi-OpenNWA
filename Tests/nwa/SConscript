@@ -18,12 +18,12 @@ env.AppendUnique(CPPPATH=[gtest_include, WaliDir])
 env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
 
 test_files = Split("""
-    test.cpp
-    NWA-tests.cpp
-    fixtures.cpp
-    class-NWA/supporting.cpp
-    class-NWA/construction-assignment.cpp
-    class-NWA/get-size-is-add-remove-clear.cpp
+    Source/test.cpp
+    Source/NWA-tests.cpp
+    Source/fixtures.cpp
+    Source/class-NWA/supporting.cpp
+    Source/class-NWA/construction-assignment.cpp
+    Source/class-NWA/get-size-is-add-remove-clear.cpp
     """)
 
 built = env.Program('nwa-test', test_files)
