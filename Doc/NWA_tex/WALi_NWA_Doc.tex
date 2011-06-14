@@ -47,7 +47,7 @@
 \usepackage[maxfloats=40]{morefloats}
 
 \usepackage{adjustbox}
-
+\usepackage{expdlist}
 %\usepackage{ulem} % for strike out
 
 \setcounter{topnumber}{5}
@@ -79,11 +79,11 @@
 
 
 % this sets the spacings in the description environment
-\renewcommand{\descripthook}{\setlength{\topsep}{0pt}%
-  \setlength{\itemsep}{0pt}%
-  \setlength{\parsep}{0ex}%
-  \setlength{\labelsep}{\textwidth}%
-}
+%\renewcommand{\descripthook}{\setlength{\topsep}{0pt}%
+%  \setlength{\itemsep}{0pt}%
+%  \setlength{\parsep}{0ex}%
+%  \setlength{\labelsep}{\textwidth}%
+%}
 
 
 % \usepackage{relsize}
@@ -161,9 +161,15 @@ reflect the views of NSF, ONR, ARL, and AFRL.
 \renewcommand{\includegraphics}[2][Whatever]{}
 
 %\newcommand{\nwaimage}[2][]{\realincludegraphics[#1]{#2}}
-\newrobustcmd{\nwaimage}[2][]{%
+\newcommand{\nwaimage}[2][]{%
   \adjustbox{width=\textwidth,height=\textheight,keepaspectratio=true}{\input{#2}}%
 }
+
+\newenvironment{functionlist}%
+               {\begin{list}{\TODO{MISSING}}{\setlength{\itemsep}{0pt}%
+                                             \setlength{\parsep}{0ex}}}
+               {\end{list}}
+\newcommand{\functionitem}[1][\TODO{missing}]{\item[#1]\hspace*{\fill}\\}
 
 
 \input{01-overview}

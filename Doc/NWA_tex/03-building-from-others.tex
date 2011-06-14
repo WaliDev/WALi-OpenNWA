@@ -16,53 +16,53 @@ operation in a subclass of \texttt{NWA}.
 
 Each of these functions is in the namespace \texttt{wali::nwa::construct}:
 
-\begin{description}
+\begin{functionlist}
 
-  \item[\texttt{NWARefPtr unionNWA( NWA const \& a, NWA const \& b )}]
-  \item[\texttt{void unionNWA( NWA \& out, NWA const \& a, NWA const \& b )}]
+  \functionitem[\texttt{NWARefPtr unionNWA( NWA const \& a, NWA const \& b )}]
+  \functionitem[\texttt{void unionNWA( NWA \& out, NWA const \& a, NWA const \& b )}]
     Computes the union of the NWAs \texttt{a} and \texttt{b},
     either returning the result or storing it in \texttt{out}.
     See Section
     \ref{Se:Union}.
 
-  \item[\texttt{NWARefPtr intersect( NWA const \& a, NWA const \& b )}]
-  \item[\texttt{void intersect( NWA \& out, NWA const \& a, NWA const \& b )}]
+  \functionitem[\texttt{NWARefPtr intersect( NWA const \& a, NWA const \& b )}]
+  \functionitem[\texttt{void intersect( NWA \& out, NWA const \& a, NWA const \& b )}]
     Computes the intersection of the NWAs \texttt{a} and \texttt{b},
     either returning the result or storing it in \texttt{out}.
     See Section \ref{Se:Intersection}.
 
-  \item[\texttt{NWARefPtr concat( NWA const \& left, NWA const \& right )}]
-  \item[\texttt{void concat( NWA \& out, NWA const \& left, NWA const \& right )}]
+  \functionitem[\texttt{NWARefPtr concat( NWA const \& left, NWA const \& right )}]
+  \functionitem[\texttt{void concat( NWA \& out, NWA const \& left, NWA const \& right )}]
     Computes the concatenation of the NWAs \texttt{left} and
     \texttt{right}, either returning the result or storing it in
     \texttt{out}.
     See Section \ref{Se:Concatenation}.
 
-  \item[\texttt{NWARefPtr star( NWA const \& orig )}]
-  \item[\texttt{void star( NWA \& out, NWA const \& orig )}]
+  \functionitem[\texttt{NWARefPtr star( NWA const \& orig )}]
+  \functionitem[\texttt{void star( NWA \& out, NWA const \& orig )}]
     Computes the Kleene-Star of the NWA \texttt{orig}, either
     returning the result or storing it in \texttt{out}. See Section
     \ref{Se:Star}.
 
-  \item[\texttt{NWARefPtr reverse( NWA const \& orig )}]
-  \item[\texttt{void reverse( NWA \& out, NWA const \& orig )}]
+  \functionitem[\texttt{NWARefPtr reverse( NWA const \& orig )}]
+  \functionitem[\texttt{void reverse( NWA \& out, NWA const \& orig )}]
     Computes the NWA that accepts the reverse of each nested word
     accepted by the NWA \texttt{orig}, either returning the result or
     storing it in \texttt{out}. See Section \ref{Se:Reverse}.
 
-  \item[\texttt{NWARefPtr determinize( NWA const \& orig )}]
-  \item[\texttt{NWARefPtr determinize( NWA \& out, NWA const \& orig )}]
+  \functionitem[\texttt{NWARefPtr determinize( NWA const \& orig )}]
+  \functionitem[\texttt{NWARefPtr determinize( NWA \& out, NWA const \& orig )}]
     Computes a determinization of \texttt{orig}, either returning the
     result or storing it in \texttt{out}.
     See Section \ref{Se:Determinize}.
 
-  \item[\texttt{NWARefPtr complement( NWA const \& orig )}]
-  \item[\texttt{void complement( NWA \& out, NWA const \& orig )}]
+  \functionitem[\texttt{NWARefPtr complement( NWA const \& orig )}]
+  \functionitem[\texttt{void complement( NWA \& out, NWA const \& orig )}]
     Computes the complement of the determinization of \texttt{orig},
     either returning the result or storing it in \texttt{out}.
     See Section
     \ref{Se:Complement}.
-\end{description}
+\end{functionlist}
 
 As mentioned above, these functions create a small language of set
 expressions. For instance, to compute an automaton \texttt{M} whose language
@@ -196,9 +196,9 @@ overridden in subclasses to specify alternative behaviors.
 \noindent The following operations are methods of class NWA and are intended
 to be overridden to customize behavior:
 
-\begin{description}
+\begin{functionlist}
 
-  \item[\texttt{bool stateIntersect( NWA const \& first, Key state1,\\ 
+  \functionitem[\texttt{bool stateIntersect( NWA const \& first, Key state1,\\ 
                    \hspace*{3.25cm} NWA const \& second, Key state2,\\
                    \hspace*{3.25cm} Key\& resSt, ref\_ptr<ClientInfo>\& resCI )}]
     \nopagebreak
@@ -209,7 +209,7 @@ to be overridden to customize behavior:
     key of the combined state (storing it in \texttt{resSt} and the client
     information (storing it in \texttt{resCI}), then returns \texttt{true}.
 
-  \item[\texttt{bool transitionIntersect( NWA const \& first, Key
+  \functionitem[\texttt{bool transitionIntersect( NWA const \& first, Key
     sym1,\\ \hspace*{3.25cm} NWA const \& second, Key
     sym2,\\ \hspace*{3.25cm} Key\& resSym )}] \nopagebreak
 
@@ -218,15 +218,15 @@ to be overridden to customize behavior:
     be associated with the combined transition (storing it in
     \texttt{resSym}) and returns true. If not, returns false.
 
-  \item[\texttt{void intersectClientInfoInternal( \\ \hspace*{3.25cm}
+  \functionitem[\texttt{void intersectClientInfoInternal( \\ \hspace*{3.25cm}
     NWA const \& first, Key src1, Key tgt1,\\ \hspace*{3.25cm} NWA const \&
     second, Key src2, Key tgt2,\\ \hspace*{3.25cm} Key resSym, Key resSt )}]
     \nopagebreak
-  \item[\texttt{void intersectClientInfoCall( \\ \hspace*{3.25cm}
+  \functionitem[\texttt{void intersectClientInfoCall( \\ \hspace*{3.25cm}
     NWA const \& first ,Key call1, Key entry1,\\ \hspace*{3.25cm}
     NWA const \& second, Key call2, Key entry2,\\ \hspace*{3.25cm} Key
     resSym, Key resSt )}] \nopagebreak
-  \item[\texttt{void intersectClientInfoReturn( \\ \hspace*{1.75cm}
+  \functionitem[\texttt{void intersectClientInfoReturn( \\ \hspace*{1.75cm}
     NWA const \& first, Key exit1, Key call1, Key ret1,\\ \hspace*{1.75cm}
     NWA const \& second, Key exit2, Key call2, Key ret2,\\ \hspace*{1.75cm}
     Key resSym, Key resSt )}]
@@ -235,7 +235,7 @@ to be overridden to customize behavior:
     endpoints of the transition just added (as well as access to the client
     information associated with each state).
 
-\end{description}
+\end{functionlist}
 
 
 Consider the slightly more complex example of computing the intersection of
@@ -527,25 +527,25 @@ state of the transition being added.
 The following functions can be overridden in a subclass of \texttt{NWA} to
 customize the behavior of determinization.
 
-\begin{description}
+\begin{functionlist}
 
-  \item[\texttt{void mergeClientInfo( NWA const \& first,\\ \hspace*{3.25cm}
+  \functionitem[\texttt{void mergeClientInfo( NWA const \& first,\\ \hspace*{3.25cm}
     BinaryRelation const\& binRel,\\ \hspace*{3.25cm} St resSt,
     ref\_ptr<ClientInfo>\& resCI )}] \nopagebreak
 
     Computes the client information that should be associated with the given state.
 
-  \item[\texttt{void mergeClientInfoInternal( NWA const \& first,\nopagebreak
+  \functionitem[\texttt{void mergeClientInfoInternal( NWA const \& first,\nopagebreak
     \\ \hspace*{3.25cm} BinaryRelation const\& binRelSource,\nopagebreak
     \\ \hspace*{3.25cm} BinaryRelation const\& binRelTarget, \nopagebreak
     \\ \hspace*{3.25cm} Key sourceSt, Key resSym, Key resSt, \nopagebreak
     \\ \hspace*{3.25cm} ref\_ptr<ClientInfo>\& resCI )}] \nopagebreak
-  \item[\texttt{void mergeClientInfoCall( NWA const \&
+  \functionitem[\texttt{void mergeClientInfoCall( NWA const \&
     first,\\ \hspace*{3.25cm} BinaryRelation const\&
     binRelCall,\\ \hspace*{3.25cm} BinaryRelation const\&
     binRelEntry,\\ \hspace*{3.25cm} Key callSt, Key resSym, Key
     resSt,\\ \hspace*{3.25cm} ref\_ptr<ClientInfo>\& resCI )}] \nopagebreak
-  \item[\texttt{void mergeClientInfoReturn( NWA const \&
+  \functionitem[\texttt{void mergeClientInfoReturn( NWA const \&
     first,\\ \hspace*{3.25cm} BinaryRelation const\&
     binRelExit,\\ \hspace*{3.25cm} BinaryRelation const\&
     binRelCall,\\ \hspace*{3.25cm} BinaryRelation const\&
@@ -557,7 +557,7 @@ customize the behavior of determinization.
     information about the transition being added to the determinized
     automaton.
 
-\end{description}
+\end{functionlist}
 
 %Consider the slightly more complex determinization of the NWA shown in Figure \ref{Fi:Det3}.  The resulting NWA is shown in Figure \ref{Fi:Det4}.
 

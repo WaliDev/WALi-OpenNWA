@@ -31,29 +31,29 @@ The following functions are in the namespace \texttt{wali::nwa::nwa\_pds} and
 are declared in the header \texttt{wali/nwa/nwa\_pds/conversions.hpp}.
 
 
-\begin{description}
+\begin{functionlist}
 
-  \item\texttt{WPDS plusWPDS( NWA const \& nwa, const WPDS\& base )} \nopagebreak
+  \functionitem[\texttt{WPDS plusWPDS( NWA const \& nwa, const WPDS\& base )}] \nopagebreak
 
     This returns the WPDS that is the
     product of \texttt{nwa} and the given WPDS
     \cite{advancedquerying}.
 
-  \item\texttt{void PDStoNWA( NWA \& out, const WPDS\& pds )} \nopagebreak
-  \item\texttt{NWARefPtr PDStoNWA( NWA const \& nwa, const WPDS\& pds )} \nopagebreak
+  \functionitem[\texttt{void PDStoNWA( NWA \& out, const WPDS\& pds )}] \nopagebreak
+  \functionitem[\texttt{NWARefPtr PDStoNWA( NWA const \& nwa, const WPDS\& pds )}] \nopagebreak
     Converts \texttt{pds} to an NWA and either stores the result in
     \texttt{nwa} or returns it.
 
 
-  \item\texttt{WPDS NWAtoPDScalls( NWA const \& nwa, WeightGen<Client>\& wg ) const} \nopagebreak
-  \item\texttt{WPDS NWAtoBackwardsPDScalls( NWA const \& nwa, WeightGen<Client>\& wg )} \nopagebreak
-  \item\texttt{WPDS NWAtoPDSreturns( NWA const \& nwa, WeightGen<Client>\& wg ) const} \nopagebreak
-  \item\texttt{WPDS NWAtoBackwardsPDSreturns( NWA const \& nwa, WeightGen<Client>\& wg )} \nopagebreak
+  \functionitem[\texttt{WPDS NWAtoPDScalls( NWA const \& nwa, WeightGen<Client>\& wg ) const}] \nopagebreak
+  \functionitem[\texttt{WPDS NWAtoBackwardsPDScalls( NWA const \& nwa, WeightGen<Client>\& wg )}] \nopagebreak
+  \functionitem[\texttt{WPDS NWAtoPDSreturns( NWA const \& nwa, WeightGen<Client>\& wg ) const}] \nopagebreak
+  \functionitem[\texttt{WPDS NWAtoBackwardsPDSreturns( NWA const \& nwa, WeightGen<Client>\& wg )}] \nopagebreak
     Constructs the WPDS that is equivalent to \texttt{nwa} using the
     appropriate method (backwards or forwards flow, and stacking calls or
     stacking returns), returning the result. Uses \texttt{wg} to determine
     weights for the WPDS's transitions.
-\end{description}
+\end{functionlist}
 
 \begin{changebar}
 For the rest of the section assume that we have a PDS $(P, \Gamma, \Delta )$ 
@@ -107,7 +107,7 @@ Note that $Q_0$ and $Q_f$ are empty.
 
 \begin{figure}[p]
   \centering
-    \begin{description}
+    \begin{itemize}
       \centering
       \item{ $\langle p,main \rangle \hookrightarrow \langle p,q_1 \rangle$}
       \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
@@ -122,7 +122,7 @@ Note that $Q_0$ and $Q_f$ are empty.
       \item{ $\langle p,c_2 \rangle \hookrightarrow \langle p,e \hspace{.1cm} r_2 \rangle$}
       \item{ $\langle p,r_2 \rangle \hookrightarrow \langle p,q_6 \rangle$}
       \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,exit \rangle$}
-    \end{description}
+    \end{itemize}
   \caption{An example PDS.}
   \label{Fig:PDStoNWA1}
 \end{figure}
@@ -161,24 +161,24 @@ underlying NWA to be decoupled from the weight domain used in the PDS.  See
 
 \noindent The following operations are methods of class WeightGen and are intended to be overridden:
 
-\begin{description} 
-  \item \texttt{sem\_elem\_t getOne()}  \nopagebreak
+\begin{functionlist} 
+  \functionitem[\texttt{sem\_elem\_t getOne()}]  \nopagebreak
     Returns an instance of the $\bar{1}$ element of the weight domain.
 
-  \item \texttt{sem\_elem\_t getWeight( Key source, ref\_ptr<ClientInfo> sourceInfo, \\  
+  \functionitem[\texttt{sem\_elem\_t getWeight( Key source, ref\_ptr<ClientInfo> sourceInfo, \\  
                               \hspace*{3.25cm} Key symbol, Kind k, \\
-                              \hspace*{3.25cm} Key target, ref\_ptr<ClientInfo> targetInfo )}  \nopagebreak
+                              \hspace*{3.25cm} Key target, ref\_ptr<ClientInfo> targetInfo )}]  \nopagebreak
     Computes and returns the weight (in the desired semiring) for a
     (\texttt{kind}) NWA transition from \texttt{source} to \texttt{target}
     labeled with symbol \texttt{symbol}.
 
-  \item \texttt{sem\_elem\_t getWildWeight( \\
+  \functionitem[\texttt{sem\_elem\_t getWildWeight( \\
                               \hspace*{3.25cm} Key source, ref\_ptr<ClientInfo> sourceInfo, \\
-                              \hspace*{3.25cm} Key target, ref\_ptr<ClientInfo> targetInfo )}  \nopagebreak
+                              \hspace*{3.25cm} Key target, ref\_ptr<ClientInfo> targetInfo )}]  \nopagebreak
     Computes and returns the weight (in the desired semiring) for an NWA
     transition from \texttt{source} to \texttt{target} labeled with the
     meta-symbol \texttt{*}. \\
-\end{description}
+\end{functionlist}
 
 (By default, \texttt{getWeight} and \texttt{getWildWeight} return the result
 of a call to \texttt{getOne}, so the only function that absolutely needs to be
@@ -260,7 +260,7 @@ shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
 
 \begin{figure}[htbp]
   \centering
-    \begin{description}
+    \begin{itemize}
       \centering
       \item{ $\langle p,main \rangle \hookrightarrow \langle p,q_1 \rangle$}
       \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
@@ -278,7 +278,7 @@ shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
       \item{ $\langle p_x,c_1 \rangle \hookrightarrow \langle p,r_1 \rangle$}
       \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
       \item{ $\langle p_x,c_2 \rangle \hookrightarrow \langle p,r_2 \rangle$}
-    \end{description}
+    \end{itemize}
   \caption{The PDS resulting from converting the NWA shown in Figure \ref{Fig:NWAtoPDS1} into a PDS.}
   \label{Fig:NWAtoPDS4}
 \end{figure}
@@ -353,7 +353,7 @@ WPDS is shown in Figure \ref{Fig:NWAtoPDS5}.  Note:
 
 \begin{figure}[htbp]
   \centering
-    \begin{description}
+    \begin{itemize}
       \centering
       \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,main \rangle$}
       \item{ $\langle p,c_1 \rangle \hookrightarrow \langle p,q_1 \rangle$}
@@ -371,7 +371,7 @@ WPDS is shown in Figure \ref{Fig:NWAtoPDS5}.  Note:
       \item{ $\langle p_e,r_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
       \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
       \item{ $\langle p_e,r_2 \rangle \hookrightarrow \langle p,c_2 \rangle$}
-    \end{description}
+    \end{itemize}
   \caption{The PDS resulting from converting the NWA shown in Figure \ref{Fig:NWAtoPDS1} into a PDS.}
   \label{Fig:NWAtoPDS5}
 \end{figure}
@@ -441,7 +441,7 @@ shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
 
 \begin{figure}[htbp]
   \centering
-    \begin{description}
+    \begin{itemize}
       \centering
       \item{ $\langle p,main \rangle \hookrightarrow \langle p,q_1 \rangle$}
       \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
@@ -459,7 +459,7 @@ shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
       \item{ $\langle p_x,r_1 \rangle \hookrightarrow \langle p,r_1 \rangle$}
       \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
       \item{ $\langle p_x,r_2 \rangle \hookrightarrow \langle p,r_2 \rangle$}
-    \end{description}
+    \end{itemize}
   \caption{The PDS resulting from converting the NWA shown in Figure \ref{Fig:NWAtoPDS1} into a PDS.}
   \label{Fig:NWAtoPDS2}
 \end{figure}
@@ -557,7 +557,7 @@ WPDS is shown in Figure \ref{Fig:NWAtoPDS3}. \\
 
 \begin{figure}[htbp]
   \centering
-    \begin{description}
+    \begin{itemize}
       \centering
       \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,main \rangle$}
       \item{ $\langle p,c_1 \rangle \hookrightarrow \langle p,q_1 \rangle$}
@@ -575,7 +575,7 @@ WPDS is shown in Figure \ref{Fig:NWAtoPDS3}. \\
       \item{ $\langle p_e,c_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
       \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
       \item{ $\langle p_e,c_2 \rangle \hookrightarrow \langle p,c_2 \rangle$}
-    \end{description}
+    \end{itemize}
   \caption{The PDS resulting from converting the NWA shown in Figure
     \ref{Fig:NWAtoPDS1} into a PDS.}
   \label{Fig:NWAtoPDS3}
