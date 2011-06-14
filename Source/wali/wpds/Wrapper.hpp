@@ -45,9 +45,9 @@ namespace wali
 
         virtual ~Wrapper() {}
 
-        virtual sem_elem_t wrap( wfa::ITrans& t );
+        virtual sem_elem_t wrap( wfa::ITrans const & t );
 
-        virtual sem_elem_t wrap( wpds::Rule& r );
+        virtual sem_elem_t wrap( wpds::Rule const & r );
 
         /**
          * Wrapping of a rule's weight happens before wrapping
@@ -60,7 +60,7 @@ namespace wali
          *
          * @see wali::witness::WitnessWrapper
          */
-        virtual merge_fn_t wrap( wpds::ewpds::ERule& r, merge_fn_t user_merge);
+        virtual merge_fn_t wrap( wpds::ewpds::ERule const & r, merge_fn_t user_merge);
 
         virtual sem_elem_t unwrap( sem_elem_t se );
 

@@ -13,19 +13,19 @@ namespace wali
   namespace wpds
   {
     // default does nothing
-    sem_elem_t Wrapper::wrap( wfa::ITrans& t )
+    sem_elem_t Wrapper::wrap( wfa::ITrans const & t )
     {
       return t.weight();
     }
 
     // default does nothing
-    sem_elem_t Wrapper::wrap( wpds::Rule& r )
+    sem_elem_t Wrapper::wrap( wpds::Rule const & r )
     {
       return r.weight();
     }
 
     // default does nothing
-    merge_fn_t Wrapper::wrap( wpds::ewpds::ERule& r ATTR_UNUSED, merge_fn_t user_merge )
+    merge_fn_t Wrapper::wrap( wpds::ewpds::ERule const & r ATTR_UNUSED, merge_fn_t user_merge )
     {
       (void) r;
       return user_merge;

@@ -1350,7 +1350,7 @@ namespace wali
        * @return the WFA resulting from performing the prestar reachability query 
        *
        */
-      virtual wfa::WFA prestar( wfa::WFA & input, WeightGen const & wg ) const;
+      virtual wfa::WFA prestar( wfa::WFA const & input, WeightGen const & wg ) const;
 
       /**
        *
@@ -1366,7 +1366,7 @@ namespace wali
        * @param - wg: the functions to use in generating weights
        *
        */
-      virtual void prestar( wfa::WFA & input, wfa::WFA & output, WeightGen const & wg ) const;
+      virtual void prestar( wfa::WFA const & input, wfa::WFA & output, WeightGen const & wg ) const;
 
       /**
        *
@@ -1379,7 +1379,7 @@ namespace wali
        * @return the WFA resulting from performing the poststar reachability query
        *
        */
-      virtual wfa::WFA poststar( wfa::WFA & input, WeightGen const & wg ) const;
+      virtual wfa::WFA poststar( wfa::WFA const & input, WeightGen const & wg ) const;
 
       /**
        *
@@ -1395,7 +1395,7 @@ namespace wali
        * @param - wg: the functions to use in generating weights
        *
        */
-      virtual void poststar( wfa::WFA & input, wfa::WFA & output, WeightGen const & wg ) const;
+      virtual void poststar( wfa::WFA const & input, wfa::WFA & output, WeightGen const & wg ) const;
 
       //Utilities	
 

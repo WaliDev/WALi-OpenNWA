@@ -44,7 +44,7 @@ namespace wali
     /**
      * @class WPDS
      */
-    class WPDS : public Printable, public wfa::TransFunctor
+    class WPDS : public Printable, public wfa::ConstTransFunctor
     {
 
       public:
@@ -177,7 +177,7 @@ namespace wali
          *
          * @see wfa::WFA
          */
-        virtual wfa::WFA prestar( wfa::WFA & input );
+        virtual wfa::WFA prestar( wfa::WFA const & input );
 
         /**
          * @brief Perform prestar reachability query
@@ -191,7 +191,7 @@ namespace wali
          *
          * @see wfa::WFA
          */
-        virtual void prestar( wfa::WFA & input, wfa::WFA & output );
+        virtual void prestar( wfa::WFA const & input, wfa::WFA & output );
 
         /**
          * @brief Perform poststar reachability query
@@ -200,7 +200,7 @@ namespace wali
          *
          * @see wfa::WFA
          */
-        virtual wfa::WFA poststar( wfa::WFA & input );
+        virtual wfa::WFA poststar( wfa::WFA const & input );
 
         /**
          * @brief Perform poststar reachability query.
@@ -214,7 +214,7 @@ namespace wali
          *
          * @see wfa::WFA
          */
-        virtual void poststar( wfa::WFA & input, wfa::WFA & output );
+        virtual void poststar( wfa::WFA const & input, wfa::WFA & output );
 
         /**
          * This method writes the WPDS to the passed in 
@@ -265,7 +265,7 @@ namespace wali
         /**
          * Implementation of TransFunctor
          */
-        virtual void operator()( wfa::ITrans* t );
+        virtual void operator()( wfa::ITrans const * t );
 
         bool is_pds_state(wali::Key k) const;
         int num_pds_states() const { return (int) pds_states.size(); }
@@ -323,7 +323,7 @@ namespace wali
         /**
          * @brief copy relevant material from input WFA to output WFA
          */
-        virtual void setupOutput( wfa::WFA& input, wfa::WFA& fa );
+        virtual void setupOutput( wfa::WFA const & input, wfa::WFA& fa );
 
         /**
          * @brief For each t \in fa, t->setConfig(0)
@@ -333,7 +333,7 @@ namespace wali
         /**
          * @brief Gets WPDS ready for fixpoint
          */
-        virtual void prestarSetupFixpoint( wfa::WFA& input, wfa::WFA& fa );
+        virtual void prestarSetupFixpoint( wfa::WFA const & input, wfa::WFA& fa );
 
         /**
          * @brief Performs the fixpoint computation
@@ -367,7 +367,7 @@ namespace wali
         /**
          * @brief Gets WPDS ready for fixpoint
          */
-        virtual void poststarSetupFixpoint( wfa::WFA& input, wfa::WFA& fa );
+        virtual void poststarSetupFixpoint( wfa::WFA const & input, wfa::WFA& fa );
 
         /**
          * @brief Performs the fixpoint computation

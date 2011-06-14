@@ -15,12 +15,12 @@ namespace wali
 {
   namespace witness
   {
-    sem_elem_t WitnessWrapper::wrap( wfa::ITrans& t )
+    sem_elem_t WitnessWrapper::wrap( wfa::ITrans const & t )
     {
       return new WitnessTrans(t);
     }
 
-    sem_elem_t WitnessWrapper::wrap( wpds::Rule& r )
+    sem_elem_t WitnessWrapper::wrap( wpds::Rule const & r )
     {
       return new WitnessRule(r);
     }
@@ -29,7 +29,7 @@ namespace wali
     //   The weight r->weight() is already a wrapped
     //   witness, so no need to rewrap it here.
     merge_fn_t WitnessWrapper::wrap( 
-        wpds::ewpds::ERule& r, 
+        wpds::ewpds::ERule const & r, 
         merge_fn_t user_merge )
     {
       sem_elem_t se = r.weight();

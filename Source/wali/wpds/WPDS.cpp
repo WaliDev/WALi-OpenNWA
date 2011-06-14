@@ -56,7 +56,7 @@ namespace wali
 
     WPDS::WPDS( const WPDS& w ) :
       wali::Printable(),
-      wali::wfa::TransFunctor(),
+      wali::wfa::ConstTransFunctor(),
       wrapper(w.wrapper),
       worklist( new DefaultWorklist<wfa::ITrans>() ),
       currentOutputWFA(0)
@@ -178,14 +178,14 @@ namespace wali
       return rb;
     }
 
-    WFA WPDS::prestar( WFA & input )
+    WFA WPDS::prestar( WFA const & input )
     {
       WFA output;
       prestar(input,output);
       return output;
     }
 
-    void WPDS::prestar( WFA & input, WFA & fa )
+    void WPDS::prestar( WFA const & input, WFA & fa )
     {
       prestarSetupFixpoint(input,fa);
       prestarComputeFixpoint( fa );
@@ -193,7 +193,7 @@ namespace wali
       currentOutputWFA = 0;
     }
 
-    void WPDS::setupOutput( ::wali::wfa::WFA& input, ::wali::wfa::WFA& fa )
+    void WPDS::setupOutput( ::wali::wfa::WFA const & input, ::wali::wfa::WFA& fa )
     {
       currentOutputWFA = &fa;
       Key init = input.getInitialState();
@@ -241,7 +241,7 @@ namespace wali
       fa.for_each(unlinker);
     }
 
-    void WPDS::prestarSetupFixpoint( WFA& input, WFA& fa )
+    void WPDS::prestarSetupFixpoint( WFA const & input, WFA& fa )
     {
       setupOutput(input,fa);
       fa.setQuery(WFA::INORDER);
@@ -418,14 +418,14 @@ namespace wali
       }
     }
 
-    WFA WPDS::poststar( WFA & input )
+    WFA WPDS::poststar( WFA const & input )
     {
       WFA output;
       poststar(input,output);
       return output;
     }
 
-    void WPDS::poststar( WFA & input, WFA & fa )
+    void WPDS::poststar( WFA const & input, WFA & fa )
     {
       poststarSetupFixpoint(input,fa);
       poststarComputeFixpoint(fa);
@@ -433,7 +433,7 @@ namespace wali
       currentOutputWFA = 0;
     }
 
-    void WPDS::poststarSetupFixpoint( WFA& input, WFA& fa )
+    void WPDS::poststarSetupFixpoint( WFA const & input, WFA& fa )
     {
       setupOutput(input,fa);
       fa.setQuery(WFA::REVERSE);
@@ -992,7 +992,7 @@ namespace wali
     // to the output. 
     // This sets up the links for running saturation.
     /////////////////////////////////////////////////////////////////
-    void WPDS::operator()( wfa::ITrans* orig )
+    void WPDS::operator()( wfa::ITrans const * orig )
     {
       if( wali::is_strict() && is_pds_state(orig->to())) {
         *waliErr << "[ERROR] WALi cannot have incoming transition to a PDS state\n";
