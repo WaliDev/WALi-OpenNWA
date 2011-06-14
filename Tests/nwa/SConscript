@@ -23,6 +23,7 @@ test_files = Split("""
     fixtures.cpp
     class-NWA/supporting.cpp
     class-NWA/construction-assignment.cpp
+    class-NWA/get-size-is-add-remove-clear.cpp
     """)
 
 built = env.Program('nwa-test', test_files)
