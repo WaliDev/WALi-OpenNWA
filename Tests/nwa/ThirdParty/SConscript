@@ -7,6 +7,7 @@ Import('MkStatic')
 Import('Platform')
 Import('Is64')
 Import('BuildDir')
+Import('ProgEnv')
 
 if Debug:
     print '\n+++ Entered "#/Test/nwa/ThirdParty/SConscript"\n'
@@ -16,13 +17,12 @@ GtestDir = 'gtest-1.6.0'
 
 # download binary distribution archive
 archive = 'gtest-1.6.0.zip'
-env = Environment(
+env = ProgEnv.Clone(
     archive  = File(archive),
     mirror   = 'http://googletest.googlecode.com/files',
     url      = '$mirror/%s' % archive,
     builddir = BuildDir
     )
-env['ENV']['PATH']=os.environ['PATH']
 
 if not File(archive,ThirdParty).exists():
     print
