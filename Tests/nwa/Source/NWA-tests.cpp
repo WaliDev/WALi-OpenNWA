@@ -42,6 +42,19 @@ namespace wali
 
         // TODO: write tests
         
-        
+     
+
+	// duplicateState(orig, dup)
+	//  - orig must be a member of the nwa or it asserts
+	//  - a duplicate of an initial state becomes an initial state
+	//  - a duplicate of a final state becomes a final state
+	//  - the duplicate is added to the NWA regardless
+	//  - 
+	
+	//  - figure out what we want to test about duplicate states
+	//    that are already present. (Really I mean figure out what
+	//    the function should do.) Current behavior I think:
+	//      - If it was initial/final, remains initial/final
+	//      - Transitions are added
     }
 }
