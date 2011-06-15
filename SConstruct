@@ -52,6 +52,7 @@ else:
     BinInstallDir  = os.path.join(WaliDir,'bin')
     BuildDir       = os.path.join(WaliDir,'_build')
 
+BaseEnv['CMAKE'] = os.environ.get('CMAKE', 'cmake')
 
 if 'gcc' == BaseEnv['CC']:
     # -Waddress -Wlogical-op
