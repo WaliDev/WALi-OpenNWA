@@ -49,7 +49,7 @@ namespace wali {
           min->clearFinalStates();
         }
 
-        finalnwa->combineWith(min);
+        finalnwa->combineWith(*min);
       }
 
 
