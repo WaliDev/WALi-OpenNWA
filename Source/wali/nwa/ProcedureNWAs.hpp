@@ -6,10 +6,45 @@
 #include <map>
 #include <string>
 
+#include <boost/function.hpp>
+
 namespace wali {
   namespace nwa {
+    ///
     /// Maps name of procedure to the procedure NWA
     typedef std::map<std::string, NWARefPtr> ProcedureMap;
+
+    
+    struct CallReturnTransitionInserter {
+      const Symbol call_symbol;
+      const Symbol return_symbol;
+
+      CallReturnTransitionInserter(Symbol _call_symbol,
+                                   Symbol _return_symbol)
+        : call_symbol(_call_symbol)
+        , return_symbol(_return_symbol)
+      {}
+
+      void operator() (NWA & nwa, State source, State target) {
+        nwa.addCallTrans(source, call_symbol, target);
+      }
+
+      void operator() (NWA & nwa, State source, State pred, State target) {
+        nwa.addReturnTrans(source, pred, return_symbol, target);
+      }
+    };
+    
+
+    struct EpsilonTransitionInserter {
+      void operator() (NWA & nwa, State source, State target) {
+        nwa.addInternalTrans(source, WALI_EPSILON, target);
+      }
+
+      void operator() (NWA & nwa, State source, State pred, State target) {
+        (void) pred;
+        nwa.addInternalTrans(source, WALI_EPSILON, target);
+      }
+    };
 
     /// Assembles all NWAs in 'procedures' into one large
     /// NWA. Replaces any transition labeled with a symbol
@@ -24,7 +59,9 @@ namespace wali {
     /// start state, and the accepting state of 'main' is the full
     /// NWA's accepting state.
     NWARefPtr
-    assemble_nwa(ProcedureMap const & procedures, Key call_key, Key return_key);
+    assemble_nwa(ProcedureMap const & procedures,
+                 boost::function<void (NWA &, State, State)> call_inserter,
+                 boost::function<void (NWA &, State, State, State)> return_inserter);
 
   }
 }

@@ -23,7 +23,9 @@ namespace wali {
 
         
     NWARefPtr
-    assemble_nwa(ProcedureMap const & procedures, Key call_key, Key return_key)
+    assemble_nwa(ProcedureMap const & procedures,
+                 boost::function<void (NWA &, State, State)> call_inserter,
+                 boost::function<void (NWA &, State, State, State)> return_inserter)
     {
       NWARefPtr finalnwa = new NWA();
 
@@ -118,14 +120,18 @@ namespace wali {
         for (std::set<State>::const_iterator entry = entries.begin();
              entry != entries.end(); ++entry)
         {
-          finalnwa->addCallTrans(call_site, call_key, *entry);
+          call_inserter(*finalnwa, call_site, *entry);
+          //finalnwa->addCallTrans(call_site, call_key, *entry);
+          //finalnwa->addInternalTrans(call_site, WALI_EPSILON, *entry);
         }
 
         // Now add the return transition(s)
         for (std::set<State>::const_iterator exit = exits.begin();
              exit != exits.end(); ++exit)
         {
-          finalnwa->addReturnTrans(*exit, call_site, return_key, return_site);
+          return_inserter(*finalnwa, *exit, call_site, return_site);
+          //finalnwa->addReturnTrans(*exit, call_site, return_key, return_site);
+          //finalnwa->addInternalTrans(*exit, WALI_EPSILON, return_site);
         }
       }
 
