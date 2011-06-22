@@ -419,7 +419,7 @@ namespace wali {
 
         wfa::State const * state = ca_in.getState(*set_it);
 
-        wfa::State::iterator tli = state->begin();;
+        wfa::State::const_iterator tli = state->begin();;
 
         for( ; tli != state->end(); tli++) {
 
