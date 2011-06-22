@@ -122,6 +122,16 @@ namespace wali
           return transSet.end();
         }
 
+        const_iterator begin() const
+        {
+          return transSet.begin();
+        }
+
+        const_iterator end() const
+        {
+          return transSet.end();
+        }
+
         bool eraseTrans(
             Key from,
             Key stack,

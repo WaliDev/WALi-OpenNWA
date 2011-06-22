@@ -39,6 +39,7 @@ namespace wali
         }
 
         virtual ITrans* copy() const = 0;
+        virtual ITrans* copy(Key fromst, Key stk, Key tost) const = 0;
 
         //
         // getters (const)

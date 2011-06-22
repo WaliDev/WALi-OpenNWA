@@ -88,7 +88,7 @@ namespace wali {
                 void getUpdatedTransitions(std::list<WTransition> &ls);
                 void preGetUpdatedTransitions(std::list<WTransition> &ls);
                 void getMiddleTransitions(std::list<WTransition> &ls);
-                void summaryPoststar(wali::wfa::WFA& ca_in, wali::wfa::WFA& ca_out);
+                void summaryPoststar(wali::wfa::WFA const & ca_in, wali::wfa::WFA& ca_out);
 
                 sem_elem_t pushWeight(Key k);
                 sem_elem_t popWeight(Key k);

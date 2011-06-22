@@ -63,8 +63,15 @@ namespace wali
         SWPDS(ref_ptr<Wrapper> wrapper);
         virtual ~SWPDS();
 
-        virtual void prestar( wfa::WFA &input, wfa::WFA &output);
-        virtual void poststar( wfa::WFA &input, wfa::WFA &output);
+        virtual void prestar( wfa::WFA const & input, wfa::WFA &output);
+        virtual wfa::WFA prestar( wfa::WFA const & input) {
+          return this->EWPDS::prestar(input);
+        }
+
+        virtual void poststar( wfa::WFA const & input, wfa::WFA &output);
+        virtual wfa::WFA poststar( wfa::WFA const & input) {
+          return this->EWPDS::poststar(input);
+        }
 
         void nonSummaryPrestar( wfa::WFA &input, wfa::WFA &output);
         void nonSummaryPoststar( wfa::WFA &input, wfa::WFA &output);
@@ -81,6 +88,18 @@ namespace wali
             Key stk2,
 	    bool replace_weight,
             rule_t& r );
+
+        ////////////////////////
+        // Forwarding function to allow compilation with
+        // -Woverloaded-virtual. See a couple comments in EWPDS.hpp for more.
+        virtual bool make_rule(
+            Config *f,
+            Config *t,
+            Key stk2,
+
+            rule_t& r ) {
+          return this->FWPDS::make_rule(f, t, stk2, r);
+        }
 
       private:
         WpdsStackSymbols syms;

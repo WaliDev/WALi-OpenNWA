@@ -152,7 +152,7 @@ std::ostream& graphPrintKey( int k, std::ostream& o ) {
   return wali::printKey(o,(Key)k);
 }
 
-void FWPDS::prestar( wfa::WFA& input, wfa::WFA& output )
+void FWPDS::prestar( wfa::WFA const & input, wfa::WFA& output )
 {
   // setup output
   addEtrans = true;
@@ -297,7 +297,7 @@ void FWPDS::prestar_handle_trans(
 }
 
 
-bool FWPDS::checkResults( wfa::WFA& input, bool do_poststar )
+bool FWPDS::checkResults( wfa::WFA const & input, bool do_poststar )
 {
   if( wali::get_verify_fwpds() ) 
   {
@@ -336,7 +336,7 @@ bool FWPDS::checkResults( wfa::WFA& input, bool do_poststar )
   return true;
 }
 
-void FWPDS::poststar( wfa::WFA& input, wfa::WFA& output ) {
+void FWPDS::poststar( wfa::WFA const & input, wfa::WFA& output ) {
   poststarIGR(input, output);
   
   //{
@@ -348,7 +348,7 @@ void FWPDS::poststar( wfa::WFA& input, wfa::WFA& output ) {
   interGr = NULL;
 }
 
-void FWPDS::poststarIGR( wfa::WFA& input, wfa::WFA& output )
+void FWPDS::poststarIGR( wfa::WFA const & input, wfa::WFA& output )
 {
 
   EWPDS::poststarSetupFixpoint(input,output);
@@ -563,7 +563,7 @@ wfa::ITrans* FWPDS::update_prime(
   return t;
 }
 
-void FWPDS::operator()( wfa::ITrans* orig ) {
+void FWPDS::operator()( wfa::ITrans const * orig ) {
   if(checkingPhase) {
     return EWPDS::operator()(orig);
   }

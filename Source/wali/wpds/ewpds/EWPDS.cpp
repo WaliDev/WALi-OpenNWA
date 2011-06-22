@@ -409,7 +409,7 @@ namespace wali
       }
 
 
-      void EWPDS::prestar( WFA & input, WFA& fa )
+      void EWPDS::prestar( WFA const & input, WFA& fa )
       {
 
         // Add ETrans when Rule0 transitions are added
@@ -520,7 +520,7 @@ namespace wali
       // Protected Methods
       /////////////////////////////////////////////////////////////////
 
-      void EWPDS::operator()( wfa::ITrans * orig )
+      void EWPDS::operator()( wfa::ITrans const * orig )
       {
         if( is_strict() && is_pds_state(orig->to())) {
           *waliErr << "WALi Error: cannot have incoming transition to a PDS state\n";

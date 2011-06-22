@@ -155,7 +155,7 @@ namespace wali
         return sgr->multiple_proc(k);
       }
 
-      void SWPDS::poststar(wfa::WFA &ca_in, wfa::WFA &ca_out) {
+      void SWPDS::poststar(wfa::WFA const & ca_in, wfa::WFA &ca_out) {
 
         if(!preprocessed) {
           *waliErr << "SWPDS: Error: Must preprocess before running query\n";
@@ -188,7 +188,7 @@ namespace wali
 
       //TODO: Can probably implement this like poststar, where SummaryGraph
       //creates regexp for performing saturation. But this is OK for now.
-      void SWPDS::prestar(wfa::WFA &ca_in, wfa::WFA &ca_out) {
+      void SWPDS::prestar(wfa::WFA const & ca_in, wfa::WFA &ca_out) {
         if(!preprocessed) {
           *waliErr << "SWPDS: Error: Must preprocess before running query\n";
           assert(0);

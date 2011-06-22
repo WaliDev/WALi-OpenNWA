@@ -388,7 +388,7 @@ namespace wali {
     // is used. The intuition is that not all incoming transitions to a state
     // have their weight change in the pop phase. So use their weights once, and
     // after that do APSP style computation of weights on the eps transtions.
-    void SummaryGraph::summaryPoststar(wali::wfa::WFA& ca_in, wali::wfa::WFA& ca_out) {
+    void SummaryGraph::summaryPoststar(wali::wfa::WFA const & ca_in, wali::wfa::WFA& ca_out) {
       int i;
       RegExp::startSatProcess(post_igr->sem);
       RegExp::extendDirectionBackwards(false);
@@ -417,7 +417,7 @@ namespace wali {
       // and a graph representing the WFA (will use for SCC decomposition)
       for(set_it = states.begin(); set_it != states.end(); set_it++) {
 
-        wfa::State* state = ca_in.getState(*set_it);
+        wfa::State const * state = ca_in.getState(*set_it);
 
         wfa::State::iterator tli = state->begin();;
 
@@ -613,8 +613,8 @@ namespace wali {
         nodes[nno].weight = weight;
 
         // Go through all outgoing transition of q and do eps-contraction
-        State* state = ca_in.getState(q);
-        State::iterator tli = state->begin();
+        State const * state = ca_in.getState(q);
+        State::const_iterator tli = state->begin();
 
         for( ; tli != state->end(); tli++) {
 

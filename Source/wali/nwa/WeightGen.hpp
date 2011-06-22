@@ -143,20 +143,24 @@ namespace wali
         static const Reach r(true);
         return r.one();
       }
-
-      sem_elem_t getWeight( const State & src, const Symbol & inst, Kind k, const State & tgt ) const
+      
+      virtual sem_elem_t getWeight( Key src, ClientInfoRefPtr srcInfo, Key sym, Kind kind, Key tgt, ClientInfoRefPtr tgtInfo ) const
       {
         (void) src;
-        (void) inst;
-        (void) k;
+        (void) sym;
         (void) tgt;
+        (void) kind;
+        (void) srcInfo;
+        (void) tgtInfo;
         return getOne();
       }
-           
-      sem_elem_t getWildWeight( const State & src, const State & tgt ) const
+
+      virtual sem_elem_t getWildWeight( Key src, ClientInfoRefPtr srcInfo, Key tgt, ClientInfoRefPtr tgtInfo ) const
       {
         (void) src;
         (void) tgt;
+        (void) srcInfo;
+        (void) tgtInfo;
         return getOne();
       }
     };

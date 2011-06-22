@@ -49,9 +49,7 @@ namespace wali
           typedef HashMap< KeyTriple, rule_t > merge_rule_hash_t;
 
         public:
-          using WPDS::poststar;
-          using WPDS::prestar;
-          using WPDS::replace_rule;
+          //using WPDS::replace_rule;
           friend class TransCopyPairLinker;
 
         public:
@@ -166,7 +164,11 @@ namespace wali
            *
            * @see WFA
            */
-          virtual void prestar( WFA & input, WFA& output );
+          virtual void prestar( WFA const & input, WFA& output );
+
+          virtual wfa::WFA prestar( wfa::WFA const & input ) {
+            return this->WPDS::prestar(input);
+          }
 
           /**
            * This method writes the EWPDS to the passed in 
@@ -189,12 +191,41 @@ namespace wali
           virtual std::ostream & marshall( std::ostream & o ) const;
 
           /**
-           * Override WPDS::operator()(ITrans*) for linking b/c
+           * Override WPDS::operator()(ITrans const *) for linking b/c
            * EWPDS uses paired weights
            */
-          virtual void operator()( wfa::ITrans* t );
+          virtual void operator()( wfa::ITrans const * t );
 
           rule_t lookup_rule(wali::Key to_state, wali::Key to_stack1, wali::Key to_stack2) const;
+
+        
+          ///////////////////////////
+          // These next two functions just forward to the base class. They are
+          // here so we can compile under GCC with -Woverloaded-virtual. (See
+          // another comment below for more discussion about a similar issue
+          // with a couple add_rule functions.)
+          virtual bool replace_rule(
+            Key from_state,
+            Key from_stack,
+            Key to_state,
+            sem_elem_t se )
+          {
+            return this->WPDS::replace_rule(from_state, from_stack,
+                                            to_state, se);
+          }
+
+          virtual bool replace_rule(
+            Key from_state,
+            Key from_stack,
+            Key to_state,
+            Key to_stack1,
+            sem_elem_t se )
+          {
+            return this->WPDS::replace_rule(from_state, from_stack,
+                                            to_state, to_stack1, se);
+          }
+        
+        
 
         protected:
 
@@ -212,6 +243,7 @@ namespace wali
               merge_fn_t mf,
 	      bool replace_weight);
 
+          
           /**
            * @brief helper method for prestar
            */
@@ -265,6 +297,46 @@ namespace wali
               sem_elem_t wWithRule //<! delta \extends r->weight()
               );
 
+
+        ///////////////////////////
+        // These next two functions just forward to the base class. They are
+        // here so we can compile under GCC with -Woverloaded-virtual. (An
+        // alternate solution -- that used to be employed -- is the use of a
+        // 'using' declaration to bring these into scope. However, this can
+        // hide problems if a set of functions are brought into scope with
+        // 'using' and then it is overloaded, when what was intended was only
+        // some of the originals should be brought into scope and then a new
+        // function is an override of one of the others. This means that the
+        // critical bugs that -Woverloaded-virtual are intended to find won't
+        // trigger a warning.
+        virtual bool add_rule(
+            Key from_state,
+            Key from_stack,
+            Key to_state,
+            Key to_stack1,
+            Key to_stack2,
+            sem_elem_t se,
+	    bool replace_weight,
+            rule_t& r )
+        {
+          return this->WPDS::add_rule(from_state, from_stack, to_state, to_stack1, to_stack2,
+                                      se, replace_weight, r);
+        }
+
+        virtual bool add_rule(
+            Key from_state,
+            Key from_stack,
+            Key to_state,
+            Key to_stack1,
+            Key to_stack2,
+            sem_elem_t se,
+            rule_t& r )
+        {
+          return this->WPDS::add_rule(from_state, from_stack, to_state,
+                                      to_stack1, to_stack2, se, r);
+        }
+
+          
         private:
           merge_rule_hash_t merge_rule_hash; // FIXME: verify correct usage of HashMap
         protected:

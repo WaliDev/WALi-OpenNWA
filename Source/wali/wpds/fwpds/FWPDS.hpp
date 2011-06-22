@@ -59,14 +59,23 @@ namespace wali {
           ///////////
           // pre*
           ///////////
-          virtual void prestar( wfa::WFA & input, wfa::WFA & output );
+          virtual void prestar( wfa::WFA const & input, wfa::WFA & output );
+
+          virtual wfa::WFA prestar( wfa::WFA const & input) {
+              return this->EWPDS::prestar(input);
+          }
 
 
           ///////////
           // post*
           ///////////
-          virtual void poststar( wfa::WFA & input, wfa::WFA & output );
-          void poststarIGR( wfa::WFA & input, wfa::WFA & output );
+          virtual void poststar( wfa::WFA const & input, wfa::WFA & output );
+
+          virtual wfa::WFA poststar( wfa::WFA const & input) {
+              return this->EWPDS::poststar(input);
+          }
+
+          void poststarIGR( wfa::WFA const & input, wfa::WFA & output );
 
           ///////////////////////
           // FWPDS Settings
@@ -122,12 +131,12 @@ namespace wali {
               sem_elem_t wWithRule //<! delta \extends r->weight()
               );
 
-          void operator()( wfa::ITrans * orig );
+          void operator()( wfa::ITrans const * orig );
 
           ///////////
           // helpers
           ///////////
-          bool checkResults( wfa::WFA& input, bool poststar );
+          bool checkResults( wfa::WFA const & input, bool poststar );
 
         protected:
           sem_elem_t wghtOne;
