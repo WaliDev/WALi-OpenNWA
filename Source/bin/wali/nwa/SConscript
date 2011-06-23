@@ -4,21 +4,21 @@ Import('BinInstallDir')
 env = ProgEnv.Clone()
 
 
-def _ProgramTarget(env, command, function, source):
+def _ProgramTarget(env, command, function, namespace, source):
     if function == None:
         function = command
     assert 'CPPDEFINES' not in env
     obj = env.Object('nwa-%s' % command, source,
                      CPPDEFINES={'CONSTRUCTION_FUNCTION': function,
-                                 'CONSTRUCTION_NAMESPACE' : 'construct'})
+                                 'CONSTRUCTION_NAMESPACE' : namespace})
     prg = env.Program('nwa-%s.exe' % command, obj)
     return prg
 
-def SingleProgramTarget(env, command, function=None):
-    return _ProgramTarget(env, command, function, 'single-nwa-command.cpp')
+def SingleProgramTarget(env, command, function=None, namespace='construct'):
+    return _ProgramTarget(env, command, function, namespace, 'single-nwa-command.cpp')
 
-def DoubleProgramTarget(env, command, function=None):
-    return _ProgramTarget(env, command, function, 'double-nwa-command.cpp')
+def DoubleProgramTarget(env, command, function=None, namespace='construct'):
+    return _ProgramTarget(env, command, function, namespace, 'double-nwa-command.cpp')
 
 
 built = [
