@@ -2,12 +2,15 @@
 #define WALI_NWA_TRAVERSE_DEPTH_HPP
 
 #include "wali/nwa/traverse/StateFunctor.hpp"
+#include "wali/nwa/traverse/TransitionFunctor.hpp"
 
 namespace wali {
   namespace nwa {
     namespace traverse {
 
-      void dfsCallStringTraversal(NWA const & nwa, ConstCallStringStateFunctor & functor);
+      void dfsCallStringTraversal(NWA const & nwa,
+                                  ConstCallStringStateFunctor * functor,
+                                  ConstCallStringTransitionFunctor * functor);
         
     }
   }

@@ -10,36 +10,47 @@ namespace wali {
     namespace traverse {
       namespace details {
         typedef ConstCallStringStateFunctor::CallString CallString;
+        typedef std::set<std::pair<Symbol,State> > SymbolStatePairSet;
 
-        StateSet extractTargets(std::set<std::pair<Symbol,State> > pairs)
-        {
-          typedef std::set<std::pair<Symbol,State> >::const_iterator Iterator;
-          StateSet targets;
 
-          for (Iterator iter = pairs.begin(); iter != pairs.end(); ++iter) {
-            targets.insert(iter->second);
-          }
+        void
+        handle_internals(NWA const & nwa, CallString const & cs, State state,
+                         StateSet & visited, ConstCallStringStateFunctor * state_functor,
+                         ConstCallStringTransitionFunctor * trans_functor,
+                         StateSet & return_sites);
+        void
+        handle_calls(NWA const & nwa, CallString const & cs, State state,
+                     StateSet & visited, ConstCallStringStateFunctor * state_functor,
+                     ConstCallStringTransitionFunctor * trans_functor,
+                     StateSet & return_sites);
 
-          return targets;
-        }
-        
+        void
+        handle_returns(NWA const & nwa, CallString const & cs, State state,
+                       ConstCallStringTransitionFunctor * trans_functor,
+                       StateSet & return_sites);
+
         
         /// Performs a depth-first traversal of the transition graph of
         /// 'nwa', starting from 'state'. Returns the set of return nodes
         /// from the current "procedure".
         ///
-        /// It calls 'functor' with the given state and call string. When it
-        /// reaches a call transition, for the next recursive call it pushes
-        /// 'state' onto the call string. When it reaches a return
+        /// When it reaches a call transition, for the next recursive call it
+        /// pushes 'state' onto the call string. When it reaches a return
         /// transition, it compares the call predecessor on that transition
         /// to the actual call site on the top of the call string. If it
         /// matches, then the return site of that transition is added to the
         /// return set. If it does not match, it is discarded.
-        StateSet dfsCallStringTraversalHelper(NWA const & nwa,
-                                              CallString const & cs,
-                                              State state,
-                                              StateSet & visited_in_this_procedure,
-                                              ConstCallStringStateFunctor & functor)
+        ///
+        /// If 'state_functor' is non-null, calls it for each new state. If
+        /// 'trans_functor' is set, calls it for each transition in the
+        /// expanded nw.
+        StateSet
+        dfsCallStringTraversalHelper(NWA const & nwa,
+                                     CallString const & cs,
+                                     State state,
+                                     StateSet & visited_in_this_procedure,
+                                     ConstCallStringStateFunctor * state_functor,
+                                     ConstCallStringTransitionFunctor * trans_functor)
         {
           // These are the return sites that we have found are reachable
           StateSet return_sites;
@@ -50,41 +61,82 @@ namespace wali {
           }
 
           
-          // Call the functor
-          functor(nwa, cs, state);
+          // Call the state functor
+          if (state_functor) {
+            (*state_functor)(nwa, cs, state);
+          }
 
-          // Used for all three transitions
-          StateSet targets;
+          // Call helper functions to do the actual traversal
+          handle_internals(nwa, cs, state, visited_in_this_procedure,
+                           state_functor, trans_functor, return_sites);
+          handle_calls(nwa, cs, state, visited_in_this_procedure,
+                       state_functor, trans_functor, return_sites);
+          handle_returns(nwa, cs, state, trans_functor, return_sites);
 
-          ///////////////
-          // Internal transitions.
-          targets = extractTargets(query::getTargets(nwa, state));
-          for (StateSet::const_iterator iter = targets.begin();
+          return return_sites;        
+        }
+
+
+        ///////////////
+        // Internal transitions.
+        void
+        handle_internals(NWA const & nwa, CallString const & cs, State state,
+                         StateSet & visited, ConstCallStringStateFunctor * state_functor,
+                         ConstCallStringTransitionFunctor * trans_functor,
+                         StateSet & return_sites)
+        {
+          SymbolStatePairSet targets = query::getTargets(nwa, state);
+          
+          for (SymbolStatePairSet::const_iterator iter = targets.begin();
                iter != targets.end(); ++iter)
           {
-            State target = *iter;
+            Symbol symbol = iter->first;
+            State target = iter->second;
+
+            // If the user requested a trans_functor, call it
+            if (trans_functor) {
+              trans_functor->doInternal(nwa, cs, state, symbol, target);
+            }
             
             // For the recursive call, 'nwa' and 'functor' obviously
             // unchanged. 'cs' is unchanged because this is an internal
             // transition. 'visited_in_this_procedure' is the same object
             // because it's an internal transition.
             StateSet new_returns = dfsCallStringTraversalHelper(nwa, cs, target,
-                                                                visited_in_this_procedure,
-                                                                functor);
+                                                                visited,
+                                                                state_functor,
+                                                                trans_functor);
 
             // If we found any return sites reachable from 'target', they
             // are reachable from 'state' as well.
             return_sites.insert(new_returns.begin(), new_returns.end());
           }
+        }
 
-          ///////////////
-          // Call transitions
-          targets = extractTargets(query::getEntries(nwa, state));
-          for (StateSet::const_iterator iter = targets.begin();
+        
+        ///////////////
+        // Call transitions
+        void
+        handle_calls(NWA const & nwa, CallString const & cs, State state,
+                     StateSet & visited_in_this_procedure,
+                     ConstCallStringStateFunctor * state_functor,
+                     ConstCallStringTransitionFunctor * trans_functor,
+                     StateSet & return_sites)
+        {
+          SymbolStatePairSet targets = query::getEntries(nwa, state);
+          
+          for (SymbolStatePairSet::const_iterator iter = targets.begin();
                iter != targets.end(); ++iter)
           {
-            State target = *iter;
+            Symbol symbol = iter->first;
+            State target = iter->second;
 
+            // If the user gave us a trans_functor, call it
+            if (trans_functor) {
+              trans_functor->doCall(nwa, cs, state, symbol, target);
+            }            
+
+            
             // Now we set up stuff for the recursive call. First, we need a
             // new set since we're starting a new procedure.
             StateSet visited_in_the_next_procedure;
@@ -96,7 +148,8 @@ namespace wali {
             // Now we can make the recursive call.
             StateSet return_succs = dfsCallStringTraversalHelper(nwa, new_cs, target,
                                                                  visited_in_the_next_procedure,
-                                                                 functor);
+                                                                 state_functor,
+                                                                 trans_functor);
 
 
             // But we're not done. What that recursive call returns is the
@@ -114,30 +167,52 @@ namespace wali {
             {
               StateSet new_returns = dfsCallStringTraversalHelper(nwa, cs, *return_iter,
                                                                   visited_in_this_procedure,
-                                                                  functor);
+                                                                  state_functor,
+                                                                  trans_functor);
 
               // If we found any return sites reachable from 'target', they
               // are reachable from 'state' as well.
               return_sites.insert(new_returns.begin(), new_returns.end());
             }
-
-          }
-
-          /////////////////
-          // Return transitions
-          targets = extractTargets(query::getReturns(nwa, state, cs.back()));
-
-          // Return transitions don't mark anything we need to traverse
-          // now. We will traverse those when we return back to the calling
-          // function. But we do need to tell it that it's reachable.
-          return_sites.insert(targets.begin(), targets.end());
-
-          return return_sites;        
+          } // for each transition (sym/tgt pair)
         }
-        
+
+
+        /////////////////
+        // Return transitions
+        void
+        handle_returns(NWA const & nwa, CallString const & cs, State state,
+                       ConstCallStringTransitionFunctor * trans_functor,
+                       StateSet & return_sites)
+        {
+          State call_pred = cs.back();
+          
+          SymbolStatePairSet targets = query::getReturns(nwa, state, call_pred);
+
+          for (SymbolStatePairSet::const_iterator iter = targets.begin();
+               iter != targets.end(); ++iter)
+          {
+            State symbol = iter->first;
+            State target = iter->second;
+
+            // If the user gave us a trans_functor, use it
+            if (trans_functor) {
+              trans_functor->doReturn(nwa, cs, state, call_pred, symbol, target);
+            }
+
+            // Return transitions don't mark anything we need to traverse
+            // now. We will traverse those when we return back to the calling
+            // function. But we do need to tell it that it's reachable.
+            return_sites.insert(target);
+          }
+        }
+
       } // namespace details
 
-      void dfsCallStringTraversal(NWA const & nwa, ConstCallStringStateFunctor & functor)
+        
+      void dfsCallStringTraversal(NWA const & nwa,
+                                  ConstCallStringStateFunctor * state_functor,
+                                  ConstCallStringTransitionFunctor * trans_functor)
       {
         details::CallString cs;
         cs.push_back(getKey("<below main>"));
@@ -146,7 +221,8 @@ namespace wali {
         for (NWA::StateIterator initial = nwa.beginInitialStates();
              initial != nwa.endInitialStates(); ++initial)
         {
-          details::dfsCallStringTraversalHelper(nwa, cs, *initial, visited_in_main, functor);
+          details::dfsCallStringTraversalHelper(nwa, cs, *initial, visited_in_main,
+                                                state_functor, trans_functor);
         }
 
       }
