@@ -19,7 +19,8 @@ using std::exit;
 
 using wali::nwa::NWARefPtr;
 using wali::nwa::read_nwa;
-using wali::nwa::construct::CONSTRUCTION_FUNCTION;
+
+using wali::nwa::CONSTRUCTION_NAMESPACE::CONSTRUCTION_FUNCTION;
 
 int main(int argc, char** argv)
 {

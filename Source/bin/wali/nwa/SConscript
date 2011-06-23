@@ -9,7 +9,8 @@ def _ProgramTarget(env, command, function, source):
         function = command
     assert 'CPPDEFINES' not in env
     obj = env.Object('nwa-%s' % command, source,
-                     CPPDEFINES={'CONSTRUCTION_FUNCTION': function})
+                     CPPDEFINES={'CONSTRUCTION_FUNCTION': function,
+                                 'CONSTRUCTION_NAMESPACE' : 'construct'})
     prg = env.Program('nwa-%s.exe' % command, obj)
     return prg
 
