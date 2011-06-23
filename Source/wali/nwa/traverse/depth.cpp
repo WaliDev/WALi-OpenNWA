@@ -197,7 +197,9 @@ namespace wali {
 
             // If the user gave us a trans_functor, use it
             if (trans_functor) {
-              trans_functor->doReturn(nwa, cs, state, call_pred, symbol, target);
+              CallString cs_copy = cs;
+              cs_copy.pop_back();
+              trans_functor->doReturn(nwa, cs_copy, state, call_pred, symbol, target);
             }
 
             // Return transitions don't mark anything we need to traverse
