@@ -8,6 +8,7 @@
 #include "wali/nwa/NWAParser.hpp"
 
 #include "wali/nwa/construct/constructions.hpp"
+#include "wali/nwa/Expand.hpp"
 
 using std::string;
 using std::ifstream;
