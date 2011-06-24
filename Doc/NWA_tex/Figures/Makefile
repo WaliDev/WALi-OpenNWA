@@ -69,3 +69,6 @@ determinize-result.nwa: determinize.nwa
 
 complement-of-determinize.nwa: determinize.nwa
 	$(COMPLEMENT) -o $@ $^
+
+clean:
+	-rm $(addsuffix .png,$(FILES))  $(addsuffix .tex,$(FILES)) $(addsuffix .dot,$(FILES))
