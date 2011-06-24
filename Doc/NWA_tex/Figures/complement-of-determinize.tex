@@ -5,124 +5,126 @@
 \pgfsetcolor{black}
   % Edge: Exit2 -> Return
   \pgfsetcolor{red}
-  \draw [->] (250.51bp,27.148bp) .. controls (258.24bp,32.462bp) and (267.57bp,38.874bp)  .. (284.41bp,50.449bp);
+  \draw [->] (147.8bp,26.972bp) .. controls (139.99bp,32.207bp) and (130.57bp,38.522bp)  .. (113.56bp,49.923bp);
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw (274.33bp,19.962bp) node {ret: Entry2, };
+  \draw (145.85bp,51.654bp) node {ret: Entry2, };
   % Edge: Call -> Entry1
   \pgfsetcolor{green}
-  \draw [->] (113.26bp,178.64bp) .. controls (120.97bp,183.95bp) and (130.43bp,190.47bp)  .. (147.63bp,202.34bp);
+  \draw [->] (286.98bp,179.5bp) .. controls (279.12bp,184.58bp) and (269.53bp,190.77bp)  .. (252.09bp,202.05bp);
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw (135.23bp,173.58bp) node {call};
+  \draw (282.81bp,202.01bp) node {call};
   % Edge: State2 -> Exit2
-  \draw [->] (181.56bp,20.956bp) .. controls (186.45bp,20.442bp) and (191.6bp,19.903bp)  .. (206.87bp,18.3bp);
-  \draw (189.11bp,10.163bp) node {a};
+  \draw [->] (217.47bp,21.52bp) .. controls (212.31bp,20.929bp) and (206.86bp,20.305bp)  .. (191.4bp,18.534bp);
+  \draw (209.49bp,30.605bp) node {a};
   % Edge: Exit1 -> Return
   \pgfsetcolor{red}
-  \draw [->] (301.06bp,130.87bp) .. controls (301.25bp,118.82bp) and (301.52bp,101.56bp)  .. (301.89bp,77.35bp);
+  \draw [->] (97.741bp,130.71bp) .. controls (97.378bp,118.6bp) and (96.854bp,101.07bp)  .. (96.121bp,76.536bp);
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw (283.4bp,109.15bp) node {ret: Entry1, };
+  \draw (79.083bp,108.72bp) node {ret: Entry1, };
   % Edge: State1 -> Exit1
-  \draw [->] (258.62bp,192.76bp) .. controls (265.5bp,185.09bp) and (274.29bp,175.31bp)  .. (288.82bp,159.11bp);
-  \draw (260.34bp,170.71bp) node {b};
+  \draw [->] (140.63bp,192.12bp) .. controls (133.71bp,184.47bp) and (124.87bp,174.72bp)  .. (110.25bp,158.56bp);
+  \draw (118.84bp,188.1bp) node {b};
   % Edge: Start -> Call
-  \draw [->] (46.967bp,193.04bp) .. controls (53.896bp,189.55bp) and (61.842bp,185.56bp)  .. (78.504bp,177.18bp);
-  \draw (63.156bp,198.41bp) node {a};
+  \draw [->] (354.23bp,194.32bp) .. controls (347.09bp,190.7bp) and (338.87bp,186.54bp)  .. (322.11bp,178.06bp);
+  \draw (347.69bp,177.48bp) node {a};
   % Edge: Call -> Entry2
   \pgfsetcolor{green}
-  \draw [->] (97.651bp,152.81bp) .. controls (97.864bp,140.97bp) and (98.166bp,124.12bp)  .. (98.597bp,100.09bp);
+  \draw [->] (303.02bp,154.14bp) .. controls (302.5bp,142.19bp) and (301.76bp,125bp)  .. (300.7bp,100.55bp);
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw (113.03bp,131.46bp) node {call};
+  \draw (287.08bp,132.44bp) node {call};
   % Edge: Entry2 -> State2
-  \draw [->] (111.68bp,70.155bp) .. controls (118.39bp,62.63bp) and (126.74bp,53.269bp)  .. (140.92bp,37.378bp);
-  \draw (132.92bp,66.55bp) node {a};
+  \draw [->] (287.16bp,70.726bp) .. controls (280.42bp,63.237bp) and (272.02bp,53.922bp)  .. (257.77bp,38.107bp);
+  \draw (265.86bp,67.183bp) node {a};
   % Edge: Entry1 -> State1
-  \draw [->] (195.45bp,211.7bp) .. controls (199.49bp,211.27bp) and (203.68bp,210.81bp)  .. (218.06bp,209.26bp);
-  \draw (201.65bp,200.03bp) node {b};
+  \draw [->] (203.77bp,211bp) .. controls (199.74bp,210.57bp) and (195.55bp,210.12bp)  .. (181.2bp,208.57bp);
+  \draw (197.58bp,221.34bp) node {b};
   % Edge: Return -> Finish
-  \draw [->] (322.4bp,51.665bp) .. controls (329.85bp,47.645bp) and (338.36bp,43.048bp)  .. (355.18bp,33.957bp);
-  \draw (340.28bp,56.251bp) node {a};
+  \draw [->] (74.776bp,51.264bp) .. controls (67.366bp,47.49bp) and (58.949bp,43.203bp)  .. (42.241bp,34.695bp);
+  \draw (57.997bp,56.265bp) node {a};
+  % Edge: Start__precursor__ -> Start
+  \draw [->] (416.63bp,231.28bp) .. controls (411.26bp,227.89bp) and (405.37bp,224.17bp)  .. (391.15bp,215.19bp);
   % Node: Entry2
 \begin{scope}
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw (99bp,85bp) ellipse (26bp and 12bp);
-  \draw (99bp,85bp) ellipse (30bp and 16bp);
-  \draw (98.877bp,84.501bp) node {Entry2};
+  \draw (300bp,85bp) ellipse (26bp and 12bp);
+  \draw (300bp,85bp) ellipse (30bp and 16bp);
+  \draw (300.03bp,85.004bp) node {Entry2};
 \end{scope}
   % Node: Entry1
 \begin{scope}
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw (166bp,215bp) ellipse (26bp and 12bp);
-  \draw (166bp,215bp) ellipse (30bp and 16bp);
-  \draw (165.85bp,214.9bp) node {Entry1};
+  \draw (233bp,214bp) ellipse (26bp and 12bp);
+  \draw (233bp,214bp) ellipse (30bp and 16bp);
+  \draw (233.31bp,214.19bp) node {Entry1};
 \end{scope}
   % Node: Exit1
 \begin{scope}
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw (301bp,146bp) ellipse (23bp and 11bp);
-  \draw (301bp,146bp) ellipse (27bp and 15bp);
-  \draw (300.83bp,145.73bp) node {Exit1};
+  \draw (98bp,145bp) ellipse (23bp and 11bp);
+  \draw (98bp,145bp) ellipse (27bp and 15bp);
+  \draw (98.175bp,145.22bp) node {Exit1};
 \end{scope}
   % Node: State2
 \begin{scope}
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw (153bp,24bp) ellipse (25bp and 11bp);
-  \draw (153bp,24bp) ellipse (29bp and 15bp);
-  \draw (152.89bp,23.964bp) node {State2};
+  \draw (246bp,25bp) ellipse (25bp and 11bp);
+  \draw (246bp,25bp) ellipse (29bp and 15bp);
+  \draw (245.74bp,24.758bp) node {State2};
 \end{scope}
   % Node: Exit2
 \begin{scope}
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw (234bp,16bp) ellipse (23bp and 11bp);
-  \draw (234bp,16bp) ellipse (27bp and 15bp);
-  \draw (233.56bp,15.5bp) node {Exit2};
+  \draw (165bp,16bp) ellipse (23bp and 11bp);
+  \draw (165bp,16bp) ellipse (27bp and 15bp);
+  \draw (164.91bp,15.5bp) node {Exit2};
 \end{scope}
   % Node: Start
 \begin{scope}
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw [very thick] (28bp,203bp) ellipse (22bp and 11bp);
-  \draw [very thick] (28bp,203bp) ellipse (26bp and 15bp);
-  \draw (27.5bp,202.83bp) node {Start};
+  \draw (374bp,204bp) ellipse (22bp and 11bp);
+  \draw (374bp,204bp) ellipse (26bp and 15bp);
+  \draw (373.76bp,204.2bp) node {Start};
 \end{scope}
   % Node: State1
 \begin{scope}
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw (247bp,206bp) ellipse (25bp and 11bp);
-  \draw (247bp,206bp) ellipse (29bp and 15bp);
-  \draw (246.58bp,206.18bp) node {State1};
+  \draw (153bp,205bp) ellipse (25bp and 11bp);
+  \draw (153bp,205bp) ellipse (29bp and 15bp);
+  \draw (152.74bp,205.5bp) node {State1};
 \end{scope}
   % Node: Finish
 \begin{scope}
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw (371bp,25bp) ellipse (25bp and 11bp);
-  \draw (370.95bp,25.438bp) node {Finish};
+  \draw (26bp,26bp) ellipse (25bp and 11bp);
+  \draw (26bp,26.423bp) node {Finish};
 \end{scope}
   % Node: Call
 \begin{scope}
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw (97bp,168bp) ellipse (20bp and 11bp);
-  \draw (97bp,168bp) ellipse (24bp and 15bp);
-  \draw (97.384bp,167.68bp) node {Call};
+  \draw (304bp,169bp) ellipse (20bp and 11bp);
+  \draw (304bp,169bp) ellipse (24bp and 15bp);
+  \draw (303.65bp,168.72bp) node {Call};
 \end{scope}
   % Node: Return
 \begin{scope}
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw (302bp,63bp) ellipse (26bp and 11bp);
-  \draw (302bp,63bp) ellipse (30bp and 15bp);
-  \draw (302.12bp,62.62bp) node {Return};
+  \draw (96bp,62bp) ellipse (26bp and 11bp);
+  \draw (96bp,62bp) ellipse (30bp and 15bp);
+  \draw (95.683bp,61.911bp) node {Return};
 \end{scope}
 %
 \end{tikzpicture}

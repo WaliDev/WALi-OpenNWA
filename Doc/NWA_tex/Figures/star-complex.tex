@@ -3,62 +3,66 @@
   \pgfsetlinewidth{1bp}
 %%
 \pgfsetcolor{black}
-  % Edge: Exit -> Return
-  \pgfsetcolor{red}
-  \draw [->] (167bp,125.37bp) .. controls (165.89bp,114.45bp) and (164.11bp,97.005bp)  .. (161.59bp,72.231bp);
+  % Edge: Call -> Return
+  \draw [->] (86.158bp,170.52bp) .. controls (78.46bp,175.11bp) and (68.513bp,181.05bp)  .. (50.603bp,191.74bp);
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw (146.82bp,104.96bp) node {ret: Call, };
-  % Edge: Call -> Return
-  \draw [->] (101.57bp,58.969bp) .. controls (107.12bp,58.836bp) and (113.34bp,58.686bp)  .. (130.05bp,58.285bp);
-  \draw (110.58bp,48.753bp) node {b};
+  \draw (65.688bp,166.56bp) node {b};
   % Edge: Call -> Entry
   \pgfsetcolor{green}
-  \draw [->] (82.365bp,70.052bp) .. controls (83.588bp,81.848bp) and (85.597bp,101.23bp)  .. (88.197bp,126.32bp);
+  \draw [->] (104.33bp,172.82bp) .. controls (109.2bp,183.49bp) and (116.94bp,200.43bp)  .. (127.39bp,223.3bp);
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw (99.761bp,92.17bp) node {call};
-  % Edge: Entry -> Exit
-  \draw [->] (113.44bp,137.38bp) .. controls (121.11bp,137.18bp) and (129.69bp,136.95bp)  .. (147.91bp,136.47bp);
-  \draw (125.59bp,127.06bp) node {b};
+  \draw (97.705bp,200.34bp) node {call};
   % Edge: Start -> Call
-  \draw [->] (34.638bp,20.746bp) .. controls (42.57bp,27.331bp) and (53.418bp,36.337bp)  .. (70.554bp,50.563bp);
-  \draw (56.646bp,22.375bp) node {a};
+  \draw [->] (119.58bp,101.47bp) .. controls (116.09bp,112.15bp) and (110.6bp,128.92bp)  .. (103.09bp,151.88bp);
+  \draw (123.92bp,124.83bp) node {a};
+  % Edge: Entry -> Exit
+  \draw [->] (117.43bp,243.52bp) .. controls (108.45bp,248.85bp) and (96.872bp,255.72bp)  .. (78.183bp,266.82bp);
+  \draw (95.138bp,240.6bp) node {b};
+  % Edge: Exit -> Return
+  \pgfsetcolor{red}
+  \draw [->] (59.786bp,264.64bp) .. controls (55.239bp,254.75bp) and (48.205bp,239.46bp)  .. (38.043bp,217.36bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (70.038bp,237.62bp) node {ret: Call, };
+  % Edge: Start__precursor__ -> Start
+  \draw [->] (132.25bp,37.145bp) .. controls (130.52bp,47.273bp) and (128.35bp,59.923bp)  .. (124.85bp,80.353bp);
+  % Node: Return
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (32bp,203bp) ellipse (26bp and 11bp);
+  \draw (32bp,203bp) ellipse (30bp and 15bp);
+  \draw (31.5bp,203.13bp) node {Return};
+\end{scope}
   % Node: Start
 \begin{scope}
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw [very thick] (24bp,12bp) ellipse (22bp and 11bp);
-  \draw (23.5bp,11.5bp) node {Start};
+  \draw (123bp,91bp) ellipse (22bp and 11bp);
+  \draw (123.04bp,90.905bp) node {Start};
 \end{scope}
   % Node: Call
 \begin{scope}
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw (81bp,59bp) ellipse (20bp and 11bp);
-  \draw (81.267bp,59.456bp) node {Call};
-\end{scope}
-  % Node: Return
-\begin{scope}
-  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
-  \pgfsetstrokecolor{strokecol}
-  \draw (160bp,58bp) ellipse (26bp and 11bp);
-  \draw (160bp,58bp) ellipse (30bp and 15bp);
-  \draw (160.09bp,57.564bp) node {Return};
-\end{scope}
-  % Node: Exit
-\begin{scope}
-  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
-  \pgfsetstrokecolor{strokecol}
-  \draw (168bp,136bp) ellipse (20bp and 11bp);
-  \draw (168.08bp,135.94bp) node {Exit};
+  \draw (100bp,162bp) ellipse (20bp and 11bp);
+  \draw (99.615bp,162.49bp) node {Call};
 \end{scope}
   % Node: Entry
 \begin{scope}
   \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
   \pgfsetstrokecolor{strokecol}
-  \draw (89bp,138bp) ellipse (24bp and 12bp);
-  \draw (89.41bp,138.02bp) node {Entry};
+  \draw (133bp,235bp) ellipse (24bp and 12bp);
+  \draw (132.53bp,234.56bp) node {Entry};
+\end{scope}
+  % Node: Exit
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (65bp,275bp) ellipse (20bp and 11bp);
+  \draw (64.517bp,274.93bp) node {Exit};
 \end{scope}
 %
 \end{tikzpicture}
