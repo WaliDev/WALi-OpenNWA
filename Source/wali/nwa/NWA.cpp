@@ -2009,7 +2009,10 @@ namespace wali
       StateSet initials = getInitialStates();
       for(  StateSet::const_iterator it = initials.begin(); it != initials.end(); it++ )
       {
-        printKey(o << "\"",*it,abbrev)<<"\" [ style=bold ]";
+        printKey(o << "\"",*it,abbrev)<<"__precursor__\" [ label=\"\",style=\"invis\" ]";
+        printKey(o << "\"",*it,abbrev)<<"__precursor__\"";
+        o << "->";
+        printKey(o << "\"",*it,abbrev)<<"\"";
       }
 
       //final states
