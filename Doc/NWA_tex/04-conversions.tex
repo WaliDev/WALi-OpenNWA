@@ -1,4 +1,4 @@
-\section{Conversions beween PDS and NWA (or ``The
+\section{Conversions beween WPDS and NWA (or ``The
   \texttt{wali::nwa::nwa\_pds} namespace)}
 \label{Se:Conversions}
 
@@ -9,17 +9,17 @@ of constructing a WPDS from an NWA, i.e., one cannot perform the two
 conversions in sequence and obtain the identity conversion.
 
 At a high level, these operations work by making the NWA track both the state
-of the PDS and its top-of-stack symbol. A PDS rule of the form $\langle
+of the WPDS and its top-of-stack symbol. A WPDS rule of the form $\langle
 p,q_1 \rangle \hookrightarrow \langle p,q_2 \rangle$ leaves the stack height
 unchanged, and thus is associated with an internal NWA transition; in this
 case, that transition goes from the state $(p,q_1)$ to $(p,q_2)$. The symbol
 of a transition is associated with the top-of-stack symbol of the source
 state, so in this example, the symbol labeling that transition would be
-$q_1$. PDS push rules correspond to NWA call transitions, and PDS pop rules
+$q_1$. WPDS push rules correspond to NWA call transitions, and WPDS pop rules
 correspond to NWA return transitions.
 
-(This association is strongly informed by our uses of both PDSs and NWAs in
-program analysis. It is common for PDSs to have just one state, $p$, and to
+(This association is strongly informed by our uses of both WPDSs and NWAs in
+program analysis. It is common for WPDSs to have just one state, $p$, and to
 use the top-of-stack symbol to track the ``current'' program point. Pushing
 something onto the stack corresponds to a call, and popping corresponds to a
 return. For NWAs, we use the states themselves to track the current program
@@ -56,7 +56,7 @@ are declared in the header \texttt{wali/nwa/nwa\_pds/conversions.hpp}.
 \end{functionlist}
 
 \begin{changebar}
-For the rest of the section assume that we have a PDS $(P, \Gamma, \Delta )$ 
+For the rest of the section assume that we have a WPDS $(P, \Gamma, \Delta )$ 
 where $\Delta = (\Delta_0, \Delta_1, \Delta_2)$ and a 
 NWA $(Q, \Sigma,
 Q_0, \delta, Q_f)$ where $\delta =
@@ -64,14 +64,14 @@ Q_0, \delta, Q_f)$ where $\delta =
 
 \end{changebar}
 
-\subsection{PDS to NWA}
+\subsection{WPDS to NWA}
 \label{Se:PDStoNWA}
 
-The \texttt{PDStoNWA} functions convert a PDS into an NWA in a manner
+The \texttt{PDStoNWA} functions convert a WPDS into an NWA in a manner
 faithful to the association suggested in the introduction to this section.
 
 \begin{changebar}
-Given a PDS the corresponding NWA is constructed using the following rules:
+Given a WPDS the corresponding NWA is constructed using the following rules:
 
 \begin{mathpar}
 {\inferrule*[left=\textsc{States}]
@@ -123,24 +123,24 @@ Note that $Q_0$ and $Q_f$ are empty.
       \item{ $\langle p,r_2 \rangle \hookrightarrow \langle p,q_6 \rangle$}
       \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,exit \rangle$}
     \end{itemize}
-  \caption{An example PDS.}
+  \caption{An example WPDS.}
   \label{Fig:PDStoNWA1}
 \end{figure}
 
-For example, the NWA resulting from converting the PDS shown in Figure
+For example, the NWA resulting from converting the WPDS shown in Figure
 \ref{Fig:PDStoNWA1} into an NWA is shown in Figure \ref{Fig:PDStoNWA2}.
 
 \begin{figure}[p]
   \centering
     \nwaimage[width=12cm]{Figures/pds-equivalent}
-  \caption{The NWA resulting from converting the PDS in Figure \ref{Fig:PDStoNWA1} into an NWA.}
+  \caption{The NWA resulting from converting the WPDS in Figure \ref{Fig:PDStoNWA1} into an NWA.}
   \label{Fig:PDStoNWA2}
 \end{figure}
 
 The client information for all states in the resulting NWA are set to \texttt{null}.
 
 
-\subsection{NWA to PDS}
+\subsection{NWA to WPDS}
 \label{Se:NWAtoPDS}
 
 An NWA can also be converted into a WPDS.  In this way it is possible to use
@@ -155,7 +155,7 @@ determine weights for WPDS rules.
 \texttt{WeightGen} provides an abstract class that client code must implement for
 calculating the weights for NWA transitions which are subsequently used in
 calculating the weights for corresponding WPDS rules.  It allows the
-underlying NWA to be decoupled from the weight domain used in the PDS.  See
+underlying NWA to be decoupled from the weight domain used in the WPDS.  See
 \cite[\S4-\S5]{wali} for details about weight domains.
 
 
@@ -254,7 +254,7 @@ w_3 &= \mathtt{wg.getOne}()
 \end{changebar}
 
 \noindent Consider, as an example, converting the NWA in Figure
-\ref{Fig:NWAtoPDS5} into a WPDS. The WPDS resulting from converting the PDS
+\ref{Fig:NWAtoPDS5} into a WPDS. The WPDS resulting from converting the WPDS
 shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
 \ref{Fig:NWAtoPDS4}. \\
 
@@ -279,7 +279,7 @@ shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
       \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
       \item{ $\langle p_x,c_2 \rangle \hookrightarrow \langle p,r_2 \rangle$}
     \end{itemize}
-  \caption{The PDS resulting from converting the NWA shown in Figure \ref{Fig:NWAtoPDS1} into a PDS.}
+  \caption{The WPDS resulting from converting the NWA shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS.}
   \label{Fig:NWAtoPDS4}
 \end{figure}
 
@@ -372,7 +372,7 @@ WPDS is shown in Figure \ref{Fig:NWAtoPDS5}.  Note:
       \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
       \item{ $\langle p_e,r_2 \rangle \hookrightarrow \langle p,c_2 \rangle$}
     \end{itemize}
-  \caption{The PDS resulting from converting the NWA shown in Figure \ref{Fig:NWAtoPDS1} into a PDS.}
+  \caption{The WPDS resulting from converting the NWA shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS.}
   \label{Fig:NWAtoPDS5}
 \end{figure}
 
@@ -435,7 +435,7 @@ w_3 &= \begin{cases}
 \end{changebar}
 
 \noindent Consider, as an example, converting the NWA in Figure
-\ref{Fig:NWAtoPDS1} into a WPDS.  The WPDS resulting from converting the PDS
+\ref{Fig:NWAtoPDS1} into a WPDS.  The WPDS resulting from converting the WPDS
 shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
 \ref{Fig:NWAtoPDS2}. \\
 
@@ -460,7 +460,7 @@ shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
       \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
       \item{ $\langle p_x,r_2 \rangle \hookrightarrow \langle p,r_2 \rangle$}
     \end{itemize}
-  \caption{The PDS resulting from converting the NWA shown in Figure \ref{Fig:NWAtoPDS1} into a PDS.}
+  \caption{The WPDS resulting from converting the NWA shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS.}
   \label{Fig:NWAtoPDS2}
 \end{figure}
 
@@ -552,7 +552,7 @@ w_3 &= \begin{cases}
 
 \noindent Consider, as an example, converting the NWA in Figure
 \ref{Fig:NWAtoPDS3} into a backwards flow WPDS.  The WPDS resulting from
-converting the PDS shown in Figure \ref{Fig:NWAtoPDS1} into a backwards flow
+converting the WPDS shown in Figure \ref{Fig:NWAtoPDS1} into a backwards flow
 WPDS is shown in Figure \ref{Fig:NWAtoPDS3}. \\
 
 \begin{figure}[htbp]
@@ -576,8 +576,8 @@ WPDS is shown in Figure \ref{Fig:NWAtoPDS3}. \\
       \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
       \item{ $\langle p_e,c_2 \rangle \hookrightarrow \langle p,c_2 \rangle$}
     \end{itemize}
-  \caption{The PDS resulting from converting the NWA shown in Figure
-    \ref{Fig:NWAtoPDS1} into a PDS.}
+  \caption{The WPDS resulting from converting the NWA shown in Figure
+    \ref{Fig:NWAtoPDS1} into a WPDS.}
   \label{Fig:NWAtoPDS3}
 \end{figure}
 
