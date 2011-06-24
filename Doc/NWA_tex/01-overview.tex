@@ -15,8 +15,12 @@ Alur et al.~\cite{DLT:AM2006,JACM:AM2009} describe them in detail. Our
 implementation corresponds to the definition from the DLT 2006
 paper~\cite{DLT:AM2006}; relative to followup work~\cite{JACM:AM2009}, this definition removes
 the distinction between the machine's linear and hierarchical states, and on
-a call always stacks the source state. (In the JACM 2009 presentation of the
-work, this would be called a ``weakly-hierarchical'' NWA.)
+\begin{changebar}
+a call always stacks the source state. In addition, we only require that the
+final linear state be accepting for an NWA to accept a
+word. (Following~\cite{JACM:AM2009}, this specific variant is a
+``weakly-hierarchical, linearly-accepting'' NWA.)
+\end{changebar}
 
 The terminology used in the interface of the package is geared
 toward program analysis, so we use terms such as ``call site'' and ``return

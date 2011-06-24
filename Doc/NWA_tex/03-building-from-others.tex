@@ -23,7 +23,8 @@ Each of these functions is in the namespace \texttt{wali::nwa::construct}:
     Computes the union of the NWAs \texttt{a} and \texttt{b},
     either returning the result or storing it in \texttt{out}.
     See Section
-    \ref{Se:Union}.
+    \ref{Se:Union}. (This function is called \texttt{unionNWA} instead of
+    \texttt{union} because the latter is a C keyword.)
 
   \functionitem[\texttt{NWARefPtr intersect( NWA const \& a, NWA const \& b )}]
   \functionitem[\texttt{void intersect( NWA \& out, NWA const \& a, NWA const \& b )}]
