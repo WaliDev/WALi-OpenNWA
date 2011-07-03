@@ -263,6 +263,14 @@ namespace wali {
       // This could be an expensive check, but hopefully not...
       //assert (NWA::equal(internal_nwa, min_nwa));
 
+      if (internal_nwa->sizeSymbols() != min_nwa->sizeSymbols()) {
+        for (NWA::SymbolIterator sym = internal_nwa->beginSymbols();
+             sym != internal_nwa->endSymbols(); ++sym)
+        {
+          min_nwa->addSymbol(*sym);
+        }
+      }
+
       min_nwa->realizeImplicitTrans(getKey("{}"));
             
       return min_nwa;
