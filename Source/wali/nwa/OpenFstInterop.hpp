@@ -65,6 +65,13 @@ namespace wali {
     /// minimizing that, then converting it back.)
     NWARefPtr
     minimize_internal_nwa(NWARefPtr internal_nwa, std::string node_prefix = "");
+
+    /// Given an NWA 'internal_nwa' without call or return transitions, treat
+    /// the NWA as a standard FA and determinize it using OpenFST.  (It does
+    /// this by converting it to an OpenFST acceptor, minimizing that, then
+    /// converting it back.)
+    NWARefPtr
+    determinize_internal_nwa(NWARefPtr internal_nwa, std::string node_prefix = "");
   }
 }
 
