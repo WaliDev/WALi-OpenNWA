@@ -81,7 +81,7 @@ namespace wali {
 
 
       // Set the accepting states of the FST
-      assert(nwa->sizeFinalStates() == 1);
+      //assert(nwa->sizeFinalStates() == 1);
       set<State> const & finals = nwa->getFinalStates();
       for (set<State>::const_iterator final = finals.begin();
            final != finals.end(); ++final)
@@ -262,6 +262,8 @@ namespace wali {
             
       // This could be an expensive check, but hopefully not...
       //assert (NWA::equal(internal_nwa, min_nwa));
+
+      min_nwa->realizeImplicitTrans(getKey("{}"));
             
       return min_nwa;
     }
