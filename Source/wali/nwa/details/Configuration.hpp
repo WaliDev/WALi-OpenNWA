@@ -1,6 +1,8 @@
 #ifndef wali_nwa_CONFIGURATION_HPP
 #define wali_nwa_CONFIGURATION_HPP
 
+#include <iostream>
+
 namespace wali
 {
   namespace nwa
@@ -41,6 +43,18 @@ namespace wali
         }
       };
 
+
+      inline
+      std::ostream &
+      operator << (std::ostream & os, Configuration const & configuration)
+      {
+        os << key2str(configuration.state) << "  [";
+        for (size_t i=0; i<configuration.callPredecessors.size(); ++i) {
+          os << key2str(configuration.callPredecessors[i]) << " ";
+        }
+        os << "]";
+        return os;
+      }
     }
   }
 }
