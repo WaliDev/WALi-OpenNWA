@@ -1051,8 +1051,6 @@ namespace wali
     }
 
 
-#if 0 // Commented out because I don't know how this interacts with the new stuck state behavior
-    
     void NWA::removeImplicitTransitions()
     {
       // This proceeds in two steps: detects stuck states, then removes
@@ -1094,23 +1092,16 @@ namespace wali
       }
 
       // Now we have a list of stuck states. Go through and remove each,
-      // but only if the acceptingness is the same as the true stuck state.
+      // but only if the stuck state is not final.
       for(  StateSet::iterator stuck = stuckStates.begin();
             stuck != stuckStates.end(); ++stuck)
       {
-        if( isFinalState(*stuck) == isFinalState(states.getStuckState()) )
+        if( ! isFinalState(*stuck) )
         {
-          if(states.isStuckState(*stuck)) {
-            removeState(*stuck);
-          }
-          else {
-            // Remove all the explicit transitions to the stuck state at least
-            trans.removeTransWith(*stuck);
-          }
+          removeState(*stuck);
         }
       }
     }
-#endif
 
     
     void NWA::pruneUnreachableForward(const StateSet & sources)
