@@ -41,7 +41,7 @@ int main(int argc, char** argv)
     NWARefPtr nwa1 = read_nwa(infile1);
     NWARefPtr nwa2 = read_nwa(infile2);
 
-    bool result = NWA::equal(*nwa1, *nwa2);
+    bool result = wali::nwa::NWA::equal(*nwa1, *nwa2);
 
     if (result) {
         cout << "The NWAs ARE equal\n";
