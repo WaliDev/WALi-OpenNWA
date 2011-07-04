@@ -20,7 +20,7 @@ using wali::nwa::read_nwa;
 
 int main(int argc, char** argv)
 {
-    if (argc != 3 || argv[1] != std::string("-o")) {
+    if (argc != 3) {
         cerr << "Syntax: " << argv[0] << " nwa1 nwa2\n";
         exit(1);
     }
