@@ -1,6 +1,9 @@
 #include "ProcedureNWAs.hpp"
-
 #include "OpenFstInterop.hpp"
+
+#include "query/internals.hpp"
+#include "query/calls.hpp"
+#include "query/returns.hpp"
 
 namespace wali {
   namespace nwa {
@@ -134,6 +137,25 @@ namespace wali {
           //finalnwa->addInternalTrans(*exit, WALI_EPSILON, return_site);
         }
       }
+
+
+      // Finally, we remove the __call__ symbols from the automaton.
+      for (NWA::SymbolIterator symiter = finalnwa->beginSymbols();
+           symiter != finalnwa->endSymbols(); ++symiter)
+      {
+        Symbol symbol = *symiter;
+
+        if (string_starts_with(key2str(symbol), call_prefix)) {
+          // It shouldn't be used in any transitions. Check that.
+          assert(query::getSources_Sym(*finalnwa, symbol).size() == 0);
+          assert(query::getCallSites_Sym(*finalnwa, symbol).size() == 0);
+          assert(query::getExits_Sym(*finalnwa, symbol).size() == 0);
+
+          // Now remove it
+          finalnwa->removeSymbol(symbol);
+        }
+      }
+
 
       return finalnwa;
     } // end assemble_nwa()
