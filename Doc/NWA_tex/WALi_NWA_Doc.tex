@@ -179,14 +179,14 @@ reflect the views of the sponsoring agencies.
   %
   % except split this up for easier latexing
   %
-  \ifdimless{\thenwaimagewidth}{\textwidth}{%
-    \ifdimless{\thenwaimageheight}{\textheight}{%
+  \ifdimless{\thenwaimagewidth}{0.66\textwidth}{%
+    \ifdimless{\thenwaimageheight}{0.66\textheight}{%
       \usebox{\thenwaimagebox}%
     }{%
-      \adjustbox{width=\textwidth,height=\textheight,keepaspectratio=true}{\usebox{\thenwaimagebox}}%
+      \adjustbox{width=0.66\textwidth,height=0.66\textheight,keepaspectratio=true}{\usebox{\thenwaimagebox}}%
     }%
   }{%
-    \adjustbox{width=\textwidth,height=\textheight,keepaspectratio=true}{\usebox{\thenwaimagebox}}%
+    \adjustbox{width=0.66\textwidth,height=0.66\textheight,keepaspectratio=true}{\usebox{\thenwaimagebox}}%
   }%
 }
 
