@@ -59,8 +59,8 @@ are declared in the header \texttt{wali/nwa/nwa\_pds/conversions.hpp}.
     \cite{advancedquerying}.
 \end{functionlist}
 
-\begin{changebar}
-\end{changebar}
+
+
 
 \subsection{WPDS to NWA}
 \label{Se:PDStoNWA}
@@ -196,7 +196,7 @@ the compiler will not let you ignore this responsibility.)
 
 \noindent The conversion is performed by:
 
-\begin{changebar}
+
 
 \begin{mathpar}
 
@@ -250,7 +250,7 @@ w_2 &= \begin{cases}
       \end{cases} \\
 w_3 &= \mathtt{wg.getOne}() 
 \end{align*}
-\end{changebar}
+
 
 \noindent Consider, as an example, converting the NWA in Figure
 \ref{Fig:NWAtoPDS5} into a WPDS. The WPDS resulting from converting the NWA
@@ -286,7 +286,7 @@ shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
 
 \noindent The conversion is performed by:
 
-\begin{changebar}
+
 
 \begin{mathpar}
 {\inferrule*%%[left=\textsc{States}]
@@ -342,7 +342,7 @@ w_3 &= \mathtt{wg.getOne}()
 \end{align*}
 
 
-\end{changebar}
+
 
 \noindent Consider, as an example, converting the NWA in Figure
 \ref{Fig:NWAtoPDS1} into a backwards flow WPDS.  The WPDS resulting from
@@ -379,7 +379,7 @@ WPDS is shown in Figure \ref{Fig:NWAtoPDS5}.  Note:
 
 \noindent The conversion is performed by:
 
-\begin{changebar}
+
 \begin{mathpar}
 {\inferrule*%%[left=\textsc{States}]
   { }
@@ -431,7 +431,7 @@ w_3 &= \begin{cases}
           \mathtt{wg.getWeight}(q_x,CI_{q_x},\sigma, \mathtt{EXIT\_TO\_RET},q_r,CI_{q_r}), & \text{otherwise}
       \end{cases} 
 \end{align*}
-\end{changebar}
+
 
 \noindent Consider, as an example, converting the NWA in Figure
 \ref{Fig:NWAtoPDS1} into a WPDS.  The WPDS resulting from converting the WPDS
@@ -467,7 +467,7 @@ shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
 
 \noindent The conversion is performed by:
 
-\begin{changebar}
+
 
 \begin{mathpar}
 {\inferrule*[left=\textsc{States}]
@@ -521,7 +521,7 @@ w_3 &= \begin{cases}
       \end{cases} 
 \end{align*}
 
-\end{changebar}
+
 
 \begin{enumerate}
 

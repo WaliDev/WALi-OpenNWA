@@ -56,7 +56,7 @@ Each of these functions is in the namespace \texttt{wali::nwa::construct}:
     Computes a determinization of \texttt{orig}, either returning the
     result or storing it in \texttt{out}.
     See Section \ref{Se:Determinize}.
-\begin{changebar}
+
   \functionitem[\texttt{NWARefPtr complement( NWA const \& orig, bool determinize )}]
   \functionitem[\texttt{void complement( NWA \& out, NWA const \& orig, bool determinize )}]
     Computes the complement of the determinization of \texttt{orig},
@@ -67,7 +67,7 @@ Each of these functions is in the namespace \texttt{wali::nwa::construct}:
     know that \texttt{orig} must be deterministic, you can set it to
     \texttt{false} to avoid this step. (Complementing a nondeterministic NWA
     without determinization can easily lead to an incorrect result.)
-\end{changebar}
+
 \end{functionlist}
 
 As mentioned above, these functions create a small language of set
@@ -324,7 +324,7 @@ Client information is copied directly from the original NWAs using
 \subsection{Kleene-Star}
 \label{Se:Star}
 
-\begin{changebar}
+
 If the original NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$,
 then the result of performing Kleene-Star on that NWA is $(Q', \Sigma,
 Q_0', \delta', Q_0')$ where $\delta' =
@@ -367,7 +367,7 @@ Q_0', \delta', Q_0')$ where $\delta' =
 }
 \end{mathpar}
 
-\end{changebar}
+
 
 \noindent The NWA resulting from performing Kleene-Star on the NWA shown in
 \figref{Star1} is shown in \figref{Star2}.  Note: The primed
@@ -411,7 +411,7 @@ and $q'$ have the same client information.
 \subsection{Reverse}
 \label{Se:Reverse}
 
-\begin{changebar}
+
 
 If the original NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$, then the result of
 reversing that NWA is $(Q, \Sigma, Q_0, \delta_{rev}, Q_f)$ obtained using
@@ -433,7 +433,7 @@ the following rules:
   { (q_r,q_e,\sigma,q_x) \in {\delta_{rev}}_r }
 }
 \end{mathpar}
-\end{changebar}
+
 
 \noindent The NWA resulting from performing reverse on the NWA shown in
 Figure \ref{Fi:Example1} is shown in Figure \ref{Fi:Reverse1}.
