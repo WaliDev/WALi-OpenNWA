@@ -1,0 +1,91 @@
+\section{Determinize}
+
+We found the explanations of how to determinize NWAs that are given
+in~\cite{DLT:AM2006,JACM:AM2009} to be confusing (and contradictory between
+the two accounts), and so we reformulated it using almost entirely relational
+operations.
+
+We use the following notation in the determinize algorithm: \\
+\begin{quote}
+\begin{tabular}{ll}
+  $(Q, \Sigma, \delta, Q_0, Q_f)$\hspace{1em}
+                                     & The components of the input automaton \texttt{nwa} \\
+  $\delta_i|_\sigma$                 & The binary relation $\{(p,q) | (p, \sigma, q) \in\delta_i\}$ \\
+  $\delta_c|_\sigma$                 & The binary relation $\{(p,q) | (p, \sigma, q) \in\delta_c\}$ \\
+  $\delta_r|_\sigma$                 & The binary relation $\{(p,q) | \exists c. (p, c, \sigma, q) \in\delta_r\}$ \\
+  $R \circ S$                        & Relational composition of the binary relations $R$ and $S$ \\
+  $R^*$                              & Transitive closure of the binary relation $R$ \\
+  $Q^{new}, \delta^{new}$            & Components of the determinized NWA \\
+\end{tabular}
+\end{quote}
+We use the following auxiliary function to compute the target of
+return transitions:
+\begin{eqnarray*}
+  \textrm{Merge}(R^{exit}, R^{call}, \delta) = \{(q, q')\, |\, \exists q_1, q_2.&& (q, q_1) \in R^{call} \\
+                                                         &&  \textrm{and}\ (q_1, q_2) \in R^{exit} \\
+                                                         &&  \textrm{and}\ (q_2, q_1, q') \in \delta\}
+\end{eqnarray*}
+
+\newpage
+\begin{algorithm}[H]
+  \hrule
+  \SetAlgorithmName{Listing}{listing}{listing}
+  \SetKw{Int}{int}
+  \SetKw{Boolean}{bool}
+  \SetKwBlock{DetDef}{determinize(NWA nwa)}{end}
+  \SetKwFunction{Merge}{Merge}
+
+  \DetDef{
+    $Close$ = $(\delta_i |_\epsilon)^*$\;
+    $Id$ = $\{(q,q) | q \in Q\}$\;
+    $R_0$ = $Id |_Q \circ Close$\;
+    $Q^{new}$ = $\{R_0\}$\;
+    Insert $R_0$ in worklist\;
+    \While{worklist is not empty} {
+      select and remove a relation $R$ from worklist\;
+      mark $R$\;
+      \For{$\sigma\in\Sigma$}{
+        \tcp{Compute internal transitions}
+        $R^i$ = $R \circ \delta_i|_\sigma \circ Close$\;
+        $Q^{new}$ = $Q^{new} \cup \{R^i\}$\;
+        Insert $R \overset{\sigma}{\rightarrow} R^i$ into $\delta_i^{new}$\;
+        \If{$R^i$ unmarked}{
+          $WL$ = $WL \cup \{R^i\}$\;
+        }
+        \BlankLine
+        \tcp{Compute call transitions}
+        $R^c$ = $Id \circ Close \circ \delta_c|_\sigma \circ Close$\;
+        $Q^{new}$ = $Q^{new} \cup \{R^c\}$\;
+        Insert $R \overset{\sigma}{\rightarrow} R^c$ into $\delta_c^{new}$\;
+        \If{$R^c$ unmarked}{
+          $WL$ = $WL \cup \{R^c\}$\;
+        }
+        \BlankLine
+        \tcp{Compute return transitions where $R$ appears as the exit node}
+        \For{$R^{call} \in Q^{new}$}{
+          $R^r$ = $\Merge(R, R^{call}, \delta_r|_\sigma) \circ Close$\;
+          $Q^{new}$ = $Q^{new} \cup \{R^r\}$\;
+          Insert $(R, R^{call}, \sigma, R^r)$ into $\delta_r^{new}$\;
+          \If{$R^r$ unmarked}{
+            $WL$ = $WL \cup \{R^r\}$\;
+          }
+        }
+        \BlankLine
+        \tcp{Compute return transitions where $R$ appears as the call predecessor}
+        \For{$R^{exit} \in Q^{new}$}{
+          $R^r$ = $\Merge(R^{exit}, R, \delta_r|_\sigma) \circ Close$\;
+          $Q^{new}$ = $Q^{new} \cup \{R^r\}$\;
+          Insert $(R^{exit}, R, \sigma, R^r)$ into $\delta_r^{new}$\;
+          \If{$R^r$ unmarked}{
+            $WL$ = $WL \cup \{R^r\}$\;
+          }
+        }
+      }
+    }
+    \tcp{end worklist while loop}
+    $Q_f^{new}$ = $\{R \in Q^{new} |\ \textrm{there is}\ (p,q) \in R
+                                      \ \textrm{with}\ q \in Q_f\}$\;
+    \Return{$(Q^{new}, \Sigma, \delta^{new}, \{R_0\}, Q_f^{new})$}\;
+  }
+  \hrule
+\end{algorithm}
