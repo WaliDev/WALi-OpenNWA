@@ -1,8 +1,8 @@
 \section{The \texttt{NestedWord} class}
 \label{Se:class-nested-word}
 
-The class \texttt{wali::nwa::NestedWord} is very simple. It provides support for
-building nested words and iterating over their lengths; currently there
+The class \texttt{wali::nwa::NestedWord} provides support for
+building and iterating over nested words; currently there
 is no support for modifying them (other than appending).
 
 The representation used by this class is closer to that of a word in a
@@ -23,12 +23,15 @@ the type of the position.
 
 The \texttt{NestedWord} class has just six functions:
 \begin{functionlist}
-  \functionitem[\texttt{appendInternal(Symbol s)}, \texttt{appendCall(Symbol s)}, and \texttt{appendReturn(Symbol s)}]
+  \functionitemnonl[\texttt{appendInternal(Symbol s)}]
+  \functionitemnonl[\texttt{appendCall(Symbol s)}]
+  \functionitem[\texttt{appendReturn(Symbol s)}]
     These append the symbol \texttt{s} to the linear word, and annotate that
     position as an internal, call, or return position, respectively.
   \functionitem[\texttt{append(Position p)}]
     Appends \texttt{p} to the word.
-  \functionitem[\texttt{begin()} and \texttt{end()}]
+  \functionitemnonl[\texttt{begin() const}]
+  \functionitem[\texttt{end() const}]
     These return a \texttt{NestedWord::const\_iterator} to the start or end
     of the nested word. The type returned by dereferencing these iterators is
     a \texttt{Position} object. (There is no non-const version of these
@@ -36,8 +39,8 @@ The \texttt{NestedWord} class has just six functions:
 \end{functionlist}
 
 The only operation the library currently supports on
-\texttt{NestedWord}s, besides building them, is to check whether a
-nested word is in an NWA's language. This is done by the function
-\texttt{wali::nwa::query::languageContains}; see
+\texttt{NestedWord}s, besides building them, is checking whether a
+nested word is in an NWA's language. This is done by
+\texttt{wali::nwa::query::languageContains(\mbox{NWA const \&}, \mbox{NestedWord const \&})}. See
 \sectref{query-language}.
 

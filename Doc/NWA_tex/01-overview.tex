@@ -1,11 +1,11 @@
 \section{Nested-Word Automata and Overview of the Library's Organization}
 \label{Se:Nested Word Automata}
 
-WALi-NWA is a library for constructing, querying, and operating on
+WALi-NWA is a C++ library for constructing, querying, and operating on
 nested-word automata.  It is a portion of the WALi library, which provides
 types and operations for weighted automata.
-It is implemented in C++.  The NWA portions of WALi
-are largely logically separate from the rest of WALi, but WALi-NWA does use
+While the NWA portions of WALi
+are mostly logically separate from the rest of WALi, it does use
 facilities provided by WALi and inter-operates with WALi's weighted pushdown
 system (WPDS) code.
 
@@ -15,26 +15,30 @@ Alur et al.~\cite{DLT:AM2006,JACM:AM2009} describe them in detail. Our
 implementation corresponds to the definition from the DLT 2006
 paper~\cite{DLT:AM2006}; relative to followup work~\cite{JACM:AM2009}, this definition removes
 the distinction between the machine's linear and hierarchical states, and on
-
 a call always stacks the source state. In addition, we only require that the
 final linear state be accepting for an NWA to accept a
 word. (Following~\cite{JACM:AM2009}, this specific variant is a
 ``weakly-hierarchical, linearly-accepting'' NWA.)
-
 
 The terminology used in the interface of the package is geared
 toward program analysis, so we use terms such as ``call site'' and ``return
 site'' to refer to states of the NWA even though they take on different
 meanings in different contexts.
 
-The NWAs in this library have support for balanced and unbalanced-left nested
-words only, and does not provide support for any words with pending
-returns. (That is, we support balanced words and nested-word prefixes, but
-not nested-word suffixes or general nested words.)
+In contrast to the standard definitions, we allow internal $\epsilon$
+transitions transitions (but not calls or returns). We also allow ``wild''
+transitions, which match any single symbol. (Wilds \emph{can} appear on calls
+and returns.)
+
+%The NWAs in this library have support for balanced and unbalanced-left nested
+%words only, and does not provide support for any words with pending
+%returns. (That is, we support balanced words and nested-word prefixes, but
+%not nested-word suffixes or general nested words.)
 
 The WALi library is available from
 \url{http://www.cs.wisc.edu/wpis/wpds/download.php}. This document describes
-the NWA portion of version 4.0.
+the NWA portion of version 4.0. Building instructions can be found in
+\texttt{README.txt} in the root directory of the distribution.
 
 
 \subsection{Library overview}
@@ -60,22 +64,22 @@ directory from the WALi distribution.
 These types live in namespace \texttt{wali::nwa}:
 
 \begin{functionlist}
-  \functionitem[\texttt{NestedWord}] Models a single nested word. Currently the only
+  \functionitem[\texttt{NestedWord}] Implements a single nested word. Currently the only
     operation that can be performed using one is to check whether a
-    \texttt{NestedWord} is a member of an \texttt{NWA}'s language. (The word can be
-    balanced or unbalanced, but bear in mind that our automata do not support
-    pending returns, so a word containing one is not very useful.) To use,
+    \texttt{NestedWord} is a member of an \texttt{NWA}'s language. To use,
     include \texttt{wali/nwa/NestedWord.hpp}.
-  \functionitem[\texttt{NWA}] Models a nested-word automaton. To use, include
+  \functionitem[\texttt{NWA}] Implements a nested-word automaton. To use, include
     \texttt{wali/nwa/NWA.hpp}, or \texttt{wali/nwa/NWAFwd.hpp} if a
     definition is not needed. See
-    \sectref{NWA-class}. (\sectref{serialization} also discusses a couple of
+    \sectref{NWA-class}. (\sectref{serialization} also discusses member
     functions related to serializing an NWA.)
   \functionitem[\texttt{NWARefPtr}] \texttt{NWARefPtr} is a typedef of \texttt{ref\_ptr$<$NWA$>$} (see
     below). This is defined in \texttt{wali/nwa/NWAFwd.hpp}.
   \functionitem[\texttt{State} and \texttt{Symbol}] These are both typedefs of
     \texttt{wali::Key} (see below). Both are defined in
-    \texttt{wali/nwa/NWAFwd.hpp}.
+    \texttt{wali/nwa/NWAFwd.hpp}. \emph{Note:} the use of keys for both
+    states and symbols means that they can be confused from a types
+    perspective, so use caution that this does not happen. 
   \functionitem[\texttt{StateSet} and \texttt{SymbolSet}] These are typedefs of
     \texttt{std::set}s of the corresponding type. (Client code should not
     rely on this
@@ -123,7 +127,7 @@ NWAs. These are partitioned into the following namespaces:
   \functionitem[\texttt{wali::nwa::construct}] This namespace provides functions for
     constructing an NWA. Functions in this namespace are standard,
     language-theoretic operations such as intersection, union, concatenation,
-    Kleene star, and reversing. See \sectref{Building NWAs}.
+    Kleene star, and reversal. See \sectref{Building NWAs}.
   \functionitem[\texttt{wali::nwa::nwa\_pds}] This namespace provides functions for
     converting between NWAs and PDSs, and related functions. (Note that
     construction of an NWA from a PDS is in this namespace, not in
@@ -140,22 +144,20 @@ The NWA library uses these portions of the standard WALi library. Unless
 otherwise specified, they are in namespace \texttt{wali}. See \cite{wali}.
 
 \begin{functionlist}
-  \functionitem[\texttt{ref\_ptr$<$T$>$}] This is a reference-counted intrusive
+  \functionitem[\texttt{ref\_ptr$<$T$>$}] This is a reference-counted, intrusive
     smart-pointer template. (``Intrusive'' means that the pointed-to type
     must be modified to include a \texttt{count} field used by the
     pointer. This is most conveniently done by subclassing
     \texttt{wali::Countable}.) Defined in \texttt{wali/ref\_ptr.hpp}.
   \functionitem[\texttt{Key}] A \texttt{Key} is a unique identifier naming states and symbols in an
     NWA or NestedWord. It is actually a typedef of an integer, though client
-    code should not rely on this precise type. \textsl{Note:} the use of keys for both
-    states and symbols means that they can be confused from a types
-    perspective, so use caution that this does not happen. Declared in
+    code should not rely on this precise type. Declared in
     \texttt{wali/Key.hpp}.
   \functionitem[\texttt{getKey(...)}] This function produces a key from some input. If
     the input has not been seen before, it returns a new key; if it has, then
     it returns the same key as before. (One can think of this as translating
     whatever unique identifier is known by the client code to the
-    \texttt{Key} needed by WALi.) Versions of this function are provided for
+    \texttt{Key} needed by WALi.) Overloads of this function are provided for
     the following types:
     \begin{itemize}
       \item \texttt{std::string const \&}

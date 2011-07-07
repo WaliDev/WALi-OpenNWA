@@ -10,12 +10,13 @@ client code can add or remove states, add or remove symbols, add or remove
 transitions, and set the status of certain states as initial or final.
 
 
-The following functions are related to construction:
+The following functions are basic NWA operations:
 \begin{functionlist}
-  \functionitem[\texttt{NWA::NWA()}] constructs an empty NWA.
+  \functionitem[\texttt{NWA::NWA()}]
+    Constructs an empty NWA.
 
   \functionitem[\texttt{NWA::NWA(NWA const \& other)}] Copies \texttt{other}; the
-    automata will not share structure.
+    automata will not share structure. Any client information that is present is cloned.
 
   \functionitem[\texttt{NWA::operator=(NWA const \& other)}] Assigns \texttt{other} to \texttt{this};
     the automata will not share structure.
@@ -46,6 +47,11 @@ The names of these functions are very regular, but
 \newgeometry{bottom=0.70in,top=0.70in}
 \begin{sidewaystable}\sffamily\footnotesize
 \begin{threeparttable}
+\caption{\vbox{Table of functions for accessing and manipulating elements
+  of NWAs. All are members of the \texttt{NWA} class, and thus declared in \texttt{wali/nwa/NWA.hpp}. \TODO{Fix footnote
+    numbering}}
+}
+\label{Ta:simple-functions}
 \begin{tabular}{p{0.75in}p{1.55in}p{1.6in}p{1.35in}p{1.27in}p{1.2in}p{1.5in}}
 \toprule
                  &  add\tnote{1}                            &  remove\tnote{1}                          &  check membership\tnote{3} &  count                &  clear                     &  get\tnote{4}                 \\
@@ -63,7 +69,8 @@ symbols\tnote{2} &  addSymbol(Symbol sym)                   &  removeSymbol(Symb
                                                                                                                                                                                              \{begin,end\}Symbols()         \\
 \hline %---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 all \newline
-transitions      &  ---                                     &  findTrans(State s1, Symbol sym, State s2)&  ---                       &  sizeTrans()          &  clearTrans()              &  ---                           \\
+transitions      &  ---                                     &  findTrans(State s1, \newline
+                                                               \phantom{find}Symbol sym, State s2)&  ---                       &  sizeTrans()          &  clearTrans()              &  ---                           \\
 internal \newline
 transitions      &  addInternalTrans(\phantom{.}...\tnote{6}\phantom{a})
                                                             &  removeInternalTrans(\phantom{.}...\tnote{6}\phantom{a})
@@ -96,26 +103,22 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
     interpretation.
   \item[4] The entries of the form, e.g., ``\{begin,end\}States()'' denote a pair
     of functions, each of which returns an iterator. The type of that iterator
-    depends on the function, but is either a \texttt{NWA::StateIterator},
+    is either a \texttt{NWA::StateIterator},
     \texttt{NWA::SymbolIterator}, \texttt{NWA::CallIterator},
-    \texttt{NWA::InternalIterator}, or \texttt{NWA::ReturnIterator}. All are
-    actually const iterators. The other functions (``get\textsl{Kind}()'')
+    \texttt{NWA::InternalIterator}, or \texttt{NWA::ReturnIterator}, as appropriate; all of these are
+    actually const iterators. The other functions (``get\textit{Kind}()'')
     return a \texttt{StateSet} or \texttt{SymbolSet} as appropriate.
   \item[5] Removing a state or a symbol also removes all transitions
     involving it. (Hence clearing all states or clearing all symbols also
     clears all transitions.)
   \item[6] There are two overloads of each of these functions. The first
     takes each element of the transition tuple individually,
-    e.g., \texttt{addInternalTrans(State src, State sym, State tgt)}. The
+    e.g., \texttt{addCallTrans(State src, State sym, State tgt)}. The
     second takes a (constant reference to an) \texttt{NWA::Internal},
     \texttt{NWA::Call}, or \texttt{NWA::Return} object (as
     appropriate). (These are typedefs of a \texttt{Triple} or \texttt{Quad}
     of the appropriate type.)
 \end{tablenotes}
-\caption{Table of functions for accessing and manipulating elements
-  of NWAs. All are members of the \texttt{NWA} class. \TODO{Fix footnote
-    numbering}}
-\label{Ta:simple-functions}
 \end{threeparttable}
 \end{sidewaystable}
 \restoregeometry
@@ -152,7 +155,7 @@ elements of $\Sigma$; see \tableref{simple-functions}, footnote 2. \TODO{Fix
 
 Each state in the NWA can be associated with some client-specific
 information. To utilize this functionality, client code must subclass
-\texttt{ClientInfo}. 
+\texttt{ClientInfo} and override \texttt{ClientInfo * clone() const}.
 
 Once done, client information can be attached or retrieved using the
 following two functions (both members of \texttt{NWA}):
@@ -168,11 +171,11 @@ Client information is tracked through the use of \texttt{ref\_ptr}s, so the
 programmer must consider the standard aliasing and lifetime considerations
 imposed by using smart pointers.
 
-
+\vspace{\baselineskip}
 In addition, you may wish to subclass \texttt{NWA} itself. There are several
 virtual helper functions that are called during intersection and
-determinization to compute the client info for the resulting automaton; These
-can be overriden to customize the behavior. (This is an instance
+determinization to compute the client info for the resulting automaton; these
+can be overriden to customize the behavior. (This design is an instance
 of the ``template method'' design pattern.)
 
 The list of these helper methods is:
@@ -185,7 +188,7 @@ The list of these helper methods is:
   \item \texttt{mergeClientInfoCall}
   \item \texttt{mergeClientInfoReturn}
 \end{itemize}
-(The first three are used by intersection, and the remaining four by
+(The first three are used by intersection and the remaining four by
 determinization.) In addition, \texttt{stateIntersect} and
 \texttt{transitionIntersect} can further customize the behavior of
 intersection, including computation of client
