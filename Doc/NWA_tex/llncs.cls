@@ -1132,7 +1132,7 @@ to0pt{\kern0.55\wd0\vrule height0.45\ht0\hss}\box0}}}}
 \spn@wtheorem{case}{Case}{\itshape}{\rmfamily}
 \spn@wtheorem{conjecture}{Conjecture}{\itshape}{\rmfamily}
 \spn@wtheorem{corollary}{Corollary}{\bfseries}{\itshape}
-\spn@wtheorem{definition}{Definition}{\bfseries}{\itshape}
+\spn@wtheorem{definition}{Definition}{\bfseries}{\slshape}
 \spn@wtheorem{example}{Example}{\itshape}{\rmfamily}
 \spn@wtheorem{exercise}{Exercise}{\itshape}{\rmfamily}
 \spn@wtheorem{lemma}{Lemma}{\bfseries}{\itshape}
