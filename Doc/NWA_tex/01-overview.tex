@@ -40,6 +40,9 @@ The WALi library is available from
 the NWA portion of version 4.0. Building instructions can be found in
 \texttt{README.txt} in the root directory of the distribution.
 
+\clearpage
+\tableofcontents
+\clearpage
 
 \subsection{Library overview}
 
@@ -176,8 +179,8 @@ otherwise specified, they are in namespace \texttt{wali}. See \cite{wali}.
 
     All overloads are declared in \texttt{wali/Key.hpp}.
   \functionitem[\texttt{key2str}] \texttt{key2str} is an ``inverse'' of \texttt{getKey}, except that it
-    always returns a string representation. If the key was created with the
-    \texttt{getKey(std::string const \&)} overload in the first place, this
+    always returns a string representation. If the key was created with
+    \texttt{getKey(std::string const \&)} in the first place, this
     returns a copy of the original string.\footnote{For \texttt{int}s, it is the
     textual representation of the original number. For a \texttt{set<Key>},
     it is the set printed in standard set notation. For a pair of keys, it is
