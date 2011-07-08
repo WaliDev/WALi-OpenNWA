@@ -97,6 +97,33 @@ is $\texttt{A} \cup (\texttt{B} \cap \texttt{C})*$ (where \texttt{A},
 \end{center}
 
 
+\begin{figure}[tb]
+  \centering
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \nwaimage[.49]{Figures/figure-1}
+    \caption{An example NWA.}
+    \label{Fi:Example1}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \nwaimage[0.49]{Figures/union-other}
+    \caption{A second example NWA.}
+    \label{Fi:Union1}
+  \end{minipage}
+\end{figure}
+
+\begin{figure}[tbp]
+  \centering
+    \nwaimage[.55]{Figures/union-result}
+  \caption{The NWA resulting from the union of the NWA in Figure
+    \ref{Fi:Example1} and the NWA in Figure \ref{Fi:Union1}. Note that there
+    are two initial states.}
+  \label{Fi:Union2}
+\end{figure}
+
+
+
 \subsection{Union}
 \label{Se:Union}
 The union of two NWAs is constructed by taking the union of each of the
@@ -119,30 +146,6 @@ then the union is computed as follows:
 As an example, \figref{Union2} illustrates the union of \figref{Example1} and
 \figref{Union1}.
 
-
-\begin{figure}[htb]
-  \centering
-    \nwaimage{Figures/figure-1}
-  \caption{An example NWA.}
-  \label{Fi:Example1}
-\end{figure}
-
-
-\begin{figure}[htbp]
-  \centering
-    \nwaimage{Figures/union-other}
-  \caption{Simple NWA to union with the NWA in Figure \ref{Fi:Example1}.}
-  \label{Fi:Union1}
-\end{figure}
-
-\begin{figure}[htbp]
-  \centering
-    \nwaimage{Figures/union-result}
-  \caption{The NWA resulting from the union of the NWA in Figure
-    \ref{Fi:Example1} and the NWA in Figure \ref{Fi:Union1}. Note that there
-    are two initial states.}
-  \label{Fi:Union2}
-\end{figure}
 
 The state sets of the NWAs must not overlap,
 i.e., $Q_1 \cap Q_2 = \emptyset$. \textsl{Client code should not rely on
@@ -169,20 +172,40 @@ or return) and the symbols on the edge are identical or one is wild.
 \figref{Intersect1} shows the intersection of \figref{Example1} and
 \figref{Intersect1}.
  
-\begin{figure}[htbp]
+\begin{figure}[tp]
   \centering
-    \nwaimage{Figures/intersection-simple-other}
-  \caption{Simple NWA to intersect with the NWA in Figure \ref{Fi:Example1}.}
-  \label{Fi:Intersect1}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \nwaimage[0.45]{Figures/intersection-simple-other}
+    \caption{Simple NWA to intersect with the NWA in Figure \ref{Fi:Example1}.}
+    \label{Fi:Intersect1}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \nwaimage{Figures/intersection-simple-result}
+    \caption{The NWA resulting from the intersection of the NWA in Figure
+      \ref{Fi:Example1} and the NWA in Figure \ref{Fi:Intersect1}.}
+    \label{Fi:Intersect2}
+  \end{minipage}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
-    \nwaimage{Figures/intersection-simple-result}
-  \caption{The NWA resulting from the intersection of the NWA in Figure
-    \ref{Fi:Example1} and the NWA in Figure \ref{Fi:Intersect1}.}
-  \label{Fi:Intersect2}
+    \adjustbox{width=\textwidth,height=\textheight,keepaspectratio=true}{
+    \nwaimage{Figures/intersection-complex-first}
+    \nwaimage{Figures/intersection-complex-second}}
+  \caption{Two complex NWAs to intersect.}
+  \label{Fi:Intersect3}
 \end{figure}
+
+\begin{figure}[p]
+  \centering
+    \nwaimage[.45]{Figures/intersection-complex-result}
+  \caption{The NWA resulting from the intersection of the NWAs in Figure \ref{Fi:Intersect3}.}
+  \label{Fi:Intersect4}
+\end{figure}
+
+\antistupidfloats
 
 It is possible to customize what symbols are considered equivalent by
 overriding the \texttt{transitionIntersect} function in a subclass of
@@ -271,23 +294,6 @@ Consider the slightly more complex example of computing the intersection of
 the NWAs shown in Figure \ref{Fi:Intersect3}.  The resulting NWA is shown in
 Figure \ref{Fi:Intersect4}.
 
-\begin{figure}[p]
-  \centering
-    \adjustbox{width=\textwidth,height=\textheight,keepaspectratio=true}{
-    \nwaimage{Figures/intersection-complex-first}
-    \nwaimage{Figures/intersection-complex-second}}
-  \caption{Complex NWAs to intersect.}
-  \label{Fi:Intersect3}
-\end{figure}
-
-\begin{figure}[p]
-  \centering
-    \nwaimage{Figures/intersection-complex-result}
-  \caption{The NWA resulting from the intersection of the NWAs in Figure \ref{Fi:Intersect3}.}
-  \label{Fi:Intersect4}
-\end{figure}
-
-
 
 \subsection{Concatenation}
 \label{Se:Concatenation}
@@ -317,6 +323,36 @@ following manner. When computing the concatenation of \texttt{left} and
 %\ref{Fi:Example1} and the NWA shown in Figure \ref{Fi:Concat1} is shown in
 %Figure \ref{Fi:Concat2}.
 
+\begin{figure}[p]
+  \centering
+  \begin{minipage}{0.5\textwidth}
+    \begin{minipage}{\textwidth}
+      \centering
+      \nwaimage[1]{Figures/concat-other}
+      \caption{Simple NWA to concatenate onto the NWA in Figure \ref{Fi:Example1}.}
+      \label{Fi:Concat1}
+    \end{minipage}
+
+    \vspace{2\baselineskip}
+    \begin{minipage}{0.8\textwidth}
+      \centering
+      \nwaimage[0.55]{Figures/reverse-of-figure-1}
+      \caption{The NWA resulting from performing reverse on the NWA in Figure \ref{Fi:Example1}.}
+      \label{Fi:Reverse1}
+    \end{minipage}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \nwaimage[0.75]{Figures/concat-result}
+    \caption{The NWA resulting from the concatenation of the NWA in Figure
+      \ref{Fi:Example1} with the NWA in Figure \ref{Fi:Concat1}.}
+    \label{Fi:Concat2}
+  \end{minipage}
+\end{figure}
+
+\antistupidfloats
+
+
 
 The state sets of the NWAs must not overlap,
 i.e., $Q_1 \cap Q_2 = \emptyset$. \textsl{Client code should not rely on
@@ -330,23 +366,6 @@ Client information is copied directly from the original NWAs using
 \figref{Concat1}.
 
 
-
-\begin{figure}[p]
-  \centering
-    \nwaimage{Figures/concat-other}
-  \caption{Simple NWA to concatenate onto the NWA in Figure \ref{Fi:Example1}.}
-  \label{Fi:Concat1}
-\end{figure}
-
-\begin{figure}[p]
-  \centering
-    \nwaimage{Figures/concat-result}
-  \caption{The NWA resulting from the concatenation of the NWA in Figure
-    \ref{Fi:Example1} with the NWA in Figure \ref{Fi:Concat1}.}
-  \label{Fi:Concat2}
-\end{figure}
-
-
 \subsection{Kleene-Star}
 \label{Se:Star}
 
@@ -358,6 +377,22 @@ allowed to take a return transition where the call predecessor is an initial
 state of the automaton.)  Because of this, when computing $R = A*$ for some
 NWA $A$, the resulting NWA has two ``copies'' of $A$. These are denoted by
 primed and unprimed version of states from $A$ in the definition below. 
+
+\begin{figure}[p]
+  \centering
+    \nwaimage[.4]{Figures/star-simple}
+  \caption{An NWA on which to perform Kleene-Star.}
+  \label{Fi:Star1}
+\end{figure}
+
+\begin{figure}[p]
+  \centering
+    \nwaimage[1.1]{Figures/star-simple-result}
+  \caption{The NWA resulting from performing Kleene-Star on the NWA in Figure \ref{Fi:Star1}.}
+  \label{Fi:Star2}
+\end{figure}
+\antistupidfloats
+
 
 Suppose $R$ is reading a word $w_1w_2\cdots w_n$ where each $w_i \in
 L(A)$. $R$ begins in a start state of $A'$. Henceforth it maintains an
@@ -439,20 +474,6 @@ Q_0', \delta', Q_0')$ where $\delta' =
 The NWA resulting from performing Kleene-Star on the NWA shown in
 \figref{Star1} is shown in \figref{Star2}.
 
-\begin{figure}[p]
-  \centering
-    \nwaimage{Figures/star-simple}
-  \caption{An NWA on which to perform Kleene-Star.}
-  \label{Fi:Star1}
-\end{figure}
-
-\begin{figure}[p]
-  \centering
-    \nwaimage{Figures/star-simple-result}
-  \caption{The NWA resulting from performing Kleene-Star on the NWA in Figure \ref{Fi:Star1}.}
-  \label{Fi:Star2}
-\end{figure}
-
 \goodbreak Client information is copied directly from the original NWA (using
 \texttt{ClientInfo::clone()}) such that for each $q \in Q$, $q$
 and $q'$ have the same client information.
@@ -503,12 +524,6 @@ the following rules:
 The NWA resulting from performing reverse on the NWA shown in
 Figure \ref{Fi:Example1} is shown in Figure \ref{Fi:Reverse1}.
  
-\begin{figure}[p]
-  \centering
-    \nwaimage{Figures/reverse-of-figure-1}
-  \caption{The NWA resulting from performing reverse on the NWA in Figure \ref{Fi:Example1}.}
-  \label{Fi:Reverse1}
-\end{figure}
 
 Client
 information is copied directly from the original NWA using
@@ -570,7 +585,7 @@ The result of determinizing the automaton in \figref{Det1} is shown in
 
 \begin{figure}[p]
   \centering
-    \nwaimage{Figures/determinize}
+    \nwaimage[0.45]{Figures/determinize}
   \caption{Simple nondeterministic NWA.}
   \label{Fi:Det1}
 \end{figure}
@@ -578,15 +593,11 @@ The result of determinizing the automaton in \figref{Det1} is shown in
 
 \begin{figure}[p]
   \centering
-    \nwaimage{Figures/determinize-result}
+    \nwaimage[.75]{Figures/determinize-result}
     \caption{The NWA resulting from determinizing the NWA in Figure
-      \ref{Fi:Det1}. As mentioned in the text, states in the determinized
-      NWA are relations on the states in the original NWA. For example, state
-      1 above corresponds to the relation $\{$(Start,Stuck), (Call,Stuck),
-      (Entry1,Stuck), (Entry2,Exit2), (State1,Stuck), (State2,Stuck),
-      (Exit1,Stuck), (Exit2,Stuck), (Return,Stuck), (Fishish,Stuck),
-      (Stuck,Stuck)$\}$.}
- 
+      \ref{Fi:Det1}. As mentioned in the text, states in the determinized NWA
+      are relations on the states in the original NWA. The state
+      $\varnothing$ has been removed from this diagram.} 
   \label{Fi:Det2}
 \end{figure}
 
@@ -680,15 +691,19 @@ the input NWA must already be deterministic. The result of
 complementing of the NWA shown in Figure \ref{Fi:Det1} is
 shown in Figure \ref{Fi:Comp1}.
 
-\begin{figure}[p]
+Client information is copied directly
+from the determinization of the original NWA using \texttt{ClientInfo::clone()}.
+
+\begin{figure}[h]
   \centering
-    \nwaimage{Figures/complement-of-determinize}
+    \nwaimage[1]{Figures/complement-of-determinize}
   \caption{The complement of the NWA in Figure \ref{Fi:Det1} (the
-    determinization of which is shown in Figure \ref{Fi:Det2}).}
+    determinization of which is shown in Figure \ref{Fi:Det2}).  We omit
+    transitions to the state $\{\}$; any action which does not appear in that
+    diagram goes to that state.
+  }
   \label{Fi:Comp1}
 \end{figure}
 
-Client information is copied directly
-from the determinization of the original NWA using \texttt{ClientInfo::clone()}.
 
 
