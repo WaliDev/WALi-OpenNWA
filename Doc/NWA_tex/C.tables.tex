@@ -12,16 +12,19 @@ expect.
 
 \listoftables
 
+\clearpage
 
-\newgeometry{bottom=0.70in,top=0.70in}
+\newgeometry{bottom=1in,top=0.7in}
+\setlength{\extrarowheight}{4pt}
+
 \begin{sidewaystable}\sffamily\footnotesize
 \begin{threeparttable}
-\caption{\vbox{Table of functions for accessing and manipulating elements
+\caption{Table of functions for accessing and manipulating elements
   of NWAs. All are members of the \texttt{NWA} class, and thus declared in \texttt{wali/nwa/NWA.hpp}. \TODO{Fix footnote
-    numbering}}
+    numbering}
 }
 \label{Ta:simple-functions}
-\begin{tabular}{p{0.75in}p{1.55in}p{1.6in}p{1.35in}p{1.27in}p{1.2in}p{1.5in}}
+\begin{tabular}{p{0.55in}p{1.40in}p{1.45in}p{1.2in}p{1.12in}p{1.05in}p{1.35in}}
 \toprule
                  &  add\tnote{1}                            &  remove\tnote{1}                          &  check membership\tnote{3} &  count                &  clear                     &  get\tnote{4}                 \\
 \hline\hline %---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -90,15 +93,11 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
 \end{tablenotes}
 \end{threeparttable}
 \end{sidewaystable}
-\restoregeometry
 
 
 
 \newcommand{\RP}{\tnote{1}} %"returns pair"
 
-\setlength{\extrarowheight}{4pt}
-
-\newgeometry{bottom=0.75in,top=0.75in}
 \begin{sidewaystable}\sffamily
 \begin{threeparttable}
 \caption{\textbf{Query functions for all transitions.} These functions are
@@ -205,7 +204,7 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
   name \texttt{call}; the symbol is the third component and uses the argument
   name \texttt{sym}; the ``return site'' is the fourth component and uses the
   argument name \texttt{ret}. }
-\begin{tabular}{p{0.6in}p{0.65in}p{0.6in}|@{\hspace{0.1in}}p{1.75in}p{1.9in}p{1.9in}p{2in}}
+\begin{tabular}{p{0.5in}p{0.55in}p{0.5in}|@{\hspace{0.1in}}p{1.55in}p{1.7in}p{1.7in}p{1.75in}}
 \toprule\toprule
 \multicolumn{3}{c|@{\hspace{0.1in}}}{\textsl{What you know}}  & \multicolumn{4}{c}{\textsl{What you want}}                                                                                                                                                \tabularnewline
  this...  & and this ...  & and this & exit sites & call predecessors &
