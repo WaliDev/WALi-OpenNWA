@@ -68,7 +68,7 @@ reverse-of-figure-1.nwa: figure-1.nwa
 determinize-result.nwa: determinize.nwa
 	$(DETERMINIZE) -o $@ $^
 
-complement-of-determinize.nwa: determinize.nwa
+complement-of-determinize.nwa: determinize-result.nwa
 	$(COMPLEMENT) -o $@ $^
 
 clean:
