@@ -186,7 +186,7 @@ reflect the views of the sponsoring agencies.
 \newlength{\thenwaimagewidth}
 \newlength{\thenwaimageheight}
 
-\newcommand{\nwaimage}[2][]{%
+\newcommand{\nwaimage}[2][0.66]{%
   \sbox{\thenwaimagebox}{\input{#2}}%
   \settoboxwidth{\thenwaimagewidth}{\thenwaimagebox}%
   \settoboxheight{\thenwaimageheight}{\thenwaimagebox}%
@@ -198,14 +198,14 @@ reflect the views of the sponsoring agencies.
   %
   % except split this up for easier latexing
   %
-  \ifdimless{\thenwaimagewidth}{0.66\textwidth}{%
-    \ifdimless{\thenwaimageheight}{0.66\textheight}{%
+  \ifdimless{\thenwaimagewidth}{#1\textwidth}{%
+    \ifdimless{\thenwaimageheight}{#1\textheight}{%
       \usebox{\thenwaimagebox}%
     }{%
-      \adjustbox{width=0.66\textwidth,height=0.66\textheight,keepaspectratio=true}{\usebox{\thenwaimagebox}}%
+      \adjustbox{width=#1\textwidth,height=#1\textheight,keepaspectratio=true}{\usebox{\thenwaimagebox}}%
     }%
   }{%
-    \adjustbox{width=0.66\textwidth,height=0.66\textheight,keepaspectratio=true}{\usebox{\thenwaimagebox}}%
+    \adjustbox{width=#1\textwidth,height=#1\textheight,keepaspectratio=true}{\usebox{\thenwaimagebox}}%
   }%
 }
 
