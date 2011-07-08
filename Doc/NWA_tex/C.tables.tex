@@ -1,0 +1,263 @@
+\section{Tables}
+\label{Se:Tables}
+This section provides a number of quick-reference tables.
+
+The tables do not have \textsl{all} the information one needs to know in
+order to call the functions, and the entries use some shorthands; but they
+provide enough information for specifics to be looked up in the corresponding
+header or Doxygen documentation. The caption of each table gives the header
+that contains the functions listed. In the interest of space, the types of
+the function arguments are sometimes omitted, but they are likely to be what you
+expect.
+
+
+\newgeometry{bottom=0.70in,top=0.70in}
+\begin{sidewaystable}\sffamily\footnotesize
+\begin{threeparttable}
+\caption{\vbox{Table of functions for accessing and manipulating elements
+  of NWAs. All are members of the \texttt{NWA} class, and thus declared in \texttt{wali/nwa/NWA.hpp}. \TODO{Fix footnote
+    numbering}}
+}
+\label{Ta:simple-functions}
+\begin{tabular}{p{0.75in}p{1.55in}p{1.6in}p{1.35in}p{1.27in}p{1.2in}p{1.5in}}
+\toprule
+                 &  add\tnote{1}                            &  remove\tnote{1}                          &  check membership\tnote{3} &  count                &  clear                     &  get\tnote{4}                 \\
+\hline\hline %---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+states           &  addState(State st)                      &  removeState(State st)\tnote{5}           &  isState(State st)         &  sizeStates()         &  clearStates()\tnote{5}    &  getStates() or \newline
+                                                                                                                                                                                             \{begin,end\}States()        \\
+initial \newline
+states           &  addInitialState(State st)               &  removeInitialState(State st)             &  isInitialState(State st)  &  sizeInitialStates()  &  clearInitialStates()      &  getInitialStates() or \newline
+                                                                                                                                                                                             \{begin,end\}InitialStates() \\
+final
+\newline  states &  addFinalState(State st)                 &  removeFinalState(State st)               &  isFinalState(State)       &  sizeFinalStates()    &  clearFinalStates()        &  getFinalStates() or \newline
+                                                                                                                                                                                             \{begin,end\}FinalStates()    \\
+\hline %---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+symbols\tnote{2} &  addSymbol(Symbol sym)                   &  removeSymbol(Symbol sym)\tnote{5}        &  isSymbol(Symbol sym)      &  sizeSymbols()        &  clearSymbols()            &  getSymbols() or \newline
+                                                                                                                                                                                             \{begin,end\}Symbols()         \\
+\hline %---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+all \newline
+transitions      &  ---                                     &  findTrans(State s1, \newline
+                                                               \phantom{find}Symbol sym, State s2)&  ---                       &  sizeTrans()          &  clearTrans()              &  ---                           \\
+internal \newline
+transitions      &  addInternalTrans(\phantom{.}...\tnote{6}\phantom{a})
+                                                            &  removeInternalTrans(\phantom{.}...\tnote{6}\phantom{a})
+                                                                                                        &  ---                       &  sizeInternalTrans()  &  ---                       &  \{begin,end\}internalTrans()  \\
+call \newline
+transitions      &  addCallTrans(\phantom{.}...\tnote{6}\phantom{a})
+                                                            &  removeCallTrans(\phantom{.}...\tnote{6}\phantom{a})
+                                                                                                        &  ---                       &  sizeCallTrans()      &  ---                       &  \{begin,end\}callTrans()      \\
+return \newline
+transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
+                                                            &  removeReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
+                                                                                                        &  ---                       &  sizeReturnTrans()  &  ---                       &  \{begin,end\}returnTrans()\\
+\hline
+\end{tabular}
+\begin{tablenotes}
+  \item[1] These functions return a \texttt{bool} indicating whether the item
+    was added/removed. Adding a transition implicitly adds all
+    states and symbols in that transition if they are not already present.
+    Removing a state or symbol removes all transitions the removed item was a
+    part of.
+  \item[2] \texttt{WALI\_EPSILON} and \texttt{WALI\_WILD} are not explicit
+    members of the symbol set. This has the following consequences (for
+    \texttt{s} as epsilon or wild): \texttt{addSymbol(s)} and
+    \texttt{removeSymbol(s)} are both no-ops and return \texttt{false},
+    \texttt{isSymbol(s)} returns false, \texttt{sizeSymbols()} does not count
+    epsilon or wild, and neither the set returned by \texttt{getSymbols()}
+    nor the iterator range \texttt{\{begin,end\}Symbols()} will contain
+    epsilon or wild.
+  \item[3] These functions return a \texttt{bool} with the natural
+    interpretation.
+  \item[4] The entries of the form, e.g., ``\{begin,end\}States()'' denote a pair
+    of functions, each of which returns an iterator. The type of that iterator
+    is either a \texttt{NWA::StateIterator},
+    \texttt{NWA::SymbolIterator}, \texttt{NWA::CallIterator},
+    \texttt{NWA::InternalIterator}, or \texttt{NWA::ReturnIterator}, as appropriate; all of these are
+    actually const iterators. The other functions (``get\textit{Kind}()'')
+    return a \texttt{StateSet} or \texttt{SymbolSet} as appropriate.
+  \item[5] Removing a state or a symbol also removes all transitions
+    involving it. (Hence clearing all states or clearing all symbols also
+    clears all transitions.)
+  \item[6] There are two overloads of each of these functions. The first
+    takes each element of the transition tuple individually,
+    e.g., \texttt{addCallTrans(State src, State sym, State tgt)}. The
+    second takes a (constant reference to an) \texttt{NWA::Internal},
+    \texttt{NWA::Call}, or \texttt{NWA::Return} object (as
+    appropriate). (These are typedefs of a \texttt{Triple} or \texttt{Quad}
+    of the appropriate type.)
+\end{tablenotes}
+\end{threeparttable}
+\end{sidewaystable}
+\restoregeometry
+
+
+
+\newcommand{\RP}{\tnote{1}} %"returns pair"
+
+\setlength{\extrarowheight}{4pt}
+
+\newgeometry{bottom=0.75in,top=0.75in}
+\begin{sidewaystable}\sffamily
+\begin{threeparttable}
+\caption{\textbf{Query functions for all transitions.} These functions are
+  in the namespace \texttt{wali::nwa::query}; include the
+  file \texttt{wali/nwa/query/transitions.hpp}. For return transitions, the
+  ``source'' is the first component of the transition; nothing involving call
+  predecessors (the second component of return transitions) appears in this table. A table
+  entry of ``---'' means that the combination of arguments does not make sense. }
+\begin{tabular}{p{1in}p{1in}|@{\hspace{0.1in}}p{2.2in}p{2.2in}p{2in}}
+\toprule\toprule
+\multicolumn{2}{c|@{\hspace{0.1in}}}{\textsl{What you know}} & \multicolumn{3}{c}{\textsl{What you want}}                                                                 \tabularnewline
+ this...        & ... and this      &    sources                    &   symbols                          &    targets                     \tabularnewline
+\midrule
+\midrule %-------------------------------------------------------------------------------------------------------------------------------
+  source        &  (nothing)        &      ---                      &  (none)                            &  getSuccessors(nwa, src)       \tabularnewline
+                &  symbol           &      ---                      &        ---                         &  getSuccessors(nwa, src, sym)  \tabularnewline
+                &  target           &      ---                      &  getSymbol(nwa, src, tgt, \&sym)   &   ---                          \tabularnewline
+\midrule %-------------------------------------------------------------------------------------------------------------------------------
+  symbol        &  (nothing)        &      ---                      &        ---                         &   (none)                       \tabularnewline
+                &  target           & getPredecessors(nwa, sym, tgt)&       ---                         &   ---                          \tabularnewline
+\midrule %-------------------------------------------------------------------------------------------------------------------------------
+  target        &  (nothing)        & getPredecessors(nwa, tgt)     &  (none)                            &   ---                          \tabularnewline
+\bottomrule\bottomrule
+\end{tabular}
+\end{threeparttable}
+\label{Ta:query-all-transitions}
+\end{sidewaystable}
+
+\begin{sidewaystable}\sffamily
+\caption{\textbf{Query functions for internal transitions.}
+  These functions are in the namespace \texttt{wali::nwa::query};
+  include the file \texttt{wali/nwa/query/internals.hpp}.
+  A table entry of ``---'' means that combinations of arguments does not make
+  sense.}
+\begin{threeparttable}
+\begin{tabular}{p{1in}p{1in}|@{\hspace{0.1in}}p{2.2in}p{2.2in}p{2in}}
+\toprule\toprule
+\multicolumn{2}{c|@{\hspace{0.1in}}}{\textsl{What you know}} & \multicolumn{3}{c}{\textsl{What you want}}                                                                 \tabularnewline
+ this...        & ... and this      &    sources                    &   symbols                          &    targets                     \tabularnewline
+\midrule
+\midrule %-------------------------------------------------------------------------------------------------------------------------------
+ (nothing)      &  (nothing)        & getSources(nwa)               &  getInternalSym(nwa)               &  getTargets(nwa)               \tabularnewline
+\midrule %-------------------------------------------------------------------------------------------------------------------------------
+  source        &  (nothing)        &      ---                      &  getInternalSym\_Source(nwa, src) \newline
+                                                                       or getTargets(nwa, src)\RP        &  getTargets(nwa, src)\RP       \tabularnewline
+                &  symbol           &      ---                      &        ---                         &  getTargets(nwa, src, sym)     \tabularnewline
+                &  target           &      ---                      &  getInternalSym(nwa, src, tgt)     &   ---                          \tabularnewline
+\midrule %-------------------------------------------------------------------------------------------------------------------------------
+  symbol        &  (nothing)        & getSources\_Sym(nwa, sym)     &        ---                         &  getTargets\_Sym(nwa, sym)     \tabularnewline
+                &  target           & getSources(nwa, sym, tgt)     &        ---                         &   ---                          \tabularnewline
+\midrule %-------------------------------------------------------------------------------------------------------------------------------
+  target        &  (nothing)        & getSources(nwa, tgt)\RP       &  getInternalSym\_Target(nwa, tgt) \newline
+                                                                       or getSources(nwa, tgt)\RP        &   ---                          \tabularnewline
+\bottomrule\bottomrule
+\end{tabular}
+\begin{tablenotes}
+  \item[1] Returns a set of pairs (either source/symbol or symbol/target).
+\end{tablenotes}
+\end{threeparttable}
+\label{Ta:query-internal-transitions}
+\end{sidewaystable}
+
+\begin{sidewaystable}\sffamily
+\begin{threeparttable}
+\caption{\textbf{Query functions for call transitions.} These functions are in the
+  namespace \texttt{wali::nwa::query}; include the
+  file \texttt{wali/nwa/query/calls.hpp}. The ``call site'' is the source of the transition (and uses the argument 
+  name \texttt{call}), and the ``entry'' of the transition is the target (and
+  uses the argument name \texttt{ent}). }
+\begin{tabular}{p{1in}p{1in}|@{\hspace{0.1in}}p{2.2in}p{2.2in}p{2in}}
+\toprule\toprule
+\multicolumn{2}{c|@{\hspace{0.1in}}}{\textsl{What you know}} & \multicolumn{3}{c}{\textsl{What you want}}                                                                 \tabularnewline
+ this...        & ... and this      &    call sites                   &   symbols                          &    entries                     \tabularnewline
+\midrule
+\midrule %-------------------------------------------------------------------------------------------------------------------------------
+ (nothing)      &  (nothing)        & getCallSites(nwa)               &  getCallSym(nwa)                   &  getEntries(nwa)               \tabularnewline
+\midrule %-------------------------------------------------------------------------------------------------------------------------------
+ call site      &  (nothing)        &      ---                        &  getCallSym\_Call(nwa, call)\newline
+                                                                         or getEntries(nwa, call)\RP       &  getEntries(nwa, call)\RP      \tabularnewline
+                &  symbol           &      ---                        &        ---                         &  getEntries(nwa, call, sym)    \tabularnewline
+                &  target           &      ---                        &  getCallSym(nwa, call, ent)        &   ---                          \tabularnewline
+\midrule %-------------------------------------------------------------------------------------------------------------------------------
+  symbol        &  (nothing)        & getCallSites\_Sym(nwa, sym)     &        ---                         &  getEntries\_Sym(nwa, sym)     \tabularnewline
+                &  target           & getCallSites(nwa, sym, ent)     &        ---                         &   ---                          \tabularnewline
+\midrule %-------------------------------------------------------------------------------------------------------------------------------
+  entry         &  (nothing)        & getCallSites(nwa, ent)\RP       &  getCallSym\_Entry(nwa, ent) \newline
+                                                                         or getCallSites(nwa, ent)\RP      &   ---                          \tabularnewline
+\bottomrule\bottomrule
+\end{tabular}
+\begin{tablenotes}
+  \item[1] Returns a set of pairs (either call site/symbol or symbol/entry).
+\end{tablenotes}
+\end{threeparttable}
+\label{Ta:query-call-transitions}
+\end{sidewaystable}
+
+\begin{sidewaystable}\footnotesize\sffamily
+\begin{threeparttable}
+\caption{\textbf{Query functions for return transitions.} These functions are in the
+  namespace \texttt{wali::nwa::query}; include the
+  file \texttt{wali/nwa/query/returns.hpp}.   The ``exit site'' is the source of the transition
+  (the first component) and uses the argument name \texttt{exit} in this table;
+  the ``call predecessor'' is the second component and uses the argument
+  name \texttt{call}; the symbol is the third component and uses the argument
+  name \texttt{sym}; the ``return site'' is the fourth component and uses the
+  argument name \texttt{ret}. }
+\begin{tabular}{p{0.6in}p{0.65in}p{0.6in}|@{\hspace{0.1in}}p{1.75in}p{1.9in}p{1.9in}p{2in}}
+\toprule\toprule
+\multicolumn{3}{c|@{\hspace{0.1in}}}{\textsl{What you know}}  & \multicolumn{4}{c}{\textsl{What you want}}                                                                                                                                                \tabularnewline
+ this...  & and this ...  & and this & exit sites & call predecessors &
+ symbols & return sites \tabularnewline
+\midrule
+\midrule %--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ (nothing)      &  (nothing)        &  (nothing)    & getExits(nwa)                 &  getCalls(nwa)                        &  getReturnSym(nwa)                           &  getReturns(nwa)                            \tabularnewline
+\midrule %--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ exit site      &  (nothing)        &  (nothing)    &      ---                      &  getCalls\_Exit(nwa, exit)\RP         &  getReturnSym\_Exit(nwa, exit) \newline
+                                                                                                                               or getReturns\_Exit(nwa, exit)\RP\newline
+                                                                                                                               or getCalls\_Exit(nwa, exit)\RP             &  getReturns\_Exit(nwa, exit)\RP             \tabularnewline
+                \cline{2-7} %-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                &  call pred        &  (nothing)    &      ---                      &    ---                                &  getReturnSym\_ExitCall(nwa, exit, \newline
+                                                                                                                               \phantom{getReturnSym\_ExitCall(}call) \newline
+                                                                                                                               or getReturns(nwa, exit, call)\RP           &  getReturns(nwa, exit, call)\RP             \tabularnewline
+                &                   &  symbol       &      ---                      &    ---                                &        ---                                   &  getReturns(nwa, exit, call, sym)           \tabularnewline
+                &                   &  return       &      ---                      &    ---                                &  getReturnSym(nwa, exit, call, \newline
+                                                                                                                               \phantom{getReturnSym(}ret)                 &    ---                                      \tabularnewline
+                \cline{2-7} %-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                &  symbol           &  (nothing)    &      ---                      &  getCalls\_Exit(nwa, exit, sym)       &        ---                                   &  getReturns\_Exit(nwa, exit, sym)           \tabularnewline
+                &                   &  return       &      ---                      &  getCalls(nwa, exit, sym, ret)        &        ---                                   &  getEntries(nwa, call, sym, ret)            \tabularnewline
+                \cline{2-7} %-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                &  return site      &  (nothing)    &      ---                      &  getCalls(nwa, exit, ret)\RP          &  getReturnSym\_ExitRet(nwa, exit, \newline
+                                                                                                                               \phantom{getReturnSym\_ExitRet(}ret) \newline
+                                                                                                                               or getCalls(nwa, exit, ret)\RP              &   ---                                       \tabularnewline
+\midrule %-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ call pred      &  (nothing)        &  (nothing)    & getExits\_Call(nwa, call)\RP  &   ---                                 &  getReturnSym\_Call(nwa, call) \newline
+                                                                                                                               or getReturns\_Call(nwa, call)\RP\newline
+                                                                                                                               or getExits\_Call(nwa, call)\RP            &  getReturnSites(nwa, call) or \newline
+                                                                                                                                                                             getCallSuccessors(nwa, call) or \newline
+                                                                                                                                                                             getReturns\_Call(nwa, call)\RP              \tabularnewline
+                \cline{2-7} %-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                &  symbol           &  (nothing)    & getExits\_Call(nwa, call, sym)&   ---                                 &        ---                                   &  getCallSuccessors(nwa, call, sym) \newline
+                                                                                                                                                                              or getReturns\_Call(nwa, call, sym)        \tabularnewline
+                &                   &  return       & getExits(nwa, call, sym, ret) &   ---                                 &        ---                                   &    ---                                      \tabularnewline
+                \cline{2-7} %-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                &  return site      &  (nothing)    & getExits(nwa, call, ret)\RP   &   ---                                 &  getReturnSym\_CallRet(nwa, call, \newline
+                                                                                                                               \phantom{getReturnSym\_CallRet(}ret) \newline
+                                                                                                                               or getExits(nwa, call, ret)\RP              &   ---                                       \tabularnewline
+\midrule %--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ symbol         &  (nothing)        &  (nothing)    & getExits\_Sym(nwa, c)         &  getCalls\_Sym(nwa, c)                &   ---                                        &  getReturns\_Sym(nwa, sym)                  \tabularnewline
+                \cline{2-7} %-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                &  return site      &  (nothing)    & getExits\_Ret(nwa, call, ret) &  getCallPredecessors(nwa, sym, ret) \newline
+                                                                                       or getCalls\_Ret(nwa, sym, c)        &   ---                                        &   ---                                       \tabularnewline
+\midrule %--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ return site    &  (nothing)         & (nothing)    & getExits\_Ret(nwa, ret)       &  getCallPredecessors(nwa, ret) \newline
+                                                                                       or getCalls\_Ret(nwa, ret)\RP        &  getReturnSym\_Ret(nwa, ret) or \newline
+                                                                                                                               getCalls\_Ret(nwa, ret)\RP                  &   ---                                       \tabularnewline
+\bottomrule\bottomrule
+\end{tabular}
+\begin{tablenotes}
+  \item[1] Returns a set of pairs (a symbol with one of the states, in the order of the raw transition).
+\end{tablenotes}
+\end{threeparttable}
+\label{Ta:query-return-transitions}
+\end{sidewaystable}
+\restoregeometry
