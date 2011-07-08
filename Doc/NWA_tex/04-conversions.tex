@@ -199,7 +199,7 @@ be overridden:
         State target, ClientInfoRefPtr targetInfo ) const}}]  \nopagebreak
     Computes and returns the weight for the WPDS rule corresponding to the
     transition from \texttt{source} to \texttt{target} labeled with the
-    meta-symbol \texttt{*}. By default, returns texttt{getOne()}.
+    meta-symbol \wild. By default, returns texttt{getOne()}.
 
   \functionitem[\texttt{sem\_elem\_t getExitWeight(State src, ClientInfoRefPtr srcInfo)} const]
   This method computes the weight(in the desired semiring) for the return rule of
@@ -260,17 +260,17 @@ be overridden:
 \text{where }
 w_0 & = \begin{cases}
         \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
-        \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{*} \\
+        \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{\wild} \\
         \mathtt{wg.getWeight}(q_x,CI_{q_x},\sigma,\mathtt{EXIT\_TO\_RET},q_r,CI_{q_r}), & \text{otherwise}
       \end{cases}  \\
 w_1 &= \begin{cases}
          \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
-         \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{*} \\
+         \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{\wild} \\
          \mathtt{wg.getWeight}(q,CI_q,\sigma,\mathtt{INTRA},q',CI_{q'}), & \text{otherwise}
       \end{cases} \\
 w_2 &= \begin{cases}
          \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
-         \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{*} \\
+         \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{\wild} \\
          \mathtt{wg.getWeight}(q_c,CI_{q_c},\sigma,\mathtt{CALL\_TO\_ENTRY},q_e,CI_{q_e}), & \text{otherwise}
       \end{cases} \\
 w_3 &= \mathtt{wg.getOne}() 
@@ -349,17 +349,17 @@ shown in Figure \ref{Fig:NwaToWpds1} into a WPDS is shown in Figure
 \text{where }
 w_0 &= \begin{cases}
            \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
-           \mathtt{wg.getWildWeight}(q_c,CI_{q_c},q_e,CI_{q_e}), & \text{if } \sigma = \text{*} \\
+           \mathtt{wg.getWildWeight}(q_c,CI_{q_c},q_e,CI_{q_e}), & \text{if } \sigma = \text{\wild} \\
            \mathtt{wg.getWeight}(q_c,CI_{q_c},\sigma, \mathtt{CALL\_TO\_ENTRY},q_e,CI_{q_e}), & \text{otherwise}
       \end{cases} \\
 w_1 &= \begin{cases}
            \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
-           \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{*} \\
+           \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{\wild} \\
            \mathtt{wg.getWeight}(q,CI_q,\sigma, \mathtt{INTRA},q',CI_{q'}), & \text{otherwise}
        \end{cases} \\
 w_2 &= \begin{cases}
           \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
-          \mathtt{wg.getWildWeight}(q_x,CI_{q_x},q_r,CI_{q_r}), & \text{if } \sigma = \text{*} \\
+          \mathtt{wg.getWildWeight}(q_x,CI_{q_x},q_r,CI_{q_r}), & \text{if } \sigma = \text{\wild} \\
           \mathtt{wg.getWeight}(q_x,CI_{q_x},\sigma, \mathtt{EXIT\_TO\_RET},q_r,CI_{q_r}), & \text{otherwise}
       \end{cases} \\
 w_3 &= \mathtt{wg.getOne}()
@@ -441,17 +441,17 @@ WPDS is shown in Figure \ref{Fig:NwaToWpds5}.  Note:
 w_0 &= \mathtt{wg.getOne}() \\
 w_1 &= \begin{cases}
            \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
-           \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{*} \\
+           \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{\wild} \\
            \mathtt{wg.getWeight}(q,CI_q,\sigma, \mathtt{INTRA},q',CI_{q'}), & \text{otherwise}
        \end{cases} \\
 w_2 &= \begin{cases}
            \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
-           \mathtt{wg.getWildWeight}(q_c,CI_{q_c},q_e,CI_{q_e}), & \text{if } \sigma = \text{*} \\
+           \mathtt{wg.getWildWeight}(q_c,CI_{q_c},q_e,CI_{q_e}), & \text{if } \sigma = \text{\wild} \\
            \mathtt{wg.getWeight}(q_c,CI_{q_c},\sigma, \mathtt{CALL\_TO\_ENTRY},q_e,CI_{q_e}), & \text{otherwise}
       \end{cases} \\
 w_3 &= \begin{cases}
           \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
-          \mathtt{wg.getWildWeight}(q_x,CI_{q_x},q_r,CI_{q_r}), & \text{if } \sigma = \text{*} \\
+          \mathtt{wg.getWildWeight}(q_x,CI_{q_x},q_r,CI_{q_r}), & \text{if } \sigma = \text{\wild} \\
           \mathtt{wg.getWeight}(q_x,CI_{q_x},\sigma, \mathtt{EXIT\_TO\_RET},q_r,CI_{q_r}), & \text{otherwise}
       \end{cases} 
 \end{align*}
@@ -530,17 +530,17 @@ shown in Figure \ref{Fig:NwaToWpds1} into a WPDS is shown in Figure
 w_0 &= \mathtt{wg.getOne}() \\
 w_1 &= \begin{cases}
            \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
-           \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{*} \\
+           \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{\wild} \\
            \mathtt{wg.getWeight}(q,CI_q,\sigma, \mathtt{INTRA},q',CI_{q'}), & \text{otherwise}
        \end{cases} \\
 w_2 &= \begin{cases}
           \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
-          \mathtt{wg.getWildWeight}(q_x,CI_{q_x},q_r,CI_{q_r}), & \text{if } \sigma = \text{*} \\
+          \mathtt{wg.getWildWeight}(q_x,CI_{q_x},q_r,CI_{q_r}), & \text{if } \sigma = \text{\wild} \\
           \mathtt{wg.getWeight}(q_x,CI_{q_x},\sigma, \mathtt{EXIT\_TO\_RET},q_r,CI_{q_r}), & \text{otherwise}
       \end{cases} \\
 w_3 &= \begin{cases}
            \mathtt{wg.getOne}(), & \text{if } \sigma = \epsilon \\
-           \mathtt{wg.getWildWeight}(q_c,CI_{q_c},q_e,CI_{q_e}), & \text{if } \sigma = \text{*} \\
+           \mathtt{wg.getWildWeight}(q_c,CI_{q_c},q_e,CI_{q_e}), & \text{if } \sigma = \text{\wild} \\
            \mathtt{wg.getWeight}(q_c,CI_{q_c},\sigma, \mathtt{CALL\_TO\_ENTRY},q_e,CI_{q_e}), & \text{otherwise}
       \end{cases} 
 \end{align*}

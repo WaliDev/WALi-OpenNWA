@@ -526,19 +526,19 @@ An NWA, $(Q,\Sigma,Q_0,\delta,Q_f)$, is \textbf{deterministic} iff
 
 \item For all $q \in Q$: 
   \begin{itemize}
-    \item if $(q,*,q') \in \delta_i$ then $|\{q'|(q,\sigma,q') \in
-      \delta_i, {\sigma\neq*}\}| = 0$; \\ otherwise, for all $\sigma \in \Sigma - \{*\}$,
+    \item if $(q,\wild,q') \in \delta_i$ then $|\{q'|(q,\sigma,q') \in
+      \delta_i, {\sigma\neq*}\}| = 0$; \\ otherwise, for all $\sigma \in \Sigma - \{\wild\}$,
       $|\{q'|(q,\sigma,q') \in \delta_i\}| \leq 1$,
 
-    \item if $(q,*,q') \in \delta_c$ then $ |\{q'|(q,\sigma,q') \in
+    \item if $(q,\wild,q') \in \delta_c$ then $ |\{q'|(q,\sigma,q') \in
       \delta_c, {\sigma\neq*}\}| = 0$;\\
-      otherwise, for all $\sigma \in \Sigma - \{*\}$,
+      otherwise, for all $\sigma \in \Sigma - \{\wild\}$,
       $|\{q'|(q,\sigma,q') \in \delta_c\}| \leq 1$, and
 
-    \item for all $q' \in Q$, if $(q,q',*,q'') \in \delta_r$ then
+    \item for all $q' \in Q$, if $(q,q',\wild,q'') \in \delta_r$ then
       $|\{q''|(q,q',\sigma,q'') \in \delta_r, {\sigma\neq*}\}| = 0$; \\
       otherwise, for all
-      $\sigma \in \Sigma - \{*\}$, $|\{q''|(q,q',\sigma,q'') \in \delta_r\}|
+      $\sigma \in \Sigma - \{\wild\}$, $|\{q''|(q,q',\sigma,q'') \in \delta_r\}|
       \leq 1$,
   \end{itemize}
 \item And
