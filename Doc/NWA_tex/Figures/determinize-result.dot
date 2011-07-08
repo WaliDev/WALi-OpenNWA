@@ -1,0 +1,27 @@
+//*, <2,2>, <2,4>, <4,8><4,11>, <4,10>, <4,6>, <4,9>, <2,13>, <2,3>, <4,12>
+digraph "NWA" { 
+
+"(2,2)__precursor__" [ label="",style="invis" ]"(2,2)__precursor__"->"(2,2)""(2,3)" [ peripheries=2 ]//Delta_c: 
+"(2,2)"->"(4,8)(4,11)"[ label="call" color=green len=1.0];
+"(2,4)"->"(4,8)(4,11)"[ label="call" color=green len=1.0];
+"(4,8)(4,11)"->"(4,8)(4,11)"[ label="call" color=green len=2.0];
+"(4,10)"->"(4,8)(4,11)"[ label="call" color=green len=2.0];
+"(4,6)"->"(4,8)(4,11)"[ label="call" color=green len=2.0];
+"(4,9)"->"(4,8)(4,11)"[ label="call" color=green len=2.0];
+"(2,13)"->"(4,8)(4,11)"[ label="call" color=green len=2.0];
+"(2,3)"->"(4,8)(4,11)"[ label="call" color=green len=1.0];
+"(4,12)"->"(4,8)(4,11)"[ label="call" color=green len=5.0];
+ 
+// Delta_i:
+"(2,2)"->"(2,4)"[ label="a" len=2.0];
+"(4,8)(4,11)"->"(4,10)"[ label="a" len=2.0];
+"(4,8)(4,11)"->"(4,6)"[ label="b" len=2.0];
+"(4,10)"->"(4,12)"[ label="a" len=2.0];
+"(4,6)"->"(4,9)"[ label="b" len=2.0];
+"(2,13)"->"(2,3)"[ label="a" len=2.0];
+ 
+// Delta_r:
+"(4,9)" ->"(2,13)"[ label="ret: (2,4)" color=red len=2.0];
+"(4,12)" ->"(2,13)"[ label="ret: (2,4)" color=red len=2.0];
+
+}
