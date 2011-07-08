@@ -15,34 +15,36 @@ most of the rest of this section. We also provide a parser for this format,
 with minor caveats. The grammar that the parser uses is defined
 formally in \sectref{nwa-grammar}.
 
-The second is output in Graphviz Dot format. The output is
-natural. The color of an edge denotes the type of a transition: black
-edges are internal transitions, green edges are call transitions, and
-red edges are return transitions. Return transitions are labeled with
-both the symbol for that transition and the call predecessor. (The
-result of each Dot graph includes a key as a reminder of what the
-colors mean.) Because it is possible to wind up with extremely long
-key names (especially in a determinized NWA) that can essentially
-destroy the ability of Dot to render useful output, by default any
-state names longer than 20 characters are replaced by the numerical
-value; this behavior can be changed however.
+The second is output in Graphviz Dot format. The output is natural. The color
+of an edge denotes the type of a transition: black edges are internal
+transitions, green edges are call transitions, and red edges are return
+transitions. Return transitions are labeled with both the symbol for that
+transition and the call predecessor.  Because it is possible to wind up with
+extremely long key names (especially in a determinized NWA) that can
+essentially destroy the ability of Dot to render useful output, by default
+any state names longer than 20 characters are replaced by the numerical
+value. A call to \texttt{print\_dot} can specify different behavior, however.
+All figures later in the document have been created via the Dot output (with
+minimal post-processing in some cases).
 
 There is a member function to produce each type of output:
-\begin{description}
-  \item[\texttt{std::ostream\& NWA::print(std::ostream \& stream) const}]
+\begin{functionlist}
+  \functionitem[\texttt{std::ostream\& NWA::print(std::ostream \& stream) const}]
     Writes the custom output described in this section
     to \texttt{stream}, returning \texttt{stream}.
     (This method is actually inherited from
     the \texttt{wali::Printable} abstract class.)
 
-  \item[\texttt{std::ostream\& NWA::print\_dot(ostream \& os,
-    std::string const \& n, bool abbrev = true)}] Outputs a Dot
-    description of the NWA to the stream \texttt{os}, returning \texttt{os}.
-    The name of the graph (\texttt{digraph "n" \{...\}}) is given
-    by \texttt{n}. Finally, if \texttt{abbrev} is set
-    to \texttt{false}, the aforementioned abbreviation step above for state names is
-    not done. Use this freedom at your peril.
-\end{description}
+  \functionitem[\texttt{std::ostream\& NWA::print\_dot(
+      \parbox[t][2\baselineskip][t]{4in}{
+                 ostream \& os, std::string const \& n,\\
+                 bool abbrev = true)}}]
+    Outputs a Dot description of the NWA to the stream \texttt{os}, returning
+    \texttt{os}.  The name of the graph (\texttt{digraph "n" \{...\}}) is
+    given by \texttt{n}. Finally, if \texttt{abbrev} is set to
+    \texttt{false}, the aforementioned abbreviation step above for state
+    names is not done. Use this freedom at your peril.
+\end{functionlist}
 
 \subsection{Parser}
 \label{Se:parser}
@@ -59,26 +61,25 @@ input does not match the grammar, but we signal such input failures
 with assertion violations. In a future version of the library, we will
 report errors more gracefully, almost certainly through exceptions.
 
-There are two functions that parse NWA descriptions:
-\begin{itemize}
-  \item\texttt{NWARefPtr read\_nwa(std::istream \&, std::string * name = NULL)}
-  \item\texttt{std::map$<$std::string, NWARefPtr$>$ read\_nwa\_proc\_set(std::istream \&)}
-\end{itemize}
-A stream may contain descriptions of one or more automata; the first
-function reads a single description, and the second function reads all.  (The return
-type of the second function is \texttt{typedef}ed to the name
-\texttt{ProcedureMap}.)
+There are two functions that parse NWA descriptions, both declared in
+\texttt{wali/nwa/NWAParser.hpp} in namespace \texttt{wali::nwa}:
+\begin{functionlist}
+  \functionitem[\texttt{NWARefPtr read\_nwa(std::istream \& is, std::string *
+      name = NULL)}] Reads a description of a single NWA from \texttt{is} and
+  returns it. The serialization format allows an optional name for an NWA; if
+  one is specified and \texttt{name} is non-null, then the name is stored in
+  the string pointed to by \texttt{name}.
 
-The former function reads the first description of an NWA from the
-input string and returns it. Descriptions specify an optional name of
-an NWA; if one is specified and \texttt{name} is non-null, then the
-name is stored in the string pointed to by \texttt{name}.
+  \functionitem[\texttt{std::map$<$std::string, NWARefPtr$>$
+      read\_nwa\_proc\_set(std::istream \&)}] Reads the entire input stream,
+  returning a map from the name of each automaton description to the parsed
+  NWA. (This form was originally created to read NWAs for an entire program
+  formatted with each procedure in a separate NWA. The name of each NWA was
+  the name of the procedure in the original program.) The return type of the
+  second function is \texttt{typedef}ed to the name \texttt{ProcedureMap},
+  defined in the same header and namespace.
+\end{functionlist}
 
-The second function reads the entire input stream. It returns a map
-from the name of each automaton specification to the parsed NWA. (This
-form was originally created to read NWAs for an entire program formatted with
-each procedure in a separate NWA. The name of each NWA was the name of
-the procedure in the original program.)
 
 \subsection{Examples}
 
@@ -114,10 +115,10 @@ following as part of their description: ``you should not rely on
 this.'' In such cases, we reserve the right to change this behavior in
 future versions. %and to not feel bad about it.
 
-\textsl{Note:} The NWA parser has unit tests embedded in the code. (It
-does not use any unit-test framework.) These tests can be run by
-calling \texttt{wali::nwa::parser\_test\_all}. The file
-\texttt{NwaParserMain.cpp} is a short program that does this.
+%\textsl{Note:} The NWA parser has unit tests embedded in the code. (It
+%does not use any unit-test framework.) These tests can be run by
+%calling \texttt{wali::nwa::parser\_test\_all}. The file
+%\texttt{NwaParserMain.cpp} is a short program that does this.
 
 
 The grammar for an NWA is as follows. In order to accept a couple of
@@ -148,7 +149,7 @@ states, symbols, or transitions.
                   &    | & \nonterm{delta-block}
 \end{grammar}
 
-Blocks of the same type can be repeated; e.g. it is perfectly fine to
+There can be more than one block of a given type; e.g. it is perfectly fine to
 specify all transitions in one block (as in \figref{nwa-mattf}),
 one block per transition (as in \figref{nwa-simple}), or
 any mixture. The ``block header'' specifies what kind of block
@@ -156,15 +157,15 @@ it is, and the body is a comma-separated list of whatever entity the
 block header specifies (e.g., states). The body may be surrounded by
 curly braces, but they are not required unless the body is empty.
 
-If a block specifies states, it can specify just that a state is
-present, an initial state, or an accepting state; these are denoted by
+State blocks can specify states, initial states, or accepting states;
+these are denoted by
 the block headers \texttt{Q:}, \texttt{Q0:}, and \texttt{Qf:},
 respectively.
  
 \begin{grammar}
-  \nonterm{state-block} &  ::= & \term{Q:} \cfgsp \term\{? \cfgsp \nonterm{name-list}\cfgsp\term\}? \\
-                        &   |  & \term{Q0:}\cfgsp \term\{? \cfgsp \nonterm{name-list}\cfgsp\term\}? \\
-                        &   |  & \term{Qf:}\cfgsp \term\{? \cfgsp \nonterm{name-list}\cfgsp\term\}?
+  \nonterm{state-block} &  ::= & \term{Q:} \cfgsp \nonterm{name-list} \\
+                        &   |  & \term{Q0:}\cfgsp \nonterm{name-list} \\
+                        &   |  & \term{Qf:}\cfgsp \nonterm{name-list}
 \end{grammar}
 
 (It is not necessary to explicitly list all states; if a state is
@@ -175,7 +176,7 @@ no \texttt{Q:} blocks.)
 A name-list is simply a comma-separate list of names of states.
 
 \begin{grammar}
-  \nonterm{name-list} & ::= & (\nonterm{name}\cfgsp (\term{,}\cfgsp  \nonterm{name})*)?
+  \nonterm{name-list} & ::= & \term\{? \cfgsp (\nonterm{name}\cfgsp (\term{,}\cfgsp  \nonterm{name})*)?\cfgsp\term\}?
 \end{grammar}
 
 Recall that if the list is empty, it must be followed by a \texttt{\}}
@@ -189,25 +190,26 @@ Symbol blocks are just like name blocks, except that they specify symbol
 names. The block header is simply 'sigma'.
 
 \begin{grammar}
-  \nonterm{sigma-block} & ::= & \term{sigma:}\cfgsp  \term{\{}?\cfgsp  \nonterm{name-list}\cfgsp  \term{\}}?
+  \nonterm{sigma-block} & ::= & \term{sigma:}\cfgsp  \nonterm{name-list}
 \end{grammar}
 
-A transition block can be for internal, call, or return transitions,
-denoted by the block headers \texttt{delta\_i}, \texttt{delta\_c}, and
-\texttt{delta\_r}, respectively.
+A transition block can list internal, call, or return transitions,
+denoted by the block headers \texttt{Delta\_i}, \texttt{Delta\_c}, and
+\texttt{Delta\_r}, respectively.
  
 \begin{grammar}
-  \nonterm{delta-block} & ::= & \term{delta\_i:}\cfgsp  \term{\{}?\cfgsp  \nonterm{triple-list}\cfgsp  \term{\}}? \\
-                        &   | & \term{delta\_c:}\cfgsp  \term{\{}?\cfgsp  \nonterm{triple-list}\cfgsp  \term{\}}? \\
-                        &   | & \term{delta\_r:}\cfgsp  \term{\{}?\cfgsp  \nonterm{quad-list}  \cfgsp  \term{\}}?
+  \nonterm{delta-block} & ::= & \term{Delta\_i:}\cfgsp  \nonterm{triple-list} \\
+                        &   | & \term{Delta\_c:}\cfgsp  \nonterm{triple-list} \\
+                        &   | & \term{Delta\_r:}\cfgsp  \nonterm{quad-list}
 \end{grammar}
 
 The bodies in each case are simply a comma-separated list of triples
-or quads:
+or quads (like \nonterm{name-list}, if these are empty, they must be followed
+by \term{\}}):
 
 \begin{grammar}
-  \nonterm{triple-list} & ::= & (\nonterm{triple}\cfgsp  (\term{,}\cfgsp  \nonterm{triple})*)? \\
-  \nonterm{quad-list}   & ::= & (\nonterm{quad}\cfgsp  (\term{,}\cfgsp  \nonterm{quad})*)?
+  \nonterm{triple-list} & ::= & \term\{?\cfgsp(\nonterm{triple}\cfgsp  (\term{,}\cfgsp  \nonterm{triple})*)?\cfgsp\term\}? \\
+  \nonterm{quad-list}   & ::= & \term\{?\cfgsp(\nonterm{quad}\cfgsp  (\term{,}\cfgsp  \nonterm{quad})*)?\cfgsp\term\}?
 \end{grammar}
 
 and each triple (resp., quad) is a 3-tuple (4-tuple) of names:
@@ -220,17 +222,18 @@ and each triple (resp., quad) is a 3-tuple (4-tuple) of names:
 
 All that remains is to define the grammar for `name'. Because the
 format grew organically and we wished to keep compatibility with
-existing log files (which could previously not be automatically parsed
-but which we could look at), the `name' terminal is a bit convoluted.
+existing log files (which could previously not be automatically parsed),
+the `name' terminal is a bit convoluted.
 
 The name consists of the actual name of the state or symbol
 in question, followed by an optional parenthesis-delimited token that
-is ignored. (In some of our output, the name is the result of
+is ignored. (In the output of \texttt{print()}, the \nonterm{name} is the result of
 \texttt{key2str} and the optional token is the actual numeric value of
 the key.)
 
 \begin{grammar}
-  \nonterm{name} & ::= &  \nonterm{actual-name}\cfgsp  \nonterm{dummy-token}?
+  \nonterm{name} & ::= &  \nonterm{actual-name}\cfgsp  \nonterm{dummy-token}? \\
+  \nonterm{dummy-token} & ::= & \term{(}\cfgsp(\neg\{\term{(}\})*\cfgsp\term{)}
 \end{grammar}
 
 The $\nonterm{actual-name}$ portion generally behaves like a standard
@@ -241,8 +244,7 @@ set of parentheses. (We actually allow a larger set of characters than
 is typical, but you should not rely on this. Surround your names
 with parentheses if you use ``special'' characters.)
 
-We can now define the effective grammar. A `unit' is a letter or
-parenthesis group.
+We can now define the grammar of \term{actual-name}.
 
 \begin{grammar}
   \nonterm{actual-name} & ::= &  \nonterm{unit}+ \\

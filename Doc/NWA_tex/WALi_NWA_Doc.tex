@@ -28,7 +28,10 @@
 % \usepackage[figuresright]{rotating}
 \usepackage[figuresleft]{rotating}
 \usepackage{color}
-% \usepackage{algorithmic}
+%\usepackage[noend]{algorithmic}
+%\algsetup{indent=2em}
+\usepackage[noline,noend]{algorithm2e}
+%\usepackage{program}
 \usepackage{paralist}
 \usepackage{geometry}
 
@@ -44,7 +47,8 @@
 \usepackage{tikz}
 \usetikzlibrary{snakes,arrows,shapes}
 
-\usepackage[maxfloats=40]{morefloats}
+\usepackage[section]{placeins}
+\usepackage[maxfloats=25]{morefloats}
 
 \usepackage{adjustbox}
 \usepackage{expdlist}
@@ -199,16 +203,28 @@ reflect the views of the sponsoring agencies.
 
 \setlength{\belowcaptionskip}{0.66\baselineskip}
 
+\newcommand{\wild}{\ensuremath{@}}
+\renewcommand{\epsilon}{\varepsilon}
+
 \input{01-overview}
+\clearpage
 \input{class-nested-word}
+\clearpage
 \input{class-nwa}
+\clearpage
 \input{namespace-query}
+\clearpage
 \input{parser}
+\clearpage
 \input{03-building-from-others}
+\clearpage
 \input{04-conversions}
+\clearpage
 \appendix
 \input{A.nwas}
-
+\clearpage
+\input{B.determinize}
+\clearpage
 \bibliographystyle{plain}
 \bibliography{df,mab}
 

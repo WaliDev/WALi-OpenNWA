@@ -1,16 +1,17 @@
-\section{Nested-Word Automata and Overview of the Library's Organization}
+\section{Nested-Word Automata}
 \label{App:nwa-definition}
 
 Nested-word automata (NWAs)~\cite{DLT:AM2006,JACM:AM2009} are a generalization
 of finite-state automata that can capture the matched-parenthesis structure
-that is exhibited by, for example, opening and closing tags in XML, and the
+that is exhibited by, for example, opening and closing tags in XML and the
 call/return structure in execution traces in multi-procedure
 programs. Their languages represent somewhat of a middle-ground between
-standard regular languages and context-free languages. Nested-word languages
-retain the call/return structure mentioned above, which makes them a
-refinement of standard regular languages. (For instance, there is an NWA that
+standard regular languages and context-free languages. They are strictly more
+powerful than finite automata (FAs), but can also accept some languages that
+are context-free once the call/return structure is induced. (For instance,
+there is an NWA that
 accepts exactly the language of properly-balanced parentheses, with the
-associated matching structure.) However, nested-word languages also retain all the closure
+associated matching structure.) Importantly, nested-word languages also retain all the closure
 properties that makes standard regular languages attractive; in particular,
 they are closed under complementation and intersection. However, they are not
 directly comparable to languages of linear words, because the call/return
@@ -18,7 +19,7 @@ structure is an explicit part of each nested word.
 
 \begin{definition}
   A \textsl{nested word} $(w,\rightsquigarrow)$ over alphabet $\Sigma$ is an
-  ordinary (linear) word $w \in \Sigma^*$ of length $|w|$ together with a
+  ordinary (linear) word $w \in \Sigma^*$ together with a
   \textsl{nesting relation} $\rightsquigarrow$.
 
   The relation $\rightsquigarrow$ is a collection of edges (over the
@@ -49,7 +50,8 @@ When $i \rightsquigarrow j$ holds, for $1 \leq i \leq |w|$, $i$ is called a
 \textsl{pending call}; otherwise $i$ is a \textsl{matched call}, and the
 (unique) position $j$ such that $i \rightsquigarrow j$ is called its
 \textsl{return successor}. (Note that these terms refer to positions within
-$w$ rather than the symbol.)
+$w$ and not the symbol, which is what you may expect if you are familiar with
+visibly pushdown languages~\cite{JACM:AM2009}.)
 
 Similarly, when $i \rightsquigarrow j$ holds, for $1 \leq j \leq |w|$, $j$
 is a \textsl{return} position. If $-\infty \rightsquigarrow j$, then $j$ is
@@ -64,11 +66,8 @@ A nested word is \textsl{balanced} if it has no pending calls
 or returns.  A nested word is \textsl{unbalanced-left} (or a
 \textsl{nested-word prefix}) if it has only pending calls, and it is
 \textsl{unbalanced-right} (or a \textsl{nested-word suffix})
-if it has only pending returns. (It is a general nested word otherwise.)
+if it has only pending returns.
 
-
-The library supports balanced and unbalanced-left nested words, but not
-unbalanced-right.
 
 
 \begin{definition}
@@ -106,9 +105,25 @@ unbalanced-right.
   $(w,\rightsquigarrow)$ that terminates in a state $q\in F$, then $A$
   accepts $(w,\rightsquigarrow)$.
 
-  NWAs can be either deterministic or nondeterministic, and these types have
+  NWAs can be either deterministic or nondeterministic, and these variations have
   equivalent power.
 \end{definition}
+
+We extend the above definition to allow two meta-symbols, $\epsilon$ and
+\wild\ (wild). Call and return transitions are prohibited from being labeled
+with $\epsilon$, but allowing $\epsilon$s on internal transitions can be done
+in an analogous fashion to standard FAs. (We think that allowing $\epsilon$
+on calls and returns would eliminate the closure properties of NWAs.) The
+wild symbol, \wild, can label any transition, and it matches any input
+symbol. For example, the internal rule from the definition would be reworded
+as follows:
+\begin{quote}If $A$ is in state $q$ when reading input
+  symbol $\sigma$ at position $i$ in $w$, and $i$ is an internal
+  position, $A$ makes a transition to a state $q'$ (if
+  one is available) such that either $(q,\sigma,q')\in\delta_i$ or
+  $(q,\wild,q')\in\delta_i$.
+\end{quote}
+The other rules are modified similarly.
 
 
 To distinguish among the different roles for states in an internal

@@ -160,10 +160,10 @@ information. To utilize this functionality, client code must subclass
 Once done, client information can be attached or retrieved using the
 following two functions (both members of \texttt{NWA}):
 \begin{functionlist}
-  \functionitem[\texttt{ref\_ptr<ClientInfo> getClientInfo( Key st ) const}]
+  \functionitem[\texttt{ref\_ptr<ClientInfo> NWA::getClientInfo( Key st ) const}]
     Allows the user to access the client-specific information associated with
     the given state, \texttt{st}.
-  \functionitem[\texttt{void setClientInfo( Key st, ref\_ptr<ClientInfo> ci )}]
+  \functionitem[\texttt{void NWA::setClientInfo( Key st, ref\_ptr<ClientInfo> ci )}]
     Allows the user to specify the client-specific information, \texttt{ci},
     associated with the given state, \texttt{st}. \\
 \end{functionlist}
@@ -201,7 +201,7 @@ intersection and determinization, and discuss these functions further.
 \subsection{The following are more functions that don't fit into the above categories}
 
 \begin{functionlist}
-  \functionitem[\texttt{void duplicateState( Key orig, Key dup )}] \nopagebreak
+  \functionitem[\texttt{void NWA::duplicateState( Key orig, Key dup )}] \nopagebreak
 
     Duplicates all the transitions containing the state \texttt{orig} and
     adds the transitions to the NWA with \texttt{orig} replaced by
@@ -220,7 +220,7 @@ intersection and determinization, and discuss these functions further.
     $(\texttt{dup},\texttt{orig},a,\texttt{orig})$, and
     $(\texttt{orig},\texttt{orig},a,\texttt{dup})$ are added.
 
-  \functionitem[\texttt{void duplicateStateOutgoing( Key orig, Key dup )}] \nopagebreak
+  \functionitem[\texttt{void NWA::duplicateStateOutgoing( Key orig, Key dup )}] \nopagebreak
 
     Duplicates all the transitions originating from \texttt{orig} and adds
     the transitions to the NWA with \texttt{orig} replaced by \texttt{dup}.
@@ -236,7 +236,7 @@ intersection and determinization, and discuss these functions further.
     $(\texttt{dup},\texttt{orig},a,\texttt{dup})$, and
     $(\texttt{dup},\texttt{orig},a,\texttt{orig})$ are added.
 
-  \functionitem[\texttt{void realizeImplicitTrans(State stuck)}] \nopagebreak
+  \functionitem[\texttt{void NWA::realizeImplicitTrans(State stuck)}] \nopagebreak
 
     Makes the transition relation ``at least total.''
     For any source state and symbol pair that does not have at least one

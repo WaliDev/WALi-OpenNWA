@@ -30,7 +30,7 @@ provide a quick reference for the functions.
 The tables do not have \textsl{all} the information one needs to know in
 order to call them, and the entries use some shorthands; but they provide enough
 information for specifics to be
-looked up in the header or Doxygen documentation. The caption of each table
+looked up in the corresponding header or Doxygen documentation. The caption of each table
 gives the header that contains the functions listed. In the interest of
 space, the types of the function arguments are omitted, but they are likely to
 be what you expect. (The number of arguments is also always sufficient to
@@ -63,6 +63,12 @@ set of pairs are marked specially.)
 
 \begin{sidewaystable}\sffamily
 \begin{threeparttable}
+\caption{\textbf{Query functions for all transitions.} These functions are
+  in the namespace \texttt{wali::nwa::query}; include the
+  file \texttt{wali/nwa/query/transitions.hpp}. For return transitions, the
+  ``source'' is the first component of the transition; nothing involving call
+  predecessors (the second component of return transitions) appears in this table. A table
+  entry of ``---'' means that the combination of arguments does not make sense. }
 \begin{tabular}{p{1in}p{1in}|@{\hspace{0.1in}}p{2.2in}p{2.2in}p{2in}}
 \toprule\toprule
 \multicolumn{2}{c|@{\hspace{0.1in}}}{\textsl{What you know}} & \multicolumn{3}{c}{\textsl{What you want}}                                                                 \tabularnewline
@@ -73,23 +79,22 @@ set of pairs are marked specially.)
                 &  symbol           &      ---                      &        ---                         &  getSuccessors(nwa, src, sym)  \tabularnewline
                 &  target           &      ---                      &  getSymbol(nwa, src, tgt, \&sym)   &   ---                          \tabularnewline
 \midrule %-------------------------------------------------------------------------------------------------------------------------------
-  symbol        &  (nothing)        &                               &        ---                         &   (none)                       \tabularnewline
+  symbol        &  (nothing)        &      ---                      &        ---                         &   (none)                       \tabularnewline
                 &  target           & getPredecessors(nwa, sym, tgt)&       ---                         &   ---                          \tabularnewline
 \midrule %-------------------------------------------------------------------------------------------------------------------------------
   target        &  (nothing)        & getPredecessors(nwa, tgt)     &  (none)                            &   ---                          \tabularnewline
 \bottomrule\bottomrule
 \end{tabular}
-\caption{\textbf{Query functions for all transitions.} These functions are
-  in the namespace \texttt{wali::nwa::query}; include the
-  file \texttt{wali/nwa/query/transitions.hpp}. For return transitions, the
-  ``source'' is the first component of the transition; nothing involving call
-  predecessors (the second component of return transitions) appears in this table. A table
-  entry of ``---'' means that the combination of arguments does not make sense. }
 \end{threeparttable}
 \label{Ta:query-all-transitions}
 \end{sidewaystable}
 
 \begin{sidewaystable}\sffamily
+\caption{\textbf{Query functions for internal transitions.}
+  These functions are in the namespace \texttt{wali::nwa::query};
+  include the file \texttt{wali/nwa/query/internals.hpp}.
+  A table entry of ``---'' means that combinations of arguments does not make
+  sense.}
 \begin{threeparttable}
 \begin{tabular}{p{1in}p{1in}|@{\hspace{0.1in}}p{2.2in}p{2.2in}p{2in}}
 \toprule\toprule
@@ -114,17 +119,17 @@ set of pairs are marked specially.)
 \begin{tablenotes}
   \item[1] Returns a set of pairs (either source/symbol or symbol/target).
 \end{tablenotes}
-\caption{\textbf{Query functions for internal transitions.}
-  These functions are in the namespace \texttt{wali::nwa::query};
-  include the file \texttt{wali/nwa/query/internals.hpp}.
-  A table entry of ``---'' means that combinations of arguments does not make
-  sense.}
 \end{threeparttable}
 \label{Ta:query-internal-transitions}
 \end{sidewaystable}
 
 \begin{sidewaystable}\sffamily
 \begin{threeparttable}
+\caption{\textbf{Query functions for call transitions.} These functions are in the
+  namespace \texttt{wali::nwa::query}; include the
+  file \texttt{wali/nwa/query/calls.hpp}. The ``call site'' is the source of the transition (and uses the argument 
+  name \texttt{call}), and the ``entry'' of the transition is the target (and
+  uses the argument name \texttt{ent}). }
 \begin{tabular}{p{1in}p{1in}|@{\hspace{0.1in}}p{2.2in}p{2.2in}p{2in}}
 \toprule\toprule
 \multicolumn{2}{c|@{\hspace{0.1in}}}{\textsl{What you know}} & \multicolumn{3}{c}{\textsl{What you want}}                                                                 \tabularnewline
@@ -148,17 +153,20 @@ set of pairs are marked specially.)
 \begin{tablenotes}
   \item[1] Returns a set of pairs (either call site/symbol or symbol/entry).
 \end{tablenotes}
-\caption{\textbf{Query functions for call transitions.} These functions are in the
-  namespace \texttt{wali::nwa::query}; include the
-  file \texttt{wali/nwa/query/calls.hpp}. The ``call site'' is the source of the transition (and uses the argument 
-  name \texttt{call}), and the ``entry'' of the transition is the target (and
-  uses the argument name \texttt{ent}). }
 \end{threeparttable}
 \label{Ta:query-call-transitions}
 \end{sidewaystable}
 
 \begin{sidewaystable}\footnotesize\sffamily
 \begin{threeparttable}
+\caption{\textbf{Query functions for return transitions.} These functions are in the
+  namespace \texttt{wali::nwa::query}; include the
+  file \texttt{wali/nwa/query/returns.hpp}.   The ``exit site'' is the source of the transition
+  (the first component) and uses the argument name \texttt{exit} in this table;
+  the ``call predecessor'' is the second component and uses the argument
+  name \texttt{call}; the symbol is the third component and uses the argument
+  name \texttt{sym}; the ``return site'' is the fourth component and uses the
+  argument name \texttt{ret}. }
 \begin{tabular}{p{0.6in}p{0.65in}p{0.6in}|@{\hspace{0.1in}}p{1.75in}p{1.9in}p{1.9in}p{2in}}
 \toprule\toprule
 \multicolumn{3}{c|@{\hspace{0.1in}}}{\textsl{What you know}}  & \multicolumn{4}{c}{\textsl{What you want}}                                                                                                                                                \tabularnewline
@@ -213,14 +221,6 @@ set of pairs are marked specially.)
 \begin{tablenotes}
   \item[1] Returns a set of pairs (a symbol with one of the states, in the order of the raw transition).
 \end{tablenotes}
-\caption{\textbf{Query functions for return transitions.} These functions are in the
-  namespace \texttt{wali::nwa::query}; include the
-  file \texttt{wali/nwa/query/returns.hpp}.   The ``exit site'' is the source of the transition
-  (the first component) and uses the argument name \texttt{exit} in this table;
-  the ``call predecessor'' is the second component and uses the argument
-  name \texttt{call}; the symbol is the third component and uses the argument
-  name \texttt{sym}; the ``return site'' is the fourth component and uses the
-  argument name \texttt{ret}. }
 \end{threeparttable}
 \label{Ta:query-return-transitions}
 \end{sidewaystable}
@@ -254,11 +254,12 @@ namespace \texttt{wali::nwa::query}).
 \subsection{Querying properties of an automaton's language}
 \label{Se:query-language}
 
-The NWA library has several functions for querying standard
-formal-language theoretic properties, and in addition supports
+The NWA library has several functions for querying
+properties of the language of an NWA (or how the languages of two NWAs
+relate), and it also supports
 the poststar and prestar queries used in program analysis.
 
-The functions that perform standard language-theoretic queries are
+The following functions perform standard language-theoretic queries. They are
 located in namespace \texttt{wali::nwa::query} and are declared in
 \texttt{wali/nwa/query/language.hpp}. They are:
 \begin{functionlist}
@@ -266,23 +267,36 @@ located in namespace \texttt{wali::nwa::query} and are declared in
     const \& word)}] Computes whether \texttt{word} is a member of
     \texttt{nwa}'s language, and returns the result. (It simulates the
     NWA in a nondeterministic fashion; the NWA is not determinized to answer
-    this query.)
+    this query.) To a first approximation, the worst-case running time is
+    $O(|\texttt{word}|\cdot w\log w\cdot\log n)$, where $w$ is the ``width'' of
+    the nondeterminism of the NWA (i.e. the maximum number of
+    simultaneous configurations that are possible when reading \texttt{word})
+    and $n$ is the number of states in the NWA.
   \functionitem[\texttt{bool languageIsEmpty(NWA const \& nwa)}] Computes
     whether the NWA's language is empty, and returns the result.
   \functionitem[\texttt{bool languageSubsetEq(NWA const \& left, NWA const \& right)}]
     Computes whether $L(\texttt{left}) \subseteq L(\texttt{right})$
-    and returns the result.
+    and returns the result. Since this procedure must determinize \texttt{right},
+    the worst-case running time is $O(2^{n^2}n^2m)$ where $n$ is the number of
+    states in \texttt{right} and $m$ is the number of states in \texttt{left}.
   \functionitem[\texttt{bool languageEquals(NWA const \& left, NWA const \& right)}]
     Equivalent to \texttt{languageSubsetEq(left, right) \&\&
-    languageSubsetEq(right, left)}
+    languageSubsetEq(right, left)}. This determinizes both machines; the
+    running time is ... .
 \end{functionlist}
 
-Finally, there are functions for performing a poststar and prestar
+There are also functions for performing a poststar and prestar
 query on an NWA. These work by converting the NWA to a WPDS (see
 \sectref{Conversions} and, in particular, \sectref{NWAtoPDS}) using
 the function \texttt{NWAtoPDScalls} then running the query on the PDS.
 
-There are two variants of each. One returns the WFA that results from
+The transition system that pre- and poststar query is the space of
+configurations of the NWA. A configuration is a pair $\langle q, s\rangle$,
+where $q$ is the current state and $s$ is the stack of unmatched call
+sites. (More exactly, it is the stack of states the machine was in before
+reading a symbol in a call position that has not yet been matched.)
+
+There are two variants of each function. One returns the WFA that results from
 the query, and the other stores the WFA in an output parameter. The
 \texttt{WFA} type is \texttt{wali::wfa::WFA}.
 

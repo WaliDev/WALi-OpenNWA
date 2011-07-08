@@ -8,7 +8,7 @@ However, the construction of an NWA from a WPDS is not the inverse
 of constructing a WPDS from an NWA, i.e., one cannot perform the two
 conversions in sequence and obtain the identity conversion.
 
-At a high level, these operations work by making the NWA encode both the state
+At a high level, the WPDS to NWA conversion works by making the NWA encode both the state
 of the WPDS and its top-of-stack symbol. A WPDS rule of the form $\langle
 p,q_1 \rangle \hookrightarrow \langle p,q_2 \rangle$ leaves the stack height
 unchanged, and thus is associated with an internal NWA transition; in this
@@ -16,20 +16,41 @@ case, that transition goes from the state $(p,q_1)$ to $(p,q_2)$. The symbol
 of a transition is associated with the top-of-stack symbol of the source
 state, so in this example, the symbol labeling that transition would be
 $q_1$. WPDS push rules correspond to NWA call transitions, and WPDS pop rules
-correspond to NWA return transitions.
-
+correspond to NWA return transitions.\footnote{
 This encoding is motivated by our uses of both WPDSs and NWAs in program
 analysis. It is common for WPDSs to have just one state, $p$, and to use the
 top-of-stack symbol to encode the ``current'' program point. Pushing
 something onto the stack corresponds to a call, and popping corresponds to a
 return. For NWAs, we use the states themselves to encode the current program
-point. Furthermore, in our uses the label on an edge has been an identifier
-for the program point from which the edge emanates. (The function that
-converts a WPDS into an NWA supports multi-state PDSs, however; the fact that
-there is typically a single state is not a restriction. The functions that
-convert from an NWA to a WPDS will output WPDSs with one state that plays the
-role described above, but also one ``helper'' state for each NWA state that
-appears in the exit position of a return transition.)
+point. (The function that
+converts a WPDS into an NWA supports multi-state WPDSs, however; the fact that
+there is typically a single state is not a restriction.)}
+
+The conversion in the other direction creates a WPDS with one primary state
+and one ``helper'' state for each NWA state that appears in the exit position
+of a return transition. The NWA's state is ``moved'' to the top state of the
+stack -- essentially the inverse of the encoding described in the previous
+paragraph. A slight complication arises in the case of return
+transitions. The NWA is able to look at both the exit node and the call
+predecessor. In the WPDS this translates to looking at the top two stack
+symbols -- but this is not allowed. Hence each NWA return transition becomes
+two WPDS rules; the first pops the top symbol (which corresponds to the
+current NWA state) and remembers what it was using the helper state; the
+second rule looks at the call predecessor and the helper state to dispatch to
+the corresponding return site.
+
+The library also offers two slight variants on this conversion.First, there
+is a backwards variant that can be used for backwards flow analysis
+problems. Second, the resulting WPDS can stack either calls or returns. The
+``stacking calls'' version turns call transitions $(q, \sigma, q')$ into a
+WPDS rule $\langle p, q\rangle \hookrightarrow \langle p, q' q\rangle$ --
+leaving the call predecessor on the stack. (This is like the version
+described in the previous paragraph.) The ``stacking returns'' version
+instead makes several WPDS push rules for each NWA call transition. Each
+push rule leaves a potential return site on the stack. (For example, if there
+is a call transition $(c,\sigma,e)$ and a return transition $(x, c, \sigma',
+r)$, then the WPDS will have a rule $\langle p,
+c\rangle\hookrightarrow\langle p, e r\rangle$.
 
 
 The following functions are in the namespace \texttt{wali::nwa::nwa\_pds} and
@@ -37,15 +58,14 @@ are declared in the header \texttt{wali/nwa/nwa\_pds/conversions.hpp}.
 
 
 \begin{functionlist}
-  \functionitem[\texttt{void PDStoNWA( NWA \& out, const WPDS\& pds )}] \nopagebreak
-  \functionitem[\texttt{NWARefPtr PDStoNWA( NWA const \& nwa, const WPDS\& pds )}] \nopagebreak
-    Converts \texttt{pds} to an NWA and either stores the result in
-    \texttt{nwa} or returns it.
+  \functionitem[\texttt{void WpdsToNwa( NWA \& out, const WPDS\& pds )}] \nopagebreak
+  \functionitem[\texttt{NWARefPtr WpdsToNwa( NWA const \& nwa, const WPDS\& pds )}] \nopagebreak
+    Converts \texttt{pds} to an NWA, either storing the result in
+    \texttt{nwa} or returning it.
 
-
-  \functionitem[\texttt{WPDS NWAtoPDScalls( NWA const \& nwa, WeightGen<Client>\& wg ) const}] \nopagebreak
+  \functionitem[\texttt{WPDS NwaToWpdscalls( NWA const \& nwa, WeightGen<Client>\& wg ) const}] \nopagebreak
   \functionitem[\texttt{WPDS NWAtoBackwardsPDScalls( NWA const \& nwa, WeightGen<Client>\& wg )}] \nopagebreak
-  \functionitem[\texttt{WPDS NWAtoPDSreturns( NWA const \& nwa, WeightGen<Client>\& wg ) const}] \nopagebreak
+  \functionitem[\texttt{WPDS NwaToWpdsreturns( NWA const \& nwa, WeightGen<Client>\& wg ) const}] \nopagebreak
   \functionitem[\texttt{WPDS NWAtoBackwardsPDSreturns( NWA const \& nwa, WeightGen<Client>\& wg )}] \nopagebreak
     Constructs the WPDS that is equivalent to \texttt{nwa} using the
     appropriate method (backwards or forwards flow, and stacking calls or
@@ -63,9 +83,9 @@ are declared in the header \texttt{wali/nwa/nwa\_pds/conversions.hpp}.
 
 
 \subsection{WPDS to NWA}
-\label{Se:PDStoNWA}
+\label{Se:WpdsToNwa}
 
-The \texttt{PDStoNWA} functions convert a WPDS into an NWA in a manner
+The \texttt{WpdsToNwa} functions convert a WPDS into an NWA in a manner
 faithful to the encoding suggested in the introduction to this section.
 
 Assume that we have a WPDS $(P, \Gamma, \Delta )$ 
@@ -122,17 +142,17 @@ Note that $Q_0$ and $Q_f$ are empty.
       \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,exit \rangle$}
     \end{itemize}
   \caption{An example WPDS.}
-  \label{Fig:PDStoNWA1}
+  \label{Fig:WpdsToNwa1}
 \end{figure}
 
 For example, the NWA resulting from converting the WPDS shown in Figure
-\ref{Fig:PDStoNWA1} into an NWA is shown in Figure \ref{Fig:PDStoNWA2}.
+\ref{Fig:WpdsToNwa1} into an NWA is shown in Figure \ref{Fig:WpdsToNwa2}.
 
 \begin{figure}[p]
   \centering
     \nwaimage[width=12cm]{Figures/pds-equivalent}
-  \caption{The NWA resulting from converting the WPDS in Figure \ref{Fig:PDStoNWA1} into an NWA.}
-  \label{Fig:PDStoNWA2}
+  \caption{The NWA resulting from converting the WPDS in Figure \ref{Fig:WpdsToNwa1} into an NWA.}
+  \label{Fig:WpdsToNwa2}
 \end{figure}
 
 The client information for all states in the resulting NWA are set to \texttt{null}.
@@ -143,53 +163,58 @@ The client information for all states in the resulting NWA are set to \texttt{nu
 
 
 An NWA can also be converted into a WPDS.  In this way it is possible to use
-the WPDS reachability queries that are a part of the main WALi library on NWAs.
-There are four variations on the NWA to WPDS
-conversion: \begin{inparaenum} \item forward flow with call states on the
-  stack \item backward flow with call states on the stack \item forward flow
-  with return states on the stack \item backward flow with return states on
-  the stack. \end{inparaenum} All four variations use \texttt{WeightGen} to
-determine weights for WPDS rules.
+the WPDS reachability queries that are a part of the main WALi library on
+NWAs.  As mentioned in the introduction to \sectref{Conversions}, there are
+four variations on the NWA to WPDS conversion: forward flow with call states
+on the stack, backward flow with call states on the stack, forward flow with
+return states on the stack, and backward flow with return states on the
+stack. All four variations use \texttt{WeightGen} to determine weights for
+WPDS rules.
 
-\texttt{WeightGen} provides an abstract class that client code must implement for
-calculating the weights for NWA transitions, which are subsequently used in
-calculating the weights for corresponding WPDS rules.  It allows the
+\texttt{WeightGen} is an abstract class that client code must subclass to
+calculate the weights of the rules in the generated WPDS.  It allows the
 underlying NWA to be decoupled from the weight domain used in the WPDS.  See
 \cite[\S4-\S5]{wali} for details about weight domains.
 
-
-\noindent The following operations are methods of class WeightGen and are intended to be overridden:
+The following operations are virtual methods of class WeightGen intended to
+be overridden:
 
 \begin{functionlist} 
-  \functionitem[\texttt{sem\_elem\_t getOne()}]  \nopagebreak
+  \functionitem[\texttt{sem\_elem\_t getOne()} const = 0]  \nopagebreak
     Returns an instance of the $\bar{1}$ element of the weight domain.
 
-  \functionitem[\texttt{sem\_elem\_t getWeight( Key source, ref\_ptr<ClientInfo> sourceInfo, \\  
-                              \hspace*{3.25cm} Key symbol, Kind k, \\
-                              \hspace*{3.25cm} Key target, ref\_ptr<ClientInfo> targetInfo )}]  \nopagebreak
-    Computes and returns the weight (in the desired semiring) for a
-    (\texttt{kind}) NWA transition from \texttt{source} to \texttt{target}
-    labeled with symbol \texttt{symbol}.
+  \functionitem[\texttt{sem\_elem\_t getWeight(
+      \parbox[t]{4in}{
+        State source, ClientInfoRefPtr sourceInfo, \\  
+        Symbol symbol, Kind k, \\
+        State target, ClientInfoRefPtr targetInfo ) const}}]  \nopagebreak
+    Computes and returns the weight for the rule corresponding to the
+    transition from \texttt{source} to \texttt{target} (of
+    \texttt{kind})
+    labeled with symbol \texttt{symbol}. By default, returns texttt{getOne()}.
 
   \functionitem[\texttt{sem\_elem\_t getWildWeight( \\
-                              \hspace*{3.25cm} Key source, ref\_ptr<ClientInfo> sourceInfo, \\
-                              \hspace*{3.25cm} Key target, ref\_ptr<ClientInfo> targetInfo )}]  \nopagebreak
-    Computes and returns the weight (in the desired semiring) for an NWA
+      \parbox[t]{4in}{
+        State source, ClientInfoRefPtr sourceInfo, \\  
+        State target, ClientInfoRefPtr targetInfo ) const}}]  \nopagebreak
+    Computes and returns the weight for the WPDS rule corresponding to the
     transition from \texttt{source} to \texttt{target} labeled with the
-    meta-symbol \texttt{*}. \\
-\end{functionlist}
+    meta-symbol \texttt{*}. By default, returns texttt{getOne()}.
 
-(By default, \texttt{getWeight} and \texttt{getWildWeight} return the result
-of a call to \texttt{getOne}, so the only function that absolutely needs to be
-overridden is \texttt{getOne}. This is pure virtual in \texttt{WeightGen}, so
-the compiler will not let you ignore this responsibility.)
+  \functionitem[\texttt{sem\_elem\_t getExitWeight(State src, ClientInfoRefPtr srcInfo)} const]
+  This method computes the weight(in the desired semiring) for the return rule of
+  the WPDS corresponding to the exit 'src'.
+  Note: value is generally the same as \texttt{getOne()}, which is what the
+  default implementation returns.
+
+\end{functionlist}
 
 
 \begin{figure}[htbp]
   \centering
-    \includegraphics[width=12cm]{Figures/Figure23}
+    \nwaimage[width=12cm]{Figures/pre-pds-nwa}
   \caption{An example NWA.}
-  \label{Fig:NWAtoPDS1}
+  \label{Fig:NwaToWpds1}
 \end{figure}
 
 \subsubsection{1. Forwards Flow Stacking Calls}
@@ -252,10 +277,9 @@ w_3 &= \mathtt{wg.getOne}()
 \end{align*}
 
 
-\noindent Consider, as an example, converting the NWA in Figure
-\ref{Fig:NWAtoPDS5} into a WPDS. The WPDS resulting from converting the NWA
-shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
-\ref{Fig:NWAtoPDS4}. \\
+For example, the WPDS resulting from converting the NWA
+shown in Figure \ref{Fig:NwaToWpds1} into a WPDS is shown in Figure
+\ref{Fig:NwaToWpds4}. \\
 
 \begin{figure}[htbp]
   \centering
@@ -278,8 +302,8 @@ shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
       \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
       \item{ $\langle p_x,c_2 \rangle \hookrightarrow \langle p,r_2 \rangle$}
     \end{itemize}
-  \caption{The WPDS resulting from converting the NWA shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS.}
-  \label{Fig:NWAtoPDS4}
+  \caption{The WPDS resulting from converting the NWA shown in Figure \ref{Fig:NwaToWpds1} into a WPDS.}
+  \label{Fig:NwaToWpds4}
 \end{figure}
 
 \subsubsection{2. Backwards Flow Stacking Calls}
@@ -345,10 +369,10 @@ w_3 &= \mathtt{wg.getOne}()
 
 
 \noindent Consider, as an example, converting the NWA in Figure
-\ref{Fig:NWAtoPDS1} into a backwards flow WPDS.  The WPDS resulting from
-converting the NWA shown in Figure \ref{Fig:NWAtoPDS1} into a backwards flow
-WPDS is shown in Figure \ref{Fig:NWAtoPDS5}.  Note:
-\texttt{NWAtoBackwardsPDScalls(A)} = \texttt{NWAtoPDScalls(reverse(A))}.  \\
+\ref{Fig:NwaToWpds1} into a backwards flow WPDS.  The WPDS resulting from
+converting the NWA shown in Figure \ref{Fig:NwaToWpds1} into a backwards flow
+WPDS is shown in Figure \ref{Fig:NwaToWpds5}.  Note:
+\texttt{NWAtoBackwardsPDScalls(A)} = \texttt{NwaToWpdscalls(reverse(A))}.  \\
 
 \begin{figure}[htbp]
   \centering
@@ -371,8 +395,8 @@ WPDS is shown in Figure \ref{Fig:NWAtoPDS5}.  Note:
       \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
       \item{ $\langle p_e,r_2 \rangle \hookrightarrow \langle p,c_2 \rangle$}
     \end{itemize}
-  \caption{The WPDS resulting from converting the NWA shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS.}
-  \label{Fig:NWAtoPDS5}
+  \caption{The WPDS resulting from converting the NWA shown in Figure \ref{Fig:NwaToWpds1} into a WPDS.}
+  \label{Fig:NwaToWpds5}
 \end{figure}
 
 \subsubsection{3. Forwards Flow Stacking Returns}
@@ -434,9 +458,9 @@ w_3 &= \begin{cases}
 
 
 \noindent Consider, as an example, converting the NWA in Figure
-\ref{Fig:NWAtoPDS1} into a WPDS.  The WPDS resulting from converting the WPDS
-shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
-\ref{Fig:NWAtoPDS2}. \\
+\ref{Fig:NwaToWpds1} into a WPDS.  The WPDS resulting from converting the WPDS
+shown in Figure \ref{Fig:NwaToWpds1} into a WPDS is shown in Figure
+\ref{Fig:NwaToWpds2}. \\
 
 \begin{figure}[htbp]
   \centering
@@ -459,8 +483,8 @@ shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS is shown in Figure
       \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
       \item{ $\langle p_x,r_2 \rangle \hookrightarrow \langle p,r_2 \rangle$}
     \end{itemize}
-  \caption{The WPDS resulting from converting the NWA shown in Figure \ref{Fig:NWAtoPDS1} into a WPDS.}
-  \label{Fig:NWAtoPDS2}
+  \caption{The WPDS resulting from converting the NWA shown in Figure \ref{Fig:NwaToWpds1} into a WPDS.}
+  \label{Fig:NwaToWpds2}
 \end{figure}
 
 \subsubsection{4. Backwards Flow Stacking Returns}
@@ -550,9 +574,9 @@ w_3 &= \begin{cases}
 \end{enumerate}
 
 \noindent Consider, as an example, converting the NWA in Figure
-\ref{Fig:NWAtoPDS3} into a backwards flow WPDS.  The WPDS resulting from
-converting the WPDS shown in Figure \ref{Fig:NWAtoPDS1} into a backwards flow
-WPDS is shown in Figure \ref{Fig:NWAtoPDS3}. \\
+\ref{Fig:NwaToWpds3} into a backwards flow WPDS.  The WPDS resulting from
+converting the WPDS shown in Figure \ref{Fig:NwaToWpds1} into a backwards flow
+WPDS is shown in Figure \ref{Fig:NwaToWpds3}. \\
 
 \begin{figure}[htbp]
   \centering
@@ -576,8 +600,8 @@ WPDS is shown in Figure \ref{Fig:NWAtoPDS3}. \\
       \item{ $\langle p_e,c_2 \rangle \hookrightarrow \langle p,c_2 \rangle$}
     \end{itemize}
   \caption{The WPDS resulting from converting the NWA shown in Figure
-    \ref{Fig:NWAtoPDS1} into a WPDS.}
-  \label{Fig:NWAtoPDS3}
+    \ref{Fig:NwaToWpds1} into a WPDS.}
+  \label{Fig:NwaToWpds3}
 \end{figure}
 
 
