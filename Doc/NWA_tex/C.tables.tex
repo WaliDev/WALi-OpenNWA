@@ -19,8 +19,9 @@ expect.
 
 \begin{sidewaystable}\sffamily\footnotesize
 \begin{threeparttable}
-\caption{\textbf{Table of accessors and mutators of elements
-  of NWAs.} All are members of the \texttt{NWA} class, and thus declared in \texttt{wali/nwa/NWA.hpp}.
+  \captionex{Accessors and mutators of NWA components}{All functions are
+    members of the \texttt{NWA} class, and thus declared in
+    \texttt{wali/nwa/NWA.hpp}.
 }
 \label{Ta:simple-functions}
 \begin{tabular}{p{0.55in}p{1.40in}p{1.45in}p{1.2in}p{1.12in}p{1.05in}p{1.35in}}
@@ -99,7 +100,7 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
 
 \begin{sidewaystable}\sffamily
 \begin{threeparttable}
-\caption{\textbf{Query functions for all transitions.} These functions are
+\captionex{Query functions for all transition types}{These functions are
   in the namespace \texttt{wali::nwa::query}; include the
   file \texttt{wali/nwa/query/transitions.hpp}. For return transitions, the
   ``source'' is the first component of the transition; nothing involving call
@@ -127,7 +128,7 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
 \end{sidewaystable}
 
 \begin{sidewaystable}\sffamily
-\caption{\textbf{Query functions for internal transitions.}
+\captionex{Query functions for internal transitions.}{%
   These functions are in the namespace \texttt{wali::nwa::query};
   include the file \texttt{wali/nwa/query/internals.hpp}.
   A table entry of ``---'' means that combinations of arguments does not make
@@ -163,7 +164,7 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
 
 \begin{sidewaystable}\sffamily
 \begin{threeparttable}
-\caption{\textbf{Query functions for call transitions.} These functions are in the
+\captionex{Query functions for call transitions}{These functions are in the
   namespace \texttt{wali::nwa::query}; include the
   file \texttt{wali/nwa/query/calls.hpp}. The ``call site'' is the source of the transition (and uses the argument 
   name \texttt{call}), and the ``entry'' of the transition is the target (and
@@ -198,7 +199,7 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
 
 \begin{sidewaystable}\footnotesize\sffamily
 \begin{threeparttable}
-\caption{\textbf{Query functions for return transitions.} These functions are in the
+\captionex{Query functions for return transitions.}{These functions are in the
   namespace \texttt{wali::nwa::query}; include the
   file \texttt{wali/nwa/query/returns.hpp}.   The ``exit site'' is the source of the transition
   (the first component) and uses the argument name \texttt{exit} in this table;
