@@ -30,7 +30,8 @@ FILES=figure-1                      \
       determinize                   \
       determinize-result            \
       complement-of-determinize     \
-      pds-equivalent
+      pds-equivalent                \
+      pre-pds-nwa
 
 
 all: $(addsuffix .png,$(FILES))  $(addsuffix .tex,$(FILES))

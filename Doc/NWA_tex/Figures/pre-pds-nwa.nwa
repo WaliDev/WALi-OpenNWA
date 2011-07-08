@@ -1,0 +1,22 @@
+Delta_i: {
+  (main, main, q1),
+  (q1, q1, c1),
+  (e, e, q2),
+  (q2, q2, q3),
+  (q3, q3, x),
+  (r1, r1, q4),
+  (q4, q4, q5),
+  (q5, q5, c2),
+  (r2, r2, q6),
+  (q6, q6, exit)
+}
+
+Delta_c: {
+  (c1, c1, e),
+  (c2, c2, e)
+}
+
+Delta_r: {
+  (x, c1, x, r1),
+  (x, c2, x, r2)
+}
