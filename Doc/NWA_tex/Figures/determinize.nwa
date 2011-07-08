@@ -16,6 +16,6 @@ Delta_c: {
 }
 
 Delta_r: {
-  (Exit1, Entry1, ret, Return),
-  (Exit2, Entry2, ret, Return)
+  (Exit1, Call, ret, Return),
+  (Exit2, Call, ret, Return)
 }
