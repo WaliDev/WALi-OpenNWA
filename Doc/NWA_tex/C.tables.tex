@@ -104,7 +104,9 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
   file \texttt{wali/nwa/query/transitions.hpp}. For return transitions, the
   ``source'' is the first component of the transition; nothing involving call
   predecessors (the second component of return transitions) appears in this table. A table
-  entry of ``---'' means that the combination of arguments does not make sense. }
+  entry of ``---'' means that the combination of arguments does not make sense.
+}
+\label{Ta:query-all-transitions}
 \begin{tabular}{p{1in}p{1in}|@{\hspace{0.1in}}p{2.2in}p{2.2in}p{2in}}
 \toprule\toprule
 \multicolumn{2}{c|@{\hspace{0.1in}}}{\textsl{What you know}} & \multicolumn{3}{c}{\textsl{What you want}}                                                                 \tabularnewline
@@ -122,7 +124,6 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
 \bottomrule\bottomrule
 \end{tabular}
 \end{threeparttable}
-\label{Ta:query-all-transitions}
 \end{sidewaystable}
 
 \begin{sidewaystable}\sffamily
@@ -130,7 +131,9 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
   These functions are in the namespace \texttt{wali::nwa::query};
   include the file \texttt{wali/nwa/query/internals.hpp}.
   A table entry of ``---'' means that combinations of arguments does not make
-  sense.}
+  sense.
+}
+\label{Ta:query-internal-transitions}
 \begin{threeparttable}
 \begin{tabular}{p{1in}p{1in}|@{\hspace{0.1in}}p{2.2in}p{2.2in}p{2in}}
 \toprule\toprule
@@ -156,7 +159,6 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
   \item[1] Returns a set of pairs (either source/symbol or symbol/target).
 \end{tablenotes}
 \end{threeparttable}
-\label{Ta:query-internal-transitions}
 \end{sidewaystable}
 
 \begin{sidewaystable}\sffamily
@@ -165,7 +167,9 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
   namespace \texttt{wali::nwa::query}; include the
   file \texttt{wali/nwa/query/calls.hpp}. The ``call site'' is the source of the transition (and uses the argument 
   name \texttt{call}), and the ``entry'' of the transition is the target (and
-  uses the argument name \texttt{ent}). }
+  uses the argument name \texttt{ent}).
+}
+\label{Ta:query-call-transitions}
 \begin{tabular}{p{1in}p{1in}|@{\hspace{0.1in}}p{2.2in}p{2.2in}p{2in}}
 \toprule\toprule
 \multicolumn{2}{c|@{\hspace{0.1in}}}{\textsl{What you know}} & \multicolumn{3}{c}{\textsl{What you want}}                                                                 \tabularnewline
@@ -190,7 +194,6 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
   \item[1] Returns a set of pairs (either call site/symbol or symbol/entry).
 \end{tablenotes}
 \end{threeparttable}
-\label{Ta:query-call-transitions}
 \end{sidewaystable}
 
 \begin{sidewaystable}\footnotesize\sffamily
@@ -202,7 +205,9 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
   the ``call predecessor'' is the second component and uses the argument
   name \texttt{call}; the symbol is the third component and uses the argument
   name \texttt{sym}; the ``return site'' is the fourth component and uses the
-  argument name \texttt{ret}. }
+  argument name \texttt{ret}.
+}
+\label{Ta:query-return-transitions}
 \begin{tabular}{p{0.5in}p{0.55in}p{0.5in}|@{\hspace{0.1in}}p{1.55in}p{1.7in}p{1.7in}p{1.75in}}
 \toprule\toprule
 \multicolumn{3}{c|@{\hspace{0.1in}}}{\textsl{What you know}}  & \multicolumn{4}{c}{\textsl{What you want}}                                                                                                                                                \tabularnewline
@@ -258,6 +263,5 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
   \item[1] Returns a set of pairs (a symbol with one of the states, in the order of the raw transition).
 \end{tablenotes}
 \end{threeparttable}
-\label{Ta:query-return-transitions}
 \end{sidewaystable}
 \restoregeometry
