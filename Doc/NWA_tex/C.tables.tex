@@ -19,16 +19,15 @@ expect.
 
 \begin{sidewaystable}\sffamily\footnotesize
 \begin{threeparttable}
-\caption{Table of functions for accessing and manipulating elements
-  of NWAs. All are members of the \texttt{NWA} class, and thus declared in \texttt{wali/nwa/NWA.hpp}. \TODO{Fix footnote
-    numbering}
+\caption{\textbf{Table of accessors and mutators of elements
+  of NWAs.} All are members of the \texttt{NWA} class, and thus declared in \texttt{wali/nwa/NWA.hpp}.
 }
 \label{Ta:simple-functions}
 \begin{tabular}{p{0.55in}p{1.40in}p{1.45in}p{1.2in}p{1.12in}p{1.05in}p{1.35in}}
 \toprule
-                 &  add\tnote{1}                            &  remove\tnote{1}                          &  check membership\tnote{3} &  count                &  clear                     &  get\tnote{4}                 \\
+                 &  add\tnote{1}                            &  remove\tnote{1}                          &  check membership\tnote{2} &  count                &  clear                     &  get\tnote{3}                 \\
 \hline\hline %---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-states           &  addState(State st)                      &  removeState(State st)\tnote{5}           &  isState(State st)         &  sizeStates()         &  clearStates()\tnote{5}    &  getStates() or \newline
+states           &  addState(State st)                      &  removeState(State st)\tnote{4}           &  isState(State st)         &  sizeStates()         &  clearStates()\tnote{4}    &  getStates() or \newline
                                                                                                                                                                                              \{begin,end\}States()        \\
 initial \newline
 states           &  addInitialState(State st)               &  removeInitialState(State st)             &  isInitialState(State st)  &  sizeInitialStates()  &  clearInitialStates()      &  getInitialStates() or \newline
@@ -37,7 +36,7 @@ final
 \newline  states &  addFinalState(State st)                 &  removeFinalState(State st)               &  isFinalState(State)       &  sizeFinalStates()    &  clearFinalStates()        &  getFinalStates() or \newline
                                                                                                                                                                                              \{begin,end\}FinalStates()    \\
 \hline %---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-symbols\tnote{2} &  addSymbol(Symbol sym)                   &  removeSymbol(Symbol sym)\tnote{5}        &  isSymbol(Symbol sym)      &  sizeSymbols()        &  clearSymbols()            &  getSymbols() or \newline
+symbols\tnote{5} &  addSymbol(Symbol sym)                   &  removeSymbol(Symbol sym)\tnote{4}        &  isSymbol(Symbol sym)      &  sizeSymbols()        &  clearSymbols()            &  getSymbols() or \newline
                                                                                                                                                                                              \{begin,end\}Symbols()         \\
 \hline %---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 all \newline
@@ -63,7 +62,19 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
     states and symbols in that transition if they are not already present.
     Removing a state or symbol removes all transitions the removed item was a
     part of.
-  \item[2] \texttt{WALI\_EPSILON} and \texttt{WALI\_WILD} are not explicit
+  \item[2] These functions return a \texttt{bool} with the natural
+    interpretation.
+  \item[3] The entries of the form, e.g., ``\{begin,end\}States()'' denote a pair
+    of functions, each of which returns an iterator. The type of that iterator
+    is either a \texttt{NWA::StateIterator},
+    \texttt{NWA::SymbolIterator}, \texttt{NWA::CallIterator},
+    \texttt{NWA::InternalIterator}, or \texttt{NWA::ReturnIterator}, as appropriate; all of these are
+    actually const iterators. The other functions (``get\textit{Kind}()'')
+    return a \texttt{StateSet} or \texttt{SymbolSet} as appropriate.
+  \item[4] Removing a state or a symbol also removes all transitions
+    involving it. (Hence clearing all states or clearing all symbols also
+    clears all transitions.)
+  \item[5] \texttt{WALI\_EPSILON} and \texttt{WALI\_WILD} are not explicit
     members of the symbol set. This has the following consequences (for
     \texttt{s} as epsilon or wild): \texttt{addSymbol(s)} and
     \texttt{removeSymbol(s)} are both no-ops and return \texttt{false},
@@ -71,18 +82,6 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
     epsilon or wild, and neither the set returned by \texttt{getSymbols()}
     nor the iterator range \texttt{\{begin,end\}Symbols()} will contain
     epsilon or wild.
-  \item[3] These functions return a \texttt{bool} with the natural
-    interpretation.
-  \item[4] The entries of the form, e.g., ``\{begin,end\}States()'' denote a pair
-    of functions, each of which returns an iterator. The type of that iterator
-    is either a \texttt{NWA::StateIterator},
-    \texttt{NWA::SymbolIterator}, \texttt{NWA::CallIterator},
-    \texttt{NWA::InternalIterator}, or \texttt{NWA::ReturnIterator}, as appropriate; all of these are
-    actually const iterators. The other functions (``get\textit{Kind}()'')
-    return a \texttt{StateSet} or \texttt{SymbolSet} as appropriate.
-  \item[5] Removing a state or a symbol also removes all transitions
-    involving it. (Hence clearing all states or clearing all symbols also
-    clears all transitions.)
   \item[6] There are two overloads of each of these functions. The first
     takes each element of the transition tuple individually,
     e.g., \texttt{addCallTrans(State src, State sym, State tgt)}. The
