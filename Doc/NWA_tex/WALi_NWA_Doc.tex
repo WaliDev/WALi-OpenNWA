@@ -1,7 +1,16 @@
 \documentclass{article}
 %\documentclass{llncs}
 \newcommand{\inst}[1]{}
-\newtheorem{definition}{Definition}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+
+%\theoremstyle{definition}
+%\newtheorem{definition}{Definition}
+
+\newenvironment{definition}{%
+  \begin{quote}\textbf{Definition.}}{%
+  \end{quote}}
 
 
 %\usepackage{squeeze_llncs}
@@ -16,7 +25,6 @@
 % \usepackage{alltt}
 % \usepackage{indentfirst}
 \usepackage{latexsym}
-\usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
 % \usepackage{gdefs}
