@@ -26,7 +26,12 @@ Each of these functions is in the namespace \texttt{wali::nwa::construct}:
     \texttt{union} because the latter is a keyword.) The two NWAs must not
     have any states in common, and the output will be nondeterministic even
     if both input NWAs are deterministic. The running time is
-    $O(|Q^a|+|Q^b|+|\delta^a|+|\delta^b|)$.
+    $O(|Q^a|+|Q^b|+|\delta^a|+|\delta^b|)$. \TODO{What do you think about
+      putting these in here? I'm not 100\% sure they are all accurate, they
+      aren't really counting ``lookup'' time (usually $\log |Q|$ or $\log
+      |\delta|$, occasionally higher), in
+      some cases they are only approximate (e.g. determinize). Should we
+      leave them with a disclaimer? Remove them? Add more?}
 
   \functionDefFirstEarly{NWARefPtr}{intersect}{NWA const \& a, NWA const \& b}{}
   \functionDef{void}{intersect}{NWA \& out, NWA const \& a, NWA const \& b}{}
