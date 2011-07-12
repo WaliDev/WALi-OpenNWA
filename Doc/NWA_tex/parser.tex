@@ -17,9 +17,10 @@ formally in \sectref{nwa-grammar}.
 
 The second is output in Graphviz Dot format. The output is natural. The color
 of an edge denotes the type of a transition: black edges are internal
-transitions, green edges are call transitions, and red edges are return
-transitions. Return transitions are labeled with both the symbol for that
-transition and the call predecessor.  Because it is possible to wind up with
+transitions, green edges are call transitions, and red edges are sets of return
+transitions with the same exit site, return site, and symbol. Return
+transitions are labeled with the symbol for its
+transitions and the list of call predecessors.  Because it is possible to wind up with
 extremely long key names (especially in a determinized NWA) that can
 essentially destroy the ability of Dot to render useful output, by default
 any state names longer than 20 characters are replaced by the numerical
@@ -32,7 +33,7 @@ There is a member function to produce each type of output:
   \functionitem[\texttt{std::ostream\& NWA::print(std::ostream \& stream) const}]
     Writes the custom output described in this section
     to \texttt{stream}, returning \texttt{stream}.
-    (This method is actually inherited from
+    (This method is inherited from
     the \texttt{wali::Printable} abstract class.)
 
   \functionitem[\texttt{std::ostream\& NWA::print\_dot(
@@ -55,7 +56,7 @@ NWAs. The format is described below, and matches the result of calling
 calling \texttt{key2str} on the state and symbol keys produces strings
 that match the description of \nonterm{actual-names} in this grammar.
 
-\textsl{Note:} This is experimental code; in particular, the
+\emph{Note:} This is experimental code; in particular, the
 error-handling in it is basically non-existent. We detect when the
 input does not match the grammar, but we signal such input failures
 with assertion violations. In a future version of the library, we will
@@ -75,8 +76,8 @@ There are two functions that parse NWA descriptions, both declared in
   returning a map from the name of each automaton description to the parsed
   NWA. (This form was originally created to read NWAs for an entire program
   formatted with each procedure in a separate NWA. The name of each NWA was
-  the name of the procedure in the original program.) The return type of the
-  second function is \texttt{typedef}ed to the name \texttt{ProcedureMap},
+  the name of the procedure in the original program.) The return type
+  is \texttt{typedef}ed to the name \texttt{ProcedureMap},
   defined in the same header and namespace.
 \end{functionlist}
 
@@ -110,12 +111,12 @@ format is accepted.
 
 This section describes the grammar of the file format.
 
-\textsl{Note:} Some characteristics in the following have the
+\emph{Note:} Some characteristics in the following have the
 following as part of their description: ``you should not rely on
 this.'' In such cases, we reserve the right to change this behavior in
 future versions. %and to not feel bad about it.
 
-%\textsl{Note:} The NWA parser has unit tests embedded in the code. (It
+%\emph{Note:} The NWA parser has unit tests embedded in the code. (It
 %does not use any unit-test framework.) These tests can be run by
 %calling \texttt{wali::nwa::parser\_test\_all}. The file
 %\texttt{NwaParserMain.cpp} is a short program that does this.
@@ -135,7 +136,7 @@ NWAs, each individual starts with the literal \texttt{nwa}.
   \nonterm{nwa-description} & ::= & \left(\term{nwa}\cfgsp\nonterm{name}?\cfgsp\term{:}?\right)?\cfgsp\term{\{}?\cfgsp\nonterm{block}{+}\cfgsp\term{\}}?
 \end{grammar}
 
-\textsl{Braces are required if 'nwa' is present and the name is absent}
+\emph{Braces are required if 'nwa' is present and the name is absent}
  in order to
  distinguish the first block header (\texttt{Q:}, \texttt{Q0:},
  or \texttt{Qf:}) from the name of the NWA.
@@ -170,7 +171,7 @@ respectively.
 
 (It is not necessary to explicitly list all states; if a state is
 listed in a transition, it is implicitly added to the machine as
-needed. Thus, it is quite possible to have a machine description with
+needed. Thus, it is quite reasonable to have a machine description with
 no \texttt{Q:} blocks.)
 
 A name-list is simply a comma-separate list of names of states.
@@ -239,7 +240,7 @@ the key.)
 The $\nonterm{actual-name}$ portion generally behaves like a standard
 programming-language identifier, but with one important difference: it can
 contain
-balanced parentheses, and \textsl{any} characters are allowed within a
+balanced parentheses, and \emph{any} characters are allowed within a
 set of parentheses. (We actually allow a larger set of characters than
 is typical, but you should not rely on this. Surround your names
 with parentheses if you use ``special'' characters.)
@@ -266,6 +267,6 @@ We can now define the grammar of \term{actual-name}.
   \nonterm{paren-group}& ::= &  \nonterm{left-paren}\cfgsp  (\nonterm{non-paren}\ |\ \nonterm{paren-group})*\cfgsp  \nonterm{right-paren}
 \end{grammar}
 
-(Finally, we do not currently demand that the \textsl{types} of parens
+(Finally, we do not currently demand that the \emph{types} of parens
   match up: e.g., \texttt{(1, 2, 3]} is a valid name. You should not
     rely on this feature.)

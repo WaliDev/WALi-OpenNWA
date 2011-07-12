@@ -69,12 +69,12 @@ These types live in namespace \texttt{wali::nwa}:
 
 \begin{functionlist}
   \functionitem[\texttt{NestedWord}] Implements a single nested word. Currently the only
-    operation that can be performed using one is to check whether a
-    \texttt{NestedWord} is a member of an \texttt{NWA}'s language. To use,
-    include \texttt{wali/nwa/NestedWord.hpp}.
-  \functionitem[\texttt{NWA}] Implements a nested-word automaton. To use, include
-    \texttt{wali/nwa/NWA.hpp}, or \texttt{wali/nwa/NWAFwd.hpp} if a
-    definition is not needed. See
+    operation that can be performed using one is checking whether a
+    \texttt{NestedWord} is a member of an \texttt{NWA}'s language. Defined in
+    \texttt{wali/nwa/NestedWord.hpp}. See \sectref{class-nested-word}.
+  \functionitem[\texttt{NWA}] Implements a nested-word automaton. Defined in
+    \texttt{wali/nwa/NWA.hpp} with a forward declaration in \texttt{wali/nwa/NWAFwd.hpp}.
+    See
     \sectref{NWA-class}. (\sectref{serialization} also discusses member
     functions related to serializing an NWA.)
   \functionitem[\texttt{NWARefPtr}] \texttt{NWARefPtr} is a typedef of \texttt{ref\_ptr$<$NWA$>$} (see
@@ -130,7 +130,7 @@ NWAs. These are partitioned into the following namespaces:
     
   \functionitem[\texttt{wali::nwa::construct}] This namespace provides functions for
     constructing an NWA. Functions in this namespace are standard,
-    language-theoretic operations such as intersection, union, concatenation,
+    automata-theoretic operations such as intersection, union, concatenation,
     Kleene star, and reversal. See \sectref{Building NWAs}.
   \functionitem[\texttt{wali::nwa::nwa\_pds}] This namespace provides functions for
     converting between NWAs and PDSs, and related functions. (Note that

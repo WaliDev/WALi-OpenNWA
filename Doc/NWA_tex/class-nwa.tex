@@ -1,10 +1,10 @@
 \section{The \texttt{NWA} class}
 \label{Se:NWA-class}
 
-\subsection{Construction, copying, and assignment}
+\subsection{Construction, copying, assignment, clearing}
 \label{Se:Construction}
 
-The NWA provides two constructors, the default constructor and the copy
+The NWA provides two constructors: the default constructor and the copy
 constructor. The default constructor creates an empty NWA. Thereafter,
 client code can add or remove states, add or remove symbols, add or remove
 transitions, and set the status of certain states as initial or final.
@@ -46,9 +46,9 @@ The names of these functions are very regular, but
 
 The only potential difficulties are in the interactions between the
 functions. Naturally, removing a state or a symbol also removes all
-transitions involving it; hence, clearing all states or clearing all symbols
+transitions involving it; likewise, clearing all states or clearing all symbols
 also clears all transitions. (Calling \texttt{removeInitialState} or \texttt{removeFinalState}
-does not cause ripple effects, however.)
+does not cause ripple effects.)
 
 Adding a transition implicitly adds the states and symbol involved in that
 transition if they are not already present; hence it is not necessary to
@@ -60,7 +60,7 @@ transitions.)
 The system supports two meta-symbols: \texttt{wali::WALI\_EPSILON}
 (\texttt{$\epsilon$}) and \texttt{wali::WALI\_WILD} (\texttt{\wild}).
 \texttt{WALI\_EPSILON} is the standard $\epsilon$ from automata theory; it
-denotes the situation in which a transition can be traversed without matching
+denotes that a transition can be traversed without matching
 and consuming an input symbol.  Epsilon symbols cannot label call or return
 transitions. \texttt{WALI\_WILD} is the `any' symbol; it matches a single input
 symbol of any kind.  Because the NWA alphabet is not fixed, the actual symbols

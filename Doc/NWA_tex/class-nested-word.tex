@@ -12,7 +12,7 @@ position in the word is annotated with whether it is an internal, call, or
 return position. The nesting relation is induced by the matchings between
 calls and returns.
 
-A position in the word is represented by the (nested) structure
+A position in a word is represented by the (nested) structure
 \texttt{NestedWord::Position}. \texttt{Position} itself declares an
 enumeration \texttt{Type}, which has the possible values \texttt{CallType},
 \texttt{InternalType}, or \texttt{ReturnType}.
@@ -23,16 +23,16 @@ the type of the position.
 
 The \texttt{NestedWord} class has just six functions:
 \begin{functionlist}
-  \functionitemnonl[\texttt{NestedWord::appendInternal(Symbol s)}]
-  \functionitemnonl[\texttt{NestedWord::appendCall(Symbol s)}]
-  \functionitem[\texttt{NestedWord::appendReturn(Symbol s)}]
+  \functionitemnonl[\texttt{void NestedWord::appendInternal(Symbol s)}]
+  \functionitemnonl[\texttt{void NestedWord::appendCall(Symbol s)}]
+  \functionitem[\texttt{void NestedWord::appendReturn(Symbol s)}]
     These append the symbol \texttt{s} to the linear word, and annotate that
     position as an internal, call, or return position, respectively.
-  \functionitem[\texttt{NestedWord::append(Position p)}]
+  \functionitem[\texttt{void NestedWord::append(Position p)}]
     Appends \texttt{p} to the word.
-  \functionitemnonl[\texttt{NestedWord::begin() const}]
-  \functionitem[\texttt{NestedWord::end() const}]
-    These return a \texttt{NestedWord::const\_iterator} to the start or end
+  \functionitemnonl[\texttt{NestedWord::const\_iterator NestedWord::begin() const}]
+  \functionitem[\texttt{NestedWord::const\_iterator NestedWord::end() const}]
+    These return an iterator to the start or end
     of the nested word. The type returned by dereferencing these iterators is
     a \texttt{Position} object. (There is no non-const version of these
     functions.)
