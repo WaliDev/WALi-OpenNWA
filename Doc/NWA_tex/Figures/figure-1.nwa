@@ -13,5 +13,3 @@ Delta_c: {
 Delta_r: {
   (Exit, Call, ret, Return)
 }
-
-	 
