@@ -63,10 +63,10 @@ are declared in the header \texttt{wali/nwa/nwa\_pds/conversions.hpp}.
     Converts \texttt{pds} to an NWA, either storing the result in
     \texttt{nwa} or returning it.
 
-  \functionitem[\texttt{WPDS NwaToWpdscalls( NWA const \& nwa, WeightGen<Client>\& wg ) const}] \nopagebreak
-  \functionitem[\texttt{WPDS NWAtoBackwardsPDScalls( NWA const \& nwa, WeightGen<Client>\& wg )}] \nopagebreak
-  \functionitem[\texttt{WPDS NwaToWpdsreturns( NWA const \& nwa, WeightGen<Client>\& wg ) const}] \nopagebreak
-  \functionitem[\texttt{WPDS NWAtoBackwardsPDSreturns( NWA const \& nwa, WeightGen<Client>\& wg )}] \nopagebreak
+  \functionitem[\texttt{WPDS NwaToWpdsCalls( NWA const \& nwa, WeightGen<Client>\& wg ) const}] \nopagebreak
+  \functionitem[\texttt{WPDS NwaToBackwardsWpdsCalls( NWA const \& nwa, WeightGen<Client>\& wg )}] \nopagebreak
+  \functionitem[\texttt{WPDS NwaToWpdsReturns( NWA const \& nwa, WeightGen<Client>\& wg ) const}] \nopagebreak
+  \functionitem[\texttt{WPDS NwaToBackwardsWpdsReturns( NWA const \& nwa, WeightGen<Client>\& wg )}] \nopagebreak
     Constructs the WPDS that is equivalent to \texttt{nwa} using the
     appropriate method (backwards or forwards flow, and stacking calls or
     stacking returns), returning the result. Uses \texttt{wg} to determine
@@ -154,17 +154,17 @@ WPDS state and stack symbol being converted.
       \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,exit \rangle$}
     \end{itemize}
   \caption{An example WPDS.}
-  \label{Fig:WpdsToNwa1}
+  \label{Fi:WpdsToNwa1}
 \end{figure}
 
-For example, the NWA resulting from converting the WPDS shown in Figure
-\ref{Fig:WpdsToNwa1} into an NWA is shown in Figure \ref{Fig:WpdsToNwa2}.
+For example, the NWA resulting from converting the WPDS shown in
+\figref{WpdsToNwa1} into an NWA is shown in \figref{WpdsToNwa2}.
 
 \begin{figure}[t]
   \centering
     \nwaimage[1]{Figures/pds-equivalent}
-  \caption{The NWA resulting from converting the WPDS in Figure \ref{Fig:WpdsToNwa1} into an NWA.}
-  \label{Fig:WpdsToNwa2}
+  \caption{The NWA resulting from converting the WPDS in \figref{WpdsToNwa1} into an NWA.}
+  \label{Fi:WpdsToNwa2}
 \end{figure}
 
 
@@ -188,6 +188,114 @@ WPDS rules.
 calculate the weights of the rules in the generated WPDS.  It allows the
 underlying NWA to be decoupled from the weight domain used in the WPDS.  See
 \cite[\S4-\S5]{wali} for details about weight domains.
+
+
+\begin{figure}[p]
+  \centering
+  \begin{minipage}{\textwidth}
+    \nwaimage[1]{Figures/pre-pds-nwa}
+    \caption{An example NWA.}
+    \label{Fi:NwaToWpds1}
+  \end{minipage}
+  \begin{minipage}{0.42\textwidth}
+    \begin{itemize}
+      \centering
+      \item{ $\langle p,main \rangle \hookrightarrow \langle p,q_1 \rangle$}
+      \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
+      \item{ $\langle p,e \rangle \hookrightarrow \langle p,q_2 \rangle$}
+      \item{ $\langle p,q_2 \rangle \hookrightarrow \langle p,q_3 \rangle$}
+      \item{ $\langle p,q_3 \rangle \hookrightarrow \langle p,x \rangle$}
+      \item{ $\langle p,r_1 \rangle \hookrightarrow \langle p,q_4 \rangle$}
+      \item{ $\langle p,q_4 \rangle \hookrightarrow \langle p,q_5 \rangle$}
+      \item{ $\langle p,q_5 \rangle \hookrightarrow \langle p,c_2 \rangle$}
+      \item{ $\langle p,r_2 \rangle \hookrightarrow \langle p,q_6 \rangle$}
+      \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,exit \rangle$}
+      \item{ $\langle p,c_1 \rangle \hookrightarrow \langle p,e \hspace{.1cm} c_1 \rangle$}
+      \item{ $\langle p,c_2 \rangle \hookrightarrow \langle p,e \hspace{.1cm} c_2 \rangle$}
+      \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
+      \item{ $\langle p_x,c_1 \rangle \hookrightarrow \langle p,r_1 \rangle$}
+      \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
+      \item{ $\langle p_x,c_2 \rangle \hookrightarrow \langle p,r_2 \rangle$}
+    \end{itemize}
+    \caption{The WPDS resulting from calling \texttt{NwaToWpdsCalls} on \figref{NwaToWpds1}}
+    \label{Fi:NwaToWpds4}
+  \end{minipage}
+  \hspace{0.1\textwidth}
+  \begin{minipage}{0.42\textwidth}
+    \centering
+    \begin{itemize}
+      \centering
+      \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,main \rangle$}
+      \item{ $\langle p,c_1 \rangle \hookrightarrow \langle p,q_1 \rangle$}
+      \item{ $\langle p,q_2 \rangle \hookrightarrow \langle p,e \rangle$}
+      \item{ $\langle p,q_3 \rangle \hookrightarrow \langle p,q_2 \rangle$}
+      \item{ $\langle p,x \rangle \hookrightarrow \langle p,q_3 \rangle$}
+      \item{ $\langle p,q_4 \rangle \hookrightarrow \langle p,r_1 \rangle$}
+      \item{ $\langle p,q_5 \rangle \hookrightarrow \langle p,q_4 \rangle$}
+      \item{ $\langle p,c_2 \rangle \hookrightarrow \langle p,q_5 \rangle$}
+      \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,r_2 \rangle$}
+      \item{ $\langle p,exit \rangle \hookrightarrow \langle p,q_6 \rangle$}
+      \item{ $\langle p,r_1 \rangle \hookrightarrow \langle p,x \hspace{.1cm} r_1 \rangle$}
+      \item{ $\langle p,r_2 \rangle \hookrightarrow \langle p,x \hspace{.1cm} r_2 \rangle$}
+      \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
+      \item{ $\langle p_e,r_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
+      \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
+      \item{ $\langle p_e,r_2 \rangle \hookrightarrow \langle p,c_2 \rangle$}
+    \end{itemize}
+    \caption{The result of calling \texttt{NwaToBackwardsWpdsCalls} on \figref{NwaToWpds1}}
+    \label{Fi:NwaToWpds5}
+  \end{minipage}
+  \begin{minipage}{0.42\textwidth}
+    \centering
+    \begin{itemize}
+      \centering
+      \item{ $\langle p,main \rangle \hookrightarrow \langle p,q_1 \rangle$}
+      \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
+      \item{ $\langle p,e \rangle \hookrightarrow \langle p,q_2 \rangle$}
+      \item{ $\langle p,q_2 \rangle \hookrightarrow \langle p,q_3 \rangle$}
+      \item{ $\langle p,q_3 \rangle \hookrightarrow \langle p,x \rangle$}
+      \item{ $\langle p,r_1 \rangle \hookrightarrow \langle p,q_4 \rangle$}
+      \item{ $\langle p,q_4 \rangle \hookrightarrow \langle p,q_5 \rangle$}
+      \item{ $\langle p,q_5 \rangle \hookrightarrow \langle p,c_2 \rangle$}
+      \item{ $\langle p,r_2 \rangle \hookrightarrow \langle p,q_6 \rangle$}
+      \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,exit \rangle$}
+      \item{ $\langle p,c_1 \rangle \hookrightarrow \langle p,e \hspace{.1cm} r_1 \rangle$}
+      \item{ $\langle p,c_2 \rangle \hookrightarrow \langle p,e \hspace{.1cm} r_2 \rangle$}
+      \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
+      \item{ $\langle p_x,r_1 \rangle \hookrightarrow \langle p,r_1 \rangle$}
+      \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
+      \item{ $\langle p_x,r_2 \rangle \hookrightarrow \langle p,r_2 \rangle$}
+    \end{itemize}
+    \caption{The WPDS resulting from calling \texttt{NwaToWpdsReturns} on \figref{NwaToWpds1}}
+    \label{Fi:NwaToWpds2}
+  \end{minipage}
+  \hspace{0.1\textwidth}
+  \begin{minipage}{0.42\textwidth}
+    \centering
+    \begin{itemize}
+      \centering
+      \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,main \rangle$}
+      \item{ $\langle p,c_1 \rangle \hookrightarrow \langle p,q_1 \rangle$}
+      \item{ $\langle p,q_2 \rangle \hookrightarrow \langle p,e \rangle$}
+      \item{ $\langle p,q_3 \rangle \hookrightarrow \langle p,q_2 \rangle$}
+      \item{ $\langle p,x \rangle \hookrightarrow \langle p,q_3 \rangle$}
+      \item{ $\langle p,q_4 \rangle \hookrightarrow \langle p,r_1 \rangle$}
+      \item{ $\langle p,q_5 \rangle \hookrightarrow \langle p,q_4 \rangle$}
+      \item{ $\langle p,c_2 \rangle \hookrightarrow \langle p,q_5 \rangle$}
+      \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,r_2 \rangle$}
+      \item{ $\langle p,exit \rangle \hookrightarrow \langle p,q_6 \rangle$}
+      \item{ $\langle p,r_1 \rangle \hookrightarrow \langle p,x \hspace{.1cm} c_1 \rangle$}
+      \item{ $\langle p,r_2 \rangle \hookrightarrow \langle p,x \hspace{.1cm} c_2 \rangle$}
+      \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
+      \item{ $\langle p_e,c_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
+      \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
+      \item{ $\langle p_e,c_2 \rangle \hookrightarrow \langle p,c_2 \rangle$}
+    \end{itemize}
+    \caption{The result of calling \texttt{Nwa\-To\-Backwards\-Wpds\-Returns} on \figref{NwaToWpds1}}
+    \label{Fi:NwaToWpds3}
+  \end{minipage}
+\end{figure}
+
 
 The following operations are virtual methods of class WeightGen intended to
 be overridden:
@@ -222,13 +330,6 @@ be overridden:
 
 \end{functionlist}
 
-
-\begin{figure}[htbp]
-  \centering
-    \nwaimage[1]{Figures/pre-pds-nwa}
-  \caption{An example NWA.}
-  \label{Fig:NwaToWpds1}
-\end{figure}
 
 \subsubsection{1. Forwards Flow Stacking Calls}
 
@@ -291,33 +392,9 @@ w_3 &= \mathtt{wg.getOne}()
 
 
 For example, the WPDS resulting from converting the NWA
-shown in Figure \ref{Fig:NwaToWpds1} into a WPDS is shown in Figure
-\ref{Fig:NwaToWpds4}. \\
+shown in \figref{NwaToWpds1} into a WPDS is shown in
+\figref{NwaToWpds4}. \\
 
-\begin{figure}[htbp]
-  \centering
-    \begin{itemize}
-      \centering
-      \item{ $\langle p,main \rangle \hookrightarrow \langle p,q_1 \rangle$}
-      \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
-      \item{ $\langle p,e \rangle \hookrightarrow \langle p,q_2 \rangle$}
-      \item{ $\langle p,q_2 \rangle \hookrightarrow \langle p,q_3 \rangle$}
-      \item{ $\langle p,q_3 \rangle \hookrightarrow \langle p,x \rangle$}
-      \item{ $\langle p,r_1 \rangle \hookrightarrow \langle p,q_4 \rangle$}
-      \item{ $\langle p,q_4 \rangle \hookrightarrow \langle p,q_5 \rangle$}
-      \item{ $\langle p,q_5 \rangle \hookrightarrow \langle p,c_2 \rangle$}
-      \item{ $\langle p,r_2 \rangle \hookrightarrow \langle p,q_6 \rangle$}
-      \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,exit \rangle$}
-      \item{ $\langle p,c_1 \rangle \hookrightarrow \langle p,e \hspace{.1cm} c_1 \rangle$}
-      \item{ $\langle p,c_2 \rangle \hookrightarrow \langle p,e \hspace{.1cm} c_2 \rangle$}
-      \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
-      \item{ $\langle p_x,c_1 \rangle \hookrightarrow \langle p,r_1 \rangle$}
-      \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
-      \item{ $\langle p_x,c_2 \rangle \hookrightarrow \langle p,r_2 \rangle$}
-    \end{itemize}
-  \caption{The WPDS resulting from converting the NWA shown in Figure \ref{Fig:NwaToWpds1} into a WPDS.}
-  \label{Fig:NwaToWpds4}
-\end{figure}
 
 \subsubsection{2. Backwards Flow Stacking Calls}
 
@@ -381,36 +458,11 @@ w_3 &= \mathtt{wg.getOne}()
 
 
 
-\noindent Consider, as an example, converting the NWA in Figure
-\ref{Fig:NwaToWpds1} into a backwards flow WPDS.  The WPDS resulting from
-converting the NWA shown in Figure \ref{Fig:NwaToWpds1} into a backwards flow
-WPDS is shown in Figure \ref{Fig:NwaToWpds5}.  Note:
+\noindent Consider, as an example, converting the NWA in
+\figref{NwaToWpds1} into a backwards flow WPDS.  The WPDS resulting from
+converting the NWA shown in \figref{NwaToWpds1} into a backwards flow
+WPDS is shown in \figref{NwaToWpds5}.  Note:
 \texttt{NWAtoBackwardsPDScalls(A)} = \texttt{NwaToWpdscalls(reverse(A))}.  \\
-
-\begin{figure}[htbp]
-  \centering
-    \begin{itemize}
-      \centering
-      \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,main \rangle$}
-      \item{ $\langle p,c_1 \rangle \hookrightarrow \langle p,q_1 \rangle$}
-      \item{ $\langle p,q_2 \rangle \hookrightarrow \langle p,e \rangle$}
-      \item{ $\langle p,q_3 \rangle \hookrightarrow \langle p,q_2 \rangle$}
-      \item{ $\langle p,x \rangle \hookrightarrow \langle p,q_3 \rangle$}
-      \item{ $\langle p,q_4 \rangle \hookrightarrow \langle p,r_1 \rangle$}
-      \item{ $\langle p,q_5 \rangle \hookrightarrow \langle p,q_4 \rangle$}
-      \item{ $\langle p,c_2 \rangle \hookrightarrow \langle p,q_5 \rangle$}
-      \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,r_2 \rangle$}
-      \item{ $\langle p,exit \rangle \hookrightarrow \langle p,q_6 \rangle$}
-      \item{ $\langle p,r_1 \rangle \hookrightarrow \langle p,x \hspace{.1cm} r_1 \rangle$}
-      \item{ $\langle p,r_2 \rangle \hookrightarrow \langle p,x \hspace{.1cm} r_2 \rangle$}
-      \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
-      \item{ $\langle p_e,r_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
-      \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
-      \item{ $\langle p_e,r_2 \rangle \hookrightarrow \langle p,c_2 \rangle$}
-    \end{itemize}
-  \caption{The WPDS resulting from converting the NWA shown in Figure \ref{Fig:NwaToWpds1} into a WPDS.}
-  \label{Fig:NwaToWpds5}
-\end{figure}
 
 \subsubsection{3. Forwards Flow Stacking Returns}
 
@@ -470,35 +522,11 @@ w_3 &= \begin{cases}
 \end{align*}
 
 
-\noindent Consider, as an example, converting the NWA in Figure
-\ref{Fig:NwaToWpds1} into a WPDS.  The WPDS resulting from converting the WPDS
-shown in Figure \ref{Fig:NwaToWpds1} into a WPDS is shown in Figure
-\ref{Fig:NwaToWpds2}. \\
+\noindent Consider, as an example, converting the NWA in
+\figref{NwaToWpds1} into a WPDS.  The WPDS resulting from converting the WPDS
+shown in \figref{NwaToWpds1} into a WPDS is shown in
+\figref{NwaToWpds2}. \\
 
-\begin{figure}[htbp]
-  \centering
-    \begin{itemize}
-      \centering
-      \item{ $\langle p,main \rangle \hookrightarrow \langle p,q_1 \rangle$}
-      \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
-      \item{ $\langle p,e \rangle \hookrightarrow \langle p,q_2 \rangle$}
-      \item{ $\langle p,q_2 \rangle \hookrightarrow \langle p,q_3 \rangle$}
-      \item{ $\langle p,q_3 \rangle \hookrightarrow \langle p,x \rangle$}
-      \item{ $\langle p,r_1 \rangle \hookrightarrow \langle p,q_4 \rangle$}
-      \item{ $\langle p,q_4 \rangle \hookrightarrow \langle p,q_5 \rangle$}
-      \item{ $\langle p,q_5 \rangle \hookrightarrow \langle p,c_2 \rangle$}
-      \item{ $\langle p,r_2 \rangle \hookrightarrow \langle p,q_6 \rangle$}
-      \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,exit \rangle$}
-      \item{ $\langle p,c_1 \rangle \hookrightarrow \langle p,e \hspace{.1cm} r_1 \rangle$}
-      \item{ $\langle p,c_2 \rangle \hookrightarrow \langle p,e \hspace{.1cm} r_2 \rangle$}
-      \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
-      \item{ $\langle p_x,r_1 \rangle \hookrightarrow \langle p,r_1 \rangle$}
-      \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
-      \item{ $\langle p_x,r_2 \rangle \hookrightarrow \langle p,r_2 \rangle$}
-    \end{itemize}
-  \caption{The WPDS resulting from converting the NWA shown in Figure \ref{Fig:NwaToWpds1} into a WPDS.}
-  \label{Fig:NwaToWpds2}
-\end{figure}
 
 \subsubsection{4. Backwards Flow Stacking Returns}
 
@@ -586,35 +614,10 @@ w_3 &= \begin{cases}
   on $\sigma$).
 \end{enumerate}
 
-\noindent Consider, as an example, converting the NWA in Figure
-\ref{Fig:NwaToWpds3} into a backwards flow WPDS.  The WPDS resulting from
-converting the WPDS shown in Figure \ref{Fig:NwaToWpds1} into a backwards flow
-WPDS is shown in Figure \ref{Fig:NwaToWpds3}. \\
+\noindent Consider, as an example, converting the NWA in
+\figref{NwaToWpds3} into a backwards flow WPDS.  The WPDS resulting from
+converting the WPDS shown in \figref{NwaToWpds1} into a backwards flow
+WPDS is shown in \figref{NwaToWpds3}. \\
 
-\begin{figure}[htbp]
-  \centering
-    \begin{itemize}
-      \centering
-      \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,main \rangle$}
-      \item{ $\langle p,c_1 \rangle \hookrightarrow \langle p,q_1 \rangle$}
-      \item{ $\langle p,q_2 \rangle \hookrightarrow \langle p,e \rangle$}
-      \item{ $\langle p,q_3 \rangle \hookrightarrow \langle p,q_2 \rangle$}
-      \item{ $\langle p,x \rangle \hookrightarrow \langle p,q_3 \rangle$}
-      \item{ $\langle p,q_4 \rangle \hookrightarrow \langle p,r_1 \rangle$}
-      \item{ $\langle p,q_5 \rangle \hookrightarrow \langle p,q_4 \rangle$}
-      \item{ $\langle p,c_2 \rangle \hookrightarrow \langle p,q_5 \rangle$}
-      \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,r_2 \rangle$}
-      \item{ $\langle p,exit \rangle \hookrightarrow \langle p,q_6 \rangle$}
-      \item{ $\langle p,r_1 \rangle \hookrightarrow \langle p,x \hspace{.1cm} c_1 \rangle$}
-      \item{ $\langle p,r_2 \rangle \hookrightarrow \langle p,x \hspace{.1cm} c_2 \rangle$}
-      \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
-      \item{ $\langle p_e,c_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
-      \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
-      \item{ $\langle p_e,c_2 \rangle \hookrightarrow \langle p,c_2 \rangle$}
-    \end{itemize}
-  \caption{The WPDS resulting from converting the NWA shown in Figure
-    \ref{Fig:NwaToWpds1} into a WPDS.}
-  \label{Fig:NwaToWpds3}
-\end{figure}
 
 
