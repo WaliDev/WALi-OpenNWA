@@ -58,21 +58,21 @@ are declared in the header \texttt{wali/nwa/nwa\_pds/conversions.hpp}.
 
 
 \begin{functionlist}
-  \functionitem[\texttt{void WpdsToNwa( NWA \& out, const WPDS\& pds )}] \nopagebreak
+  \functionitemnonl[\texttt{void WpdsToNwa( NWA \& out, const WPDS\& pds )}] \nopagebreak
   \functionitem[\texttt{NWARefPtr WpdsToNwa( NWA const \& nwa, const WPDS\& pds )}] \nopagebreak
     Converts \texttt{pds} to an NWA, either storing the result in
     \texttt{nwa} or returning it.
 
-  \functionitem[\texttt{WPDS NwaToWpdsCalls( NWA const \& nwa, WeightGen<Client>\& wg ) const}] \nopagebreak
-  \functionitem[\texttt{WPDS NwaToBackwardsWpdsCalls( NWA const \& nwa, WeightGen<Client>\& wg )}] \nopagebreak
-  \functionitem[\texttt{WPDS NwaToWpdsReturns( NWA const \& nwa, WeightGen<Client>\& wg ) const}] \nopagebreak
+  \functionitemnonl[\texttt{WPDS NwaToWpdsCalls( NWA const \& nwa, WeightGen<Client>\& wg ) const}] \nopagebreak
+  \functionitemnonl[\texttt{WPDS NwaToBackwardsWpdsCalls( NWA const \& nwa, WeightGen<Client>\& wg )}] \nopagebreak
+  \functionitemnonl[\texttt{WPDS NwaToWpdsReturns( NWA const \& nwa, WeightGen<Client>\& wg ) const}] \nopagebreak
   \functionitem[\texttt{WPDS NwaToBackwardsWpdsReturns( NWA const \& nwa, WeightGen<Client>\& wg )}] \nopagebreak
     Constructs a WPDS that is equivalent to \texttt{nwa} using the
     appropriate method (backwards or forwards flow, and stacking calls or
     stacking returns), returning the result. Uses \texttt{wg} to determine
     weights for the WPDS's transitions.
 
-  \functionitem[\texttt{WPDS plusWPDS( NWA const \& nwa, const WPDS\& base )}] \nopagebreak
+  \functionitemnonl[\texttt{WPDS plusWPDS( NWA const \& nwa, const WPDS\& base )}] \nopagebreak
 
     This returns the WPDS that is the
     product of \texttt{nwa} and the given WPDS, described in \S6 (``explicit
