@@ -219,6 +219,16 @@ reflect the views of the sponsoring agencies.
 \newcommand{\functionitem}[1][\TODO{missing}]{\item[#1]\hspace*{\fill}\\}
 \newcommand{\functionitemnonl}[1][\TODO{missing}]{\item[#1]}
 
+\newcommand{\functionDef}[4]{\item[\texttt{#1 \textsl{#2}(#3) #4}]\mbox{}\\}
+\newcommand{\functionDefEarly}[4]{\item[\texttt{#1 \textsl{#2}(#3) #4}]}
+\newcommand{\functionDefFirst}[4]{\vspace{0.5\baselineskip}\item[\texttt{#1 \textsl{#2}(#3) #4}]\mbox{}\\}
+\newcommand{\functionDefFirstEarly}[4]{\vspace{0.5\baselineskip}\item[\texttt{#1 \textsl{#2}(#3) #4}]}
+
+\newcommand{\functionDefNoCloseParen}[3]{\item[\texttt{#1 \textsl{#2}(#3}]\mbox{}\\}
+\newcommand{\functionDefEarlyNoCloseParen}[3]{\item[\texttt{#1 \textsl{#2}(#3}]}
+\newcommand{\functionDefFirstNoCloseParen}[3]{\vspace{0.5\baselineskip}\item[\texttt{#1 \textsl{#2}(#3}]\mbox{}\\}
+\newcommand{\functionDefFirstEarlyNoCloseParen}[3]{\vspace{0.5\baselineskip}\item[\texttt{#1 \textsl{#2}(#3}]}
+
 \setlength{\belowcaptionskip}{0.66\baselineskip}
 
 \newcommand{\wild}{\ensuremath{@}}

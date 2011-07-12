@@ -30,16 +30,16 @@ minimal post-processing in some cases).
 
 There is a member function to produce each type of output:
 \begin{functionlist}
-  \functionitem[\texttt{std::ostream\& NWA::print(std::ostream \& stream) const}]
+  \functionDef{std::ostream\&}{NWA::print}{std::ostream \& stream}{const}
     Writes the custom output described in this section
     to \texttt{stream}, returning \texttt{stream}.
     (This method is inherited from
     the \texttt{wali::Printable} abstract class.)
 
-  \functionitemnonl[\texttt{std::ostream\& NWA::print\_dot(
-      \parbox[t][2\baselineskip][t]{4in}{
+  \functionDefFirstEarlyNoCloseParen{std::ostream\&}{NWA::print\_dot}{%
+      \parbox[t][2\baselineskip][t]{3.5in}{
                  ostream \& os, std::string const \& n,\\
-                 bool abbrev = true)}}]
+                 bool abbrev = true) const}}
     Outputs a Dot description of the NWA to the stream \texttt{os}, returning
     \texttt{os}.  The name of the graph (\texttt{digraph "n" \{...\}}) is
     given by \texttt{n}. Finally, if \texttt{abbrev} is set to
@@ -65,14 +65,15 @@ report errors more gracefully, almost certainly through exceptions.
 There are two functions that parse NWA descriptions, both declared in
 \texttt{wali/nwa/NWAParser.hpp} in namespace \texttt{wali::nwa}:
 \begin{functionlist}
-  \functionitem[\texttt{NWARefPtr read\_nwa(std::istream \& is, std::string *
-      name = NULL)}] Reads a description of a single NWA from \texttt{is} and
+  \functionDef{NWARefPtr}{read\_nwa}{std::istream \& is, std::string * name = NULL}{} 
+  Reads a description of a single NWA from \texttt{is} and
   returns it. The serialization format allows an optional name for an NWA; if
   one is specified and \texttt{name} is non-null, then the name is stored in
   the string pointed to by \texttt{name}.
 
-  \functionitem[\texttt{std::map$<$std::string, NWARefPtr$>$
-      read\_nwa\_proc\_set(std::istream \&)}] Reads the entire input stream,
+  \functionDefFirst{std::map$<$std::string, NWARefPtr$>$}%
+                   {read\_nwa\_proc\_set}{std::istream \&}{}
+  Reads the entire input stream,
   returning a map from the name of each automaton description to the parsed
   NWA. (This form was originally created to read NWAs for an entire program
   formatted with each procedure in a separate NWA. The name of each NWA was

@@ -23,15 +23,17 @@ the type of the position.
 
 The \texttt{NestedWord} class has just six functions:
 \begin{functionlist}
-  \functionitemnonl[\texttt{void NestedWord::appendInternal(Symbol s)}]
-  \functionitemnonl[\texttt{void NestedWord::appendCall(Symbol s)}]
-  \functionitem[\texttt{void NestedWord::appendReturn(Symbol s)}]
+  \functionDefEarly{void}{NestedWord::appendInternal}{Symbol s}{}
+  \functionDefEarly{void}{NestedWord::appendCall}{Symbol s}{}
+  \functionDef{void}{NestedWord::appendReturn}{Symbol s}{}
     These append the symbol \texttt{s} to the linear word, and annotate that
     position as an internal, call, or return position, respectively.
-  \functionitem[\texttt{void NestedWord::append(Position p)}]
+
+  \functionDefFirst{void}{NestedWord::append}{Position p}{}
     Appends \texttt{p} to the word.
-  \functionitemnonl[\texttt{NestedWord::const\_iterator NestedWord::begin() const}]
-  \functionitem[\texttt{NestedWord::const\_iterator NestedWord::end() const}]
+
+  \functionDefFirstEarly{NestedWord::const\_iterator}{NestedWord::begin}{}{const}
+  \functionDef{NestedWord::const\_iterator}{NestedWord::end}{}{const}
     These return an iterator to the start or end
     of the nested word. The type returned by dereferencing these iterators is
     a \texttt{Position} object. (There is no non-const version of these

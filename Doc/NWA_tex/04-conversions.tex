@@ -58,22 +58,21 @@ are declared in the header \texttt{wali/nwa/nwa\_pds/conversions.hpp}.
 
 
 \begin{functionlist}
-  \functionitemnonl[\texttt{void WpdsToNwa( NWA \& out, const WPDS\& pds )}] \nopagebreak
-  \functionitem[\texttt{NWARefPtr WpdsToNwa( NWA const \& nwa, const WPDS\& pds )}] \nopagebreak
+  \functionDefEarly{void}{WpdsToNwa}{NWA \& out, const WPDS\& pds}{}
+  \functionDef{NWARefPtr}{WpdsToNwa}{NWA const \& nwa, const WPDS\& pds}{}
     Converts \texttt{pds} to an NWA, either storing the result in
     \texttt{nwa} or returning it.
 
-  \functionitemnonl[\texttt{WPDS NwaToWpdsCalls( NWA const \& nwa, WeightGen<Client>\& wg ) const}] \nopagebreak
-  \functionitemnonl[\texttt{WPDS NwaToBackwardsWpdsCalls( NWA const \& nwa, WeightGen<Client>\& wg )}] \nopagebreak
-  \functionitemnonl[\texttt{WPDS NwaToWpdsReturns( NWA const \& nwa, WeightGen<Client>\& wg ) const}] \nopagebreak
-  \functionitem[\texttt{WPDS NwaToBackwardsWpdsReturns( NWA const \& nwa, WeightGen<Client>\& wg )}] \nopagebreak
+  \functionDefFirstEarly{WPDS}{NwaToWpdsCalls}{NWA const \& nwa, WeightGen<Client>\& wg}{}
+  \functionDefEarly{WPDS}{NwaToBackwardsWpdsCalls}{NWA const \& nwa, WeightGen<Client>\& wg}{}
+  \functionDefEarly{WPDS}{NwaToWpdsReturns}{NWA const \& nwa, WeightGen<Client>\& wg}{}
+  \functionDef{WPDS}{NwaToBackwardsWpdsReturn}{NWA const \& nwa, WeightGen<Client>\& wg}{}
     Constructs a WPDS that is equivalent to \texttt{nwa} using the
     appropriate method (backwards or forwards flow, and stacking calls or
     stacking returns), returning the result. Uses \texttt{wg} to determine
     weights for the WPDS's transitions.
 
-  \functionitemnonl[\texttt{WPDS plusWPDS( NWA const \& nwa, const WPDS\& base )}] \nopagebreak
-
+  \functionDefFirst{WPDS}{plusWPDS}{NWA const \& nwa, const WPDS\& base}{}
     This returns the WPDS that is the
     product of \texttt{nwa} and the given WPDS, described in \S6 (``explicit
     NWA plus PDS'' construction) in
@@ -310,28 +309,28 @@ The following operations are virtual methods of \texttt{WeightGen} intended to
 be overridden:
 
 \begin{functionlist} 
-  \functionitem[\texttt{sem\_elem\_t getOne() const = 0}]  \nopagebreak
+  \functionDef{sem\_elem\_t}{WeightGen::getOne}{}{const = 0}  \nopagebreak
     Returns an instance of the $\bar{1}$ element of the weight domain.
 
-  \functionitem[\texttt{sem\_elem\_t getWeight(
+  \functionDefFirstNoCloseParen{sem\_elem\_t}{getWeight}{%
       \parbox[t]{4in}{
         State source, ClientInfoRefPtr sourceInfo, \\  
         Symbol symbol, Kind k, \\
-        State target, ClientInfoRefPtr targetInfo ) const}}]  \nopagebreak
+        State target, ClientInfoRefPtr targetInfo ) const}}  \nopagebreak
     Computes and returns the weight for the rule corresponding to the
     transition from \texttt{source} to \texttt{target} (of
     \texttt{kind})
     labeled with symbol \texttt{symbol}. By default, returns texttt{getOne()}.
 
-  \functionitem[\texttt{sem\_elem\_t getWildWeight( \\
+  \functionDefFirstNoCloseParen{sem\_elem\_t}{getWildWeight}{%
       \parbox[t]{4in}{
         State source, ClientInfoRefPtr sourceInfo, \\  
-        State target, ClientInfoRefPtr targetInfo ) const}}]  \nopagebreak
+        State target, ClientInfoRefPtr targetInfo ) const}}
     Computes and returns the weight for the WPDS rule corresponding to the
     transition from \texttt{source} to \texttt{target} labeled with the
     meta-symbol \wild. By default, returns texttt{getOne()}.
 
-  \functionitem[\texttt{sem\_elem\_t getExitWeight(State src, ClientInfoRefPtr srcInfo)} const]
+  \functionDefFirst{sem\_elem\_t}{getExitWeight}{State src, ClientInfoRefPtr srcInfo}{const}
   This method computes the weight(in the desired semiring) for the return rule of
   the WPDS corresponding to the exit \texttt{src}.
   Note: value is generally the same as \texttt{getOne()}, which is what the

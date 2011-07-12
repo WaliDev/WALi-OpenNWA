@@ -12,16 +12,18 @@ transitions, and set the status of certain states as initial or final.
 
 The following functions are basic NWA operations:
 \begin{functionlist}
-  \functionitem[\texttt{NWA::NWA()}]
+  \functionDef{}{NWA::NWA}{}{}
     Constructs an empty NWA.
 
-  \functionitem[\texttt{NWA::NWA(NWA const \& other)}] Copies \texttt{other}; the
+  \functionDefFirst{}{NWA::NWA}{NWA const \& other}{}
+    Copies \texttt{other}; the
     automata will not share structure. Any client information that is present is cloned.
 
-  \functionitem[\texttt{NWA::operator=(NWA const \& other)}] Assigns \texttt{other} to \texttt{this};
+  \functionDefFirst{NWA\&}{NWA::operator=}{NWA const \& other}{}
+    Assigns \texttt{other} to \texttt{this};
     the automata will not share structure.
 
-  \functionitem[\texttt{NWA::clear()}] \nopagebreak
+  \functionDefFirst{void}{NWA::clear}{}{}
     Removes all states, symbols, and transitions from the NWA.
 
 \end{functionlist}
@@ -80,10 +82,11 @@ information. To utilize this functionality, client code must subclass
 Once done, client information can be attached or retrieved using the
 following two functions (both members of \texttt{NWA}):
 \begin{functionlist}
-  \functionitem[\texttt{ref\_ptr<ClientInfo> NWA::getClientInfo( Key st ) const}]
+  \functionDefFirst{ref\_ptr<ClientInfo>}{NWA::getClientInfo}{Key st}{const}
     Allows the user to access the client-specific information associated with
     the given state, \texttt{st}.
-  \functionitem[\texttt{void NWA::setClientInfo( Key st, ref\_ptr<ClientInfo> ci )}]
+
+  \functionDefFirst{void}{NWA::setClientInfo}{Key st, ref\_ptr<ClientInfo> ci}{}
     Allows the user to specify the client-specific information, \texttt{ci},
     associated with the given state, \texttt{st}. \\
 \end{functionlist}
@@ -121,7 +124,7 @@ intersection and determinization, and discuss these functions further.
 \subsection{The following are more functions that don't fit into the above categories}
 
 \begin{functionlist}
-  \functionitem[\texttt{void NWA::duplicateState( Key orig, Key dup )}] \nopagebreak
+  \functionDef{void}{NWA::duplicateState}{Key orig, Key dup}{}
 
     Duplicates all the transitions containing the state \texttt{orig} and
     adds the transitions to the NWA with \texttt{orig} replaced by
@@ -140,7 +143,7 @@ intersection and determinization, and discuss these functions further.
     $(\texttt{dup},\texttt{orig},a,\texttt{orig})$, and
     $(\texttt{orig},\texttt{orig},a,\texttt{dup})$ are added.
 
-  \functionitem[\texttt{void NWA::duplicateStateOutgoing( Key orig, Key dup )}] \nopagebreak
+  \functionDef{void}{NWA::duplicateStateOutgoing}{Key orig, Key dup}{}
 
     Duplicates all the transitions originating from \texttt{orig} and adds
     the transitions to the NWA with \texttt{orig} replaced by \texttt{dup}.
@@ -156,7 +159,7 @@ intersection and determinization, and discuss these functions further.
     $(\texttt{dup},\texttt{orig},a,\texttt{dup})$, and
     $(\texttt{dup},\texttt{orig},a,\texttt{orig})$ are added.
 
-  \functionitem[\texttt{void NWA::realizeImplicitTrans(State stuck)}] \nopagebreak
+  \functionDef{void}{NWA::realizeImplicitTrans}{State stuck}{}
 
     Makes the transition relation ``at least total.''
     For any source state and symbol pair that does not have at least one
