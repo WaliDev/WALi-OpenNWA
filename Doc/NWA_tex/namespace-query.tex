@@ -120,11 +120,16 @@ query on an NWA. These work by converting the NWA to a WPDS (see
 \sectref{Conversions} and, in particular, \sectref{NWAtoPDS}) using
 the function \texttt{NWAtoPDScalls} then running the query on the PDS.
 
-The transition system that pre- and poststar query is the space of
+Conceptually, the transition system queried by prestar and poststar is the space of
 configurations of the NWA. A configuration is a pair $\langle q, s\rangle$,
 where $q$ is the current state and $s$ is the stack of unmatched call
 sites. (More exactly, it is the stack of states the machine was in before
-reading a symbol in a call position that has not yet been matched.)
+reading a symbol in a call position that has not yet been matched.) In
+reality,  the transition system is the configuration space of the WPDS
+resulting from calling \texttt{NwaToWpdsCalls} (see
+\sectrefs{Conversions}{wpds-forwards-flow-stacking-calls}); that space is
+$\langle p, t\rangle$, where $p$ is a WPDS state and $t$ is the stack of
+unmatched call sites with the NWA's ``current'' state $q$ added on top.
 
 There are two variants of each function. One returns the WFA that results from
 the query, and the other stores the WFA in an output parameter. The

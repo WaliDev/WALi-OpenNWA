@@ -383,14 +383,13 @@ Client information is copied directly from the original NWAs using
 \figref{Concat2} shows the result of concatenating \figref{Example1} and
 \figref{Concat1}.
 
-
 \subsection{Kleene-Star}
 \label{Se:Star}
 
 Like concatenation, Kleene-star is complicated in the case of NWAs because of
 the ability to have unbalanced-right words in the automaton's
-language. Relative to standard FAs, in the concatenation case we only needed
-to add extra transitions; in this case, we must add additional states as well.
+language. Relative to standard FAs, in the concatenation construction we only needed
+to add extra transitions; in this construction, we must add additional states as well.
 
 When computing $R = A*$ for some
 NWA $A$, the resulting NWA has two ``copies'' of $A$. These are denoted by
@@ -425,9 +424,9 @@ will be primed.
 
 The description above describes $R$'s operation under ``normal''
 conditions. If it is about to move to a final state however, it is also allowed to guess that it
-should restart after the current character. This guess is correct if is
-reading last character in $w_i$
-(making the next character first one in $w_{i+1}$). $R$ is allowed to
+should restart after the current character. This guess is correct if it is
+reading the last character in $w_i$
+(making the next character the first one in $w_{i+1}$). $R$ is allowed to
 restart only if it is about to move to a final state, but that final state
 can be in either copy of A. If the machine
 does restart, it moves to an initial state (which is always primed, in order to
@@ -437,58 +436,50 @@ The NWA resulting from performing Kleene-Star on the NWA shown in
 \figref{Star1} is shown in \figref{Star2}.
 
 Formally, if the original NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$,
-then the result of performing Kleene-Star on that NWA is $(Q', \Sigma,
-Q_0', \delta', Q_0')$ where $\delta' =
-\{\delta_i',\delta_c',\delta_r'\}$ using the following rules:
+then the result of performing Kleene-Star on that NWA is $(Q^*, \Sigma,
+Q_0^*, \delta^*, Q_f^*)$. The sets of states are defined by $Q^* = Q \cup
+Q'$ and  $Q_0^* = Q_f^* = Q_0'$ (where $Q' = \{q'\, |\, q \in Q\}$ and $Q_0' =
+\{q'\, |\, q \in Q_0\}$).
+The transitions in $\delta^*$ are defined by the following rules:
 
 \begin{mathpar}
-{\inferrule*[left=\textsc{States}]
-         {q \in Q}
-  { q \in Q' \\ q' \in Q'}
-}
-\and
-{\inferrule*[left=\textsc{Initial and Final States}]
-         {q_0 \in Q_0}
-  { q_0' \in Q_0' \\ q_0' \in Q_f' }
-} \\
-\and
-{\inferrule*[left=\textsc{Internal}]
+{\inferrule*[left=\textsc{Int}]
              {(q,a,p) \in \delta_i }
-  { (q,a,p) \in  \delta_i' \\ (q',a,p') \in \delta_i'}
+  { (q,a,p) \in  \delta_i^* \\ (q',a,p') \in \delta_i^*}
 }
 \and
-{\inferrule*
+{\inferrule*[right=\textsc{Int-restart}]
   {(q,a,p) \in \delta_i \\ p \in Q_f \\ r' \in  Q_0'}
-  {(q,a,r') \in \delta_i'\\ (q',a,r') \in \delta_i' }
+  {(q,a,r') \in \delta_i^*\\ (q',a,r') \in \delta_i^* }
 }
 \and
 {\inferrule*[left=\textsc{Call}]
            { (q,a,p) \in \delta_c  }
-  { (q,a,p) \in  \delta_c' \\ (q',a,p) \in \delta_c'   }
+  { (q,a,p) \in  \delta_c^* \\ (q',a,p) \in \delta_c^*   }
 }
 \and
-{\inferrule*
+{\inferrule*[right=\textsc{Call-restart}]
     { (q,a,p) \in \delta_c \\ p \in Q_f \\ r' \in Q_0' }
-  { (q,a,r') \in \delta_c'\\ (q',a,r') \in \delta_c' }
+  { (q,a,r') \in \delta_c^*\\ (q',a,r') \in \delta_c^* }
 }
 \and
-{\inferrule*[left=\textsc{Return}]
+{\inferrule*[left=\textsc{Ret}]
               { (q,r,a,p) \in \delta_r }
-  {(q,r,a,p) \in  \delta_r' \\ (q,r',a,p') \in \delta_r' }
+  {(q,r,a,p) \in  \delta_r^* \\ (q,r',a,p') \in \delta_r^* }
 }
 \and
-{\inferrule*
+{\inferrule*[right=\textsc{Ret-re}]
   { (q,r,a,p) \in \delta_r \\ p \in Q_f \\  s' \in Q_0'}
-  {(q,r,a,s') \in \delta_r' \\ (q,r',a,s') \in \delta_r'  }
+  {(q,r,a,s') \in \delta_r^* \\ (q,r',a,s') \in \delta_r^*  }
 }\\
-{\inferrule*
-  { (q,r,a,p) \in \delta_r \\ r \in Q_0 \\ s \in Q' }
-  {(q',s,a,p') \in  \delta_r' }
+{\inferrule*[left=\textsc{Unbal-Ret}]
+  { (q,r,a,p) \in \delta_r \\ r \in Q_0 \\ s' \in Q' }
+  {(q',s',a,p') \in  \delta_r^* }
 }
 \and
-{\inferrule*
-  { (q,r,a,p) \in \delta_r \\ r \in Q_0 \\ s \in Q' \\ p \in Q_f \\ t' \in Q_0'}
-  {(q',s,a,t') \in \delta_r' }
+{\inferrule*[left=\textsc{Unbal-Ret-Restart}]
+  { (q,r,a,p) \in \delta_r \\ r \in Q_0 \\ s' \in Q' \\ p \in Q_f \\ t' \in Q_0'}
+  {(q',s',a,t') \in \delta_r^* }
 }
 \end{mathpar}
 
@@ -519,23 +510,23 @@ and $q'$ have (different copies of) the same client information.
 
 
 If the original NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$, then the result of
-reversing that NWA is $(Q, \Sigma, Q_f, \delta_{rev}, Q_0)$ obtained using
+reversing that NWA is $(Q, \Sigma, Q_f, \delta^{rev}, Q_0)$ obtained using
 the following rules:
 
 \begin{mathpar}
 {\inferrule*[left=\textsc{Internal}]
      { (q,\sigma,q') \in \delta_i  }
-  { (q',\sigma,q)  \in {\delta_{rev}}_i }
+  { (q',\sigma,q)  \in \delta^{rev}_i }
 } 
 \and
 {\inferrule*[left=\textsc{Call}]
        { (q_c,\sigma,q_e) \in \delta_c }
-  { (q_e,\sigma,q_c) \in {\delta_{rev}}_c }
+  { (q_e,\sigma,q_c) \in \delta^{rev}_c }
 }
 \and
 {\inferrule*[left=\textsc{Return}]
   { (q_x,q_c,\sigma,q_r) \in \delta_r  \\ (q_c,\sigma,q_e) \in  \delta_c }
-  { (q_r,q_e,\sigma,q_x) \in {\delta_{rev}}_r }
+  { (q_r,q_e,\sigma,q_x) \in \delta^{rev}_r }
 }
 \end{mathpar}
 
