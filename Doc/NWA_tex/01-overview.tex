@@ -151,11 +151,13 @@ otherwise specified, they are in namespace \texttt{wali}. See \cite{wali}.
     must be modified to include a \texttt{count} field used by the
     pointer. This is most conveniently done by subclassing
     \texttt{wali::Countable}.) Defined in \texttt{wali/ref\_ptr.hpp}.
+
   \functionitem[\texttt{Key}] A \texttt{Key} is a unique identifier naming states and symbols in an
     NWA or NestedWord. It is actually a typedef of an integer, though client
     code should not rely on this precise type. Declared in
     \texttt{wali/Key.hpp}.
-  \functionitem[\texttt{getKey(...)}] This function produces a key from some input. If
+
+  \functionDef{Key}{getKey}{...}{} This function produces a key from some input. If
     the input has not been seen before, it returns a new key; if it has, then
     it returns the same key as before. (One can think of this as translating
     whatever unique identifier is known by the client code to the
@@ -170,14 +172,15 @@ otherwise specified, they are in namespace \texttt{wali}. See \cite{wali}.
         \texttt{getKey})
       \item \texttt{key\_src\_t}
     \end{itemize}
-
     The final overload, for \texttt{key\_src\_t}, is a \texttt{ref\_ptr} to a
     \texttt{KeySource} object. \texttt{KeySource} is an abstract class that
     client code can subclass to provide a translation to \texttt{Key}s for
     arbitrary types.
 
     All overloads are declared in \texttt{wali/Key.hpp}.
-  \functionitem[\texttt{key2str}] \texttt{key2str} is an ``inverse'' of \texttt{getKey}, except that it
+
+  \functionDef{std::string}{key2str}{Key k}{}
+    \texttt{key2str} is an ``inverse'' of \texttt{getKey}, except that it
     always returns a string representation. If the key was created with
     \texttt{getKey(std::string const \&)} in the first place, this
     returns a copy of the original string.\footnote{For \texttt{int}s, it is the
@@ -187,9 +190,11 @@ otherwise specified, they are in namespace \texttt{wali}. See \cite{wali}.
     calling \texttt{key\_src\_t::print}. See the \texttt{print} function in
     each of the files \texttt{wali/*Source.cpp}.} Declared in
     \texttt{wali/Key.hpp}.
+
   \functionitem[\texttt{wali::wfa::WFA}] This is a weighted finite automaton. It is
     used in NWA poststar and prestar queries in much the same manner as in
     WPDS poststar and prestar queries. Defined in \texttt{wali/wfa/WFA.hpp}.
+
   \functionitem[\texttt{wali::wpds::WPDS}] This is a weighted pushdown system. NWAs use
     WPDSs behind the scenes when doing poststar and prestar queries, and the
     library provides conversion routines between the two automata
