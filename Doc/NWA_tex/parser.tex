@@ -233,6 +233,22 @@ is ignored. (In the output of \texttt{print()}, the \nonterm{name} is the result
 \texttt{key2str} and the optional token is the actual numeric value of
 the key.)
 
+Before we discuss the grammar of \nonterm{name}, the following shows
+some examples of strings that are names:
+\begin{quote}
+\begin{tabular}{lll}
+  123         & xyz          & a2y          \\
+  123 (=4)    & xyz (=42)    & a2y (=o3oth) \\
+  (a,b)(x,y)  & (a, b) (=32) & $<$1, 2$>$
+\end{tabular}
+\end{quote}
+and strings which are not names:
+\begin{quote}
+\begin{tabular}{lll}
+  hello world & hello world (=32)  & (unmatched
+\end{tabular}
+\end{quote}
+
 \begin{grammar}
   \nonterm{name} & ::= &  \nonterm{actual-name}\cfgsp  \nonterm{dummy-token}? \\
   \nonterm{dummy-token} & ::= & \term{(}\cfgsp(\neg\{\term{(}\})*\cfgsp\term{)}
