@@ -1,6 +1,17 @@
 \documentclass{article}
+
+\makeatletter
+\def\and{%
+  \end{tabular}%
+  \hskip .1em\relax
+  \begin{tabular}[t]{c}}
+\makeatother
+
+
 %\documentclass{llncs}
-\newcommand{\inst}[1]{}
+\newcommand{\inst}[1]{$^{#1}$}
+
+\usepackage{minted}
 
 \usepackage{amsmath}
 \usepackage{amsthm}
@@ -16,7 +27,8 @@
 
 
 %\usepackage{squeeze_llncs}
-\usepackage[left=1.5in,right=1.5in,top=1in,bottom=1in]{geometry}
+\usepackage[left=1.75in,right=1.75in,top=1in,bottom=1in]{geometry}
+\usepackage{changepage}
 \usepackage{verbatim}
 %\usepackage{times}
 
@@ -168,13 +180,29 @@ reflect the views of the sponsoring agencies.
 }
 
 
+
 \author{Amanda Burton\inst{1} \and Aditya Thakur\inst{1} \and Evan Driscoll\inst{1} \and Thomas Reps\inst{1,2}}
 %\institute{
 %  University of Wisconsin \and GrammaTech, Inc. \\
 %  \email{\{burtona,adi,driscoll,reps\}@cs.wisc.edu}
 %}
 \date{}
+
+%\begin{adjustwidth}{-.5in}{-.5in}
 \maketitle
+{\centering
+\inst{1}University of Wisconsin --- Madison \\
+Computer Sciences Department \\
+\texttt{\{burtona,adi,driscoll,reps\}@cs.wisc.edu} \\
+\vspace{\baselineskip}
+\inst{2}GrammaTech, Inc.
+
+}
+%\end{adjustwidth}
+
+
+
+\vspace{2\baselineskip}
 
 \input{macro} % Contains various defs and macros for PDS notation
 \input{macros}% Created by Tom, taken from FSTTCS submission
