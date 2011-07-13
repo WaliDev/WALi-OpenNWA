@@ -61,6 +61,8 @@ but can also include the WPDS portions of the library.
 Throughout this document, include paths are relative to the \texttt{Source}
 directory from the WALi distribution.
 
+Section \ref{Se:ExampleUse} illustrates a simple sample use of the library.
+
 \subsection{NWA core classes}
 
 These types live in namespace \texttt{wali::nwa}:
@@ -201,4 +203,12 @@ otherwise specified, they are in namespace \texttt{wali}. See \cite{wali}.
     types. Defined in \texttt{wali/wpds/WPDS.hpp}.
 \end{functionlist}
 
+
+\subsection{Simple Example use of the Library}
+\label{Se:ExampleUse}
+The following is an illustration of basic operations of the library. The full
+code is available in the file \texttt{Doc/NWA\_tex/Example/example.cpp} in the
+WALi distribution.
+
+\inputminted{c++}{Example/example-abbrev.cpp}
 
