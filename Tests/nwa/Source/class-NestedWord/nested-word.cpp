@@ -18,6 +18,7 @@ namespace wali {
         {
             NestedWord w;
 
+            EXPECT_EQ(0u, w.size());
             EXPECT_EQ(w.begin(), w.end());
         }
 
@@ -78,6 +79,8 @@ namespace wali {
             w.appendInternal(b);
             w.appendReturn(c);
             w.appendCall(a);
+
+            EXPECT_EQ(7u, w.size());
 
             Iterator i = w.begin();
 
