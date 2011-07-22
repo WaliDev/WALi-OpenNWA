@@ -25,22 +25,22 @@ namespace wali
       ///
       struct Position
       {
-	/// The type of a position: either a call position, internal
-	/// position, or return position.
+        /// The type of a position: either a call position, internal
+        /// position, or return position.
         enum Type {
           CallType, InternalType, ReturnType
         };
-
-	/// The symbol at this position
-	///
+        
+        /// The symbol at this position
+        ///
         Symbol symbol;
 
-	/// The type (call/internal/return) of this position
-	///
+        /// The type (call/internal/return) of this position
+        ///
         Type type;
         
-	/// Constructs a Position object with the given symbol and
-	/// type
+        /// Constructs a Position object with the given symbol and
+        /// type
         Position(Symbol sym, Type ty) : symbol(sym), type(ty) {}
       };
       
