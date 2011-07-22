@@ -245,8 +245,7 @@ namespace wali
         //Set the clientInfo of this state.
         //TODO: check this -- if it is not right, fix star() in NWA.hpp
         if (stateSet.getClientInfo(*it) != 0) {
-          Client info = *(stateSet.getClientInfo(*it));
-          ClientInfoRefPtr ci = ClientInfoRefPtr(new Client(info));
+          ClientInfoRefPtr ci = stateSet.getClientInfo(*it)->cloneRp();
           setClientInfo(*it,ci);
         }
       }
