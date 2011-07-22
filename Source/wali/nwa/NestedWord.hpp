@@ -85,6 +85,12 @@ namespace wali
       {
         return word.end();
       }
+
+      /// Returns the number of positions in this nested word
+      size_t size() const
+      {
+        return word.size();
+      }
     };
   }
 }
