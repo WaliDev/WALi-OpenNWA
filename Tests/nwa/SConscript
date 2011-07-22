@@ -25,6 +25,7 @@ test_files = Split("""
     Source/NWA-tests.cpp
     Source/fixtures.cpp
     Source/wali-prereqs.cpp
+    Source/class-NestedWord/nested-word.cpp
     Source/class-NWA/supporting.cpp
     Source/class-NWA/construction-assignment.cpp
     Source/class-NWA/get-size-is-add-remove-clear.cpp
