@@ -31,11 +31,11 @@ namespace wali
 
   std::ostream& KeyPairSource::print( std::ostream& o ) const
   {
-    o << "( ";
+    o << "(";
     printKey(o,kp.first);
-    o << " , ";
+    o << ",";
     printKey(o,kp.second);
-    o << " )";
+    o << ")";
     return o;
   }
 

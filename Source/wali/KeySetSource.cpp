@@ -32,16 +32,16 @@ namespace wali
 
   std::ostream& KeySetSource::print( std::ostream& o ) const
   {
-    o << "{ ";
+    o << "{";
     bool first = true;
     for( std::set<Key>::const_iterator it = kys.begin();
           it != kys.end(); it++,first = false )
     {
       if(!first)
-        o << " , ";
+        o << ",";
       printKey(o,*it);
     }        
-    o << " }";
+    o << "}";
     return o;
   }
 
