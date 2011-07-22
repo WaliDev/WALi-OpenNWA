@@ -21,7 +21,7 @@ else:
 
 
 Platform       = platform.system()
-MkStatic       = True #(Platform == 'Windows')
+MkStatic       = (Platform == 'Windows')
 WaliDir        = os.getcwd()
 BaseEnv        = Environment() #MSVC_USE_SCRIPT=False)
 Is64           = (platform_bits == 64)
@@ -58,8 +58,7 @@ if 'gcc' == BaseEnv['CC']:
     # -Waddress -Wlogical-op
 
     # -Wcast-qual 
-    BaseEnv.Append(LINKFLAGS='-fprofile-arcs')
-    BaseEnv.Append(CCFLAGS='-g -ggdb -Wall -Wextra $WARNING_FLAGS -fdiagnostics-show-option -fprofile-arcs -ftest-coverage')
+    BaseEnv.Append(CCFLAGS='-g -ggdb -Wall -Wextra $WARNING_FLAGS -fdiagnostics-show-option -O2')
     BaseEnv.Append(WARNING_FLAGS='-Werror -Wformat=2 -Winit-self -Wunused -Wfloat-equal -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wwrite-strings -Wconversion -Woverloaded-virtual')
 
     if platform_bits == 64 and not Is64:
