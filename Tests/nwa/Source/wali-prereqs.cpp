@@ -12,7 +12,7 @@ namespace wali {
             , char_star_key(getKey("char*"))
             , int_key(getKey(12))
             , set_key(getKey(std::set<Key>()))
-            , pair_key(getKey(1, 2))
+            , pair_key(getKey(string_key, int_key))
         {}
     };
     
@@ -35,7 +35,7 @@ namespace wali {
         EXPECT_EQ(keys.char_star_key, getKey("char*"));
         EXPECT_EQ(keys.int_key, getKey(12));
         EXPECT_EQ(keys.set_key, getKey(std::set<Key>()));
-        EXPECT_EQ(keys.pair_key, getKey(1, 2));
+        EXPECT_EQ(keys.pair_key, getKey(keys.string_key, keys.int_key));
     }
 
     TEST(wali$getKey, differentValueGiveDifferentKeys)
@@ -52,4 +52,23 @@ namespace wali {
         EXPECT_NE(keys.pair_key, getKey(1, 3));
     }
 
+
+    TEST(wali$key2str, getStringRepresentation)
+    {
+        KeyFixture keys;
+
+        std::set<Key> keyset;
+        keyset.insert(getKey("1"));
+        Key const keyset_key_1 = getKey(keyset);
+        keyset.insert(getKey("2"));
+        Key const keyset_key_1_2 = getKey(keyset);
+
+        EXPECT_EQ("string", key2str(keys.string_key));
+        EXPECT_EQ("char*", key2str(keys.char_star_key));
+        EXPECT_EQ("12", key2str(keys.int_key));
+        EXPECT_EQ("{}", key2str(keys.set_key));
+        EXPECT_EQ("{1}", key2str(keyset_key_1));
+        EXPECT_EQ("{1, 2}", key2str(keyset_key_1_2));
+        EXPECT_EQ("(string, 12)", key2str(keys.pair_key));
+    }
 }
