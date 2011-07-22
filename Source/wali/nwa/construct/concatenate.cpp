@@ -44,12 +44,19 @@ namespace wali
 
         //Duplicate all of the functionality of the first machine (except the final state property).
         out = first;
-        out.clearFinalStates();
 
         //Duplicate all of the functionality of the second machine (except the initial state property).
         out.combineWith(second);
 
+        out.clearInitialStates();
+        out.clearFinalStates();
 
+        for (NWA::StateIterator initial = first.beginInitialStates();
+             initial != first.endInitialStates(); ++initial)
+        {
+          out.addInitialState(*initial);
+        }
+        
         // Now we have both machines combined. We need to set the final states
         // of the combined machine to be the final states of the second
         // machine, then add epsilon transitions from the final states of the
