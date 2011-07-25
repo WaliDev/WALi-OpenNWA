@@ -4,6 +4,7 @@
 
 #include "Tests/nwa/Source/fixtures.hpp"
 #include "Tests/nwa/Source/class-NWA/supporting.hpp"
+#include "Tests/nwa/Source/int-client-info.hpp"
 
 namespace wali
 {
@@ -53,7 +54,47 @@ namespace wali
         //  - Test that client information is equal but not shared
         TEST(wali$nwa$NWA$NWA$$copy, clientInformationIsCloned)
         {
-            // TODO: tests (also add to assignment test)
+            OddNumEvenGroupsNwa fixture;
+
+            ref_ptr<IntClientInfo> q0_ci = new IntClientInfo(0);
+            ref_ptr<IntClientInfo> q1_ci = new IntClientInfo(1);
+            ref_ptr<IntClientInfo> q2_ci = new IntClientInfo(2);
+            ref_ptr<IntClientInfo> q3_ci = new IntClientInfo(3);
+                        
+            fixture.nwa.setClientInfo(fixture.q0, q0_ci);
+            fixture.nwa.setClientInfo(fixture.q1, q1_ci);
+            fixture.nwa.setClientInfo(fixture.q2, q2_ci);
+            fixture.nwa.setClientInfo(fixture.q3, q3_ci);
+
+            NWA copy(fixture.nwa);
+            
+#define EXPECT_CLIENT_INFO_IS(expect, nwa, state)                       \
+            do {                                                        \
+                ClientInfo * ci = nwa.getClientInfo(state).get_ptr();   \
+                IntClientInfo * ici = dynamic_cast<IntClientInfo *>(ci);\
+                ASSERT_TRUE(ici != NULL);                               \
+                EXPECT_EQ(expect, ici->n);                              \
+            } while (0)
+
+            // Check that it makes it over
+            EXPECT_CLIENT_INFO_IS(0, copy, fixture.q0);
+            EXPECT_CLIENT_INFO_IS(1, copy, fixture.q1);
+            EXPECT_CLIENT_INFO_IS(2, copy, fixture.q2);
+            EXPECT_CLIENT_INFO_IS(3, copy, fixture.q3);
+            EXPECT_TRUE(copy.getClientInfo(fixture.dummy) == NULL);
+
+
+            // Check that it isn't changed
+            q0_ci->n = 10;
+            q1_ci->n = 11;
+            q2_ci->n = 12;
+            q3_ci->n = 13;
+
+            EXPECT_CLIENT_INFO_IS(0, copy, fixture.q0);
+            EXPECT_CLIENT_INFO_IS(1, copy, fixture.q1);
+            EXPECT_CLIENT_INFO_IS(2, copy, fixture.q2);
+            EXPECT_CLIENT_INFO_IS(3, copy, fixture.q3);
+            EXPECT_TRUE(copy.getClientInfo(fixture.dummy) == NULL);
         }
         
         
