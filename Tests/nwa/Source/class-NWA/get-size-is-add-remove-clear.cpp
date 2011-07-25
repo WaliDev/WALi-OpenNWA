@@ -151,6 +151,9 @@ namespace wali
             Key q = getKey('q');
             nwa.addInternalTrans(q, WALI_EPSILON, q);
             nwa.addInternalTrans(q, WALI_WILD, q);
+            nwa.addCallTrans(q, WALI_WILD, q);
+            nwa.addReturnTrans(q, q, WALI_WILD, q);
+
 
             // Sanity check
             EXPECT_EQ(2u, nwa.sizeInternalTrans());
@@ -259,8 +262,24 @@ namespace wali
 
         
         //     - For isSymbol(), make sure epsilon and wild return false both when they
-        //       are used in transitions and not.
-        // This is done inline with the above
+        //       are used in transitions and not.       
+        // This is done partially inline with the above
+
+        TEST(wali$nwa$NWA$isSymbol, epsilonAndWildAreNotSymbolsAccordingToIsSymbol)
+        {
+            OddNumEvenGroupsNwa fixture;
+
+            EXPECT_FALSE(fixture.nwa.isSymbol(WALI_EPSILON));
+            EXPECT_FALSE(fixture.nwa.isSymbol(WALI_WILD));
+
+            fixture.nwa.addInternalTrans(fixture.q0, WALI_EPSILON, fixture.q1);
+            fixture.nwa.addInternalTrans(fixture.q0, WALI_WILD, fixture.q1);
+            fixture.nwa.addCallTrans(fixture.q0, WALI_WILD, fixture.q1);
+            fixture.nwa.addReturnTrans(fixture.q0, fixture.q2, WALI_WILD, fixture.q1);
+
+            EXPECT_FALSE(fixture.nwa.isSymbol(WALI_EPSILON));
+            EXPECT_FALSE(fixture.nwa.isSymbol(WALI_WILD));
+        }
         
 
         //   addXXX()
