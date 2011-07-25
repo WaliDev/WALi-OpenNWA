@@ -196,7 +196,7 @@ namespace wali
 
 
         // Accepts )* <balanced>
-        class AcceptsPossiblyUnbalancedLeft
+        class AcceptsPossiblyUnbalancedRight
         {
         public:
             //            ( push q0
@@ -216,7 +216,7 @@ namespace wali
             State const q0, q1;
             Symbol const zero, call, ret;
 
-            AcceptsPossiblyUnbalancedLeft()
+            AcceptsPossiblyUnbalancedRight()
                 : q0(getKey("q0")), q1(getKey("q1"))
                 , zero(getKey("0")), call(getKey("(")), ret(getKey(")"))
             {
