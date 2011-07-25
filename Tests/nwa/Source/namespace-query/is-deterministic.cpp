@@ -46,6 +46,9 @@ namespace wali {
             }
 
 
+            //////////////////
+            // Wilds
+            
             TEST(wali$nwa$query$$isDeterministic, merePresenceOfWildsDoesNotMakeNondeterministic)
             {
                 OddNumEvenGroupsNwa fixture;
@@ -96,6 +99,75 @@ namespace wali {
                 EXPECT_FALSE(isDeterministic(fixture.nwa));
             }
 
+            ///////////////////
+            // Epsilon transitions
+
+            TEST(wali$nwa$query$$isDeterministic, internalEpsilonTransitionsMakeNondeterministic)
+            {
+                OddNumEvenGroupsNwa fixture;
+                fixture.nwa.removeState(fixture.dummy);
+                
+                fixture.nwa.addInternalTrans(fixture.q2, WALI_EPSILON, fixture.q0);
+
+                EXPECT_FALSE(isDeterministic(fixture.nwa));
+
+                fixture.nwa.addInternalTrans(fixture.q2, WALI_EPSILON, fixture.q2);
+
+                EXPECT_FALSE(isDeterministic(fixture.nwa));
+            }
+
+
+            //////////////////
+            // "Normal" transitions
+
+            TEST(wali$nwa$query$$isDeterministic, twoTransitionsFromTheSameNodeAreNotEnoughToMakeNondeterministic)
+            {
+                OddNumEvenGroupsNwa fixture;
+                fixture.nwa.removeState(fixture.dummy);
+
+                // Same source & destination, different symbol
+                fixture.nwa.addInternalTrans(fixture.q2, fixture.call, fixture.q3);
+                fixture.nwa.addCallTrans(fixture.q0, fixture.zero, fixture.q2);
+
+                // Same source, predecessor, & destination; different symbol
+                fixture.nwa.addReturnTrans(fixture.q3, fixture.q1, fixture.zero, fixture.q0);
+                // Same source, symbol, & destination; different predecessor
+                fixture.nwa.addReturnTrans(fixture.q3, fixture.q2, fixture.ret, fixture.q0);
+
+                EXPECT_TRUE(isDeterministic(fixture.nwa));
+            }
+
+            
+            TEST(wali$nwa$query$$isDeterministic, twoInternalsWithSameSymbolMakeNondeterministic)
+            {
+                OddNumEvenGroupsNwa fixture;
+                fixture.nwa.removeState(fixture.dummy);
+                
+                fixture.nwa.addInternalTrans(fixture.q2, fixture.zero, fixture.q0);
+
+                EXPECT_FALSE(isDeterministic(fixture.nwa));
+            }
+
+
+            TEST(wali$nwa$query$$isDeterministic, twoCallsWithSameSymbolMakeNondeterministic)
+            {
+                OddNumEvenGroupsNwa fixture;
+                fixture.nwa.removeState(fixture.dummy);
+                
+                fixture.nwa.addCallTrans(fixture.q0, fixture.call, fixture.q3);
+
+                EXPECT_FALSE(isDeterministic(fixture.nwa));
+            }
+
+            TEST(wali$nwa$query$$isDeterministic, twoReturnsWithSamePredecessorAndSymbolMakeNondeterministic)
+            {
+                OddNumEvenGroupsNwa fixture;
+                fixture.nwa.removeState(fixture.dummy);
+                
+                fixture.nwa.addReturnTrans(fixture.q3, fixture.q1, fixture.ret, fixture.q2);
+
+                EXPECT_FALSE(isDeterministic(fixture.nwa));
+            }
         }
     }
 }
