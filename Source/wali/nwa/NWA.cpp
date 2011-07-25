@@ -2690,10 +2690,10 @@ namespace wali
            config != currConfigs.end(); ++config)
       {
         if (isFinalState(config->state)) {
-          if (config->callPredecessors.size() != 0) {
-            std::cerr << "Alert! In SimulateWordNondet, we are ending in a final state with nonempty stack!\n";
-            exit(20);
-          }
+          //if (config->callPredecessors.size() != 0) {
+          //  std::cerr << "Alert! In SimulateWordNondet, we are ending in a final state with nonempty stack!\n";
+          //  exit(20);
+          //}
           return true;
         }
       }
