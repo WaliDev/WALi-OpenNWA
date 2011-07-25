@@ -242,6 +242,28 @@ namespace wali
             EXPECT_TRUE(copy.getClientInfo(fixture.dummy) == NULL);
 #undef EXPECT_CLIENT_INFO_IS
         }
-        
+
+
+        ///////////////////////////
+        // clear ()
+        //  - From an NWA that has states, initial states, accepting states, symbols,
+        //    and transitions of all three kinds (each of which transitions with a
+        //    real symbol, epsilon, and wild), calling clear() removes everything.
+        TEST(wali$nwa$NWA$$clear, clearingEmptyGivesEmpty)
+        {
+            NWA empty;
+            empty.clear();
+
+            expect_nwa_is_empty(empty);
+        }
+
+        TEST(wali$nwa$NWA$$clear, clearingNonEmptyGivesEmpty)
+        {
+            OddNumEvenGroupsNwa fixture;
+            fixture.nwa.clear();
+
+            expect_nwa_is_empty(fixture.nwa);
+        }
+
     }
 }

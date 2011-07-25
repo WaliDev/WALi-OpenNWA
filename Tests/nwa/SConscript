@@ -22,7 +22,6 @@ env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
 
 test_files = Split("""
     Source/test.cpp
-    Source/NWA-tests.cpp
     Source/fixtures.cpp
     Source/wali-prereqs.cpp
     Source/class-NestedWord/nested-word.cpp
