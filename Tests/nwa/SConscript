@@ -30,6 +30,7 @@ test_files = Split("""
     Source/class-NWA/get-size-is-add-remove-clear.cpp
     Source/namespace-query/is-deterministic.cpp
     Source/namespace-query/states-overlap.cpp
+    Source/namespace-query/language-contains.cpp
     """)
 
 built = env.Program('nwa-test', test_files)
