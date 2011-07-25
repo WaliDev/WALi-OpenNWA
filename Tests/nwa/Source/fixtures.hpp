@@ -75,6 +75,263 @@ namespace wali
             //          \     /
             //           `---'
         };
+
+
+        ///////////////////////////////////////////////////////////////////
+        // The following are parenthesis languages with 0s allowed anywhere
+
+        // Accepts:
+        //      S -> S S
+        //         | ( S )
+        //         | 0
+        //         | epsilon
+        class AcceptsBalancedOnly
+        {
+        public:
+            //            ( push q0
+            //        /-------------->  /---\.
+            // -->((q0))              q1    |  ( push q1
+            //    / /\<-------------/  /\   |  ) pop q1
+            //   /  |    ) pop q0       |   |  0
+            //   |  |                    \_/
+            //   \_/
+            //    0
+
+            NWA nwa;
+            State const q0, q1;
+            Symbol const zero, call, ret;
+
+            AcceptsBalancedOnly()
+                : q0(getKey("q0")), q1(getKey("q1"))
+                , zero(getKey("0")), call(getKey("(")), ret(getKey(")"))
+            {
+                nwa.addInitialState(q0);
+                nwa.addFinalState(q0);
+                
+                nwa.addInternalTrans(q0, zero, q0);
+                nwa.addInternalTrans(q1, zero, q1);
+                nwa.addCallTrans(q0, call, q1);
+                nwa.addCallTrans(q1, call, q1);
+                nwa.addReturnTrans(q1, q1, ret, q1);
+                nwa.addReturnTrans(q1, q0, ret, q0);
+            }
+        };
         
+
+        // Accepts  <balanced> (+
+        class AcceptsStrictlyUnbalancedLeft
+        {
+        public:
+            //            ( push q0
+            //        /-------------->  /---\.
+            // -->  q0              ((q1))  |  ( push q1
+            //    / /\<-------------/  /\   |  ) pop q1
+            //   /  |    ) pop q0       |   |  0
+            //   |  |                    \_/
+            //   \_/
+            //    0
+            //
+            // Just like AcceptsBalancedOnly except with q1 as the accepting
+            // state instead of q0.
+
+            NWA nwa;
+            State const q0, q1;
+            Symbol const zero, call, ret;
+
+            AcceptsStrictlyUnbalancedLeft()
+                : q0(getKey("q0")), q1(getKey("q1"))
+                , zero(getKey("0")), call(getKey("(")), ret(getKey(")"))
+            {
+                nwa.addInitialState(q0);
+                nwa.addFinalState(q1);
+                
+                nwa.addInternalTrans(q0, zero, q0);
+                nwa.addInternalTrans(q1, zero, q1);
+                nwa.addCallTrans(q0, call, q1);
+                nwa.addCallTrans(q1, call, q1);
+                nwa.addReturnTrans(q1, q1, ret, q1);
+                nwa.addReturnTrans(q1, q0, ret, q0);
+            }
+
+        };
+
+
+        // Accepts  <balanced> (*
+        class AcceptsPosssiblyUnbalancedLeft
+        {
+        public:
+            //            ( push q0
+            //        /-------------->  /---\.
+            // -->((q0))            ((q1))  |  ( push q1
+            //    / /\<-------------/  /\   |  ) pop q1
+            //   /  |    ) pop q0       |   |  0
+            //   |  |                    \_/
+            //   \_/
+            //    0
+            //
+            // Just like AcceptsBalancedOnly except with both q0 and q1
+            // accepting.
+
+            NWA nwa;
+            State const q0, q1;
+            Symbol const zero, call, ret;
+
+            AcceptsPosssiblyUnbalancedLeft()
+                : q0(getKey("q0")), q1(getKey("q1"))
+                , zero(getKey("0")), call(getKey("(")), ret(getKey(")"))
+            {
+                nwa.addInitialState(q0);
+                nwa.addFinalState(q0);
+                nwa.addFinalState(q1);
+                
+                nwa.addInternalTrans(q0, zero, q0);
+                nwa.addInternalTrans(q1, zero, q1);
+                nwa.addCallTrans(q0, call, q1);
+                nwa.addCallTrans(q1, call, q1);
+                nwa.addReturnTrans(q1, q1, ret, q1);
+                nwa.addReturnTrans(q1, q0, ret, q0);
+            }
+
+        };
+
+
+        // Accepts )* <balanced>
+        class AcceptsPossiblyUnbalancedLeft
+        {
+        public:
+            //            ( push q0
+            //        /-------------->  /---\.
+            // -->((q0))              q1    |  ( push q1
+            //    / /\<-------------/  /\   |  ) pop q1
+            //   /  |    ) pop q0       |   |  0
+            //   |  |                    \_/
+            //   \_/
+            //    0
+            //    ) pop q0
+            //
+            // Just like AcceptsBalancedOnly except with extra q0->q0 self
+            // loop on ") pop q0".
+
+            NWA nwa;
+            State const q0, q1;
+            Symbol const zero, call, ret;
+
+            AcceptsPossiblyUnbalancedLeft()
+                : q0(getKey("q0")), q1(getKey("q1"))
+                , zero(getKey("0")), call(getKey("(")), ret(getKey(")"))
+            {
+                nwa.addInitialState(q0);
+                nwa.addFinalState(q0);
+                
+                nwa.addInternalTrans(q0, zero, q0);
+                nwa.addInternalTrans(q1, zero, q1);
+                nwa.addCallTrans(q0, call, q1);
+                nwa.addCallTrans(q1, call, q1);
+                nwa.addReturnTrans(q1, q1, ret, q1);
+                nwa.addReturnTrans(q1, q0, ret, q0);
+                nwa.addReturnTrans(q0, q0, ret, q0);
+            }
+
+        };
+
+        // Accepts )* <balanced> (*
+        class AcceptsPositionallyConsistentString
+        {
+        public:
+            //            ( push q0
+            //        /-------------->  /---\.
+            // -->((q0))            ((q1))  |  ( push q1
+            //    / /\<-------------/  /\   |  ) pop q1
+            //   /  |    ) pop q0       |   |  0
+            //   |  |                    \_/
+            //   \_/
+            //    0
+            //    ) pop q0
+            //
+            // Just like AcceptsBalancedOnly except with q1 accepting too and
+            // the extra q0->q0 self loop on ") pop q0"
+
+            NWA nwa;
+            State const q0, q1;
+            Symbol const zero, call, ret;
+
+            AcceptsPositionallyConsistentString()
+                : q0(getKey("q0")), q1(getKey("q1"))
+                , zero(getKey("0")), call(getKey("(")), ret(getKey(")"))
+            {
+                nwa.addInitialState(q0);
+                nwa.addFinalState(q0);
+                nwa.addFinalState(q1);
+                
+                nwa.addInternalTrans(q0, zero, q0);
+                nwa.addInternalTrans(q1, zero, q1);
+                nwa.addCallTrans(q0, call, q1);
+                nwa.addCallTrans(q1, call, q1);
+                nwa.addReturnTrans(q1, q1, ret, q1);
+                nwa.addReturnTrans(q1, q0, ret, q0);
+                nwa.addReturnTrans(q0, q0, ret, q0);
+            }
+
+        };
+
+        // Accepts )+ <balanced>
+        class AcceptsStrictlyUnbalancedRight
+        {
+        public:
+            //            ( push q0
+            //        /-------------->  /---\.
+            // -->  q0                q1    |  ( push q1
+            //    / /\<-------------/  /\   |  ) pop q1
+            //   /  |    ) pop q0       |   |  0
+            //  /|  |                    \_/
+            // / \_/
+            // |  0
+            // |
+            // |) pop q0
+            // \          ( push q2
+            // _\|    /-------------->  /---\.
+            //    ((q2))              q3    |  ( push q3
+            //    / /\<-------------/  /\   |  ) pop q3
+            //   /  |    ) pop q2       |   |  0
+            //   |  |                    \_/
+            //   \_/
+            //    0
+            //
+            // This has two "copies" of AcceptsBalancedOnly, with the extra
+            // transition between them and the limited accept states.
+
+            NWA nwa;
+            State const q0, q1, q2, q3;
+            Symbol const zero, call, ret;
+
+            AcceptsStrictlyUnbalancedRight()
+                : q0(getKey("q0")), q1(getKey("q1"))
+                , q2(getKey("q2")), q3(getKey("q3"))
+                , zero(getKey("0")), call(getKey("(")), ret(getKey(")"))
+            {
+                nwa.addInitialState(q0);
+                nwa.addFinalState(q2);
+
+                // Copy 0
+                nwa.addInternalTrans(q0, zero, q0);
+                nwa.addInternalTrans(q1, zero, q1);
+                nwa.addCallTrans(q0, call, q1);
+                nwa.addCallTrans(q1, call, q1);
+                nwa.addReturnTrans(q1, q1, ret, q1);
+                nwa.addReturnTrans(q1, q0, ret, q0);
+
+                // Copy 1
+                nwa.addInternalTrans(q2, zero, q2);
+                nwa.addInternalTrans(q3, zero, q3);
+                nwa.addCallTrans(q2, call, q3);
+                nwa.addCallTrans(q3, call, q3);
+                nwa.addReturnTrans(q3, q3, ret, q3);
+                nwa.addReturnTrans(q3, q2, ret, q2);
+
+                // Connector
+                nwa.addReturnTrans(q0, q0, ret, q2);
+            }
+
+        };
     }
 }
