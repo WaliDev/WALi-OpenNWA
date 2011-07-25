@@ -684,7 +684,7 @@ namespace wali
             // Check changes
             EXPECT_EQ(0u, nwa.sizeFinalStates());
 
-            // Check preservation: only initials should have changed
+            // Check preservation: only finals should have changed
             expect_nwas_nearly_the_same(fixture.nwa, nwa,
                                         true, true, false, // states
                                         true,              // symbols
@@ -709,7 +709,7 @@ namespace wali
             EXPECT_EQ(0u, nwa.sizeCallTrans());
             EXPECT_EQ(0u, nwa.sizeReturnTrans());
 
-            // Check preservation: only initials should have changed
+            // Check preservation: there should be no states and no transitions
             expect_nwas_nearly_the_same(fixture.nwa, nwa,
                                         false, false, false,  // states
                                         true,                 // symbols
@@ -730,7 +730,7 @@ namespace wali
             EXPECT_EQ(0u, nwa.sizeCallTrans());
             EXPECT_EQ(0u, nwa.sizeReturnTrans());
 
-            // Check preservation: only initials should have changed
+            // Check preservation: there should be no symbols and no transitions
             expect_nwas_nearly_the_same(fixture.nwa, nwa,
                                         true, true, true,     // states
                                         false,                // symbols
@@ -751,7 +751,7 @@ namespace wali
             EXPECT_EQ(0u, nwa.sizeCallTrans());
             EXPECT_EQ(0u, nwa.sizeReturnTrans());
 
-            // Check preservation: only initials should have changed
+            // Check preservation: only transitions should have changed
             expect_nwas_nearly_the_same(fixture.nwa, nwa,
                                         true, true, true,     // states
                                         true,                 // symbols
