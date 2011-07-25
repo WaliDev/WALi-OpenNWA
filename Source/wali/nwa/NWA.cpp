@@ -2613,14 +2613,28 @@ namespace wali
             // call predecessor matches.
             Returns rets = trans.getReturns(config->state, curpos->symbol);
             for( ReturnIterator rit = rets.begin(); rit != rets.end(); rit++ ) {
-              if( Trans::getCallSite(*rit) == config->callPredecessors.back() ) {
-                // Construct a new configuration that's the same as the old
-                // configuration, except with a popped stack and new state
-                Configuration c(*config);
-                c.callPredecessors.pop_back();
-                c.state = Trans::getReturnSite(*rit);
-                nextConfigs.insert(c);
+              // We can take a return transition under two conditions. One is
+              // that there are things in the call predecessors stack and we
+              // match. The other is there is nothing in the call predecessor
+              // stack and the call predecessor on the return transition is
+              // an initial state.
+
+              if (config->callPredecessors.empty()) {
+                if (isInitialState(rit->second)) {
+                  Configuration c(*config);
+                  c.state = Trans::getReturnSite(*rit);
+                  nextConfigs.insert(c);
+                }
               }
+              else {
+                if (Trans::getCallSite(*rit) == config->callPredecessors.back()) {
+                  Configuration c(*config);
+                  c.callPredecessors.pop_back();
+                  c.state = Trans::getReturnSite(*rit);
+                  nextConfigs.insert(c);
+                }
+              }
+              // Ok, we've checked that return transition
             }
           }
         }
