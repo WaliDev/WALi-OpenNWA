@@ -97,7 +97,52 @@ namespace wali
             EXPECT_TRUE(copy.getClientInfo(fixture.dummy) == NULL);
 #undef EXPECT_CLIENT_INFO_IS
         }
-        
+
+
+        // Test that aliased ClientInfos "separate" when copied
+        TEST(wali$nwa$NWA$NWA$$copy, aliasedClientInfosSeparate)
+        {
+            OddNumEvenGroupsNwa fixture;
+            ref_ptr<ClientInfo> ci = new IntClientInfo(0);
+
+            fixture.nwa.setClientInfo(fixture.q0, ci);
+            fixture.nwa.setClientInfo(fixture.q1, ci);
+            ASSERT_EQ(fixture.nwa.getClientInfo(fixture.q0),
+                      fixture.nwa.getClientInfo(fixture.q1));
+
+            // Now copy it and demonstrate that the copies of q0 and q1 have
+            // different client info (after sanity checks that they differ
+            // from the original)
+            NWA copy = fixture.nwa;
+
+            ASSERT_NE(ci, copy.getClientInfo(fixture.q0));
+            ASSERT_NE(ci, copy.getClientInfo(fixture.q1));
+
+            EXPECT_NE(copy.getClientInfo(fixture.q0), copy.getClientInfo(fixture.q1));
+        }
+
+        TEST(wali$nwa$NWA$NWA$$operatorEquals, aliasedClientInfosSeparate)
+        {
+            OddNumEvenGroupsNwa fixture;
+            ref_ptr<ClientInfo> ci = new IntClientInfo(0);
+
+            fixture.nwa.setClientInfo(fixture.q0, ci);
+            fixture.nwa.setClientInfo(fixture.q1, ci);
+            ASSERT_EQ(fixture.nwa.getClientInfo(fixture.q0),
+                      fixture.nwa.getClientInfo(fixture.q1));
+
+            // Now copy it and demonstrate that the copies of q0 and q1 have
+            // different client info (after sanity checks that they differ
+            // from the original)
+            NWA copy;
+            copy = fixture.nwa;
+
+            ASSERT_NE(ci, copy.getClientInfo(fixture.q0));
+            ASSERT_NE(ci, copy.getClientInfo(fixture.q1));
+
+            EXPECT_NE(copy.getClientInfo(fixture.q0), copy.getClientInfo(fixture.q1));
+        }
+
         
         // operator= (NWA const & other)
         //  - Same questions as NWA(NWA const &)
