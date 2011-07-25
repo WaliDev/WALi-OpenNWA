@@ -84,9 +84,9 @@ namespace wali
         /// 'endBlah()'.
         void expect_size_consistent_with_range(NWA const & nwa)
         {
-#define CHECK_CONSISTENCY(Attribute)                                             \
-            EXPECT_EQ(nwa.size##Attribute(),                                     \
-                      static_cast<size_t>(std::distance(nwa.begin##Attribute(),  \
+#define CHECK_CONSISTENCY(Attribute)                                    \
+            EXPECT_EQ(nwa.size##Attribute(),                            \
+                      static_cast<size_t>(std::distance(nwa.begin##Attribute(), \
                                                         nwa.end##Attribute())))
             
             CHECK_CONSISTENCY(States);
@@ -100,17 +100,17 @@ namespace wali
         }
 
 
-	void expect_nwas_nearly_the_same(NWA const & reference,
-					 NWA const & nwa,
-					 bool states,
-					 bool initials,
-					 bool finals,
-					 bool symbols,
-					 bool internals,
-					 bool calls,
-					 bool returns)
-	{
-	    std::vector<NWA::Internal>
+        void expect_nwas_nearly_the_same(NWA const & reference,
+                                         NWA const & nwa,
+                                         bool states,
+                                         bool initials,
+                                         bool finals,
+                                         bool symbols,
+                                         bool internals,
+                                         bool calls,
+                                         bool returns)
+        {
+            std::vector<NWA::Internal>
                 reference_internals(reference.beginInternalTrans(), reference.endInternalTrans()),
                 nwa_internals(nwa.beginInternalTrans(), nwa.endInternalTrans());
             std::vector<NWA::Call>
@@ -120,16 +120,17 @@ namespace wali
                 reference_returns(reference.beginReturnTrans(), reference.endReturnTrans()),
                 nwa_returns(nwa.beginReturnTrans(), nwa.endReturnTrans());
 
-	    if (states)   EXPECT_EQ(reference.getStates(), nwa.getStates());
-	    if (initials) EXPECT_EQ(reference.getInitialStates(), nwa.getInitialStates());
-	    if (finals)   EXPECT_EQ(reference.getFinalStates(), nwa.getFinalStates());
-	    
-	    if (symbols) EXPECT_EQ(reference.getSymbols(), nwa.getSymbols());
-
+            if (states)   EXPECT_EQ(reference.getStates(), nwa.getStates());
+            if (initials) EXPECT_EQ(reference.getInitialStates(), nwa.getInitialStates());
+            if (finals)   EXPECT_EQ(reference.getFinalStates(), nwa.getFinalStates());
+            
+            if (symbols)  EXPECT_EQ(reference.getSymbols(), nwa.getSymbols());
+      
             if (internals) EXPECT_EQ(reference_internals, nwa_internals);
             if (calls)     EXPECT_EQ(reference_calls, nwa_calls);
             if (returns)   EXPECT_EQ(reference_returns, nwa_returns);
-	}
+        }
+
         
         /////////////////////////////////
         // Now begin the actual tests
@@ -617,23 +618,23 @@ namespace wali
         {
             OddNumEvenGroupsNwa fixture;
 
-	    // Add a transition of 'zero' to the calls and returns, so
-	    // we can make sure we remove those kinds
-	    ASSERT_TRUE(fixture.nwa.addCallTrans(fixture.q0, fixture.zero, fixture.q1));
-	    ASSERT_TRUE(fixture.nwa.addReturnTrans(fixture.q0, fixture.q1, fixture.zero, fixture.q3));
+            // Add a transition of 'zero' to the calls and returns, so
+            // we can make sure we remove those kinds
+            ASSERT_TRUE(fixture.nwa.addCallTrans(fixture.q0, fixture.zero, fixture.q1));
+            ASSERT_TRUE(fixture.nwa.addReturnTrans(fixture.q0, fixture.q1, fixture.zero, fixture.q3));
 
             ASSERT_EQ(4u, fixture.nwa.sizeInternalTrans());
             ASSERT_EQ(4u, fixture.nwa.sizeCallTrans());
             ASSERT_EQ(4u, fixture.nwa.sizeReturnTrans());
 
-	    // Now, test removing 'zero' removes those transitions
-	    EXPECT_TRUE(fixture.nwa.removeSymbol(fixture.zero));
+            // Now, test removing 'zero' removes those transitions
+            EXPECT_TRUE(fixture.nwa.removeSymbol(fixture.zero));
 
-	    // Should remove the following transitions:
-	    //   Internal: q2 ---> q3 on zero
-	    //             q3 ---> q2 on zero
-	    //   Call:     q0 ---> q1 on zero (added above)
-	    //   Return:   q0 ---> q3 on zero (q1 pred; added above)
+            // Should remove the following transitions:
+            //   Internal: q2 ---> q3 on zero
+            //             q3 ---> q2 on zero
+            //   Call:     q0 ---> q1 on zero (added above)
+            //   Return:   q0 ---> q3 on zero (q1 pred; added above)
             EXPECT_EQ(2u, fixture.nwa.sizeInternalTrans());
             EXPECT_EQ(3u, fixture.nwa.sizeCallTrans());
             EXPECT_EQ(3u, fixture.nwa.sizeReturnTrans());
@@ -641,66 +642,66 @@ namespace wali
 
         TEST(wali$nwa$NWA$removeSymbol, removingAnUnusedSymbolDoesntDoAnythingElse)
         {
-	    OddNumEvenGroupsNwa fixture;
-	    NWA nwa = fixture.nwa;
-	    Symbol one = getKey("one");
+            OddNumEvenGroupsNwa fixture;
+            NWA nwa = fixture.nwa;
+            Symbol one = getKey("one");
 
-	    ASSERT_TRUE(nwa.addSymbol(one));
+            ASSERT_TRUE(nwa.addSymbol(one));
 
-	    EXPECT_TRUE(nwa.removeSymbol(one));
-	    expect_nwas_are_equal(fixture.nwa, nwa);
-	}
+            EXPECT_TRUE(nwa.removeSymbol(one));
+            expect_nwas_are_equal(fixture.nwa, nwa);
+        }
 
 
         //   clearXXX()
         //     - Make sure that the set of XXX is empty after.
         //     - Make sure that sets that shouldn't be different are
         //       not different.
-	TEST(wali$nwa$NWA$clearInitialStates, checkClearingAndPersisting)
-	{
-	    OddNumEvenGroupsNwa fixture;
-	    NWA nwa = fixture.nwa;
+        TEST(wali$nwa$NWA$clearInitialStates, checkClearingAndPersisting)
+        {
+            OddNumEvenGroupsNwa fixture;
+            NWA nwa = fixture.nwa;
 
-	    nwa.clearInitialStates();
+            nwa.clearInitialStates();
 
-	    // Check changes
-	    EXPECT_EQ(0u, nwa.sizeInitialStates());
+            // Check changes
+            EXPECT_EQ(0u, nwa.sizeInitialStates());
 
-	    // Check preservation: only initials should have changed
-	    expect_nwas_nearly_the_same(fixture.nwa, nwa,
-					true, false, true, // states
-					true,              // symbols
-					true, true, true); // transitions
-	}
+            // Check preservation: only initials should have changed
+            expect_nwas_nearly_the_same(fixture.nwa, nwa,
+                                        true, false, true, // states
+                                        true,              // symbols
+                                        true, true, true); // transitions
+        }
 
-	TEST(wali$nwa$NWA$clearFinalStates, checkClearingAndPersisting)
-	{
-	    OddNumEvenGroupsNwa fixture;
-	    NWA nwa = fixture.nwa;
+        TEST(wali$nwa$NWA$clearFinalStates, checkClearingAndPersisting)
+        {
+            OddNumEvenGroupsNwa fixture;
+            NWA nwa = fixture.nwa;
 
-	    nwa.clearFinalStates();
+            nwa.clearFinalStates();
 
-	    // Check changes
-	    EXPECT_EQ(0u, nwa.sizeFinalStates());
+            // Check changes
+            EXPECT_EQ(0u, nwa.sizeFinalStates());
 
-	    // Check preservation: only initials should have changed
-	    expect_nwas_nearly_the_same(fixture.nwa, nwa,
-					true, true, false, // states
-					true,              // symbols
-					true, true, true); // transitions
-	}
+            // Check preservation: only initials should have changed
+            expect_nwas_nearly_the_same(fixture.nwa, nwa,
+                                        true, true, false, // states
+                                        true,              // symbols
+                                        true, true, true); // transitions
+        }
 
         //     - For clearStates(), make sure initial/accepting states and
         //       transitions have all been cleared too.
-	TEST(wali$nwa$NWA$clearStates, checkClearingAndPersisting)
-	{
-	    OddNumEvenGroupsNwa fixture;
-	    NWA nwa = fixture.nwa;
+        TEST(wali$nwa$NWA$clearStates, checkClearingAndPersisting)
+        {
+            OddNumEvenGroupsNwa fixture;
+            NWA nwa = fixture.nwa;
 
-	    nwa.clearStates();
+            nwa.clearStates();
 
-	    // Check changes
-	    EXPECT_EQ(0u, nwa.sizeStates());
+            // Check changes
+            EXPECT_EQ(0u, nwa.sizeStates());
             EXPECT_EQ(0u, nwa.sizeInitialStates());
             EXPECT_EQ(0u, nwa.sizeFinalStates());
             EXPECT_EQ(0u, nwa.sizeTrans());
@@ -708,108 +709,108 @@ namespace wali
             EXPECT_EQ(0u, nwa.sizeCallTrans());
             EXPECT_EQ(0u, nwa.sizeReturnTrans());
 
-	    // Check preservation: only initials should have changed
-	    expect_nwas_nearly_the_same(fixture.nwa, nwa,
-					false, false, false,  // states
-					true,                 // symbols
-					false, false, false); // transitions
-	}
+            // Check preservation: only initials should have changed
+            expect_nwas_nearly_the_same(fixture.nwa, nwa,
+                                        false, false, false,  // states
+                                        true,                 // symbols
+                                        false, false, false); // transitions
+        }
 
-	TEST(wali$nwa$NWA$clearSymbols, checkClearingAndPersisting)
-	{
-	    OddNumEvenGroupsNwa fixture;
-	    NWA nwa = fixture.nwa;
+        TEST(wali$nwa$NWA$clearSymbols, checkClearingAndPersisting)
+        {
+            OddNumEvenGroupsNwa fixture;
+            NWA nwa = fixture.nwa;
 
-	    nwa.clearSymbols();
+            nwa.clearSymbols();
 
-	    // Check changes
+            // Check changes
             EXPECT_EQ(0u, nwa.sizeSymbols());
             EXPECT_EQ(0u, nwa.sizeTrans());
             EXPECT_EQ(0u, nwa.sizeInternalTrans());
             EXPECT_EQ(0u, nwa.sizeCallTrans());
             EXPECT_EQ(0u, nwa.sizeReturnTrans());
 
-	    // Check preservation: only initials should have changed
-	    expect_nwas_nearly_the_same(fixture.nwa, nwa,
-					true, true, true,     // states
-					false,                // symbols
-					false, false, false); // transitions
-	}
+            // Check preservation: only initials should have changed
+            expect_nwas_nearly_the_same(fixture.nwa, nwa,
+                                        true, true, true,     // states
+                                        false,                // symbols
+                                        false, false, false); // transitions
+        }
 
         //     - For clearSymbols(), make sure transitions are all clear too.
-	TEST(wali$nwa$NWA$clearTrans, checkClearingAndPersisting)
-	{
-	    OddNumEvenGroupsNwa fixture;
-	    NWA nwa = fixture.nwa;
+        TEST(wali$nwa$NWA$clearTrans, checkClearingAndPersisting)
+        {
+            OddNumEvenGroupsNwa fixture;
+            NWA nwa = fixture.nwa;
 
-	    nwa.clearTrans();
+            nwa.clearTrans();
 
-	    // Check changes
+            // Check changes
             EXPECT_EQ(0u, nwa.sizeTrans());
             EXPECT_EQ(0u, nwa.sizeInternalTrans());
             EXPECT_EQ(0u, nwa.sizeCallTrans());
             EXPECT_EQ(0u, nwa.sizeReturnTrans());
 
-	    // Check preservation: only initials should have changed
-	    expect_nwas_nearly_the_same(fixture.nwa, nwa,
-					true, true, true,     // states
-					true,                 // symbols
-					false, false, false); // transitions
-	}
+            // Check preservation: only initials should have changed
+            expect_nwas_nearly_the_same(fixture.nwa, nwa,
+                                        true, true, true,     // states
+                                        true,                 // symbols
+                                        false, false, false); // transitions
+        }
 
 #if 0   // We don't have these functions right now, but here are some tests
         // in case we one day do.
         
         TEST(wali$nwa$NWA$clearInternalTrans, checkClearingAndPersisting)
-	{
-	    OddNumEvenGroupsNwa fixture;
-	    NWA nwa = fixture.nwa;
+        {
+            OddNumEvenGroupsNwa fixture;
+            NWA nwa = fixture.nwa;
 
-	    nwa.clearInternalTrans();
+            nwa.clearInternalTrans();
 
-	    // Check changes
+            // Check changes
             EXPECT_EQ(0u, nwa.sizeInternalTrans());
 
-	    // Check preservation: only initials should have changed
-	    expect_nwas_nearly_the_same(fixture.nwa, nwa,
-					true, true, true,   // states
-					true,               // symbols
-					false, true, true); // transitions
-	}
+            // Check preservation: only initials should have changed
+            expect_nwas_nearly_the_same(fixture.nwa, nwa,
+                                        true, true, true,   // states
+                                        true,               // symbols
+                                        false, true, true); // transitions
+        }
 
         TEST(wali$nwa$NWA$clearCallTrans, checkClearingAndPersisting)
-	{
-	    OddNumEvenGroupsNwa fixture;
-	    NWA nwa = fixture.nwa;
+        {
+            OddNumEvenGroupsNwa fixture;
+            NWA nwa = fixture.nwa;
 
-	    nwa.clearCallTrans();
+            nwa.clearCallTrans();
 
-	    // Check changes
+            // Check changes
             EXPECT_EQ(0u, nwa.sizeCallTrans());
 
-	    // Check preservation: only initials should have changed
-	    expect_nwas_nearly_the_same(fixture.nwa, nwa,
-					true, true, true,   // states
-					true,               // symbols
-					true, false, true); // transitions
-	}
+            // Check preservation: only initials should have changed
+            expect_nwas_nearly_the_same(fixture.nwa, nwa,
+                                        true, true, true,   // states
+                                        true,               // symbols
+                                        true, false, true); // transitions
+        }
         
         TEST(wali$nwa$NWA$clearReturnTrans, checkClearingAndPersisting)
-	{
-	    OddNumEvenGroupsNwa fixture;
-	    NWA nwa = fixture.nwa;
+        {
+            OddNumEvenGroupsNwa fixture;
+            NWA nwa = fixture.nwa;
 
-	    nwa.clearReturnTrans();
+            nwa.clearReturnTrans();
 
-	    // Check changes
+            // Check changes
             EXPECT_EQ(0u, nwa.sizeReturnTrans());
 
-	    // Check preservation: only initials should have changed
-	    expect_nwas_nearly_the_same(fixture.nwa, nwa,
-					true, true, true,   // states
-					true,               // symbols
-					true, true, false); // transitions
-	}
+            // Check preservation: only initials should have changed
+            expect_nwas_nearly_the_same(fixture.nwa, nwa,
+                                        true, true, true,   // states
+                                        true,               // symbols
+                                        true, true, false); // transitions
+        }
 #endif
         
         
