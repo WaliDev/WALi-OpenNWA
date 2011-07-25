@@ -819,6 +819,158 @@ namespace wali
         //     - For addYYYTrans, try from the situation where the states and symbol are
         //       and are not present. If they were not, check that they are after the
         //       addition.
+
+        TEST(wali$nwa$NWA$addInternalTrans, addingNewTransitionMakesItPresent)
+        {
+            OddNumEvenGroupsNwa fixture;
+            unsigned int const starting_num = fixture.nwa.sizeInternalTrans();
+
+            EXPECT_TRUE(fixture.nwa.addInternalTrans(fixture.q0, fixture.zero, fixture.q1));
+
+            EXPECT_EQ(starting_num + 1, fixture.nwa.sizeInternalTrans());
+        }
+
+        TEST(wali$nwa$NWA$addInternalTrans, addExistingTransitionDoesntChange)
+        {
+            OddNumEvenGroupsNwa fixture;
+            NWA copy = fixture.nwa;
+
+            EXPECT_FALSE(fixture.nwa.addInternalTrans(fixture.q2, fixture.zero, fixture.q3));
+
+            expect_nwas_are_equal(copy, fixture.nwa);
+        }
+
+        TEST(wali$nwa$NWA$addInternalTrans, addNewTransitionOnNonexistingElements)
+        {
+            OddNumEvenGroupsNwa fixture;
+            NWA copy = fixture.nwa;
+            SomeElements e;
+            
+            unsigned int const starting_num_internals = fixture.nwa.sizeInternalTrans();
+            unsigned int const starting_num_states = fixture.nwa.sizeStates();
+            unsigned int const starting_num_symbols = fixture.nwa.sizeSymbols();
+
+            EXPECT_TRUE(fixture.nwa.addInternalTrans(e.state, e.symbol, e.state2));
+
+            // Two different ways of checking that the states and symbols
+            // were added. First by number, then we check explicitly.
+            EXPECT_EQ(starting_num_internals + 1, fixture.nwa.sizeInternalTrans());
+            EXPECT_EQ(starting_num_states + 2, fixture.nwa.sizeStates());
+            EXPECT_EQ(starting_num_symbols + 1, fixture.nwa.sizeSymbols());
+
+            EXPECT_TRUE(fixture.nwa.isState(e.state));
+            EXPECT_TRUE(fixture.nwa.isState(e.state2));
+            EXPECT_TRUE(fixture.nwa.isSymbol(e.symbol));
+
+            // Now make sure nothing else changed
+            expect_nwas_nearly_the_same(fixture.nwa, copy,
+                                        false, true, true,   // states
+                                        false,               // symbols
+                                        false, true,true);   // transitions
+        }
+
+
+        TEST(wali$nwa$NWA$addCallTrans, addingNewTransitionMakesItPresent)
+        {
+            OddNumEvenGroupsNwa fixture;
+            unsigned int const starting_num = fixture.nwa.sizeCallTrans();
+
+            EXPECT_TRUE(fixture.nwa.addCallTrans(fixture.q0, fixture.zero, fixture.q1));
+
+            EXPECT_EQ(starting_num + 1, fixture.nwa.sizeCallTrans());
+        }
+
+        TEST(wali$nwa$NWA$addCallTrans, addExistingTransitionDoesntChange)
+        {
+            OddNumEvenGroupsNwa fixture;
+            NWA copy = fixture.nwa;
+
+            EXPECT_FALSE(fixture.nwa.addCallTrans(fixture.q0, fixture.call, fixture.q2));
+
+            expect_nwas_are_equal(copy, fixture.nwa);
+        }
+
+        TEST(wali$nwa$NWA$addCallTrans, addNewTransitionOnNonexistingElements)
+        {
+            OddNumEvenGroupsNwa fixture;
+            NWA copy = fixture.nwa;
+            SomeElements e;
+            
+            unsigned int const starting_num_internals = fixture.nwa.sizeCallTrans();
+            unsigned int const starting_num_states = fixture.nwa.sizeStates();
+            unsigned int const starting_num_symbols = fixture.nwa.sizeSymbols();
+
+            EXPECT_TRUE(fixture.nwa.addCallTrans(e.state, e.symbol, e.state2));
+
+            // Two different ways of checking that the states and symbols
+            // were added. First by number, then we check explicitly.
+            EXPECT_EQ(starting_num_internals + 1, fixture.nwa.sizeCallTrans());
+            EXPECT_EQ(starting_num_states + 2, fixture.nwa.sizeStates());
+            EXPECT_EQ(starting_num_symbols + 1, fixture.nwa.sizeSymbols());
+
+            EXPECT_TRUE(fixture.nwa.isState(e.state));
+            EXPECT_TRUE(fixture.nwa.isState(e.state2));
+            EXPECT_TRUE(fixture.nwa.isSymbol(e.symbol));
+
+            // Now make sure nothing else changed
+            expect_nwas_nearly_the_same(fixture.nwa, copy,
+                                        false, true, true,   // states
+                                        false,               // symbols
+                                        true, false, true);  // transitions
+        }
+
+
+
+        TEST(wali$nwa$NWA$addReturnTrans, addingNewTransitionMakesItPresent)
+        {
+            OddNumEvenGroupsNwa fixture;
+            unsigned int const starting_num = fixture.nwa.sizeReturnTrans();
+
+            EXPECT_TRUE(fixture.nwa.addReturnTrans(fixture.q0, fixture.q1, fixture.zero, fixture.q1));
+
+            EXPECT_EQ(starting_num + 1, fixture.nwa.sizeReturnTrans());
+        }
+
+        TEST(wali$nwa$NWA$addReturnTrans, addExistingTransitionDoesntChange)
+        {
+            OddNumEvenGroupsNwa fixture;
+            NWA copy = fixture.nwa;
+
+            EXPECT_FALSE(fixture.nwa.addReturnTrans(fixture.q3, fixture.q0, fixture.ret, fixture.q1));
+
+            expect_nwas_are_equal(copy, fixture.nwa);
+        }
+
+        TEST(wali$nwa$NWA$addReturnTrans, addNewTransitionOnNonexistingElements)
+        {
+            OddNumEvenGroupsNwa fixture;
+            NWA copy = fixture.nwa;
+            SomeElements e;
+            
+            unsigned int const starting_num_internals = fixture.nwa.sizeReturnTrans();
+            unsigned int const starting_num_states = fixture.nwa.sizeStates();
+            unsigned int const starting_num_symbols = fixture.nwa.sizeSymbols();
+
+            EXPECT_TRUE(fixture.nwa.addReturnTrans(e.state, e.state3, e.symbol, e.state2));
+
+            // Two different ways of checking that the states and symbols
+            // were added. First by number, then we check explicitly.
+            EXPECT_EQ(starting_num_internals + 1, fixture.nwa.sizeReturnTrans());
+            EXPECT_EQ(starting_num_states + 3, fixture.nwa.sizeStates());
+            EXPECT_EQ(starting_num_symbols + 1, fixture.nwa.sizeSymbols());
+
+            EXPECT_TRUE(fixture.nwa.isState(e.state));
+            EXPECT_TRUE(fixture.nwa.isState(e.state2));
+            EXPECT_TRUE(fixture.nwa.isState(e.state3));
+            EXPECT_TRUE(fixture.nwa.isSymbol(e.symbol));
+
+            // Now make sure nothing else changed
+            expect_nwas_nearly_the_same(fixture.nwa, copy,
+                                        false, true, true,   // states
+                                        false,               // symbols
+                                        true, true, false);  // transitions
+        }
+        
         //     - For addYYYTrans, add more than one transition with the given source/sym,
         //       source/tgt, and sym/tgt.
         // 
