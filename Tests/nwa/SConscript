@@ -28,6 +28,7 @@ test_files = Split("""
     Source/class-NWA/supporting.cpp
     Source/class-NWA/construction-assignment.cpp
     Source/class-NWA/get-size-is-add-remove-clear.cpp
+    Source/namespace-query/is-deterministic.cpp
     """)
 
 built = env.Program('nwa-test', test_files)
