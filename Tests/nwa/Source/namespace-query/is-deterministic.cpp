@@ -35,6 +35,15 @@ namespace wali {
                 EXPECT_TRUE(isDeterministic(fixture.nwa));
             }
 
+
+            TEST(wali$nwa$query$$isDeterministic, multipleInitialStatesMakesNondeterministic)
+            {
+                OddNumEvenGroupsNwa fixture;
+
+                fixture.nwa.addInitialState(fixture.q2);
+
+                EXPECT_FALSE(isDeterministic(fixture.nwa));
+            }
         }
     }
 }
