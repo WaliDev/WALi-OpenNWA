@@ -95,12 +95,13 @@ namespace wali
             EXPECT_CLIENT_INFO_IS(2, copy, fixture.q2);
             EXPECT_CLIENT_INFO_IS(3, copy, fixture.q3);
             EXPECT_TRUE(copy.getClientInfo(fixture.dummy) == NULL);
+#undef EXPECT_CLIENT_INFO_IS
         }
         
         
         // operator= (NWA const & other)
         //  - Same questions as NWA(NWA const &)
-        TEST(wali$nwa$NWA$operatorEquals, copyOfEmptyNwaIsEmpty)
+        TEST(wali$nwa$NWA$$operatorEquals, copyOfEmptyNwaIsEmpty)
         {
             NWA empty, also_empty;
             also_empty = empty;
@@ -108,7 +109,7 @@ namespace wali
             expect_nwa_is_empty(also_empty);
         }
 
-        TEST(wali$nwa$NWA$operatorEquals, copyOfNonemptyNwaIsSame)
+        TEST(wali$nwa$NWA$$operatorEquals, copyOfNonemptyNwaIsSame)
         {
             OddNumEvenGroupsNwa fixture;
             NWA copy;
@@ -117,7 +118,7 @@ namespace wali
             expect_nwas_are_equal(fixture.nwa, copy);
         }
         
-        TEST(wali$nwa$NWA$operatorEquals, copyOfNonemptyNwaDoesNotShareState)
+        TEST(wali$nwa$NWA$$operatorEquals, copyOfNonemptyNwaDoesNotShareState)
         {
             OddNumEvenGroupsNwa fixture;
             NWA copy;
@@ -127,7 +128,7 @@ namespace wali
         }
 
         //  - Test self assignment
-        TEST(wali$nwa$NWA$operatorEquals, selfAssignmentDoesNotDestroyNwa)
+        TEST(wali$nwa$NWA$$operatorEquals, selfAssignmentDoesNotDestroyNwa)
         {
             OddNumEvenGroupsNwa fixture;
             NWA copy = fixture.nwa;
@@ -137,7 +138,7 @@ namespace wali
             expect_nwas_are_equal(fixture.nwa, copy);
         }
 
-        TEST(wali$nwa$NWA$operatorEquals, selfAssignmentDoesNotCopy)
+        TEST(wali$nwa$NWA$$operatorEquals, selfAssignmentDoesNotCopy)
         {
             OddNumEvenGroupsNwa fixture;
             NWA copy = fixture.nwa;
@@ -164,6 +165,83 @@ namespace wali
             EXPECT_EQ(returns, copy.beginReturnTrans());
         }
 
+        TEST(wali$nwa$NWA$$operatorEquals, selfAssignmentDoesNotDestroyClientInfo)
+        {
+            OddNumEvenGroupsNwa fixture;
+
+            fixture.nwa.setClientInfo(fixture.q0, new IntClientInfo(0));
+            fixture.nwa.setClientInfo(fixture.q1, new IntClientInfo(1));
+            fixture.nwa.setClientInfo(fixture.q2, new IntClientInfo(2));
+            fixture.nwa.setClientInfo(fixture.q3, new IntClientInfo(3));
+            
+            NWA copy = fixture.nwa;
+
+            copy = copy;
+            
+#define EXPECT_CLIENT_INFO_IS(expect, nwa, state)                       \
+            do {                                                        \
+                ClientInfo * ci = nwa.getClientInfo(state).get_ptr();   \
+                IntClientInfo * ici = dynamic_cast<IntClientInfo *>(ci);\
+                ASSERT_TRUE(ici != NULL);                               \
+                EXPECT_EQ(expect, ici->n);                              \
+            } while (0)
+
+            // Check that it makes it over
+            EXPECT_CLIENT_INFO_IS(0, copy, fixture.q0);
+            EXPECT_CLIENT_INFO_IS(1, copy, fixture.q1);
+            EXPECT_CLIENT_INFO_IS(2, copy, fixture.q2);
+            EXPECT_CLIENT_INFO_IS(3, copy, fixture.q3);
+            EXPECT_TRUE(copy.getClientInfo(fixture.dummy) == NULL);
+#undef EXPECT_CLIENT_INFO_IS
+        }
+
+        //  - Test that client information is copied but not shared
+        TEST(wali$nwa$NWA$NWA$$operatorEquals, clientInformationIsCloned)
+        {
+            OddNumEvenGroupsNwa fixture;
+
+            ref_ptr<IntClientInfo> q0_ci = new IntClientInfo(0);
+            ref_ptr<IntClientInfo> q1_ci = new IntClientInfo(1);
+            ref_ptr<IntClientInfo> q2_ci = new IntClientInfo(2);
+            ref_ptr<IntClientInfo> q3_ci = new IntClientInfo(3);
+                        
+            fixture.nwa.setClientInfo(fixture.q0, q0_ci);
+            fixture.nwa.setClientInfo(fixture.q1, q1_ci);
+            fixture.nwa.setClientInfo(fixture.q2, q2_ci);
+            fixture.nwa.setClientInfo(fixture.q3, q3_ci);
+
+            NWA copy;
+            copy = fixture.nwa;
+            
+#define EXPECT_CLIENT_INFO_IS(expect, nwa, state)                       \
+            do {                                                        \
+                ClientInfo * ci = nwa.getClientInfo(state).get_ptr();   \
+                IntClientInfo * ici = dynamic_cast<IntClientInfo *>(ci);\
+                ASSERT_TRUE(ici != NULL);                               \
+                EXPECT_EQ(expect, ici->n);                              \
+            } while (0)
+
+            // Check that it makes it over
+            EXPECT_CLIENT_INFO_IS(0, copy, fixture.q0);
+            EXPECT_CLIENT_INFO_IS(1, copy, fixture.q1);
+            EXPECT_CLIENT_INFO_IS(2, copy, fixture.q2);
+            EXPECT_CLIENT_INFO_IS(3, copy, fixture.q3);
+            EXPECT_TRUE(copy.getClientInfo(fixture.dummy) == NULL);
+
+
+            // Check that it isn't changed
+            q0_ci->n = 10;
+            q1_ci->n = 11;
+            q2_ci->n = 12;
+            q3_ci->n = 13;
+
+            EXPECT_CLIENT_INFO_IS(0, copy, fixture.q0);
+            EXPECT_CLIENT_INFO_IS(1, copy, fixture.q1);
+            EXPECT_CLIENT_INFO_IS(2, copy, fixture.q2);
+            EXPECT_CLIENT_INFO_IS(3, copy, fixture.q3);
+            EXPECT_TRUE(copy.getClientInfo(fixture.dummy) == NULL);
+#undef EXPECT_CLIENT_INFO_IS
+        }
         
     }
 }
