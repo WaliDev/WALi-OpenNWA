@@ -69,8 +69,12 @@ namespace wali {
                         ss << "Current NWA number " << nwa << " and word number " << word;
                         SCOPED_TRACE(ss.str());
 
-                        EXPECT_EQ(expected_answers[nwa][word],
-                                  languageContains(nwas[nwa], words[word]));
+                        if (expected_answers[nwa][word]) {
+                            EXPECT_TRUE(languageContains(nwas[nwa], words[word]));
+                        }
+                        else {
+                            EXPECT_FALSE(languageContains(nwas[nwa], words[word]));
+                        }
                     }
                 }
             }
