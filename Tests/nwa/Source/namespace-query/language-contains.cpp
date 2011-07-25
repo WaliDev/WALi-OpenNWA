@@ -15,6 +15,7 @@ using namespace wali::nwa;
 // WARNING: the order of these words must be consistent with the row order
 //          in the table 'expected_answers' below.
 NWA const nwas[] = {
+    NWA(),
     AcceptsBalancedOnly().nwa,
     AcceptsStrictlyUnbalancedLeft().nwa,
     AcceptsPossiblyUnbalancedLeft().nwa,
@@ -47,6 +48,7 @@ const unsigned num_words = NUM_ELEMENTS(words);
 //          consistent with the order of 'words' and 'nwas' above.
 bool expected_answers[][num_words] = {
     /*                     empty    bal    bal0    left   left0    right  right0   full   full0 */
+    /* empty NWA      */ { false,   false, false,  false, false,   false, false,   false, false },
     /* balanced only  */ { true,    true,  true,   false, false,   false, false,   false, false },
     /* strictly left  */ { false,   false, false,  true,  true,    false, false,   false, false },
     /* maybe left     */ { true,    true,  true,   true,  true,    false, false,   false, false },
