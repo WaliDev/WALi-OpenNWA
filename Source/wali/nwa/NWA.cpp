@@ -1268,8 +1268,10 @@ namespace wali
       //An NWA is not deterministic if there are epsilon transitions. 
       for( InternalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
       {
-        if( Trans::getInternalSym(*iit) == WALI_EPSILON )
+        if( Trans::getInternalSym(*iit) == WALI_EPSILON ) {
+          //std::cout << "There are epsilon transitions";
           return false;
+        }
       }
       
       //TODO: optimize this, it can be very expensive
@@ -1285,8 +1287,13 @@ namespace wali
           bool wild = false;
           for( CallIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
           {
+            if( wild && cit->first == *sit && Trans::getCallSym(*cit) == WALI_WILD ) {
+              // Two wild transitions from the same site
+              return false;
+            }
+            
             //Wild symbol 
-            if( Trans::getCallSym(*cit) == WALI_WILD )
+            if( cit->first == *sit && Trans::getCallSym(*cit) == WALI_WILD )
               wild = true;  
 
             //Keep a count of multiple transitions with the same from
@@ -1294,30 +1301,49 @@ namespace wali
             else if( (Trans::getCallSite(*cit) == (*sit)) && (Trans::getCallSym(*cit) == *it) )
               count_found++;
           }
-          if( count_found > 1 )
+          if( count_found > 1 ) {
+            //std::cout << "isDeterministic returning on line " << (__LINE__+1) << "\n";
             return false;
-          else if( wild && count_found > 0 )
+          }
+          else if( wild && count_found > 0 ) {
+            //std::cout << "isDeterministic returning on line " << (__LINE__+1) << "\n";
             return false;
+          }
 
           //Check internal transitions.
           count_found = 0;
           wild = false;
+          //std::cout << "About to look for internals\n";
           for( InternalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
           {
-            //Wild symbol 
-            if( Trans::getInternalSym(*iit) == WALI_WILD )
-              wild = true;  
+            //Wild symbol
+            if( wild && iit->first == *sit && Trans::getInternalSym(*iit) == WALI_WILD ) {
+              // Two wild transitions from the same state
+              return false;
+            }
+            
+            if( iit->first == *sit && Trans::getInternalSym(*iit) == WALI_WILD ) {
+              //std::cout << "Found internal from " << key2str(iit->first) << " to "
+              //          << key2str(iit->third) << " on " << key2str(iit->second) << "\n";
+              wild = true;
+            }
 
             //Keep a count of multiple transitions with the same from
             //state and symbol(that is not epsilon).
-            else if( (Trans::getSource(*iit) == *sit) && (Trans::getInternalSym(*iit) == *it) )
+            else if( (Trans::getSource(*iit) == *sit) && (Trans::getInternalSym(*iit) == *it) ) {
+              //std::cout << "Found internal from " << key2str(iit->first) << " to "
+              //          << key2str(iit->third) << " on " << key2str(iit->second) << "\n";
               count_found++;
+            }
           }
-          if( count_found > 1 )
+          if( count_found > 1 ) {
+            //std::cout << "isDeterministic returning on line " << (__LINE__+1) << "\n";
             return false;
-          else if( wild && count_found > 0 )
+          }
+          else if( wild && count_found > 0 ) {
+            //std::cout << "isDeterministic returning on line " << (__LINE__+1) << "\n";
             return false;  
-
+          }
           for( StateIterator pit = beginStates(); pit != endStates(); pit++ )
           {
             //Check return transitions.
@@ -1325,9 +1351,22 @@ namespace wali
             wild = false;
             for( ReturnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
             {
-              //Wild symbol 
-              if( Trans::getReturnSym(*rit) == WALI_WILD )
-                wild = true; 
+              //Wild symbol
+
+              if( wild
+                  && rit->first == *sit
+                  && rit->second == *pit
+                  && Trans::getReturnSym(*rit) == WALI_WILD )
+              {
+                return false;
+              }
+              
+              if( rit->first == *sit
+                  && rit->second == *pit
+                  && Trans::getReturnSym(*rit) == WALI_WILD )
+              {
+                wild = true;
+              }
 
               //Keep a count of multiple transitions with the same from
               //state and symbol(that is not epsilon).
@@ -1336,10 +1375,14 @@ namespace wali
                        && (Trans::getReturnSym(*rit) == *it) )
                 count_found++;
             }
-            if( count_found > 1 )
+            if( count_found > 1 ) {
+              //std::cout << "isDeterministic returning on line " << (__LINE__+1) << "\n";
               return false;
-            else if( wild && count_found > 0 )
-              return false;  
+            }
+            else if( wild && count_found > 0 ) {
+              //std::cout << "isDeterministic returning on line " << (__LINE__+1) << "\n";
+              return false;
+            }
           }
         }
       }
