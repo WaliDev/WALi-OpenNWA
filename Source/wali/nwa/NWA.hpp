@@ -841,50 +841,7 @@ namespace wali
 
       // }}}
       
-
-      /**
-       *
-       * @brief tests whether this NWA is deterministic 
-       *
-       * This method tests whether this NWA is deterministic or nondeterministic. If this 
-       * NWA is deterministic, true is returned.  Otherwise, false is returned.
-       *
-       * @return true if this NWA is deterministic, false otherwise
-       *
-       */
-      bool isDeterministic( );
-
-      /**
-       * 
-       * @brief determines whether there is any overlap in the states of the given NWAs
-       *
-       * This method tests whether there is any overlap in the states of the given NWAs.
-       *
-       *   first->states()  intersect  second->states()  = {]
-       *
-       * @param - first: one of the NWAs whose states to compare
-       * @param - second: one of the NWAs whose states to compare
-       * @return true if there is some overlap in the states of the given NWAs, false otherwise
-       *
-       */
-      static bool overlap(NWA const & first, NWA const & second)
-      {
-        StateSet intersection;
-        // The following line does 'intersection = first->states() intersect second->states()'
-        std::set_intersection(first.beginStates(), first.endStates(),
-                              second.beginStates(), second.endStates(),
-                              std::inserter(intersection, intersection.begin()));
-
-        if (intersection.size() == 0) {
-          // No states are shared
-          return false;
-        }
-        else {
-          return true;
-        }
-      }
-
-
+      bool _private_isDeterministic_() const;
 
       // {{{ intersection callbacks
       

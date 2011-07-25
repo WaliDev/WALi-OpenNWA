@@ -1,5 +1,7 @@
 #include "wali/nwa/NWA.hpp"
 
+#include "wali/nwa/query/automaton.hpp"
+
 namespace wali
 {
   namespace nwa
@@ -37,7 +39,7 @@ namespace wali
         //A: The clientInfos from the component machines are copied and added to the concatenated NWA.
 
         //Test state Key overlap of the two NWAs.
-        assert(! NWA::overlap(first, second) );
+        assert(! query::statesOverlap(first, second) );
 
         //Clear all states(except the stuck state) and transitions from this machine.
         out.clear();

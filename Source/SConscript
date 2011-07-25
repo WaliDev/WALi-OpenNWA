@@ -84,6 +84,7 @@ nice_files = Split("""
 ./wali/nwa/details/TransitionInfo.cpp
 ./wali/nwa/details/TransitionStorage.cpp
 ./wali/nwa/NwaParser.cpp
+./wali/nwa/query/automaton.cpp
 ./wali/nwa/query/transitions.cpp
 ./wali/nwa/query/calls.cpp
 ./wali/nwa/query/returns.cpp
