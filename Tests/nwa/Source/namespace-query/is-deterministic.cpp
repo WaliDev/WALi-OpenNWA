@@ -80,7 +80,7 @@ namespace wali {
                 fixture.nwa.removeState(fixture.dummy);
 
                 fixture.nwa.addCallTrans(fixture.q3, WALI_WILD, fixture.q1);
-                fixture.nwa.addCallTrans(fixture.q3, WALI_WILD, fixture.q1);
+                fixture.nwa.addCallTrans(fixture.q3, WALI_WILD, fixture.q2);
 
                 EXPECT_FALSE(isDeterministic(fixture.nwa));
             }
