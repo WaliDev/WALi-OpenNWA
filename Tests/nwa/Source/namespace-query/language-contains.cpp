@@ -48,9 +48,9 @@ const unsigned num_words = NUM_ELEMENTS(words);
 bool expected_answers[][num_words] = {
     /*                     empty    bal    bal0    left   left0    right  right0   full   full0 */
     /* balanced only  */ { true,    true,  true,   false, false,   false, false,   false, false },
-    /* strictly left  */ { false,   false, true,   true,  true,    false, false,   false, false },
+    /* strictly left  */ { false,   false, false,  true,  true,    false, false,   false, false },
     /* maybe left     */ { true,    true,  true,   true,  true,    false, false,   false, false },
-    /* strictly right */ { false,   false, true,   false, false,   true,  true,    false, false },
+    /* strictly right */ { false,   false, false,  false, false,   true,  true,    false, false },
     /* maybe right    */ { true,    true,  true,   false, false,   true,  true,    false, false },
     /* maybe fully    */ { true,    true,  true,   true,  true,    true,  true,    true,  true  }
 };
