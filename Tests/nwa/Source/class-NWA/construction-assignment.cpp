@@ -265,5 +265,49 @@ namespace wali
             expect_nwa_is_empty(fixture.nwa);
         }
 
+
+        ////////////////////////////////
+        // getClientInfo(), setClientInfo()
+        //  - some prerequsites for the tests above to be meaningful
+        TEST(wali$nwa$NWA$NWA$$getClientInfo$and$setClientInfo, clientInfoStartsOffNull)
+        {
+            OddNumEvenGroupsNwa fixture;
+
+            EXPECT_TRUE(fixture.nwa.getClientInfo(fixture.q0) == NULL);
+            EXPECT_TRUE(fixture.nwa.getClientInfo(fixture.dummy) == NULL);
+        }
+        
+        
+        TEST(wali$nwa$NWA$NWA$$getClientInfo$and$setClientInfo, getAfterSetWorks)
+        {
+            OddNumEvenGroupsNwa fixture;
+
+            ref_ptr<ClientInfo> q0_ci = new IntClientInfo(0);
+            ref_ptr<ClientInfo> q1_ci = new IntClientInfo(1);
+            ref_ptr<ClientInfo> q2_ci = new IntClientInfo(2);
+            ref_ptr<ClientInfo> q3_ci = new IntClientInfo(3);
+
+            // Set some info, then retrieve it to make sure it's the same
+            fixture.nwa.setClientInfo(fixture.q0, q0_ci);
+            fixture.nwa.setClientInfo(fixture.q1, q1_ci);
+
+            EXPECT_EQ(q0_ci, fixture.nwa.getClientInfo(fixture.q0));
+            EXPECT_EQ(q1_ci, fixture.nwa.getClientInfo(fixture.q1));
+        }
+
+        TEST(wali$nwa$NWA$NWA$$getClientInfo$and$setClientInfo, canSetClientInfoToNull)
+        {
+            OddNumEvenGroupsNwa fixture;
+
+            ref_ptr<ClientInfo> q0_ci = new IntClientInfo(0);
+            fixture.nwa.setClientInfo(fixture.q0, q0_ci);
+            ASSERT_EQ(q0_ci, fixture.nwa.getClientInfo(fixture.q0));
+            
+            // Now set it back to null, and make sure it is
+            fixture.nwa.setClientInfo(fixture.q0, NULL);
+            
+            EXPECT_TRUE(fixture.nwa.getClientInfo(fixture.q0) == NULL);
+        }
+
     }
 }
