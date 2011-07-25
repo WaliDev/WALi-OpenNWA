@@ -1262,7 +1262,7 @@ namespace wali
     bool NWA::_private_isDeterministic_( ) const
     {
       //An NWA is not deterministic if there is not exactly one initial state
-      if( sizeInitialStates() != 1 ) 
+      if( sizeInitialStates() > 1 ) 
         return false;
       
       //An NWA is not deterministic if there are epsilon transitions. 
