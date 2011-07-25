@@ -69,6 +69,8 @@ namespace wali
       public:
       
       //Constructors and Destructor
+      StateStorage();
+      StateStorage(StateStorage const & other);
       StateStorage & operator=( const StateStorage & other );
 
       //Client Info Accessors
@@ -508,4 +510,12 @@ namespace wali
     }
   }
 }
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
+
 #endif
+

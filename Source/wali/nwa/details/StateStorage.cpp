@@ -16,7 +16,24 @@ namespace wali
     //
     // Methods
     //
+      StateStorage::StateStorage()
+      {
+      }
+        
 
+      StateStorage::StateStorage(StateStorage const & other)
+        : Printable(other)
+        , states(other.states)
+        , initialStates(other.initialStates)
+        , finalStates(other.finalStates)
+      {
+        for (std::map<State,ClientInfoRefPtr>::const_iterator other_cis = other.stateInfos.begin() ;
+             other_cis != other.stateInfos.end(); ++other_cis)
+        {
+          stateInfos[other_cis->first] = other_cis->second->cloneRp();
+        }
+      }
+      
     
     StateStorage & StateStorage::operator=( const StateStorage & other )
     {
@@ -29,7 +46,12 @@ namespace wali
       initialStates = other.initialStates;
       finalStates = other.finalStates;
 
-      stateInfos = other.stateInfos;
+      stateInfos.clear();
+      for (std::map<State,ClientInfoRefPtr>::const_iterator other_cis = other.stateInfos.begin() ;
+           other_cis != other.stateInfos.end(); ++other_cis)
+      {
+        stateInfos[other_cis->first] = other_cis->second->cloneRp();
+      }
 
       return *this;
     }
@@ -594,4 +616,10 @@ namespace wali
     }
   }
 }
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
 
