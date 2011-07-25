@@ -1,5 +1,7 @@
 #include "wali/nwa/NWA.hpp"
 
+#include "wali/nwa/NestedWord.hpp"
+
 namespace wali
 {
     namespace nwa
@@ -80,6 +82,100 @@ namespace wali
         ///////////////////////////////////////////////////////////////////
         // The following are parenthesis languages with 0s allowed anywhere
 
+        class WordCollection
+        {
+        public:
+            // For paren-only version:
+            // Balanced is                ( ) ( ( ) )
+            // Unbalanced left is         <balanced>   ( ( )
+            // Unbalanced right is  ( ) ) <balanced>
+            // Fully unbalanced is  ( ) ) <balanced>   ( ( )
+
+            // For zero version:
+            // Balanced is                0 ( 0 ) ( 0 ( 0 ) 0 ) 0
+            // Unbalanced left is               <balanced>      ( ( ) 0
+            // Unbalanced right is  0 ( ) )     <balanced>
+            // Fully unbalanced is  0 ( ) )     <balanced>      ( ( ) 0
+            
+            NestedWord empty,
+                balanced, balanced0,
+                unbalancedLeft, unbalancedLeft0,
+                unbalancedRight, unbalancedRight0,
+                fullyUnbalanced, fullyUnbalanced0;
+
+            Symbol const zero, call, ret;
+
+            static void
+            appendWord(NestedWord * target, NestedWord const & source)
+            {
+                for(NestedWord::const_iterator p = source.begin();
+                    p != source.end(); ++p)
+                {
+                    target->append(*p);
+                }
+            }
+
+            WordCollection()
+                : zero(getKey("0")), call(getKey("(")), ret(getKey(")"))
+            {
+                NestedWord prefix, suffix, prefix0, suffix0;
+                
+                prefix.appendCall(call);
+                prefix.appendReturn(ret);
+                prefix.appendReturn(ret);
+
+                prefix0.appendInternal(zero);
+                prefix0.appendCall(call);
+                prefix0.appendReturn(ret);
+                prefix0.appendReturn(ret);
+
+                suffix.appendCall(call);
+                suffix.appendCall(call);
+                suffix.appendReturn(ret);
+
+                suffix0.appendCall(call);
+                suffix0.appendCall(call);
+                suffix0.appendReturn(ret);
+                suffix0.appendInternal(zero);
+
+                // Now, we can make our words.
+                balanced.appendCall(call);
+                balanced.appendReturn(ret);
+                balanced.appendCall(call);
+                balanced.appendCall(call);
+                balanced.appendReturn(ret);
+                balanced.appendReturn(ret);
+
+                // 0 ( 0 ) ( 0 ( 0 ) 0 ) 0
+                balanced0.appendInternal(zero);
+                balanced0.appendCall(call);
+                balanced0.appendInternal(zero);
+                balanced0.appendReturn(ret);
+                balanced0.appendCall(call);
+                balanced0.appendInternal(zero);
+                balanced0.appendCall(call);
+                balanced0.appendInternal(zero);
+                balanced0.appendReturn(ret);
+                balanced0.appendInternal(zero);
+                balanced0.appendReturn(ret);
+                balanced0.appendInternal(zero);
+
+                // Unbalanced left:  balanced + suffix
+                appendWord(&unbalancedLeft, balanced);
+                appendWord(&unbalancedLeft, suffix);
+
+                // Unbalanced right: prefix + balanaced
+                appendWord(&unbalancedRight, prefix);
+                appendWord(&unbalancedRight, balanced);
+
+                // Fully unbalanced: prefix + balanced + suffix
+                appendWord(&fullyUnbalanced, prefix);
+                appendWord(&fullyUnbalanced, balanced);
+                appendWord(&fullyUnbalanced, suffix);
+            }
+        };
+        
+
         // Accepts:
         //      S -> S S
         //         | ( S )
@@ -157,7 +253,7 @@ namespace wali
 
 
         // Accepts  <balanced> (*
-        class AcceptsPosssiblyUnbalancedLeft
+        class AcceptsPossiblyUnbalancedLeft
         {
         public:
             //            ( push q0
@@ -176,7 +272,7 @@ namespace wali
             State const q0, q1;
             Symbol const zero, call, ret;
 
-            AcceptsPosssiblyUnbalancedLeft()
+            AcceptsPossiblyUnbalancedLeft()
                 : q0(getKey("q0")), q1(getKey("q1"))
                 , zero(getKey("0")), call(getKey("(")), ret(getKey(")"))
             {
