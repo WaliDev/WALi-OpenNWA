@@ -164,14 +164,24 @@ namespace wali
                 appendWord(&unbalancedLeft, balanced);
                 appendWord(&unbalancedLeft, suffix);
 
+                appendWord(&unbalancedLeft0, balanced0);
+                appendWord(&unbalancedLeft0, suffix0);
+
                 // Unbalanced right: prefix + balanaced
                 appendWord(&unbalancedRight, prefix);
                 appendWord(&unbalancedRight, balanced);
+
+                appendWord(&unbalancedRight0, prefix0);
+                appendWord(&unbalancedRight0, balanced0);
 
                 // Fully unbalanced: prefix + balanced + suffix
                 appendWord(&fullyUnbalanced, prefix);
                 appendWord(&fullyUnbalanced, balanced);
                 appendWord(&fullyUnbalanced, suffix);
+
+                appendWord(&fullyUnbalanced0, prefix0);
+                appendWord(&fullyUnbalanced0, balanced0);
+                appendWord(&fullyUnbalanced0, suffix0);
             }
         };
         
