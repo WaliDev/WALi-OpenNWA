@@ -544,6 +544,27 @@ namespace wali {
       std::stringstream ss4(duplicates);
       read_nwa(ss4);
       EXPECT_TRUE(ss4.peek() == -1);
+
+
+      std::string named_nwa =
+        "nwa Test {" "\n"
+        "Q: { a }" "\n"
+        "Q: b" "\n"
+        "Delta_i: (a, b (c), c)" "\n"
+        "Delta_r: (a, b, c, d)" "\n"
+        "Delta_c: {}" "\n"
+        "Delta_i: (a, b, d)" "\n"
+        "}" "\n"
+        "nwa Foo { }\n";
+      
+
+      std::string name;
+      std::stringstream ss5(named_nwa);
+      read_nwa(ss5, &name);
+
+      EXPECT_FALSE(ss5.peek() == -1);
+
+      EXPECT_EQ(name, "Test");
     }
     
   } // namespace nwa
