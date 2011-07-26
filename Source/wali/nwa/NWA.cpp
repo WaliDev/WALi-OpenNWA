@@ -1867,6 +1867,13 @@ namespace wali
         initials.addTrans(init,*it,fin,wgts.one());
       }
 
+#if 1 // Allow pending returns
+      for( StateIterator it = beginInitialStates(); it != endInitialStates(); it++ )
+      {
+        initials.addTrans(fin,*it,fin,wgts.one());
+      }
+#endif
+
       //std::cout << "Initials:\n";
       //initials.print_dot(std::cout);
       //std::cout << "\n";
@@ -1885,6 +1892,13 @@ namespace wali
       {
         finals.addTrans(init,*it,fin,wgts.one());
       }
+
+#if 1 // Allow pending calls
+      for( StateIterator it = beginStates(); it != endStates(); it++ )
+      {
+        finals.addTrans(fin,*it,fin,wgts.one());
+      }
+#endif
 
       //std::cout << "Finals:\n";
       //finals.print_dot(std::cout);
