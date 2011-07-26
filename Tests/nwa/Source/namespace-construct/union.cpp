@@ -23,6 +23,34 @@ namespace wali {
                 EXPECT_FALSE(query::isDeterministic(*u));
             }
 
+
+            TEST(wali$nwa$construct$$union, unionWithEmptyIsNoop)
+            {
+                OddNumEvenGroupsNwa fixture;
+                NWA empty;
+
+                NWARefPtr u = unionNWA(fixture.nwa, empty);
+
+                EXPECT_EQ(fixture.nwa, *u);
+
+                u = unionNWA(empty, empty);
+
+                EXPECT_EQ(empty, empty);
+            }
+
+
+            TEST(wali$nwa$construct$$union$$DeathTest, overlappingStatesTriggerAssertionViolation)
+            {
+                NWA nwa;
+                nwa.addState(getKey("s"));
+
+                EXPECT_DEATH({
+                        NWARefPtr u = unionNWA(nwa, nwa);
+                    },
+                    "statesOverlap");
+            }
+
+            
         }
     }
 }
