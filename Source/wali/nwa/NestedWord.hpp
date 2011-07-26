@@ -2,6 +2,7 @@
 #define wali_nwa_NESTED_WORD_HPP
 
 #include "wali/nwa/NWAFwd.hpp"
+#include <vector>
 
 namespace wali
 {
