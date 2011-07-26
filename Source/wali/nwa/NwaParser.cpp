@@ -427,7 +427,7 @@ test_read_triple_quad()
   std::stringstream ss2("(a, b, c)z");
   std::stringstream ss3("(a,b, c)(d, e, f)");
 
-  KeyTriple ans3(4, 3, 2);
+  KeyTriple ans3(getKey("a"), getKey("b"), getKey("c"));
     
   assert(read_triple(ss1) == ans3);
   assert(read_triple(ss2) == ans3);
@@ -443,7 +443,7 @@ test_read_triple_quad()
   std::stringstream ss7("(a, b, c, d)z");
   std::stringstream ss8("(a,b, c, d)(h, e, f)");
 
-  KeyQuad ans4(4, 3, 2, 5);
+  KeyQuad ans4(getKey("a"), getKey("b"), getKey("c"), getKey("d"));
 
   assert(read_quad(ss6) == ans4);
   assert(read_quad(ss7) == ans4);
