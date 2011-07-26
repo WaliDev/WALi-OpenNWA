@@ -34,6 +34,7 @@ test_files = Split("""
     Source/namespace-query/language-comparison.cpp
     Source/namespace-query/language-is-empty.cpp
     Source/namespace-construct/complement.cpp
+    Source/namespace-construct/union.cpp
     Source/serialization/idempotency.cpp
     Source/serialization/parser-unit-tests.cpp
     """)
