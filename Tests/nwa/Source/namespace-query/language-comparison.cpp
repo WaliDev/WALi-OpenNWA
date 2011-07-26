@@ -10,10 +10,22 @@ using namespace wali::nwa;
 
 #define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
 
+
+static NWA buildEmptyishNwa()
+{
+    NWA nwa;
+    WordCollection words;
+    nwa.addSymbol(words.zero);
+    nwa.addSymbol(words.ret);
+    nwa.addSymbol(words.call);
+    return nwa;
+}
+
+
 // WARNING: the order of these words must be consistent with the row & column
 //          order in the table 'expected_answers' below.
 static NWA const nwas[] = {
-    NWA(),
+    buildEmptyishNwa(),
     AcceptsBalancedOnly().nwa,
     AcceptsStrictlyUnbalancedLeft().nwa,
     AcceptsPossiblyUnbalancedLeft().nwa,
