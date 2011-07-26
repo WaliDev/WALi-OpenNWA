@@ -34,7 +34,7 @@ static bool expected_answers[] = {
     /* balanced     */  false,
     /* strict left  */  false,
     /* maybe left   */  false,
-    /* strict right */  true,  // WRONG once unbalanced
+    /* strict right */  false,
     /* maybe right  */  false,
     /* maybe full   */  false
 };
@@ -64,3 +64,4 @@ namespace wali {
         }
     }
 }
+
