@@ -33,7 +33,7 @@ namespace wali
 
         //Start with a deterministic copy of the given NWA.
         // FIXME: keep information about whether a machine is deterministic
-        if(false) //! first.isDeterministic() )
+        if(true) //! first.isDeterministic() )
         {
           determinize(out, first);   //Note: determinize() will take care of clientInfo information.
         }
