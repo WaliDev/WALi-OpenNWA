@@ -33,6 +33,7 @@ test_files = Split("""
     Source/namespace-query/language-contains.cpp
     Source/namespace-query/language-comparison.cpp
     Source/namespace-query/language-is-empty.cpp
+    Source/namespace-construct/complement.cpp
     """)
 
 built = env.Program('nwa-test', test_files)
