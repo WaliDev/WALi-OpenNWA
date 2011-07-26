@@ -30,7 +30,8 @@ namespace wali
     /// A reference-counted smart pointer to an NWA
     ///
     typedef ref_ptr<NWA> NWARefPtr;
-    
+
+    /// Not part of the public API
     struct Configuration;
 
     // Forward decl
@@ -48,6 +49,11 @@ namespace wali
     /// change to an unordered_set or other type with a similar
     /// interface in future versions.)
     typedef std::set<Symbol> SymbolSet;
+
+    // Forward decl
+    class ClientInfo;
+
+    typedef ref_ptr<ClientInfo> ClientInfoRefPtr;
   }
 }
 

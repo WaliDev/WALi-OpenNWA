@@ -7,6 +7,7 @@
 
 // ::wali
 #include "wali/Countable.hpp"
+#include "wali/nwa/NWAFwd.hpp"
 
 namespace wali
 {
@@ -32,6 +33,7 @@ namespace wali
         return ref_ptr<ClientInfo>(clone());
       }
     };
+
   }
 }
 
