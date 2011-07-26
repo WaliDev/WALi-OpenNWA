@@ -14,9 +14,13 @@ namespace wali {
             TEST(wali$nwa$construct$$complement, complementOfACompletelyEmptyAutomatonContainsStuff)
             {
                 NWA empty;
-                NWARefPtr comp = complement(empty);
-
                 WordCollection words;
+                
+                empty.addSymbol(words.zero);
+                empty.addSymbol(words.ret);
+                empty.addSymbol(words.call);
+                                
+                NWARefPtr comp = complement(empty);
 
                 EXPECT_TRUE(query::languageContains(*comp, words.empty));
                 EXPECT_TRUE(query::languageContains(*comp, words.balanced));
