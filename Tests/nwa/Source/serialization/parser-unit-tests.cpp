@@ -57,7 +57,7 @@ namespace wali {
             , read_char(c)
             , line(li)
           {
-            EXPECT_TRUE(c!=-1);
+            assert(c!=-1);
             message = err_msg();
           }
 
