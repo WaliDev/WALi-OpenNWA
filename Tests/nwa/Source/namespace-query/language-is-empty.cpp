@@ -32,9 +32,9 @@ static const unsigned num_nwas = NUM_ELEMENTS(nwas);
 static bool expected_answers[] = {
     /* empty        */  true,
     /* balanced     */  false,
-    /* strict left  */  true,
+    /* strict left  */  true,  // WRONG once unbalanced
     /* maybe left   */  false,
-    /* strict right */  true,
+    /* strict right */  true,  // WRONG once unbalanced
     /* maybe right  */  false,
     /* maybe full   */  false
 };
