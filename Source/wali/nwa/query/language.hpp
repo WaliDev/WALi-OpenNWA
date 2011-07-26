@@ -31,6 +31,19 @@ namespace wali {
       bool
       languageSubsetEq(NWA const & left, NWA const & right);
 
+
+      /**
+       *
+       * @brief tests whether the language accepted by this NWA is empty
+       *
+       * This method tests whether the language accepted by this NWA is empty.
+       *
+       * @return true if the language accepted by this NWA is empty
+       *
+       */
+      bool
+      languageIsEmpty(NWA const & nwa);
+
     }
   }
 }

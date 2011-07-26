@@ -6,6 +6,7 @@
 
 #include "wali/nwa/NWA.hpp"
 #include "wali/nwa/NWAParser.hpp"
+#include "wali/nwa/query/language.hpp"
 
 using std::string;
 using std::ifstream;
@@ -30,7 +31,7 @@ int main(int argc, char** argv)
     }
 
     wali::nwa::NWARefPtr nwa = wali::nwa::read_nwa(infile);
-    if (nwa->isEmpty()) {
+    if (wali::nwa::query::languageIsEmpty(*nwa)) {
         cout << "THE NWA IS EMPTY\n";
     }
     else {

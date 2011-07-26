@@ -24,7 +24,14 @@ namespace wali {
         NWA inter;
         inter.intersect(first,comp); //L(a1) intersect (complement L(a2))
 
-        return inter.isEmpty();
+        return languageIsEmpty(inter);
+      }
+
+      
+      bool
+      languageIsEmpty(NWA const & nwa)
+      {
+        return nwa._private_isEmpty_();
       }
 
     }

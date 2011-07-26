@@ -1829,7 +1829,7 @@ namespace wali
      *
      */
     
-    bool NWA::isEmpty( ) const
+    bool NWA::_private_isEmpty_( ) const
     {
       //An automaton with no initial states must accept only the empty language.
       if( sizeInitialStates() == 0 )

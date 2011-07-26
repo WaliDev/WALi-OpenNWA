@@ -1243,7 +1243,7 @@ namespace wali
        * @return true if the language accepted by this NWA is empty
        *
        */
-      bool isEmpty( ) const;
+      bool _private_isEmpty_( ) const;
 
       
       /**
