@@ -116,7 +116,7 @@ namespace wali
             }
 
             WordCollection()
-                : zero(getKey("0")), call(getKey("(")), ret(getKey(")"))
+                : zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
             {
                 NestedWord prefix, suffix, prefix0, suffix0;
                 
@@ -209,7 +209,7 @@ namespace wali
 
             AcceptsBalancedOnly()
                 : q0(getKey("q0")), q1(getKey("q1"))
-                , zero(getKey("0")), call(getKey("(")), ret(getKey(")"))
+                , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
             {
                 nwa.addInitialState(q0);
                 nwa.addFinalState(q0);
@@ -246,7 +246,7 @@ namespace wali
 
             AcceptsStrictlyUnbalancedLeft()
                 : q0(getKey("q0")), q1(getKey("q1"))
-                , zero(getKey("0")), call(getKey("(")), ret(getKey(")"))
+                , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
             {
                 nwa.addInitialState(q0);
                 nwa.addFinalState(q1);
@@ -284,7 +284,7 @@ namespace wali
 
             AcceptsPossiblyUnbalancedLeft()
                 : q0(getKey("q0")), q1(getKey("q1"))
-                , zero(getKey("0")), call(getKey("(")), ret(getKey(")"))
+                , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
             {
                 nwa.addInitialState(q0);
                 nwa.addFinalState(q0);
@@ -324,7 +324,7 @@ namespace wali
 
             AcceptsPossiblyUnbalancedRight()
                 : q0(getKey("q0")), q1(getKey("q1"))
-                , zero(getKey("0")), call(getKey("(")), ret(getKey(")"))
+                , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
             {
                 nwa.addInitialState(q0);
                 nwa.addFinalState(q0);
@@ -363,7 +363,7 @@ namespace wali
 
             AcceptsPositionallyConsistentString()
                 : q0(getKey("q0")), q1(getKey("q1"))
-                , zero(getKey("0")), call(getKey("(")), ret(getKey(")"))
+                , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
             {
                 nwa.addInitialState(q0);
                 nwa.addFinalState(q0);
@@ -413,7 +413,7 @@ namespace wali
             AcceptsStrictlyUnbalancedRight()
                 : q0(getKey("q0")), q1(getKey("q1"))
                 , q2(getKey("q2")), q3(getKey("q3"))
-                , zero(getKey("0")), call(getKey("(")), ret(getKey(")"))
+                , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
             {
                 nwa.addInitialState(q0);
                 nwa.addFinalState(q2);
