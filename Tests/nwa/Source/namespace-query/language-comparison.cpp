@@ -67,9 +67,9 @@ namespace wali {
             TEST(wali$nwa$query$$languageEquals, testBatteryOfVariouslyBalancedNwas)
             {
                 for (unsigned left = 0 ; left < num_nwas ; ++left) {
-                    for (unsigned right = 0 ; right < num_nwas ; ++right) {
+                    for (unsigned right = left ; right < num_nwas ; ++right) {
                         std::stringstream ss;
-                        ss << "Testing NWA " << left << " \\subseteq " << right;
+                        ss << "Testing NWA " << left << " = " << right;
                         SCOPED_TRACE(ss.str());
 
                         // If left subseteq right and right subseteq left,
