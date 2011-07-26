@@ -14,7 +14,7 @@ using namespace wali::nwa;
 
 // WARNING: the order of these words must be consistent with the row order
 //          in the table 'expected_answers' below.
-NWA const nwas[] = {
+static NWA const nwas[] = {
     NWA(),
     AcceptsBalancedOnly().nwa,
     AcceptsStrictlyUnbalancedLeft().nwa,
@@ -24,12 +24,12 @@ NWA const nwas[] = {
     AcceptsPositionallyConsistentString().nwa
 };
 
-const unsigned num_nwas = NUM_ELEMENTS(nwas);
+static const unsigned num_nwas = NUM_ELEMENTS(nwas);
 
 
 // WARNING: the order of these words must be consistent with the column order
 //          in the table 'expected_answers' below.
-NestedWord const words[] = {
+static NestedWord const words[] = {
     WordCollection().empty,
     WordCollection().balanced,
     WordCollection().balanced0,
@@ -41,12 +41,12 @@ NestedWord const words[] = {
     WordCollection().fullyUnbalanced0
 };
 
-const unsigned num_words = NUM_ELEMENTS(words);
+static const unsigned num_words = NUM_ELEMENTS(words);
 
 
 // WARNING: the order of the rows and columns in this table must be
 //          consistent with the order of 'words' and 'nwas' above.
-bool expected_answers[][num_words] = {
+static bool expected_answers[][num_words] = {
     /*                     empty    bal    bal0    left   left0    right  right0   full   full0 */
     /* empty NWA      */ { false,   false, false,  false, false,   false, false,   false, false },
     /* balanced only  */ { true,    true,  true,   false, false,   false, false,   false, false },
