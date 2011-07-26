@@ -17,12 +17,21 @@ namespace wali {
       bool
       languageSubsetEq(NWA const & first, NWA const & second)
       {
+        NWA second_copy = second;
+        
+        // We have to synchronize alphabets first
+        for (NWA::SymbolIterator sym = first.beginSymbols();
+             sym != first.endSymbols(); ++sym)
+        {
+          second_copy.addSymbol(*sym);
+        }
+        
         //Check L(a1) contained in L(a2) by checking 
         //if L(a1) intersect (complement L(a2)) is empty.
         NWA comp;
-        comp.complement(second);   //complement L(a2)
+        comp.complement(second_copy);   //complement L(a2)
         NWA inter;
-        inter.intersect(first,comp); //L(a1) intersect (complement L(a2))
+        inter.intersect(first, comp); //L(a1) intersect (complement L(a2))
 
         return languageIsEmpty(inter);
       }
