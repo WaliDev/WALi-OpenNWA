@@ -1246,29 +1246,6 @@ namespace wali
       bool _private_isEmpty_( ) const;
 
       
-      /**
-       *
-       * @brief tests whether the languages of the given NWAs are equal
-       *
-       * This method tests the equivalence of the languages accepted by the given NWAs.
-       *
-       * @param - first: one of the NWAs whose language to test
-       * @param - second: one of the NWAs whose language to test
-       * @return true if the languages accepted by the given NWAs are equal, false otherwise
-       *
-       */
-      static bool equal( NWA const & first, NWA const & second)
-      {
-        NWARefPtr det_first = determinize(first, getKey("[stuck-3119]"));
-        NWARefPtr det_second = determinize(second, getKey("[stuck-3120]"));
-        
-        //The languages accepted by two NWAs are equivalent if they are both contained
-        //in each other, ie L(a1) contained in L(a2) and L(a2) contained in L(a1).
-        bool first_in_second = query::languageSubsetEq(*det_first, *det_second);
-        bool second_in_first = query::languageSubsetEq(*det_second, *det_first);
-
-        return (first_in_second && second_in_first );
-      }
 
 
       /**

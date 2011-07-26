@@ -34,6 +34,18 @@ namespace wali {
         return nwa._private_isEmpty_();
       }
 
+
+      bool
+      languageEquals(NWA const & first, NWA const & second)
+      {
+        //The languages accepted by two NWAs are equivalent if they are both contained
+        //in each other, ie L(a1) contained in L(a2) and L(a2) contained in L(a1).
+        bool first_in_second = query::languageSubsetEq(first, second);
+        bool second_in_first = query::languageSubsetEq(second, first);
+
+        return (first_in_second && second_in_first );
+      }
+      
     }
   }
 }

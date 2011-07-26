@@ -44,6 +44,21 @@ namespace wali {
       bool
       languageIsEmpty(NWA const & nwa);
 
+
+      /**
+       *
+       * @brief tests whether the languages of the given NWAs are equal
+       *
+       * This method tests the equivalence of the languages accepted by the given NWAs.
+       *
+       * @param - first: one of the NWAs whose language to test
+       * @param - second: one of the NWAs whose language to test
+       * @return true if the languages accepted by the given NWAs are equal, false otherwise
+       *
+       */
+      bool
+      languageEquals(NWA const & first, NWA const & second);
+      
     }
   }
 }
