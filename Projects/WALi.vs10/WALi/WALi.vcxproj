@@ -1,0 +1,369 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{BF42778C-A9FD-4B04-8004-D41AAB67B92C}</ProjectGuid>
+    <RootNamespace>WALi</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\..\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\Debug/</AssemblerListingLocation>
+      <ObjectFileName>.\Debug/</ObjectFileName>
+      <ProgramDataBaseFileName>.\Debug/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>..\..\..\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <AdditionalIncludeDirectories>..\..\..\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\Debug/</AssemblerListingLocation>
+      <ObjectFileName>.\Debug/</ObjectFileName>
+      <ProgramDataBaseFileName>.\Debug/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\..\..\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Source\wali\Reach.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wpds\fwpds\FWPDS.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wpds\fwpds\LazyTrans.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wpds\fwpds\SWPDS.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wpds\Config.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wpds\DebugWPDS.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wpds\GenKeySource.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wpds\LinkedTrans.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wpds\Rule.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wpds\RuleFunctor.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wpds\WPDS.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wpds\Wrapper.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wfa\ITrans.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wfa\State.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wfa\Trans.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wfa\TransFunctor.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wfa\TransSet.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wfa\WeightMaker.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wfa\WFA.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\witness\Visitor.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\witness\VisitorDot.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\witness\VisitorPrinter.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\witness\Witness.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\witness\WitnessCombine.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\witness\WitnessExtend.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\witness\WitnessMerge.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\witness\WitnessMergeFn.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\witness\WitnessRule.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\witness\WitnessTrans.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\witness\WitnessWrapper.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\util\ParseArgv.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\util\StringUtils.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\util\Timer.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\Common.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\Exception.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\IMergeFn.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\IntSource.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\Key.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\KeyPairSource.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\KeySetSource.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\KeySpace.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\Markable.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\MergeFn.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\MergeFnFactory.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\Printable.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\PriorityWorklist.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\SemElem.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\SemElemPair.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\StringSource.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\TotalOrderWorklist.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\WeightFactory.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\graph\Graph.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\graph\InterGraph.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\graph\IntraGraph.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\graph\LinkEval.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\graph\RegExp.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\graph\SummaryGraph.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wpds\ewpds\ERule.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wpds\ewpds\ETrans.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wpds\ewpds\EWPDS.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\regex\Concat.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\regex\Regex.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\regex\Root.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\regex\Star.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\regex\Union.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wfa\epr\EPA.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wfa\epr\FunctionalWeight.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wfa\epr\FunctionalWeightMaker.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\NWA.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\details\StateStorage.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\details\SymbolStorage.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\details\TransitionInfo.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\details\TransitionStorage.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\query\calls.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\query\internals.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\query\returns.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\query\transitions.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\construct\complement.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\construct\concatenate.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\construct\determinize.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\construct\intersect.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\construct\reverse.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\construct\star.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\construct\union.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\nwa_pds\NwaToPds.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\FWPDS.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\LazyTrans.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\SWPDS.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wpds\Config.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wpds\DebugWPDS.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wpds\GenKeySource.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wpds\LinkedTrans.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wpds\Rule.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wpds\RuleFunctor.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wpds\WPDS.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wpds\Wrapper.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wfa\DecoratorTrans.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wfa\ITrans.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wfa\State.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wfa\Trans.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wfa\TransFunctor.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wfa\TransSet.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wfa\WeightMaker.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wfa\WFA.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\witness\Visitable.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\witness\Visitor.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\witness\VisitorDot.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\witness\VisitorPrinter.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\witness\Witness.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\witness\WitnessCombine.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\witness\WitnessExtend.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\witness\WitnessMerge.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\witness\WitnessMergeFn.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\witness\WitnessRule.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\witness\WitnessTrans.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\witness\WitnessWrapper.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\util\ParseArgv.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\util\StringUtils.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\util\Timer.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\Common.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\Countable.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\DefaultWorklist.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\Exception.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\HashMap.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\hm_hash.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\IMarkable.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\IMergeFn.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\IntSource.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\Key.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\KeyContainer.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\KeyPairSource.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\KeySetSource.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\KeySource.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\KeySpace.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\Markable.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\MergeFn.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\MergeFnFactory.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\Printable.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\PriorityWorklist.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\ref_ptr.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\SemElem.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\SemElemPair.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\StringSource.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\TaggedWeight.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\TotalOrderWorklist.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\WeightFactory.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\Worklist.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\graph\Graph.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\graph\GraphCommon.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\graph\InterGraph.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\graph\IntraGraph.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\graph\LinkEval.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\graph\RegExp.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\graph\SummaryGraph.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wpds\ewpds\ERule.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wpds\ewpds\ETrans.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wpds\ewpds\EWPDS.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\regex\AllRegex.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\regex\Concat.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\regex\Regex.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\regex\Root.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\regex\Star.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\regex\Union.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wfa\epr\EPA.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wfa\epr\FunctionalWeight.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wfa\epr\FunctionalWeightMaker.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wfa\epr\StatePriorityWorklist.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\ClientInfo.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\Configuration.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\deprecate.h" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\NestedWord.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\NWA.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\NWAFwd.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\NWAParser.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\RelationOps.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\StateSet.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\SymbolSet.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\TransInfo.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\TransSet.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\WeightGen.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\WordRecConfig.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\details\StateStorage.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\details\SymbolStorage.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\details\TransitionInfo.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\details\TransitionStorage.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\calls.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\internals.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\returns.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\transitions.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="VTune\WALi.vpj" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

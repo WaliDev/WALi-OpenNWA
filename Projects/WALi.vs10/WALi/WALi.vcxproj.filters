@@ -1,0 +1,675 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\wali.wpds.fwpds">
+      <UniqueIdentifier>{32abe426-7d8e-4bb7-8ac9-6f52818b5905}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\wali.wpds">
+      <UniqueIdentifier>{df607734-51c6-439c-8bad-810cff58d927}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\wali.wfa">
+      <UniqueIdentifier>{ddc5e659-335b-4a19-94e8-7bc28939db94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\wali.witness">
+      <UniqueIdentifier>{a9c48b09-4484-4866-8baf-a330b3c06ca5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\wali.util">
+      <UniqueIdentifier>{cbdc1cef-38a3-452a-ad5d-4afebb6caeca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\wali">
+      <UniqueIdentifier>{7d897af7-1055-41ad-aead-c82b0e4f3783}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\wali.graph">
+      <UniqueIdentifier>{a0bb4f8d-c414-47ef-b555-7b91d00dd1d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\wali.wpds.ewpds">
+      <UniqueIdentifier>{4d5d6c01-7e8b-4e07-bb79-38a47bd1bca4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\wali.regex">
+      <UniqueIdentifier>{9c886b49-8122-4ba0-b23c-6c358f6afa8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\wali.wfa.epr">
+      <UniqueIdentifier>{40c62e3b-04f4-4400-8f38-3e1aaa04d184}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\wali.nwa">
+      <UniqueIdentifier>{227e9079-b14a-4de6-b7a5-cbbdf479d433}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\wali.nwa\details">
+      <UniqueIdentifier>{65a2b3de-c50a-4bd7-9312-86fa485f6b7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\wali.nwa\query">
+      <UniqueIdentifier>{2d70cb71-1693-46cb-b663-35acabfdd162}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\wali.nwa\construct">
+      <UniqueIdentifier>{204834f6-bb4f-4847-8bde-fd56bb6b76d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\wali.nwa\nwa_pds">
+      <UniqueIdentifier>{4d2c0616-a699-4f1a-aca0-5b832edbe6cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\wali.wpds.fwpds">
+      <UniqueIdentifier>{16f9d3de-d3c7-417a-91a5-518cc5bd59c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\wali.wpds">
+      <UniqueIdentifier>{6aa597a4-32ba-4f1c-acfa-b37fa831a424}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\wali.wfa">
+      <UniqueIdentifier>{9feb8c3c-037a-4565-94e0-b6e1fc64c389}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\wali.witness">
+      <UniqueIdentifier>{e9d9a415-4b8f-4827-a91d-82252fefcf47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\wali.util">
+      <UniqueIdentifier>{4397bfdb-db8d-4ae1-8461-49ec0b0318cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\wali">
+      <UniqueIdentifier>{b6817cc8-eaac-4c7c-8194-a57fe8af94dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\wali.graph">
+      <UniqueIdentifier>{c149e6de-a1bd-44b1-aad6-dcf6eee3c0e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\wali.wpds.ewpds">
+      <UniqueIdentifier>{24d1f87f-b0a9-45e8-a8ba-f05eedc40829}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\wali.regex">
+      <UniqueIdentifier>{a9758a79-c68d-42be-a091-0659be203dc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\wali.wfa.epr">
+      <UniqueIdentifier>{842cb8f3-231e-4a52-a4df-47052e16d8a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\wali.nwa">
+      <UniqueIdentifier>{a2ea5c4d-6703-45d0-ab7b-589304bbde59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\wali.nwa\details">
+      <UniqueIdentifier>{44380c1a-190a-4e91-9c0e-e68c13c1b3e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\wali.nwa\query">
+      <UniqueIdentifier>{bdf508ff-cdf2-40f4-899c-adcd30db94ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Source\wali\Reach.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wpds\fwpds\FWPDS.cpp">
+      <Filter>Source Files\wali.wpds.fwpds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wpds\fwpds\LazyTrans.cpp">
+      <Filter>Source Files\wali.wpds.fwpds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wpds\fwpds\SWPDS.cpp">
+      <Filter>Source Files\wali.wpds.fwpds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wpds\Config.cpp">
+      <Filter>Source Files\wali.wpds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wpds\DebugWPDS.cpp">
+      <Filter>Source Files\wali.wpds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wpds\GenKeySource.cpp">
+      <Filter>Source Files\wali.wpds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wpds\LinkedTrans.cpp">
+      <Filter>Source Files\wali.wpds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wpds\Rule.cpp">
+      <Filter>Source Files\wali.wpds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wpds\RuleFunctor.cpp">
+      <Filter>Source Files\wali.wpds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wpds\WPDS.cpp">
+      <Filter>Source Files\wali.wpds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wpds\Wrapper.cpp">
+      <Filter>Source Files\wali.wpds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wfa\ITrans.cpp">
+      <Filter>Source Files\wali.wfa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wfa\State.cpp">
+      <Filter>Source Files\wali.wfa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wfa\Trans.cpp">
+      <Filter>Source Files\wali.wfa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wfa\TransFunctor.cpp">
+      <Filter>Source Files\wali.wfa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wfa\TransSet.cpp">
+      <Filter>Source Files\wali.wfa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wfa\WeightMaker.cpp">
+      <Filter>Source Files\wali.wfa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wfa\WFA.cpp">
+      <Filter>Source Files\wali.wfa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\witness\Visitor.cpp">
+      <Filter>Source Files\wali.witness</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\witness\VisitorDot.cpp">
+      <Filter>Source Files\wali.witness</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\witness\VisitorPrinter.cpp">
+      <Filter>Source Files\wali.witness</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\witness\Witness.cpp">
+      <Filter>Source Files\wali.witness</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\witness\WitnessCombine.cpp">
+      <Filter>Source Files\wali.witness</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\witness\WitnessExtend.cpp">
+      <Filter>Source Files\wali.witness</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\witness\WitnessMerge.cpp">
+      <Filter>Source Files\wali.witness</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\witness\WitnessMergeFn.cpp">
+      <Filter>Source Files\wali.witness</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\witness\WitnessRule.cpp">
+      <Filter>Source Files\wali.witness</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\witness\WitnessTrans.cpp">
+      <Filter>Source Files\wali.witness</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\witness\WitnessWrapper.cpp">
+      <Filter>Source Files\wali.witness</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\util\ParseArgv.cpp">
+      <Filter>Source Files\wali.util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\util\StringUtils.cpp">
+      <Filter>Source Files\wali.util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\util\Timer.cpp">
+      <Filter>Source Files\wali.util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\Common.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\Exception.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\IMergeFn.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\IntSource.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\Key.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\KeyPairSource.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\KeySetSource.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\KeySpace.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\Markable.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\MergeFn.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\MergeFnFactory.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\Printable.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\PriorityWorklist.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\SemElem.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\SemElemPair.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\StringSource.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\TotalOrderWorklist.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\WeightFactory.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\graph\Graph.cpp">
+      <Filter>Source Files\wali.graph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\graph\InterGraph.cpp">
+      <Filter>Source Files\wali.graph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\graph\IntraGraph.cpp">
+      <Filter>Source Files\wali.graph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\graph\LinkEval.cpp">
+      <Filter>Source Files\wali.graph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\graph\RegExp.cpp">
+      <Filter>Source Files\wali.graph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\graph\SummaryGraph.cpp">
+      <Filter>Source Files\wali.graph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wpds\ewpds\ERule.cpp">
+      <Filter>Source Files\wali.wpds.ewpds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wpds\ewpds\ETrans.cpp">
+      <Filter>Source Files\wali.wpds.ewpds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wpds\ewpds\EWPDS.cpp">
+      <Filter>Source Files\wali.wpds.ewpds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\regex\Concat.cpp">
+      <Filter>Source Files\wali.regex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\regex\Regex.cpp">
+      <Filter>Source Files\wali.regex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\regex\Root.cpp">
+      <Filter>Source Files\wali.regex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\regex\Star.cpp">
+      <Filter>Source Files\wali.regex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\regex\Union.cpp">
+      <Filter>Source Files\wali.regex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wfa\epr\EPA.cpp">
+      <Filter>Source Files\wali.wfa.epr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wfa\epr\FunctionalWeight.cpp">
+      <Filter>Source Files\wali.wfa.epr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wfa\epr\FunctionalWeightMaker.cpp">
+      <Filter>Source Files\wali.wfa.epr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\NWA.cpp">
+      <Filter>Source Files\wali.nwa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\details\StateStorage.cpp">
+      <Filter>Source Files\wali.nwa\details</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\details\SymbolStorage.cpp">
+      <Filter>Source Files\wali.nwa\details</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\details\TransitionInfo.cpp">
+      <Filter>Source Files\wali.nwa\details</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\details\TransitionStorage.cpp">
+      <Filter>Source Files\wali.nwa\details</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\query\calls.cpp">
+      <Filter>Source Files\wali.nwa\query</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\query\internals.cpp">
+      <Filter>Source Files\wali.nwa\query</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\query\returns.cpp">
+      <Filter>Source Files\wali.nwa\query</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\query\transitions.cpp">
+      <Filter>Source Files\wali.nwa\query</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\construct\complement.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\construct\concatenate.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\construct\determinize.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\construct\intersect.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\construct\reverse.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\construct\star.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\construct\union.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\nwa_pds\NwaToPds.cpp">
+      <Filter>Source Files\wali.nwa\nwa_pds</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\FWPDS.hpp">
+      <Filter>Header Files\wali.wpds.fwpds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\LazyTrans.hpp">
+      <Filter>Header Files\wali.wpds.fwpds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\SWPDS.hpp">
+      <Filter>Header Files\wali.wpds.fwpds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wpds\Config.hpp">
+      <Filter>Header Files\wali.wpds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wpds\DebugWPDS.hpp">
+      <Filter>Header Files\wali.wpds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wpds\GenKeySource.hpp">
+      <Filter>Header Files\wali.wpds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wpds\LinkedTrans.hpp">
+      <Filter>Header Files\wali.wpds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wpds\Rule.hpp">
+      <Filter>Header Files\wali.wpds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wpds\RuleFunctor.hpp">
+      <Filter>Header Files\wali.wpds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wpds\WPDS.hpp">
+      <Filter>Header Files\wali.wpds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wpds\Wrapper.hpp">
+      <Filter>Header Files\wali.wpds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wfa\DecoratorTrans.hpp">
+      <Filter>Header Files\wali.wfa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wfa\ITrans.hpp">
+      <Filter>Header Files\wali.wfa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wfa\State.hpp">
+      <Filter>Header Files\wali.wfa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wfa\Trans.hpp">
+      <Filter>Header Files\wali.wfa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wfa\TransFunctor.hpp">
+      <Filter>Header Files\wali.wfa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wfa\TransSet.hpp">
+      <Filter>Header Files\wali.wfa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wfa\WeightMaker.hpp">
+      <Filter>Header Files\wali.wfa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wfa\WFA.hpp">
+      <Filter>Header Files\wali.wfa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\witness\Visitable.hpp">
+      <Filter>Header Files\wali.witness</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\witness\Visitor.hpp">
+      <Filter>Header Files\wali.witness</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\witness\VisitorDot.hpp">
+      <Filter>Header Files\wali.witness</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\witness\VisitorPrinter.hpp">
+      <Filter>Header Files\wali.witness</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\witness\Witness.hpp">
+      <Filter>Header Files\wali.witness</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\witness\WitnessCombine.hpp">
+      <Filter>Header Files\wali.witness</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\witness\WitnessExtend.hpp">
+      <Filter>Header Files\wali.witness</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\witness\WitnessMerge.hpp">
+      <Filter>Header Files\wali.witness</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\witness\WitnessMergeFn.hpp">
+      <Filter>Header Files\wali.witness</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\witness\WitnessRule.hpp">
+      <Filter>Header Files\wali.witness</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\witness\WitnessTrans.hpp">
+      <Filter>Header Files\wali.witness</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\witness\WitnessWrapper.hpp">
+      <Filter>Header Files\wali.witness</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\util\ParseArgv.hpp">
+      <Filter>Header Files\wali.util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\util\StringUtils.hpp">
+      <Filter>Header Files\wali.util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\util\Timer.hpp">
+      <Filter>Header Files\wali.util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\Common.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\Countable.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\DefaultWorklist.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\Exception.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\HashMap.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\hm_hash.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\IMarkable.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\IMergeFn.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\IntSource.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\Key.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\KeyContainer.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\KeyPairSource.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\KeySetSource.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\KeySource.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\KeySpace.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\Markable.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\MergeFn.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\MergeFnFactory.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\Printable.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\PriorityWorklist.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\ref_ptr.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\SemElem.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\SemElemPair.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\StringSource.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\TaggedWeight.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\TotalOrderWorklist.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\WeightFactory.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\Worklist.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\graph\Graph.hpp">
+      <Filter>Header Files\wali.graph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\graph\GraphCommon.hpp">
+      <Filter>Header Files\wali.graph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\graph\InterGraph.hpp">
+      <Filter>Header Files\wali.graph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\graph\IntraGraph.hpp">
+      <Filter>Header Files\wali.graph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\graph\LinkEval.hpp">
+      <Filter>Header Files\wali.graph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\graph\RegExp.hpp">
+      <Filter>Header Files\wali.graph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\graph\SummaryGraph.hpp">
+      <Filter>Header Files\wali.graph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wpds\ewpds\ERule.hpp">
+      <Filter>Header Files\wali.wpds.ewpds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wpds\ewpds\ETrans.hpp">
+      <Filter>Header Files\wali.wpds.ewpds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wpds\ewpds\EWPDS.hpp">
+      <Filter>Header Files\wali.wpds.ewpds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\regex\AllRegex.hpp">
+      <Filter>Header Files\wali.regex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\regex\Concat.hpp">
+      <Filter>Header Files\wali.regex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\regex\Regex.hpp">
+      <Filter>Header Files\wali.regex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\regex\Root.hpp">
+      <Filter>Header Files\wali.regex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\regex\Star.hpp">
+      <Filter>Header Files\wali.regex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\regex\Union.hpp">
+      <Filter>Header Files\wali.regex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wfa\epr\EPA.hpp">
+      <Filter>Header Files\wali.wfa.epr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wfa\epr\FunctionalWeight.hpp">
+      <Filter>Header Files\wali.wfa.epr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wfa\epr\FunctionalWeightMaker.hpp">
+      <Filter>Header Files\wali.wfa.epr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wfa\epr\StatePriorityWorklist.hpp">
+      <Filter>Header Files\wali.wfa.epr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\ClientInfo.hpp">
+      <Filter>Header Files\wali.nwa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\Configuration.hpp">
+      <Filter>Header Files\wali.nwa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\deprecate.h">
+      <Filter>Header Files\wali.nwa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\NestedWord.hpp">
+      <Filter>Header Files\wali.nwa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\NWA.hpp">
+      <Filter>Header Files\wali.nwa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\NWAFwd.hpp">
+      <Filter>Header Files\wali.nwa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\NWAParser.hpp">
+      <Filter>Header Files\wali.nwa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\RelationOps.hpp">
+      <Filter>Header Files\wali.nwa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\StateSet.hpp">
+      <Filter>Header Files\wali.nwa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\SymbolSet.hpp">
+      <Filter>Header Files\wali.nwa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\TransInfo.hpp">
+      <Filter>Header Files\wali.nwa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\TransSet.hpp">
+      <Filter>Header Files\wali.nwa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\WeightGen.hpp">
+      <Filter>Header Files\wali.nwa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\WordRecConfig.hpp">
+      <Filter>Header Files\wali.nwa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\details\StateStorage.hpp">
+      <Filter>Header Files\wali.nwa\details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\details\SymbolStorage.hpp">
+      <Filter>Header Files\wali.nwa\details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\details\TransitionInfo.hpp">
+      <Filter>Header Files\wali.nwa\details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\details\TransitionStorage.hpp">
+      <Filter>Header Files\wali.nwa\details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\calls.hpp">
+      <Filter>Header Files\wali.nwa\query</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\internals.hpp">
+      <Filter>Header Files\wali.nwa\query</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\returns.hpp">
+      <Filter>Header Files\wali.nwa\query</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\transitions.hpp">
+      <Filter>Header Files\wali.nwa\query</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="VTune\WALi.vpj" />
+  </ItemGroup>
+</Project>
