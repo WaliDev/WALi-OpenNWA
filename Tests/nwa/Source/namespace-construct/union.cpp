@@ -6,6 +6,7 @@
 #include "wali/nwa/query/automaton.hpp"
 
 #include "Tests/nwa/Source/fixtures.hpp"
+#include "Tests/nwa/Source/int-client-info.hpp"
 #include "Tests/nwa/Source/class-NWA/supporting.hpp"
 
 namespace wali {
@@ -48,6 +49,36 @@ namespace wali {
                         NWARefPtr u = unionNWA(nwa, nwa);
                     },
                     "statesOverlap");
+            }
+
+
+            TEST(wali$nwa$construct$$union, unionCopiesClientInfo)
+            {
+                AcceptsBalancedOnly bal;
+                NWA nwa; SomeElements e; e.add_to_nwa(&nwa);
+
+                ClientInfoRefPtr ci1 = new IntClientInfo(1);
+                ClientInfoRefPtr ci2 = new IntClientInfo(2);
+                
+                bal.nwa.setClientInfo(bal.q0, ci1);
+                nwa.setClientInfo(e.state, ci2);
+
+                NWARefPtr u = unionNWA(bal.nwa, nwa);
+                
+#define EXPECT_CLIENT_INFO_IS(expect, nwa, state)                       \
+                do {                                                    \
+                    ClientInfo * ci = (nwa).getClientInfo(state).get_ptr(); \
+                    IntClientInfo * ici = dynamic_cast<IntClientInfo *>(ci); \
+                    ASSERT_TRUE(ici != NULL);                           \
+                    EXPECT_EQ(expect, ici->n);                          \
+                } while (0)
+
+                EXPECT_CLIENT_INFO_IS(1, *u, bal.q0);
+                EXPECT_CLIENT_INFO_IS(2, *u, e.state);
+#undef EXPECT_CLIENT_INFO_IS
+
+                EXPECT_NE(ci1, u->getClientInfo(bal.q0));
+                EXPECT_NE(ci2, u->getClientInfo(e.state));
             }
 
             
