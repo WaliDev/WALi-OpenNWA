@@ -172,6 +172,20 @@ namespace wali
             expect_nwas_are_physically_different(fixture.nwa, copy);
         }
 
+        TEST(wali$nwa$NWA$$operatorEquals, doesOperatorEqualsCompareClientInfo)
+        {
+            ClientInfoRefPtr ci = new IntClientInfo(1);
+            
+            OddNumEvenGroupsNwa fixture;
+            fixture.nwa.setClientInfo(fixture.q0, ci);
+            
+            NWA copy = fixture.nwa;
+
+            ASSERT_NE(ci, copy.getClientInfo(fixture.q0));
+
+            EXPECT_EQ(fixture.nwa, copy);
+        }
+
         //  - Test self assignment
         TEST(wali$nwa$NWA$$operatorEquals, selfAssignmentDoesNotDestroyNwa)
         {
