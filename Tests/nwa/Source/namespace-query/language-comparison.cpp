@@ -63,6 +63,27 @@ namespace wali {
                 }
             }
 
+
+            TEST(wali$nwa$query$$languageEquals, testBatteryOfVariouslyBalancedNwas)
+            {
+                for (unsigned left = 0 ; left < num_nwas ; ++left) {
+                    for (unsigned right = 0 ; right < num_nwas ; ++right) {
+                        std::stringstream ss;
+                        ss << "Testing NWA " << left << " \\subseteq " << right;
+                        SCOPED_TRACE(ss.str());
+
+                        // If left subseteq right and right subseteq left,
+                        // then they are equal
+                        if (expected_answers[left][right]
+                            && expected_answers[right][left]) {
+                            EXPECT_TRUE(languageEquals(nwas[left], nwas[right]));
+                        }
+                        else {
+                            EXPECT_FALSE(languageEquals(nwas[left], nwas[right]));
+                        }
+                    }
+                }
+            }
             
         }
     }
