@@ -45,14 +45,14 @@
 // token ::=  ~(' ' | ',(')+
 //   with balenced ( )
 
+namespace wali { namespace nwa { namespace parser { namespace details {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// DISCARDWS
 ///
 /// Discards any whitespace (see std::isspace) that appears at the start of 'is'.
-static int lineno;
+int lineno;
 
-static
 void
 discardws(std::istream & is)
 {
@@ -63,7 +63,6 @@ discardws(std::istream & is)
   }
 }
 
-static
 void
 test_discardws()
 {
@@ -143,7 +142,6 @@ struct CharactersDifferException : std::exception {
 
 struct StreamTooShortException   : std::exception {};
 
-static
 std::string
 read_lit(std::istream & is, std::string const & lit)
 {
@@ -164,7 +162,6 @@ read_lit(std::istream & is, std::string const & lit)
   return lit;
 }
 
-static
 void
 test_read_lit()
 {
@@ -229,21 +226,18 @@ test_read_lit()
 /// TODO: fix comment to take into account matched parens and different paren
 /// types -Evan 3/4/11
 
-static
 bool
 is_lparen(int c)
 {
   return c == '(' || c == '{' || c == '[' || c == '<';
 }
 
-static
 bool
 is_rparen(int c)
 {
   return c == ')' || c == '}' || c == ']' || c == '>';
 }
 
-static
 std::string
 read_token(std::istream & is)
 {
@@ -289,7 +283,6 @@ read_token(std::istream & is)
   return ret;
 }
 
-static
 std::string
 read_name(std::istream & is)
 {
@@ -302,7 +295,6 @@ read_name(std::istream & is)
   return token;
 }
 
-static
 void
 test_read_name()
 {
@@ -386,7 +378,6 @@ using wali::make_triple;
 using wali::make_quad;
 using wali::nwa::NWARefPtr;
 
-static
 KeyTriple
 read_triple(std::istream & is)
 {
@@ -401,7 +392,6 @@ read_triple(std::istream & is)
   return make_triple(getKey(fn), getKey(sn), getKey(tn));
 }
 
-static
 KeyQuad
 read_quad(std::istream & is)
 {
@@ -419,7 +409,6 @@ read_quad(std::istream & is)
 }
 
 
-static
 void
 test_read_triple_quad()
 {
@@ -515,28 +504,24 @@ read_list(std::istream & is,  UnitType (*unitParser)(std::istream & is))
 /// Returns a vector of strings (for name-list), KeyTriples, and KeyQuads as
 /// appropriate.
 
-static
 std::vector<std::string>
 read_name_list(std::istream & is)
 {
   return read_list<std::string>(is, read_name);
 }
 
-static
 std::vector<KeyTriple>
 read_triple_list(std::istream & is)
 {
   return read_list<KeyTriple>(is, read_triple);
 }
 
-static
 std::vector<KeyQuad>
 read_quad_list(std::istream & is)
 {
   return read_list<KeyQuad>(is, read_quad);
 }
 
-static
 void
 test_read_lists()
 {
@@ -648,7 +633,6 @@ test_read_lists()
 //
 // However, the } is optional after the triple-list and quad-list
 
-static
 void
 read_sigma_block(std::istream & is, NWARefPtr nwa)
 {
@@ -672,7 +656,6 @@ read_sigma_block(std::istream & is, NWARefPtr nwa)
 }
 
 
-static
 void
 read_state_block(std::istream & is, NWARefPtr nwa)
 {
@@ -722,7 +705,6 @@ read_state_block(std::istream & is, NWARefPtr nwa)
 }
 
 
-static
 void
 read_delta_block(std::istream & is, NWARefPtr nwa)
 {
@@ -775,7 +757,6 @@ read_delta_block(std::istream & is, NWARefPtr nwa)
 }
 
 
-static
 void
 test_read_blocks()
 {
@@ -842,7 +823,6 @@ test_read_blocks()
 /// Reads a block (any kind) and as a semantic action adds the appropriate
 /// state/letter/transition to the NWA.
 
-static
 void
 read_block(std::istream & is, NWARefPtr nwa)
 {
@@ -864,6 +844,8 @@ read_block(std::istream & is, NWARefPtr nwa)
 }
 
 
+}}}}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// READ_NWA
 ///
@@ -875,6 +857,7 @@ read_block(std::istream & is, NWARefPtr nwa)
 
 namespace wali {
   namespace nwa {
+    using namespace parser::details;
 
     NWARefPtr
     read_nwa(std::istream & is, std::string * nwa_name)
@@ -936,7 +919,6 @@ namespace wali {
       return procs;
     }
 
-    static
     void
     test_read_map()
     {
@@ -960,7 +942,6 @@ namespace wali {
     }
 
         
-    static
     void
     test_read_nwa()
     {
