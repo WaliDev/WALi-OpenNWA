@@ -32,6 +32,7 @@
 #include "wali/nwa/construct/star.hpp"
 #include "wali/nwa/construct/union.hpp"
 #include "wali/nwa/nwa_pds/NWAToPDS.hpp"
+#include "wali/nwa/query/language.hpp"
 
 //#define USE_BUDDY
 #ifdef USE_BUDDY
@@ -1246,32 +1247,6 @@ namespace wali
 
       
       /**
-       * @brief tests whether the language of the first NWA is included in the language of 
-       *        the second NWA
-       *
-       * This method tests whether the language of the first NWA is included in the language
-       * of the second NWA.
-       *
-       * @param - first: the proposed subset
-       * @param - second: the proposed superset
-       * @return true if the language of the first NWA is included in the language of the 
-       *          second NWA, false otherwise
-       *
-       */
-      static bool inclusion( NWA const & first, NWA const & second )
-      {
-        //Check L(a1) contained in L(a2) by checking 
-        //if L(a1) intersect (complement L(a2)) is empty.
-        NWA comp;
-        comp.complement(second);   //complement L(a2)
-        NWA inter;
-        inter.intersect(first,comp); //L(a1) intersect (complement L(a2))
-
-        return inter.isEmpty();
-      }
-
-
-      /**
        *
        * @brief tests whether the languages of the given NWAs are equal
        *
@@ -1289,8 +1264,8 @@ namespace wali
         
         //The languages accepted by two NWAs are equivalent if they are both contained
         //in each other, ie L(a1) contained in L(a2) and L(a2) contained in L(a1).
-        bool first_in_second = inclusion(*det_first, *det_second);
-        bool second_in_first = inclusion(*det_second, *det_first);
+        bool first_in_second = query::languageSubsetEq(*det_first, *det_second);
+        bool second_in_first = query::languageSubsetEq(*det_second, *det_first);
 
         return (first_in_second && second_in_first );
       }
