@@ -32,6 +32,7 @@ test_files = Split("""
     Source/namespace-query/states-overlap.cpp
     Source/namespace-query/language-contains.cpp
     Source/namespace-query/language-comparison.cpp
+    Source/namespace-query/language-is-empty.cpp
     """)
 
 built = env.Program('nwa-test', test_files)
