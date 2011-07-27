@@ -7,6 +7,41 @@
 #include "Tests/nwa/Source/fixtures.hpp"
 #include "Tests/nwa/Source/class-NWA/supporting.hpp"
 
+
+using namespace wali::nwa;
+
+#define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
+
+// WARNING: the order of these words must be consistent with the row & column
+//          order in the table 'expected_answers' below.
+static NWA const nwas[] = {
+    NWA(),
+    AcceptsBalancedOnly().nwa,
+    AcceptsStrictlyUnbalancedLeft().nwa,
+    AcceptsPossiblyUnbalancedLeft().nwa,
+    AcceptsStrictlyUnbalancedRight().nwa,
+    AcceptsPossiblyUnbalancedRight().nwa,
+    AcceptsPositionallyConsistentString().nwa
+};
+
+static const unsigned num_nwas = NUM_ELEMENTS(nwas);
+
+
+// WARNING: the order of the rows and columns in this table must be
+//          consistent with the order of 'words' and 'nwas' above.
+//
+// "Is the row NWA a subset(eq) of the column NWA?"
+static bool expected_answers[] = {
+    /* empty        */  false,
+    /* balanced     */  true,
+    /* strict left  */  true,
+    /* maybe left   */  true,
+    /* strict right */  true,
+    /* maybe right  */  true,
+    /* maybe full   */  true
+};
+
+
 namespace wali {
     namespace nwa {
         namespace construct {
@@ -32,6 +67,25 @@ namespace wali {
                 EXPECT_TRUE(query::languageContains(*comp, words.fullyUnbalanced));
                 EXPECT_TRUE(query::languageContains(*comp, words.fullyUnbalanced0));
             }
+
+            TEST(wali$nwa$query$$complement, testBatteryOfVariouslyBalancedNwas)
+            {
+                for (unsigned nwa = 0 ; nwa < num_nwas ; ++nwa) {
+                    std::stringstream ss;
+                    ss << "Testing NWA " << nwa;
+                    SCOPED_TRACE(ss.str());
+
+                    NWARefPtr c = complement(nwas[nwa]);
+                    
+                    if (expected_answers[nwa]) {
+                        EXPECT_TRUE(query::languageIsEmpty(*c));
+                    }
+                    else {
+                        EXPECT_FALSE(query::languageIsEmpty(*c));
+                    }
+                }
+            }
+
 
         }
     }
