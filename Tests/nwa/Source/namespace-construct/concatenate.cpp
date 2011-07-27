@@ -48,9 +48,9 @@ static const NWA * const expected_answers[][num_nwas] = {
     /* balanced     */  { &empty, &balanced,     &strict_left, &maybe_left,  &strict_right, &maybe_right,  &maybe_full },
     /* strict left  */  { &empty, &strict_left,  &strict_left, &strict_left, NULL,          NULL,          NULL,       },
     /* maybe left   */  { &empty, &maybe_left,   &strict_left, &maybe_left,  NULL,          &maybe_full,   &maybe_full },
-    /* strict right */  { &empty, &strict_right, &maybe_full,  &maybe_full,  &strict_right, &strict_right, &maybe_full },
-    /* maybe right  */  { &empty, &maybe_right,  &maybe_full,  &maybe_full,  &strict_right, &maybe_right,  &maybe_full },
-    /* maybe full   */  { &empty, &maybe_full,   &maybe_full,  &maybe_full,  &maybe_full,   &maybe_full,   &maybe_full }
+    /* strict right */  { &empty, &strict_right, NULL,         NULL,         &strict_right, &strict_right, NULL,       },
+    /* maybe right  */  { &empty, &maybe_right,  NULL,         &maybe_full,  &strict_right, &maybe_right,  &maybe_full },
+    /* maybe full   */  { &empty, &maybe_full,   NULL,         &maybe_full,  NULL,          &maybe_full,   &maybe_full }
 };
 
 
@@ -72,7 +72,7 @@ namespace wali {
                         // (i.e. it's not no_answer).
                         if (expected_answer && left != right) {
                             NWARefPtr u = concatenate(nwas[left], nwas[right]);
-                            
+
                             EXPECT_TRUE(query::languageEquals(*expected_answer, *u));
                         }
                     } // for right
