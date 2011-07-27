@@ -2,6 +2,8 @@
 
 #include "wali/nwa/query/automaton.hpp"
 
+#include "wali/nwa/query/calls.hpp"
+
 namespace wali
 {
   namespace nwa
@@ -79,6 +81,29 @@ namespace wali
                sit != second.endInitialStates(); sit++ )
           {
             out.addInternalTrans(*fit, WALI_EPSILON, *sit);
+          }
+        }
+
+        // Third step: add additional return transitions. Each return
+        // transition of the form (_, q0, _, _) in the second half can be
+        // taken by a pending return -- but now that pending return can match
+        // something in the first half. So we need to add a new transition
+        // (_, q', _, _) for each q' in the first NWA that appears as the
+        // call site in a call transition.
+        StateSet call_sites = query::getCallSites(first);
+        
+        for( NWA::ReturnIterator rit = second.beginReturnTrans();
+             rit != second.endReturnTrans(); ++rit)
+        {
+          NWA::Return rtrans = *rit;
+          
+          if (second.isInitialState(rtrans.second)) {
+            for( StateSet::const_iterator new_pred = call_sites.begin();
+                 new_pred != call_sites.end(); ++new_pred)
+            {
+              rtrans.second = *new_pred;
+              out.addReturnTrans(rtrans);
+            }
           }
         }
       }
