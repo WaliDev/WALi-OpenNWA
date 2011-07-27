@@ -86,16 +86,16 @@ namespace wali
         {
         public:
             // For paren-only version:
-            // Balanced is                ( ) ( ( ) )
-            // Unbalanced left is         <balanced>   ( ( )
-            // Unbalanced right is  ( ) ) <balanced>
-            // Fully unbalanced is  ( ) ) <balanced>   ( ( )
+            // Balanced is                  ( ) ( ( ) )
+            // Unbalanced left is           <balanced>  ( ( ( )
+            // Unbalanced right is  ( ) ) ) <balanced>
+            // Fully unbalanced is  ( ) ) ) <balanced>  ( ( ( )
 
             // For zero version:
             // Balanced is                0 ( 0 ) ( 0 ( 0 ) 0 ) 0
-            // Unbalanced left is               <balanced>      ( ( ) 0
-            // Unbalanced right is  0 ( ) )     <balanced>
-            // Fully unbalanced is  0 ( ) )     <balanced>      ( ( ) 0
+            // Unbalanced left is                <balanced>    ( ( ( ) 0
+            // Unbalanced right is  0 ( ) ) )    <balanced>
+            // Fully unbalanced is  0 ( ) ) )    <balanced>    ( ( ( ) 0
             
             NestedWord empty,
                 balanced, balanced0,
@@ -123,16 +123,20 @@ namespace wali
                 prefix.appendCall(call);
                 prefix.appendReturn(ret);
                 prefix.appendReturn(ret);
+                prefix.appendReturn(ret);
 
                 prefix0.appendInternal(zero);
                 prefix0.appendCall(call);
                 prefix0.appendReturn(ret);
                 prefix0.appendReturn(ret);
+                prefix0.appendReturn(ret);
 
+                suffix.appendCall(call);
                 suffix.appendCall(call);
                 suffix.appendCall(call);
                 suffix.appendReturn(ret);
 
+                suffix0.appendCall(call);
                 suffix0.appendCall(call);
                 suffix0.appendCall(call);
                 suffix0.appendReturn(ret);
