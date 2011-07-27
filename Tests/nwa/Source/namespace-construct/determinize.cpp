@@ -14,7 +14,7 @@ namespace wali {
     namespace nwa {
         namespace construct {
 
-            TEST(wali$nwa$construct$$determinize, takeEpsilonClosureAroundCall)
+            TEST(wali$nwa$construct$$determinize, allowPendingCallsOnAccepting)
             {
                 SomeElements e;
                 NWA nwa;
