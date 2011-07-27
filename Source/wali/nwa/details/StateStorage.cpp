@@ -30,7 +30,10 @@ namespace wali
         for (std::map<State,ClientInfoRefPtr>::const_iterator other_cis = other.stateInfos.begin() ;
              other_cis != other.stateInfos.end(); ++other_cis)
         {
-          stateInfos[other_cis->first] = other_cis->second->cloneRp();
+          ClientInfoRefPtr ci = other_cis->second;
+          if (ci.is_valid()) {
+            stateInfos[other_cis->first] = ci->cloneRp();
+          }
         }
       }
       
