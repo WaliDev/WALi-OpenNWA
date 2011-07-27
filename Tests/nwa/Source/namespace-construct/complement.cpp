@@ -34,9 +34,9 @@ static const unsigned num_nwas = NUM_ELEMENTS(nwas);
 static bool expected_answers[] = {
     /* empty        */  false,
     /* balanced     */  true,
-    /* strict left  */  true,
+    /* strict left  */  false,
     /* maybe left   */  true,
-    /* strict right */  true,
+    /* strict right */  false,
     /* maybe right  */  true,
     /* maybe full   */  true
 };
@@ -76,6 +76,7 @@ namespace wali {
                     SCOPED_TRACE(ss.str());
 
                     NWARefPtr c = complement(nwas[nwa]);
+                    c = intersect(*c, AcceptsBalancedOnly().nwa);
                     
                     if (expected_answers[nwa]) {
                         EXPECT_TRUE(query::languageIsEmpty(*c));
