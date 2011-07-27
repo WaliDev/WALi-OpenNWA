@@ -43,14 +43,14 @@ static const unsigned num_nwas = NUM_ELEMENTS(nwas);
 //
 // "What is the union of the row and column?"
 static const NWA * const expected_answers[][num_nwas] = {
-    /*                    empty   balanced   strict left   maybe left   strict right   maybe right   maybe full */
-    /* empty        */  { &empty, &empty,    &empty,       &empty,      &empty,        &empty,       &empty        },
-    /* balanced     */  { &empty, &balanced, &balanced,    &balanced,   &balanced,     &balanced,    &balanced     },
-    /* strict left  */  { &empty, &balanced, &strict_left, &balanced,   &empty,        &balanced,    &strict_left  },
-    /* maybe left   */  { &empty, &balanced, &balanced,    &maybe_left, &empty,        &balanced,    &maybe_left   },
-    /* strict right */  { &empty, &balanced, &empty,       &empty,      &strict_right, &balanced,    &strict_right },
-    /* maybe right  */  { &empty, &balanced, &balanced,    &balanced,   &balanced,     &maybe_right, &maybe_right  },
-    /* maybe full   */  { &empty, &balanced, &strict_left, &maybe_left, &strict_right, &maybe_right, &maybe_full   }
+    /*                    empty   balanced   strict left   maybe left    strict right   maybe right    maybe full */
+    /* empty        */  { &empty, &empty,    &empty,       &empty,       &empty,        &empty,        &empty        },
+    /* balanced     */  { &empty, &balanced, &empty,       &balanced,    &empty,        &balanced,     &balanced     },
+    /* strict left  */  { &empty, &empty,    &strict_left, &strict_left, &empty,        &empty,        &strict_left  },
+    /* maybe left   */  { &empty, &balanced, &strict_left, &maybe_left,  &empty,        &balanced,     &maybe_left   },
+    /* strict right */  { &empty, &empty,    &empty,       &empty,       &strict_right, &strict_right, &strict_right },
+    /* maybe right  */  { &empty, &balanced, &empty,       &balanced,    &strict_right, &maybe_right,  &maybe_right  },
+    /* maybe full   */  { &empty, &balanced, &strict_left, &maybe_left,  &strict_right, &maybe_right,  &maybe_full   }
 };
 
 
