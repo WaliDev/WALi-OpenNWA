@@ -438,12 +438,17 @@ namespace wali
       typedef  relations::RelationTypedefs<State>::BinaryRelation::const_iterator Iterator;
 
       std::stringstream ss;
+
+      ss << "{";
+      
       for( Iterator mit = R.begin(); mit != R.end(); mit++ )
       {
 #define key2str(a) a
         ss << "<" << key2str(mit->first) << "," << key2str(mit->second) << ">"; // 
 #undef key2str
       }
+
+      ss << "}";
 
       //std::cerr << "makeKey -> " << ss.str().size() << " characters\n";
 
