@@ -87,20 +87,20 @@ namespace wali
         public:
             // For paren-only version:
             // Balanced is                  ( ) ( ( ) )
-            // Unbalanced left is           <balanced>  ( ( ( )
-            // Unbalanced right is  ( ) ) ) <balanced>
+            // Unbalanced right is           <balanced>  ( ( ( )
+            // Unbalanced left is  ( ) ) ) <balanced>
             // Fully unbalanced is  ( ) ) ) <balanced>  ( ( ( )
 
             // For zero version:
             // Balanced is                0 ( 0 ) ( 0 ( 0 ) 0 ) 0
-            // Unbalanced left is                <balanced>    ( ( ( ) 0
-            // Unbalanced right is  0 ( ) ) )    <balanced>
+            // Unbalanced right is                <balanced>    ( ( ( ) 0
+            // Unbalanced left is  0 ( ) ) )    <balanced>
             // Fully unbalanced is  0 ( ) ) )    <balanced>    ( ( ( ) 0
             
             NestedWord empty,
                 balanced, balanced0,
-                unbalancedLeft, unbalancedLeft0,
                 unbalancedRight, unbalancedRight0,
+                unbalancedLeft, unbalancedLeft0,
                 fullyUnbalanced, fullyUnbalanced0;
 
             Symbol const zero, call, ret;
@@ -164,19 +164,19 @@ namespace wali
                 balanced0.appendReturn(ret);
                 balanced0.appendInternal(zero);
 
-                // Unbalanced left:  balanced + suffix
-                appendWord(&unbalancedLeft, balanced);
-                appendWord(&unbalancedLeft, suffix);
-
-                appendWord(&unbalancedLeft0, balanced0);
-                appendWord(&unbalancedLeft0, suffix0);
-
-                // Unbalanced right: prefix + balanaced
-                appendWord(&unbalancedRight, prefix);
+                // Unbalanced right:  balanced + suffix
                 appendWord(&unbalancedRight, balanced);
+                appendWord(&unbalancedRight, suffix);
 
-                appendWord(&unbalancedRight0, prefix0);
                 appendWord(&unbalancedRight0, balanced0);
+                appendWord(&unbalancedRight0, suffix0);
+
+                // Unbalanced left: prefix + balanaced
+                appendWord(&unbalancedLeft, prefix);
+                appendWord(&unbalancedLeft, balanced);
+
+                appendWord(&unbalancedLeft0, prefix0);
+                appendWord(&unbalancedLeft0, balanced0);
 
                 // Fully unbalanced: prefix + balanced + suffix
                 appendWord(&fullyUnbalanced, prefix);
@@ -229,7 +229,7 @@ namespace wali
         
 
         // Accepts  <balanced> (+
-        class AcceptsStrictlyUnbalancedLeft
+        class AcceptsStrictlyUnbalancedRight
         {
         public:
             //            ( push q0
@@ -248,7 +248,7 @@ namespace wali
             State const q0, q1;
             Symbol const zero, call, ret;
 
-            AcceptsStrictlyUnbalancedLeft()
+            AcceptsStrictlyUnbalancedRight()
                 : q0(getKey("q0sl")), q1(getKey("q1sl"))
                 , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
             {
@@ -267,7 +267,7 @@ namespace wali
 
 
         // Accepts  <balanced> (*
-        class AcceptsPossiblyUnbalancedLeft
+        class AcceptsPossiblyUnbalancedRight
         {
         public:
             //            ( push q0
@@ -286,7 +286,7 @@ namespace wali
             State const q0, q1;
             Symbol const zero, call, ret;
 
-            AcceptsPossiblyUnbalancedLeft()
+            AcceptsPossiblyUnbalancedRight()
                 : q0(getKey("q0ml")), q1(getKey("q1ml"))
                 , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
             {
@@ -306,7 +306,7 @@ namespace wali
 
 
         // Accepts )* <balanced>
-        class AcceptsPossiblyUnbalancedRight
+        class AcceptsPossiblyUnbalancedLeft
         {
         public:
             //            ( push q0
@@ -326,7 +326,7 @@ namespace wali
             State const q0, q1;
             Symbol const zero, call, ret;
 
-            AcceptsPossiblyUnbalancedRight()
+            AcceptsPossiblyUnbalancedLeft()
                 : q0(getKey("q0mr")), q1(getKey("q1mr"))
                 , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
             {
@@ -385,7 +385,7 @@ namespace wali
         };
 
         // Accepts )+ <balanced>
-        class AcceptsStrictlyUnbalancedRight
+        class AcceptsStrictlyUnbalancedLeft
         {
         public:
             //            ( push q0
@@ -410,13 +410,13 @@ namespace wali
             //
             // This has two "copies" of AcceptsBalancedOnly, with the extra
             // transition between them and the limited accept states, and the
-            // extra pop transition like AcceptsPossiblyUnbalancedRight
+            // extra pop transition like AcceptsPossiblyUnbalancedLeft
 
             NWA nwa;
             State const q0, q1, q2, q3;
             Symbol const zero, call, ret;
 
-            AcceptsStrictlyUnbalancedRight()
+            AcceptsStrictlyUnbalancedLeft()
                 : q0(getKey("q0sr")), q1(getKey("q1sr"))
                 , q2(getKey("q2sr")), q3(getKey("q3sr"))
                 , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
