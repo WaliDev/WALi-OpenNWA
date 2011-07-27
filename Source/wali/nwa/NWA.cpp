@@ -1,3 +1,6 @@
+#include <sstream>
+#include <cstring>
+
 #include "wali/nwa/NWA.hpp"
 #include "wali/nwa/details/Configuration.hpp"
 #include "wali/nwa/NestedWord.hpp"
@@ -1937,6 +1940,7 @@ namespace wali
 #endif
 
       reachable.prune();
+      //reachable.print_dot(std::cout << "Reachable after prune: \n") << "\n";
 
       //If there are no transitions in this intersection, then the NWA is empty.
       wali::wfa::TransCounter tc = wali::wfa::TransCounter();
@@ -2577,6 +2581,14 @@ namespace wali
       return os;
     }
 
+    const char *
+    NWA::toStringGdb() const
+    {
+      std::stringstream ss;
+      print(ss);
+
+      return strdup(ss.str().c_str());
+    }
 
     void
     NWA::combineWith(NWA const & rhs)

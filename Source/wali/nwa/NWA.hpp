@@ -1245,7 +1245,8 @@ namespace wali
        */
       bool _private_isEmpty_( ) const;
 
-      
+
+      const char * toStringGdb() const;
 
 
       /**
