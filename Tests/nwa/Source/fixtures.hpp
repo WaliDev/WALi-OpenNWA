@@ -208,7 +208,7 @@ namespace wali
             Symbol const zero, call, ret;
 
             AcceptsBalancedOnly()
-                : q0(getKey("q0")), q1(getKey("q1"))
+                : q0(getKey("q0b")), q1(getKey("q1b"))
                 , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
             {
                 nwa.addInitialState(q0);
@@ -245,7 +245,7 @@ namespace wali
             Symbol const zero, call, ret;
 
             AcceptsStrictlyUnbalancedLeft()
-                : q0(getKey("q0")), q1(getKey("q1"))
+                : q0(getKey("q0sl")), q1(getKey("q1sl"))
                 , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
             {
                 nwa.addInitialState(q0);
@@ -283,7 +283,7 @@ namespace wali
             Symbol const zero, call, ret;
 
             AcceptsPossiblyUnbalancedLeft()
-                : q0(getKey("q0")), q1(getKey("q1"))
+                : q0(getKey("q0ml")), q1(getKey("q1ml"))
                 , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
             {
                 nwa.addInitialState(q0);
@@ -323,7 +323,7 @@ namespace wali
             Symbol const zero, call, ret;
 
             AcceptsPossiblyUnbalancedRight()
-                : q0(getKey("q0")), q1(getKey("q1"))
+                : q0(getKey("q0mr")), q1(getKey("q1mr"))
                 , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
             {
                 nwa.addInitialState(q0);
@@ -362,7 +362,7 @@ namespace wali
             Symbol const zero, call, ret;
 
             AcceptsPositionallyConsistentString()
-                : q0(getKey("q0")), q1(getKey("q1"))
+                : q0(getKey("q0mf")), q1(getKey("q1mf"))
                 , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
             {
                 nwa.addInitialState(q0);
@@ -411,8 +411,8 @@ namespace wali
             Symbol const zero, call, ret;
 
             AcceptsStrictlyUnbalancedRight()
-                : q0(getKey("q0")), q1(getKey("q1"))
-                , q2(getKey("q2")), q3(getKey("q3"))
+                : q0(getKey("q0sr")), q1(getKey("q1sr"))
+                , q2(getKey("q2sr")), q3(getKey("q3sr"))
                 , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
             {
                 nwa.addInitialState(q0);
