@@ -70,7 +70,7 @@ namespace wali {
 
                         // First, make sure that we expect an answer
                         // (i.e. it's not no_answer).
-                        if (expected_answer) {
+                        if (expected_answer && left != right) {
                             NWARefPtr u = unionNWA(nwas[left], nwas[right]);
                             
                             EXPECT_TRUE(query::languageEquals(*expected_answer, *u));
