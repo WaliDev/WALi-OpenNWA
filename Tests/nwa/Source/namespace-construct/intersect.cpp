@@ -63,7 +63,7 @@ namespace wali {
                 for (unsigned left = 0 ; left < num_nwas ; ++left) {
                     for (unsigned right = 0 ; right < num_nwas ; ++right) {
                         std::stringstream ss;
-                        ss << "Testing NWA " << left << " union " << right;
+                        ss << "Testing NWA " << left << " intersect " << right;
                         SCOPED_TRACE(ss.str());
 
                         NWA const * expected_answer = expected_answers[left][right];
