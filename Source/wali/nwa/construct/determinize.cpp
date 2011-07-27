@@ -385,10 +385,10 @@ namespace wali
         //Deterministic final states.
         //Necessary components for a final state, i.e., 
         //any final state must contain one of the pairs in 
-        //{(init,fin) | init is an initial state and fin is a final state}
+        //{(q,fin) | q is any state and fin is a final state}
         DECLARE(BinaryRelation, Rf);
-        for( StateIterator iit = nondet.beginInitialStates();
-             iit != nondet.endInitialStates(); iit++ )
+        for( StateIterator iit = nondet.beginStates();
+             iit != nondet.endStates(); iit++ )
         {
           for( StateIterator fit = nondet.beginFinalStates();
                fit != nondet.endFinalStates(); fit++ )
