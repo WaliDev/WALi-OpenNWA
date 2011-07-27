@@ -406,9 +406,11 @@ namespace wali
             //   |  |                    \_/
             //   \_/
             //    0
+            //   ) pop q0
             //
             // This has two "copies" of AcceptsBalancedOnly, with the extra
-            // transition between them and the limited accept states.
+            // transition between them and the limited accept states, and the
+            // extra pop transition like AcceptsPossiblyUnbalancedRight
 
             NWA nwa;
             State const q0, q1, q2, q3;
@@ -438,8 +440,9 @@ namespace wali
                 nwa.addReturnTrans(q3, q3, ret, q3);
                 nwa.addReturnTrans(q3, q2, ret, q2);
 
-                // Connector
+                // Connector and extra return transiiton
                 nwa.addReturnTrans(q0, q0, ret, q2);
+                nwa.addReturnTrans(q2, q0, ret, q2);
             }
 
         };
