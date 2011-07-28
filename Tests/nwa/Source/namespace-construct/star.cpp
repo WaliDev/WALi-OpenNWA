@@ -12,7 +12,8 @@ using namespace wali::nwa;
 
 #define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
 
-// For every case, L(nwa[i])* = L(nwa[i])
+// For every case, L(nwa[i])* = L(nwa[i]), except that the strictly
+// unbalanced ones don't accept epsilon.
 static NWA const nwas[] = {
     NWA(),
     AcceptsBalancedOnly().nwa,
@@ -37,9 +38,26 @@ namespace wali {
                     ss << "Testing NWA " << nwa;
                     SCOPED_TRACE(ss.str());
 
-                    NWARefPtr s = star(nwas[nwa]);
-                    
-                    EXPECT_TRUE(query::languageEquals(nwas[nwa], *s));
+                    NWA src = nwas[nwa];
+                    NWARefPtr closure = star(nwas[nwa]);
+
+                    // Now we split. If the original language does not
+                    // include epsilon, then I don't want to do anything so
+                    // as to minimize what I'm testing.
+                    NestedWord epsilon;
+
+                    if (!query::languageContains(src, epsilon)) {
+                        // Since closure=src* contains epsilon but src does
+                        // not, we either have to remove epsilon from src* or
+                        // add it to src before we compare. We'll do the
+                        // latter.
+                        State newstart = getKey("newStart");
+                        
+                        src.addInitialState(newstart);
+                        src.addFinalState(newstart);
+                    }
+
+                    EXPECT_TRUE(query::languageEquals(src, *closure));
                 }
             }
 
