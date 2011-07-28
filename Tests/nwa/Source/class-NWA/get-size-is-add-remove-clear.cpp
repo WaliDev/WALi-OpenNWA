@@ -997,7 +997,7 @@ namespace wali
 
 
         /// Make sure WALI_BAD_KEY causes an assertion
-        TEST(wali$nwa$NWA$$isState$and$addState$and$removeState, assertsOnWaliBadKey)
+        TEST(wali$nwa$NWA$$isState$and$addState$and$removeState$DeathTest, assertsOnWaliBadKey)
         {
             NWA nwa;
             EXPECT_DEATH({
@@ -1014,7 +1014,7 @@ namespace wali
                 "< wali::WALI_BAD_KEY");
         }
 
-        TEST(wali$nwa$NWA$$isInitialState$and$addInitialState$and$removeInitialState, assertsOnWaliBadKey)
+        TEST(wali$nwa$NWA$$isInitialState$and$addInitialState$and$removeInitialState$DeathTest, assertsOnWaliBadKey)
         {
             NWA nwa;
             EXPECT_DEATH({
@@ -1031,7 +1031,7 @@ namespace wali
                 "< wali::WALI_BAD_KEY");
         }
 
-        TEST(wali$nwa$NWA$$isFinalState$and$addFinalState$and$removeFinalState, assertsOnWaliBadKey)
+        TEST(wali$nwa$NWA$$isFinalState$and$addFinalState$and$removeFinalState$DeathTest, assertsOnWaliBadKey)
         {
             NWA nwa;
             EXPECT_DEATH({
@@ -1048,7 +1048,7 @@ namespace wali
                 "< wali::WALI_BAD_KEY");
         }
 
-        TEST(wali$nwa$NWA$$isSymbol$and$addSymbol$and$removeSymbol, assertsOnWaliBadKey)
+        TEST(wali$nwa$NWA$$isSymbol$and$addSymbol$and$removeSymbol$DeathTest, assertsOnWaliBadKey)
         {
             NWA nwa;
             EXPECT_DEATH({
@@ -1066,7 +1066,7 @@ namespace wali
         }
 
 
-        TEST(wali$nwa$NWA$$addInternalTrans$and$removeInternalTrans, assertsOnWaliBadKey)
+        TEST(wali$nwa$NWA$$addInternalTrans$and$removeInternalTrans$DeathTest, assertsOnWaliBadKey)
         {
             NWA nwa;
 
@@ -1100,7 +1100,7 @@ namespace wali
                 "< wali::WALI_BAD_KEY");
         }
         
-        TEST(wali$nwa$NWA$$addCallTrans$and$removeCallTrans, assertsOnWaliBadKey)
+        TEST(wali$nwa$NWA$$addCallTrans$and$removeCallTrans$DeathTest, assertsOnWaliBadKey)
         {
             NWA nwa;
 
@@ -1134,7 +1134,7 @@ namespace wali
                 "< wali::WALI_BAD_KEY");
         }
 
-        TEST(wali$nwa$NWA$$addReturnTrans$and$removeReturnTrans, assertsOnWaliBadKey)
+        TEST(wali$nwa$NWA$$addReturnTrans$and$removeReturnTrans$DeathTest, assertsOnWaliBadKey)
         {
             NWA nwa;
 

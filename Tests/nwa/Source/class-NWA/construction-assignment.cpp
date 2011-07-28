@@ -370,7 +370,7 @@ namespace wali
 
 
         ///////////////////////////
-        TEST(wali$nwa$NWA$$getClientInfo$and$setClientInfo, waliBadKeyAsserts)
+        TEST(wali$nwa$NWA$$getClientInfo$and$setClientInfo$DeathTest, waliBadKeyAsserts)
         {
             NWA nwa;
             EXPECT_DEATH({
