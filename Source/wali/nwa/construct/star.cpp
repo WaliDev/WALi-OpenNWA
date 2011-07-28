@@ -63,6 +63,9 @@ namespace wali
         }
       }
 
+      clearInitialStates();
+      clearFinalStates();
+
       //The initial and final states of A* are Q0'. 
       for( StateIterator sit = first.beginInitialStates(); 
            sit != first.endInitialStates(); sit++ )
