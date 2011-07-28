@@ -327,8 +327,8 @@ namespace wali
 
         ////////////////////////////////
         // getClientInfo(), setClientInfo()
-        //  - some prerequsites for the tests above to be meaningful
-        TEST(wali$nwa$NWA$NWA$$getClientInfo$and$setClientInfo, clientInfoStartsOffNull)
+        //  - some prerequsites for the tests above to be meaningful        
+        TEST(wali$nwa$NWA$$getClientInfo$and$setClientInfo, clientInfoStartsOffNull)
         {
             OddNumEvenGroupsNwa fixture;
 
@@ -337,7 +337,7 @@ namespace wali
         }
         
         
-        TEST(wali$nwa$NWA$NWA$$getClientInfo$and$setClientInfo, getAfterSetWorks)
+        TEST(wali$nwa$NWA$$getClientInfo$and$setClientInfo, getAfterSetWorks)
         {
             OddNumEvenGroupsNwa fixture;
 
@@ -354,7 +354,7 @@ namespace wali
             EXPECT_EQ(q1_ci, fixture.nwa.getClientInfo(fixture.q1));
         }
 
-        TEST(wali$nwa$NWA$NWA$$getClientInfo$and$setClientInfo, canSetClientInfoToNull)
+        TEST(wali$nwa$NWA$$getClientInfo$and$setClientInfo, canSetClientInfoToNull)
         {
             OddNumEvenGroupsNwa fixture;
 
@@ -368,5 +368,19 @@ namespace wali
             EXPECT_TRUE(fixture.nwa.getClientInfo(fixture.q0) == NULL);
         }
 
+
+        ///////////////////////////
+        TEST(wali$nwa$NWA$$getClientInfo$and$setClientInfo, waliBadKeyAsserts)
+        {
+            NWA nwa;
+            EXPECT_DEATH({
+                    nwa.getClientInfo(WALI_BAD_KEY);
+                },
+                "state < wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.setClientInfo(WALI_BAD_KEY, NULL);
+                },
+                "state < wali::WALI_BAD_KEY");
+        }
     }
 }

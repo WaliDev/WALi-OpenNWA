@@ -992,6 +992,189 @@ namespace wali
         
         //     - For addYYYTrans, add more than one transition with the given source/sym,
         //       source/tgt, and sym/tgt.
-        // 
+        //
+
+
+
+        /// Make sure WALI_BAD_KEY causes an assertion
+        TEST(wali$nwa$NWA$$isState$and$addState$and$removeState, assertsOnWaliBadKey)
+        {
+            NWA nwa;
+            EXPECT_DEATH({
+                    nwa.addState(WALI_BAD_KEY);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.isState(WALI_BAD_KEY);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.removeState(WALI_BAD_KEY);
+                },
+                "< wali::WALI_BAD_KEY");
+        }
+
+        TEST(wali$nwa$NWA$$isInitialState$and$addInitialState$and$removeInitialState, assertsOnWaliBadKey)
+        {
+            NWA nwa;
+            EXPECT_DEATH({
+                    nwa.addInitialState(WALI_BAD_KEY);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.isInitialState(WALI_BAD_KEY);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.removeInitialState(WALI_BAD_KEY);
+                },
+                "< wali::WALI_BAD_KEY");
+        }
+
+        TEST(wali$nwa$NWA$$isFinalState$and$addFinalState$and$removeFinalState, assertsOnWaliBadKey)
+        {
+            NWA nwa;
+            EXPECT_DEATH({
+                    nwa.addFinalState(WALI_BAD_KEY);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.isFinalState(WALI_BAD_KEY);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.removeFinalState(WALI_BAD_KEY);
+                },
+                "< wali::WALI_BAD_KEY");
+        }
+
+        TEST(wali$nwa$NWA$$isSymbol$and$addSymbol$and$removeSymbol, assertsOnWaliBadKey)
+        {
+            NWA nwa;
+            EXPECT_DEATH({
+                    nwa.addSymbol(WALI_BAD_KEY);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.isSymbol(WALI_BAD_KEY);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.removeSymbol(WALI_BAD_KEY);
+                },
+                "< wali::WALI_BAD_KEY");
+        }
+
+
+        TEST(wali$nwa$NWA$$addInternalTrans$and$removeInternalTrans, assertsOnWaliBadKey)
+        {
+            NWA nwa;
+
+            // sanity
+            nwa.addInternalTrans(0, WALI_WILD, 0);
+            
+            EXPECT_DEATH({
+                    nwa.addInternalTrans(WALI_BAD_KEY, WALI_WILD, 0);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.addInternalTrans(0, WALI_BAD_KEY, 0);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.addInternalTrans(0, WALI_WILD, WALI_BAD_KEY);
+                },
+                "< wali::WALI_BAD_KEY");
+
+            EXPECT_DEATH({
+                    nwa.removeInternalTrans(WALI_BAD_KEY, WALI_WILD, 0);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.removeInternalTrans(0, WALI_BAD_KEY, 0);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.removeInternalTrans(0, WALI_WILD, WALI_BAD_KEY);
+                },
+                "< wali::WALI_BAD_KEY");
+        }
+        
+        TEST(wali$nwa$NWA$$addCallTrans$and$removeCallTrans, assertsOnWaliBadKey)
+        {
+            NWA nwa;
+
+            // sanity
+            nwa.addCallTrans(0, WALI_WILD, 0);
+            
+            EXPECT_DEATH({
+                    nwa.addCallTrans(WALI_BAD_KEY, WALI_WILD, 0);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.addCallTrans(0, WALI_BAD_KEY, 0);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.addCallTrans(0, WALI_WILD, WALI_BAD_KEY);
+                },
+                "< wali::WALI_BAD_KEY");
+
+            EXPECT_DEATH({
+                    nwa.removeCallTrans(WALI_BAD_KEY, WALI_WILD, 0);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.removeCallTrans(0, WALI_BAD_KEY, 0);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.removeCallTrans(0, WALI_WILD, WALI_BAD_KEY);
+                },
+                "< wali::WALI_BAD_KEY");
+        }
+
+        TEST(wali$nwa$NWA$$addReturnTrans$and$removeReturnTrans, assertsOnWaliBadKey)
+        {
+            NWA nwa;
+
+            // sanity
+            nwa.addReturnTrans(0, 0, WALI_WILD, 0);
+            
+            EXPECT_DEATH({
+                    nwa.addReturnTrans(WALI_BAD_KEY, 0, WALI_WILD, 0);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.addReturnTrans(0, WALI_BAD_KEY, WALI_WILD, 0);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.addReturnTrans(0, 0, WALI_BAD_KEY, 0);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.addReturnTrans(0, 0, WALI_WILD, WALI_BAD_KEY);
+                },
+                "< wali::WALI_BAD_KEY");
+
+            EXPECT_DEATH({
+                    nwa.removeReturnTrans(WALI_BAD_KEY, 0, WALI_WILD, 0);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.removeReturnTrans(0, WALI_BAD_KEY, WALI_WILD, 0);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.removeReturnTrans(0, 0, WALI_BAD_KEY, 0);
+                },
+                "< wali::WALI_BAD_KEY");
+            EXPECT_DEATH({
+                    nwa.removeReturnTrans(0, 0, WALI_WILD, WALI_BAD_KEY);
+                },
+                "< wali::WALI_BAD_KEY");
+        }
+
     }
 }
