@@ -79,6 +79,20 @@ namespace wali {
                 } // for left
             }
             
+
+            TEST(wali$nwa$construct$$concat, resultingAutomatonIsNondeterministic)
+            {
+                SomeElements e;
+                NWA left, right;
+                left.addInitialState(e.state);
+                left.addFinalState(e.state);
+                right.addInitialState(e.state2);
+                right.addInitialState(e.state2);
+
+                NWARefPtr u = concatenate(left, right);
+
+                EXPECT_FALSE(query::isDeterministic(*u));
+            }
             
         }
     }
