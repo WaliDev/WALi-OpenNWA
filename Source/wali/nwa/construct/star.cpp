@@ -31,6 +31,9 @@ namespace wali
     
     void NWA::_private_star_( NWA const & first )
     {
+      State newStart = getKey("kleeneStarStart");
+      assert(!first.isState(newStart));
+      
       //TODO: ponder the following ... 
       //Q: how do we prevent the stuck state from being the same as any of the states that we
       //      generate as a part of this process?
@@ -63,22 +66,25 @@ namespace wali
         }
       }
 
+     
+
+      //The initial and final state of A* is newStart
       clearInitialStates();
       clearFinalStates();
+      addInitialState(newStart);
+      addFinalState(newStart);
 
-      //The initial and final states of A* are Q0'. 
-      for( StateIterator sit = first.beginInitialStates(); 
-           sit != first.endInitialStates(); sit++ )
-      {
-        State sp = wali::getKey(*sit,prime);
-        addInitialState(sp);
-        addFinalState(sp);
+      // Add newStart->q0 transitions
+      for( StateIterator sit = first.beginInitialStates(); sit != first.endInitialStates(); sit++ ) {
+        State target = getKey(*sit, prime);
+        addInternalTrans(newStart, WALI_EPSILON, target);
       }
+      
 
       //Transitions of A*:
 
       //Internal: for each (q,a,p) in delta_i, A* gets (q,a,p) and (q',a,p') and if
-      //          p in Qf, then (q,a,r') and (q',a,r') for each r in Q0
+      //          p in Qf, then (q,a,newStart) and (q',a,newStart)
       for( InternalIterator iit = first.beginInternalTrans();
            iit != first.endInternalTrans(); iit++ )
       {
@@ -97,23 +103,16 @@ namespace wali
         //if p in Qf
         if( first.isFinalState(p) )
         {
-          //for each r in Q0
-          for( StateIterator sit = first.beginInitialStates(); 
-               sit != first.endInitialStates(); sit++ )
-          {
-            State rp = wali::getKey(*sit,prime);
+          //(q,a,r')
+          addInternalTrans(q,a,newStart);
 
-            //(q,a,r')
-            addInternalTrans(q,a,rp);
-
-            //(q',a,r')
-            addInternalTrans(qp,a,rp);
-          }
+          //(q',a,r')
+          addInternalTrans(qp,a,newStart);
         }
       }
 
       //Call: for each(q,a,p) in delta_c, A* gets (q,a,p) and (q',a,p), 
-      //      and if p in Qf then (q,a,r') and (q',a,r') for each r in Q0
+      //      and if p in Qf then (q,a,newStart) and (q',a,newStart)
       for( CallIterator cit = first.beginCallTrans();
            cit != first.endCallTrans(); cit++ )
       {
@@ -131,26 +130,19 @@ namespace wali
         //if p in Qf
         if( first.isFinalState(p) )
         {
-          //for each r in Q0
-          for( StateIterator sit = first.beginInitialStates();
-               sit != first.endInitialStates(); sit++ )
-          {
-            State rp = wali::getKey(*sit,prime);
+          //(q,a,r')
+          addCallTrans(q,a,newStart);
 
-            //(q,a,r')
-            addCallTrans(q,a,rp);
-
-            //(q',a,r')
-            addCallTrans(qp,a,rp);
-          }
+          //(q',a,r')
+          addCallTrans(qp,a,newStart);
         }
       }
 
       //Return: for each (q,r,a,p) in delta_r, A* gets (q,r,a,p) and (q,r',a,p'), 
-      //          and if p in Qf, then (q,r,a,s') and (q,r',a,s') for each s in Q0
+      //          and if p in Qf, t hen (q,r,a,s') and (q,r',a,s') for each s in Q0
       //          For each (q,r,a,p) in delra_r with r in Q0, 
-      //            A* gets (q',s,a,p') for each s in Q union Q' 
-      //          and if p in Qf, then (q',s,a,t') for each s in Q union Q' and t in Q0.
+      //            A* gets (q',s,a,p') for each s in Q union Q' and (q',newStart,a,p')
+      //          and if p in Qf, then (q',s,a,newStart) for each s in Q union Q' and (q',newStart,a,newStart)
       for( ReturnIterator rit = first.beginReturnTrans();
            rit != first.endReturnTrans(); rit++ )
       {
@@ -170,18 +162,11 @@ namespace wali
         //if p in Qf
         if( first.isFinalState(p) )
         {
-          //for each s in Q0
-          for( StateIterator sit = first.beginInitialStates();
-               sit != first.endInitialStates(); sit++ )
-          { 
-            State sp = wali::getKey(*sit,prime);
+          //(q,r,a,s')
+          addReturnTrans(q,r,a,newStart);
 
-            //(q,r,a,s')
-            addReturnTrans(q,r,a,sp);
-
-            //(q,r',a,s')
-            addReturnTrans(q,rp,a,sp);
-          } 
+          //(q,r',a,s')
+          addReturnTrans(q,rp,a,newStart);
         }
 
         //if r in Q0
@@ -203,23 +188,22 @@ namespace wali
             State sp = wali::getKey(s,prime);
             addReturnTrans(qp,sp,a,pp);
 
+            // (q',newStart,a,p')
+            addReturnTrans(qp,newStart,a,pp);
+
             //if p in Qf
             if( first.isFinalState(p) )
             {
-              //for each t in Q0
-              for( StateIterator it = first.beginInitialStates();
-                   it != first.endInitialStates(); it++ )
-              {                
-                State tp = wali::getKey(*it,prime);
+              //Handle s
+              //(q',s,a,t')
+              addReturnTrans(qp,s,a,newStart);
 
-                //Handle s
-                //(q',s,a,t')
-                addReturnTrans(qp,s,a,tp);
+              //Handle corresponding s'
+              //(q',s',a,t')
+              addReturnTrans(qp,sp,a,newStart);
 
-                //Handle corresponding s'
-                //(q',s',a,t')
-                addReturnTrans(qp,sp,a,tp);
-              }
+              //(q',newStart,a,newStart)
+              addReturnTrans(qp,newStart,a,newStart);
             }
           }
         }
