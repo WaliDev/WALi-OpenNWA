@@ -33,6 +33,26 @@ namespace wali {
 
                 EXPECT_FALSE(query::languageIsEmpty(*det));
             }
+
+            
+            TEST(wali$nwa$construct$$determinize, initialStateHasEpsilonClosureDone)
+            {
+                SomeElements e;
+                NWA nwa;
+
+                //              *
+                //  --> state -----> ((state2))
+                
+                nwa.addInitialState(e.state);
+                nwa.addFinalState(e.state2);
+
+                nwa.addInternalTrans(e.state, WALI_EPSILON, e.state2);
+
+                NWARefPtr det = determinize(nwa);
+
+                EXPECT_FALSE(query::languageIsEmpty(*det));
+            }
+
             
         }
     }

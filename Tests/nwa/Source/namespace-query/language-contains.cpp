@@ -82,6 +82,27 @@ namespace wali {
             }
 
 
+            TEST(wali$nwa$query$$languageContains, epsilonClosureAtStart)
+            {
+                NWA nwa;
+                SomeElements e;
+
+                //              *           symbol
+                //  --> state ----->  state2 ----> ((state3))
+
+                nwa.addInitialState(e.state);
+                nwa.addFinalState(e.state3);
+
+                nwa.addInternalTrans(e.state, WALI_EPSILON, e.state2);
+                nwa.addInternalTrans(e.state2, e.symbol, e.state3);
+
+
+                NestedWord nw;
+                nw.appendInternal(e.symbol);
+
+                EXPECT_TRUE(languageContains(nwa, nw));
+            }
+
         }
     }
 }
