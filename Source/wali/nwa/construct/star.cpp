@@ -79,6 +79,13 @@ namespace wali
         State target = getKey(*sit, prime);
         addInternalTrans(newStart, WALI_EPSILON, target);
       }
+      for( StateIterator sit = first.beginFinalStates(); sit != first.endFinalStates(); sit++ ) {
+        State f = *sit;
+        State fp = getKey(*sit, prime);
+        
+        addInternalTrans(f, WALI_EPSILON, newStart);
+        addInternalTrans(fp, WALI_EPSILON, newStart);
+      }
       
 
       //Transitions of A*:
@@ -99,16 +106,6 @@ namespace wali
         State qp = wali::getKey(q,prime);
         State pp = wali::getKey(p,prime);
         addInternalTrans(qp,a,pp);
-
-        //if p in Qf
-        if( first.isFinalState(p) )
-        {
-          //(q,a,r')
-          addInternalTrans(q,a,newStart);
-
-          //(q',a,r')
-          addInternalTrans(qp,a,newStart);
-        }
       }
 
       //Call: for each(q,a,p) in delta_c, A* gets (q,a,p) and (q',a,p), 
@@ -126,16 +123,6 @@ namespace wali
         //(q',a,p)
         State qp = wali::getKey(q,prime);
         addCallTrans(qp,a,p);
-
-        //if p in Qf
-        if( first.isFinalState(p) )
-        {
-          //(q,a,r')
-          addCallTrans(q,a,newStart);
-
-          //(q',a,r')
-          addCallTrans(qp,a,newStart);
-        }
       }
 
       //Return: for each (q,r,a,p) in delta_r, A* gets (q,r,a,p) and (q,r',a,p'), 
@@ -159,16 +146,6 @@ namespace wali
         State pp = wali::getKey(p,prime);
         addReturnTrans(q,rp,a,pp);
 
-        //if p in Qf
-        if( first.isFinalState(p) )
-        {
-          //(q,r,a,s')
-          addReturnTrans(q,r,a,newStart);
-
-          //(q,r',a,s')
-          addReturnTrans(q,rp,a,newStart);
-        }
-
         //if r in Q0
         if( first.isInitialState(r) )
         {
@@ -190,21 +167,6 @@ namespace wali
 
             // (q',newStart,a,p')
             addReturnTrans(qp,newStart,a,pp);
-
-            //if p in Qf
-            if( first.isFinalState(p) )
-            {
-              //Handle s
-              //(q',s,a,t')
-              addReturnTrans(qp,s,a,newStart);
-
-              //Handle corresponding s'
-              //(q',s',a,t')
-              addReturnTrans(qp,sp,a,newStart);
-
-              //(q',newStart,a,newStart)
-              addReturnTrans(qp,newStart,a,newStart);
-            }
           }
         }
       }
