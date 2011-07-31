@@ -468,6 +468,34 @@ namespace wali {
     transitive_closure(typename RelationTypedefs<State>::BinaryRelation & out_result,
                        typename RelationTypedefs<State>::BinaryRelation const & r)
     {
+      // When doing transitive closure of a relation R (from SxS), you make a
+      // 2-D array of size N-by-N, where N is the number of elements in S,
+      // then do a triply-nested loop over it.
+      //
+      // Because the access in the loop are done so many times, they should
+      // be fast, so I made them into vectors (well, a vector of deques to
+      // avoid the vector<bool> problem). But to do things right, you have to
+      // map Wali Keys to indices in this matrix.
+      //
+      // I didn't want to do this before, so I just left the matrix
+      // (potentially) very sparse. If your NWA's keys were exclusively in
+      // the range 3000 to 4000, then you'd get a 4000-by-4000 matrix. Of
+      // course, you only really need a 1000-by-1000 matrix, so multiplying
+      // the size by 4 meant that it would take 4^3=64 times longer than it
+      // "should."
+      //
+      // This hasn't been a problem for me in the past, but in the unit tests
+      // we do determinization on NWAs that are created quite far into the
+      // procedure -- and with all the calls to determinize that were being
+      // done, doing repeated useless work in transitive_closure() was taking
+      // the running time from well under a second to half a minute.
+      //
+      // So I fixed it for good. I convert the input relation to
+      // transitive_closure into one that is dense: mapping the Wali keys
+      // down to a dense range 1...N (these I call "canonical keys"), do the
+      // transitive closure on that, then map the keys in the resulting
+      // relation back.
+
       if (r.empty()) return;
       
       typedef typename RelationTypedefs<State>::BinaryRelation BinaryRelation;
