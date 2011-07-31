@@ -372,20 +372,10 @@ namespace wali {
       return std::max(s1, std::max(s2, s3));
     }
 
-    /// Constructs the transitive closure of an algorithm.
-    ///
-    /// TODO: Right now we break the abstraction and assume State is a
-    /// (reasonably small) integer.
-    ///
-    /// { (p, q) | p R* q} or however you want to denote it
-    ///
-    /// Parameters:
-    ///   out_result: The transitive closure of r
-    ///   r:          The source relation
     template<typename State>
     void
-    transitive_closure(typename RelationTypedefs<State>::BinaryRelation & out_result,
-                       typename RelationTypedefs<State>::BinaryRelation const & r)
+    transitive_closure_no_remap(typename RelationTypedefs<State>::BinaryRelation & out_result,
+                                typename RelationTypedefs<State>::BinaryRelation const & r)
     {
       typedef typename RelationTypedefs<State>::BinaryRelation::const_iterator Iterator;
 
@@ -409,7 +399,8 @@ namespace wali {
         matrix[i].resize(largest_state);
       }
 
-      for(size_t source=0; source<largest_state; ++source)
+      // The first key we use is 1, not 0
+      for(size_t source=1; source<largest_state; ++source)
       {
         matrix[source][source] = 1;
       }
@@ -460,6 +451,94 @@ namespace wali {
         }
       } // done with 
     }
+    
+    
+    /// Constructs the transitive closure of an algorithm.
+    ///
+    /// TODO: Right now we break the abstraction and assume State is a
+    /// (reasonably small) integer.
+    ///
+    /// { (p, q) | p R* q} or however you want to denote it
+    ///
+    /// Parameters:
+    ///   out_result: The transitive closure of r
+    ///   r:          The source relation
+    template<typename State>
+    void
+    transitive_closure(typename RelationTypedefs<State>::BinaryRelation & out_result,
+                       typename RelationTypedefs<State>::BinaryRelation const & r)
+    {
+      if (r.empty()) return;
+      
+      typedef typename RelationTypedefs<State>::BinaryRelation BinaryRelation;
+      typedef typename RelationTypedefs<State>::BinaryRelation::const_iterator Iterator;
+
+      // Forward map is input State -> canonical State
+      std::map<State, State> forward;
+      std::map<State, State> backward;
+
+      BinaryRelation r_canonical;
+      State next_canonical = 1;
+
+      std::cout << "\nNew transitive closure call:\n";
+
+      //////////////////////////////////////////
+      // Conversion input->canonical
+      for(Iterator edge_original = r.begin(); edge_original != r.end(); ++edge_original)
+      {
+        State src_original = edge_original->first;
+        State tgt_original = edge_original->second;
+
+        if (forward.find(src_original) == forward.end()) {
+          //std::cout << "  Mapping input key " << src_original << " to canonical key " << next_canonical << "\n";
+          // Have not seen src_original yet
+          forward[src_original] = next_canonical;
+          backward[next_canonical] = src_original;
+          ++next_canonical;
+        }
+
+        if (forward.find(tgt_original) == forward.end()) {
+          //std::cout << "  Mapping input key " << src_original << " to canonical key " << next_canonical << "\n";
+          // Have not seen src_original yet
+          forward[tgt_original] = next_canonical;
+          backward[next_canonical] = tgt_original;
+          ++next_canonical;
+        }
+
+        State src_canonical = forward[src_original];
+        State tgt_canonical = forward[tgt_original];
+        
+        r_canonical.insert(std::make_pair(src_canonical, tgt_canonical));
+      }
+
+      /////////////////////////////
+      // Actual transitive closure
+      BinaryRelation canonical_closure;
+      transitive_closure_no_remap<State>(canonical_closure, r_canonical);
+
+      /////////////////////////////
+      // Conversion canonical->input
+      for(Iterator edge_canonical = canonical_closure.begin();
+          edge_canonical != canonical_closure.end(); ++edge_canonical)
+      {
+        State src_canonical = edge_canonical->first;
+        State tgt_canonical = edge_canonical->second;
+
+        if (backward.find(src_canonical) == backward.end()) {
+          std:: cout << "  ERROR: cannot find original key for canonical key " << src_canonical << std::endl;
+          std:: cout << "         related to canonical key " << tgt_canonical << std::endl;
+        }
+
+        assert(backward.find(src_canonical) != backward.end());
+        assert(backward.find(tgt_canonical) != backward.end());
+
+        State src_original = backward[src_canonical];
+        State tgt_original = backward[tgt_canonical];
+
+        out_result.insert(std::make_pair(src_original, tgt_original));
+      }      
+    }
+
 
 
     /// Returns the intersection of two binary relations on states
