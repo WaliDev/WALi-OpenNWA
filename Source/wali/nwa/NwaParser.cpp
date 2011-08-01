@@ -80,17 +80,17 @@ namespace wali { namespace nwa { namespace parser { namespace details {
 
         struct CharactersDifferException : std::exception {
           std::string lit;
-          int differing_pos;
+          size_t differing_pos;
           int read_char;
           boost::shared_array<const char> message;
           int line;
 
-          CharactersDifferException(std::string const & l, int p, int c, int li)
+          CharactersDifferException(std::string const & l, size_t p, int c, int li)
             : lit(l)
             , differing_pos(p)
             , read_char(c)
+            , message(NULL)              
             , line(li)
-            , message(NULL)
           {
             assert(c!=-1);
             message = boost::shared_array<const char>(err_msg());
@@ -216,8 +216,9 @@ namespace wali { namespace nwa { namespace parser { namespace details {
                 ++paren_count;
               }
             }
-        
-            ret += is.get();
+
+            // is.get() will either be a char or -1 (which we took care of above)
+            ret += static_cast<char>(is.get());
           }
           discardws(is);
           return ret;
