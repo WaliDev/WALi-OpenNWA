@@ -122,7 +122,7 @@ namespace wali { namespace nwa { namespace parser { namespace details {
 
           ~CharactersDifferException() throw()
           {
-            if (message[0] != '[') {
+            if (message && message[0] != '[') {
               // We allocated this in err_msg
               delete[] message;
             }
