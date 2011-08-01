@@ -508,7 +508,7 @@ namespace wali {
       BinaryRelation r_canonical;
       State next_canonical = 1;
 
-      std::cout << "\nNew transitive closure call:\n";
+      //std::cout << "\nNew transitive closure call:\n";
 
       //////////////////////////////////////////
       // Conversion input->canonical
