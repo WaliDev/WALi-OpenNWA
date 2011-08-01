@@ -185,9 +185,12 @@ namespace wali {
         typename Map::const_iterator store_iter = relation2_1.find(key);
         typename Map::const_iterator next_map = store_iter;
 
-        // Now, if key wasn't actually *in* the map, then we want the
-        // range to be empty. Otherwise, advance to the next set.
-        if(store_iter->first == key) {
+        // Now, if key wasn't actually *in* the map, then we want the range
+        // to be empty. This is the case right now, since
+        // store_iter==next_map.
+        // 
+        // Otherwise (if we did find 'key', advance 'next_map' to the next set.
+        if(store_iter != relation2_1.end()) {
           ++next_map;
         }
 
