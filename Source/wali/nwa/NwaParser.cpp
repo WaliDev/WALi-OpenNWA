@@ -7,6 +7,8 @@
 #include <ctime>
 #include <cctype>
 
+#include <boost/shared_array.hpp>
+
 #include "wali/nwa/NWAParser.hpp"
 #include "wali/nwa/NWA.hpp"
 #include "wali/KeyContainer.hpp"
@@ -80,7 +82,7 @@ namespace wali { namespace nwa { namespace parser { namespace details {
           std::string lit;
           int differing_pos;
           int read_char;
-          const char * message;
+          boost::shared_array<const char> message;
           int line;
 
           CharactersDifferException(std::string const & l, int p, int c, int li)
@@ -88,14 +90,15 @@ namespace wali { namespace nwa { namespace parser { namespace details {
             , differing_pos(p)
             , read_char(c)
             , line(li)
+            , message(NULL)
           {
             assert(c!=-1);
-            message = err_msg();
+            message = boost::shared_array<const char>(err_msg());
           }
 
           const char * what() const throw()
           {
-            return message;
+            return message.get();
           }
 
           const char * err_msg() const
@@ -112,21 +115,19 @@ namespace wali { namespace nwa { namespace parser { namespace details {
               char * pm = new char[s.size()];
             
               std::copy(s.begin(), s.end(), pm);
+              std::cout << "CharactersDifferException allocated message at " << (unsigned long long) pm << "\n";
               return pm;
             }
-            catch (std::exception const & e) {
-              (void) e;
-              return "[CharactersDifferException: cannot allocate memory]\n";
+            catch (...) {
+              //std::cout << "CharactersDifferException could not allocate memory\n";
+              //return "[CharactersDifferException: cannot allocate memory]\n";
+              return NULL;
             }
           }
 
+          virtual
           ~CharactersDifferException() throw()
-          {
-            if (message && message[0] != '[') {
-              // We allocated this in err_msg
-              delete[] message;
-            }
-          }
+          {}
         };
 
         struct StreamTooShortException   : std::exception {};
