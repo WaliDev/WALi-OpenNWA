@@ -215,6 +215,19 @@ namespace wali
                 : q0(getKey("q0b")), q1(getKey("q1b"))
                 , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
             {
+                init();
+            }
+
+            AcceptsBalancedOnly(int a)
+                : q0(getKey("q0b")), q1(getKey("q1b"))
+                , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
+            {
+                (void) a;
+                init();
+            }
+
+            void init()
+            {
                 nwa.addInitialState(q0);
                 nwa.addFinalState(q0);
                 
@@ -251,6 +264,19 @@ namespace wali
             AcceptsStrictlyUnbalancedRight()
                 : q0(getKey("q0sl")), q1(getKey("q1sl"))
                 , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
+            {
+                init();
+            }
+
+            AcceptsStrictlyUnbalancedRight(int a)
+                : q0(getKey("q0sl")), q1(getKey("q1sl"))
+                , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
+            {
+                (void) a;
+                init();
+            }
+
+            void init()
             {
                 nwa.addInitialState(q0);
                 nwa.addFinalState(q1);
@@ -289,6 +315,19 @@ namespace wali
             AcceptsPossiblyUnbalancedRight()
                 : q0(getKey("q0ml")), q1(getKey("q1ml"))
                 , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
+            {
+                init();
+            }
+
+            AcceptsPossiblyUnbalancedRight(int a)
+                : q0(getKey("q0ml")), q1(getKey("q1ml"))
+                , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
+            {
+                (void) a;
+                init();
+            }
+
+            void init()
             {
                 nwa.addInitialState(q0);
                 nwa.addFinalState(q0);
@@ -330,6 +369,19 @@ namespace wali
                 : q0(getKey("q0mr")), q1(getKey("q1mr"))
                 , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
             {
+                init();
+            }
+
+            AcceptsPossiblyUnbalancedLeft(int a)
+                : q0(getKey("q0mr")), q1(getKey("q1mr"))
+                , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
+            {
+                (void) a;
+                init();
+            }
+
+            void init()
+            {
                 nwa.addInitialState(q0);
                 nwa.addFinalState(q0);
                 
@@ -368,6 +420,19 @@ namespace wali
             AcceptsPositionallyConsistentString()
                 : q0(getKey("q0mf")), q1(getKey("q1mf"))
                 , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
+            {
+                init();
+            }
+
+            AcceptsPositionallyConsistentString(int a)
+                : q0(getKey("q0mf")), q1(getKey("q1mf"))
+                , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
+            {
+                (void) a;
+                init();
+            }
+
+            void init()
             {
                 nwa.addInitialState(q0);
                 nwa.addFinalState(q0);
@@ -420,6 +485,22 @@ namespace wali
                 : q0(getKey("q0sr")), q1(getKey("q1sr"))
                 , q2(getKey("q2sr")), q3(getKey("q3sr"))
                 , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
+            {
+                init();
+            }
+
+
+            AcceptsStrictlyUnbalancedLeft(int a)
+                : q0(getKey("q0sr")), q1(getKey("q1sr"))
+                , q2(getKey("q2sr")), q3(getKey("q3sr"))
+                , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
+            {
+                (void) a;
+                init();
+            }
+
+            
+            void init()
             {
                 nwa.addInitialState(q0);
                 nwa.addFinalState(q2);
