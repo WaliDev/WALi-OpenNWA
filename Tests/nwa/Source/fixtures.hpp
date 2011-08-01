@@ -218,11 +218,10 @@ namespace wali
                 init();
             }
 
-            AcceptsBalancedOnly(int a)
+            AcceptsBalancedOnly(Symbol callKey, Symbol returnKey)
                 : q0(getKey("q0b")), q1(getKey("q1b"))
-                , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
+                , zero(getKey("0")), call(callKey), ret(returnKey)
             {
-                (void) a;
                 init();
             }
 
@@ -268,11 +267,10 @@ namespace wali
                 init();
             }
 
-            AcceptsStrictlyUnbalancedRight(int a)
+            AcceptsStrictlyUnbalancedRight(Symbol callKey, Symbol returnKey)
                 : q0(getKey("q0sl")), q1(getKey("q1sl"))
-                , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
+                , zero(getKey("0")), call(callKey), ret(returnKey)
             {
-                (void) a;
                 init();
             }
 
@@ -319,11 +317,10 @@ namespace wali
                 init();
             }
 
-            AcceptsPossiblyUnbalancedRight(int a)
+            AcceptsPossiblyUnbalancedRight(Symbol callKey, Symbol returnKey)
                 : q0(getKey("q0ml")), q1(getKey("q1ml"))
-                , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
+                , zero(getKey("0")), call(callKey), ret(returnKey)
             {
-                (void) a;
                 init();
             }
 
@@ -372,11 +369,10 @@ namespace wali
                 init();
             }
 
-            AcceptsPossiblyUnbalancedLeft(int a)
+            AcceptsPossiblyUnbalancedLeft(Symbol callKey, Symbol returnKey)
                 : q0(getKey("q0mr")), q1(getKey("q1mr"))
-                , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
+                , zero(getKey("0")), call(callKey), ret(returnKey)
             {
-                (void) a;
                 init();
             }
 
@@ -424,11 +420,10 @@ namespace wali
                 init();
             }
 
-            AcceptsPositionallyConsistentString(int a)
+            AcceptsPositionallyConsistentString(Symbol callKey, Symbol returnKey)
                 : q0(getKey("q0mf")), q1(getKey("q1mf"))
-                , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
+                , zero(getKey("0")), call(callKey), ret(returnKey)
             {
-                (void) a;
                 init();
             }
 
@@ -490,12 +485,11 @@ namespace wali
             }
 
 
-            AcceptsStrictlyUnbalancedLeft(int a)
+            AcceptsStrictlyUnbalancedLeft(Symbol callKey, Symbol returnKey)
                 : q0(getKey("q0sr")), q1(getKey("q1sr"))
                 , q2(getKey("q2sr")), q3(getKey("q3sr"))
-                , zero(getKey("0")), call(getKey("call")), ret(getKey("return"))
+                , zero(getKey("0")), call(callKey), ret(returnKey)
             {
-                (void) a;
                 init();
             }
 
