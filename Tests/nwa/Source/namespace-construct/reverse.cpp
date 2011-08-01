@@ -27,14 +27,19 @@ static NWA const nwas[] = {
 static const unsigned num_nwas = NUM_ELEMENTS(nwas);
 
 
+// Yes, these are correct: in the reverse automaton, calls become returns &
+// vice versa.
+const Symbol callKey = AcceptsBalancedOnly().ret;
+const Symbol returnKey = AcceptsBalancedOnly().call;
+
 static NWA const expected_answers[] = {
     NWA(),
-    AcceptsBalancedOnly().nwa,
-    AcceptsStrictlyUnbalancedRight().nwa,
-    AcceptsPossiblyUnbalancedRight().nwa,
-    AcceptsStrictlyUnbalancedLeft().nwa,
-    AcceptsPossiblyUnbalancedLeft().nwa,
-    AcceptsPositionallyConsistentString().nwa
+    AcceptsBalancedOnly(callKey, returnKey).nwa,
+    AcceptsStrictlyUnbalancedRight(callKey, returnKey).nwa,
+    AcceptsPossiblyUnbalancedRight(callKey, returnKey).nwa,
+    AcceptsStrictlyUnbalancedLeft(callKey, returnKey).nwa,
+    AcceptsPossiblyUnbalancedLeft(callKey, returnKey).nwa,
+    AcceptsPositionallyConsistentString(callKey, returnKey).nwa
 };
 
 
