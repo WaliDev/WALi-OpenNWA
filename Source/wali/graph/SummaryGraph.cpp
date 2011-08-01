@@ -209,8 +209,8 @@ namespace wali {
     // mimics getIntraNodeNumber (see that function for more comments)
     // returns "is the node present in post_igr", i.e., it is reachable
     // from some procedure entry?
-    bool SummaryGraph::reachable(int stk) {
-      assert(stk != (int)WALI_EPSILON);
+    bool SummaryGraph::reachable(Key stk) {
+      assert(stk != WALI_EPSILON);
       
       Transition tr(init_state, stk, init_state); // final state is redundant
       
@@ -233,7 +233,7 @@ namespace wali {
     }
 
     // Does the node stk belong to multiple procedures?
-    bool SummaryGraph::multiple_proc(int stk) {
+    bool SummaryGraph::multiple_proc(Key stk) {
       return (multiple_proc_nodes.find(stk) != multiple_proc_nodes.end());
     }
 
@@ -319,7 +319,7 @@ namespace wali {
 
     void SummaryGraph::preAddUpdate(Transition &t, sem_elem_t wt) {
 
-      assert(t.src == (int)init_state);
+      assert(t.src == init_state);
       assert(t.stack != (int)WALI_EPSILON);
 
       int nno = getIntraNodeNumber(t);

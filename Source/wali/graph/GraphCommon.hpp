@@ -10,9 +10,9 @@ namespace wali {
 
 
         struct Transition {
-            int src, tgt, stack;
+            Key src, tgt, stack;
             Transition() : src(0), tgt(0), stack(0) {}
-            Transition(int s, int st, int t) : src(s), tgt(t), stack(st) {}
+            Transition(Key s, Key st, Key t) : src(s), tgt(t), stack(st) {}
             Transition(const Transition &t) : src(t.src), tgt(t.tgt), stack(t.stack) {}
             Transition(const wali::wfa::ITrans& t ) : src(t.from()), tgt(t.to()), stack(t.stack()) {}
             bool operator == (const Transition &t) {

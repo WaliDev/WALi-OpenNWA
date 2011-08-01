@@ -48,7 +48,7 @@ namespace wali {
       }
       else {
         clock_t t = sum_tms(end_tms) - sum_tms(st_tms);
-        return (t * 1.0) / (double)(TIMER_CLK_TICK);
+        return static_cast<double>(t) / (double)(TIMER_CLK_TICK);
       }
 #else
       return 0;
@@ -65,7 +65,7 @@ namespace wali {
     }
 
     std::ostream& Timer::printTime(std::ostream& out, clock_t clk ) {
-      return out << (clk * 1.0 / (double)(CLOCKS_PER_SEC));
+      return out << (static_cast<double>(clk) / (double)(CLOCKS_PER_SEC));
     }
 
   } // namespace util

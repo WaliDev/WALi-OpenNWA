@@ -44,7 +44,7 @@ namespace wali {
 
         class RegExp;
         typedef ref_ptr<RegExp> reg_exp_t;
-        typedef unsigned int node_no_t;
+        typedef long unsigned int node_no_t;
 
         struct cmp_reg_exp {
             bool operator() (reg_exp_t r1, reg_exp_t r2) const {
@@ -98,8 +98,8 @@ namespace wali {
             }
         };
 
-        typedef pair<int,int> out_node_height_t;
-        typedef map<int, out_node_height_t> out_node_stat_t;
+        typedef pair<long int, long int> out_node_height_t;
+        typedef map<long int, out_node_height_t> out_node_stat_t;
 
         struct RegExpStats {
             int nstar;
@@ -107,9 +107,9 @@ namespace wali {
             int ncombine;
             int hashmap_hits;
             int hashmap_misses;
-            int height;
-            int out_nodes;
-            int lnd;
+            long int height;
+            long int out_nodes;
+            long int lnd;
             RegExpStats() {
                 nstar = ncombine = nextend = 0;
                 hashmap_hits = 0;
@@ -149,7 +149,7 @@ namespace wali {
                 unsigned int last_change;
                 unsigned int last_seen;
 
-                set<int> outnodes; // set of out-nodes contained in this RegExp
+                set<long int> outnodes; // set of out-nodes contained in this RegExp
                 out_node_stat_t outnode_height;
                 int samechange,differentchange,lastchange;
 
@@ -163,8 +163,8 @@ namespace wali {
                 static vector<reg_exp_t> updatable_nodes;
 
                 static vector<RegExpSatProcess> satProcesses;
-                static unsigned int currentSatProcess;
-                unsigned int satProcess;
+                static long unsigned int currentSatProcess;
+                long unsigned int satProcess;
 
                 static bool extend_backwards;
                 static reg_exp_hash_t reg_exp_hash;
@@ -256,7 +256,7 @@ namespace wali {
                 static reg_exp_t updatable(node_no_t nno, sem_elem_t se);
                 static reg_exp_t compress(reg_exp_t r, reg_exp_cache_t &cache);
                 static reg_exp_t minimize_height(reg_exp_t r, reg_exp_cache_t &cache);
-                static int getNextUpdatableNumber() {
+                static size_t getNextUpdatableNumber() {
                     return updatable_nodes.size();
                 }
                 static void update(node_no_t nno, sem_elem_t se);

@@ -300,7 +300,7 @@ namespace wali
 
             // Ignore return transitions created by poststar
             // TODO: there should be a better place for this check
-            if(newit->first.src != (int)start_state) continue;
+            if(newit->first.src != start_state) continue;
 
             if(state_has_etrans) {
               t = new ewpds::ETrans(newit->first.src, newit->first.stack, q, 0, newit->second, 0);

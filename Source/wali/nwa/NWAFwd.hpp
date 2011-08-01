@@ -31,9 +31,6 @@ namespace wali
     ///
     typedef ref_ptr<NWA> NWARefPtr;
 
-    /// Not part of the public API
-    struct Configuration;
-
     // Forward decl
     class NestedWord;
 

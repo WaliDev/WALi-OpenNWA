@@ -14,7 +14,7 @@ namespace wali {
         struct ActionFunctor {
             ActionFunctor() { }
             virtual ~ActionFunctor() { }
-            virtual void operator() (int n) = 0;
+            virtual void operator() (long int n) = 0;
         };
 
         class Node {
@@ -40,20 +40,20 @@ namespace wali {
             friend struct AssignSCCActionFunctor;
 
             vector<Node> nodes;
-            map<int, int> env_to_node;
+            map<long int, long int> env_to_node;
             //map<int, int> node_to_env;
 
             public:
             void addEdge(int s, int t);
             int runSCCdecomposition();
 
-            int getNnodes();
+            size_t getNnodes();
             int getSccNumber(int n);
             int getBfsNumber(int n);
 
             private:
-            inline int create_node(int n);
-            void dfs(int node, int direction, ActionFunctor &action);
+            inline long int create_node(int n);
+            void dfs(long node, int direction, ActionFunctor &action);
         };
 
     } // namespace graph

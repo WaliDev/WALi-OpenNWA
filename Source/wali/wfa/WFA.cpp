@@ -1410,8 +1410,8 @@ namespace wali
           }
         }
       }
-      for( int u = n-1; u >= 0; u-- ) {
-        for( int w = u-1; w >=0 ; w-- ) {
+      for( long u = static_cast<long>(n)-1; u >= 0; u-- ) {
+        for( long w = u-1; w >=0 ; w-- ) {
           if( P[u][w]->isZero() ) continue;
           if( u == w ) {
             //nodes[u] = Regex::EXTEND(nodes[u],P[u][w]);

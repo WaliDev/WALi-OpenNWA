@@ -7,13 +7,13 @@ namespace wali {
     namespace graph {
 
         struct FinishedActionFunctor : ActionFunctor {
-            list<int> &finished;
+            list<long> &finished;
 
-            FinishedActionFunctor(list<int> &_f) : finished(_f) { }
+            FinishedActionFunctor(list<long> &_f) : finished(_f) { }
 
             virtual ~FinishedActionFunctor() { }
 
-            virtual void operator() (int n) {
+            virtual void operator() (long n) {
                 finished.push_front(n);
             }
         };
@@ -26,18 +26,18 @@ namespace wali {
 
             virtual ~AssignSCCActionFunctor() { }
 
-            virtual void operator() (int n) {
+            virtual void operator() (long n) {
                 gr.nodes[n].scc = scc;
             }
         };
 
-        int Graph::create_node(int n) {
+        long int Graph::create_node(int n) {
             if(env_to_node.find(n) == env_to_node.end()) {
-                int s = env_to_node.size();
+                size_t s = env_to_node.size();
                 env_to_node[n] = s;
                 //node_to_env[s] = n;
                 nodes.resize(s+1);
-                return s;
+                return static_cast<long>(s);
             }
             return env_to_node[n];
         }
@@ -52,8 +52,8 @@ namespace wali {
 
         // Returns the number of SCCs
         int Graph::runSCCdecomposition() {
-            int i,n;
-            n = nodes.size();
+            long i,n;
+            n = static_cast<long>(nodes.size());
 
             // initialize
             for(i=0;i<n;i++) {
@@ -63,7 +63,7 @@ namespace wali {
             }
 
             // Do a forward DFS and compute the finishing times
-            list<int> finished;
+            list<long> finished;
             FinishedActionFunctor fin(finished);
             for(i=0;i<n;i++) {
                 if(nodes[i].visited)
@@ -78,7 +78,7 @@ namespace wali {
             }
 
             // Now run a backward DFS in order of decreasing finishing time
-            list<int>::iterator it;
+            list<long int>::iterator it;
             int scc = 0;
             AssignSCCActionFunctor ascc(*this, scc);
             for(it = finished.begin(); it != finished.end(); it++) {
@@ -93,7 +93,7 @@ namespace wali {
 
         }
 
-        void Graph::dfs(int node, int direction, ActionFunctor &action) {
+        void Graph::dfs(long node, int direction, ActionFunctor &action) {
             nodes[node].visited = true;
             set<int>::iterator it;
             for(it = nodes[node].edges[direction].begin(); it != nodes[node].edges[direction].end(); it++) {
@@ -103,7 +103,7 @@ namespace wali {
             action(node);
         }
 
-        int Graph::getNnodes() {
+        size_t Graph::getNnodes() {
             return nodes.size();
         }
 

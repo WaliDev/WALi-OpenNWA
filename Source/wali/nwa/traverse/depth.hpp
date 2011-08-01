@@ -9,8 +9,8 @@ namespace wali {
     namespace traverse {
 
       void dfsCallStringTraversal(NWA const & nwa,
-                                  ConstCallStringStateFunctor * functor,
-                                  ConstCallStringTransitionFunctor * functor);
+                                  ConstCallStringStateFunctor * state_functor,
+                                  ConstCallStringTransitionFunctor * trans_functor);
         
     }
   }

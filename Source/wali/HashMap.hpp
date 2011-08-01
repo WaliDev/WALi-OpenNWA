@@ -236,8 +236,8 @@ namespace wali
         public:     // con/destructor
           HashMap( size_type the_size=47 )
             : numValues(0),numBuckets(the_size), 
-            growthFactor( the_size * HASHMAP_GROWTH_FRACTION ), 
-            shrinkFactor( the_size * HASHMAP_SHRINK_FRACTION )
+              growthFactor( static_cast<double>(the_size) * HASHMAP_GROWTH_FRACTION ), 
+              shrinkFactor( static_cast<double>(the_size) * HASHMAP_SHRINK_FRACTION )
         { initBuckets(); }
 
           HashMap( const HashMap& hm )
@@ -606,8 +606,8 @@ namespace wali
         buckets = tmp;
         numBuckets = new_size;
         // set up new growth|shrink factors
-        growthFactor = numBuckets * HASHMAP_GROWTH_FRACTION;
-        shrinkFactor = numBuckets * HASHMAP_SHRINK_FRACTION;
+        growthFactor = static_cast<double>(numBuckets) * HASHMAP_GROWTH_FRACTION;
+        shrinkFactor = static_cast<double>(numBuckets) * HASHMAP_SHRINK_FRACTION;
       }
 
 } // namespace wali

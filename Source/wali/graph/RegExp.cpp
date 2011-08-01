@@ -10,7 +10,7 @@ namespace wali {
         vector<reg_exp_t> RegExp::updatable_nodes;
         
         vector<RegExpSatProcess> RegExp::satProcesses;
-        unsigned int RegExp::currentSatProcess = 0;
+        unsigned long int RegExp::currentSatProcess = 0;
 
         bool RegExp::extend_backwards = false;
         reg_exp_hash_t RegExp::reg_exp_hash;
@@ -284,9 +284,9 @@ namespace wali {
 
 
         // a = a union b
-        void my_set_union(std::set<int> &a, std::set<int> &b) {
-          std::set<int> c;
-          insert_iterator< set<int> > ii(c, c.begin());
+        void my_set_union(std::set<long int> &a, std::set<long int> &b) {
+          std::set<long int> c;
+          insert_iterator< set<long int> > ii(c, c.begin());
           std::set_union(a.begin(), a.end(), b.begin(), b.end(), ii);
           a = c;
         }
@@ -376,7 +376,7 @@ namespace wali {
 
             while(heap.size() != 1) {
                 list<reg_exp_t>::iterator min_pos = heap.begin(), next_it;
-                int min = (*min_pos)->outnodes.size();
+                size_t min = (*min_pos)->outnodes.size();
                 it = heap.begin();
                 it++;
                 min += (*it)->outnodes.size();

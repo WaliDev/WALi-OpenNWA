@@ -11,6 +11,8 @@
 #include <iostream>
 #include <iomanip>
 
+typedef int INTER_GRAPH_INT;
+
 using namespace std;
 
 namespace wali {
@@ -115,9 +117,9 @@ namespace wali {
         int InterGraph::nodeno(Transition &t) {
             TransMap::iterator it = node_number.find(t);
             if(it == node_number.end()) {
-                node_number[t] = nodes.size();
+                node_number[t] = static_cast<INTER_GRAPH_INT>(nodes.size());
                 nodes.push_back(GraphNode(t));
-                return (nodes.size() - 1);
+                return (static_cast<INTER_GRAPH_INT>(nodes.size()) - 1);
             }
             return it->second;
         }
@@ -156,9 +158,11 @@ namespace wali {
             }
 
             bool InterGraph::exists(int state, int stack, WT_CHECK op) {
-                unsigned i;
+                size_t i;
                 for(i=0;i<nodes.size();i++) {
-                    if(nodes[i].trans.src == state && nodes[i].trans.stack == stack) {
+                    if(static_cast<INTER_GRAPH_INT>(nodes[i].trans.src) == state
+                       && static_cast<INTER_GRAPH_INT>(nodes[i].trans.stack) == stack)
+                    {
                         if(op((nodes[i].gr->get_weight(nodes[i].intra_nodeno)).get_ptr())) 
                             return true;
                     }

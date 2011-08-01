@@ -93,8 +93,8 @@ namespace wali {
                 sem_elem_t pushWeight(Key k);
                 sem_elem_t popWeight(Key k);
                 Key getEntry(Key k);
-                bool reachable(int stk);
-                bool multiple_proc(int stk);
+                bool reachable(Key stk);
+                bool multiple_proc(Key stk);
 
                 ostream &printStats(ostream &out);
 
