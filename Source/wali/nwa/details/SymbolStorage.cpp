@@ -1,5 +1,7 @@
 #include "SymbolStorage.hpp"
 
+#include <cstdlib>
+
 namespace wali {
 namespace nwa {
 namespace details {
