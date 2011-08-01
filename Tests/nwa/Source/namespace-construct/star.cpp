@@ -62,6 +62,21 @@ namespace wali {
             }
 
 
+            TEST(wali$nwa$query$$star, universalNwa)
+            {
+                NWA nwa;
+                SomeElements e;
+
+                nwa.addInitialState(e.state);
+                nwa.addFinalState(e.state);
+                nwa.addInternalTrans(e.state, e.symbol, e.state);
+                nwa.addCallTrans(e.state, e.symbol, e.state);
+                nwa.addReturnTrans(e.state, e.state, e.symbol, e.state);
+
+                NWARefPtr closure = star(nwa);
+
+                EXPECT_TRUE(query::languageEquals(nwa, *closure));
+            }
         }
     }
 }
