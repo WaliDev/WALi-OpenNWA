@@ -385,7 +385,7 @@ namespace wali {
                     next_it++;
                     if(next_it == heap.end())
                         break;
-                    if( (int)((*it)->outnodes.size() + (*next_it)->outnodes.size()) < min) {
+                    if( (*it)->outnodes.size() + (*next_it)->outnodes.size() < min) {
                         min_pos = it;
                         min = (*it)->outnodes.size() + (*next_it)->outnodes.size();
                     }
