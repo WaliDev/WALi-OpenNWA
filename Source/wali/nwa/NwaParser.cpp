@@ -124,7 +124,7 @@ namespace wali { namespace nwa { namespace parser { namespace details {
           {
             if (message[0] != '[') {
               // We allocated this in err_msg
-              delete message;
+              delete[] message;
             }
           }
         };
