@@ -138,15 +138,10 @@ namespace wali {
 
           // Make sure if we start with stuff other than the query we get an
           // exception
-          exn = false;
-          try {
-            read_lit(differ, query);
-          }
-          catch(CharactersDifferException const & e) {
-            (void) e;
-            exn = true;
-          }
-          EXPECT_TRUE(exn);
+          EXPECT_THROW({
+              read_lit(differ, query);
+            },
+            CharactersDifferException);
         }
 
         
