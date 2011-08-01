@@ -39,6 +39,7 @@ test_files = Split("""
     Source/namespace-construct/concatenate.cpp
     Source/namespace-construct/determinize.cpp
     Source/namespace-construct/star.cpp
+    Source/namespace-construct/reverse.cpp 
     Source/serialization/idempotency.cpp
     Source/serialization/parser-unit-tests.cpp
     """)
