@@ -9,7 +9,7 @@ Delta_i: {
   (Start, b, Call_2),
   (Entry_2, a, State_2),
   (State_2, a, Exit_2),
-  (Return_2, a, Finish)
+  (Return_2, b, Finish)
 }
 
 Delta_c: {
