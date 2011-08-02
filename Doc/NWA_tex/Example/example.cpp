@@ -1,8 +1,8 @@
-// This program will walk through creating the NWA shown in figure 3 of the
-// associated documentation, and reverse it (to get the result of figure 11).
-// We then make a NestedWord of the one word in fig3's language and another
-// NestedWord of the one word in fig11's language, then test that each is a
-// member of just the appropriate NWA.
+// This program will walk through creating the NWA shown in Figure 3 of the
+// associated documentation, and reverse it (to get the result of Figure 11).
+// We then make a NestedWord of the one word in Figure 3's language and
+// another NestedWord of the one word in Figure 11's language, then test that
+// each is a member of just the appropriate NWA.
 
 #include <iostream>
 
@@ -22,7 +22,7 @@ using wali::nwa::NestedWord;
 using wali::nwa::construct::reverse;
 using wali::nwa::query::languageContains;
 
-// These symbols are used in both the NWA and both words, so I'll make them
+// These symbols are used in the NWA and both words, so I'll make them
 // global.
 Symbol const sym_a    = getKey("a");
 Symbol const sym_b    = getKey("b");
@@ -31,7 +31,7 @@ Symbol const sym_ret  = getKey("ret");
 
 
 
-/// Creates the NWA shown in figure 3 of the Wali NWA documentation, storing
+/// Creates the NWA shown in Figure 3 of the Wali NWA documentation, storing
 /// it in 'out'.
 NWA
 create_figure_3()
@@ -64,7 +64,7 @@ create_figure_3()
 
 
 ///
-/// Creates a (the one) word in the language of figure 3's NWA
+/// Creates a (the one) word in the language of Figure 3's NWA
 NestedWord
 create_forwards_word()
 {
@@ -80,8 +80,8 @@ create_forwards_word()
 }
 
 
-/// Creates a (the one) word in the language of the reverse of figure 3's NWA
-/// (i.e. that's in figure 11's NWA).
+/// Creates a (the one) word in the language of the reverse of Figure 3's NWA
+/// (i.e. that's in Figure 11's NWA).
 NestedWord
 create_backwards_word()
 {

@@ -1,3 +1,5 @@
+\begin{abstract}
+
 WALi-NWA is a C++ library for constructing, querying, and operating on
 nested-word automata.  It is a portion of the WALi library, which provides
 types and operations for weighted automata.
@@ -6,12 +8,19 @@ are mostly logically separate from the rest of WALi, it does use
 facilities provided by WALi and inter-operates with WALi's weighted pushdown
 system (WPDS) code.
 
+\end{abstract}
+
+The WALi library is available from
+\url{http://www.cs.wisc.edu/wpis/wpds/download.php}. This document describes
+the NWA portion of version 4.0. Building instructions can be found in
+\texttt{README.txt} in the root directory of the distribution.
+
 We assume the reader is familiar with nested words and
 nested-word automata; if not, \appref{nwa-definition} provides the definition
 we use and
 Alur et al.~\cite{DLT:AM2006,JACM:AM2009} describe them in detail. Our
 implementation corresponds to the definition from the DLT 2006
-paper~\cite{DLT:AM2006}; relative to followup work~\cite{JACM:AM2009}, this definition removes
+paper~\cite{DLT:AM2006}; relative to follow-up work~\cite{JACM:AM2009}, this definition removes
 the distinction between the machine's linear and hierarchical states, and on
 a call transition always stacks the source state. In addition, we only require that the
 final linear state be accepting for an NWA to accept a
@@ -24,7 +33,7 @@ site'' to refer to states of the NWA even though they take on different
 meanings in different contexts.
 
 In contrast to the standard definitions, we allow internal $\epsilon$
-transitions (but not calls or returns). We also allow ``wild''
+transitions (but not call or return $\epsilon$ transitions). We also allow ``wild''
 transitions, which match any single symbol. (Wilds \emph{can} appear on calls
 and returns.)
 
@@ -33,10 +42,7 @@ and returns.)
 %returns. (That is, we support balanced words and nested-word prefixes, but
 %not nested-word suffixes or general nested words.)
 
-The WALi library is available from
-\url{http://www.cs.wisc.edu/wpis/wpds/download.php}. This document describes
-the NWA portion of version 4.0. Building instructions can be found in
-\texttt{README.txt} in the root directory of the distribution.
+
 
 \vfill
 
@@ -208,7 +214,7 @@ otherwise specified, they are in namespace \texttt{wali}. See \cite{wali}.
 \end{functionlist}
 
 
-\subsection{Simple Example use of the Library}
+\subsection{Simple example use of the library}
 \label{Se:ExampleUse}
 The following is an illustration of basic operations of the library. The full
 code is available in the file \texttt{Doc/NWA\_tex/Example/example.cpp} in the

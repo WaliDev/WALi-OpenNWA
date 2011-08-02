@@ -1,7 +1,7 @@
 \section{The \texttt{NWA} class}
 \label{Se:NWA-class}
 
-\subsection{Construction, copying, assignment, clearing}
+\subsection{Construction, copying, assignment, and clearing}
 \label{Se:Construction}
 
 The NWA provides two constructors: the default constructor and the copy
@@ -92,7 +92,8 @@ following two functions (both members of \texttt{NWA}):
 \end{functionlist}
 Client information is tracked through the use of \texttt{ref\_ptr}s, so the
 programmer must consider the standard aliasing and lifetime considerations
-imposed by using smart pointers.
+imposed by using smart pointers. (\texttt{ClientInfo} supplies the
+\texttt{count} field needed by \texttt{ref\_ptr}.)
 
 \vspace{\baselineskip}
 In addition, you may wish to subclass \texttt{NWA} itself. There are several

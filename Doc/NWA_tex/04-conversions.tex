@@ -1,4 +1,4 @@
-\section{Conversions beween WPDS and NWA (namespace
+\section{Conversions beween WPDSs and NWAs (namespace
   \texttt{wali::nwa::nwa\_pds})}
 \label{Se:Conversions}
 
@@ -15,7 +15,10 @@ unchanged, and is thus associated with an internal NWA transition; in this
 case, that transition goes from the state $(p,q_1)$ to $(p,q_2)$. The symbol
 of a transition is associated with the top-of-stack symbol of the source
 state, so in this example, the symbol labeling that transition would be
-$q_1$. WPDS push rules correspond to NWA call transitions, and WPDS pop rules
+$q_1$. In other words, the WPDS rule $\langle p,q_1 \rangle \hookrightarrow
+\langle p,q_2 \rangle$ is translated to the NWA internal transition
+$((p,q_1), q_1, (p,q_2))$.
+WPDS push rules correspond to NWA call transitions, and WPDS pop rules
 correspond to NWA return transitions.\footnote{
 This encoding is motivated by our uses of both WPDSs and NWAs in program
 analysis. It is common for WPDSs to have just one state, $p$, and to use the
@@ -23,8 +26,10 @@ top-of-stack symbol to encode the ``current'' program point. Pushing
 something onto the stack corresponds to a call, and popping corresponds to a
 return. For NWAs, we use the states themselves to encode the current program
 point. (The function that
-converts a WPDS into an NWA supports multi-state WPDSs, however; the fact that
-there is typically a single state is not a restriction.)}
+converts a WPDS into an NWA supports multi-state WPDSs, however; a WPDS rule
+of the form $\langle p_1,q_1 \rangle \hookrightarrow
+\langle p_2,q_2 \rangle$ is translated to the NWA internal transition
+$((p_1,q_1), q_1, (p_2,q_2))$.)}
 
 The conversion in the other direction creates a WPDS with one primary state
 and one ``helper'' state for each NWA state that appears in the exit position
@@ -32,25 +37,25 @@ of a return transition. The NWA's state is encoded by the symbol at the top of t
 stack -- essentially the inverse of the encoding described in the previous
 paragraph. A slight complication arises in the case of return
 transitions. The NWA is able to look at both the exit node and the call
-predecessor. In the WPDS this translates to looking at the top two stack
-symbols -- but this is not allowed. Hence each NWA return transition becomes
+predecessor. In the WPDS this would correspond to looking at the top two stack
+symbols -- but the WPDS is only allowed to look at the top \emph{one}. Hence each NWA return transition becomes
 two WPDS rules: the first pops the top symbol (which corresponds to the
 current NWA state) and remembers what it was using the helper state; the
 second rule looks at the call predecessor and the helper state to dispatch to
 the corresponding return site.
 
 The library also offers two slight variants on this conversion.First, there
-is a backwards variant that can be used for backwards flow analysis
+is a backwards variant that can be used for backwards dataflow-analysis
 problems. Second, the resulting WPDS can stack either calls or returns. The
-``stacking calls'' version turns call transitions $(q, \sigma, q')$ into a
-WPDS rule $\langle p, q\rangle \hookrightarrow \langle p, q' q\rangle$ --
-leaving the call predecessor on the stack. (This is like the version
-described in the previous paragraph.) The ``stacking returns'' version
-instead makes several WPDS push rules for each NWA call transition. Each
+``stacking-calls'' version turns a call transition $(c, \sigma, e)$ into a
+WPDS rule $\langle p, c\rangle \hookrightarrow \langle p, e c\rangle$ --
+leaving the call predecessor $c$ on the stack. (This is the translation
+described in the previous paragraph.) The ``stacking-returns'' version
+has, in general, several WPDS push rules for each NWA call transition. Each
 push rule leaves a potential return site on the stack. (For example, if there
 is a call transition $(c,\sigma,e)$ and a return transition $(x, c, \sigma',
 r)$, then the WPDS will have a rule $\langle p,
-c\rangle\hookrightarrow\langle p, e r\rangle$.
+c\rangle\hookrightarrow\langle p, e r\rangle$).
 
 
 The following functions are in the namespace \texttt{wali::nwa::nwa\_pds} and

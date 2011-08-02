@@ -24,7 +24,7 @@ transitions and the list of call predecessors.  Because it is possible to wind u
 extremely long key names (especially in a determinized NWA) that can
 essentially destroy the ability of Dot to render useful output, by default
 any state names longer than 20 characters are replaced by the numerical
-value. A call to \texttt{print\_dot} can specify different behavior, however.
+value of the key. A call to \texttt{print\_dot} can specify different behavior, however.
 All figures later in the document have been created via the Dot output (with
 minimal post-processing in some cases).
 
@@ -94,7 +94,7 @@ format is accepted.
   \begin{tabular}{p{2.5in}}
     \verbatiminput{Figures/figure-1.nwa}
   \end{tabular}
-  \caption{Serialized form of the NWA drawn in \figref{Example1}.}
+  \caption{Serialized form of the NWA depicted in \figref{Example1}.}
   \label{Fi:nwa-simple}
 \end{figure}
 
@@ -103,7 +103,7 @@ format is accepted.
   \begin{tabular}{p{6in}}
     \verbatiminput{Figures/star-simple-result.nwa}
   \end{tabular}
-  \caption{Serialized form of the NWA drawn in \figref{Star2}.}
+  \caption{Serialized form of the NWA depicted in \figref{Star2}.}
   \label{Fi:nwa-mattf}
 \end{figure}
 
@@ -112,8 +112,8 @@ format is accepted.
 
 This section describes the grammar of the file format.
 
-\emph{Note:} Some characteristics in the following have the
-following as part of their description: ``you should not rely on
+\emph{Note:} Some characteristics in the description below have the
+following phrase as part of their description: ``you should not rely on
 this.'' In such cases, we reserve the right to change this behavior in
 future versions. %and to not feel bad about it.
 
@@ -137,7 +137,7 @@ NWAs, each individual starts with the literal \texttt{nwa}.
   \nonterm{nwa-description} & ::= & \left(\term{nwa}\cfgsp\nonterm{name}?\cfgsp\term{:}?\right)?\cfgsp\term{\{}?\cfgsp\nonterm{block}{+}\cfgsp\term{\}}?
 \end{grammar}
 
-\emph{Braces are required if 'nwa' is present and the name is absent}
+\emph{Braces are required if ``nwa'' is present and the name is absent}
  in order to
  distinguish the first block header (\texttt{Q:}, \texttt{Q0:},
  or \texttt{Qf:}) from the name of the NWA.
