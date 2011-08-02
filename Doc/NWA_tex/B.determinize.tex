@@ -20,7 +20,7 @@ We use the following notation in the determinize algorithm: \\
 \end{tabular}
 \end{quote}
 We use the following auxiliary function to compute the target of
-return transitions:
+a return transition:
 \begin{eqnarray*}
   \textrm{Merge}(R^{exit}, R^{call}, \delta) = \{(q, q') & |& \exists q_1, q_2.\,(q, q_1) \in R^{call} \\
                                                          &&  \phantom{\exists q_1, q_2.\,}\textrm{and}\ (q_1, q_2) \in R^{exit} \\
@@ -34,17 +34,22 @@ state $q_1$ of the original, etc. For NWAs, a state $\{(p_0, q_0), (p_1,
 q_1), \cdots, (p_n, q_n)\}$ means that the NWA is one of the states $\{q_0,
 q_1, \cdots, q_n\}$, but the relation carries around extra meaning.
 
-A single $(p,q)$ pair means that the NWA was in state $p$, immediately read a
-call symbol, and then read some substring of the input with balanced calls
-and returns. This means that if the automaton then reads a return symbol, $q$
-is the exit site and $p$ is the call predecessor: the two pieces of
-information the automaton needs to decide what return transitions it can
-take.
+If a state in the determinized automaton contains a pair $(p,q)$, then this
+means the input automaton can begin in the state $p$, immediately take a call
+transition, follow a path with balanced calls and returns, and finally arrive
+in state $q$. In such a configuration, if the input automaton then reads a
+return symbol, $q$ is the exit site and $p$ is the call predecessor. These
+two pieces of information are exactly what the automaton needs to decide what
+return transitions it can take. The call predecessor $p$ needs to be stored
+explicitly because it is possible to arrive at the same state $q$ with
+different call predecessors.
 
 At the start of the run, and any time the automaton has not read any pending
 calls, the first component of each pair in the current state will be some $q
 \in Q_0$; this is because the initial states act as call predecessors in that
 situation.
+
+\newcommand{\WL}{\textit{WL}}
 
 \newpage
 \begin{algorithm}[H]
@@ -58,11 +63,11 @@ situation.
   \DetDef{
     $Close$ = $(\delta_i |_\epsilon)^*$\;
     $Id$ = $\{(q,q) | q \in Q\}$\;
-    $R_0$ = $Q_0 \times Q_0$\;
+    $R_0$ = $Q_0 \times Q_0 \circ Close$\;
     $Q^{new}$ = $\{R_0\}$\;
-    Insert $R_0$ in worklist\;
-    \While{worklist is not empty} {
-      select and remove a relation $R$ from worklist\;
+    Insert $R_0$ in \WL\;
+    \While{$\WL \neq \varnothing$}{
+      select and remove a relation $R$ from \WL\;
       \tcp{Note that $R$ is a state in $Q^{new}$}
       mark $R$\;
       \For{$\sigma\in\Sigma$}{

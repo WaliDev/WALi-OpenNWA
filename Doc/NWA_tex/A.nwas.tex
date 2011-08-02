@@ -50,7 +50,7 @@ When $i \rightsquigarrow j$ holds, for $1 \leq i \leq |w|$, $i$ is called a
 \emph{pending call}; otherwise $i$ is a \emph{matched call}, and the
 (unique) position $j$ such that $i \rightsquigarrow j$ is called its
 \emph{return successor}. (Note that these terms refer to positions within
-$w$ and not the symbol, which is what you may expect if you are familiar with
+$w$ and not the to symbol itself, which is what you may expect if you are familiar with
 visibly pushdown languages~\cite{JACM:AM2009}.)
 
 Similarly, when $i \rightsquigarrow j$ holds, for $1 \leq j \leq |w|$, $j$
@@ -110,8 +110,9 @@ if it has only pending returns.
 We extend the above definition to allow two meta-symbols, $\epsilon$ and
 \wild\ (wild). Call and return transitions are prohibited from being labeled
 with $\epsilon$, but allowing $\epsilon$s on internal transitions can be done
-in an analogous fashion to standard FAs. (We think that allowing $\epsilon$
-on calls and returns would eliminate the closure properties of NWAs.) The
+in an analogous fashion to standard FAs. %(We think that allowing $\epsilon$
+%on calls and returns would eliminate the closure properties of NWAs.)
+The
 wild symbol, \wild, can label any transition, and it matches any input
 symbol. For example, the internal rule from the definition would be reworded
 as follows:
