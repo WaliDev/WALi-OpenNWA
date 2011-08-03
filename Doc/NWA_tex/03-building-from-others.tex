@@ -76,8 +76,8 @@ Each of these functions is in the namespace \texttt{wali::nwa::construct}:
     See Section \ref{Se:Determinize}. The worst-case running time for this
     algorithm is at least $O({|Q|^3} \cdot2^{|Q|^2})$.
 
-  \functionDefFirstEarly{NWARefPtr}{complement}{NWA const \& orig, bool determinize}{}
-  \functionDef{void}{complement}{NWA \& out, NWA const \& orig, bool determinize}{}
+  \functionDefFirstEarly{NWARefPtr}{complement}{NWA const \& orig}{}
+  \functionDef{void}{complement}{NWA \& out, NWA const \& orig}{}
     Computes the complement of the determinization of \texttt{orig},
     either returning the result or storing it in \texttt{out}.
     See Section
@@ -562,22 +562,22 @@ An NWA, $(Q,\Sigma,Q_0,\delta,Q_f)$, is \textbf{deterministic} iff
 
 \begin{enumerate} 
 
-\item $|Q_0| = 1$, 
+\item $|Q_0| \leq 1$, 
 
 \item For all $q \in Q$, there is never a choice between reading $\sigma$ and
-  following a $\sigma$ transition or following a \wild\ transition:
+  following a $\sigma$ transition or following a wild (\wild) transition:
   \begin{itemize}
     \item if $(q,\wild,q') \in \delta_i$ then $|\{q'|(q,\sigma,q') \in
-      \delta_i, {\sigma\neq*}\}| = 0$; \\ otherwise, for all $\sigma \in \Sigma - \{\wild\}$,
+      \delta_i, {\sigma\neq@}\}| = 0$; \\ otherwise, for all $\sigma \in \Sigma - \{\wild\}$,
       $|\{q'|(q,\sigma,q') \in \delta_i\}| \leq 1$,
 
     \item if $(q,\wild,q') \in \delta_c$ then $ |\{q'|(q,\sigma,q') \in
-      \delta_c, {\sigma\neq*}\}| = 0$;\\
+      \delta_c, {\sigma\neq@}\}| = 0$;\\
       otherwise, for all $\sigma \in \Sigma - \{\wild\}$,
       $|\{q'|(q,\sigma,q') \in \delta_c\}| \leq 1$, and
 
     \item for $q' \in Q$, if $(q,q',\wild,q'') \in \delta_r$ then
-      $|\{q''|(q,q',\sigma,q'') \in \delta_r, {\sigma\neq*}\}| = 0$; \\
+      $|\{q''|(q,q',\sigma,q'') \in \delta_r, {\sigma\neq@}\}| = 0$; \\
       otherwise, for all
       $\sigma \in \Sigma - \{\wild\}$, $|\{q''|(q,q',\sigma,q'') \in \delta_r\}|
       \leq 1$,

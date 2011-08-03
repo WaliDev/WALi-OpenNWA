@@ -21,7 +21,12 @@ The following functions are basic NWA operations:
 
   \functionDefFirst{NWA\&}{NWA::operator=}{NWA const \& other}{}
     Assigns \texttt{other} to \texttt{this};
-    the automata will not share structure.
+    the automata will not share structure. Client information is cloned.
+
+  \functionDefFirst{bool}{NWA::operator==}{NWA const \& other}{}
+    Determines whether the two automata are structurally equal --- that is,
+    they contain exactly the same set of states (including initial and final
+    states), symbols, and transitions --- and returns the result.
 
   \functionDefFirst{void}{NWA::clear}{}{}
     Removes all states, symbols, and transitions from the NWA.
@@ -64,8 +69,8 @@ The system supports two meta-symbols: \texttt{wali::WALI\_EPSILON}
 \texttt{WALI\_EPSILON} is the standard $\epsilon$ from automata theory; it
 denotes that a transition can be traversed without matching
 and consuming an input symbol.  Epsilon symbols cannot label call or return
-transitions. \texttt{WALI\_WILD} is the `any' symbol; it matches a single input
-symbol of any kind.  Because the NWA alphabet is not fixed, the actual symbols
+transitions. \texttt{WALI\_WILD} is the `any' symbol; it matches any single
+symbol.  Because the NWA alphabet is not fixed, the actual symbols
 that \texttt{WALI\_WILD} stands for is fluid.  \textsl{Note:}
 \texttt{WALI\_EPSILON} and \texttt{WALI\_WILD} are not explicit
 elements of $\Sigma$; see \tableref{simple-functions}, footnote 5.
@@ -83,17 +88,21 @@ Once done, client information can be attached or retrieved using the
 following two functions (both members of \texttt{NWA}):
 \begin{functionlist}
   \functionDefFirst{ref\_ptr<ClientInfo>}{NWA::getClientInfo}{Key st}{const}
-    Allows the user to access the client-specific information associated with
+    Returns the client-specific information associated with
     the given state, \texttt{st}.
 
   \functionDefFirst{void}{NWA::setClientInfo}{Key st, ref\_ptr<ClientInfo> ci}{}
-    Allows the user to specify the client-specific information, \texttt{ci},
+    Sets the client-specific information, \texttt{ci},
     associated with the given state, \texttt{st}. \\
 \end{functionlist}
 Client information is tracked through the use of \texttt{ref\_ptr}s, so the
 programmer must consider the standard aliasing and lifetime considerations
 imposed by using smart pointers. (\texttt{ClientInfo} supplies the
-\texttt{count} field needed by \texttt{ref\_ptr}.)
+\texttt{count} field needed by \texttt{ref\_ptr}.) Operations such as copying
+an NWA that clone client information can also result in changes in aliasing:
+if the client information for states $p$ and $q$ are aliased in NWA $N$ which
+is then copied to NWA $N'$, the ``copies'' of $p$ and $q$ in $N'$ will have
+separate copies of the client information.
 
 \vspace{\baselineskip}
 In addition, you may wish to subclass \texttt{NWA} itself. There are several

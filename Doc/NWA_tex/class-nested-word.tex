@@ -21,7 +21,7 @@ and \texttt{Position::Type type}; these hold the symbol at that position and
 the type of the position.
 
 
-The \texttt{NestedWord} class has just six functions:
+The \texttt{NestedWord} class has just seven functions:
 \begin{functionlist}
   \functionDefEarly{void}{NestedWord::appendInternal}{Symbol s}{}
   \functionDefEarly{void}{NestedWord::appendCall}{Symbol s}{}
@@ -31,6 +31,9 @@ The \texttt{NestedWord} class has just six functions:
 
   \functionDefFirst{void}{NestedWord::append}{Position p}{}
     Appends \texttt{p} to the word.
+
+  \functionDefFirst{size\_t}{NestedWord::size}{}{const}
+    Returns the length of the word.
 
   \functionDefFirstEarly{NestedWord::const\_iterator}{NestedWord::begin}{}{const}
   \functionDef{NestedWord::const\_iterator}{NestedWord::end}{}{const}
