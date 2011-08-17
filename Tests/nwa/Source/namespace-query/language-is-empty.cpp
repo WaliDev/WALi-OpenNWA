@@ -7,6 +7,7 @@
 #include "Tests/nwa/Source/class-NWA/supporting.hpp"
 
 using namespace wali::nwa;
+using namespace std;
 
 #define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
 
@@ -40,6 +41,8 @@ static bool expected_answers[] = {
 };
 
 
+extern NestedWord getWord(NWA const * aut);
+
 namespace wali {
     namespace nwa {
         namespace query {
@@ -61,6 +64,25 @@ namespace wali {
             }
 
             
+            TEST(wali$nwa$query$$getWord, testBatteryOfVariouslyBalancedNwas)
+            {
+                for (unsigned nwa = 0 ; nwa < num_nwas ; ++nwa) {
+                    std::stringstream ss;
+                    ss << "Testing NWA " << nwa;
+                    SCOPED_TRACE(ss.str());
+                    
+                    if (expected_answers[nwa]) {
+                        //EXPECT_TRUE(languageIsEmpty(nwas[nwa]));
+                    }
+                    else {
+                        NestedWord word = getWord(&nwas[nwa]);
+
+                        EXPECT_TRUE(languageContains(nwas[nwa], word));
+                    }
+                }
+            }
+
+
         }
     }
 }
