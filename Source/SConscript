@@ -99,6 +99,7 @@ nice_files = Split("""
 ./wali/nwa/nwa_pds/NwaToPds.cpp
 ./wali/nwa/traverse/depth.cpp
 ./wali/nwa/traverse/Expand.cpp
+./wali/nwa/wordaut.cpp
 """)
 
 

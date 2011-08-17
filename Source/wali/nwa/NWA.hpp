@@ -1222,6 +1222,8 @@ namespace wali
         return nwa_pds::NWAToPDSCalls(nwa, wg);
       }
 
+      wpds::WPDS
+      _private_NWAtoPDScallsWitness( WeightGen & wg ) const;
 
       wpds::WPDS _private_NwaToBackwardsPdsCalls_( WeightGen const & wg ) const;
       wpds::WPDS NWAtoBackwardsPDScalls( WeightGen const & wg ) const {

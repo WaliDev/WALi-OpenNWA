@@ -9,6 +9,9 @@
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/State.hpp"
 #include "wali/nwa/NWA.hpp"
+#include "wali/nwa/query/returns.hpp"
+#include "wali/nwa/query/transitions.hpp"
+#include "wali/nwa/query/language.hpp"
 #include "wali/wpds/WPDS.hpp"
 #include "wali/Key.hpp"
 #include "wali/wfa/epr/FunctionalWeight.hpp"
@@ -22,6 +25,7 @@
 #include "wali/witness/WitnessRule.hpp"
 
 using namespace std;
+using namespace wali;
 using namespace wali::nwa;
 
 // This is exactly like NWAtoPDScalls, except when the return WPDS is
@@ -30,8 +34,8 @@ using namespace wali::nwa;
 //
 // NOTE: This should be placed in NWA.hpp
 //
-template <typename Client>
-wpds::WPDS NWA<Client>::NWAtoPDScallsWitness( WeightGen<Client> & wg ) const
+wpds::WPDS
+NWA::_private_NWAtoPDScallsWitness( WeightGen & wg ) const
 {
   //TODO: beware the implicit transitions
   //Q: do we need to make all transitions explicit in order to make this correct?
@@ -44,20 +48,20 @@ wpds::WPDS NWA<Client>::NWAtoPDScallsWitness( WeightGen<Client> & wg ) const
   wali::sem_elem_t wgt;
   
   //Internal Transitions
-  for( internalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
+  for( InternalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
     {  
       // (q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
       // where the weight w depends on sigma
       
-      St src = Trans::getSource(*iit);
-      St tgt = Trans::getTarget(*iit);
+      State src = Trans::getSource(*iit);
+      State tgt = Trans::getTarget(*iit);
       
-      if( isWild(Trans::getInternalSym(*iit)) )
+      if( Trans::getInternalSym(*iit) == WALI_WILD )
 	wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
       else
 	wgt = wg.getWeight(src, getClientInfo(src),
 			   Trans::getInternalSym(*iit),
-			   WeightGen<Client>::INTRA,
+			   WeightGen::INTRA,
 			   tgt, getClientInfo(tgt));           // w
       
       result.add_rule(program,                                //from_state (p)
@@ -68,21 +72,21 @@ wpds::WPDS NWA<Client>::NWAtoPDScallsWitness( WeightGen<Client> & wg ) const
     }
   
   //Call Transitions
-  for( callIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
+  for( CallIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
     {           
       // (q_c,sigma,q_e) in delta_c goes to
       // <p,q_c> -w-> <p,q_e q_c> in delta_2 
       // and the weight w depends on sigma
       
-      St src = Trans::getCallSite(*cit);
-      St tgt = Trans::getEntry(*cit);
+      State src = Trans::getCallSite(*cit);
+      State tgt = Trans::getEntry(*cit);
       
-      if( isWild(Trans::getCallSym(*cit)) )
+      if( Trans::getCallSym(*cit) == WALI_WILD )
 	wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w
       else
 	wgt = wg.getWeight(src, getClientInfo(src),
 			   Trans::getCallSym(*cit),
-			   WeightGen<Client>::CALL_TO_ENTRY,
+			   WeightGen::CALL_TO_ENTRY,
 			   tgt, getClientInfo(tgt));          // w
       
       result.add_rule(program,                                //from_state (p)
@@ -95,7 +99,7 @@ wpds::WPDS NWA<Client>::NWAtoPDScallsWitness( WeightGen<Client> & wg ) const
   
   //Return Transitions
   int r_count = 0;
-  for( returnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
+  for( ReturnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
     {
       ++r_count;
       
@@ -105,15 +109,15 @@ wpds::WPDS NWA<Client>::NWAtoPDScallsWitness( WeightGen<Client> & wg ) const
       // and <p_q_xcr,q_c> -1-> <p,q_r> in delta_1
       // where p_q_xcr = (p,q_x,q_c,q_r), and w depends on sigma
       
-      St src = Trans::getExit(*rit);
-      St tgt = Trans::getReturnSite(*rit);
+      State src = Trans::getExit(*rit);
+      State tgt = Trans::getReturnSite(*rit);
       
-      if( isWild(Trans::getReturnSym(*rit)) )
+      if( Trans::getReturnSym(*rit) == WALI_WILD )
 	wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w 
       else
 	wgt = wg.getWeight(src, getClientInfo(src), 
 			   Trans::getReturnSym(*rit),
-			   WeightGen<Client>::EXIT_TO_RET,  
+			   WeightGen::EXIT_TO_RET,  
 			   tgt, getClientInfo(tgt));    // w     
       
       //Note: if you change this, make sure you modify the code in NWPForest.createCA()
@@ -207,7 +211,7 @@ namespace wali {
     class PathVisitor : public wali::witness::Visitor {
     protected:
 				
-      wali::nwa::NWA<> *o;
+      wali::nwa::NWA *o;
       vector<string> path;
       vector<string> pathPreds;
       vector<wali::Key> states;
@@ -216,7 +220,7 @@ namespace wali {
 			
     public:
 				
-      PathVisitor(wali::nwa::NWA<> *orig) {
+      PathVisitor(wali::nwa::NWA *orig) {
 	o = orig;
 
 	set<wali::Key> ostates = o->getStates();
@@ -233,11 +237,20 @@ namespace wali {
 				
       ~PathVisitor() {}
 
-      bool visit( wali::witness::Witness * w ) {return true;}
+      bool visit( wali::witness::Witness * w ) {
+          (void) w;
+          return true;
+      }
 		
-      bool visitExtend( wali::witness::WitnessExtend * w ) {return true;}
+      bool visitExtend( wali::witness::WitnessExtend * w ) {
+          (void) w;
+          return true;
+      }
 		
-      bool visitCombine( wali::witness::WitnessCombine * w ) {return true;}
+      bool visitCombine( wali::witness::WitnessCombine * w ) {
+          (void) w;
+          return true;
+      }
 
       // Keeps track of everything needed to 
       bool visitRule( wali::witness::WitnessRule * w ) {
@@ -258,7 +271,7 @@ namespace wali {
 	bool found;
 	
 	if(states.size() > 0 && fromstate == states.back()) {
-	  set<wali::Key> r = o->getReturnSym(symbs.back(), from, to);
+          set<wali::Key> r = query::getReturnSym(*o, symbs.back(), from, to);
 	  sym = *(r.begin());
 
 	  states.pop_back();
@@ -266,7 +279,7 @@ namespace wali {
 
 	  if(r.size() > 0) found = true;
 	} else
-	  found = o->getSymbol(from,to,sym);
+          found = query::getSymbol(*o,from,to,sym);
 
 	if(!found) return true;
 					
@@ -284,23 +297,29 @@ namespace wali {
 
       vector<string> getPathPreds() {return pathPreds;}
 		
-      bool visitTrans( wali::witness::WitnessTrans * w ) {return true;}
+      bool visitTrans( wali::witness::WitnessTrans * w ) {
+          (void) w;
+          return true;
+      }
 		
-      bool visitMerge( wali::witness::WitnessMerge * w ) {return true;}
+      bool visitMerge( wali::witness::WitnessMerge * w ) {
+          (void) w;
+          return true;
+      }
 		
     };
   }
 }
 
-vector<string> getWord(wali::nwa::NWA<> *aut) {
+vector<string> getWord(wali::nwa::NWA *aut) {
   
   vector<string> ret;
 
-  if(!aut->isEmpty()) {
+  if(!query::languageIsEmpty(*aut)) {
     
-    wali::nwa::ReachGen<> wg;    
+    wali::nwa::ReachGen wg;
     wali::wfa::WFA query;
-    wali::wpds::WPDS conv = aut->NWAtoPDScallsWitness(wg);
+    wali::wpds::WPDS conv = aut->_private_NWAtoPDScallsWitness(wg);
     
     set<wali::Key> wpstates = conv.get_states();
     set<wali::Key>::iterator bi = wpstates.begin();
@@ -325,7 +344,7 @@ vector<string> getWord(wali::nwa::NWA<> *aut) {
 	path.path_summary();
 
 	// Find a path to the final state
-	wali::Key start = path.getInitialState();	
+	//wali::Key start = path.getInitialState();	
 	wali::wfa::TransSet t = path.match(state,*i);
 
 	// Collect the transitions
