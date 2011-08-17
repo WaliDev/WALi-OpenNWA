@@ -213,7 +213,7 @@ namespace wali {
     protected:
 				
       wali::nwa::NWA *o;
-      vector<string> path;
+        NestedWord word;
         //vector<string> pathPreds;
       vector<wali::Key> states;
       vector<wali::Key> symbs;
@@ -282,9 +282,11 @@ namespace wali {
 	}
 
 	bool found = false;
+        NestedWord::Position::Type trans_type;
 	
 	if(states.size() > 0 && fromstate == states.back()) {
           // if dealing with second half of return transition
+          trans_type = NestedWord::Position::ReturnType;
           set<wali::Key> r = query::getReturnSym(*o, symbs.back(), from, to);
 	  sym = *(r.begin());
 
@@ -296,9 +298,11 @@ namespace wali {
             // either internal or call
             if (to2 != WALI_EPSILON) {
               // call
+              trans_type = NestedWord::Position::CallType;
             }
             else {
               // internal
+              trans_type = NestedWord::Position::InternalType;
             }
           found = query::getSymbol(*o,from,to,sym);
         }
@@ -309,13 +313,14 @@ namespace wali {
 
 	if(symstr != "") {
           //pathPreds.push_back(state_preds[to]);
-	  path.push_back(symstr);
+          //path.push_back(symstr);
+          word.append(NestedWord::Position(sym, trans_type));
         }
 					
 	return true;
       }
 				
-      vector<string> getPath() {return path;}
+      NestedWord getPath() {return word;}
 
       //vector<string> getPathPreds() {return pathPreds;}
 		
@@ -333,10 +338,8 @@ namespace wali {
   }
 }
 
-vector<string> getWord(wali::nwa::NWA *aut) {
+NestedWord getWord(wali::nwa::NWA *aut) {
   
-  vector<string> ret;
-
   if(!query::languageIsEmpty(*aut)) {
     
     wali::nwa::ReachGen wg;
@@ -377,17 +380,12 @@ vector<string> getWord(wali::nwa::NWA *aut) {
 	  wali::witness::Witness* wit = dynamic_cast<wali::witness::Witness*>(se.get_ptr());		
 	  if( 0 != wit ) {
 	    wit->accept(v);
-	    vector<string>::iterator it;
-	    vector<string> p = v.getPath();
-	    //vector<string> preds = v.getPathPreds();
-	    for(it = p.begin(); it != p.end(); it++) {
-	      ret.push_back(*it);
-	    }
+            return v.getPath();
 	  }
 	}
       }
     }
   }
 
-  return ret;
+  return NestedWord();
 }
