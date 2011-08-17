@@ -212,7 +212,7 @@ namespace wali {
     class PathVisitor : public wali::witness::Visitor {
     protected:
 				
-      wali::nwa::NWA *o;
+      wali::nwa::NWA const * o;
         NestedWord word;
         //vector<string> pathPreds;
       vector<wali::Key> states;
@@ -221,7 +221,7 @@ namespace wali {
 			
     public:
 				
-      PathVisitor(wali::nwa::NWA *orig) {
+      PathVisitor(wali::nwa::NWA const * orig) {
 	o = orig;
 
         //std::cout << "PathVisitor(...):\n";
@@ -338,7 +338,7 @@ namespace wali {
   }
 }
 
-NestedWord getWord(wali::nwa::NWA *aut) {
+NestedWord getWord(wali::nwa::NWA const * aut) {
   
   if(!query::languageIsEmpty(*aut)) {
     

@@ -19,7 +19,7 @@ using std::vector;
 
 using wali::nwa::NestedWord;
 
-extern NestedWord getWord(wali::nwa::NWA *aut);
+extern NestedWord getWord(wali::nwa::NWA const * aut);
 
 int main(int argc, char** argv)
 {
