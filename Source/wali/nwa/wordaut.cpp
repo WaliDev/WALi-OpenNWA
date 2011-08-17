@@ -159,6 +159,7 @@ void Tokenize(const string& str,
 }
 
 pair<wali::Key, wali::Key> dissectIntersectState(string statelabel) {
+    //std::cout << "dissectIntersectState(" << statelabel << ")\n";
   
   statelabel.replace(statelabel.find("("), 1, "");
   statelabel.replace(statelabel.find(")"), 1, "");
@@ -223,6 +224,8 @@ namespace wali {
       PathVisitor(wali::nwa::NWA *orig) {
 	o = orig;
 
+        //std::cout << "PathVisitor(...):\n";
+
 	set<wali::Key> ostates = o->getStates();
 	for(set<wali::Key>::iterator kit = ostates.begin(); kit != ostates.end(); kit++) {
 
@@ -231,6 +234,8 @@ namespace wali {
 	  printKey(ss, *kit);
 	  ss.flush();
 	  stateLabels.insert(pair<wali::Key, string>(*kit, ss.str()));
+
+          //std::cout<< "  stateLabels maps [" << *kit << "] to [" << ss.str() << "]\n";
 	}
 						
       }
@@ -261,6 +266,12 @@ namespace wali {
 	wali::Key tostate = w->getRuleStub().to_state();
 	wali::Key sym;
 
+        //std::cout << "visitRule(...):\n"
+        //          << "  from stack [" << from << "] " << key2str(from) << "\n"
+        //          << "  from state [" << fromstate << "] " << key2str(fromstate) << "\n"
+        //          << "  to stack1 [" << to << "] " << key2str(to) << "\n"
+        //          << "  to state  [" << tostate << "] " << key2str(tostate) << std::endl;
+
 	if( to == wali::WALI_EPSILON) {
 	  symbs.push_back(from);
 	  states.push_back(tostate);
@@ -286,7 +297,7 @@ namespace wali {
 	string symstr = key2str(sym);
 
 	if(symstr != "") {
-          pathPreds.push_back(state_preds[dissectIntersectState(stateLabels[to]).second]);
+          pathPreds.push_back(state_preds[to]);
 	  path.push_back(symstr);
         }
 					
