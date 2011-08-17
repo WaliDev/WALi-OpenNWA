@@ -281,7 +281,7 @@ namespace wali {
 	  return true;
 	}
 
-	bool found;
+	bool found = false;
 	
 	if(states.size() > 0 && fromstate == states.back()) {
           // if dealing with second half of return transition
