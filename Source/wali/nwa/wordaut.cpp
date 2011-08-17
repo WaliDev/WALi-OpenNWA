@@ -214,7 +214,7 @@ namespace wali {
 				
       wali::nwa::NWA *o;
       vector<string> path;
-      vector<string> pathPreds;
+        //vector<string> pathPreds;
       vector<wali::Key> states;
       vector<wali::Key> symbs;
       map<wali::Key, string> stateLabels;
@@ -263,6 +263,7 @@ namespace wali {
 	wali::Key from = w->getRuleStub().from_stack();
 	wali::Key fromstate = w->getRuleStub().from_state();
 	wali::Key to = w->getRuleStub().to_stack1();
+        wali::Key to2 = w->getRuleStub().to_stack2();
 	wali::Key tostate = w->getRuleStub().to_state();
 	wali::Key sym;
 
@@ -273,6 +274,7 @@ namespace wali {
         //          << "  to state  [" << tostate << "] " << key2str(tostate) << std::endl;
 
 	if( to == wali::WALI_EPSILON) {
+          // dealing with first half of return transition
 	  symbs.push_back(from);
 	  states.push_back(tostate);
 
@@ -282,6 +284,7 @@ namespace wali {
 	bool found;
 	
 	if(states.size() > 0 && fromstate == states.back()) {
+          // if dealing with second half of return transition
           set<wali::Key> r = query::getReturnSym(*o, symbs.back(), from, to);
 	  sym = *(r.begin());
 
@@ -289,15 +292,23 @@ namespace wali {
 	  symbs.pop_back();
 
 	  if(r.size() > 0) found = true;
-	} else
+	} else {
+            // either internal or call
+            if (to2 != WALI_EPSILON) {
+              // call
+            }
+            else {
+              // internal
+            }
           found = query::getSymbol(*o,from,to,sym);
+        }
 
 	if(!found) return true;
 					
 	string symstr = key2str(sym);
 
 	if(symstr != "") {
-          pathPreds.push_back(state_preds[to]);
+          //pathPreds.push_back(state_preds[to]);
 	  path.push_back(symstr);
         }
 					
@@ -306,7 +317,7 @@ namespace wali {
 				
       vector<string> getPath() {return path;}
 
-      vector<string> getPathPreds() {return pathPreds;}
+      //vector<string> getPathPreds() {return pathPreds;}
 		
       bool visitTrans( wali::witness::WitnessTrans * w ) {
           (void) w;
@@ -368,7 +379,7 @@ vector<string> getWord(wali::nwa::NWA *aut) {
 	    wit->accept(v);
 	    vector<string>::iterator it;
 	    vector<string> p = v.getPath();
-	    vector<string> preds = v.getPathPreds();
+	    //vector<string> preds = v.getPathPreds();
 	    for(it = p.begin(); it != p.end(); it++) {
 	      ret.push_back(*it);
 	    }
