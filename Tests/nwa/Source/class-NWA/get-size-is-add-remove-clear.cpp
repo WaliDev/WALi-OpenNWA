@@ -842,7 +842,7 @@ namespace wali
         TEST(wali$nwa$NWA$addInternalTrans, addingNewTransitionMakesItPresent)
         {
             OddNumEvenGroupsNwa fixture;
-            unsigned int const starting_num = fixture.nwa.sizeInternalTrans();
+            size_t const starting_num = fixture.nwa.sizeInternalTrans();
 
             EXPECT_TRUE(fixture.nwa.addInternalTrans(fixture.q0, fixture.zero, fixture.q1));
 
@@ -865,9 +865,9 @@ namespace wali
             NWA copy = fixture.nwa;
             SomeElements e;
             
-            unsigned int const starting_num_internals = fixture.nwa.sizeInternalTrans();
-            unsigned int const starting_num_states = fixture.nwa.sizeStates();
-            unsigned int const starting_num_symbols = fixture.nwa.sizeSymbols();
+            size_t const starting_num_internals = fixture.nwa.sizeInternalTrans();
+            size_t const starting_num_states = fixture.nwa.sizeStates();
+            size_t const starting_num_symbols = fixture.nwa.sizeSymbols();
 
             EXPECT_TRUE(fixture.nwa.addInternalTrans(e.state, e.symbol, e.state2));
 
@@ -892,7 +892,7 @@ namespace wali
         TEST(wali$nwa$NWA$addCallTrans, addingNewTransitionMakesItPresent)
         {
             OddNumEvenGroupsNwa fixture;
-            unsigned int const starting_num = fixture.nwa.sizeCallTrans();
+            size_t const starting_num = fixture.nwa.sizeCallTrans();
 
             EXPECT_TRUE(fixture.nwa.addCallTrans(fixture.q0, fixture.zero, fixture.q1));
 
@@ -915,9 +915,9 @@ namespace wali
             NWA copy = fixture.nwa;
             SomeElements e;
             
-            unsigned int const starting_num_internals = fixture.nwa.sizeCallTrans();
-            unsigned int const starting_num_states = fixture.nwa.sizeStates();
-            unsigned int const starting_num_symbols = fixture.nwa.sizeSymbols();
+            size_t const starting_num_internals = fixture.nwa.sizeCallTrans();
+            size_t const starting_num_states = fixture.nwa.sizeStates();
+            size_t const starting_num_symbols = fixture.nwa.sizeSymbols();
 
             EXPECT_TRUE(fixture.nwa.addCallTrans(e.state, e.symbol, e.state2));
 
@@ -943,7 +943,7 @@ namespace wali
         TEST(wali$nwa$NWA$addReturnTrans, addingNewTransitionMakesItPresent)
         {
             OddNumEvenGroupsNwa fixture;
-            unsigned int const starting_num = fixture.nwa.sizeReturnTrans();
+            size_t const starting_num = fixture.nwa.sizeReturnTrans();
 
             EXPECT_TRUE(fixture.nwa.addReturnTrans(fixture.q0, fixture.q1, fixture.zero, fixture.q1));
 
@@ -966,9 +966,9 @@ namespace wali
             NWA copy = fixture.nwa;
             SomeElements e;
             
-            unsigned int const starting_num_internals = fixture.nwa.sizeReturnTrans();
-            unsigned int const starting_num_states = fixture.nwa.sizeStates();
-            unsigned int const starting_num_symbols = fixture.nwa.sizeSymbols();
+            size_t const starting_num_internals = fixture.nwa.sizeReturnTrans();
+            size_t const starting_num_states = fixture.nwa.sizeStates();
+            size_t const starting_num_symbols = fixture.nwa.sizeSymbols();
 
             EXPECT_TRUE(fixture.nwa.addReturnTrans(e.state, e.state3, e.symbol, e.state2));
 
