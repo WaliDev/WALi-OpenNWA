@@ -33,6 +33,7 @@ namespace wali
 
     // Forward decl
     class NestedWord;
+    typedef ref_ptr<NestedWord> NestedWordRefPtr;
 
     /// A set of States.
     ///

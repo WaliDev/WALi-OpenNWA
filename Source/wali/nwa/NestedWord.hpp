@@ -1,6 +1,7 @@
 #ifndef wali_nwa_NESTED_WORD_HPP
 #define wali_nwa_NESTED_WORD_HPP
 
+#include "wali/Countable.hpp"
 #include "wali/nwa/NWAFwd.hpp"
 #include <vector>
 #include <algorithm>
@@ -22,7 +23,7 @@ namespace wali
     /// with whether it is an internal, call, or return position. The
     /// nesting relation is induced by the matchings between calls and
     /// returns.
-    class NestedWord
+    class NestedWord : public Countable
     {
     public:
       /// Each position in the nested word has a symbol and a type.
@@ -115,6 +116,9 @@ namespace wali
         }
       }
     };
+
+
+    typedef ref_ptr<NestedWord> NestedWordRefPtr;
   }
 }
 

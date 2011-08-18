@@ -212,16 +212,14 @@ namespace wali {
       } // namespace wali::nwa::query::details
 
 
-      /// Given an automaton 'aut', return some word in its language.
-      ///
-      /// If L(aut)={}, right now there is no way to distinguish that case
-      /// from the case where L(aut) contains epsilon, and that's what the
-      /// function returns. (You can, of course, call languageContains to see
-      /// if epsilon is in the language.)
-      NestedWord getSomeAcceptedWord(wali::nwa::NWA const & nwa) {
-  
-        if(!query::languageIsEmpty(nwa)) {
-    
+      
+      ref_ptr<NestedWord>
+      getSomeAcceptedWord(wali::nwa::NWA const & nwa)
+      {
+        if(query::languageIsEmpty(nwa)) {
+          return NULL;
+        }
+        else {
           wali::nwa::ReachGen wg;
           wali::wfa::WFA query;
           ref_ptr<wali::wpds::Wrapper> wrapper = new wali::witness::WitnessWrapper();
@@ -270,12 +268,13 @@ namespace wali {
                 dynamic_cast<wali::witness::Witness*>(se.get_ptr());
               assert(wit);
               wit->accept(v);
-              return v.getPath();
+              return new NestedWord(v.getPath());
             }
           }
         }
 
-        return NestedWord();
+        assert(0 && "unreachable, I think");
+        return NULL;
       }
 
     } // namespace wali::nwa::query

@@ -75,9 +75,9 @@ namespace wali {
                         //EXPECT_TRUE(languageIsEmpty(nwas[nwa]));
                     }
                     else {
-                        NestedWord word = getSomeAcceptedWord(nwas[nwa]);
+                        NestedWordRefPtr word = getSomeAcceptedWord(nwas[nwa]);
 
-                        EXPECT_TRUE(languageContains(nwas[nwa], word));
+                        EXPECT_TRUE(languageContains(nwas[nwa], *word));
                     }
                 }
             }
@@ -94,8 +94,8 @@ namespace wali {
 
                 NestedWord eps;
 
-                NestedWord word = getSomeAcceptedWord(nwa);
-                EXPECT_EQ(eps, word);
+                NestedWordRefPtr word = getSomeAcceptedWord(nwa);
+                EXPECT_EQ(eps, *word);
             }
             
             TEST(wali$nwa$query$$languageIsEmpty$and$getSomeAcceptedWord, testInternalOnlyNwa)
@@ -119,9 +119,9 @@ namespace wali {
                 expected.appendInternal(e.symbol);
                 expected.appendInternal(e.symbol);
 
-                NestedWord word = getSomeAcceptedWord(nwa);
+                NestedWordRefPtr word = getSomeAcceptedWord(nwa);
                 
-                EXPECT_EQ(expected, word);
+                EXPECT_EQ(expected, *word);
             }
 
             TEST(wali$nwa$query$$languageIsEmpty$and$getSomeAcceptedWord, testMiddleCall)
@@ -145,9 +145,9 @@ namespace wali {
                 expected.appendCall(e.symbol);
                 expected.appendInternal(e.symbol);
 
-                NestedWord word = getSomeAcceptedWord(nwa);
+                NestedWordRefPtr word = getSomeAcceptedWord(nwa);
                 
-                EXPECT_EQ(expected, word);
+                EXPECT_EQ(expected, *word);
             }
 
 
@@ -172,9 +172,9 @@ namespace wali {
                 expected.appendReturn(e.symbol);
                 expected.appendInternal(e.symbol);
 
-                NestedWord word = getSomeAcceptedWord(nwa);
+                NestedWordRefPtr word = getSomeAcceptedWord(nwa);
                 
-                EXPECT_EQ(expected, word);
+                EXPECT_EQ(expected, *word);
             }
 
 
@@ -211,10 +211,10 @@ namespace wali {
 
                 ASSERT_TRUE(languageContains(nwa, expected));
 
-                NestedWord word = getSomeAcceptedWord(nwa);
+                NestedWordRefPtr word = getSomeAcceptedWord(nwa);
 
-                EXPECT_TRUE(languageContains(nwa, word));
-                EXPECT_EQ(expected, word);
+                EXPECT_TRUE(languageContains(nwa, *word));
+                EXPECT_EQ(expected, *word);
             }
         }
     }
