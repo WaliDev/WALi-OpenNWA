@@ -47,9 +47,6 @@ namespace wali {
     namespace nwa {
         namespace query {
 
-            extern NestedWord getSomeAcceptedWord(NWA const & aut);
-
-
             TEST(wali$nwa$query$$languageIsEmpty, testBatteryOfVariouslyBalancedNwas)
             {
                 for (unsigned nwa = 0 ; nwa < num_nwas ; ++nwa) {

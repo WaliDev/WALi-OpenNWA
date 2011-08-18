@@ -47,6 +47,26 @@ namespace wali {
 
       /**
        *
+       * @brief Returns some word accepted by 'nwa'
+       *
+       * If there is not such a word (L(nwa)={}), returns the empty
+       * string. (There is no way to distinguish "empty language" from
+       * "here's epsilon; it's in the language" from just this call; use
+       * languageContains to make that determination.)
+       *
+       * @return A word accepted by 'nwa'
+       *
+       */
+      extern
+      NestedWord
+      getSomeAcceptedWord(NWA const & nwa);
+
+
+
+
+
+      /**
+       *
        * @brief tests whether the languages of the given NWAs are equal
        *
        * This method tests the equivalence of the languages accepted by the given NWAs.

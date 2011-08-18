@@ -19,9 +19,6 @@ using std::vector;
 
 using wali::nwa::NestedWord;
 
-namespace wali { namespace nwa { namespace query {
-            extern NestedWord getSomeAcceptedWord(wali::nwa::NWA const & aut);
-        }}}
 
 int main(int argc, char** argv)
 {
