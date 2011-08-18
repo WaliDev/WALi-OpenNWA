@@ -309,9 +309,7 @@ namespace wali {
 
 	if(!found) return true;
 					
-	string symstr = key2str(sym);
-
-	if(symstr != "") {
+	if(sym != WALI_EPSILON) {
           //pathPreds.push_back(state_preds[to]);
           //path.push_back(symstr);
           word.append(NestedWord::Position(sym, trans_type));
