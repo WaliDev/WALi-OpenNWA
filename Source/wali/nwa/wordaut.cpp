@@ -273,8 +273,7 @@ namespace wali {
             NestedWord::Position::Type trans_type;
 	
             if(states.size() > 0) {
-              // Dealing with the second half of a return transition (case #2
-              // above).
+              // Dealing with the second half of a return transition (case #2 above).
               assert(fromstate == states.back());
               
               trans_type = NestedWord::Position::ReturnType;
@@ -348,36 +347,33 @@ namespace wali {
           set<wali::Key> finals = aut->getFinalStates();
           wali::Key accept = wali::getKey("__accept");
 
-          // Try to find a path from some initial state to some final state
-          for(j = inits.begin(); j != inits.end(); j++) {
-            for(i = finals.begin(); i != finals.end(); i++) {
 
-              // Construct the query automaton
-              query.addTrans(state, *j, accept, wg.getOne());
-              query.set_initial_state(state);
-              query.add_final_state(accept);
-              // Accept pending returns
-              for( NWA::StateIterator it = aut->beginInitialStates(); it != aut->endInitialStates(); it++ ) {
-                query.addTrans(accept, *it, accept, wg.getOne());
-              }
+          // Construct the query automaton
+          query.set_initial_state(state);
+          query.add_final_state(accept);
+          // Accept pending returns
+          for( NWA::StateIterator it = aut->beginInitialStates(); it != aut->endInitialStates(); it++ ) {
+            query.addTrans(state, *it, accept, wg.getOne());
+            query.addTrans(accept, *it, accept, wg.getOne());
+          }
 	
               // Execute the post* query
-              wali::wfa::WFA path = conv.poststar(query);
-              path.path_summary();
-
-              // Find a path to the final state
-              wali::wfa::TransSet t = path.match(state,*i);
-
-              // Collect the transitions
-              for(wali::wfa::TransSet::iterator itt = t.begin(); itt != t.end(); itt++) {
-                sem_elem_t se = path.getState((*itt)->to())->weight()->extend((*itt)->weight());
-                if(se->equal(se->zero())) continue;
-                details::PathVisitor v(aut);					
-                wali::witness::Witness* wit = dynamic_cast<wali::witness::Witness*>(se.get_ptr());		
-                if( 0 != wit ) {
-                  wit->accept(v);
-                  return v.getPath();
-                }
+          wali::wfa::WFA path = conv.poststar(query);
+          path.path_summary();
+          
+          for(i = finals.begin(); i != finals.end(); i++) {              
+            // Find a path to the final state
+            wali::wfa::TransSet t = path.match(state,*i);
+            
+            // Collect the transitions
+            for(wali::wfa::TransSet::iterator itt = t.begin(); itt != t.end(); itt++) {
+              sem_elem_t se = path.getState((*itt)->to())->weight()->extend((*itt)->weight());
+              if(se->equal(se->zero())) continue;
+              details::PathVisitor v(aut);					
+              wali::witness::Witness* wit = dynamic_cast<wali::witness::Witness*>(se.get_ptr());		
+              if( 0 != wit ) {
+                wit->accept(v);
+                return v.getPath();
               }
             }
           }
