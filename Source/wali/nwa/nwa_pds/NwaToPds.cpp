@@ -6,14 +6,16 @@ namespace wali
   {
     namespace nwa_pds
     {
-      wpds::WPDS NWAToPDSReturns( NWA const & nwa, WeightGen const & wg )
+      wpds::WPDS NWAToPDSReturns( NWA const & nwa, WeightGen const & wg)
       {
 	return nwa._private_NwaToPdsReturns_(wg);
       }
 
-      wpds::WPDS NWAToPDSCalls( NWA const & nwa, WeightGen const & wg )
+      wpds::WPDS NWAToPDSCalls( NWA const & nwa,
+                                WeightGen const & wg,
+                                ref_ptr<wali::wpds::Wrapper> wrapper  )
       {
-	return nwa._private_NwaToPdsCalls_(wg);
+	return nwa._private_NwaToPdsCalls_(wg, wrapper);
       }
 
       wpds::WPDS NWAToBackwardsPDSReturns( NWA const & nwa, WeightGen const & wg )
@@ -238,12 +240,13 @@ namespace wali
 
 
     // constructs the PDS equivalent to this NWA, stacking calls
-    wpds::WPDS NWA::_private_NwaToPdsCalls_( WeightGen const & wg ) const
+    wpds::WPDS NWA::_private_NwaToPdsCalls_( WeightGen const & wg,
+                                             ref_ptr<wali::wpds::Wrapper> wrapper ) const
     {
       //TODO: beware the implicit transitions
       //Q: do we need to make all transitions explicit in order to make this correct?
 
-      wpds::WPDS result = wpds::WPDS();
+      wpds::WPDS result(wrapper);
 
       Key program = getProgramControlLocation();  // = wali::getKey("program");
 

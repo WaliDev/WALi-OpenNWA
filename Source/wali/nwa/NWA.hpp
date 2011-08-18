@@ -1214,16 +1214,14 @@ namespace wali
       }
 
 
-      wpds::WPDS _private_NwaToPdsCalls_( WeightGen const & wg ) const;
+      wpds::WPDS _private_NwaToPdsCalls_( WeightGen const & wg,
+                                          ref_ptr<wali::wpds::Wrapper> wrapper ) const;
       wpds::WPDS NWAtoPDScalls( WeightGen const & wg ) const {
 	return nwa_pds::NWAToPDSCalls(*this, wg);
       }
       static wpds::WPDS NWAtoPDScalls( NWA const & nwa, WeightGen const & wg ) {
         return nwa_pds::NWAToPDSCalls(nwa, wg);
       }
-
-      wpds::WPDS
-      _private_NWAtoPDScallsWitness( WeightGen & wg ) const;
 
       wpds::WPDS _private_NwaToBackwardsPdsCalls_( WeightGen const & wg ) const;
       wpds::WPDS NWAtoBackwardsPDScalls( WeightGen const & wg ) const {

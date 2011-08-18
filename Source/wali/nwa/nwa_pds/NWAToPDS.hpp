@@ -32,7 +32,18 @@ namespace wali
        * @return the backwards PDS equivalent to this NWA
        *
        */ 
-      extern wpds::WPDS NWAToPDSCalls( NWA const & nwa, WeightGen const & wg );
+      extern
+      wpds::WPDS
+      NWAToPDSCalls( NWA const & nwa,
+                     WeightGen const & wg,
+                     ref_ptr<wali::wpds::Wrapper> wrapper );
+        
+      inline
+      wpds::WPDS
+      NWAToPDSCalls( NWA const & nwa, WeightGen const & wg )
+      {
+        return NWAToPDSCalls(nwa, wg, NULL);
+      }
 
 
       /**
