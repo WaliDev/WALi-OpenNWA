@@ -346,9 +346,7 @@ NestedWord getWord(wali::nwa::NWA const * aut) {
     wali::wfa::WFA query;
     wali::wpds::WPDS conv = aut->_private_NWAtoPDScallsWitness(wg);
     
-    set<wali::Key> wpstates = conv.get_states();
-    set<wali::Key>::iterator bi = wpstates.begin();
-    wali::Key state = *bi;		
+    wali::Key state = getProgramControlLocation();
     
     set<wali::Key>::iterator i, j;
     set<wali::Key> inits = aut->getInitialStates();
