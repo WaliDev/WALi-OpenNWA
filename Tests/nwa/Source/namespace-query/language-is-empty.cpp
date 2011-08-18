@@ -82,7 +82,22 @@ namespace wali {
                 }
             }
 
+            
+            TEST(wali$nwa$query$$languageIsEmpty$and$getWord, testEpsilonNwa)
+            {
+                NWA nwa;
+                SomeElements e;
+                nwa.addInitialState(e.state);
+                nwa.addFinalState(e.state);
 
+                EXPECT_FALSE(languageIsEmpty(nwa));
+
+                NestedWord eps;
+
+                NestedWord word = getWord(&nwa);
+                EXPECT_EQ(eps, word);
+            }
+            
         }
     }
 }
