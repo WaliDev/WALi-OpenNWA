@@ -98,6 +98,84 @@ namespace wali {
                 EXPECT_EQ(eps, word);
             }
             
+            TEST(wali$nwa$query$$languageIsEmpty$and$getWord, testInternalOnlyNwa)
+            {
+                //               a              a              a
+                //  --> (state) ----> (state2) ----> (state3) ---> ((state4))
+                NWA nwa;
+                SomeElements e;
+                State state4 = getKey("state4");
+                    
+                nwa.addInitialState(e.state);
+                nwa.addInternalTrans(e.state, e.symbol, e.state2);
+                nwa.addInternalTrans(e.state2, e.symbol, e.state3);
+                nwa.addInternalTrans(e.state3, e.symbol, state4);
+                nwa.addFinalState(state4);
+                
+                EXPECT_FALSE(languageIsEmpty(nwa));
+
+                NestedWord expected;
+                expected.appendInternal(e.symbol);
+                expected.appendInternal(e.symbol);
+                expected.appendInternal(e.symbol);
+
+                NestedWord word = getWord(&nwa);
+                
+                EXPECT_EQ(expected, word);
+            }
+
+            TEST(wali$nwa$query$$languageIsEmpty$and$getWord, testMiddleCall)
+            {
+                //               a              (a             a
+                //  --> (state) ----> (state2) ----> (state3) ---> ((state4))
+                NWA nwa;
+                SomeElements e;
+                State state4 = getKey("state4");
+                    
+                nwa.addInitialState(e.state);
+                nwa.addInternalTrans(e.state, e.symbol, e.state2);
+                nwa.addCallTrans(e.state2, e.symbol, e.state3);
+                nwa.addInternalTrans(e.state3, e.symbol, state4);
+                nwa.addFinalState(state4);
+                
+                EXPECT_FALSE(languageIsEmpty(nwa));
+
+                NestedWord expected;
+                expected.appendInternal(e.symbol);
+                expected.appendCall(e.symbol);
+                expected.appendInternal(e.symbol);
+
+                NestedWord word = getWord(&nwa);
+                
+                EXPECT_EQ(expected, word);
+            }
+
+
+            TEST(wali$nwa$query$$languageIsEmpty$and$getWord, testMiddleReturn)
+            {
+                //               a              a)             a
+                //  --> (state) ----> (state2) ----> (state3) ---> ((state4))
+                NWA nwa;
+                SomeElements e;
+                State state4 = getKey("state4");
+                    
+                nwa.addInitialState(e.state);
+                nwa.addInternalTrans(e.state, e.symbol, e.state2);
+                nwa.addReturnTrans(e.state2, e.state, e.symbol, e.state3);
+                nwa.addInternalTrans(e.state3, e.symbol, state4);
+                nwa.addFinalState(state4);
+                
+                EXPECT_FALSE(languageIsEmpty(nwa));
+
+                NestedWord expected;
+                expected.appendInternal(e.symbol);
+                expected.appendReturn(e.symbol);
+                expected.appendInternal(e.symbol);
+
+                NestedWord word = getWord(&nwa);
+                
+                EXPECT_EQ(expected, word);
+            }
         }
     }
 }
