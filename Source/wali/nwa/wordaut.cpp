@@ -44,7 +44,7 @@ namespace wali {
           /// Holds the NWA associated with the given query. We need this so
           /// that when we know that the trace went from state p to q, we can
           /// look up a symbol on that edge.
-          wali::nwa::NWA const & o;
+          wali::nwa::NWA const & nwa;
 
           /// This is the word that corresponds to the trace; built up as
           /// visitRule() is called.
@@ -53,13 +53,14 @@ namespace wali {
           /// Holds the *PDS* state and stack symbol corresponding to the
           /// "first half" of a NWA return transition. See visitRule() for
           /// more details.
-          vector<wali::Key> states;
           vector<wali::Key> symbs;
+          vector<wali::Key> states;
+          
 			
         public:
 				
           PathVisitor(wali::nwa::NWA const & orig)
-            : o(orig)
+            : nwa(orig)
           {}
 				
           ~PathVisitor() {}
@@ -162,7 +163,7 @@ namespace wali {
               assert(fromstate == states.back());
               
               trans_type = NestedWord::Position::ReturnType;
-              set<wali::Key> r = query::getReturnSym(o, symbs.back(), from, to);
+              set<wali::Key> r = query::getReturnSym(nwa, symbs.back(), from, to);
               assert(r.size() > 0);
               sym = *(r.begin());
 
@@ -172,14 +173,14 @@ namespace wali {
             else if (to2 != WALI_EPSILON) {
               // call (part of case #3)
               trans_type = NestedWord::Position::CallType;
-              set<wali::Key> r = query::getCallSym(o,from,to);
+              set<wali::Key> r = query::getCallSym(nwa, from, to);
               assert(r.size() > 0);
               sym = *(r.begin());
             }
             else {
               // internal (part of case #3)
               trans_type = NestedWord::Position::InternalType;
-              set<wali::Key> r = query::getInternalSym(o,from,to);
+              set<wali::Key> r = query::getInternalSym(nwa, from, to);
               assert(r.size() > 0);
               sym = *(r.begin());
             }
