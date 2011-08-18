@@ -269,7 +269,6 @@ namespace wali {
             // OK, we're in one of cases #2 or q3 above. Figure out which
             // one, and put the transition type in trans_type, and the symbol
             // in 'sym'.
-            bool found = false;
             wali::Key sym;
             NestedWord::Position::Type trans_type;
 	
@@ -282,34 +281,24 @@ namespace wali {
               set<wali::Key> r = query::getReturnSym(*o, symbs.back(), from, to);
               assert(r.size() > 0);
               sym = *(r.begin());
-              found = true;
 
               states.pop_back();
               symbs.pop_back();
-            } else {
-              // Dealing with either an internal or call (case #3 above).
-              if (to2 != WALI_EPSILON) {
-                // call
-                trans_type = NestedWord::Position::CallType;
-                set<wali::Key> r = query::getCallSym(*o,from,to);
-                assert(r.size() > 0);
-                sym = *(r.begin());
-                found = true;
-              }
-              else {
-                // internal
-                trans_type = NestedWord::Position::InternalType;
-                set<wali::Key> r = query::getInternalSym(*o,from,to);
-                assert(r.size() > 0);
-                sym = *(r.begin());
-                found = true;
-              }
-              
             }
-
-            // I think this should never happen
-            assert(found);
-            if(!found) return true;
+            else if (to2 != WALI_EPSILON) {
+              // call (part of case #3)
+              trans_type = NestedWord::Position::CallType;
+              set<wali::Key> r = query::getCallSym(*o,from,to);
+              assert(r.size() > 0);
+              sym = *(r.begin());
+            }
+            else {
+              // internal (part of case #3)
+              trans_type = NestedWord::Position::InternalType;
+              set<wali::Key> r = query::getInternalSym(*o,from,to);
+              assert(r.size() > 0);
+              sym = *(r.begin());
+            }
 
             // If the transition was an epsilon transition, then we don't
             // want to save it since it isn't part of the word.
