@@ -280,18 +280,19 @@ namespace wali {
               
               trans_type = NestedWord::Position::ReturnType;
               set<wali::Key> r = query::getReturnSym(*o, symbs.back(), from, to);
+              assert(r.size() > 0);
               sym = *(r.begin());
+              found = true;
 
               states.pop_back();
               symbs.pop_back();
-
-              if(r.size() > 0) found = true;
             } else {
               // Dealing with either an internal or call (case #3 above).
               if (to2 != WALI_EPSILON) {
                 // call
                 trans_type = NestedWord::Position::CallType;
                 set<wali::Key> r = query::getCallSym(*o,from,to);
+                assert(r.size() > 0);
                 sym = *(r.begin());
                 found = true;
               }
@@ -299,6 +300,7 @@ namespace wali {
                 // internal
                 trans_type = NestedWord::Position::InternalType;
                 set<wali::Key> r = query::getInternalSym(*o,from,to);
+                assert(r.size() > 0);
                 sym = *(r.begin());
                 found = true;
               }
