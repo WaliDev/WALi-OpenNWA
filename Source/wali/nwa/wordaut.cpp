@@ -161,19 +161,9 @@ namespace wali {
 			
         public:
 				
-          PathVisitor(wali::nwa::NWA const * orig) {
-            o = orig;
-
-            set<wali::Key> ostates = o->getStates();
-            for(set<wali::Key>::iterator kit = ostates.begin(); kit != ostates.end(); kit++) {
-
-              stringstream ss(stringstream::in | stringstream::out);
-
-              printKey(ss, *kit);
-              ss.flush();
-            }
-						
-          }
+          PathVisitor(wali::nwa::NWA const * orig)
+            : o(orig)
+          {}
 				
           ~PathVisitor() {}
 
