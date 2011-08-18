@@ -341,12 +341,7 @@ namespace wali {
           wali::wpds::WPDS conv = aut->_private_NWAtoPDScallsWitness(wg);
     
           wali::Key state = getProgramControlLocation();
-    
-          set<wali::Key>::iterator i, j;
-          set<wali::Key> inits = aut->getInitialStates();
-          set<wali::Key> finals = aut->getFinalStates();
           wali::Key accept = wali::getKey("__accept");
-
 
           // Construct the query automaton
           query.set_initial_state(state);
@@ -361,7 +356,7 @@ namespace wali {
           wali::wfa::WFA path = conv.poststar(query);
           path.path_summary();
           
-          for(i = finals.begin(); i != finals.end(); i++) {              
+          for(NWA::StateIterator i = aut->beginFinalStates(); i != aut->endFinalStates(); i++) {              
             // Find a path to the final state
             wali::wfa::TransSet t = path.match(state,*i);
             
