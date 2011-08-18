@@ -151,177 +151,177 @@ namespace wali {
 
       namespace details {
 		
-    class PathVisitor : public wali::witness::Visitor {
-    protected:
+        class PathVisitor : public wali::witness::Visitor {
+        protected:
 				
-      wali::nwa::NWA const * o;
-      NestedWord word;
-      vector<wali::Key> states;
-      vector<wali::Key> symbs;
+          wali::nwa::NWA const * o;
+          NestedWord word;
+          vector<wali::Key> states;
+          vector<wali::Key> symbs;
 			
-    public:
+        public:
 				
-      PathVisitor(wali::nwa::NWA const * orig) {
-	o = orig;
+          PathVisitor(wali::nwa::NWA const * orig) {
+            o = orig;
 
-	set<wali::Key> ostates = o->getStates();
-	for(set<wali::Key>::iterator kit = ostates.begin(); kit != ostates.end(); kit++) {
+            set<wali::Key> ostates = o->getStates();
+            for(set<wali::Key>::iterator kit = ostates.begin(); kit != ostates.end(); kit++) {
 
-	  stringstream ss(stringstream::in | stringstream::out);
+              stringstream ss(stringstream::in | stringstream::out);
 
-	  printKey(ss, *kit);
-	  ss.flush();
-	}
+              printKey(ss, *kit);
+              ss.flush();
+            }
 						
-      }
+          }
 				
-      ~PathVisitor() {}
+          ~PathVisitor() {}
 
-      bool visit( wali::witness::Witness * w ) {
-        (void) w;
-        return true;
-      }
+          bool visit( wali::witness::Witness * w ) {
+            (void) w;
+            return true;
+          }
 		
-      bool visitExtend( wali::witness::WitnessExtend * w ) {
-        (void) w;
-        return true;
-      }
+          bool visitExtend( wali::witness::WitnessExtend * w ) {
+            (void) w;
+            return true;
+          }
 		
-      bool visitCombine( wali::witness::WitnessCombine * w ) {
-        (void) w;
-        return true;
-      }
+          bool visitCombine( wali::witness::WitnessCombine * w ) {
+            (void) w;
+            return true;
+          }
 
-      // Keeps track of everything needed to 
-      bool visitRule( wali::witness::WitnessRule * w ) {
+          // Keeps track of everything needed to 
+          bool visitRule( wali::witness::WitnessRule * w ) {
 								
-	wali::Key from = w->getRuleStub().from_stack();
-	wali::Key fromstate = w->getRuleStub().from_state();
-	wali::Key to = w->getRuleStub().to_stack1();
-        wali::Key to2 = w->getRuleStub().to_stack2();
-	wali::Key tostate = w->getRuleStub().to_state();
-	wali::Key sym;
+            wali::Key from = w->getRuleStub().from_stack();
+            wali::Key fromstate = w->getRuleStub().from_state();
+            wali::Key to = w->getRuleStub().to_stack1();
+            wali::Key to2 = w->getRuleStub().to_stack2();
+            wali::Key tostate = w->getRuleStub().to_state();
+            wali::Key sym;
 
-        //std::cout << "visitRule(...):\n"
-        //          << "  from stack [" << from << "] " << key2str(from) << "\n"
-        //          << "  from state [" << fromstate << "] " << key2str(fromstate) << "\n"
-        //          << "  to stack1 [" << to << "] " << key2str(to) << "\n"
-        //          << "  to state  [" << tostate << "] " << key2str(tostate) << std::endl;
+            //std::cout << "visitRule(...):\n"
+            //          << "  from stack [" << from << "] " << key2str(from) << "\n"
+            //          << "  from state [" << fromstate << "] " << key2str(fromstate) << "\n"
+            //          << "  to stack1 [" << to << "] " << key2str(to) << "\n"
+            //          << "  to state  [" << tostate << "] " << key2str(tostate) << std::endl;
 
-	if( to == wali::WALI_EPSILON) {
-          // dealing with first half of return transition
-	  symbs.push_back(from);
-	  states.push_back(tostate);
+            if( to == wali::WALI_EPSILON) {
+              // dealing with first half of return transition
+              symbs.push_back(from);
+              states.push_back(tostate);
 
-	  return true;
-	}
+              return true;
+            }
 
-	bool found = false;
-        NestedWord::Position::Type trans_type;
+            bool found = false;
+            NestedWord::Position::Type trans_type;
 	
-	if(states.size() > 0 && fromstate == states.back()) {
-          // if dealing with second half of return transition
-          trans_type = NestedWord::Position::ReturnType;
-          set<wali::Key> r = query::getReturnSym(*o, symbs.back(), from, to);
-	  sym = *(r.begin());
+            if(states.size() > 0 && fromstate == states.back()) {
+              // if dealing with second half of return transition
+              trans_type = NestedWord::Position::ReturnType;
+              set<wali::Key> r = query::getReturnSym(*o, symbs.back(), from, to);
+              sym = *(r.begin());
 
-	  states.pop_back();
-	  symbs.pop_back();
+              states.pop_back();
+              symbs.pop_back();
 
-	  if(r.size() > 0) found = true;
-	} else {
-          // either internal or call
-          if (to2 != WALI_EPSILON) {
-            // call
-            trans_type = NestedWord::Position::CallType;
-          }
-          else {
-            // internal
-            trans_type = NestedWord::Position::InternalType;
-          }
-          found = query::getSymbol(*o,from,to,sym);
-        }
+              if(r.size() > 0) found = true;
+            } else {
+              // either internal or call
+              if (to2 != WALI_EPSILON) {
+                // call
+                trans_type = NestedWord::Position::CallType;
+              }
+              else {
+                // internal
+                trans_type = NestedWord::Position::InternalType;
+              }
+              found = query::getSymbol(*o,from,to,sym);
+            }
 
-	if(!found) return true;
+            if(!found) return true;
 					
-	if(sym != WALI_EPSILON) {
-          //pathPreds.push_back(state_preds[to]);
-          //path.push_back(symstr);
-          word.append(NestedWord::Position(sym, trans_type));
-        }
+            if(sym != WALI_EPSILON) {
+              //pathPreds.push_back(state_preds[to]);
+              //path.push_back(symstr);
+              word.append(NestedWord::Position(sym, trans_type));
+            }
 					
-	return true;
-      }
+            return true;
+          }
 				
-      NestedWord getPath() {return word;}
+          NestedWord getPath() {return word;}
 
-      bool visitTrans( wali::witness::WitnessTrans * w ) {
-        (void) w;
-        return true;
-      }
+          bool visitTrans( wali::witness::WitnessTrans * w ) {
+            (void) w;
+            return true;
+          }
 		
-      bool visitMerge( wali::witness::WitnessMerge * w ) {
-        (void) w;
-        return true;
-      }
+          bool visitMerge( wali::witness::WitnessMerge * w ) {
+            (void) w;
+            return true;
+          }
 		
-    };
+        };
 
       } // namespace wali::nwa::query::details
 
       
-NestedWord getWord(wali::nwa::NWA const * aut) {
+      NestedWord getWord(wali::nwa::NWA const * aut) {
   
-  if(!query::languageIsEmpty(*aut)) {
+        if(!query::languageIsEmpty(*aut)) {
     
-    wali::nwa::ReachGen wg;
-    wali::wfa::WFA query;
-    wali::wpds::WPDS conv = aut->_private_NWAtoPDScallsWitness(wg);
+          wali::nwa::ReachGen wg;
+          wali::wfa::WFA query;
+          wali::wpds::WPDS conv = aut->_private_NWAtoPDScallsWitness(wg);
     
-    wali::Key state = getProgramControlLocation();
+          wali::Key state = getProgramControlLocation();
     
-    set<wali::Key>::iterator i, j;
-    set<wali::Key> inits = aut->getInitialStates();
-    set<wali::Key> finals = aut->getFinalStates();
-    wali::Key accept = wali::getKey("__accept");
+          set<wali::Key>::iterator i, j;
+          set<wali::Key> inits = aut->getInitialStates();
+          set<wali::Key> finals = aut->getFinalStates();
+          wali::Key accept = wali::getKey("__accept");
 
-    // Try to find a path from some initial state to some final state
-    for(j = inits.begin(); j != inits.end(); j++) {
-      for(i = finals.begin(); i != finals.end(); i++) {
+          // Try to find a path from some initial state to some final state
+          for(j = inits.begin(); j != inits.end(); j++) {
+            for(i = finals.begin(); i != finals.end(); i++) {
 
-	// Construct the query automaton
-	query.addTrans(state, *j, accept, wg.getOne());
-	query.set_initial_state(state);
-	query.add_final_state(accept);
-        // Accept pending returns
-        for( NWA::StateIterator it = aut->beginInitialStates(); it != aut->endInitialStates(); it++ ) {
-          query.addTrans(accept, *it, accept, wg.getOne());
-        }
+              // Construct the query automaton
+              query.addTrans(state, *j, accept, wg.getOne());
+              query.set_initial_state(state);
+              query.add_final_state(accept);
+              // Accept pending returns
+              for( NWA::StateIterator it = aut->beginInitialStates(); it != aut->endInitialStates(); it++ ) {
+                query.addTrans(accept, *it, accept, wg.getOne());
+              }
 	
-	// Execute the post* query
-	wali::wfa::WFA path = conv.poststar(query);
-	path.path_summary();
+              // Execute the post* query
+              wali::wfa::WFA path = conv.poststar(query);
+              path.path_summary();
 
-	// Find a path to the final state
-	wali::wfa::TransSet t = path.match(state,*i);
+              // Find a path to the final state
+              wali::wfa::TransSet t = path.match(state,*i);
 
-	// Collect the transitions
-	for(wali::wfa::TransSet::iterator itt = t.begin(); itt != t.end(); itt++) {
-	  sem_elem_t se = path.getState((*itt)->to())->weight()->extend((*itt)->weight());
-	  if(se->equal(se->zero())) continue;
-	  details::PathVisitor v(aut);					
-	  wali::witness::Witness* wit = dynamic_cast<wali::witness::Witness*>(se.get_ptr());		
-	  if( 0 != wit ) {
-	    wit->accept(v);
-            return v.getPath();
-	  }
-	}
+              // Collect the transitions
+              for(wali::wfa::TransSet::iterator itt = t.begin(); itt != t.end(); itt++) {
+                sem_elem_t se = path.getState((*itt)->to())->weight()->extend((*itt)->weight());
+                if(se->equal(se->zero())) continue;
+                details::PathVisitor v(aut);					
+                wali::witness::Witness* wit = dynamic_cast<wali::witness::Witness*>(se.get_ptr());		
+                if( 0 != wit ) {
+                  wit->accept(v);
+                  return v.getPath();
+                }
+              }
+            }
+          }
+        }
+
+        return NestedWord();
       }
-    }
-  }
-
-  return NestedWord();
-}
 
     }
   }
