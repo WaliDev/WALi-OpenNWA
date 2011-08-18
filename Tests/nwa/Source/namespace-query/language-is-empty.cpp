@@ -179,6 +179,46 @@ namespace wali {
                 
                 EXPECT_EQ(expected, word);
             }
+
+
+            TEST(wali$nwa$query$$getWord, testChooseCallOverInternal)
+            {
+                //               a              a(           a)/state2
+                //  --> (state) ----> (state2) ----> (state3) ---> ((state4))
+                //                             ---->
+                //                              b
+
+                // Why are we doing this? Because the current version of
+                // getWord calls only getSymbol() for both internal and call
+                // transitions. This will return 'b' for what needs to be a
+                // call, but 'a b( a)' is not in the language.
+                
+                NWA nwa;
+                SomeElements e;
+                State state4 = getKey("state4");
+                Symbol distractor = getKey("distractor");
+                    
+                nwa.addInitialState(e.state);
+                nwa.addInternalTrans(e.state, e.symbol, e.state2);
+                nwa.addCallTrans(e.state2, e.symbol, e.state3);
+                nwa.addInternalTrans(e.state2, distractor, e.state3);
+                nwa.addReturnTrans(e.state3, e.state2, e.symbol, state4);
+                nwa.addFinalState(state4);
+                
+                EXPECT_FALSE(languageIsEmpty(nwa));
+
+                NestedWord expected;
+                expected.appendInternal(e.symbol);
+                expected.appendCall(e.symbol);
+                expected.appendReturn(e.symbol);
+
+                ASSERT_TRUE(languageContains(nwa, expected));
+
+                NestedWord word = getWord(&nwa);
+
+                EXPECT_TRUE(languageContains(nwa, word));
+                EXPECT_EQ(expected, word);
+            }
         }
     }
 }
