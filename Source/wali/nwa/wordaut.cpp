@@ -44,7 +44,7 @@ namespace wali {
           /// Holds the NWA associated with the given query. We need this so
           /// that when we know that the trace went from state p to q, we can
           /// look up a symbol on that edge.
-          wali::nwa::NWA const * o;
+          wali::nwa::NWA const & o;
 
           /// This is the word that corresponds to the trace; built up as
           /// visitRule() is called.
@@ -58,7 +58,7 @@ namespace wali {
 			
         public:
 				
-          PathVisitor(wali::nwa::NWA const * orig)
+          PathVisitor(wali::nwa::NWA const & orig)
             : o(orig)
           {}
 				
@@ -162,7 +162,7 @@ namespace wali {
               assert(fromstate == states.back());
               
               trans_type = NestedWord::Position::ReturnType;
-              set<wali::Key> r = query::getReturnSym(*o, symbs.back(), from, to);
+              set<wali::Key> r = query::getReturnSym(o, symbs.back(), from, to);
               assert(r.size() > 0);
               sym = *(r.begin());
 
@@ -172,14 +172,14 @@ namespace wali {
             else if (to2 != WALI_EPSILON) {
               // call (part of case #3)
               trans_type = NestedWord::Position::CallType;
-              set<wali::Key> r = query::getCallSym(*o,from,to);
+              set<wali::Key> r = query::getCallSym(o,from,to);
               assert(r.size() > 0);
               sym = *(r.begin());
             }
             else {
               // internal (part of case #3)
               trans_type = NestedWord::Position::InternalType;
-              set<wali::Key> r = query::getInternalSym(*o,from,to);
+              set<wali::Key> r = query::getInternalSym(o,from,to);
               assert(r.size() > 0);
               sym = *(r.begin());
             }
@@ -217,14 +217,14 @@ namespace wali {
       /// from the case where L(aut) contains epsilon, and that's what the
       /// function returns. (You can, of course, call languageContains to see
       /// if epsilon is in the language.)
-      NestedWord getWord(wali::nwa::NWA const * aut) {
+      NestedWord getWord(wali::nwa::NWA const & nwa) {
   
-        if(!query::languageIsEmpty(*aut)) {
+        if(!query::languageIsEmpty(nwa)) {
     
           wali::nwa::ReachGen wg;
           wali::wfa::WFA query;
           ref_ptr<wali::wpds::Wrapper> wrapper = new wali::witness::WitnessWrapper();
-          wali::wpds::WPDS conv = nwa_pds::NWAToPDSCalls(*aut, wg, wrapper);
+          wali::wpds::WPDS conv = nwa_pds::NWAToPDSCalls(nwa, wg, wrapper);
     
           wali::Key state = getProgramControlLocation();
           wali::Key accept = wali::getKey("__accept");
@@ -232,8 +232,8 @@ namespace wali {
           // Construct the query automaton
           query.set_initial_state(state);
           query.add_final_state(accept);
-          for( NWA::StateIterator initial = aut->beginInitialStates();
-               initial != aut->endInitialStates(); initial++ )
+          for( NWA::StateIterator initial = nwa.beginInitialStates();
+               initial != nwa.endInitialStates(); initial++ )
           {
             query.addTrans(state, *initial, accept, wg.getOne());
             query.addTrans(accept, *initial, accept, wg.getOne()); // Accept pending returns
@@ -243,8 +243,8 @@ namespace wali {
           wali::wfa::WFA path = conv.poststar(query);
           path.path_summary();
           
-          for(NWA::StateIterator final = aut->beginFinalStates();
-              final != aut->endFinalStates(); final++)
+          for(NWA::StateIterator final = nwa.beginFinalStates();
+              final != nwa.endFinalStates(); final++)
           {
             // See if there are any transitions to the current final state
             wali::wfa::TransSet t = path.match(state, *final);
@@ -264,7 +264,7 @@ namespace wali {
 
               // We found an actual path to the final state, so figure out
               // how it did that.
-              details::PathVisitor v(aut);					
+              details::PathVisitor v(nwa);					
               wali::witness::Witness* wit =
                 dynamic_cast<wali::witness::Witness*>(se.get_ptr());
               assert(wit);

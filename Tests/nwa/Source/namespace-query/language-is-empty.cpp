@@ -47,7 +47,7 @@ namespace wali {
     namespace nwa {
         namespace query {
 
-            extern NestedWord getWord(NWA const * aut);
+            extern NestedWord getWord(NWA const & aut);
 
 
             TEST(wali$nwa$query$$languageIsEmpty, testBatteryOfVariouslyBalancedNwas)
@@ -78,7 +78,7 @@ namespace wali {
                         //EXPECT_TRUE(languageIsEmpty(nwas[nwa]));
                     }
                     else {
-                        NestedWord word = getWord(&nwas[nwa]);
+                        NestedWord word = getWord(nwas[nwa]);
 
                         EXPECT_TRUE(languageContains(nwas[nwa], word));
                     }
@@ -97,7 +97,7 @@ namespace wali {
 
                 NestedWord eps;
 
-                NestedWord word = getWord(&nwa);
+                NestedWord word = getWord(nwa);
                 EXPECT_EQ(eps, word);
             }
             
@@ -122,7 +122,7 @@ namespace wali {
                 expected.appendInternal(e.symbol);
                 expected.appendInternal(e.symbol);
 
-                NestedWord word = getWord(&nwa);
+                NestedWord word = getWord(nwa);
                 
                 EXPECT_EQ(expected, word);
             }
@@ -148,7 +148,7 @@ namespace wali {
                 expected.appendCall(e.symbol);
                 expected.appendInternal(e.symbol);
 
-                NestedWord word = getWord(&nwa);
+                NestedWord word = getWord(nwa);
                 
                 EXPECT_EQ(expected, word);
             }
@@ -175,7 +175,7 @@ namespace wali {
                 expected.appendReturn(e.symbol);
                 expected.appendInternal(e.symbol);
 
-                NestedWord word = getWord(&nwa);
+                NestedWord word = getWord(nwa);
                 
                 EXPECT_EQ(expected, word);
             }
@@ -214,7 +214,7 @@ namespace wali {
 
                 ASSERT_TRUE(languageContains(nwa, expected));
 
-                NestedWord word = getWord(&nwa);
+                NestedWord word = getWord(nwa);
 
                 EXPECT_TRUE(languageContains(nwa, word));
                 EXPECT_EQ(expected, word);
