@@ -243,7 +243,6 @@ namespace wali {
             wali::Key to = w->getRuleStub().to_stack1();
             wali::Key to2 = w->getRuleStub().to_stack2();
             wali::Key tostate = w->getRuleStub().to_state();
-            wali::Key sym;
 
             //std::cout << "visitRule(...):\n"
             //          << "  from stack [" << from << "] " << key2str(from) << "\n"
@@ -256,6 +255,9 @@ namespace wali {
             // transition. (Case #1 above.)
             if( to == wali::WALI_EPSILON) {
               // dealing with first half of return transition
+              assert(symbs.size() == 0);
+              assert(states.size() == 0);
+              
               symbs.push_back(from);
               states.push_back(tostate);
 
@@ -266,11 +268,14 @@ namespace wali {
             // one, and put the transition type in trans_type, and the symbol
             // in 'sym'.
             bool found = false;
+            wali::Key sym;
             NestedWord::Position::Type trans_type;
 	
-            if(states.size() > 0 && fromstate == states.back()) {
+            if(states.size() > 0) {
               // Dealing with the second half of a return transition (case #2
               // above).
+              assert(fromstate == states.back());
+              
               trans_type = NestedWord::Position::ReturnType;
               set<wali::Key> r = query::getReturnSym(*o, symbs.back(), from, to);
               sym = *(r.begin());
@@ -293,6 +298,7 @@ namespace wali {
             }
 
             // I think this should never happen
+            assert(found);
             if(!found) return true;
 
             // If the transition was an epsilon transition, then we don't
