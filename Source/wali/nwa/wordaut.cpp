@@ -49,94 +49,94 @@ NWA::_private_NWAtoPDScallsWitness( WeightGen & wg ) const
   
   //Internal Transitions
   for( InternalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
-    {  
-      // (q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
-      // where the weight w depends on sigma
+  {  
+    // (q,sigma,q') in delta_i goes to <p,q> -w-> <p,q'> in delta_1
+    // where the weight w depends on sigma
       
-      State src = Trans::getSource(*iit);
-      State tgt = Trans::getTarget(*iit);
+    State src = Trans::getSource(*iit);
+    State tgt = Trans::getTarget(*iit);
       
-      if( Trans::getInternalSym(*iit) == WALI_WILD )
-	wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
-      else
-	wgt = wg.getWeight(src, getClientInfo(src),
-			   Trans::getInternalSym(*iit),
-			   WeightGen::INTRA,
-			   tgt, getClientInfo(tgt));           // w
+    if( Trans::getInternalSym(*iit) == WALI_WILD )
+      wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
+    else
+      wgt = wg.getWeight(src, getClientInfo(src),
+                         Trans::getInternalSym(*iit),
+                         WeightGen::INTRA,
+                         tgt, getClientInfo(tgt));           // w
       
-      result.add_rule(program,                                //from_state (p)
-		      src,                                    //from_stack (q)
-		      program,                                //to_state (p)
-		      tgt,                                    //to_stack1 (q')
-		      wgt);                                   //weight (w)      
-    }
+    result.add_rule(program,                                //from_state (p)
+                    src,                                    //from_stack (q)
+                    program,                                //to_state (p)
+                    tgt,                                    //to_stack1 (q')
+                    wgt);                                   //weight (w)      
+  }
   
   //Call Transitions
   for( CallIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
-    {           
-      // (q_c,sigma,q_e) in delta_c goes to
-      // <p,q_c> -w-> <p,q_e q_c> in delta_2 
-      // and the weight w depends on sigma
+  {           
+    // (q_c,sigma,q_e) in delta_c goes to
+    // <p,q_c> -w-> <p,q_e q_c> in delta_2 
+    // and the weight w depends on sigma
       
-      State src = Trans::getCallSite(*cit);
-      State tgt = Trans::getEntry(*cit);
+    State src = Trans::getCallSite(*cit);
+    State tgt = Trans::getEntry(*cit);
       
-      if( Trans::getCallSym(*cit) == WALI_WILD )
-	wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w
-      else
-	wgt = wg.getWeight(src, getClientInfo(src),
-			   Trans::getCallSym(*cit),
-			   WeightGen::CALL_TO_ENTRY,
-			   tgt, getClientInfo(tgt));          // w
+    if( Trans::getCallSym(*cit) == WALI_WILD )
+      wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w
+    else
+      wgt = wg.getWeight(src, getClientInfo(src),
+                         Trans::getCallSym(*cit),
+                         WeightGen::CALL_TO_ENTRY,
+                         tgt, getClientInfo(tgt));          // w
       
-      result.add_rule(program,                                //from_state (p)
-		      src,                                    //from_stack (q_c)
-		      program,                                //to_state (p)
-		      Trans::getEntry(*cit),                  //to_stack1 (q_e)
-		      src,                                    //to_stack2 (q_c)
-		      wgt);                                   //weight (w)  
-    } 
+    result.add_rule(program,                                //from_state (p)
+                    src,                                    //from_stack (q_c)
+                    program,                                //to_state (p)
+                    Trans::getEntry(*cit),                  //to_stack1 (q_e)
+                    src,                                    //to_stack2 (q_c)
+                    wgt);                                   //weight (w)  
+  } 
   
   //Return Transitions
   int r_count = 0;
   for( ReturnIterator rit = trans.beginReturn(); rit != trans.endReturn(); rit++ )
-    {
-      ++r_count;
+  {
+    ++r_count;
       
-      //std::cerr << "Return transition #" << r_count << " of " << trans.size() << "\n";
-      // (q_x,q_c,sigma,q_r) in delta_r goes to 
-      // <p,q_x> -w-> <p_q_xcr,epsilon> in delta_0
-      // and <p_q_xcr,q_c> -1-> <p,q_r> in delta_1
-      // where p_q_xcr = (p,q_x,q_c,q_r), and w depends on sigma
+    //std::cerr << "Return transition #" << r_count << " of " << trans.size() << "\n";
+    // (q_x,q_c,sigma,q_r) in delta_r goes to 
+    // <p,q_x> -w-> <p_q_xcr,epsilon> in delta_0
+    // and <p_q_xcr,q_c> -1-> <p,q_r> in delta_1
+    // where p_q_xcr = (p,q_x,q_c,q_r), and w depends on sigma
       
-      State src = Trans::getExit(*rit);
-      State tgt = Trans::getReturnSite(*rit);
+    State src = Trans::getExit(*rit);
+    State tgt = Trans::getReturnSite(*rit);
       
-      if( Trans::getReturnSym(*rit) == WALI_WILD )
-	wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w 
-      else
-	wgt = wg.getWeight(src, getClientInfo(src), 
-			   Trans::getReturnSym(*rit),
-			   WeightGen::EXIT_TO_RET,  
-			   tgt, getClientInfo(tgt));    // w     
+    if( Trans::getReturnSym(*rit) == WALI_WILD )
+      wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w 
+    else
+      wgt = wg.getWeight(src, getClientInfo(src), 
+                         Trans::getReturnSym(*rit),
+                         WeightGen::EXIT_TO_RET,  
+                         tgt, getClientInfo(tgt));    // w     
       
-      //Note: if you change this, make sure you modify the code in NWPForest.createCA()
-      Key rstate = getControlLocation(src,Trans::getCallSite(*rit),tgt);  //p_q_xcr
+    //Note: if you change this, make sure you modify the code in NWPForest.createCA()
+    Key rstate = getControlLocation(src,Trans::getCallSite(*rit),tgt);  //p_q_xcr
       
-      result.add_rule(program,                              //from_state (p)
-		      src,                                  //from_stack (q_x)
-		      rstate,                               //to_state (p_q_xcr == (p,q_x,q_c,q_r))
-		      wgt);                                 //weight (w)
+    result.add_rule(program,                              //from_state (p)
+                    src,                                  //from_stack (q_x)
+                    rstate,                               //to_state (p_q_xcr == (p,q_x,q_c,q_r))
+                    wgt);                                 //weight (w)
       
       
-      wgt = wg.getOne();                                    // 1                      
+    wgt = wg.getOne();                                    // 1                      
       
-      result.add_rule(rstate,                               //from_state (p_q_xcr == (p,q_x,q_c,q_r))
-		      Trans::getCallSite(*rit),             //from_stack (q_c)
-		      program,                              //to_state (p)
-		      tgt,                                  //to_stack (q_r)
-		      wgt);                                 //weight (1)
-    }
+    result.add_rule(rstate,                               //from_state (p_q_xcr == (p,q_x,q_c,q_r))
+                    Trans::getCallSite(*rit),             //from_stack (q_c)
+                    program,                              //to_state (p)
+                    tgt,                                  //to_stack (q_r)
+                    wgt);                                 //weight (1)
+  }
   
   return result;
 }
@@ -151,8 +151,8 @@ namespace wali {
     protected:
 				
       wali::nwa::NWA const * o;
-        NestedWord word;
-        //vector<string> pathPreds;
+      NestedWord word;
+      //vector<string> pathPreds;
       vector<wali::Key> states;
       vector<wali::Key> symbs;
       map<wali::Key, string> stateLabels;
@@ -181,18 +181,18 @@ namespace wali {
       ~PathVisitor() {}
 
       bool visit( wali::witness::Witness * w ) {
-          (void) w;
-          return true;
+        (void) w;
+        return true;
       }
 		
       bool visitExtend( wali::witness::WitnessExtend * w ) {
-          (void) w;
-          return true;
+        (void) w;
+        return true;
       }
 		
       bool visitCombine( wali::witness::WitnessCombine * w ) {
-          (void) w;
-          return true;
+        (void) w;
+        return true;
       }
 
       // Keeps track of everything needed to 
@@ -233,15 +233,15 @@ namespace wali {
 
 	  if(r.size() > 0) found = true;
 	} else {
-            // either internal or call
-            if (to2 != WALI_EPSILON) {
-              // call
-              trans_type = NestedWord::Position::CallType;
-            }
-            else {
-              // internal
-              trans_type = NestedWord::Position::InternalType;
-            }
+          // either internal or call
+          if (to2 != WALI_EPSILON) {
+            // call
+            trans_type = NestedWord::Position::CallType;
+          }
+          else {
+            // internal
+            trans_type = NestedWord::Position::InternalType;
+          }
           found = query::getSymbol(*o,from,to,sym);
         }
 
@@ -261,13 +261,13 @@ namespace wali {
       //vector<string> getPathPreds() {return pathPreds;}
 		
       bool visitTrans( wali::witness::WitnessTrans * w ) {
-          (void) w;
-          return true;
+        (void) w;
+        return true;
       }
 		
       bool visitMerge( wali::witness::WitnessMerge * w ) {
-          (void) w;
-          return true;
+        (void) w;
+        return true;
       }
 		
     };
@@ -327,3 +327,11 @@ NestedWord getWord(wali::nwa::NWA const * aut) {
 
   return NestedWord();
 }
+
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
+
