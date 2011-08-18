@@ -41,11 +41,14 @@ static bool expected_answers[] = {
 };
 
 
-extern NestedWord getWord(NWA const * aut);
+
 
 namespace wali {
     namespace nwa {
         namespace query {
+
+            extern NestedWord getWord(NWA const * aut);
+
 
             TEST(wali$nwa$query$$languageIsEmpty, testBatteryOfVariouslyBalancedNwas)
             {

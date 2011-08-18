@@ -145,7 +145,11 @@ NWA::_private_NWAtoPDScallsWitness( WeightGen & wg ) const
 
 namespace wali {
   
-  namespace witness {
+  namespace nwa {
+
+    namespace query {
+
+      namespace details {
 		
     class PathVisitor : public wali::witness::Visitor {
     protected:
@@ -262,9 +266,10 @@ namespace wali {
       }
 		
     };
-  }
-}
 
+      } // namespace wali::nwa::query::details
+
+      
 NestedWord getWord(wali::nwa::NWA const * aut) {
   
   if(!query::languageIsEmpty(*aut)) {
@@ -304,7 +309,7 @@ NestedWord getWord(wali::nwa::NWA const * aut) {
 	for(wali::wfa::TransSet::iterator itt = t.begin(); itt != t.end(); itt++) {
 	  sem_elem_t se = path.getState((*itt)->to())->weight()->extend((*itt)->weight());
 	  if(se->equal(se->zero())) continue;
-	  wali::witness::PathVisitor v(aut);					
+	  details::PathVisitor v(aut);					
 	  wali::witness::Witness* wit = dynamic_cast<wali::witness::Witness*>(se.get_ptr());		
 	  if( 0 != wit ) {
 	    wit->accept(v);
@@ -317,6 +322,11 @@ NestedWord getWord(wali::nwa::NWA const * aut) {
 
   return NestedWord();
 }
+
+    }
+  }
+}
+
 
 
 // Yo, Emacs!

@@ -19,7 +19,9 @@ using std::vector;
 
 using wali::nwa::NestedWord;
 
-extern NestedWord getWord(wali::nwa::NWA const * aut);
+namespace wali { namespace nwa { namespace query {
+            extern NestedWord getWord(wali::nwa::NWA const * aut);
+        }}}
 
 int main(int argc, char** argv)
 {
@@ -37,7 +39,7 @@ int main(int argc, char** argv)
 
     wali::nwa::NWARefPtr nwa = wali::nwa::read_nwa(infile);
 
-    NestedWord word = getWord(nwa.get_ptr());
+    NestedWord word = wali::nwa::query::getWord(nwa.get_ptr());
 
     for(NestedWord::const_iterator it = word.begin(); it!=word.end(); ++it) {
         cout << it->type << ": [" << it->symbol << "] " << wali::key2str(it->symbol) << "\n";
