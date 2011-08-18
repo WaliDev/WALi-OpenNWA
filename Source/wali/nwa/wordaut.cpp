@@ -152,17 +152,13 @@ namespace wali {
 				
       wali::nwa::NWA const * o;
       NestedWord word;
-      //vector<string> pathPreds;
       vector<wali::Key> states;
       vector<wali::Key> symbs;
-      map<wali::Key, string> stateLabels;
 			
     public:
 				
       PathVisitor(wali::nwa::NWA const * orig) {
 	o = orig;
-
-        //std::cout << "PathVisitor(...):\n";
 
 	set<wali::Key> ostates = o->getStates();
 	for(set<wali::Key>::iterator kit = ostates.begin(); kit != ostates.end(); kit++) {
@@ -171,9 +167,6 @@ namespace wali {
 
 	  printKey(ss, *kit);
 	  ss.flush();
-	  stateLabels.insert(pair<wali::Key, string>(*kit, ss.str()));
-
-          //std::cout<< "  stateLabels maps [" << *kit << "] to [" << ss.str() << "]\n";
 	}
 						
       }
@@ -258,8 +251,6 @@ namespace wali {
 				
       NestedWord getPath() {return word;}
 
-      //vector<string> getPathPreds() {return pathPreds;}
-		
       bool visitTrans( wali::witness::WitnessTrans * w ) {
         (void) w;
         return true;
@@ -307,7 +298,6 @@ NestedWord getWord(wali::nwa::NWA const * aut) {
 	path.path_summary();
 
 	// Find a path to the final state
-	//wali::Key start = path.getInitialState();	
 	wali::wfa::TransSet t = path.match(state,*i);
 
 	// Collect the transitions
