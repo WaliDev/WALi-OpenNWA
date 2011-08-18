@@ -346,18 +346,21 @@ namespace wali {
           // Construct the query automaton
           query.set_initial_state(state);
           query.add_final_state(accept);
-          // Accept pending returns
-          for( NWA::StateIterator it = aut->beginInitialStates(); it != aut->endInitialStates(); it++ ) {
+          for( NWA::StateIterator it = aut->beginInitialStates();
+               it != aut->endInitialStates(); it++ )
+          {
             query.addTrans(state, *it, accept, wg.getOne());
-            query.addTrans(accept, *it, accept, wg.getOne());
+            query.addTrans(accept, *it, accept, wg.getOne()); // Accept pending returns
           }
 	
-              // Execute the post* query
+          // Execute the post* query
           wali::wfa::WFA path = conv.poststar(query);
           path.path_summary();
           
-          for(NWA::StateIterator i = aut->beginFinalStates(); i != aut->endFinalStates(); i++) {              
-            // Find a path to the final state
+          for(NWA::StateIterator i = aut->beginFinalStates();
+              i != aut->endFinalStates(); i++)
+          {
+            // See if there are any transitions to the current final state
             wali::wfa::TransSet t = path.match(state,*i);
             
             // Collect the transitions
@@ -377,7 +380,7 @@ namespace wali {
         return NestedWord();
       }
 
-    }
+    } // namespace wali::nwa::query
   }
 }
 
