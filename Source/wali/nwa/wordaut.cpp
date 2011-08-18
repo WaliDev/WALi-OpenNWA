@@ -359,6 +359,10 @@ NestedWord getWord(wali::nwa::NWA const * aut) {
 	query.addTrans(state, *j, accept, wg.getOne());
 	query.set_initial_state(state);
 	query.add_final_state(accept);
+        // Accept pending returns
+        for( NWA::StateIterator it = aut->beginInitialStates(); it != aut->endInitialStates(); it++ ) {
+          query.addTrans(accept, *it, accept, wg.getOne());
+        }
 	
 	// Execute the post* query
 	wali::wfa::WFA path = conv.poststar(query);
