@@ -346,33 +346,44 @@ namespace wali {
           // Construct the query automaton
           query.set_initial_state(state);
           query.add_final_state(accept);
-          for( NWA::StateIterator it = aut->beginInitialStates();
-               it != aut->endInitialStates(); it++ )
+          for( NWA::StateIterator initial = aut->beginInitialStates();
+               initial != aut->endInitialStates(); initial++ )
           {
-            query.addTrans(state, *it, accept, wg.getOne());
-            query.addTrans(accept, *it, accept, wg.getOne()); // Accept pending returns
+            query.addTrans(state, *initial, accept, wg.getOne());
+            query.addTrans(accept, *initial, accept, wg.getOne()); // Accept pending returns
           }
 	
           // Execute the post* query
           wali::wfa::WFA path = conv.poststar(query);
           path.path_summary();
           
-          for(NWA::StateIterator i = aut->beginFinalStates();
-              i != aut->endFinalStates(); i++)
+          for(NWA::StateIterator final = aut->beginFinalStates();
+              final != aut->endFinalStates(); final++)
           {
             // See if there are any transitions to the current final state
-            wali::wfa::TransSet t = path.match(state,*i);
+            wali::wfa::TransSet t = path.match(state, *final);
             
             // Collect the transitions
-            for(wali::wfa::TransSet::iterator itt = t.begin(); itt != t.end(); itt++) {
-              sem_elem_t se = path.getState((*itt)->to())->weight()->extend((*itt)->weight());
-              if(se->equal(se->zero())) continue;
-              details::PathVisitor v(aut);					
-              wali::witness::Witness* wit = dynamic_cast<wali::witness::Witness*>(se.get_ptr());		
-              if( 0 != wit ) {
-                wit->accept(v);
-                return v.getPath();
+            for(wali::wfa::TransSet::iterator trans = t.begin();
+                trans != t.end(); trans++)
+            {
+              sem_elem_t se =
+                path.getState((*trans)->to())
+                  ->weight()
+                  ->extend((*trans)->weight());
+              if(se->equal(se->zero())) {
+                // Doesn't make it to the final state. Try again.
+                continue;
               }
+
+              // We found an actual path to the final state, so figure out
+              // how it did that.
+              details::PathVisitor v(aut);					
+              wali::witness::Witness* wit =
+                dynamic_cast<wali::witness::Witness*>(se.get_ptr());
+              assert(wit);
+              wit->accept(v);
+              return v.getPath();
             }
           }
         }
