@@ -47,7 +47,7 @@ namespace wali {
     namespace nwa {
         namespace query {
 
-            extern NestedWord getWord(NWA const & aut);
+            extern NestedWord getSomeAcceptedWord(NWA const & aut);
 
 
             TEST(wali$nwa$query$$languageIsEmpty, testBatteryOfVariouslyBalancedNwas)
@@ -67,7 +67,7 @@ namespace wali {
             }
 
             
-            TEST(wali$nwa$query$$getWord, testBatteryOfVariouslyBalancedNwas)
+            TEST(wali$nwa$query$$getSomeAcceptedWord, testBatteryOfVariouslyBalancedNwas)
             {
                 for (unsigned nwa = 0 ; nwa < num_nwas ; ++nwa) {
                     std::stringstream ss;
@@ -78,7 +78,7 @@ namespace wali {
                         //EXPECT_TRUE(languageIsEmpty(nwas[nwa]));
                     }
                     else {
-                        NestedWord word = getWord(nwas[nwa]);
+                        NestedWord word = getSomeAcceptedWord(nwas[nwa]);
 
                         EXPECT_TRUE(languageContains(nwas[nwa], word));
                     }
@@ -86,7 +86,7 @@ namespace wali {
             }
 
             
-            TEST(wali$nwa$query$$languageIsEmpty$and$getWord, testEpsilonNwa)
+            TEST(wali$nwa$query$$languageIsEmpty$and$getSomeAcceptedWord, testEpsilonNwa)
             {
                 NWA nwa;
                 SomeElements e;
@@ -97,11 +97,11 @@ namespace wali {
 
                 NestedWord eps;
 
-                NestedWord word = getWord(nwa);
+                NestedWord word = getSomeAcceptedWord(nwa);
                 EXPECT_EQ(eps, word);
             }
             
-            TEST(wali$nwa$query$$languageIsEmpty$and$getWord, testInternalOnlyNwa)
+            TEST(wali$nwa$query$$languageIsEmpty$and$getSomeAcceptedWord, testInternalOnlyNwa)
             {
                 //               a              a              a
                 //  --> (state) ----> (state2) ----> (state3) ---> ((state4))
@@ -122,12 +122,12 @@ namespace wali {
                 expected.appendInternal(e.symbol);
                 expected.appendInternal(e.symbol);
 
-                NestedWord word = getWord(nwa);
+                NestedWord word = getSomeAcceptedWord(nwa);
                 
                 EXPECT_EQ(expected, word);
             }
 
-            TEST(wali$nwa$query$$languageIsEmpty$and$getWord, testMiddleCall)
+            TEST(wali$nwa$query$$languageIsEmpty$and$getSomeAcceptedWord, testMiddleCall)
             {
                 //               a              (a             a
                 //  --> (state) ----> (state2) ----> (state3) ---> ((state4))
@@ -148,13 +148,13 @@ namespace wali {
                 expected.appendCall(e.symbol);
                 expected.appendInternal(e.symbol);
 
-                NestedWord word = getWord(nwa);
+                NestedWord word = getSomeAcceptedWord(nwa);
                 
                 EXPECT_EQ(expected, word);
             }
 
 
-            TEST(wali$nwa$query$$languageIsEmpty$and$getWord, testMiddleReturn)
+            TEST(wali$nwa$query$$languageIsEmpty$and$getSomeAcceptedWord, testMiddleReturn)
             {
                 //               a              a)             a
                 //  --> (state) ----> (state2) ----> (state3) ---> ((state4))
@@ -175,13 +175,13 @@ namespace wali {
                 expected.appendReturn(e.symbol);
                 expected.appendInternal(e.symbol);
 
-                NestedWord word = getWord(nwa);
+                NestedWord word = getSomeAcceptedWord(nwa);
                 
                 EXPECT_EQ(expected, word);
             }
 
 
-            TEST(wali$nwa$query$$getWord, testChooseCallOverInternal)
+            TEST(wali$nwa$query$$getSomeAcceptedWord, testChooseCallOverInternal)
             {
                 //               a              a(           a)/state2
                 //  --> (state) ----> (state2) ----> (state3) ---> ((state4))
@@ -189,7 +189,7 @@ namespace wali {
                 //                              b
 
                 // Why are we doing this? Because the current version of
-                // getWord calls only getSymbol() for both internal and call
+                // getSomeAcceptedWord calls only getSymbol() for both internal and call
                 // transitions. This will return 'b' for what needs to be a
                 // call, but 'a b( a)' is not in the language.
                 
@@ -214,7 +214,7 @@ namespace wali {
 
                 ASSERT_TRUE(languageContains(nwa, expected));
 
-                NestedWord word = getWord(nwa);
+                NestedWord word = getSomeAcceptedWord(nwa);
 
                 EXPECT_TRUE(languageContains(nwa, word));
                 EXPECT_EQ(expected, word);

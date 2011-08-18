@@ -218,7 +218,7 @@ namespace wali {
       /// from the case where L(aut) contains epsilon, and that's what the
       /// function returns. (You can, of course, call languageContains to see
       /// if epsilon is in the language.)
-      NestedWord getWord(wali::nwa::NWA const & nwa) {
+      NestedWord getSomeAcceptedWord(wali::nwa::NWA const & nwa) {
   
         if(!query::languageIsEmpty(nwa)) {
     
