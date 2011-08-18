@@ -3,6 +3,7 @@
 
 #include "wali/nwa/NWAFwd.hpp"
 #include <vector>
+#include <algorithm>
 
 namespace wali
 {
@@ -45,6 +46,13 @@ namespace wali
         /// Constructs a Position object with the given symbol and
         /// type
         Position(Symbol sym, Type ty) : symbol(sym), type(ty) {}
+
+        /// Returns whether two positions are equal
+        ///
+        bool operator==(Position const & p) const
+        {
+          return symbol == p.symbol && type == p.type;
+        }
       };
       
     private:
@@ -89,10 +97,22 @@ namespace wali
         return word.end();
       }
 
+      ///
       /// Returns the number of positions in this nested word
       size_t size() const
       {
         return word.size();
+      }
+
+      /// Returns whether the two nested words are equal
+      bool operator==(NestedWord const & other) const
+      {
+        if (word.size() != other.word.size()) {
+          return false;
+        }
+        else {
+          return std::equal(word.begin(), word.end(), other.word.begin());
+        }
       }
     };
   }
