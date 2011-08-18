@@ -152,10 +152,20 @@ namespace wali {
       namespace details {
 		
         class PathVisitor : public wali::witness::Visitor {
-        protected:
-				
+          
+        private:
+          /// Holds the NWA associated with the given query. We need this so
+          /// that when we know that the trace went from state p to q, we can
+          /// look up a symbol on that edge.
           wali::nwa::NWA const * o;
+
+          /// This is the word that corresponds to the trace; built up as
+          /// visitRule() is called.
           NestedWord word;
+
+          /// Holds the *PDS* state and stack symbol corresponding to the
+          /// "first half" of a NWA return transition. See visitRule() for
+          /// more details.
           vector<wali::Key> states;
           vector<wali::Key> symbs;
 			
@@ -182,9 +192,52 @@ namespace wali {
             return true;
           }
 
-          // Keeps track of everything needed to 
+          /// This is basically called once for each WPDS rule taken on the
+          /// PDS's "accepting" path. Builds up 'word' so it contains the
+          /// actual NWA word.
           bool visitRule( wali::witness::WitnessRule * w ) {
-								
+            // There are four kinds of WPDS rules that we need to
+            // handle. Internal NWA transitions correspond to (some -- see
+            // in a bit) internal PDS transitions. Call NWA transitions
+            // correspond to push WPDS rules. Return NWA transitions
+            // correspond to a pair of WPDS rules: a pop, then an
+            // internal. We will call these two WPDS rules the "first half"
+            // and "second half" of the NWA transition, respectively.
+            //
+            // Here's how we figure each of these things out. Our goal in
+            // each case is basically to figure out the source and target NWA
+            // states and the type of transition, then retrieve a symbol that
+            // appears on an edge meeting those descriptions. (Then we stick
+            // that onto the end of 'word'.)
+            //
+            // 1. We detect the first half of a return transition easily --
+            //    it's just a pop (delta_0) rule. When we see this, we know
+            //    that the second half is coming up in a moment. We record
+            //    the exit site in the stack 'symbs' (recall that the exit
+            //    site -- an NWA state -- is a PDS stack symbol).
+            //
+            //    When we see one, we don't do anything else. (We can't: we
+            //    need to know the target state first, and we won't know that
+            //    until the second half.)
+            //
+            // 2. We detect the second half of a return transition based on
+            //    whether there is a currently-recorded exit site in
+            //    'symbs'. If there is, now we have the information we need
+            //    to append to 'word'.
+            //
+            // 3. If neither of these cases applies, then we're in an "easy"
+            //    case: either an NWA internal or call transition. Figuring
+            //    out which simply means checking whether the WPDS rule is an
+            //    internal (delta_1) rule or a push (delta_2) rule. Both of
+            //    those have all the information we need to get the symbol.
+            //
+            // There are some sanity checks throughout... for instance, in
+            // addition to recording the exit site in 'symbs', we also record
+            // the WPDS state that is the target of the first half of the
+            // transition, and make sure it's the same as the source node of
+            // the second half of the transition.
+
+
             wali::Key from = w->getRuleStub().from_stack();
             wali::Key fromstate = w->getRuleStub().from_state();
             wali::Key to = w->getRuleStub().to_stack1();
@@ -198,6 +251,9 @@ namespace wali {
             //          << "  to stack1 [" << to << "] " << key2str(to) << "\n"
             //          << "  to state  [" << tostate << "] " << key2str(tostate) << std::endl;
 
+
+            // Detect a pop rule: this discovers the first half of a return
+            // transition. (Case #1 above.)
             if( to == wali::WALI_EPSILON) {
               // dealing with first half of return transition
               symbs.push_back(from);
@@ -206,11 +262,15 @@ namespace wali {
               return true;
             }
 
+            // OK, we're in one of cases #2 or q3 above. Figure out which
+            // one, and put the transition type in trans_type, and the symbol
+            // in 'sym'.
             bool found = false;
             NestedWord::Position::Type trans_type;
 	
             if(states.size() > 0 && fromstate == states.back()) {
-              // if dealing with second half of return transition
+              // Dealing with the second half of a return transition (case #2
+              // above).
               trans_type = NestedWord::Position::ReturnType;
               set<wali::Key> r = query::getReturnSym(*o, symbs.back(), from, to);
               sym = *(r.begin());
@@ -220,7 +280,7 @@ namespace wali {
 
               if(r.size() > 0) found = true;
             } else {
-              // either internal or call
+              // Dealing with either an internal or call (case #3 above).
               if (to2 != WALI_EPSILON) {
                 // call
                 trans_type = NestedWord::Position::CallType;
@@ -232,17 +292,19 @@ namespace wali {
               found = query::getSymbol(*o,from,to,sym);
             }
 
+            // I think this should never happen
             if(!found) return true;
-					
+
+            // If the transition was an epsilon transition, then we don't
+            // want to save it since it isn't part of the word.
             if(sym != WALI_EPSILON) {
-              //pathPreds.push_back(state_preds[to]);
-              //path.push_back(symstr);
               word.append(NestedWord::Position(sym, trans_type));
             }
 					
             return true;
           }
-				
+
+          
           NestedWord getPath() {return word;}
 
           bool visitTrans( wali::witness::WitnessTrans * w ) {
@@ -259,7 +321,13 @@ namespace wali {
 
       } // namespace wali::nwa::query::details
 
-      
+
+      /// Given an automaton 'aut', return some word in its language.
+      ///
+      /// If L(aut)={}, right now there is no way to distinguish that case
+      /// from the case where L(aut) contains epsilon, and that's what the
+      /// function returns. (You can, of course, call languageContains to see
+      /// if epsilon is in the language.)
       NestedWord getWord(wali::nwa::NWA const * aut) {
   
         if(!query::languageIsEmpty(*aut)) {
