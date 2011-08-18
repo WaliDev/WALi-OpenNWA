@@ -141,69 +141,7 @@ NWA::_private_NWAtoPDScallsWitness( WeightGen & wg ) const
   return result;
 }
 
-map<wali::Key, string> state_preds;
 
-void Tokenize(const string& str,
-	      vector<string>& tokens,
-	      const string& delimiters = " ")
-{    
-  string::size_type lastPos = str.find_first_not_of(delimiters, 0);
-  string::size_type pos     = str.find_first_of(delimiters, lastPos);
-
-  while (string::npos != pos || string::npos != lastPos)
-    {
-      tokens.push_back(str.substr(lastPos, pos - lastPos));
-      lastPos = str.find_first_not_of(delimiters, pos);
-      pos = str.find_first_of(delimiters, lastPos);
-    }
-}
-
-pair<wali::Key, wali::Key> dissectIntersectState(string statelabel) {
-    //std::cout << "dissectIntersectState(" << statelabel << ")\n";
-  
-  statelabel.replace(statelabel.find("("), 1, "");
-  statelabel.replace(statelabel.find(")"), 1, "");
-
-  vector<string> tokens1;
-  vector<string> tokens2;  
-  Tokenize(statelabel,tokens1,"#");
-  Tokenize(tokens1[1],tokens2,",");
-
-  int first = atoi(tokens2[0].c_str());
-  int second = atoi(tokens2[1].c_str());
-
-  return pair<wali::Key, wali::Key>((wali::Key)first, (wali::Key)second);
-}
-
-class STR
-{
-public:
-  STR() { };
-  STR( std::string st ) : str(st) { }
-  
-  size_t hash( ) const
-  {
-    return str.length();
-  } 
-  
-  std::ostream& print( std::ostream & o ) const
-  {
-    return o << str;
-  }
-  
-  bool operator==( const STR & other ) const
-  {
-    return str == other.str;
-  }
-  
-  bool operator<( const STR & other ) const
-  {
-    return str < other.str;
-  }
-  
-private:
-  std::string str;
-};
 
 namespace wali {
   
