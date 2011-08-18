@@ -11,6 +11,8 @@
 #include "wali/nwa/NWA.hpp"
 #include "wali/nwa/query/returns.hpp"
 #include "wali/nwa/query/transitions.hpp"
+#include "wali/nwa/query/calls.hpp"
+#include "wali/nwa/query/internals.hpp"
 #include "wali/nwa/query/language.hpp"
 #include "wali/wpds/WPDS.hpp"
 #include "wali/Key.hpp"
@@ -289,12 +291,18 @@ namespace wali {
               if (to2 != WALI_EPSILON) {
                 // call
                 trans_type = NestedWord::Position::CallType;
+                set<wali::Key> r = query::getCallSym(*o,from,to);
+                sym = *(r.begin());
+                found = true;
               }
               else {
                 // internal
                 trans_type = NestedWord::Position::InternalType;
+                set<wali::Key> r = query::getInternalSym(*o,from,to);
+                sym = *(r.begin());
+                found = true;
               }
-              found = query::getSymbol(*o,from,to,sym);
+              
             }
 
             // I think this should never happen
