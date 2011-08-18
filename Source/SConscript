@@ -89,6 +89,7 @@ nice_files = Split("""
 ./wali/nwa/query/returns.cpp
 ./wali/nwa/query/internals.cpp
 ./wali/nwa/query/language.cpp
+./wali/nwa/query/getSomeAcceptedWord.cpp
 ./wali/nwa/construct/complement.cpp
 ./wali/nwa/construct/concatenate.cpp
 ./wali/nwa/construct/reverse.cpp
@@ -99,7 +100,6 @@ nice_files = Split("""
 ./wali/nwa/nwa_pds/NwaToPds.cpp
 ./wali/nwa/traverse/depth.cpp
 ./wali/nwa/traverse/Expand.cpp
-./wali/nwa/wordaut.cpp
 """)
 
 
