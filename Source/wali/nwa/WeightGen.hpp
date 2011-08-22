@@ -5,7 +5,7 @@
  * @author Amanda Burton
  */
 
-#include "wali/nwa/NWA.hpp"
+#include "wali/nwa/ClientInfo.hpp"
 #include "wali/Reach.hpp"
 
 

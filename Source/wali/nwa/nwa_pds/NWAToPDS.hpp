@@ -1,4 +1,11 @@
+#ifndef WALI_NWA_NWA_PDS_nwatopds_HPP
+#define WALI_NWA_NWA_PDS_nwatopds_HPP
+
+
 #include "wali/nwa/NWAFwd.hpp"
+#include "wali/wpds/WPDS.hpp"
+#include "wali/nwa/WeightGen.hpp"
+
 #include "wali/nwa/deprecate.h"
 
 #include <sstream>
@@ -181,3 +188,4 @@ namespace wali
 //   c-basic-offset: 2
 // End:
 
+#endif
