@@ -1198,17 +1198,24 @@ namespace wali
 
       // {{{ deprecated nwa_pds functions (and cheater functions)
       wpds::WPDS _private_NwaToPdsReturns_( WeightGen const & wg ) const;
+
+      DEPRECATE("Use nwa_pds::NwaToWpdsReturns()")
       wpds::WPDS NWAtoPDSreturns( WeightGen const & wg ) const {
 	return nwa_pds::NwaToWpdsReturns(*this, wg);
       }
+      DEPRECATE("Use nwa_pds::NwaToWpdsReturns()")
       static wpds::WPDS NWAtoPDSreturns( NWA const & nwa, WeightGen const & wg ) {
         return nwa_pds::NwaToWpdsReturns(nwa, wg);
       }
 
       wpds::WPDS _private_NwaToBackwardsPdsReturns_( WeightGen const & wg ) const;
+
+      DEPRECATE("Use nwa_pds::NwaToWpdsReturns()")
       wpds::WPDS NWAtoBackwardsPDSreturns( WeightGen const & wg ) const {
 	return nwa_pds::NwaToBackwardsWpdsReturns(*this, wg);
       }
+
+      DEPRECATE("Use nwa_pds::NwaToWpdsReturns()")
       static wpds::WPDS NWAtoBackwardsPDSreturns( NWA const & nwa, WeightGen const & wg ) {
         return nwa_pds::NwaToBackwardsWpdsReturns(nwa, wg);
       }
@@ -1216,17 +1223,23 @@ namespace wali
 
       wpds::WPDS _private_NwaToPdsCalls_( WeightGen const & wg,
                                           ref_ptr<wali::wpds::Wrapper> wrapper ) const;
+
+      DEPRECATE("Use nwa_pds::NwaToWpdsReturns()")
       wpds::WPDS NWAtoPDScalls( WeightGen const & wg ) const {
 	return nwa_pds::NwaToWpdsCalls(*this, wg);
       }
+      DEPRECATE("Use nwa_pds::NwaToWpdsReturns()")
       static wpds::WPDS NWAtoPDScalls( NWA const & nwa, WeightGen const & wg ) {
         return nwa_pds::NwaToWpdsCalls(nwa, wg);
       }
 
       wpds::WPDS _private_NwaToBackwardsPdsCalls_( WeightGen const & wg ) const;
+
+      DEPRECATE("Use nwa_pds::NwaToWpdsReturns()")
       wpds::WPDS NWAtoBackwardsPDScalls( WeightGen const & wg ) const {
 	return nwa_pds::NwaToBackwardsWpdsCalls(*this, wg);
       }
+      DEPRECATE("Use nwa_pds::NwaToWpdsReturns()")
       static wpds::WPDS NWAtoBackwardsPDScalls( NWA const & nwa, WeightGen const & wg ) {
         return nwa_pds::NwaToBackwardsWpdsCalls(nwa, wg);
       }

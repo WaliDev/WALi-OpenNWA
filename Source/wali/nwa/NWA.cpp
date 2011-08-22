@@ -1966,7 +1966,7 @@ namespace wali
     {
       //Q: does anything need to be done to transform the resulting WFA from the 
       //    PDS vocab back to the NWA vocab?
-      return ((NWAtoPDScalls(wg)).prestar(input));
+      return ((nwa_pds::NwaToWpdsCalls(*this, wg)).prestar(input));
     }
 
     /**
@@ -1986,7 +1986,7 @@ namespace wali
     {
       //Q: does anything need to be done to transform the resulting WFA from the 
       //    PDS vocab back to the NWA vocab?
-      (NWAtoPDScalls(wg)).prestar(input,output);
+      (nwa_pds::NwaToWpdsCalls(*this, wg)).prestar(input,output);
     }
 
     /**
@@ -2003,7 +2003,7 @@ namespace wali
     {
       //Q: does anything need to be done to transform the resulting WFA from the 
       //    PDS vocab back to the NWA vocab?
-      return ((NWAtoPDScalls(wg)).poststar(input));
+      return ((nwa_pds::NwaToWpdsCalls(*this, wg)).poststar(input));
     }
 
     /**
@@ -2023,7 +2023,7 @@ namespace wali
     {
       //Q: does anything need to be done to transform the resulting WFA from the 
       //    PDS vocab back to the NWA vocab?
-      (NWAtoPDScalls(wg)).poststar(input,output);
+      (nwa_pds::NwaToWpdsCalls(*this, wg)).poststar(input,output);
     }
 
     //Utilities	
