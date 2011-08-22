@@ -31,7 +31,7 @@
 #include "wali/nwa/construct/reverse.hpp"
 #include "wali/nwa/construct/star.hpp"
 #include "wali/nwa/construct/union.hpp"
-#include "wali/nwa/nwa_pds/NWAToPDS.hpp"
+#include "wali/nwa/nwa_pds/conversions.hpp"
 #include "wali/nwa/query/language.hpp"
 
 //#define USE_BUDDY
