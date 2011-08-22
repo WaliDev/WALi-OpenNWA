@@ -1,0 +1,9 @@
+import fnmatch
+import os
+
+headers = []
+for root, dirnames, filenames in os.walk('../../../../Source'):
+  for filename in fnmatch.filter(filenames, '*.hpp'):
+      headers.append(os.path.join(root, filename))
+
+print headers

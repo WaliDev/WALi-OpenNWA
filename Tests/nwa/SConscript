@@ -49,6 +49,8 @@ test_files = Split("""
     Source/namespace-nwa_pds/answers-nwa-to-pds-returns.cpp
     """)
 
+env.SConscript('Source/header-compilation/SConscript')
+
 built = env.Program('nwa-test', test_files)
 
 Return('built')
