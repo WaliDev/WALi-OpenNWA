@@ -223,7 +223,7 @@ namespace wali {
           wali::nwa::ReachGen wg;
           wali::wfa::WFA query;
           ref_ptr<wali::wpds::Wrapper> wrapper = new wali::witness::WitnessWrapper();
-          wali::wpds::WPDS conv = nwa_pds::NWAToPDSCalls(nwa, wg, wrapper);
+          wali::wpds::WPDS conv = nwa_pds::NwaToWpdsCalls(nwa, wg, wrapper);
     
           wali::Key state = getProgramControlLocation();
           wali::Key accept = wali::getKey("__accept");

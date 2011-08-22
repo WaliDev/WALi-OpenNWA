@@ -1,4 +1,5 @@
 #include "wali/nwa/NWAFwd.hpp"
+#include "wali/nwa/deprecate.h"
 
 namespace wali
 {
@@ -18,7 +19,15 @@ namespace wali
        * @return the PDS equivalent to this NWA
        *
        */ 
-      extern wpds::WPDS NWAToPDSReturns( NWA const & nwa, WeightGen const & wg );
+      extern wpds::WPDS NwaToWpdsReturns( NWA const & nwa, WeightGen const & wg );
+
+      DEPRECATE("Use NwaToWpdsReturns()")
+      inline
+      wpds::WPDS
+      NWAToPDSReturns( NWA const & nwa, WeightGen const & wg )
+      {
+        return NwaToWpdsReturns(nwa, wg);
+      }
 
       
       /**
@@ -34,15 +43,24 @@ namespace wali
        */ 
       extern
       wpds::WPDS
-      NWAToPDSCalls( NWA const & nwa,
+      NwaToWpdsCalls( NWA const & nwa,
                      WeightGen const & wg,
                      ref_ptr<wali::wpds::Wrapper> wrapper );
         
       inline
       wpds::WPDS
+      NwaToWpdsCalls( NWA const & nwa, WeightGen const & wg )
+      {
+        return NwaToWpdsCalls(nwa, wg, NULL);
+      }
+
+
+      DEPRECATE("Use NwaToWpdsCalls()")
+      inline
+      wpds::WPDS
       NWAToPDSCalls( NWA const & nwa, WeightGen const & wg )
       {
-        return NWAToPDSCalls(nwa, wg, NULL);
+        return NwaToWpdsCalls(nwa, wg, NULL);
       }
 
 
@@ -57,7 +75,17 @@ namespace wali
        * @return the PDS equivalent to this NWA
        *
        */ 
-      extern wpds::WPDS NWAToBackwardsPDSReturns( NWA const & nwa, WeightGen const & wg );
+      extern wpds::WPDS NwaToBackwardsWpdsReturns( NWA const & nwa, WeightGen const & wg );
+
+
+      DEPRECATE("Use NwaToBackwardsWpdsReturns()")
+      inline
+      wpds::WPDS
+      NWAToBackwardsPDSReturns( NWA const & nwa, WeightGen const & wg )
+      {
+        return NwaToBackwardsWpdsReturns(nwa, wg);
+      }
+
 
       /**
        *
@@ -70,7 +98,15 @@ namespace wali
        * @return the backwards PDS equivalent to this NWA
        *
        */ 
-      extern wpds::WPDS NWAToBackwardsPDSCalls( NWA const & nwa, WeightGen const & wg );
+      extern wpds::WPDS NwaToBackwardsWpdsCalls( NWA const & nwa, WeightGen const & wg );
+
+      DEPRECATE("Use NwaToBackwardsWpdsCalls()")
+      inline
+      wpds::WPDS
+      NWAToBackwardsPDSCalls( NWA const & nwa, WeightGen const & wg )
+      {
+        return NwaToBackwardsWpdsCalls(nwa, wg);
+      }
 
     }
   }

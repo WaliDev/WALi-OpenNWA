@@ -6,24 +6,24 @@ namespace wali
   {
     namespace nwa_pds
     {
-      wpds::WPDS NWAToPDSReturns( NWA const & nwa, WeightGen const & wg)
+      wpds::WPDS NwaToWpdsReturns( NWA const & nwa, WeightGen const & wg)
       {
 	return nwa._private_NwaToPdsReturns_(wg);
       }
 
-      wpds::WPDS NWAToPDSCalls( NWA const & nwa,
+      wpds::WPDS NwaToWpdsCalls( NWA const & nwa,
                                 WeightGen const & wg,
                                 ref_ptr<wali::wpds::Wrapper> wrapper  )
       {
 	return nwa._private_NwaToPdsCalls_(wg, wrapper);
       }
 
-      wpds::WPDS NWAToBackwardsPDSReturns( NWA const & nwa, WeightGen const & wg )
+      wpds::WPDS NwaToBackwardsWpdsReturns( NWA const & nwa, WeightGen const & wg )
       {
 	return nwa._private_NwaToBackwardsPdsReturns_(wg);
       }
 
-      wpds::WPDS NWAToBackwardsPDSCalls( NWA const & nwa, WeightGen const & wg )
+      wpds::WPDS NwaToBackwardsWpdsCalls( NWA const & nwa, WeightGen const & wg )
       {
 	return nwa._private_NwaToBackwardsPdsCalls_(wg);
       }

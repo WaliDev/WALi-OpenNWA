@@ -1199,36 +1199,36 @@ namespace wali
       // {{{ deprecated nwa_pds functions (and cheater functions)
       wpds::WPDS _private_NwaToPdsReturns_( WeightGen const & wg ) const;
       wpds::WPDS NWAtoPDSreturns( WeightGen const & wg ) const {
-	return nwa_pds::NWAToPDSReturns(*this, wg);
+	return nwa_pds::NwaToWpdsReturns(*this, wg);
       }
       static wpds::WPDS NWAtoPDSreturns( NWA const & nwa, WeightGen const & wg ) {
-        return nwa_pds::NWAToPDSReturns(nwa, wg);
+        return nwa_pds::NwaToWpdsReturns(nwa, wg);
       }
 
       wpds::WPDS _private_NwaToBackwardsPdsReturns_( WeightGen const & wg ) const;
       wpds::WPDS NWAtoBackwardsPDSreturns( WeightGen const & wg ) const {
-	return nwa_pds::NWAToBackwardsPDSReturns(*this, wg);
+	return nwa_pds::NwaToBackwardsWpdsReturns(*this, wg);
       }
       static wpds::WPDS NWAtoBackwardsPDSreturns( NWA const & nwa, WeightGen const & wg ) {
-        return nwa_pds::NWAToBackwardsPDSReturns(nwa, wg);
+        return nwa_pds::NwaToBackwardsWpdsReturns(nwa, wg);
       }
 
 
       wpds::WPDS _private_NwaToPdsCalls_( WeightGen const & wg,
                                           ref_ptr<wali::wpds::Wrapper> wrapper ) const;
       wpds::WPDS NWAtoPDScalls( WeightGen const & wg ) const {
-	return nwa_pds::NWAToPDSCalls(*this, wg);
+	return nwa_pds::NwaToWpdsCalls(*this, wg);
       }
       static wpds::WPDS NWAtoPDScalls( NWA const & nwa, WeightGen const & wg ) {
-        return nwa_pds::NWAToPDSCalls(nwa, wg);
+        return nwa_pds::NwaToWpdsCalls(nwa, wg);
       }
 
       wpds::WPDS _private_NwaToBackwardsPdsCalls_( WeightGen const & wg ) const;
       wpds::WPDS NWAtoBackwardsPDScalls( WeightGen const & wg ) const {
-	return nwa_pds::NWAToBackwardsPDSCalls(*this, wg);
+	return nwa_pds::NwaToBackwardsWpdsCalls(*this, wg);
       }
       static wpds::WPDS NWAtoBackwardsPDScalls( NWA const & nwa, WeightGen const & wg ) {
-        return nwa_pds::NWAToBackwardsPDSCalls(nwa, wg);
+        return nwa_pds::NwaToBackwardsWpdsCalls(nwa, wg);
       }
 
       // }}}
