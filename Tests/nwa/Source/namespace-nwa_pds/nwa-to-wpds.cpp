@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "wali/nwa/NWA.hpp"
-#include "wali/nwa/nwa_pds/NWAToPDS.hpp"
+#include "wali/nwa/nwa_pds/conversions.hpp"
 #include "wali/Reach.hpp"
 
 #include "Tests/nwa/Source/fixtures.hpp"
