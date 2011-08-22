@@ -42,6 +42,11 @@ test_files = Split("""
     Source/namespace-construct/reverse.cpp 
     Source/serialization/idempotency.cpp
     Source/serialization/parser-unit-tests.cpp
+    Source/namespace-nwa_pds/nwa-to-wpds.cpp
+    Source/namespace-nwa_pds/answers-nwa-to-backwards-pds-calls.cpp
+    Source/namespace-nwa_pds/answers-nwa-to-backwards-pds-returns.cpp
+    Source/namespace-nwa_pds/answers-nwa-to-pds-calls.cpp
+    Source/namespace-nwa_pds/answers-nwa-to-pds-returns.cpp
     """)
 
 built = env.Program('nwa-test', test_files)
