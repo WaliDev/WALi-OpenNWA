@@ -225,7 +225,7 @@ namespace wali {
           ref_ptr<wali::wpds::Wrapper> wrapper = new wali::witness::WitnessWrapper();
           wali::wpds::WPDS conv = nwa_pds::NwaToWpdsCalls(nwa, wg, wrapper);
     
-          wali::Key state = getProgramControlLocation();
+          wali::Key state = wali::nwa::nwa_pds::getProgramControlLocation();
           wali::Key accept = wali::getKey("__accept");
 
           // Construct the query automaton

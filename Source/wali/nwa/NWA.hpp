@@ -1651,45 +1651,6 @@ namespace wali
     };
 
 
-    /**
-     *  
-     * @brief returns the default program control location for PDSs
-     *
-     * This method provides access to the default program control location for PDSs.
-     * 
-     * @return the default program control location for PDSs
-     *
-     */
-    inline
-    wali::Key
-    getProgramControlLocation( )
-    {
-      static Key key = getKey("program");
-      return key;
-    }
-
-    /**
-     *  
-     * @brief returns the program control location corresponding to the given states
-     *
-     * This method provides access to the program control location corresponding to
-     * the given exit point/call site/return site triple.
-     *
-     * @param - exit: the exit point corresponding to this control location
-     * @param - callSite: the call site corresponding to this control location
-     * @param - returnSite: the return site corresponding to this control location
-     * @return the program control location corresponding to the given states
-     *
-     */
-    inline
-    wali::Key
-    getControlLocation( Key exit, Key callSite, Key returnSite )
-    {
-      std::stringstream ss;
-      ss << "(key#"  << exit << "," << callSite << "," << returnSite << ")";
-      wali::Key key = getKey(getProgramControlLocation(), getKey(ss.str()));
-      return key;
-    }
 
   }
 }

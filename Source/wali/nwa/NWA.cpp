@@ -1857,7 +1857,7 @@ namespace wali
       //initial state of the NWA.
       wali::wfa::WFA initials;
       //Set up initial state.
-      wali::Key init = getProgramControlLocation();
+      wali::Key init = wali::nwa::nwa_pds::getProgramControlLocation();
       initials.addState(init,wgts.zero());
       initials.setInitialState(init);
       //Set up final state.

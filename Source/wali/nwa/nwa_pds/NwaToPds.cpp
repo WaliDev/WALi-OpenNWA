@@ -38,7 +38,7 @@ namespace wali
 
       wpds::WPDS result = wpds::WPDS();
 
-      Key program = getProgramControlLocation();  //= wali::getKey("program");
+      Key program = wali::nwa::nwa_pds::getProgramControlLocation();  //= wali::getKey("program");
 
       wali::sem_elem_t wgt;
 
@@ -115,7 +115,7 @@ namespace wali
                              WeightGen::EXIT_TO_RET,
                              tgt, getClientInfo(tgt));  // w            
 
-        Key rstate = getControlLocation(src,Trans::getCallSite(*rit),tgt);    //p_q_xcr
+        Key rstate = wali::nwa::nwa_pds::getControlLocation(src,Trans::getCallSite(*rit),tgt);    //p_q_xcr
 
         result.add_rule(program,                    //from_state (p)
                         src,                        //from_stack (q_x)
@@ -143,7 +143,7 @@ namespace wali
 
       wpds::WPDS result = wpds::WPDS();
 
-      Key program = getProgramControlLocation();  //= wali::getKey("program");
+      Key program = wali::nwa::nwa_pds::getProgramControlLocation();  //= wali::getKey("program");
 
       wali::sem_elem_t wgt;
 
@@ -192,7 +192,7 @@ namespace wali
                                  WeightGen::CALL_TO_ENTRY,  
                                  tgt, getClientInfo(tgt)); // w    
 
-            Key cstate = getControlLocation(tgt,Trans::getReturnSite(*rit),src);    //p_q_erc
+            Key cstate = wali::nwa::nwa_pds::getControlLocation(tgt,Trans::getReturnSite(*rit),src);    //p_q_erc
 
             result.add_rule(program,                    //from_state (p)
                             Trans::getEntry(*cit),      //from_stack (q_e)
@@ -248,7 +248,7 @@ namespace wali
 
       wpds::WPDS result(wrapper);
 
-      Key program = getProgramControlLocation();  // = wali::getKey("program");
+      Key program = wali::nwa::nwa_pds::getProgramControlLocation();  // = wali::getKey("program");
 
       wali::sem_elem_t wgt;
 
@@ -326,7 +326,7 @@ namespace wali
                              tgt, getClientInfo(tgt));    // w     
 
         //Note: if you change this, make sure you modify the code in NWPForest.createCA()
-        Key rstate = getControlLocation(src,Trans::getCallSite(*rit),tgt);  //p_q_xcr
+        Key rstate = wali::nwa::nwa_pds::getControlLocation(src,Trans::getCallSite(*rit),tgt);  //p_q_xcr
 
         result.add_rule(program,                              //from_state (p)
                         src,                                  //from_stack (q_x)
@@ -355,7 +355,7 @@ namespace wali
 
       wpds::WPDS result = wpds::WPDS();
 
-      Key program = getProgramControlLocation();  // = wali::getKey("program"); 
+      Key program = wali::nwa::nwa_pds::getProgramControlLocation();  // = wali::getKey("program"); 
 
       wali::sem_elem_t wgt;
 
@@ -404,7 +404,7 @@ namespace wali
                                  WeightGen::CALL_TO_ENTRY,
                                  tgt, getClientInfo(tgt));         // w                  
 
-            Key cstate = getControlLocation(tgt,Trans::getReturnSite(*rit),src);  //p_q_erc
+            Key cstate = wali::nwa::nwa_pds::getControlLocation(tgt,Trans::getReturnSite(*rit),src);  //p_q_erc
 
             result.add_rule(program,                              //from_state (p)
                             tgt,                                  //from_stack (q_e)
