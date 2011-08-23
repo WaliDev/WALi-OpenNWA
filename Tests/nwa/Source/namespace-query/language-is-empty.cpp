@@ -70,13 +70,14 @@ namespace wali {
                     std::stringstream ss;
                     ss << "Testing NWA " << nwa;
                     SCOPED_TRACE(ss.str());
+
+                    NestedWordRefPtr word = getSomeAcceptedWord(nwas[nwa]);
                     
                     if (expected_answers[nwa]) {
-                        //EXPECT_TRUE(languageIsEmpty(nwas[nwa]));
+                        EXPECT_TRUE(word == NULL);
                     }
                     else {
-                        NestedWordRefPtr word = getSomeAcceptedWord(nwas[nwa]);
-
+                        ASSERT_TRUE(word != NULL);
                         EXPECT_TRUE(languageContains(nwas[nwa], *word));
                     }
                 }
