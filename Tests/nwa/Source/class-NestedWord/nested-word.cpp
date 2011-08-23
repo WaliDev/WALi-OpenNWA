@@ -2,6 +2,8 @@
 
 #include "wali/nwa/NestedWord.hpp"
 
+#include "Tests/nwa/Source/fixtures.hpp"
+
 
 namespace wali {
     namespace nwa {
@@ -121,6 +123,79 @@ namespace wali {
             ++i;
             EXPECT_EQ(i, w.end());
         }
+
+        TEST(wali$nwa$NestedWord$$operatorEquals, equalWordsEqual)
+        {
+            NestedWord word1, word2;
+            SomeElements e;
+            
+            EXPECT_EQ(word1, word2);
+
+            word1.appendInternal(e.symbol);
+            word2.appendInternal(e.symbol);
+
+            EXPECT_EQ(word1, word2);
+
+            word1.appendCall(e.symbol);
+            word2.appendCall(e.symbol);
+
+            EXPECT_EQ(word1, word2);
+
+            word1.appendReturn(e.symbol);
+            word2.appendReturn(e.symbol);
+
+            EXPECT_EQ(word1, word2);
+        }
+
+        TEST(wali$nwa$NestedWord$$operatorEquals, differentLengthsUnequal)
+        {
+            NestedWord word1, word2;
+            SomeElements e;
+            word1.appendInternal(e.symbol);
+
+            EXPECT_NE(word1, word2);
+            EXPECT_NE(word2, word1);
+        }
+
+        TEST(wali$nwa$NestedWord$$operatorEquals, differentLettersUnequal)
+        {
+            NestedWord word1, word2;
+            SomeElements e;
+
+            word1.appendInternal(e.state);
+            word2.appendInternal(e.symbol);
+
+            EXPECT_NE(word1, word2);
+            EXPECT_NE(word2, word1);
+        }
+
+        TEST(wali$nwa$NestedWord$$operatorEquals, differentKindsUnequal)
+        {
+            NestedWord word1, word2, word3, word4, word5, word6;
+            SomeElements e;
+
+            // internal-call
+            word1.appendInternal(e.symbol);
+            word2.appendCall(e.symbol);
+
+            EXPECT_NE(word1, word2);
+            EXPECT_NE(word2, word1);
+
+            // internal-return
+            word3.appendInternal(e.symbol);
+            word4.appendReturn(e.symbol);
+
+            EXPECT_NE(word3, word4);
+            EXPECT_NE(word4, word3);
+
+            // call-return
+            word5.appendCall(e.symbol);
+            word6.appendReturn(e.symbol);
+
+            EXPECT_NE(word5, word6);
+            EXPECT_NE(word6, word5);
+        }
+
     }
 }
 
