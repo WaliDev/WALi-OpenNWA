@@ -215,12 +215,7 @@ namespace wali
        * @return the NWA equivalent to the given PDS
        *
        */
-      NWARefPtr WpdsToNwa( const wpds::WPDS & pds )
-      {
-        NWARefPtr nwa(new NWA());
-        nwa->WpdsToNwa(pds);
-        return nwa;
-      }
+      NWARefPtr WpdsToNwa( const wpds::WPDS & pds );
       
     } // namespace nwa_pds
 

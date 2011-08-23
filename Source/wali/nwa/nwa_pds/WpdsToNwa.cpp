@@ -7,12 +7,19 @@ namespace wali
   {
     namespace nwa_pds
     {
-    
-      void NWA::PDStoNWA( const wpds::WPDS & pds )
+      NWARefPtr WpdsToNwa( const wpds::WPDS & pds );
+      {
+        NWARefPtr nwa(new NWA());
+        nwa->WpdsToNwa(pds);
+        return nwa;
+      }
+
+      
+      void WpdsToNwa( NWA & nwa, const wpds::WPDS & pds )
       {
         //TODO: check this!
 
-        clear();
+        nwa.clear();
 
         std::map<State,State> call_return;
 
@@ -25,9 +32,9 @@ namespace wali
         for( std::set<wpds::Rule>::iterator it = rules.stepRules.begin();
              it != rules.stepRules.end(); it++ )
         {
-          addInternalTrans(getKey(it->from_state(),it->from_stack()), //from
-                           it->from_stack(),                          //sym
-                           getKey(it->to_state(),it->to_stack1()));   //to
+          nwa.addInternalTrans(getKey(it->from_state(),it->from_stack()), //from
+                               it->from_stack(),                          //sym
+                               getKey(it->to_state(),it->to_stack1()));   //to
         }
 
         //Call Rules:
@@ -37,12 +44,12 @@ namespace wali
         for( std::set<wpds::Rule>::iterator it = rules.pushRules.begin();
              it != rules.pushRules.end(); it++ )
         {
-          addCallTrans(getKey(it->from_state(),it->from_stack()),   //from
-                       it->from_stack(),                           //sym
-                       getKey(it->to_state(),it->to_stack1()));    //to
+          nwa.addCallTrans(getKey(it->from_state(),it->from_stack()),   //from
+                           it->from_stack(),                           //sym
+                           getKey(it->to_state(),it->to_stack1()));    //to
 
-          call_return.insert(std::pair<State,State>(getKey(it->from_state(),it->from_stack()),  //call
-                                                    it->to_stack2()));                          //ret
+          nwa.call_return.insert(std::pair<State,State>(getKey(it->from_state(),it->from_stack()),  //call
+                                                        it->to_stack2()));                          //ret
         }
 
 
@@ -56,10 +63,10 @@ namespace wali
           for( std::map<State,State>::iterator cr_it = call_return.begin();
                cr_it != call_return.end(); cr_it++ )
           {
-            addReturnTrans(getKey(it->from_state(),it->from_stack()),   //from
-                           cr_it->first,                               //pred
-                           it->from_stack(),                           //sym
-                           getKey(it->to_state(),cr_it->second));      //to
+            nwa.addReturnTrans(getKey(it->from_state(),it->from_stack()),   //from
+                               cr_it->first,                               //pred
+                               it->from_stack(),                           //sym
+                               getKey(it->to_state(),cr_it->second));      //to
           }
         }
       }
