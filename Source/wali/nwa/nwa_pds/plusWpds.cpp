@@ -13,7 +13,7 @@ namespace wali
     {
 
       wpds::WPDS
-      plusWPDS( NWA const & nwa, const wpds::WPDS & base )
+      plusWpds( NWA const & nwa, const wpds::WPDS & base )
       {
         typedef wali::nwa::details::TransitionStorage Trans;
       
