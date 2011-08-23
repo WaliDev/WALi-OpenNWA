@@ -43,6 +43,7 @@ test_files = Split("""
     Source/serialization/idempotency.cpp
     Source/serialization/parser-unit-tests.cpp
     Source/namespace-nwa_pds/nwa-to-wpds.cpp
+    Source/namespace-nwa_pds/wpds-to-nwa.cpp
     Source/namespace-nwa_pds/answers-nwa-to-backwards-pds-calls.cpp
     Source/namespace-nwa_pds/answers-nwa-to-backwards-pds-returns.cpp
     Source/namespace-nwa_pds/answers-nwa-to-pds-calls.cpp
