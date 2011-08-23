@@ -3,7 +3,25 @@ import os
 
 headers = []
 for root, dirnames, filenames in os.walk('../../../../Source'):
-  for filename in fnmatch.filter(filenames, '*.hpp'):
-      headers.append(os.path.join(root, filename))
+    headers.extend(Glob(root + '/*.hpp'))
 
-print headers
+
+Import('BaseEnv')
+
+objs = []
+bad_headers = ['OpenFstInterop.hpp', 'ProcedureNWAs.hpp', 'RelationOpsBuddy.hpp', 'RelationOpsPaired.hpp',
+               'abbreviated-nwa.hpp']
+
+for h in headers:
+    if h.name not in bad_headers:
+        cpp = BaseEnv.Command(h.name + '.cpp', [], 'echo #include \"' + h.abspath + '\" > $TARGET')
+        o = BaseEnv.Object(cpp)
+        objs.append(o)
+
+Return('objs')
+
+#print [h.abspath for h in headers]
+#print h
+#print dir(headers[0])
+
+
