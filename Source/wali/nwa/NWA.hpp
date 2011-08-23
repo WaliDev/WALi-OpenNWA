@@ -1135,68 +1135,22 @@ namespace wali
         return nwa.plusWPDS(base, stuck);
       }
 
-      /**
-       *
-       * @brief constructs the NWA equivalent to the given PDS
-       *
-       * This method constructs the NWA that is equivalent to the given
-       * PDS. The NWA's state space tracks both the PDS's state and top stack
-       * symbol; the NWA's "stack" tracks the remainder of the PDS's stack.
-       * The symbol on each transition is the from_stack portion of the
-       * corresponding PDS rule.
-       *
-       *
-       * Let the PDS be (P, G, D). The NWA we create is (Q, Q_0, d, Q_f); d
-       * is split up into the usual (for NWAs) components d_i, d_c, and d_r.
-       *  - Q = P x G    (Tracking the PDS state + top stack symbol)
-       *  - d_i = { ((q,a), a, (q',a'))        |  <q, a> -> <q', a'> in D }
-       *  - d_c = { ((q,a), a, (q',b))         |  <q, a> -> <q', b a'> in D }
-       *  - d_r = { ((q,a), (p,b), a, (q',a')) |  <q, a> -> <q', *> in D  and
-       *                                          <p, b> -> <_, _ a'> in D }
-       *
-       * The last rule is a little funky in a couple ways. First, it has two
-       * conditions because the pop rule doesn't let you know what's on the
-       * top of the stack, and we need to figure that out from the
-       * corresponding push rule.
-       *
-       * Second, note that the push rules we look at in the condition is
-       * totally unconstrained. This is because, with the exception of the
-       * "revealed" stack symbol a', everything that the push rule talks
-       * about concerns the call predecessor (p,b) and entry node (_,_);
-       * nothing the pop rule talks about -- q, a, or q' -- has any relation
-       * to those.
-       *
-       * This last fact means that the NWA we construct can potentially have
-       * quadratically-many rules as the input PDS. If the PDS has M push
-       * rules and N pop rules, the NWA will have M*N return transitions.
-       *
-       * @param - pds: the pds to convert 
-       * @return the NWA equivalent to the given PDS
-       *
-       */
-      void PDStoNWA( const wpds::WPDS & pds ); 
 
-      /**
-       *
-       * @brief constructs the NWA equivalent to the given PDS
-       *
-       * This method constructs the NWA that is equivalent to the given PDS.
-       *
-       * @param - pds: the pds to convert
-       * @param - stuck: dummy parameter
-       * @return the NWA equivalent to the given PDS
-       *
-       */
+      // {{{ deprecated nwa_pds functions (and cheater functions)
+      DEPRECATE("Use nwa_pds::WpdsToNwa()")
+      void PDStoNWA( const wpds::WPDS & pds )
+      {
+        nwa_pds::WpdsToNwa(*this, pds);
+      }
+
+      DEPRECATE("Use nwa_pds::WpdsToNwa()")
       static NWARefPtr PDStoNWA( const wpds::WPDS & pds, State stuck )
       {
         (void) stuck;
-        NWARefPtr nwa(new NWA());
-        nwa->PDStoNWA(pds);
-        return nwa;
+        return nwa_pds::WpdsToNwa(pds);
       }
 
 
-      // {{{ deprecated nwa_pds functions (and cheater functions)
       wpds::WPDS _private_NwaToPdsReturns_( WeightGen const & wg ) const;
 
       DEPRECATE("Use nwa_pds::NwaToWpdsReturns()")
