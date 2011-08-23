@@ -32,6 +32,7 @@
 #include "wali/nwa/construct/star.hpp"
 #include "wali/nwa/construct/union.hpp"
 #include "wali/nwa/nwa_pds/conversions.hpp"
+#include "wali/nwa/nwa_pds/plusWpds.hpp"
 #include "wali/nwa/query/language.hpp"
 
 //#define USE_BUDDY
@@ -1103,36 +1104,18 @@ namespace wali
 
 
       //Using NWAs
-
-      /**
-       * 
-       * @brief constructs the WPDS which is the result of the explicit NWA plus WPDS 
-       *        construction from Advanced Querying for Property Checking
-       *
-       * This method constructs the WPDS which allows WPDS reachability to be used to 
-       * perform property checking using this NWA and the given WPDS.
-       *
-       * @param - base: the WPDS that forms the basis for the constructed WPDS
-       * @return the WPDS which can be used to perform property checking using PDS 
-       *          reachability
-       */
-      wpds::WPDS plusWPDS( const wpds::WPDS & base, State stuck ); 
-      /**
-       * 
-       * @brief constructs the WPDS which is the result of the explicit NWA plus WPDS 
-       *        construction from Advanced Querying for Property Checking
-       *
-       * This method constructs the WPDS which allows WPDS reachability to be used to 
-       * perform property checking using this NWA and the given WPDS.
-       *
-       * @param - base: the WPDS that forms the basis for the constructed WPDS
-       * @param - nwa: the NWA to process
-       * @return the WPDS which can be used to perform property checking using PDS 
-       *          reachability
-       */
+      DEPRECATE("Use nwa_pds::plusWpds()");
+      wpds::WPDS plusWPDS( const wpds::WPDS & base, State stuck )
+      {
+        (void) stuck;
+        return nwa_pds::plusWpds(*this, base);
+      }
+      
+      DEPRECATE("Use nwa_pds::plusWpds()");
       static wpds::WPDS plusWPDS( const wpds::WPDS & base, NWA & nwa, State stuck )
       {
-        return nwa.plusWPDS(base, stuck);
+        (void) stuck;
+        return nwa_pds::plusWpds(nwa, base);
       }
 
 
