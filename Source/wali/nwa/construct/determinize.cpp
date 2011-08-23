@@ -131,12 +131,24 @@ namespace wali
       union_(close, bdd_pre_close, Id);
 
       // R0 is used later; to avoid recomputation we do it now
-      // Epsilon Closure( {(q,q) | q is an element of Q_in in nondeterministic NWA } )
+      // Epsilon Closure( Q0 x Q0 )
       DECLARE(BinaryRelation, R0);
+      DECLARE(BinaryRelation, q0crossQ0);
+
+      for( StateIterator initial1 = nondet.beginInitialStates();
+           initial1 != nondet.endInitialStates(); ++initial1 )
+      {
+        for( StateIterator initial2 = nondet.beginInitialStates();
+             initial2 != nondet.endInitialStates(); ++initial2 )
+        {
+          q0crossQ0.insert(std::make_pair(*initial1, *initial2));
+        }
+      }
+      
 #ifdef USE_BUDDY
-      compose/*<St>*/(R0,Id0,close);
+      compose/*<St>*/(R0,q0crossQ0,close);
 #else
-      compose<State>(R0,Id0,close);
+      compose<State>(R0,q0crossQ0,close);
 #endif
 
       //Make a key for this state.
