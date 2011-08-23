@@ -80,6 +80,18 @@ namespace wali
 
     };
 
+    class RuleDotty : public ConstRuleFunctor
+    {
+      std::ostream & os;
+      bool print_states;
+
+      public:
+      RuleDotty( std::ostream & o, bool _print_states = false );
+      virtual ~RuleDotty();
+
+      virtual void operator()( const rule_t & r );
+    };
+
     /*!
      * @class WpdsStackSymbols
      * Gets all stack symbols from the WPDS and classfies them

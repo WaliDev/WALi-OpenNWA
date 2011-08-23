@@ -599,6 +599,17 @@ namespace wali
       return o;
     }
 
+    std::ostream & WPDS::print_dot( std::ostream & o, bool print_weights) const
+    {
+      o << "digraph \"WPDS@" << std::hex << (void*)this << std::dec << "\" {\n";
+
+      RuleDotty rd(o, print_weights);
+      for_each( rd );
+
+      o << "}\n";
+      return o;
+    }
+
     int WPDS::count_rules() const {
       int cnt = 0;
       const_iterator it = config_map().begin();

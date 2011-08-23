@@ -237,6 +237,24 @@ namespace wali
         virtual std::ostream & marshall( std::ostream & o ) const;
 
         /**
+         * Print the WPDS in dot format. The format is a little strange:
+         * by default it does not print state information (since there is
+         * typically only one state in a WPDS), however, it can be included
+         * optionally.
+         *
+         * Additionally, delta-0 edges are drawn as edges to nowhere
+         * (indicating "I don't know where this goes, since it is dynamic"),
+         * and delta-2 edges use the stack symbol which is pushed as the edge
+         * label, and call the top of stack symbol the state.
+         *
+         * Printing weights is not currently supported, though it would not be
+         * difficult to add.
+         */
+        virtual std::ostream & print_dot( 
+            std::ostream & o,
+            bool print_state=false) const;
+
+        /**
          * @brief Return the number of rules in the WPDS.
          * Note that this function takes time O(num rules), not
          * constant time.
