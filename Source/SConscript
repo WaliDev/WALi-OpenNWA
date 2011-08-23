@@ -99,6 +99,7 @@ nice_files = Split("""
 ./wali/nwa/construct/star.cpp
 ./wali/nwa/nwa_pds/NwaToPds.cpp
 ./wali/nwa/nwa_pds/WpdsToNwa.cpp
+./wali/nwa/nwa_pds/plusWpds.cpp
 ./wali/nwa/traverse/depth.cpp
 ./wali/nwa/traverse/Expand.cpp
 """)
