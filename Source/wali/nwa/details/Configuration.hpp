@@ -1,7 +1,10 @@
 #ifndef wali_nwa_CONFIGURATION_HPP
 #define wali_nwa_CONFIGURATION_HPP
 
-#include <iostream>
+#include "wali/nwa/NWAFwd.hpp"
+
+#include <ios>
+#include <vector>
 
 namespace wali
 {
