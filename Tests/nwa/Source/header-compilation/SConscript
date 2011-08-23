@@ -1,5 +1,6 @@
 import fnmatch
 import os
+import platform
 
 headers = []
 for root, dirnames, filenames in os.walk('../../../../Source'):
@@ -14,7 +15,10 @@ bad_headers = ['OpenFstInterop.hpp', 'ProcedureNWAs.hpp', 'RelationOpsBuddy.hpp'
 
 for h in headers:
     if h.name not in bad_headers:
-        cpp = BaseEnv.Command(h.name + '.cpp', [], 'echo #include \"' + h.abspath + '\" > $TARGET')
+        if 'Windows' in platform.system():
+            cpp = BaseEnv.Command(h.name + '.cpp', [], 'echo #include \"' + h.abspath + '\" > $TARGET')
+        else:
+            cpp = BaseEnv.Command(h.name + '.cpp', [], 'echo \'#include \"' + h.abspath + '\"\' > $TARGET')
         o = BaseEnv.Object(cpp)
         objs.append(o)
 
