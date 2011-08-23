@@ -7,10 +7,10 @@ namespace wali
   {
     namespace nwa_pds
     {
-      NWARefPtr WpdsToNwa( const wpds::WPDS & pds );
+      NWARefPtr WpdsToNwa( const wpds::WPDS & pds )
       {
         NWARefPtr nwa(new NWA());
-        nwa->WpdsToNwa(pds);
+        WpdsToNwa(*nwa, pds);
         return nwa;
       }
 
@@ -48,7 +48,7 @@ namespace wali
                            it->from_stack(),                           //sym
                            getKey(it->to_state(),it->to_stack1()));    //to
 
-          nwa.call_return.insert(std::pair<State,State>(getKey(it->from_state(),it->from_stack()),  //call
+          call_return.insert(std::pair<State,State>(getKey(it->from_state(),it->from_stack()),  //call
                                                         it->to_stack2()));                          //ret
         }
 
