@@ -105,6 +105,7 @@ namespace wali
         return word.size();
       }
 
+      ///
       /// Returns whether the two nested words are equal
       bool operator==(NestedWord const & other) const
       {
@@ -115,6 +116,14 @@ namespace wali
           return std::equal(word.begin(), word.end(), other.word.begin());
         }
       }
+
+      ///
+      /// Returns whether two nested words are unequal
+      bool operator!=(NestedWord const & other) const
+      {
+        return !(*this == other);
+      }
+      
     };
 
 
