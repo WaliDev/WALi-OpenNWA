@@ -49,7 +49,7 @@ namespace wali
                            getKey(it->to_state(),it->to_stack1()));    //to
 
           call_return.insert(std::pair<State,State>(getKey(it->from_state(),it->from_stack()),  //call
-                                                        it->to_stack2()));                          //ret
+                                                    it->to_stack2()));                          //ret
         }
 
 
