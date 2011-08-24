@@ -24,9 +24,11 @@ targets are:
   - all       Build everything!
 
 
-To get Doxygen output, I recommend looking up and appropriately modifying
-tribal rain dances, at least until I can figure out how to do it and update
-this document accordingly.
+To get Doxygen output, run 'doxygen Doxyfile' from the top-level
+directory. By default, it will generate HTML output to Doc/doxygen/html and
+Latex output to Doc/doxygen/latex. (Run 'make' in the latter directory to
+build the Latex to a PDF.)
+
 
 To build the NWA documentation, change to Doc/NWA_tex/ and run (pdf)latex on
 WALi_NWA_Doc.tex. If you would like to rebuild the figures (though this is
