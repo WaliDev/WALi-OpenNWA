@@ -109,7 +109,7 @@ namespace wali
       DECLARE(BinaryRelation, Id0);
       for( StateIterator sit = nondet.beginInitialStates(); sit != nondet.endInitialStates(); sit++ )
       {
-        Id0.insert(std::pair<State,State>(*sit,*sit));
+        //Id0.insert(std::pair<State,State>(*sit,*sit));
       }
       
       //Construct the epsilon closure relation for the states in nondet.
