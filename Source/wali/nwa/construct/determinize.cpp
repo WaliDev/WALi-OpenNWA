@@ -105,13 +105,6 @@ namespace wali
         Id.insert(std::pair<State,State>(*sit,*sit));
       }
       
-      // Construct Id0
-      DECLARE(BinaryRelation, Id0);
-      for( StateIterator sit = nondet.beginInitialStates(); sit != nondet.endInitialStates(); sit++ )
-      {
-        //Id0.insert(std::pair<State,State>(*sit,*sit));
-      }
-      
       //Construct the epsilon closure relation for the states in nondet.
       SetBinaryRelation pre_close; //Collapse epsilon transitions.
       SetBinaryRelation Ie;   //Internal transitions with epsilon.
