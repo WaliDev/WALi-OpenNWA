@@ -1104,14 +1104,14 @@ namespace wali
 
 
       //Using NWAs
-      DEPRECATE("Use nwa_pds::plusWpds()");
+      DEPRECATE("Use nwa_pds::plusWpds()")
       wpds::WPDS plusWPDS( const wpds::WPDS & base, State stuck )
       {
         (void) stuck;
         return nwa_pds::plusWpds(*this, base);
       }
       
-      DEPRECATE("Use nwa_pds::plusWpds()");
+      DEPRECATE("Use nwa_pds::plusWpds()")
       static wpds::WPDS plusWPDS( const wpds::WPDS & base, NWA & nwa, State stuck )
       {
         (void) stuck;
