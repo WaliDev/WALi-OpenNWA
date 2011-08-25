@@ -7,7 +7,9 @@ Prerequsites:
 Optional prerequsites (for documentation)
   - Doxgen  (we use 1.7.1)
   - Latex  (we use TexLive 2010, but it has also built with MikTex)
-  - dot2tex  (optional even if you are building the documentation; we have 2.8.7)
+  - dot2tex  (optional even if you are building the documentation; we have
+    2.8.7)
+  - pygments
 
 
 To build, simply run 'scons'. By default, this will build the library (a
@@ -37,9 +39,11 @@ build the Latex to a PDF.)
 
 
 To build the NWA documentation, change to Doc/NWA_tex/ and run (pdf)latex on
-WALi_NWA_Doc.tex. If you would like to rebuild the figures (though this is
-not necessary if you do not change them), change to Doc/NWA_tex/Figures and
-run 'make'. Note that a couple of the figures used in the "official" version
-of the NWA manual have been modified by hand, and regenerating them will
-cause those changes to be lost.
+WALi_NWA_Doc.tex, passing '-shell-escape'. ('-shell-escape' is required by
+the pygmentize package, used for source-highlighting the example code at the
+beginning.) If you would like to rebuild the figures (though this is not
+necessary if you do not change them), change to Doc/NWA_tex/Figures and run
+'make'. Note that a couple of the figures used in the "official" version of
+the NWA manual have been modified by hand, and regenerating them will cause
+those changes to be lost.
 
