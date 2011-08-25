@@ -23,6 +23,12 @@ targets are:
               point to the executable.
   - all       Build everything!
 
+You can pass 'arch=x86' to SCons if you are on a 64-bit Linux machine to get
+a 32-bit build. (The 32 and 64 bit builds live next to each other, so it's
+not either-or.) Note: because of the way 'cmake' is called for the Google
+Test library, you probably won't be able to do this for the 'tests' or 'all'
+pseudo-targets.
+
 
 To get Doxygen output, run 'doxygen Doxyfile' from the top-level
 directory. By default, it will generate HTML output to Doc/doxygen/html and
