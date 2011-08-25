@@ -107,14 +107,12 @@ located in namespace \texttt{wali::nwa::query} and are declared in
 
   \functionDefFirst{bool}{languageIsEmpty}{NWA const \& nwa}{}
     Computes
-    whether the NWA's language is empty, and returns the result. \TODO{This
-      is the one place where I think we have to make a decision about how to
-      support unbalanced words. Do we have one function
-      that takes ``accept unbalanced left'' and ``accept unbalanced right''
-      flags? Multiple (potentially four) functions? Set a state variable in
-      the NWA which isEmpty queries? Say that you can always intersect your
-      NWA with $(^n)^n$ if you want only balanced, so only provide a
-      fully-general version?}
+    whether the NWA's language is empty, and returns the result.
+
+  \functionDefFirst{ref\_ptr$<$NestedWord$>$}{getSomeAcceptedWord}{NWA const \& nwa}{}
+    If \texttt{nwa}'s language is empty, returns \texttt{NULL}. Otherwise
+    returns any word in $L(\texttt{nwa})$. (If \texttt{nwa} accepts
+    unbalanced words, the return value may be unbalanced.)
 
   \functionDefFirst{bool}{languageSubsetEq}{NWA const \& left, NWA const \& right}{}
     Computes whether $L(\texttt{left}) \subseteq L(\texttt{right})$

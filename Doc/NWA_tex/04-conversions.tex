@@ -58,29 +58,47 @@ r)$, then the WPDS will have a rule $\langle p,
 c\rangle\hookrightarrow\langle p, e r\rangle$).
 
 
-The following functions are in the namespace \texttt{wali::nwa::nwa\_pds} and
-are declared in the header \texttt{wali/nwa/nwa\_pds/conversions.hpp}.
+The following functions are in the namespace \texttt{wali::nwa::nwa\_pds}
+and, except for \texttt{plusWpds()}, are declared in the header
+\texttt{wali/nwa/nwa\_pds/conversions.hpp}:
 
 
 \begin{functionlist}
   \functionDefEarly{void}{WpdsToNwa}{NWA \& out, const WPDS\& pds}{}
-  \functionDef{NWARefPtr}{WpdsToNwa}{NWA const \& nwa, const WPDS\& pds}{}
+  \functionDef{NWARefPtr}{WpdsToNwa}{const WPDS\& pds}{}
     Converts \texttt{pds} to an NWA, either storing the result in
     \texttt{nwa} or returning it.
 
-  \functionDefFirstEarly{WPDS}{NwaToWpdsCalls}{NWA const \& nwa, WeightGen<Client>\& wg}{}
-  \functionDefEarly{WPDS}{NwaToBackwardsWpdsCalls}{NWA const \& nwa, WeightGen<Client>\& wg}{}
-  \functionDefEarly{WPDS}{NwaToWpdsReturns}{NWA const \& nwa, WeightGen<Client>\& wg}{}
-  \functionDef{WPDS}{NwaToBackwardsWpdsReturn}{NWA const \& nwa, WeightGen<Client>\& wg}{}
+  \functionDefFirstEarly{WPDS}{NwaToWpdsCalls}{NWA const \& nwa, WeightGen const \& wg}{}
+  \functionDefEarlyNoCloseParen{WPDS}{NwaToWpdsCalls}{\parbox[t]{4in}{NWA const \& nwa, WeightGen const \& wg,\\ref\_ptr<Wrapper> wr)}}
+  \functionDefEarly{WPDS}{NwaToBackwardsWpdsCalls}{NWA const \& nwa, WeightGen const \& wg}{}
+  \functionDefEarly{WPDS}{NwaToWpdsReturns}{NWA const \& nwa, WeightGen const \& wg}{}
+  \functionDef{WPDS}{NwaToBackwardsWpdsReturn}{NWA const \& nwa, WeightGen const \& wg}{}
     Constructs a WPDS that is equivalent to \texttt{nwa} using the
     appropriate method (backwards or forwards flow, and stacking calls or
     stacking returns), returning the result. Uses \texttt{wg} to determine
-    weights for the WPDS's transitions.
+    weights for the WPDS's transitions. The second variant of
+    \texttt{NwaToWpdsCalls} takes a \texttt{wali::wpds::Wrapper} reference
+    \texttt{wr}, and the WPDS is constructed by passing \texttt{wr} to the
+    constructor. This can be used, for instance, if you would like the
+    resulting WPDS to support witness tracing. (If \texttt{wr} is
+    \texttt{NULL}, then the second version is equivalent to the first.)
 
-  \functionDefFirst{WPDS}{plusWPDS}{NWA const \& nwa, const WPDS\& base}{}
+  \functionDefFirst{State}{getProgramControlLocation}{}{}
+    Returns the program state $p$ used as the primary WPDS state in the
+    result of the \texttt{NwaToWpds*} variants.
+
+  \functionDefFirst{State}{getControlLocation}{State exit, State call, State return}{}
+    Returns the WPDS state $p_{q_x}$ or $p_{q_3}$ used as a ``helper'' state
+    for return transitions from \texttt{exit} to \texttt{return} with
+    \texttt{call} as a predecessor.
+
+  \functionDefFirst{WPDS}{plusWpds}{NWA const \& nwa, const WPDS\& base}{}
     This returns the WPDS that is the
     product of \texttt{nwa} and the given WPDS, described in the ``Explicit
-    NWA plus PDS'' construction from \cite[\S6]{advancedquerying}.
+    NWA plus PDS'' construction from \cite[\S6]{advancedquerying}. This
+    function is declared in the header
+    \texttt{wali/nwa/nwa\_pds/plusWpds.hpp}.
 \end{functionlist}
 
 

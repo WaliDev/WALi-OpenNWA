@@ -63,7 +63,6 @@ situation.
 
   \DetDef{
     $Close$ = $(\delta_i |_\epsilon)^*$\;
-    $Id$ = $\{(q,q) | q \in Q\}$\;
     $R_0$ = $Q_0 \times Q_0 \circ Close$\;
     $Q^{new}$ = $\{R_0\}$\;
     Insert $R_0$ in \WL\;
@@ -81,7 +80,7 @@ situation.
         }
         \BlankLine
         \tcp{Compute call transitions}
-        $R^c$ = $Id \circ Close \circ \delta_c|_\sigma \circ Close$\;
+        $R^c$ = $Close \circ \delta_c|_\sigma \circ Close$\;
         $Q^{new}$ = $Q^{new} \cup \{R^c\}$\;
         Insert $R \overset{\sigma}{\rightarrow} R^c$ into $\delta_c^{new}$\;
         \If{$R^c$ unmarked}{
