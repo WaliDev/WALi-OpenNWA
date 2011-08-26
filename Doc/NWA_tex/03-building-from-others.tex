@@ -26,7 +26,7 @@ Each of these functions is in the namespace \texttt{wali::nwa::construct}:
     \texttt{union} because the latter is a C++ keyword.) The two NWAs must not
     have any states in common, and the output will be nondeterministic even
     if both input NWAs are deterministic. The running time\footnote{We count
-      state lookups, additions, etc. as constant time even though they are
+      state lookups, additions, etc.\ as constant time even though they are
       actually logarithmic, and occasionally linear.} is
     $O(|Q^a|+|Q^b|+|\delta^a|+|\delta^b|)$.
 
@@ -404,15 +404,16 @@ to add extra transitions; in this construction, we must add additional states as
 
 The construction presented in \cite{JACM:AM2009} has an error. The error is
 analogous to not adding a distinguished start state in the traditional
-Thompson's construction\footnote{The initial state of the automaton $A^*$
-  must accept, because $\epsilon$ is in $L^*$; and thus of this it is
-  incorrect to simply add epsilon transitions from the old final states to
+Thompson's construction,\footnote{The initial state of the automaton $A^*$
+  must accept, because $\epsilon$ is in $L^*$; and because of this property it is
+  incorrect to merely add epsilon transitions from the old final states to
   the old initial states. If you do this and there is a cycle from the
   initial state back to itself (for example, a self-loop on the initial
-  state), that path would be accepted even though it shouldn't be.}, and in
+  state), that path would be accepted even though it should not be.} and in
 fact can be exhibited using the same example (it is not necessary to use NWA
-calls or returns). Alur confirmed that our interpretation is correct. We
-formulate a version using $\epsilon$-transitions, and thus it looks a bit
+calls or returns). Alur confirmed that our interpretation is
+correct~\cite{AlurNwaStarBroken}. Below, we present
+a version that uses $\epsilon$-transitions, and thus it looks a bit
 different from the version in \cite{JACM:AM2009}.
 
 When computing $R = A^*$ for some
@@ -438,7 +439,7 @@ primed and unprimed version of states from $A$ in the definition below.
 Suppose $R$ is reading a word $w_1w_2\cdots w_n$ where each $w_i \in
 L(A)$. $R$ begins in a start state of $A'$. Henceforth it maintains an
 invariant: if the next symbol is in a return position, then that symbol is a
-\emph{pending} return iff $R$ is in the $A'$ portion (i.e. if the current state is
+\emph{pending} return iff $R$ is in the $A'$ portion (i.e., if the current state is
 primed). Internal transitions thus keep $R$ in the same copy of $A$, and call
 transitions always take $R$ to the unprimed copy of $A$ (because if it then
 reads a return, the return will match that call). Return transitions can
@@ -523,15 +524,15 @@ and $q'$ have (different copies of) the same client information.
 \subsection{Reverse}
 \label{Se:Reverse}
 
-The algorithm for reversing an NWA has a similar flavor to that of the Kleene
-star procedure. The automaton $A^{rev}$ has two ``copies'' of $A$ (one
+The algorithm for reversing an NWA has a similar flavor to that of the
+Kleene-star procedure. The automaton $A^{rev}$ has two ``copies'' of $A$ (one
 primed). The reversed automaton will start in the $A'$ copy, stay in $A'$
 until it reads a call, transition to the $A$ copy, stay in $A$ until it reads
 the matched return for the call that caused it to switch copies, then
 transition back to $A'$.
 
 Our construction of reverse is more complicated than the one presented in
-\cite{JACM:AM2009}; this is necessary because the version in
+\cite{JACM:AM2009}, which necessary because the version in
 \cite{JACM:AM2009} will not work as-stated with a weakly-hierarchical
 NWA.
 

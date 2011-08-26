@@ -35,7 +35,7 @@ q_1), \cdots, (p_n, q_n)\}$ means that the NWA is one of the states $\{q_0,
 q_1, \cdots, q_n\}$, but the relation carries around extra meaning.
 
 If a state in the determinized automaton contains a pair $(p,q)$, then this
-means the input automaton can begin in the state $p$, immediately take a call
+means the input automaton can begin in the state $p$, immediately perform a call
 transition, follow a path with balanced calls and returns, and finally arrive
 in state $q$. In such a configuration, if the input automaton then reads a
 return symbol, $q$ is the exit site and $p$ is the call predecessor. These

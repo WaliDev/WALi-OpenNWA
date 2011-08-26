@@ -111,7 +111,7 @@ located in namespace \texttt{wali::nwa::query} and are declared in
 
   \functionDefFirst{ref\_ptr$<$NestedWord$>$}{getSomeAcceptedWord}{NWA const \& nwa}{}
     If \texttt{nwa}'s language is empty, returns \texttt{NULL}. Otherwise
-    returns any word in $L(\texttt{nwa})$. (If \texttt{nwa} accepts
+    returns an arbitrary word in $L(\texttt{nwa})$. (If \texttt{nwa} accepts
     unbalanced words, the return value may be unbalanced.)
 
   \functionDefFirst{bool}{languageSubsetEq}{NWA const \& left, NWA const \& right}{}

@@ -74,13 +74,13 @@ and, except for \texttt{plusWpds()}, are declared in the header
   \functionDefEarly{WPDS}{NwaToBackwardsWpdsCalls}{NWA const \& nwa, WeightGen const \& wg}{}
   \functionDefEarly{WPDS}{NwaToWpdsReturns}{NWA const \& nwa, WeightGen const \& wg}{}
   \functionDef{WPDS}{NwaToBackwardsWpdsReturn}{NWA const \& nwa, WeightGen const \& wg}{}
-    Constructs a WPDS that is equivalent to \texttt{nwa} using the
+    These functions each construct a WPDS that is equivalent to \texttt{nwa} using the
     appropriate method (backwards or forwards flow, and stacking calls or
     stacking returns), returning the result. Uses \texttt{wg} to determine
     weights for the WPDS's transitions. The second variant of
     \texttt{NwaToWpdsCalls} takes a \texttt{wali::wpds::Wrapper} reference
     \texttt{wr}, and the WPDS is constructed by passing \texttt{wr} to the
-    constructor. This can be used, for instance, if you would like the
+    constructor. This feature can be used, for instance, if you would like the
     resulting WPDS to support witness tracing. (If \texttt{wr} is
     \texttt{NULL}, then the second version is equivalent to the first.)
 
@@ -94,7 +94,7 @@ and, except for \texttt{plusWpds()}, are declared in the header
     \texttt{call} as a predecessor.
 
   \functionDefFirst{WPDS}{plusWpds}{NWA const \& nwa, const WPDS\& base}{}
-    This returns the WPDS that is the
+    This function returns a WPDS that is the
     product of the NWA \texttt{nwa} and WPDS \texttt{base}, as described in the ``Explicit
     NWA plus PDS'' construction from \cite[\S6]{advancedquerying}. This
     function is declared in the header
@@ -147,7 +147,7 @@ because, with the exception of the ``revealed'' stack symbol $q_r$,
 everything that the push rule talks about concerns the call predecessor
 $(p,q_c)$ and entry node $(q', q_e)$; nothing that the pop rule talks about ---
 $p''$, $q_x$, or $p'''$ --- has any relation to those. (A consequence is that the
-number of the number of NWA transitions may be quadratic in the number of
+number of NWA transitions may be quadratic in the number of
 WPDS rules.)
 
 
@@ -184,8 +184,8 @@ resulting NWA.
   \label{Fi:WpdsToNwa1}
 \end{figure}
 
-For example, the NWA resulting from converting the WPDS shown in
-\figref{WpdsToNwa1} into an NWA is shown in \figref{WpdsToNwa2}.
+For example, the NWA created from the WPDS shown in
+\figref{WpdsToNwa1} is shown in \figref{WpdsToNwa2}.
 
 \begin{figure}[t]
   \centering

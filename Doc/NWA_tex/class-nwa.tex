@@ -26,7 +26,9 @@ The following functions are basic NWA operations:
   \functionDefFirst{bool}{NWA::operator==}{NWA const \& other}{}
     Determines whether the two automata are structurally equal --- that is,
     they contain exactly the same set of states (including initial and final
-    states), symbols, and transitions --- and returns the result.
+    states), symbols, and transitions --- and returns the result. (To test
+    language equality, use the \texttt{languageEquals} function covered
+    in\sectref{namespace-query}.)
 
   \functionDefFirst{void}{NWA::clear}{}{}
     Removes all states, symbols, and transitions from the NWA.
@@ -100,7 +102,7 @@ programmer must consider the standard aliasing and lifetime considerations
 imposed by using smart pointers. (\texttt{ClientInfo} supplies the
 \texttt{count} field needed by \texttt{ref\_ptr}.) Operations such as copying
 an NWA that clone client information can also result in changes in aliasing:
-if the client information for states $p$ and $q$ are aliased in NWA $N$ which
+if the client information for states $p$ and $q$ are aliased in NWA $N$ that
 is then copied to NWA $N'$, the ``copies'' of $p$ and $q$ in $N'$ will have
 separate copies of the client information.
 
