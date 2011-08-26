@@ -25,13 +25,10 @@ Each of these functions is in the namespace \texttt{wali::nwa::construct}:
     \ref{Se:Union}. (This function is called \texttt{unionNWA} instead of
     \texttt{union} because the latter is a C++ keyword.) The two NWAs must not
     have any states in common, and the output will be nondeterministic even
-    if both input NWAs are deterministic. The running time is
-    $O(|Q^a|+|Q^b|+|\delta^a|+|\delta^b|)$. \TODO{What do you think about
-      putting these in here? I'm not 100\% sure they are all accurate, they
-      aren't really counting ``lookup'' time (usually $\log |Q|$ or $\log
-      |\delta|$, occasionally higher), in
-      some cases they are only approximate (e.g. determinize). Should we
-      leave them with a disclaimer? Remove them? Add more?}
+    if both input NWAs are deterministic. The running time\footnote{We count
+      state lookups, additions, etc. as constant time even though they are
+      actually logarithmic, and occasionally linear.} is
+    $O(|Q^a|+|Q^b|+|\delta^a|+|\delta^b|)$.
 
   \functionDefFirstEarly{NWARefPtr}{intersect}{NWA const \& a, NWA const \& b}{}
   \functionDef{void}{intersect}{NWA \& out, NWA const \& a, NWA const \& b}{}
@@ -39,7 +36,7 @@ Each of these functions is in the namespace \texttt{wali::nwa::construct}:
     either returning the result or storing it in \texttt{out}.
     See Section \ref{Se:Intersection}. If both input NWAs are deterministic,
     the output will be deterministic. The worst-case running time is
-    $O(|Q^a||Q^b|d_ad_b)$, where $d_a$ is the maximum out-degree
+    $O(|Q^a| |Q^b| d_a d_b)$, where $d_a$ is the maximum out-degree
     of a state in \texttt{a} and $d_b$ is the maximum out-degree of a state
     in \texttt{b}.
 
@@ -51,9 +48,6 @@ Each of these functions is in the namespace \texttt{wali::nwa::construct}:
     See Section \ref{Se:Concatenation}. The output automaton will be
     nondeterministic. The running time is
     $O(|Q^a|+|Q^b|+|\delta^a|+|\delta^b|+|Q^a||\delta_r^b|)$.
-    (The $\delta_r^b$ term can be refined to be the number of
-    return transitions with a state from $Q_0^b$ in the call-predecessor
-    position.)
 
   \functionDefFirstEarly{NWARefPtr}{star}{NWA const \& orig}{}
   \functionDef{void}{star}{NWA \& out, NWA const \& orig}{}
@@ -81,26 +75,28 @@ Each of these functions is in the namespace \texttt{wali::nwa::construct}:
     Computes the complement of the determinization of \texttt{orig},
     either returning the result or storing it in \texttt{out}.
     See Section
-    \ref{Se:Complement}. For complementing the set of final states to work
-    correctly, two things must hold: \texttt{orig} must be deterministic and
-    the transition functions must be total. (That is, for a given state $q$
-    and symbol $\sigma$, there must be exactly one internal transition $(q,
-    \sigma, q') \in\delta_i$, exactly one call transition $(q, \sigma,
-    q')\in\delta_c$, and exactly one return transition $(q, p, \sigma,
-    q')\in\delta_r$ for each state $p$.)
+    \ref{Se:Complement}. %For complementing the set of final states to work
+    %correctly, two things must hold: \texttt{orig} must be deterministic and
+    %the transition functions must be total. (That is, for a given state $q$
+    %and symbol $\sigma$, there must be exactly one internal transition $(q,
+    %5\sigma, q') \in\delta_i$, exactly one call transition $(q, \sigma,
+    %q')\in\delta_c$, and exactly one return transition $(q, p, \sigma,
+    %q')\in\delta_r$ for each state $p$.)
+    \texttt{complement()} determinizes \texttt{orig}, so its worst-case
+    running time is also at least $O({|Q|^3} \cdot2^{|Q|^2})$.
 
-    \vspace{0.5\baselineskip}
-    If \texttt{determinize} is \texttt{true}, it will
-    automatically determinize the input NWA before complementation, which
-    also guarantees the input machine will be total. If you
-    know that \texttt{orig} is already deterministic and total, you can set
-    \texttt{determinize} to
-    \texttt{false} to avoid this step. (Complementing a nondeterministic or
-    non-total NWA can easily lead to an incorrect result.) If
-    \texttt{determinize} is \texttt{true}, the worst-case running time is the
-    same as for the \texttt{determinize} function (roughly
-    $O(2^{|Q|^2})$). If \texttt{determinize} is \texttt{false}, the running
-    time is $O(|Q|+|\delta|)$.
+    %\vspace{0.5\baselineskip}
+    %If \texttt{determinize} is \texttt{true}, it will
+    %automatically determinize the input NWA before complementation, which
+    %also guarantees the input machine will be total. If you
+    %know that \texttt{orig} is already deterministic and total, you can set
+    %\texttt{determinize} to
+    %\texttt{false} to avoid this step. (Complementing a nondeterministic or
+    %non-total NWA can easily lead to an incorrect result.) If
+    %\texttt{determinize} is \texttt{true}, the worst-case running time is the
+    %same as for the \texttt{determinize} function (roughly
+    %$O(2^{|Q|^2})$). If \texttt{determinize} is \texttt{false}, the running
+    %time is $O(|Q|+|\delta|)$.
 
 \end{functionlist}
 
