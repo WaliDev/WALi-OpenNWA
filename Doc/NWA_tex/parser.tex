@@ -249,6 +249,7 @@ and strings which are not names:
 \end{tabular}
 \end{quote}
 
+The actual grammar is:
 \begin{grammar}
   \nonterm{name} & ::= &  \nonterm{actual-name}\cfgsp  \nonterm{dummy-token}? \\
   \nonterm{dummy-token} & ::= & \term{(}\cfgsp(\neg\{\term{(}\})*\cfgsp\term{)}
