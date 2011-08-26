@@ -1,0 +1,51 @@
+Q: {
+  Begin (=2),
+  End (=3),
+  Entry (=4),
+  Exit (=6),
+  ( Begin , prime ) (=10),
+  ( End , prime ) (=11),
+  ( Entry , prime ) (=12),
+  ( Exit , prime ) (=13)}
+
+Q0: {
+  Begin (=2),
+  ( Begin , prime ) (=10)}
+
+Qf: {
+  End (=3),
+  ( Begin , prime ) (=10)}
+Sigma: {
+  call,
+  a,
+  ret}
+Delta_c: {
+  (Begin (=2) , call, Entry (=4) ), 
+  (( Begin , prime ) (=10) , call, Entry (=4) )
+}
+Delta_i:  {
+  (Entry (=4) , a, Exit (=6) ),
+  (( Entry , prime ) (=12) , a, ( Exit , prime ) (=13) )
+}
+Delta_r: {
+  (Exit (=6) , Begin (=2) , ret, End (=3) ),
+  (Exit (=6) , Begin (=2) , ret, ( Begin , prime ) (=10) ),
+  (Exit (=6) , ( Begin , prime ) (=10) , ret, ( Begin , prime ) (=10) ),
+  (Exit (=6) , ( Begin , prime ) (=10) , ret, ( End , prime ) (=11) ),
+  (( Exit , prime ) (=13) , Begin (=2) , ret, ( Begin , prime ) (=10) ),
+  (( Exit , prime ) (=13) , Begin (=2) , ret, ( End , prime ) (=11) ),
+  (( Exit , prime ) (=13) , End (=3) , ret, ( Begin , prime ) (=10) ),
+  (( Exit , prime ) (=13) , End (=3) , ret, ( End , prime ) (=11) ),
+  (( Exit , prime ) (=13) , Entry (=4) , ret, ( Begin , prime ) (=10) ),
+  (( Exit , prime ) (=13) , Entry (=4) , ret, ( End , prime ) (=11) ),
+  (( Exit , prime ) (=13) , Exit (=6) , ret, ( Begin , prime ) (=10) ),
+  (( Exit , prime ) (=13) , Exit (=6) , ret, ( End , prime ) (=11) ),
+  (( Exit , prime ) (=13) , ( Begin , prime ) (=10) , ret, ( Begin , prime ) (=10) ),
+  (( Exit , prime ) (=13) , ( Begin , prime ) (=10) , ret, ( End , prime ) (=11) ),
+  (( Exit , prime ) (=13) , ( End , prime ) (=11) , ret, ( Begin , prime ) (=10) ),
+  (( Exit , prime ) (=13) , ( End , prime ) (=11) , ret, ( End , prime ) (=11) ),
+  (( Exit , prime ) (=13) , ( Entry , prime ) (=12) , ret, ( Begin , prime ) (=10) ),
+  (( Exit , prime ) (=13) , ( Entry , prime ) (=12) , ret, ( End , prime ) (=11) ),
+  (( Exit , prime ) (=13) , ( Exit , prime ) (=13) , ret, ( Begin , prime ) (=10) ),
+  (( Exit , prime ) (=13) , ( Exit , prime ) (=13) , ret, ( End , prime ) (=11) )
+}
