@@ -406,6 +406,19 @@ the ability to have unbalanced-right words in the automaton's
 language. Relative to standard FAs, in the concatenation construction we only needed
 to add extra transitions; in this construction, we must add additional states as well.
 
+The construction presented in \cite{JACM:AM2009} has an error. The error is
+analogous to not adding a distinguished start state in the traditional
+Thompson's construction\footnote{The initial state of the automaton $A^*$
+  must accept, because $\epsilon$ is in $L^*$; and thus of this it is
+  incorrect to simply add epsilon transitions from the old final states to
+  the old initial states. If you do this and there is a cycle from the
+  initial state back to itself (for example, a self-loop on the initial
+  state), that path would be accepted even though it shouldn't be.}, and in
+fact can be exhibited using the same example (it is not necessary to use NWA
+calls or returns). Alur confirmed that our interpretation is correct. We
+formulate a version using $\epsilon$-transitions, and thus it looks a bit
+different from the version in \cite{JACM:AM2009}.
+
 When computing $R = A*$ for some
 NWA $A$, the resulting NWA has two ``copies'' of $A$. These are denoted by
 primed and unprimed version of states from $A$ in the definition below. 
@@ -481,12 +494,12 @@ The transitions in $\delta^*$ are defined by the following rules:
 \\
 {\inferrule*[left=\textsc{Start}]
   { q \in Q_0 }
-  {(q_0, \varepsilon, q) \in \delta_i^*}
+  {(q_0, \epsilon, q) \in \delta_i^*}
 }
 \and
 {\inferrule*[right=\textsc{Retart}]
   { q \in Q_f }
-  {(q, \varepsilon, q_0) \in \delta_i^* \\ (q', \varepsilon, q_0) \in \delta_i^* }
+  {(q, \epsilon, q_0) \in \delta_i^* \\ (q', \epsilon, q_0) \in \delta_i^* }
 }
 \end{mathpar}
 
