@@ -453,7 +453,8 @@ The NWA resulting from performing Kleene-Star on the NWA shown in
 Formally, if the original NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$,
 then the result of performing Kleene-Star on that NWA is $(Q^*, \Sigma,
 Q_0^*, \delta^*, Q_f^*)$. The sets of states are defined by $Q^* = Q \cup
-Q'$ and  $Q_0^* = Q_f^* = Q_0'$ (where $Q' = \{q'\, |\, q \in Q\}$ and $Q_0' =
+Q' \cup \{q_0\}$ (for a distinguished start state $q_0 \not\in Q$)
+and  $Q_0^* = Q_f^* = Q_0'$ (where $Q' = \{q'\, |\, q \in Q\}$ and $Q_0' =
 \{q'\, |\, q \in Q_0\}$).
 The transitions in $\delta^*$ are defined by the following rules:
 
@@ -463,19 +464,9 @@ The transitions in $\delta^*$ are defined by the following rules:
   { (q,a,p) \in  \delta_i^* \\ (q',a,p') \in \delta_i^*}
 }
 \and
-{\inferrule*[right=\textsc{Int-restart}]
-  {(q,a,p) \in \delta_i \\ p \in Q_f \\ r' \in  Q_0'}
-  {(q,a,r') \in \delta_i^*\\ (q',a,r') \in \delta_i^* }
-}
-\and
-{\inferrule*[left=\textsc{Call}]
+{\inferrule*[right=\textsc{Call}]
            { (q,a,p) \in \delta_c  }
   { (q,a,p) \in  \delta_c^* \\ (q',a,p) \in \delta_c^*   }
-}
-\and
-{\inferrule*[right=\textsc{Call-restart}]
-    { (q,a,p) \in \delta_c \\ p \in Q_f \\ r' \in Q_0' }
-  { (q,a,r') \in \delta_c^*\\ (q',a,r') \in \delta_c^* }
 }
 \and
 {\inferrule*[left=\textsc{Ret}]
@@ -483,18 +474,19 @@ The transitions in $\delta^*$ are defined by the following rules:
   {(q,r,a,p) \in  \delta_r^* \\ (q,r',a,p') \in \delta_r^* }
 }
 \and
-{\inferrule*[right=\textsc{Ret-re}]
-  { (q,r,a,p) \in \delta_r \\ p \in Q_f \\  s' \in Q_0'}
-  {(q,r,a,s') \in \delta_r^* \\ (q,r',a,s') \in \delta_r^*  }
-}\\
 {\inferrule*[left=\textsc{Unbal-Ret}]
-  { (q,r,a,p) \in \delta_r \\ r \in Q_0 \\ s' \in Q' }
-  {(q',s',a,p') \in  \delta_r^* }
+  { (q,r,a,p) \in \delta_r \\ r \in Q_0 \\ s \in Q \cup Q' }
+  {(q',s,a,p') \in  \delta_r^* }
+}
+\\
+{\inferrule*[left=\textsc{Start}]
+  { q \in Q_0 }
+  {(q_0, \varepsilon, q) \in \delta_i^*}
 }
 \and
-{\inferrule*[left=\textsc{Unbal-Ret-Restart}]
-  { (q,r,a,p) \in \delta_r \\ r \in Q_0 \\ s' \in Q' \\ p \in Q_f \\ t' \in Q_0'}
-  {(q',s',a,t') \in \delta_r^* }
+{\inferrule*[right=\textsc{Retart}]
+  { q \in Q_f }
+  {(q, \varepsilon, q_0) \in \delta_i^* \\ (q', \varepsilon, q_0) \in \delta_i^* }
 }
 \end{mathpar}
 
