@@ -527,28 +527,48 @@ and $q'$ have (different copies of) the same client information.
 \subsection{Reverse}
 \label{Se:Reverse}
 
+The algorithm for reversing an NWA has a similar flavor to that of the Kleene
+star procedure. The automaton $A^{rev}$ has two ``copies'' of $A$ (one
+primed). The reversed automaton will start in the $A'$ copy, stay in $A'$
+until it reads a call, transition to the $A$ copy, stay in $A$ until it reads
+the matched return for the call that caused it to switch copies, then
+transition back to $A'$.
 
+Our construction of reverse is more complicated than the one presented in
+\cite{JACM:AM2009}; this is necessary because the version in
+\cite{JACM:AM2009} will not work as-stated with a weakly-hierarchical
+NWA.
 
 If the original NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$, then the result of
-reversing that NWA is $(Q, \Sigma, Q_f, \delta^{rev}, Q_0)$ obtained using
+reversing that NWA is $(Q \cup Q', \Sigma, Q_f'', \delta^{rev}, Q_0)$ obtained using
 the following rules:
 
 \begin{mathpar}
 {\inferrule*[left=\textsc{Internal}]
-     { (q,\sigma,q') \in \delta_i  }
-  { (q',\sigma,q)  \in \delta^{rev}_i }
+     { (p,\sigma,q) \in \delta_i  }
+  { (q,\sigma,p)  \in \delta^{rev}_i \\ (q',\sigma,p')  \in \delta^{rev}_i }
 } 
 \and
-{\inferrule*[left=\textsc{Call}]
-       { (q_c,\sigma,q_e) \in \delta_c }
-  { (q_e,\sigma,q_c) \in \delta^{rev}_c }
+{\inferrule*[left=\textsc{Call-Return}]
+       { (q_c,\sigma_c,q_e) \in  \delta_c \\ (q_x,\_\!\_\,,\sigma_r,q_r) \in \delta_r }
+  { (q_r, \sigma_r, q_x), (q_r', \sigma_r, q_x) \in \delta^{rev}_c \\
+    (q_e, q_r, \sigma_c, q_c), (q_e, q_r', \sigma_c, q_c') \in \delta^{rev}_c }
 }
 \and
-{\inferrule*[left=\textsc{Return}]
-  { (q_x,q_c,\sigma,q_r) \in \delta_r  \\ (q_c,\sigma,q_e) \in  \delta_c }
-  { (q_r,q_e,\sigma,q_x) \in \delta^{rev}_r }
+{\inferrule*[left=\textsc{Pending-Return}]
+       { (q_c,\sigma,q_e) \in  \delta_c \\ q_f \in Q_f }
+  { (q_e', q_f, \sigma, q_c') \in \delta^{rev}_R }
 }
 \end{mathpar}
+%The \textsc{Pending-Return} rule is the most perplexing one. The name
+%\textsc{Pending-Return} is written from the perspective of the reversed
+%automaton -- in other words, the reversed automaton will take a transition
+%added by this rule when it reads a pending return, and that pending return
+%would have been a pending call in the original automaton. However, $q_f \in
+%Q_f$ is written from the perspective of the original automaton: because
+%$q_f$ is a final state in the original it is an initial state in the
+%reversed automaton, and this is why the transition can be taken on a pending
+%return.
 
 
 The NWA resulting from performing reverse on the NWA shown in
