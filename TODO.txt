@@ -1,0 +1,40 @@
+Non-NWA tests:
+
+ - Except for some tests of Key stuff in the NWA tests, there are none.
+
+
+NWA tests:
+
+ - We have some tests for the getKey and key2str functions -- other than a
+   raw key_src_t. It would be kind of nice to add those.
+
+ - We don't have tests for the functions in tables 2-4 (transition query
+   functions), except insofar as they are called by other functions. (This is
+   actually a majority of the non-covered code that's part of the public
+   interface of the NWA portion of the library.)
+
+ - We don't have tests of the NWA's own prestar/poststar functions.
+
+ - We don't say what happens if WALI_EPSILON labels a call or return edge, so
+   I don't have any tests for it.
+
+ - We have almost no tests for WALI_WILD.
+
+ - We don't have any tests for print_dot, and probably not much for print or
+   read_nwa (or read_nwa_proc_set).
+
+ - WpdsToNwa, NwaToWpds*, plusWpds are not really tested at all. We call them
+   with an empty NWA or empty WPDS, mostly to make sure they
+   compile. (NwaToWpdsCalls() is used by languageIsEmpty() and
+   getSomeAcceptedWord(), so it is actually tested reasonably decently
+   as-is, except that we don't really use fancy weights so wouldn't notice if
+   it's calling the wrong weightgen function.)
+
+ - We don't test *any* of the client info callbacks in determinize or
+   intersect, and we don't really test the calls to the weightgen functions
+   in the NWA->WPDS conversions.
+
+ - intersect() is lacking in coverage a little.
+
+ - Nothing in 'details' namespaces is tested, nor are a number of functions
+   that did not make it into the Latex documentation.
