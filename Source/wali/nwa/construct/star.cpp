@@ -90,8 +90,7 @@ namespace wali
 
       //Transitions of A*:
 
-      //Internal: for each (q,a,p) in delta_i, A* gets (q,a,p) and (q',a,p') and if
-      //          p in Qf, then (q,a,newStart) and (q',a,newStart)
+      //Internal: for each (q,a,p) in delta_i, A* gets (q,a,p) and (q',a,p')
       for( InternalIterator iit = first.beginInternalTrans();
            iit != first.endInternalTrans(); iit++ )
       {
@@ -108,8 +107,7 @@ namespace wali
         addInternalTrans(qp,a,pp);
       }
 
-      //Call: for each(q,a,p) in delta_c, A* gets (q,a,p) and (q',a,p), 
-      //      and if p in Qf then (q,a,newStart) and (q',a,newStart)
+      //Call: for each(q,a,p) in delta_c, A* gets (q,a,p) and (q',a,p)
       for( CallIterator cit = first.beginCallTrans();
            cit != first.endCallTrans(); cit++ )
       {
@@ -126,10 +124,8 @@ namespace wali
       }
 
       //Return: for each (q,r,a,p) in delta_r, A* gets (q,r,a,p) and (q,r',a,p'), 
-      //          and if p in Qf, t hen (q,r,a,s') and (q,r',a,s') for each s in Q0
       //          For each (q,r,a,p) in delra_r with r in Q0, 
       //            A* gets (q',s,a,p') for each s in Q union Q' and (q',newStart,a,p')
-      //          and if p in Qf, then (q',s,a,newStart) for each s in Q union Q' and (q',newStart,a,newStart)
       for( ReturnIterator rit = first.beginReturnTrans();
            rit != first.endReturnTrans(); rit++ )
       {
