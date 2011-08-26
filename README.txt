@@ -2,27 +2,40 @@ Prerequsites:
   - Boost  (old versions are OK; we actually use 1.33.1)
   - SCons
   - G++ or MSVC
-  - cmake (only for 'scons tests' and 'scons all')
 
-Optional prerequsites (for documentation)
-  - Doxgen  (we use 1.7.1)
+Optional prerequsites for the 'scons tests' pseudotarget (or 'scons all'):
+  - cmake
+  - internet connection
+
+Optional prerequsites for Doxygen documentation:
+  - Doxgen  (we use 1.7.1) 
+
+Optional prerequsites for Latex documentation
   - Latex  (we use TexLive 2010, but it has also built with MikTex)
+  - pygments
   - dot2tex  (optional even if you are building the documentation; we have
     2.8.7)
-  - pygments
 
 
 To build, simply run 'scons'. By default, this will build the library (a
 shared library with GCC and a static library for MSVC). Other possible
 targets are:
   - addons    Build the contents of AddOns/, such as the XML WPDS parser
+
   - examples  Build the contents of Examples/
+
   - tests     Build the contents of Tests/, including the NWA unit tests.
               (The NWA unit tests build to Tests/nwa/nwa-tests (or
               nwa-tests.exe) but are not automatically run.) CMAKE either
               needs to be picked up by SCons by default (and it does NOT
               pick up your $PATH) or set the $CMAKE environment variable to
               point to the executable.
+
+              The NWA tests are actually reasonably complete, relative to the
+              Latex documentation. TODO.txt mentions the omissions. Also
+              mostly omitted are a number of functions that did not make it
+              into the Latex documentation.
+
   - all       Build everything!
 
 You can pass 'arch=x86' to SCons if you are on a 64-bit Linux machine to get
