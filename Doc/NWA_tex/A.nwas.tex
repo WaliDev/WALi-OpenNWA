@@ -8,13 +8,13 @@ call/return structure in execution traces in multi-procedure
 programs. Their languages represent somewhat of a middle-ground between
 standard regular languages and context-free languages. They are strictly more
 powerful than finite automata (FAs), but can also accept some languages that
-are context-free once the call/return structure is dropped. (For instance,
+are context-free once the nesting structure (call/return, etc.) is dropped. (For instance,
 there is an NWA that
 accepts exactly the language of properly-balanced parentheses, with the
 associated matching structure.) Importantly, nested-word languages also retain all the closure
 properties that makes standard regular languages attractive; in particular,
 they are closed under complementation and intersection. However, they are not
-directly comparable to languages of linear words, because the call/return
+directly comparable to languages of linear words, because the nesting
 structure is an explicit part of each nested word.
 
 \begin{definition}

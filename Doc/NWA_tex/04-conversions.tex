@@ -95,7 +95,7 @@ and, except for \texttt{plusWpds()}, are declared in the header
 
   \functionDefFirst{WPDS}{plusWpds}{NWA const \& nwa, const WPDS\& base}{}
     This returns the WPDS that is the
-    product of \texttt{nwa} and the given WPDS, described in the ``Explicit
+    product of the NWA \texttt{nwa} and WPDS \texttt{base}, as described in the ``Explicit
     NWA plus PDS'' construction from \cite[\S6]{advancedquerying}. This
     function is declared in the header
     \texttt{wali/nwa/nwa\_pds/plusWpds.hpp}.
@@ -147,7 +147,8 @@ because, with the exception of the ``revealed'' stack symbol $q_r$,
 everything that the push rule talks about concerns the call predecessor
 $(p,q_c)$ and entry node $(q', q_e)$; nothing that the pop rule talks about ---
 $p''$, $q_x$, or $p'''$ --- has any relation to those. (A consequence is that the
-number of WPDS rules may be quadratic in the number of NWA transitions.)
+number of the number of NWA transitions may be quadratic in the number of
+WPDS rules.)
 
 
 In the resulting NWA, $Q_0$ and $Q_f$ are empty; client code must set the initial and
