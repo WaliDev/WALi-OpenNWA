@@ -397,7 +397,11 @@ Client information is copied directly from the original NWAs using
 Like concatenation, Kleene-star is complicated in the case of NWAs because of
 the ability to have unbalanced-right words in the automaton's
 language. Relative to standard FAs, in the concatenation construction we only needed
-to add extra transitions; in this construction, we must add additional states as well.
+to add extra transitions; in this construction, we must add additional states
+as well.
+
+The NWA resulting from performing Kleene-Star on the NWA shown in
+\figref{Star1} is shown in \figref{Star2}.
 
 The construction presented in \cite{JACM:AM2009} has an error. The error is
 analogous to not adding a distinguished start state in the traditional
@@ -433,11 +437,15 @@ primed and unprimed version of states from $A$ in the definition below.
 \antistupidfloats
 
 
-Suppose $R$ is reading a word $w_1w_2\cdots w_n$ where each $w_i \in
+Suppose $R$ is reading a word $w=w_1w_2\cdots w_n$ where each $w_i \in
 L(A)$. $R$ begins in a start state of $A'$. Henceforth it maintains an
-invariant: if the next symbol is in a return position, then that symbol is a
-\emph{pending} return iff $R$ is in the $A'$ portion (i.e., if the current state is
-primed). Internal transitions thus keep $R$ in the same copy of $A$, and call
+invariant: if the next symbol $\sigma$ is in a return position, then that
+symbol is a \emph{pending} return in the current $w_i$ iff $R$ is in the $A'$
+portion, i.e., if the current state is primed. (Note that this return is only
+pending in the current $w_i$. In the full string $w$, $\sigma$ may match a
+call in an earlier $w_j$, or it may be pending in the whole string.)
+
+Internal transitions thus keep $R$ in the same copy of $A$, and call
 transitions always take $R$ to the unprimed copy of $A$ (because if it then
 reads a return, the return will match that call). Return transitions can
 target either copy of $A$: if the call predecessor is unprimed, then the
@@ -445,28 +453,48 @@ target will be unprimed; if the call predecessor is primed, then the target
 will be primed.
 
 The description above describes $R$'s operation under ``normal''
-conditions. If it is about to move to a final state, however, it is also allowed to guess that it
-should restart after the current character. This guess is correct if it is
-reading the last character in $w_i$
-(making the next character the first one in $w_{i+1}$). $R$ is allowed to
-restart only if it is about to move to a final state, but that final state
-can be in either copy of A. If the machine
-does restart, it moves to an initial state (which is always primed, in order to
-maintain the invariant).
+conditions. If the automaton is in a state that accepts in the input
+automaton, it is also allowed to guess that it should ``restart'' by taking
+an epsilon transition to $q_0$. This guess is correct if it just read the
+last character in $w_i$ (making the next character the first one in
+$w_{i+1}$). $R$ is allowed to restart only if it is in a final state, but
+that final state can be in either copy of A. Note that $q_0$ only leads to
+the $A'$ portion of $R$, maintaining the invariant.
 
-The NWA resulting from performing Kleene-Star on the NWA shown in
-\figref{Star1} is shown in \figref{Star2}.
+The reason for the two copies of $A$ comes into play when $R$ reads a return
+$\sigma$ in the $A'$ portion. By the invariant, $\sigma$ is pending in the
+current $w_i$. In the original automaton $A$, the transitions that the
+machine can use are return transitions $(q,r,a,p)$ where the call predecessor
+$r$ is in $Q_0$. We need to make sure that $R$ can take those same
+transitions. There are two cases we need to consider. For the cases where
+$\sigma$ is pending in the whole string $w$, we need to have a version of the
+return transition with $q_0$ in the call predecessor position, so we add $(q,
+q_0, a, p)$. For the cases where $\sigma$ is matched with a call in some
+earlier $w_j$, it does not matter what state the machine was in before that
+call; thus we add $(q, s, a, p)$ for each state $s$ in $R$.
+
+``Normal'' operation corresponds to the transitions introduced by the
+\textsc{Internal}, \textsc{Call}, and \textsc{Return} inference rules given
+below. The \textsc{Restart} rule allows $R$ to restart, and the
+\textsc{Start} rule allows $R$ to get from $q_0$ to the $A'$ portion. (These
+transitions target $A'$ because there have been no calls read in the current
+$w_i$.) The \textsc{Globally-Unbalanced} rule addresses the situation where
+the current symbol is pending in the whole string. (This is the first case in
+the previous paragraph.) The \textsc{Locally-Unbalanced} rule addresses the
+situation where the current symbol is pending in the current $w_i$ but
+matches a call from a previous $w_j$.
+
 
 Formally, if the original NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$,
 then the result of performing Kleene-Star on that NWA is $(Q^*, \Sigma,
 Q_0^*, \delta^*, Q_f^*)$. The sets of states are defined by $Q^* = Q \cup
-Q' \cup \{q_0\}$ (with $Q' = \{q'\, |\, q \in Q\}$ and $q_0$ is a
+Q' \cup \{q_0\}$ (with $Q' = \{q'\, |\, q \in Q\}$ and $q_0$ a
 distinguished state not in $Q$),
 and  $Q_0^* = Q_f^* = \{q_0\}$.
 The transitions in $\delta^*$ are defined by the following rules:
 
 \begin{mathpar}
-{\inferrule*[left=\textsc{Int}]
+{\inferrule*[left=\textsc{Internal}]
              {(q,a,p) \in \delta_i }
   { (q,a,p) \in  \delta_i^* \\ (q',a,p') \in \delta_i^*}
 }
@@ -476,16 +504,12 @@ The transitions in $\delta^*$ are defined by the following rules:
   { (q,a,p) \in  \delta_c^* \\ (q',a,p) \in \delta_c^*   }
 }
 \and
-{\inferrule*[left=\textsc{Ret}]
+{\inferrule*[left=\textsc{Return}]
               { (q,r,a,p) \in \delta_r }
   {(q,r,a,p) \in  \delta_r^* \\ (q,r',a,p') \in \delta_r^* }
 }
-\and
-{\inferrule*[left=\textsc{Unbal-Ret}]
-  { (q,r,a,p) \in \delta_r \\ r \in Q_0 \\ s \in Q \cup Q' }
-  {(q',s,a,p') \in  \delta_r^* }
-}
 \\
+\and
 {\inferrule*[left=\textsc{Start}]
   { q \in Q_0 }
   {(q_0, \epsilon, q) \in \delta_i^*}
@@ -494,6 +518,16 @@ The transitions in $\delta^*$ are defined by the following rules:
 {\inferrule*[right=\textsc{Retart}]
   { q \in Q_f }
   {(q, \epsilon, q_0) \in \delta_i^* \\ (q', \epsilon, q_0) \in \delta_i^* }
+}
+\and
+{\inferrule*[left=\textsc{Globally-Unbalanced}]
+  { (q,r,a,p) \in \delta_r \\ r \in Q_0 \\ s \in Q \cup Q' }
+  {(q',s,a,p') \in  \delta_r^* }
+}
+\and
+{\inferrule*[left=\textsc{Locally-Unbalanced}]
+  { (q,r,a,p) \in \delta_r \\ r \in Q_0 \\ s \in Q \cup Q' }
+  {(q',s,a,p') \in  \delta_r^* }
 }
 \end{mathpar}
 
