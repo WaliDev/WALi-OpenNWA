@@ -395,7 +395,7 @@ Client information is copied directly from the original NWAs using
 \label{Se:Star}
 
 Like concatenation, Kleene-star is complicated in the case of NWAs because of
-the ability to have unbalanced-right words in the automaton's
+the ability to have unbalanced words in the automaton's
 language. Relative to standard FAs, in the concatenation construction we only needed
 to add extra transitions; in this construction, we must add additional states
 as well.
@@ -478,11 +478,11 @@ call; thus we add $(q, s, a, p)$ for each state $s$ in $R$.
 below. The \textsc{Restart} rule allows $R$ to restart, and the
 \textsc{Start} rule allows $R$ to get from $q_0$ to the $A'$ portion. (These
 transitions target $A'$ because there have been no calls read in the current
-$w_i$.) The \textsc{Globally-Unbalanced} rule addresses the situation where
-the current symbol is pending in the whole string. (This is the first case in
-the previous paragraph.) The \textsc{Locally-Unbalanced} rule addresses the
-situation where the current symbol is pending in the current $w_i$ but
-matches a call from a previous $w_j$.
+$w_i$.) The \textsc{Globally-Pending} rule addresses the situation where the
+current symbol is a return that is pending in the whole string $w$. (This is
+the first case in the previous paragraph.) The \textsc{Locally-Pending} rule
+addresses the situation where the current symbol is a return that is pending
+in the current $w_i$ but matches a call from a previous $w_j$.
 
 
 Formally, if the original NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$,
@@ -512,7 +512,7 @@ The transitions in $\delta^*$ are defined by the following rules:
 \and
 {\inferrule*[left=\textsc{Start}]
   { q \in Q_0 }
-  {(q_0, \epsilon, q) \in \delta_i^*}
+  {(q_0, \epsilon, q') \in \delta_i^*}
 }
 \and
 {\inferrule*[right=\textsc{Retart}]
@@ -520,14 +520,14 @@ The transitions in $\delta^*$ are defined by the following rules:
   {(q, \epsilon, q_0) \in \delta_i^* \\ (q', \epsilon, q_0) \in \delta_i^* }
 }
 \and
-{\inferrule*[left=\textsc{Globally-Unbalanced}]
-  { (q,r,a,p) \in \delta_r \\ r \in Q_0 \\ s \in Q \cup Q' }
-  {(q',s,a,p') \in  \delta_r^* }
+{\inferrule*[left=\textsc{Globally-Pending}]
+  { (q,r,a,p) \in \delta_r \\ r \in Q_0 }
+  {(q',q_0,a,p') \in  \delta_r^* }
 }
 \and
-{\inferrule*[left=\textsc{Locally-Unbalanced}]
-  { (q,r,a,p) \in \delta_r \\ r \in Q_0 \\ s \in Q \cup Q' }
-  {(q',s,a,p') \in  \delta_r^* }
+{\inferrule*[left=\textsc{Locally-Pending}]
+  { (q,r,a,p) \in \delta_r \\ r \in Q_0 \\ s \in Q }
+  {(q',s,a,p'), (q', s', a, p') \in  \delta_r^* }
 }
 \end{mathpar}
 
@@ -560,17 +560,28 @@ any $q$.
 \subsection{Reverse}
 \label{Se:Reverse}
 
-The algorithm for reversing an NWA has a similar flavor to that of the
-Kleene-star procedure. The automaton $A^{rev}$ has two ``copies'' of $A$ (one
-primed). The reversed automaton will start in the $A'$ copy, stay in $A'$
-until it reads a call, transition to the $A$ copy, stay in $A$ until it reads
-the matched return for the call that caused it to switch copies, then
-transition back to $A'$.
+A nested word $n = (w, \rightsquigarrow)$ is reversed by reversing the linear
+word $w$ and exchanging calls and returns. Formally,
+$n^{rev} = (w^{rev}, \{(|w|+1-r, |w|+1-c) | (r,c)
+\in\rightsquigarrow\})$. (Pending calls and returns are handled by defining
+$|w|+1-(+\infty) = -\infty$ and $|w|+1-(-\infty) = +\infty$.) Roughly
+speaking, call transitions in $A$ correspond to return transitions in
+$A^{rev}$ and vice versa, and we reverse the direction of all transitions as
+in the standard FA construction. We describe the construction from the
+perspective of $A^{rev}$ -- that is, a ``call transition'' is a call
+transition in $A^{rev}$, and a ``call'' is a call in the reversed string.
 
-Our construction of reverse is more complicated than the one presented in
-\cite{JACM:AM2009}, which necessary because the version in
-\cite{JACM:AM2009} will not work as-stated with a weakly-hierarchical
-NWA.
+Perhaps unsurprisingly, pending returns pose a similar problem because the
+role of initial and final states are exchanged. Because of this complication,
+the algorithm for reversing an NWA has a similar flavor to that of the
+Kleene-star procedure. The automaton $A^{rev}$ has two ``copies'' of $A$ (one
+primed), and maintains the same invariant as the Kleene-star construction: if
+the next symbol $\sigma$ is in a return position, then that symbol is a
+\emph{pending} return iff $A^{rev}$ is in the $A'$ portion.
+
+(For those familiar with the construction in \cite{JACM:AM2009}, ours is more
+complicated because the version in \cite{JACM:AM2009} will not work as-stated
+with a weakly-hierarchical NWA.)
 
 If the original NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$, then the result of
 reversing that NWA is $(Q \cup Q', \Sigma, Q_f', \delta^{rev}, Q_0)$ obtained using
