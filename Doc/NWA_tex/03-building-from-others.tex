@@ -382,8 +382,7 @@ $p$ that either appear in the call position of a call transition in
 
 The state sets of the NWAs must not overlap,
 i.e., $Q_1 \cap Q_2 = \emptyset$. \textsl{Client code should not rely on
-  this condition being checked} or any particular behavior occurring if it
-does not hold.
+  this condition being checked.}
 
 Client information is copied directly from the original NWAs using
 \texttt{ClientInfo::clone()}.
@@ -659,8 +658,8 @@ An NWA, $(Q,\Sigma,Q_0,\delta,Q_f)$, is \textbf{deterministic} iff
       otherwise, for all $\sigma \in \Sigma - \{\wild\}$,
       $|\{q'|(q,\sigma,q') \in \delta_c\}| \leq 1$, and
 
-    \item for $q' \in Q$, if $(q,q',\wild,q'') \in \delta_r$ then
-      $|\{q''|(q,q',\sigma,q'') \in \delta_r, {\sigma\neq@}\}| = 0$; \\
+    \item \mbox{for $q' \in Q$, if $(q,q',\wild,q'') \in \delta_r$ then
+      $|\{q''|(q,q',\sigma,q'') \in \delta_r, {\sigma\neq@}\}| = 0$;} \\
       otherwise, for all
       $\sigma \in \Sigma - \{\wild\}$, $|\{q''|(q,q',\sigma,q'') \in \delta_r\}|
       \leq 1$,
