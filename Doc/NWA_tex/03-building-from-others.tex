@@ -481,7 +481,7 @@ q_0, \sigma, p')$.
 earlier $w_j$, it does not matter what state the machine was in before that
 call; thus we add $(q', s, \sigma, p')$ for each state $s$ in $Q \cup Q'$.
 \end{enumerate}
-We will call the first case ``globally pending'' and the second ``locally pending.''
+\vspace{0.25\baselineskip}
 
 ``Normal'' operation corresponds to the transitions introduced by the
 \textsc{Internal}, \textsc{Call}, and \textsc{Locally-Matched-Return}
@@ -490,7 +490,9 @@ inference rules given below. The source states of both transitions added by
 is a return that matches a call in the same $w_i$, $R$ will be in
 the $A$ portion by the invariant.
 The \textsc{Restart} rule allows $R$ to restart, and the
-\textsc{Start} rule allows $R$ to get from $q_0$ to the $A'$ portion.
+\textsc{Start} rule allows $R$ to get from $q_0$ to the $A'$ portion; these
+transitions target the $A'$ portion because there have been no calls read in
+the current $w_i$, and thus a return symbol would be pending.
 The \textsc{Globally-Pending-Return} rule addresses the situation where the
 current symbol is a return that is pending in the whole string $w$. (This is
 the first case in the previous paragraph.) The \textsc{Locally-Pending-Return} rule
