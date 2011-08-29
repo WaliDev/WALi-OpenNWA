@@ -405,14 +405,16 @@ The NWA resulting from performing Kleene-Star on the NWA shown in
 
 The construction presented in \cite{JACM:AM2009} has an error. The error is
 analogous to not adding a distinguished start state in the traditional
-Thompson's construction,\footnote{The initial state of the automaton $A^*$
+Thompson construction,\footnote{The initial state of the automaton $A^*$
   must accept, because $\epsilon$ is in $L^*$; and because of this property it is
   incorrect to merely add epsilon transitions from the old final states to
   the old initial states. If you do this and there is a cycle from the
   initial state back to itself (for example, a self-loop on the initial
-  state), that path would be accepted even though it should not be.} and in
+  state), the word corresponding to that path would be accepted even though
+  it should not be.} and in
 fact can be exhibited using the same example (it is not necessary to use NWA
-calls or returns). Alur confirmed that our interpretation is
+calls or returns). Alur confirmed that our interpretation of the construction
+in \cite{JACM:AM2009} is
 correct~\cite{AlurNwaStarBroken}. Below, we present
 a version that uses $\epsilon$-transitions, and thus it looks a bit
 different from the version in \cite{JACM:AM2009}.
@@ -437,9 +439,11 @@ primed and unprimed version of states from $A$ in the definition below.
 \antistupidfloats
 
 
-Suppose $R$ is reading a word $w=w_1w_2\cdots w_n$ where each $w_i \in
-L(A)$. $R$ begins in a start state of $A'$. Henceforth it maintains an
-invariant: if the next symbol $\sigma$ is in a return position, then that
+Suppose that $R$ is reading a word $w=w_1w_2\cdots w_n$, where each $w_i \in
+L(A)$. $R$ begins in a start state of $A'$. Henceforth it maintains the
+following invariant on the state that $R$ is in with respect to the portion
+of $w$ read so far: if the next symbol $\sigma$ is in a return position, then
+that
 symbol is a \emph{pending} return in the current $w_i$ iff $R$ is in the $A'$
 portion, i.e., if the current state is primed. (Note that this return only
 needs to be
@@ -454,35 +458,43 @@ target will be unprimed; if the call predecessor is primed, then the target
 will be primed.
 
 The description above describes $R$'s operation under ``normal''
-conditions. If the automaton is in a final state state of the input
-automaton, it is also allowed to guess that it should ``restart'' by taking
+conditions. If $R$ is in a final state (either primed or unprimed) of the
+automaton $A$, it is also allowed to guess that it should ``restart'' by taking
 an epsilon transition to a distinguished start and final state $q_0$. This
 guess is correct if it just read the
 last character in $w_i$ (making the next character the first one in
-$w_{i+1}$). $R$ is allowed to restart only if it is in a final state, but
-that final state can be in either copy of A. Note that $q_0$ only leads to
+$w_{i+1}$). Note that $q_0$ only has transitions to
 the $A'$ portion of $R$, maintaining the invariant.
 
 The reason for the two copies of $A$ comes into play when $R$ reads a return
 $\sigma$ while in the $A'$ portion. By the invariant, $\sigma$ is pending in the
 current $w_i$. In the original automaton $A$, the transitions that the
-machine can use are return transitions $(q,r,a,p)$ where the call predecessor
+machine can use are return transitions $(q,r,\sigma,p)$ where the call predecessor
 $r$ is in $Q_0$. We need to make sure that $R$ can take those same
-transitions. There are two cases we need to consider. For the cases where
+transitions. There are two cases we need to consider:
+\begin{enumerate}
+\item For the cases where
 $\sigma$ is pending in the whole string $w$, we need to have a version of the
-return transition with $q_0$ in the call predecessor position, so we add $(q,
-q_0, a, p)$. For the cases where $\sigma$ is matched with a call in some
+return transition with $q_0$ in the call-predecessor position, so we add $(q',
+q_0, \sigma, p')$.
+\item For the cases where $\sigma$ is matched with a call in some
 earlier $w_j$, it does not matter what state the machine was in before that
-call; thus we add $(q, s, a, p)$ for each state $s$ in $R$.
+call; thus we add $(q', s, \sigma, p')$ for each state $s$ in $Q \cup Q'$.
+\end{enumerate}
+For purposes of this discussion, we call the first case ``globally pending''
+and the second ``locally pending.''
 
 ``Normal'' operation corresponds to the transitions introduced by the
-\textsc{Internal}, \textsc{Call}, and \textsc{Return} inference rules given
-below. The \textsc{Restart} rule allows $R$ to restart, and the
+\textsc{Internal}, \textsc{Call}, and \textsc{Locally-Matched-Return}
+inference rules given below. The source states of both transitions added by
+\textsc{Locally-Matched-Return} are unprimed, because if the current symbol
+is a return that matches a call in the same $w_i$, $R$ will be in
+the $A$ portion by the invariant.
+The \textsc{Restart} rule allows $R$ to restart, and the
 \textsc{Start} rule allows $R$ to get from $q_0$ to the $A'$ portion.
-transitions target $A'$ because there have been no calls read in the current
-The \textsc{Globally-Pending} rule addresses the situation where the
+The \textsc{Globally-Pending-Return} rule addresses the situation where the
 current symbol is a return that is pending in the whole string $w$. (This is
-the first case in the previous paragraph.) The \textsc{Locally-Pending} rule
+the first case in the previous paragraph.) The \textsc{Locally-Pending-Return} rule
 addresses the situation where the current symbol is a return that is pending
 in the current $w_i$ but matches a call from a previous $w_j$.
 
@@ -496,18 +508,18 @@ The transitions in $\delta^*$ are defined by the following rules:
 
 \begin{mathpar}
 {\inferrule*[left=\textsc{Internal}]
-             {(q,a,p) \in \delta_i }
-  { (q,a,p) \in  \delta_i^* \\ (q',a,p') \in \delta_i^*}
+             {(q,\sigma,p) \in \delta_i }
+  { (q,\sigma,p) \in  \delta_i^* \\ (q',\sigma,p') \in \delta_i^*}
 }
 \and
 {\inferrule*[right=\textsc{Call}]
-           { (q,a,p) \in \delta_c  }
-  { (q,a,p) \in  \delta_c^* \\ (q',a,p) \in \delta_c^*   }
+           { (q,\sigma,p) \in \delta_c  }
+  { (q,\sigma,p) \in  \delta_c^* \\ (q',\sigma,p) \in \delta_c^*   }
 }
 \and
-{\inferrule*[left=\textsc{Return}]
-              { (q,r,a,p) \in \delta_r }
-  {(q,r,a,p) \in  \delta_r^* \\ (q,r',a,p') \in \delta_r^* }
+{\inferrule*[left=\textsc{Locally-Matched-Return}]
+              { (q,r,\sigma,p) \in \delta_r }
+  {(q,r,\sigma,p) \in  \delta_r^* \\ (q,r',\sigma,p') \in \delta_r^* }
 }
 \\
 \and
@@ -521,14 +533,14 @@ The transitions in $\delta^*$ are defined by the following rules:
   {(q, \epsilon, q_0) \in \delta_i^* \\ (q', \epsilon, q_0) \in \delta_i^* }
 }
 \and
-{\inferrule*[left=\textsc{Globally-Pending}]
-  { (q,r,a,p) \in \delta_r \\ r \in Q_0 }
-  {(q',q_0,a,p') \in  \delta_r^* }
+{\inferrule*[left=\textsc{Globally-Pending-Return}]
+  { (q,r,\sigma,p) \in \delta_r \\ r \in Q_0 }
+  {(q',q_0,\sigma,p') \in  \delta_r^* }
 }
 \and
-{\inferrule*[left=\textsc{Locally-Pending}]
-  { (q,r,a,p) \in \delta_r \\ r \in Q_0 \\ s \in Q }
-  {(q',s,a,p') \in \delta_r^* \\ (q', s', a, p') \in  \delta_r^* }
+{\inferrule*[left=\textsc{Locally-Pending-Return}]
+  { (q,r,\sigma,p) \in \delta_r \\ r \in Q_0 \\ s \in Q \cup Q' }
+  {(q',s,\sigma,p') \in \delta_r^* }
 }
 \end{mathpar}
 
@@ -563,7 +575,7 @@ any $q$.
 
 A nested word $n = (w, \rightsquigarrow)$ is reversed by reversing the linear
 word $w$ and exchanging calls and returns. Formally,
-$n^{rev} = (w^{rev}, \{(|w|+1-r, |w|+1-c) | (r,c)
+$n^{rev} = (w^{rev}, \{(|w|+1-r, |w|+1-c) | (c,r)
 \in\rightsquigarrow\})$. (Pending calls and returns are handled by defining
 $|w|+1-(+\infty) = -\infty$ and $|w|+1-(-\infty) = +\infty$.) Roughly
 speaking, call transitions in $A$ correspond to return transitions in
@@ -575,12 +587,13 @@ transition in $A^{rev}$, and a ``call'' is a call in the reversed string.
 Perhaps unsurprisingly, pending returns pose a problem because the
 role of initial and final states are exchanged. Because of this complication,
 the algorithm for reversing an NWA has a similar flavor to that of the
-Kleene-star procedure. The automaton $A^{rev}$ has two ``copies'' of $A$ (one
-primed), and maintains the same invariant as the Kleene-star construction: if
+Kleene-star procedure. The automaton $A^{rev}$ has two ``copies'' of $A$
+(primed and unprimed), and maintains the same invariant as the Kleene-star
+construction: if
 the next symbol $\sigma$ is in a return position, then that symbol is a
 \emph{pending} return iff $A^{rev}$ is in the $A'$ portion.
 (For those familiar with the construction in \cite{JACM:AM2009}, ours is more
-complicated because the version in \cite{JACM:AM2009} will not work as-stated
+complicated because the version in \cite{JACM:AM2009} will not work as stated
 with a weakly-hierarchical NWA.)
 
 If the original NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$, then the result of
