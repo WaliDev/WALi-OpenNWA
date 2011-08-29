@@ -77,12 +77,14 @@ namespace wali
       // Add newStart->q0 transitions
       for( StateIterator sit = first.beginInitialStates(); sit != first.endInitialStates(); sit++ ) {
         State target = getKey(*sit, prime);
+        // INTERNAL (inference rule in TR)
         addInternalTrans(newStart, WALI_EPSILON, target);
       }
       for( StateIterator sit = first.beginFinalStates(); sit != first.endFinalStates(); sit++ ) {
         State f = *sit;
         State fp = getKey(*sit, prime);
-        
+
+        // RESTART (inference rule in TR)
         addInternalTrans(f, WALI_EPSILON, newStart);
         addInternalTrans(fp, WALI_EPSILON, newStart);
       }
@@ -99,11 +101,13 @@ namespace wali
         State p = Trans::getTarget(*iit);
 
         //(q,a,p)
+        // INTERNAL (inference rule in TR)
         addInternalTrans(q,a,p);
 
         //(q',a,p')
         State qp = wali::getKey(q,prime);
         State pp = wali::getKey(p,prime);
+        // INTERNAL (inference rule in TR)
         addInternalTrans(qp,a,pp);
       }
 
@@ -116,10 +120,12 @@ namespace wali
         State p = Trans::getEntry(*cit);
 
         //(q,a,p)
+        // CALL (inference rule in TR)
         addCallTrans(q,a,p);
 
         //(q',a,p)
         State qp = wali::getKey(q,prime);
+        // CALL (inference rule in TR)
         addCallTrans(qp,a,p);
       }
 
@@ -134,35 +140,41 @@ namespace wali
         Symbol a = Trans::getReturnSym(*rit);
         State p = Trans::getReturnSite(*rit);
 
+        State qp = wali::getKey(q,prime);
+
         //(q,r,a,p)
+        // RETURN (inference rule in TR)
         addReturnTrans(q,r,a,p);
 
         //(q,r',a,p')
         State rp = wali::getKey(r,prime);
         State pp = wali::getKey(p,prime);
+        // RETURN (inference rule in TR)
         addReturnTrans(q,rp,a,pp);
 
         //if r in Q0
         if( first.isInitialState(r) )
         {
+          // (q',newStart,a,p')
+          // GLOBALLY-PENDING (inference rule in TR)
+          addReturnTrans(qp,newStart,a,pp);
+          
           //for each s in Q
           for( StateIterator sit = first.beginStates();
                sit != first.endStates(); sit++ )
           {
             State s = *sit;
-            State qp = wali::getKey(q,prime);
 
             //Handle s
             //(q',s,a,p')
+            // LOCALLY_PENDING (inference rule in TR)
             addReturnTrans(qp,s,a,pp);
 
             //Handle corresponding s'
             //(q',s',a,p')
+            // LOCALLY_PENDING (inference rule in TR)
             State sp = wali::getKey(s,prime);
             addReturnTrans(qp,sp,a,pp);
-
-            // (q',newStart,a,p')
-            addReturnTrans(qp,newStart,a,pp);
           }
         }
       }
