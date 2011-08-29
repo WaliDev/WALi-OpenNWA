@@ -148,7 +148,7 @@ particular, it does \textsl{not} do a cross-product construction, and will
 both machines have at least one initial state.)
 
 Formally, the union of NWAs $N = (Q_N, \Sigma_N, Q_{0,N}, \delta_N, F_N)$
-and $M = (Q_M, \Sigma_M,$ $Q_{0,M},$ $\delta_M, F_M)$ is
+and $M = (Q_M, \Sigma_M,$ $Q_{0,M}, \delta_M, F_M)$ is
 $N \cup M = (Q_N \cup Q_M, \Sigma_N \cup \Sigma_M, Q_{0,N} \cup
    Q_{0,M}, \delta_N \cup \delta_M, F_N \cup F_M)$.
 
@@ -460,9 +460,9 @@ The NWA resulting from performing Kleene-Star on the NWA shown in
 Formally, if the original NWA is $(Q, \Sigma, Q_0, \delta, Q_f)$,
 then the result of performing Kleene-Star on that NWA is $(Q^*, \Sigma,
 Q_0^*, \delta^*, Q_f^*)$. The sets of states are defined by $Q^* = Q \cup
-Q' \cup \{q_0\}$ (for a distinguished start state $q_0 \not\in Q$)
-and  $Q_0^* = Q_f^* = Q_0'$ (where $Q' = \{q'\, |\, q \in Q\}$ and $Q_0' =
-\{q'\, |\, q \in Q_0\}$).
+Q' \cup \{q_0\}$ (with $Q' = \{q'\, |\, q \in Q\}$ and $q_0$ is a
+distinguished state not in $Q$),
+and  $Q_0^* = Q_f^* = \{q_0\}$.
 The transitions in $\delta^*$ are defined by the following rules:
 
 \begin{mathpar}
@@ -501,6 +501,11 @@ The transitions in $\delta^*$ are defined by the following rules:
 Client information is copied directly from the original NWA (using
 \texttt{ClientInfo::clone()}) such that for each $q \in Q$, $q$
 and $q'$ have (different copies of) the same client information.
+
+\emph{Note:} The key for state $q'$ is generated from the key for state $q$
+using the expression \texttt{getKey(q, getKey("prime"))}. The input automaton
+to the Kleene star function must not already contain both $q$ and $q'$ for
+any $q$.
 
 %Consider the slightly more complex example of computing the Kleene-Star of the NWA shown in Figure \ref{Fi:Star3}.  The resulting NWA is shown in Figure \ref{Fi:Star4}.
 
