@@ -70,6 +70,7 @@ Each of these functions is in the namespace \texttt{wali::nwa::construct}:
     See Section \ref{Se:Determinize}. The worst-case running time for this
     algorithm is at least $O({|Q|^3} \cdot2^{|Q|^2})$.
 
+\clearpage
   \functionDefFirstEarly{NWARefPtr}{complement}{NWA const \& orig}{}
   \functionDef{void}{complement}{NWA \& out, NWA const \& orig}{}
     Computes the complement of the determinization of \texttt{orig},
@@ -111,28 +112,30 @@ is $\texttt{A} \cup (\texttt{B} \cap \texttt{C})*$ (where \texttt{A},
 
 \begin{figure}[tb]
   \centering
-  \begin{minipage}{0.49\textwidth}
+  \begin{minipage}{0.3\textwidth}
     \centering
-    \nwaimage[.49]{Figures/figure-1}
+    \nwaimage[.6]{Figures/figure-1}
     \caption{An example NWA.}
     \label{Fi:Example1}
   \end{minipage}
-  \begin{minipage}{0.49\textwidth}
+  \hspace{0.025\textwidth}
+  \begin{minipage}{0.3\textwidth}
     \centering
     \nwaimage[0.49]{Figures/union-other}
     \caption{A second example NWA.}
     \label{Fi:Union1}
   \end{minipage}
+  \hspace{0.025\textwidth}
+  \begin{minipage}{0.3\textwidth}
+    \centering
+    \nwaimage[0.8]{Figures/union-result}
+    \caption{The NWA resulting from the union of the NWA in Figure
+      \ref{Fi:Example1} and the NWA in Figure \ref{Fi:Union1}. Note that there
+      are two initial states.}
+    \label{Fi:Union2}
+  \end{minipage}
 \end{figure}
 
-\begin{figure}[tbp]
-  \centering
-    \nwaimage[.55]{Figures/union-result}
-  \caption{The NWA resulting from the union of the NWA in Figure
-    \ref{Fi:Example1} and the NWA in Figure \ref{Fi:Union1}. Note that there
-    are two initial states.}
-  \label{Fi:Union2}
-\end{figure}
 
 
 
@@ -144,16 +147,10 @@ particular, it does \textsl{not} do a cross-product construction, and will
 \textsl{always} produce a nondeterministic automaton as a result as long as
 both machines have at least one initial state.)
 
-Formally, given $N$ and $M$ such that
-\begin{itemize}
- \item $N = (Q_N, \Sigma_N, Q_{0,N}, \delta_N, F_N)$
- \item $M = (Q_M, \Sigma_M, Q_{0,M}, \delta_M, F_M)$
-\end{itemize}
-then the union is computed as follows:
-\begin{itemize}
- \item $N \cup M = (Q_N \cup Q_M, \Sigma_N \cup \Sigma_M, Q_{0,N} \cup
-   Q_{0,M}, \delta_N \cup \delta_M, F_N \cup F_M)$
-\end{itemize}
+Formally, the union of NWAs $N = (Q_N, \Sigma_N, Q_{0,N}, \delta_N, F_N)$
+and $M = (Q_M, \Sigma_M,$ $Q_{0,M},$ $\delta_M, F_M)$ is
+$N \cup M = (Q_N \cup Q_M, \Sigma_N \cup \Sigma_M, Q_{0,N} \cup
+   Q_{0,M}, \delta_N \cup \delta_M, F_N \cup F_M)$.
 
 As an example, \figref{Union2} illustrates the union of \figref{Example1} and
 \figref{Union1}.
