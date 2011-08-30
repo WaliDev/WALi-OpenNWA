@@ -17,6 +17,9 @@ Optional prerequsites for Latex documentation
     2.8.7)
 
 
+Building the Library
+--------------------
+
 To build, simply run 'scons'. By default, this will build the library (a
 shared library with GCC and a static library for MSVC). Other possible
 targets are:
@@ -44,6 +47,12 @@ not either-or.) Note: because of the way 'cmake' is called for the Google
 Test library, you probably won't be able to do this for the 'tests' or 'all'
 pseudo-targets.
 
+There is also a Visual Studio 2005 project, though the NWA unit tests aren't
+hooked up for this at all.
+
+
+Building Documentation
+----------------------
 
 To get Doxygen output, run 'doxygen Doxyfile' from the top-level
 directory. By default, it will generate HTML output to Doc/doxygen/html and
@@ -59,4 +68,21 @@ necessary if you do not change them), change to Doc/NWA_tex/Figures and run
 'make'. Note that a couple of the figures used in the "official" version of
 the NWA manual have been modified by hand, and regenerating them will cause
 those changes to be lost.
+
+
+NWA documentation
+-----------------
+
+The NWA documentation is a little bit... strange. It doesn't quite know what
+it wants to be. It's way too long to just sit down and read, but is probably
+less convenient to use as a reference than, say, Doxygen comments would
+be. (The exception is the function tables at the end of the document.)
+But... we also have Doxygen comments, and they aren't usually the same. So at
+some point in the future, we need to unify the comments. (In virtually all
+cases, the Latex documentation is far more detailed.)
+
+My suggestion is to look over sections 1 ("Library Overview") and 3 ("The NWA
+class"), and then refer to the more detailed sections as appropriate.
+
+
 
