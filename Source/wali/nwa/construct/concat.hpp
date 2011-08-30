@@ -19,7 +19,7 @@ namespace wali
        * @param - second: the NWA to concatenate onto the end of 'first'
        *
        */
-      extern void concatenate(NWA & out, NWA const & first, NWA const & second);
+      extern void concat(NWA & out, NWA const & first, NWA const & second);
 
 
       /**
@@ -36,7 +36,7 @@ namespace wali
        * @return the NWA resulting from the concatenation of the given NWAs
        *
        */
-      extern NWARefPtr concatenate( NWA const & first, NWA const & second );
+      extern NWARefPtr concat( NWA const & first, NWA const & second );
 
       
     }

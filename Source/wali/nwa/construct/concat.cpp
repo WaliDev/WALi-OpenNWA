@@ -12,10 +12,10 @@ namespace wali
     namespace construct
     {
       
-      NWARefPtr concatenate( NWA const & first, NWA const & second )
+      NWARefPtr concat( NWA const & first, NWA const & second )
       {
         NWARefPtr nwa( new NWA());
-        concatenate(*nwa, first, second);
+        concat(*nwa, first, second);
         return nwa;
       }
 
@@ -27,7 +27,7 @@ namespace wali
        * @param - second: the NWA to concatenate onto the end of 'first'
        *
        */
-      void concatenate( NWA & out, NWA const & first, NWA const & second )
+      void concat( NWA & out, NWA const & first, NWA const & second )
       {
         //Q: Do we need to guarantee that there is no overlap in states between machines?
         //A: YES!

@@ -71,7 +71,7 @@ namespace wali {
                         // First, make sure that we expect an answer
                         // (i.e. it's not no_answer).
                         if (expected_answer && left != right) {
-                            NWARefPtr u = concatenate(nwas[left], nwas[right]);
+                            NWARefPtr u = concat(nwas[left], nwas[right]);
 
                             EXPECT_TRUE(query::languageEquals(*expected_answer, *u));
                         }
@@ -89,7 +89,7 @@ namespace wali {
                 right.addInitialState(e.state2);
                 right.addInitialState(e.state2);
 
-                NWARefPtr u = concatenate(left, right);
+                NWARefPtr u = concat(left, right);
 
                 EXPECT_FALSE(query::isDeterministic(*u));
             }

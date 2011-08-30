@@ -31,7 +31,7 @@ built = [
 
     DoubleProgramTarget(env, 'intersect'),
     DoubleProgramTarget(env, 'union', 'unionNWA'),
-    DoubleProgramTarget(env, 'concat', 'concatenate'),
+    DoubleProgramTarget(env, 'concat'),
 
     SingleProgramTarget(env, 'star'),
     SingleProgramTarget(env, 'complement'),
