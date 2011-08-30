@@ -77,16 +77,12 @@ namespace wali
       /// @brief ref_ptr to a ClientInfo object
       typedef StateStorage::ClientInfoRefPtr ClientInfoRefPtr;
 
-      DEPRECATE("Use (capital-S) StateIterator")
-      typedef StateStorage::const_iterator stateIterator;
       /// @brief Iterator for traversing a set of states
       ///
       /// Dereferences to a 'State'. (This is used for the set of states, set
       /// of initial states, and set of accepting states.)
       typedef StateStorage::const_iterator StateIterator;
       
-      DEPRECATE("Use (capital-S) SymbolIterator")
-      typedef SymbolStorage::const_iterator symbolIterator;
       ///
       /// @brief Iterator for traversing the set of symbols. Dereferences to a 'Symbol'
       typedef SymbolStorage::const_iterator SymbolIterator;
@@ -1104,83 +1100,12 @@ namespace wali
 
 
       //Using NWAs
-      DEPRECATE("Use nwa_pds::plusWpds()")
-      wpds::WPDS plusWPDS( const wpds::WPDS & base, State stuck )
-      {
-        (void) stuck;
-        return nwa_pds::plusWpds(*this, base);
-      }
-      
-      DEPRECATE("Use nwa_pds::plusWpds()")
-      static wpds::WPDS plusWPDS( const wpds::WPDS & base, NWA & nwa, State stuck )
-      {
-        (void) stuck;
-        return nwa_pds::plusWpds(nwa, base);
-      }
-
-
       // {{{ deprecated nwa_pds functions (and cheater functions)
-      DEPRECATE("Use nwa_pds::WpdsToNwa()")
-      void PDStoNWA( const wpds::WPDS & pds )
-      {
-        nwa_pds::WpdsToNwa(*this, pds);
-      }
-
-      DEPRECATE("Use nwa_pds::WpdsToNwa()")
-      static NWARefPtr PDStoNWA( const wpds::WPDS & pds, State stuck )
-      {
-        (void) stuck;
-        return nwa_pds::WpdsToNwa(pds);
-      }
-
-
       wpds::WPDS _private_NwaToPdsReturns_( WeightGen const & wg ) const;
-
-      DEPRECATE("Use nwa_pds::NwaToWpdsReturns()")
-      wpds::WPDS NWAtoPDSreturns( WeightGen const & wg ) const {
-	return nwa_pds::NwaToWpdsReturns(*this, wg);
-      }
-      DEPRECATE("Use nwa_pds::NwaToWpdsReturns()")
-      static wpds::WPDS NWAtoPDSreturns( NWA const & nwa, WeightGen const & wg ) {
-        return nwa_pds::NwaToWpdsReturns(nwa, wg);
-      }
-
       wpds::WPDS _private_NwaToBackwardsPdsReturns_( WeightGen const & wg ) const;
-
-      DEPRECATE("Use nwa_pds::NwaToWpdsReturns()")
-      wpds::WPDS NWAtoBackwardsPDSreturns( WeightGen const & wg ) const {
-	return nwa_pds::NwaToBackwardsWpdsReturns(*this, wg);
-      }
-
-      DEPRECATE("Use nwa_pds::NwaToWpdsReturns()")
-      static wpds::WPDS NWAtoBackwardsPDSreturns( NWA const & nwa, WeightGen const & wg ) {
-        return nwa_pds::NwaToBackwardsWpdsReturns(nwa, wg);
-      }
-
-
       wpds::WPDS _private_NwaToPdsCalls_( WeightGen const & wg,
                                           ref_ptr<wali::wpds::Wrapper> wrapper ) const;
-
-      DEPRECATE("Use nwa_pds::NwaToWpdsReturns()")
-      wpds::WPDS NWAtoPDScalls( WeightGen const & wg ) const {
-	return nwa_pds::NwaToWpdsCalls(*this, wg);
-      }
-      DEPRECATE("Use nwa_pds::NwaToWpdsReturns()")
-      static wpds::WPDS NWAtoPDScalls( NWA const & nwa, WeightGen const & wg ) {
-        return nwa_pds::NwaToWpdsCalls(nwa, wg);
-      }
-
       wpds::WPDS _private_NwaToBackwardsPdsCalls_( WeightGen const & wg ) const;
-
-      DEPRECATE("Use nwa_pds::NwaToWpdsReturns()")
-      wpds::WPDS NWAtoBackwardsPDScalls( WeightGen const & wg ) const {
-	return nwa_pds::NwaToBackwardsWpdsCalls(*this, wg);
-      }
-      DEPRECATE("Use nwa_pds::NwaToWpdsReturns()")
-      static wpds::WPDS NWAtoBackwardsPDScalls( NWA const & nwa, WeightGen const & wg ) {
-        return nwa_pds::NwaToBackwardsWpdsCalls(nwa, wg);
-      }
-
       // }}}
 
       
