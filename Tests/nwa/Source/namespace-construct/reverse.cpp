@@ -72,7 +72,7 @@ namespace wali {
                 nwa.addCallTrans(e.state, e.symbol, e.state);
                 nwa.addReturnTrans(e.state, e.state, e.symbol, e.state);
 
-                NWARefPtr closure = star(nwa);
+                NWARefPtr closure = reverse(nwa);
 
                 EXPECT_TRUE(query::languageEquals(nwa, *closure));
             }
