@@ -1,4 +1,5 @@
 #include "wali/nwa/NWA.hpp"
+#include "wali/nwa/construct/union.hpp"
 
 #include "wali/nwa/query/automaton.hpp"
 

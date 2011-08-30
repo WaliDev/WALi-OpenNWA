@@ -1,4 +1,5 @@
 #include "wali/nwa/NWA.hpp"
+#include "wali/nwa/construct/reverse.hpp"
 #include "wali/nwa/details/TransitionStorage.hpp"
 
 using wali::nwa::details::TransitionStorage;

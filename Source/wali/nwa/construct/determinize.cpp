@@ -1,4 +1,5 @@
 #include "wali/nwa/NWA.hpp"
+#include "wali/nwa/construct/determinize.hpp"
 
 namespace wali
 {
