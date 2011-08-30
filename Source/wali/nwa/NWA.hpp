@@ -22,16 +22,6 @@
 
 #include "wali/nwa/WeightGen.hpp"
 
-
-// TODO: remove these after removing deprecated stuff
-#include "wali/nwa/construct/complement.hpp"
-#include "wali/nwa/construct/concatenate.hpp"
-#include "wali/nwa/construct/determinize.hpp"
-#include "wali/nwa/construct/intersect.hpp"
-#include "wali/nwa/construct/reverse.hpp"
-#include "wali/nwa/construct/star.hpp"
-#include "wali/nwa/construct/union.hpp"
-
 //#define USE_BUDDY
 #ifdef USE_BUDDY
 #  include "wali/nwa/RelationOpsBuddy.hpp"
@@ -771,83 +761,9 @@ namespace wali
 
 
       // {{{ Deprecated construction functions (& private cheater functions)
-
-      DEPRECATE("Use construct:: version")
-      void unionNWA( NWA const & first, NWA const & second ) {
-        construct::unionNWA(*this, first, second);
-      }
-      DEPRECATE("Use construct:: version")
-      static NWARefPtr unionNWA( NWA const & first, NWA const & second, State stuck ) {
-        (void) stuck;
-        return construct::unionNWA(first, second);
-      }
-
-
-      DEPRECATE("Use construct:: version")
-      void concat( NWA const & first, NWA const & second ) {
-        construct::concatenate(*this, first, second);
-      }
-      DEPRECATE("Use construct:: version")
-      static NWARefPtr concat( NWA const & first, NWA const & second, State stuck ) {
-        (void) stuck;
-        return construct::concatenate(first, second);
-      }
-
-
-      DEPRECATE("Use construct:: version")
-      void reverse( NWA const & first ) {
-        construct::reverse(*this, first);
-      }
-      DEPRECATE("Use construct:: version")
-      static NWARefPtr reverse( NWA const & first, State stuck ) {
-        (void) stuck;
-        return construct::reverse(first);
-      }
-
       void _private_star_( NWA const & first );
-      DEPRECATE("Use construct:: version")
-      void star( NWA const & first ) {
-        construct::star(*this, first);
-      }
-      DEPRECATE("Use construct:: version")
-      static NWARefPtr star( NWA const & first, State stuck ) {
-        (void) stuck;
-        return construct::star(first);
-      }
-
-
-      DEPRECATE("Use construct:: version")
-      void complement( NWA const & first ) {
-        construct::complement(*this, first);
-      }
-      DEPRECATE("Use construct:: version")
-      static NWARefPtr complement( NWA const & first, State stuck ) {
-        (void) stuck;
-        return construct::complement(first);
-      }
-
       void _private_determinize_( NWA const & nondet );
-      DEPRECATE("Use construct:: version")
-      void determinize( NWA const & nondet ) {
-        construct::determinize(*this, nondet);
-      }
-      DEPRECATE("Use construct:: version")
-      static NWARefPtr determinize( NWA const & nondet, State stuck ) {
-        (void) stuck;
-        return construct::determinize(nondet);
-      }
-
       void _private_intersect_( NWA const & first, NWA const & second );
-      DEPRECATE("Use construct:: version")
-      void intersect( NWA const & first, NWA const & second ) {
-        construct::intersect(*this, first, second);
-      }
-      DEPRECATE("Use construct:: version")
-      static NWARefPtr intersect( NWA const & first, NWA const & second, State stuck ) {
-        (void) stuck;
-        return construct::intersect(first, second);
-      }
-
       // }}}
       
       bool _private_isDeterministic_() const;
