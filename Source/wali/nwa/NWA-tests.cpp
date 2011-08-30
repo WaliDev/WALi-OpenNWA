@@ -1,7 +1,15 @@
-/**
- * @author Amanda Burton
- */
-//#define NWA_TEST
+///////////////////////////////////////
+///////////////////////////////////////
+//
+// This is left because there are
+// some tests of the OpenFST stuff
+// which haven't made their way to
+// GTest yet. (They aren't considered
+// part of the public interface of
+// library at this point.)
+//
+///////////////////////////////////////
+///////////////////////////////////////
 
 
 // ::wali
