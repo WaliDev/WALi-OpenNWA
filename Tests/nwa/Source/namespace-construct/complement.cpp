@@ -3,6 +3,7 @@
 #include "wali/nwa/NWA.hpp"
 #include "wali/nwa/query/language.hpp"
 #include "wali/nwa/construct/complement.hpp"
+#include "wali/nwa/construct/intersect.hpp"
 
 #include "Tests/nwa/Source/fixtures.hpp"
 #include "Tests/nwa/Source/class-NWA/supporting.hpp"
