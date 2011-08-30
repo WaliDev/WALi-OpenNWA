@@ -2,7 +2,7 @@
 
 #include "wali/nwa/NWA.hpp"
 #include "wali/nwa/query/language.hpp"
-#include "wali/nwa/construct/concatenate.hpp"
+#include "wali/nwa/construct/concat.hpp"
 #include "wali/nwa/query/automaton.hpp"
 #include "wali/nwa/query/language.hpp"
 

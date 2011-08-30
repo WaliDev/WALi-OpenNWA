@@ -91,7 +91,7 @@ nice_files = Split("""
 ./wali/nwa/query/language.cpp
 ./wali/nwa/query/getSomeAcceptedWord.cpp
 ./wali/nwa/construct/complement.cpp
-./wali/nwa/construct/concatenate.cpp
+./wali/nwa/construct/concat.cpp
 ./wali/nwa/construct/reverse.cpp
 ./wali/nwa/construct/union.cpp
 ./wali/nwa/construct/determinize.cpp

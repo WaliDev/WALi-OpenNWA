@@ -1,5 +1,5 @@
 #include "wali/nwa/NWA.hpp"
-#include "wali/nwa/construct/concatenate.hpp"
+#include "wali/nwa/construct/concat.hpp"
 
 #include "wali/nwa/query/automaton.hpp"
 

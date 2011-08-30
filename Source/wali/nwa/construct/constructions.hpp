@@ -1,5 +1,5 @@
 #include "wali/nwa/construct/complement.hpp"
-#include "wali/nwa/construct/concatenate.hpp"
+#include "wali/nwa/construct/concat.hpp"
 #include "wali/nwa/construct/determinize.hpp"
 #include "wali/nwa/construct/intersect.hpp"
 #include "wali/nwa/construct/reverse.hpp"
