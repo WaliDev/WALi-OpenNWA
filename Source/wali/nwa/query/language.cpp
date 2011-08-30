@@ -1,5 +1,7 @@
 #include "wali/nwa/NWA.hpp"
 #include "wali/nwa/NestedWord.hpp"
+#include "wali/nwa/construct/intersect.hpp"
+#include "wali/nwa/construct/complement.hpp"
 
 #include "wali/nwa/query/language.hpp"
 
@@ -28,12 +30,11 @@ namespace wali {
         
         //Check L(a1) contained in L(a2) by checking 
         //if L(a1) intersect (complement L(a2)) is empty.
-        NWA comp;
-        comp.complement(second_copy);   //complement L(a2)
-        NWA inter;
-        inter.intersect(first, comp); //L(a1) intersect (complement L(a2))
+        NWARefPtr comp = construct::complement(second_copy);
+        NWARefPtr inter = construct::intersect(first, *comp);
+        //inter.intersect(first, comp); //L(a1) intersect (complement L(a2))
 
-        return languageIsEmpty(inter);
+        return languageIsEmpty(*inter);
       }
 
       
