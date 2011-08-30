@@ -14,6 +14,7 @@
 #include "wali/nwa/query/calls.hpp"
 #include "wali/nwa/query/internals.hpp"
 #include "wali/nwa/query/language.hpp"
+#include "wali/nwa/nwa_pds/conversions.hpp"
 #include "wali/wpds/WPDS.hpp"
 #include "wali/Key.hpp"
 #include "wali/wfa/epr/FunctionalWeight.hpp"

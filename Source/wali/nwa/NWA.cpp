@@ -7,6 +7,7 @@
 #include "wali/nwa/query/transitions.hpp"
 #include "wali/nwa/query/calls.hpp"
 #include "wali/nwa/query/internals.hpp"
+#include "wali/nwa/nwa_pds/conversions.hpp"
 
 namespace wali
 {

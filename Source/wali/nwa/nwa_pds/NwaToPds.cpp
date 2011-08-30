@@ -1,4 +1,5 @@
 #include "wali/nwa/NWA.hpp"
+#include "wali/nwa/nwa_pds/conversions.hpp"
 
 namespace wali
 {
