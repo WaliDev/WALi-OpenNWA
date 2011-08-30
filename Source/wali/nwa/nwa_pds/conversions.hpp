@@ -30,13 +30,6 @@ namespace wali
        */ 
       extern wpds::WPDS NwaToWpdsReturns( NWA const & nwa, WeightGen const & wg );
 
-      DEPRECATE("Use NwaToWpdsReturns()")
-      inline
-      wpds::WPDS
-      NWAToPDSReturns( NWA const & nwa, WeightGen const & wg )
-      {
-        return NwaToWpdsReturns(nwa, wg);
-      }
 
       
       /**
@@ -64,15 +57,6 @@ namespace wali
       }
 
 
-      DEPRECATE("Use NwaToWpdsCalls()")
-      inline
-      wpds::WPDS
-      NWAToPDSCalls( NWA const & nwa, WeightGen const & wg )
-      {
-        return NwaToWpdsCalls(nwa, wg, NULL);
-      }
-
-
       /**
        *
        * @brief constructs the PDS equivalent to this NWA
@@ -87,15 +71,6 @@ namespace wali
       extern wpds::WPDS NwaToBackwardsWpdsReturns( NWA const & nwa, WeightGen const & wg );
 
 
-      DEPRECATE("Use NwaToBackwardsWpdsReturns()")
-      inline
-      wpds::WPDS
-      NWAToBackwardsPDSReturns( NWA const & nwa, WeightGen const & wg )
-      {
-        return NwaToBackwardsWpdsReturns(nwa, wg);
-      }
-
-
       /**
        *
        * @brief constructs the backwards PDS equivalent to this NWA
@@ -108,14 +83,6 @@ namespace wali
        *
        */ 
       extern wpds::WPDS NwaToBackwardsWpdsCalls( NWA const & nwa, WeightGen const & wg );
-
-      DEPRECATE("Use NwaToBackwardsWpdsCalls()")
-      inline
-      wpds::WPDS
-      NWAToBackwardsPDSCalls( NWA const & nwa, WeightGen const & wg )
-      {
-        return NwaToBackwardsWpdsCalls(nwa, wg);
-      }
 
 
       /**
@@ -218,25 +185,6 @@ namespace wali
       NWARefPtr WpdsToNwa( const wpds::WPDS & pds );
       
     } // namespace nwa_pds
-
-
-    DEPRECATE("Use version of this function inside wali::nwa::nwa_pds")
-    inline
-    wali::Key
-    getProgramControlLocation( )
-    {
-      return nwa_pds::getProgramControlLocation();
-    }
-
-    DEPRECATE("Use version of this function inside wali::nwa::nwa_pds")    
-    inline
-    wali::Key
-    getControlLocation( Key exit, Key callSite, Key returnSite )
-    {
-      return nwa_pds::getControlLocation(exit, callSite, returnSite);
-    }
-
-
   }
 }
 
