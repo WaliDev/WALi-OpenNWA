@@ -9,12 +9,10 @@
 
 namespace wali
 {
-  //
-  // Only used here in Common.cpp
-  //
-  static KeySpace* createKeySpace()
+  static void initEmptyKeySpace(KeySpace * keySpace)
   {
-    KeySpace* keySpace = new KeySpace();
+    assert(keySpace->size() == 0);
+
     // WPDS_EPSILON == 0 == "*"
     Key epsilon = keySpace->getKey("*");
     // NWA_WILD == 1 == "@"
@@ -22,7 +20,12 @@ namespace wali
 
     assert(epsilon == WALI_EPSILON);
     assert(wild == WALI_WILD);
-    
+  }
+
+  static KeySpace* createKeySpace()
+  {
+    KeySpace* keySpace = new KeySpace();
+    initEmptyKeySpace(keySpace);
     return keySpace;
   }
 
@@ -38,6 +41,7 @@ namespace wali
   void clearKeyspace()
   {
     getKeySpace()->clear();
+    initEmptyKeySpace(getKeySpace());
   }
 
   //
