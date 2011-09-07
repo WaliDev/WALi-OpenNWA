@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "wali/Key.hpp"
+#include "wali/Common.hpp"
 
 namespace wali {
 
@@ -70,5 +71,14 @@ namespace wali {
         EXPECT_EQ("{1}", key2str(keyset_key_1));
         EXPECT_EQ("{1,2}", key2str(keyset_key_1_2));
         EXPECT_EQ("(string,12)", key2str(keys.pair_key));
+    }
+
+    TEST(wali$clearKeySpace, clearingKeySpaceLeavesWildAndEpsilon)
+    {
+        clearKeyspace();
+
+        EXPECT_EQ(2u, getKey("heeeey"));
+        EXPECT_EQ("*", key2str(WALI_EPSILON));
+        EXPECT_EQ("@", key2str(WALI_WILD));
     }
 }
