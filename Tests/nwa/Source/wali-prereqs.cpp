@@ -71,6 +71,9 @@ namespace wali {
         EXPECT_EQ("{1}", key2str(keyset_key_1));
         EXPECT_EQ("{1,2}", key2str(keyset_key_1_2));
         EXPECT_EQ("(string,12)", key2str(keys.pair_key));
+
+        EXPECT_EQ("*", key2str(WALI_EPSILON));
+        EXPECT_EQ("@", key2str(WALI_WILD));
     }
 
     TEST(wali$clearKeySpace, clearingKeySpaceLeavesWildAndEpsilon)
