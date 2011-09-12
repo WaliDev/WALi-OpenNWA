@@ -21,15 +21,25 @@ Summary:
     epsilonClosure functions from NWA class to NWA.cpp only
     Many functions from the NWA class become free functions
     Stuck state handling will be revamped
+    intersect(), star(), union(), reverse(), concat(), complement(), determinize()
+        to construct namespace (and headers in construct/ directory)
 
   Deletions:
     class NWA:
-      getEpsilon, getWild, isEpsilon, isWild
-      is_nwa_state, get_states, num_nwa_states, count_rules
-      isMember, simulateWord
+      (removed)       (use this instead)
+      getEpsilon      WALI_EPSILON (constant)
+      getWild         WALI_WILD
+      isEpsilon       == WALI_EPSILON
+      isWild          == WALI_WILD
+      is_nwa_state    isState()
+      get_states      getStates()
+      num_nwa_states  sizeStates()
+      count_rules     sizeTrans()
+      isMember        query::languageContains()
+      simulateWord    query::languageContains()
 
     class SymbolStorage (nee SymbolSet):
-      getEpsilon, getWild, isEpsilon, isWild
+      getEpsilon, getWild, isEpsilon, isWild  (use same as above)
 
     class NWS (whole thing)
     class NWP (whole thing)
