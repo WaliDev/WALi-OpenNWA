@@ -97,6 +97,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
+    <Filter Include="Header Files\wali.nwa\nwa_pds">
+      <UniqueIdentifier>{ec55cbab-92d1-4f06-8032-43eab875d308}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\wali.nwa\construct">
+      <UniqueIdentifier>{32aad30f-1b0f-4018-9203-a356e44e7527}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\wali.nwa\query\details">
+      <UniqueIdentifier>{ec809e5a-b618-4c9f-92dc-d4c9c3ee84f3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\wali\Reach.cpp">
@@ -333,9 +342,6 @@
     <ClCompile Include="..\..\..\Source\wali\nwa\construct\complement.cpp">
       <Filter>Source Files\wali.nwa\construct</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\construct\concatenate.cpp">
-      <Filter>Source Files\wali.nwa\construct</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\wali\nwa\construct\determinize.cpp">
       <Filter>Source Files\wali.nwa\construct</Filter>
     </ClCompile>
@@ -352,6 +358,24 @@
       <Filter>Source Files\wali.nwa\construct</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\wali\nwa\nwa_pds\NwaToPds.cpp">
+      <Filter>Source Files\wali.nwa\nwa_pds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\construct\concat.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\query\language.cpp">
+      <Filter>Source Files\wali.nwa\query</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\query\automaton.cpp">
+      <Filter>Source Files\wali.nwa\query</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\query\getSomeAcceptedWord.cpp">
+      <Filter>Source Files\wali.nwa\query</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\nwa_pds\plusWpds.cpp">
+      <Filter>Source Files\wali.nwa\nwa_pds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\nwa\nwa_pds\WpdsToNwa.cpp">
       <Filter>Source Files\wali.nwa\nwa_pds</Filter>
     </ClCompile>
   </ItemGroup>
@@ -667,6 +691,54 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\wali\nwa\query\transitions.hpp">
       <Filter>Header Files\wali.nwa\query</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\language.hpp">
+      <Filter>Header Files\wali.nwa\query</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\automaton.hpp">
+      <Filter>Header Files\wali.nwa\query</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\details\Configuration.hpp">
+      <Filter>Header Files\wali.nwa\details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\nwa_pds\conversions.hpp">
+      <Filter>Header Files\wali.nwa\nwa_pds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\construct\union.hpp">
+      <Filter>Header Files\wali.nwa\construct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\construct\complement.hpp">
+      <Filter>Header Files\wali.nwa\construct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\construct\concat.hpp">
+      <Filter>Header Files\wali.nwa\construct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\construct\constructions.hpp">
+      <Filter>Header Files\wali.nwa\construct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\construct\determinize.hpp">
+      <Filter>Header Files\wali.nwa\construct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\construct\intersect.hpp">
+      <Filter>Header Files\wali.nwa\construct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\construct\reverse.hpp">
+      <Filter>Header Files\wali.nwa\construct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\construct\star.hpp">
+      <Filter>Header Files\wali.nwa\construct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\details\selectors.hpp">
+      <Filter>Header Files\wali.nwa\query\details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\details\filters.hpp">
+      <Filter>Header Files\wali.nwa\query\details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\details\genesis.hpp">
+      <Filter>Header Files\wali.nwa\query\details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\details\iterators.hpp">
+      <Filter>Header Files\wali.nwa\query\details</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

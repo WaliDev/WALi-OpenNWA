@@ -149,6 +149,12 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Source\wali\nwa\construct\concat.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\nwa_pds\plusWpds.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\nwa_pds\WpdsToNwa.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\query\automaton.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\query\getSomeAcceptedWord.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\nwa\query\language.cpp" />
     <ClCompile Include="..\..\..\Source\wali\Reach.cpp" />
     <ClCompile Include="..\..\..\Source\wali\wpds\fwpds\FWPDS.cpp" />
     <ClCompile Include="..\..\..\Source\wali\wpds\fwpds\LazyTrans.cpp" />
@@ -236,7 +242,6 @@
     <ClCompile Include="..\..\..\Source\wali\nwa\query\returns.cpp" />
     <ClCompile Include="..\..\..\Source\wali\nwa\query\transitions.cpp" />
     <ClCompile Include="..\..\..\Source\wali\nwa\construct\complement.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\construct\concatenate.cpp" />
     <ClCompile Include="..\..\..\Source\wali\nwa\construct\determinize.cpp" />
     <ClCompile Include="..\..\..\Source\wali\nwa\construct\intersect.cpp" />
     <ClCompile Include="..\..\..\Source\wali\nwa\construct\reverse.cpp" />
@@ -255,6 +260,22 @@
     <ClCompile Include="..\..\..\Source\wali\nwa\nwa_pds\NwaToPds.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Source\wali\nwa\construct\complement.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\construct\concat.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\construct\constructions.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\construct\determinize.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\construct\intersect.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\construct\reverse.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\construct\star.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\construct\union.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\details\Configuration.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\nwa_pds\conversions.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\automaton.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\details\filters.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\details\genesis.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\details\iterators.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\details\selectors.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\nwa\query\language.hpp" />
     <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\FWPDS.hpp" />
     <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\LazyTrans.hpp" />
     <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\SWPDS.hpp" />
