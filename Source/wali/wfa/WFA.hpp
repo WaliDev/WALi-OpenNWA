@@ -338,8 +338,9 @@ namespace wali
          * getting the weight on the initial state. I.e.,
          *
          * <code>
-         *      fa.toRegex().solve() 
+         *      fa.toRegex().solve(); 
          *    <==>
+         *      fa.path_summary();
          *      fa.getState( fa.getInitialState() )->weight();
          *
          * </code>
