@@ -11,9 +11,6 @@
 
 #include "wali/SemElem.hpp"
 
-using wali::SemElem;
-using wali::sem_elem_t;
-
 /*!
  * @class GenKillTransformer_T
  *
@@ -36,7 +33,8 @@ class Set {
 
         static bool Eq( const Set& x, const Set& y );
 
-        static Set Diff( const Set& x, const Set& y );
+        static Set Diff( const Set& x, const Set& y,
+                         bool normalizing = false );
 
         static Set Union( const Set& x, const Set& y );
 
@@ -51,15 +49,22 @@ class Set {
         std::ostream& print(std::ostream& o);
 };
 
-For normal elements, a semiring element is represented by
+For normal elements, a semiring element is represented by a
 pair of sets (k,g), which have the meaning \x.(x - k) union g.
-However, if k and g were allowed to be arbitrary sets,
+
+Note that if k and g were allowed to be arbitrary sets,
 it would introduce redundant elements into the domain:
 e.g., ({a,b}, {c,d}) would have the same meaning
 as ({a,b,c,d}, {c,d}).
 Therefore, there is a class invariant that k intersect g = empty,
 and the operation that builds a semiring element performs
 the normalization (k,g) |-> (k-g,g).
+However, often the universe of the domain is too large for k-g to be
+represented efficiently when k is the universal set; in this case, it may be
+acceptable to allow k and g to intersect iff k is the universe.  (This also
+holds when Set is a cross product of domains and k has a universe component.)
+To support this, the normalization invokes the function Diff with
+normalizing==true.
 
 There are three special elements:
 1. zero
@@ -72,22 +77,28 @@ The implementation maintains unique representations
 for zero
 
 */
-template< typename Set > class GenKillTransformer_T : public wali::SemElem {
+template< typename Set >
+class GenKillTransformer_T : public wali::SemElem
+{
 public: // methods
 
-  sem_elem_t one()    const { return MkOne();    }
-  sem_elem_t zero()   const { return MkZero();   }
-  sem_elem_t bottom() const { return MkBottom(); }
+  wali::sem_elem_t one()    const { return MkOne();    }
+  wali::sem_elem_t zero()   const { return MkZero();   }
+  wali::sem_elem_t bottom() const { return MkBottom(); }
 
   // A client uses makeGenKillTransformer_T to create a
   // GenKillTransformer_T instead of calling the constructor directly;
+  //
   // makeGenKillTransformer_T normalizes the stored kill and gen sets
   // so that kill intersect gen == emptyset.
+  //
   // makeGenKillTransformer_T also maintains unique representatives for the
   // special semiring values one, and bottom.
-  static sem_elem_t makeGenKillTransformer_T(const Set& k, const Set& g )
+  //
+  static wali::sem_elem_t
+  makeGenKillTransformer_T(const Set& k, const Set& g )
   {
-      Set k_normalized = Set::Diff(k,g); 
+      Set k_normalized = Set::Diff(k, g, true);
       if (Set::Eq(k_normalized, Set::EmptySet())&& 
               Set::Eq(g, Set::UniverseSet()))
       {
@@ -108,7 +119,7 @@ public: // methods
   //-------------------------------------------------
   // Semiring methods
   //-------------------------------------------------
-  static sem_elem_t MkOne()
+  static wali::sem_elem_t MkOne()
   {
       // Uses a method-static variable to avoid
       // problems with static-initialization order
@@ -122,8 +133,8 @@ public: // methods
     if(this == MkOne().get_ptr()) 
       return true;
 
-    UWAssert::shouldNeverHappen( Set::Eq(kill, Set::EmptySet()) 
-                                    && Set::Eq(gen, Set::EmptySet()) );
+    UWAssert::shouldNeverHappen( Set::Eq(kill, Set::EmptySet()) &&
+                                 Set::Eq(gen, Set::EmptySet()) );
 
     return false;
   }
@@ -131,7 +142,7 @@ public: // methods
   // Zero is a special value that doesn't map to any gen/kill pair,
   // so all we really want out of this is a unique representative.
   // The gen/kill sets with which it is initialized are arbitrary.
-  static sem_elem_t MkZero()
+  static wali::sem_elem_t MkZero()
   {
       // Uses a method-static variable to avoid
       // problems with static-initialization order
@@ -142,7 +153,8 @@ public: // methods
 
   bool IsZero() const { return is_zero; }
 
-  static sem_elem_t MkBottom()
+  static wali::sem_elem_t
+  MkBottom()
   {
       // Uses a method-static variable to avoid
       // problems with static-initialization order
@@ -170,7 +182,9 @@ public: // methods
   // Considering x and y as functions, x extend y = y o x,
   // where (g o f)(v) = g(f(v)).
   //
-  sem_elem_t extend( SemElem* _y ) // FIXME: const: wali::SemElem::extend is not declared as const
+  // FIXME: const: wali::SemElem::extend is not declared as const
+  wali::sem_elem_t
+  extend( wali::SemElem* _y )
   {
       // Handle special case for either argument being zero()
       if( this->equal(zero()) || _y->equal(zero()) ) {
@@ -199,7 +213,9 @@ public: // methods
       return makeGenKillTransformer_T( temp_k,temp_g );
   }
 
-  sem_elem_t combine( SemElem* _y ) // FIXME: const: wali::SemElem::combine is not declared as const
+  // FIXME: const: wali::SemElem::combine is not declared as const
+  wali::sem_elem_t
+  combine( wali::SemElem* _y )
   {
       // Handle special case for either argument being zero()
       if( this->equal(zero()) ) {
@@ -211,8 +227,8 @@ public: // methods
 
       // Handle special case for either argument being bottom()
       if( this->equal(bottom()) || _y->equal(bottom()) ) {
-        return bottom(); // bottom combine _y = bottom; this combine bottom = bottom 
-      }
+        return bottom(); // bottom combine _y = bottom;
+      }                  // this combine bottom = bottom 
 
       const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>(_y);
 
@@ -222,7 +238,8 @@ public: // methods
       return makeGenKillTransformer_T( temp_k,temp_g );
   }
 
-  sem_elem_t quasiOne() const
+  wali::sem_elem_t
+  quasiOne() const
   {
       return one();
   }
@@ -238,7 +255,8 @@ public: // methods
   // 2. y combine r = y combine a,
   //    i.e., isEqual(combine(y,r), combine(y,a)) == true
   //
-  sem_elem_t diff( SemElem* _y ) const
+  wali::sem_elem_t
+  diff( wali::SemElem* _y ) const
   {
       // Handle special case for either argument being zero()
       if( this->equal(zero()) ) {
@@ -266,8 +284,9 @@ public: // methods
   // by address rather by its contained Gen/Kill sets.
   bool isEqual(const GenKillTransformer_T* y) const
   {
-    // Check for identical arguments: could be two special values (i.e., two zeros,
-    // two ones, or two bottoms) or two identical instances of a non-special semiring value. 
+    // Check for identical arguments: could be two special values (i.e., two
+    // zeros, two ones, or two bottoms) or two identical instances of a
+    // non-special semiring value. 
     if(this == y) return true;
 
     // Return false if any argument is zero.
@@ -281,13 +300,16 @@ public: // methods
     return Set::Eq(kill,y->kill) && Set::Eq(gen,y->gen);
   }
 
-  bool equal(SemElem* _y) const {
+  bool equal(wali::SemElem* _y) const
+  {
     const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>(_y);
     return this->isEqual(y);
   }
 
-  bool equal(sem_elem_t _y) const {
-    const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>(_y.get_ptr());
+  bool equal(wali::sem_elem_t _y) const
+  {
+    const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>
+                                                (_y.get_ptr());
     return this->isEqual(y);
   }
 
@@ -300,7 +322,11 @@ public: // methods
     if(this->IsBottom())
       return o << "<bottom>";
 
-    o << "<\\S.(S - {" << kill << "}) U {" << gen << "}>";
+    o << "<\\S.(S - {";
+    kill.print(o);
+    o << "}) U {";
+    gen.print(o);
+    o << "}>";
     return o;
   }
 
@@ -346,9 +372,6 @@ private: // methods -----------------------------------------------------------
       wali::SemElem(), kill(k), gen(g), is_zero(false)
   {
       count = c;
-#if 0
-      std::cerr << "GenKillTransformer_T(" << k << ", " << g << ")" << std::endl;
-#endif
   }
 
   // Constructor for zero
@@ -356,10 +379,7 @@ private: // methods -----------------------------------------------------------
       wali::SemElem(), is_zero(true)
   {
       count = c;
-#if 0
-      std::cerr << "GenKillTransformer_T()" << std::endl;
-#endif
-      }
+  }
 
 private: // members -----------------------------------------------------------
   Set kill, gen;   // Used to represent the function \S.(S - kill) U gen
@@ -368,10 +388,11 @@ private: // members -----------------------------------------------------------
 };
 
 template< typename Set >
-std::ostream& operator<< (std::ostream& out, const GenKillTransformer_T<Set>& t)
+std::ostream &
+operator<< (std::ostream& out, const GenKillTransformer_T<Set> & t)
 {
   t.print(out);
-  return(out);
+  return out;
 }
 
 #endif
