@@ -215,15 +215,24 @@ namespace wali {
       } // namespace wali::nwa::query::details
 
 
+      ref_ptr<NestedWord>
+      getSomeAcceptedWord(wali::nwa::NWA const & nwa, WeightGen const & wg);
+
       
       ref_ptr<NestedWord>
       getSomeAcceptedWord(wali::nwa::NWA const & nwa)
+      {
+          wali::nwa::ShortestPathGen wg;
+          return getSomeAcceptedWord(nwa, wg);
+      }
+      
+      ref_ptr<NestedWord>
+      getSomeAcceptedWord(wali::nwa::NWA const & nwa, WeightGen const & wg)
       {
         if(query::languageIsEmpty(nwa)) {
           return NULL;
         }
         else {
-          wali::nwa::ShortestPathGen wg;
           wali::wfa::WFA query;
           ref_ptr<wali::wpds::Wrapper> wrapper = new wali::witness::WitnessWrapper();
           wali::wpds::WPDS conv = nwa_pds::NwaToWpdsCalls(nwa, wg, wrapper);
