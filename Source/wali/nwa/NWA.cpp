@@ -13,6 +13,8 @@ namespace wali
 {
   namespace nwa
   {
+    using wali::wpds::WPDS;
+    
     const std::string NWA::XMLTag = "XML";
       
     //
@@ -1807,11 +1809,15 @@ namespace wali
      *
      */
     
-    wfa::WFA NWA::prestar( wfa::WFA const & input, WeightGen const & wg ) const
+    wfa::WFA NWA::prestar( wfa::WFA const & input,
+                           WeightGen const & wg,
+                           ref_ptr< Worklist<wfa::ITrans> > worklist) const
     {
-      //Q: does anything need to be done to transform the resulting WFA from the 
-      //    PDS vocab back to the NWA vocab?
-      return ((nwa_pds::NwaToWpdsCalls(*this, wg)).prestar(input));
+      WPDS wpds = nwa_pds::NwaToWpdsCalls(*this, wg);
+      if (worklist != NULL) {
+        wpds.setWorklist(worklist);
+      }
+      return wpds.prestar(input);
     }
 
     /**
@@ -1827,11 +1833,16 @@ namespace wali
      *
      */
     
-    void NWA::prestar( wfa::WFA const & input, wfa::WFA & output, WeightGen const & wg ) const
+    void NWA::prestar( wfa::WFA const & input,
+                       wfa::WFA & output,
+                       WeightGen const & wg,
+                       ref_ptr< Worklist<wfa::ITrans> > worklist) const
     {
-      //Q: does anything need to be done to transform the resulting WFA from the 
-      //    PDS vocab back to the NWA vocab?
-      (nwa_pds::NwaToWpdsCalls(*this, wg)).prestar(input,output);
+      WPDS wpds = nwa_pds::NwaToWpdsCalls(*this, wg);
+      if (worklist != NULL) {
+        wpds.setWorklist(worklist);
+      }
+      wpds.prestar(input, output);
     }
 
     /**
@@ -1844,11 +1855,15 @@ namespace wali
      *
      */
     
-    wfa::WFA NWA::poststar( wfa::WFA const & input, WeightGen const & wg ) const
+    wfa::WFA NWA::poststar( wfa::WFA const & input,
+                            WeightGen const & wg,
+                            ref_ptr< Worklist<wfa::ITrans> > worklist) const
     {
-      //Q: does anything need to be done to transform the resulting WFA from the 
-      //    PDS vocab back to the NWA vocab?
-      return ((nwa_pds::NwaToWpdsCalls(*this, wg)).poststar(input));
+      WPDS wpds = nwa_pds::NwaToWpdsCalls(*this, wg);
+      if (worklist != NULL) {
+        wpds.setWorklist(worklist);
+      }
+      return wpds.poststar(input);
     }
 
     /**
@@ -1864,11 +1879,16 @@ namespace wali
      *
      */
     
-    void NWA::poststar( wfa::WFA const & input, wfa::WFA & output, WeightGen const & wg ) const
+    void NWA::poststar( wfa::WFA const & input,
+                        wfa::WFA & output,
+                        WeightGen const & wg,
+                        ref_ptr< Worklist<wfa::ITrans> > worklist) const
     {
-      //Q: does anything need to be done to transform the resulting WFA from the 
-      //    PDS vocab back to the NWA vocab?
-      (nwa_pds::NwaToWpdsCalls(*this, wg)).poststar(input,output);
+      WPDS wpds = nwa_pds::NwaToWpdsCalls(*this, wg);
+      if (worklist != NULL) {
+        wpds.setWorklist(worklist);
+      }
+      wpds.poststar(input, output);
     }
 
     //Utilities	

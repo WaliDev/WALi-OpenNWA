@@ -20,6 +20,8 @@
 #include "wali/wpds/RuleFunctor.hpp"
 #include "wali/wpds/Rule.hpp"
 
+#include "wali/Worklist.hpp"
+
 #include "wali/nwa/WeightGen.hpp"
 
 //#define USE_BUDDY
@@ -1062,7 +1064,15 @@ namespace wali
        * @return the WFA resulting from performing the prestar reachability query 
        *
        */
-      virtual wfa::WFA prestar( wfa::WFA const & input, WeightGen const & wg ) const;
+      wfa::WFA prestar( wfa::WFA const & input,
+                        WeightGen const & wg ) const
+      {
+        return prestar(input, wg, NULL);
+      }
+
+      virtual wfa::WFA prestar( wfa::WFA const & input,
+                                WeightGen const & wg,
+                                ref_ptr< Worklist<wfa::ITrans> > worklist) const;
 
       /**
        *
@@ -1078,7 +1088,17 @@ namespace wali
        * @param - wg: the functions to use in generating weights
        *
        */
-      virtual void prestar( wfa::WFA const & input, wfa::WFA & output, WeightGen const & wg ) const;
+      void prestar( wfa::WFA const & input,
+                   wfa::WFA & output,
+                   WeightGen const & wg ) const
+      {
+        prestar(input, output, wg, NULL);
+      }
+
+      virtual void prestar( wfa::WFA const & input,
+                            wfa::WFA & output,
+                            WeightGen const & wg,
+                            ref_ptr< Worklist<wfa::ITrans> > worklist) const;
 
       /**
        *
@@ -1091,7 +1111,17 @@ namespace wali
        * @return the WFA resulting from performing the poststar reachability query
        *
        */
-      virtual wfa::WFA poststar( wfa::WFA const & input, WeightGen const & wg ) const;
+      wfa::WFA poststar( wfa::WFA const & input,
+                         WeightGen const & wg ) const
+      {
+        return poststar(input, wg, NULL);
+      }
+
+
+      virtual wfa::WFA poststar( wfa::WFA const & input,
+                                 WeightGen const & wg,
+                                 ref_ptr< Worklist<wfa::ITrans> > wl) const;
+
 
       /**
        *
@@ -1107,7 +1137,17 @@ namespace wali
        * @param - wg: the functions to use in generating weights
        *
        */
-      virtual void poststar( wfa::WFA const & input, wfa::WFA & output, WeightGen const & wg ) const;
+      void poststar( wfa::WFA const & input,
+                         wfa::WFA & output,
+                         WeightGen const & wg ) const
+      {
+        poststar(input, output, wg, NULL);
+      }
+
+      virtual void poststar( wfa::WFA const & input,
+                             wfa::WFA & output,
+                             WeightGen const & wg,
+                             ref_ptr< Worklist<wfa::ITrans> > worklist) const;
 
       //Utilities	
 
