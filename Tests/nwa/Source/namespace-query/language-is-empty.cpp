@@ -46,6 +46,10 @@ static bool expected_answers[] = {
 namespace wali {
     namespace nwa {
         namespace query {
+            // Not public interface
+            ref_ptr<NestedWord>
+            getSomeAcceptedWord(wali::nwa::NWA const & nwa, WeightGen const & wg);
+            
 
             TEST(wali$nwa$query$$languageIsEmpty, testBatteryOfVariouslyBalancedNwas)
             {
@@ -216,6 +220,46 @@ namespace wali {
 
                 EXPECT_TRUE(languageContains(nwa, *word));
                 EXPECT_EQ(expected, *word);
+            }
+
+
+            TEST(wali$nwa$query$$getSomeAcceptedWord, findsShortest)
+            {
+                //              a            a
+                // --> (state) --> (state2) --> (state3)
+                //    b |                        /\ .
+                //      V                        | b  (both directions to facilitate
+                //     (state4) --> (state5) <---+    switching whether top or bottom
+                //                                    path is shorter by changing accepting state)
+
+                NWA nwa;
+                SomeElements e;
+                State state4 = getKey("state4");
+                State state5 = getKey("state5");
+                Symbol b = getKey("b");
+
+                nwa.addInitialState(e.state);
+                nwa.addFinalState(state5);
+
+                // Top path
+                nwa.addInternalTrans(e.state, e.symbol, e.state2);
+                nwa.addInternalTrans(e.state2, e.symbol, e.state3);
+                nwa.addInternalTrans(e.state3, e.symbol, state5);
+
+                // Bottom path
+                nwa.addInternalTrans(e.state, b, state4);
+                nwa.addInternalTrans(state4, b, state5);
+                nwa.addInternalTrans(state5, b, e.state3);
+
+                ReachGen rg;
+                
+                NestedWordRefPtr long_word = getSomeAcceptedWord(nwa, rg);
+                NestedWordRefPtr short_word = getSomeAcceptedWord(nwa);
+
+                // This could fail if the iteration order or something
+                // changes and the rg version also returns the shortest
+                // word. Such is life.
+                EXPECT_LT(short_word->size(), long_word->size());
             }
         }
     }
