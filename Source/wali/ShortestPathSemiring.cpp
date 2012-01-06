@@ -60,7 +60,7 @@ namespace wali {
     assert(dynamic_cast<ShortestPathSemiring*>(rhs));
 
     ShortestPathSemiring* that = static_cast< ShortestPathSemiring* >(rhs);
-    return v != that->v;
+    return v == that->v;
   }
 
   
