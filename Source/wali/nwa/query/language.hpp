@@ -57,9 +57,6 @@ namespace wali {
       getSomeAcceptedWord(NWA const & nwa);
 
 
-
-
-
       /**
        *
        * @brief tests whether the languages of the given NWAs are equal
