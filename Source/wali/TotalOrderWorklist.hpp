@@ -19,7 +19,7 @@ namespace wali
       /*!
        * Returns -1 if a's weight is less than b's weight.
        */
-      virtual int compareTo( const wfa::Trans* a, const wfa::Trans* b ) const;
+      virtual int compareTo( const wfa::ITrans* a, const wfa::ITrans* b ) const;
 
   }; // class PriorityWorklist
 

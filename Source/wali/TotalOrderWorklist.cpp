@@ -17,8 +17,8 @@ namespace wali
   }
 
   int TotalOrderWorklist::compareTo(
-      const wfa::Trans* a
-      , const wfa::Trans* b) const
+      const wfa::ITrans* a
+      , const wfa::ITrans* b) const
   {
     sem_elem_t tmp = a->weight()->combine( b->weight() );
     if( tmp->equal( a->weight() ) )

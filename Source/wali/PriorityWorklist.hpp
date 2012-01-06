@@ -13,7 +13,7 @@
 
 namespace wali
 {
-  class PriorityWorklist : public Worklist<wfa::Trans>
+  class PriorityWorklist : public Worklist<wfa::ITrans>
   {
     private:
       struct LessThan {
@@ -21,7 +21,7 @@ namespace wali
 
         PriorityWorklist& pWorklist;
 
-        bool operator()( const wfa::Trans* a, const wfa::Trans* b ) const
+        bool operator()( const wfa::ITrans* a, const wfa::ITrans* b ) const
         {
           return pWorklist.compareTo(a,b) < 0;
         }
@@ -29,16 +29,16 @@ namespace wali
       };
 
     public:
-      typedef std::multiset< wfa::Trans*, LessThan > pwl_t;
+      typedef std::multiset< wfa::ITrans*, LessThan > pwl_t;
 
     public:
       PriorityWorklist();
 
       virtual ~PriorityWorklist();
 
-      virtual bool put( wfa::Trans *t );
+      virtual bool put( wfa::ITrans *t );
 
-      virtual wfa::Trans * get();
+      virtual wfa::ITrans * get();
 
       virtual bool empty() const;
 
@@ -48,7 +48,7 @@ namespace wali
        * Override this for custom sorting. Default is to perform a
        * comparison on the Trans's stack key.
        */
-      virtual int compareTo( const wfa::Trans* a, const wfa::Trans* b ) const;
+      virtual int compareTo( const wfa::ITrans* a, const wfa::ITrans* b ) const;
 
     protected:
       pwl_t workset;

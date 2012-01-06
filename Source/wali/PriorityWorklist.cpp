@@ -7,14 +7,14 @@
 
 namespace wali
 {
-  PriorityWorklist::PriorityWorklist() : Worklist<wfa::Trans>(), workset(LessThan(*this)) {}
+  PriorityWorklist::PriorityWorklist() : Worklist<wfa::ITrans>(), workset(LessThan(*this)) {}
 
   PriorityWorklist::~PriorityWorklist()
   {
     clear();
   }
 
-  bool PriorityWorklist::put( wfa::Trans *t )
+  bool PriorityWorklist::put( wfa::ITrans *t )
   {
     if( !t->marked() ) {
       t->mark();
@@ -25,10 +25,10 @@ namespace wali
       return false;
   }
 
-  wfa::Trans * PriorityWorklist::get() 
+  wfa::ITrans * PriorityWorklist::get() 
   {
     pwl_t::iterator i = workset.begin();
-    wfa::Trans* t = (*i);
+    wfa::ITrans* t = (*i);
     workset.erase(i);
     t->unmark();
     return t;
@@ -50,7 +50,7 @@ namespace wali
     workset.clear();
   }
 
-  int PriorityWorklist::compareTo( const wfa::Trans* a , const wfa::Trans* b) const
+  int PriorityWorklist::compareTo( const wfa::ITrans* a , const wfa::ITrans* b) const
   {
     if( a->stack() == b->stack() ) {
       return 0;
