@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 
+#include "wali/TotalOrderWorklist.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/State.hpp"
 #include "wali/nwa/NWA.hpp"
@@ -26,6 +27,7 @@
 #include "wali/witness/VisitorDot.hpp"
 #include "wali/witness/VisitorPrinter.hpp"
 #include "wali/witness/WitnessRule.hpp"
+
 
 using namespace std;
 using namespace wali;
@@ -221,11 +223,13 @@ namespace wali {
           return NULL;
         }
         else {
-          wali::nwa::ReachGen wg;
+          wali::nwa::ShortestPathGen wg;
           wali::wfa::WFA query;
           ref_ptr<wali::wpds::Wrapper> wrapper = new wali::witness::WitnessWrapper();
           wali::wpds::WPDS conv = nwa_pds::NwaToWpdsCalls(nwa, wg, wrapper);
-    
+
+          conv.setWorklist(new TotalOrderWorklist());
+
           wali::Key state = wali::nwa::nwa_pds::getProgramControlLocation();
           wali::Key accept = wali::getKey("__accept");
 
