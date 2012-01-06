@@ -32,6 +32,7 @@ nice_files = Split("""
 ./wali/IMergeFn.cpp
 ./wali/MergeFn.cpp
 ./wali/MergeFnFactory.cpp
+./wali/ShortestPathSemiring.cpp
 ./wali/wpds/RuleFunctor.cpp
 ./wali/wpds/Config.cpp
 ./wali/wpds/ewpds/ERule.cpp
