@@ -18,8 +18,11 @@ files = Split("""
 Env = ProgEnv.Clone()
 
 Env['WARNING_FLAGS'] = Env['WARNING_FLAGS'].replace('-Wshadow', '')
+Env['WARNING_FLAGS'] = Env['WARNING_FLAGS'].replace('-Wfloat-equal', '')
 
 #Env.Append(CPPPATH=[os.path.join(WaliDir,'AddOns','RandomNwa','Source')])
+Env.Append(CPPPATH=['/unsup/boost-1.47.0/include'])
+Env.Append(LIBPATH=['/unsup/boost-1.47.0/lib'])
 Env.Append(LIBS=['boost_program_options'])
 
 built = Env.Program('random-nwa', files)
