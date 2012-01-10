@@ -13,8 +13,16 @@ namespace po = boost::program_options;
 
 #include <iostream>
 #include <iterator>
+#include <vector>
 
 using namespace std;
+
+#include <wali/nwa/NWA.hpp>
+
+using namespace wali;
+using namespace wali::nwa;
+
+boost::mt19937 rng;
 
 
 class incompatible_options_exception : public std::exception {
@@ -25,9 +33,14 @@ public:
 };
 
 
+int get_int(int low, int hi)
+{
+    boost::random::uniform_int_distribution<> num(low, hi);
+    return num(rng);
+}
+
 int get_bernoulli(int n, double p)
 {
-    boost::mt19937 rng;
     boost::binomial_distribution<> bin(n, p);
 
     boost::variate_generator<boost::mt19937&, boost::binomial_distribution<> > die(rng, bin);
@@ -163,6 +176,9 @@ class NwaGenerator
     int num_epsilon;
     int num_return;
 
+    std::vector<State> states;
+    std::vector<Symbol> symbols;
+
     NwaGenerator(po::variables_map const & options)
         : num_states(options["number-of-states"].as<int>())
         , num_symbols(options["number-of-symbols"].as<int>())
@@ -172,6 +188,72 @@ class NwaGenerator
         , num_internal(get_num_internal_transitions(options))
         , num_return(get_num_return_transitions(options))
     {}
+
+
+    wali::nwa::NWARefPtr generate() {
+        NWARefPtr nwa = new NWA();
+
+        // Add states
+        states.resize(num_states);
+        for (int i=0; i<num_states; ++i) {
+            states[i] = getKey(i);
+            nwa->addState(states[i]);
+        }
+
+        // Add symbols
+        symbols.resize(num_symbols);
+        for (int i=0; i<num_symbols; ++i) {
+            symbols[i] = getKey(i);
+            nwa->addSymbol(states[i]);
+        }
+
+        // Add initial states; WLOG we use the first n
+        for (int i=0; i<num_initial_states; ++i) {
+            nwa->addInitialState(states[i]);
+        }
+
+        // Add final states; we can't do the same trick
+        // since initials and finals can overlap
+        for (int i=0; i<num_accepting_states; ++i) {
+            bool added = nwa->addFinalState(randomState());
+            if (!added) --i;
+        }
+
+        // Add call transitions
+        for (int i=0; i<num_call; ++i) {
+            bool added = nwa->addCallTrans(randomState(), randomSymbol(), randomState());
+            if (!added) --i;
+        }
+
+        // Add internal transitions
+        for (int i=0; i<num_internal; ++i) {
+            bool added = nwa->addInternalTrans(randomState(), randomSymbol(), randomState());
+            if (!added) --i;
+        }
+
+        // Add jump transitions
+        for (int i=0; i<num_epsilon; ++i) {
+            bool added = nwa->addInternalTrans(randomState(), WALI_EPSILON, randomState());
+            if (!added) --i;
+        }
+
+        // Add call transitions
+        for (int i=0; i<num_return; ++i) {
+            bool added = nwa->addReturnTrans(randomState(), randomState(), randomSymbol(), randomState());
+            if (!added) --i;
+        }
+
+        return nwa;
+    }
+
+
+    State randomState() {
+        return states[get_int(0, num_states-1)];
+    }
+
+    Symbol randomSymbol() {
+        return symbols[get_int(0, num_symbols-1)];
+    }
 };
 
 
