@@ -179,6 +179,7 @@ class NwaGenerator
     std::vector<State> states;
     std::vector<Symbol> symbols;
 
+public:
     NwaGenerator(po::variables_map const & options)
         : num_states(options["number-of-states"].as<int>())
         , num_symbols(options["number-of-symbols"].as<int>())
@@ -246,7 +247,7 @@ class NwaGenerator
         return nwa;
     }
 
-
+private:
     State randomState() {
         return states[get_int(0, num_states-1)];
     }
@@ -296,12 +297,9 @@ int main(int ac, char* av[])
             return 1;
         }
 
-        if (vm.count("compression")) {
-            cout << "Compression level was set to " 
-                 << vm["compression"].as<int>() << ".\n";
-        } else {
-            cout << "Compression level was not set.\n";
-        }
+        NwaGenerator gen(vm);
+
+        gen.generate()->print(std::cout);
     }
     catch(exception& e) {
         cerr << "error: " << e.what() << "\n";
