@@ -1,0 +1,17 @@
+import os, os.path, sys
+
+Import('Debug')
+Import('BaseEnv')
+Import('BuildDir')
+
+if Debug:
+    print '\n+++ Entered "#/AddOns/RandomNwa"\n'
+
+
+built = SConscript(
+    os.path.join('Source','SConscript'), 
+    build_dir=os.path.join(BuildDir,'AddOns','RandomNwa'),
+    duplicate=0)
+
+Return('built')
+
