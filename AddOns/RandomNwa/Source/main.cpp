@@ -187,6 +187,7 @@ public:
         , num_accepting_states(get_num_accepting_states(options))
         , num_call(get_num_call_transitions(options))
         , num_internal(get_num_internal_transitions(options))
+        , num_epsilon(get_num_jump_transitions(options))
         , num_return(get_num_return_transitions(options))
     {}
 
@@ -197,20 +198,20 @@ public:
         // Add states
         states.resize(num_states);
         for (int i=0; i<num_states; ++i) {
-            states[i] = getKey(i);
-            nwa->addState(states[i]);
+            states.at(i) = getKey(i);
+            nwa->addState(states.at(i));
         }
 
         // Add symbols
         symbols.resize(num_symbols);
         for (int i=0; i<num_symbols; ++i) {
             symbols[i] = getKey(i);
-            nwa->addSymbol(states[i]);
+            nwa->addSymbol(symbols.at(i));
         }
 
         // Add initial states; WLOG we use the first n
         for (int i=0; i<num_initial_states; ++i) {
-            nwa->addInitialState(states[i]);
+            nwa->addInitialState(states.at(i));
         }
 
         // Add final states; we can't do the same trick
@@ -249,11 +250,11 @@ public:
 
 private:
     State randomState() {
-        return states[get_int(0, num_states-1)];
+        return states.at(get_int(0, num_states-1));
     }
 
     Symbol randomSymbol() {
-        return symbols[get_int(0, num_symbols-1)];
+        return symbols.at(get_int(0, num_symbols-1));
     }
 };
 
@@ -266,6 +267,8 @@ int main(int ac, char* av[])
         po::options_description desc("Allowed options");
         desc.add_options()
             ("help", "produce help message")
+
+            ("rng-seed", po::value<unsigned int>()->default_value(static_cast<unsigned int>(std::time(0))), "")
 
             ("absolute-internal-transition-density", po::value<int>(), "")
             ("deterministic-internal-transition-density", po::value<int>(), "")
@@ -296,6 +299,8 @@ int main(int ac, char* av[])
             cout << desc << "\n";
             return 1;
         }
+
+        rng.seed(vm["rng-seed"].as<unsigned int>());
 
         NwaGenerator gen(vm);
 
