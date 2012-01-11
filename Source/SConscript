@@ -20,6 +20,7 @@ nice_files = Split("""
 ./wali/KeySpace.cpp
 ./wali/KeySetSource.cpp
 ./wali/TotalOrderWorklist.cpp
+./wali/KeyOrderWorklist.cpp
 ./wali/SemElem.cpp
 ./wali/PriorityWorklist.cpp
 ./wali/Exception.cpp
