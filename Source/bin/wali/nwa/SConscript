@@ -22,6 +22,7 @@ def DoubleProgramTarget(env, command, function=None, namespace='construct'):
 
 
 built = [
+    env.Program('nwa-print-stats.exe', ['print-stats.cpp']),
     env.Program('nwa-print-dot.exe', ['print-dot.cpp']),
     env.Program('nwa-is-empty.exe', ['is-empty.cpp']),
     env.Program('nwa-get-example.exe', ['get-example.cpp']),
