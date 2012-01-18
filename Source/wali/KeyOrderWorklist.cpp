@@ -27,13 +27,13 @@ namespace wali
       b_triple(b->from(), b->to(), b->stack());
 
     if (a_triple < b_triple) {
-      return -1;
+      return 1;
     }
     else if (a_triple == b_triple) {
       return 0;
     }
     else {
-      return 1;
+      return -1;
     }
   }
 
