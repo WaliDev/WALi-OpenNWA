@@ -8,10 +8,12 @@ if Debug:
     print '\n+++ Entered "#/AddOns/RandomNwa"\n'
 
 
-built = SConscript(
-    os.path.join('Source','SConscript'), 
-    build_dir=os.path.join(BuildDir,'AddOns','RandomNwa'),
-    duplicate=0)
+built = []
+
+#SConscript(
+#    os.path.join('Source','SConscript'), 
+#    build_dir=os.path.join(BuildDir,'AddOns','RandomNwa'),
+#    duplicate=0)
 
 Return('built')
 
