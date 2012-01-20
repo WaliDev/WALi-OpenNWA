@@ -7,6 +7,7 @@
 #include <sstream>
 
 #include "wali/TotalOrderWorklist.hpp"
+#include "wali/KeyOrderWorklist.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/State.hpp"
 #include "wali/nwa/NWA.hpp"
@@ -216,18 +217,26 @@ namespace wali {
 
 
       ref_ptr<NestedWord>
-      getSomeAcceptedWord(wali::nwa::NWA const & nwa, WeightGen const & wg);
+      getSomeAcceptedWordInternal(wali::nwa::NWA const & nwa, WeightGen const & wg);
 
       
       ref_ptr<NestedWord>
       getSomeAcceptedWord(wali::nwa::NWA const & nwa)
       {
+        wali::nwa::ReachGen wg;
+        return getSomeAcceptedWordInternal(nwa, wg);
+      }
+
+
+      ref_ptr<NestedWord>
+      getSomeShortestAcceptedWord(wali::nwa::NWA const & nwa)
+      {
         wali::nwa::ShortestPathGen wg;
-        return getSomeAcceptedWord(nwa, wg);
+        return getSomeAcceptedWordInternal(nwa, wg);
       }
       
       ref_ptr<NestedWord>
-      getSomeAcceptedWord(wali::nwa::NWA const & nwa, WeightGen const & wg)
+      getSomeAcceptedWordInternal(wali::nwa::NWA const & nwa, WeightGen const & wg)
       {
         if (nwa.sizeInitialStates() == 0) {
           return NULL;

@@ -56,6 +56,10 @@ namespace wali {
       ref_ptr<NestedWord>
       getSomeAcceptedWord(NWA const & nwa);
 
+      extern
+      ref_ptr<NestedWord>
+      getSomeShortestAcceptedWord(NWA const & nwa);
+      
 
       /**
        *
