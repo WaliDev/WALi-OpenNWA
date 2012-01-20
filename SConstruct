@@ -128,6 +128,9 @@ if 'help' not in COMMAND_LINE_TARGETS:
     if 'all' in COMMAND_LINE_TARGETS:
         for d in ['AddOns','Examples','Tests']:
             built += SConscript('%s/SConscript' % d)
+        nwa_tests = SConscript('Tests/nwa/SConscript', variant_dir=os.path.join(BuildDir,'tests'), duplicate=0)
+        built += nwa_tests
+        built += BaseEnv.Install('Tests/nwa', nwa_tests)
         BaseEnv.Alias('all',built)
 
     ## AddOns
