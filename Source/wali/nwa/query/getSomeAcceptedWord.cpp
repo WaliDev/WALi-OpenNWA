@@ -229,7 +229,11 @@ namespace wali {
       ref_ptr<NestedWord>
       getSomeAcceptedWord(wali::nwa::NWA const & nwa, WeightGen const & wg)
       {
-        if(query::languageIsEmpty(nwa)) {
+        if (nwa.sizeInitialStates() == 0) {
+          return NULL;
+        }
+        
+        if(false) {
           return NULL;
         }
         else {
@@ -287,7 +291,6 @@ namespace wali {
           }
         }
 
-        assert(0 && "unreachable, I think");
         return NULL;
       }
 
