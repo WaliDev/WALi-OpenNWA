@@ -522,6 +522,7 @@ namespace wali
       sem_elem_t wrule_trans = delta->extend( r->weight() );
 
       if( r->to_stack2() == WALI_EPSILON ) {
+        // t must be a rule 1 (pop rules handled by poststar_handle_eps_trans)
         update( rtstate, rtstack, t->to(), wrule_trans, r->to() );
       }
       else {
