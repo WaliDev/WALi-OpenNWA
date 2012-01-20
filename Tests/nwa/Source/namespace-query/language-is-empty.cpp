@@ -46,9 +46,6 @@ static bool expected_answers[] = {
 namespace wali {
     namespace nwa {
         namespace query {
-            // Not public interface
-            ref_ptr<NestedWord>
-            getSomeAcceptedWord(wali::nwa::NWA const & nwa, WeightGen const & wg);
             
 
             TEST(wali$nwa$query$$languageIsEmpty, testBatteryOfVariouslyBalancedNwas)
@@ -76,13 +73,17 @@ namespace wali {
                     SCOPED_TRACE(ss.str());
 
                     NestedWordRefPtr word = getSomeAcceptedWord(nwas[nwa]);
+                    NestedWordRefPtr shortest_word = getSomeShortestAcceptedWord(nwas[nwa]);
                     
                     if (expected_answers[nwa]) {
                         EXPECT_TRUE(word == NULL);
+                        EXPECT_TRUE(shortest_word == NULL);
                     }
                     else {
                         ASSERT_TRUE(word != NULL);
+                        ASSERT_TRUE(shortest_word != NULL);
                         EXPECT_TRUE(languageContains(nwas[nwa], *word));
+                        EXPECT_TRUE(languageContains(nwas[nwa], *shortest_word));
                     }
                 }
             }
@@ -100,7 +101,10 @@ namespace wali {
                 NestedWord eps;
 
                 NestedWordRefPtr word = getSomeAcceptedWord(nwa);
+                NestedWordRefPtr shortest_word = getSomeShortestAcceptedWord(nwa);
+                
                 EXPECT_EQ(eps, *word);
+                EXPECT_EQ(eps, *shortest_word);
             }
             
             TEST(wali$nwa$query$$languageIsEmpty$and$getSomeAcceptedWord, testInternalOnlyNwa)
@@ -125,8 +129,10 @@ namespace wali {
                 expected.appendInternal(e.symbol);
 
                 NestedWordRefPtr word = getSomeAcceptedWord(nwa);
+                NestedWordRefPtr shortest_word = getSomeShortestAcceptedWord(nwa);
                 
                 EXPECT_EQ(expected, *word);
+                EXPECT_EQ(expected, *shortest_word);
             }
 
             TEST(wali$nwa$query$$languageIsEmpty$and$getSomeAcceptedWord, testMiddleCall)
@@ -151,8 +157,10 @@ namespace wali {
                 expected.appendInternal(e.symbol);
 
                 NestedWordRefPtr word = getSomeAcceptedWord(nwa);
+                NestedWordRefPtr shortest_word = getSomeShortestAcceptedWord(nwa);
                 
                 EXPECT_EQ(expected, *word);
+                EXPECT_EQ(expected, *shortest_word);
             }
 
 
@@ -178,8 +186,10 @@ namespace wali {
                 expected.appendInternal(e.symbol);
 
                 NestedWordRefPtr word = getSomeAcceptedWord(nwa);
+                NestedWordRefPtr shortest_word = getSomeShortestAcceptedWord(nwa);
                 
                 EXPECT_EQ(expected, *word);
+                EXPECT_EQ(expected, *shortest_word);
             }
 
 
@@ -217,9 +227,13 @@ namespace wali {
                 ASSERT_TRUE(languageContains(nwa, expected));
 
                 NestedWordRefPtr word = getSomeAcceptedWord(nwa);
+                NestedWordRefPtr shortest_word = getSomeShortestAcceptedWord(nwa);
 
                 EXPECT_TRUE(languageContains(nwa, *word));
+                EXPECT_TRUE(languageContains(nwa, *shortest_word));
+
                 EXPECT_EQ(expected, *word);
+                EXPECT_EQ(expected, *shortest_word);
             }
 
 
@@ -253,14 +267,17 @@ namespace wali {
 
                 ReachGen rg;
                 
-                NestedWordRefPtr long_word = getSomeAcceptedWord(nwa, rg);
-                NestedWordRefPtr short_word = getSomeAcceptedWord(nwa);
+                NestedWordRefPtr long_word = getSomeAcceptedWord(nwa);
+                NestedWordRefPtr short_word = getSomeShortestAcceptedWord(nwa);
 
                 // This could fail if the iteration order or something
                 // changes and the rg version also returns the shortest
                 // word. Such is life.
                 EXPECT_LT(short_word->size(), long_word->size());
             }
+
+
+            
         }
     }
 }
