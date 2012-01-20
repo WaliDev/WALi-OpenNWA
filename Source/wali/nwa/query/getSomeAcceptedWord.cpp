@@ -222,8 +222,8 @@ namespace wali {
       ref_ptr<NestedWord>
       getSomeAcceptedWord(wali::nwa::NWA const & nwa)
       {
-          wali::nwa::ShortestPathGen wg;
-          return getSomeAcceptedWord(nwa, wg);
+        wali::nwa::ShortestPathGen wg;
+        return getSomeAcceptedWord(nwa, wg);
       }
       
       ref_ptr<NestedWord>
@@ -233,64 +233,60 @@ namespace wali {
           return NULL;
         }
         
-        if(false) {
-          return NULL;
+        wali::wfa::WFA query;
+        ref_ptr<wali::wpds::Wrapper> wrapper = new wali::witness::WitnessWrapper();
+        wali::wpds::WPDS conv = nwa_pds::NwaToWpdsCalls(nwa, wg, wrapper);
+
+        conv.setWorklist(new TotalOrderWorklist());
+
+        wali::Key state = wali::nwa::nwa_pds::getProgramControlLocation();
+        wali::Key accept = wali::getKey("__accept");
+
+        // Construct the query automaton
+        query.set_initial_state(state);
+        query.add_final_state(accept);
+        for( NWA::StateIterator initial = nwa.beginInitialStates();
+             initial != nwa.endInitialStates(); initial++ )
+        {
+          query.addTrans(state, *initial, accept, wg.getOne());
+          query.addTrans(accept, *initial, accept, wg.getOne()); // Accept pending returns
         }
-        else {
-          wali::wfa::WFA query;
-          ref_ptr<wali::wpds::Wrapper> wrapper = new wali::witness::WitnessWrapper();
-          wali::wpds::WPDS conv = nwa_pds::NwaToWpdsCalls(nwa, wg, wrapper);
-
-          conv.setWorklist(new TotalOrderWorklist());
-
-          wali::Key state = wali::nwa::nwa_pds::getProgramControlLocation();
-          wali::Key accept = wali::getKey("__accept");
-
-          // Construct the query automaton
-          query.set_initial_state(state);
-          query.add_final_state(accept);
-          for( NWA::StateIterator initial = nwa.beginInitialStates();
-               initial != nwa.endInitialStates(); initial++ )
-          {
-            query.addTrans(state, *initial, accept, wg.getOne());
-            query.addTrans(accept, *initial, accept, wg.getOne()); // Accept pending returns
-          }
 	
-          // Execute the post* query
-          wali::wfa::WFA path = conv.poststar(query);
-          path.path_summary();
-          
-          for(NWA::StateIterator final = nwa.beginFinalStates();
-              final != nwa.endFinalStates(); final++)
-          {
-            // See if there are any transitions to the current final state
-            wali::wfa::TransSet t = path.match(state, *final);
-            
-            // Collect the transitions
-            for(wali::wfa::TransSet::iterator trans = t.begin();
-                trans != t.end(); trans++)
-            {
-              sem_elem_t se =
-                path.getState((*trans)->to())
-                  ->weight()
-                  ->extend((*trans)->weight());
-              if(se->equal(se->zero())) {
-                // Doesn't make it to the final state. Try again.
-                continue;
-              }
+        // Execute the post* query
+        wali::wfa::WFA path = conv.poststar(query);
+        path.path_summary();
 
-              // We found an actual path to the final state, so figure out
-              // how it did that.
-              details::PathVisitor v(nwa);					
-              wali::witness::Witness* wit =
-                dynamic_cast<wali::witness::Witness*>(se.get_ptr());
-              assert(wit);
-              wit->accept(v);
-              return new NestedWord(v.getPath());
+        for(NWA::StateIterator final = nwa.beginFinalStates();
+            final != nwa.endFinalStates(); final++)
+        {
+          // See if there are any transitions to the current final state
+          wali::wfa::TransSet t = path.match(state, *final);
+            
+          // Collect the transitions
+          for(wali::wfa::TransSet::iterator trans = t.begin();
+              trans != t.end(); trans++)
+          {
+            sem_elem_t se =
+              path.getState((*trans)->to())
+              ->weight()
+              ->extend((*trans)->weight());
+            if(se->equal(se->zero())) {
+              // Doesn't make it to the final state. Try again.
+              continue;
             }
+
+            // We found an actual path to the final state, so figure out
+            // how it did that.
+            details::PathVisitor v(nwa);					
+            wali::witness::Witness* wit =
+              dynamic_cast<wali::witness::Witness*>(se.get_ptr());
+            assert(wit);
+            wit->accept(v);
+            return new NestedWord(v.getPath());
           }
         }
 
+        // No word was found.
         return NULL;
       }
 
