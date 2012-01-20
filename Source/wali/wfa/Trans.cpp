@@ -116,11 +116,11 @@ namespace wali
       // This's weight is w+se
       se = p.first;
 
-      // Delta is combined with the new delta.
+      // Combine current delta with p's delta (wnew - se) and set status to
+      // modified if this's delta changes value.
+      sem_elem_t old_delta = delta;
       delta = delta->combine( p.second );
-
-      // Set status
-      status = ( delta->equal(delta->zero()) ) ? SAME : MODIFIED;
+      status = ( old_delta->equal(delta) ) ? SAME : MODIFIED;
     }
 
     wpds::Config* Trans::getConfig() const {
