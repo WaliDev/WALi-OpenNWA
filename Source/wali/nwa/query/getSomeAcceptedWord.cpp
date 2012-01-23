@@ -231,7 +231,7 @@ namespace wali {
       ref_ptr<NestedWord>
       getSomeShortestAcceptedWord(wali::nwa::NWA const & nwa)
       {
-        wali::nwa::ShortestPathGen wg;
+        wali::nwa::ShortestWordGen wg;
         return getSomeAcceptedWordInternal(nwa, wg);
       }
       

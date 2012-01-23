@@ -145,7 +145,7 @@ namespace wali
         return r.one();
       }
     };
-
+  
 
     class ShortestPathGen : public WeightGen
     {
@@ -172,6 +172,57 @@ namespace wali
         (void) tgt;
         (void) tgtInfo;
         return getUnitWeight();
+      }
+        
+      virtual sem_elem_t getExitWeight( Key src, ClientInfoRefPtr srcInfo ) const
+      {
+        (void) src;
+        (void) srcInfo;
+        return getUnitWeight();
+      }
+
+      virtual sem_elem_t getWildWeight( Key src, ClientInfoRefPtr srcInfo, Key tgt, ClientInfoRefPtr tgtInfo ) const
+      {
+        (void) src;
+        (void) srcInfo;
+        (void) tgt;
+        (void) tgtInfo;
+        return getUnitWeight();
+      }
+      
+    };
+
+
+    class ShortestWordGen : public WeightGen
+    {
+    public:
+      // Semiring 1 is length 0
+      sem_elem_t getOne( ) const
+      {
+        static const ShortestPathSemiring r;
+        return r.one();
+      }
+
+
+      sem_elem_t getUnitWeight() const
+      {
+        static const sem_elem_t r = new ShortestPathSemiring(1);
+        return r;
+      }
+
+      virtual sem_elem_t getWeight( Key src, ClientInfoRefPtr srcInfo, Key sym, Kind kind, Key tgt, ClientInfoRefPtr tgtInfo ) const
+      {
+        (void) src;
+        (void) srcInfo;
+        (void) kind;
+        (void) tgt;
+        (void) tgtInfo;
+        if (sym != WALI_EPSILON) {
+          return getUnitWeight();
+        }
+        else {
+          return getOne();
+        }
       }
         
       virtual sem_elem_t getExitWeight( Key src, ClientInfoRefPtr srcInfo ) const
