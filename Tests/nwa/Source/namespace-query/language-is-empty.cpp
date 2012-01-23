@@ -277,6 +277,44 @@ namespace wali {
             }
 
 
+            TEST(wali$nwa$query$$getSomeShortestAcceptedWord, findsShortestWordNotPath)
+            {
+                //              a            a
+                // --> (state) --> (state2) --> (state3)
+                //  eps |                        /\ .
+                //      V                        | b
+                //     (state4) --> (state5) ----+
+                //             eps
+                //
+                // Note that the lower path is longer but the word is shorter
+
+                NWA nwa;
+                SomeElements e;
+                State state4 = getKey("state4");
+                State state5 = getKey("state5");
+                Symbol b = getKey("b");
+
+                nwa.addInitialState(e.state);
+                nwa.addFinalState(e.state3);
+
+                // Top path
+                nwa.addInternalTrans(e.state, e.symbol, e.state2);
+                nwa.addInternalTrans(e.state2, e.symbol, e.state3);
+
+                // Bottom path
+                nwa.addInternalTrans(e.state, WALI_EPSILON, state4);
+                nwa.addInternalTrans(state4, WALI_EPSILON, state5);
+                nwa.addInternalTrans(state5, b, e.state3);
+
+                NestedWordRefPtr word = getSomeShortestAcceptedWord(nwa);
+
+                EXPECT_EQ(1u, word->size());
+
+                NestedWord expected;
+                expected.appendInternal(b);
+
+                EXPECT_EQ(expected, *word);
+            }
             
         }
     }
