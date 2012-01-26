@@ -1,6 +1,6 @@
-#include "wali/nwa/NWA.hpp"
+#include "opennwa/NWA.hpp"
 
-#include "wali/nwa/NestedWord.hpp"
+#include "opennwa/NestedWord.hpp"
 
 namespace wali
 {
@@ -40,7 +40,7 @@ namespace wali
             static const State q0, q1, q2, q3, dummy;
             static const Symbol call, ret, zero;
             
-            // From NWA-tests.cpp in Source/wali/nwa if you want to trace
+            // From NWA-tests.cpp in Source/opennwa if you want to trace
             // history.
                 
             // Accepts NWs with an odd number of () groups, each of which

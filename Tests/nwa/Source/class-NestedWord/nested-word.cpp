@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "wali/nwa/NestedWord.hpp"
+#include "opennwa/NestedWord.hpp"
 
 #include "Tests/nwa/Source/fixtures.hpp"
 

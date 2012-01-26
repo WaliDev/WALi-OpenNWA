@@ -1,10 +1,10 @@
 #include "gtest/gtest.h"
 
-#include "wali/nwa/NWA.hpp"
-#include "wali/nwa/query/language.hpp"
-#include "wali/nwa/construct/concat.hpp"
-#include "wali/nwa/query/automaton.hpp"
-#include "wali/nwa/query/language.hpp"
+#include "opennwa/NWA.hpp"
+#include "opennwa/query/language.hpp"
+#include "opennwa/construct/concat.hpp"
+#include "opennwa/query/automaton.hpp"
+#include "opennwa/query/language.hpp"
 
 #include "Tests/nwa/Source/fixtures.hpp"
 #include "Tests/nwa/Source/int-client-info.hpp"

@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "wali/nwa/NWA.hpp"
+#include "opennwa/NWA.hpp"
 
 #include "supporting.hpp"
 

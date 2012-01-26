@@ -72,7 +72,7 @@ namespace wali
         void
         OddNumEvenGroupsNwa::build_nwa(NWA * nwa)
         {
-            // From NWA-tests.cpp in Source/wali/nwa if you want to trace
+            // From NWA-tests.cpp in Source/opennwa if you want to trace
             // history.
                 
             // Accepts NWs with an odd number of () groups, each of which

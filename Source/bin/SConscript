@@ -1,5 +1,5 @@
 Import('BaseEnv')
 
-built = BaseEnv.SConscript('wali/nwa/SConscript')
+built = BaseEnv.SConscript('opennwa/SConscript')
 
 Return('built')

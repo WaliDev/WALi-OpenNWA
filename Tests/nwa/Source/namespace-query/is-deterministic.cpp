@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
-#include "wali/nwa/NWA.hpp"
-#include "wali/nwa/query/automaton.hpp"
+#include "opennwa/NWA.hpp"
+#include "opennwa/query/automaton.hpp"
 
 #include "Tests/nwa/Source/fixtures.hpp"
 #include "Tests/nwa/Source/class-NWA/supporting.hpp"

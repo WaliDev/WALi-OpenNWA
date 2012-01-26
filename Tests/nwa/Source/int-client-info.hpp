@@ -1,7 +1,7 @@
 #ifndef WALI_TESTS_NWA_int_client_info_HPP
 #define WALI_TESTS_NWA_int_client_info_HPP
 
-#include "wali/nwa/ClientInfo.hpp"
+#include "opennwa/ClientInfo.hpp"
 
 namespace wali {
     namespace nwa {
