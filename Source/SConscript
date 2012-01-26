@@ -21,6 +21,8 @@ nice_files = Split("""
 ./wali/KeySetSource.cpp
 ./wali/TotalOrderWorklist.cpp
 ./wali/KeyOrderWorklist.cpp
+./wali/RankedWorklist.cpp
+./wali/ShortestPathWorklist.cpp
 ./wali/SemElem.cpp
 ./wali/PriorityWorklist.cpp
 ./wali/Exception.cpp
