@@ -3,7 +3,7 @@
 
 #include <fst/fstlib.h>
 
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 
 namespace opennwa {
 

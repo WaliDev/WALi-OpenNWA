@@ -1,7 +1,7 @@
 #ifndef PROCEDURE_NWAS_HPP
 #define PROCEDURE_NWAS_HPP
 
-#include "NWA.hpp"
+#include "Nwa.hpp"
 
 #include <map>
 #include <string>
@@ -24,22 +24,22 @@ namespace opennwa {
         , return_symbol(_return_symbol)
       {}
 
-      void operator() (NWA & nwa, State source, State target) {
+      void operator() (Nwa & nwa, State source, State target) {
         nwa.addCallTrans(source, call_symbol, target);
       }
 
-      void operator() (NWA & nwa, State source, State pred, State target) {
+      void operator() (Nwa & nwa, State source, State pred, State target) {
         nwa.addReturnTrans(source, pred, return_symbol, target);
       }
     };
     
 
     struct EpsilonTransitionInserter {
-      void operator() (NWA & nwa, State source, State target) {
+      void operator() (Nwa & nwa, State source, State target) {
         nwa.addInternalTrans(source, EPSILON, target);
       }
 
-      void operator() (NWA & nwa, State source, State pred, State target) {
+      void operator() (Nwa & nwa, State source, State pred, State target) {
         (void) pred;
         nwa.addInternalTrans(source, EPSILON, target);
       }
@@ -59,8 +59,8 @@ namespace opennwa {
     /// NWA's accepting state.
     NwaRefPtr
     assemble_nwa(ProcedureMap const & procedures,
-                 boost::function<void (NWA &, State, State)> call_inserter,
-                 boost::function<void (NWA &, State, State, State)> return_inserter);
+                 boost::function<void (Nwa &, State, State)> call_inserter,
+                 boost::function<void (Nwa &, State, State, State)> return_inserter);
 
 
 }

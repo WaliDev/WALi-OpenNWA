@@ -268,7 +268,7 @@ namespace opennwa
       {
         addState(*it);
         //Set the clientInfo of this state.
-        //TODO: check this -- if it is not right, fix star() in NWA.hpp
+        //TODO: check this -- if it is not right, fix star() in Nwa.hpp
         if (stateSet.getClientInfo(*it) != 0) {
           ClientInfoRefPtr ci = stateSet.getClientInfo(*it)->cloneRp();
           setClientInfo(*it,ci);

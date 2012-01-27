@@ -3,7 +3,7 @@
 #ifndef wali_nwa_query_details_GENESIS_HPP
 #define wali_nwa_query_details_GENESIS_HPP
 
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 #include "opennwa/query/details/iterators.hpp"
 
 #include <utility>

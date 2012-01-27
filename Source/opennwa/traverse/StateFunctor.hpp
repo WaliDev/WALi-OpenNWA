@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "opennwa/NWAFwd.hpp"
+#include "opennwa/NwaFwd.hpp"
 
 namespace opennwa {
     namespace traverse {

@@ -7,7 +7,7 @@
 
 //#define LABEL
 
-#include "opennwa/NWAFwd.hpp"
+#include "opennwa/NwaFwd.hpp"
  
 // ::wali
 #include "wali/KeyContainer.hpp"

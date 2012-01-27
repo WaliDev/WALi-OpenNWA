@@ -3,7 +3,7 @@
 
 #include <iosfwd>
 #include <string>
-#include "NWA.hpp"
+#include "Nwa.hpp"
 
 namespace opennwa {
 

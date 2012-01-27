@@ -1,7 +1,7 @@
 #include <sstream>
 #include <cstring>
 
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 #include "opennwa/details/Configuration.hpp"
 #include "opennwa/NestedWord.hpp"
 #include "opennwa/query/transitions.hpp"

@@ -1,7 +1,7 @@
 #ifndef wali_nwa_query_details_ITERATORS_HPP
 #define wali_nwa_query_details_ITERATORS_HPP
 
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 
 #include <iterator>
 #include <utility>

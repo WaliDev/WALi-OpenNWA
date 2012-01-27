@@ -1,4 +1,4 @@
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 #include "opennwa/query/internals.hpp"
 
 namespace opennwa

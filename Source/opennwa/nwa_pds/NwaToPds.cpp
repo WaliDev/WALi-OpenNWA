@@ -1,4 +1,4 @@
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 #include "opennwa/nwa_pds/conversions.hpp"
 
 using wali::wpds::WPDS;

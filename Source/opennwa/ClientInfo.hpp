@@ -7,7 +7,7 @@
 
 // ::wali
 #include "wali/Countable.hpp"
-#include "opennwa/NWAFwd.hpp"
+#include "opennwa/NwaFwd.hpp"
 
 namespace opennwa
 {

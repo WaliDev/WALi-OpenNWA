@@ -1,4 +1,4 @@
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 #include "opennwa/construct/complement.hpp"
 #include "opennwa/construct/determinize.hpp"
 

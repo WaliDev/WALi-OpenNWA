@@ -6,7 +6,7 @@
  */
 
 #include "opennwa/deprecate.h"
-#include "opennwa/NWAFwd.hpp"
+#include "opennwa/NwaFwd.hpp"
 
 // ::wali
 #include "wali/Printable.hpp"

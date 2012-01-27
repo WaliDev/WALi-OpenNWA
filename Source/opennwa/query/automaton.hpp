@@ -1,7 +1,7 @@
 #ifndef WALI_NWA_QUERY_automaton_HPP
 #define WALI_NWA_QUERY_automaton_HPP
 
-#include "opennwa/NWAFwd.hpp"
+#include "opennwa/NwaFwd.hpp"
 
 
 namespace opennwa {

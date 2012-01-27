@@ -1,4 +1,4 @@
-#include "opennwa/NWAFwd.hpp"
+#include "opennwa/NwaFwd.hpp"
 
 namespace opennwa {
         namespace experimental {

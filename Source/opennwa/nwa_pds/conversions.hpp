@@ -2,7 +2,7 @@
 #define WALI_NWA_NWA_PDS_nwatopds_HPP
 
 
-#include "opennwa/NWAFwd.hpp"
+#include "opennwa/NwaFwd.hpp"
 #include "wali/wpds/WPDS.hpp"
 #include "opennwa/WeightGen.hpp"
 

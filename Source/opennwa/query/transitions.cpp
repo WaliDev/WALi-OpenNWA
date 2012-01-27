@@ -1,4 +1,4 @@
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 #include "opennwa/query/transitions.hpp"
 #include "opennwa/details/TransitionStorage.hpp"
 

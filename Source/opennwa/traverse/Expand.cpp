@@ -1,5 +1,5 @@
 #include "opennwa/traverse/depth.hpp"
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 
 namespace opennwa {
     namespace experimental {

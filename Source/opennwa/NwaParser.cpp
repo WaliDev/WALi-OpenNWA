@@ -9,8 +9,8 @@
 
 #include <boost/shared_array.hpp>
 
-#include "opennwa/NWAParser.hpp"
-#include "opennwa/NWA.hpp"
+#include "opennwa/NwaParser.hpp"
+#include "opennwa/Nwa.hpp"
 #include "wali/KeyContainer.hpp"
 
 // The grammar:

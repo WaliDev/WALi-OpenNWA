@@ -2,7 +2,7 @@
 #define wali_nwa_NESTED_WORD_HPP
 
 #include "wali/Countable.hpp"
-#include "opennwa/NWAFwd.hpp"
+#include "opennwa/NwaFwd.hpp"
 #include <vector>
 #include <algorithm>
 

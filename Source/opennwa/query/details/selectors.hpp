@@ -1,7 +1,7 @@
 #ifndef wali_nwa_query_details_SELECTORS_HPP
 #define wali_nwa_query_details_SELECTORS_HPP
 
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 
 #include <utility>
 

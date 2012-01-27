@@ -1,6 +1,6 @@
 #include "opennwa/traverse/depth.hpp"
 
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 #include "opennwa/query/internals.hpp"
 #include "opennwa/query/returns.hpp"
 #include "opennwa/query/calls.hpp"

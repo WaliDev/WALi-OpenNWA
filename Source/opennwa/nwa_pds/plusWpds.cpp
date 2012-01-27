@@ -1,7 +1,7 @@
 #include <sstream>
 #include <cstring>
 
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 #include "opennwa/nwa_pds/plusWpds.hpp"
 
 using wali::wpds::WPDS;

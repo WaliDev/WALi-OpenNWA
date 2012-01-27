@@ -13,7 +13,7 @@
 
 
 // ::wali
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 #include "opennwa/OpenFstInterop.hpp"
 #include "opennwa/ProcedureNWAs.hpp"
 #include "wali/Key.hpp"

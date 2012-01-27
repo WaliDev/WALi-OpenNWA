@@ -1,7 +1,7 @@
 #ifndef WALI_NWA_QUERY_LANGUAGE_HPP
 #define WALI_NWA_QUERY_LANGUAGE_HPP
 
-#include "opennwa/NWAFwd.hpp"
+#include "opennwa/NwaFwd.hpp"
 #include "opennwa/NestedWord.hpp"
 
 namespace opennwa {

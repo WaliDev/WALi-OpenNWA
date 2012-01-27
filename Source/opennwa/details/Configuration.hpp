@@ -1,7 +1,7 @@
 #ifndef wali_nwa_CONFIGURATION_HPP
 #define wali_nwa_CONFIGURATION_HPP
 
-#include "opennwa/NWAFwd.hpp"
+#include "opennwa/NwaFwd.hpp"
 
 #include <ios>
 #include <vector>

@@ -1,4 +1,4 @@
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 #include "opennwa/construct/concat.hpp"
 
 #include "opennwa/query/automaton.hpp"

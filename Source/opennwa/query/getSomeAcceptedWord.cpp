@@ -10,7 +10,7 @@
 #include "wali/KeyOrderWorklist.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/State.hpp"
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 #include "opennwa/query/returns.hpp"
 #include "opennwa/query/transitions.hpp"
 #include "opennwa/query/calls.hpp"
