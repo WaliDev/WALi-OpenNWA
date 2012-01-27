@@ -1,10 +1,8 @@
 #include "opennwa/NWAFwd.hpp"
 
-namespace wali {
-    namespace nwa {
+namespace opennwa {
         namespace experimental {
             NWARefPtr expandNwa(NWA const & nwa);
         }
-    }
 }
 

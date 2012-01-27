@@ -5,8 +5,7 @@
 
 #include "opennwa/NWAFwd.hpp"
 
-namespace wali {
-  namespace nwa {
+namespace opennwa {
     namespace traverse {
 
       class ConstTransitionFunctor
@@ -38,7 +37,6 @@ namespace wali {
                               State source, State pred, Symbol symbol, State target) = 0;
       };
       
-    }
   }
 }
 

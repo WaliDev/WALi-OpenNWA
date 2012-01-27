@@ -5,10 +5,8 @@
 #include "opennwa/NWAFwd.hpp"
 #include "wali/wpds/WPDS.hpp"
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace nwa_pds
     {
 
@@ -25,9 +23,9 @@ namespace wali
        * @return the WPDS which can be used to perform property checking using PDS 
        *          reachability
        */
-      wpds::WPDS plusWpds( NWA const & nwa, const wpds::WPDS & base ); 
+      wali::wpds::WPDS plusWpds( NWA const & nwa, const wali::wpds::WPDS & base ); 
 
-    }
+
   }
 }
 

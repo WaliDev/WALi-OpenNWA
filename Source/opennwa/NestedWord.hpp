@@ -6,10 +6,8 @@
 #include <vector>
 #include <algorithm>
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     /// This class represents a single nested word.
     ///
     /// The word can be unbalanced left or unbalanced right, even
@@ -23,7 +21,7 @@ namespace wali
     /// with whether it is an internal, call, or return position. The
     /// nesting relation is induced by the matchings between calls and
     /// returns.
-    class NestedWord : public Countable
+    class NestedWord : public wali::Countable
     {
     public:
       /// Each position in the nested word has a symbol and a type.
@@ -128,7 +126,6 @@ namespace wali
 
 
     typedef ref_ptr<NestedWord> NestedWordRefPtr;
-  }
 }
 
 

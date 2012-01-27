@@ -2,12 +2,10 @@
 #include "opennwa/construct/reverse.hpp"
 #include "opennwa/details/TransitionStorage.hpp"
 
-using wali::nwa::details::TransitionStorage;
+using opennwa::details::TransitionStorage;
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace construct
     {
 
@@ -132,7 +130,6 @@ namespace wali
       }
 
       
-    }
   }
 }
 

@@ -19,10 +19,8 @@
 #include <set>
 #include <map>
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace details
     {
       
@@ -32,7 +30,7 @@ namespace wali
      *  
      */
     
-    class StateStorage : public Printable
+    class StateStorage : public wali::Printable
     {
       public:
         typedef ClientInfo Client;
@@ -507,7 +505,7 @@ namespace wali
       std::map<State,ClientInfoRefPtr> stateInfos;
     };
 
-    }
+
   }
 }
 

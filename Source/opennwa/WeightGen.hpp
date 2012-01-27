@@ -10,10 +10,11 @@
 #include "wali/ShortestPathSemiring.hpp"
 
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
+  using wali::Key; // TODO remove
+  using wali::sem_elem_t;
+  
     /**
      *
      * This class is used in NWA::NWAtoPDS and NWA::NWAtoBackwardsPDS.  It is used to
@@ -152,14 +153,14 @@ namespace wali
     public:
       sem_elem_t getOne( ) const
       {
-        static const ShortestPathSemiring r;
+        static const wali::ShortestPathSemiring r;
         return r.one();
       }
 
 
       sem_elem_t getUnitWeight() const
       {
-        static const sem_elem_t r = new ShortestPathSemiring(1);
+        static const sem_elem_t r = new wali::ShortestPathSemiring(1);
         return r;
       }
 
@@ -199,14 +200,14 @@ namespace wali
       // Semiring 1 is length 0
       sem_elem_t getOne( ) const
       {
-        static const ShortestPathSemiring r;
+        static const wali::ShortestPathSemiring r;
         return r.one();
       }
 
 
       sem_elem_t getUnitWeight() const
       {
-        static const sem_elem_t r = new ShortestPathSemiring(1);
+        static const sem_elem_t r = new wali::ShortestPathSemiring(1);
         return r;
       }
 
@@ -217,7 +218,7 @@ namespace wali
         (void) kind;
         (void) tgt;
         (void) tgtInfo;
-        if (sym != WALI_EPSILON) {
+        if (sym != EPSILON) {
           return getUnitWeight();
         }
         else {
@@ -243,7 +244,6 @@ namespace wali
       
     };
     
-  }
 }
 
 // Yo, Emacs!

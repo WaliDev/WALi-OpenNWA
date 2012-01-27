@@ -5,8 +5,7 @@
 
 #include "opennwa/query/language.hpp"
 
-namespace wali {
-  namespace nwa {
+namespace opennwa {
     namespace query {
 
       bool
@@ -56,7 +55,6 @@ namespace wali {
         return (first_in_second && second_in_first );
       }
       
-    }
   }
 }
 

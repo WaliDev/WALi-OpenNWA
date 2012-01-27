@@ -2,8 +2,7 @@
 #include "opennwa/NWA.hpp"
 #include "opennwa/query/automaton.hpp"
 
-namespace wali {
-  namespace nwa {
+namespace opennwa {
     namespace query {
 
       
@@ -34,7 +33,6 @@ namespace wali {
         }
       }
 
-    }
   }
 }
 

@@ -32,12 +32,9 @@
 
 using namespace std;
 using namespace wali;
-using namespace wali::nwa;
 
-namespace wali {
+namespace opennwa {
   
-  namespace nwa {
-
     namespace query {
 
       namespace details {
@@ -48,7 +45,7 @@ namespace wali {
           /// Holds the NWA associated with the given query. We need this so
           /// that when we know that the trace went from state p to q, we can
           /// look up a symbol on that edge.
-          wali::nwa::NWA const & nwa;
+          NWA const & nwa;
 
           /// This is the word that corresponds to the trace; built up as
           /// visitRule() is called.
@@ -63,7 +60,7 @@ namespace wali {
 			
         public:
 				
-          PathVisitor(wali::nwa::NWA const & orig)
+          PathVisitor(NWA const & orig)
             : nwa(orig)
           {}
 				
@@ -145,7 +142,7 @@ namespace wali {
 
             // Detect a pop rule: this discovers the first half of a return
             // transition. (Case #1 above.)
-            if( to == wali::WALI_EPSILON) {
+            if( to == EPSILON) {
               // dealing with first half of return transition
               assert(symbs.size() == 0);
               assert(states.size() == 0);
@@ -174,7 +171,7 @@ namespace wali {
               states.pop_back();
               symbs.pop_back();
             }
-            else if (to2 != WALI_EPSILON) {
+            else if (to2 != EPSILON) {
               // call (part of case #3)
               trans_type = NestedWord::Position::CallType;
               set<wali::Key> r = query::getCallSym(nwa, from, to);
@@ -191,7 +188,7 @@ namespace wali {
 
             // If the transition was an epsilon transition, then we don't
             // want to save it since it isn't part of the word.
-            if(sym != WALI_EPSILON) {
+            if(sym != EPSILON) {
               word.append(NestedWord::Position(sym, trans_type));
             }
 					
@@ -213,30 +210,30 @@ namespace wali {
 		
         };
 
-      } // namespace wali::nwa::query::details
+      } // namespace query::details
 
 
       ref_ptr<NestedWord>
-      getSomeAcceptedWordInternal(wali::nwa::NWA const & nwa, WeightGen const & wg);
+      getSomeAcceptedWordInternal(NWA const & nwa, WeightGen const & wg);
 
       
       ref_ptr<NestedWord>
-      getSomeAcceptedWord(wali::nwa::NWA const & nwa)
+      getSomeAcceptedWord(NWA const & nwa)
       {
-        wali::nwa::ReachGen wg;
+        ReachGen wg;
         return getSomeAcceptedWordInternal(nwa, wg);
       }
 
 
       ref_ptr<NestedWord>
-      getSomeShortestAcceptedWord(wali::nwa::NWA const & nwa)
+      getSomeShortestAcceptedWord(NWA const & nwa)
       {
-        wali::nwa::ShortestWordGen wg;
+        ShortestWordGen wg;
         return getSomeAcceptedWordInternal(nwa, wg);
       }
       
       ref_ptr<NestedWord>
-      getSomeAcceptedWordInternal(wali::nwa::NWA const & nwa, WeightGen const & wg)
+      getSomeAcceptedWordInternal(NWA const & nwa, WeightGen const & wg)
       {
         if (nwa.sizeInitialStates() == 0) {
           return NULL;
@@ -248,7 +245,7 @@ namespace wali {
 
         conv.setWorklist(new TotalOrderWorklist());
 
-        wali::Key state = wali::nwa::nwa_pds::getProgramControlLocation();
+        wali::Key state = nwa_pds::getProgramControlLocation();
         wali::Key accept = wali::getKey("__accept");
 
         // Construct the query automaton
@@ -299,8 +296,7 @@ namespace wali {
         return NULL;
       }
 
-    } // namespace wali::nwa::query
-  }
+    } // namespace query
 }
 
 

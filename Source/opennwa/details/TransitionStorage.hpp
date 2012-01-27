@@ -19,10 +19,8 @@
 #include <set>
 #include <assert.h>
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace details
     {
     
@@ -31,7 +29,7 @@ namespace wali
      * This class is used to keep track of the transitions of an NWA.
      *
      */
-    class TransitionStorage : public Printable
+    class TransitionStorage : public wali::Printable
     {
       public:    
         typedef std::set<State> States;
@@ -1560,7 +1558,7 @@ namespace wali
       Info T_info;
     };
 
-    }
+
   }
 }
 #endif

@@ -10,18 +10,24 @@
 
 // ::wali
 #include "wali/Key.hpp"
+#include "wali/Common.hpp"
 #include "wali/ref_ptr.hpp"
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
+  using wali::ref_ptr;
+  
     /// Globally (within a process) unique ID of a state
     ///
-    typedef Key State;
+    typedef wali::Key State;
     /// Globally (within a process) unique ID of a symbol
     ///
-    typedef Key Symbol;
+    typedef wali::Key Symbol;
+
+  const Symbol EPSILON = wali::WALI_EPSILON;
+  const Symbol WILD = wali::WALI_WILD;
+
+  using wali::getKey;
 
 
     // Forward decl
@@ -52,7 +58,6 @@ namespace wali
     class ClientInfo;
 
     typedef ref_ptr<ClientInfo> ClientInfoRefPtr;
-  }
 }
 
 // Yo, Emacs!

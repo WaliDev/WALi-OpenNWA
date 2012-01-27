@@ -1,9 +1,9 @@
 #include "TransitionStorage.hpp"
 
-namespace wali
+using wali::printKey;
+
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace details
     {
     
@@ -103,14 +103,14 @@ namespace wali
       const Info::Internals & from = T_info.fromTrans(fromSt);
       for( Info::InternalIterator it = from.begin(); it != from.end(); it++ )
       {
-        if( toSt == getTarget(*it) && ( sym == getInternalSym(*it) || sym == wali::WALI_WILD ) )
+        if( toSt == getTarget(*it) && ( sym == getInternalSym(*it) || sym == WILD ) )
           return true;
       }
       //Check call transitions.
       const Info::Calls & call = T_info.callTrans(fromSt);
       for( Info::CallIterator it = call.begin(); it != call.end(); it++ )
       {
-        if( toSt == getEntry(*it) && ( sym == getCallSym(*it) || sym == wali::WALI_WILD ) )
+        if( toSt == getEntry(*it) && ( sym == getCallSym(*it) || sym == WILD ) )
         {
           return true;
         }
@@ -119,7 +119,7 @@ namespace wali
       const Info::Returns & exit = T_info.exitTrans(fromSt);
       for( Info::ReturnIterator it = exit.begin(); it != exit.end(); it++ )
       {
-        if( toSt == getReturnSite(*it) && ( sym == getReturnSym(*it) || sym == wali::WALI_WILD ) )
+        if( toSt == getReturnSite(*it) && ( sym == getReturnSym(*it) || sym == WILD ) )
         {
           return true;
         }
@@ -1662,7 +1662,7 @@ namespace wali
       return result;
     }
 
-    }
+
   }
 }
 

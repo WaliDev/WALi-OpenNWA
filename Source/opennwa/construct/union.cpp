@@ -3,10 +3,8 @@
 
 #include "opennwa/query/automaton.hpp"
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace construct
     {
 
@@ -68,7 +66,6 @@ namespace wali
         }
       }
 
-    }
   }
 }
 

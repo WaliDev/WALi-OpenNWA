@@ -5,8 +5,7 @@
 #include "query/calls.hpp"
 #include "query/returns.hpp"
 
-namespace wali {
-  namespace nwa {
+namespace opennwa {
 
     bool
     string_starts_with(std::string const & str, std::string const & prefix)
@@ -125,7 +124,7 @@ namespace wali {
         {
           call_inserter(*finalnwa, call_site, *entry);
           //finalnwa->addCallTrans(call_site, call_key, *entry);
-          //finalnwa->addInternalTrans(call_site, WALI_EPSILON, *entry);
+          //finalnwa->addInternalTrans(call_site, EPSILON, *entry);
         }
 
         // Now add the return transition(s)
@@ -134,7 +133,7 @@ namespace wali {
         {
           return_inserter(*finalnwa, *exit, call_site, return_site);
           //finalnwa->addReturnTrans(*exit, call_site, return_key, return_site);
-          //finalnwa->addInternalTrans(*exit, WALI_EPSILON, return_site);
+          //finalnwa->addInternalTrans(*exit, EPSILON, return_site);
         }
       }
 
@@ -159,7 +158,7 @@ namespace wali {
 
       return finalnwa;
     } // end assemble_nwa()
-  }
+
 }
 
 

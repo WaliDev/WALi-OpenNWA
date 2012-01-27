@@ -2,15 +2,17 @@
 
 #include <cstdlib>
 
-namespace wali {
-namespace nwa {
+using wali::printKey;
+
+namespace opennwa {
 namespace details {
+
 
 //Constructors
 SymbolStorage::SymbolStorage( )
 {
   //Epsilon is always a symbol of the NWA.
-  addSymbol( WALI_EPSILON );
+  addSymbol( EPSILON );
 }
 
 SymbolStorage::SymbolStorage( const SymbolStorage & other )
@@ -38,9 +40,9 @@ SymbolStorage & SymbolStorage::operator=( const SymbolStorage & other )
  * @return false if the symbol already exists, true otherwise
  *
  */
-bool SymbolStorage::addSymbol( Key sym )
+bool SymbolStorage::addSymbol( Sym sym )
 {
-  if (sym == wali::WALI_EPSILON || sym == wali::WALI_WILD) {
+  if (sym == EPSILON || sym == WILD) {
     return false;
   }
 
@@ -68,7 +70,7 @@ void SymbolStorage::addAllSymbols( SymbolStorage symSet )
  * @return false if the symbol does not exist, true otherwise
  *
  */
-bool SymbolStorage::removeSymbol( Key sym )
+bool SymbolStorage::removeSymbol( Sym sym )
 {
   size_t erased = symbols.erase(sym);
   return erased > 0;
@@ -113,7 +115,7 @@ std::ostream & SymbolStorage::print( std::ostream & o ) const
       o << ",\n  "; 
     }
 
-    if( *it == WALI_EPSILON )
+    if( *it == EPSILON )
       o << "Epsilon";
     else
       printKey(o,*it);
@@ -396,7 +398,7 @@ std::ostream & Label::print( std::ostream & o, const SymbolStorage & symbolPool 
         first = false;
       }
 
-      if( *it == WALI_EPSILON )
+      if( *it == EPSILON )
         o << "Epsilon";
       else
         printKey(o,*it);
@@ -501,5 +503,4 @@ const std::set<Label::Sym> Label::getSymbolsNotIn( const SymbolStorage & symbolP
 }
 
 } // namespace details
-} // namespace nwa
-} // namespace wali
+} // namespace opennwa

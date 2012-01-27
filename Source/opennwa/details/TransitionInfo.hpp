@@ -18,10 +18,8 @@
 #include <map> 
 #include <set>
  
-namespace wali
+namespace opennwa
 { 
-  namespace nwa
-  {
     namespace details
     {
       
@@ -34,13 +32,13 @@ namespace wali
     {    
       public:
 
-        typedef Triple<State,Symbol,State> Internal;
-        typedef Triple<State,Symbol,State> Call;
-        typedef Quad<State,State,Symbol,State> Return;
+        typedef wali::Triple<State,Symbol,State> Internal;
+        typedef wali::Triple<State,Symbol,State> Call;
+        typedef wali::Quad<State,State,Symbol,State> Return;
 
-        typedef Triple<State,Label,State> Int;
-        typedef Triple<State,Label,State> Cal;
-        typedef Quad<State,State,Label,State> Ret;
+        typedef wali::Triple<State,Label,State> Int;
+        typedef wali::Triple<State,Label,State> Cal;
+        typedef wali::Quad<State,State,Label,State> Ret;
 
         typedef std::set<Internal> Internals;
         DEPRECATE("Use capitalized version (InternalIterator), not that you shoud be using the one from this class in the first place.")
@@ -1129,7 +1127,7 @@ namespace wali
       RetMap ret_RTrans;
     };
 
-    }
+
   }
 }
 #endif

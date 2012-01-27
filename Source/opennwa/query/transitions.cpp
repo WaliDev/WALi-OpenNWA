@@ -2,10 +2,8 @@
 #include "opennwa/query/transitions.hpp"
 #include "opennwa/details/TransitionStorage.hpp"
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace query
     {
       typedef details::TransitionStorage Trans;
@@ -40,7 +38,7 @@ namespace wali
       assert(from < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       return trans.getSymbol(from,to,sym);
     }
 
@@ -62,7 +60,7 @@ namespace wali
       assert(sym < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
       
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       return trans.findTrans(from,sym,to);
     }
 
@@ -81,7 +79,7 @@ namespace wali
       assert(source < wali::WALI_BAD_KEY);
       assert(target < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       std::set<Symbol> syms;
 
@@ -122,7 +120,7 @@ namespace wali
     {
       assert(source < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       std::set<Symbol> syms;
 
@@ -160,7 +158,7 @@ namespace wali
     {
       assert(target < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       std::set<Symbol> syms;
 
@@ -198,7 +196,7 @@ namespace wali
     {
       assert(state < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
        
       std::set<Call> const & calls = trans.getTransEntry(state);
       for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
@@ -246,7 +244,7 @@ namespace wali
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       std::set<Call> const & calls = trans.getTransEntry(state);
       for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
@@ -296,7 +294,7 @@ namespace wali
     {
       assert(state < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
        
       std::set<Call> const & calls = trans.getTransCall(state);
       for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
@@ -344,7 +342,7 @@ namespace wali
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       std::set<Call> const & calls = trans.getTransCall(state);
       for( CallIterator cit = calls.begin(); cit != calls.end(); cit++ )
@@ -398,7 +396,7 @@ namespace wali
       assert(call < wali::WALI_BAD_KEY);
       assert(ret < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       std::set<Symbol> syms;
 
@@ -427,7 +425,7 @@ namespace wali
     {
       assert(call < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       std::set<Symbol> syms;
 
@@ -455,7 +453,7 @@ namespace wali
     {
       assert(ret < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       std::set<Symbol> syms;
 
@@ -481,7 +479,7 @@ namespace wali
     {
       assert(state < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       
       std::set<Return> const & returns = trans.getTransRet(state);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
@@ -523,7 +521,7 @@ namespace wali
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       std::set<Return> const & returns = trans.getTransRet(state);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
@@ -563,7 +561,7 @@ namespace wali
     {
       assert(state < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       
       std::set<Return> const & returns = trans.getTransPred(state);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
@@ -603,7 +601,7 @@ namespace wali
       assert(state < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       
       std::set<Return> const & returns = trans.getTransPred(state);
       for( ReturnIterator rit = returns.begin(); rit != returns.end(); rit++ )
@@ -631,7 +629,6 @@ namespace wali
     }
 
 
-    }
   }
 }
 

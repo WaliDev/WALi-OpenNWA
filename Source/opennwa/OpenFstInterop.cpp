@@ -14,8 +14,7 @@ using fst::StdFst;
 using fst::StdExpandedFst;
 using fst::StdMutableFst;
 
-namespace wali {
-  namespace nwa {
+namespace opennwa {
         
     Key
     get_wali_key(FstKey fstkey, fst_wali_key_maps const & maps)
@@ -48,7 +47,7 @@ namespace wali {
     StdVectorFst
     internal_only_nwa_to_fst(NWARefPtr nwa, fst_wali_key_maps * maps)
     {
-      assert(WALI_EPSILON == 0);
+      assert(EPSILON == 0);
             
       StdVectorFst retFst;
             
@@ -150,7 +149,7 @@ namespace wali {
             
 
             
-      assert(WALI_EPSILON == 0);
+      assert(EPSILON == 0);
             
       NWARefPtr nwa = new NWA();
             
@@ -277,7 +276,6 @@ namespace wali {
     }
 
 
-  }
 }
 
 

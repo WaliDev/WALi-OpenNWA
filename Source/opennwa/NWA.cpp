@@ -9,11 +9,11 @@
 #include "opennwa/query/internals.hpp"
 #include "opennwa/nwa_pds/conversions.hpp"
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     using wali::wpds::WPDS;
+  using wali::printKey;
+  using wali::key2str;
     
     const std::string NWA::XMLTag = "XML";
       
@@ -459,7 +459,7 @@ namespace wali
     {
       assert(sym < wali::WALI_BAD_KEY);
 
-      if( sym == WALI_WILD || sym == WALI_EPSILON )
+      if( sym == WILD || sym == EPSILON )
         return false;
 
       bool removed = symbols.removeSymbol(sym);
@@ -538,10 +538,10 @@ namespace wali
     
     void NWA::realizeImplicitTrans(State stuck)
     {
-      std::set<Triple<State, Symbol, State> > returns;
+      std::set<wali::Triple<State, Symbol, State> > returns;
       for( ReturnIterator ret = beginReturnTrans(); ret != endReturnTrans(); ++ret) 
       {
-        returns.insert(Triple<State, Symbol, State>(ret->first, ret->second, ret->third));
+        returns.insert(wali::Triple<State, Symbol, State>(ret->first, ret->second, ret->third));
       }
 
       // For every state
@@ -564,31 +564,31 @@ namespace wali
 
           // Skip over epsilons. (A) they are handled in other places and
           // (B) there's no implicit epsilon transitions to stuck anyway.
-          if( symbol == WALI_EPSILON )
+          if( symbol == EPSILON )
           {
             continue;
           }
 
           //Skip over wilds.
-          if( symbol == WALI_WILD )
+          if( symbol == WILD )
           {
             continue;
           }
 
-          if( !trans.callExists(state, symbol) && !trans.callExists(state, WALI_WILD) )
+          if( !trans.callExists(state, symbol) && !trans.callExists(state, WILD) )
           {
             addCallTrans(state, symbol, stuck);
           }
 
-          if( !trans.internalExists(state, symbol) && !trans.internalExists(state, WALI_WILD) )
+          if( !trans.internalExists(state, symbol) && !trans.internalExists(state, WILD) )
           {
             addInternalTrans(state, symbol, stuck);
           }
 
           for( StateIterator pred = beginStates(); pred != endStates(); ++pred )
           {
-            if( returns.find(Triple<State,Symbol,State>(state, *pred, symbol)) == returns.end() 
-                && returns.find(Triple<State,Symbol,State>(state, *pred, WALI_WILD)) == returns.end() )
+            if( returns.find(wali::Triple<State,Symbol,State>(state, *pred, symbol)) == returns.end() 
+                && returns.find(wali::Triple<State,Symbol,State>(state, *pred, WILD)) == returns.end() )
             {
               addReturnTrans(state, *pred, symbol, stuck);
             }
@@ -641,7 +641,7 @@ namespace wali
       assert(sym < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
 
-      assert(sym != WALI_EPSILON ); //An Epsilon symbol on a call doesn't make sense.
+      assert(sym != EPSILON ); //An Epsilon symbol on a call doesn't make sense.
 
       //Add the states and symbol of this transition to the appropriate sets.
       addState(from);
@@ -666,7 +666,7 @@ namespace wali
       assert(Trans::getCallSym(ct) < wali::WALI_BAD_KEY);
       assert(Trans::getEntry(ct) < wali::WALI_BAD_KEY);
 
-      assert( Trans::getCallSym(ct) != WALI_EPSILON ); //An Epsilon symbol on a call doesn't make sense.
+      assert( Trans::getCallSym(ct) != EPSILON ); //An Epsilon symbol on a call doesn't make sense.
 
       //Add the states and symbol of this transition to the appropriate sets.
       addState(Trans::getCallSite(ct));
@@ -693,7 +693,7 @@ namespace wali
       assert(sym < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
 
-      if(! isState(from) || ! isSymbol(sym) || ! isState(to) || sym == WALI_EPSILON )
+      if(! isState(from) || ! isSymbol(sym) || ! isState(to) || sym == EPSILON )
         return false;
 
       return trans.removeCall(from,sym,to);
@@ -717,7 +717,7 @@ namespace wali
       if(! isState(Trans::getCallSite(ct))
          || ! isSymbol(Trans::getCallSym(ct))
          || ! isState(Trans::getEntry(ct)) 
-         || Trans::getCallSym(ct) == WALI_EPSILON )
+         || Trans::getCallSym(ct) == EPSILON )
         return false;
 
       return trans.removeCall(ct);
@@ -806,7 +806,7 @@ namespace wali
       assert(to < wali::WALI_BAD_KEY);
 
       if(! isState(from)
-         || (! isSymbol(sym) && sym != WALI_EPSILON && sym != WALI_WILD)
+         || (! isSymbol(sym) && sym != EPSILON && sym != WILD)
          || ! isState(to) )
         return false;
 
@@ -871,7 +871,7 @@ namespace wali
       assert(sym < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
 
-      assert( sym != WALI_EPSILON ); //An Epsilon symbol on a return doesn't make sense.
+      assert( sym != EPSILON ); //An Epsilon symbol on a return doesn't make sense.
 
       //Add the states and symbol of this transition to the approprite stes.
       addState(from);
@@ -898,7 +898,7 @@ namespace wali
       assert(Trans::getReturnSym(rt) < wali::WALI_BAD_KEY);
       assert(Trans::getReturnSite(rt) < wali::WALI_BAD_KEY);
 
-      assert( Trans::getReturnSym(rt) != WALI_EPSILON ); //An Epsilon symbol on a return doesn't make sense.
+      assert( Trans::getReturnSym(rt) != EPSILON ); //An Epsilon symbol on a return doesn't make sense.
 
       //Add the states and symbol of this transition to the appropriate sets.
       addState(Trans::getExit(rt));
@@ -926,7 +926,7 @@ namespace wali
       assert(sym < wali::WALI_BAD_KEY);
       assert(to < wali::WALI_BAD_KEY);
 
-      if(! isState(from) || ! isSymbol(sym) || ! isState(to) ||  sym == WALI_EPSILON )
+      if(! isState(from) || ! isSymbol(sym) || ! isState(to) ||  sym == EPSILON )
         return false;
      
       bool removed = false;
@@ -960,7 +960,7 @@ namespace wali
       assert(to < wali::WALI_BAD_KEY);
 
       if(! isState(from) || ! isState(pred) || ! isSymbol(sym) || ! isState(to) 
-         || sym == WALI_EPSILON )
+         || sym == EPSILON )
         return false;
 
       return trans.removeReturn(from,pred,sym,to);
@@ -986,7 +986,7 @@ namespace wali
          || ! isState(Trans::getCallSite(rt))
          || ! isSymbol(Trans::getReturnSym(rt))
          || ! isState(Trans::getReturnSite(rt)) 
-         || Trans::getReturnSym(rt) == WALI_EPSILON )
+         || Trans::getReturnSym(rt) == EPSILON )
         return false;
 
       return trans.removeReturn(rt);
@@ -1274,7 +1274,7 @@ namespace wali
       //An NWA is not deterministic if there are epsilon transitions. 
       for( InternalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
       {
-        if( Trans::getInternalSym(*iit) == WALI_EPSILON ) {
+        if( Trans::getInternalSym(*iit) == EPSILON ) {
           //std::cout << "There are epsilon transitions";
           return false;
         }
@@ -1293,13 +1293,13 @@ namespace wali
           bool wild = false;
           for( CallIterator cit = trans.beginCall(); cit != trans.endCall(); cit++ )
           {
-            if( wild && cit->first == *sit && Trans::getCallSym(*cit) == WALI_WILD ) {
+            if( wild && cit->first == *sit && Trans::getCallSym(*cit) == WILD ) {
               // Two wild transitions from the same site
               return false;
             }
             
             //Wild symbol 
-            if( cit->first == *sit && Trans::getCallSym(*cit) == WALI_WILD )
+            if( cit->first == *sit && Trans::getCallSym(*cit) == WILD )
               wild = true;  
 
             //Keep a count of multiple transitions with the same from
@@ -1323,12 +1323,12 @@ namespace wali
           for( InternalIterator iit = trans.beginInternal(); iit != trans.endInternal(); iit++ )
           {
             //Wild symbol
-            if( wild && iit->first == *sit && Trans::getInternalSym(*iit) == WALI_WILD ) {
+            if( wild && iit->first == *sit && Trans::getInternalSym(*iit) == WILD ) {
               // Two wild transitions from the same state
               return false;
             }
             
-            if( iit->first == *sit && Trans::getInternalSym(*iit) == WALI_WILD ) {
+            if( iit->first == *sit && Trans::getInternalSym(*iit) == WILD ) {
               //std::cout << "Found internal from " << key2str(iit->first) << " to "
               //          << key2str(iit->third) << " on " << key2str(iit->second) << "\n";
               wild = true;
@@ -1362,14 +1362,14 @@ namespace wali
               if( wild
                   && rit->first == *sit
                   && rit->second == *pit
-                  && Trans::getReturnSym(*rit) == WALI_WILD )
+                  && Trans::getReturnSym(*rit) == WILD )
               {
                 return false;
               }
               
               if( rit->first == *sit
                   && rit->second == *pit
-                  && Trans::getReturnSym(*rit) == WALI_WILD )
+                  && Trans::getReturnSym(*rit) == WILD )
               {
                 wild = true;
               }
@@ -1543,15 +1543,15 @@ namespace wali
       //      given symbols are compatible and set result to the appropriate symbol.
 
       //Epsilons are treated separately in the algorithms, so epsilons match nothing.
-      if( sym1 == WALI_EPSILON || sym2 == WALI_EPSILON )
+      if( sym1 == EPSILON || sym2 == EPSILON )
         return false;
       //Wild symbols match everything.
-      if( sym1 == WALI_WILD )
+      if( sym1 == WILD )
       {
         resSym = sym2;
         return true;
       }
-      if( sym2 == WALI_WILD )
+      if( sym2 == WILD )
       {
         resSym = sym1;
         return true;
@@ -1576,7 +1576,7 @@ namespace wali
      */
     
     void NWA::mergeClientInfo( NWA const & first, 
-                               relations::RelationTypedefs<State>::BinaryRelation const & binRel, 
+                               wali::relations::RelationTypedefs<State>::BinaryRelation const & binRel, 
                                State resSt, ClientInfoRefPtr & resCI )
     {
       (void) first, (void) binRel, (void) resSt, (void) resCI;
@@ -1600,8 +1600,8 @@ namespace wali
      */
     
     void NWA::mergeClientInfoCall( NWA const & nwa, 
-                                   relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
-                                   relations::RelationTypedefs<State>::BinaryRelation const & binRelEntry,
+                                   wali::relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
+                                   wali::relations::RelationTypedefs<State>::BinaryRelation const & binRelEntry,
                                    State callSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI )
     {
       (void) nwa, (void) binRelCall, (void) binRelEntry, (void) callSt;
@@ -1626,8 +1626,8 @@ namespace wali
      */
     
     void NWA::mergeClientInfoInternal( NWA const & nwa, 
-                                       relations::RelationTypedefs<State>::BinaryRelation const & binRelSource, 
-                                       relations::RelationTypedefs<State>::BinaryRelation const & binRelTarget,
+                                       wali::relations::RelationTypedefs<State>::BinaryRelation const & binRelSource, 
+                                       wali::relations::RelationTypedefs<State>::BinaryRelation const & binRelTarget,
                                        State sourceSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI )
     {
       (void) nwa, (void) binRelSource, (void) binRelTarget, (void) sourceSt;
@@ -1654,9 +1654,9 @@ namespace wali
      */
     
     void NWA::mergeClientInfoReturn( NWA const & nwa, 
-                                     relations::RelationTypedefs<State>::BinaryRelation const & binRelExit,
-                                     relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
-                                     relations::RelationTypedefs<State>::BinaryRelation const & binRelReturn,
+                                     wali::relations::RelationTypedefs<State>::BinaryRelation const & binRelExit,
+                                     wali::relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
+                                     wali::relations::RelationTypedefs<State>::BinaryRelation const & binRelReturn,
                                      State exitSt, State callSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI )
     {
       (void) nwa, (void) binRelExit, (void) binRelCall, (void) binRelReturn;
@@ -1704,7 +1704,7 @@ namespace wali
       //initial state of the NWA.
       wali::wfa::WFA initials;
       //Set up initial state.
-      wali::Key init = wali::nwa::nwa_pds::getProgramControlLocation();
+      wali::Key init = nwa_pds::getProgramControlLocation();
       initials.addState(init,wgts.zero());
       initials.setInitialState(init);
       //Set up final state.
@@ -1809,9 +1809,9 @@ namespace wali
      *
      */
     
-    wfa::WFA NWA::prestar( wfa::WFA const & input,
+    wali::wfa::WFA NWA::prestar( wali::wfa::WFA const & input,
                            WeightGen const & wg,
-                           ref_ptr< Worklist<wfa::ITrans> > worklist) const
+                           ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const
     {
       WPDS wpds = nwa_pds::NwaToWpdsCalls(*this, wg);
       if (worklist != NULL) {
@@ -1833,10 +1833,10 @@ namespace wali
      *
      */
     
-    void NWA::prestar( wfa::WFA const & input,
-                       wfa::WFA & output,
+    void NWA::prestar( wali::wfa::WFA const & input,
+                       wali::wfa::WFA & output,
                        WeightGen const & wg,
-                       ref_ptr< Worklist<wfa::ITrans> > worklist) const
+                       ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const
     {
       WPDS wpds = nwa_pds::NwaToWpdsCalls(*this, wg);
       if (worklist != NULL) {
@@ -1855,9 +1855,9 @@ namespace wali
      *
      */
     
-    wfa::WFA NWA::poststar( wfa::WFA const & input,
+    wali::wfa::WFA NWA::poststar( wali::wfa::WFA const & input,
                             WeightGen const & wg,
-                            ref_ptr< Worklist<wfa::ITrans> > worklist) const
+                            ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const
     {
       WPDS wpds = nwa_pds::NwaToWpdsCalls(*this, wg);
       if (worklist != NULL) {
@@ -1879,10 +1879,10 @@ namespace wali
      *
      */
     
-    void NWA::poststar( wfa::WFA const & input,
-                        wfa::WFA & output,
+    void NWA::poststar( wali::wfa::WFA const & input,
+                        wali::wfa::WFA & output,
                         WeightGen const & wg,
-                        ref_ptr< Worklist<wfa::ITrans> > worklist) const
+                        ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const
     {
       WPDS wpds = nwa_pds::NwaToWpdsCalls(*this, wg);
       if (worklist != NULL) {
@@ -2059,7 +2059,7 @@ namespace wali
     //TODO: add methods like ...
     //virtual void for_each(ConstRuleFunctor &func) const;
     //virtual void for_each(RuleFunctor &func) const;
-    //virtual void operator()(wfa::ITrans *t);
+    //virtual void operator()(wali::wfa::ITrans *t);
 
     /**
      *
@@ -2334,7 +2334,7 @@ namespace wali
     void NWA::epsilonClosure( StateSet * newPairs, State st ) const
     {
       //compute the states reachable from st via epsilon transitions
-      Internals reachable = trans.getInternals(st,WALI_EPSILON);
+      Internals reachable = trans.getInternals(st,EPSILON);
       for(  Internals::iterator it = reachable.begin(); it != reachable.end(); it++ )
       {
         State newSt = Trans::getTarget(*it);
@@ -2368,7 +2368,7 @@ namespace wali
       //Compute the cross produce of all states reachable from sp via epsilon transitions.
 
       //Explore epsilon transitions reachable from the first component of sp.
-      Internals reachable = first.trans.getInternals(sp.first, WALI_EPSILON);
+      Internals reachable = first.trans.getInternals(sp.first, EPSILON);
       for(  Internals::iterator it = reachable.begin(); it != reachable.end(); it++ )
       {
         StatePair newSP = StatePair(Trans::getTarget(*it),sp.second);
@@ -2383,7 +2383,7 @@ namespace wali
       }
 
       //Explore epsilon transitions reachable from the second component of sp.
-      reachable = second.trans.getInternals(sp.second, WALI_EPSILON);
+      reachable = second.trans.getInternals(sp.second, EPSILON);
       for(  Internals::iterator it = reachable.begin(); it != reachable.end(); it++ )
       {
         StatePair newSP = StatePair(sp.first,Trans::getTarget(*it));
@@ -2464,9 +2464,9 @@ namespace wali
     }
 
     bool
-    NWA::isMemberNondet( ::wali::nwa::NestedWord const & word ) const
+    NWA::isMemberNondet( NestedWord const & word ) const
     {
-      typedef ::wali::nwa::details::Configuration Configuration;
+      typedef details::Configuration Configuration;
       
       std::set<Configuration> nextConfigs;
       for(StateIterator iter = beginInitialStates(); iter!=endInitialStates(); ++iter) {
@@ -2624,7 +2624,6 @@ namespace wali
       return false;
     }
 
-  }
 }
 
 

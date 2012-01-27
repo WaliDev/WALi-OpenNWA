@@ -5,10 +5,8 @@
 
 #include "opennwa/query/calls.hpp"
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace construct
     {
       
@@ -81,7 +79,7 @@ namespace wali
           for( NWA::StateIterator sit = second.beginInitialStates();
                sit != second.endInitialStates(); sit++ )
           {
-            out.addInternalTrans(*fit, WALI_EPSILON, *sit);
+            out.addInternalTrans(*fit, EPSILON, *sit);
           }
         }
 
@@ -110,7 +108,6 @@ namespace wali
       }
 
       
-    }
   }
 }
 

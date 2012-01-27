@@ -4,15 +4,13 @@
 #include "opennwa/traverse/StateFunctor.hpp"
 #include "opennwa/traverse/TransitionFunctor.hpp"
 
-namespace wali {
-  namespace nwa {
+namespace opennwa {
     namespace traverse {
 
       void dfsCallStringTraversal(NWA const & nwa,
                                   ConstCallStringStateFunctor * state_functor,
                                   ConstCallStringTransitionFunctor * trans_functor);
         
-    }
   }
 }
 

@@ -6,6 +6,7 @@
  */
 
 #include "opennwa/deprecate.h"
+#include "opennwa/NWAFwd.hpp"
 
 // ::wali
 #include "wali/Printable.hpp"
@@ -15,17 +16,15 @@
 // ::std
 #include <assert.h>
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace details
     {
       
-    class SymbolStorage : public Printable
+    class SymbolStorage : public wali::Printable
     { 
       public:
-        typedef Key Sym;
+        typedef Symbol Sym;
         typedef std::set<Sym>::const_iterator const_iterator;
 
         static std::string const & XMLSymbolTag() {
@@ -240,7 +239,7 @@ namespace wali
       symbols.clear();
 
       // Epsilon is always a symbol of the NWA.
-      addSymbol( WALI_EPSILON );
+      addSymbol( EPSILON );
     }
 
     //Utilities
@@ -292,7 +291,7 @@ namespace wali
     class Label
     {
       public:
-        typedef Key Sym;
+        typedef Symbol Sym;
         typedef std::set<Sym>::const_iterator const_iterator;
        
       //
@@ -600,7 +599,7 @@ namespace wali
         return (symbolPool.sizeSymbols() - syms.size());
     }
 
-    }
+
   }
 }
 #endif

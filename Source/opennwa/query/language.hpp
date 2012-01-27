@@ -4,8 +4,7 @@
 #include "opennwa/NWAFwd.hpp"
 #include "opennwa/NestedWord.hpp"
 
-namespace wali {
-  namespace nwa {
+namespace opennwa {
     namespace query {
 
       /// @brief Determines whether word is in the language of the given NWA.
@@ -75,7 +74,6 @@ namespace wali {
       bool
       languageEquals(NWA const & first, NWA const & second);
       
-    }
   }
 }
 

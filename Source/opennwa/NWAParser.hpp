@@ -5,8 +5,7 @@
 #include <string>
 #include "NWA.hpp"
 
-namespace wali {
-  namespace nwa {
+namespace opennwa {
 
     /// Reads a single NWA from 'is'. If 'name' is nonnull and the
     /// stream specifies a name, store the NWA's name at the location
@@ -26,7 +25,7 @@ namespace wali {
     /// Run NWA Parser unit tests
     ///
     extern void parser_test_all();
-  }
+
 }
 
 

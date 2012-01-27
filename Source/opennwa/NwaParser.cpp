@@ -47,7 +47,7 @@
 // token ::=  ~(' ' | ',(')+
 //   with balenced ( )
 
-namespace wali { namespace nwa { namespace parser { namespace details {
+namespace opennwa { namespace parser { namespace details {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// DISCARDWS
@@ -253,7 +253,7 @@ namespace wali { namespace nwa { namespace parser { namespace details {
         using wali::getKey;
         using wali::make_triple;
         using wali::make_quad;
-        using wali::nwa::NWARefPtr;
+        using opennwa::NWARefPtr;
 
         KeyTriple
         read_triple(std::istream & is)
@@ -555,7 +555,7 @@ namespace wali { namespace nwa { namespace parser { namespace details {
         }
 
 
-      }}}}
+      }}}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// READ_NWA
@@ -566,8 +566,7 @@ namespace wali { namespace nwa { namespace parser { namespace details {
 ///
 /// Reads in an nwa-description
 
-namespace wali {
-  namespace nwa {
+namespace opennwa {
     using namespace parser::details;
 
     NWARefPtr
@@ -630,8 +629,7 @@ namespace wali {
       return procs;
     }
 
-  } // namespace nwa
-} // namespace wali
+} // namespace opennwa
 
 // Yo, Emacs!
 // Local Variables:

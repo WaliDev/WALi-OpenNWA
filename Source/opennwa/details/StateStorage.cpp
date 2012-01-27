@@ -5,10 +5,10 @@
 // ::wali
 #include "StateStorage.hpp"
 
-namespace wali
+using wali::printKey;
+
+namespace opennwa
 {
-  namespace nwa
-  {
 
     namespace details
     {
@@ -616,7 +616,7 @@ namespace wali
         addFinalState(dup);
     }
 
-    }
+
   }
 }
 

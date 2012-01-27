@@ -5,8 +5,7 @@
 
 #include "opennwa/NWA.hpp"
 
-namespace wali {
-  namespace nwa {
+namespace opennwa {
 
     /// Structure for holding Wali keys. (Introduced to increase type
     /// safety between Wali and OpenFST keys, to decrease the chance
@@ -72,7 +71,7 @@ namespace wali {
     /// converting it back.)
     NWARefPtr
     determinize_internal_nwa(NWARefPtr internal_nwa, std::string node_prefix = "");
-  }
+
 }
 
 

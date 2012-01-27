@@ -1,10 +1,9 @@
 #include "opennwa/NWA.hpp"
 #include "opennwa/construct/star.hpp"
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
+
     namespace construct
     {
 
@@ -20,7 +19,8 @@ namespace wali
         return nwa;
       }
       
-    }
+    } // end of 'namespace construct' !!!
+  
     
     /**
      *
@@ -79,15 +79,15 @@ namespace wali
       for( StateIterator sit = first.beginInitialStates(); sit != first.endInitialStates(); sit++ ) {
         State target = getKey(*sit, prime);
         // INTERNAL (inference rule in TR)
-        addInternalTrans(newStart, WALI_EPSILON, target);
+        addInternalTrans(newStart, EPSILON, target);
       }
       for( StateIterator sit = first.beginFinalStates(); sit != first.endFinalStates(); sit++ ) {
         State f = *sit;
         State fp = getKey(*sit, prime);
 
         // RESTART (inference rule in TR)
-        addInternalTrans(f, WALI_EPSILON, newStart);
-        addInternalTrans(fp, WALI_EPSILON, newStart);
+        addInternalTrans(f, EPSILON, newStart);
+        addInternalTrans(fp, EPSILON, newStart);
       }
       
 
@@ -182,7 +182,6 @@ namespace wali
     }
 
       
-  }
 }
 
 

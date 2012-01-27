@@ -1,13 +1,15 @@
 #include "opennwa/NWA.hpp"
 #include "opennwa/nwa_pds/conversions.hpp"
 
-namespace wali
+using wali::wpds::WPDS;
+using wali::wpds::Rule;
+using wali::wpds::WpdsRules;
+
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace nwa_pds
     {
-      NWARefPtr WpdsToNwa( const wpds::WPDS & pds )
+      NWARefPtr WpdsToNwa( const WPDS & pds )
       {
         NWARefPtr nwa(new NWA());
         WpdsToNwa(*nwa, pds);
@@ -15,7 +17,7 @@ namespace wali
       }
 
       
-      void WpdsToNwa( NWA & nwa, const wpds::WPDS & pds )
+      void WpdsToNwa( NWA & nwa, const WPDS & pds )
       {
         //TODO: check this!
 
@@ -23,13 +25,13 @@ namespace wali
 
         std::map<State,State> call_return;
 
-        wpds::WpdsRules rules = wpds::WpdsRules();
+        WpdsRules rules = WpdsRules(); //FIXME
         pds.for_each(rules);
 
         //Step Rules:
         // For each <p,n_1> -w-> <p',n_2> in delta_1,
         // add ((p,n_1), n_1, (p',n_2)) to delta_i
-        for( std::set<wpds::Rule>::iterator it = rules.stepRules.begin();
+        for( std::set<Rule>::iterator it = rules.stepRules.begin();
              it != rules.stepRules.end(); it++ )
         {
           nwa.addInternalTrans(getKey(it->from_state(),it->from_stack()), //from
@@ -41,7 +43,7 @@ namespace wali
         // For each <p,n_c> -w-> <p',e r_c> in delta_2,
         // add ((p,n_c), n_c, (p',e)) to delta_c, and
         // add (p,n_c) => r_c to the call-return map 
-        for( std::set<wpds::Rule>::iterator it = rules.pushRules.begin();
+        for( std::set<Rule>::iterator it = rules.pushRules.begin();
              it != rules.pushRules.end(); it++ )
         {
           nwa.addCallTrans(getKey(it->from_state(),it->from_stack()),   //from
@@ -57,7 +59,7 @@ namespace wali
         // For each <p,x> -w-> <p',*> in delta_0 and
         //          (p'',n_c) => r_c in the call-return map,
         // add ((p,x),(p'',n_c),x,(p',r)) to delta_r 
-        for( std::set<wpds::Rule>::iterator it = rules.popRules.begin();
+        for( std::set<Rule>::iterator it = rules.popRules.begin();
              it != rules.popRules.end(); it++ )
         {
           for( std::map<State,State>::iterator cr_it = call_return.begin();
@@ -73,7 +75,6 @@ namespace wali
 
       
 
-    }
   }
 }
 

@@ -5,8 +5,7 @@
 
 #include "opennwa/NWAFwd.hpp"
 
-namespace wali {
-  namespace nwa {
+namespace opennwa {
     namespace traverse {
 
       class ConstStateFunctor
@@ -31,7 +30,6 @@ namespace wali {
         virtual void operator() (NWA const & nwa, CallString const & cs, State state) = 0;
       };
       
-    }
   }
 }
 

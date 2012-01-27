@@ -4,18 +4,19 @@
 #include "opennwa/NWA.hpp"
 #include "opennwa/nwa_pds/plusWpds.hpp"
 
+using wali::wpds::WPDS;
+using wali::wpds::Rule;
+using wali::wpds::WpdsRules;
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace nwa_pds
     {
 
-      wpds::WPDS
-      plusWpds( NWA const & nwa, const wpds::WPDS & base )
+      WPDS
+      plusWpds( NWA const & nwa, const WPDS & base )
       {
-        typedef wali::nwa::details::TransitionStorage Trans;
+        typedef ::opennwa::details::TransitionStorage Trans;
       
         //Q: do implicit transitions to the stuck state affect this result?
         //A: it changes the states that are reachable
@@ -28,14 +29,14 @@ namespace wali
       
         copy.realizeImplicitTrans(stuck);
 
-        wpds::WPDS result;
+        WPDS result;
 
-        wpds::WpdsRules rules = wpds::WpdsRules();
+        WpdsRules rules = WpdsRules(); //FIXME
 
         base.for_each(rules);
 
         //Step Rules:
-        for(  std::set<wpds::Rule>::iterator it = rules.stepRules.begin();
+        for(  std::set<Rule>::iterator it = rules.stepRules.begin();
               it != rules.stepRules.end(); it++ )
         {
           //<p,n_1> -w-> <p',n_2> in delta_1, (q,n_1,q') in delta_i
@@ -55,7 +56,7 @@ namespace wali
         }
 
         //Call Rules:
-        for(  std::set<wpds::Rule>::iterator it = rules.pushRules.begin();
+        for(  std::set<Rule>::iterator it = rules.pushRules.begin();
               it != rules.pushRules.end(); it++ )
         {
           //<p,n_c> -w-> <p',e r_c> in delta_3, (q_c,n_c,q) in delta_c
@@ -76,7 +77,7 @@ namespace wali
         }
 
         //Return Rules:
-        for( std::set<wpds::Rule>::iterator it = rules.popRules.begin();
+        for( std::set<Rule>::iterator it = rules.popRules.begin();
              it != rules.popRules.end(); it++ )
         {
           //<p,x> -w-> <p',*> in delta_0, (q_r,q_c,x,q) in delta_r
@@ -92,7 +93,7 @@ namespace wali
               Key to = getKey(it->to_state(),getKey(Trans::getExit(*rit),sym));
               result.add_rule(from,sym,to,it->weight());
               //For all r_c in delta_2
-              for( std::set<wpds::Rule>::iterator dit = rules.pushRules.begin();
+              for( std::set<Rule>::iterator dit = rules.pushRules.begin();
                    dit != rules.pushRules.end(); dit++ )
               {
                 //<(p',q_r^x),(r_c,q_c)> -1-> <(p',q),r_c>
@@ -107,7 +108,7 @@ namespace wali
         return result;
       }
 
-    }
+
   }
 }
 

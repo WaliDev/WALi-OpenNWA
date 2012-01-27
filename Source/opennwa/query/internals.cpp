@@ -1,10 +1,8 @@
 #include "opennwa/NWA.hpp"
 #include "opennwa/query/internals.hpp"
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace query
     {
       typedef details::TransitionStorage Trans;
@@ -34,7 +32,7 @@ namespace wali
     {
       assert(symbol < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       const Internals & src = trans.getInternals();
       StateSet sources;
@@ -63,7 +61,7 @@ namespace wali
       assert(target < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       const Internals & src = trans.getTransTo(target);
       StateSet sources;
@@ -91,7 +89,7 @@ namespace wali
     {
       assert(target < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       const Internals & src = trans.getTransTo(target);
       std::set<std::pair<Symbol,State> > sources;
@@ -112,7 +110,7 @@ namespace wali
 	
     const std::set< State> getSources(NWA const & nwa)
     {
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       const Internals & src = trans.getInternals();
       StateSet sources;
       for( InternalIterator it = src.begin(); it != src.end(); it++ )
@@ -132,7 +130,7 @@ namespace wali
     
     const std::set< Symbol> getInternalSym(NWA const & nwa)
     {
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       const Internals & ints = trans.getInternals();
       std::set<Symbol> syms;
       for( InternalIterator it = ints.begin(); it != ints.end(); it++ )
@@ -156,7 +154,7 @@ namespace wali
     
     const std::set< Symbol> getInternalSym(NWA const & nwa, State source, State target )
     {
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       const Internals & ints = trans.getTransFrom(source);
       std::set<Symbol> syms;
       for( InternalIterator it = ints.begin(); it != ints.end(); it++ )
@@ -180,7 +178,7 @@ namespace wali
     
     const std::set< Symbol> getInternalSym_Source(NWA const & nwa, State source )
     {
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       const Internals & ints = trans.getTransFrom(source);
       std::set<Symbol> syms;
       for( InternalIterator it = ints.begin(); it != ints.end(); it++ )
@@ -203,7 +201,7 @@ namespace wali
     
     const std::set< Symbol> getInternalSym_Target(NWA const & nwa, State target )
     {
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       const Internals & ints = trans.getTransTo(target);
       std::set<Symbol> syms;
       for( InternalIterator it = ints.begin(); it != ints.end(); it++ )
@@ -226,7 +224,7 @@ namespace wali
     {
       assert(symbol < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       const Internals & tgt = trans.getInternals();
       StateSet targets;
@@ -256,7 +254,7 @@ namespace wali
       assert(source < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
 
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
 
       const Internals & tgt = trans.getTransFrom(source);
       StateSet targets;
@@ -280,7 +278,7 @@ namespace wali
     const std::set<std::pair< Symbol, State> > getTargets(NWA const & nwa, State source )
     {
       assert(source < wali::WALI_BAD_KEY);
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       const Internals & tgt = trans.getTransFrom(source);
       std::set<std::pair<Symbol,State> > targets;
       for( InternalIterator it = tgt.begin(); it != tgt.end(); it++ )
@@ -300,7 +298,7 @@ namespace wali
     
     const std::set< State> getTargets(NWA const & nwa)
     {
-      wali::nwa::details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
+      details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       
       const Internals & tgt = trans.getInternals();
       StateSet targets;
@@ -311,7 +309,7 @@ namespace wali
       return targets;
     }
 
-    }
+
   }
 }
 

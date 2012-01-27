@@ -4,8 +4,7 @@
 #include "opennwa/NWAFwd.hpp"
 
 
-namespace wali {
-  namespace nwa {
+namespace opennwa {
     namespace query {
 
       
@@ -39,7 +38,6 @@ namespace wali {
       bool
       statesOverlap(NWA const & first, NWA const & second);
 
-    }
   }
 }
 

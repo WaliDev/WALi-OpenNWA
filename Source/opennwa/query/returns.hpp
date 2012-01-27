@@ -3,10 +3,8 @@
 
 #include "opennwa/NWAFwd.hpp"
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace query
     {
       //Return Transitions
@@ -510,7 +508,6 @@ namespace wali
        */
       extern const  StateSet getReturnSites(NWA const & nwa, State callSite );
 
-    }
   }
 }
 

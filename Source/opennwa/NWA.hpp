@@ -37,17 +37,15 @@
 #include <map>
 #include <deque>
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     /**
      *
      * This class models nested word automata (NWA). 
      * Note: StName must be a unique identifier for states.
      *
      */
-    class NWA : public Printable, public Countable
+    class NWA : public wali::Printable, public wali::Countable
     {
     private:
       typedef ClientInfo Client;
@@ -123,7 +121,7 @@ namespace wali
       /// depending on whether you are using the (very experimental) BuDDY
       /// support or just std::maps. See the appropriate version of
       /// RelationOps.hpp.
-      typedef relations::RelationTypedefs<State>::BinaryRelation BinaryRelation;
+      typedef wali::relations::RelationTypedefs<State>::BinaryRelation BinaryRelation;
 
       // }}}
 
@@ -390,7 +388,7 @@ namespace wali
 
       /// @brief Tests whether the given symbol is a member the NWA.
       ///
-      /// This returns 'false' for WALI_EPSILON and WALI_WILD, even if they
+      /// This returns 'false' for EPSILON and WILD, even if they
       /// are used on a transition.
       ///
       /// @param - sym: the symbol to check
@@ -400,8 +398,8 @@ namespace wali
       /// @brief Adds the given symbol to the NWA.
       ///
       /// If 'sym' is already present in the NWA, this function is a
-      /// no-op. It is also a no-op if 'sym' is either 'WALI_EPSILON' or
-      /// 'WALI_WILD'.
+      /// no-op. It is also a no-op if 'sym' is either 'EPSILON' or
+      /// 'WILD'.
       ///
       /// The return value indicates whether 'sym' was added.
       ///
@@ -413,8 +411,8 @@ namespace wali
       ///        and wild).
       ///
       /// Symbols in the automaton are counted regardless of whether they are
-      /// used to label any transitions. Neither 'WALI_EPSILON' nor
-      /// 'WALI_WILD' are included in this count at all, regardless of
+      /// used to label any transitions. Neither 'EPSILON' nor
+      /// 'WILD' are included in this count at all, regardless of
       /// whether they are used to label transitions or not.
       ///
       /// @return The number of symbols in this NWA
@@ -439,7 +437,7 @@ namespace wali
       /// NWA. It does not touch any states.
       ///
       /// (Note: this also removes all transitions labeled with
-      /// 'WALI_EPSILON' and 'WALI_WILD' even though this perhaps needn't be
+      /// 'EPSILON' and 'WILD' even though this perhaps needn't be
       /// the case.)
       void clearSymbols( );
 
@@ -524,7 +522,7 @@ namespace wali
       /// no-op (other than the return value). The return value indicates
       /// whether the transition was successfully added.
       ///
-      /// Note: 'sym' cannot be WALI_EPSILON.
+      /// Note: 'sym' cannot be EPSILON.
       ///
       /// @param - from: the state the edge departs from
       /// @param - sym: the symbol labeling the edge
@@ -582,7 +580,7 @@ namespace wali
       /// (other than the return value). The return value indicates whether
       /// the transition was successfully added.
       ///
-      /// Note: 'sym' cannot be WALI_EPSILON.
+      /// Note: 'sym' cannot be EPSILON.
       ///
       /// @param - call: the state the edge departs from
       /// @param - sym: the symbol labeling the edge
@@ -639,7 +637,7 @@ namespace wali
       /// no-op (other than the return value). The return value indicates
       /// whether the transition was successfully added.
       ///
-      /// Note: 'sym' cannot be WALI_EPSILON.
+      /// Note: 'sym' cannot be EPSILON.
       ///
       /// @param - exit: the state the edge departs from
       /// @param - sym: the symbol labeling the edge
@@ -1030,11 +1028,11 @@ namespace wali
 
       //Using NWAs
       // {{{ deprecated nwa_pds functions (and cheater functions)
-      wpds::WPDS _private_NwaToPdsReturns_( WeightGen const & wg ) const;
-      wpds::WPDS _private_NwaToBackwardsPdsReturns_( WeightGen const & wg ) const;
-      wpds::WPDS _private_NwaToPdsCalls_( WeightGen const & wg,
-                                          ref_ptr<wali::wpds::Wrapper> wrapper ) const;
-      wpds::WPDS _private_NwaToBackwardsPdsCalls_( WeightGen const & wg ) const;
+      wali::wpds::WPDS _private_NwaToPdsReturns_( WeightGen const & wg ) const;
+      wali::wpds::WPDS _private_NwaToBackwardsPdsReturns_( WeightGen const & wg ) const;
+      wali::wpds::WPDS _private_NwaToPdsCalls_( WeightGen const & wg,
+                                                ref_ptr<wali::wpds::Wrapper> wrapper ) const;
+      wali::wpds::WPDS _private_NwaToBackwardsPdsCalls_( WeightGen const & wg ) const;
       // }}}
 
       
@@ -1064,15 +1062,15 @@ namespace wali
        * @return the WFA resulting from performing the prestar reachability query 
        *
        */
-      wfa::WFA prestar( wfa::WFA const & input,
-                        WeightGen const & wg ) const
+      wali::wfa::WFA prestar( wali::wfa::WFA const & input,
+                              WeightGen const & wg ) const
       {
         return prestar(input, wg, NULL);
       }
 
-      virtual wfa::WFA prestar( wfa::WFA const & input,
-                                WeightGen const & wg,
-                                ref_ptr< Worklist<wfa::ITrans> > worklist) const;
+      virtual wali::wfa::WFA prestar( wali::wfa::WFA const & input,
+                                      WeightGen const & wg,
+                                      ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const;
 
       /**
        *
@@ -1088,17 +1086,17 @@ namespace wali
        * @param - wg: the functions to use in generating weights
        *
        */
-      void prestar( wfa::WFA const & input,
-                   wfa::WFA & output,
-                   WeightGen const & wg ) const
+      void prestar( wali::wfa::WFA const & input,
+                    wali::wfa::WFA & output,
+                    WeightGen const & wg ) const
       {
         prestar(input, output, wg, NULL);
       }
 
-      virtual void prestar( wfa::WFA const & input,
-                            wfa::WFA & output,
+      virtual void prestar( wali::wfa::WFA const & input,
+                            wali::wfa::WFA & output,
                             WeightGen const & wg,
-                            ref_ptr< Worklist<wfa::ITrans> > worklist) const;
+                            ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const;
 
       /**
        *
@@ -1111,16 +1109,16 @@ namespace wali
        * @return the WFA resulting from performing the poststar reachability query
        *
        */
-      wfa::WFA poststar( wfa::WFA const & input,
+      wali::wfa::WFA poststar( wali::wfa::WFA const & input,
                          WeightGen const & wg ) const
       {
         return poststar(input, wg, NULL);
       }
 
 
-      virtual wfa::WFA poststar( wfa::WFA const & input,
+      virtual wali::wfa::WFA poststar( wali::wfa::WFA const & input,
                                  WeightGen const & wg,
-                                 ref_ptr< Worklist<wfa::ITrans> > wl) const;
+                                 ref_ptr< wali::Worklist<wali::wfa::ITrans> > wl) const;
 
 
       /**
@@ -1137,17 +1135,17 @@ namespace wali
        * @param - wg: the functions to use in generating weights
        *
        */
-      void poststar( wfa::WFA const & input,
-                         wfa::WFA & output,
+      void poststar( wali::wfa::WFA const & input,
+                         wali::wfa::WFA & output,
                          WeightGen const & wg ) const
       {
         poststar(input, output, wg, NULL);
       }
 
-      virtual void poststar( wfa::WFA const & input,
-                             wfa::WFA & output,
+      virtual void poststar( wali::wfa::WFA const & input,
+                             wali::wfa::WFA & output,
                              WeightGen const & wg,
-                             ref_ptr< Worklist<wfa::ITrans> > worklist) const;
+                             ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const;
 
       //Utilities	
 
@@ -1190,7 +1188,7 @@ namespace wali
       //TODO: add methods like ...
       //virtual void for_each(ConstRuleFunctor &func) const;
       //virtual void for_each(RuleFunctor &func) const;
-      //virtual void operator()(wfa::ITrans *t);
+      //virtual void operator()(wali::wfa::ITrans *t);
 
       /**
        *
@@ -1482,7 +1480,7 @@ namespace wali
       ///
       /// @returns true if 'word' is in L(this), and false otherwise.
       bool
-      isMemberNondet( ::wali::nwa::NestedWord const & word ) const;
+      isMemberNondet( NestedWord const & word ) const;
 
 
       /// @brief Adds all states, symbols, and transitions from 'rhs' to 'this'.
@@ -1492,9 +1490,6 @@ namespace wali
       void combineWith(NWA const & rhs);
     };
 
-
-
-  }
 }
 
 

@@ -2,10 +2,8 @@
 #include "opennwa/construct/complement.hpp"
 #include "opennwa/construct/determinize.hpp"
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace construct
     {
 
@@ -54,7 +52,6 @@ namespace wali
         }
       }
 
-    }
   }
 }
 

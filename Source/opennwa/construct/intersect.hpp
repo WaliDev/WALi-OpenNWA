@@ -1,9 +1,7 @@
 #include "opennwa/NWAFwd.hpp"
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace construct
     {
 
@@ -38,7 +36,6 @@ namespace wali
       extern NWARefPtr intersect( NWA const & first, NWA const & second );
 
       
-    }
   }
 }
 

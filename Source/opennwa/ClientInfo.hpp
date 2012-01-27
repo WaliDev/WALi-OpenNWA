@@ -9,17 +9,15 @@
 #include "wali/Countable.hpp"
 #include "opennwa/NWAFwd.hpp"
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     /*
      *
      * This class is a placeholder for any additional information that you might want to
      * associate with a state.  It must be extended for the client's specific needs.
      *
      */
-    class ClientInfo : public Countable
+    class ClientInfo : public wali::Countable
     { 
     public:
       /// Allocates and returns a new ClientInfo object that is a copy
@@ -34,7 +32,6 @@ namespace wali
       }
     };
 
-  }
 }
 
 

@@ -1,10 +1,8 @@
 #include "opennwa/NWA.hpp"
 #include "opennwa/construct/determinize.hpp"
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace construct
     {
       
@@ -22,7 +20,7 @@ namespace wali
       }
 
       
-    }
+    } // end 'namespace construct' !!!
     
 
 #if 0
@@ -109,7 +107,7 @@ namespace wali
       //Construct the epsilon closure relation for the states in nondet.
       SetBinaryRelation pre_close; //Collapse epsilon transitions.
       SetBinaryRelation Ie;   //Internal transitions with epsilon.
-      project_symbol_3<SetBinaryRelation>(Ie,nondet.trans.getInternals(), WALI_EPSILON);
+      project_symbol_3<SetBinaryRelation>(Ie,nondet.trans.getInternals(), EPSILON);
 #ifdef USE_BUDDY
       transitive_closure(pre_close,Ie);
 #else
@@ -169,8 +167,8 @@ namespace wali
       std::map<wali::Key, TernaryRelation> returnTransPerSymbol;
 
       for( SymbolIterator it = nondet.beginSymbols(); it != nondet.endSymbols(); it++ ) {
-        if (*it == WALI_EPSILON) continue;    //Epsilon is handled with closure.
-        if (*it == WALI_WILD) continue;
+        if (*it == EPSILON) continue;    //Epsilon is handled with closure.
+        if (*it == WILD) continue;
 
 #ifdef USE_BUDDY
         internalTransPerSymbol[*it] = BinaryRelation(nondet.largestState());
@@ -179,13 +177,13 @@ namespace wali
 #endif
         
         project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet.trans.getInternals(), *it);
-        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet.trans.getInternals(), WALI_WILD);
+        project_symbol_3<BinaryRelation>(internalTransPerSymbol[*it], nondet.trans.getInternals(), WILD);
 
         project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet.trans.getCalls(), *it);
-        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet.trans.getCalls(), WALI_WILD);   //Every symbol also matches wild.
+        project_symbol_3<BinaryRelation>(callTransPerSymbol[*it], nondet.trans.getCalls(), WILD);   //Every symbol also matches wild.
 
         project_symbol_4(returnTransPerSymbol[*it], nondet.trans.getReturns(), *it);
-        project_symbol_4(returnTransPerSymbol[*it], nondet.trans.getReturns(),WALI_WILD);   //Every symbol also matches wild.
+        project_symbol_4(returnTransPerSymbol[*it], nondet.trans.getReturns(),WILD);   //Every symbol also matches wild.
       }
 
       
@@ -206,8 +204,8 @@ namespace wali
         //Check each symbol individually.
         for( SymbolIterator it = nondet.beginSymbols(); it != nondet.endSymbols(); it++ )
         {
-          if (*it == WALI_EPSILON) continue;    //Epsilon is handled with closure.
-          if (*it == WALI_WILD) continue;       //Wild is matched to every symbol as we go.
+          if (*it == EPSILON) continue;    //Epsilon is handled with closure.
+          if (*it == WILD) continue;       //Wild is matched to every symbol as we go.
 
           //Process internal transitions.
           //Compute the relation.
@@ -218,7 +216,7 @@ namespace wali
 #if 0
           DECLARE(BinaryRelation, IiOrig);
           project_symbol_3(IiOrig,nondet.trans.getInternals(),*it);   
-          project_symbol_3(IiOrig,nondet.trans.getInternals(),WALI_WILD);   //Every symbol also matches wild.
+          project_symbol_3(IiOrig,nondet.trans.getInternals(),WILD);   //Every symbol also matches wild.
           
           if (Ii == IiOrig) {
             std::cout << "Ii == IiOrig holds!\n";
@@ -265,7 +263,7 @@ namespace wali
 #if 0
           DECLARE(BinaryRelation, IcOrig);
           project_symbol_3(IcOrig,nondet.trans.getCalls(),*it);  
-          project_symbol_3(IcOrig,nondet.trans.getCalls(),WALI_WILD);   //Every symbol also matches wild.
+          project_symbol_3(IcOrig,nondet.trans.getCalls(),WILD);   //Every symbol also matches wild.
           
           if (Ic == IcOrig) {
             std::cout << "Ic == IcOrig holds!\n";
@@ -307,7 +305,7 @@ namespace wali
 #if 0
           TernaryRelation IrOrig;
           project_symbol_4(IrOrig,nondet.trans.getReturns(),*it);    
-          project_symbol_4(IrOrig,nondet.trans.getReturns(),WALI_WILD);   //Every symbol also matches wild.
+          project_symbol_4(IrOrig,nondet.trans.getReturns(),WILD);   //Every symbol also matches wild.
 
           if (Ir == IrOrig) {
             std::cout << "Ir == IrOrig holds!\n";
@@ -407,7 +405,7 @@ namespace wali
               sit != visited.end(); sit++ )
         {
           DECLARE(BinaryRelation, Rtmpf);
-          relations::intersect(Rtmpf,Rf,*sit);
+          wali::relations::intersect(Rtmpf,Rf,*sit);
           if(! Rtmpf.empty() )
           {
             State f = makeKey(*sit);
@@ -421,7 +419,7 @@ namespace wali
 #ifdef USE_BUDDY
     
     State NWA::makeKey(
-      relations::RelationTypedefs<State>::BinaryRelation const & R ) const
+      wali::relations::RelationTypedefs<State>::BinaryRelation const & R ) const
     {
       std::stringstream ss;
       ss << R.getBdd();
@@ -438,10 +436,10 @@ namespace wali
      */
     
     State NWA::makeKey(
-      relations::RelationTypedefs<State>::BinaryRelation const & R ) const
+      wali::relations::RelationTypedefs<State>::BinaryRelation const & R ) const
     {
       // C++ really needs C++0x's 'auto' keyword :-)
-      typedef  relations::RelationTypedefs<State>::BinaryRelation::const_iterator Iterator;
+      typedef  wali::relations::RelationTypedefs<State>::BinaryRelation::const_iterator Iterator;
 
       std::stringstream ss;
 
@@ -463,8 +461,6 @@ namespace wali
 #endif
 
       
-
-  }
 }
 
 

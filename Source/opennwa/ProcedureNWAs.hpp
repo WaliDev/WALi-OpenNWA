@@ -8,8 +8,7 @@
 
 #include <boost/function.hpp>
 
-namespace wali {
-  namespace nwa {
+namespace opennwa {
     ///
     /// Maps name of procedure to the procedure NWA
     typedef std::map<std::string, NWARefPtr> ProcedureMap;
@@ -37,12 +36,12 @@ namespace wali {
 
     struct EpsilonTransitionInserter {
       void operator() (NWA & nwa, State source, State target) {
-        nwa.addInternalTrans(source, WALI_EPSILON, target);
+        nwa.addInternalTrans(source, EPSILON, target);
       }
 
       void operator() (NWA & nwa, State source, State pred, State target) {
         (void) pred;
-        nwa.addInternalTrans(source, WALI_EPSILON, target);
+        nwa.addInternalTrans(source, EPSILON, target);
       }
     };
 
@@ -63,7 +62,7 @@ namespace wali {
                  boost::function<void (NWA &, State, State)> call_inserter,
                  boost::function<void (NWA &, State, State, State)> return_inserter);
 
-  }
+
 }
 
 

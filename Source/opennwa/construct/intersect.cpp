@@ -1,10 +1,8 @@
 #include "opennwa/NWA.hpp"
 #include "opennwa/construct/intersect.hpp"
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace construct
     {
       void intersect(NWA & out, NWA const & first, NWA const & second)
@@ -19,7 +17,8 @@ namespace wali
         intersect(*nwa, first, second);
         return nwa;
       }
-    }
+      
+    } // end 'namespace construct'!!!
 
     /**
      *
@@ -629,7 +628,6 @@ namespace wali
     }
 
 
-  }
 }
 
 

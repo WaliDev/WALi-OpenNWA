@@ -1,45 +1,46 @@
 #include "opennwa/NWA.hpp"
 #include "opennwa/nwa_pds/conversions.hpp"
 
-namespace wali
+using wali::wpds::WPDS;
+
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace nwa_pds
     {
-      wpds::WPDS NwaToWpdsReturns( NWA const & nwa, WeightGen const & wg)
+      WPDS NwaToWpdsReturns( NWA const & nwa, WeightGen const & wg)
       {
 	return nwa._private_NwaToPdsReturns_(wg);
       }
 
-      wpds::WPDS NwaToWpdsCalls( NWA const & nwa,
+      WPDS NwaToWpdsCalls( NWA const & nwa,
                                 WeightGen const & wg,
                                 ref_ptr<wali::wpds::Wrapper> wrapper  )
       {
 	return nwa._private_NwaToPdsCalls_(wg, wrapper);
       }
 
-      wpds::WPDS NwaToBackwardsWpdsReturns( NWA const & nwa, WeightGen const & wg )
+      WPDS NwaToBackwardsWpdsReturns( NWA const & nwa, WeightGen const & wg )
       {
 	return nwa._private_NwaToBackwardsPdsReturns_(wg);
       }
 
-      wpds::WPDS NwaToBackwardsWpdsCalls( NWA const & nwa, WeightGen const & wg )
+      WPDS NwaToBackwardsWpdsCalls( NWA const & nwa, WeightGen const & wg )
       {
 	return nwa._private_NwaToBackwardsPdsCalls_(wg);
       }
-    }
+      
+    } // end of 'namespace nwa_pds' !!!
 
 
     // constructs the PDS equivalent to this NWA, stacking returns
-    wpds::WPDS NWA::_private_NwaToPdsReturns_( WeightGen const & wg ) const
+    WPDS NWA::_private_NwaToPdsReturns_( WeightGen const & wg ) const
     {
       //TODO: beware the implicit transitions
       //Q: do we need to make all transitions explicit in order to make this correct?
 
-      wpds::WPDS result = wpds::WPDS();
+      WPDS result = WPDS();
 
-      Key program = wali::nwa::nwa_pds::getProgramControlLocation();  //= wali::getKey("program");
+      Key program = nwa_pds::getProgramControlLocation();  //= wali::getKey("program");
 
       wali::sem_elem_t wgt;
 
@@ -52,7 +53,7 @@ namespace wali
         State src = Trans::getSource(*iit);
         State tgt = Trans::getTarget(*iit);
       
-        if( Trans::getInternalSym(*iit) == WALI_WILD )
+        if( Trans::getInternalSym(*iit) == WILD )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
         else
           wgt = wg.getWeight(src, getClientInfo(src),
@@ -79,7 +80,7 @@ namespace wali
             //(q_c,sigma,q_e) in delta_c and (q_x,q_c,*,q_r) in delta_r goes to
             // <p,q_c> -w-> <p,q_e q_r> in delta_2 and w depends on sigma
 
-            if( Trans::getCallSym(*cit) == WALI_WILD )
+            if( Trans::getCallSym(*cit) == WILD )
               wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w
             else
               wgt = wg.getWeight(src, getClientInfo(src),
@@ -108,7 +109,7 @@ namespace wali
         State src = Trans::getExit(*rit);
         State tgt = Trans::getReturnSite(*rit);
         
-        if( Trans::getReturnSym(*rit) == WALI_WILD )
+        if( Trans::getReturnSym(*rit) == WILD )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w  
         else
           wgt = wg.getWeight(src, getClientInfo(src),
@@ -116,7 +117,7 @@ namespace wali
                              WeightGen::EXIT_TO_RET,
                              tgt, getClientInfo(tgt));  // w            
 
-        Key rstate = wali::nwa::nwa_pds::getControlLocation(src,Trans::getCallSite(*rit),tgt);    //p_q_xcr
+        Key rstate = nwa_pds::getControlLocation(src,Trans::getCallSite(*rit),tgt);    //p_q_xcr
 
         result.add_rule(program,                    //from_state (p)
                         src,                        //from_stack (q_x)
@@ -137,14 +138,14 @@ namespace wali
 
 
     // constructs the backwards PDS equivalent to this NWA, stacking returns
-    wpds::WPDS NWA::_private_NwaToBackwardsPdsReturns_( WeightGen const & wg ) const
+    WPDS NWA::_private_NwaToBackwardsPdsReturns_( WeightGen const & wg ) const
     {
       //TODO: beware the implicit transitions
       //Q: do we need to make all transitions explicit in order to make this correct?
 
-      wpds::WPDS result = wpds::WPDS();
+      WPDS result = WPDS();
 
-      Key program = wali::nwa::nwa_pds::getProgramControlLocation();  //= wali::getKey("program");
+      Key program = nwa_pds::getProgramControlLocation();  //= wali::getKey("program");
 
       wali::sem_elem_t wgt;
 
@@ -157,7 +158,7 @@ namespace wali
         State src = Trans::getSource(*iit);
         State tgt = Trans::getTarget(*iit);
         
-        if( Trans::getInternalSym(*iit) == WALI_WILD )
+        if( Trans::getInternalSym(*iit) == WILD )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
         else
           wgt = wg.getWeight(src, getClientInfo(src),
@@ -185,7 +186,7 @@ namespace wali
             // and <p_q_erc,q_c> -1-> <p,q_c> in delta_1
             // where p_q_erc = (p,q_e,q_r,q_c) and w depends on sigma
 
-            if( Trans::getCallSym(*cit) == WALI_WILD )
+            if( Trans::getCallSym(*cit) == WILD )
               wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w
             else
               wgt = wg.getWeight(src, getClientInfo(src), 
@@ -193,7 +194,7 @@ namespace wali
                                  WeightGen::CALL_TO_ENTRY,  
                                  tgt, getClientInfo(tgt)); // w    
 
-            Key cstate = wali::nwa::nwa_pds::getControlLocation(tgt,Trans::getReturnSite(*rit),src);    //p_q_erc
+            Key cstate = nwa_pds::getControlLocation(tgt,Trans::getReturnSite(*rit),src);    //p_q_erc
 
             result.add_rule(program,                    //from_state (p)
                             Trans::getEntry(*cit),      //from_stack (q_e)
@@ -220,7 +221,7 @@ namespace wali
         State src = Trans::getExit(*rit);
         State tgt = Trans::getReturnSite(*rit);
         
-        if( Trans::getReturnSym(*rit) == WALI_WILD )
+        if( Trans::getReturnSym(*rit) == WILD )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
         else
           wgt = wg.getWeight(src, getClientInfo(src),
@@ -241,15 +242,15 @@ namespace wali
 
 
     // constructs the PDS equivalent to this NWA, stacking calls
-    wpds::WPDS NWA::_private_NwaToPdsCalls_( WeightGen const & wg,
+    WPDS NWA::_private_NwaToPdsCalls_( WeightGen const & wg,
                                              ref_ptr<wali::wpds::Wrapper> wrapper ) const
     {
       //TODO: beware the implicit transitions
       //Q: do we need to make all transitions explicit in order to make this correct?
 
-      wpds::WPDS result(wrapper);
+      WPDS result(wrapper);
 
-      Key program = wali::nwa::nwa_pds::getProgramControlLocation();  // = wali::getKey("program");
+      Key program = nwa_pds::getProgramControlLocation();  // = wali::getKey("program");
 
       wali::sem_elem_t wgt;
 
@@ -262,7 +263,7 @@ namespace wali
         State src = Trans::getSource(*iit);
         State tgt = Trans::getTarget(*iit);
 
-        if( Trans::getInternalSym(*iit) == WALI_WILD )
+        if( Trans::getInternalSym(*iit) == WILD )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
         else
           wgt = wg.getWeight(src, getClientInfo(src),
@@ -287,7 +288,7 @@ namespace wali
         State src = Trans::getCallSite(*cit);
         State tgt = Trans::getEntry(*cit);
 
-        if( Trans::getCallSym(*cit) == WALI_WILD )
+        if( Trans::getCallSym(*cit) == WILD )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w
         else
           wgt = wg.getWeight(src, getClientInfo(src),
@@ -318,7 +319,7 @@ namespace wali
         State src = Trans::getExit(*rit);
         State tgt = Trans::getReturnSite(*rit);
 
-        if( Trans::getReturnSym(*rit) == WALI_WILD )
+        if( Trans::getReturnSym(*rit) == WILD )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w 
         else
           wgt = wg.getWeight(src, getClientInfo(src), 
@@ -327,7 +328,7 @@ namespace wali
                              tgt, getClientInfo(tgt));    // w     
 
         //Note: if you change this, make sure you modify the code in NWPForest.createCA()
-        Key rstate = wali::nwa::nwa_pds::getControlLocation(src,Trans::getCallSite(*rit),tgt);  //p_q_xcr
+        Key rstate = nwa_pds::getControlLocation(src,Trans::getCallSite(*rit),tgt);  //p_q_xcr
 
         result.add_rule(program,                              //from_state (p)
                         src,                                  //from_stack (q_x)
@@ -349,14 +350,14 @@ namespace wali
 
 
     // constructs the backwards PDS equivalent to this NWA, stacking calls
-    wpds::WPDS NWA::_private_NwaToBackwardsPdsCalls_( WeightGen const & wg ) const
+    WPDS NWA::_private_NwaToBackwardsPdsCalls_( WeightGen const & wg ) const
     {
       //TODO: beware the implicit transitions
       //Q: do we need to make all transitions explicit in order to make this correct?
 
-      wpds::WPDS result = wpds::WPDS();
+      WPDS result = WPDS();
 
-      Key program = wali::nwa::nwa_pds::getProgramControlLocation();  // = wali::getKey("program"); 
+      Key program = nwa_pds::getProgramControlLocation();  // = wali::getKey("program"); 
 
       wali::sem_elem_t wgt;
 
@@ -369,7 +370,7 @@ namespace wali
         State src = Trans::getSource(*iit);
         State tgt = Trans::getTarget(*iit);
         
-        if( Trans::getInternalSym(*iit) == WALI_WILD )
+        if( Trans::getInternalSym(*iit) == WILD )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt));  // w
         else
           wgt = wg.getWeight(src, getClientInfo(src),
@@ -397,7 +398,7 @@ namespace wali
             // and <p_q_erc,q_r> -1-> <p,q_c> in delta_1
             // where p_q_erc = (p,q_e,q_r,q_c) and w depends on sigma
             
-            if( Trans::getCallSym(*cit) == WALI_WILD )
+            if( Trans::getCallSym(*cit) == WILD )
               wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); // w  
             else
               wgt = wg.getWeight(src, getClientInfo(src),
@@ -405,7 +406,7 @@ namespace wali
                                  WeightGen::CALL_TO_ENTRY,
                                  tgt, getClientInfo(tgt));         // w                  
 
-            Key cstate = wali::nwa::nwa_pds::getControlLocation(tgt,Trans::getReturnSite(*rit),src);  //p_q_erc
+            Key cstate = nwa_pds::getControlLocation(tgt,Trans::getReturnSite(*rit),src);  //p_q_erc
 
             result.add_rule(program,                              //from_state (p)
                             tgt,                                  //from_stack (q_e)
@@ -432,7 +433,7 @@ namespace wali
         State src = Trans::getExit(*rit);
         State tgt = Trans::getReturnSite(*rit);
 
-        if( Trans::getReturnSym(*rit) == WALI_WILD )
+        if( Trans::getReturnSym(*rit) == WILD )
           wgt = wg.getWildWeight(src,getClientInfo(src),tgt,getClientInfo(tgt)); //w
         else
           wgt = wg.getWeight(src, getClientInfo(src),
@@ -451,7 +452,7 @@ namespace wali
       return result;
     }
       
-  }
+
 }
 
 

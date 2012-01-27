@@ -6,10 +6,8 @@
 #include <ios>
 #include <vector>
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace details
     {
         
@@ -51,14 +49,14 @@ namespace wali
       std::ostream &
       operator << (std::ostream & os, Configuration const & configuration)
       {
-        os << key2str(configuration.state) << "  [";
+        os << wali::key2str(configuration.state) << "  [";
         for (size_t i=0; i<configuration.callPredecessors.size(); ++i) {
-          os << key2str(configuration.callPredecessors[i]) << " ";
+          os << wali::key2str(configuration.callPredecessors[i]) << " ";
         }
         os << "]";
         return os;
       }
-    }
+        
   }
 }
 

@@ -3,10 +3,8 @@
 
 #include "opennwa/NWAFwd.hpp"
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace query
     {
       //Call Transitions
@@ -180,7 +178,7 @@ namespace wali
        *
        */
       extern const  StateSet getEntries(NWA const & nwa );      
-    }
+
   }
 }
 

@@ -1,8 +1,7 @@
 #include "opennwa/traverse/depth.hpp"
 #include "opennwa/NWA.hpp"
 
-namespace wali {
-  namespace nwa {
+namespace opennwa {
     namespace experimental {
 
 
@@ -82,7 +81,7 @@ namespace wali {
         return out;
       }
       
-    }
+
   }
 }
 

@@ -5,8 +5,7 @@
 #include "opennwa/query/returns.hpp"
 #include "opennwa/query/calls.hpp"
 
-namespace wali {
-  namespace nwa {
+namespace opennwa {
     namespace traverse {
       namespace details {
         typedef ConstCallStringStateFunctor::CallString CallString;
@@ -231,8 +230,7 @@ namespace wali {
 
       
     } // namespace traverse
-  } // namespcae nwa
-} // namespace wali
+} // namespace opennwa
 
 
 

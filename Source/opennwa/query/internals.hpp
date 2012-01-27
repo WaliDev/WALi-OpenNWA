@@ -4,10 +4,8 @@
 #include "opennwa/NWAFwd.hpp"
 
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace query
     {
       
@@ -181,7 +179,7 @@ namespace wali
        *
        */
       extern const  StateSet getTargets(NWA const & nwa);
-    }
+
   }
 }
 
