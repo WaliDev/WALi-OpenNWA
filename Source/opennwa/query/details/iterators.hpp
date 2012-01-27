@@ -11,10 +11,8 @@
 #include <boost/iterator/iterator_adaptor.hpp>
 #include <boost/shared_ptr.hpp>
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace query
     {
       namespace details
@@ -239,7 +237,7 @@ namespace wali
           };
 
           
-        }
+
       }
     }
   }

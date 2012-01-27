@@ -6,10 +6,8 @@
 #include <iterator>
 #include <utility>
 
-namespace wali
+namespace opennwa
 {
-  namespace nwa
-  {
     namespace query
     {
       namespace details
@@ -164,7 +162,7 @@ namespace wali
             }
           };
           
-        }
+
       }
     }
   }
