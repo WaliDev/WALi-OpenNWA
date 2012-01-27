@@ -30,8 +30,8 @@ int main(int argc, char** argv)
         exit(2);
     }
 
-    wali::nwa::NWARefPtr nwa = wali::nwa::read_nwa(infile);
-    if (wali::nwa::query::languageIsEmpty(*nwa)) {
+    opennwa::NWARefPtr nwa = opennwa::read_nwa(infile);
+    if (opennwa::query::languageIsEmpty(*nwa)) {
         cout << "THE NWA IS EMPTY\n";
     }
     else {

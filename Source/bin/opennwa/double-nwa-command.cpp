@@ -17,9 +17,9 @@ using std::cerr;
 using std::endl;
 using std::exit;
 
-using wali::nwa::NWARefPtr;
-using wali::nwa::read_nwa;
-using wali::nwa::construct::CONSTRUCTION_FUNCTION;
+using opennwa::NWARefPtr;
+using opennwa::read_nwa;
+using opennwa::construct::CONSTRUCTION_FUNCTION;
 
 int main(int argc, char** argv)
 {

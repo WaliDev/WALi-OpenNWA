@@ -36,7 +36,7 @@ int main(int argc, char** argv)
     }
 
 
-    wali::nwa::NWARefPtr nwa = wali::nwa::read_nwa(infile);
+    opennwa::NWARefPtr nwa = opennwa::read_nwa(infile);
     nwa->print_dot(outfile, "", false);
 }
 

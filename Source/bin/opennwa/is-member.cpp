@@ -31,7 +31,7 @@ int main(int argc, char** argv)
         exit(2);
     }
 
-    wali::nwa::NestedWord nw;
+    opennwa::NestedWord nw;
 
     std::stringstream ss(argv[2]);
     std::string s;
@@ -49,7 +49,7 @@ int main(int argc, char** argv)
         }
     }
 
-    wali::nwa::NWARefPtr nwa = wali::nwa::read_nwa(infile);
+    opennwa::NWARefPtr nwa = opennwa::read_nwa(infile);
     if (nwa->isMemberNondet(nw)) {
         cout << "THE NWA CONTAINS THE GIVEN STRING\n";
     }

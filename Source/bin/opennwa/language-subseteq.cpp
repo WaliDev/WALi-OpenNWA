@@ -16,8 +16,8 @@ using std::cerr;
 using std::endl;
 using std::exit;
 
-using wali::nwa::NWARefPtr;
-using wali::nwa::read_nwa;
+using opennwa::NWARefPtr;
+using opennwa::read_nwa;
 
 int main(int argc, char** argv)
 {
@@ -42,7 +42,7 @@ int main(int argc, char** argv)
     NWARefPtr nwa1 = read_nwa(infile1);
     NWARefPtr nwa2 = read_nwa(infile2);
 
-    bool result = wali::nwa::query::languageSubsetEq(*nwa1, *nwa2);
+    bool result = opennwa::query::languageSubsetEq(*nwa1, *nwa2);
 
     if (result) {
         cout << "The language of the first is a subset of the second\n";

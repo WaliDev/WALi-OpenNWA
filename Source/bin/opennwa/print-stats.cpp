@@ -35,7 +35,7 @@ int main(int argc, char** argv)
         exit(2);
     }
 
-    wali::nwa::NWARefPtr nwa = wali::nwa::read_nwa(infile);
+    opennwa::NWARefPtr nwa = opennwa::read_nwa(infile);
 
     if (argc == 2) {
         // Print "human readable"
