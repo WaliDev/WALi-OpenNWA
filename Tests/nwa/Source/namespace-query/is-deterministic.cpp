@@ -10,7 +10,7 @@
 namespace opennwa {
         namespace query {
 
-            TEST(wali$nwa$query$$isDeterministic, emptyNwaIsDeterministic)
+            TEST(opennwa$query$$isDeterministic, emptyNwaIsDeterministic)
             {
                 NWA empty;
 
@@ -18,7 +18,7 @@ namespace opennwa {
             }
 
                     
-            TEST(wali$nwa$query$$isDeterministic, evenOddNotDeterministic)
+            TEST(opennwa$query$$isDeterministic, evenOddNotDeterministic)
             {
                 OddNumEvenGroupsNwa fixture;
 
@@ -26,7 +26,7 @@ namespace opennwa {
             }
 
 
-            TEST(wali$nwa$query$$isDeterministic, evenOddWithoutDummyIsDeterministic)
+            TEST(opennwa$query$$isDeterministic, evenOddWithoutDummyIsDeterministic)
             {
                 OddNumEvenGroupsNwa fixture;
                 ASSERT_TRUE(fixture.nwa.removeState(fixture.dummy));
@@ -35,7 +35,7 @@ namespace opennwa {
             }
 
 
-            TEST(wali$nwa$query$$isDeterministic, multipleInitialStatesMakesNondeterministic)
+            TEST(opennwa$query$$isDeterministic, multipleInitialStatesMakesNondeterministic)
             {
                 OddNumEvenGroupsNwa fixture;
 
@@ -48,7 +48,7 @@ namespace opennwa {
             //////////////////
             // Wilds
             
-            TEST(wali$nwa$query$$isDeterministic, merePresenceOfWildsDoesNotMakeNondeterministic)
+            TEST(opennwa$query$$isDeterministic, merePresenceOfWildsDoesNotMakeNondeterministic)
             {
                 OddNumEvenGroupsNwa fixture;
                 ASSERT_TRUE(fixture.nwa.removeState(fixture.dummy));
@@ -65,7 +65,7 @@ namespace opennwa {
                 EXPECT_TRUE(isDeterministic(fixture.nwa));
             }
 
-            TEST(wali$nwa$query$$isDeterministic, twoWildInternalTransitionsFromSameStateMakesNondeterministic)
+            TEST(opennwa$query$$isDeterministic, twoWildInternalTransitionsFromSameStateMakesNondeterministic)
             {
                 OddNumEvenGroupsNwa fixture;
                 ASSERT_TRUE(fixture.nwa.removeState(fixture.dummy));
@@ -76,7 +76,7 @@ namespace opennwa {
                 EXPECT_FALSE(isDeterministic(fixture.nwa));
             }
 
-            TEST(wali$nwa$query$$isDeterministic, twoWildCallTransitionsFromSameStateMakesNondeterministic)
+            TEST(opennwa$query$$isDeterministic, twoWildCallTransitionsFromSameStateMakesNondeterministic)
             {
                 OddNumEvenGroupsNwa fixture;
                 ASSERT_TRUE(fixture.nwa.removeState(fixture.dummy));
@@ -87,7 +87,7 @@ namespace opennwa {
                 EXPECT_FALSE(isDeterministic(fixture.nwa));
             }
 
-            TEST(wali$nwa$query$$isDeterministic, twoWildReturnTransitionsFromSameStateAndPredecessorMakesNondeterministic)
+            TEST(opennwa$query$$isDeterministic, twoWildReturnTransitionsFromSameStateAndPredecessorMakesNondeterministic)
             {
                 OddNumEvenGroupsNwa fixture;
                 fixture.nwa.removeState(fixture.dummy);
@@ -101,7 +101,7 @@ namespace opennwa {
             ///////////////////
             // Epsilon transitions
 
-            TEST(wali$nwa$query$$isDeterministic, internalEpsilonTransitionsMakeNondeterministic)
+            TEST(opennwa$query$$isDeterministic, internalEpsilonTransitionsMakeNondeterministic)
             {
                 OddNumEvenGroupsNwa fixture;
                 ASSERT_TRUE(fixture.nwa.removeState(fixture.dummy));
@@ -119,7 +119,7 @@ namespace opennwa {
             //////////////////
             // "Normal" transitions
 
-            TEST(wali$nwa$query$$isDeterministic, twoTransitionsFromTheSameNodeAreNotEnoughToMakeNondeterministic)
+            TEST(opennwa$query$$isDeterministic, twoTransitionsFromTheSameNodeAreNotEnoughToMakeNondeterministic)
             {
                 OddNumEvenGroupsNwa fixture;
                 ASSERT_TRUE(fixture.nwa.removeState(fixture.dummy));
@@ -137,7 +137,7 @@ namespace opennwa {
             }
 
             
-            TEST(wali$nwa$query$$isDeterministic, twoInternalsWithSameSymbolMakeNondeterministic)
+            TEST(opennwa$query$$isDeterministic, twoInternalsWithSameSymbolMakeNondeterministic)
             {
                 OddNumEvenGroupsNwa fixture;
                 ASSERT_TRUE(fixture.nwa.removeState(fixture.dummy));
@@ -148,7 +148,7 @@ namespace opennwa {
             }
 
 
-            TEST(wali$nwa$query$$isDeterministic, twoCallsWithSameSymbolMakeNondeterministic)
+            TEST(opennwa$query$$isDeterministic, twoCallsWithSameSymbolMakeNondeterministic)
             {
                 OddNumEvenGroupsNwa fixture;
                 ASSERT_TRUE(fixture.nwa.removeState(fixture.dummy));
@@ -158,7 +158,7 @@ namespace opennwa {
                 EXPECT_FALSE(isDeterministic(fixture.nwa));
             }
 
-            TEST(wali$nwa$query$$isDeterministic, twoReturnsWithSamePredecessorAndSymbolMakeNondeterministic)
+            TEST(opennwa$query$$isDeterministic, twoReturnsWithSamePredecessorAndSymbolMakeNondeterministic)
             {
                 OddNumEvenGroupsNwa fixture;
                 ASSERT_TRUE(fixture.nwa.removeState(fixture.dummy));

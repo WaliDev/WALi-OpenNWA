@@ -62,7 +62,7 @@ static bool expected_answers[][num_words] = {
 namespace opennwa {
         namespace query {
 
-            TEST(wali$nwa$query$$languageContains, testBatteryOfVariouslyBalancedWordsAndNwas)
+            TEST(opennwa$query$$languageContains, testBatteryOfVariouslyBalancedWordsAndNwas)
             {
                 for (unsigned word = 0 ; word < num_words ; ++word) {
                     for (unsigned nwa = 0 ; nwa < num_nwas ; ++nwa) {
@@ -81,7 +81,7 @@ namespace opennwa {
             }
 
 
-            TEST(wali$nwa$query$$languageContains, epsilonClosureAtStart)
+            TEST(opennwa$query$$languageContains, epsilonClosureAtStart)
             {
                 NWA nwa;
                 SomeElements e;

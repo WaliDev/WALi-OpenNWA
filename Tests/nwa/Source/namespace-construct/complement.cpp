@@ -46,7 +46,7 @@ static bool expected_answers[] = {
 namespace opennwa {
         namespace construct {
 
-            TEST(wali$nwa$construct$$complement, complementOfACompletelyEmptyAutomatonContainsStuff)
+            TEST(opennwa$construct$$complement, complementOfACompletelyEmptyAutomatonContainsStuff)
             {
                 NWA empty;
                 WordCollection words;
@@ -68,7 +68,7 @@ namespace opennwa {
                 EXPECT_TRUE(query::languageContains(*comp, words.fullyUnbalanced0));
             }
 
-            TEST(wali$nwa$query$$complement, testBatteryOfVariouslyBalancedNwas)
+            TEST(opennwa$query$$complement, testBatteryOfVariouslyBalancedNwas)
             {
                 for (unsigned nwa = 0 ; nwa < num_nwas ; ++nwa) {
                     std::stringstream ss;

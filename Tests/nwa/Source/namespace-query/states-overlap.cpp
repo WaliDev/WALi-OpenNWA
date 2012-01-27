@@ -10,7 +10,7 @@
 namespace opennwa {
         namespace query {
 
-            TEST(wali$nwa$query$$statesOverlap, emptyDoesNotOverlap)
+            TEST(opennwa$query$$statesOverlap, emptyDoesNotOverlap)
             {
                 OddNumEvenGroupsNwa fixture;
                 NWA empty;
@@ -20,7 +20,7 @@ namespace opennwa {
             }
 
 
-            TEST(wali$nwa$query$$statesOverlap, oddEvenOverlapsWithItself)
+            TEST(opennwa$query$$statesOverlap, oddEvenOverlapsWithItself)
             {
                 OddNumEvenGroupsNwa f1, f2;
 
@@ -28,7 +28,7 @@ namespace opennwa {
             }
 
 
-            TEST(wali$nwa$query$$statesOverlap, subsetsOverlap)
+            TEST(opennwa$query$$statesOverlap, subsetsOverlap)
             {
                 OddNumEvenGroupsNwa fixture;
                 NWA nwa;
@@ -48,7 +48,7 @@ namespace opennwa {
             }
 
 
-            TEST(wali$nwa$query$$statesOverlap, largeDisjointLargeDoNotOverlap)
+            TEST(opennwa$query$$statesOverlap, largeDisjointLargeDoNotOverlap)
             {
                 OddNumEvenGroupsNwa fixture;
                 SomeElements e;
@@ -60,7 +60,7 @@ namespace opennwa {
             }
 
             
-            TEST(wali$nwa$query$$statesOverlap, incomparableDoNotOverlap)
+            TEST(opennwa$query$$statesOverlap, incomparableDoNotOverlap)
             {
                 OddNumEvenGroupsNwa fixture;
                 NWA nwa1 = fixture.nwa;

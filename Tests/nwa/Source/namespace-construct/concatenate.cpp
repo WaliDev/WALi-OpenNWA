@@ -57,7 +57,7 @@ static const NWA * const expected_answers[][num_nwas] = {
 namespace opennwa {
         namespace construct {
 
-            TEST(wali$nwa$construct$$concat, testBatteryOfVariouslyBalancedNwas)
+            TEST(opennwa$construct$$concat, testBatteryOfVariouslyBalancedNwas)
             {
                 for (unsigned left = 0 ; left < num_nwas ; ++left) {
                     for (unsigned right = 0 ; right < num_nwas ; ++right) {
@@ -79,7 +79,7 @@ namespace opennwa {
             }
             
 
-            TEST(wali$nwa$construct$$concat, resultingAutomatonIsNondeterministic)
+            TEST(opennwa$construct$$concat, resultingAutomatonIsNondeterministic)
             {
                 SomeElements e;
                 NWA left, right;

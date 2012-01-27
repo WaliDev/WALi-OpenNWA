@@ -47,7 +47,7 @@ namespace opennwa {
         namespace query {
             
 
-            TEST(wali$nwa$query$$languageIsEmpty, testBatteryOfVariouslyBalancedNwas)
+            TEST(opennwa$query$$languageIsEmpty, testBatteryOfVariouslyBalancedNwas)
             {
                 for (unsigned nwa = 0 ; nwa < num_nwas ; ++nwa) {
                     std::stringstream ss;
@@ -64,7 +64,7 @@ namespace opennwa {
             }
 
             
-            TEST(wali$nwa$query$$getSomeAcceptedWord, testBatteryOfVariouslyBalancedNwas)
+            TEST(opennwa$query$$getSomeAcceptedWord, testBatteryOfVariouslyBalancedNwas)
             {
                 for (unsigned nwa = 0 ; nwa < num_nwas ; ++nwa) {
                     std::stringstream ss;
@@ -88,7 +88,7 @@ namespace opennwa {
             }
 
             
-            TEST(wali$nwa$query$$languageIsEmpty$and$getSomeAcceptedWord, testEpsilonNwa)
+            TEST(opennwa$query$$languageIsEmpty$and$getSomeAcceptedWord, testEpsilonNwa)
             {
                 NWA nwa;
                 SomeElements e;
@@ -106,7 +106,7 @@ namespace opennwa {
                 EXPECT_EQ(eps, *shortest_word);
             }
             
-            TEST(wali$nwa$query$$languageIsEmpty$and$getSomeAcceptedWord, testInternalOnlyNwa)
+            TEST(opennwa$query$$languageIsEmpty$and$getSomeAcceptedWord, testInternalOnlyNwa)
             {
                 //               a              a              a
                 //  --> (state) ----> (state2) ----> (state3) ---> ((state4))
@@ -134,7 +134,7 @@ namespace opennwa {
                 EXPECT_EQ(expected, *shortest_word);
             }
 
-            TEST(wali$nwa$query$$languageIsEmpty$and$getSomeAcceptedWord, testMiddleCall)
+            TEST(opennwa$query$$languageIsEmpty$and$getSomeAcceptedWord, testMiddleCall)
             {
                 //               a              (a             a
                 //  --> (state) ----> (state2) ----> (state3) ---> ((state4))
@@ -163,7 +163,7 @@ namespace opennwa {
             }
 
 
-            TEST(wali$nwa$query$$languageIsEmpty$and$getSomeAcceptedWord, testMiddleReturn)
+            TEST(opennwa$query$$languageIsEmpty$and$getSomeAcceptedWord, testMiddleReturn)
             {
                 //               a              a)             a
                 //  --> (state) ----> (state2) ----> (state3) ---> ((state4))
@@ -192,7 +192,7 @@ namespace opennwa {
             }
 
 
-            TEST(wali$nwa$query$$getSomeAcceptedWord, testChooseCallOverInternal)
+            TEST(opennwa$query$$getSomeAcceptedWord, testChooseCallOverInternal)
             {
                 //               a              a(           a)/state2
                 //  --> (state) ----> (state2) ----> (state3) ---> ((state4))
@@ -236,7 +236,7 @@ namespace opennwa {
             }
 
 
-            TEST(wali$nwa$query$$getSomeAcceptedWord, findsShortest)
+            TEST(opennwa$query$$getSomeAcceptedWord, findsShortest)
             {
                 //              a            a
                 // --> (state) --> (state2) --> (state3)
@@ -276,7 +276,7 @@ namespace opennwa {
             }
 
 
-            TEST(wali$nwa$query$$getSomeShortestAcceptedWord, findsShortestWordNotPath)
+            TEST(opennwa$query$$getSomeShortestAcceptedWord, findsShortestWordNotPath)
             {
                 //              a            a
                 // --> (state) --> (state2) --> (state3)

@@ -13,7 +13,7 @@ using namespace wali::wpds;
 namespace opennwa {
         namespace nwa_pds {
 
-            TEST(wali$nwa$nwa_pds$$WpdsToNwa, compilationTest)
+            TEST(opennwa$nwa_pds$$WpdsToNwa, compilationTest)
             {
                 WPDS wpds;
                 NWARefPtr nwa = WpdsToNwa(wpds);

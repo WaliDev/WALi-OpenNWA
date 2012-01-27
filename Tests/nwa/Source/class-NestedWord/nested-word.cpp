@@ -15,7 +15,7 @@ namespace opennwa {
         Position::Type ReturnType = Position::ReturnType;
 
 
-        TEST(wali$nwa$NestedWord, newNestedWordIsEmpty)
+        TEST(opennwa$NestedWord, newNestedWordIsEmpty)
         {
             NestedWord w;
 
@@ -24,7 +24,7 @@ namespace opennwa {
         }
 
 
-        TEST(wali$nwa$NestedWord, oneCharacterWords)
+        TEST(opennwa$NestedWord, oneCharacterWords)
         {
             // wa(i,c,r) = word with "appendInternal", "appendCall", "appendReturn"
             // wapi(i,c,r) = word with "append", appending internal, call, or return
@@ -66,7 +66,7 @@ namespace opennwa {
         }
 
 
-        TEST(wali$nwa$NestedWord, longerWord)
+        TEST(opennwa$NestedWord, longerWord)
         {
             Symbol const a = getKey("a");
             Symbol const b = getKey("b");
@@ -123,7 +123,7 @@ namespace opennwa {
             EXPECT_EQ(i, w.end());
         }
 
-        TEST(wali$nwa$NestedWord$$operatorEquals, equalWordsEqual)
+        TEST(opennwa$NestedWord$$operatorEquals, equalWordsEqual)
         {
             NestedWord word1, word2;
             SomeElements e;
@@ -146,7 +146,7 @@ namespace opennwa {
             EXPECT_EQ(word1, word2);
         }
 
-        TEST(wali$nwa$NestedWord$$operatorEquals, differentLengthsUnequal)
+        TEST(opennwa$NestedWord$$operatorEquals, differentLengthsUnequal)
         {
             NestedWord word1, word2;
             SomeElements e;
@@ -156,7 +156,7 @@ namespace opennwa {
             EXPECT_NE(word2, word1);
         }
 
-        TEST(wali$nwa$NestedWord$$operatorEquals, differentLettersUnequal)
+        TEST(opennwa$NestedWord$$operatorEquals, differentLettersUnequal)
         {
             NestedWord word1, word2;
             SomeElements e;
@@ -168,7 +168,7 @@ namespace opennwa {
             EXPECT_NE(word2, word1);
         }
 
-        TEST(wali$nwa$NestedWord$$operatorEquals, differentKindsUnequal)
+        TEST(opennwa$NestedWord$$operatorEquals, differentKindsUnequal)
         {
             NestedWord word1, word2, word3, word4, word5, word6;
             SomeElements e;

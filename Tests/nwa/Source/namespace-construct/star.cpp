@@ -30,7 +30,7 @@ static const unsigned num_nwas = NUM_ELEMENTS(nwas);
 namespace opennwa {
         namespace construct {
 
-            TEST(wali$nwa$query$$star, testBatteryOfVariouslyBalancedNwas)
+            TEST(opennwa$query$$star, testBatteryOfVariouslyBalancedNwas)
             {
                 for (unsigned nwa = 0 ; nwa < num_nwas ; ++nwa) {
                     std::stringstream ss;
@@ -61,7 +61,7 @@ namespace opennwa {
             }
 
 
-            TEST(wali$nwa$query$$star, universalNwa)
+            TEST(opennwa$query$$star, universalNwa)
             {
                 NWA nwa;
                 SomeElements e;

@@ -42,7 +42,7 @@ namespace opennwa {
             EXPECT_EQ(output.str(), again_output.str());
         }
 
-        TEST(wali$nwa$$print$and$read_nwa$, printAndread_nwaAreIdempotent)
+        TEST(opennwa$$print$and$read_nwa$, printAndread_nwaAreIdempotent)
         {
             for (unsigned nwa = 0; nwa < num_nwas; ++nwa) {
                 std::stringstream ss;

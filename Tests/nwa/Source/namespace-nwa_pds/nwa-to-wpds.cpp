@@ -53,7 +53,7 @@ namespace opennwa {
                 std::sort(c.begin(), c.end());
             }
 
-            TEST(wali$nwa$nwa_pds$$NwaToWpdsCalls, testBatteryOfVariouslyBalancedNwas)
+            TEST(opennwa$nwa_pds$$NwaToWpdsCalls, testBatteryOfVariouslyBalancedNwas)
             {
                 for (unsigned nwa = 0 ; nwa < num_nwas ; ++nwa) {
                     std::stringstream ss;

@@ -14,7 +14,7 @@
 namespace opennwa {
         namespace construct {
 
-            TEST(wali$nwa$construct$$determinize, allowPendingCallsOnAccepting)
+            TEST(opennwa$construct$$determinize, allowPendingCallsOnAccepting)
             {
                 SomeElements e;
                 NWA nwa;
@@ -35,7 +35,7 @@ namespace opennwa {
             }
 
             
-            TEST(wali$nwa$construct$$determinize, initialStateHasEpsilonClosureDone)
+            TEST(opennwa$construct$$determinize, initialStateHasEpsilonClosureDone)
             {
                 SomeElements e;
                 NWA nwa;
@@ -54,7 +54,7 @@ namespace opennwa {
             }
 
 
-            TEST(wali$nwa$construct$$determinize, useADifferentInitialStateToStartAndAsAPendingReturn)
+            TEST(opennwa$construct$$determinize, useADifferentInitialStateToStartAndAsAPendingReturn)
             {
                 SomeElements e;
                 NWA nwa;

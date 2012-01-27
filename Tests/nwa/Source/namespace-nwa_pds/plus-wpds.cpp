@@ -13,7 +13,7 @@ using namespace wali::wpds;
 namespace opennwa {
         namespace nwa_pds {
 
-            TEST(wali$nwa$nwa_pds$$plusWpds, compilationTest)
+            TEST(opennwa$nwa_pds$$plusWpds, compilationTest)
             {
                 WPDS wpds;
                 NWA nwa;

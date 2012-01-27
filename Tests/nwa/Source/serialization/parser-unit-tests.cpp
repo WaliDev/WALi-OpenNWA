@@ -30,7 +30,7 @@ namespace opennwa {
           ;
 
 
-        TEST(wali$nwa$parser$$discardws, unitTests)
+        TEST(opennwa$parser$$discardws, unitTests)
         {
           std::stringstream ss("  helllo");
 
@@ -102,7 +102,7 @@ namespace opennwa {
         struct StreamTooShortException   : std::exception {};
 
 
-        TEST(wali$nwa$parser$$readLit, unitTests)
+        TEST(opennwa$parser$$readLit, unitTests)
         {
           std::stringstream empty("");
           std::stringstream short_("he");
@@ -153,7 +153,7 @@ namespace opennwa {
           ;        
 
         
-        TEST(wali$nwa$parser$$readName, unitTests)
+        TEST(opennwa$parser$$readName, unitTests)
         {
           // Test several that look like they are a non-final name in a list
           std::stringstream ss1(" hello, world");
@@ -228,7 +228,7 @@ namespace opennwa {
           ;
 
 
-        TEST(wali$nwa$parser$$readTripleQuad, unitTests)
+        TEST(opennwa$parser$$readTripleQuad, unitTests)
         {
           std::stringstream ss1("(a, b, c)");
           std::stringstream ss2("(a, b, c)z");
@@ -280,7 +280,7 @@ namespace opennwa {
           ;
 
 
-        TEST(wali$nwa$parser$$readLists, unitTests)
+        TEST(opennwa$parser$$readLists, unitTests)
         {
           // These should return a zero list for all three kinds of lists.  When we
           // do the corresponding EXPECT_TRUEs below, make sure that they (really, ss2)
@@ -371,7 +371,7 @@ namespace opennwa {
         
 
 
-        TEST(wali$nwa$parser$$readBlocks, unitTests)
+        TEST(opennwa$parser$$readBlocks, unitTests)
         {
           NWARefPtr nwa = new opennwa::NWA();
     
@@ -444,7 +444,7 @@ namespace opennwa {
 namespace opennwa {
     using namespace parser::details;
 
-    TEST(wali$nwa$parser$$readMap, unitTests)
+    TEST(opennwa$parser$$readMap, unitTests)
     {
       std::string nwas =
         "nwa main : { Q0: start_m Qf: end_m }\n"
@@ -466,7 +466,7 @@ namespace opennwa {
     }
 
 
-    TEST(wali$nwa$parser$$readNwa, unitTests)
+    TEST(opennwa$parser$$readNwa, unitTests)
     {
       std::string mattsNwa =
         "Q: {" "\n"

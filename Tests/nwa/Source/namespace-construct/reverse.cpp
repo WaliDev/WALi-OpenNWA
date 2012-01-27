@@ -46,7 +46,7 @@ static NWA const expected_answers[] = {
 namespace opennwa {
         namespace construct {
 
-            TEST(wali$nwa$query$$reverse, testBatteryOfVariouslyBalancedNwas)
+            TEST(opennwa$query$$reverse, testBatteryOfVariouslyBalancedNwas)
             {
                 for (unsigned nwa = 0 ; nwa < num_nwas ; ++nwa) {
                     std::stringstream ss;
@@ -60,7 +60,7 @@ namespace opennwa {
             }
 
 
-            TEST(wali$nwa$query$$reverse, universalNwa)
+            TEST(opennwa$query$$reverse, universalNwa)
             {
                 NWA nwa;
                 SomeElements e;

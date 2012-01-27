@@ -57,7 +57,7 @@ static const NWA * const expected_answers[][num_nwas] = {
 namespace opennwa {
         namespace construct {
 
-            TEST(wali$nwa$construct$$intersection, testBatteryOfVariouslyBalancedNwas)
+            TEST(opennwa$construct$$intersection, testBatteryOfVariouslyBalancedNwas)
             {
                 for (unsigned left = 0 ; left < num_nwas ; ++left) {
                     for (unsigned right = 0 ; right < num_nwas ; ++right) {
@@ -79,7 +79,7 @@ namespace opennwa {
             }
             
 
-            TEST(wali$nwa$construct$$intersection, resultingAutomatonIsDeterministic)
+            TEST(opennwa$construct$$intersection, resultingAutomatonIsDeterministic)
             {
                 NWA left, right;
                 left.addInitialState(getKey("s"));

@@ -57,7 +57,7 @@ static const NWA * const expected_answers[][num_nwas] = {
 namespace opennwa {
         namespace construct {
 
-            TEST(wali$nwa$construct$$union, testBatteryOfVariouslyBalancedNwas)
+            TEST(opennwa$construct$$union, testBatteryOfVariouslyBalancedNwas)
             {
                 for (unsigned left = 0 ; left < num_nwas ; ++left) {
                     for (unsigned right = 0 ; right < num_nwas ; ++right) {
@@ -79,7 +79,7 @@ namespace opennwa {
             }
             
 
-            TEST(wali$nwa$construct$$union, resultingAutomatonIsNondeterministic)
+            TEST(opennwa$construct$$union, resultingAutomatonIsNondeterministic)
             {
                 NWA left, right;
                 left.addInitialState(getKey("s"));
@@ -91,7 +91,7 @@ namespace opennwa {
             }
 
 
-            TEST(wali$nwa$construct$$union, unionWithEmptyIsNoop)
+            TEST(opennwa$construct$$union, unionWithEmptyIsNoop)
             {
                 OddNumEvenGroupsNwa fixture;
                 NWA empty;
@@ -106,7 +106,7 @@ namespace opennwa {
             }
 
 
-            TEST(wali$nwa$construct$$union$$DeathTest, overlappingStatesTriggerAssertionViolation)
+            TEST(opennwa$construct$$union$$DeathTest, overlappingStatesTriggerAssertionViolation)
             {
                 NWA nwa;
                 nwa.addState(getKey("s"));
@@ -118,7 +118,7 @@ namespace opennwa {
             }
 
 
-            TEST(wali$nwa$construct$$union, unionCopiesClientInfo)
+            TEST(opennwa$construct$$union, unionCopiesClientInfo)
             {
                 AcceptsBalancedOnly bal;
                 NWA nwa; SomeElements e; e.add_to_nwa(&nwa);
