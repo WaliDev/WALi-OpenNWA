@@ -16,7 +16,7 @@ namespace opennwa
        * @param - first: the NWA to perform the complement of
        *
        */
-      extern void complement(NWA & out, NWA const & source);
+      extern void complement(Nwa & out, Nwa const & source);
 
 
       /**
@@ -31,7 +31,7 @@ namespace opennwa
        * @return the NWA resulting from complementing the given NWA
        *
        */
-      extern NWARefPtr complement( NWA const & source );
+      extern NwaRefPtr complement( Nwa const & source );
 
       
   }

@@ -31,7 +31,7 @@ built = [
     env.Program('nwa-language-subseteq.exe', ['language-subseteq.cpp']),
 
     DoubleProgramTarget(env, 'intersect'),
-    DoubleProgramTarget(env, 'union', 'unionNWA'),
+    DoubleProgramTarget(env, 'union', 'unionNwa'),
     DoubleProgramTarget(env, 'concat'),
 
     SingleProgramTarget(env, 'star'),

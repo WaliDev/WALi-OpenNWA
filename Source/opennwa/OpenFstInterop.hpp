@@ -46,7 +46,7 @@ namespace opennwa {
     /// is non-null, stores the mapping between Wali and OpenFST keys
     /// (state IDs) at that location.
     fst::StdVectorFst
-    internal_only_nwa_to_fst(NWARefPtr nwa, fst_wali_key_maps * maps = NULL);
+    internal_only_nwa_to_fst(NwaRefPtr nwa, fst_wali_key_maps * maps = NULL);
 
 
     /// Converts an OpenFST acceptor to an NWA. 'maps' could specify
@@ -55,22 +55,22 @@ namespace opennwa {
     /// 'node_prefix' is prepended to the OpenFST key of FST states,
     /// and provdies a way to make, say, state 1 of two different FSTs
     /// produce different Wali states.
-    NWARefPtr
+    NwaRefPtr
     fst_to_nwa(fst::StdExpandedFst const & fst, fst_wali_key_maps & maps, std::string node_prefix = "");
 
     /// Given an NWA 'internal_nwa' without call or return
     /// transitions, treat the NWA as a standard FA and minimize
     /// it. (It does this by converting it to an OpenFST acceptor,
     /// minimizing that, then converting it back.)
-    NWARefPtr
-    minimize_internal_nwa(NWARefPtr internal_nwa, std::string node_prefix = "");
+    NwaRefPtr
+    minimize_internal_nwa(NwaRefPtr internal_nwa, std::string node_prefix = "");
 
     /// Given an NWA 'internal_nwa' without call or return transitions, treat
     /// the NWA as a standard FA and determinize it using OpenFST.  (It does
     /// this by converting it to an OpenFST acceptor, minimizing that, then
     /// converting it back.)
-    NWARefPtr
-    determinize_internal_nwa(NWARefPtr internal_nwa, std::string node_prefix = "");
+    NwaRefPtr
+    determinize_internal_nwa(NwaRefPtr internal_nwa, std::string node_prefix = "");
 
 }
 

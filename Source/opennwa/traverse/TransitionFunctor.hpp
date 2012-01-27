@@ -13,9 +13,9 @@ namespace opennwa {
       public:
         virtual ~ConstTransitionFunctor() {}
 
-        virtual void doInternal(NWA const & nwa, State source, Symbol symbol, State target) = 0;
-        virtual void doCall(NWA const & nwa, State source, Symbol symbol, State target) = 0;
-        virtual void doReturn(NWA const & nwa, State source, State pred, Symbol symbol, State target) = 0;
+        virtual void doInternal(Nwa const & nwa, State source, Symbol symbol, State target) = 0;
+        virtual void doCall(Nwa const & nwa, State source, Symbol symbol, State target) = 0;
+        virtual void doReturn(Nwa const & nwa, State source, State pred, Symbol symbol, State target) = 0;
       };
 
 
@@ -29,11 +29,11 @@ namespace opennwa {
 
         virtual ~ConstCallStringTransitionFunctor() {}
 
-        virtual void doInternal(NWA const & nwa, CallString const & cs,
+        virtual void doInternal(Nwa const & nwa, CallString const & cs,
                                 State source, Symbol symbol, State target) = 0;
-        virtual void doCall(NWA const & nwa, CallString const & cs,
+        virtual void doCall(Nwa const & nwa, CallString const & cs,
                             State source, Symbol symbol, State target) = 0;
-        virtual void doReturn(NWA const & nwa, CallString const & cs,
+        virtual void doReturn(Nwa const & nwa, CallString const & cs,
                               State source, State pred, Symbol symbol, State target) = 0;
       };
       

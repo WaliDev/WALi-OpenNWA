@@ -31,11 +31,11 @@ namespace opennwa
 
 
     // Forward decl
-    class NWA;
+    class Nwa;
 
     /// A reference-counted smart pointer to an NWA
     ///
-    typedef ref_ptr<NWA> NWARefPtr;
+    typedef ref_ptr<Nwa> NwaRefPtr;
 
     // Forward decl
     class NestedWord;

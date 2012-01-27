@@ -7,7 +7,7 @@
 namespace opennwa {
     namespace traverse {
 
-      void dfsCallStringTraversal(NWA const & nwa,
+      void dfsCallStringTraversal(Nwa const & nwa,
                                   ConstCallStringStateFunctor * state_functor,
                                   ConstCallStringTransitionFunctor * trans_functor);
         

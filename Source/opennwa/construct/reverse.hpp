@@ -16,7 +16,7 @@ namespace opennwa
        * @param - first: the NWA to reverse
        * 
        */
-      extern void reverse(NWA & out, NWA const & source);
+      extern void reverse(Nwa & out, Nwa const & source);
 
 
       /**
@@ -32,7 +32,7 @@ namespace opennwa
        * @return the NWA resulting from reversing the given NWA
        * 
        */
-      extern NWARefPtr reverse( NWA const & source );
+      extern NwaRefPtr reverse( Nwa const & source );
 
       
   }

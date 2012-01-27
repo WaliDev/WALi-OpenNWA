@@ -9,19 +9,19 @@ namespace opennwa {
     namespace query {
 
       bool
-      languageContains(NWA const & nwa, NestedWord const & word)
+      languageContains(Nwa const & nwa, NestedWord const & word)
       {
         return nwa.isMemberNondet(word);
       }
 
 
       bool
-      languageSubsetEq(NWA const & first, NWA const & second)
+      languageSubsetEq(Nwa const & first, Nwa const & second)
       {
-        NWA second_copy = second;
+        Nwa second_copy = second;
         
         // We have to synchronize alphabets first
-        for (NWA::SymbolIterator sym = first.beginSymbols();
+        for (Nwa::SymbolIterator sym = first.beginSymbols();
              sym != first.endSymbols(); ++sym)
         {
           second_copy.addSymbol(*sym);
@@ -29,8 +29,8 @@ namespace opennwa {
         
         //Check L(a1) contained in L(a2) by checking 
         //if L(a1) intersect (complement L(a2)) is empty.
-        NWARefPtr comp = construct::complement(second_copy);
-        NWARefPtr inter = construct::intersect(first, *comp);
+        NwaRefPtr comp = construct::complement(second_copy);
+        NwaRefPtr inter = construct::intersect(first, *comp);
         //inter.intersect(first, comp); //L(a1) intersect (complement L(a2))
 
         return languageIsEmpty(*inter);
@@ -38,14 +38,14 @@ namespace opennwa {
 
       
       bool
-      languageIsEmpty(NWA const & nwa)
+      languageIsEmpty(Nwa const & nwa)
       {
         return nwa._private_isEmpty_();
       }
 
 
       bool
-      languageEquals(NWA const & first, NWA const & second)
+      languageEquals(Nwa const & first, Nwa const & second)
       {
         //The languages accepted by two NWAs are equivalent if they are both contained
         //in each other, ie L(a1) contained in L(a2) and L(a2) contained in L(a1).

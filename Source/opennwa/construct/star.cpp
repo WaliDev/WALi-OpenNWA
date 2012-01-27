@@ -7,14 +7,14 @@ namespace opennwa
     namespace construct
     {
 
-      void star(NWA & out, NWA const & source)
+      void star(Nwa & out, Nwa const & source)
       {
         out._private_star_(source);
       }
 
-      NWARefPtr star( NWA const & source )
+      NwaRefPtr star( Nwa const & source )
       {
-        NWARefPtr nwa( new NWA());
+        NwaRefPtr nwa( new Nwa());
         star(*nwa, source);
         return nwa;
       }
@@ -30,7 +30,7 @@ namespace opennwa
      *
      */
     
-    void NWA::_private_star_( NWA const & first )
+    void Nwa::_private_star_( Nwa const & first )
     {
       State newStart = getKey("kleeneStarStart");
       assert(!first.isState(newStart));

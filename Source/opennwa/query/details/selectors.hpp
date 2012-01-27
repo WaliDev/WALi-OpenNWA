@@ -39,9 +39,9 @@ namespace opennwa
           /// This class selects the whole transition
           struct CallTransitionSelector
           {
-            typedef NWA::Call type;
+            typedef Nwa::Call type;
 
-            NWA::Call operator()(NWA::Call const & c) const {
+            Nwa::Call operator()(Nwa::Call const & c) const {
               return c;
             }
           };
@@ -49,9 +49,9 @@ namespace opennwa
           /// This class selects the whole transition
           struct InternalTransitionSelector
           {
-            typedef NWA::Internal type;
+            typedef Nwa::Internal type;
 
-            NWA::Internal operator()(NWA::Internal const & c) const {
+            Nwa::Internal operator()(Nwa::Internal const & c) const {
               return c;
             }
           };
@@ -60,9 +60,9 @@ namespace opennwa
           /// This class selects the whole transition
           struct ReturnTransitionSelector
           {
-            typedef NWA::Return type;
+            typedef Nwa::Return type;
 
-            NWA::Return operator()(NWA::Return const & c) const {
+            Nwa::Return operator()(Nwa::Return const & c) const {
               return c;
             }
           };
@@ -75,15 +75,15 @@ namespace opennwa
             /// source, so that's a state.
             typedef State type;
 
-            State operator()(NWA::Call const & c) const {
+            State operator()(Nwa::Call const & c) const {
               return c.first;
             }
 
-            //State operator()(NWA::Internal const & i) const {
+            //State operator()(Nwa::Internal const & i) const {
             //  return i.first;
             //}
 
-            State operator()(NWA::Return const & r) const {
+            State operator()(Nwa::Return const & r) const {
               return r.first;
             }
           };
@@ -95,15 +95,15 @@ namespace opennwa
             /// SymbolSelectors select the symbol, which is a Symbol
             typedef Symbol type;
 
-            State operator()(NWA::Call const & c) const {
+            State operator()(Nwa::Call const & c) const {
               return c.second;
             }
 
-            //State operator()(NWA::Internal const & i) const {
+            //State operator()(Nwa::Internal const & i) const {
             //  return i.second;
             //}
 
-            State operator()(NWA::Return const & r) const {
+            State operator()(Nwa::Return const & r) const {
               return r.third;
             }
           };
@@ -114,15 +114,15 @@ namespace opennwa
           {
             typedef State type;
 
-            State operator()(NWA::Call const & c) const {
+            State operator()(Nwa::Call const & c) const {
               return c.third;
             }
 
-            //State operator()(NWA::Internal const & i) const {
+            //State operator()(Nwa::Internal const & i) const {
             //  return i.third;
             //}
 
-            State operator()(NWA::Return const & r) const {
+            State operator()(Nwa::Return const & r) const {
               return r.fourth;
             }
           };
@@ -133,7 +133,7 @@ namespace opennwa
           {
             typedef State type;
 
-            State operator()(NWA::Return const & r) const {
+            State operator()(Nwa::Return const & r) const {
               return r.second;
             }
           };
@@ -150,17 +150,17 @@ namespace opennwa
             // The type *this* selector selects
             typedef std::pair<T1, T2> type;
 
-            type operator()(NWA::Call const & c) const {
+            type operator()(Nwa::Call const & c) const {
               return type(Selector1()(c),
                           Selector2()(c));
             }
 
-            //type operator()(NWA::Internal const & c) const {
+            //type operator()(Nwa::Internal const & c) const {
             //  return type(Selector1()(c),
             //              Selector2()(c));
             //}
 
-            type operator()(NWA::Return const & c) const {
+            type operator()(Nwa::Return const & c) const {
               return type(Selector1()(c),
                           Selector2()(c));
             }

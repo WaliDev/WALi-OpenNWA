@@ -11,7 +11,7 @@ namespace opennwa {
       ///
       /// @returns true if 'word' is in L(this), and false otherwise.
       bool
-      languageContains(NWA const & nwa, NestedWord const & word);
+      languageContains(Nwa const & nwa, NestedWord const & word);
 
 
       /**
@@ -28,7 +28,7 @@ namespace opennwa {
        *
        */
       bool
-      languageSubsetEq(NWA const & left, NWA const & right);
+      languageSubsetEq(Nwa const & left, Nwa const & right);
 
 
       /**
@@ -41,7 +41,7 @@ namespace opennwa {
        *
        */
       bool
-      languageIsEmpty(NWA const & nwa);
+      languageIsEmpty(Nwa const & nwa);
 
 
       /**
@@ -53,11 +53,11 @@ namespace opennwa {
        */
       extern
       ref_ptr<NestedWord>
-      getSomeAcceptedWord(NWA const & nwa);
+      getSomeAcceptedWord(Nwa const & nwa);
 
       extern
       ref_ptr<NestedWord>
-      getSomeShortestAcceptedWord(NWA const & nwa);
+      getSomeShortestAcceptedWord(Nwa const & nwa);
       
 
       /**
@@ -72,7 +72,7 @@ namespace opennwa {
        *
        */
       bool
-      languageEquals(NWA const & first, NWA const & second);
+      languageEquals(Nwa const & first, Nwa const & second);
       
   }
 }

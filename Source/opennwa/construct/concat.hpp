@@ -17,7 +17,7 @@ namespace opennwa
        * @param - second: the NWA to concatenate onto the end of 'first'
        *
        */
-      extern void concat(NWA & out, NWA const & first, NWA const & second);
+      extern void concat(Nwa & out, Nwa const & first, Nwa const & second);
 
 
       /**
@@ -34,7 +34,7 @@ namespace opennwa
        * @return the NWA resulting from the concatenation of the given NWAs
        *
        */
-      extern NWARefPtr concat( NWA const & first, NWA const & second );
+      extern NwaRefPtr concat( Nwa const & first, Nwa const & second );
 
       
   }

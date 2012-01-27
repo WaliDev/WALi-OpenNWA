@@ -8,10 +8,10 @@ namespace opennwa
     namespace construct
     {
 
-      NWARefPtr unionNWA( NWA const & first, NWA const & second )
+      NwaRefPtr unionNwa( Nwa const & first, Nwa const & second )
       {
-        NWARefPtr nwa( new NWA());
-        unionNWA(*nwa, first, second);
+        NwaRefPtr nwa( new Nwa());
+        unionNwa(*nwa, first, second);
         return nwa;
       }
 
@@ -24,7 +24,7 @@ namespace opennwa
        * @param - second: the NWA to union with 'first'
        *
        */
-      void unionNWA( NWA & out, NWA const & first, NWA const & second )
+      void unionNwa( Nwa & out, Nwa const & first, Nwa const & second )
       {
         //Q: Do we need to guarantee that there is no overlap in states between machines? 
         //A: YES
@@ -53,13 +53,13 @@ namespace opennwa
         // transitions from the two machines. It has the initial and final
         // states of the 'first' machine, but lacks the initial and final
         // states of the 'second' machine. So we need to add those.
-        for (NWA::StateIterator initial = second.beginInitialStates();
+        for (Nwa::StateIterator initial = second.beginInitialStates();
              initial != second.endInitialStates(); ++initial)
         {
           out.addInitialState(*initial);
         }
 
-        for (NWA::StateIterator final = second.beginFinalStates();
+        for (Nwa::StateIterator final = second.beginFinalStates();
              final != second.endFinalStates(); ++final)
         {
           out.addFinalState(*final);

@@ -13,18 +13,18 @@ namespace opennwa {
 
 
         void
-        handle_internals(NWA const & nwa, CallString const & cs, State state,
+        handle_internals(Nwa const & nwa, CallString const & cs, State state,
                          StateSet & visited, ConstCallStringStateFunctor * state_functor,
                          ConstCallStringTransitionFunctor * trans_functor,
                          StateSet & return_sites);
         void
-        handle_calls(NWA const & nwa, CallString const & cs, State state,
+        handle_calls(Nwa const & nwa, CallString const & cs, State state,
                      StateSet & visited, ConstCallStringStateFunctor * state_functor,
                      ConstCallStringTransitionFunctor * trans_functor,
                      StateSet & return_sites);
 
         void
-        handle_returns(NWA const & nwa, CallString const & cs, State state,
+        handle_returns(Nwa const & nwa, CallString const & cs, State state,
                        ConstCallStringTransitionFunctor * trans_functor,
                        StateSet & return_sites);
 
@@ -44,7 +44,7 @@ namespace opennwa {
         /// 'trans_functor' is set, calls it for each transition in the
         /// expanded nw.
         StateSet
-        dfsCallStringTraversalHelper(NWA const & nwa,
+        dfsCallStringTraversalHelper(Nwa const & nwa,
                                      CallString const & cs,
                                      State state,
                                      StateSet & visited_in_this_procedure,
@@ -79,7 +79,7 @@ namespace opennwa {
         ///////////////
         // Internal transitions.
         void
-        handle_internals(NWA const & nwa, CallString const & cs, State state,
+        handle_internals(Nwa const & nwa, CallString const & cs, State state,
                          StateSet & visited, ConstCallStringStateFunctor * state_functor,
                          ConstCallStringTransitionFunctor * trans_functor,
                          StateSet & return_sites)
@@ -116,7 +116,7 @@ namespace opennwa {
         ///////////////
         // Call transitions
         void
-        handle_calls(NWA const & nwa, CallString const & cs, State state,
+        handle_calls(Nwa const & nwa, CallString const & cs, State state,
                      StateSet & visited_in_this_procedure,
                      ConstCallStringStateFunctor * state_functor,
                      ConstCallStringTransitionFunctor * trans_functor,
@@ -180,7 +180,7 @@ namespace opennwa {
         /////////////////
         // Return transitions
         void
-        handle_returns(NWA const & nwa, CallString const & cs, State state,
+        handle_returns(Nwa const & nwa, CallString const & cs, State state,
                        ConstCallStringTransitionFunctor * trans_functor,
                        StateSet & return_sites)
         {
@@ -211,7 +211,7 @@ namespace opennwa {
       } // namespace details
 
         
-      void dfsCallStringTraversal(NWA const & nwa,
+      void dfsCallStringTraversal(Nwa const & nwa,
                                   ConstCallStringStateFunctor * state_functor,
                                   ConstCallStringTransitionFunctor * trans_functor)
       {
@@ -219,7 +219,7 @@ namespace opennwa {
         cs.push_back(getKey("<below main>"));
         
         StateSet visited_in_main;
-        for (NWA::StateIterator initial = nwa.beginInitialStates();
+        for (Nwa::StateIterator initial = nwa.beginInitialStates();
              initial != nwa.endInitialStates(); ++initial)
         {
           details::dfsCallStringTraversalHelper(nwa, cs, *initial, visited_in_main,

@@ -29,7 +29,7 @@ namespace opennwa
      *
      */
     
-    const std::set< State> getCallSites_Sym(NWA const & nwa, Symbol symbol )
+    const std::set< State> getCallSites_Sym(Nwa const & nwa, Symbol symbol )
     {
       assert(symbol < wali::WALI_BAD_KEY);
 
@@ -58,7 +58,7 @@ namespace opennwa
      *
      */
     
-    const std::set< State> getCallSites(NWA const & nwa, Symbol symbol, State entryPoint )
+    const std::set< State> getCallSites(Nwa const & nwa, Symbol symbol, State entryPoint )
     {
       assert(entryPoint < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
@@ -87,7 +87,7 @@ namespace opennwa
      *
      */
     
-    const std::set<std::pair< State, Symbol> > getCallSites(NWA const & nwa, State entryPoint )
+    const std::set<std::pair< State, Symbol> > getCallSites(Nwa const & nwa, State entryPoint )
     {
       assert(entryPoint < wali::WALI_BAD_KEY);
 
@@ -110,7 +110,7 @@ namespace opennwa
      *
      */
 	
-    const std::set< State> getCallSites(NWA const & nwa)
+    const std::set< State> getCallSites(Nwa const & nwa)
     {
       details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       const Calls & call = trans.getCalls();
@@ -130,7 +130,7 @@ namespace opennwa
      *
      */
     
-    const std::set< Symbol> getCallSym(NWA const & nwa)
+    const std::set< Symbol> getCallSym(Nwa const & nwa)
     {
       details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       const Calls & calls = trans.getCalls();
@@ -154,7 +154,7 @@ namespace opennwa
      *
      */
     
-    const std::set< Symbol> getCallSym(NWA const & nwa, State callSite, State entryPoint )
+    const std::set< Symbol> getCallSym(Nwa const & nwa, State callSite, State entryPoint )
     {
       assert(callSite < wali::WALI_BAD_KEY);
       assert(entryPoint < wali::WALI_BAD_KEY);
@@ -182,7 +182,7 @@ namespace opennwa
      *
      */
     
-    const std::set< Symbol> getCallSym_Call(NWA const & nwa, State callSite )
+    const std::set< Symbol> getCallSym_Call(Nwa const & nwa, State callSite )
     {
       assert(callSite < wali::WALI_BAD_KEY);
 
@@ -208,7 +208,7 @@ namespace opennwa
      *
      */
     
-    const std::set< Symbol> getCallSym_Entry(NWA const & nwa, State entryPoint )
+    const std::set< Symbol> getCallSym_Entry(Nwa const & nwa, State entryPoint )
     {
       assert(entryPoint < wali::WALI_BAD_KEY);
 
@@ -232,7 +232,7 @@ namespace opennwa
      *
      */
     
-    const std::set< State> getEntries_Sym(NWA const & nwa, Symbol symbol )
+    const std::set< State> getEntries_Sym(Nwa const & nwa, Symbol symbol )
     {
       assert(symbol < wali::WALI_BAD_KEY);
 
@@ -260,7 +260,7 @@ namespace opennwa
      *
      */
     
-    const std::set< State> getEntries(NWA const & nwa, State callSite, Symbol symbol )
+    const std::set< State> getEntries(Nwa const & nwa, State callSite, Symbol symbol )
     {
       assert(callSite < wali::WALI_BAD_KEY);
       assert(symbol < wali::WALI_BAD_KEY);
@@ -286,7 +286,7 @@ namespace opennwa
      *
      */
     
-    const std::set<std::pair< Symbol, State> > getEntries(NWA const & nwa, State callSite )
+    const std::set<std::pair< Symbol, State> > getEntries(Nwa const & nwa, State callSite )
     {
       assert(callSite < wali::WALI_BAD_KEY);
       details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
@@ -307,7 +307,7 @@ namespace opennwa
      *
      */
 	
-    const std::set< State> getEntries(NWA const & nwa)
+    const std::set< State> getEntries(Nwa const & nwa)
     {
       details::TransitionStorage const & trans = nwa._private_get_transition_storage_();
       const Calls & call = trans.getCalls();

@@ -5,7 +5,7 @@ namespace opennwa
     namespace construct
     {
 
-      extern void determinize(NWA & out, NWA const & source);
+      extern void determinize(Nwa & out, Nwa const & source);
 
 
       /**
@@ -20,7 +20,7 @@ namespace opennwa
        * @return the NWA resulting from determinizing the given NWA
        *
        */
-      extern NWARefPtr determinize( NWA const & nondet );
+      extern NwaRefPtr determinize( Nwa const & nondet );
 
       
   }

@@ -45,7 +45,7 @@ namespace opennwa
      * Note: StName must be a unique identifier for states.
      *
      */
-    class NWA : public wali::Printable, public wali::Countable
+    class Nwa : public wali::Printable, public wali::Countable
     {
     private:
       typedef ClientInfo Client;
@@ -132,17 +132,17 @@ namespace opennwa
 
       ///
       /// @brief Constructs an empty NWA
-      NWA( );
+      Nwa( );
 
       /// @brief Copies 'other'. Does not share structure.
       ///
       /// Will clone the client info objects. TODO-RELEASE
-      NWA( const NWA & other );
+      Nwa( const Nwa & other );
 
       /// @brief Assigns 'other' to this NWA. Does not share structure.
       ///
       /// Will clone the client info objects. TODO-RELEASE
-      NWA & operator=( const NWA & other );
+      Nwa & operator=( const Nwa & other );
 
       /**
        * @brief Removes all states, symbols, and transitions from this NWA
@@ -709,7 +709,7 @@ namespace opennwa
        * @brief constructs an NWA which is the projection of the given NWA to the states
        * provided
        */
-      void projectStates(NWA const & first, StateSet const & prjStates);
+      void projectStates(Nwa const & first, StateSet const & prjStates);
 
 
       
@@ -761,9 +761,9 @@ namespace opennwa
 
 
       // {{{ Deprecated construction functions (& private cheater functions)
-      void _private_star_( NWA const & first );
-      void _private_determinize_( NWA const & nondet );
-      void _private_intersect_( NWA const & first, NWA const & second );
+      void _private_star_( Nwa const & first );
+      void _private_determinize_( Nwa const & nondet );
+      void _private_intersect_( Nwa const & first, Nwa const & second );
       // }}}
       
       bool _private_isDeterministic_() const;
@@ -799,8 +799,8 @@ namespace opennwa
        * @param - resSym: the symbol associated with the transition that is being created
        * @param - resSt: the state which will receive the computed client information
        */
-      virtual void intersectClientInfoCall( NWA const & first, State call1, State entry1, 
-                                            NWA const & second, State call2, State entry2, 
+      virtual void intersectClientInfoCall( Nwa const & first, State call1, State entry1, 
+                                            Nwa const & second, State call2, State entry2, 
                                             Symbol resSym, State resSt );  
 
       /**
@@ -833,8 +833,8 @@ namespace opennwa
        * @param - resSt: the state which will receive the computed client information
        *
        */
-      virtual void intersectClientInfoInternal( NWA const & first, State src1, State tgt1, 
-                                                NWA const & second, State src2, State tgt2, 
+      virtual void intersectClientInfoInternal( Nwa const & first, State src1, State tgt1, 
+                                                Nwa const & second, State src2, State tgt2, 
                                                 Symbol resSym, State resSt );  
 
       /**
@@ -871,8 +871,8 @@ namespace opennwa
        * @param - resSt: the state which will receive the computed client information
        *
        */
-      virtual void intersectClientInfoReturn( NWA const & first, State exit1, State call1, State ret1,
-                                              NWA const & second, State exit2, State call2, State ret2,
+      virtual void intersectClientInfoReturn( Nwa const & first, State exit1, State call1, State ret1,
+                                              Nwa const & second, State exit2, State call2, State ret2,
                                               Symbol resSym, State resSt );
 
       /**
@@ -894,7 +894,7 @@ namespace opennwa
        * @param - resCI: the client info that results from performing the intersection
        *
        */
-      virtual bool stateIntersect( NWA const & first, State state1, NWA const & second, State state2,
+      virtual bool stateIntersect( Nwa const & first, State state1, Nwa const & second, State state2,
                                    State & resSt, ClientInfoRefPtr & resCI );
 
       /**
@@ -915,7 +915,7 @@ namespace opennwa
        * @param - resSym: the symbol that results from performing the intersection
        *
        */
-      virtual bool transitionIntersect( NWA const & first, Symbol sym1, NWA const & second, Symbol sym2,
+      virtual bool transitionIntersect( Nwa const & first, Symbol sym1, Nwa const & second, Symbol sym2,
                                         Symbol & resSym );
 
       // }}}
@@ -939,7 +939,7 @@ namespace opennwa
        * @param - resCI: the client info that results from performing the merge
        *
        */
-      virtual void mergeClientInfo( NWA const & nwa, 
+      virtual void mergeClientInfo( Nwa const & nwa, 
                                     BinaryRelation const & binRel, 
                                     State resSt, ClientInfoRefPtr & resCI );
 
@@ -961,7 +961,7 @@ namespace opennwa
        * @param - resCI: the client info that results from performing the merge
        *
        */
-      virtual void mergeClientInfoCall( NWA const & nwa, 
+      virtual void mergeClientInfoCall( Nwa const & nwa, 
                                         BinaryRelation const & binRelCall, 
                                         BinaryRelation const & binRelEntry,
                                         State callSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI );
@@ -988,7 +988,7 @@ namespace opennwa
        * @param - resCI: the client info that results from performing the merge
        *
        */
-      virtual void mergeClientInfoInternal( NWA const & nwa, 
+      virtual void mergeClientInfoInternal( Nwa const & nwa, 
                                             BinaryRelation const & binRelSource, 
                                             BinaryRelation const & binRelTarget,
                                             State sourceSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI );
@@ -1017,7 +1017,7 @@ namespace opennwa
        * @param - resCI: the client info that results from performing the merge
        *
        */
-      virtual void mergeClientInfoReturn( NWA const & nwa, 
+      virtual void mergeClientInfoReturn( Nwa const & nwa, 
                                           BinaryRelation const & binRelExit,
                                           BinaryRelation const & binRelCall, 
                                           BinaryRelation const & binRelReturn,
@@ -1183,7 +1183,7 @@ namespace opennwa
        * @return true if this NWA is equivalent to the NWA 'other'
        *
        */
-      bool operator==( const NWA & other ) const;
+      bool operator==( const Nwa & other ) const;
 
       //TODO: add methods like ...
       //virtual void for_each(ConstRuleFunctor &func) const;
@@ -1447,7 +1447,7 @@ namespace opennwa
        *                  component of the state pair
        *
        */
-      void epsilonClosure(  std::set<StatePair> * newPairs, StatePair sp, NWA const & first, NWA const & second ) const;
+      void epsilonClosure(  std::set<StatePair> * newPairs, StatePair sp, Nwa const & first, Nwa const & second ) const;
 
       /**
        * 
@@ -1487,7 +1487,7 @@ namespace opennwa
       ///
       /// This is like unionNWA(), except that it doesn't modify the initial
       /// or accepting states.
-      void combineWith(NWA const & rhs);
+      void combineWith(Nwa const & rhs);
     };
 
 }

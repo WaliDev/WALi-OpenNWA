@@ -6,15 +6,15 @@ namespace opennwa
     namespace construct
     {
       
-      void determinize(NWA & out, NWA const & source)
+      void determinize(Nwa & out, Nwa const & source)
       {
         out._private_determinize_(source);
       }
 
 
-      NWARefPtr determinize( NWA const & nondet )
+      NwaRefPtr determinize( Nwa const & nondet )
       {
-        NWARefPtr nwa( new NWA());
+        NwaRefPtr nwa( new Nwa());
         determinize(*nwa, nondet);
         return nwa;
       }
@@ -56,7 +56,7 @@ namespace opennwa
      *
      */
     
-    void NWA::_private_determinize_( NWA const & nondet )
+    void Nwa::_private_determinize_( Nwa const & nondet )
     {
 #ifdef USE_BUDDY
       wali::relations::buddyInit();
@@ -435,7 +435,7 @@ namespace opennwa
      *
      */
     
-    State NWA::makeKey(
+    State Nwa::makeKey(
       wali::relations::RelationTypedefs<State>::BinaryRelation const & R ) const
     {
       // C++ really needs C++0x's 'auto' keyword :-)

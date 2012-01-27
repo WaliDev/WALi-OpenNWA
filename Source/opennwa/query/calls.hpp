@@ -20,7 +20,7 @@ namespace opennwa
        * @return the set of call site states associated with the given symbol
        *
        */
-      extern const  StateSet getCallSites_Sym(NWA const & nwa, Symbol symbol );
+      extern const  StateSet getCallSites_Sym(Nwa const & nwa, Symbol symbol );
 
       /**
        * 
@@ -37,7 +37,7 @@ namespace opennwa
        *          and entry point
        *
        */
-      extern const  StateSet getCallSites(NWA const & nwa, Symbol symbol, State entryPoint );
+      extern const  StateSet getCallSites(Nwa const & nwa, Symbol symbol, State entryPoint );
       
       /**
        * 
@@ -53,11 +53,11 @@ namespace opennwa
        *          entry point
        *
        */
-      extern const  std::set<std::pair<State,Symbol> > getCallSites(NWA const & nwa, State entryPoint );
+      extern const  std::set<std::pair<State,Symbol> > getCallSites(Nwa const & nwa, State entryPoint );
 
       /**
        * 
-       * @brief returns the call sites of all call transitions in the NWA
+       * @brief returns the call sites of all call transitions in the Nwa
        *
        * This method provides access to the call sites of all call transitions
        * in the NWA.
@@ -65,7 +65,7 @@ namespace opennwa
        * @return the set of call sites of all call transitions in the NWA
        *
        */
-      extern const  StateSet getCallSites(NWA const & nwa );
+      extern const  StateSet getCallSites(Nwa const & nwa );
 
       /**
        * 
@@ -77,7 +77,7 @@ namespace opennwa
        * @return the set of symbols that label call transitions in the NWA
        *
        */
-      extern const  SymbolSet getCallSym(NWA const & nwa );
+      extern const  SymbolSet getCallSym(Nwa const & nwa );
 
       /**
        * 
@@ -93,7 +93,7 @@ namespace opennwa
        *          'callSite' to 'entryPoint' in the NWA
        *
        */
-      extern const  SymbolSet getCallSym(NWA const & nwa, State callSite, State entryPoint );
+      extern const  SymbolSet getCallSym(Nwa const & nwa, State callSite, State entryPoint );
 
       /**
        * 
@@ -108,7 +108,7 @@ namespace opennwa
        *          'callSite' in the NWA
        *
        */
-      extern const  SymbolSet getCallSym_Call(NWA const & nwa, State callSite );
+      extern const  SymbolSet getCallSym_Call(Nwa const & nwa, State callSite );
 
       /**
        * 
@@ -123,7 +123,7 @@ namespace opennwa
        *          'entryPoint' in the NWA
        *
        */
-      extern const  SymbolSet getCallSym_Entry(NWA const & nwa, State entryPoint );
+      extern const  SymbolSet getCallSym_Entry(Nwa const & nwa, State entryPoint );
 
       /**
        * 
@@ -136,7 +136,7 @@ namespace opennwa
        * @return the set of entry point states associated with the given symbol
        *
        */
-      extern const  StateSet getEntries_Sym(NWA const & nwa, Symbol symbol );
+      extern const  StateSet getEntries_Sym(Nwa const & nwa, Symbol symbol );
       
       /**
        * 
@@ -152,7 +152,7 @@ namespace opennwa
        *          site and symbol
        *
        */
-      extern const  StateSet getEntries(NWA const & nwa, State callSite, Symbol symbol );
+      extern const  StateSet getEntries(Nwa const & nwa, State callSite, Symbol symbol );
 
       /**
        * 
@@ -165,7 +165,7 @@ namespace opennwa
        * @return the set of symbol/entry point pairs associated with the given call site
        *
        */
-      extern const  std::set<std::pair<Symbol,State> > getEntries(NWA const & nwa, State callSite );
+      extern const  std::set<std::pair<Symbol,State> > getEntries(Nwa const & nwa, State callSite );
 
       /**
        * 
@@ -177,7 +177,7 @@ namespace opennwa
        * @return the set of entry points of all call transitions in the NWA
        *
        */
-      extern const  StateSet getEntries(NWA const & nwa );      
+      extern const  StateSet getEntries(Nwa const & nwa );      
 
   }
 }

@@ -14,13 +14,13 @@ namespace opennwa
     {
 
       WPDS
-      plusWpds( NWA const & nwa, const WPDS & base )
+      plusWpds( Nwa const & nwa, const WPDS & base )
       {
         typedef ::opennwa::details::TransitionStorage Trans;
       
         //Q: do implicit transitions to the stuck state affect this result?
         //A: it changes the states that are reachable
-        NWA copy = nwa;
+        Nwa copy = nwa;
 
         State stuck = getKey("stuck");
         while (copy.isState(stuck)) {
@@ -42,7 +42,7 @@ namespace opennwa
           //<p,n_1> -w-> <p',n_2> in delta_1, (q,n_1,q') in delta_i
           Key sym = it->from_stack();
           //look for internal transitions in the NWA with symbol 'sym'
-          for( NWA::InternalIterator iit = copy.beginInternalTrans();
+          for( Nwa::InternalIterator iit = copy.beginInternalTrans();
                iit != copy.endInternalTrans(); iit++ )
           {
             if( sym == Trans::getInternalSym(*iit) )
@@ -62,7 +62,7 @@ namespace opennwa
           //<p,n_c> -w-> <p',e r_c> in delta_3, (q_c,n_c,q) in delta_c
           Key sym = it->from_stack();
           //look for call transitions in the NWA with symbol 'sym'
-          for( NWA::CallIterator cit = copy.beginCallTrans();
+          for( Nwa::CallIterator cit = copy.beginCallTrans();
                cit != copy.endCallTrans(); cit++ )
           {
             if( sym == Trans::getCallSym(*cit) )
@@ -83,7 +83,7 @@ namespace opennwa
           //<p,x> -w-> <p',*> in delta_0, (q_r,q_c,x,q) in delta_r
           Key sym = it->from_stack();
           //look for return transitions in the NWA with symbol 'sym'
-          for( NWA::ReturnIterator rit = copy.beginReturnTrans();
+          for( Nwa::ReturnIterator rit = copy.beginReturnTrans();
                rit != copy.endReturnTrans(); rit++ )
           {
             if( sym == Trans::getReturnSym(*rit) )

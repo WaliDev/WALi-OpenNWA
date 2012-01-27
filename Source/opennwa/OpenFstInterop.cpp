@@ -45,7 +45,7 @@ namespace opennwa {
 
            
     StdVectorFst
-    internal_only_nwa_to_fst(NWARefPtr nwa, fst_wali_key_maps * maps)
+    internal_only_nwa_to_fst(NwaRefPtr nwa, fst_wali_key_maps * maps)
     {
       assert(EPSILON == 0);
             
@@ -126,7 +126,7 @@ namespace opennwa {
     }
 
 
-    NWARefPtr
+    NwaRefPtr
     fst_to_nwa(StdExpandedFst const & fst,
                fst_wali_key_maps & maps,
                std::string node_prefix)
@@ -151,7 +151,7 @@ namespace opennwa {
             
       assert(EPSILON == 0);
             
-      NWARefPtr nwa = new NWA();
+      NwaRefPtr nwa = new NWA();
             
       typedef StateIterator<StdFst> StateIter;
       typedef ArcIterator<StdFst> ArcIter;
@@ -201,8 +201,8 @@ namespace opennwa {
     // to an OpenFST acceptor, minimizes that acceptor, then converts it
     // back. (Unfortunately, this will destroy the state names. C'est la
     // vie.)
-    NWARefPtr
-    minimize_internal_nwa(NWARefPtr internal_nwa,
+    NwaRefPtr
+    minimize_internal_nwa(NwaRefPtr internal_nwa,
                           std::string node_prefix)
     {
       // Convert to a FSM
@@ -224,7 +224,7 @@ namespace opennwa {
       fst::Minimize(&det_fsm);
             
       // Now convert back
-      NWARefPtr min_nwa = fst_to_nwa(det_fsm, maps, node_prefix);
+      NwaRefPtr min_nwa = fst_to_nwa(det_fsm, maps, node_prefix);
             
       // This could be an expensive check, but hopefully not...
       //assert (NWA::equal(internal_nwa, min_nwa));
@@ -236,8 +236,8 @@ namespace opennwa {
     // to an OpenFST acceptor, minimizes that acceptor, then converts it
     // back. (Unfortunately, this will destroy the state names. C'est la
     // vie.)
-    NWARefPtr
-    determinize_internal_nwa(NWARefPtr internal_nwa,
+    NwaRefPtr
+    determinize_internal_nwa(NwaRefPtr internal_nwa,
                              std::string node_prefix)
     {
       // Convert to a FSM
@@ -257,7 +257,7 @@ namespace opennwa {
       fst::Determinize(fsm, &det_fsm);
             
       // Now convert back
-      NWARefPtr min_nwa = fst_to_nwa(det_fsm, maps, node_prefix);
+      NwaRefPtr min_nwa = fst_to_nwa(det_fsm, maps, node_prefix);
             
       // This could be an expensive check, but hopefully not...
       //assert (NWA::equal(internal_nwa, min_nwa));

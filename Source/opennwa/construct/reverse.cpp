@@ -9,9 +9,9 @@ namespace opennwa
     namespace construct
     {
 
-      NWARefPtr reverse( NWA const & source )
+      NwaRefPtr reverse( Nwa const & source )
       {
-        NWARefPtr nwa( new NWA());
+        NwaRefPtr nwa( new Nwa());
         reverse(*nwa, source);
         return nwa;
       }
@@ -22,7 +22,7 @@ namespace opennwa
        * @param - first: the NWA to reverse
        * 
        */
-      void reverse( NWA & out, NWA const & first )
+      void reverse( Nwa & out, Nwa const & first )
       {
         //Q: How should clientInfos be generated for the reversed NWA?
         //A: The clientInfos from the component machines are copied and added to the reversed NWA.
@@ -34,7 +34,7 @@ namespace opennwa
 
         //The reverse machine has all the states of the original machine.
         // FIXME-RELEASE: copy clientinfo. Or figure out how to do this.
-        for (NWA::StateIterator sit = first.beginStates();
+        for (Nwa::StateIterator sit = first.beginStates();
              sit != first.endStates(); ++sit)
         {
           State state = *sit;
@@ -46,7 +46,7 @@ namespace opennwa
           
 
         //Swap initial and final state functionality.
-        for( NWA::StateIterator it = first.beginInitialStates(); 
+        for( Nwa::StateIterator it = first.beginInitialStates(); 
              it != first.endInitialStates(); it++ )
         {
           State state = *it;
@@ -55,7 +55,7 @@ namespace opennwa
           out.addFinalState(state);
           out.addFinalState(primed);
         }
-        for( NWA::StateIterator it = first.beginFinalStates(); 
+        for( Nwa::StateIterator it = first.beginFinalStates(); 
              it != first.endFinalStates(); it++ )
         {
           out.addInitialState(getKey(*it, prime));
@@ -63,7 +63,7 @@ namespace opennwa
 
       
         //Duplicate internal transitions with source/target swapped.
-        for( NWA::InternalIterator it = first.beginInternalTrans(); 
+        for( Nwa::InternalIterator it = first.beginInternalTrans(); 
              it != first.endInternalTrans(); it++ )
         {
           State source = it->first;
@@ -80,7 +80,7 @@ namespace opennwa
 
         //Duplicate call transitions with associated return transitions as 
         //return transitions with (entry,return,sym,call).
-        for( NWA::CallIterator cit = first.beginCallTrans(); 
+        for( Nwa::CallIterator cit = first.beginCallTrans(); 
              cit != first.endCallTrans(); cit++ )
         {
           State call_site = cit->first;
@@ -90,7 +90,7 @@ namespace opennwa
           State call_site_p = getKey(call_site, prime);
           State entry_site_p = getKey(entry_site, prime);
           
-          for( NWA::ReturnIterator rit = first.beginReturnTrans(); 
+          for( Nwa::ReturnIterator rit = first.beginReturnTrans(); 
                rit != first.endReturnTrans(); rit++ )
           {
             if( TransitionStorage::getCallSite(*cit) == TransitionStorage::getCallSite(*rit) )
@@ -117,7 +117,7 @@ namespace opennwa
 
               out.addReturnTrans(entry_site, return_site, call_sym, call_site);
               out.addReturnTrans(entry_site, return_site_p, call_sym, call_site_p);
-              for (NWA::StateIterator q0it = out.beginInitialStates();
+              for (Nwa::StateIterator q0it = out.beginInitialStates();
                    q0it != out.endInitialStates(); ++q0it)
               {
                 out.addReturnTrans(entry_site_p, *q0it, call_sym, call_site_p);

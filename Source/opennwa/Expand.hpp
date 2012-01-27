@@ -2,7 +2,7 @@
 
 namespace opennwa {
         namespace experimental {
-            NWARefPtr expandNwa(NWA const & nwa);
+            NwaRefPtr expandNwa(Nwa const & nwa);
         }
 }
 

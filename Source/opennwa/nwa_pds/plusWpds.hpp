@@ -23,7 +23,7 @@ namespace opennwa
        * @return the WPDS which can be used to perform property checking using PDS 
        *          reachability
        */
-      wali::wpds::WPDS plusWpds( NWA const & nwa, const wali::wpds::WPDS & base ); 
+      wali::wpds::WPDS plusWpds( Nwa const & nwa, const wali::wpds::WPDS & base ); 
 
 
   }

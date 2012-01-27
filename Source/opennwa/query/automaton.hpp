@@ -19,7 +19,7 @@ namespace opennwa {
        *
        */
       bool
-      isDeterministic(NWA const & nwa);
+      isDeterministic(Nwa const & nwa);
 
 
       /**
@@ -36,7 +36,7 @@ namespace opennwa {
        *
        */
       bool
-      statesOverlap(NWA const & first, NWA const & second);
+      statesOverlap(Nwa const & first, Nwa const & second);
 
   }
 }

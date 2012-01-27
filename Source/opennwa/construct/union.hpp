@@ -16,7 +16,7 @@ namespace opennwa
        * @param - second: the NWA to union with 'first'
        *
        */
-      extern void unionNWA(NWA & out, NWA const & first, NWA const & second);
+      extern void unionNwa(Nwa & out, Nwa const & first, Nwa const & second);
 
 
       /**
@@ -33,7 +33,7 @@ namespace opennwa
        * @return the NWA resulting from the union of the given NWAs
        *
        */
-      extern NWARefPtr unionNWA( NWA const & first, NWA const & second );
+      extern NwaRefPtr unionNwa( Nwa const & first, Nwa const & second );
 
       
   }

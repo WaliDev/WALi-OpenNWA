@@ -8,7 +8,7 @@ namespace opennwa {
       
 
       bool
-      isDeterministic(NWA const & nwa)
+      isDeterministic(Nwa const & nwa)
       {
         return nwa._private_isDeterministic_();
       }
@@ -16,7 +16,7 @@ namespace opennwa {
 
 
       bool
-      statesOverlap(NWA const & first, NWA const & second)
+      statesOverlap(Nwa const & first, Nwa const & second)
       {
         StateSet intersection;
         // The following line does 'intersection = first->states() intersect second->states()'

@@ -10,11 +10,11 @@ namespace opennwa {
     /// Reads a single NWA from 'is'. If 'name' is nonnull and the
     /// stream specifies a name, store the NWA's name at the location
     /// pointed to by 'name'.
-    extern NWARefPtr read_nwa(std::istream & is, std::string * name = NULL);
+    extern NwaRefPtr read_nwa(std::istream & is, std::string * name = NULL);
 
     /// A collection of named NWAs.
     ///
-    typedef std::map<std::string, NWARefPtr> ProcedureMap;
+    typedef std::map<std::string, NwaRefPtr> ProcedureMap;
 
     /// Reads a stream full of NWA descriptions, returning the set of
     /// named NWAs. (The NWAs in the stream better all have unique

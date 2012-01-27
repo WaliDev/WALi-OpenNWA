@@ -7,9 +7,9 @@ namespace opennwa
     namespace construct
     {
 
-      NWARefPtr complement( NWA const & source )
+      NwaRefPtr complement( Nwa const & source )
       {
-        NWARefPtr nwa( new NWA());
+        NwaRefPtr nwa( new Nwa());
         complement(*nwa, source);
         return nwa;
       }
@@ -21,7 +21,7 @@ namespace opennwa
        * @param - first: the NWA to perform the complement of
        *
        */
-      void complement( NWA & out, NWA const & first )
+      void complement( Nwa & out, Nwa const & first )
       {
         //Q: How should clientInfos be generated for the complemented NWA?
         //A: The clientInfos from the component machines are copied and added to the complemented NWA.
@@ -45,7 +45,7 @@ namespace opennwa
         //FinalStates = AllStates - FinalStates
         StateSet oldFinalStates(out.beginFinalStates(), out.endFinalStates());
         out.clearFinalStates();
-        for( NWA::StateIterator sit = out.beginStates(); sit != out.endStates(); sit++ )
+        for( Nwa::StateIterator sit = out.beginStates(); sit != out.endStates(); sit++ )
         {
           if( oldFinalStates.count(*sit) == 0 )
             out.addFinalState(*sit);

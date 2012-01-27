@@ -9,15 +9,15 @@ namespace opennwa
 {
     namespace nwa_pds
     {
-      NWARefPtr WpdsToNwa( const WPDS & pds )
+      NwaRefPtr WpdsToNwa( const WPDS & pds )
       {
-        NWARefPtr nwa(new NWA());
+        NwaRefPtr nwa(new Nwa());
         WpdsToNwa(*nwa, pds);
         return nwa;
       }
 
       
-      void WpdsToNwa( NWA & nwa, const WPDS & pds )
+      void WpdsToNwa( Nwa & nwa, const WPDS & pds )
       {
         //TODO: check this!
 

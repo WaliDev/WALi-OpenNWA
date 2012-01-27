@@ -15,25 +15,25 @@ namespace opennwa
   using wali::printKey;
   using wali::key2str;
     
-    const std::string NWA::XMLTag = "XML";
+    const std::string Nwa::XMLTag = "XML";
       
     //
     // Methods
     //
 
     //Constructors and Destructor
-    NWA::NWA( )
+    Nwa::Nwa( )
     { }
 
     
-    NWA::NWA( const NWA & other )
+    Nwa::Nwa( const Nwa & other )
       : Printable(other)
       , Countable(other)
       , states(other.states), symbols(other.symbols), trans(other.trans)
     {   }
 
     
-    NWA & NWA::operator=( const NWA & other )
+    Nwa & Nwa::operator=( const Nwa & other )
     {
       if( this == &other )
         return *this;
@@ -58,7 +58,7 @@ namespace opennwa
      *
      */
     
-    void NWA::clear( )
+    void Nwa::clear( )
     {
       clearStates();
       clearSymbols();
@@ -76,7 +76,7 @@ namespace opennwa
      *
      */
     
-    NWA::ClientInfoRefPtr NWA::getClientInfo( State state ) const
+    Nwa::ClientInfoRefPtr Nwa::getClientInfo( State state ) const
     {
       assert(state < wali::WALI_BAD_KEY);
       return states.getClientInfo(state);
@@ -91,7 +91,7 @@ namespace opennwa
      *
      */
     
-    void NWA::setClientInfo( State state, const ClientInfoRefPtr c )
+    void Nwa::setClientInfo( State state, const ClientInfoRefPtr c )
     {
       assert(state < wali::WALI_BAD_KEY);
       states.setClientInfo(state,c);
@@ -107,7 +107,7 @@ namespace opennwa
      *
      */
     
-    const StateSet & NWA::getStates( ) const
+    const StateSet & Nwa::getStates( ) const
     {
       return states.getStates();
     }
@@ -121,7 +121,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::isState( State state ) const
+    bool Nwa::isState( State state ) const
     {
       assert(state < wali::WALI_BAD_KEY);
       return states.isState(state);
@@ -136,7 +136,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::addState( State state )
+    bool Nwa::addState( State state )
     {
       assert(state < wali::WALI_BAD_KEY);
       return states.addState(state);
@@ -150,7 +150,7 @@ namespace opennwa
      *
      */
     
-    size_t NWA::sizeStates( ) const
+    size_t Nwa::sizeStates( ) const
     {
       return states.sizeStates();
     }
@@ -174,7 +174,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::removeState( State state )
+    bool Nwa::removeState( State state )
     {
       assert(state < wali::WALI_BAD_KEY);
 
@@ -194,7 +194,7 @@ namespace opennwa
      *
      */
     
-    void NWA::clearStates( )
+    void Nwa::clearStates( )
     {
       states.clearStates();
 
@@ -213,7 +213,7 @@ namespace opennwa
      */
     
     
-    const StateSet & NWA::getInitialStates( ) const
+    const StateSet & Nwa::getInitialStates( ) const
     {
       return states.getInitialStates();
     }
@@ -228,7 +228,7 @@ namespace opennwa
      */
     
     
-    bool NWA::isInitialState( State state ) const
+    bool Nwa::isInitialState( State state ) const
     {
       assert(state < wali::WALI_BAD_KEY);
       return states.isInitialState(state);
@@ -244,7 +244,7 @@ namespace opennwa
      */
     
     
-    bool NWA::addInitialState( State state )
+    bool Nwa::addInitialState( State state )
     {
       assert(state < wali::WALI_BAD_KEY);
       return states.addInitialState(state);
@@ -259,7 +259,7 @@ namespace opennwa
      */
     
     
-    size_t NWA::sizeInitialStates( ) const
+    size_t Nwa::sizeInitialStates( ) const
     {
       return states.sizeInitialStates();
     }
@@ -274,7 +274,7 @@ namespace opennwa
      */
     
     
-    bool NWA::removeInitialState( State state )
+    bool Nwa::removeInitialState( State state )
     {
       assert(state < wali::WALI_BAD_KEY);
       return states.removeInitialState(state);
@@ -287,7 +287,7 @@ namespace opennwa
      */
     
     
-    void NWA::clearInitialStates( )
+    void Nwa::clearInitialStates( )
     {
       states.clearInitialStates();
     }
@@ -303,7 +303,7 @@ namespace opennwa
      */
     
     
-    const StateSet & NWA::getFinalStates( ) const
+    const StateSet & Nwa::getFinalStates( ) const
     {
       return states.getFinalStates();
     }
@@ -318,7 +318,7 @@ namespace opennwa
      */
     
     
-    bool NWA::isFinalState( State state ) const
+    bool Nwa::isFinalState( State state ) const
     {
       assert(state < wali::WALI_BAD_KEY);
       return states.isFinalState(state);
@@ -334,7 +334,7 @@ namespace opennwa
      */
     
     
-    bool NWA::addFinalState( State state )
+    bool Nwa::addFinalState( State state )
     {
       assert(state < wali::WALI_BAD_KEY);
       return states.addFinalState(state);
@@ -349,7 +349,7 @@ namespace opennwa
      */
     
     
-    size_t NWA::sizeFinalStates( ) const
+    size_t Nwa::sizeFinalStates( ) const
     {
       return states.sizeFinalStates();
     }
@@ -364,7 +364,7 @@ namespace opennwa
      */
     
     
-    bool NWA::removeFinalState( State state )
+    bool Nwa::removeFinalState( State state )
     {
       assert(state < wali::WALI_BAD_KEY);
       return states.removeFinalState(state);
@@ -377,7 +377,7 @@ namespace opennwa
      */
     
     
-    void NWA::clearFinalStates( )
+    void Nwa::clearFinalStates( )
     {
       states.clearFinalStates();
     }
@@ -393,7 +393,7 @@ namespace opennwa
      */
     
     
-    const std::set< Symbol> & NWA::getSymbols( ) const
+    const std::set< Symbol> & Nwa::getSymbols( ) const
     {
       return symbols.getSymbols();
     }
@@ -408,7 +408,7 @@ namespace opennwa
      */
     
     
-    bool NWA::isSymbol( Symbol sym ) const
+    bool Nwa::isSymbol( Symbol sym ) const
     {
       assert(sym < wali::WALI_BAD_KEY);
       return symbols.isSymbol(sym);
@@ -424,7 +424,7 @@ namespace opennwa
      */
     
     
-    bool NWA::addSymbol( Symbol sym )
+    bool Nwa::addSymbol( Symbol sym )
     {
       assert(sym < wali::WALI_BAD_KEY);
       return symbols.addSymbol(sym);
@@ -441,7 +441,7 @@ namespace opennwa
      */
     
     
-    size_t NWA::sizeSymbols( ) const
+    size_t Nwa::sizeSymbols( ) const
     {
       return symbols.sizeSymbols();
     }
@@ -455,7 +455,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::removeSymbol( Symbol sym )
+    bool Nwa::removeSymbol( Symbol sym )
     {
       assert(sym < wali::WALI_BAD_KEY);
 
@@ -476,7 +476,7 @@ namespace opennwa
      *
      */
     
-    void NWA::clearSymbols( )
+    void Nwa::clearSymbols( )
     {
       symbols.clearSymbols();
 
@@ -497,7 +497,7 @@ namespace opennwa
      *
      */
     
-    void NWA::duplicateStateOutgoing( State orig, State dup )
+    void Nwa::duplicateStateOutgoing( State orig, State dup )
     {
       assert(orig < wali::WALI_BAD_KEY);
       assert(dup < wali::WALI_BAD_KEY);
@@ -518,7 +518,7 @@ namespace opennwa
      *
      */
     
-    void NWA::duplicateState( State orig, State dup )
+    void Nwa::duplicateState( State orig, State dup )
     {
       assert(orig < wali::WALI_BAD_KEY);
       assert(dup < wali::WALI_BAD_KEY);
@@ -536,7 +536,7 @@ namespace opennwa
      *
      */
     
-    void NWA::realizeImplicitTrans(State stuck)
+    void Nwa::realizeImplicitTrans(State stuck)
     {
       std::set<wali::Triple<State, Symbol, State> > returns;
       for( ReturnIterator ret = beginReturnTrans(); ret != endReturnTrans(); ++ret) 
@@ -606,7 +606,7 @@ namespace opennwa
      */
     
     
-    size_t NWA::sizeTrans( ) const
+    size_t Nwa::sizeTrans( ) const
     {
       return trans.size();
     }
@@ -616,7 +616,7 @@ namespace opennwa
      * @brief remove all transitions from the NWA
      *
      */
-    void NWA::clearTrans( )
+    void Nwa::clearTrans( )
     {
       trans.clear();
     }
@@ -635,7 +635,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::addCallTrans( State from, Symbol sym, State to )
+    bool Nwa::addCallTrans( State from, Symbol sym, State to )
     {
       assert(from < wali::WALI_BAD_KEY);
       assert(sym < wali::WALI_BAD_KEY);
@@ -660,7 +660,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::addCallTrans( Call & ct )
+    bool Nwa::addCallTrans( Call & ct )
     {
       assert(Trans::getCallSite(ct) < wali::WALI_BAD_KEY);
       assert(Trans::getCallSym(ct) < wali::WALI_BAD_KEY);
@@ -687,7 +687,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::removeCallTrans( State from, Symbol sym, State to )
+    bool Nwa::removeCallTrans( State from, Symbol sym, State to )
     {
       assert(from < wali::WALI_BAD_KEY);
       assert(sym < wali::WALI_BAD_KEY);
@@ -708,7 +708,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::removeCallTrans( const Call & ct )
+    bool Nwa::removeCallTrans( const Call & ct )
     {
       assert(Trans::getCallSite(ct) < wali::WALI_BAD_KEY);
       assert(Trans::getCallSym(ct) < wali::WALI_BAD_KEY);
@@ -732,7 +732,7 @@ namespace opennwa
      */
     
     
-    size_t NWA::sizeCallTrans( ) const
+    size_t Nwa::sizeCallTrans( ) const
     {
       return trans.sizeCall();
     }
@@ -751,7 +751,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::addInternalTrans( State from, Symbol sym, State to )
+    bool Nwa::addInternalTrans( State from, Symbol sym, State to )
     {
       assert(from < wali::WALI_BAD_KEY);
       assert(sym < wali::WALI_BAD_KEY);
@@ -774,7 +774,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::addInternalTrans( Internal & it )
+    bool Nwa::addInternalTrans( Internal & it )
     {
       assert(Trans::getSource(it) < wali::WALI_BAD_KEY);
       assert(Trans::getInternalSym(it) < wali::WALI_BAD_KEY);
@@ -799,7 +799,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::removeInternalTrans( State from, Symbol sym, State to )
+    bool Nwa::removeInternalTrans( State from, Symbol sym, State to )
     {
       assert(from < wali::WALI_BAD_KEY);
       assert(sym < wali::WALI_BAD_KEY);
@@ -822,7 +822,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::removeInternalTrans( const Internal & it )
+    bool Nwa::removeInternalTrans( const Internal & it )
     {
       assert(Trans::getSource(it) < wali::WALI_BAD_KEY);
       assert(Trans::getInternalSym(it) < wali::WALI_BAD_KEY);
@@ -845,7 +845,7 @@ namespace opennwa
      */
     
     
-    size_t NWA::sizeInternalTrans( ) const
+    size_t Nwa::sizeInternalTrans( ) const
     {
       return trans.sizeInternal();
     }
@@ -864,7 +864,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::addReturnTrans( State from, State pred, Symbol sym, State to )
+    bool Nwa::addReturnTrans( State from, State pred, Symbol sym, State to )
     {
       assert(from < wali::WALI_BAD_KEY);
       assert(pred < wali::WALI_BAD_KEY);
@@ -891,7 +891,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::addReturnTrans( Return & rt )
+    bool Nwa::addReturnTrans( Return & rt )
     {
       assert(Trans::getExit(rt) < wali::WALI_BAD_KEY);
       assert(Trans::getCallSite(rt) < wali::WALI_BAD_KEY);
@@ -920,7 +920,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::removeReturnTrans( State from, Symbol sym, State to )
+    bool Nwa::removeReturnTrans( State from, Symbol sym, State to )
     {
       assert(from < wali::WALI_BAD_KEY);
       assert(sym < wali::WALI_BAD_KEY);
@@ -952,7 +952,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::removeReturnTrans( State from, State pred, Symbol sym, State to )
+    bool Nwa::removeReturnTrans( State from, State pred, Symbol sym, State to )
     {
       assert(from < wali::WALI_BAD_KEY);
       assert(pred < wali::WALI_BAD_KEY);
@@ -975,7 +975,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::removeReturnTrans( const Return & rt )
+    bool Nwa::removeReturnTrans( const Return & rt )
     {
       assert(Trans::getExit(rt) < wali::WALI_BAD_KEY);
       assert(Trans::getCallSite(rt) < wali::WALI_BAD_KEY);
@@ -1001,7 +1001,7 @@ namespace opennwa
      */
     
     
-    size_t NWA::sizeReturnTrans( ) const
+    size_t Nwa::sizeReturnTrans( ) const
     {
       return trans.sizeReturn();
     }
@@ -1014,7 +1014,7 @@ namespace opennwa
      * provided
      */
     
-    void NWA::projectStates(const NWA & other, const StateSet &prjStates)
+    void Nwa::projectStates(const Nwa & other, const StateSet &prjStates)
     {
       //copy data from other
       states = other.states;
@@ -1048,7 +1048,7 @@ namespace opennwa
 
 
     
-    bool NWA::isTransitionPossible( const State &src, const Symbol &sym, const State &tgt) 
+    bool Nwa::isTransitionPossible( const State &src, const Symbol &sym, const State &tgt) 
     {
       (void) src;
       (void) sym;
@@ -1057,7 +1057,7 @@ namespace opennwa
     }
 
 
-    void NWA::removeImplicitTransitions()
+    void Nwa::removeImplicitTransitions()
     {
       // This proceeds in two steps: detects stuck states, then removes
       // them and transitions to them.
@@ -1110,7 +1110,7 @@ namespace opennwa
     }
 
     
-    void NWA::pruneUnreachableForward(const StateSet & sources)
+    void Nwa::pruneUnreachableForward(const StateSet & sources)
     {
       std::deque<State> worklist(sources.begin(), sources.end());  
       StateSet unreachables = getStates();
@@ -1170,7 +1170,7 @@ namespace opennwa
     }
 
        
-    void NWA::pruneUnreachableBackward(const StateSet & targets)
+    void Nwa::pruneUnreachableBackward(const StateSet & targets)
     {      
       std::deque<State> worklist(targets.begin(), targets.end());  
       StateSet unreachables = getStates();
@@ -1235,17 +1235,17 @@ namespace opennwa
     }
 
     
-    void NWA::pruneUnreachableInitial() {
+    void Nwa::pruneUnreachableInitial() {
       pruneUnreachableForward( getInitialStates() );
     }
 
     
-    void NWA::pruneUnreachableFinal() {
+    void Nwa::pruneUnreachableFinal() {
       pruneUnreachableBackward( getFinalStates() );
     }
 
     
-    void NWA::chop()
+    void Nwa::chop()
     {
       pruneUnreachableInitial();
       pruneUnreachableFinal();
@@ -1265,7 +1265,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::_private_isDeterministic_( ) const
+    bool Nwa::_private_isDeterministic_( ) const
     {
       //An NWA is not deterministic if there is not exactly one initial state
       if( sizeInitialStates() > 1 ) 
@@ -1415,8 +1415,8 @@ namespace opennwa
      *
      */
     
-    void NWA::intersectClientInfoCall( NWA const & first, State call1, State entry1, 
-                                       NWA const & second, State call2, State entry2, 
+    void Nwa::intersectClientInfoCall( Nwa const & first, State call1, State entry1, 
+                                       Nwa const & second, State call2, State entry2, 
                                        Symbol resSym, State resSt )
     {
       (void) first, (void) call1, (void) entry1, (void) second;
@@ -1447,8 +1447,8 @@ namespace opennwa
      *
      */
     
-    void NWA::intersectClientInfoInternal( NWA const & first, State src1, State tgt1, 
-                                           NWA const & second, State src2, State tgt2, 
+    void Nwa::intersectClientInfoInternal( Nwa const & first, State src1, State tgt1, 
+                                           Nwa const & second, State src2, State tgt2, 
                                            Symbol resSym, State resSt )
     {
       (void) first, (void) src1, (void) tgt1, (void) second, (void) src2;
@@ -1483,8 +1483,8 @@ namespace opennwa
      *
      */
     
-    void NWA::intersectClientInfoReturn( NWA const & first, State exit1, State call1, State ret1,
-                                         NWA const & second, State exit2, State call2, State ret2,
+    void Nwa::intersectClientInfoReturn( Nwa const & first, State exit1, State call1, State ret1,
+                                         Nwa const & second, State exit2, State call2, State ret2,
                                          Symbol resSym, State resSt )
     {
       (void) first, (void) exit1, (void) call1, (void) ret1, (void) second;
@@ -1506,7 +1506,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::stateIntersect( NWA const & first, State state1, NWA const & second, State state2, 
+    bool Nwa::stateIntersect( Nwa const & first, State state1, Nwa const & second, State state2, 
                               State & resSt, ClientInfoRefPtr & resCI ) 
     {
       (void) first, (void) second, (void) resCI;
@@ -1535,7 +1535,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::transitionIntersect( NWA const & first, Symbol sym1, NWA const & second, Symbol sym2, Symbol & resSym )
+    bool Nwa::transitionIntersect( Nwa const & first, Symbol sym1, Nwa const & second, Symbol sym2, Symbol & resSym )
     {
       (void) first, (void) second;
       
@@ -1575,7 +1575,7 @@ namespace opennwa
      *
      */
     
-    void NWA::mergeClientInfo( NWA const & first, 
+    void Nwa::mergeClientInfo( Nwa const & first, 
                                wali::relations::RelationTypedefs<State>::BinaryRelation const & binRel, 
                                State resSt, ClientInfoRefPtr & resCI )
     {
@@ -1599,7 +1599,7 @@ namespace opennwa
      *
      */
     
-    void NWA::mergeClientInfoCall( NWA const & nwa, 
+    void Nwa::mergeClientInfoCall( Nwa const & nwa, 
                                    wali::relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
                                    wali::relations::RelationTypedefs<State>::BinaryRelation const & binRelEntry,
                                    State callSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI )
@@ -1625,7 +1625,7 @@ namespace opennwa
      *
      */
     
-    void NWA::mergeClientInfoInternal( NWA const & nwa, 
+    void Nwa::mergeClientInfoInternal( Nwa const & nwa, 
                                        wali::relations::RelationTypedefs<State>::BinaryRelation const & binRelSource, 
                                        wali::relations::RelationTypedefs<State>::BinaryRelation const & binRelTarget,
                                        State sourceSt, Symbol resSym, State resSt, ClientInfoRefPtr & resCI )
@@ -1653,7 +1653,7 @@ namespace opennwa
      *
      */
     
-    void NWA::mergeClientInfoReturn( NWA const & nwa, 
+    void Nwa::mergeClientInfoReturn( Nwa const & nwa, 
                                      wali::relations::RelationTypedefs<State>::BinaryRelation const & binRelExit,
                                      wali::relations::RelationTypedefs<State>::BinaryRelation const & binRelCall, 
                                      wali::relations::RelationTypedefs<State>::BinaryRelation const & binRelReturn,
@@ -1679,7 +1679,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::_private_isEmpty_( ) const
+    bool Nwa::_private_isEmpty_( ) const
     {
       //An automaton with no initial states must accept only the empty language.
       if( sizeInitialStates() == 0 )
@@ -1809,7 +1809,7 @@ namespace opennwa
      *
      */
     
-    wali::wfa::WFA NWA::prestar( wali::wfa::WFA const & input,
+    wali::wfa::WFA Nwa::prestar( wali::wfa::WFA const & input,
                            WeightGen const & wg,
                            ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const
     {
@@ -1833,7 +1833,7 @@ namespace opennwa
      *
      */
     
-    void NWA::prestar( wali::wfa::WFA const & input,
+    void Nwa::prestar( wali::wfa::WFA const & input,
                        wali::wfa::WFA & output,
                        WeightGen const & wg,
                        ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const
@@ -1855,7 +1855,7 @@ namespace opennwa
      *
      */
     
-    wali::wfa::WFA NWA::poststar( wali::wfa::WFA const & input,
+    wali::wfa::WFA Nwa::poststar( wali::wfa::WFA const & input,
                             WeightGen const & wg,
                             ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const
     {
@@ -1879,7 +1879,7 @@ namespace opennwa
      *
      */
     
-    void NWA::poststar( wali::wfa::WFA const & input,
+    void Nwa::poststar( wali::wfa::WFA const & input,
                         wali::wfa::WFA & output,
                         WeightGen const & wg,
                         ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const
@@ -1902,7 +1902,7 @@ namespace opennwa
      *
      */
     
-    std::ostream & NWA::print( std::ostream & o ) const
+    std::ostream & Nwa::print( std::ostream & o ) const
     {
       //TODO: flag for explicit stuck state transition printing?
       states.print(o);
@@ -1920,7 +1920,7 @@ namespace opennwa
      *
      */
     
-    std::ostream & NWA::print_dot( std::ostream & o, std::string title, bool abbrev ) const
+    std::ostream & Nwa::print_dot( std::ostream & o, std::string title, bool abbrev ) const
     {
       //TODO: flag for explicit stuck state transition printing?
       o << "digraph \"NWA\" { \n";
@@ -2049,7 +2049,7 @@ namespace opennwa
      *
      */
     
-    bool NWA::operator==( const NWA & other ) const
+    bool Nwa::operator==( const Nwa & other ) const
     {
       return ( (states == other.states) 
                && (symbols == other.symbols) 
@@ -2070,7 +2070,7 @@ namespace opennwa
      */
     
     
-    void NWA::addAllStates( StateStorage addStateSet )
+    void Nwa::addAllStates( StateStorage addStateSet )
     {
       states.addAllStates(addStateSet);
     }
@@ -2084,7 +2084,7 @@ namespace opennwa
      */
     
     
-    NWA::StateIterator NWA::beginStates( ) const
+    Nwa::StateIterator Nwa::beginStates( ) const
     {
       return states.beginStates();
     }
@@ -2098,7 +2098,7 @@ namespace opennwa
      */
     
     
-    NWA::StateIterator NWA::endStates( ) const
+    Nwa::StateIterator Nwa::endStates( ) const
     {
       return states.endStates();
     }
@@ -2114,7 +2114,7 @@ namespace opennwa
      */
     
     
-    void NWA::addAllInitialStates( StateStorage addStateSet )
+    void Nwa::addAllInitialStates( StateStorage addStateSet )
     {
       states.addAllInitialStates(addStateSet);
     }
@@ -2128,7 +2128,7 @@ namespace opennwa
      */ 
     
     
-    NWA::StateIterator NWA::beginInitialStates( ) const
+    Nwa::StateIterator Nwa::beginInitialStates( ) const
     {
       return states.beginInitialStates();
     }
@@ -2142,7 +2142,7 @@ namespace opennwa
      */
     
     
-    NWA::StateIterator NWA::endInitialStates( ) const
+    Nwa::StateIterator Nwa::endInitialStates( ) const
     {
       return states.endInitialStates();
     }
@@ -2158,7 +2158,7 @@ namespace opennwa
      */
     
     
-    void NWA::addAllFinalStates( StateStorage addStateSet )
+    void Nwa::addAllFinalStates( StateStorage addStateSet )
     {
       states.addAllFinalStates(addStateSet);
     }
@@ -2172,7 +2172,7 @@ namespace opennwa
      */
     
     
-    NWA::StateIterator NWA::beginFinalStates( ) const
+    Nwa::StateIterator Nwa::beginFinalStates( ) const
     {
       return states.beginFinalStates();
     }
@@ -2186,7 +2186,7 @@ namespace opennwa
      */
     
     
-    NWA::StateIterator NWA::endFinalStates( ) const
+    Nwa::StateIterator Nwa::endFinalStates( ) const
     {
       return states.endFinalStates();
     }
@@ -2200,7 +2200,7 @@ namespace opennwa
      */
     
     
-    void NWA::addAllSymbols( SymbolStorage addSymbolSet )
+    void Nwa::addAllSymbols( SymbolStorage addSymbolSet )
     {
       symbols.addAllSymbols(addSymbolSet);
     }
@@ -2214,7 +2214,7 @@ namespace opennwa
      */
     
     
-    NWA::SymbolIterator NWA::beginSymbols( ) const
+    Nwa::SymbolIterator Nwa::beginSymbols( ) const
     {
       return symbols.beginSymbols();
     }
@@ -2228,7 +2228,7 @@ namespace opennwa
      */
     
     
-    NWA::SymbolIterator NWA::endSymbols( ) const
+    Nwa::SymbolIterator Nwa::endSymbols( ) const
     {
       return symbols.endSymbols();
     }
@@ -2242,7 +2242,7 @@ namespace opennwa
      */
     
     
-    NWA::CallIterator NWA::beginCallTrans( ) const
+    Nwa::CallIterator Nwa::beginCallTrans( ) const
     {
       return trans.beginCall();
     }
@@ -2256,7 +2256,7 @@ namespace opennwa
      */
     
     
-    NWA::CallIterator NWA::endCallTrans( ) const
+    Nwa::CallIterator Nwa::endCallTrans( ) const
     {
       return trans.endCall();
     }
@@ -2270,7 +2270,7 @@ namespace opennwa
      */
     
     
-    NWA::InternalIterator NWA::beginInternalTrans( ) const
+    Nwa::InternalIterator Nwa::beginInternalTrans( ) const
     {
       return trans.beginInternal();
     }
@@ -2284,7 +2284,7 @@ namespace opennwa
      */
     
     
-    NWA::InternalIterator NWA::endInternalTrans( ) const
+    Nwa::InternalIterator Nwa::endInternalTrans( ) const
     {
       return trans.endInternal();
     }
@@ -2298,7 +2298,7 @@ namespace opennwa
      */
     
     
-    NWA::ReturnIterator NWA::beginReturnTrans( ) const
+    Nwa::ReturnIterator Nwa::beginReturnTrans( ) const
     {
       return trans.beginReturn();
     }
@@ -2312,7 +2312,7 @@ namespace opennwa
      */
     
     
-    NWA::ReturnIterator NWA::endReturnTrans( ) const
+    Nwa::ReturnIterator Nwa::endReturnTrans( ) const
     {
       return trans.endReturn();
     }
@@ -2331,7 +2331,7 @@ namespace opennwa
      *
      */
     
-    void NWA::epsilonClosure( StateSet * newPairs, State st ) const
+    void Nwa::epsilonClosure( StateSet * newPairs, State st ) const
     {
       //compute the states reachable from st via epsilon transitions
       Internals reachable = trans.getInternals(st,EPSILON);
@@ -2363,7 +2363,7 @@ namespace opennwa
      *
      */
     
-    void NWA::epsilonClosure( std::set<StatePair> * newPairs, StatePair sp, NWA const & first, NWA const & second ) const
+    void Nwa::epsilonClosure( std::set<StatePair> * newPairs, StatePair sp, Nwa const & first, Nwa const & second ) const
     {
       //Compute the cross produce of all states reachable from sp via epsilon transitions.
 
@@ -2399,7 +2399,7 @@ namespace opennwa
     }
 
     
-    std::ostream& NWA::marshall( std::ostream& os ) const
+    std::ostream& Nwa::marshall( std::ostream& os ) const
     {
       os << "<" << XMLTag << ">\n";
 
@@ -2447,7 +2447,7 @@ namespace opennwa
     }
 
     const char *
-    NWA::toStringGdb() const
+    Nwa::toStringGdb() const
     {
       std::stringstream ss;
       print(ss);
@@ -2456,7 +2456,7 @@ namespace opennwa
     }
 
     void
-    NWA::combineWith(NWA const & rhs)
+    Nwa::combineWith(Nwa const & rhs)
     {
       this->states.addAll(rhs.states);
       this->addAllSymbols(rhs.symbols);
@@ -2464,7 +2464,7 @@ namespace opennwa
     }
 
     bool
-    NWA::isMemberNondet( NestedWord const & word ) const
+    Nwa::isMemberNondet( NestedWord const & word ) const
     {
       typedef details::Configuration Configuration;
       

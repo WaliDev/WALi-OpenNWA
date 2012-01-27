@@ -26,7 +26,7 @@ namespace opennwa
        * @return the PDS equivalent to this NWA
        *
        */ 
-      extern wali::wpds::WPDS NwaToWpdsReturns( NWA const & nwa, WeightGen const & wg );
+      extern wali::wpds::WPDS NwaToWpdsReturns( Nwa const & nwa, WeightGen const & wg );
 
 
       
@@ -43,13 +43,13 @@ namespace opennwa
        */ 
       extern
       wali::wpds::WPDS
-      NwaToWpdsCalls( NWA const & nwa,
+      NwaToWpdsCalls( Nwa const & nwa,
                      WeightGen const & wg,
                      ref_ptr<wali::wpds::Wrapper> wrapper );
         
       inline
       wali::wpds::WPDS
-      NwaToWpdsCalls( NWA const & nwa, WeightGen const & wg )
+      NwaToWpdsCalls( Nwa const & nwa, WeightGen const & wg )
       {
         return NwaToWpdsCalls(nwa, wg, NULL);
       }
@@ -66,7 +66,7 @@ namespace opennwa
        * @return the PDS equivalent to this NWA
        *
        */ 
-      extern wali::wpds::WPDS NwaToBackwardsWpdsReturns( NWA const & nwa, WeightGen const & wg );
+      extern wali::wpds::WPDS NwaToBackwardsWpdsReturns( Nwa const & nwa, WeightGen const & wg );
 
 
       /**
@@ -80,7 +80,7 @@ namespace opennwa
        * @return the backwards PDS equivalent to this NWA
        *
        */ 
-      extern wali::wpds::WPDS NwaToBackwardsWpdsCalls( NWA const & nwa, WeightGen const & wg );
+      extern wali::wpds::WPDS NwaToBackwardsWpdsCalls( Nwa const & nwa, WeightGen const & wg );
 
 
       /**
@@ -167,7 +167,7 @@ namespace opennwa
        * @return the NWA equivalent to the given PDS
        *
        */
-      void WpdsToNwa( NWA & out, const wali::wpds::WPDS & pds ); 
+      void WpdsToNwa( Nwa & out, const wali::wpds::WPDS & pds ); 
 
       /**
        *
@@ -180,7 +180,7 @@ namespace opennwa
        * @return the NWA equivalent to the given PDS
        *
        */
-      NWARefPtr WpdsToNwa( const wali::wpds::WPDS & pds );
+      NwaRefPtr WpdsToNwa( const wali::wpds::WPDS & pds );
       
     } // namespace nwa_pds
 }

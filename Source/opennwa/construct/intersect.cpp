@@ -5,15 +5,15 @@ namespace opennwa
 {
     namespace construct
     {
-      void intersect(NWA & out, NWA const & first, NWA const & second)
+      void intersect(Nwa & out, Nwa const & first, Nwa const & second)
       {
         out._private_intersect_(first, second);
       }
 
 
-      NWARefPtr intersect( NWA const & first, NWA const & second )
+      NwaRefPtr intersect( Nwa const & first, Nwa const & second )
       {
-        NWARefPtr nwa(new NWA());
+        NwaRefPtr nwa(new Nwa());
         intersect(*nwa, first, second);
         return nwa;
       }
@@ -28,7 +28,7 @@ namespace opennwa
      * @param - second: the NWA to intersect with 'first'
      *	
      */
-    void NWA::_private_intersect_( NWA const & first, NWA const & second ) 
+    void Nwa::_private_intersect_( Nwa const & first, Nwa const & second ) 
     {
       //TODO: ponder the following ...
       //Q: how do we prevent the stuck state from being the same as any of the states that we

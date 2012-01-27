@@ -24,7 +24,7 @@ namespace opennwa
        * @return true if some such transition is found, false otherwise
        *
        */
-      extern bool getSymbol(NWA const &, State from, State to, Symbol & sym );
+      extern bool getSymbol(Nwa const &, State from, State to, Symbol & sym );
 
       /**
        * 
@@ -40,7 +40,7 @@ namespace opennwa
        * @return true if such a transition exists, false otherwise
        * 
        */
-      extern bool findTrans(NWA const &, State from, Symbol sym, State to );
+      extern bool findTrans(Nwa const &, State from, Symbol sym, State to );
 
       /**
        * 
@@ -54,7 +54,7 @@ namespace opennwa
        * @return the set of symbols that label transitions from 'source' to 'target'
        *
        */
-      extern const  SymbolSet getSymbols(NWA const &, State source, State target );
+      extern const  SymbolSet getSymbols(Nwa const &, State source, State target );
 
       /**
        * 
@@ -66,7 +66,7 @@ namespace opennwa
        * @return the set of symbols that label transitions from 'source'
        *
        */
-      extern const  SymbolSet getSymbolsFrom(NWA const &, State source );
+      extern const  SymbolSet getSymbolsFrom(Nwa const &, State source );
 
       /**
        * 
@@ -78,7 +78,7 @@ namespace opennwa
        * @return the set of symbols that label transitions to 'target'
        *
        */
-      extern const  SymbolSet getSymbolsTo(NWA const &, State target );
+      extern const  SymbolSet getSymbolsTo(Nwa const &, State target );
 
       /**
        *  
@@ -91,7 +91,7 @@ namespace opennwa
        * @param - preds: the set of all states that are predecessors of the given state
        *
        */    
-      extern void getPredecessors(NWA const &, State state,  StateSet & preds );
+      extern void getPredecessors(Nwa const &, State state,  StateSet & preds );
       /**
        * 
        * @brief obtains all the states that are predecessors of the given state
@@ -102,7 +102,7 @@ namespace opennwa
        * @return the set of all states that are predecessors of the given state
        *
        */
-      extern const  StateSet getPredecessors(NWA const &, State state );
+      extern const  StateSet getPredecessors(Nwa const &, State state );
 
       /**
        * 
@@ -120,7 +120,7 @@ namespace opennwa
        *                  with respect to the given symbol
        *
        */
-      extern void getPredecessors(NWA const &, Symbol symbol, State state,  StateSet & preds );
+      extern void getPredecessors(Nwa const &, Symbol symbol, State state,  StateSet & preds );
       /**
        * 
        * @brief obtains all the states that are predecessors of the given state with
@@ -137,7 +137,7 @@ namespace opennwa
        *			respect to the given symbol
        *
        */
-      extern const  StateSet getPredecessors(NWA const &, Symbol symbol, State state );
+      extern const  StateSet getPredecessors(Nwa const &, Symbol symbol, State state );
 
       /**
        * 
@@ -149,7 +149,7 @@ namespace opennwa
        * @param - succs: the set of all states that are successors of the given state
        *
        */
-      extern void getSuccessors(NWA const &, State state,  StateSet & succs );
+      extern void getSuccessors(Nwa const &, State state,  StateSet & succs );
       /**
        * 
        * @brief obtains all the states that are successors of the given state
@@ -160,7 +160,7 @@ namespace opennwa
        * @return the set of all states that are successors of the given state
        *
        */
-      extern const  StateSet getSuccessors(NWA const &, State state );
+      extern const  StateSet getSuccessors(Nwa const &, State state );
 
       /**
        * 
@@ -178,7 +178,7 @@ namespace opennwa
        *                  with respect to the given symbol
        *
        */
-      extern void getSuccessors(NWA const &, State state, Symbol symbol,  StateSet & succs );
+      extern void getSuccessors(Nwa const &, State state, Symbol symbol,  StateSet & succs );
       /**
        * 
        * @brief obtains all the states that are successors of the given state with
@@ -195,7 +195,7 @@ namespace opennwa
        *			with respect to the given symbol
        *
        */
-      extern const  StateSet getSuccessors(NWA const &, State state, Symbol symbol );
+      extern const  StateSet getSuccessors(Nwa const &, State state, Symbol symbol );
 
       /**
        * 
@@ -211,7 +211,7 @@ namespace opennwa
        *			call-predecessor is 'call' and whose return site is 'ret'
        *
        */
-      extern const  SymbolSet getCallRetSymbols(NWA const &, State call, State ret );
+      extern const  SymbolSet getCallRetSymbols(Nwa const &, State call, State ret );
 
       /**
        * 
@@ -226,7 +226,7 @@ namespace opennwa
        *			call-predecessor is 'call'
        *
        */
-      extern const  SymbolSet getCallRetSymbolsFrom(NWA const &, State call );
+      extern const  SymbolSet getCallRetSymbolsFrom(Nwa const &, State call );
 
       /**
        * 
@@ -241,7 +241,7 @@ namespace opennwa
        *			return site is 'ret'
        *
        */
-      extern const  SymbolSet getCallRetSymbolsTo(NWA const &, State ret );
+      extern const  SymbolSet getCallRetSymbolsTo(Nwa const &, State ret );
 
       /**
        *  
@@ -254,7 +254,7 @@ namespace opennwa
        * @param - preds: the set of all states that are call-predecessors of the given state
        *
        */ 
-      extern void getCallPredecessors(NWA const &, State state,  StateSet & c_preds );
+      extern void getCallPredecessors(Nwa const &, State state,  StateSet & c_preds );
       /**
        * 
        * @brief obtains all the states that are call-predecessors of the given state
@@ -265,7 +265,7 @@ namespace opennwa
        * @return the set of all states that are call-predecessors of the given state
        *
        */
-      extern const  StateSet getCallPredecessors(NWA const &, State state );
+      extern const  StateSet getCallPredecessors(Nwa const &, State state );
       
       /**
        * 
@@ -283,7 +283,7 @@ namespace opennwa
        *                  with respect to the given symbol
        *
        */
-      extern void getCallPredecessors(NWA const &, Symbol symbol, State state,  StateSet & c_preds );
+      extern void getCallPredecessors(Nwa const &, Symbol symbol, State state,  StateSet & c_preds );
       /**
        * 
        * @brief obtains all the states that are call-predecessors of the given state with
@@ -300,7 +300,7 @@ namespace opennwa
        *			with respect to the given symbol
        *
        */
-      extern const  StateSet getCallPredecessors(NWA const &, Symbol symbol, State state );
+      extern const  StateSet getCallPredecessors(Nwa const &, Symbol symbol, State state );
 
       /**
        * 
@@ -312,7 +312,7 @@ namespace opennwa
        * @param - succs: the set of all states that are call-successors of the given state
        *
        */
-      extern void getCallSuccessors(NWA const &, State state,  StateSet & c_succs );
+      extern void getCallSuccessors(Nwa const &, State state,  StateSet & c_succs );
       /**
        * 
        * @brief obtains all the states that are call-successors of the given state
@@ -323,7 +323,7 @@ namespace opennwa
        * @return the set of all states that are call-successors of the given state
        *
        */
-      extern const  StateSet getCallSuccessors(NWA const &, State state );
+      extern const  StateSet getCallSuccessors(Nwa const &, State state );
 
       /**
        * 
@@ -341,7 +341,7 @@ namespace opennwa
        *                  with respect to the given symbol
        *
        */
-      extern void getCallSuccessors(NWA const &, State state, Symbol symbol,  StateSet & c_succs );
+      extern void getCallSuccessors(Nwa const &, State state, Symbol symbol,  StateSet & c_succs );
       /**
        * 
        * @brief obtains all the states that are call-successors of the given state with 
@@ -358,7 +358,7 @@ namespace opennwa
        *			respect to the given symbol
        *
        */
-      extern const  StateSet getCallSuccessors(NWA const &, State state, Symbol symbol );
+      extern const  StateSet getCallSuccessors(Nwa const &, State state, Symbol symbol );
 
   }
 }

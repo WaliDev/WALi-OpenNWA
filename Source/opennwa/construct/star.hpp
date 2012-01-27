@@ -16,7 +16,7 @@ namespace opennwa
        * @param - first: the NWA to perform the Kleene-* of
        *
        */
-      extern void star(NWA & out, NWA const & source);
+      extern void star(Nwa & out, Nwa const & source);
 
 
       /**
@@ -32,7 +32,7 @@ namespace opennwa
        * @return the NWA resulting from performing Kleene-* on the given NWA
        *
        */
-      extern NWARefPtr star( NWA const & nondet );
+      extern NwaRefPtr star( Nwa const & nondet );
 
       
   }

@@ -22,7 +22,7 @@ namespace opennwa
        * @return the set of source states associated with the given symbol
        *
        */
-      extern const  StateSet getSources_Sym(NWA const & nwa, Symbol symbol );
+      extern const  StateSet getSources_Sym(Nwa const & nwa, Symbol symbol );
 
       /**
        * 
@@ -38,7 +38,7 @@ namespace opennwa
        *          symbol and target state
        *
        */
-      extern const  StateSet getSources(NWA const & nwa, Symbol symbol, State target );
+      extern const  StateSet getSources(Nwa const & nwa, Symbol symbol, State target );
 
       /**
        * 
@@ -54,7 +54,7 @@ namespace opennwa
        *          target state
        *
        */
-      extern const  std::set<std::pair<State,Symbol> > getSources(NWA const & nwa, State target );
+      extern const  std::set<std::pair<State,Symbol> > getSources(Nwa const & nwa, State target );
 
       /**
        * 
@@ -66,7 +66,7 @@ namespace opennwa
        * @return the set of sources of all internal transitions in the NWA
        *
        */
-      extern const  StateSet getSources(NWA const & nwa );
+      extern const  StateSet getSources(Nwa const & nwa );
 
       /**
        * 
@@ -78,7 +78,7 @@ namespace opennwa
        * @return the set of symbols that label internal transitions in the NWA
        *
        */
-      extern const  SymbolSet getInternalSym(NWA const & nwa );
+      extern const  SymbolSet getInternalSym(Nwa const & nwa );
 
       /**
        * 
@@ -94,7 +94,7 @@ namespace opennwa
        *          to 'target' in the NWA
        *
        */
-      extern const  SymbolSet getInternalSym(NWA const & nwa, State source, State target );
+      extern const  SymbolSet getInternalSym(Nwa const & nwa, State source, State target );
 
       /**
        * 
@@ -109,7 +109,7 @@ namespace opennwa
        *          in the NWA
        *
        */
-      extern const  SymbolSet getInternalSym_Source(NWA const & nwa, State source );
+      extern const  SymbolSet getInternalSym_Source(Nwa const & nwa, State source );
 
       /**
        * 
@@ -124,7 +124,7 @@ namespace opennwa
        *          to 'target' in the NWA
        *
        */
-      extern const  SymbolSet getInternalSym_Target(NWA const & nwa, State target );
+      extern const  SymbolSet getInternalSym_Target(Nwa const & nwa, State target );
 
       /**
        * 
@@ -137,7 +137,7 @@ namespace opennwa
        * @return the set of target states associated with the given symbol
        *
        */
-      extern const  StateSet getTargets_Sym(NWA const & nwa, Symbol symbol );
+      extern const  StateSet getTargets_Sym(Nwa const & nwa, Symbol symbol );
 
       /**
        * 
@@ -153,7 +153,7 @@ namespace opennwa
        *          state and symbol
        *
        */
-      extern const  StateSet getTargets(NWA const & nwa, State source, Symbol symbol );
+      extern const  StateSet getTargets(Nwa const & nwa, State source, Symbol symbol );
 
       /**
        * 
@@ -166,7 +166,7 @@ namespace opennwa
        * @return the set of symbol/target pairs associated with the given source
        *
        */
-      extern const  std::set<std::pair<Symbol,State> > getTargets(NWA const & nwa, State source );
+      extern const  std::set<std::pair<Symbol,State> > getTargets(Nwa const & nwa, State source );
 
       /**
        * 
@@ -178,7 +178,7 @@ namespace opennwa
        * @return the set of targets of all internal transitions in the NWA
        *
        */
-      extern const  StateSet getTargets(NWA const & nwa);
+      extern const  StateSet getTargets(Nwa const & nwa);
 
   }
 }

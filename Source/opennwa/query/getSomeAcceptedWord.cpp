@@ -45,7 +45,7 @@ namespace opennwa {
           /// Holds the NWA associated with the given query. We need this so
           /// that when we know that the trace went from state p to q, we can
           /// look up a symbol on that edge.
-          NWA const & nwa;
+          Nwa const & nwa;
 
           /// This is the word that corresponds to the trace; built up as
           /// visitRule() is called.
@@ -60,7 +60,7 @@ namespace opennwa {
 			
         public:
 				
-          PathVisitor(NWA const & orig)
+          PathVisitor(Nwa const & orig)
             : nwa(orig)
           {}
 				
@@ -214,11 +214,11 @@ namespace opennwa {
 
 
       ref_ptr<NestedWord>
-      getSomeAcceptedWordInternal(NWA const & nwa, WeightGen const & wg);
+      getSomeAcceptedWordInternal(Nwa const & nwa, WeightGen const & wg);
 
       
       ref_ptr<NestedWord>
-      getSomeAcceptedWord(NWA const & nwa)
+      getSomeAcceptedWord(Nwa const & nwa)
       {
         ReachGen wg;
         return getSomeAcceptedWordInternal(nwa, wg);
@@ -226,14 +226,14 @@ namespace opennwa {
 
 
       ref_ptr<NestedWord>
-      getSomeShortestAcceptedWord(NWA const & nwa)
+      getSomeShortestAcceptedWord(Nwa const & nwa)
       {
         ShortestWordGen wg;
         return getSomeAcceptedWordInternal(nwa, wg);
       }
       
       ref_ptr<NestedWord>
-      getSomeAcceptedWordInternal(NWA const & nwa, WeightGen const & wg)
+      getSomeAcceptedWordInternal(Nwa const & nwa, WeightGen const & wg)
       {
         if (nwa.sizeInitialStates() == 0) {
           return NULL;
@@ -251,7 +251,7 @@ namespace opennwa {
         // Construct the query automaton
         query.set_initial_state(state);
         query.add_final_state(accept);
-        for( NWA::StateIterator initial = nwa.beginInitialStates();
+        for( Nwa::StateIterator initial = nwa.beginInitialStates();
              initial != nwa.endInitialStates(); initial++ )
         {
           query.addTrans(state, *initial, accept, wg.getOne());
@@ -262,7 +262,7 @@ namespace opennwa {
         wali::wfa::WFA path = conv.poststar(query);
         path.path_summary();
 
-        for(NWA::StateIterator final = nwa.beginFinalStates();
+        for(Nwa::StateIterator final = nwa.beginFinalStates();
             final != nwa.endFinalStates(); final++)
         {
           // See if there are any transitions to the current final state

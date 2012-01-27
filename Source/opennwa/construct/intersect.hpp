@@ -17,7 +17,7 @@ namespace opennwa
        * @param - second: the NWA to intersect with 'first'
        *	
        */
-      extern void intersect(NWA & out, NWA const & first, NWA const & second);
+      extern void intersect(Nwa & out, Nwa const & first, Nwa const & second);
 
 
       /**
@@ -33,7 +33,7 @@ namespace opennwa
        * @return the NWA resulting from the intersection of the given NWAs
        *	
        */
-      extern NWARefPtr intersect( NWA const & first, NWA const & second );
+      extern NwaRefPtr intersect( Nwa const & first, Nwa const & second );
 
       
   }

@@ -10,9 +10,9 @@ namespace opennwa
     namespace construct
     {
       
-      NWARefPtr concat( NWA const & first, NWA const & second )
+      NwaRefPtr concat( Nwa const & first, Nwa const & second )
       {
-        NWARefPtr nwa( new NWA());
+        NwaRefPtr nwa( new Nwa());
         concat(*nwa, first, second);
         return nwa;
       }
@@ -25,7 +25,7 @@ namespace opennwa
        * @param - second: the NWA to concatenate onto the end of 'first'
        *
        */
-      void concat( NWA & out, NWA const & first, NWA const & second )
+      void concat( Nwa & out, Nwa const & first, Nwa const & second )
       {
         //Q: Do we need to guarantee that there is no overlap in states between machines?
         //A: YES!
@@ -54,7 +54,7 @@ namespace opennwa
         out.clearInitialStates();
         out.clearFinalStates();
 
-        for (NWA::StateIterator initial = first.beginInitialStates();
+        for (Nwa::StateIterator initial = first.beginInitialStates();
              initial != first.endInitialStates(); ++initial)
         {
           out.addInitialState(*initial);
@@ -66,17 +66,17 @@ namespace opennwa
         // first to the final states of the second.
 
         // First step: set final states.
-        for (NWA::StateIterator final = second.beginFinalStates();
+        for (Nwa::StateIterator final = second.beginFinalStates();
              final != second.endFinalStates(); ++final)
         {
           out.addFinalState(*final);
         }
       
         // Second step: add transitions from the first machine to the second
-        for( NWA::StateIterator fit = first.beginFinalStates();
+        for( Nwa::StateIterator fit = first.beginFinalStates();
              fit != first.endFinalStates(); fit++ )
         {
-          for( NWA::StateIterator sit = second.beginInitialStates();
+          for( Nwa::StateIterator sit = second.beginInitialStates();
                sit != second.endInitialStates(); sit++ )
           {
             out.addInternalTrans(*fit, EPSILON, *sit);
@@ -91,10 +91,10 @@ namespace opennwa
         // call site in a call transition.
         StateSet call_sites = query::getCallSites(first);
         
-        for( NWA::ReturnIterator rit = second.beginReturnTrans();
+        for( Nwa::ReturnIterator rit = second.beginReturnTrans();
              rit != second.endReturnTrans(); ++rit)
         {
-          NWA::Return rtrans = *rit;
+          Nwa::Return rtrans = *rit;
           
           if (second.isInitialState(rtrans.second)) {
             for( StateSet::const_iterator new_pred = call_sites.begin();

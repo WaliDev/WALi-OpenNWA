@@ -253,7 +253,7 @@ namespace opennwa { namespace parser { namespace details {
         using wali::getKey;
         using wali::make_triple;
         using wali::make_quad;
-        using opennwa::NWARefPtr;
+        using opennwa::NwaRefPtr;
 
         KeyTriple
         read_triple(std::istream & is)
@@ -400,7 +400,7 @@ namespace opennwa { namespace parser { namespace details {
 // However, the } is optional after the triple-list and quad-list
 
         void
-        read_sigma_block(std::istream & is, NWARefPtr nwa)
+        read_sigma_block(std::istream & is, NwaRefPtr nwa)
         {
           // Read the 'Sigma:' block header, then the optional {
           read_lit(is, "Sigma:");
@@ -423,7 +423,7 @@ namespace opennwa { namespace parser { namespace details {
 
 
         void
-        read_state_block(std::istream & is, NWARefPtr nwa)
+        read_state_block(std::istream & is, NwaRefPtr nwa)
         {
           // Figure out if it's "Q:", "Q0:", or "Qf:". Read over the block
           // intro. Set the initial/final variables appropriately.
@@ -472,7 +472,7 @@ namespace opennwa { namespace parser { namespace details {
 
 
         void
-        read_delta_block(std::istream & is, NWARefPtr nwa)
+        read_delta_block(std::istream & is, NwaRefPtr nwa)
         {
           // Figure out if it's "delta_i", "delta_c", or "delta_r". Read over the
           // block intro. Set the call/return_ variable appropriately.
@@ -535,7 +535,7 @@ namespace opennwa { namespace parser { namespace details {
 /// state/letter/transition to the NWA.
 
         void
-        read_block(std::istream & is, NWARefPtr nwa)
+        read_block(std::istream & is, NwaRefPtr nwa)
         {
           switch (is.peek()) {
             case 'Q': read_state_block(is, nwa); break;
@@ -569,13 +569,13 @@ namespace opennwa { namespace parser { namespace details {
 namespace opennwa {
     using namespace parser::details;
 
-    NWARefPtr
+    NwaRefPtr
     read_nwa(std::istream & is, std::string * nwa_name)
     {
       lineno = 0;
             
       // Create the NWA
-      NWARefPtr nwa = new NWA();
+      NwaRefPtr nwa = new Nwa();
 
       // Skip over a bunch of stuff: opening whitespace, the optional
       // 'nwa'-name-':' sequence, and the optional '{'
@@ -621,7 +621,7 @@ namespace opennwa {
 
       while(is.peek() != -1) {
         std::string name;
-        NWARefPtr nwa = read_nwa(is, &name);
+        NwaRefPtr nwa = read_nwa(is, &name);
 
         procs[name] = nwa;
       }

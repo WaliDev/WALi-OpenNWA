@@ -11,7 +11,7 @@
 namespace opennwa {
     ///
     /// Maps name of procedure to the procedure NWA
-    typedef std::map<std::string, NWARefPtr> ProcedureMap;
+    typedef std::map<std::string, NwaRefPtr> ProcedureMap;
 
     
     struct CallReturnTransitionInserter {
@@ -57,7 +57,7 @@ namespace opennwa {
     /// The initial state of the NWA named 'main' is the full NWA's
     /// start state, and the accepting state of 'main' is the full
     /// NWA's accepting state.
-    NWARefPtr
+    NwaRefPtr
     assemble_nwa(ProcedureMap const & procedures,
                  boost::function<void (NWA &, State, State)> call_inserter,
                  boost::function<void (NWA &, State, State, State)> return_inserter);

@@ -13,7 +13,7 @@ namespace opennwa {
       public:
         virtual ~ConstStateFunctor() {}
 
-        virtual void operator() (NWA const & nwa, State state) = 0;
+        virtual void operator() (Nwa const & nwa, State state) = 0;
       };
 
       
@@ -27,7 +27,7 @@ namespace opennwa {
         
         virtual ~ConstCallStringStateFunctor() {}
 
-        virtual void operator() (NWA const & nwa, CallString const & cs, State state) = 0;
+        virtual void operator() (Nwa const & nwa, CallString const & cs, State state) = 0;
       };
       
   }

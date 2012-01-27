@@ -7,24 +7,24 @@ namespace opennwa
 {
     namespace nwa_pds
     {
-      WPDS NwaToWpdsReturns( NWA const & nwa, WeightGen const & wg)
+      WPDS NwaToWpdsReturns( Nwa const & nwa, WeightGen const & wg)
       {
 	return nwa._private_NwaToPdsReturns_(wg);
       }
 
-      WPDS NwaToWpdsCalls( NWA const & nwa,
+      WPDS NwaToWpdsCalls( Nwa const & nwa,
                                 WeightGen const & wg,
                                 ref_ptr<wali::wpds::Wrapper> wrapper  )
       {
 	return nwa._private_NwaToPdsCalls_(wg, wrapper);
       }
 
-      WPDS NwaToBackwardsWpdsReturns( NWA const & nwa, WeightGen const & wg )
+      WPDS NwaToBackwardsWpdsReturns( Nwa const & nwa, WeightGen const & wg )
       {
 	return nwa._private_NwaToBackwardsPdsReturns_(wg);
       }
 
-      WPDS NwaToBackwardsWpdsCalls( NWA const & nwa, WeightGen const & wg )
+      WPDS NwaToBackwardsWpdsCalls( Nwa const & nwa, WeightGen const & wg )
       {
 	return nwa._private_NwaToBackwardsPdsCalls_(wg);
       }
@@ -33,7 +33,7 @@ namespace opennwa
 
 
     // constructs the PDS equivalent to this NWA, stacking returns
-    WPDS NWA::_private_NwaToPdsReturns_( WeightGen const & wg ) const
+    WPDS Nwa::_private_NwaToPdsReturns_( WeightGen const & wg ) const
     {
       //TODO: beware the implicit transitions
       //Q: do we need to make all transitions explicit in order to make this correct?
@@ -138,7 +138,7 @@ namespace opennwa
 
 
     // constructs the backwards PDS equivalent to this NWA, stacking returns
-    WPDS NWA::_private_NwaToBackwardsPdsReturns_( WeightGen const & wg ) const
+    WPDS Nwa::_private_NwaToBackwardsPdsReturns_( WeightGen const & wg ) const
     {
       //TODO: beware the implicit transitions
       //Q: do we need to make all transitions explicit in order to make this correct?
@@ -242,7 +242,7 @@ namespace opennwa
 
 
     // constructs the PDS equivalent to this NWA, stacking calls
-    WPDS NWA::_private_NwaToPdsCalls_( WeightGen const & wg,
+    WPDS Nwa::_private_NwaToPdsCalls_( WeightGen const & wg,
                                              ref_ptr<wali::wpds::Wrapper> wrapper ) const
     {
       //TODO: beware the implicit transitions
@@ -350,7 +350,7 @@ namespace opennwa
 
 
     // constructs the backwards PDS equivalent to this NWA, stacking calls
-    WPDS NWA::_private_NwaToBackwardsPdsCalls_( WeightGen const & wg ) const
+    WPDS Nwa::_private_NwaToBackwardsPdsCalls_( WeightGen const & wg ) const
     {
       //TODO: beware the implicit transitions
       //Q: do we need to make all transitions explicit in order to make this correct?

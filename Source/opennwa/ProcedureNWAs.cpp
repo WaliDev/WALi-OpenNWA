@@ -24,12 +24,12 @@ namespace opennwa {
     static std::string call_prefix = "__call__";
 
         
-    NWARefPtr
+    NwaRefPtr
     assemble_nwa(ProcedureMap const & procedures,
                  boost::function<void (NWA &, State, State)> call_inserter,
                  boost::function<void (NWA &, State, State, State)> return_inserter)
     {
-      NWARefPtr finalnwa = new NWA();
+      NwaRefPtr finalnwa = new NWA();
 
       std::map<std::string, std::set<State> > entries_map;
       std::map<std::string, std::set<State> > exits_map;
@@ -42,8 +42,8 @@ namespace opennwa {
       for (ProcedureMap::const_iterator proc = procedures.begin();
            proc != procedures.end(); ++proc)
       {
-        NWARefPtr min = minimize_internal_nwa(proc->second);
-        //NWARefPtr min = proc->second;
+        NwaRefPtr min = minimize_internal_nwa(proc->second);
+        //NwaRefPtr min = proc->second;
 
         entries_map[proc->first] = min->getInitialStates();
         exits_map[proc->first] = min->getFinalStates();

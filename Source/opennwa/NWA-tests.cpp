@@ -25,10 +25,10 @@
 using wali::getKey;
 using wali::Key;
 using wali::nwa::NWA;
-using wali::nwa::NWARefPtr;
+using wali::nwa::NwaRefPtr;
 using wali::nwa::fst_to_nwa;
 
-NWARefPtr
+NwaRefPtr
 buildNwa_Alur_JACM_fig6(std::string const & name_prefix)
 {
     // "Suppose Sigma = {0, 1}. Consider the language L of nested words 'n'
@@ -70,7 +70,7 @@ buildNwa_Alur_JACM_fig6(std::string const & name_prefix)
 
 
 
-NWARefPtr
+NwaRefPtr
 buildNwa_even_zeros(std::string const & name_prefix = "",
                     std::string const & stuck = "[stuck]")
 {
@@ -94,7 +94,7 @@ buildNwa_even_zeros(std::string const & name_prefix = "",
     // Error transitions are any ) from q1. q0 is accepting.
     
     
-    NWARefPtr nwa = new NWA(getKey(stuck));
+    NwaRefPtr nwa = new NWA(getKey(stuck));
 
     Key q0 = getKey(name_prefix + "__q0");
     Key q1 = getKey(name_prefix + "__q1");
@@ -121,7 +121,7 @@ buildNwa_even_zeros(std::string const & name_prefix = "",
 }
 
 
-NWARefPtr
+NwaRefPtr
 build_odd_num_groups(std::string const & name_prefix = "",
                      std::string const & stuck = "[stuck]")
 {
@@ -151,7 +151,7 @@ build_odd_num_groups(std::string const & name_prefix = "",
     //          \     /  X___________________ \     /
     //           `---'    \                    `---'
 
-    NWARefPtr nwa = new NWA(getKey(stuck));
+    NwaRefPtr nwa = new NWA(getKey(stuck));
 
     Key q0 = getKey("q0");
     Key q1 = getKey("q1");
@@ -193,8 +193,8 @@ build_odd_num_groups_separate(std::string const & stuck = "[stuck]")
     //          \     /  X___________________ \\___//
     //           `---'    \                    `---'
 
-    NWARefPtr main = new NWA(getKey(stuck));
-    NWARefPtr odd_zero = new NWA(getKey(stuck));
+    NwaRefPtr main = new NWA(getKey(stuck));
+    NwaRefPtr odd_zero = new NWA(getKey(stuck));
 
     Key q0 = getKey("q0");
     Key q1 = getKey("q1");
@@ -227,7 +227,7 @@ build_odd_num_groups_separate(std::string const & stuck = "[stuck]")
 
 
 
-NWARefPtr
+NwaRefPtr
 build_internal_nwa(std::string const & stuck = "[stuck]")
 {
     // This is a FSM expressed as an NWA. It accepts strings with an even
@@ -243,7 +243,7 @@ build_internal_nwa(std::string const & stuck = "[stuck]")
     //    (EO)<----------> OO
     //             0
 
-    NWARefPtr nwa = new NWA(getKey(stuck));
+    NwaRefPtr nwa = new NWA(getKey(stuck));
 
     Key ee = getKey("ee");
     Key oe = getKey("oe");
@@ -276,7 +276,7 @@ build_internal_nwa(std::string const & stuck = "[stuck]")
 }
 
 
-NWARefPtr
+NwaRefPtr
 build_nondet_internal_nwa(std::string const & stuck = "[stuck]")
 {
     // This is a FSM expressed as an NWA. It accepts strings with an even
@@ -301,7 +301,7 @@ build_nondet_internal_nwa(std::string const & stuck = "[stuck]")
     //     V
     //     ACC
 
-    NWARefPtr nwa = new NWA(getKey(stuck));
+    NwaRefPtr nwa = new NWA(getKey(stuck));
 
     Key ee = getKey("ee");
     Key oe = getKey("oe");
@@ -351,8 +351,8 @@ build_nondet_internal_nwa(std::string const & stuck = "[stuck]")
 
 int main()
 {
-    NWARefPtr nwa1 = buildNwa_even_zeros("#");
-    NWARefPtr nwa2 = buildNwa_even_zeros("@");
+    NwaRefPtr nwa1 = buildNwa_even_zeros("#");
+    NwaRefPtr nwa2 = buildNwa_even_zeros("@");
     Key call_key = getKey("(");
     Key return_key = getKey(")");
 
@@ -364,11 +364,11 @@ int main()
     /// TESTS WITH JUST build_internal_nwa
     
     wali::nwa::fst_wali_key_maps maps;
-    NWARefPtr eo_nwa = build_internal_nwa();
+    NwaRefPtr eo_nwa = build_internal_nwa();
     fst::StdVectorFst eo_fst = internal_only_nwa_to_fst(eo_nwa, &maps);
 
     // Now convert it and test
-    NWARefPtr eo_converted = fst_to_nwa(eo_fst, eo_nwa->getStuckState(), maps);
+    NwaRefPtr eo_converted = fst_to_nwa(eo_fst, eo_nwa->getStuckState(), maps);
     assert (NWA::equal(eo_nwa, eo_converted));
     //assert (*eo == *eo_converted); UNCOMMENT WHEN FIX TODO ABOUT fst->nwa conversion maps
 
@@ -422,7 +422,7 @@ int main()
     procs["main"] = eo_nwa;
     procs["other"] = eo_converted;
 
-    NWARefPtr assembled = assemble_nwa(procs, call_key, return_key);
+    NwaRefPtr assembled = assemble_nwa(procs, call_key, return_key);
 
 #if 0
     std::ofstream f1("baseline.nwa");
@@ -439,7 +439,7 @@ int main()
     ///////////////////////////////////////
     /// Test assemble_nwa
 
-    NWARefPtr baseline = build_odd_num_groups();
+    NwaRefPtr baseline = build_odd_num_groups();
 
     procs.clear();
     procs = build_odd_num_groups_separate();

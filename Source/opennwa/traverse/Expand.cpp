@@ -7,7 +7,7 @@ namespace opennwa {
 
       class TransCopier : public traverse::ConstCallStringTransitionFunctor
       {
-        NWA & dest_nwa;
+        Nwa & dest_nwa;
 
         State getPrefixedName(CallString const & cs, State state) {
           State result = cs[0];
@@ -34,12 +34,12 @@ namespace opennwa {
 
         
       public:
-        TransCopier(NWA & destination_nwa)
+        TransCopier(Nwa & destination_nwa)
           : dest_nwa(destination_nwa)
         {}
 
         
-        virtual void doInternal(NWA const & nwa, CallString const & cs,
+        virtual void doInternal(Nwa const & nwa, CallString const & cs,
                                 State source, Symbol symbol, State target)
         {
           (void) nwa;
@@ -49,7 +49,7 @@ namespace opennwa {
         }
 
         
-        virtual void doCall(NWA const & nwa, CallString const & cs,
+        virtual void doCall(Nwa const & nwa, CallString const & cs,
                             State source, Symbol symbol, State target)
         {
           (void) nwa;
@@ -59,7 +59,7 @@ namespace opennwa {
         }
 
         
-        virtual void doReturn(NWA const & nwa, CallString const & cs,
+        virtual void doReturn(Nwa const & nwa, CallString const & cs,
                               State source, State pred, Symbol symbol, State target)
         {
           (void) nwa;
@@ -71,9 +71,9 @@ namespace opennwa {
       };
       
       
-      NWARefPtr expandNwa(NWA const & nwa)
+      NwaRefPtr expandNwa(Nwa const & nwa)
       {
-        NWARefPtr out = new NWA();
+        NwaRefPtr out = new Nwa();
         TransCopier copier(*out);
 
         dfsCallStringTraversal(nwa, NULL, &copier);

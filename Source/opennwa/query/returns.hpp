@@ -20,7 +20,7 @@ namespace opennwa
        * @return the set of exit states associated with the given symbol
        *
        */
-      extern const  StateSet getExits_Sym(NWA const & nwa, Symbol symbol );
+      extern const  StateSet getExits_Sym(Nwa const & nwa, Symbol symbol );
 
       /**
        * 
@@ -37,7 +37,7 @@ namespace opennwa
        *          symbol, and return site
        *
        */
-      extern const  StateSet getExits(NWA const & nwa, State callSite, Symbol symbol, State returnSite );
+      extern const  StateSet getExits(Nwa const & nwa, State callSite, Symbol symbol, State returnSite );
 
       /**
        * 
@@ -53,7 +53,7 @@ namespace opennwa
        *          and return site
        *
        */
-      extern const  std::set<std::pair<State,Symbol> > getExits(NWA const & nwa, State callSite, State returnSite );
+      extern const  std::set<std::pair<State,Symbol> > getExits(Nwa const & nwa, State callSite, State returnSite );
 
       /**
        * 
@@ -65,7 +65,7 @@ namespace opennwa
        * @return the set of exit points of all return transitions in the NWA
        *
        */
-      extern const  StateSet getExits(NWA const & nwa );
+      extern const  StateSet getExits(Nwa const & nwa );
 
       /**
        * 
@@ -81,7 +81,7 @@ namespace opennwa
        *          and symbol
        *
        */
-      extern const  StateSet getExits_Call(NWA const & nwa, State callSite, Symbol symbol );
+      extern const  StateSet getExits_Call(Nwa const & nwa, State callSite, Symbol symbol );
 
       /**
        * 
@@ -97,7 +97,7 @@ namespace opennwa
        *          call site
        *
        */
-      extern const  std::set<std::pair<State,Symbol> > getExits_Call(NWA const & nwa, State callSite );
+      extern const  std::set<std::pair<State,Symbol> > getExits_Call(Nwa const & nwa, State callSite );
 
       /**
        * 
@@ -113,7 +113,7 @@ namespace opennwa
        *          return site
        *
        */
-      extern const  StateSet getExits_Ret(NWA const & nwa, Symbol symbol, State returnSite );
+      extern const  StateSet getExits_Ret(Nwa const & nwa, Symbol symbol, State returnSite );
 
       /**
        * 
@@ -129,7 +129,7 @@ namespace opennwa
        *          return site
        *
        */
-      extern const  std::set<std::pair<State,Symbol> > getExits_Ret(NWA const & nwa, State returnSite );
+      extern const  std::set<std::pair<State,Symbol> > getExits_Ret(Nwa const & nwa, State returnSite );
 
       /**
        * 
@@ -142,7 +142,7 @@ namespace opennwa
        * @return the set of call site states associated with the given symbol
        *
        */
-      extern const  StateSet getCalls_Sym(NWA const & nwa, Symbol symbol );
+      extern const  StateSet getCalls_Sym(Nwa const & nwa, Symbol symbol );
 
       /**
        * 
@@ -159,7 +159,7 @@ namespace opennwa
        *          point, symbol, and return site
        * 
        */
-      extern const  StateSet getCalls(NWA const & nwa, State exitPoint, Symbol symbol, State returnSite );
+      extern const  StateSet getCalls(Nwa const & nwa, State exitPoint, Symbol symbol, State returnSite );
 
       /**
        * 
@@ -175,7 +175,7 @@ namespace opennwa
        *          point and return site states
        *
        */
-      extern const  std::set<std::pair<State,Symbol> > getCalls(NWA const & nwa, State exitPoint, State returnSite );
+      extern const  std::set<std::pair<State,Symbol> > getCalls(Nwa const & nwa, State exitPoint, State returnSite );
 
       /**
        * 
@@ -187,7 +187,7 @@ namespace opennwa
        * @return the set of call sites of all return transitions in the NWA
        *
        */
-      extern const  StateSet getCalls(NWA const & nwa );
+      extern const  StateSet getCalls(Nwa const & nwa );
 
       /**
        * 
@@ -203,7 +203,7 @@ namespace opennwa
        *          and symbol
        *
        */
-      extern const  StateSet getCalls_Exit(NWA const & nwa, State exitPoint, Symbol symbol );
+      extern const  StateSet getCalls_Exit(Nwa const & nwa, State exitPoint, Symbol symbol );
 
       /**
        * 
@@ -218,7 +218,7 @@ namespace opennwa
        *         exit point
        *
        */
-      extern const  std::set<std::pair<State,Symbol> > getCalls_Exit(NWA const & nwa, State exitPoint );
+      extern const  std::set<std::pair<State,Symbol> > getCalls_Exit(Nwa const & nwa, State exitPoint );
 
       /**
        * 
@@ -234,7 +234,7 @@ namespace opennwa
        *          and return site
        *
        */
-      extern const  StateSet getCalls_Ret(NWA const & nwa, Symbol symbol, State returnSite );
+      extern const  StateSet getCalls_Ret(Nwa const & nwa, Symbol symbol, State returnSite );
 
       /**
        * 
@@ -250,7 +250,7 @@ namespace opennwa
        *          given return site
        *
        */
-      extern const  std::set<std::pair<State,Symbol> > getCalls_Ret(NWA const & nwa, State returnSite );
+      extern const  std::set<std::pair<State,Symbol> > getCalls_Ret(Nwa const & nwa, State returnSite );
 
       /**
        * 
@@ -262,7 +262,7 @@ namespace opennwa
        * @return the set of symbols that label return transitions in the NWA
        *
        */
-      extern const  SymbolSet getReturnSym(NWA const & nwa );
+      extern const  SymbolSet getReturnSym(Nwa const & nwa );
 
       /**
        * 
@@ -279,7 +279,7 @@ namespace opennwa
        *          to 'returnSite' with call-predecessor 'callSite' in the NWA
        *
        */
-      extern const  SymbolSet getReturnSym(NWA const & nwa, State exitPoint, State callSite, State returnSite );
+      extern const  SymbolSet getReturnSym(Nwa const & nwa, State exitPoint, State callSite, State returnSite );
 
       /**
        * 
@@ -294,7 +294,7 @@ namespace opennwa
        *          in the NWA
        *
        */
-      extern const  SymbolSet getReturnSym_Exit(NWA const & nwa, State exitPoint );
+      extern const  SymbolSet getReturnSym_Exit(Nwa const & nwa, State exitPoint );
 
       /**
        * 
@@ -309,7 +309,7 @@ namespace opennwa
        *          with call-predecessor 'callSite' in the NWA
        *
        */
-      extern const  SymbolSet getReturnSym_Call(NWA const & nwa, State callSite );
+      extern const  SymbolSet getReturnSym_Call(Nwa const & nwa, State callSite );
 
       /**
        * 
@@ -324,7 +324,7 @@ namespace opennwa
        *          to 'returnSite' in the NWA
        *
        */
-      extern const  SymbolSet getReturnSym_Ret(NWA const & nwa, State returnSite );
+      extern const  SymbolSet getReturnSym_Ret(Nwa const & nwa, State returnSite );
 
       /**
        * 
@@ -340,7 +340,7 @@ namespace opennwa
        *          with call-predecessor 'callSite' in the NWA
        *
        */
-      extern const  SymbolSet getReturnSym_ExitCall(NWA const & nwa, State exitPoint, State callSite );
+      extern const  SymbolSet getReturnSym_ExitCall(Nwa const & nwa, State exitPoint, State callSite );
 
       /**
        * 
@@ -356,7 +356,7 @@ namespace opennwa
        *          to 'returnSite' in the NWA
        *
        */
-      extern const  SymbolSet getReturnSym_ExitRet(NWA const & nwa, State exitPoint, State returnSite );
+      extern const  SymbolSet getReturnSym_ExitRet(Nwa const & nwa, State exitPoint, State returnSite );
 
       /**
        * 
@@ -372,7 +372,7 @@ namespace opennwa
        *          to 'returnSite' with call-predecessor 'callSite' in the NWA
        *
        */
-      extern const  SymbolSet getReturnSym_CallRet(NWA const & nwa, State callSite, State returnSite );
+      extern const  SymbolSet getReturnSym_CallRet(Nwa const & nwa, State callSite, State returnSite );
 
 
       /**
@@ -386,7 +386,7 @@ namespace opennwa
        * @return the set of return site states associated with the given symbol
        *
        */
-      extern const  StateSet getReturns_Sym(NWA const & nwa, Symbol symbol );
+      extern const  StateSet getReturns_Sym(Nwa const & nwa, Symbol symbol );
 
       /**
        * 
@@ -403,7 +403,7 @@ namespace opennwa
        *          point, call site, and symbol
        *
        */
-      extern const  StateSet getReturns(NWA const & nwa, State exitPoint, State callSite, Symbol symbol );
+      extern const  StateSet getReturns(Nwa const & nwa, State exitPoint, State callSite, Symbol symbol );
 
       /**
        * 
@@ -419,7 +419,7 @@ namespace opennwa
        *          point and call site
        *
        */
-      extern const  std::set<std::pair<Symbol,State> > getReturns(NWA const & nwa, State exitPoint, State callSite );
+      extern const  std::set<std::pair<Symbol,State> > getReturns(Nwa const & nwa, State exitPoint, State callSite );
 
       /**
        * 
@@ -431,7 +431,7 @@ namespace opennwa
        * @return the set of return sites of all return transitions in the NWA
        *
        */
-      extern const  StateSet getReturns(NWA const & nwa );
+      extern const  StateSet getReturns(Nwa const & nwa );
 
       /**
        * 
@@ -447,7 +447,7 @@ namespace opennwa
        *         point and symbol
        *
        */
-      extern const  StateSet getReturns_Exit(NWA const & nwa, State exitPoint, Symbol symbol );
+      extern const  StateSet getReturns_Exit(Nwa const & nwa, State exitPoint, Symbol symbol );
 
       /**
        * 
@@ -462,7 +462,7 @@ namespace opennwa
        *          exit point
        *
        */
-      extern const  std::set<std::pair<Symbol,State> > getReturns_Exit(NWA const & nwa, State exitPoint );
+      extern const  std::set<std::pair<Symbol,State> > getReturns_Exit(Nwa const & nwa, State exitPoint );
 
       /**
        * 
@@ -478,7 +478,7 @@ namespace opennwa
        *          site and symbol
        *
        */
-      extern const  StateSet getReturns_Call(NWA const & nwa, State callSite, Symbol symbol );
+      extern const  StateSet getReturns_Call(Nwa const & nwa, State callSite, Symbol symbol );
 
       /**
        * 
@@ -493,7 +493,7 @@ namespace opennwa
        *          call site
        *
        */
-      extern const  std::set<std::pair<Symbol,State> > getReturns_Call(NWA const & nwa, State callSite );
+      extern const  std::set<std::pair<Symbol,State> > getReturns_Call(Nwa const & nwa, State callSite );
 
       /**
        * 
@@ -506,7 +506,7 @@ namespace opennwa
        * @return the set of return sites associated with the given call site
        *
        */
-      extern const  StateSet getReturnSites(NWA const & nwa, State callSite );
+      extern const  StateSet getReturnSites(Nwa const & nwa, State callSite );
 
   }
 }
