@@ -1,5 +1,5 @@
 \section{Conversions beween WPDSs and NWAs (namespace
-  \texttt{wali::nwa::nwa\_pds})}
+  \texttt{opennwa::nwa\_pds})}
 \label{Se:Conversions}
 
 
@@ -58,9 +58,9 @@ r)$, then the WPDS will have a rule $\langle p,
 c\rangle\hookrightarrow\langle p, e r\rangle$).
 
 
-The following functions are in the namespace \texttt{wali::nwa::nwa\_pds}
+The following functions are in the namespace \texttt{opennwa::nwa\_pds}
 and, except for \texttt{plusWpds()}, are declared in the header
-\texttt{wali/nwa/nwa\_pds/conversions.hpp}:
+\texttt{opennwa/nwa\_pds/conversions.hpp}:
 
 
 \begin{functionlist}
@@ -99,7 +99,7 @@ and, except for \texttt{plusWpds()}, are declared in the header
     product of the NWA \texttt{nwa} and WPDS \texttt{base}, as described in the ``Explicit
     NWA plus PDS'' construction from \cite[\S6]{advancedquerying}. This
     function is declared in the header
-    \texttt{wali/nwa/nwa\_pds/plusWpds.hpp}.
+    \texttt{opennwa/nwa\_pds/plusWpds.hpp}.
 \end{functionlist}
 
 
@@ -222,7 +222,7 @@ There is a trivial weight domain (containing $\overline{1}$ and
 $\overline{0}$ only) implemented in the class \texttt{Reach}, defined in
 \texttt{wali/Reach.hpp}. A \texttt{WeightGen} subclass that returns elements
 from this reachability domain is provided as the \texttt{ReachGen} class,
-defined in \texttt{wali/nwa/WeightGen.hpp}. \texttt{ReachGen} returns
+defined in \texttt{opennwa/WeightGen.hpp}. \texttt{ReachGen} returns
 $\overline{1}$ for all transitions.
 
 

@@ -1,4 +1,4 @@
-\section{Building NWAs from other NWAs (namespace \texttt{wali::nwa::construct})}
+\section{Building NWAs from other NWAs (namespace \texttt{opennwa::construct})}
 \label{Se:Building NWAs}
 
 The library provides functions for performing automata-theoretic operations upon
@@ -13,7 +13,7 @@ first form is usually more convenient to use, and creates a mini language for
 set expressions; the second form makes it possible to store the result of an
 operation in a subclass of \texttt{NWA}.
 
-Each of these functions is in the namespace \texttt{wali::nwa::construct}:
+Each of these functions is in the namespace \texttt{opennwa::construct}:
 
 \begin{functionlist}
 
@@ -680,7 +680,7 @@ in the determinized NWA being subsets of states in the original NWA, states of t
 determinized NWA are sets of state pairs (i.e., binary relations on states)
 \cite{JACM:AM2009}.  To support determinization, the library provides a
 typedef of \texttt{std::set$<$pair$<$State, State$>>$} as 
-\texttt{NWA::BinaryRelation}. See also \texttt{wali/nwa/RelationOps.hpp}.
+\texttt{NWA::BinaryRelation}. See also \texttt{opennwa/RelationOps.hpp}.
 
 We present the algorithm we use for determinization in
 \appref{DeterminizeAlgorithm}.

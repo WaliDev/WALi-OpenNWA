@@ -1,7 +1,7 @@
-\section{The \texttt{wali::nwa::query} namespace}
+\section{The \texttt{opennwa::query} namespace}
 \label{Se:namespace-query}
 
-The \texttt{wali::nwa::query} namespace provides functions related to
+The \texttt{opennwa::query} namespace provides functions related to
 querying both the structure and language of an automaton.
 
 In this section, we first discuss how to retrieve information from an
@@ -13,7 +13,7 @@ Following that, we discuss queries about the
 
 \subsection{Querying information about an automaton's transitions}
 \label{Se:query-transitions}
-The \texttt{wali::nwa::query} namespace provides a large number of functions
+The \texttt{opennwa::query} namespace provides a large number of functions
 for retrieving information about an \texttt{NWA}'s transitions. The questions
 answered by these functions are of the form, e.g., ``what are all symbols that
 appear on a return transition where the call predecessor state is \texttt{s1}
@@ -65,8 +65,8 @@ of NWAs themselves. One computes whether an NWA is deterministic, and
 the other computes whether two automata have any states in common.
 
 These functions are declared in the header
-\texttt{wali/nwa/query/automaton.hpp} (and, of course, defined in the
-namespace \texttt{wali::nwa::query}).
+\texttt{opennwa/query/automaton.hpp} (and, of course, defined in the
+namespace \texttt{opennwa::query}).
 
 \begin{functionlist}
   \functionDef{bool}{isDeterministic}{NWA const \& nwa}{}
@@ -91,8 +91,8 @@ relate), and it also supports
 the poststar and prestar queries used in program analysis.
 
 The following functions perform standard language-theoretic queries. They are
-located in namespace \texttt{wali::nwa::query} and are declared in
-\texttt{wali/nwa/query/language.hpp}. They are:
+located in namespace \texttt{opennwa::query} and are declared in
+\texttt{opennwa/query/language.hpp}. They are:
 \begin{functionlist}
   \functionDef{bool}{languageContains}{NWA const \& nwa, Nested Word
     const \& word}{}
@@ -152,8 +152,8 @@ the query, and the other stores the WFA in an output parameter. The
 \texttt{WFA} type is \texttt{wali::wfa::WFA}.
 
 The functions that perform poststar and prestar are in the namespace
-\texttt{wali::nwa::query} and are declared in the header
-\texttt{wali/nwa/query/weighted.hpp}. They are:
+\texttt{opennwa::query} and are declared in the header
+\texttt{opennwa/query/weighted.hpp}. They are:
 \begin{functionlist}
   \functionDefEarly{WFA}{prestar}{NWA const \& nwa, WFA const \& input, WeightGen \& wg}{}
   \functionDefEarly{void}{prestar}{NWA const \& nwa, WFA const \& input, WFA \& output, WeightGen \& wg}{}

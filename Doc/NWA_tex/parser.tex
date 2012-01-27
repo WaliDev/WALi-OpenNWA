@@ -63,7 +63,7 @@ with assertion violations. In a future version of the library, we will
 report errors more gracefully, almost certainly through exceptions.
 
 There are two functions that parse NWA descriptions, both declared in
-\texttt{wali/nwa/NWAParser.hpp} in namespace \texttt{wali::nwa}:
+\texttt{opennwa/NWAParser.hpp} in namespace \texttt{opennwa}:
 \begin{functionlist}
   \functionDef{NWARefPtr}{read\_nwa}{std::istream \& is, std::string * name = NULL}{} 
   Reads a description of a single NWA from \texttt{is} and
@@ -119,7 +119,7 @@ future versions. %and to not feel bad about it.
 
 %\emph{Note:} The NWA parser has unit tests embedded in the code. (It
 %does not use any unit-test framework.) These tests can be run by
-%calling \texttt{wali::nwa::parser\_test\_all}. The file
+%calling \texttt{opennwa::parser\_test\_all}. The file
 %\texttt{NwaParserMain.cpp} is a short program that does this.
 
 

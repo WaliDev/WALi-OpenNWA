@@ -53,14 +53,14 @@ and returns.)
 \section{Library Overview}
 \label{Se:Nested Word Automata}
 
-The core of the NWA library is in the namespace \texttt{wali::nwa}. It
+The core of the NWA library is in the namespace \texttt{opennwa}. It
 includes the classes \texttt{NestedWord}, \texttt{NWA}, and others.
 
 There are a large number of non-member functions that operate on NWAs. These
 are divided into three sub-namespaces:
-\texttt{wali::nwa::query}, \texttt{wali::nwa::construct}, and
-\texttt{wali::nwa::nwa\_pds}. There is also an experimental parser in
-\texttt{wali::nwa}.
+\texttt{opennwa::query}, \texttt{opennwa::construct}, and
+\texttt{opennwa::nwa\_pds}. There is also an experimental parser in
+\texttt{opennwa}.
 
 Finally, there are some operations and classes provided by WALi that the NWA
 portion of the library uses. This mostly consists of the key-handling code,
@@ -73,38 +73,38 @@ Section \ref{Se:ExampleUse} illustrates a simple sample use of the library.
 
 \subsection{NWA core classes}
 
-These types live in namespace \texttt{wali::nwa}:
+These types live in namespace \texttt{opennwa}:
 
 \begin{functionlist}
   \functionitem[\texttt{NestedWord}] Implements a single nested word. Currently the only
     operation that can be performed using one is checking whether a
     \texttt{NestedWord} is a member of an \texttt{NWA}'s language. Defined in
-    \texttt{wali/nwa/NestedWord.hpp}. See \sectref{class-nested-word}.
+    \texttt{opennwa/NestedWord.hpp}. See \sectref{class-nested-word}.
   \functionitem[\texttt{NWA}] Implements a nested-word automaton. Defined in
-    \texttt{wali/nwa/NWA.hpp} with a forward declaration in \texttt{wali/nwa/NWAFwd.hpp}.
+    \texttt{opennwa/NWA.hpp} with a forward declaration in \texttt{opennwa/NWAFwd.hpp}.
     See
     \sectref{NWA-class}. (\sectref{serialization} also discusses member
     functions related to serializing an NWA.)
   \functionitem[\texttt{NWARefPtr}] \texttt{NWARefPtr} is a typedef of \texttt{ref\_ptr$<$NWA$>$} (see
-    below). This is defined in \texttt{wali/nwa/NWAFwd.hpp}.
+    below). This is defined in \texttt{opennwa/NWAFwd.hpp}.
   \functionitem[\texttt{State} and \texttt{Symbol}] These are both typedefs of
     \texttt{wali::Key} (see below). Both are defined in
-    \texttt{wali/nwa/NWAFwd.hpp}. \emph{Note:} the use of keys for both
+    \texttt{opennwa/NWAFwd.hpp}. \emph{Note:} the use of keys for both
     states and symbols means that they can be confused from a types
     perspective, so use caution that this does not happen. 
   \functionitem[\texttt{StateSet} and \texttt{SymbolSet}] These are typedefs of
     \texttt{std::set}s of the corresponding type. (Client code should not
     rely on this
     fact; it could change to be an \texttt{unordered\_map} or other similar
-    container.) Both are defined in \texttt{wali/nwa/NWAFwd.hpp}.
+    container.) Both are defined in \texttt{opennwa/NWAFwd.hpp}.
   \functionitem[\texttt{ClientInfo}] This class holds client-specific information that
     is associated with a state. Client code can subclass \texttt{ClientInfo} and use
     functions of the \texttt{NWA} class to attach instances to states. To use,
-    include \texttt{wali/nwa/ClientInfo.hpp}. See \sectref{client-info}.
+    include \texttt{opennwa/ClientInfo.hpp}. See \sectref{client-info}.
   \functionitem[\texttt{WeightGen}] This abstract class describes how to assign weights
     to transitions of the NWA, and is used both when converting an NWA to a
     PDS and when doing prestar/poststar queries on the NWA directly. To use,
-    include \texttt{wali/nwa/WeightGen.hpp}. See \sectref{NWAtoPDS}.
+    include \texttt{opennwa/WeightGen.hpp}. See \sectref{NWAtoPDS}.
 \end{functionlist}
 
 
@@ -114,7 +114,7 @@ The library provides a large number of non-member functions for operating on
 NWAs. These are partitioned into the following namespaces:
 
 \begin{functionlist}
-  \functionitem[\texttt{wali::nwa::query}] This namespace provides functions for
+  \functionitem[\texttt{opennwa::query}] This namespace provides functions for
     querying an automaton. The kinds of functions in this namespace are:
     \begin{itemize}
       \item Functions that query transitions of
@@ -136,15 +136,15 @@ NWAs. These are partitioned into the following namespaces:
         \sectref{query-language}.
     \end{itemize}
     
-  \functionitem[\texttt{wali::nwa::construct}] This namespace provides functions for
+  \functionitem[\texttt{opennwa::construct}] This namespace provides functions for
     constructing an NWA. Functions in this namespace are standard,
     automata-theoretic operations such as intersection, union, concatenation,
     Kleene star, and reversal. See \sectref{Building NWAs}.
-  \functionitem[\texttt{wali::nwa::nwa\_pds}] This namespace provides functions for
+  \functionitem[\texttt{opennwa::nwa\_pds}] This namespace provides functions for
     converting between NWAs and PDSs, and related functions. (Note that
     construction of an NWA from a PDS is in this namespace, not in
     \texttt{construct}.) See \sectref{Conversions}.
-  \functionitem[\texttt{wali::nwa}] This namespace, in addition to the items already
+  \functionitem[\texttt{opennwa}] This namespace, in addition to the items already
     discussed, provides an experimental parser for a serialization format of
     NWAs. See \sectref{serialization}.
 \end{functionlist}
