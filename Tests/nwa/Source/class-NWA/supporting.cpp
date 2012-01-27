@@ -4,10 +4,8 @@
 
 #include "supporting.hpp"
 
-namespace wali
+namespace opennwa
 {
-    namespace nwa
-    {
         //////////////////////////////////
         // Supporting stuff
 
@@ -88,5 +86,4 @@ namespace wali
         }
 
 
-    }
 }

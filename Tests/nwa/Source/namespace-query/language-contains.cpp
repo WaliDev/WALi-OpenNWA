@@ -8,7 +8,7 @@
 #include "Tests/nwa/Source/fixtures.hpp"
 #include "Tests/nwa/Source/class-NWA/supporting.hpp"
 
-using namespace wali::nwa;
+using namespace opennwa;
 
 #define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
 
@@ -59,8 +59,7 @@ static bool expected_answers[][num_words] = {
 
 
 
-namespace wali {
-    namespace nwa {
+namespace opennwa {
         namespace query {
 
             TEST(wali$nwa$query$$languageContains, testBatteryOfVariouslyBalancedWordsAndNwas)
@@ -93,7 +92,7 @@ namespace wali {
                 nwa.addInitialState(e.state);
                 nwa.addFinalState(e.state3);
 
-                nwa.addInternalTrans(e.state, WALI_EPSILON, e.state2);
+                nwa.addInternalTrans(e.state, EPSILON, e.state2);
                 nwa.addInternalTrans(e.state2, e.symbol, e.state3);
 
 
@@ -103,6 +102,5 @@ namespace wali {
                 EXPECT_TRUE(languageContains(nwa, nw));
             }
 
-        }
     }
 }

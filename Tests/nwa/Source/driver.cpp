@@ -16,7 +16,7 @@ using boost::unit_test_framework::test_suite;
 using boost::unit_test_framework::test_case;
 using Arbitrary::suite_of_random_tests;
 
-typedef wali::nwa::NWA<wali::nwa::ClientInfo> Nwa;
+typedef opennwa::NWA<opennwa::ClientInfo> Nwa;
 typedef wali::ref_ptr<Nwa> NwaRefPtr;
 
 

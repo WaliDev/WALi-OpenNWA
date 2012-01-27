@@ -7,8 +7,7 @@
 #include "Tests/nwa/Source/class-NWA/supporting.hpp"
 
 
-namespace wali {
-    namespace nwa {
+namespace opennwa {
         namespace query {
 
             TEST(wali$nwa$query$$statesOverlap, emptyDoesNotOverlap)
@@ -73,6 +72,5 @@ namespace wali {
                 EXPECT_TRUE(statesOverlap(nwa1, nwa2));
             }
 
-        }
     }
 }

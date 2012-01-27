@@ -6,7 +6,7 @@
 #include "Tests/nwa/Source/fixtures.hpp"
 #include "Tests/nwa/Source/class-NWA/supporting.hpp"
 
-using namespace wali::nwa;
+using namespace opennwa;
 using namespace std;
 
 #define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
@@ -43,8 +43,7 @@ static bool expected_answers[] = {
 
 
 
-namespace wali {
-    namespace nwa {
+namespace opennwa {
         namespace query {
             
 
@@ -302,8 +301,8 @@ namespace wali {
                 nwa.addInternalTrans(e.state2, e.symbol, e.state3);
 
                 // Bottom path
-                nwa.addInternalTrans(e.state, WALI_EPSILON, state4);
-                nwa.addInternalTrans(state4, WALI_EPSILON, state5);
+                nwa.addInternalTrans(e.state, EPSILON, state4);
+                nwa.addInternalTrans(state4, EPSILON, state5);
                 nwa.addInternalTrans(state5, b, e.state3);
 
                 NestedWordRefPtr word = getSomeShortestAcceptedWord(nwa);
@@ -316,7 +315,6 @@ namespace wali {
                 EXPECT_EQ(expected, *word);
             }
             
-        }
     }
 }
 

@@ -9,7 +9,7 @@
 #include "Tests/nwa/Source/class-NWA/supporting.hpp"
 
 
-using namespace wali::nwa;
+using namespace opennwa;
 
 #define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
 
@@ -43,8 +43,7 @@ static bool expected_answers[] = {
 };
 
 
-namespace wali {
-    namespace nwa {
+namespace opennwa {
         namespace construct {
 
             TEST(wali$nwa$construct$$complement, complementOfACompletelyEmptyAutomatonContainsStuff)
@@ -90,5 +89,4 @@ namespace wali {
 
 
         }
-    }
 }

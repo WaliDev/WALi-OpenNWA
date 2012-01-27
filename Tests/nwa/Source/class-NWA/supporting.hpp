@@ -2,10 +2,8 @@
 
 #include "opennwa/NWA.hpp"
 
-namespace wali
+namespace opennwa
 {
-    namespace nwa
-    {
         //////////////////////////////////
         // Supporting stuff
 
@@ -23,5 +21,4 @@ namespace wali
         /// doesn't change 'reference'.
         extern void expect_nwas_are_physically_different(NWA const & reference, NWA & copy);
 
-    }
 }

@@ -8,7 +8,7 @@
 #include "Tests/nwa/Source/class-NWA/supporting.hpp"
 
 
-using namespace wali::nwa;
+using namespace opennwa;
 
 #define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
 
@@ -27,8 +27,7 @@ static NWA const nwas[] = {
 static const unsigned num_nwas = NUM_ELEMENTS(nwas);
 
 
-namespace wali {
-    namespace nwa {
+namespace opennwa {
         namespace construct {
 
             TEST(wali$nwa$query$$star, testBatteryOfVariouslyBalancedNwas)
@@ -77,6 +76,6 @@ namespace wali {
 
                 EXPECT_TRUE(query::languageEquals(nwa, *closure));
             }
-        }
+
     }
 }

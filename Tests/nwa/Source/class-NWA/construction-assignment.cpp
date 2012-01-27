@@ -6,10 +6,8 @@
 #include "Tests/nwa/Source/class-NWA/supporting.hpp"
 #include "Tests/nwa/Source/int-client-info.hpp"
 
-namespace wali
+namespace opennwa
 {
-    namespace nwa
-    {
         /////////////////////////////////
         // Now begin the actual tests
         
@@ -374,13 +372,13 @@ namespace wali
         {
             NWA nwa;
             EXPECT_DEATH({
-                    nwa.getClientInfo(WALI_BAD_KEY);
+                    nwa.getClientInfo(wali::WALI_BAD_KEY);
                 },
                 "state < wali::WALI_BAD_KEY");
             EXPECT_DEATH({
-                    nwa.setClientInfo(WALI_BAD_KEY, NULL);
+                    nwa.setClientInfo(wali::WALI_BAD_KEY, NULL);
                 },
                 "state < wali::WALI_BAD_KEY");
         }
-    }
+
 }

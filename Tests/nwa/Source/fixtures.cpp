@@ -2,10 +2,8 @@
 
 #include "fixtures.hpp"
 
-namespace wali
+namespace opennwa
 {
-    namespace nwa
-    {
         //////////////////////////////////
         // Supporting stuff
 
@@ -43,8 +41,8 @@ namespace wali
             EXPECT_FALSE(nwa.isSymbol(elements.state));
                 
             // Should always be true
-            EXPECT_FALSE(nwa.isSymbol(WALI_EPSILON));
-            EXPECT_FALSE(nwa.isSymbol(WALI_WILD));
+            EXPECT_FALSE(nwa.isSymbol(EPSILON));
+            EXPECT_FALSE(nwa.isSymbol(WILD));
         }
 
         void
@@ -58,8 +56,8 @@ namespace wali
             EXPECT_TRUE(nwa.isSymbol(elements.state));
                 
             // Should always be true
-            EXPECT_FALSE(nwa.isSymbol(WALI_EPSILON));
-            EXPECT_FALSE(nwa.isSymbol(WALI_WILD));
+            EXPECT_FALSE(nwa.isSymbol(EPSILON));
+            EXPECT_FALSE(nwa.isSymbol(WILD));
         }
 
         
@@ -121,10 +119,10 @@ namespace wali
             nwa->addReturnTrans(q3, q0, ret, q1);
 
 
-            nwa->addInternalTrans(q2, WALI_EPSILON, dummy);
-            nwa->addInternalTrans(q2, WALI_WILD, dummy);
-            nwa->addCallTrans(q2, WALI_WILD, dummy);
-            nwa->addReturnTrans(q2, q1, WALI_WILD, dummy);
+            nwa->addInternalTrans(q2, EPSILON, dummy);
+            nwa->addInternalTrans(q2, WILD, dummy);
+            nwa->addCallTrans(q2, WILD, dummy);
+            nwa->addReturnTrans(q2, q1, WILD, dummy);
         }
         
         const State OddNumEvenGroupsNwa::q0 = getKey("q0");
@@ -137,5 +135,4 @@ namespace wali
         const Symbol OddNumEvenGroupsNwa::call = getKey("(");
         const Symbol OddNumEvenGroupsNwa::ret = getKey(")");
         
-    }
 }

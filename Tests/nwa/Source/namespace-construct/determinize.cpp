@@ -11,8 +11,7 @@
 #include "Tests/nwa/Source/int-client-info.hpp"
 #include "Tests/nwa/Source/class-NWA/supporting.hpp"
 
-namespace wali {
-    namespace nwa {
+namespace opennwa {
         namespace construct {
 
             TEST(wali$nwa$construct$$determinize, allowPendingCallsOnAccepting)
@@ -27,7 +26,7 @@ namespace wali {
                 nwa.addInitialState(e.state);
                 nwa.addFinalState(e.state3);
 
-                nwa.addInternalTrans(e.state, WALI_EPSILON, e.state2);
+                nwa.addInternalTrans(e.state, EPSILON, e.state2);
                 nwa.addCallTrans(e.state2, e.symbol, e.state3);
 
                 NWARefPtr det = determinize(nwa);
@@ -47,7 +46,7 @@ namespace wali {
                 nwa.addInitialState(e.state);
                 nwa.addFinalState(e.state2);
 
-                nwa.addInternalTrans(e.state, WALI_EPSILON, e.state2);
+                nwa.addInternalTrans(e.state, EPSILON, e.state2);
 
                 NWARefPtr det = determinize(nwa);
 
@@ -108,7 +107,7 @@ namespace wali {
                 EXPECT_FALSE(query::languageContains(*det, empty));
                 EXPECT_TRUE(query::languageContains(*det, word));
             }
+
         }
-    }
 }
 

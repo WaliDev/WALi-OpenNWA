@@ -10,7 +10,7 @@
 #include "Tests/nwa/Source/int-client-info.hpp"
 #include "Tests/nwa/Source/class-NWA/supporting.hpp"
 
-using namespace wali::nwa;
+using namespace opennwa;
 
 #define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
 
@@ -54,8 +54,7 @@ static const NWA * const expected_answers[][num_nwas] = {
 };
 
 
-namespace wali {
-    namespace nwa {
+namespace opennwa {
         namespace construct {
 
             TEST(wali$nwa$construct$$concat, testBatteryOfVariouslyBalancedNwas)
@@ -95,5 +94,4 @@ namespace wali {
             }
             
         }
-    }
 }

@@ -6,7 +6,7 @@
 #include "Tests/nwa/Source/fixtures.hpp"
 #include "Tests/nwa/Source/class-NWA/supporting.hpp"
 
-using namespace wali::nwa;
+using namespace opennwa;
 
 #define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
 
@@ -42,8 +42,7 @@ static bool expected_answers[][num_nwas] = {
 };
 
 
-namespace wali {
-    namespace nwa {
+namespace opennwa {
         namespace query {
 
             TEST(wali$nwa$query$$languageSubetEq, testBatteryOfVariouslyBalancedNwas)
@@ -86,6 +85,5 @@ namespace wali {
                 }
             }
             
-        }
     }
 }

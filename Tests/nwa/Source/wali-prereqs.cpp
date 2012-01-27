@@ -2,6 +2,7 @@
 
 #include "wali/Key.hpp"
 #include "wali/Common.hpp"
+#include "opennwa/NWAFwd.hpp"
 
 namespace wali {
 
@@ -83,5 +84,11 @@ namespace wali {
         EXPECT_EQ(2u, getKey("heeeey"));
         EXPECT_EQ("*", key2str(WALI_EPSILON));
         EXPECT_EQ("@", key2str(WALI_WILD));
+    }
+
+    TEST(opennwa$epslion$$and$wild, opennwaAndWaliEpsilonAndWildAgree)
+    {
+        EXPECT_EQ(wali::WALI_EPSILON, opennwa::EPSILON);
+        EXPECT_EQ(wali::WALI_WILD, opennwa::WILD);
     }
 }

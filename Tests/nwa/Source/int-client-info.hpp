@@ -3,8 +3,7 @@
 
 #include "opennwa/ClientInfo.hpp"
 
-namespace wali {
-    namespace nwa {
+namespace opennwa {
 
         struct IntClientInfo : ClientInfo
         {
@@ -24,7 +23,6 @@ namespace wali {
             int n;
         };
         
-    }
 }
 
 #endif

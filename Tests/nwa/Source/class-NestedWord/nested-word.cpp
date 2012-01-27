@@ -5,8 +5,7 @@
 #include "Tests/nwa/Source/fixtures.hpp"
 
 
-namespace wali {
-    namespace nwa {
+namespace opennwa {
 
         typedef NestedWord::Position Position;
         typedef NestedWord::const_iterator Iterator;
@@ -196,7 +195,6 @@ namespace wali {
             EXPECT_NE(word6, word5);
         }
 
-    }
 }
 
     

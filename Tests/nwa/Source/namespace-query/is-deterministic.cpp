@@ -7,8 +7,7 @@
 #include "Tests/nwa/Source/class-NWA/supporting.hpp"
 
 
-namespace wali {
-    namespace nwa {
+namespace opennwa {
         namespace query {
 
             TEST(wali$nwa$query$$isDeterministic, emptyNwaIsDeterministic)
@@ -54,14 +53,14 @@ namespace wali {
                 OddNumEvenGroupsNwa fixture;
                 ASSERT_TRUE(fixture.nwa.removeState(fixture.dummy));
 
-                ASSERT_TRUE(fixture.nwa.addInternalTrans(fixture.q0, WALI_WILD, fixture.q1));
-                ASSERT_TRUE(fixture.nwa.addCallTrans(fixture.q3, WALI_WILD, fixture.q1));
-                ASSERT_TRUE(fixture.nwa.addReturnTrans(fixture.q2, fixture.q3, WALI_WILD, fixture.q1));
+                ASSERT_TRUE(fixture.nwa.addInternalTrans(fixture.q0, WILD, fixture.q1));
+                ASSERT_TRUE(fixture.nwa.addCallTrans(fixture.q3, WILD, fixture.q1));
+                ASSERT_TRUE(fixture.nwa.addReturnTrans(fixture.q2, fixture.q3, WILD, fixture.q1));
                 // Make sure we test two wild transitions out of the same
                 // state with different call predecessors...
-                ASSERT_TRUE(fixture.nwa.addReturnTrans(fixture.q2, fixture.q0, WALI_WILD, fixture.q1));
+                ASSERT_TRUE(fixture.nwa.addReturnTrans(fixture.q2, fixture.q0, WILD, fixture.q1));
                 // ... and from different states with the same call predecessors
-                ASSERT_TRUE(fixture.nwa.addReturnTrans(fixture.q1, fixture.q3, WALI_WILD, fixture.q1));
+                ASSERT_TRUE(fixture.nwa.addReturnTrans(fixture.q1, fixture.q3, WILD, fixture.q1));
                 
                 EXPECT_TRUE(isDeterministic(fixture.nwa));
             }
@@ -71,8 +70,8 @@ namespace wali {
                 OddNumEvenGroupsNwa fixture;
                 ASSERT_TRUE(fixture.nwa.removeState(fixture.dummy));
 
-                ASSERT_TRUE(fixture.nwa.addInternalTrans(fixture.q0, WALI_WILD, fixture.q1));
-                ASSERT_TRUE(fixture.nwa.addInternalTrans(fixture.q0, WALI_WILD, fixture.q2));
+                ASSERT_TRUE(fixture.nwa.addInternalTrans(fixture.q0, WILD, fixture.q1));
+                ASSERT_TRUE(fixture.nwa.addInternalTrans(fixture.q0, WILD, fixture.q2));
 
                 EXPECT_FALSE(isDeterministic(fixture.nwa));
             }
@@ -82,8 +81,8 @@ namespace wali {
                 OddNumEvenGroupsNwa fixture;
                 ASSERT_TRUE(fixture.nwa.removeState(fixture.dummy));
 
-                ASSERT_TRUE(fixture.nwa.addCallTrans(fixture.q3, WALI_WILD, fixture.q1));
-                ASSERT_TRUE(fixture.nwa.addCallTrans(fixture.q3, WALI_WILD, fixture.q2));
+                ASSERT_TRUE(fixture.nwa.addCallTrans(fixture.q3, WILD, fixture.q1));
+                ASSERT_TRUE(fixture.nwa.addCallTrans(fixture.q3, WILD, fixture.q2));
 
                 EXPECT_FALSE(isDeterministic(fixture.nwa));
             }
@@ -93,8 +92,8 @@ namespace wali {
                 OddNumEvenGroupsNwa fixture;
                 fixture.nwa.removeState(fixture.dummy);
 
-                fixture.nwa.addReturnTrans(fixture.q2, fixture.q1, WALI_WILD, fixture.q3);
-                fixture.nwa.addReturnTrans(fixture.q2, fixture.q1, WALI_WILD, fixture.q0);
+                fixture.nwa.addReturnTrans(fixture.q2, fixture.q1, WILD, fixture.q3);
+                fixture.nwa.addReturnTrans(fixture.q2, fixture.q1, WILD, fixture.q0);
 
                 EXPECT_FALSE(isDeterministic(fixture.nwa));
             }
@@ -107,11 +106,11 @@ namespace wali {
                 OddNumEvenGroupsNwa fixture;
                 ASSERT_TRUE(fixture.nwa.removeState(fixture.dummy));
                 
-                ASSERT_TRUE(fixture.nwa.addInternalTrans(fixture.q2, WALI_EPSILON, fixture.q0));
+                ASSERT_TRUE(fixture.nwa.addInternalTrans(fixture.q2, EPSILON, fixture.q0));
 
                 EXPECT_FALSE(isDeterministic(fixture.nwa));
 
-                ASSERT_TRUE(fixture.nwa.addInternalTrans(fixture.q2, WALI_EPSILON, fixture.q2));
+                ASSERT_TRUE(fixture.nwa.addInternalTrans(fixture.q2, EPSILON, fixture.q2));
 
                 EXPECT_FALSE(isDeterministic(fixture.nwa));
             }
@@ -168,6 +167,6 @@ namespace wali {
 
                 EXPECT_FALSE(isDeterministic(fixture.nwa));
             }
-        }
+
     }
 }

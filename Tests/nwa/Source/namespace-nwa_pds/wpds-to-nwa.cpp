@@ -10,8 +10,7 @@
 using namespace wali::wpds;
 
 
-namespace wali {
-    namespace nwa {
+namespace opennwa {
         namespace nwa_pds {
 
             TEST(wali$nwa$nwa_pds$$WpdsToNwa, compilationTest)
@@ -20,6 +19,6 @@ namespace wali {
                 NWARefPtr nwa = WpdsToNwa(wpds);
             }
 
-        }
+
     }
 }

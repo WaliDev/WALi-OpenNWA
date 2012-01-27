@@ -13,7 +13,7 @@
 #include <iostream>
 #include <algorithm>
 
-using namespace wali::nwa;
+using namespace opennwa;
 using namespace wali::wpds;
 using namespace std;
 using boost::algorithm::split;
@@ -44,8 +44,7 @@ extern std::string answers_forwards_returns[],
 
 
 
-namespace wali {
-    namespace nwa {
+namespace opennwa {
         namespace nwa_pds {
 
             template<typename Container>
@@ -102,6 +101,5 @@ namespace wali {
                 }
             }
             
-        }
     }
 }

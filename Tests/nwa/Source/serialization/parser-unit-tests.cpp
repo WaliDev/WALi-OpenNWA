@@ -17,8 +17,10 @@
 #include <ctime>
 #include <cctype>
 
-namespace wali {
-  namespace nwa {
+using wali::KeyTriple;
+using wali::KeyQuad;
+
+namespace opennwa {
     namespace parser {
       namespace details {
 
@@ -371,7 +373,7 @@ namespace wali {
 
         TEST(wali$nwa$parser$$readBlocks, unitTests)
         {
-          NWARefPtr nwa = new wali::nwa::NWA();
+          NWARefPtr nwa = new opennwa::NWA();
     
           // These tests call read_*_block (implicitly making sure there are no
           // exceptions or EXPECT_TRUEions), then make sure they read everything they
@@ -425,7 +427,6 @@ namespace wali {
 
 
 
-      }
     }
   }
 }
@@ -440,8 +441,7 @@ namespace wali {
 ///
 /// Reads in an nwa-description
 
-namespace wali {
-  namespace nwa {
+namespace opennwa {
     using namespace parser::details;
 
     TEST(wali$nwa$parser$$readMap, unitTests)
@@ -562,8 +562,7 @@ namespace wali {
       EXPECT_EQ(name, "Test");
     }
     
-  } // namespace nwa
-} // namespace wali
+} // namespace opennwa
 
 // Yo, Emacs!
 // Local Variables:
