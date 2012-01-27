@@ -626,118 +626,118 @@
     <ClInclude Include="..\..\..\Source\wali\wfa\epr\StatePriorityWorklist.hpp">
       <Filter>Header Files\wali.wfa.epr</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\ClientInfo.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\ClientInfo.hpp">
       <Filter>Header Files\wali.nwa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\Configuration.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\Configuration.hpp">
       <Filter>Header Files\wali.nwa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\deprecate.h">
+    <ClInclude Include="..\..\..\Source\opennwa\deprecate.h">
       <Filter>Header Files\wali.nwa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\NestedWord.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\NestedWord.hpp">
       <Filter>Header Files\wali.nwa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\NWA.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\NWA.hpp">
       <Filter>Header Files\wali.nwa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\NWAFwd.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\NWAFwd.hpp">
       <Filter>Header Files\wali.nwa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\NWAParser.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\NWAParser.hpp">
       <Filter>Header Files\wali.nwa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\RelationOps.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\RelationOps.hpp">
       <Filter>Header Files\wali.nwa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\StateSet.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\StateSet.hpp">
       <Filter>Header Files\wali.nwa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\SymbolSet.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\SymbolSet.hpp">
       <Filter>Header Files\wali.nwa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\TransInfo.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\TransInfo.hpp">
       <Filter>Header Files\wali.nwa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\TransSet.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\TransSet.hpp">
       <Filter>Header Files\wali.nwa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\WeightGen.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\WeightGen.hpp">
       <Filter>Header Files\wali.nwa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\WordRecConfig.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\WordRecConfig.hpp">
       <Filter>Header Files\wali.nwa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\details\StateStorage.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\details\StateStorage.hpp">
       <Filter>Header Files\wali.nwa\details</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\details\SymbolStorage.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\details\SymbolStorage.hpp">
       <Filter>Header Files\wali.nwa\details</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\details\TransitionInfo.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\details\TransitionInfo.hpp">
       <Filter>Header Files\wali.nwa\details</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\details\TransitionStorage.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\details\TransitionStorage.hpp">
       <Filter>Header Files\wali.nwa\details</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\query\calls.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\query\calls.hpp">
       <Filter>Header Files\wali.nwa\query</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\query\internals.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\query\internals.hpp">
       <Filter>Header Files\wali.nwa\query</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\query\returns.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\query\returns.hpp">
       <Filter>Header Files\wali.nwa\query</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\query\transitions.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\query\transitions.hpp">
       <Filter>Header Files\wali.nwa\query</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\query\language.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\query\language.hpp">
       <Filter>Header Files\wali.nwa\query</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\query\automaton.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\query\automaton.hpp">
       <Filter>Header Files\wali.nwa\query</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\details\Configuration.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\details\Configuration.hpp">
       <Filter>Header Files\wali.nwa\details</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\nwa_pds\conversions.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\nwa_pds\conversions.hpp">
       <Filter>Header Files\wali.nwa\nwa_pds</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\construct\union.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\construct\union.hpp">
       <Filter>Header Files\wali.nwa\construct</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\construct\complement.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\construct\complement.hpp">
       <Filter>Header Files\wali.nwa\construct</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\construct\concat.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\construct\concat.hpp">
       <Filter>Header Files\wali.nwa\construct</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\construct\constructions.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\construct\constructions.hpp">
       <Filter>Header Files\wali.nwa\construct</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\construct\determinize.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\construct\determinize.hpp">
       <Filter>Header Files\wali.nwa\construct</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\construct\intersect.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\construct\intersect.hpp">
       <Filter>Header Files\wali.nwa\construct</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\construct\reverse.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\construct\reverse.hpp">
       <Filter>Header Files\wali.nwa\construct</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\construct\star.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\construct\star.hpp">
       <Filter>Header Files\wali.nwa\construct</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\query\details\selectors.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\query\details\selectors.hpp">
       <Filter>Header Files\wali.nwa\query\details</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\query\details\filters.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\query\details\filters.hpp">
       <Filter>Header Files\wali.nwa\query\details</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\query\details\genesis.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\query\details\genesis.hpp">
       <Filter>Header Files\wali.nwa\query\details</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\wali\nwa\query\details\iterators.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\query\details\iterators.hpp">
       <Filter>Header Files\wali.nwa\query\details</Filter>
     </ClInclude>
   </ItemGroup>

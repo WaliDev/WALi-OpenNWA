@@ -638,26 +638,26 @@
 				Name="wali.nwa"
 				>
 				<File
-					RelativePath="..\..\..\Source\wali\nwa\NWA.cpp"
+					RelativePath="..\..\..\Source\opennwa\NWA.cpp"
 					>
 				</File>
 				<Filter
 					Name="details"
 					>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\details\StateStorage.cpp"
+						RelativePath="..\..\..\Source\opennwa\details\StateStorage.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\details\SymbolStorage.cpp"
+						RelativePath="..\..\..\Source\opennwa\details\SymbolStorage.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\details\TransitionInfo.cpp"
+						RelativePath="..\..\..\Source\opennwa\details\TransitionInfo.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\details\TransitionStorage.cpp"
+						RelativePath="..\..\..\Source\opennwa\details\TransitionStorage.cpp"
 						>
 					</File>
 				</Filter>
@@ -665,19 +665,19 @@
 					Name="query"
 					>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\query\calls.cpp"
+						RelativePath="..\..\..\Source\opennwa\query\calls.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\query\internals.cpp"
+						RelativePath="..\..\..\Source\opennwa\query\internals.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\query\returns.cpp"
+						RelativePath="..\..\..\Source\opennwa\query\returns.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\query\transitions.cpp"
+						RelativePath="..\..\..\Source\opennwa\query\transitions.cpp"
 						>
 					</File>
 				</Filter>
@@ -685,27 +685,27 @@
 					Name="construct"
 					>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\construct\complement.cpp"
+						RelativePath="..\..\..\Source\opennwa\construct\complement.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\construct\concatenate.cpp"
+						RelativePath="..\..\..\Source\opennwa\construct\concatenate.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\construct\determinize.cpp"
+						RelativePath="..\..\..\Source\opennwa\construct\determinize.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\construct\intersect.cpp"
+						RelativePath="..\..\..\Source\opennwa\construct\intersect.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\construct\reverse.cpp"
+						RelativePath="..\..\..\Source\opennwa\construct\reverse.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\construct\star.cpp"
+						RelativePath="..\..\..\Source\opennwa\construct\star.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -727,7 +727,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\construct\union.cpp"
+						RelativePath="..\..\..\Source\opennwa\construct\union.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -753,7 +753,7 @@
 					Name="nwa_pds"
 					>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\nwa_pds\NwaToPds.cpp"
+						RelativePath="..\..\..\Source\opennwa\nwa_pds\NwaToPds.cpp"
 						>
 					</File>
 				</Filter>
@@ -1136,78 +1136,78 @@
 				Name="wali.nwa"
 				>
 				<File
-					RelativePath="..\..\..\Source\wali\nwa\ClientInfo.hpp"
+					RelativePath="..\..\..\Source\opennwa\ClientInfo.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Source\wali\nwa\Configuration.hpp"
+					RelativePath="..\..\..\Source\opennwa\Configuration.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Source\wali\nwa\deprecate.h"
+					RelativePath="..\..\..\Source\opennwa\deprecate.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Source\wali\nwa\NestedWord.hpp"
+					RelativePath="..\..\..\Source\opennwa\NestedWord.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Source\wali\nwa\NWA.hpp"
+					RelativePath="..\..\..\Source\opennwa\NWA.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Source\wali\nwa\NWAFwd.hpp"
+					RelativePath="..\..\..\Source\opennwa\NWAFwd.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Source\wali\nwa\NWAParser.hpp"
+					RelativePath="..\..\..\Source\opennwa\NWAParser.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Source\wali\nwa\RelationOps.hpp"
+					RelativePath="..\..\..\Source\opennwa\RelationOps.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Source\wali\nwa\StateSet.hpp"
+					RelativePath="..\..\..\Source\opennwa\StateSet.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Source\wali\nwa\SymbolSet.hpp"
+					RelativePath="..\..\..\Source\opennwa\SymbolSet.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Source\wali\nwa\TransInfo.hpp"
+					RelativePath="..\..\..\Source\opennwa\TransInfo.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Source\wali\nwa\TransSet.hpp"
+					RelativePath="..\..\..\Source\opennwa\TransSet.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Source\wali\nwa\WeightGen.hpp"
+					RelativePath="..\..\..\Source\opennwa\WeightGen.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Source\wali\nwa\WordRecConfig.hpp"
+					RelativePath="..\..\..\Source\opennwa\WordRecConfig.hpp"
 					>
 				</File>
 				<Filter
 					Name="details"
 					>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\details\StateStorage.hpp"
+						RelativePath="..\..\..\Source\opennwa\details\StateStorage.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\details\SymbolStorage.hpp"
+						RelativePath="..\..\..\Source\opennwa\details\SymbolStorage.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\details\TransitionInfo.hpp"
+						RelativePath="..\..\..\Source\opennwa\details\TransitionInfo.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\details\TransitionStorage.hpp"
+						RelativePath="..\..\..\Source\opennwa\details\TransitionStorage.hpp"
 						>
 					</File>
 				</Filter>
@@ -1215,19 +1215,19 @@
 					Name="query"
 					>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\query\calls.hpp"
+						RelativePath="..\..\..\Source\opennwa\query\calls.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\query\internals.hpp"
+						RelativePath="..\..\..\Source\opennwa\query\internals.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\query\returns.hpp"
+						RelativePath="..\..\..\Source\opennwa\query\returns.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\Source\wali\nwa\query\transitions.hpp"
+						RelativePath="..\..\..\Source\opennwa\query\transitions.hpp"
 						>
 					</File>
 				</Filter>
