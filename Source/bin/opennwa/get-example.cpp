@@ -35,7 +35,7 @@ int main(int argc, char** argv)
         exit(2);
     }
 
-    opennwa::NWARefPtr nwa = opennwa::read_nwa(infile);
+    opennwa::NwaRefPtr nwa = opennwa::read_nwa(infile);
 
     NestedWordRefPtr word = opennwa::query::getSomeAcceptedWord(*nwa);
 

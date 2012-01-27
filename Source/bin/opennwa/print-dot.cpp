@@ -36,7 +36,7 @@ int main(int argc, char** argv)
     }
 
 
-    opennwa::NWARefPtr nwa = opennwa::read_nwa(infile);
+    opennwa::NwaRefPtr nwa = opennwa::read_nwa(infile);
     nwa->print_dot(outfile, "", false);
 }
 

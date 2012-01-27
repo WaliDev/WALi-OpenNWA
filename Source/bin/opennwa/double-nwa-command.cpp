@@ -17,7 +17,7 @@ using std::cerr;
 using std::endl;
 using std::exit;
 
-using opennwa::NWARefPtr;
+using opennwa::NwaRefPtr;
 using opennwa::read_nwa;
 using opennwa::construct::CONSTRUCTION_FUNCTION;
 
@@ -47,10 +47,10 @@ int main(int argc, char** argv)
         exit(3);
     }
 
-    NWARefPtr nwa1 = read_nwa(infile1);
-    NWARefPtr nwa2 = read_nwa(infile2);
+    NwaRefPtr nwa1 = read_nwa(infile1);
+    NwaRefPtr nwa2 = read_nwa(infile2);
     
-    NWARefPtr result = CONSTRUCTION_FUNCTION(*nwa1, *nwa2);
+    NwaRefPtr result = CONSTRUCTION_FUNCTION(*nwa1, *nwa2);
 
     result->print(outfile);
 }

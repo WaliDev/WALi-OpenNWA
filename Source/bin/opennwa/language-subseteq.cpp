@@ -16,7 +16,7 @@ using std::cerr;
 using std::endl;
 using std::exit;
 
-using opennwa::NWARefPtr;
+using opennwa::NwaRefPtr;
 using opennwa::read_nwa;
 
 int main(int argc, char** argv)
@@ -39,8 +39,8 @@ int main(int argc, char** argv)
         exit(2);
     }
 
-    NWARefPtr nwa1 = read_nwa(infile1);
-    NWARefPtr nwa2 = read_nwa(infile2);
+    NwaRefPtr nwa1 = read_nwa(infile1);
+    NwaRefPtr nwa2 = read_nwa(infile2);
 
     bool result = opennwa::query::languageSubsetEq(*nwa1, *nwa2);
 
