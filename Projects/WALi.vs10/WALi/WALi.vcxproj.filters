@@ -638,13 +638,13 @@
     <ClInclude Include="..\..\..\Source\opennwa\NestedWord.hpp">
       <Filter>Header Files\wali.nwa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\opennwa\NWA.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\Nwa.hpp">
       <Filter>Header Files\wali.nwa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\opennwa\NWAFwd.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\NwaFwd.hpp">
       <Filter>Header Files\wali.nwa</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\opennwa\NWAParser.hpp">
+    <ClInclude Include="..\..\..\Source\opennwa\NwaParser.hpp">
       <Filter>Header Files\wali.nwa</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\opennwa\RelationOps.hpp">

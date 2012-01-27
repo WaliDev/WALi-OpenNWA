@@ -352,9 +352,9 @@
     <ClInclude Include="..\..\..\Source\opennwa\Configuration.hpp" />
     <ClInclude Include="..\..\..\Source\opennwa\deprecate.h" />
     <ClInclude Include="..\..\..\Source\opennwa\NestedWord.hpp" />
-    <ClInclude Include="..\..\..\Source\opennwa\NWA.hpp" />
-    <ClInclude Include="..\..\..\Source\opennwa\NWAFwd.hpp" />
-    <ClInclude Include="..\..\..\Source\opennwa\NWAParser.hpp" />
+    <ClInclude Include="..\..\..\Source\opennwa\Nwa.hpp" />
+    <ClInclude Include="..\..\..\Source\opennwa\NwaFwd.hpp" />
+    <ClInclude Include="..\..\..\Source\opennwa\NwaParser.hpp" />
     <ClInclude Include="..\..\..\Source\opennwa\RelationOps.hpp" />
     <ClInclude Include="..\..\..\Source\opennwa\StateSet.hpp" />
     <ClInclude Include="..\..\..\Source\opennwa\SymbolSet.hpp" />

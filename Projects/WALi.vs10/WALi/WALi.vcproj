@@ -1152,15 +1152,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Source\opennwa\NWA.hpp"
+					RelativePath="..\..\..\Source\opennwa\Nwa.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Source\opennwa\NWAFwd.hpp"
+					RelativePath="..\..\..\Source\opennwa\NwaFwd.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Source\opennwa\NWAParser.hpp"
+					RelativePath="..\..\..\Source\opennwa\NwaParser.hpp"
 					>
 				</File>
 				<File
