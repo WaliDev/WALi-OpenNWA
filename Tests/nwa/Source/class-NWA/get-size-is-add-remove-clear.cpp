@@ -1001,15 +1001,15 @@ namespace opennwa
             EXPECT_DEATH({
                     nwa.addState(wali::WALI_BAD_KEY);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.isState(wali::WALI_BAD_KEY);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.removeState(wali::WALI_BAD_KEY);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
         }
 
         TEST(wali$nwa$NWA$$isInitialState$and$addInitialState$and$removeInitialState$DeathTest, assertsOnWaliBadKey)
@@ -1018,15 +1018,15 @@ namespace opennwa
             EXPECT_DEATH({
                     nwa.addInitialState(wali::WALI_BAD_KEY);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.isInitialState(wali::WALI_BAD_KEY);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.removeInitialState(wali::WALI_BAD_KEY);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
         }
 
         TEST(wali$nwa$NWA$$isFinalState$and$addFinalState$and$removeFinalState$DeathTest, assertsOnWaliBadKey)
@@ -1035,15 +1035,15 @@ namespace opennwa
             EXPECT_DEATH({
                     nwa.addFinalState(wali::WALI_BAD_KEY);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.isFinalState(wali::WALI_BAD_KEY);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.removeFinalState(wali::WALI_BAD_KEY);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
         }
 
         TEST(wali$nwa$NWA$$isSymbol$and$addSymbol$and$removeSymbol$DeathTest, assertsOnWaliBadKey)
@@ -1052,15 +1052,15 @@ namespace opennwa
             EXPECT_DEATH({
                     nwa.addSymbol(wali::WALI_BAD_KEY);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.isSymbol(wali::WALI_BAD_KEY);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.removeSymbol(wali::WALI_BAD_KEY);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
         }
 
 
@@ -1074,28 +1074,28 @@ namespace opennwa
             EXPECT_DEATH({
                     nwa.addInternalTrans(wali::WALI_BAD_KEY, WILD, 0);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.addInternalTrans(0, wali::WALI_BAD_KEY, 0);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.addInternalTrans(0, WILD, wali::WALI_BAD_KEY);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
 
             EXPECT_DEATH({
                     nwa.removeInternalTrans(wali::WALI_BAD_KEY, WILD, 0);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.removeInternalTrans(0, wali::WALI_BAD_KEY, 0);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.removeInternalTrans(0, WILD, wali::WALI_BAD_KEY);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
         }
         
         TEST(wali$nwa$NWA$$addCallTrans$and$removeCallTrans$DeathTest, assertsOnWaliBadKey)
@@ -1108,28 +1108,28 @@ namespace opennwa
             EXPECT_DEATH({
                     nwa.addCallTrans(wali::WALI_BAD_KEY, WILD, 0);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.addCallTrans(0, wali::WALI_BAD_KEY, 0);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.addCallTrans(0, WILD, wali::WALI_BAD_KEY);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
 
             EXPECT_DEATH({
                     nwa.removeCallTrans(wali::WALI_BAD_KEY, WILD, 0);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.removeCallTrans(0, wali::WALI_BAD_KEY, 0);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.removeCallTrans(0, WILD, wali::WALI_BAD_KEY);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
         }
 
         TEST(wali$nwa$NWA$$addReturnTrans$and$removeReturnTrans$DeathTest, assertsOnWaliBadKey)
@@ -1142,36 +1142,36 @@ namespace opennwa
             EXPECT_DEATH({
                     nwa.addReturnTrans(wali::WALI_BAD_KEY, 0, WILD, 0);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.addReturnTrans(0, wali::WALI_BAD_KEY, WILD, 0);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.addReturnTrans(0, 0, wali::WALI_BAD_KEY, 0);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.addReturnTrans(0, 0, WILD, wali::WALI_BAD_KEY);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
 
             EXPECT_DEATH({
                     nwa.removeReturnTrans(wali::WALI_BAD_KEY, 0, WILD, 0);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.removeReturnTrans(0, wali::WALI_BAD_KEY, WILD, 0);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.removeReturnTrans(0, 0, wali::WALI_BAD_KEY, 0);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
             EXPECT_DEATH({
                     nwa.removeReturnTrans(0, 0, WILD, wali::WALI_BAD_KEY);
                 },
-                "< wali::wali::WALI_BAD_KEY");
+                "< wali::WALI_BAD_KEY");
         }
 
 }
