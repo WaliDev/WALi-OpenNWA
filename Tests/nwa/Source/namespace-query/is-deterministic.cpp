@@ -12,7 +12,7 @@ namespace opennwa {
 
             TEST(opennwa$query$$isDeterministic, emptyNwaIsDeterministic)
             {
-                NWA empty;
+                Nwa empty;
 
                 EXPECT_TRUE(isDeterministic(empty));
             }

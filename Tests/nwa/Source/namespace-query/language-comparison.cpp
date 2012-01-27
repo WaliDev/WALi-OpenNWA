@@ -13,8 +13,8 @@ using namespace opennwa;
 
 // WARNING: the order of these words must be consistent with the row & column
 //          order in the table 'expected_answers' below.
-static NWA const nwas[] = {
-    NWA(),
+static Nwa const nwas[] = {
+    Nwa(),
     AcceptsBalancedOnly().nwa,
     AcceptsStrictlyUnbalancedLeft().nwa,
     AcceptsPossiblyUnbalancedLeft().nwa,
@@ -50,7 +50,7 @@ namespace opennwa {
                 for (unsigned left = 0 ; left < num_nwas ; ++left) {
                     for (unsigned right = 0 ; right < num_nwas ; ++right) {
                         std::stringstream ss;
-                        ss << "Testing NWA " << left << " \\subseteq " << right;
+                        ss << "Testing Nwa " << left << " \\subseteq " << right;
                         SCOPED_TRACE(ss.str());
 
                         if (expected_answers[left][right]) {
@@ -69,7 +69,7 @@ namespace opennwa {
                 for (unsigned left = 0 ; left < num_nwas ; ++left) {
                     for (unsigned right = left ; right < num_nwas ; ++right) {
                         std::stringstream ss;
-                        ss << "Testing NWA " << left << " = " << right;
+                        ss << "Testing Nwa " << left << " = " << right;
                         SCOPED_TRACE(ss.str());
 
                         // If left subseteq right and right subseteq left,

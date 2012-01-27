@@ -16,7 +16,7 @@ namespace opennwa {
             TEST(opennwa$nwa_pds$$plusWpds, compilationTest)
             {
                 WPDS wpds;
-                NWA nwa;
+                Nwa nwa;
                 wpds = plusWpds(nwa, wpds);
             }
 

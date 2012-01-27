@@ -12,7 +12,7 @@ namespace opennwa
         
         ///
         /// Uses EXPECT macros to make sure 'nwa' is empty
-        void expect_nwa_is_empty(NWA const & nwa)
+        void expect_nwa_is_empty(Nwa const & nwa)
         {
             EXPECT_EQ(0u, nwa.sizeStates());
             EXPECT_EQ(0u, nwa.sizeInitialStates());
@@ -26,7 +26,7 @@ namespace opennwa
 
         ///
         /// Uses EXPECT macros to make sure NWAs are equal
-        void expect_nwas_are_equal(NWA const & a, NWA const & b)
+        void expect_nwas_are_equal(Nwa const & a, Nwa const & b)
         {
             EXPECT_EQ(a, b);
 
@@ -35,13 +35,13 @@ namespace opennwa
             EXPECT_EQ(a.getFinalStates(), b.getFinalStates());
             EXPECT_EQ(a.getSymbols(), b.getSymbols());
 
-            std::vector<NWA::Internal>
+            std::vector<Nwa::Internal>
                 a_internals(a.beginInternalTrans(), a.endInternalTrans()),
                 b_internals(b.beginInternalTrans(), b.endInternalTrans());
-            std::vector<NWA::Call>
+            std::vector<Nwa::Call>
                 a_calls(a.beginCallTrans(), a.endCallTrans()),
                 b_calls(b.beginCallTrans(), b.endCallTrans());
-            std::vector<NWA::Return>
+            std::vector<Nwa::Return>
                 a_returns(a.beginReturnTrans(), a.endReturnTrans()),
                 b_returns(b.beginReturnTrans(), b.endReturnTrans());
             
@@ -53,7 +53,7 @@ namespace opennwa
 
         /// Adds stuff to 'copy' and makes sure it doesn't change
         /// 'reference'.
-        void expect_nwas_are_physically_different(NWA const & reference, NWA & copy)
+        void expect_nwas_are_physically_different(Nwa const & reference, Nwa & copy)
         {
             State state = getKey("additional state");
             State initial = getKey("additional initial state");
@@ -71,9 +71,9 @@ namespace opennwa
 
 #undef ADD_AND_CHECK_NOT_IN_COPY
             
-            NWA::Internal internal(state, symbol, initial);
-            NWA::Call call(state, symbol, initial);
-            NWA::Return ret(state, state, symbol, state);
+            Nwa::Internal internal(state, symbol, initial);
+            Nwa::Call call(state, symbol, initial);
+            Nwa::Return ret(state, state, symbol, state);
 
             copy.addInternalTrans(internal);
             EXPECT_EQ(copy.sizeInternalTrans(), reference.sizeInternalTrans() + 1);

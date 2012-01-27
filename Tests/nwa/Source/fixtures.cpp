@@ -18,7 +18,7 @@ namespace opennwa
         {}
 
         void
-        SomeElements::add_to_nwa(NWA * nwa)
+        SomeElements::add_to_nwa(Nwa * nwa)
         {
             SomeElements elements;
                 
@@ -31,7 +31,7 @@ namespace opennwa
         }
 
         void
-        SomeElements::expect_not_present(NWA const & nwa)
+        SomeElements::expect_not_present(Nwa const & nwa)
         {
             SomeElements elements;
                 
@@ -46,7 +46,7 @@ namespace opennwa
         }
 
         void
-        expect_present(NWA const & nwa)
+        expect_present(Nwa const & nwa)
         {
             SomeElements elements;
                 
@@ -68,7 +68,7 @@ namespace opennwa
         }
             
         void
-        OddNumEvenGroupsNwa::build_nwa(NWA * nwa)
+        OddNumEvenGroupsNwa::build_nwa(Nwa * nwa)
         {
             // From NWA-tests.cpp in Source/opennwa if you want to trace
             // history.

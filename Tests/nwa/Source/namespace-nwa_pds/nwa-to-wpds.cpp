@@ -23,8 +23,8 @@ using boost::algorithm::is_any_of;
 
 // WARNING: the order of these words must be consistent with the row & column
 //          order in the table 'expected_answers' below.
-static NWA const nwas[] = {
-    NWA(),
+static Nwa const nwas[] = {
+    Nwa(),
     AcceptsBalancedOnly().nwa,
     AcceptsStrictlyUnbalancedLeft().nwa,
     AcceptsPossiblyUnbalancedLeft().nwa,

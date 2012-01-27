@@ -12,28 +12,28 @@ namespace opennwa
         public:
             State state, state2, state3;
             Symbol symbol;
-            NWA::Internal internal;
-            NWA::Call call;
-            NWA::Return ret;
+            Nwa::Internal internal;
+            Nwa::Call call;
+            Nwa::Return ret;
 
             SomeElements();
 
-            static void add_to_nwa(NWA * nwa);
+            static void add_to_nwa(Nwa * nwa);
 
-            static void expect_not_present(NWA const & nwa);
+            static void expect_not_present(Nwa const & nwa);
 
-            static void expect_present(NWA const & nwa);
+            static void expect_present(Nwa const & nwa);
         };
         
 
         class OddNumEvenGroupsNwa
         {
         public:
-            NWA nwa;
+            Nwa nwa;
 
             OddNumEvenGroupsNwa();
             
-            static void build_nwa(NWA * nwa);
+            static void build_nwa(Nwa * nwa);
 
             static const State q0, q1, q2, q3, dummy;
             static const Symbol call, ret, zero;
@@ -205,7 +205,7 @@ namespace opennwa
             //   \_/
             //    0
 
-            NWA nwa;
+            Nwa nwa;
             State const q0, q1;
             Symbol const zero, call, ret;
 
@@ -254,7 +254,7 @@ namespace opennwa
             // Just like AcceptsBalancedOnly except with q1 as the accepting
             // state instead of q0.
 
-            NWA nwa;
+            Nwa nwa;
             State const q0, q1;
             Symbol const zero, call, ret;
 
@@ -304,7 +304,7 @@ namespace opennwa
             // Just like AcceptsBalancedOnly except with both q0 and q1
             // accepting.
 
-            NWA nwa;
+            Nwa nwa;
             State const q0, q1;
             Symbol const zero, call, ret;
 
@@ -356,7 +356,7 @@ namespace opennwa
             // Just like AcceptsBalancedOnly except with extra q0->q0 self
             // loop on ") pop q0".
 
-            NWA nwa;
+            Nwa nwa;
             State const q0, q1;
             Symbol const zero, call, ret;
 
@@ -407,7 +407,7 @@ namespace opennwa
             // Just like AcceptsBalancedOnly except with q1 accepting too and
             // the extra q0->q0 self loop on ") pop q0"
 
-            NWA nwa;
+            Nwa nwa;
             State const q0, q1;
             Symbol const zero, call, ret;
 
@@ -470,7 +470,7 @@ namespace opennwa
             // transition between them and the limited accept states, and the
             // extra pop transition like AcceptsPossiblyUnbalancedLeft
 
-            NWA nwa;
+            Nwa nwa;
             State const q0, q1, q2, q3;
             Symbol const zero, call, ret;
 

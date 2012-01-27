@@ -15,8 +15,8 @@ using namespace opennwa;
 
 // WARNING: the order of these words must be consistent with the row & column
 //          order in the table 'expected_answers' below.
-static NWA const nwas[] = {
-    NWA(),
+static Nwa const nwas[] = {
+    Nwa(),
     AcceptsBalancedOnly().nwa,
     AcceptsStrictlyUnbalancedLeft().nwa,
     AcceptsPossiblyUnbalancedLeft().nwa,
@@ -48,14 +48,14 @@ namespace opennwa {
 
             TEST(opennwa$construct$$complement, complementOfACompletelyEmptyAutomatonContainsStuff)
             {
-                NWA empty;
+                Nwa empty;
                 WordCollection words;
                 
                 empty.addSymbol(words.zero);
                 empty.addSymbol(words.ret);
                 empty.addSymbol(words.call);
                                 
-                NWARefPtr comp = complement(empty);
+                NwaRefPtr comp = complement(empty);
 
                 EXPECT_TRUE(query::languageContains(*comp, words.empty));
                 EXPECT_TRUE(query::languageContains(*comp, words.balanced));
@@ -75,7 +75,7 @@ namespace opennwa {
                     ss << "Testing NWA " << nwa;
                     SCOPED_TRACE(ss.str());
 
-                    NWARefPtr c = complement(nwas[nwa]);
+                    NwaRefPtr c = complement(nwas[nwa]);
                     c = intersect(*c, AcceptsBalancedOnly().nwa);
                     
                     if (expected_answers[nwa]) {

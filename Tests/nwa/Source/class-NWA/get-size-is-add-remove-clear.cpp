@@ -17,7 +17,7 @@ namespace opennwa
         /// the state should be added.
 
         void
-        add_to_states_and_check(NWA * nwa, State state, bool expect_addition)
+        add_to_states_and_check(Nwa * nwa, State state, bool expect_addition)
         {
             size_t original_size_trans = nwa->sizeTrans();
             
@@ -32,7 +32,7 @@ namespace opennwa
         }
         
         void
-        add_to_initial_states_and_check(NWA * nwa, State state, bool expect_addition)
+        add_to_initial_states_and_check(Nwa * nwa, State state, bool expect_addition)
         {
             size_t original_size_trans = nwa->sizeTrans();
             
@@ -47,7 +47,7 @@ namespace opennwa
         }
 
         void
-        add_to_final_states_and_check(NWA * nwa, State state, bool expect_addition)
+        add_to_final_states_and_check(Nwa * nwa, State state, bool expect_addition)
         {
             size_t original_size_trans = nwa->sizeTrans();
             
@@ -62,7 +62,7 @@ namespace opennwa
         }
         
         void
-        add_to_symbols_and_check(NWA * nwa, Symbol symbol, bool expect_addition)
+        add_to_symbols_and_check(Nwa * nwa, Symbol symbol, bool expect_addition)
         {
             size_t original_size_trans = nwa->sizeTrans();
             
@@ -80,7 +80,7 @@ namespace opennwa
         /// Checks that, in 'nwa', the sizes returned by 'sizeBlah()' is the
         /// same as the number of elements between 'beginBlah()' and
         /// 'endBlah()'.
-        void expect_size_consistent_with_range(NWA const & nwa)
+        void expect_size_consistent_with_range(Nwa const & nwa)
         {
 #define CHECK_CONSISTENCY(Attribute)                                    \
             EXPECT_EQ(nwa.size##Attribute(),                            \
@@ -98,8 +98,8 @@ namespace opennwa
         }
 
 
-        void expect_nwas_nearly_the_same(NWA const & reference,
-                                         NWA const & nwa,
+        void expect_nwas_nearly_the_same(Nwa const & reference,
+                                         Nwa const & nwa,
                                          bool states,
                                          bool initials,
                                          bool finals,
@@ -108,13 +108,13 @@ namespace opennwa
                                          bool calls,
                                          bool returns)
         {
-            std::vector<NWA::Internal>
+            std::vector<Nwa::Internal>
                 reference_internals(reference.beginInternalTrans(), reference.endInternalTrans()),
                 nwa_internals(nwa.beginInternalTrans(), nwa.endInternalTrans());
-            std::vector<NWA::Call>
+            std::vector<Nwa::Call>
                 reference_calls(reference.beginCallTrans(), reference.endCallTrans()),
                 nwa_calls(nwa.beginCallTrans(), nwa.endCallTrans());
-            std::vector<NWA::Return>
+            std::vector<Nwa::Return>
                 reference_returns(reference.beginReturnTrans(), reference.endReturnTrans()),
                 nwa_returns(nwa.beginReturnTrans(), nwa.endReturnTrans());
 
@@ -143,9 +143,9 @@ namespace opennwa
         // 
         //     - For getSymbols(), check in an automaton that uses epsilon and wild on
         //       transitions. Make sure that neither is present in the given set.
-        TEST(opennwa$NWA$getSymbols, epsilonAndWildAreNotPresent)
+        TEST(opennwa$Nwa$getSymbols, epsilonAndWildAreNotPresent)
         {
-            NWA nwa;
+            Nwa nwa;
             Key q = getKey('q');
             nwa.addInternalTrans(q, EPSILON, q);
             nwa.addInternalTrans(q, WILD, q);
@@ -164,13 +164,13 @@ namespace opennwa
         //////////////////
         //   sizeXXX()
         //     - Make sure this agrees with the size of getXXX()       
-        TEST(opennwa$NWA$getXXX, checkSizeConsistentForEmptyNwa)
+        TEST(opennwa$Nwa$getXXX, checkSizeConsistentForEmptyNwa)
         {
-            NWA empty;
+            Nwa empty;
             expect_size_consistent_with_range(empty);
         }
 
-        TEST(opennwa$NWA$getXXX, checkSizeConsistentForBigNwa)
+        TEST(opennwa$Nwa$getXXX, checkSizeConsistentForBigNwa)
         {
             OddNumEvenGroupsNwa fixture;
             expect_size_consistent_with_range(fixture.nwa);
@@ -180,15 +180,15 @@ namespace opennwa
         //////////////////
         //   isXXX() and addXXX() for states and symbols
         //
-        //     - Check if an XXX is a member of the empty NWA       
-        TEST(opennwa$NWA$isXXX, checkNothingMemberOfEmpty)
+        //     - Check if an XXX is a member of the empty Nwa       
+        TEST(opennwa$Nwa$isXXX, checkNothingMemberOfEmpty)
         {
-            NWA empty;
+            Nwa empty;
             SomeElements::expect_not_present(empty);
         }
 
         //     - Add unrelated items of each type; check.
-        TEST(opennwa$NWA$isXXX, checkNothingMemberOfStuff)
+        TEST(opennwa$Nwa$isXXX, checkNothingMemberOfStuff)
         {
             OddNumEvenGroupsNwa fixture;
             SomeElements::expect_not_present(fixture.nwa);
@@ -198,30 +198,30 @@ namespace opennwa
         //     - Add item being checked to an empty NWA; check
         //     - Check that adding an XXX adds it to the set returned by
         //       getXXX and returns true       
-        TEST(opennwa$NWA$isState$$and$addState, addToEmptyAndCheck)
+        TEST(opennwa$Nwa$isState$$and$addState, addToEmptyAndCheck)
         {
-            NWA empty;
+            Nwa empty;
             SomeElements e;
             add_to_states_and_check(&empty, e.state, true);
         }
         
-        TEST(opennwa$NWA$isInitialState$$and$addInitialState, addToEmptyAndCheck)
+        TEST(opennwa$Nwa$isInitialState$$and$addInitialState, addToEmptyAndCheck)
         {
-            NWA empty;
+            Nwa empty;
             SomeElements e;
             add_to_initial_states_and_check(&empty, e.state, true);
         }
 
-        TEST(opennwa$NWA$isFinalState$$and$addFinalState, addToEmptyAndCheck)
+        TEST(opennwa$Nwa$isFinalState$$and$addFinalState, addToEmptyAndCheck)
         {
-            NWA empty;
+            Nwa empty;
             SomeElements e;
             add_to_final_states_and_check(&empty, e.state, true);
         }
 
-        TEST(opennwa$NWA$isSymbol$$and$addSymbol, addToEmptyAndCheck)
+        TEST(opennwa$Nwa$isSymbol$$and$addSymbol, addToEmptyAndCheck)
         {
-            NWA empty;
+            Nwa empty;
             SomeElements e;
             add_to_symbols_and_check(&empty, e.symbol, true);
         }
@@ -230,28 +230,28 @@ namespace opennwa
         //     - Add both unrelated and checked item, then more unrelated
         //       items; check. (I'm not doing the "then more
         //       unrelated". TODO?)
-        TEST(opennwa$NWA$isState$$and$addState, addToBusyAndCheck)
+        TEST(opennwa$Nwa$isState$$and$addState, addToBusyAndCheck)
         {
             OddNumEvenGroupsNwa fixture;
             SomeElements e;
             add_to_states_and_check(&fixture.nwa, e.state, true);
         }
         
-        TEST(opennwa$NWA$isInitialState$$and$addInitialState, addToBusyAndCheck)
+        TEST(opennwa$Nwa$isInitialState$$and$addInitialState, addToBusyAndCheck)
         {
             OddNumEvenGroupsNwa fixture;
             SomeElements e;
             add_to_initial_states_and_check(&fixture.nwa, e.state, true);
         }
 
-        TEST(opennwa$NWA$isFinalState$$and$addFinalState, addToBusyAndCheck)
+        TEST(opennwa$Nwa$isFinalState$$and$addFinalState, addToBusyAndCheck)
         {
             OddNumEvenGroupsNwa fixture;
             SomeElements e;
             add_to_final_states_and_check(&fixture.nwa, e.state, true);
         }
 
-        TEST(opennwa$NWA$isSymbol$$and$addSymbol, addToBusyAndCheck)
+        TEST(opennwa$Nwa$isSymbol$$and$addSymbol, addToBusyAndCheck)
         {
             OddNumEvenGroupsNwa fixture;
             SomeElements e;
@@ -263,7 +263,7 @@ namespace opennwa
         //       are used in transitions and not.       
         // This is done partially inline with the above
 
-        TEST(opennwa$NWA$isSymbol, epsilonAndWildAreNotSymbolsAccordingToIsSymbol)
+        TEST(opennwa$Nwa$isSymbol, epsilonAndWildAreNotSymbolsAccordingToIsSymbol)
         {
             OddNumEvenGroupsNwa fixture;
 
@@ -283,49 +283,49 @@ namespace opennwa
         //   addXXX()
         //     - Check that adding it again leaves the return from getXXX
         //       unchanged, and returns false
-        TEST(opennwa$NWA$addState, addTwiceToEmptyAndCheck)
+        TEST(opennwa$Nwa$addState, addTwiceToEmptyAndCheck)
         {
-            NWA nwa;
+            Nwa nwa;
             SomeElements e;
             add_to_states_and_check(&nwa, e.state, true);
 
-            NWA copy = nwa;
+            Nwa copy = nwa;
             add_to_states_and_check(&nwa, e.state, false);
             
             expect_nwas_are_equal(nwa, copy);
         }
         
-        TEST(opennwa$NWA$addInitialState, addTwiceToEmptyAndCheck)
+        TEST(opennwa$Nwa$addInitialState, addTwiceToEmptyAndCheck)
         {
-            NWA nwa;
+            Nwa nwa;
             SomeElements e;
             add_to_initial_states_and_check(&nwa, e.state, true);
 
-            NWA copy = nwa;
+            Nwa copy = nwa;
             add_to_initial_states_and_check(&nwa, e.state, false);
 
             expect_nwas_are_equal(nwa, copy);
         }
 
-        TEST(opennwa$NWA$addFinalState, addTwiceToNwaAndCheck)
+        TEST(opennwa$Nwa$addFinalState, addTwiceToNwaAndCheck)
         {
-            NWA nwa;
+            Nwa nwa;
             SomeElements e;
             add_to_final_states_and_check(&nwa, e.state, true);
 
-            NWA copy = nwa;
+            Nwa copy = nwa;
             add_to_final_states_and_check(&nwa, e.state, false);
 
             expect_nwas_are_equal(nwa, copy);
         }
 
-        TEST(opennwa$NWA$addSymbol, addTwiceToEmptyAndCheck)
+        TEST(opennwa$Nwa$addSymbol, addTwiceToEmptyAndCheck)
         {
-            NWA nwa;
+            Nwa nwa;
             SomeElements e;
             add_to_symbols_and_check(&nwa, e.symbol, true);
 
-            NWA copy = nwa;
+            Nwa copy = nwa;
             add_to_symbols_and_check(&nwa, e.symbol, false);
 
             expect_nwas_are_equal(nwa, copy);
@@ -345,9 +345,9 @@ namespace opennwa
         //
         // The above checks the situation where it was not present, and
         // checks that it was added.
-        TEST(opennwa$NWA$addInitialState, addInitialStateOfAStateAlreadyPresent)
+        TEST(opennwa$Nwa$addInitialState, addInitialStateOfAStateAlreadyPresent)
         {
-            NWA nwa;
+            Nwa nwa;
             SomeElements e;
             EXPECT_TRUE(nwa.addState(e.state));
 
@@ -369,9 +369,9 @@ namespace opennwa
 
         //     - For addSymbol(), make sure adding epsilon or wild returns false even if
         //       they are the first things done
-        TEST(opennwa$NWA$addSymbol, addingEpsilonOrWildShouldFail)
+        TEST(opennwa$Nwa$addSymbol, addingEpsilonOrWildShouldFail)
         {
-            NWA nwa;
+            Nwa nwa;
 
             EXPECT_FALSE(nwa.addSymbol(EPSILON));
             EXPECT_FALSE(nwa.addSymbol(WILD));
@@ -381,9 +381,9 @@ namespace opennwa
         //   removeXXX()
         //     - Try from empty automaton, one containing given item, one not
         //       containing given item. Check correct value is returned.
-        TEST(opennwa$NWA$removeXXX, removingFromEmptyShouldFail)
+        TEST(opennwa$Nwa$removeXXX, removingFromEmptyShouldFail)
         {
-            NWA nwa;
+            Nwa nwa;
             SomeElements e;
 
             EXPECT_FALSE(nwa.removeState(e.state));
@@ -395,9 +395,9 @@ namespace opennwa
             EXPECT_FALSE(nwa.removeReturnTrans(e.ret));
         }
 
-        TEST(opennwa$NWA$removeXXX, removingSingleItemsShouldLeaveEmpty)
+        TEST(opennwa$Nwa$removeXXX, removingSingleItemsShouldLeaveEmpty)
         {
-            NWA nwa;
+            Nwa nwa;
             SomeElements e;
             SomeElements::add_to_nwa(&nwa);
 
@@ -456,10 +456,10 @@ namespace opennwa
             expect_nwa_is_empty(nwa);
         }
 
-        TEST(opennwa$NWA$removeXXX, removingItemNotInNwaShouldLeaveItUnchanged)
+        TEST(opennwa$Nwa$removeXXX, removingItemNotInNwaShouldLeaveItUnchanged)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA nwa = fixture.nwa;
+            Nwa nwa = fixture.nwa;
             SomeElements e;
 
             EXPECT_FALSE(nwa.removeInternalTrans(e.internal));
@@ -475,13 +475,13 @@ namespace opennwa
             expect_nwas_are_equal(fixture.nwa, nwa);
         }
 
-        TEST(opennwa$NWA$removeXXX, removingItemWhenThereIsMoreThanOneOfThatKindLeavesTheOthers)
+        TEST(opennwa$Nwa$removeXXX, removingItemWhenThereIsMoreThanOneOfThatKindLeavesTheOthers)
         {
             // TODO: this test doesn't really test that the right transitions
             // were removed.
             
             OddNumEvenGroupsNwa fixture;
-            NWA nwa = fixture.nwa;
+            Nwa nwa = fixture.nwa;
 
             // We'll add a couple more for good fun
             ASSERT_TRUE(nwa.addInitialState(fixture.q2));
@@ -543,7 +543,7 @@ namespace opennwa
 
         //     - For removeState(), make sure that removing a state that is
         //       an initial and/or final state works correctly
-        TEST(opennwa$NWA$removeState, removingAStateRemovesFromInitialsAndFinals)
+        TEST(opennwa$Nwa$removeState, removingAStateRemovesFromInitialsAndFinals)
         {
             OddNumEvenGroupsNwa fixture;
 
@@ -573,7 +573,7 @@ namespace opennwa
         //       the state in all applicable coordinates: source/target of
         //       internal, call/entry of call, and exit/pred/return of
         //       return.
-        TEST(opennwa$NWA$removeState, removingAStateRemovesAssociatedTransitions)
+        TEST(opennwa$Nwa$removeState, removingAStateRemovesAssociatedTransitions)
         {
             OddNumEvenGroupsNwa fixture;
 
@@ -614,7 +614,7 @@ namespace opennwa
             // should not change anything except the set of states. We'll
             // test this by making a copy of the current NWA, then removing
             // 'dummy' and reinserting it.
-            NWA copy = fixture.nwa;
+            Nwa copy = fixture.nwa;
             
             EXPECT_TRUE(fixture.nwa.removeState(fixture.dummy));
 
@@ -631,7 +631,7 @@ namespace opennwa
         
         //     - For removeSymbol(), try from automaton in which the symbol is and is not
         //       involved in any transtions. Test all three kinds of transitions.
-        TEST(opennwa$NWA$removeSymbol, removingASymbolRemovesAssociatedTransitions)
+        TEST(opennwa$Nwa$removeSymbol, removingASymbolRemovesAssociatedTransitions)
         {
             OddNumEvenGroupsNwa fixture;
 
@@ -657,10 +657,10 @@ namespace opennwa
             EXPECT_EQ(3u, fixture.nwa.sizeReturnTrans());
         }
 
-        TEST(opennwa$NWA$removeSymbol, removingAnUnusedSymbolDoesntDoAnythingElse)
+        TEST(opennwa$Nwa$removeSymbol, removingAnUnusedSymbolDoesntDoAnythingElse)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA nwa = fixture.nwa;
+            Nwa nwa = fixture.nwa;
             Symbol one = getKey("one");
 
             ASSERT_TRUE(nwa.addSymbol(one));
@@ -674,10 +674,10 @@ namespace opennwa
         //     - Make sure that the set of XXX is empty after.
         //     - Make sure that sets that shouldn't be different are
         //       not different.
-        TEST(opennwa$NWA$clearInitialStates, checkClearingAndPersisting)
+        TEST(opennwa$Nwa$clearInitialStates, checkClearingAndPersisting)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA nwa = fixture.nwa;
+            Nwa nwa = fixture.nwa;
 
             nwa.clearInitialStates();
 
@@ -691,10 +691,10 @@ namespace opennwa
                                         true, true, true); // transitions
         }
 
-        TEST(opennwa$NWA$clearFinalStates, checkClearingAndPersisting)
+        TEST(opennwa$Nwa$clearFinalStates, checkClearingAndPersisting)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA nwa = fixture.nwa;
+            Nwa nwa = fixture.nwa;
 
             nwa.clearFinalStates();
 
@@ -710,10 +710,10 @@ namespace opennwa
 
         //     - For clearStates(), make sure initial/accepting states and
         //       transitions have all been cleared too.
-        TEST(opennwa$NWA$clearStates, checkClearingAndPersisting)
+        TEST(opennwa$Nwa$clearStates, checkClearingAndPersisting)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA nwa = fixture.nwa;
+            Nwa nwa = fixture.nwa;
 
             nwa.clearStates();
 
@@ -733,10 +733,10 @@ namespace opennwa
                                         false, false, false); // transitions
         }
 
-        TEST(opennwa$NWA$clearSymbols, checkClearingAndPersisting)
+        TEST(opennwa$Nwa$clearSymbols, checkClearingAndPersisting)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA nwa = fixture.nwa;
+            Nwa nwa = fixture.nwa;
 
             nwa.clearSymbols();
 
@@ -755,10 +755,10 @@ namespace opennwa
         }
 
         //     - For clearSymbols(), make sure transitions are all clear too.
-        TEST(opennwa$NWA$clearTrans, checkClearingAndPersisting)
+        TEST(opennwa$Nwa$clearTrans, checkClearingAndPersisting)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA nwa = fixture.nwa;
+            Nwa nwa = fixture.nwa;
 
             nwa.clearTrans();
 
@@ -778,10 +778,10 @@ namespace opennwa
 #if 0   // We don't have these functions right now, but here are some tests
         // in case we one day do.
         
-        TEST(opennwa$NWA$clearInternalTrans, checkClearingAndPersisting)
+        TEST(opennwa$Nwa$clearInternalTrans, checkClearingAndPersisting)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA nwa = fixture.nwa;
+            Nwa nwa = fixture.nwa;
 
             nwa.clearInternalTrans();
 
@@ -795,10 +795,10 @@ namespace opennwa
                                         false, true, true); // transitions
         }
 
-        TEST(opennwa$NWA$clearCallTrans, checkClearingAndPersisting)
+        TEST(opennwa$Nwa$clearCallTrans, checkClearingAndPersisting)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA nwa = fixture.nwa;
+            Nwa nwa = fixture.nwa;
 
             nwa.clearCallTrans();
 
@@ -812,10 +812,10 @@ namespace opennwa
                                         true, false, true); // transitions
         }
         
-        TEST(opennwa$NWA$clearReturnTrans, checkClearingAndPersisting)
+        TEST(opennwa$Nwa$clearReturnTrans, checkClearingAndPersisting)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA nwa = fixture.nwa;
+            Nwa nwa = fixture.nwa;
 
             nwa.clearReturnTrans();
 
@@ -837,7 +837,7 @@ namespace opennwa
         //       and are not present. If they were not, check that they are after the
         //       addition.
 
-        TEST(opennwa$NWA$addInternalTrans, addingNewTransitionMakesItPresent)
+        TEST(opennwa$Nwa$addInternalTrans, addingNewTransitionMakesItPresent)
         {
             OddNumEvenGroupsNwa fixture;
             size_t const starting_num = fixture.nwa.sizeInternalTrans();
@@ -847,20 +847,20 @@ namespace opennwa
             EXPECT_EQ(starting_num + 1, fixture.nwa.sizeInternalTrans());
         }
 
-        TEST(opennwa$NWA$addInternalTrans, addExistingTransitionDoesntChange)
+        TEST(opennwa$Nwa$addInternalTrans, addExistingTransitionDoesntChange)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA copy = fixture.nwa;
+            Nwa copy = fixture.nwa;
 
             EXPECT_FALSE(fixture.nwa.addInternalTrans(fixture.q2, fixture.zero, fixture.q3));
 
             expect_nwas_are_equal(copy, fixture.nwa);
         }
 
-        TEST(opennwa$NWA$addInternalTrans, addNewTransitionOnNonexistingElements)
+        TEST(opennwa$Nwa$addInternalTrans, addNewTransitionOnNonexistingElements)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA copy = fixture.nwa;
+            Nwa copy = fixture.nwa;
             SomeElements e;
             
             size_t const starting_num_internals = fixture.nwa.sizeInternalTrans();
@@ -887,7 +887,7 @@ namespace opennwa
         }
 
 
-        TEST(opennwa$NWA$addCallTrans, addingNewTransitionMakesItPresent)
+        TEST(opennwa$Nwa$addCallTrans, addingNewTransitionMakesItPresent)
         {
             OddNumEvenGroupsNwa fixture;
             size_t const starting_num = fixture.nwa.sizeCallTrans();
@@ -897,20 +897,20 @@ namespace opennwa
             EXPECT_EQ(starting_num + 1, fixture.nwa.sizeCallTrans());
         }
 
-        TEST(opennwa$NWA$addCallTrans, addExistingTransitionDoesntChange)
+        TEST(opennwa$Nwa$addCallTrans, addExistingTransitionDoesntChange)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA copy = fixture.nwa;
+            Nwa copy = fixture.nwa;
 
             EXPECT_FALSE(fixture.nwa.addCallTrans(fixture.q0, fixture.call, fixture.q2));
 
             expect_nwas_are_equal(copy, fixture.nwa);
         }
 
-        TEST(opennwa$NWA$addCallTrans, addNewTransitionOnNonexistingElements)
+        TEST(opennwa$Nwa$addCallTrans, addNewTransitionOnNonexistingElements)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA copy = fixture.nwa;
+            Nwa copy = fixture.nwa;
             SomeElements e;
             
             size_t const starting_num_internals = fixture.nwa.sizeCallTrans();
@@ -938,7 +938,7 @@ namespace opennwa
 
 
 
-        TEST(opennwa$NWA$addReturnTrans, addingNewTransitionMakesItPresent)
+        TEST(opennwa$Nwa$addReturnTrans, addingNewTransitionMakesItPresent)
         {
             OddNumEvenGroupsNwa fixture;
             size_t const starting_num = fixture.nwa.sizeReturnTrans();
@@ -948,20 +948,20 @@ namespace opennwa
             EXPECT_EQ(starting_num + 1, fixture.nwa.sizeReturnTrans());
         }
 
-        TEST(opennwa$NWA$addReturnTrans, addExistingTransitionDoesntChange)
+        TEST(opennwa$Nwa$addReturnTrans, addExistingTransitionDoesntChange)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA copy = fixture.nwa;
+            Nwa copy = fixture.nwa;
 
             EXPECT_FALSE(fixture.nwa.addReturnTrans(fixture.q3, fixture.q0, fixture.ret, fixture.q1));
 
             expect_nwas_are_equal(copy, fixture.nwa);
         }
 
-        TEST(opennwa$NWA$addReturnTrans, addNewTransitionOnNonexistingElements)
+        TEST(opennwa$Nwa$addReturnTrans, addNewTransitionOnNonexistingElements)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA copy = fixture.nwa;
+            Nwa copy = fixture.nwa;
             SomeElements e;
             
             size_t const starting_num_internals = fixture.nwa.sizeReturnTrans();
@@ -995,9 +995,9 @@ namespace opennwa
 
 
         /// Make sure wali::WALI_BAD_KEY causes an assertion
-        TEST(opennwa$NWA$$isState$and$addState$and$removeState$DeathTest, assertsOnWaliBadKey)
+        TEST(opennwa$Nwa$$isState$and$addState$and$removeState$DeathTest, assertsOnWaliBadKey)
         {
-            NWA nwa;
+            Nwa nwa;
             EXPECT_DEATH({
                     nwa.addState(wali::WALI_BAD_KEY);
                 },
@@ -1012,9 +1012,9 @@ namespace opennwa
                 "< wali::WALI_BAD_KEY");
         }
 
-        TEST(opennwa$NWA$$isInitialState$and$addInitialState$and$removeInitialState$DeathTest, assertsOnWaliBadKey)
+        TEST(opennwa$Nwa$$isInitialState$and$addInitialState$and$removeInitialState$DeathTest, assertsOnWaliBadKey)
         {
-            NWA nwa;
+            Nwa nwa;
             EXPECT_DEATH({
                     nwa.addInitialState(wali::WALI_BAD_KEY);
                 },
@@ -1029,9 +1029,9 @@ namespace opennwa
                 "< wali::WALI_BAD_KEY");
         }
 
-        TEST(opennwa$NWA$$isFinalState$and$addFinalState$and$removeFinalState$DeathTest, assertsOnWaliBadKey)
+        TEST(opennwa$Nwa$$isFinalState$and$addFinalState$and$removeFinalState$DeathTest, assertsOnWaliBadKey)
         {
-            NWA nwa;
+            Nwa nwa;
             EXPECT_DEATH({
                     nwa.addFinalState(wali::WALI_BAD_KEY);
                 },
@@ -1046,9 +1046,9 @@ namespace opennwa
                 "< wali::WALI_BAD_KEY");
         }
 
-        TEST(opennwa$NWA$$isSymbol$and$addSymbol$and$removeSymbol$DeathTest, assertsOnWaliBadKey)
+        TEST(opennwa$Nwa$$isSymbol$and$addSymbol$and$removeSymbol$DeathTest, assertsOnWaliBadKey)
         {
-            NWA nwa;
+            Nwa nwa;
             EXPECT_DEATH({
                     nwa.addSymbol(wali::WALI_BAD_KEY);
                 },
@@ -1064,9 +1064,9 @@ namespace opennwa
         }
 
 
-        TEST(opennwa$NWA$$addInternalTrans$and$removeInternalTrans$DeathTest, assertsOnWaliBadKey)
+        TEST(opennwa$Nwa$$addInternalTrans$and$removeInternalTrans$DeathTest, assertsOnWaliBadKey)
         {
-            NWA nwa;
+            Nwa nwa;
 
             // sanity
             nwa.addInternalTrans(0, WILD, 0);
@@ -1098,9 +1098,9 @@ namespace opennwa
                 "< wali::WALI_BAD_KEY");
         }
         
-        TEST(opennwa$NWA$$addCallTrans$and$removeCallTrans$DeathTest, assertsOnWaliBadKey)
+        TEST(opennwa$Nwa$$addCallTrans$and$removeCallTrans$DeathTest, assertsOnWaliBadKey)
         {
-            NWA nwa;
+            Nwa nwa;
 
             // sanity
             nwa.addCallTrans(0, WILD, 0);
@@ -1132,9 +1132,9 @@ namespace opennwa
                 "< wali::WALI_BAD_KEY");
         }
 
-        TEST(opennwa$NWA$$addReturnTrans$and$removeReturnTrans$DeathTest, assertsOnWaliBadKey)
+        TEST(opennwa$Nwa$$addReturnTrans$and$removeReturnTrans$DeathTest, assertsOnWaliBadKey)
         {
-            NWA nwa;
+            Nwa nwa;
 
             // sanity
             nwa.addReturnTrans(0, 0, WILD, 0);

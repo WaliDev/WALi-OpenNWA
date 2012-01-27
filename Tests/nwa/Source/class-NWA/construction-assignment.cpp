@@ -12,45 +12,45 @@ namespace opennwa
         // Now begin the actual tests
         
 
-        // NWA()
+        // Nwa()
         //  - Test that a new NWA is empty
-        TEST(opennwa$NWA$NWA$$default, newNwaIsEmpty)
+        TEST(opennwa$Nwa$Nwa$$default, newNwaIsEmpty)
         {
-            NWA empty;
+            Nwa empty;
             expect_nwa_is_empty(empty);
         }
 
-        // NWA(NWA const & other)
+        // Nwa(Nwa const & other)
         //  - Test that a copy of an empty NWA is empty
-        TEST(opennwa$NWA$NWA$$copy, copyOfEmptyNwaIsEmpty)
+        TEST(opennwa$Nwa$Nwa$$copy, copyOfEmptyNwaIsEmpty)
         {
-            NWA empty;
-            NWA also_empty = empty;
+            Nwa empty;
+            Nwa also_empty = empty;
 
             expect_nwa_is_empty(also_empty);
         }
         
         //  - Test that a copy of a non-empty NWA has all the same states
-        TEST(opennwa$NWA$NWA$$copy, copyOfNonemptyNwaIsSame)
+        TEST(opennwa$Nwa$Nwa$$copy, copyOfNonemptyNwaIsSame)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA copy = fixture.nwa;
+            Nwa copy = fixture.nwa;
 
             expect_nwas_are_equal(fixture.nwa, copy);
         }
         
         //  - Test that the NWAs do not share structure (changing one doesn't
         //    change the other)
-        TEST(opennwa$NWA$NWA$$copy, copyOfNonemptyNwaDoesNotShareState)
+        TEST(opennwa$Nwa$Nwa$$copy, copyOfNonemptyNwaDoesNotShareState)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA copy = fixture.nwa;
+            Nwa copy = fixture.nwa;
 
             expect_nwas_are_physically_different(fixture.nwa, copy);
         }
 
         //  - Test that client information is equal but not shared
-        TEST(opennwa$NWA$NWA$$copy, clientInformationIsCloned)
+        TEST(opennwa$Nwa$Nwa$$copy, clientInformationIsCloned)
         {
             OddNumEvenGroupsNwa fixture;
 
@@ -64,7 +64,7 @@ namespace opennwa
             fixture.nwa.setClientInfo(fixture.q2, q2_ci);
             fixture.nwa.setClientInfo(fixture.q3, q3_ci);
 
-            NWA copy(fixture.nwa);
+            Nwa copy(fixture.nwa);
             
 #define EXPECT_CLIENT_INFO_IS(expect, nwa, state)                       \
             do {                                                        \
@@ -98,7 +98,7 @@ namespace opennwa
 
 
         // Test that aliased ClientInfos "separate" when copied
-        TEST(opennwa$NWA$NWA$$copy, aliasedClientInfosSeparate)
+        TEST(opennwa$Nwa$Nwa$$copy, aliasedClientInfosSeparate)
         {
             OddNumEvenGroupsNwa fixture;
             ref_ptr<ClientInfo> ci = new IntClientInfo(0);
@@ -111,7 +111,7 @@ namespace opennwa
             // Now copy it and demonstrate that the copies of q0 and q1 have
             // different client info (after sanity checks that they differ
             // from the original)
-            NWA copy = fixture.nwa;
+            Nwa copy = fixture.nwa;
 
             ASSERT_NE(ci, copy.getClientInfo(fixture.q0));
             ASSERT_NE(ci, copy.getClientInfo(fixture.q1));
@@ -119,7 +119,7 @@ namespace opennwa
             EXPECT_NE(copy.getClientInfo(fixture.q0), copy.getClientInfo(fixture.q1));
         }
 
-        TEST(opennwa$NWA$NWA$$operatorEquals, aliasedClientInfosSeparate)
+        TEST(opennwa$Nwa$Nwa$$operatorEquals, aliasedClientInfosSeparate)
         {
             OddNumEvenGroupsNwa fixture;
             ref_ptr<ClientInfo> ci = new IntClientInfo(0);
@@ -132,7 +132,7 @@ namespace opennwa
             // Now copy it and demonstrate that the copies of q0 and q1 have
             // different client info (after sanity checks that they differ
             // from the original)
-            NWA copy;
+            Nwa copy;
             copy = fixture.nwa;
 
             ASSERT_NE(ci, copy.getClientInfo(fixture.q0));
@@ -142,42 +142,42 @@ namespace opennwa
         }
 
         
-        // operator= (NWA const & other)
-        //  - Same questions as NWA(NWA const &)
-        TEST(opennwa$NWA$$operatorEquals, copyOfEmptyNwaIsEmpty)
+        // operator= (Nwa const & other)
+        //  - Same questions as Nwa(Nwa const &)
+        TEST(opennwa$Nwa$$operatorEquals, copyOfEmptyNwaIsEmpty)
         {
-            NWA empty, also_empty;
+            Nwa empty, also_empty;
             also_empty = empty;
 
             expect_nwa_is_empty(also_empty);
         }
 
-        TEST(opennwa$NWA$$operatorEquals, copyOfNonemptyNwaIsSame)
+        TEST(opennwa$Nwa$$operatorEquals, copyOfNonemptyNwaIsSame)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA copy;
+            Nwa copy;
             copy = fixture.nwa;
 
             expect_nwas_are_equal(fixture.nwa, copy);
         }
         
-        TEST(opennwa$NWA$$operatorEquals, copyOfNonemptyNwaDoesNotShareState)
+        TEST(opennwa$Nwa$$operatorEquals, copyOfNonemptyNwaDoesNotShareState)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA copy;
+            Nwa copy;
             copy = fixture.nwa;
 
             expect_nwas_are_physically_different(fixture.nwa, copy);
         }
 
-        TEST(opennwa$NWA$$operatorEquals, doesOperatorEqualsCompareClientInfo)
+        TEST(opennwa$Nwa$$operatorEquals, doesOperatorEqualsCompareClientInfo)
         {
             ClientInfoRefPtr ci = new IntClientInfo(1);
             
             OddNumEvenGroupsNwa fixture;
             fixture.nwa.setClientInfo(fixture.q0, ci);
             
-            NWA copy = fixture.nwa;
+            Nwa copy = fixture.nwa;
 
             ASSERT_NE(ci, copy.getClientInfo(fixture.q0));
 
@@ -185,31 +185,31 @@ namespace opennwa
         }
 
         //  - Test self assignment
-        TEST(opennwa$NWA$$operatorEquals, selfAssignmentDoesNotDestroyNwa)
+        TEST(opennwa$Nwa$$operatorEquals, selfAssignmentDoesNotDestroyNwa)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA copy = fixture.nwa;
+            Nwa copy = fixture.nwa;
 
             copy = copy;
 
             expect_nwas_are_equal(fixture.nwa, copy);
         }
 
-        TEST(opennwa$NWA$$operatorEquals, selfAssignmentDoesNotCopy)
+        TEST(opennwa$Nwa$$operatorEquals, selfAssignmentDoesNotCopy)
         {
             OddNumEvenGroupsNwa fixture;
-            NWA copy = fixture.nwa;
+            Nwa copy = fixture.nwa;
 
-            NWA::StateIterator
+            Nwa::StateIterator
                 states = copy.beginStates(),
                 initials = copy.beginInitialStates(),
                 finals = copy.beginFinalStates();
 
-            NWA::SymbolIterator symbols = copy.beginSymbols();
+            Nwa::SymbolIterator symbols = copy.beginSymbols();
 
-            NWA::InternalIterator internals = copy.beginInternalTrans();
-            NWA::CallIterator calls = copy.beginCallTrans();
-            NWA::ReturnIterator returns = copy.beginReturnTrans();
+            Nwa::InternalIterator internals = copy.beginInternalTrans();
+            Nwa::CallIterator calls = copy.beginCallTrans();
+            Nwa::ReturnIterator returns = copy.beginReturnTrans();
 
             copy = copy;
 
@@ -222,7 +222,7 @@ namespace opennwa
             EXPECT_EQ(returns, copy.beginReturnTrans());
         }
 
-        TEST(opennwa$NWA$$operatorEquals, selfAssignmentDoesNotDestroyClientInfo)
+        TEST(opennwa$Nwa$$operatorEquals, selfAssignmentDoesNotDestroyClientInfo)
         {
             OddNumEvenGroupsNwa fixture;
 
@@ -231,7 +231,7 @@ namespace opennwa
             fixture.nwa.setClientInfo(fixture.q2, new IntClientInfo(2));
             fixture.nwa.setClientInfo(fixture.q3, new IntClientInfo(3));
             
-            NWA copy = fixture.nwa;
+            Nwa copy = fixture.nwa;
 
             copy = copy;
             
@@ -253,7 +253,7 @@ namespace opennwa
         }
 
         //  - Test that client information is copied but not shared
-        TEST(opennwa$NWA$NWA$$operatorEquals, clientInformationIsCloned)
+        TEST(opennwa$Nwa$Nwa$$operatorEquals, clientInformationIsCloned)
         {
             OddNumEvenGroupsNwa fixture;
 
@@ -267,7 +267,7 @@ namespace opennwa
             fixture.nwa.setClientInfo(fixture.q2, q2_ci);
             fixture.nwa.setClientInfo(fixture.q3, q3_ci);
 
-            NWA copy;
+            Nwa copy;
             copy = fixture.nwa;
             
 #define EXPECT_CLIENT_INFO_IS(expect, nwa, state)                       \
@@ -306,15 +306,15 @@ namespace opennwa
         //  - From an NWA that has states, initial states, accepting states, symbols,
         //    and transitions of all three kinds (each of which transitions with a
         //    real symbol, epsilon, and wild), calling clear() removes everything.
-        TEST(opennwa$NWA$$clear, clearingEmptyGivesEmpty)
+        TEST(opennwa$Nwa$$clear, clearingEmptyGivesEmpty)
         {
-            NWA empty;
+            Nwa empty;
             empty.clear();
 
             expect_nwa_is_empty(empty);
         }
 
-        TEST(opennwa$NWA$$clear, clearingNonEmptyGivesEmpty)
+        TEST(opennwa$Nwa$$clear, clearingNonEmptyGivesEmpty)
         {
             OddNumEvenGroupsNwa fixture;
             fixture.nwa.clear();
@@ -326,7 +326,7 @@ namespace opennwa
         ////////////////////////////////
         // getClientInfo(), setClientInfo()
         //  - some prerequsites for the tests above to be meaningful        
-        TEST(opennwa$NWA$$getClientInfo$and$setClientInfo, clientInfoStartsOffNull)
+        TEST(opennwa$Nwa$$getClientInfo$and$setClientInfo, clientInfoStartsOffNull)
         {
             OddNumEvenGroupsNwa fixture;
 
@@ -335,7 +335,7 @@ namespace opennwa
         }
         
         
-        TEST(opennwa$NWA$$getClientInfo$and$setClientInfo, getAfterSetWorks)
+        TEST(opennwa$Nwa$$getClientInfo$and$setClientInfo, getAfterSetWorks)
         {
             OddNumEvenGroupsNwa fixture;
 
@@ -352,7 +352,7 @@ namespace opennwa
             EXPECT_EQ(q1_ci, fixture.nwa.getClientInfo(fixture.q1));
         }
 
-        TEST(opennwa$NWA$$getClientInfo$and$setClientInfo, canSetClientInfoToNull)
+        TEST(opennwa$Nwa$$getClientInfo$and$setClientInfo, canSetClientInfoToNull)
         {
             OddNumEvenGroupsNwa fixture;
 
@@ -368,9 +368,9 @@ namespace opennwa
 
 
         ///////////////////////////
-        TEST(opennwa$NWA$$getClientInfo$and$setClientInfo$DeathTest, waliBadKeyAsserts)
+        TEST(opennwa$Nwa$$getClientInfo$and$setClientInfo$DeathTest, waliBadKeyAsserts)
         {
-            NWA nwa;
+            Nwa nwa;
             EXPECT_DEATH({
                     nwa.getClientInfo(wali::WALI_BAD_KEY);
                 },

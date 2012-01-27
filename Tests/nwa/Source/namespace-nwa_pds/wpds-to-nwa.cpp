@@ -16,7 +16,7 @@ namespace opennwa {
             TEST(opennwa$nwa_pds$$WpdsToNwa, compilationTest)
             {
                 WPDS wpds;
-                NWARefPtr nwa = WpdsToNwa(wpds);
+                NwaRefPtr nwa = WpdsToNwa(wpds);
             }
 
 

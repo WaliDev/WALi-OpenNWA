@@ -17,7 +17,7 @@ namespace opennwa {
             TEST(opennwa$construct$$determinize, allowPendingCallsOnAccepting)
             {
                 SomeElements e;
-                NWA nwa;
+                Nwa nwa;
 
                 //              *          symbol   ______
                 //  --> state -----> state2 ----> ((state3))
@@ -29,7 +29,7 @@ namespace opennwa {
                 nwa.addInternalTrans(e.state, EPSILON, e.state2);
                 nwa.addCallTrans(e.state2, e.symbol, e.state3);
 
-                NWARefPtr det = determinize(nwa);
+                NwaRefPtr det = determinize(nwa);
 
                 EXPECT_FALSE(query::languageIsEmpty(*det));
             }
@@ -38,7 +38,7 @@ namespace opennwa {
             TEST(opennwa$construct$$determinize, initialStateHasEpsilonClosureDone)
             {
                 SomeElements e;
-                NWA nwa;
+                Nwa nwa;
 
                 //              *
                 //  --> state -----> ((state2))
@@ -48,7 +48,7 @@ namespace opennwa {
 
                 nwa.addInternalTrans(e.state, EPSILON, e.state2);
 
-                NWARefPtr det = determinize(nwa);
+                NwaRefPtr det = determinize(nwa);
 
                 EXPECT_FALSE(query::languageIsEmpty(*det));
             }
@@ -57,7 +57,7 @@ namespace opennwa {
             TEST(opennwa$construct$$determinize, useADifferentInitialStateToStartAndAsAPendingReturn)
             {
                 SomeElements e;
-                NWA nwa;
+                Nwa nwa;
 
                 // --> state
                 // --> state2 -----------------------> ((state3))
@@ -69,7 +69,7 @@ namespace opennwa {
 
                 nwa.addReturnTrans(e.state2, e.state, e.symbol, e.state3);
 
-                NWARefPtr det = determinize(nwa);
+                NwaRefPtr det = determinize(nwa);
 
                 // Now test to see if it's got 'symbol(' in it, and that it
                 // doesn't contain epsilon

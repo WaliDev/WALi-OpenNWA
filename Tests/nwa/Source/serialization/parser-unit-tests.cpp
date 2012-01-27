@@ -356,24 +356,24 @@ namespace opennwa {
 
         extern        
         void
-        read_sigma_block(std::istream & is, NWARefPtr nwa)
+        read_sigma_block(std::istream & is, NwaRefPtr nwa)
           ;
 
         extern        
         void
-        read_state_block(std::istream & is, NWARefPtr nwa)
+        read_state_block(std::istream & is, NwaRefPtr nwa)
           ;
 
         extern
         void
-        read_delta_block(std::istream & is, NWARefPtr nwa)
+        read_delta_block(std::istream & is, NwaRefPtr nwa)
           ;
         
 
 
         TEST(opennwa$parser$$readBlocks, unitTests)
         {
-          NWARefPtr nwa = new opennwa::NWA();
+          NwaRefPtr nwa = new opennwa::Nwa();
     
           // These tests call read_*_block (implicitly making sure there are no
           // exceptions or EXPECT_TRUEions), then make sure they read everything they

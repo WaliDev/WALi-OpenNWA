@@ -14,8 +14,8 @@ using namespace opennwa;
 
 // WARNING: the order of these words must be consistent with the row order
 //          in the table 'expected_answers' below.
-static NWA const nwas[] = {
-    NWA(),
+static Nwa const nwas[] = {
+    Nwa(),
     AcceptsBalancedOnly().nwa,
     AcceptsStrictlyUnbalancedLeft().nwa,
     AcceptsPossiblyUnbalancedLeft().nwa,
@@ -83,7 +83,7 @@ namespace opennwa {
 
             TEST(opennwa$query$$languageContains, epsilonClosureAtStart)
             {
-                NWA nwa;
+                Nwa nwa;
                 SomeElements e;
 
                 //              *           symbol

@@ -14,8 +14,8 @@ using namespace opennwa;
 
 // For every case, L(nwa[i])* = L(nwa[i]), except that the strictly
 // unbalanced ones don't accept epsilon.
-static NWA const nwas[] = {
-    NWA(),
+static Nwa const nwas[] = {
+    Nwa(),
     AcceptsBalancedOnly().nwa,
     AcceptsStrictlyUnbalancedLeft().nwa,
     AcceptsPossiblyUnbalancedLeft().nwa,
@@ -37,8 +37,8 @@ namespace opennwa {
                     ss << "Testing NWA " << nwa;
                     SCOPED_TRACE(ss.str());
 
-                    NWA src = nwas[nwa];
-                    NWARefPtr closure = star(nwas[nwa]);
+                    Nwa src = nwas[nwa];
+                    NwaRefPtr closure = star(nwas[nwa]);
 
                     // Now we split. If the original language does not
                     // include epsilon, then I don't want to do anything so
@@ -63,7 +63,7 @@ namespace opennwa {
 
             TEST(opennwa$query$$star, universalNwa)
             {
-                NWA nwa;
+                Nwa nwa;
                 SomeElements e;
 
                 nwa.addInitialState(e.state);
@@ -72,7 +72,7 @@ namespace opennwa {
                 nwa.addCallTrans(e.state, e.symbol, e.state);
                 nwa.addReturnTrans(e.state, e.state, e.symbol, e.state);
 
-                NWARefPtr closure = star(nwa);
+                NwaRefPtr closure = star(nwa);
 
                 EXPECT_TRUE(query::languageEquals(nwa, *closure));
             }

@@ -13,8 +13,8 @@ using namespace std;
 
 // WARNING: the order of these words must be consistent with the row & column
 //          order in the table 'expected_answers' below.
-static NWA const nwas[] = {
-    NWA(),
+static Nwa const nwas[] = {
+    Nwa(),
     AcceptsBalancedOnly().nwa,
     AcceptsStrictlyUnbalancedLeft().nwa,
     AcceptsPossiblyUnbalancedLeft().nwa,
@@ -90,7 +90,7 @@ namespace opennwa {
             
             TEST(opennwa$query$$languageIsEmpty$and$getSomeAcceptedWord, testEpsilonNwa)
             {
-                NWA nwa;
+                Nwa nwa;
                 SomeElements e;
                 nwa.addInitialState(e.state);
                 nwa.addFinalState(e.state);
@@ -110,7 +110,7 @@ namespace opennwa {
             {
                 //               a              a              a
                 //  --> (state) ----> (state2) ----> (state3) ---> ((state4))
-                NWA nwa;
+                Nwa nwa;
                 SomeElements e;
                 State state4 = getKey("state4");
                     
@@ -138,7 +138,7 @@ namespace opennwa {
             {
                 //               a              (a             a
                 //  --> (state) ----> (state2) ----> (state3) ---> ((state4))
-                NWA nwa;
+                Nwa nwa;
                 SomeElements e;
                 State state4 = getKey("state4");
                     
@@ -167,7 +167,7 @@ namespace opennwa {
             {
                 //               a              a)             a
                 //  --> (state) ----> (state2) ----> (state3) ---> ((state4))
-                NWA nwa;
+                Nwa nwa;
                 SomeElements e;
                 State state4 = getKey("state4");
                     
@@ -204,7 +204,7 @@ namespace opennwa {
                 // transitions. This will return 'b' for what needs to be a
                 // call, but 'a b( a)' is not in the language.
                 
-                NWA nwa;
+                Nwa nwa;
                 SomeElements e;
                 State state4 = getKey("state4");
                 Symbol distractor = getKey("distractor");
@@ -245,7 +245,7 @@ namespace opennwa {
                 //     (state4) --> (state5) <---+    switching whether top or bottom
                 //                                    path is shorter by changing accepting state)
 
-                NWA nwa;
+                Nwa nwa;
                 SomeElements e;
                 State state4 = getKey("state4");
                 State state5 = getKey("state5");
@@ -287,7 +287,7 @@ namespace opennwa {
                 //
                 // Note that the lower path is longer but the word is shorter
 
-                NWA nwa;
+                Nwa nwa;
                 SomeElements e;
                 State state4 = getKey("state4");
                 State state5 = getKey("state5");

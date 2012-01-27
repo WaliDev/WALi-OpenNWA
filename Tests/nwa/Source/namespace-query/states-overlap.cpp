@@ -13,7 +13,7 @@ namespace opennwa {
             TEST(opennwa$query$$statesOverlap, emptyDoesNotOverlap)
             {
                 OddNumEvenGroupsNwa fixture;
-                NWA empty;
+                Nwa empty;
 
                 EXPECT_FALSE(statesOverlap(empty, empty));
                 EXPECT_FALSE(statesOverlap(empty, fixture.nwa));
@@ -31,7 +31,7 @@ namespace opennwa {
             TEST(opennwa$query$$statesOverlap, subsetsOverlap)
             {
                 OddNumEvenGroupsNwa fixture;
-                NWA nwa;
+                Nwa nwa;
                 
                 // 1 element overlap
                 ASSERT_TRUE(nwa.addState(fixture.q0));
@@ -52,7 +52,7 @@ namespace opennwa {
             {
                 OddNumEvenGroupsNwa fixture;
                 SomeElements e;
-                NWA nwa;
+                Nwa nwa;
 
                 e.add_to_nwa(&nwa);
 
@@ -63,8 +63,8 @@ namespace opennwa {
             TEST(opennwa$query$$statesOverlap, incomparableDoNotOverlap)
             {
                 OddNumEvenGroupsNwa fixture;
-                NWA nwa1 = fixture.nwa;
-                NWA nwa2 = fixture.nwa;
+                Nwa nwa1 = fixture.nwa;
+                Nwa nwa2 = fixture.nwa;
 
                 ASSERT_TRUE(nwa1.removeState(fixture.dummy));
                 ASSERT_TRUE(nwa2.removeState(fixture.q0));

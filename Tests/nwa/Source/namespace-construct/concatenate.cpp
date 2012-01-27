@@ -14,7 +14,7 @@ using namespace opennwa;
 
 #define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
 
-static const NWA empty,
+static const Nwa empty,
     balanced = AcceptsBalancedOnly().nwa,
     strict_left = AcceptsStrictlyUnbalancedLeft().nwa,
     maybe_left = AcceptsPossiblyUnbalancedLeft().nwa,
@@ -25,7 +25,7 @@ static const NWA empty,
 
 // WARNING: the order of these words must be consistent with the row & column
 //          order in the table 'expected_answers' below.
-static NWA const nwas[] = {
+static Nwa const nwas[] = {
     empty,
     balanced,
     strict_left,
@@ -42,7 +42,7 @@ static const unsigned num_nwas = NUM_ELEMENTS(nwas);
 //          consistent with the order of 'nwas' above.
 //
 // "What is the union of the row and column?"
-static const NWA * const expected_answers[][num_nwas] = {
+static const Nwa * const expected_answers[][num_nwas] = {
     /*                    empty   balanced       strict left   maybe left    strict right   maybe right    maybe full */
     /* empty        */  { &empty, &empty,        &empty,       &empty,       &empty,        &empty,        &empty      },
     /* balanced     */  { &empty, &balanced,     &strict_left, &maybe_left,  &strict_right, &maybe_right,  &maybe_full },
@@ -65,12 +65,12 @@ namespace opennwa {
                         ss << "Testing NWA " << left << " . " << right;
                         SCOPED_TRACE(ss.str());
 
-                        NWA const * expected_answer = expected_answers[left][right];
+                        Nwa const * expected_answer = expected_answers[left][right];
 
                         // First, make sure that we expect an answer
                         // (i.e. it's not no_answer).
                         if (expected_answer && left != right) {
-                            NWARefPtr u = concat(nwas[left], nwas[right]);
+                            NwaRefPtr u = concat(nwas[left], nwas[right]);
 
                             EXPECT_TRUE(query::languageEquals(*expected_answer, *u));
                         }
@@ -82,13 +82,13 @@ namespace opennwa {
             TEST(opennwa$construct$$concat, resultingAutomatonIsNondeterministic)
             {
                 SomeElements e;
-                NWA left, right;
+                Nwa left, right;
                 left.addInitialState(e.state);
                 left.addFinalState(e.state);
                 right.addInitialState(e.state2);
                 right.addInitialState(e.state2);
 
-                NWARefPtr u = concat(left, right);
+                NwaRefPtr u = concat(left, right);
 
                 EXPECT_FALSE(query::isDeterministic(*u));
             }

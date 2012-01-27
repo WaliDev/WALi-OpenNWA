@@ -14,7 +14,7 @@ using namespace opennwa;
 
 #define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
 
-static const NWA empty,
+static const Nwa empty,
     balanced = AcceptsBalancedOnly().nwa,
     strict_left = AcceptsStrictlyUnbalancedLeft().nwa,
     maybe_left = AcceptsPossiblyUnbalancedLeft().nwa,
@@ -25,7 +25,7 @@ static const NWA empty,
 
 // WARNING: the order of these words must be consistent with the row & column
 //          order in the table 'expected_answers' below.
-static NWA const nwas[] = {
+static Nwa const nwas[] = {
     empty,
     balanced,
     strict_left,
@@ -42,7 +42,7 @@ static const unsigned num_nwas = NUM_ELEMENTS(nwas);
 //          consistent with the order of 'nwas' above.
 //
 // "What is the union of the row and column?"
-static const NWA * const expected_answers[][num_nwas] = {
+static const Nwa * const expected_answers[][num_nwas] = {
     /*                    empty   balanced   strict left   maybe left    strict right   maybe right    maybe full */
     /* empty        */  { &empty, &empty,    &empty,       &empty,       &empty,        &empty,        &empty        },
     /* balanced     */  { &empty, &balanced, &empty,       &balanced,    &empty,        &balanced,     &balanced     },
@@ -65,12 +65,12 @@ namespace opennwa {
                         ss << "Testing NWA " << left << " intersect " << right;
                         SCOPED_TRACE(ss.str());
 
-                        NWA const * expected_answer = expected_answers[left][right];
+                        Nwa const * expected_answer = expected_answers[left][right];
 
                         // First, make sure that we expect an answer
                         // (i.e. it's not no_answer).
                         if (expected_answer && left != right) {
-                            NWARefPtr u = intersect(nwas[left], nwas[right]);
+                            NwaRefPtr u = intersect(nwas[left], nwas[right]);
                             
                             EXPECT_TRUE(query::languageEquals(*expected_answer, *u));
                         }
@@ -81,11 +81,11 @@ namespace opennwa {
 
             TEST(opennwa$construct$$intersection, resultingAutomatonIsDeterministic)
             {
-                NWA left, right;
+                Nwa left, right;
                 left.addInitialState(getKey("s"));
                 right.addInitialState(getKey("t"));
 
-                NWARefPtr u = intersect(left, right);
+                NwaRefPtr u = intersect(left, right);
 
                 EXPECT_TRUE(query::isDeterministic(*u));
             }

@@ -12,8 +12,8 @@ using namespace opennwa;
 
 #define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
 
-static NWA const nwas[] = {
-    NWA(),
+static Nwa const nwas[] = {
+    Nwa(),
     AcceptsBalancedOnly().nwa,
     AcceptsStrictlyUnbalancedLeft().nwa,
     AcceptsPossiblyUnbalancedLeft().nwa,
@@ -28,12 +28,12 @@ static const unsigned num_nwas = NUM_ELEMENTS(nwas);
 namespace opennwa {
 
         void
-        expect_nwa_is_idempotent(NWA const & nwa)
+        expect_nwa_is_idempotent(Nwa const & nwa)
         {
             std::stringstream output;
             nwa.print(output);
 
-            NWARefPtr again_nwa = read_nwa(output);
+            NwaRefPtr again_nwa = read_nwa(output);
 
             std::stringstream again_output;
             again_nwa->print(again_output);

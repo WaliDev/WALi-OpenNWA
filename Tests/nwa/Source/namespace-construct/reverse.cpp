@@ -14,8 +14,8 @@ using namespace opennwa;
 
 // For every case, L(nwa[i])* = L(nwa[i]), except that the strictly
 // unbalanced ones don't accept epsilon.
-static NWA const nwas[] = {
-    NWA(),
+static Nwa const nwas[] = {
+    Nwa(),
     AcceptsBalancedOnly().nwa,
     AcceptsStrictlyUnbalancedLeft().nwa,
     AcceptsPossiblyUnbalancedLeft().nwa,
@@ -32,8 +32,8 @@ static const unsigned num_nwas = NUM_ELEMENTS(nwas);
 const Symbol callKey = AcceptsBalancedOnly().ret;
 const Symbol returnKey = AcceptsBalancedOnly().call;
 
-static NWA const expected_answers[] = {
-    NWA(),
+static Nwa const expected_answers[] = {
+    Nwa(),
     AcceptsBalancedOnly(callKey, returnKey).nwa,
     AcceptsStrictlyUnbalancedRight(callKey, returnKey).nwa,
     AcceptsPossiblyUnbalancedRight(callKey, returnKey).nwa,
@@ -53,7 +53,7 @@ namespace opennwa {
                     ss << "Testing NWA " << nwa;
                     SCOPED_TRACE(ss.str());
 
-                    NWARefPtr r = reverse(nwas[nwa]);
+                    NwaRefPtr r = reverse(nwas[nwa]);
 
                     EXPECT_TRUE(query::languageEquals(expected_answers[nwa], *r));
                 }
@@ -62,7 +62,7 @@ namespace opennwa {
 
             TEST(opennwa$query$$reverse, universalNwa)
             {
-                NWA nwa;
+                Nwa nwa;
                 SomeElements e;
 
                 nwa.addInitialState(e.state);
@@ -71,7 +71,7 @@ namespace opennwa {
                 nwa.addCallTrans(e.state, e.symbol, e.state);
                 nwa.addReturnTrans(e.state, e.state, e.symbol, e.state);
 
-                NWARefPtr closure = reverse(nwa);
+                NwaRefPtr closure = reverse(nwa);
 
                 EXPECT_TRUE(query::languageEquals(nwa, *closure));
             }
