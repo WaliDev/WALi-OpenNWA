@@ -4,8 +4,8 @@
 #include <cstdlib>
 #include <fstream>
 
-#include "opennwa/NWA.hpp"
-#include "opennwa/NWAParser.hpp"
+#include "opennwa/Nwa.hpp"
+#include "opennwa/NwaParser.hpp"
 
 #include "opennwa/construct/constructions.hpp"
 #include "opennwa/Expand.hpp"

@@ -5,9 +5,9 @@
 #include <fstream>
 #include <sstream>
 
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 #include "opennwa/NestedWord.hpp"
-#include "opennwa/NWAParser.hpp"
+#include "opennwa/NwaParser.hpp"
 
 using std::string;
 using std::ifstream;

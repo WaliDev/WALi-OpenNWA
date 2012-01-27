@@ -2,7 +2,7 @@
 
 #include "wali/Key.hpp"
 #include "wali/Common.hpp"
-#include "opennwa/NWAFwd.hpp"
+#include "opennwa/NwaFwd.hpp"
 
 namespace wali {
 

@@ -149,12 +149,28 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Source\wali\nwa\construct\concat.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\nwa_pds\plusWpds.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\nwa_pds\WpdsToNwa.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\query\automaton.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\query\getSomeAcceptedWord.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\query\language.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\complement.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\concat.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\determinize.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\intersect.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\reverse.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\star.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\union.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\details\StateStorage.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\details\SymbolStorage.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\details\TransitionInfo.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\details\TransitionStorage.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\NWA.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\nwa_pds\NwaToPds.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\nwa_pds\plusWpds.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\nwa_pds\WpdsToNwa.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\query\automaton.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\query\calls.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\query\getSomeAcceptedWord.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\query\internals.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\query\language.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\query\returns.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\query\transitions.cpp" />
     <ClCompile Include="..\..\..\Source\wali\Reach.cpp" />
     <ClCompile Include="..\..\..\Source\wali\wpds\fwpds\FWPDS.cpp" />
     <ClCompile Include="..\..\..\Source\wali\wpds\fwpds\LazyTrans.cpp" />
@@ -232,32 +248,6 @@
     <ClCompile Include="..\..\..\Source\wali\wfa\epr\EPA.cpp" />
     <ClCompile Include="..\..\..\Source\wali\wfa\epr\FunctionalWeight.cpp" />
     <ClCompile Include="..\..\..\Source\wali\wfa\epr\FunctionalWeightMaker.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\NWA.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\details\StateStorage.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\details\SymbolStorage.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\details\TransitionInfo.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\details\TransitionStorage.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\query\calls.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\query\internals.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\query\returns.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\query\transitions.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\construct\complement.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\construct\determinize.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\construct\intersect.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\construct\reverse.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\nwa\construct\star.cpp">
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
-      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
-      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\construct\union.cpp">
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
-      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
-      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\nwa_pds\NwaToPds.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\wali\nwa\construct\complement.hpp" />

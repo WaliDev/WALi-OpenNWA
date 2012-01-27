@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 #include "opennwa/query/language.hpp"
 #include "opennwa/construct/complement.hpp"
 #include "opennwa/construct/intersect.hpp"

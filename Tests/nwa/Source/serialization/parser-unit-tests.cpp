@@ -2,8 +2,8 @@
 
 #include "gtest/gtest.h"
 
-#include "opennwa/NWA.hpp"
-#include "opennwa/NWAParser.hpp"
+#include "opennwa/Nwa.hpp"
+#include "opennwa/NwaParser.hpp"
 
 #include "Tests/nwa/Source/fixtures.hpp"
 #include "Tests/nwa/Source/class-NWA/supporting.hpp"

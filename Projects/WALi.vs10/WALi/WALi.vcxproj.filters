@@ -312,71 +312,71 @@
     <ClCompile Include="..\..\..\Source\wali\wfa\epr\FunctionalWeightMaker.cpp">
       <Filter>Source Files\wali.wfa.epr</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\NWA.cpp">
+    <ClCompile Include="..\..\..\Source\opennwa\construct\union.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\construct\complement.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\construct\concat.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\construct\determinize.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\construct\intersect.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\construct\reverse.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\construct\star.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\details\TransitionStorage.cpp">
+      <Filter>Source Files\wali.nwa\details</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\details\StateStorage.cpp">
+      <Filter>Source Files\wali.nwa\details</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\details\SymbolStorage.cpp">
+      <Filter>Source Files\wali.nwa\details</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\details\TransitionInfo.cpp">
+      <Filter>Source Files\wali.nwa\details</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\nwa_pds\WpdsToNwa.cpp">
+      <Filter>Source Files\wali.nwa\nwa_pds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\nwa_pds\NwaToPds.cpp">
+      <Filter>Source Files\wali.nwa\nwa_pds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\nwa_pds\plusWpds.cpp">
+      <Filter>Source Files\wali.nwa\nwa_pds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\query\transitions.cpp">
+      <Filter>Source Files\wali.nwa\query</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\query\automaton.cpp">
+      <Filter>Source Files\wali.nwa\query</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\query\calls.cpp">
+      <Filter>Source Files\wali.nwa\query</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\query\getSomeAcceptedWord.cpp">
+      <Filter>Source Files\wali.nwa\query</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\query\internals.cpp">
+      <Filter>Source Files\wali.nwa\query</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\query\language.cpp">
+      <Filter>Source Files\wali.nwa\query</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\query\returns.cpp">
+      <Filter>Source Files\wali.nwa\query</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\NWA.cpp">
       <Filter>Source Files\wali.nwa</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\details\StateStorage.cpp">
-      <Filter>Source Files\wali.nwa\details</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\details\SymbolStorage.cpp">
-      <Filter>Source Files\wali.nwa\details</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\details\TransitionInfo.cpp">
-      <Filter>Source Files\wali.nwa\details</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\details\TransitionStorage.cpp">
-      <Filter>Source Files\wali.nwa\details</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\query\calls.cpp">
-      <Filter>Source Files\wali.nwa\query</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\query\internals.cpp">
-      <Filter>Source Files\wali.nwa\query</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\query\returns.cpp">
-      <Filter>Source Files\wali.nwa\query</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\query\transitions.cpp">
-      <Filter>Source Files\wali.nwa\query</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\construct\complement.cpp">
-      <Filter>Source Files\wali.nwa\construct</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\construct\determinize.cpp">
-      <Filter>Source Files\wali.nwa\construct</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\construct\intersect.cpp">
-      <Filter>Source Files\wali.nwa\construct</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\construct\reverse.cpp">
-      <Filter>Source Files\wali.nwa\construct</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\construct\star.cpp">
-      <Filter>Source Files\wali.nwa\construct</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\construct\union.cpp">
-      <Filter>Source Files\wali.nwa\construct</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\nwa_pds\NwaToPds.cpp">
-      <Filter>Source Files\wali.nwa\nwa_pds</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\construct\concat.cpp">
-      <Filter>Source Files\wali.nwa\construct</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\query\language.cpp">
-      <Filter>Source Files\wali.nwa\query</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\query\automaton.cpp">
-      <Filter>Source Files\wali.nwa\query</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\query\getSomeAcceptedWord.cpp">
-      <Filter>Source Files\wali.nwa\query</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\nwa_pds\plusWpds.cpp">
-      <Filter>Source Files\wali.nwa\nwa_pds</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\nwa\nwa_pds\WpdsToNwa.cpp">
-      <Filter>Source Files\wali.nwa\nwa_pds</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 #include "opennwa/query/automaton.hpp"
 
 #include "Tests/nwa/Source/fixtures.hpp"

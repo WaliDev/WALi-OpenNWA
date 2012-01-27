@@ -8,7 +8,7 @@
 #  include <boost/test/unit_test.hpp>
 #endif
 
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 
 #include "arbitrary.hpp"
 

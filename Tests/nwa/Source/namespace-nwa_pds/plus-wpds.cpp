@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "opennwa/NWA.hpp"
+#include "opennwa/Nwa.hpp"
 #include "opennwa/nwa_pds/plusWpds.hpp"
 
 #include "Tests/nwa/Source/fixtures.hpp"
