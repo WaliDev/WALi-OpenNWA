@@ -1,12 +1,17 @@
 \begin{abstract}
 
-WALi-NWA is a C++ library for constructing, querying, and operating on
-nested-word automata.  It is a portion of the WALi library, which provides
-types and operations for weighted automata.
-While the NWA portions of WALi
-are mostly logically separate from the rest of WALi, it does use
-facilities provided by WALi and inter-operates with WALi's weighted pushdown
-system (WPDS) code.
+Nested-word automata (NWAs) are a language formalism that helps bridge
+the gap between finite-state automata and pushdown automata. NWAs can express
+some context-free properties, such as parenthesis matching, yet retain all
+the desirable closure characteristics of finite-state automata.
+
+This document describes OpenNWA, a C++ implementation of NWAs.  OpenNWA
+provides the expected automata-theoretic operations, such as intersection,
+determinization, and complementation, as well as query operations. It is
+packaged with WALi---\textit{W}eighted \textit{A}utomata
+\textit{Li}brary---and interoperates closely with the weighted pushdown
+system portions of WALi.
+
 
 \end{abstract}
 
@@ -44,7 +49,7 @@ and returns.)
 %words only, and does not provide support for any words with pending
 %returns. (That is, we support balanced words and nested-word prefixes, but
 %not nested-word suffixes or general nested words.)
-
+\clearpage
 \tableofcontents
 
 \vspace{2\baselineskip}
