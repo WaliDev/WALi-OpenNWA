@@ -65,16 +65,16 @@ and, except for \texttt{plusWpds()}, are declared in the header
 
 \begin{functionlist}
   \functionDefEarly{void}{WpdsToNwa}{NWA \& out, const WPDS\& pds}{}
-  \functionDef{NWARefPtr}{WpdsToNwa}{const WPDS\& pds}{}
+  \functionDef{NwaRefPtr}{WpdsToNwa}{const WPDS\& pds}{}
     Converts \texttt{pds} to an NWA, either storing the result in
     \texttt{nwa} or returning it.
 
 \clearpage
-  \functionDefFirstEarly{WPDS}{NwaToWpdsCalls}{NWA const \& nwa, WeightGen const \& wg}{}
-  \functionDefEarlyNoCloseParen{WPDS}{NwaToWpdsCalls}{\parbox[t]{4in}{NWA const \& nwa, WeightGen const \& wg,\\ref\_ptr<Wrapper> wr)}}
-  \functionDefEarly{WPDS}{NwaToBackwardsWpdsCalls}{NWA const \& nwa, WeightGen const \& wg}{}
-  \functionDefEarly{WPDS}{NwaToWpdsReturns}{NWA const \& nwa, WeightGen const \& wg}{}
-  \functionDef{WPDS}{NwaToBackwardsWpdsReturn}{NWA const \& nwa, WeightGen const \& wg}{}
+  \functionDefFirstEarly{WPDS}{NwaToWpdsCalls}{Nwa const \& nwa, WeightGen const \& wg}{}
+  \functionDefEarlyNoCloseParen{WPDS}{NwaToWpdsCalls}{\parbox[t]{4in}{Nwa const \& nwa, WeightGen const \& wg,\\ref\_ptr<Wrapper> wr)}}
+  \functionDefEarly{WPDS}{NwaToBackwardsWpdsCalls}{Nwa const \& nwa, WeightGen const \& wg}{}
+  \functionDefEarly{WPDS}{NwaToWpdsReturns}{Nwa const \& nwa, WeightGen const \& wg}{}
+  \functionDef{WPDS}{NwaToBackwardsWpdsReturn}{Nwa const \& nwa, WeightGen const \& wg}{}
     These functions each construct a WPDS that is equivalent to \texttt{nwa} using the
     appropriate method (backwards or forwards flow, and stacking calls or
     stacking returns), returning the result. Uses \texttt{wg} to determine
@@ -94,7 +94,7 @@ and, except for \texttt{plusWpds()}, are declared in the header
     for return transitions from \texttt{exit} to \texttt{return} with
     \texttt{call} as a predecessor.
 
-  \functionDefFirst{WPDS}{plusWpds}{NWA const \& nwa, const WPDS\& base}{}
+  \functionDefFirst{WPDS}{plusWpds}{Nwa const \& nwa, const WPDS\& base}{}
     This function returns a WPDS that is the
     product of the NWA \texttt{nwa} and WPDS \texttt{base}, as described in the ``Explicit
     NWA plus PDS'' construction from \cite[\S6]{advancedquerying}. This

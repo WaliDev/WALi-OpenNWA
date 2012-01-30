@@ -67,9 +67,9 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
     interpretation.
   \item[3] The entries of the form, e.g., ``\{begin,end\}States()'' denote a pair
     of functions, each of which returns an iterator. The type of that iterator
-    is either a \texttt{NWA::StateIterator},
-    \texttt{NWA::SymbolIterator}, \texttt{NWA::CallIterator},
-    \texttt{NWA::InternalIterator}, or \texttt{NWA::ReturnIterator}, as appropriate; all of these are
+    is either a \texttt{Nwa::StateIterator},
+    \texttt{Nwa::SymbolIterator}, \texttt{Nwa::CallIterator},
+    \texttt{Nwa::InternalIterator}, or \texttt{Nwa::ReturnIterator}, as appropriate; all of these are
     actually const iterators. The other functions (``get\textit{Kind}()'')
     return a \texttt{StateSet} or \texttt{SymbolSet} as appropriate.
   \item[4] Removing a state or a symbol also removes all transitions
@@ -86,8 +86,8 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
   \item[6] There are two overloads of each of these functions. The first
     takes each element of the transition tuple individually,
     e.g., \texttt{addCallTrans(State src, State sym, State tgt)}. The
-    second takes a (constant reference to an) \texttt{NWA::Internal},
-    \texttt{NWA::Call}, or \texttt{NWA::Return} object (as
+    second takes a (constant reference to an) \texttt{Nwa::Internal},
+    \texttt{Nwa::Call}, or \texttt{Nwa::Return} object (as
     appropriate). (These are typedefs of a \texttt{Triple} or \texttt{Quad}
     of the appropriate type.)
 \end{tablenotes}

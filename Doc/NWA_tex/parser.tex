@@ -30,13 +30,13 @@ minimal post-processing in some cases).
 
 There is a member function to produce each type of output:
 \begin{functionlist}
-  \functionDef{std::ostream\&}{NWA::print}{std::ostream \& stream}{const}
+  \functionDef{std::ostream\&}{Nwa::print}{std::ostream \& stream}{const}
     Writes the custom output described in this section
     to \texttt{stream}, returning \texttt{stream}.
     (This method is inherited from
     the \texttt{wali::Printable} abstract class.)
 
-  \functionDefFirstEarlyNoCloseParen{std::ostream\&}{NWA::print\_dot}{%
+  \functionDefFirstEarlyNoCloseParen{std::ostream\&}{Nwa::print\_dot}{%
       \parbox[t][2\baselineskip][t]{3.5in}{
                  ostream \& os, std::string const \& n,\\
                  bool abbrev = true) const}}
@@ -52,7 +52,7 @@ There is a member function to produce each type of output:
 
 The NWA library contains a semi-experimental parser for descriptions of
 NWAs. The format is described below, and matches the result of calling
-\texttt{NWA::print(std::ostream \&)}, provided that the result of
+\texttt{Nwa::print(std::ostream \&)}, provided that the result of
 calling \texttt{key2str} on the state and symbol keys produces strings
 that match the description of \nonterm{actual-names} in this grammar.
 
@@ -65,13 +65,13 @@ report errors more gracefully, almost certainly through exceptions.
 There are two functions that parse NWA descriptions, both declared in
 \texttt{opennwa/NWAParser.hpp} in namespace \texttt{opennwa}:
 \begin{functionlist}
-  \functionDef{NWARefPtr}{read\_nwa}{std::istream \& is, std::string * name = NULL}{} 
+  \functionDef{NwaRefPtr}{read\_nwa}{std::istream \& is, std::string * name = NULL}{} 
   Reads a description of a single NWA from \texttt{is} and
   returns it. The serialization format allows an optional name for an NWA; if
   one is specified and \texttt{name} is non-null, then the name is stored in
   the string pointed to by \texttt{name}.
 
-  \functionDefFirst{std::map$<$std::string, NWARefPtr$>$}%
+  \functionDefFirst{std::map$<$std::string, NwaRefPtr$>$}%
                    {read\_nwa\_proc\_set}{std::istream \&}{}
   Reads the entire input stream,
   returning a map from the name of each automaton description to the parsed

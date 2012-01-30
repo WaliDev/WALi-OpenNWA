@@ -7,7 +7,7 @@ reversal, Kleene star, complement, and determinization.
 
 The library supports two interfaces to each of these operations. In one, the
 operation allocates an NWA with \texttt{new}, performs the construction, and
-returns a \texttt{NWARefPtr} to the result.  In the other, the operation takes
+returns a \texttt{NwaRefPtr} to the result.  In the other, the operation takes
 a reference to an NWA, clears it, and constructs the result in-place. The
 first form is usually more convenient to use, and creates a mini language for
 set expressions; the second form makes it possible to store the result of an
@@ -17,12 +17,12 @@ Each of these functions is in the namespace \texttt{opennwa::construct}:
 
 \begin{functionlist}
 
-  \functionDefEarly{NWARefPtr}{unionNWA}{NWA const \& a, NWA const \& b}{}
-  \functionDef{void}{unionNWA}{NWA \& out, NWA const \& a, NWA const \& b}{}
+  \functionDefEarly{NwaRefPtr}{unionNwa}{Nwa const \& a, Nwa const \& b}{}
+  \functionDef{void}{unionNwa}{NWA \& out, Nwa const \& a, Nwa const \& b}{}
     Computes the union of the NWAs \texttt{a} and \texttt{b},
     either returning the result or storing it in \texttt{out}.
     See Section
-    \ref{Se:Union}. (This function is called \texttt{unionNWA} instead of
+    \ref{Se:Union}. (This function is called \texttt{unionNwa} instead of
     \texttt{union} because the latter is a C++ keyword.) The two NWAs must not
     have any states in common, and the output will be nondeterministic even
     if both input NWAs are deterministic. The running time\footnote{We count
@@ -30,8 +30,8 @@ Each of these functions is in the namespace \texttt{opennwa::construct}:
       actually logarithmic, and occasionally linear.} is
     $O(|Q^a|+|Q^b|+|\delta^a|+|\delta^b|)$.
 
-  \functionDefFirstEarly{NWARefPtr}{intersect}{NWA const \& a, NWA const \& b}{}
-  \functionDef{void}{intersect}{NWA \& out, NWA const \& a, NWA const \& b}{}
+  \functionDefFirstEarly{NwaRefPtr}{intersect}{Nwa const \& a, Nwa const \& b}{}
+  \functionDef{void}{intersect}{NWA \& out, Nwa const \& a, Nwa const \& b}{}
     Computes the intersection of the NWAs \texttt{a} and \texttt{b},
     either returning the result or storing it in \texttt{out}.
     See Section \ref{Se:Intersection}. If both input NWAs are deterministic,
@@ -40,8 +40,8 @@ Each of these functions is in the namespace \texttt{opennwa::construct}:
     of a state in \texttt{a} and $d_b$ is the maximum out-degree of a state
     in \texttt{b}.
 
-  \functionDefFirstEarly{NWARefPtr}{concat}{NWA const \& left, NWA const \& right}{}
-  \functionDef{void}{concat}{NWA \& out, NWA const \& left, NWA const \& right}{}
+  \functionDefFirstEarly{NwaRefPtr}{concat}{Nwa const \& left, Nwa const \& right}{}
+  \functionDef{void}{concat}{NWA \& out, Nwa const \& left, Nwa const \& right}{}
     Computes the concatenation of the NWAs \texttt{left} and
     \texttt{right}, either returning the result or storing it in
     \texttt{out}.
@@ -49,30 +49,30 @@ Each of these functions is in the namespace \texttt{opennwa::construct}:
     nondeterministic. The running time is
     $O(|Q^a|+|Q^b|+|\delta^a|+|\delta^b|+|Q^a||\delta_r^b|)$.
 
-  \functionDefFirstEarly{NWARefPtr}{star}{NWA const \& orig}{}
-  \functionDef{void}{star}{NWA \& out, NWA const \& orig}{}
+  \functionDefFirstEarly{NwaRefPtr}{star}{Nwa const \& orig}{}
+  \functionDef{void}{star}{NWA \& out, Nwa const \& orig}{}
     Computes the Kleene star of the NWA \texttt{orig}, either
     returning the result or storing it in \texttt{out}. See Section
     \ref{Se:Star}. The output automaton will be nondeterministic. The
     running time is $O(|Q|+|\delta|+|Q_0||Q_f||\delta_c|)$.
 
-  \functionDefFirstEarly{NWARefPtr}{reverse}{NWA const \& orig}{}
-  \functionDef{void}{reverse}{NWA \& out, NWA const \& orig}{}
+  \functionDefFirstEarly{NwaRefPtr}{reverse}{Nwa const \& orig}{}
+  \functionDef{void}{reverse}{NWA \& out, Nwa const \& orig}{}
     Computes the NWA that accepts the reverse of each nested word
     accepted by the NWA \texttt{orig}, either returning the result or
     storing it in \texttt{out}. See Section \ref{Se:Reverse}. The running
     time is $O(|Q|+|\delta|)$.
 
-  \functionDefFirstEarly{NWARefPtr}{determinize}{NWA const \& orig}{}
-  \functionDef{NWARefPtr}{determinize}{NWA \& out, NWA const \& orig}{}
+  \functionDefFirstEarly{NwaRefPtr}{determinize}{Nwa const \& orig}{}
+  \functionDef{NwaRefPtr}{determinize}{NWA \& out, Nwa const \& orig}{}
     Computes a determinization of \texttt{orig}, either returning the
     result or storing it in \texttt{out}.
     See Section \ref{Se:Determinize}. The worst-case running time for this
     algorithm is at least $O({|Q|^3} \cdot2^{|Q|^2})$.
 
 \clearpage
-  \functionDefFirstEarly{NWARefPtr}{complement}{NWA const \& orig}{}
-  \functionDef{void}{complement}{NWA \& out, NWA const \& orig}{}
+  \functionDefFirstEarly{NwaRefPtr}{complement}{Nwa const \& orig}{}
+  \functionDef{void}{complement}{NWA \& out, Nwa const \& orig}{}
     Computes the complement of the determinization of \texttt{orig},
     either returning the result or storing it in \texttt{out}.
     See Section
@@ -104,9 +104,9 @@ Each of these functions is in the namespace \texttt{opennwa::construct}:
 As mentioned above, these functions create a small language of set
 expressions. For instance, to compute an automaton \texttt{M} whose language
 is $\texttt{A} \cup (\texttt{B} \cap \texttt{C})*$ (where \texttt{A},
-\texttt{B}, and \texttt{C} are \texttt{NWARefPtr}s), one can write
+\texttt{B}, and \texttt{C} are \texttt{NwaRefPtr}s), one can write
 \begin{center}
-  \texttt{NWARefPtr M = unionNWA(*A, *star(*intersect(*B, *C)))}
+  \texttt{NwaRefPtr M = unionNwa(*A, *star(*intersect(*B, *C)))}
 \end{center}
 
 
@@ -263,8 +263,8 @@ to be overridden to customize behavior:
 \begin{functionlist}
   \functionDefNoCloseParen{bool}{stateIntersect}{%
                   \parbox[t]{4in}
-                              {NWA const \& first, Key state1,\\ 
-                               NWA const \& second, Key state2,\\
+                              {Nwa const \& first, Key state1,\\ 
+                               Nwa const \& second, Key state2,\\
                                Key\& resSt, ref\_ptr<ClientInfo>\& resCI)}}
     Determines whether the given states can be combined and,
     if so, creates the combined state. If the two states are incompatable,
@@ -274,8 +274,8 @@ to be overridden to customize behavior:
 
   \functionDefFirstNoCloseParen{bool}{transitionIntersect}{%
                   \parbox[t]{4in}
-                              {NWA const \& first, Key sym1,\\
-                               NWA const \& second, Key sym2,\\ 
+                              {Nwa const \& first, Key sym1,\\
+                               Nwa const \& second, Key sym2,\\ 
                                Key\& resSym )}}
     Determines whether the given symbols are considered to be equivalent for
     the purposes of intersection. If so, it computes the symbol that should
@@ -284,19 +284,19 @@ to be overridden to customize behavior:
 
   \functionDefFirstEarlyNoCloseParen{void}{intersectClientInfoInternal}{%
                   \parbox[t]{4in}
-                     {NWA const \& first, Key src1, Key tgt1,\\
-                      NWA const \& second, Key src2, Key tgt2,\\
+                     {Nwa const \& first, Key src1, Key tgt1,\\
+                      Nwa const \& second, Key src2, Key tgt2,\\
                       Key resSym, Key resSt )}}
     \nopagebreak
   \functionDefEarlyNoCloseParen{void}{intersectClientInfoCall}{%
                   \parbox[t]{4in}
-                      {NWA const \& first ,Key call1, Key entry1,\\
-                       NWA const \& second, Key call2, Key entry2,\\
+                      {Nwa const \& first ,Key call1, Key entry1,\\
+                       Nwa const \& second, Key call2, Key entry2,\\
                        Key resSym, Key resSt )}} \nopagebreak
   \functionDefNoCloseParen{void}{intersectClientInfoReturn}{%
                   \parbox[t]{4in}
-                      {NWA const \& first, Key exit1, Key call1, Key ret1,\\
-                       NWA const \& second, Key exit2, Key call2, Key ret2,\\
+                      {Nwa const \& first, Key exit1, Key call1, Key ret1,\\
+                       Nwa const \& second, Key exit2, Key call2, Key ret2,\\
                        Key resSym, Key resSt )}}
     Called after a transition of the corresponding type is added to the
     automaton. It is intended to be used to
@@ -680,7 +680,7 @@ in the determinized NWA being subsets of states in the original NWA, states of t
 determinized NWA are sets of state pairs (i.e., binary relations on states)
 \cite{JACM:AM2009}.  To support determinization, the library provides a
 typedef of \texttt{std::set$<$pair$<$State, State$>>$} as 
-\texttt{NWA::BinaryRelation}. See also \texttt{opennwa/RelationOps.hpp}.
+\texttt{Nwa::BinaryRelation}. See also \texttt{opennwa/RelationOps.hpp}.
 
 We present the algorithm we use for determinization in
 \appref{DeterminizeAlgorithm}.
@@ -732,7 +732,7 @@ customize the behavior of determinization:
 \begin{functionlist}
   \functionDefNoCloseParen{void}{mergeClientInfo}{%
      \parbox[t]{4in}{
-       NWA const \& nondet, BinaryRelation const\& binRel, \\
+       Nwa const \& nondet, BinaryRelation const\& binRel, \\
        St resSt, ref\_ptr<ClientInfo>\& resCI)}}
   Callback that gets called when a new state \texttt{resSt} (representing the
   binary relation \texttt{binRel}) is added to the determinized automaton.
@@ -743,21 +743,21 @@ customize the behavior of determinization:
 
   \functionDefFirstEarlyNoCloseParen{void}{mergeClientInfoInternal}{%
      \parbox[t]{4in}{
-       NWA const \& nondet,\\
+       Nwa const \& nondet,\\
        BinaryRelation const\& binRelSource,\\
        BinaryRelation const\& binRelTarget,\\
        Key sourceSt, Key resSym, Key resSt,\\
        ref\_ptr<ClientInfo>\& resCI )}}
   \functionDefEarlyNoCloseParen{void}{mergeClientInfoCall}{%
      \parbox[t]{4in}{
-       NWA const \& nondet,\\
+       Nwa const \& nondet,\\
        BinaryRelation const\& binRelCall,\\
        BinaryRelation const\& binRelEntry,\\
        Key callSt, Key resSym, Key resSt,\\
        ref\_ptr<ClientInfo>\& resCI )}}
   \functionDefNoCloseParen{void}{mergeClientInfoReturn}{%
      \parbox[t]{4in}{
-       NWA const \& nondet,\\
+       Nwa const \& nondet,\\
        BinaryRelation const\& binRelExit,\\
        BinaryRelation const\& binRelCall,\\
        BinaryRelation const\& binRelReturn,\\
