@@ -17,7 +17,7 @@ built += buddy
 
 domains = SConscript(
     'Source/SConscript', 
-    build_dir=os.path.join(BuildDir,'AddOns','Domains'),
+    variant_dir=os.path.join(BuildDir,'AddOns','Domains'),
     duplicate=0)
 
 built += domains

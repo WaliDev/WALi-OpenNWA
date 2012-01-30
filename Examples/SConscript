@@ -15,7 +15,7 @@ built = []
 ## Reach example
 built += SConscript(
         os.path.join(ExampleDir,'Reach','SConscript'),
-        build_dir= os.path.join(BuildDir,'Examples','Reach'),
+        variant_dir= os.path.join(BuildDir,'Examples','Reach'),
         duplicate=0
         )
 
@@ -24,19 +24,19 @@ built += SConscript(
 ## GenKill examples
 built += SConscript(
         os.path.join(ExampleDir,'GenKill','SConscript'),
-        build_dir= os.path.join(BuildDir,'Examples','GenKill'),
+        variant_dir= os.path.join(BuildDir,'Examples','GenKill'),
         duplicate=0
         )
 
 built += SConscript(
         os.path.join(ExampleDir,'ProgAnalysis','SConscript'),
-        build_dir= os.path.join(BuildDir,'Examples','ProgAnalysis'),
+        variant_dir= os.path.join(BuildDir,'Examples','ProgAnalysis'),
         duplicate=0)
 
 # Affine Relations Weight Domain
 # o = SConscript(
 #         os.path.join(ExampleDir,'AffineRelations','SConscript'),
-#         build_dir= os.path.join('_build','AffineRelations'),
+#         variant_dir= os.path.join('_build','AffineRelations'),
 #         duplicate=0
 #         )
 # built += o

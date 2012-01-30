@@ -20,12 +20,12 @@ built = [xerces]
 
 [parse] = SConscript(
     os.path.join('Source','SConscript'), 
-    build_dir=os.path.join(BuildDir,'AddOns','Parse'),
+    variant_dir=os.path.join(BuildDir,'AddOns','Parse'),
     duplicate=0)
 built += [parse]
 
 examples = SConscript(os.path.join('Examples','SConscript'), 
-    build_dir=os.path.join(BuildDir,'AddOns','Parse','Examples'),
+    variant_dir=os.path.join(BuildDir,'AddOns','Parse','Examples'),
     duplicate=0)
 built += examples
 
