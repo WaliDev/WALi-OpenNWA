@@ -7,7 +7,13 @@
 
 namespace wali
 {
-  PriorityWorklist::PriorityWorklist() : Worklist<wfa::ITrans>(), workset(LessThan(*this)) {}
+#ifdef _MSC_VER
+#pragma warning(disable: 4355) // 'this' : used in base member initializer list
+#endif
+  PriorityWorklist::PriorityWorklist()
+    : Worklist<wfa::ITrans>()
+    , workset(LessThan(*this))
+  {}
 
   PriorityWorklist::~PriorityWorklist()
   {
