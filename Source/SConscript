@@ -118,7 +118,6 @@ naughty_files = Split("""
 
 
 
-
 env = BaseEnv.Clone()
         
 if Debug:
@@ -127,23 +126,22 @@ if Debug:
 
 # Build these separately so we can use fewer warning flags
 if MkStatic:
-    naughty_objs = [env.StaticObject(naughty_file, WARNING_FLAGS='') for naughty_file in naughty_files]
+    naughty_objs = [env.StaticObject(naughty_file, WARNING_FLAGS='-Wno-sign-compare -Werror')
+                    for naughty_file in naughty_files]
 else:
-    naughty_objs = [env.SharedObject(naughty_file, WARNING_FLAGS='') for naughty_file in naughty_files]
+    naughty_objs = [env.SharedObject(naughty_file, WARNING_FLAGS='-Wno-sign-compare -Werror')
+                    for naughty_file in naughty_files]
 
 
 wali_files = nice_files + naughty_objs
 
 
-
 if MkStatic:
     wali = env.StaticLibrary('wali' , wali_files)
-    i = env.Install(LibInstallDir, wali)
-    built = i
-    Return('built')
 else:
     wali = env.SharedLibrary('wali' , wali_files)
-    i = env.Install(LibInstallDir, wali)
-    built = i
-    Return('built')
+
+i = env.Install(LibInstallDir, wali)
+built = i
+Return('built')
 
