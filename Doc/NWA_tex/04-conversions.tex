@@ -242,113 +242,6 @@ configurations, while \texttt{ShortestWordGen} results in a WPDS with weights
 that describe the length of the shortest \emph{word}.
 
 
-\begin{figure}[p]
-  \centering
-  \begin{minipage}{\textwidth}
-    \nwaimage[1]{Figures/pre-pds-nwa}
-    \caption{An example NWA.}
-    \label{Fi:NwaToWpds1}
-  \end{minipage}
-  \begin{minipage}{0.42\textwidth}
-    \begin{itemize}
-      \centering
-      \item{ $\langle p,main \rangle \hookrightarrow \langle p,q_1 \rangle$}
-      \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
-      \item{ $\langle p,e \rangle \hookrightarrow \langle p,q_2 \rangle$}
-      \item{ $\langle p,q_2 \rangle \hookrightarrow \langle p,q_3 \rangle$}
-      \item{ $\langle p,q_3 \rangle \hookrightarrow \langle p,x \rangle$}
-      \item{ $\langle p,r_1 \rangle \hookrightarrow \langle p,q_4 \rangle$}
-      \item{ $\langle p,q_4 \rangle \hookrightarrow \langle p,q_5 \rangle$}
-      \item{ $\langle p,q_5 \rangle \hookrightarrow \langle p,c_2 \rangle$}
-      \item{ $\langle p,r_2 \rangle \hookrightarrow \langle p,q_6 \rangle$}
-      \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,exit \rangle$}
-      \item{ $\langle p,c_1 \rangle \hookrightarrow \langle p,e \hspace{.1cm} c_1 \rangle$}
-      \item{ $\langle p,c_2 \rangle \hookrightarrow \langle p,e \hspace{.1cm} c_2 \rangle$}
-      \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
-      \item{ $\langle p_x,c_1 \rangle \hookrightarrow \langle p,r_1 \rangle$}
-      \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
-      \item{ $\langle p_x,c_2 \rangle \hookrightarrow \langle p,r_2 \rangle$}
-    \end{itemize}
-    \caption{The WPDS resulting from calling \texttt{NwaToWpdsCalls} on \figref{NwaToWpds1}}
-    \label{Fi:NwaToWpds4}
-  \end{minipage}
-  \hspace{0.1\textwidth}
-  \begin{minipage}{0.42\textwidth}
-    \centering
-    \begin{itemize}
-      \centering
-      \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,main \rangle$}
-      \item{ $\langle p,c_1 \rangle \hookrightarrow \langle p,q_1 \rangle$}
-      \item{ $\langle p,q_2 \rangle \hookrightarrow \langle p,e \rangle$}
-      \item{ $\langle p,q_3 \rangle \hookrightarrow \langle p,q_2 \rangle$}
-      \item{ $\langle p,x \rangle \hookrightarrow \langle p,q_3 \rangle$}
-      \item{ $\langle p,q_4 \rangle \hookrightarrow \langle p,r_1 \rangle$}
-      \item{ $\langle p,q_5 \rangle \hookrightarrow \langle p,q_4 \rangle$}
-      \item{ $\langle p,c_2 \rangle \hookrightarrow \langle p,q_5 \rangle$}
-      \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,r_2 \rangle$}
-      \item{ $\langle p,exit \rangle \hookrightarrow \langle p,q_6 \rangle$}
-      \item{ $\langle p,r_1 \rangle \hookrightarrow \langle p,x \hspace{.1cm} r_1 \rangle$}
-      \item{ $\langle p,r_2 \rangle \hookrightarrow \langle p,x \hspace{.1cm} r_2 \rangle$}
-      \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
-      \item{ $\langle p_e,r_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
-      \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
-      \item{ $\langle p_e,r_2 \rangle \hookrightarrow \langle p,c_2 \rangle$}
-    \end{itemize}
-    \caption{The result of calling \texttt{NwaToBackwardsWpdsCalls} on \figref{NwaToWpds1}}
-    \label{Fi:NwaToWpds5}
-  \end{minipage}
-  \begin{minipage}{0.42\textwidth}
-    \centering
-    \begin{itemize}
-      \centering
-      \item{ $\langle p,main \rangle \hookrightarrow \langle p,q_1 \rangle$}
-      \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
-      \item{ $\langle p,e \rangle \hookrightarrow \langle p,q_2 \rangle$}
-      \item{ $\langle p,q_2 \rangle \hookrightarrow \langle p,q_3 \rangle$}
-      \item{ $\langle p,q_3 \rangle \hookrightarrow \langle p,x \rangle$}
-      \item{ $\langle p,r_1 \rangle \hookrightarrow \langle p,q_4 \rangle$}
-      \item{ $\langle p,q_4 \rangle \hookrightarrow \langle p,q_5 \rangle$}
-      \item{ $\langle p,q_5 \rangle \hookrightarrow \langle p,c_2 \rangle$}
-      \item{ $\langle p,r_2 \rangle \hookrightarrow \langle p,q_6 \rangle$}
-      \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,exit \rangle$}
-      \item{ $\langle p,c_1 \rangle \hookrightarrow \langle p,e \hspace{.1cm} r_1 \rangle$}
-      \item{ $\langle p,c_2 \rangle \hookrightarrow \langle p,e \hspace{.1cm} r_2 \rangle$}
-      \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
-      \item{ $\langle p_x,r_1 \rangle \hookrightarrow \langle p,r_1 \rangle$}
-      \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
-      \item{ $\langle p_x,r_2 \rangle \hookrightarrow \langle p,r_2 \rangle$}
-    \end{itemize}
-    \caption{The WPDS resulting from calling \texttt{NwaToWpdsReturns} on \figref{NwaToWpds1}}
-    \label{Fi:NwaToWpds2}
-  \end{minipage}
-  \hspace{0.1\textwidth}
-  \begin{minipage}{0.42\textwidth}
-    \centering
-    \begin{itemize}
-      \centering
-      \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,main \rangle$}
-      \item{ $\langle p,c_1 \rangle \hookrightarrow \langle p,q_1 \rangle$}
-      \item{ $\langle p,q_2 \rangle \hookrightarrow \langle p,e \rangle$}
-      \item{ $\langle p,q_3 \rangle \hookrightarrow \langle p,q_2 \rangle$}
-      \item{ $\langle p,x \rangle \hookrightarrow \langle p,q_3 \rangle$}
-      \item{ $\langle p,q_4 \rangle \hookrightarrow \langle p,r_1 \rangle$}
-      \item{ $\langle p,q_5 \rangle \hookrightarrow \langle p,q_4 \rangle$}
-      \item{ $\langle p,c_2 \rangle \hookrightarrow \langle p,q_5 \rangle$}
-      \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,r_2 \rangle$}
-      \item{ $\langle p,exit \rangle \hookrightarrow \langle p,q_6 \rangle$}
-      \item{ $\langle p,r_1 \rangle \hookrightarrow \langle p,x \hspace{.1cm} c_1 \rangle$}
-      \item{ $\langle p,r_2 \rangle \hookrightarrow \langle p,x \hspace{.1cm} c_2 \rangle$}
-      \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
-      \item{ $\langle p_e,c_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
-      \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
-      \item{ $\langle p_e,c_2 \rangle \hookrightarrow \langle p,c_2 \rangle$}
-    \end{itemize}
-    \caption{The result of calling \texttt{Nwa\-To\-Backwards\-Wpds\-Returns} on \figref{NwaToWpds1}}
-    \label{Fi:NwaToWpds3}
-  \end{minipage}
-\end{figure}
-
-
 The following operations are virtual methods of \texttt{WeightGen} intended to
 be overridden:
 
@@ -651,3 +544,110 @@ w_3 &= \begin{cases}
       \end{cases} 
 \end{align*}
 
+
+
+\begin{figure}[p]
+  \centering
+  \begin{minipage}{\textwidth}
+    \nwaimage[1]{Figures/pre-pds-nwa}
+    \caption{An example NWA.}
+    \label{Fi:NwaToWpds1}
+  \end{minipage}
+  \begin{minipage}{0.42\textwidth}
+    \begin{itemize}
+      \centering
+      \item{ $\langle p,main \rangle \hookrightarrow \langle p,q_1 \rangle$}
+      \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
+      \item{ $\langle p,e \rangle \hookrightarrow \langle p,q_2 \rangle$}
+      \item{ $\langle p,q_2 \rangle \hookrightarrow \langle p,q_3 \rangle$}
+      \item{ $\langle p,q_3 \rangle \hookrightarrow \langle p,x \rangle$}
+      \item{ $\langle p,r_1 \rangle \hookrightarrow \langle p,q_4 \rangle$}
+      \item{ $\langle p,q_4 \rangle \hookrightarrow \langle p,q_5 \rangle$}
+      \item{ $\langle p,q_5 \rangle \hookrightarrow \langle p,c_2 \rangle$}
+      \item{ $\langle p,r_2 \rangle \hookrightarrow \langle p,q_6 \rangle$}
+      \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,exit \rangle$}
+      \item{ $\langle p,c_1 \rangle \hookrightarrow \langle p,e \hspace{.1cm} c_1 \rangle$}
+      \item{ $\langle p,c_2 \rangle \hookrightarrow \langle p,e \hspace{.1cm} c_2 \rangle$}
+      \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
+      \item{ $\langle p_x,c_1 \rangle \hookrightarrow \langle p,r_1 \rangle$}
+      \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
+      \item{ $\langle p_x,c_2 \rangle \hookrightarrow \langle p,r_2 \rangle$}
+    \end{itemize}
+    \caption{The WPDS resulting from calling \texttt{NwaToWpdsCalls} on \figref{NwaToWpds1}}
+    \label{Fi:NwaToWpds4}
+  \end{minipage}
+  \hspace{0.1\textwidth}
+  \begin{minipage}{0.42\textwidth}
+    \centering
+    \begin{itemize}
+      \centering
+      \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,main \rangle$}
+      \item{ $\langle p,c_1 \rangle \hookrightarrow \langle p,q_1 \rangle$}
+      \item{ $\langle p,q_2 \rangle \hookrightarrow \langle p,e \rangle$}
+      \item{ $\langle p,q_3 \rangle \hookrightarrow \langle p,q_2 \rangle$}
+      \item{ $\langle p,x \rangle \hookrightarrow \langle p,q_3 \rangle$}
+      \item{ $\langle p,q_4 \rangle \hookrightarrow \langle p,r_1 \rangle$}
+      \item{ $\langle p,q_5 \rangle \hookrightarrow \langle p,q_4 \rangle$}
+      \item{ $\langle p,c_2 \rangle \hookrightarrow \langle p,q_5 \rangle$}
+      \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,r_2 \rangle$}
+      \item{ $\langle p,exit \rangle \hookrightarrow \langle p,q_6 \rangle$}
+      \item{ $\langle p,r_1 \rangle \hookrightarrow \langle p,x \hspace{.1cm} r_1 \rangle$}
+      \item{ $\langle p,r_2 \rangle \hookrightarrow \langle p,x \hspace{.1cm} r_2 \rangle$}
+      \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
+      \item{ $\langle p_e,r_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
+      \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
+      \item{ $\langle p_e,r_2 \rangle \hookrightarrow \langle p,c_2 \rangle$}
+    \end{itemize}
+    \caption{The result of calling \texttt{NwaToBackwardsWpdsCalls} on \figref{NwaToWpds1}}
+    \label{Fi:NwaToWpds5}
+  \end{minipage}
+  \begin{minipage}{0.42\textwidth}
+    \centering
+    \begin{itemize}
+      \centering
+      \item{ $\langle p,main \rangle \hookrightarrow \langle p,q_1 \rangle$}
+      \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
+      \item{ $\langle p,e \rangle \hookrightarrow \langle p,q_2 \rangle$}
+      \item{ $\langle p,q_2 \rangle \hookrightarrow \langle p,q_3 \rangle$}
+      \item{ $\langle p,q_3 \rangle \hookrightarrow \langle p,x \rangle$}
+      \item{ $\langle p,r_1 \rangle \hookrightarrow \langle p,q_4 \rangle$}
+      \item{ $\langle p,q_4 \rangle \hookrightarrow \langle p,q_5 \rangle$}
+      \item{ $\langle p,q_5 \rangle \hookrightarrow \langle p,c_2 \rangle$}
+      \item{ $\langle p,r_2 \rangle \hookrightarrow \langle p,q_6 \rangle$}
+      \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,exit \rangle$}
+      \item{ $\langle p,c_1 \rangle \hookrightarrow \langle p,e \hspace{.1cm} r_1 \rangle$}
+      \item{ $\langle p,c_2 \rangle \hookrightarrow \langle p,e \hspace{.1cm} r_2 \rangle$}
+      \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
+      \item{ $\langle p_x,r_1 \rangle \hookrightarrow \langle p,r_1 \rangle$}
+      \item{ $\langle p,x \rangle \hookrightarrow \langle p_x, \epsilon \rangle$}
+      \item{ $\langle p_x,r_2 \rangle \hookrightarrow \langle p,r_2 \rangle$}
+    \end{itemize}
+    \caption{The WPDS resulting from calling \texttt{NwaToWpdsReturns} on \figref{NwaToWpds1}}
+    \label{Fi:NwaToWpds2}
+  \end{minipage}
+  \hspace{0.1\textwidth}
+  \begin{minipage}{0.42\textwidth}
+    \centering
+    \begin{itemize}
+      \centering
+      \item{ $\langle p,q_1 \rangle \hookrightarrow \langle p,main \rangle$}
+      \item{ $\langle p,c_1 \rangle \hookrightarrow \langle p,q_1 \rangle$}
+      \item{ $\langle p,q_2 \rangle \hookrightarrow \langle p,e \rangle$}
+      \item{ $\langle p,q_3 \rangle \hookrightarrow \langle p,q_2 \rangle$}
+      \item{ $\langle p,x \rangle \hookrightarrow \langle p,q_3 \rangle$}
+      \item{ $\langle p,q_4 \rangle \hookrightarrow \langle p,r_1 \rangle$}
+      \item{ $\langle p,q_5 \rangle \hookrightarrow \langle p,q_4 \rangle$}
+      \item{ $\langle p,c_2 \rangle \hookrightarrow \langle p,q_5 \rangle$}
+      \item{ $\langle p,q_6 \rangle \hookrightarrow \langle p,r_2 \rangle$}
+      \item{ $\langle p,exit \rangle \hookrightarrow \langle p,q_6 \rangle$}
+      \item{ $\langle p,r_1 \rangle \hookrightarrow \langle p,x \hspace{.1cm} c_1 \rangle$}
+      \item{ $\langle p,r_2 \rangle \hookrightarrow \langle p,x \hspace{.1cm} c_2 \rangle$}
+      \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
+      \item{ $\langle p_e,c_1 \rangle \hookrightarrow \langle p,c_1 \rangle$}
+      \item{ $\langle p,e \rangle \hookrightarrow \langle p_e, \epsilon \rangle$}
+      \item{ $\langle p_e,c_2 \rangle \hookrightarrow \langle p,c_2 \rangle$}
+    \end{itemize}
+    \caption{The result of calling \texttt{Nwa\-To\-Backwards\-Wpds\-Returns} on \figref{NwaToWpds1}}
+    \label{Fi:NwaToWpds3}
+  \end{minipage}
+\end{figure}
