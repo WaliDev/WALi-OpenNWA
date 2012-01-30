@@ -220,11 +220,26 @@ underlying NWA to be decoupled from the weight domain used in the WPDS.  See
 \cite[\S4-\S5]{wali} for details about weight domains.
 
 There is a trivial weight domain (containing $\overline{1}$ and
-$\overline{0}$ only) implemented in the class \texttt{Reach}, defined in
+$\overline{0}$ only) implemented in the class \texttt{wali::Reach}, defined in
 \texttt{wali/Reach.hpp}. A \texttt{WeightGen} subclass that returns elements
 from this reachability domain is provided as the \texttt{ReachGen} class,
 defined in \texttt{opennwa/WeightGen.hpp}. \texttt{ReachGen} returns
 $\overline{1}$ for all transitions.
+
+In addition, we provide shortest-path weights and two variants on a
+\texttt{WeightGen} subclass for them. The shortest path weights are
+implemented in the class \texttt{wali::ShortestPathSemiring} in
+\texttt{wali/ShortestPathSemiring.hpp}; a semiring element of this class
+consists of just a single integer. The two \texttt{WeightGen} implementations
+we provide (both defined in \texttt{opennwa/WeightGen.hpp}) are
+\texttt{ShortestPathGen} and \texttt{ShortestWordGen}. Both set the weight of
+each WPDS rule to have a length 1 (note that this is different from the
+semiring $\overline{1}$ element), except that \texttt{ShortestWordGen} uses
+length 0 for rules that correspond to $\varepsilon$ transitions. Thus
+\texttt{ShortestPathGen} results in a WPDS with weights that describe the
+length of the shortest \emph{path} through the NWA, from the initial
+configurations, while \texttt{ShortestWordGen} results in a WPDS with weights
+that describe the length of the shortest \emph{word}.
 
 
 \begin{figure}[p]

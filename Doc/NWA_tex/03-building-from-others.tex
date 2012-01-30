@@ -791,15 +791,19 @@ customize the behavior of determinization:
 \label{Se:Complement}
 
 Complementing an NWA is performed by determinizing the automaton and then
-complementing the set of final states. In our implementation, an extra flag
+complementing the set of final states.
+\begin{comment}
+ In our implementation, an extra flag
 to \texttt{complement} controls whether the determinization step is to be
 performed, so it can be bypassed if you have \textsl{a priori} knowledge that
-the input NWA must already be deterministic. The result of
+the input NWA must already be deterministic.
+\end{comment}
+The result of
 complementing the NWA shown in Figure \ref{Fi:Det1} is
 shown in Figure \ref{Fi:Comp1}.
 
-Client information is copied directly
-from the determinization of the original NWA using \texttt{ClientInfo::clone()}.
+Client information is computed during determinization as described in the
+previous section, then cloned during the complement step.
 
 \begin{figure}[h]
   \centering
