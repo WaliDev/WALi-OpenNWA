@@ -1,11 +1,15 @@
+WALi and OpenNWA
+----------------
+
 Prerequsites:
-  - Boost  (old versions are OK; we actually use 1.33.1)
+  - Boost  (old versions are OK; we actually variously use 1.33.1 and 1.42)
   - SCons
   - G++ or MSVC
 
 Optional prerequsites for the 'scons tests' pseudotarget (or 'scons all'):
   - cmake
-  - internet connection
+  - internet connection (will download Google Test automatically;
+    no system-wide installation is done)
 
 Optional prerequsites for Doxygen documentation:
   - Doxgen  (we use 1.7.1) 
@@ -28,11 +32,12 @@ targets are:
   - examples  Build the contents of Examples/
 
   - tests     Build the contents of Tests/, including the NWA unit tests.
-              (The NWA unit tests build to Tests/nwa/nwa-tests (or
-              nwa-tests.exe) but are not automatically run.) CMAKE either
-              needs to be picked up by SCons by default (and it does NOT
-              pick up your $PATH) or set the $CMAKE environment variable to
-              point to the executable.
+              The NWA unit tests build to Tests/nwa/nwa-tests (or
+              nwa-tests.exe) but are not automatically run.
+
+              CMAKE either needs to be picked up by SCons by default (and it
+              does NOT look at your $PATH) or set the $CMAKE environment
+              variable to point to the executable.
 
               The NWA tests are actually reasonably complete, relative to the
               Latex documentation. TODO.txt mentions the omissions. Also
@@ -42,13 +47,18 @@ targets are:
   - all       Build everything!
 
 You can pass 'arch=x86' to SCons if you are on a 64-bit Linux machine to get
-a 32-bit build. (The 32 and 64 bit builds live next to each other, so it's
-not either-or.) Note: because of the way 'cmake' is called for the Google
+a 32-bit build. (The 32 and 64 bit builds live next to each other, so they
+can coexist.) Note: because of the way 'cmake' is called for the Google
 Test library, you probably won't be able to do this for the 'tests' or 'all'
 pseudo-targets.
 
 There is also a Visual Studio 2005 project, though the NWA unit tests aren't
 hooked up for this at all.
+
+
+WALi and OpenNWA are built to a single library, which will be copied into the
+lib/ or lib64/ directory. Addons will be built to other shared libraries in
+that directory.
 
 
 Building Documentation
@@ -60,11 +70,11 @@ Latex output to Doc/doxygen/latex. (Run 'make' in the latter directory to
 build the Latex to a PDF.)
 
 
-To build the NWA documentation, change to Doc/NWA_tex/ and run (pdf)latex on
-WALi_NWA_Doc.tex, passing '-shell-escape'. ('-shell-escape' is required by
+To build the NWA documentation, change to Doc/opennwa/ and run pdflatex on
+opennwa.tex, passing '-shell-escape'. ('-shell-escape' is required by
 the pygmentize package, used for source-highlighting the example code at the
 beginning.) If you would like to rebuild the figures (though this is not
-necessary if you do not change them), change to Doc/NWA_tex/Figures and run
+necessary if you do not change them), change to Doc/opennwa/Figures and run
 'make'. Note that a couple of the figures used in the "official" version of
 the NWA manual have been modified by hand, and regenerating them will cause
 those changes to be lost.

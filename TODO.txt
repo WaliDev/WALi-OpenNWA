@@ -13,12 +13,12 @@ NWA tests:
    actually a majority of the non-covered code that's part of the public
    interface of the NWA portion of the library.)
 
- - We don't have tests of the NWA's own prestar/poststar functions.
+ - We don't have tests of the NWA's prestar/poststar functions.
 
- - We don't say what happens if WALI_EPSILON labels a call or return edge, so
+ - We don't say what happens if EPSILON labels a call or return edge, so
    I don't have any tests for it.
 
- - We have almost no tests for WALI_WILD.
+ - We have almost no tests for WILD.
 
  - We don't have any tests for print_dot, and probably not much for print or
    read_nwa (or read_nwa_proc_set).
@@ -36,5 +36,5 @@ NWA tests:
 
  - intersect() is lacking in coverage a little.
 
- - Nothing in 'details' namespaces is tested, nor are a number of functions
-   that did not make it into the Latex documentation.
+ - Nothing in 'details' namespaces is tested directly, nor are a number of
+   functions that did not make it into the Latex documentation.
