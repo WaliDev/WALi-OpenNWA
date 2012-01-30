@@ -10,14 +10,13 @@ system (WPDS) code.
 
 \end{abstract}
 
-\tableofcontents
 
-\vspace{2\baselineskip}
-
-The WALi library is available from
-\url{http://www.cs.wisc.edu/wpis/wpds/download.php}. This document describes
-the NWA portion of version 4.0. Building instructions can be found in
-\texttt{README.txt} in the root directory of the distribution.
+The OpenNWA library is available from
+\url{http://www.cs.wisc.edu/wpis/OpenNWA/}. It is packaged with the
+\textit{W}eighted \textit{A}utomata \textit{Li}brary, WALi. WALi 4.0 is
+paired with the first public release of OpenNWA, which is what this document
+describes. Building instructions can be found in \texttt{README.txt} in the
+root directory of the OpenNWA/WALi distribution.
 
 We assume the reader is familiar with nested words and
 nested-word automata; if not, \appref{nwa-definition} provides the definition
@@ -46,6 +45,11 @@ and returns.)
 %returns. (That is, we support balanced words and nested-word prefixes, but
 %not nested-word suffixes or general nested words.)
 
+\tableofcontents
+
+\vspace{2\baselineskip}
+
+
 
 
 \clearpage
@@ -54,7 +58,7 @@ and returns.)
 \label{Se:Nested Word Automata}
 
 The core of the NWA library is in the namespace \texttt{opennwa}. It
-includes the classes \texttt{NestedWord}, \texttt{NWA}, and others.
+includes the classes \texttt{NestedWord}, \texttt{Nwa}, and others.
 
 There are a large number of non-member functions that operate on NWAs. These
 are divided into three sub-namespaces:
@@ -78,28 +82,30 @@ These types live in namespace \texttt{opennwa}:
 \begin{functionlist}
   \functionitem[\texttt{NestedWord}] Implements a single nested word. Currently the only
     operation that can be performed using one is checking whether a
-    \texttt{NestedWord} is a member of an \texttt{NWA}'s language. Defined in
+    \texttt{NestedWord} is a member of an \texttt{Nwa}'s language. Defined in
     \texttt{opennwa/NestedWord.hpp}. See \sectref{class-nested-word}.
-  \functionitem[\texttt{NWA}] Implements a nested-word automaton. Defined in
-    \texttt{opennwa/NWA.hpp} with a forward declaration in \texttt{opennwa/NWAFwd.hpp}.
+  \functionitem[\texttt{Nwa}] Implements a nested-word automaton. Defined in
+    \texttt{opennwa/Nwa.hpp} with a forward declaration in \texttt{opennwa/NwaFwd.hpp}.
     See
     \sectref{NWA-class}. (\sectref{serialization} also discusses member
     functions related to serializing an NWA.)
-  \functionitem[\texttt{NwaRefPtr}] \texttt{NwaRefPtr} is a typedef of \texttt{ref\_ptr$<$NWA$>$} (see
-    below). This is defined in \texttt{opennwa/NWAFwd.hpp}.
+  \functionitem[\texttt{NwaRefPtr}] \texttt{NwaRefPtr} is a typedef of \texttt{ref\_ptr$<$Nwa$>$} (see
+    below). This is defined in \texttt{opennwa/NwaFwd.hpp}.
   \functionitem[\texttt{State} and \texttt{Symbol}] These are both typedefs of
     \texttt{wali::Key} (see below). Both are defined in
-    \texttt{opennwa/NWAFwd.hpp}. \emph{Note:} the use of keys for both
+    \texttt{opennwa/NwaFwd.hpp}. \emph{Note:} the use of keys for both
     states and symbols means that they can be confused from a types
-    perspective, so use caution that this does not happen. 
+    perspective, so use caution that this does not happen. In addition, a
+    future version of the library may change \texttt{State} and
+    \texttt{Symbol} to be distinct types.
   \functionitem[\texttt{StateSet} and \texttt{SymbolSet}] These are typedefs of
     \texttt{std::set}s of the corresponding type. (Client code should not
     rely on this
     fact; it could change to be an \texttt{unordered\_map} or other similar
-    container.) Both are defined in \texttt{opennwa/NWAFwd.hpp}.
+    container.) Both are defined in \texttt{opennwa/NwaFwd.hpp}.
   \functionitem[\texttt{ClientInfo}] This class holds client-specific information that
     is associated with a state. Client code can subclass \texttt{ClientInfo} and use
-    functions of the \texttt{NWA} class to attach instances to states. To use,
+    functions of the \texttt{Nwa} class to attach instances to states. To use,
     include \texttt{opennwa/ClientInfo.hpp}. See \sectref{client-info}.
   \functionitem[\texttt{WeightGen}] This abstract class describes how to assign weights
     to transitions of the NWA, and is used both when converting an NWA to a
@@ -124,7 +130,7 @@ NWAs. These are partitioned into the following namespaces:
         this source state.'') See \sectref{query-transitions}.
       \item Determining whether two NWAs have any states in
         common. See \sectref{query-automaton}.
-      \item Determining whether an \texttt{NWA} is deterministic. See
+      \item Determining whether an \texttt{Nwa} is deterministic. See
         \sectref{query-automaton}.
       \item Determining whether a \texttt{NestedWord} is a member of the
         language of an NWA. See \sectref{query-language}.
@@ -132,7 +138,7 @@ NWAs. These are partitioned into the following namespaces:
         \sectref{query-language}.
       \item Determining whether the languages of two NWAs are equal, or if
         one is a subset of the other. See \sectref{query-language}.
-      \item prestar and poststar operations on an NWA. See
+      \item Prestar and poststar operations on an NWA. See
         \sectref{query-language}.
     \end{itemize}
     
@@ -141,8 +147,8 @@ NWAs. These are partitioned into the following namespaces:
     automata-theoretic operations such as intersection, union, concatenation,
     Kleene star, and reversal. See \sectref{Building NWAs}.
   \functionitem[\texttt{opennwa::nwa\_pds}] This namespace provides functions for
-    converting between NWAs and PDSs, and related functions. (Note that
-    construction of an NWA from a PDS is in this namespace, not in
+    converting between NWAs and WPDSs, and related functions. (Note that
+    construction of an NWA from a WPDS is in this namespace, not in
     \texttt{construct}.) See \sectref{Conversions}.
   \functionitem[\texttt{opennwa}] This namespace, in addition to the items already
     discussed, provides an experimental parser for a serialization format of
@@ -150,7 +156,7 @@ NWAs. These are partitioned into the following namespaces:
 \end{functionlist}
 
 
-\subsection{Generic WALi}
+\subsection{Supporting features from WALi}
 
 The NWA library uses these portions of the standard WALi library. Unless
 otherwise specified, they are in namespace \texttt{wali}. See \cite{wali}.
@@ -160,7 +166,12 @@ otherwise specified, they are in namespace \texttt{wali}. See \cite{wali}.
     smart-pointer template. (``Intrusive'' means that the pointed-to type
     must be modified to include a \texttt{count} field used by the
     pointer. This is most conveniently done by subclassing
-    \texttt{wali::Countable}.) Defined in \texttt{wali/ref\_ptr.hpp}.
+    \texttt{wali::Countable}.) Defined in
+    \texttt{wali/ref\_ptr.hpp}. However, a \texttt{using wali::ref\_ptr}
+    declaration brings this type into the \texttt{opennwa} namespace as well;
+    we suggest preferring this version. In addition, there are typedefs of
+    both \texttt{ref\_ptr$<$Nwa$>$} and \texttt{ref\_ptr$<$NestedWord$>$},
+    and we suggest preferring those names.
 
   \functionitem[\texttt{Key}] A \texttt{Key} is a unique identifier naming states and symbols in an
     NWA or NestedWord. It is actually a typedef of an integer, though client
@@ -171,7 +182,7 @@ otherwise specified, they are in namespace \texttt{wali}. See \cite{wali}.
     the input has not been seen before, it returns a new key; if it has, then
     it returns the same key as before. (One can think of this as translating
     whatever unique identifier is known by the client code to the
-    \texttt{Key} needed by WALi.) Overloads of this function are provided for
+    \texttt{Key} needed by OpenNWA and WALi.) Overloads of this function are provided for
     the following types:
     \begin{itemize}
       \item \texttt{std::string const \&}
@@ -216,7 +227,7 @@ otherwise specified, they are in namespace \texttt{wali}. See \cite{wali}.
 \label{Se:ExampleUse}
 The following is an illustration of basic operations of the library. The full
 code is available in the file \texttt{Doc/NWA\_tex/Example/example.cpp} in the
-WALi distribution.
+OpenNWA distribution.
 
 \inputminted{c++}{Example/example-abbrev.cpp}
 

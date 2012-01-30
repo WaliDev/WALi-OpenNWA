@@ -1,4 +1,4 @@
-\section{The \texttt{NWA} class}
+\section{The \texttt{Nwa} class}
 \label{Se:NWA-class}
 
 \subsection{Construction, copying, assignment, and clearing}
@@ -12,14 +12,14 @@ transitions, and set the status of certain states as initial or final.
 
 The following functions are basic NWA operations:
 \begin{functionlist}
-  \functionDef{}{Nwa::NWA}{}{}
+  \functionDef{}{Nwa::Nwa}{}{}
     Constructs an empty NWA.
 
-  \functionDefFirst{}{Nwa::NWA}{Nwa const \& other}{}
+  \functionDefFirst{}{Nwa::Nwa}{Nwa const \& other}{}
     Copies \texttt{other}; the
     automata will not share structure. Any client information that is present is cloned.
 
-  \functionDefFirst{NWA\&}{Nwa::operator=}{Nwa const \& other}{}
+  \functionDefFirst{Nwa\&}{Nwa::operator=}{Nwa const \& other}{}
     Assigns \texttt{other} to \texttt{this};
     the automata will not share structure. Client information is cloned.
 
@@ -43,7 +43,7 @@ automaton. It also tracks the set of initial and accepting states.
 Counting each kind of transition separately, this gives 7 kinds of
 ``entities'' that client code may need to manipulate.
 
-For each kind of entity, there are \texttt{NWA} member functions to add and
+For each kind of entity, there are \texttt{Nwa} member functions to add and
 remove a single entity, check whether a particular entity is in the
 automaton, count the number of entities of a particular type, remove all
 entities of a particular type, and retrieve the set of entities in the
@@ -66,15 +66,16 @@ reasonable to build an NWA by just adding initial states, final states, and
 transitions.)
 
 
-The system supports two meta-symbols: \texttt{wali::WALI\_EPSILON}
-(\texttt{$\epsilon$}) and \texttt{wali::WALI\_WILD} (\texttt{\wild}).
-\texttt{WALI\_EPSILON} is the standard $\epsilon$ from automata theory; it
+The system supports two meta-symbols: \texttt{opennwa::EPSILON}
+(\texttt{$\epsilon$}) and \texttt{opennwa::WILD} (\texttt{\wild}).
+\texttt{EPSILON} is the standard $\epsilon$ from automata theory; it
 denotes that a transition can be traversed without matching
 and consuming an input symbol.  Epsilon symbols cannot label call or return
-transitions. \texttt{WALI\_WILD} is the `any' symbol; it matches any single
+transitions. \texttt{WILD} is the `any' symbol; it matches any single
 symbol.  Because the NWA alphabet is not fixed, the actual symbols
-that \texttt{WALI\_WILD} stands for is fluid.  \textsl{Note:}
-\texttt{WALI\_EPSILON} and \texttt{WALI\_WILD} are not explicit
+that \texttt{WILD} stands for is fluid. (This is useful if you do not know
+all possible symbols at the time you construct the NWA.)  \textsl{Note:}
+\texttt{EPSILON} and \texttt{WILD} are not explicit
 elements of $\Sigma$; see \tableref{simple-functions}, footnote 5.
 
 
@@ -87,7 +88,7 @@ information. To utilize this functionality, client code must subclass
 \texttt{ClientInfo} and override \texttt{ClientInfo * clone() const}.
 
 Once done, client information can be attached or retrieved using the
-following two functions (both members of \texttt{NWA}):
+following two functions (both members of \texttt{Nwa}):
 \begin{functionlist}
   \functionDefFirst{ref\_ptr<ClientInfo>}{Nwa::getClientInfo}{Key st}{const}
     Returns the client-specific information associated with
@@ -100,14 +101,15 @@ following two functions (both members of \texttt{NWA}):
 Client information is tracked through the use of \texttt{ref\_ptr}s, so the
 programmer must consider the standard aliasing and lifetime considerations
 imposed by using smart pointers. (\texttt{ClientInfo} supplies the
-\texttt{count} field needed by \texttt{ref\_ptr}.) Operations such as copying
-an NWA that clone client information can also result in changes in aliasing:
+\texttt{count} field needed by \texttt{ref\_ptr}.) Operations that clone
+client information, such as copying
+an NWA, can also result in changes in aliasing:
 if the client information for states $p$ and $q$ are aliased in NWA $N$ that
 is then copied to NWA $N'$, the ``copies'' of $p$ and $q$ in $N'$ will have
 separate copies of the client information.
 
 \vspace{\baselineskip}
-In addition, you may wish to subclass \texttt{NWA} itself. There are several
+In addition, you may wish to subclass \texttt{Nwa} itself. There are several
 virtual helper functions that are called during intersection and
 determinization to compute the client info for the resulting automaton; these
 can be overriden to customize the behavior. (This design is an instance

@@ -51,7 +51,7 @@ There is a member function to produce each type of output:
 \label{Se:parser}
 
 The NWA library contains a semi-experimental parser for descriptions of
-NWAs. The format is described below, and matches the result of calling
+NWAs. The format is described below, and matches the output of
 \texttt{Nwa::print(std::ostream \&)}, provided that the result of
 calling \texttt{key2str} on the state and symbol keys produces strings
 that match the description of \nonterm{actual-names} in this grammar.
@@ -63,7 +63,7 @@ with assertion violations. In a future version of the library, we will
 report errors more gracefully, almost certainly through exceptions.
 
 There are two functions that parse NWA descriptions, both declared in
-\texttt{opennwa/NWAParser.hpp} in namespace \texttt{opennwa}:
+\texttt{opennwa/NwaParser.hpp} in namespace \texttt{opennwa}:
 \begin{functionlist}
   \functionDef{NwaRefPtr}{read\_nwa}{std::istream \& is, std::string * name = NULL}{} 
   Reads a description of a single NWA from \texttt{is} and

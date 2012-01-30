@@ -3,7 +3,7 @@
 \label{Se:Conversions}
 
 
-It is possible to convert a WALi WPDS to an NWA and vice versa.
+It is possible to convert an NWA into a WALi WPDS and vice versa.
 However, the construction of an NWA from a WPDS is not the inverse
 of constructing a WPDS from an NWA, i.e., one cannot perform the two
 conversions in sequence and obtain the identity conversion.
@@ -60,11 +60,12 @@ c\rangle\hookrightarrow\langle p, e r\rangle$).
 
 The following functions are in the namespace \texttt{opennwa::nwa\_pds}
 and, except for \texttt{plusWpds()}, are declared in the header
-\texttt{opennwa/nwa\_pds/conversions.hpp}:
+\texttt{opennwa/nwa\_pds/conversions.hpp}. The \texttt{WPDS} type is
+\texttt{wali::wpds::WPDS}, and is declared in \texttt{wali/wpds/WPDS.hpp}.
 
 
 \begin{functionlist}
-  \functionDefEarly{void}{WpdsToNwa}{NWA \& out, const WPDS\& pds}{}
+  \functionDefEarly{void}{WpdsToNwa}{Nwa \& out, const WPDS\& pds}{}
   \functionDef{NwaRefPtr}{WpdsToNwa}{const WPDS\& pds}{}
     Converts \texttt{pds} to an NWA, either storing the result in
     \texttt{nwa} or returning it.

@@ -20,8 +20,8 @@ expect.
 \begin{sidewaystable}\sffamily\footnotesize
 \begin{threeparttable}
   \captionex{Accessors and mutators of NWA components}{All functions are
-    members of the \texttt{NWA} class, and thus declared in
-    \texttt{opennwa/NWA.hpp}.
+    members of the \texttt{Nwa} class, and thus declared in
+    \texttt{opennwa/Nwa.hpp}.
 }
 \label{Ta:simple-functions}
 \begin{tabular}{p{0.55in}p{1.40in}p{1.45in}p{1.2in}p{1.12in}p{1.05in}p{1.35in}}
@@ -75,7 +75,7 @@ transitions      &  addReturnTrans(\phantom{.}...\tnote{6}\phantom{a})
   \item[4] Removing a state or a symbol also removes all transitions
     involving it. (Hence clearing all states or clearing all symbols also
     clears all transitions.)
-  \item[5] \texttt{WALI\_EPSILON} and \texttt{WALI\_WILD} are not explicit
+  \item[5] \texttt{EPSILON} and \texttt{WILD} are not explicit
     members of the symbol set. This has the following consequences (for
     \texttt{s} as epsilon or wild): \texttt{addSymbol(s)} and
     \texttt{removeSymbol(s)} are both no-ops and return \texttt{false},

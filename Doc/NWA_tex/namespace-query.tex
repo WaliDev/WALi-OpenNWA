@@ -14,7 +14,7 @@ Following that, we discuss queries about the
 \subsection{Querying information about an automaton's transitions}
 \label{Se:query-transitions}
 The \texttt{opennwa::query} namespace provides a large number of functions
-for retrieving information about an \texttt{NWA}'s transitions. The questions
+for retrieving information about an \texttt{Nwa}'s transitions. The questions
 answered by these functions are of the form, e.g., ``what are all symbols that
 appear on a return transition where the call predecessor state is \texttt{s1}
 and the return site state is \texttt{s1}?''
@@ -65,7 +65,7 @@ of NWAs themselves. One computes whether an NWA is deterministic, and
 the other computes whether two automata have any states in common.
 
 These functions are declared in the header
-\texttt{opennwa/query/automaton.hpp} (and, of course, defined in the
+\texttt{opennwa/query/automaton.hpp} (and, of course, are defined in the
 namespace \texttt{opennwa::query}).
 
 \begin{functionlist}
@@ -134,7 +134,7 @@ located in namespace \texttt{opennwa::query} and are declared in
 There are also functions for performing a poststar and prestar
 query on an NWA. These work by converting the NWA to a WPDS (see
 \sectref{Conversions} and, in particular, \sectref{NWAtoPDS}) using
-the function \texttt{NWAtoPDScalls} then running the query on the PDS.
+the function \texttt{NwaToWpdsCalls} then running the query on the PDS.
 
 Conceptually, the transition system queried by prestar and poststar is the space of
 configurations of the NWA. A configuration is a pair $\langle q, s\rangle$,
