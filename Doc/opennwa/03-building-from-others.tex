@@ -11,7 +11,7 @@ returns a \texttt{NwaRefPtr} to the result.  In the other, the operation takes
 a reference to an NWA, clears it, and constructs the result in-place. The
 first form is usually more convenient to use, and creates a mini language for
 set expressions; the second form makes it possible to store the result of an
-operation in a subclass of \texttt{Nwa}.
+operation in a subclass of \texttt{Nwa}, or an existing \texttt{Nwa} object.
 
 Each of these functions is in the namespace \texttt{opennwa::construct}:
 
@@ -293,10 +293,10 @@ to be overridden to customize behavior:
                       {Nwa const \& first ,State call1, State entry1,\\
                        Nwa const \& second, State call2, State entry2,\\
                        Symbol resSym, State resSt )}} \nopagebreak
-  \functionDefNoCloseParen{void}{intersectClientInfoReturn}{%
+  \functionDefNoCloseParen{\small void}{\small intersectClientInfoReturn}{%
                   \parbox[t]{4in}
-                      {Nwa const \& first, State exit1, State call1, State ret1,\\
-                       Nwa const \& second, State exit2, State call2, State ret2,\\
+                      {\small Nwa const \& first, State exit1, State call1,State ret1,\\
+                       Nwa const \& second, State exit2,State call2, State ret2,\\
                        Symbol resSym, State resSt )}}
     Called after a transition of the corresponding type is added to the
     automaton. It is intended to be used to

@@ -71,12 +71,12 @@ are divided into three sub-namespaces:
 \texttt{opennwa::nwa\_pds}. There is also an experimental parser in
 \texttt{opennwa}.
 
-Finally, there are some operations and classes provided by WALi that the NWA
-portion of the library uses. This mostly consists of the key-handling code,
-but can also include the WPDS portions of the library.
+Finally, there are some operations and classes provided by WALi that OpenNWA
+uses. This mostly consists of the key-handling code,
+but also includes the WPDS portions of WALi.
 
 Throughout this document, include paths are relative to the \texttt{Source}
-directory from the WALi distribution.
+directory from the WALi/OpenNWA distribution.
 
 Section \ref{Se:ExampleUse} illustrates a simple sample use of the library.
 
@@ -94,8 +94,18 @@ These types live in namespace \texttt{opennwa}:
     See
     \sectref{NWA-class}. (\sectref{serialization} also discusses member
     functions related to serializing an NWA.)
-  \functionitem[\texttt{NwaRefPtr}] \texttt{NwaRefPtr} is a typedef of \texttt{ref\_ptr$<$Nwa$>$} (see
-    below). This is defined in \texttt{opennwa/NwaFwd.hpp}.
+  \functionitem[\texttt{ref\_ptr$<$T$>$}] This is a reference-counted, intrusive
+    smart-pointer template. (``Intrusive'' means that the pointed-to type
+    must be modified to include a \texttt{count} field used by the
+    pointer. This is most conveniently done by subclassing
+    \texttt{wali::Countable}.) Defined in
+    \texttt{wali/ref\_ptr.hpp}. However, a \texttt{using wali::ref\_ptr}
+    declaration brings this type into the \texttt{opennwa} namespace as well;
+    we suggest preferring the latter version. In addition, there are typedefs of
+    both \texttt{ref\_ptr$<$Nwa$>$} and \texttt{ref\_ptr$<$NestedWord$>$},
+    and we suggest preferring those names.
+  \functionitem[\texttt{NwaRefPtr}] \texttt{NwaRefPtr} is a typedef of \texttt{ref\_ptr$<$Nwa$>$}.
+    Defined in \texttt{opennwa/NwaFwd.hpp}.
   \functionitem[\texttt{State} and \texttt{Symbol}] These are both typedefs of
     \texttt{wali::Key} (see below). Both are defined in
     \texttt{opennwa/NwaFwd.hpp}. \emph{Note:} the use of keys for both
@@ -126,7 +136,7 @@ NWAs. These are partitioned into the following namespaces:
 
 \begin{functionlist}
   \functionitem[\texttt{opennwa::query}] This namespace provides functions for
-    querying an automaton. The kinds of functions in this namespace are:
+    querying an automaton. The functions in this namespace are:
     \begin{itemize}
       \item Functions that query transitions of
         the NWA, returning information about one of the states or the symbol
@@ -167,17 +177,6 @@ The NWA library uses these portions of the standard WALi library. Unless
 otherwise specified, they are in namespace \texttt{wali}. See \cite{wali}.
 
 \begin{functionlist}
-  \functionitem[\texttt{ref\_ptr$<$T$>$}] This is a reference-counted, intrusive
-    smart-pointer template. (``Intrusive'' means that the pointed-to type
-    must be modified to include a \texttt{count} field used by the
-    pointer. This is most conveniently done by subclassing
-    \texttt{wali::Countable}.) Defined in
-    \texttt{wali/ref\_ptr.hpp}. However, a \texttt{using wali::ref\_ptr}
-    declaration brings this type into the \texttt{opennwa} namespace as well;
-    we suggest preferring this version. In addition, there are typedefs of
-    both \texttt{ref\_ptr$<$Nwa$>$} and \texttt{ref\_ptr$<$NestedWord$>$},
-    and we suggest preferring those names.
-
   \functionitem[\texttt{Key}] A \texttt{Key} is a unique identifier naming states and symbols in an
     NWA or NestedWord. It is actually a typedef of an integer, though client
     code should not rely on this precise type. Declared in

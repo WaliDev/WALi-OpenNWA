@@ -38,7 +38,7 @@ The following functions are basic NWA operations:
 
 \subsection{Simple manipulations}
 
-An NWA object tracks the set of states, symbols, and transitions in the
+An \texttt{Nwa} object tracks the set of states, symbols, and transitions in the
 automaton. It also tracks the set of initial and accepting states.
 Counting each kind of transition separately, this gives 7 kinds of
 ``entities'' that client code may need to manipulate.
@@ -90,11 +90,11 @@ information. To utilize this functionality, client code must subclass
 Once done, client information can be attached or retrieved using the
 following two functions (both members of \texttt{Nwa}):
 \begin{functionlist}
-  \functionDefFirst{ref\_ptr<ClientInfo>}{Nwa::getClientInfo}{Key st}{const}
+  \functionDefFirst{ref\_ptr<ClientInfo>}{Nwa::getClientInfo}{State st}{const}
     Returns the client-specific information associated with
     the given state, \texttt{st}.
 
-  \functionDefFirst{void}{Nwa::setClientInfo}{Key st, ref\_ptr<ClientInfo> ci}{}
+  \functionDefFirst{void}{Nwa::setClientInfo}{State st, ref\_ptr<ClientInfo> ci}{}
     Sets the client-specific information, \texttt{ci},
     associated with the given state, \texttt{st}. \\
 \end{functionlist}
