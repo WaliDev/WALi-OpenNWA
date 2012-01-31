@@ -22,6 +22,8 @@ walidomains_files = Split("""
 """)
 
 Env = BaseEnv.Clone()
+# Disable warnings because of BuDDy
+Env["WARNING_FLAGS"]="-Werror"
 Env.Append(CPPPATH=[os.path.join(WaliDir , 'AddOns', 'Domains' , 'Source')])
 Env.Append(CPPPATH=[os.path.join(WaliDir , 'AddOns', 'Domains' , 'ThirdParty', 'include')])
 
