@@ -17,12 +17,12 @@ namespace opennwa
 {
   using wali::ref_ptr;
   
-    /// Globally (within a process) unique ID of a state
-    ///
-    typedef wali::Key State;
-    /// Globally (within a process) unique ID of a symbol
-    ///
-    typedef wali::Key Symbol;
+  /// Globally (within a process) unique ID of a state
+  ///
+  typedef wali::Key State;
+  /// Globally (within a process) unique ID of a symbol
+  ///
+  typedef wali::Key Symbol;
 
   const Symbol EPSILON = wali::WALI_EPSILON;
   const Symbol WILD = wali::WALI_WILD;
@@ -30,34 +30,34 @@ namespace opennwa
   using wali::getKey;
 
 
-    // Forward decl
-    class Nwa;
+  // Forward decl
+  class Nwa;
 
-    /// A reference-counted smart pointer to an NWA
-    ///
-    typedef ref_ptr<Nwa> NwaRefPtr;
+  /// A reference-counted smart pointer to an NWA
+  ///
+  typedef ref_ptr<Nwa> NwaRefPtr;
 
-    // Forward decl
-    class NestedWord;
-    typedef ref_ptr<NestedWord> NestedWordRefPtr;
+  // Forward decl
+  class NestedWord;
+  typedef ref_ptr<NestedWord> NestedWordRefPtr;
 
-    /// A set of States.
-    ///
-    /// (Do not depend on the details of std::set; the type could
-    /// change to an unordered_set or other type with a similar
-    /// interface in future versions.)
-    typedef std::set<State> StateSet;
-    /// A set of Symbols
-    ///
-    /// (Do not depend on the details of std::set; the type could
-    /// change to an unordered_set or other type with a similar
-    /// interface in future versions.)
-    typedef std::set<Symbol> SymbolSet;
+  /// A set of States.
+  ///
+  /// (Do not depend on the details of std::set; the type could
+  /// change to an unordered_set or other type with a similar
+  /// interface in future versions.)
+  typedef std::set<State> StateSet;
+  /// A set of Symbols
+  ///
+  /// (Do not depend on the details of std::set; the type could
+  /// change to an unordered_set or other type with a similar
+  /// interface in future versions.)
+  typedef std::set<Symbol> SymbolSet;
 
-    // Forward decl
-    class ClientInfo;
+  // Forward decl
+  class ClientInfo;
 
-    typedef ref_ptr<ClientInfo> ClientInfoRefPtr;
+  typedef ref_ptr<ClientInfo> ClientInfoRefPtr;
 }
 
 // Yo, Emacs!

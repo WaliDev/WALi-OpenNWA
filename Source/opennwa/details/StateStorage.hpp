@@ -21,8 +21,8 @@
 
 namespace opennwa
 {
-    namespace details
-    {
+  namespace details
+  {
       
     /**
      *
@@ -32,31 +32,31 @@ namespace opennwa
     
     class StateStorage : public wali::Printable
     {
-      public:
-        typedef ClientInfo Client;
-        typedef StateSet::const_iterator const_iterator;   
-        typedef StateSet::iterator iterator; 
+    public:
+      typedef ClientInfo Client;
+      typedef StateSet::const_iterator const_iterator;   
+      typedef StateSet::iterator iterator; 
 
-        typedef ref_ptr<Client> ClientInfoRefPtr;
+      typedef ref_ptr<Client> ClientInfoRefPtr;
 
 
-        // The following macro fakes static data declarations with
-        // initializers in a template class to work around C++ being
-        // dumb. Static data in a template class is almost useless
-        // because you have to explicitly define it for every
-        // instantiation. Instead, make a static member function that
-        // returns the value. (In this case, it's stored as a
-        // function-static variable, but this is somewhat irrelevant.
+      // The following macro fakes static data declarations with
+      // initializers in a template class to work around C++ being
+      // dumb. Static data in a template class is almost useless
+      // because you have to explicitly define it for every
+      // instantiation. Instead, make a static member function that
+      // returns the value. (In this case, it's stored as a
+      // function-static variable, but this is somewhat irrelevant.
 #define DEFINE_FAKE_STATIC_DATA(name, value)    \
-        static std::string const & name() {  \
-          static std::string ret = value;    \
-          return ret;                        \
-        }
+      static std::string const & name() {       \
+        static std::string ret = value;         \
+        return ret;                             \
+      }
 
-        DEFINE_FAKE_STATIC_DATA(XMLFinalAttr, "final")
-        DEFINE_FAKE_STATIC_DATA(XMLInitialAttr, "initial")
-        DEFINE_FAKE_STATIC_DATA(XMLNameAttr, "name")
-        DEFINE_FAKE_STATIC_DATA(XMLStateTag, "State")
+      DEFINE_FAKE_STATIC_DATA(XMLFinalAttr, "final")
+      DEFINE_FAKE_STATIC_DATA(XMLInitialAttr, "initial")
+      DEFINE_FAKE_STATIC_DATA(XMLNameAttr, "name")
+      DEFINE_FAKE_STATIC_DATA(XMLStateTag, "State")
 
 #undef DEFINE_FAKE_STATIC_DATA
 

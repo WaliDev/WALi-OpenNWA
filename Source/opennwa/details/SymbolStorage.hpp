@@ -18,30 +18,30 @@
 
 namespace opennwa
 {
-    namespace details
-    {
+  namespace details
+  {
       
     class SymbolStorage : public wali::Printable
     { 
-      public:
-        typedef Symbol Sym;
-        typedef std::set<Sym>::const_iterator const_iterator;
+    public:
+      typedef Symbol Sym;
+      typedef std::set<Sym>::const_iterator const_iterator;
 
-        static std::string const & XMLSymbolTag() {
-          static std::string ret = "Symbol";
-          return ret;
-        }
+      static std::string const & XMLSymbolTag() {
+        static std::string ret = "Symbol";
+        return ret;
+      }
 
-        static std::string const & XMLNameAttr() {
-          static std::string ret = "name";
-          return ret;
-        }
+      static std::string const & XMLNameAttr() {
+        static std::string ret = "name";
+        return ret;
+      }
 
       //
       // Methods
       //
 
-      public:
+    public:
       //Constructors and Destructor
       SymbolStorage( );
       SymbolStorage( const SymbolStorage & other );
@@ -160,7 +160,7 @@ namespace opennwa
        */
       bool operator==( const SymbolStorage & other ) const;
 
-       /**
+      /**
        * 
        * @brief provides access to the symbols in the collection 
        *
@@ -193,8 +193,8 @@ namespace opennwa
        */
       size_t sizeSymbols( ) const;
 
-      private:
-        std::set<Sym> symbols;
+    private:
+      std::set<Sym> symbols;
     };
 
     //Accessors
@@ -290,15 +290,15 @@ namespace opennwa
      */
     class Label
     {
-      public:
-        typedef Symbol Sym;
-        typedef std::set<Sym>::const_iterator const_iterator;
+    public:
+      typedef Symbol Sym;
+      typedef std::set<Sym>::const_iterator const_iterator;
        
       //
       // Methods
       //
 
-      public:
+    public:
       //Constructors and Destructor
       //Note: The default starting state for a label is to represent the 
       //absence of symbols.  If the representation of wild is desired, then makeWild() 
@@ -505,7 +505,7 @@ namespace opennwa
       // Variables
       //
       
-      protected:
+    protected:
       
       std::set<Sym> syms;
       bool neg;
@@ -602,4 +602,11 @@ namespace opennwa
 
   }
 }
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
+
 #endif

@@ -7,23 +7,23 @@
 
 namespace opennwa
 {
-    namespace nwa_pds
-    {
+  namespace nwa_pds
+  {
 
-      /**
-       * 
-       * @brief constructs the WPDS which is the result of the explicit NWA plus WPDS 
-       *        construction from Advanced Querying for Property Checking
-       *
-       * This method constructs the WPDS which allows WPDS reachability to be used to 
-       * perform property checking using this NWA and the given WPDS.
-       *
-       * @param - base: the WPDS that forms the basis for the constructed WPDS
-       * @param - nwa: the NWA to process
-       * @return the WPDS which can be used to perform property checking using PDS 
-       *          reachability
-       */
-      wali::wpds::WPDS plusWpds( Nwa const & nwa, const wali::wpds::WPDS & base ); 
+    /**
+     * 
+     * @brief constructs the WPDS which is the result of the explicit NWA plus WPDS 
+     *        construction from Advanced Querying for Property Checking
+     *
+     * This method constructs the WPDS which allows WPDS reachability to be used to 
+     * perform property checking using this NWA and the given WPDS.
+     *
+     * @param - base: the WPDS that forms the basis for the constructed WPDS
+     * @param - nwa: the NWA to process
+     * @return the WPDS which can be used to perform property checking using PDS 
+     *          reachability
+     */
+    wali::wpds::WPDS plusWpds( Nwa const & nwa, const wali::wpds::WPDS & base ); 
 
 
   }

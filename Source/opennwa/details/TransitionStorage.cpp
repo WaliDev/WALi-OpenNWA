@@ -4,8 +4,8 @@ using wali::printKey;
 
 namespace opennwa
 {
-    namespace details
-    {
+  namespace details
+  {
     
     //
     // Methods
@@ -74,14 +74,14 @@ namespace opennwa
       }
       //Q: does this count as a symbol we would like to have?
       /*const Info::Returns pred = T_info.predTrans(fromSt);
-      for( Info::ReturnIterator it = pred.begin(); it != pred.end(); it++ )
-      {
+        for( Info::ReturnIterator it = pred.begin(); it != pred.end(); it++ )
+        {
         if( toSt == getReturnSite(*it) )
         {
-          sym = getReturnSym(*it);
-          return true;
+        sym = getReturnSym(*it);
+        return true;
         }
-      }*/
+        }*/
       
       return false;
     }
@@ -126,13 +126,13 @@ namespace opennwa
       }
       //Q: does this count as a symbol we would like to have?
       /*const Info::Returns pred = T_info.predTrans(fromSt);
-      for( Info::ReturnIterator it = pred.begin(); it != pred.end(); it++ )
-      {
+        for( Info::ReturnIterator it = pred.begin(); it != pred.end(); it++ )
+        {
         if( toSt == getReturnSite(*it) && sym == getReturnSym(*it) )
         {
-          return true;
+        return true;
         }
-      }*/
+        }*/
       
       return false;
     }
@@ -558,21 +558,21 @@ namespace opennwa
     {   
       //Add call transitions.
       for(CallIterator it = addTransSet.beginCall(); 
-            it != addTransSet.endCall(); it ++ )
+          it != addTransSet.endCall(); it ++ )
       {
         addCall(*it);
       }
 
       //Add internal transitions.
       for(InternalIterator it = addTransSet.beginInternal(); 
-            it != addTransSet.endInternal(); it ++ )
+          it != addTransSet.endInternal(); it ++ )
       {
         addInternal(*it);
       }
 
       //Add return transitions.
       for(ReturnIterator it = addTransSet.beginReturn(); 
-            it != addTransSet.endReturn(); it ++ )
+          it != addTransSet.endReturn(); it ++ )
       {
         addReturn(*it);
       }
@@ -878,8 +878,8 @@ namespace opennwa
     std::ostream & TransitionStorage::print_dot( std::ostream & o) const
     {
 #if 0
-        // TODO: make this work. Or not. -Evan 3/4/11
-        // it won't compile. Was never instantiated in templated version
+      // TODO: make this work. Or not. -Evan 3/4/11
+      // it won't compile. Was never instantiated in templated version
       //Print call transitions.
       o << "//Delta_c: \n";
       for (CallIterator cit = callTrans.begin(); cit != callTrans.end(); cit++)
@@ -1409,7 +1409,7 @@ namespace opennwa
       return (outgoing.size() > 0) || (incoming.size() > 0) || (predgoing.size() > 0);
     }
 
-   /** 
+    /** 
      *
      * @brief removes all transitions with the given symbol 
      *
@@ -1634,7 +1634,7 @@ namespace opennwa
       for( ReturnIterator rit = outgoing.begin(); rit != outgoing.end(); rit++ )
       {
         if( (getCallSite(*rit) == pred) && (getReturnSym(*rit) == sym) )
-            return true;      
+          return true;      
       }     
       return false;
     }   
@@ -1665,4 +1665,11 @@ namespace opennwa
 
   }
 }
+
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
 

@@ -21,8 +21,8 @@
 
 namespace opennwa
 {
-    namespace details
-    {
+  namespace details
+  {
     
     /**
      *
@@ -31,63 +31,63 @@ namespace opennwa
      */
     class TransitionStorage : public wali::Printable
     {
-      public:    
-        typedef std::set<State> States;
+    public:    
+      typedef std::set<State> States;
 
-        DEPRECATE("Use (captial-S) StateIterator, not that you should be using this one anyway")
-        typedef States::const_iterator stateIterator;
-        typedef States::const_iterator StateIterator;
+      DEPRECATE("Use (captial-S) StateIterator, not that you should be using this one anyway")
+      typedef States::const_iterator stateIterator;
+      typedef States::const_iterator StateIterator;
 
-        typedef TransitionInfo::Call Call;
-        typedef TransitionInfo::Internal Internal;
-        typedef TransitionInfo::Return Return;
+      typedef TransitionInfo::Call Call;
+      typedef TransitionInfo::Internal Internal;
+      typedef TransitionInfo::Return Return;
 
-        typedef TransitionInfo::Calls Calls;
-        typedef TransitionInfo::Internals Internals;
-        typedef TransitionInfo::Returns Returns;
+      typedef TransitionInfo::Calls Calls;
+      typedef TransitionInfo::Internals Internals;
+      typedef TransitionInfo::Returns Returns;
 
-        DEPRECATE("Use capitalized version (CallIterator) instead. (Not that you should be using it from TransitionStorage in the first place.)")
-        typedef Calls::const_iterator callIterator;
-        DEPRECATE("Use capitalized version (InternalIterator) instead. (Not that you should be using it from TransitionStorage in the first place.)")
-        typedef Internals::const_iterator internalIterator;
-        DEPRECATE("Use capitalized version (ReturnIterator) instead. (Not that you should be using it from TransitionStorage in the first place.)")
-        typedef Returns::const_iterator returnIterator;
+      DEPRECATE("Use capitalized version (CallIterator) instead. (Not that you should be using it from TransitionStorage in the first place.)")
+      typedef Calls::const_iterator callIterator;
+      DEPRECATE("Use capitalized version (InternalIterator) instead. (Not that you should be using it from TransitionStorage in the first place.)")
+      typedef Internals::const_iterator internalIterator;
+      DEPRECATE("Use capitalized version (ReturnIterator) instead. (Not that you should be using it from TransitionStorage in the first place.)")
+      typedef Returns::const_iterator returnIterator;
 
-        typedef Calls::const_iterator CallIterator;
-        typedef Internals::const_iterator InternalIterator;
-        typedef Returns::const_iterator ReturnIterator;
+      typedef Calls::const_iterator CallIterator;
+      typedef Internals::const_iterator InternalIterator;
+      typedef Returns::const_iterator ReturnIterator;
 
-        // The following macro fakes static data declarations with
-        // initializers in a template class to work around C++ being
-        // dumb. Static data in a template class is almost useless
-        // because you have to explicitly define it for every
-        // instantiation. Instead, make a static member function that
-        // returns the value. (In this case, it's stored as a
-        // function-static variable, but this is somewhat irrelevant.
+      // The following macro fakes static data declarations with
+      // initializers in a template class to work around C++ being
+      // dumb. Static data in a template class is almost useless
+      // because you have to explicitly define it for every
+      // instantiation. Instead, make a static member function that
+      // returns the value. (In this case, it's stored as a
+      // function-static variable, but this is somewhat irrelevant.
 #define DEFINE_FAKE_STATIC_DATA(name, value)    \
-        static std::string const & name() {  \
-          static std::string ret = value;    \
-          return ret;                        \
-        }
+      static std::string const & name() {       \
+        static std::string ret = value;         \
+        return ret;                             \
+      }
 
-        DEFINE_FAKE_STATIC_DATA(XMLFromAttr, "from");
-        DEFINE_FAKE_STATIC_DATA(XMLPredAttr, "call");
-        DEFINE_FAKE_STATIC_DATA(XMLSymbolAttr, "symbol");
-        DEFINE_FAKE_STATIC_DATA(XMLToAttr, "to");
+      DEFINE_FAKE_STATIC_DATA(XMLFromAttr, "from");
+      DEFINE_FAKE_STATIC_DATA(XMLPredAttr, "call");
+      DEFINE_FAKE_STATIC_DATA(XMLSymbolAttr, "symbol");
+      DEFINE_FAKE_STATIC_DATA(XMLToAttr, "to");
 
-        DEFINE_FAKE_STATIC_DATA(InternalXMLTag, "InternalTrans");
-        DEFINE_FAKE_STATIC_DATA(CallXMLTag, "CallTrans");
-        DEFINE_FAKE_STATIC_DATA(ReturnXMLTag, "ReturnTrans");
+      DEFINE_FAKE_STATIC_DATA(InternalXMLTag, "InternalTrans");
+      DEFINE_FAKE_STATIC_DATA(CallXMLTag, "CallTrans");
+      DEFINE_FAKE_STATIC_DATA(ReturnXMLTag, "ReturnTrans");
 
 #undef DEFINE_FAKE_STATIC_DATA
         
-        typedef TransitionInfo Info;
+      typedef TransitionInfo Info;
       
       //
       // Methods
       //
 
-      public:
+    public:
       
       //Constructors and Destructor
       TransitionStorage & operator=( const TransitionStorage & other );
@@ -299,7 +299,7 @@ namespace opennwa
        *
        */
       inline
-        static Label getCallLabel( const Info::Cal & callTrans )
+      static Label getCallLabel( const Info::Cal & callTrans )
       {
         return callTrans.second;
       }
@@ -1549,7 +1549,7 @@ namespace opennwa
       // Variables
       //
       
-      protected: 
+    protected: 
        
       Calls callTrans;
       Internals internalTrans;
@@ -1561,4 +1561,12 @@ namespace opennwa
 
   }
 }
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
+
+
 #endif

@@ -5,11 +5,11 @@
 #include "opennwa/traverse/TransitionFunctor.hpp"
 
 namespace opennwa {
-    namespace traverse {
+  namespace traverse {
 
-      void dfsCallStringTraversal(Nwa const & nwa,
-                                  ConstCallStringStateFunctor * state_functor,
-                                  ConstCallStringTransitionFunctor * trans_functor);
+    void dfsCallStringTraversal(Nwa const & nwa,
+                                ConstCallStringStateFunctor * state_functor,
+                                ConstCallStringTransitionFunctor * trans_functor);
         
   }
 }

@@ -10,32 +10,32 @@ using wali::printKey;
 namespace opennwa
 {
 
-    namespace details
-    {
+  namespace details
+  {
       
     //
     // Methods
     //
-      StateStorage::StateStorage()
-      {
-      }
+    StateStorage::StateStorage()
+    {
+    }
         
 
-      StateStorage::StateStorage(StateStorage const & other)
-        : Printable(other)
-        , states(other.states)
-        , initialStates(other.initialStates)
-        , finalStates(other.finalStates)
+    StateStorage::StateStorage(StateStorage const & other)
+      : Printable(other)
+      , states(other.states)
+      , initialStates(other.initialStates)
+      , finalStates(other.finalStates)
+    {
+      for (std::map<State,ClientInfoRefPtr>::const_iterator other_cis = other.stateInfos.begin() ;
+           other_cis != other.stateInfos.end(); ++other_cis)
       {
-        for (std::map<State,ClientInfoRefPtr>::const_iterator other_cis = other.stateInfos.begin() ;
-             other_cis != other.stateInfos.end(); ++other_cis)
-        {
-          ClientInfoRefPtr ci = other_cis->second;
-          if (ci.is_valid()) {
-            stateInfos[other_cis->first] = ci->cloneRp();
-          }
+        ClientInfoRefPtr ci = other_cis->second;
+        if (ci.is_valid()) {
+          stateInfos[other_cis->first] = ci->cloneRp();
         }
       }
+    }
       
     
     StateStorage & StateStorage::operator=( const StateStorage & other )
@@ -193,7 +193,7 @@ namespace opennwa
     
     bool StateStorage::addState( State state )
     {
-	  // If the ClientInfo is requested for the state, it will be null
+      // If the ClientInfo is requested for the state, it will be null
       bool inserted = states.insert(state).second;
       return inserted;
     }    
@@ -211,8 +211,8 @@ namespace opennwa
     {
       bool inserted = initialStates.insert(initialState).second;
       if (inserted) {
-      // It wasn't a initial state, so we might not have seen it
-          addState(initialState);
+        // It wasn't a initial state, so we might not have seen it
+        addState(initialState);
       }
       
       return inserted;
@@ -232,7 +232,7 @@ namespace opennwa
       bool inserted = finalStates.insert(finalState).second;
       if (inserted) {
         // It wasn't a final state, so we might not have seen it
-	      addState(finalState);
+        addState(finalState);
       }
       
       return inserted;

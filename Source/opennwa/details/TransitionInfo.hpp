@@ -20,68 +20,68 @@
  
 namespace opennwa
 { 
-    namespace details
-    {
+  namespace details
+  {
       
     /**
      *
      * This class is used to keep track of the maps from state to transition for an NWA.
      *
      */
-   class TransitionInfo
+    class TransitionInfo
     {    
-      public:
+    public:
 
-        typedef wali::Triple<State,Symbol,State> Internal;
-        typedef wali::Triple<State,Symbol,State> Call;
-        typedef wali::Quad<State,State,Symbol,State> Return;
+      typedef wali::Triple<State,Symbol,State> Internal;
+      typedef wali::Triple<State,Symbol,State> Call;
+      typedef wali::Quad<State,State,Symbol,State> Return;
 
-        typedef wali::Triple<State,Label,State> Int;
-        typedef wali::Triple<State,Label,State> Cal;
-        typedef wali::Quad<State,State,Label,State> Ret;
+      typedef wali::Triple<State,Label,State> Int;
+      typedef wali::Triple<State,Label,State> Cal;
+      typedef wali::Quad<State,State,Label,State> Ret;
 
-        typedef std::set<Internal> Internals;
-        DEPRECATE("Use capitalized version (InternalIterator), not that you shoud be using the one from this class in the first place.")
-        typedef Internals::const_iterator internalIterator;
-        typedef Internals::const_iterator InternalIterator;
+      typedef std::set<Internal> Internals;
+      DEPRECATE("Use capitalized version (InternalIterator), not that you shoud be using the one from this class in the first place.")
+      typedef Internals::const_iterator internalIterator;
+      typedef Internals::const_iterator InternalIterator;
         
-        typedef std::set<Call> Calls;
-        DEPRECATE("Use capitalized version (CallIterator), not that you shoud be using the one from this class in the first place.")
-        typedef Calls::const_iterator callIterator;
-        typedef Calls::const_iterator CallIterator;
+      typedef std::set<Call> Calls;
+      DEPRECATE("Use capitalized version (CallIterator), not that you shoud be using the one from this class in the first place.")
+      typedef Calls::const_iterator callIterator;
+      typedef Calls::const_iterator CallIterator;
         
-        typedef std::set<Return> Returns;
-        DEPRECATE("Use capitalized version (ReturnIterator), not that you shoud be using the one from this class in the first place.")
-        typedef Returns::const_iterator returnIterator;
-        typedef Returns::const_iterator ReturnIterator;
+      typedef std::set<Return> Returns;
+      DEPRECATE("Use capitalized version (ReturnIterator), not that you shoud be using the one from this class in the first place.")
+      typedef Returns::const_iterator returnIterator;
+      typedef Returns::const_iterator ReturnIterator;
 #if !defined(LABEL)
-        typedef std::map<State,Internals> IntraMap;
-        typedef std::map<State,Calls> CallMap;
-        typedef std::map<State,Returns> RetMap;
+      typedef std::map<State,Internals> IntraMap;
+      typedef std::map<State,Calls> CallMap;
+      typedef std::map<State,Returns> RetMap;
 #else
-        typedef std::map<St,Int> IntraMap;
-        typedef std::map<St,Cal> CallMap;
-        typedef std::map<St,Ret> RetMap;
+      typedef std::map<St,Int> IntraMap;
+      typedef std::map<St,Cal> CallMap;
+      typedef std::map<St,Ret> RetMap;
 #endif
 
-        static Internals const & emptyInternals() {
-          static Internals r;
-          return r;
-        }
-        static Calls const & emptyCalls() {
-          static Calls c;
-          return c;
-        }
-        static Returns const & emptyReturns() {
-          static Returns r;
-          return r;
-        }
+      static Internals const & emptyInternals() {
+        static Internals r;
+        return r;
+      }
+      static Calls const & emptyCalls() {
+        static Calls c;
+        return c;
+      }
+      static Returns const & emptyReturns() {
+        static Returns r;
+        return r;
+      }
 
       //
       // Methods
       //
       
-      public:
+    public:
       
       //Constructors and Destructor
       TransitionInfo & operator=( const TransitionInfo & other )
@@ -572,7 +572,7 @@ namespace opennwa
           //Add a symbol to the label.
           ((it->second).second).addSymbol(intra.second);     
         }
-     }
+      }
       
       /**
        * 
@@ -587,22 +587,22 @@ namespace opennwa
       void removeIntra( const Internal & intra )
       {
 /*        //Update the map for the source of the transition.
-        IntraMap::iterator it = from_ITrans.find(intra.first);
-        if( it != from_ITrans.end() )
-        {
+          IntraMap::iterator it = from_ITrans.find(intra.first);
+          if( it != from_ITrans.end() )
+          {
           it->second.erase(intra);
           if( it->second.empty() )
-            from_ITrans.erase(it);
-        }
+          from_ITrans.erase(it);
+          }
         
-        //Update the map for the target of the transition.
-        it = to_ITrans.find(intra.third);
-        if( it != to_ITrans.end() )
-        {
+          //Update the map for the target of the transition.
+          it = to_ITrans.find(intra.third);
+          if( it != to_ITrans.end() )
+          {
           it->second.erase(intra);
           if( it->second.empty() )
-            to_ITrans.erase(it);
-        }
+          to_ITrans.erase(it);
+          }
 */      }
 
       /**
@@ -617,28 +617,28 @@ namespace opennwa
        */
       void addCall( const Call & call )
       {
- /*       //Update the maps for the call point of the transition.
-        CallMap::iterator it = call_CTrans.find(call.first);
-        if( it == call_CTrans.end() )
-        {
-          Calls cTrans;
-          cTrans.insert(call);
-          call_CTrans.insert(std::pair<St,Calls>(call.first,cTrans));
-        }
-        else  
-          it->second.insert(call);
+        /*       //Update the maps for the call point of the transition.
+                 CallMap::iterator it = call_CTrans.find(call.first);
+                 if( it == call_CTrans.end() )
+                 {
+                 Calls cTrans;
+                 cTrans.insert(call);
+                 call_CTrans.insert(std::pair<St,Calls>(call.first,cTrans));
+                 }
+                 else  
+                 it->second.insert(call);
         
-        //Update the maps for the entry point of the transition.
-        it = entry_CTrans.find(call.third);
-        if( it == entry_CTrans.end() )
-        { 
-          Calls cTrans;
-          cTrans.insert(call);
-          entry_CTrans.insert(std::pair<St,Calls>(call.third,cTrans));
-        }
-        else
-          it->second.insert(call);
-  */    }
+                 //Update the maps for the entry point of the transition.
+                 it = entry_CTrans.find(call.third);
+                 if( it == entry_CTrans.end() )
+                 { 
+                 Calls cTrans;
+                 cTrans.insert(call);
+                 entry_CTrans.insert(std::pair<St,Calls>(call.third,cTrans));
+                 }
+                 else
+                 it->second.insert(call);
+        */    }
       
       /**
        * 
@@ -653,23 +653,23 @@ namespace opennwa
       void removeCall( const Call & call )
       {
 /*        //Update the maps for the call point of the transition.
-        CallMap::iterator it = call_CTrans.find(call.first);
-        if( it != call_CTrans.end() )
-        {
+          CallMap::iterator it = call_CTrans.find(call.first);
+          if( it != call_CTrans.end() )
+          {
           it->second.erase(call);
           if( it->second.empty() )
-            call_CTrans.erase(it);
-        }
+          call_CTrans.erase(it);
+          }
         
-        //Update the maps for the entry point of the transition.
-        it = entry_CTrans.find(call.third);
-        if( it != entry_CTrans.end() )
-        {
+          //Update the maps for the entry point of the transition.
+          it = entry_CTrans.find(call.third);
+          if( it != entry_CTrans.end() )
+          {
           it->second.erase(call);
           if( it->second.empty() )
-            entry_CTrans.erase(it);
-        }
- */     }
+          entry_CTrans.erase(it);
+          }
+*/     }
       
       /**
        * 
@@ -683,39 +683,39 @@ namespace opennwa
        */
       void addRet( const Return & ret )
       {
- /*       //Update the maps for the exit point of the transition.
-        RetMap::iterator it = exit_RTrans.find(ret.first);
-        if( it == exit_RTrans.end() )
-        {
-          Returns rTrans;
-          rTrans.insert(ret);
-          exit_RTrans.insert(std::pair<St,Returns>(ret.first,rTrans));
-        }
-        else  
-          it->second.insert(ret);
+        /*       //Update the maps for the exit point of the transition.
+                 RetMap::iterator it = exit_RTrans.find(ret.first);
+                 if( it == exit_RTrans.end() )
+                 {
+                 Returns rTrans;
+                 rTrans.insert(ret);
+                 exit_RTrans.insert(std::pair<St,Returns>(ret.first,rTrans));
+                 }
+                 else  
+                 it->second.insert(ret);
         
-        //Update the maps for the call predecessor of the transition.
-        it = pred_RTrans.find(ret.second);
-        if( it == pred_RTrans.end() )
-        { 
-          Returns rTrans;
-          rTrans.insert(ret);
-          pred_RTrans.insert(std::pair<St,Returns>(ret.second,rTrans));
-        }
-        else
-          it->second.insert(ret);
+                 //Update the maps for the call predecessor of the transition.
+                 it = pred_RTrans.find(ret.second);
+                 if( it == pred_RTrans.end() )
+                 { 
+                 Returns rTrans;
+                 rTrans.insert(ret);
+                 pred_RTrans.insert(std::pair<St,Returns>(ret.second,rTrans));
+                 }
+                 else
+                 it->second.insert(ret);
           
-        //Update the maps for the return point of the transition.  
-        it = ret_RTrans.find(ret.fourth);
-        if( it == ret_RTrans.end() )
-        { 
-          Returns rTrans;
-          rTrans.insert(ret);
-          ret_RTrans.insert(std::pair<St,Returns>(ret.fourth,rTrans));
-        }
-        else
-          it->second.insert(ret);  
- */     }
+                 //Update the maps for the return point of the transition.  
+                 it = ret_RTrans.find(ret.fourth);
+                 if( it == ret_RTrans.end() )
+                 { 
+                 Returns rTrans;
+                 rTrans.insert(ret);
+                 ret_RTrans.insert(std::pair<St,Returns>(ret.fourth,rTrans));
+                 }
+                 else
+                 it->second.insert(ret);  
+        */     }
       
       /**
        * 
@@ -730,31 +730,31 @@ namespace opennwa
       void removeRet( const Return & ret )
       { 
 /*        //Update the maps for the exit point of the transition.
-        RetMap::iterator it = exit_RTrans.find(ret.first);
-        if( it != exit_RTrans.end() )
-        {
+          RetMap::iterator it = exit_RTrans.find(ret.first);
+          if( it != exit_RTrans.end() )
+          {
           it->second.erase(ret);
           if( it->second.empty() )
-            exit_RTrans.erase(it);
-        }
+          exit_RTrans.erase(it);
+          }
         
-        //Update the maps for the call predecessor of the transition.
-        it = pred_RTrans.find(ret.second);
-        if( it != pred_RTrans.end() )
-        {
+          //Update the maps for the call predecessor of the transition.
+          it = pred_RTrans.find(ret.second);
+          if( it != pred_RTrans.end() )
+          {
           it->second.erase(ret);
           if( it->second.empty() )
-            pred_RTrans.erase(it);
-        }
+          pred_RTrans.erase(it);
+          }
         
-        //Update the maps for the return point of the transition.
-        it = ret_RTrans.find(ret.fourth);
-        if( it != ret_RTrans.end() )
-        {
+          //Update the maps for the return point of the transition.
+          it = ret_RTrans.find(ret.fourth);
+          if( it != ret_RTrans.end() )
+          {
           it->second.erase(ret);
           if( it->second.empty() )
-            ret_RTrans.erase(it);
-        }
+          ret_RTrans.erase(it);
+          }
 */      }
       
       /**
@@ -770,12 +770,12 @@ namespace opennwa
        */
       const Internals fromTrans( St state ) const
       {
- /*       IntraMap::const_iterator it = from_ITrans.find(state);
-        if( it == from_ITrans.end() )
- */         return Internals();
- /*       else
-          return it->second;
- */     }
+        /*       IntraMap::const_iterator it = from_ITrans.find(state);
+                 if( it == from_ITrans.end() )
+        */         return Internals();
+        /*       else
+                 return it->second;
+        */     }
       
       /**
        *  
@@ -790,12 +790,12 @@ namespace opennwa
        */
       const Internals toTrans( St state ) const
       {
- /*       IntraMap::const_iterator it = to_ITrans.find(state);
-        if( it == to_ITrans.end() )
- */         return Internals();
- /*       else
-          return it->second;
- */     } 
+        /*       IntraMap::const_iterator it = to_ITrans.find(state);
+                 if( it == to_ITrans.end() )
+        */         return Internals();
+        /*       else
+                 return it->second;
+        */     } 
       
       /**
        *  
@@ -809,14 +809,14 @@ namespace opennwa
        *         the call site
        *
        */
-     const Calls callTrans( St state ) const
+      const Calls callTrans( St state ) const
       {
-  /*       CallMap::const_iterator it = call_CTrans.find(state);
-        if( it == call_CTrans.end() )
-  */        return Calls();
-  /*      else
-          return it->second;
-  */   }
+        /*       CallMap::const_iterator it = call_CTrans.find(state);
+                 if( it == call_CTrans.end() )
+        */        return Calls();
+        /*      else
+                return it->second;
+        */   }
        
       /**
        *  
@@ -832,12 +832,12 @@ namespace opennwa
        */
       const Calls entryTrans( St state ) const
       { 
-  /*      CallMap::const_iterator it = entry_CTrans.find(state);
-        if( it == entry_CTrans.end() )
-   */       return Calls();
-   /*     else
-          return it->second;
-   */   }
+        /*      CallMap::const_iterator it = entry_CTrans.find(state);
+                if( it == entry_CTrans.end() )
+        */       return Calls();
+        /*     else
+               return it->second;
+        */   }
       
       /**
        *  
@@ -853,12 +853,12 @@ namespace opennwa
        */
       const Returns exitTrans( St state ) const
       {
-  /*      RetMap::const_iterator it = exit_RTrans.find(state);
-        if( it == exit_RTrans.end() )
-  */        return Returns();
-  /*      else
-          return it->second;
-  */    }
+        /*      RetMap::const_iterator it = exit_RTrans.find(state);
+                if( it == exit_RTrans.end() )
+        */        return Returns();
+        /*      else
+                return it->second;
+        */    }
       
       /**
        *  
@@ -874,12 +874,12 @@ namespace opennwa
        */
       const Returns predTrans( St state )const
       {
-  /*      RetMap::const_iterator it = pred_RTrans.find(state);
-        if( it == pred_RTrans.end() )
-  */        return Returns();
- /*      else
-          return it->second;
-  */    }
+        /*      RetMap::const_iterator it = pred_RTrans.find(state);
+                if( it == pred_RTrans.end() )
+        */        return Returns();
+        /*      else
+                return it->second;
+        */    }
       
       /**
        *  
@@ -893,14 +893,14 @@ namespace opennwa
        *         of the return site.
        *
        */
-       const Returns retTrans( St state )const
+      const Returns retTrans( St state )const
       {
-   /*    RetMap::const_iterator it = ret_RTrans.find(state);
-        if( it == ret_RTrans.end() )
-  */        return Returns();
-   /*     else
-          return it->second;
-   */   }
+        /*    RetMap::const_iterator it = ret_RTrans.find(state);
+              if( it == ret_RTrans.end() )
+        */        return Returns();
+        /*     else
+               return it->second;
+        */   }
       
       /**
        *  
@@ -916,13 +916,13 @@ namespace opennwa
        */
       bool isFrom( St state ) const
       {
- /*       IntraMap::iterator it = from_ITrans.find(state);
-        if( it != from_ITrans.end() )
-        {
-          if( !(it.second.empty()) )
-            return true;
-       }
- */        return false;
+        /*       IntraMap::iterator it = from_ITrans.find(state);
+                 if( it != from_ITrans.end() )
+                 {
+                 if( !(it.second.empty()) )
+                 return true;
+                 }
+        */        return false;
       }
       
       /**
@@ -939,13 +939,13 @@ namespace opennwa
        */
       bool isTo( St state ) const
       { 
- /*       IntraMap::iterator it = to_ITrans.find(state);
-        if( it != to_ITrans.end() )
-        {
-          if( !(it.second.empty()) )
-            return true;
-        }
-  */      return false;
+        /*       IntraMap::iterator it = to_ITrans.find(state);
+                 if( it != to_ITrans.end() )
+                 {
+                 if( !(it.second.empty()) )
+                 return true;
+                 }
+        */      return false;
       }
       
       /**
@@ -962,13 +962,13 @@ namespace opennwa
        */
       bool isCall( St state ) const
       {
- /*       CallMap::iterator it = call_CTrans.find(state);
-        if( it != call_CTrans.end() )
-        {
-          if( !(it.second.empty()) )
-            return true;
-        }
- */       return false;
+        /*       CallMap::iterator it = call_CTrans.find(state);
+                 if( it != call_CTrans.end() )
+                 {
+                 if( !(it.second.empty()) )
+                 return true;
+                 }
+        */       return false;
       }
       
       /**
@@ -985,13 +985,13 @@ namespace opennwa
        */
       bool isEntry( St state ) const
       {
- /*       CallMap::iterator it = entry_CTrans.find(state);
-        if( it != entry_CTrans.end() )
-        {
-          if( !(it.second.empty()) )
-            return true;
-        }
-  */      return false;
+        /*       CallMap::iterator it = entry_CTrans.find(state);
+                 if( it != entry_CTrans.end() )
+                 {
+                 if( !(it.second.empty()) )
+                 return true;
+                 }
+        */      return false;
       }
       
       /**
@@ -1009,12 +1009,12 @@ namespace opennwa
       bool isExit( St state ) const
       {
 /*        RetMap::iterator it = exit_RTrans.find(state);
-        if( it != exit_RTrans.end() )
-        {
+          if( it != exit_RTrans.end() )
+          {
           if( !(it.second.empty()) )
-            return true;
-        }
- */       return false;
+          return true;
+          }
+*/       return false;
       }
       
       /**
@@ -1032,13 +1032,13 @@ namespace opennwa
        */
       bool isPred( St state ) const
       {
- /*       RetMap::iterator it = pred_RTrans.find(state);
-        if( it != pred_RTrans.end() )
-        {
-          if( !(it.second.empty()) )
-            return true;
-        }
-  */      return false;
+        /*       RetMap::iterator it = pred_RTrans.find(state);
+                 if( it != pred_RTrans.end() )
+                 {
+                 if( !(it.second.empty()) )
+                 return true;
+                 }
+        */      return false;
       }
       
       /**
@@ -1055,13 +1055,13 @@ namespace opennwa
        */
       bool isRet( St state ) const
       {
- /*       RetMap::iterator it = ret_RTrans.find(state);
-        if( it != ret_RTrans.end() )
-        {
-          if( !(it.second.empty()) )
-            return true;
-        }
-  */      return false;
+        /*       RetMap::iterator it = ret_RTrans.find(state);
+                 if( it != ret_RTrans.end() )
+                 {
+                 if( !(it.second.empty()) )
+                 return true;
+                 }
+        */      return false;
       }
 #endif
       
@@ -1113,7 +1113,7 @@ namespace opennwa
       // Variables
       //
 
-      private:
+    private:
       
       // maps to speed up transition search
       IntraMap from_ITrans;
@@ -1130,4 +1130,12 @@ namespace opennwa
 
   }
 }
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
+
+
 #endif

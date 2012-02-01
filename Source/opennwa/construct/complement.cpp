@@ -4,53 +4,53 @@
 
 namespace opennwa
 {
-    namespace construct
+  namespace construct
+  {
+
+    NwaRefPtr complement( Nwa const & source )
     {
+      NwaRefPtr nwa( new Nwa());
+      complement(*nwa, source);
+      return nwa;
+    }
+      
+    /**
+     * 
+     * @brief constructs the NWA that is the complement of the given NWA
+     *
+     * @param - first: the NWA to perform the complement of
+     *
+     */
+    void complement( Nwa & out, Nwa const & first )
+    {
+      //Q: How should clientInfos be generated for the complemented NWA?
+      //A: The clientInfos from the component machines are copied and added to the complemented NWA.
 
-      NwaRefPtr complement( Nwa const & source )
+      //Clear all states(except the stuck state) and transitions from this machine.
+      out.clear();
+
+
+      //Start with a deterministic copy of the given NWA.
+      // FIXME: keep information about whether a machine is deterministic
+      if(true) //! first.isDeterministic() )
       {
-        NwaRefPtr nwa( new Nwa());
-        complement(*nwa, source);
-        return nwa;
+        determinize(out, first);   //Note: determinize() will take care of clientInfo information.
+      }
+      else
+      {
+        out = first;
       }
       
-      /**
-       * 
-       * @brief constructs the NWA that is the complement of the given NWA
-       *
-       * @param - first: the NWA to perform the complement of
-       *
-       */
-      void complement( Nwa & out, Nwa const & first )
+      
+      //FinalStates = AllStates - FinalStates
+      StateSet oldFinalStates(out.beginFinalStates(), out.endFinalStates());
+      out.clearFinalStates();
+      for( Nwa::StateIterator sit = out.beginStates(); sit != out.endStates(); sit++ )
       {
-        //Q: How should clientInfos be generated for the complemented NWA?
-        //A: The clientInfos from the component machines are copied and added to the complemented NWA.
-
-        //Clear all states(except the stuck state) and transitions from this machine.
-        out.clear();
-
-
-        //Start with a deterministic copy of the given NWA.
-        // FIXME: keep information about whether a machine is deterministic
-        if(true) //! first.isDeterministic() )
-        {
-          determinize(out, first);   //Note: determinize() will take care of clientInfo information.
-        }
-        else
-        {
-          out = first;
-        }
-      
-      
-        //FinalStates = AllStates - FinalStates
-        StateSet oldFinalStates(out.beginFinalStates(), out.endFinalStates());
-        out.clearFinalStates();
-        for( Nwa::StateIterator sit = out.beginStates(); sit != out.endStates(); sit++ )
-        {
-          if( oldFinalStates.count(*sit) == 0 )
-            out.addFinalState(*sit);
-        }
+        if( oldFinalStates.count(*sit) == 0 )
+          out.addFinalState(*sit);
       }
+    }
 
   }
 }

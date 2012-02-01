@@ -3,19 +3,19 @@
 
 namespace opennwa
 {
-    namespace query
-    {
-      typedef details::TransitionStorage Trans;
-      typedef  Trans::CallIterator CallIterator;
-      typedef  Trans::InternalIterator InternalIterator;
-      typedef  Trans::ReturnIterator ReturnIterator;
-      typedef  Trans::Call Call;       
-      typedef  Trans::Internal Internal;   
-      typedef  Trans::Return Return;          
+  namespace query
+  {
+    typedef details::TransitionStorage Trans;
+    typedef  Trans::CallIterator CallIterator;
+    typedef  Trans::InternalIterator InternalIterator;
+    typedef  Trans::ReturnIterator ReturnIterator;
+    typedef  Trans::Call Call;       
+    typedef  Trans::Internal Internal;   
+    typedef  Trans::Return Return;          
       
-      typedef  Trans::Calls Calls;
-      typedef  Trans::Internals Internals;
-      typedef  Trans::Returns Returns;
+    typedef  Trans::Calls Calls;
+    typedef  Trans::Internals Internals;
+    typedef  Trans::Returns Returns;
 
     //Internal Transitions
 
