@@ -2,7 +2,7 @@
 #define wali_nwa_ClientInfo_GUARD 1
 
 /**
- * @author Amanda Burton
+ * @author Amanda Burton, Evan Driscoll, Aditya Thakur
  */
 
 // ::wali

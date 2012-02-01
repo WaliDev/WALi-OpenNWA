@@ -4,7 +4,7 @@
 #include "opennwa/NwaFwd.hpp"
 
 /**
- * @author Amanda Burton
+ * @author Amanda Burton, Evan Driscoll, Aditya Thakur
  */
 
 // ::wali

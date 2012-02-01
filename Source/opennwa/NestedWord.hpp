@@ -1,6 +1,10 @@
 #ifndef wali_nwa_NESTED_WORD_HPP
 #define wali_nwa_NESTED_WORD_HPP
 
+///
+/// @author Evan Driscoll
+///
+
 #include "wali/Countable.hpp"
 #include "opennwa/NwaFwd.hpp"
 #include <vector>

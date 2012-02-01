@@ -2,7 +2,7 @@
 #define wali_nwa_WeightGen_GUARD 1
 
 /**
- * @author Amanda Burton
+ * @author Amanda Burton, Evan Driscoll, Aditya Thakur
  */
 
 #include "opennwa/ClientInfo.hpp"

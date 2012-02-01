@@ -12,8 +12,8 @@
 namespace opennwa
 {
     using wali::wpds::WPDS;
-  using wali::printKey;
-  using wali::key2str;
+    using wali::printKey;
+    using wali::key2str;
     
     const std::string Nwa::XMLTag = "XML";
       
