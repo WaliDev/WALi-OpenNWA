@@ -41,6 +41,8 @@ namespace wali
             rule()->accept(v,visitOnce);
           if( hasCallee() )
             callee()->accept(v,visitOnce);
+
+          v.postvisitMerge(this);
         }
       }
     }

@@ -27,7 +27,9 @@ namespace wali
       // TODO how does marking work...need a flag maybe
       (void) visitOnce;
       mark();
-      v.visitTrans(this);
+      if (v.visitTrans(this)) {
+          v.postvisitTrans(this);
+      }
     }
 
     // Overrides Witness::prettyPrint

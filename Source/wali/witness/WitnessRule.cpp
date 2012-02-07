@@ -102,7 +102,9 @@ namespace wali
       // TODO how does marking work...need a flag maybe
       (void) visitOnce;
       mark();
-      v.visitRule(this);
+      if(v.visitRule(this)) {
+          v.postvisitRule(this);
+      }
     }
 
     // override Witness::prettyPrint

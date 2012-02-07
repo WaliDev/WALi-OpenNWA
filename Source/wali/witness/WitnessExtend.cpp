@@ -37,6 +37,8 @@ namespace wali
             left()->accept(v,visitOnce);
           if( hasRight() )
             right()->accept(v,visitOnce);
+
+          v.postvisitExtend(this);
         }
       }
     }

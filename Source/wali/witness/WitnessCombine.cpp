@@ -110,6 +110,8 @@ namespace wali
             witness_t& child = *it;
             child->accept(v,visitOnce);
           }
+
+          v.postvisitCombine(this);
         }
       }
     }

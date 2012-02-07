@@ -65,6 +65,22 @@ namespace wali
         //!
         virtual bool visitMerge( WitnessMerge * w );
 
+
+        //! Called in postorder. NOT called if visitExtend() returns false.
+        virtual void postvisitExtend( WitnessExtend * w)   { (void) w; }
+
+        //! Called in postorder. NOT called if visitCombine() returns false.
+        virtual void postvisitCombine( WitnessCombine * w) { (void) w; }
+
+        //! Called in postorder. NOT called if visitRule() returns false.
+        virtual void postvisitRule( WitnessRule * w)       { (void) w; }
+
+        //! Called in postorder. NOT called if visitTrans() returns false.
+        virtual void postvisitTrans( WitnessTrans * w)     { (void) w; }
+
+        //! Called in postorder. NOT called if visitMerge() returns false.
+        virtual void postvisitMerge( WitnessMerge * w)     { (void) w; }
+
     }; // class Visitor
 
   } // namespace witness

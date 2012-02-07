@@ -1,4 +1,7 @@
 WALi/OpenNWA 4.0:
+  WALi features:
+  - Added postorder visit functions to the witness visitor
+
   OpenNWA bug fixes:
   - Updated license and author information
 
