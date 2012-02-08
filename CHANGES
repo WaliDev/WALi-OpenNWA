@@ -1,4 +1,10 @@
 WALi/OpenNWA 4.0:
+  General features
+  - Added 'scons CXX=...' to choose compiler
+
+  General bug fixes
+  - Fixed building with more recent versions of GCC
+
   WALi features:
   - Added postorder visit functions to the witness visitor
 
