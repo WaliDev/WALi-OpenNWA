@@ -52,8 +52,10 @@ can coexist.) Note: because of the way 'cmake' is called for the Google
 Test library, you probably won't be able to do this for the 'tests' or 'all'
 pseudo-targets.
 
-You can also pass 'CXX=...' to pick the particular compiler, e.g.
-'scons CXX=icc'.
+You can also pass 'CXX=...' to pick the particular compiler, e.g.  'scons
+CXX=icc'. (If you are using compilers other than GCC or CL, you'll probably
+also have to pass strong_warnings=0 to disable a bunch of -W flags that your
+compiler probably doesn't understand.)
 
 There is also a Visual Studio 2005 project, though the NWA unit tests aren't
 hooked up for this at all.

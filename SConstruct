@@ -33,9 +33,12 @@ vars = Variables()
 vars.Add(EnumVariable('arch', 'Architecture', 'default',
          allowed_values=ThirtyTwoBitAliases+SixtyFourBitAliases+['default']))
 vars.Add(PathVariable('CXX', 'Path to compiler', 'g++', PathVariable.PathAccept))
+vars.Add(BoolVariable('strong_warnings', 'Enable (on by default) to get strong warning flags', True))
+
 tempEnviron = Environment(tools=[], variables=vars)
 arch = tempEnviron['arch']
 BaseEnv['CXX'] = tempEnviron['CXX']
+strong_warnings = tempEnviron['strong_warnings']
 tempEnviron = None
 vars = None
 
@@ -62,8 +65,12 @@ if 'gcc' == BaseEnv['CC']:
     # -Waddress -Wlogical-op
 
     # -Wcast-qual 
-    BaseEnv.Append(CCFLAGS='-g -ggdb -Wall -Wextra $WARNING_FLAGS -fdiagnostics-show-option -O2')
-    BaseEnv.Append(WARNING_FLAGS='-Werror -Wformat=2 -Winit-self -Wunused -Wfloat-equal -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wwrite-strings -Wconversion -Woverloaded-virtual')
+    BaseEnv.Append(CCFLAGS='-g -ggdb -Wall -O2')
+    if strong_warnings:
+        BaseEnv.Append(CCFLAGS='-Wextra $WARNING_FLAGS -fdiagnostics-show-option')
+        BaseEnv.Append(WARNING_FLAGS='-Werror -Wformat=2 -Winit-self -Wunused -Wfloat-equal -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wwrite-strings -Wconversion -Woverloaded-virtual')
+    else:
+        BaseEnv.Append(WARNING_FLAGS='')
 
     if platform_bits == 64 and not Is64:
         # If we're on a 64-bit platform but want to compile for 32.

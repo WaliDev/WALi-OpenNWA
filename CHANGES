@@ -1,6 +1,7 @@
 WALi/OpenNWA 4.0:
   General features
-  - Added 'scons CXX=...' to choose compiler
+  - Added 'scons CXX=...' to choose compiler and strong_warnings=0 to disable
+    extra warning flags
 
   General bug fixes
   - Fixed building with more recent versions of GCC
