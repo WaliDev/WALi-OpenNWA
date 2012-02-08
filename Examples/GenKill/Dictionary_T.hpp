@@ -181,7 +181,7 @@ public:
                 return myEntry->datum;
             }
 
-            const bool IsRootShared(const iterator& rhs) const  {
+            bool IsRootShared(const iterator& rhs) const  {
                 return (myEntry == rhs.myEntry);
             }
 
@@ -893,7 +893,7 @@ DictNode_T<Key_t, Datum_t, KeyComp_t>::DictNode_T(Key_t k, Datum_t d, Dictionary
 {
   height_t l_height = l.Height();
   height_t r_height = r.Height();
-  height = 1 + ( (l_height >= r_height) ? l_height : r_height );
+  height = static_cast<height_t>(1 + ( (l_height >= r_height) ? l_height : r_height ));
 #ifdef EXPLICIT_PICKLE_REFCOUNT_FIELD_IN_DICT
     pickle_refcount = 0;
 #endif
@@ -992,7 +992,7 @@ template <class Key_t, class Datum_t, class KeyComp_t>
 void DictNode_T<Key_t, Datum_t, KeyComp_t>::DecrRef()
 {
   if (refCount < maxRefCount) {
-    refCount -= 1;
+    refCount--;
     if (refCount == 0) {
       delete this;
     }

@@ -70,7 +70,7 @@ VarSet* makeUniverseVarSet()
     VarSet* vs = new VarSet();
     std::string s;
     for (int i = 0; i < 26; i++) {
-        s = 'a' + i;
+        s = static_cast<char>('a' + i);
         vs->Insert(s);
     }
     return vs;
