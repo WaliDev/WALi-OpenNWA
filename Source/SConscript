@@ -63,6 +63,7 @@ nice_files = Split("""
 ./wali/witness/WitnessWrapper.cpp
 ./wali/witness/WitnessRule.cpp
 ./wali/witness/Visitor.cpp
+./wali/witness/CalculatingVisitor.cpp
 ./wali/witness/WitnessMergeFn.cpp
 ./wali/witness/VisitorDot.cpp
 ./wali/witness/WitnessTrans.cpp
