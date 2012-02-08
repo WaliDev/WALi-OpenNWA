@@ -4,7 +4,7 @@ WALi/OpenNWA 4.0:
     extra warning flags
 
   General bug fixes
-  - Fixed building with more recent versions of GCC
+  - Fixed building with broader range of compilers
 
   WALi features:
   - Added postorder visit functions to the witness visitor

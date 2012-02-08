@@ -1,5 +1,6 @@
 #include <iomanip>
 #include <iostream>
+#include <unistd.h>
 #include "wali/Common.hpp"
 
 #include "wali/util/Timer.hpp"
