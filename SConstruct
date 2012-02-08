@@ -32,8 +32,10 @@ SixtyFourBitAliases=['64', 'x64', 'x86_64', 'amd64']
 vars = Variables()
 vars.Add(EnumVariable('arch', 'Architecture', 'default',
          allowed_values=ThirtyTwoBitAliases+SixtyFourBitAliases+['default']))
+vars.Add(PathVariable('CXX', 'Path to compiler', 'g++', PathVariable.PathAccept))
 tempEnviron = Environment(tools=[], variables=vars)
 arch = tempEnviron['arch']
+BaseEnv['CXX'] = tempEnviron['CXX']
 tempEnviron = None
 vars = None
 
@@ -41,6 +43,8 @@ if arch in ThirtyTwoBitAliases:
     Is64 = False
 elif arch in SixtyFourBitAliases:
     Is64 = True
+
+
 
 
 if Is64:
