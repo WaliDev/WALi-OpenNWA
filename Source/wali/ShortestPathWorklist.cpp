@@ -7,6 +7,7 @@
 #include "wali/ShortestPathSemiring.hpp"
 #include "wali/wfa/Trans.hpp"
 #include <climits>
+#include <cstdlib>
 #include <iostream>
 #include <typeinfo>
 
