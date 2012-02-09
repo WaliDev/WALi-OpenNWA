@@ -1,11 +1,12 @@
 #include <iomanip>
 #include <iostream>
-#include <unistd.h>
 #include "wali/Common.hpp"
 
 #include "wali/util/Timer.hpp"
 
 #ifndef _WIN32
+#include <unistd.h>
+
 clock_t sum_tms( const struct tms& t ) {
   clock_t c = t.tms_utime 
     + t.tms_stime + t.tms_cutime + t.tms_cstime;
