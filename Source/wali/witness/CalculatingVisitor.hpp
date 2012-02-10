@@ -45,20 +45,22 @@ namespace wali
     class WitnessMerge;
 
     template<typename AnswerType>
-    class CalculatingVisitor
+    class CalculatingVisitor : public Visitor
     {
     private:
-      std::stack<AnswerType> answerStack;
+      typedef std::pair<AnswerType, Witness*> SourcedAnswer;
+      std::stack<SourcedAnswer> answerStack;
 
       AnswerType popCheck(Witness * expected_source) {
         assert(!answerStack.empty());
-        AnswerType temp = answerStack.top();
+        SourcedAnswer temp = answerStack.top();
         answerStack.pop();
-        return temp;
+        assert(temp.second == expected_source);
+        return temp.first;
       }
 
-      AnswerType push(Witness * source, AnswerType const & ans) {
-        answerStack.push(ans);
+      void push(Witness * source, AnswerType const & ans) {
+        answerStack.push(SourcedAnswer(ans, source));
       }
       
     public:
