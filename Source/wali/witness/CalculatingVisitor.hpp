@@ -79,8 +79,8 @@ namespace wali
 
       // These functions do fancy-schmancy stuff
       virtual void postvisitExtend( WitnessExtend * w) {
-        AnswerType left  = popCheck(w->left().get_ptr());
         AnswerType right = popCheck(w->right().get_ptr());
+        AnswerType left  = popCheck(w->left().get_ptr());
         
         AnswerType ans = calculateExtend(w, left, right);
         push(w, ans);
@@ -100,9 +100,9 @@ namespace wali
       }
       
       virtual void postvisitMerge( WitnessMerge * w) {
-        AnswerType caller = popCheck(w->caller().get_ptr());
-        AnswerType rule   = popCheck(w->rule().get_ptr());
         AnswerType callee = popCheck(w->callee().get_ptr());
+        AnswerType rule   = popCheck(w->rule().get_ptr());
+        AnswerType caller = popCheck(w->caller().get_ptr());
         
         AnswerType ans = calculateMerge(w, caller, rule, callee);
         push(w, ans);
