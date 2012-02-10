@@ -64,6 +64,11 @@ namespace wali
       }
       
     public:
+      AnswerType const & answer() const {
+        assert(answerStack.size() == 1);
+        return answerStack.top().first;
+      }
+      
       // These functions return true to continue visiting children.
       virtual bool visit( Witness * w )                { (void) w; return true; }
       virtual bool visitExtend( WitnessExtend * w )    { (void) w; return true; }
@@ -77,8 +82,8 @@ namespace wali
         AnswerType left  = popCheck(w->left().get_ptr());
         AnswerType right = popCheck(w->right().get_ptr());
         
-        AnswerType answer = calculateExtend(w, left, right);
-        push(w, answer);
+        AnswerType ans = calculateExtend(w, left, right);
+        push(w, ans);
       }
       
       virtual void postvisitCombine( WitnessCombine * w) {
@@ -89,8 +94,8 @@ namespace wali
           child_answers.push_back(popCheck(child->get_ptr()));
         }
 
-        AnswerType answer = calculateCombine(w, child_answers);
-        push(w, answer);
+        AnswerType ans = calculateCombine(w, child_answers);
+        push(w, ans);
       }
       
       virtual void postvisitMerge( WitnessMerge * w) {
@@ -98,18 +103,18 @@ namespace wali
         AnswerType rule   = popCheck(w->rule().get_ptr());
         AnswerType callee = popCheck(w->callee().get_ptr());
         
-        AnswerType answer = calculateMerge(w, caller, rule, callee);
-        push(w, answer);
+        AnswerType ans = calculateMerge(w, caller, rule, callee);
+        push(w, ans);
       }
       
       virtual void postvisitRule( WitnessRule * w) {
-        AnswerType answer = calculateRule(w);
-        push(w, answer);
+        AnswerType ans = calculateRule(w);
+        push(w, ans);
       }
       
       virtual void postvisitTrans( WitnessTrans * w) {
-        AnswerType answer = calculateTrans(w);
-        push(w, answer);
+        AnswerType ans = calculateTrans(w);
+        push(w, ans);
       }
 
 
@@ -123,7 +128,7 @@ namespace wali
       
       //! Overload to calculate the value of an merge node. Modifications to
       //! the AnswerType& parameters will not persist.
-      virtual AnswerType calculateMerge( WitnessMerge * w, AnswerType & leftValue, AnswerType & ruleValue, AnswerType & rightValue ) = 0;
+      virtual AnswerType calculateMerge( WitnessMerge * w, AnswerType & callerValue, AnswerType & ruleValue, AnswerType & calleeValue ) = 0;
 
       //! Overload to calculate the value of a rule node.
       virtual AnswerType calculateRule( WitnessRule * w) = 0;
