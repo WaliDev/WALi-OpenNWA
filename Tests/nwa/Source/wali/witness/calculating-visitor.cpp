@@ -182,5 +182,24 @@ namespace wali {
             EXPECT_EQ("1", sc.answer());
         }
         
+        TEST(wali$witness$CalculatingVisitor, WitnessCombine) {
+            witness_t w1 = make_example_rule(1);
+            witness_t w2 = make_example_rule(2);
+
+            WitnessCombine * w = new WitnessCombine(NULL);
+            witness_t auto_w = w;
+            w->addChild(w1);
+            w->addChild(w2);
+            
+            
+            NumberComputer nc;
+            w->accept(nc);
+            EXPECT_EQ(3, nc.answer());
+
+            StringComputer sc;
+            w->accept(sc);
+            EXPECT_EQ("(1 + 2)", sc.answer());
+        }
+        
     }
 }
