@@ -90,8 +90,9 @@ namespace wali
         std::list<witness_t> children = w->children();
         
         std::list<AnswerType> child_answers;
-        for (std::list<witness_t>::const_iterator child = children.begin(); child != children.end(); ++child) {
-          child_answers.push_back(popCheck(child->get_ptr()));
+        for (std::list<witness_t>::const_reverse_iterator child = children.rbegin();
+             child != children.rend(); ++child) {
+          child_answers.push_front(popCheck(child->get_ptr()));
         }
 
         AnswerType ans = calculateCombine(w, child_answers);
