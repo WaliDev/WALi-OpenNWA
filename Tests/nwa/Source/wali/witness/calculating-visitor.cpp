@@ -183,8 +183,8 @@ namespace wali {
         }
         
         TEST(wali$witness$CalculatingVisitor, WitnessCombine) {
-            witness_t w1 = make_example_rule(1);
-            witness_t w2 = make_example_rule(2);
+            witness_t w1 = make_example_rule(2);
+            witness_t w2 = make_example_rule(3);
 
             WitnessCombine * w = new WitnessCombine(NULL);
             witness_t auto_w = w;
@@ -194,11 +194,26 @@ namespace wali {
             
             NumberComputer nc;
             w->accept(nc);
-            EXPECT_EQ(3, nc.answer());
+            EXPECT_EQ(5, nc.answer());
 
             StringComputer sc;
             w->accept(sc);
-            EXPECT_EQ("(1 + 2)", sc.answer());
+            EXPECT_EQ("(2 + 3)", sc.answer());
+        }
+
+        TEST(wali$witness$CalculatingVisitor, WitnessExtend$2arg) {
+            witness_t w1 = make_example_rule(2);
+            witness_t w2 = make_example_rule(3);
+
+            witness_t w = new WitnessExtend(NULL, w1, w2);
+            
+            NumberComputer nc;
+            w->accept(nc);
+            EXPECT_EQ(6, nc.answer());
+
+            StringComputer sc;
+            w->accept(sc);
+            EXPECT_EQ("(2 * 3)", sc.answer());
         }
         
     }
