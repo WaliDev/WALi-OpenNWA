@@ -2,12 +2,18 @@
 
 #include "wali/Key.hpp"
 #include "wali/Common.hpp"
+#include "wali/wpds/Config.hpp"
+#include "wali/wpds/Rule.hpp"
 #include "wali/witness/WitnessMerge.hpp"
 #include "wali/witness/WitnessCombine.hpp"
 #include "wali/witness/WitnessExtend.hpp"
 #include "wali/witness/WitnessRule.hpp"
 #include "wali/witness/WitnessTrans.hpp"
 #include "wali/witness/CalculatingVisitor.hpp"
+
+using wali::wpds::Config;
+using wali::wpds::Rule;
+using wali::wfa::Trans;
 
 namespace wali {
     namespace witness {
@@ -56,7 +62,7 @@ namespace wali {
             virtual int calculateRule( WitnessRule * w)
             {
                 (void) w;
-                std::string s = key2str(w->getRuleStub().from_stack());
+                std::string s = key2str(w->getRuleStub().from_state());
                 std::stringstream ss(s);
                 int ret = -1;
                 ss >> ret;
@@ -122,7 +128,7 @@ namespace wali {
             virtual std::string calculateRule( WitnessRule * w)
             {
                 (void) w;
-                return key2str(w->getRuleStub().from_stack());
+                return key2str(w->getRuleStub().from_state());
             }
 
             //! Overload to calculate the value of a trans node.
@@ -135,7 +141,26 @@ namespace wali {
         
 
         TEST(wali$witness$CalculatingVisitor, WitnessTrans) {
-            WitnessTrans w(wali::wfa::Trans(getKey("1"), 0, 0, NULL));
+            Key k = getKey("dummy");
+            WitnessTrans w(Trans(getKey("1"), k, k, NULL));
+            
+            NumberComputer nc;
+            w.accept(nc);
+            EXPECT_EQ(1, nc.answer());
+
+            StringComputer sc;
+            w.accept(sc);
+            EXPECT_EQ("1", sc.answer());
+        }
+
+        TEST(wali$witness$CalculatingVisitor, WitnessRule) {
+            Key k = getKey("dummy");
+            Config* from = new Config(getKey("1"), k);
+            Config* to   = new Config(k, k);
+
+            Rule rule(from, to, 0, NULL);
+            
+            WitnessRule w(rule);
             
             NumberComputer nc;
             w.accept(nc);
