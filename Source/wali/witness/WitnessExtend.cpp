@@ -20,7 +20,10 @@ namespace wali
 
     // weight == left->extend( right )
     WitnessExtend::WitnessExtend( sem_elem_t the_weight, witness_t the_left, witness_t the_right ) :
-      Witness(the_weight),lchild(the_left),rchild(the_right) {}
+      Witness(the_weight),lchild(the_left),rchild(the_right) {
+      assert(the_left != NULL);
+      assert(the_right != NULL);
+    }
 
     // virtual destructor
     WitnessExtend::~WitnessExtend() {}
