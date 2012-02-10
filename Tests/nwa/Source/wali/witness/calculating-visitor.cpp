@@ -138,36 +138,47 @@ namespace wali {
                 return key2str(w->getTrans().from_state());
             }
         };
+
+        
+        witness_t make_example_trans()
+        {
+            Key k = getKey("dummy");
+            witness_t w = new WitnessTrans(Trans(getKey("1"), k, k, NULL));
+            return w;
+        }
+
+        witness_t make_example_rule()
+        {
+            Key k = getKey("dummy");
+            Config* from = new Config(getKey("1"), k);
+            Config* to   = new Config(k, k);
+            Rule rule(from, to, 0, NULL);
+            witness_t w = new WitnessRule(rule);
+            return w;
+        }
         
 
         TEST(wali$witness$CalculatingVisitor, WitnessTrans) {
-            Key k = getKey("dummy");
-            WitnessTrans w(Trans(getKey("1"), k, k, NULL));
+            witness_t w = make_example_trans();
             
             NumberComputer nc;
-            w.accept(nc);
+            w->accept(nc);
             EXPECT_EQ(1, nc.answer());
 
             StringComputer sc;
-            w.accept(sc);
+            w->accept(sc);
             EXPECT_EQ("1", sc.answer());
         }
 
         TEST(wali$witness$CalculatingVisitor, WitnessRule) {
-            Key k = getKey("dummy");
-            Config* from = new Config(getKey("1"), k);
-            Config* to   = new Config(k, k);
-
-            Rule rule(from, to, 0, NULL);
-            
-            WitnessRule w(rule);
+            witness_t w = make_example_rule();
             
             NumberComputer nc;
-            w.accept(nc);
+            w->accept(nc);
             EXPECT_EQ(1, nc.answer());
 
             StringComputer sc;
-            w.accept(sc);
+            w->accept(sc);
             EXPECT_EQ("1", sc.answer());
         }
         
