@@ -140,17 +140,17 @@ namespace wali {
         };
 
         
-        witness_t make_example_trans()
+        witness_t make_example_trans(int val)
         {
             Key k = getKey("dummy");
-            witness_t w = new WitnessTrans(Trans(getKey("1"), k, k, NULL));
+            witness_t w = new WitnessTrans(Trans(getKey(val), k, k, NULL));
             return w;
         }
 
-        witness_t make_example_rule()
+        witness_t make_example_rule(int val)
         {
             Key k = getKey("dummy");
-            Config* from = new Config(getKey("1"), k);
+            Config* from = new Config(getKey(val), k);
             Config* to   = new Config(k, k);
             Rule rule(from, to, 0, NULL);
             witness_t w = new WitnessRule(rule);
@@ -159,7 +159,7 @@ namespace wali {
         
 
         TEST(wali$witness$CalculatingVisitor, WitnessTrans) {
-            witness_t w = make_example_trans();
+            witness_t w = make_example_trans(1);
             
             NumberComputer nc;
             w->accept(nc);
@@ -171,7 +171,7 @@ namespace wali {
         }
 
         TEST(wali$witness$CalculatingVisitor, WitnessRule) {
-            witness_t w = make_example_rule();
+            witness_t w = make_example_rule(1);
             
             NumberComputer nc;
             w->accept(nc);
