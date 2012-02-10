@@ -216,19 +216,5 @@ namespace wali {
             EXPECT_EQ("(2 * 3)", sc.answer());
         }
 
-        TEST(wali$witness$CalculatingVisitor, WitnessExtend$1arg) {
-            witness_t w1 = make_example_rule(2);
-
-            witness_t w = new WitnessExtend(NULL, w1);
-            
-            NumberComputer nc;
-            w->accept(nc);
-            EXPECT_EQ(2, nc.answer());
-
-            StringComputer sc;
-            w->accept(sc);
-            EXPECT_EQ("2", sc.answer());
-        }
-        
     }
 }
