@@ -140,14 +140,14 @@ namespace wali {
         };
 
         
-        witness_t make_example_trans(int val)
+        witness_t make_example_trans(std::string val)
         {
             Key k = getKey("dummy");
             witness_t w = new WitnessTrans(Trans(getKey(val), k, k, NULL));
             return w;
         }
 
-        witness_t make_example_rule(int val)
+        witness_t make_example_rule(std::string val)
         {
             Key k = getKey("dummy");
             Config* from = new Config(getKey(val), k);
@@ -167,7 +167,7 @@ namespace wali {
         
 
         TEST(wali$witness$CalculatingVisitor, WitnessTrans) {
-            witness_t w = make_example_trans(1);
+            witness_t w = make_example_trans("1");
             
             NumberComputer nc;
             w->accept(nc);
@@ -179,7 +179,7 @@ namespace wali {
         }
 
         TEST(wali$witness$CalculatingVisitor, WitnessRule) {
-            witness_t w = make_example_rule(1);
+            witness_t w = make_example_rule("1");
             
             NumberComputer nc;
             w->accept(nc);
@@ -191,8 +191,8 @@ namespace wali {
         }
         
         TEST(wali$witness$CalculatingVisitor, WitnessCombine) {
-            witness_t w1 = make_example_rule(2);
-            witness_t w2 = make_example_rule(3);
+            witness_t w1 = make_example_rule("2");
+            witness_t w2 = make_example_rule("3");
 
             witness_t w = make_combine(w1, w2);
             
@@ -206,8 +206,8 @@ namespace wali {
         }
 
         TEST(wali$witness$CalculatingVisitor, WitnessExtend$2arg) {
-            witness_t w1 = make_example_rule(2);
-            witness_t w2 = make_example_rule(3);
+            witness_t w1 = make_example_rule("2");
+            witness_t w2 = make_example_rule("3");
 
             witness_t w = new WitnessExtend(NULL, w1, w2);
             
@@ -220,5 +220,7 @@ namespace wali {
             EXPECT_EQ("(2 * 3)", sc.answer());
         }
 
+
+        
     }
 }
