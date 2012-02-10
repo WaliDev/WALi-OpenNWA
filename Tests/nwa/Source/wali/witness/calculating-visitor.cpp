@@ -220,6 +220,22 @@ namespace wali {
             EXPECT_EQ("(2 * 3)", sc.answer());
         }
 
+        TEST(wali$witness$CalculatingVisitor, WitnessExtend$1arg$impossible) {
+            witness_t w1 = make_example_rule("1");
+            EXPECT_DEATH({
+                    WitnessExtend e(NULL, NULL, w1);
+                },
+                "Assertion `the_left != __null\' failed");
+            EXPECT_DEATH({
+                    WitnessExtend e(NULL, w1, NULL);
+                },
+                "Assertion `the_right != __null\' failed");
+            EXPECT_DEATH({
+                    WitnessExtend e(NULL, NULL, NULL);
+                },
+                "Assertion `the_left != __null\' failed");
+        }
+
 
         TEST(wali$witness$CalculatingVisitor, largeExamples$Richs) {
             witness_t stem =
@@ -267,6 +283,6 @@ namespace wali {
             tree->accept(sc);
             EXPECT_EQ(str_tree, sc.answer());
         }
-        
+
     }
 }
