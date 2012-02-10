@@ -221,6 +221,52 @@ namespace wali {
         }
 
 
+        TEST(wali$witness$CalculatingVisitor, largeExamples$Richs) {
+            witness_t stem =
+                new WitnessExtend(NULL,
+                                  new WitnessExtend(NULL,
+                                                    make_example_trans("1 root"),
+                                                    make_example_rule("2->3")),
+                                  make_example_rule("3->6"));
+
+            witness_t loop_body =
+                new WitnessExtend(NULL,
+                                  new WitnessExtend(NULL,
+                                                    new WitnessExtend(NULL,
+                                                                      new WitnessExtend(NULL,
+                                                                                        stem,
+                                                                                        make_example_rule("6->7")),
+                                                                      make_example_rule("7->11")),
+                                                    make_example_rule("11->13")),
+                                  make_example_rule("13->6"));
+
+            witness_t loop_head = make_combine(loop_body, stem);
+
+            witness_t tree =
+                new WitnessExtend(NULL,
+                                  new WitnessExtend(NULL,
+                                                    new WitnessExtend(NULL,
+                                                                      new WitnessExtend(NULL,
+                                                                                        loop_head,
+                                                                                        make_example_rule("6->7")),
+                                                                      make_example_rule("7->11")),
+                                                    make_example_rule("11->13")),
+                                  make_example_rule("13->15"));
+                                                                      
+            NumberComputer nc;
+            tree->accept(nc);
+            EXPECT_EQ(216468252, nc.answer());
+
+
+            std::string str_stem = "((1 root * 2->3) * 3->6)";
+            std::string str_body = "((((" + str_stem + " * 6->7) * 7->11) * 11->13) * 13->6)";
+            std::string str_loop = "(" + str_body + " + " + str_stem + ")";
+            std::string str_tree = "((((" + str_loop + " * 6->7) * 7->11) * 11->13) * 13->15)";
+
+            StringComputer sc;
+            tree->accept(sc);
+            EXPECT_EQ(str_tree, sc.answer());
+        }
         
     }
 }
