@@ -156,6 +156,14 @@ namespace wali {
             witness_t w = new WitnessRule(rule);
             return w;
         }
+
+        witness_t make_combine(witness_t left, witness_t right)
+        {
+            WitnessCombine * w = new WitnessCombine(NULL);
+            w->addChild(left);
+            w->addChild(right);
+            return w;
+        }
         
 
         TEST(wali$witness$CalculatingVisitor, WitnessTrans) {
@@ -186,11 +194,7 @@ namespace wali {
             witness_t w1 = make_example_rule(2);
             witness_t w2 = make_example_rule(3);
 
-            WitnessCombine * w = new WitnessCombine(NULL);
-            witness_t auto_w = w;
-            w->addChild(w1);
-            w->addChild(w2);
-            
+            witness_t w = make_combine(w1, w2);
             
             NumberComputer nc;
             w->accept(nc);
