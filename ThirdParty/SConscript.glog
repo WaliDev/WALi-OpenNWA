@@ -1,0 +1,39 @@
+from os.path import join
+import urllib
+######################
+# @author: Prathmesh Prabhu
+
+import sys
+import os
+import shutil
+
+glog = 'glog-0.3.2'
+
+Import('Debug')
+Import('LibInstallDir')
+Import('IncludeDir')
+Import('BaseEnv')
+
+if Debug:
+	print '\n+++ Entered "#/ThirdParty/SConscript.glog"\n'
+
+def get_targz(base):
+  wget = "curl -O"
+  targz = base + '.tar.gz'
+  BaseEnv.Execute('%s http://google-glog.googlecode.com/files/%s' % (wget,targz))
+  BaseEnv.Execute('tar zxvf %s' % targz)
+
+includeDir = join(IncludeDir,'glog')
+if not File(os.path.join(glog,'.libs','libglog.so')).exists():
+  get_targz(glog)
+  #BaseEnv.Execute('autoreconf -if')
+  BaseEnv.Execute('cd %s; ./configure --prefix=%s --libdir=%s' %(glog,os.path.join(os.getcwd(),glog),LibInstallDir))
+  BaseEnv.Execute('cd %s; make' %(glog))
+  BaseEnv.Execute('cd %s; make install' %(glog))
+if not Dir(includeDir).exists() or not File(os.path.join(LibInstallDir,'libglog.so')).exists():
+  BaseEnv.Execute('cd %s; make install' %(glog))
+    
+built = []
+fromInc = join(os.getcwd(), glog, 'include', 'glog')
+built += Command(includeDir, fromInc, [Copy(includeDir,fromInc)])
+Return('built')
