@@ -5,6 +5,7 @@ import os,platform
 
 Import('WaliDir')
 Import('LibInstallDir')
+Import('ThirdPartyDir')
 Import('MkStatic')
 Import('BaseEnv')
 Import('Debug')
@@ -16,26 +17,36 @@ if Debug:
 
 walidomains_files = Split("""
 ./wali/domains/binrel/BinRel.cpp
+./wali/domains/binrel/BinRelManager.cpp
 ./wali/domains/reach/Reach.cpp
 ./wali/domains/lh/LH.cpp
 ./wali/domains/lh/PhaseLH.cpp
 """)
 
 Env = BaseEnv.Clone()
+
+built = []
+
+# BinRel needs glog. Make sure that glog is built in ThirdParty
+ThirdPartyEnv = Env.Clone()
+toBuild = ['glog']
+Export('toBuild')
+built += SConscript(os.path.join(ThirdPartyDir,'SConscript'))
+
 # Disable warnings because of BuDDy
 Env["WARNING_FLAGS"]="-Werror"
 Env.Append(CPPPATH=[os.path.join(WaliDir , 'AddOns', 'Domains' , 'Source')])
 Env.Append(CPPPATH=[os.path.join(WaliDir , 'AddOns', 'Domains' , 'ThirdParty', 'include')])
-
+Env.Append(CPPPATH=[os.path.join(ThirdPartyDir, 'include')])
 
 if MkStatic:
   walidomains = Env.StaticLibrary('walidomains' , walidomains_files)
   i = Env.Install(LibInstallDir, walidomains)
-  built = i
+  built += i
   Return('built')
 else:
   walidomains = Env.SharedLibrary('walidomains' , walidomains_files)
   i = Env.Install(LibInstallDir, walidomains)
-  built = i
+  built += i
   Return('built')
 
