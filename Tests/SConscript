@@ -11,12 +11,17 @@ if Debug:
 
 ## ###############################
 ## Environment
+
+## Adding Domains paths to the enviornment
+ProgEnv.Append(CPPPATH = [os.path.join(WaliDir,'AddOns','Domains','Source')])
+ProgEnv.Append(CPPPATH = [os.path.join(WaliDir,'AddOns','Domains','ThirdParty','include')])
 Env = ProgEnv.Clone()
 
 ## Note - Be sure to use a list when 'Append'ing to CPPPATH
 Env.Append(CPPPATH = [os.path.join(WaliDir,'Examples','Reach')])
 
 TestDir = os.path.join(WaliDir,'Tests')
+Export('TestDir')
 
 built = []
 
@@ -26,6 +31,6 @@ for t in ['t1','t3','t4','twitness','tprune','tTransSet']:
     built += (exe)
 
 #nwa_built = SConscript('nwa/SConscript')
-
+built += SConscript('Addons/SConscript')
 Return('built')
 

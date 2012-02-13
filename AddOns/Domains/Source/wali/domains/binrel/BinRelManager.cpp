@@ -42,14 +42,14 @@ namespace wali
       // The interface assumes that the google logging library is initialized before
       // calling any of its functions.
 
-      inline void addBoolVar(Voc& voc, std::string name)
+      void addBoolVar(Voc& voc, std::string name)
       {
         BddInfo_t bi = new BddInfo;
         bi->maxVal = 2;
         voc[name] = bi;
       }
 
-      inline void addIntVar(Voc& voc, std::string name, int size)
+      void addIntVar(Voc& voc, std::string name, int size)
       {
         LOG_IF(WARNING, size < 2) 
           << "I haven't tested the library for int size less than 2";

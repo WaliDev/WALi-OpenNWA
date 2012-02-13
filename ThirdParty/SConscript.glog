@@ -35,5 +35,5 @@ if not Dir(includeDir).exists() or not File(os.path.join(LibInstallDir,'libglog.
     
 built = []
 fromInc = join(os.getcwd(), glog, 'include', 'glog')
-built += Command(includeDir, fromInc, [Copy(includeDir,fromInc)])
+built += Command(includeDir, fromInc, [Delete(includeDir),Copy(includeDir,fromInc)])
 Return('built')
