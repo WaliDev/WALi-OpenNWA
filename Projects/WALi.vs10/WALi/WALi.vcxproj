@@ -149,13 +149,13 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Source\opennwa\construct\complement.cpp" />
-    <ClCompile Include="..\..\..\Source\opennwa\construct\concat.cpp" />
-    <ClCompile Include="..\..\..\Source\opennwa\construct\determinize.cpp" />
-    <ClCompile Include="..\..\..\Source\opennwa\construct\intersect.cpp" />
-    <ClCompile Include="..\..\..\Source\opennwa\construct\reverse.cpp" />
-    <ClCompile Include="..\..\..\Source\opennwa\construct\star.cpp" />
-    <ClCompile Include="..\..\..\Source\opennwa\construct\union.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_complement.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_concat.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_determinize.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_intersect.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_reverse.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_star.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_union.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\details\StateStorage.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\details\SymbolStorage.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\details\TransitionInfo.cpp" />

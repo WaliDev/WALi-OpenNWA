@@ -312,27 +312,6 @@
     <ClCompile Include="..\..\..\Source\wali\wfa\epr\FunctionalWeightMaker.cpp">
       <Filter>Source Files\wali.wfa.epr</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\opennwa\construct\union.cpp">
-      <Filter>Source Files\wali.nwa\construct</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\opennwa\construct\complement.cpp">
-      <Filter>Source Files\wali.nwa\construct</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\opennwa\construct\concat.cpp">
-      <Filter>Source Files\wali.nwa\construct</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\opennwa\construct\determinize.cpp">
-      <Filter>Source Files\wali.nwa\construct</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\opennwa\construct\intersect.cpp">
-      <Filter>Source Files\wali.nwa\construct</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\opennwa\construct\reverse.cpp">
-      <Filter>Source Files\wali.nwa\construct</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\opennwa\construct\star.cpp">
-      <Filter>Source Files\wali.nwa\construct</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\opennwa\details\TransitionStorage.cpp">
       <Filter>Source Files\wali.nwa\details</Filter>
     </ClCompile>
@@ -380,6 +359,27 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\opennwa\NwaParser.cpp">
       <Filter>Source Files\wali.nwa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_union.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_star.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_concat.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_complement.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_determinize.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_intersect.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_reverse.cpp">
+      <Filter>Source Files\wali.nwa\construct</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
