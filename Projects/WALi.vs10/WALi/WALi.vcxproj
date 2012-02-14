@@ -161,6 +161,7 @@
     <ClCompile Include="..\..\..\Source\opennwa\details\TransitionInfo.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\details\TransitionStorage.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\NWA.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\NwaParser.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\nwa_pds\NwaToPds.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\nwa_pds\plusWpds.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\nwa_pds\WpdsToNwa.cpp" />

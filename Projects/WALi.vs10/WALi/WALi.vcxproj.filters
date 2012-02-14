@@ -378,6 +378,9 @@
     <ClCompile Include="..\..\..\Source\opennwa\NWA.cpp">
       <Filter>Source Files\wali.nwa</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\opennwa\NwaParser.cpp">
+      <Filter>Source Files\wali.nwa</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\FWPDS.hpp">
