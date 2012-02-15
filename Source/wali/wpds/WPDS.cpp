@@ -709,7 +709,7 @@ namespace wali
         Key to_stack1,
         Key to_stack2,
         sem_elem_t se,
-	bool replace_weight,
+        bool replace_weight,
         rule_t& r
         )
     {
@@ -838,7 +838,7 @@ namespace wali
         Config *f,
         Config *t,
         Key stk2,
-	bool replace_weight,
+        bool replace_weight,
         rule_t& r )
     {
       bool exists = false;
@@ -857,12 +857,12 @@ namespace wali
             r->setWeight( wrapper->wrap(*r) );
           }
 
-	  if(!replace_weight) {
-	    sem_elem_t x = tmp->weight()->combine(r->weight()); 
-	    r->setWeight(x);
-	  }
-	  // This copy operation also copies other things that might sit on the
-	  // rule (i.e., merge functions)
+          if(!replace_weight) {
+            sem_elem_t x = tmp->weight()->combine(r->weight()); 
+            r->setWeight(x);
+          }
+          // This copy operation also copies other things that might sit on the
+          // rule (i.e., merge functions)
           tmp->copy(r);
           r = tmp;
           break;
