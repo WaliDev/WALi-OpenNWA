@@ -32,7 +32,7 @@ SixtyFourBitAliases=['64', 'x64', 'x86_64', 'amd64']
 vars = Variables()
 vars.Add(EnumVariable('arch', 'Architecture', 'default',
          allowed_values=ThirtyTwoBitAliases+SixtyFourBitAliases+['default']))
-vars.Add(PathVariable('CXX', 'Path to compiler', 'g++', PathVariable.PathAccept))
+vars.Add(PathVariable('CXX', 'Path to compiler', BaseEnv['CXX'], PathVariable.PathAccept))
 vars.Add(BoolVariable('strong_warnings', 'Enable (on by default) to get strong warning flags', True))
 
 tempEnviron = Environment(tools=[], variables=vars)
