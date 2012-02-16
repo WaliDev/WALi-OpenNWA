@@ -82,6 +82,11 @@ namespace wali
 #   endif
 #   define CONSTANT_CONDITION(x) x
 #   define UNUSED_PARAMETER(x) x ATTR_UNUSED
+#   if( GCC_VERSION >= 40400 )
+#       define HAS_PRAGMA_MESSAGE 1
+#   else
+#       define HAS_PRAGMA_MESSAGE 0
+#   endif
 #elif defined(_WIN32)
 #   pragma once
 #   define ATTR_UNUSED
@@ -98,6 +103,7 @@ namespace wali
 #       define CONSTANT_CONDITION(x) x
 #   endif
 #   define UNUSED_PARAMETER(x)
+#   define HAS_PRAGMA_MESSAGE 1
 #endif // defined(__GNUC__)
 
 #endif  // wali_COMMON_GUARD
