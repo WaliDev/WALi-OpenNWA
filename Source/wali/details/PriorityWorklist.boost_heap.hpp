@@ -12,19 +12,39 @@
 #include <set>
 #include <functional>
 
+#include <boost/heap/binomial_heap.hpp>
+
 namespace wali
 {
   namespace details
   {
     template<typename Compare>
+    struct binary_negate_with_default_constructor : std::binary_negate<Compare>
+    {
+      binary_negate_with_default_constructor()
+        : std::binary_negate<Compare>(Compare())
+      {}
+
+      binary_negate_with_default_constructor(Compare const & cmp)
+        : std::binary_negate<Compare>(cmp)
+      {}
+
+      binary_negate_with_default_constructor(binary_negate_with_default_constructor const & cmp)
+        : std::binary_negate<Compare>(cmp)
+      {}
+    };
+    
+    
+    template<typename Compare>
     class BoostHeapPriorityWorklist : public Worklist<wfa::ITrans>
     {
       // Boost implements max-heaps, not min-heaps. We want to hide this
       // pecularity, so negate the comparison functor.
-      typedef std::binary_negate<Compare> NotCompare;
+      typedef binary_negate_with_default_constructor<Compare> NotCompare;
       
     public:
-      typedef std::multiset< wfa::ITrans*, NotCompare > pwl_t;
+      typedef boost::heap::binomial_heap< wfa::ITrans*,
+                                          boost::heap::compare<NotCompare> > pwl_t;
 
     public:
       BoostHeapPriorityWorklist();

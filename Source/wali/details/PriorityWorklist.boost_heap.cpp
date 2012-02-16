@@ -32,7 +32,7 @@ namespace wali
       if( !t->marked() ) {
         //std::cout << " (was not there before)\n";
         t->mark();
-        workset.insert(t);
+        workset.push(t);
         return true;
       }
       else {
@@ -57,11 +57,8 @@ namespace wali
       // if (invocation_count++ % 100000 == 0) {
       //   std::cout << invocation_count << " " << "worklist size: " << workset.size() << "\n";
       // }
-      typename pwl_t::iterator i = workset.begin();
-      wfa::ITrans* t = (*i);
-      workset.erase(i);
-      t->unmark();
-      //std::cout << "Removing " << t->toString() << " from the worklist\n";
+      wfa::ITrans* t = workset.top();
+      workset.pop();
       return t;
     }
 
