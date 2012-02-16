@@ -2452,7 +2452,11 @@ namespace opennwa
     std::stringstream ss;
     print(ss);
 
+#ifdef _MSC_VER // Avoid MSVC warning
+    return _strdup(ss.str().c_str());
+#else
     return strdup(ss.str().c_str());
+#endif
   }
 
   void
