@@ -12,6 +12,7 @@ namespace wali
 #ifdef _MSC_VER
 #pragma warning(disable: 4355) // 'this' : used in base member initializer list
 #endif
+    
 
     template<typename Compare>
     BoostHeapPriorityWorklist<Compare>::BoostHeapPriorityWorklist()
@@ -28,24 +29,12 @@ namespace wali
     template<typename Compare>
     bool BoostHeapPriorityWorklist<Compare>::put( wfa::ITrans *t )
     {
-      //std::cout << "\"Adding\" " << t->toString() << " to worklist...";
       if( !t->marked() ) {
-        //std::cout << " (was not there before)\n";
         t->mark();
         workset.push(t);
         return true;
       }
       else {
-        //std::cout << "CALLING FIND (removing and re-adding)\n";
-        // pwl_t::iterator loc = std::find(workset.begin(), workset.end(), t);
-        // if (loc != workset.end()) {
-        //   workset.erase(loc);
-        //   workset.insert(t);
-        // }
-        // else {
-        //   std::cout << "t marked but not in WL\n";
-        //   assert(false);
-        // }
         return false;
       }
     }
@@ -53,10 +42,6 @@ namespace wali
     template<typename Compare>
     wfa::ITrans * BoostHeapPriorityWorklist<Compare>::get() 
     {
-      // static int invocation_count = 0;
-      // if (invocation_count++ % 100000 == 0) {
-      //   std::cout << invocation_count << " " << "worklist size: " << workset.size() << "\n";
-      // }
       wfa::ITrans* t = workset.top();
       workset.pop();
       return t;
