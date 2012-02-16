@@ -46,5 +46,12 @@ namespace wali
 
 #include "wali/PriorityWorklist.cpp"
 
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
+
 #endif  // wali_PRIORITY_WORKLIST_GUARD
 
