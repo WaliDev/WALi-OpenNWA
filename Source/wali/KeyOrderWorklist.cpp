@@ -9,7 +9,7 @@
 
 namespace wali
 {
-  KeyOrderWorklist::KeyOrderWorklist() : PriorityWorklist()
+  KeyOrderWorklist::KeyOrderWorklist() : PriorityWorklist<KeyComparer>()
   {
   }
 
