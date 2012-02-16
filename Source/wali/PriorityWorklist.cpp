@@ -55,7 +55,7 @@ namespace wali
     // if (invocation_count++ % 100000 == 0) {
     //   std::cout << invocation_count << " " << "worklist size: " << workset.size() << "\n";
     // }
-    pwl_t::iterator i = workset.begin();
+    typename pwl_t::iterator i = workset.begin();
     wfa::ITrans* t = (*i);
     workset.erase(i);
     t->unmark();
@@ -72,8 +72,8 @@ namespace wali
   template<typename Compare>
   void PriorityWorklist<Compare>::clear()
   {
-    pwl_t::iterator i = workset.begin();
-    pwl_t::iterator iEND = workset.end();
+    typename pwl_t::iterator i = workset.begin();
+    typename pwl_t::iterator iEND = workset.end();
     // unmark everything
     for( ; i != iEND ; i++ ) {
       (*i)->unmark();
