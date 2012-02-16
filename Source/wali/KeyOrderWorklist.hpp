@@ -10,7 +10,7 @@
 
 namespace wali
 {
-  struct KeyComparer
+  struct KeyComparer : std::binary_function<const wfa::ITrans*, const wfa::ITrans*, bool>
   {
     bool operator() (const wfa::ITrans* a, const wfa::ITrans* b) const
     {

@@ -10,7 +10,8 @@
 
 namespace wali
 {
-  struct LessThan {
+  struct LessThan : std::binary_function<const wfa::ITrans*, const wfa::ITrans*, bool>
+  {
     bool operator()( const wfa::ITrans* a, const wfa::ITrans* b ) const
     {
       // a + b == a means that a >= b (so a < b is false)

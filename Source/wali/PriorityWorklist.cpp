@@ -14,7 +14,7 @@ namespace wali
   template<typename Compare>
   PriorityWorklist<Compare>::PriorityWorklist()
     : Worklist<wfa::ITrans>()
-    , workset(Compare())
+    , workset(NotCompare(Compare()))
   {}
 
   template<typename Compare>
