@@ -86,6 +86,7 @@ namespace opennwa {
     void SymbolStorage::removeAll( SymbolStorage symSet )
     {
       // FIXME: Make this not suck
+      (void) symSet;
       assert(0);
       std::exit(10);
       //symbols.erase(symSet.symbols.begin(),symSet.symbols.end());
