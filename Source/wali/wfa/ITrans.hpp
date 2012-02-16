@@ -108,7 +108,7 @@ namespace wali
         virtual const sem_elem_t weight() const throw()  = 0;
 
         /*! @return the worklist info */
-        virtual ref_ptr<WorklistData> worklistData() const throw();
+        virtual ref_ptr<WorklistData> worklistData() const throw() = 0;
 
         /*!
          * @return const sem_elem_t delta of ITrans
