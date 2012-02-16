@@ -33,10 +33,10 @@ namespace opennwa
 
             OddNumEvenGroupsNwa();
             
-            static void build_nwa(Nwa * nwa);
+            void build_nwa(Nwa * nwa);
 
-            static const State q0, q1, q2, q3, dummy;
-            static const Symbol call, ret, zero;
+            const State q0, q1, q2, q3, dummy;
+            const Symbol call, ret, zero;
             
             // From NWA-tests.cpp in Source/opennwa if you want to trace
             // history.
