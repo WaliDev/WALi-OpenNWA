@@ -101,7 +101,9 @@ namespace opennwa { namespace parser { namespace details {
             return &((*message)[0]);
           }
           else {
-            return NULL;
+            return
+              "The program raised a CharactersDifferException; in addition, the error message "
+              "for that exception could not be constructed";
           }
         }
 
