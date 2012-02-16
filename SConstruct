@@ -80,7 +80,8 @@ if 'gcc' == BaseEnv['CC']:
         BaseEnv.Append(LINKFLAGS='-m32')
 elif 'cl' == BaseEnv['CC']:
     # Mostly copied from VS C++ 2005 Command line
-    BaseEnv.Append(CCFLAGS='/TP /errorReport:prompt /W4 /wd4512 /GR /MTd /EHsc')
+    BaseEnv.Append(CCFLAGS='/TP /errorReport:prompt /W4 /wd4512 /GR /MTd /EHsc /Zi')
+    BaseEnv.Append(LINKFLAGS='/DEBUG')
     BaseEnv.Append(WARNING_FLAGS='')
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , '..', 'boost')])
