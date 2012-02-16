@@ -81,6 +81,7 @@ namespace wali
 #       define ATTR_UNUSED
 #   endif
 #   define CONSTANT_CONDITION(x) x
+#   define UNUSED_PARAMETER(x) x ATTR_UNUSED
 #elif defined(_WIN32)
 #   pragma once
 #   define ATTR_UNUSED
@@ -96,6 +97,7 @@ namespace wali
 #   else
 #       define CONSTANT_CONDITION(x) x
 #   endif
+#   define UNUSED_PARAMETER(x)
 #endif // defined(__GNUC__)
 
 #endif  // wali_COMMON_GUARD
