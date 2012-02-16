@@ -1,5 +1,5 @@
-#ifndef wali_PRIORITY_WORKLIST_GUARD
-#define wali_PRIORITY_WORKLIST_GUARD 1
+#ifndef wali_BOOST_HEAP_PRIORITY_WORKLIST_GUARD
+#define wali_BOOST_HEAP_PRIORITY_WORKLIST_GUARD 1
 
 /*!
  * @author Nicholas Kidd
@@ -14,8 +14,11 @@
 
 namespace wali
 {
+  namespace details
+  {
+  
   template<typename Compare>
-  class PriorityWorklist : public Worklist<wfa::ITrans>
+  class BoostHeapPriorityWorklist : public Worklist<wfa::ITrans>
   {
       // Boost implements max-heaps, not min-heaps. We want to hide this
       // pecularity, so negate the comparison functor.
@@ -25,9 +28,9 @@ namespace wali
       typedef std::multiset< wfa::ITrans*, NotCompare > pwl_t;
 
     public:
-      PriorityWorklist();
+      BoostHeapPriorityWorklist();
 
-      virtual ~PriorityWorklist();
+      virtual ~BoostHeapPriorityWorklist();
 
       virtual bool put( wfa::ITrans *t );
 
@@ -40,11 +43,13 @@ namespace wali
     protected:
       pwl_t workset;
 
-  }; // class PriorityWorklist
+  }; // class BoostHeapPriorityWorklist
 
+
+  } // namespace details
 } // namespace wali
 
-#include "wali/PriorityWorklist.cpp"
+#include "wali/details/PriorityWorklist.boost_heap.cpp"
 
 // Yo, Emacs!
 // Local Variables:
@@ -53,5 +58,5 @@ namespace wali
 // End:
 
 
-#endif  // wali_PRIORITY_WORKLIST_GUARD
+#endif  // wali_BOOST_HEAP_PRIORITY_WORKLIST_GUARD
 

@@ -3,28 +3,29 @@
  */
 
 #include "wali/Common.hpp"
-#include "wali/PriorityWorklist.hpp"
 
 namespace wali
 {
+  namespace details
+  {
 #ifdef _MSC_VER
 #pragma warning(disable: 4355) // 'this' : used in base member initializer list
 #endif
 
   template<typename Compare>
-  PriorityWorklist<Compare>::PriorityWorklist()
+  MultisetPriorityWorklist<Compare>::MultisetPriorityWorklist()
     : Worklist<wfa::ITrans>()
-    , workset(NotCompare(Compare()))
+    , workset(Compare())
   {}
 
   template<typename Compare>
-  PriorityWorklist<Compare>::~PriorityWorklist()
+  MultisetPriorityWorklist<Compare>::~MultisetPriorityWorklist()
   {
     clear();
   }
 
   template<typename Compare>
-  bool PriorityWorklist<Compare>::put( wfa::ITrans *t )
+  bool MultisetPriorityWorklist<Compare>::put( wfa::ITrans *t )
   {
     //std::cout << "\"Adding\" " << t->toString() << " to worklist...";
     if( !t->marked() ) {
@@ -49,7 +50,7 @@ namespace wali
   }
 
   template<typename Compare>
-  wfa::ITrans * PriorityWorklist<Compare>::get() 
+  wfa::ITrans * MultisetPriorityWorklist<Compare>::get() 
   {
     // static int invocation_count = 0;
     // if (invocation_count++ % 100000 == 0) {
@@ -64,13 +65,13 @@ namespace wali
   }
 
   template<typename Compare>
-  bool PriorityWorklist<Compare>::empty() const
+  bool MultisetPriorityWorklist<Compare>::empty() const
   {
     return workset.empty();
   }
 
   template<typename Compare>
-  void PriorityWorklist<Compare>::clear()
+  void MultisetPriorityWorklist<Compare>::clear()
   {
     typename pwl_t::iterator i = workset.begin();
     typename pwl_t::iterator iEND = workset.end();
@@ -79,6 +80,8 @@ namespace wali
       (*i)->unmark();
     }
     workset.clear();
+  }
+
   }
 }
 
