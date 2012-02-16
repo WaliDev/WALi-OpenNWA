@@ -83,7 +83,11 @@ elif 'cl' == BaseEnv['CC']:
     BaseEnv.Append(CCFLAGS='/TP /errorReport:prompt /W4 /wd4512 /GR /MTd /EHsc')
     BaseEnv.Append(WARNING_FLAGS='')
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
-BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
+BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , '..', 'boost')])
+try:
+    BaseEnv.Append(CPPPATH = [os.environ['BOOST_HOME']])
+except KeyError:
+    pass
 
 ## Only supporting 32 bit on Darwin to not deal w/ Leopard/Snow Leopard diffs
 if 'Darwin' == Platform and not MkStatic:
