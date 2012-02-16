@@ -69,15 +69,15 @@ namespace opennwa
             , q3   (getKey("q3"))
             , dummy(getKey("dummy"))
         
-            , zero (getKey("0"))
             , call (getKey("("))
             , ret  (getKey(")"))
+            , zero (getKey("0"))
         {
           build_nwa(&nwa);
         }
             
         void
-        OddNumEvenGroupsNwa::build_nwa(Nwa * nwa)
+        OddNumEvenGroupsNwa::build_nwa(Nwa * a)
         {
             // From NWA-tests.cpp in Source/opennwa if you want to trace
             // history.
@@ -116,22 +116,22 @@ namespace opennwa
             //          \     /
             //           `---'
 
-            nwa->addInitialState(q0);
-            nwa->addFinalState(q1);
+            a->addInitialState(q0);
+            a->addFinalState(q1);
                 
-            nwa->addInternalTrans(q2, zero, q3);
-            nwa->addInternalTrans(q3, zero, q2);
+            a->addInternalTrans(q2, zero, q3);
+            a->addInternalTrans(q3, zero, q2);
                 
-            nwa->addCallTrans(q0, call, q2);
-            nwa->addCallTrans(q1, call, q2);
-            nwa->addReturnTrans(q3, q1, ret, q0);
-            nwa->addReturnTrans(q3, q0, ret, q1);
+            a->addCallTrans(q0, call, q2);
+            a->addCallTrans(q1, call, q2);
+            a->addReturnTrans(q3, q1, ret, q0);
+            a->addReturnTrans(q3, q0, ret, q1);
 
 
-            nwa->addInternalTrans(q2, EPSILON, dummy);
-            nwa->addInternalTrans(q2, WILD, dummy);
-            nwa->addCallTrans(q2, WILD, dummy);
-            nwa->addReturnTrans(q2, q1, WILD, dummy);
+            a->addInternalTrans(q2, EPSILON, dummy);
+            a->addInternalTrans(q2, WILD, dummy);
+            a->addCallTrans(q2, WILD, dummy);
+            a->addReturnTrans(q2, q1, WILD, dummy);
         }
       
 }
