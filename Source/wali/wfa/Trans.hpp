@@ -139,6 +139,10 @@ namespace wali
           return delta;
         }
 
+        ref_ptr<WorklistData> worklistData() const throw() {
+          return worklist_data;
+        }
+
         //
         // getters (non const)
         //
@@ -202,6 +206,13 @@ namespace wali
          */
         void setDelta( const sem_elem_t w ) {
           delta = w;
+        }
+
+        /*!
+         * Sets the worklist data
+         */
+        void setWorklistData( ref_ptr<WorklistData> wd ) {
+          worklist_data = wd;
         }
 
         /*!
@@ -269,6 +280,7 @@ namespace wali
         Key toStateKey;
         mutable sem_elem_t se;
         sem_elem_t delta;
+        ref_ptr<WorklistData> worklist_data;
 
       protected:  // vars used in Process and not relevant to Trans
         status_t status;
