@@ -230,7 +230,6 @@
     <ClCompile Include="..\..\..\Source\wali\MergeFn.cpp" />
     <ClCompile Include="..\..\..\Source\wali\MergeFnFactory.cpp" />
     <ClCompile Include="..\..\..\Source\wali\Printable.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\PriorityWorklist.cpp" />
     <ClCompile Include="..\..\..\Source\wali\SemElem.cpp" />
     <ClCompile Include="..\..\..\Source\wali\SemElemPair.cpp" />
     <ClCompile Include="..\..\..\Source\wali\StringSource.cpp" />

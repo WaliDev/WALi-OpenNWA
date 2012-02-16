@@ -10,17 +10,21 @@ namespace wali
 #ifdef _MSC_VER
 #pragma warning(disable: 4355) // 'this' : used in base member initializer list
 #endif
-  PriorityWorklist::PriorityWorklist()
+
+  template<typename Compare>
+  PriorityWorklist<Compare>::PriorityWorklist()
     : Worklist<wfa::ITrans>()
-    , workset(LessThan(*this))
+    , workset(Compare())
   {}
 
-  PriorityWorklist::~PriorityWorklist()
+  template<typename Compare>
+  PriorityWorklist<Compare>::~PriorityWorklist()
   {
     clear();
   }
 
-  bool PriorityWorklist::put( wfa::ITrans *t )
+  template<typename Compare>
+  bool PriorityWorklist<Compare>::put( wfa::ITrans *t )
   {
     //std::cout << "\"Adding\" " << t->toString() << " to worklist...";
     if( !t->marked() ) {
@@ -44,7 +48,8 @@ namespace wali
     }
   }
 
-  wfa::ITrans * PriorityWorklist::get() 
+  template<typename Compare>
+  wfa::ITrans * PriorityWorklist<Compare>::get() 
   {
     // static int invocation_count = 0;
     // if (invocation_count++ % 100000 == 0) {
@@ -58,12 +63,14 @@ namespace wali
     return t;
   }
 
-  bool PriorityWorklist::empty() const
+  template<typename Compare>
+  bool PriorityWorklist<Compare>::empty() const
   {
     return workset.empty();
   }
 
-  void PriorityWorklist::clear()
+  template<typename Compare>
+  void PriorityWorklist<Compare>::clear()
   {
     pwl_t::iterator i = workset.begin();
     pwl_t::iterator iEND = workset.end();
@@ -73,27 +80,5 @@ namespace wali
     }
     workset.clear();
   }
-
-  int PriorityWorklist::compareTo( const wfa::ITrans* a , const wfa::ITrans* b) const
-  {
-    if( a->stack() == b->stack() ) {
-      return 0;
-    }
-    else if( a->stack() < b->stack() ) {
-      return -1;
-    }
-    else {
-      return 1;
-    }
-    /*
-       if( (a->stack() != WALI_EPSILON) && (b->stack() != WALI_EPSILON)) {
-       return (a->stack() < b->stack()) ? -1 : 1;
-       }
-       else {
-       return a->stack() && (b->stack() == WALI_EPSILON);
-       }
-       */
-  }
-
 }
 

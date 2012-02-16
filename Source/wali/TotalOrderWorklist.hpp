@@ -10,17 +10,24 @@
 
 namespace wali
 {
-  class TotalOrderWorklist : public PriorityWorklist
+  struct LessThan {
+    bool operator()( const wfa::ITrans* a, const wfa::ITrans* b ) const
+    {
+      // a + b == a means that a >= b (so a < b is false)
+      sem_elem_t tmp = a->weight()->combine( b->weight() );
+      if( tmp->equal( a->weight() ) )
+        return false;
+      else
+        return true;
+    }
+  };
+
+
+  class TotalOrderWorklist : public PriorityWorklist<LessThan>
   {
     public:
       TotalOrderWorklist();
       virtual ~TotalOrderWorklist();
-
-      /*!
-       * Returns -1 if a's weight is less than b's weight.
-       */
-      virtual int compareTo( const wfa::ITrans* a, const wfa::ITrans* b ) const;
-
   }; // class PriorityWorklist
 
 } // namespace wali

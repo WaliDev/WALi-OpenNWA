@@ -15,17 +15,5 @@ namespace wali
   TotalOrderWorklist::~TotalOrderWorklist()
   {
   }
-
-  int TotalOrderWorklist::compareTo(
-      const wfa::ITrans* a
-      , const wfa::ITrans* b) const
-  {
-    sem_elem_t tmp = a->weight()->combine( b->weight() );
-    if( tmp->equal( a->weight() ) )
-      return -1;
-    else
-      return 1;
-  }
-
 }
 

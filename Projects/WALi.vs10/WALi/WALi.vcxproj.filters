@@ -243,9 +243,6 @@
     <ClCompile Include="..\..\..\Source\wali\Printable.cpp">
       <Filter>Source Files\wali</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\PriorityWorklist.cpp">
-      <Filter>Source Files\wali</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\wali\SemElem.cpp">
       <Filter>Source Files\wali</Filter>
     </ClCompile>

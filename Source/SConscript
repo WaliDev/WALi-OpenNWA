@@ -24,7 +24,6 @@ nice_files = Split("""
 ./wali/RankedWorklist.cpp
 ./wali/ShortestPathWorklist.cpp
 ./wali/SemElem.cpp
-./wali/PriorityWorklist.cpp
 ./wali/Exception.cpp
 ./wali/Printable.cpp
 ./wali/Key.cpp

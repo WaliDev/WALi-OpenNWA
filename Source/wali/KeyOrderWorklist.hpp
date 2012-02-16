@@ -10,17 +10,24 @@
 
 namespace wali
 {
-  class KeyOrderWorklist : public PriorityWorklist
+  struct KeyComparer
+  {
+    bool operator() (const wfa::ITrans* a, const wfa::ITrans* b) const
+    {
+      // < 0 if a < b
+      Triple<Key, Key, Key>
+        a_triple(a->from(), a->to(), a->stack()),
+        b_triple(b->from(), b->to(), b->stack());
+
+      return a_triple < b_triple;
+    }
+  };
+
+  class KeyOrderWorklist : public PriorityWorklist<KeyComparer>
   {
     public:
       KeyOrderWorklist();
       virtual ~KeyOrderWorklist();
-
-      /*!
-       * Returns -1 if a's weight is less than b's weight.
-       */
-      virtual int compareTo( const wfa::ITrans* a, const wfa::ITrans* b ) const;
-
   }; // class PriorityWorklist
 
 } // namespace wali
