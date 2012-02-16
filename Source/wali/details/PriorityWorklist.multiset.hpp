@@ -16,9 +16,9 @@ namespace wali
   namespace details
   {
   
-  template<typename Compare>
-  class MultisetPriorityWorklist : public Worklist<wfa::ITrans>
-  {
+    template<typename Compare>
+    class MultisetPriorityWorklist : public Worklist<wfa::ITrans>
+    {
     public:
       typedef std::multiset< wfa::ITrans*, Compare > pwl_t;
 
@@ -38,7 +38,7 @@ namespace wali
     protected:
       pwl_t workset;
 
-  }; // class PriorityWorklist
+    }; // class PriorityWorklist
 
   } // namespace details
 } // namespace wali

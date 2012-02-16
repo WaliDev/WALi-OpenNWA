@@ -16,10 +16,9 @@ namespace wali
 {
   namespace details
   {
-  
-  template<typename Compare>
-  class BoostHeapPriorityWorklist : public Worklist<wfa::ITrans>
-  {
+    template<typename Compare>
+    class BoostHeapPriorityWorklist : public Worklist<wfa::ITrans>
+    {
       // Boost implements max-heaps, not min-heaps. We want to hide this
       // pecularity, so negate the comparison functor.
       typedef std::binary_negate<Compare> NotCompare;
@@ -43,7 +42,7 @@ namespace wali
     protected:
       pwl_t workset;
 
-  }; // class BoostHeapPriorityWorklist
+    }; // class BoostHeapPriorityWorklist
 
 
   } // namespace details
