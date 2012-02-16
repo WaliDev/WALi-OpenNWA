@@ -7,7 +7,7 @@
 #include <ctime>
 #include <cctype>
 
-#include <boost/shared_array.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "opennwa/NwaParser.hpp"
 #include "opennwa/Nwa.hpp"
@@ -82,26 +82,30 @@ namespace opennwa { namespace parser { namespace details {
         std::string lit;
         size_t differing_pos;
         int read_char;
-        boost::shared_array<const char> message;
+        boost::shared_ptr<std::vector<char> const> message;
         int line;
 
         CharactersDifferException(std::string const & l, size_t p, int c, int li)
           : lit(l)
           , differing_pos(p)
           , read_char(c)
-          , message(NULL)              
+          , message(err_msg())              
           , line(li)
         {
           assert(c!=-1);
-          message = boost::shared_array<const char>(err_msg());
         }
 
         const char * what() const throw()
         {
-          return message.get();
+          if (message) {
+            return &((*message)[0]);
+          }
+          else {
+            return NULL;
+          }
         }
 
-        const char * err_msg() const
+        std::vector<char> * err_msg() const
         {
           try {
             std::stringstream ss;
@@ -112,11 +116,8 @@ namespace opennwa { namespace parser { namespace details {
                << " of the literal; line " << line << "\n";
 
             std::string s = ss.str();
-            char * pm = new char[s.size()];
-            
-            std::copy(s.begin(), s.end(), pm);
-            std::cout << "CharactersDifferException allocated message at " << (unsigned long long) pm << "\n";
-            return pm;
+            std::vector<char> * v = new std::vector<char>(s.begin(), s.end());
+            return v;
           }
           catch (...) {
             //std::cout << "CharactersDifferException could not allocate memory\n";
