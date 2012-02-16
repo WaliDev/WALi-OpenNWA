@@ -85,14 +85,14 @@ namespace wali {
         };
 
         struct sem_elem_equal {
-            size_t operator() (sem_elem_t s1, sem_elem_t s2) const {
+            bool operator() (sem_elem_t s1, sem_elem_t s2) const {
                 return (s1.get_ptr() == s2.get_ptr());
                 //return (s1->equal(s2));
             }
         };
 
         struct sem_elem_less {
-            size_t operator() (sem_elem_t s1, sem_elem_t s2) const {
+            bool operator() (sem_elem_t s1, sem_elem_t s2) const {
                 return (s1.get_ptr() < s2.get_ptr());
                 //return (s1->equal(s2));
             }
