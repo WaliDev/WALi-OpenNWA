@@ -12,14 +12,6 @@
 #include <set>
 #include <functional>
 
-#include <boost/version.hpp>
-
-#if !defined(BOOST_VERSION) || BOOST_VERSION < 104900
-#    pragma message ("NOTE: This file requires Boost 1.49 or higher (with the Heap library). The next lines are likely to be a missing header error.")
-#endif
-
-#include <boost/heap/binomial_heap.hpp>
-
 namespace wali
 {
   template<typename Compare>
