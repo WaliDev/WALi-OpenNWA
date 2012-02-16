@@ -32,7 +32,7 @@ namespace opennwa
 
       //Start with a deterministic copy of the given NWA.
       // FIXME: keep information about whether a machine is deterministic
-      if(true) //! first.isDeterministic() )
+      if(CONSTANT_CONDITION(true)) //! first.isDeterministic() )
       {
         determinize(out, first);   //Note: determinize() will take care of clientInfo information.
       }
