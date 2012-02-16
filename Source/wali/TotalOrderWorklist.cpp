@@ -8,7 +8,7 @@
 
 namespace wali
 {
-  TotalOrderWorklist::TotalOrderWorklist() : PriorityWorklist()
+  TotalOrderWorklist::TotalOrderWorklist() : PriorityWorklist<LessThan>()
   {
   }
 
