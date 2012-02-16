@@ -80,6 +80,7 @@ namespace wali
 #   else
 #       define ATTR_UNUSED
 #   endif
+#   define CONSTANT_CONDITION(x) x
 #elif defined(_WIN32)
 #   pragma once
 #   define ATTR_UNUSED
@@ -89,6 +90,11 @@ namespace wali
 #   endif
 #   if !defined(_CPPRTTI)
 #       error RTTI is required by WALi.
+#   endif
+#   if _MSC_VER > 1500
+#       define CONSTANT_CONDITION(x) __pragma(warning(suppress:4127)) x
+#   else
+#       define CONSTANT_CONDITION(x) x
 #   endif
 #endif // defined(__GNUC__)
 

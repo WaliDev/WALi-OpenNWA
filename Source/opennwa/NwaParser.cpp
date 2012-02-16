@@ -184,7 +184,7 @@ namespace opennwa { namespace parser { namespace details {
         int paren_count = 0;
         discardws(is);
         std::string ret;
-        while (true) {
+        while (CONSTANT_CONDITION(true)) {
           int c = is.peek();
 
           // If we're at the end of the stream there's nothing we can do
