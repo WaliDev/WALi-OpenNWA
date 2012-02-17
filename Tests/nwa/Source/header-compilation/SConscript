@@ -11,7 +11,7 @@ Import('BaseEnv')
 
 objs = []
 bad_headers = ['OpenFstInterop.hpp', 'ProcedureNWAs.hpp', 'RelationOpsBuddy.hpp', 'RelationOpsPaired.hpp',
-               'abbreviated-nwa.hpp', 'iterators.hpp']
+               'abbreviated-nwa.hpp', 'iterators.hpp', 'PriorityWorklist.boost_heap.hpp']
 
 for h in headers:
     if h.name not in bad_headers:
