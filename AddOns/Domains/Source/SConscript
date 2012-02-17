@@ -23,30 +23,33 @@ walidomains_files = Split("""
 ./wali/domains/lh/PhaseLH.cpp
 """)
 
-Env = BaseEnv.Clone()
+env = BaseEnv.Clone()
 
 built = []
 
 # BinRel needs glog. Make sure that glog is built in ThirdParty
-ThirdPartyEnv = Env.Clone()
-toBuild = ['glog']
-Export('toBuild')
-built += SConscript(os.path.join(ThirdPartyDir,'SConscript'))
+ListOfBuilds = ['glog']
+[(glog_lib,glog_inc)] = SConscript(os.path.join(ThirdPartyDir,'SConscript'), 'ListOfBuilds')
 
 # Disable warnings because of BuDDy
-Env["WARNING_FLAGS"]="-Werror"
-Env.Append(CPPPATH=[os.path.join(WaliDir , 'AddOns', 'Domains' , 'Source')])
-Env.Append(CPPPATH=[os.path.join(WaliDir , 'AddOns', 'Domains' , 'ThirdParty', 'include')])
-Env.Append(CPPPATH=[os.path.join(ThirdPartyDir, 'include')])
+env["WARNING_FLAGS"]="-Werror"
+
+#buddy headers include path
+env.Append(CPPPATH=[os.path.join(WaliDir , 'AddOns', 'Domains' , 'ThirdParty', 'include')]) 
+#glog include path
+#env.Append(CPPPATH=[os.path.join(ThirdPartyDir, 'include')])
+env.Append(CPPPATH=[os.path.join(WaliDir , 'AddOns', 'Domains' , 'Source')])
+env.Append(CPPPATH=[glog_inc])
 
 if MkStatic:
-  walidomains = Env.StaticLibrary('walidomains' , walidomains_files)
-  i = Env.Install(LibInstallDir, walidomains)
+  walidomains = env.StaticLibrary('walidomains' , walidomains_files)
+  i = env.Install(LibInstallDir, walidomains)
   built += i
   Return('built')
 else:
-  walidomains = Env.SharedLibrary('walidomains' , walidomains_files)
-  i = Env.Install(LibInstallDir, walidomains)
+  walidomains = env.SharedLibrary('walidomains' , walidomains_files)
+  i = env.Install(LibInstallDir, walidomains)
   built += i
   Return('built')
+
 

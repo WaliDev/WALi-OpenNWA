@@ -5,11 +5,12 @@ Import('WaliDir')
 Import('LibInstallDir')
 Import('ProgEnv')
 Import('Debug')
+Import('TestDir')
 
 if Debug:
     print '\n+++ Entered "#/Tests/nwa/SConscript"\n'
 
-[(gtest_lib, gtest_include)] = SConscript('ThirdParty/SConscript')
+[(gtest_lib, gtest_include)] = SConscript(os.path.join(TestDir,'ThirdParty/SConscript'))
 
 env = ProgEnv.Clone()
 

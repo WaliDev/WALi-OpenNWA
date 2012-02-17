@@ -9,7 +9,7 @@ import shutil
 
 Import('Debug')
 Import('BaseEnv')
-Import('toBuild')
+Import('ListOfBuilds')
 Import('LibInstallDir')
 env = BaseEnv.Clone()
 
@@ -17,14 +17,13 @@ if Debug:
 	print '\n+++ Entered "#/ThirdParty/SConscript"\n'
 
 IncludeDir = os.path.join(os.getcwd(),'include')
-Export('IncludeDir')
 
 built = []
-if 'all' in toBuild:
-  built+= SConscript('SConscript.glog')
+if 'all' in ListOfBuilds:
+  built+= SConscript('SConscript.glog', ['IncludeDir'])
 else:
-  if 'glog' in toBuild:
-    built+= SConscript('SConscript.glog')
+  if 'glog' in ListOfBuilds:
+    built+= SConscript('SConscript.glog', ['IncludeDir'])
 
 Return('built')
  

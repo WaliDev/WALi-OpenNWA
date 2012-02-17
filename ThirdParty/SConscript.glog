@@ -8,32 +8,46 @@ import os
 import shutil
 
 glog = 'glog-0.3.2'
-
+lib_name = 'glog'
 Import('Debug')
 Import('LibInstallDir')
 Import('IncludeDir')
 Import('BaseEnv')
 
+env = BaseEnv.Clone()
+
 if Debug:
 	print '\n+++ Entered "#/ThirdParty/SConscript.glog"\n'
 
-def get_targz(base):
-  wget = "curl -O"
-  targz = base + '.tar.gz'
-  BaseEnv.Execute('%s http://google-glog.googlecode.com/files/%s' % (wget,targz))
-  BaseEnv.Execute('tar zxvf %s' % targz)
 
-includeDir = join(IncludeDir,'glog')
+compileCom = []
+installCom = []
+headerCom = []
+
+#setup commands for build according as what files already exist
+#Trying to give a coarse grained incremental build.
 if not File(os.path.join(glog,'.libs','libglog.so')).exists():
-  get_targz(glog)
-  #BaseEnv.Execute('autoreconf -if')
-  BaseEnv.Execute('cd %s; ./configure --prefix=%s --libdir=%s' %(glog,os.path.join(os.getcwd(),glog),LibInstallDir))
-  BaseEnv.Execute('cd %s; make' %(glog))
-  BaseEnv.Execute('cd %s; make install' %(glog))
-if not Dir(includeDir).exists() or not File(os.path.join(LibInstallDir,'libglog.so')).exists():
-  BaseEnv.Execute('cd %s; make install' %(glog))
-    
-built = []
-fromInc = join(os.getcwd(), glog, 'include', 'glog')
-built += Command(includeDir, fromInc, [Delete(includeDir),Copy(includeDir,fromInc)])
+  wget = "curl -O"
+  targz = glog + '.tar.gz'
+  compileCom = ['%s http://google-glog.googlecode.com/files/%s' % (wget,targz),
+    'tar zxvf %s' %targz,
+    #'autoreconf -if',
+    'cd %s; ./configure --prefix=%s --libdir=%s' %(glog,join(os.getcwd(),glog),LibInstallDir),
+    'cd %s; make;' %(glog)]
+if not File(os.path.join(LibInstallDir,'libglog.so')).exists():
+  installCom = ['cd %s; make install;' %(glog)]
+includeDir = join(IncludeDir,'glog')
+if not Dir(includeDir).exists(): 
+  fromInc = join(os.getcwd(), glog, 'include')
+  headerCom = ['rm -rf %s; cp -r %s %s;' %(includeDir,fromInc,IncludeDir)]
+
+
+#The acual commands to run during the build
+command = compileCom + installCom + headerCom
+#lib = env.Command(lib_name, [], command)
+lib = 'glog'
+#I really don't know why the Command isn't working.
+env.Execute(command)  
+print lib
+built = [(lib, IncludeDir)]
 Return('built')
