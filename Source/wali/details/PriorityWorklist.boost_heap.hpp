@@ -12,7 +12,8 @@
 #include <set>
 #include <functional>
 
-#include <boost/heap/binomial_heap.hpp>
+#include <boost/heap/fibonacci_heap.hpp>
+#include <boost/heap/d_ary_heap.hpp>
 
 namespace wali
 {
@@ -43,9 +44,17 @@ namespace wali
       typedef binary_negate_with_default_constructor<Compare> NotCompare;
       
     public:
-      typedef boost::heap::binomial_heap< wfa::ITrans*,
-                                          boost::heap::compare<NotCompare> > pwl_t;
 
+#if 1
+      typedef boost::heap::d_ary_heap< wfa::ITrans*,
+                                       boost::heap::compare<NotCompare>,
+                                       boost::heap::mutable_<true>,
+                                       boost::heap::arity<3> > pwl_t;
+#else
+      typedef boost::heap::fibonacci_heap< wfa::ITrans*,
+                                           boost::heap::compare<NotCompare> > pwl_t;
+#endif
+      
     public:
       BoostHeapPriorityWorklist();
 
