@@ -48,7 +48,10 @@ elif arch in SixtyFourBitAliases:
     Is64 = True
 
 
+BaseEnv['CC'] = BaseEnv.WhereIs(BaseEnv['CC'])
+BaseEnv['CXX'] = BaseEnv.WhereIs(BaseEnv['CXX'])
 
+(dummy, BaseEnv['compiler']) = os.path.split(BaseEnv['CC'])
 
 if Is64:
     LibInstallDir  = os.path.join(WaliDir,'lib64')
@@ -61,7 +64,7 @@ else:
 
 BaseEnv['CMAKE'] = os.environ.get('CMAKE', 'cmake')
 
-if 'gcc' == BaseEnv['CC']:
+if 'gcc' == BaseEnv['compiler']:
     # -Waddress -Wlogical-op
 
     # -Wcast-qual 
@@ -78,7 +81,7 @@ if 'gcc' == BaseEnv['CC']:
         # right now (Is64 = (platform_bits == 64))
         BaseEnv.Append(CCFLAGS='-m32')
         BaseEnv.Append(LINKFLAGS='-m32')
-elif 'cl' == BaseEnv['CC']:
+elif 'cl' == BaseEnv['compiler']:
     # Mostly copied from VS C++ 2005 Command line
     BaseEnv.Append(CCFLAGS='/TP /errorReport:prompt /W4 /wd4512 /GR /MTd /EHsc /Zi')
     BaseEnv.Append(LINKFLAGS='/DEBUG')

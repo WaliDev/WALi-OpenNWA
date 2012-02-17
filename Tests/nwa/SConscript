@@ -13,7 +13,7 @@ if Debug:
 
 env = ProgEnv.Clone()
 
-if 'cl' != env['CC']:
+if 'cl' != env['compiler']:
     env.AppendUnique(LIBS=[gtest_lib, 'pthread'])
 else:
     env.AppendUnique(LIBS=[gtest_lib])
