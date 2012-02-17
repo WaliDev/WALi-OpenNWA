@@ -68,7 +68,7 @@ if 'gcc' == BaseEnv['CC']:
     BaseEnv.Append(CCFLAGS='-g -ggdb -Wall -O2')
     if strong_warnings:
         BaseEnv.Append(CCFLAGS='-Wextra $WARNING_FLAGS -fdiagnostics-show-option')
-        BaseEnv.Append(WARNING_FLAGS='-Werror -Wformat=2 -Winit-self -Wunused -Wfloat-equal -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wwrite-strings -Wconversion -Woverloaded-virtual')
+        BaseEnv.Append(WARNING_FLAGS='-Werror -Wformat=2 -Winit-self -Wunused -Wfloat-equal -Wundef -Wpointer-arith -Wcast-align -Wwrite-strings -Wconversion -Woverloaded-virtual')
     else:
         BaseEnv.Append(WARNING_FLAGS='')
 
