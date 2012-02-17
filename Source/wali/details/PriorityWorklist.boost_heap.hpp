@@ -62,6 +62,18 @@ namespace wali
     protected:
       pwl_t workset;
 
+    private:
+
+      struct HeapHandleData : wali::wfa::ITrans::WorklistData
+      {
+        typedef typename pwl_t::handle_type Handle;
+
+        Handle handle;
+
+        HeapHandleData(Handle const & h) : handle(h) {}
+      };
+
+
     }; // class BoostHeapPriorityWorklist
 
 
