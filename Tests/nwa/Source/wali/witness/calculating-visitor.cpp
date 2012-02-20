@@ -1,5 +1,7 @@
 #include "gtest/gtest.h"
 
+#include <boost/shared_ptr.hpp>
+
 #include "wali/Key.hpp"
 #include "wali/Common.hpp"
 #include "wali/wpds/Config.hpp"
@@ -139,7 +141,6 @@ namespace wali {
             }
         };
 
-        
         witness_t make_example_trans(std::string val)
         {
             Key k = getKey("dummy");
@@ -147,12 +148,15 @@ namespace wali {
             return w;
         }
 
-        witness_t make_example_rule(std::string val)
+        typedef boost::shared_ptr<Config> config_ptr;
+        typedef std::pair<config_ptr, config_ptr> config_ptr_pair;
+
+        witness_t make_example_rule(std::string val, config_ptr_pair * configs)
         {
             Key k = getKey("dummy");
-            Config* from = new Config(getKey(val), k);
-            Config* to   = new Config(k, k);
-            Rule rule(from, to, 0, NULL);
+            configs->first = config_ptr(new Config(getKey(val), k));
+            configs->second = config_ptr(new Config(k, k));
+            Rule rule(configs->first.get(), configs->second.get(), 0, NULL);
             witness_t w = new WitnessRule(rule);
             return w;
         }
@@ -179,7 +183,8 @@ namespace wali {
         }
 
         TEST(wali$witness$CalculatingVisitor, WitnessRule) {
-            witness_t w = make_example_rule("1");
+            config_ptr_pair ptrs;
+            witness_t w = make_example_rule("1", &ptrs);
             
             NumberComputer nc;
             w->accept(nc);
@@ -191,8 +196,9 @@ namespace wali {
         }
         
         TEST(wali$witness$CalculatingVisitor, WitnessCombine) {
-            witness_t w1 = make_example_rule("2");
-            witness_t w2 = make_example_rule("3");
+            config_ptr_pair ptrs1, ptrs2;
+            witness_t w1 = make_example_rule("2", &ptrs1);
+            witness_t w2 = make_example_rule("3", &ptrs2);
 
             witness_t w = make_combine(w1, w2);
             
@@ -206,8 +212,9 @@ namespace wali {
         }
 
         TEST(wali$witness$CalculatingVisitor, WitnessExtend$2arg) {
-            witness_t w1 = make_example_rule("2");
-            witness_t w2 = make_example_rule("3");
+            config_ptr_pair ptrs1, ptrs2;
+            witness_t w1 = make_example_rule("2", &ptrs1);
+            witness_t w2 = make_example_rule("3", &ptrs2);
 
             witness_t w = new WitnessExtend(NULL, w1, w2);
             
@@ -221,7 +228,9 @@ namespace wali {
         }
 
         TEST(wali$witness$CalculatingVisitor, WitnessExtend$1arg$impossible) {
-            witness_t w1 = make_example_rule("1");
+            config_ptr_pair ptrs;
+            witness_t w1 = make_example_rule("1", &ptrs);
+            
             EXPECT_DEATH({
                     WitnessExtend e(NULL, NULL, w1);
                 },
@@ -238,12 +247,14 @@ namespace wali {
 
 
         TEST(wali$witness$CalculatingVisitor, largeExamples$Richs) {
+            config_ptr_pair ptrs1, ptrs2, ptrs3, ptrs4, ptrs5, ptrs6, ptrs7, ptrs8, ptrs9, ptrs10;
+            
             witness_t stem =
                 new WitnessExtend(NULL,
                                   new WitnessExtend(NULL,
                                                     make_example_trans("1 root"),
-                                                    make_example_rule("2->3")),
-                                  make_example_rule("3->6"));
+                                                    make_example_rule("2->3", &ptrs1)),
+                                  make_example_rule("3->6", &ptrs8));
 
             witness_t loop_body =
                 new WitnessExtend(NULL,
@@ -251,10 +262,10 @@ namespace wali {
                                                     new WitnessExtend(NULL,
                                                                       new WitnessExtend(NULL,
                                                                                         stem,
-                                                                                        make_example_rule("6->7")),
-                                                                      make_example_rule("7->11")),
-                                                    make_example_rule("11->13")),
-                                  make_example_rule("13->6"));
+                                                                                        make_example_rule("6->7", &ptrs9)),
+                                                                      make_example_rule("7->11", &ptrs2)),
+                                                    make_example_rule("11->13", &ptrs3)),
+                                  make_example_rule("13->6", &ptrs4));
 
             witness_t loop_head = make_combine(loop_body, stem);
 
@@ -264,10 +275,10 @@ namespace wali {
                                                     new WitnessExtend(NULL,
                                                                       new WitnessExtend(NULL,
                                                                                         loop_head,
-                                                                                        make_example_rule("6->7")),
-                                                                      make_example_rule("7->11")),
-                                                    make_example_rule("11->13")),
-                                  make_example_rule("13->15"));
+                                                                                        make_example_rule("6->7", &ptrs10)),
+                                                                      make_example_rule("7->11", &ptrs5)),
+                                                    make_example_rule("11->13", &ptrs6)),
+                                  make_example_rule("13->15", &ptrs7));
                                                                       
             NumberComputer nc;
             tree->accept(nc);
