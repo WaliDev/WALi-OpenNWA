@@ -87,11 +87,12 @@ namespace wali
       }
       
       virtual void postvisitCombine( WitnessCombine * w) {
-        std::list<witness_t> children = w->children();
+        std::list<witness_t> const & children = w->children();
         
         std::list<AnswerType> child_answers;
         for (std::list<witness_t>::const_reverse_iterator child = children.rbegin();
-             child != children.rend(); ++child) {
+             child != children.rend(); ++child)
+        {
           child_answers.push_front(popCheck(child->get_ptr()));
         }
 
