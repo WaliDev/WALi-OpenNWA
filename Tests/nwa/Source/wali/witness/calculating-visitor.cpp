@@ -234,15 +234,15 @@ namespace wali {
             EXPECT_DEATH({
                     WitnessExtend e(NULL, NULL, w1);
                 },
-                "Assertion `the_left != __null\' failed");
+                "Assertion `the_left != .?__null.?\' failed");
             EXPECT_DEATH({
                     WitnessExtend e(NULL, w1, NULL);
                 },
-                "Assertion `the_right != __null\' failed");
+                "Assertion `the_right != .?__null.?\' failed");
             EXPECT_DEATH({
                     WitnessExtend e(NULL, NULL, NULL);
                 },
-                "Assertion `the_left != __null\' failed");
+                "Assertion `the_left != .?__null.?\' failed");
         }
 
 
