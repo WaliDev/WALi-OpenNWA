@@ -82,15 +82,16 @@ namespace opennwa { namespace parser { namespace details {
         std::string lit;
         size_t differing_pos;
         int read_char;
-        boost::shared_ptr<std::vector<char> const> message;
         int line;
+        boost::shared_ptr<std::vector<char> const> message;
+
 
         CharactersDifferException(std::string const & l, size_t p, int c, int li)
           : lit(l)
           , differing_pos(p)
           , read_char(c)
-          , message(err_msg())              
           , line(li)
+          , message(err_msg())              
         {
           assert(c!=-1);
         }
