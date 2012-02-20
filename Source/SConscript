@@ -71,7 +71,6 @@ nice_files = Split("""
 ./wali/witness/WitnessCombine.cpp
 ./wali/witness/WitnessMerge.cpp
 ./wali/graph/RegExp.cpp
-./wali/graph/Graph.cpp
 ./wali/graph/LinkEval.cpp
 ./wali/regex/Concat.cpp
 ./wali/regex/Regex.cpp
@@ -111,6 +110,7 @@ nice_files = Split("""
 
 
 naughty_files = Split("""
+    ./wali/graph/Graph.cpp
     ./wali/graph/IntraGraph.cpp
     ./wali/graph/InterGraph.cpp
     ./wali/graph/SummaryGraph.cpp
