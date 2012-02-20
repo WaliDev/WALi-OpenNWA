@@ -93,6 +93,10 @@ try:
 except KeyError:
     pass
 
+if os.path.split(BaseEnv['CXX'])[1] == 'pathCC':
+   BaseEnv.Append(LIBS=['gcc_s'])
+   BaseEnv.Append(LIBPATH=['/s/gcc-4.6.1/lib64'])
+
 ## Only supporting 32 bit on Darwin to not deal w/ Leopard/Snow Leopard diffs
 if 'Darwin' == Platform and not MkStatic:
    Is64 = False
