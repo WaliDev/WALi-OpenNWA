@@ -32,6 +32,8 @@ if not File(archive,ThirdParty).exists():
 if not File('README', os.path.join(ThirdParty, GtestDir)).exists():
     unpack = ['unzip', '-o', '-d', '$archive.dir', '$archive']
     env.Execute([unpack])
+    patch = ['patch', '-p0', '<' 'gtest-pathcc.patch']
+    env.Execute([patch])
 
 # build gtest
 build_dir = os.path.join('$builddir', GtestDir)

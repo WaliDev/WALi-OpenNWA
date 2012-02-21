@@ -1,0 +1,27 @@
+diff -u --recursive gtest-1.6.0/cmake/internal_utils.cmake gtest-pathcc/cmake/internal_utils.cmake
+--- gtest-1.6.0/cmake/internal_utils.cmake	2011-04-15 14:49:09.000000000 -0500
++++ gtest-pathcc/cmake/internal_utils.cmake	2012-02-20 13:39:11.000000000 -0600
+@@ -69,7 +69,8 @@
+     # whether RTTI is enabled.  Therefore we define GTEST_HAS_RTTI
+     # explicitly.
+     set(cxx_no_rtti_flags "-fno-rtti -DGTEST_HAS_RTTI=0")
+-    set(cxx_strict_flags "-Wextra")
++    # Disabled for PathScale
++    # set(cxx_strict_flags "-Wextra")
+   elseif (CMAKE_CXX_COMPILER_ID STREQUAL "SunPro")
+     set(cxx_exception_flags "-features=except")
+     # Sun Pro doesn't provide macros to indicate whether exceptions and
+diff -u --recursive gtest-1.6.0/include/gtest/internal/gtest-port.h gtest-pathcc/include/gtest/internal/gtest-port.h
+--- gtest-1.6.0/include/gtest/internal/gtest-port.h	2011-04-15 14:49:10.000000000 -0500
++++ gtest-pathcc/include/gtest/internal/gtest-port.h	2012-02-20 13:43:03.000000000 -0600
+@@ -449,8 +449,8 @@
+ // defining __GNUC__ and friends, but cannot compile GCC's tuple
+ // implementation.  MSVC 2008 (9.0) provides TR1 tuple in a 323 MB
+ // Feature Pack download, which we cannot assume the user has.
+-# if (defined(__GNUC__) && !defined(__CUDACC__) && (GTEST_GCC_VER_ >= 40000)) \
+-    || _MSC_VER >= 1600
++# if (defined(__GNUC__) && !defined(__CUDACC__) && !defined(__PATHCC__) \
++    && (GTEST_GCC_VER_ >= 40000)) || _MSC_VER >= 1600
+ #  define GTEST_USE_OWN_TR1_TUPLE 0
+ # else
+ #  define GTEST_USE_OWN_TR1_TUPLE 1
