@@ -102,7 +102,7 @@ if 'gcc' == BaseEnv['compiler']:
         BaseEnv.Append(LINKFLAGS='-m32')
 elif 'cl' == BaseEnv['compiler']:
     # Mostly copied from VS C++ 2005 Command line
-    BaseEnv.Append(CCFLAGS='/TP /errorReport:prompt /W4 /wd4512 /GR /EHsc /Zi')
+    BaseEnv.Append(CCFLAGS='/errorReport:prompt /W4 /wd4512 /GR /EHsc /Zi')
     BaseEnv.Append(LINKFLAGS='/DEBUG')
     BaseEnv.Append(WARNING_FLAGS='')
     if optimize:
