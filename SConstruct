@@ -73,6 +73,10 @@ else:
 
 BaseEnv['CMAKE'] = os.environ.get('CMAKE', 'cmake')
 
+assert 'CPPDEFINES' not in BaseEnv
+BaseEnv['CPPDEFINES'] = {}
+
+
 if 'gcc' == BaseEnv['compiler']:
     # -Waddress -Wlogical-op
 
@@ -81,8 +85,7 @@ if 'gcc' == BaseEnv['compiler']:
     if optimize:
        BaseEnv.Append(CCFLAGS=' -O2')
     if CheckedLevel == 'slow':
-       assert 'CPPDEFINES' not in BaseEnv
-       BaseEnv['CPPDEFINES'] = {'_GLIBCXX_DEBUG': 1}
+       BaseEnv['CPPDEFINES']['_GLIBCXX_DEBUG'] = 1
     if strong_warnings:
         BaseEnv.Append(CCFLAGS='-Wextra $WARNING_FLAGS -fdiagnostics-show-option')
         BaseEnv.Append(WARNING_FLAGS='-Werror -Wformat=2 -Winit-self -Wunused -Wfloat-equal -Wundef -Wpointer-arith -Wcast-align -Wwrite-strings -Wconversion -Woverloaded-virtual')
@@ -112,6 +115,9 @@ try:
     BaseEnv.Append(CPPPATH = [os.environ['BOOST_HOME']])
 except KeyError:
     pass
+
+levels={'slow': 2, 'fast':1, 'ultra':0}
+BaseEnv['CPPDEFINES']['CHECKED_LEVEL'] = levels[CheckedLevel]
 
 if os.path.split(BaseEnv['CXX'])[1] == 'pathCC':
    BaseEnv.Append(LIBS=['gcc_s'])
