@@ -65,7 +65,52 @@ namespace wali
    */
   extern bool is_strict();
 
+# if !defined(CHECKED_LEVEL)
+#   error "CHECKED_LEVEL should be defined by now"
+# endif
+# if CHECKED_LEVEL < 0 || CHECKED_LEVEL > 2
+#   error "CHECKED_LEVEL has an invalid value; should be 0, 1, or 2"
+# endif
+
+  void assert_fail(const char* assertion,
+		   const char* file,
+		   unsigned int line,
+		   const char* function);
+
+# define WALI_DO_ASSERT(expr)                                                  \
+  ((expr)                                                               \
+   ? static_cast<void>(0)                                               \
+   : ::wali::assert_fail (#expr, __FILE__, __LINE__, WALI_FUNCTION))
+  
+# if defined(__GNUC__)
+#   define WALI_FUNCTION __PRETTY_FUNCTION__
+# else
+#   define WALI_FUNCTION __func__
+# endif
+
+  // Now, the user-visible assertions. CHECKED_LEVEL=0 corresponds
+  // to 'ultra', CHECKED_LEVEL=1 to 'fast', and CHECKED_LEVEL=2 to
+  // 'slow'. ('slow' also picks up debugging iterators.)
+  //
+  // 'fast_assert' should trigger for checking levels 'slow' and 'fast',
+  //               i.e. anything >= 1.
+  // 'slow_assert' should trigger for checking level 'slow' only,
+  //               i.e. anything >= 2 (i.e. right now, just 2)
+
+# if CHECKED_LEVEL >= 1
+#   define fast_assert(expr)    DoAssert(expr)
+# else
+#   define fast_assert(expr)    static_cast<void>(0)
+# endif
+
+# if CHECKED_LEVEL >= 2
+#   define slow_assert(expr)    DoAssert(expr)
+# else
+#   define slow_assert(expr)    static_cast<void>(0)
+# endif
+
 } // namespace wali
+
 
 /*!
  * @macro ATTR_UNUSED
