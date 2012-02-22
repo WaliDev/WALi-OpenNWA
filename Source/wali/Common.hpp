@@ -66,7 +66,7 @@ namespace wali
   extern bool is_strict();
 
 # if !defined(CHECKED_LEVEL)
-#   error "CHECKED_LEVEL should be defined by now"
+#   define CHECKED_LEVEL 1
 # endif
 # if CHECKED_LEVEL < 0 || CHECKED_LEVEL > 2
 #   error "CHECKED_LEVEL has an invalid value; should be 0, 1, or 2"
