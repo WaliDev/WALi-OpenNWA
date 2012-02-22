@@ -23,7 +23,7 @@ LibPath    = [ LibInstallDir ]
 
 if MkStatic:
   StaticLibs = [
-    os.path.join(LibInstallDir,'${LIBPREFIX}waliparse${WALISUFFIX}'),
+    os.path.join(LibInstallDir,'${LIBPREFIX}waliparse${LIBSUFFIX}'),
     os.path.join(LibInstallDir,'${LIBPREFIX}wali${LIBSUFFIX}'),
     os.path.join(LibInstallDir,xerces_lib_name),
     ]
