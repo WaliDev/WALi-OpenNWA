@@ -35,7 +35,7 @@ vars.Add(EnumVariable('arch', 'Architecture', 'default',
 vars.Add(PathVariable('CXX', 'Path to compiler', BaseEnv['CXX'], PathVariable.PathAccept))
 vars.Add(BoolVariable('strong_warnings', 'Enable (on by default) to get strong warning flags', True))
 vars.Add(BoolVariable('optimize', 'Turn on optimization', True))
-vars.Add(EnumVariable('checking', "Level of checking. 'slow' gives full checking, e.g. checked iterators. 'fast' gives only quick checks. 'ultra' removes all assertions.", None, allowed_values=('slow', 'fast', 'ultra')))
+vars.Add(EnumVariable('checking', "Level of checking. 'slow' gives full checking, e.g. checked iterators. 'fast' gives only quick checks. 'ultra' removes all assertions. NOTE: On Windows, this also controls whether the library builds with /MTd (under 'slow') or /MT (under 'fast' and 'ultra').", None, allowed_values=('slow', 'fast', 'ultra')))
 
 tempEnviron = Environment(tools=[], variables=vars)
 arch = tempEnviron['arch']
@@ -77,7 +77,12 @@ if 'gcc' == BaseEnv['compiler']:
     # -Waddress -Wlogical-op
 
     # -Wcast-qual 
-    BaseEnv.Append(CCFLAGS='-g -ggdb -Wall -O2')
+    BaseEnv.Append(CCFLAGS='-g -ggdb -Wall')
+    if optimize:
+       BaseEnv.Append(CCFLAGS=' -O2')
+    if CheckedLevel == 'slow':
+       assert 'CPPDEFINES' not in BaseEnv
+       BaseEnv['CPPDEFINES'] = {'_GLIBCXX_DEBUG': 1}
     if strong_warnings:
         BaseEnv.Append(CCFLAGS='-Wextra $WARNING_FLAGS -fdiagnostics-show-option')
         BaseEnv.Append(WARNING_FLAGS='-Werror -Wformat=2 -Winit-self -Wunused -Wfloat-equal -Wundef -Wpointer-arith -Wcast-align -Wwrite-strings -Wconversion -Woverloaded-virtual')
@@ -92,9 +97,15 @@ if 'gcc' == BaseEnv['compiler']:
         BaseEnv.Append(LINKFLAGS='-m32')
 elif 'cl' == BaseEnv['compiler']:
     # Mostly copied from VS C++ 2005 Command line
-    BaseEnv.Append(CCFLAGS='/TP /errorReport:prompt /W4 /wd4512 /GR /MTd /EHsc /Zi')
+    BaseEnv.Append(CCFLAGS='/TP /errorReport:prompt /W4 /wd4512 /GR /EHsc /Zi')
     BaseEnv.Append(LINKFLAGS='/DEBUG')
     BaseEnv.Append(WARNING_FLAGS='')
+    if optimize:
+       BaseEnv.Append(CCFLAGS=' /O2')
+    if CheckedLevel == 'slow':
+       BaseEnv.Append(CCFLAGS=' /MTd')
+    else:
+       BaseEnv.Append(CCFLAGS=' /MT')
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , '..', 'boost')])
 try:
