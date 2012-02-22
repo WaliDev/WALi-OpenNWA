@@ -34,11 +34,21 @@ vars.Add(EnumVariable('arch', 'Architecture', 'default',
          allowed_values=ThirtyTwoBitAliases+SixtyFourBitAliases+['default']))
 vars.Add(PathVariable('CXX', 'Path to compiler', BaseEnv['CXX'], PathVariable.PathAccept))
 vars.Add(BoolVariable('strong_warnings', 'Enable (on by default) to get strong warning flags', True))
+vars.Add(BoolVariable('optimize', 'Turn on optimization', True))
+vars.Add(EnumVariable('checking', "Level of checking. 'slow' gives full checking, e.g. checked iterators. 'fast' gives only quick checks. 'ultra' removes all assertions.", None, allowed_values=('slow', 'fast', 'ultra')))
 
 tempEnviron = Environment(tools=[], variables=vars)
 arch = tempEnviron['arch']
 BaseEnv['CXX'] = tempEnviron['CXX']
 strong_warnings = tempEnviron['strong_warnings']
+optimize = tempEnviron['optimize']
+if 'checking' not in tempEnviron:
+   if optimize:
+      CheckedLevel = 'fast'
+   else:
+      CheckedLevel = 'slow'
+else:
+   CheckedLevel = tempEnviron['checking']
 tempEnviron = None
 vars = None
 
@@ -46,7 +56,6 @@ if arch in ThirtyTwoBitAliases:
     Is64 = False
 elif arch in SixtyFourBitAliases:
     Is64 = True
-
 
 BaseEnv['CC'] = BaseEnv.WhereIs(BaseEnv['CC'])
 BaseEnv['CXX'] = BaseEnv.WhereIs(BaseEnv['CXX'])
@@ -113,7 +122,9 @@ if Debug:
     print "+ %20s : '%s'" % ('WaliDir',WaliDir)
     print "+ %20s : '%s'" % ('LibInstallDir',LibInstallDir)
     for f in ['CC','CXX','CFLAGS','CCFLAGS','CXXFLAGS','CPPPATH','SHLINKFLAGS']:
-        print "+ %20s : '%s'" % (f,BaseEnv[f])   
+        print "+ %20s : '%s'" % (f,BaseEnv[f])
+    print "+ %20s : '%s'" % ('optimize', optimize)
+    print "+ %20s : '%s'" % ('CheckedLevel', CheckedLevel)
 
 Export('Debug')
 Export('WaliDir')
@@ -124,6 +135,7 @@ Export('MkStatic')
 Export('BaseEnv')
 Export('Platform')
 Export('Is64')
+Export('CheckedLevel')
 
 ## Setup a default environment for building executables that use WALi
 ProgEnv = BaseEnv.Clone()
