@@ -14,7 +14,7 @@ if platform.machine() == 'i686':
    platform_bits = 32
 elif platform.machine() == 'x86_64':
    platform_bits = 64
-elif platform.machin() == 'AMD64':
+elif platform.machine() == 'AMD64':
    platform_bits = 64
 else:
     print "Warning: Check platform_bits for machine type", platform.machine()
