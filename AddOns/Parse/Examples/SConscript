@@ -54,7 +54,6 @@ Reach/Reach.cpp
 
 StaticLibs = [env.File(l) for l in StaticLibs]
 env.Append(LIBS=StaticLibs)
-env.Append(LIBS='pthread')
 env.Append(LIBPATH=LibInstallDir)
 Reach = env.Program('ExMain',ReachFiles)
 
