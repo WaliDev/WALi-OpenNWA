@@ -25,11 +25,10 @@ if MkStatic:
   StaticLibs = [
     os.path.join(LibInstallDir,'${LIBPREFIX}waliparse${LIBSUFFIX}'),
     os.path.join(LibInstallDir,'${LIBPREFIX}wali${LIBSUFFIX}'),
-    os.path.join(LibInstallDir,xerces_lib_name),
     ]
-  Libs = []
+  Libs = [xerces_lib_name]
   LibPath = []
-	
+
 	
 ## ###############################
 ## Environment
@@ -52,7 +51,14 @@ ReachFiles= Split("""
 Reach/ExMain.cpp
 Reach/Reach.cpp
 """)
-Reach = env.Program('ExMain',ReachFiles + StaticLibs)
+
+StaticLibs = [env.File(l) for l in StaticLibs]
+env.Append(LIBS=StaticLibs)
+env.Append(LIBS='pthread')
+env.Append(LIBPATH=LibInstallDir)
+Reach = env.Program('ExMain',ReachFiles)
+
+
 built = Reach
 
 Return('built')
