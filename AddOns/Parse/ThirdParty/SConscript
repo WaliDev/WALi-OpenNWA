@@ -41,7 +41,7 @@ if not File('README', os.path.join(ThirdParty,XercesDir)).exists():
 
 
 # copy Xerces library into common WALi library area
-library = ('lib/libxerces-c-3.1$SHLIBSUFFIX','lib/libxerces-c.a')[MkStatic]
+library = ('lib/libxerces-c-3.1$SHLIBSUFFIX','lib/${LIBPREFIX}xerces-c${LIBSUFFIX}')[MkStatic]
 instlib = env.Install(LibInstallDir, env.File(library,XercesDir))
 
 #print 'path  = ', instlib[0].path
