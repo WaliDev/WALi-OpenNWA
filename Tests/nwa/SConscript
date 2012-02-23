@@ -49,6 +49,7 @@ test_files = Split("""
     Source/namespace-nwa_pds/answers-nwa-to-backwards-pds-returns.cpp
     Source/namespace-nwa_pds/answers-nwa-to-pds-calls.cpp
     Source/namespace-nwa_pds/answers-nwa-to-pds-returns.cpp
+    Source/namespace-nwa_pds/get-control-location.cpp
     
     Source/wali/witness/calculating-visitor.cpp
     """)
