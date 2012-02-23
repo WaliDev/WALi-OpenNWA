@@ -19,21 +19,27 @@ using namespace std;
 using boost::algorithm::split;
 using boost::algorithm::is_any_of;
 
-#define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
 
-// WARNING: the order of these words must be consistent with the row & column
-//          order in the table 'expected_answers' below.
-static Nwa const nwas[] = {
-    Nwa(),
-    AcceptsBalancedOnly().nwa,
-    AcceptsStrictlyUnbalancedLeft().nwa,
-    AcceptsPossiblyUnbalancedLeft().nwa,
-    AcceptsStrictlyUnbalancedRight().nwa,
-    AcceptsPossiblyUnbalancedRight().nwa,
-    AcceptsPositionallyConsistentString().nwa
-};
+vector<Nwa> test_nwas()
+{
+#   define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
 
-static const unsigned num_nwas = NUM_ELEMENTS(nwas);
+    // WARNING: the order of these words must be consistent with the row & column
+    //          order in the table 'expected_answers' below.
+    Nwa const nwas[] = {
+	Nwa(),
+	AcceptsBalancedOnly().nwa,
+	AcceptsStrictlyUnbalancedLeft().nwa,
+	AcceptsPossiblyUnbalancedLeft().nwa,
+	AcceptsStrictlyUnbalancedRight().nwa,
+	AcceptsPossiblyUnbalancedRight().nwa,
+	AcceptsPositionallyConsistentString().nwa
+    };
+    
+    const unsigned num_nwas = NUM_ELEMENTS(nwas);
+
+    return vector<Nwa>(nwas, nwas+num_nwas);
+}
 
 
 extern std::string answers_forwards_returns[],
@@ -55,7 +61,8 @@ namespace opennwa {
 
             TEST(opennwa$nwa_pds$$NwaToWpdsCalls, testBatteryOfVariouslyBalancedNwas)
             {
-                for (unsigned nwa = 0 ; nwa < num_nwas ; ++nwa) {
+                vector<Nwa> nwas = test_nwas();
+                for (size_t nwa = 0 ; nwa < nwas.size() ; ++nwa) {
                     std::stringstream ss;
                     ss << "Testing NWA " << nwa;
                     SCOPED_TRACE(ss.str());
@@ -93,7 +100,7 @@ namespace opennwa {
                     sort(expected_fr);
                     sort(expected_bc);
                     sort(expected_br);
-                    
+
                     EXPECT_EQ(expected_fc, actual_fc);
                     EXPECT_EQ(expected_fr, actual_fr);
                     EXPECT_EQ(expected_bc, actual_bc);
