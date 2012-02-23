@@ -7,6 +7,7 @@
 #include "wali/Common.hpp"
 
 #include <iostream>
+#include <cstdlib>
 
 namespace wali
 {
@@ -97,11 +98,18 @@ namespace wali
 		   const char* function)
   {
 # ifdef _MSC_VER
+    using std::mbstowcs;
     std::cerr << "In function " << function <<":\n";
-    int sz_assertion = mbstowcs(NULL, assertion, 0);
-    int sz_file = mbstowcs(NULL, file, 0);
-    
+    size_t sz_assertion = mbstowcs(NULL, assertion, 0);
+    size_t sz_file = mbstowcs(NULL, file, 0);
+    wchar_t* wassertion = new wchar_t[sz_assertion + 1];
+    wchar_t* wfile = new wchar_t[sz_file + 1];
+    mbstowcs(wassertion, assertion, sz_assertion);
+    mbstowcs(wfile, file, sz_file);
     _wassert(assertion, file, line)
+# else
+    __assert_fail (assertion, file, line, function);
+# endif
   }
   
 
