@@ -82,10 +82,10 @@ namespace wali
    ? static_cast<void>(0)                                               \
    : ::wali::assert_fail (#expr, __FILE__, __LINE__, WALI_FUNCTION))
   
-# if defined(__GNUC__)
-#   define WALI_FUNCTION __PRETTY_FUNCTION__
+# if defined(_MSC_VER)
+#   define WALI_FUNCTION __FUNCSIG__
 # else
-#   define WALI_FUNCTION __func__
+#   define WALI_FUNCTION __PRETTY_FUNCTION__
 # endif
 
   // Now, the user-visible assertions. CHECKED_LEVEL=0 corresponds
@@ -98,13 +98,13 @@ namespace wali
   //               i.e. anything >= 2 (i.e. right now, just 2)
 
 # if CHECKED_LEVEL >= 1
-#   define fast_assert(expr)    DoAssert(expr)
+#   define fast_assert(expr)    WALI_DO_ASSERT(expr)
 # else
 #   define fast_assert(expr)    static_cast<void>(0)
 # endif
 
 # if CHECKED_LEVEL >= 2
-#   define slow_assert(expr)    DoAssert(expr)
+#   define slow_assert(expr)    WALI_DO_ASSERT(expr)
 # else
 #   define slow_assert(expr)    static_cast<void>(0)
 # endif

@@ -6,6 +6,8 @@
 
 #include "wali/Common.hpp"
 
+#include <iostream>
+
 namespace wali
 {
   // std::cerr is the default err stream
@@ -87,6 +89,21 @@ namespace wali
   bool is_strict() {
     return b_strict;
   }
+
+
+  void assert_fail(const char* assertion,
+		   const char* file,
+		   unsigned int line,
+		   const char* function)
+  {
+# ifdef _MSC_VER
+    std::cerr << "In function " << function <<":\n";
+    int sz_assertion = mbstowcs(NULL, assertion, 0);
+    int sz_file = mbstowcs(NULL, file, 0);
+    
+    _wassert(assertion, file, line)
+  }
+  
 
 } // namespace wali
 
