@@ -10,23 +10,29 @@
 
 
 using namespace opennwa;
+using std::vector;
 
-#define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
-
-// WARNING: the order of these words must be consistent with the row & column
-//          order in the table 'expected_answers' below.
-static Nwa const nwas[] = {
-    Nwa(),
-    AcceptsBalancedOnly().nwa,
-    AcceptsStrictlyUnbalancedLeft().nwa,
-    AcceptsPossiblyUnbalancedLeft().nwa,
-    AcceptsStrictlyUnbalancedRight().nwa,
-    AcceptsPossiblyUnbalancedRight().nwa,
-    AcceptsPositionallyConsistentString().nwa
-};
-
-static const unsigned num_nwas = NUM_ELEMENTS(nwas);
-
+namespace {
+    vector<Nwa> test_nwas() {
+#       define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
+        
+        // WARNING: the order of these words must be consistent with the row & column
+        //          order in the table 'expected_answers' below.
+        Nwa const nwas[] = {
+            Nwa(),
+            AcceptsBalancedOnly().nwa,
+            AcceptsStrictlyUnbalancedLeft().nwa,
+            AcceptsPossiblyUnbalancedLeft().nwa,
+            AcceptsStrictlyUnbalancedRight().nwa,
+            AcceptsPossiblyUnbalancedRight().nwa,
+            AcceptsPositionallyConsistentString().nwa
+        };
+        
+        const unsigned num_nwas = NUM_ELEMENTS(nwas);
+        
+        return vector<Nwa>(nwas, nwas+num_nwas);
+    }
+}
 
 // WARNING: the order of the rows and columns in this table must be
 //          consistent with the order of 'words' and 'nwas' above.
@@ -70,7 +76,8 @@ namespace opennwa {
 
             TEST(opennwa$query$$complement, testBatteryOfVariouslyBalancedNwas)
             {
-                for (unsigned nwa = 0 ; nwa < num_nwas ; ++nwa) {
+                vector<Nwa> nwas = test_nwas();
+                for (unsigned nwa = 0 ; nwa < nwas.size() ; ++nwa) {
                     std::stringstream ss;
                     ss << "Testing NWA " << nwa;
                     SCOPED_TRACE(ss.str());
