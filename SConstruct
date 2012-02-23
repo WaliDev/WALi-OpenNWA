@@ -37,7 +37,7 @@ vars.Add(EnumVariable('arch', 'Architecture', 'default',
 vars.Add(PathVariable('CXX', 'Path to compiler', BaseEnv['CXX'], PathVariable.PathAccept))
 vars.Add(BoolVariable('strong_warnings', 'Enable (on by default) to get strong warning flags', True))
 vars.Add(BoolVariable('optimize', 'Turn on optimization', True))
-vars.Add(EnumVariable('checking', "Level of checking. 'slow' gives full checking, e.g. checked iterators. 'fast' gives only quick checks. 'ultra' removes all assertions. NOTE: On Windows, this also controls whether the library builds with /MTd (under 'slow') or /MT (under 'fast' and 'ultra').", None, allowed_values=('slow', 'fast', 'ultra')))
+vars.Add(EnumVariable('checking', "Level of checking. 'slow' gives full checking, e.g. checked iterators. 'fast' gives only quick checks. 'none' removes all assertions. NOTE: On Windows, this also controls whether the library builds with /MTd (under 'slow') or /MT (under 'fast' and 'none').", None, allowed_values=('slow', 'fast', 'none')))
 
 tempEnviron = Environment(tools=[], variables=vars)
 arch = tempEnviron['arch']
@@ -118,7 +118,7 @@ try:
 except KeyError:
     pass
 
-levels={'slow': 2, 'fast':1, 'ultra':0}
+levels={'slow': 2, 'fast':1, 'none':0}
 BaseEnv['CPPDEFINES']['CHECKED_LEVEL'] = levels[CheckedLevel]
 
 if os.path.split(BaseEnv['CXX'])[1] == 'pathCC':
