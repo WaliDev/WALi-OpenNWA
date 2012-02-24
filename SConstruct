@@ -79,6 +79,11 @@ BaseEnv['CXX'] = unquoting_requoting_WhereIs(BaseEnv['CXX'])
 
 
 (dummy, BaseEnv['compiler']) = os.path.split(BaseEnv['CC'])
+if BaseEnv['compiler'][0] == '"':
+   BaseEnv['compiler'] = BaseEnv['compiler'][1:]
+if BaseEnv['compiler'][-1] == '"':
+   BaseEnv['compiler'] = BaseEnv['compiler'][0:-1]
+
 
 if Is64:
     LibInstallDir  = os.path.join(WaliDir,'lib64')
@@ -116,7 +121,7 @@ if 'gcc' == BaseEnv['compiler']:
         # right now (Is64 = (platform_bits == 64))
         BaseEnv.Append(CCFLAGS='-m32')
         BaseEnv.Append(LINKFLAGS='-m32')
-elif 'cl' == BaseEnv['compiler']:
+elif BaseEnv['compiler'] in ['cl', 'cl.EXE']:
     # Mostly copied from VS C++ 2005 Command line
     BaseEnv.Append(CCFLAGS='/errorReport:prompt /W4 /wd4512 /GR /EHsc /Zi')
     BaseEnv.Append(LINKFLAGS='/DEBUG')
@@ -160,6 +165,7 @@ if Debug:
         print "+ %20s : '%s'" % (f,BaseEnv[f])
     print "+ %20s : '%s'" % ('optimize', optimize)
     print "+ %20s : '%s'" % ('CheckedLevel', CheckedLevel)
+
 
 Export('Debug')
 Export('WaliDir')
