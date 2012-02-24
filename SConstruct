@@ -84,6 +84,9 @@ if BaseEnv['compiler'][0] == '"':
 if BaseEnv['compiler'][-1] == '"':
    BaseEnv['compiler'] = BaseEnv['compiler'][0:-1]
 
+if BaseEnv['compiler'] == 'cl.EXE':
+   BaseEnv['compiler'] = 'cl'
+
 
 if Is64:
     LibInstallDir  = os.path.join(WaliDir,'lib64')
