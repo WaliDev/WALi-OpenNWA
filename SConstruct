@@ -59,8 +59,24 @@ if arch in ThirtyTwoBitAliases:
 elif arch in SixtyFourBitAliases:
     Is64 = True
 
-BaseEnv['CC'] = BaseEnv.WhereIs(BaseEnv['CC'])
-BaseEnv['CXX'] = BaseEnv.WhereIs(BaseEnv['CXX'])
+
+def unquoting_WhereIs(possibly_relative_path_with_arguments):
+    no_variables = BaseEnv.subst(possibly_relative_path_with_arguments)
+    just_the_program = shlex.split(no_variables)[0]
+    absolute_path = str(BaseEnv.WhereIs(just_the_program))
+    return absolute_path
+
+import shlex
+def unquoting_requoting_WhereIs(possibly_relative_path_with_arguments):
+    absolute_path = unquoting_WhereIs(possibly_relative_path_with_arguments)
+    if ' ' in absolute_path:
+       return '"%s"' % absolute_path
+    else:
+       return absolute_path
+
+BaseEnv['CC']  = unquoting_requoting_WhereIs(BaseEnv['CC']) 
+BaseEnv['CXX'] = unquoting_requoting_WhereIs(BaseEnv['CXX']) 
+
 
 (dummy, BaseEnv['compiler']) = os.path.split(BaseEnv['CC'])
 
