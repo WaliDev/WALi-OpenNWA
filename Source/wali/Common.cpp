@@ -114,7 +114,7 @@ namespace wali
     wchar_t* wfile = new wchar_t[sz_file + 1];
     mbstowcs(wassertion, assertion, sz_assertion);
     mbstowcs(wfile, file, sz_file);
-    _wassert(assertion, file, line)
+    _wassert(wassertion, wfile, line);
 # else
     __assert_fail (assertion, file, line, function);
 # endif
