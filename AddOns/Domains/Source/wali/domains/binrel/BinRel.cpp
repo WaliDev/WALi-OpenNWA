@@ -3,9 +3,10 @@
  * @author Prathmesh Prabhu
  * @version $Id: BinRel.cpp 557 2009-10-19 18:51:54Z kidd $
  */
-
+ 
 #include "BinRel.hpp"
-#include "BuddyExt.hpp"
+#include "buddy/fdd.h"
+//#include "BuddyExt.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -118,7 +119,8 @@ const Voc BinRel::initialize(int bddMemSize, int cacheSize, Voc v)
     fdd_strm_hook( myFddStrmHandler );
   }else{
     //can not happen, unless reset fails.
-    *waliErr << "[WARNING] BuDDy already initialized." << endl;
+    *waliErr << "[ERROR] BuDDy already initialized." << endl;
+    assert( 0 );
   }
   // End initialize BuDDy
   // ///////////////////////
@@ -227,11 +229,11 @@ const Voc BinRel::initialize(int bddMemSize, int cacheSize, Voc v)
     commonVocSet23 = commonVocSet23 & fdd_ithset(varInfo->tensor1Rhs);
     commonVocSet23 = commonVocSet23 & fdd_ithset(varInfo->tensor2Lhs);
     commonVocId23 = commonVocId23 &
-      biimp(varInfo->maxVal, varInfo->tensor1Rhs, varInfo->tensor2Lhs);
+      fdd_equals(varInfo->tensor1Rhs, varInfo->tensor2Lhs);
     commonVocSet13 = commonVocSet13 & fdd_ithset(varInfo->tensor1Lhs);
     commonVocSet13 = commonVocSet13 & fdd_ithset(varInfo->tensor2Lhs);
     commonVocId13 = commonVocId13 & 
-      biimp(varInfo->maxVal, varInfo->tensor1Lhs, varInfo->tensor2Lhs);
+      fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
 
     //add the current varInfoiable with all its regalia to voc
     voc[varName] = varInfo;
@@ -263,6 +265,8 @@ const Voc BinRel::initialize(int bddMemSize, int cacheSize, Voc v)
 void BinRel::reset()
 {
 
+  if(bdd_isrunning == 0)
+    return;
   for(VocIter iter = voc.begin(), endIter = voc.end();
       endIter != iter;
       ++iter){
@@ -562,10 +566,10 @@ void BinRel::setId()
      ){
     BddInfo_t varInfo = (*varIter).second;
     baseId = baseId &
-      biimp(varInfo->maxVal, varInfo->baseLhs, varInfo->baseRhs);
+      fdd_equals(varInfo->baseLhs, varInfo->baseRhs);
     tensorId = tensorId &
-      (biimp(varInfo->maxVal, varInfo->tensor1Lhs, varInfo->tensor1Rhs) &
-       biimp(varInfo->maxVal, varInfo->tensor2Lhs, varInfo->tensor2Rhs));
+      (fdd_equals(varInfo->tensor1Lhs, varInfo->tensor1Rhs) &
+       fdd_equals(varInfo->tensor2Lhs, varInfo->tensor2Rhs));
   }
 }
 

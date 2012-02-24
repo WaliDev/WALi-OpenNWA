@@ -414,7 +414,28 @@ BDD fdd_ithvar(int var, int val)
    return v;
 }
 
-
+#if 0
+/*
+NAME    {* fdd\_biiimp *}
+SECTION {* fdd *}
+SHORT   {* Returns an identity relation on two fdd variables*}
+PROTO   {* BDD fdd_biimp(int maxVal, int idx1, int idx2) *}
+DESCR   {* idx1 and idx2 are indices for two fdd variables of the same max
+           value. The returned BDD is an identity mapping on the two fdd's*}
+RETURN  {* The identity map on the two fdd variables. Behaviour is unspecified
+           if the two fdd vars are not of the same width, or their maximum value
+           does not equal maxVal *}
+*/
+BDD fdd_biimp(int maxVal, int idx1, int idx2)
+{
+  BDD id = bddfalse;
+  int ctr;
+  for(ctr = 0; ctr < maxVal; ++ctr)
+    id = id |
+      (fdd_ithvar(idx1,ctr)  fdd_ithvar(idx2,ctr));
+  return id;
+}
+#endif
 /*
 NAME    {* fdd\_scanvar *}
 SECTION {* fdd *}

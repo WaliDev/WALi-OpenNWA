@@ -11,10 +11,12 @@ namespace wali
     namespace binrel
     {
 
+      const Voc initialize(int bddMemSize, int cacheSize, Voc voc);
+      void binRelDone();
+
       void addBoolVar(Voc& voc, std::string name);
       void addIntVar(Voc& voc, std::string name, int size);
 
-      const Voc initialize(int bddMemSize, int cacheSize, Voc voc);
       std::ostream& dumpManagerData(std::ostream& o);
       /** Makes an expression bdd from the variable */
       bdd From(std::string var);
@@ -35,6 +37,7 @@ namespace wali
       bdd Assign(std::string var, bdd expr);
       bdd Assume(bdd expr1, bdd expr2);
 
+      bdd tGetRandomTransformer(const Voc& voc, bool isTensored);
     }
   }
 }

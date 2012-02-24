@@ -57,6 +57,7 @@ namespace wali {
             int ar = find(a);
             int br = find(b);
             arr[ar] = br; // FIXME: Randomize this
+            //TODO: Used ranked union
         }
 
         inter_node_t promote_type(inter_node_t t1, inter_node_t t2) {

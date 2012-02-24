@@ -17,10 +17,6 @@
   Changelog (Prathmesh):
     (1) Added limited tensor product functionality. 2-STP implemented. No support
         for more general tensor products.
-    (2) Added printing functions for logicbox and xsb.
-
-  Note: Does not have unit tests!
-
  */
 
 #include <map>
@@ -103,6 +99,8 @@ namespace wali
           /** @return true if BinRel has been successfully initialized */
           static bool is_initialized();
 
+          static void reset();
+
           inline static const Voc getVoc() { return voc; }
         public:
           /** @see BinRel::Compose */
@@ -168,7 +166,6 @@ namespace wali
           std::ostream& printStats( std::ostream& o ) const;
 #endif
         protected:
-          static void reset();
           /** gets a bdd for identity relation on the correct bdd variables.*/
           static void setId();
 

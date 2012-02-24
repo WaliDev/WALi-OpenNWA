@@ -66,7 +66,9 @@ if 'gcc' == BaseEnv['CC']:
     # -Waddress -Wlogical-op
 
     # -Wcast-qual 
-    BaseEnv.Append(CCFLAGS='-g -ggdb -Wall -O2')
+    BaseEnv.Append(CCFLAGS='-g -ggdb -Wall -O0')
+    #PPP: FIXME: You are still building for debug!
+    #BaseEnv.Append(CCFLAGS='-g -ggdb -Wall -O2')
     if strong_warnings:
         BaseEnv.Append(CCFLAGS='-Wextra $WARNING_FLAGS -fdiagnostics-show-option')
         BaseEnv.Append(WARNING_FLAGS='-Werror -Wformat=2 -Winit-self -Wunused -Wfloat-equal -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wwrite-strings -Wconversion -Woverloaded-virtual')
@@ -139,9 +141,10 @@ if 'help' not in COMMAND_LINE_TARGETS:
     ## ##################
     ## All
     if 'all' in COMMAND_LINE_TARGETS:
-        for d in ['AddOns','Examples','Tests']:
+        for d in ['AddOns','Examples']:
             built += SConscript('%s/SConscript' % d)
-        nwa_tests = SConscript('Tests/nwa/SConscript', variant_dir=os.path.join(BuildDir,'tests'), duplicate=0)
+        built += SConscript('Tests/SConscript', variant_dir=os.path.join(BuildDir,'tests'), duplicate=0)
+        nwa_tests = SConscript('Tests/nwa/SConscript', variant_dir=os.path.join(BuildDir,'nwatests'), duplicate=0)
         built += nwa_tests
         built += BaseEnv.Install('Tests/nwa', nwa_tests)
         BaseEnv.Alias('all',built)

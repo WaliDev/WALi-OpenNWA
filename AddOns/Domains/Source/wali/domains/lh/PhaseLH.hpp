@@ -21,7 +21,7 @@
 #include <iostream>
 #include <vector>
 
-#include "bdd.h"
+#include "buddy/bdd.h"
 
 #include "wali/Common.hpp"
 

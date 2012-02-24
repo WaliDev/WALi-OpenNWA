@@ -1,8 +1,11 @@
 #include "BinRelManager.hpp"
-#include "BuddyExt.hpp"
+//#include "BuddyExt.hpp"
 
 #include "glog/logging.h"
 #include "buddy/fdd.h"
+
+#include <cstdlib>
+#include <ctime>
 
 using namespace  wali::domains::binrel;
 
@@ -56,6 +59,12 @@ namespace wali
         BddInfo_t bi = new BddInfo;
         bi->maxVal = size;
         voc[name] = bi;
+      }
+
+      void binRelDone()
+      {
+        reset();
+        BinRel::reset();
       }
 
       static void reset()
@@ -276,9 +285,9 @@ namespace wali
         }
         const BddInfo_t bi = (*BinRel::getVoc().find(var)).second;
         if(bi->maxVal == BOOLSIZE)
-          ret = biimp(bi->maxVal, bi->baseLhs, regAbool->baseRhs);
+          ret = fdd_equals(bi->baseLhs, regAbool->baseRhs);
         else
-          ret = biimp(bi->maxVal, bi->baseLhs, regAint->baseRhs);
+          ret = fdd_equals(bi->baseLhs, regAint->baseRhs);
 
         return ret;
       }
@@ -452,7 +461,7 @@ namespace wali
             ++iter)
         {
           if(var != iter->first)
-            c = c & biimp(iter->second->maxVal, (iter->second)->baseLhs,
+            c = c & fdd_equals((iter->second)->baseLhs,
                 (iter->second)->baseRhs);
         }
         return expr & c;
@@ -508,21 +517,20 @@ namespace wali
         bdd equate = bddtrue;
         for(Voc::const_iterator iter = voc.begin(); iter != voc.end(); ++iter){
           equate = equate &
-            biimp(
-                iter->second->maxVal,
+            fdd_equals(
                 iter->second->baseLhs,
                 iter->second->baseRhs
                 );
-        }
+        } 
         if(regAbool != NULL)
           equate = equate &
-            biimp(regAbool->maxVal,
+            fdd_equals(
                 regAbool->baseExtra,
                 regBbool->baseExtra
                 );
         if(regAint != NULL)
           equate = equate &
-            biimp(regAint->maxVal,
+            fdd_equals(
                 regAint->baseExtra,
                 regBint->baseExtra
                 );
@@ -540,6 +548,57 @@ namespace wali
 
         return ret;
       }
+
+      bdd tGetRandomTransformer(const Voc& voc, bool isTensored)
+      {
+        bdd ret = bddfalse;
+        int numRounds = rand() % 10 + 1;
+        for(int count=0; count < numRounds; ++count){
+          bdd inbdd = rand()%2?bddfalse:bddtrue;
+          for(Voc::const_iterator iter = voc.begin(); 
+              iter != voc.end();
+              ++iter){
+            int size = iter->second->maxVal;
+            int n;
+            if(!isTensored){
+              n = rand() % 4;
+              if(n==0)
+                inbdd = inbdd & fdd_ithvar(iter->second->baseLhs,rand()%size);
+              if(n==1)    
+                inbdd = inbdd | fdd_ithvar(iter->second->baseLhs,rand()%size);
+              n = rand() % 4;
+              if(n==0)
+                inbdd = inbdd & fdd_ithvar(iter->second->baseRhs,rand()%size);
+              if(n==1)    
+                inbdd = inbdd | fdd_ithvar(iter->second->baseRhs,rand()%size);
+            }else{
+              n = rand() % 4;
+              if(n==0)
+                inbdd = inbdd & fdd_ithvar(iter->second->tensor1Lhs,rand()%size);
+              if(n==1)    
+                inbdd = inbdd | fdd_ithvar(iter->second->tensor1Lhs,rand()%size);
+              n = rand() % 4;
+              if(n==0)
+                inbdd = inbdd & fdd_ithvar(iter->second->tensor1Rhs,rand()%size);
+              if(n==1)    
+                inbdd = inbdd | fdd_ithvar(iter->second->tensor1Rhs,rand()%size);
+              n = rand() % 4;
+              if(n==0)
+                inbdd = inbdd & fdd_ithvar(iter->second->tensor2Lhs,rand()%size);
+              if(n==1)    
+                inbdd = inbdd | fdd_ithvar(iter->second->tensor2Lhs,rand()%size);
+              n = rand() % 4;
+              if(n==0)
+                inbdd = inbdd & fdd_ithvar(iter->second->tensor2Rhs,rand()%size);
+              if(n==1)    
+                inbdd = inbdd | fdd_ithvar(iter->second->tensor2Rhs,rand()%size);
+            }
+          }
+          ret = rand() % 2 ? ret & inbdd : ret | inbdd;
+        }
+        return ret;
+      }
+
     }
   }
 }

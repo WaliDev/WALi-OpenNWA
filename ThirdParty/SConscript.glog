@@ -48,6 +48,5 @@ command = compileCom + installCom + headerCom
 lib = 'glog'
 #I really don't know why the Command isn't working.
 env.Execute(command)  
-print lib
 built = [(lib, IncludeDir)]
 Return('built')

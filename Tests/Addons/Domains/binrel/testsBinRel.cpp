@@ -8,6 +8,7 @@
 #include <limits>
 #include <sstream>
 #include <string>
+#include <cstdlib>
 
 // ::wali::domains::binrel
 #include "wali/domains/binrel/BinRel.hpp"
@@ -240,8 +241,7 @@ namespace{
       Voc voc;
   };
 
-  sem_elem_tensor_t BinRelTestInt::screenVar(string var, sem_elem_tensor_t wt)
-  {
+  sem_elem_tensor_t BinRelTestInt::screenVar(string var, sem_elem_tensor_t wt){
     sem_elem_tensor_t screen = new BinRel(Assume(From(var),Const(0)), false);
     return dynamic_cast<SemElemTensor*>(wt->extend(screen.get_ptr()).get_ptr());
   }
@@ -259,6 +259,229 @@ namespace{
     wt->print(ss << "W[1 && a==0 && b==0 && c==0]: ") << endl;
     EXPECT_TRUE(compareOutput("BinRelTestInt","testScreen",ss));
   }
+
+  TEST(BinRelTestRandom, baseDomain){
+    // //Maybe this should be done in a more repeat-friendly way// //
+    stringstream ss;
+    bool failed = false, dump = false;
+    Voc initVoc,voc;
+    addIntVar(initVoc, "a", 4);
+    addBoolVar(initVoc, "b");
+    addIntVar(initVoc, "c", 4);
+    addBoolVar(initVoc, "d");
+    voc = initialize(0,0,initVoc);
+    ASSERT_EQ(voc.size(),4);
+
+    srand(time(NULL));
+    for(int h=0;h<20;++h){
+      bdd r1bdd = tGetRandomTransformer(voc, false);
+      bdd r2bdd = tGetRandomTransformer(voc, false);
+      bdd r3bdd = tGetRandomTransformer(voc, false);
+
+      sem_elem_t r1 = new BinRel(r1bdd,false);
+      sem_elem_t r2 = new BinRel(r2bdd,false);
+      sem_elem_t r3 = new BinRel(r3bdd,false);
+      sem_elem_t w1,w2,w3,w4,w5;
+
+      w1 = r1->combine(r2);
+      w2 = r2->combine(r1);
+      if(!w1->equal(w2) || dump){
+        ss << "#################################\nr1 | r2 <> r2 | r1\n\n";
+        r1->print(ss << "r1: ") << endl;
+        r2->print(ss << "r2: ") << endl;
+        w1->print(ss << "r1 | r2: ") << endl;
+        w2->print(ss << "r2 | r1: ") << endl;
+        failed = true;
+      }
+
+      w1 = (r1->extend(r2))->combine(r1->extend(r3));
+      w2 = r1->extend(r2->combine(r3));;
+      if(!w1->equal(w2) || dump){
+        ss << "#################################\nr1 & (r2 | r3) <> r1 & r2 | r1 & r3\n\n";
+        r1->print(ss << "r1: ") << endl;
+        r2->print(ss << "r2: ") << endl;
+        r3->print(ss << "r3: ") << endl;
+        w1->print(ss << "r1 & (r2 | r3): ") << endl;
+        w2->print(ss << "r1 & r2 | r1 & r3: ") << endl;
+        failed = true;
+      }
+
+      w1 = (r1->extend(r3))->combine(r2->extend(r3));
+      w2 = (r1->combine(r2))->extend(r3);
+      if(!w1->equal(w2) || dump){
+        ss << "#################################\n(r1 | r2 ) & r3 <> r1 & r3 | r2 & r3\n\n";
+        r1->print(ss << "r1: ") << endl;
+        r2->print(ss << "r2: ") << endl;
+        r3->print(ss << "r3: ") << endl;
+        w1->print(ss << "(r1 | r2) & r3: ") << endl;
+        w2->print(ss << "r1 & r3 | r2 & r3: ") << endl;
+        failed = true;
+      }
+    }
+
+    if(failed){
+      cerr << "\n Differences logged in BinRelTestRandom_baseDomain.output\n";
+      writeOutput("BinRelTestRandom","baseDomain", ss);
+    }
+    ASSERT_FALSE(failed);
+  }
+
+  TEST(BinRelTestRandom, tensorDomain){
+    // //Maybe this should be done in a more repeat-friendly way// //
+    stringstream ss;
+    bool failed = false;
+    bool dump = false;
+    Voc initVoc,voc;
+    addIntVar(initVoc, "a", 4);
+    addBoolVar(initVoc, "b");
+    addIntVar(initVoc, "c", 4);
+    addBoolVar(initVoc, "d");
+    voc = initialize(0,0,initVoc);
+    ASSERT_EQ(voc.size(),4);
+
+    srand(time(NULL));
+    for(int h=0;h<20;++h){
+      bdd r1bdd = tGetRandomTransformer(voc, true);
+      bdd r2bdd = tGetRandomTransformer(voc, true);
+      bdd r3bdd = tGetRandomTransformer(voc, true);
+
+      sem_elem_t r1 = new BinRel(r1bdd,true);
+      sem_elem_t r2 = new BinRel(r2bdd,true);
+      sem_elem_t r3 = new BinRel(r3bdd,true);
+      sem_elem_t w1,w2,w3,w4,w5;
+
+      w1 = r1->combine(r2);
+      w2 = r2->combine(r1);
+      if(!w1->equal(w2) || dump){
+        ss << "#################################\n[tensor] r1 | r2 <> r2 | r1\n\n";
+        r1->print(ss << "r1: ") << endl;
+        r2->print(ss << "r2: ") << endl;
+        w1->print(ss << "r1 | r2: ") << endl;
+        w2->print(ss << "r2 | r1: ") << endl;
+        failed = true;
+      }
+
+      w1 = (r1->extend(r2))->combine(r1->extend(r3));
+      w2 = r1->extend(r2->combine(r3));;
+      if(!w1->equal(w2) || dump){
+        ss << "#################################\n[tensor] r1 & (r2 | r3) <> r1 & r2 | r1 & r3\n\n";
+        r1->print(ss << "r1: ") << endl;
+        r2->print(ss << "r2: ") << endl;
+        r3->print(ss << "r3: ") << endl;
+        w1->print(ss << "r1 & (r2 | r3): ") << endl;
+        w2->print(ss << "r1 & r2 | r1 & r3: ") << endl;
+        failed = true;
+      }
+
+      w1 = (r1->extend(r3))->combine(r2->extend(r3));
+      w2 = (r1->combine(r2))->extend(r3);
+      if(!w1->equal(w2) || dump){
+        ss << "#################################\n[tensor] (r1 | r2 ) & r3 <> r1 & r3 | r2 & r3\n\n";
+        r1->print(ss << "r1: ") << endl;
+        r2->print(ss << "r2: ") << endl;
+        r3->print(ss << "r3: ") << endl;
+        w1->print(ss << "(r1 | r2) & r3: ") << endl;
+        w2->print(ss << "r1 & r3 | r2 & r3: ") << endl;
+        failed = true;
+      }
+    }
+
+    if(failed){
+      cerr << "\n Differences logged in BinRelTestRandom_baseDomain.output\n";
+      writeOutput("BinRelTestRandom","tensorDomain", ss);
+    }
+    ASSERT_FALSE(failed);
+  }
+
+  TEST(BinRelTestRandom, baseTensorDomain){
+    // //Maybe this should be done in a more repeat-friendly way// //
+    stringstream ss;
+    bool failed = false;
+    bool dump = false;
+    Voc initVoc,voc;
+    addIntVar(initVoc, "a", 4);
+    addBoolVar(initVoc, "b");
+    addIntVar(initVoc, "c", 4);
+    addBoolVar(initVoc, "d");
+    voc = initialize(0,0,initVoc);
+    ASSERT_EQ(voc.size(),4);
+
+    srand(time(NULL));
+    for(int h=0;h<20;++h){
+      bdd b1bdd = tGetRandomTransformer(voc, false);
+      bdd b2bdd = tGetRandomTransformer(voc, false);
+      bdd b3bdd = tGetRandomTransformer(voc, false);
+      bdd b4bdd = tGetRandomTransformer(voc, false);
+      bdd t1bdd = tGetRandomTransformer(voc, true);
+      bdd t2bdd = tGetRandomTransformer(voc, true);
+
+      sem_elem_tensor_t b1 = new BinRel(b1bdd,false);
+      sem_elem_tensor_t b2 = new BinRel(b2bdd,false);
+      sem_elem_tensor_t b3 = new BinRel(b3bdd,false);
+      sem_elem_tensor_t b4 = new BinRel(b4bdd,false);
+      sem_elem_tensor_t t1 = new BinRel(t1bdd,true);
+      sem_elem_tensor_t t2 = new BinRel(t2bdd,true);
+      sem_elem_tensor_t w1,w2,w3,w4;
+
+
+      w1 = b1->tensor(b2.get_ptr());
+      w2 = b3->tensor(b4.get_ptr());
+      w1 = dynamic_cast<SemElemTensor*>(w1->extend(w2.get_ptr()).get_ptr());
+
+      w3 = dynamic_cast<SemElemTensor*>(b1->extend(b2.get_ptr()).get_ptr());
+      w4 = dynamic_cast<SemElemTensor*>(b3->extend(b4.get_ptr()).get_ptr());
+      w3 = w3->tensor(w4.get_ptr());
+
+      if(!w1->equal(w3) || dump){
+        ss << "#################################\n(b1,b2) & (b3,b4) <> (b1 & b2,b3 & b4)\n\n";
+        b1->print(ss << "b1: ") << endl;
+        b2->print(ss << "b2: ") << endl;
+        b3->print(ss << "b3: ") << endl;
+        b4->print(ss << "b4: ") << endl;
+        w1->print(ss << "(b1,b2) & (b3,b4): ") << endl;
+        w3->print(ss << "(b1 & b2,b3 & b4): ") << endl;
+        failed = true;
+      }
+
+      w1 = dynamic_cast<SemElemTensor*>(t1->combine(t2.get_ptr()).get_ptr());
+      w1 = w1->detensor();
+
+      w2 = t1->detensor();
+      w3 = t2->detensor();
+      w2 = dynamic_cast<SemElemTensor*>(w2->combine(w3.get_ptr()).get_ptr());
+
+      if(!w1->equal(w2) || dump){
+        ss << "#################################\nD(t1 | t2) <> D(t1) | D(t2)\n\n";
+        t1->print(ss << "t1: ") << endl;
+        t2->print(ss << "t2: ") << endl;
+        w1->print(ss << "D(t1 | t2): ") << endl;
+        w2->print(ss << "D(t1) | D(t2): ") << endl;
+        failed = true;
+      }
+
+      w1 = b1->tensor(b2.get_ptr());
+      w1 = w1->detensor();
+
+      w2 = dynamic_cast<SemElemTensor*>(b1->extend(b2.get_ptr()).get_ptr());
+
+      if(!w1->equal(w2) || dump){
+        ss << "#################################\nD((b1, b2)) <> b1 & b2\n\n";
+        b1->print(ss << "b1: ") << endl;
+        b2->print(ss << "b2: ") << endl;
+        w1->print(ss << "D((b1 , r2)): ") << endl;
+        w2->print(ss << "b1 & b2: ") << endl;
+        failed = true;
+      }
+    }
+
+    if(failed){
+      cerr << "\n Differences logged in BinRelTestRandom_baseDomain.output\n";
+      writeOutput("BinRelTestRandom","baseTensorDomain", ss);
+    }
+    ASSERT_FALSE(failed);
+  }
+
+
 
 } //namespace
 

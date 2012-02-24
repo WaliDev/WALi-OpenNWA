@@ -43,11 +43,12 @@ namespace{
 
   // ////////////////////////INIT TESTS////////////////////////////////////
   //We need separate initialization tests becaues the SetUp function in the
-  //fixture already initiazes.
+  //fixture already initializes.
   TEST(BinRelInitTest, defaultInitEmptyVoc){
     Voc voc;
     Voc retVoc = initialize(0,0,voc);
     ASSERT_EQ(retVoc.size(), 0);
+    binRelDone();
   }
   
   TEST(BinRelInitTest, userInit){
@@ -66,7 +67,7 @@ namespace{
     addIntVar(voc,"t",32);
     addIntVar(voc,"u",32);
     addIntVar(voc,"v",32);
-    const Voc retVoc = initialize(1000,1000,voc);
+    const Voc retVoc = initialize(0,0,voc);
     ASSERT_GT(retVoc.size(),0);
   }
 
