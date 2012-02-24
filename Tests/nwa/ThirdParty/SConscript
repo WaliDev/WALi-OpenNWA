@@ -41,6 +41,11 @@ build_dir = os.path.join('$builddir', GtestDir)
 if 'cl' == env['compiler']:
     cmake_command = 'cd %s && $CMAKE -G"NMake Makefiles" %s'
     build_command = 'cd %s && nmake'
+    if (str(env['CCFLAGS']).find('/MTd') != -1
+        or str(env['CCFLAGS']).find('/MDd') != -1):
+        cmake_command += ' -DCMAKE_BUILD_TYPE=Debug'
+    else:
+        cmake_command += ' -DCMAKE_BUILD_TYPE=Release'
     lib_name = os.path.join(build_dir, 'gtest.lib')
 else:
     cmake_command = 'cd %s && $CMAKE %s' + (
