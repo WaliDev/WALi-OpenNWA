@@ -40,7 +40,8 @@ struct Conf{
   */
 struct Names{
   wali::Key pdsState;
-  wali::Key entryMain;
+  wali::Key *entries;
+  wali::Key *exits;
   std::vector< wali::Key > errs;
 };
 

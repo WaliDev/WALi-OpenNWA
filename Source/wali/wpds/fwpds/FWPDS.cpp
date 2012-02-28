@@ -148,7 +148,8 @@ struct FWPDSCompareFunctor : public wfa::ConstTransFunctor
   }
 };
 
-std::ostream& graphPrintKey( int k, std::ostream& o ) {
+//std::ostream& graphPrintKey( int k, std::ostream& o ) {
+std::ostream& graphPrintKey(std::ostream& o, int k) {
   return wali::printKey(o,(Key)k);
 }
 

@@ -82,11 +82,18 @@ void randfwpds(FWPDS& pds, const Conf& conf, Names& names,
       *o << "*******************************\n";
   }
 
+  names.pdsState = pdsState;
+  names.entries = new wali::Key[conf.numprocs];
+  names.exits = new wali::Key[conf.numprocs];
+  for(int i=0;i<conf.numprocs;++i){
+    names.entries[i] = entries[i];
+    names.exits[i] = exits[i];
+  }
+
   //Correct?
   delete [] entries;
   delete [] exits;
 
-  names.pdsState = pdsState;
   //TODO: What about errors?
 }
 

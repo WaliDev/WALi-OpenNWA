@@ -16,10 +16,18 @@
 
 #include "generateRandomFWPDS.hpp"
 
+// ::wali::wfa
+#include "wali/wfa/WFA.hpp"
+
+// ::wali
+#include "wali/KeySpace.hpp"
+#include "wali/Key.hpp"
+
 using namespace std;
 using namespace wali;
 using namespace wali::domains::binrel;
 using namespace wali::wpds::fwpds;
+using namespace wali::wfa;
 
 #include "Common.cpp"
 namespace{
@@ -52,14 +60,28 @@ namespace{
   TEST_F(RandomFWPDSTest,genTest){
     Conf conf;
     conf.randomWt = &randomWt;
-    conf.numprocs = 5;
-    conf.numcalls = 45;
-    conf.numsplits = 40;
-    conf.numnodes = 300;
+    conf.numprocs = 50;
+    conf.numcalls = 450;
+    conf.numsplits = 400;
+    conf.numnodes = 9000;
     Names names;
     FWPDS pds;
-    randfwpds(pds,conf, names,&cout);
-    //pds.print(cout);
+    randfwpds(pds,conf, names, &cout);
+    pds.print(cout);
+    WFA fa;
+    wali::Key acc = wali::getKeySpace()->getKey("accept");
+    for(int i=i;i<conf.numprocs;++i)
+      fa.addTrans(names.pdsState,names.entries[i],acc,(*randomWt)());
+    fa.setInitialState(names.pdsState);
+    fa.addFinalState(acc);
+  
+    //fa.print(cout);
+
+    WFA outfa;
+    pds.poststarIGR(fa,outfa);
+
+    //outfa.print(cout);
+
     ASSERT_TRUE(true);
   }
 }
