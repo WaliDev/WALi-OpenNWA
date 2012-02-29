@@ -1,0 +1,20 @@
+#!/bin/bash
+
+WALI=../../../..
+
+for BZ2 in *.bz2; do
+    ROOT=$(basename "$BZ2" .bz2)
+    if [ ! -e "$ROOT" ]; then
+        bunzip2 --keep "$BZ2"
+    fi
+
+    echo "*********************************"
+    echo "Test: $ROOT"
+    time $WALI/bin64/nwa-get-example.exe "$ROOT" > /dev/null
+    time $WALI/bin64/nwa-get-example.exe "$ROOT" > /dev/null
+    time $WALI/bin64/nwa-get-example.exe "$ROOT" > /dev/null
+    echo
+    echo
+done
+
+
