@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd $(dirname "$0")
+
 WALI=../../../..
 
 for BZ2 in *.bz2; do
