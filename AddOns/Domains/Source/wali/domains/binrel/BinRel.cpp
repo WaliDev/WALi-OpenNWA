@@ -589,9 +589,9 @@ wali::sem_elem_t BinRel::zero() const
 std::ostream& BinRel::print( std::ostream& o ) const 
 {
   if(!isTensored)
-    o << "Base relation:" << endl;
+    o << "Base relation: ";
   else
-    o << "Tensored relation:" << endl;
+    o << "Tensored relation: ";
   o << fddset << rel;
   return o;
 }

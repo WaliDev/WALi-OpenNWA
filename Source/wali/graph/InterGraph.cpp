@@ -11,6 +11,9 @@
 #include <iostream>
 #include <iomanip>
 
+// ::wali
+#include "wali/SemElemTensor.hpp"
+
 typedef int INTER_GRAPH_INT;
 
 using namespace std;
@@ -21,6 +24,7 @@ namespace wali {
 
         UnionFind::UnionFind(int len) {
             n = len;
+            count = len;
             arr = new int[n];
             for(int i=0; i < n;i++) {
                 arr[i] = i;
@@ -58,6 +62,15 @@ namespace wali {
             int br = find(b);
             arr[ar] = br; // FIXME: Randomize this
             //TODO: Used ranked union
+
+            // if two sets were merged, the total number of sets has decreaseed
+            // by one
+            if(ar != br) count--;
+            assert(count > 0 && "Count of sets reached zero: There is a bug\n");
+        }
+
+        int UnionFind::countSets(){
+          return count;
         }
 
         inter_node_t promote_type(inter_node_t t1, inter_node_t t2) {
@@ -440,6 +453,309 @@ namespace wali {
                 return l+int((u-l+1)*(a/(RAND_MAX + 1.0))); 
             }
 
+            // I call this raw dfs because there are some dfs implementations floating around.
+            // Mine works directly on arrays storing the adjacency list.
+            // Note: This implementation is highly tailored to the use case (see below)
+            // Time Complexity: O(#nodes *max{out-degree})
+            // out: scc stores sccs in sets
+            // out: mindfsn also holds a topological order of connected components
+            void InterGraph::rawDfs(
+                const int u, //current node.
+                
+                const int& adjLine1[], //[i]: The row in adjMat that corresponds to node i 
+                const int& adjLine2[], //[i]: The row in adjMat that corresponds to node i
+                const int& deg[]; //[i]: degree of node i
+                const int& adjMat[][]; //The adjacency matrix
+                
+                int& dfsn[], //[i]: the dfs number of vertex i
+                int& dfsnext, //next free dfs number
+                int& comp[], //O(1) membership stack containing the 
+                            //vertices of current component
+                int& ncomp, //number of outstanding vertices in the components
+                bool& incomp[], //[i] a marker that says, I've seen i, but haven't 
+                              //finished putting it in a component
+
+                int& mindfsn[], //(in:out) [i]: minimum dfs number reachable from vertex i
+                UnionFind& scc //(out) The output scc are stored here.
+                )
+            { 
+              //If this does not make any sense to you
+              // go to: http://shygpsy/com/tools/scc.cpp
+              //The code below is an adapted version.
+
+              dfsn[u] = mindfsn[u] = dfsnext++;
+              comp[ncomp++] = u;
+              incomp[u] = true;
+             
+              for(int i = 0, v; i < deg[adjLine1[u]]; ++i){
+                v = adjMat[adjLine1[u]][i];
+                if(!dfsn[v]) 
+                  dfs(u,adjLine1,adjLine2,deg,adjMat,dfsn,dfsnext,comp,ncomp,incomp,mindfsn,scc);
+                if(incomp[v])
+                  mindfsn[u] = (mindfsn[v] < mindfsn[u])? mindfsn[v] : mindfsn[u];
+              }
+              for(int i = 0, v; i < deg[adjLine2[u]]; ++i){
+                v = adjMat[adjLine2[u]][i];
+                if(!dfsn[v]) 
+                  dfs(u,adjLine1,adjLine2,deg,adjMat,dfsn,dfsnext,comp,ncomp,incomp,mindfsn,scc);
+                if(incomp[v])
+                  mindfsn[u] = (mindfsn[v] < mindfsn[u])? mindfsn[v] : mindfsn[u];
+              }
+
+              if(dfsn[u] == mindfsn[u]){
+                //u is the root of a connected component. Unify the component
+                //and forget it.
+                do{
+                  scc.takeUnion(u, comp[--ncomp]);
+                  incomp[comp[ncomp]] = false;
+                }while(comp[ncomp] != u);
+              }
+              //else I've seen a smaller mindfsn in my dfs from this node
+              //i.e., This node belongs to some smaller numbered scc. So, I will
+              //be added to an SCC when that recursive call returns.
+            }
+
+
+            // Creates a bunch of intergraphs and uses Nodelisting to generate
+            // regular expressions.  Then executes Newton iterations till
+            // stabilization.  Since we use lazy transitions (and lazy
+            // RegExps), only needed values are computed, other values can be
+            // computed on demand.
+            void InterGraph::setupNewtonSolution()
+            {
+              RegExp::startSatProcess(sem);
+
+              int n = nodes.size(); //total number of nodes in the graph
+              vector< GraphEdge >::iterator geIter;
+              vector< HyperEdge >::iterator heIter;
+
+              //First, find the CFGs
+              UnionFind cfgUf(n); //The cfgs are constructed as sets cfgUf
+              for(
+                  geIter = intra_edges.begin();
+                  geIter != intra_edges.end();
+                  ++geIter){
+                cfgUf.takeUnion(geIter->src,geIter->tgt);
+              }
+              for(
+                  heIter = inter_edges.begin();
+                  heIter != inter_edges.end();
+                  ++heIter){
+                cfgUf.takeUnion(heIter->src1,heIter->tgt);
+              }
+              //cfgUf now has sets corresponding to the CFGs.
+
+              int nCfg = cfgUf.countSets(); //Count the number of CFGs - O(1)
+
+              //We will now renumber the target nodes so as to have them 
+              //numberd consecutively.
+              //A map from target Nodes to their actual nodes in the graph
+              //Time Complexity: O(#TgtNodes)
+              //Also
+              // We do not explicitely build the adjacency matrix for 
+              // target nodes. Instead, we use lCallNodes to obtain the list of
+              // call nodes for the corresponding CFGs. We must look for nodes
+              // in the cfg of the external Source (src2) and the target
+              // itself(tgt).
+              //Time Complexity: O(#TgtNodes)
+              int nTgt = inter_edges.size(); //total number of target nodes
+              int tgt2Node[nTgt];
+              int extSrcCfg[nTgt]; //The external source belongs to this cfg.
+              int tgtCfg[nTgt];
+              for(
+                  int i = 0,
+                  heIter = inter_edges.begin();
+                  heIter != inter_edges.end();
+                  ++i,
+                  ++heIter){
+                tgt2Node[i] = heIter->tgt;
+                extSrcCfg[i] = cfgUf.find(heIter->src2);
+                tgtCfg[i] = cfgUf.find(heIter->tgt);
+              }
+              
+              /////Next, find SCCs
+
+              //Compute a list of target nodes in each CFG
+              //Time Complexity: O(#CFGs + #TgtNodes)
+              //We tradeoff space for time -- use arrays everywhere.
+              int lCallNodes[nCfg][nTgt]; //lists of targets per cfg
+              int numCallNodes[nCfg]; //number of target nodes per cfg
+              for(int i=0; i<nCfg; ++i){
+                numCallNodes[i]=0;
+              }
+              for(int i=0; i < nTgt; ++i){
+                int tgtCfg = cfgUf.find(tgt2Node[i]);
+                lCallNodes[tgtCfg][numCallNodes[tgtCfg]++] = i;
+              }
+             
+
+              //Now the actual SCC. The following are used by rawDfs
+              UnionFind sccUf(nTgt); //output: sets will represent SCCs
+              int dfsn[nTgt]; 
+              int dfsnext;
+              int mindfsn[nTgt];
+              int comp[nTgt];
+              int ncomp;
+              bool incomp[nTgt];
+
+              dfsnext = 0;
+              ncomp = 0;
+              for(int i=0; i < nTgt; ++i){
+                dfsn[i] = 0;
+                mindfsn[i] = 0; // Not really needed
+                comp[i] = 0;
+                incomp[i] = false;
+              }
+              for(int u=0; u < nTgt; ++u){
+                if(!dfsn[u])
+                  rawDfs(
+                      u,
+                      extSrcCfg,tgtCfg,numCallNodes,lCallNodes,
+                      dfsn,dfsnext,comp,ncomp,incomp,
+                      mindfsn,sccUf
+                      );
+              }
+
+              // SCC done. sccUf now has sets that corresponds to SCCs (with
+              // targets numbered from 0...nTgt-1)
+              // Note: mindfsn holds a topological order on connected
+              // components (while SCCs have the same mindfsn)
+
+              //Setup worklist.
+              //- We use multiset<mindfsn,tgt> for worklist
+              //  This gives us a worklist that is always sorted by mindfsn, hence
+              //  our fixpoint operation proceeds in topological order.
+              //- We insert the actual nodes from the graph here, not the tgt values.
+              TopSortWorkList wl;
+              for(int i=0; i < nTgt; ++i)
+                wl.insert(new tup(mindfsn[i],tgt2Node[i]));
+
+              // We update cfgUf to those we get after differentiation, i.e.,
+              // call graphs are merged into CFGs
+              for(int i=0; i<nTgt; ++i){
+                cfgUf.takeUnion(tgtCfg[i],extSrcCfg[i]);
+              }
+
+              // Now create the IntraGraphs
+              std::list<IntraGraph *>::iterator gr_it;
+              for(i = 0; i < n;i++) {
+                int j = cfgUf->find(i);
+                if(nodes[j].gr == NULL) {
+                  nodes[j].gr = new IntraGraph(running_prestar,sem);
+                  gr_list.push_back(nodes[j].gr);
+                }
+                nodes[i].gr = nodes[j].gr;
+
+                nodes[i].intra_nodeno = nodes[i].gr->makeNode(nodes[i].trans);
+
+                if(is_source_type(nodes[i].type)) {
+                  nodes[i].gr->setSource(nodes[i].intra_nodeno, nodes[i].weight);
+                }
+                // zero all weights (some are set by setSource() )
+                if(nodes[i].weight.get_ptr() != NULL)
+                  nodes[i].weight = nodes[i].weight->zero();
+              }
+
+              //All edges in the intraprocedural graph get weights of the
+              //form (1^T,w) where (,) denotes tensor, ^T denotes transpose,
+              //and w is the weight on the CFG edge
+              for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
+                int s = (*it).src;
+                int t = (*it).tgt;
+                sem_elem_t wt = it->weight;
+                sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>(it->weight->one().getPtr());
+                wt = one->tensor(dynamic_cast<SemElemTensor*>(wt.getPtr()));
+                nodes[s].gr->addEdge(nodes[s].intra_nodeno, nodes[t].intra_nodeno, (*it).weight);
+              }
+              //For each hyperedge (tgt <- src1 src2], we add two edges [t <-
+              //src1] and [t <- src2]. Initially these edges have the weight
+              //zero.
+              //These edges will be updatable.
+              for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
+                IntraGraph *gr = nodes[(*it2).tgt].gr;
+                sem_elem_tensor_t zero = sem->zero();
+                zero = dynamic_cast<SemElemTensor*>(zero.getPtr())->tensor(dynamic_cast<SemElemTensor*>(zero.getPtr()));
+                gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, zero, true);
+                gr->addEdge(nodes[(*it2).src2].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, zero, true);
+                //The external source and the target must belong to the same CFG after differentiation.
+                assert(nodes[(*it2).src2].gr == gr);
+              }
+              //Done creating IntraGraphs
+
+              //setupIntraSolution uses path listing to create regular expressions for each CFG.
+              for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
+                (*gr_it)->setupIntraSolution(false);
+              }
+              //cout << "Intra setup done.\n";
+
+
+              //Now Saturate Netwon's iterations.
+              while(!wl.empty()) {
+                // Get an target whose in-transitions are to be checked.
+                multiset<tup>::iterator wit = worklist.begin();
+                int tgt = (*wit).second;
+                worklist.erase(wit);
+
+                weight = nodes[onode].gr->get_weight(nodes[onode].intra_nodeno);
+                if(nodes[onode].weight.get_ptr() != NULL && nodes[onode].weight->equal(weight))
+                  continue;
+                nodes[onode].weight = weight;
+
+                STAT(stats.niter++);
+
+                FWPDSDBGS(
+                    cout << "Popped ";
+                    IntraGraph::print_trans(nodes[onode].trans,cout) << "with weight ";
+                    weight->print(cout) << "\n";
+                    );
+
+                // Go through all its targets and modify their weights
+                std::list<int>::iterator beg = nodes[onode].out_hyper_edges.begin();
+                std::list<int>::iterator end = nodes[onode].out_hyper_edges.end();
+                for(; beg != end; beg++) {
+                  int inode = inter_edges[*beg].tgt;
+                  int onode1 = inter_edges[*beg].src1;
+                  sem_elem_t uw;
+                  if(running_ewpds && inter_edges[*beg].mf.get_ptr()) {
+                    uw = inter_edges[*beg].mf->apply_f(sem->one(), weight);
+                    FWPDSDBGS(
+                        cout << "Apply merge function ";
+                        inter_edges[*beg].mf->print(cout) << " to ";
+                        weight->print(cout) << "\n";
+                        uw->print(cout << "Got ") << "\n";
+                        );
+                  } else {
+                    uw = inter_edges[*beg].weight->extend(weight);
+                  }
+                  STAT(stats.nextend++);
+                  nodes[inode].gr->updateEdgeWeight(nodes[onode1].intra_nodeno, nodes[inode].intra_nodeno, uw);
+                }
+                // Go through all targets again and insert them into the workist without
+                // seeing if they actually got modified or not
+                beg = nodes[onode].out_hyper_edges.begin();
+                for(; beg != end; beg++) {
+                  int inode = inter_edges[*beg].tgt;
+                  IntraGraph *gr = nodes[inode].gr;
+                  if(gr->scc_number != scc_n) {
+                    assert(gr->scc_number > scc_n);
+                    continue;
+                  }
+                  moutnodes = gr->getOutTransitions();
+                  std::list<int>::iterator mbeg = moutnodes->begin();
+                  std::list<int>::iterator mend = moutnodes->end();
+                  for(; mbeg != mend; mbeg++) {
+                    int mnode = (*mbeg);
+                    worklist.insert(tup(gr->bfs_number, mnode));
+                  }
+                }
+              }
+
+
+
+
+            }
+
+
             // If an argument is passed in then only weights on those transitions will be available
             // I can fix this (i.e., weights for others will be available on demand), but not right now.
             void InterGraph::setupInterSolution(std::list<Transition> *wt_required) {
@@ -529,6 +845,7 @@ namespace wali {
                 std::list<IntraGraph *> gr_sorted;
                 unsigned components = SCC(gr_list, gr_sorted);
                 STAT(stats.ncomponents = components);
+
 
                 //delete timer;
                 //timer = new util::Timer("FWPDS Saturation");
@@ -634,8 +951,8 @@ namespace wali {
 
             // New Saturation Procedure -- minimize calls to get_weight
             void InterGraph::saturate(multiset<tup> &worklist, unsigned scc_n) {
-                sem_elem_t weight;
-                std::list<int> *moutnodes;
+              sem_elem_t weight;
+              std::list<int> *moutnodes;
 
                 while(!worklist.empty()) {
                     // Get an outnode whose weight is to be propagated

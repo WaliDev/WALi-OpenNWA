@@ -104,21 +104,35 @@ static void genproc(FWPDS& pds, const Conf& conf, int procnum, int remNodes, int
   if(remNodes < 1) remNodes = 1;
   if(remSplits < 1) remSplits = 1;
 
+  //In order to keep modulus related code clean,
+  //bump values up by one, and stop at 1
+  remCalls++;
+  remNodes++;
+  remSplits++;
   wali::Key curhead = entries[procnum];
 
   //remNodes +=3; //To avoid corner casees.
   if(o){
     *o << "proc[" << procnum << "(entry:"<< entries[procnum] 
       <<", exit:"<<exits[procnum] <<")]:\n";
-    *o << "DEBUG: remNodes:" << remNodes << " remSplits:" 
-      << remSplits << " remCalls:" << remCalls << "\n";
+    *o << "DEBUG: remNodes:" << remNodes-1 << " remSplits:" 
+      << remSplits-1 << " remCalls:" << remCalls-1 << "\n";
   }
-  while(remNodes > 1){
-    int nodes = rand() % remNodes + 1;
-    int calls = rand() % remCalls;
-    int splits = rand() % remSplits;
+  while(remNodes > 1 || remCalls > 1 || remSplits > 1){
+    int nodes,calls,splits;
+    if(remNodes < 1)
+      nodes = 0;
+    else 
+      nodes = rand() % remNodes;
+    if(remCalls < 1)
+      calls = 0;
+    else
+      calls = rand() % remCalls;
+    if(remSplits < 1)
+      splits = 0;
+    else
+      splits = rand() % remSplits;
     remNodes -= nodes;
-    if(remNodes <= 0) remNodes = 1;
     remCalls -= calls;
     remSplits -= splits;
     curhead = genblock(pds,conf,curhead,nodes,splits,calls,o,tabspace+2);
@@ -143,16 +157,14 @@ static void genproc(FWPDS& pds, const Conf& conf, int procnum, int remNodes, int
 static wali::Key genblock(FWPDS& pds, const Conf& conf, wali::Key curhead, int
     remNodes, int remSplits, int remCalls, std::ostream *o, int tabspace)
 {
-  if(remCalls < 1) remCalls = 1;
-  if(remNodes < 1) remNodes = 1;
-  if(remSplits < 1) remSplits = 1;
 
   wali::Key endhead,endhead1,endhead2,nexthead;
   int nodes1,nodes2,splits1,splits2,calls1,calls2,fn;
-  while(remNodes > 1){
-    int choice = rand() % 100;
+  int choice;
+  while(remNodes > 0 || remCalls > 0 || remSplits > 0){
+    choice = rand() % 100;
     if(choice < pCall){
-      if(remCalls < 2) break;
+      if(remCalls < 1) continue;
       nexthead = wali::getKeySpace()->getKey(curKey++);
       fn = rand() % conf.numprocs;
       if(o){
@@ -170,25 +182,45 @@ static wali::Key genblock(FWPDS& pds, const Conf& conf, wali::Key curhead, int
           new wali::MergeFn((*conf.randomWt)())
           );
       curhead = nexthead;
-      remNodes--;
-      //if(remNodes <=1) remNodes = 1;
       remCalls--;
-
     }else if(choice < pCall + pSplit){
-      if(remNodes < 4) break;
-      if(remSplits < 2) break;
+      if(remSplits < 1) continue;
       remSplits--;
-      calls1 = rand() % remCalls;
-      remCalls -= calls1;
-      calls2 = rand() % remCalls;
+
+      if(remCalls < 1){
+        calls1 = calls2 = 0;
+      }else{
+        calls1 = rand() % remCalls;
+        remCalls -= calls1;
+        if(remCalls < 1)
+          calls2 = 0;
+        else
+          calls2 = rand() % remCalls;
+      }
       remCalls -= calls2;
-      nodes1 = rand() % remNodes;
-      remNodes -= nodes1;
-      nodes2 = rand() % remNodes;
+
+      if(remNodes < 1){
+        nodes1 = nodes2 = 0;
+      }else{
+        nodes1 = rand() % remNodes;
+        remNodes -= nodes1;
+        if(remNodes < 1)
+          nodes2 = 0;
+        else
+          nodes2 = rand() % remNodes;
+      }
       remNodes -= nodes2;
-      splits1 = rand() % remSplits;
-      remSplits -= splits1;
-      splits2 = rand() % remSplits;
+
+      if(remSplits < 1){
+        splits1 = splits2 = 0;
+      }else{
+        splits1 = rand() % remSplits;
+        remSplits -= splits1;
+        if(remSplits < 1)
+          splits2 = 0;
+        else
+          splits2 = rand() % remSplits;
+      }
       remSplits -= splits2;
 
       if(o){
@@ -204,7 +236,6 @@ static wali::Key genblock(FWPDS& pds, const Conf& conf, wali::Key curhead, int
           nexthead,
           (*conf.randomWt)()
           );
-      remNodes --;
       endhead1 = genblock(pds,conf,nexthead,nodes1,splits1,calls1,o,tabspace+2);
       if(o){
         for(int j=0;j<tabspace+2;++j)
@@ -225,7 +256,6 @@ static wali::Key genblock(FWPDS& pds, const Conf& conf, wali::Key curhead, int
           nexthead,
           (*conf.randomWt)()
           );
-      remNodes --;
       endhead2 = genblock(pds,conf,nexthead,nodes1,splits1,calls1,o,tabspace+2);
       if(o){
         for(int j=0;j<tabspace+2;++j)
@@ -248,7 +278,6 @@ static wali::Key genblock(FWPDS& pds, const Conf& conf, wali::Key curhead, int
           endhead,
           (*conf.randomWt)()
           );
-      remNodes--;
       curhead = endhead;
     }else{
       nexthead = wali::getKeySpace()->getKey(curKey++);
@@ -266,7 +295,6 @@ static wali::Key genblock(FWPDS& pds, const Conf& conf, wali::Key curhead, int
           );
       curhead = nexthead;
       remNodes--;
-      //if(remNodes <= 1) remNodes = 1;
     }
   }
   return curhead;

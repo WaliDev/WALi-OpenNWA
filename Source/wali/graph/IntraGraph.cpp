@@ -1481,5 +1481,13 @@ namespace wali {
       }
     }
 
+    void IntraGraph::differentiate()
+    {
+      for(int i=0; i<nedges; ++i){
+        IntraGraphEdge edge = edges[i];
+        //edge->weight = edge->weight->tensor(edge->weight->one());
+      }
+
+    }
   } // namespace graph
 } // namespace wali

@@ -24,12 +24,16 @@ namespace wali {
             friend class InterGraph;
             int *arr;
             int n;
+            int count;
             public:
             UnionFind(int len);
             ~UnionFind();
             void reset();
             int find(int a);
             void takeUnion(int a, int b);
+            /// Counts the number of sets by counting the number
+            /// of self edges.
+            int countSets();
         };
 
 
@@ -140,6 +144,7 @@ namespace wali {
                 typedef SemElem *(*WT_CORRECT)(SemElem *);
                 typedef std::pair<int,int> tup;
                 typedef std::pair<int, int> call_edge_t;
+                typedef std::multiset< tup, std::greater< tup > > TopSortWorkList;
 
                 std::vector<GraphNode> nodes;
                 std::vector<GraphEdge> intra_edges;
@@ -156,6 +161,7 @@ namespace wali {
                 TransMap node_number;
                 sem_elem_t sem; 
                 bool running_ewpds;
+                bool running_nwpds;
                 bool running_prestar;
                 InterGraphStats stats;
 
@@ -165,10 +171,11 @@ namespace wali {
                 }
 
             public:
-                InterGraph(wali::sem_elem_t s, bool e, bool pre) {
+                InterGraph(wali::sem_elem_t s, bool e, bool pre, bool n = false) {
                     sem = s;
                     intra_graph_uf = NULL;
                     running_ewpds = e;
+                    running_nwpds = n;
                     running_prestar = pre;
                     max_scc_computed = 0;
                     count = 0;
