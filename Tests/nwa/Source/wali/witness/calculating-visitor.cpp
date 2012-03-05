@@ -230,19 +230,27 @@ namespace wali {
         TEST(wali$witness$CalculatingVisitor, WitnessExtend$1arg$impossible) {
             config_ptr_pair ptrs;
             witness_t w1 = make_example_rule("1", &ptrs);
+
+#if defined(_MSC_VER)
+	    char const * death_message_left = "Assertion failed: the_left != NULL";
+	    char const * death_message_right = "Assertion failed: the_right != NULL";
+#else
+	    char const * death_message_left = "Assertion `the_left != .?__null.?\' failed";
+	    char const * death_message_right = "Assertion `the_right != .?__null.?\' failed";
+#endif
             
             EXPECT_DEATH({
                     WitnessExtend e(NULL, NULL, w1);
                 },
-                "Assertion `the_left != .?__null.?\' failed");
+		death_message_left);
             EXPECT_DEATH({
                     WitnessExtend e(NULL, w1, NULL);
                 },
-                "Assertion `the_right != .?__null.?\' failed");
+                death_message_right);
             EXPECT_DEATH({
                     WitnessExtend e(NULL, NULL, NULL);
                 },
-                "Assertion `the_left != .?__null.?\' failed");
+                death_message_left);
         }
 
 
