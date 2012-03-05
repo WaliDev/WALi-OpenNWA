@@ -6,7 +6,7 @@
  */
 
 #include "wali/Common.hpp"
-#include "ref_ptr.hpp"
+#include "wali/ref_ptr.hpp"
 
 namespace wali
 {
