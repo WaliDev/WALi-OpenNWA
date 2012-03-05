@@ -31,6 +31,9 @@ Is64           = (platform_bits == 64)
 ThirtyTwoBitAliases=['32', 'x86', 'ia_32', 'ia32']
 SixtyFourBitAliases=['64', 'x64', 'x86_64', 'amd64']
 
+if platform.system() == 'Windows':
+   BaseEnv['ENV']['PATH'] += ';c:\\cygwin\\bin'
+
 vars = Variables()
 vars.Add(EnumVariable('arch', 'Architecture', 'default',
          allowed_values=ThirtyTwoBitAliases+SixtyFourBitAliases+['default']))
