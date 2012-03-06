@@ -463,6 +463,13 @@ namespace wali {
       return true;
     }
 
+    sem_elem_t IntraGraph::readEdgeWeight(int s, int t) {
+      int eno = edgeno(s,t);
+      if(eno == -1) return NULL;
+      return edges[eno].weight;
+    }
+
+
     void IntraGraph::addEdge(int s, int t, sem_elem_t se, bool updatable) {
 
       create_node(s);
@@ -1481,13 +1488,5 @@ namespace wali {
       }
     }
 
-    void IntraGraph::differentiate()
-    {
-      for(int i=0; i<nedges; ++i){
-        IntraGraphEdge edge = edges[i];
-        //edge->weight = edge->weight->tensor(edge->weight->one());
-      }
-
-    }
   } // namespace graph
 } // namespace wali

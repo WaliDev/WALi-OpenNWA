@@ -462,20 +462,18 @@ namespace wali {
             void InterGraph::rawDfs(
                 const int u, //current node.
                 
-                const int& adjLine1[], //[i]: The row in adjMat that corresponds to node i 
-                const int& adjLine2[], //[i]: The row in adjMat that corresponds to node i
-                const int& deg[]; //[i]: degree of node i
-                const int& adjMat[][]; //The adjacency matrix
+                const int deg[], //[i]: degree of node i
+                const int * const * const adjMat, //The adjacency matrix
                 
-                int& dfsn[], //[i]: the dfs number of vertex i
+                int dfsn[], //[i]: the dfs number of vertex i
                 int& dfsnext, //next free dfs number
-                int& comp[], //O(1) membership stack containing the 
+                int comp[], //O(1) membership stack containing the 
                             //vertices of current component
                 int& ncomp, //number of outstanding vertices in the components
-                bool& incomp[], //[i] a marker that says, I've seen i, but haven't 
+                bool incomp[], //[i] a marker that says, I've seen i, but haven't 
                               //finished putting it in a component
 
-                int& mindfsn[], //(in:out) [i]: minimum dfs number reachable from vertex i
+                int mindfsn[], //(in:out) [i]: minimum dfs number reachable from vertex i
                 UnionFind& scc //(out) The output scc are stored here.
                 )
             { 
@@ -487,17 +485,10 @@ namespace wali {
               comp[ncomp++] = u;
               incomp[u] = true;
              
-              for(int i = 0, v; i < deg[adjLine1[u]]; ++i){
-                v = adjMat[adjLine1[u]][i];
+              for(int i = 0, v; i < deg[u]; ++i){
+                v = adjMat[u][i];
                 if(!dfsn[v]) 
-                  dfs(u,adjLine1,adjLine2,deg,adjMat,dfsn,dfsnext,comp,ncomp,incomp,mindfsn,scc);
-                if(incomp[v])
-                  mindfsn[u] = (mindfsn[v] < mindfsn[u])? mindfsn[v] : mindfsn[u];
-              }
-              for(int i = 0, v; i < deg[adjLine2[u]]; ++i){
-                v = adjMat[adjLine2[u]][i];
-                if(!dfsn[v]) 
-                  dfs(u,adjLine1,adjLine2,deg,adjMat,dfsn,dfsnext,comp,ncomp,incomp,mindfsn,scc);
+                  rawDfs(u,deg,adjMat,dfsn,dfsnext,comp,ncomp,incomp,mindfsn,scc);
                 if(incomp[v])
                   mindfsn[u] = (mindfsn[v] < mindfsn[u])? mindfsn[v] : mindfsn[u];
               }
@@ -528,6 +519,7 @@ namespace wali {
               int n = nodes.size(); //total number of nodes in the graph
               vector< GraphEdge >::iterator geIter;
               vector< HyperEdge >::iterator heIter;
+              std::list<IntraGraph *>::iterator grIter;
 
               //First, find the CFGs
               UnionFind cfgUf(n); //The cfgs are constructed as sets cfgUf
@@ -545,49 +537,66 @@ namespace wali {
               }
               //cfgUf now has sets corresponding to the CFGs.
 
-              int nCfg = cfgUf.countSets(); //Count the number of CFGs - O(1)
+              //int nCfg = cfgUf.countSets(); //Count the number of CFGs - O(1)
 
-              //We will now renumber the target nodes so as to have them 
+              /////Next, find SCCs
+
+              //We will now renumber the target nodes so as to have them
               //numberd consecutively.
-              //A map from target Nodes to their actual nodes in the graph
-              //Time Complexity: O(#TgtNodes)
-              //Also
-              // We do not explicitely build the adjacency matrix for 
-              // target nodes. Instead, we use lCallNodes to obtain the list of
-              // call nodes for the corresponding CFGs. We must look for nodes
-              // in the cfg of the external Source (src2) and the target
-              // itself(tgt).
               //Time Complexity: O(#TgtNodes)
               int nTgt = inter_edges.size(); //total number of target nodes
-              int tgt2Node[nTgt];
-              int extSrcCfg[nTgt]; //The external source belongs to this cfg.
-              int tgtCfg[nTgt];
+              int tgt2Node[nTgt]; //map from 1...nTgt to actual tgt node
+              int tgt2ExtSrc[nTgt]; //the external source for each target
+              int tgt2IntSrc[nTgt]; //the internal source for each target
+              int i;
               for(
-                  int i = 0,
+                  i = 0,
                   heIter = inter_edges.begin();
                   heIter != inter_edges.end();
                   ++i,
                   ++heIter){
                 tgt2Node[i] = heIter->tgt;
-                extSrcCfg[i] = cfgUf.find(heIter->src2);
-                tgtCfg[i] = cfgUf.find(heIter->tgt);
+                tgt2ExtSrc[i] = heIter->src2;
+                tgt2IntSrc[i] = heIter->src1;
               }
-              
-              /////Next, find SCCs
 
               //Compute a list of target nodes in each CFG
               //Time Complexity: O(#CFGs + #TgtNodes)
               //We tradeoff space for time -- use arrays everywhere.
-              int lCallNodes[nCfg][nTgt]; //lists of targets per cfg
-              int numCallNodes[nCfg]; //number of target nodes per cfg
-              for(int i=0; i<nCfg; ++i){
-                numCallNodes[i]=0;
+              int lTgtNodes[n][nTgt]; //lists of targets per cfg
+              int nTgtNodes[n]; //number of target nodes per cfg
+              for(int i=0; i<n; ++i){
+                nTgtNodes[i]=0;
               }
               for(int i=0; i < nTgt; ++i){
                 int tgtCfg = cfgUf.find(tgt2Node[i]);
-                lCallNodes[tgtCfg][numCallNodes[tgtCfg]++] = i;
+                lTgtNodes[tgtCfg][nTgtNodes[tgtCfg]++] = i;
               }
-             
+
+              //Create the adjacency matrix.
+              //uses consecutive numbering.
+              //Time Complexity: O(#TgtNodes^2) or O(#call_edges)
+
+              // There is no clean way of passing this to a function if this is
+              // na array, hence pionter
+              // int dependents[nTgt][nTgt];
+              int **dependents = (int**) malloc(sizeof(int)*nTgt*nTgt);
+              int nDependents[nTgt];
+              for(int i = 0; i< nTgt; ++i){
+                nDependents[i] = 0;
+              }
+              for(int i = 0; i < nTgt; ++i){
+                int c;
+                //add me as a dependent to all targets in my CFG.
+                c = cfgUf.find(tgt2Node[i]);
+                for(int j = 0; j < nTgtNodes[c]; ++j){
+                  dependents[lTgtNodes[c][j]][nDependents[lTgtNodes[c][j]]++] = i;
+                }
+                c = cfgUf.find(tgt2ExtSrc[i]);
+                for(int j = 0; j < nTgtNodes[c]; ++j){
+                  dependents[lTgtNodes[c][j]][nDependents[lTgtNodes[c][j]]++] = i;
+                }
+              }
 
               //Now the actual SCC. The following are used by rawDfs
               UnionFind sccUf(nTgt); //output: sets will represent SCCs
@@ -610,7 +619,7 @@ namespace wali {
                 if(!dfsn[u])
                   rawDfs(
                       u,
-                      extSrcCfg,tgtCfg,numCallNodes,lCallNodes,
+                      nDependents,dependents,
                       dfsn,dfsnext,comp,ncomp,incomp,
                       mindfsn,sccUf
                       );
@@ -625,21 +634,20 @@ namespace wali {
               //- We use multiset<mindfsn,tgt> for worklist
               //  This gives us a worklist that is always sorted by mindfsn, hence
               //  our fixpoint operation proceeds in topological order.
-              //- We insert the actual nodes from the graph here, not the tgt values.
-              TopSortWorkList wl;
+              WorkList wl;
               for(int i=0; i < nTgt; ++i)
-                wl.insert(new tup(mindfsn[i],tgt2Node[i]));
+                wl.insert(tup(mindfsn[i],i));
 
               // We update cfgUf to those we get after differentiation, i.e.,
               // call graphs are merged into CFGs
               for(int i=0; i<nTgt; ++i){
-                cfgUf.takeUnion(tgtCfg[i],extSrcCfg[i]);
+                cfgUf.takeUnion(tgt2Node[i],tgt2ExtSrc[i]);
               }
 
               // Now create the IntraGraphs
               std::list<IntraGraph *>::iterator gr_it;
-              for(i = 0; i < n;i++) {
-                int j = cfgUf->find(i);
+              for(int i = 0; i < n;i++) {
+                int j = cfgUf.find(i);
                 if(nodes[j].gr == NULL) {
                   nodes[j].gr = new IntraGraph(running_prestar,sem);
                   gr_list.push_back(nodes[j].gr);
@@ -652,102 +660,80 @@ namespace wali {
                   nodes[i].gr->setSource(nodes[i].intra_nodeno, nodes[i].weight);
                 }
                 // zero all weights (some are set by setSource() )
+                // All weights should be tensored
+                sem_elem_t zero = sem->zero();
+                zero = dynamic_cast<SemElemTensor*>(zero.get_ptr())
+                          ->tensor(dynamic_cast<SemElemTensor*>(zero.get_ptr()));
                 if(nodes[i].weight.get_ptr() != NULL)
-                  nodes[i].weight = nodes[i].weight->zero();
+                  nodes[i].weight = zero;
               }
 
               //All edges in the intraprocedural graph get weights of the
               //form (1^T,w) where (,) denotes tensor, ^T denotes transpose,
               //and w is the weight on the CFG edge
-              for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
-                int s = (*it).src;
-                int t = (*it).tgt;
-                sem_elem_t wt = it->weight;
-                sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>(it->weight->one().getPtr());
-                wt = one->tensor(dynamic_cast<SemElemTensor*>(wt.getPtr()));
-                nodes[s].gr->addEdge(nodes[s].intra_nodeno, nodes[t].intra_nodeno, (*it).weight);
+              for(geIter = intra_edges.begin(); geIter != intra_edges.end(); ++geIter) {
+                int s = geIter->src;
+                int t = geIter->tgt;
+                sem_elem_t wt = geIter->weight;
+                sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>(geIter->weight->one().get_ptr());
+                wt = one->tensor(dynamic_cast<SemElemTensor*>(wt.get_ptr()));
+                nodes[s].gr->addEdge(nodes[s].intra_nodeno, nodes[t].intra_nodeno, wt);
               }
               //For each hyperedge (tgt <- src1 src2], we add two edges [t <-
               //src1] and [t <- src2]. Initially these edges have the weight
               //zero.
               //These edges will be updatable.
-              for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
-                IntraGraph *gr = nodes[(*it2).tgt].gr;
-                sem_elem_tensor_t zero = sem->zero();
-                zero = dynamic_cast<SemElemTensor*>(zero.getPtr())->tensor(dynamic_cast<SemElemTensor*>(zero.getPtr()));
-                gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, zero, true);
-                gr->addEdge(nodes[(*it2).src2].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, zero, true);
+              for(heIter = inter_edges.begin(); heIter != inter_edges.end(); heIter++) {
+                IntraGraph *gr = nodes[heIter->tgt].gr;
+                sem_elem_tensor_t zero = dynamic_cast<SemElemTensor*>(sem->zero().get_ptr());
+                zero = dynamic_cast<SemElemTensor*>(zero.get_ptr())->tensor(dynamic_cast<SemElemTensor*>(zero.get_ptr()));
+                gr->addEdge(nodes[heIter->src1].intra_nodeno, nodes[heIter->tgt].intra_nodeno, zero, true);
+                gr->addEdge(nodes[heIter->src2].intra_nodeno, nodes[heIter->tgt].intra_nodeno, zero, true);
                 //The external source and the target must belong to the same CFG after differentiation.
-                assert(nodes[(*it2).src2].gr == gr);
+                assert(nodes[heIter->src2].gr == gr);
               }
               //Done creating IntraGraphs
 
               //setupIntraSolution uses path listing to create regular expressions for each CFG.
-              for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
-                (*gr_it)->setupIntraSolution(false);
+              for(grIter = gr_list.begin(); grIter != gr_list.end(); grIter++) {
+                (*grIter)->setupIntraSolution(false);
               }
               //cout << "Intra setup done.\n";
 
 
               //Now Saturate Netwon's iterations.
+              //TODO: Something more than nothing! :)
               while(!wl.empty()) {
+                //bool change = false;
                 // Get an target whose in-transitions are to be checked.
-                multiset<tup>::iterator wit = worklist.begin();
-                int tgt = (*wit).second;
-                worklist.erase(wit);
+                WorkList::iterator wit = wl.begin();
+                //int tgt = (*wit).second;
+                wl.erase(wit);
 
-                weight = nodes[onode].gr->get_weight(nodes[onode].intra_nodeno);
-                if(nodes[onode].weight.get_ptr() != NULL && nodes[onode].weight->equal(weight))
+#if 0
+                //Do the thing
+                sem_elem_tensor_t intWt, extWt, intEdgeWt, extEdgeWt;
+                IntraGraph* gr = nodes[tgt2Node[tgt]].gr;
+
+                intWt = gr->get_weight(nodes[tgt2IntSrc[tgt]].intra_nodeno);
+                extWt = gr->get_weight(nodes[tgt2ExtSrc[tgt]].intra_nodeno);
+                intEdgeWt = gr->readEdgeWeight(nodes[tgt2IntSrc[tgt]].intra_nodeno, nodes[tgt2node[tgt]].intra_nodeno);
+                extEdgeWt = gr->readEdgeWeight(nodes[tgt2ExtSrc[tgt]].intra_nodeno, nodes[tgt2node[tgt]].intra_nodeno);
+                if(intWt == extEdgeWt && extWt == intEdgeWt)
                   continue;
-                nodes[onode].weight = weight;
+              
+                if(!running_ewpds)
+                  assert(false && "Newton's method only works for EWPDS right now!");
 
-                STAT(stats.niter++);
+                //TODO:INCOMPLETE!!!
 
-                FWPDSDBGS(
-                    cout << "Popped ";
-                    IntraGraph::print_trans(nodes[onode].trans,cout) << "with weight ";
-                    weight->print(cout) << "\n";
-                    );
-
-                // Go through all its targets and modify their weights
-                std::list<int>::iterator beg = nodes[onode].out_hyper_edges.begin();
-                std::list<int>::iterator end = nodes[onode].out_hyper_edges.end();
-                for(; beg != end; beg++) {
-                  int inode = inter_edges[*beg].tgt;
-                  int onode1 = inter_edges[*beg].src1;
-                  sem_elem_t uw;
-                  if(running_ewpds && inter_edges[*beg].mf.get_ptr()) {
-                    uw = inter_edges[*beg].mf->apply_f(sem->one(), weight);
-                    FWPDSDBGS(
-                        cout << "Apply merge function ";
-                        inter_edges[*beg].mf->print(cout) << " to ";
-                        weight->print(cout) << "\n";
-                        uw->print(cout << "Got ") << "\n";
-                        );
-                  } else {
-                    uw = inter_edges[*beg].weight->extend(weight);
-                  }
-                  STAT(stats.nextend++);
-                  nodes[inode].gr->updateEdgeWeight(nodes[onode1].intra_nodeno, nodes[inode].intra_nodeno, uw);
-                }
-                // Go through all targets again and insert them into the workist without
-                // seeing if they actually got modified or not
-                beg = nodes[onode].out_hyper_edges.begin();
-                for(; beg != end; beg++) {
-                  int inode = inter_edges[*beg].tgt;
-                  IntraGraph *gr = nodes[inode].gr;
-                  if(gr->scc_number != scc_n) {
-                    assert(gr->scc_number > scc_n);
-                    continue;
-                  }
-                  moutnodes = gr->getOutTransitions();
-                  std::list<int>::iterator mbeg = moutnodes->begin();
-                  std::list<int>::iterator mend = moutnodes->end();
-                  for(; mbeg != mend; mbeg++) {
-                    int mnode = (*mbeg);
-                    worklist.insert(tup(gr->bfs_number, mnode));
+                // If "change"'d, add all depndents to the worklist.
+                if(changed){
+                  for(int i=0; i < nDependents[tgt]; ++i){
+                    wl.insert(new tup(mindfsn[dependents[tgt][i]],dependents[tgt][i]));
                   }
                 }
+#endif //#if 0
               }
 
 

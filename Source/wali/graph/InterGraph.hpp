@@ -144,6 +144,7 @@ namespace wali {
                 typedef SemElem *(*WT_CORRECT)(SemElem *);
                 typedef std::pair<int,int> tup;
                 typedef std::pair<int, int> call_edge_t;
+                typedef std::multiset< tup > WorkList;
                 typedef std::multiset< tup, std::greater< tup > > TopSortWorkList;
 
                 std::vector<GraphNode> nodes;
@@ -192,6 +193,7 @@ namespace wali {
                 void setESource(Transition t, wali::sem_elem_t wtAtCall, wali::sem_elem_t wtAfterCall);
 
                 void setupInterSolution(std::list<Transition> *wt_required = NULL);
+                void setupNewtonSolution();
 
                 sem_elem_t get_weight(Transition t);
                 sem_elem_t get_call_weight(Transition t);
@@ -217,6 +219,24 @@ namespace wali {
                 int intra_edgeno(Transition &src, Transition &tgt);
 
                 int inter_edgeno(Transition &src1, Transition &src2, Transition &tgt);
+
+                void rawDfs(
+                    const int u, //current node.
+
+                    const int deg[], //[i]: degree of node i
+                    const int * const * const adjMat, //The adjacency matrix
+
+                    int dfsn[], //[i]: the dfs number of vertex i
+                    int& dfsnext, //next free dfs number
+                    int comp[], //O(1) membership stack containing the 
+                    //vertices of current component
+                    int& ncomp, //number of outstanding vertices in the components
+                    bool incomp[], //[i] a marker that says, I've seen i, but haven't 
+                    //finished putting it in a component
+
+                    int mindfsn[], //(in:out) [i]: minimum dfs number reachable from vertex i
+                    UnionFind& scc //(out) The output scc are stored here.
+                    );
 
                 void dfsIntraForward(IntraGraph *gr, 
                         std::list<IntraGraph *> &finished, 

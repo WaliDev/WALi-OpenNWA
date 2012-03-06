@@ -247,6 +247,7 @@ namespace wali {
             void clearUpdates();
 
             bool updateEdgeWeight(int src, int tgt, sem_elem_t se);
+            sem_elem_t readEdgeWeight(int src, int tgt);
             void setupIntraSolution(bool compress_regexp = false);
             sem_elem_t get_weight(int outnode);
             ostream &print(ostream &out, PRINT_OP pop = defaultPrintOp);
