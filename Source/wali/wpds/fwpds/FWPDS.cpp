@@ -49,15 +49,15 @@ using namespace wali::wpds::ewpds;
 
 const std::string FWPDS::XMLTag("FWPDS");
 
-FWPDS::FWPDS() : EWPDS(), interGr(NULL), checkingPhase(false)
+FWPDS::FWPDS() : EWPDS(), interGr(NULL), checkingPhase(false), newton(false)
 {
 }
 
-FWPDS::FWPDS(ref_ptr<wpds::Wrapper> wr) : EWPDS(wr) , interGr(NULL), checkingPhase(false)
+FWPDS::FWPDS(ref_ptr<wpds::Wrapper> wr) : EWPDS(wr) , interGr(NULL), checkingPhase(false), newton(false)
 {
 }
 
-FWPDS::FWPDS( const FWPDS& f ) : EWPDS(f),interGr(NULL),checkingPhase(false)
+FWPDS::FWPDS( const FWPDS& f ) : EWPDS(f),interGr(NULL),checkingPhase(false), newton(f.newton)
 {
 }
 
@@ -151,6 +151,10 @@ struct FWPDSCompareFunctor : public wfa::ConstTransFunctor
 //std::ostream& graphPrintKey( int k, std::ostream& o ) {
 std::ostream& graphPrintKey(std::ostream& o, int k) {
   return wali::printKey(o,(Key)k);
+}
+
+void FWPDS::setupNewton(bool set){
+  newton = set;
 }
 
 void FWPDS::prestar( wfa::WFA const & input, wfa::WFA& output )
