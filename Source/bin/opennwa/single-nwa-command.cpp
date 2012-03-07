@@ -46,8 +46,10 @@ int main(int argc, char** argv)
     NwaRefPtr nwa = read_nwa(infile);
     
     NwaRefPtr out = CONSTRUCTION_FUNCTION(*nwa);
-    
-    out->print(outfile);
+
+    if (argv[2] != string("/dev/null") && argv[2] != string("NUL")) {
+        out->print(outfile);
+    }
 }
 
 
