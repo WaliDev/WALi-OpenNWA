@@ -13,8 +13,6 @@ for BZ2 in *.bz2; do
     echo "*********************************"
     echo "Test: $ROOT"
     time $WALI/bin64/nwa-get-example.exe "$ROOT" > /dev/null
-    time $WALI/bin64/nwa-get-example.exe "$ROOT" > /dev/null
-    time $WALI/bin64/nwa-get-example.exe "$ROOT" > /dev/null
     echo
     echo
 done
