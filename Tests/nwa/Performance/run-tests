@@ -4,3 +4,8 @@ cd $(dirname "$0")
 
 cd jam-emptiness
 ./run-tests
+cd ..
+
+cd pcca-determinize
+./run-tests
+cd ..
