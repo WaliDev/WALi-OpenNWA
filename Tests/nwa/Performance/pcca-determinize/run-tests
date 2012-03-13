@@ -12,6 +12,7 @@ for BZ2 in *.bz2; do
 
     echo "*********************************"
     echo "Test: $ROOT"
+    cat "$ROOT" > $DEV_NULL
     time $WALI/bin64/nwa-determinize.exe -o /dev/null "$ROOT"
     echo
     echo

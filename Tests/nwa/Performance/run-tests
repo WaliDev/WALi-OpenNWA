@@ -2,6 +2,14 @@
 
 cd $(dirname "$0")
 
+export DEV_NULL=/dev/null
+
+if [ $(uname -o) = "Cygwin" ]
+then
+    DEV_NULL=NUL
+fi
+
+
 cd jam-emptiness
 ./run-tests
 cd ..
