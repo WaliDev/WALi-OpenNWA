@@ -4,6 +4,13 @@ cd $(dirname "$0")
 
 WALI=../../../..
 
+DEV_NULL=/dev/null
+
+if [ $(uname -o) = "Cygwin" ]
+then
+    DEV_NULL=NUL
+fi
+
 for BZ2 in *.bz2; do
     ROOT=$(basename "$BZ2" .bz2)
     if [ ! -e "$ROOT" ]; then
@@ -12,7 +19,7 @@ for BZ2 in *.bz2; do
 
     echo "*********************************"
     echo "Test: $ROOT"
-    time $WALI/bin64/nwa-get-example.exe "$ROOT" > /dev/null
+    time $WALI/bin64/nwa-get-example.exe "$ROOT" > $DEV_NULL
     echo
     echo
 done
