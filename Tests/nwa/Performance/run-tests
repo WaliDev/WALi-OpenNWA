@@ -9,6 +9,14 @@ then
     DEV_NULL=NUL
 fi
 
+if [ $(uname -m) = "x86_64" ]
+then
+    WALI_BIN=$PWD/../../../bin64
+else
+    WALI_BIN=$PWD../../../bin
+fi
+export WALI_BIN
+
 
 cd jam-emptiness
 ./run-tests

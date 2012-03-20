@@ -2,7 +2,7 @@
 
 cd $(dirname "$0")
 
-WALI=../../../..
+
 
 for BZ2 in *.bz2; do
     ROOT=$(basename "$BZ2" .bz2)
@@ -13,7 +13,7 @@ for BZ2 in *.bz2; do
     echo "*********************************"
     echo "Test: $ROOT"
     cat "$ROOT" > $DEV_NULL
-    time $WALI/bin64/nwa-determinize.exe -o /dev/null "$ROOT"
+    time $WALI_BIN/nwa-determinize.exe -o /dev/null "$ROOT"
     echo
     echo
 done
