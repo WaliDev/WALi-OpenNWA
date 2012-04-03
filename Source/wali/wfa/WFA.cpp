@@ -36,7 +36,8 @@ namespace wali
     const std::string WFA::XMLInorderTag("INORDER");
     const std::string WFA::XMLReverseTag("REVERSE");
 
-    WFA::WFA( query_t q ) : init_state( WALI_EPSILON ),query(q),generation(0)
+    WFA::WFA( query_t q, progress_t prog = NULL )
+        : init_state( WALI_EPSILON ),query(q),generation(0),progress(prog)
     {
       if( query == MAX ) {
         *waliErr << "[WARNING] Invalid WFA::query. Resetting to INORDER.\n";
@@ -59,6 +60,7 @@ namespace wali
         init_state = rhs.init_state;
         F = rhs.F;
         query = rhs.query;
+        progress = rhs.progress;
 
         // Be sure to copy the state_map. Otherwise, 
         // some states that are in rhs but not actually apart
@@ -680,6 +682,8 @@ namespace wali
             }
           }
         }
+        if( progress.is_valid() )
+            progress->tick();
       }
       { // BEGIN DEBUGGING
         //*waliErr << "\n --- WFA::path_summary needed " << numPops << " pops\n";

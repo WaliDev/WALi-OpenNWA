@@ -11,6 +11,7 @@
 #include "wali/SemElem.hpp"
 #include "wali/HashMap.hpp"
 #include "wali/KeyContainer.hpp"
+#include "wali/Progress.hpp"
 
 // ::wali::wfa
 #include "wali/wfa/WeightMaker.hpp"
@@ -102,7 +103,7 @@ namespace wali
         // Methods
         //
       public:
-        WFA( query_t q = INORDER );
+        WFA( query_t q = INORDER, progress_t prog = NULL );
         WFA( const WFA & rhs );
         WFA & operator=( const WFA & rhs );
 
@@ -565,6 +566,7 @@ namespace wali
         std::set< Key > Q;       //! < set of all states
         query_t query;           //! < determine the extend order for path_summary
         size_t generation;       //! < Each WPDS query increments the generation count.
+        progress_t progress;     //! < Provides indication of progress to client.
 
       private:
 

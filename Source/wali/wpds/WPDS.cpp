@@ -420,7 +420,7 @@ namespace wali
 
     WFA WPDS::poststar( WFA const & input )
     {
-      WFA output;
+      WFA output(WFA::INORDER, input.progress);
       poststar(input,output);
       return output;
     }
@@ -450,7 +450,8 @@ namespace wali
           Key gstate = gen_state( r->to_state(),r->to_stack1() );
           fa.addState( gstate,r->weight()->zero() );
         }
-
+        if( fa.progress.is_valid() )
+            fa.progress->tick();
       }
     }
 
@@ -461,6 +462,8 @@ namespace wali
       while( get_from_worklist( t ) ) 
       {
         post( t , fa );
+        if( fa.progress.is_valid() )
+            fa.progress->tick();
       }
     }
 
