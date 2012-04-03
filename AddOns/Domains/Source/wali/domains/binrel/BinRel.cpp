@@ -627,5 +627,12 @@ std::ostream& BinRel::printStats( std::ostream& o) const
   o << "Number of Equal operations: " << numEqual << endl; 
   return o;
 }
+
 #endif //BINREL_STATS
 
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:

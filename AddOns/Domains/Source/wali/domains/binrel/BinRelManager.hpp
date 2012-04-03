@@ -41,5 +41,12 @@ namespace wali
     }
   }
 }
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
+
 #endif //wN_binrel_BINRELMANAGER_GUARD
 
