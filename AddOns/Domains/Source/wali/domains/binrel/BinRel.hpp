@@ -42,8 +42,8 @@ namespace wali
       /**
        * Variable name, maximum value and the different base indices.
        */
-      typedef struct _BddInfo : public Countable, public Printable{
-        public:
+      struct BddInfo : public Countable, public Printable
+      {
           int maxVal;
           // /fdd indices
           // The following three indices are for the base relation
@@ -63,7 +63,8 @@ namespace wali
           int tensor2Extra;
 
           std::ostream& print( std::ostream& o ) const;
-      }BddInfo;
+      };
+        
       typedef ref_ptr<BddInfo> BddInfo_t;
 
       /**A Voc has the binding information for the variables in the
