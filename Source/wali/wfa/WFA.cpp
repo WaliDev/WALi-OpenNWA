@@ -36,7 +36,7 @@ namespace wali
     const std::string WFA::XMLInorderTag("INORDER");
     const std::string WFA::XMLReverseTag("REVERSE");
 
-    WFA::WFA( query_t q, progress_t prog = NULL )
+    WFA::WFA( query_t q, progress_t prog )
         : init_state( WALI_EPSILON ),query(q),generation(0),progress(prog)
     {
       if( query == MAX ) {
