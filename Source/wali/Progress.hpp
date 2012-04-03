@@ -2,6 +2,7 @@
 #define wali_PROGRESS_GUARD 1
 
 #include "wali/ref_ptr.hpp"
+#include "wali/Countable.hpp"
 
 /**
  * @author David Magagnosc
