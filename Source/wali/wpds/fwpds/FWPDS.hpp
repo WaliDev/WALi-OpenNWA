@@ -47,9 +47,17 @@ namespace wali {
 
         public:
           FWPDS();
-          FWPDS(bool useNetwon);
+          FWPDS(bool newton);
           FWPDS(ref_ptr<Wrapper> wrapper);
           FWPDS( const FWPDS& f );
+
+
+          ////////////
+          // Constrol Solver behaviour
+          ///////////
+          ///Must be called before the graph based solvers are setup.
+          ///So, call before calling poststar/prestar etc.
+          void useNewton(bool set);
 
           ////////////
           // add rules
@@ -139,9 +147,6 @@ namespace wali {
           ///////////
           bool checkResults( wfa::WFA const & input, bool poststar );
 
-          ///Must be called before the graph based solvers are setup.
-          ///So, call before calling poststar/prestar etc.
-          void setupNewton(bool set);
 
         protected:
           sem_elem_t wghtOne;

@@ -272,7 +272,7 @@ namespace{
     voc = initialize(0,0,initVoc);
     ASSERT_EQ(voc.size(),4);
 
-    srand(time(NULL));
+    srand((unsigned)time(NULL));
     for(int h=0;h<20;++h){
       bdd r1bdd = tGetRandomTransformer(voc, false);
       bdd r2bdd = tGetRandomTransformer(voc, false);
@@ -339,7 +339,7 @@ namespace{
     voc = initialize(0,0,initVoc);
     ASSERT_EQ(voc.size(),4);
 
-    srand(time(NULL));
+    srand((unsigned)time(NULL));
     for(int h=0;h<20;++h){
       bdd r1bdd = tGetRandomTransformer(voc, true);
       bdd r2bdd = tGetRandomTransformer(voc, true);
@@ -404,9 +404,11 @@ namespace{
     addIntVar(initVoc, "c", 4);
     addBoolVar(initVoc, "d");
     voc = initialize(0,0,initVoc);
-    ASSERT_EQ(voc.size(),4);
 
     srand(time(NULL));
+    //for debugging
+    //srand(1);
+
     for(int h=0;h<20;++h){
       bdd b1bdd = tGetRandomTransformer(voc, false);
       bdd b2bdd = tGetRandomTransformer(voc, false);
@@ -423,23 +425,40 @@ namespace{
       sem_elem_tensor_t t2 = new BinRel(t2bdd,true);
       sem_elem_tensor_t w1,w2,w3,w4;
 
-
       w1 = b1->tensor(b2.get_ptr());
       w2 = b3->tensor(b4.get_ptr());
       w1 = dynamic_cast<SemElemTensor*>(w1->extend(w2.get_ptr()).get_ptr());
 
-      w3 = dynamic_cast<SemElemTensor*>(b1->extend(b2.get_ptr()).get_ptr());
-      w4 = dynamic_cast<SemElemTensor*>(b3->extend(b4.get_ptr()).get_ptr());
+      w3 = dynamic_cast<SemElemTensor*>(b1->extend(b3.get_ptr()).get_ptr());
+      w4 = dynamic_cast<SemElemTensor*>(b2->extend(b4.get_ptr()).get_ptr());
       w3 = w3->tensor(w4.get_ptr());
 
       if(!w1->equal(w3) || dump){
-        ss << "#################################\n(b1,b2) & (b3,b4) <> (b1 & b2,b3 & b4)\n\n";
+        ss << "#################################\n(b1,b2) & (b3,b4) <> (b1 & b3,b2 & b4)\n\n";
+
         b1->print(ss << "b1: ") << endl;
         b2->print(ss << "b2: ") << endl;
         b3->print(ss << "b3: ") << endl;
         b4->print(ss << "b4: ") << endl;
+        w1 = b1->tensor(b2.get_ptr());
+        w1->print(ss << "(b1,b2): ") << endl;
+        w2 = b3->tensor(b4.get_ptr());
+        w2->print(ss << "(b3,b4): ") << endl;
+        w1 = dynamic_cast<SemElemTensor*>(w1->extend(w2.get_ptr()).get_ptr());
         w1->print(ss << "(b1,b2) & (b3,b4): ") << endl;
-        w3->print(ss << "(b1 & b2,b3 & b4): ") << endl;
+
+
+        b1->print(ss << "b1: ") << endl;
+        b2->print(ss << "b2: ") << endl;
+        b3->print(ss << "b3: ") << endl;
+        b4->print(ss << "b4: ") << endl;
+        w3 = dynamic_cast<SemElemTensor*>(b1->extend(b3.get_ptr()).get_ptr());
+        w3->print(ss << "b1 & b3: ") << endl;
+        w4 = dynamic_cast<SemElemTensor*>(b2->extend(b4.get_ptr()).get_ptr());
+        w4->print(ss << "b2 & b4: ") << endl;
+        w3 = w3->tensor(w4.get_ptr());
+        w3->print(ss << "(b1 & b3,b2 & b4): ") << endl;
+
         failed = true;
       }
 
@@ -454,8 +473,19 @@ namespace{
         ss << "#################################\nD(t1 | t2) <> D(t1) | D(t2)\n\n";
         t1->print(ss << "t1: ") << endl;
         t2->print(ss << "t2: ") << endl;
+
+        w1 = dynamic_cast<SemElemTensor*>(t1->combine(t2.get_ptr()).get_ptr());
+        w1->print(ss << "t1 | t2: ") << endl;
+        w1 = w1->detensor();
         w1->print(ss << "D(t1 | t2): ") << endl;
+
+        w2 = t1->detensor();
+        w2->print(ss << "D(t1): ") << endl;
+        w3 = t2->detensor();
+        w3->print(ss << "D(t2): ") << endl;
+        w2 = dynamic_cast<SemElemTensor*>(w2->combine(w3.get_ptr()).get_ptr());
         w2->print(ss << "D(t1) | D(t2): ") << endl;
+
         failed = true;
       }
 
@@ -468,8 +498,14 @@ namespace{
         ss << "#################################\nD((b1, b2)) <> b1 & b2\n\n";
         b1->print(ss << "b1: ") << endl;
         b2->print(ss << "b2: ") << endl;
-        w1->print(ss << "D((b1 , r2)): ") << endl;
+        w1 = b1->tensor(b2.get_ptr());
+        w1->print(ss << "(b1,r2): ") << endl;
+        w1 = w1->detensor();
+        w1->print(ss << "D((b1,r2)): ") << endl;
+
+        w2 = dynamic_cast<SemElemTensor*>(b1->extend(b2.get_ptr()).get_ptr());
         w2->print(ss << "b1 & b2: ") << endl;
+
         failed = true;
       }
     }

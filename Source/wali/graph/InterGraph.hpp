@@ -27,10 +27,12 @@ namespace wali {
             int count;
             public:
             UnionFind(int len);
+            UnionFind(UnionFind& from);
             ~UnionFind();
             void reset();
             int find(int a);
             void takeUnion(int a, int b);
+            std::ostream& print(std::ostream& o);
             /// Counts the number of sets by counting the number
             /// of self edges.
             int countSets();
@@ -224,7 +226,7 @@ namespace wali {
                     const int u, //current node.
 
                     const int deg[], //[i]: degree of node i
-                    const int * const * const adjMat, //The adjacency matrix
+                    std::vector< std::vector <int> > adjMat, //The adjacency matrix
 
                     int dfsn[], //[i]: the dfs number of vertex i
                     int& dfsnext, //next free dfs number

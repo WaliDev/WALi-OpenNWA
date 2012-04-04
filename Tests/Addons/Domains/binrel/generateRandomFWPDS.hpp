@@ -1,3 +1,9 @@
+#ifndef wali_genereate_Random_FWPDS_guard
+#define wali_genereate_Random_FWPDS_guard 1
+
+//TODO: move this to wali/wpds/fwpds
+//TODO: also put stuff inside ::wali::wpds::fwpds
+
 // ::wali::wpds::fwpds
 #include "wali/wpds/fwpds/FWPDS.hpp"
 
@@ -20,9 +26,11 @@ typedef wali::sem_elem_t (* RANDOMWT) ();
   * function.
   * @see randfwpds(...)
   */
-struct Conf{
+struct Conf
+{
   //! pointer to a function that generates random weights
-  RANDOMWT randomWt;
+  //RANDOMWT randomWt;
+  virtual wali::sem_elem_t randomWt() const = 0;
   //! The number of procedures to be generated
   int numprocs;
   //! The number of callsites to be generated
@@ -33,16 +41,21 @@ struct Conf{
   int numsplits;
   //! Number of error points to be generated
   int numerrs;
+
+  virtual ~Conf() {}
 };
 
 /**
   * Used to return the important names to the function  calling randfwpds(...)
   */
-struct Names{
+struct Names
+{
   wali::Key pdsState;
   wali::Key *entries;
   wali::Key *exits;
   std::vector< wali::Key > errs;
+  Names();
+  ~Names();
 };
 
 /**
@@ -51,5 +64,6 @@ struct Names{
   * @see struct Conf
   **/
 void randfwpds(FWPDS& pds, const Conf& conf, Names& names, 
-    std::ostream *o = NULL, float pCall = 0.45, float pSplit = 0.45);
+    std::ostream *o = NULL, double pCall = 0.45, double pSplit = 0.45);
 
+#endif //wali_genereate_Random_FWPDS_guard

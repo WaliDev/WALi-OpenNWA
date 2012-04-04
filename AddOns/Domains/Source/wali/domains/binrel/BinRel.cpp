@@ -265,7 +265,7 @@ const Voc BinRel::initialize(int bddMemSize, int cacheSize, Voc v)
 void BinRel::reset()
 {
 
-  if(bdd_isrunning == 0)
+  if(bdd_isrunning() == 0)
     return;
   for(VocIter iter = voc.begin(), endIter = voc.end();
       endIter != iter;

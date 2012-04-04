@@ -9,6 +9,7 @@
 #include "wali/Common.hpp"
 #include "wali/ref_ptr.hpp"
 #include "wali/SemElem.hpp"
+#include "wali/SemElemTensor.hpp"
 #include <iostream>
 
 
@@ -38,6 +39,24 @@ namespace wali
        *         call -> enter -> exit -> return
        */
       virtual sem_elem_t apply_f(sem_elem_t w1, sem_elem_t w2) = 0;
+
+      /**
+       * Return the coeff of the [w1] term for the linear equation obtained 
+       * by differentiating this function. 
+       *
+       * @return: sem_elem_tensor_t coefficient along the path
+       *         call -> w1_edge -> return
+       */
+      virtual sem_elem_tensor_t get_lin_coeff_w1(sem_elem_t w1, sem_elem_t w2) = 0;
+
+      /**
+       * Return the coeff of the [w1] term for the linear equation obtained 
+       * by differentiating this function. 
+       *
+       * @return: sem_elem_tensor_t coefficient along the path
+       *         call -> w1_edge -> return
+       */
+      virtual sem_elem_tensor_t get_lin_coeff_w2(sem_elem_t w1, sem_elem_t w2) = 0;
 
       /*  
        * Check to see if the two merge functions are equal. This is used to resolve the

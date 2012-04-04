@@ -20,9 +20,9 @@ using namespace wali::wpds;
 
 // Data
 // Array that stores keys for all procedure entries.
-static wali::Key *entries;
+static wali::Key * entries;
 // Array that stores keys for all procedure exits.
-static wali::Key *exits;
+static wali::Key * exits;
 // Name of the pds state to use
 static wali::Key pdsState;
 
@@ -31,6 +31,16 @@ static int pCall;
 static int pSplit;
 // end::Data
 
+Names::Names()
+{
+  entries = NULL;
+  exits = NULL;
+}
+Names::~Names()
+{
+  delete [] entries;
+  delete [] exits;
+}
 // /Forward declaration of functions.
 static void genproc(FWPDS& pds, const Conf& conf, int procnum, int remNodes, int
     remSplits, int remCalls, std::ostream *o, int tabstop);
@@ -43,9 +53,11 @@ static wali::Key genblock(FWPDS& pds, const Conf& conf, wali::Key curhead, int
   * @see struct Conf
   **/
 void randfwpds(FWPDS& pds, const Conf& conf, Names& names, 
-    std::ostream *o, float _pCall, float _pSplit)
+    std::ostream *o, double _pCall, double _pSplit)
 {
   srand(time(NULL));
+  //For debugging
+  //srand(1);
 
   wali::clearKeyspace();
   curKey=0;
@@ -60,6 +72,7 @@ void randfwpds(FWPDS& pds, const Conf& conf, Names& names,
     entries[i] = wali::getKeySpace()->getKey(curKey++);
     exits[i] = wali::getKeySpace()->getKey(curKey++);
   }
+
 
   if(o)
     *o << "#######################################\n";
@@ -90,11 +103,10 @@ void randfwpds(FWPDS& pds, const Conf& conf, Names& names,
     names.exits[i] = exits[i];
   }
 
-  //Correct?
   delete [] entries;
   delete [] exits;
 
-  //TODO: What about errors?
+  //TODO: What about errors tags?
 }
 
 static void genproc(FWPDS& pds, const Conf& conf, int procnum, int remNodes, int
@@ -137,12 +149,13 @@ static void genproc(FWPDS& pds, const Conf& conf, int procnum, int remNodes, int
     remSplits -= splits;
     curhead = genblock(pds,conf,curhead,nodes,splits,calls,o,tabspace+2);
   }
+  //The last edge to the exit node
   pds.add_rule(
       pdsState,
       curhead,
       pdsState,
       exits[procnum],
-      (*conf.randomWt)()
+      conf.randomWt()
     );
   if(o){
     for(int j=0;j<tabspace+2;++j)
@@ -151,6 +164,31 @@ static void genproc(FWPDS& pds, const Conf& conf, int procnum, int remNodes, int
     for(int j=0;j<tabspace+2;++j)
       *o<< " ";
     *o << wali::key2str(exits[procnum]) << "\n";
+  }
+  //We add an edge from start to end, to make sure 
+  //there is a path through the function without 
+  //further calls
+  pds.add_rule(
+      pdsState,
+      entries[procnum],
+      pdsState,
+      exits[procnum],
+      conf.randomWt()
+    );
+  if(o){
+    for(int j=0;j<tabspace;++j)
+      *o<< " ";
+    *o << "Default branch: " << wali::key2str(entries[procnum]) <<
+      "->" << wali::key2str(exits[procnum]) << "\n";
+  }
+  //Return from the functions, except for the first function
+  if(procnum != 0){
+  pds.add_rule(
+      pdsState,
+      exits[procnum],
+      pdsState,
+      conf.randomWt()
+    );  
   }
 }
 
@@ -178,8 +216,8 @@ static wali::Key genblock(FWPDS& pds, const Conf& conf, wali::Key curhead, int
           pdsState,
           entries[fn],
           nexthead,
-          (*conf.randomWt)(),
-          new wali::MergeFn((*conf.randomWt)())
+          conf.randomWt(),
+          new wali::MergeFn(conf.randomWt())
           );
       curhead = nexthead;
       remCalls--;
@@ -234,7 +272,7 @@ static wali::Key genblock(FWPDS& pds, const Conf& conf, wali::Key curhead, int
           curhead,
           pdsState,
           nexthead,
-          (*conf.randomWt)()
+          conf.randomWt()
           );
       endhead1 = genblock(pds,conf,nexthead,nodes1,splits1,calls1,o,tabspace+2);
       if(o){
@@ -254,7 +292,7 @@ static wali::Key genblock(FWPDS& pds, const Conf& conf, wali::Key curhead, int
           curhead,
           pdsState,
           nexthead,
-          (*conf.randomWt)()
+          conf.randomWt()
           );
       endhead2 = genblock(pds,conf,nexthead,nodes1,splits1,calls1,o,tabspace+2);
       if(o){
@@ -269,14 +307,14 @@ static wali::Key genblock(FWPDS& pds, const Conf& conf, wali::Key curhead, int
           endhead1,
           pdsState,
           endhead,
-          (*conf.randomWt)()
+          conf.randomWt()
           );
       pds.add_rule(
           pdsState,
           endhead2,
           pdsState,
           endhead,
-          (*conf.randomWt)()
+          conf.randomWt()
           );
       curhead = endhead;
     }else{
@@ -291,7 +329,7 @@ static wali::Key genblock(FWPDS& pds, const Conf& conf, wali::Key curhead, int
           curhead,
           pdsState,
           nexthead,
-          (*conf.randomWt)()
+          conf.randomWt()
           );
       curhead = nexthead;
       remNodes--;

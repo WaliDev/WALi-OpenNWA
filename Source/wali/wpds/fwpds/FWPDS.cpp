@@ -61,6 +61,10 @@ FWPDS::FWPDS( const FWPDS& f ) : EWPDS(f),interGr(NULL),checkingPhase(false), ne
 {
 }
 
+FWPDS::FWPDS(bool _newton) : EWPDS(), newton(_newton)
+{
+}
+
 ///////////////////////////////////////////////////////////////////
 void FWPDS::topDownEval(bool f) {
   graph::RegExp::topDownEval(f);
@@ -153,7 +157,7 @@ std::ostream& graphPrintKey(std::ostream& o, int k) {
   return wali::printKey(o,(Key)k);
 }
 
-void FWPDS::setupNewton(bool set){
+void FWPDS::useNewton(bool set){
   newton = set;
 }
 
@@ -189,7 +193,10 @@ void FWPDS::prestar( wfa::WFA const & input, wfa::WFA& output )
   EWPDS::prestarComputeFixpoint(output);
 
   // Compute summaries
-  interGr->setupInterSolution();
+  if(newton)
+    interGr->setupNewtonSolution();
+  else
+    interGr->setupInterSolution();
 
   //interGr->print(std::cout << "THE INTERGRAPH\n",graphPrintKey);
 
@@ -306,7 +313,6 @@ bool FWPDS::checkResults( wfa::WFA const & input, bool do_poststar )
 {
   if( wali::get_verify_fwpds() ) 
   {
-
     // set flag to use EWPDS's saturation
     checkingPhase = true;
 
@@ -384,7 +390,11 @@ void FWPDS::poststarIGR( wfa::WFA const & input, wfa::WFA& output )
     std::string msg = (get_verify_fwpds()) ? "FWPDS Saturation" : "";
     util::Timer timer(msg);
     // Compute summaries
-    interGr->setupInterSolution();
+    if(newton){
+      interGr->setupNewtonSolution();
+    }
+    else
+      interGr->setupInterSolution();
   }
 
   //interGr->print(std::cout << "THE INTERGRAPH\n",graphPrintKey);

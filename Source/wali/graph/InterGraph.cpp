@@ -31,6 +31,12 @@ namespace wali {
             }
         }
 
+        UnionFind::UnionFind(UnionFind& from) : n(from.n), count(from.count){
+          arr = new int[n];
+          for(int i=0; i<n; ++i)
+            arr[i] = from.arr[i];
+        }
+
         UnionFind::~UnionFind() {
             delete [] arr;
             arr = NULL;
@@ -71,6 +77,30 @@ namespace wali {
 
         int UnionFind::countSets(){
           return count;
+        }
+
+        std::ostream& UnionFind::print(std::ostream& o)
+        {
+          std::multiset< std::pair< int, int > > shadow;
+          int curset = -1;
+
+          o << "[ ";
+          for(int i=0; i<n; ++i){
+            shadow.insert(std::pair< int, int >(find(i),i));
+          }
+
+          for(std::multiset< std::pair< int, int > >::iterator iter = shadow.begin();
+              iter != shadow.end();
+              ++iter){
+            if(iter->first > curset){
+              if(curset != -1) 
+                o << ">>>>>>>>>" << std::endl;
+              curset = iter->first;
+            }
+            o << iter->second << " ";
+          }
+          o << "]";
+          return o;
         }
 
         inter_node_t promote_type(inter_node_t t1, inter_node_t t2) {
@@ -453,6 +483,27 @@ namespace wali {
                 return l+int((u-l+1)*(a/(RAND_MAX + 1.0))); 
             }
 
+#if 0
+            std::ostream& _printArr2D(std::ostream& o, int **arr, int numRows, int cols[])
+            {
+              //You might want to have a newline before you call _printArr2D
+              for(int i=0; i<numRows; ++i){
+                for(int j =0; j<cols[i]; ++j){
+                  o << arr[i][j] << " ";
+                }
+                o << std::endl;
+              }
+              return o;
+            }
+
+            std::ostream& _printArr1D(std::ostream& o, int arr[], int maxCols)
+            {
+              for(int i=0; i<maxCols; ++i)
+                o << arr[i] << std::endl;
+              return o;
+            }
+#endif //#if 0
+
             // I call this raw dfs because there are some dfs implementations floating around.
             // Mine works directly on arrays storing the adjacency list.
             // Note: This implementation is highly tailored to the use case (see below)
@@ -463,7 +514,7 @@ namespace wali {
                 const int u, //current node.
                 
                 const int deg[], //[i]: degree of node i
-                const int * const * const adjMat, //The adjacency matrix
+                const std::vector< std::vector< int > > adjMat, //The adjacency matrix
                 
                 int dfsn[], //[i]: the dfs number of vertex i
                 int& dfsnext, //next free dfs number
@@ -478,7 +529,7 @@ namespace wali {
                 )
             { 
               //If this does not make any sense to you
-              // go to: http://shygpsy/com/tools/scc.cpp
+              // go to: http://shygypsy.com/tools/scc.cpp
               //The code below is an adapted version.
 
               dfsn[u] = mindfsn[u] = dfsnext++;
@@ -487,10 +538,16 @@ namespace wali {
              
               for(int i = 0, v; i < deg[u]; ++i){
                 v = adjMat[u][i];
-                if(!dfsn[v]) 
-                  rawDfs(u,deg,adjMat,dfsn,dfsnext,comp,ncomp,incomp,mindfsn,scc);
-                if(incomp[v])
+                if(u == v)
+                  //I really don't care about self loops
+                  continue;
+                if(dfsn[v] == -1){
+                  rawDfs(v,deg,adjMat,dfsn,dfsnext,comp,ncomp,incomp,mindfsn,scc);
                   mindfsn[u] = (mindfsn[v] < mindfsn[u])? mindfsn[v] : mindfsn[u];
+                }else if(incomp[v]){
+                  //mindfsn[u] = (mindfsn[v] < mindfsn[u])? mindfsn[v] : mindfsn[u];
+                  mindfsn[u] = (dfsn[v] < mindfsn[u])? dfsn[v] : mindfsn[u];
+                }
               }
 
               if(dfsn[u] == mindfsn[u]){
@@ -514,7 +571,18 @@ namespace wali {
             // computed on demand.
             void InterGraph::setupNewtonSolution()
             {
+              //Having this lying around as non tensor can do harm*/
+              sem_elem_tensor_t sem_old = dynamic_cast<SemElemTensor*>(sem.get_ptr());
+              sem = sem_old->tensor(sem_old.get_ptr());
+
               RegExp::startSatProcess(sem);
+
+              //Why is this implementation so myopic? Because it has to fit
+              //in this large framework which doesn't give me  nice hooks 
+              //to do stuff. The idea is that this function along with rawDfs
+              //are almost independent of the rest of the code.
+              bool dbg = true;
+              std::ostream& o = std::cout;
 
               int n = nodes.size(); //total number of nodes in the graph
               vector< GraphEdge >::iterator geIter;
@@ -528,14 +596,26 @@ namespace wali {
                   geIter != intra_edges.end();
                   ++geIter){
                 cfgUf.takeUnion(geIter->src,geIter->tgt);
+                //if(dbg) 
+                //  o << "Intra:" << geIter->src 
+                //  << "->" << geIter->tgt << endl;
               }
               for(
                   heIter = inter_edges.begin();
                   heIter != inter_edges.end();
                   ++heIter){
                 cfgUf.takeUnion(heIter->src1,heIter->tgt);
+                //if(dbg) 
+                //  o << "Inter:i:" << heIter->src1 
+                //  << ",e:" << heIter->src2 
+                //  << "->" << heIter->tgt << endl;
               }
               //cfgUf now has sets corresponding to the CFGs.
+
+              if(dbg){
+                o << "cfgUf after the initial cfg finding: ";
+                cfgUf.print(o) << std::endl;
+              }
 
               //int nCfg = cfgUf.countSets(); //Count the number of CFGs - O(1)
 
@@ -548,6 +628,7 @@ namespace wali {
               int tgt2Node[nTgt]; //map from 1...nTgt to actual tgt node
               int tgt2ExtSrc[nTgt]; //the external source for each target
               int tgt2IntSrc[nTgt]; //the internal source for each target
+              int tgt2HypEdge[nTgt];
               int i;
               for(
                   i = 0,
@@ -558,6 +639,24 @@ namespace wali {
                 tgt2Node[i] = heIter->tgt;
                 tgt2ExtSrc[i] = heIter->src2;
                 tgt2IntSrc[i] = heIter->src1;
+                //whacko!
+                tgt2HypEdge[i] = i;
+              }
+
+              if(dbg){
+                o << "Consecute numbers assigned to target nodes. Here are the maps:" << endl;
+                o << "tgt2Node: ";
+                for(int i=0; i<nTgt; ++i)
+                  o << i << ":" << tgt2Node[i] << " ";
+                o << endl;
+                o << "tgt2ExtSrc: ";
+                for(int i=0; i<nTgt; ++i)
+                  o << i  << ":" << tgt2ExtSrc[i] << " ";
+                o << endl;
+                o << "tgt2IntSrc: ";
+                for(int i=0; i<nTgt; ++i)
+                  o << i << ":" << tgt2IntSrc[i] << " ";
+                o << endl;
               }
 
               //Compute a list of target nodes in each CFG
@@ -568,9 +667,31 @@ namespace wali {
               for(int i=0; i<n; ++i){
                 nTgtNodes[i]=0;
               }
+              if(dbg){
+                //Makes debugging easier. All unused
+                //space is -1. We don't want this
+                //in production code because of
+                //complexity
+                for(int i=0; i < n; ++i)
+                  for(int j=0; j < nTgt; ++j)
+                    lTgtNodes[i][j] = -1;
+              }
               for(int i=0; i < nTgt; ++i){
                 int tgtCfg = cfgUf.find(tgt2Node[i]);
                 lTgtNodes[tgtCfg][nTgtNodes[tgtCfg]++] = i;
+              }
+              if(dbg){
+                o << "List of target nodes in each CFG. [Using real node numbers]" << endl;
+                for(int i=0; i<n; ++i){
+                  if(nTgtNodes[i] != 0)
+                    o << i << " --> ";
+                  for(int j=0; j<nTgtNodes[i];++j){
+                    o << tgt2Node[lTgtNodes[i][j]] << " ";
+                  }
+                  if(nTgtNodes[i] != 0)
+                    o << endl;
+                }
+                o << "------" << endl;
               }
 
               //Create the adjacency matrix.
@@ -580,7 +701,12 @@ namespace wali {
               // There is no clean way of passing this to a function if this is
               // na array, hence pionter
               // int dependents[nTgt][nTgt];
-              int **dependents = (int**) malloc(sizeof(int)*nTgt*nTgt);
+              std::vector< std::vector< int > > dependents;
+              for(int i=0; i<nTgt; ++i){
+                std::vector< int > nv;
+                dependents.push_back(nv);
+              }
+                
               int nDependents[nTgt];
               for(int i = 0; i< nTgt; ++i){
                 nDependents[i] = 0;
@@ -590,12 +716,30 @@ namespace wali {
                 //add me as a dependent to all targets in my CFG.
                 c = cfgUf.find(tgt2Node[i]);
                 for(int j = 0; j < nTgtNodes[c]; ++j){
-                  dependents[lTgtNodes[c][j]][nDependents[lTgtNodes[c][j]]++] = i;
+                  int other = lTgtNodes[c][j];
+                  dependents[other].push_back(i);
+                  nDependents[other]++;
                 }
+                //add me as a dependent to all targets in the CFG of 
+                //my external source
                 c = cfgUf.find(tgt2ExtSrc[i]);
                 for(int j = 0; j < nTgtNodes[c]; ++j){
-                  dependents[lTgtNodes[c][j]][nDependents[lTgtNodes[c][j]]++] = i;
+                  int other = lTgtNodes[c][j];
+                  dependents[other].push_back(i);
+                  nDependents[other]++;
                 }
+              }
+
+              if(dbg){
+                o << "Adjacency matrix computed. [Using real node numbers]" << endl;
+                for(int i=0; i<nTgt; ++i){
+                  o << tgt2Node[i] << " --> ";
+                  for(int j=0; j < nDependents[i]; ++j){
+                    o << tgt2Node[dependents[i][j]] << " ";
+                  }
+                  o << endl;
+                }
+                o << "------" << endl;
               }
 
               //Now the actual SCC. The following are used by rawDfs
@@ -610,13 +754,13 @@ namespace wali {
               dfsnext = 0;
               ncomp = 0;
               for(int i=0; i < nTgt; ++i){
-                dfsn[i] = 0;
-                mindfsn[i] = 0; // Not really needed
+                dfsn[i] = -1;
+                mindfsn[i] = -1; // Not really needed
                 comp[i] = 0;
                 incomp[i] = false;
               }
               for(int u=0; u < nTgt; ++u){
-                if(!dfsn[u])
+                if(dfsn[u] == -1)
                   rawDfs(
                       u,
                       nDependents,dependents,
@@ -625,6 +769,19 @@ namespace wali {
                       );
               }
 
+              if(dbg){
+                o << "SCC done. SCCs:" << endl;
+                  for(int i=0; i < nTgt; ++i){
+                    o << "SCC[" << i <<"]: ";
+                    for(int j=0; j<nTgt; ++j){
+                      if(mindfsn[j] == i){
+                        o << tgt2Node[j] << " ";
+                      }
+                    }
+                    o << endl;
+                  }
+                o << "------" << endl;
+              }
               // SCC done. sccUf now has sets that corresponds to SCCs (with
               // targets numbered from 0...nTgt-1)
               // Note: mindfsn holds a topological order on connected
@@ -637,6 +794,14 @@ namespace wali {
               WorkList wl;
               for(int i=0; i < nTgt; ++i)
                 wl.insert(tup(mindfsn[i],i));
+
+              if(dbg){
+                o << "Worklist:";
+                for(WorkList::const_iterator iter = wl.begin(); iter != wl.end(); ++iter){
+                  o << "[" << iter->first << "," << tgt2Node[iter->second] <<"] ";
+                }
+                o << endl;
+              }
 
               // We update cfgUf to those we get after differentiation, i.e.,
               // call graphs are merged into CFGs
@@ -657,26 +822,45 @@ namespace wali {
                 nodes[i].intra_nodeno = nodes[i].gr->makeNode(nodes[i].trans);
 
                 if(is_source_type(nodes[i].type)) {
-                  nodes[i].gr->setSource(nodes[i].intra_nodeno, nodes[i].weight);
+                  //This is a source node. 
+                  //Pre*:   w -> (w^T,1)
+                  //Post*:  w -> (1^T,w)
+                  //where ^T is transpose and (,) is tensor
+                  sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>((nodes[i].weight).get_ptr());
+                  sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());
+                  if(running_prestar){
+                    wt = wt->transpose();
+                    wt = wt->tensor(one.get_ptr());
+                  }else{
+                    wt = one->tensor(wt.get_ptr());
+                  }
+                  nodes[i].gr->setSource(nodes[i].intra_nodeno, wt);
                 }
                 // zero all weights (some are set by setSource() )
                 // All weights should be tensored
-                sem_elem_t zero = sem->zero();
-                zero = dynamic_cast<SemElemTensor*>(zero.get_ptr())
-                          ->tensor(dynamic_cast<SemElemTensor*>(zero.get_ptr()));
+                sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>((sem->zero()).get_ptr()); //sem is tensored
                 if(nodes[i].weight.get_ptr() != NULL)
-                  nodes[i].weight = zero;
+                  nodes[i].weight = zerot;
               }
 
+              //Pre*:
               //All edges in the intraprocedural graph get weights of the
-              //form (1^T,w) where (,) denotes tensor, ^T denotes transpose,
+              //form (w^T,1) where (,) denotes tensor, ^T denotes transpose,
               //and w is the weight on the CFG edge
+              //Post*:
+              //All edges in the intraprocedural graph get weights of the
+              //form (1^T,w) 
               for(geIter = intra_edges.begin(); geIter != intra_edges.end(); ++geIter) {
                 int s = geIter->src;
                 int t = geIter->tgt;
-                sem_elem_t wt = geIter->weight;
-                sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>(geIter->weight->one().get_ptr());
-                wt = one->tensor(dynamic_cast<SemElemTensor*>(wt.get_ptr()));
+                sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>((geIter->weight).get_ptr());
+                sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>(wt->one().get_ptr());
+                if(running_prestar){
+                  wt = wt->transpose();
+                  wt = wt->tensor(one.get_ptr());
+                }else{
+                  wt = one->tensor(wt.get_ptr());
+                }
                 nodes[s].gr->addEdge(nodes[s].intra_nodeno, nodes[t].intra_nodeno, wt);
               }
               //For each hyperedge (tgt <- src1 src2], we add two edges [t <-
@@ -685,10 +869,9 @@ namespace wali {
               //These edges will be updatable.
               for(heIter = inter_edges.begin(); heIter != inter_edges.end(); heIter++) {
                 IntraGraph *gr = nodes[heIter->tgt].gr;
-                sem_elem_tensor_t zero = dynamic_cast<SemElemTensor*>(sem->zero().get_ptr());
-                zero = dynamic_cast<SemElemTensor*>(zero.get_ptr())->tensor(dynamic_cast<SemElemTensor*>(zero.get_ptr()));
-                gr->addEdge(nodes[heIter->src1].intra_nodeno, nodes[heIter->tgt].intra_nodeno, zero, true);
-                gr->addEdge(nodes[heIter->src2].intra_nodeno, nodes[heIter->tgt].intra_nodeno, zero, true);
+                sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>(sem->zero().get_ptr()); //zero is tensored
+                gr->addEdge(nodes[heIter->src1].intra_nodeno, nodes[heIter->tgt].intra_nodeno, zerot, true);
+                gr->addEdge(nodes[heIter->src2].intra_nodeno, nodes[heIter->tgt].intra_nodeno, zerot, true);
                 //The external source and the target must belong to the same CFG after differentiation.
                 assert(nodes[heIter->src2].gr == gr);
               }
@@ -698,47 +881,110 @@ namespace wali {
               for(grIter = gr_list.begin(); grIter != gr_list.end(); grIter++) {
                 (*grIter)->setupIntraSolution(false);
               }
-              //cout << "Intra setup done.\n";
+              if(dbg)
+                o << "Intra setup done.\n";
 
 
               //Now Saturate Netwon's iterations.
-              //TODO: Something more than nothing! :)
               while(!wl.empty()) {
-                //bool change = false;
-                // Get an target whose in-transitions are to be checked.
+                bool changed = false;
                 WorkList::iterator wit = wl.begin();
-                //int tgt = (*wit).second;
+
+                if(dbg)
+                  o << "Saturation: popped:" << tgt2Node[wit->second] << ",SCC=" << wit->first << endl;
+
+                int tgt = (*wit).second;
                 wl.erase(wit);
 
-#if 0
-                //Do the thing
-                sem_elem_tensor_t intWt, extWt, intEdgeWt, extEdgeWt;
+                sem_elem_tensor_t intWt, extWt, intEdgeWt, extEdgeWt, newIntEdgeWt, newExtEdgeWt;
                 IntraGraph* gr = nodes[tgt2Node[tgt]].gr;
 
-                intWt = gr->get_weight(nodes[tgt2IntSrc[tgt]].intra_nodeno);
-                extWt = gr->get_weight(nodes[tgt2ExtSrc[tgt]].intra_nodeno);
-                intEdgeWt = gr->readEdgeWeight(nodes[tgt2IntSrc[tgt]].intra_nodeno, nodes[tgt2node[tgt]].intra_nodeno);
-                extEdgeWt = gr->readEdgeWeight(nodes[tgt2ExtSrc[tgt]].intra_nodeno, nodes[tgt2node[tgt]].intra_nodeno);
-                if(intWt == extEdgeWt && extWt == intEdgeWt)
-                  continue;
-              
+                intWt = dynamic_cast<SemElemTensor*>(gr->get_weight(nodes[tgt2IntSrc[tgt]].intra_nodeno).get_ptr());
+                extWt = dynamic_cast<SemElemTensor*>(gr->get_weight(nodes[tgt2ExtSrc[tgt]].intra_nodeno).get_ptr());
+                intEdgeWt = dynamic_cast<SemElemTensor*>(gr->readEdgeWeight(nodes[tgt2IntSrc[tgt]].intra_nodeno, nodes[tgt2Node[tgt]].intra_nodeno).get_ptr());
+                extEdgeWt = dynamic_cast<SemElemTensor*>(gr->readEdgeWeight(nodes[tgt2ExtSrc[tgt]].intra_nodeno, nodes[tgt2Node[tgt]].intra_nodeno).get_ptr());
+
                 if(!running_ewpds)
-                  assert(false && "Newton's method only works for EWPDS right now!");
+                  assert(false && "Newton's method only works for EWPDS right now!\n");
 
-                //TODO:INCOMPLETE!!!
+                //Does this even make sense? Can you save an iterator and then use
+                //it as an index? 
+                if(
+                    false &&          //FIXME:SHORT CIRCUITED
+                    running_ewpds && inter_edges[(tgt2HypEdge[tgt])].mf.get_ptr()){
 
-                // If "change"'d, add all depndents to the worklist.
-                if(changed){
-                  for(int i=0; i < nDependents[tgt]; ++i){
-                    wl.insert(new tup(mindfsn[dependents[tgt][i]],dependents[tgt][i]));
+                  assert(false && "Newton's method: I don't het know how to handle MergeFns.\n");
+
+                }else{
+                  {
+                    //intEdgeWt
+                    //D() denotes detensor
+                    //Pre*: ([f(extSrc,tgtNode) X D(extWt)]^T , 1)
+                    //Post*: (1, [f(extSrc,tgtNode) X D(extWt)])
+                    sem_elem_tensor_t extWtD = extWt->detensorTranspose();
+                    sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>(inter_edges[tgt2HypEdge[tgt]].weight.get_ptr());
+                    if(wt == NULL)
+                      wt = dynamic_cast<SemElemTensor*>(extWtD->one().get_ptr());
+                      //FIXME:Should be this. Above is a part of short-circuit
+                      //wt = dynamic_cast<SemElemTensor*>(extWtD->zero().get_ptr());
+                    wt = dynamic_cast<SemElemTensor*>(wt->extend(extWtD.get_ptr()).get_ptr());
+                    sem_elem_tensor_t one  = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());
+                    if(running_prestar){
+                      wt = wt->transpose();
+                      wt = wt->tensor(one.get_ptr());
+                    }else{
+                      wt = one->tensor(wt.get_ptr());
+                    }
+                    if(!intEdgeWt->equal(wt.get_ptr())){
+                      changed = true;
+                      gr->updateEdgeWeight(nodes[tgt2IntSrc[tgt]].intra_nodeno, nodes[tgt2Node[tgt]].intra_nodeno, wt);
+                    }
+                  }
+                  {
+                    //extEdgeWt
+                    //D() denotes detensor
+                    //Pre*: ([f(extSrc,tgtNode)]^T, [D(intWt)]^T)
+                    //Post*: ([D(intWt) X f(extSrc,tgtNode)], 1)
+                    sem_elem_tensor_t intWtD = intWt->detensorTranspose();
+                    sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>(inter_edges[tgt2HypEdge[tgt]].weight.get_ptr());
+                    if(wt == NULL)
+                      wt = dynamic_cast<SemElemTensor*>(intWtD->one().get_ptr());
+                      //FIXME:Should be this. Above is a part of short-circuit
+                      //wt = dynamic_cast<SemElemTensor*>(intWD->zero().get_ptr());
+                    sem_elem_tensor_t one  = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());
+                    if(running_prestar){
+                      wt = wt->transpose();
+                      wt = wt->tensor((intWtD->transpose()).get_ptr());
+                    }else{
+                      wt = dynamic_cast<SemElemTensor*>((intWtD->extend(wt.get_ptr())).get_ptr());
+                      wt = wt->tensor(one.get_ptr());
+                    }
+                    if(!extEdgeWt->equal(wt.get_ptr())){
+                      changed = true;
+                      gr->updateEdgeWeight(nodes[tgt2ExtSrc[tgt]].intra_nodeno, nodes[tgt2Node[tgt]].intra_nodeno, wt);
+                    }
                   }
                 }
-#endif //#if 0
+
+                if(changed){
+                  for(int i=0; i < nDependents[tgt]; ++i){
+                    wl.insert(tup(mindfsn[dependents[tgt][i]],dependents[tgt][i]));
+                  }
+                }
+
+                if(dbg){
+                  o << "Saturation: Worklist:";
+                  for(WorkList::const_iterator iter = wl.begin(); iter != wl.end(); ++iter){
+                    o << "[" << iter->first << "," << tgt2Node[iter->second] <<"] ";
+                  }
+                  o << endl;
+                }
               }
-
-
-
-
+              //Now I will set some class data members and globals that the
+              //rest of the graph implementation seems to rely upon
+              intra_graph_uf = new UnionFind(cfgUf);
+              RegExp::stopSatProcess();
+              RegExp::executingPoststar(!running_prestar);
             }
 
 
