@@ -110,7 +110,7 @@ namespace{
 
 
 
-  TEST(RandomPds,pdsGenTest){
+  TEST(RandomPds,DISABLED_pdsGenTest){
     Voc voc;
     Conf* conf;
     Voc initVoc;
@@ -166,7 +166,7 @@ namespace{
     delete conf;
   }
 
-  TEST_F(NewtonSolverTests, first){
+  TEST_F(NewtonSolverTests, DISABLED_first){
     WFA fa;
     wali::Key acc = wali::getKeySpace()->getKey("accept");
     //for(int i=0;i<conf->numprocs;++i)
