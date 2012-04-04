@@ -39,7 +39,7 @@ if not File(os.path.join(LibInstallDir,'libglog.so')).exists():
 includeDir = join(IncludeDir,'glog')
 if not Dir(includeDir).exists(): 
   fromInc = join(os.getcwd(), glog, 'include')
-  headerCom = ['rm -rf %s; cp -r %s %s;' %(includeDir,fromInc,IncludeDir)]
+  headerCom = ['rm -rf %s; mkdir -p %s; cp -r %s/* %s;' %(includeDir,includeDir,fromInc,IncludeDir)]
 
 
 #The acual commands to run during the build
