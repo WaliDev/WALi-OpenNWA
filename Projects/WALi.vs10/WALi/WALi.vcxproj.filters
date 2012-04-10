@@ -740,6 +740,9 @@
     <ClInclude Include="..\..\..\Source\opennwa\query\details\iterators.hpp">
       <Filter>Header Files\wali.nwa\query\details</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\Progress.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="VTune\WALi.vpj" />

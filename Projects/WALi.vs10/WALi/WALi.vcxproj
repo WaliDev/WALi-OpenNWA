@@ -305,6 +305,7 @@
     <ClInclude Include="..\..\..\Source\opennwa\query\details\iterators.hpp" />
     <ClInclude Include="..\..\..\Source\opennwa\query\details\selectors.hpp" />
     <ClInclude Include="..\..\..\Source\opennwa\query\language.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\Progress.hpp" />
     <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\FWPDS.hpp" />
     <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\LazyTrans.hpp" />
     <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\SWPDS.hpp" />
