@@ -1,9 +1,11 @@
-#include "ProcedureNWAs.hpp"
-#include "OpenFstInterop.hpp"
+#include "opennwa/ProcedureNwas.hpp"
+#include "opennwa/OpenFstInterop.hpp"
 
 #include "query/internals.hpp"
 #include "query/calls.hpp"
 #include "query/returns.hpp"
+
+using wali::key2str;
 
 namespace opennwa {
 
@@ -26,10 +28,10 @@ namespace opennwa {
         
   NwaRefPtr
   assemble_nwa(ProcedureMap const & procedures,
-               boost::function<void (NWA &, State, State)> call_inserter,
-               boost::function<void (NWA &, State, State, State)> return_inserter)
+               boost::function<void (Nwa &, State, State)> call_inserter,
+               boost::function<void (Nwa &, State, State, State)> return_inserter)
   {
-    NwaRefPtr finalnwa = new NWA();
+    NwaRefPtr finalnwa = new Nwa();
 
     std::map<std::string, std::set<State> > entries_map;
     std::map<std::string, std::set<State> > exits_map;
@@ -62,9 +64,9 @@ namespace opennwa {
             
     // Now, find each of the transitions on a symbol __call__*. These
     // are the transitions we will replace.
-    NWA::Internals fake_call_transitions;
+    Nwa::Internals fake_call_transitions;
             
-    for (NWA::InternalIterator trans=finalnwa->beginInternalTrans();
+    for (Nwa::InternalIterator trans=finalnwa->beginInternalTrans();
          trans != finalnwa->endInternalTrans(); ++trans)
     {
       std::string symbol = key2str(trans->second);
@@ -94,7 +96,7 @@ namespace opennwa {
     //                  V               |
     //             entry_foo         exit_foo
     //
-    for (NWA::Internals::iterator fake_call = fake_call_transitions.begin();
+    for (Nwa::Internals::iterator fake_call = fake_call_transitions.begin();
          fake_call != fake_call_transitions.end(); ++fake_call)
     {
       // Remove the fake call.
@@ -139,7 +141,7 @@ namespace opennwa {
 
 
     // Finally, we remove the __call__ symbols from the automaton.
-    for (NWA::SymbolIterator symiter = finalnwa->beginSymbols();
+    for (Nwa::SymbolIterator symiter = finalnwa->beginSymbols();
          symiter != finalnwa->endSymbols(); ++symiter)
     {
       Symbol symbol = *symiter;
