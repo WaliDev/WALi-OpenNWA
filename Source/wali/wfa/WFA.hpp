@@ -20,8 +20,10 @@
 
 // std::c++
 #include <iostream>
+#include <vector>
 #include <list>
 #include <set>
+#include <map>
 
 namespace wali
 {
@@ -570,6 +572,28 @@ namespace wali
 
       private:
 
+
+      public:
+
+        typedef std::map<Key, sem_elem_t> AccessibleStateMap;
+        typedef std::vector<Key> Word;
+
+        /// Return the set of states reachable from 'start', along with the
+        /// weights gathered by following those paths. Does NOT include the
+        /// 'start' state itself, at this point.
+        ///
+        /// Assumes there are no epsilon loops accessible via epsilon
+        /// transitions from start.
+        AccessibleStateMap epsilonClose(Key start);
+
+        /// Starting from the states in 'start' (with the given weight),
+        /// simulate running the word 'word'. Return the list of accessible
+        /// states, and the weights with which they can be accessed.
+        ///
+        /// Assumes there are no epsilon loops along the path encountered by
+        /// 'word'.
+        AccessibleStateMap simulate(AccessibleStateMap const & start,
+                                    Word const & word);
     };
 
   } // namespace wfa

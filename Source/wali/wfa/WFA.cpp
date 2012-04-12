@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <vector>
+#include <stack>
 
 #define FOR_EACH_STATE(name)                                \
   State* name;                                            \
@@ -1452,7 +1453,115 @@ namespace wali
         regex::Regex::EXTEND(a,b) : regex::Regex::EXTEND(b,a);
     }
 
+
+
+
+
+    //////////////
+    // Helper functions
+
+    /// Adds to 'accessible' the fact that it is possible to reach the
+    /// destination of the transition 'trans' with the weight of 'trans'. If
+    /// that state was already known to be reachable, joins the new weight
+    /// with the old one.
+    void add_trans_to_accessible_states(WFA::AccessibleStateMap & accessible,
+                                        Key dest, sem_elem_t weight)
+    {
+      if (accessible.find(dest) != accessible.end()) {
+        weight = weight->combine(accessible[dest]);
+      }
+
+      accessible[dest] = weight;
+    }
+    
+
+    WFA::AccessibleStateMap
+    WFA::epsilonClose(Key start)
+    {
+      AccessibleStateMap result;
+      std::stack<Key> worklist;
+      std::set<Key> visited;
+      
+      worklist.push(start);
+      visited.insert(start);
+
+      while (!worklist.empty()) {
+        Key source = worklist.top();
+        worklist.pop();
+
+        TransSet const & eps_dests = eps_map[source];
+        for (TransSet::const_iterator trans_it = eps_dests.begin();
+             trans_it != eps_dests.end(); ++trans_it)
+        {
+          Key dest = (*trans_it)->to();
+          add_trans_to_accessible_states(result, dest, (*trans_it)->weight());
+
+          // Add the destination state to the worklist (maybe)
+          if (visited.find(dest) != visited.end()) {
+            visited.insert(dest);
+          }
+        }
+      }
+
+      return result;
+    }
+
+    
+    WFA::AccessibleStateMap
+    WFA::simulate(AccessibleStateMap const & start,
+                  Word const & word)
+    {
+      AccessibleStateMap before = start;
+      AccessibleStateMap after;
+
+      for (Word::const_iterator pos = word.begin(); pos != word.end(); ++pos) {
+        // Figure out where the machine will be in the next step from each of
+        // the current positions.
+        after.clear();
+        Key letter = *pos;
+
+        for (AccessibleStateMap::const_iterator start_config = before.begin();
+             start_config != before.end(); ++start_config)
+        {
+          Key source = start_config->first;
+          sem_elem_t source_weight = start_config->second;
+          
+          // Where can we go from this position?
+          TransSet const & transitions = kpmap[KeyPair(source, letter)];
+
+          for (TransSet::const_iterator trans_it = transitions.begin();
+               trans_it != transitions.end(); ++trans_it)
+          {
+            // Well, it might be the target of the transition itself...
+            add_trans_to_accessible_states(after, (*trans_it)->to(), (*trans_it)->weight());
+
+            AccessibleStateMap eclose = epsilonClose((*trans_it)->to());
+            for (AccessibleStateMap::const_iterator dest = eclose.begin();
+                 dest != eclose.end(); ++dest)
+            {
+              add_trans_to_accessible_states(after, dest->first, dest->second);
+            }
+          } // For each outgoing transition
+          
+        } // For each possible starting configuration
+
+        // Now after holds the list of starting positions. After this, before
+        // will.
+        swap(after, before);
+        
+      } // For each letter in 'word'
+
+      return before;
+    }
+
+
   } // namespace wfa
 
 } // namespace wali
 
+// Yo emacs!
+// Local Variables:
+//     c-file-style: "ellemtel"
+//     c-basic-offset: 2
+//     indent-tabs-mode: nil
+// End:
