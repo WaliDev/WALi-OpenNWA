@@ -1496,10 +1496,11 @@ namespace wali
           {
             Key dest = (*trans_it)->to();
             add_trans_to_accessible_states(result, dest, (*trans_it)->weight());
-            
+
             // Add the destination state to the worklist (maybe)
-            if (visited.find(dest) != visited.end()) {
+            if (visited.find(dest) == visited.end()) {
               visited.insert(dest);
+              worklist.push(dest);
             }
           }
         }
