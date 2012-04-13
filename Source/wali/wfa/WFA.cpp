@@ -1529,24 +1529,26 @@ namespace wali
           sem_elem_t source_weight = start_config->second;
           
           // Where can we go from this position?
-          TransSet const & transitions = kpmap.find(KeyPair(source, letter))->second;
+          if (kpmap.find(KeyPair(source, letter)) != kpmap.end()) {
+            TransSet const & transitions = kpmap.find(KeyPair(source, letter))->second;
 
-          for (TransSet::const_iterator trans_it = transitions.begin();
-               trans_it != transitions.end(); ++trans_it)
-          {
-            // Well, it might be the target of the transition itself...
-            add_trans_to_accessible_states(after, (*trans_it)->to(), (*trans_it)->weight());
-
-            AccessibleStateMap eclose = epsilonClose((*trans_it)->to());
-            for (AccessibleStateMap::const_iterator dest = eclose.begin();
-                 dest != eclose.end(); ++dest)
+            for (TransSet::const_iterator trans_it = transitions.begin();
+                 trans_it != transitions.end(); ++trans_it)
             {
-              add_trans_to_accessible_states(after, dest->first, dest->second);
-            }
-          } // For each outgoing transition
-          
+              // Well, it might be the target of the transition itself...
+              add_trans_to_accessible_states(after, (*trans_it)->to(), (*trans_it)->weight());
+              
+              AccessibleStateMap eclose = epsilonClose((*trans_it)->to());
+              for (AccessibleStateMap::const_iterator dest = eclose.begin();
+                   dest != eclose.end(); ++dest)
+              {
+                add_trans_to_accessible_states(after, dest->first, dest->second);
+              }
+            } // For each outgoing transition
+            
+          }  // if there are outgoing transitions...
         } // For each possible starting configuration
-
+        
         // Now after holds the list of starting positions. After this, before
         // will.
         swap(after, before);
