@@ -1473,6 +1473,18 @@ namespace wali
 
       accessible[dest] = weight;
     }
+
+    /// Like dest += src. For any key in src not in dest, add it with the
+    /// weight in src. For keys in both, dest's weight is set to the combine.
+    void merge_state_maps(WFA::AccessibleStateMap & dest,
+                          WFA::AccessibleStateMap const & src)
+    {
+      for (WFA::AccessibleStateMap::const_iterator state = src.begin();
+           state != src.end(); ++state)
+      {
+        add_trans_to_accessible_states(dest, state->first, state->second);
+      }
+    }
     
 
     WFA::AccessibleStateMap
@@ -1529,6 +1541,13 @@ namespace wali
     {
       AccessibleStateMap before = start;
       AccessibleStateMap after;
+
+      for (AccessibleStateMap::const_iterator start_it = start.begin();
+           start_it != start.end(); ++start_it)
+      {
+        AccessibleStateMap eclose = epsilonClose(start_it->first);
+        merge_state_maps(before, eclose);
+      }
 
       for (Word::const_iterator pos = word.begin(); pos != word.end(); ++pos) {
         // Figure out where the machine will be in the next step from each of
