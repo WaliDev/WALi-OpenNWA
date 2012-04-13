@@ -1468,7 +1468,7 @@ namespace wali
                                         Key dest, sem_elem_t weight)
     {
       if (accessible.find(dest) != accessible.end()) {
-        //weight = weight->combine(accessible[dest]);
+        weight = weight->combine(accessible[dest]);
       }
 
       accessible[dest] = weight;
