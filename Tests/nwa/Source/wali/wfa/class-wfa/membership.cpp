@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "wali/wfa/WFA.hpp"
+#include "wali/ShortestPathSemiring.hpp"
 
 #include "fixtures.hpp"
 
@@ -97,6 +98,90 @@ namespace wali {
                     EXPECT_EQ(expected, actual);
                 }
             }
+        }
+
+
+        void check_shortest_distance_eq(unsigned expected, sem_elem_t actual_rp)
+        {
+            ShortestPathSemiring * actual =
+                dynamic_cast<ShortestPathSemiring*>(actual_rp.get_ptr());
+
+            ASSERT_TRUE(actual != NULL);
+            EXPECT_EQ(expected, actual->getNum());
+        }
+
+
+        TEST(wali$wfa$$epsilonClose, weightFromOneEpsilonTrans)
+        {
+            //     eps(d2)
+            // -->o-------->(o)
+            sem_elem_t distance_zero = new ShortestPathSemiring(0);
+            sem_elem_t distance_two = new ShortestPathSemiring(2);
+
+            // Create the automaton
+            Key start = getKey("start");
+            Key accept = getKey("accept");
+
+            WFA wfa;
+
+            wfa.addState(start, distance_zero);
+            wfa.addState(accept, distance_zero);
+
+            wfa.setInitialState(start);
+            wfa.addFinalState(accept);
+
+            wfa.addTrans(start, WALI_EPSILON, accept, distance_two);
+
+            // Create the queries
+            WFA::AccessibleStateMap start_zero, start_ten;
+            start_zero[start] = distance_zero;
+
+            // Issue queries
+            WFA::AccessibleStateMap end_from_zero = wfa.epsilonClose(start);
+
+            // Check the answers
+            EXPECT_EQ(1u, end_from_zero.size());
+            ASSERT_TRUE(end_from_zero.find(accept) != end_from_zero.end());
+            check_shortest_distance_eq(2u, end_from_zero[accept]);
+        }
+
+
+        TEST(wali$wfa$$epsilonClose, DISABLED_weightFromTwoEpsilonTransInSequence)
+        {
+            //     eps(d1)   eps(d2)
+            // -->o-------->o------->(o)
+            sem_elem_t distance_zero = new ShortestPathSemiring(0);
+            sem_elem_t distance_one = new ShortestPathSemiring(1);
+            sem_elem_t distance_two = new ShortestPathSemiring(2);
+
+            // Create the automaton
+            Key start = getKey("start");
+            Key middle = getKey("middle");
+            Key accept = getKey("accept");
+
+            WFA wfa;
+
+            wfa.addState(start, distance_zero);
+            wfa.addState(middle, distance_zero);
+            wfa.addState(accept, distance_zero);
+
+            wfa.setInitialState(start);
+            wfa.addFinalState(accept);
+
+            wfa.addTrans(start, WALI_EPSILON, middle, distance_one);
+            wfa.addTrans(middle, WALI_EPSILON, accept, distance_two);
+
+            // Create the queries
+            WFA::AccessibleStateMap start_zero, start_ten;
+            start_zero[start] = distance_zero;
+
+            // Issue queries
+            WFA::AccessibleStateMap end_from_zero = wfa.epsilonClose(start);
+
+            // Check the answers
+            EXPECT_EQ(1u, end_from_zero.size());
+            ASSERT_TRUE(end_from_zero.find(accept) != end_from_zero.end());
+            check_shortest_distance_eq(3u, end_from_zero[accept]);
         }
 
     }
