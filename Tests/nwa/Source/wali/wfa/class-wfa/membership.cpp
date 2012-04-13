@@ -179,7 +179,7 @@ namespace wali {
             WFA::AccessibleStateMap end_from_zero = wfa.epsilonClose(start);
 
             // Check the answers
-            EXPECT_EQ(1u, end_from_zero.size());
+            EXPECT_EQ(2u, end_from_zero.size());
             ASSERT_TRUE(end_from_zero.find(accept) != end_from_zero.end());
             check_shortest_distance_eq(3u, end_from_zero[accept]);
         }
