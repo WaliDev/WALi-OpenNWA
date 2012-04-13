@@ -48,6 +48,39 @@ static const bool answers[num_fas][num_words] = {
 namespace wali {
     namespace wfa {
 
+#define EXPECT_CONTAINS(container, value) EXPECT_NE(container.end(), container.find(value))
+
+        TEST(wali$wfa$$epsilonClose, EpsilonTransitionToMiddleToEpsilonToAccepting)
+        {
+            EpsilonTransitionToMiddleToEpsilonToAccepting fixture;
+
+            Key start = getKey("start");
+            Key middle = getKey("middle");
+            Key almost = getKey("almost");
+            Key accept = getKey("accept");
+
+            WFA::AccessibleStateMap start_closure = fixture.wfa.epsilonClose(start);
+            WFA::AccessibleStateMap middle_closure = fixture.wfa.epsilonClose(middle);
+            WFA::AccessibleStateMap almost_closure = fixture.wfa.epsilonClose(almost);
+            WFA::AccessibleStateMap accept_closure = fixture.wfa.epsilonClose(accept);
+
+            WFA::AccessibleStateMap::const_iterator iter;
+
+            EXPECT_EQ(2u, start_closure.size());
+            EXPECT_CONTAINS(start_closure, start);
+            EXPECT_CONTAINS(start_closure, middle);
+
+            EXPECT_EQ(1u, middle_closure.size());
+            EXPECT_CONTAINS(middle_closure, middle);
+
+            EXPECT_EQ(2u, almost_closure.size());
+            EXPECT_CONTAINS(almost_closure, almost);
+            EXPECT_CONTAINS(almost_closure, accept);
+
+            EXPECT_EQ(1u, accept_closure.size());
+            EXPECT_CONTAINS(accept_closure, accept);
+        }
+
 
         TEST(wali$wfa$$isAcceptedWithNonzeroWeight, testBatteryOfVariousFas)
         {
