@@ -227,7 +227,7 @@ namespace wali {
                 wfa.addTrans(start, l.a, a_top, one);
                 wfa.addTrans(start, l.a, a_left, one);
                 wfa.addTrans(a_top, l.b, ab, one);
-                wfa.addTrans(a_left, l.b, ac, one);
+                wfa.addTrans(a_left, l.c, ac, one);
             }
         };
         
