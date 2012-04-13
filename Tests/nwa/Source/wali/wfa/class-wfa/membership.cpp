@@ -82,7 +82,6 @@ namespace wali {
         }
 
 
-#if 0
         TEST(wali$wfa$$isAcceptedWithNonzeroWeight, testBatteryOfVariousFas)
         {
             for (unsigned fa = 0 ; fa < num_fas ; ++fa) {
@@ -98,7 +97,6 @@ namespace wali {
                 }
             }
         }
-#endif
 
     }
 }
