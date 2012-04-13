@@ -33,7 +33,7 @@ static const WFA::Word words[] = {
 static const unsigned num_fas = NUM_ELEMENTS(fas);
 static const unsigned num_words = NUM_ELEMENTS(words);
 
-static const bool answers[num_words][num_fas] = {
+static const bool answers[num_fas][num_words] = {
     //                               eps    a      b      c      aa     ab     ac
     { /* loop reject              */ false, false, false, false, false, false, false },
     { /* loop accept              */ true,  true,  true,  true,  true,  true,  true  },
@@ -53,9 +53,13 @@ namespace wali {
         {
             for (unsigned fa = 0 ; fa < num_fas ; ++fa) {
                 for (unsigned word = 0 ; word < num_words ; ++word) {
-                    bool expected = answers[word][fa];
+                    bool expected = answers[fa][word];
                     bool actual = fas[fa].isAcceptedWithNonzeroWeight(words[word]);
 
+                    std::stringstream ss;
+                    ss << "Testing FA #" << fa << " with string #" << word;
+                    SCOPED_TRACE(ss.str());
+                    
                     EXPECT_EQ(expected, actual);
                 }
             }
