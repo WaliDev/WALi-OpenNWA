@@ -52,6 +52,7 @@ test_files = Split("""
     Source/namespace-nwa_pds/get-control-location.cpp
     
     Source/wali/witness/calculating-visitor.cpp
+    Source/wali/wfa/class-wfa/membership.cpp
     """)
 
 just_compile = env.SConscript('Source/header-compilation/SConscript')
