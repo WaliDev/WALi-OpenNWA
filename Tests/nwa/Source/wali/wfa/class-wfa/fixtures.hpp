@@ -230,8 +230,45 @@ namespace wali {
                 wfa.addTrans(a_left, l.c, ac, one);
             }
         };
+
+        struct AEpsilonEpsilonEpsilonA
+        {
+            //     a     eps    eps    eps   a
+            // -->o---->o----->o----->o---->o----->(o)
+            WFA wfa;
+
+            AEpsilonEpsilonEpsilonA() {
+                sem_elem_t one = Reach(true).one();
+                sem_elem_t zero = Reach(true).zero();
+                
+                Key start = getKey("start");
+                Key a = getKey("a");
+                Key ae = getKey("a e");
+                Key aee = getKey("a e e");
+                Key aeee = getKey("a e e e");
+                Key accept = getKey("accept");
+
+                Letters l;
+
+                wfa.addState(start, zero);
+                wfa.addState(a, zero);
+                wfa.addState(ae, zero);
+                wfa.addState(aee, zero);
+                wfa.addState(aeee, zero);
+                wfa.addState(accept, zero);
+
+                wfa.setInitialState(start);
+                wfa.addFinalState(accept);
+
+                wfa.addTrans(start, l.a, a, one);
+                wfa.addTrans(a, WALI_EPSILON, ae, one);
+                wfa.addTrans(ae, WALI_EPSILON, aee, one);
+                wfa.addTrans(aee, WALI_EPSILON, aeee, one);
+                wfa.addTrans(aeee, l.a, accept, one);
+            }
+        };
         
-        }
+    }
 }
 
 

@@ -1,5 +1,4 @@
 #include "gtest/gtest.h"
-
 #include "wali/wfa/WFA.hpp"
 
 #include "fixtures.hpp"
@@ -15,7 +14,8 @@ static const WFA fas[] = {
     EpsilonTransitionToAccepting().wfa,
     EpsilonTransitionToMiddleToAccepting().wfa,
     EpsilonTransitionToMiddleToEpsilonToAccepting().wfa,
-    AcceptAbOrAcNondet().wfa
+    AcceptAbOrAcNondet().wfa,
+    AEpsilonEpsilonEpsilonA().wfa
 };
 
 Words ws;
@@ -41,7 +41,8 @@ static const bool answers[num_fas][num_words] = {
     { /* eps -> accept            */ true,  false, false, false, false, false, false },
     { /* eps -> mid -> acc        */ false, true,  false, false, false, false, false },
     { /* eps -> mid -> eps -> acc */ false, true,  false, false, false, false, false },
-    { /* AB or AC nondet          */ false, false, false, false, false, true,  true  }
+    { /* AB or AC nondet          */ false, false, false, false, false, true,  true  },
+    { /* A eps eps eps A          */ false, false, false, false, true,  false, false }
 };
 
 
