@@ -584,7 +584,7 @@ namespace wali
         ///
         /// Assumes there are no epsilon loops accessible via epsilon
         /// transitions from start.
-        AccessibleStateMap epsilonClose(Key start);
+        AccessibleStateMap epsilonClose(Key start) const;
 
         /// Starting from the states in 'start' (with the given weight),
         /// simulate running the word 'word'. Return the list of accessible
@@ -593,7 +593,11 @@ namespace wali
         /// Assumes there are no epsilon loops along the path encountered by
         /// 'word'.
         AccessibleStateMap simulate(AccessibleStateMap const & start,
-                                    Word const & word);
+                                    Word const & word) const;
+
+        /// Returns whether the given string is accepted with a non-zero
+        /// weight
+        bool isAcceptedWithNonzeroWeight(Word const & word) const;
     };
 
   } // namespace wfa

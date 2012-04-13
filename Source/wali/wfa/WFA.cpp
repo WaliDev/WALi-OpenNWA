@@ -1468,7 +1468,7 @@ namespace wali
                                         Key dest, sem_elem_t weight)
     {
       if (accessible.find(dest) != accessible.end()) {
-        weight = weight->combine(accessible[dest]);
+        //weight = weight->combine(accessible[dest]);
       }
 
       accessible[dest] = weight;
@@ -1476,7 +1476,7 @@ namespace wali
     
 
     WFA::AccessibleStateMap
-    WFA::epsilonClose(Key start)
+    WFA::epsilonClose(Key start) const
     {
       AccessibleStateMap result;
       std::stack<Key> worklist;
@@ -1489,16 +1489,18 @@ namespace wali
         Key source = worklist.top();
         worklist.pop();
 
-        TransSet const & eps_dests = eps_map[source];
-        for (TransSet::const_iterator trans_it = eps_dests.begin();
-             trans_it != eps_dests.end(); ++trans_it)
-        {
-          Key dest = (*trans_it)->to();
-          add_trans_to_accessible_states(result, dest, (*trans_it)->weight());
-
-          // Add the destination state to the worklist (maybe)
-          if (visited.find(dest) != visited.end()) {
-            visited.insert(dest);
+        if (eps_map.find(source) != eps_map.end()) {
+          TransSet const & eps_dests = eps_map.find(source)->second;
+          for (TransSet::const_iterator trans_it = eps_dests.begin();
+               trans_it != eps_dests.end(); ++trans_it)
+          {
+            Key dest = (*trans_it)->to();
+            add_trans_to_accessible_states(result, dest, (*trans_it)->weight());
+            
+            // Add the destination state to the worklist (maybe)
+            if (visited.find(dest) != visited.end()) {
+              visited.insert(dest);
+            }
           }
         }
       }
@@ -1509,7 +1511,7 @@ namespace wali
     
     WFA::AccessibleStateMap
     WFA::simulate(AccessibleStateMap const & start,
-                  Word const & word)
+                  Word const & word) const
     {
       AccessibleStateMap before = start;
       AccessibleStateMap after;
@@ -1527,7 +1529,7 @@ namespace wali
           sem_elem_t source_weight = start_config->second;
           
           // Where can we go from this position?
-          TransSet const & transitions = kpmap[KeyPair(source, letter)];
+          TransSet const & transitions = kpmap.find(KeyPair(source, letter))->second;
 
           for (TransSet::const_iterator trans_it = transitions.begin();
                trans_it != transitions.end(); ++trans_it)
@@ -1552,6 +1554,28 @@ namespace wali
       } // For each letter in 'word'
 
       return before;
+    }
+
+
+    bool
+    WFA::isAcceptedWithNonzeroWeight(Word const & word) const
+    {
+      AccessibleStateMap start;
+      start[getInitialState()] = NULL;
+
+      AccessibleStateMap finish = simulate(start, word);
+
+      std::set<Key> const & finals = getFinalStates();
+      for(std::set<Key>::const_iterator final = finals.begin();
+          final != finals.end(); ++final)
+      {
+        if (finish.find(*final) != finish.end()) {
+          //  FIXME: check weight
+          return true;
+        }
+      }
+
+      return false;
     }
 
 
