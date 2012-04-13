@@ -1504,14 +1504,15 @@ namespace wali
       
       
       AccessibleStateMap result;
-      std::stack<Key> worklist;
+      std::stack<std::pair<Key, sem_elem_t> > worklist;
       std::set<Key> visited;
       
-      worklist.push(start);
+      worklist.push(std::make_pair(start, getSomeWeight()->one()));
       visited.insert(start);
 
       while (!worklist.empty()) {
-        Key source = worklist.top();
+        Key source = worklist.top().first;
+        sem_elem_t weight = worklist.top().second;
         worklist.pop();
 
         if (forward_eps_map.find(source) != forward_eps_map.end()) {
@@ -1519,13 +1520,17 @@ namespace wali
           for (TransSet::const_iterator trans_it = eps_dests.begin();
                trans_it != eps_dests.end(); ++trans_it)
           {
+            sem_elem_t dest_weight = weight->extend((*trans_it)->weight());
             Key dest = (*trans_it)->to();
-            add_trans_to_accessible_states(result, dest, (*trans_it)->weight());
+            add_trans_to_accessible_states(result, dest, dest_weight);
 
             // Add the destination state to the worklist (maybe)
             if (visited.find(dest) == visited.end()) {
               visited.insert(dest);
-              worklist.push(dest);
+              worklist.push(std::make_pair(dest, dest_weight));
+            }
+            else {
+              // FIXME: update entry in worklist. (Needed?)
             }
           }
         }
