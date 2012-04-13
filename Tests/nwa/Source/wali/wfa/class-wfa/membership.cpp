@@ -48,7 +48,7 @@ static const bool answers[num_fas][num_words] = {
 namespace wali {
     namespace wfa {
 
-#define EXPECT_CONTAINS(container, value) EXPECT_NE(container.end(), container.find(value))
+#define EXPECT_CONTAINS(container, value) EXPECT_FALSE(container.end() == container.find(value))
 
         TEST(wali$wfa$$epsilonClose, EpsilonTransitionToMiddleToEpsilonToAccepting)
         {
