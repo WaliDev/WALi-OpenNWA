@@ -66,19 +66,19 @@ namespace wali {
 
             WFA::AccessibleStateMap::const_iterator iter;
 
-            EXPECT_EQ(2u, start_closure.size());
-            EXPECT_CONTAINS(start_closure, start);
+            EXPECT_EQ(1u, start_closure.size());
+            //EXPECT_CONTAINS(start_closure, start);
             EXPECT_CONTAINS(start_closure, middle);
 
-            EXPECT_EQ(1u, middle_closure.size());
-            EXPECT_CONTAINS(middle_closure, middle);
+            EXPECT_EQ(0u, middle_closure.size());
+            //EXPECT_CONTAINS(middle_closure, middle);
 
-            EXPECT_EQ(2u, almost_closure.size());
-            EXPECT_CONTAINS(almost_closure, almost);
+            EXPECT_EQ(1u, almost_closure.size());
+            //EXPECT_CONTAINS(almost_closure, almost);
             EXPECT_CONTAINS(almost_closure, accept);
 
-            EXPECT_EQ(1u, accept_closure.size());
-            EXPECT_CONTAINS(accept_closure, accept);
+            EXPECT_EQ(0u, accept_closure.size());
+            //EXPECT_CONTAINS(accept_closure, accept);
         }
 
 
