@@ -1478,6 +1478,19 @@ namespace wali
     WFA::AccessibleStateMap
     WFA::epsilonClose(Key start) const
     {
+      eps_map_t forward_eps_map;
+      for (eps_map_t::const_iterator eps_it = eps_map.begin();
+           eps_it != eps_map.end(); ++eps_it)
+      {
+        TransSet const & eps_dests = eps_it->second;
+        for (TransSet::const_iterator trans_it = eps_dests.begin();
+             trans_it != eps_dests.end(); ++trans_it)
+        {
+          forward_eps_map[(*trans_it)->from()].insert(*trans_it);
+        }
+      }
+      
+      
       AccessibleStateMap result;
       std::stack<Key> worklist;
       std::set<Key> visited;
@@ -1489,8 +1502,8 @@ namespace wali
         Key source = worklist.top();
         worklist.pop();
 
-        if (eps_map.find(source) != eps_map.end()) {
-          TransSet const & eps_dests = eps_map.find(source)->second;
+        if (forward_eps_map.find(source) != forward_eps_map.end()) {
+          TransSet const & eps_dests = forward_eps_map.find(source)->second;
           for (TransSet::const_iterator trans_it = eps_dests.begin();
                trans_it != eps_dests.end(); ++trans_it)
           {
