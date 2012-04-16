@@ -1605,6 +1605,14 @@ namespace wali
     }
 
 
+    WFA
+    WFA::determinize() const
+    {
+      WFA result;
+      return result;
+    }
+
+
   } // namespace wfa
 
 } // namespace wali

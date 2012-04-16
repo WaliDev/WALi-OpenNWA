@@ -598,6 +598,11 @@ namespace wali
         /// Returns whether the given string is accepted with a non-zero
         /// weight
         bool isAcceptedWithNonzeroWeight(Word const & word) const;
+
+
+        /// Performs the subset construction and returns the resulting
+        /// WFA. (Does not mutate.)
+        WFA determinize() const;
     };
 
   } // namespace wfa
