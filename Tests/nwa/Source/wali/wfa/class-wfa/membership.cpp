@@ -183,11 +183,11 @@ namespace wali {
             // Check the answers
             EXPECT_EQ(3u, end_from_zero.size());
             ASSERT_TRUE(end_from_zero.find(start) != end_from_zero.end());
-            ASSERT_TRUE(end_from_zero.find(middle) != end_from_zero.end());            
+            ASSERT_TRUE(end_from_zero.find(middle) != end_from_zero.end());
             ASSERT_TRUE(end_from_zero.find(accept) != end_from_zero.end());
             check_shortest_distance_eq(0u, end_from_zero[start]);
             check_shortest_distance_eq(1u, end_from_zero[middle]);
-            check_shortest_distance_eq(3u, end_from_zero[accept]);            
+            check_shortest_distance_eq(3u, end_from_zero[accept]);
         }
 
     }
