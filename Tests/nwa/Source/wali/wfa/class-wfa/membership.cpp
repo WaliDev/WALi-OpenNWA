@@ -13,7 +13,9 @@ static const WFA fas[] = {
     LoopAccept().wfa,
     EvenAsEvenBs().wfa,
     EpsilonTransitionToAccepting().wfa,
+    EpsilonDeterministic().wfa,
     EpsilonTransitionToMiddleToAccepting().wfa,
+    ADeterministic().wfa,
     EpsilonTransitionToMiddleToEpsilonToAccepting().wfa,
     AcceptAbOrAcNondet().wfa,
     AEpsilonEpsilonEpsilonA().wfa
@@ -40,7 +42,9 @@ static const bool answers[num_fas][num_words] = {
     { /* loop accept              */ true,  true,  true,  true,  true,  true,  true  },
     { /* even As, even Bs         */ true,  false, false, false, true,  false, false },
     { /* eps -> accept            */ true,  false, false, false, false, false, false },
+    { /* epsilon deterministic    */ true,  false, false, false, false, false, false },    
     { /* eps -> mid -> acc        */ false, true,  false, false, false, false, false },
+    { /* A deterministic          */ false, true,  false, false, false, false, false },    
     { /* eps -> mid -> eps -> acc */ false, true,  false, false, false, false, false },
     { /* AB or AC nondet          */ false, false, false, false, false, true,  true  },
     { /* A eps eps eps A          */ false, false, false, false, true,  false, false }
