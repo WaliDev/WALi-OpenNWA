@@ -1506,6 +1506,8 @@ namespace wali
       AccessibleStateMap result;
       std::stack<std::pair<Key, sem_elem_t> > worklist;
       std::set<Key> visited;
+
+      result.insert(std::make_pair(start, getSomeWeight()->one()));
       
       worklist.push(std::make_pair(start, getSomeWeight()->one()));
       visited.insert(start);
@@ -1573,9 +1575,6 @@ namespace wali
             for (TransSet::const_iterator trans_it = transitions.begin();
                  trans_it != transitions.end(); ++trans_it)
             {
-              // Well, it might be the target of the transition itself...
-              add_trans_to_accessible_states(after, (*trans_it)->to(), (*trans_it)->weight());
-              
               AccessibleStateMap eclose = epsilonClose((*trans_it)->to());
               for (AccessibleStateMap::const_iterator dest = eclose.begin();
                    dest != eclose.end(); ++dest)

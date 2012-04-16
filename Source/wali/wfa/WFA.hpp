@@ -579,8 +579,8 @@ namespace wali
         typedef std::vector<Key> Word;
 
         /// Return the set of states reachable from 'start', along with the
-        /// weights gathered by following those paths. Does NOT include the
-        /// 'start' state itself, at this point.
+        /// weights gathered by following those paths. Includes the start
+        /// state, with weight one.
         ///
         /// Assumes there are no epsilon loops accessible via epsilon
         /// transitions from start.
