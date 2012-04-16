@@ -48,6 +48,10 @@ namespace wali {
 
         struct LoopReject
         {
+            // -->o--\
+            //    ^  | a, b, c
+            //    |  |
+            //    \--/
             WFA wfa;
             Key state;
 
@@ -68,6 +72,10 @@ namespace wali {
 
         struct LoopAccept
         {
+            // -->(o)--\
+            //     ^   | a, b, c
+            //     |   |
+            //     \---/
             WFA wfa;
             Key state;
 
@@ -81,6 +89,13 @@ namespace wali {
 
         struct EvenAsEvenBs
         {
+            //            b
+            // -->(ee) <-----> eo
+            //     /\          /\
+            //   a |           | a
+            //     \/          \/
+            //     oe  <-----> oo
+            //            b
             WFA wfa;
 
             EvenAsEvenBs() {
