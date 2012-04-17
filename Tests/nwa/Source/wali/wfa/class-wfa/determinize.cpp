@@ -73,6 +73,38 @@ namespace wali {
             EXPECT_FALSE(w0.isIsomorphicTo(w1));
         }
 
+        TEST(wali$wfa$$isIsomorphicTo, isomorphismIgnoresStateWeightsWhenCheckWeghtsIsFalse)
+        {
+            sem_elem_t one = Reach(true).one();
+            sem_elem_t zero = Reach(true).zero();
+            
+            Letters l;
+            WFA w0, w1;
+
+            w0.addState(l.a, zero);
+            w1.addState(l.a, one);
+
+            EXPECT_TRUE(w0.isIsomorphicTo(w1, false));
+        }
+        
+        TEST(wali$wfa$$isIsomorphicTo, isomorphismIgnoresTransWeightsWhenCheckWeghtsIsFalse)
+        {
+            sem_elem_t one = Reach(true).one();
+            sem_elem_t zero = Reach(true).zero();
+            
+            Letters l;
+            WFA w0, w1;
+
+            w0.addState(l.a, zero);
+            w1.addState(l.a, zero);
+
+            w0.addTrans(l.a, l.a, l.a, zero);
+            w1.addTrans(l.a, l.a, l.a, one);
+
+            EXPECT_TRUE(w0.isIsomorphicTo(w1, false));
+        }
+
+
         TEST(wali$wfa$$isIsomorphicTo, battery)
         {
             for (size_t i=0; i<num_fas; ++i) {
@@ -85,6 +117,8 @@ namespace wali {
                     WFA right = fas[j];
 
                     EXPECT_EQ(i == j, left.isIsomorphicTo(right));
+                    EXPECT_EQ(i == j, left.isIsomorphicTo(right, true));
+                    EXPECT_EQ(i == j, left.isIsomorphicTo(right, false));
                 }
             }
         }

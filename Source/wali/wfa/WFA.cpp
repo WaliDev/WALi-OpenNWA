@@ -1641,7 +1641,8 @@ namespace wali
     bool
     transitions_match(TransSet const & left_trans_set,
                       TransSet const & right_trans_set,
-                      std::map<Key, Key> const & left_to_right)
+                      std::map<Key, Key> const & left_to_right,
+                      bool check_weights)
     {
       for (TransSet::const_iterator trans_it = left_trans_set.begin();
            trans_it != left_trans_set.end(); ++trans_it)
@@ -1661,7 +1662,9 @@ namespace wali
 
         ITrans const * right_trans = *r_place;
 
-        if (!left_trans->weight()->equal(right_trans->weight().get_ptr())) {
+        if (!left_trans->weight()->equal(right_trans->weight().get_ptr())
+            && check_weights)
+        {
           return false;
         }
       }
@@ -1672,9 +1675,11 @@ namespace wali
 
     bool
     WFA::is_isomorphism(WFA const & left, std::vector<Key> const & left_states,
-                        WFA const & right, std::vector<Key> const & right_states)
+                        WFA const & right, std::vector<Key> const & right_states,
+                        bool check_weights)
     {
       assert(left_states.size() == right_states.size());
+      (void) check_weights;
 
       std::map<Key, Key> left_to_right;
       for (size_t state_index = 0; state_index < left_states.size(); ++state_index) {
@@ -1687,7 +1692,8 @@ namespace wali
         Key right_state = right_states[state_index];
 
         if (!left.getState(left_state)->weight()->equal(
-              right.getState(right_state)->weight().get_ptr()))
+              right.getState(right_state)->weight().get_ptr())
+            && check_weights)
         {
           return false;
         }
@@ -1720,7 +1726,9 @@ namespace wali
             TransSet const & left_trans_set = kpmap_iter->second;
             TransSet const & right_trans_set = r_place->second;
 
-            if (!transitions_match(left_trans_set, right_trans_set, left_to_right)) {
+            if (!transitions_match(left_trans_set, right_trans_set,
+                                   left_to_right, check_weights))
+            {
               return false;
             }
 
@@ -1739,6 +1747,13 @@ namespace wali
     bool
     WFA::isIsomorphicTo(WFA const & other) const
     {
+      return isIsomorphicTo(other, true);
+    }
+
+    
+    bool
+    WFA::isIsomorphicTo(WFA const & other, bool check_weights) const
+    {
       std::vector<Key> left_states(getStates().begin(),
                                    getStates().end());
       std::vector<Key> right_states(other.getStates().begin(),
@@ -1751,7 +1766,7 @@ namespace wali
       size_t count = 0; // Sanity checking
 
       do {
-        if (is_isomorphism(*this, left_states, other, right_states)) {
+        if (is_isomorphism(*this, left_states, other, right_states, check_weights)) {
           return true;
         }
         ++count;

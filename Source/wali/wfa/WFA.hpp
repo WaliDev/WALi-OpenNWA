@@ -613,10 +613,17 @@ namespace wali
         /// same.)
         bool isIsomorphicTo(WFA const & other) const;
 
+        /// Same as isIsomorphicTo(WFA const & other) const, except that
+        /// conditions (2) and (4) (those pertaining to the weights on states
+        /// and transitions) are lifted if 'check_weights' is false.
+        bool isIsomorphicTo(WFA const & other, bool check_weights) const;
+        
+
         static
         bool
         is_isomorphism(WFA const & left, std::vector<Key> const & left_states,
-                       WFA const & right, std::vector<Key> const & right_states);
+                       WFA const & right, std::vector<Key> const & right_states,
+                       bool check_weights);
         
     };
 
