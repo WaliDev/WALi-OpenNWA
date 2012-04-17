@@ -1606,10 +1606,97 @@ namespace wali
     }
 
 
+    typedef std::set<Key> KeySet;    
+
+    std::map<Key, KeySet>
+    WFA::next_states(WFA const & wfa, KeySet const & froms)
+    {
+      // symbol -> keyset
+      std::map<Key, KeySet> nexts;
+
+      for(KeySet::const_iterator from = froms.begin();
+          from != froms.end(); ++from)
+      {
+        for (kp_map_t::const_iterator kpmap_iter = wfa.kpmap.begin();
+             kpmap_iter != wfa.kpmap.end(); ++kpmap_iter)
+        {
+          Key source = kpmap_iter->first.first;
+          if (source == *from) {
+            Key symbol = kpmap_iter->first.second;
+
+            TransSet const & outgoing = kpmap_iter->second;
+            for (TransSet::const_iterator trans = outgoing.begin();
+                 trans != outgoing.end(); ++trans)
+            {
+              Key target = (*trans)->to();
+              nexts[symbol].insert(target);
+            } // for "each" outgoing transition [part 1]
+          } // for "each" outgoing transition [part 2]
+        } // for "each" outgoing transition [part 3]
+        
+      } // for each nondeterministic possibility
+
+      return nexts;
+    }
+
+
     WFA
     WFA::determinize() const
     {
+      std::stack<KeySet> worklist;
+      std::set<Key> visited;
+
       WFA result;
+      sem_elem_t zero = getSomeWeight()->zero();
+      sem_elem_t one = getSomeWeight()->one();
+
+      {
+        // Set up initial states
+        KeySet det_initial;
+        
+        AccessibleStateMap initials = epsilonClose(this->getInitialState());
+        for (AccessibleStateMap::const_iterator initial = initials.begin();
+             initial != initials.end(); ++initial)
+        {
+          det_initial.insert(initial->first);
+        }
+
+        Key initial_key = getKey(det_initial);
+        
+        result.addState(initial_key, zero);
+        result.setInitialState(initial_key);
+        worklist.push(det_initial);
+        visited.insert(initial_key);
+      }
+
+      while (!worklist.empty())
+      {
+        KeySet sources = worklist.top();
+        worklist.pop();
+
+        Key sources_key = getKey(sources);
+        result.addState(sources_key, zero);
+
+        // symbol -> next state
+        std::map<Key, KeySet> nexts = next_states(*this, sources);
+
+        for (std::map<Key, KeySet>::const_iterator next = nexts.begin();
+             next != nexts.end(); ++next)
+        {
+          Key symbol = next->first;
+          Key target_key = getKey(next->second);
+          
+          result.addTrans(sources_key, symbol, target_key, one);
+
+          std::pair<KeySet::iterator, bool> p = visited.insert(target_key);
+          if (p.second) {
+            // It wasn't already there
+            worklist.push(next->second);
+          }
+        }
+      }
+      
+
       return result;
     }
 

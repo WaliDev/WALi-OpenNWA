@@ -624,7 +624,11 @@ namespace wali
         is_isomorphism(WFA const & left, std::vector<Key> const & left_states,
                        WFA const & right, std::vector<Key> const & right_states,
                        bool check_weights);
-        
+
+        static
+        std::map<Key, std::set<Key> >
+        next_states(WFA const & wfa, std::set<Key> const & froms);
+
     };
 
   } // namespace wfa
