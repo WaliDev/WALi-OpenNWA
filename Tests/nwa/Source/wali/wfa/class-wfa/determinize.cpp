@@ -42,5 +42,19 @@ namespace wali {
             EXPECT_FALSE(acc.wfa.isIsomorphicTo(rej.wfa));
         }
 
+        TEST(wali$wfa$$isIsomorphicTo, DISABLED_isomorphismChecksStateWeights)
+        {
+            sem_elem_t one = Reach(true).one();
+            sem_elem_t zero = Reach(true).zero();
+            
+            Letters l;
+            WFA w0, w1;
+
+            w0.addState(l.a, zero);
+            w1.addState(l.a, one);
+
+            EXPECT_FALSE(w0.isIsomorphicTo(w1));
+        }
+        
     }
 }
