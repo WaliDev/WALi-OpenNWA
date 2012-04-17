@@ -90,6 +90,11 @@ namespace wali {
         }
 
 
+        TEST(wali$wfa$$determinize, DISABLE_loopReject) {
+            LoopReject r;
+            WFA d = r.wfa.determinize();
 
+            EXPECT_TRUE(r.wfa.isIsomorphicTo(d));
+        }
     }
 }
