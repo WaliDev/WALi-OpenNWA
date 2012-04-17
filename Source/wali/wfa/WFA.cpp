@@ -1711,21 +1711,17 @@ namespace wali
             Key right_source = left_to_right[left_source];
             Key symbol = kpmap_iter->first.second;
 
-            TransSet const & left_trans_set = kpmap_iter->second;
-            try {
-              TransSet const & right_trans_set = get(right.kpmap,
-                                                     KeyPair(right_source, symbol));
-
-              if (!transitions_match(left_trans_set, right_trans_set, left_to_right)) {
-                return false;
-              }
+            kp_map_t::const_iterator r_place = right.kpmap.find(KeyPair(right_source, symbol));
+            if (r_place == right.kpmap.end()) {
+              // There is no outgoing transition on (source, symbol)
+              return false;
             }
-            catch (int x) {
-              if (x == 7) {
-                // There are no outgoing transitions
-                return false;
-              }
-              throw;
+
+            TransSet const & left_trans_set = kpmap_iter->second;
+            TransSet const & right_trans_set = r_place->second;
+
+            if (!transitions_match(left_trans_set, right_trans_set, left_to_right)) {
+              return false;
             }
 
             // All transitions from left/right under symbol match
