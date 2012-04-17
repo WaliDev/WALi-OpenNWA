@@ -34,5 +34,13 @@ namespace wali {
             EXPECT_TRUE(f.wfa.isIsomorphicTo(f.wfa));
         }
         
+        TEST(wali$wfa$$isIsomorphicTo, DISABLED_selfIsomorphismOfDifferentAutsFail)
+        {
+            LoopReject rej;
+            LoopAccept acc;
+
+            EXPECT_FALSE(acc.wfa.isIsomorphicTo(rej.wfa));
+        }
+
     }
 }
