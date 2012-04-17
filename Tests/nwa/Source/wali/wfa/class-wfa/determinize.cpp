@@ -157,7 +157,7 @@ namespace wali {
         
 
 
-        TEST(wali$wfa$$determinize, DISABLED_alreadyDeterministicBattery) {
+        TEST(wali$wfa$$determinize, alreadyDeterministicBattery) {
             for (size_t i=0; i<num_fas_already_deterministic; ++i) {
                 std::stringstream ss;
                 ss << "Testing FA " << i;
@@ -169,6 +169,7 @@ namespace wali {
                 EXPECT_TRUE(orig.isIsomorphicTo(det, false));
             }
         }
-        
+
+
     }
 }
