@@ -1606,7 +1606,21 @@ namespace wali
     }
 
 
-    typedef std::set<Key> KeySet;    
+    typedef std::set<Key> KeySet;
+
+    static
+    bool
+    any_final(WFA const & wfa, KeySet const & states)
+    {
+      for(KeySet::const_iterator state = states.begin();
+          state != states.end(); ++state)
+      {
+        if (wfa.isFinalState(*state)) {
+          return true;
+        }
+      }
+      return false;
+    }
 
     std::map<Key, KeySet>
     WFA::next_states(WFA const & wfa, KeySet const & froms)
@@ -1676,6 +1690,10 @@ namespace wali
 
         Key sources_key = getKey(sources);
         result.addState(sources_key, zero);
+
+        if (any_final(*this, sources)) {
+          result.addFinalState(sources_key);
+        }
 
         // symbol -> next state
         std::map<Key, KeySet> nexts = next_states(*this, sources);
