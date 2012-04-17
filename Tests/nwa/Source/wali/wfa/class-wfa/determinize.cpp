@@ -23,6 +23,17 @@ static const WFA fas[] = {
 
 static const unsigned num_fas = NUM_ELEMENTS(fas);
 
+static const WFA fas_already_deterministic[] = {
+    LoopReject().wfa,
+    LoopAccept().wfa,
+    EvenAsEvenBs().wfa,
+    EpsilonDeterministic().wfa,
+    ADeterministic().wfa,
+    AcceptAbOrAcDeterministic().wfa
+};
+
+static const unsigned num_fas_already_deterministic = NUM_ELEMENTS(fas_already_deterministic);
+
 
 namespace wali {
     namespace wfa {
@@ -124,11 +135,18 @@ namespace wali {
         }
 
 
-        TEST(wali$wfa$$determinize, loopReject) {
-            LoopReject r;
-            WFA d = r.wfa.determinize();
+        TEST(wali$wfa$$determinize, DISABLED_alreadyDeterministicBattery) {
+            for (size_t i=0; i<num_fas_already_deterministic; ++i) {
+                std::stringstream ss;
+                ss << "Testing FA " << i;
+                SCOPED_TRACE(ss.str());
 
-            EXPECT_TRUE(r.wfa.isIsomorphicTo(d));
+                WFA orig = fas_already_deterministic[i];
+                WFA det = orig.determinize();
+
+                EXPECT_TRUE(orig.isIsomorphicTo(det, false));
+            }
         }
+        
     }
 }
