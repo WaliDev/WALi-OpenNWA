@@ -1712,11 +1712,20 @@ namespace wali
             Key symbol = kpmap_iter->first.second;
 
             TransSet const & left_trans_set = kpmap_iter->second;
-            TransSet const & right_trans_set = get(right.kpmap,
-                                                   KeyPair(right_source, symbol));
+            try {
+              TransSet const & right_trans_set = get(right.kpmap,
+                                                     KeyPair(right_source, symbol));
 
-            if (!transitions_match(left_trans_set, right_trans_set, left_to_right)) {
-              return false;
+              if (!transitions_match(left_trans_set, right_trans_set, left_to_right)) {
+                return false;
+              }
+            }
+            catch (int x) {
+              if (x == 7) {
+                // There are no outgoing transitions
+                return false;
+              }
+              throw;
             }
 
             // All transitions from left/right under symbol match

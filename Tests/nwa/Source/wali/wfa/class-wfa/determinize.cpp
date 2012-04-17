@@ -77,6 +77,10 @@ namespace wali {
         {
             for (size_t i=0; i<num_fas; ++i) {
                 for (size_t j=0; j<num_fas; ++j) {
+                    std::stringstream ss;
+                    ss << "Testing FAs " << i << " ~ " << j;
+                    SCOPED_TRACE(ss.str());
+                    
                     WFA left = fas[i];
                     WFA right = fas[j];
 
