@@ -325,7 +325,6 @@ namespace wali {
 
         struct AcceptAbOrAcDeterministic
         {
-            //               
             //         a         b
             // -->o--------->o-------->(o)
             //    |         /|          |
