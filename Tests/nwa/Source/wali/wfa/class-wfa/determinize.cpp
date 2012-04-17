@@ -72,6 +72,18 @@ namespace wali {
 
             EXPECT_FALSE(w0.isIsomorphicTo(w1));
         }
+
+        TEST(wali$wfa$$isIsomorphicTo, DISABLED_battery)
+        {
+            for (size_t i=0; i<num_fas; ++i) {
+                for (size_t j=0; j<num_fas; ++j) {
+                    WFA left = fas[i];
+                    WFA right = fas[j];
+
+                    EXPECT_EQ(i == j, left.isIsomorphicTo(right));
+                }
+            }
+        }
         
     }
 }
