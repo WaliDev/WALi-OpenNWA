@@ -124,7 +124,7 @@ namespace wali {
         }
 
 
-        TEST(wali$wfa$$determinize, DISABLE_loopReject) {
+        TEST(wali$wfa$$determinize, DISABLED_loopReject) {
             LoopReject r;
             WFA d = r.wfa.determinize();
 
