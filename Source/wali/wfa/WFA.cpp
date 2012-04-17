@@ -1739,6 +1739,10 @@ namespace wali
       std::vector<Key> right_states(other.getStates().begin(),
                                     other.getStates().end());
 
+      if (left_states.size() != right_states.size()) {
+        return false;
+      }
+
       size_t count = 0; // Sanity checking
 
       do {
