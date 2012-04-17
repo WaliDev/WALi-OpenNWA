@@ -227,6 +227,9 @@ namespace wali
           typedef size_t                                              size_type;
           typedef Bucket< value_type >                                bucket_type;
 
+          typedef Key   key_type;
+          typedef Data  mapped_type;
+
           // friend iterator
           friend class HashMapIterator<Key,Data,HashFunc,EqualFunc>;
           friend class HashMapConstIterator<Key,Data,HashFunc,EqualFunc>;
