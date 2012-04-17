@@ -134,6 +134,28 @@ namespace wali {
             }
         }
 
+        TEST(wali$wfa$$isIsomorphicTo, loopRejectAndSimilar)
+        {
+            LoopReject f;
+            WFA wfa;
+
+            sem_elem_t one = Reach(true).one();
+            sem_elem_t zero = Reach(true).zero();
+                
+            Letters l;
+            Key state = getKey("different state");
+            ASSERT_NE(state, f.state);
+
+            wfa.addState(state, zero);
+            wfa.setInitialState(state);
+            wfa.addTrans(state, l.a, state, one);
+            wfa.addTrans(state, l.b, state, one);
+            wfa.addTrans(state, l.c, state, one);
+            
+            EXPECT_TRUE(f.wfa.isIsomorphicTo(wfa));
+        }
+        
+
 
         TEST(wali$wfa$$determinize, DISABLED_alreadyDeterministicBattery) {
             for (size_t i=0; i<num_fas_already_deterministic; ++i) {
