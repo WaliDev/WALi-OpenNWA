@@ -171,5 +171,14 @@ namespace wali {
         }
 
 
+        TEST(wali$wfa$$determinize, DISABLED_EpsilonTransitionToAccepting) {
+            EpsilonTransitionToAccepting f;
+            EpsilonDeterministic expected;
+            WFA wfa = f.wfa.determinize();
+
+            EXPECT_TRUE(wfa.isIsomorphicTo(expected.wfa));
+        }
+        
+        
     }
 }
