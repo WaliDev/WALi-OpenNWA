@@ -27,14 +27,14 @@ static const unsigned num_fas = NUM_ELEMENTS(fas);
 namespace wali {
     namespace wfa {
 
-        TEST(wali$wfa$$isIsomorphicTo, DISABLED_selfIsomorphismHolds)
+        TEST(wali$wfa$$isIsomorphicTo, selfIsomorphismHolds)
         {
             LoopReject f;
 
             EXPECT_TRUE(f.wfa.isIsomorphicTo(f.wfa));
         }
         
-        TEST(wali$wfa$$isIsomorphicTo, DISABLED_selfIsomorphismOfDifferentAutsFail)
+        TEST(wali$wfa$$isIsomorphicTo, selfIsomorphismOfDifferentAutsFail)
         {
             LoopReject rej;
             LoopAccept acc;
