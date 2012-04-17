@@ -1683,6 +1683,12 @@ namespace wali
         Key left_state = left_states[state_index];
         Key right_state = right_states[state_index];
 
+        if (!left.getState(left_state)->weight()->equal(
+              right.getState(right_state)->weight().get_ptr()))
+        {
+          return false;
+        }
+
         if (left.isInitialState(left_state) != right.isInitialState(right_state)) {
           // One is the start state and the other isn't
           return false;

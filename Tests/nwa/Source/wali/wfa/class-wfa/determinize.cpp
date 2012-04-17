@@ -42,7 +42,7 @@ namespace wali {
             EXPECT_FALSE(acc.wfa.isIsomorphicTo(rej.wfa));
         }
 
-        TEST(wali$wfa$$isIsomorphicTo, DISABLED_isomorphismChecksStateWeights)
+        TEST(wali$wfa$$isIsomorphicTo, isomorphismChecksStateWeights)
         {
             sem_elem_t one = Reach(true).one();
             sem_elem_t zero = Reach(true).zero();
