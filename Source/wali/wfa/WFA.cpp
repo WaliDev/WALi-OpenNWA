@@ -12,6 +12,7 @@
 #include "wali/regex/AllRegex.hpp"
 #include "wali/wpds/GenKeySource.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <vector>
 #include <stack>
@@ -1613,10 +1614,133 @@ namespace wali
     }
 
 
+    static
+    size_t
+    fact(size_t n) {
+      if (n == 1) {
+        return 1;
+      }
+      else {
+        return n * fact(n-1);
+      }
+    }
+
+
+    template<typename MapType>
+    typename MapType::mapped_type
+    get(MapType const & m, typename MapType::key_type key)
+    {
+      typename MapType::const_iterator place = m.find(key);
+      if (place == m.end()) {
+        throw 7;
+      }
+      return place->second;
+    }
+
+    static
+    bool
+    transitions_match(TransSet const & left_trans_set,
+                      TransSet const & right_trans_set,
+                      std::map<Key, Key> const & left_to_right)
+    {
+      for (TransSet::const_iterator trans_it = left_trans_set.begin();
+           trans_it != left_trans_set.end(); ++trans_it)
+      {
+        ITrans const * left_trans = *trans_it;
+
+        Key right_from_needed = get(left_to_right, left_trans->from());
+        Key right_to_needed = get(left_to_right, left_trans->to());
+
+        TransSet::const_iterator r_place = right_trans_set.find(right_from_needed,
+                                                                left_trans->stack(),
+                                                                right_to_needed);
+
+        if (r_place == right_trans_set.end()) {
+          // There was no such transition
+          return false;
+        }
+
+        // FIXME: check weight
+      }
+
+      return true;
+    }
+    
+
+    bool
+    WFA::is_isomorphism(WFA const & left, std::vector<Key> const & left_states,
+                        WFA const & right, std::vector<Key> const & right_states)
+    {
+      assert(left_states.size() == right_states.size());
+
+      std::map<Key, Key> left_to_right;
+      for (size_t state_index = 0; state_index < left_states.size(); ++state_index) {
+        left_to_right[left_states[state_index]]
+          = right_states[state_index];
+      }
+
+      for (size_t state_index = 0; state_index < left_states.size(); ++state_index) {
+        Key left_state = left_states[state_index];
+        Key right_state = right_states[state_index];
+
+        if (left.isInitialState(left_state) != right.isInitialState(right_state)) {
+          // One is the start state and the other isn't
+          return false;
+        }
+
+        if (left.isFinalState(left_state) != right.isFinalState(right_state)) {
+          // One accepts and the other rejects
+          return false;
+        }
+
+        for (kp_map_t::const_iterator kpmap_iter = left.kpmap.begin();
+             kpmap_iter != left.kpmap.end(); ++kpmap_iter)
+        {
+          Key left_source = kpmap_iter->first.first;
+          if (left_source == left_state) {
+            // We're looking at outgoing transitions from left_state
+            Key right_source = left_to_right[left_source];
+            Key symbol = kpmap_iter->first.second;
+
+            TransSet const & left_trans_set = kpmap_iter->second;
+            TransSet const & right_trans_set = get(right.kpmap,
+                                                   KeyPair(right_source, symbol));
+
+            if (!transitions_match(left_trans_set, right_trans_set, left_to_right)) {
+              return false;
+            }
+
+            // All transitions from left/right under symbol match
+          }
+        }
+
+        // Everything about left/right states themselves and outgoing
+        // transitions match. Time to check the next pair.
+      }
+
+      return true;
+    }
+
+    
     bool
     WFA::isIsomorphicTo(WFA const & other) const
     {
-      (void) other;
+      std::vector<Key> left_states(getStates().begin(),
+                                   getStates().end());
+      std::vector<Key> right_states(other.getStates().begin(),
+                                    other.getStates().end());
+
+      size_t count = 0; // Sanity checking
+
+      do {
+        if (is_isomorphism(*this, left_states, other, right_states)) {
+          return true;
+        }
+        ++count;
+      } while(next_permutation(right_states.begin(), right_states.end()));
+
+      assert(count == fact(getStates().size()));
+      
       return false;
     }
     

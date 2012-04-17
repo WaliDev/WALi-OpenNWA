@@ -611,6 +611,12 @@ namespace wali
         /// correspond, (2) edge labels (symbols) must correspond, and (3)
         /// edge weights must be the same.)
         bool isIsomorphicTo(WFA const & other) const;
+
+        static
+        bool
+        is_isomorphism(WFA const & left, std::vector<Key> const & left_states,
+                       WFA const & right, std::vector<Key> const & right_states);
+        
     };
 
   } // namespace wfa
