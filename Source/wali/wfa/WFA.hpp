@@ -603,6 +603,14 @@ namespace wali
         /// Performs the subset construction and returns the resulting
         /// WFA. (Does not mutate.)
         WFA determinize() const;
+
+        /// Returns whether this WFA is isomorphic to the given WFA; that is,
+        /// the two automata are equal up to a relabeling of the states. (Or,
+        /// expressed another way, the transition graphs are isomorphic with
+        /// the extra conditions that (1) start and final states must
+        /// correspond, (2) edge labels (symbols) must correspond, and (3)
+        /// edge weights must be the same.)
+        bool isIsomorphicTo(WFA const & other) const;
     };
 
   } // namespace wfa

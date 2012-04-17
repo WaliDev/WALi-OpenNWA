@@ -1613,6 +1613,14 @@ namespace wali
     }
 
 
+    bool
+    WFA::isIsomorphicTo(WFA const & other) const
+    {
+      (void) other;
+      return false;
+    }
+    
+
   } // namespace wfa
 
 } // namespace wali
