@@ -56,5 +56,22 @@ namespace wali {
             EXPECT_FALSE(w0.isIsomorphicTo(w1));
         }
         
+        TEST(wali$wfa$$isIsomorphicTo, isomorphismChecksTransWeights)
+        {
+            sem_elem_t one = Reach(true).one();
+            sem_elem_t zero = Reach(true).zero();
+            
+            Letters l;
+            WFA w0, w1;
+
+            w0.addState(l.a, zero);
+            w1.addState(l.a, zero);
+
+            w0.addTrans(l.a, l.a, l.a, zero);
+            w1.addTrans(l.a, l.a, l.a, one);
+
+            EXPECT_FALSE(w0.isIsomorphicTo(w1));
+        }
+        
     }
 }

@@ -1654,13 +1654,16 @@ namespace wali
         TransSet::const_iterator r_place = right_trans_set.find(right_from_needed,
                                                                 left_trans->stack(),
                                                                 right_to_needed);
-
         if (r_place == right_trans_set.end()) {
           // There was no such transition
           return false;
         }
 
-        // FIXME: check weight
+        ITrans const * right_trans = *r_place;
+
+        if (!left_trans->weight()->equal(right_trans->weight().get_ptr())) {
+          return false;
+        }
       }
 
       return true;
