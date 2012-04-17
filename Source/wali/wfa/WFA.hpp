@@ -608,8 +608,9 @@ namespace wali
         /// the two automata are equal up to a relabeling of the states. (Or,
         /// expressed another way, the transition graphs are isomorphic with
         /// the extra conditions that (1) start and final states must
-        /// correspond, (2) edge labels (symbols) must correspond, and (3)
-        /// edge weights must be the same.)
+        /// correspond, (2) state weights must be the same, (3) edge labels
+        /// (symbols) must correspond, and (4) edge weights must be the
+        /// same.)
         bool isIsomorphicTo(WFA const & other) const;
 
         static
