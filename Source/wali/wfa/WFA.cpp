@@ -1635,15 +1635,22 @@ namespace wali
              kpmap_iter != wfa.kpmap.end(); ++kpmap_iter)
         {
           Key source = kpmap_iter->first.first;
-          if (source == *from) {
-            Key symbol = kpmap_iter->first.second;
-
+          Key symbol = kpmap_iter->first.second;
+          
+          if (source == *from
+              && symbol != WALI_EPSILON)
+          {
             TransSet const & outgoing = kpmap_iter->second;
             for (TransSet::const_iterator trans = outgoing.begin();
                  trans != outgoing.end(); ++trans)
             {
-              Key target = (*trans)->to();
-              nexts[symbol].insert(target);
+              AccessibleStateMap eclose = wfa.epsilonClose((*trans)->to());
+
+              for (AccessibleStateMap::const_iterator target = eclose.begin();
+                   target != eclose.end(); ++target)
+              {
+                nexts[symbol].insert(target->first);
+              }
             } // for "each" outgoing transition [part 1]
           } // for "each" outgoing transition [part 2]
         } // for "each" outgoing transition [part 3]
