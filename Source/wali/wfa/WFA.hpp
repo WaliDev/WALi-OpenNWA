@@ -617,6 +617,26 @@ namespace wali
         /// conditions (2) and (4) (those pertaining to the weights on states
         /// and transitions) are lifted if 'check_weights' is false.
         bool isIsomorphicTo(WFA const & other, bool check_weights) const;
+
+        /// Adds transitions so that every state has an outgoing for every
+        /// symbol. The overloads allow specification of:
+        ///
+        /// - What you mean by "every symbol". By default, this is every
+        ///   symbol that appears in any transition in the WFA. If you
+        ///   specify your own set, no attempt is made to ensure that your
+        ///   set is a superset of the default, so there may be symbols for
+        ///   which there are transitions out of some states but not others.
+        ///
+        /// - What the destination state should be. By default, this is
+        ///   getKey({}), where {} is an empty std::set<Key>, whether or not
+        ///   that state is already in the WFA. (In other words, if the WFA
+        ///   already has a sink state, but it's different, then you have to
+        ///   find and specify that yourself.) If that state is already there
+        ///   but is not a sink state, then the code asserts.
+        void complete(std::set<Key> const & symbols, Key sink_state);
+        void complete(std::set<Key> const & symbols);
+        void complete(Key sink_state);
+        void complete();
         
 
         static

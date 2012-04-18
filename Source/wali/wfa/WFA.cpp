@@ -1712,7 +1712,7 @@ namespace wali
           Key target_key = getKey(next->second);
           
           result.addTrans(sources_key, symbol, target_key, one);
-
+          
           std::pair<KeySet::iterator, bool> p = visited.insert(target_key);
           if (p.second) {
             // It wasn't already there
@@ -1889,6 +1889,35 @@ namespace wali
       return false;
     }
     
+
+    void WFA::complete(std::set<Key> const & symbols, Key sink_state)
+    {
+      (void) symbols;
+      (void) sink_state;
+    }
+
+    void WFA::complete(std::set<Key> const & symbols)
+    {
+      std::set<Key> empty;
+      complete(symbols, getKey(empty));
+    }
+
+    void WFA::complete(Key sink_state)
+    {
+      std::set<Key> symbols;
+      for (kp_map_t::const_iterator kpmap_iter = kpmap.begin();
+           kpmap_iter != kpmap.end(); ++kpmap_iter)
+      {
+        symbols.insert(kpmap_iter->first.second);
+      }
+      complete(symbols, sink_state);
+    }
+    
+    void WFA::complete()
+    {
+      std::set<Key> empty;
+      complete(getKey(empty));
+    }
 
   } // namespace wfa
 
