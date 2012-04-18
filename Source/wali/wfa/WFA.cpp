@@ -1662,7 +1662,7 @@ namespace wali
 
 
     WFA
-    WFA::determinize() const
+    WFA::semideterminize() const
     {
       std::stack<KeySet> worklist;
       std::set<Key> visited;
@@ -1725,7 +1725,14 @@ namespace wali
       return result;
     }
 
-
+    WFA
+    WFA::determinize() const
+    {
+      WFA det = semideterminize();
+      det.complete();
+      return det;
+    }
+      
     static
     size_t
     fact(size_t n) {

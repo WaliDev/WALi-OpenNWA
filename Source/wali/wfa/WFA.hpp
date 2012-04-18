@@ -601,9 +601,14 @@ namespace wali
 
 
         /// Performs the subset construction and returns the resulting
-        /// WFA. (Does not mutate.)
+        /// WFA. (Does not mutate.) Completes the automaton when done.
         WFA determinize() const;
 
+        /// Performs the subset construction and returns the resulting
+        /// WFA. (Does not mutate.) Is likely to return a WFA with a
+        /// non-total transition function.
+        WFA semideterminize() const;
+        
         /// Returns whether this WFA is isomorphic to the given WFA; that is,
         /// the two automata are equal up to a relabeling of the states. (Or,
         /// expressed another way, the transition graphs are isomorphic with

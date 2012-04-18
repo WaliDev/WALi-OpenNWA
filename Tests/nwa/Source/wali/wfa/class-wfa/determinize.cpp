@@ -171,7 +171,7 @@ namespace wali {
         }
 
 
-        TEST(wali$wfa$$determinize, DISABLED_completeEpsilonTransitionToAccepting) {
+        TEST(wali$wfa$$determinize, DISABLED_EpsilonTransitionToAccepting) {
             EpsilonTransitionToAccepting f;
             EpsilonDeterministic expected;
             WFA wfa = f.wfa.determinize();
@@ -179,9 +179,9 @@ namespace wali {
             EXPECT_TRUE(wfa.isIsomorphicTo(expected.wfa));
         }
         
-        TEST(wali$wfa$$determinize, incompleteEpsilonTransitionToAccepting) {
+        TEST(wali$wfa$$semideterminize, EpsilonTransitionToAccepting) {
             EpsilonTransitionToAccepting f;
-            WFA wfa = f.wfa.determinize();
+            WFA wfa = f.wfa.semideterminize();
 
             EpsilonSemiDeterministic expected;
 
@@ -189,7 +189,7 @@ namespace wali {
         }
 
 
-        TEST(wali$wfa$$complete, epsilonSemi)
+        TEST(wali$wfa$$complete, DISABLED_epsilonSemi)
         {
             EpsilonSemiDeterministic orig;
             EpsilonDeterministic expected;
