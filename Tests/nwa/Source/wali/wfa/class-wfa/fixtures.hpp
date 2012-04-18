@@ -188,6 +188,25 @@ namespace wali {
             }
         };
         
+        struct EpsilonSemiDeterministic
+        {
+            // --> (o)
+            WFA wfa;
+
+            EpsilonSemiDeterministic() {
+                sem_elem_t one = Reach(true).one();
+                sem_elem_t zero = Reach(true).zero();
+
+                Letters l;
+
+                Key start = getKey("start");
+
+                wfa.addState(start, zero);
+                wfa.setInitialState(start);
+                wfa.addFinalState(start);
+            }
+        };
+        
 
         struct EpsilonTransitionToMiddleToAccepting
         {
@@ -212,6 +231,31 @@ namespace wali {
 
                 wfa.addTrans(start, WALI_EPSILON, middle, one);
                 wfa.addTrans(middle, Letters().a, accept, one);
+            }
+        };
+
+        struct ASemiDeterministic
+        {
+            //        a
+            // --> o ----> (o)
+            WFA wfa;
+
+            ASemiDeterministic() {
+                sem_elem_t one = Reach(true).one();
+                sem_elem_t zero = Reach(true).zero();
+
+                Letters l;
+
+                Key start = getKey("start");
+                Key accept = getKey("accept");
+
+                wfa.addState(start, zero);
+                wfa.addState(accept, zero);
+
+                wfa.setInitialState(start);
+                wfa.addFinalState(accept);
+
+                wfa.addTrans(start, l.a, accept, one);
             }
         };
 
@@ -255,6 +299,7 @@ namespace wali {
                 wfa.addTrans(reject, l.c, reject, one);
             }
         };
+
 
         struct EpsilonTransitionToMiddleToEpsilonToAccepting
         {
@@ -323,6 +368,60 @@ namespace wali {
             }
         };
 
+        struct AcceptAbOrAcSemiDeterministic
+        {
+            //         a         b
+            // -->o--------->o-------->(o)
+            //               |
+            //               |c
+            //               V
+            //              (o)
+            WFA wfa;
+
+            AcceptAbOrAcSemiDeterministic() {
+                sem_elem_t one = Reach(true).one();
+                sem_elem_t zero = Reach(true).zero();
+                
+                Key start = getKey("start");
+                Key a = getKey("a (state)");
+                Key ab = getKey("ab");
+                Key ac = getKey("ac");
+                Key reject = getKey("reject");
+
+                Letters l;
+
+                wfa.addState(start, zero);
+                wfa.addState(a, zero);
+                wfa.addState(ab, zero);
+                wfa.addState(ac, zero);
+                wfa.addState(reject, zero);
+
+                wfa.setInitialState(start);
+                wfa.addFinalState(ab);
+                wfa.addFinalState(ac);
+
+                wfa.addTrans(start, l.a, a, one);
+                wfa.addTrans(start, l.b, reject, one);
+                wfa.addTrans(start, l.c, reject, one);
+
+                wfa.addTrans(a, l.a, reject, one);
+                wfa.addTrans(a, l.b, ab, one);
+                wfa.addTrans(a, l.c, ac, one);
+
+                wfa.addTrans(ab, l.a, reject, one);
+                wfa.addTrans(ab, l.b, reject, one);
+                wfa.addTrans(ab, l.c, reject, one);
+                
+                wfa.addTrans(ac, l.a, reject, one);
+                wfa.addTrans(ac, l.b, reject, one);
+                wfa.addTrans(ac, l.c, reject, one);
+                
+                wfa.addTrans(reject, l.a, reject, one);
+                wfa.addTrans(reject, l.b, reject, one);
+                wfa.addTrans(reject, l.c, reject, one);
+            }
+        };
+
         struct AcceptAbOrAcDeterministic
         {
             //         a         b
@@ -382,6 +481,7 @@ namespace wali {
                 wfa.addTrans(reject, l.c, reject, one);
             }
         };
+
 
         struct AEpsilonEpsilonEpsilonA
         {

@@ -183,14 +183,9 @@ namespace wali {
             EpsilonTransitionToAccepting f;
             WFA wfa = f.wfa.determinize();
 
-            WFA expected;
-            sem_elem_t zero = Reach(true).zero();
-            Key state = getKey("blah");
-            expected.addState(state, zero);
-            expected.setInitialState(state);
-            expected.addFinalState(state);
+            EpsilonSemiDeterministic expected;
 
-            EXPECT_TRUE(wfa.isIsomorphicTo(expected));
+            EXPECT_TRUE(wfa.isIsomorphicTo(expected.wfa));
         }
         
     }
