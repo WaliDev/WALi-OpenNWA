@@ -187,6 +187,22 @@ namespace wali {
 
             EXPECT_TRUE(wfa.isIsomorphicTo(expected.wfa));
         }
-        
+
+
+        TEST(wali$wfa$$complete, epsilonSemi)
+        {
+            EpsilonSemiDeterministic orig;
+            EpsilonDeterministic expected;
+
+            Letters l;
+            std::set<Key> symbols;
+            symbols.insert(l.a);
+            symbols.insert(l.b);
+            symbols.insert(l.c);
+
+            orig.wfa.complete(symbols);
+
+            EXPECT_TRUE(expected.wfa.isIsomorphicTo(orig.wfa));
+        }
     }
 }
