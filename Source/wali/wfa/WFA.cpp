@@ -1933,6 +1933,10 @@ namespace wali
     {
       sem_elem_t one = getSomeWeight()->one();
 
+      // We only add {} on-demand. If it's not reachable, then we don't want
+      // it there.
+      bool added_sink_state = false;
+
       // Maps source state to set of outgoing letters. (We don't care where
       // they go, just whether there is any.)
       std::map<Key, KeySet> outgoing;
@@ -1953,8 +1957,18 @@ namespace wali
              symbol != symbols.end(); ++symbol)
         {
           if (outgoing[*state].find(*symbol) == outgoing[*state].end()) {
+            added_sink_state = true;
+            addState(sink_state, one->zero());
             addTrans(*state, *symbol, sink_state, one);
           }
+        }
+      }
+
+      if (added_sink_state) {
+        for (kp_map_t::const_iterator kp_iter = kpmap.begin();
+             kp_iter != kpmap.end(); ++kp_iter)
+        {
+          addTrans(sink_state, kp_iter->first.second, sink_state, one);
         }
       }
     }
