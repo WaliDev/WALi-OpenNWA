@@ -175,6 +175,7 @@ namespace wali
 
     void Witness::accept( Visitor& v, bool visitOnce ATTR_UNUSED )
     {
+      (void) visitOnce;
       mark();
       //assert(0);
       //*waliErr << "[?ERROR?] Witness::accept called\n";

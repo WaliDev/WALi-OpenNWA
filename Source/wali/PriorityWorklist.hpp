@@ -1,61 +1,64 @@
 #ifndef wali_PRIORITY_WORKLIST_GUARD
 #define wali_PRIORITY_WORKLIST_GUARD 1
 
-/*!
- * @author Nicholas Kidd
- */
+#include <boost/version.hpp>
+
+#if defined(BOOST_VERSION) && BOOST_VERSION >= 104900
+#    define WALI_HAS_BOOST_HEAP 1
+#else
+#    define WALI_HAS_BOOST_HEAP 0
+#endif
+
 
 #include "wali/Common.hpp"
 #include "wali/Worklist.hpp"
 #include "wali/wfa/Trans.hpp"
-#include <map>
-#include <set>
+
+
+
+#if WALI_HAS_BOOST_HEAP
+
+#    include "wali/details/PriorityWorklist.boost_heap.hpp"
 
 namespace wali
 {
-  class PriorityWorklist : public Worklist<wfa::ITrans>
-  {
-    private:
-      struct LessThan {
-        LessThan( PriorityWorklist& pw ) : pWorklist(pw) {}
+  template<typename Compare>
+  class PriorityWorklist : public wali::details::BoostHeapPriorityWorklist<Compare>
+  {};
+}
 
-        PriorityWorklist& pWorklist;
+#else
+#    if HAS_PRAGMA_MESSAGE
+#        pragma message ("NOTE: Proper priority queues require Boost 1.49 or higher (with the Heap library). Disabling these and replacing with the default, unordered worklist.")
+#    endif
 
-        bool operator()( const wfa::ITrans* a, const wfa::ITrans* b ) const
-        {
-          return pWorklist.compareTo(a,b) < 0;
-        }
+#    include "wali/DefaultWorklist.hpp"
 
-      };
+namespace wali
+{
+  template<typename Compare>
+  class PriorityWorklist : public DefaultWorklist<wfa::ITrans>
+  {};
+}
 
-    public:
-      typedef std::multiset< wfa::ITrans*, LessThan > pwl_t;
+#endif
 
-    public:
-      PriorityWorklist();
 
-      virtual ~PriorityWorklist();
 
-      virtual bool put( wfa::ITrans *t );
+#include "wali/details/PriorityWorklist.multiset.hpp"
 
-      virtual wfa::ITrans * get();
+namespace wali
+{
+  template<typename Compare>
+  class FixedPriorityWorklist : public wali::details::MultisetPriorityWorklist<Compare>
+  {};
+}
 
-      virtual bool empty() const;
-
-      virtual void clear();
-
-      /*
-       * Override this for custom sorting. Default is to perform a
-       * comparison on the Trans's stack key.
-       */
-      virtual int compareTo( const wfa::ITrans* a, const wfa::ITrans* b ) const;
-
-    protected:
-      pwl_t workset;
-
-  }; // class PriorityWorklist
-
-} // namespace wali
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
 
 #endif  // wali_PRIORITY_WORKLIST_GUARD
 

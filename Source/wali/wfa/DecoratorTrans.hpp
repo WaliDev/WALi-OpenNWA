@@ -227,9 +227,18 @@ namespace wali
           return delegate;
         }
 
+
+        ref_ptr<WorklistData> worklistData() const throw() {
+          return worklist_data;
+        }
+
+        void setWorklistData(ref_ptr<WorklistData> wd) {
+          worklist_data = wd;
+        }
+
       protected:
         ITrans* delegate; //! < Decorator delegates all ITrans methods to the delegate
-
+        ref_ptr<WorklistData> worklist_data;
     };
 
   } // namespace wfa

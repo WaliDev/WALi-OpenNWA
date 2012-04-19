@@ -72,6 +72,13 @@ namespace wali
         static const std::string XMLStackTag;
         static const std::string XMLToTag;
 
+        /**
+         *  WFA transitions store some information that the worklist can use.
+         */
+        struct WorklistData : Countable {
+          virtual ~WorklistData() {}
+        };
+
         //
         // Methods
         //
@@ -99,6 +106,9 @@ namespace wali
 
         /*! @return const sem_elem_t of ITrans */
         virtual const sem_elem_t weight() const throw()  = 0;
+
+        /*! @return the worklist info */
+        virtual ref_ptr<WorklistData> worklistData() const throw() = 0;
 
         /*!
          * @return const sem_elem_t delta of ITrans
@@ -146,6 +156,9 @@ namespace wali
          * Set the delta value for the ITrans.
          */
         virtual void setDelta( const sem_elem_t w ) = 0;
+
+        /*! @return the worklist info */
+        virtual void setWorklistData(ref_ptr<WorklistData> wd) = 0;
 
         /*!
          * When inserting a transition into an automaton, 

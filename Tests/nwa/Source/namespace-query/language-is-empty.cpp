@@ -272,7 +272,8 @@ namespace opennwa {
                 // This could fail if the iteration order or something
                 // changes and the rg version also returns the shortest
                 // word. Such is life.
-                EXPECT_LT(short_word->size(), long_word->size());
+                //EXPECT_LT(short_word->size(), long_word->size());
+                EXPECT_EQ(short_word->size(), 2u);
             }
 
 

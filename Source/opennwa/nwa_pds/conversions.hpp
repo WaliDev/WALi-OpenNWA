@@ -96,8 +96,7 @@ namespace opennwa
     wali::Key
     getProgramControlLocation( )
     {
-      static Key key = getKey("program");
-      return key;
+      return getKey("program");
     }
 
     /**

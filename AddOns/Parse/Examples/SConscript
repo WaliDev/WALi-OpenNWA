@@ -11,19 +11,24 @@ Import('XercesDir')
 
 XercesPath = os.path.join(WaliDir, 'AddOns', 'Parse', 'ThirdParty', XercesDir)
 
+import platform
+if platform.system() == 'Windows':
+   xerces_lib_name = 'xerces-c_3.lib'
+else:
+   xerces_lib_name = '${LIBPREFIX}xerces-c${LIBSUFFIX}'
+
 StaticLibs = []
 Libs       = [ 'wali', 'waliparse', 'xerces-c', ] 
 LibPath    = [ LibInstallDir ]
 
 if MkStatic:
   StaticLibs = [
-    os.path.join(LibInstallDir,'libwaliparse.a'),
-		os.path.join(LibInstallDir,'libwali.a'),
-		os.path.join(LibInstallDir,'libxerces-c.a'),
+    os.path.join(LibInstallDir,'${LIBPREFIX}waliparse${LIBSUFFIX}'),
+    os.path.join(LibInstallDir,'${LIBPREFIX}wali${LIBSUFFIX}'),
     ]
-  Libs = []
+  Libs = [xerces_lib_name]
   LibPath = []
-	
+
 	
 ## ###############################
 ## Environment
@@ -46,7 +51,13 @@ ReachFiles= Split("""
 Reach/ExMain.cpp
 Reach/Reach.cpp
 """)
-Reach = env.Program('ExMain',ReachFiles + StaticLibs)
+
+StaticLibs = [env.File(l) for l in StaticLibs]
+env.Append(LIBS=StaticLibs)
+env.Append(LIBPATH=LibInstallDir)
+Reach = env.Program('ExMain',ReachFiles)
+
+
 built = Reach
 
 Return('built')

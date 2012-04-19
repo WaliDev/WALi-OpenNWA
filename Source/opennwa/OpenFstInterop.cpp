@@ -92,7 +92,7 @@ namespace opennwa {
             
 
     //Internal Transitions
-    for (NWA::InternalIterator iit = nwa->beginInternalTrans();
+    for (Nwa::InternalIterator iit = nwa->beginInternalTrans();
          iit != nwa->endInternalTrans(); iit++)
     {
       WaliKey w_start(iit->first);
@@ -109,14 +109,14 @@ namespace opennwa {
     }
 
     //Call Transitions
-    for (NWA::CallIterator iit = nwa->beginCallTrans();
+    for (Nwa::CallIterator iit = nwa->beginCallTrans();
          iit != nwa->endCallTrans(); iit++)
     {
       assert(false && "Trying to convert an NWA with call transitions to a FSM");
     }
 
     //Return Transitions
-    for (NWA::ReturnIterator iit = nwa->beginReturnTrans();
+    for (Nwa::ReturnIterator iit = nwa->beginReturnTrans();
          iit != nwa->endReturnTrans(); iit++)
     {
       assert(false && "Trying to convert an NWA with return transitions to a FSM");
@@ -151,7 +151,7 @@ namespace opennwa {
             
     assert(EPSILON == 0);
             
-    NwaRefPtr nwa = new NWA();
+    NwaRefPtr nwa = new Nwa();
             
     typedef StateIterator<StdFst> StateIter;
     typedef ArcIterator<StdFst> ArcIter;
@@ -197,7 +197,7 @@ namespace opennwa {
 
 
 
-  // Converts the given NWA (which must have only internal transitions)
+  // Converts the given Nwa (which must have only internal transitions)
   // to an OpenFST acceptor, minimizes that acceptor, then converts it
   // back. (Unfortunately, this will destroy the state names. C'est la
   // vie.)
@@ -227,12 +227,12 @@ namespace opennwa {
     NwaRefPtr min_nwa = fst_to_nwa(det_fsm, maps, node_prefix);
             
     // This could be an expensive check, but hopefully not...
-    //assert (NWA::equal(internal_nwa, min_nwa));
+    //assert (Nwa::equal(internal_nwa, min_nwa));
             
     return min_nwa;
   }
 
-  // Converts the given NWA (which must have only internal transitions)
+  // Converts the given Nwa (which must have only internal transitions)
   // to an OpenFST acceptor, minimizes that acceptor, then converts it
   // back. (Unfortunately, this will destroy the state names. C'est la
   // vie.)
@@ -260,10 +260,10 @@ namespace opennwa {
     NwaRefPtr min_nwa = fst_to_nwa(det_fsm, maps, node_prefix);
             
     // This could be an expensive check, but hopefully not...
-    //assert (NWA::equal(internal_nwa, min_nwa));
+    //assert (Nwa::equal(internal_nwa, min_nwa));
 
     if (internal_nwa->sizeSymbols() != min_nwa->sizeSymbols()) {
-      for (NWA::SymbolIterator sym = internal_nwa->beginSymbols();
+      for (Nwa::SymbolIterator sym = internal_nwa->beginSymbols();
            sym != internal_nwa->endSymbols(); ++sym)
       {
         min_nwa->addSymbol(*sym);

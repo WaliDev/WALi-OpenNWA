@@ -1,0 +1,27 @@
+#!/bin/sh
+
+cd $(dirname "$0")
+
+export DEV_NULL=/dev/null
+
+if [ $(uname -o) = "Cygwin" ]
+then
+    DEV_NULL=NUL
+fi
+
+if [ $(uname -m) = "x86_64" ]
+then
+    WALI_BIN=$PWD/../../../bin64
+else
+    WALI_BIN=$PWD../../../bin
+fi
+export WALI_BIN
+
+
+cd jam-emptiness
+./run-tests
+cd ..
+
+cd pcca-determinize
+./run-tests
+cd ..

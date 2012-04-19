@@ -66,7 +66,7 @@ namespace wali {
       return out;
     }
 
-    ostream &IntraGraph::print(ostream &out, PRINT_OP pop ATTR_UNUSED) {
+    ostream &IntraGraph::print(ostream &out, PRINT_OP UNUSED_PARAMETER(pop)) {
       int n = nedges;
       int i;
       out << "IntraGraph:\n";
@@ -125,7 +125,7 @@ namespace wali {
 
     // return value: number of SCCs
     int IntraGraph::SCC(vector<IntraGraphNode> &cnodes, int ncnodes,
-			vector<IntraGraphEdge> &cedges, int ncedges ATTR_UNUSED) {
+			vector<IntraGraphEdge> &cedges, int UNUSED_PARAMETER(ncedges)) {
       int n = ncnodes;
       int i;
       // reset visited
@@ -214,7 +214,7 @@ namespace wali {
 
     // postcond: sets iscutset for all nodes
     void IntraGraph::topSort(vector<IntraGraphNode> &cnodes, int ncnodes,
-			     vector<IntraGraphEdge> &cedges, int ncedges ATTR_UNUSED,
+			     vector<IntraGraphEdge> &cedges, int UNUSED_PARAMETER(ncedges),
                              list<int> &ts, vector<int> &cs, bool no_outgoing, bool no_updatable) {
       int n = ncnodes;
       int i;
@@ -311,7 +311,7 @@ namespace wali {
 
     void IntraGraph::buildCutsetRegExp(list<int> &ts, vector<int> &cs,
                                        vector<IntraGraphNode> &cnodes, int ncnodes,
-				       vector<IntraGraphEdge> &cedges, int ncedges ATTR_UNUSED) {
+				       vector<IntraGraphEdge> &cedges, int UNUSED_PARAMETER(ncedges)) {
       int m = cs.size();
       int n = ncnodes;
       assert(n == (int)ts.size());
@@ -790,6 +790,7 @@ namespace wali {
           nodes[nno].regexp->print(cout) << "\n";
         });
       int nevals ATTR_UNUSED;
+      (void) nevals; // This is only sometimes used
       STAT(nevals = nodes[nno].regexp->get_nevals());
       sem_elem_t ret = nodes[nno].regexp->get_weight();
       STAT({
@@ -801,7 +802,7 @@ namespace wali {
     }
 
 
-    void IntraGraph::setupIntraSolution(bool compress_regexp ATTR_UNUSED) {
+    void IntraGraph::setupIntraSolution(bool UNUSED_PARAMETER(compress_regexp)) {
       RegExp::extendDirectionBackwards(running_prestar);
       vector<IntraGraphNode> cnodes;
       vector<IntraGraphEdge> cedges;

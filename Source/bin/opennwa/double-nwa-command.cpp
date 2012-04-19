@@ -52,7 +52,9 @@ int main(int argc, char** argv)
     
     NwaRefPtr result = CONSTRUCTION_FUNCTION(*nwa1, *nwa2);
 
-    result->print(outfile);
+    if (argv[2] != string("/dev/null") && argv[2] != string("NUL")) {
+        result->print(outfile);
+    }
 }
 
 

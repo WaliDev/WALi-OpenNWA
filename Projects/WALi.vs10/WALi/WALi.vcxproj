@@ -84,7 +84,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\Source;$(BOOST_HOME);..\..\..\..\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -96,20 +96,22 @@
       <AssemblerListingLocation>.\Debug/</AssemblerListingLocation>
       <ObjectFileName>.\Debug/</ObjectFileName>
       <ProgramDataBaseFileName>.\Debug/</ProgramDataBaseFileName>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions>/wd4512 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\..\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\Source;$(BOOST_HOME);..\..\..\..\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions>/wd4512 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -118,7 +120,7 @@
     </Midl>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\Source;$(BOOST_HOME);..\..\..\..\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -130,8 +132,9 @@
       <AssemblerListingLocation>.\Debug/</AssemblerListingLocation>
       <ObjectFileName>.\Debug/</ObjectFileName>
       <ProgramDataBaseFileName>.\Debug/</ProgramDataBaseFileName>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions>/wd4512 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -139,28 +142,30 @@
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\Source;$(BOOST_HOME);..\..\..\..\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions>/wd4512 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Source\opennwa\construct\complement.cpp" />
-    <ClCompile Include="..\..\..\Source\opennwa\construct\concat.cpp" />
-    <ClCompile Include="..\..\..\Source\opennwa\construct\determinize.cpp" />
-    <ClCompile Include="..\..\..\Source\opennwa\construct\intersect.cpp" />
-    <ClCompile Include="..\..\..\Source\opennwa\construct\reverse.cpp" />
-    <ClCompile Include="..\..\..\Source\opennwa\construct\star.cpp" />
-    <ClCompile Include="..\..\..\Source\opennwa\construct\union.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_complement.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_concat.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_determinize.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_intersect.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_reverse.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_star.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_union.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\details\StateStorage.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\details\SymbolStorage.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\details\TransitionInfo.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\details\TransitionStorage.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\NWA.cpp" />
+    <ClCompile Include="..\..\..\Source\opennwa\NwaParser.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\nwa_pds\NwaToPds.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\nwa_pds\plusWpds.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\nwa_pds\WpdsToNwa.cpp" />
@@ -225,23 +230,57 @@
     <ClCompile Include="..\..\..\Source\wali\MergeFn.cpp" />
     <ClCompile Include="..\..\..\Source\wali\MergeFnFactory.cpp" />
     <ClCompile Include="..\..\..\Source\wali\Printable.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\PriorityWorklist.cpp" />
     <ClCompile Include="..\..\..\Source\wali\SemElem.cpp" />
     <ClCompile Include="..\..\..\Source\wali\SemElemPair.cpp" />
     <ClCompile Include="..\..\..\Source\wali\StringSource.cpp" />
     <ClCompile Include="..\..\..\Source\wali\TotalOrderWorklist.cpp" />
     <ClCompile Include="..\..\..\Source\wali\WeightFactory.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\graph\Graph.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\graph\InterGraph.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\graph\IntraGraph.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\graph\LinkEval.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\graph\RegExp.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\graph\SummaryGraph.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\graph\Graph.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\graph\InterGraph.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\graph\IntraGraph.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\graph\LinkEval.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\graph\RegExp.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\graph\SummaryGraph.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="..\..\..\Source\wali\wpds\ewpds\ERule.cpp" />
     <ClCompile Include="..\..\..\Source\wali\wpds\ewpds\ETrans.cpp" />
     <ClCompile Include="..\..\..\Source\wali\wpds\ewpds\EWPDS.cpp" />
     <ClCompile Include="..\..\..\Source\wali\regex\Concat.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\regex\Regex.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\regex\Regex.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/wd4267 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="..\..\..\Source\wali\regex\Root.cpp" />
     <ClCompile Include="..\..\..\Source\wali\regex\Star.cpp" />
     <ClCompile Include="..\..\..\Source\wali\regex\Union.cpp" />
@@ -266,6 +305,7 @@
     <ClInclude Include="..\..\..\Source\opennwa\query\details\iterators.hpp" />
     <ClInclude Include="..\..\..\Source\opennwa\query\details\selectors.hpp" />
     <ClInclude Include="..\..\..\Source\opennwa\query\language.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\Progress.hpp" />
     <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\FWPDS.hpp" />
     <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\LazyTrans.hpp" />
     <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\SWPDS.hpp" />

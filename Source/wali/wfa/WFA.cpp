@@ -12,8 +12,10 @@
 #include "wali/regex/AllRegex.hpp"
 #include "wali/wpds/GenKeySource.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <vector>
+#include <stack>
 
 #define FOR_EACH_STATE(name)                                \
   State* name;                                            \
@@ -36,7 +38,8 @@ namespace wali
     const std::string WFA::XMLInorderTag("INORDER");
     const std::string WFA::XMLReverseTag("REVERSE");
 
-    WFA::WFA( query_t q ) : init_state( WALI_EPSILON ),query(q),generation(0)
+    WFA::WFA( query_t q, progress_t prog )
+        : init_state( WALI_EPSILON ),query(q),generation(0),progress(prog)
     {
       if( query == MAX ) {
         *waliErr << "[WARNING] Invalid WFA::query. Resetting to INORDER.\n";
@@ -59,6 +62,7 @@ namespace wali
         init_state = rhs.init_state;
         F = rhs.F;
         query = rhs.query;
+        progress = rhs.progress;
 
         // Be sure to copy the state_map. Otherwise, 
         // some states that are in rhs but not actually apart
@@ -218,7 +222,7 @@ namespace wali
     // If the WFA is empty, return NULL
     //
     sem_elem_t WFA::getSomeWeight() const{
-      sem_elem_t ret;
+      sem_elem_t ret = getState(getInitialState())->weight();
       kp_map_t::const_iterator it = kpmap.begin();
       while(it != kpmap.end()) {
         const TransSet &tset = it->second;
@@ -680,6 +684,8 @@ namespace wali
             }
           }
         }
+        if( progress.is_valid() )
+            progress->tick();
       }
       { // BEGIN DEBUGGING
         //*waliErr << "\n --- WFA::path_summary needed " << numPops << " pops\n";
@@ -1448,7 +1454,516 @@ namespace wali
         regex::Regex::EXTEND(a,b) : regex::Regex::EXTEND(b,a);
     }
 
+
+
+
+
+    //////////////
+    // Helper functions
+
+    /// Adds to 'accessible' the fact that it is possible to reach the
+    /// destination of the transition 'trans' with the weight of 'trans'. If
+    /// that state was already known to be reachable, joins the new weight
+    /// with the old one.
+    bool add_trans_to_accessible_states(WFA::AccessibleStateMap & accessible,
+                                        Key dest, sem_elem_t weight)
+    {
+      if (accessible.find(dest) != accessible.end()) {
+        sem_elem_t old = accessible[dest];
+        weight = weight->combine(old);
+
+        if (weight->equal(old.get_ptr())) {
+          // No change
+          return false;
+        }
+      }
+
+      // Either this is a new accessible state or the weight changed
+      accessible[dest] = weight;
+      return true;
+    }
+
+    /// Like dest += src. For any key in src not in dest, add it with the
+    /// weight in src. For keys in both, dest's weight is set to the combine.
+    void merge_state_maps(WFA::AccessibleStateMap & dest,
+                          WFA::AccessibleStateMap const & src)
+    {
+      for (WFA::AccessibleStateMap::const_iterator state = src.begin();
+           state != src.end(); ++state)
+      {
+        add_trans_to_accessible_states(dest, state->first, state->second);
+      }
+    }
+    
+
+    WFA::AccessibleStateMap
+    WFA::epsilonClose(Key start) const
+    {
+      AccessibleStateMap result;
+      std::set<Key> worklist;
+      std::set<Key> visited;
+
+      result.insert(std::make_pair(start, getSomeWeight()->one()));
+      
+      worklist.insert(start);
+      visited.insert(start);
+
+      while (!worklist.empty()) {
+        Key source = *worklist.begin();
+        sem_elem_t weight = result[source];
+        worklist.erase(worklist.begin());
+
+        if (kpmap.find(KeyPair(source, WALI_EPSILON)) != kpmap.end()) {
+          TransSet const & eps_dests = kpmap.find(KeyPair(source, WALI_EPSILON))->second;
+          for (TransSet::const_iterator trans_it = eps_dests.begin();
+               trans_it != eps_dests.end(); ++trans_it)
+          {
+            sem_elem_t dest_weight = weight->extend((*trans_it)->weight());
+            Key dest = (*trans_it)->to();
+            bool change = add_trans_to_accessible_states(result, dest, dest_weight);
+
+            // Add the destination state to the worklist (maybe). We need to
+            // do this if it wasn't there before or if the weight has changed.
+            if (visited.find(dest) == visited.end() || change)
+            {
+              visited.insert(dest);
+              worklist.insert(dest);
+            }
+          }
+        }
+      }
+
+      return result;
+    }
+
+    
+    WFA::AccessibleStateMap
+    WFA::simulate(AccessibleStateMap const & start,
+                  Word const & word) const
+    {
+      AccessibleStateMap before = start;
+      AccessibleStateMap after;
+
+      for (AccessibleStateMap::const_iterator start_it = start.begin();
+           start_it != start.end(); ++start_it)
+      {
+        AccessibleStateMap eclose = epsilonClose(start_it->first);
+        merge_state_maps(before, eclose);
+      }
+
+      for (Word::const_iterator pos = word.begin(); pos != word.end(); ++pos) {
+        // Figure out where the machine will be in the next step from each of
+        // the current positions.
+        after.clear();
+        Key letter = *pos;
+
+        for (AccessibleStateMap::const_iterator start_config = before.begin();
+             start_config != before.end(); ++start_config)
+        {
+          Key source = start_config->first;
+          sem_elem_t source_weight = start_config->second;
+          
+          // Where can we go from this position?
+          if (kpmap.find(KeyPair(source, letter)) != kpmap.end()) {
+            TransSet const & transitions = kpmap.find(KeyPair(source, letter))->second;
+
+            for (TransSet::const_iterator trans_it = transitions.begin();
+                 trans_it != transitions.end(); ++trans_it)
+            {
+              AccessibleStateMap eclose = epsilonClose((*trans_it)->to());
+              for (AccessibleStateMap::const_iterator dest = eclose.begin();
+                   dest != eclose.end(); ++dest)
+              {
+                add_trans_to_accessible_states(after, dest->first, dest->second);
+              }
+            } // For each outgoing transition
+            
+          }  // if there are outgoing transitions...
+        } // For each possible starting configuration
+        
+        // Now after holds the list of starting positions. After this, before
+        // will.
+        swap(after, before);
+        
+      } // For each letter in 'word'
+
+      return before;
+    }
+
+
+    bool
+    WFA::isAcceptedWithNonzeroWeight(Word const & word) const
+    {
+      AccessibleStateMap start;
+      start[getInitialState()] = NULL;
+
+      AccessibleStateMap finish = simulate(start, word);
+
+      std::set<Key> const & finals = getFinalStates();
+      for(std::set<Key>::const_iterator final = finals.begin();
+          final != finals.end(); ++final)
+      {
+        if (finish.find(*final) != finish.end()) {
+          //  FIXME: check weight
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+
+    typedef std::set<Key> KeySet;
+
+    static
+    bool
+    any_final(WFA const & wfa, KeySet const & states)
+    {
+      for(KeySet::const_iterator state = states.begin();
+          state != states.end(); ++state)
+      {
+        if (wfa.isFinalState(*state)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    std::map<Key, KeySet>
+    WFA::next_states(WFA const & wfa, KeySet const & froms)
+    {
+      // symbol -> keyset
+      std::map<Key, KeySet> nexts;
+
+      for(KeySet::const_iterator from = froms.begin();
+          from != froms.end(); ++from)
+      {
+        for (kp_map_t::const_iterator kpmap_iter = wfa.kpmap.begin();
+             kpmap_iter != wfa.kpmap.end(); ++kpmap_iter)
+        {
+          Key source = kpmap_iter->first.first;
+          Key symbol = kpmap_iter->first.second;
+          
+          if (source == *from
+              && symbol != WALI_EPSILON)
+          {
+            TransSet const & outgoing = kpmap_iter->second;
+            for (TransSet::const_iterator trans = outgoing.begin();
+                 trans != outgoing.end(); ++trans)
+            {
+              AccessibleStateMap eclose = wfa.epsilonClose((*trans)->to());
+
+              for (AccessibleStateMap::const_iterator target = eclose.begin();
+                   target != eclose.end(); ++target)
+              {
+                nexts[symbol].insert(target->first);
+              }
+            } // for "each" outgoing transition [part 1]
+          } // for "each" outgoing transition [part 2]
+        } // for "each" outgoing transition [part 3]
+        
+      } // for each nondeterministic possibility
+
+      return nexts;
+    }
+
+
+    WFA
+    WFA::semideterminize() const
+    {
+      std::stack<KeySet> worklist;
+      std::set<Key> visited;
+
+      WFA result;
+      sem_elem_t zero = getSomeWeight()->zero();
+      sem_elem_t one = getSomeWeight()->one();
+
+      {
+        // Set up initial states
+        KeySet det_initial;
+        
+        AccessibleStateMap initials = epsilonClose(this->getInitialState());
+        for (AccessibleStateMap::const_iterator initial = initials.begin();
+             initial != initials.end(); ++initial)
+        {
+          det_initial.insert(initial->first);
+        }
+
+        Key initial_key = getKey(det_initial);
+        
+        result.addState(initial_key, zero);
+        result.setInitialState(initial_key);
+        worklist.push(det_initial);
+        visited.insert(initial_key);
+      }
+
+      while (!worklist.empty())
+      {
+        KeySet sources = worklist.top();
+        worklist.pop();
+
+        Key sources_key = getKey(sources);
+        result.addState(sources_key, zero);
+
+        if (any_final(*this, sources)) {
+          result.addFinalState(sources_key);
+        }
+
+        // symbol -> next state
+        std::map<Key, KeySet> nexts = next_states(*this, sources);
+
+        for (std::map<Key, KeySet>::const_iterator next = nexts.begin();
+             next != nexts.end(); ++next)
+        {
+          Key symbol = next->first;
+          Key target_key = getKey(next->second);
+          
+          result.addTrans(sources_key, symbol, target_key, one);
+          
+          std::pair<KeySet::iterator, bool> p = visited.insert(target_key);
+          if (p.second) {
+            // It wasn't already there
+            worklist.push(next->second);
+          }
+        }
+      }
+      
+
+      return result;
+    }
+
+    WFA
+    WFA::determinize() const
+    {
+      WFA det = semideterminize();
+      det.complete();
+      return det;
+    }
+      
+    static
+    size_t
+    fact(size_t n) {
+      if (n == 1) {
+        return 1;
+      }
+      else {
+        return n * fact(n-1);
+      }
+    }
+
+
+    template<typename MapType>
+    typename MapType::mapped_type
+    get(MapType const & m, typename MapType::key_type key)
+    {
+      typename MapType::const_iterator place = m.find(key);
+      if (place == m.end()) {
+        throw 7;
+      }
+      return place->second;
+    }
+
+    static
+    bool
+    transitions_match(TransSet const & left_trans_set,
+                      TransSet const & right_trans_set,
+                      std::map<Key, Key> const & left_to_right,
+                      bool check_weights)
+    {
+      for (TransSet::const_iterator trans_it = left_trans_set.begin();
+           trans_it != left_trans_set.end(); ++trans_it)
+      {
+        ITrans const * left_trans = *trans_it;
+
+        Key right_from_needed = get(left_to_right, left_trans->from());
+        Key right_to_needed = get(left_to_right, left_trans->to());
+
+        TransSet::const_iterator r_place = right_trans_set.find(right_from_needed,
+                                                                left_trans->stack(),
+                                                                right_to_needed);
+        if (r_place == right_trans_set.end()) {
+          // There was no such transition
+          return false;
+        }
+
+        ITrans const * right_trans = *r_place;
+
+        if (!left_trans->weight()->equal(right_trans->weight().get_ptr())
+            && check_weights)
+        {
+          return false;
+        }
+      }
+
+      return true;
+    }
+    
+
+    bool
+    WFA::is_isomorphism(WFA const & left, std::vector<Key> const & left_states,
+                        WFA const & right, std::vector<Key> const & right_states,
+                        bool check_weights)
+    {
+      assert(left_states.size() == right_states.size());
+      (void) check_weights;
+
+      std::map<Key, Key> left_to_right;
+      for (size_t state_index = 0; state_index < left_states.size(); ++state_index) {
+        left_to_right[left_states[state_index]]
+          = right_states[state_index];
+      }
+
+      for (size_t state_index = 0; state_index < left_states.size(); ++state_index) {
+        Key left_state = left_states[state_index];
+        Key right_state = right_states[state_index];
+
+        if (!left.getState(left_state)->weight()->equal(
+              right.getState(right_state)->weight().get_ptr())
+            && check_weights)
+        {
+          return false;
+        }
+
+        if (left.isInitialState(left_state) != right.isInitialState(right_state)) {
+          // One is the start state and the other isn't
+          return false;
+        }
+
+        if (left.isFinalState(left_state) != right.isFinalState(right_state)) {
+          // One accepts and the other rejects
+          return false;
+        }
+
+        for (kp_map_t::const_iterator kpmap_iter = left.kpmap.begin();
+             kpmap_iter != left.kpmap.end(); ++kpmap_iter)
+        {
+          Key left_source = kpmap_iter->first.first;
+          if (left_source == left_state) {
+            // We're looking at outgoing transitions from left_state
+            Key right_source = left_to_right[left_source];
+            Key symbol = kpmap_iter->first.second;
+
+            kp_map_t::const_iterator r_place = right.kpmap.find(KeyPair(right_source, symbol));
+            if (r_place == right.kpmap.end()) {
+              // There is no outgoing transition on (source, symbol)
+              return false;
+            }
+
+            TransSet const & left_trans_set = kpmap_iter->second;
+            TransSet const & right_trans_set = r_place->second;
+
+            if (!transitions_match(left_trans_set, right_trans_set,
+                                   left_to_right, check_weights))
+            {
+              return false;
+            }
+
+            // All transitions from left/right under symbol match
+          }
+        }
+
+        // Everything about left/right states themselves and outgoing
+        // transitions match. Time to check the next pair.
+      }
+
+      return true;
+    }
+
+    
+    bool
+    WFA::isIsomorphicTo(WFA const & other) const
+    {
+      return isIsomorphicTo(other, true);
+    }
+
+    
+    bool
+    WFA::isIsomorphicTo(WFA const & other, bool check_weights) const
+    {
+      std::vector<Key> left_states(getStates().begin(),
+                                   getStates().end());
+      std::vector<Key> right_states(other.getStates().begin(),
+                                    other.getStates().end());
+
+      if (left_states.size() != right_states.size()) {
+        return false;
+      }
+
+      size_t count = 0; // Sanity checking
+
+      do {
+        if (is_isomorphism(*this, left_states, other, right_states, check_weights)) {
+          return true;
+        }
+        ++count;
+      } while(next_permutation(right_states.begin(), right_states.end()));
+
+      assert(count == fact(getStates().size()));
+      
+      return false;
+    }
+    
+
+    void WFA::complete(std::set<Key> const & symbols, Key sink_state)
+    {
+      sem_elem_t one = getSomeWeight()->one();
+
+      // Maps source state to set of outgoing letters. (We don't care where
+      // they go, just whether there is any.)
+      std::map<Key, KeySet> outgoing;
+      
+      for (kp_map_t::const_iterator kpmap_iter = kpmap.begin();
+           kpmap_iter != kpmap.end(); ++kpmap_iter)
+      {
+        if (kpmap_iter->second.size() > 0) {
+          outgoing[kpmap_iter->first.first].insert(kpmap_iter->first.second);
+        }
+      }
+
+      KeySet const & states = getStates();
+      for (KeySet::const_iterator state = states.begin();
+           state != states.end(); ++state)
+      {
+        for (KeySet::const_iterator symbol = symbols.begin();
+             symbol != symbols.end(); ++symbol)
+        {
+          if (outgoing[*state].find(*symbol) == outgoing[*state].end()) {
+            addTrans(*state, *symbol, sink_state, one);
+          }
+        }
+      }
+    }
+
+    void WFA::complete(std::set<Key> const & symbols)
+    {
+      std::set<Key> empty;
+      complete(symbols, getKey(empty));
+    }
+
+    void WFA::complete(Key sink_state)
+    {
+      std::set<Key> symbols;
+      for (kp_map_t::const_iterator kpmap_iter = kpmap.begin();
+           kpmap_iter != kpmap.end(); ++kpmap_iter)
+      {
+        symbols.insert(kpmap_iter->first.second);
+      }
+      complete(symbols, sink_state);
+    }
+    
+    void WFA::complete()
+    {
+      std::set<Key> empty;
+      complete(getKey(empty));
+    }
+
   } // namespace wfa
 
 } // namespace wali
 
+// Yo emacs!
+// Local Variables:
+//     c-file-style: "ellemtel"
+//     c-basic-offset: 2
+//     indent-tabs-mode: nil
+// End:

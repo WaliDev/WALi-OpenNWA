@@ -30,13 +30,13 @@ namespace wali
          * Constructor creates WitnessExtend with no children.
          * How does this happen?
          */
-        WitnessExtend( sem_elem_t weight );
+        //WitnessExtend( sem_elem_t weight );
 
         /*!
          * Constructor creates WitnessExtend with only a left child.
          * Parameter weight should equal left
          */
-        WitnessExtend( sem_elem_t weight, witness_t left );
+        //WitnessExtend( sem_elem_t weight, witness_t left );
 
         /*!
          * Constructor creates WitnessExtend with a left & right child.

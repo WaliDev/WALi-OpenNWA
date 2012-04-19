@@ -7,11 +7,11 @@ env = ProgEnv.Clone()
 def _ProgramTarget(env, command, function, namespace, source):
     if function == None:
         function = command
-    assert 'CPPDEFINES' not in env
-    obj = env.Object('nwa-%s' % command, source,
-                     CPPDEFINES={'CONSTRUCTION_FUNCTION': function,
-                                 'CONSTRUCTION_NAMESPACE' : namespace})
-    prg = env.Program('nwa-%s.exe' % command, obj)
+    this_env = env.Clone()
+    this_env['CPPDEFINES']['CONSTRUCTION_FUNCTION'] = function
+    this_env['CPPDEFINES']['CONSTRUCTION_NAMESPACE'] = namespace
+    obj = this_env.Object('nwa-%s' % command, source)
+    prg = this_env.Program('nwa-%s.exe' % command, obj)
     return prg
 
 def SingleProgramTarget(env, command, function=None, namespace='construct'):

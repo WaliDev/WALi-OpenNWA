@@ -216,7 +216,7 @@ namespace wali {
 
             std::ostream &InterGraph::print(std::ostream &out, PRINT_OP pop) {
                 unsigned i;
-                if(1)//intra_graph_uf == NULL) 
+                if(CONSTANT_CONDITION(1))//intra_graph_uf == NULL) 
                 {
                     out << "Source Transitions:\n";
                     for(i=0;i<nodes.size();i++) {

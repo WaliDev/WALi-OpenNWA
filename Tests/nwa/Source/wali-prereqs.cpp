@@ -70,7 +70,13 @@ namespace wali {
         EXPECT_EQ("12", key2str(keys.int_key));
         EXPECT_EQ("{}", key2str(keys.set_key));
         EXPECT_EQ("{1}", key2str(keyset_key_1));
-        EXPECT_EQ("{1,2}", key2str(keyset_key_1_2));
+        // Depending on the order the tests were run in, this may go either way.
+        if (getKey("1") < getKey("2")) {
+            EXPECT_EQ("{1,2}", key2str(keyset_key_1_2));
+        }
+        else {
+            EXPECT_EQ("{2,1}", key2str(keyset_key_1_2));
+        }
         EXPECT_EQ("(string,12)", key2str(keys.pair_key));
 
         EXPECT_EQ("*", key2str(WALI_EPSILON));

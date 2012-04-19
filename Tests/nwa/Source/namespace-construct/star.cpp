@@ -12,19 +12,6 @@ using namespace opennwa;
 
 #define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
 
-// For every case, L(nwa[i])* = L(nwa[i]), except that the strictly
-// unbalanced ones don't accept epsilon.
-static Nwa const nwas[] = {
-    Nwa(),
-    AcceptsBalancedOnly().nwa,
-    AcceptsStrictlyUnbalancedLeft().nwa,
-    AcceptsPossiblyUnbalancedLeft().nwa,
-    AcceptsStrictlyUnbalancedRight().nwa,
-    AcceptsPossiblyUnbalancedRight().nwa,
-    AcceptsPositionallyConsistentString().nwa
-};
-
-static const unsigned num_nwas = NUM_ELEMENTS(nwas);
 
 
 namespace opennwa {
@@ -32,6 +19,21 @@ namespace opennwa {
 
             TEST(opennwa$query$$star, testBatteryOfVariouslyBalancedNwas)
             {
+                // For every case, L(nwa[i])* = L(nwa[i]), except that the
+                // strictly unbalanced ones don't accept epsilon.
+                Nwa const nwas[] = {
+                    Nwa(),
+                    AcceptsBalancedOnly().nwa,
+                    AcceptsStrictlyUnbalancedLeft().nwa,
+                    AcceptsPossiblyUnbalancedLeft().nwa,
+                    AcceptsStrictlyUnbalancedRight().nwa,
+                    AcceptsPossiblyUnbalancedRight().nwa,
+                    AcceptsPositionallyConsistentString().nwa
+                };
+
+                const unsigned num_nwas = NUM_ELEMENTS(nwas);
+
+                
                 for (unsigned nwa = 0 ; nwa < num_nwas ; ++nwa) {
                     std::stringstream ss;
                     ss << "Testing NWA " << nwa;

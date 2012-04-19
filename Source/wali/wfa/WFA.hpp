@@ -11,6 +11,7 @@
 #include "wali/SemElem.hpp"
 #include "wali/HashMap.hpp"
 #include "wali/KeyContainer.hpp"
+#include "wali/Progress.hpp"
 
 // ::wali::wfa
 #include "wali/wfa/WeightMaker.hpp"
@@ -19,8 +20,10 @@
 
 // std::c++
 #include <iostream>
+#include <vector>
 #include <list>
 #include <set>
+#include <map>
 
 namespace wali
 {
@@ -102,7 +105,7 @@ namespace wali
         // Methods
         //
       public:
-        WFA( query_t q = INORDER );
+        WFA( query_t q = INORDER, progress_t prog = NULL );
         WFA( const WFA & rhs );
         WFA & operator=( const WFA & rhs );
 
@@ -565,8 +568,91 @@ namespace wali
         std::set< Key > Q;       //! < set of all states
         query_t query;           //! < determine the extend order for path_summary
         size_t generation;       //! < Each WPDS query increments the generation count.
+        progress_t progress;     //! < Provides indication of progress to client.
 
       private:
+
+
+      public:
+
+        typedef std::map<Key, sem_elem_t> AccessibleStateMap;
+        typedef std::vector<Key> Word;
+
+        /// Return the set of states reachable from 'start', along with the
+        /// weights gathered by following those paths. Includes the start
+        /// state, with weight one.
+        ///
+        /// Assumes there are no epsilon loops accessible via epsilon
+        /// transitions from start.
+        AccessibleStateMap epsilonClose(Key start) const;
+
+        /// Starting from the states in 'start' (with the given weight),
+        /// simulate running the word 'word'. Return the list of accessible
+        /// states, and the weights with which they can be accessed.
+        ///
+        /// Assumes there are no epsilon loops along the path encountered by
+        /// 'word'.
+        AccessibleStateMap simulate(AccessibleStateMap const & start,
+                                    Word const & word) const;
+
+        /// Returns whether the given string is accepted with a non-zero
+        /// weight
+        bool isAcceptedWithNonzeroWeight(Word const & word) const;
+
+
+        /// Performs the subset construction and returns the resulting
+        /// WFA. (Does not mutate.) Completes the automaton when done.
+        WFA determinize() const;
+
+        /// Performs the subset construction and returns the resulting
+        /// WFA. (Does not mutate.) Is likely to return a WFA with a
+        /// non-total transition function.
+        WFA semideterminize() const;
+        
+        /// Returns whether this WFA is isomorphic to the given WFA; that is,
+        /// the two automata are equal up to a relabeling of the states. (Or,
+        /// expressed another way, the transition graphs are isomorphic with
+        /// the extra conditions that (1) start and final states must
+        /// correspond, (2) state weights must be the same, (3) edge labels
+        /// (symbols) must correspond, and (4) edge weights must be the
+        /// same.)
+        bool isIsomorphicTo(WFA const & other) const;
+
+        /// Same as isIsomorphicTo(WFA const & other) const, except that
+        /// conditions (2) and (4) (those pertaining to the weights on states
+        /// and transitions) are lifted if 'check_weights' is false.
+        bool isIsomorphicTo(WFA const & other, bool check_weights) const;
+
+        /// Adds transitions so that every state has an outgoing for every
+        /// symbol. The overloads allow specification of:
+        ///
+        /// - What you mean by "every symbol". By default, this is every
+        ///   symbol that appears in any transition in the WFA. If you
+        ///   specify your own set, no attempt is made to ensure that your
+        ///   set is a superset of the default, so there may be symbols for
+        ///   which there are transitions out of some states but not others.
+        ///
+        /// - What the destination state should be. By default, this is
+        ///   getKey({}), where {} is an empty std::set<Key>, whether or not
+        ///   that state is already in the WFA. (In other words, if the WFA
+        ///   already has a sink state, but it's different, then you have to
+        ///   find and specify that yourself.) If that state is already there
+        ///   but is not a sink state, then the code asserts.
+        void complete(std::set<Key> const & symbols, Key sink_state);
+        void complete(std::set<Key> const & symbols);
+        void complete(Key sink_state);
+        void complete();
+        
+
+        static
+        bool
+        is_isomorphism(WFA const & left, std::vector<Key> const & left_states,
+                       WFA const & right, std::vector<Key> const & right_states,
+                       bool check_weights);
+
+        static
+        std::map<Key, std::set<Key> >
+        next_states(WFA const & wfa, std::set<Key> const & froms);
 
     };
 

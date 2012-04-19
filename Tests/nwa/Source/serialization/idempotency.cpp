@@ -12,19 +12,6 @@ using namespace opennwa;
 
 #define NUM_ELEMENTS(array)  (sizeof(array)/sizeof((array)[0]))
 
-static Nwa const nwas[] = {
-    Nwa(),
-    AcceptsBalancedOnly().nwa,
-    AcceptsStrictlyUnbalancedLeft().nwa,
-    AcceptsPossiblyUnbalancedLeft().nwa,
-    AcceptsStrictlyUnbalancedRight().nwa,
-    AcceptsPossiblyUnbalancedRight().nwa,
-    AcceptsPositionallyConsistentString().nwa
-};
-
-static const unsigned num_nwas = NUM_ELEMENTS(nwas);
-
-
 namespace opennwa {
 
         void
@@ -44,6 +31,19 @@ namespace opennwa {
 
         TEST(opennwa$$print$and$read_nwa$, printAndread_nwaAreIdempotent)
         {
+            Nwa const nwas[] = {
+                Nwa(),
+                AcceptsBalancedOnly().nwa,
+                AcceptsStrictlyUnbalancedLeft().nwa,
+                AcceptsPossiblyUnbalancedLeft().nwa,
+                AcceptsStrictlyUnbalancedRight().nwa,
+                AcceptsPossiblyUnbalancedRight().nwa,
+                AcceptsPositionallyConsistentString().nwa
+            };
+
+            const unsigned num_nwas = NUM_ELEMENTS(nwas);
+
+            
             for (unsigned nwa = 0; nwa < num_nwas; ++nwa) {
                 std::stringstream ss;
                 ss << "Testing NWA " << nwa;

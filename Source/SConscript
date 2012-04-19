@@ -25,7 +25,6 @@ nice_files = Split("""
 ./wali/ShortestPathWorklist.cpp
 ./wali/SemElem.cpp
 ./wali/SemElemTensor.cpp
-./wali/PriorityWorklist.cpp
 ./wali/Exception.cpp
 ./wali/Printable.cpp
 ./wali/Key.cpp
@@ -73,7 +72,6 @@ nice_files = Split("""
 ./wali/witness/WitnessCombine.cpp
 ./wali/witness/WitnessMerge.cpp
 ./wali/graph/RegExp.cpp
-./wali/graph/Graph.cpp
 ./wali/graph/LinkEval.cpp
 ./wali/regex/Concat.cpp
 ./wali/regex/Regex.cpp
@@ -96,13 +94,13 @@ nice_files = Split("""
 ./opennwa/query/internals.cpp
 ./opennwa/query/language.cpp
 ./opennwa/query/getSomeAcceptedWord.cpp
-./opennwa/construct/complement.cpp
-./opennwa/construct/concat.cpp
-./opennwa/construct/reverse.cpp
-./opennwa/construct/union.cpp
-./opennwa/construct/determinize.cpp
-./opennwa/construct/intersect.cpp
-./opennwa/construct/star.cpp
+./opennwa/construct/nwa_complement.cpp
+./opennwa/construct/nwa_concat.cpp
+./opennwa/construct/nwa_reverse.cpp
+./opennwa/construct/nwa_union.cpp
+./opennwa/construct/nwa_determinize.cpp
+./opennwa/construct/nwa_intersect.cpp
+./opennwa/construct/nwa_star.cpp
 ./opennwa/nwa_pds/NwaToPds.cpp
 ./opennwa/nwa_pds/WpdsToNwa.cpp
 ./opennwa/nwa_pds/plusWpds.cpp
@@ -113,6 +111,7 @@ nice_files = Split("""
 
 
 naughty_files = Split("""
+    ./wali/graph/Graph.cpp
     ./wali/graph/IntraGraph.cpp
     ./wali/graph/InterGraph.cpp
     ./wali/graph/SummaryGraph.cpp
