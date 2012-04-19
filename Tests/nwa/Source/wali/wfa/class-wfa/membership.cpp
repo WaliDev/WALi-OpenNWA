@@ -194,5 +194,86 @@ namespace wali {
             check_shortest_distance_eq(3u, end_from_zero[accept]);
         }
 
+        TEST(wali$wfa$$epsilonClose, DISABLED_weightOnDiamond)
+        {
+            // The goal of this test is to make sure that:
+            //
+            //   1. The weight on C is set to 2, not 11, despite 11
+            //      (hopefully) being encountered first
+            //
+            //   2. The weight on E is set to 3, not 12, despite E(12)
+            //      (hopefully) being encountered before even C(2). This
+            //      makes sure that C was reinserted onto the worklist when
+            //      we saw that the weight changed.
+            //
+            //  All transitions are epsilon; given are weights
+            //         1       10         1
+            // -->A-------->B-------->C------->E
+            //    |                   /\                [anti-multi-line comment]
+            //    |                   |
+            //    \-------->D---------/
+            //        1        1
+            sem_elem_t distance_zero = new ShortestPathSemiring(0);
+            sem_elem_t distance_one = new ShortestPathSemiring(1);
+            sem_elem_t distance_two = new ShortestPathSemiring(2);
+            sem_elem_t distance_three = new ShortestPathSemiring(3);
+            sem_elem_t distance_ten = new ShortestPathSemiring(10);
+
+            // Create the automaton
+            Key A = getKey("A");
+            Key B = getKey("B");
+            Key C = getKey("C");
+            Key D = getKey("D");
+            Key E = getKey("E");
+
+            if (C < B) {
+                // Makes "sure" that we pull B off the worklist before C
+                std::swap(C, B);
+            }
+            if (D < C) {
+                std::swap(D, C);
+            }
+
+            
+            WFA wfa;
+
+            wfa.addState(A, distance_zero);
+            wfa.addState(B, distance_zero);
+            wfa.addState(C, distance_zero);
+            wfa.addState(D, distance_zero);
+            wfa.addState(E, distance_zero);
+
+            wfa.setInitialState(A);
+            wfa.addFinalState(E);
+
+            wfa.addTrans(A, WALI_EPSILON, B, distance_one);
+            wfa.addTrans(A, WALI_EPSILON, D, distance_one);            
+            wfa.addTrans(B, WALI_EPSILON, C, distance_ten);
+            wfa.addTrans(D, WALI_EPSILON, C, distance_one);
+            wfa.addTrans(C, WALI_EPSILON, E, distance_one);
+
+            // Create the queries
+            WFA::AccessibleStateMap start_zero;
+            start_zero[A] = distance_zero;
+
+            // Issue queries
+            WFA::AccessibleStateMap end_from_zero = wfa.epsilonClose(A);
+
+            // Check the answers
+            EXPECT_EQ(5u, end_from_zero.size());
+            ASSERT_TRUE(end_from_zero.find(A) != end_from_zero.end());
+            ASSERT_TRUE(end_from_zero.find(B) != end_from_zero.end());
+            ASSERT_TRUE(end_from_zero.find(C) != end_from_zero.end());
+            ASSERT_TRUE(end_from_zero.find(D) != end_from_zero.end());
+            ASSERT_TRUE(end_from_zero.find(E) != end_from_zero.end());
+
+            check_shortest_distance_eq(0u, end_from_zero[A]);
+            check_shortest_distance_eq(1u, end_from_zero[B]);
+            check_shortest_distance_eq(2u, end_from_zero[C]);
+            check_shortest_distance_eq(1u, end_from_zero[D]);
+            check_shortest_distance_eq(3u, end_from_zero[E]);
+        }
+
+
     }
 }
