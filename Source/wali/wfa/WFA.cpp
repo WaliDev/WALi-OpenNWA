@@ -1719,13 +1719,22 @@ namespace wali
         {
           Key symbol = next->first;
           Key target_key = getKey(next->second);
+
+          if (next->second.size() > 0) {
+            // Only add a transition if it doesn't go to {}. Why? This is
+            // borne out of the difference between determinize and
+            // semideterminize. Determinize "can't" produce a total
+            // automaton. However, without this check, it still inserts the
+            // initial transitions to {}. From the point of view of producing
+            // an incomplete automaton, these transitions are dumb. So we get
+            // rid of them.
+            result.addTrans(sources_key, symbol, target_key, one);
           
-          result.addTrans(sources_key, symbol, target_key, one);
-          
-          std::pair<KeySet::iterator, bool> p = visited.insert(target_key);
-          if (p.second) {
-            // It wasn't already there
-            worklist.push(next->second);
+            std::pair<KeySet::iterator, bool> p = visited.insert(target_key);
+            if (p.second) {
+              // It wasn't already there
+              worklist.push(next->second);
+            }
           }
         }
       }
