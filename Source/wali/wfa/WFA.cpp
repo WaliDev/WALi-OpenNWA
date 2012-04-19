@@ -1899,8 +1899,32 @@ namespace wali
 
     void WFA::complete(std::set<Key> const & symbols, Key sink_state)
     {
-      (void) symbols;
-      (void) sink_state;
+      sem_elem_t one = getSomeWeight()->one();
+
+      // Maps source state to set of outgoing letters. (We don't care where
+      // they go, just whether there is any.)
+      std::map<Key, KeySet> outgoing;
+      
+      for (kp_map_t::const_iterator kpmap_iter = kpmap.begin();
+           kpmap_iter != kpmap.end(); ++kpmap_iter)
+      {
+        if (kpmap_iter->second.size() > 0) {
+          outgoing[kpmap_iter->first.first].insert(kpmap_iter->first.second);
+        }
+      }
+
+      KeySet const & states = getStates();
+      for (KeySet::const_iterator state = states.begin();
+           state != states.end(); ++state)
+      {
+        for (KeySet::const_iterator symbol = symbols.begin();
+             symbol != symbols.end(); ++symbol)
+        {
+          if (outgoing[*state].find(*symbol) == outgoing[*state].end()) {
+            addTrans(*state, *symbol, sink_state, one);
+          }
+        }
+      }
     }
 
     void WFA::complete(std::set<Key> const & symbols)
