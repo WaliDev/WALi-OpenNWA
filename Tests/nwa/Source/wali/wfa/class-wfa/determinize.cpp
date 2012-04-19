@@ -233,5 +233,21 @@ namespace wali {
             }
         }
         
+        TEST(wali$wfa$$determinize, battery)
+        {
+            for (size_t i=0; i<num_fas_to_determinize; ++i) {
+                std::stringstream ss;
+                ss << "Testing FA " << i;
+                SCOPED_TRACE(ss.str());
+                
+                WFA input    = fas_to_determinize_and_answers[i][0];
+                WFA expected = fas_to_determinize_and_answers[i][2];
+
+                WFA det = input.determinize();
+
+                EXPECT_TRUE(expected.isIsomorphicTo(det));
+            }
+        }
+        
     }
 }
