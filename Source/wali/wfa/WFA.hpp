@@ -17,6 +17,7 @@
 #include "wali/wfa/WeightMaker.hpp"
 #include "wali/wfa/Trans.hpp"
 #include "wali/wfa/TransSet.hpp"
+#include "wali/wfa/DeterminizeWeightGen.hpp"
 
 // std::c++
 #include <iostream>
@@ -55,6 +56,7 @@ namespace wali
     class State;
     class TransFunctor;
     class ConstTransFunctor;
+    class DeterminizeWeightGen;
 
     /** @class WFA
      *
@@ -603,11 +605,13 @@ namespace wali
         /// Performs the subset construction and returns the resulting
         /// WFA. (Does not mutate.) Completes the automaton when done.
         WFA determinize() const;
+        WFA determinize(DeterminizeWeightGen const & weight_gen) const;
 
         /// Performs the subset construction and returns the resulting
         /// WFA. (Does not mutate.) Is likely to return a WFA with a
         /// non-total transition function.
         WFA semideterminize() const;
+        WFA semideterminize(DeterminizeWeightGen const & weight_gen) const;
         
         /// Returns whether this WFA is isomorphic to the given WFA; that is,
         /// the two automata are equal up to a relabeling of the states. (Or,

@@ -11,6 +11,7 @@
 #include "wali/wfa/WeightMaker.hpp"
 #include "wali/regex/AllRegex.hpp"
 #include "wali/wpds/GenKeySource.hpp"
+#include "wali/wfa/DeterminizeWeightGen.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -1669,8 +1670,9 @@ namespace wali
 
 
     WFA
-    WFA::semideterminize() const
+    WFA::semideterminize(DeterminizeWeightGen const & wg) const
     {
+      (void) wg;
       std::stack<KeySet> worklist;
       std::set<Key> visited;
 
@@ -1733,13 +1735,27 @@ namespace wali
     }
 
     WFA
-    WFA::determinize() const
+    WFA::semideterminize() const
     {
-      WFA det = semideterminize();
+      AlwaysReturnOneWeightGen wg(getSomeWeight());
+      return semideterminize(wg);
+    }
+    
+    WFA
+    WFA::determinize(DeterminizeWeightGen const & wg) const
+    {
+      WFA det = semideterminize(wg);
       det.complete();
       return det;
     }
-      
+
+    WFA
+    WFA::determinize() const
+    {
+      AlwaysReturnOneWeightGen wg(getSomeWeight());
+      return determinize(wg);
+    }
+    
     static
     size_t
     fact(size_t n) {
