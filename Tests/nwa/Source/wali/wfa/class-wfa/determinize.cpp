@@ -35,6 +35,17 @@ static const WFA fas_already_deterministic[] = {
 static const unsigned num_fas_already_deterministic = NUM_ELEMENTS(fas_already_deterministic);
 
 
+static const WFA fas_to_determinize_and_answers[4][3] = {
+    // Original                                            Semi-det,                            det
+    { EpsilonTransitionToAccepting().wfa,                  EpsilonSemiDeterministic().wfa,      EpsilonDeterministic().wfa },
+    { EpsilonTransitionToMiddleToAccepting().wfa,          ASemiDeterministic().wfa,            ADeterministic().wfa },
+    { EpsilonTransitionToMiddleToEpsilonToAccepting().wfa, ASemiDeterministic().wfa,            ADeterministic().wfa },
+    { AcceptAbOrAcNondet().wfa,                            AcceptAbOrAcSemiDeterministic().wfa, AcceptAbOrAcDeterministic().wfa }
+};
+
+static const unsigned num_fas_to_determinize = NUM_ELEMENTS(fas_to_determinize_and_answers);
+
+
 namespace wali {
     namespace wfa {
 
@@ -204,5 +215,23 @@ namespace wali {
 
             EXPECT_TRUE(expected.wfa.isIsomorphicTo(orig.wfa));
         }
+
+
+        TEST(wali$wfa$$semideterminize, battery)
+        {
+            for (size_t i=0; i<num_fas_to_determinize; ++i) {
+                std::stringstream ss;
+                ss << "Testing FA " << i;
+                SCOPED_TRACE(ss.str());
+                
+                WFA input    = fas_to_determinize_and_answers[i][0];
+                WFA expected = fas_to_determinize_and_answers[i][1];
+
+                WFA det = input.semideterminize();
+
+                EXPECT_TRUE(expected.isIsomorphicTo(det));
+            }
+        }
+        
     }
 }
