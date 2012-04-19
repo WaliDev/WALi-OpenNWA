@@ -53,8 +53,8 @@ sem_elem_t Reach::combine( SemElem* se )
 
 bool Reach::equal( SemElem* se ) const
 {
-  Reach* rhs = static_cast< Reach* >(se);
-  return ( isreached == rhs->isreached );
+  Reach* rhs = dynamic_cast< Reach* >(se);
+  return ( rhs && isreached == rhs->isreached );
 }
 
 std::ostream & Reach::print( std::ostream & o ) const
