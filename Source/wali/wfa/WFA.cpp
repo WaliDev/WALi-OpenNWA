@@ -1492,18 +1492,18 @@ namespace wali
     WFA::epsilonClose(Key start) const
     {
       AccessibleStateMap result;
-      std::stack<std::pair<Key, sem_elem_t> > worklist;
+      std::set<Key> worklist;
       std::set<Key> visited;
 
       result.insert(std::make_pair(start, getSomeWeight()->one()));
       
-      worklist.push(std::make_pair(start, getSomeWeight()->one()));
+      worklist.insert(start);
       visited.insert(start);
 
       while (!worklist.empty()) {
-        Key source = worklist.top().first;
-        sem_elem_t weight = worklist.top().second;
-        worklist.pop();
+        Key source = *worklist.begin();
+        sem_elem_t weight = result[source];
+        worklist.erase(worklist.begin());
 
         if (kpmap.find(KeyPair(source, WALI_EPSILON)) != kpmap.end()) {
           TransSet const & eps_dests = kpmap.find(KeyPair(source, WALI_EPSILON))->second;
@@ -1517,10 +1517,10 @@ namespace wali
             // Add the destination state to the worklist (maybe)
             if (visited.find(dest) == visited.end()) {
               visited.insert(dest);
-              worklist.push(std::make_pair(dest, dest_weight));
+              worklist.insert(dest);
             }
             else {
-              // FIXME: update entry in worklist. (Needed?)
+              // FIXME: add to worklist again?
             }
           }
         }
