@@ -152,7 +152,7 @@ namespace wali {
         }
 
 
-        TEST(wali$wfa$$epsilonClose, DISABLED_weightFromTwoEpsilonTransInSequence)
+        TEST(wali$wfa$$epsilonClose, weightFromTwoEpsilonTransInSequence)
         {
             //     eps(d1)   eps(d2)
             // -->o-------->o------->(o)
