@@ -1465,14 +1465,22 @@ namespace wali
     /// destination of the transition 'trans' with the weight of 'trans'. If
     /// that state was already known to be reachable, joins the new weight
     /// with the old one.
-    void add_trans_to_accessible_states(WFA::AccessibleStateMap & accessible,
+    bool add_trans_to_accessible_states(WFA::AccessibleStateMap & accessible,
                                         Key dest, sem_elem_t weight)
     {
       if (accessible.find(dest) != accessible.end()) {
-        weight = weight->combine(accessible[dest]);
+        sem_elem_t old = accessible[dest];
+        weight = weight->combine(old);
+
+        if (weight->equal(old.get_ptr())) {
+          // No change
+          return false;
+        }
       }
 
+      // Either this is a new accessible state or the weight changed
       accessible[dest] = weight;
+      return true;
     }
 
     /// Like dest += src. For any key in src not in dest, add it with the
@@ -1512,15 +1520,14 @@ namespace wali
           {
             sem_elem_t dest_weight = weight->extend((*trans_it)->weight());
             Key dest = (*trans_it)->to();
-            add_trans_to_accessible_states(result, dest, dest_weight);
+            bool change = add_trans_to_accessible_states(result, dest, dest_weight);
 
-            // Add the destination state to the worklist (maybe)
-            if (visited.find(dest) == visited.end()) {
+            // Add the destination state to the worklist (maybe). We need to
+            // do this if it wasn't there before or if the weight has changed.
+            if (visited.find(dest) == visited.end() || change)
+            {
               visited.insert(dest);
               worklist.insert(dest);
-            }
-            else {
-              // FIXME: add to worklist again?
             }
           }
         }

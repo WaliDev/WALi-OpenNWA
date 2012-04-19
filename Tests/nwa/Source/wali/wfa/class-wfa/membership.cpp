@@ -194,7 +194,7 @@ namespace wali {
             check_shortest_distance_eq(3u, end_from_zero[accept]);
         }
 
-        TEST(wali$wfa$$epsilonClose, DISABLED_weightOnDiamond)
+        TEST(wali$wfa$$epsilonClose, weightOnDiamond)
         {
             // The goal of this test is to make sure that:
             //
