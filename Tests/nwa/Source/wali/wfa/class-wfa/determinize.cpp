@@ -13,7 +13,7 @@ static const WFA fas[] = {
     LoopAccept().wfa,
     EvenAsEvenBs().wfa,
     EpsilonTransitionToAccepting().wfa,
-    EpsilonDeterministic().wfa,
+    EpsilonFull().wfa,
     EpsilonTransitionToMiddleToAccepting().wfa,
     ADeterministic().wfa,
     EpsilonTransitionToMiddleToEpsilonToAccepting().wfa,
@@ -27,7 +27,7 @@ static const WFA fas_already_deterministic[] = {
     LoopReject().wfa,
     LoopAccept().wfa,
     EvenAsEvenBs().wfa,
-    EpsilonDeterministic().wfa,
+    EpsilonFull().wfa,
     ADeterministic().wfa,
     AcceptAbOrAcDeterministic().wfa
 };
@@ -37,7 +37,7 @@ static const unsigned num_fas_already_deterministic = NUM_ELEMENTS(fas_already_d
 
 static const WFA fas_to_determinize_and_answers[4][3] = {
     // Original                                            Semi-det,                            det
-    { EpsilonTransitionToAccepting().wfa,                  EpsilonSemiDeterministic().wfa,      EpsilonDeterministic().wfa },
+    { EpsilonTransitionToAccepting().wfa,                  EpsilonSemiDeterministic().wfa,      EpsilonSemiDeterministic().wfa },
     { EpsilonTransitionToMiddleToAccepting().wfa,          ASemiDeterministic().wfa,            ADeterministic().wfa },
     { EpsilonTransitionToMiddleToEpsilonToAccepting().wfa, ASemiDeterministic().wfa,            ADeterministic().wfa },
     { AcceptAbOrAcNondet().wfa,                            AcceptAbOrAcSemiDeterministic().wfa, AcceptAbOrAcDeterministic().wfa }
@@ -184,7 +184,7 @@ namespace wali {
 
         TEST(wali$wfa$$determinize, DISABLED_EpsilonTransitionToAccepting) {
             EpsilonTransitionToAccepting f;
-            EpsilonDeterministic expected;
+            EpsilonFull expected;
             WFA wfa = f.wfa.determinize();
 
             EXPECT_TRUE(wfa.isIsomorphicTo(expected.wfa));
@@ -203,7 +203,7 @@ namespace wali {
         TEST(wali$wfa$$complete, DISABLED_epsilonSemi)
         {
             EpsilonSemiDeterministic orig;
-            EpsilonDeterministic expected;
+            EpsilonFull expected;
 
             Letters l;
             std::set<Key> symbols;

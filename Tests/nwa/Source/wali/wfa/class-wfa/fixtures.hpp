@@ -153,7 +153,7 @@ namespace wali {
             }
         };
 
-        struct EpsilonDeterministic
+        struct EpsilonFull
         {
             //
             //         a,b,c
@@ -163,7 +163,7 @@ namespace wali {
             //                 \---/
             WFA wfa;
 
-            EpsilonDeterministic() {
+            EpsilonFull() {
                 sem_elem_t one = Reach(true).one();
                 sem_elem_t zero = Reach(true).zero();
 
@@ -262,6 +262,40 @@ namespace wali {
         struct ADeterministic
         {
             //
+            //        a        a
+            // --> o ----> (o) ----> o --\              [anti-line-continuation]
+            //                       ^   | a
+            //                       |   |
+            //                       \---/
+            WFA wfa;
+
+            ADeterministic() {
+                sem_elem_t one = Reach(true).one();
+                sem_elem_t zero = Reach(true).zero();
+
+                Letters l;
+
+                Key start = getKey("start");
+                Key accept = getKey("accept");
+                Key reject = getKey("reject");
+
+                wfa.addState(start, zero);
+                wfa.addState(accept, zero);
+                wfa.addState(reject, zero);
+
+                wfa.setInitialState(start);
+                wfa.addFinalState(accept);
+
+                wfa.addTrans(start,  l.a, accept, one);
+                wfa.addTrans(accept, l.a, reject, one);
+                wfa.addTrans(reject, l.a, reject, one);
+            }
+        };
+
+
+        struct AFull
+        {
+            //
             //        a        a,b,c
             // --> o ----> (o) ----> o --\              [anti-line-continuation]
             //     |                 ^   | a, b, c
@@ -269,7 +303,7 @@ namespace wali {
             //     \----------------/\---/
             WFA wfa;
 
-            ADeterministic() {
+            AFull() {
                 sem_elem_t one = Reach(true).one();
                 sem_elem_t zero = Reach(true).zero();
 

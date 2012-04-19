@@ -13,7 +13,7 @@ static const WFA fas[] = {
     LoopAccept().wfa,
     EvenAsEvenBs().wfa,
     EpsilonTransitionToAccepting().wfa,
-    EpsilonDeterministic().wfa,
+    EpsilonFull().wfa,
     EpsilonTransitionToMiddleToAccepting().wfa,
     ADeterministic().wfa,
     EpsilonTransitionToMiddleToEpsilonToAccepting().wfa,
