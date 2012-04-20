@@ -328,9 +328,9 @@ namespace wali
         Key p,
         Key g,
         Key q,
-        Trans & t )
+        Trans & t ) const
     {
-      ITrans *itrans = find(p,g,q);
+      ITrans const * itrans = find(p,g,q);
       if(itrans != 0) {
         t = *itrans;
         return true;
@@ -349,14 +349,24 @@ namespace wali
         Key g,
         Key q)
     {
+      WFA const * const_this = this;
+      ITrans const * trans = const_this->find(p,g,q);
+      return const_cast<ITrans*>(trans);
+    }
+
+    ITrans const * WFA::find( 
+        Key p,
+        Key g,
+        Key q) const
+    {
       KeyPair kp(p,g);
-      kp_map_t::iterator it = kpmap.find(kp);
+      kp_map_t::const_iterator it = kpmap.find(kp);
       if( it != kpmap.end() )
       {
-        TransSet& transSet = it->second;
-        TransSet::iterator tsit= transSet.find(p,g,q);
+        TransSet const & transSet = it->second;
+        TransSet::const_iterator tsit= transSet.find(p,g,q);
         if( tsit != transSet.end() ) {
-          ITrans* itrans = *tsit;
+          ITrans const * itrans = *tsit;
           return itrans;
         }
       }

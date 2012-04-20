@@ -277,7 +277,7 @@ namespace wali
             Key p,
             Key g,
             Key q,
-            Trans & t );
+            Trans & t ) const;
 
         /**
          * @brief invoke TransFunctor tf on each Trans
@@ -499,6 +499,11 @@ namespace wali
             Key g,
             Key q);
 
+        virtual ITrans const * find( 
+            Key p,
+            Key g,
+            Key q) const;
+        
         /**
          * Erases the specified Trans(from,stack,to) from the
          * kpmap and epsmap. A null return value means no transition existed.
