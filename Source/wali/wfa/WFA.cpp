@@ -1682,7 +1682,6 @@ namespace wali
     WFA
     WFA::semideterminize(DeterminizeWeightGen const & wg) const
     {
-      (void) wg;
       std::stack<KeySet> worklist;
       std::set<Key> visited;
 
@@ -1738,7 +1737,8 @@ namespace wali
             // initial transitions to {}. From the point of view of producing
             // an incomplete automaton, these transitions are dumb. So we get
             // rid of them.
-            result.addTrans(sources_key, symbol, target_key, one);
+            sem_elem_t weight = wg.getWeight(*this, result, sources, symbol, next->second);
+            result.addTrans(sources_key, symbol, target_key, weight);
           
             std::pair<KeySet::iterator, bool> p = visited.insert(target_key);
             if (p.second) {

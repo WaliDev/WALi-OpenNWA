@@ -319,11 +319,11 @@ namespace wali {
             : LiftCombineWeightGen
         {
             sem_elem_t liftWeight(WFA const & UNUSED_PARAMETER(original_wfa),
-                                  ITrans const * trans_in_original)
+                                  ITrans const * trans_in_original) const
             {
                 std::stringstream ss;
                 ss << key2str(trans_in_original->from())
-                   << " --" << trans_in_original->stack() << "--> "
+                   << " --" << key2str(trans_in_original->stack()) << "--> "
                    << key2str(trans_in_original->to());
                 return new StringWeight(ss.str());
             }
@@ -331,13 +331,11 @@ namespace wali {
 
 #define ASSERT_CONTAINS(container, value) ASSERT_FALSE(container.end() == container.find(value))
         
-        TEST(wali$wfa$$determinize, DISABLED_weightGen)
+        TEST(wali$wfa$$determinize, weightGen)
         {
             Letters l;
             AcceptAbOrAcNondet nondet;
             WFA det = nondet.wfa.semideterminize(TestLifter());
-
-            det.print(std::cout);
 
             std::set<Key> start_set, a_set, ab_set, ac_set;
             start_set.insert(nondet.start);
