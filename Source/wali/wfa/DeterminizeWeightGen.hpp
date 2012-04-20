@@ -22,6 +22,7 @@ namespace wali {
       virtual sem_elem_t getWeight(WFA const & original_wfa,
                                    WFA const & determinized_wfa_so_far,
                                    std::set<Key> const & source,
+                                   Key symbol,
                                    std::set<Key> const & target)
         = 0;
     };
@@ -40,13 +41,13 @@ namespace wali {
       virtual sem_elem_t getWeight(WFA const & UNUSED_PARAMETER(original_wfa),
                                    WFA const & UNUSED_PARAMETER(determinized_wfa_so_far),
                                    std::set<Key> const & UNUSED_PARAMETER(source),
+                                   Key UNUSED_PARAMETER(symbol),
                                    std::set<Key> const & UNUSED_PARAMETER(target))
       {
         return one;
       }
     };
 
-    
   }
 }
 
