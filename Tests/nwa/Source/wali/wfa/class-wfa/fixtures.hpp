@@ -373,15 +373,17 @@ namespace wali {
             //    o--------->(o)
             WFA wfa;
 
+            Key start, a_top, a_left, ab, ac;
+
             AcceptAbOrAcNondet() {
                 sem_elem_t one = Reach(true).one();
                 sem_elem_t zero = Reach(true).zero();
                 
-                Key start = getKey("start");
-                Key a_top = getKey("a (top)");
-                Key a_left = getKey("a (left)");
-                Key ab = getKey("ab");
-                Key ac = getKey("ac");
+                start = getKey("start");
+                a_top = getKey("a (top)");
+                a_left = getKey("a (left)");
+                ab = getKey("ab");
+                ac = getKey("ac");
 
                 Letters l;
 
