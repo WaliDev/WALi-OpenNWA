@@ -10,6 +10,7 @@ namespace wali {
   namespace wfa {
 
     class WFA;
+    class ITrans;
 
     struct DeterminizeWeightGen
     {
@@ -28,6 +29,30 @@ namespace wali {
     };
 
 
+    /// Provides a class that computes the weight for a determinizied
+    /// transition as follows. Given a transition from S to T (both sets of
+    /// states in the nondeterministic WFA), it looks at all edges (in the
+    /// nondeterministic machine) from any state in S to any state in T with
+    /// the appropriate symbol, collects up all those weights, calls
+    /// 'liftWeight' with each of them, and then 'combines' the result.
+    struct LiftCombineWeightGen
+      : DeterminizeWeightGen
+    {
+      /// Overload to return the lifted weight for a nondeterministic
+      /// transition.
+      virtual sem_elem_t liftWeight(WFA const & original_wfa,
+                                    ITrans const * trans_in_original)
+      = 0;
+
+
+      sem_elem_t getWeight(WFA const & original_wfa,
+                           WFA const & UNUSED_PARAMETER(determinized_wfa_so_far),
+                           std::set<Key> const & sources,
+                           Key symbol,
+                           std::set<Key> const & targets);
+    };
+
+    
     class AlwaysReturnOneWeightGen
       : public DeterminizeWeightGen
     {
