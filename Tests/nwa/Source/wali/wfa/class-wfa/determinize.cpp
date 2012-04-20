@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "wali/wfa/WFA.hpp"
 #include "wali/ShortestPathSemiring.hpp"
+#include "wali/wfa/DeterminizeWeightGen.hpp"
 
 #include "fixtures.hpp"
 
@@ -247,6 +248,140 @@ namespace wali {
 
                 EXPECT_TRUE(expected.isIsomorphicTo(det));
             }
+        }
+
+
+        /// NOTE: THIS IS NOT ACTUALLY A VALID SEMIRING
+        struct StringWeight : SemElem
+        {
+            std::string str;
+
+            StringWeight() {}
+            StringWeight(std::string const & s) : str(s) {}
+
+            sem_elem_t one() const {
+                static sem_elem_t r = new StringWeight();
+                return r;
+            }
+
+            sem_elem_t zero() const {
+                static sem_elem_t r;
+                if (r == NULL) {
+                    r = new StringWeight("ZERO");
+                }
+                return r;
+            }
+
+            sem_elem_t extend(SemElem * se) {
+                StringWeight * w = dynamic_cast<StringWeight*>(se);
+                if (w) {
+                    if (this == zero().get_ptr() || w == zero().get_ptr()) {
+                        return zero();
+                    }
+                    return new StringWeight(str + " " + w->str);
+                }
+                assert (false);
+                return NULL;
+            }
+
+            sem_elem_t combine(SemElem * se) {
+                StringWeight * w = dynamic_cast<StringWeight*>(se);
+                if (w) {
+                    if (this == zero().get_ptr()) {
+                        return w;
+                    }
+                    else if (w == zero().get_ptr()) {
+                        return this;
+                    }
+                    return new StringWeight(str + " | " + w->str);
+                }
+                assert (false);
+                return NULL;
+            }
+
+            bool equal(SemElem * se) const {
+                StringWeight * w = dynamic_cast<StringWeight*>(se);
+                if (w) {
+                    return w->str == str;
+                }
+                return false;
+            }
+
+            std::ostream& print( std::ostream & o ) const {
+                o << ("[" + str + "]");
+                return o;
+            }
+
+        };
+
+
+        struct TestLifter
+            : LiftCombineWeightGen
+        {
+            sem_elem_t liftWeight(WFA const & UNUSED_PARAMETER(original_wfa),
+                                  ITrans const * trans_in_original)
+            {
+                std::stringstream ss;
+                ss << key2str(trans_in_original->from())
+                   << " --" << trans_in_original->stack() << "--> "
+                   << key2str(trans_in_original->to());
+                return new StringWeight(ss.str());
+            }
+        };
+
+#define ASSERT_CONTAINS(container, value) ASSERT_FALSE(container.end() == container.find(value))
+        
+        TEST(wali$wfa$$determinize, DISABLED_weightGen)
+        {
+            Letters l;
+            AcceptAbOrAcNondet nondet;
+            WFA det = nondet.wfa.semideterminize(TestLifter());
+
+            det.print(std::cout);
+
+            std::set<Key> start_set, a_set, ab_set, ac_set;
+            start_set.insert(nondet.start);
+            a_set.insert(nondet.a_left);
+            a_set.insert(nondet.a_top);
+            ab_set.insert(nondet.ab);
+            ac_set.insert(nondet.ac);
+
+            Key start = getKey(start_set);
+            Key a = getKey(a_set);
+            Key ab = getKey(ab_set);
+            Key ac = getKey(ac_set);
+
+            // Just some sanity checks
+            ASSERT_EQ(4u, det.getStates().size());
+            ASSERT_CONTAINS(det.getStates(), start);
+            ASSERT_CONTAINS(det.getStates(), a);
+            ASSERT_CONTAINS(det.getStates(), ab);
+            ASSERT_CONTAINS(det.getStates(), ac);
+
+            // Now extract the transitions
+            Trans trans_start_a, trans_a_ab, trans_a_ac;
+            ASSERT_TRUE(det.find(start, l.a, a, trans_start_a));
+            ASSERT_TRUE(det.find(a, l.b, ab, trans_a_ab));
+            ASSERT_TRUE(det.find(a, l.c, ac, trans_a_ac));
+
+            // Now extract the weights
+            sem_elem_t se_start_a = trans_start_a.weight();
+            sem_elem_t se_a_ab = trans_a_ab.weight();
+            sem_elem_t se_a_ac = trans_a_ac.weight();
+
+            StringWeight * weight_start_a = dynamic_cast<StringWeight*>(se_start_a.get_ptr());
+            StringWeight * weight_a_ab = dynamic_cast<StringWeight*>(se_a_ab.get_ptr());
+            StringWeight * weight_a_ac = dynamic_cast<StringWeight*>(se_a_ac.get_ptr());
+
+            ASSERT_TRUE(weight_start_a != NULL);
+            ASSERT_TRUE(weight_a_ab != NULL);
+            ASSERT_TRUE(weight_a_ac != NULL);
+
+            // Finally, check that they are what we expect. Note: the first
+            // test is fragile as the order could change.
+            EXPECT_EQ("start --a--> a (top) | start --a--> a (left)", weight_start_a->str);
+            EXPECT_EQ("a (top) --b--> ab", weight_a_ab->str);
+            EXPECT_EQ("a (left) --c--> ac", weight_a_ac->str);
         }
         
     }
