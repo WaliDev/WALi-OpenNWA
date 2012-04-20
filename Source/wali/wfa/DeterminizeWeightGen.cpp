@@ -11,14 +11,14 @@ namespace wali
                                     WFA const & UNUSED_PARAMETER(determinized_wfa_so_far),
                                     std::set<Key> const & sources,
                                     Key symbol,
-                                    std::set<Key> const & targets)
+                                    std::set<Key> const & targets) const
     {
       sem_elem_t total_weight = NULL;
       
       for (std::set<Key>::const_iterator source = sources.begin();
            source != sources.end(); ++source)
       {
-        for (std::set<Key>::const_iterator target = targets.end();
+        for (std::set<Key>::const_iterator target = targets.begin();
              target != targets.end(); ++target)
         {
           Trans trans;

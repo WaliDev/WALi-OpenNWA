@@ -24,7 +24,7 @@ namespace wali {
                                    WFA const & determinized_wfa_so_far,
                                    std::set<Key> const & source,
                                    Key symbol,
-                                   std::set<Key> const & target)
+                                   std::set<Key> const & target) const
         = 0;
     };
 
@@ -41,7 +41,7 @@ namespace wali {
       /// Overload to return the lifted weight for a nondeterministic
       /// transition.
       virtual sem_elem_t liftWeight(WFA const & original_wfa,
-                                    ITrans const * trans_in_original)
+                                    ITrans const * trans_in_original) const
       = 0;
 
 
@@ -49,7 +49,7 @@ namespace wali {
                            WFA const & UNUSED_PARAMETER(determinized_wfa_so_far),
                            std::set<Key> const & sources,
                            Key symbol,
-                           std::set<Key> const & targets);
+                           std::set<Key> const & targets) const;
     };
 
     
@@ -67,7 +67,7 @@ namespace wali {
                                    WFA const & UNUSED_PARAMETER(determinized_wfa_so_far),
                                    std::set<Key> const & UNUSED_PARAMETER(source),
                                    Key UNUSED_PARAMETER(symbol),
-                                   std::set<Key> const & UNUSED_PARAMETER(target))
+                                   std::set<Key> const & UNUSED_PARAMETER(target)) const
       {
         return one;
       }
