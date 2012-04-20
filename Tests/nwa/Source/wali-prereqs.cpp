@@ -21,6 +21,8 @@ namespace wali {
 
     TEST(wali$getKey, returnsSequentialAcrossTypes)
     {
+        clearKeyspace();
+
         KeyFixture keys;
 
         EXPECT_EQ(keys.char_star_key, keys.string_key + 1);
