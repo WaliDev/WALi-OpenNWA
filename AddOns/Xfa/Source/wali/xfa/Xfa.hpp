@@ -96,7 +96,28 @@ namespace cfglib {
                 }
                 return result;
             }
-            
+
+            std::set<wali::Key> const & getStateKeys() const {
+                return wfa_.getStates();
+            }
+
+            void addState(State state, BinaryRelation relation) {
+                wfa_.addState(state.key, relation);
+            }
+
+            wali::wfa::State const * getState(wali::Key name) const {
+                return wfa_.getState(name);
+            }
+
+            void for_each( wali::wfa::ConstTransFunctor& tf ) const {
+                wfa_.for_each(tf);
+            }
+
+            void for_each( wali::wfa::TransFunctor& tf ) {
+                wfa_.for_each(tf);
+            }
+
+                        
         };
         
     }
