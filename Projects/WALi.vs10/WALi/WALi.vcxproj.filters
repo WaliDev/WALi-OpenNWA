@@ -378,6 +378,9 @@
     <ClCompile Include="..\..\..\Source\opennwa\construct\nwa_reverse.cpp">
       <Filter>Source Files\wali.nwa\construct</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\SemElemTensor.cpp">
+      <Filter>Source Files\wali</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\FWPDS.hpp">
@@ -741,6 +744,9 @@
       <Filter>Header Files\wali.nwa\query\details</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\wali\Progress.hpp">
+      <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\SemElemTensor.hpp">
       <Filter>Header Files\wali</Filter>
     </ClInclude>
   </ItemGroup>

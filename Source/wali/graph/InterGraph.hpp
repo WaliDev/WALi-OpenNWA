@@ -141,6 +141,10 @@ namespace wali {
             private:
                 friend class SummaryGraph;
 
+				typedef std::vector< int > Int1D;
+				typedef std::vector< Int1D > Int2D;
+				typedef std::vector< bool > Bool1D;
+				
                 typedef std::map<Transition, int, TransitionCmp> TransMap;
                 typedef bool (*WT_CHECK)(SemElem *);
                 typedef SemElem *(*WT_CORRECT)(SemElem *);
@@ -222,23 +226,23 @@ namespace wali {
 
                 int inter_edgeno(Transition &src1, Transition &src2, Transition &tgt);
 
-                void rawDfs(
-                    const int u, //current node.
+				void InterGraph::rawDfs(
+					const int u, //current node.
+                
+					const Int1D deg, //[i]: degree of node i
+					const Int2D adjMat, //The adjacency matrix
+                
+					Int1D dfsn, //[i]: the dfs number of vertex i
+					int& dfsnext, //next free dfs number
+					Int1D comp, //O(1) membership stack containing the 
+								//vertices of current component
+					int& ncomp, //number of outstanding vertices in the components
+					Bool1D incomp, //[i] a marker that says, I've seen i, but haven't 
+								  //finished putting it in a component
 
-                    const int deg[], //[i]: degree of node i
-                    std::vector< std::vector <int> > adjMat, //The adjacency matrix
-
-                    int dfsn[], //[i]: the dfs number of vertex i
-                    int& dfsnext, //next free dfs number
-                    int comp[], //O(1) membership stack containing the 
-                    //vertices of current component
-                    int& ncomp, //number of outstanding vertices in the components
-                    bool incomp[], //[i] a marker that says, I've seen i, but haven't 
-                    //finished putting it in a component
-
-                    int mindfsn[], //(in:out) [i]: minimum dfs number reachable from vertex i
-                    UnionFind& scc //(out) The output scc are stored here.
-                    );
+					Int1D mindfsn, //(in:out) [i]: minimum dfs number reachable from vertex i
+					UnionFind& scc //(out) The output scc are stored here.
+                );
 
                 void dfsIntraForward(IntraGraph *gr, 
                         std::list<IntraGraph *> &finished, 

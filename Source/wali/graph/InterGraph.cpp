@@ -513,18 +513,18 @@ namespace wali {
             void InterGraph::rawDfs(
                 const int u, //current node.
                 
-                const int deg[], //[i]: degree of node i
-                const std::vector< std::vector< int > > adjMat, //The adjacency matrix
+                const Int1D deg, //[i]: degree of node i
+                const Int2D adjMat, //The adjacency matrix
                 
-                int dfsn[], //[i]: the dfs number of vertex i
+                Int1D dfsn, //[i]: the dfs number of vertex i
                 int& dfsnext, //next free dfs number
-                int comp[], //O(1) membership stack containing the 
+                Int1D comp, //O(1) membership stack containing the 
                             //vertices of current component
                 int& ncomp, //number of outstanding vertices in the components
-                bool incomp[], //[i] a marker that says, I've seen i, but haven't 
+                Bool1D incomp, //[i] a marker that says, I've seen i, but haven't 
                               //finished putting it in a component
 
-                int mindfsn[], //(in:out) [i]: minimum dfs number reachable from vertex i
+                Int1D mindfsn, //(in:out) [i]: minimum dfs number reachable from vertex i
                 UnionFind& scc //(out) The output scc are stored here.
                 )
             { 
@@ -625,10 +625,10 @@ namespace wali {
               //numberd consecutively.
               //Time Complexity: O(#TgtNodes)
               int nTgt = inter_edges.size(); //total number of target nodes
-              int tgt2Node[nTgt]; //map from 1...nTgt to actual tgt node
-              int tgt2ExtSrc[nTgt]; //the external source for each target
-              int tgt2IntSrc[nTgt]; //the internal source for each target
-              int tgt2HypEdge[nTgt];
+              Int1D tgt2Node(nTgt); //map from 1...nTgt to actual tgt node
+              Int1D tgt2ExtSrc(nTgt); //the external source for each target
+              Int1D tgt2IntSrc(nTgt); //the internal source for each target
+              Int1D tgt2HypEdge(nTgt);
               int i;
               for(
                   i = 0,
@@ -662,8 +662,8 @@ namespace wali {
               //Compute a list of target nodes in each CFG
               //Time Complexity: O(#CFGs + #TgtNodes)
               //We tradeoff space for time -- use arrays everywhere.
-              int lTgtNodes[n][nTgt]; //lists of targets per cfg
-              int nTgtNodes[n]; //number of target nodes per cfg
+              Int2D lTgtNodes(n, Int1D(nTgt)); //lists of targets per cfg
+              Int1D nTgtNodes(n); //number of target nodes per cfg
               for(int i=0; i<n; ++i){
                 nTgtNodes[i]=0;
               }
@@ -701,13 +701,13 @@ namespace wali {
               // There is no clean way of passing this to a function if this is
               // na array, hence pionter
               // int dependents[nTgt][nTgt];
-              std::vector< std::vector< int > > dependents;
+              Int2D dependents;
               for(int i=0; i<nTgt; ++i){
-                std::vector< int > nv;
+                Int1D nv;
                 dependents.push_back(nv);
               }
                 
-              int nDependents[nTgt];
+              Int1D nDependents(nTgt);
               for(int i = 0; i< nTgt; ++i){
                 nDependents[i] = 0;
               }
@@ -744,12 +744,12 @@ namespace wali {
 
               //Now the actual SCC. The following are used by rawDfs
               UnionFind sccUf(nTgt); //output: sets will represent SCCs
-              int dfsn[nTgt]; 
+              Int1D dfsn(nTgt); 
               int dfsnext;
-              int mindfsn[nTgt];
-              int comp[nTgt];
+              Int1D mindfsn(nTgt);
+              Int1D comp(nTgt);
               int ncomp;
-              bool incomp[nTgt];
+              Bool1D incomp(nTgt);
 
               dfsnext = 0;
               ncomp = 0;
