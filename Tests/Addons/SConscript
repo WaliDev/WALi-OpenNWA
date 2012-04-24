@@ -1,0 +1,7 @@
+Import('Debug')
+if Debug:
+  print '\n+++ Entered "#/Tests/Addons"\n'
+
+built = []  
+built += SConscript('Domains/SConscript')
+Return('built')
