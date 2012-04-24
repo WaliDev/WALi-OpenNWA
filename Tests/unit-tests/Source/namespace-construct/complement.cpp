@@ -5,8 +5,8 @@
 #include "opennwa/construct/complement.hpp"
 #include "opennwa/construct/intersect.hpp"
 
-#include "Tests/nwa/Source/fixtures.hpp"
-#include "Tests/nwa/Source/class-NWA/supporting.hpp"
+#include "Tests/unit-tests/Source/fixtures.hpp"
+#include "Tests/unit-tests/Source/class-NWA/supporting.hpp"
 
 
 using namespace opennwa;

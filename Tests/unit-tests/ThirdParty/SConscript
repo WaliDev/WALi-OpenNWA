@@ -10,9 +10,9 @@ Import('BuildDir')
 Import('ProgEnv')
 
 if Debug:
-    print '\n+++ Entered "#/Test/nwa/ThirdParty/SConscript"\n'
+    print '\n+++ Entered "#/Test/unit-tests/ThirdParty/SConscript"\n'
 
-ThirdParty = os.path.join(WaliDir,'Tests', 'nwa', 'ThirdParty')
+ThirdParty = os.path.join(WaliDir,'Tests', 'unit-tests', 'ThirdParty')
 GtestDir = 'gtest-1.6.0'
 
 # download binary distribution archive

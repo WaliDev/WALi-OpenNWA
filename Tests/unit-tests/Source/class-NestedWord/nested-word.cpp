@@ -2,7 +2,7 @@
 
 #include "opennwa/NestedWord.hpp"
 
-#include "Tests/nwa/Source/fixtures.hpp"
+#include "Tests/unit-tests/Source/fixtures.hpp"
 
 
 namespace opennwa {

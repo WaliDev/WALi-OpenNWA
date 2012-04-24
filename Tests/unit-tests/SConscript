@@ -7,7 +7,7 @@ Import('ProgEnv')
 Import('Debug')
 
 if Debug:
-    print '\n+++ Entered "#/Tests/nwa/SConscript"\n'
+    print '\n+++ Entered "#/Tests/unit-tests/SConscript"\n'
 
 [(gtest_lib, gtest_include)] = SConscript('ThirdParty/SConscript')
 

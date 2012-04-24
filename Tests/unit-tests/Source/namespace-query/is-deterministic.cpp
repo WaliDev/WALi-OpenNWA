@@ -3,8 +3,8 @@
 #include "opennwa/Nwa.hpp"
 #include "opennwa/query/automaton.hpp"
 
-#include "Tests/nwa/Source/fixtures.hpp"
-#include "Tests/nwa/Source/class-NWA/supporting.hpp"
+#include "Tests/unit-tests/Source/fixtures.hpp"
+#include "Tests/unit-tests/Source/class-NWA/supporting.hpp"
 
 
 namespace opennwa {

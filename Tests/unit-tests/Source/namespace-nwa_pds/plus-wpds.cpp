@@ -3,9 +3,9 @@
 #include "gtest/gtest.h"
 
 #include "opennwa/Nwa.hpp"
-#include "opennwa/nwa_pds/conversions.hpp"
+#include "opennwa/nwa_pds/plusWpds.hpp"
 
-#include "Tests/nwa/Source/fixtures.hpp"
+#include "Tests/unit-tests/Source/fixtures.hpp"
 
 using namespace wali::wpds;
 
@@ -13,12 +13,12 @@ using namespace wali::wpds;
 namespace opennwa {
         namespace nwa_pds {
 
-            TEST(opennwa$nwa_pds$$WpdsToNwa, compilationTest)
+            TEST(opennwa$nwa_pds$$plusWpds, compilationTest)
             {
                 WPDS wpds;
-                NwaRefPtr nwa = WpdsToNwa(wpds);
+                Nwa nwa;
+                wpds = plusWpds(nwa, wpds);
             }
-
 
     }
 }
