@@ -5,7 +5,7 @@
 #include "opennwa/construct/star.hpp"
 
 #include "Tests/unit-tests/Source/fixtures.hpp"
-#include "Tests/unit-tests/Source/class-NWA/supporting.hpp"
+#include "Tests/unit-tests/Source/opennwa/class-NWA/supporting.hpp"
 
 
 using namespace opennwa;
