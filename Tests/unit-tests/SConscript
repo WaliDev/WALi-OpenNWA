@@ -61,6 +61,8 @@ just_compile = env.SConscript('Source/header-compilation/SConscript')
 
 built = env.Program('nwa-test', test_files + just_compile)
 
+built += env.SConscript('Source/AddOns/SConscript')
+
 Return('built')
 
 #  ## ###############################

@@ -3,7 +3,6 @@ from os.path import join
 Import('Debug')
 Import('ProgEnv')
 Import('LibInstallDir')
-Import('TestDir')
 Import('WaliDir')
 Import('ThirdPartyDir')
 
@@ -11,9 +10,14 @@ if Debug:
   print '\n+++ Entered "#/Tests/Addons/Domains/binrel"\n'
 env = ProgEnv.Clone()
 
-[(gtest_lib, gtest_inc)] = SConscript(join(TestDir,'ThirdParty','SConscript'))
+env.AppendUnique(CPPPATH=['#/AddOns/Domains/ThirdParty/include/',
+                          '#/AddOns/Domains/Source/'])
+
+env.AppendUnique(LIBPATH=['#/AddOns/Domains/ThirdParty/'])
+
+[(gtest_lib, gtest_inc)] = SConscript("#/Tests/unit-tests/ThirdParty/SConscript")
 ListOfBuilds = ['glog']
-[(glog_lib, glog_inc)] = SConscript(join(WaliDir,'ThirdParty','SConscript'), 'ListOfBuilds')
+[(glog_lib, glog_inc)] = SConscript('#/ThirdParty/SConscript', 'ListOfBuilds')
 
 if 'cl' != env['CC']:
   env.AppendUnique(LIBS=['pthread'])
