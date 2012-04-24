@@ -1,0 +1,15 @@
+import os, os.path, sys
+
+Import('Debug')
+Import('BaseEnv')
+Import('BuildDir')
+
+if Debug:
+    print '\n+++ Entered "#/AddOns/RandomFWPDS"\n'
+
+
+built = []
+
+
+Return('built')
+

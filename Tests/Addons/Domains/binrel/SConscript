@@ -30,9 +30,9 @@ test_files = Split("""
   testsMain.cpp
   testsBinRelManager.cpp
   testsBinRel.cpp
-  generateRandomFWPDS.cpp
-  randomFwpdsTests.cpp
 """)
+#generateRandomFWPDS.cpp
+#randomFwpdsTests.cpp
 
 built=[]
 #built+= env.Program('testProj', test_files, LIBS = ['gtest', 'bdd', 'glog', 'wali'])

@@ -226,7 +226,7 @@ namespace wali {
 
                 int inter_edgeno(Transition &src1, Transition &src2, Transition &tgt);
 
-				void InterGraph::rawDfs(
+				void rawDfs(
 					const int u, //current node.
                 
 					const Int1D deg, //[i]: degree of node i
