@@ -4,7 +4,7 @@
 #include "opennwa/query/language.hpp"
 #include "opennwa/construct/reverse.hpp"
 
-#include "Tests/unit-tests/Source/fixtures.hpp"
+#include "Tests/unit-tests/Source/opennwa/fixtures.hpp"
 #include "Tests/unit-tests/Source/opennwa/class-NWA/supporting.hpp"
 
 

@@ -5,7 +5,7 @@
 #include "opennwa/Nwa.hpp"
 #include "opennwa/nwa_pds/conversions.hpp"
 
-#include "Tests/unit-tests/Source/fixtures.hpp"
+#include "Tests/unit-tests/Source/opennwa/fixtures.hpp"
 
 using namespace wali::wpds;
 

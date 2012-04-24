@@ -4,7 +4,7 @@
 #include "opennwa/nwa_pds/conversions.hpp"
 #include "wali/Reach.hpp"
 
-#include "Tests/unit-tests/Source/fixtures.hpp"
+#include "Tests/unit-tests/Source/opennwa/fixtures.hpp"
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>

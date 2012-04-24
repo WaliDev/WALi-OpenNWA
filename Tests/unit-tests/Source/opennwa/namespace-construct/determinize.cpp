@@ -7,8 +7,8 @@
 #include "opennwa/query/automaton.hpp"
 #include "opennwa/query/language.hpp"
 
-#include "Tests/unit-tests/Source/fixtures.hpp"
-#include "Tests/unit-tests/Source/int-client-info.hpp"
+#include "Tests/unit-tests/Source/opennwa/fixtures.hpp"
+#include "Tests/unit-tests/Source/opennwa/int-client-info.hpp"
 #include "Tests/unit-tests/Source/opennwa/class-NWA/supporting.hpp"
 
 namespace opennwa {

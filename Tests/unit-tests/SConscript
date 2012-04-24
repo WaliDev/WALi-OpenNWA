@@ -22,9 +22,13 @@ env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
 
 test_files = Split("""
     Source/test.cpp
-    Source/fixtures.cpp
-    Source/wali-prereqs.cpp
 
+    Source/wali/wali-prereqs.cpp    
+    Source/wali/witness/calculating-visitor.cpp
+    Source/wali/wfa/class-wfa/membership.cpp
+    Source/wali/wfa/class-wfa/determinize.cpp
+
+    Source/opennwa/fixtures.cpp
     Source/opennwa/class-NestedWord/nested-word.cpp
     Source/opennwa/class-NWA/supporting.cpp
     Source/opennwa/class-NWA/construction-assignment.cpp
@@ -51,10 +55,6 @@ test_files = Split("""
     Source/opennwa/namespace-nwa_pds/answers-nwa-to-pds-calls.cpp
     Source/opennwa/namespace-nwa_pds/answers-nwa-to-pds-returns.cpp
     Source/opennwa/namespace-nwa_pds/get-control-location.cpp
-    
-    Source/wali/witness/calculating-visitor.cpp
-    Source/wali/wfa/class-wfa/membership.cpp
-    Source/wali/wfa/class-wfa/determinize.cpp
     """)
 
 just_compile = env.SConscript('Source/header-compilation/SConscript')
