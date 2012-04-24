@@ -522,6 +522,7 @@ private:
    
    friend bdd    fdd_ithvarpp(int, int);
    friend bdd    fdd_ithsetpp(int);
+//   friend bdd    fdd_biimppp(int, int, int);
    friend bdd    fdd_domainpp(int);
    friend int    fdd_scanvar(const bdd &, int);
    friend int*   fdd_scanallvar(const bdd &);

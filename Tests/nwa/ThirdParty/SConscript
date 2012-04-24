@@ -49,7 +49,7 @@ if 'cl' == env['compiler']:
     lib_name = os.path.join(build_dir, 'gtest.lib')
 else:
     cmake_command = 'cd %s && $CMAKE %s' + (
-                       ' -DCMAKE_C_COMPILER=%s -DCMAKE_CXX_COMPILER=%s' %
+                       ' -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=%s -DCMAKE_CXX_COMPILER=%s' %
                        (ProgEnv['CC'], ProgEnv['CXX']))
     if str(ProgEnv['CCFLAGS']).find("-m32") != -1:
         cmake_command += ' -DCMAKE_CXX_FLAGS=-m32'

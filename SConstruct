@@ -25,6 +25,7 @@ else:
 Platform       = platform.system()
 MkStatic       = (Platform == 'Windows')
 WaliDir        = os.getcwd()
+ThirdPartyDir     = os.path.join(WaliDir,'ThirdParty')
 BaseEnv        = Environment() #MSVC_USE_SCRIPT=False)
 Is64           = (platform_bits == 64)
 
@@ -178,6 +179,7 @@ Export('WaliDir')
 Export('LibInstallDir')
 Export('BinInstallDir')
 Export('BuildDir')
+Export('ThirdPartyDir')
 Export('MkStatic')
 Export('BaseEnv')
 Export('Platform')
@@ -211,9 +213,10 @@ if 'help' not in COMMAND_LINE_TARGETS:
     ## ##################
     ## All
     if 'all' in COMMAND_LINE_TARGETS:
-        for d in ['AddOns','Examples','Tests']:
+        for d in ['AddOns','Examples']:
             built += SConscript('%s/SConscript' % d)
-        nwa_tests = SConscript('Tests/nwa/SConscript', variant_dir=os.path.join(BuildDir,'tests'), duplicate=0)
+        built += SConscript('Tests/SConscript', variant_dir=os.path.join(BuildDir,'tests'), duplicate=0)
+        nwa_tests = SConscript('Tests/nwa/SConscript', variant_dir=os.path.join(BuildDir,'nwatests'), duplicate=0)
         built += nwa_tests
         built += BaseEnv.Install('Tests/nwa', nwa_tests)
         BaseEnv.Alias('all',built)
@@ -227,8 +230,8 @@ if 'help' not in COMMAND_LINE_TARGETS:
             built += SConscript('Examples/SConscript')
             BaseEnv.Alias('examples',built)
         if 'tests' in COMMAND_LINE_TARGETS:
-            built += SConscript('Tests/SConscript')
-            nwa_tests = SConscript('Tests/nwa/SConscript', variant_dir=os.path.join(BuildDir,'tests'), duplicate=0)
+            built += SConscript('Tests/SConscript', variant_dir=os.path.join(BuildDir,'tests'), duplicate=0)
+            nwa_tests = SConscript('Tests/nwa/SConscript', variant_dir=os.path.join(BuildDir,'nwatests'), duplicate=0)
             built += nwa_tests
             built += BaseEnv.Install('Tests/nwa', nwa_tests)
             BaseEnv.Alias('tests',built)

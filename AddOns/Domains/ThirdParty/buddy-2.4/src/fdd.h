@@ -58,6 +58,7 @@ extern BDD  fdd_ithvar(int, int);
 extern int  fdd_scanvar(BDD, int);
 extern int* fdd_scanallvar(BDD);
 extern BDD  fdd_ithset(int);
+//extern BDD  fdd_biimp(int,int,int);
 extern BDD  fdd_domain(int);
 extern BDD  fdd_equals(int, int);
 extern bddfilehandler fdd_file_hook(bddfilehandler);
@@ -89,6 +90,11 @@ inline bdd fdd_ithvarpp(int var, int val)
 
 inline bdd fdd_ithsetpp(int var)
 { return fdd_ithset(var); }
+
+#if 0
+inline bdd fdd_biimppp(int maxVal, int idx1, int idx2)
+{ return fdd_biimp(maxVal, idx1, idx2); }
+#endif
 
 inline bdd fdd_domainpp(int var)
 { return fdd_domain(var); }
@@ -158,6 +164,7 @@ inline bdd fdd_neq(int bitnum, bdd *left, bdd *right)
    /* Hacks to allow for overloading of return-types only */
 #define fdd_ithvar fdd_ithvarpp
 #define fdd_ithset fdd_ithsetpp
+//#define fdd_biimp fdd_biimppp
 #define fdd_domain fdd_domainpp
 #define fdd_equals fdd_equalspp
 #define fdd_makeset fdd_makesetpp

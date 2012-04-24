@@ -1,0 +1,29 @@
+## ################
+## @Prathmesh Prabhu
+
+import platform
+import urllib
+import sys
+import os
+import shutil
+
+Import('Debug')
+Import('BaseEnv')
+Import('ListOfBuilds')
+Import('LibInstallDir')
+env = BaseEnv.Clone()
+
+if Debug:
+	print '\n+++ Entered "#/ThirdParty/SConscript"\n'
+
+IncludeDir = os.path.join(os.getcwd(),'include')
+
+built = []
+if 'all' in ListOfBuilds:
+  built+= SConscript('SConscript.glog', ['IncludeDir'])
+else:
+  if 'glog' in ListOfBuilds:
+    built+= SConscript('SConscript.glog', ['IncludeDir'])
+
+Return('built')
+ 

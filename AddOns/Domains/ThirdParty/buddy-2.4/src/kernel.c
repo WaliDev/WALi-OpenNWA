@@ -277,6 +277,10 @@ void bdd_done(void)
    err_handler = NULL;
    gbc_handler = NULL;
    resize_handler = NULL;
+
+   //PPP:bugfix
+   bddvar2level = NULL;
+   bddlevel2var = NULL;
 }
 
 
