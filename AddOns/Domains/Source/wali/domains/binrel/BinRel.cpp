@@ -152,7 +152,7 @@ const Voc BinRel::initialize(int bddMemSize, int cacheSize, Voc v)
       ++varIter
      ){
     std::string varName = (*varIter).first;
-    BddInfo_t varInfo = (*varIter).second;
+    bddinfo_t varInfo = (*varIter).second;
     //We will create indices such that we get a default variable ordering where
     //baseLhs, baseRhs, baseExtra are mixed.
     //tensor1Lhs, tensor1Rhs, tensor1Extra are mixed.
@@ -246,7 +246,7 @@ const Voc BinRel::initialize(int bddMemSize, int cacheSize, Voc v)
   for(Voc::const_iterator iter = voc.begin();
       iter != voc.end();
       ++iter){
-    BddInfo_t bi = iter->second;
+    bddinfo_t bi = iter->second;
     idx2Name[bi->baseLhs] = iter->first;
     idx2Name[bi->baseRhs] = iter->first + "'";
     idx2Name[bi->baseExtra] = iter->first + "''";
@@ -270,7 +270,7 @@ void BinRel::reset()
   for(VocIter iter = voc.begin(), endIter = voc.end();
       endIter != iter;
       ++iter){
-    //set the BddInfo_t to NULL.
+    //set the bddinfo_t to NULL.
     //This *should* remove the last reference to the BddInfo object. And the
     //object should get deleted. If someone was holding onto the object before
     //resetting, we're fine with that too.
@@ -564,7 +564,7 @@ void BinRel::setId()
       varIter != voc.end();
       ++varIter
      ){
-    BddInfo_t varInfo = (*varIter).second;
+    bddinfo_t varInfo = (*varIter).second;
     baseId = baseId &
       fdd_equals(varInfo->baseLhs, varInfo->baseRhs);
     tensorId = tensorId &

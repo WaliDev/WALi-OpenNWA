@@ -65,12 +65,12 @@ namespace wali
           std::ostream& print( std::ostream& o ) const;
       };
         
-      typedef ref_ptr<BddInfo> BddInfo_t;
+      typedef ref_ptr<BddInfo> bddinfo_t;
 
       /**A Voc has the binding information for the variables in the
        * domain.
        */
-      typedef std::map<const std::string,BddInfo_t> Voc;
+      typedef std::map<const std::string,bddinfo_t> Voc;
       typedef Voc::iterator VocIter;
       typedef std::map<const int,std::string> RevVoc;
 

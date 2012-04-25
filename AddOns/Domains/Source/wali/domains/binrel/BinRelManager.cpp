@@ -23,7 +23,7 @@ namespace wali
 
 #define BOOLSIZE 2
 
-      static BddInfo_t regAbool, regBbool, regAint, regBint;
+      static bddinfo_t regAbool, regBbool, regAint, regBint;
 
       static bdd bddAnd, bddOr, bddNot;
       static bdd bddPlus, bddMinus, bddTimes, bddDiv;
@@ -34,9 +34,9 @@ namespace wali
       //move around freely.
 
       static void reset();
-      static bdd applyBinOp(bdd lexpr, bdd rexpr, bdd op, BddInfo_t regA,
-          BddInfo_t regB);
-      static bdd applyUnOp(bdd expr, bdd op, BddInfo_t regA);
+      static bdd applyBinOp(bdd lexpr, bdd rexpr, bdd op, bddinfo_t regA,
+          bddinfo_t regB);
+      static bdd applyUnOp(bdd expr, bdd op, bddinfo_t regA);
       static bdd applyBinOpBool(bdd lexpr, bdd rexpr, bdd op);
       static bdd applyBinOpInt(bdd lexpr, bdd rexpr, bdd op);
       static bdd applyUnOpBool(bdd expr, bdd op);
@@ -47,7 +47,7 @@ namespace wali
 
       void addBoolVar(Voc& voc, std::string name)
       {
-        BddInfo_t bi = new BddInfo;
+        bddinfo_t bi = new BddInfo;
         bi->maxVal = 2;
         voc[name] = bi;
       }
@@ -56,7 +56,7 @@ namespace wali
       {
         LOG_IF(WARNING, size < 2) 
           << "I haven't tested the library for int size less than 2";
-        BddInfo_t bi = new BddInfo;
+        bddinfo_t bi = new BddInfo;
         bi->maxVal = size;
         voc[name] = bi;
       }
@@ -69,7 +69,7 @@ namespace wali
 
       static void reset()
       {
-        //set all BddInfo_t objects to NULL. The BddInfo counts should drop to
+        //set all bddinfo_t objects to NULL. The BddInfo counts should drop to
         //0, and the objects should be deleted on their own.
         regAbool = NULL;
         regBbool = NULL;
@@ -283,7 +283,7 @@ namespace wali
           LOG(ERROR) << "From called before initializing BinRel";
           return bddfalse;
         }
-        const BddInfo_t bi = (*BinRel::getVoc().find(var)).second;
+        const bddinfo_t bi = (*BinRel::getVoc().find(var)).second;
         if(bi->maxVal == BOOLSIZE)
           ret = fdd_equals(bi->baseLhs, regAbool->baseRhs);
         else
@@ -317,8 +317,8 @@ namespace wali
         return bddtrue;
       }
 
-      static bdd applyBinOp(bdd lexpr, bdd rexpr, bdd op, BddInfo_t regA,
-          BddInfo_t regB)
+      static bdd applyBinOp(bdd lexpr, bdd rexpr, bdd op, bddinfo_t regA,
+          bddinfo_t regB)
       { 
         bddPair *regA2regB = bdd_newpair();
         fdd_setpair(regA2regB, regA->baseRhs, regB->baseRhs);
@@ -343,7 +343,7 @@ namespace wali
         return lexpr;
       }
 
-      static bdd applyUnOp(bdd expr, bdd op, BddInfo_t regA)
+      static bdd applyUnOp(bdd expr, bdd op, bddinfo_t regA)
       {
         expr = bdd_relprod(
             expr,
@@ -411,7 +411,7 @@ namespace wali
 
       bdd Assign(std::string var, bdd expr)
       {
-        BddInfo_t bi;
+        bddinfo_t bi;
         Voc voc = BinRel::getVoc();
         if(voc.find(var) == voc.end()){
           LOG(WARNING) << "[BinRelManager::Assign] Unknown Variable";
