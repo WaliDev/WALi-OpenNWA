@@ -37,7 +37,7 @@ namespace wali
       bdd Assign(std::string var, bdd expr);
       bdd Assume(bdd expr1, bdd expr2);
 
-      bdd tGetRandomTransformer(const Voc& voc, bool isTensored);
+      bdd tGetRandomTransformer(const Voc& voc, bool isTensored = false);
     }
   }
 }

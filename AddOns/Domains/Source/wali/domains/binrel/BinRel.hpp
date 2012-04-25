@@ -115,7 +115,7 @@ namespace wali
 
         public:
           BinRel(const BinRel& that);
-          BinRel(bdd b,bool is_tensored);
+          BinRel(bdd b,bool is_tensored=false);
 
           virtual ~BinRel();
 
