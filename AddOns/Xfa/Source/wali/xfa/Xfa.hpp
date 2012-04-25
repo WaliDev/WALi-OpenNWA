@@ -20,6 +20,7 @@ namespace cfglib {
             {}
         };
 
+        inline
         bool operator< (State left, State right) {
             return left.key < right.key;
         }
@@ -32,10 +33,12 @@ namespace cfglib {
             {}
         };
 
+        inline
         State getState(std::string const & str) {
             return State(wali::getKey(str));
         }
 
+        inline
         Symbol getSymbol(std::string const & str) {
             return Symbol(wali::getKey(str));
         }
@@ -117,7 +120,10 @@ namespace cfglib {
                 wfa_.for_each(tf);
             }
 
-                        
+            bool isIsomorphicTo(Xfa const & other) {
+                return wfa_.isIsomorphicTo(other.wfa_);
+            }
+            
         };
         
     }
