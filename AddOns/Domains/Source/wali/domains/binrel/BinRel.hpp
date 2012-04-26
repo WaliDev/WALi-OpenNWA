@@ -22,6 +22,7 @@
 #include <map>
 #include <utility>
 #include <string>
+#include <vector>
 
 #include "wali/Countable.hpp"
 #include "wali/ref_ptr.hpp"
@@ -73,6 +74,17 @@ namespace wali
       typedef std::map<const std::string,BddInfo_t> Voc;
       typedef Voc::iterator VocIter;
       typedef std::map<const int,std::string> RevVoc;
+
+      typedef std::map<std::string, int> Assignment;
+
+      extern
+      std::vector<Assignment>
+      getAllAssignments(Voc const & voc);
+
+      extern
+      void
+      printImagemagickInstructions(bdd b, Voc const & voc, std::ostream & os, std::string const & for_file);
+      
 
       class BinRel;
       typedef wali::ref_ptr<BinRel> binrel_t;
@@ -159,6 +171,16 @@ namespace wali
 
           /** @return [this]->Eq34Project() */
           sem_elem_tensor_t detensorTranspose();
+
+          /** @return The backing BDD */
+          bdd getBdd() const {
+            return rel;
+          }
+
+          /** @return Get the vocabulary the relation is over */
+          Voc const & getVocabulary() const {
+            return voc;
+          }
 
           // ////////////////////////////////
           // Printing functions

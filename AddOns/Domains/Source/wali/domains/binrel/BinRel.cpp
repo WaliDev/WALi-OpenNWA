@@ -6,6 +6,7 @@
  
 #include "BinRel.hpp"
 #include "buddy/fdd.h"
+#include "BinRelManager.hpp"
 //#include "BuddyExt.hpp"
 
 #include <iostream>
@@ -629,6 +630,208 @@ std::ostream& BinRel::printStats( std::ostream& o) const
 }
 
 #endif //BINREL_STATS
+
+///////////////////////////////
+
+namespace wali {
+  namespace domains {
+    namespace binrel {
+
+      std::vector<Assignment>
+      getAllAssignments(Voc const & voc)
+      {
+        // Make a copy so we can index by number instead of by name. (A
+        // vector is just a map from int to something.)
+        std::vector<std::pair<std::string, BddInfo_t> > voc_vector(voc.begin(), voc.end());
+        BddInfo_t bddinfo = new BddInfo();
+        bddinfo->maxVal = 17;
+        voc_vector.push_back(Voc::value_type("__dummy__", bddinfo));
+        
+        std::vector<Assignment> result;
+
+        // The current assignment. Essentially [0..max)^n, except the limit
+        // may change depending on coordinate and we add one more to the end
+        // as sort of an elephant. When we overflow into
+        // assignment_vec[voc.size()], then we're done.
+        std::vector<int> assignment_vec(voc.size()+1, 0);
+          
+        while(assignment_vec.at(voc.size()) == 0) {
+          // Create the current assignment
+          Assignment assignment;
+          for (size_t varno=0; varno<voc.size(); ++varno) {
+            assignment[voc_vector.at(varno).first] = assignment_vec.at(varno);
+          }
+          result.push_back(assignment);
+        
+          // Increment the assignment vector for next iteration.
+          assert(assignment_vec.at(assignment_vec.size()-1) == 0);
+          for (size_t placeno=0; true; ++placeno) {
+            assignment_vec.at(placeno) += 1;
+            // Do we overflow?
+            if (assignment_vec.at(placeno) == voc_vector.at(placeno).second->maxVal) {
+              // Yes: reset to 0 and keep going
+              assignment_vec.at(placeno) = 0;
+            }
+            else {
+              // No overflow: so we're done adding
+              break;
+            }
+          }
+        }
+          
+        return result;
+      }
+
+      template<typename Mapping>
+      typename Mapping::mapped_type
+      safe_get(Mapping const & m, typename Mapping::key_type const & k)
+      {
+        typename Mapping::const_iterator it = m.find(k);
+        if (it == m.end()) {
+          assert(false);
+        }
+        return it->second;
+      }
+
+      enum VocabularyId { PRE_VOCABULARY, POST_VOCABULARY };
+
+      bdd toBdd(Assignment const & assignment, Voc const & voc, VocabularyId vid)
+      {
+        bdd result = bddtrue;
+        for (Assignment::const_iterator pair = assignment.begin();
+             pair != assignment.end(); ++pair)
+          
+        {
+          BddInfo_t varinfo = safe_get(voc, pair->first);
+          int val = pair->second;
+
+          bdd b;
+          if (vid == PRE_VOCABULARY) {
+            b = fdd_ithvar(varinfo->baseLhs, val);
+          }
+          else {
+            b = fdd_ithvar(varinfo->baseRhs, val);
+          }
+          
+          result &= b;
+        }
+        return result;
+      }
+
+      namespace details {
+        bool is_feasible(Assignment const & pre_assgn,
+                         Assignment const & post_assgn,
+                         Voc const & voc,
+                         bdd b)
+        {
+          bdd pre_bdd = toBdd(pre_assgn, voc, PRE_VOCABULARY);
+          bdd post_bdd = toBdd(post_assgn, voc, POST_VOCABULARY);
+
+          bdd everything = pre_bdd & post_bdd & b;
+
+          return (everything != bddfalse);
+        }
+
+        const int width = 200;
+        const int pre_x_center = 15;
+        const int post_x_center = 85;
+        
+        const int radius = 2;
+
+        const int v_margin = 25;
+        const int v_separation = 50;
+
+
+        void write_line(int pre_no, int post_no, std::ostream & os)
+        {
+          int x1 = pre_x_center;
+          int y1 = v_margin + pre_no * v_separation;
+
+          int x2 = post_x_center;
+          int y2 = v_margin + post_no * v_separation;
+
+          os << "    -draw \"line "
+             << x1 << "," << y1 << " "
+             << x2 << "," << y2 << "\"    \\\n";
+        }
+
+        std::string toString(Assignment const & assgn)
+        {
+          std::stringstream ss;
+          Assignment::const_iterator iter = assgn.begin();
+
+          ss << "(" << iter->first << "=" << iter->second;
+          ++iter;
+
+          for(; iter != assgn.end(); ++iter) {
+            ss << ", " << iter->first << "=" << iter->second;
+          }
+
+          ss << ")";
+          return ss.str();
+        }
+
+        void write_dot(int dot_no, Assignment const & assgn, std::ostream & os)
+        {
+          int x = pre_x_center;
+          int y = v_margin + dot_no * v_separation;
+
+          os << "    -draw \"circle "
+             << x << "," << y << " "
+             << (x-radius) << "," << (y-radius) << "\"    ";
+
+          x = post_x_center;          
+
+          os << "    -draw \"circle "
+             << x << "," << y << " "
+             << (x-radius) << "," << (y-radius) << "\"    ";
+
+          x = post_x_center + pre_x_center;
+          os << "    -draw \"text "
+             << x << "," << y << " "
+             << "\'" << toString(assgn) << "\'\"    \\\n";
+        } 
+      }
+
+      void
+      printImagemagickInstructions(bdd b, Voc const & voc, std::ostream & os, std::string const & for_file)
+      {
+        std::vector<Assignment> possibleAssignments = getAllAssignments(voc);
+
+        const int height = 2*details::v_margin + possibleAssignments.size()*details::v_separation;
+
+        os << "convert -size " << details::width << "x" << height
+           << " xc:wheat    \\\n"
+           << "    -fill red    \\\n";
+
+        // Draw the lines
+        for (size_t pre_no=0; pre_no<possibleAssignments.size(); ++pre_no) {
+          for (size_t post_no=0; post_no<possibleAssignments.size(); ++post_no) {
+            if (details::is_feasible(possibleAssignments.at(pre_no),
+                                     possibleAssignments.at(post_no),
+                                     voc,
+                                     b))
+            {
+              details::write_line(pre_no, post_no, os);
+            }
+          }
+        }
+
+        os << "    -fill black    \\\n";
+        os << "    -font Times-Roman  \\\n";
+
+        // Draw the dots
+        for (size_t dot_no=0; dot_no < possibleAssignments.size(); ++dot_no) {
+          details::write_dot(dot_no, possibleAssignments.at(dot_no), os);
+        }
+
+        os << "    " << for_file << "\n";        
+      }
+      
+    }
+  }
+}
+
 
 
 // Yo, Emacs!
