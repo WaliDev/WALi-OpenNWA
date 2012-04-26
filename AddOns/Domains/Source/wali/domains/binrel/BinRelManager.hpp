@@ -76,45 +76,30 @@ namespace wali
           // //////////////Generates a random bdd///////////////////////////////////////////
           bdd tGetRandomTransformer(bool isTensored = false);
 
-          // ///////////////////DEPRECATED//////////////////////////////////////////////
-          /**
-           * Initialize the BinRelManager, and the BinRel class. 
-           * You do not need to call BinRel::initialize if you call this
-           * @param [bddMemSize] the memory size buddy should use. Use 0 for default.
-           * @param [cacheSize] the memory size buddy should use. Use 0 for default.
-           * @param [voc] The vocabulary of the BinRel semiring. Vocabulary can not be changed once 
-           *              initialize is called. voc is passed by reference, and modified to reflect 
-           *              the bdd indices populated.
-           * @return The updated vocabulary.
-           * @see BinRel::BddInfo
-           * deprecated. Use the constructor BinRelManager::BinRelManager(...) for the same functionality.
-           **/
-          const Voc initialize(int bddMemSize, int cacheSize, Voc voc);
-          /**
-           * @deprecated. BinRelManager is now a class, and the object cleans up after itself.
-           **/
-          void binRelDone();
-
-
         private:
 
           //FIXME: add const when initialize() has been removed.
           unsigned BOOLSIZE;
 
-          bddinfo_t regAbool, regBbool, regAint, regBint;
+          // This is the bdd index of the size info in each bdd
+          unsigned sizeInfo;
+          // This is the maximum size a register can have
+          unsigned maxSize; 
+          // These store indices for the "base" only bdd levels that we use for manipulation
+          bddinfo_t regAInfo, regBInfo;
 
-          bdd bddAnd, bddOr, bddNot;
-          bdd bddPlus, bddMinus, bddTimes, bddDiv;
-
+          bdd bddAnd();
+          bdd bddOr();
+          bdd bddNot();
+          bdd bddPlus(unsigned in1Size, unsigned in2Size);
+          bdd bddMinus(unsigned in1Size, unsigned in2Size);
+          bdd bddTimes(unsigned in1Size, unsigned in2Size);
+          bdd bddDiv(unsigned in1Size, unsigned in2Size);
 
           //Helper functions
-          void reset();
-          bdd applyBinOp(bdd lexpr, bdd rexpr, bdd op, bddinfo_t regA,
-              bddinfo_t regB);
-          bdd applyUnOp(bdd expr, bdd op, bddinfo_t regA);
-          bdd applyBinOpBool(bdd lexpr, bdd rexpr, bdd op);
-          bdd applyBinOpInt(bdd lexpr, bdd rexpr, bdd op);
-          bdd applyUnOpBool(bdd expr, bdd op);
+          unsigned getRegSize(bdd forThis);
+          bdd applyBinOp(bdd lexpr, bdd rexpr, bdd op);
+          bdd applyUnOp(bdd expr, bdd op);
       };
     } // namespace binrel
   } //namespace domains

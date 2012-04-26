@@ -1,5 +1,4 @@
 #include "BinRelManager.hpp"
-//#include "BuddyExt.hpp"
 
 #include "glog/logging.h"
 #include "buddy/fdd.h"
@@ -15,6 +14,17 @@ using namespace  wali::domains::binrel;
 // ////////////////////////////////////////
 
 using namespace wali::domains::binrel;
+
+namespace wali
+{
+  namespace domains
+  {
+    namespace binrel
+    {
+      extern RevVoc idx2Name;
+    }
+  }
+}
 
 //TODO: remove this comment, and to do that, put comments elsewhere.
 
@@ -47,397 +57,96 @@ namespace wali
   } // namespace domains
 } // namespace wali
 
-void BinRelManager::binRelDone()
-{
-  reset();
-  BinRel::reset();
-}
-
 BinRelManager::~BinRelManager()
 {
-  reset();
+  regAInfo = regBInfo = NULL;
   BinRel::reset();
-}
-
-void BinRelManager::reset()
-{
-  //set all bddinfo_t objects to NULL. The BddInfo counts should drop to
-  //0, and the objects should be deleted on their own.
-  regAbool = NULL;
-  regBbool = NULL;
-  regAint = NULL;
-  regBint = NULL;
-
-  //reste all bdds
-  bddAnd = bddfalse;
-  bddOr = bddfalse;
-  bddNot = bddfalse;
-  bddPlus = bddfalse;
-  bddMinus = bddfalse;
-  bddTimes = bddfalse;
-  bddDiv = bddfalse;
 }
 
 BinRelManager::BinRelManager(Voc& voc, int bddMemSize, int cacheSize) :
   Countable(),
-  BOOLSIZE(2)
+  BOOLSIZE(2),
+  sizeInfo(-1),
+  regAInfo(NULL),
+  regBInfo(NULL)
 {
+  
   BinRel::initialize(voc, bddMemSize, cacheSize);
-  const Voc& retVoc = voc;
 
-  regAbool = NULL;
-  regBbool = NULL;
-  for(
-      Voc::const_iterator iter = retVoc.begin(); 
-      iter != retVoc.end();
-      ++iter
-     ){
-    if(regBbool != NULL)
-      break;
-    if((iter->second)->maxVal == BOOLSIZE){
-      if(regAbool == NULL)
-        regAbool = iter->second;
+  //This stuff basically extends the bdd domain in buddy by some extra levels.
+  {
+    //Find the maximum register size in the vocabulary
+    unsigned maxVal = 0;
+    for(Voc::const_iterator vocIter = voc.begin();
+        vocIter != voc.end();
+        ++vocIter)
+      maxVal = (vocIter->second->maxVal > maxVal)? vocIter->second->maxVal : maxVal;
+    maxSize = maxVal;
+    //Create space in the bdd to store the size of the current register.
+    if(maxVal != 0){
+      //if maxVal is zero, you can't do anything anyway.
+      //+1 because I want to be able to store the size of the largest register.
+      int domains[1] = {maxVal+1};
+      int retSizeInfo = fdd_extdomain(domains,1);
+      if(retSizeInfo < 0)
+        LOG(ERROR) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(retSizeInfo) << "\"" << endl
+          << "    Aborting." << endl;
       else
-        regBbool = iter->second;
-    }
-  }
+        sizeInfo = (unsigned) retSizeInfo;
+      //To pretty print during testing, we add some names for this regsiter size fdd level.
+      idx2Name[sizeInfo] = "__regSize";
+      //Now create two extra bdd levels, and the corresponding BddInfo entries to be used for manipulation
+      //inside BinRelManager.
+      //We will create indices such that we get a default variable ordering where
+      //baseLhs, baseRhs, baseExtra are mixed.
+      {
+        int domains[3] = {maxVal, maxVal, maxVal};
+        regAInfo = new BddInfo();
+        //Create fdds for base
+        int base = fdd_extdomain(domains,3);
+        if (base < 0)
+          LOG(ERROR) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl
+            << "    Aborting." << endl;
 
-  regAint = NULL;
-  regBint = NULL;
-  for(
-      Voc::const_iterator iter = retVoc.begin(); 
-      iter != retVoc.end();
-      ++iter
-     ){
-    if(regBint != NULL)
-      break;
-    if((iter->second)->maxVal > BOOLSIZE){
-      if(regAint == NULL)
-        regAint = iter->second;
-      else
-        regBint = iter->second;
-    }
-  }
+        regAInfo->baseLhs = (unsigned) base;
+        regAInfo->baseRhs = (unsigned) base + 1;
+        regAInfo->baseExtra = (unsigned) base + 2;
 
-  if(regAbool == NULL || regBbool == NULL){
-    LOG(INFO) << "[binrel::initialize] I did not find enough Boolean vars"
-      << "\nAnd(...) will not be functional.";
-  }else{
-    bddAnd =
-      (fdd_ithvar(regAbool->baseRhs,1) & 
-       fdd_ithvar(regBbool->baseRhs,1) &
-       fdd_ithvar(regAbool->baseExtra,1))
-      |
-      (fdd_ithvar(regAbool->baseRhs,1) & 
-       fdd_ithvar(regBbool->baseRhs,0) &
-       fdd_ithvar(regAbool->baseExtra,0))
-      |
-      (fdd_ithvar(regAbool->baseRhs,0) & 
-       fdd_ithvar(regBbool->baseRhs,1) &
-       fdd_ithvar(regAbool->baseExtra,0))
-      |
-      (fdd_ithvar(regAbool->baseRhs,0) & 
-       fdd_ithvar(regBbool->baseRhs,0) &
-       fdd_ithvar(regAbool->baseExtra,0));
-  }
+        //To pretty print during testing, we add some names for this extra register
+        //Currently, idx2Name is a global variable in wali::domains::binrel
+        idx2Name[regAInfo->baseLhs] = "__regA";
+        idx2Name[regAInfo->baseRhs] = "__regA'";
+        idx2Name[regAInfo->baseExtra] = "__regA''";
+      }
+      {
+        int domains[3] = {maxVal, maxVal, maxVal};
+        regBInfo = new BddInfo();
+        //Create fdds for base
+        int base = fdd_extdomain(domains,3);
+        if (base < 0)
+          LOG(ERROR) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl
+            << "    Aborting." << endl;
+        regBInfo->baseLhs = (unsigned) base;
+        regBInfo->baseRhs = (unsigned )base + 1;
+        regBInfo->baseExtra = (unsigned) base + 2;
 
-  if(regAbool == NULL || regBbool == NULL){
-    LOG(INFO) << "[binrel::initialize] I did not find enough Boolean vars"
-      << "\nOr(...) will not be functional.";
-  }else{
-    bddOr =
-      (fdd_ithvar(regAbool->baseRhs,1) & 
-       fdd_ithvar(regBbool->baseRhs,1) &
-       fdd_ithvar(regAbool->baseExtra,1))
-      |
-      (fdd_ithvar(regAbool->baseRhs,1) & 
-       fdd_ithvar(regBbool->baseRhs,0) &
-       fdd_ithvar(regAbool->baseExtra,1))
-      |
-      (fdd_ithvar(regAbool->baseRhs,0) & 
-       fdd_ithvar(regBbool->baseRhs,1) &
-       fdd_ithvar(regAbool->baseExtra,1))
-      |
-      (fdd_ithvar(regAbool->baseRhs,0) & 
-       fdd_ithvar(regBbool->baseRhs,0) &
-       fdd_ithvar(regAbool->baseExtra,0));
-  }
-
-  if(regAbool == NULL){
-    LOG(INFO) << "[binrel::initialize] I did not find enough Boolean vars"
-      << "\nNot(...) will not be functional.";
-  }else{
-    bddNot =
-      (fdd_ithvar(regAbool->baseRhs,1) & 
-       fdd_ithvar(regAbool->baseExtra,0))
-      |
-      (fdd_ithvar(regAbool->baseRhs,0) & 
-       fdd_ithvar(regAbool->baseExtra,1));
-  }
-
-  int maxVal=0;
-  if(regAint != NULL)
-    maxVal = regAint->maxVal;
-
-  if(regAint == NULL || regBint == NULL){
-    LOG(INFO) << "[binrel::initialize] I did not find enough int vars"
-      << "\nPlus(...) will not be functional.";
-  }else{
-    bddPlus = bddfalse;
-    for(int i=0; i<maxVal; ++i){
-      for(int j=0; j<maxVal; ++j){
-        int k = (i + j) % maxVal;
-        bddPlus = bddPlus |
-          (fdd_ithvar(regAint->baseRhs,i) &
-           fdd_ithvar(regBint->baseRhs,j) &
-           fdd_ithvar(regAint->baseExtra,k));
+        //To pretty print during testing, we add some names for this extra register
+        //Currently, idx2Name is a global variable in wali::domains::binrel
+        idx2Name[regBInfo->baseLhs] = "__regB";
+        idx2Name[regBInfo->baseRhs] = "__regB'";
+        idx2Name[regBInfo->baseExtra] = "__regB''";
       }
     }
   }
-
-  if(regAint == NULL || regBint == NULL){
-    LOG(INFO) << "[binrel::initialize] I did not find enough int vars"
-      << "\nMinus(...) will not be functional.";
-  }else{
-    bddMinus = bddfalse;
-    for(int i=0; i<maxVal; ++i){
-      for(int j=0; j<maxVal; ++j){
-        int k = (i - j + maxVal) % maxVal;
-        bddMinus = bddMinus |
-          (fdd_ithvar(regAint->baseRhs,i) &
-           fdd_ithvar(regBint->baseRhs,j) &
-           fdd_ithvar(regAint->baseExtra,k));
-      }
-    }
-  }
-
-  if(regAint == NULL || regBint == NULL){
-    LOG(INFO) << "[binrel::initialize] I did not find enough int vars"
-      << "\nTimes(...) will not be functional.";
-  }else{
-    bddTimes = bddfalse;
-    for(int i=0; i<maxVal; ++i){
-      for(int j=0; j<maxVal; ++j){
-        int k = (i * j) % maxVal;
-        bddTimes = bddTimes |
-          (fdd_ithvar(regAint->baseRhs,i) &
-           fdd_ithvar(regBint->baseRhs,j) &
-           fdd_ithvar(regAint->baseExtra,k));
-      }
-    }
-  }
-
-  if(regAint == NULL || regBint == NULL){
-    LOG(INFO) << "[binrel::initialize] I did not find enough int vars"
-      << "\nDiv(...) will not be functional.";
-  }else{
-    bddDiv = bddfalse;
-    for(int i=0; i<maxVal; ++i){
-      for(int j=0; j<maxVal; ++j){
-        int k;
-        if(j == 0)
-          //arbitrary
-          k = 0;
-        else
-          k = (int) i / j;
-        bddDiv = bddDiv |
-          (fdd_ithvar(regAint->baseRhs,i) &
-           fdd_ithvar(regBint->baseRhs,j) &
-           fdd_ithvar(regAint->baseExtra,k));
-      }
-    }
-  }
-}
-
-
-const Voc BinRelManager::initialize(int bddMemSize, int cacheSize, Voc voc)
-{
-  BOOLSIZE=2; //move to intialize in the constructor
-  reset();
-  BinRel::initialize(voc, bddMemSize, cacheSize);
-  const Voc& retVoc = voc;
-
-  regAbool = NULL;
-  regBbool = NULL;
-  for(
-      Voc::const_iterator iter = retVoc.begin(); 
-      iter != retVoc.end();
-      ++iter
-     ){
-    if(regBbool != NULL)
-      break;
-    if((iter->second)->maxVal == BOOLSIZE){
-      if(regAbool == NULL)
-        regAbool = iter->second;
-      else
-        regBbool = iter->second;
-    }
-  }
-
-  regAint = NULL;
-  regBint = NULL;
-  for(
-      Voc::const_iterator iter = retVoc.begin(); 
-      iter != retVoc.end();
-      ++iter
-     ){
-    if(regBint != NULL)
-      break;
-    if((iter->second)->maxVal > BOOLSIZE){
-      if(regAint == NULL)
-        regAint = iter->second;
-      else
-        regBint = iter->second;
-    }
-  }
-
-  if(regAbool == NULL || regBbool == NULL){
-    LOG(INFO) << "[binrel::initialize] I did not find enough Boolean vars"
-      << "\nAnd(...) will not be functional.";
-  }else{
-    bddAnd =
-      (fdd_ithvar(regAbool->baseRhs,1) & 
-       fdd_ithvar(regBbool->baseRhs,1) &
-       fdd_ithvar(regAbool->baseExtra,1))
-      |
-      (fdd_ithvar(regAbool->baseRhs,1) & 
-       fdd_ithvar(regBbool->baseRhs,0) &
-       fdd_ithvar(regAbool->baseExtra,0))
-      |
-      (fdd_ithvar(regAbool->baseRhs,0) & 
-       fdd_ithvar(regBbool->baseRhs,1) &
-       fdd_ithvar(regAbool->baseExtra,0))
-      |
-      (fdd_ithvar(regAbool->baseRhs,0) & 
-       fdd_ithvar(regBbool->baseRhs,0) &
-       fdd_ithvar(regAbool->baseExtra,0));
-  }
-
-  if(regAbool == NULL || regBbool == NULL){
-    LOG(INFO) << "[binrel::initialize] I did not find enough Boolean vars"
-      << "\nOr(...) will not be functional.";
-  }else{
-    bddOr =
-      (fdd_ithvar(regAbool->baseRhs,1) & 
-       fdd_ithvar(regBbool->baseRhs,1) &
-       fdd_ithvar(regAbool->baseExtra,1))
-      |
-      (fdd_ithvar(regAbool->baseRhs,1) & 
-       fdd_ithvar(regBbool->baseRhs,0) &
-       fdd_ithvar(regAbool->baseExtra,1))
-      |
-      (fdd_ithvar(regAbool->baseRhs,0) & 
-       fdd_ithvar(regBbool->baseRhs,1) &
-       fdd_ithvar(regAbool->baseExtra,1))
-      |
-      (fdd_ithvar(regAbool->baseRhs,0) & 
-       fdd_ithvar(regBbool->baseRhs,0) &
-       fdd_ithvar(regAbool->baseExtra,0));
-  }
-
-  if(regAbool == NULL){
-    LOG(INFO) << "[binrel::initialize] I did not find enough Boolean vars"
-      << "\nNot(...) will not be functional.";
-  }else{
-    bddNot =
-      (fdd_ithvar(regAbool->baseRhs,1) & 
-       fdd_ithvar(regAbool->baseExtra,0))
-      |
-      (fdd_ithvar(regAbool->baseRhs,0) & 
-       fdd_ithvar(regAbool->baseExtra,1));
-  }
-
-  int maxVal=0;
-  if(regAint != NULL)
-    maxVal = regAint->maxVal;
-
-  if(regAint == NULL || regBint == NULL){
-    LOG(INFO) << "[binrel::initialize] I did not find enough int vars"
-      << "\nPlus(...) will not be functional.";
-  }else{
-    bddPlus = bddfalse;
-    for(int i=0; i<maxVal; ++i){
-      for(int j=0; j<maxVal; ++j){
-        int k = (i + j) % maxVal;
-        bddPlus = bddPlus |
-          (fdd_ithvar(regAint->baseRhs,i) &
-           fdd_ithvar(regBint->baseRhs,j) &
-           fdd_ithvar(regAint->baseExtra,k));
-      }
-    }
-  }
-
-  if(regAint == NULL || regBint == NULL){
-    LOG(INFO) << "[binrel::initialize] I did not find enough int vars"
-      << "\nMinus(...) will not be functional.";
-  }else{
-    bddMinus = bddfalse;
-    for(int i=0; i<maxVal; ++i){
-      for(int j=0; j<maxVal; ++j){
-        int k = (i - j + maxVal) % maxVal;
-        bddMinus = bddMinus |
-          (fdd_ithvar(regAint->baseRhs,i) &
-           fdd_ithvar(regBint->baseRhs,j) &
-           fdd_ithvar(regAint->baseExtra,k));
-      }
-    }
-  }
-
-  if(regAint == NULL || regBint == NULL){
-    LOG(INFO) << "[binrel::initialize] I did not find enough int vars"
-      << "\nTimes(...) will not be functional.";
-  }else{
-    bddTimes = bddfalse;
-    for(int i=0; i<maxVal; ++i){
-      for(int j=0; j<maxVal; ++j){
-        int k = (i * j) % maxVal;
-        bddTimes = bddTimes |
-          (fdd_ithvar(regAint->baseRhs,i) &
-           fdd_ithvar(regBint->baseRhs,j) &
-           fdd_ithvar(regAint->baseExtra,k));
-      }
-    }
-  }
-
-  if(regAint == NULL || regBint == NULL){
-    LOG(INFO) << "[binrel::initialize] I did not find enough int vars"
-      << "\nDiv(...) will not be functional.";
-  }else{
-    bddDiv = bddfalse;
-    for(int i=0; i<maxVal; ++i){
-      for(int j=0; j<maxVal; ++j){
-        int k;
-        if(j == 0)
-          //arbitrary
-          k = 0;
-        else
-          k = (int) i / j;
-        bddDiv = bddDiv |
-          (fdd_ithvar(regAint->baseRhs,i) &
-           fdd_ithvar(regBint->baseRhs,j) &
-           fdd_ithvar(regAint->baseExtra,k));
-      }
-    }
-  }
-  return retVoc;
 }
 
 std::ostream& BinRelManager::print(std::ostream& o)
 {
   o << "BinRelManager dump:" << std::endl;
-  regAbool->print(o << "regAbool: ") << std::endl;
-  regBbool->print(o << "regBbool: ") << std::endl;
-  regAint->print(o << "regAint: ") << std::endl;
-  regBint->print(o << "regBint: ") << std::endl;
-
-  o << "bddAnd: " << fddset << bddAnd << std::endl;
-  o << "bddOr: " << fddset << bddOr << std::endl;
-  o << "bddNot: " << fddset << bddNot << std::endl;
-  o << "bddPlus: " << fddset << bddPlus << std::endl;
-  o << "bddMinus: " << fddset << bddMinus << std::endl;
-  o << "bddTimes: " << fddset << bddTimes << std::endl;
-  o << "bddDiv: " << fddset << bddDiv << std::endl;
-
+  o << "sizeInfo: " << sizeInfo << std::endl;
+  o << "maxSize: " << maxSize << std::endl;
+  regAInfo->print(o << "regAInfo: ") << std::endl;
+  regBInfo->print(o << "regBInfo: ") << std::endl;
   return o;
 }
 
@@ -450,32 +159,29 @@ bdd BinRelManager::From(std::string var)
     return bddfalse;
   }
   const bddinfo_t bi = (*BinRel::getVoc().find(var)).second;
-  if(bi->maxVal == BOOLSIZE)
-    ret = fdd_equals(bi->baseLhs, regAbool->baseRhs);
-  else
-    ret = fdd_equals(bi->baseLhs, regAint->baseRhs);
-
-  return ret;
+  for(unsigned i = 0; i < bi->maxVal; ++i)
+    ret = ret | (fdd_ithvar(bi->baseLhs, i) & fdd_ithvar(regAInfo->baseRhs, i));
+  return ret & fdd_ithvar(sizeInfo, bi->maxVal);
 }
 
 bdd BinRelManager::True()
 {
-  return fdd_ithvar(regAbool->baseRhs,1);
+  return fdd_ithvar(regAInfo->baseRhs,1) & fdd_ithvar(sizeInfo, BOOLSIZE);
 }
 
 bdd BinRelManager::False()
 {
-  return fdd_ithvar(regAbool->baseRhs,0);
+  return fdd_ithvar(regAInfo->baseRhs,0) & fdd_ithvar(sizeInfo, BOOLSIZE);
 }
 
 bdd BinRelManager::Const(unsigned val)
 {
-  if(val >= regAint->maxVal){
+  if(val >= maxSize){
     LOG(ERROR) << "[Const] Attempted to create a constant value larger "
       << "than maxVal";
     return bddfalse;
   }
-  return fdd_ithvar(regAint->baseRhs, val);
+  return fdd_ithvar(regAInfo->baseRhs, val) & fdd_ithvar(sizeInfo, maxSize);
 }
 
 bdd BinRelManager::NonDet()
@@ -483,11 +189,10 @@ bdd BinRelManager::NonDet()
   return bddtrue;
 }
 
-bdd BinRelManager::applyBinOp(bdd lexpr, bdd rexpr, bdd op, bddinfo_t regA,
-    bddinfo_t regB)
+bdd BinRelManager::applyBinOp(bdd lexpr, bdd rexpr, bdd op)
 { 
   bddPair *regA2regB = bdd_newpair();
-  fdd_setpair(regA2regB, regA->baseRhs, regB->baseRhs);
+  fdd_setpair(regA2regB, regAInfo->baseRhs, regBInfo->baseRhs);
   rexpr = bdd_replace(rexpr, regA2regB);
   bdd_freepair(regA2regB);
 
@@ -498,81 +203,223 @@ bdd BinRelManager::applyBinOp(bdd lexpr, bdd rexpr, bdd op, bddinfo_t regA,
   lexpr = bdd_relprod(
       lexpr,
       op, 
-      fdd_ithset(regA->baseRhs) & fdd_ithset(regB->baseRhs)
+      fdd_ithset(regAInfo->baseRhs) & fdd_ithset(regBInfo->baseRhs)
       );
 
   bddPair *regAExtra2Rhs = bdd_newpair();
-  fdd_setpair(regAExtra2Rhs, regA->baseExtra, regA->baseRhs);
+  fdd_setpair(regAExtra2Rhs, regAInfo->baseExtra, regAInfo->baseRhs);
   lexpr = bdd_replace(lexpr, regAExtra2Rhs);
   bdd_freepair(regAExtra2Rhs);
 
   return lexpr;
 }
 
-bdd BinRelManager::applyUnOp(bdd expr, bdd op, bddinfo_t regA)
+bdd BinRelManager::applyUnOp(bdd expr, bdd op)
 {
   expr = bdd_relprod(
       expr,
       op,
-      fdd_ithset(regA->baseRhs)
+      fdd_ithset(regAInfo->baseRhs)
       );
 
   bddPair *regAExtra2Rhs = bdd_newpair();
-  fdd_setpair(regAExtra2Rhs, regA->baseExtra, regA->baseRhs);
+  fdd_setpair(regAExtra2Rhs, regAInfo->baseExtra, regAInfo->baseRhs);
   expr = bdd_replace(expr, regAExtra2Rhs);
   bdd_freepair(regAExtra2Rhs);
 
   return expr;
 }
 
-bdd BinRelManager::applyBinOpBool(bdd lexpr, bdd rexpr, bdd op)
-{
-  return applyBinOp(lexpr,rexpr,op,regAbool,regBbool);
-}
-
-bdd BinRelManager::applyBinOpInt(bdd lexpr, bdd rexpr, bdd op)
-{
-  return applyBinOp(lexpr,rexpr,op,regAint,regBint);
-}
-
-bdd BinRelManager::applyUnOpBool(bdd expr, bdd op)
-{
-  return applyUnOp(expr,op,regAbool);
-}
-
 bdd BinRelManager::And(bdd lexpr, bdd rexpr)
 {
-  return applyBinOpBool(lexpr, rexpr, bddAnd);      
+  return applyBinOp(lexpr, rexpr, bddAnd());      
 }
 
 bdd BinRelManager::Or(bdd lexpr, bdd rexpr)
 {
-  return applyBinOpBool(lexpr, rexpr, bddOr);      
+  return applyBinOp(lexpr, rexpr, bddOr());
 }
 
 bdd BinRelManager::Not(bdd expr)
 {
-  return applyUnOpBool(expr, bddNot);      
+  return applyUnOp(expr, bddNot());      
 }
 
 bdd BinRelManager::Plus(bdd lexpr, bdd rexpr)
 {
-  return applyBinOpInt(lexpr, rexpr, bddPlus);
+  unsigned in1 = getRegSize(lexpr);
+  unsigned in2 = getRegSize(rexpr);
+  return applyBinOp(lexpr, rexpr, bddPlus(in1,in2));
 }
 
 bdd BinRelManager::Minus(bdd lexpr, bdd rexpr)
 {
-  return applyBinOpInt(lexpr, rexpr, bddMinus);
+  unsigned in1 = getRegSize(lexpr);
+  unsigned in2 = getRegSize(rexpr);
+  return applyBinOp(lexpr, rexpr, bddMinus(in1,in2));
 }
 
 bdd BinRelManager::Times(bdd lexpr, bdd rexpr)
 {
-  return applyBinOpInt(lexpr, rexpr, bddTimes);
+  unsigned in1 = getRegSize(lexpr);
+  unsigned in2 = getRegSize(rexpr);
+  return applyBinOp(lexpr, rexpr, bddTimes(in1,in2));
 }
 
 bdd BinRelManager::Div(bdd lexpr, bdd rexpr)
 {
-  return applyBinOpInt(lexpr, rexpr, bddDiv);
+  unsigned in1 = getRegSize(lexpr);
+  unsigned in2 = getRegSize(rexpr);
+  return applyBinOp(lexpr, rexpr, bddDiv(in1,in2));
+}
+
+bdd BinRelManager::bddAnd()
+{
+  bdd ret =
+    (fdd_ithvar(regAInfo->baseRhs,1) & 
+     fdd_ithvar(regBInfo->baseRhs,1) &
+     fdd_ithvar(regAInfo->baseExtra,1))
+    |
+    (fdd_ithvar(regAInfo->baseRhs,1) & 
+     fdd_ithvar(regBInfo->baseRhs,0) &
+     fdd_ithvar(regAInfo->baseExtra,0))
+    |
+    (fdd_ithvar(regAInfo->baseRhs,0) & 
+     fdd_ithvar(regBInfo->baseRhs,1) &
+     fdd_ithvar(regAInfo->baseExtra,0))
+    |
+    (fdd_ithvar(regAInfo->baseRhs,0) & 
+     fdd_ithvar(regBInfo->baseRhs,0) &
+     fdd_ithvar(regAInfo->baseExtra,0));
+  ret = ret & fdd_ithvar(sizeInfo, BOOLSIZE);
+  return ret;
+}
+
+bdd BinRelManager::bddOr()
+{
+  bdd ret = 
+    (fdd_ithvar(regAInfo->baseRhs,1) & 
+     fdd_ithvar(regBInfo->baseRhs,1) &
+     fdd_ithvar(regAInfo->baseExtra,1))
+    |
+    (fdd_ithvar(regAInfo->baseRhs,1) & 
+     fdd_ithvar(regBInfo->baseRhs,0) &
+     fdd_ithvar(regAInfo->baseExtra,1))
+    |
+    (fdd_ithvar(regAInfo->baseRhs,0) & 
+     fdd_ithvar(regBInfo->baseRhs,1) &
+     fdd_ithvar(regAInfo->baseExtra,1))
+    |
+    (fdd_ithvar(regAInfo->baseRhs,0) & 
+     fdd_ithvar(regBInfo->baseRhs,0) &
+     fdd_ithvar(regAInfo->baseExtra,0));
+  ret = ret & fdd_ithvar(sizeInfo, BOOLSIZE);
+  return ret;
+}
+
+bdd BinRelManager::bddNot()
+{
+  bdd ret =
+    (fdd_ithvar(regAInfo->baseRhs,1) & 
+     fdd_ithvar(regAInfo->baseExtra,0))
+    |
+    (fdd_ithvar(regAInfo->baseRhs,0) & 
+     fdd_ithvar(regAInfo->baseExtra,1));
+  ret = ret & fdd_ithvar(sizeInfo, BOOLSIZE);
+  return ret;
+}
+
+bdd BinRelManager::bddPlus(unsigned in1Size, unsigned in2Size)
+{
+  if(in1Size != in2Size)
+    LOG(ERROR) << "[BinRelManager::bddPlus] Addition of number of different bit widths is not allowed.\n";
+  int outSize = in1Size;
+  bdd ret = bddfalse;
+  for(unsigned i=0; i<in1Size; ++i){
+    for(unsigned j=0; j<in2Size; ++j){
+      int k = (i + j) % outSize;
+      ret = ret  |
+        (fdd_ithvar(regAInfo->baseRhs,i) &
+         fdd_ithvar(regBInfo->baseRhs,j) &
+         fdd_ithvar(regAInfo->baseExtra,k));
+    }
+  }
+  ret = ret & fdd_ithvar(sizeInfo, outSize);
+  return ret;
+}
+
+bdd BinRelManager::bddMinus(unsigned in1Size, unsigned in2Size)
+{
+  if(in1Size != in2Size)
+    LOG(ERROR) << "[BinRelManager::bddMinus] Subtraction of number of different bit widths is not allowed.\n";
+  int outSize = in1Size;
+  bdd ret = bddfalse;
+  for(unsigned i=0; i<in1Size; ++i){
+    for(unsigned j=0; j<in2Size; ++j){
+      int k = (i - j + outSize) % outSize;
+      ret = ret  |
+        (fdd_ithvar(regAInfo->baseRhs,i) &
+         fdd_ithvar(regBInfo->baseRhs,j) &
+         fdd_ithvar(regAInfo->baseExtra,k));
+    }
+  }
+  ret = ret & fdd_ithvar(sizeInfo, outSize);
+  return ret;
+}
+
+bdd BinRelManager::bddTimes(unsigned in1Size, unsigned in2Size)
+{
+  if(in1Size != in2Size)
+    LOG(ERROR) << "[BinRelManager::bddTimes] Multiplication of number of different bit widths is not allowed.\n";
+  int outSize = in1Size;
+  bdd ret = bddfalse;
+  for(unsigned i=0; i<in1Size; ++i){
+    for(unsigned j=0; j<in2Size; ++j){
+      int k = (i * j) % outSize;
+      ret = ret  |
+        (fdd_ithvar(regAInfo->baseRhs,i) &
+         fdd_ithvar(regBInfo->baseRhs,j) &
+         fdd_ithvar(regAInfo->baseExtra,k));
+    }
+  }
+  ret = ret & fdd_ithvar(sizeInfo, outSize);
+  return ret;
+}
+
+bdd BinRelManager::bddDiv(unsigned in1Size, unsigned in2Size)
+{
+  if(in1Size != in2Size)
+    LOG(ERROR) << "[BinRelManager::bddDiv] Division of number of different bit widths is not allowed.\n";
+  int outSize = in1Size;
+  bdd ret = bddfalse;
+  for(unsigned i=0; i<in1Size; ++i){
+    for(unsigned j=0; j<in2Size; ++j){
+      int k;
+      if(j == 0)
+        //arbitrary
+        k = 0;
+      else
+        k = (int) i / j;
+      ret = ret |
+        (fdd_ithvar(regAInfo->baseRhs,i) &
+         fdd_ithvar(regBInfo->baseRhs,j) &
+         fdd_ithvar(regAInfo->baseExtra,k));
+    }
+  }
+  ret = ret & fdd_ithvar(sizeInfo, outSize);
+  return ret;
+}
+
+unsigned BinRelManager::getRegSize(bdd forThis)
+{
+  //Inefficient!!!
+  for(unsigned i = 0; i <= maxSize; ++i){
+    bdd tmp = fdd_ithvar(sizeInfo, i);
+    if((tmp & forThis) != bddfalse)
+      return i;
+  }
+  LOG(FATAL) << "[BinRelManager::getRegSize] bdd does not have a recognizable regSize\n";
+  return 0;
 }
 
 bdd BinRelManager::Assign(std::string var, bdd expr)
@@ -588,37 +435,20 @@ bdd BinRelManager::Assign(std::string var, bdd expr)
 
   //redundant?
   bddPair *regARhs2Extra = bdd_newpair();
-  if(bi->maxVal == BOOLSIZE)
-    fdd_setpair(
-        regARhs2Extra,
-        regAbool->baseRhs,
-        regAbool->baseExtra
-        );
-  else
-    fdd_setpair(
-        regARhs2Extra,
-        regAint->baseRhs,
-        regAint->baseExtra
-        );
+  fdd_setpair(
+      regARhs2Extra,
+      regAInfo->baseRhs,
+      regAInfo->baseExtra
+      );
   expr = bdd_replace(expr,regARhs2Extra);
   bdd_freepair(regARhs2Extra);
   //up to here.
 
-  bddPair *regA2var = bdd_newpair();
-  if(bi->maxVal == BOOLSIZE)
-    fdd_setpair(
-        regA2var,
-        regAbool->baseExtra,
-        bi->baseRhs
-        );
-  else
-    fdd_setpair(
-        regA2var,
-        regAint->baseExtra,
-        bi->baseRhs
-        );
-  expr = bdd_replace(expr, regA2var);
-  bdd_freepair(regA2var);
+  bdd regA2var = bddfalse;
+  for(unsigned i = 0; i < bi->maxVal; ++i)
+    regA2var = regA2var |
+      (fdd_ithvar(regAInfo->baseExtra,i) & fdd_ithvar(bi->baseRhs,i));
+  expr = bdd_relprod(expr,regA2var,fdd_ithset(regAInfo->baseExtra));
 
   bdd c = bddtrue;
   for(
@@ -630,7 +460,7 @@ bdd BinRelManager::Assign(std::string var, bdd expr)
       c = c & fdd_equals((iter->second)->baseLhs,
           (iter->second)->baseRhs);
   }
-  return expr & c;
+  return bdd_exist(expr & c, fdd_ithset(sizeInfo));
 }
 
 bdd BinRelManager::Assume(bdd expr1, bdd expr2)
@@ -638,34 +468,20 @@ bdd BinRelManager::Assume(bdd expr1, bdd expr2)
   const Voc voc = BinRel::getVoc();
 
   bddPair *regARhs2Extra = bdd_newpair();
-  if(regAbool != NULL)
-    fdd_setpair(
-        regARhs2Extra,
-        regAbool->baseRhs,
-        regAbool->baseExtra
-        );
-  if(regAint != NULL)
-    fdd_setpair(
-        regARhs2Extra,
-        regAint->baseRhs,
-        regAint->baseExtra
-        );
+  fdd_setpair(
+      regARhs2Extra,
+      regAInfo->baseRhs,
+      regAInfo->baseExtra
+      );
   expr1 = bdd_replace(expr1, regARhs2Extra);
   bdd_freepair(regARhs2Extra);
 
   bddPair *regARhs2BExtra = bdd_newpair();
-  if(regAbool != NULL)
-    fdd_setpair(
-        regARhs2BExtra,
-        regAbool->baseRhs,
-        regBbool->baseExtra
-        );
-  if(regAint != NULL)
-    fdd_setpair(
-        regARhs2BExtra,
-        regAint->baseRhs,
-        regBint->baseExtra
-        );
+  fdd_setpair(
+      regARhs2BExtra,
+      regAInfo->baseRhs,
+      regBInfo->baseExtra
+      );
   expr2 = bdd_replace(expr2, regARhs2BExtra);
   bdd_freepair(regARhs2BExtra);
 
@@ -688,31 +504,18 @@ bdd BinRelManager::Assume(bdd expr1, bdd expr2)
           iter->second->baseRhs
           );
   } 
-  if(regAbool != NULL)
-    equate = equate &
-      fdd_equals(
-          regAbool->baseExtra,
-          regBbool->baseExtra
-          );
-  if(regAint != NULL)
-    equate = equate &
-      fdd_equals(
-          regAint->baseExtra,
-          regBint->baseExtra
-          );
+  equate = equate &
+    fdd_equals(
+        regAInfo->baseExtra,
+        regBInfo->baseExtra
+        );
 
   bdd ret = expr1 & expr2 & equate;
 
-  if(regAbool != NULL){
-    ret = bdd_exist(ret, fdd_ithset(regAbool->baseExtra));
-    ret = bdd_exist(ret, fdd_ithset(regBbool->baseExtra));
-  }
-  if(regAint != NULL){
-    ret = bdd_exist(ret, fdd_ithset(regAint->baseExtra));
-    ret = bdd_exist(ret, fdd_ithset(regBint->baseExtra));
-  }
+  ret = bdd_exist(ret, fdd_ithset(regAInfo->baseExtra));
+  ret = bdd_exist(ret, fdd_ithset(regBInfo->baseExtra));
 
-  return ret;
+  return bdd_exist(ret, fdd_ithset(sizeInfo));
 }
 
 bdd BinRelManager::tGetRandomTransformer(bool isTensored)

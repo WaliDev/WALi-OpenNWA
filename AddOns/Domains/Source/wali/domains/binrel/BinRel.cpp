@@ -31,13 +31,30 @@ using wali::waliErr;
 //It's a good habit to forward declare all the static functions in the
 //file so that there is an index and so that the contents of the file can
 //move around freely.
-static void myFddStrmHandler(std::ostream &o, int var);
-static BinRel* convert(wali::SemElem* se);
+
+namespace wali
+{
+  namespace domains
+  {
+    namespace binrel
+    {
+      /**
+       * idx2Name gives strings to print for bdd level indices.
+       * This is passed to the callback function in buddy.
+       * This is currently a global so that it can be 
+       * accessed in BinRelManager.
+       **/
+      RevVoc idx2Name;
+
+      static void myFddStrmHandler(std::ostream &o, int var);
+      static BinRel* convert(wali::SemElem* se);
+    }
+  }
+}
 
 // ////////////////////////////
 // Definitions of static members from BinRel class
 Voc BinRel::voc;
-//RevVoc BinRel::idx2Name;
 
 bddPair* BinRel::baseSwap = NULL;
 bddPair* BinRel::baseRightShift = NULL;
@@ -87,12 +104,35 @@ std::ostream& BddInfo::print(std::ostream& o) const
   return o;
 }
 
-static RevVoc idx2Name;
-static void myFddStrmHandler(std::ostream &o, int var)
+namespace wali
 {
-  extern RevVoc idx2Name;
-  o << idx2Name[var];
-}
+  namespace domains
+  {
+    namespace binrel
+    {
+      static void myFddStrmHandler(std::ostream &o, int var)
+      {
+        extern RevVoc idx2Name;
+        o << idx2Name[var];
+      }
+
+      // Helper function that converts a SemElem
+      // into a BinRel*
+      static BinRel* convert(wali::SemElem* se) 
+      {
+        BinRel* br = dynamic_cast<BinRel*>(se);
+        if (br == NULL) {
+          *waliErr << "[ERROR] Cannot cast to class wali::binrel::BinRel.\n";
+          se->print( *waliErr << "    " ) << endl;
+          assert(false);
+        }
+        // When done with developement
+        // BinRel* br = static_cast<BinRel*>(se)
+        return br;
+      }
+    } // namespace binrel
+  } // namespace domains
+} // namespace wali
 
 // ////////////////////////////
 // Static
@@ -521,21 +561,6 @@ binrel_t BinRel::Eq13Project() const
 
 // ////////////////////////////
 // SemElem Interface functions
-
-// Helper function that converts a SemElem
-// into a BinRel*
-static BinRel* convert(wali::SemElem* se) 
-{
-  BinRel* br = dynamic_cast<BinRel*>(se);
-  if (br == NULL) {
-    *waliErr << "[ERROR] Cannot cast to class wali::binrel::BinRel.\n";
-    se->print( *waliErr << "    " ) << endl;
-    assert(false);
-  }
-  // When done with developement
-  // BinRel* br = static_cast<BinRel*>(se)
-  return br;
-}
 
 wali::sem_elem_t BinRel::combine(wali::SemElem* se) 
 {

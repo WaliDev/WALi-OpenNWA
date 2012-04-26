@@ -47,20 +47,20 @@ namespace wali
           unsigned maxVal;
           // /fdd indices
           // The following three indices are for the base relation
-          int baseLhs;
-          int baseRhs;
+          unsigned baseLhs;
+          unsigned baseRhs;
           //used for extends
-          int baseExtra;
+          unsigned baseExtra;
           //The following three indices are for the tensored relations when this
           //variable is in the left operand in the tensor product
-          int tensor1Lhs;
-          int tensor1Rhs;
-          int tensor1Extra;
+          unsigned tensor1Lhs;
+          unsigned tensor1Rhs;
+          unsigned tensor1Extra;
           //The following three indices are for the tensored relations when this
           //variable is in the right operand in the tensor product
-          int tensor2Lhs;
-          int tensor2Rhs;
-          int tensor2Extra;
+          unsigned tensor2Lhs;
+          unsigned tensor2Rhs;
+          unsigned tensor2Extra;
 
           std::ostream& print( std::ostream& o ) const;
       };
