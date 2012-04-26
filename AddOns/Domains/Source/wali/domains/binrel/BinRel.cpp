@@ -96,7 +96,7 @@ static void myFddStrmHandler(std::ostream &o, int var)
 
 // ////////////////////////////
 // Static
-const Voc BinRel::initialize(int bddMemSize, int cacheSize, Voc v) 
+void BinRel::initialize(Voc& v, int bddMemSize, int cacheSize) 
 {
   if(bdd_isrunning() == 1){
     *waliErr << "[INFO] " << "BinRel initialize called multiple times" 
@@ -234,17 +234,20 @@ const Voc BinRel::initialize(int bddMemSize, int cacheSize, Voc v)
     commonVocSet13 = commonVocSet13 & fdd_ithset(varInfo->tensor2Lhs);
     commonVocId13 = commonVocId13 & 
       fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
-
-    //add the current varInfoiable with all its regalia to voc
-    voc[varName] = varInfo;
   }
-
+  //Make a copy of the vocabulary and store it.
+  //We don't want to expose the BinRel's copy to the outside world.
+  for(Voc::const_iterator iter = v.begin();
+      iter != v.end();
+      ++iter){
+    bddinfo_t varInfo = new BddInfo(*(iter->second));
+    voc[iter->first] = varInfo;
+  }
   //setup Static Id relations. Yes, this is wasteful iff no one uses Id ever.
   //But that is highly unlikely
   BinRel::setId();
-
-  for(Voc::const_iterator iter = voc.begin();
-      iter != voc.end();
+  for(Voc::const_iterator iter = v.begin();
+      iter != v.end();
       ++iter){
     bddinfo_t bi = iter->second;
     idx2Name[bi->baseLhs] = iter->first;
@@ -257,9 +260,6 @@ const Voc BinRel::initialize(int bddMemSize, int cacheSize, Voc v)
     idx2Name[bi->tensor2Rhs] = iter->first + "_t2'";
     idx2Name[bi->tensor2Extra] = iter->first + "_t2''";
   }
-
-  //return updated voc (v)
-  return v;
 }
 
 void BinRel::reset()

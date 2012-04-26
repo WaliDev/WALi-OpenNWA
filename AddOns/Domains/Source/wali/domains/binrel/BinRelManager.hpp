@@ -98,6 +98,7 @@ namespace wali
 
         private:
 
+          //FIXME: add const when initialize() has been removed.
           unsigned BOOLSIZE;
 
           bddinfo_t regAbool, regBbool, regAint, regBint;

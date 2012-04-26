@@ -95,7 +95,7 @@ namespace wali
            * @return [const] 
            *        Voc updated with the fddIdx values.
            */
-          static const Voc initialize(int bddMemSize, int cacheSize, Voc voc);
+          static void initialize(Voc& voc, int bddMemSize=0, int cacheSize=0);
 
           /** @return true if BinRel has been successfully initialized */
           static bool is_initialized();

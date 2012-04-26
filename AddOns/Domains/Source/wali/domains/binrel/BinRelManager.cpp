@@ -79,16 +79,183 @@ void BinRelManager::reset()
 }
 
 BinRelManager::BinRelManager(Voc& voc, int bddMemSize, int cacheSize) :
-  Countable()
+  Countable(),
+  BOOLSIZE(2)
 {
-  initialize(bddMemSize, cacheSize, voc);
+  BinRel::initialize(voc, bddMemSize, cacheSize);
+  const Voc& retVoc = voc;
+
+  regAbool = NULL;
+  regBbool = NULL;
+  for(
+      Voc::const_iterator iter = retVoc.begin(); 
+      iter != retVoc.end();
+      ++iter
+     ){
+    if(regBbool != NULL)
+      break;
+    if((iter->second)->maxVal == BOOLSIZE){
+      if(regAbool == NULL)
+        regAbool = iter->second;
+      else
+        regBbool = iter->second;
+    }
+  }
+
+  regAint = NULL;
+  regBint = NULL;
+  for(
+      Voc::const_iterator iter = retVoc.begin(); 
+      iter != retVoc.end();
+      ++iter
+     ){
+    if(regBint != NULL)
+      break;
+    if((iter->second)->maxVal > BOOLSIZE){
+      if(regAint == NULL)
+        regAint = iter->second;
+      else
+        regBint = iter->second;
+    }
+  }
+
+  if(regAbool == NULL || regBbool == NULL){
+    LOG(INFO) << "[binrel::initialize] I did not find enough Boolean vars"
+      << "\nAnd(...) will not be functional.";
+  }else{
+    bddAnd =
+      (fdd_ithvar(regAbool->baseRhs,1) & 
+       fdd_ithvar(regBbool->baseRhs,1) &
+       fdd_ithvar(regAbool->baseExtra,1))
+      |
+      (fdd_ithvar(regAbool->baseRhs,1) & 
+       fdd_ithvar(regBbool->baseRhs,0) &
+       fdd_ithvar(regAbool->baseExtra,0))
+      |
+      (fdd_ithvar(regAbool->baseRhs,0) & 
+       fdd_ithvar(regBbool->baseRhs,1) &
+       fdd_ithvar(regAbool->baseExtra,0))
+      |
+      (fdd_ithvar(regAbool->baseRhs,0) & 
+       fdd_ithvar(regBbool->baseRhs,0) &
+       fdd_ithvar(regAbool->baseExtra,0));
+  }
+
+  if(regAbool == NULL || regBbool == NULL){
+    LOG(INFO) << "[binrel::initialize] I did not find enough Boolean vars"
+      << "\nOr(...) will not be functional.";
+  }else{
+    bddOr =
+      (fdd_ithvar(regAbool->baseRhs,1) & 
+       fdd_ithvar(regBbool->baseRhs,1) &
+       fdd_ithvar(regAbool->baseExtra,1))
+      |
+      (fdd_ithvar(regAbool->baseRhs,1) & 
+       fdd_ithvar(regBbool->baseRhs,0) &
+       fdd_ithvar(regAbool->baseExtra,1))
+      |
+      (fdd_ithvar(regAbool->baseRhs,0) & 
+       fdd_ithvar(regBbool->baseRhs,1) &
+       fdd_ithvar(regAbool->baseExtra,1))
+      |
+      (fdd_ithvar(regAbool->baseRhs,0) & 
+       fdd_ithvar(regBbool->baseRhs,0) &
+       fdd_ithvar(regAbool->baseExtra,0));
+  }
+
+  if(regAbool == NULL){
+    LOG(INFO) << "[binrel::initialize] I did not find enough Boolean vars"
+      << "\nNot(...) will not be functional.";
+  }else{
+    bddNot =
+      (fdd_ithvar(regAbool->baseRhs,1) & 
+       fdd_ithvar(regAbool->baseExtra,0))
+      |
+      (fdd_ithvar(regAbool->baseRhs,0) & 
+       fdd_ithvar(regAbool->baseExtra,1));
+  }
+
+  int maxVal=0;
+  if(regAint != NULL)
+    maxVal = regAint->maxVal;
+
+  if(regAint == NULL || regBint == NULL){
+    LOG(INFO) << "[binrel::initialize] I did not find enough int vars"
+      << "\nPlus(...) will not be functional.";
+  }else{
+    bddPlus = bddfalse;
+    for(int i=0; i<maxVal; ++i){
+      for(int j=0; j<maxVal; ++j){
+        int k = (i + j) % maxVal;
+        bddPlus = bddPlus |
+          (fdd_ithvar(regAint->baseRhs,i) &
+           fdd_ithvar(regBint->baseRhs,j) &
+           fdd_ithvar(regAint->baseExtra,k));
+      }
+    }
+  }
+
+  if(regAint == NULL || regBint == NULL){
+    LOG(INFO) << "[binrel::initialize] I did not find enough int vars"
+      << "\nMinus(...) will not be functional.";
+  }else{
+    bddMinus = bddfalse;
+    for(int i=0; i<maxVal; ++i){
+      for(int j=0; j<maxVal; ++j){
+        int k = (i - j + maxVal) % maxVal;
+        bddMinus = bddMinus |
+          (fdd_ithvar(regAint->baseRhs,i) &
+           fdd_ithvar(regBint->baseRhs,j) &
+           fdd_ithvar(regAint->baseExtra,k));
+      }
+    }
+  }
+
+  if(regAint == NULL || regBint == NULL){
+    LOG(INFO) << "[binrel::initialize] I did not find enough int vars"
+      << "\nTimes(...) will not be functional.";
+  }else{
+    bddTimes = bddfalse;
+    for(int i=0; i<maxVal; ++i){
+      for(int j=0; j<maxVal; ++j){
+        int k = (i * j) % maxVal;
+        bddTimes = bddTimes |
+          (fdd_ithvar(regAint->baseRhs,i) &
+           fdd_ithvar(regBint->baseRhs,j) &
+           fdd_ithvar(regAint->baseExtra,k));
+      }
+    }
+  }
+
+  if(regAint == NULL || regBint == NULL){
+    LOG(INFO) << "[binrel::initialize] I did not find enough int vars"
+      << "\nDiv(...) will not be functional.";
+  }else{
+    bddDiv = bddfalse;
+    for(int i=0; i<maxVal; ++i){
+      for(int j=0; j<maxVal; ++j){
+        int k;
+        if(j == 0)
+          //arbitrary
+          k = 0;
+        else
+          k = (int) i / j;
+        bddDiv = bddDiv |
+          (fdd_ithvar(regAint->baseRhs,i) &
+           fdd_ithvar(regBint->baseRhs,j) &
+           fdd_ithvar(regAint->baseExtra,k));
+      }
+    }
+  }
 }
+
 
 const Voc BinRelManager::initialize(int bddMemSize, int cacheSize, Voc voc)
 {
   BOOLSIZE=2; //move to intialize in the constructor
   reset();
-  const Voc retVoc = BinRel::initialize(bddMemSize, cacheSize, voc);
+  BinRel::initialize(voc, bddMemSize, cacheSize);
+  const Voc& retVoc = voc;
 
   regAbool = NULL;
   regBbool = NULL;
