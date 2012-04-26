@@ -28,9 +28,10 @@ env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Werror', '')
 
 test_files = Split("""
   testsMain.cpp
-  testsBinRelManager.cpp
   testsBinRel.cpp
+  testsBinRelManager.cpp
 """)
+
 #generateRandomFWPDS.cpp
 #randomFwpdsTests.cpp
 

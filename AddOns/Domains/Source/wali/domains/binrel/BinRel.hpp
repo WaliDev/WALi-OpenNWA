@@ -44,7 +44,7 @@ namespace wali
        */
       struct BddInfo : public Countable, public Printable
       {
-          int maxVal;
+          unsigned maxVal;
           // /fdd indices
           // The following three indices are for the base relation
           int baseLhs;
