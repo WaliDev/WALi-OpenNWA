@@ -11,6 +11,7 @@
 #include "wali/wfa/WeightMaker.hpp"
 #include "wali/regex/AllRegex.hpp"
 #include "wali/wpds/GenKeySource.hpp"
+#include "wali/wfa/DeterminizeWeightGen.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -327,9 +328,9 @@ namespace wali
         Key p,
         Key g,
         Key q,
-        Trans & t )
+        Trans & t ) const
     {
-      ITrans *itrans = find(p,g,q);
+      ITrans const * itrans = find(p,g,q);
       if(itrans != 0) {
         t = *itrans;
         return true;
@@ -348,14 +349,24 @@ namespace wali
         Key g,
         Key q)
     {
+      WFA const * const_this = this;
+      ITrans const * trans = const_this->find(p,g,q);
+      return const_cast<ITrans*>(trans);
+    }
+
+    ITrans const * WFA::find( 
+        Key p,
+        Key g,
+        Key q) const
+    {
       KeyPair kp(p,g);
-      kp_map_t::iterator it = kpmap.find(kp);
+      kp_map_t::const_iterator it = kpmap.find(kp);
       if( it != kpmap.end() )
       {
-        TransSet& transSet = it->second;
-        TransSet::iterator tsit= transSet.find(p,g,q);
+        TransSet const & transSet = it->second;
+        TransSet::const_iterator tsit= transSet.find(p,g,q);
         if( tsit != transSet.end() ) {
-          ITrans* itrans = *tsit;
+          ITrans const * itrans = *tsit;
           return itrans;
         }
       }
@@ -1669,7 +1680,7 @@ namespace wali
 
 
     WFA
-    WFA::semideterminize() const
+    WFA::semideterminize(DeterminizeWeightGen const & wg) const
     {
       std::stack<KeySet> worklist;
       std::set<Key> visited;
@@ -1717,13 +1728,23 @@ namespace wali
         {
           Key symbol = next->first;
           Key target_key = getKey(next->second);
+
+          if (next->second.size() > 0) {
+            // Only add a transition if it doesn't go to {}. Why? This is
+            // borne out of the difference between determinize and
+            // semideterminize. Determinize "can't" produce a total
+            // automaton. However, without this check, it still inserts the
+            // initial transitions to {}. From the point of view of producing
+            // an incomplete automaton, these transitions are dumb. So we get
+            // rid of them.
+            sem_elem_t weight = wg.getWeight(*this, result, sources, symbol, next->second);
+            result.addTrans(sources_key, symbol, target_key, weight);
           
-          result.addTrans(sources_key, symbol, target_key, one);
-          
-          std::pair<KeySet::iterator, bool> p = visited.insert(target_key);
-          if (p.second) {
-            // It wasn't already there
-            worklist.push(next->second);
+            std::pair<KeySet::iterator, bool> p = visited.insert(target_key);
+            if (p.second) {
+              // It wasn't already there
+              worklist.push(next->second);
+            }
           }
         }
       }
@@ -1733,13 +1754,27 @@ namespace wali
     }
 
     WFA
-    WFA::determinize() const
+    WFA::semideterminize() const
     {
-      WFA det = semideterminize();
+      AlwaysReturnOneWeightGen wg(getSomeWeight());
+      return semideterminize(wg);
+    }
+    
+    WFA
+    WFA::determinize(DeterminizeWeightGen const & wg) const
+    {
+      WFA det = semideterminize(wg);
       det.complete();
       return det;
     }
-      
+
+    WFA
+    WFA::determinize() const
+    {
+      AlwaysReturnOneWeightGen wg(getSomeWeight());
+      return determinize(wg);
+    }
+    
     static
     size_t
     fact(size_t n) {
@@ -1908,6 +1943,10 @@ namespace wali
     {
       sem_elem_t one = getSomeWeight()->one();
 
+      // We only add {} on-demand. If it's not reachable, then we don't want
+      // it there.
+      bool added_sink_state = false;
+
       // Maps source state to set of outgoing letters. (We don't care where
       // they go, just whether there is any.)
       std::map<Key, KeySet> outgoing;
@@ -1928,8 +1967,18 @@ namespace wali
              symbol != symbols.end(); ++symbol)
         {
           if (outgoing[*state].find(*symbol) == outgoing[*state].end()) {
+            added_sink_state = true;
+            addState(sink_state, one->zero());
             addTrans(*state, *symbol, sink_state, one);
           }
+        }
+      }
+
+      if (added_sink_state) {
+        for (kp_map_t::const_iterator kp_iter = kpmap.begin();
+             kp_iter != kpmap.end(); ++kp_iter)
+        {
+          addTrans(sink_state, kp_iter->first.second, sink_state, one);
         }
       }
     }

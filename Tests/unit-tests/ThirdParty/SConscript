@@ -1,0 +1,107 @@
+import os, sys
+
+Import('Debug')
+Import('WaliDir')
+Import('LibInstallDir')
+Import('MkStatic')
+Import('Platform')
+Import('Is64')
+Import('BuildDir')
+Import('ProgEnv')
+
+if Debug:
+    print '\n+++ Entered "#/Test/unit-tests/ThirdParty/SConscript"\n'
+
+ThirdParty = os.path.join(WaliDir,'Tests', 'unit-tests', 'ThirdParty')
+GtestDir = 'gtest-1.6.0'
+
+# download binary distribution archive
+archive = 'gtest-1.6.0.zip'
+env = ProgEnv.Clone(
+    archive  = File(archive),
+    mirror   = 'http://googletest.googlecode.com/files',
+    url      = '$mirror/%s' % archive,
+    builddir = BuildDir
+    )
+
+if not File(archive,ThirdParty).exists():
+    print
+    env.Execute([['curl', '--silent', '--fail', '--show-error', '--output', '$archive', '$url']])
+
+# unpack the archive to get the good stuff out
+if not File('README', os.path.join(ThirdParty, GtestDir)).exists():
+    unpack = ['unzip', '-o', '-d', '$archive.dir', '$archive']
+    env.Execute([unpack])
+    patch = ['patch', '-p0', '<' 'gtest-pathcc.patch']
+    env.Execute([patch])
+
+# build gtest
+build_dir = os.path.join('$builddir', GtestDir)
+
+if 'cl' == env['compiler']:
+    cmake_command = 'cd %s && $CMAKE -G"NMake Makefiles" %s'
+    build_command = 'cd %s && nmake'
+    if (str(env['CCFLAGS']).find('/MTd') != -1
+        or str(env['CCFLAGS']).find('/MDd') != -1):
+        cmake_command += ' -DCMAKE_BUILD_TYPE=Debug'
+    else:
+        cmake_command += ' -DCMAKE_BUILD_TYPE=Release'
+    lib_name = os.path.join(build_dir, 'gtest.lib')
+else:
+    cmake_command = 'cd %s && $CMAKE %s' + (
+                       ' -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=%s -DCMAKE_CXX_COMPILER=%s' %
+                       (ProgEnv['CC'], ProgEnv['CXX']))
+    if str(ProgEnv['CCFLAGS']).find("-m32") != -1:
+        cmake_command += ' -DCMAKE_CXX_FLAGS=-m32'
+    build_command = 'make -C %s'
+    lib_name = os.path.join(build_dir, 'libgtest.a')
+
+lib = env.Command(lib_name,
+                  [],
+                  ['-mkdir %s' % build_dir,
+                   cmake_command % (build_dir, os.path.join(ThirdParty, GtestDir)),
+                   build_command % build_dir]
+                  )
+built = [(lib, os.path.join(ThirdParty, GtestDir, 'include'))]
+Return('built')
+
+#  # copy Xerces library into common WALi library area
+#  library = ('lib/libxerces-c-3.1$SHLIBSUFFIX','lib/libxerces-c.a')[MkStatic]
+#  instlib = env.Install(LibInstallDir, env.File(library,XercesDir))
+#  
+#  #print 'path  = ', instlib[0].path
+#  #print 'apath = ', instlib[0].abspath
+#  if 'Darwin' == Platform and not MkStatic:
+#      env.AddPostAction(instlib,
+#                        "install_name_tool -id %s %s" % (instlib[0].abspath,instlib[0].path))
+#  
+#  # cannot use Install for symlinks due to known SCons bug:
+#  # <http://scons.tigris.org/issues/show_bug.cgi?id=1604>
+#  
+#  # generic symlinking action
+#  def symlink(target, source, env):
+#      [target] = target
+#      dest = source[0].read()
+#      print 'Dest: %s' % dest
+#      print 'Tgt : %s' % str(target)
+#      os.symlink(dest, str(target))
+#  
+#  # add shared-lib symlinks
+#  if not MkStatic:
+#      dest = Value(env.subst('libxerces-c-3.1$SHLIBSUFFIX'))
+#      #print dest.read()
+#      real = env.File(dest.read(), LibInstallDir)
+#      #print real
+#      target = env.File('libxerces-c$SHLIBSUFFIX', LibInstallDir)
+#      #print target
+#      Command(target, [dest, real], symlink)
+#  
+#  
+#  # does not clean up completely due to known SCons bugs:
+#  # <http://scons.tigris.org/issues/show_bug.cgi?id=1706>
+#  # <http://scons.tigris.org/issues/show_bug.cgi?id=2095>
+#  Clean('.', XercesDir)
+#  
+#  
+#  built = instlib
+#  Return('built')

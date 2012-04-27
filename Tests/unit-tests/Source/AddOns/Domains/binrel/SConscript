@@ -1,0 +1,45 @@
+from os.path import join
+
+Import('Debug')
+Import('ProgEnv')
+Import('LibInstallDir')
+Import('WaliDir')
+Import('ThirdPartyDir')
+
+if Debug:
+  print '\n+++ Entered "#/Tests/Addons/Domains/binrel"\n'
+env = ProgEnv.Clone()
+
+env.AppendUnique(CPPPATH=['#/AddOns/Domains/ThirdParty/include/',
+                          '#/AddOns/Domains/Source/'])
+
+env.AppendUnique(LIBPATH=['#/AddOns/Domains/ThirdParty/'])
+
+[(gtest_lib, gtest_inc)] = SConscript("#/Tests/unit-tests/ThirdParty/SConscript")
+ListOfBuilds = ['glog']
+[(glog_lib, glog_inc)] = SConscript('#/ThirdParty/SConscript', 'ListOfBuilds')
+
+if 'cl' != env['CC']:
+  env.AppendUnique(LIBS=['pthread'])
+env.AppendUnique(CPPPATH=[gtest_inc, WaliDir])
+#env.AppendUnique(CPPPATH=[join(ThirdPartyDir,'include')])
+env.AppendUnique(CPPPATH=[glog_inc])
+env.AppendUnique(LIBS=[gtest_lib, 'pthread', glog_lib, 'bdd', 'libwalidomains'])
+
+#gtest is ill behaved w.r.t. to this flag.
+env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
+env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Werror', '')
+
+test_files = Split("""
+  testsMain.cpp
+  testsBinRelManager.cpp
+  testsBinRel.cpp
+""")
+#generateRandomFWPDS.cpp
+#randomFwpdsTests.cpp
+
+built=[]
+#built+= env.Program('testProj', test_files, LIBS = ['gtest', 'bdd', 'glog', 'wali'])
+built+= env.Program('testProj', test_files)
+
+Return('built')

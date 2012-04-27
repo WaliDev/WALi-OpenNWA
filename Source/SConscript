@@ -56,6 +56,7 @@ nice_files = Split("""
 ./wali/wfa/WeightMaker.cpp
 ./wali/wfa/TransFunctor.cpp
 ./wali/wfa/TransSet.cpp
+./wali/wfa/DeterminizeWeightGen.cpp
 ./wali/wfa/epr/EPA.cpp
 ./wali/wfa/epr/FunctionalWeight.cpp
 ./wali/wfa/epr/FunctionalWeightMaker.cpp

@@ -31,6 +31,6 @@ for t in ['t1','t3','t4','twitness','tprune','tTransSet']:
     built += (exe)
 
 #nwa_built = SConscript('nwa/SConscript')
-built += SConscript('Addons/SConscript')
+#built += SConscript('Addons/SConscript')
 Return('built')
 
