@@ -2,10 +2,14 @@
 #define INCLUDE_CFGLIB_XFA_XFA_HPP
 
 #include <wali/wfa/WFA.hpp>
+#include <wali/wfa/TransFunctor.hpp>
+#include <wali/wfa/ITrans.hpp>
 #include <wali/domains/binrel/BinRel.hpp>
 #include <wali/Key.hpp>
 
 #include <map>
+#include <sstream>
+#include <fstream>
 
 #include "../cpp11.hpp"
 
@@ -123,7 +127,43 @@ namespace cfglib {
             bool isIsomorphicTo(Xfa const & other) {
                 return wfa_.isIsomorphicTo(other.wfa_);
             }
-            
+
+
+            struct Drawer : wali::wfa::ConstTransFunctor {
+                std::string const & dir;
+                Drawer(std::string const & d) : dir(d) {}
+                
+                virtual void operator()( const wali::wfa::ITrans* t ) {
+                    wali::sem_elem_t w_se = t->weight();
+                    BinaryRelation w = dynamic_cast<wali::domains::binrel::BinRel*>(w_se.get_ptr());
+                    assert(w != NULL);
+
+                    std::stringstream ss;
+                    ss << dir << "/" << t->from() << "--" << t->to();
+                    std::ofstream file((ss.str() + ".cmd").c_str());
+
+                    printImagemagickInstructions(w->getBdd(),
+                                                 w->getVocabulary(),
+                                                 file,
+                                                 ss.str() + ".png");
+
+                    std::cout << "source " << ss.str() << ".cmd\n";
+                }
+            };
+
+
+            void output_draw_package(std::string const & dirname) const {
+                system(("rm -rf " + dirname).c_str());
+                system(("mkdir " + dirname).c_str());
+                
+                std::ofstream f((dirname + "/fa.dot").c_str());
+                this->print_dot(f);
+                std::cout << "dot -Tsvg -o" << dirname << "/fa.svg " << dirname << "/fa.dot\n";
+                std::cout << "cp ~/public/html/demo/fa.html " << dirname << "\n";
+                
+                Drawer d(dirname);
+                wfa_.for_each(d);
+            }
         };
         
     }
