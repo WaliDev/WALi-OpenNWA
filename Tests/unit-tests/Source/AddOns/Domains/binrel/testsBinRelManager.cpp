@@ -279,6 +279,24 @@ namespace{
     EXPECT_NE(s,brm->Assign("s", brm->Const(11)));
   }
 
+  TEST(BinRelManagerCornCases, veryFewVars){
+    {
+      Voc voc;
+      binrel_manager_t brm = new BinRelManager(voc);
+      bdd a = brm->True();
+      bdd b = brm->Assume(brm->True(), brm->True());
+      bdd c = brm->Assume(brm->False(), brm->False());
+      ASSERT_EQ(b,c);
+    }
+    {
+      Voc voc;
+      addBoolVar(voc, "a");
+      binrel_manager_t brm = new BinRelManager(voc);
+      ASSERT_EQ(
+          brm->Assume(brm->True(),brm->True()),
+          brm->Assume(brm->From("a"),brm->From("a")));
+    } 
+  }
 
 
 
