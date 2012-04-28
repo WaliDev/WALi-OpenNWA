@@ -12,6 +12,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <boost/algorithm/string/predicate.hpp>
+
 using namespace wali::domains::binrel;
 using std::endl;
 using wali::waliErr;
@@ -659,9 +661,14 @@ namespace wali {
           // Create the current assignment
           Assignment assignment;
           for (size_t varno=0; varno<voc.size(); ++varno) {
-            assignment[voc_vector.at(varno).first] = assignment_vec.at(varno);
+            if (!boost::starts_with(voc_vector.at(varno).first,
+                                    "DUMMY")) {
+              assignment[voc_vector.at(varno).first] = assignment_vec.at(varno);
+            }
           }
-          result.push_back(assignment);
+          if (std::find(result.begin(), result.end(), assignment) == result.end()) {
+            result.push_back(assignment);
+          }
         
           // Increment the assignment vector for next iteration.
           assert(assignment_vec.at(assignment_vec.size()-1) == 0);
@@ -732,14 +739,14 @@ namespace wali {
           return (everything != bddfalse);
         }
 
-        const int width = 200;
+        const int width = 150;
         const int pre_x_center = 15;
-        const int post_x_center = 85;
+        const int post_x_center = 50;
         
         const int radius = 2;
 
         const int v_margin = 25;
-        const int v_separation = 50;
+        const int v_separation = 25;
 
 
         void write_line(int pre_no, int post_no, std::ostream & os)
@@ -755,6 +762,22 @@ namespace wali {
              << x2 << "," << y2 << "\"    \\\n";
         }
 
+        std::string toStringNums(Assignment const & assgn)
+        {
+          std::stringstream ss;
+          Assignment::const_iterator iter = assgn.begin();
+
+          ss << "(" << iter->second;
+          ++iter;
+
+          for(; iter != assgn.end(); ++iter) {
+            ss << ", " << iter->second;
+          }
+
+          ss << ")";
+          return ss.str();
+        }
+
         std::string toString(Assignment const & assgn)
         {
           std::stringstream ss;
@@ -765,6 +788,22 @@ namespace wali {
 
           for(; iter != assgn.end(); ++iter) {
             ss << ", " << iter->first << "=" << iter->second;
+          }
+
+          ss << ")";
+          return ss.str();
+        }
+        
+        std::string toStringNames(Assignment const & assgn)
+        {
+          std::stringstream ss;
+          Assignment::const_iterator iter = assgn.begin();
+
+          ss << "(" << iter->first;
+          ++iter;
+
+          for(; iter != assgn.end(); ++iter) {
+            ss << ", " << iter->first;
           }
 
           ss << ")";
@@ -789,7 +828,7 @@ namespace wali {
           x = post_x_center + pre_x_center;
           os << "    -draw \"text "
              << x << "," << y << " "
-             << "\'" << toString(assgn) << "\'\"    \\\n";
+             << "\'" << toStringNums(assgn) << "\'\"    \\\n";
         } 
       }
 
@@ -802,6 +841,8 @@ namespace wali {
 
         os << "convert -size " << details::width << "x" << height
            << " xc:wheat    \\\n"
+           << "    -font Times-Roman  \\\n"
+           << "    -draw \"text 0,12 \'" << details::toStringNames(possibleAssignments[0]) << "\'\"    \\\n"
            << "    -fill red    \\\n";
 
         // Draw the lines
@@ -818,7 +859,6 @@ namespace wali {
         }
 
         os << "    -fill black    \\\n";
-        os << "    -font Times-Roman  \\\n";
 
         // Draw the dots
         for (size_t dot_no=0; dot_no < possibleAssignments.size(); ++dot_no) {
