@@ -279,7 +279,7 @@ namespace{
     EXPECT_NE(s,brm->Assign("s", brm->Const(11)));
   }
 
-  TEST(BinRelManagerCornCases, veryFewVars){
+  TEST(BinRelManagerCornCases, DISABLED_veryFewVars){
     {
       Voc voc;
       binrel_manager_t brm = new BinRelManager(voc);
