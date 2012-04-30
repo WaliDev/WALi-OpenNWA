@@ -86,6 +86,10 @@ namespace wali {
          ETransHandler() {}
          bool exists(int ret);
          void addEdge(int call, int ret, sem_elem_t wtCallRule);
+         /**
+          * If using Newton Method based on tensored weights, these weights need to be tensored as well.
+          **/
+         void tensorWeights(bool running_prestar);
          sem_elem_t get_dependency(int ret, int &call);
 
        private:

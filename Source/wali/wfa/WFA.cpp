@@ -616,7 +616,7 @@ namespace wali
 
         { // BEGIN DEBUGGING
           numPops++;
-          //q->print( *waliErr << "  Popped: " ) << std::endl;
+          q->print( *waliErr << "  Popped: " ) << std::endl;
         } // END DEBUGGING
 
         // Get a handle on ZERO b/c we use it alot
@@ -650,7 +650,7 @@ namespace wali
             ITrans* t = *tit; // (q',_,q)
 
             { // BEGIN DEBUGGING
-              //t->print( *waliErr << "\t++ Popped " ) << std::endl;
+              t->print( *waliErr << "\t++ Popped " ) << std::endl;
             } // END DEBUGGING
 
             if( t->to() == q->name() ) {
@@ -671,10 +671,10 @@ namespace wali
             newW->delta( qprime->weight() );
 
           { // BEGIN DEBUGGING
-            //qprime->weight()->print( *waliErr << "   oldW " << key2str(qprime->name()) ) << std::endl;
-            //newW->print( *waliErr << "   newW " << key2str(qprime->name()) ) << std::endl;
-            //p.first->print( *waliErr << "\t++ p.first " ) << std::endl;
-            //p.second->print( *waliErr << "\t++ p.second " ) << std::endl;
+            qprime->weight()->print( *waliErr << "   oldW " << key2str(qprime->name()) ) << std::endl;
+            newW->print( *waliErr << "   newW " << key2str(qprime->name()) ) << std::endl;
+            p.first->print( *waliErr << "\t++ p.first " ) << std::endl;
+            p.second->print( *waliErr << "\t++ p.second " ) << std::endl;
           } // END DEBUGGING
 
           // Sets qprime's new weight
@@ -699,12 +699,12 @@ namespace wali
             progress->tick();
       }
       { // BEGIN DEBUGGING
-        //*waliErr << "\n --- WFA::path_summary needed " << numPops << " pops\n";
-        //*waliErr << "WFA state labels:\n";
-        //FOR_EACH_STATE( st ) {
-        //    *waliErr << "\t" << key2str(st->name()) << ": ";
-        //    st->weight()->print( *waliErr ) << std::endl;
-        //}
+        *waliErr << "\n --- WFA::path_summary needed " << numPops << " pops\n";
+        *waliErr << "WFA state labels:\n";
+        FOR_EACH_STATE( st ) {
+            *waliErr << "\t" << key2str(st->name()) << ": ";
+            st->weight()->print( *waliErr ) << std::endl;
+        }
       } // END DEBUGGING
     }
 

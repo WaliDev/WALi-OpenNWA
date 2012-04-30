@@ -74,9 +74,9 @@ namespace{
 
         bmt = new BinRelManager(voc);
         mwg = new MyWtGen(bmt);
-        rpt = new RandomPdsGen(mwg,4,10,40,10);
+        rpt = new RandomPdsGen(mwg,2,6,10,6);
         rpt->get(pds,names);
-        //pds.print(cout);
+        pds.print(cout);
       }
       virtual void TearDown(){
         bmt = NULL;
@@ -146,6 +146,8 @@ namespace{
 
     sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>(((*mwg)()->one()).get_ptr());
     sem_elem_tensor_t onet = one->tensor(one.get_ptr());
+
+    cout << "Running Path Summary\n";
     outfa.path_summary(onet);
   }
 }
