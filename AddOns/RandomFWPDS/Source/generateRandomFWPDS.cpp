@@ -235,8 +235,7 @@ wali::Key RandomPdsGen::genblock(
           pdsState,
           entries[fn],
           nexthead,
-          (*randomWt)(),
-          new wali::MergeFn((*randomWt)())
+          (*randomWt)()
           );
       curhead = nexthead;
       remCalls--;

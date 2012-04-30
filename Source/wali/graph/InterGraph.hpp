@@ -229,18 +229,18 @@ namespace wali {
 				void rawDfs(
 					const int u, //current node.
                 
-					const Int1D deg, //[i]: degree of node i
-					const Int2D adjMat, //The adjacency matrix
+					const Int1D& deg, //[i]: degree of node i
+					const Int2D& adjMat, //The adjacency matrix
                 
-					Int1D dfsn, //[i]: the dfs number of vertex i
+					Int1D& dfsn, //[i]: the dfs number of vertex i
 					int& dfsnext, //next free dfs number
-					Int1D comp, //O(1) membership stack containing the 
+					Int1D& comp, //O(1) membership stack containing the 
 								//vertices of current component
 					int& ncomp, //number of outstanding vertices in the components
-					Bool1D incomp, //[i] a marker that says, I've seen i, but haven't 
+					Bool1D& incomp, //[i] a marker that says, I've seen i, but haven't 
 								  //finished putting it in a component
 
-					Int1D mindfsn, //(in:out) [i]: minimum dfs number reachable from vertex i
+					Int1D& mindfsn, //(in:out) [i]: minimum dfs number reachable from vertex i
 					UnionFind& scc //(out) The output scc are stored here.
                 );
 

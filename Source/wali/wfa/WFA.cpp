@@ -1176,10 +1176,14 @@ namespace wali
         // Do it here b/c we do not have a way to
         // get the ONE and ZERO weights w/out first
         // having a weight, i.e. st->weight()
-        if( first ) {
-          ONE = st->weight()->one();
-          ZERO = st->weight()->zero();
-          if(wtFinal.get_ptr() == NULL) {
+        // Further if wtFinal was provided, use that.
+        if(first){
+          if(wtFinal!=NULL){
+            ONE = wtFinal->one();
+            ZERO = wtFinal->zero();
+          }else{
+            ONE = st->weight()->one();
+            ZERO = st->weight()->zero();
             wtFinal = ONE;
           }
           first = false;

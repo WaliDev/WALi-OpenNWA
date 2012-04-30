@@ -69,22 +69,12 @@ namespace{
         Voc voc;
         addBoolVar(voc,"a");
         addBoolVar(voc,"b");
-        addBoolVar(voc,"c");
-        addIntVar(voc,"p",4);
-        addIntVar(voc,"q",4);
-        addIntVar(voc,"r",4);
-        addIntVar(voc,"s",4);
-        addIntVar(voc,"t",4);
-        addIntVar(voc,"u",4);
-        addIntVar(voc,"v",4);
-        addIntVar(voc,"w",4);
-        addIntVar(voc,"x",4);
-        addIntVar(voc,"y",4);
-        addIntVar(voc,"z",4);
+        addIntVar(voc,"p",3);
+        addIntVar(voc,"q",3);
 
         bmt = new BinRelManager(voc);
         mwg = new MyWtGen(bmt);
-        rpt = new RandomPdsGen(mwg);
+        rpt = new RandomPdsGen(mwg,4,10,40,10);
         rpt->get(pds,names);
         //pds.print(cout);
       }
@@ -136,13 +126,13 @@ namespace{
 
     ASSERT_TRUE(true);
   }
-#if 0
-  TEST_F(NewtonSolverTests, DISABLED_first){
+
+  TEST_F(NewtonSolverTests, first){
     WFA fa;
     wali::Key acc = wali::getKeySpace()->getKey("accept");
     //for(int i=0;i<conf->numprocs;++i)
     //  fa.addTrans(names.pdsState,names.entries[i],acc,conf->randomWt());
-    fa.addTrans(names.pdsState, names.entries[0],acc,conf->randomWt());
+    fa.addTrans(names.pdsState, names.entries[0],acc,(*mwg)());
     fa.setInitialState(names.pdsState);
     fa.addFinalState(acc);
 
@@ -154,6 +144,8 @@ namespace{
     wali::set_verify_fwpds(false);
     pds.poststarIGR(fa,outfa);
 
+    sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>(((*mwg)()->one()).get_ptr());
+    sem_elem_tensor_t onet = one->tensor(one.get_ptr());
+    outfa.path_summary(onet);
   }
-#endif //#if 0
 }

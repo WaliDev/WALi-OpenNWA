@@ -415,6 +415,7 @@ binrel_t BinRel::Compose( binrel_t that ) const
   if(isTensored != that->isTensored){
     *waliErr << "[WARNING] " << "Composing incompatible relations" << endl;
     that->print(print(*waliErr) << endl) << endl;
+    assert(false);
     return new BinRel(bddfalse,isTensored);
   }
 #endif
@@ -441,6 +442,7 @@ binrel_t BinRel::Union( binrel_t that ) const
   if(isTensored != that->isTensored){
     *waliErr << "[WARNING] " << "Unioning incompatible relations" << endl;
     that->print(print(*waliErr) << endl) << endl;
+    assert(false);
     return new BinRel(bddtrue,isTensored);
   }
 #endif
@@ -457,6 +459,7 @@ binrel_t BinRel::Intersect( binrel_t that ) const
   if(isTensored != that->isTensored){
     *waliErr << "[WARNING] " << "Intersecting incompatible relations" << endl;
     that->print(print(*waliErr) << endl) << endl;
+    assert(false);
     return new BinRel(bddfalse,isTensored);
   }
 #endif
@@ -474,6 +477,7 @@ bool BinRel::Equal( binrel_t that) const
     *waliErr << "[WARNING] " << "Compared (Equality) incompatible relations" 
       << endl;
     that->print(print(*waliErr) << endl) << endl;
+    assert(false);
     return false;
   }
 #endif
