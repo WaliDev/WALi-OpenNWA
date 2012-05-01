@@ -116,6 +116,12 @@ namespace wali {
                 hashmap_misses = 0;
                 height = lnd = out_nodes = 0;
             }
+            void reset() {
+                nstar = ncombine = nextend = 0;
+                hashmap_hits = 0;
+                hashmap_misses = 0;
+                height = lnd = out_nodes = 0;
+            }
         };
 
         ostream &operator << (ostream &out, const RegExpStats &s);
@@ -289,6 +295,14 @@ namespace wali {
 
                 bool isCyclic();
                 sem_elem_t reevaluate();
+
+                /**
+                 * @author Prathmesh Prabhu
+                 * There are a bunch of static variables in this class that cause trouble during
+                 * multiple runs of analyses in the same process.
+                 * Anyway, FWPDS (using RegExps) should be able to clean up after itself.
+                 **/
+                static void cleanUp();
 
             private:
 

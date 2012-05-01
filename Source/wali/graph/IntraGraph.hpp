@@ -245,6 +245,7 @@ namespace wali {
             void updateWeight(int node, int uno);
             void assignUpdates();
             void clearUpdates();
+             
 
             bool updateEdgeWeight(int src, int tgt, sem_elem_t se);
             sem_elem_t readEdgeWeight(int src, int tgt);
@@ -257,6 +258,11 @@ namespace wali {
             void solveSummarySolution(list<WTransition> &change);
             void preSolveSummarySolution(list<WTransition> &change);
             void setupSummarySolution();
+            /**
+             * IntraGraph holds on to some static variables. 
+             * These should be cleaned up when we're finished with the analysis.
+             **/
+            static void cleanUp();
 
             private:
             //int nodeno(Transition &t);

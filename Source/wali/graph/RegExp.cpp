@@ -1295,5 +1295,21 @@ namespace wali {
         return false;
     }
 
+    void RegExp::cleanUp()
+    {
+        RegExp::satProcesses.clear();
+        RegExp::currentSatProcess = 0;
+        RegExp::extend_backwards = false;
+        RegExp::reg_exp_hash.clear();
+        RegExp::const_reg_exp_hash.clear();
+        RegExp::stats.reset();
+        RegExp::reg_exp_one = NULL;
+        RegExp::reg_exp_zero = NULL;
+        RegExp::saturation_complete = false;
+        RegExp::executing_poststar = true;
+        RegExp::initialized = false;
+        RegExp::top_down_eval = true;
+    }
+
     } // namespace graph
 } // namespace wali

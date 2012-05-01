@@ -65,6 +65,19 @@ FWPDS::FWPDS(bool _newton) : EWPDS(), newton(_newton)
 {
 }
 
+FWPDS::~FWPDS()
+{
+  // This cleans up the graph structures.
+  // There are some static variables holding on to values
+  // that cause trouble when re-running analysis.
+  // The downside is that if you have other FWPDSs
+  // hanging around, deleting even one of them will clean up
+  // the graph structure, and bad things will happen.
+
+  // You would have to clean up outside *after* you're done
+  // will *all* FWPDSs.
+  interGr->cleanUp();
+}
 ///////////////////////////////////////////////////////////////////
 void FWPDS::topDownEval(bool f) {
   graph::RegExp::topDownEval(f);

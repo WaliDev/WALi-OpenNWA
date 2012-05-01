@@ -50,6 +50,7 @@ namespace wali {
           FWPDS(bool newton);
           FWPDS(ref_ptr<Wrapper> wrapper);
           FWPDS( const FWPDS& f );
+          ~FWPDS();
 
 
           ////////////

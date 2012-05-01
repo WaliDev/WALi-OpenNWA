@@ -223,6 +223,14 @@ namespace wali {
                 int nGraphs() {
                     return (int)gr_list.size();
                 }
+
+                /**
+                 * @author Prathmesh Prabhu
+                 * Classes in the graph* structures use some static variables to hold on to values.
+                 * We want to clean up the structure before finishing the anlysis.
+                 **/
+                static void cleanUp();
+                
             private:
                 int nodeno(Transition &t);
 

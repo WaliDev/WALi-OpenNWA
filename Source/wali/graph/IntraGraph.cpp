@@ -1489,5 +1489,25 @@ namespace wali {
       }
     }
 
+    void IntraGraph::cleanUp()
+    {
+      IntraGraph::se = NULL;
+#ifdef STATIC_MEMORY
+      if(IntraGraph::intraGraphBuffer){
+        delete IntraGraph::intraGraphBuffer;
+        IntraGraph::intraGraphBuffer = 0;
+      }
+      if(IntraGraph::childrenBuffer){
+        delete [] IntraGraph::childreBuffer;
+        IntraGraph::childrenBuffer = 0;
+      }
+      if(IntraGraph::regBuffer){
+        delete [] IntraGraph::regBuffer;
+        IntraGraph::regBuffer = 0;
+      }
+      IntraGraph::intraGraphBufferSize = 0;
+#endif
+    }
+
   } // namespace graph
 } // namespace wali
