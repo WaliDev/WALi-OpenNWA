@@ -180,16 +180,10 @@ namespace cfglib {
             };
 
 
-            void output_draw_package(std::string const & dirname) const {
-                system(("rm -rf " + dirname).c_str());
-                system(("mkdir " + dirname).c_str());
-                
-                std::ofstream f((dirname + "/fa.dot").c_str());
+            void output_draw_package(std::string const & filename) const {
+                std::ofstream f(filename.c_str());
                 HoverWeightPrinter p;
                 this->print_dot(f, false, &p);
-                
-                std::cout << "dot -Tsvg -o" << dirname << "/fa.svg " << dirname << "/fa.dot\n";
-                std::cout << "cp ~/public/html/demo/fa.html " << dirname << "\n";
             }
 
 
