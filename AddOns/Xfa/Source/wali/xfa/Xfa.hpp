@@ -10,6 +10,7 @@
 #include <map>
 #include <sstream>
 #include <fstream>
+#include <cstdio>
 
 #include "../cpp11.hpp"
 
@@ -129,6 +130,25 @@ namespace cfglib {
             }
 
 
+            static
+            std::vector<char>
+            read_all(FILE* file) {
+                std::vector<char> data;
+                const int block_size = 4096;
+
+                while (true) {
+                    data.resize(data.size() + block_size);
+                    int size_just_read = std::fread(&data[data.size()-block_size], 1u, block_size, file);
+
+                    if (size_just_read < block_size) {
+                        int excess = block_size - size_just_read;
+                        data.resize(data.size() - excess);
+                        return data;
+                    }
+                }
+            }
+
+
             struct Drawer : wali::wfa::ConstTransFunctor {
                 std::string const & dir;
                 Drawer(std::string const & d) : dir(d) {}
@@ -140,14 +160,20 @@ namespace cfglib {
 
                     std::stringstream ss;
                     ss << dir << "/" << t->from() << "--" << t->to();
-                    std::ofstream file((ss.str() + ".cmd").c_str());
+                    std::ofstream file((ss.str() + ".png").c_str());
+
+                    std::stringstream command;
 
                     printImagemagickInstructions(w->getBdd(),
                                                  w->getVocabulary(),
-                                                 file,
-                                                 ss.str() + ".png");
+                                                 command,
+                                                 "png:-");
 
-                    std::cout << "source " << ss.str() << ".cmd\n";
+                    FILE* image_data_stream = popen(command.str().c_str(), "r");
+
+                    std::vector<char> image_data = read_all(image_data_stream);
+
+                    file.write(&image_data[0], image_data.size());
                 }
             };
 
@@ -158,12 +184,22 @@ namespace cfglib {
                 
                 std::ofstream f((dirname + "/fa.dot").c_str());
                 this->print_dot(f);
+                
                 std::cout << "dot -Tsvg -o" << dirname << "/fa.svg " << dirname << "/fa.dot\n";
                 std::cout << "cp ~/public/html/demo/fa.html " << dirname << "\n";
                 
                 Drawer d(dirname);
                 wfa_.for_each(d);
             }
+
+
+            /// Returns whether the given string is accepted with a non-zero
+            /// weight
+            typedef std::vector<wali::Key> Word;            
+            bool isAcceptedWithNonzeroWeight(Word const & word) const {
+                return wfa_.isAcceptedWithNonzeroWeight(word);
+            }
+            
         };
         
     }
