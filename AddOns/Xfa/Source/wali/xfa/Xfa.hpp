@@ -13,9 +13,11 @@
 #include <cstdio>
 
 #include "../cpp11.hpp"
+#include "base64.hpp"
 
 namespace cfglib {
     namespace xfa {
+
 
         struct State {
             wali::Key key;
@@ -85,9 +87,10 @@ namespace cfglib {
             }
 
             virtual std::ostream& print_dot(std::ostream& o,
-                                            bool print_weights=false ) const
+                                            bool print_weights=false,
+                                            wali::wfa::DotAttributePrinter * printer=NULL) const
             {
-                return wfa_.print_dot(o, print_weights);
+                return wfa_.print_dot(o, print_weights, printer);
             }
 
             std::set<wali::Key> const & getFinalStateKeys() const {
@@ -149,18 +152,14 @@ namespace cfglib {
             }
 
 
-            struct Drawer : wali::wfa::ConstTransFunctor {
-                std::string const & dir;
-                Drawer(std::string const & d) : dir(d) {}
+            struct HoverWeightPrinter : wali::wfa::DotAttributePrinter {
+                virtual void print_extra_attributes(wali::wfa::State const * s, std::ostream & os) CPP11_OVERRIDE {
+                }
                 
-                virtual void operator()( const wali::wfa::ITrans* t ) {
+                virtual void print_extra_attributes( const wali::wfa::ITrans* t, std::ostream & os ) CPP11_OVERRIDE {
                     wali::sem_elem_t w_se = t->weight();
                     BinaryRelation w = dynamic_cast<wali::domains::binrel::BinRel*>(w_se.get_ptr());
                     assert(w != NULL);
-
-                    std::stringstream ss;
-                    ss << dir << "/" << t->from() << "--" << t->to();
-                    std::ofstream file((ss.str() + ".png").c_str());
 
                     std::stringstream command;
 
@@ -172,8 +171,11 @@ namespace cfglib {
                     FILE* image_data_stream = popen(command.str().c_str(), "r");
 
                     std::vector<char> image_data = read_all(image_data_stream);
+                    std::vector<unsigned char> image_data_u(image_data.begin(), image_data.end());
 
-                    file.write(&image_data[0], image_data.size());
+                    std::string image_data_base64 = base64_encode(&image_data_u[0], image_data_u.size());
+
+                    os << ",onhover=\"<img src='data:image/png;base64," << image_data_base64 << "'>\"";
                 }
             };
 
@@ -183,13 +185,11 @@ namespace cfglib {
                 system(("mkdir " + dirname).c_str());
                 
                 std::ofstream f((dirname + "/fa.dot").c_str());
-                this->print_dot(f);
+                HoverWeightPrinter p;
+                this->print_dot(f, false, &p);
                 
                 std::cout << "dot -Tsvg -o" << dirname << "/fa.svg " << dirname << "/fa.dot\n";
                 std::cout << "cp ~/public/html/demo/fa.html " << dirname << "\n";
-                
-                Drawer d(dirname);
-                wfa_.for_each(d);
             }
 
 
