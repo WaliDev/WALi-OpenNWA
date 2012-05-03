@@ -66,7 +66,7 @@ BinRelManager::~BinRelManager()
 BinRelManager::BinRelManager(Voc& voc, int bddMemSize, int cacheSize) :
   Countable(),
   BOOLSIZE(2),
-  sizeInfo(-1),
+  sizeInfo(0),
   regAInfo(NULL),
   regBInfo(NULL)
 {
@@ -89,7 +89,7 @@ BinRelManager::BinRelManager(Voc& voc, int bddMemSize, int cacheSize) :
       int domains[1] = {maxVal+1};
       int retSizeInfo = fdd_extdomain(domains,1);
       if(retSizeInfo < 0)
-        LOG(ERROR) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(retSizeInfo) << "\"" << endl
+        LOG(FATAL) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(retSizeInfo) << "\"" << endl
           << "    Aborting." << endl;
       else
         sizeInfo = (unsigned) retSizeInfo;
@@ -100,10 +100,10 @@ BinRelManager::BinRelManager(Voc& voc, int bddMemSize, int cacheSize) :
       //We will create indices such that we get a default variable ordering where
       //baseLhs, baseRhs, baseExtra are mixed.
       {
-        int domains[3] = {maxVal, maxVal, maxVal};
+        int domains2[3] = {maxVal, maxVal, maxVal};
         regAInfo = new BddInfo();
         //Create fdds for base
-        int base = fdd_extdomain(domains,3);
+        int base = fdd_extdomain(domains2,3);
         if (base < 0)
           LOG(ERROR) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl
             << "    Aborting." << endl;
@@ -119,10 +119,10 @@ BinRelManager::BinRelManager(Voc& voc, int bddMemSize, int cacheSize) :
         idx2Name[regAInfo->baseExtra] = "__regA''";
       }
       {
-        int domains[3] = {maxVal, maxVal, maxVal};
+        int domains2[3] = {maxVal, maxVal, maxVal};
         regBInfo = new BddInfo();
         //Create fdds for base
-        int base = fdd_extdomain(domains,3);
+        int base = fdd_extdomain(domains2,3);
         if (base < 0)
           LOG(ERROR) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl
             << "    Aborting." << endl;
@@ -523,7 +523,7 @@ bdd BinRelManager::tGetRandomTransformer(bool isTensored)
   const Voc voc = BinRel::getVoc();
   bdd ret = bddfalse;
   int numRounds = rand() % 10 + 1;
-  for(int count=0; count < numRounds; ++count){
+  for(int c=0; c < numRounds; ++c){
     bdd inbdd = rand()%2?bddfalse:bddtrue;
     for(Voc::const_iterator iter = voc.begin(); 
         iter != voc.end();
