@@ -7,6 +7,8 @@
 #include <wali/domains/binrel/BinRel.hpp>
 #include <wali/Key.hpp>
 
+#include <opennwa/Nwa.hpp>
+
 #include <map>
 #include <sstream>
 #include <fstream>
@@ -195,7 +197,50 @@ namespace cfglib {
             }
             
         };
-        
+
+
+
+        inline
+        Xfa from_internal_only_nwa(opennwa::Nwa const & nwa,
+                                   BinaryRelation rel)
+        {
+            using opennwa::Nwa;
+            using wali::domains::binrel::BinRel;
+            Xfa xfa;
+
+            BinaryRelation one = dynamic_cast<BinRel*>(rel->one().get_ptr());
+            BinaryRelation zero = dynamic_cast<BinRel*>(rel->zero().get_ptr());
+
+            assert(one.get_ptr());
+            assert(zero.get_ptr());
+
+            for (Nwa::StateIterator state = nwa.beginStates();
+                 state != nwa.endStates() ; ++state)
+            {
+                xfa.addState(State(*state), zero);
+            }
+
+            assert(nwa.sizeInitialStates() == 1);
+            xfa.setInitialState(State(*nwa.beginInitialStates()));
+
+            for (Nwa::StateIterator state = nwa.beginFinalStates();
+                 state != nwa.endFinalStates() ; ++state)
+            {
+                xfa.addFinalState(State(*state));
+            }
+
+            for (Nwa::InternalIterator trans = nwa.beginInternalTrans();
+                 trans != nwa.endInternalTrans() ; ++trans)
+            {
+                xfa.addTrans(State(trans->first),
+                             Symbol(trans->second),
+                             State(trans->third),
+                             one);
+            }
+
+            assert(nwa.sizeCallTrans() == 0);
+            assert(nwa.sizeReturnTrans() == 0);
+        }
     }
 }
 
