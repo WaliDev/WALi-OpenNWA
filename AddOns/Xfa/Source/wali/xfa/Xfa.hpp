@@ -195,7 +195,11 @@ namespace cfglib {
             bool isAcceptedWithNonzeroWeight(Word const & word) const {
                 return wfa_.isAcceptedWithNonzeroWeight(word);
             }
-            
+
+
+            wali::wfa::WFA semideterminize() const {
+                return wfa_.semideterminize();
+            }
         };
 
 
