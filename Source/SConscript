@@ -43,6 +43,7 @@ nice_files = Split("""
 ./wali/wpds/ewpds/EWPDS.cpp
 ./wali/wpds/Rule.cpp
 ./wali/wpds/fwpds/FWPDS.cpp
+./wali/wpds/nwpds/NWPDS.cpp
 ./wali/wpds/fwpds/SWPDS.cpp
 ./wali/wpds/fwpds/LazyTrans.cpp
 ./wali/wpds/Wrapper.cpp

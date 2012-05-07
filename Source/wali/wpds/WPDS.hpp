@@ -171,6 +171,19 @@ namespace wali
             sem_elem_t se );
 
         /**
+         * @brief Erases the rule r from the WPDS
+         * @author Prathmesh Prabhu
+         * @return true if found and erased, false otherwise.
+         **/ 
+        virtual bool erase_rule(
+            Key from_state,
+            Key from_stack,
+            Key to_state,
+            Key to_stack1,
+            Key to_stack2
+            );
+
+        /**
          * @brief Perform prestar reachability query
          *
          * @return wfa::WFA

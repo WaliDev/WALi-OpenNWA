@@ -808,6 +808,71 @@ namespace wali
     }
 
 
+    // I don't clean up the pds states. So there might be pds states left with no transitions
+    // referring to them.
+    bool WPDS::erase_rule(
+        Key from_state, 
+        Key from_stack, 
+        Key to_state, 
+        Key to_stack1,
+        Key to_stack2
+        )
+    {
+      //These three must be defined
+      assert( from_state != WALI_EPSILON );
+      assert( from_stack != WALI_EPSILON );
+      assert( to_state   != WALI_EPSILON );
+
+      Config * from = find_config(from_state, from_stack);
+      Config * to  = find_config(to_state, to_stack1);
+
+      //If either of from / to are NULL, the rules does not exist.
+      if(from == NULL || to == NULL)
+        return false;
+      
+      //Find the rule
+      rule_t r;
+      for(Config::const_iterator it = from->begin();
+          it != from->end();
+          ++it){
+        if((*it)->from_state() == from_state &&
+            (*it)->from_stack() == from_stack &&
+            (*it)->to_state() == to_state &&
+            (*it)->to_stack1() == to_stack1 &&
+            (*it)->to_stack2() == to_stack2){
+          r = *it;
+          break;
+        }
+      }
+
+      bool erasefrom = from->erase(r);
+      bool eraseto = to->rerase(r);
+
+      if(to_stack1 == WALI_EPSILON && eraseto)
+      {
+        assert(to_stack2 == WALI_EPSILON);
+        rule_zeroes.erase(to);
+      }else if(r->to_stack2() != WALI_EPSILON){
+        r2hash_t::iterator r2it = r2hash.find(r->to_stack2());
+        assert(r2it != r2hash.end());
+        for(std::list< rule_t >::iterator it = (r2it->second).begin();
+            it != (r2it->second).end();
+            ++it){
+          if(*it == r){
+            (r2it->second).erase(it);
+            break;
+          }
+        }
+        if((r2it->second).size() == 0)
+          r2hash.erase(r->to_stack2());
+      }
+      if(erasefrom)
+        config_map().erase(KeyPair(r->from_state(), r->to_stack1()));
+      if(eraseto)
+        config_map().erase(KeyPair(r->to_state(), r->to_stack1()));
+      return true;
+    }
+
     /**
      * Creates a Config if one does not already exist
      * with KeyPair (state,stack).

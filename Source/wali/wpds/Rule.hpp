@@ -233,6 +233,10 @@ namespace wali
           return rc.is_valid();
         }
 
+        bool operator == (const rule_t& rhs) const{
+          return rc == rhs.rc;
+        }
+
       private:
 
         ref_ptr< Rule > rc;
