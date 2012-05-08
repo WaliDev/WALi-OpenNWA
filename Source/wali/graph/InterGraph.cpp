@@ -948,9 +948,9 @@ namespace wali {
                 sem_elem_tensor_t extWtD = extWt->detensorTranspose();
                 sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>(inter_edges[tgt2HypEdge[tgt]].weight.get_ptr());
                 if(wt == NULL)
-                  wt = dynamic_cast<SemElemTensor*>(extWtD->one().get_ptr());
+                //  wt = dynamic_cast<SemElemTensor*>(extWtD->one().get_ptr());
                 //FIXME:Should be this. Above is a part of short-circuit
-                //wt = dynamic_cast<SemElemTensor*>(extWtD->zero().get_ptr());
+                    wt = dynamic_cast<SemElemTensor*>(extWtD->zero().get_ptr());
                 wt = dynamic_cast<SemElemTensor*>(wt->extend(extWtD.get_ptr()).get_ptr());
                 sem_elem_tensor_t one  = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());
                 if(running_prestar){
@@ -972,9 +972,9 @@ namespace wali {
                 sem_elem_tensor_t intWtD = intWt->detensorTranspose();
                 sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>(inter_edges[tgt2HypEdge[tgt]].weight.get_ptr());
                 if(wt == NULL)
-                  wt = dynamic_cast<SemElemTensor*>(intWtD->one().get_ptr());
+                  //wt = dynamic_cast<SemElemTensor*>(intWtD->one().get_ptr());
                 //FIXME:Should be this. Above is a part of short-circuit
-                //wt = dynamic_cast<SemElemTensor*>(intWD->zero().get_ptr());
+                  wt = dynamic_cast<SemElemTensor*>(intWtD->zero().get_ptr());
                 sem_elem_tensor_t one  = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());
                 if(running_prestar){
                   wt = wt->transpose();

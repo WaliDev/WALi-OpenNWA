@@ -185,6 +185,7 @@
     <ClCompile Include="..\..\..\Source\wali\wpds\DebugWPDS.cpp" />
     <ClCompile Include="..\..\..\Source\wali\wpds\GenKeySource.cpp" />
     <ClCompile Include="..\..\..\Source\wali\wpds\LinkedTrans.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wpds\nwpds\NWPDS.cpp" />
     <ClCompile Include="..\..\..\Source\wali\wpds\Rule.cpp" />
     <ClCompile Include="..\..\..\Source\wali\wpds\RuleFunctor.cpp" />
     <ClCompile Include="..\..\..\Source\wali\wpds\WPDS.cpp" />
@@ -315,6 +316,7 @@
     <ClInclude Include="..\..\..\Source\wali\wpds\DebugWPDS.hpp" />
     <ClInclude Include="..\..\..\Source\wali\wpds\GenKeySource.hpp" />
     <ClInclude Include="..\..\..\Source\wali\wpds\LinkedTrans.hpp" />
+    <ClInclude Include="..\..\..\Source\wali\wpds\nwpds\NWPDS.hpp" />
     <ClInclude Include="..\..\..\Source\wali\wpds\Rule.hpp" />
     <ClInclude Include="..\..\..\Source\wali\wpds\RuleFunctor.hpp" />
     <ClInclude Include="..\..\..\Source\wali\wpds\WPDS.hpp" />

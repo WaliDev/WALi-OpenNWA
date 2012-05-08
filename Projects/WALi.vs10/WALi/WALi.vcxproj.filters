@@ -106,6 +106,12 @@
     <Filter Include="Header Files\wali.nwa\query\details">
       <UniqueIdentifier>{ec809e5a-b618-4c9f-92dc-d4c9c3ee84f3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\wali.wpds.nwpds">
+      <UniqueIdentifier>{1ab06515-2544-4daa-a28f-5f4a64815e17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\wali.wpds.nwpds">
+      <UniqueIdentifier>{8569e7b7-d205-42fa-b649-9c8326e0005a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\wali\Reach.cpp">
@@ -380,6 +386,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\wali\SemElemTensor.cpp">
       <Filter>Source Files\wali</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wpds\nwpds\NWPDS.cpp">
+      <Filter>Source Files\wali.wpds.nwpds</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -748,6 +757,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\wali\SemElemTensor.hpp">
       <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\wpds\nwpds\NWPDS.hpp">
+      <Filter>Header Files\wali.wpds.nwpds</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

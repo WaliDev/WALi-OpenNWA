@@ -1,4 +1,4 @@
-#ifndef wali_wpds_newpds_NWPDS_GUARD
+#ifndef wali_wpds_nwpds_NWPDS_GUARD
 #define wali_wpds_nwpds_NWPDS_GUARD 1
 
 /**
@@ -51,8 +51,8 @@ namespace wali
           static const std::string XMLTag;
 
         public:
-          NWPDS(bool dbg=false);
-          NWPDS(ref_ptr<Wrapper> wrapper, bool dbg=false);
+          NWPDS(bool dbg=true);
+          NWPDS(ref_ptr<Wrapper> wrapper, bool dbg=true);
           NWPDS( const NWPDS& f );
           ~NWPDS();
 
@@ -62,8 +62,9 @@ namespace wali
           virtual void prestar( wfa::WFA const & input, wfa::WFA & output );
 
           virtual wfa::WFA prestar( wfa::WFA const & input) {
-            assert(0 && "Haven't implemented this yet");
-            return input;
+            wfa::WFA output;
+            prestar(input,output);
+            return output;
           }
 
 

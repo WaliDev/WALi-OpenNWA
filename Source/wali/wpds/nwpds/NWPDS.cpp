@@ -15,8 +15,9 @@
 // ::wali
 #include "wali/Key.hpp"
 
-using namespace wali;
 using namespace std;
+using namespace wali;
+using namespace wali::wpds;
 using namespace wali::wpds::ewpds;
 using namespace wali::wpds::fwpds;
 using namespace wali::wpds::nwpds;
@@ -37,7 +38,7 @@ NWPDS::NWPDS(bool b) :
   dbg(b)
 {}
 
-NWPDS::NWPDS(ref_ptr<Wrapper> wrapper, bool b) :
+NWPDS::NWPDS(ref_ptr<wpds::Wrapper> wrapper, bool b) :
   FWPDS(wrapper),
   dbg(b)
 {}
