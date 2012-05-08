@@ -20,7 +20,8 @@ if 'cl' != env['compiler']:
 else:
     env.AppendUnique(LIBS=[gtest_lib])
 env.AppendUnique(CPPPATH=[gtest_include, WaliDir])
-env.AppendUnique(CPPPATH=['#/AddOns/Domains/ThirdParty/include/',
+env.AppendUnique(CPPPATH=['#/Tests/unit-tests/Source',
+                          '#/AddOns/Domains/ThirdParty/include/',
                           '#/AddOns/Domains/Source/'])
 env.AppendUnique(LIBPATH=['#/AddOns/Domains/ThirdParty/'])
 env.AppendUnique(CPPPATH=[glog_inc])
@@ -66,8 +67,8 @@ test_files = Split("""
     Source/opennwa/namespace-nwa_pds/answers-nwa-to-pds-returns.cpp
     Source/opennwa/namespace-nwa_pds/get-control-location.cpp
 
-    Source/AddOns/Domains/binrel/testsBinRelManager.cpp
-    Source/AddOns/Domains/binrel/testsBinRel.cpp
+    Source/AddOns/Domains/binrel/binrelmanager.cpp
+    Source/AddOns/Domains/binrel/binrel.cpp
     """)
 
 just_compile = env.SConscript('Source/header-compilation/SConscript')
