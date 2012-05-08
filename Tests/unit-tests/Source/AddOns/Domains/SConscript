@@ -1,7 +1,0 @@
-Import('Debug')
-
-if Debug:
-  print '\n+++ Entered "#/Tests/Addons/Domains"\n'
-built = []
-built += SConscript('binrel/SConscript')
-Return('built')

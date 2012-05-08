@@ -28,9 +28,7 @@ built = []
 Reach = os.path.join(WaliDir,'Examples','Reach','Reach.cpp')
 for t in ['t1','t3','t4','twitness','tprune','tTransSet']:
     exe = Env.Program('%s' % t, ['%s.cpp' % t,'%s' % Reach ])
-    built += (exe)
+    built += Env.Install('#/Tests/harness',exe)
 
-#nwa_built = SConscript('nwa/SConscript')
-#built += SConscript('Addons/SConscript')
 Return('built')
 

@@ -10,6 +10,8 @@ if Debug:
     print '\n+++ Entered "#/Tests/unit-tests/SConscript"\n'
 
 [(gtest_lib, gtest_include)] = SConscript('ThirdParty/SConscript')
+ListOfBuilds = ['glog']
+[(glog_lib, glog_inc)] = SConscript('#/ThirdParty/SConscript', 'ListOfBuilds')
 
 env = ProgEnv.Clone()
 
@@ -18,7 +20,15 @@ if 'cl' != env['compiler']:
 else:
     env.AppendUnique(LIBS=[gtest_lib])
 env.AppendUnique(CPPPATH=[gtest_include, WaliDir])
+env.AppendUnique(CPPPATH=['#/AddOns/Domains/ThirdParty/include/',
+                          '#/AddOns/Domains/Source/'])
+env.AppendUnique(LIBPATH=['#/AddOns/Domains/ThirdParty/'])
+env.AppendUnique(CPPPATH=[glog_inc])
+env.AppendUnique(LIBS=[glog_lib, 'bdd', 'libwalidomains'])
+
+#gtest and glog are ill begaved w.r.t. to these flags.
 env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
+env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Werror', '')
 
 test_files = Split("""
     Source/test.cpp
@@ -55,13 +65,17 @@ test_files = Split("""
     Source/opennwa/namespace-nwa_pds/answers-nwa-to-pds-calls.cpp
     Source/opennwa/namespace-nwa_pds/answers-nwa-to-pds-returns.cpp
     Source/opennwa/namespace-nwa_pds/get-control-location.cpp
+
+    Source/AddOns/Domains/binrel/testsBinRelManager.cpp
+    Source/AddOns/Domains/binrel/testsBinRel.cpp
     """)
 
 just_compile = env.SConscript('Source/header-compilation/SConscript')
 
-built = env.Program('nwa-test', test_files + just_compile)
-
-built += env.SConscript('Source/AddOns/SConscript')
+unit_tests = env.Program('unit-tests', test_files + just_compile)
+built = unit_tests
+built += env.Install('#/Tests/harness/unit-tests',unit_tests)
+built += env.Install('#/Tests/harness/unit-tests/','#/Tests/unit-tests/regression_baseline')
 
 Return('built')
 

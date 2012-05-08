@@ -218,7 +218,6 @@ if 'help' not in COMMAND_LINE_TARGETS:
         built += SConscript('Tests/SConscript', variant_dir=os.path.join(BuildDir,'tests'), duplicate=0)
         unit_tests = SConscript('Tests/unit-tests/SConscript', variant_dir=os.path.join(BuildDir,'unit-tests'), duplicate=0)
         built += unit_tests
-        built += BaseEnv.Install('Tests/unit-tests', unit_tests)
         BaseEnv.Alias('all',built)
 
     ## AddOns
@@ -233,7 +232,6 @@ if 'help' not in COMMAND_LINE_TARGETS:
             built += SConscript('Tests/SConscript', variant_dir=os.path.join(BuildDir,'tests'), duplicate=0)
             unit_tests = SConscript('Tests/unit-tests/SConscript', variant_dir=os.path.join(BuildDir,'unit-tests'), duplicate=0)
             built += unit_tests
-            built += BaseEnv.Install('Tests/unit-tests', unit_tests)
             BaseEnv.Alias('tests',built)
 else:
     BaseEnv.Alias('help',[])

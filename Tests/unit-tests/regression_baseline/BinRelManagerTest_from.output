@@ -1,0 +1,7 @@
+
+From(a): <a:0, __regSize:2, __regA':0><a:1, __regSize:2, __regA':1>
+From(b): <b:0, __regSize:2, __regA':0><b:1, __regSize:2, __regA':1>
+From(c): <c:0, __regSize:2, __regA':0><c:1, __regSize:2, __regA':1>
+From(p): <p:0, __regSize:4, __regA':0><p:2, __regSize:4, __regA':2><p:1, __regSize:4, __regA':1><p:3, __regSize:4, __regA':3>
+From(q): <q:0, __regSize:4, __regA':0><q:2, __regSize:4, __regA':2><q:1, __regSize:4, __regA':1><q:3, __regSize:4, __regA':3>
+From(r): <r:0, __regSize:4, __regA':0><r:2, __regSize:4, __regA':2><r:1, __regSize:4, __regA':1><r:3, __regSize:4, __regA':3>

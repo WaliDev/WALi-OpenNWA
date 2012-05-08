@@ -308,7 +308,7 @@ namespace wali {
 
 
         struct TestLifter
-            : LiftCombineWeightGen
+            : public LiftCombineWeightGen
         {
             sem_elem_t liftWeight(WFA const & UNUSED_PARAMETER(original_wfa),
                                   ITrans const * trans_in_original) const
