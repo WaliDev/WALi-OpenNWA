@@ -56,7 +56,7 @@ namespace wali
     class State;
     class TransFunctor;
     class ConstTransFunctor;
-    class DeterminizeWeightGen;
+    struct DeterminizeWeightGen;
 
     /** @class WFA
      *
