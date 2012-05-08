@@ -10,6 +10,8 @@ if Debug:
   print '\n+++ Entered "#/Tests/Addons/Domains/binrel"\n'
 env = ProgEnv.Clone()
 
+SConscript('#/AddOns/Domains/ThirdParty/SConscript')
+
 env.AppendUnique(CPPPATH=['#/AddOns/Domains/ThirdParty/include/',
                           '#/AddOns/Domains/Source/'])
 
