@@ -12,7 +12,7 @@
 
 // ::wali::domains::binrel
 #include "wali/domains/binrel/BinRel.hpp"
-#include "wali/domains/binrel/BinRelManager.hpp"
+#include "wali/domains/binrel/ProgramBddContext.hpp"
 
 
 using namespace std;

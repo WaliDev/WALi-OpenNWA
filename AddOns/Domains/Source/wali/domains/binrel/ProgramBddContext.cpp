@@ -1,4 +1,4 @@
-#include "BinRelManager.hpp"
+#include "ProgramBddContext.hpp"
 
 #include "glog/logging.h"
 #include "buddy/fdd.h"

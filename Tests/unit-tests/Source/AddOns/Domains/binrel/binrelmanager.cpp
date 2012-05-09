@@ -9,7 +9,7 @@
 #include <sstream>
 
 // ::wali::domains::binrel
-#include "wali/domains/binrel/BinRelManager.hpp"
+#include "wali/domains/binrel/ProgramBddContext.hpp"
 
 using namespace std;
 using namespace wali::domains::binrel;
