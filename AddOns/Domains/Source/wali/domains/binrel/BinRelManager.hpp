@@ -23,10 +23,10 @@ namespace wali
       // /// The following functions should be used to add variables to a vocabulary *before*
       // /// Creating your BinRelManager Object.
       /** Add a boolean variable to the vocabulary with the name 'name' **/
-      void addBoolVar(Voc& voc, std::string name);
+      void addBoolVar(BddContext& voc, std::string name);
       /** Add a int variable to the vocabulary with the name 'name'. The integer can take values
        * between 0...size-1. **/
-      void addIntVar(Voc& voc, std::string name, int size);
+      void addIntVar(BddContext& voc, std::string name, int size);
 
       class BinRelManager : public Countable
       {
@@ -37,13 +37,13 @@ namespace wali
            * You do not need to call BinRel::initialize if you call this
            * @param [bddMemSize] the memory size buddy should use. Use 0 for default.
            * @param [cacheSize] the memory size buddy should use. Use 0 for default.
-           * @param [voc] The vocabulary of the BinRel semiring. Vocabulary of the BinRel domain
+           * @param [voc] The vocabulary of the BinRel semiring. BddContextabulary of the BinRel domain
                           can not be changed once the BinRelManager has been created.
                           [TODO] voc is passed by reference, and modified to reflect 
            *              the bdd indices populated.
            * @see BinRel::BddInfo
            **/
-          BinRelManager(Voc& voc, int bddMemSize=0, int cacheSize=0);
+          BinRelManager(BddContext& voc, int bddMemSize=0, int cacheSize=0);
           ~BinRelManager();
 
           std::ostream& print(std::ostream& o);

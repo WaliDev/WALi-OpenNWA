@@ -44,7 +44,7 @@ namespace wali
        * This is currently a global so that it can be 
        * accessed in BinRelManager.
        **/
-      RevVoc idx2Name;
+      RevBddContext idx2Name;
 
       static void myFddStrmHandler(std::ostream &o, int var);
       static BinRel* convert(wali::SemElem* se);
@@ -54,7 +54,7 @@ namespace wali
 
 // ////////////////////////////
 // Definitions of static members from BinRel class
-Voc BinRel::voc;
+BddContext BinRel::voc;
 
 bddPair* BinRel::baseSwap = NULL;
 bddPair* BinRel::baseRightShift = NULL;
@@ -66,12 +66,12 @@ bddPair* BinRel::move2Tensor2 = NULL;
 bddPair* BinRel::move2Base = NULL;
 bddPair* BinRel::move2BaseTwisted = NULL;
 
-bdd BinRel::baseSecVocSet = bddfalse;
-bdd BinRel::tensorSecVocSet = bddfalse;
-bdd BinRel::commonVocSet23 = bddfalse;
-bdd BinRel::commonVocId23 = bddfalse;
-bdd BinRel::commonVocSet13 = bddfalse;
-bdd BinRel::commonVocId13 = bddfalse;
+bdd BinRel::baseSecBddContextSet = bddfalse;
+bdd BinRel::tensorSecBddContextSet = bddfalse;
+bdd BinRel::commonBddContextSet23 = bddfalse;
+bdd BinRel::commonBddContextId23 = bddfalse;
+bdd BinRel::commonBddContextSet13 = bddfalse;
+bdd BinRel::commonBddContextId13 = bddfalse;
 
 bdd BinRel::baseId = bddtrue;
 bdd BinRel::tensorId = bddtrue;
@@ -112,7 +112,7 @@ namespace wali
     {
       static void myFddStrmHandler(std::ostream &o, int var)
       {
-        extern RevVoc idx2Name;
+        extern RevBddContext idx2Name;
         o << idx2Name[var];
       }
 
@@ -136,7 +136,7 @@ namespace wali
 
 // ////////////////////////////
 // Static
-void BinRel::initialize(Voc& v, int bddMemSize, int cacheSize) 
+void BinRel::initialize(BddContext& v, int bddMemSize, int cacheSize) 
 {
   if(bdd_isrunning() == 1){
     *waliErr << "[INFO] " << "BinRel initialize called multiple times" 
@@ -177,17 +177,17 @@ void BinRel::initialize(Voc& v, int bddMemSize, int cacheSize)
   move2BaseTwisted = bdd_newpair();
 
   //initialize static bdds
-  baseSecVocSet = bddtrue;
-  tensorSecVocSet= bddtrue;
-  commonVocSet23 = bddtrue;
-  commonVocSet13 = bddtrue;
-  commonVocId23 = bddtrue;
-  commonVocId13 = bddtrue;
+  baseSecBddContextSet = bddtrue;
+  tensorSecBddContextSet= bddtrue;
+  commonBddContextSet23 = bddtrue;
+  commonBddContextSet13 = bddtrue;
+  commonBddContextId23 = bddtrue;
+  commonBddContextId13 = bddtrue;
 
 
   //Create bdd domains for relations
   for(
-      VocIter varIter = v.begin();
+      BddContextIter varIter = v.begin();
       varIter != v.end();
       ++varIter
      ){
@@ -263,21 +263,21 @@ void BinRel::initialize(Voc& v, int bddMemSize, int cacheSize)
     fdd_setpair(move2BaseTwisted,varInfo->tensor2Rhs,varInfo->baseRhs);
 
     //update static bdds
-    baseSecVocSet = baseSecVocSet & fdd_ithset(varInfo->baseRhs);
-    tensorSecVocSet = tensorSecVocSet & fdd_ithset(varInfo->tensor1Rhs);
-    tensorSecVocSet = tensorSecVocSet & fdd_ithset(varInfo->tensor2Rhs);
-    commonVocSet23 = commonVocSet23 & fdd_ithset(varInfo->tensor1Rhs);
-    commonVocSet23 = commonVocSet23 & fdd_ithset(varInfo->tensor2Lhs);
-    commonVocId23 = commonVocId23 &
+    baseSecBddContextSet = baseSecBddContextSet & fdd_ithset(varInfo->baseRhs);
+    tensorSecBddContextSet = tensorSecBddContextSet & fdd_ithset(varInfo->tensor1Rhs);
+    tensorSecBddContextSet = tensorSecBddContextSet & fdd_ithset(varInfo->tensor2Rhs);
+    commonBddContextSet23 = commonBddContextSet23 & fdd_ithset(varInfo->tensor1Rhs);
+    commonBddContextSet23 = commonBddContextSet23 & fdd_ithset(varInfo->tensor2Lhs);
+    commonBddContextId23 = commonBddContextId23 &
       fdd_equals(varInfo->tensor1Rhs, varInfo->tensor2Lhs);
-    commonVocSet13 = commonVocSet13 & fdd_ithset(varInfo->tensor1Lhs);
-    commonVocSet13 = commonVocSet13 & fdd_ithset(varInfo->tensor2Lhs);
-    commonVocId13 = commonVocId13 & 
+    commonBddContextSet13 = commonBddContextSet13 & fdd_ithset(varInfo->tensor1Lhs);
+    commonBddContextSet13 = commonBddContextSet13 & fdd_ithset(varInfo->tensor2Lhs);
+    commonBddContextId13 = commonBddContextId13 & 
       fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
   }
   //Make a copy of the vocabulary and store it.
   //We don't want to expose the BinRel's copy to the outside world.
-  for(Voc::const_iterator iter = v.begin();
+  for(BddContext::const_iterator iter = v.begin();
       iter != v.end();
       ++iter){
     bddinfo_t varInfo = new BddInfo(*(iter->second));
@@ -286,7 +286,7 @@ void BinRel::initialize(Voc& v, int bddMemSize, int cacheSize)
   //setup Static Id relations. Yes, this is wasteful iff no one uses Id ever.
   //But that is highly unlikely
   BinRel::setId();
-  for(Voc::const_iterator iter = v.begin();
+  for(BddContext::const_iterator iter = v.begin();
       iter != v.end();
       ++iter){
     bddinfo_t bi = iter->second;
@@ -307,7 +307,7 @@ void BinRel::reset()
 
   if(bdd_isrunning() == 0)
     return;
-  for(VocIter iter = voc.begin(), endIter = voc.end();
+  for(BddContextIter iter = voc.begin(), endIter = voc.end();
       endIter != iter;
       ++iter){
     //set the bddinfo_t to NULL.
@@ -338,12 +338,12 @@ void BinRel::reset()
   bdd_freepair(BinRel::move2BaseTwisted);
   BinRel::move2BaseTwisted = NULL;
 
-  BinRel::baseSecVocSet = bddtrue;
-  BinRel::tensorSecVocSet = bddtrue;
-  BinRel::commonVocSet23 = bddtrue;
-  BinRel::commonVocId23 = bddtrue;
-  BinRel::commonVocSet13 = bddtrue;
-  BinRel::commonVocId13 = bddtrue;
+  BinRel::baseSecBddContextSet = bddtrue;
+  BinRel::tensorSecBddContextSet = bddtrue;
+  BinRel::commonBddContextSet23 = bddtrue;
+  BinRel::commonBddContextId23 = bddtrue;
+  BinRel::commonBddContextSet13 = bddtrue;
+  BinRel::commonBddContextId13 = bddtrue;
 
   BinRel::baseId = bddtrue;
   BinRel::tensorId = bddtrue;
@@ -422,11 +422,11 @@ binrel_t BinRel::Compose( binrel_t that ) const
   bdd c;
   if(!isTensored){
     bdd temp1 = bdd_replace(that->rel,baseRightShift);
-    bdd temp2 = bdd_relprod(rel,temp1,baseSecVocSet);
+    bdd temp2 = bdd_relprod(rel,temp1,baseSecBddContextSet);
     c = bdd_replace(temp2,baseRestore);
   }else{
     bdd temp1 = bdd_replace(that->rel,tensorRightShift);
-    bdd temp2 = bdd_relprod(rel,temp1,tensorSecVocSet);
+    bdd temp2 = bdd_relprod(rel,temp1,tensorSecBddContextSet);
     c = bdd_replace(temp2,tensorRestore);
   }
 #ifdef BINREL_STATS
@@ -533,8 +533,8 @@ binrel_t BinRel::Eq23Project() const
     return new BinRel(bddfalse, false);
   }
 #endif
-  bdd rel1 = rel & commonVocId23; 
-  bdd rel2 = bdd_exist(rel1, commonVocSet23);
+  bdd rel1 = rel & commonBddContextId23; 
+  bdd rel2 = bdd_exist(rel1, commonBddContextSet23);
   bdd c = bdd_replace(rel2, move2Base);
 #ifdef BINREL_STATS
   BinRel::numEq23Project++;
@@ -552,8 +552,8 @@ binrel_t BinRel::Eq13Project() const
     return new BinRel(bddfalse, false);
   }
 #endif
-  bdd rel1 = rel & commonVocId13; 
-  bdd rel2 = bdd_exist(rel1, commonVocSet13);
+  bdd rel1 = rel & commonBddContextId13; 
+  bdd rel2 = bdd_exist(rel1, commonBddContextSet13);
   bdd c = bdd_replace(rel2, move2BaseTwisted);
 #ifdef BINREL_STATS
   BinRel::numEq13Project++;
@@ -589,7 +589,7 @@ void BinRel::setId()
   baseId = bddtrue;
   tensorId = bddtrue;
   for(
-      VocIter varIter = voc.begin();
+      BddContextIter varIter = voc.begin();
       varIter != voc.end();
       ++varIter
      ){

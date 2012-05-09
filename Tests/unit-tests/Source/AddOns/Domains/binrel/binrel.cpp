@@ -24,18 +24,18 @@ using namespace wali::domains::binrel;
 namespace{
 
   TEST(BinRelSelfTest, creationTest){
-    Voc initVoc;
-    addBoolVar(initVoc,"a");
-    addBoolVar(initVoc,"b");
-    addBoolVar(initVoc,"c");
-    addBoolVar(initVoc,"d");
+    BddContext initBddContext;
+    addBoolVar(initBddContext,"a");
+    addBoolVar(initBddContext,"b");
+    addBoolVar(initBddContext,"c");
+    addBoolVar(initBddContext,"d");
 
-    addIntVar(initVoc,"p",4);
-    addIntVar(initVoc,"q",4);
-    addIntVar(initVoc,"r",4);
-    addIntVar(initVoc,"s",4);
+    addIntVar(initBddContext,"p",4);
+    addIntVar(initBddContext,"q",4);
+    addIntVar(initBddContext,"r",4);
+    addIntVar(initBddContext,"s",4);
 
-    binrel_manager_t brm = new BinRelManager(initVoc);
+    binrel_manager_t brm = new BinRelManager(initBddContext);
     //ASSERT_EQ(voc.size(), 8);
 
     bdd a = brm->From("a");
@@ -51,13 +51,13 @@ namespace{
   }
 
   TEST(BinRelSelfTest, selfTest){
-    Voc initVoc;
-    addBoolVar(initVoc,"a");
-    addBoolVar(initVoc,"b");
+    BddContext initBddContext;
+    addBoolVar(initBddContext,"a");
+    addBoolVar(initBddContext,"b");
 
-    addIntVar(initVoc,"p",4);
+    addIntVar(initBddContext,"p",4);
 
-    binrel_manager_t brm = new BinRelManager(initVoc);
+    binrel_manager_t brm = new BinRelManager(initBddContext);
     //ASSERT_EQ(voc.size(), 3);
     bdd a = brm->From("a");
     a = brm->Assign("b",a);
@@ -69,11 +69,11 @@ namespace{
   class BinRelTestBool: public ::testing::Test{
     protected:
       virtual void SetUp(){
-        Voc initVoc;
-        addBoolVar(initVoc,"a");
-        addBoolVar(initVoc,"b");
-        addBoolVar(initVoc,"c");
-        brm = new BinRelManager(initVoc);
+        BddContext initBddContext;
+        addBoolVar(initBddContext,"a");
+        addBoolVar(initBddContext,"b");
+        addBoolVar(initBddContext,"c");
+        brm = new BinRelManager(initBddContext);
         //ASSERT_EQ(voc.size(), 3);
       }
     protected:
@@ -161,11 +161,11 @@ namespace{
   }
 
   TEST_F(BinRelTestBool, tensorTests){
-    Voc initVoc;
-    addBoolVar(initVoc,"a");
-    addBoolVar(initVoc,"b");
+    BddContext initBddContext;
+    addBoolVar(initBddContext,"a");
+    addBoolVar(initBddContext,"b");
     brm = NULL;
-    brm = new BinRelManager(initVoc);
+    brm = new BinRelManager(initBddContext);
     //ASSERT_EQ(voc.size(), 2);
 
     stringstream ss;
@@ -230,12 +230,12 @@ namespace{
   class BinRelTestInt: public ::testing::Test{
     protected:
       virtual void SetUp(){
-        Voc initVoc;
-        addIntVar(initVoc,"a",4);
-        addIntVar(initVoc,"b",4);
-        addIntVar(initVoc,"c",4);
+        BddContext initBddContext;
+        addIntVar(initBddContext,"a",4);
+        addIntVar(initBddContext,"b",4);
+        addIntVar(initBddContext,"c",4);
         brm = NULL;
-        brm = new BinRelManager(initVoc);
+        brm = new BinRelManager(initBddContext);
         //ASSERT_EQ(voc.size(), 3);
       }
     protected:
@@ -266,12 +266,12 @@ namespace{
     // //Maybe this should be done in a more repeat-friendly way// //
     stringstream ss;
     bool failed = false, dump = false;
-    Voc initVoc;
-    addIntVar(initVoc, "a", 4);
-    addBoolVar(initVoc, "b");
-    addIntVar(initVoc, "c", 4);
-    addBoolVar(initVoc, "d");
-    binrel_manager_t brm = new BinRelManager(initVoc);
+    BddContext initBddContext;
+    addIntVar(initBddContext, "a", 4);
+    addBoolVar(initBddContext, "b");
+    addIntVar(initBddContext, "c", 4);
+    addBoolVar(initBddContext, "d");
+    binrel_manager_t brm = new BinRelManager(initBddContext);
     //ASSERT_EQ(voc.size(),4);
 
     srand((unsigned)time(NULL));
@@ -333,12 +333,12 @@ namespace{
     stringstream ss;
     bool failed = false;
     bool dump = false;
-    Voc initVoc;
-    addIntVar(initVoc, "a", 4);
-    addBoolVar(initVoc, "b");
-    addIntVar(initVoc, "c", 4);
-    addBoolVar(initVoc, "d");
-    binrel_manager_t brm = new BinRelManager(initVoc);
+    BddContext initBddContext;
+    addIntVar(initBddContext, "a", 4);
+    addBoolVar(initBddContext, "b");
+    addIntVar(initBddContext, "c", 4);
+    addBoolVar(initBddContext, "d");
+    binrel_manager_t brm = new BinRelManager(initBddContext);
     //ASSERT_EQ(voc.size(),4);
 
     srand((unsigned)time(NULL));
@@ -400,12 +400,12 @@ namespace{
     stringstream ss;
     bool failed = false;
     bool dump = false;
-    Voc initVoc;
-    addIntVar(initVoc, "a", 4);
-    addBoolVar(initVoc, "b");
-    addIntVar(initVoc, "c", 4);
-    addBoolVar(initVoc, "d");
-    binrel_manager_t brm = new BinRelManager(initVoc);
+    BddContext initBddContext;
+    addIntVar(initBddContext, "a", 4);
+    addBoolVar(initBddContext, "b");
+    addIntVar(initBddContext, "c", 4);
+    addBoolVar(initBddContext, "d");
+    binrel_manager_t brm = new BinRelManager(initBddContext);
 
     srand(time(NULL));
     //for debugging

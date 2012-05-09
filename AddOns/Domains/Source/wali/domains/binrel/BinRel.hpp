@@ -67,12 +67,12 @@ namespace wali
         
       typedef ref_ptr<BddInfo> bddinfo_t;
 
-      /**A Voc has the binding information for the variables in the
+      /**A BddContext has the binding information for the variables in the
        * domain.
        */
-      typedef std::map<const std::string,bddinfo_t> Voc;
-      typedef Voc::iterator VocIter;
-      typedef std::map<const int,std::string> RevVoc;
+      typedef std::map<const std::string,bddinfo_t> BddContext;
+      typedef BddContext::iterator BddContextIter;
+      typedef std::map<const int,std::string> RevBddContext;
 
       class BinRel;
       typedef wali::ref_ptr<BinRel> binrel_t;
@@ -93,16 +93,16 @@ namespace wali
            *        [maxVal]. Optional field is the name of each vaiable [name].
            *        The variable index fields are ignored.
            * @return [const] 
-           *        Voc updated with the fddIdx values.
+           *        BddContext updated with the fddIdx values.
            */
-          static void initialize(Voc& voc, int bddMemSize=0, int cacheSize=0);
+          static void initialize(BddContext& voc, int bddMemSize=0, int cacheSize=0);
 
           /** @return true if BinRel has been successfully initialized */
           static bool is_initialized();
 
           static void reset();
 
-          inline static const Voc getVoc() { return voc; }
+          inline static const BddContext getBddContext() { return voc; }
         public:
           /** @see BinRel::Compose */
           friend binrel_t operator*(binrel_t a, binrel_t b);
@@ -177,7 +177,7 @@ namespace wali
           // ////////////////////////////////
           // Static variables for the domain
         private:
-          static Voc voc;
+          static BddContext voc;
 
           // ///////////////////////////////
           // We use the name convention for different 
@@ -205,17 +205,17 @@ namespace wali
 
           //sets for operation
           //Set: B2
-          static bdd baseSecVocSet;
+          static bdd baseSecBddContextSet;
           //Set: TL2 U TR2
-          static bdd tensorSecVocSet;
+          static bdd tensorSecBddContextSet;
           //Set: TL2 U TR1
-          static bdd commonVocSet23;
+          static bdd commonBddContextSet23;
           //Id: TL2 = TR1
-          static bdd commonVocId23;
+          static bdd commonBddContextId23;
           //Set: TL2 U TR2
-          static bdd commonVocSet13;
+          static bdd commonBddContextSet13;
           //Id: TL2 = TR2
-          static bdd commonVocId13;
+          static bdd commonBddContextId13;
 
           //Static identities
           static bdd baseId;

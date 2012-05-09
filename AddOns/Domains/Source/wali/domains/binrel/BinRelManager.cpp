@@ -21,7 +21,7 @@ namespace wali
   {
     namespace binrel
     {
-      extern RevVoc idx2Name;
+      extern RevBddContext idx2Name;
     }
   }
 }
@@ -38,14 +38,14 @@ namespace wali
   {
     namespace binrel
     {
-      void addBoolVar(Voc& voc, std::string name)
+      void addBoolVar(BddContext& voc, std::string name)
       {
         bddinfo_t bi = new BddInfo;
         bi->maxVal = 2;
         voc[name] = bi;
       }
 
-      void addIntVar(Voc& voc, std::string name, int size)
+      void addIntVar(BddContext& voc, std::string name, int size)
       {
         LOG_IF(WARNING, size < 2) 
           << "I haven't tested the library for int size less than 2";
@@ -63,7 +63,7 @@ BinRelManager::~BinRelManager()
   BinRel::reset();
 }
 
-BinRelManager::BinRelManager(Voc& voc, int bddMemSize, int cacheSize) :
+BinRelManager::BinRelManager(BddContext& voc, int bddMemSize, int cacheSize) :
   Countable(),
   BOOLSIZE(2),
   sizeInfo(0),
@@ -77,7 +77,7 @@ BinRelManager::BinRelManager(Voc& voc, int bddMemSize, int cacheSize) :
   {
     //Find the maximum register size in the vocabulary
     unsigned maxVal = 0;
-    for(Voc::const_iterator vocIter = voc.begin();
+    for(BddContext::const_iterator vocIter = voc.begin();
         vocIter != voc.end();
         ++vocIter)
       maxVal = (vocIter->second->maxVal > maxVal)? vocIter->second->maxVal : maxVal;
@@ -158,7 +158,7 @@ bdd BinRelManager::From(std::string var)
     LOG(ERROR) << "From called before initializing BinRel";
     return bddfalse;
   }
-  const bddinfo_t bi = (*BinRel::getVoc().find(var)).second;
+  const bddinfo_t bi = (*BinRel::getBddContext().find(var)).second;
   for(unsigned i = 0; i < bi->maxVal; ++i)
     ret = ret | (fdd_ithvar(bi->baseLhs, i) & fdd_ithvar(regAInfo->baseRhs, i));
   return ret & fdd_ithvar(sizeInfo, bi->maxVal);
@@ -425,12 +425,12 @@ unsigned BinRelManager::getRegSize(bdd forThis)
 bdd BinRelManager::Assign(std::string var, bdd expr)
 {
   bddinfo_t bi;
-  Voc voc = BinRel::getVoc();
+  BddContext voc = BinRel::getBddContext();
   if(voc.find(var) == voc.end()){
     LOG(WARNING) << "[BinRelManager::Assign] Unknown Variable";
     return bddfalse;
   }else{
-    bi = BinRel::getVoc().find(var)->second;
+    bi = BinRel::getBddContext().find(var)->second;
   }
 
   //redundant?
@@ -452,7 +452,7 @@ bdd BinRelManager::Assign(std::string var, bdd expr)
 
   bdd c = bddtrue;
   for(
-      Voc::const_iterator iter = voc.begin();
+      BddContext::const_iterator iter = voc.begin();
       iter != voc.end();
       ++iter)
   {
@@ -465,7 +465,7 @@ bdd BinRelManager::Assign(std::string var, bdd expr)
 
 bdd BinRelManager::Assume(bdd expr1, bdd expr2)
 {
-  const Voc voc = BinRel::getVoc();
+  const BddContext voc = BinRel::getBddContext();
 
   bddPair *regARhs2Extra = bdd_newpair();
   fdd_setpair(
@@ -486,7 +486,7 @@ bdd BinRelManager::Assume(bdd expr1, bdd expr2)
   bdd_freepair(regARhs2BExtra);
 
   bddPair *baseLhs2Rhs = bdd_newpair();
-  for(Voc::const_iterator iter = voc.begin(); iter != voc.end(); ++iter){
+  for(BddContext::const_iterator iter = voc.begin(); iter != voc.end(); ++iter){
     fdd_setpair(
         baseLhs2Rhs,
         (iter->second)->baseLhs,
@@ -497,7 +497,7 @@ bdd BinRelManager::Assume(bdd expr1, bdd expr2)
   bdd_freepair(baseLhs2Rhs);
 
   bdd equate = bddtrue;
-  for(Voc::const_iterator iter = voc.begin(); iter != voc.end(); ++iter){
+  for(BddContext::const_iterator iter = voc.begin(); iter != voc.end(); ++iter){
     equate = equate &
       fdd_equals(
           iter->second->baseLhs,
@@ -520,12 +520,12 @@ bdd BinRelManager::Assume(bdd expr1, bdd expr2)
 
 bdd BinRelManager::tGetRandomTransformer(bool isTensored)
 {
-  const Voc voc = BinRel::getVoc();
+  const BddContext voc = BinRel::getBddContext();
   bdd ret = bddfalse;
   int numRounds = rand() % 10 + 1;
   for(int c=0; c < numRounds; ++c){
     bdd inbdd = rand()%2?bddfalse:bddtrue;
-    for(Voc::const_iterator iter = voc.begin(); 
+    for(BddContext::const_iterator iter = voc.begin(); 
         iter != voc.end();
         ++iter){
       int size = iter->second->maxVal;

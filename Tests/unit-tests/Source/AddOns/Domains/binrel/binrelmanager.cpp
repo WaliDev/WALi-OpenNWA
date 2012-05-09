@@ -20,7 +20,7 @@ namespace{
 
   class BinRelManagerTest: public ::testing::Test{
     protected:
-      Voc voc;
+      BddContext voc;
       binrel_manager_t brm;
       virtual void SetUp(){
         addBoolVar(voc,"a");
@@ -44,15 +44,15 @@ namespace{
   // ////////////////////////INIT TESTS////////////////////////////////////
   //We need separate initialization tests becaues the SetUp function in the
   //fixture already initializes.
-  TEST(BinRelInitTest, defaultInitEmptyVoc){
-    Voc voc;
+  TEST(BinRelInitTest, defaultInitEmptyBddContext){
+    BddContext voc;
     binrel_manager_t brm = new BinRelManager(voc);
     //ASSERT_EQ(voc.size(), 0);
     //binRelDone();
   }
   
   TEST(BinRelInitTest, userInit){
-    Voc voc;
+    BddContext voc;
     addBoolVar(voc,"a");
     addBoolVar(voc,"b");
     addBoolVar(voc,"c");
@@ -68,13 +68,13 @@ namespace{
     addIntVar(voc,"u",32);
     addIntVar(voc,"v",32);
     binrel_manager_t brm = new BinRelManager(voc);
-    //ASSERT_GT(retVoc.size(),0);
+    //ASSERT_GT(retBddContext.size(),0);
   }
 
 
-  TEST(BinRelInitTest, multiInitEmptyVoc){
+  TEST(BinRelInitTest, multiInitEmptyBddContext){
     {
-    Voc voc;
+    BddContext voc;
     addBoolVar(voc,"a");
     addIntVar(voc,"b",32);
     binrel_manager_t brm  = new BinRelManager(voc);
@@ -82,7 +82,7 @@ namespace{
     }
 
     {
-    Voc voc;
+    BddContext voc;
     addBoolVar(voc,"a");
     addIntVar(voc,"b",32);
     addBoolVar(voc,"c");
@@ -100,7 +100,7 @@ namespace{
     std::stringstream ss;
     //yippe SetUp works!
     ASSERT_TRUE(true);
-    for(Voc::const_iterator iter = voc.begin();
+    for(BddContext::const_iterator iter = voc.begin();
         iter != voc.end();
         ++iter)
       iter->second->print(ss << iter->first);
@@ -203,12 +203,12 @@ namespace{
   TEST_F(BinRelManagerTest, assignNassumeBool){
     std::stringstream ss;
 
-    Voc initVoc;
-    addBoolVar(initVoc,"a");
-    addBoolVar(initVoc,"b");
-    addBoolVar(initVoc,"c");
+    BddContext initBddContext;
+    addBoolVar(initBddContext,"a");
+    addBoolVar(initBddContext,"b");
+    addBoolVar(initBddContext,"c");
     brm = NULL;
-    brm = new BinRelManager(initVoc);
+    brm = new BinRelManager(initBddContext);
     bdd a = brm->From("a");
     bdd b = brm->From("b");
     bdd c = brm->From("c");
@@ -226,12 +226,12 @@ namespace{
   TEST_F(BinRelManagerTest, assignNassumeInt){
     std::stringstream ss;
 
-    Voc initVoc;
-    addIntVar(initVoc,"p",4);
-    addIntVar(initVoc,"q",4);
-    addIntVar(initVoc,"r",4);
+    BddContext initBddContext;
+    addIntVar(initBddContext,"p",4);
+    addIntVar(initBddContext,"q",4);
+    addIntVar(initBddContext,"r",4);
     brm = NULL;
-    brm = new BinRelManager(initVoc);
+    brm = new BinRelManager(initBddContext);
     bdd p = brm->From("p");
     bdd q = brm->From("q");
     bdd r = brm->From("r");
@@ -246,17 +246,17 @@ namespace{
   }
 
   TEST_F(BinRelManagerTest, logical){
-    Voc initVoc;
-    addBoolVar(initVoc,"a");
-    addBoolVar(initVoc,"b");
-    addBoolVar(initVoc,"c");
-    addBoolVar(initVoc,"d");
-    addIntVar(initVoc,"p",20);
-    addIntVar(initVoc,"q",20);
-    addIntVar(initVoc,"r",20);
-    addIntVar(initVoc,"s",20);
+    BddContext initBddContext;
+    addBoolVar(initBddContext,"a");
+    addBoolVar(initBddContext,"b");
+    addBoolVar(initBddContext,"c");
+    addBoolVar(initBddContext,"d");
+    addIntVar(initBddContext,"p",20);
+    addIntVar(initBddContext,"q",20);
+    addIntVar(initBddContext,"r",20);
+    addIntVar(initBddContext,"s",20);
     brm = NULL;
-    brm = new BinRelManager(initVoc);
+    brm = new BinRelManager(initBddContext);
 
     bdd a = brm->From("a");
     bdd b = brm->From("b");
@@ -281,7 +281,7 @@ namespace{
 
   TEST(BinRelManagerCornCases, DISABLED_veryFewVars){
     {
-      Voc voc;
+      BddContext voc;
       binrel_manager_t brm = new BinRelManager(voc);
       bdd a = brm->True();
       bdd b = brm->Assume(brm->True(), brm->True());
@@ -289,7 +289,7 @@ namespace{
       ASSERT_EQ(b,c);
     }
     {
-      Voc voc;
+      BddContext voc;
       addBoolVar(voc, "a");
       binrel_manager_t brm = new BinRelManager(voc);
       ASSERT_EQ(
