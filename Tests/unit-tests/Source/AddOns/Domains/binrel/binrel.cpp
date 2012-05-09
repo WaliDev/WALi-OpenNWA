@@ -24,25 +24,22 @@ using namespace wali::domains::binrel;
 namespace{
 
   TEST(BinRelSelfTest, creationTest){
-    BddContext initBddContext;
-    addBoolVar(initBddContext,"a");
-    addBoolVar(initBddContext,"b");
-    addBoolVar(initBddContext,"c");
-    addBoolVar(initBddContext,"d");
-
-    addIntVar(initBddContext,"p",4);
-    addIntVar(initBddContext,"q",4);
-    addIntVar(initBddContext,"r",4);
-    addIntVar(initBddContext,"s",4);
-
-    binrel_manager_t brm = new BinRelManager(initBddContext);
-    //ASSERT_EQ(voc.size(), 8);
+    program_bdd_context_t brm = new ProgramBddContext();
+    brm->addBoolVar("a");
+    brm->addBoolVar("b");
+    brm->addBoolVar("c");
+    brm->addBoolVar("d");
+    brm->addIntVar("p",4);
+    brm->addIntVar("q",4);
+    brm->addIntVar("r",4);
+    brm->addIntVar("s",4);
+    ASSERT_EQ(brm->size(), 8);
 
     bdd a = brm->From("a");
     bdd p = brm->From("p");
 
-    sem_elem_t se1 = new BinRel(a,false);
-    sem_elem_t se2 = new BinRel(p,false);
+    sem_elem_t se1 = new BinRel(brm.get_ptr(),a,false);
+    sem_elem_t se2 = new BinRel(brm.get_ptr(),p,false);
 
     stringstream ss;
     se1->print(ss << "se1: ") << endl;
@@ -51,17 +48,14 @@ namespace{
   }
 
   TEST(BinRelSelfTest, selfTest){
-    BddContext initBddContext;
-    addBoolVar(initBddContext,"a");
-    addBoolVar(initBddContext,"b");
+    program_bdd_context_t brm = new ProgramBddContext();
+    brm->addBoolVar("a");
+    brm->addBoolVar("b");
+    brm->addIntVar("p",4);
 
-    addIntVar(initBddContext,"p",4);
-
-    binrel_manager_t brm = new BinRelManager(initBddContext);
-    //ASSERT_EQ(voc.size(), 3);
     bdd a = brm->From("a");
     a = brm->Assign("b",a);
-    sem_elem_t se1 = new BinRel(a,false);
+    sem_elem_t se1 = new BinRel(brm.get_ptr(),a,false);
     wali::test_semelem_impl(se1);
   }
 
@@ -69,20 +63,19 @@ namespace{
   class BinRelTestBool: public ::testing::Test{
     protected:
       virtual void SetUp(){
-        BddContext initBddContext;
-        addBoolVar(initBddContext,"a");
-        addBoolVar(initBddContext,"b");
-        addBoolVar(initBddContext,"c");
-        brm = new BinRelManager(initBddContext);
+        brm = new ProgramBddContext();
+        brm->addBoolVar("a");
+        brm->addBoolVar("b");
+        brm->addBoolVar("c");
         //ASSERT_EQ(voc.size(), 3);
       }
     protected:
-      binrel_manager_t brm;
+      program_bdd_context_t brm;
   };
 
   TEST_F(BinRelTestBool,constantTests){
     stringstream ss;
-    sem_elem_t se = new BinRel(brm->False(),false);
+    sem_elem_t se = new BinRel(brm.get_ptr(),brm->False(),false);
     se->one()->print(ss << "one(): ") << endl;
     se->zero()->print(ss << "zero(): ") << endl;
     EXPECT_TRUE(compareOutput("BinRelTestBool","constantTests",ss));
@@ -92,9 +85,9 @@ namespace{
     stringstream ss;
     bdd a;
     a = brm->Assign("c", brm->And(brm->From("a"),brm->From("b")));
-    sem_elem_t se1 = new BinRel(a,false);
+    sem_elem_t se1 = new BinRel(brm.get_ptr(),a,false);
     a = brm->Assume(brm->From("a"), brm->From("b"));
-    sem_elem_t se2 = new BinRel(a,false);
+    sem_elem_t se2 = new BinRel(brm.get_ptr(),a,false);
     sem_elem_t one = se1->one();
     sem_elem_t zero = se1->zero();
 
@@ -122,9 +115,9 @@ namespace{
     stringstream ss;
     bdd a;
     a = brm->Assign("c", brm->And(brm->From("a"),brm->From("b")));
-    sem_elem_t se1 = new BinRel(a,false);
+    sem_elem_t se1 = new BinRel(brm.get_ptr(),a,false);
     a = brm->Assume(brm->From("a"), brm->From("b"));
-    sem_elem_t se2 = new BinRel(a,false);
+    sem_elem_t se2 = new BinRel(brm.get_ptr(),a,false);
     sem_elem_t one = se1->one();
     sem_elem_t zero = se1->zero();
 
@@ -148,9 +141,9 @@ namespace{
     stringstream ss;
     bdd a;
     a = brm->Assign("c", brm->And(brm->From("a"),brm->From("b")));
-    sem_elem_tensor_t se1 = new BinRel(a,false);
+    sem_elem_tensor_t se1 = new BinRel(brm.get_ptr(),a,false);
     a = brm->Assume(brm->From("a"), brm->From("b"));
-    sem_elem_tensor_t se2 = new BinRel(a,false);
+    sem_elem_tensor_t se2 = new BinRel(brm.get_ptr(),a,false);
 
     se1->print(ss << "se1: ") << endl;
     se1->transpose()->print(ss << "se1: ") << endl;
@@ -161,19 +154,17 @@ namespace{
   }
 
   TEST_F(BinRelTestBool, tensorTests){
-    BddContext initBddContext;
-    addBoolVar(initBddContext,"a");
-    addBoolVar(initBddContext,"b");
-    brm = NULL;
-    brm = new BinRelManager(initBddContext);
+    brm = new ProgramBddContext();
+    brm->addBoolVar("a");
+    brm->addBoolVar("b");
     //ASSERT_EQ(voc.size(), 2);
 
     stringstream ss;
     bdd a;
     a = brm->Assume(brm->From("a"), brm->From("b"));
-    sem_elem_tensor_t se1 = new BinRel(a,false);
+    sem_elem_tensor_t se1 = new BinRel(brm.get_ptr(),a,false);
     a = brm->Assume(brm->From("a"), brm->Not(brm->From("b")));
-    sem_elem_tensor_t se2 = new BinRel(a,false);
+    sem_elem_tensor_t se2 = new BinRel(brm.get_ptr(),a,false);
     sem_elem_tensor_t se3 = se1->tensor(se2.get_ptr());
 
     se1->print(ss << "se1: ") << endl;
@@ -189,9 +180,9 @@ namespace{
     stringstream ss;
     bdd a;
     a = brm->Assume(brm->From("a"), brm->From("b"));
-    sem_elem_tensor_t se1 = new BinRel(a,false);
+    sem_elem_tensor_t se1 = new BinRel(brm.get_ptr(),a,false);
     a = brm->Assume(brm->From("b"), brm->From("c"));
-    sem_elem_tensor_t se2 = new BinRel(a,false);
+    sem_elem_tensor_t se2 = new BinRel(brm.get_ptr(),a,false);
     sem_elem_tensor_t se3 = se1->tensor(se2.get_ptr());
     sem_elem_tensor_t se4 = se3->detensor();
     sem_elem_tensor_t se5 =
@@ -211,9 +202,9 @@ namespace{
     stringstream ss;
     bdd a;
     a = brm->Assign("a", brm->From("c"));
-    sem_elem_tensor_t se1 = new BinRel(a,false);
+    sem_elem_tensor_t se1 = new BinRel(brm.get_ptr(),a,false);
     a = brm->Assume(brm->From("b"), brm->From("c"));
-    sem_elem_tensor_t se2 = new BinRel(a,false);
+    sem_elem_tensor_t se2 = new BinRel(brm.get_ptr(),a,false);
     sem_elem_tensor_t se3 = se1->tensor(se2.get_ptr());
     sem_elem_tensor_t se4 = se3->detensor();
     sem_elem_tensor_t se5 =
@@ -230,27 +221,25 @@ namespace{
   class BinRelTestInt: public ::testing::Test{
     protected:
       virtual void SetUp(){
-        BddContext initBddContext;
-        addIntVar(initBddContext,"a",4);
-        addIntVar(initBddContext,"b",4);
-        addIntVar(initBddContext,"c",4);
-        brm = NULL;
-        brm = new BinRelManager(initBddContext);
+        brm = new ProgramBddContext();
+        brm->addIntVar("a",4);
+        brm->addIntVar("b",4);
+        brm->addIntVar("c",4);
         //ASSERT_EQ(voc.size(), 3);
       }
     protected:
       sem_elem_tensor_t screenVar(string var, sem_elem_tensor_t wt);
-      binrel_manager_t brm;
+      program_bdd_context_t brm;
   };
 
   sem_elem_tensor_t BinRelTestInt::screenVar(string var, sem_elem_tensor_t wt){
-    sem_elem_tensor_t screen = new BinRel(brm->Assume(brm->From(var),brm->Const(0)), false);
+    sem_elem_tensor_t screen = new BinRel(brm.get_ptr(),brm->Assume(brm->From(var),brm->Const(0)), false);
     return dynamic_cast<SemElemTensor*>(wt->extend(screen.get_ptr()).get_ptr());
   }
 
   TEST_F(BinRelTestInt,testScreen){
     stringstream ss;
-    sem_elem_tensor_t wt = new BinRel(brm->Const(0), false);
+    sem_elem_tensor_t wt = new BinRel(brm.get_ptr(),brm->Const(0), false);
     wt = dynamic_cast<SemElemTensor*>(wt->one().get_ptr());
     wt->print(ss << "W[1]: ") << endl;
     wt = screenVar("a",wt);
@@ -266,12 +255,11 @@ namespace{
     // //Maybe this should be done in a more repeat-friendly way// //
     stringstream ss;
     bool failed = false, dump = false;
-    BddContext initBddContext;
-    addIntVar(initBddContext, "a", 4);
-    addBoolVar(initBddContext, "b");
-    addIntVar(initBddContext, "c", 4);
-    addBoolVar(initBddContext, "d");
-    binrel_manager_t brm = new BinRelManager(initBddContext);
+    program_bdd_context_t brm = new ProgramBddContext();
+    brm->addIntVar( "a", 4);
+    brm->addBoolVar( "b");
+    brm->addIntVar( "c", 4);
+    brm->addBoolVar( "d");
     //ASSERT_EQ(voc.size(),4);
 
     srand((unsigned)time(NULL));
@@ -280,9 +268,9 @@ namespace{
       bdd r2bdd = brm->tGetRandomTransformer();
       bdd r3bdd = brm->tGetRandomTransformer();
 
-      sem_elem_t r1 = new BinRel(r1bdd,false);
-      sem_elem_t r2 = new BinRel(r2bdd,false);
-      sem_elem_t r3 = new BinRel(r3bdd,false);
+      sem_elem_t r1 = new BinRel(brm.get_ptr(),r1bdd,false);
+      sem_elem_t r2 = new BinRel(brm.get_ptr(),r2bdd,false);
+      sem_elem_t r3 = new BinRel(brm.get_ptr(),r3bdd,false);
       sem_elem_t w1,w2,w3,w4,w5;
 
       w1 = r1->combine(r2);
@@ -333,12 +321,11 @@ namespace{
     stringstream ss;
     bool failed = false;
     bool dump = false;
-    BddContext initBddContext;
-    addIntVar(initBddContext, "a", 4);
-    addBoolVar(initBddContext, "b");
-    addIntVar(initBddContext, "c", 4);
-    addBoolVar(initBddContext, "d");
-    binrel_manager_t brm = new BinRelManager(initBddContext);
+    program_bdd_context_t brm = new ProgramBddContext();
+    brm->addIntVar( "a", 4);
+    brm->addBoolVar( "b");
+    brm->addIntVar( "c", 4);
+    brm->addBoolVar( "d");
     //ASSERT_EQ(voc.size(),4);
 
     srand((unsigned)time(NULL));
@@ -347,9 +334,9 @@ namespace{
       bdd r2bdd = brm->tGetRandomTransformer(true);
       bdd r3bdd = brm->tGetRandomTransformer(true);
 
-      sem_elem_t r1 = new BinRel(r1bdd,true);
-      sem_elem_t r2 = new BinRel(r2bdd,true);
-      sem_elem_t r3 = new BinRel(r3bdd,true);
+      sem_elem_t r1 = new BinRel(brm.get_ptr(),r1bdd,true);
+      sem_elem_t r2 = new BinRel(brm.get_ptr(),r2bdd,true);
+      sem_elem_t r3 = new BinRel(brm.get_ptr(),r3bdd,true);
       sem_elem_t w1,w2,w3,w4,w5;
 
       w1 = r1->combine(r2);
@@ -400,12 +387,11 @@ namespace{
     stringstream ss;
     bool failed = false;
     bool dump = false;
-    BddContext initBddContext;
-    addIntVar(initBddContext, "a", 4);
-    addBoolVar(initBddContext, "b");
-    addIntVar(initBddContext, "c", 4);
-    addBoolVar(initBddContext, "d");
-    binrel_manager_t brm = new BinRelManager(initBddContext);
+    program_bdd_context_t brm = new ProgramBddContext();
+    brm->addIntVar( "a", 4);
+    brm->addBoolVar( "b");
+    brm->addIntVar( "c", 4);
+    brm->addBoolVar( "d");
 
     srand(time(NULL));
     //for debugging
@@ -419,12 +405,12 @@ namespace{
       bdd t1bdd = brm->tGetRandomTransformer(true);
       bdd t2bdd = brm->tGetRandomTransformer(true);
 
-      sem_elem_tensor_t b1 = new BinRel(b1bdd,false);
-      sem_elem_tensor_t b2 = new BinRel(b2bdd,false);
-      sem_elem_tensor_t b3 = new BinRel(b3bdd,false);
-      sem_elem_tensor_t b4 = new BinRel(b4bdd,false);
-      sem_elem_tensor_t t1 = new BinRel(t1bdd,true);
-      sem_elem_tensor_t t2 = new BinRel(t2bdd,true);
+      sem_elem_tensor_t b1 = new BinRel(brm.get_ptr(),b1bdd,false);
+      sem_elem_tensor_t b2 = new BinRel(brm.get_ptr(),b2bdd,false);
+      sem_elem_tensor_t b3 = new BinRel(brm.get_ptr(),b3bdd,false);
+      sem_elem_tensor_t b4 = new BinRel(brm.get_ptr(),b4bdd,false);
+      sem_elem_tensor_t t1 = new BinRel(brm.get_ptr(),t1bdd,true);
+      sem_elem_tensor_t t2 = new BinRel(brm.get_ptr(),t2bdd,true);
       sem_elem_tensor_t w1,w2,w3,w4;
 
       w1 = b1->tensor(b2.get_ptr());

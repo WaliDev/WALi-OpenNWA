@@ -16,35 +16,29 @@ namespace wali
     namespace binrel
     {
 
-      // Forward declare class to define the ref_ptr to BinRelManager. 
-      class BinRelManager;
-      typedef ref_ptr< BinRelManager > binrel_manager_t;
+      // Forward declare class to define the ref_ptr to ProgramBddContext. 
+      class ProgramBddContext;
+      typedef ref_ptr< ProgramBddContext > program_bdd_context_t;
 
-      // /// The following functions should be used to add variables to a vocabulary *before*
-      // /// Creating your BinRelManager Object.
-      /** Add a boolean variable to the vocabulary with the name 'name' **/
-      void addBoolVar(BddContext& voc, std::string name);
-      /** Add a int variable to the vocabulary with the name 'name'. The integer can take values
-       * between 0...size-1. **/
-      void addIntVar(BddContext& voc, std::string name, int size);
-
-      class BinRelManager : public Countable
+      class ProgramBddContext : public BddContext
       {
         public:
 
           /**
-           * Initialize the BinRelManager, and the BinRel class. 
-           * You do not need to call BinRel::initialize if you call this
+           * Initialize the ProgramBddContext. 
            * @param [bddMemSize] the memory size buddy should use. Use 0 for default.
            * @param [cacheSize] the memory size buddy should use. Use 0 for default.
-           * @param [voc] The vocabulary of the BinRel semiring. BddContextabulary of the BinRel domain
-                          can not be changed once the BinRelManager has been created.
-                          [TODO] voc is passed by reference, and modified to reflect 
-           *              the bdd indices populated.
-           * @see BinRel::BddInfo
            **/
-          BinRelManager(BddContext& voc, int bddMemSize=0, int cacheSize=0);
-          ~BinRelManager();
+          ProgramBddContext(int bddMemSize=0, int cacheSize=0);
+          ProgramBddContext(const ProgramBddContext& other);
+          virtual ProgramBddContext& operator = (const ProgramBddContext& other);
+          ~ProgramBddContext();
+
+          /** Add a boolean variable to the vocabulary with the name 'name' **/
+          virtual void addBoolVar(std::string name);
+          /** Add a int variable to the vocabulary with the name 'name'. The integer can take values
+           * between 0...size-1. **/
+          virtual void addIntVar(std::string name, unsigned size);
 
           std::ostream& print(std::ostream& o);
 
@@ -77,10 +71,6 @@ namespace wali
           bdd tGetRandomTransformer(bool isTensored = false);
 
         private:
-
-          //FIXME: add const when initialize() has been removed.
-          unsigned BOOLSIZE;
-
           // This is the bdd index of the size info in each bdd
           unsigned sizeInfo;
           // This is the maximum size a register can have

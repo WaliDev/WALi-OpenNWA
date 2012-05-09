@@ -25,68 +25,28 @@ namespace wali
     }
   }
 }
-
-//TODO: remove this comment, and to do that, put comments elsewhere.
-
-
 // ////////////////////////////////////////////////////////////////////////////
 // The interface assumes that the google logging library is initialized before
 // calling any of its functions.
-namespace wali 
-{
-  namespace domains
-  {
-    namespace binrel
-    {
-      void addBoolVar(BddContext& voc, std::string name)
-      {
-        bddinfo_t bi = new BddInfo;
-        bi->maxVal = 2;
-        voc[name] = bi;
-      }
 
-      void addIntVar(BddContext& voc, std::string name, int size)
-      {
-        LOG_IF(WARNING, size < 2) 
-          << "I haven't tested the library for int size less than 2";
-        bddinfo_t bi = new BddInfo;
-        bi->maxVal = size;
-        voc[name] = bi;
-      }
-    } // namespace binrel
-  } // namespace domains
-} // namespace wali
-
-BinRelManager::~BinRelManager()
+ProgramBddContext::~ProgramBddContext()
 {
   regAInfo = regBInfo = NULL;
   BinRel::reset();
 }
 
-BinRelManager::BinRelManager(BddContext& voc, int bddMemSize, int cacheSize) :
-  Countable(),
-  BOOLSIZE(2),
-  sizeInfo(0),
-  regAInfo(NULL),
-  regBInfo(NULL)
+void ProgramBddContext::addBoolVar(std::string name)
 {
-  
-  BinRel::initialize(voc, bddMemSize, cacheSize);
+  addIntVar(name,2);
+}
 
-  //This stuff basically extends the bdd domain in buddy by some extra levels.
-  {
-    //Find the maximum register size in the vocabulary
-    unsigned maxVal = 0;
-    for(BddContext::const_iterator vocIter = voc.begin();
-        vocIter != voc.end();
-        ++vocIter)
-      maxVal = (vocIter->second->maxVal > maxVal)? vocIter->second->maxVal : maxVal;
-    maxSize = maxVal;
-    //Create space in the bdd to store the size of the current register.
-    if(maxVal != 0){
-      //if maxVal is zero, you can't do anything anyway.
-      //+1 because I want to be able to store the size of the largest register.
-      int domains[1] = {maxVal+1};
+void ProgramBddContext::addIntVar(std::string name, unsigned size)
+{
+  BddContext::addIntVar(name,size);
+  if(size > maxSize){
+    if(maxSize == 0){
+      //This is when we *create* the extra levels needed
+      int domains[1] = {size+1};
       int retSizeInfo = fdd_extdomain(domains,1);
       if(retSizeInfo < 0)
         LOG(FATAL) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(retSizeInfo) << "\"" << endl
@@ -96,11 +56,11 @@ BinRelManager::BinRelManager(BddContext& voc, int bddMemSize, int cacheSize) :
       //To pretty print during testing, we add some names for this regsiter size fdd level.
       idx2Name[sizeInfo] = "__regSize";
       //Now create two extra bdd levels, and the corresponding BddInfo entries to be used for manipulation
-      //inside BinRelManager.
+      //inside ProgramBddContext.
       //We will create indices such that we get a default variable ordering where
       //baseLhs, baseRhs, baseExtra are mixed.
       {
-        int domains2[3] = {maxVal, maxVal, maxVal};
+        int domains2[3] = {size, size, size};
         regAInfo = new BddInfo();
         //Create fdds for base
         int base = fdd_extdomain(domains2,3);
@@ -119,7 +79,7 @@ BinRelManager::BinRelManager(BddContext& voc, int bddMemSize, int cacheSize) :
         idx2Name[regAInfo->baseExtra] = "__regA''";
       }
       {
-        int domains2[3] = {maxVal, maxVal, maxVal};
+        int domains2[3] = {size, size, size};
         regBInfo = new BddInfo();
         //Create fdds for base
         int base = fdd_extdomain(domains2,3);
@@ -136,13 +96,122 @@ BinRelManager::BinRelManager(BddContext& voc, int bddMemSize, int cacheSize) :
         idx2Name[regBInfo->baseRhs] = "__regB'";
         idx2Name[regBInfo->baseExtra] = "__regB''";
       }
+    }else{
+      //This is when we *enlarge* the extra levels needed
+      int maxVal = size - maxSize;
+
+      int domains[1] = {maxVal};
+      int retSizeInfo = fdd_extdomain(domains,1);
+      if(retSizeInfo < 0)
+        LOG(FATAL) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(retSizeInfo) << "\"" << endl
+          << "    Aborting." << endl;
+      retSizeInfo = fdd_overlapdomain(sizeInfo,retSizeInfo);
+      if(retSizeInfo < 0)
+        LOG(FATAL) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(retSizeInfo) << "\"" << endl
+          << "    Aborting." << endl;
+      sizeInfo = retSizeInfo;
+
+      //To pretty print during testing, we add some names for this regsiter size fdd level.
+      idx2Name[sizeInfo] = "__regSize";
+      //Now create two extra bdd levels, and the corresponding BddInfo entries to be used for manipulation
+      //inside ProgramBddContext.
+      //We will create indices such that we get a default variable ordering where
+      //baseLhs, baseRhs, baseExtra are mixed.
+      {
+        int domains2[3] = {maxVal, maxVal, maxVal};
+        //Create fdds for base
+        int base = fdd_extdomain(domains2,3);
+        if (base < 0)
+          LOG(ERROR) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl
+            << "    Aborting." << endl;
+        int retbase;
+        retbase = fdd_overlapdomain(regAInfo->baseLhs,base);
+        regAInfo->baseLhs = retbase;
+        if (base < 0)
+          LOG(ERROR) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl
+            << "    Aborting." << endl;
+        retbase = fdd_overlapdomain(regAInfo->baseRhs,base+1);
+        regAInfo->baseRhs = retbase;
+        if (base < 0)
+          LOG(ERROR) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl
+            << "    Aborting." << endl;
+        retbase = fdd_overlapdomain(regAInfo->baseExtra,base+2);
+        regAInfo->baseExtra = retbase;
+        if (base < 0)
+          LOG(ERROR) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl
+            << "    Aborting." << endl;
+        //To pretty print during testing, we add some names for this extra register
+        //Currently, idx2Name is a global variable in wali::domains::binrel
+        idx2Name[regAInfo->baseLhs] = "__regA";
+        idx2Name[regAInfo->baseRhs] = "__regA'";
+        idx2Name[regAInfo->baseExtra] = "__regA''";
+      }
+      {
+        int domains2[3] = {maxVal, maxVal, maxVal};
+        //Create fdds for base
+        int base = fdd_extdomain(domains2,3);
+        if (base < 0)
+          LOG(ERROR) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl
+            << "    Aborting." << endl;
+        int retbase;
+        retbase = fdd_overlapdomain(regBInfo->baseLhs,base);
+        regBInfo->baseLhs = retbase;
+        if (base < 0)
+          LOG(ERROR) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl
+            << "    Aborting." << endl;
+        retbase = fdd_overlapdomain(regBInfo->baseRhs,base+1);
+        regBInfo->baseRhs = retbase;
+        if (base < 0)
+          LOG(ERROR) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl
+            << "    Aborting." << endl;
+        retbase = fdd_overlapdomain(regBInfo->baseExtra,base+2);
+        regBInfo->baseExtra = retbase;
+        if (base < 0)
+          LOG(ERROR) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl
+            << "    Aborting." << endl;
+        //To pretty print during testing, we add some names for this extra register
+        //Currently, idx2Name is a global variable in wali::domains::binrel
+        idx2Name[regBInfo->baseLhs] = "__regB";
+        idx2Name[regBInfo->baseRhs] = "__regB'";
+        idx2Name[regBInfo->baseExtra] = "__regB''";
+      }
     }
+    maxSize = size;
   }
 }
 
-std::ostream& BinRelManager::print(std::ostream& o)
+ProgramBddContext::ProgramBddContext(int bddMemSize, int cacheSize) :
+  BddContext(bddMemSize, cacheSize),
+  sizeInfo(0),
+  maxSize(0),
+  regAInfo(NULL),
+  regBInfo(NULL)
+{}
+
+ProgramBddContext::ProgramBddContext(const ProgramBddContext& other) :
+  BddContext(other),
+  sizeInfo(other.sizeInfo),
+  maxSize(other.maxSize),
+  regAInfo(other.regAInfo),
+  regBInfo(other.regBInfo)
+{}
+
+ProgramBddContext& ProgramBddContext::operator = (const ProgramBddContext& other)
 {
-  o << "BinRelManager dump:" << std::endl;
+  if(this != &other){
+    BddContext::operator=(other);
+    sizeInfo=other.sizeInfo;
+    maxSize=other.maxSize;
+    regAInfo=other.regAInfo;
+    regBInfo=other.regBInfo;
+  }
+  return *this;
+}
+
+
+std::ostream& ProgramBddContext::print(std::ostream& o)
+{
+  o << "ProgramBddContext dump:" << std::endl;
   o << "sizeInfo: " << sizeInfo << std::endl;
   o << "maxSize: " << maxSize << std::endl;
   regAInfo->print(o << "regAInfo: ") << std::endl;
@@ -150,31 +219,30 @@ std::ostream& BinRelManager::print(std::ostream& o)
   return o;
 }
 
-bdd BinRelManager::From(std::string var)
+bdd ProgramBddContext::From(std::string var)
 {
   //TODO: This header should be placed in all functions below.
   bdd ret = bddfalse;
-  if(!BinRel::is_initialized()){
-    LOG(ERROR) << "From called before initializing BinRel";
-    return bddfalse;
-  }
-  const bddinfo_t bi = (*BinRel::getBddContext().find(var)).second;
+  ProgramBddContext::const_iterator iter = (this->find(var));
+  if(iter == this->end())
+    LOG(FATAL) << "Attempted From () on \"" << var << "\". I don't recognize this name\n";
+  const bddinfo_t bi = iter->second;
   for(unsigned i = 0; i < bi->maxVal; ++i)
     ret = ret | (fdd_ithvar(bi->baseLhs, i) & fdd_ithvar(regAInfo->baseRhs, i));
   return ret & fdd_ithvar(sizeInfo, bi->maxVal);
 }
 
-bdd BinRelManager::True()
+bdd ProgramBddContext::True()
 {
-  return fdd_ithvar(regAInfo->baseRhs,1) & fdd_ithvar(sizeInfo, BOOLSIZE);
+  return fdd_ithvar(regAInfo->baseRhs,1) & fdd_ithvar(sizeInfo, 2);
 }
 
-bdd BinRelManager::False()
+bdd ProgramBddContext::False()
 {
-  return fdd_ithvar(regAInfo->baseRhs,0) & fdd_ithvar(sizeInfo, BOOLSIZE);
+  return fdd_ithvar(regAInfo->baseRhs,0) & fdd_ithvar(sizeInfo, 2);
 }
 
-bdd BinRelManager::Const(unsigned val)
+bdd ProgramBddContext::Const(unsigned val)
 {
   if(val >= maxSize){
     LOG(ERROR) << "[Const] Attempted to create a constant value larger "
@@ -184,12 +252,12 @@ bdd BinRelManager::Const(unsigned val)
   return fdd_ithvar(regAInfo->baseRhs, val) & fdd_ithvar(sizeInfo, maxSize);
 }
 
-bdd BinRelManager::NonDet()
+bdd ProgramBddContext::NonDet()
 {
   return bddtrue;
 }
 
-bdd BinRelManager::applyBinOp(bdd lexpr, bdd rexpr, bdd op)
+bdd ProgramBddContext::applyBinOp(bdd lexpr, bdd rexpr, bdd op)
 { 
   bddPair *regA2regB = bdd_newpair();
   fdd_setpair(regA2regB, regAInfo->baseRhs, regBInfo->baseRhs);
@@ -214,7 +282,7 @@ bdd BinRelManager::applyBinOp(bdd lexpr, bdd rexpr, bdd op)
   return lexpr;
 }
 
-bdd BinRelManager::applyUnOp(bdd expr, bdd op)
+bdd ProgramBddContext::applyUnOp(bdd expr, bdd op)
 {
   expr = bdd_relprod(
       expr,
@@ -230,50 +298,50 @@ bdd BinRelManager::applyUnOp(bdd expr, bdd op)
   return expr;
 }
 
-bdd BinRelManager::And(bdd lexpr, bdd rexpr)
+bdd ProgramBddContext::And(bdd lexpr, bdd rexpr)
 {
   return applyBinOp(lexpr, rexpr, bddAnd());      
 }
 
-bdd BinRelManager::Or(bdd lexpr, bdd rexpr)
+bdd ProgramBddContext::Or(bdd lexpr, bdd rexpr)
 {
   return applyBinOp(lexpr, rexpr, bddOr());
 }
 
-bdd BinRelManager::Not(bdd expr)
+bdd ProgramBddContext::Not(bdd expr)
 {
   return applyUnOp(expr, bddNot());      
 }
 
-bdd BinRelManager::Plus(bdd lexpr, bdd rexpr)
+bdd ProgramBddContext::Plus(bdd lexpr, bdd rexpr)
 {
   unsigned in1 = getRegSize(lexpr);
   unsigned in2 = getRegSize(rexpr);
   return applyBinOp(lexpr, rexpr, bddPlus(in1,in2));
 }
 
-bdd BinRelManager::Minus(bdd lexpr, bdd rexpr)
+bdd ProgramBddContext::Minus(bdd lexpr, bdd rexpr)
 {
   unsigned in1 = getRegSize(lexpr);
   unsigned in2 = getRegSize(rexpr);
   return applyBinOp(lexpr, rexpr, bddMinus(in1,in2));
 }
 
-bdd BinRelManager::Times(bdd lexpr, bdd rexpr)
+bdd ProgramBddContext::Times(bdd lexpr, bdd rexpr)
 {
   unsigned in1 = getRegSize(lexpr);
   unsigned in2 = getRegSize(rexpr);
   return applyBinOp(lexpr, rexpr, bddTimes(in1,in2));
 }
 
-bdd BinRelManager::Div(bdd lexpr, bdd rexpr)
+bdd ProgramBddContext::Div(bdd lexpr, bdd rexpr)
 {
   unsigned in1 = getRegSize(lexpr);
   unsigned in2 = getRegSize(rexpr);
   return applyBinOp(lexpr, rexpr, bddDiv(in1,in2));
 }
 
-bdd BinRelManager::bddAnd()
+bdd ProgramBddContext::bddAnd()
 {
   bdd ret =
     (fdd_ithvar(regAInfo->baseRhs,1) & 
@@ -291,11 +359,11 @@ bdd BinRelManager::bddAnd()
     (fdd_ithvar(regAInfo->baseRhs,0) & 
      fdd_ithvar(regBInfo->baseRhs,0) &
      fdd_ithvar(regAInfo->baseExtra,0));
-  ret = ret & fdd_ithvar(sizeInfo, BOOLSIZE);
+  ret = ret & fdd_ithvar(sizeInfo, 2);
   return ret;
 }
 
-bdd BinRelManager::bddOr()
+bdd ProgramBddContext::bddOr()
 {
   bdd ret = 
     (fdd_ithvar(regAInfo->baseRhs,1) & 
@@ -313,11 +381,11 @@ bdd BinRelManager::bddOr()
     (fdd_ithvar(regAInfo->baseRhs,0) & 
      fdd_ithvar(regBInfo->baseRhs,0) &
      fdd_ithvar(regAInfo->baseExtra,0));
-  ret = ret & fdd_ithvar(sizeInfo, BOOLSIZE);
+  ret = ret & fdd_ithvar(sizeInfo, 2);
   return ret;
 }
 
-bdd BinRelManager::bddNot()
+bdd ProgramBddContext::bddNot()
 {
   bdd ret =
     (fdd_ithvar(regAInfo->baseRhs,1) & 
@@ -325,14 +393,14 @@ bdd BinRelManager::bddNot()
     |
     (fdd_ithvar(regAInfo->baseRhs,0) & 
      fdd_ithvar(regAInfo->baseExtra,1));
-  ret = ret & fdd_ithvar(sizeInfo, BOOLSIZE);
+  ret = ret & fdd_ithvar(sizeInfo, 2);
   return ret;
 }
 
-bdd BinRelManager::bddPlus(unsigned in1Size, unsigned in2Size)
+bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size)
 {
   if(in1Size != in2Size)
-    LOG(ERROR) << "[BinRelManager::bddPlus] Addition of number of different bit widths is not allowed.\n";
+    LOG(ERROR) << "[ProgramBddContext::bddPlus] Addition of number of different bit widths is not allowed.\n";
   int outSize = in1Size;
   bdd ret = bddfalse;
   for(unsigned i=0; i<in1Size; ++i){
@@ -348,10 +416,10 @@ bdd BinRelManager::bddPlus(unsigned in1Size, unsigned in2Size)
   return ret;
 }
 
-bdd BinRelManager::bddMinus(unsigned in1Size, unsigned in2Size)
+bdd ProgramBddContext::bddMinus(unsigned in1Size, unsigned in2Size)
 {
   if(in1Size != in2Size)
-    LOG(ERROR) << "[BinRelManager::bddMinus] Subtraction of number of different bit widths is not allowed.\n";
+    LOG(ERROR) << "[ProgramBddContext::bddMinus] Subtraction of number of different bit widths is not allowed.\n";
   int outSize = in1Size;
   bdd ret = bddfalse;
   for(unsigned i=0; i<in1Size; ++i){
@@ -367,10 +435,10 @@ bdd BinRelManager::bddMinus(unsigned in1Size, unsigned in2Size)
   return ret;
 }
 
-bdd BinRelManager::bddTimes(unsigned in1Size, unsigned in2Size)
+bdd ProgramBddContext::bddTimes(unsigned in1Size, unsigned in2Size)
 {
   if(in1Size != in2Size)
-    LOG(ERROR) << "[BinRelManager::bddTimes] Multiplication of number of different bit widths is not allowed.\n";
+    LOG(ERROR) << "[ProgramBddContext::bddTimes] Multiplication of number of different bit widths is not allowed.\n";
   int outSize = in1Size;
   bdd ret = bddfalse;
   for(unsigned i=0; i<in1Size; ++i){
@@ -386,10 +454,10 @@ bdd BinRelManager::bddTimes(unsigned in1Size, unsigned in2Size)
   return ret;
 }
 
-bdd BinRelManager::bddDiv(unsigned in1Size, unsigned in2Size)
+bdd ProgramBddContext::bddDiv(unsigned in1Size, unsigned in2Size)
 {
   if(in1Size != in2Size)
-    LOG(ERROR) << "[BinRelManager::bddDiv] Division of number of different bit widths is not allowed.\n";
+    LOG(ERROR) << "[ProgramBddContext::bddDiv] Division of number of different bit widths is not allowed.\n";
   int outSize = in1Size;
   bdd ret = bddfalse;
   for(unsigned i=0; i<in1Size; ++i){
@@ -410,7 +478,7 @@ bdd BinRelManager::bddDiv(unsigned in1Size, unsigned in2Size)
   return ret;
 }
 
-unsigned BinRelManager::getRegSize(bdd forThis)
+unsigned ProgramBddContext::getRegSize(bdd forThis)
 {
   //Inefficient!!!
   for(unsigned i = 0; i <= maxSize; ++i){
@@ -418,19 +486,18 @@ unsigned BinRelManager::getRegSize(bdd forThis)
     if((tmp & forThis) != bddfalse)
       return i;
   }
-  LOG(FATAL) << "[BinRelManager::getRegSize] bdd does not have a recognizable regSize\n";
+  LOG(FATAL) << "[ProgramBddContext::getRegSize] bdd does not have a recognizable regSize\n";
   return 0;
 }
 
-bdd BinRelManager::Assign(std::string var, bdd expr)
+bdd ProgramBddContext::Assign(std::string var, bdd expr)
 {
   bddinfo_t bi;
-  BddContext voc = BinRel::getBddContext();
-  if(voc.find(var) == voc.end()){
-    LOG(WARNING) << "[BinRelManager::Assign] Unknown Variable";
+  if(this->find(var) == this->end()){
+    LOG(WARNING) << "[ProgramBddContext::Assign] Unknown Variable";
     return bddfalse;
   }else{
-    bi = BinRel::getBddContext().find(var)->second;
+    bi = this->find(var)->second;
   }
 
   //redundant?
@@ -452,8 +519,8 @@ bdd BinRelManager::Assign(std::string var, bdd expr)
 
   bdd c = bddtrue;
   for(
-      BddContext::const_iterator iter = voc.begin();
-      iter != voc.end();
+      BddContext::const_iterator iter = this->begin();
+      iter != this->end();
       ++iter)
   {
     if(var != iter->first)
@@ -463,10 +530,8 @@ bdd BinRelManager::Assign(std::string var, bdd expr)
   return bdd_exist(expr & c, fdd_ithset(sizeInfo));
 }
 
-bdd BinRelManager::Assume(bdd expr1, bdd expr2)
+bdd ProgramBddContext::Assume(bdd expr1, bdd expr2)
 {
-  const BddContext voc = BinRel::getBddContext();
-
   bddPair *regARhs2Extra = bdd_newpair();
   fdd_setpair(
       regARhs2Extra,
@@ -486,7 +551,7 @@ bdd BinRelManager::Assume(bdd expr1, bdd expr2)
   bdd_freepair(regARhs2BExtra);
 
   bddPair *baseLhs2Rhs = bdd_newpair();
-  for(BddContext::const_iterator iter = voc.begin(); iter != voc.end(); ++iter){
+  for(BddContext::const_iterator iter = this->begin(); iter != this->end(); ++iter){
     fdd_setpair(
         baseLhs2Rhs,
         (iter->second)->baseLhs,
@@ -497,7 +562,7 @@ bdd BinRelManager::Assume(bdd expr1, bdd expr2)
   bdd_freepair(baseLhs2Rhs);
 
   bdd equate = bddtrue;
-  for(BddContext::const_iterator iter = voc.begin(); iter != voc.end(); ++iter){
+  for(BddContext::const_iterator iter = this->begin(); iter != this->end(); ++iter){
     equate = equate &
       fdd_equals(
           iter->second->baseLhs,
@@ -518,15 +583,14 @@ bdd BinRelManager::Assume(bdd expr1, bdd expr2)
   return bdd_exist(ret, fdd_ithset(sizeInfo));
 }
 
-bdd BinRelManager::tGetRandomTransformer(bool isTensored)
+bdd ProgramBddContext::tGetRandomTransformer(bool isTensored)
 {
-  const BddContext voc = BinRel::getBddContext();
   bdd ret = bddfalse;
   int numRounds = rand() % 10 + 1;
   for(int c=0; c < numRounds; ++c){
     bdd inbdd = rand()%2?bddfalse:bddtrue;
-    for(BddContext::const_iterator iter = voc.begin(); 
-        iter != voc.end();
+    for(BddContext::const_iterator iter = this->begin(); 
+        iter != this->end();
         ++iter){
       int size = iter->second->maxVal;
       int n;

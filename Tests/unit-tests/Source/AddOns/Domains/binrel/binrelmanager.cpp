@@ -18,23 +18,21 @@ using namespace google;
 #include "Common.cpp"
 namespace{
 
-  class BinRelManagerTest: public ::testing::Test{
+  class ProgramBddContextTest: public ::testing::Test{
     protected:
-      BddContext voc;
-      binrel_manager_t brm;
+      program_bdd_context_t brm;
       virtual void SetUp(){
-        addBoolVar(voc,"a");
-        addBoolVar(voc,"b");
-        addBoolVar(voc,"c");
-        addBoolVar(voc,"d");
+        brm = new ProgramBddContext();
+        brm->addBoolVar("a");
+        brm->addBoolVar("b");
+        brm->addBoolVar("c");
+        brm->addBoolVar("d");
 
-        addIntVar(voc,"p",4);
-        addIntVar(voc,"q",4);
-        addIntVar(voc,"r",4);
-        addIntVar(voc,"s",4);
-
-        brm = new BinRelManager(voc);
-        ASSERT_EQ(voc.size(), 8);
+        brm->addIntVar("p",4);
+        brm->addIntVar("q",4);
+        brm->addIntVar("r",4);
+        brm->addIntVar("s",4);
+        ASSERT_EQ(brm->size(), 8);
       }
   };
 
@@ -45,80 +43,73 @@ namespace{
   //We need separate initialization tests becaues the SetUp function in the
   //fixture already initializes.
   TEST(BinRelInitTest, defaultInitEmptyBddContext){
-    BddContext voc;
-    binrel_manager_t brm = new BinRelManager(voc);
-    //ASSERT_EQ(voc.size(), 0);
-    //binRelDone();
+    program_bdd_context_t brm = new ProgramBddContext();
   }
   
   TEST(BinRelInitTest, userInit){
-    BddContext voc;
-    addBoolVar(voc,"a");
-    addBoolVar(voc,"b");
-    addBoolVar(voc,"c");
-    addBoolVar(voc,"d");
-    addBoolVar(voc,"e");
-    addBoolVar(voc,"f");
+    program_bdd_context_t brm = new ProgramBddContext();
+    brm->addBoolVar("a");
+    brm->addBoolVar("b");
+    brm->addBoolVar("c");
+    brm->addBoolVar("d");
+    brm->addBoolVar("e");
+    brm->addBoolVar("f");
 
-    addIntVar(voc,"p",32);
-    addIntVar(voc,"q",32);
-    addIntVar(voc,"r",32);
-    addIntVar(voc,"s",32);
-    addIntVar(voc,"t",32);
-    addIntVar(voc,"u",32);
-    addIntVar(voc,"v",32);
-    binrel_manager_t brm = new BinRelManager(voc);
+    brm->addIntVar("p",32);
+    brm->addIntVar("q",32);
+    brm->addIntVar("r",32);
+    brm->addIntVar("s",32);
+    brm->addIntVar("t",32);
+    brm->addIntVar("u",32);
+    brm->addIntVar("v",32);
     //ASSERT_GT(retBddContext.size(),0);
   }
 
 
   TEST(BinRelInitTest, multiInitEmptyBddContext){
     {
-    BddContext voc;
-    addBoolVar(voc,"a");
-    addIntVar(voc,"b",32);
-    binrel_manager_t brm  = new BinRelManager(voc);
-    //EXPECT_EQ(ret1.size(),2);
+    program_bdd_context_t brm  = new ProgramBddContext();
+    brm->addBoolVar("a");
+    brm->addIntVar("b",32);
+    EXPECT_EQ(brm->size(),2);
     }
 
     {
-    BddContext voc;
-    addBoolVar(voc,"a");
-    addIntVar(voc,"b",32);
-    addBoolVar(voc,"c");
-    addIntVar(voc,"d",32);
-    binrel_manager_t brm = new BinRelManager(voc,10000,20000);
-    //EXPECT_EQ(ret2.size(),4);
+    program_bdd_context_t brm = new ProgramBddContext(10000,20000);
+    brm->addBoolVar("a");
+    brm->addIntVar("b",32);
+    brm->addBoolVar("c");
+    brm->addIntVar("d",32);
+    EXPECT_EQ(brm->size(),4);
     }
   }
 
 
   // /////////////////////////////////////////////
-  // BinRelManagerTest Fixture
+  // ProgramBddContextTest Fixture
   // ////////////////////////////////////////////
-  TEST_F(BinRelManagerTest, empty){
+  TEST_F(ProgramBddContextTest, empty){
     std::stringstream ss;
     //yippe SetUp works!
     ASSERT_TRUE(true);
-    for(BddContext::const_iterator iter = voc.begin();
-        iter != voc.end();
+    for(ProgramBddContext::const_iterator iter = brm->begin();
+        iter != brm->end();
         ++iter)
       iter->second->print(ss << iter->first);
-    brm->print(ss);
-    
+    brm->print(ss); 
     // Uncomment if you want to log the output.
     LOG(INFO) << ss.str();
   }
 
-  TEST_F(BinRelManagerTest, valueConstructors){
+  TEST_F(ProgramBddContextTest, valueConstructors){
     std::stringstream ss;
     ss << "True(): " << fddset << brm->True() << std::endl;
     ss << "False(): " << fddset << brm->False() << std::endl;
     ss << "Const(5): " << fddset << brm->Const(5) << std::endl;
-    ASSERT_TRUE(compareOutput("BinRelManagerTest","valueconstructors",ss));
+    ASSERT_TRUE(compareOutput("ProgramBddContextTest","valueconstructors",ss));
   }
 
-  TEST_F(BinRelManagerTest, from){
+  TEST_F(ProgramBddContextTest, DISABLED_from){
     std::stringstream ss;
     bdd a = brm->From("a");
     bdd b = brm->From("b");
@@ -136,10 +127,10 @@ namespace{
     ss << "\nFrom(q): " << fddset << q;
     ss << "\nFrom(r): " << fddset << r;
 
-    ASSERT_TRUE(compareOutput("BinRelManagerTest","from",ss));
+    ASSERT_TRUE(compareOutput("ProgramBddContextTest","from",ss));
   }
 
-  TEST_F(BinRelManagerTest, boolOps){
+  TEST_F(ProgramBddContextTest, boolOps){
     std::stringstream ss;
     bdd a = brm->From("a");
     bdd b = brm->From("b");
@@ -162,10 +153,10 @@ namespace{
     ss << "\nNot(a): " << fddset << d;
     d = brm->Not(b);
     ss << "\nNot(b): " << fddset << d;
-    ASSERT_TRUE(compareOutput("BinRelManagerTest","boolOps",ss));
+    ASSERT_TRUE(compareOutput("ProgramBddContextTest","boolOps",ss));
   }
 
-  TEST_F(BinRelManagerTest, intOps){
+  TEST_F(ProgramBddContextTest, intOps){
     std::stringstream ss;
     bdd p = brm->From("p");
     bdd q = brm->From("q");
@@ -197,18 +188,16 @@ namespace{
     ss << "\nDiv(q,p): " << fddset << s;
     s = brm->Div(q,r);
     ss << "\nDiv(q,r): " << fddset << s;
-    ASSERT_TRUE(compareOutput("BinRelManagerTest","intOps",ss));
+    ASSERT_TRUE(compareOutput("ProgramBddContextTest","intOps",ss));
   }
 
-  TEST_F(BinRelManagerTest, assignNassumeBool){
+  TEST_F(ProgramBddContextTest, assignNassumeBool){
     std::stringstream ss;
 
-    BddContext initBddContext;
-    addBoolVar(initBddContext,"a");
-    addBoolVar(initBddContext,"b");
-    addBoolVar(initBddContext,"c");
-    brm = NULL;
-    brm = new BinRelManager(initBddContext);
+    brm = new ProgramBddContext();
+    brm->addBoolVar("a");
+    brm->addBoolVar("b");
+    brm->addBoolVar("c");
     bdd a = brm->From("a");
     bdd b = brm->From("b");
     bdd c = brm->From("c");
@@ -220,18 +209,16 @@ namespace{
     ss << "\nAssign(a,And(b,a))" << fddset << brm->Assign("a",d);
     ss << "\nAssign(a,NonDet())" << fddset << brm->Assign("a",brm->NonDet());
 
-    ASSERT_TRUE(compareOutput("BinRelManagerTest","assignNassumeBool",ss));
+    ASSERT_TRUE(compareOutput("ProgramBddContextTest","assignNassumeBool",ss));
   }
 
-  TEST_F(BinRelManagerTest, assignNassumeInt){
+  TEST_F(ProgramBddContextTest, assignNassumeInt){
     std::stringstream ss;
 
-    BddContext initBddContext;
-    addIntVar(initBddContext,"p",4);
-    addIntVar(initBddContext,"q",4);
-    addIntVar(initBddContext,"r",4);
-    brm = NULL;
-    brm = new BinRelManager(initBddContext);
+    brm = new ProgramBddContext();
+    brm->addIntVar("p",4);
+    brm->addIntVar("q",4);
+    brm->addIntVar("r",4);
     bdd p = brm->From("p");
     bdd q = brm->From("q");
     bdd r = brm->From("r");
@@ -242,21 +229,19 @@ namespace{
     ss << "\nAssign(q,Div(q,r))" << fddset << brm->Assign("q",s);
     ss << "\nAssume(q,r)" << fddset << brm->Assume(q,r);
     ss << "\nAssign(q,NonDet())" << fddset << brm->Assign("q",brm->NonDet());
-    ASSERT_TRUE(compareOutput("BinRelManagerTest","assignNassumeInt",ss));
+    ASSERT_TRUE(compareOutput("ProgramBddContextTest","assignNassumeInt",ss));
   }
 
-  TEST_F(BinRelManagerTest, logical){
-    BddContext initBddContext;
-    addBoolVar(initBddContext,"a");
-    addBoolVar(initBddContext,"b");
-    addBoolVar(initBddContext,"c");
-    addBoolVar(initBddContext,"d");
-    addIntVar(initBddContext,"p",20);
-    addIntVar(initBddContext,"q",20);
-    addIntVar(initBddContext,"r",20);
-    addIntVar(initBddContext,"s",20);
-    brm = NULL;
-    brm = new BinRelManager(initBddContext);
+  TEST_F(ProgramBddContextTest, logical){
+    brm = new ProgramBddContext();
+    brm->addBoolVar("a");
+    brm->addBoolVar("b");
+    brm->addBoolVar("c");
+    brm->addBoolVar("d");
+    brm->addIntVar("p",20);
+    brm->addIntVar("q",20);
+    brm->addIntVar("r",20);
+    brm->addIntVar("s",20);
 
     bdd a = brm->From("a");
     bdd b = brm->From("b");
@@ -279,19 +264,17 @@ namespace{
     EXPECT_NE(s,brm->Assign("s", brm->Const(11)));
   }
 
-  TEST(BinRelManagerCornCases, DISABLED_veryFewVars){
+  TEST(ProgramBddContextCornCases, DISABLED_veryFewVars){
     {
-      BddContext voc;
-      binrel_manager_t brm = new BinRelManager(voc);
+      program_bdd_context_t brm = new ProgramBddContext();
       bdd a = brm->True();
       bdd b = brm->Assume(brm->True(), brm->True());
       bdd c = brm->Assume(brm->False(), brm->False());
       ASSERT_EQ(b,c);
     }
     {
-      BddContext voc;
-      addBoolVar(voc, "a");
-      binrel_manager_t brm = new BinRelManager(voc);
+      program_bdd_context_t brm = new ProgramBddContext();
+      brm->addBoolVar( "a");
       ASSERT_EQ(
           brm->Assume(brm->True(),brm->True()),
           brm->Assume(brm->From("a"),brm->From("a")));
