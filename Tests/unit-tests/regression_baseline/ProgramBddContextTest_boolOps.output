@@ -1,0 +1,9 @@
+
+And(a,b): <a:0, __regSize:2, __regA':0, :0, __regSize:2, :0, __regA':0><a:1, __regSize:2, __regA':0, b:0, :0, __regSize:2, :0, __regA':0><a:1, __regSize:2, __regA':1, b:1, :0, __regSize:2, :0, __regA':1>
+And(b,a): <a:0, __regSize:2, __regA':0, :0, __regSize:2, :0, __regA':0><a:1, __regSize:2, __regA':0, b:0, :0, __regSize:2, :0, __regA':0><a:1, __regSize:2, __regA':1, b:1, :0, __regSize:2, :0, __regA':1>
+And(b,c): <__regSize:2, __regA':0, b:0, :0, __regSize:2, :0, __regA':0><__regSize:2, __regA':0, b:1, c:0, :0, __regSize:2, :0, __regA':0><__regSize:2, __regA':1, b:1, c:1, :0, __regSize:2, :0, __regA':1>
+Or(a,b): <a:0, __regSize:2, __regA':0, b:0, :0, __regSize:2, :0, __regA':0><a:0, __regSize:2, __regA':1, b:1, :0, __regSize:2, :0, __regA':1><a:1, __regSize:2, __regA':1, :0, __regSize:2, :0, __regA':1>
+Or(b,a): <a:0, __regSize:2, __regA':0, b:0, :0, __regSize:2, :0, __regA':0><a:0, __regSize:2, __regA':1, b:1, :0, __regSize:2, :0, __regA':1><a:1, __regSize:2, __regA':1, :0, __regSize:2, :0, __regA':1>
+Or(b,c): <__regSize:2, __regA':0, b:0, c:0, :0, __regSize:2, :0, __regA':0><__regSize:2, __regA':1, b:0, c:1, :0, __regSize:2, :0, __regA':1><__regSize:2, __regA':1, b:1, :0, __regSize:2, :0, __regA':1>
+Not(a): <a:0, __regSize:2, __regA':1, :0, __regSize:2, :0, __regA':1><a:1, __regSize:2, __regA':0, :0, __regSize:2, :0, __regA':0>
+Not(b): <__regSize:2, __regA':0, b:1, :0, __regSize:2, :0, __regA':0><__regSize:2, __regA':1, b:0, :0, __regSize:2, :0, __regA':1>
