@@ -1,8 +1,8 @@
-#ifndef wali_genereate_Random_FWPDS_guard
-#define wali_genereate_Random_FWPDS_guard 1
+#ifndef wali_genereate_Random_WPDS_guard
+#define wali_genereate_Random_WPDS_guard 1
 
 // ::wali::wpds::fwpds
-#include "wali/wpds/fwpds/FWPDS.hpp"
+#include "wali/wpds/WPDS.hpp"
 
 // ::wali
 #include "wali/Key.hpp"
@@ -64,15 +64,16 @@ namespace wali
             int numsplits = 100,
             int numerrs = 0,
             double pCall = 0.45, 
-            double pSplit = 0.45
+            double pSplit = 0.45,
+            unsigned seed = 0
             );
         ~RandomPdsGen();
-        void get(wali::wpds::fwpds::FWPDS& pds, Names& names, std::ostream * o = NULL);
+        void get(wali::wpds::WPDS& pds, Names& names, std::ostream * o = NULL);
 
       private:
         // /Forward declaration of functions.
         void genproc(
-            wali::wpds::fwpds::FWPDS& pds, 
+            wali::wpds::WPDS& pds, 
             int procnum, 
             wali::Key curKey,
             int remNodes, 
@@ -82,7 +83,7 @@ namespace wali
             int tabstop
             );
         wali::Key genblock(
-            wali::wpds::fwpds::FWPDS& pds, 
+            wali::wpds::WPDS& pds, 
             wali::Key curhead, 
             wali::Key curKey,
             int remNodes, 
@@ -110,6 +111,8 @@ namespace wali
         double pCall;
         //! Probability with wich a split is generated
         double pSplit;
+        //! If Non-zero, this seed is used for the random number generator
+        unsigned seed;
 
         // Data Used during the generation of a new randomd PDS
         // Array that stores keys for all procedure entries.
@@ -121,4 +124,4 @@ namespace wali
     };
   } // namespace wpds
 } // namespace wali
-#endif //wali_genereate_Random_FWPDS_guard
+#endif //wali_genereate_Random_WPDS_guard

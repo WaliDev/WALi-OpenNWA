@@ -1,5 +1,5 @@
-// ::wali::wpds::fwpds
-#include "wali/wpds/fwpds/FWPDS.hpp"
+// ::wali::wpds
+#include "wali/wpds/WPDS.hpp"
 
 // ::wali
 #include "wali/Key.hpp"
@@ -14,10 +14,9 @@
 
 #include "generateRandomFWPDS.hpp"
 
-using namespace wali::wpds::fwpds;
 using namespace wali::wpds;
 
-RandomPdsGen::RandomPdsGen(wtgen_t r, int np, int nc, int nn, int ns, int ne, double pc, double ps) :
+RandomPdsGen::RandomPdsGen(wtgen_t r, int np, int nc, int nn, int ns, int ne, double pc, double ps, unsigned s) :
   Countable(),
   randomWt(r),
   numprocs(np),
@@ -26,7 +25,8 @@ RandomPdsGen::RandomPdsGen(wtgen_t r, int np, int nc, int nn, int ns, int ne, do
   numsplits(ns),
   numerrs(ne),
   pCall(pc*100),
-  pSplit(ps*100)
+  pSplit(ps*100),
+  seed(s)
 {
   entries = NULL;
   exits = NULL;
@@ -61,11 +61,12 @@ RandomPdsGen::Names::~Names()
   * @detail ...
   * @see struct Conf
   **/
-void RandomPdsGen::get(FWPDS& pds, Names& names, std::ostream * o)
+void RandomPdsGen::get(WPDS& pds, Names& names, std::ostream * o)
 {
-  srand(time(NULL));
-  //For debugging
-  //srand(1);
+  if(seed != 0)
+    srand(seed);
+  else
+    srand(time(NULL));
 
   wali::clearKeyspace();
   wali::Key curKey=0;
@@ -113,7 +114,7 @@ void RandomPdsGen::get(FWPDS& pds, Names& names, std::ostream * o)
 }
 
 void RandomPdsGen::genproc(
-    FWPDS& pds, 
+    WPDS& pds, 
     int procnum, 
     Key curKey,
     int remNodes, 
@@ -204,7 +205,7 @@ void RandomPdsGen::genproc(
 }
 
 wali::Key RandomPdsGen::genblock(
-    FWPDS& pds, 
+    WPDS& pds, 
     Key curhead, 
     Key curKey,
     int remNodes, 

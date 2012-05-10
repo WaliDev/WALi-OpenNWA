@@ -86,7 +86,7 @@ namespace wali
            */
           BddContext(int bddMemeSize=0, int cacheSize=0);
           BddContext(const BddContext& other);
-          virtual BddContext& operator = (const BddContext& other);
+          BddContext& operator = (const BddContext& other);
           virtual ~BddContext();
 
           /** Add a boolean variable to the vocabulary with the name 'name' **/

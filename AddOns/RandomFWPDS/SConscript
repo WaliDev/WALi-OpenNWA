@@ -8,11 +8,11 @@ Import('ProgEnv')
 if Debug:
     print '\n+++ Entered "#/AddOns/RandomFWPDS"\n'
 
-compile_files = """
-Source/generateRandomFWPDS.cpp
-"""
+#compile_files = """
+#Source/generateRandomFWPDS.cpp
+#"""
 
 built = []
-built += ProgEnv.Object('generateRandomFWPDS', Split(compile_files)) 
+#built += ProgEnv.Object('generateRandomFWPDS', Split(compile_files)) 
 Return('built')
 

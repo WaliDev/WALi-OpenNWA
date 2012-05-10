@@ -208,7 +208,6 @@ ProgramBddContext& ProgramBddContext::operator = (const ProgramBddContext& other
   return *this;
 }
 
-
 std::ostream& ProgramBddContext::print(std::ostream& o)
 {
   o << "ProgramBddContext dump:" << std::endl;
@@ -583,8 +582,10 @@ bdd ProgramBddContext::Assume(bdd expr1, bdd expr2)
   return bdd_exist(ret, fdd_ithset(sizeInfo));
 }
 
-bdd ProgramBddContext::tGetRandomTransformer(bool isTensored)
+bdd ProgramBddContext::tGetRandomTransformer(bool isTensored, unsigned seed)
 {
+  if(seed != 0)
+    srand(seed);
   bdd ret = bddfalse;
   int numRounds = rand() % 10 + 1;
   for(int c=0; c < numRounds; ++c){

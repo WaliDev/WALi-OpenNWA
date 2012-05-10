@@ -844,8 +844,21 @@ namespace wali
           break;
         }
       }
-
       bool erasefrom = from->erase(r);
+/*
+      for(Config::const_iterator it = to->begin();
+          it != to->end();
+          ++it){
+        if((*it)->from_state() == from_state &&
+            (*it)->from_stack() == from_stack &&
+            (*it)->to_state() == to_state &&
+            (*it)->to_stack1() == to_stack1 &&
+            (*it)->to_stack2() == to_stack2){
+          r = *it;
+          break;
+        }
+      }
+*/
       bool eraseto = to->rerase(r);
 
       if(to_stack1 == WALI_EPSILON && eraseto)

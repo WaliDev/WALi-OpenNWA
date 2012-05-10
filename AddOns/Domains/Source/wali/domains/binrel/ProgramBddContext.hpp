@@ -32,6 +32,10 @@ namespace wali
           ProgramBddContext(int bddMemSize=0, int cacheSize=0);
           ProgramBddContext(const ProgramBddContext& other);
           virtual ProgramBddContext& operator = (const ProgramBddContext& other);
+          //This is left undefined. We need this declaration so that the compiler doesn't think we've
+          //hidden the user defined operator = for base class BddContext. We leave it undefined so that 
+          //you get a link error if you try to call this.
+          //virtual ProgramBddContext& operator = (const BddContext& other);
           ~ProgramBddContext();
 
           /** Add a boolean variable to the vocabulary with the name 'name' **/
@@ -68,7 +72,7 @@ namespace wali
           bdd Assume(bdd expr1, bdd expr2);
 
           // //////////////Generates a random bdd///////////////////////////////////////////
-          bdd tGetRandomTransformer(bool isTensored = false);
+          bdd tGetRandomTransformer(bool isTensored = false, unsigned seed=0);
 
         private:
           // This is the bdd index of the size info in each bdd

@@ -116,7 +116,7 @@ namespace wali
 
         /*! 
           @author Prathmesh Prabhu
-          @brief erase a rule from both forwards list
+          @brief erase a rule from forwards list
           @return true if both fwrules and bwrules are empty after erasing. 
          */
         bool erase(rule_t r) throw () {
@@ -143,8 +143,8 @@ namespace wali
          */
         bool rerase(rule_t r) throw () {
           { // BEGIN DEBUGGING
-            assert( r->from_state() == state() );
-            assert( r->from_stack() == stack() );
+            assert( r->to_state() == state() );
+            assert( r->to_stack1() == stack() );
           } // END DEBUGGING
           for(std::list<rule_t>::iterator it = bwrules. begin();
               it != bwrules.end();

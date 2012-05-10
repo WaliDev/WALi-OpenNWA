@@ -40,7 +40,7 @@ using namespace wali::wpds::fwpds;
 using namespace wali::wpds;
 using namespace wali::wfa;
 
-//#include "Common.cpp"
+#include "Common.cpp"
 namespace{
 
   class MyWtGen : public RandomPdsGen::WtGen
