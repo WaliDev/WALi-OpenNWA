@@ -20,7 +20,6 @@
 namespace cfglib {
     namespace xfa {
 
-
         struct State {
             wali::Key key;
             
@@ -81,6 +80,7 @@ namespace cfglib {
             }
 
             void addTrans(State src, Symbol sym, State tgt, BinaryRelation relation) {
+                assert(relation.get_ptr());
                 wfa_.addTrans(src.key, sym.key, tgt.key, relation);
             }
 
@@ -115,6 +115,7 @@ namespace cfglib {
             }
 
             void addState(State state, BinaryRelation relation) {
+                assert(relation.get_ptr());
                 wfa_.addState(state.key, relation);
             }
 
@@ -208,6 +209,8 @@ namespace cfglib {
         Xfa from_internal_only_nwa(opennwa::Nwa const & nwa,
                                    BinaryRelation rel)
         {
+            assert(rel.get_ptr());
+
             using opennwa::Nwa;
             using wali::domains::binrel::BinRel;
             Xfa xfa;
