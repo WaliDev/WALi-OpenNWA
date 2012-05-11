@@ -201,6 +201,10 @@ namespace cfglib {
             wali::wfa::WFA semideterminize() const {
                 return wfa_.semideterminize();
             }
+
+            wali::wfa::WFA semideterminize(wali::wfa::DeterminizeWeightGen const & weight_gen) const {
+                return wfa_.semideterminize(weight_gen);
+            }
         };
 
 
