@@ -251,6 +251,8 @@ namespace cfglib {
 
             assert(nwa.sizeCallTrans() == 0);
             assert(nwa.sizeReturnTrans() == 0);
+
+            return xfa;
         }
     }
 }
