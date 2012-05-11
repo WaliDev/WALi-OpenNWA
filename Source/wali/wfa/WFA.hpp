@@ -64,6 +64,7 @@ namespace wali
     struct DotAttributePrinter {
       virtual void print_extra_attributes(State const * state, std::ostream& o) = 0;
       virtual void print_extra_attributes(ITrans const * trans, std::ostream& o) = 0;
+      virtual ~DotAttributePrinter() {}
     };
 
       
