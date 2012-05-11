@@ -58,6 +58,16 @@ namespace wali
     class ConstTransFunctor;
     struct DeterminizeWeightGen;
 
+    /**
+     * "Callbacks" for outputting attributes in the Dot.
+     */
+    struct DotAttributePrinter {
+      virtual void print_extra_attributes(State const * state, std::ostream& o) = 0;
+      virtual void print_extra_attributes(ITrans const * trans, std::ostream& o) = 0;
+    };
+
+      
+
     /** @class WFA
      *
      * TODO:
@@ -409,7 +419,8 @@ namespace wali
          */
         virtual std::ostream& print_dot(
             std::ostream& o,
-            bool print_weights=false ) const;
+            bool print_weights=false,
+            DotAttributePrinter * attribute_printer=NULL) const;
 
         /**
          * @brief marshall WFA in XML 

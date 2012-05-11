@@ -70,6 +70,7 @@ namespace wali
         // of a transition will be lost.
         state_map_t::const_iterator it = rhs.state_map.begin();
         for( ; it != rhs.state_map.end(); it++ ) {
+          // FIXME: why is this ->zero()? --EED 5/11/2012
           addState( it->first, it->second->weight()->zero() );
         }
 
@@ -918,10 +919,11 @@ namespace wali
     //
     std::ostream& WFA::print_dot(
         std::ostream& o,
-        bool print_weights ) const
+        bool print_weights,
+        DotAttributePrinter * attribute_printer ) const
     {
       o << "digraph \"WFA@" << std::hex << (void*)this << std::dec << "\" {\n";
-      TransDotty dotter( o, print_weights );
+      TransDotty dotter( o, print_weights, attribute_printer );
       for_each(dotter);
       state_map_t::const_iterator stit = state_map.begin();
       state_map_t::const_iterator stitEND = state_map.end();
@@ -936,6 +938,9 @@ namespace wali
         }
         else if( isFinalState(key) ) {
           o  << ",color=lightblue,style=filled";
+        }
+        if (attribute_printer) {
+          attribute_printer->print_extra_attributes(stit->second, o);
         }
         o << "];\n";
       }

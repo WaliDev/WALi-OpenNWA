@@ -88,8 +88,8 @@ namespace wali
     //////////////
     // TransDotty
     //////////////
-    TransDotty::TransDotty( std::ostream& theo,bool b ) :
-      o(theo), print_weights(b) {}
+    TransDotty::TransDotty( std::ostream& theo,bool b, DotAttributePrinter * attribute_printer ) :
+      o(theo), print_weights(b), printer(attribute_printer) {}
 
     void TransDotty::operator()( const ITrans* t )
     {
@@ -107,7 +107,11 @@ namespace wali
         t->weight()->print( o );
         o << " >";
       }
-      o << "\"];\n";
+      o << "\"";
+      if (printer) {
+        printer->print_extra_attributes(t, o);
+      }
+      o << "];\n";
     }
 
     //////////////////

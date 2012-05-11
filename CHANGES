@@ -10,6 +10,9 @@ WALi/OpenNWA 4.0:
   - Added postorder visit functions to the witness visitor
   - Significant API changes to the BinRel domain, and addition of a feature
     to output diagrams
+  - Added a new callback class, DotAttributePrinter, which allows someone
+    calling WFA::print_dot to output extra attributes for either nodes
+    or edges.
 
   OpenNWA bug fixes:
   - Updated license and author information
