@@ -81,6 +81,8 @@ namespace cfglib {
             virtual sem_elem_t liftWeight(wali::wfa::WFA const & original_wfa,
                                           wali::wfa::ITrans const * trans_in_original) const
             {
+                //std::cout << "Lifting weight.\n";
+                
                 using wali::domains::binrel::Voc;
                 using wali::domains::binrel::BinRel;
                 using wali::domains::binrel::BddInfo_t;
@@ -100,6 +102,9 @@ namespace cfglib {
                         new_info = safe_get(new_voc, var->first);
 
                     assert(new_info.get_ptr());
+
+                    //std::cout << "Will rename: " << orig_info->baseLhs << "->" << new_info->baseLhs << "\n";
+                    //std::cout << "Will rename: " << orig_info->baseRhs << "->" << new_info->baseRhs << "\n";
 
                     orig_names.push_back(orig_info->baseLhs);
                     orig_names.push_back(orig_info->baseRhs);
@@ -127,7 +132,13 @@ namespace cfglib {
                 int source_fdd = safe_get(new_voc, "current_state")->baseLhs;
                 int dest_fdd = safe_get(new_voc, "current_state")->baseRhs;
 
+                //std::cout << "Creating state change BDD, setting\n"
+                //            << "    FDD " << source_fdd << " to " << source << "\n"
+                //          << "    FDD " << dest_fdd << " to " << dest << "\n";
+
                 bdd state_change = fdd_ithvar(source_fdd, source) & fdd_ithvar(dest_fdd, dest);
+
+                //std::cout << "Created. Returning answer.\n";
 
                 // Third step: combine them together
                 return new BinRel(renamed_bdd & state_change, false);
