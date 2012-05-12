@@ -13,6 +13,8 @@
 #include "wali/wpds/RuleFunctor.hpp"
 // ::wali::wpds::fwpds
 #include "wali/wpds/fwpds/FWPDS.hpp"
+// ::wali::wpds::ewpds
+#include "wali/wpds/ewpds/EWPDS.hpp"
 // ::wali::wfa
 #include "wali/wfa/TransFunctor.hpp"
 #include "wali/wfa/ITrans.hpp"
@@ -33,8 +35,9 @@ namespace wali
     namespace nwpds 
     {
 
-      class NWPDS : public fwpds::FWPDS
+      class NWPDS : public wpds::ewpds::EWPDS
       {
+        public:
           /**
            * Newton Solver creates copies of some stack symbols in order to store values
            * computed in the last Newton iteration.
@@ -51,8 +54,8 @@ namespace wali
           static const std::string XMLTag;
 
         public:
-          NWPDS(bool dbg=true);
-          NWPDS(ref_ptr<Wrapper> wrapper, bool dbg=true);
+          NWPDS(bool dbg=false);
+          NWPDS(ref_ptr<Wrapper> wrapper, bool dbg=false);
           NWPDS( const NWPDS& f );
           ~NWPDS();
 
@@ -82,6 +85,11 @@ namespace wali
            * Restores PDS to its former ruleset after prestar
            **/
           void prestarRestorePds();
+          /**
+           * Sets the weights on transitions in outfa that correspond to constants in the fix point calculation
+           * to zero
+           **/
+          void prestarCleanUpFa(wali::wfa::WFA& fa);
 
           /**
            * Creates a map from new to old key if needed, and returns the old key for the new key.
@@ -121,24 +129,30 @@ namespace wali
           bool dbg;
       };
 
-    /**
-     * 
-     * @class Delta2Rules
-     *
-     * Gets all delta_2 rules from the wpds. Holds on to const rule_t
-     * so that it can be cast down to the correct ERule/Rule type.
-     */
-    class Delta2Rules: public RuleFunctor
-    {
-      public:
-        std::vector< rule_t > rules;
-        Delta2Rules();
-        virtual ~Delta2Rules();
-        virtual void operator() (rule_t & r);
-    };
+      /**
+       * 
+       * @class Delta2Rules
+       *
+       * Gets all delta_2 rules from the wpds. Holds on to const rule_t
+       * so that it can be cast down to the correct ERule/Rule type.
+       */
+      class Delta2Rules: public RuleFunctor
+      {
+        public:
+          std::vector< rule_t > rules;
+          Delta2Rules();
+          virtual ~Delta2Rules();
+          virtual void operator() (rule_t & r);
+      };
 
-
-
+      class RemoveOldTrans : public wali::wfa::TransFunctor
+      {
+        public:
+          RemoveOldTrans(NWPDS::Key2KeyMap& oldMap);
+          virtual void operator() (wali::wfa::ITrans * it);
+        private:
+          NWPDS::Key2KeyMap& oldMap;
+      };
     } //namespace nwpds
   } //namespace wpds
 } //namespae wali

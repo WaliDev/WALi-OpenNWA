@@ -34,17 +34,17 @@ namespace wali
 } //namewpace wali
 
 NWPDS::NWPDS(bool b) :
-  FWPDS(),
+  EWPDS(),
   dbg(b)
 {}
 
 NWPDS::NWPDS(ref_ptr<wpds::Wrapper> wrapper, bool b) :
-  FWPDS(wrapper),
+  EWPDS(wrapper),
   dbg(b)
 {}
 
 NWPDS::NWPDS(const NWPDS& f) :
-  FWPDS(f),
+  EWPDS(f),
   dbg(f.dbg)
 {}
 
@@ -181,11 +181,23 @@ void NWPDS::prestar(wfa::WFA const & input, wfa::WFA & output)
   output = input;
   prestarSetupPds();
   do{
-    FWPDS::prestar(output,output);
+    EWPDS::prestar(output,output);
   }while(prestarUpdateFa(output));
   prestarRestorePds();
+  prestarCleanUpFa(output);
 }
 
+void NWPDS::prestarCleanUpFa(wfa::WFA& output)
+{
+  Key2KeyMap old2NewMap;
+  for(Key2KeyMap::iterator iter = var2ConstMap.begin();
+      iter != var2ConstMap.end();
+      ++iter)
+    old2NewMap[iter->second] = iter->first;
+
+  RemoveOldTrans rot(old2NewMap);
+  output.for_each(rot);
+}
 
 NWPDS::UpdateFaFunctor::UpdateFaFunctor(wali::wfa::WFA& f, NWPDS::Key2KeyMap& n2om) :
   TransFunctor(),
@@ -227,6 +239,13 @@ void Delta2Rules::operator() (rule_t & r)
     rules.push_back(r);
 }
 
+RemoveOldTrans::RemoveOldTrans(NWPDS::Key2KeyMap& m) : oldMap(m) {}
 
+void RemoveOldTrans::operator() (wali::wfa::ITrans* t)
+{
+  if(oldMap.find(t->stack()) != oldMap.end())
+    if(t->weight() != NULL)
+      t->setWeight(t->weight()->zero());
+}
 
 

@@ -27,33 +27,12 @@ RandomPdsGen::RandomPdsGen(wtgen_t r, int np, int nc, int nn, int ns, int ne, do
   pCall(pc*100),
   pSplit(ps*100),
   seed(s)
-{
-  entries = NULL;
-  exits = NULL;
-}
+{}
 
 RandomPdsGen::~RandomPdsGen()
 {
-  if(entries)
-    delete [] entries;
-  entries = NULL;
-  if(exits)
-    delete [] exits;
-  exits = NULL;
-}
-RandomPdsGen::Names::Names()
-{
-  entries = NULL;
-  exits = NULL;
-}
-RandomPdsGen::Names::~Names()
-{
-  if(entries != NULL)
-    delete [] entries;
-  entries = NULL;
-  if(exits != NULL)
-    delete [] exits;
-  exits = NULL;
+  entries.clear();
+  exits.clear();
 }
 
 /**
@@ -73,11 +52,11 @@ void RandomPdsGen::get(WPDS& pds, Names& names, std::ostream * o)
 
   pdsState = wali::getKeySpace()->getKey(curKey++);
   //Generate Keys for all procedure entries and exits.  
-  entries = new wali::Key[numprocs];
-  exits = new wali::Key[numprocs];
+  entries.clear();
+  exits.clear();
   for(int i=0;i<numprocs; ++i){
-    entries[i] = wali::getKeySpace()->getKey(curKey++);
-    exits[i] = wali::getKeySpace()->getKey(curKey++);
+    entries.push_back(wali::getKeySpace()->getKey(curKey++));
+    exits.push_back(wali::getKeySpace()->getKey(curKey++));
   }
 
 
@@ -103,11 +82,11 @@ void RandomPdsGen::get(WPDS& pds, Names& names, std::ostream * o)
   }
 
   names.pdsState = pdsState;
-  names.entries = new wali::Key[numprocs];
-  names.exits = new wali::Key[numprocs];
+  names.entries.clear();
+  names.exits.clear();
   for(int i=0;i<numprocs;++i){
-    names.entries[i] = entries[i];
-    names.exits[i] = exits[i];
+    names.entries.push_back(entries[i]);
+    names.exits.push_back(exits[i]);
   }
 
   //TODO: What about errors tags?

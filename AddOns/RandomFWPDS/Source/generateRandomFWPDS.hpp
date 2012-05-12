@@ -43,12 +43,11 @@ namespace wali
          */
         struct Names
         {
+          typedef std::vector<wali::Key> KeyVector;
           wali::Key pdsState;
-          wali::Key *entries;
-          wali::Key *exits;
-          std::vector< wali::Key > errs;
-          Names();
-          ~Names();
+          KeyVector entries;
+          KeyVector exits;
+          KeyVector errs;
         };
 
         /**
@@ -116,9 +115,9 @@ namespace wali
 
         // Data Used during the generation of a new randomd PDS
         // Array that stores keys for all procedure entries.
-        wali::Key * entries;
+        std::vector<wali::Key> entries;
         // Array that stores keys for all procedure exits.
-        wali::Key * exits;
+        std::vector<wali::Key> exits;
         // Name of the pds state to use
         wali::Key pdsState;
     };
