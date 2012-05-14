@@ -2011,6 +2011,123 @@ namespace wali
       complete(getKey(empty));
     }
 
+
+    WFA WFA::removeEpsilons() const
+    {
+      WFA result(*this);
+
+      std::stack<ITrans const *> eps_transitions;
+
+      // Step 1:
+      // Make a list of all epsilon transitions
+      for (eps_map_t::const_iterator eps_map_iter=result.eps_map.begin();
+           eps_map_iter != result.eps_map.end(); ++eps_map_iter)
+      {
+        TransSet const & transitions = eps_map_iter->second;
+        for (TransSet::const_iterator trans_iter = transitions.begin();
+             trans_iter != transitions.end(); ++trans_iter)
+        {
+          ITrans const * trans = *trans_iter;
+          eps_transitions.push(trans);
+
+          if (trans->from() == trans->to()) {
+            // Not sure if this is true, but I think it is...
+            std::cerr << "[WARNING] epsilon self loop found in removeEpsilons(); this may go into an infinite loop now\n";
+          }
+        }
+      }
+
+      //std::cout << "removeEpsilons():\n    step 1 found " << eps_transitions.size() << " transitions\n";
+
+      // Step 2:
+      // Copy transitions around epsilon transitons.
+      while (eps_transitions.size() > 0) {
+        ITrans const * trans = eps_transitions.top();
+        eps_transitions.pop();
+
+        Key eps_source = trans->from();
+        Key eps_dest = trans->to();
+        sem_elem_t eps_weight = trans->weight();
+
+        //std::cout << "    Looking at " << key2str(eps_source) << " --> " << key2str(eps_dest) << "\n";
+
+        // OK. kp_map_t maps from (source * stack) -> {trans}. Furthermore,
+        // this is a hash map so is not in any particular order, which means
+        // we have to loop over the whole dang thing. (If we had an explicit
+        // list of symbols we could do (for every symbol) but we can't.)
+        for(kp_map_t::const_iterator group = kpmap.begin();
+            group != kpmap.end(); ++group)
+        {
+          if (group->first.first == eps_dest) {
+            // If we get in here, we're looking at outgoing transitions from
+            // (source) on *some* symbol. So loop over all the transitions
+            // from that state, "copy" them to eps_source. If we find another
+            // epsilon transition, be sure to add it so we do this again in
+            // the future.
+            TransSet const & nexts = group->second;
+            for (TransSet::const_iterator next = nexts.begin(); next != nexts.end(); ++next) {
+              //std::cout << "        adding " << key2str(eps_source) << " to " << key2str((*next)->to()) << " on " << key2str((*next)->stack()) << "\n";
+              result.addTrans(eps_source,
+                              (*next)->stack(),
+                              (*next)->to(),
+                              eps_weight->extend((*next)->weight()));
+              if ((*next)->stack() == WALI_EPSILON) {
+                eps_transitions.push(result.find(eps_source,
+                                                 (*next)->stack(),
+                                                 (*next)->to()));
+              }
+            }
+          }
+        }
+      }
+      
+      // Step 3:
+      // Make another list of all epsilon transitions. (We destroyed the last
+      // one, and even if we hadn't, we would have needed to keep it
+      // up-to-date.)
+      for (eps_map_t::const_iterator eps_map_iter=result.eps_map.begin();
+           eps_map_iter != result.eps_map.end(); ++eps_map_iter)
+      {
+        TransSet const & transitions = eps_map_iter->second;
+        for (TransSet::const_iterator trans_iter = transitions.begin();
+             trans_iter != transitions.end(); ++trans_iter)
+        {
+          ITrans const * trans = *trans_iter;
+          eps_transitions.push(trans);
+          
+          if (trans->from() == trans->to()) {
+            // Not sure if this is true, but I think it is...
+            std::cerr << "[WARNING] epsilon self loop found in removeEpsilons(); this may go into an infinite loop now\n";
+          }
+        }
+      }
+
+      // Step 4:
+      // Remove all epsilon transitions.
+      while (eps_transitions.size() > 0) {
+        ITrans const * trans = eps_transitions.top();
+        eps_transitions.pop();
+        assert(trans->stack() == WALI_EPSILON);
+        if (result.isFinalState(trans->to())) {
+          result.addFinalState(trans->from());
+        }
+        result.erase(trans->from(), WALI_EPSILON, trans->to());
+        // TODO: delete trans? Who holds ownership?
+      }
+
+      // Step 5:
+      // Sanity check
+      for (eps_map_t::const_iterator eps_map_iter=result.eps_map.begin();
+           eps_map_iter != result.eps_map.end(); ++eps_map_iter)
+      {
+        TransSet const & transitions = eps_map_iter->second;
+        assert(transitions.size() == 0);
+      }
+
+      return result;
+    }
+    
+  
   } // namespace wfa
 
 } // namespace wali

@@ -605,6 +605,13 @@ namespace wali
         /// transitions from start.
         AccessibleStateMap epsilonClose(Key start) const;
 
+        /// Creates (and returns) a new WFA which is the same as *this,
+        /// except that it has no epsilon transitions.
+        ///
+        /// The combine-over-all-paths solution for every pair of states has
+        /// the same value in this and the original.
+        WFA removeEpsilons() const;
+
         /// Starting from the states in 'start' (with the given weight),
         /// simulate running the word 'word'. Return the list of accessible
         /// states, and the weights with which they can be accessed.
