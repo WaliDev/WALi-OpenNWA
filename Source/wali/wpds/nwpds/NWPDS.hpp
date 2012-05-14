@@ -70,6 +70,13 @@ namespace wali
             return output;
           }
 
+          virtual void poststar( wfa::WFA const & input, wfa::WFA & output );
+
+          virtual wfa::WFA poststar( wfa::WFA const & input) {
+            wfa::WFA output;
+            poststar(input,output);
+            return output;
+          }
 
         private:
           /**
@@ -77,27 +84,29 @@ namespace wali
            **/
           void prestarSetupPds();
           /**
-           * After each linearized prestar, checks if the fa has changed, if yes, it updates the 
-           * stored const values on the FA.
+           * Changes some rules of this PDS to actually solve the linearized poststar problem. 
            **/
-          bool prestarUpdateFa(wali::wfa::WFA& f);
+          void poststarSetupPds();
           /**
-           * Restores PDS to its former ruleset after prestar
+           * After each linearized prestar/poststar, checks if the fa has
+           * changed, if yes, it updates the stored const values on the FA.
            **/
-          void prestarRestorePds();
+          bool updateFa(wali::wfa::WFA& f);
+          /**
+           * Restores PDS to its former ruleset after prestar/poststar
+           **/
+          void restorePds();
           /**
            * Sets the weights on transitions in outfa that correspond to constants in the fix point calculation
            * to zero
            **/
-          void prestarCleanUpFa(wali::wfa::WFA& fa);
+          void cleanUpFa(wali::wfa::WFA& fa);
 
           /**
            * Creates a map from new to old key if needed, and returns the old key for the new key.
            **/
           wali::Key getOldKey(wali::Key newKey);
 
-          //void poststarSetupPds();
-          //bool poststarUpdateFa();
         public:
 
           class UpdateFaFunctor : public wali::wfa::TransFunctor

@@ -384,7 +384,7 @@ int main()
     {
       wali::util::Timer * t2 = new wali::util::Timer("NWPDS prestar",cout);
       cout << "[NWPDS prestar]\n";
-      npds.prestar(fa,outfa);
+      npds.poststar(fa,outfa);
       delete t2;
     }
     outfa.for_each(fac);
@@ -433,7 +433,7 @@ int main()
     {
       wali::util::Timer * t3 = new wali::util::Timer("EWPDS prestar",cout);
       cout << "[EWPDS prestar]\n";
-      fpds.prestar(fa,outfa);
+      fpds.poststar(fa,outfa);
       delete t3;
     }
     outfa.for_each(fac);
