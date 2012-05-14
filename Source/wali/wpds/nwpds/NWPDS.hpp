@@ -103,13 +103,14 @@ namespace wali
           class UpdateFaFunctor : public wali::wfa::TransFunctor
           {
             public:
-              UpdateFaFunctor(wali::wfa::WFA& fa, Key2KeyMap& new2OldMap); 
+              UpdateFaFunctor(wali::wfa::WFA& fa, Key2KeyMap& new2OldMap, bool dbg=false); 
               virtual void operator()(wali::wfa::ITrans* t);
               bool updated() { return changed; }
             private:
               wali::wfa::WFA& fa;
               const Key2KeyMap& new2OldMap;
               bool changed;
+              bool dbg;
           };
 
 

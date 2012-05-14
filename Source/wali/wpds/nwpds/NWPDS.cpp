@@ -14,6 +14,7 @@
 #include "wali/wfa/Trans.hpp"
 // ::wali
 #include "wali/Key.hpp"
+#include "wali/Common.hpp"
 
 using namespace std;
 using namespace wali;
@@ -36,17 +37,38 @@ namespace wali
 NWPDS::NWPDS(bool b) :
   EWPDS(),
   dbg(b)
-{}
+{
+  //XXX:HACK?
+  //we disable wali::strict
+  //We allow incoming transitions to query automata. 
+  //Two newton steps are like a continued pre/post star query interjected
+  //by other stuff. So we want to allow incoming transitions there (I think)
+  wali::set_strict(false);
+}
 
 NWPDS::NWPDS(ref_ptr<wpds::Wrapper> wrapper, bool b) :
   EWPDS(wrapper),
   dbg(b)
-{}
+{
+  //XXX:HACK?
+  //we disable wali::strict
+  //We allow incoming transitions to query automata. 
+  //Two newton steps are like a continued pre/post star query interjected
+  //by other stuff. So we want to allow incoming transitions there (I think)
+  wali::set_strict(false);
+}
 
 NWPDS::NWPDS(const NWPDS& f) :
   EWPDS(f),
   dbg(f.dbg)
-{}
+{
+  //XXX:HACK?
+  //we disable wali::strict
+  //We allow incoming transitions to query automata. 
+  //Two newton steps are like a continued pre/post star query interjected
+  //by other stuff. So we want to allow incoming transitions there (I think)
+  wali::set_strict(false);
+}
 
 NWPDS::~NWPDS()
 {
@@ -82,17 +104,17 @@ void NWPDS::prestarSetupPds()
     for(std::set<Rule>::iterator it = wr.stepRules.begin();
         it != wr.stepRules.end();
         ++it)
-      (*it).print(*waliErr);
-    *waliErr << "Delta_2 rules: \n";
+      (*it).print(*waliErr) << std::endl;
+    *waliErr << "\n\nDelta_2 rules: \n";
     for(std::set<Rule>::iterator it = wr.pushRules.begin();
         it != wr.pushRules.end();
         ++it)
-      (*it).print(*waliErr);
-    *waliErr << "Delta_0 rules: \n";
+      (*it).print(*waliErr) << std::endl;
+    *waliErr << "\n\nDelta_0 rules: \n";
     for(std::set<Rule>::iterator it = wr.popRules.begin();
         it != wr.popRules.end();
         ++it)
-      (*it).print(*waliErr);
+      (*it).print(*waliErr) << std::endl;
   }
   var2ConstMap.clear();
   savedRules.clear();
@@ -102,6 +124,11 @@ void NWPDS::prestarSetupPds()
       it != dr.rules.end();
       ++it){
     rule_t r = *it;
+    if(dbg){
+      *waliErr << "[SetupPDS] Processing Rule:" << std::endl;
+      r->print(*waliErr);
+      *waliErr << endl;
+    }
     //backup the current rule
     savedRules.push_back(r);
 
@@ -133,17 +160,17 @@ void NWPDS::prestarSetupPds()
     for(std::set<Rule>::iterator it = wr.stepRules.begin();
         it != wr.stepRules.end();
         ++it)
-      (*it).print(*waliErr);
-    *waliErr << "Delta_2 rules: \n";
+      (*it).print(*waliErr) << std::endl;
+    *waliErr << "\n\nDelta_2 rules: \n";
     for(std::set<Rule>::iterator it = wr.pushRules.begin();
         it != wr.pushRules.end();
         ++it)
-      (*it).print(*waliErr);
-    *waliErr << "Delta_0 rules: \n";
+      (*it).print(*waliErr) << std::endl;
+    *waliErr << "\n\nDelta_0 rules: \n";
     for(std::set<Rule>::iterator it = wr.popRules.begin();
         it != wr.popRules.end();
         ++it)
-      (*it).print(*waliErr);
+      (*it).print(*waliErr) << std::endl;
   }
 }
 
@@ -171,17 +198,23 @@ void NWPDS::prestarRestorePds()
 
 bool NWPDS::prestarUpdateFa(wfa::WFA& f)
 {
-  UpdateFaFunctor uff(f, var2ConstMap);
+  UpdateFaFunctor uff(f, var2ConstMap,dbg);
   f.for_each(uff);
   return uff.updated();
 }
 
 void NWPDS::prestar(wfa::WFA const & input, wfa::WFA & output)
 {
-  output = input;
+  int i = 0;
+  if(&output != &input)
+    output = input;
   prestarSetupPds();
+  if(dbg)
+    output.print(*waliErr << "\n\n\n\n" << "Current Fa on iter[" << i << "]\n") << std::endl;
   do{
     EWPDS::prestar(output,output);
+    if(dbg)
+      output.print(*waliErr << "\n\n\n\n" << "Current Fa on iter[" << ++i << "]\n") << std::endl;
   }while(prestarUpdateFa(output));
   prestarRestorePds();
   prestarCleanUpFa(output);
@@ -199,27 +232,56 @@ void NWPDS::prestarCleanUpFa(wfa::WFA& output)
   output.for_each(rot);
 }
 
-NWPDS::UpdateFaFunctor::UpdateFaFunctor(wali::wfa::WFA& f, NWPDS::Key2KeyMap& n2om) :
+NWPDS::UpdateFaFunctor::UpdateFaFunctor(wali::wfa::WFA& f, NWPDS::Key2KeyMap& n2om, bool d) :
   TransFunctor(),
   fa(f),
-  new2OldMap(n2om)
+  new2OldMap(n2om),
+  dbg(d)
 {
   changed = false;
 }
 
 void NWPDS::UpdateFaFunctor::operator () (wali::wfa::ITrans* t)
 {
-  wfa::Trans old;
+  if(dbg){
+    *waliErr << "[UpdateFaFunctor]: " << std::endl << "Processing:" << std::endl;
+    t->print(*waliErr) << std::endl;
+  }
   Key2KeyMap::const_iterator it = new2OldMap.find(t->stack());
   if(it != new2OldMap.end()){
+    if(dbg){
+      *waliErr << "Found old stack sym: " << wali::key2str(it->second) << std::endl;
+    }
     //We want to track if anything was updated during the
     //functor operation.
     if(!changed){
       wfa::Trans oldt;
       fa.find(t->from(), it->second, t->to(), oldt);
-      changed = (t->weight() == oldt.weight());
+      wali::sem_elem_t newwt = t->weight();
+      wali::sem_elem_t oldwt = oldt.weight();
+      if(newwt == NULL)
+        changed = false;
+      else if(oldwt == NULL)
+        changed = true;
+      else
+        changed = !(newwt->equal(oldwt));
     }
-    fa.addTrans(t->from(), it->second, t->to(), t->weight());
+    if(dbg){
+      wfa::Trans oldt;
+      fa.find(t->from(), it->second, t->to(), oldt);
+      if(oldt.weight() != NULL)
+        (oldt.weight())->print(*waliErr << "NEWTON_CONST_WT" << std::endl) 
+          << std::endl;
+      if(t->weight() != NULL)
+        (t->weight())->print(*waliErr << "NEWTON_VAR_WT" 
+            << std::endl) << std::endl;
+      if(t->weight() != NULL && oldt.weight() != NULL)
+        *waliErr << "The weights are the same (" 
+          << (t->weight()->equal(oldt.weight())) << ")" << std::endl;
+    }
+    wali::wfa::ITrans * oldt;
+    oldt = t->copy(t->from(),it->second, t->to());
+    fa.addTrans(oldt);
   }
 }
 

@@ -21,12 +21,14 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <ctime>
 // ::wali
 #include "wali/KeySpace.hpp"
 #include "wali/Key.hpp"
 #include "wali/ref_ptr.hpp"
 #include "wali/MergeFn.hpp"
-
+// ::wali::util
+#include "wali/util/Timer.hpp"
 using namespace std;
 using namespace wali;
 using namespace wali::wfa;
@@ -330,7 +332,8 @@ namespace{
 int main()
 {
   //NEED a CONST VALUE
-  unsigned seed = 1;
+  unsigned seed = time(NULL);
+  //unsigned seed = 111;
   program_bdd_context_t bmt = new ProgramBddContext();
   random_pdsgen_t rpt;
   mywtgen_t mwg;
@@ -343,10 +346,15 @@ int main()
   WFACompare fac("NEWTON","KLEENE");
   PDSCompare pac("NEWTON","KLEENE");
   {
-    NWPDS npds;
+    NWPDS npds(false);
     RandomPdsGen::Names names;
-    rpt = new RandomPdsGen(mwg,2,6,10,6,0,0.45,0.45,seed);
-    rpt->get(npds,names);
+    {
+      wali::util::Timer * t1 = new wali::util::Timer("Generating Random PDS");
+      // rpt = new RandomPdsGen(mwg,2,6,10,6,0,0.45,0.45,seed);
+      rpt = new RandomPdsGen(mwg,400,6000,10000,2000,0,0.45,0.45,seed);
+      rpt->get(npds,names);
+      delete t1;
+    }
     npds.for_each(pac);
     pac.advance_mode();
     WFA fa;
@@ -373,7 +381,12 @@ int main()
       innfa << "}" << endl;
     }
     WFA outfa;
-    npds.prestar(fa,outfa);
+    {
+      wali::util::Timer * t2 = new wali::util::Timer("NWPDS prestar",cout);
+      cout << "[NWPDS prestar]\n";
+      npds.prestar(fa,outfa);
+      delete t2;
+    }
     outfa.for_each(fac);
     {
       fstream outfaf("newton_out_fa.dot", fstream::out);
@@ -387,7 +400,9 @@ int main()
   {
     EWPDS fpds;
     RandomPdsGen::Names names;
-    rpt = new RandomPdsGen(mwg,2,6,10,6,0,0.45,0.45,seed);
+    //rpt = new RandomPdsGen(mwg,2,6,10,6,0,0.45,0.45,seed);
+    rpt = new RandomPdsGen(mwg,400,6000,10000,2000,0,0.45,0.45,seed);
+
     rpt->get(fpds,names);
     fpds.for_each(pac);
     pac.advance_mode();
@@ -415,7 +430,12 @@ int main()
       innfa << "}" << endl;
     }
     WFA outfa;
-    fpds.prestar(fa,outfa);
+    {
+      wali::util::Timer * t3 = new wali::util::Timer("EWPDS prestar",cout);
+      cout << "[EWPDS prestar]\n";
+      fpds.prestar(fa,outfa);
+      delete t3;
+    }
     outfa.for_each(fac);
     {
       fstream outfaf("kleene_out_fa.dot", fstream::out);

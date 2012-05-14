@@ -11,10 +11,19 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
+#include <sstream>
 
 #include "generateRandomFWPDS.hpp"
 
 using namespace wali::wpds;
+using namespace std;
+
+string RandomPdsGen::getName(unsigned curKey)
+{
+  stringstream ss;
+  ss << "Node__" << curKey;
+  return ss.str();
+}
 
 RandomPdsGen::RandomPdsGen(wtgen_t r, int np, int nc, int nn, int ns, int ne, double pc, double ps, unsigned s) :
   Countable(),
@@ -48,15 +57,15 @@ void RandomPdsGen::get(WPDS& pds, Names& names, std::ostream * o)
     srand(time(NULL));
 
   wali::clearKeyspace();
-  wali::Key curKey=0;
+  unsigned curKey=1;
 
-  pdsState = wali::getKeySpace()->getKey(curKey++);
+  pdsState = wali::getKeySpace()->getKey(getName(curKey++));
   //Generate Keys for all procedure entries and exits.  
   entries.clear();
   exits.clear();
   for(int i=0;i<numprocs; ++i){
-    entries.push_back(wali::getKeySpace()->getKey(curKey++));
-    exits.push_back(wali::getKeySpace()->getKey(curKey++));
+    entries.push_back(wali::getKeySpace()->getKey(getName(curKey++)));
+    exits.push_back(wali::getKeySpace()->getKey(getName(curKey++)));
   }
 
 
@@ -95,7 +104,7 @@ void RandomPdsGen::get(WPDS& pds, Names& names, std::ostream * o)
 void RandomPdsGen::genproc(
     WPDS& pds, 
     int procnum, 
-    Key curKey,
+    unsigned& curKey,
     int remNodes, 
     int remSplits, 
     int remCalls, 
@@ -116,8 +125,8 @@ void RandomPdsGen::genproc(
 
   //remNodes +=3; //To avoid corner casees.
   if(o){
-    *o << "proc[" << procnum << "(entry:"<< entries[procnum] 
-      <<", exit:"<<exits[procnum] <<")]:\n";
+    *o << "proc[" << procnum << "(entry:"<< wali::key2str(entries[procnum])
+      <<", exit:"<< wali::key2str(exits[procnum]) <<")]:\n";
     *o << "DEBUG: remNodes:" << remNodes-1 << " remSplits:" 
       << remSplits-1 << " remCalls:" << remCalls-1 << "\n";
   }
@@ -186,7 +195,7 @@ void RandomPdsGen::genproc(
 wali::Key RandomPdsGen::genblock(
     WPDS& pds, 
     Key curhead, 
-    Key curKey,
+    unsigned& curKey,
     int remNodes, 
     int remSplits, 
     int remCalls, 
@@ -202,12 +211,13 @@ wali::Key RandomPdsGen::genblock(
     choice = rand() % 100;
     if(choice < pCall){
       if(remCalls < 1) continue;
-      nexthead = wali::getKeySpace()->getKey(curKey++);
+      nexthead = wali::getKeySpace()->getKey(getName(curKey++));
       fn = rand() % numprocs;
       if(o){
         for(int j=0;j<tabspace;++j)
           *o<< " ";
-        *o << wali::key2str(curhead) << "[CALL TO PROC(" << fn << ")[" << entries[fn] <<"]" << "\n";
+        *o << wali::key2str(curhead) << "[CALL TO PROC(" << fn << ")[" << wali::key2str(entries[fn]) 
+          <<"] stk:" << wali::key2str(nexthead) << "\n";
       }
       pds.add_rule(
           pdsState,
@@ -264,7 +274,7 @@ wali::Key RandomPdsGen::genblock(
           *o<< " ";
         *o << wali::key2str(curhead) << "[BRANCH 1]" << "\n";
       }
-      nexthead = wali::getKeySpace()->getKey(curKey++);
+      nexthead = wali::getKeySpace()->getKey(getName(curKey++));
       pds.add_rule(
           pdsState,
           curhead,
@@ -284,7 +294,7 @@ wali::Key RandomPdsGen::genblock(
           *o<< " ";
         *o << wali::key2str(curhead) << "[BRANCH 2]" << "\n";
       }
-      nexthead = wali::getKeySpace()->getKey(curKey++);
+      nexthead = wali::getKeySpace()->getKey(getName(curKey++));
       pds.add_rule(
           pdsState,
           curhead,
@@ -299,7 +309,7 @@ wali::Key RandomPdsGen::genblock(
         *o << wali::key2str(endhead2)<< "\n";
       }
 
-      endhead =  wali::getKeySpace()->getKey(curKey++);
+      endhead =  wali::getKeySpace()->getKey(getName(curKey++));
       pds.add_rule(
           pdsState,
           endhead1,
@@ -316,7 +326,7 @@ wali::Key RandomPdsGen::genblock(
           );
       curhead = endhead;
     }else{
-      nexthead = wali::getKeySpace()->getKey(curKey++);
+      nexthead = wali::getKeySpace()->getKey(getName(curKey++));
       if(o){
         for(int j=0;j<tabspace;++j)
           *o<< " ";

@@ -826,12 +826,40 @@ namespace wali
       Config * from = find_config(from_state, from_stack);
       Config * to  = find_config(to_state, to_stack1);
 
+#if 0
+      {//DEBUGGING
+        *waliErr << "[WPDS::erase_rule] called with: " 
+          << "from_state(" << (from_state) << ") "
+          << "from_stack(" << (from_stack) << ") "
+          << "to_state(" << (to_state) << ") "
+          << "to_stack1(" << (to_stack1) << ") "
+          << "to_stack2(" << (to_stack2) << ") " << std::endl;
+        from->print(*waliErr << "Config(from):" << std::endl)  
+                             << std::endl << "FW: ";
+        for(Config::const_iterator it = from->begin(); it != from->end(); ++it)
+          (*it)->print(*waliErr << "[") << "] ";
+        *waliErr << std::endl << "BW: ";
+        for(Config::const_reverse_iterator it = from->rbegin(); it != from->rend(); ++it)
+          (*it)->print(*waliErr << "[") << "] ";
+        *waliErr << std::endl;
+        to->print(*waliErr << "Config(to):" << std::endl) 
+                  << std::endl << "FW: ";
+        for(Config::const_iterator it = to->begin(); it != to->end(); ++it)
+          (*it)->print(*waliErr << "[") << "] ";
+        *waliErr << std::endl << "BW: " ;
+        for(Config::const_reverse_iterator it = to->rbegin(); it != to->rend(); ++it)
+          (*it)->print(*waliErr << "[") << "] ";
+        
+        *waliErr << std::endl;
+      }//DEBUGGING
+#endif
+
       //If either of from / to are NULL, the rules does not exist.
       if(from == NULL || to == NULL)
         return false;
       
       //Find the rule
-      rule_t r;
+      rule_t r = NULL;
       for(Config::const_iterator it = from->begin();
           it != from->end();
           ++it){
@@ -844,6 +872,7 @@ namespace wali
           break;
         }
       }
+      assert(!(r == NULL));
       bool erasefrom = from->erase(r);
 /*
       for(Config::const_iterator it = to->begin();
@@ -880,7 +909,7 @@ namespace wali
           r2hash.erase(r->to_stack2());
       }
       if(erasefrom)
-        config_map().erase(KeyPair(r->from_state(), r->to_stack1()));
+        config_map().erase(KeyPair(r->from_state(), r->from_stack()));
       if(eraseto)
         config_map().erase(KeyPair(r->to_state(), r->to_stack1()));
       return true;

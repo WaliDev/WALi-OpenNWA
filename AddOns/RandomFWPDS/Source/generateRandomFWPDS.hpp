@@ -74,7 +74,7 @@ namespace wali
         void genproc(
             wali::wpds::WPDS& pds, 
             int procnum, 
-            wali::Key curKey,
+            unsigned& curKey,
             int remNodes, 
             int remSplits, 
             int remCalls, 
@@ -84,13 +84,14 @@ namespace wali
         wali::Key genblock(
             wali::wpds::WPDS& pds, 
             wali::Key curhead, 
-            wali::Key curKey,
+            unsigned& curKey,
             int remNodes, 
             int remSplits, 
             int remCalls, 
             std::ostream *o, 
             int tabstop
             );
+        std::string getName(unsigned curKey);
 
       private:
         //Configuration of the Generator as set by the constructor
