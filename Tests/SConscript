@@ -11,6 +11,8 @@ if Debug:
 
 ## ###############################
 ## Environment
+## Adding Domains paths to the enviornment
+
 Env = ProgEnv.Clone()
 
 ## Note - Be sure to use a list when 'Append'ing to CPPPATH
@@ -23,9 +25,7 @@ built = []
 Reach = os.path.join(WaliDir,'Examples','Reach','Reach.cpp')
 for t in ['t1','t3','t4','twitness','tprune','tTransSet']:
     exe = Env.Program('%s' % t, ['%s.cpp' % t,'%s' % Reach ])
-    built += (exe)
-
-#nwa_built = SConscript('nwa/SConscript')
+    built += Env.Install('#/Tests/harness',exe)
 
 Return('built')
 

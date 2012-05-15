@@ -1,0 +1,7 @@
+
+From(a): <0:0, 9:0, 10:1, 12:0, 62:0, 64:0><0:1, 9:0, 10:1, 12:1, 62:0, 64:0>
+From(b): <__regSize:2, __regA':0, b:0, :0, __regSize:2, :0, __regA':0><__regSize:2, __regA':1, b:1, :0, __regSize:2, :0, __regA':1>
+From(c): <__regSize:2, __regA':0, c:0, :0, __regSize:2, :0, __regA':0><__regSize:2, __regA':1, c:1, :0, __regSize:2, :0, __regA':1>
+From(p): <__regSize:0, __regA':0, p:0, :1, __regSize:4, :0, __regA':0><__regSize:0, __regA':0, p:2, :1, __regSize:4, :1, __regA':2><__regSize:0, __regA':1, p:1, :1, __regSize:4, :0, __regA':1><__regSize:0, __regA':1, p:3, :1, __regSize:4, :1, __regA':3>
+From(q): <__regSize:0, __regA':0, :1, __regSize:4, :0, __regA':0, q:0><__regSize:0, __regA':0, :1, __regSize:4, :1, __regA':2, q:2><__regSize:0, __regA':1, :1, __regSize:4, :0, __regA':1, q:1><__regSize:0, __regA':1, :1, __regSize:4, :1, __regA':3, q:3>
+From(r): <__regSize:0, __regA':0, :1, __regSize:4, :0, __regA':0, r:0><__regSize:0, __regA':0, :1, __regSize:4, :1, __regA':2, r:2><__regSize:0, __regA':1, :1, __regSize:4, :0, __regA':1, r:1><__regSize:0, __regA':1, :1, __regSize:4, :1, __regA':3, r:3>

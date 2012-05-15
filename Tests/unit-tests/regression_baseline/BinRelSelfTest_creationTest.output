@@ -1,0 +1,2 @@
+se1: Base relation: <a:0, __regSize:2, __regA':0, :0, __regSize:2, :0, __regA':0><a:1, __regSize:2, __regA':1, :0, __regSize:2, :0, __regA':1>
+se2: Base relation: <__regSize:0, __regA':0, p:0, :1, __regSize:4, :0, __regA':0><__regSize:0, __regA':0, p:2, :1, __regSize:4, :1, __regA':2><__regSize:0, __regA':1, p:1, :1, __regSize:4, :0, __regA':1><__regSize:0, __regA':1, p:3, :1, __regSize:4, :1, __regA':3>

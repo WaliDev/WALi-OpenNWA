@@ -5,7 +5,7 @@
 #include <fstream>
 
 namespace{
-  std::string regrDir = "Regr";
+  std::string regrDir = "regression_baseline";
 
   //declarations
   static void writeOutput(

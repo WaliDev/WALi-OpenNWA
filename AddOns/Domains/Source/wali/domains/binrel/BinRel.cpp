@@ -6,7 +6,7 @@
  
 #include "BinRel.hpp"
 #include "buddy/fdd.h"
-#include "BinRelManager.hpp"
+#include "ProgramBddContext.hpp"
 //#include "BuddyExt.hpp"
 #include "combination.hpp"
 
@@ -35,34 +35,32 @@ using wali::waliErr;
 //It's a good habit to forward declare all the static functions in the
 //file so that there is an index and so that the contents of the file can
 //move around freely.
-static void myFddStrmHandler(std::ostream &o, int var);
-static BinRel* convert(wali::SemElem* se);
+
+namespace wali
+{
+  namespace domains
+  {
+    namespace binrel
+    {
+      /**
+       * idx2Name gives strings to print for bdd level indices.
+       * This is passed to the callback function in buddy.
+       * This is currently a global so that it can be 
+       * accessed in BinRelManager.
+       **/
+      RevBddContext idx2Name;
+
+      static void myFddStrmHandler(std::ostream &o, int var);
+      static BinRel* convert(wali::SemElem* se);
+    }
+  }
+}
+
 
 // ////////////////////////////
-// Definitions of static members from BinRel class
-Voc BinRel::voc;
-//RevVoc BinRel::idx2Name;
+// Definitions of static members from BddContext/BinRel class
 
-bddPair* BinRel::baseSwap = NULL;
-bddPair* BinRel::baseRightShift = NULL;
-bddPair* BinRel::tensorRightShift = NULL; 
-bddPair* BinRel::baseRestore = NULL;
-bddPair* BinRel::tensorRestore = NULL;
-bddPair* BinRel::move2Tensor1 = NULL;
-bddPair* BinRel::move2Tensor2 = NULL;
-bddPair* BinRel::move2Base = NULL;
-bddPair* BinRel::move2BaseTwisted = NULL;
-
-bdd BinRel::baseSecVocSet = bddfalse;
-bdd BinRel::tensorSecVocSet = bddfalse;
-bdd BinRel::commonVocSet23 = bddfalse;
-bdd BinRel::commonVocId23 = bddfalse;
-bdd BinRel::commonVocSet13 = bddfalse;
-bdd BinRel::commonVocId13 = bddfalse;
-
-bdd BinRel::baseId = bddtrue;
-bdd BinRel::tensorId = bddtrue;
-
+int BddContext::numBddContexts = 0;
 #ifdef BINREL_STATS
 StatCount BinRel::numCompose = 0;
 StatCount BinRel::numUnion = 0;
@@ -91,45 +89,72 @@ std::ostream& BddInfo::print(std::ostream& o) const
   return o;
 }
 
-static RevVoc idx2Name;
-static void myFddStrmHandler(std::ostream &o, int var)
+namespace wali
 {
-  extern RevVoc idx2Name;
-  o << idx2Name[var];
-}
+  namespace domains
+  {
+    namespace binrel
+    {
+      static void myFddStrmHandler(std::ostream &o, int var)
+      {
+        extern RevBddContext idx2Name;
+        o << idx2Name[var];
+      }
 
-// ////////////////////////////
-// Static
-const Voc BinRel::initialize(int bddMemSize, int cacheSize, Voc v) 
+      // Helper function that converts a SemElem
+      // into a BinRel*
+      static BinRel* convert(wali::SemElem* se) 
+      {
+        BinRel* br = dynamic_cast<BinRel*>(se);
+        if (br == NULL) {
+          *waliErr << "[ERROR] Cannot cast to class wali::binrel::BinRel.\n";
+          se->print( *waliErr << "    " ) << endl;
+          assert(false);
+        }
+        // When done with developement
+        // BinRel* br = static_cast<BinRel*>(se)
+        return br;
+      }
+    } // namespace binrel
+  } // namespace domains
+} // namespace wali
+
+
+BddContext::BddContext(int bddMemSize, int cacheSize) :
+  std::map< const std::string, bddinfo_t>(),
+  count(0)
 {
-  if(bdd_isrunning() == 1){
-    *waliErr << "[INFO] " << "BinRel initialize called multiple times" 
-      << endl << "Resetting!" << endl;
-    BinRel::reset();
-  }
-  bddMemSize = (bddMemSize==0)?BDDMEMSIZE:bddMemSize;
-  cacheSize = (cacheSize==0)?CACHESIZE:cacheSize;
-  // ///////////////////////
-  // Begin initialize BuDDy
-  if (0 == bdd_isrunning()){
-    int rc = bdd_init(bddMemSize,cacheSize);
-    if( rc < 0 ){
-      *waliErr << "[ERROR] " << bdd_errstring(rc) << endl;
+  //If buddy has not been initialized, initialize it.
+  //We handle this by keeping track of the number of BddContext objects
+  //lying around. Since every BinRel also has a BddContext object in it,
+  //if there are no BddContext objects, there is Nothing!
+  //lock mutex
+  if(numBddContexts == 0){
+    // ///////////////////////
+    // Begin initialize BuDDy
+    bddMemSize = (bddMemSize==0)?BDDMEMSIZE:bddMemSize;
+    cacheSize = (cacheSize==0)?CACHESIZE:cacheSize;
+    if (0 == bdd_isrunning()){
+      int rc = bdd_init(bddMemSize,cacheSize);
+      if( rc < 0 ){
+        *waliErr << "[ERROR] " << bdd_errstring(rc) << endl;
+        assert( 0 );
+      }
+      // Default is 50,000 (1 Mb),memory is cheap, so use 100,000
+      bdd_setmaxincrease(MAXMEMINC);
+      // TODO: bdd_error_hook( my_error_handler );
+      fdd_strm_hook( myFddStrmHandler );
+    }else{
+      //can not happen, unless reset fails.
+      *waliErr << "[ERROR] BuDDy already initialized." << endl;
       assert( 0 );
     }
-    // Default is 50,000 (1 Mb),memory is cheap, so use 100,000
-    bdd_setmaxincrease(MAXMEMINC);
-    // TODO: bdd_error_hook( my_error_handler );
-    fdd_strm_hook( myFddStrmHandler );
-  }else{
-    //can not happen, unless reset fails.
-    *waliErr << "[ERROR] BuDDy already initialized." << endl;
-    assert( 0 );
+    // End initialize BuDDy
+    // ///////////////////////
   }
-  // End initialize BuDDy
-  // ///////////////////////
+  numBddContexts++;
+  //release mutex
 
-  //create static bddPairs
   baseSwap = bdd_newpair();
   baseRightShift = bdd_newpair();
   tensorRightShift = bdd_newpair(); 
@@ -141,177 +166,259 @@ const Voc BinRel::initialize(int bddMemSize, int cacheSize, Voc v)
   move2BaseTwisted = bdd_newpair();
 
   //initialize static bdds
-  baseSecVocSet = bddtrue;
-  tensorSecVocSet= bddtrue;
-  commonVocSet23 = bddtrue;
-  commonVocSet13 = bddtrue;
-  commonVocId23 = bddtrue;
-  commonVocId13 = bddtrue;
+  baseSecBddContextSet = bddtrue;
+  tensorSecBddContextSet= bddtrue;
+  commonBddContextSet23 = bddtrue;
+  commonBddContextSet13 = bddtrue;
+  commonBddContextId23 = bddtrue;
+  commonBddContextId13 = bddtrue;
 
-
-  //Create bdd domains for relations
-  for(
-      VocIter varIter = v.begin();
-      varIter != v.end();
-      ++varIter
-     ){
-    std::string varName = (*varIter).first;
-    BddInfo_t varInfo = (*varIter).second;
-    //We will create indices such that we get a default variable ordering where
-    //baseLhs, baseRhs, baseExtra are mixed.
-    //tensor1Lhs, tensor1Rhs, tensor1Extra are mixed.
-    //tensor2Lhs, tensor2Rhs, tensor2Extra are mixed.
-    int base;
-    int domains[3] = {varInfo->maxVal, varInfo->maxVal, varInfo->maxVal};
-
-    //Create fdds for base
-    base = fdd_extdomain(domains,3);
-    if (base < 0){
-      *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
-      *waliErr << "    Aborting." << endl;
-      assert (false);
-    }
-    varInfo->baseLhs = base;
-    varInfo->baseRhs = base + 1;
-    varInfo->baseExtra = base + 2;
-
-    //create fdds for tensor1
-    base = fdd_extdomain(domains,3);
-    if (base < 0){
-      *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
-      *waliErr << "    Aborting." << endl;
-      assert (false);
-    }
-    varInfo->tensor1Lhs = base;
-    varInfo->tensor1Rhs = base + 1;
-    varInfo->tensor1Extra = base + 2;
-
-    //create fdds for tensor2
-    base = fdd_extdomain(domains,3);
-    if (base < 0){
-      *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
-      *waliErr << "    Aborting." << endl;
-      assert (false);
-    }
-    varInfo->tensor2Lhs = base;
-    varInfo->tensor2Rhs = base + 1;
-    varInfo->tensor2Extra = base + 2;
-
-    //update static bddPairs
-    fdd_setpair(baseSwap, varInfo->baseLhs, varInfo->baseRhs);
-    fdd_setpair(baseSwap, varInfo->baseRhs, varInfo->baseLhs);
-
-    fdd_setpair(baseRightShift,varInfo->baseLhs,varInfo->baseRhs);
-    fdd_setpair(baseRightShift,varInfo->baseRhs,varInfo->baseExtra);
-
-    fdd_setpair(tensorRightShift,varInfo->tensor1Lhs,varInfo->tensor1Rhs);
-    fdd_setpair(tensorRightShift,varInfo->tensor2Lhs,varInfo->tensor2Rhs);
-    fdd_setpair(tensorRightShift,varInfo->tensor1Rhs,varInfo->tensor1Extra);
-    fdd_setpair(tensorRightShift,varInfo->tensor2Rhs,varInfo->tensor2Extra);
-
-    fdd_setpair(baseRestore,varInfo->baseExtra,varInfo->baseRhs);
-
-    fdd_setpair(tensorRestore,varInfo->tensor1Extra,varInfo->tensor1Rhs);
-    fdd_setpair(tensorRestore,varInfo->tensor2Extra,varInfo->tensor2Rhs);
-
-    fdd_setpair(move2Tensor1,varInfo->baseLhs,varInfo->tensor1Lhs);
-    fdd_setpair(move2Tensor1,varInfo->baseRhs,varInfo->tensor1Rhs);
-
-    fdd_setpair(move2Tensor2,varInfo->baseLhs,varInfo->tensor2Lhs);
-    fdd_setpair(move2Tensor2,varInfo->baseRhs,varInfo->tensor2Rhs);
-
-    fdd_setpair(move2Base,varInfo->tensor1Lhs,varInfo->baseLhs);
-    fdd_setpair(move2Base,varInfo->tensor2Rhs,varInfo->baseRhs);
-
-    fdd_setpair(move2BaseTwisted,varInfo->tensor1Rhs,varInfo->baseLhs);
-    fdd_setpair(move2BaseTwisted,varInfo->tensor2Rhs,varInfo->baseRhs);
-
-    //update static bdds
-    baseSecVocSet = baseSecVocSet & fdd_ithset(varInfo->baseRhs);
-    tensorSecVocSet = tensorSecVocSet & fdd_ithset(varInfo->tensor1Rhs);
-    tensorSecVocSet = tensorSecVocSet & fdd_ithset(varInfo->tensor2Rhs);
-    commonVocSet23 = commonVocSet23 & fdd_ithset(varInfo->tensor1Rhs);
-    commonVocSet23 = commonVocSet23 & fdd_ithset(varInfo->tensor2Lhs);
-    commonVocId23 = commonVocId23 &
-      fdd_equals(varInfo->tensor1Rhs, varInfo->tensor2Lhs);
-    commonVocSet13 = commonVocSet13 & fdd_ithset(varInfo->tensor1Lhs);
-    commonVocSet13 = commonVocSet13 & fdd_ithset(varInfo->tensor2Lhs);
-    commonVocId13 = commonVocId13 & 
-      fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
-
-    //add the current varInfoiable with all its regalia to voc
-    voc[varName] = varInfo;
-  }
-
-  //setup Static Id relations. Yes, this is wasteful iff no one uses Id ever.
-  //But that is highly unlikely
-  BinRel::setId();
-
-  for(Voc::const_iterator iter = voc.begin();
-      iter != voc.end();
-      ++iter){
-    BddInfo_t bi = iter->second;
-    idx2Name[bi->baseLhs] = iter->first;
-    idx2Name[bi->baseRhs] = iter->first + "'";
-    idx2Name[bi->baseExtra] = iter->first + "''";
-    idx2Name[bi->tensor1Lhs] = iter->first + "_t1";
-    idx2Name[bi->tensor1Rhs] = iter->first + "_t1'";
-    idx2Name[bi->tensor1Extra] = iter->first + "_t1''";
-    idx2Name[bi->tensor2Lhs] = iter->first + "_t2";
-    idx2Name[bi->tensor2Rhs] = iter->first + "_t2'";
-    idx2Name[bi->tensor2Extra] = iter->first + "_t2''";
-  }
-
-  //return updated voc (v)
-  return v;
+  cachedBaseOne = NULL;
+  cachedBaseZero = NULL;
+  cachedTensorOne = NULL;
+  cachedTensorZero = NULL;
+  populateCache();
 }
 
+//Don't copy count
+BddContext::BddContext(const BddContext& other) :
+  std::map< const std::string, bddinfo_t>(other),
+  count(0),
+  baseSwap(other.baseSwap),
+  baseRightShift(other.baseRightShift),
+  tensorRightShift(other.tensorRightShift),
+  baseRestore(other.baseRestore),
+  tensorRestore(other.tensorRestore),
+  move2Tensor1(other.move2Tensor1),
+  move2Tensor2(other.move2Tensor2),
+  move2Base(other.move2Base),
+  move2BaseTwisted(other.move2BaseTwisted),
+  baseSecBddContextSet(other.baseSecBddContextSet),
+  tensorSecBddContextSet(other.tensorSecBddContextSet),
+  commonBddContextSet23(other.commonBddContextSet23),
+  commonBddContextSet13(other.commonBddContextSet13),
+  commonBddContextId13(other.commonBddContextId13),
+  cachedBaseOne(other.cachedBaseOne),
+  cachedBaseZero(other.cachedBaseZero),
+  cachedTensorOne(other.cachedTensorOne),
+  cachedTensorZero(other.cachedTensorZero)
+{}
+
+BddContext& BddContext::operator = (const BddContext& other)
+{
+  if(this!=&other){
+    count=0;
+    baseSwap=other.baseSwap;
+    baseRightShift=other.baseRightShift;
+    tensorRightShift=other.tensorRightShift;
+    baseRestore=other.baseRestore;
+    tensorRestore=other.tensorRestore;
+    move2Tensor1=other.move2Tensor1;
+    move2Tensor2=other.move2Tensor2;
+    move2Base=other.move2Base;
+    move2BaseTwisted=other.move2BaseTwisted;
+    baseSecBddContextSet=other.baseSecBddContextSet;
+    tensorSecBddContextSet=other.tensorSecBddContextSet;
+    commonBddContextSet23=other.commonBddContextSet23;
+    commonBddContextSet13=other.commonBddContextSet13;
+    commonBddContextId13=other.commonBddContextId13;
+    cachedBaseOne=other.cachedBaseOne;
+    cachedBaseZero=other.cachedBaseZero;
+    cachedTensorOne=other.cachedTensorOne;
+    cachedTensorZero=other.cachedTensorZero;
+  }
+  return *this;
+}
+
+
+BddContext::~BddContext()
+{
+  bdd_freepair(baseSwap);
+  baseSwap = NULL;
+  bdd_freepair(baseRightShift);
+  baseRightShift = NULL;
+  bdd_freepair(tensorRightShift);
+  tensorRightShift = NULL;
+  bdd_freepair(baseRestore);
+  baseRestore = NULL;
+  bdd_freepair(tensorRestore);
+  tensorRestore = NULL;
+  bdd_freepair(move2Tensor1);
+  move2Tensor1 = NULL;
+  bdd_freepair(move2Tensor2);
+  move2Tensor2 = NULL;
+  bdd_freepair(move2Base);
+  move2Base = NULL;
+  bdd_freepair(move2BaseTwisted);
+  move2BaseTwisted = NULL;
+
+  baseSecBddContextSet = bddtrue;
+  tensorSecBddContextSet = bddtrue;
+  commonBddContextSet23 = bddtrue;
+  commonBddContextId23 = bddtrue;
+  commonBddContextSet13 = bddtrue;
+  commonBddContextId13 = bddtrue;
+
+  //Delete cached BinRel objects.
+  cachedBaseOne = NULL;
+  cachedBaseZero = NULL;
+  cachedTensorOne = NULL;
+  cachedTensorZero = NULL;
+
+  //Clear the bddinfo_t vector.
+  this->clear();
+
+  //lock mutex
+  numBddContexts--;
+  if(numBddContexts == 0){
+    //All BddContexts are now dead. So we must shutdown buddy.
+    if(bdd_isrunning() != 0)
+      bdd_done();
+    //Now clear the reverse map.
+    idx2Name.clear();
+    //Also clean up the BinRel class
+    BinRel::reset();
+  }
+  //release mutex
+}
+
+void BddContext::addBoolVar(std::string name)
+{
+  addIntVar(name,2);
+}
+
+void BddContext::addIntVar(std::string name, unsigned size)
+{
+  //create and insert a new BddInfo into the vocabulary
+  if(size < 2){
+    *waliErr << "I haven't tested the library for int size less than 2";
+    assert(false);
+  }
+  bddinfo_t varInfo = new BddInfo;
+  varInfo->maxVal = size;
+  (*this)[name] = varInfo;
+
+  //Create space in buddy for this variable
+  //We will create indices such that we get a default variable ordering where
+  //baseLhs, baseRhs, baseExtra are mixed.
+  //tensor1Lhs, tensor1Rhs, tensor1Extra are mixed.
+  //tensor2Lhs, tensor2Rhs, tensor2Extra are mixed.
+
+  //lock mutex
+  int base;
+  int domains[3] = {varInfo->maxVal, varInfo->maxVal, varInfo->maxVal};
+
+  //Create fdds for base
+  base = fdd_extdomain(domains,3);
+  if (base < 0){
+    *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
+    *waliErr << "    Aborting." << endl;
+    assert (false);
+  }
+  varInfo->baseLhs = base;
+  varInfo->baseRhs = base + 1;
+  varInfo->baseExtra = base + 2;
+
+  //create fdds for tensor1
+  base = fdd_extdomain(domains,3);
+  if (base < 0){
+    *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
+    *waliErr << "    Aborting." << endl;
+    assert (false);
+  }
+  varInfo->tensor1Lhs = base;
+  varInfo->tensor1Rhs = base + 1;
+  varInfo->tensor1Extra = base + 2;
+
+  //create fdds for tensor2
+  base = fdd_extdomain(domains,3);
+  if (base < 0){
+    *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
+    *waliErr << "    Aborting." << endl;
+    assert (false);
+  }
+  varInfo->tensor2Lhs = base;
+  varInfo->tensor2Rhs = base + 1;
+  varInfo->tensor2Extra = base + 2;
+  //release mutex
+
+  //We will now update all the cached bdds and bddpairs 
+  //update bddPairs
+  fdd_setpair(baseSwap, varInfo->baseLhs, varInfo->baseRhs);
+  fdd_setpair(baseSwap, varInfo->baseRhs, varInfo->baseLhs);
+  fdd_setpair(baseRightShift,varInfo->baseLhs,varInfo->baseRhs);
+  fdd_setpair(baseRightShift,varInfo->baseRhs,varInfo->baseExtra);
+  fdd_setpair(tensorRightShift,varInfo->tensor1Lhs,varInfo->tensor1Rhs);
+  fdd_setpair(tensorRightShift,varInfo->tensor2Lhs,varInfo->tensor2Rhs);
+  fdd_setpair(tensorRightShift,varInfo->tensor1Rhs,varInfo->tensor1Extra);
+  fdd_setpair(tensorRightShift,varInfo->tensor2Rhs,varInfo->tensor2Extra);
+  fdd_setpair(baseRestore,varInfo->baseExtra,varInfo->baseRhs);
+  fdd_setpair(tensorRestore,varInfo->tensor1Extra,varInfo->tensor1Rhs);
+  fdd_setpair(tensorRestore,varInfo->tensor2Extra,varInfo->tensor2Rhs);
+  fdd_setpair(move2Tensor1,varInfo->baseLhs,varInfo->tensor1Lhs);
+  fdd_setpair(move2Tensor1,varInfo->baseRhs,varInfo->tensor1Rhs);
+  fdd_setpair(move2Tensor2,varInfo->baseLhs,varInfo->tensor2Lhs);
+  fdd_setpair(move2Tensor2,varInfo->baseRhs,varInfo->tensor2Rhs);
+  fdd_setpair(move2Base,varInfo->tensor1Lhs,varInfo->baseLhs);
+  fdd_setpair(move2Base,varInfo->tensor2Rhs,varInfo->baseRhs);
+  fdd_setpair(move2BaseTwisted,varInfo->tensor1Rhs,varInfo->baseLhs);
+  fdd_setpair(move2BaseTwisted,varInfo->tensor2Rhs,varInfo->baseRhs);
+  //update static bdds
+  baseSecBddContextSet = baseSecBddContextSet & fdd_ithset(varInfo->baseRhs);
+  tensorSecBddContextSet = tensorSecBddContextSet & fdd_ithset(varInfo->tensor1Rhs);
+  tensorSecBddContextSet = tensorSecBddContextSet & fdd_ithset(varInfo->tensor2Rhs);
+  commonBddContextSet23 = commonBddContextSet23 & fdd_ithset(varInfo->tensor1Rhs);
+  commonBddContextSet23 = commonBddContextSet23 & fdd_ithset(varInfo->tensor2Lhs);
+  commonBddContextId23 = commonBddContextId23 &
+    fdd_equals(varInfo->tensor1Rhs, varInfo->tensor2Lhs);
+  commonBddContextSet13 = commonBddContextSet13 & fdd_ithset(varInfo->tensor1Lhs);
+  commonBddContextSet13 = commonBddContextSet13 & fdd_ithset(varInfo->tensor2Lhs);
+  commonBddContextId13 = commonBddContextId13 & 
+    fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
+
+  //update cached BinRel objects
+  populateCache();
+  //update RevBddContext for pretty printing through buddy.
+  //lock mutex
+  idx2Name[varInfo->baseLhs] = name;
+  idx2Name[varInfo->baseRhs] = name + "'";
+  idx2Name[varInfo->baseExtra] = name + "''";
+  idx2Name[varInfo->tensor1Lhs] = name + "_t1";
+  idx2Name[varInfo->tensor1Rhs] = name + "_t1'";
+  idx2Name[varInfo->tensor1Extra] = name + "_t1''";
+  idx2Name[varInfo->tensor2Lhs] = name + "_t2";
+  idx2Name[varInfo->tensor2Rhs] = name + "_t2'";
+  idx2Name[varInfo->tensor2Extra] = name + "_t2''";
+  //release mutex
+}
+
+void BddContext::populateCache()
+{
+  bdd baseId = bddtrue;
+  bdd tensorId = bddtrue;
+  for(
+      BddContextIter varIter = this->begin();
+      varIter != this->end();
+      ++varIter
+     ){
+    bddinfo_t varInfo = (*varIter).second;
+    baseId = baseId &
+      fdd_equals(varInfo->baseLhs, varInfo->baseRhs);
+    tensorId = tensorId &
+      (fdd_equals(varInfo->tensor1Lhs, varInfo->tensor1Rhs) &
+       fdd_equals(varInfo->tensor2Lhs, varInfo->tensor2Rhs));
+  }
+  cachedBaseOne = new BinRel(this, baseId, false);
+  cachedBaseZero = new BinRel(this, bddfalse, false);
+  cachedTensorOne = new BinRel(this, tensorId, true);
+  cachedTensorZero = new BinRel(this, bddfalse, true);
+}
+
+
+// ////////////////////////////
+// Static
 void BinRel::reset()
 {
-
-  if(bdd_isrunning() == 0)
-    return;
-  for(VocIter iter = voc.begin(), endIter = voc.end();
-      endIter != iter;
-      ++iter){
-    //set the BddInfo_t to NULL.
-    //This *should* remove the last reference to the BddInfo object. And the
-    //object should get deleted. If someone was holding onto the object before
-    //resetting, we're fine with that too.
-    iter->second = NULL;
-  }
-  voc.clear();
-
-  //delete all bddPair objects
-  bdd_freepair(BinRel::baseSwap);
-  BinRel::baseSwap = NULL;
-  bdd_freepair(BinRel::baseRightShift);
-  BinRel::baseRightShift = NULL;
-  bdd_freepair(BinRel::tensorRightShift);
-  BinRel::tensorRightShift = NULL;
-  bdd_freepair(BinRel::baseRestore);
-  BinRel::baseRestore = NULL;
-  bdd_freepair(BinRel::tensorRestore);
-  BinRel::tensorRestore = NULL;
-  bdd_freepair(BinRel::move2Tensor1);
-  BinRel::move2Tensor1 = NULL;
-  bdd_freepair(BinRel::move2Tensor2);
-  BinRel::move2Tensor2 = NULL;
-  bdd_freepair(BinRel::move2Base);
-  BinRel::move2Base = NULL;
-  bdd_freepair(BinRel::move2BaseTwisted);
-  BinRel::move2BaseTwisted = NULL;
-
-  BinRel::baseSecVocSet = bddtrue;
-  BinRel::tensorSecVocSet = bddtrue;
-  BinRel::commonVocSet23 = bddtrue;
-  BinRel::commonVocId23 = bddtrue;
-  BinRel::commonVocSet13 = bddtrue;
-  BinRel::commonVocId13 = bddtrue;
-
-  BinRel::baseId = bddtrue;
-  BinRel::tensorId = bddtrue;
-
 #ifdef BINREL_STATS
   //reset all counter;
   BinRel::numCompose = 0;
@@ -322,22 +429,7 @@ void BinRel::reset()
   BinRel::numTranspose = 0;
   BinRel::numEq23Project = 0;
   BinRel::numEq24Project = 0;
-
-  //empty out the cross index for printing
-  //idx2Name
-  idx2Name.clear();
 #endif
-
-  //These static member variables were declared within functions
-  BinRel::baseId = bddtrue;
-  BinRel::tensorId = bddtrue;
-
-  //reset bdd
-  bdd_done();
-}
-bool BinRel::is_initialized()
-{
-  return (bdd_isrunning() == 1);
 }
 
 
@@ -367,8 +459,18 @@ namespace wali{
 
 // ////////////////////////////
 // Members and Con/Destructors
-BinRel::BinRel(const BinRel& that) : wali::SemElemTensor(that),rel(that.rel) {}
-BinRel::BinRel(bdd b,bool it) : rel(b), isTensored(it) {}
+BinRel::BinRel(const BinRel& that) : 
+  wali::SemElemTensor(that),
+  con(that.con),
+  rel(that.rel),
+  isTensored(that.isTensored)
+{}
+
+BinRel::BinRel(BddContext * c, bdd b,bool it) : 
+  con(c),
+  rel(b), 
+  isTensored(it) 
+{}
 BinRel::~BinRel() {}
 // ////////////////////////////
 
@@ -376,68 +478,72 @@ binrel_t BinRel::Compose( binrel_t that ) const
 {
   //We skip this test if you insist
 #ifndef BINREL_HASTY
-  if(isTensored != that->isTensored){
+  if(isTensored != that->isTensored || con != that->con){
     *waliErr << "[WARNING] " << "Composing incompatible relations" << endl;
     that->print(print(*waliErr) << endl) << endl;
-    return new BinRel(bddfalse,isTensored);
+    assert(false);
+    return new BinRel(con,bddfalse,isTensored);
   }
 #endif
   bdd c;
   if(!isTensored){
-    bdd temp1 = bdd_replace(that->rel,baseRightShift);
-    bdd temp2 = bdd_relprod(rel,temp1,baseSecVocSet);
-    c = bdd_replace(temp2,baseRestore);
+    bdd temp1 = bdd_replace(that->rel,con->baseRightShift);
+    bdd temp2 = bdd_relprod(rel,temp1,con->baseSecBddContextSet);
+    c = bdd_replace(temp2,con->baseRestore);
   }else{
-    bdd temp1 = bdd_replace(that->rel,tensorRightShift);
-    bdd temp2 = bdd_relprod(rel,temp1,tensorSecVocSet);
-    c = bdd_replace(temp2,tensorRestore);
+    bdd temp1 = bdd_replace(that->rel,con->tensorRightShift);
+    bdd temp2 = bdd_relprod(rel,temp1,con->tensorSecBddContextSet);
+    c = bdd_replace(temp2,con->tensorRestore);
   }
 #ifdef BINREL_STATS
   BinRel::numCompose++;
 #endif
-  return new BinRel(c,isTensored);
+  return new BinRel(con,c,isTensored);
 }
 
 binrel_t BinRel::Union( binrel_t that ) const
 {
   //We skip this test if you insist
 #ifndef BINREL_HASTY
-  if(isTensored != that->isTensored){
+  if(isTensored != that->isTensored || con != that->con){
     *waliErr << "[WARNING] " << "Unioning incompatible relations" << endl;
     that->print(print(*waliErr) << endl) << endl;
-    return new BinRel(bddtrue,isTensored);
+    assert(false);
+    return new BinRel(con,bddtrue,isTensored);
   }
 #endif
 #ifdef BINREL_STATS
   BinRel::numUnion++;
 #endif
-  return new BinRel(rel | that->rel, isTensored);
+  return new BinRel(con,rel | that->rel, isTensored);
 }
 
 binrel_t BinRel::Intersect( binrel_t that ) const
 {
   //We skip this test if you insist
 #ifndef BINREL_HASTY
-  if(isTensored != that->isTensored){
+  if(isTensored != that->isTensored || con != that->con){
     *waliErr << "[WARNING] " << "Intersecting incompatible relations" << endl;
     that->print(print(*waliErr) << endl) << endl;
-    return new BinRel(bddfalse,isTensored);
+    assert(false);
+    return new BinRel(con,bddfalse,isTensored);
   }
 #endif
 #ifdef BINREL_STATS
   BinRel::numIntersect++;
 #endif
-  return new BinRel(rel & that->rel,isTensored);
+  return new BinRel(con, rel & that->rel,isTensored);
 }
 
 bool BinRel::Equal( binrel_t that) const
 {
   //We skip this test if you insist
 #ifndef BINREL_HASTY
-  if(isTensored != that->isTensored){
+  if(isTensored != that->isTensored || con != that->con){
     *waliErr << "[WARNING] " << "Compared (Equality) incompatible relations" 
       << endl;
     that->print(print(*waliErr) << endl) << endl;
+    assert(false);
     return false;
   }
 #endif
@@ -454,92 +560,81 @@ binrel_t BinRel::Transpose() const
     *waliErr << "[WARNING] " << "Attempted to transpose tensored weight."
       << endl << "Not supported" << endl;
     print(*waliErr) << endl;
-    return new BinRel(bddfalse, true);
+    assert(false);
+    return new BinRel(con, bddfalse, true);
   }
 #endif
-  bdd c = bdd_replace(rel, baseSwap);
+  bdd c = bdd_replace(rel, con->baseSwap);
 #ifdef BINREL_STATS
   BinRel::numTranspose++;
 #endif
-  return new BinRel(c, isTensored);
+  return new BinRel(con, c, isTensored);
 }
 
 binrel_t BinRel::Kronecker(binrel_t that) const
 {
 #ifndef BINREL_HASTY
-  if(isTensored || that->isTensored){
-    *waliErr << "[WARNING] " << "Attempted to tensor two tensored weights."
+  if(isTensored || that->isTensored || con != that->con){
+    *waliErr << "[WARNING] " << "Attempted to tensor two tensored weights OR attempted to tensor uncompatible relations."
       << endl << "Not supported" << endl;
     that->print(print(*waliErr) << endl) << endl;
-    return new BinRel(bddfalse, true);
+    assert(false);
+    return new BinRel(con, bddfalse, true);
   }
 #endif
-  bdd rel1 = bdd_replace(rel, move2Tensor1);
-  bdd rel2 = bdd_replace(that->rel, move2Tensor2);
+  bdd rel1 = bdd_replace(rel, con->move2Tensor1);
+  bdd rel2 = bdd_replace(that->rel, con->move2Tensor2);
   bdd c = rel1 & rel2;
 #ifdef BINREL_STATS
   BinRel::numKronecker++;
 #endif
-  return new BinRel(c,true);
+  return new BinRel(con, c,true);
 }
 
 binrel_t BinRel::Eq23Project() const
 {
 #ifndef BINREL_HASTY
   if(!isTensored){
-    *waliErr << "[WARNING] " << "Attempted to detensor two tensored weights."
+    *waliErr << "[WARNING] " << "Attempted to detensor untensored weight."
       << endl;
     print(*waliErr) << endl;
-    return new BinRel(bddfalse, false);
+    assert(false);
+    return new BinRel(con,bddfalse, false);
   }
 #endif
-  bdd rel1 = rel & commonVocId23; 
-  bdd rel2 = bdd_exist(rel1, commonVocSet23);
-  bdd c = bdd_replace(rel2, move2Base);
+  bdd rel1 = rel & con->commonBddContextId23; 
+  bdd rel2 = bdd_exist(rel1, con->commonBddContextSet23);
+  bdd c = bdd_replace(rel2, con->move2Base);
 #ifdef BINREL_STATS
   BinRel::numEq23Project++;
 #endif
-  return new BinRel(c,false);
+  return new BinRel(con,c,false);
 }
 
 binrel_t BinRel::Eq13Project() const
 {
 #ifndef BINREL_HASTY
   if(!isTensored){
-    *waliErr << "[WARNING] " << "Attempted to detensor two tensored weights."
+    *waliErr << "[WARNING] " << "Attempted to detensor untensored weight."
       << endl;
     print(*waliErr) << endl;
-    return new BinRel(bddfalse, false);
+    assert(false);
+    return new BinRel(con,bddfalse, false);
   }
 #endif
-  bdd rel1 = rel & commonVocId13; 
-  bdd rel2 = bdd_exist(rel1, commonVocSet13);
-  bdd c = bdd_replace(rel2, move2BaseTwisted);
+  bdd rel1 = rel & con->commonBddContextId13; 
+  bdd rel2 = bdd_exist(rel1, con->commonBddContextSet13);
+  bdd c = bdd_replace(rel2, con->move2BaseTwisted);
 #ifdef BINREL_STATS
   BinRel::numEq13Project++;
 #endif
-  return new BinRel(c,false);
+  return new BinRel(con,c,false);
 }
 
 
 
 // ////////////////////////////
 // SemElem Interface functions
-
-// Helper function that converts a SemElem
-// into a BinRel*
-static BinRel* convert(wali::SemElem* se) 
-{
-  BinRel* br = dynamic_cast<BinRel*>(se);
-  if (br == NULL) {
-    *waliErr << "[ERROR] Cannot cast to class wali::binrel::BinRel.\n";
-    se->print( *waliErr << "    " ) << endl;
-    assert(false);
-  }
-  // When done with developement
-  // BinRel* br = static_cast<BinRel*>(se)
-  return br;
-}
 
 wali::sem_elem_t BinRel::combine(wali::SemElem* se) 
 {
@@ -559,35 +654,21 @@ bool BinRel::equal(wali::SemElem* se) const
   return Equal(that);
 }
 
-void BinRel::setId()
-{
-  baseId = bddtrue;
-  tensorId = bddtrue;
-  for(
-      VocIter varIter = voc.begin();
-      varIter != voc.end();
-      ++varIter
-     ){
-    BddInfo_t varInfo = (*varIter).second;
-    baseId = baseId &
-      fdd_equals(varInfo->baseLhs, varInfo->baseRhs);
-    tensorId = tensorId &
-      (fdd_equals(varInfo->tensor1Lhs, varInfo->tensor1Rhs) &
-       fdd_equals(varInfo->tensor2Lhs, varInfo->tensor2Rhs));
-  }
-}
 
 wali::sem_elem_t BinRel::one() const
 {
   if (!isTensored)
-    return new BinRel(baseId,false);
+    return con->cachedBaseOne;
   else
-    return new BinRel(tensorId,true);
+    return con->cachedTensorOne;
 }
 
 wali::sem_elem_t BinRel::zero() const
 {
-  return new BinRel(bddfalse,isTensored);
+  if(!isTensored)
+    return con->cachedBaseZero;
+  else
+    return con->cachedTensorZero;
 }
 
 std::ostream& BinRel::print( std::ostream& o ) const 
@@ -639,16 +720,28 @@ std::ostream& BinRel::printStats( std::ostream& o) const
 namespace wali {
   namespace domains {
     namespace binrel {
+      
+      typedef std::vector<std::pair<std::string, bddinfo_t> > VectorVocabulary;
+      
+      std::vector<Assignment>
+      getAllAssignments(VectorVocabulary const & voc);
+      
+      std::vector<Assignment>
+      getAllAssignments(BddContext const & voc)
+      {
+        VectorVocabulary voc_vec(voc.begin(), voc.end());
+        return getAllAssignments(voc_vec);
+      }
 
       std::vector<Assignment>
-      getAllAssignments(Voc const & voc)
+      getAllAssignments(VectorVocabulary const & voc)
       {
         // Make a copy so we can index by number instead of by name. (A
         // vector is just a map from int to something.)
-        std::vector<std::pair<std::string, BddInfo_t> > voc_vector(voc.begin(), voc.end());
-        BddInfo_t bddinfo = new BddInfo();
+        std::vector<std::pair<std::string, bddinfo_t> > voc_vector(voc.begin(), voc.end());
+        bddinfo_t bddinfo = new BddInfo();
         bddinfo->maxVal = 17;
-        voc_vector.push_back(Voc::value_type("__dummy__", bddinfo));
+        voc_vector.push_back(VectorVocabulary::value_type("__dummy__", bddinfo));
         
         std::vector<Assignment> result;
 
@@ -656,7 +749,7 @@ namespace wali {
         // may change depending on coordinate and we add one more to the end
         // as sort of an elephant. When we overflow into
         // assignment_vec[voc.size()], then we're done.
-        std::vector<int> assignment_vec(voc.size()+1, 0);
+        std::vector<unsigned int> assignment_vec(voc.size()+1, 0);
           
         while(assignment_vec.at(voc.size()) == 0) {
           // Create the current assignment
@@ -703,14 +796,14 @@ namespace wali {
 
       enum VocabularyId { PRE_VOCABULARY, POST_VOCABULARY };
 
-      bdd toBdd(Assignment const & assignment, Voc const & voc, VocabularyId vid)
+      bdd toBdd(Assignment const & assignment, BddContext const & voc, VocabularyId vid)
       {
         bdd result = bddtrue;
         for (Assignment::const_iterator pair = assignment.begin();
              pair != assignment.end(); ++pair)
           
         {
-          BddInfo_t varinfo = safe_get(voc, pair->first);
+          bddinfo_t varinfo = safe_get(voc, pair->first);
           int val = pair->second;
 
           bdd b;
@@ -726,10 +819,11 @@ namespace wali {
         return result;
       }
 
+
       namespace details {
         bool is_feasible(Assignment const & pre_assgn,
                          Assignment const & post_assgn,
-                         Voc const & voc,
+                         BddContext const & voc,
                          bdd b)
         {
           bdd pre_bdd = toBdd(pre_assgn, voc, PRE_VOCABULARY);
@@ -832,20 +926,21 @@ namespace wali {
              << "\'" << toStringNums(assgn) << "\'\"    \\\n";
         }
 
-        std::vector<std::pair<Voc, bdd> >
-        partition(Voc const & vars, bdd b);
+      
+        std::vector<std::pair<VectorVocabulary, bdd> >
+        partition(BddContext const & vars, bdd b);
+
       }
-
-
+      
       void
-      printImagemagickInstructions(bdd b, Voc const & voc, std::ostream & os, std::string const & for_file)
+      printImagemagickInstructions(bdd b, BddContext const & voc, std::ostream & os, std::string const & for_file)
       {
-        std::vector<std::pair<Voc, bdd> > independent_components = details::partition(voc, b);
+        std::vector<std::pair<VectorVocabulary, bdd> > independent_components = details::partition(voc, b);
         std::vector<std::vector<Assignment> > possible_assignments_by_component;
 
         int total_height = 0;
         for (size_t comp_no=0; comp_no<independent_components.size(); ++comp_no) {
-          Voc const & comp_voc = independent_components.at(comp_no).first;
+          VectorVocabulary const & comp_voc = independent_components.at(comp_no).first;
           std::vector<Assignment> possibleAssignments = getAllAssignments(comp_voc);
           possible_assignments_by_component.push_back(possibleAssignments);
           
@@ -866,7 +961,7 @@ namespace wali {
         int current_base_y = 0;
         
         for (size_t comp_no=0; comp_no<independent_components.size(); ++comp_no) {
-          Voc const & comp_voc = independent_components.at(comp_no).first;
+          VectorVocabulary const & comp_voc = independent_components.at(comp_no).first;
           if(boost::starts_with(comp_voc.begin()->first, "DUMMY")) {
             assert(comp_voc.size() == 1);
             continue;
@@ -912,11 +1007,10 @@ namespace wali {
         
         ///////////////
         
-
-        bdd to_bdd_varset(Voc const & vars)
+        bdd to_bdd_varset(VectorVocabulary const & vars)
         {
           bdd result = bddtrue;
-          for(Voc::const_iterator var = vars.begin(); var != vars.end(); ++var) {
+          for(VectorVocabulary::const_iterator var = vars.begin(); var != vars.end(); ++var) {
             int fdd_no_left = var->second->baseLhs;
             int fdd_no_right = var->second->baseRhs;
 
@@ -925,8 +1019,10 @@ namespace wali {
           return result;
         }
 
-        bool are_independent(Voc const & vars_a, bdd & ra,
-                             Voc const & vars_b, bdd & rb,
+
+
+        bool are_independent(VectorVocabulary const & vars_a, bdd & ra,
+                             VectorVocabulary const & vars_b, bdd & rb,
                              bdd b)
         {
           ra = bdd_exist(b, to_bdd_varset(vars_b));
@@ -937,15 +1033,15 @@ namespace wali {
 
 
         bool
-        first_less_than(std::pair<std::string, BddInfo_t> const & left,
-                        std::pair<std::string, BddInfo_t> const & right)
+        first_less_than(std::pair<std::string, bddinfo_t> const & left,
+                        std::pair<std::string, bddinfo_t> const & right)
         {
           return left.first < right.first;
         }
 
 #define PRINT 0
-        void partition(std::vector<std::pair<Voc, bdd> > & cur_partition,
-                       Voc const & vars,
+        void partition(std::vector<std::pair<VectorVocabulary, bdd> > & cur_partition,
+                       VectorVocabulary const & vars,
                        bdd b,
                        int starting_size)
         {
@@ -954,30 +1050,28 @@ namespace wali {
 #endif
           
           assert(vars.size() > 0);
-          std::vector<std::pair<std::string, BddInfo_t> > voc_vec(vars.begin(), vars.end());
+          std::vector<std::pair<std::string, bddinfo_t> > voc_vec(vars.begin(), vars.end());
           
           for(size_t i=starting_size; i<vars.size(); ++i) {
             // for each combination C of size I from Vars.
-            std::vector<std::pair<std::string, BddInfo_t> > combination(voc_vec.begin(), voc_vec.begin()+i);
+            std::vector<std::pair<std::string, bddinfo_t> > combination(voc_vec.begin(), voc_vec.begin()+i);
             do
             {            
-              Voc voc_minus_combination;
+              VectorVocabulary voc_minus_combination;
 
               std::set_difference(voc_vec.begin(), voc_vec.end(), combination.begin(), combination.end(),
                                   std::inserter(voc_minus_combination, voc_minus_combination.begin()),
                                   first_less_than);
 
-              Voc combination_voc(combination.begin(), combination.end());
-
 #if PRINT
               std::cout << "    Testing partition:\n";
                std::cout << "        [ ";
-               for(Voc::const_iterator vi=combination_voc.begin(); vi!=combination_voc.end(); ++vi) {
+               for(VectorVocabulary::const_iterator vi=combination.begin(); vi!=combination.end(); ++vi) {
                  std::cout << vi->first << ", ";
                }
                std::cout << "]\n";
                std::cout << "        [ ";
-               for(Voc::const_iterator vi=voc_minus_combination.begin(); vi!=voc_minus_combination.end(); ++vi) {
+               for(VectorVocabulary::const_iterator vi=voc_minus_combination.begin(); vi!=voc_minus_combination.end(); ++vi) {
                  std::cout << vi->first << ", ";
                }
                std::cout << "]\n";
@@ -985,12 +1079,12 @@ namespace wali {
 
               
               bdd ra, rb;
-              if (are_independent(combination_voc, ra, voc_minus_combination, rb, b))
+              if (are_independent(combination, ra, voc_minus_combination, rb, b))
               {
 #if PRINT
                 std::cout << "        are independent!\n";
 #endif
-                cur_partition.push_back(std::make_pair(combination_voc, ra));
+                cur_partition.push_back(std::make_pair(combination, ra));
                 partition(cur_partition, voc_minus_combination, rb, i);
                 return;
               }
@@ -1008,11 +1102,12 @@ namespace wali {
           }
         }
         
-        std::vector<std::pair<Voc, bdd> >
-        partition(Voc const & vars, bdd b)
+        std::vector<std::pair<VectorVocabulary, bdd> >
+        partition(BddContext const & vars, bdd b)
         {
-          std::vector<std::pair<Voc, bdd> > result;
-          partition(result, vars, b, 1);
+          VectorVocabulary vars_vec(vars.begin(), vars.end());
+          std::vector<std::pair<VectorVocabulary, bdd> > result;
+          partition(result, vars_vec, b, 1);
           //result.push_back(std::make_pair(vars, b));
           return result;
         }
