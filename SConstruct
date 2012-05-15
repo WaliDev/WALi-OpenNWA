@@ -42,12 +42,15 @@ vars.Add(PathVariable('CXX', 'Path to compiler', BaseEnv['CXX'], PathVariable.Pa
 vars.Add(BoolVariable('strong_warnings', 'Enable (on by default) to get strong warning flags', True))
 vars.Add(BoolVariable('optimize', 'Turn on optimization', True))
 vars.Add(EnumVariable('checking', "Level of checking. 'slow' gives full checking, e.g. checked iterators. 'fast' gives only quick checks. 'none' removes all assertions. NOTE: On Windows, this also controls whether the library builds with /MTd (under 'slow') or /MT (under 'fast' and 'none').", None, allowed_values=('slow', 'fast', 'none')))
+vars.Add(BoolVariable('profile', 'Compile so that grpof can profile the exectuables', False))
 
 tempEnviron = Environment(tools=[], variables=vars)
 arch = tempEnviron['arch']
 BaseEnv['CXX'] = tempEnviron['CXX']
 strong_warnings = tempEnviron['strong_warnings']
 optimize = tempEnviron['optimize']
+profile = tempEnviron['profile']
+
 if 'checking' not in tempEnviron:
    if optimize:
       CheckedLevel = 'fast'
@@ -111,7 +114,7 @@ if 'gcc' == BaseEnv['compiler']:
     # -Waddress -Wlogical-op
 
     # -Wcast-qual 
-    BaseEnv.Append(CCFLAGS='-g3 -ggdb -Wall')
+    BaseEnv.Append(CCFLAGS='-Wall')
     if optimize:
        BaseEnv.Append(CCFLAGS=' -O2')
     if CheckedLevel == 'slow':
@@ -121,6 +124,10 @@ if 'gcc' == BaseEnv['compiler']:
         BaseEnv.Append(WARNING_FLAGS='-Werror -Wformat=2 -Winit-self -Wunused -Wfloat-equal -Wundef -Wpointer-arith -Wcast-align -Wwrite-strings -Wconversion -Woverloaded-virtual')
     else:
         BaseEnv.Append(WARNING_FLAGS='')
+    if profile:
+        BaseEnv.Append(CCFLAGS='-pg')
+        BaseEnv.Append(CXXFLAGS='-pg')
+        BaseEnv.Append(LINKFLAGS='-pg')
 
     if platform_bits == 64 and not Is64:
         # If we're on a 64-bit platform but want to compile for 32.
