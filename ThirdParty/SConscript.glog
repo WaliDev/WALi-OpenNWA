@@ -1,11 +1,13 @@
 from os.path import join
 import urllib
 ######################
-# @author: Prathmesh Prabhu
+# @author: Prathmesh Prabhu, Evan Driscoll
 
 import sys
 import os
 import shutil
+import platform
+import subprocess
 
 glog = 'glog-0.3.2'
 lib_name = 'glog'
@@ -13,33 +15,63 @@ Import('Debug')
 Import('LibInstallDir')
 Import('IncludeDir')
 Import('BaseEnv')
+Import('Is64')
 
 env = BaseEnv.Clone()
 
 if Debug:
-	print '\n+++ Entered "#/ThirdParty/SConscript.glog"\n'
+    print '\n+++ Entered "#/ThirdParty/SConscript.glog"\n'
 
 
 compileCom = []
 installCom = []
 headerCom = []
 
+
+def is_file_built_correctly(filename):
+    if not File(filename).exists():
+        return False
+    if platform.system() == 'Windows':
+        # Oh well. Sucks to be you. Hopefully it's right.
+        return True
+    filetype = subprocess.Popen(["file", "--dereference", filename], stdout=subprocess.PIPE).stdout.read()
+    if '32-bit' in filetype:
+        return not Is64
+    if '64-bit' in filetype:
+        return Is64
+    print
+    print "*** Huh? I ran '", file, filename, "' and it said"
+    print "***", filetype.strip()
+    print "*** which does not contain 32-bit or 64-bit"
+    print
+    assert False
+
+addl_32_bit_flags = ''
+if not Is64:
+    addl_32_bit_flags = 'CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32'
+
+
 #setup commands for build according as what files already exist
 #Trying to give a coarse grained incremental build.
-if not File(os.path.join(glog,'.libs','libglog.so')).exists():
+
+# This builds glog
+if not is_file_built_correctly(os.path.join(glog,'.libs','libglog.so')):
   wget = "curl -O"
   targz = glog + '.tar.gz'
   compileCom = ['%s http://google-glog.googlecode.com/files/%s' % (wget,targz),
     'tar zxvf %s' %targz,
-    #'autoreconf -if',
-    'cd %s; ./configure --prefix=%s --libdir=%s' %(glog,join(os.getcwd(),glog),LibInstallDir),
+    'cd %s; ./configure --prefix=%s --libdir=%s %s' %(glog,join(os.getcwd(),glog), LibInstallDir, addl_32_bit_flags),
     'cd %s; make;' %(glog)]
-if not File(os.path.join(LibInstallDir,'libglog.so')).exists():
-  installCom = ['cd %s; make install;' %(glog)]
+
+# This installs glog to the normal LibInstallDir
+if not is_file_built_correctly(os.path.join(LibInstallDir,'libglog.so')):
+    installCom = ['cd %s; make install;' %(glog)]
+
+# This copies glog header files to ThirdParty/include/glog
 includeDir = join(IncludeDir,'glog')
 if not Dir(includeDir).exists(): 
-  fromInc = join(os.getcwd(), glog, 'include')
-  headerCom = ['rm -rf %s; mkdir -p %s; cp -r %s/* %s;' %(includeDir,includeDir,fromInc,IncludeDir)]
+    fromInc = join(os.getcwd(), glog, 'include')
+    headerCom = ['rm -rf %s; mkdir -p %s; cp -r %s/* %s;' %(includeDir,includeDir,fromInc,IncludeDir)]
 
 
 #The acual commands to run during the build
