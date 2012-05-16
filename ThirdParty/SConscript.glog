@@ -56,12 +56,10 @@ if not Is64:
 
 # This builds glog
 if not is_file_built_correctly(os.path.join(glog,'.libs','libglog.so')):
-  wget = "curl -O"
   targz = glog + '.tar.gz'
-  compileCom = ['%s http://google-glog.googlecode.com/files/%s' % (wget,targz),
-    'tar zxvf %s' %targz,
-    'cd %s; ./configure --prefix=%s --libdir=%s %s' %(glog,join(os.getcwd(),glog), LibInstallDir, addl_32_bit_flags),
-    'cd %s; make;' %(glog)]
+  compileCom = ['tar zxvf %s' %targz,
+                'cd %s; ./configure --prefix=%s --libdir=%s %s' %(glog,join(os.getcwd(),glog), LibInstallDir, addl_32_bit_flags),
+                'cd %s; make;' %(glog)]
 
 # This installs glog to the normal LibInstallDir
 if not is_file_built_correctly(os.path.join(LibInstallDir,'libglog.so')):
