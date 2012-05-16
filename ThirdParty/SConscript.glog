@@ -56,20 +56,25 @@ if not Is64:
 
 # This builds glog
 if not is_file_built_correctly(os.path.join(glog,'.libs','libglog.so')):
-  targz = glog + '.tar.gz'
-  compileCom = ['tar zxvf %s' %targz,
-                'cd %s; ./configure --prefix=%s --libdir=%s %s' %(glog,join(os.getcwd(),glog), LibInstallDir, addl_32_bit_flags),
-                'cd %s; make;' %(glog)]
+    assert ' ' not in os.getcwd()
+    targz = glog + '.tar.gz'
+    compileCom = ['tar zxvf %s' %targz,
+                  'cd %s && ./configure --prefix=%s --libdir=%s %s' %(glog,join(os.getcwd(),glog), LibInstallDir, addl_32_bit_flags),
+                  'cd %s && make;' %(glog)]
 
 # This installs glog to the normal LibInstallDir
 if not is_file_built_correctly(os.path.join(LibInstallDir,'libglog.so')):
+    assert ' ' not in glog
     installCom = ['cd %s; make install;' %(glog)]
 
 # This copies glog header files to ThirdParty/include/glog
 includeDir = join(IncludeDir,'glog')
-if not Dir(includeDir).exists(): 
+if not Dir(includeDir).exists():
     fromInc = join(os.getcwd(), glog, 'include')
-    headerCom = ['rm -rf %s; mkdir -p %s; cp -r %s/* %s;' %(includeDir,includeDir,fromInc,IncludeDir)]
+    assert ' ' not in includeDir
+    assert ' ' not in fromInc
+    assert ' ' not in IncludeDir
+    headerCom = ['rm -rf %s && mkdir -p %s && cp -r %s/* %s;' %(includeDir,includeDir,fromInc,IncludeDir)]
 
 
 #The acual commands to run during the build
