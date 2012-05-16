@@ -68,13 +68,13 @@ if not is_file_built_correctly(os.path.join(LibInstallDir,'libglog.so')):
     installCom = ['cd %s; make install;' %(glog)]
 
 # This copies glog header files to ThirdParty/include/glog
-includeDir = join(ThirdPartyIncludeDir,'glog')
-if not Dir(includeDir).exists():
+destIncDir = join(ThirdPartyIncludeDir, 'glog')
+if not Dir(destIncDir).exists():
     fromInc = join(os.getcwd(), glog, 'include')
-    assert ' ' not in includeDir
+    assert ' ' not in destIncDir
     assert ' ' not in fromInc
-    assert ' ' not in IncludeDir
-    headerCom = ['rm -rf %s && mkdir -p %s && cp -r %s/* %s;' %(includeDir,includeDir,fromInc,ThirdPartyIncludeDir)]
+    assert ' ' not in ThirdPartyIncludeDir
+    headerCom = ['mkdir -p %s && cp -r %s/* %s;' % (destIncDir, fromInc, ThirdPartyIncludeDir)]
 
 #The acual commands to run during the build
 command = compileCom + installCom + headerCom
