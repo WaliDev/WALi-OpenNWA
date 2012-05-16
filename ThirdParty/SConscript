@@ -16,14 +16,14 @@ env = BaseEnv.Clone()
 if Debug:
 	print '\n+++ Entered "#/ThirdParty/SConscript"\n'
 
-IncludeDir = os.path.join(os.getcwd(),'include')
+ThirdPartyIncludeDir = os.path.join(os.getcwd(),'include')
 
 built = []
 if 'all' in ListOfBuilds:
-  built+= SConscript('SConscript.glog', ['IncludeDir'])
+  built+= SConscript('SConscript.glog', ['ThirdPartyIncludeDir'])
 else:
   if 'glog' in ListOfBuilds:
-    built+= SConscript('SConscript.glog', ['IncludeDir'])
+    built+= SConscript('SConscript.glog', ['ThirdPartyIncludeDir'])
 
 Return('built')
  

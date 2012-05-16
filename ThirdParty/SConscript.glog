@@ -10,10 +10,10 @@ import platform
 import subprocess
 
 glog = 'glog-0.3.2'
-lib_name = 'glog'
+
 Import('Debug')
 Import('LibInstallDir')
-Import('IncludeDir')
+Import('ThirdPartyIncludeDir')
 Import('BaseEnv')
 Import('Is64')
 
@@ -68,20 +68,17 @@ if not is_file_built_correctly(os.path.join(LibInstallDir,'libglog.so')):
     installCom = ['cd %s; make install;' %(glog)]
 
 # This copies glog header files to ThirdParty/include/glog
-includeDir = join(IncludeDir,'glog')
+includeDir = join(ThirdPartyIncludeDir,'glog')
 if not Dir(includeDir).exists():
     fromInc = join(os.getcwd(), glog, 'include')
     assert ' ' not in includeDir
     assert ' ' not in fromInc
     assert ' ' not in IncludeDir
-    headerCom = ['rm -rf %s && mkdir -p %s && cp -r %s/* %s;' %(includeDir,includeDir,fromInc,IncludeDir)]
-
+    headerCom = ['rm -rf %s && mkdir -p %s && cp -r %s/* %s;' %(includeDir,includeDir,fromInc,ThirdPartyIncludeDir)]
 
 #The acual commands to run during the build
 command = compileCom + installCom + headerCom
-#lib = env.Command(lib_name, [], command)
-lib = 'glog'
-#I really don't know why the Command isn't working.
 env.Execute(command)  
-built = [(lib, IncludeDir)]
+
+built = [('glog', ThirdPartyIncludeDir)]
 Return('built')
