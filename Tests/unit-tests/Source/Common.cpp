@@ -5,7 +5,7 @@
 #include <fstream>
 
 namespace{
-  std::string regrDir = "regression_baseline";
+  std::string regrDir = "Tests/harness/unit-tests/regression_baseline";
 
   //declarations
   static void writeOutput(
