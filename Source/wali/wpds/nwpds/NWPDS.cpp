@@ -244,6 +244,10 @@ void NWPDS::poststarSetupPds()
     add_rule(p,t,p_prime,y_prime,y_prime_prime,er->weight(),er->merge_fn());
     //<p,y> -> <p',t'y''>
     add_rule(p,y,p_prime,t_prime,y_prime_prime,er->weight(),er->merge_fn());
+
+    //poststar will generate mid states for (p',t').
+    //We need to remember these to be able to clean the final WFA.
+    genStates.push_back(std::pair<wali::Key, wali::Key> (p_prime,t_prime));
   }
   if(dbg){
     WpdsRules wr;
@@ -301,8 +305,10 @@ NWPDS::worklist_t NWPDS::updateFa(wfa::WFA& f)
 void NWPDS::prestar(wfa::WFA const & input, wfa::WFA & output)
 {
   int newtonSteps = 0;
+  genStates.clear();
+  savedRules.clear();
+
   prestarSetupPds();
-  
   EWPDS::addEtrans = true;
   EWPDS::prestarSetupFixpoint(input, output);
   EWPDS::addEtrans = false;
@@ -326,9 +332,11 @@ void NWPDS::prestar(wfa::WFA const & input, wfa::WFA & output)
 void NWPDS::poststar(wfa::WFA const & input, wfa::WFA & output)
 {
   int newtonSteps = 0;
+  genStates.clear();
+  savedRules.clear();
+
   poststarSetupPds();
-  
-  EWPDS::poststarSetupFixpoint(input,output);
+  poststarSetupFixpoint(input,output);
 
   NWPDS::worklist_t wl;
   do{
@@ -353,10 +361,28 @@ void NWPDS::cleanUpFa(wfa::WFA& output)
       ++iter)
     old2NewMap[iter->second] = iter->first;
 
-  RemoveOldTrans rot(old2NewMap);
+  //DEBUGGING
+  //*waliErr << "oldStates: ";
+  //for(std::set<wali::Key>::iterator it = oldStates.begin();
+  //    it != oldStates.end();
+  //    ++it)
+  //  *waliErr << wali::key2str(*it) << " ";
+  //*waliErr << std::endl;
+  //DEBUGGING
+
+  RemoveOldTrans rot(old2NewMap,oldStates);
   output.for_each(rot);
 }
 
+void NWPDS::poststarSetupFixpoint(WFA const & input, WFA& fa)
+{
+  EWPDS::poststarSetupFixpoint(input,fa);
+  for(GenStates::const_iterator it = genStates.begin();
+      it != genStates.end();
+      ++it){
+    oldStates.insert(gen_state((*it).first,(*it).second));
+  }
+}
 /////////////////////////////////////////////////////////////////
 // class UpdateFaFunctor
 /////////////////////////////////////////////////////////////////
@@ -485,29 +511,22 @@ void Delta2Rules::operator() (rule_t & r)
 /////////////////////////////////////////////////////////////////
 // class RemoveOldTrans
 /////////////////////////////////////////////////////////////////
-RemoveOldTrans::RemoveOldTrans(NWPDS::Key2KeyMap& m) : oldMap(m) {}
+RemoveOldTrans::RemoveOldTrans(const NWPDS::Key2KeyMap& m, const std::set<wali::Key>& g) : oldMap(m), oldStates(g){}
 
 void RemoveOldTrans::operator() (wali::wfa::ITrans* t)
 {
-  wali::KeyPairSource *fromSrc=NULL, *toSrc=NULL;
   //is stack phony?
   if(oldMap.find(t->stack()) != oldMap.end())
     if(t->weight() != NULL)
       t->setWeight(t->weight()->zero());
   //is from phony?
-  fromSrc = dynamic_cast<wali::KeyPairSource*>(wali::getKeySource(t->from()).get_ptr());
-  if(fromSrc != NULL)
-    *waliErr << wali::key2str(fromSrc->second()) << std::endl;
-    if(oldMap.find(fromSrc->second()) != oldMap.end()){
-      if(t->weight() != NULL)
-        t->setWeight(t->weight()->zero());
-    }
+  if(oldStates.find(t->from()) != oldStates.end())
+    if(t->weight() != NULL)
+      t->setWeight(t->weight()->zero());
   //is to phony?
-  toSrc = dynamic_cast<wali::KeyPairSource*>(wali::getKeySource(t->to()).get_ptr());
-  if(toSrc != NULL)
-    if(oldMap.find(toSrc->second()) != oldMap.end())
-      if(t->weight() != NULL)
-        t->setWeight(t->weight()->zero());
+  if(oldStates.find(t->to()) != oldStates.end())
+    if(t->weight() != NULL)
+      t->setWeight(t->weight()->zero());
 }
 
 

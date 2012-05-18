@@ -344,9 +344,9 @@ namespace{
 int main()
 {
   //NEED a CONST VALUE
-  //unsigned seed = time((unsigned)(NULL));
-  unsigned seed = 5;
-  int nabad=10;
+  unsigned seed = (unsigned)time(NULL);
+  //unsigned seed = 5;
+  int nabad=100;
   //unsigned seed = 111;
   program_bdd_context_t bmt = new ProgramBddContext();
   random_pdsgen_t rpt;

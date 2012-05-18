@@ -83,6 +83,9 @@ namespace wali
             return output;
           }
 
+        protected:
+          void poststarSetupFixpoint(wfa::WFA const & intpu, wfa::WFA& fa);
+
         private:
           /**
            * Changes some rules of this PDS to actually solve the linearized prestar problem. 
@@ -112,6 +115,7 @@ namespace wali
            **/
           wali::Key getOldKey(wali::Key newKey);
 
+          
         public:
 
           class UpdateFaFunctor : public wali::wfa::TransFunctor
@@ -132,6 +136,14 @@ namespace wali
         private:
 
           Key2KeyMap var2ConstMap;
+
+          /**
+            * Remember states generated for Newton Steps in the fa
+            * We need to clean these up when returning the fa
+            **/
+          typedef std::vector< std::pair< wali::Key, wali::Key>  > GenStates;
+          GenStates genStates;
+          std::set<wali::Key> oldStates;
 
           /**
            * We modify the pds to linearize the equations to be solved.
@@ -164,10 +176,11 @@ namespace wali
       class RemoveOldTrans : public wali::wfa::TransFunctor
       {
         public:
-          RemoveOldTrans(NWPDS::Key2KeyMap& oldMap);
+          RemoveOldTrans(const NWPDS::Key2KeyMap& oldMap, const std::set<wali::Key >& oldStates);
           virtual void operator() (wali::wfa::ITrans * it);
         private:
-          NWPDS::Key2KeyMap& oldMap;
+          const NWPDS::Key2KeyMap& oldMap;
+          const std::set<wali::Key> oldStates;
       };
     } //namespace nwpds
   } //namespace wpds
