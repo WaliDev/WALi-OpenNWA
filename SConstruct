@@ -114,7 +114,7 @@ if 'gcc' == BaseEnv['compiler']:
     # -Waddress -Wlogical-op
 
     # -Wcast-qual 
-    BaseEnv.Append(CCFLAGS='-Wall')
+    BaseEnv.Append(CCFLAGS='-Wall -ggdb -g3')
     if optimize:
        BaseEnv.Append(CCFLAGS=' -O2')
     if CheckedLevel == 'slow':

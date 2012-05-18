@@ -7,6 +7,7 @@
 
 // ::wali
 #include "wali/Common.hpp"
+#include "wali/Worklist.hpp"
 // ::wali::wpds
 #include "wali/wpds/WPDS.hpp"
 #include "wali/wpds/Wrapper.hpp"
@@ -45,6 +46,10 @@ namespace wali
            * solver (call to poststar/prestar).
            **/
           typedef std::map< wali::Key,wali::Key > Key2KeyMap;
+          /**
+            Short name:
+          **/
+          typedef wali::ref_ptr< wali::Worklist< wali::wfa::ITrans > > worklist_t;
 
         public:
           /**
@@ -91,7 +96,7 @@ namespace wali
            * After each linearized prestar/poststar, checks if the fa has
            * changed, if yes, it updates the stored const values on the FA.
            **/
-          bool updateFa(wali::wfa::WFA& f);
+          worklist_t updateFa(wali::wfa::WFA& f);
           /**
            * Restores PDS to its former ruleset after prestar/poststar
            **/
@@ -112,13 +117,14 @@ namespace wali
           class UpdateFaFunctor : public wali::wfa::TransFunctor
           {
             public:
-              UpdateFaFunctor(wali::wfa::WFA& fa, Key2KeyMap& new2OldMap, bool dbg=false); 
+              UpdateFaFunctor(wali::wfa::WFA& fa, Key2KeyMap& new2OldMap, NWPDS::worklist_t wl, NWPDS& npds, bool dbg=false); 
               virtual void operator()(wali::wfa::ITrans* t);
-              bool updated() { return changed; }
+              worklist_t updated() { return wl; }
             private:
               wali::wfa::WFA& fa;
               const Key2KeyMap& new2OldMap;
-              bool changed;
+              NWPDS::worklist_t wl;
+              NWPDS& npds;
               bool dbg;
           };
 

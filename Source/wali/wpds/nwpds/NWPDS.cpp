@@ -12,11 +12,14 @@
 // ::wali::Wfa
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/Trans.hpp"
+#include "wali/wfa/ITrans.hpp"
 // ::wali
 #include "wali/Key.hpp"
 #include "wali/Common.hpp"
 #include "wali/KeySource.hpp"
 #include "wali/KeyPairSource.hpp"
+#include "wali/Worklist.hpp"
+#include "wali/DefaultWorklist.hpp"
 
 using namespace std;
 using namespace wali;
@@ -287,44 +290,58 @@ void NWPDS::restorePds()
   }
 }
 
-bool NWPDS::updateFa(wfa::WFA& f)
+NWPDS::worklist_t NWPDS::updateFa(wfa::WFA& f)
 {
-  UpdateFaFunctor uff(f, var2ConstMap,dbg);
+  NWPDS::worklist_t wl = new wali::DefaultWorklist<wfa::ITrans>();
+  UpdateFaFunctor uff(f, var2ConstMap,wl,*this,dbg);
   f.for_each(uff);
   return uff.updated();
 }
 
 void NWPDS::prestar(wfa::WFA const & input, wfa::WFA & output)
 {
-  int i = 0;
-  if(&output != &input)
-    output = input;
+  int newtonSteps = 0;
   prestarSetupPds();
-  if(dbg)
-    output.print(*waliErr << "\n\n\n\n" << "Current Fa on iter[" << i << "]\n") << std::endl;
+  
+  EWPDS::addEtrans = true;
+  EWPDS::prestarSetupFixpoint(input, output);
+  EWPDS::addEtrans = false;
+
+  NWPDS::worklist_t wl;
   do{
-    EWPDS::prestar(output,output);
-    if(dbg)
-      output.print(*waliErr << "\n\n\n\n" << "Current Fa on iter[" << ++i << "]\n") << std::endl;
-  }while(updateFa(output));
+    EWPDS::prestarComputeFixpoint(output);
+    wl = updateFa(output);
+    EWPDS::setWorklist(wl);
+    newtonSteps++;
+  }while(!wl->empty());
+  //if(dbg)
+    *waliErr << "Total Newton Steps: " << newtonSteps << std::endl;
+  wl = NULL;
   restorePds();
+  EWPDS::unlinkOutput(output);
+  EWPDS::currentOutputWFA = 0;
   cleanUpFa(output);
 }
 
 void NWPDS::poststar(wfa::WFA const & input, wfa::WFA & output)
 {
-  int i = 0;
-  if(&output != &input)
-    output = input;
+  int newtonSteps = 0;
   poststarSetupPds();
-  if(dbg)
-    output.print(*waliErr << "\n\n\n\n" << "Current Fa on iter[" << i << "]\n") << std::endl;
+  
+  EWPDS::poststarSetupFixpoint(input,output);
+
+  NWPDS::worklist_t wl;
   do{
-    EWPDS::poststar(output,output);
-    if(dbg)
-      output.print(*waliErr << "\n\n\n\n" << "Current Fa on iter[" << ++i << "]\n") << std::endl;
-  }while(updateFa(output));
+    EWPDS::poststarComputeFixpoint(output);
+    wl = updateFa(output);
+    EWPDS::setWorklist(wl);
+    newtonSteps++;
+  }while(!wl->empty());
+  //if(dbg)
+    *waliErr << "Total Newton Steps: " << newtonSteps << std::endl;
   restorePds();
+  EWPDS::unlinkOutput(output);
+  EWPDS::currentOutputWFA = 0;
   cleanUpFa(output);
 }
 
@@ -343,14 +360,14 @@ void NWPDS::cleanUpFa(wfa::WFA& output)
 /////////////////////////////////////////////////////////////////
 // class UpdateFaFunctor
 /////////////////////////////////////////////////////////////////
-NWPDS::UpdateFaFunctor::UpdateFaFunctor(wali::wfa::WFA& f, NWPDS::Key2KeyMap& n2om, bool d) :
+NWPDS::UpdateFaFunctor::UpdateFaFunctor(wali::wfa::WFA& f, NWPDS::Key2KeyMap& n2om, worklist_t w, NWPDS& n, bool d) :
   TransFunctor(),
   fa(f),
   new2OldMap(n2om),
+  wl(w),
+  npds(n),
   dbg(d)
-{
-  changed = false;
-}
+{}
 
 void NWPDS::UpdateFaFunctor::operator () (wali::wfa::ITrans* t)
 {
@@ -421,7 +438,8 @@ void NWPDS::UpdateFaFunctor::operator () (wali::wfa::ITrans* t)
     }
     //We want to track if anything was updated during the
     //functor operation.
-    if(!changed){
+    bool changed = false;
+    {
       wfa::Trans old;
       fa.find(oldFrom, oldStack, oldTo, old);
       wali::sem_elem_t newwt = t->weight();
@@ -434,9 +452,17 @@ void NWPDS::UpdateFaFunctor::operator () (wali::wfa::ITrans* t)
         changed = !(newwt->equal(oldwt));
     }
     //Now actually do the update, changing the from/stack/to as needed.
-    wali::wfa::ITrans * oldt = NULL;
-    oldt = t->copy(oldFrom,oldStack,oldTo);
-    fa.addTrans(oldt);
+    if(changed){
+      wali::wfa::ITrans * oldt = NULL;
+      oldt = t->copy(oldFrom,oldStack,oldTo);
+      //I'm not sure of this.
+      fa.addTrans(oldt);
+      if(fromSrc == NULL){
+        oldt->setConfig(npds.make_config(oldt->from(),oldt->stack()));
+        //Trans with generated from state do not go onto the worklist
+        wl->put(oldt);
+      }
+    }
   }
 }
 
@@ -463,9 +489,25 @@ RemoveOldTrans::RemoveOldTrans(NWPDS::Key2KeyMap& m) : oldMap(m) {}
 
 void RemoveOldTrans::operator() (wali::wfa::ITrans* t)
 {
+  wali::KeyPairSource *fromSrc=NULL, *toSrc=NULL;
+  //is stack phony?
   if(oldMap.find(t->stack()) != oldMap.end())
     if(t->weight() != NULL)
       t->setWeight(t->weight()->zero());
+  //is from phony?
+  fromSrc = dynamic_cast<wali::KeyPairSource*>(wali::getKeySource(t->from()).get_ptr());
+  if(fromSrc != NULL)
+    *waliErr << wali::key2str(fromSrc->second()) << std::endl;
+    if(oldMap.find(fromSrc->second()) != oldMap.end()){
+      if(t->weight() != NULL)
+        t->setWeight(t->weight()->zero());
+    }
+  //is to phony?
+  toSrc = dynamic_cast<wali::KeyPairSource*>(wali::getKeySource(t->to()).get_ptr());
+  if(toSrc != NULL)
+    if(oldMap.find(toSrc->second()) != oldMap.end())
+      if(t->weight() != NULL)
+        t->setWeight(t->weight()->zero());
 }
 
 

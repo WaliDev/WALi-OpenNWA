@@ -65,23 +65,35 @@ namespace{
     public:
       class TransKey {
         public:
+        /*
         wali::Key from;
         wali::Key stack;
         wali::Key to;
+        */
+        std::string from;
+        std::string stack;
+        std::string to;
         TransKey(wali::Key f,wali::Key s,wali::Key t) :
-          from(f),
-          stack(s),
-          to(t)
+          from(wali::key2str(f)),
+          stack(wali::key2str(s)),
+          to(wali::key2str(t))
         {}
         bool operator < (const TransKey& other) const
         {
-          return from < other.from || from == other.from && (
-                  stack < other.stack || stack == other.stack && (
-                    to < other.to));
+          return from < other.from || 
+            (from == other.from && ( stack < other.stack || 
+            (stack == other.stack && to < other.to)));
+         
+         /*
+          return wali::key2str(from) < wali::key2str(other.from) || 
+            (wali::key2str(from) == wali::key2str(other.from) && ( wali::key2str(stack) < wali::key2str(other.stack) || 
+            (wali::key2str(stack) == wali::key2str(other.stack) && wali::key2str(to) < wali::key2str(other.to))));
+         */
         }
         ostream& print(ostream& out) const
         {
-          out << "[" << wali::key2str(from) << " -- " << wali::key2str(stack) << " -> " << wali::key2str(to) << "]" << std::endl;
+          //out << "[" << wali::key2str(from) << " -- " << wali::key2str(stack) << " -> " << wali::key2str(to) << "]" << std::endl;
+          out << "[" << from << " -- " << stack << " -> " << to << "]" << std::endl;
           return out;
         }
       };
@@ -208,11 +220,11 @@ namespace{
         {}
           bool operator < (const RuleKey& other) const
           {
-            return from_state < other.from_state || from_state == other.from_state && (
-                from_stack < other.from_stack || from_stack == other.from_stack && (
-                  to_state < other.to_state || to_state == other.to_state && (
-                    to_stack1 < other.to_stack1 || to_stack1 == other.to_stack1 && (
-                      to_stack2 < other.to_stack2))));
+            return from_state < other.from_state || (from_state == other.from_state && (
+                from_stack < other.from_stack || (from_stack == other.from_stack && (
+                  to_state < other.to_state || (to_state == other.to_state && (
+                    to_stack1 < other.to_stack1 || (to_stack1 == other.to_stack1 && (
+                      to_stack2 < other.to_stack2))))))));
           }
           ostream& print(ostream& out) const
           {
@@ -332,7 +344,9 @@ namespace{
 int main()
 {
   //NEED a CONST VALUE
-  unsigned seed = time(NULL);
+  //unsigned seed = time((unsigned)(NULL));
+  unsigned seed = 5;
+  int nabad=10;
   //unsigned seed = 111;
   program_bdd_context_t bmt = new ProgramBddContext();
   random_pdsgen_t rpt;
@@ -343,73 +357,23 @@ int main()
   bmt->addIntVar("q",3);
   mwg = new MyWtGen(bmt);
   //pds.print(cout);
-  WFACompare fac("NEWTON","KLEENE");
-  PDSCompare pac("NEWTON","KLEENE");
-  {
-    NWPDS npds(false);
-    RandomPdsGen::Names names;
-    {
-      wali::util::Timer * t1 = new wali::util::Timer("Generating Random PDS");
-      // rpt = new RandomPdsGen(mwg,2,6,10,6,0,0.45,0.45,seed);
-      rpt = new RandomPdsGen(mwg,400,6000,10000,2000,0,0.45,0.45,seed);
-      rpt->get(npds,names);
-      delete t1;
-    }
-    npds.for_each(pac);
-    pac.advance_mode();
-    WFA fa;
-    wali::Key acc = wali::getKeySpace()->getKey("accept");
-    for(RandomPdsGen::Names::KeyVector::iterator iter =  names.exits.begin();
-        iter != names.exits.end();
-        ++iter
-       )
-      fa.addTrans(names.pdsState,*iter,acc,(*mwg)());
-    fa.setInitialState(names.pdsState);
-    fa.addFinalState(acc);
-    {
-      fstream newton_pds("newton_pds.dot", fstream::out);
-      RuleDotty rd(newton_pds);
-      newton_pds << "digraph{" << endl;
-      npds.for_each(rd);
-      newton_pds << "}" << endl;
-    }
-    {
-      fstream innfa("newton_in_fa.dot", fstream::out);
-      TransDotty td(innfa,false);
-      innfa << "digraph{" << endl;
-      fa.for_each(td);
-      innfa << "}" << endl;
-    }
-    WFA outfa;
-    {
-      wali::util::Timer * t2 = new wali::util::Timer("NWPDS prestar",cout);
-      cout << "[NWPDS prestar]\n";
-      npds.poststar(fa,outfa);
-      delete t2;
-    }
-    outfa.for_each(fac);
-    {
-      fstream outfaf("newton_out_fa.dot", fstream::out);
-      TransDotty td(outfaf,false);
-      outfaf << "digraph{" << endl;
-      outfa.for_each(td);
-      outfaf << "}" << endl;
-    }
-    fac.advance_mode();
-  }
+  WFACompare fac("KLEENE", "NEWTON");
+  PDSCompare pac("KLEENE", "NEWTON");
+
   {
     EWPDS fpds;
     RandomPdsGen::Names names;
-    //rpt = new RandomPdsGen(mwg,2,6,10,6,0,0.45,0.45,seed);
-    rpt = new RandomPdsGen(mwg,400,6000,10000,2000,0,0.45,0.45,seed);
-
-    rpt->get(fpds,names);
+    rpt = new RandomPdsGen(mwg,nabad,15*nabad,25*nabad,4*nabad,0,0.45,0.45,seed);
+    {
+      fstream pds_out("pds_gen",fstream::out);
+      rpt->get(fpds,names,&pds_out);
+    }
     fpds.for_each(pac);
     pac.advance_mode();
     WFA fa;
     wali::Key acc = wali::getKeySpace()->getKey("accept");
-    for(RandomPdsGen::Names::KeyVector::iterator iter =  names.exits.begin();
-        iter != names.exits.end();
+    for(RandomPdsGen::Names::KeyVector::iterator iter =  names.entries.begin();
+        iter != names.entries.end();
         ++iter
        )
       fa.addTrans(names.pdsState,*iter,acc,(*mwg)());
@@ -431,14 +395,69 @@ int main()
     }
     WFA outfa;
     {
-      wali::util::Timer * t3 = new wali::util::Timer("EWPDS prestar",cout);
-      cout << "[EWPDS prestar]\n";
+      wali::util::Timer * t3 = new wali::util::Timer("EWPDS poststar",cout);
+      cout << "[EWPDS poststar]\n";
       fpds.poststar(fa,outfa);
       delete t3;
     }
     outfa.for_each(fac);
     {
       fstream outfaf("kleene_out_fa.dot", fstream::out);
+      TransDotty td(outfaf,false);
+      outfaf << "digraph{" << endl;
+      outfa.for_each(td);
+      outfaf << "}" << endl;
+    }
+    fac.advance_mode();
+  }
+
+
+
+  wali::set_verify_fwpds(false);
+  {
+    NWPDS npds(false);
+    RandomPdsGen::Names names;
+    {
+      wali::util::Timer * t1 = new wali::util::Timer("Generating Random PDS");
+      rpt = new RandomPdsGen(mwg,nabad,15*nabad,25*nabad,4*nabad,0,0.45,0.45,seed);
+      rpt->get(npds,names);
+      delete t1;
+    }
+    npds.for_each(pac);
+    pac.advance_mode();
+    WFA fa;
+    wali::Key acc = wali::getKeySpace()->getKey("accept");
+    for(RandomPdsGen::Names::KeyVector::iterator iter =  names.entries.begin();
+        iter != names.entries.end();
+        ++iter
+       )
+      fa.addTrans(names.pdsState,*iter,acc,(*mwg)());
+    fa.setInitialState(names.pdsState);
+    fa.addFinalState(acc);
+    {
+      fstream newton_pds("newton_pds.dot", fstream::out);
+      RuleDotty rd(newton_pds);
+      newton_pds << "digraph{" << endl;
+      npds.for_each(rd);
+      newton_pds << "}" << endl;
+    }
+    {
+      fstream innfa("newton_in_fa.dot", fstream::out);
+      TransDotty td(innfa,false);
+      innfa << "digraph{" << endl;
+      fa.for_each(td);
+      innfa << "}" << endl;
+    }
+    WFA outfa;
+    {
+      wali::util::Timer * t2 = new wali::util::Timer("NWPDS poststar",cout);
+      cout << "[NWPDS poststar]\n";
+      npds.poststar(fa,outfa);
+      delete t2;
+    }
+    outfa.for_each(fac);
+    {
+      fstream outfaf("newton_out_fa.dot", fstream::out);
       TransDotty td(outfaf,false);
       outfaf << "digraph{" << endl;
       outfa.for_each(td);

@@ -30,6 +30,7 @@ env.AppendUnique(LIBS=[glog_lib, 'bdd', 'libwalidomains'])
 #gtest and glog are ill begaved w.r.t. to these flags.
 env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
 env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Werror', '')
+env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wsign-compare', '')
 
 test_files = Split("""
     Source/test.cpp

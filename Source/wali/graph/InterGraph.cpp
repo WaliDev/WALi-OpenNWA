@@ -717,9 +717,6 @@ namespace wali {
           //uses consecutive numbering.
           //Time Complexity: O(#TgtNodes^2) or O(#call_edges)
 
-          // There is no clean way of passing this to a function if this is
-          // na array, hence pionter
-          // int dependents[nTgt][nTgt];
           Int2D dependents;
           for(int i=0; i<nTgt; ++i){
             Int1D nv;
@@ -830,7 +827,7 @@ namespace wali {
 
 
           //First update the ETransHandler object that stores weights on call edges.
-          //This guy is used during path summary. We must tensore the weights there correctly.
+          //This guy is used during path summary. We must tensor the weights there correctly.
           eHandler.tensorWeights(running_prestar);
 
           // Now create the IntraGraphs
@@ -910,10 +907,11 @@ namespace wali {
 
 
           //Now Saturate Netwon's iterations.
+          unsigned newtonSatSteps = 0;
           while(!wl.empty()) {
             bool changed = false;
             WorkList::iterator wit = wl.begin();
-
+            newtonSatSteps++;
             if(dbg)
               o << "Saturation: popped:" << tgt2Node[wit->second] << ",SCC=" << wit->first << endl;
 
@@ -1004,6 +1002,7 @@ namespace wali {
               o << endl;
             }
           }
+          *waliErr << "NewtonSatSteps: " << newtonSatSteps << std::endl;
           //Now I will set some class data members and globals that the
           //rest of the graph implementation seems to rely upon
           intra_graph_uf = new UnionFind(cfgUf);

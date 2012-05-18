@@ -18,12 +18,49 @@
 using namespace wali::wpds;
 using namespace std;
 
-string RandomPdsGen::getName(unsigned curKey)
+string RandomPdsGen::getNode(unsigned curKey)
 {
   stringstream ss;
   ss << "Node__" << curKey;
   return ss.str();
 }
+string RandomPdsGen::getPds(unsigned curKey)
+{
+  stringstream ss;
+  ss << "Pds__" << curKey;
+  return ss.str();
+}
+string RandomPdsGen::getCall(unsigned curKey)
+{
+  stringstream ss;
+  ss << "Call__" << curKey;
+  return ss.str();
+}
+string RandomPdsGen::getRet(unsigned curKey)
+{
+  stringstream ss;
+  ss << "Ret__" << curKey;
+  return ss.str();
+}
+string RandomPdsGen::getEntry(unsigned curKey)
+{
+  stringstream ss;
+  ss << "Entry__" << curKey;
+  return ss.str();
+}
+string RandomPdsGen::getExit(unsigned curKey)
+{
+  stringstream ss;
+  ss << "Exit__" << curKey;
+  return ss.str();
+}
+string RandomPdsGen::getSplit(unsigned curKey)
+{
+  stringstream ss;
+  ss << "Split__" << curKey;
+  return ss.str();
+}
+
 
 RandomPdsGen::RandomPdsGen(wtgen_t r, int np, int nc, int nn, int ns, int ne, double pc, double ps, unsigned s) :
   Countable(),
@@ -54,18 +91,18 @@ void RandomPdsGen::get(WPDS& pds, Names& names, std::ostream * o)
   if(seed != 0)
     srand(seed);
   else
-    srand(time(NULL));
+    srand((unsigned) time(NULL));
 
   wali::clearKeyspace();
   unsigned curKey=1;
 
-  pdsState = wali::getKeySpace()->getKey(getName(curKey++));
+  pdsState = wali::getKeySpace()->getKey(getPds(curKey++));
   //Generate Keys for all procedure entries and exits.  
   entries.clear();
   exits.clear();
   for(int i=0;i<numprocs; ++i){
-    entries.push_back(wali::getKeySpace()->getKey(getName(curKey++)));
-    exits.push_back(wali::getKeySpace()->getKey(getName(curKey++)));
+    entries.push_back(wali::getKeySpace()->getKey(getEntry(curKey++)));
+    exits.push_back(wali::getKeySpace()->getKey(getExit(curKey++)));
   }
 
 
@@ -211,7 +248,6 @@ wali::Key RandomPdsGen::genblock(
     choice = rand() % 100;
     if(choice < pCall){
       if(remCalls < 1) continue;
-      nexthead = wali::getKeySpace()->getKey(getName(curKey++));
       fn = rand() % numprocs;
       if(o){
         for(int j=0;j<tabspace;++j)
@@ -219,6 +255,16 @@ wali::Key RandomPdsGen::genblock(
         *o << wali::key2str(curhead) << "[CALL TO PROC(" << fn << ")[" << wali::key2str(entries[fn]) 
           <<"] stk:" << wali::key2str(nexthead) << "\n";
       }
+      nexthead = wali::getKeySpace()->getKey(getCall(curKey++));
+      pds.add_rule(
+          pdsState,
+          curhead,
+          pdsState,
+          nexthead,
+          (*randomWt)()
+          );
+      curhead = nexthead;
+      nexthead = wali::getKeySpace()->getKey(getRet(curKey++));
       pds.add_rule(
           pdsState,
           curhead,
@@ -274,7 +320,16 @@ wali::Key RandomPdsGen::genblock(
           *o<< " ";
         *o << wali::key2str(curhead) << "[BRANCH 1]" << "\n";
       }
-      nexthead = wali::getKeySpace()->getKey(getName(curKey++));
+      nexthead = wali::getKeySpace()->getKey(getSplit(curKey++));
+      pds.add_rule(
+          pdsState,
+          curhead,
+          pdsState,
+          nexthead,
+          (*randomWt)()
+          );
+      curhead = nexthead;
+      nexthead = wali::getKeySpace()->getKey(getNode(curKey++));
       pds.add_rule(
           pdsState,
           curhead,
@@ -294,7 +349,7 @@ wali::Key RandomPdsGen::genblock(
           *o<< " ";
         *o << wali::key2str(curhead) << "[BRANCH 2]" << "\n";
       }
-      nexthead = wali::getKeySpace()->getKey(getName(curKey++));
+      nexthead = wali::getKeySpace()->getKey(getNode(curKey++));
       pds.add_rule(
           pdsState,
           curhead,
@@ -309,7 +364,7 @@ wali::Key RandomPdsGen::genblock(
         *o << wali::key2str(endhead2)<< "\n";
       }
 
-      endhead =  wali::getKeySpace()->getKey(getName(curKey++));
+      endhead =  wali::getKeySpace()->getKey(getNode(curKey++));
       pds.add_rule(
           pdsState,
           endhead1,
@@ -326,7 +381,7 @@ wali::Key RandomPdsGen::genblock(
           );
       curhead = endhead;
     }else{
-      nexthead = wali::getKeySpace()->getKey(getName(curKey++));
+      nexthead = wali::getKeySpace()->getKey(getNode(curKey++));
       if(o){
         for(int j=0;j<tabspace;++j)
           *o<< " ";

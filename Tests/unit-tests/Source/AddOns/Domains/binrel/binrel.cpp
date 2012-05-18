@@ -393,7 +393,7 @@ namespace{
     brm->addIntVar( "c", 4);
     brm->addBoolVar( "d");
 
-    srand(time(NULL));
+    srand(static_cast<unsigned>(time(NULL)));
     //for debugging
     //srand(1);
 
