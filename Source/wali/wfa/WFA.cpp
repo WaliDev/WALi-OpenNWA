@@ -1936,7 +1936,7 @@ namespace wali
           return true;
         }
         ++count;
-      } while(next_permutation(right_states.begin(), right_states.end()));
+      } while(std::next_permutation(right_states.begin(), right_states.end()));
 
       assert(count == fact(getStates().size()));
       
