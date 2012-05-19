@@ -49,7 +49,8 @@ namespace wali
           /**
             Short name:
           **/
-          typedef wali::ref_ptr< wali::Worklist< wali::wfa::ITrans > > worklist_t;
+          //typedef wali::ref_ptr< wali::Worklist< wali::wfa::ITrans > > worklist_t;
+          typedef std::vector < wali::wfa::ITrans* > worklist_t;
 
         public:
           /**
@@ -84,66 +85,68 @@ namespace wali
           }
 
         protected:
-          void poststarSetupFixpoint(wfa::WFA const & intpu, wfa::WFA& fa);
+          virtual void poststarSetupFixpoint(wfa::WFA const & input, wfa::WFA& fa);
+          virtual void update(
+              Key from,
+              Key stack,
+              Key to,
+              sem_elem_t se,
+              Config * cfg);
+          virtual wfa::ITrans* update_prime(
+              Key from,
+              wfa::ITrans* call,
+              rule_t r, 
+              sem_elem_t delta, 
+              sem_elem_t wWithRule );
 
-        private:
-          /**
-           * Changes some rules of this PDS to actually solve the linearized prestar problem. 
-           **/
-          void prestarSetupPds();
-          /**
-           * Changes some rules of this PDS to actually solve the linearized poststar problem. 
-           **/
-          void poststarSetupPds();
-          /**
-           * After each linearized prestar/poststar, checks if the fa has
-           * changed, if yes, it updates the stored const values on the FA.
-           **/
-          worklist_t updateFa(wali::wfa::WFA& f);
-          /**
-           * Restores PDS to its former ruleset after prestar/poststar
-           **/
-          void restorePds();
-          /**
-           * Sets the weights on transitions in outfa that correspond to constants in the fix point calculation
-           * to zero
-           **/
-          void cleanUpFa(wali::wfa::WFA& fa);
+            /**
+             * Changes some rules of this PDS to actually solve the linearized prestar problem. 
+             **/
+            void prestarSetupPds();
+            /**
+             * Changes some rules of this PDS to actually solve the linearized poststar problem. 
+             **/
+            void poststarSetupPds();
+            /**
+             * After each linearized prestar/poststar, checks if the fa has
+             * changed, if yes, it updates the stored const values on the FA.
+             **/
+            void updateFa(wali::wfa::WFA& f);
+            /**
+             * Restores PDS to its former ruleset after prestar/poststar
+             **/
+            void restorePds();
+            /**
+             * Sets the weights on transitions in outfa that correspond to constants in the fix point calculation
+             * to zero
+             **/
+            void cleanUpFa(wali::wfa::WFA& fa);
 
-          /**
-           * Creates a map from new to old key if needed, and returns the old key for the new key.
-           **/
-          wali::Key getOldKey(wali::Key newKey);
-
-          
-        public:
-
-          class UpdateFaFunctor : public wali::wfa::TransFunctor
-          {
-            public:
-              UpdateFaFunctor(wali::wfa::WFA& fa, Key2KeyMap& new2OldMap, NWPDS::worklist_t wl, NWPDS& npds, bool dbg=false); 
-              virtual void operator()(wali::wfa::ITrans* t);
-              worklist_t updated() { return wl; }
-            private:
-              wali::wfa::WFA& fa;
-              const Key2KeyMap& new2OldMap;
-              NWPDS::worklist_t wl;
-              NWPDS& npds;
-              bool dbg;
-          };
+            /**
+             * Creates a map from new to old key if needed, and returns the old key for the new key.
+             **/
+            wali::Key getOldKey(wali::Key newKey);
 
 
         private:
 
-          Key2KeyMap var2ConstMap;
+          Key2KeyMap stack2ConstMap;
+          Key2KeyMap state2ConstMap;
+          Key2KeyMap state2StackMap;
 
           /**
-            * Remember states generated for Newton Steps in the fa
-            * We need to clean these up when returning the fa
-            **/
-          typedef std::vector< std::pair< wali::Key, wali::Key>  > GenStates;
+           * Remember states generated for Newton Steps in the fa
+           * We need to clean these up when returning the fa
+           **/
+          typedef std::vector< std::pair< wali::Key, std::pair<wali::Key, wali::Key> >  > GenStates;
           GenStates genStates;
-          std::set<wali::Key> oldStates;
+
+          /**
+           * This worklist is used to remember what transitions were modified in one
+           * Newton Step. Only those are checked for changed values to be copied over
+           * to the Newton constant transitions.
+           **/
+          worklist_t newtonWl;
 
           /**
            * We modify the pds to linearize the equations to be solved.
@@ -176,11 +179,20 @@ namespace wali
       class RemoveOldTrans : public wali::wfa::TransFunctor
       {
         public:
-          RemoveOldTrans(const NWPDS::Key2KeyMap& oldMap, const std::set<wali::Key >& oldStates);
+          RemoveOldTrans(const NWPDS::Key2KeyMap& oldStackMap, const NWPDS::Key2KeyMap& oldStateMap);
           virtual void operator() (wali::wfa::ITrans * it);
         private:
-          const NWPDS::Key2KeyMap& oldMap;
-          const std::set<wali::Key> oldStates;
+          const NWPDS::Key2KeyMap& oldStackMap;
+          const NWPDS::Key2KeyMap& oldStateMap;
+      };
+
+      class CreateInitialNewtonWl : public wali::wfa::TransFunctor
+      {
+        public:
+          CreateInitialNewtonWl(NWPDS::worklist_t& wl);
+          virtual void operator () (wali::wfa::ITrans * it);
+        private:
+          NWPDS::worklist_t& wl;
       };
     } //namespace nwpds
   } //namespace wpds

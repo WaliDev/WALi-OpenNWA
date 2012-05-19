@@ -341,20 +341,55 @@ namespace{
 
 }
 
-int main()
+int main(int argc, char ** argv)
 {
   //NEED a CONST VALUE
-  unsigned seed = (unsigned)time(NULL);
-  //unsigned seed = 5;
-  int nabad=100;
+  unsigned seed = 0;
+  unsigned numVars = 0;
+  int pdsSizeFactor=0;
+  if(argc >=2){
+    stringstream s;
+    s << argv[2];
+    s >> numVars;
+  }
+  if(argc >= 3){
+    stringstream s;
+    s << argv[1];
+    s >> pdsSizeFactor;
+  }
+  if(argc >= 4){
+    stringstream s;
+    s << argv[1];
+    s >> seed;
+  }
+
+  if(seed <= 0) 
+    seed = (unsigned)time(NULL);
+  if(pdsSizeFactor <= 0)
+    pdsSizeFactor = (unsigned)time(NULL) % 300;
+  if(numVars <= 0)
+    numVars = (unsigned)time(NULL) % 9;
+
+  cout << "numVars: " << numVars << " bools & " << numVars << " ints" << std::endl;
+  cout << "pdsSizeFactor: " << pdsSizeFactor << std::endl;
+  cout << "seed: " << seed << std::endl;
+
   //unsigned seed = 111;
   program_bdd_context_t bmt = new ProgramBddContext();
   random_pdsgen_t rpt;
   mywtgen_t mwg;
-  bmt->addBoolVar("a");
-  bmt->addBoolVar("b");
-  bmt->addIntVar("p",3);
-  bmt->addIntVar("q",3);
+  for(unsigned i =0 ; i < numVars; ++i){
+    {
+      stringstream s;
+      s << "bool_" << i;
+      bmt->addBoolVar(s.str());
+    }
+    {
+      stringstream s;
+      s << "int_" << i;
+      bmt->addIntVar(s.str(),4);
+    }
+  }
   mwg = new MyWtGen(bmt);
   //pds.print(cout);
   WFACompare fac("KLEENE", "NEWTON");
@@ -363,7 +398,7 @@ int main()
   {
     EWPDS fpds;
     RandomPdsGen::Names names;
-    rpt = new RandomPdsGen(mwg,nabad,15*nabad,25*nabad,4*nabad,0,0.45,0.45,seed);
+    rpt = new RandomPdsGen(mwg,pdsSizeFactor,15*pdsSizeFactor,25*pdsSizeFactor,4*pdsSizeFactor,0,0.45,0.45,seed);
     {
       fstream pds_out("pds_gen",fstream::out);
       rpt->get(fpds,names,&pds_out);
@@ -419,7 +454,7 @@ int main()
     RandomPdsGen::Names names;
     {
       wali::util::Timer * t1 = new wali::util::Timer("Generating Random PDS");
-      rpt = new RandomPdsGen(mwg,nabad,15*nabad,25*nabad,4*nabad,0,0.45,0.45,seed);
+      rpt = new RandomPdsGen(mwg,pdsSizeFactor,15*pdsSizeFactor,25*pdsSizeFactor,4*pdsSizeFactor,0,0.45,0.45,seed);
       rpt->get(npds,names);
       delete t1;
     }

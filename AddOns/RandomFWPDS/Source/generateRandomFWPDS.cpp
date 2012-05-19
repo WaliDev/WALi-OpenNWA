@@ -249,13 +249,12 @@ wali::Key RandomPdsGen::genblock(
     if(choice < pCall){
       if(remCalls < 1) continue;
       fn = rand() % numprocs;
+      nexthead = wali::getKeySpace()->getKey(getCall(curKey++));
       if(o){
         for(int j=0;j<tabspace;++j)
           *o<< " ";
-        *o << wali::key2str(curhead) << "[CALL TO PROC(" << fn << ")[" << wali::key2str(entries[fn]) 
-          <<"] stk:" << wali::key2str(nexthead) << "\n";
+        *o << wali::key2str(curhead) << "\n";
       }
-      nexthead = wali::getKeySpace()->getKey(getCall(curKey++));
       pds.add_rule(
           pdsState,
           curhead,
@@ -265,6 +264,12 @@ wali::Key RandomPdsGen::genblock(
           );
       curhead = nexthead;
       nexthead = wali::getKeySpace()->getKey(getRet(curKey++));
+      if(o){
+        for(int j=0;j<tabspace;++j)
+          *o<< " ";
+        *o << wali::key2str(curhead) << "[CALL TO PROC(" << fn << ")[" << wali::key2str(entries[fn]) 
+          <<"] stk:" << wali::key2str(nexthead) << "\n";
+      }
       pds.add_rule(
           pdsState,
           curhead,
@@ -315,12 +320,12 @@ wali::Key RandomPdsGen::genblock(
       }
       remSplits -= splits2;
 
+      nexthead = wali::getKeySpace()->getKey(getSplit(curKey++));
       if(o){
         for(int j=0;j<tabspace;++j)
           *o<< " ";
-        *o << wali::key2str(curhead) << "[BRANCH 1]" << "\n";
+        *o << wali::key2str(curhead) << "\n";
       }
-      nexthead = wali::getKeySpace()->getKey(getSplit(curKey++));
       pds.add_rule(
           pdsState,
           curhead,
@@ -330,6 +335,11 @@ wali::Key RandomPdsGen::genblock(
           );
       curhead = nexthead;
       nexthead = wali::getKeySpace()->getKey(getNode(curKey++));
+      if(o){
+        for(int j=0;j<tabspace;++j)
+          *o<< " ";
+        *o << wali::key2str(curhead) << "[BRANCH 1]" << "\n";
+      }
       pds.add_rule(
           pdsState,
           curhead,
