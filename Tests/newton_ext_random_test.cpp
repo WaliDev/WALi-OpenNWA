@@ -366,9 +366,9 @@ int main(int argc, char ** argv)
   if(seed <= 0) 
     seed = (unsigned)time(NULL);
   if(pdsSizeFactor <= 0)
-    pdsSizeFactor = (unsigned)time(NULL) % 300;
+    pdsSizeFactor = (unsigned)time(NULL) % 400 + 200;
   if(numVars <= 0)
-    numVars = (unsigned)time(NULL) % 9;
+    numVars = (unsigned)time(NULL) % 4 + 5;
 
   cout << "numVars: " << numVars << " bools & " << numVars << " ints" << std::endl;
   cout << "pdsSizeFactor: " << pdsSizeFactor << std::endl;
