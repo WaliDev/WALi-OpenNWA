@@ -349,17 +349,17 @@ int main(int argc, char ** argv)
   int pdsSizeFactor=0;
   if(argc >=2){
     stringstream s;
-    s << argv[2];
+    s << argv[1];
     s >> numVars;
   }
   if(argc >= 3){
     stringstream s;
-    s << argv[1];
+    s << argv[2];
     s >> pdsSizeFactor;
   }
   if(argc >= 4){
     stringstream s;
-    s << argv[1];
+    s << argv[3];
     s >> seed;
   }
 
