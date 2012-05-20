@@ -165,6 +165,7 @@ namespace wali {
 
                 UnionFind *intra_graph_uf;
                 std::list<IntraGraph *> gr_list;
+                IntraGraph * newtonGr;
 
                 ETransHandler eHandler;
                 //map<int,IntraGraph*> intra_graph_map;
@@ -189,6 +190,7 @@ namespace wali {
                     running_nwpds = n;
                     running_prestar = pre;
                     max_scc_computed = 0;
+                    newtonGr = NULL;
                     count = 0;
                 }
                 ~InterGraph();
@@ -203,6 +205,7 @@ namespace wali {
                 void setESource(Transition t, wali::sem_elem_t wtAtCall, wali::sem_elem_t wtAfterCall);
 
                 void setupInterSolution(std::list<Transition> *wt_required = NULL);
+                void setupNewtonSolution2(std::list<Transition> *wt_required = NULL);
                 void setupNewtonSolution();
 
                 sem_elem_t get_weight(Transition t);
@@ -266,6 +269,7 @@ namespace wali {
                 unsigned SCC(std::list<IntraGraph *> &grlist, std::list<IntraGraph *> &grsorted);
 
                 void saturate(std::multiset<tup> &worklist, unsigned scc_n);
+                void saturateNewton(std::multiset<tup> &worklist, unsigned scc_n);
 
                 void setup_worklist(std::list<IntraGraph *> &gr_sorted, 
                         std::list<IntraGraph *>::iterator &gr_it, 

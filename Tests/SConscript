@@ -37,7 +37,7 @@ BinRelEnv.AppendUnique(CPPPATH = [
   os.path.join(WaliDir,'ThirdParty','include'),
   os.path.join(WaliDir,'AddOns','RandomFWPDS','Source')])
 randPdsGen = os.path.join(WaliDir,'AddOns','RandomFWPDS','Source','generateRandomFWPDS.cpp')
-for t in ['newton_ext_random_test']:
+for t in ['newton_ext_random_test', 'newton_fwpds_test']:
   exe = BinRelEnv.Program('%s' % t, ['%s.cpp' % t, randPdsGen], LIBS=['libwalidomains','bdd','wali','glog'])
   built += BinRelEnv.Install('#/Tests/harness',exe)
 

@@ -826,11 +826,11 @@ namespace wali {
         //for( int i=0; i < nnodes; i++) {
         //    nodes[i].regexp->print(std::cout<< i << ")   ") << std::endl;
         //}
-      }
-
       //cout << "graph = (" << nnodes << "," << nedges << ")\n";
       //cout << "size = " << path_sequence.size() << "\n";
       //cout << "\n";
+      }
+
 
       STAT(stats.ndom_sequence = path_sequence.size());
       return;
@@ -918,6 +918,10 @@ namespace wali {
 
       for(i=0;i<(int)seq.size();i++) {
         PathSequence &ps = seq[i];
+        {//DEBUGGING
+          //cout << "PATH SEQUENCE(" << ps.src << "-->" << ps.tgt << ")\n";
+          //ps.regexp->print(cout) << endl;
+        }//DEBUGGING
         if(ps.src == ps.tgt) {
           nodes[ps.src].regexp = RegExp::extend(nodes[ps.src].regexp, ps.regexp);
         } else {

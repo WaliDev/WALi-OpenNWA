@@ -207,7 +207,7 @@ void FWPDS::prestar( wfa::WFA const & input, wfa::WFA& output )
 
   // Compute summaries
   if(newton)
-    interGr->setupNewtonSolution();
+    interGr->setupNewtonSolution2();
   else
     interGr->setupInterSolution();
 
@@ -404,7 +404,7 @@ void FWPDS::poststarIGR( wfa::WFA const & input, wfa::WFA& output )
     util::Timer timer(msg);
     // Compute summaries
     if(newton){
-      interGr->setupNewtonSolution();
+      interGr->setupNewtonSolution2();
     }
     else
       interGr->setupInterSolution();
@@ -452,10 +452,9 @@ void FWPDS::poststar_handle_eps_trans(wfa::ITrans* teps, wfa::ITrans* tprime, se
     erule_t r = etrans->getERule();
 
     interGr->addEdge(Transition(*tprime),
-        Transition(*teps),
+       Transition(*teps),
         Transition(teps->from(),tprime->stack(),tprime->to()),
         etrans->getMergeFn());
-
   } else {
     interGr->addEdge(Transition(*tprime),
         Transition(*teps),
