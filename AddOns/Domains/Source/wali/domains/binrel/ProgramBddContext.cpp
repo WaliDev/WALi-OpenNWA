@@ -463,19 +463,17 @@ bdd ProgramBddContext::bddNot() const
 
 bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size) const
 {
-  // If the following assertion fails, then you have a variable whose domain
-  // size isn't a power of two. That's not supported for now because I'm lazy.
-  assert(in1Size == (unsigned)fdd_domainsize(regAInfo->baseRhs));
-  (void)in2Size;
-  
-  bdd plus_bdd = details::make_adder(regAInfo->baseRhs, regBInfo->baseRhs, regAInfo->baseExtra);
-  plus_bdd = plus_bdd & fdd_ithvar(sizeInfo, in1Size);
-
-  
-#if BINREL_DO_EXTREMELY_SLOW_SANITY_CHECKS
   if(in1Size != in2Size)
     LOG(ERROR) << "[ProgramBddContext::bddPlus] Addition of number of different bit widths is not allowed.\n";
   int outSize = in1Size;
+
+#if BINREL_BUILD_FAST_ADDER  
+  assert(in1Size == (unsigned)fdd_domainsize(regAInfo->baseRhs));
+  bdd plus_bdd = details::make_adder(regAInfo->baseRhs, regBInfo->baseRhs, regAInfo->baseExtra);
+  plus_bdd = plus_bdd & fdd_ithvar(sizeInfo, outSize);
+#endif
+  
+#if BINREL_BUILD_SLOW_ADDER
   bdd ret = bddfalse;
   for(unsigned i=0; i<in1Size; ++i){
     for(unsigned j=0; j<in2Size; ++j){
@@ -487,11 +485,19 @@ bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size) const
     }
   }
   ret = ret & fdd_ithvar(sizeInfo, outSize);
+#endif
 
+#if BINREL_BUILD_FAST_ADDER && BINREL_BUILD_SLOW_ADDER
   assert(plus_bdd == ret);  
 #endif
 
-  return plus_bdd;  
+#if BINREL_BUILD_FAST_ADDER
+  return plus_bdd;
+#elif BINREL_BUILD_SLOW_ADDER
+  return ret;
+#else
+  #error "Must define one of BINREL_BUILD_FAST_ADDER or BINREL_BUILD_SLOW_ADDER"
+#endif
 }
 
 #ifdef BINREL_I_WANT_MINUS_TIMES_AND_DIV_EVEN_THOUGH_THEY_CAN_BE_EXPONENTIALLY_SLOW
