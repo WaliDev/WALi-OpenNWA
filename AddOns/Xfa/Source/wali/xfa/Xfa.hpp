@@ -7,7 +7,7 @@
 #include <wali/wfa/TransFunctor.hpp>
 #include <wali/wfa/ITrans.hpp>
 #include <wali/domains/binrel/BinRel.hpp>
-#include <wali/domains/binrel/BinRelManager.hpp>
+#include <wali/domains/binrel/ProgramBddContext.hpp>
 #include <wali/Key.hpp>
 
 #include <opennwa/Nwa.hpp>
@@ -326,9 +326,9 @@ namespace cfglib {
             
 
             
-            wali::domains::binrel::Voc new_voc;
+            wali::domains::binrel::ProgramBddContext new_voc;
 
-            IntroduceStateToRelationWeightGen(wali::domains::binrel::Voc v,
+            IntroduceStateToRelationWeightGen(wali::domains::binrel::ProgramBddContext v,
                                               Xfa const & xfa)
                 : new_voc(v)
             {
@@ -340,16 +340,13 @@ namespace cfglib {
                                           wali::wfa::ITrans const * trans_in_original) const
             {
                 //std::cout << "Lifting weight.\n";
-                
-                using wali::domains::binrel::Voc;
+                using wali::domains::binrel::BddContext;
                 using wali::domains::binrel::BinRel;
-                using wali::domains::binrel::BddInfo_t;
-                using wali::domains::binrel::Assign;
-                using wali::domains::binrel::NonDet;
+                using wali::domains::binrel::bddinfo_t;
 
                 // Zeroth step: havoc the current state
                 BinaryRelation havoc_current_state =
-                    new BinRel(Assign("current_state", NonDet()), false);
+                    new BinRel(&new_voc, new_voc.Assign("current_state", new_voc.NonDet()));
 
                 sem_elem_t orig_rel_then_havoc =
                     trans_in_original->weight()->extend(havoc_current_state);
@@ -360,13 +357,13 @@ namespace cfglib {
 
                 // Now pull out the BDD and vocabulary
                 bdd orig_bdd = orig_rel->getBdd();
-                Voc const & orig_voc = orig_rel->getVoc();
+                BddContext const & orig_voc = orig_rel->getVocabulary();
 
                 // First step: rename variables to new domain
                 std::vector<int> orig_names, new_names;
 
-                for (Voc::const_iterator var=orig_voc.begin(); var!=orig_voc.end(); ++var) {
-                    BddInfo_t
+                for (BddContext::const_iterator var=orig_voc.begin(); var!=orig_voc.end(); ++var) {
+                    bddinfo_t
                         orig_info = var->second,
                         new_info = safe_get(new_voc, var->first);
 
@@ -414,7 +411,7 @@ namespace cfglib {
                 //std::cout << "Created. Returning answer.\n";
 
                 // Third step: combine them together
-                return new BinRel(renamed_bdd & state_change, false);
+                return new BinRel(&new_voc, renamed_bdd & state_change);
             }
         };
         
