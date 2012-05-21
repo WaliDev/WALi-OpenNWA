@@ -181,7 +181,7 @@ namespace wali
           friend binrel_t operator&(binrel_t a, binrel_t b);
         public:
           BinRel(const BinRel& that);
-          BinRel(BddContext * con, bdd b,bool is_tensored=false);
+          BinRel(BddContext const * con, bdd b,bool is_tensored=false);
           virtual ~BinRel();
         public:
           binrel_t Compose( binrel_t that ) const;
@@ -245,7 +245,7 @@ namespace wali
           //This has to be a raw/weak pointer.
           //BddContext caches some BinRel objects. It is not BinRel's responsibility to
           //manage memory for BddContext. 
-          BddContext * con;
+          BddContext const * con;
           bdd rel;
           bool isTensored;
 #ifdef BINREL_STATS
