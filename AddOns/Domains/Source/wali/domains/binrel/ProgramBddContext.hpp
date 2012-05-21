@@ -9,6 +9,8 @@
 
 #include "buddy/fdd.h"
 
+#define BINREL_I_WANT_MINUS_TIMES_AND_DIV_EVEN_THOUGH_THEY_CAN_BE_EXPONENTIALLY_SLOW
+
 namespace wali
 {
   namespace domains
@@ -62,9 +64,11 @@ namespace wali
           bdd Const(unsigned val);
 
           bdd Plus(bdd lexpr, bdd rexpr);
+#ifdef BINREL_I_WANT_MINUS_TIMES_AND_DIV_EVEN_THOUGH_THEY_CAN_BE_EXPONENTIALLY_SLOW
           bdd Minus(bdd lexpr, bdd rexpr);
           bdd Times(bdd lexpr, bdd rexpr);
           bdd Div(bdd lexpr, bdd rexpr);
+#endif
 
           // //////////////Statement Generators/////////////////////////////////////////////
           // Statements can not be composed.

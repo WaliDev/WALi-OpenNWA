@@ -25,6 +25,69 @@ namespace wali
     }
   }
 }
+
+
+namespace details
+{
+  bdd make_adder_box(int in1_varno, int in2_varno, int out_varno,
+                     bdd t0, bdd t1, bdd t2, bool inv)
+  {
+    bdd a = bdd_ithvar(in1_varno);
+    bdd b = bdd_ithvar(in2_varno);
+    bdd c = bdd_ithvar(out_varno);
+
+    if (inv) {
+      // If there's a carry in, then the result is the opposite of what it
+      // "should" be.
+      c = !c;
+
+      // Furthermore, if a+b=1, we carry to the next bit.
+      t1 = t2;
+    }
+
+    // The following is a truth-table for a 1-bit adder, which also conjoins
+    // in the appropriate box from the next level.
+    return ((  a &  b & !c & t2)
+            |( a & !b &  c & t1)
+            |(!a &  b &  c & t1)
+            |(!a & !b & !c & t0));
+  }
+
+  
+  bdd make_adder(int fdd_lhs, int fdd_rhs, int fdd_result)
+  {
+    int num_vars = fdd_varnum(fdd_lhs);
+    assert(num_vars == fdd_varnum(fdd_rhs));
+    assert(num_vars == fdd_varnum(fdd_result));
+
+    int * lhs_vars = fdd_vars(fdd_lhs);
+    int * rhs_vars = fdd_vars(fdd_rhs);
+    int * result_vars = fdd_vars(fdd_result);
+
+    bdd left_box = bddtrue;
+    bdd right_box = bddtrue;
+
+    for (int level=0; level<num_vars; ++level) {
+      // IMPORTANT: level counts from 0=msb to num_vars-1=lsb. However,
+      // *_vars have index 0 as the lsb.
+      int lhs_var = lhs_vars[num_vars-1 - level];
+      int rhs_var = rhs_vars[num_vars-1 - level];
+      int result_var = result_vars[num_vars-1 - level];
+
+      bdd new_left_box = make_adder_box(lhs_var, rhs_var, result_var,
+                                        left_box, left_box, right_box, false);
+      bdd new_right_box = make_adder_box(lhs_var, rhs_var, result_var,
+                                         left_box, right_box, right_box, true);
+
+      left_box = new_left_box;
+      right_box = new_right_box;
+    }
+
+    return left_box;
+  }
+}
+
+
 // ////////////////////////////////////////////////////////////////////////////
 // The interface assumes that the google logging library is initialized before
 // calling any of its functions.
@@ -319,6 +382,7 @@ bdd ProgramBddContext::Plus(bdd lexpr, bdd rexpr)
   return applyBinOp(lexpr, rexpr, bddPlus(in1,in2));
 }
 
+#ifdef BINREL_I_WANT_MINUS_TIMES_AND_DIV_EVEN_THOUGH_THEY_CAN_BE_EXPONENTIALLY_SLOW
 bdd ProgramBddContext::Minus(bdd lexpr, bdd rexpr)
 {
   unsigned in1 = getRegSize(lexpr);
@@ -339,6 +403,7 @@ bdd ProgramBddContext::Div(bdd lexpr, bdd rexpr)
   unsigned in2 = getRegSize(rexpr);
   return applyBinOp(lexpr, rexpr, bddDiv(in1,in2));
 }
+#endif
 
 bdd ProgramBddContext::bddAnd()
 {
@@ -398,6 +463,11 @@ bdd ProgramBddContext::bddNot()
 
 bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size)
 {
+  (void)in1Size;
+  (void)in2Size;
+  bdd plus_bdd = details::make_adder(regAInfo->baseRhs, regBInfo->baseRhs, regAInfo->baseExtra);
+
+#if BINREL_DO_EXTREMELY_SLOW_SANITY_CHECKS
   if(in1Size != in2Size)
     LOG(ERROR) << "[ProgramBddContext::bddPlus] Addition of number of different bit widths is not allowed.\n";
   int outSize = in1Size;
@@ -412,9 +482,14 @@ bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size)
     }
   }
   ret = ret & fdd_ithvar(sizeInfo, outSize);
-  return ret;
+
+  assert(plus_bdd == ret);  
+#endif
+
+  return plus_bdd;  
 }
 
+#ifdef BINREL_I_WANT_MINUS_TIMES_AND_DIV_EVEN_THOUGH_THEY_CAN_BE_EXPONENTIALLY_SLOW
 bdd ProgramBddContext::bddMinus(unsigned in1Size, unsigned in2Size)
 {
   if(in1Size != in2Size)
@@ -476,6 +551,7 @@ bdd ProgramBddContext::bddDiv(unsigned in1Size, unsigned in2Size)
   ret = ret & fdd_ithvar(sizeInfo, outSize);
   return ret;
 }
+#endif
 
 unsigned ProgramBddContext::getRegSize(bdd forThis)
 {
