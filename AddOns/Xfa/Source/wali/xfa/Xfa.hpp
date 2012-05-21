@@ -1,10 +1,13 @@
 #ifndef INCLUDE_CFGLIB_XFA_XFA_HPP
 #define INCLUDE_CFGLIB_XFA_XFA_HPP
 
+#include <boost/bimap.hpp>
+
 #include <wali/wfa/WFA.hpp>
 #include <wali/wfa/TransFunctor.hpp>
 #include <wali/wfa/ITrans.hpp>
 #include <wali/domains/binrel/BinRel.hpp>
+#include <wali/domains/binrel/BinRelManager.hpp>
 #include <wali/Key.hpp>
 
 #include <opennwa/Nwa.hpp>
@@ -28,9 +31,22 @@ namespace cfglib {
             {}
         };
 
+        struct SequentialFromZeroState {
+            int index;
+            
+            explicit SequentialFromZeroState(int i)
+                : index(i)
+            {}
+        };
+        
         inline
         bool operator< (State left, State right) {
             return left.key < right.key;
+        }
+
+        inline
+        bool operator< (SequentialFromZeroState left, SequentialFromZeroState right) {
+            return left.index < right.index;
         }
 
         struct Symbol {
@@ -55,95 +71,6 @@ namespace cfglib {
 
         typedef wali::domains::binrel::binrel_t BinaryRelation;
 
-
-        struct IntroduceStateToRelationWeightGen
-            : wali::wfa::LiftCombineWeightGen
-        {
-            template<typename Mapping>
-            typename Mapping::mapped_type
-            safe_get(Mapping const & m, typename Mapping::key_type const & k) const
-            {
-                typename Mapping::const_iterator it = m.find(k);
-                if (it == m.end()) {
-                    assert(false);
-                }
-                return it->second;
-            }
-
-            
-            wali::domains::binrel::Voc new_voc;
-
-            IntroduceStateToRelationWeightGen(wali::domains::binrel::Voc v)
-                : new_voc(v)
-            {}
-                
-            
-            virtual sem_elem_t liftWeight(wali::wfa::WFA const & original_wfa,
-                                          wali::wfa::ITrans const * trans_in_original) const
-            {
-                //std::cout << "Lifting weight.\n";
-                
-                using wali::domains::binrel::Voc;
-                using wali::domains::binrel::BinRel;
-                using wali::domains::binrel::BddInfo_t;
-                
-                BinaryRelation orig_rel
-                    = dynamic_cast<BinRel*>(trans_in_original->weight().get_ptr());
-
-                bdd orig_bdd = orig_rel->getBdd();
-                Voc const & orig_voc = orig_rel->getVoc();
-
-                // First step: rename variables to new domain
-                std::vector<int> orig_names, new_names;
-
-                for (Voc::const_iterator var=orig_voc.begin(); var!=orig_voc.end(); ++var) {
-                    BddInfo_t
-                        orig_info = var->second,
-                        new_info = safe_get(new_voc, var->first);
-
-                    assert(new_info.get_ptr());
-
-                    //std::cout << "Will rename: " << orig_info->baseLhs << "->" << new_info->baseLhs << "\n";
-                    //std::cout << "Will rename: " << orig_info->baseRhs << "->" << new_info->baseRhs << "\n";
-
-                    orig_names.push_back(orig_info->baseLhs);
-                    orig_names.push_back(orig_info->baseRhs);
-                    new_names.push_back(new_info->baseLhs);
-                    new_names.push_back(new_info->baseRhs);
-
-                }
-
-                bddPair* rename_pairs = bdd_newpair();
-                assert(orig_names.size() == new_names.size());
-                fdd_setpairs(rename_pairs,
-                             &orig_names[0],
-                             &new_names[0],
-                             orig_names.size());
-
-                bdd renamed_bdd = bdd_replace(orig_bdd, rename_pairs);
-
-                bdd_freepair(rename_pairs);
-
-                // Second step: create a BDD that enforces that the state
-                // changes in the right way.
-                wali::Key source = trans_in_original->from();
-                wali::Key dest = trans_in_original->to();
-
-                int source_fdd = safe_get(new_voc, "current_state")->baseLhs;
-                int dest_fdd = safe_get(new_voc, "current_state")->baseRhs;
-
-                //std::cout << "Creating state change BDD, setting\n"
-                //            << "    FDD " << source_fdd << " to " << source << "\n"
-                //          << "    FDD " << dest_fdd << " to " << dest << "\n";
-
-                bdd state_change = fdd_ithvar(source_fdd, source) & fdd_ithvar(dest_fdd, dest);
-
-                //std::cout << "Created. Returning answer.\n";
-
-                // Third step: combine them together
-                return new BinRel(renamed_bdd & state_change, false);
-            }
-        };
         
         
 
@@ -152,7 +79,7 @@ namespace cfglib {
             
             wali::wfa::WFA wfa_;
 
-            std::map<State, BinaryRelation> accepting_weights;
+            std::map<State, BinaryRelation> accepting_weights;            
 
         public:
             /// Returns the old one
@@ -223,6 +150,15 @@ namespace cfglib {
 
             bool isIsomorphicTo(Xfa const & other) {
                 return wfa_.isIsomorphicTo(other.wfa_);
+            }
+
+
+            wali::wfa::WFA removeEpsilons() const {
+                return wfa_.removeEpsilons();
+            }
+
+            void erase(State from, Symbol sym, State to) {
+                wfa_.erase(from.key, sym.key, to.key);
             }
 
 
@@ -344,6 +280,144 @@ namespace cfglib {
 
             return xfa;
         }
+
+
+
+        struct IntroduceStateToRelationWeightGen
+            : wali::wfa::LiftCombineWeightGen
+        {
+            typedef boost::bimap<State, SequentialFromZeroState> SfzMap;
+            SfzMap sequential_state_map;
+
+            void set_up_sequential_state_map(Xfa const & xfa)
+            {
+                assert(sequential_state_map.size()==0);
+                int next_sequential_state = 1;
+                std::set<wali::Key> const & states = xfa.getStateKeys();
+                for(std::set<wali::Key>::const_iterator state = states.begin();
+                    state != states.end(); ++state)
+                {
+                    sequential_state_map.insert(SfzMap::value_type(State(*state),
+                                                                   SequentialFromZeroState(next_sequential_state++)));
+                }
+            }
+
+            template<typename Mapping>
+            typename Mapping::mapped_type
+            safe_get(Mapping const & m, typename Mapping::key_type const & k) const
+            {
+                typename Mapping::const_iterator it = m.find(k);
+                if (it == m.end()) {
+                    assert(false);
+                }
+                return it->second;
+            }
+            
+
+            State from_sfz_state(SequentialFromZeroState sfz_state) const
+            {
+                return sequential_state_map.right.at(sfz_state);
+            }
+            
+            SequentialFromZeroState from_state(State state) const
+            {
+                return sequential_state_map.left.at(state);
+            }
+            
+
+            
+            wali::domains::binrel::Voc new_voc;
+
+            IntroduceStateToRelationWeightGen(wali::domains::binrel::Voc v,
+                                              Xfa const & xfa)
+                : new_voc(v)
+            {
+                set_up_sequential_state_map(xfa);
+            }
+                
+            
+            virtual sem_elem_t liftWeight(wali::wfa::WFA const & original_wfa,
+                                          wali::wfa::ITrans const * trans_in_original) const
+            {
+                //std::cout << "Lifting weight.\n";
+                
+                using wali::domains::binrel::Voc;
+                using wali::domains::binrel::BinRel;
+                using wali::domains::binrel::BddInfo_t;
+                using wali::domains::binrel::Assign;
+                using wali::domains::binrel::NonDet;
+
+                // Zeroth step: havoc the current state
+                BinaryRelation havoc_current_state =
+                    new BinRel(Assign("current_state", NonDet()), false);
+
+                sem_elem_t orig_rel_then_havoc =
+                    trans_in_original->weight()->extend(havoc_current_state);
+
+                // not really the *original* relation, but close enough
+                BinaryRelation orig_rel
+                    = dynamic_cast<BinRel*>(orig_rel_then_havoc.get_ptr());
+
+                // Now pull out the BDD and vocabulary
+                bdd orig_bdd = orig_rel->getBdd();
+                Voc const & orig_voc = orig_rel->getVoc();
+
+                // First step: rename variables to new domain
+                std::vector<int> orig_names, new_names;
+
+                for (Voc::const_iterator var=orig_voc.begin(); var!=orig_voc.end(); ++var) {
+                    BddInfo_t
+                        orig_info = var->second,
+                        new_info = safe_get(new_voc, var->first);
+
+                    assert(new_info.get_ptr());
+
+                    //std::cout << "Will rename: " << orig_info->baseLhs << "->" << new_info->baseLhs << "\n";
+                    //std::cout << "Will rename: " << orig_info->baseRhs << "->" << new_info->baseRhs << "\n";
+
+                    orig_names.push_back(orig_info->baseLhs);
+                    orig_names.push_back(orig_info->baseRhs);
+                    new_names.push_back(new_info->baseLhs);
+                    new_names.push_back(new_info->baseRhs);
+
+                }
+
+                bddPair* rename_pairs = bdd_newpair();
+                assert(orig_names.size() == new_names.size());
+                fdd_setpairs(rename_pairs,
+                             &orig_names[0],
+                             &new_names[0],
+                             orig_names.size());
+
+                bdd renamed_bdd = bdd_replace(orig_bdd, rename_pairs);
+
+                bdd_freepair(rename_pairs);
+
+                // Second step: create a BDD that enforces that the state
+                // changes in the right way.
+                wali::Key source = trans_in_original->from();
+                wali::Key dest = trans_in_original->to();
+
+                int source_fdd = safe_get(new_voc, "current_state")->baseLhs;
+                int dest_fdd = safe_get(new_voc, "current_state")->baseRhs;
+
+                //std::cout << "Creating state change BDD, setting\n"
+                //            << "    FDD " << source_fdd << " to " << source << "\n"
+                //          << "    FDD " << dest_fdd << " to " << dest << "\n";
+
+                SequentialFromZeroState
+                    sfz_source = from_state(State(source)),
+                    sfz_dest = from_state(State(dest));
+
+                bdd state_change = fdd_ithvar(source_fdd, sfz_source.index) & fdd_ithvar(dest_fdd, sfz_dest.index);
+
+                //std::cout << "Created. Returning answer.\n";
+
+                // Third step: combine them together
+                return new BinRel(renamed_bdd & state_change, false);
+            }
+        };
+        
     }
 }
 
