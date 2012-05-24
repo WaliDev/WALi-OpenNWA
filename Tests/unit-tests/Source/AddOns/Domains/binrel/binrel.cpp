@@ -23,6 +23,22 @@ using namespace wali::domains::binrel;
 
 namespace{
 
+  TEST(BinRelSelfTest, copyTest){
+    ProgramBddContext ctx;
+    ctx.addBoolVar("a");
+
+    ProgramBddContext ctx2 = ctx;
+  }
+
+#if 0
+  TEST(BinRelSelfTest, repopulateCacheOnCopy){
+      ProgramBddContext ctx;
+      ctx.addBoolVar("a");
+
+      ProgramBddContext ctx2 = ctx;
+  }
+#endif
+
   TEST(BinRelSelfTest, creationTest){
     program_bdd_context_t brm = new ProgramBddContext();
     brm->addBoolVar("a");
