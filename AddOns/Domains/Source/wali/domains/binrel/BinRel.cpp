@@ -203,6 +203,7 @@ BddContext::BddContext(const BddContext& other) :
   cachedTensorOne(other.cachedTensorOne),
   cachedTensorZero(other.cachedTensorZero)
 {
+  numBddContexts++;
   populateCache();
 }
 
