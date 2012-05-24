@@ -468,7 +468,7 @@ bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size) const
   int outSize = in1Size;
 
 #if BINREL_BUILD_FAST_ADDER  
-  assert(in1Size == (unsigned)fdd_domainsize(regAInfo->baseRhs));
+  assert(in1Size <= (unsigned)fdd_domainsize(regAInfo->baseRhs));
   bdd plus_bdd = details::make_adder(regAInfo->baseRhs, regBInfo->baseRhs, regAInfo->baseExtra);
   plus_bdd = plus_bdd & fdd_ithvar(sizeInfo, outSize);
 #endif
