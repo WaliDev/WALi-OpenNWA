@@ -202,7 +202,9 @@ BddContext::BddContext(const BddContext& other) :
   cachedBaseZero(other.cachedBaseZero),
   cachedTensorOne(other.cachedTensorOne),
   cachedTensorZero(other.cachedTensorZero)
-{}
+{
+  populateCache();
+}
 
 BddContext& BddContext::operator = (const BddContext& other)
 {
@@ -226,6 +228,7 @@ BddContext& BddContext::operator = (const BddContext& other)
     cachedBaseZero=other.cachedBaseZero;
     cachedTensorOne=other.cachedTensorOne;
     cachedTensorZero=other.cachedTensorZero;
+    populateCache();
   }
   return *this;
 }
