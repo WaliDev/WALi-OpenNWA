@@ -24,6 +24,8 @@
 #include <string>
 #include <vector>
 
+#include <boost/shared_ptr.hpp> // It'd be nice to include the standard version but there are too many ways to get it.
+
 #include "wali/Countable.hpp"
 #include "wali/ref_ptr.hpp"
 #include "wali/SemElemTensor.hpp"
@@ -35,6 +37,30 @@ namespace wali
   {
     namespace binrel 
     {
+      /// Reference-counting bddPair pointer. These must be freed using
+      /// bdd_freepair, not delete, so we can't used ref_ptr. This just wraps
+      /// Boost's shared_ptr, setting bdd_freepair as the custom
+      /// deleter. (And this is the main reason for not just using a typedef.)
+      struct BddPairPtr
+        : public boost::shared_ptr<bddPair>
+      {
+        typedef boost::shared_ptr<bddPair> Base;
+        
+        // We keep with the Boost/std practice of making this constructor
+        // explicit, for it is a Good Idea.
+        explicit
+        BddPairPtr(bddPair * ptr)
+          : Base(ptr, bdd_freepair)
+        {}
+
+        BddPairPtr(BddPairPtr const & other)
+          : Base(other)
+        {}
+
+        BddPairPtr()
+        {}
+      };
+
       /**
         * Used to count the different operations performed by the library
         */
@@ -109,23 +135,23 @@ namespace wali
           // sets as B1,B2,B3; TL1,TL2,TL3; TR1, TR2, TR3.
           // Comments contain the more meaningful, but ghastly names
           //B1->B2 B2->B1
-          bddPair* baseSwap;
+          BddPairPtr baseSwap;
           //B1->B2 B2->B3
-          bddPair* baseRightShift;
+          BddPairPtr baseRightShift;
           //TL1->TL2 TR1->TR2 TL2->TL3 TR2->TR3 
-          bddPair* tensorRightShift; 
+          BddPairPtr tensorRightShift; 
           //B3->B2
-          bddPair* baseRestore;
+          BddPairPtr baseRestore;
           //TL3->TL2 TR3->TR2
-          bddPair* tensorRestore;
+          BddPairPtr tensorRestore;
           //B1->LT1 B2->TL2 B3->TL3
-          bddPair* move2Tensor1;
+          BddPairPtr move2Tensor1;
           //B1->TR1 B2->TR2 B3->TR3
-          bddPair* move2Tensor2;
+          BddPairPtr move2Tensor2;
           //TL1->B1 TR2->B2
-          bddPair* move2Base;
+          BddPairPtr move2Base;
           //TL1->B1 TR1->B2
-          bddPair* move2BaseTwisted;
+          BddPairPtr move2BaseTwisted;
           //sets for operation
           //Set: B2
           bdd baseSecBddContextSet;
