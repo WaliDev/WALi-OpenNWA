@@ -30,14 +30,29 @@ namespace{
     ProgramBddContext ctx2 = ctx;
   }
 
-#if 0
   TEST(BinRelSelfTest, repopulateCacheOnCopy){
       ProgramBddContext ctx;
       ctx.addBoolVar("a");
 
       ProgramBddContext ctx2 = ctx;
+      sem_elem_t b = new BinRel(&ctx2, bddtrue);
+
+      // This should just not fail an exception is what I'm checking.
+      b->one()->extend(b);
   }
-#endif
+
+  TEST(BinRelSelfTest, repopulateCacheOnAssign){
+      ProgramBddContext ctx;
+      ctx.addBoolVar("a");
+
+      ProgramBddContext ctx2;
+      ctx2 = ctx;
+      sem_elem_t b = new BinRel(&ctx2, bddtrue);
+
+      // This should just not fail an exception is what I'm checking.
+      b->one()->extend(b);
+  }
+
 
   TEST(BinRelSelfTest, creationTest){
     program_bdd_context_t brm = new ProgramBddContext();
