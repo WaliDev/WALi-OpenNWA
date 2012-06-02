@@ -470,7 +470,6 @@ int main(int argc, char ** argv)
   }
 
 
-
   wali::set_verify_fwpds(false);
   {
     NWPDS npds(false);

@@ -182,6 +182,12 @@ namespace wali {
                     return out;
                 }
 
+                static std::ostream &keyPrintOp(std::ostream &out, int a) {
+                  wali::Key key = (wali::Key) a;
+                  out << wali::key2str(key);
+                  return out;
+                }
+
             public:
                 InterGraph(wali::sem_elem_t s, bool e, bool pre, bool n = false) {
                     sem = s;
@@ -240,6 +246,8 @@ namespace wali {
                 int intra_edgeno(Transition &src, Transition &tgt);
 
                 int inter_edgeno(Transition &src1, Transition &src2, Transition &tgt);
+
+                sem_elem_t get_weight(unsigned n);
 
 				void rawDfs(
 					const int u, //current node.

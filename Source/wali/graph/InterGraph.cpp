@@ -1024,20 +1024,29 @@ namespace wali {
         // I can fix this (i.e., weights for others will be available on demand), but not right now.
         void InterGraph::setupNewtonSolution2(std::list<Transition> *wt_required)
         {
+          ///////////////////Setup weights so that everything is tensored ////////
+          sem_elem_tensor_t sem_old = dynamic_cast<SemElemTensor*>(sem.get_ptr());
+          sem = sem_old->tensor(sem_old.get_ptr());
+          //First update the ETransHandler object that stores weights on call edges.
+          //This guy is used during path summary. We must tensor the weights there correctly.
+          //TODO: Check that path_summary is not broken w.r.t. this implementation.
+          //eHandler.tensorWeights(running_prestar);
+
+          ///////////////////Inter Setup begin.
           RegExp::startSatProcess(sem);
 
-            int n = nodes.size();
-            int i;
-            unsigned int max_scc_required;
-            intra_graph_uf = new UnionFind(n);
+          int n = nodes.size();
+          int i;
+          unsigned int max_scc_required;
+          intra_graph_uf = new UnionFind(n);
 
+          std::list<IntraGraph *>::iterator gr_it;
+
+          //////////////// First, find the IntraGraphs
+          {
             vector<GraphEdge>::iterator it;
             vector<HyperEdge>::iterator it2;
-            std::list<IntraGraph *>::iterator gr_it;
-
-          {
             wali::util::Timer * guidingTimer = new wali::util::Timer("[setupNewtonSolution] Guiding Intra Graph setup");
-            // First, find the IntraGraphs
             for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
               intra_graph_uf->takeUnion((*it).src,(*it).tgt);
             }
@@ -1065,40 +1074,71 @@ namespace wali {
             }
             for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
               IntraGraph *gr = nodes[(*it2).tgt].gr;
-              gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, sem->zero(), true);
+              gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, sem->zero(), false);
               IntraGraph *gr2 = nodes[(*it2).src2].gr;
               gr2->setOutNode(nodes[(*it2).src2].intra_nodeno, (*it2).src2);
             }
             delete guidingTimer;
           }
+          ////////////////We will now create the Newton IntraGraph which will store the
+          ////////////////actual weights, and fom which RegExp will be generated.
           {
+            vector<GraphEdge>::iterator geIter;
+            vector<HyperEdge>::iterator heIter;
             wali::util::Timer * newtonGrSetupTimer = new wali::util::Timer("[setupNewtonSolution] newtonGr setup timer"); 
-            //We will now create the Newton IntraGraph which will store the
-            //actual weights, and fom which RegExp will be generated.
-            //TODO:tensor
             newtonGr = new IntraGraph(running_prestar,sem);
             for(int i = 0; i < n;i++) {
               //The node[i].intra_nodeno will point to newtonGr, while 
               //node[i].gr still points to old IntraGraphs.
               nodes[i].intra_nodeno = newtonGr->makeNode(nodes[i].trans);
               if(is_source_type(nodes[i].type)) {
-                newtonGr->setSource(nodes[i].intra_nodeno, nodes[i].weight);
+                //This is a source node. 
+                //Pre*:   w -> (w,1^T)
+                //Post*:  w -> (1^T,w)
+                //where ^T is transpose and (,) is tensor
+                sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>((nodes[i].weight).get_ptr());
+                sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());
+                if(running_prestar){
+                  //wt = wt->transpose();
+                  wt = wt->tensor(one.get_ptr());
+                }else{
+                  wt = one->tensor(wt.get_ptr());
+                }
+                newtonGr->setSource(nodes[i].intra_nodeno, wt);
               }
               // zero all weights (some are set by setSource() )
-              //TODO:tensor
+              // All weights should be tensored
+              sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>((sem->zero()).get_ptr()); //sem is tensored
               if(nodes[i].weight.get_ptr() != NULL)
-                nodes[i].weight = nodes[i].weight->zero();
+                nodes[i].weight = zerot;
             }
-            // Now fill up the Newton IntraGraph
-            for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
-              int s = (*it).src;
-              int t = (*it).tgt;
-              newtonGr->addEdge(nodes[s].intra_nodeno, nodes[t].intra_nodeno, (*it).weight);
+            //Intraprocedural weight
+            //(,) is tensor, ^T is transpose
+            //Pre*: w -> (w,1^T)
+            //Post* w -> (1^T,w)
+            for(geIter = intra_edges.begin(); geIter != intra_edges.end(); ++geIter) {
+              int s = geIter->src;
+              int t = geIter->tgt;
+              sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>((geIter->weight).get_ptr());
+              sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>(wt->one().get_ptr());
+              if(running_prestar){
+                //wt = wt->transpose();
+                wt = wt->tensor(one.get_ptr());
+              }else{
+                wt = one->tensor(wt.get_ptr());
+              }
+              newtonGr->addEdge(nodes[s].intra_nodeno, nodes[t].intra_nodeno, wt);
             }
-            for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
-              newtonGr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, sem->zero(), true);
-              newtonGr->setOutNode(nodes[(*it2).src2].intra_nodeno, (*it2).src2);
-              newtonGr->addEdge(nodes[(*it2).src2].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, sem->zero(), true);
+            //For each hyperedge (tgt <- src1 src2], we add two edges [t <-
+            //src1] and [t <- src2]. Initially these edges have the weight
+            //zero(must be tensored).
+            //These edges will be updatable.
+            for(heIter = inter_edges.begin(); heIter != inter_edges.end(); heIter++) {
+              sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>(sem->zero().get_ptr()); //zero is tensored
+              newtonGr->addEdge(nodes[heIter->src1].intra_nodeno, nodes[heIter->tgt].intra_nodeno, zerot, true);
+              newtonGr->addEdge(nodes[heIter->src2].intra_nodeno, nodes[heIter->tgt].intra_nodeno, zerot, true);
+              //FIXME: Needed? I don't think we use outNodes of newtonGr at all. Try removing it.
+              newtonGr->setOutNode(nodes[heIter->src2].intra_nodeno, heIter->src2);
             }
             {
               wali::util::Timer * setupNewtonTimer = new wali::util::Timer("[setupNewtonSolution] newton RegExp timer");
@@ -1118,9 +1158,9 @@ namespace wali {
           unsigned components = SCC(gr_list, gr_sorted);
           STAT(stats.ncomponents = components);
 
+          ///////////////// Saturate
           {
             wali::util::Timer * satTimer = new wali::util::Timer("[setupNewtonSolution] Saturation Timer");
-            // Saturate
             if(wt_required == NULL) {
               max_scc_required = components;
             } else {
@@ -1144,74 +1184,203 @@ namespace wali {
           RegExp::stopSatProcess();
           RegExp::executingPoststar(!running_prestar);
         }
-       
-        // New Saturation Procedure -- minimize calls to get_weight
+
         void InterGraph::saturateNewton(multiset<tup> &worklist, unsigned scc_n) 
         {
-          sem_elem_t weight;
+          int numSteps = 0;
+          //This saturation procedure assumes that there are no merge functions.
+          //It also assumes that you're using EWPDS.
+          //With EWPDSs, a default merge functions is created for delta2 rules, behaves exactly like 
+          //WPDS delta2 rules, except that the call edge weight is assumed to be one.
+          //We check if a call edge wt was added to the graph, if not (i.e., it is zero) we assume the
+          //call weight to be one.
+          sem_elem_tensor_t onodeWt, onodeWtOld, onode1Wt, onode1WtOld;
+          sem_elem_t inodeWt, inodeWtOld;
+          sem_elem_tensor_t onodeWtD, onode1WtD;
+          sem_elem_t callWt;
+          bool onode1Changed, onodeChanged;
           std::list<int> *moutnodes;
+          sem_elem_tensor_t semD = dynamic_cast<SemElemTensor*>(sem.get_ptr());
+          semD = semD->detensor(); //sem is tensored
+          sem_elem_tensor_t oneD = dynamic_cast<SemElemTensor*>((semD->one()).get_ptr()); 
 
           while(!worklist.empty()) {
-            // Get an outnode whose weight is to be propagated
             multiset<tup>::iterator wit = worklist.begin();
+            onode1Changed = onodeChanged = false;
             int onode = (*wit).second;
             worklist.erase(wit);
-            //int onode = worklist.front();
-            //worklist.pop_front();
-
-            weight = newtonGr->get_weight(nodes[onode].intra_nodeno);
-            if(nodes[onode].weight.get_ptr() != NULL && nodes[onode].weight->equal(weight))
-              continue;
-            nodes[onode].weight = weight;
-
             STAT(stats.niter++);
 
-            FWPDSDBGS(
-                cout << "Popped ";
-                IntraGraph::print_trans(nodes[onode].trans,cout) << "with weight ";
-                weight->print(cout) << "\n";
-                );
+            //See if the weight onode changed & update
+            onodeChanged = false;
+            onodeWt = dynamic_cast<wali::SemElemTensor*>(get_weight(nodes[onode].intra_nodeno).get_ptr());
+            assert(onodeWt != NULL);
+            onodeWtOld = dynamic_cast<wali::SemElemTensor*>(nodes[onode].weight.get_ptr());
+            if(onodeWtOld == NULL || ! onodeWt->equal(onodeWtOld)){
+              onodeChanged = true;
+              onodeWtD = onodeWt->detensorTranspose();
+              nodes[onode].weight = onodeWt;
+            }
 
-            // Go through all its targets and modify their weights
             std::list<int>::iterator beg = nodes[onode].out_hyper_edges.begin();
             std::list<int>::iterator end = nodes[onode].out_hyper_edges.end();
             for(; beg != end; beg++) {
               int inode = inter_edges[*beg].tgt;
               int onode1 = inter_edges[*beg].src1;
-              sem_elem_t uw;
-              if(running_ewpds && inter_edges[*beg].mf.get_ptr()) {
-                uw = inter_edges[*beg].mf->apply_f(sem->one(), weight);
-                FWPDSDBGS(
-                    cout << "Apply merge function ";
-                    inter_edges[*beg].mf->print(cout) << " to ";
-                    weight->print(cout) << "\n";
-                    uw->print(cout << "Got ") << "\n";
-                    );
-              } else {
-                uw = inter_edges[*beg].weight->extend(weight);
+
+              //See if the weight onode1 changed & update
+              onode1Changed = false;
+              //onode1Wt = dynamic_cast<wali::SemElemTensor*>(newtonGr->get_weight(nodes[onode1].intra_nodeno).get_ptr());
+              //If the FWPDS implementation assumes an underlying EWPDS, 
+              //We must obtain weight for a stacked transition by using the
+              //callWt.
+              int callTrans;
+              callWt = eHandler.get_dependency(onode1,callTrans);
+              if(callTrans != -1){
+                //This is a return transition, and we're using EWPDS.
+                onode1Wt = dynamic_cast<wali::SemElemTensor*>(newtonGr->get_weight(nodes[callTrans].intra_nodeno).get_ptr()); 
+                assert(callWt != NULL);
+              }else{
+                onode1Wt = dynamic_cast<wali::SemElemTensor*>(newtonGr->get_weight(nodes[onode1].intra_nodeno).get_ptr());
+                callWt = NULL;
               }
-              STAT(stats.nextend++);
-              newtonGr->updateEdgeWeight(nodes[onode1].intra_nodeno, nodes[inode].intra_nodeno, uw);
-            }
-            // Go through all targets again and insert them into the workist without
-            // seeing if they actually got modified or not
-            beg = nodes[onode].out_hyper_edges.begin();
-            for(; beg != end; beg++) {
-              int inode = inter_edges[*beg].tgt;
-              IntraGraph *gr = nodes[inode].gr;
-              if(gr->scc_number != scc_n) {
-                assert(gr->scc_number > scc_n);
-                continue;
+              assert(onode1Wt != NULL);
+              onode1WtOld = dynamic_cast<wali::SemElemTensor*>(nodes[onode1].weight.get_ptr());
+              if(onode1WtOld == NULL || ! onode1Wt->equal(onode1WtOld)){
+                onode1Changed = true;
+                onode1WtD = onode1Wt->detensorTranspose();
+                nodes[onode1].weight = onode1Wt;
               }
-              moutnodes = gr->getOutTransitions();
-              std::list<int>::iterator mbeg = moutnodes->begin();
-              std::list<int>::iterator mend = moutnodes->end();
-              for(; mbeg != mend; mbeg++) {
-                int mnode = (*mbeg);
-                worklist.insert(tup(gr->bfs_number, mnode));
+
+              //TODO:Move this out of saturation. I can update inter_edges[...].weight to be the correct weights.
+              //Obtain the call rule weight. This is slightly twisted because of the way
+              //things are setup.
+              if(running_ewpds && inter_edges[*beg].mf.get_ptr() && callWt == NULL){
+                //check if call rule weight was added to hyper edge
+                //if it is zero, assume it to be one.
+                callWt = inter_edges[*beg].weight;
+                if(callWt == NULL || callWt->equal(callWt->zero()))
+                  callWt = semD->one();
+              }else if(callWt == NULL){
+                //It does not make sense to have a call edge without merge functions *and* zero weight.
+                callWt = inter_edges[*beg].weight;
+                assert(!callWt->equal(callWt->zero()));
               }
+              //If onodeWt has changed, update edge onode1 ---> inode
+              if(onodeChanged){
+                //udpate edge weight.
+                //D() denotes detensorTranspose
+                //1d is 1 in the non tensor domain
+                //Pre*: ([callWt X D(onodeWt)] , 1d^T)
+                //Post*: (1d^T, [callWt X D(onodeWt)])
+                sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>(callWt.get_ptr());
+                wt = dynamic_cast<SemElemTensor*>(wt->extend(onodeWtD.get_ptr()).get_ptr());
+                if(running_prestar){
+                  //wt = wt->transpose();
+                  wt = wt->tensor(oneD.get_ptr());
+                }else{
+                  wt = oneD->tensor(wt.get_ptr());
+                }
+                //Check that new edge weight is at least as big as the old weight. (Remove check to speed thins up)
+                sem_elem_t oldEdgeWt = newtonGr->readEdgeWeight(nodes[onode1].intra_nodeno, nodes[inode].intra_nodeno);
+                if(oldEdgeWt != NULL)
+                  assert(wt->equal(wt->combine(oldEdgeWt.get_ptr())));
+                newtonGr->updateEdgeWeight(nodes[onode1].intra_nodeno, nodes[inode].intra_nodeno, wt);
+              }
+
+              //If onode1Wt has changed, update edge onode ---> inode
+              if(onode1Changed){
+                //udpate edge weight.
+                //D() denotes detensor
+                //Pre*: (callWt, [D(onode1Wt)]^T)
+                //Post*: ([D(onode1Wt) X callWt]^T, 1)
+                sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>(callWt.get_ptr());
+                if(running_prestar){
+                  //wt = wt->transpose();
+                  wt = wt->tensor((onode1WtD->transpose()).get_ptr());
+                }else{
+                  wt = dynamic_cast<SemElemTensor*>((onode1WtD->extend(wt.get_ptr())).get_ptr());
+                  wt = wt->transpose();
+                  wt = wt->tensor(oneD.get_ptr());
+                }
+                //Check that new edge weight is at least as big as the old weight. (Remove check to speed thins up)
+                sem_elem_t oldEdgeWt = newtonGr->readEdgeWeight(nodes[onode].intra_nodeno, nodes[inode].intra_nodeno);
+                if(oldEdgeWt != NULL)
+                  assert(wt->equal(wt->combine(oldEdgeWt.get_ptr())));
+                newtonGr->updateEdgeWeight(nodes[onode].intra_nodeno, nodes[inode].intra_nodeno, wt);
+              }
+
+              ////Update worklist
+              if(onode1Changed || onodeChanged){
+                //This guard is optional. 
+                //If you keep it, you have to calculate one extra weight from newtonGr.
+                //At the same time, it might save you from adding onode (which is very
+                //expensive) to the worklist.
+                inodeWt = newtonGr->get_weight(nodes[inode].intra_nodeno);
+                assert(inodeWt != NULL);
+                inodeWtOld = nodes[inode].weight;
+                if(inodeWtOld == NULL || ! inodeWt->equal(inodeWtOld)){
+                  //Add onode back to the worklist.
+                  //This is *very* expensive, but necessary to propogate changes
+                  //back from inode to onode1
+                  worklist.insert(tup(nodes[onode].gr->bfs_number, onode));
+                  //Also add outNodes from the graph of inode. This will propogate the
+                  //changes to dependent graphs.
+                  IntraGraph *gr = nodes[inode].gr;
+                  if(gr->scc_number != scc_n) {
+                    assert(gr->scc_number > scc_n);
+                    continue;
+                  }
+                  moutnodes = gr->getOutTransitions();
+                  std::list<int>::iterator mbeg = moutnodes->begin();
+                  std::list<int>::iterator mend = moutnodes->end();
+                  for(; mbeg != mend; mbeg++) {
+                    int mnode = (*mbeg);
+                    worklist.insert(tup(gr->bfs_number, mnode));
+                  }
+                }
+              }
+           
+              /*
+              {//DEBUGGING
+                cout << "______________________________\n";
+                inodeWt = get_weight(nodes[inode].intra_nodeno);
+                inodeWtOld = nodes[inode].weight;
+                sem_elem_tensor_t inodeWtD;
+                inodeWtD = dynamic_cast<SemElemTensor*>(inodeWt.get_ptr());
+                inodeWtD = inodeWtD->detensorTranspose();
+                cout << "onodeChanged :" << onodeChanged << endl;
+                cout << "onode1Changed :" << onode1Changed << endl;
+                cout << "onode: \n";
+                IntraGraph::print_trans(nodes[onode].trans,cout,keyPrintOp) 
+                  << "[nodeno:" << onode 
+                  << ", intra_nodeno:" << nodes[onode].intra_nodeno
+                  << "] with weight \n";
+                onodeWt->print(cout)<< "--\n";
+                onodeWtD->print(cout) << "\n";
+                cout << "onode1: \n";
+                IntraGraph::print_trans(nodes[onode1].trans,cout,keyPrintOp)
+                  << "[nodeno:" << onode1 
+                  << ", intra_nodeno:" << nodes[onode1].intra_nodeno
+                  << "] with weight \n";
+                onode1Wt->print(cout)<< "--\n";
+                onode1WtD->print(cout) << "\n";
+                cout << "Call weight\n";
+                callWt->print(cout) << "\n";
+                cout << "inode obtained: \n";
+                IntraGraph::print_trans(nodes[inode].trans,cout,keyPrintOp) 
+                  << "[nodeno:" << inode 
+                  << ", intra_nodeno:" << nodes[inode].intra_nodeno
+                  << "] with weight \n";
+                inodeWt->print(cout)<< "--\n";
+                inodeWtD->print(cout) << "\n";
+                cout << "______________________________\n";
+              }//DEBUGGING
+              */
+              numSteps++;
             }
           }
+          std::cout << "Newton Steps: " << numSteps << std::endl;
         }
 
         // If an argument is passed in then only weights on those transitions will be available
@@ -1495,16 +1664,30 @@ namespace wali {
             return nodes[n].gr->get_weight(nodes[n].intra_nodeno);
         }
 
-        sem_elem_t InterGraph::get_weight(Transition t) {
+        sem_elem_t InterGraph::get_weight(Transition t){
           unsigned orig_size = nodes.size();
           unsigned n = nodeno(t);
           assert(orig_size == nodes.size()); // Transition t must not be a new one
-
+          return get_weight(n);
+        }
+        sem_elem_t InterGraph::get_weight(unsigned n) {
           // check eHandler
           if(eHandler.exists(n)) {
             // This must be a return transition
             int nc;
-            sem_elem_t wtCallRule = eHandler.get_dependency(n, nc);
+            sem_elem_tensor_t wtCallRule =dynamic_cast<SemElemTensor*>( eHandler.get_dependency(n, nc).get_ptr());
+            if(newtonGr){
+              //Pre*:   w -> (w^T,1)
+              //Post*:  w -> (1^T,w)
+              //where ^T is transpose and (,) is tensor
+              sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wtCallRule->one()).get_ptr());
+              if(running_prestar){
+                wtCallRule = wtCallRule->transpose();
+                wtCallRule = wtCallRule->tensor(one.get_ptr());
+              }else{
+                wtCallRule = one->tensor(wtCallRule.get_ptr());
+              }
+            }
             sem_elem_t wt;
             if(nc != -1) {
               if(newtonGr)
@@ -1574,10 +1757,10 @@ namespace wali {
               Transition t2(nodes[i].trans.tgt,0,0);
               if(newtonGr)
                 ca->addEdge(get_number(intra_node_map,state,ca), get_number(intra_node_map, nodes[i].trans.tgt,ca), 
-                  correct(newtonGr->get_weight(nodes[i].intra_nodeno).get_ptr()));
+                    correct(newtonGr->get_weight(nodes[i].intra_nodeno).get_ptr()));
               else
                 ca->addEdge(get_number(intra_node_map,state,ca), get_number(intra_node_map, nodes[i].trans.tgt,ca), 
-                  correct(nodes[i].gr->get_weight(nodes[i].intra_nodeno).get_ptr()));
+                    correct(nodes[i].gr->get_weight(nodes[i].intra_nodeno).get_ptr()));
               worklist.push_back(nodes[i].trans.tgt);
             }
           }

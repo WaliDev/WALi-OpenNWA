@@ -40,13 +40,13 @@ void ProgramBddContext::addBoolVar(std::string name)
   addIntVar(name,2);
 }
 
-void ProgramBddContext::addIntVar(std::string name, unsigned size)
+void ProgramBddContext::addIntVar(std::string name, unsigned siz)
 {
-  BddContext::addIntVar(name,size);
-  if(size > maxSize){
+  BddContext::addIntVar(name,siz);
+  if(siz > maxSize){
     if(maxSize == 0){
       //This is when we *create* the extra levels needed
-      int domains[1] = {size+1};
+      int domains[1] = {siz+1};
       int retSizeInfo = fdd_extdomain(domains,1);
       if(retSizeInfo < 0)
         LOG(FATAL) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(retSizeInfo) << "\"" << endl
@@ -60,7 +60,7 @@ void ProgramBddContext::addIntVar(std::string name, unsigned size)
       //We will create indices such that we get a default variable ordering where
       //baseLhs, baseRhs, baseExtra are mixed.
       {
-        int domains2[3] = {size, size, size};
+        int domains2[3] = {siz, siz, siz};
         regAInfo = new BddInfo();
         //Create fdds for base
         int base = fdd_extdomain(domains2,3);
@@ -79,7 +79,7 @@ void ProgramBddContext::addIntVar(std::string name, unsigned size)
         idx2Name[regAInfo->baseExtra] = "__regA''";
       }
       {
-        int domains2[3] = {size, size, size};
+        int domains2[3] = {siz, siz, siz};
         regBInfo = new BddInfo();
         //Create fdds for base
         int base = fdd_extdomain(domains2,3);
@@ -98,7 +98,7 @@ void ProgramBddContext::addIntVar(std::string name, unsigned size)
       }
     }else{
       //This is when we *enlarge* the extra levels needed
-      int maxVal = size - maxSize;
+      int maxVal = siz - maxSize;
 
       int domains[1] = {maxVal};
       int retSizeInfo = fdd_extdomain(domains,1);
@@ -176,7 +176,7 @@ void ProgramBddContext::addIntVar(std::string name, unsigned size)
         idx2Name[regBInfo->baseExtra] = "__regB''";
       }
     }
-    maxSize = size;
+    maxSize = siz;
   }
 }
 
@@ -593,40 +593,40 @@ bdd ProgramBddContext::tGetRandomTransformer(bool isTensored, unsigned seed)
     for(BddContext::const_iterator iter = this->begin(); 
         iter != this->end();
         ++iter){
-      int size = iter->second->maxVal;
+      int siz = iter->second->maxVal;
       int n;
       if(!isTensored){
         n = rand() % 4;
         if(n==0)
-          inbdd = inbdd & fdd_ithvar(iter->second->baseLhs,rand()%size);
+          inbdd = inbdd & fdd_ithvar(iter->second->baseLhs,rand()%siz);
         if(n==1)    
-          inbdd = inbdd | fdd_ithvar(iter->second->baseLhs,rand()%size);
+          inbdd = inbdd | fdd_ithvar(iter->second->baseLhs,rand()%siz);
         n = rand() % 4;
         if(n==0)
-          inbdd = inbdd & fdd_ithvar(iter->second->baseRhs,rand()%size);
+          inbdd = inbdd & fdd_ithvar(iter->second->baseRhs,rand()%siz);
         if(n==1)    
-          inbdd = inbdd | fdd_ithvar(iter->second->baseRhs,rand()%size);
+          inbdd = inbdd | fdd_ithvar(iter->second->baseRhs,rand()%siz);
       }else{
         n = rand() % 4;
         if(n==0)
-          inbdd = inbdd & fdd_ithvar(iter->second->tensor1Lhs,rand()%size);
+          inbdd = inbdd & fdd_ithvar(iter->second->tensor1Lhs,rand()%siz);
         if(n==1)    
-          inbdd = inbdd | fdd_ithvar(iter->second->tensor1Lhs,rand()%size);
+          inbdd = inbdd | fdd_ithvar(iter->second->tensor1Lhs,rand()%siz);
         n = rand() % 4;
         if(n==0)
-          inbdd = inbdd & fdd_ithvar(iter->second->tensor1Rhs,rand()%size);
+          inbdd = inbdd & fdd_ithvar(iter->second->tensor1Rhs,rand()%siz);
         if(n==1)    
-          inbdd = inbdd | fdd_ithvar(iter->second->tensor1Rhs,rand()%size);
+          inbdd = inbdd | fdd_ithvar(iter->second->tensor1Rhs,rand()%siz);
         n = rand() % 4;
         if(n==0)
-          inbdd = inbdd & fdd_ithvar(iter->second->tensor2Lhs,rand()%size);
+          inbdd = inbdd & fdd_ithvar(iter->second->tensor2Lhs,rand()%siz);
         if(n==1)    
-          inbdd = inbdd | fdd_ithvar(iter->second->tensor2Lhs,rand()%size);
+          inbdd = inbdd | fdd_ithvar(iter->second->tensor2Lhs,rand()%siz);
         n = rand() % 4;
         if(n==0)
-          inbdd = inbdd & fdd_ithvar(iter->second->tensor2Rhs,rand()%size);
+          inbdd = inbdd & fdd_ithvar(iter->second->tensor2Rhs,rand()%siz);
         if(n==1)    
-          inbdd = inbdd | fdd_ithvar(iter->second->tensor2Rhs,rand()%size);
+          inbdd = inbdd | fdd_ithvar(iter->second->tensor2Rhs,rand()%siz);
       }
     }
     ret = rand() % 2 ? ret & inbdd : ret | inbdd;

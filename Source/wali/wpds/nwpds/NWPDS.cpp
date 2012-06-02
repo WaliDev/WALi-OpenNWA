@@ -306,6 +306,10 @@ void NWPDS::updateFa(wfa::WFA& fa)
       it != newtonWl.end();
       ++it){
     t = *it;
+
+    //DEBUGGING
+    std::cout << ":" << t->from() << "-" << t->stack() << "->" << t->to() <<std::endl;
+
     if(dbg){
       *waliErr << "[UpdateFa]: " << std::endl << "Processing:" << std::endl;
       t->print(*waliErr) << std::endl;
@@ -367,29 +371,33 @@ void NWPDS::updateFa(wfa::WFA& fa)
       //We want to track if anything was updated during the
       //functor operation.
       bool changed = false;
-      {
+      //{
         wfa::Trans old;
-        fa.find(oldFrom, oldStack, oldTo, old);
+        bool found = fa.find(oldFrom, oldStack, oldTo, old);
         wali::sem_elem_t newwt = t->weight();
-        wali::sem_elem_t oldwt = old.weight();
+        wali::sem_elem_t oldwt = found? old.weight() : NULL;
         if(newwt == NULL)
           changed = false;
         else if(oldwt == NULL)
           changed = true;
         else
           changed = !(newwt->equal(oldwt));
-      }
+      //}
       //Now actually do the update, changing the from/stack/to as needed.
       if(changed){
         wali::wfa::ITrans * oldt = NULL;
         oldt = t->copy(oldFrom,oldStack,oldTo);
+        assert(oldt != NULL);
         fa.addTrans(oldt);
         //DEBUGGING
         //oldt->print(*waliErr << "[Newton] Updated transition: ") << std::endl;
         //t->print(*waliErr << "from: ") << std::endl << std::endl;
         //DEBUGGING
         if(fromIt == state2ConstMap.end()){
-          oldt->setConfig(make_config(oldt->from(),oldt->stack()));
+          wali::Key f = oldt->from();
+          wali::Key s = oldt->stack();
+          Config * cfg = make_config(f,s); 
+          oldt->setConfig(cfg);
           //Trans with generated from state do not go onto the worklist
           worklist->put(oldt);
         }

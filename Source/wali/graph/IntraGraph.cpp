@@ -823,12 +823,14 @@ namespace wali {
       buildRegExp(path_sequence);
 
       { // NAK DEBUGGING REGEXP
-        //for( int i=0; i < nnodes; i++) {
-        //    nodes[i].regexp->print(std::cout<< i << ")   ") << std::endl;
-        //}
-      //cout << "graph = (" << nnodes << "," << nedges << ")\n";
-      //cout << "size = " << path_sequence.size() << "\n";
-      //cout << "\n";
+        /*
+        for( int i=0; i < nnodes; i++) {
+          nodes[i].regexp->print(std::cout<< i << ")   ") << std::endl;
+        }
+        cout << "graph = (" << nnodes << "," << nedges << ")\n";
+        cout << "size = " << path_sequence.size() << "\n";
+        cout << "\n";
+        */
       }
 
 

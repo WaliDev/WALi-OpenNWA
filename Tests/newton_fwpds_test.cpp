@@ -104,7 +104,7 @@ namespace{
           firstData[TransKey(t->from(),t->stack(),t->to())] = t->weight();
         else if(cur == READ_SECOND){
           wali::SemElemTensor * wt = dynamic_cast<SemElemTensor*>(t->weight().get_ptr());
-          secondData[TransKey(t->from(),t->stack(),t->to())] = wt;//wt->detensor();
+          secondData[TransKey(t->from(),t->stack(),t->to())] = wt->detensorTranspose();
         }
         else
           assert(false && "Not in any read mode right now");
@@ -122,10 +122,9 @@ namespace{
       {
         bool diffFound = false;
         assert(cur == COMPARE);
-
-        /*
-           {//DEBUG
-           if(out){
+        {//DEBUG
+          /*
+             if(out){
            *out << "firstData:" << std::endl;
            for(DataMap::const_iterator iter = firstData.begin();
            iter != firstData.end();
@@ -137,8 +136,9 @@ namespace{
            iter++)
            (iter->first).print(*out);
            }
-           }//DEBUG
-         */
+          */
+        }//DEBUG
+
 
         for(DataMap::const_iterator iter = firstData.begin();
             iter != firstData.end();
@@ -175,6 +175,26 @@ namespace{
                   *out << "NULL" << std::endl;
                 *out << std::endl;
               }
+            }else{
+              //DEBUGGING
+              /*
+              if(out){
+                *out << "Printing anyway:\n";
+                (iter->first).print(*out);
+                *out << std::endl << "[ " << first << " weight]" << std::endl;
+                if(iter->second != NULL)
+                  iter->second->print(*out);
+                else
+                  *out << "NULL" << std::endl;
+                *out << std::endl << "[ " << second << " weight]" << std::endl;
+                if(iter2->second != NULL)
+                  iter2->second->print(*out);
+                else
+                  *out << "NULL" << std::endl;
+                *out << std::endl;
+              }
+              */
+              //DEBUGGING
             }
           }
         }
@@ -186,10 +206,10 @@ namespace{
             if(!(iter->second == NULL) && !(iter->second->equal(iter->second->zero()))){
               diffFound=true;
               if(out){
-              *out << "DIFF: Found in " << second << " but not in " << first << ":" << std::endl;
-              (iter->first).print(*out);
-              iter->second->print(*out);
-              *out << std::endl;
+                *out << "DIFF: Found in " << second << " but not in " << first << ":" << std::endl;
+                (iter->first).print(*out);
+                iter->second->print(*out);
+                *out << std::endl;
               }
             }
           }
