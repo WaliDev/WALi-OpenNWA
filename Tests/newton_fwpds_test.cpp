@@ -104,7 +104,7 @@ namespace{
           firstData[TransKey(t->from(),t->stack(),t->to())] = t->weight();
         else if(cur == READ_SECOND){
           wali::SemElemTensor * wt = dynamic_cast<SemElemTensor*>(t->weight().get_ptr());
-          secondData[TransKey(t->from(),t->stack(),t->to())] = wt->detensorTranspose();
+          secondData[TransKey(t->from(),t->stack(),t->to())] = wt;//->detensorTranspose();
         }
         else
           assert(false && "Not in any read mode right now");

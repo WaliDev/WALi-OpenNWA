@@ -1213,7 +1213,7 @@ namespace wali {
 
             //See if the weight onode changed & update
             onodeChanged = false;
-            onodeWt = dynamic_cast<wali::SemElemTensor*>(get_weight(nodes[onode].intra_nodeno).get_ptr());
+            onodeWt = dynamic_cast<wali::SemElemTensor*>(newtonGr->get_weight(nodes[onode].intra_nodeno).get_ptr());
             assert(onodeWt != NULL);
             onodeWtOld = dynamic_cast<wali::SemElemTensor*>(nodes[onode].weight.get_ptr());
             if(onodeWtOld == NULL || ! onodeWt->equal(onodeWtOld)){
@@ -1675,23 +1675,14 @@ namespace wali {
           if(eHandler.exists(n)) {
             // This must be a return transition
             int nc;
-            sem_elem_tensor_t wtCallRule =dynamic_cast<SemElemTensor*>( eHandler.get_dependency(n, nc).get_ptr());
-            if(newtonGr){
-              //Pre*:   w -> (w^T,1)
-              //Post*:  w -> (1^T,w)
-              //where ^T is transpose and (,) is tensor
-              sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wtCallRule->one()).get_ptr());
-              if(running_prestar){
-                wtCallRule = wtCallRule->transpose();
-                wtCallRule = wtCallRule->tensor(one.get_ptr());
-              }else{
-                wtCallRule = one->tensor(wtCallRule.get_ptr());
-              }
-            }
+            //sem_elem_tensor_t wtCallRule = dynamic_cast<SemElemTensor*>( eHandler.get_dependency(n, nc).get_ptr());
+            sem_elem_t wtCallRule = eHandler.get_dependency(n, nc);
             sem_elem_t wt;
             if(nc != -1) {
-              if(newtonGr)
-                wt = newtonGr->get_weight(nodes[nc].intra_nodeno);
+              if(newtonGr){
+                sem_elem_tensor_t twt = dynamic_cast<SemElemTensor*>((newtonGr->get_weight(nodes[nc].intra_nodeno)).get_ptr());
+                wt = twt->detensorTranspose();
+              }
               else
                 wt = nodes[nc].gr->get_weight(nodes[nc].intra_nodeno);
             } else {
@@ -1701,9 +1692,10 @@ namespace wali {
             return wt->extend(wtCallRule);
           }
 
-          if(newtonGr)
-            return newtonGr->get_weight(nodes[n].intra_nodeno);
-          else
+          if(newtonGr){
+                sem_elem_tensor_t twt = dynamic_cast<SemElemTensor*>((newtonGr->get_weight(nodes[n].intra_nodeno)).get_ptr());
+                return twt->detensorTranspose();
+          } else
             return nodes[n].gr->get_weight(nodes[n].intra_nodeno);
         }
 
