@@ -607,8 +607,8 @@ namespace wali
       // BEGIN DEBUGGING
       int numPops = 0;
       // END DEBUGGING
-      PredHash_t preds;
-      setupFixpoint( wl,preds, wt );
+      IncomingTransMap_t preds;
+      setupFixpoint( wl, &preds, NULL, wt );
       while( !wl.empty() )
       {
         State* q = wl.get();
@@ -624,47 +624,41 @@ namespace wali
         sem_elem_t ZERO = q->weight()->zero();
 
         // Find predecessor set
-        PredHash_t::iterator predHashIt = preds.find(q->name());
+        IncomingTransMap_t::iterator incomingTransIt = preds.find(q->name());
 
         // Some states may have no predecessors, like
         // the initial state
-        if(  predHashIt == preds.end() )
+        if(  incomingTransIt == preds.end() )
         {
           continue;
         }
 
         // Tell predecessors we have changed
-        StateSet_t& stateSet = predHashIt->second;
-        StateSet_t::iterator stateit = stateSet.begin();
-        for( ; stateit != stateSet.end() ; stateit++ )
+        std::vector<ITrans*> & incoming = incomingTransIt->second;
+
+        std::vector<ITrans*>::iterator transit = incoming.begin();
+        for( ; transit != incoming.end() ; ++transit )
         {
-          State* qprime = *stateit;
+          ITrans* t = *transit;
+          
+          // We are looking at a transition (q', _, q)
+          State* qprime = state_map[t->from()];
 
-          // For each Trans (q',x,q)
-          State::iterator tit = qprime->begin();
-          State::iterator titEND = qprime->end();
-          // the new W(q')
           sem_elem_t newW = qprime->weight()->zero();
-          // For each (q',_,q)
-          for( ; tit != titEND ; tit++ )
-          {
-            ITrans* t = *tit; // (q',_,q)
 
-            { // BEGIN DEBUGGING
-              //t->print( *waliErr << "\t++ Popped " ) << std::endl;
-            } // END DEBUGGING
+          { // BEGIN DEBUGGING
+            //t->print( *waliErr << "\t++ Popped " ) << std::endl;
+          } // END DEBUGGING
 
-            if( t->to() == q->name() ) {
+          assert(t->to() == q->name());
 
-              sem_elem_t extended;
-              if( query == INORDER )
-                extended = t->weight()->extend( the_delta );
-              else
-                extended = the_delta->extend( t->weight() );
-              newW = newW->combine(extended);
-            }
+          sem_elem_t extended;
+          if( query == INORDER )
+            extended = t->weight()->extend( the_delta );
+          else
+            extended = the_delta->extend( t->weight() );
+          newW = newW->combine(extended);
 
-          }
           // delta => (w+se,w-se)
           // Use extended->delta b/c we want the diff b/w the new
           // weight (extended) and what was there before
@@ -728,7 +722,7 @@ namespace wali
       // Now, do the (init_state, F) chop
       DefaultWorklist<State> wl;
       PredHash_t preds;
-      setupFixpoint( wl,preds );
+      setupFixpoint( wl,NULL,&preds );
       FOR_EACH_STATE(resetState) {
         resetState->tag = 0;
       }
@@ -1158,16 +1152,16 @@ namespace wali
     // Place WFA in state ready for fixpoint
     // Initialize weight on final states to be st (if it is NULL, then ONE) 
     //
-    void WFA::setupFixpoint( Worklist<State>& wl, PredHash_t& preds) {
+    void WFA::setupFixpoint( Worklist<State>& wl, IncomingTransMap_t* trans, PredHash_t* preds) {
       sem_elem_t nullwt; // treated as ONE
-      setupFixpoint(wl, preds, nullwt);
+      setupFixpoint(wl, trans, preds, nullwt);
     }
 
     //
     // Place WFA in state ready for fixpoint
     // Initialize weight on final states to be st (if it is NULL, then ONE) 
     //
-    void WFA::setupFixpoint( Worklist<State>& wl, PredHash_t& preds, sem_elem_t wtFinal )
+    void WFA::setupFixpoint( Worklist<State>& wl, IncomingTransMap_t* trans, PredHash_t* preds, sem_elem_t wtFinal )
     {
       state_map_t::iterator it = state_map.begin();
       state_map_t::iterator itEND = state_map.end();
@@ -1207,14 +1201,28 @@ namespace wali
           // (p,_,q)
           ITrans* t = *stit;
           Key toKey = t->to();
-          PredHash_t::iterator predIt = preds.find(toKey);
-          if( predIt == preds.end() ) {
-            StateSet_t stateSet;
-            predIt = preds.insert(toKey,stateSet).first;
+
+          if (preds != NULL) {
+            PredHash_t::iterator predIt = preds->find(toKey);
+            if( predIt == preds->end() ) {
+              StateSet_t stateSet;
+              predIt = preds->insert(toKey,stateSet).first;
+            }
+            //*waliErr << "Adding '" << key2str(st->name()) << "' to pred of '";
+            //*waliErr << key2str(toKey) << "'\n";
+            predIt->second.insert( st );
           }
-          //*waliErr << "Adding '" << key2str(st->name()) << "' to pred of '";
-          //*waliErr << key2str(toKey) << "'\n";
-          predIt->second.insert( st );
+
+          if (trans != NULL) {
+            IncomingTransMap_t::iterator transIt = trans->find(toKey);
+            if( transIt == trans->end() ) {
+              std::vector<ITrans*> transitions;
+              transIt = trans->insert(toKey, transitions).first;
+            }
+            //*waliErr << "Adding transition from '" << key2str(st->name()) << "' to pred of '";
+            //*waliErr << key2str(toKey) << "'\n";
+            transIt->second.push_back(t);
+          }
         }
       }
     }

@@ -14,8 +14,13 @@ WALi/OpenNWA 4.0:
     calling WFA::print_dot to output extra attributes for either nodes
     or edges.
 
+  WALi bug fixes:
+  - Fixed a rather bad efficiency problem with path_summary; on large examples
+    this can run almost an order of magnitude faster.
+
   OpenNWA bug fixes:
   - Updated license and author information
+
 
 
 WALi/OpenNWA 4.0 RC1:

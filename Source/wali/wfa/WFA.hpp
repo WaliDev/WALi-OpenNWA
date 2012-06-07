@@ -99,6 +99,7 @@ namespace wali
         typedef wali::HashMap< Key , TransSet > eps_map_t;
         typedef std::set< State*,State > StateSet_t;
         typedef wali::HashMap< Key,StateSet_t > PredHash_t;
+        typedef wali::HashMap< Key, std::vector<ITrans*> > IncomingTransMap_t;
 
         friend class ::wali::wpds::WPDS;
         friend class ::wali::wpds::DebugWPDS;
@@ -497,14 +498,14 @@ namespace wali
          * setupFixpoint clears each states markable flag and sets
          * the states weight to zero
          */
-        void setupFixpoint( Worklist<State>& wl, PredHash_t& preds );
+        void setupFixpoint( Worklist<State>& wl, IncomingTransMap_t* trans, PredHash_t* preds );
 
         /**
          * setupFixpoint clears each states markable flag and sets
          * the states weight to zero, and weight of final states to
          * wtFinal (or ONE if NULL)
          */
-        void setupFixpoint( Worklist<State>& wl, PredHash_t& preds, sem_elem_t wtFinal );
+        void setupFixpoint( Worklist<State>& wl, IncomingTransMap_t* trans, PredHash_t* preds, sem_elem_t wtFinal );
 
         virtual ITrans * find( 
             Key p,
