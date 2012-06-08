@@ -6,6 +6,7 @@
 
 #include "opennwa/Nwa.hpp"
 #include "opennwa/NwaParser.hpp"
+#include "opennwa/query/automaton.hpp"
 
 using std::string;
 using std::ifstream;
@@ -14,6 +15,8 @@ using std::cout;
 using std::cerr;
 using std::endl;
 using std::exit;
+
+using namespace opennwa::query;
 
 int main(int argc, char** argv)
 {
@@ -39,16 +42,20 @@ int main(int argc, char** argv)
 
     if (argc == 2) {
         // Print "human readable"
-        std::cout << "Number of states:      " << nwa->sizeStates() << "\n";
-        std::cout << "          initials:    " << nwa->sizeInitialStates() << "\n";
-        std::cout << "          accepting:   " << nwa->sizeFinalStates() << "\n";
+        std::cout << "Number of states:       " << nwa->sizeStates() << "\n";
+        std::cout << "          initials:     " << nwa->sizeInitialStates() << "\n";
+        std::cout << "          accepting:    " << nwa->sizeFinalStates() << "\n";
+        std::cout << "          call sites:   " << numCallSites(*nwa) << "\n";
+        std::cout << "          entry sites:  " << numEntrySites(*nwa) << "\n";
+        std::cout << "          exit sites:   " << numExitSites(*nwa) << "\n";
+        std::cout << "          return sites: " << numReturnSites(*nwa) << "\n";        
         std::cout << "\n";
-        std::cout << "Number of symbols:     " << nwa->sizeSymbols() << "\n";
+        std::cout << "Number of symbols:      " << nwa->sizeSymbols() << "\n";
         std::cout << "\n";
-        std::cout << "Number of transitions: " << nwa->sizeTrans() << "\n";
-        std::cout << "          internals:   " << nwa->sizeInternalTrans() << "\n";
-        std::cout << "          calls:       " << nwa->sizeCallTrans() << "\n";
-        std::cout << "          returns:     " << nwa->sizeReturnTrans() << "\n";
+        std::cout << "Number of transitions:  " << nwa->sizeTrans() << "\n";
+        std::cout << "          internals:    " << nwa->sizeInternalTrans() << "\n";
+        std::cout << "          calls:        " << nwa->sizeCallTrans() << "\n";
+        std::cout << "          returns:      " << nwa->sizeReturnTrans() << "\n";
     }
     else {
         // Print JSON
@@ -56,6 +63,10 @@ int main(int argc, char** argv)
         std::cout << "    \"count_states\":           " << nwa->sizeStates() << "\n";
         std::cout << "    \"count_initial_states\":   " << nwa->sizeInitialStates() << "\n";
         std::cout << "    \"count_accepting_states\": " << nwa->sizeFinalStates() << "\n";
+        std::cout << "    \"count_call_sites\":       " << numCallSites(*nwa) << "\n";
+        std::cout << "    \"count_entry_sites\":      " << numEntrySites(*nwa) << "\n";
+        std::cout << "    \"count_exit_sites\":       " << numExitSites(*nwa) << "\n";
+        std::cout << "    \"count_return_sites\":     " << numReturnSites(*nwa) << "\n";        
         
         std::cout << "    \"count_symbols\":          " << nwa->sizeSymbols() << "\n";
         

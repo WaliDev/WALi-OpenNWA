@@ -14,6 +14,10 @@ WALi/OpenNWA 4.0:
     calling WFA::print_dot to output extra attributes for either nodes
     or edges.
 
+  OpenNWA features:
+  - Added NWA statistics functions num{Call,Entry,Exit,Return}Sites in
+    opennwa::query (opennwa/query/automaton.hpp)
+
   WALi bug fixes:
   - Fixed a rather bad efficiency problem with path_summary; on large examples
     this can run almost an order of magnitude faster.
