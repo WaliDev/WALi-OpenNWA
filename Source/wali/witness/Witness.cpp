@@ -10,7 +10,9 @@
 #include "wali/witness/WitnessCombine.hpp"
 #include "wali/witness/Visitor.hpp"
 #include "wali/witness/VisitorPrinter.hpp"
+
 #include <typeinfo>
+#include <map>
 
 namespace wali
 {
@@ -57,12 +59,16 @@ namespace wali
 
     int Witness::COUNT = 0;
 
-    Witness::Witness( sem_elem_t set ) : user_se(set),isEmpty(false)
+    Witness::Witness( sem_elem_t set )
+      : user_se(set)
+      , isEmpty(false)
     {
       COUNT++;
     }
 
-    Witness::Witness( sem_elem_t se, bool ie) : user_se(se),isEmpty(ie)
+    Witness::Witness( sem_elem_t se, bool ie)
+      : user_se(se)
+      , isEmpty(ie)
     {
       COUNT++;
     }
@@ -86,12 +92,32 @@ namespace wali
 
     sem_elem_t Witness::one() const
     {
-      return new Witness( user_se->one(),true );
+      typedef std::map<sem_elem_t, sem_elem_t> OneCache;
+      static OneCache one_cache;
+
+      sem_elem_t z = user_se->one();
+      
+      OneCache::iterator oit = one_cache.find(z);
+      if (oit == one_cache.end()) {
+        oit = one_cache.insert(std::make_pair(z, new Witness(z, true))).first;
+      }
+      assert(oit->second.get_ptr() != NULL);
+      return oit->second;
     }
 
     sem_elem_t Witness::zero() const
     {
-      return new Witness( user_se->zero(),true );
+      typedef std::map<sem_elem_t, sem_elem_t> ZeroCache;
+      static ZeroCache zero_cache;
+
+      sem_elem_t z = user_se->zero();
+      
+      ZeroCache::iterator zit = zero_cache.find(z);
+      if (zit == zero_cache.end()) {
+        zit = zero_cache.insert(std::make_pair(z, new Witness(z, true))).first;
+      }
+      assert(zit->second.get_ptr() != NULL);
+      return zit->second;
     }
 
     sem_elem_t Witness::extend( SemElem * se )
