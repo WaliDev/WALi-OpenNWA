@@ -51,6 +51,7 @@ test_files = Split("""
     Source/opennwa/namespace-query/language-contains.cpp
     Source/opennwa/namespace-query/language-comparison.cpp
     Source/opennwa/namespace-query/language-is-empty.cpp
+    Source/opennwa/namespace-query/stats.cpp
     Source/opennwa/namespace-construct/complement.cpp
     Source/opennwa/namespace-construct/union.cpp
     Source/opennwa/namespace-construct/intersect.cpp

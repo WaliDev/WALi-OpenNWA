@@ -38,6 +38,22 @@ namespace opennwa {
     bool
     statesOverlap(Nwa const & first, Nwa const & second);
 
+    /// Returns the number of states of 'nwa' that appear in the call
+    /// position of a call transition.
+    size_t numCallSites(Nwa const & nwa);
+
+    /// Returns the number of states of 'nwa' that appear in the entry
+    /// position of a call transition.
+    size_t numEntrySites(Nwa const & nwa);    
+
+    /// Returns the number of states of 'nwa' that appear in the exit
+    /// position of a return transition.
+    size_t numExitSites(Nwa const & nwa);
+
+    /// Returns the number of states of 'nwa' that appear in the return
+    /// position of a return transition.
+    size_t numReturnSites(Nwa const & nwa);
+
   }
 }
 
