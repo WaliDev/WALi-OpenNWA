@@ -92,32 +92,32 @@ namespace wali
 
     sem_elem_t Witness::one() const
     {
-      typedef std::map<sem_elem_t, sem_elem_t> OneCache;
-      static OneCache one_cache;
-
-      sem_elem_t z = user_se->one();
-      
-      OneCache::iterator oit = one_cache.find(z);
-      if (oit == one_cache.end()) {
-        oit = one_cache.insert(std::make_pair(z, new Witness(z, true))).first;
-      }
-      assert(oit->second.get_ptr() != NULL);
-      return oit->second;
+      return new Witness(user_se->one(), true);
     }
 
     sem_elem_t Witness::zero() const
     {
+      sem_elem_t user_zero = user_se->zero();
+      
+#if !defined(WALI_WITNESS_CACHE_ZEROES)
+      // Currently Witness will create a new zero every time it is called. If
+      // this becomes a problem, here's an alternate implementation that does
+      // not. However, it can be a regression if the weights the witnesses
+      // are wrapping don't cache their own zeros and ones, or if many many
+      // many different kinds of weights are used.
+
       typedef std::map<sem_elem_t, sem_elem_t> ZeroCache;
       static ZeroCache zero_cache;
-
-      sem_elem_t z = user_se->zero();
-      
-      ZeroCache::iterator zit = zero_cache.find(z);
+     
+      ZeroCache::iterator zit = zero_cache.find(user_zero);
       if (zit == zero_cache.end()) {
-        zit = zero_cache.insert(std::make_pair(z, new Witness(z, true))).first;
+        zit = zero_cache.insert(std::make_pair(user_zero, new Witness(user_zero, true))).first;
       }
       assert(zit->second.get_ptr() != NULL);
       return zit->second;
+#else
+      return new Witness(user_zero, true);
+#endif
     }
 
     sem_elem_t Witness::extend( SemElem * se )

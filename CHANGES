@@ -17,13 +17,10 @@ WALi/OpenNWA 4.0:
   WALi bug fixes:
   - Fixed a rather bad efficiency problem with path_summary; on large examples
     this can run almost an order of magnitude faster.
-  - Made the Witness class cache zero and one values instead of creating a
-    new object each time zero()/one() is called. In almost all cases this
-    will result in a nice improvement in the amount of memory (and also
-    speed) used. However, it can be a regression if the weights the witnesses
-    are wrapping don't cache their own zeros and ones, or if many many many
-    different kinds of weights are used. Let us know if this is a problem for
-    you. (Or, modify the one() and zero() functions in Witness.cpp.)
+  - Use the cached theZero object in WPDS::post instead of creating a new
+    zero; this is important if you have a class (like Witness) that doesn't
+    cache its own zeroes.
+  - There is an optional setting to make Witness cache its zeros and ones.
 
   OpenNWA bug fixes:
   - Updated license and author information

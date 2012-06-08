@@ -477,7 +477,7 @@ namespace wali
 
       // Reset delta of t to zero to signify completion
       // of work for that delta
-      t->setDelta(dnew->zero());
+      t->setDelta(theZero);
 
       // For each forward rule of config
       // Apply rule to create new transition
