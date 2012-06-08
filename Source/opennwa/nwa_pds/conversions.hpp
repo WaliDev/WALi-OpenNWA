@@ -114,14 +114,13 @@ namespace opennwa
      */
     inline
     wali::Key
-    getControlLocation( Key exit, Key callSite, Key returnSite )
+    getControlLocation( Key otherState )
     {
       //std::stringstream ss;
       //ss << "(key#"  << exit << "," << callSite << "," << returnSite << ")";
       //wali::Key key = getKey(getProgramControlLocation(), getKey(ss.str()));
 
-      State key = getKey(getProgramControlLocation(),
-                         getKey(exit, getKey(callSite, returnSite)));
+      State key = getKey(getProgramControlLocation(), otherState);
       return key;
     }
 
