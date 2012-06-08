@@ -100,6 +100,10 @@ namespace wali
         return *ptr;
       }
 
+      bool operator<(ref_ptr const & that) const {
+        return ptr < that.get_ptr();
+      }
+
       bool is_empty() const { return (0 == ptr); }
       bool is_valid() const { return !(is_empty());}
 
