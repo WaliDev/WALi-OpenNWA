@@ -27,7 +27,10 @@ WALi/OpenNWA 4.0:
 
   OpenNWA bug fixes:
   - Updated license and author information
-
+  - Fixed a bad performance problem with the NWA to WPDS conversion. Our code
+    didn't match our tech report. Our tech report created a number of PDS
+    states that was linear in the number of return points. Our code created a
+    number that was cubic. Oops.
 
 
 WALi/OpenNWA 4.0 RC1:
