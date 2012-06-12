@@ -1029,6 +1029,28 @@ namespace wali
       worklist->put( t );
     }
 
+
+    void WPDS::printStatistics(std::ostream & os) const
+    {
+      WpdsStackSymbols stack;
+      for_each(stack);
+
+      WpdsRules rules;
+      for_each(rules);
+      
+      os << "Statistics for WPDS " << this << ":\n"
+         << "   control states: " << num_pds_states() << "\n"
+         << "\n"
+         << "   stack symbols: " << stack.gamma.size() << "\n"
+         << "   call points:   " << stack.callPoints.size() << "\n"
+         << "   entry points:  " << stack.entryPoints.size() << "\n"
+         << "   return points: " << stack.returnPoints.size() << "\n"
+         << "\n"
+         << "   rules:  " << rules.pushRules.size() + rules.popRules.size() + rules.stepRules.size() << "\n"
+         << "   pushes: " << rules.pushRules.size() << "\n"
+         << "   steps:  " << rules.stepRules.size() << "\n"
+         << "   pops:   " << rules.popRules.size() << "\n";
+    }
   } // namespace wpds
 
 } // namespace wali

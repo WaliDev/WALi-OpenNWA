@@ -13,6 +13,7 @@ WALi/OpenNWA 4.0:
   - Added a new callback class, DotAttributePrinter, which allows someone
     calling WFA::print_dot to output extra attributes for either nodes
     or edges.
+  - Added printStatistics() functions to WFA and WPDS
 
   OpenNWA features:
   - Added NWA statistics functions num{Call,Entry,Exit,Return}Sites in

@@ -2135,7 +2135,28 @@ namespace wali
       return result;
     }
     
-  
+
+    //// Prints to 'os' statistics about this WFA. 
+    void WFA::printStatistics(std::ostream & os) const
+    {
+      TransCounter counter;
+      for_each(counter);
+
+      std::set<Key> symbols;
+      for(kp_map_t::const_iterator it = kpmap.begin();
+          it != kpmap.end(); ++it)
+      {
+        symbols.insert(it->first.second);
+      }
+
+      os << "Statistics for WFA " << this << ":\n"
+         << "              states: " << numStates() << "\n"
+         << "    accepting states: " << getFinalStates().size() << "\n"
+         << "             symbols: " << symbols.size() << "\n"
+         << "         transitions: " << counter.getNumTrans() << "\n";
+    }
+      
+    
   } // namespace wfa
 
 } // namespace wali
