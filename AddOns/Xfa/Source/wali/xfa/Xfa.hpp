@@ -327,12 +327,17 @@ namespace cfglib {
 
             
             wali::domains::binrel::ProgramBddContext new_voc;
+            BinaryRelation havoc_current_state;
 
-            IntroduceStateToRelationWeightGen(wali::domains::binrel::ProgramBddContext v,
+            IntroduceStateToRelationWeightGen(wali::domains::binrel::ProgramBddContext const & v,
                                               Xfa const & xfa)
                 : new_voc(v)
             {
                 set_up_sequential_state_map(xfa);
+
+                using wali::domains::binrel::BinRel;
+                havoc_current_state =
+                    new BinRel(&v, new_voc.Assign("current_state", new_voc.NonDet()));
             }
                 
             
@@ -345,9 +350,6 @@ namespace cfglib {
                 using wali::domains::binrel::bddinfo_t;
 
                 // Zeroth step: havoc the current state
-                BinaryRelation havoc_current_state =
-                    new BinRel(&new_voc, new_voc.Assign("current_state", new_voc.NonDet()));
-
                 sem_elem_t orig_rel_then_havoc =
                     trans_in_original->weight()->extend(havoc_current_state);
 
