@@ -99,7 +99,7 @@ namespace wali
     {
       sem_elem_t user_zero = user_se->zero();
       
-#if !defined(WALI_WITNESS_CACHE_ZEROES)
+#if defined(WALI_WITNESS_CACHE_ZEROES)
       // Currently Witness will create a new zero every time it is called. If
       // this becomes a problem, here's an alternate implementation that does
       // not. However, it can be a regression if the weights the witnesses
