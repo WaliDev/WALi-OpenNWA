@@ -117,11 +117,12 @@ namespace wali
     mbstowcs(wfile, file, sz_file);
     _wassert(wassertion, wfile, line);
 # else
-    std::cerr << "In function " << function <<":\n";
-    std::cerr << "  file: " << file << "\n"
+    std::cerr << "In function " << function <<":\n"
+              << "  file: " << file << "\n"
               << "  line: " << line << "\n"
-              << "  assertion failure!\n"
-              << "\n";
+              << "  assertion failure:\n"
+              << "    " << assertion << "\n"
+              ;
     abort();
 # endif
 #endif
