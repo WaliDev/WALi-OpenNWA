@@ -97,6 +97,7 @@ namespace wali
 		   unsigned int line,
 		   const char* function)
   {
+#ifndef NDEBUG
 # ifdef _MSC_VER
     using std::mbstowcs;
     std::cerr << "In function " << function <<":\n";
@@ -116,8 +117,14 @@ namespace wali
     mbstowcs(wfile, file, sz_file);
     _wassert(wassertion, wfile, line);
 # else
-    __assert_fail (assertion, file, line, function);
+    std::cerr << "In function " << function <<":\n";
+    std::cerr << "  file: " << file << "\n"
+              << "  line: " << line << "\n"
+              << "  assertion failure!\n"
+              << "\n";
+    abort();
 # endif
+#endif
   }
   
 
