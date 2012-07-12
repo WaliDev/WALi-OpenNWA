@@ -174,7 +174,7 @@ namespace wali
     }; // class TransZeroWeight
 
 
-    class DotAttributePrinter;
+    struct DotAttributePrinter;
 
     /*!
      * @class TransDotty
