@@ -12,7 +12,7 @@ namespace wali {
 
     namespace graph {
 
-        enum node_type {None, SuperSource, Source, OutNode};
+        enum node_type {None, SuperSource, Source, OutNode, Out1Node};
 
         struct IntraGraphStats {
             int nstar;
@@ -146,6 +146,8 @@ namespace wali {
             int nedges;
             list<int> *out_nodes_intra; // out nodes numbered as in this IntraGraph
             list<int> *out_nodes_inter; // out nodes numbered as in the InterGraph
+            list<int> *out1_nodes_intra; // out 1 nodes numbered as in this IntraGraph
+            list<int> *out1_nodes_inter; // out 1 nodes numbered as in the InterGraph
             //transition_map_t node_number;
             bool running_prestar;
 
@@ -187,6 +189,8 @@ namespace wali {
                 nedges = 0;
                 out_nodes_intra = new list<int>;
                 out_nodes_inter = new list<int>;
+                out1_nodes_intra = new list<int>;
+                out1_nodes_inter = new list<int>;
                 running_prestar = pre;
                 se = _se;
                 apsp = NULL;
@@ -195,6 +199,8 @@ namespace wali {
             ~IntraGraph() {
                 delete out_nodes_intra;
                 delete out_nodes_inter;
+                delete out1_nodes_intra;
+                delete out1_nodes_inter;
                 if(apsp != NULL) {
                     int i;
                     for(i=0;i<nnodes;i++)
@@ -205,6 +211,9 @@ namespace wali {
             }
             list<int> *getOutTransitions() {
                 return out_nodes_inter;
+            }
+            list<int> *getOut1Transitions() {
+                return out1_nodes_inter;
             }
             IntraGraphStats get_stats();
             int getSize() {
@@ -240,6 +249,7 @@ namespace wali {
             void addEdge(int src, int tgt, sem_elem_t se, bool updatable = false);
             void setSource(int t, sem_elem_t se);
             void setOutNode(int t, int inter_t);
+            void setOut1Node(int t, int inter_t);
             void addCallEdge(IntraGraph *next);
             void updateWeight(int node, sem_elem_t wt);
             void updateWeight(int node, int uno);

@@ -147,7 +147,7 @@ elif BaseEnv['compiler'] in ['cl', 'cl.EXE']:
     else:
        BaseEnv.Append(CCFLAGS=' /MT')
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
-BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , '..', 'boost')])
+#BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , '..', 'boost')])
 try:
     BaseEnv.Append(CPPPATH = [os.environ['BOOST_HOME']])
 except KeyError:

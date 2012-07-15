@@ -776,6 +776,15 @@ namespace wali {
       }
     }
 
+    void IntraGraph::setOut1Node(int n, int inter_n) {
+      create_node(n);
+      if(nodes[n].type != Out1Node) { // Avoid duplicates
+        nodes[n].type = Out1Node;
+        out1_nodes_intra->push_back(n);
+        out1_nodes_inter->push_back(inter_n);
+      }
+    }
+
     sem_elem_t IntraGraph::get_weight(int nno) {
 
       if(nodes[nno].regexp.get_ptr() == NULL) {

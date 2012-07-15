@@ -21,6 +21,7 @@
 #include "wali/KeyPairSource.hpp"
 #include "wali/Worklist.hpp"
 #include "wali/DefaultWorklist.hpp"
+//#include "wali/KeyOrderWorklist.hpp"
 
 using namespace std;
 using namespace wali;
@@ -50,6 +51,7 @@ NWPDS::NWPDS(bool b) :
   //Two newton steps are like a continued pre/post star query interjected
   //by other stuff. So we want to allow incoming transitions there (I think)
   wali::set_strict(false);
+  worklist = new DefaultWorklist<wfa::ITrans>; //new KeyOrderWorklist;
 }
 
 NWPDS::NWPDS(ref_ptr<wpds::Wrapper> wrapper, bool b) :
@@ -308,7 +310,7 @@ void NWPDS::updateFa(wfa::WFA& fa)
     t = *it;
 
     //DEBUGGING
-    std::cout << ":" << t->from() << "-" << t->stack() << "->" << t->to() <<std::endl;
+    //std::cout << ":" << t->from() << "-" << t->stack() << "->" << t->to() <<std::endl;
 
     if(dbg){
       *waliErr << "[UpdateFa]: " << std::endl << "Processing:" << std::endl;

@@ -131,11 +131,12 @@ namespace wali {
                 std::list<int> outgoing;
                 std::list<int> incoming;
                 std::list<int> out_hyper_edges;
+                std::list<int> out1_hyper_edges;
                 bool visited;
                 GraphNode(Transition tr, inter_node_t ty = InterNone) : trans(tr), intra_nodeno(-1), type(ty), weight(0), gr(NULL) {}
                 GraphNode(const GraphNode &g) : trans(g.trans), intra_nodeno(g.intra_nodeno), type(g.type), weight(g.weight), 
                 gr(g.gr), outgoing(g.outgoing), incoming(g.incoming),
-                out_hyper_edges(g.out_hyper_edges), visited(g.visited) {}
+                out_hyper_edges(g.out_hyper_edges), out1_hyper_edges(g.out1_hyper_edges), visited(g.visited) {}
         };
 
       class InterGraph : public Countable {
@@ -280,6 +281,10 @@ namespace wali {
                 void saturateNewton(std::multiset<tup> &worklist, unsigned scc_n);
 
                 void setup_worklist(std::list<IntraGraph *> &gr_sorted, 
+                        std::list<IntraGraph *>::iterator &gr_it, 
+                        unsigned int scc_n,
+                        std::multiset<tup> &worklist);
+                void setup_worklist_newton(std::list<IntraGraph *> &gr_sorted, 
                         std::list<IntraGraph *>::iterator &gr_it, 
                         unsigned int scc_n,
                         std::multiset<tup> &worklist);
