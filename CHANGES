@@ -1,4 +1,4 @@
-WALi/OpenNWA 4.0:
+WALi/OpenNWA 4.1 RC1:
   General features
   - Added 'scons CXX=...' to choose compiler and strong_warnings=0 to disable
     extra warning flags
