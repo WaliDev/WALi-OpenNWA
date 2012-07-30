@@ -142,7 +142,9 @@ elif BaseEnv['compiler'] in ['cl', 'cl.EXE']:
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , '..', 'boost')])
 try:
-    BaseEnv.Append(CPPPATH = [os.environ['BOOST_HOME']])
+        BaseEnv.Append(CPPPATH = [os.environ['BOOST_HOME']])
+        BaseEnv.Append(LIBPATH = [os.environ['BOOST_LIB']])
+        BaseEnv.Append(RPATH = [os.environ['BOOST_LIB']])
 except KeyError:
     pass
 
