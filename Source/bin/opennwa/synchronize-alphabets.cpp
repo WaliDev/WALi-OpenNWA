@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <fstream>
 
-#include <boost/filesystem.hpp>
+#include <boost/filesystem/convenience.hpp>
 
 #include "opennwa/Nwa.hpp"
 #include "opennwa/NwaParser.hpp"
