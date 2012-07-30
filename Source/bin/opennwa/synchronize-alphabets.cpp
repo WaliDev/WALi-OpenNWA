@@ -19,8 +19,7 @@ using std::endl;
 using std::exit;
 using std::vector;
 
-using opennwa::NestedWord;
-using opennwa::NestedWordRefPtr;
+using namespace opennwa;
 
 
 int main(int argc, char** argv)
@@ -38,7 +37,7 @@ int main(int argc, char** argv)
     // Read in all NWAs
     std::vector<NwaRefPtr> nwas;
     for (size_t i=0; i<filenames.size(); ++i) {
-        ifstream infile(filenames[i]);
+        ifstream infile(filenames[i].c_str());
         if (!infile.good()) {
             cerr << "Error opening input file " << argv[1] << "\n";
             exit(2);
@@ -49,7 +48,7 @@ int main(int argc, char** argv)
     // Collect up all symbols
     std::set<opennwa::Symbol> symbols;
     for (size_t i=0; i<nwas.size(); ++i) {
-        symbols.insert(nwas->beginSymbols(), nwas->endSymbols());
+        symbols.insert(nwas.at(i)->beginSymbols(), nwas.at(i)->endSymbols());
     }
 
     // Apply those symbols to each NWA
@@ -72,14 +71,14 @@ int main(int argc, char** argv)
     // Write things back out
     assert(filenames.size() == nwas.size());
     for (size_t i=0; i<nwas.size(); ++i) {
-        if (nwas.at(i)) {
+        if (nwas.at(i) != NULL) {
             std::string bakname = filenames.at(i) + ".bak";
             if (boost::filesystem::exists(bakname)) {
                 boost::filesystem::remove(bakname);
             }
             boost::filesystem::rename(filenames.at(i), bakname);
 
-            ofstream outfile(filenames.at(i));
+            ofstream outfile(filenames.at(i).c_str());
 
             nwas.at(i)->print(outfile);
         }
