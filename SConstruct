@@ -148,6 +148,10 @@ try:
 except KeyError:
     pass
 
+conf = Configure(BaseEnv)
+BaseEnv["HAS_BOOST_FILESYSTEM"] = conf.CheckLib('boost_filesystem', language='c++')
+BaseEnv = conf.Finish()
+
 levels={'slow': 2, 'fast':1, 'none':0}
 BaseEnv['CPPDEFINES']['CHECKED_LEVEL'] = levels[CheckedLevel]
 

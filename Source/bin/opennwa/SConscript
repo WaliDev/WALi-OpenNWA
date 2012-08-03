@@ -29,8 +29,6 @@ built = [
     env.Program('nwa-is-member.exe', ['is-member.cpp']),
     env.Program('nwa-language-equals.exe', ['language-equals.cpp']),
     env.Program('nwa-language-subseteq.exe', ['language-subseteq.cpp']),
-    env.Program('nwa-synchronize-alphabets.exe', ['synchronize-alphabets.cpp'],
-                LIBS=["boost_filesystem", "wali"]),
 
     DoubleProgramTarget(env, 'intersect'),
     DoubleProgramTarget(env, 'union', 'unionNwa'),
@@ -43,6 +41,10 @@ built = [
 
     SingleProgramTarget(env, 'expand', 'expandNwa', 'experimental')
 ]
+
+if env["HAS_BOOST_FILESYSTEM"]:
+    built.append(env.Program('nwa-synchronize-alphabets.exe', ['synchronize-alphabets.cpp'],
+                             LIBS=["boost_filesystem", "wali"]))
 
 i = env.Install(BinInstallDir, built)
 
