@@ -175,6 +175,11 @@ namespace wali {
                 static bool extend_backwards;
                 static reg_exp_hash_t reg_exp_hash;
                 static const_reg_exp_hash_t const_reg_exp_hash;
+                // Remember what Regular Experessions are the root of the tree
+                // in the current Saturation phase. This is reset between saturation
+                // phases.
+                // Note that constant RegExps never go in this map.
+                static reg_exp_hash_t roots;
                 static RegExpStats stats;
                 static reg_exp_t reg_exp_zero, reg_exp_one;
 
@@ -251,6 +256,7 @@ namespace wali {
                 }
 
                 ostream &print(ostream &out);
+                long toDot(ostream &out, std::set<long>& seen, bool isRoot = false);
                 static reg_exp_t star(reg_exp_t r);
                 static reg_exp_t extend(reg_exp_t r1, reg_exp_t r2);
                 static reg_exp_t combine(reg_exp_t r1, reg_exp_t r2);
@@ -266,6 +272,7 @@ namespace wali {
                     return updatable_nodes.size();
                 }
                 static void update(node_no_t nno, sem_elem_t se);
+                static void update(std::vector<node_no_t> nnos, std::vector<sem_elem_t> ses);
                 int updatableNumber();
 #ifdef DWPDS
                 sem_elem_t get_delta(unsigned int ls);
@@ -276,6 +283,7 @@ namespace wali {
                 }
                 static int out_node_height(set<RegExp *> reg_equations);
                 sem_elem_t get_weight();
+                static void evaluateRoots();
 
                 int get_nevals() {
                     return nevals;
@@ -303,6 +311,13 @@ namespace wali {
                  * Anyway, FWPDS (using RegExps) should be able to clean up after itself.
                  **/
                 static void cleanUp();
+
+                /**
+                 * @author Prathmesh Prabhu
+                 * Obtain the hash map that stores the roots in the current
+                 * sat process
+                 **/
+                static const reg_exp_hash_t& getRoots();
 
             private:
 

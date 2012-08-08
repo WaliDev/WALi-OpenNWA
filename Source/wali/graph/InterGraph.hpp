@@ -119,6 +119,35 @@ namespace wali {
                 }
         };
 
+        //This class is used to compute SCCs of the call graph.
+        class SCCGraph;
+        typedef wali::ref_ptr<SCCGraph> scc_graph_t;
+        typedef std::list< scc_graph_t > SCCGraphs;
+        class SCCGraphLE {
+          public:
+            bool operator () (const scc_graph_t lhs, const scc_graph_t rhs) const
+            {
+              return lhs.get_ptr() < rhs.get_ptr();
+            }
+        };
+
+        class SCCGraph : public Countable 
+        {
+          // Graph data
+          public:
+            std::vector<int> nodes;
+            std::vector<GraphEdge> intraEdges;
+            std::vector<HyperEdge> interEdges;
+            // Used for computing SCC
+          public:
+            bool visited;
+            unsigned scc_number;
+            SCCGraphs nextGraphs;
+          public:
+            SCCGraph() : visited(false), scc_number(0) {}
+        };
+
+       
         enum inter_node_t {InterNone = 0, InterSource = 1, InterOutNode = 2, InterSourceOutNode = 3};
 
         class GraphNode {
@@ -128,6 +157,7 @@ namespace wali {
                 inter_node_t type;
                 sem_elem_t weight;
                 IntraGraph *gr;
+                scc_graph_t sccgr;
                 std::list<int> outgoing;
                 std::list<int> incoming;
                 std::list<int> out_hyper_edges;
@@ -139,157 +169,172 @@ namespace wali {
                 out_hyper_edges(g.out_hyper_edges), out1_hyper_edges(g.out1_hyper_edges), visited(g.visited) {}
         };
 
-      class InterGraph : public Countable {
-            public:
-                typedef std::ostream & (*PRINT_OP)(std::ostream &, int);
 
-            private:
-                friend class SummaryGraph;
+        class InterGraph : public Countable {
+          public:
+            typedef std::ostream & (*PRINT_OP)(std::ostream &, int);
 
-				typedef std::vector< int > Int1D;
-				typedef std::vector< Int1D > Int2D;
-				typedef std::vector< bool > Bool1D;
-				
-                typedef std::map<Transition, int, TransitionCmp> TransMap;
-                typedef bool (*WT_CHECK)(SemElem *);
-                typedef SemElem *(*WT_CORRECT)(SemElem *);
-                typedef std::pair<int,int> tup;
-                typedef std::pair<int, int> call_edge_t;
-                typedef std::multiset< tup > WorkList;
-                typedef std::multiset< tup, std::greater< tup > > TopSortWorkList;
+          private:
+            friend class SummaryGraph;
 
-                std::vector<GraphNode> nodes;
-                std::vector<GraphEdge> intra_edges;
-                std::vector<HyperEdge> inter_edges;
-                std::vector<call_edge_t> call_edges;
-                int max_scc_computed;
+            typedef std::vector< int > Int1D;
+            typedef std::vector< Int1D > Int2D;
+            typedef std::vector< bool > Bool1D;
 
-                UnionFind *intra_graph_uf;
-                std::list<IntraGraph *> gr_list;
-                IntraGraph * newtonGr;
+            typedef std::map<Transition, int, TransitionCmp> TransMap;
+            typedef bool (*WT_CHECK)(SemElem *);
+            typedef SemElem *(*WT_CORRECT)(SemElem *);
+            typedef std::pair<int,int> tup;
+            typedef std::pair<int, int> call_edge_t;
+            typedef std::multiset< tup > WorkList;
+            typedef std::multiset< tup, std::greater< tup > > TopSortWorkList;
 
-                ETransHandler eHandler;
-                //map<int,IntraGraph*> intra_graph_map;
+            std::vector<GraphNode> nodes;
+            std::vector<GraphEdge> intra_edges;
+            std::vector<HyperEdge> inter_edges;
+            std::vector<call_edge_t> call_edges;
+            int max_scc_computed;
 
-                TransMap node_number;
-                sem_elem_t sem; 
-                bool running_ewpds;
-                bool running_nwpds;
-                bool running_prestar;
-                InterGraphStats stats;
+            UnionFind *intra_graph_uf;
+            std::list<IntraGraph *> gr_list;
+            std::list<IntraGraph *> linear_gr_list;
 
-                static std::ostream &defaultPrintOp(std::ostream &out, int a) {
-                    out << a;
-                    return out;
-                }
+            IntraGraph * newtonGr; //to be removed
 
-                static std::ostream &keyPrintOp(std::ostream &out, int a) {
-                  wali::Key key = (wali::Key) a;
-                  out << wali::key2str(key);
-                  return out;
-                }
+            bool runningNewton;
+            ETransHandler eHandler;
+            //map<int,IntraGraph*> intra_graph_map;
 
-            public:
-                InterGraph(wali::sem_elem_t s, bool e, bool pre, bool n = false) {
-                    sem = s;
-                    intra_graph_uf = NULL;
-                    running_ewpds = e;
-                    running_nwpds = n;
-                    running_prestar = pre;
-                    max_scc_computed = 0;
-                    newtonGr = NULL;
-                    count = 0;
-                }
-                ~InterGraph();
-                void addEdge(Transition src, Transition tgt, wali::sem_elem_t se);
-                void addEdge(Transition src1, Transition src2, Transition tgt, wali::sem_elem_t se);
-                void addEdge(Transition src1, Transition src2, Transition tgt, wali::merge_fn_t mf);
-                void addCallRetEdge(Transition src, Transition tgt, wali::sem_elem_t se);
+            TransMap node_number;
+            sem_elem_t sem; 
+            bool running_ewpds;
+            bool running_nwpds;
+            bool running_prestar;
+            InterGraphStats stats;
 
-                void addCallEdge(Transition src1, Transition src2);
+            static std::ostream &defaultPrintOp(std::ostream &out, int a) {
+              out << a;
+              return out;
+            }
 
-                void setSource(Transition t, wali::sem_elem_t se);
-                void setESource(Transition t, wali::sem_elem_t wtAtCall, wali::sem_elem_t wtAfterCall);
+            static std::ostream &keyPrintOp(std::ostream &out, int a) {
+              wali::Key key = (wali::Key) a;
+              out << wali::key2str(key);
+              return out;
+            }
 
-                void setupInterSolution(std::list<Transition> *wt_required = NULL);
-                void setupNewtonSolution2(std::list<Transition> *wt_required = NULL);
-                void setupNewtonSolution();
+          public:
+            InterGraph(wali::sem_elem_t s, bool e, bool pre, bool n = false) {
+              sem = s;
+              intra_graph_uf = NULL;
+              running_ewpds = e;
+              running_nwpds = n;
+              running_prestar = pre;
+              max_scc_computed = 0;
+              newtonGr = NULL;
+              runningNewton = false;
+              count = 0;
+            }
+            ~InterGraph();
+            void addEdge(Transition src, Transition tgt, wali::sem_elem_t se);
+            void addEdge(Transition src1, Transition src2, Transition tgt, wali::sem_elem_t se);
+            void addEdge(Transition src1, Transition src2, Transition tgt, wali::merge_fn_t mf);
+            void addCallRetEdge(Transition src, Transition tgt, wali::sem_elem_t se);
 
-                sem_elem_t get_weight(Transition t);
-                sem_elem_t get_call_weight(Transition t);
+            void addCallEdge(Transition src1, Transition src2);
 
-                void update_all_weights();
+            void setSource(Transition t, wali::sem_elem_t se);
+            void setESource(Transition t, wali::sem_elem_t wtAtCall, wali::sem_elem_t wtAfterCall);
 
-                bool exists(int state, int stack, WT_CHECK op);
+            void setupInterSolution(std::list<Transition> *wt_required = NULL);
+            void setupNewtonSolution2();
+            void setupNewtonSolution();
 
-                std::ostream &print(std::ostream &out, PRINT_OP pop = defaultPrintOp);
+            sem_elem_t get_weight(Transition t);
+            sem_elem_t get_call_weight(Transition t);
 
-                std::ostream &print_stats(std::ostream &out); 
+            void update_all_weights();
 
-                bool path_summary(int state, int stack, int accept, WT_CORRECT correct, WT_CHECK op);
+            bool exists(int state, int stack, WT_CHECK op);
 
-                bool exists(Transition &t);
+            std::ostream &print(std::ostream &out, PRINT_OP pop = defaultPrintOp);
 
-                int nGraphs() {
-                    return (int)gr_list.size();
-                }
+            std::ostream &print_stats(std::ostream &out); 
 
-                /**
-                 * @author Prathmesh Prabhu
-                 * Classes in the graph* structures use some static variables to hold on to values.
-                 * We want to clean up the structure before finishing the anlysis.
-                 **/
-                static void cleanUp();
-                
-            private:
-                int nodeno(Transition &t);
+            bool path_summary(int state, int stack, int accept, WT_CORRECT correct, WT_CHECK op);
 
-                int intra_edgeno(Transition &src, Transition &tgt);
+            bool exists(Transition &t);
 
-                int inter_edgeno(Transition &src1, Transition &src2, Transition &tgt);
+            int nGraphs() {
+              return (int)gr_list.size();
+            }
 
-                sem_elem_t get_weight(unsigned n);
+            /**
+             * @author Prathmesh Prabhu
+             * Classes in the graph* structures use some static variables to hold on to values.
+             * We want to clean up the structure before finishing the anlysis.
+             **/
+            static void cleanUp();
 
-				void rawDfs(
-					const int u, //current node.
-                
-					const Int1D& deg, //[i]: degree of node i
-					const Int2D& adjMat, //The adjacency matrix
-                
-					Int1D& dfsn, //[i]: the dfs number of vertex i
-					int& dfsnext, //next free dfs number
-					Int1D& comp, //O(1) membership stack containing the 
-								//vertices of current component
-					int& ncomp, //number of outstanding vertices in the components
-					Bool1D& incomp, //[i] a marker that says, I've seen i, but haven't 
-								  //finished putting it in a component
+          private:
+            int nodeno(Transition &t);
 
-					Int1D& mindfsn, //(in:out) [i]: minimum dfs number reachable from vertex i
-					UnionFind& scc //(out) The output scc are stored here.
+            int intra_edgeno(Transition &src, Transition &tgt);
+
+            int inter_edgeno(Transition &src1, Transition &src2, Transition &tgt);
+
+            sem_elem_t get_weight(unsigned n);
+
+            void rawDfs(
+                const int u, //current node.
+
+                const Int1D& deg, //[i]: degree of node i
+                const Int2D& adjMat, //The adjacency matrix
+
+                Int1D& dfsn, //[i]: the dfs number of vertex i
+                int& dfsnext, //next free dfs number
+                Int1D& comp, //O(1) membership stack containing the 
+                //vertices of current component
+                int& ncomp, //number of outstanding vertices in the components
+                Bool1D& incomp, //[i] a marker that says, I've seen i, but haven't 
+                //finished putting it in a component
+
+                Int1D& mindfsn, //(in:out) [i]: minimum dfs number reachable from vertex i
+                UnionFind& scc //(out) The output scc are stored here.
                 );
 
-                void dfsIntraForward(IntraGraph *gr, 
-                        std::list<IntraGraph *> &finished, 
-                        std::map<IntraGraph *, 
-                        std::list<IntraGraph *> > &rev_edges);
+            void dfsIntraForward(IntraGraph *gr, 
+                std::list<IntraGraph *> &finished, 
+                std::map<IntraGraph *, 
+                std::list<IntraGraph *> > &rev_edges);
 
-                void bfsIntra(IntraGraph *start, unsigned int scc_number);
+            void bfsIntra(IntraGraph *start, unsigned int scc_number);
 
-                unsigned SCC(std::list<IntraGraph *> &grlist, std::list<IntraGraph *> &grsorted);
+            unsigned SCC(std::list<IntraGraph *> &grlist, std::list<IntraGraph *> &grsorted);
 
-                void saturate(std::multiset<tup> &worklist, unsigned scc_n);
-                void saturateNewton(std::multiset<tup> &worklist, unsigned scc_n);
+            // The two following functions are identical to SCC and dfsIntraForward, except that they operate on SCCGraph objects
+            void dfsLight(
+                scc_graph_t gr, 
+                SCCGraphs& finished, 
+                std::map< scc_graph_t, SCCGraphs, SCCGraphLE> & rev_edges);
+            unsigned SCCLight(
+                SCCGraphs& grlist,
+                SCCGraphs& grsorted);
 
-                void setup_worklist(std::list<IntraGraph *> &gr_sorted, 
-                        std::list<IntraGraph *>::iterator &gr_it, 
-                        unsigned int scc_n,
-                        std::multiset<tup> &worklist);
-                void setup_worklist_newton(std::list<IntraGraph *> &gr_sorted, 
-                        std::list<IntraGraph *>::iterator &gr_it, 
-                        unsigned int scc_n,
-                        std::multiset<tup> &worklist);
 
-                void resetSCCedges(IntraGraph *gr, unsigned int scc_number);
+            void saturate(std::multiset<tup> &worklist, unsigned scc_n);
+            void saturateNewton(std::multiset<tup> &worklist, unsigned scc_n);
+
+            void setup_worklist(std::list<IntraGraph *> &gr_sorted, 
+                std::list<IntraGraph *>::iterator &gr_it, 
+                unsigned int scc_n,
+                std::multiset<tup> &worklist);
+            void setup_worklist_newton(std::list<IntraGraph *> &gr_sorted, 
+                std::list<IntraGraph *>::iterator &gr_it, 
+                unsigned int scc_n,
+                std::multiset<tup> &worklist);
+
+            void resetSCCedges(IntraGraph *gr, unsigned int scc_number);
         };
 
         typedef ref_ptr<InterGraph> InterGraphPtr;

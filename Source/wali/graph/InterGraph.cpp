@@ -1,6 +1,7 @@
 #include "wali/graph/InterGraph.hpp"
 #include "wali/graph/IntraGraph.hpp"
 #include "wali/graph/RegExp.hpp"
+#include "wali/graph/Functional.hpp"
 
 #include "wali/util/Timer.hpp"
 
@@ -9,8 +10,9 @@
 #include <time.h>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <iomanip>
-
+#include <sstream>
 // ::wali
 #include "wali/SemElemTensor.hpp"
 
@@ -167,12 +169,17 @@ namespace wali {
         }
 
         InterGraph::~InterGraph() {
+          std::set<IntraGraph*> deleteGr;
           for(unsigned i = 0; i < nodes.size(); i++) {
             if(nodes[i].gr && intra_graph_uf->find(i) == (int)i) {
-              delete nodes[i].gr;
+              deleteGr.insert(nodes[i].gr);
               nodes[i].gr=NULL;
             }
+              nodes[i].sccgr = NULL;
           }
+          for(std::set<IntraGraph*>::iterator it = deleteGr.begin(); it != deleteGr.end(); ++it)
+            delete *it;
+
           if(intra_graph_uf) {
             delete intra_graph_uf;
             intra_graph_uf = NULL;
@@ -366,6 +373,80 @@ namespace wali {
           nodes[n].weight = wtAtCall;
           // Extra dependency
           eHandler.addEdge(-1, n, wtAfterCall);
+        }
+
+        unsigned InterGraph::SCCLight(SCCGraphs& grlist, SCCGraphs& grsorted)
+        {
+          SCCGraphs::iterator gr_it;
+          // reset visited
+          for(gr_it = grlist.begin(); gr_it != grlist.end(); gr_it++) {
+            (*gr_it)->visited = false;
+            (*gr_it)->scc_number = 0;
+          }
+          SCCGraphs finished;
+          std::map<scc_graph_t , SCCGraphs, SCCGraphLE> rev_edges;
+          // Do DFS
+          SCCGraphs::reverse_iterator gr_rit;
+          for(gr_rit = grlist.rbegin(); gr_rit != grlist.rend(); gr_rit++) {
+            scc_graph_t gr = *gr_rit;
+            if(gr->visited)
+              continue;
+            dfsLight(gr,finished,rev_edges);
+          }
+
+          unsigned scc = 0;
+
+          for(gr_it = grlist.begin(); gr_it != grlist.end(); gr_it++) {
+            (*gr_it)->visited = false;
+          }
+
+          for(gr_it = finished.begin(); gr_it != finished.end(); gr_it++) {
+            scc_graph_t gr = *gr_it;
+            if(gr->visited)
+              continue;
+            scc++;
+            typedef pair<scc_graph_t, SCCGraphs::iterator> StackEl;
+            std::list<StackEl> stack;
+            stack.push_back(StackEl(gr, rev_edges[gr].begin()));
+            while(!stack.empty()) {
+              StackEl p = stack.front();
+              stack.pop_front();
+              scc_graph_t v = p.first;
+              SCCGraphs::iterator it = p.second;
+              v->scc_number = scc;
+              if(!v->visited) grsorted.push_back(v);
+              v->visited = true;
+              while(it != rev_edges[v].end()) {
+                scc_graph_t c = *it;
+                if(c->visited) {
+                  it++;
+                } else { 
+                  stack.push_front(StackEl(v,++it));
+                  stack.push_front(StackEl(c, rev_edges[c].begin()));
+                  break;
+                }
+              }
+            }
+          }
+          // reset visited
+          for(gr_it = grlist.begin(); gr_it != grlist.end(); gr_it++) {
+            (*gr_it)->visited = false;
+          }
+          return scc;
+        }
+
+        void InterGraph::dfsLight(scc_graph_t gr, SCCGraphs& finished, std::map<scc_graph_t, SCCGraphs, SCCGraphLE >& rev_edges) {
+          gr->visited = true;
+          for(SCCGraphs::iterator it = gr->nextGraphs.begin();
+              it != gr->nextGraphs.end();
+              it++){
+            scc_graph_t ch = *it;
+            rev_edges[ch].push_back(gr);
+            if(!ch->visited)
+              dfsLight(ch, finished, rev_edges);
+          }
+                    
+          finished.push_front(gr);
         }
 
         unsigned InterGraph::SCC(list<IntraGraph *> &grlist, std::list<IntraGraph *> &grsorted) {
@@ -1064,33 +1145,21 @@ namespace wali {
         }
 
 
-        // If an argument is passed in then only weights on those transitions will be available
-        // I can fix this (i.e., weights for others will be available on demand), but not right now.
-        void InterGraph::setupNewtonSolution2(std::list<Transition> *wt_required)
+        void InterGraph::setupNewtonSolution2()
         {
-          ///////////////////Setup weights so that everything is tensored ////////
-          sem_elem_tensor_t sem_old = dynamic_cast<SemElemTensor*>(sem.get_ptr());
-          sem = sem_old->tensor(sem_old.get_ptr());
-          //First update the ETransHandler object that stores weights on call edges.
-          //This guy is used during path summary. We must tensor the weights there correctly.
-          //TODO: Check that path_summary is not broken w.r.t. this implementation.
-          //eHandler.tensorWeights(running_prestar);
-
-          ///////////////////Inter Setup begin.
-          RegExp::startSatProcess(sem);
+          runningNewton = true;         
+          // First populate SCCGraph objects
 
           int n = nodes.size();
           int i;
           unsigned int max_scc_required;
+          SCCGraphs scc_gr_list;
+          SCCGraphs gr_sorted;
           intra_graph_uf = new UnionFind(n);
-
-          std::list<IntraGraph *>::iterator gr_it;
-
-          //////////////// First, find the IntraGraphs
           {
             vector<GraphEdge>::iterator it;
             vector<HyperEdge>::iterator it2;
-            wali::util::Timer * guidingTimer = new wali::util::Timer("[setupNewtonSolution] Guiding Intra Graph setup");
+            wali::util::Timer * sccTimer = new wali::util::Timer("[setupNewtonSolution] SCC");
             for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
               intra_graph_uf->takeUnion((*it).src,(*it).tgt);
             }
@@ -1098,287 +1167,366 @@ namespace wali {
               intra_graph_uf->takeUnion((*it2).src1,(*it2).tgt);
             }
 
+            // Add nodes to SCCGraphs
             for(i = 0; i < n;i++) {
               int j = intra_graph_uf->find(i);
-              if(nodes[j].gr == NULL) {
-                nodes[j].gr = new IntraGraph(running_prestar,sem);
-                gr_list.push_back(nodes[j].gr);
+              if(nodes[j].sccgr == NULL){
+                nodes[j].sccgr = new SCCGraph();
+                scc_gr_list.push_back(nodes[j].sccgr);
               }
-              nodes[i].gr = nodes[j].gr;
-              nodes[i].intra_nodeno = nodes[i].gr->makeNode(nodes[i].trans);
-              if(is_source_type(nodes[i].type)) {
-                nodes[i].gr->setSource(nodes[i].intra_nodeno, nodes[i].weight);
-              }
+              nodes[i].sccgr = nodes[j].sccgr;
+              nodes[i].sccgr->nodes.push_back(i);
             }
-            // Now fill up the IntraGraphs
-            for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
-              int s = (*it).src;
-              int t = (*it).tgt;
-              nodes[s].gr->addEdge(nodes[s].intra_nodeno, nodes[t].intra_nodeno, (*it).weight);
-            }
-            for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
-              IntraGraph *gr = nodes[(*it2).tgt].gr;
-              gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, sem->zero(), false);
-              IntraGraph *gr2 = nodes[(*it2).src2].gr;
-              gr2->setOutNode(nodes[(*it2).src2].intra_nodeno, (*it2).src2);
-              gr->setOut1Node(nodes[(*it2).src1].intra_nodeno, (*it2).src1);
-            }
-            delete guidingTimer;
+            // Add edges tp SCCGraphs
+            for(it = intra_edges.begin(); it != intra_edges.end(); it++)
+              nodes[(*it).src].sccgr->intraEdges.push_back(*it);
+            for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++)
+              nodes[(*it2).tgt].sccgr->interEdges.push_back(*it2);
+            // Also populate inter graph maps for the scc
+            for (it2 = inter_edges.begin(); it2 != inter_edges.end(); ++it2)
+              nodes[(*it2).src2].sccgr->nextGraphs.push_back(nodes[(*it2).tgt].sccgr);
+
+
+            // Do SCC decomposition 
+            max_scc_required = SCCLight(scc_gr_list, gr_sorted);
+            STAT(stats.ncomponents = max_scc_required);
+            delete sccTimer;
+
           }
-          ////////////////We will now create the Newton IntraGraph which will store the
-          ////////////////actual weights, and fom which RegExp will be generated.
+
+          //Setup weights so that everything is tensored
+          sem_elem_tensor_t sem_old = dynamic_cast<SemElemTensor*>(sem.get_ptr());
+          sem = sem_old->tensor(sem_old.get_ptr());
+          //First update the ETransHandler object that stores weights on call edges.
+          //This guy is used during path summary. We must tensor the weights there correctly.
+          //TODO: Check that path_summary is not broken w.r.t. this implementation.
+          //eHandler.tensorWeights(false);
+
+
+          // For each SCC, solve completely using Newton's method.
           {
-            vector<GraphEdge>::iterator geIter;
-            vector<HyperEdge>::iterator heIter;
-            wali::util::Timer * newtonGrSetupTimer = new wali::util::Timer("[setupNewtonSolution] newtonGr setup timer"); 
-            newtonGr = new IntraGraph(running_prestar,sem);
-            for(int i = 0; i < n;i++) {
-              //The node[i].intra_nodeno will point to newtonGr, while 
-              //node[i].gr still points to old IntraGraphs.
-              nodes[i].intra_nodeno = newtonGr->makeNode(nodes[i].trans);
-              if(is_source_type(nodes[i].type)) {
-                //This is a source node. 
-                //Pre*:   w -> (w,1^T)
-                //Post*:  w -> (1^T,w)
-                //where ^T is transpose and (,) is tensor
-                sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>((nodes[i].weight).get_ptr());
-                sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());
-                if(running_prestar){
-                  //wt = wt->transpose();
-                  wt = wt->tensor(one.get_ptr());
-                }else{
-                  wt = one->tensor(wt.get_ptr());
+            wali::util::Timer * newtonTotalTimer = new wali::util::Timer("[setupNewtonSolution] Newton Total Timer");
+
+            SCCGraphs::iterator gr_it = gr_sorted.begin();
+            for(unsigned scc_n = 1; scc_n <= max_scc_required; scc_n++) {
+              wali::util::Timer * subProblemTimer = new wali::util::Timer("[setupNewtonSolution] newtonGr SCC problem Total Timer"); 
+
+              RegExp::startSatProcess(sem);
+
+              ////////////////We will now create the Newton IntraGraph which will store the
+              ////////////////actual weights, and from which RegExp will be generated.
+              ////////////////This is the TDG for the linearized problem for the current SCC
+            
+              SCCGraphs::iterator scc_head = gr_it;
+              IntraGraph * graph = new IntraGraph(false, sem); //pre = false
+              linear_gr_list.push_back(graph);
+              //Add nodes to IntraGraph
+              while(gr_it != gr_sorted.end() && (*gr_it)->scc_number == scc_n){
+                scc_graph_t gr = *gr_it;
+                for(vector<int>::iterator iter = gr->nodes.begin(); iter != gr->nodes.end(); ++iter){
+                  int i = *iter;
+                  nodes[i].intra_nodeno = graph->makeNode(nodes[i].trans);
+                  nodes[i].gr = graph;
                 }
-                newtonGr->setSource(nodes[i].intra_nodeno, wt);
+                gr_it++;
               }
-              // zero all weights (some are set by setSource() )
-              // All weights should be tensored
-              sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>((sem->zero()).get_ptr()); //sem is tensored
-              if(nodes[i].weight.get_ptr() != NULL)
-                nodes[i].weight = zerot;
-            }
-            //Intraprocedural weight
-            //(,) is tensor, ^T is transpose
-            //Pre*: w -> (w,1^T)
-            //Post* w -> (1^T,w)
-            for(geIter = intra_edges.begin(); geIter != intra_edges.end(); ++geIter) {
-              int s = geIter->src;
-              int t = geIter->tgt;
-              sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>((geIter->weight).get_ptr());
-              sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>(wt->one().get_ptr());
+
+              //Reset gr_it
+              gr_it = scc_head;
+              // Now add the myriad edges
+              while(gr_it != gr_sorted.end() && (*gr_it)->scc_number == scc_n){
+                scc_graph_t gr = *gr_it;
+
+                // Source nodes:
+                for(vector<int>::iterator iter = gr->nodes.begin(); iter != gr->nodes.end(); ++iter){
+                  int i = *iter;
+                  if(is_source_type(nodes[i].type)) {
+                    //This is a source node. 
+                    //Create an immutable edge with weight:
+                    //Post*:  w -> (1^T,w)
+                    sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>((nodes[i].weight).get_ptr());
+                    sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());
+                    wt = one->tensor(wt.get_ptr());
+                    graph->setSource(nodes[i].intra_nodeno, wt);
+                  }
+                  // zero all weights (some are set by InterGraph::setSource() )
+                  sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>((sem->zero()).get_ptr()); //sem is tensored
+                  if(nodes[i].weight.get_ptr() != NULL)
+                    nodes[i].weight = zerot;
+                }
+
+                // Intra Edges:
+                for(vector<GraphEdge>::iterator iter = gr->intraEdges.begin(); iter != gr->intraEdges.end(); iter++){
+                  //This is an edge (src--w-->tgt)
+                  //Add an immutable edge src--w'-->tgt)
+                  // w' = (1^T,w)
+                  sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>((iter->weight).get_ptr());
+                  sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());
+                  wt = one->tensor(wt.get_ptr());
+                  graph->addEdge(nodes[iter->src].intra_nodeno, nodes[iter->tgt].intra_nodeno, wt);
+                  //Also add a mutable edge (s--f-->tgt) from the source vertex s with weight 0 (tensored) and
+                  //functional f = (1^T, DetTrans(wt(src)) x w) (one untensored)
+                  sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>(sem->zero().get_ptr());
+                  wt = dynamic_cast<SemElemTensor*>((iter->weight).get_ptr());
+                  functional_t f = 
+                    SemElemFunctional::tensor(
+                      SemElemFunctional::constant(one),
+                      SemElemFunctional::extend(
+                        SemElemFunctional::detensorTranspose(
+                          SemElemFunctional::in(nodes[iter->src].intra_nodeno)),
+                        SemElemFunctional::constant(wt)));
+                  int e = graph->setSource(nodes[iter->tgt].intra_nodeno, zerot, f);
+                  // Back references in the node to edges that depend on it.
+                  graph->addDependentEdge(e, nodes[iter->src].intra_nodeno);                  
+                }
+
+                // Inter Edges:
+                for(vector<HyperEdge>::iterator iter = gr->interEdges.begin(); iter != gr->interEdges.end(); ++iter){
+                  // src2 is the external source for a hyperedge
+                  if(nodes[iter->src2].gr != NULL && nodes[iter->src2].gr != graph){
+                    // Case: The entry node belongs to a graph that has a lower scc.
+                    // Treat this case as an intraedge
+                    //Add an immutable edge src1--w'-->tgt)
+                    // w' = (1^T, DetTrans(wt(src2)))
+                    sem_elem_t wtsrc2 = nodes[iter->src2].gr->getWeight(nodes[iter->src2].intra_nodeno);
+                    sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>(wtsrc2.get_ptr());
+                    wt = wt->detensorTranspose();
+                    sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());
+                    wt = one->tensor(wt.get_ptr());
+                    graph->addEdge(nodes[iter->src1].intra_nodeno, nodes[iter->tgt].intra_nodeno, wt);
+                    //Also add a mutable edge (s--f-->tgt) from the source vertex s with weight 0 (tensored) and
+                    //functional f = (1^T, DetTrans(wt(src1)) x Constant(DetTrans(wt(src2)))) (one untensored)
+                    sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>(sem->zero().get_ptr());
+                    wt = dynamic_cast<SemElemTensor*>(wtsrc2.get_ptr());
+                    wt = wt->detensorTranspose();
+                    functional_t f = 
+                      SemElemFunctional::tensor(
+                        SemElemFunctional::constant(one),
+                        SemElemFunctional::extend(
+                          SemElemFunctional::detensorTranspose(
+                            SemElemFunctional::in(nodes[iter->src1].intra_nodeno)),
+                          SemElemFunctional::constant(wt)));
+                    int e = graph->setSource(nodes[iter->tgt].intra_nodeno, zerot, f);                    
+                    // Back references in the node to edges that depend on it.
+                    graph->addDependentEdge(e, nodes[iter->src1].intra_nodeno);
+                  }else{
+                    // Case: The entry nodes does not belong to a graph that has a lower scc.
+                    // Note: It must belong to the same scc then
+                    assert(nodes[iter->src2].gr == graph);
+                    // Add mutable edge src1--f-->tgt with weight 0 (tensored) and
+                    // f = (1^T, DetTrans(wt(src2)))
+                    sem_elem_tensor_t one = (dynamic_cast<SemElemTensor*>(sem->one().get_ptr()))->detensorTranspose();
+                    sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>(sem->zero().get_ptr());
+                    functional_t f = 
+                      SemElemFunctional::tensor(
+                          SemElemFunctional::constant(one),
+                          SemElemFunctional::detensorTranspose(
+                            SemElemFunctional::in(nodes[iter->src2].intra_nodeno)));
+                    int e = graph->addEdge(nodes[iter->src1].intra_nodeno, nodes[iter->tgt].intra_nodeno, zerot, true, f);
+                    // Back references in the node to edges that depend on it.
+                    graph->addDependentEdge(e, nodes[iter->src2].intra_nodeno);
+                    // Add mutable edge src2--f-->tgt with weight 0 (tensored) and
+                    // f = (Transpose(DetTrans(wt(src1))), 1)
+                    f = 
+                      SemElemFunctional::tensor(
+                          SemElemFunctional::transpose(
+                            SemElemFunctional::detensorTranspose(
+                              SemElemFunctional::in(nodes[iter->src1].intra_nodeno))),
+                          SemElemFunctional::constant(one));
+                    e = graph->addEdge(nodes[iter->src2].intra_nodeno, nodes[iter->tgt].intra_nodeno, zerot, true, f);
+                    graph->addDependentEdge(e, nodes[iter->src1].intra_nodeno);
+                    // Add mutable edge s--f-->tgt from source node s with weight 0(tensored) and
+                    // f = (1^T,DetTrans(wt(src1)) x DetTrans(wt(src2)))
+                    f =
+                      SemElemFunctional::tensor(
+                          SemElemFunctional::constant(one),
+                          SemElemFunctional::extend(
+                            SemElemFunctional::detensorTranspose(
+                              SemElemFunctional::in(nodes[iter->src1].intra_nodeno)),
+                            SemElemFunctional::detensorTranspose(
+                              SemElemFunctional::in(nodes[iter->src2].intra_nodeno))));
+                    e = graph->setSource(nodes[iter->tgt].intra_nodeno, zerot, f);
+                    // Back references in the node to edges that depend on it.
+                    graph->addDependentEdge(e, nodes[iter->src1].intra_nodeno);
+                    graph->addDependentEdge(e, nodes[iter->src2].intra_nodeno);
+                  }
+                }
+                gr_it++;
+              }              
+              // We have the intra graph ready at this point. 
+              if(1){
+                // DEBUGGING
+                std::stringstream ss;
+                ss << "graph" << scc_n << ".dot";
+                std::ofstream foo(ss.str().c_str());
+                string dot = graph->toDot();
+                foo << dot;
+                foo.close();
+              }
+              // Use Tarjan's path listing algorithm to generate regular expressions for nodes.
+              graph->setupIntraSolution();
+              // Now solve the linearized problem by saturating.
+              graph->saturate();
+              // The next SCC will use another sat procss phase.
+              RegExp::stopSatProcess();
+              delete subProblemTimer;
+          }
+          delete newtonTotalTimer;
+        }
+        max_scc_computed = max_scc_required;
+        //RegExp::stopSatProcess();
+        RegExp::executingPoststar(!running_prestar);
+    }
+
+    void InterGraph::saturateNewton(multiset<tup> &worklist, unsigned scc_n) 
+    {
+      int numSteps = 0;
+      //This saturation procedure assumes that there are no merge functions.
+      //It also assumes that you're using EWPDS.
+      assert(running_ewpds);
+      //With EWPDSs, a default merge functions is created for delta2 rules, behaves exactly like 
+      //WPDS delta2 rules, except that the call edge weight is assumed to be one.
+      //We check if a call edge wt was added to the graph, if not (i.e., it is zero) we assume the
+      //call weight to be one.
+      sem_elem_tensor_t onodeWt, onodeWtOld, onode1Wt, onode1WtOld;
+      sem_elem_t inodeWt, inodeWtOld;
+      sem_elem_tensor_t onodeWtD, onode1WtD;
+      sem_elem_t callWt;
+      bool onode1Changed, onodeChanged;
+      std::list<int> *moutnodes;
+      sem_elem_tensor_t semD = dynamic_cast<SemElemTensor*>(sem.get_ptr());
+      semD = semD->detensor(); //sem is tensored
+      sem_elem_tensor_t oneD = dynamic_cast<SemElemTensor*>((semD->one()).get_ptr()); 
+
+      while(!worklist.empty()) {
+        multiset<tup>::iterator wit = worklist.begin();
+        onode1Changed = onodeChanged = false;
+        int bfs_number = (*wit).first;
+        int node = (*wit).second;
+        worklist.erase(wit);
+        STAT(stats.niter++);
+        if(bfs_number % 2 == 0){
+          //This is an out1Node.
+          int onode1 = node;
+          //See if the weight onode1 changed & update
+          onode1Changed = false;
+          //The FWPDS implementation assumes an underlying EWPDS, 
+          //We must obtain weight for a stacked transition by using the
+          //callWt.
+          int callTrans = -1;
+          callWt = eHandler.get_dependency(onode1,callTrans);
+          if(callTrans != -1){
+            //This is a return transition, and we're using EWPDS.
+            onode1Wt = dynamic_cast<wali::SemElemTensor*>(newtonGr->get_weight(nodes[callTrans].intra_nodeno).get_ptr()); 
+            assert(callWt != NULL);
+          }else{
+            onode1Wt = dynamic_cast<wali::SemElemTensor*>(newtonGr->get_weight(nodes[onode1].intra_nodeno).get_ptr());
+            callWt = NULL;
+          }
+          assert(onode1Wt != NULL);
+          onode1WtOld = dynamic_cast<wali::SemElemTensor*>(nodes[onode1].weight.get_ptr());
+          if(onode1WtOld == NULL || ! onode1Wt->equal(onode1WtOld)){
+            onode1Changed = true;
+            onode1WtD = onode1Wt->detensorTranspose();
+            nodes[onode1].weight = onode1Wt;
+          }
+          if(onode1Changed){
+            //For each onode corresponding to this onode1, update the edge weight onode-->inode
+            std::list<int>::iterator beg = nodes[onode1].out1_hyper_edges.begin();
+            std::list<int>::iterator end = nodes[onode1].out1_hyper_edges.end();
+            for(; beg != end; beg++) {
+              int inode = inter_edges[*beg].tgt;
+              int onode = inter_edges[*beg].src2;
+
+              if(callWt == NULL){
+                //We did not find an eHandler entry for this transition. This means there is no merge function
+                //associated with this edge
+                assert(inter_edges[*beg].mf.get_ptr()!=NULL);
+                //It does not make sense to have a call edge without merge functions *and* zero weight.
+                callWt = inter_edges[*beg].weight;
+                assert(!callWt->equal(callWt->zero()));
+              }
+
+              //udpate edge weight.
+              //D() denotes detensor
+              //Pre*: (callWt, [D(onode1Wt)]^T)
+              //Post*: ([D(onode1Wt) X callWt]^T, 1)
+              sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>(callWt.get_ptr());
               if(running_prestar){
                 //wt = wt->transpose();
-                wt = wt->tensor(one.get_ptr());
+                wt = wt->tensor((onode1WtD->transpose()).get_ptr());
               }else{
-                wt = one->tensor(wt.get_ptr());
+                wt = dynamic_cast<SemElemTensor*>((onode1WtD->extend(wt.get_ptr())).get_ptr());
+                wt = wt->transpose();
+                wt = wt->tensor(oneD.get_ptr());
               }
-              newtonGr->addEdge(nodes[s].intra_nodeno, nodes[t].intra_nodeno, wt);
+              //Check that new edge weight is at least as big as the old weight. (Remove check to speed thins up)
+              sem_elem_t oldEdgeWt = newtonGr->readEdgeWeight(nodes[onode].intra_nodeno, nodes[inode].intra_nodeno);
+              if(oldEdgeWt != NULL)
+                assert(wt->equal(wt->combine(oldEdgeWt.get_ptr())));
+              newtonGr->updateEdgeWeight(nodes[onode].intra_nodeno, nodes[inode].intra_nodeno, wt);
+
             }
-            //For each hyperedge (tgt <- src1 src2], we add two edges [t <-
-            //src1] and [t <- src2]. Initially these edges have the weight
-            //zero(must be tensored).
-            //These edges will be updatable.
-            for(heIter = inter_edges.begin(); heIter != inter_edges.end(); heIter++) {
-              sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>(sem->zero().get_ptr()); //zero is tensored
-              newtonGr->addEdge(nodes[heIter->src1].intra_nodeno, nodes[heIter->tgt].intra_nodeno, zerot, true);
-              newtonGr->addEdge(nodes[heIter->src2].intra_nodeno, nodes[heIter->tgt].intra_nodeno, zerot, true);
-              //FIXME: Needed? I don't think we use outNodes of newtonGr at all. Try removing it.
-              newtonGr->setOutNode(nodes[heIter->src2].intra_nodeno, heIter->src2);
-            }
+
+            //Now, add all OutNode1s in the same graph as onode1 back to worklist, since our edge update might change the inode weight.
             {
-              wali::util::Timer * setupNewtonTimer = new wali::util::Timer("[setupNewtonSolution] newton RegExp timer");
-              //Build RegExp for newtonGr ONLY. Other IntraGraphs are only used to guide the
-              //saturation. Weights are stored only in newtonGr
-              newtonGr->setupIntraSolution(false);
-              delete setupNewtonTimer;
+              IntraGraph *gr = nodes[onode1].gr;
+              moutnodes = gr->getOut1Transitions();
+              std::list<int>::iterator mbeg = moutnodes->begin();
+              std::list<int>::iterator mend = moutnodes->end();
+              for(; mbeg != mend; mbeg++) {
+                int mnode = (*mbeg);
+                worklist.insert(tup(gr->bfs_number*2, mnode));
+              }
             }
-            delete newtonGrSetupTimer; 
           }
-
-          // Setup Worklist
-          multiset<tup > worklist;
-
-          // Do SCC decomposition of IntraGraphs
-          std::list<IntraGraph *> gr_sorted;
-          unsigned components = SCC(gr_list, gr_sorted);
-          STAT(stats.ncomponents = components);
-
-          ///////////////// Saturate
-          {
-            wali::util::Timer * satTimer = new wali::util::Timer("[setupNewtonSolution] Saturation Timer");
-            if(wt_required == NULL) {
-              max_scc_required = components;
-            } else {
-              max_scc_required = 0;
-              std::list<Transition>::iterator trans_it;
-              for(trans_it = wt_required->begin(); trans_it != wt_required->end(); trans_it++) {
-                int nno = nodeno(*trans_it);
-                max_scc_required = (max_scc_required >= nodes[nno].gr->scc_number) ? max_scc_required : nodes[nno].gr->scc_number;
-              }
-            }
-            //cout << "Saturation started\n";
-            gr_it = gr_sorted.begin();
-            for(unsigned scc_n = 1; scc_n <= max_scc_required; scc_n++) {
-              bfsIntra(*gr_it, scc_n);
-              setup_worklist_newton(gr_sorted, gr_it, scc_n, worklist);
-              saturateNewton(worklist,scc_n);
-            }
-            delete satTimer;
+        }else{
+          //This node is an OutNode
+          int onode = node;
+          //See if the weight onode changed & update
+          onodeChanged = false;
+          onodeWt = dynamic_cast<wali::SemElemTensor*>(newtonGr->get_weight(nodes[onode].intra_nodeno).get_ptr());
+          assert(onodeWt != NULL);
+          onodeWtOld = dynamic_cast<wali::SemElemTensor*>(nodes[onode].weight.get_ptr());
+          if(onodeWtOld == NULL || ! onodeWt->equal(onodeWtOld)){
+            onodeChanged = true;
+            onodeWtD = onodeWt->detensorTranspose();
+            nodes[onode].weight = onodeWt;
           }
-          max_scc_computed = max_scc_required;
-          RegExp::stopSatProcess();
-          RegExp::executingPoststar(!running_prestar);
-        }
+          if(onodeChanged){
+            //update the edge weight onode1-->inode for each onode1,inode pair corresponding to onode
+            std::list<int>::iterator beg = nodes[onode].out_hyper_edges.begin();
+            std::list<int>::iterator end = nodes[onode].out_hyper_edges.end();
+            for(; beg != end; beg++) {
+              int inode = inter_edges[*beg].tgt;
+              int onode1 = inter_edges[*beg].src1;
 
-        void InterGraph::saturateNewton(multiset<tup> &worklist, unsigned scc_n) 
-        {
-          int numSteps = 0;
-          //This saturation procedure assumes that there are no merge functions.
-          //It also assumes that you're using EWPDS.
-          assert(running_ewpds);
-          //With EWPDSs, a default merge functions is created for delta2 rules, behaves exactly like 
-          //WPDS delta2 rules, except that the call edge weight is assumed to be one.
-          //We check if a call edge wt was added to the graph, if not (i.e., it is zero) we assume the
-          //call weight to be one.
-          sem_elem_tensor_t onodeWt, onodeWtOld, onode1Wt, onode1WtOld;
-          sem_elem_t inodeWt, inodeWtOld;
-          sem_elem_tensor_t onodeWtD, onode1WtD;
-          sem_elem_t callWt;
-          bool onode1Changed, onodeChanged;
-          std::list<int> *moutnodes;
-          sem_elem_tensor_t semD = dynamic_cast<SemElemTensor*>(sem.get_ptr());
-          semD = semD->detensor(); //sem is tensored
-          sem_elem_tensor_t oneD = dynamic_cast<SemElemTensor*>((semD->one()).get_ptr()); 
-
-          while(!worklist.empty()) {
-            multiset<tup>::iterator wit = worklist.begin();
-            onode1Changed = onodeChanged = false;
-            int bfs_number = (*wit).first;
-            int node = (*wit).second;
-            worklist.erase(wit);
-            STAT(stats.niter++);
-            if(bfs_number % 2 == 0){
-              //This is an out1Node.
-              int onode1 = node;
-              //See if the weight onode1 changed & update
-              onode1Changed = false;
-              //The FWPDS implementation assumes an underlying EWPDS, 
-              //We must obtain weight for a stacked transition by using the
-              //callWt.
-              int callTrans = -1;
-              callWt = eHandler.get_dependency(onode1,callTrans);
-              if(callTrans != -1){
-                //This is a return transition, and we're using EWPDS.
-                onode1Wt = dynamic_cast<wali::SemElemTensor*>(newtonGr->get_weight(nodes[callTrans].intra_nodeno).get_ptr()); 
-                assert(callWt != NULL);
-              }else{
-                onode1Wt = dynamic_cast<wali::SemElemTensor*>(newtonGr->get_weight(nodes[onode1].intra_nodeno).get_ptr());
-                callWt = NULL;
-              }
-              assert(onode1Wt != NULL);
-              onode1WtOld = dynamic_cast<wali::SemElemTensor*>(nodes[onode1].weight.get_ptr());
-              if(onode1WtOld == NULL || ! onode1Wt->equal(onode1WtOld)){
-                onode1Changed = true;
-                onode1WtD = onode1Wt->detensorTranspose();
-                nodes[onode1].weight = onode1Wt;
-              }
-              if(onode1Changed){
-                //For each onode corresponding to this onode1, update the edge weight onode-->inode
-                std::list<int>::iterator beg = nodes[onode1].out1_hyper_edges.begin();
-                std::list<int>::iterator end = nodes[onode1].out1_hyper_edges.end();
-                for(; beg != end; beg++) {
-                  int inode = inter_edges[*beg].tgt;
-                  int onode = inter_edges[*beg].src2;
-
-                  if(callWt == NULL){
-                    //We did not find an eHandler entry for this transition. This means there is no merge function
-                    //associated with this edge
-                    assert(inter_edges[*beg].mf.get_ptr()!=NULL);
-                    //It does not make sense to have a call edge without merge functions *and* zero weight.
-                    callWt = inter_edges[*beg].weight;
-                    assert(!callWt->equal(callWt->zero()));
-                  }
-
-                  //udpate edge weight.
-                  //D() denotes detensor
-                  //Pre*: (callWt, [D(onode1Wt)]^T)
-                  //Post*: ([D(onode1Wt) X callWt]^T, 1)
-                  sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>(callWt.get_ptr());
-                  if(running_prestar){
-                    //wt = wt->transpose();
-                    wt = wt->tensor((onode1WtD->transpose()).get_ptr());
-                  }else{
-                    wt = dynamic_cast<SemElemTensor*>((onode1WtD->extend(wt.get_ptr())).get_ptr());
-                    wt = wt->transpose();
-                    wt = wt->tensor(oneD.get_ptr());
-                  }
-                  //Check that new edge weight is at least as big as the old weight. (Remove check to speed thins up)
-                  sem_elem_t oldEdgeWt = newtonGr->readEdgeWeight(nodes[onode].intra_nodeno, nodes[inode].intra_nodeno);
-                  if(oldEdgeWt != NULL)
-                    assert(wt->equal(wt->combine(oldEdgeWt.get_ptr())));
-                  newtonGr->updateEdgeWeight(nodes[onode].intra_nodeno, nodes[inode].intra_nodeno, wt);
-
-                }
-
-                //Now, add all OutNode1s in the same graph as onode1 back to worklist, since our edge update might change the inode weight.
-                {
-                  IntraGraph *gr = nodes[onode1].gr;
-                  moutnodes = gr->getOut1Transitions();
-                  std::list<int>::iterator mbeg = moutnodes->begin();
-                  std::list<int>::iterator mend = moutnodes->end();
-                  for(; mbeg != mend; mbeg++) {
-                    int mnode = (*mbeg);
-                    worklist.insert(tup(gr->bfs_number*2, mnode));
-                  }
+              //obtain callWt
+              {
+                int callTrans;
+                callWt = eHandler.get_dependency(onode1,callTrans);
+                if(callTrans != -1){
+                  assert(callWt != NULL);
+                }else{
+                  //We did not find an eHandler entry for this transition. This means there is no merge function
+                  //associated with this edge
+                  assert(inter_edges[*beg].mf.get_ptr()!=NULL);
+                  //It does not make sense to have a call edge without merge functions *and* zero weight.
+                  callWt = inter_edges[*beg].weight;
+                  assert(!callWt->equal(callWt->zero()));
                 }
               }
-            }else{
-              //This node is an OutNode
-              int onode = node;
-              //See if the weight onode changed & update
-              onodeChanged = false;
-              onodeWt = dynamic_cast<wali::SemElemTensor*>(newtonGr->get_weight(nodes[onode].intra_nodeno).get_ptr());
-              assert(onodeWt != NULL);
-              onodeWtOld = dynamic_cast<wali::SemElemTensor*>(nodes[onode].weight.get_ptr());
-              if(onodeWtOld == NULL || ! onodeWt->equal(onodeWtOld)){
-                onodeChanged = true;
-                onodeWtD = onodeWt->detensorTranspose();
-                nodes[onode].weight = onodeWt;
-              }
-              if(onodeChanged){
-                //update the edge weight onode1-->inode for each onode1,inode pair corresponding to onode
-                std::list<int>::iterator beg = nodes[onode].out_hyper_edges.begin();
-                std::list<int>::iterator end = nodes[onode].out_hyper_edges.end();
-                for(; beg != end; beg++) {
-                  int inode = inter_edges[*beg].tgt;
-                  int onode1 = inter_edges[*beg].src1;
-
-                  //obtain callWt
-                  {
-                    int callTrans;
-                    callWt = eHandler.get_dependency(onode1,callTrans);
-                    if(callTrans != -1){
-                      assert(callWt != NULL);
-                    }else{
-                      //We did not find an eHandler entry for this transition. This means there is no merge function
-                      //associated with this edge
-                      assert(inter_edges[*beg].mf.get_ptr()!=NULL);
-                      //It does not make sense to have a call edge without merge functions *and* zero weight.
-                      callWt = inter_edges[*beg].weight;
-                      assert(!callWt->equal(callWt->zero()));
-                    }
-                  }
-                  //udpate edge weight.
-                  {
-                    //D() denotes detensorTranspose
-                    //1d is 1 in the non tensor domain
-                    //Pre*: ([callWt X D(onodeWt)] , 1d^T)
-                    //Post*: (1d^T, [callWt X D(onodeWt)])
-                    sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>(callWt.get_ptr());
-                    wt = dynamic_cast<SemElemTensor*>(wt->extend(onodeWtD.get_ptr()).get_ptr());
-                    if(running_prestar){
-                      //wt = wt->transpose();
-                      wt = wt->tensor(oneD.get_ptr());
+              //udpate edge weight.
+              {
+                //D() denotes detensorTranspose
+                //1d is 1 in the non tensor domain
+                //Pre*: ([callWt X D(onodeWt)] , 1d^T)
+                //Post*: (1d^T, [callWt X D(onodeWt)])
+                sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>(callWt.get_ptr());
+                wt = dynamic_cast<SemElemTensor*>(wt->extend(onodeWtD.get_ptr()).get_ptr());
+                if(running_prestar){
+                  //wt = wt->transpose();
+                  wt = wt->tensor(oneD.get_ptr());
                     }else{
                       wt = oneD->tensor(wt.get_ptr());
                     }
@@ -1555,8 +1703,29 @@ namespace wali {
 
             {
               wali::util::Timer * timer3 = new wali::util::Timer("[setupInterSolution] Intra Graphs RegExp Timer");
+              //int tempCount = 0;
               for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
                 (*gr_it)->setupIntraSolution(false);
+                /*
+                //temporary:
+                {
+                stringstream ss;
+                ss << "regexp" << tempCount++ << ".dot";
+                string filename = ss.str();
+                fstream foo;
+                foo.open(filename.c_str(), fstream::out);
+                const reg_exp_hash_t& roots = RegExp::getRoots();
+                foo << "digraph {\n";
+                for(reg_exp_hash_t::const_iterator iter = roots.begin();
+                iter != roots.end();
+                ++iter){
+                std::set<long> seen;
+                (iter->second)->toDot(foo, seen, true);
+                }
+                foo << "}\n";
+                foo.close();
+                }
+                 */
               }
               delete timer3;
             }
@@ -1577,320 +1746,321 @@ namespace wali {
               max_scc_required = components;
             } else {
               max_scc_required = 0;
-                std::list<Transition>::iterator trans_it;
-                for(trans_it = wt_required->begin(); trans_it != wt_required->end(); trans_it++) {
-                  int nno = nodeno(*trans_it);
-                  max_scc_required = (max_scc_required >= nodes[nno].gr->scc_number) ? max_scc_required : nodes[nno].gr->scc_number;
-                }
+              std::list<Transition>::iterator trans_it;
+              for(trans_it = wt_required->begin(); trans_it != wt_required->end(); trans_it++) {
+                int nno = nodeno(*trans_it);
+                max_scc_required = (max_scc_required >= nodes[nno].gr->scc_number) ? max_scc_required : nodes[nno].gr->scc_number;
               }
-              //cout << "Saturation started\n";
-              gr_it = gr_sorted.begin();
-              for(unsigned scc_n = 1; scc_n <= max_scc_required; scc_n++) {
-                //cout << ".";
-                bfsIntra(*gr_it, scc_n);
-                setup_worklist(gr_sorted, gr_it, scc_n, worklist);
-                saturate(worklist,scc_n);
-              }
-              delete timer4;
             }
-            max_scc_computed = max_scc_required;
-            RegExp::stopSatProcess();
-            RegExp::executingPoststar(!running_prestar);
+            //cout << "Saturation started\n";
+            gr_it = gr_sorted.begin();
+            for(unsigned scc_n = 1; scc_n <= max_scc_required; scc_n++) {
+              //cout << ".";
+              bfsIntra(*gr_it, scc_n);
+              setup_worklist(gr_sorted, gr_it, scc_n, worklist);
+              saturate(worklist,scc_n);
+            }
+            delete timer4;
+          }
+          max_scc_computed = max_scc_required;
+
+          RegExp::stopSatProcess();
+          RegExp::executingPoststar(!running_prestar);
 
 #ifdef STATIC_MEMORY
-            IntraGraph::clearStaticBuffer();
+          IntraGraph::clearStaticBuffer();
 #endif
-          }
+        }
 
-          std::ostream &InterGraph::print_stats(std::ostream &out) {
-            InterGraphStats total_stats = stats;
-            int n = nodes.size();
-            int i;      
-            set<RegExp *> reg_equations;
-            int ned = 0;
-            for(i = 0; i < n; i++) {
-              if(intra_graph_uf->find(i) == i) {
-                std::list<int>::iterator tbeg = nodes[i].gr->getOutTransitions()->begin();
-                std::list<int>::iterator tend = nodes[i].gr->getOutTransitions()->end();
-                for(; tbeg != tend; tbeg++) {
-                  int onode = nodes[i].intra_nodeno;
-                  reg_equations.insert(nodes[i].gr->nodes[onode].regexp.get_ptr());
-                }
-                total_stats.ngraphs ++;
-                IntraGraphStats st = nodes[i].gr->get_stats(); 
-                total_stats.ncombine += st.ncombine;
-                total_stats.nextend += st.nextend;
-                total_stats.nstar += st.nstar;
-                total_stats.nupdatable += st.nupdatable * st.nupdatable;
-                total_stats.ncutset += st.ncutset * st.ncutset * st.ncutset;
-                total_stats.nget_weight += st.nget_weight;
-                total_stats.ndom_sequence += st.ndom_sequence;
-                total_stats.ndom_components += st.ndom_components;
-                total_stats.ndom_componentsize += (st.ndom_componentsize * st.ndom_componentsize);
-                total_stats.ndom_componentcutset += st.ndom_componentcutset;
-                ned += st.nedges;
+        std::ostream &InterGraph::print_stats(std::ostream &out) {
+          InterGraphStats total_stats = stats;
+          int n = nodes.size();
+          int i;      
+          set<RegExp *> reg_equations;
+          int ned = 0;
+          for(i = 0; i < n; i++) {
+            if(intra_graph_uf->find(i) == i) {
+              std::list<int>::iterator tbeg = nodes[i].gr->getOutTransitions()->begin();
+              std::list<int>::iterator tend = nodes[i].gr->getOutTransitions()->end();
+              for(; tbeg != tend; tbeg++) {
+                int onode = nodes[i].intra_nodeno;
+                reg_equations.insert(nodes[i].gr->nodes[onode].regexp.get_ptr());
               }
+              total_stats.ngraphs ++;
+              IntraGraphStats st = nodes[i].gr->get_stats(); 
+              total_stats.ncombine += st.ncombine;
+              total_stats.nextend += st.nextend;
+              total_stats.nstar += st.nstar;
+              total_stats.nupdatable += st.nupdatable * st.nupdatable;
+              total_stats.ncutset += st.ncutset * st.ncutset * st.ncutset;
+              total_stats.nget_weight += st.nget_weight;
+              total_stats.ndom_sequence += st.ndom_sequence;
+              total_stats.ndom_components += st.ndom_components;
+              total_stats.ndom_componentsize += (st.ndom_componentsize * st.ndom_componentsize);
+              total_stats.ndom_componentcutset += st.ndom_componentcutset;
+              ned += st.nedges;
             }
-            int changestat = RegExp::out_node_height(reg_equations);
-            total_stats.nhyperedges = inter_edges.size();
-            total_stats.nedges = intra_edges.size();
-            total_stats.nnodes = nodes.size();
-
-            RegExpStats rst = RegExp::get_stats();
-            total_stats.ncombine += rst.ncombine;
-            total_stats.nextend += rst.nextend;
-            total_stats.nstar += rst.nstar;
-            total_stats.ngraphs = (total_stats.ngraphs == 0) ? 1 : total_stats.ngraphs;
-            rst.out_nodes = (rst.out_nodes == 0) ? 1 : rst.out_nodes;
-            out << "----------------------------------\n";
-            out << "          FWPDS Stats             \n";
-            out << "----------------------------------\n";
-            out << "InterGraph nodes : " << total_stats.nnodes << "\n";
-            out << "InterGraph edges : " << total_stats.nedges << "\n";
-            out << "InterGraph hyperedges : " << total_stats.nhyperedges << "\n";
-            out << "InterGraph iterations : " << total_stats.niter << "\n";
-            out << "InterGraph get_weight : " << total_stats.nget_weight << "\n";
-            out << "IntraGraphs : " << total_stats.ngraphs << "\n";
-            out << "IntraGraph SCC : " << total_stats.ncomponents << "\n";
-            out << "IntraGraph SCC Computed: " << max_scc_computed << "\n";
-            out << "Avg. IntraGraph nodes : " << (total_stats.nnodes / total_stats.ngraphs) << "\n";
-            out << "Avg. IntraGraph edges : " << (ned / total_stats.ngraphs) << "\n";
-            out << "Avg. IntraGraph cutset : " << (pow(total_stats.ncutset/total_stats.ngraphs,0.33)) << "\n";
-            out << "Avg. IntraGraph updatable : " << (int)(pow((double)total_stats.nupdatable/total_stats.ngraphs,0.5)) << "\n";
-            out << "Avg. IntraGraph dom-sequence length : " << (total_stats.ndom_sequence / total_stats.ngraphs) << "\n";
-            out << "Avg. IntraGraph dom-component size : " << (int)pow((double)total_stats.ndom_componentsize / (total_stats.ndom_components+1),0.5) << "\n";
-            out << "Avg. IntraGraph dom-component cuset : " << setprecision(2) << (double)total_stats.ndom_componentcutset / (total_stats.ndom_components+1) << "\n";
-            out << "Semiring Combine : " << total_stats.ncombine << "\n";
-            out << "Semiring Extend : " << total_stats.nextend << "\n";
-            out << "Semiring Star : " << total_stats.nstar << "\n";
-            out << "RegExp HashMap hits : " << rst.hashmap_hits << "\n";
-            out << "RegExp HashMap misses : " << rst.hashmap_misses << "\n";
-            out << "OutNode Height : " << setprecision(4) << (rst.height / rst.out_nodes) << "\n"; 
-            out << "OutNode Loop ND : " << setprecision(4) << (rst.lnd / rst.out_nodes) << "\n";
-            out << "Change Stat : " << changestat << "\n";
-            out << "\n";
-            return out;
           }
+          int changestat = RegExp::out_node_height(reg_equations);
+          total_stats.nhyperedges = inter_edges.size();
+          total_stats.nedges = intra_edges.size();
+          total_stats.nnodes = nodes.size();
 
-          // New Saturation Procedure -- minimize calls to get_weight
-          void InterGraph::saturate(multiset<tup> &worklist, unsigned scc_n) {
-            int numSteps = 0;
-            sem_elem_t weight;
-            std::list<int> *moutnodes;
+          RegExpStats rst = RegExp::get_stats();
+          total_stats.ncombine += rst.ncombine;
+          total_stats.nextend += rst.nextend;
+          total_stats.nstar += rst.nstar;
+          total_stats.ngraphs = (total_stats.ngraphs == 0) ? 1 : total_stats.ngraphs;
+          rst.out_nodes = (rst.out_nodes == 0) ? 1 : rst.out_nodes;
+          out << "----------------------------------\n";
+          out << "          FWPDS Stats             \n";
+          out << "----------------------------------\n";
+          out << "InterGraph nodes : " << total_stats.nnodes << "\n";
+          out << "InterGraph edges : " << total_stats.nedges << "\n";
+          out << "InterGraph hyperedges : " << total_stats.nhyperedges << "\n";
+          out << "InterGraph iterations : " << total_stats.niter << "\n";
+          out << "InterGraph get_weight : " << total_stats.nget_weight << "\n";
+          out << "IntraGraphs : " << total_stats.ngraphs << "\n";
+          out << "IntraGraph SCC : " << total_stats.ncomponents << "\n";
+          out << "IntraGraph SCC Computed: " << max_scc_computed << "\n";
+          out << "Avg. IntraGraph nodes : " << (total_stats.nnodes / total_stats.ngraphs) << "\n";
+          out << "Avg. IntraGraph edges : " << (ned / total_stats.ngraphs) << "\n";
+          out << "Avg. IntraGraph cutset : " << (pow(total_stats.ncutset/total_stats.ngraphs,0.33)) << "\n";
+          out << "Avg. IntraGraph updatable : " << (int)(pow((double)total_stats.nupdatable/total_stats.ngraphs,0.5)) << "\n";
+          out << "Avg. IntraGraph dom-sequence length : " << (total_stats.ndom_sequence / total_stats.ngraphs) << "\n";
+          out << "Avg. IntraGraph dom-component size : " << (int)pow((double)total_stats.ndom_componentsize / (total_stats.ndom_components+1),0.5) << "\n";
+          out << "Avg. IntraGraph dom-component cuset : " << setprecision(2) << (double)total_stats.ndom_componentcutset / (total_stats.ndom_components+1) << "\n";
+          out << "Semiring Combine : " << total_stats.ncombine << "\n";
+          out << "Semiring Extend : " << total_stats.nextend << "\n";
+          out << "Semiring Star : " << total_stats.nstar << "\n";
+          out << "RegExp HashMap hits : " << rst.hashmap_hits << "\n";
+          out << "RegExp HashMap misses : " << rst.hashmap_misses << "\n";
+          out << "OutNode Height : " << setprecision(4) << (rst.height / rst.out_nodes) << "\n"; 
+          out << "OutNode Loop ND : " << setprecision(4) << (rst.lnd / rst.out_nodes) << "\n";
+          out << "Change Stat : " << changestat << "\n";
+          out << "\n";
+          return out;
+        }
 
-            while(!worklist.empty()) {
-              // Get an outnode whose weight is to be propagated
-              multiset<tup>::iterator wit = worklist.begin();
-              int onode = (*wit).second;
-              worklist.erase(wit);
-              //int onode = worklist.front();
-              //worklist.pop_front();
+        // New Saturation Procedure -- minimize calls to get_weight
+        void InterGraph::saturate(multiset<tup> &worklist, unsigned scc_n) {
+          int numSteps = 0;
+          sem_elem_t weight;
+          std::list<int> *moutnodes;
 
-              numSteps++;
-              weight = nodes[onode].gr->get_weight(nodes[onode].intra_nodeno);
-              if(nodes[onode].weight.get_ptr() != NULL && nodes[onode].weight->equal(weight))
+          while(!worklist.empty()) {
+            // Get an outnode whose weight is to be propagated
+            multiset<tup>::iterator wit = worklist.begin();
+            int onode = (*wit).second;
+            worklist.erase(wit);
+            //int onode = worklist.front();
+            //worklist.pop_front();
+
+            numSteps++;
+            weight = nodes[onode].gr->get_weight(nodes[onode].intra_nodeno);
+            if(nodes[onode].weight.get_ptr() != NULL && nodes[onode].weight->equal(weight))
+              continue;
+            nodes[onode].weight = weight;
+
+            STAT(stats.niter++);
+
+            FWPDSDBGS(
+                cout << "Popped ";
+                IntraGraph::print_trans(nodes[onode].trans,cout) << "with weight ";
+                weight->print(cout) << "\n";
+                );
+
+            // Go through all its targets and modify their weights
+            std::list<int>::iterator beg = nodes[onode].out_hyper_edges.begin();
+            std::list<int>::iterator end = nodes[onode].out_hyper_edges.end();
+            for(; beg != end; beg++) {
+              int inode = inter_edges[*beg].tgt;
+              int onode1 = inter_edges[*beg].src1;
+              sem_elem_t uw;
+              if(running_ewpds && inter_edges[*beg].mf.get_ptr()) {
+                uw = inter_edges[*beg].mf->apply_f(sem->one(), weight);
+                FWPDSDBGS(
+                    cout << "Apply merge function ";
+                    inter_edges[*beg].mf->print(cout) << " to ";
+                    weight->print(cout) << "\n";
+                    uw->print(cout << "Got ") << "\n";
+                    );
+              } else {
+                uw = inter_edges[*beg].weight->extend(weight);
+              }
+              STAT(stats.nextend++);
+              nodes[inode].gr->updateEdgeWeight(nodes[onode1].intra_nodeno, nodes[inode].intra_nodeno, uw);
+            }
+            // Go through all targets again and insert them into the workist without
+            // seeing if they actually got modified or not
+            beg = nodes[onode].out_hyper_edges.begin();
+            for(; beg != end; beg++) {
+              int inode = inter_edges[*beg].tgt;
+              IntraGraph *gr = nodes[inode].gr;
+              if(gr->scc_number != scc_n) {
+                assert(gr->scc_number > scc_n);
                 continue;
-              nodes[onode].weight = weight;
-
-              STAT(stats.niter++);
-
-              FWPDSDBGS(
-                  cout << "Popped ";
-                  IntraGraph::print_trans(nodes[onode].trans,cout) << "with weight ";
-                  weight->print(cout) << "\n";
-                  );
-
-              // Go through all its targets and modify their weights
-              std::list<int>::iterator beg = nodes[onode].out_hyper_edges.begin();
-              std::list<int>::iterator end = nodes[onode].out_hyper_edges.end();
-              for(; beg != end; beg++) {
-                int inode = inter_edges[*beg].tgt;
-                int onode1 = inter_edges[*beg].src1;
-                sem_elem_t uw;
-                if(running_ewpds && inter_edges[*beg].mf.get_ptr()) {
-                  uw = inter_edges[*beg].mf->apply_f(sem->one(), weight);
-                  FWPDSDBGS(
-                      cout << "Apply merge function ";
-                      inter_edges[*beg].mf->print(cout) << " to ";
-                      weight->print(cout) << "\n";
-                      uw->print(cout << "Got ") << "\n";
-                      );
-                } else {
-                  uw = inter_edges[*beg].weight->extend(weight);
-                }
-                STAT(stats.nextend++);
-                nodes[inode].gr->updateEdgeWeight(nodes[onode1].intra_nodeno, nodes[inode].intra_nodeno, uw);
               }
-              // Go through all targets again and insert them into the workist without
-              // seeing if they actually got modified or not
-              beg = nodes[onode].out_hyper_edges.begin();
-              for(; beg != end; beg++) {
-                int inode = inter_edges[*beg].tgt;
-                IntraGraph *gr = nodes[inode].gr;
-                if(gr->scc_number != scc_n) {
-                  assert(gr->scc_number > scc_n);
-                  continue;
-                }
-                moutnodes = gr->getOutTransitions();
-                std::list<int>::iterator mbeg = moutnodes->begin();
-                std::list<int>::iterator mend = moutnodes->end();
-                for(; mbeg != mend; mbeg++) {
-                  int mnode = (*mbeg);
-                  worklist.insert(tup(gr->bfs_number, mnode));
-                }
+              moutnodes = gr->getOutTransitions();
+              std::list<int>::iterator mbeg = moutnodes->begin();
+              std::list<int>::iterator mend = moutnodes->end();
+              for(; mbeg != mend; mbeg++) {
+                int mnode = (*mbeg);
+                worklist.insert(tup(gr->bfs_number, mnode));
               }
             }
-            //DEBUGGING
-            cout << "Kleene saturation # Steps: " << numSteps << endl;
-
           }
+          //DEBUGGING
+          cout << "Kleene saturation # Steps: " << numSteps << endl;
 
-          // Must be called after saturation
-          sem_elem_t InterGraph::get_call_weight(Transition t) {
-            unsigned orig_size = nodes.size();
-            unsigned n = nodeno(t);
-            assert(orig_size == nodes.size()); // Transition t must not be a new one
+        }
 
-            if(newtonGr)
-              return newtonGr->get_weight(nodes[n].intra_nodeno);
-            else
-              return nodes[n].gr->get_weight(nodes[n].intra_nodeno);
-          }
+        // Must be called after saturation
+        sem_elem_t InterGraph::get_call_weight(Transition t) {
+          unsigned orig_size = nodes.size();
+          unsigned n = nodeno(t);
+          assert(orig_size == nodes.size()); // Transition t must not be a new one
 
-          sem_elem_t InterGraph::get_weight(Transition t){
-            unsigned orig_size = nodes.size();
-            unsigned n = nodeno(t);
-            assert(orig_size == nodes.size()); // Transition t must not be a new one
-            return get_weight(n);
-          }
-          sem_elem_t InterGraph::get_weight(unsigned n) {
-            // check eHandler
-            if(eHandler.exists(n)) {
-              // This must be a return transition
-              int nc;
-              //sem_elem_tensor_t wtCallRule = dynamic_cast<SemElemTensor*>( eHandler.get_dependency(n, nc).get_ptr());
-              sem_elem_t wtCallRule = eHandler.get_dependency(n, nc);
-              sem_elem_t wt;
-              if(nc != -1) {
-                if(newtonGr){
-                  sem_elem_tensor_t twt = dynamic_cast<SemElemTensor*>((newtonGr->get_weight(nodes[nc].intra_nodeno)).get_ptr());
-                  wt = twt->detensorTranspose();
-                }
-                else
-                  wt = nodes[nc].gr->get_weight(nodes[nc].intra_nodeno);
-              } else {
-                // ESource
-                wt = wtCallRule->one();
+          if(newtonGr)
+            return newtonGr->get_weight(nodes[n].intra_nodeno);
+          else
+            return nodes[n].gr->get_weight(nodes[n].intra_nodeno);
+        }
+
+        sem_elem_t InterGraph::get_weight(Transition t){
+          unsigned orig_size = nodes.size();
+          unsigned n = nodeno(t);
+          assert(orig_size == nodes.size()); // Transition t must not be a new one
+          return get_weight(n);
+        }
+        sem_elem_t InterGraph::get_weight(unsigned n) {
+          // check eHandler
+          if(eHandler.exists(n)) {
+            // This must be a return transition
+            int nc;
+            //sem_elem_tensor_t wtCallRule = dynamic_cast<SemElemTensor*>( eHandler.get_dependency(n, nc).get_ptr());
+            sem_elem_t wtCallRule = eHandler.get_dependency(n, nc);
+            sem_elem_t wt;
+            if(nc != -1) {
+              if(runningNewton){
+                sem_elem_tensor_t twt = dynamic_cast<SemElemTensor*>((nodes[nc].gr->get_weight(nodes[nc].intra_nodeno)).get_ptr());
+                wt = twt->detensorTranspose();
               }
-              return wt->extend(wtCallRule);
-            }
-
-            if(newtonGr){
-              sem_elem_tensor_t twt = dynamic_cast<SemElemTensor*>((newtonGr->get_weight(nodes[n].intra_nodeno)).get_ptr());
-              return twt->detensorTranspose();
-            } else
-              return nodes[n].gr->get_weight(nodes[n].intra_nodeno);
-          }
-
-          void InterGraph::update_all_weights() {
-            unsigned int i;
-            for(i=0;i<nodes.size();i++) {
-              sem_elem_t w;
-              if(newtonGr)
-                w = newtonGr->get_weight(nodes[i].intra_nodeno);
               else
-                w = nodes[i].gr->get_weight(nodes[i].intra_nodeno);
-              nodes[i].weight = w;
+                wt = nodes[nc].gr->get_weight(nodes[nc].intra_nodeno);
+            } else {
+              // ESource
+              wt = wtCallRule->one();
             }
+            return wt->extend(wtCallRule);
           }
 
-          inline int get_number(map<int,int> &intra_node_map, int src, IntraGraph *ca) {
-            std::map<int,int>::iterator it = intra_node_map.find(src);
-            if(it != intra_node_map.end()) {
-              return it->second;
-            }
-            int s = ca->makeNode();
-            intra_node_map[src] = s;
-            return s;
+          if(runningNewton){
+            sem_elem_tensor_t twt = dynamic_cast<SemElemTensor*>((nodes[n].gr->get_weight(nodes[n].intra_nodeno)).get_ptr());
+            return twt->detensorTranspose();
+          } else
+            return nodes[n].gr->get_weight(nodes[n].intra_nodeno);
+        }
+
+        void InterGraph::update_all_weights() {
+          unsigned int i;
+          for(i=0;i<nodes.size();i++) {
+            sem_elem_t w;
+            if(newtonGr)
+              w = newtonGr->get_weight(nodes[i].intra_nodeno);
+            else
+              w = nodes[i].gr->get_weight(nodes[i].intra_nodeno);
+            nodes[i].weight = w;
           }
+        }
 
-          bool InterGraph::path_summary(int state, int stack, int accept, WT_CORRECT correct, WT_CHECK op) {
-            // Build a hashmap: transition.src -> transitions
-            typedef wali::HashMap<int, std::list<int> > trans_map_t;
-            std::map<int, int> intra_node_map; // transition.src -> intra node number
+        inline int get_number(map<int,int> &intra_node_map, int src, IntraGraph *ca) {
+          std::map<int,int>::iterator it = intra_node_map.find(src);
+          if(it != intra_node_map.end()) {
+            return it->second;
+          }
+          int s = ca->makeNode();
+          intra_node_map[src] = s;
+          return s;
+        }
 
-            trans_map_t trans_map;
-            set<int> states_visited;
-            std::list<int> worklist;
-            unsigned int i;
-            IntraGraph *ca = new IntraGraph(true, sem); // running_prestar = true because extend goes backward
-            //Transition initial_st(state, 0, 0);
+        bool InterGraph::path_summary(int state, int stack, int accept, WT_CORRECT correct, WT_CHECK op) {
+          // Build a hashmap: transition.src -> transitions
+          typedef wali::HashMap<int, std::list<int> > trans_map_t;
+          std::map<int, int> intra_node_map; // transition.src -> intra node number
 
-            ca->setSource(get_number(intra_node_map,state,ca), sem->one());
-            for(i=0;i<nodes.size();i++) {
-              trans_map_t::iterator it = trans_map.find(nodes[i].trans.src);
-              if(it == trans_map.end()) {
-                std::list<int> temp;
-                temp.push_back(i);
-                trans_map.insert(nodes[i].trans.src, temp);
-              } else {
-                it->second.push_back(i);
-              }
-              // add initial (state, stack, _) transitions
-              if(nodes[i].trans.src == state && nodes[i].trans.stack == stack) {
-                Transition t1(state,0,0);
-                Transition t2(nodes[i].trans.tgt,0,0);
-                if(newtonGr)
-                  ca->addEdge(get_number(intra_node_map,state,ca), get_number(intra_node_map, nodes[i].trans.tgt,ca), 
-                      correct(newtonGr->get_weight(nodes[i].intra_nodeno).get_ptr()));
-                else
-                  ca->addEdge(get_number(intra_node_map,state,ca), get_number(intra_node_map, nodes[i].trans.tgt,ca), 
-                      correct(nodes[i].gr->get_weight(nodes[i].intra_nodeno).get_ptr()));
+          trans_map_t trans_map;
+          set<int> states_visited;
+          std::list<int> worklist;
+          unsigned int i;
+          IntraGraph *ca = new IntraGraph(true, sem); // running_prestar = true because extend goes backward
+          //Transition initial_st(state, 0, 0);
+
+          ca->setSource(get_number(intra_node_map,state,ca), sem->one());
+          for(i=0;i<nodes.size();i++) {
+            trans_map_t::iterator it = trans_map.find(nodes[i].trans.src);
+            if(it == trans_map.end()) {
+              std::list<int> temp;
+              temp.push_back(i);
+              trans_map.insert(nodes[i].trans.src, temp);
+            } else {
+              it->second.push_back(i);
+            }
+            // add initial (state, stack, _) transitions
+            if(nodes[i].trans.src == state && nodes[i].trans.stack == stack) {
+              Transition t1(state,0,0);
+              Transition t2(nodes[i].trans.tgt,0,0);
+              if(newtonGr)
+                ca->addEdge(get_number(intra_node_map,state,ca), get_number(intra_node_map, nodes[i].trans.tgt,ca), 
+                    correct(newtonGr->get_weight(nodes[i].intra_nodeno).get_ptr()));
+              else
+                ca->addEdge(get_number(intra_node_map,state,ca), get_number(intra_node_map, nodes[i].trans.tgt,ca), 
+                    correct(nodes[i].gr->get_weight(nodes[i].intra_nodeno).get_ptr()));
+              worklist.push_back(nodes[i].trans.tgt);
+            }
+          }
+          states_visited.insert(state);
+          while(!worklist.empty()) {
+            int st = worklist.front();
+            worklist.pop_front();
+            if(states_visited.find(st) != states_visited.end()) 
+              continue;
+            states_visited.insert(st);
+            trans_map_t::iterator trans_it = trans_map.find(st);
+            if(trans_it == trans_map.end())
+              continue;
+            std::list<int> &trans = trans_it->second;
+            std::list<int>::iterator it;
+            for(it = trans.begin(); it != trans.end(); it++) {
+              i = *it;
+              int t1 = get_number(intra_node_map,nodes[i].trans.src,ca);
+              int t2 = get_number(intra_node_map,nodes[i].trans.tgt,ca);
+              if(newtonGr)
+                ca->addEdge(t1, t2, correct(newtonGr->get_weight(nodes[i].intra_nodeno).get_ptr()));
+              else
+                ca->addEdge(t1, t2, correct(nodes[i].gr->get_weight(nodes[i].intra_nodeno).get_ptr()));
+              if(states_visited.find(nodes[i].trans.tgt) == states_visited.end()) {
                 worklist.push_back(nodes[i].trans.tgt);
               }
             }
-            states_visited.insert(state);
-            while(!worklist.empty()) {
-              int st = worklist.front();
-              worklist.pop_front();
-              if(states_visited.find(st) != states_visited.end()) 
-                continue;
-              states_visited.insert(st);
-              trans_map_t::iterator trans_it = trans_map.find(st);
-              if(trans_it == trans_map.end())
-                continue;
-              std::list<int> &trans = trans_it->second;
-              std::list<int>::iterator it;
-              for(it = trans.begin(); it != trans.end(); it++) {
-                i = *it;
-                int t1 = get_number(intra_node_map,nodes[i].trans.src,ca);
-                int t2 = get_number(intra_node_map,nodes[i].trans.tgt,ca);
-                if(newtonGr)
-                  ca->addEdge(t1, t2, correct(newtonGr->get_weight(nodes[i].intra_nodeno).get_ptr()));
-                else
-                  ca->addEdge(t1, t2, correct(nodes[i].gr->get_weight(nodes[i].intra_nodeno).get_ptr()));
-                if(states_visited.find(nodes[i].trans.tgt) == states_visited.end()) {
-                  worklist.push_back(nodes[i].trans.tgt);
-                }
-              }
-            }
-            int final_st = get_number(intra_node_map,accept, ca);
-            ca->setOutNode(final_st, 1); // second argument is not required
-            ca->setupIntraSolution(false);
-            bool r = op(ca->get_weight(final_st).get_ptr());
-            delete ca;
-            return r;
           }
+          int final_st = get_number(intra_node_map,accept, ca);
+          ca->setOutNode(final_st, 1); // second argument is not required
+          ca->setupIntraSolution(false);
+          bool r = op(ca->get_weight(final_st).get_ptr());
+          delete ca;
+          return r;
+        }
 
-          void InterGraph::cleanUp()
-          {
-            //I don't have any static variables of my own.
-            //The following classes are not so well behaved.
-            IntraGraph::cleanUp();
-            RegExp::cleanUp();
-          }
+        void InterGraph::cleanUp()
+        {
+          //I don't have any static variables of my own.
+          //The following classes are not so well behaved.
+          IntraGraph::cleanUp();
+          RegExp::cleanUp();
+        }
 
-        } // namespace graph
+    } // namespace graph
 
-    } // namespace wali
+} // namespace wali
 

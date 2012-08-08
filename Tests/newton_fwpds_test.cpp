@@ -433,8 +433,8 @@ int main(int argc, char ** argv)
   PDSCompare pac("KLEENE", "NEWTON");
 
   {
-    FWPDS fpds;
-    fpds.useNewton(false);
+    EWPDS fpds;
+    //fpds.useNewton(false);
     RandomPdsGen::Names names;
     rpt = new RandomPdsGen(mwg,pdsSizeFactor,15*pdsSizeFactor,25*pdsSizeFactor,4*pdsSizeFactor,0,0.45,0.45,seed);
     if(dump){

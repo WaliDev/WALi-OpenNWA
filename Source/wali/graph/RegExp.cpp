@@ -15,6 +15,7 @@ namespace wali {
         bool RegExp::extend_backwards = false;
         reg_exp_hash_t RegExp::reg_exp_hash;
         const_reg_exp_hash_t RegExp::const_reg_exp_hash;
+        reg_exp_hash_t RegExp::roots;
         RegExpStats RegExp::stats;
         reg_exp_t RegExp::reg_exp_one;
         reg_exp_t RegExp::reg_exp_zero;
@@ -46,38 +47,69 @@ namespace wali {
             return (int)updatable_node_no;
         }
 
-        void RegExp::update(node_no_t nno, sem_elem_t se) {
-            if(saturation_complete) {
-              cerr << "RegExp: Error: cannot update nodes when saturation is complete\n";
-              assert(!initialized);
-              assert(0);
-            }
+        // Updates all the updatable edgses given in the list together, so that all of them
+        // get the same update_count.
+        void RegExp::update(std::vector<node_no_t> nnos, std::vector<sem_elem_t> ses)
+        {
+          //Make sure that correct number of weights were passed in.
+          assert(nnos.size() == ses.size() && "[RegExp::update] Sizes of input vectors must match\n");
+          if(saturation_complete) {
+            cerr << "RegExp: Error: cannot update nodes when saturation is complete\n";
+            assert(!initialized);
+            assert(0);
+          }
 
+          unsigned int &update_count = satProcesses[currentSatProcess].update_count;
+          for(unsigned i = 0; i < nnos.size(); ++i){
+            node_no_t nno = nnos[i];
+            sem_elem_t se = ses[i];
             updatable(nno,se); // make sure that this node exists
             if(!updatable_nodes[nno]->value->equal(se)) {
-                unsigned int &update_count = satProcesses[currentSatProcess].update_count;
-
 #ifdef DWPDS
-                updatable_nodes[nno]->delta[update_count+1] = se->diff(updatable_nodes[nno]->value);
+              updatable_nodes[nno]->delta[update_count+1] = se->diff(updatable_nodes[nno]->value);
 #endif
-                update_count = update_count + 1;
-                updatable_nodes[nno]->value = se;
-                updatable_nodes[nno]->last_change = update_count;
-                updatable_nodes[nno]->last_seen = update_count;
-                updatable_nodes[nno]->eval_map.clear();
-
+              updatable_nodes[nno]->value = se;
+              updatable_nodes[nno]->last_change = update_count;
+              updatable_nodes[nno]->last_seen = update_count;
+              updatable_nodes[nno]->eval_map.clear();
             }
             //updates.push_back(nno);
+          }
+          update_count = update_count + 1;
+        }
+
+        void RegExp::update(node_no_t nno, sem_elem_t se) {
+          if(saturation_complete) {
+            cerr << "RegExp: Error: cannot update nodes when saturation is complete\n";
+            assert(!initialized);
+            assert(0);
+          }
+
+          updatable(nno,se); // make sure that this node exists
+          if(!updatable_nodes[nno]->value->equal(se)) {
+            unsigned int &update_count = satProcesses[currentSatProcess].update_count;
+
+#ifdef DWPDS
+            updatable_nodes[nno]->delta[update_count+1] = se->diff(updatable_nodes[nno]->value);
+#endif
+            update_count = update_count + 1;
+            updatable_nodes[nno]->value = se;
+            updatable_nodes[nno]->last_change = update_count;
+            updatable_nodes[nno]->last_seen = update_count;
+            updatable_nodes[nno]->eval_map.clear();
+
+          }
+          //updates.push_back(nno);
         }
 
         ostream &operator << (ostream &out, const RegExpStats &s) {
-            out << "Semiring Extend : " << s.nextend << "\n";
-            out << "Semiring Combine : " << s.ncombine << "\n";
-            out << "Semiring Star : " << s.nstar << "\n";
-            out << "Semiring Ops : " << (s.nstar + s.ncombine + s.nextend) << "\n";
-            out << "HashMap hits : "<< s.hashmap_hits << "\n";
-            out << "HashMap misses : " << s.hashmap_misses << "\n";
-            return out;
+          out << "Semiring Extend : " << s.nextend << "\n";
+          out << "Semiring Combine : " << s.ncombine << "\n";
+          out << "Semiring Star : " << s.nstar << "\n";
+          out << "Semiring Ops : " << (s.nstar + s.ncombine + s.nextend) << "\n";
+          out << "HashMap hits : "<< s.hashmap_hits << "\n";
+          out << "HashMap misses : " << s.hashmap_misses << "\n";
+          return out;
         }
 
         ostream &RegExp::print(ostream &out) {
@@ -122,6 +154,83 @@ namespace wali {
             return out;
         }
 
+        // nextLbl is the next label *to be used*
+        // The returned label is the *last label used* and the label for the *returning node*.
+        long RegExp::toDot(ostream& out, std::set<long>& seen, bool isRoot)
+        {
+          hash_sem_elem hse;
+
+          long me;
+          switch(type){
+            case Constant:
+              me = hse(value); 
+              if(seen.find(me) != seen.end())
+                return me;
+              if(isRoot)
+                out << "n" << me << "[label = \"constant (root)\" fillcolor=\"firebrick\"];\n";
+              else
+                out << "n" << me << "[label = \"constant\"];\n";
+              seen.insert(me);
+              return me;
+            case Updatable:
+              me = hse(value); 
+              if(seen.find(me) != seen.end())
+                return me;
+              if(isRoot)
+                out << "n" << me << "[label = \"updatable (root)\" fillcolor=\"firebrick\"];\n";
+              else
+                out << "n" << me << "[label = \"updatable\"];\n";
+              seen.insert(me);
+              return me;
+            case Combine:
+            case Extend:
+            case Star:
+            default:
+              break;
+          }
+
+          vector<long int> others;
+          reg_exp_key_t rkey(type, this);
+          hash_reg_exp_key hrek;
+          me = hrek(rkey);
+          if(seen.find(me) != seen.end()){
+            return me;
+          }
+          me = hrek(rkey);
+          seen.insert(me);
+          for(list<reg_exp_t>::iterator it = children.begin(); it != children.end(); it++)
+            others.push_back((*it)->toDot(out, seen));
+          switch(type){
+            case Constant:
+            case Updatable:
+              break;
+            case Star:
+              if(isRoot)
+                out << "n" << me << "[label = \"* (root)\" fillcolor=\"firebrick\"];\n";
+              else
+                out << "n" << me << "[label = \"*\" fillcolor=\"aquamarine\"];\n";
+              break;
+            case Combine:
+              if(isRoot)
+                out << "n" << me << "[label = \"+ (root)\" fillcolor=\"firebrick\"];\n";
+              else
+                out << "n" << me << "[label = \"+\" fillcolor=\"gold\"];\n";
+              break;
+            case Extend:
+              if(isRoot)
+                out << "n" << me << "[label = \"x (root)\" fillcolor=\"firebrick\"];\n";
+              else
+                out << "n" << me << "[label = \"x\" fillcolor=\"coral\"];\n";
+              break;
+            default:
+              assert(false && "[RegExp::toDot] Unknown RegExp Type.\n");
+          }
+          for(vector<long>::iterator it = others.begin(); it != others.end(); it++)
+            out << "n" << me << " -> n" << *it << "\n";
+          return me;
+        }
+
+
         // need not return an evaluated reg_exp
         reg_exp_t RegExp::star(reg_exp_t r) {
             if(r->type == Star) {
@@ -133,7 +242,16 @@ namespace wali {
                 }
             }
 #ifndef REGEXP_CACHING
-            return new RegExp(Star, r);
+            reg_exp_t res = new RegExp(Star, r);
+            // Manipulate the set of root nodes.
+            // remove r from roots.
+            reg_exp_key_t delkey(r->type, r);
+            roots.erase(delkey);
+            // Add the new regexp to roots
+            reg_exp_key_t inskey(res->type, res);
+            roots.insert(inskey, res);           
+
+            return res;
 #else // REGEXP_CACHING
 
             if(r->type == Constant) {
@@ -147,6 +265,15 @@ namespace wali {
             if(it == reg_exp_hash.end()) {
                 reg_exp_t res = new RegExp(Star, r);
                 reg_exp_hash.insert(rkey, res);
+
+                // Manipulate the set of root nodes.
+                // remove r from roots.
+                reg_exp_key_t delkey(r->type, r);
+                roots.erase(delkey);
+                // Add the new regexp to roots
+                reg_exp_key_t inskey(res->type, res);
+                roots.insert(inskey, res);           
+
                 STAT(stats.hashmap_misses++);
                 return res;
             }
@@ -164,7 +291,18 @@ namespace wali {
                 return r1;
             }
 #ifndef REGEXP_CACHING
-            return new RegExp(Combine, r1, r2);
+            reg_exp_t res = new RegExp(Combine, r1, r2);
+            // Manipulate the set of root nodes.
+            // remove r1,r2 from roots.
+            reg_exp_key_t del1key(r1->type, r1);
+            roots.erase(del1key);
+            reg_exp_key_t del2key(r2->type, r2);
+            roots.erase(del2key);
+            // Add the new regexp to roots
+            reg_exp_key_t inskey(res->type, res);
+            roots.insert(inskey, res);           
+
+            return res;
 #else
             reg_exp_key_t rkey1(Combine, r1, r2);
             reg_exp_hash_t::iterator it = reg_exp_hash.find(rkey1);
@@ -177,6 +315,17 @@ namespace wali {
                 if(it == reg_exp_hash.end()) {
                     reg_exp_t res = new RegExp(Combine, r1, r2);
                     reg_exp_hash.insert(rkey2, res);
+
+                    // Manipulate the set of root nodes.
+                    // remove r1,r2 from roots.
+                    reg_exp_key_t del1key(r1->type, r1);
+                    roots.erase(del1key);
+                    reg_exp_key_t del2key(r2->type, r2);
+                    roots.erase(del2key);
+                    // Add the new regexp to roots
+                    reg_exp_key_t inskey(res->type, res);
+                    roots.insert(inskey, res);           
+
                     STAT(stats.hashmap_misses++);
                     return res;
                 }
@@ -187,6 +336,10 @@ namespace wali {
         }
 
         reg_exp_t RegExp::combine(list<reg_exp_t> &ls) {
+          // Prathmesh: I added this "false" assertion here.
+          // It looks like this one doesn't implement the whole
+          // RegExp caching logic. A remnant of old times?
+          assert(false && "Prathmesh: Deprecated?\n");
           if(ls.size() == 0)
             return reg_exp_zero;
           if(ls.size() == 1)
@@ -212,7 +365,18 @@ namespace wali {
             } 
 
 #ifndef REGEXP_CACHING
-            return new RegExp(Extend, r1, r2);
+            reg_exp_t res = new RegExp(Extend, r1, r2);
+            // Manipulate the set of root nodes.
+            // remove r1,r2 from roots.
+            reg_exp_key_t del1key(r1->type, r1);
+            roots.erase(del1key);
+            reg_exp_key_t del2key(r2->type, r2);
+            roots.erase(del2key);
+            // Add the new regexp to roots
+            reg_exp_key_t inskey(res->type, res);
+            roots.insert(inskey, res);           
+
+            return res;
 #else
             if(r1->type == Constant && r1->value->equal(r1->value->one())) {
                 return r2;
@@ -224,6 +388,17 @@ namespace wali {
             if(it == reg_exp_hash.end()) {
                 reg_exp_t res = new RegExp(Extend, r1, r2);
                 reg_exp_hash.insert(rkey, res);
+
+                // Manipulate the set of root nodes.
+                // remove r1,r2 from roots.
+                reg_exp_key_t del1key(r1->type, r1);
+                roots.erase(del1key);
+                reg_exp_key_t del2key(r2->type, r2);
+                roots.erase(del2key);
+                // Add the new regexp to roots
+                reg_exp_key_t inskey(res->type, res);
+                roots.insert(inskey, res);           
+
                 STAT(stats.hashmap_misses++);
                 return res;
             }
@@ -263,6 +438,8 @@ namespace wali {
           
           reg_exp_hash.clear();
           const_reg_exp_hash.clear();
+          // The set of root nodes is cleared between saturation phases.
+          roots.clear();
           updatable_nodes.clear();
           
           reg_exp_zero = new RegExp(se->zero());
@@ -282,6 +459,10 @@ namespace wali {
           
         }
 
+        const reg_exp_hash_t& RegExp::getRoots()
+        {
+          return roots;
+        }
 
         // a = a union b
         void my_set_union(std::set<long int> &a, std::set<long int> &b) {
@@ -799,220 +980,237 @@ namespace wali {
             return changestat;
         }
 
+        void RegExp::evaluateRoots()
+        {
+          const reg_exp_hash_t& roots = getRoots();
+          for(reg_exp_hash_t::const_iterator iter = roots.begin(); iter != roots.end(); ++iter){
+            reg_exp_t regexp = iter->second;
+            if(regexp->last_seen == satProcesses[regexp->satProcess].update_count && regexp->last_change != (unsigned)-1)  // evaluate(w) sets last_change to -1
+              continue;
+            if(!top_down_eval || !saturation_complete)
+              regexp->evaluate();
+            else if(executing_poststar)
+              regexp->evaluate(regexp->value->one());
+            else 
+              // Executing prestar
+              regexp->evaluate();
+          }
+        }
+
         void RegExp::evaluate_iteratively() {
-            typedef list<reg_exp_t>::iterator iter_t;
-            typedef pair<reg_exp_t, iter_t > stack_el;
+          typedef list<reg_exp_t>::iterator iter_t;
+          typedef pair<reg_exp_t, iter_t > stack_el;
 
-            if(last_seen == satProcesses[satProcess].update_count)
-                return;
+          if(last_seen == satProcesses[satProcess].update_count)
+            return;
 
-            list<stack_el> stack;
-            stack.push_front(stack_el(this, children.begin()));
+          list<stack_el> stack;
+          stack.push_front(stack_el(this, children.begin()));
 
-            while(!stack.empty()) {
-                stack_el sel = stack.front();
-                stack.pop_front();
+          while(!stack.empty()) {
+            stack_el sel = stack.front();
+            stack.pop_front();
 
-                reg_exp_t re = sel.first;
-                iter_t cit = sel.second;
+            reg_exp_t re = sel.first;
+            iter_t cit = sel.second;
 
-                while( cit != re->children.end() && (*cit)->last_seen == satProcesses[satProcess].update_count) {
-                    cit++;
-                }
-
-                if(cit == re->children.end()) {
-                    switch(re->type) {
-                        case Constant:
-                        case Updatable:
-                            break;
-                        case Star: {
-                                       reg_exp_t ch = re->children.front();
-                                       if(ch->last_change <= re->last_seen) { // child did not change
-                                           re->last_seen = satProcesses[satProcess].update_count;
-                                       } else {
-                                           sem_elem_t w = ch->value->star();
-                                           STAT(stats.nstar++);
-                                           re->last_seen = satProcesses[satProcess].update_count;
-                                           if(!re->value->equal(w)) {
-                                               //last_change = update_count;
-                                               re->last_change = ch->last_change;
-                                               re->value = w;
-                                           }
-                                       }
-                                       break;
-                                   }
-                        case Extend: {
-                                         list<reg_exp_t>::iterator ch;
-                                         sem_elem_t wnew = re->value->one();
-                                         bool changed = false;
-                                         unsigned max = re->last_change;
-                                         for(ch = re->children.begin(); ch != re->children.end() && !changed; ch++) {
-                                             changed = changed | ((*ch)->last_change > re->last_seen);
-                                         }
-                                         re->last_seen = satProcesses[satProcess].update_count;
-                                         if(changed) {
-                                             for(ch = re->children.begin(); ch != re->children.end(); ch++) {
-                                                 wnew = wnew->extend( (*ch)->value);
-                                                 max = ((*ch)->last_change > max) ? (*ch)->last_change : max;        
-                                                 STAT(stats.nextend++);
-                                             }
-                                             if(!re->value->equal(wnew)) {
-                                                 re->last_change = max;
-                                                 re->value = wnew;
-                                             }
-                                         }
-                                         break;
-                                     }
-                        case Combine: {
-                                          list<reg_exp_t>::iterator ch;
-                                          sem_elem_t wnew = re->value;
-                                          unsigned max = re->last_change;
-                                          for(ch = re->children.begin(); ch != re->children.end(); ch++) {
-                                              if((*ch)->last_change > re->last_seen) {
-                                                  wnew = wnew->combine((*ch)->value);
-                                                  max = ((*ch)->last_change > max) ? (*ch)->last_change : max;
-                                                  STAT(stats.ncombine++);
-                                              }
-                                          }
-                                          re->last_seen = satProcesses[satProcess].update_count;
-                                          if(!re->value->equal(wnew)) {
-                                              re->last_change = max;
-                                              re->value = wnew;
-                                          }
-                                          break;
-                                      }
-                    }
-                    re->last_change = (re->last_change > 1) ? re->last_change : 1;  
-                } else { // cit != re->children.end()
-                    iter_t cit2 = cit;
-                    stack.push_front(stack_el(re, ++cit2));
-                    stack.push_front(stack_el(*cit, (*cit)->children.begin()));
-                }
+            while( cit != re->children.end() && (*cit)->last_seen == satProcesses[satProcess].update_count) {
+              cit++;
             }
+
+            if(cit == re->children.end()) {
+              switch(re->type) {
+                case Constant:
+                case Updatable:
+                  break;
+                case Star: {
+                             reg_exp_t ch = re->children.front();
+                             if(ch->last_change <= re->last_seen) { // child did not change
+                               re->last_seen = satProcesses[satProcess].update_count;
+                             } else {
+                               sem_elem_t w = ch->value->star();
+                               STAT(stats.nstar++);
+                               re->last_seen = satProcesses[satProcess].update_count;
+                               if(!re->value->equal(w)) {
+                                 //last_change = update_count;
+                                 re->last_change = ch->last_change;
+                                 re->value = w;
+                               }
+                             }
+                             break;
+                           }
+                case Extend: {
+                               list<reg_exp_t>::iterator ch;
+                               sem_elem_t wnew = re->value->one();
+                               bool changed = false;
+                               unsigned max = re->last_change;
+                               for(ch = re->children.begin(); ch != re->children.end() && !changed; ch++) {
+                                 changed = changed | ((*ch)->last_change > re->last_seen);
+                               }
+                               re->last_seen = satProcesses[satProcess].update_count;
+                               if(changed) {
+                                 for(ch = re->children.begin(); ch != re->children.end(); ch++) {
+                                   wnew = wnew->extend( (*ch)->value);
+                                   max = ((*ch)->last_change > max) ? (*ch)->last_change : max;        
+                                   STAT(stats.nextend++);
+                                 }
+                                 if(!re->value->equal(wnew)) {
+                                   re->last_change = max;
+                                   re->value = wnew;
+                                 }
+                               }
+                               break;
+                             }
+                case Combine: {
+                                list<reg_exp_t>::iterator ch;
+                                sem_elem_t wnew = re->value;
+                                unsigned max = re->last_change;
+                                for(ch = re->children.begin(); ch != re->children.end(); ch++) {
+                                  if((*ch)->last_change > re->last_seen) {
+                                    wnew = wnew->combine((*ch)->value);
+                                    max = ((*ch)->last_change > max) ? (*ch)->last_change : max;
+                                    STAT(stats.ncombine++);
+                                  }
+                                }
+                                re->last_seen = satProcesses[satProcess].update_count;
+                                if(!re->value->equal(wnew)) {
+                                  re->last_change = max;
+                                  re->value = wnew;
+                                }
+                                break;
+                              }
+              }
+              re->last_change = (re->last_change > 1) ? re->last_change : 1;  
+            } else { // cit != re->children.end()
+              iter_t cit2 = cit;
+              stack.push_front(stack_el(re, ++cit2));
+              stack.push_front(stack_el(*cit, (*cit)->children.begin()));
+            }
+          }
         }
 
         sem_elem_t RegExp::evaluate(sem_elem_t w) {
-            map<sem_elem_t, sem_elem_t,sem_elem_less>::iterator it;
-            sem_elem_t ret;
+          map<sem_elem_t, sem_elem_t,sem_elem_less>::iterator it;
+          sem_elem_t ret;
 
-            if(last_seen == satProcesses[satProcess].update_count) {
-                it = eval_map.find(w);
-                if(it != eval_map.end()) {
-                    return it->second;
-                } else { 
-#if 0
-                    if(false && last_change != (unsigned)-1) {// "value" is available
-                        ret = w->extend(value);
-                        eval_map[w] = ret;
-                        return ret;
-                    }
-#endif
-                }
-            } else {
-                eval_map.clear();
-            }
-
-            switch(type) {
-                case Constant:
-                case Updatable:
-                    ret = w->extend(value);
-                    STAT(stats.nextend++);
-                    break;
-                case Star: {
-                               reg_exp_t ch = children.front();
-                               sem_elem_t ans = w->zero(), nans = w;
-                               sem_elem_t temp = w;
-                               while(!ans->equal(nans)) {
-                                   ans = nans;
-                                   temp = ch->evaluate(temp);
-                                   nans = nans->combine(temp);
-                                   STAT(stats.ncombine++);
-                               }
-                               ret = nans;
-                               break;
-                           }
-                case Extend: {
-                                 list<reg_exp_t>::iterator ch;
-                                 sem_elem_t temp = w;
-                                 for(ch = children.begin(); ch != children.end(); ch++) {
-                                     temp = (*ch)->evaluate(temp);
-                                 }
-                                 ret = temp;
-                                 break;
-                             }
-                case Combine: {
-                                  list<reg_exp_t>::iterator ch;
-                                  sem_elem_t temp = w->zero();
-                                  for(ch = children.begin(); ch != children.end(); ch++) {
-                                      temp = temp->combine((*ch)->evaluate(w));
-                                      STAT(stats.ncombine++);
-                                  }
-                                  ret = temp;
-                                  break;
-                              }
-            }
-            eval_map[w] = ret;
-            last_seen = satProcesses[satProcess].update_count; last_change = (unsigned)-1;
-            return ret;
-        }
-
-    // Evaluate in reverse
-    sem_elem_t RegExp::evaluateRev(sem_elem_t w) {
-        map<sem_elem_t, sem_elem_t,sem_elem_less>::iterator it;
-        sem_elem_t ret;
-
-        if(last_seen == satProcesses[satProcess].update_count) {
+          if(last_seen == satProcesses[satProcess].update_count) {
             it = eval_map.find(w);
             if(it != eval_map.end()) {
-                return it->second;
+              return it->second;
             } else { 
 #if 0
-                if(false && last_change != (unsigned)-1) {// "value" is available
-                    ret = w->extend(value);
-                    eval_map[w] = ret;
-                    return ret;
-                }
+              if(false && last_change != (unsigned)-1) {// "value" is available
+                ret = w->extend(value);
+                eval_map[w] = ret;
+                return ret;
+              }
 #endif
             }
-        } else {
+          } else {
             eval_map.clear();
-        }
+          }
 
-        switch(type) {
+          switch(type) {
             case Constant:
             case Updatable:
-                ret = value->extend(w);
-                STAT(stats.nextend++);
-                break;
+              ret = w->extend(value);
+              STAT(stats.nextend++);
+              break;
             case Star: {
-                           reg_exp_t ch = children.front();
-                           sem_elem_t ans = w->zero(), nans = w;
-                           sem_elem_t temp = w;
-                           while(!ans->equal(nans)) {
-                               ans = nans;
-                               temp = ch->evaluateRev(temp);
-                               nans = nans->combine(temp);
-                               STAT(stats.ncombine++);
-                           }
-                           ret = nans;
-                           break;
+                         reg_exp_t ch = children.front();
+                         sem_elem_t ans = w->zero(), nans = w;
+                         sem_elem_t temp = w;
+                         while(!ans->equal(nans)) {
+                           ans = nans;
+                           temp = ch->evaluate(temp);
+                           nans = nans->combine(temp);
+                           STAT(stats.ncombine++);
+                         }
+                         ret = nans;
+                         break;
                        }
             case Extend: {
-                             list<reg_exp_t>::reverse_iterator ch;
-                             sem_elem_t temp = w;
-                             for(ch = children.rbegin(); ch != children.rend(); ch++) {
-                                 temp = (*ch)->evaluateRev(temp);
-                             }
-                             ret = temp;
-                             break;
+                           list<reg_exp_t>::iterator ch;
+                           sem_elem_t temp = w;
+                           for(ch = children.begin(); ch != children.end(); ch++) {
+                             temp = (*ch)->evaluate(temp);
+                           }
+                           ret = temp;
+                           break;
                          }
             case Combine: {
-                              list<reg_exp_t>::iterator ch;
-                              sem_elem_t temp = w->zero();
-                              for(ch = children.begin(); ch != children.end(); ch++) {
-                                  temp = temp->combine((*ch)->evaluateRev(w));
-                                  STAT(stats.ncombine++);
-                              }
+                            list<reg_exp_t>::iterator ch;
+                            sem_elem_t temp = w->zero();
+                            for(ch = children.begin(); ch != children.end(); ch++) {
+                              temp = temp->combine((*ch)->evaluate(w));
+                              STAT(stats.ncombine++);
+                            }
+                            ret = temp;
+                            break;
+                          }
+          }
+          eval_map[w] = ret;
+          last_seen = satProcesses[satProcess].update_count; last_change = (unsigned)-1;
+          return ret;
+        }
+
+        // Evaluate in reverse
+        sem_elem_t RegExp::evaluateRev(sem_elem_t w) {
+          map<sem_elem_t, sem_elem_t,sem_elem_less>::iterator it;
+          sem_elem_t ret;
+
+          if(last_seen == satProcesses[satProcess].update_count) {
+            it = eval_map.find(w);
+            if(it != eval_map.end()) {
+              return it->second;
+            } else { 
+#if 0
+              if(false && last_change != (unsigned)-1) {// "value" is available
+                ret = w->extend(value);
+                eval_map[w] = ret;
+                return ret;
+              }
+#endif
+            }
+          } else {
+            eval_map.clear();
+          }
+
+          switch(type) {
+            case Constant:
+            case Updatable:
+              ret = value->extend(w);
+              STAT(stats.nextend++);
+              break;
+            case Star: {
+                         reg_exp_t ch = children.front();
+                         sem_elem_t ans = w->zero(), nans = w;
+                         sem_elem_t temp = w;
+                         while(!ans->equal(nans)) {
+                           ans = nans;
+                           temp = ch->evaluateRev(temp);
+                           nans = nans->combine(temp);
+                           STAT(stats.ncombine++);
+                         }
+                         ret = nans;
+                         break;
+                       }
+            case Extend: {
+                           list<reg_exp_t>::reverse_iterator ch;
+                           sem_elem_t temp = w;
+                           for(ch = children.rbegin(); ch != children.rend(); ch++) {
+                             temp = (*ch)->evaluateRev(temp);
+                           }
+                           ret = temp;
+                           break;
+                         }
+            case Combine: {
+                            list<reg_exp_t>::iterator ch;
+                            sem_elem_t temp = w->zero();
+                            for(ch = children.begin(); ch != children.end(); ch++) {
+                              temp = temp->combine((*ch)->evaluateRev(w));
+                              STAT(stats.ncombine++);
+                            }
                               ret = temp;
                               break;
                           }
@@ -1302,6 +1500,7 @@ namespace wali {
         RegExp::extend_backwards = false;
         RegExp::reg_exp_hash.clear();
         RegExp::const_reg_exp_hash.clear();
+        RegExp::roots.clear();
         RegExp::stats.reset();
         RegExp::reg_exp_one = NULL;
         RegExp::reg_exp_zero = NULL;

@@ -183,6 +183,7 @@ namespace wali
         std::ostream& o;
         bool print_weights;
 
+        std::set<wali::Key> nodesSeen;
         TransDotty( std::ostream& o, bool print_weights );
 
         virtual ~TransDotty() {}

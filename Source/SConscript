@@ -108,6 +108,7 @@ nice_files = Split("""
 ./opennwa/nwa_pds/plusWpds.cpp
 ./opennwa/traverse/depth.cpp
 ./opennwa/traverse/Expand.cpp
+./wali/graph/Functional.cpp
 """)
 
 

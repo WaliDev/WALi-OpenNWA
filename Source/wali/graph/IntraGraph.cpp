@@ -5,7 +5,7 @@
 #include "wali/graph/GraphCommon.hpp"
 
 #include <iostream>
-
+#include <sstream>
 using namespace std;
 
 namespace wali {
@@ -470,13 +470,69 @@ namespace wali {
     }
 
 
-    void IntraGraph::addEdge(int s, int t, sem_elem_t se, bool updatable) {
+    int IntraGraph::addEdge(int s, int t, sem_elem_t se, bool updatable, functional_t exp) 
+    {
 
       create_node(s);
       create_node(t);
 
       int eno = edgeno(s,t);
+      if(eno != -1){
+        // The edge already exists.
+        edges[eno].weight = edges[eno].weight->combine(se);
+        if(!edges[eno].updatable && updatable){
+          //The original edge was not updatable, but the new is.
+          int uno = 0;
+          uno = RegExp::getNextUpdatableNumber();
+          // Create updatable RegExp node
+          RegExp::updatable(uno,se);
+          // Convert the edge to an updatable edge
+          edges[eno].updatable = true;
+          edges[eno].updatable_no = uno;
+          edges[eno].regexp = RegExp::combine(edges[eno].regexp, RegExp::updatable(uno, se));
+          edges[eno].exp = exp;
+          // Add this edge to the set of updatable edges
+          updatable_edges.push_back(eno);
+        }else if(edges[eno].updatable && updatable){
+          // The original as well as the new edge are updatable.
+          if(s != 0){
+            // We only get this situation with source nodes.
+            // otheriwise, emit warning.
+            cerr << "FWPDS: Warning, parallel updatable edges. Results may not be correct\n";
+            print_trans(nodes[edges[eno].src].trans,std::cerr);
+            std::cerr << "\n";
+            print_trans(nodes[edges[eno].tgt].trans,std::cerr);
+            std::cerr << "\n";
+          }
+          edges[eno].exp = SemElemFunctional::combine(edges[eno].exp, exp);
+        }else{
+          edges[eno].regexp = RegExp::combine(edges[eno].regexp, RegExp::constant(se));
+        }
+      }else{
+        // Create a new edge.
+        int uno = 0;
+        if(updatable){
+          uno = RegExp::getNextUpdatableNumber();
+          // Create updatable RegExp node
+          RegExp::updatable(uno,se);
+        }
+        IntraGraphEdge ed(s,t,se,updatable,uno,exp);
+        if(edges.size() == (unsigned)nedges) {
+          edges.resize(2*nedges);
+        }
+        edges[nedges] = ed; // .set(s,t,se,updatable,uno);
+        nedges++;
+        eno = nedges - 1;
+        if(updatable) {
+          edges[eno].updatable_no = uno;
+          updatable_edges.push_back(eno);
+        }
+        nodes[s].outgoing.push_back(eno);
+        nodes[t].incoming.push_back(eno);
+      }
+      return eno;
 
+#if 0
       //    if(eno != -1) {
       //      edges[eno].weight = edges[eno].weight->combine(se);
       //      return;
@@ -488,7 +544,7 @@ namespace wali {
         // create the updatable reg-exp-node
         RegExp::updatable(uno, se);
       }
-      IntraGraphEdge ed(s,t,se,updatable,uno);
+      IntraGraphEdge ed(s,t,se,updatable,uno,exp);
 
       if(eno != -1) { 
         // Edge existed before
@@ -523,7 +579,7 @@ namespace wali {
       if(updatable) {
         updatable_edges.push_back(e);
       }
-
+#endif
     }
 
     void IntraGraph::setSource(int n, sem_elem_t init_weight) {
@@ -540,6 +596,20 @@ namespace wali {
       int e = nedges - 1;
       nodes[0].outgoing.push_back(e);
       nodes[n].incoming.push_back(e);
+    }
+
+    int IntraGraph::setSource(int n, sem_elem_t init_weight, functional_t exp) 
+    {
+      create_node(n);
+      nodes[n].type = Source;
+
+      // add Edge
+      return addEdge(0, n, init_weight, true, exp);
+    }
+
+    void IntraGraph::addDependentEdge(int e, int n)
+    {
+      nodes[n].addDependentEdge(e);
     }
 
     void IntraGraph::addCallEdge(IntraGraph *next) {
@@ -664,6 +734,12 @@ namespace wali {
       assert(nno >=0 && nno < nnodes);
 
       return node_pop_weight[nno];
+    }
+
+    sem_elem_t IntraGraph::getWeight(int nno) const 
+    {
+      assert (nno >= 0 && nno < nnodes);
+      return nodes[nno].weight;
     }
 
     // Solve backward query, with initial configurations as "updates"
@@ -1523,6 +1599,62 @@ namespace wali {
       IntraGraph::intraGraphBufferSize = 0;
 #endif
     }
+
+    string IntraGraph::toDot()
+    {
+      std::stringstream ss;
+      ss << "digraph {\n";
+      for(int i = 0; i < nnodes; ++i)
+        ss << i << "\n";
+      for(int i = 0; i < nedges; ++i)
+        ss << edges[i].src << " -> " << edges[i].tgt << "\n";
+      ss << "}";
+      return ss.str();
+    }
+
+
+    // Used during Newton's method to saturate an IntraGraph corresponding to a linearized equation system
+    void IntraGraph::saturate()
+    {
+      bool repeat = true;
+      while(repeat){
+        //First, evaluate the current regular expressions completely.
+        RegExp::evaluateRoots();
+        
+        //Now, obtain the set of nodes who's values have changed.
+        std::vector<IntraGraphNode*> changedNodes;
+        // The first node is the source node.
+        for(int i = 1; i < nnodes; ++i){
+          if(nodes[i].weight == NULL || !nodes[i].weight->equal(nodes[i].regexp->get_weight())){
+            changedNodes.push_back(&nodes[i]);
+            nodes[i].weight = nodes[i].regexp->get_weight();
+          }
+        }
+
+        //Given the set of nodes who's weights have changed, find the set of mutable edges that need to
+        // be updated.
+        std::set<unsigned long> updateEdgesSet;
+        std::vector<unsigned long> updateEdges;
+        std::vector<sem_elem_t> weights;
+        for(vector<IntraGraphNode*>::const_iterator iter = changedNodes.begin(); iter != changedNodes.end(); ++iter){
+          for(std::set<int>::const_iterator ei = (*iter)->dependentEdges.begin(); ei != (*iter)->dependentEdges.end(); ++ei){
+            assert(edges[*ei].updatable);
+            int updatable_no = edges[*ei].updatable_no;
+            if(updateEdgesSet.find(updatable_no) == updateEdgesSet.end()){
+              updateEdges.push_back(updatable_no);
+              weights.push_back(edges[*ei].exp->evaluate(this));
+              updateEdgesSet.insert(updatable_no);
+            }
+          }
+        }
+
+        if(updateEdges.size() > 0){
+          repeat  = true;
+          RegExp::update(updateEdges, weights);
+        }else repeat = false;
+      }
+    }
+
 
   } // namespace graph
 } // namespace wali
