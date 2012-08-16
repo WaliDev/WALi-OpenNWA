@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <iterator>
 
+//debugging
+#include "wali/SemElemTensor.hpp"
+
 namespace wali {
 
     namespace graph {
@@ -69,8 +72,8 @@ namespace wali {
               updatable_nodes[nno]->delta[update_count+1] = se->diff(updatable_nodes[nno]->value);
 #endif
               updatable_nodes[nno]->value = se;
-              updatable_nodes[nno]->last_change = update_count;
-              updatable_nodes[nno]->last_seen = update_count;
+              updatable_nodes[nno]->last_change = update_count + 1;
+              updatable_nodes[nno]->last_seen = update_count + 1;
               updatable_nodes[nno]->eval_map.clear();
             }
             //updates.push_back(nno);
@@ -159,27 +162,52 @@ namespace wali {
         long RegExp::toDot(ostream& out, std::set<long>& seen, bool isRoot)
         {
           hash_sem_elem hse;
-
           long me;
+          bool isZero = false, isOne = false;
+          if(value != NULL){
+            isZero = value->equal(value->zero());
+            isOne = value->equal(value->one());
+          }else
+            isZero = true;
+          const long myptr = (const long) this;
           switch(type){
             case Constant:
-              me = hse(value); 
+              me = hse(value);
               if(seen.find(me) != seen.end())
                 return me;
               if(isRoot)
-                out << "n" << me << "[label = \"constant (root)\" fillcolor=\"firebrick\"];\n";
+                out << "n" << me << "[label = \""
+                  << "constant \\n "
+                  << "(root)\\n "
+                  << "zero: " << isZero << "\\n "
+                  << "one: " << isOne << "\\n "
+                  << "\" color=red];\n";
               else
-                out << "n" << me << "[label = \"constant\"];\n";
+                out << "n" << me << "[label = \""
+                  << "constant \\n "
+                  << "zero: " << isZero << "\\n "
+                  << "one: " << isOne << "\\n "
+                  << "\"];\n";
               seen.insert(me);
               return me;
             case Updatable:
-              me = hse(value); 
+              //me = hse(value); 
+              me = updatable_node_no;
               if(seen.find(me) != seen.end())
                 return me;
               if(isRoot)
-                out << "n" << me << "[label = \"updatable (root)\" fillcolor=\"firebrick\"];\n";
+                out << "n" << me << "[label = \""
+                  << "updatable\\n " 
+                  << "(root) \\n "
+                  << "zero: " << isZero << "\\n "
+                  << "one: " << isOne << "\\n "
+                  << "\" color=red];\n";
               else
-                out << "n" << me << "[label = \"updatable\"];\n";
+                out << "n" << me << "[label = \""
+                  << "updatable\\n "
+                  << "zero: " << isZero << "\\n "
+                  << "one: " << isOne << "\\n "
+                  << "\" color=brown];\n";
               seen.insert(me);
               return me;
             case Combine:
@@ -196,7 +224,6 @@ namespace wali {
           if(seen.find(me) != seen.end()){
             return me;
           }
-          me = hrek(rkey);
           seen.insert(me);
           for(list<reg_exp_t>::iterator it = children.begin(); it != children.end(); it++)
             others.push_back((*it)->toDot(out, seen));
@@ -206,21 +233,48 @@ namespace wali {
               break;
             case Star:
               if(isRoot)
-                out << "n" << me << "[label = \"* (root)\" fillcolor=\"firebrick\"];\n";
+                out << "n" << me << "[label = \""
+                  << "*\\n "
+                  << "(root)\\n "<< myptr << "\\n "
+                  << "zero: " << isZero << "\\n "
+                  << "one: " << isOne << "\\n "
+                  << "\" color=red];\n";
               else
-                out << "n" << me << "[label = \"*\" fillcolor=\"aquamarine\"];\n";
+                out << "n" << me << "[label = \""
+                  << "*\\n " << myptr << "\\n "
+                  << "zero: " << isZero << "\\n "
+                  << "one: " << isOne << "\\n "
+                  << "\" color=aquamarine];\n";
               break;
             case Combine:
               if(isRoot)
-                out << "n" << me << "[label = \"+ (root)\" fillcolor=\"firebrick\"];\n";
+                out << "n" << me << "[label = \""
+                  << "+\\n "
+                  << "(root)\\n "<< myptr << "\\n "
+                  << "zero: " << isZero << "\\n "
+                  << "one: " << isOne << "\\n "
+                  << "\" color=red];\n";
               else
-                out << "n" << me << "[label = \"+\" fillcolor=\"gold\"];\n";
+                out << "n" << me << "[label = \""
+                  << "+\\n " << myptr << "\\n "
+                  << "zero: " << isZero << "\\n "
+                  << "one: " << isOne << "\\n "
+                  << "\" color=blue];\n";
               break;
             case Extend:
               if(isRoot)
-                out << "n" << me << "[label = \"x (root)\" fillcolor=\"firebrick\"];\n";
+                out << "n" << me << "[label = \""
+                  << "x\\n "
+                  << "(root)\\n "<< myptr << "\\n "
+                  << "zero: " << isZero << "\\n "
+                  << "one: " << isOne << "\\n "
+                  << "\" color=red];\n";
               else
-                out << "n" << me << "[label = \"x\" fillcolor=\"coral\"];\n";
+                out << "n" << me << "[label = \""
+                  << "x\\n " << myptr << "\\n "
+                  << "zero: " << isZero << "\\n "
+                  << "one: " << isOne << "\\n "
+                  << "\" color=green];\n";
               break;
             default:
               assert(false && "[RegExp::toDot] Unknown RegExp Type.\n");

@@ -177,8 +177,7 @@ namespace{
               }
             }else{
               //DEBUGGING
-              /*
-              if(out){
+              if(out && 0){
                 *out << "Printing anyway:\n";
                 (iter->first).print(*out);
                 *out << std::endl << "[ " << first << " weight]" << std::endl;
@@ -193,7 +192,6 @@ namespace{
                   *out << "NULL" << std::endl;
                 *out << std::endl;
               }
-              */
               //DEBUGGING
             }
           }
@@ -433,10 +431,12 @@ int main(int argc, char ** argv)
   PDSCompare pac("KLEENE", "NEWTON");
 
   {
-    EWPDS fpds;
+    WPDS fpds;
     //fpds.useNewton(false);
     RandomPdsGen::Names names;
-    rpt = new RandomPdsGen(mwg,pdsSizeFactor,15*pdsSizeFactor,25*pdsSizeFactor,4*pdsSizeFactor,0,0.45,0.45,seed);
+    //rpt = new RandomPdsGen(mwg,pdsSizeFactor,5*pdsSizeFactor,5*pdsSizeFactor,4*pdsSizeFactor,0,0.45,0.45,seed);
+    rpt = new RandomPdsGen(mwg, 2*pdsSizeFactor, 2*pdsSizeFactor, pdsSizeFactor,
+        pdsSizeFactor, 0,0.45,0.45,seed);
     if(dump){
       fstream pds_out("pds_gen",fstream::out);
       rpt->get(fpds,names,&pds_out);
@@ -472,7 +472,7 @@ int main(int argc, char ** argv)
     {
       wali::util::Timer * t3 = new wali::util::Timer("EWPDS poststar",cout);
       cout << "[EWPDS poststar]\n";
-      fpds.poststar(fa,outfa);
+      fpds.poststar(fa,outfa); 
       delete t3;
     }
     outfa.for_each(fac);
@@ -495,7 +495,9 @@ int main(int argc, char ** argv)
     RandomPdsGen::Names names;
     {
       wali::util::Timer * t1 = new wali::util::Timer("Generating Random PDS");
-      rpt = new RandomPdsGen(mwg,pdsSizeFactor,15*pdsSizeFactor,25*pdsSizeFactor,4*pdsSizeFactor,0,0.45,0.45,seed);
+      //rpt = new RandomPdsGen(mwg,pdsSizeFactor,5*pdsSizeFactor,5*pdsSizeFactor,4*pdsSizeFactor,0,0.45,0.45,seed);
+    rpt = new RandomPdsGen(mwg, 2*pdsSizeFactor, 2*pdsSizeFactor, pdsSizeFactor,
+        pdsSizeFactor, 0,0.45,0.45,seed);
       rpt->get(npds,names);
       delete t1;
     }
@@ -528,7 +530,7 @@ int main(int argc, char ** argv)
     {
       wali::util::Timer * t2 = new wali::util::Timer("NWPDS poststar",cout);
       cout << "[NWPDS poststar]\n";
-      npds.poststarIGR(fa,outfa);
+      npds.poststar(fa,outfa);
       delete t2;
     }
     outfa.for_each(fac);

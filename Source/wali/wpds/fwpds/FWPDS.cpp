@@ -450,7 +450,6 @@ void FWPDS::poststar_handle_eps_trans(wfa::ITrans* teps, wfa::ITrans* tprime, se
   ewpds::ETrans* etrans = lt->getETrans();
   if (0 != etrans) {
     erule_t r = etrans->getERule();
-
     interGr->addEdge(Transition(*tprime),
        Transition(*teps),
         Transition(teps->from(),tprime->stack(),tprime->to()),

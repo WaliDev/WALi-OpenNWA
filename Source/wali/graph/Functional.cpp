@@ -124,3 +124,28 @@ sem_elem_tensor_t SemElemFunctional::evaluate(IntraGraph * const gr)
       assert(false && "[SemElemFunctiona::evaluate] Unknown case\n");
   }
 }
+
+void SemElemFunctional::leafNodes(std::vector<int>& leaves)
+{
+  std::vector<int> ret;
+  switch(type){
+    case Constant:
+      break;
+    case In:
+      leaves.push_back(intra_nodeno);
+      break;
+    case Extend:
+    case Combine:
+    case Tensor:
+       lhs->leafNodes(leaves);
+       rhs->leafNodes(leaves);
+       break;
+    case Detensor:
+    case DetensorTranspose:
+    case Transpose:
+       lhs->leafNodes(leaves);
+       break;
+    default:
+      assert(false && "[SemElemFunctiona::evaluate] Unknown case\n");
+  }
+}

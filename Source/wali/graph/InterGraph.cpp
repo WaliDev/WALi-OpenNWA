@@ -1145,6 +1145,29 @@ namespace wali {
         }
 
 
+        static std::ostream& pp_weight(std::ostream& o, sem_elem_t weight)
+        {
+          if(weight == NULL){
+            o << "NULL";
+            return o;
+          }
+
+          stringstream ss;
+          weight->print(ss);
+          string res = "";
+          string ssstr = ss.str();
+          for(string::iterator iter = ssstr.begin(); iter != ssstr.end();
+              iter++){
+            if(*iter == '>'){
+              res.push_back(*iter);
+              res.append("\\n");
+            }else
+              res.push_back(*iter);
+          }
+          o << res;
+          return o;
+        }
+
         void InterGraph::setupNewtonSolution2()
         {
           runningNewton = true;         
@@ -1216,7 +1239,7 @@ namespace wali {
               ////////////////We will now create the Newton IntraGraph which will store the
               ////////////////actual weights, and from which RegExp will be generated.
               ////////////////This is the TDG for the linearized problem for the current SCC
-            
+
               SCCGraphs::iterator scc_head = gr_it;
               IntraGraph * graph = new IntraGraph(false, sem); //pre = false
               linear_gr_list.push_back(graph);
@@ -1270,11 +1293,11 @@ namespace wali {
                   wt = dynamic_cast<SemElemTensor*>((iter->weight).get_ptr());
                   functional_t f = 
                     SemElemFunctional::tensor(
-                      SemElemFunctional::constant(one),
-                      SemElemFunctional::extend(
-                        SemElemFunctional::detensorTranspose(
-                          SemElemFunctional::in(nodes[iter->src].intra_nodeno)),
-                        SemElemFunctional::constant(wt)));
+                        SemElemFunctional::constant(one),
+                        SemElemFunctional::extend(
+                          SemElemFunctional::detensorTranspose(
+                            SemElemFunctional::in(nodes[iter->src].intra_nodeno)),
+                          SemElemFunctional::constant(wt)));
                   int e = graph->setSource(nodes[iter->tgt].intra_nodeno, zerot, f);
                   // Back references in the node to edges that depend on it.
                   graph->addDependentEdge(e, nodes[iter->src].intra_nodeno);                  
@@ -1301,16 +1324,16 @@ namespace wali {
                     wt = wt->detensorTranspose();
                     functional_t f = 
                       SemElemFunctional::tensor(
-                        SemElemFunctional::constant(one),
-                        SemElemFunctional::extend(
-                          SemElemFunctional::detensorTranspose(
-                            SemElemFunctional::in(nodes[iter->src1].intra_nodeno)),
-                          SemElemFunctional::constant(wt)));
+                          SemElemFunctional::constant(one),
+                          SemElemFunctional::extend(
+                            SemElemFunctional::detensorTranspose(
+                              SemElemFunctional::in(nodes[iter->src1].intra_nodeno)),
+                            SemElemFunctional::constant(wt)));
                     int e = graph->setSource(nodes[iter->tgt].intra_nodeno, zerot, f);                    
                     // Back references in the node to edges that depend on it.
                     graph->addDependentEdge(e, nodes[iter->src1].intra_nodeno);
                   }else{
-                    // Case: The entry nodes does not belong to a graph that has a lower scc.
+                    // Case: The entry node does not belong to a graph that has a lower scc.
                     // Note: It must belong to the same scc then
                     assert(nodes[iter->src2].gr == graph);
                     // Add mutable edge src1--f-->tgt with weight 0 (tensored) and
@@ -1353,81 +1376,139 @@ namespace wali {
                 }
                 gr_it++;
               }              
+              // Use Tarjan's path listing algorithm to generate regular expressions for nodes.
+              graph->setupIntraSolution();
+
               // We have the intra graph ready at this point. 
-              if(1){
+              if(0){
                 // DEBUGGING
                 std::stringstream ss;
                 ss << "graph" << scc_n << ".dot";
                 std::ofstream foo(ss.str().c_str());
                 string dot = graph->toDot();
+                foo << "digraph {\n";
                 foo << dot;
+                foo << "}";
                 foo.close();
               }
-              // Use Tarjan's path listing algorithm to generate regular expressions for nodes.
-              graph->setupIntraSolution();
+
+
+
               // Now solve the linearized problem by saturating.
+              cout << "GRAPH " << scc_n << "\n";
               graph->saturate();
               // The next SCC will use another sat procss phase.
               RegExp::stopSatProcess();
               delete subProblemTimer;
+            }
+            delete newtonTotalTimer;
+
+
           }
-          delete newtonTotalTimer;
+          max_scc_computed = max_scc_required;
+          //RegExp::stopSatProcess();
+          RegExp::executingPoststar(!running_prestar);
+
+
+          //DEBUGGING
+          if(1){
+            std::stringstream ss;
+            ss << "digraph{\n";
+            for(i=0; i<n; i++){
+              ss << "node" << i << " [label=\"(" <<
+                key2str(nodes[i].trans.src) <<
+                ", " << key2str(nodes[i].trans.stack) <<
+                ", " << key2str(nodes[i].trans.tgt) << ")\\n";
+              sem_elem_t wt =nodes[i].gr->get_weight(nodes[i].intra_nodeno); 
+              if(wt == NULL)
+                pp_weight(ss, wt);
+              else{
+                sem_elem_tensor_t wtt =
+                  dynamic_cast<SemElemTensor*>(wt.get_ptr());
+                pp_weight(ss, wtt->detensorTranspose());
+              }
+              ss<< "\"];\n";
+            }
+            for(vector<GraphEdge>::iterator it = intra_edges.begin(); it != intra_edges.end(); ++it){
+              ss << "node" << it->src << " -> node" << it->tgt 
+                << " [label=\"";
+              pp_weight(ss, it->weight);
+              ss  << "\"];\n";
+            }
+            for(vector<HyperEdge>::iterator it2 = inter_edges.begin(); it2 != inter_edges.end(); ++it2){
+              ss << "node" << it2->src1 << " -> node" << it2->tgt 
+                << " [label=\"";
+              pp_weight(ss, it2->weight);
+              ss << "\" color=brown];\n";
+              if(it2->mf.get_ptr()){ 
+                ss << "node" << it2->src2 << " -> node" << it2->tgt 
+                  << " [color=red, label=\"Has Merge Fn\"];\n";
+              }else{
+                ss << "node" << it2->src2 << " -> node" << it2->tgt 
+                  << " [color=red, label=\"No Merge Fn\"];\n";
+              }
+            }
+            ss << "}\n";
+
+
+            ofstream foo("tdg.dot");
+            foo << ss.str();
+            foo.close();
+          }
+
+
         }
-        max_scc_computed = max_scc_required;
-        //RegExp::stopSatProcess();
-        RegExp::executingPoststar(!running_prestar);
-    }
 
-    void InterGraph::saturateNewton(multiset<tup> &worklist, unsigned scc_n) 
-    {
-      int numSteps = 0;
-      //This saturation procedure assumes that there are no merge functions.
-      //It also assumes that you're using EWPDS.
-      assert(running_ewpds);
-      //With EWPDSs, a default merge functions is created for delta2 rules, behaves exactly like 
-      //WPDS delta2 rules, except that the call edge weight is assumed to be one.
-      //We check if a call edge wt was added to the graph, if not (i.e., it is zero) we assume the
-      //call weight to be one.
-      sem_elem_tensor_t onodeWt, onodeWtOld, onode1Wt, onode1WtOld;
-      sem_elem_t inodeWt, inodeWtOld;
-      sem_elem_tensor_t onodeWtD, onode1WtD;
-      sem_elem_t callWt;
-      bool onode1Changed, onodeChanged;
-      std::list<int> *moutnodes;
-      sem_elem_tensor_t semD = dynamic_cast<SemElemTensor*>(sem.get_ptr());
-      semD = semD->detensor(); //sem is tensored
-      sem_elem_tensor_t oneD = dynamic_cast<SemElemTensor*>((semD->one()).get_ptr()); 
+        void InterGraph::saturateNewton(multiset<tup> &worklist, unsigned scc_n) 
+        {
+          int numSteps = 0;
+          //This saturation procedure assumes that there are no merge functions.
+          //It also assumes that you're using EWPDS.
+          assert(running_ewpds);
+          //With EWPDSs, a default merge functions is created for delta2 rules, behaves exactly like 
+          //WPDS delta2 rules, except that the call edge weight is assumed to be one.
+          //We check if a call edge wt was added to the graph, if not (i.e., it is zero) we assume the
+          //call weight to be one.
+          sem_elem_tensor_t onodeWt, onodeWtOld, onode1Wt, onode1WtOld;
+          sem_elem_t inodeWt, inodeWtOld;
+          sem_elem_tensor_t onodeWtD, onode1WtD;
+          sem_elem_t callWt;
+          bool onode1Changed, onodeChanged;
+          std::list<int> *moutnodes;
+          sem_elem_tensor_t semD = dynamic_cast<SemElemTensor*>(sem.get_ptr());
+          semD = semD->detensor(); //sem is tensored
+          sem_elem_tensor_t oneD = dynamic_cast<SemElemTensor*>((semD->one()).get_ptr()); 
 
-      while(!worklist.empty()) {
-        multiset<tup>::iterator wit = worklist.begin();
-        onode1Changed = onodeChanged = false;
-        int bfs_number = (*wit).first;
-        int node = (*wit).second;
-        worklist.erase(wit);
-        STAT(stats.niter++);
-        if(bfs_number % 2 == 0){
-          //This is an out1Node.
-          int onode1 = node;
-          //See if the weight onode1 changed & update
-          onode1Changed = false;
-          //The FWPDS implementation assumes an underlying EWPDS, 
-          //We must obtain weight for a stacked transition by using the
-          //callWt.
-          int callTrans = -1;
-          callWt = eHandler.get_dependency(onode1,callTrans);
-          if(callTrans != -1){
-            //This is a return transition, and we're using EWPDS.
-            onode1Wt = dynamic_cast<wali::SemElemTensor*>(newtonGr->get_weight(nodes[callTrans].intra_nodeno).get_ptr()); 
-            assert(callWt != NULL);
-          }else{
-            onode1Wt = dynamic_cast<wali::SemElemTensor*>(newtonGr->get_weight(nodes[onode1].intra_nodeno).get_ptr());
-            callWt = NULL;
-          }
-          assert(onode1Wt != NULL);
-          onode1WtOld = dynamic_cast<wali::SemElemTensor*>(nodes[onode1].weight.get_ptr());
-          if(onode1WtOld == NULL || ! onode1Wt->equal(onode1WtOld)){
-            onode1Changed = true;
-            onode1WtD = onode1Wt->detensorTranspose();
+          while(!worklist.empty()) {
+            multiset<tup>::iterator wit = worklist.begin();
+            onode1Changed = onodeChanged = false;
+            int bfs_number = (*wit).first;
+            int node = (*wit).second;
+            worklist.erase(wit);
+            STAT(stats.niter++);
+            if(bfs_number % 2 == 0){
+              //This is an out1Node.
+              int onode1 = node;
+              //See if the weight onode1 changed & update
+              onode1Changed = false;
+              //The FWPDS implementation assumes an underlying EWPDS, 
+              //We must obtain weight for a stacked transition by using the
+              //callWt.
+              int callTrans = -1;
+              callWt = eHandler.get_dependency(onode1,callTrans);
+              if(callTrans != -1){
+                //This is a return transition, and we're using EWPDS.
+                onode1Wt = dynamic_cast<wali::SemElemTensor*>(newtonGr->get_weight(nodes[callTrans].intra_nodeno).get_ptr()); 
+                assert(callWt != NULL);
+              }else{
+                onode1Wt = dynamic_cast<wali::SemElemTensor*>(newtonGr->get_weight(nodes[onode1].intra_nodeno).get_ptr());
+                callWt = NULL;
+              }
+              assert(onode1Wt != NULL);
+              onode1WtOld = dynamic_cast<wali::SemElemTensor*>(nodes[onode1].weight.get_ptr());
+              if(onode1WtOld == NULL || ! onode1Wt->equal(onode1WtOld)){
+                onode1Changed = true;
+                onode1WtD = onode1Wt->detensorTranspose();
             nodes[onode1].weight = onode1Wt;
           }
           if(onode1Changed){
@@ -1886,7 +1967,21 @@ namespace wali {
                     uw->print(cout << "Got ") << "\n";
                     );
               } else {
-                uw = inter_edges[*beg].weight->extend(weight);
+                //uw = inter_edges[*beg].weight->extend(weight);
+                // @author Prathmesh
+                // I believe that FWPDS originally does not work correctly for
+                // non-merge function PDSs. This is my fix
+                // I am not sure this is correct for prestar. I wrote it for
+                // poststar
+                sem_elem_t onode1weight =
+                  nodes[onode1].gr->get_weight(nodes[onode1].intra_nodeno);
+                if(nodes[onode1].weight.get_ptr() == NULL ||
+                     !nodes[onode1].weight->equal(onode1weight))
+                  nodes[onode1].weight = onode1weight;
+                if(inter_edges[*beg].weight == NULL)
+                  uw = onode1weight->extend(weight);
+                else
+                  uw = onode1weight->extend(inter_edges[*beg].weight->extend(weight));
               }
               STAT(stats.nextend++);
               nodes[inode].gr->updateEdgeWeight(nodes[onode1].intra_nodeno, nodes[inode].intra_nodeno, uw);
@@ -1945,6 +2040,23 @@ namespace wali {
               if(runningNewton){
                 sem_elem_tensor_t twt = dynamic_cast<SemElemTensor*>((nodes[nc].gr->get_weight(nodes[nc].intra_nodeno)).get_ptr());
                 wt = twt->detensorTranspose();
+
+                //DEBUGGING
+                if(1){
+                  cout << "get_weight whacky case:" << endl;
+                  cout << "Return trans: " 
+                    << key2str(nodes[n].trans.src) << " -- "
+                    << key2str(nodes[n].trans.stack) << " -> "
+                    << key2str(nodes[n].trans.tgt) << endl;
+                  cout << "Proxy trans: "
+                    << key2str(nodes[nc].trans.src) << " -- "
+                    << key2str(nodes[nc].trans.stack) << " -> "
+                    << key2str(nodes[nc].trans.tgt) << endl;
+                  wt->print(cout << "weight:" << endl) << endl;
+                  wtCallRule->print(cout << "wtCallRule:" << endl) << endl;
+                  wt->extend(wtCallRule)->print(cout << "Final:" << endl) 
+                    << endl;
+                }
               }
               else
                 wt = nodes[nc].gr->get_weight(nodes[nc].intra_nodeno);

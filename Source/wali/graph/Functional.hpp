@@ -7,6 +7,8 @@
 #include "wali/ref_ptr.hpp"
 #include "wali/Countable.hpp"
 
+#include <vector>
+
 namespace wali
 {
   namespace graph
@@ -41,6 +43,9 @@ namespace wali
         static functional_t transpose(functional_t arg);
 
         sem_elem_tensor_t evaluate(IntraGraph* const gr);
+        
+        //DEBUGGING
+        void leafNodes(std::vector<int>& leaves);
     };
   }
 }

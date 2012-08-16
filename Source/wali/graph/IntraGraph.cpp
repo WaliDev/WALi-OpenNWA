@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <fstream>
 using namespace std;
 
 namespace wali {
@@ -1603,20 +1604,48 @@ namespace wali {
     string IntraGraph::toDot()
     {
       std::stringstream ss;
-      ss << "digraph {\n";
-      for(int i = 0; i < nnodes; ++i)
-        ss << i << "\n";
-      for(int i = 0; i < nedges; ++i)
-        ss << edges[i].src << " -> " << edges[i].tgt << "\n";
-      ss << "}";
+      for(int i = 0; i < nnodes; ++i){
+        if(i != 0){
+        const long regexpaddr = (const long) nodes[i].regexp.get_ptr();
+        ss << "node" << i << " [label=\"(" << key2str(nodes[i].trans.src) 
+          << ", " << key2str(nodes[i].trans.stack) << ", " 
+          << key2str(nodes[i].trans.tgt) << ")\\n" << regexpaddr
+          << "\"];\n";
+        }else{
+          ss << "node" << i << ";\n";
+        }
+      }
+      for(int i = 0; i < nedges; ++i){
+        if(!edges[i].updatable){
+          ss << "node" << edges[i].src << " -> node" << edges[i].tgt << ";\n";
+        }else{
+          ss << "node" << edges[i].src << " -> node" << edges[i].tgt 
+            << " [color=red, label=\"";
+          std::vector<int> leaves;
+          edges[i].exp->leafNodes(leaves);
+          for(std::vector<int>::iterator iter = leaves.begin(); iter !=
+              leaves.end(); ++iter)
+            if(*iter == 0)
+              ss << "(node 0)\\n";
+            else
+              ss << "(" << key2str(nodes[*iter].trans.src) << ", "
+                << key2str(nodes[*iter].trans.stack) << ", " <<
+                key2str(nodes[*iter].trans.tgt) << ")\\n";
+          ss << "\"];\n";
+        }
+      }
       return ss.str();
     }
 
 
     // Used during Newton's method to saturate an IntraGraph corresponding to a linearized equation system
+    // Only for debugging
+    static int saturateCount = 1;
     void IntraGraph::saturate()
     {
+      int round = 0;
       bool repeat = true;
+
       while(repeat){
         //First, evaluate the current regular expressions completely.
         RegExp::evaluateRoots();
@@ -1642,7 +1671,14 @@ namespace wali {
             int updatable_no = edges[*ei].updatable_no;
             if(updateEdgesSet.find(updatable_no) == updateEdgesSet.end()){
               updateEdges.push_back(updatable_no);
-              weights.push_back(edges[*ei].exp->evaluate(this));
+              //XXX: Compiler bug. This statement should not have been
+              // allowed by the type checker.
+              //weights.push_back(edges[*ei].exp->evaluate(this));   
+              sem_elem_t wt = edges[*ei].exp->evaluate(this).get_ptr();
+              weights.push_back(wt);
+              //update the edge anyway. This weight should not be used, except
+              //for debugging.
+              edges[*ei].weight = weights.back();
               updateEdgesSet.insert(updatable_no);
             }
           }
@@ -1652,7 +1688,83 @@ namespace wali {
           repeat  = true;
           RegExp::update(updateEdges, weights);
         }else repeat = false;
+
+
+        if(0){
+          //DEBUGGING 
+          {
+            stringstream ss;
+            ss << "regexp" << saturateCount << "_" << round << ".dot";
+            string filename = ss.str();
+            fstream foo;
+            foo.open(filename.c_str(), fstream::out);
+            const reg_exp_hash_t& roots = RegExp::getRoots();
+            foo << "digraph {\n";
+            std::set<long> seen;
+            for(reg_exp_hash_t::const_iterator iter = roots.begin();
+                iter != roots.end();
+                ++iter){
+              (iter->second)->toDot(foo, seen, true);
+            }
+            foo << "}\n";
+            foo.close();
+          }
+
+          cout << "Weights after saturateCount" << saturateCount << 
+            ", round " << round << "\n";
+          cout << "NODES \n";
+          cout << "node0:\n";
+          if(nodes[0].weight != NULL){
+            nodes[0].weight->print(cout);
+            cout << "\n";
+            SemElemTensor * wt =
+              dynamic_cast<SemElemTensor*>(nodes[0].weight.get_ptr());
+            (wt->detensorTranspose())->print(cout);
+          }
+          else
+            cout << "NULL";
+          cout << "\n";
+          for(int i = 1; i < nnodes; i++){  
+            cout << "(" << key2str(nodes[i].trans.src) << ", " <<
+              key2str(nodes[i].trans.stack) << ", " << 
+              key2str(nodes[i].trans.tgt) << "):\n";
+            if(nodes[i].weight != NULL){
+              nodes[i].weight->print(cout);
+              cout << "\n";
+              SemElemTensor * wt =
+                dynamic_cast<SemElemTensor*>(nodes[i].weight.get_ptr());
+              (wt->detensorTranspose())->print(cout);
+            }
+            else
+              cout << "NULL";
+            cout << "\n";
+          }
+          cout << "EDGES \n";
+          for(int i = 1; i < nedges; i++){
+            //if(!edges[i].updatable) continue;
+            int src = edges[i].src;
+            int tgt = edges[i].tgt;
+            cout << "(" << key2str(nodes[src].trans.src) << ", " <<
+              key2str(nodes[src].trans.stack) << ", " << 
+              key2str(nodes[src].trans.tgt) << ") --> "
+              << "(" << key2str(nodes[tgt].trans.src) << ", " <<
+              key2str(nodes[tgt].trans.stack) << ", " << 
+              key2str(nodes[tgt].trans.tgt) << "):\n";
+            if(edges[i].weight != NULL){
+              edges[i].weight->print(cout);
+              cout << "\n";
+              SemElemTensor * wt =
+                dynamic_cast<SemElemTensor*>(edges[i].weight.get_ptr());
+              (wt->detensorTranspose())->print(cout);
+            }
+            else
+              cout << "NULL";
+            cout << "\n";
+          }
+        }
+        round++;
       }
+        saturateCount ++;
     }
 
 
