@@ -74,4 +74,8 @@ namespace wali {
 #define STAT(stmt)
 #endif
 
+// Switch on logging in newton solver
+#define NEWTON_LOGGING 1
+
+
 #endif // wali_graph_GRAPH_COMMON_H_

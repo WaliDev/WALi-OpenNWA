@@ -2,6 +2,7 @@
 #include "wali/graph/IntraGraph.hpp"
 #include "wali/graph/RegExp.hpp"
 #include "wali/graph/Functional.hpp"
+#include "wali/graph/NewtonLogger.hpp"
 
 #include "wali/util/Timer.hpp"
 
@@ -579,6 +580,7 @@ namespace wali {
 
         }                       
 
+#if 0
         static std::ostream& pp_weight(std::ostream& o, sem_elem_t weight)
         {
           if(weight == NULL){
@@ -601,12 +603,16 @@ namespace wali {
           o << res;
           return o;
         }
+#endif //#if 0
 
         void InterGraph::setupNewtonSolution()
         {
+          newton_logger_t nlog = new NewtonLogger();
+          BEGIN_NEWTON_SOLVER(nlog);
           runningNewton = true;         
           // First populate SCCGraph objects
 
+          BEGIN_SCC_COMPUTATION(nlog);
           int n = nodes.size();
           int i;
           unsigned int max_scc_required;
@@ -616,7 +622,6 @@ namespace wali {
           {
             vector<GraphEdge>::iterator it;
             vector<HyperEdge>::iterator it2;
-            wali::util::Timer * sccTimer = new wali::util::Timer("[setupNewtonSolution] SCC");
             for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
               intra_graph_uf->takeUnion((*it).src,(*it).tgt);
             }
@@ -647,9 +652,8 @@ namespace wali {
             // Do SCC decomposition 
             max_scc_required = SCCLight(scc_gr_list, gr_sorted);
             STAT(stats.ncomponents = max_scc_required);
-            delete sccTimer;
-
           }
+          END_SCC_COMPUTATION(nlog, max_scc_required);
 
           //Setup weights so that everything is tensored
           sem_elem_tensor_t sem_old = dynamic_cast<SemElemTensor*>(sem.get_ptr());
@@ -657,18 +661,16 @@ namespace wali {
 
           // For each SCC, solve completely using Newton's method.
           {
-            wali::util::Timer * newtonTotalTimer = new wali::util::Timer("[setupNewtonSolution] Newton Total Timer");
-
             SCCGraphs::iterator gr_it = gr_sorted.begin();
             for(unsigned scc_n = 1; scc_n <= max_scc_required; scc_n++) {
-              wali::util::Timer * subProblemTimer = new wali::util::Timer("[setupNewtonSolution] newtonGr SCC problem Total Timer"); 
-
+              BEGIN_SCC_SOLVER(nlog);
               RegExp::startSatProcess(sem);
 
               ////////////////We will now create the Newton IntraGraph which will store the
               ////////////////actual weights, and from which RegExp will be generated.
               ////////////////This is the TDG for the linearized problem for the current SCC
 
+              BEGIN_INTRAGRAPH_CREATION(nlog);
               SCCGraphs::iterator scc_head = gr_it;
               IntraGraph * graph = new IntraGraph(false, sem); //pre = false
               linear_gr_list.push_back(graph);
@@ -825,11 +827,14 @@ namespace wali {
                 }
                 gr_it++;
               }              
+              END_INTRAGRAPH_CREATION(nlog);
               // Use Tarjan's path listing algorithm to generate regular expressions for nodes.
+              BEGIN_TARJAN(nlog);
               graph->setupIntraSolution();
+              END_TARJAN(nlog);
 
+#if 0
               // We have the intra graph ready at this point. 
-              if(0){
                 // DEBUGGING
                 std::stringstream ss;
                 ss << "graph" << scc_n << ".dot";
@@ -839,28 +844,27 @@ namespace wali {
                 foo << dot;
                 foo << "}";
                 foo.close();
-              }
-
+              cout << "GRAPH " << scc_n << "\n";
+#endif //#if 0
 
 
               // Now solve the linearized problem by saturating.
-              cout << "GRAPH " << scc_n << "\n";
-              graph->saturate();
+              BEGIN_NEWTON_SOLUTION(nlog);
+              graph->saturate(nlog);
+              END_NEWTON_SOLUTION(nlog);
               // The next SCC will use another sat procss phase.
               RegExp::stopSatProcess();
-              delete subProblemTimer;
+
+              END_SCC_SOLVER(nlog);
             }
-            delete newtonTotalTimer;
-
-
           }
           max_scc_computed = max_scc_required;
           //RegExp::stopSatProcess();
           RegExp::executingPoststar(!running_prestar);
+          END_NEWTON_SOLVER(nlog);
 
-
+#if 0
           //DEBUGGING
-          if(1){
             std::stringstream ss;
             ss << "digraph{\n";
             for(i=0; i<n; i++){
@@ -903,9 +907,10 @@ namespace wali {
             ofstream foo("tdg.dot");
             foo << ss.str();
             foo.close();
-          }
 
+#endif //#if 0
 
+            PRINT_NEWTON_LOG(nlog);
         }
 
         // If an argument is passed in then only weights on those transitions will be available
@@ -1030,6 +1035,7 @@ namespace wali {
 
           {
             wali::util::Timer * timer4 = new wali::util::Timer("[setupInterSolution] saturation timer");
+            int numSteps = 0;
             // Saturate
             if(wt_required == NULL) {
               max_scc_required = components;
@@ -1047,9 +1053,11 @@ namespace wali {
               //cout << ".";
               bfsIntra(*gr_it, scc_n);
               setup_worklist(gr_sorted, gr_it, scc_n, worklist);
-              saturate(worklist,scc_n);
+              numSteps += saturate(worklist,scc_n);
             }
             delete timer4;
+            // DEBUGGING
+            cout << "Total number of steps: " << numSteps << endl;
           }
           max_scc_computed = max_scc_required;
 
@@ -1132,7 +1140,7 @@ namespace wali {
         }
 
         // New Saturation Procedure -- minimize calls to get_weight
-        void InterGraph::saturate(multiset<tup> &worklist, unsigned scc_n) {
+        int InterGraph::saturate(multiset<tup> &worklist, unsigned scc_n) {
           int numSteps = 0;
           sem_elem_t weight;
           std::list<int> *moutnodes;
@@ -1200,7 +1208,8 @@ namespace wali {
             }
           }
           //DEBUGGING
-          cout << "Kleene saturation # Steps: " << numSteps << endl;
+          //cout << "Kleene saturation # Steps: " << numSteps << endl;
+          return numSteps;
 
         }
 

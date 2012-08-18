@@ -302,7 +302,7 @@ namespace wali {
                 SCCGraphs& grsorted);
 
 
-            void saturate(std::multiset<tup> &worklist, unsigned scc_n);
+            int saturate(std::multiset<tup> &worklist, unsigned scc_n);
 
             void setup_worklist(std::list<IntraGraph *> &gr_sorted, 
                 std::list<IntraGraph *>::iterator &gr_it, 

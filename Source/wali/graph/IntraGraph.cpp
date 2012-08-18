@@ -1631,16 +1631,21 @@ namespace wali {
 
     // Used during Newton's method to saturate an IntraGraph corresponding to a linearized equation system
     // Only for debugging
-    static int saturateCount = 1;
-    void IntraGraph::saturate()
+    void IntraGraph::saturate(newton_logger_t nlog)
     {
-      int round = 0;
+      //nlog might be unused
+      if(nlog == NULL) {}
+
       bool repeat = true;
 
       while(repeat){
+        BEGIN_NEWTON_STEP(nlog);
         //First, evaluate the current regular expressions completely.
+        BEGIN_EVALUATE_ROOTS(nlog);
         RegExp::evaluateRoots();
+        END_EVALUATE_ROOTS(nlog);
         
+        BEGIN_FIND_CHANGED_NODES(nlog);
         //Now, obtain the set of nodes who's values have changed.
         std::vector<IntraGraphNode*> changedNodes;
         // The first node is the source node.
@@ -1650,8 +1655,10 @@ namespace wali {
             nodes[i].weight = nodes[i].regexp->get_weight();
           }
         }
+        END_FIND_CHANGED_NODES(nlog);
 
-        //Given the set of nodes who's weights have changed, find the set of mutable edges that need to
+        BEGIN_FIND_CHANGED_EDGES(nlog);
+        // Given the set of nodes who's weights have changed, find the set of mutable edges that need to
         // be updated.
         std::set<unsigned long> updateEdgesSet;
         std::vector<unsigned long> updateEdges;
@@ -1662,26 +1669,26 @@ namespace wali {
             int updatable_no = edges[*ei].updatable_no;
             if(updateEdgesSet.find(updatable_no) == updateEdgesSet.end()){
               updateEdges.push_back(updatable_no);
-              //XXX: Compiler bug. This statement should not have been
-              // allowed by the type checker.
-              //weights.push_back(edges[*ei].exp->evaluate(this));   
               sem_elem_t wt = edges[*ei].exp->evaluate(this).get_ptr();
               weights.push_back(wt);
-              //update the edge anyway. This weight should not be used, except
-              //for debugging.
+              //update the edge anyway. This weight should not be used, except for debugging.
               edges[*ei].weight = weights.back();
               updateEdgesSet.insert(updatable_no);
             }
           }
         }
+        END_FIND_CHANGED_EDGES(nlog);
 
         if(updateEdges.size() > 0){
           repeat  = true;
+          BEGIN_UPDATE_EDGES(nlog);
           RegExp::update(updateEdges, weights);
+          END_UPDATE_EDGES(nlog);
         }else repeat = false;
 
+      END_NEWTON_STEP(nlog);
 
-        if(0){
+#if 0
           //DEBUGGING 
           {
             stringstream ss;
@@ -1752,10 +1759,8 @@ namespace wali {
               cout << "NULL";
             cout << "\n";
           }
-        }
-        round++;
+#endif
       }
-        saturateCount ++;
     }
 
 

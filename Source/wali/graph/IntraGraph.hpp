@@ -6,6 +6,7 @@
 #include "wali/graph/RegExp.hpp"
 #include "wali/graph/Functional.hpp"
 #include "wali/graph/GraphCommon.hpp"
+#include "wali/graph/NewtonLogger.hpp"
 
 #include <map>
 
@@ -41,6 +42,8 @@ namespace wali {
                 nget_weight = 0;
                 t1 = t2 = t3 = t4 = t5 = 0;
             }
+
+
         };
         ostream &operator << (ostream &out, const IntraGraphStats &s);
 
@@ -281,7 +284,7 @@ namespace wali {
              * These should be cleaned up when we're finished with the analysis.
              **/
             static void cleanUp();
-            void saturate();
+            void saturate(newton_logger_t nlog = NULL);
 
             sem_elem_t getWeight(int nno) const ;
             string toDot();

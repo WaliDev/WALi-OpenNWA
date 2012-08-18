@@ -431,7 +431,7 @@ int main(int argc, char ** argv)
   PDSCompare pac("KLEENE", "NEWTON");
 
   {
-    WPDS fpds;
+    FWPDS fpds;
     //fpds.useNewton(false);
     RandomPdsGen::Names names;
     //rpt = new RandomPdsGen(mwg,pdsSizeFactor,5*pdsSizeFactor,5*pdsSizeFactor,4*pdsSizeFactor,0,0.45,0.45,seed);
@@ -470,9 +470,9 @@ int main(int argc, char ** argv)
     }
     WFA outfa;
     {
-      wali::util::Timer * t3 = new wali::util::Timer("EWPDS poststar",cout);
-      cout << "[EWPDS poststar]\n";
-      fpds.poststar(fa,outfa); 
+      wali::util::Timer * t3 = new wali::util::Timer("FWPDS poststar",cout);
+      cout << "[FWPDS poststar]\n";
+      fpds.poststarIGR(fa,outfa); 
       delete t3;
     }
     outfa.for_each(fac);
