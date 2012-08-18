@@ -89,7 +89,6 @@ namespace wali {
          /**
           * If using Newton Method based on tensored weights, these weights need to be tensored as well.
           **/
-         void tensorWeights(bool running_prestar);
          sem_elem_t get_dependency(int ret, int &call);
 
        private:
@@ -247,7 +246,6 @@ namespace wali {
             void setESource(Transition t, wali::sem_elem_t wtAtCall, wali::sem_elem_t wtAfterCall);
 
             void setupInterSolution(std::list<Transition> *wt_required = NULL);
-            void setupNewtonSolution2();
             void setupNewtonSolution();
 
             sem_elem_t get_weight(Transition t);
@@ -285,24 +283,6 @@ namespace wali {
 
             sem_elem_t get_weight(unsigned n);
 
-            void rawDfs(
-                const int u, //current node.
-
-                const Int1D& deg, //[i]: degree of node i
-                const Int2D& adjMat, //The adjacency matrix
-
-                Int1D& dfsn, //[i]: the dfs number of vertex i
-                int& dfsnext, //next free dfs number
-                Int1D& comp, //O(1) membership stack containing the 
-                //vertices of current component
-                int& ncomp, //number of outstanding vertices in the components
-                Bool1D& incomp, //[i] a marker that says, I've seen i, but haven't 
-                //finished putting it in a component
-
-                Int1D& mindfsn, //(in:out) [i]: minimum dfs number reachable from vertex i
-                UnionFind& scc //(out) The output scc are stored here.
-                );
-
             void dfsIntraForward(IntraGraph *gr, 
                 std::list<IntraGraph *> &finished, 
                 std::map<IntraGraph *, 
@@ -323,17 +303,11 @@ namespace wali {
 
 
             void saturate(std::multiset<tup> &worklist, unsigned scc_n);
-            void saturateNewton(std::multiset<tup> &worklist, unsigned scc_n);
 
             void setup_worklist(std::list<IntraGraph *> &gr_sorted, 
                 std::list<IntraGraph *>::iterator &gr_it, 
                 unsigned int scc_n,
                 std::multiset<tup> &worklist);
-            void setup_worklist_newton(std::list<IntraGraph *> &gr_sorted, 
-                std::list<IntraGraph *>::iterator &gr_it, 
-                unsigned int scc_n,
-                std::multiset<tup> &worklist);
-
             void resetSCCedges(IntraGraph *gr, unsigned int scc_number);
         };
 

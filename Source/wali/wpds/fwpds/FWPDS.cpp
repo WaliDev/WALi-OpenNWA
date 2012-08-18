@@ -207,7 +207,7 @@ void FWPDS::prestar( wfa::WFA const & input, wfa::WFA& output )
 
   // Compute summaries
   if(newton)
-    interGr->setupNewtonSolution2();
+    interGr->setupNewtonSolution();
   else
     interGr->setupInterSolution();
 
@@ -404,7 +404,7 @@ void FWPDS::poststarIGR( wfa::WFA const & input, wfa::WFA& output )
     util::Timer timer(msg);
     // Compute summaries
     if(newton){
-      interGr->setupNewtonSolution2();
+      interGr->setupNewtonSolution();
     }
     else
       interGr->setupInterSolution();
