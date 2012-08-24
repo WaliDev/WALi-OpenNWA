@@ -55,6 +55,12 @@ struct Command {
     {}
 
     Command(std::string const & n,
+            Action * cons_takes_ownership)
+        : name(n)
+        , consequent(cons_takes_ownership)
+    {}
+
+    Command(std::string const & n,
             std::vector<std::string> const & args,
             Action * cons_takes_ownership,
             Action * alt_takes_ownership)
@@ -69,8 +75,14 @@ typedef std::vector<std::shared_ptr<Action> > ActionList;
 
 struct Range {
     int low, high;
-    Range(int l, int h) : low(l), high(h) {}
 };
+
+inline Range make_range(int l, int h) {
+    Range r;
+    r.low = l;
+    r.high = h;
+    return r;
+}
 
 
 struct Transition
@@ -96,15 +108,15 @@ struct Transition
 struct State
 {
     std::string name;
-    std::shared_ptr<Action> action;
+    std::shared_ptr<ActionList> actions;
 
     State(std::string const & n)
         : name(n)
     {}
 
-    State(std::string const & n, Action * action_takes_ownership)
+    State(std::string const & n, ActionList * action_takes_ownership)
         : name(n)
-        , action(action_takes_ownership)
+        , actions(action_takes_ownership)
     {}
 };
 
