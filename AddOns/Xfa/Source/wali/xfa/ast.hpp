@@ -19,7 +19,7 @@ struct Action {
         , action_type(ty)
         , operand_id(-1)
     {
-        assert(action_type == "fire" || action_type == "alert");
+        assert(action_type == "fire" || action_type == "alert" || action_type == "reject");
     }
 
     Action(int rid, std::string const & ty, int opid, Command * cmd_takes_ownership)
