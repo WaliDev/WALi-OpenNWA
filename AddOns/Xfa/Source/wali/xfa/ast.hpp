@@ -6,6 +6,8 @@
 #include <string>
 #include <cassert>
 
+namespace xfa_parser {
+
 struct Command;
 
 struct Action {
@@ -136,5 +138,9 @@ struct Xfa
         transitions.push_back(std::shared_ptr<Transition>(tr_takes_ownership));
     }
 };
+
+extern Xfa * parse_stdin();
+
+}
 
 #endif
