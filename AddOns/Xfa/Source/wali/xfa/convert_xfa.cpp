@@ -19,14 +19,14 @@ namespace cfglib {
             
             cfglib::xfa::Xfa ret;
 
-            for (auto ast_state : ast.states) {
-                State state = getState(ast_state->name);
+            for (auto ast_state = ast.states.begin(); ast_state != ast.states.end(); ++ast_state) {
+                State state = getState((*ast_state)->name);
                 ret.addState(state, zero);
             }
 
-            for (auto ast_trans : ast.transitions) {
-                State source = getState(ast_trans->source);
-                State dest = getState(ast_trans->dest);
+            for (auto ast_trans = ast.transitions.begin(); ast_trans != ast.transitions.end(); ++ast_trans) {
+                State source = getState((*ast_trans)->source);
+                State dest = getState((*ast_trans)->dest);
                 ret.addTrans(source, eps, dest, zero);
             }
 

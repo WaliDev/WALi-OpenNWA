@@ -3,6 +3,8 @@
 
 #include <boost/bimap.hpp>
 
+#include "xfa-parser/ast.hh"
+
 #include <wali/wfa/WFA.hpp>
 #include <wali/wfa/TransFunctor.hpp>
 #include <wali/wfa/ITrans.hpp>
@@ -417,6 +419,9 @@ namespace cfglib {
             }
         };
         
+        extern Xfa
+        from_parser_ast(xfa_parser::Xfa const & ast,
+                        wali::domains::binrel::ProgramBddContext & voc);
     }
 }
 
