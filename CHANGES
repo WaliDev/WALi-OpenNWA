@@ -1,5 +1,6 @@
 WALi/OpenNWA 4.1:
-  No changes since RC1
+  General bug fixes:
+  - Improved detection of Boost filesystem library
 
 
 WALi/OpenNWA 4.1 RC1:
