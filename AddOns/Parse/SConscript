@@ -29,8 +29,6 @@ examples = SConscript(os.path.join('Examples','SConscript'),
     duplicate=0)
 built += examples
 
-print 'parse = ', parse
-print 'xerces= ', xerces
 BaseEnv.Depends(parse,xerces)
 
 Return('built')

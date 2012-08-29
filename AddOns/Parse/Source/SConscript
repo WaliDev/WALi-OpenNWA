@@ -27,6 +27,13 @@ waliparse_files = Split("""
 
 Env = BaseEnv.Clone()
 
+# Define include directories
+IncludeDirs = [
+    os.path.join(WaliDir , 'Source'),
+    os.path.join(WaliDir,'AddOns','Parse','Source'),
+    os.path.join(WaliDir,'AddOns','Parse','ThirdParty',XercesDir,'include'),
+]
+
 Env['WARNING_FLAGS'] = Env['WARNING_FLAGS'].replace('-Wundef', '')
 Env['WARNING_FLAGS'] = Env['WARNING_FLAGS'].replace('-Wshadow', '')
 
@@ -39,7 +46,11 @@ if MkStatic:
     built = i
     Return('built')
 else:
-    waliparse = Env.SharedLibrary('waliparse' , waliparse_files)
+    waliparse = Env.SharedLibrary('waliparse' , waliparse_files,
+                                  LIBS=['xerces-c', 'wali'],
+                                  LIBPATH=LibInstallDir,
+                                  RPATH=LibInstallDir,
+                                  )
     i = Env.Install(LibInstallDir, waliparse)
     built = i
     Return('built')
