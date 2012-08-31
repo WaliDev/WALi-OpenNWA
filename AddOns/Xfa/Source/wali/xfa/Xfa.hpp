@@ -421,7 +421,8 @@ namespace cfglib {
         
         extern Xfa
         from_parser_ast(xfa_parser::Xfa const & ast,
-                        wali::domains::binrel::ProgramBddContext & voc);
+                        wali::domains::binrel::ProgramBddContext & voc,
+                        int fdd_size);
     }
 }
 
