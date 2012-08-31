@@ -77,34 +77,47 @@ struct Command {
 
 typedef std::vector<std::shared_ptr<Action> > ActionList;
 
-struct Range {
+struct Symbol {
+    virtual ~Symbol() {}
+};
+
+struct Range : Symbol {
     int low, high;
 };
 
-inline Range make_range(int l, int h) {
-    Range r;
-    r.low = l;
-    r.high = h;
+inline Range* make_range(int l, int h) {
+    Range * r = new Range();
+    r->low = l;
+    r->high = h;
     return r;
 }
 
+struct Name : Symbol {
+    std::string name;
+};
+
+inline Name * make_name(std::string const & name) {
+    Name * n = new Name();
+    n->name = name;
+    return n;
+}
 
 struct Transition
 {
     std::string source, dest;
-    std::vector<Range> symbol_ranges;
+    std::vector<std::unique_ptr<Symbol>> symbols;
     ActionList actions;
 
-    Transition(std::string const & s, std::string const & d, std::vector<Range> const & rs)
+    Transition(std::string const & s, std::string const & d, std::vector<std::unique_ptr<Symbol>> & rs_moves_from)
         : source(s)
         , dest(d)
-        , symbol_ranges(rs)
+        , symbols(std::move(rs_moves_from))
     {}
 
-    Transition(std::string const & s, std::string const & d, std::vector<Range> const & rs, ActionList const & acts)
+    Transition(std::string const & s, std::string const & d, std::vector<std::unique_ptr<Symbol>> & rs_moves_from, ActionList const & acts)
         : source(s)
         , dest(d)
-        , symbol_ranges(rs)
+        , symbols(std::move(rs_moves_from))
         , actions(acts)
     {}
 };
