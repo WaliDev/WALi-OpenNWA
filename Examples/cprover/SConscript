@@ -1,0 +1,49 @@
+# Reachability example
+import os
+
+Import('Debug')
+Import('WaliDir')
+Import('ProgEnv')
+Import('MkStatic')
+
+if Debug:
+    print '\n+++ Entered "#/Examples/cprover/SConscript"\n'
+
+env = ProgEnv.Clone();
+
+env.Append(YACCFLAGS = ['--defines']);
+parser = env.CFile('bp_parser.c', 'bp_parser.y');
+lexer = env.CFile('bp_scanner.c', 'bp_scanner.l');
+env.Append(CPPPATH = [os.path.join(WaliDir,'Examples','cprover')])
+env.Append(CPPPATH = [os.path.join(WaliDir,'AddOns','Domains','Source')])
+env.Append(CPPPATH=[os.path.join(WaliDir , 'AddOns', 'Domains' , 'ThirdParty', 'include')])
+
+c_files = [
+  'ast.c'
+]
+naughty_files = [
+  'bp_parser.c',
+  'bp_scanner.c',
+  'BplToPds.cpp'
+]
+
+if MkStatic:
+  naughty_objs = [env.StaticObject(naughty_file, WARNING_FLAGS='')
+                  for naughty_file in naughty_files]
+else:
+  naughty_objs = [env.SharedObject(naughty_file, WARNING_FLAGS='')
+                  for naughty_file in naughty_files]
+
+cenv = env.Clone()
+
+cenv['WARNING_FLAGS'] = cenv['WARNING_FLAGS'].replace('-Woverloaded-virtual', '')
+if MkStatic:
+  c_objs = [cenv.StaticObject(cfile) for cfile in c_files]
+else:
+  c_objs = [cenv.SharedObject(cfile) for cfile in c_files]
+
+env.Append(LIBS = ['walidomains', 'glog', 'bdd']);
+built = [env.Program('bp_parser', [naughty_objs, c_objs])]
+
+Return('built')
+
