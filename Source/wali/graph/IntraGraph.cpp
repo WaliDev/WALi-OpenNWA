@@ -4,6 +4,9 @@
 #include "wali/graph/LinkEval.hpp"
 #include "wali/graph/GraphCommon.hpp"
 
+//debugging
+//#include "wali/graph/NewtonLogger.hpp"
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -39,11 +42,20 @@ namespace wali {
     }
 
     int IntraGraph::edgeno(int s, int t) {
-      list<int>::iterator it = nodes[s].outgoing.begin();
-      for(; it != nodes[s].outgoing.end(); it++) {
-        if(edges[*it].tgt == t) {
+      // For newton, the source node 0 has many edges going out.
+      // On the other hand, all nodes have only a small number 
+      // of edges coming in. So we change this to the equivalent
+      // use of incoming edges instead.
+      //list<int>::iterator it = nodes[s].outgoing.begin();
+      //for(; it != nodes[s].outgoing.end(); it++) {
+      //  if(edges[*it].tgt == t) {
+      //    return *it;
+      //  }
+      //}
+      list<int>::iterator it = nodes[t].incoming.begin();
+      for(; it != nodes[t].incoming.end(); it++){
+        if(edges[*it].src == s)
           return *it;
-        }
       }
       return -1;
     }
@@ -605,7 +617,8 @@ namespace wali {
       nodes[n].type = Source;
 
       // add Edge
-      return addEdge(0, n, init_weight, true, exp);
+      int e = addEdge(0, n, init_weight, true, exp);
+      return e;
     }
 
     void IntraGraph::addDependentEdge(int e, int n)
@@ -1644,6 +1657,7 @@ namespace wali {
         BEGIN_EVALUATE_ROOTS(nlog);
         RegExp::evaluateRoots();
         END_EVALUATE_ROOTS(nlog);
+        RegExp::print_stats(cout);
         
         BEGIN_FIND_CHANGED_NODES(nlog);
         //Now, obtain the set of nodes who's values have changed.
@@ -1656,6 +1670,7 @@ namespace wali {
           }
         }
         END_FIND_CHANGED_NODES(nlog);
+        RegExp::print_stats(cout);
 
         BEGIN_FIND_CHANGED_EDGES(nlog);
         // Given the set of nodes who's weights have changed, find the set of mutable edges that need to

@@ -1180,6 +1180,15 @@ namespace wali {
                            nans = nans->combine(temp);
                            STAT(stats.ncombine++);
                          }
+                         /*
+                         nans = ch->evaluate(w);
+                         while(!ans->equal(nans)) {
+                           ans = nans;
+                           nans = nans->combine(ans->extend(ans));
+                           STAT(stats.ncombine++);
+                           STAT(stats.nextend++);
+                         }
+                         */
                          ret = nans;
                          break;
                        }

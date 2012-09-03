@@ -4,6 +4,8 @@
 #include "wali/Common.hpp"
 #include "wali/wfa/ITrans.hpp"
 
+#include "wali/graph/NewtonLogger.hpp"
+
 namespace wali {
 
     namespace graph {
@@ -46,6 +48,11 @@ namespace wali {
         typedef std::pair<Transition, wali::sem_elem_t> WTransition;
 
 
+  
+        //debugging
+        extern newton_logger_t debugNewtonLog;
+
+
     } // namespace graph
 
 } // namespace wali
@@ -68,14 +75,13 @@ namespace wali {
 #define INCREMENTAL(stmt)
 #endif
 
+#define FWPDS_STATS 1
 #ifdef FWPDS_STATS 
 #define STAT(stmt) do { if(1) { stmt; } }while(0)
 #else
 #define STAT(stmt)
 #endif
 
-// Switch on logging in newton solver
-#define NEWTON_LOGGING 1
 
 
 #endif // wali_graph_GRAPH_COMMON_H_

@@ -7,6 +7,10 @@
 #include "wali/util/Timer.hpp"
 
 #include <vector>
+#include <string>
+
+// Switch on logging in newton solver
+#define NEWTON_LOGGING 1
 
 namespace wali 
 {
@@ -16,6 +20,7 @@ namespace wali
     struct NewtonLogger : public Countable
     {
       //Timers used as needed
+      std::string name;
       util::Timer *t1, *t2, *t3, *t4, *t5, *t6, *t7;
 
       double newtonSolverTime;
@@ -32,10 +37,32 @@ namespace wali
       std::vector<double> findChangedNodesTimes;
       std::vector<double> findChangedEdgesTimes;
       std::vector<double> updateEdgesTimes;
+      std::vector<double> miscTimes;
+
+      int nExtendGraphCreation;
+      int nCombineGraphCreation;
+      int nTensorGraphCreation;
+      int nDetensorGraphCreation;
+      int nTransposeGraphCreation;
+
+      int nExtendSaturation;
+      int nCombineSaturation;
+      int nTensorSaturation;
+      int nDetensorSaturation;
+      int nTransposeSaturation;
+
+      int nExtendRest;
+      int nCombineRest;
+      int nTensorRest;
+      int nDetensorRest;
+      int nTransposeRest;
 
       //internal
       bool oldMeasureAndReport;
+      bool inGraphCreation;
+      bool inSaturation;
 
+      NewtonLogger(std::string name);
       void printLog();
     };
 
@@ -83,11 +110,13 @@ namespace wali
 
 #define BEGIN_INTRAGRAPH_CREATION(obj) \
     if(!(obj == NULL)) { \
+      obj->inGraphCreation = true; \
       obj->t3 = new util::Timer("", std::cout); \
     }
 
 #define END_INTRAGRAPH_CREATION(obj) \
     if(!(obj == NULL)) { \
+      obj->inGraphCreation = false; \
       obj->intraGraphCreationTimes.push_back(obj->t3->elapsed()); \
       delete obj->t3; \
     }
@@ -105,12 +134,14 @@ namespace wali
 
 #define BEGIN_NEWTON_SOLUTION(obj) \
     if(!(obj == NULL)) { \
+      obj->inSaturation = true; \
       obj->t3 = new util::Timer("", std::cout); \
       obj->numNewtonSteps.push_back(0); \
     }
 
 #define END_NEWTON_SOLUTION(obj) \
     if(!(obj == NULL)) { \
+      obj->inSaturation = false; \
       obj->newtonSolverTimes.push_back(obj->t3->elapsed()); \
       delete obj->t3; \
     }
@@ -173,6 +204,68 @@ namespace wali
       delete obj->t5; \
     }
 
+#define BEGIN_MISC(obj) \
+    if(!(obj == NULL)) { \
+      obj->t6 = new util::Timer("", std::cout); \
+    }
+
+#define END_MISC(obj) \
+    if(!(obj == NULL)) { \
+      obj->miscTimes.push_back(obj->t6->elapsed()); \
+      delete obj->t6; \
+    }
+
+#define EXTEND(obj) \
+    if(!(obj == NULL)) { \
+      if(obj->inGraphCreation) \
+        nExtendGraphCreation++; \
+      else if(obj->inSaturation) \
+        nExtendSaturation++; \
+      else \
+        nExtendRest++; \
+    }
+
+#define COMBINE(obj) \
+    if(!(obj == NULL)) { \
+      if(obj->inGraphCreation) \
+        nCombineGraphCreation++; \
+      else if(obj->inSaturation) \
+        nCombineSaturation++; \
+      else \
+        nCombineRest++; \
+    }
+
+#define TENSOR(obj) \
+    if(!(obj == NULL)) { \
+      if(obj->inGraphCreation) \
+        nTensorGraphCreation++; \
+      else if(obj->inSaturation) \
+        nTensorSaturation++; \
+      else \
+        nTensorRest++; \
+    }
+
+#define DETENSOR(obj) \
+    if(!(obj == NULL)) { \
+      if(obj->inGraphCreation) \
+        nDetensorGraphCreation++; \
+      else if(obj->inSaturation) \
+        nDetensorSaturation++; \
+      else \
+        nDetensorRest++; \
+    }
+
+#define TRANSPOSE(obj) \
+    if(!(obj == NULL)) { \
+      if(obj->inGraphCreation) \
+        nTransposeGraphCreation++; \
+      else if(obj->inSaturation) \
+        nTransposeSaturation++; \
+      else \
+        nTransposeRest++; \
+    }
+
+
 #define PRINT_NEWTON_LOG(obj) \
     if(!(obj == NULL)) { \
       obj->printLog();\
@@ -204,6 +297,14 @@ namespace wali
 #define END_FIND_CHANGED_EDGES(obj) SKIP
 #define BEGIN_UPDATE_EDGES(obj) SKIP
 #define END_UPDATE_EDGES(obj) SKIP
+#define BEGIN_MISC(obj) SKIP
+#define END_MISC(obj) SKIP
+
+#define EXTEND SKIP
+#define COMBINE SKIP
+#define TENSOR SKIP
+#define DETENSOR SKIP
+#define TRANSPOSE SKIP
 
 #define PRINT_NEWTON_LOG(obj) SKIP
 #endif //#ifdef NEWTON_LOGGING

@@ -605,9 +605,11 @@ namespace wali {
         }
 #endif //#if 0
 
+        newton_logger_t debugNewtonLog; 
         void InterGraph::setupNewtonSolution()
         {
-          newton_logger_t nlog = new NewtonLogger();
+          newton_logger_t nlog = new NewtonLogger("Newton Logger");
+          debugNewtonLog = new NewtonLogger("Debug Logger");
           BEGIN_NEWTON_SOLVER(nlog);
           runningNewton = true;         
           // First populate SCCGraph objects
@@ -716,7 +718,9 @@ namespace wali {
                   // w' = (1^T,w)
                   sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>((iter->weight).get_ptr());
                   sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());
+              BEGIN_MISC(debugNewtonLog);
                   wt = one->tensor(wt.get_ptr());
+              END_MISC(debugNewtonLog);
                   graph->addEdge(nodes[iter->src].intra_nodeno, nodes[iter->tgt].intra_nodeno, wt);
                   //Also add a mutable edge (s--f-->tgt) from the source vertex s with weight 0 (tensored) and
                   //functional f = (1^T, DetTrans(wt(src)) x w) (one untensored)
@@ -825,6 +829,7 @@ namespace wali {
                     graph->addDependentEdge(e, nodes[iter->src2].intra_nodeno);
                   }
                 }
+              
                 gr_it++;
               }              
               END_INTRAGRAPH_CREATION(nlog);
@@ -911,6 +916,8 @@ namespace wali {
 #endif //#if 0
 
             PRINT_NEWTON_LOG(nlog);
+            PRINT_NEWTON_LOG(debugNewtonLog);
+            //RegExp::print_stats(cout);
         }
 
         // If an argument is passed in then only weights on those transitions will be available
@@ -1064,6 +1071,8 @@ namespace wali {
           RegExp::stopSatProcess();
           RegExp::executingPoststar(!running_prestar);
 
+          RegExp::print_stats(cout);
+          //print_stats(cout);
 #ifdef STATIC_MEMORY
           IntraGraph::clearStaticBuffer();
 #endif
