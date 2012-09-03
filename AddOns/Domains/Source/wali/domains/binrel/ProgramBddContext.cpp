@@ -208,7 +208,7 @@ ProgramBddContext& ProgramBddContext::operator = (const ProgramBddContext& other
   return *this;
 }
 
-std::ostream& ProgramBddContext::print(std::ostream& o)
+std::ostream& ProgramBddContext::print(std::ostream& o) const
 {
   o << "ProgramBddContext dump:" << std::endl;
   o << "sizeInfo: " << sizeInfo << std::endl;
@@ -218,7 +218,7 @@ std::ostream& ProgramBddContext::print(std::ostream& o)
   return o;
 }
 
-bdd ProgramBddContext::From(std::string var)
+bdd ProgramBddContext::From(std::string var) const
 {
   //TODO: This header should be placed in all functions below.
   bdd ret = bddfalse;
@@ -231,17 +231,17 @@ bdd ProgramBddContext::From(std::string var)
   return ret & fdd_ithvar(sizeInfo, bi->maxVal);
 }
 
-bdd ProgramBddContext::True()
+bdd ProgramBddContext::True() const
 {
   return fdd_ithvar(regAInfo->baseRhs,1) & fdd_ithvar(sizeInfo, 2);
 }
 
-bdd ProgramBddContext::False()
+bdd ProgramBddContext::False() const
 {
   return fdd_ithvar(regAInfo->baseRhs,0) & fdd_ithvar(sizeInfo, 2);
 }
 
-bdd ProgramBddContext::Const(unsigned val)
+bdd ProgramBddContext::Const(unsigned val) const
 {
   if(val >= maxSize){
     LOG(ERROR) << "[Const] Attempted to create a constant value larger "
@@ -251,12 +251,12 @@ bdd ProgramBddContext::Const(unsigned val)
   return fdd_ithvar(regAInfo->baseRhs, val) & fdd_ithvar(sizeInfo, maxSize);
 }
 
-bdd ProgramBddContext::NonDet()
+bdd ProgramBddContext::NonDet() const 
 {
   return bddtrue;
 }
 
-bdd ProgramBddContext::applyBinOp(bdd lexpr, bdd rexpr, bdd op)
+bdd ProgramBddContext::applyBinOp(bdd lexpr, bdd rexpr, bdd op) const 
 { 
   bddPair *regA2regB = bdd_newpair();
   fdd_setpair(regA2regB, regAInfo->baseRhs, regBInfo->baseRhs);
@@ -281,7 +281,7 @@ bdd ProgramBddContext::applyBinOp(bdd lexpr, bdd rexpr, bdd op)
   return lexpr;
 }
 
-bdd ProgramBddContext::applyUnOp(bdd expr, bdd op)
+bdd ProgramBddContext::applyUnOp(bdd expr, bdd op) const 
 {
   expr = bdd_relprod(
       expr,
@@ -297,50 +297,50 @@ bdd ProgramBddContext::applyUnOp(bdd expr, bdd op)
   return expr;
 }
 
-bdd ProgramBddContext::And(bdd lexpr, bdd rexpr)
+bdd ProgramBddContext::And(bdd lexpr, bdd rexpr) const 
 {
   return applyBinOp(lexpr, rexpr, bddAnd());      
 }
 
-bdd ProgramBddContext::Or(bdd lexpr, bdd rexpr)
+bdd ProgramBddContext::Or(bdd lexpr, bdd rexpr) const 
 {
   return applyBinOp(lexpr, rexpr, bddOr());
 }
 
-bdd ProgramBddContext::Not(bdd expr)
+bdd ProgramBddContext::Not(bdd expr) const
 {
   return applyUnOp(expr, bddNot());      
 }
 
-bdd ProgramBddContext::Plus(bdd lexpr, bdd rexpr)
+bdd ProgramBddContext::Plus(bdd lexpr, bdd rexpr) const 
 {
   unsigned in1 = getRegSize(lexpr);
   unsigned in2 = getRegSize(rexpr);
   return applyBinOp(lexpr, rexpr, bddPlus(in1,in2));
 }
 
-bdd ProgramBddContext::Minus(bdd lexpr, bdd rexpr)
+bdd ProgramBddContext::Minus(bdd lexpr, bdd rexpr) const 
 {
   unsigned in1 = getRegSize(lexpr);
   unsigned in2 = getRegSize(rexpr);
   return applyBinOp(lexpr, rexpr, bddMinus(in1,in2));
 }
 
-bdd ProgramBddContext::Times(bdd lexpr, bdd rexpr)
+bdd ProgramBddContext::Times(bdd lexpr, bdd rexpr) const
 {
   unsigned in1 = getRegSize(lexpr);
   unsigned in2 = getRegSize(rexpr);
   return applyBinOp(lexpr, rexpr, bddTimes(in1,in2));
 }
 
-bdd ProgramBddContext::Div(bdd lexpr, bdd rexpr)
+bdd ProgramBddContext::Div(bdd lexpr, bdd rexpr) const 
 {
   unsigned in1 = getRegSize(lexpr);
   unsigned in2 = getRegSize(rexpr);
   return applyBinOp(lexpr, rexpr, bddDiv(in1,in2));
 }
 
-bdd ProgramBddContext::bddAnd()
+bdd ProgramBddContext::bddAnd() const
 {
   bdd ret =
     (fdd_ithvar(regAInfo->baseRhs,1) & 
@@ -362,7 +362,7 @@ bdd ProgramBddContext::bddAnd()
   return ret;
 }
 
-bdd ProgramBddContext::bddOr()
+bdd ProgramBddContext::bddOr() const
 {
   bdd ret = 
     (fdd_ithvar(regAInfo->baseRhs,1) & 
@@ -384,7 +384,7 @@ bdd ProgramBddContext::bddOr()
   return ret;
 }
 
-bdd ProgramBddContext::bddNot()
+bdd ProgramBddContext::bddNot() const
 {
   bdd ret =
     (fdd_ithvar(regAInfo->baseRhs,1) & 
@@ -396,7 +396,7 @@ bdd ProgramBddContext::bddNot()
   return ret;
 }
 
-bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size)
+bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size) const
 {
   if(in1Size != in2Size)
     LOG(ERROR) << "[ProgramBddContext::bddPlus] Addition of number of different bit widths is not allowed.\n";
@@ -415,7 +415,7 @@ bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size)
   return ret;
 }
 
-bdd ProgramBddContext::bddMinus(unsigned in1Size, unsigned in2Size)
+bdd ProgramBddContext::bddMinus(unsigned in1Size, unsigned in2Size) const
 {
   if(in1Size != in2Size)
     LOG(ERROR) << "[ProgramBddContext::bddMinus] Subtraction of number of different bit widths is not allowed.\n";
@@ -434,7 +434,7 @@ bdd ProgramBddContext::bddMinus(unsigned in1Size, unsigned in2Size)
   return ret;
 }
 
-bdd ProgramBddContext::bddTimes(unsigned in1Size, unsigned in2Size)
+bdd ProgramBddContext::bddTimes(unsigned in1Size, unsigned in2Size) const
 {
   if(in1Size != in2Size)
     LOG(ERROR) << "[ProgramBddContext::bddTimes] Multiplication of number of different bit widths is not allowed.\n";
@@ -453,7 +453,7 @@ bdd ProgramBddContext::bddTimes(unsigned in1Size, unsigned in2Size)
   return ret;
 }
 
-bdd ProgramBddContext::bddDiv(unsigned in1Size, unsigned in2Size)
+bdd ProgramBddContext::bddDiv(unsigned in1Size, unsigned in2Size) const
 {
   if(in1Size != in2Size)
     LOG(ERROR) << "[ProgramBddContext::bddDiv] Division of number of different bit widths is not allowed.\n";
@@ -477,7 +477,7 @@ bdd ProgramBddContext::bddDiv(unsigned in1Size, unsigned in2Size)
   return ret;
 }
 
-unsigned ProgramBddContext::getRegSize(bdd forThis)
+unsigned ProgramBddContext::getRegSize(bdd forThis) const
 {
   //Inefficient!!!
   for(unsigned i = 0; i <= maxSize; ++i){
@@ -489,7 +489,7 @@ unsigned ProgramBddContext::getRegSize(bdd forThis)
   return 0;
 }
 
-bdd ProgramBddContext::Assign(std::string var, bdd expr)
+bdd ProgramBddContext::Assign(std::string var, bdd expr) const
 {
   bddinfo_t bi;
   if(this->find(var) == this->end()){
@@ -529,7 +529,7 @@ bdd ProgramBddContext::Assign(std::string var, bdd expr)
   return bdd_exist(expr & c, fdd_ithset(sizeInfo));
 }
 
-bdd ProgramBddContext::Assume(bdd expr1, bdd expr2)
+bdd ProgramBddContext::Assume(bdd expr1, bdd expr2) const
 {
   bddPair *regARhs2Extra = bdd_newpair();
   fdd_setpair(
@@ -582,7 +582,7 @@ bdd ProgramBddContext::Assume(bdd expr1, bdd expr2)
   return bdd_exist(ret, fdd_ithset(sizeInfo));
 }
 
-bdd ProgramBddContext::tGetRandomTransformer(bool isTensored, unsigned seed)
+bdd ProgramBddContext::tGetRandomTransformer(bool isTensored, unsigned seed) const
 {
   if(seed != 0)
     srand(seed);
