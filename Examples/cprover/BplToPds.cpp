@@ -230,11 +230,41 @@ namespace wali
     {
       binrel_t temp = new BinRel(con, con->True());
       binrel_t one = dynamic_cast<BinRel*>(temp->one().get_ptr());
+      bdd b;
+      str_list * vl;
+      expr_list * el;
+      stmt_list * sl;
+      stmt_ptr_stmt_list_ptr_hash_map::const_iterator goto_iter;
+
       if(!s)
         assert(0 && "dump_pds_from_stmt");
       switch(s->op){
         case AST_SKIP:
-          pds->add_rule(stt(), stk(s), stk(ns), one);
+          pds->add_rule(stt(), stk(s), stt(), stk(ns), one);
+          break;
+        case AST_GOTO:
+          goto_iter = goto_to_targets.find(s);
+          assert(goto_iter != goto_to_targets.end());
+          sl = goto_iter->second;
+          while(sl){
+            pds->add_rule(stt(), stk(s), stt(), stk(sl->s), one);
+          }
+          break;
+        case AST_RETURN:
+          pds->add_rule(stt(), stk(s), stt(), one);
+          break;
+        case AST_ASSIGN:
+          b = bddtrue;
+          vl = s->vl;
+          el = s->el;
+          while(vl || el){
+            if(!vl || !el)
+              assert(0 && "[dump_pds_from_stmt] Assignment should have the same number of lhs/rhs");
+            b = b & con->Assign(string(vl->v), expr_as_bdd(el->e, con, f));
+            vl = vl->n;
+            el = el->n;
+          }            
+          pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
           break;
         case AST_ITE:   
           if(s->sl1)
@@ -245,7 +275,7 @@ namespace wali
       }
     }
 
-    static void dump_pds_from_stmt_list(WPDS * pds, const stmt_list * sl, const ProgramBddContext con, const stmt_ptr_stmt_list_ptr_hash_map&
+    static void dump_pds_from_stmt_list(WPDS * pds, const stmt_list * sl, const ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map&
         goto_to_targets, const stmt_ptr_proc_ptr_hash_map& call_to_callee, const char * f, stmt * es)
     {
       while(sl){
@@ -256,7 +286,7 @@ namespace wali
         sl = sl->n;
       }
     }
-    void dump_pds_from_proc(WPDS * pds, const proc * p, const ProgramBddContext con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const stmt_ptr_proc_ptr_hash_map& call_to_callee)
+    void dump_pds_from_proc(WPDS * pds, const proc * p, const ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const stmt_ptr_proc_ptr_hash_map& call_to_callee)
     {
       dump_pds_from_stmt_list(pds, p->sl, con, goto_to_targets, call_to_callee, p->f, NULL);
     }

@@ -434,9 +434,9 @@ int main(int argc, char ** argv)
     FWPDS fpds;
     //fpds.useNewton(false);
     RandomPdsGen::Names names;
-    //rpt = new RandomPdsGen(mwg,pdsSizeFactor,5*pdsSizeFactor,5*pdsSizeFactor,4*pdsSizeFactor,0,0.45,0.45,seed);
-    rpt = new RandomPdsGen(mwg, 2*pdsSizeFactor, 2*pdsSizeFactor, pdsSizeFactor,
-        pdsSizeFactor, 0,0.45,0.45,seed);
+    //rpt = new RandomPdsGen(mwg,pdsSizeFactor,5*pdsSizeFactor,5*pdsSizeFactor,4*pdsSizeFactor,0,0.45,0.45,seed); //original
+    //rpt = new RandomPdsGen(mwg, 2*pdsSizeFactor, 2*pdsSizeFactor, pdsSizeFactor, pdsSizeFactor, 0, 0.45, 0.45, seed);
+    rpt = new RandomPdsGen(mwg, pdsSizeFactor, 10 * pdsSizeFactor, pdsSizeFactor, 5 * pdsSizeFactor, 0,0.45,0.45,seed);
     if(dump){
       fstream pds_out("pds_gen",fstream::out);
       rpt->get(fpds,names,&pds_out);
@@ -496,8 +496,7 @@ int main(int argc, char ** argv)
     {
       wali::util::Timer * t1 = new wali::util::Timer("Generating Random PDS");
       //rpt = new RandomPdsGen(mwg,pdsSizeFactor,5*pdsSizeFactor,5*pdsSizeFactor,4*pdsSizeFactor,0,0.45,0.45,seed);
-    rpt = new RandomPdsGen(mwg, 2*pdsSizeFactor, 2*pdsSizeFactor, pdsSizeFactor,
-        pdsSizeFactor, 0,0.45,0.45,seed);
+    rpt = new RandomPdsGen(mwg, pdsSizeFactor, 10 * pdsSizeFactor, pdsSizeFactor, 5 * pdsSizeFactor, 0,0.45,0.45,seed);
       rpt->get(npds,names);
       delete t1;
     }
