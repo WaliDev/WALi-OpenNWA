@@ -114,7 +114,7 @@ namespace wali
 
     }
 
-    void dump_pds_from_prog(wpds::WPDS * pds, const prog * pg)
+    void dump_pds_from_prog(wpds::WPDS * pds, prog * pg)
     {
       ProgramBddContext * con = new ProgramBddContext(); 
 
@@ -123,7 +123,7 @@ namespace wali
         con->addBoolVar(string(vl->v));
         vl = vl->n;
       }
-      const proc_list * pl = pg->pl;
+      proc_list * pl = pg->pl;
       while(pl){
         vl = pl->p->al;
         while(vl){
@@ -151,7 +151,7 @@ namespace wali
 
       pl = pg->pl;
       while(pl){
-        const proc * p = pl->p;
+        proc * p = pl->p;
         map_label_to_stmt(label_to_stmt, p);
         map_goto_to_targets(goto_to_targets, label_to_stmt, p);
         map_call_to_callee(call_to_callee, name_to_proc, p);
@@ -168,7 +168,7 @@ namespace wali
   
 
    
-    bdd expr_as_bdd(const expr * e, const program_bdd_context_t con, const char * f)
+    static bdd expr_as_bdd(const expr * e, const ProgramBddContext *  con, const char * f)
     {
       if(!e)
         assert(0 && "expr_as_bdd");
@@ -225,16 +225,21 @@ namespace wali
       return getKey((long) s);
     };
 
-    void dump_pds_from_stmt(WPDS * pds, const stmt * s, const ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const
+    void dump_pds_from_stmt(WPDS * pds, stmt * s, const ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const
         stmt_ptr_proc_ptr_hash_map& call_to_callee, const char * f, stmt * ns)
     {
+      if(1){
+        fprintf(stdout, "DUMPING: ");
+        emit_stmt(stdout, s, 2);            
+      }
       binrel_t temp = new BinRel(con, con->True());
       binrel_t one = dynamic_cast<BinRel*>(temp->one().get_ptr());
-      bdd b;
+      bdd b, b1;
       str_list * vl;
       expr_list * el;
       stmt_list * sl;
       stmt_ptr_stmt_list_ptr_hash_map::const_iterator goto_iter;
+      stmt_ptr_proc_ptr_hash_map::const_iterator callee_iter;
 
       if(!s)
         assert(0 && "dump_pds_from_stmt");
@@ -248,12 +253,14 @@ namespace wali
           sl = goto_iter->second;
           while(sl){
             pds->add_rule(stt(), stk(s), stt(), stk(sl->s), one);
+            sl = sl->n;
           }
           break;
         case AST_RETURN:
           pds->add_rule(stt(), stk(s), stt(), one);
           break;
         case AST_ASSIGN:
+          assert(s->vl && s->el);
           b = bddtrue;
           vl = s->vl;
           el = s->el;
@@ -265,17 +272,54 @@ namespace wali
             el = el->n;
           }            
           pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
-          break;
+          break;       
         case AST_ITE:   
+          assert(s->e && s->sl1);
+          if(s->sl1){
+            assert(s->sl1->s);
+            b = con->Assume(expr_as_bdd(s->e, con, f), con->True());
+            pds->add_rule(stt(), stk(s), stt(), stk(s->sl1->s), new BinRel(con, b));
+          }
+          if(s->sl2){
+            assert(s->sl2->s);
+            b = con->Assume(expr_as_bdd(s->e, con, f), con->False());
+            pds->add_rule(stt(), stk(s), stt(), stk(s->sl2->s), new BinRel(con, b));
+          }
           if(s->sl1)
             dump_pds_from_stmt_list(pds, s->sl1, con, goto_to_targets, call_to_callee, f, ns);
           if(s->sl2)
             dump_pds_from_stmt_list(pds, s->sl2, con, goto_to_targets, call_to_callee, f, ns);
           break;
+        case AST_WHILE:
+          assert(s->e && s->sl1);
+          b = con->Assume(expr_as_bdd(s->e, con, f), con->True());
+          pds->add_rule(stt(), stk(s), stt(), stk(s->sl1->s), new BinRel(con, b));
+          dump_pds_from_stmt_list(pds, s->sl1, con, goto_to_targets, call_to_callee, f, s);
+          b = con->Assume(expr_as_bdd(s->e, con, f), con->False());
+          pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
+          break;
+        case AST_ASSERT:
+          assert(s->e);
+          cerr << "Changed Assert to Assume";
+          b = con->Assume(expr_as_bdd(s->e, con, f), con->True());
+          pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
+          break;
+        case AST_ASSUME:
+          assert(s->e);
+          b = con->Assume(expr_as_bdd(s->e, con, f), con->True());
+          pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
+          break;
+        case AST_CALL:
+          callee_iter = call_to_callee.find(s);
+          assert(callee_iter != call_to_callee.end());
+          assert(callee_iter->second->sl);
+          assert(callee_iter->second->sl->s);
+          pds->add_rule(stt(), stk(s), stt(), stk(callee_iter->second->sl->s), stk(ns), one);
+          break;
       }
     }
 
-    static void dump_pds_from_stmt_list(WPDS * pds, const stmt_list * sl, const ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map&
+    void dump_pds_from_stmt_list(WPDS * pds, stmt_list * sl, const ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map&
         goto_to_targets, const stmt_ptr_proc_ptr_hash_map& call_to_callee, const char * f, stmt * es)
     {
       while(sl){
@@ -286,31 +330,29 @@ namespace wali
         sl = sl->n;
       }
     }
-    void dump_pds_from_proc(WPDS * pds, const proc * p, const ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const stmt_ptr_proc_ptr_hash_map& call_to_callee)
+    void dump_pds_from_proc(WPDS * pds, proc * p, const ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const stmt_ptr_proc_ptr_hash_map& call_to_callee)
     {
       dump_pds_from_stmt_list(pds, p->sl, con, goto_to_targets, call_to_callee, p->f, NULL);
     }
+ 
+    void read_program(WPDS * pds, const char * fname, bool dbg)
+    {
+      FILE * fin;
+      fin = fopen(fname, "r");
+      parse(fin);
+      prog * pg = parsing_result;
+      if(dbg)
+        emit_prog(stdout, pg);
+      dump_pds_from_prog(pds, pg);
+      deep_erase_prog(&pg);
+    }
+ 
   }
 }
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/*
 int main(int argc, char ** argv)
 {
   FILE * fin;
@@ -368,6 +410,7 @@ int main(int argc, char ** argv)
       fprintf(stdout, "  %s\n", iter->second->f);
     }
 
+
     label_to_stmt.clear();
     clear_stmt_ptr_stmt_list_ptr_hash_map(goto_to_targets);
     call_to_callee.clear();
@@ -375,7 +418,11 @@ int main(int argc, char ** argv)
   }
   name_to_proc.clear();
 
+  // pds geneartion
+  WPDS * pds = new WPDS;
+  dump_pds_from_prog(pds, pg);
+  //
   deep_erase_prog(&pg);
   return 0;
 }
-
+*/

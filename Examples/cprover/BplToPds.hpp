@@ -85,27 +85,29 @@ namespace wali
     void dump_pds_from_prog(wpds::WPDS * pds, prog * pg);
     void dump_pds_from_proc(
         wpds::WPDS * pds, 
-        const proc * p, 
+        proc * p, 
         const domains::binrel::ProgramBddContext * con, 
         const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
         const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee);
     void dump_pds_from_stmt(
         wpds::WPDS * pds, 
-        const stmt * s, 
+        stmt * s, 
         const domains::binrel::ProgramBddContext * con, 
         const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
         const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee,
         const char * f,
         stmt * ns);
      
-    static void dump_pds_from_stmt_list(
+    void dump_pds_from_stmt_list(
         wpds::WPDS * pds, 
-        const stmt_list * sl, 
+        stmt_list * sl, 
         const domains::binrel::ProgramBddContext * con, 
         const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, 
         const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee, 
         const char * f, 
         stmt * es);
+
+    void read_program(wpds::WPDS * pds, const char * fname, bool dbg = false);
   } 
 }
 
