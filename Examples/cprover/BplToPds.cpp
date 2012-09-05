@@ -120,7 +120,9 @@ namespace wali
 
       const str_list * vl = pg->vl;
       while(vl){
-        con->addBoolVar(string(vl->v));
+        stringstream ss;
+        ss << "::" << vl->v;
+        con->addBoolVar(ss.str());
         vl = vl->n;
       }
       proc_list * pl = pg->pl;
@@ -202,8 +204,10 @@ namespace wali
           if(con->find(ss.str()) != con->end()){
             return con->From(ss.str());
           }else{
-            assert(con->find(string(e->v)) != con->end());
-            return con->From(string(e->v));
+            stringstream ss2;
+            ss2 << "::" << e->v;
+            assert(con->find(ss2.str()) != con->end());
+            return con->From(ss2.str());
           }
         case AST_CONSTANT:
           if(e->c == ONE)
@@ -240,6 +244,7 @@ namespace wali
       stmt_list * sl;
       stmt_ptr_stmt_list_ptr_hash_map::const_iterator goto_iter;
       stmt_ptr_proc_ptr_hash_map::const_iterator callee_iter;
+      string lhs;
 
       if(!s)
         assert(0 && "dump_pds_from_stmt");
@@ -257,7 +262,15 @@ namespace wali
           }
           break;
         case AST_RETURN:
-          pds->add_rule(stt(), stk(s), stt(), one);
+          b = bddtrue;
+          // havoc all local variables because there is no merge function yet.
+          for(ProgramBddContext::const_iterator cit = con->begin(); cit != con->end(); ++cit){
+            if(cit->first.size() > 0 && cit->first.at(0) == ':'){
+              string st = string(cit->first);
+              b = b & con->Assign(st, con->From(st));            
+            }
+          }
+          pds->add_rule(stt(), stk(s), stt(), new BinRel(con, b));
           break;
         case AST_ASSIGN:
           assert(s->vl && s->el);
@@ -267,7 +280,16 @@ namespace wali
           while(vl || el){
             if(!vl || !el)
               assert(0 && "[dump_pds_from_stmt] Assignment should have the same number of lhs/rhs");
-            b = b & con->Assign(string(vl->v), expr_as_bdd(el->e, con, f));
+            stringstream ss;
+            ss << f << "::" << vl->v;
+            if(con->find(ss.str()) != con->end()){
+              lhs = ss.str();
+            }else{
+              stringstream ss2;
+              ss2 << "::" << vl->v;           
+              lhs = string(ss2.str());
+            }
+            b = b & con->Assign(lhs, expr_as_bdd(el->e, con, f));
             vl = vl->n;
             el = el->n;
           }            
@@ -300,7 +322,7 @@ namespace wali
           break;
         case AST_ASSERT:
           assert(s->e);
-          cerr << "Changed Assert to Assume";
+          fprintf(stderr, "Changed Assert to Assume\n");
           b = con->Assume(expr_as_bdd(s->e, con, f), con->True());
           pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
           break;
@@ -352,7 +374,7 @@ namespace wali
 
 
 
-/*
+
 int main(int argc, char ** argv)
 {
   FILE * fin;
@@ -425,4 +447,4 @@ int main(int argc, char ** argv)
   deep_erase_prog(&pg);
   return 0;
 }
-*/
+

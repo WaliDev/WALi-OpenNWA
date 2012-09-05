@@ -185,6 +185,14 @@ function_definition
 	  {
 	    $$ = make_proc($1,$2,$3,$5,$6,$8);
 	  }
+  | fun_type IDENTIFIER parms BEG decl_list enforce abortif END
+    {
+      // there are no statements, so add a skip statement.
+      stmt * s = make_skip_stmt();
+      stmt_list * sl = make_stmt_list_item(s);
+      $$ = make_proc($1, $2, $3, $5, $6, sl);
+    }
+   
 	 ;
 
 fun_type
