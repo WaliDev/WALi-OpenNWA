@@ -5,6 +5,7 @@ Import('Debug')
 Import('WaliDir')
 Import('ProgEnv')
 Import('MkStatic')
+Import('LibInstallDir')
 
 if Debug:
     print '\n+++ Entered "#/Examples/cprover/SConscript"\n'
@@ -42,8 +43,17 @@ if MkStatic:
 else:
   c_objs = [cenv.SharedObject(cfile) for cfile in c_files]
 
-env.Append(LIBS = ['walidomains', 'glog', 'bdd']);
-built = [env.Program('bp_parser', [naughty_objs, c_objs])]
+if MkStatic:
+	bpparser = env.StaticLibrary('bpparser', [naughty_objs, c_objs])
+else:
+	bpparser = env.SharedLibrary('bpparser', [naughty_objs, c_objs])
+
+built = [env.Install(LibInstallDir, bpparser)]
+
+penv = env.Clone()
+penv.Append(LIBS = ['bpparser', 'walidomains', 'glog', 'bdd']);
+built += penv.Program('PrintBplStats.cpp')
+built += penv.Program('NewtonFwpdsCompare.cpp')
 
 Return('built')
 

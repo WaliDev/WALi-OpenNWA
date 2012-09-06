@@ -4,6 +4,7 @@
 #include "wali/HashMap.hpp"
 
 #include "wali/wpds/WPDS.hpp"
+#include "wali/wpds/fwpds/FWPDS.hpp"
 
 #include "wali/domains/binrel/BinRel.hpp"
 #include "wali/domains/binrel/ProgramBddContext.hpp"
@@ -16,98 +17,107 @@ namespace wali
 {
   namespace cprover 
   {
-
-    namespace resolve_details
+    namespace details 
     {
-      struct hash_str 
+      namespace resolve_details
       {
-        size_t operator() (const char * const & str) const 
+        struct hash_str 
         {
-          const char * c = str;
-          size_t sum = 0;
-          while(*c != '\0'){
-            sum += *c;
-            c++;
-          }
-          return sum;
+          size_t operator() (const char * const & str) const 
+          {
+            const char * c = str;
+            size_t sum = 0;
+            while(*c != '\0'){
+              sum += *c;
+              c++;
+            }
+            return sum;
+          };
         };
-      };
-      struct str_equal 
-      {
-        bool operator () (const char * c1, const char * c2)
+        struct str_equal 
         {
-          if(c1 == NULL && c2 == NULL)
-            return true;
-          if(c1 == NULL || c2 == NULL)
-            return false;
-          while(*c1 != '\0' && *c2 != '\0'){
-            if(*c1 != *c2)
+          bool operator () (const char * c1, const char * c2)
+          {
+            if(c1 == NULL && c2 == NULL)
+              return true;
+            if(c1 == NULL || c2 == NULL)
               return false;
-            c1++;
-            c2++;
-          }
-          if(*c1 != '\0' || *c2 != '\0')
-            return false;
-          return true;
+            while(*c1 != '\0' && *c2 != '\0'){
+              if(*c1 != *c2)
+                return false;
+              c1++;
+              c2++;
+            }
+            if(*c1 != '\0' || *c2 != '\0')
+              return false;
+            return true;
+          };
         };
-      };
-      struct hash_stmt_ptr
-      {
-        size_t operator() (const stmt * const & s) const 
+        struct hash_stmt_ptr
         {
-          return (size_t) s; 
+          size_t operator() (const stmt * const & s) const 
+          {
+            return (size_t) s; 
+          };
         };
-      };
-      struct stmt_ptr_equal
-      {
-        bool operator() (const stmt * s1, const stmt * s2) const
+        struct stmt_ptr_equal
         {
-          return s1 == s2;
+          bool operator() (const stmt * s1, const stmt * s2) const
+          {
+            return s1 == s2;
+          };
         };
-      };
 
-      typedef wali::HashMap<const char *, stmt *, hash_str, str_equal> str_stmt_ptr_hash_map;
-      typedef wali::HashMap<const char *, proc *, hash_str, str_equal> str_proc_ptr_hash_map;
-      //IMP: This hashmap owns the stmt_list, but not the stmt in the key, or those in the list.
-      //On clearing, we must delete the stmt_list objects, but nothing deeper.
-      typedef wali::HashMap<stmt *, stmt_list *, hash_stmt_ptr, stmt_ptr_equal> stmt_ptr_stmt_list_ptr_hash_map;
-      typedef wali::HashMap<stmt *, proc *, hash_stmt_ptr, stmt_ptr_equal> stmt_ptr_proc_ptr_hash_map;
+        typedef wali::HashMap<const char *, stmt *, hash_str, str_equal> str_stmt_ptr_hash_map;
+        typedef wali::HashMap<const char *, proc *, hash_str, str_equal> str_proc_ptr_hash_map;
+        //IMP: This hashmap owns the stmt_list, but not the stmt in the key, or those in the list.
+        //On clearing, we must delete the stmt_list objects, but nothing deeper.
+        typedef wali::HashMap<stmt *, stmt_list *, hash_stmt_ptr, stmt_ptr_equal> stmt_ptr_stmt_list_ptr_hash_map;
+        typedef wali::HashMap<stmt *, proc *, hash_stmt_ptr, stmt_ptr_equal> stmt_ptr_proc_ptr_hash_map;
 
-      // must use this to delete a hashmap of type stmt_ptr_stmt_list_ptr_hash_map
-      void clear_stmt_ptr_stmt_list_ptr_hash_map(stmt_ptr_stmt_list_ptr_hash_map& m);
+        // must use this to delete a hashmap of type stmt_ptr_stmt_list_ptr_hash_map
+        void clear_stmt_ptr_stmt_list_ptr_hash_map(stmt_ptr_stmt_list_ptr_hash_map& m);
 
-      void map_label_to_stmt(str_stmt_ptr_hash_map& m, const proc * p);
-      void map_name_to_proc(str_proc_ptr_hash_map& m, const prog * pg);
-      void map_goto_to_targets(stmt_ptr_stmt_list_ptr_hash_map& mout, str_stmt_ptr_hash_map& min, const proc * p);
-      void map_call_to_callee(stmt_ptr_proc_ptr_hash_map& mout, str_proc_ptr_hash_map& min, const proc * p);
+        void map_label_to_stmt(str_stmt_ptr_hash_map& m, const proc * p);
+        void map_name_to_proc(str_proc_ptr_hash_map& m, const prog * pg);
+        void map_goto_to_targets(stmt_ptr_stmt_list_ptr_hash_map& mout, str_stmt_ptr_hash_map& min, const proc * p);
+        void map_call_to_callee(stmt_ptr_proc_ptr_hash_map& mout, str_proc_ptr_hash_map& min, const proc * p);
+      }
+
+      void dump_pds_from_prog(wpds::WPDS * pds, prog * pg);
+      void dump_pds_from_proc(
+          wpds::WPDS * pds, 
+          proc * p, 
+          const domains::binrel::ProgramBddContext * con, 
+          const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
+          const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee);
+      void dump_pds_from_stmt(
+          wpds::WPDS * pds, 
+          stmt * s, 
+          const domains::binrel::ProgramBddContext * con, 
+          const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
+          const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee,
+          const char * f,
+          stmt * ns);
+
+      void dump_pds_from_stmt_list(
+          wpds::WPDS * pds, 
+          stmt_list * sl, 
+          const domains::binrel::ProgramBddContext * con, 
+          const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, 
+          const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee, 
+          const char * f, 
+          stmt * es);
     }
 
-    void dump_pds_from_prog(wpds::WPDS * pds, prog * pg);
-    void dump_pds_from_proc(
-        wpds::WPDS * pds, 
-        proc * p, 
-        const domains::binrel::ProgramBddContext * con, 
-        const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
-        const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee);
-    void dump_pds_from_stmt(
-        wpds::WPDS * pds, 
-        stmt * s, 
-        const domains::binrel::ProgramBddContext * con, 
-        const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
-        const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee,
-        const char * f,
-        stmt * ns);
-     
-    void dump_pds_from_stmt_list(
-        wpds::WPDS * pds, 
-        stmt_list * sl, 
-        const domains::binrel::ProgramBddContext * con, 
-        const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, 
-        const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee, 
-        const char * f, 
-        stmt * es);
+    void read_prog(wpds::WPDS * pds, const char * fname, bool dbg = false);
+    prog * parse_prog(const char * fname);
+    wpds::WPDS * wpds_from_prog(prog * pg);
+    wpds::fwpds::FWPDS * fwpds_from_prog(prog * pg);
+    void print_prog_stats(prog * pg);
 
-    void read_program(wpds::WPDS * pds, const char * fname, bool dbg = false);
+    wali::Key getEntryStk(const prog * pg, const char * procname);
+    wali::Key getPdsState();
   } 
 }
 
