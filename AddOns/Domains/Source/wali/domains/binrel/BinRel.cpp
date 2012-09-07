@@ -279,6 +279,159 @@ void BddContext::addBoolVar(std::string name)
   addIntVar(name,2);
 }
 
+void BddContext::setIntVars(const std::map<std::string, int>& vars)
+{
+  // First work through the variable list and create the vocabulary structure
+  // This will collect information about the fdds to be created in buddy
+  int * domains = new int[9 * vars.size()];    
+  int vari = 0;
+  for(std::map<std::string, int>::const_iterator ci = vars.begin(); ci != vars.end(); ++ci){
+    if(ci->second < 2){
+      *waliErr << "I haven't tested the library for int size less than 2";
+      assert(false);
+    }
+    bddinfo_t varInfo = new BddInfo;
+    varInfo->maxVal = ci->second;
+    (*this)[ci->first] = varInfo;
+    // fill in domains with the correct sizes for the fdds
+    // There are 9 fdds corresponding to this variable with the size it->second
+    for(int j=(vari)*9; j<9*(vari+1); ++j)
+      domains[j] = ci->second;
+    vari++;      
+  }
+
+  // Now actually create the fdd levels in buddy
+  // lock mutex
+  int base = fdd_extdomain(domains, 9*vars.size());
+  if (base < 0){
+    *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
+    *waliErr << "    Aborting." << endl;
+    assert (false);
+  }
+  // release mutex
+  delete domains;
+
+  // Assign fdd levels to the variables.
+  vari = 0;
+  for(std::map<std::string, int>::const_iterator ci = vars.begin(); ci != vars.end(); ++ci){
+    bddinfo_t varInfo = (*this)[ci->first];
+
+    int j = 9 * vari;
+    // The order of these assignments determines how the individual variables fdds are intermixed.
+    varInfo->baseLhs = j++;
+    varInfo->baseRhs = j++;
+    varInfo->baseExtra = j++;
+    varInfo->tensor1Lhs = j++;
+    varInfo->tensor1Rhs = j++;
+    varInfo->tensor1Extra = j++;
+    varInfo->tensor2Lhs = j++;
+    varInfo->tensor2Rhs = j++;
+    varInfo->tensor2Extra = j++;
+    assert(j == 9 * (vari + 1));
+
+    // Also update the reverse vocabulary for printing.
+    idx2Name[varInfo->baseLhs] = ci->first;
+    idx2Name[varInfo->baseRhs] = ci->first + "'";
+    idx2Name[varInfo->baseExtra] = ci->first + "''";
+    idx2Name[varInfo->tensor1Lhs] = ci->first + "_t1";
+    idx2Name[varInfo->tensor1Rhs] = ci->first + "_t1'";
+    idx2Name[varInfo->tensor1Extra] = ci->first + "_t1''";
+    idx2Name[varInfo->tensor2Lhs] = ci->first + "_t2";
+    idx2Name[varInfo->tensor2Rhs] = ci->first + "_t2'";
+    idx2Name[varInfo->tensor2Extra] = ci->first + "_t2''";
+
+    vari++;  
+  } 
+
+
+  // Update bddPairs
+  // We will first create arrays for each of columns
+  int * baseLhs = new int[vars.size()];
+  int * baseRhs = new int[vars.size()];
+  int * baseExtra = new int[vars.size()];
+  int * tensor1Lhs = new int[vars.size()];
+  int * tensor1Rhs = new int[vars.size()];  
+  int * tensor1Extra = new int[vars.size()];
+  int * tensor2Lhs = new int[vars.size()];
+  int * tensor2Rhs = new int[vars.size()];
+  int * tensor2Extra = new int[vars.size()];
+  vari = 0;
+  for(std::map<std::string, int>::const_iterator ci = vars.begin(); ci != vars.end(); ++ci){
+    bddinfo_t varInfo = (*this)[ci->first];
+    baseLhs[vari] = varInfo->baseLhs;
+    baseRhs[vari] = varInfo->baseRhs;
+    baseExtra[vari] = varInfo->baseExtra;
+    tensor1Lhs[vari] = varInfo->tensor1Lhs;
+    tensor1Rhs[vari] = varInfo->tensor1Rhs;
+    tensor1Extra[vari] = varInfo->tensor1Extra;
+    tensor2Lhs[vari] = varInfo->tensor2Lhs;
+    tensor2Rhs[vari] = varInfo->tensor2Rhs;
+    tensor2Extra[vari] = varInfo->tensor2Extra;
+    vari++; 
+  }
+  fdd_setpairs(baseSwap.get(), baseLhs, baseRhs, vars.size());
+  fdd_setpairs(baseSwap.get(), baseRhs, baseLhs, vars.size());
+  fdd_setpairs(baseRightShift.get(), baseLhs, baseRhs, vars.size());
+  fdd_setpairs(baseRightShift.get(), baseRhs, baseExtra, vars.size());
+  fdd_setpairs(tensorRightShift.get(), tensor1Lhs, tensor1Rhs, vars.size());
+  fdd_setpairs(tensorRightShift.get(), tensor2Lhs, tensor2Rhs, vars.size());
+  fdd_setpairs(tensorRightShift.get(), tensor1Rhs, tensor1Extra, vars.size());
+  fdd_setpairs(tensorRightShift.get(), tensor2Rhs, tensor2Extra, vars.size());
+  fdd_setpairs(baseRestore.get(), baseExtra, baseRhs, vars.size());
+  fdd_setpairs(tensorRestore.get(), tensor1Extra, tensor1Rhs, vars.size());
+  fdd_setpairs(tensorRestore.get(), tensor2Extra, tensor2Rhs, vars.size());
+  fdd_setpairs(move2Tensor1.get(), baseLhs, tensor1Lhs, vars.size());
+  fdd_setpairs(move2Tensor1.get(), baseRhs, tensor1Rhs, vars.size());
+  fdd_setpairs(move2Tensor2.get(), baseLhs, tensor2Lhs, vars.size());
+  fdd_setpairs(move2Tensor2.get(), baseRhs, tensor2Rhs, vars.size());
+  fdd_setpairs(move2Base.get(), tensor1Lhs, baseLhs, vars.size());
+  fdd_setpairs(move2Base.get(), tensor2Rhs, baseRhs, vars.size());
+  fdd_setpairs(move2BaseTwisted.get(), tensor1Rhs, baseLhs, vars.size());
+  fdd_setpairs(move2BaseTwisted.get(), tensor2Rhs, baseRhs, vars.size());
+
+  delete baseLhs;
+  delete baseRhs;
+  delete baseExtra;
+  delete tensor1Lhs;
+  delete tensor1Rhs;
+  delete tensor1Extra;
+  delete tensor2Lhs;
+  delete tensor2Rhs;
+  delete tensor2Extra;
+
+  // Update static bdds
+  // Somehow make this efficient
+  for(std::map<std::string, int>::const_iterator ci = vars.begin(); ci != vars.end(); ++ci){
+    bddinfo_t varInfo = (*this)[ci->first];
+    baseSecBddContextSet = baseSecBddContextSet & fdd_ithset(varInfo->baseRhs);
+    tensorSecBddContextSet = tensorSecBddContextSet & fdd_ithset(varInfo->tensor1Rhs);
+    tensorSecBddContextSet = tensorSecBddContextSet & fdd_ithset(varInfo->tensor2Rhs);
+    commonBddContextSet23 = commonBddContextSet23 & fdd_ithset(varInfo->tensor1Rhs);
+    commonBddContextSet23 = commonBddContextSet23 & fdd_ithset(varInfo->tensor2Lhs);
+    commonBddContextId23 = commonBddContextId23 &
+      fdd_equals(varInfo->tensor1Rhs, varInfo->tensor2Lhs);
+    commonBddContextSet13 = commonBddContextSet13 & fdd_ithset(varInfo->tensor1Lhs);
+    commonBddContextSet13 = commonBddContextSet13 & fdd_ithset(varInfo->tensor2Lhs);
+    commonBddContextId13 = commonBddContextId13 & 
+      fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
+  }
+
+  // Create cached BinRel objects
+  // Somehow make this efficient
+  bdd baseId = bddtrue;
+  bdd tensorId = bddtrue;
+  for(BddContextIter varIter = this->begin(); varIter != this->end();  ++varIter){
+    bddinfo_t varInfo = (*varIter).second;
+    baseId = baseId & fdd_equals(varInfo->baseLhs, varInfo->baseRhs);
+    tensorId = tensorId & (fdd_equals(varInfo->tensor1Lhs, varInfo->tensor1Rhs) & 
+        fdd_equals(varInfo->tensor2Lhs, varInfo->tensor2Rhs));
+  }
+  cachedBaseOne = new BinRel(this, baseId, false);
+  cachedBaseZero = new BinRel(this, bddfalse, false);
+  cachedTensorOne = new BinRel(this, tensorId, true);
+  cachedTensorZero = new BinRel(this, bddfalse, true);
+}
+
 void BddContext::addIntVar(std::string name, unsigned size)
 {
   //create and insert a new BddInfo into the vocabulary

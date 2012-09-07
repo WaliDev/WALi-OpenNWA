@@ -47,6 +47,13 @@ namespace wali
           /** Add a int variable to the vocabulary with the name 'name'. The integer can take values
            * between 0...size-1. **/
           virtual void addIntVar(std::string name, unsigned size);
+
+          /**
+           * Add multiple int variables with the given sizes.
+           * This function should not be used after addBoolVar/addIntVar.
+           * This should be faster than multiple calls to addIntVar.
+           **/
+          virtual void setIntVars(const std::map<std::string, int>& vars);
          
           std::ostream& print(std::ostream& o) const;
 

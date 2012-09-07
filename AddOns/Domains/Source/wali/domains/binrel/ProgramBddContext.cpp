@@ -103,6 +103,43 @@ void ProgramBddContext::addBoolVar(std::string name)
   addIntVar(name,2);
 }
 
+void ProgramBddContext::setIntVars(const std::map<std::string, int>& vars)
+{
+  BddContext::setIntVars(vars);
+  
+  // Compute the size of register needed.
+  int size = 0;
+  for(std::map<std::string, int>::const_iterator ci = vars.begin(); ci != vars.end(); ++ci)
+    size = ci->second > size ? ci->second : size;
+  maxSize = size;
+
+  // Now create some buddy levels for scratchpad
+  int domains[7] = {size + 1, size, size, size, size, size, size};
+  int base = fdd_extdomain(domains,7);
+
+  // Now create the corresponding bddinfo
+  sizeInfo = (unsigned) base++;
+  regAInfo = new BddInfo();
+  regAInfo->baseLhs = (unsigned) base++;
+  regAInfo->baseRhs = (unsigned) base++;
+  regAInfo->baseExtra = (unsigned) base++;
+
+  regBInfo = new BddInfo();
+  regBInfo->baseLhs = (unsigned) base++;
+  regBInfo->baseRhs = (unsigned) base++;
+  regBInfo->baseExtra = (unsigned) base++;
+  
+  //To pretty print during testing, we add some names for this extra register
+  //Currently, idx2Name is a global variable in wali::domains::binrel
+  idx2Name[sizeInfo] = "__regSize";
+  idx2Name[regAInfo->baseLhs] = "__regA";
+  idx2Name[regAInfo->baseRhs] = "__regA'";
+  idx2Name[regAInfo->baseExtra] = "__regA''";
+  idx2Name[regBInfo->baseLhs] = "__regB";
+  idx2Name[regBInfo->baseRhs] = "__regB'";
+  idx2Name[regBInfo->baseExtra] = "__regB''";
+
+}
 void ProgramBddContext::addIntVar(std::string name, unsigned siz)
 {
   BddContext::addIntVar(name,siz);

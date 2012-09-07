@@ -2,6 +2,7 @@
 
 #include <string>
 #include <sstream>
+#include <map>
 
 using namespace std;
 using namespace wali;
@@ -123,11 +124,14 @@ namespace wali
       {
         ProgramBddContext * con = new ProgramBddContext(); 
 
+        map<string, int> vars;
+
         const str_list * vl = pg->vl;
         while(vl){
           stringstream ss;
           ss << "::" << vl->v;
-          con->addBoolVar(ss.str());
+          //con->addBoolVar(ss.str());
+          vars[ss.str()] = 2;
           vl = vl->n;
         }
         proc_list * pl = pg->pl;
@@ -136,18 +140,21 @@ namespace wali
           while(vl){
             stringstream ss;
             ss << pl->p->f << "::" << vl->v;
-            con->addBoolVar(ss.str());
+            //con->addBoolVar(ss.str());
+            vars[ss.str()] = 2;
             vl = vl->n;
           }
           vl = pl->p->vl;
           while(vl){
             stringstream ss;
             ss << pl->p->f << "::" << vl->v;
-            con->addBoolVar(ss.str());
+            //con->addBoolVar(ss.str());
+            vars[ss.str()] = 2;
             vl = vl->n;
           }
           pl = pl->n;
         }
+        con->setIntVars(vars);
 
         str_stmt_ptr_hash_map label_to_stmt;
         str_proc_ptr_hash_map name_to_proc;
