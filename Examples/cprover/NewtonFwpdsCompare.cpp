@@ -1,5 +1,3 @@
-// ::wali::wpds::nwpds
-#include "wali/wpds/nwpds/NWPDS.hpp"
 // ::wali::wpds::fwpds
 #include "wali/wpds/fwpds/FWPDS.hpp"
 // ::wali::wpds::ewpds
@@ -34,7 +32,6 @@ using namespace wali::wfa;
 using namespace wali::wpds;
 using namespace wali::wpds::ewpds;
 using namespace wali::wpds::fwpds;
-using namespace wali::wpds::nwpds;
 using namespace wali::cprover;
 
 namespace{
