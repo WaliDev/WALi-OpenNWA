@@ -140,6 +140,7 @@ void ProgramBddContext::setIntVars(const std::map<std::string, int>& vars)
   idx2Name[regBInfo->baseExtra] = "__regB''";
 
 }
+
 void ProgramBddContext::addIntVar(std::string name, unsigned siz)
 {
   BddContext::addIntVar(name,siz);

@@ -309,7 +309,7 @@ void BddContext::setIntVars(const std::map<std::string, int>& vars)
     assert (false);
   }
   // release mutex
-  delete domains;
+  delete [] domains;
 
   // Assign fdd levels to the variables.
   vari = 0;
@@ -389,15 +389,15 @@ void BddContext::setIntVars(const std::map<std::string, int>& vars)
   fdd_setpairs(move2BaseTwisted.get(), tensor1Rhs, baseLhs, vars.size());
   fdd_setpairs(move2BaseTwisted.get(), tensor2Rhs, baseRhs, vars.size());
 
-  delete baseLhs;
-  delete baseRhs;
-  delete baseExtra;
-  delete tensor1Lhs;
-  delete tensor1Rhs;
-  delete tensor1Extra;
-  delete tensor2Lhs;
-  delete tensor2Rhs;
-  delete tensor2Extra;
+  delete [] baseLhs;
+  delete [] baseRhs;
+  delete [] baseExtra;
+  delete [] tensor1Lhs;
+  delete [] tensor1Rhs;
+  delete [] tensor1Extra;
+  delete [] tensor2Lhs;
+  delete [] tensor2Rhs;
+  delete [] tensor2Extra;
 
   // Update static bdds
   // Somehow make this efficient

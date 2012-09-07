@@ -410,6 +410,7 @@ int main(int argc, char ** argv)
       outfaf << "}" << endl;
     }
     fac.advance_mode();
+    deep_erase_prog(&pg);
     delete fpds;
   }
 
@@ -459,6 +460,7 @@ int main(int argc, char ** argv)
       outfaf << "}" << endl;
     }
     fac.advance_mode();
+    deep_erase_prog(&pg);
     delete npds;
   }
 

@@ -16,6 +16,7 @@
 	extern FILE *bpin;
 
 unsigned start_thread_stmt_ctr, end_thread_stmt_ctr, sync_stmt_ctr, atomic_begin_stmt_ctr, atomic_end_stmt_ctr, dead_stmt_ctr, print_stmt_ctr;
+unsigned schoose_stmt_ctr;
 
 prog * parsing_result = NULL;
 
@@ -103,6 +104,7 @@ pstart:
   		atomic_end_stmt_ctr = 0;
 			dead_stmt_ctr = 0;
 			print_stmt_ctr = 0;
+      schoose_stmt_ctr = 0;
 	  } ;
 
 pend:
@@ -121,6 +123,9 @@ pend:
 			  fprintf(stderr, "Converted %d 'dead' statements to skip\n", dead_stmt_ctr);
 			if(print_stmt_ctr > 0)
 				fprintf(stderr, "Covnerted %d 'print' statements to skip\n", print_stmt_ctr);
+      if(schoose_stmt_ctr > 0)
+        fprintf(stderr, "***WARNING*** converted %d 'schoose' statements to *\n", schoose_stmt_ctr);
+
 	  }
 	;
 
@@ -512,7 +517,10 @@ primary_expression
       }
     | CHOOSE '[' expression ',' expression ']'
 	  {
-	  	$$ = make_schoose_expr($3,$5);
+	  	$$ = make_non_det_expr();
+      deep_erase_expr(&$3);
+      deep_erase_expr(&$5);
+      //make_schoose_expr($3,$5);
 	  }
 	| IDENTIFIER 	
 	  { 
