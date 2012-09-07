@@ -13,7 +13,9 @@ if Debug:
 ListOfBuilds = ['glog']
 [(glog_lib, glog_inc)] = SConscript('#/ThirdParty/SConscript', 'ListOfBuilds')
 
-#SConscript('#/AddOns/Domains/SConscript')
+
+# If the following line is uncommented, 'scons all' fails. If it is commented, 'scons tests' fails. We will fix this properly eventually.
+SConscript('#/AddOns/Domains/SConscript')
 
 env = ProgEnv.Clone()
 
