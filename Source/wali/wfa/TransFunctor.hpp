@@ -173,6 +173,9 @@ namespace wali
         virtual void operator()( ITrans* t );
     }; // class TransZeroWeight
 
+
+    struct DotAttributePrinter;
+
     /*!
      * @class TransDotty
      * Prints each Trans to std::ostream in dotty format.
@@ -182,9 +185,10 @@ namespace wali
       public:
         std::ostream& o;
         bool print_weights;
+        DotAttributePrinter * printer;
 
         std::set<wali::Key> nodesSeen;
-        TransDotty( std::ostream& o, bool print_weights );
+        TransDotty( std::ostream& o, bool print_weights, DotAttributePrinter * attribute_printer );
 
         virtual ~TransDotty() {}
 

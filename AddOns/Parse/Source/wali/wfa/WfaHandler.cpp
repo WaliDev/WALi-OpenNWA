@@ -1,7 +1,7 @@
 /**
  * @author Nicholas Kidd
  *
- * @version $Id$
+ * @version $Id: WfaHandler.cpp 634 2009-12-28 17:16:20Z kidd $
  */
 
 #include "StrX.hpp"
@@ -15,6 +15,7 @@
 #include "wali/wfa/Trans.hpp"
 #include "wali/wfa/WfaHandler.hpp"
 
+#include <string>
 #include <xercesc/sax2/Attributes.hpp>
 
 namespace wali
@@ -168,6 +169,8 @@ namespace wali
       {
         StrX lname(attributes.getLocalName(i));
         StrX val(attributes.getValue(i));
+        static const std::string str_TRUE("TRUE");
+        static const std::string str_true("true");
 
         if( State::XMLNameTag == lname.get() )
         {
@@ -178,12 +181,12 @@ namespace wali
         }
         else if( State::XMLInitialTag == lname.get() )
         {
-          if( std::string("TRUE") == val.get() )
+          if( str_true == val.get() || str_TRUE == val.get() )
             isInitial = true;
         }
         else if( State::XMLFinalTag == lname.get() )
         {
-          if( std::string("TRUE") == val.get() )
+          if( str_true == val.get() || str_TRUE == val.get() )
             isFinal = true;
         }
         else {

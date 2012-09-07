@@ -312,6 +312,9 @@ namespace wali
         Key constructCFG(std::set<Key> &entries, std::map<Key, Key> &entryState, wfa::WFA &cfg);
 
         sem_elem_t get_theZero() {return theZero; }
+
+        void printStatistics(std::ostream & os) const;
+        
       protected:
 
         /** @brief Actually creates the rule, hanldes the mappings,

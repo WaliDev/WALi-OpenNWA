@@ -4,7 +4,7 @@
 ##   ( ii) Source
 ##   (iii) Examples
 ##
-## $Id$
+## $Id: SConscript 1610 2012-01-30 23:30:19Z driscoll $
 ##
 import os, os.path, sys
 
@@ -29,8 +29,6 @@ examples = SConscript(os.path.join('Examples','SConscript'),
     duplicate=0)
 built += examples
 
-print 'parse = ', parse
-print 'xerces= ', xerces
 BaseEnv.Depends(parse,xerces)
 
 Return('built')

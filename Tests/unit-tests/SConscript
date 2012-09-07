@@ -13,6 +13,8 @@ if Debug:
 ListOfBuilds = ['glog']
 [(glog_lib, glog_inc)] = SConscript('#/ThirdParty/SConscript', 'ListOfBuilds')
 
+SConscript('#/AddOns/Domains/SConscript')
+
 env = ProgEnv.Clone()
 
 if 'cl' != env['compiler']:
@@ -25,7 +27,7 @@ env.AppendUnique(CPPPATH=['#/Tests/unit-tests/Source',
                           '#/AddOns/Domains/Source/'])
 env.AppendUnique(LIBPATH=['#/AddOns/Domains/ThirdParty/'])
 env.AppendUnique(CPPPATH=[glog_inc])
-env.AppendUnique(LIBS=[glog_lib, 'bdd', 'libwalidomains'])
+env.AppendUnique(LIBS=[glog_lib, 'bdd', 'walidomains'])
 
 #gtest and glog are ill begaved w.r.t. to these flags.
 env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
@@ -49,6 +51,7 @@ test_files = Split("""
     Source/opennwa/namespace-query/language-contains.cpp
     Source/opennwa/namespace-query/language-comparison.cpp
     Source/opennwa/namespace-query/language-is-empty.cpp
+    Source/opennwa/namespace-query/stats.cpp
     Source/opennwa/namespace-construct/complement.cpp
     Source/opennwa/namespace-construct/union.cpp
     Source/opennwa/namespace-construct/intersect.cpp

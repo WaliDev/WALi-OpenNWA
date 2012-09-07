@@ -1,7 +1,7 @@
 /**
  * @author Nicholas Kidd
  *
- * @version $Id$
+ * @version $Id: WpdsHandler.cpp 522 2009-05-28 20:17:28Z kidd $
  */
 
 #include "StrX.hpp"

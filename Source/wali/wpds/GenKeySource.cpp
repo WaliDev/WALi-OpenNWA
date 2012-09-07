@@ -1,6 +1,6 @@
 /*!
  * @author Nicholas Kidd
- * $Id$
+ * $Id: GenKeySource.cpp 418 2008-05-12 17:19:03Z kidd $
  */
 
 #include "wali/Common.hpp"

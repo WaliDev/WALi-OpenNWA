@@ -42,6 +42,10 @@ built = [
     SingleProgramTarget(env, 'expand', 'expandNwa', 'experimental')
 ]
 
+if env["HAS_BOOST_FILESYSTEM"]:
+    built.append(env.Program('nwa-synchronize-alphabets.exe', ['synchronize-alphabets.cpp'],
+                             LIBS=["boost_filesystem", "wali"]))
+
 i = env.Install(BinInstallDir, built)
 
 built = i

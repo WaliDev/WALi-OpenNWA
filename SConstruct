@@ -121,7 +121,7 @@ if 'gcc' == BaseEnv['compiler']:
        BaseEnv['CPPDEFINES']['_GLIBCXX_DEBUG'] = 1
     if strong_warnings:
         BaseEnv.Append(CCFLAGS='-Wextra $WARNING_FLAGS -fdiagnostics-show-option')
-        BaseEnv.Append(WARNING_FLAGS='-Werror -Wformat=2 -Winit-self -Wunused -Wfloat-equal -Wundef -Wpointer-arith -Wcast-align -Wwrite-strings -Wconversion -Woverloaded-virtual')
+        BaseEnv.Append(WARNING_FLAGS='-Wformat=2 -Winit-self -Wunused -Wfloat-equal -Wundef -Wpointer-arith -Wcast-align -Wwrite-strings -Wconversion -Woverloaded-virtual')
     else:
         BaseEnv.Append(WARNING_FLAGS='')
     if profile:
@@ -149,9 +149,15 @@ elif BaseEnv['compiler'] in ['cl', 'cl.EXE']:
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
 #BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , '..', 'boost')])
 try:
-    BaseEnv.Append(CPPPATH = [os.environ['BOOST_HOME']])
+        BaseEnv.Append(CPPPATH = [os.environ['BOOST_HOME']])
+        BaseEnv.Append(LIBPATH = [os.environ['BOOST_LIB']])
+        BaseEnv.Append(RPATH = [os.environ['BOOST_LIB']])
 except KeyError:
     pass
+
+conf = Configure(BaseEnv)
+BaseEnv["HAS_BOOST_FILESYSTEM"] = conf.CheckLib('boost_filesystem', language='c++')
+BaseEnv = conf.Finish()
 
 levels={'slow': 2, 'fast':1, 'none':0}
 BaseEnv['CPPDEFINES']['CHECKED_LEVEL'] = levels[CheckedLevel]

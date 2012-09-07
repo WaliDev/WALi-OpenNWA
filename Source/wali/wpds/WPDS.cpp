@@ -2,7 +2,7 @@
  * @author Nicholas Kidd
  * @author Akash Lal
  *
- * @version $Id$
+ * @version $Id: WPDS.cpp 1889 2012-05-14 16:53:32Z pprabhu $
  */
 
 #include "wali/Common.hpp"
@@ -477,7 +477,7 @@ namespace wali
 
       // Reset delta of t to zero to signify completion
       // of work for that delta
-      t->setDelta(dnew->zero());
+      t->setDelta(theZero);
 
       // For each forward rule of config
       // Apply rule to create new transition
@@ -1136,6 +1136,28 @@ namespace wali
       worklist->put( t );
     }
 
+
+    void WPDS::printStatistics(std::ostream & os) const
+    {
+      WpdsStackSymbols stack;
+      for_each(stack);
+
+      WpdsRules rules;
+      for_each(rules);
+      
+      os << "Statistics for WPDS " << this << ":\n"
+         << "   control states: " << num_pds_states() << "\n"
+         << "\n"
+         << "   stack symbols: " << stack.gamma.size() << "\n"
+         << "   call points:   " << stack.callPoints.size() << "\n"
+         << "   entry points:  " << stack.entryPoints.size() << "\n"
+         << "   return points: " << stack.returnPoints.size() << "\n"
+         << "\n"
+         << "   rules:  " << rules.pushRules.size() + rules.popRules.size() + rules.stepRules.size() << "\n"
+         << "   pushes: " << rules.pushRules.size() << "\n"
+         << "   steps:  " << rules.stepRules.size() << "\n"
+         << "   pops:   " << rules.popRules.size() << "\n";
+    }
   } // namespace wpds
 
 } // namespace wali

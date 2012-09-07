@@ -151,15 +151,15 @@ BddContext::BddContext(int bddMemSize, int cacheSize) :
   numBddContexts++;
   //release mutex
 
-  baseSwap = bdd_newpair();
-  baseRightShift = bdd_newpair();
-  tensorRightShift = bdd_newpair(); 
-  baseRestore = bdd_newpair();
-  tensorRestore = bdd_newpair();
-  move2Tensor1 = bdd_newpair();
-  move2Tensor2 = bdd_newpair();
-  move2Base = bdd_newpair();
-  move2BaseTwisted = bdd_newpair();
+  baseSwap = BddPairPtr(bdd_newpair());
+  baseRightShift = BddPairPtr(bdd_newpair());
+  tensorRightShift = BddPairPtr(bdd_newpair());
+  baseRestore = BddPairPtr(bdd_newpair());
+  tensorRestore = BddPairPtr(bdd_newpair());
+  move2Tensor1 = BddPairPtr(bdd_newpair());
+  move2Tensor2 = BddPairPtr(bdd_newpair());
+  move2Base = BddPairPtr(bdd_newpair());
+  move2BaseTwisted = BddPairPtr(bdd_newpair());
 
   //initialize static bdds
   baseSecBddContextSet = bddtrue;
@@ -198,7 +198,10 @@ BddContext::BddContext(const BddContext& other) :
   cachedBaseZero(other.cachedBaseZero),
   cachedTensorOne(other.cachedTensorOne),
   cachedTensorZero(other.cachedTensorZero)
-{}
+{
+  numBddContexts++;
+  populateCache();
+}
 
 BddContext& BddContext::operator = (const BddContext& other)
 {
@@ -222,6 +225,7 @@ BddContext& BddContext::operator = (const BddContext& other)
     cachedBaseZero=other.cachedBaseZero;
     cachedTensorOne=other.cachedTensorOne;
     cachedTensorZero=other.cachedTensorZero;
+    populateCache();
   }
   return *this;
 }
@@ -229,25 +233,17 @@ BddContext& BddContext::operator = (const BddContext& other)
 
 BddContext::~BddContext()
 {
-  bdd_freepair(baseSwap);
-  baseSwap = NULL;
-  bdd_freepair(baseRightShift);
-  baseRightShift = NULL;
-  bdd_freepair(tensorRightShift);
-  tensorRightShift = NULL;
-  bdd_freepair(baseRestore);
-  baseRestore = NULL;
-  bdd_freepair(tensorRestore);
-  tensorRestore = NULL;
-  bdd_freepair(move2Tensor1);
-  move2Tensor1 = NULL;
-  bdd_freepair(move2Tensor2);
-  move2Tensor2 = NULL;
-  bdd_freepair(move2Base);
-  move2Base = NULL;
-  bdd_freepair(move2BaseTwisted);
-  move2BaseTwisted = NULL;
-
+  // shared_ptr::reset sets it to NULL
+  baseSwap.reset();
+  baseRightShift.reset();
+  tensorRightShift.reset();
+  baseRestore.reset();
+  tensorRestore.reset();
+  move2Tensor1.reset();
+  move2Tensor2.reset();
+  move2Base.reset();
+  move2BaseTwisted.reset();
+  
   baseSecBddContextSet = bddtrue;
   tensorSecBddContextSet = bddtrue;
   commonBddContextSet23 = bddtrue;
@@ -340,25 +336,25 @@ void BddContext::addIntVar(std::string name, unsigned size)
 
   //We will now update all the cached bdds and bddpairs 
   //update bddPairs
-  fdd_setpair(baseSwap, varInfo->baseLhs, varInfo->baseRhs);
-  fdd_setpair(baseSwap, varInfo->baseRhs, varInfo->baseLhs);
-  fdd_setpair(baseRightShift,varInfo->baseLhs,varInfo->baseRhs);
-  fdd_setpair(baseRightShift,varInfo->baseRhs,varInfo->baseExtra);
-  fdd_setpair(tensorRightShift,varInfo->tensor1Lhs,varInfo->tensor1Rhs);
-  fdd_setpair(tensorRightShift,varInfo->tensor2Lhs,varInfo->tensor2Rhs);
-  fdd_setpair(tensorRightShift,varInfo->tensor1Rhs,varInfo->tensor1Extra);
-  fdd_setpair(tensorRightShift,varInfo->tensor2Rhs,varInfo->tensor2Extra);
-  fdd_setpair(baseRestore,varInfo->baseExtra,varInfo->baseRhs);
-  fdd_setpair(tensorRestore,varInfo->tensor1Extra,varInfo->tensor1Rhs);
-  fdd_setpair(tensorRestore,varInfo->tensor2Extra,varInfo->tensor2Rhs);
-  fdd_setpair(move2Tensor1,varInfo->baseLhs,varInfo->tensor1Lhs);
-  fdd_setpair(move2Tensor1,varInfo->baseRhs,varInfo->tensor1Rhs);
-  fdd_setpair(move2Tensor2,varInfo->baseLhs,varInfo->tensor2Lhs);
-  fdd_setpair(move2Tensor2,varInfo->baseRhs,varInfo->tensor2Rhs);
-  fdd_setpair(move2Base,varInfo->tensor1Lhs,varInfo->baseLhs);
-  fdd_setpair(move2Base,varInfo->tensor2Rhs,varInfo->baseRhs);
-  fdd_setpair(move2BaseTwisted,varInfo->tensor1Rhs,varInfo->baseLhs);
-  fdd_setpair(move2BaseTwisted,varInfo->tensor2Rhs,varInfo->baseRhs);
+  fdd_setpair(baseSwap.get(), varInfo->baseLhs, varInfo->baseRhs);
+  fdd_setpair(baseSwap.get(), varInfo->baseRhs, varInfo->baseLhs);
+  fdd_setpair(baseRightShift.get(), varInfo->baseLhs, varInfo->baseRhs);
+  fdd_setpair(baseRightShift.get(), varInfo->baseRhs, varInfo->baseExtra);
+  fdd_setpair(tensorRightShift.get(), varInfo->tensor1Lhs, varInfo->tensor1Rhs);
+  fdd_setpair(tensorRightShift.get(), varInfo->tensor2Lhs, varInfo->tensor2Rhs);
+  fdd_setpair(tensorRightShift.get(), varInfo->tensor1Rhs, varInfo->tensor1Extra);
+  fdd_setpair(tensorRightShift.get(), varInfo->tensor2Rhs, varInfo->tensor2Extra);
+  fdd_setpair(baseRestore.get(), varInfo->baseExtra, varInfo->baseRhs);
+  fdd_setpair(tensorRestore.get(), varInfo->tensor1Extra, varInfo->tensor1Rhs);
+  fdd_setpair(tensorRestore.get(), varInfo->tensor2Extra, varInfo->tensor2Rhs);
+  fdd_setpair(move2Tensor1.get(), varInfo->baseLhs, varInfo->tensor1Lhs);
+  fdd_setpair(move2Tensor1.get(), varInfo->baseRhs, varInfo->tensor1Rhs);
+  fdd_setpair(move2Tensor2.get(), varInfo->baseLhs, varInfo->tensor2Lhs);
+  fdd_setpair(move2Tensor2.get(), varInfo->baseRhs, varInfo->tensor2Rhs);
+  fdd_setpair(move2Base.get(), varInfo->tensor1Lhs, varInfo->baseLhs);
+  fdd_setpair(move2Base.get(), varInfo->tensor2Rhs, varInfo->baseRhs);
+  fdd_setpair(move2BaseTwisted.get(), varInfo->tensor1Rhs, varInfo->baseLhs);
+  fdd_setpair(move2BaseTwisted.get(), varInfo->tensor2Rhs, varInfo->baseRhs);
   //update static bdds
   baseSecBddContextSet = baseSecBddContextSet & fdd_ithset(varInfo->baseRhs);
   tensorSecBddContextSet = tensorSecBddContextSet & fdd_ithset(varInfo->tensor1Rhs);
@@ -483,13 +479,13 @@ binrel_t BinRel::Compose( binrel_t that ) const
 #endif
   bdd c;
   if(!isTensored){
-    bdd temp1 = bdd_replace(that->rel,con->baseRightShift);
-    bdd temp2 = bdd_relprod(rel,temp1,con->baseSecBddContextSet);
-    c = bdd_replace(temp2,con->baseRestore);
+    bdd temp1 = bdd_replace(that->rel, con->baseRightShift.get());
+    bdd temp2 = bdd_relprod(rel, temp1, con->baseSecBddContextSet);
+    c = bdd_replace(temp2, con->baseRestore.get());
   }else{
-    bdd temp1 = bdd_replace(that->rel,con->tensorRightShift);
-    bdd temp2 = bdd_relprod(rel,temp1,con->tensorSecBddContextSet);
-    c = bdd_replace(temp2,con->tensorRestore);
+    bdd temp1 = bdd_replace(that->rel, con->tensorRightShift.get());
+    bdd temp2 = bdd_relprod(rel, temp1, con->tensorSecBddContextSet);
+    c = bdd_replace(temp2, con->tensorRestore.get());
   }
 #ifdef BINREL_STATS
   BinRel::numCompose++;
@@ -560,7 +556,7 @@ binrel_t BinRel::Transpose() const
     return new BinRel(con, bddfalse, true);
   }
 #endif
-  bdd c = bdd_replace(rel, con->baseSwap);
+  bdd c = bdd_replace(rel, con->baseSwap.get());
 #ifdef BINREL_STATS
   BinRel::numTranspose++;
 #endif
@@ -578,8 +574,8 @@ binrel_t BinRel::Kronecker(binrel_t that) const
     return new BinRel(con, bddfalse, true);
   }
 #endif
-  bdd rel1 = bdd_replace(rel, con->move2Tensor1);
-  bdd rel2 = bdd_replace(that->rel, con->move2Tensor2);
+  bdd rel1 = bdd_replace(rel, con->move2Tensor1.get());
+  bdd rel2 = bdd_replace(that->rel, con->move2Tensor2.get());
   bdd c = rel1 & rel2;
 #ifdef BINREL_STATS
   BinRel::numKronecker++;
@@ -600,7 +596,7 @@ binrel_t BinRel::Eq23Project() const
 #endif
   bdd rel1 = rel & con->commonBddContextId23; 
   bdd rel2 = bdd_exist(rel1, con->commonBddContextSet23);
-  bdd c = bdd_replace(rel2, con->move2Base);
+  bdd c = bdd_replace(rel2, con->move2Base.get());
 #ifdef BINREL_STATS
   BinRel::numEq23Project++;
 #endif
@@ -620,7 +616,7 @@ binrel_t BinRel::Eq13Project() const
 #endif
   bdd rel1 = rel & con->commonBddContextId13; 
   bdd rel2 = bdd_exist(rel1, con->commonBddContextSet13);
-  bdd c = bdd_replace(rel2, con->move2BaseTwisted);
+  bdd c = bdd_replace(rel2, con->move2BaseTwisted.get());
 #ifdef BINREL_STATS
   BinRel::numEq13Project++;
 #endif

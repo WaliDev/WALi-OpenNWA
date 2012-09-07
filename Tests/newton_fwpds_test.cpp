@@ -463,7 +463,7 @@ int main(int argc, char ** argv)
     }
     if(dump){
       fstream innfa("kleene_in_fa.dot", fstream::out);
-      TransDotty td(innfa,false);
+      TransDotty td(innfa,false, NULL);
       innfa << "digraph{" << endl;
       fa.for_each(td);
       innfa << "}" << endl;
@@ -478,7 +478,7 @@ int main(int argc, char ** argv)
     outfa.for_each(fac);
     if(dump){
       fstream outfaf("kleene_out_fa.dot", fstream::out);
-      TransDotty td(outfaf,false);
+      TransDotty td(outfaf,false, NULL);
       outfaf << "digraph{" << endl;
       outfa.for_each(td);
       outfaf << "}" << endl;
@@ -520,7 +520,7 @@ int main(int argc, char ** argv)
     }
     if(dump){
       fstream innfa("newton_in_fa.dot", fstream::out);
-      TransDotty td(innfa,false);
+      TransDotty td(innfa,false, NULL);
       innfa << "digraph{" << endl;
       fa.for_each(td);
       innfa << "}" << endl;
@@ -535,7 +535,7 @@ int main(int argc, char ** argv)
     outfa.for_each(fac);
     if(dump){
       fstream outfaf("newton_out_fa.dot", fstream::out);
-      TransDotty td(outfaf,false);
+      TransDotty td(outfaf,false, NULL);
       outfaf << "digraph{" << endl;
       outfa.for_each(td);
       outfaf << "}" << endl;

@@ -224,5 +224,5 @@ namespace wali
 } // namespace wali
 
 /*!
- * @version $Id$
+ * @version $Id: Regex.cpp 418 2008-05-12 17:19:03Z kidd $
  */

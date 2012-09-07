@@ -1,7 +1,7 @@
 /*!
  * @author Nicholas Kidd
  *
- * @version $Id$
+ * @version $Id: Witness.cpp 1830 2012-04-19 19:46:18Z pprabhu $
  */
 
 #include "wali/Common.hpp"
@@ -10,7 +10,9 @@
 #include "wali/witness/WitnessCombine.hpp"
 #include "wali/witness/Visitor.hpp"
 #include "wali/witness/VisitorPrinter.hpp"
+
 #include <typeinfo>
+#include <map>
 
 namespace wali
 {
@@ -57,12 +59,16 @@ namespace wali
 
     int Witness::COUNT = 0;
 
-    Witness::Witness( sem_elem_t set ) : user_se(set),isEmpty(false)
+    Witness::Witness( sem_elem_t set )
+      : user_se(set)
+      , isEmpty(false)
     {
       COUNT++;
     }
 
-    Witness::Witness( sem_elem_t se, bool ie) : user_se(se),isEmpty(ie)
+    Witness::Witness( sem_elem_t se, bool ie)
+      : user_se(se)
+      , isEmpty(ie)
     {
       COUNT++;
     }
@@ -86,12 +92,32 @@ namespace wali
 
     sem_elem_t Witness::one() const
     {
-      return new Witness( user_se->one(),true );
+      return new Witness(user_se->one(), true);
     }
 
     sem_elem_t Witness::zero() const
     {
-      return new Witness( user_se->zero(),true );
+      sem_elem_t user_zero = user_se->zero();
+      
+#if defined(WALI_WITNESS_CACHE_ZEROES)
+      // Currently Witness will create a new zero every time it is called. If
+      // this becomes a problem, here's an alternate implementation that does
+      // not. However, it can be a regression if the weights the witnesses
+      // are wrapping don't cache their own zeros and ones, or if many many
+      // many different kinds of weights are used.
+
+      typedef std::map<sem_elem_t, sem_elem_t> ZeroCache;
+      static ZeroCache zero_cache;
+     
+      ZeroCache::iterator zit = zero_cache.find(user_zero);
+      if (zit == zero_cache.end()) {
+        zit = zero_cache.insert(std::make_pair(user_zero, new Witness(user_zero, true))).first;
+      }
+      assert(zit->second.get_ptr() != NULL);
+      return zit->second;
+#else
+      return new Witness(user_zero, true);
+#endif
     }
 
     sem_elem_t Witness::extend( SemElem * se )
@@ -210,6 +236,6 @@ namespace wali
 }   // namespace wali
 
 /*
- * $Id$
+ * $Id: Witness.cpp 1830 2012-04-19 19:46:18Z pprabhu $
  */
 

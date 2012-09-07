@@ -1,6 +1,6 @@
 /**
  * @author Nicholas Kidd
- * @version $Id$
+ * @version $Id: BinRel_old.cpp 1645 2012-02-12 00:35:49Z pprabhu $
  */
 
 #include "wali/domains/binrel/BinRel.hpp"

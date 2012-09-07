@@ -56,7 +56,18 @@ namespace wali
     class State;
     class TransFunctor;
     class ConstTransFunctor;
-    class DeterminizeWeightGen;
+    struct DeterminizeWeightGen;
+
+    /**
+     * "Callbacks" for outputting attributes in the Dot.
+     */
+    struct DotAttributePrinter {
+      virtual void print_extra_attributes(State const * state, std::ostream& o) = 0;
+      virtual void print_extra_attributes(ITrans const * trans, std::ostream& o) = 0;
+      virtual ~DotAttributePrinter() {}
+    };
+
+      
 
     /** @class WFA
      *
@@ -88,6 +99,7 @@ namespace wali
         typedef wali::HashMap< Key , TransSet > eps_map_t;
         typedef std::set< State*,State > StateSet_t;
         typedef wali::HashMap< Key,StateSet_t > PredHash_t;
+        typedef wali::HashMap< Key, std::vector<ITrans*> > IncomingTransMap_t;
 
         friend class ::wali::wpds::WPDS;
         friend class ::wali::wpds::DebugWPDS;
@@ -409,7 +421,8 @@ namespace wali
          */
         virtual std::ostream& print_dot(
             std::ostream& o,
-            bool print_weights=false ) const;
+            bool print_weights=false,
+            DotAttributePrinter * attribute_printer=NULL) const;
 
         /**
          * @brief marshall WFA in XML 
@@ -485,14 +498,14 @@ namespace wali
          * setupFixpoint clears each states markable flag and sets
          * the states weight to zero
          */
-        void setupFixpoint( Worklist<State>& wl, PredHash_t& preds );
+        void setupFixpoint( Worklist<State>& wl, IncomingTransMap_t* trans, PredHash_t* preds );
 
         /**
          * setupFixpoint clears each states markable flag and sets
          * the states weight to zero, and weight of final states to
          * wtFinal (or ONE if NULL)
          */
-        void setupFixpoint( Worklist<State>& wl, PredHash_t& preds, sem_elem_t wtFinal );
+        void setupFixpoint( Worklist<State>& wl, IncomingTransMap_t* trans, PredHash_t* preds, sem_elem_t wtFinal );
 
         virtual ITrans * find( 
             Key p,
@@ -593,6 +606,13 @@ namespace wali
         /// transitions from start.
         AccessibleStateMap epsilonClose(Key start) const;
 
+        /// Creates (and returns) a new WFA which is the same as *this,
+        /// except that it has no epsilon transitions.
+        ///
+        /// The combine-over-all-paths solution for every pair of states has
+        /// the same value in this and the original.
+        WFA removeEpsilons() const;
+
         /// Starting from the states in 'start' (with the given weight),
         /// simulate running the word 'word'. Return the list of accessible
         /// states, and the weights with which they can be accessed.
@@ -663,6 +683,9 @@ namespace wali
         std::map<Key, std::set<Key> >
         next_states(WFA const & wfa, std::set<Key> const & froms);
 
+
+        //// Prints to 'os' statistics about this WFA. 
+        void printStatistics(std::ostream & os) const;
     };
 
   } // namespace wfa

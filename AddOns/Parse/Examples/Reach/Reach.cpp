@@ -1,6 +1,6 @@
 /**
  * @author Nicholas Kidd
- * @version $Id$
+ * @version $Id: Reach.cpp 634 2009-12-28 17:16:20Z kidd $
  */
 
 #include <iostream>

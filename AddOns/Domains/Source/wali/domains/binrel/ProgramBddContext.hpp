@@ -9,6 +9,10 @@
 
 #include "buddy/fdd.h"
 
+#define BINREL_I_WANT_MINUS_TIMES_AND_DIV_EVEN_THOUGH_THEY_CAN_BE_EXPONENTIALLY_SLOW
+#define BINREL_BUILD_FAST_ADDER 0
+#define BINREL_BUILD_SLOW_ADDER 1
+
 namespace wali
 {
   namespace domains
@@ -53,7 +57,6 @@ namespace wali
           // ////////////////Boolen Expression Generators///////////////////////////////////
           bdd True() const;
           bdd False() const ;
-
           bdd And(bdd lexpr, bdd rexpr) const ;
           bdd Or(bdd lexpr, bdd rexpr) const ;
           bdd Not(bdd expr) const ;
@@ -62,9 +65,11 @@ namespace wali
           bdd Const(unsigned val) const;
 
           bdd Plus(bdd lexpr, bdd rexpr) const ;
+#ifdef BINREL_I_WANT_MINUS_TIMES_AND_DIV_EVEN_THOUGH_THEY_CAN_BE_EXPONENTIALLY_SLOW
           bdd Minus(bdd lexpr, bdd rexpr) const;
           bdd Times(bdd lexpr, bdd rexpr) const;
           bdd Div(bdd lexpr, bdd rexpr) const;
+#endif
 
           // //////////////Statement Generators/////////////////////////////////////////////
           // Statements can not be composed.

@@ -70,6 +70,7 @@ namespace wali
         // of a transition will be lost.
         state_map_t::const_iterator it = rhs.state_map.begin();
         for( ; it != rhs.state_map.end(); it++ ) {
+          // FIXME: why is this ->zero()? --EED 5/11/2012
           addState( it->first, it->second->weight()->zero() );
         }
 
@@ -606,8 +607,8 @@ namespace wali
       // BEGIN DEBUGGING
       //int numPops = 0;
       // END DEBUGGING
-      PredHash_t preds;
-      setupFixpoint( wl,preds, wt );
+      IncomingTransMap_t preds;
+      setupFixpoint( wl, &preds, NULL, wt );
       while( !wl.empty() )
       {
         State* q = wl.get();
@@ -623,47 +624,41 @@ namespace wali
         sem_elem_t ZERO = q->weight()->zero();
 
         // Find predecessor set
-        PredHash_t::iterator predHashIt = preds.find(q->name());
+        IncomingTransMap_t::iterator incomingTransIt = preds.find(q->name());
 
         // Some states may have no predecessors, like
         // the initial state
-        if(  predHashIt == preds.end() )
+        if(  incomingTransIt == preds.end() )
         {
           continue;
         }
 
         // Tell predecessors we have changed
-        StateSet_t& stateSet = predHashIt->second;
-        StateSet_t::iterator stateit = stateSet.begin();
-        for( ; stateit != stateSet.end() ; stateit++ )
+        std::vector<ITrans*> & incoming = incomingTransIt->second;
+
+        std::vector<ITrans*>::iterator transit = incoming.begin();
+        for( ; transit != incoming.end() ; ++transit )
         {
-          State* qprime = *stateit;
+          ITrans* t = *transit;
+          
+          // We are looking at a transition (q', _, q)
+          State* qprime = state_map[t->from()];
 
-          // For each Trans (q',x,q)
-          State::iterator tit = qprime->begin();
-          State::iterator titEND = qprime->end();
-          // the new W(q')
           sem_elem_t newW = qprime->weight()->zero();
-          // For each (q',_,q)
-          for( ; tit != titEND ; tit++ )
-          {
-            ITrans* t = *tit; // (q',_,q)
 
-            { // BEGIN DEBUGGING
-              //t->print( *waliErr << "\t++ Popped " ) << std::endl;
-            } // END DEBUGGING
+          { // BEGIN DEBUGGING
+            //t->print( *waliErr << "\t++ Popped " ) << std::endl;
+          } // END DEBUGGING
 
-            if( t->to() == q->name() ) {
+          assert(t->to() == q->name());
 
-              sem_elem_t extended;
-              if( query == INORDER )
-                extended = t->weight()->extend( the_delta );
-              else
-                extended = the_delta->extend( t->weight() );
-              newW = newW->combine(extended);
-            }
+          sem_elem_t extended;
+          if( query == INORDER )
+            extended = t->weight()->extend( the_delta );
+          else
+            extended = the_delta->extend( t->weight() );
+          newW = newW->combine(extended);
 
-          }
           // delta => (w+se,w-se)
           // Use extended->delta b/c we want the diff b/w the new
           // weight (extended) and what was there before
@@ -727,7 +722,7 @@ namespace wali
       // Now, do the (init_state, F) chop
       DefaultWorklist<State> wl;
       PredHash_t preds;
-      setupFixpoint( wl,preds );
+      setupFixpoint( wl,NULL,&preds );
       FOR_EACH_STATE(resetState) {
         resetState->tag = 0;
       }
@@ -918,10 +913,11 @@ namespace wali
     //
     std::ostream& WFA::print_dot(
         std::ostream& o,
-        bool print_weights ) const
+        bool print_weights,
+        DotAttributePrinter * attribute_printer ) const
     {
       o << "digraph \"WFA@" << std::hex << (void*)this << std::dec << "\" {\n";
-      TransDotty dotter( o, print_weights );
+      TransDotty dotter( o, print_weights, attribute_printer );
       for_each(dotter);
       state_map_t::const_iterator stit = state_map.begin();
       state_map_t::const_iterator stitEND = state_map.end();
@@ -936,6 +932,9 @@ namespace wali
         }
         else if( isFinalState(key) ) {
           o  << ",color=lightblue,style=filled";
+        }
+        if (attribute_printer) {
+          attribute_printer->print_extra_attributes(stit->second, o);
         }
         o << "];\n";
       }
@@ -1153,16 +1152,16 @@ namespace wali
     // Place WFA in state ready for fixpoint
     // Initialize weight on final states to be st (if it is NULL, then ONE) 
     //
-    void WFA::setupFixpoint( Worklist<State>& wl, PredHash_t& preds) {
+    void WFA::setupFixpoint( Worklist<State>& wl, IncomingTransMap_t* trans, PredHash_t* preds) {
       sem_elem_t nullwt; // treated as ONE
-      setupFixpoint(wl, preds, nullwt);
+      setupFixpoint(wl, trans, preds, nullwt);
     }
 
     //
     // Place WFA in state ready for fixpoint
     // Initialize weight on final states to be st (if it is NULL, then ONE) 
     //
-    void WFA::setupFixpoint( Worklist<State>& wl, PredHash_t& preds, sem_elem_t wtFinal )
+    void WFA::setupFixpoint( Worklist<State>& wl, IncomingTransMap_t* trans, PredHash_t* preds, sem_elem_t wtFinal )
     {
       state_map_t::iterator it = state_map.begin();
       state_map_t::iterator itEND = state_map.end();
@@ -1206,14 +1205,28 @@ namespace wali
           // (p,_,q)
           ITrans* t = *stit;
           Key toKey = t->to();
-          PredHash_t::iterator predIt = preds.find(toKey);
-          if( predIt == preds.end() ) {
-            StateSet_t stateSet;
-            predIt = preds.insert(toKey,stateSet).first;
+
+          if (preds != NULL) {
+            PredHash_t::iterator predIt = preds->find(toKey);
+            if( predIt == preds->end() ) {
+              StateSet_t stateSet;
+              predIt = preds->insert(toKey,stateSet).first;
+            }
+            //*waliErr << "Adding '" << key2str(st->name()) << "' to pred of '";
+            //*waliErr << key2str(toKey) << "'\n";
+            predIt->second.insert( st );
           }
-          //*waliErr << "Adding '" << key2str(st->name()) << "' to pred of '";
-          //*waliErr << key2str(toKey) << "'\n";
-          predIt->second.insert( st );
+
+          if (trans != NULL) {
+            IncomingTransMap_t::iterator transIt = trans->find(toKey);
+            if( transIt == trans->end() ) {
+              std::vector<ITrans*> transitions;
+              transIt = trans->insert(toKey, transitions).first;
+            }
+            //*waliErr << "Adding transition from '" << key2str(st->name()) << "' to pred of '";
+            //*waliErr << key2str(toKey) << "'\n";
+            transIt->second.push_back(t);
+          }
         }
       }
     }
@@ -1935,7 +1948,7 @@ namespace wali
           return true;
         }
         ++count;
-      } while(next_permutation(right_states.begin(), right_states.end()));
+      } while(std::next_permutation(right_states.begin(), right_states.end()));
 
       assert(count == fact(getStates().size()));
       
@@ -2010,6 +2023,144 @@ namespace wali
       complete(getKey(empty));
     }
 
+
+    WFA WFA::removeEpsilons() const
+    {
+      WFA result(*this);
+
+      std::stack<ITrans const *> eps_transitions;
+
+      // Step 1:
+      // Make a list of all epsilon transitions
+      for (eps_map_t::const_iterator eps_map_iter=result.eps_map.begin();
+           eps_map_iter != result.eps_map.end(); ++eps_map_iter)
+      {
+        TransSet const & transitions = eps_map_iter->second;
+        for (TransSet::const_iterator trans_iter = transitions.begin();
+             trans_iter != transitions.end(); ++trans_iter)
+        {
+          ITrans const * trans = *trans_iter;
+          eps_transitions.push(trans);
+
+          if (trans->from() == trans->to()) {
+            // Not sure if this is true, but I think it is...
+            std::cerr << "[WARNING] epsilon self loop found in removeEpsilons(); this may go into an infinite loop now\n";
+          }
+        }
+      }
+
+      //std::cout << "removeEpsilons():\n    step 1 found " << eps_transitions.size() << " transitions\n";
+
+      // Step 2:
+      // Copy transitions around epsilon transitons.
+      while (eps_transitions.size() > 0) {
+        ITrans const * trans = eps_transitions.top();
+        eps_transitions.pop();
+
+        Key eps_source = trans->from();
+        Key eps_dest = trans->to();
+        sem_elem_t eps_weight = trans->weight();
+
+        //std::cout << "    Looking at " << key2str(eps_source) << " --> " << key2str(eps_dest) << "\n";
+
+        // OK. kp_map_t maps from (source * stack) -> {trans}. Furthermore,
+        // this is a hash map so is not in any particular order, which means
+        // we have to loop over the whole dang thing. (If we had an explicit
+        // list of symbols we could do (for every symbol) but we can't.)
+        for(kp_map_t::const_iterator group = kpmap.begin();
+            group != kpmap.end(); ++group)
+        {
+          if (group->first.first == eps_dest) {
+            // If we get in here, we're looking at outgoing transitions from
+            // (source) on *some* symbol. So loop over all the transitions
+            // from that state, "copy" them to eps_source. If we find another
+            // epsilon transition, be sure to add it so we do this again in
+            // the future.
+            TransSet const & nexts = group->second;
+            for (TransSet::const_iterator next = nexts.begin(); next != nexts.end(); ++next) {
+              //std::cout << "        adding " << key2str(eps_source) << " to " << key2str((*next)->to()) << " on " << key2str((*next)->stack()) << "\n";
+              result.addTrans(eps_source,
+                              (*next)->stack(),
+                              (*next)->to(),
+                              eps_weight->extend((*next)->weight()));
+              if ((*next)->stack() == WALI_EPSILON) {
+                eps_transitions.push(result.find(eps_source,
+                                                 (*next)->stack(),
+                                                 (*next)->to()));
+              }
+            }
+          }
+        }
+      }
+      
+      // Step 3:
+      // Make another list of all epsilon transitions. (We destroyed the last
+      // one, and even if we hadn't, we would have needed to keep it
+      // up-to-date.)
+      for (eps_map_t::const_iterator eps_map_iter=result.eps_map.begin();
+           eps_map_iter != result.eps_map.end(); ++eps_map_iter)
+      {
+        TransSet const & transitions = eps_map_iter->second;
+        for (TransSet::const_iterator trans_iter = transitions.begin();
+             trans_iter != transitions.end(); ++trans_iter)
+        {
+          ITrans const * trans = *trans_iter;
+          eps_transitions.push(trans);
+          
+          if (trans->from() == trans->to()) {
+            // Not sure if this is true, but I think it is...
+            std::cerr << "[WARNING] epsilon self loop found in removeEpsilons(); this may go into an infinite loop now\n";
+          }
+        }
+      }
+
+      // Step 4:
+      // Remove all epsilon transitions.
+      while (eps_transitions.size() > 0) {
+        ITrans const * trans = eps_transitions.top();
+        eps_transitions.pop();
+        assert(trans->stack() == WALI_EPSILON);
+        if (result.isFinalState(trans->to())) {
+          result.addFinalState(trans->from());
+        }
+        result.erase(trans->from(), WALI_EPSILON, trans->to());
+        // TODO: delete trans? Who holds ownership?
+      }
+
+      // Step 5:
+      // Sanity check
+      for (eps_map_t::const_iterator eps_map_iter=result.eps_map.begin();
+           eps_map_iter != result.eps_map.end(); ++eps_map_iter)
+      {
+        TransSet const & transitions = eps_map_iter->second;
+        assert(transitions.size() == 0);
+      }
+
+      return result;
+    }
+    
+
+    //// Prints to 'os' statistics about this WFA. 
+    void WFA::printStatistics(std::ostream & os) const
+    {
+      TransCounter counter;
+      for_each(counter);
+
+      std::set<Key> symbols;
+      for(kp_map_t::const_iterator it = kpmap.begin();
+          it != kpmap.end(); ++it)
+      {
+        symbols.insert(it->first.second);
+      }
+
+      os << "Statistics for WFA " << this << ":\n"
+         << "              states: " << numStates() << "\n"
+         << "    accepting states: " << getFinalStates().size() << "\n"
+         << "             symbols: " << symbols.size() << "\n"
+         << "         transitions: " << counter.getNumTrans() << "\n";
+    }
+      
+    
   } // namespace wfa
 
 } // namespace wali

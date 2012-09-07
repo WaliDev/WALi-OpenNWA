@@ -1,6 +1,6 @@
 /**
  * @author Nicholas Kidd
- * @version $Id$
+ * @version $Id: UserFactoryHandler.cpp 478 2008-11-24 19:33:16Z kidd $
  */
 
 #include "StrX.hpp"

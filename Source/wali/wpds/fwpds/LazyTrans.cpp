@@ -1,7 +1,7 @@
 /*!
  * @author Akash Lal
  * @author Nicholas Kidd
- * $Id$
+ * $Id: LazyTrans.cpp 1099 2011-06-07 22:22:04Z driscoll $
  */
 
 // ::wali::wfa

@@ -1,7 +1,7 @@
 /*!
  * @author Nick Kidd
  *
- * $Id$
+ * $Id: t1.cpp 418 2008-05-12 17:19:03Z kidd $
  *
  * Tests WFA intersection.
  */

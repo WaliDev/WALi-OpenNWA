@@ -59,7 +59,7 @@ namespace opennwa {
                 std::sort(c.begin(), c.end());
             }
 
-            TEST(opennwa$nwa_pds$$NwaToWpdsCalls, testBatteryOfVariouslyBalancedNwas)
+            TEST(opennwa$nwa_pds$$NwaToWpdsCalls, DISABLED_testBatteryOfVariouslyBalancedNwas)
             {
                 vector<Nwa> nwas = test_nwas();
                 for (size_t nwa = 0 ; nwa < nwas.size() ; ++nwa) {

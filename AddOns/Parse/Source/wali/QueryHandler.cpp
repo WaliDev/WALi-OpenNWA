@@ -1,7 +1,7 @@
 /**
  * @author Nicholas Kidd
  *
- * @version $Id$
+ * @version $Id: QueryHandler.cpp 557 2009-10-19 18:51:54Z kidd $
  */
 
 #include "StrX.hpp"

@@ -96,6 +96,7 @@ nice_files = Split("""
 ./opennwa/query/internals.cpp
 ./opennwa/query/language.cpp
 ./opennwa/query/getSomeAcceptedWord.cpp
+./opennwa/query/stats.cpp
 ./opennwa/construct/nwa_complement.cpp
 ./opennwa/construct/nwa_concat.cpp
 ./opennwa/construct/nwa_reverse.cpp

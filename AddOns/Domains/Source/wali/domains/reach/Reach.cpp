@@ -1,6 +1,6 @@
 /**
  * @author Nicholas Kidd
- * @version $Id$
+ * @version $Id: Reach.cpp 485 2008-12-09 17:52:40Z kidd $
  */
 
 #include "Reach.hpp"

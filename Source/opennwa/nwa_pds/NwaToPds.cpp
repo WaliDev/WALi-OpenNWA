@@ -117,16 +117,16 @@ namespace opennwa
                            WeightGen::EXIT_TO_RET,
                            tgt, getClientInfo(tgt));  // w            
 
-      Key rstate = nwa_pds::getControlLocation(src,Trans::getCallSite(*rit),tgt);    //p_q_xcr
+      Key rstate = nwa_pds::getControlLocation(src); // p_exit
 
       result.add_rule(program,                    //from_state (p)
                       src,                        //from_stack (q_x)
-                      rstate,                     //to_state (p_q_xcr == (p,q_x,q_c,q_c))
+                      rstate,                     //to_state (p_exit)
                       wgt);                       //weight  (w)
 
       wgt = wg.getOne();                          // 1
 
-      result.add_rule(rstate,                     //from_state (p_q_xcr == (p,q_x,q_c,q_r))
+      result.add_rule(rstate,                     //from_state (p_exit)
                       tgt,                        //from_stack (q_r)
                       program,                    //to_state (p)
                       tgt,                        //to_stack (q_r)
@@ -194,16 +194,16 @@ namespace opennwa
                                WeightGen::CALL_TO_ENTRY,  
                                tgt, getClientInfo(tgt)); // w    
 
-          Key cstate = nwa_pds::getControlLocation(tgt,Trans::getReturnSite(*rit),src);    //p_q_erc
+          Key cstate = nwa_pds::getControlLocation(tgt); //p_entry
 
           result.add_rule(program,                    //from_state (p)
                           Trans::getEntry(*cit),      //from_stack (q_e)
-                          cstate,                     //to_state (p_q_erc == (p,q_e,q_r,q_c))
+                          cstate,                     //to_state (p_entry)
                           wgt);                       //weight (w)
 
           wgt = wg.getOne();                          // 1
             
-          result.add_rule(cstate,                     //from_state (p_q_erc == (p,q_e,q_r,q_c))
+          result.add_rule(cstate,                     //from_state (p_entry)
                           src,                        //from_stack (q_c)
                           program,                    //to_state (p)
                           src,                        //to_stack (q_c)
@@ -327,22 +327,22 @@ namespace opennwa
                            WeightGen::EXIT_TO_RET,  
                            tgt, getClientInfo(tgt));    // w     
 
-      //Note: if you change this, make sure you modify the code in NWPForest.createCA()
-      Key rstate = nwa_pds::getControlLocation(src,Trans::getCallSite(*rit),tgt);  //p_q_xcr
+      // Create p_exit (called p_{q_x} in the TR)
+      Key rstate = nwa_pds::getControlLocation(src);
 
-      result.add_rule(program,                              //from_state (p)
-                      src,                                  //from_stack (q_x)
-                      rstate,                               //to_state (p_q_xcr == (p,q_x,q_c,q_r))
-                      wgt);                                 //weight (w)
+      result.add_rule(program,   //from_state (p)
+                      src,       //from_stack (q_x)
+                      rstate,    //to_state (p_exit)
+                      wgt);      //weight (w)
 
         
-      wgt = wg.getOne();                                    // 1                      
+      wgt = wg.getOne(); // 1                      
          
-      result.add_rule(rstate,                               //from_state (p_q_xcr == (p,q_x,q_c,q_r))
-                      Trans::getCallSite(*rit),             //from_stack (q_c)
-                      program,                              //to_state (p)
-                      tgt,                                  //to_stack (q_r)
-                      wgt);                                 //weight (1)
+      result.add_rule(rstate,                   //from_state (p_exit)
+                      Trans::getCallSite(*rit), //from_stack (q_c)
+                      program,                  //to_state (p)
+                      tgt,                      //to_stack (q_r)
+                      wgt);                     //weight (1)
     }
 
     return result;
@@ -406,16 +406,16 @@ namespace opennwa
                                WeightGen::CALL_TO_ENTRY,
                                tgt, getClientInfo(tgt));         // w                  
 
-          Key cstate = nwa_pds::getControlLocation(tgt,Trans::getReturnSite(*rit),src);  //p_q_erc
+          Key cstate = nwa_pds::getControlLocation(tgt);  //p_entry
 
           result.add_rule(program,                              //from_state (p)
                           tgt,                                  //from_stack (q_e)
-                          cstate,                               //to_state (p_q_erc == (p,q_e,q_r,q_c))
+                          cstate,                               //to_state (p_entry)
                           wgt);                                 //weight (w)  
 
           wgt = wg.getOne();                                    // 1
 
-          result.add_rule(cstate,                               //from_state (p_q_erc == (p,q_e,q_r,q_c))
+          result.add_rule(cstate,                               //from_state (p_entry)
                           Trans::getReturnSite(*rit),           //from_stack (q_r)
                           program,                              //to_state (p)
                           src,                                  //to_stack (q_c)

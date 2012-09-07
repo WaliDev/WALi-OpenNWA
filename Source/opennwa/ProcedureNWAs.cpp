@@ -141,6 +141,7 @@ namespace opennwa {
 
 
     // Finally, we remove the __call__ symbols from the automaton.
+    std::set<Symbol> to_remove;
     for (Nwa::SymbolIterator symiter = finalnwa->beginSymbols();
          symiter != finalnwa->endSymbols(); ++symiter)
     {
@@ -152,9 +153,13 @@ namespace opennwa {
         assert(query::getCallSites_Sym(*finalnwa, symbol).size() == 0);
         assert(query::getExits_Sym(*finalnwa, symbol).size() == 0);
 
-        // Now remove it
-        finalnwa->removeSymbol(symbol);
+        // Now schedule it for removal
+        to_remove.insert(symbol);
       }
+    }
+
+    for (std::set<Symbol>::iterator s=to_remove.begin(); s!=to_remove.end(); ++s){
+      finalnwa->removeSymbol(*s);
     }
 
 

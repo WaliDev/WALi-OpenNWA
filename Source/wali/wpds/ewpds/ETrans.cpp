@@ -1,6 +1,6 @@
 /*!
  * @author Nicholas Kidd
- * $Id$
+ * $Id: ETrans.cpp 1099 2011-06-07 22:22:04Z driscoll $
  */
 
 #include "wali/Common.hpp"
