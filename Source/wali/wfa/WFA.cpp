@@ -605,7 +605,7 @@ namespace wali
     void WFA::path_summary( Worklist<State>& wl, sem_elem_t wt )
     {
       // BEGIN DEBUGGING
-      int numPops = 0;
+      //int numPops = 0;
       // END DEBUGGING
       IncomingTransMap_t preds;
       setupFixpoint( wl, &preds, NULL, wt );
@@ -616,7 +616,7 @@ namespace wali
         q->delta() = the_delta->zero();
 
         { // BEGIN DEBUGGING
-          numPops++;
+          //numPops++;
           //q->print( *waliErr << "  Popped: " ) << std::endl;
         } // END DEBUGGING
 
@@ -1175,10 +1175,14 @@ namespace wali
         // Do it here b/c we do not have a way to
         // get the ONE and ZERO weights w/out first
         // having a weight, i.e. st->weight()
-        if( first ) {
-          ONE = st->weight()->one();
-          ZERO = st->weight()->zero();
-          if(wtFinal.get_ptr() == NULL) {
+        // Further if wtFinal was provided, use that.
+        if(first){
+          if(wtFinal!=NULL){
+            ONE = wtFinal->one();
+            ZERO = wtFinal->zero();
+          }else{
+            ONE = st->weight()->one();
+            ZERO = st->weight()->zero();
             wtFinal = ONE;
           }
           first = false;

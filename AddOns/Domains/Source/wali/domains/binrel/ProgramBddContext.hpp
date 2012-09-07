@@ -47,8 +47,8 @@ namespace wali
           /** Add a int variable to the vocabulary with the name 'name'. The integer can take values
            * between 0...size-1. **/
           virtual void addIntVar(std::string name, unsigned size);
-
-          std::ostream& print(std::ostream& o);
+         
+          std::ostream& print(std::ostream& o) const;
 
           // ////////////////Create a expression for the variable var///////////////////////
           bdd From(std::string var) const;
@@ -78,7 +78,7 @@ namespace wali
           bdd Assume(bdd expr1, bdd expr2) const;
 
           // //////////////Generates a random bdd///////////////////////////////////////////
-          bdd tGetRandomTransformer(bool isTensored = false, unsigned seed=0);
+          bdd tGetRandomTransformer(bool isTensored = false, unsigned seed=0) const;
 
         private:
           // This is the bdd index of the size info in each bdd

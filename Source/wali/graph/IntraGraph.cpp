@@ -4,8 +4,12 @@
 #include "wali/graph/LinkEval.hpp"
 #include "wali/graph/GraphCommon.hpp"
 
-#include <iostream>
+//debugging
+//#include "wali/graph/NewtonLogger.hpp"
 
+#include <iostream>
+#include <sstream>
+#include <fstream>
 using namespace std;
 
 namespace wali {
@@ -38,11 +42,20 @@ namespace wali {
     }
 
     int IntraGraph::edgeno(int s, int t) {
-      list<int>::iterator it = nodes[s].outgoing.begin();
-      for(; it != nodes[s].outgoing.end(); it++) {
-        if(edges[*it].tgt == t) {
+      // For newton, the source node 0 has many edges going out.
+      // On the other hand, all nodes have only a small number 
+      // of edges coming in. So we change this to the equivalent
+      // use of incoming edges instead.
+      //list<int>::iterator it = nodes[s].outgoing.begin();
+      //for(; it != nodes[s].outgoing.end(); it++) {
+      //  if(edges[*it].tgt == t) {
+      //    return *it;
+      //  }
+      //}
+      list<int>::iterator it = nodes[t].incoming.begin();
+      for(; it != nodes[t].incoming.end(); it++){
+        if(edges[*it].src == s)
           return *it;
-        }
       }
       return -1;
     }
@@ -463,13 +476,76 @@ namespace wali {
       return true;
     }
 
-    void IntraGraph::addEdge(int s, int t, sem_elem_t se, bool updatable) {
+    sem_elem_t IntraGraph::readEdgeWeight(int s, int t) {
+      int eno = edgeno(s,t);
+      if(eno == -1) return NULL;
+      return edges[eno].weight;
+    }
+
+
+    int IntraGraph::addEdge(int s, int t, sem_elem_t se, bool updatable, functional_t exp) 
+    {
 
       create_node(s);
       create_node(t);
 
       int eno = edgeno(s,t);
+      if(eno != -1){
+        // The edge already exists.
+        edges[eno].weight = edges[eno].weight->combine(se);
+        if(!edges[eno].updatable && updatable){
+          //The original edge was not updatable, but the new is.
+          int uno = 0;
+          uno = RegExp::getNextUpdatableNumber();
+          // Create updatable RegExp node
+          RegExp::updatable(uno,se);
+          // Convert the edge to an updatable edge
+          edges[eno].updatable = true;
+          edges[eno].updatable_no = uno;
+          edges[eno].regexp = RegExp::combine(edges[eno].regexp, RegExp::updatable(uno, se));
+          edges[eno].exp = exp;
+          // Add this edge to the set of updatable edges
+          updatable_edges.push_back(eno);
+        }else if(edges[eno].updatable && updatable){
+          // The original as well as the new edge are updatable.
+          if(s != 0){
+            // We only get this situation with source nodes.
+            // otheriwise, emit warning.
+            cerr << "FWPDS: Warning, parallel updatable edges. Results may not be correct\n";
+            print_trans(nodes[edges[eno].src].trans,std::cerr);
+            std::cerr << "\n";
+            print_trans(nodes[edges[eno].tgt].trans,std::cerr);
+            std::cerr << "\n";
+          }
+          edges[eno].exp = SemElemFunctional::combine(edges[eno].exp, exp);
+        }else{
+          edges[eno].regexp = RegExp::combine(edges[eno].regexp, RegExp::constant(se));
+        }
+      }else{
+        // Create a new edge.
+        int uno = 0;
+        if(updatable){
+          uno = RegExp::getNextUpdatableNumber();
+          // Create updatable RegExp node
+          RegExp::updatable(uno,se);
+        }
+        IntraGraphEdge ed(s,t,se,updatable,uno,exp);
+        if(edges.size() == (unsigned)nedges) {
+          edges.resize(2*nedges);
+        }
+        edges[nedges] = ed; // .set(s,t,se,updatable,uno);
+        nedges++;
+        eno = nedges - 1;
+        if(updatable) {
+          edges[eno].updatable_no = uno;
+          updatable_edges.push_back(eno);
+        }
+        nodes[s].outgoing.push_back(eno);
+        nodes[t].incoming.push_back(eno);
+      }
+      return eno;
 
+#if 0
       //    if(eno != -1) {
       //      edges[eno].weight = edges[eno].weight->combine(se);
       //      return;
@@ -481,7 +557,7 @@ namespace wali {
         // create the updatable reg-exp-node
         RegExp::updatable(uno, se);
       }
-      IntraGraphEdge ed(s,t,se,updatable,uno);
+      IntraGraphEdge ed(s,t,se,updatable,uno,exp);
 
       if(eno != -1) { 
         // Edge existed before
@@ -516,7 +592,7 @@ namespace wali {
       if(updatable) {
         updatable_edges.push_back(e);
       }
-
+#endif
     }
 
     void IntraGraph::setSource(int n, sem_elem_t init_weight) {
@@ -533,6 +609,21 @@ namespace wali {
       int e = nedges - 1;
       nodes[0].outgoing.push_back(e);
       nodes[n].incoming.push_back(e);
+    }
+
+    int IntraGraph::setSource(int n, sem_elem_t init_weight, functional_t exp) 
+    {
+      create_node(n);
+      nodes[n].type = Source;
+
+      // add Edge
+      int e = addEdge(0, n, init_weight, true, exp);
+      return e;
+    }
+
+    void IntraGraph::addDependentEdge(int e, int n)
+    {
+      nodes[n].addDependentEdge(e);
     }
 
     void IntraGraph::addCallEdge(IntraGraph *next) {
@@ -657,6 +748,12 @@ namespace wali {
       assert(nno >=0 && nno < nnodes);
 
       return node_pop_weight[nno];
+    }
+
+    sem_elem_t IntraGraph::getWeight(int nno) const 
+    {
+      assert (nno >= 0 && nno < nnodes);
+      return nodes[nno].weight;
     }
 
     // Solve backward query, with initial configurations as "updates"
@@ -816,14 +913,16 @@ namespace wali {
       buildRegExp(path_sequence);
 
       { // NAK DEBUGGING REGEXP
-        //for( int i=0; i < nnodes; i++) {
-        //    nodes[i].regexp->print(std::cout<< i << ")   ") << std::endl;
-        //}
+        /*
+        for( int i=0; i < nnodes; i++) {
+          nodes[i].regexp->print(std::cout<< i << ")   ") << std::endl;
+        }
+        cout << "graph = (" << nnodes << "," << nedges << ")\n";
+        cout << "size = " << path_sequence.size() << "\n";
+        cout << "\n";
+        */
       }
 
-      //cout << "graph = (" << nnodes << "," << nedges << ")\n";
-      //cout << "size = " << path_sequence.size() << "\n";
-      //cout << "\n";
 
       STAT(stats.ndom_sequence = path_sequence.size());
       return;
@@ -911,6 +1010,10 @@ namespace wali {
 
       for(i=0;i<(int)seq.size();i++) {
         PathSequence &ps = seq[i];
+        {//DEBUGGING
+          //cout << "PATH SEQUENCE(" << ps.src << "-->" << ps.tgt << ")\n";
+          //ps.regexp->print(cout) << endl;
+        }//DEBUGGING
         if(ps.src == ps.tgt) {
           nodes[ps.src].regexp = RegExp::extend(nodes[ps.src].regexp, ps.regexp);
         } else {
@@ -1481,6 +1584,200 @@ namespace wali {
         }
       }
     }
+
+    void IntraGraph::cleanUp()
+    {
+      IntraGraph::se = NULL;
+#ifdef STATIC_MEMORY
+      if(IntraGraph::intraGraphBuffer){
+        delete IntraGraph::intraGraphBuffer;
+        IntraGraph::intraGraphBuffer = 0;
+      }
+      if(IntraGraph::childrenBuffer){
+        delete [] IntraGraph::childreBuffer;
+        IntraGraph::childrenBuffer = 0;
+      }
+      if(IntraGraph::regBuffer){
+        delete [] IntraGraph::regBuffer;
+        IntraGraph::regBuffer = 0;
+      }
+      IntraGraph::intraGraphBufferSize = 0;
+#endif
+    }
+
+    string IntraGraph::toDot()
+    {
+      std::stringstream ss;
+      for(int i = 0; i < nnodes; ++i){
+        if(i != 0){
+        const long regexpaddr = (const long) nodes[i].regexp.get_ptr();
+        ss << "node" << i << " [label=\"(" << key2str(nodes[i].trans.src) 
+          << ", " << key2str(nodes[i].trans.stack) << ", " 
+          << key2str(nodes[i].trans.tgt) << ")\\n" << regexpaddr
+          << "\"];\n";
+        }else{
+          ss << "node" << i << ";\n";
+        }
+      }
+      for(int i = 0; i < nedges; ++i){
+        if(!edges[i].updatable){
+          ss << "node" << edges[i].src << " -> node" << edges[i].tgt << ";\n";
+        }else{
+          ss << "node" << edges[i].src << " -> node" << edges[i].tgt 
+            << " [color=red, label=\"";
+          std::vector<int> leaves;
+          edges[i].exp->leafNodes(leaves);
+          for(std::vector<int>::iterator iter = leaves.begin(); iter !=
+              leaves.end(); ++iter)
+            if(*iter == 0)
+              ss << "(node 0)\\n";
+            else
+              ss << "(" << key2str(nodes[*iter].trans.src) << ", "
+                << key2str(nodes[*iter].trans.stack) << ", " <<
+                key2str(nodes[*iter].trans.tgt) << ")\\n";
+          ss << "\"];\n";
+        }
+      }
+      return ss.str();
+    }
+
+
+    // Used during Newton's method to saturate an IntraGraph corresponding to a linearized equation system
+    // Only for debugging
+    void IntraGraph::saturate(newton_logger_t nlog)
+    {
+      //nlog might be unused
+      if(nlog == NULL) {}
+
+      bool repeat = true;
+
+      while(repeat){
+        BEGIN_NEWTON_STEP(nlog);
+        //First, evaluate the current regular expressions completely.
+        BEGIN_EVALUATE_ROOTS(nlog);
+        RegExp::evaluateRoots();
+        END_EVALUATE_ROOTS(nlog);
+        RegExp::print_stats(cout);
+        
+        BEGIN_FIND_CHANGED_NODES(nlog);
+        //Now, obtain the set of nodes who's values have changed.
+        std::vector<IntraGraphNode*> changedNodes;
+        // The first node is the source node.
+        for(int i = 1; i < nnodes; ++i){
+          if(nodes[i].weight == NULL || !nodes[i].weight->equal(nodes[i].regexp->get_weight())){
+            changedNodes.push_back(&nodes[i]);
+            nodes[i].weight = nodes[i].regexp->get_weight();
+          }
+        }
+        END_FIND_CHANGED_NODES(nlog);
+        RegExp::print_stats(cout);
+
+        BEGIN_FIND_CHANGED_EDGES(nlog);
+        // Given the set of nodes who's weights have changed, find the set of mutable edges that need to
+        // be updated.
+        std::set<unsigned long> updateEdgesSet;
+        std::vector<unsigned long> updateEdges;
+        std::vector<sem_elem_t> weights;
+        for(vector<IntraGraphNode*>::const_iterator iter = changedNodes.begin(); iter != changedNodes.end(); ++iter){
+          for(std::set<int>::const_iterator ei = (*iter)->dependentEdges.begin(); ei != (*iter)->dependentEdges.end(); ++ei){
+            assert(edges[*ei].updatable);
+            int updatable_no = edges[*ei].updatable_no;
+            if(updateEdgesSet.find(updatable_no) == updateEdgesSet.end()){
+              updateEdges.push_back(updatable_no);
+              sem_elem_t wt = edges[*ei].exp->evaluate(this).get_ptr();
+              weights.push_back(wt);
+              //update the edge anyway. This weight should not be used, except for debugging.
+              edges[*ei].weight = weights.back();
+              updateEdgesSet.insert(updatable_no);
+            }
+          }
+        }
+        END_FIND_CHANGED_EDGES(nlog);
+
+        if(updateEdges.size() > 0){
+          repeat  = true;
+          BEGIN_UPDATE_EDGES(nlog);
+          RegExp::update(updateEdges, weights);
+          END_UPDATE_EDGES(nlog);
+        }else repeat = false;
+
+      END_NEWTON_STEP(nlog);
+
+#if 0
+          //DEBUGGING 
+          {
+            stringstream ss;
+            ss << "regexp" << saturateCount << "_" << round << ".dot";
+            string filename = ss.str();
+            fstream foo;
+            foo.open(filename.c_str(), fstream::out);
+            const reg_exp_hash_t& roots = RegExp::getRoots();
+            foo << "digraph {\n";
+            std::set<long> seen;
+            for(reg_exp_hash_t::const_iterator iter = roots.begin();
+                iter != roots.end();
+                ++iter){
+              (iter->second)->toDot(foo, seen, true);
+            }
+            foo << "}\n";
+            foo.close();
+          }
+
+          cout << "Weights after saturateCount" << saturateCount << 
+            ", round " << round << "\n";
+          cout << "NODES \n";
+          cout << "node0:\n";
+          if(nodes[0].weight != NULL){
+            nodes[0].weight->print(cout);
+            cout << "\n";
+            SemElemTensor * wt =
+              dynamic_cast<SemElemTensor*>(nodes[0].weight.get_ptr());
+            (wt->detensorTranspose())->print(cout);
+          }
+          else
+            cout << "NULL";
+          cout << "\n";
+          for(int i = 1; i < nnodes; i++){  
+            cout << "(" << key2str(nodes[i].trans.src) << ", " <<
+              key2str(nodes[i].trans.stack) << ", " << 
+              key2str(nodes[i].trans.tgt) << "):\n";
+            if(nodes[i].weight != NULL){
+              nodes[i].weight->print(cout);
+              cout << "\n";
+              SemElemTensor * wt =
+                dynamic_cast<SemElemTensor*>(nodes[i].weight.get_ptr());
+              (wt->detensorTranspose())->print(cout);
+            }
+            else
+              cout << "NULL";
+            cout << "\n";
+          }
+          cout << "EDGES \n";
+          for(int i = 1; i < nedges; i++){
+            //if(!edges[i].updatable) continue;
+            int src = edges[i].src;
+            int tgt = edges[i].tgt;
+            cout << "(" << key2str(nodes[src].trans.src) << ", " <<
+              key2str(nodes[src].trans.stack) << ", " << 
+              key2str(nodes[src].trans.tgt) << ") --> "
+              << "(" << key2str(nodes[tgt].trans.src) << ", " <<
+              key2str(nodes[tgt].trans.stack) << ", " << 
+              key2str(nodes[tgt].trans.tgt) << "):\n";
+            if(edges[i].weight != NULL){
+              edges[i].weight->print(cout);
+              cout << "\n";
+              SemElemTensor * wt =
+                dynamic_cast<SemElemTensor*>(edges[i].weight.get_ptr());
+              (wt->detensorTranspose())->print(cout);
+            }
+            else
+              cout << "NULL";
+            cout << "\n";
+          }
+#endif
+      }
+    }
+
 
   } // namespace graph
 } // namespace wali

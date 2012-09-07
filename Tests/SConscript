@@ -11,14 +11,15 @@ if Debug:
 
 ## ###############################
 ## Environment
-## Adding Domains paths to the enviornment
 
+## Adding Domains paths to the environment
 Env = ProgEnv.Clone()
 
 ## Note - Be sure to use a list when 'Append'ing to CPPPATH
 Env.Append(CPPPATH = [os.path.join(WaliDir,'Examples','Reach')])
 
 TestDir = os.path.join(WaliDir,'Tests')
+Export('TestDir')
 
 built = []
 
@@ -26,6 +27,19 @@ Reach = os.path.join(WaliDir,'Examples','Reach','Reach.cpp')
 for t in ['t1','t3','t4','twitness','tprune','tTransSet']:
     exe = Env.Program('%s' % t, ['%s.cpp' % t,'%s' % Reach ])
     built += Env.Install('#/Tests/harness',exe)
+
+BinRelEnv = ProgEnv.Clone()
+ListOfBuilds = ['glog']
+[(glog_lib, glog_inc)] = SConscript('#/ThirdParty/SConscript', 'ListOfBuilds')
+BinRelEnv.AppendUnique(CPPPATH = [
+  os.path.join(WaliDir,'AddOns','Domains','Source'),
+  os.path.join(WaliDir,'AddOns','Domains','ThirdParty','include'),
+  os.path.join(WaliDir,'ThirdParty','include'),
+  os.path.join(WaliDir,'AddOns','RandomFWPDS','Source')])
+randPdsGen = os.path.join(WaliDir,'AddOns','RandomFWPDS','Source','generateRandomFWPDS.cpp')
+for t in ['newton_fwpds_test']:
+  exe = BinRelEnv.Program('%s' % t, ['%s.cpp' % t, randPdsGen], LIBS=['libwalidomains','bdd','wali','glog'])
+  built += BinRelEnv.Install('#/Tests/harness',exe)
 
 Return('built')
 

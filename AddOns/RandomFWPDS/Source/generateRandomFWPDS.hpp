@@ -91,7 +91,13 @@ namespace wali
             std::ostream *o, 
             int tabstop
             );
-        std::string getName(unsigned curKey);
+        std::string getPds(unsigned curKey);
+        std::string getNode(unsigned curKey);
+        std::string getEntry(unsigned curKey);
+        std::string getExit(unsigned curKey);
+        std::string getCall(unsigned curKey);
+        std::string getRet(unsigned curKey);
+        std::string getSplit(unsigned curKey);
 
       private:
         //Configuration of the Generator as set by the constructor

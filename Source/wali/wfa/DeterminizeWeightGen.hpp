@@ -12,8 +12,9 @@ namespace wali {
     class WFA;
     class ITrans;
 
-    struct DeterminizeWeightGen
+    class DeterminizeWeightGen
     {
+    public:
       virtual ~DeterminizeWeightGen() {}
 
       /// Returns the weight for the transition from the source to target
@@ -35,8 +36,8 @@ namespace wali {
     /// nondeterministic machine) from any state in S to any state in T with
     /// the appropriate symbol, collects up all those weights, calls
     /// 'liftWeight' with each of them, and then 'combines' the result.
-    struct LiftCombineWeightGen
-      : DeterminizeWeightGen
+    class LiftCombineWeightGen
+      : public DeterminizeWeightGen
     {
       /// Overload to return the lifted weight for a nondeterministic
       /// transition.

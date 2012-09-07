@@ -4,7 +4,9 @@
 #include "wali/SemElem.hpp"
 
 #include "wali/graph/RegExp.hpp"
+#include "wali/graph/Functional.hpp"
 #include "wali/graph/GraphCommon.hpp"
+#include "wali/graph/NewtonLogger.hpp"
 
 #include <map>
 
@@ -12,7 +14,7 @@ namespace wali {
 
     namespace graph {
 
-        enum node_type {None, SuperSource, Source, OutNode};
+        enum node_type {None, SuperSource, Source, OutNode, Out1Node};
 
         struct IntraGraphStats {
             int nstar;
@@ -40,6 +42,8 @@ namespace wali {
                 nget_weight = 0;
                 t1 = t2 = t3 = t4 = t5 = 0;
             }
+
+
         };
         ostream &operator << (ostream &out, const IntraGraphStats &s);
 
@@ -49,19 +53,21 @@ namespace wali {
                 sem_elem_t weight;
                 bool updatable;
                 int updatable_no;
+                functional_t exp;
                 reg_exp_t regexp;
-                IntraGraphEdge(int s, int t, sem_elem_t w, bool u, int uno = 0) : src(s), tgt(t), weight(w), updatable(u), updatable_no(uno) {
+                IntraGraphEdge(int s, int t, sem_elem_t w, bool u, int uno = 0, functional_t e = NULL) : src(s), tgt(t), weight(w), updatable(u), updatable_no(uno), exp(e) {
                     if(updatable) 
                         regexp = RegExp::updatable(uno, weight);
                     else
                         regexp = RegExp::constant(weight);
                 }
-                void set(int s, int t, sem_elem_t w, bool u, int uno = 0) {
+                void set(int s, int t, sem_elem_t w, bool u, int uno = 0, functional_t e = NULL) {
                     src = s;
                     tgt = t;
                     weight = w;
                     updatable = u;
                     updatable_no = uno;
+                    exp = e;
                     if(updatable) 
                         regexp = RegExp::updatable(uno, weight);
                     else
@@ -74,6 +80,7 @@ namespace wali {
                     weight = e.weight;
                     updatable = e.updatable;
                     updatable_no = e.updatable_no;
+                    exp = e.exp;
                     regexp = e.regexp;
                 }
         };
@@ -102,11 +109,16 @@ namespace wali {
                 bool iscutset;
                 int visited;
                 int scc_number;
+                sem_elem_t weight;
+                std::set<int> dependentEdges; 
 
-                IntraGraphNode() : trans(0,0,0), node_no(-1), type(None) { } // creates a fake node
-                IntraGraphNode(int nno, node_type ty = None) : trans(0,0,0), node_no(nno), type(ty), iscutset(false), visited(0), scc_number(0) {}
+                IntraGraphNode() : trans(0,0,0), node_no(-1), type(None), weight(NULL){ } // creates a fake node
+                IntraGraphNode(int nno, node_type ty = None) : trans(0,0,0), node_no(nno), type(ty), iscutset(false), visited(0), scc_number(0), weight(NULL) {}
                 IntraGraphNode(const IntraGraphNode &n) : trans(n.trans), node_no(n.node_no), type(n.type), outgoing(n.outgoing), incoming(n.incoming), 
-                regexp(n.regexp), iscutset(n.iscutset), visited(n.visited), scc_number(n.scc_number) {
+                regexp(n.regexp), iscutset(n.iscutset), visited(n.visited), scc_number(n.scc_number), weight(n.weight) 
+                {
+                  for(std::set<int>::const_iterator iter = n.dependentEdges.begin(); iter != n.dependentEdges.end(); ++iter)
+                    dependentEdges.insert(*iter);
                 }
                 void set(int nno, node_type ty = None) {
                     trans = Transition(0,0,0);
@@ -115,6 +127,11 @@ namespace wali {
                     iscutset = false;
                     visited = 0;
                     scc_number = 0;
+                    weight = NULL;
+                }
+                void addDependentEdge(int e)
+                {
+                  dependentEdges.insert(e);
                 }
         };
 
@@ -237,16 +254,22 @@ namespace wali {
                 Transition t(0,0,0);
                 return makeNode(t);
             }
-            void addEdge(int src, int tgt, sem_elem_t se, bool updatable = false);
+            
+            // @return The index of the newly created / existing edge.
+            int addEdge(int src, int tgt, sem_elem_t se, bool updatable = false, functional_t e = NULL);
             void setSource(int t, sem_elem_t se);
+            int setSource(int t, sem_elem_t se, functional_t exp);
+            void addDependentEdge(int e, int n);
             void setOutNode(int t, int inter_t);
             void addCallEdge(IntraGraph *next);
             void updateWeight(int node, sem_elem_t wt);
             void updateWeight(int node, int uno);
             void assignUpdates();
             void clearUpdates();
+             
 
             bool updateEdgeWeight(int src, int tgt, sem_elem_t se);
+            sem_elem_t readEdgeWeight(int src, int tgt);
             void setupIntraSolution(bool compress_regexp = false);
             sem_elem_t get_weight(int outnode);
             ostream &print(ostream &out, PRINT_OP pop = defaultPrintOp);
@@ -256,6 +279,15 @@ namespace wali {
             void solveSummarySolution(list<WTransition> &change);
             void preSolveSummarySolution(list<WTransition> &change);
             void setupSummarySolution();
+            /**
+             * IntraGraph holds on to some static variables. 
+             * These should be cleaned up when we're finished with the analysis.
+             **/
+            static void cleanUp();
+            void saturate(newton_logger_t nlog = NULL);
+
+            sem_elem_t getWeight(int nno) const ;
+            string toDot();
 
             private:
             //int nodeno(Transition &t);

@@ -187,6 +187,7 @@ namespace wali
         bool print_weights;
         DotAttributePrinter * printer;
 
+        std::set<wali::Key> nodesSeen;
         TransDotty( std::ostream& o, bool print_weights, DotAttributePrinter * attribute_printer );
 
         virtual ~TransDotty() {}

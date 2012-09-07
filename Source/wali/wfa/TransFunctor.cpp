@@ -93,6 +93,22 @@ namespace wali
 
     void TransDotty::operator()( const ITrans* t )
     {
+      if(nodesSeen.find(t->from()) == nodesSeen.end()){
+        o << "\t";
+        o << t->from();
+        o << " [label=\"";
+        printKey(o, t->from());
+        o << "\"];\n";
+        nodesSeen.insert(t->from());
+      }
+      if(nodesSeen.find(t->to()) == nodesSeen.end()){
+        o << "\t";
+        o << t->to();
+        o << " [label=\"";
+        printKey(o, t->to());
+        o << "\"];\n";
+        nodesSeen.insert(t->to());
+      }
       o << "\t";
       o << t->from();
       o << " -> ";

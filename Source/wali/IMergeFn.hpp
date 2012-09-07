@@ -9,6 +9,7 @@
 #include "wali/Common.hpp"
 #include "wali/ref_ptr.hpp"
 #include "wali/SemElem.hpp"
+#include "wali/SemElemTensor.hpp"
 #include <iostream>
 
 

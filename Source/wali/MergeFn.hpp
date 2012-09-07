@@ -30,6 +30,10 @@ namespace wali
 
       virtual sem_elem_t apply_f(sem_elem_t w1, sem_elem_t w2);
 
+      virtual sem_elem_tensor_t get_lin_coeff_w1(sem_elem_t w1, sem_elem_t w2);
+
+      virtual sem_elem_tensor_t get_lin_coeff_w2(sem_elem_t w1, sem_elem_t w2);
+
       virtual bool equal(merge_fn_t mf);
 
       virtual MergeFn *parse_element(const char *s, sem_elem_t sem);

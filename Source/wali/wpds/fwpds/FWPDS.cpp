@@ -49,18 +49,35 @@ using namespace wali::wpds::ewpds;
 
 const std::string FWPDS::XMLTag("FWPDS");
 
-FWPDS::FWPDS() : EWPDS(), interGr(NULL), checkingPhase(false)
+FWPDS::FWPDS() : EWPDS(), interGr(NULL), checkingPhase(false), newton(false)
 {
 }
 
-FWPDS::FWPDS(ref_ptr<wpds::Wrapper> wr) : EWPDS(wr) , interGr(NULL), checkingPhase(false)
+FWPDS::FWPDS(ref_ptr<wpds::Wrapper> wr) : EWPDS(wr) , interGr(NULL), checkingPhase(false), newton(false)
 {
 }
 
-FWPDS::FWPDS( const FWPDS& f ) : EWPDS(f),interGr(NULL),checkingPhase(false)
+FWPDS::FWPDS( const FWPDS& f ) : EWPDS(f),interGr(NULL),checkingPhase(false), newton(f.newton)
 {
 }
 
+FWPDS::FWPDS(bool _newton) : EWPDS(), newton(_newton)
+{
+}
+
+FWPDS::~FWPDS()
+{
+  // This cleans up the graph structures.
+  // There are some static variables holding on to values
+  // that cause trouble when re-running analysis.
+  // The downside is that if you have other FWPDSs
+  // hanging around, deleting even one of them will clean up
+  // the graph structure, and bad things will happen.
+
+  // You would have to clean up outside *after* you're done
+  // will *all* FWPDSs.
+  interGr->cleanUp();
+}
 ///////////////////////////////////////////////////////////////////
 void FWPDS::topDownEval(bool f) {
   graph::RegExp::topDownEval(f);
@@ -148,8 +165,13 @@ struct FWPDSCompareFunctor : public wfa::ConstTransFunctor
   }
 };
 
-std::ostream& graphPrintKey( int k, std::ostream& o ) {
+//std::ostream& graphPrintKey( int k, std::ostream& o ) {
+std::ostream& graphPrintKey(std::ostream& o, int k) {
   return wali::printKey(o,(Key)k);
+}
+
+void FWPDS::useNewton(bool set){
+  newton = set;
 }
 
 void FWPDS::prestar( wfa::WFA const & input, wfa::WFA& output )
@@ -184,7 +206,10 @@ void FWPDS::prestar( wfa::WFA const & input, wfa::WFA& output )
   EWPDS::prestarComputeFixpoint(output);
 
   // Compute summaries
-  interGr->setupInterSolution();
+  if(newton)
+    interGr->setupNewtonSolution();
+  else
+    interGr->setupInterSolution();
 
   //interGr->print(std::cout << "THE INTERGRAPH\n",graphPrintKey);
 
@@ -301,7 +326,6 @@ bool FWPDS::checkResults( wfa::WFA const & input, bool do_poststar )
 {
   if( wali::get_verify_fwpds() ) 
   {
-
     // set flag to use EWPDS's saturation
     checkingPhase = true;
 
@@ -379,7 +403,11 @@ void FWPDS::poststarIGR( wfa::WFA const & input, wfa::WFA& output )
     std::string msg = (get_verify_fwpds()) ? "FWPDS Saturation" : "";
     util::Timer timer(msg);
     // Compute summaries
-    interGr->setupInterSolution();
+    if(newton){
+      interGr->setupNewtonSolution();
+    }
+    else
+      interGr->setupInterSolution();
   }
 
   //interGr->print(std::cout << "THE INTERGRAPH\n",graphPrintKey);
@@ -422,12 +450,10 @@ void FWPDS::poststar_handle_eps_trans(wfa::ITrans* teps, wfa::ITrans* tprime, se
   ewpds::ETrans* etrans = lt->getETrans();
   if (0 != etrans) {
     erule_t r = etrans->getERule();
-
     interGr->addEdge(Transition(*tprime),
         Transition(*teps),
         Transition(teps->from(),tprime->stack(),tprime->to()),
         etrans->getMergeFn());
-
   } else {
     interGr->addEdge(Transition(*tprime),
         Transition(*teps),

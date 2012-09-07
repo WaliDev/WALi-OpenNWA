@@ -37,6 +37,7 @@ namespace wali
   //!
   //! Default value is false
   static bool b_check_fwpds = false;
+  static bool b_check_newton = false;
 
   /*!
    * @brief Turn FWPDS verification on and off.
@@ -46,12 +47,29 @@ namespace wali
     b_check_fwpds = enable;
   }
 
+  /*!
+   * @brief Turn newton method verification on and off.
+   * @see useNewton
+   * @return void
+   */
+  void set_verify_newton( bool enable ) {
+    b_check_newton = enable;
+  }
+
   /*! 
    * @return true if FWPDS will verify the result
    * of each poststar or prestar query against EWPDS.
    */
   bool get_verify_fwpds() {
     return b_check_fwpds;
+  }
+
+  /*! 
+   * @return true if Newton's method will verify the result
+   * of each poststar or prestar query against vanilla FWPDS.
+   */
+  bool get_verify_newton() {
+    return b_check_newton;
   }
 
   //! @brief the static variable moderating FWPDS laziness

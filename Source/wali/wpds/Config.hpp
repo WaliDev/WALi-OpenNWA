@@ -114,6 +114,49 @@ namespace wali
           bwrules.push_back(r);
         }
 
+        /*! 
+          @author Prathmesh Prabhu
+          @brief erase a rule from forwards list
+          @return true if both fwrules and bwrules are empty after erasing. 
+         */
+        bool erase(rule_t r) throw () {
+          { // BEGIN DEBUGGING
+            assert( r->from_state() == state() );
+            assert( r->from_stack() == stack() );
+          } // END DEBUGGING
+          for(std::list<rule_t>::iterator it = fwrules.begin();
+              it != fwrules.end();
+              ++it){
+            rule_t rf = *it;
+            if(r == rf){
+              fwrules.erase(it);
+              break;
+            }
+          }
+          return (fwrules.size() == 0 && bwrules.size() == 0);
+        }
+
+        /*! 
+          @author Prathmesh Prabhu
+          @brief erase a rule from both backwards list
+          @return true if both fwrules and bwrules are empty after erasing. 
+         */
+        bool rerase(rule_t r) throw () {
+          { // BEGIN DEBUGGING
+            assert( r->to_state() == state() );
+            assert( r->to_stack1() == stack() );
+          } // END DEBUGGING
+          for(std::list<rule_t>::iterator it = bwrules. begin();
+              it != bwrules.end();
+              ++it){
+            if(r == *it){
+              bwrules.erase(it);
+              break;
+            }
+          }
+          return (fwrules.size() == 0 && bwrules.size() == 0);
+        }
+
         /*!
          * @return const iterator to list of forward rules
          *
