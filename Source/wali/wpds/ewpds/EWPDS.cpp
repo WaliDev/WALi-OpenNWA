@@ -438,7 +438,7 @@ namespace wali
 
         if( r->to_stack2() == WALI_EPSILON ) {
           //update( rtstate, rtstack, t->to(), wrule_trans, r->to() );
-          update( r->to_state(), r->to_stack1(), t->to(), wrule_trans, r->to(), t, r, delta );
+          update( r->to_state(), r->to_stack1(), t->to(), wrule_trans, r->to() );
         }
         else {
 
@@ -467,7 +467,6 @@ namespace wali
 
           //sem_elem_t quasi_extended = new SemElemPair(quasi->quasi_one(), quasi->one());
           //update( rtstate, rtstack, gstate, quasi_extended, r->to() );
-          //update( rtstate, rtstack, gstate, state->quasi, r->to() );
           update( rtstate, rtstack, gstate, state->quasi, r->to() );
 
           // Trans with generated from states do not go on the worklist
@@ -582,71 +581,6 @@ namespace wali
         }
       }
 
-      void EWPDS::update(
-          Key from,
-          Key stack,
-          Key to,
-          sem_elem_t se,
-          Config * cfg,
-          wfa::ITrans* t,
-          rule_t & r,
-          sem_elem_t delta
-          )
-      {
-        wfa::ITrans* _tnew;
-        
-        if(addEtrans) {
-          _tnew = new ETrans(from, stack, to, 0, se, 0); // _tnew->moditied == true
-        }
-        else {
-          _tnew = new wfa::Trans(from, stack, to, se); // _tnew->moditied == true
-        }
-
-        wfa::ITrans* told = currentOutputWFA->lookup_trans(_tnew);
-
-        wfa::ITrans* tnew;
-        if(told == 0)
-        { // Not exist in currentOutputWFA
-          // Insert the new trans to currentOutputWFA
-          tnew = currentOutputWFA->insert_trans(_tnew);
-        }
-        else 
-        {
-          tnew = told;
-        }
-        // If told is 0, tnew == _tnew
-
-        // Default implementation of combineTransWeights: < _tnew + tnew, delta combine (_tnew - tnew), !delta->equal(delta combine (_tnew - tnew)) >
-        std::pair<std::pair<sem_elem_t, sem_elem_t>, bool> res = 
-                r->weight()->combineTransWeights(delta, t->weight(), tnew->weight(), _tnew->weight());
-
-        // Delete _tnew if told is an existing trans from currentOutputWFA and told does not equal to _tnew
-        if( told != 0 && told != _tnew ) {
-          delete _tnew;
-        }
-
-        sem_elem_t ans = res.first.first;
-        sem_elem_t ans_delta = res.first.second;
-        bool is_changed = res.second || told == 0;
-
-        // Set the resultant weight and delta to tnew
-        tnew->setWeight(ans);
-        tnew->setDelta(ans_delta);
-
-        // tnew->status = (is_changed ? SAME : MODIFIED)
-        if(is_changed)
-          tnew->setModified();
-        else
-          tnew->setSame();
-
-        tnew->setConfig(cfg);
-
-        if (tnew->modified()) {
-          //tnew->print(std::cout << "Adding transition: ") << "\n";
-          worklist->put( tnew );
-        }
-      }
-
       wfa::ITrans* EWPDS::update_prime(
           Key from, //<! Guaranteed to be a generated state
           wfa::ITrans* call, //<! The call transition
@@ -655,7 +589,6 @@ namespace wali
           sem_elem_t wWithRule //<! delta \extends r->weight()
           )
       {
-        /*
         //
         // !!NOTE!!
         // This code is copied in FWPDS::update_prime.
@@ -668,39 +601,6 @@ namespace wali
               delta, wWithRule, er);
         wfa::ITrans* t = currentOutputWFA->insert(tmp);
         return t;
-        */
-
-        ERule* er = (ERule*)r.get_ptr();
-        wfa::ITrans* _tnew = new ETrans(from, r->to_stack2(), call->to(), delta, wWithRule, er);
-        wfa::ITrans* told = currentOutputWFA->lookup_trans(_tnew);
-
-        wfa::ITrans* tnew;
-        if(told == 0)
-        {
-          // Insert the new trans to currentOutputWFA
-          tnew = currentOutputWFA->insert_trans(_tnew);
-        }
-        else {
-          tnew = told;
-        }
-        // If told is 0, tnew == _tnew
-
-        // Default implementation of combineTransWeights: < _tnew + tnew, delta combine (_tnew - tnew), !delta->equal(delta combine (_tnew - tnew)) >
-        std::pair<std::pair<sem_elem_t, sem_elem_t>, bool> res = 
-              r->weight()->combineTransWeights(delta, call->weight(), tnew->weight(), _tnew->weight());
-
-        // Delete _tnew if told is an existing trans from currentOutputWFA and told does not equal to _tnew
-        if(told != 0 && told != _tnew)
-          delete _tnew;
-
-        sem_elem_t ans = res.first.first;
-        sem_elem_t ans_delta = res.first.second;
-
-        // Set the resultant weight and delta to tnew
-        tnew->setDelta(ans_delta);
-        tnew->setWeight(ans);
-
-        return tnew;
       }
 
     } // namespace ewpds

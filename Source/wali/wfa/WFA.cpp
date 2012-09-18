@@ -1004,8 +1004,6 @@ namespace wali
       ////
       // WFA::find code duplicated to keep
       // a handle on the kp_map_t::iterator
-      //
-      // TODO: Call lookupTrans()
       ////
       ITrans* told = 0;
       kp_map_t::iterator it = kpmap.find(tnew->keypair());
@@ -1027,7 +1025,6 @@ namespace wali
       //  else (0 != told)
       //      combine new val w/ old
       //
-      // TODO: reduce duplication with insertTrans()
       ////
       if( 0 == told )
       {
@@ -1088,106 +1085,6 @@ namespace wali
         }
       }
       return told;
-    }
-
-    //
-    // Lookup tnew into the WFA and return it
-    // If not found, reutrn 0
-    //
-    ITrans* WFA::lookup_trans( ITrans* tnew )
-    {
-      ////
-      // WFA::find code duplicated to keep
-      // a handle on the kp_map_t::iterator
-      ////
-      ITrans* told = 0;
-      kp_map_t::iterator it = kpmap.find(tnew->keypair());
-      if( it != kpmap.end() )
-      {
-        TransSet& transSet = it->second;
-        TransSet::iterator tsit= transSet.find(tnew);
-        if( tsit != transSet.end() ) {
-          told = *tsit;
-        }
-      }
-
-      return told;
-    }
-
-    //
-    // Inserts tnew into the WFA. If a transition matching tnew
-    // exists, tnew is deleted.
-    //
-    ITrans* WFA::insert_trans( ITrans* tnew )
-    {
-      ////
-      // WFA::find code duplicated to keep
-      // a handle on the kp_map_t::iterator
-      ////
-      ITrans* told = 0;
-      kp_map_t::iterator it = kpmap.find(tnew->keypair());
-      if( it != kpmap.end() )
-      {
-        TransSet& transSet = it->second;
-        TransSet::iterator tsit= transSet.find(tnew);
-        if( tsit != transSet.end() ) {
-          told = *tsit;
-        }
-      }
-
-      assert(told == 0);
-
-      ////
-      // Cases
-      //  if 0 == told (told does not exist)
-      //      if it == kpmap.end
-      //          (p,g,*) does not exist
-      //      else
-      //          just add (p,g,q) to it.second
-      //
-      ////
-      sem_elem_t ZERO( tnew->weight()->zero() );
-      //*waliErr << "\tAdding 'from' state'" << key2str(t->from()) << "'\n";
-      addState( tnew->from(), ZERO );
-      //*waliErr << "\tAdding 'to' state '" << key2str(t->to()) << "'\n";
-      addState( tnew->to(), ZERO );
-
-      if( it == kpmap.end() )
-      {
-        TransSet transSet;
-        it = kpmap.insert(tnew->keypair(),transSet).first;
-      }
-      it->second.insert(tnew);
-
-      // Set told to tnew for the return statement at end of 
-      // method
-      //told = tnew;
-
-      // Add tnew to the 'to' State's reverse trans list
-      state_map_t::iterator from_stit = state_map.find( tnew->from() );
-
-      { // BEGIN DEBUGGING
-        if( from_stit == state_map.end() ) {
-          tnew->print( *waliErr << "\n\n+++ WTF +++\n" ) << std::endl;
-          assert( Q.find(tnew->from()) != Q.end() );
-          assert( from_stit != state_map.end() );
-        }
-      } // END DEBUGGING
-
-      from_stit->second->addTrans( tnew );
-
-      // if tnew is an eps transition add to eps_map
-      if( tnew->stack() == WALI_EPSILON )
-      {
-        eps_map_t::iterator epsit = eps_map.find( tnew->to() );
-        if( epsit == eps_map.end() ) {
-          TransSet transSet;
-          epsit = eps_map.insert( tnew->to(),transSet ).first;
-        }
-        epsit->second.insert( tnew );
-      }
-
-      return tnew;
     }
 
     TransSet WFA::match( Key p, Key y ) {

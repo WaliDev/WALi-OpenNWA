@@ -526,7 +526,7 @@ namespace wali
 
       if( r->to_stack2() == WALI_EPSILON ) {
         // t must be a rule 1 (pop rules handled by poststar_handle_eps_trans)
-        update( rtstate, rtstack, t->to(), wrule_trans, r->to(), t, r, delta );
+        update( rtstate, rtstack, t->to(), wrule_trans, r->to() );
       }
       else {
 
@@ -567,7 +567,8 @@ namespace wali
               Config * config = make_config( teps->from(),tpstk );
               sem_elem_t epsW = tprime->getDelta()->extend( teps->weight() );
 
-              update( teps->from(), tpstk, tpto, epsW, config );
+              update( teps->from(),tpstk,tpto,
+                  epsW, config );
             }
           }
         }
@@ -1087,67 +1088,6 @@ namespace wali
     }
 
     /**
-     * @brief helper function to create and link a transition
-     *
-     */
-    void WPDS::update(
-        Key from,
-        Key stack,
-        Key to,
-        sem_elem_t se,
-        Config * cfg,
-        wfa::ITrans* t,
-        rule_t & r,
-        sem_elem_t delta
-        )
-    {
-      wfa::ITrans* _tnew = new Trans(from,stack,to,se); // _tnew->moditied == true
-      wfa::ITrans* told = currentOutputWFA->lookup_trans(_tnew);
-
-      wfa::ITrans* tnew;
-      if(told == 0)
-      { // Not exist in currentOutputWFA
-        // Insert the new trans to currentOutputWFA
-        tnew = currentOutputWFA->insert_trans(_tnew);
-      }
-      else 
-      {
-        tnew = told;
-      // If told is 0, tnew == _tnew
-      }
-
-      // Default implementation of combineTransWeights: < _tnew + tnew, delta combine (_tnew - tnew), !delta->equal(delta combine (_tnew - tnew)) >
-      std::pair<std::pair<sem_elem_t, sem_elem_t>, bool> res = 
-              r->weight()->combineTransWeights(delta, t->weight(), tnew->weight(), _tnew->weight());
-
-      // Delete _tnew if told is an existing trans from currentOutputWFA and told does not equal to _tnew
-      if( told != 0 && told != _tnew ) {
-        delete _tnew;
-      }
-
-      sem_elem_t ans = res.first.first;
-      sem_elem_t ans_delta = res.first.second;
-      bool is_changed = res.second || told == 0;
-
-      // Set the resultant weight and delta to tnew
-      tnew->setWeight(ans);
-      tnew->setDelta(ans_delta);
-
-      // tnew->status = (is_changed ? SAME : MODIFIED)
-      if(is_changed)
-        tnew->setModified();
-      else
-        tnew->setSame();
-
-      tnew->setConfig(cfg);
-
-      if (tnew->modified()) {
-        //tnew->print(std::cout << "Adding transition: ") << "\n";
-        worklist->put( tnew );
-      }
-    }
-
-    /**
      * update_prime does not need to take a Config b/c no Config
      * will match a transition taht is created here. The from state
      * is not \in WFA.P. Therefore we do not need to add it to the
@@ -1163,36 +1103,9 @@ namespace wali
         sem_elem_t wWithRule //<! delta \extends r->weight()
         )
     {
-      wfa::ITrans* _tnew = new Trans(from,r->to_stack2(),call->to(),wWithRule);
-      wfa::ITrans* told = currentOutputWFA->lookup_trans(_tnew);
-
-      wfa::ITrans* tnew;
-      if(told == 0)
-      {
-        // Insert the new trans to currentOutputWFA
-        tnew = currentOutputWFA->insert_trans(_tnew);
-      }
-      else {
-        tnew = told;
-      }
-      // If told is 0, tnew == _tnew
-
-      // Default implementation of combineTransWeights: < _tnew + tnew, delta combine (_tnew - tnew), !delta->equal(delta combine (_tnew - tnew)) >
-      std::pair<std::pair<sem_elem_t, sem_elem_t>, bool> res = 
-            r->weight()->combineTransWeights(delta, call->weight(), tnew->weight(), _tnew->weight());
-
-      // Delete _tnew if told is an existing trans from currentOutputWFA and told does not equal to _tnew
-      if(told != 0 && told != _tnew)
-        delete _tnew;
-
-      sem_elem_t ans = res.first.first;
-      sem_elem_t ans_delta = res.first.second;
-
-      // Set the resultant weight and delta to tnew
-      tnew->setDelta(ans_delta);
-      tnew->setWeight(ans);
-
-      return tnew;
+      wfa::ITrans* tmp = new Trans(from,r->to_stack2(),call->to(),wWithRule);
+      wfa::ITrans* t = currentOutputWFA->insert(tmp);
+      return t;
     }
 
     /////////////////////////////////////////////////////////////////
