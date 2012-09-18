@@ -80,6 +80,34 @@ namespace wali
     return wn;
   }
 
+  // default implementation of combineTransWeights
+  // 
+  //   < tnew + told, delta combine (tnew - told), !delta->equal(delta combine (tnew - told)) >
+  //
+  std::pair<std::pair<sem_elem_t, sem_elem_t>, bool> 
+      SemElem::combineTransWeights( SemElem * delta, SemElem * tweight, SemElem * told, SemElem * tnew ) const
+  {
+    sem_elem_t wnew = tnew;
+
+    // delta returns ( wnew + told, wnew - told )
+    // Use w->delta(told) b/c we want the returned diff
+    // to be what is in the new weight (wnew) and not
+    // in the existing weight (told)
+    std::pair< sem_elem_t , sem_elem_t > p = wnew->delta( told );
+
+    // This's weight is w+se
+    sem_elem_t ans_se = p.first;
+
+    // Combine current delta with p's delta (wnew - se) and set status to
+    // modified if this's delta changes value.
+    sem_elem_t old_delta = delta;
+    sem_elem_t ans_delta = delta->combine( p.second );
+
+    bool is_modified = ( !old_delta->equal(ans_delta) );
+
+    std::pair<sem_elem_t, sem_elem_t> tmp(ans_se, ans_delta);
+    return std::pair<std::pair<sem_elem_t, sem_elem_t>, bool>(tmp, is_modified);
+  }
 
   void test_semelem_impl(sem_elem_t x)
   {
