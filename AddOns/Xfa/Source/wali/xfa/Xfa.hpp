@@ -164,17 +164,24 @@ namespace cfglib {
             }
 
 
+            // Read all of the contents of 'file', returning the result
             static
             std::vector<char>
             read_all(FILE* file) {
                 std::vector<char> data;
-                const int block_size = 4096;
+                const int block_size = 4096; // amt to read at once
 
                 while (true) {
+                    // Make room for another block
                     data.resize(data.size() + block_size);
+
+                    assert(data.size() - block_size >= 0);
+
+                    // Read into that new space
                     int size_just_read = std::fread(&data[data.size()-block_size], 1u, block_size, file);
 
                     if (size_just_read < block_size) {
+                        // We hit EOF (or an error...)
                         int excess = block_size - size_just_read;
                         data.resize(data.size() - excess);
                         return data;
