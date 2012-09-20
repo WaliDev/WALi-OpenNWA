@@ -151,7 +151,18 @@ namespace cfglib {
                 State source = getState((*ast_trans)->source);
                 State dest = getState((*ast_trans)->dest);
                 BinaryRelation rel = get_relation(**ast_trans, voc, zero, ident);
-                ret.addTrans(source, eps, dest, rel);
+
+                auto const & syms = (*ast_trans)->symbols;
+                for (auto sym = syms.begin(); sym != syms.end(); ++sym) {
+                    auto name = dynamic_cast<xfa_parser::Name*>(sym->get());
+                    assert(name);
+                    if (name->name == "epsilon") {
+                        ret.addTrans(source, eps, dest, rel);
+                    }
+                    else {
+                        ret.addTrans(source, getSymbol(name->name), dest, rel);
+                    }
+                }
             }
 
             ret.setInitialState(getState(ast.start_state));
