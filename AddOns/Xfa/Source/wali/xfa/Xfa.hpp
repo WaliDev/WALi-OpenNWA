@@ -214,6 +214,8 @@ namespace cfglib {
                     }
 
                     std::vector<char> image_data = read_all(image_data_stream);
+                    pclose(image_data_stream);
+                    
                     std::vector<unsigned char> image_data_u(image_data.begin(), image_data.end());
 
                     std::string image_data_base64 = base64_encode(&image_data_u[0], image_data_u.size());
