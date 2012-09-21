@@ -208,6 +208,11 @@ namespace cfglib {
 
                     FILE* image_data_stream = popen(command.str().c_str(), "r");
 
+                    if (image_data_stream == NULL) {
+                        std::cerr << "Error opening pipe to " << command << ": ";
+                        perror(NULL);
+                    }
+
                     std::vector<char> image_data = read_all(image_data_stream);
                     std::vector<unsigned char> image_data_u(image_data.begin(), image_data.end());
 
