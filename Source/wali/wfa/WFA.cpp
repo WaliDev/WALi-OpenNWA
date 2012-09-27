@@ -2024,6 +2024,17 @@ namespace wali
     }
 
 
+    void WFA::complementStates()
+    {
+      std::set<Key> notF;
+      // notF = Q - F
+      std::set_difference(this->Q.begin(), this->Q.end(),
+                          this->F.begin(), this->F.end(),
+                          std::inserter(notF, notF.end()));
+      std::swap(this->F, notF);
+    }
+
+
     WFA WFA::removeEpsilons() const
     {
       WFA result(*this);
