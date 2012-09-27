@@ -14,6 +14,7 @@
 using namespace wali::domains::binrel;
 using std::endl;
 using wali::waliErr;
+using std::cout;
 
 // ////////////////////////////
 // Implementation of the initialization free function.
@@ -369,6 +370,48 @@ void BddContext::setIntVars(const std::map<std::string, int>& vars)
     tensor2Extra[vari] = varInfo->tensor2Extra;
     vari++; 
   }
+
+  //DEBUGGING
+#if 0
+  cout << "baseLhs: ";
+  for(int i =0; i < vari; ++i)
+    cout << " " << baseLhs[i];
+  cout << endl;
+  cout << "baseRhs: ";
+  for(int i =0; i < vari; ++i)
+    cout << " " << baseRhs[i];
+  cout << endl;
+  cout << "baseExtra: ";
+  for(int i =0; i < vari; ++i)
+    cout << " " << baseExtra[i];
+  cout << endl;
+  cout << "tensor1Lhs: ";
+  for(int i =0; i < vari; ++i)
+    cout << " " << tensor1Lhs[i];
+  cout << endl;
+  cout << "tensor1Rhs: ";
+  for(int i =0; i < vari; ++i)
+    cout << " " << tensor1Rhs[i];
+  cout << endl;
+  cout << "tensor1Extra: ";
+  for(int i =0; i < vari; ++i)
+    cout << " " << tensor1Extra[i];
+  cout << endl;
+  cout << "tensor2Lhs: ";
+  for(int i =0; i < vari; ++i)
+    cout << " " << tensor2Lhs[i];
+  cout << endl;
+  cout << "tensor2Rhs: ";
+  for(int i =0; i < vari; ++i)
+    cout << " " << tensor2Rhs[i];
+  cout << endl;
+  cout << "tensor2Extra: ";
+  for(int i =0; i < vari; ++i)
+    cout << " " << tensor2Extra[i];
+  cout << endl;
+#endif
+  //END DEBUGGING
+
   fdd_setpairs(baseSwap.get(), baseLhs, baseRhs, vars.size());
   fdd_setpairs(baseSwap.get(), baseRhs, baseLhs, vars.size());
   fdd_setpairs(baseRightShift.get(), baseLhs, baseRhs, vars.size());
@@ -389,29 +432,21 @@ void BddContext::setIntVars(const std::map<std::string, int>& vars)
   fdd_setpairs(move2BaseTwisted.get(), tensor1Rhs, baseLhs, vars.size());
   fdd_setpairs(move2BaseTwisted.get(), tensor2Rhs, baseRhs, vars.size());
 
-  delete [] baseLhs;
-  delete [] baseRhs;
-  delete [] baseExtra;
-  delete [] tensor1Lhs;
-  delete [] tensor1Rhs;
-  delete [] tensor1Extra;
-  delete [] tensor2Lhs;
-  delete [] tensor2Rhs;
-  delete [] tensor2Extra;
-
   // Update static bdds
+  baseSecBddContextSet = fdd_makeset(baseRhs, vars.size());
+  tensorSecBddContextSet = fdd_makeset(tensor1Rhs, vars.size());
+  tensorSecBddContextSet &= fdd_makeset(tensor2Rhs, vars.size());
+  commonBddContextSet23 = fdd_makeset(tensor1Rhs, vars.size());
+  commonBddContextSet23 &= fdd_makeset(tensor2Lhs, vars.size());
+  commonBddContextSet13 = fdd_makeset(tensor1Lhs, vars.size());
+  commonBddContextSet13 &= fdd_makeset(tensor2Lhs, vars.size());
+  assert(vars.size() == 0 || (baseSecBddContextSet != bddfalse && tensorSecBddContextSet != bddfalse
+        && tensorSecBddContextSet != bddfalse && commonBddContextSet23 != bddfalse && commonBddContextSet13 != bddfalse));
   // Somehow make this efficient
   for(std::map<std::string, int>::const_iterator ci = vars.begin(); ci != vars.end(); ++ci){
     bddinfo_t varInfo = (*this)[ci->first];
-    baseSecBddContextSet = baseSecBddContextSet & fdd_ithset(varInfo->baseRhs);
-    tensorSecBddContextSet = tensorSecBddContextSet & fdd_ithset(varInfo->tensor1Rhs);
-    tensorSecBddContextSet = tensorSecBddContextSet & fdd_ithset(varInfo->tensor2Rhs);
-    commonBddContextSet23 = commonBddContextSet23 & fdd_ithset(varInfo->tensor1Rhs);
-    commonBddContextSet23 = commonBddContextSet23 & fdd_ithset(varInfo->tensor2Lhs);
     commonBddContextId23 = commonBddContextId23 &
       fdd_equals(varInfo->tensor1Rhs, varInfo->tensor2Lhs);
-    commonBddContextSet13 = commonBddContextSet13 & fdd_ithset(varInfo->tensor1Lhs);
-    commonBddContextSet13 = commonBddContextSet13 & fdd_ithset(varInfo->tensor2Lhs);
     commonBddContextId13 = commonBddContextId13 & 
       fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
   }
@@ -430,6 +465,16 @@ void BddContext::setIntVars(const std::map<std::string, int>& vars)
   cachedBaseZero = new BinRel(this, bddfalse, false);
   cachedTensorOne = new BinRel(this, tensorId, true);
   cachedTensorZero = new BinRel(this, bddfalse, true);
+
+  delete [] baseLhs;
+  delete [] baseRhs;
+  delete [] baseExtra;
+  delete [] tensor1Lhs;
+  delete [] tensor1Rhs;
+  delete [] tensor1Extra;
+  delete [] tensor2Lhs;
+  delete [] tensor2Rhs;
+  delete [] tensor2Extra;
 }
 
 void BddContext::addIntVar(std::string name, unsigned size)
