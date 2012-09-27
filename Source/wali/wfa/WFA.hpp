@@ -56,7 +56,7 @@ namespace wali
     class State;
     class TransFunctor;
     class ConstTransFunctor;
-    struct DeterminizeWeightGen;
+    class DeterminizeWeightGen;
 
     /**
      * "Callbacks" for outputting attributes in the Dot.
