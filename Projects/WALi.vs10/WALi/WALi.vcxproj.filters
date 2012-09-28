@@ -381,6 +381,12 @@
     <ClCompile Include="..\..\..\Source\wali\SemElemTensor.cpp">
       <Filter>Source Files\wali</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\graph\Functional.cpp">
+      <Filter>Source Files\wali.graph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\graph\NewtonLogger.cpp">
+      <Filter>Source Files\wali.graph</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\wali\wpds\fwpds\FWPDS.hpp">
@@ -748,6 +754,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\wali\SemElemTensor.hpp">
       <Filter>Header Files\wali</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\graph\Functional.hpp">
+      <Filter>Header Files\wali.graph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\wali\graph\NewtonLogger.hpp">
+      <Filter>Header Files\wali.graph</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
