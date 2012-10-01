@@ -301,6 +301,23 @@ namespace cfglib {
         }
 
 
+        struct AndWeightMaker
+            : wali::wfa::WeightMaker
+        {
+            virtual sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs ) {
+                wali::domains::binrel::BinRel
+                    * l_rel = dynamic_cast<wali::domains::binrel::BinRel*>(lhs.get_ptr()),
+                    * r_rel = dynamic_cast<wali::domains::binrel::BinRel*>(rhs.get_ptr());
+                assert(l_rel && r_rel);
+
+                wali::domains::binrel::ProgramBddContext
+                    const & ctx = dynamic_cast<wali::domains::binrel::ProgramBddContext const &>(l_rel->getVocabulary());
+
+                auto both = ctx.And(l_rel->getBdd(), r_rel->getBdd());
+                return new wali::domains::binrel::BinRel(&ctx, both);
+            }
+        }; // WeightMaker
+        
 
         struct IntroduceStateToRelationWeightGen
             : wali::wfa::LiftCombineWeightGen
