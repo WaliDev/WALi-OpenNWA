@@ -364,16 +364,19 @@ namespace cfglib {
             
             wali::domains::binrel::ProgramBddContext new_voc;
             BinaryRelation havoc_current_state;
+            std::string current_state;
 
             IntroduceStateToRelationWeightGen(wali::domains::binrel::ProgramBddContext const & v,
-                                              Xfa const & xfa)
+                                              Xfa const & xfa,
+                                              std::string const & current_state_var_prefix)
                 : new_voc(v)
+                , current_state(current_state_var_prefix + "current_state")
             {
                 set_up_sequential_state_map(xfa);
 
                 using wali::domains::binrel::BinRel;
                 havoc_current_state =
-                    new BinRel(&v, new_voc.Assign("current_state", new_voc.NonDet()));
+                    new BinRel(&v, new_voc.Assign(current_state, new_voc.NonDet()));
             }
                 
             
@@ -433,8 +436,8 @@ namespace cfglib {
                 wali::Key source = trans_in_original->from();
                 wali::Key dest = trans_in_original->to();
 
-                int source_fdd = safe_get(new_voc, "current_state")->baseLhs;
-                int dest_fdd = safe_get(new_voc, "current_state")->baseRhs;
+                int source_fdd = safe_get(new_voc, current_state)->baseLhs;
+                int dest_fdd = safe_get(new_voc, current_state)->baseRhs;
 
                 //std::cout << "Creating state change BDD, setting\n"
                 //            << "    FDD " << source_fdd << " to " << source << "\n"
