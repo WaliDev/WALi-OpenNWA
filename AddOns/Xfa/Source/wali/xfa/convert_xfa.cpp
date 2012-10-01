@@ -6,11 +6,26 @@
 #include <boost/lexical_cast.hpp>
 
 #include <iostream>
+#include <vector>
 
 using namespace xfa_parser;
 
 namespace cfglib {
     namespace xfa {
+
+        struct WeightedTransition {
+            State source;
+            Symbol symbol;
+            State target;
+            BinaryRelation weight;
+            
+            WeightedTransition(State src, Symbol sym, State tgt, BinaryRelation w)
+                : source(src), symbol(sym), target(tgt), weight(w)
+            {}
+        };
+
+        typedef std::vector<WeightedTransition> TransList;
+        
 
         std::string
         var_name(int id,
@@ -113,22 +128,43 @@ namespace cfglib {
         }
         
 
-        BinaryRelation
-        get_relation(xfa_parser::Transition const & trans,
-                     wali::domains::binrel::ProgramBddContext & voc,
-                     BinaryRelation zero,
-                     bdd ident,
-                     std::string const & prefix)
+        TransList
+        get_transitions(xfa_parser::Transition const & trans,
+                        wali::domains::binrel::ProgramBddContext & voc,
+                        BinaryRelation zero,
+                        bdd ident,
+                        std::string const & prefix)
         {
-            std::cerr << "get_relation(trans):\n";
+            State source = getState(trans.source);
+            State dest = getState(trans.dest);
+            Symbol eps(wali::WALI_EPSILON);            
+
             using wali::domains::binrel::BinRel;
+            BinaryRelation rel;
             if (trans.actions.size() == 0u) {
-                return new BinRel(&voc, ident);
+                rel = new BinRel(&voc, ident);
             }
-            if (trans.actions.size() == 1u) {
-                return get_relation(*trans.actions[0], voc, zero, ident, prefix);
+            else if (trans.actions.size() == 1u) {
+                rel = get_relation(*trans.actions[0], voc, zero, ident, prefix);
             }
-            assert(false);
+            else {
+                assert(false);
+            }
+
+            TransList ret;
+            auto const & syms = trans.symbols;
+            for (auto sym = syms.begin(); sym != syms.end(); ++sym) {
+                auto name = dynamic_cast<xfa_parser::Name*>(sym->get());
+                assert(name);
+                if (name->name == "epsilon") {
+                    ret.push_back(WeightedTransition(source, eps, dest, rel));
+                }
+                else {
+                    ret.push_back(WeightedTransition(source, getSymbol(name->name), dest, rel));
+                }
+            }
+
+            return ret;
         }
 
 
@@ -153,20 +189,9 @@ namespace cfglib {
             }
 
             for (auto ast_trans = ast.transitions.begin(); ast_trans != ast.transitions.end(); ++ast_trans) {
-                State source = getState((*ast_trans)->source);
-                State dest = getState((*ast_trans)->dest);
-                BinaryRelation rel = get_relation(**ast_trans, voc, zero, ident, domain_var_name_prefix);
-
-                auto const & syms = (*ast_trans)->symbols;
-                for (auto sym = syms.begin(); sym != syms.end(); ++sym) {
-                    auto name = dynamic_cast<xfa_parser::Name*>(sym->get());
-                    assert(name);
-                    if (name->name == "epsilon") {
-                        ret.addTrans(source, eps, dest, rel);
-                    }
-                    else {
-                        ret.addTrans(source, getSymbol(name->name), dest, rel);
-                    }
+                TransList transs = get_transitions(**ast_trans, voc, zero, ident, domain_var_name_prefix);
+                for (auto trans = transs.begin(); trans != transs.end(); ++trans) {
+                    ret.addTrans(trans->source, trans->symbol, trans->target, trans->weight);
                 }
             }
 
