@@ -17,6 +17,7 @@
 #include <iostream>
 #include <vector>
 #include <stack>
+#include <iterator>
 
 #define FOR_EACH_STATE(name)                                \
   State* name;                                            \
