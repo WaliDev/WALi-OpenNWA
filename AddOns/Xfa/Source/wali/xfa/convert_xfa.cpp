@@ -13,15 +13,17 @@ namespace cfglib {
     namespace xfa {
 
         std::string
-        var_name(int id)
+        var_name(int id,
+                 std::string const & domain_var_name_prefix)
         {
-            return "var" + boost::lexical_cast<std::string>(id);
+            return domain_var_name_prefix + "var" + boost::lexical_cast<std::string>(id);
         }    
 
         void
         register_vars(xfa_parser::Xfa const & ast,
                       wali::domains::binrel::ProgramBddContext & voc,
-                      int fdd_size)
+                      int fdd_size,
+                      std::string const & prefix)
         {
             std::cerr << "Registering variables with size " << fdd_size << "\n";
             std::set<std::string> registered;
@@ -36,10 +38,10 @@ namespace cfglib {
                         continue;
                     }
                     assert (act.action_type == "ctr2");
-                    if (registered.find(var_name(act.operand_id)) == registered.end()) {
-                        voc.addIntVar(var_name(act.operand_id), fdd_size);
-                        std::cerr << "    " << var_name(act.operand_id) << "\n";
-                        registered.insert(var_name(act.operand_id));
+                    if (registered.find(var_name(act.operand_id, prefix)) == registered.end()) {
+                        voc.addIntVar(var_name(act.operand_id, prefix), fdd_size);
+                        std::cerr << "    " << var_name(act.operand_id, prefix) << "\n";
+                        registered.insert(var_name(act.operand_id, prefix));
                     }
                 }
             }
@@ -49,7 +51,8 @@ namespace cfglib {
         get_relation(xfa_parser::Action const & act,
                      wali::domains::binrel::ProgramBddContext & voc,
                      BinaryRelation zero,
-                     bdd ident)
+                     bdd ident,
+                     std::string const & prefix)
         {
             using namespace wali::domains::binrel;
 
@@ -74,9 +77,9 @@ namespace cfglib {
                 std::cerr << "    reset\n";
                 assert(cmd.arguments.size() == 1u);
                 int val = boost::lexical_cast<int>(cmd.arguments[0]);
-                std::cerr << "      var " << var_name(act.operand_id) << "\n";
+                std::cerr << "      var " << var_name(act.operand_id, prefix) << "\n";
                 std::cerr << "      to " << val << "\n";
-                BinaryRelation ret = new BinRel(&voc, voc.Assign(var_name(act.operand_id),
+                BinaryRelation ret = new BinRel(&voc, voc.Assign(var_name(act.operand_id, prefix),
                                                                  voc.Const(val)));
                 std::cerr << "    done\n";
                 return ret;
@@ -84,8 +87,8 @@ namespace cfglib {
 
             if (cmd.name == "incr") {
                 std::cerr << "    incr\n";
-                return new BinRel(&voc, voc.Assign(var_name(act.operand_id),
-                                                   voc.Plus(voc.From(var_name(act.operand_id)),
+                return new BinRel(&voc, voc.Assign(var_name(act.operand_id, prefix),
+                                                   voc.Plus(voc.From(var_name(act.operand_id, prefix)),
                                                             voc.Const(1))));
             }
 
@@ -97,8 +100,8 @@ namespace cfglib {
                 assert(cmd.consequent->action_type == "reject");
 
                 int rhs_id = boost::lexical_cast<int>(cmd.arguments[0]);
-                std::string lhs_name = var_name(act.operand_id);
-                std::string rhs_name = var_name(rhs_id);
+                std::string lhs_name = var_name(act.operand_id, prefix);
+                std::string rhs_name = var_name(rhs_id, prefix);
                 
                 int lhs_fdd = voc[lhs_name]->baseLhs;
                 int rhs_fdd = voc[rhs_name]->baseLhs;
@@ -114,7 +117,8 @@ namespace cfglib {
         get_relation(xfa_parser::Transition const & trans,
                      wali::domains::binrel::ProgramBddContext & voc,
                      BinaryRelation zero,
-                     bdd ident)
+                     bdd ident,
+                     std::string const & prefix)
         {
             std::cerr << "get_relation(trans):\n";
             using wali::domains::binrel::BinRel;
@@ -122,7 +126,7 @@ namespace cfglib {
                 return new BinRel(&voc, ident);
             }
             if (trans.actions.size() == 1u) {
-                return get_relation(*trans.actions[0], voc, zero, ident);
+                return get_relation(*trans.actions[0], voc, zero, ident, prefix);
             }
             assert(false);
         }
@@ -131,9 +135,10 @@ namespace cfglib {
         Xfa
         from_parser_ast(xfa_parser::Xfa const & ast,
                         wali::domains::binrel::ProgramBddContext & voc,
-                        int fdd_size)
+                        int fdd_size,
+                        std::string const & domain_var_name_prefix)
         {
-            register_vars(ast, voc, fdd_size);
+            register_vars(ast, voc, fdd_size, domain_var_name_prefix);
 
             using namespace wali::domains::binrel;
             BinaryRelation zero = new BinRel(&voc, voc.False());
@@ -150,7 +155,7 @@ namespace cfglib {
             for (auto ast_trans = ast.transitions.begin(); ast_trans != ast.transitions.end(); ++ast_trans) {
                 State source = getState((*ast_trans)->source);
                 State dest = getState((*ast_trans)->dest);
-                BinaryRelation rel = get_relation(**ast_trans, voc, zero, ident);
+                BinaryRelation rel = get_relation(**ast_trans, voc, zero, ident, domain_var_name_prefix);
 
                 auto const & syms = (*ast_trans)->symbols;
                 for (auto sym = syms.begin(); sym != syms.end(); ++sym) {
