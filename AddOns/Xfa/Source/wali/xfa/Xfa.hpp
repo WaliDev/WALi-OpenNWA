@@ -159,6 +159,10 @@ namespace cfglib {
                 return wfa_.removeEpsilons();
             }
 
+            void removeEpsilonsMutateThis() {
+                wfa_ = wfa_.removeEpsilons();
+            }
+
             void erase(State from, Symbol sym, State to) {
                 wfa_.erase(from.key, sym.key, to.key);
             }
