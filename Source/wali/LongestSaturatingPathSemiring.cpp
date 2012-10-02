@@ -14,7 +14,13 @@ namespace wali {
     }
 
     unsigned int max(unsigned int v1, unsigned int v2) {
-      return (v1 < v2) ? v1 : v2;
+      if(v1 == (unsigned int)(-1)) {
+        return v2;
+      }
+      if(v2 == (unsigned int)(-1)) {
+        return v1;
+      }
+      return (v1 < v2) ? v2 : v1;
     }
   }
 
@@ -75,7 +81,7 @@ namespace wali {
   //------------------------------------
   std::ostream & LongestSaturatingPathSemiring::print(std::ostream &out) const
   {
-    out << "LongestSaturatingPathSemiring(" << v << ")";
+    out << "LongestSaturatingPathSemiring(" << v << ", saturating at " << biggest << ")";
     return out;
   }
 
