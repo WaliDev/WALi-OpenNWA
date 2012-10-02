@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "wali/wfa/WFA.hpp"
 #include "wali/ShortestPathSemiring.hpp"
+#include "wali/LongestSaturatingPathSemiring.hpp"
 
 #include "fixtures.hpp"
 
@@ -274,6 +275,42 @@ namespace wali {
             check_shortest_distance_eq(3u, end_from_zero[E]);
         }
 
+
+        TEST(wali$wfa$$epsilonClose, DISABLED_epsilonCycleKeepsIterating)
+        {
+            //        eps
+            //   A <------> B
+            Key A = getKey("A");
+            Key B = getKey("B");
+
+            sem_elem_t distance_one = new LongestSaturatingPathSemiring(1, 10);
+            test_semelem_impl(distance_one);
+
+            WFA wfa;
+            wfa.addState(A, distance_one);
+            wfa.addState(B, distance_one);
+
+            wfa.setInitialState(A);
+
+            wfa.addTrans(A, WALI_EPSILON, B, distance_one);
+            wfa.addTrans(B, WALI_EPSILON, A, distance_one);
+
+            WFA::AccessibleStateMap accessible = wfa.epsilonClose(A);
+
+            EXPECT_EQ(2u, accessible.size());
+            EXPECT_NE(accessible.find(A), accessible.end());
+            EXPECT_NE(accessible.find(B), accessible.end());
+
+            LongestSaturatingPathSemiring
+                * w_a = dynamic_cast<LongestSaturatingPathSemiring*>(accessible[A].get_ptr()),
+                * w_b = dynamic_cast<LongestSaturatingPathSemiring*>(accessible[B].get_ptr());
+
+            ASSERT_TRUE(w_a != 0);
+            ASSERT_TRUE(w_b != 0);
+
+            EXPECT_EQ(10u, w_a->getNum()); // 0 max (1+1) max (1+1+1+1) max ...
+            EXPECT_EQ(9u, w_b->getNum());  // 1 max (1+1+1) max (1+1+1+1+1) max ...
+        }
 
     }
 }
