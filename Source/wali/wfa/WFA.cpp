@@ -1528,41 +1528,99 @@ namespace wali
     WFA::AccessibleStateMap
     WFA::epsilonClose(Key start) const
     {
-      AccessibleStateMap result;
       std::set<Key> worklist;
-      std::set<Key> visited;
 
-      result.insert(std::make_pair(start, getSomeWeight()->one()));
-      
+      // Follows Fig 3 from 'Generic epsilon-Removal Algorithm for Weighted
+      // Automata" by Mohri.
+      std::map<Key, sem_elem_t> d; // estimates the shortest distance from start to key
+      std::map<Key, sem_elem_t> r; // weight added to d[q] since last time q was visited
+
+      sem_elem_t zero = getSomeWeight()->zero();
+
+      // Inialization
+      for (std::set<Key>::const_iterator p = Q.begin(); p != Q.end(); ++p) {
+        d[*p] = r[*p] = zero;
+      }
+      d[start] = r[start] = getSomeWeight()->one();
       worklist.insert(start);
-      visited.insert(start);
 
-      while (!worklist.empty()) {
-        Key source = *worklist.begin();
-        sem_elem_t weight = result[source];
+
+      //std::cout << "--- epsilonClose(" << key2str(start) << ")\n";
+
+      // Worklist loop
+      while (worklist.size() > 0) {
+        Key q = *worklist.begin();
         worklist.erase(worklist.begin());
+        sem_elem_t r_q = r[q]; // the change in q's weight since the last time it was visited; just 'r' in the paper
+        r[q] = zero;
 
-        if (kpmap.find(KeyPair(source, WALI_EPSILON)) != kpmap.end()) {
-          TransSet const & eps_dests = kpmap.find(KeyPair(source, WALI_EPSILON))->second;
-          for (TransSet::const_iterator trans_it = eps_dests.begin();
-               trans_it != eps_dests.end(); ++trans_it)
+        //std::cout << "---   dequeued " << key2str(q) << "\n";
+
+        // so we want to look at all outgoing transitions from 'q'.
+        // kp_map_t maps from (source * stack) -> {trans}. Furthermore,
+        // this is a hash map so is not in any particular order, which
+        // means we have to loop over the whole dang thing. (If we had an
+        // explicit list of symbols we could do (for every symbol) but we
+        // can't.)
+        //
+        // The next three indentation levels are like 'for each e in E[q]' in
+        // the paper except that 'e' is called 'transition'
+        for(kp_map_t::const_iterator group = kpmap.begin();
+            group != kpmap.end(); ++group)
+        {
+          if (group->first.first == q
+              && group->first.second == WALI_EPSILON)
           {
-            sem_elem_t dest_weight = weight->extend((*trans_it)->weight());
-            Key dest = (*trans_it)->to();
-            bool change = add_trans_to_accessible_states(result, dest, dest_weight);
+            //std::cout << "---     found some epsilon transitions\n";
+            TransSet const & transitions = group->second;
+            for (TransSet::const_iterator transition = transitions.begin();
+                 transition != transitions.end(); ++transition)
+            {             
+              // 'for each transition in E[q]'. Now we have one. The
+              // following variables aren't explicitly named in the paper,
+              // but I do here because either my names are too long (for
+              // 'next') or to reduce caching.
+              Key next = (*transition)->to();                // 'n[e]'
+              sem_elem_t w_e = (*transition)->weight();      // 'w[e]'
+              sem_elem_t delta = r_q->extend(w_e);           // 'r*w[e]'
+              sem_elem_t new_d_n = d[next]->combine(delta); // 'd[n[e]] + (r*w[e])'
 
-            // Add the destination state to the worklist (maybe). We need to
-            // do this if it wasn't there before or if the weight has changed.
-            if (visited.find(dest) == visited.end() || change)
-            {
-              visited.insert(dest);
-              worklist.insert(dest);
-            }
-          }
+              // std::cout << "---     found transition to " << key2str(next) << "\n";
+              // w_e->print(std::cout << "---         the edge weight is ") << "\n";
+              // r_q->print(std::cout << "---         and the r weight is ") << "\n";
+              // delta->print(std::cout << "---         so delta is ") << ";\n";
+              // d[next]->print(std::cout << "---         the old weight on " << key2str(next) << " was ") << "\n";
+              //new_d_n->print(std::cout << "---         so the new weight would be ") << "\n";
+              
+              if (!new_d_n->equal(d[next])) {
+                //std::cout << "---       so I updated it's reachability amount and re-enqueued\n";
+                d[next] = new_d_n;
+                r[next] = r[next]->combine(delta);
+                worklist.insert(next);
+              }
+              
+            } // for each outgoing transition from q...
+          }  // ..
+        } // ...for each outgoing transition from q
+      } // while (!worklist.empty())
+
+      //d[start] = zero->one();
+
+      //std::cout << "---   done finding state weights\n";
+      //std::cout << "---   now removing nonzero states\n";
+
+      AccessibleStateMap out;
+      for (AccessibleStateMap::const_iterator iter = d.begin();
+           iter != d.end(); ++iter)
+      {
+        if (iter->second != zero) {
+          //iter->second->print(std::cout << "---     found state " << key2str(iter->first) << " with weight ") << "\n";
+          assert(!iter->second->equal(zero));
+          out[iter->first] = iter->second;
         }
       }
-
-      return result;
+      
+      return out;
     }
 
     

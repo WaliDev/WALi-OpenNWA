@@ -276,7 +276,7 @@ namespace wali {
         }
 
 
-        TEST(wali$wfa$$epsilonClose, DISABLED_epsilonCycleKeepsIterating)
+        TEST(wali$wfa$$epsilonClose, epsilonCycleKeepsIterating)
         {
             //        eps
             //   A <------> B
@@ -308,8 +308,8 @@ namespace wali {
             ASSERT_TRUE(w_a != 0);
             ASSERT_TRUE(w_b != 0);
 
-            EXPECT_EQ(10u, w_a->getNum()); // 0 max (1+1) max (1+1+1+1) max ...
-            EXPECT_EQ(9u, w_b->getNum());  // 1 max (1+1+1) max (1+1+1+1+1) max ...
+            EXPECT_EQ(10u, w_a->getNum()); // 0 max (1+1) max (1+1+1+1) max ...max 10
+            EXPECT_EQ(10u, w_b->getNum());  // 1 max (1+1+1) max (1+1+1+1+1) max ... max 10
         }
 
     }
