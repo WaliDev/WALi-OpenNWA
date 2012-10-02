@@ -13,6 +13,10 @@ namespace wali {
 
   /// This is a funny domain. But maybe it'll be useful? I just use it for
   /// testing.
+  ///
+  /// The domain is {0, 1, 2, ...., big, bottom} for some 'big' (given in the
+  /// constructor). Extend is saturating addition strictly evaluated, combine
+  /// is maximum, semiring zero is bottom, and semiring one is distance 0.
   class LongestSaturatingPathSemiring : public wali::SemElem
   {
   public:
