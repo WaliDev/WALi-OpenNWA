@@ -20,6 +20,7 @@
  */
 
 #include <map>
+#include <vector>
 #include <utility>
 #include <string>
 
@@ -127,6 +128,7 @@ namespace wali
            * used. This function is meant to be an effecient way of adding multiple variables
            **/
           virtual void setIntVars(const std::map<std::string, int>& vars);
+          virtual void setIntVars(const std::vector<std::map<std::string, int> >& vars);
 
         public:
           //using wali::Countable::count;

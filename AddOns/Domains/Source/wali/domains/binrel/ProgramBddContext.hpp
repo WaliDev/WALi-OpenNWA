@@ -54,6 +54,7 @@ namespace wali
            * This should be faster than multiple calls to addIntVar.
            **/
           virtual void setIntVars(const std::map<std::string, int>& vars);
+          virtual void setIntVars(const std::vector<std::map<std::string, int> >& vars);
          
           std::ostream& print(std::ostream& o) const;
 

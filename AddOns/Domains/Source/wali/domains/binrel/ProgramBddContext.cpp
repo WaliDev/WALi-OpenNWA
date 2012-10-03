@@ -103,14 +103,22 @@ void ProgramBddContext::addBoolVar(std::string name)
   addIntVar(name,2);
 }
 
-void ProgramBddContext::setIntVars(const std::map<std::string, int>& vars)
+void ProgramBddContext::setIntVars(const std::map<std::string, int>& flatvars)
+{
+  std::vector<std::map<std::string, int> > vars;
+  vars.push_back(flatvars);
+  setIntVars(vars);
+}
+
+
+void ProgramBddContext::setIntVars(const std::vector<std::map<std::string, int> >& vars)
 {
   BddContext::setIntVars(vars);
   
   // Compute the size of register needed.
-  int size = 0;
-  for(std::map<std::string, int>::const_iterator ci = vars.begin(); ci != vars.end(); ++ci)
-    size = ci->second > size ? ci->second : size;
+  unsigned size = 0;
+  for(std::map<const std::string, bddinfo_t>::const_iterator ci = this->begin(); ci != this->end(); ++ci)
+    size = ci->second->maxVal > size ? ci->second->maxVal : size;
   maxSize = size;
 
   // Now create some buddy levels for scratchpad
