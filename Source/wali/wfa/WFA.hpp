@@ -697,10 +697,16 @@ namespace wali
                        WFA const & right, std::vector<Key> const & right_states,
                        bool check_weights);
 
+
+        typedef std::map<Key, AccessibleStateMap> EpsilonCloseCache;
+        
         static
         std::map<Key, std::set<Key> >
         next_states(WFA const & wfa, std::set<Key> const & froms);
 
+        static
+        std::map<Key, std::set<Key> >
+        next_states(WFA const & wfa, std::set<Key> const & froms, EpsilonCloseCache & cache);
 
         //// Prints to 'os' statistics about this WFA. 
         void printStatistics(std::ostream & os) const;

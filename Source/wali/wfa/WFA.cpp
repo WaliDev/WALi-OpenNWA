@@ -31,6 +31,25 @@ std::set< Key >::iterator name##it = F.begin();                 \
 std::set< Key >::iterator name##itEND = F.end();                \
 for( ; name##it != name##itEND && (0 != (name = getState(*name##it))) ; name##it++ )
 
+
+namespace {
+  wali::wfa::WFA::AccessibleStateMap
+  epsilonCloseCached(wali::wfa::WFA const & wfa, wali::Key state, wali::wfa::WFA::EpsilonCloseCache & cache)
+  {
+    wali::wfa::WFA::EpsilonCloseCache::iterator loc = cache.find(state);
+
+    if (loc != cache.end()) {
+      return loc->second;
+    }
+    else {
+      wali::wfa::WFA::AccessibleStateMap eclose = wfa.epsilonClose(state);
+      cache[state] = eclose;
+      return eclose;
+    }
+  }
+}  
+
+
 namespace wali
 {
   namespace wfa
@@ -1630,11 +1649,12 @@ namespace wali
     {
       AccessibleStateMap before = start;
       AccessibleStateMap after;
+      EpsilonCloseCache eclose_cache;
 
       for (AccessibleStateMap::const_iterator start_it = start.begin();
            start_it != start.end(); ++start_it)
       {
-        AccessibleStateMap eclose = epsilonClose(start_it->first);
+        AccessibleStateMap eclose = epsilonCloseCached(*this, start_it->first, eclose_cache);
         merge_state_maps(before, eclose);
       }
 
@@ -1657,7 +1677,7 @@ namespace wali
             for (TransSet::const_iterator trans_it = transitions.begin();
                  trans_it != transitions.end(); ++trans_it)
             {
-              AccessibleStateMap eclose = epsilonClose((*trans_it)->to());
+              AccessibleStateMap eclose = epsilonCloseCached(*this, (*trans_it)->to(), eclose_cache);
               for (AccessibleStateMap::const_iterator dest = eclose.begin();
                    dest != eclose.end(); ++dest)
               {
@@ -1719,6 +1739,13 @@ namespace wali
     std::map<Key, KeySet>
     WFA::next_states(WFA const & wfa, KeySet const & froms)
     {
+      EpsilonCloseCache cache;
+      return next_states(wfa, froms, cache);
+    }
+
+    std::map<Key, KeySet>
+    WFA::next_states(WFA const & wfa, KeySet const & froms, EpsilonCloseCache & eclose_cache)
+    {
       // symbol -> keyset
       std::map<Key, KeySet> nexts;
 
@@ -1738,7 +1765,7 @@ namespace wali
             for (TransSet::const_iterator trans = outgoing.begin();
                  trans != outgoing.end(); ++trans)
             {
-              AccessibleStateMap eclose = wfa.epsilonClose((*trans)->to());
+              AccessibleStateMap eclose = epsilonCloseCached(wfa, (*trans)->to(), eclose_cache);
 
               for (AccessibleStateMap::const_iterator target = eclose.begin();
                    target != eclose.end(); ++target)
@@ -1754,12 +1781,12 @@ namespace wali
       return nexts;
     }
 
-
     WFA
     WFA::semideterminize(DeterminizeWeightGen const & wg) const
     {
       std::stack<KeySet> worklist;
       std::set<Key> visited;
+      EpsilonCloseCache eclose_cache;
 
       WFA result;
       sem_elem_t zero = getSomeWeight()->zero();
@@ -1769,7 +1796,7 @@ namespace wali
         // Set up initial states
         KeySet det_initial;
         
-        AccessibleStateMap initials = epsilonClose(this->getInitialState());
+        AccessibleStateMap initials = epsilonCloseCached(*this, this->getInitialState(), eclose_cache);
         for (AccessibleStateMap::const_iterator initial = initials.begin();
              initial != initials.end(); ++initial)
         {
