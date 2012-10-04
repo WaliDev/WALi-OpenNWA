@@ -577,8 +577,11 @@ namespace wali
             Key fromkey = getKey( t->from(),t2->from() );
             Key tokey = getKey( t->to(),t2->to() );
             sem_elem_t W = wmaker.make_weight(t ,t2);
-            ITrans* newTrans = new Trans(fromkey,t->stack(),tokey,W); 
-            //newTrans->print( std::cout << "\tAdding Trans: " ) << std::endl;
+            ITrans* newTrans = new Trans(fromkey,t->stack(),tokey,W);
+            //std::cout << "---   Because:\n";
+            //t->print(std::cout << "---     right (this) contains ") << std::endl;
+            //t2->print(std::cout << "---     left (other) contains ") << std::endl;
+            //newTrans->print( std::cout << "---     Adding Trans: " ) << std::endl;
             dest.addTrans( newTrans );
           }
         }
