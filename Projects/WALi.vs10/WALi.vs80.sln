@@ -7,8 +7,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LiveVar", "LiveVar\LiveVar.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Parse", "Parse\Parse.vcxproj", "{7A421A3D-B595-48F1-9C6C-E29CD16FCAE6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NWA tests", "NWA tests\NWA tests.vcxproj", "{596EF52A-E6BC-4C1A-959E-C3433394514C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -41,14 +39,6 @@ Global
 		{7A421A3D-B595-48F1-9C6C-E29CD16FCAE6}.Release|Win32.Build.0 = Release|Win32
 		{7A421A3D-B595-48F1-9C6C-E29CD16FCAE6}.Release|x64.ActiveCfg = Release|x64
 		{7A421A3D-B595-48F1-9C6C-E29CD16FCAE6}.Release|x64.Build.0 = Release|x64
-		{596EF52A-E6BC-4C1A-959E-C3433394514C}.Debug|Win32.ActiveCfg = Debug|Win32
-		{596EF52A-E6BC-4C1A-959E-C3433394514C}.Debug|Win32.Build.0 = Debug|Win32
-		{596EF52A-E6BC-4C1A-959E-C3433394514C}.Debug|x64.ActiveCfg = Debug|x64
-		{596EF52A-E6BC-4C1A-959E-C3433394514C}.Debug|x64.Build.0 = Debug|x64
-		{596EF52A-E6BC-4C1A-959E-C3433394514C}.Release|Win32.ActiveCfg = Release|Win32
-		{596EF52A-E6BC-4C1A-959E-C3433394514C}.Release|Win32.Build.0 = Release|Win32
-		{596EF52A-E6BC-4C1A-959E-C3433394514C}.Release|x64.ActiveCfg = Release|x64
-		{596EF52A-E6BC-4C1A-959E-C3433394514C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
