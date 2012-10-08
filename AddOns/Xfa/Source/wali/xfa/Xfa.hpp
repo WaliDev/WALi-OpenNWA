@@ -332,7 +332,7 @@ namespace cfglib {
             void set_up_sequential_state_map(Xfa const & xfa)
             {
                 assert(sequential_state_map.size()==0);
-                int next_sequential_state = 1;
+                int next_sequential_state = 0;
                 std::set<wali::Key> const & states = xfa.getStateKeys();
                 for(std::set<wali::Key>::const_iterator state = states.begin();
                     state != states.end(); ++state)
@@ -443,13 +443,13 @@ namespace cfglib {
                 int source_fdd = safe_get(new_voc, current_state)->baseLhs;
                 int dest_fdd = safe_get(new_voc, current_state)->baseRhs;
 
-                //std::cout << "Creating state change BDD, setting\n"
-                //            << "    FDD " << source_fdd << " to " << source << "\n"
-                //          << "    FDD " << dest_fdd << " to " << dest << "\n";
-
                 SequentialFromZeroState
                     sfz_source = from_state(State(source)),
                     sfz_dest = from_state(State(dest));
+
+                //std::cout << "Creating state change BDD, setting\n"
+                //          << "    FDD " << source_fdd << " to " << source << " (really " << sfz_source.index << ")\n"
+                //          << "    FDD " << dest_fdd << " to " << dest << " (really " << sfz_dest.index << ")\n";
 
                 bdd state_change = fdd_ithvar(source_fdd, sfz_source.index) & fdd_ithvar(dest_fdd, sfz_dest.index);
 
