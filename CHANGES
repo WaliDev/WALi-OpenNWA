@@ -7,7 +7,9 @@ Trunk:
     _DEBUG_ITERATOR_LEVEL. If it gets by the linker (this *shouldn't*
     happen but I can't promise anything of course), you'll get hard-to-
     track-down runtime bugs. (Of course, the same is true if you expected
-    /MDd before.)
+    /MDd before.) The old behavior, with the /MD flag and _DEBUG not
+    defined, is now preserved in the 'DebugMD' configuration of the core
+    WALi project.
 
   Visual Studio project changes
   - Upgraded some projects to VS2010. (The solution and existing project
