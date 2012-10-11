@@ -13,6 +13,15 @@ using namespace xfa_parser;
 namespace cfglib {
     namespace xfa {
 
+        struct ReadTransitionException {
+            BinaryRelation back_weight, bit1_weight;
+
+            ReadTransitionException(BinaryRelation back, BinaryRelation bit1)
+                : back_weight(back)
+                , bit1_weight(bit1)
+            {}
+        };
+
         struct WeightedTransition {
             State source;
             Symbol symbol;
@@ -85,7 +94,15 @@ namespace cfglib {
             if (cmd.name == "read") {
                 // FIXME
                 std::cerr << "    read\n";
-                return zero;
+                // x = x + x (where x is the __io_return being read into)
+                BinaryRelation times2 = new BinRel(&voc, voc.Assign(var_name(act.operand_id, prefix),
+                                                                    voc.Plus(voc.From(var_name(act.operand_id, prefix)),
+                                                                             voc.From(var_name(act.operand_id, prefix)))));
+                // x = x + 1 (where x is the __io_return being read into)
+                BinaryRelation plus1 = new BinRel(&voc, voc.Assign(var_name(act.operand_id, prefix),
+                                                                   voc.Plus(voc.From(var_name(act.operand_id, prefix)),
+                                                                            voc.Const(1))));
+                throw ReadTransitionException(times2, plus1);
             }
 
             if (cmd.name == "reset") {
@@ -141,26 +158,62 @@ namespace cfglib {
 
             using wali::domains::binrel::BinRel;
             BinaryRelation rel;
-            if (trans.actions.size() == 0u) {
-                rel = new BinRel(&voc, ident);
-            }
-            else if (trans.actions.size() == 1u) {
-                rel = get_relation(*trans.actions[0], voc, zero, ident, prefix);
-            }
-            else {
-                assert(false);
-            }
 
-            TransList ret;
-            auto const & syms = trans.symbols;
-            for (auto sym = syms.begin(); sym != syms.end(); ++sym) {
-                auto name = dynamic_cast<xfa_parser::Name*>(sym->get());
-                assert(name);
-                if (name->name == "epsilon") {
-                    ret.push_back(WeightedTransition(source, eps, dest, rel));
+            TransList ret;            
+
+            try {
+                if (trans.actions.size() == 0u) {
+                    rel = new BinRel(&voc, ident);
+                }
+                else if (trans.actions.size() == 1u) {
+                    rel = get_relation(*trans.actions[0], voc, zero, ident, prefix);
                 }
                 else {
-                    ret.push_back(WeightedTransition(source, getSymbol(name->name), dest, rel));
+                    assert(false);
+                }
+
+                auto const & syms = trans.symbols;
+                for (auto sym = syms.begin(); sym != syms.end(); ++sym) {
+                    auto name = dynamic_cast<xfa_parser::Name*>(sym->get());
+                    assert(name);
+                    if (name->name == "epsilon") {
+                        ret.push_back(WeightedTransition(source, eps, dest, rel));
+                    }
+                    else {
+                        ret.push_back(WeightedTransition(source, getSymbol(name->name), dest, rel));
+                    }
+                }
+            }
+            catch (ReadTransitionException & e) {
+                auto const & syms = trans.symbols;
+                for (auto sym = syms.begin(); sym != syms.end(); ++sym) {
+                    auto name = dynamic_cast<xfa_parser::Name*>(sym->get());
+                    assert(name->name != "epsilon");
+
+                    // source ---> intermediate_name ---> dest
+                    //                               <---
+                    std::stringstream intermediate_name;
+                    intermediate_name << trans.source << "__" << name->name;
+                    std::stringstream bit0_name, bit1_name;;
+                    bit0_name << name->name << "__bit_is_0";
+                    bit1_name << name->name << "__bit_is_1";
+                    Symbol startbits = getSymbol("__startbits");
+                    Symbol bit0 = getSymbol(bit0_name.str());
+                    Symbol bit1 = getSymbol(bit1_name.str());
+                    State intermediate = getState(intermediate_name.str());
+
+                    // source --> intermediate has identity weight, symbol '__startbits'
+                    rel = new BinRel(&voc, ident);
+                    ret.push_back(WeightedTransition(source, startbits, intermediate, rel));
+
+                    // intermediate --> dest has two transitions:
+                    //     '__bit_0' has identity weight
+                    //     '__bit_1' has +1 weight
+                    ret.push_back(WeightedTransition(intermediate, bit0, dest, rel));
+                    ret.push_back(WeightedTransition(intermediate, bit1, dest, e.bit1_weight));
+
+                    // dest --> intermediate has epsilon and weight *2
+                    ret.push_back(WeightedTransition(dest, eps, intermediate, e.back_weight));
                 }
             }
 
