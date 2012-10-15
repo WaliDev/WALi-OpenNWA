@@ -119,6 +119,7 @@ void ProgramBddContext::setIntVars(const std::vector<std::map<std::string, int> 
   unsigned size = 0;
   for(std::map<const std::string, bddinfo_t>::const_iterator ci = this->begin(); ci != this->end(); ++ci)
     size = ci->second->maxVal > size ? ci->second->maxVal : size;
+  size = size < 2 ? 2 : size; // The least size handled is 2. There must be at least one bool variable.
   maxSize = size;
 
   // Now create some buddy levels for scratchpad

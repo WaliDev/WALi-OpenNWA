@@ -50,7 +50,8 @@ using std::cout;
 #define TENSOR_MIN_AFFINITY
 //#define TENSOR_MAX_AFFINITY
 
-
+#define DETENSOR_TOGETHER
+//#define DETENSOR_BIT_BY_BIT
 
 // ////////////////////////////
 // Implementation of the initialization free function.
@@ -517,7 +518,7 @@ void BddContext::setIntVars(const std::vector<std::map<std::string, int> >& vars
   }
 
   //DEBUGGING
-#if 1
+#if 0
   cout << "baseLhs: ";
   for(unsigned i =0; i < this->size(); ++i)
     cout << " " << baseLhs[i];
@@ -587,6 +588,7 @@ void BddContext::setIntVars(const std::vector<std::map<std::string, int> >& vars
   commonBddContextSet13 &= fdd_makeset(tensor2Lhs, this->size());
   assert(this->size() == 0 || (baseSecBddContextSet != bddfalse && tensorSecBddContextSet != bddfalse
         && tensorSecBddContextSet != bddfalse && commonBddContextSet23 != bddfalse && commonBddContextSet13 != bddfalse));
+#if defined(TENSOR_TOGETHER)
   // Somehow make this efficient
   for(std::map<const std::string, bddinfo_t>::const_iterator ci = this->begin(); ci != this->end(); ++ci){
     bddinfo_t varInfo = ci->second;
@@ -595,6 +597,7 @@ void BddContext::setIntVars(const std::vector<std::map<std::string, int> >& vars
     commonBddContextId13 = commonBddContextId13 & 
       fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
   }
+#endif
 
   // Create cached BinRel objects
   // Somehow make this efficient
@@ -937,9 +940,20 @@ binrel_t BinRel::Eq23Project() const
     return new BinRel(con,bddfalse, false);
   }
 #endif
+#if defined(DETENSOR_TOGETHER)
   bdd rel1 = rel & con->commonBddContextId23; 
   bdd rel2 = bdd_exist(rel1, con->commonBddContextSet23);
   bdd c = bdd_replace(rel2, con->move2Base.get());
+#else
+  bdd rel1 = rel;
+  for(std::map<const std::string, bddinfo_t>::const_iterator citer = con->begin(); citer != con->end(); ++citer){
+    bddinfo_t varInfo = (*citer).second;
+    bdd id = fdd_equals(varInfo->tensor1Rhs, varInfo->tensor2Lhs);
+    rel1 = rel1 & id;
+    rel1 = bdd_exist(rel1, fdd_ithset(varInfo->tensor1Rhs) & fdd_ithset(varInfo->tensor2Lhs));
+  }
+  bdd c = bdd_replace(rel1, con->move2Base.get());
+#endif
 #ifdef BINREL_STATS
   BinRel::numEq23Project++;
 #endif
@@ -957,9 +971,20 @@ binrel_t BinRel::Eq13Project() const
     return new BinRel(con,bddfalse, false);
   }
 #endif
+#if defined(DETENSOR_TOGETHER)
   bdd rel1 = rel & con->commonBddContextId13; 
   bdd rel2 = bdd_exist(rel1, con->commonBddContextSet13);
   bdd c = bdd_replace(rel2, con->move2BaseTwisted.get());
+#else
+  bdd rel1 = rel;
+  for(std::map<const std::string, bddinfo_t>::const_iterator citer = con->begin(); citer != con->end(); ++citer){
+    bddinfo_t varInfo = (*citer).second;
+    bdd id = fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
+    rel1 = rel1 & id;
+    rel1 = bdd_exist(rel1, fdd_ithset(varInfo->tensor1Lhs) & fdd_ithset(varInfo->tensor2Lhs));
+  }
+  bdd c = bdd_replace(rel1, con->move2BaseTwisted.get());
+#endif
 #ifdef BINREL_STATS
   BinRel::numEq13Project++;
 #endif

@@ -54,6 +54,7 @@ penv = env.Clone()
 penv.Append(LIBS = ['bpparser', 'walidomains', 'glog', 'bdd']);
 built += penv.Program('PrintBplStats.cpp')
 built += penv.Program('NewtonFwpdsCompare.cpp')
+built += penv.Program('RunNewton.cpp')
 
 Return('built')
 
