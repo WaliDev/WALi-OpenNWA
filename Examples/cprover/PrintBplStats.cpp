@@ -17,5 +17,6 @@ int main(int argc, char ** argv)
   
   print_prog_stats(pg);
 
+  deep_erase_prog(&pg);
   return 0;
 }

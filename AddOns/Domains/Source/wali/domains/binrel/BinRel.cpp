@@ -18,6 +18,43 @@
 using namespace wali::domains::binrel;
 using std::endl;
 using wali::waliErr;
+using std::cout;
+
+
+/**
+ *
+ * The following describes how to control the bdd variables are setup in buddy
+ * Let x, y, w and z be variables, each requiring two bdd levels (x1 and x2)
+ * Further, for the bit x1, there are three different levels x1b, x1t1 and x1t2 
+ * -- the first one for base, the second and third for the two tensor spots. 
+ * Finally, each spot needs three levels, x1b, x1b' and x1b''.
+ *
+ * Let's disregard tensors for the moment.
+ * By default, the variables are interleaved at the bit level. So, a call to 
+ * setInts({(x, 2), (y, 2), (z, 2)}) gives the interleaving
+ * x1b x1b' x1b'' y1b y1b' y1b'' z1b z1b' z1b'' x2b x2b' x2b'' y2b y2b' y2b'' z2b z2b' z2b''
+ * There is another way of interleaving these variables. Where variables are grouped together.
+ * setInts({{(x, 2), (y, 2)}, {(z, 2), (w, 2)}}) 
+ * x1b x1b' x1b'' y1b y1b' y1b'' x2b x2b' x2b'' y2b y2b' y2b'' z1b z1b' z1b'' w1b w1b' w1b'' z2b z2b' z2b'' w2b w2b' w2b''
+ * 
+ * There are two choices with regard to tensors. 
+ * (1) TENSOR_MAX_AFFINITY
+ * This makes sure that all three levels for a bit are always together, i.e., you always get
+ * x1b x1b' x1b'' x1t1 x1t1' x1t1'' x1t2 x1t2' x1t2''
+ * The interleaving at higher levels remains the same
+ * (2) TENSOR_MIN_AFFINITY
+ * This makes sure that the three levels for the whole vocabulary are separate and copies of each other.
+ * So, for the example above, the levels would look like.
+ * x1b x1b' x1b'' y1b y1b' y1b'' x2b x2b' x2b'' y2b y2b' y2b'' z1b z1b' z1b'' w1b w1b' w1b'' z2b z2b' z2b'' w2b w2b' w2b''
+ * x1t1 x1t1' x1t1'' y1t1 y1t1' y1t1'' x2t1 x2t1' x2t1'' y2t1 y2t1' y2t1'' z1t1 z1t1' z1t1'' w1t1 w1t1' w1t1'' z2t1 z2t1' z2t1'' w2t1 w2t1' w2t1''
+ * x1t2 x1t2' x1t2'' y1t2 y1t2' y1t2'' x2t2 x2t2' x2t2'' y2t2 y2t2' y2t2'' z1t2 z1t2' z1t2'' w1t2 w1t2' w1t2'' z2t2 z2t2' z2t2'' w2t2 w2t2' w2t2''
+ * 
+ * The tensor choice is determined by the following macro:
+ **/
+#define TENSOR_MIN_AFFINITY
+//#define TENSOR_MAX_AFFINITY
+
+
 
 // ////////////////////////////
 // Implementation of the initialization free function.
@@ -281,6 +318,312 @@ BddContext::~BddContext()
 void BddContext::addBoolVar(std::string name)
 {
   addIntVar(name,2);
+}
+
+void BddContext::setIntVars(const std::map<std::string, int>& flatvars)
+{
+  std::vector<std::map<std::string, int> > vars;
+  vars.push_back(flatvars);
+  setIntVars(vars);
+}
+
+void BddContext::setIntVars(const std::vector<std::map<std::string, int> >& vars)
+{
+  int vari;
+  // First work through the variable list and create the vocabulary structure
+  // This will collect information about the fdds to be created in buddy
+  for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
+    for(std::map<std::string, int>::const_iterator cmi = (*cvi).begin(); cmi != (*cvi).end(); ++cmi){
+      if(cmi->second < 2){
+        *waliErr << "I haven't tested the library for int size less than 2";
+        assert(false);
+      }
+      bddinfo_t varInfo = new BddInfo;
+      varInfo->maxVal = cmi->second;
+      (*this)[cmi->first] = varInfo;
+    }
+  }
+
+#if defined(TENSOR_MAX_AFFINITY)
+  for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
+    std::map<std::string, int> interleavedVars = *cvi;
+    int * domains = new int[9 * interleavedVars.size()];
+    vari = 0;
+    for(std::map<std::string, int>::const_iterator cmi = interleavedVars.begin(); cmi != interleavedVars.end(); ++cmi){
+      for(int j=vari * 9; j < 9 * (vari + 1); ++j)
+        domains[j] = cmi->second;
+      vari++;
+    }
+    //Now actually create the fdd levels
+    // lock mutex
+    int base = fdd_extdomain(domains, 9 * interleavedVars.size());
+    // release mutex
+    if (base < 0){
+      *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
+      *waliErr << "    Aborting." << endl;
+      assert (false);
+    }
+    delete [] domains;
+    // Assign fdd levels to the variables.
+    vari = 0;
+    for(std::map<std::string, int>::const_iterator cmi = interleavedVars.begin(); cmi != interleavedVars.end(); ++cmi){
+      bddinfo_t varInfo = (*this)[cmi->first];
+      int j = 9 * vari;
+      varInfo->baseLhs = base + j++;
+      varInfo->baseRhs = base + j++;
+      varInfo->baseExtra = base + j++;
+      varInfo->tensor1Lhs = base + j++;
+      varInfo->tensor1Rhs = base + j++;
+      varInfo->tensor1Extra = base + j++;
+      varInfo->tensor2Lhs = base + j++;
+      varInfo->tensor2Rhs = base + j++;
+      varInfo->tensor2Extra = base + j++;
+      vari++;  
+    }
+  }
+#elif defined(TENSOR_MIN_AFFINITY)
+  //First the base levels
+  for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
+    std::map<std::string, int> interleavedVars = *cvi;
+    vari = 0;
+    int * domains = new int[3 * interleavedVars.size()];
+    for(std::map<std::string, int>::const_iterator cmi = interleavedVars.begin(); cmi != interleavedVars.end(); ++cmi){
+      for(int j=vari * 3; j < 3 * (vari + 1); ++j)
+        domains[j] = cmi->second;
+      vari++;
+    }
+    //Now actually create the fdd levels
+    // lock mutex
+    int base = fdd_extdomain(domains, 3 * interleavedVars.size());
+    // release mutex
+    if (base < 0){
+      *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
+      *waliErr << "    Aborting." << endl;
+      assert (false);
+    }
+    delete [] domains;
+    // Assign fdd levels to the variables.
+    vari = 0;
+    for(std::map<std::string, int>::const_iterator ci = interleavedVars.begin(); ci != interleavedVars.end(); ++ci){
+      bddinfo_t varInfo = (*this)[ci->first];
+      int j = 3 * vari;
+      varInfo->baseLhs = base + j++;
+      varInfo->baseRhs = base + j++;
+      varInfo->baseExtra = base + j++;
+      vari++;  
+    }
+  }
+  //Next for tensor1
+  for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
+    std::map<std::string, int> interleavedVars = *cvi;
+    vari = 0;
+    int * domains = new int[3 * interleavedVars.size()];
+    for(std::map<std::string, int>::const_iterator cmi = interleavedVars.begin(); cmi != interleavedVars.end(); ++cmi){
+      for(int j=vari * 3; j < 3 * (vari + 1); ++j)
+        domains[j] = cmi->second;
+      vari++;
+    }
+    //Now actually create the fdd levels
+    // lock mutex
+    int base = fdd_extdomain(domains, 3 * interleavedVars.size());
+    // release mutex
+    if (base < 0){
+      *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
+      *waliErr << "    Aborting." << endl;
+      assert (false);
+    }
+    delete [] domains;
+    // Assign fdd levels to the variables.
+    vari = 0;
+    for(std::map<std::string, int>::const_iterator ci = interleavedVars.begin(); ci != interleavedVars.end(); ++ci){
+      bddinfo_t varInfo = (*this)[ci->first];
+      int j = 3 * vari;
+      varInfo->tensor1Lhs = base + j++;
+      varInfo->tensor1Rhs = base + j++;
+      varInfo->tensor1Extra = base + j++;
+      vari++;  
+    }
+  }
+  //Finally for tensor2
+  for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
+    std::map<std::string, int> interleavedVars = *cvi;
+    vari = 0;
+    int * domains = new int[3 * interleavedVars.size()];
+    for(std::map<std::string, int>::const_iterator cmi = interleavedVars.begin(); cmi != interleavedVars.end(); ++cmi){
+      for(int j=vari * 3; j < 3 * (vari + 1); ++j)
+        domains[j] = cmi->second;
+      vari++;
+    }
+    //Now actually create the fdd levels
+    // lock mutex
+    int base = fdd_extdomain(domains, 3 * interleavedVars.size());
+    // release mutex
+    if (base < 0){
+      *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
+      *waliErr << "    Aborting." << endl;
+      assert (false);
+    }
+    delete [] domains;
+    // Assign fdd levels to the variables.
+    vari = 0;
+    for(std::map<std::string, int>::const_iterator ci = interleavedVars.begin(); ci != interleavedVars.end(); ++ci){
+      bddinfo_t varInfo = (*this)[ci->first];
+      int j = 3 * vari;
+      varInfo->tensor2Lhs = base + j++;
+      varInfo->tensor2Rhs = base + j++;
+      varInfo->tensor2Extra = base + j++;
+      vari++;  
+    }
+  }
+#else
+  assert(0);
+#endif
+
+  // Also update the reverse vocabulary for printing.
+  for(std::map<const std::string, bddinfo_t>::const_iterator ci = this->begin(); ci != this->end(); ++ci){
+    bddinfo_t varInfo = ci->second;
+    idx2Name[varInfo->baseLhs] = ci->first;
+    idx2Name[varInfo->baseRhs] = ci->first + "'";
+    idx2Name[varInfo->baseExtra] = ci->first + "''";
+    idx2Name[varInfo->tensor1Lhs] = ci->first + "_t1";
+    idx2Name[varInfo->tensor1Rhs] = ci->first + "_t1'";
+    idx2Name[varInfo->tensor1Extra] = ci->first + "_t1''";
+    idx2Name[varInfo->tensor2Lhs] = ci->first + "_t2";
+    idx2Name[varInfo->tensor2Rhs] = ci->first + "_t2'";
+    idx2Name[varInfo->tensor2Extra] = ci->first + "_t2''";
+  } 
+
+
+  // Update bddPairs
+  // We will first create arrays for each of columns
+  int * baseLhs = new int[this->size()];
+  int * baseRhs = new int[this->size()];
+  int * baseExtra = new int[this->size()];
+  int * tensor1Lhs = new int[this->size()];
+  int * tensor1Rhs = new int[this->size()];  
+  int * tensor1Extra = new int[this->size()];
+  int * tensor2Lhs = new int[this->size()];
+  int * tensor2Rhs = new int[this->size()];
+  int * tensor2Extra = new int[this->size()];
+  vari = 0;
+  for(std::map<const std::string, bddinfo_t>::const_iterator ci = this->begin(); ci != this->end(); ++ci){
+    bddinfo_t varInfo = ci->second; 
+    baseLhs[vari] = varInfo->baseLhs;
+    baseRhs[vari] = varInfo->baseRhs;
+    baseExtra[vari] = varInfo->baseExtra;
+    tensor1Lhs[vari] = varInfo->tensor1Lhs;
+    tensor1Rhs[vari] = varInfo->tensor1Rhs;
+    tensor1Extra[vari] = varInfo->tensor1Extra;
+    tensor2Lhs[vari] = varInfo->tensor2Lhs;
+    tensor2Rhs[vari] = varInfo->tensor2Rhs;
+    tensor2Extra[vari] = varInfo->tensor2Extra;
+    vari++; 
+  }
+
+  //DEBUGGING
+#if 1
+  cout << "baseLhs: ";
+  for(unsigned i =0; i < this->size(); ++i)
+    cout << " " << baseLhs[i];
+  cout << endl;
+  cout << "baseRhs: ";
+  for(unsigned i =0; i < this->size(); ++i)
+    cout << " " << baseRhs[i];
+  cout << endl;
+  cout << "baseExtra: ";
+  for(unsigned i =0; i < this->size(); ++i)
+    cout << " " << baseExtra[i];
+  cout << endl;
+  cout << "tensor1Lhs: ";
+  for(unsigned i =0; i < this->size(); ++i)
+    cout << " " << tensor1Lhs[i];
+  cout << endl;
+  cout << "tensor1Rhs: ";
+  for(unsigned i =0; i < this->size(); ++i)
+    cout << " " << tensor1Rhs[i];
+  cout << endl;
+  cout << "tensor1Extra: ";
+  for(unsigned i =0; i < this->size(); ++i)
+    cout << " " << tensor1Extra[i];
+  cout << endl;
+  cout << "tensor2Lhs: ";
+  for(unsigned i =0; i < this->size(); ++i)
+    cout << " " << tensor2Lhs[i];
+  cout << endl;
+  cout << "tensor2Rhs: ";
+  for(unsigned i =0; i < this->size(); ++i)
+    cout << " " << tensor2Rhs[i];
+  cout << endl;
+  cout << "tensor2Extra: ";
+  for(unsigned i =0; i < this->size(); ++i)
+    cout << " " << tensor2Extra[i];
+  cout << endl;
+#endif
+  //END DEBUGGING
+
+  fdd_setpairs(baseSwap.get(), baseLhs, baseRhs, this->size());
+  fdd_setpairs(baseSwap.get(), baseRhs, baseLhs, this->size());
+  fdd_setpairs(baseRightShift.get(), baseLhs, baseRhs, this->size());
+  fdd_setpairs(baseRightShift.get(), baseRhs, baseExtra, this->size());
+  fdd_setpairs(tensorRightShift.get(), tensor1Lhs, tensor1Rhs, this->size());
+  fdd_setpairs(tensorRightShift.get(), tensor2Lhs, tensor2Rhs, this->size());
+  fdd_setpairs(tensorRightShift.get(), tensor1Rhs, tensor1Extra, this->size());
+  fdd_setpairs(tensorRightShift.get(), tensor2Rhs, tensor2Extra, this->size());
+  fdd_setpairs(baseRestore.get(), baseExtra, baseRhs, this->size());
+  fdd_setpairs(tensorRestore.get(), tensor1Extra, tensor1Rhs, this->size());
+  fdd_setpairs(tensorRestore.get(), tensor2Extra, tensor2Rhs, this->size());
+  fdd_setpairs(move2Tensor1.get(), baseLhs, tensor1Lhs, this->size());
+  fdd_setpairs(move2Tensor1.get(), baseRhs, tensor1Rhs, this->size());
+  fdd_setpairs(move2Tensor2.get(), baseLhs, tensor2Lhs, this->size());
+  fdd_setpairs(move2Tensor2.get(), baseRhs, tensor2Rhs, this->size());
+  fdd_setpairs(move2Base.get(), tensor1Lhs, baseLhs, this->size());
+  fdd_setpairs(move2Base.get(), tensor2Rhs, baseRhs, this->size());
+  fdd_setpairs(move2BaseTwisted.get(), tensor1Rhs, baseLhs, this->size());
+  fdd_setpairs(move2BaseTwisted.get(), tensor2Rhs, baseRhs, this->size());
+
+  // Update static bdds
+  baseSecBddContextSet = fdd_makeset(baseRhs, this->size());
+  tensorSecBddContextSet = fdd_makeset(tensor1Rhs, this->size());
+  tensorSecBddContextSet &= fdd_makeset(tensor2Rhs, this->size());
+  commonBddContextSet23 = fdd_makeset(tensor1Rhs, this->size());
+  commonBddContextSet23 &= fdd_makeset(tensor2Lhs, this->size());
+  commonBddContextSet13 = fdd_makeset(tensor1Lhs, this->size());
+  commonBddContextSet13 &= fdd_makeset(tensor2Lhs, this->size());
+  assert(this->size() == 0 || (baseSecBddContextSet != bddfalse && tensorSecBddContextSet != bddfalse
+        && tensorSecBddContextSet != bddfalse && commonBddContextSet23 != bddfalse && commonBddContextSet13 != bddfalse));
+  // Somehow make this efficient
+  for(std::map<const std::string, bddinfo_t>::const_iterator ci = this->begin(); ci != this->end(); ++ci){
+    bddinfo_t varInfo = ci->second;
+    commonBddContextId23 = commonBddContextId23 &
+      fdd_equals(varInfo->tensor1Rhs, varInfo->tensor2Lhs);
+    commonBddContextId13 = commonBddContextId13 & 
+      fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
+  }
+
+  // Create cached BinRel objects
+  // Somehow make this efficient
+  bdd baseId = bddtrue;
+  bdd tensorId = bddtrue;
+  for(BddContextIter varIter = this->begin(); varIter != this->end();  ++varIter){
+    bddinfo_t varInfo = (*varIter).second;
+    baseId = baseId & fdd_equals(varInfo->baseLhs, varInfo->baseRhs);
+    tensorId = tensorId & (fdd_equals(varInfo->tensor1Lhs, varInfo->tensor1Rhs) & 
+        fdd_equals(varInfo->tensor2Lhs, varInfo->tensor2Rhs));
+  }
+  cachedBaseOne = new BinRel(this, baseId, false);
+  cachedBaseZero = new BinRel(this, bddfalse, false);
+  cachedTensorOne = new BinRel(this, tensorId, true);
+  cachedTensorZero = new BinRel(this, bddfalse, true);
+
+  delete [] baseLhs;
+  delete [] baseRhs;
+  delete [] baseExtra;
+  delete [] tensor1Lhs;
+  delete [] tensor1Rhs;
+  delete [] tensor1Extra;
+  delete [] tensor2Lhs;
+  delete [] tensor2Rhs;
+  delete [] tensor2Extra;
 }
 
 void BddContext::addIntVar(std::string name, unsigned size)

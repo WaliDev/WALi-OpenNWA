@@ -9,6 +9,7 @@
 #include <sstream>
 #include <string>
 #include <cstdlib>
+#include <map>
 
 // ::wali::domains::binrel
 #include "wali/domains/binrel/BinRel.hpp"
@@ -536,6 +537,148 @@ namespace{
     ASSERT_FALSE(failed);
   }
 
+  TEST(BinRelTestRandom, tensorDomainSetInt){
+    //same as tensorDomain, but uses setIntVars to create the vocabulary.
+    // //Maybe this should be done in a more repeat-friendly way// //
+    stringstream ss;
+    bool failed = false;
+    bool dump = false;
+    program_bdd_context_t brm = new ProgramBddContext();
+    std::map<std::string, int> vars;
+    vars["a"] = 4;
+    vars["b"] = 2;
+    vars["c"] = 4;
+    vars["d"] = 2;
+    brm->setIntVars(vars);
+    //ASSERT_EQ(voc.size(),4);
+
+    srand((unsigned)time(NULL));
+    for(int h=0;h<20;++h){
+      bdd r1bdd = brm->tGetRandomTransformer(true);
+      bdd r2bdd = brm->tGetRandomTransformer(true);
+      bdd r3bdd = brm->tGetRandomTransformer(true);
+
+      sem_elem_t r1 = new BinRel(brm.get_ptr(),r1bdd,true);
+      sem_elem_t r2 = new BinRel(brm.get_ptr(),r2bdd,true);
+      sem_elem_t r3 = new BinRel(brm.get_ptr(),r3bdd,true);
+      sem_elem_t w1,w2,w3,w4,w5;
+
+      w1 = r1->combine(r2);
+      w2 = r2->combine(r1);
+      if(!w1->equal(w2) || dump){
+        ss << "#################################\n[tensor] r1 | r2 <> r2 | r1\n\n";
+        r1->print(ss << "r1: ") << endl;
+        r2->print(ss << "r2: ") << endl;
+        w1->print(ss << "r1 | r2: ") << endl;
+        w2->print(ss << "r2 | r1: ") << endl;
+        failed = true;
+      }
+
+      w1 = (r1->extend(r2))->combine(r1->extend(r3));
+      w2 = r1->extend(r2->combine(r3));;
+      if(!w1->equal(w2) || dump){
+        ss << "#################################\n[tensor] r1 & (r2 | r3) <> r1 & r2 | r1 & r3\n\n";
+        r1->print(ss << "r1: ") << endl;
+        r2->print(ss << "r2: ") << endl;
+        r3->print(ss << "r3: ") << endl;
+        w1->print(ss << "r1 & (r2 | r3): ") << endl;
+        w2->print(ss << "r1 & r2 | r1 & r3: ") << endl;
+        failed = true;
+      }
+
+      w1 = (r1->extend(r3))->combine(r2->extend(r3));
+      w2 = (r1->combine(r2))->extend(r3);
+      if(!w1->equal(w2) || dump){
+        ss << "#################################\n[tensor] (r1 | r2 ) & r3 <> r1 & r3 | r2 & r3\n\n";
+        r1->print(ss << "r1: ") << endl;
+        r2->print(ss << "r2: ") << endl;
+        r3->print(ss << "r3: ") << endl;
+        w1->print(ss << "(r1 | r2) & r3: ") << endl;
+        w2->print(ss << "r1 & r3 | r2 & r3: ") << endl;
+        failed = true;
+      }
+    }
+
+    if(failed){
+      cerr << "\n Differences logged in BinRelTestRandom_baseDomain.output\n";
+      writeOutput("BinRelTestRandom","tensorDomain", ss);
+    }
+    ASSERT_FALSE(failed);
+  }
+
+  TEST(BinRelTestRandom, tensorDomainSetIntTwoSets){
+    // Same as tensorDomain, but uses setIntVars to create the vocabulary.
+    // Additionally, the variables are grouped into two interleaving sets.
+    // //Maybe this should be done in a more repeat-friendly way// //
+    stringstream ss;
+    bool failed = false;
+    bool dump = false;
+    program_bdd_context_t brm = new ProgramBddContext();
+    std::vector<std::map<std::string, int> > vars;
+    std::map<std::string, int> vars1;
+    std::map<std::string, int> vars2;
+    vars1["a"] = 4;
+    vars1["b"] = 2;
+    vars2["c"] = 4;
+    vars2["d"] = 2;
+    vars.push_back(vars1);
+    vars.push_back(vars2);
+    brm->setIntVars(vars);
+    //ASSERT_EQ(voc.size(),4);
+
+    srand((unsigned)time(NULL));
+    for(int h=0;h<20;++h){
+      bdd r1bdd = brm->tGetRandomTransformer(true);
+      bdd r2bdd = brm->tGetRandomTransformer(true);
+      bdd r3bdd = brm->tGetRandomTransformer(true);
+
+      sem_elem_t r1 = new BinRel(brm.get_ptr(),r1bdd,true);
+      sem_elem_t r2 = new BinRel(brm.get_ptr(),r2bdd,true);
+      sem_elem_t r3 = new BinRel(brm.get_ptr(),r3bdd,true);
+      sem_elem_t w1,w2,w3,w4,w5;
+
+      w1 = r1->combine(r2);
+      w2 = r2->combine(r1);
+      if(!w1->equal(w2) || dump){
+        ss << "#################################\n[tensor] r1 | r2 <> r2 | r1\n\n";
+        r1->print(ss << "r1: ") << endl;
+        r2->print(ss << "r2: ") << endl;
+        w1->print(ss << "r1 | r2: ") << endl;
+        w2->print(ss << "r2 | r1: ") << endl;
+        failed = true;
+      }
+
+      w1 = (r1->extend(r2))->combine(r1->extend(r3));
+      w2 = r1->extend(r2->combine(r3));;
+      if(!w1->equal(w2) || dump){
+        ss << "#################################\n[tensor] r1 & (r2 | r3) <> r1 & r2 | r1 & r3\n\n";
+        r1->print(ss << "r1: ") << endl;
+        r2->print(ss << "r2: ") << endl;
+        r3->print(ss << "r3: ") << endl;
+        w1->print(ss << "r1 & (r2 | r3): ") << endl;
+        w2->print(ss << "r1 & r2 | r1 & r3: ") << endl;
+        failed = true;
+      }
+
+      w1 = (r1->extend(r3))->combine(r2->extend(r3));
+      w2 = (r1->combine(r2))->extend(r3);
+      if(!w1->equal(w2) || dump){
+        ss << "#################################\n[tensor] (r1 | r2 ) & r3 <> r1 & r3 | r2 & r3\n\n";
+        r1->print(ss << "r1: ") << endl;
+        r2->print(ss << "r2: ") << endl;
+        r3->print(ss << "r3: ") << endl;
+        w1->print(ss << "(r1 | r2) & r3: ") << endl;
+        w2->print(ss << "r1 & r3 | r2 & r3: ") << endl;
+        failed = true;
+      }
+    }
+
+    if(failed){
+      cerr << "\n Differences logged in BinRelTestRandom_baseDomain.output\n";
+      writeOutput("BinRelTestRandom","tensorDomain", ss);
+    }
+    ASSERT_FALSE(failed);
+  }
 
 
 } //namespace

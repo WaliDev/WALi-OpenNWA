@@ -812,6 +812,7 @@ const char *bdd_errstring(int e)
 void bdd_default_errhandler(int e)
 {
    fprintf(stderr, "BDD error: %s\n", bdd_errstring(e));
+   assert(0);
    exit(1);
 }
 

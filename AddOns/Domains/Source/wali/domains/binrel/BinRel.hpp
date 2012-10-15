@@ -20,6 +20,7 @@
  */
 
 #include <map>
+#include <vector>
 #include <utility>
 #include <string>
 #include <vector>
@@ -123,6 +124,15 @@ namespace wali
           /** Add a int variable to the vocabulary with the name 'name'. The
            * integer can take values between 0...size-1. **/
           virtual void addIntVar(std::string name, unsigned size);
+
+          /** 
+           * Add multiple variables to the vocabulary with the given sizes. 
+           * This function should not be used after addBoolVar/addIntVar has been
+           * used. This function is meant to be an effecient way of adding multiple variables
+           **/
+          virtual void setIntVars(const std::map<std::string, int>& vars);
+          virtual void setIntVars(const std::vector<std::map<std::string, int> >& vars);
+
         public:
           //using wali::Countable::count;
           int count;

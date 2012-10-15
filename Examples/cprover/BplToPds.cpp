@@ -2,6 +2,7 @@
 
 #include <string>
 #include <sstream>
+#include <map>
 
 using namespace std;
 using namespace wali;
@@ -123,11 +124,14 @@ namespace wali
       {
         ProgramBddContext * con = new ProgramBddContext(); 
 
+        map<string, int> vars;
+
         const str_list * vl = pg->vl;
         while(vl){
           stringstream ss;
           ss << "::" << vl->v;
-          con->addBoolVar(ss.str());
+          //con->addBoolVar(ss.str());
+          vars[ss.str()] = 2;
           vl = vl->n;
         }
         proc_list * pl = pg->pl;
@@ -136,18 +140,23 @@ namespace wali
           while(vl){
             stringstream ss;
             ss << pl->p->f << "::" << vl->v;
-            con->addBoolVar(ss.str());
+            //con->addBoolVar(ss.str());
+            vars[ss.str()] = 2;
             vl = vl->n;
           }
           vl = pl->p->vl;
           while(vl){
             stringstream ss;
             ss << pl->p->f << "::" << vl->v;
-            con->addBoolVar(ss.str());
+            //con->addBoolVar(ss.str());
+            vars[ss.str()] = 2;
             vl = vl->n;
           }
           pl = pl->n;
         }
+        fprintf(stderr, "Entering setIntVars\n");
+        con->setIntVars(vars);
+        fprintf(stderr, "Done with setIntVars\n");
 
         str_stmt_ptr_hash_map label_to_stmt;
         str_proc_ptr_hash_map name_to_proc;
@@ -171,6 +180,7 @@ namespace wali
           pl = pl->n;
         }
         name_to_proc.clear();
+        fprintf(stderr, "Done converting\n");
       }
 
 
@@ -324,10 +334,11 @@ namespace wali
             dump_pds_from_stmt_list(pds, s->sl1, con, goto_to_targets, call_to_callee, f, s);
             b = con->Assume(expr_as_bdd(s->e, con, f), con->False());
             pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
-            break;
+            break;       
           case AST_ASSERT:
+            //WARNING: Asserts are treated as assumes.
+            //write a prepass to handle asserts.
             assert(s->e);
-            fprintf(stderr, "Changed Assert to Assume\n");
             b = con->Assume(expr_as_bdd(s->e, con, f), con->True());
             pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
             break;
@@ -406,6 +417,7 @@ namespace wali
 
     WPDS * wpds_from_prog(prog * pg)
     {
+      assert(pg);
       WPDS * pds = new WPDS;
       dump_pds_from_prog(pds, pg);
       return pds;
