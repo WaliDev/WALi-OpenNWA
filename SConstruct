@@ -23,7 +23,7 @@ else:
 
 
 Platform       = platform.system()
-MkStatic       = (Platform == 'Windows')
+MkStatic       = True #(Platform == 'Windows')
 WaliDir        = os.getcwd()
 ThirdPartyDir     = os.path.join(WaliDir,'ThirdParty')
 BaseEnv        = Environment() #MSVC_USE_SCRIPT=False)
@@ -114,7 +114,7 @@ if 'gcc' == BaseEnv['compiler']:
     # -Waddress -Wlogical-op
 
     # -Wcast-qual 
-    BaseEnv.Append(CCFLAGS='-Wall -ggdb -g3')
+    BaseEnv.Append(CCFLAGS='-Wall -g')
     if optimize:
        BaseEnv.Append(CCFLAGS=' -O2')
     if CheckedLevel == 'slow':

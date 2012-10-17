@@ -102,11 +102,16 @@ namespace wali
           bdd bddMinus(unsigned in1Size, unsigned in2Size) const;
           bdd bddTimes(unsigned in1Size, unsigned in2Size) const;
           bdd bddDiv(unsigned in1Size, unsigned in2Size) const;
-
+          
           //Helper functions
           unsigned getRegSize(bdd forThis) const;
           bdd applyBinOp(bdd lexpr, bdd rexpr, bdd op) const;
           bdd applyUnOp(bdd expr, bdd op) const;
+
+          // cache identity. We don't want to create this multiple times
+          // also the move for assume
+          bdd baseId;
+          BddPairPtr baseLhs2Rhs;
       };
     } // namespace binrel
   } //namespace domains

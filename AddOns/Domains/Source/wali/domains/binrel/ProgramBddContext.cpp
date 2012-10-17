@@ -95,6 +95,7 @@ namespace details
 ProgramBddContext::~ProgramBddContext()
 {
   regAInfo = regBInfo = NULL;
+  baseId = bddtrue;
   BinRel::reset();
 }
 
@@ -148,6 +149,21 @@ void ProgramBddContext::setIntVars(const std::vector<std::map<std::string, int> 
   idx2Name[regBInfo->baseRhs] = "__regB'";
   idx2Name[regBInfo->baseExtra] = "__regB''";
 
+  // Create cached identity
+  baseId = bddtrue;
+  int * baseLhs = new int[this->size()];
+  int * baseRhs = new int[this->size()];
+  int vari = 0;
+  for(BddContextIter varIter = this->begin(); varIter != this->end();  ++varIter){
+    bddinfo_t varInfo = (*varIter).second;
+    baseId = baseId & fdd_equals(varInfo->baseLhs, varInfo->baseRhs);
+    baseLhs[vari] = varInfo->baseLhs;
+    baseRhs[vari] = varInfo->baseRhs;
+    ++vari;
+  }
+  fdd_setpairs(baseLhs2Rhs.get(), baseLhs, baseRhs, this->size());
+  delete [] baseLhs;
+  delete [] baseRhs;
 }
 
 void ProgramBddContext::addIntVar(std::string name, unsigned siz)
@@ -288,6 +304,11 @@ void ProgramBddContext::addIntVar(std::string name, unsigned siz)
     }
     maxSize = siz;
   }
+
+    //update cached identity and base pair
+    bddinfo_t varInfo = this->find(name)->second;
+    baseId = baseId & fdd_equals(varInfo->baseLhs, varInfo->baseRhs);
+    fdd_setpair(baseLhs2Rhs.get(), varInfo->baseLhs, varInfo->baseRhs);
 }
 
 ProgramBddContext::ProgramBddContext(int bddMemSize, int cacheSize) :
@@ -295,7 +316,8 @@ ProgramBddContext::ProgramBddContext(int bddMemSize, int cacheSize) :
   sizeInfo(0),
   maxSize(0),
   regAInfo(NULL),
-  regBInfo(NULL)
+  regBInfo(NULL),
+  baseLhs2Rhs(BddPairPtr(bdd_newpair()))
 {}
 
 ProgramBddContext::ProgramBddContext(const ProgramBddContext& other) :
@@ -650,16 +672,21 @@ bdd ProgramBddContext::Assign(std::string var, bdd expr) const
       (fdd_ithvar(regAInfo->baseExtra,i) & fdd_ithvar(bi->baseRhs,i));
   expr = bdd_relprod(expr,regA2var,fdd_ithset(regAInfo->baseExtra));
 
-  bdd c = bddtrue;
-  for(
-      BddContext::const_iterator iter = this->begin();
-      iter != this->end();
-      ++iter)
-  {
-    if(var != iter->first)
-      c = c & fdd_equals((iter->second)->baseLhs,
-          (iter->second)->baseRhs);
-  }
+  //bdd c = bddtrue;
+  //for(
+  //    BddContext::const_iterator iter = this->begin();
+  //    iter != this->end();
+  //    ++iter)
+  //{
+  //  if(var != iter->first)
+  //    c = c & fdd_equals((iter->second)->baseLhs,
+  //       (iter->second)->baseRhs);
+  //}
+
+  // All transformers are slight perturbations of identity.
+  bdd c = baseId;
+  c = bdd_exist(c, fdd_ithset(bi->baseLhs));
+  c = bdd_exist(c, fdd_ithset(bi->baseRhs));
   return bdd_exist(expr & c, fdd_ithset(sizeInfo));
 }
 
@@ -683,26 +710,27 @@ bdd ProgramBddContext::Assume(bdd expr1, bdd expr2) const
   expr2 = bdd_replace(expr2, regARhs2BExtra);
   bdd_freepair(regARhs2BExtra);
 
-  bddPair *baseLhs2Rhs = bdd_newpair();
-  for(BddContext::const_iterator iter = this->begin(); iter != this->end(); ++iter){
-    fdd_setpair(
-        baseLhs2Rhs,
-        (iter->second)->baseLhs,
-        (iter->second)->baseRhs
-        );
-  }
-  expr2 = bdd_replace(expr2, baseLhs2Rhs);
-  bdd_freepair(baseLhs2Rhs);
+  /// This is now cached
+  //bddPair *baseLhs2Rhs = bdd_newpair();
+  //for(BddContext::const_iterator iter = this->begin(); iter != this->end(); ++iter){
+  //  fdd_setpair(
+  //      baseLhs2Rhs,
+  //      (iter->second)->baseLhs,
+  //      (iter->second)->baseRhs
+  //      );
+  //}
+  expr2 = bdd_replace(expr2, baseLhs2Rhs.get());
 
-  bdd equate = bddtrue;
-  for(BddContext::const_iterator iter = this->begin(); iter != this->end(); ++iter){
-    equate = equate &
-      fdd_equals(
-          iter->second->baseLhs,
-          iter->second->baseRhs
-          );
-  } 
-  equate = equate &
+  /// This is now cached
+  //bdd equate = bddtrue;
+  //for(BddContext::const_iterator iter = this->begin(); iter != this->end(); ++iter){
+  //  equate = equate &
+  //    fdd_equals(
+  //        iter->second->baseLhs,
+  //        iter->second->baseRhs
+  //        );
+  //} 
+  bdd equate = baseId &
     fdd_equals(
         regAInfo->baseExtra,
         regBInfo->baseExtra

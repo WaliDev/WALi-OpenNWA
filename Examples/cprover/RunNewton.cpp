@@ -34,6 +34,17 @@ using namespace wali::wpds::ewpds;
 using namespace wali::wpds::fwpds;
 using namespace wali::cprover;
 
+
+prog * internal_parse_prog(const char * mname)
+{
+  return parse_prog(mname);
+}
+
+FWPDS * internal_fwpds_from_prog(prog * pg)
+{
+  return fwpds_from_prog(pg);
+}
+
 int main(int argc, char ** argv)
 {
   short dump = false;
@@ -58,8 +69,8 @@ int main(int argc, char ** argv)
   {
     FWPDS * npds;
     wali::set_verify_fwpds(false);
-    prog * pg = parse_prog(fname.c_str());
-    npds = fwpds_from_prog(pg);
+    prog * pg = internal_parse_prog(fname.c_str());
+    npds = internal_fwpds_from_prog(pg);
     npds->useNewton(true);
     WFA fa;
     wali::Key acc = wali::getKeySpace()->getKey("accept");

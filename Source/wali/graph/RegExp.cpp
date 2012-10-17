@@ -2,6 +2,7 @@
 #include "wali/graph/GraphCommon.hpp"
 #include <algorithm>
 #include <iterator>
+#include <cassert>
 
 //debugging
 #include "wali/SemElemTensor.hpp"

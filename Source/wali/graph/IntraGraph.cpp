@@ -1657,8 +1657,10 @@ namespace wali {
         BEGIN_EVALUATE_ROOTS(nlog);
         RegExp::evaluateRoots();
         END_EVALUATE_ROOTS(nlog);
-        RegExp::print_stats(cout);
-        
+        //RegExp::print_stats(cout);
+       
+        exit(0);
+
         BEGIN_FIND_CHANGED_NODES(nlog);
         //Now, obtain the set of nodes who's values have changed.
         std::vector<IntraGraphNode*> changedNodes;
@@ -1670,7 +1672,7 @@ namespace wali {
           }
         }
         END_FIND_CHANGED_NODES(nlog);
-        RegExp::print_stats(cout);
+        //RegExp::print_stats(cout);
 
         BEGIN_FIND_CHANGED_EDGES(nlog);
         // Given the set of nodes who's weights have changed, find the set of mutable edges that need to
