@@ -234,6 +234,18 @@ namespace wali
           sem_elem_t one() const;
           sem_elem_t zero() const;
 
+          bool isOne() const {
+            sem_elem_t one_semelem = one();
+            BinRel * one_binrel = dynamic_cast<BinRel*>(one_semelem.get_ptr());
+            return getBdd() == one_binrel->getBdd();
+          }
+
+          bool isZero() const {
+            sem_elem_t zero_semelem = zero();
+            BinRel * zero_binrel = dynamic_cast<BinRel*>(zero_semelem.get_ptr());
+            return getBdd() == zero_binrel->getBdd();
+          }
+        
           /** @return [this]->Union( cast<BinRel*>(se) ) */
           sem_elem_t combine(SemElem* se);
 

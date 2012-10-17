@@ -815,6 +815,20 @@ BinRel::~BinRel() {}
 
 binrel_t BinRel::Compose( binrel_t that ) const
 {
+  if (this->isOne()) {
+    return that;
+  }
+  if (that->isOne()) {
+    return new BinRel(*this);
+  }
+
+  if (this->isZero() || that->isZero()) {
+    sem_elem_t zero_semelem = zero();
+    BinRel * zero_binrel = dynamic_cast<BinRel*>(zero_semelem.get_ptr());
+    return zero_binrel;
+  }
+  
+  
   //We skip this test if you insist
 #ifndef BINREL_HASTY
   if(isTensored != that->isTensored || con != that->con){
@@ -842,6 +856,13 @@ binrel_t BinRel::Compose( binrel_t that ) const
 
 binrel_t BinRel::Union( binrel_t that ) const
 {
+  if (this->isZero()) {
+    return that;
+  }
+  if (that->isZero()) {
+    return new BinRel(*this);
+  }  
+  
   //We skip this test if you insist
 #ifndef BINREL_HASTY
   if(isTensored != that->isTensored || con != that->con){
