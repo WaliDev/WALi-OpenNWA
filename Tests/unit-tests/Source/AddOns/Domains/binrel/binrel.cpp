@@ -680,6 +680,153 @@ namespace{
     ASSERT_FALSE(failed);
   }
 
+  /**
+   * The following 4 tests try the following configurations:
+   *
+   * Configuration 1:
+   * call 'addIntVar' several times (for variables a-n)
+   * construct some weights
+   * call 'addIntVar' (for variable w)
+   * do some binrel operations
+   *
+   * Configuration 2:
+   * call 'setIntVars' once (for a-n)
+   * construct some weights
+   * call 'addIntVar' (for variable w)
+   * do some binrel operations
+   *
+   * Configuration 3:
+   * call 'setIntVars' once for a-n
+   * call 'addIntVar' for w
+   * construct some weights
+   * do some binrel operations
+   *
+   * Configuration 4:
+   * call 'setIntVars' once for both a-n and w at once
+   * construct some weights
+   * do some binrel operations
+   **/
+  TEST(SetVarAddVarTests, one){
+    program_bdd_context_t brm = new ProgramBddContext();
+
+    brm->addIntVar("a", 4);
+    brm->addIntVar("b", 4);
+    brm->addIntVar("c", 4);
+    brm->addIntVar("d", 4);
+    brm->addIntVar("e", 4);
+    brm->addIntVar("f", 4);
+    brm->addIntVar("g", 4);
+    brm->addIntVar("h", 4);
+    brm->addIntVar("i", 4);
+    brm->addIntVar("j", 4);
+    brm->addIntVar("k", 4);
+    brm->addIntVar("l", 4);
+    brm->addIntVar("m", 4);
+    brm->addIntVar("n", 4);
+
+    binrel_t b1 = new BinRel(brm.get_ptr(), brm->Assign("a", brm->Plus(brm->From("b"), brm->From("c"))));
+    binrel_t b2 = new BinRel(brm.get_ptr(), brm->Assign("b", brm->Plus(brm->Const(2), brm->From("d"))));
+
+    brm->addIntVar("w", 15);
+
+    b2 = new BinRel(brm.get_ptr(), brm->Assign("w", brm->Plus(brm->Const(4), brm->From("w"))));
+    sem_elem_t b3 = b1->extend(b2.get_ptr());
+    b3 = b3->combine(b3);
+  }
+
+  TEST(SetVarAddVarTests, two){
+    program_bdd_context_t brm = new ProgramBddContext();
+
+    map<string, int> vars;
+    vars["a"] = 4;
+    vars["b"] = 4;
+    vars["c"] = 4;
+    vars["d"] = 4;
+    vars["e"] = 4;
+    vars["f"] = 4;
+    vars["g"] = 4;
+    vars["h"] = 4;
+    vars["i"] = 4;
+    vars["j"] = 4;
+    vars["k"] = 4;
+    vars["l"] = 4;
+    vars["m"] = 4;
+    vars["n"] = 4;
+    brm->setIntVars(vars);
+
+    binrel_t b1 = new BinRel(brm.get_ptr(), brm->Assign("a", brm->Plus(brm->From("b"), brm->From("c"))));
+    binrel_t b2 = new BinRel(brm.get_ptr(), brm->Assign("b", brm->Plus(brm->Const(2), brm->From("d"))));
+
+    brm->addIntVar("w", 15);
+
+    b2 = new BinRel(brm.get_ptr(), brm->Assign("w", brm->Plus(brm->Const(4), brm->From("w"))));
+    sem_elem_t b3 = b1->extend(b2.get_ptr());
+    b3 = b3->combine(b3);
+  }
+
+  TEST(SetVarAddVarTests, three){
+    program_bdd_context_t brm = new ProgramBddContext();
+
+    map<string, int> vars;
+    vars["a"] = 4;
+    vars["b"] = 4;
+    vars["c"] = 4;
+    vars["d"] = 4;
+    vars["e"] = 4;
+    vars["f"] = 4;
+    vars["g"] = 4;
+    vars["h"] = 4;
+    vars["i"] = 4;
+    vars["j"] = 4;
+    vars["k"] = 4;
+    vars["l"] = 4;
+    vars["m"] = 4;
+    vars["n"] = 4;
+    brm->setIntVars(vars);
+
+    brm->addIntVar("w", 15);
+
+    binrel_t b1 = new BinRel(brm.get_ptr(), brm->Assign("a", brm->Plus(brm->From("b"), brm->From("c"))));
+    binrel_t b2 = new BinRel(brm.get_ptr(), brm->Assign("b", brm->Plus(brm->Const(2), brm->From("d"))));
+
+
+    b2 = new BinRel(brm.get_ptr(), brm->Assign("w", brm->Plus(brm->Const(4), brm->From("w"))));
+    sem_elem_t b3 = b1->extend(b2.get_ptr());
+    b3 = b3->combine(b3);
+  }
+
+  TEST(SetVarAddVarTests, four){
+    program_bdd_context_t brm = new ProgramBddContext();
+
+    map<string, int> vars;
+    vars["a"] = 4;
+    vars["b"] = 4;
+    vars["c"] = 4;
+    vars["d"] = 4;
+    vars["e"] = 4;
+    vars["f"] = 4;
+    vars["g"] = 4;
+    vars["h"] = 4;
+    vars["i"] = 4;
+    vars["j"] = 4;
+    vars["k"] = 4;
+    vars["l"] = 4;
+    vars["m"] = 4;
+    vars["n"] = 4;
+
+    vars["w"] = 15;
+
+    brm->setIntVars(vars);
+
+
+    binrel_t b1 = new BinRel(brm.get_ptr(), brm->Assign("a", brm->Plus(brm->From("b"), brm->From("c"))));
+    binrel_t b2 = new BinRel(brm.get_ptr(), brm->Assign("b", brm->Plus(brm->Const(2), brm->From("d"))));
+
+
+    b2 = new BinRel(brm.get_ptr(), brm->Assign("w", brm->Plus(brm->Const(4), brm->From("w"))));
+    sem_elem_t b3 = b1->extend(b2.get_ptr());
+    b3 = b3->combine(b3);
+  }
 
 } //namespace
 

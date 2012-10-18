@@ -105,7 +105,7 @@ namespace{
     std::stringstream ss;
     ss << "True(): " << fddset << brm->True() << std::endl;
     ss << "False(): " << fddset << brm->False() << std::endl;
-    ss << "Const(5): " << fddset << brm->Const(5) << std::endl;
+    ss << "Const(3): " << fddset << brm->Const(3) << std::endl;
     ASSERT_TRUE(compareOutput("ProgramBddContextTest","valueconstructors",ss));
   }
 
@@ -224,7 +224,6 @@ namespace{
     bdd r = brm->From("r");
     bdd s;
     ss << "\nAssign(r,3): " << fddset << brm->Assign("r",brm->Const(3));
-    ss << "\nAssign(r,10): " << fddset << brm->Assign("r",brm->Const(10));
     s = brm->Div(q,r);
     ss << "\nAssign(q,Div(q,r))" << fddset << brm->Assign("q",s);
     ss << "\nAssume(q,r)" << fddset << brm->Assume(q,r);
@@ -280,6 +279,7 @@ namespace{
           brm->Assume(brm->From("a"),brm->From("a")));
     } 
   }
+
 
 
 
