@@ -1658,8 +1658,6 @@ namespace wali {
         RegExp::evaluateRoots();
         END_EVALUATE_ROOTS(nlog);
         //RegExp::print_stats(cout);
-       
-        exit(0);
 
         BEGIN_FIND_CHANGED_NODES(nlog);
         //Now, obtain the set of nodes who's values have changed.
