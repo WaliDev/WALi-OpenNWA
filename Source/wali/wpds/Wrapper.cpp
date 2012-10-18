@@ -1,6 +1,6 @@
 /**
  * @author Nicholas Kidd
- * @version $Id: Wrapper.cpp 1182 2011-06-14 20:56:58Z driscoll $
+ * @version $Id$
  */
 
 #include "wali/wpds/Wrapper.hpp"

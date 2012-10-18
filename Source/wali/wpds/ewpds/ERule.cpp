@@ -2,7 +2,7 @@
  * @author Akash Lal
  * @author Nicholas Kidd
  * 
- * @version $Id: ERule.cpp 1095 2011-06-07 18:47:31Z driscoll $
+ * @version $Id$
  */
 #include "wali/Common.hpp"
 #include "wali/SemElemPair.hpp"

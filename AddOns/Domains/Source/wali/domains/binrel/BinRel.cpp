@@ -6,10 +6,14 @@
  
 #include "BinRel.hpp"
 #include "buddy/fdd.h"
+#include "ProgramBddContext.hpp"
 //#include "BuddyExt.hpp"
+#include "combination.hpp"
 
 #include <iostream>
 #include <sstream>
+
+#include <boost/algorithm/string/predicate.hpp>
 
 using namespace wali::domains::binrel;
 using std::endl;
@@ -876,7 +880,7 @@ BinRel::BinRel(const BinRel& that) :
   isTensored(that.isTensored)
 {}
 
-BinRel::BinRel(const BddContext * c, bdd b,bool it) : 
+BinRel::BinRel(BddContext const * c, bdd b,bool it) : 
   con(c),
   rel(b), 
   isTensored(it) 
@@ -886,6 +890,20 @@ BinRel::~BinRel() {}
 
 binrel_t BinRel::Compose( binrel_t that ) const
 {
+  if (this->isOne()) {
+    return that;
+  }
+  if (that->isOne()) {
+    return new BinRel(*this);
+  }
+
+  if (this->isZero() || that->isZero()) {
+    sem_elem_t zero_semelem = zero();
+    BinRel * zero_binrel = dynamic_cast<BinRel*>(zero_semelem.get_ptr());
+    return zero_binrel;
+  }
+  
+  
   //We skip this test if you insist
 #ifndef BINREL_HASTY
   if(isTensored != that->isTensored || con != that->con){
@@ -913,6 +931,13 @@ binrel_t BinRel::Compose( binrel_t that ) const
 
 binrel_t BinRel::Union( binrel_t that ) const
 {
+  if (this->isZero()) {
+    return that;
+  }
+  if (that->isZero()) {
+    return new BinRel(*this);
+  }  
+  
   //We skip this test if you insist
 #ifndef BINREL_HASTY
   if(isTensored != that->isTensored || con != that->con){
@@ -1146,6 +1171,411 @@ std::ostream& BinRel::printStats( std::ostream& o) const
 }
 
 #endif //BINREL_STATS
+
+///////////////////////////////
+
+namespace wali {
+  namespace domains {
+    namespace binrel {
+      
+      typedef std::vector<std::pair<std::string, bddinfo_t> > VectorVocabulary;
+      
+      std::vector<Assignment>
+      getAllAssignments(VectorVocabulary const & voc);
+      
+      std::vector<Assignment>
+      getAllAssignments(BddContext const & voc)
+      {
+        VectorVocabulary voc_vec(voc.begin(), voc.end());
+        return getAllAssignments(voc_vec);
+      }
+
+      std::vector<Assignment>
+      getAllAssignments(VectorVocabulary const & voc)
+      {
+        // Make a copy so we can index by number instead of by name. (A
+        // vector is just a map from int to something.)
+        std::vector<std::pair<std::string, bddinfo_t> > voc_vector(voc.begin(), voc.end());
+        bddinfo_t bddinfo = new BddInfo();
+        bddinfo->maxVal = 17;
+        voc_vector.push_back(VectorVocabulary::value_type("__dummy__", bddinfo));
+        
+        std::vector<Assignment> result;
+
+        // The current assignment. Essentially [0..max)^n, except the limit
+        // may change depending on coordinate and we add one more to the end
+        // as sort of an elephant. When we overflow into
+        // assignment_vec[voc.size()], then we're done.
+        std::vector<unsigned int> assignment_vec(voc.size()+1, 0);
+          
+        while(assignment_vec.at(voc.size()) == 0) {
+          // Create the current assignment
+          Assignment assignment;
+          for (size_t varno=0; varno<voc.size(); ++varno) {
+            if (!boost::starts_with(voc_vector.at(varno).first,
+                                    "zDUMMY")) {
+              assignment[voc_vector.at(varno).first] = assignment_vec.at(varno);
+            }
+          }
+          if (std::find(result.begin(), result.end(), assignment) == result.end()) {
+            result.push_back(assignment);
+          }
+        
+          // Increment the assignment vector for next iteration.
+          assert(assignment_vec.at(assignment_vec.size()-1) == 0);
+          for (size_t placeno=0; true; ++placeno) {
+            assignment_vec.at(placeno) += 1;
+            // Do we overflow?
+            if (assignment_vec.at(placeno) == voc_vector.at(placeno).second->maxVal) {
+              // Yes: reset to 0 and keep going
+              assignment_vec.at(placeno) = 0;
+            }
+            else {
+              // No overflow: so we're done adding
+              break;
+            }
+          }
+        }
+          
+        return result;
+      }
+
+      template<typename Mapping>
+      typename Mapping::mapped_type
+      safe_get(Mapping const & m, typename Mapping::key_type const & k)
+      {
+        typename Mapping::const_iterator it = m.find(k);
+        if (it == m.end()) {
+          assert(false);
+        }
+        return it->second;
+      }
+
+      enum VocabularyId { PRE_VOCABULARY, POST_VOCABULARY };
+
+      bdd toBdd(Assignment const & assignment, BddContext const & voc, VocabularyId vid)
+      {
+        bdd result = bddtrue;
+        for (Assignment::const_iterator pair = assignment.begin();
+             pair != assignment.end(); ++pair)
+          
+        {
+          bddinfo_t varinfo = safe_get(voc, pair->first);
+          int val = pair->second;
+
+          bdd b;
+          if (vid == PRE_VOCABULARY) {
+            b = fdd_ithvar(varinfo->baseLhs, val);
+          }
+          else {
+            b = fdd_ithvar(varinfo->baseRhs, val);
+          }
+          
+          result &= b;
+        }
+        return result;
+      }
+
+
+      namespace details {
+        bool is_feasible(Assignment const & pre_assgn,
+                         Assignment const & post_assgn,
+                         BddContext const & voc,
+                         bdd b)
+        {
+          bdd pre_bdd = toBdd(pre_assgn, voc, PRE_VOCABULARY);
+          bdd post_bdd = toBdd(post_assgn, voc, POST_VOCABULARY);
+
+          bdd everything = pre_bdd & post_bdd & b;
+
+          return (everything != bddfalse);
+        }
+
+        const int width = 150;
+        const int pre_x_center = 15;
+        const int post_x_center = 50;
+        
+        const int radius = 2;
+
+        const int v_margin = 25;
+        const int v_separation = 25;
+
+
+        void write_line(int pre_no, int post_no, std::ostream & os, int base_y)
+        {
+          int x1 = pre_x_center;
+          int y1 = v_margin + pre_no * v_separation + base_y;
+
+          int x2 = post_x_center;
+          int y2 = v_margin + post_no * v_separation + base_y;
+
+          os << "    -draw \"line "
+             << x1 << "," << y1 << " "
+             << x2 << "," << y2 << "\"    \\\n";
+        }
+
+        std::string toStringNums(Assignment const & assgn)
+        {
+          std::stringstream ss;
+          Assignment::const_iterator iter = assgn.begin();
+
+          ss << "(" << iter->second;
+          ++iter;
+
+          for(; iter != assgn.end(); ++iter) {
+            ss << ", " << iter->second;
+          }
+
+          ss << ")";
+          return ss.str();
+        }
+
+        std::string toString(Assignment const & assgn)
+        {
+          std::stringstream ss;
+          Assignment::const_iterator iter = assgn.begin();
+
+          ss << "(" << iter->first << "=" << iter->second;
+          ++iter;
+
+          for(; iter != assgn.end(); ++iter) {
+            ss << ", " << iter->first << "=" << iter->second;
+          }
+
+          ss << ")";
+          return ss.str();
+        }
+        
+        std::string toStringNames(Assignment const & assgn)
+        {
+          std::stringstream ss;
+          Assignment::const_iterator iter = assgn.begin();
+
+          ss << "(" << iter->first;
+          ++iter;
+
+          for(; iter != assgn.end(); ++iter) {
+            ss << ", " << iter->first;
+          }
+
+          ss << ")";
+          return ss.str();
+        }
+
+        void write_dot(int dot_no, Assignment const & assgn, std::ostream & os, int base_y)
+        {
+          int x = pre_x_center;
+          int y = v_margin + dot_no * v_separation + base_y;
+
+          os << "    -draw \"circle "
+             << x << "," << y << " "
+             << (x-radius) << "," << (y-radius) << "\"    ";
+
+          x = post_x_center;          
+
+          os << "    -draw \"circle "
+             << x << "," << y << " "
+             << (x-radius) << "," << (y-radius) << "\"    ";
+
+          x = post_x_center + pre_x_center;
+          os << "    -draw \"text "
+             << x << "," << y << " "
+             << "\'" << toStringNums(assgn) << "\'\"    \\\n";
+        }
+
+      
+        std::vector<std::pair<VectorVocabulary, bdd> >
+        partition(BddContext const & vars, bdd b);
+
+      }
+      
+      void
+      printImagemagickInstructions(bdd b, BddContext const & voc, std::ostream & os, std::string const & for_file)
+      {
+        std::vector<std::pair<VectorVocabulary, bdd> > independent_components = details::partition(voc, b);
+        std::vector<std::vector<Assignment> > possible_assignments_by_component;
+
+        int total_height = 0;
+        for (size_t comp_no=0; comp_no<independent_components.size(); ++comp_no) {
+          VectorVocabulary const & comp_voc = independent_components.at(comp_no).first;
+          std::vector<Assignment> possibleAssignments = getAllAssignments(comp_voc);
+          possible_assignments_by_component.push_back(possibleAssignments);
+          
+          assert(comp_voc.size() > 0);
+          if(boost::starts_with(comp_voc.begin()->first, "DUMMY")) {
+            assert(comp_voc.size() == 1);
+            continue;
+          }        
+            
+          total_height += 2*details::v_margin;
+          total_height += possibleAssignments.size() * details::v_separation;
+        }
+
+        os << "convert -size " << details::width << "x" << total_height
+           << " xc:wheat    \\\n"
+           << "    -font Times-Roman  \\\n";
+
+        int current_base_y = 0;
+        
+        for (size_t comp_no=0; comp_no<independent_components.size(); ++comp_no) {
+          VectorVocabulary const & comp_voc = independent_components.at(comp_no).first;
+          if(boost::starts_with(comp_voc.begin()->first, "DUMMY")) {
+            assert(comp_voc.size() == 1);
+            continue;
+          }
+          
+          bdd comp_bdd = independent_components.at(comp_no).second;
+          std::vector<Assignment> const & possibleAssignments = possible_assignments_by_component.at(comp_no);
+
+          os << "    -draw \"text 0," << (current_base_y + 12) << " \'" << details::toStringNames(possibleAssignments[0]) << "\'\"    \\\n"
+             << "    -fill red    \\\n";
+
+          // Draw the lines
+          for (size_t pre_no=0; pre_no<possibleAssignments.size(); ++pre_no) {
+            for (size_t post_no=0; post_no<possibleAssignments.size(); ++post_no) {
+              if (details::is_feasible(possibleAssignments.at(pre_no),
+                                       possibleAssignments.at(post_no),
+                                       voc,
+                                       comp_bdd))
+              {
+                details::write_line(pre_no, post_no, os, current_base_y);
+              }
+            }
+          }
+          
+          os << "    -fill black    \\\n";
+
+          // Draw the dots
+          for (size_t dot_no=0; dot_no < possibleAssignments.size(); ++dot_no) {
+            details::write_dot(dot_no, possibleAssignments.at(dot_no), os, current_base_y);
+          }
+
+          current_base_y += 2*details::v_margin + possibleAssignments.size()*details::v_separation;          
+        }
+
+        os << "    " << for_file << "\n";        
+      }
+
+
+
+      namespace details {
+
+        ///////////////
+        
+        ///////////////
+        
+        bdd to_bdd_varset(VectorVocabulary const & vars)
+        {
+          bdd result = bddtrue;
+          for(VectorVocabulary::const_iterator var = vars.begin(); var != vars.end(); ++var) {
+            int fdd_no_left = var->second->baseLhs;
+            int fdd_no_right = var->second->baseRhs;
+
+            result &= fdd_ithset(fdd_no_left) & fdd_ithset(fdd_no_right);
+          }
+          return result;
+        }
+
+
+
+        bool are_independent(VectorVocabulary const & vars_a, bdd & ra,
+                             VectorVocabulary const & vars_b, bdd & rb,
+                             bdd b)
+        {
+          ra = bdd_exist(b, to_bdd_varset(vars_b));
+          rb = bdd_exist(b, to_bdd_varset(vars_a));
+
+          return (ra & rb) == b;
+        }
+
+
+        bool
+        first_less_than(std::pair<std::string, bddinfo_t> const & left,
+                        std::pair<std::string, bddinfo_t> const & right)
+        {
+          return left.first < right.first;
+        }
+
+#define PRINT 0
+        void partition(std::vector<std::pair<VectorVocabulary, bdd> > & cur_partition,
+                       VectorVocabulary const & vars,
+                       bdd b,
+                       int starting_size)
+        {
+#if PRINT
+          std::cout << "\n\npartition(starting_size=" << starting_size << "):\n";
+#endif
+          
+          assert(vars.size() > 0);
+          std::vector<std::pair<std::string, bddinfo_t> > voc_vec(vars.begin(), vars.end());
+          
+          for(size_t i=starting_size; i<vars.size(); ++i) {
+            // for each combination C of size I from Vars.
+            std::vector<std::pair<std::string, bddinfo_t> > combination(voc_vec.begin(), voc_vec.begin()+i);
+            do
+            {            
+              VectorVocabulary voc_minus_combination;
+
+              std::set_difference(voc_vec.begin(), voc_vec.end(), combination.begin(), combination.end(),
+                                  std::inserter(voc_minus_combination, voc_minus_combination.begin()),
+                                  first_less_than);
+
+#if PRINT
+              std::cout << "    Testing partition:\n";
+               std::cout << "        [ ";
+               for(VectorVocabulary::const_iterator vi=combination.begin(); vi!=combination.end(); ++vi) {
+                 std::cout << vi->first << ", ";
+               }
+               std::cout << "]\n";
+               std::cout << "        [ ";
+               for(VectorVocabulary::const_iterator vi=voc_minus_combination.begin(); vi!=voc_minus_combination.end(); ++vi) {
+                 std::cout << vi->first << ", ";
+               }
+               std::cout << "]\n";
+#endif
+
+              
+              bdd ra, rb;
+              if (are_independent(combination, ra, voc_minus_combination, rb, b))
+              {
+#if PRINT
+                std::cout << "        are independent!\n";
+#endif
+                cur_partition.push_back(std::make_pair(combination, ra));
+                partition(cur_partition, voc_minus_combination, rb, i);
+                return;
+              }
+#if PRINT
+              else {
+                std::cout << "        are not independent!\n";
+              }
+#endif              
+            }
+            while(stdcomb::next_combination(voc_vec.begin(), voc_vec.end(),
+                                            combination.begin(), combination.end()));
+          }
+          if (vars.size() > 0) {
+            cur_partition.push_back(std::make_pair(vars, b));
+          }
+        }
+        
+        std::vector<std::pair<VectorVocabulary, bdd> >
+        partition(BddContext const & vars, bdd b)
+        {
+          VectorVocabulary vars_vec(vars.begin(), vars.end());
+          std::vector<std::pair<VectorVocabulary, bdd> > result;
+          partition(result, vars_vec, b, 1);
+          //result.push_back(std::make_pair(vars, b));
+          return result;
+        }
+
+
+      }
+      
+    }
+  }
+}
+
 
 
 // Yo, Emacs!

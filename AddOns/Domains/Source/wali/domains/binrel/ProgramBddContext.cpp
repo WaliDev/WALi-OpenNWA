@@ -317,6 +317,7 @@ ProgramBddContext::ProgramBddContext(int bddMemSize, int cacheSize) :
   maxSize(0),
   regAInfo(NULL),
   regBInfo(NULL),
+  baseId(bddtrue),
   baseLhs2Rhs(BddPairPtr(bdd_newpair()))
 {}
 
@@ -325,7 +326,9 @@ ProgramBddContext::ProgramBddContext(const ProgramBddContext& other) :
   sizeInfo(other.sizeInfo),
   maxSize(other.maxSize),
   regAInfo(other.regAInfo),
-  regBInfo(other.regBInfo)
+  regBInfo(other.regBInfo),
+  baseId(other.baseId),
+  baseLhs2Rhs(other.baseLhs2Rhs)
 {}
 
 ProgramBddContext& ProgramBddContext::operator = (const ProgramBddContext& other)
@@ -352,7 +355,6 @@ std::ostream& ProgramBddContext::print(std::ostream& o) const
 
 bdd ProgramBddContext::From(std::string var) const
 {
-  //TODO: This header should be placed in all functions below.
   bdd ret = bddfalse;
   ProgramBddContext::const_iterator iter = (this->find(var));
   if(iter == this->end())
@@ -383,12 +385,12 @@ bdd ProgramBddContext::Const(unsigned val) const
   return fdd_ithvar(regAInfo->baseRhs, val) & fdd_ithvar(sizeInfo, maxSize);
 }
 
-bdd ProgramBddContext::NonDet() const 
+bdd ProgramBddContext::NonDet() const
 {
   return bddtrue;
 }
 
-bdd ProgramBddContext::applyBinOp(bdd lexpr, bdd rexpr, bdd op) const 
+bdd ProgramBddContext::applyBinOp(bdd lexpr, bdd rexpr, bdd op) const
 { 
   bddPair *regA2regB = bdd_newpair();
   fdd_setpair(regA2regB, regAInfo->baseRhs, regBInfo->baseRhs);
@@ -413,7 +415,7 @@ bdd ProgramBddContext::applyBinOp(bdd lexpr, bdd rexpr, bdd op) const
   return lexpr;
 }
 
-bdd ProgramBddContext::applyUnOp(bdd expr, bdd op) const 
+bdd ProgramBddContext::applyUnOp(bdd expr, bdd op) const
 {
   expr = bdd_relprod(
       expr,
@@ -429,12 +431,12 @@ bdd ProgramBddContext::applyUnOp(bdd expr, bdd op) const
   return expr;
 }
 
-bdd ProgramBddContext::And(bdd lexpr, bdd rexpr) const 
+bdd ProgramBddContext::And(bdd lexpr, bdd rexpr) const
 {
   return applyBinOp(lexpr, rexpr, bddAnd());      
 }
 
-bdd ProgramBddContext::Or(bdd lexpr, bdd rexpr) const 
+bdd ProgramBddContext::Or(bdd lexpr, bdd rexpr) const
 {
   return applyBinOp(lexpr, rexpr, bddOr());
 }

@@ -51,6 +51,6 @@ namespace wali
 } // namespace wali
 
 /*
- * $Id: WitnessTrans.cpp 1617 2012-02-07 23:15:05Z driscoll $
+ * $Id$
  */
 

@@ -1,6 +1,6 @@
 /**
  * @author Nick Kidd
- * @version $Id: ExReachWit.cpp 483 2008-11-25 20:46:04Z kidd $
+ * @version $Id$
  */
 
 /*

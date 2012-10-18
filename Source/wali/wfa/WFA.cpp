@@ -17,6 +17,7 @@
 #include <iostream>
 #include <vector>
 #include <stack>
+#include <iterator>
 
 #define FOR_EACH_STATE(name)                                \
   State* name;                                            \
@@ -29,6 +30,25 @@ for( ; name##it != name##itEND && (0 != (name = name##it->second)) ; name##it++ 
 std::set< Key >::iterator name##it = F.begin();                 \
 std::set< Key >::iterator name##itEND = F.end();                \
 for( ; name##it != name##itEND && (0 != (name = getState(*name##it))) ; name##it++ )
+
+
+namespace {
+  wali::wfa::WFA::AccessibleStateMap
+  epsilonCloseCached(wali::wfa::WFA const & wfa, wali::Key state, wali::wfa::WFA::EpsilonCloseCache & cache)
+  {
+    wali::wfa::WFA::EpsilonCloseCache::iterator loc = cache.find(state);
+
+    if (loc != cache.end()) {
+      return loc->second;
+    }
+    else {
+      wali::wfa::WFA::AccessibleStateMap eclose = wfa.epsilonClose(state);
+      cache[state] = eclose;
+      return eclose;
+    }
+  }
+}  
+
 
 namespace wali
 {
@@ -557,8 +577,11 @@ namespace wali
             Key fromkey = getKey( t->from(),t2->from() );
             Key tokey = getKey( t->to(),t2->to() );
             sem_elem_t W = wmaker.make_weight(t ,t2);
-            ITrans* newTrans = new Trans(fromkey,t->stack(),tokey,W); 
-            //newTrans->print( std::cout << "\tAdding Trans: " ) << std::endl;
+            ITrans* newTrans = new Trans(fromkey,t->stack(),tokey,W);
+            //std::cout << "---   Because:\n";
+            //t->print(std::cout << "---     right (this) contains ") << std::endl;
+            //t2->print(std::cout << "---     left (other) contains ") << std::endl;
+            //newTrans->print( std::cout << "---     Adding Trans: " ) << std::endl;
             dest.addTrans( newTrans );
           }
         }
@@ -1527,41 +1550,99 @@ namespace wali
     WFA::AccessibleStateMap
     WFA::epsilonClose(Key start) const
     {
-      AccessibleStateMap result;
       std::set<Key> worklist;
-      std::set<Key> visited;
 
-      result.insert(std::make_pair(start, getSomeWeight()->one()));
-      
+      // Follows Fig 3 from 'Generic epsilon-Removal Algorithm for Weighted
+      // Automata" by Mohri.
+      std::map<Key, sem_elem_t> d; // estimates the shortest distance from start to key
+      std::map<Key, sem_elem_t> r; // weight added to d[q] since last time q was visited
+
+      sem_elem_t zero = getSomeWeight()->zero();
+
+      // Inialization
+      for (std::set<Key>::const_iterator p = Q.begin(); p != Q.end(); ++p) {
+        d[*p] = r[*p] = zero;
+      }
+      d[start] = r[start] = getSomeWeight()->one();
       worklist.insert(start);
-      visited.insert(start);
 
-      while (!worklist.empty()) {
-        Key source = *worklist.begin();
-        sem_elem_t weight = result[source];
+
+      //std::cout << "--- epsilonClose(" << key2str(start) << ")\n";
+
+      // Worklist loop
+      while (worklist.size() > 0) {
+        Key q = *worklist.begin();
         worklist.erase(worklist.begin());
+        sem_elem_t r_q = r[q]; // the change in q's weight since the last time it was visited; just 'r' in the paper
+        r[q] = zero;
 
-        if (kpmap.find(KeyPair(source, WALI_EPSILON)) != kpmap.end()) {
-          TransSet const & eps_dests = kpmap.find(KeyPair(source, WALI_EPSILON))->second;
-          for (TransSet::const_iterator trans_it = eps_dests.begin();
-               trans_it != eps_dests.end(); ++trans_it)
+        //std::cout << "---   dequeued " << key2str(q) << "\n";
+
+        // so we want to look at all outgoing transitions from 'q'.
+        // kp_map_t maps from (source * stack) -> {trans}. Furthermore,
+        // this is a hash map so is not in any particular order, which
+        // means we have to loop over the whole dang thing. (If we had an
+        // explicit list of symbols we could do (for every symbol) but we
+        // can't.)
+        //
+        // The next three indentation levels are like 'for each e in E[q]' in
+        // the paper except that 'e' is called 'transition'
+        for(kp_map_t::const_iterator group = kpmap.begin();
+            group != kpmap.end(); ++group)
+        {
+          if (group->first.first == q
+              && group->first.second == WALI_EPSILON)
           {
-            sem_elem_t dest_weight = weight->extend((*trans_it)->weight());
-            Key dest = (*trans_it)->to();
-            bool change = add_trans_to_accessible_states(result, dest, dest_weight);
+            //std::cout << "---     found some epsilon transitions\n";
+            TransSet const & transitions = group->second;
+            for (TransSet::const_iterator transition = transitions.begin();
+                 transition != transitions.end(); ++transition)
+            {             
+              // 'for each transition in E[q]'. Now we have one. The
+              // following variables aren't explicitly named in the paper,
+              // but I do here because either my names are too long (for
+              // 'next') or to reduce caching.
+              Key next = (*transition)->to();                // 'n[e]'
+              sem_elem_t w_e = (*transition)->weight();      // 'w[e]'
+              sem_elem_t delta = r_q->extend(w_e);           // 'r*w[e]'
+              sem_elem_t new_d_n = d[next]->combine(delta); // 'd[n[e]] + (r*w[e])'
 
-            // Add the destination state to the worklist (maybe). We need to
-            // do this if it wasn't there before or if the weight has changed.
-            if (visited.find(dest) == visited.end() || change)
-            {
-              visited.insert(dest);
-              worklist.insert(dest);
-            }
-          }
+              // std::cout << "---     found transition to " << key2str(next) << "\n";
+              // w_e->print(std::cout << "---         the edge weight is ") << "\n";
+              // r_q->print(std::cout << "---         and the r weight is ") << "\n";
+              // delta->print(std::cout << "---         so delta is ") << ";\n";
+              // d[next]->print(std::cout << "---         the old weight on " << key2str(next) << " was ") << "\n";
+              //new_d_n->print(std::cout << "---         so the new weight would be ") << "\n";
+              
+              if (!new_d_n->equal(d[next])) {
+                //std::cout << "---       so I updated it's reachability amount and re-enqueued\n";
+                d[next] = new_d_n;
+                r[next] = r[next]->combine(delta);
+                worklist.insert(next);
+              }
+              
+            } // for each outgoing transition from q...
+          }  // ..
+        } // ...for each outgoing transition from q
+      } // while (!worklist.empty())
+
+      //d[start] = zero->one();
+
+      //std::cout << "---   done finding state weights\n";
+      //std::cout << "---   now removing nonzero states\n";
+
+      AccessibleStateMap out;
+      for (AccessibleStateMap::const_iterator iter = d.begin();
+           iter != d.end(); ++iter)
+      {
+        if (iter->second != zero) {
+          //iter->second->print(std::cout << "---     found state " << key2str(iter->first) << " with weight ") << "\n";
+          assert(!iter->second->equal(zero));
+          out[iter->first] = iter->second;
         }
       }
-
-      return result;
+      
+      return out;
     }
 
     
@@ -1571,11 +1652,12 @@ namespace wali
     {
       AccessibleStateMap before = start;
       AccessibleStateMap after;
+      EpsilonCloseCache eclose_cache;
 
       for (AccessibleStateMap::const_iterator start_it = start.begin();
            start_it != start.end(); ++start_it)
       {
-        AccessibleStateMap eclose = epsilonClose(start_it->first);
+        AccessibleStateMap eclose = epsilonCloseCached(*this, start_it->first, eclose_cache);
         merge_state_maps(before, eclose);
       }
 
@@ -1598,7 +1680,7 @@ namespace wali
             for (TransSet::const_iterator trans_it = transitions.begin();
                  trans_it != transitions.end(); ++trans_it)
             {
-              AccessibleStateMap eclose = epsilonClose((*trans_it)->to());
+              AccessibleStateMap eclose = epsilonCloseCached(*this, (*trans_it)->to(), eclose_cache);
               for (AccessibleStateMap::const_iterator dest = eclose.begin();
                    dest != eclose.end(); ++dest)
               {
@@ -1660,6 +1742,13 @@ namespace wali
     std::map<Key, KeySet>
     WFA::next_states(WFA const & wfa, KeySet const & froms)
     {
+      EpsilonCloseCache cache;
+      return next_states(wfa, froms, cache);
+    }
+
+    std::map<Key, KeySet>
+    WFA::next_states(WFA const & wfa, KeySet const & froms, EpsilonCloseCache & eclose_cache)
+    {
       // symbol -> keyset
       std::map<Key, KeySet> nexts;
 
@@ -1679,7 +1768,7 @@ namespace wali
             for (TransSet::const_iterator trans = outgoing.begin();
                  trans != outgoing.end(); ++trans)
             {
-              AccessibleStateMap eclose = wfa.epsilonClose((*trans)->to());
+              AccessibleStateMap eclose = epsilonCloseCached(wfa, (*trans)->to(), eclose_cache);
 
               for (AccessibleStateMap::const_iterator target = eclose.begin();
                    target != eclose.end(); ++target)
@@ -1695,12 +1784,12 @@ namespace wali
       return nexts;
     }
 
-
     WFA
     WFA::semideterminize(DeterminizeWeightGen const & wg) const
     {
       std::stack<KeySet> worklist;
       std::set<Key> visited;
+      EpsilonCloseCache eclose_cache;
 
       WFA result;
       sem_elem_t zero = getSomeWeight()->zero();
@@ -1710,7 +1799,7 @@ namespace wali
         // Set up initial states
         KeySet det_initial;
         
-        AccessibleStateMap initials = epsilonClose(this->getInitialState());
+        AccessibleStateMap initials = epsilonCloseCached(*this, this->getInitialState(), eclose_cache);
         for (AccessibleStateMap::const_iterator initial = initials.begin();
              initial != initials.end(); ++initial)
         {
@@ -2024,79 +2113,98 @@ namespace wali
     }
 
 
+    void WFA::complementStates()
+    {
+      std::set<Key> notF;
+      // notF = Q - F
+      std::set_difference(this->Q.begin(), this->Q.end(),
+                          this->F.begin(), this->F.end(),
+                          std::inserter(notF, notF.end()));
+      std::swap(this->F, notF);
+    }
+
+
     WFA WFA::removeEpsilons() const
     {
       WFA result(*this);
 
-      std::stack<ITrans const *> eps_transitions;
-
       // Step 1:
-      // Make a list of all epsilon transitions
-      for (eps_map_t::const_iterator eps_map_iter=result.eps_map.begin();
-           eps_map_iter != result.eps_map.end(); ++eps_map_iter)
-      {
-        TransSet const & transitions = eps_map_iter->second;
-        for (TransSet::const_iterator trans_iter = transitions.begin();
-             trans_iter != transitions.end(); ++trans_iter)
+      // Add new transitions around epsilon-accessible states
+      for (std::set<Key>::const_iterator q = Q.begin(); q != Q.end(); ++q) {
+        AccessibleStateMap eclose = epsilonClose(*q);
+
+        for (AccessibleStateMap::const_iterator iter = eclose.begin();
+             iter != eclose.end(); ++iter)
         {
-          ITrans const * trans = *trans_iter;
-          eps_transitions.push(trans);
-
-          if (trans->from() == trans->to()) {
-            // Not sure if this is true, but I think it is...
-            std::cerr << "[WARNING] epsilon self loop found in removeEpsilons(); this may go into an infinite loop now\n";
+          Key mid = iter->first;
+          sem_elem_t w_eps = iter->second;
+          if (mid == *q) {
+            // Don't want to add a self-loop
+            continue;
           }
-        }
-      }
 
-      //std::cout << "removeEpsilons():\n    step 1 found " << eps_transitions.size() << " transitions\n";
+          //                eps path (w_eps)
+          // We have:   *q - - - - - - - - - > mid
+          //
+          // so we want to look at all outgoing transitions from 'target'
+          // kp_map_t maps from (source * stack) -> {trans}. Furthermore,
+          // this is a hash map so is not in any particular order, which
+          // means we have to loop over the whole dang thing. (If we had an
+          // explicit list of symbols we could do (for every symbol) but we
+          // can't.)
+          for(kp_map_t::const_iterator group = kpmap.begin();
+              group != kpmap.end(); ++group)
+          {
+            if (group->first.first == mid) {
+              // If we get in here, we're looking at outgoing transitions from
+              // (source) on *some* symbol. So loop over all the transitions
+              // from that state, "copy" them to eps_source. If we find another
+              // epsilon transition, be sure to add it so we do this again in
+              // the future.
+              TransSet const & transitions = group->second;
+              for (TransSet::const_iterator transition = transitions.begin();
+                   transition != transitions.end(); ++transition)
+              {
+                Key sym = (*transition)->stack();
+                Key target = (*transition)->to();
+                sem_elem_t w_t = (*transition)->weight();
+                
+                assert(sym == group->first.second);                
+                if (sym == WALI_EPSILON) {
+                  continue;
+                }
+                
+                // We have:
+                //            eps path (w_eps)        sym (w_t) 
+                //        *q - - - - - - - - - > mid ----------> target
+                //
+                // and want to make it:
+                //
+                //            eps path (w_eps)        sym (w_t) 
+                //        *q - - - - - - - - - > mid ----------> target
+                //         |                                      /\    .
+                //         +--------------------------------------+
+                //                sym (w_eps * w_t)
+                //
+                // (We will remove the epsilon transitions later, but above
+                // we checked to make sure we aren't adding a new one now.)
+
+                sem_elem_t w_final = w_eps->extend(w_t);
+                
+                result.addTrans(*q, sym, target, w_final);
+              } // for each transition (mid, sym, __)
+              
+            } // check if the current group matches the mid
+          } // for each group in kp_map
+         
+        } // for each mid state in eclose(q)
+      } // for each q
+
 
       // Step 2:
-      // Copy transitions around epsilon transitons.
-      while (eps_transitions.size() > 0) {
-        ITrans const * trans = eps_transitions.top();
-        eps_transitions.pop();
-
-        Key eps_source = trans->from();
-        Key eps_dest = trans->to();
-        sem_elem_t eps_weight = trans->weight();
-
-        //std::cout << "    Looking at " << key2str(eps_source) << " --> " << key2str(eps_dest) << "\n";
-
-        // OK. kp_map_t maps from (source * stack) -> {trans}. Furthermore,
-        // this is a hash map so is not in any particular order, which means
-        // we have to loop over the whole dang thing. (If we had an explicit
-        // list of symbols we could do (for every symbol) but we can't.)
-        for(kp_map_t::const_iterator group = kpmap.begin();
-            group != kpmap.end(); ++group)
-        {
-          if (group->first.first == eps_dest) {
-            // If we get in here, we're looking at outgoing transitions from
-            // (source) on *some* symbol. So loop over all the transitions
-            // from that state, "copy" them to eps_source. If we find another
-            // epsilon transition, be sure to add it so we do this again in
-            // the future.
-            TransSet const & nexts = group->second;
-            for (TransSet::const_iterator next = nexts.begin(); next != nexts.end(); ++next) {
-              //std::cout << "        adding " << key2str(eps_source) << " to " << key2str((*next)->to()) << " on " << key2str((*next)->stack()) << "\n";
-              result.addTrans(eps_source,
-                              (*next)->stack(),
-                              (*next)->to(),
-                              eps_weight->extend((*next)->weight()));
-              if ((*next)->stack() == WALI_EPSILON) {
-                eps_transitions.push(result.find(eps_source,
-                                                 (*next)->stack(),
-                                                 (*next)->to()));
-              }
-            }
-          }
-        }
-      }
+      // Make a list of all epsilon transitions.
+      std::stack<ITrans const *> eps_transitions;
       
-      // Step 3:
-      // Make another list of all epsilon transitions. (We destroyed the last
-      // one, and even if we hadn't, we would have needed to keep it
-      // up-to-date.)
       for (eps_map_t::const_iterator eps_map_iter=result.eps_map.begin();
            eps_map_iter != result.eps_map.end(); ++eps_map_iter)
       {
@@ -2114,7 +2222,8 @@ namespace wali
         }
       }
 
-      // Step 4:
+      
+      // Step 3:
       // Remove all epsilon transitions.
       while (eps_transitions.size() > 0) {
         ITrans const * trans = eps_transitions.top();
@@ -2126,8 +2235,8 @@ namespace wali
         result.erase(trans->from(), WALI_EPSILON, trans->to());
         // TODO: delete trans? Who holds ownership?
       }
-
-      // Step 5:
+      
+      // Step 4:
       // Sanity check
       for (eps_map_t::const_iterator eps_map_iter=result.eps_map.begin();
            eps_map_iter != result.eps_map.end(); ++eps_map_iter)

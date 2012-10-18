@@ -1,7 +1,7 @@
 /*!
  * @author Nicholas Kidd
  *
- * @version $Id: Config.cpp 1099 2011-06-07 22:22:04Z driscoll $
+ * @version $Id$
  */
 
 #include <sstream>

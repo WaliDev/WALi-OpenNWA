@@ -1,6 +1,6 @@
 /**
  * @author Nicholas Kidd
- * @version $Id: SemElemPair.cpp 513 2009-02-10 17:09:07Z kidd $
+ * @version $Id$
  */
 
 #include "wali/SemElemPair.hpp"

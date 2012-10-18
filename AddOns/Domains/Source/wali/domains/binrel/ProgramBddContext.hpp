@@ -64,15 +64,16 @@ namespace wali
           bdd NonDet() const;
           // ////////////////Boolen Expression Generators///////////////////////////////////
           bdd True() const;
-          bdd False() const ;
-          bdd And(bdd lexpr, bdd rexpr) const ;
-          bdd Or(bdd lexpr, bdd rexpr) const ;
-          bdd Not(bdd expr) const ;
+          bdd False() const;
+
+          bdd And(bdd lexpr, bdd rexpr) const;
+          bdd Or(bdd lexpr, bdd rexpr) const;
+          bdd Not(bdd expr) const;
 
           // //////////////Integer Expression Generators///////////////////////////////////
           bdd Const(unsigned val) const;
 
-          bdd Plus(bdd lexpr, bdd rexpr) const ;
+          bdd Plus(bdd lexpr, bdd rexpr) const;
 #ifdef BINREL_I_WANT_MINUS_TIMES_AND_DIV_EVEN_THOUGH_THEY_CAN_BE_EXPONENTIALLY_SLOW
           bdd Minus(bdd lexpr, bdd rexpr) const;
           bdd Times(bdd lexpr, bdd rexpr) const;

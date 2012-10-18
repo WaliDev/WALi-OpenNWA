@@ -1,6 +1,6 @@
 ## ##################################
 ## Build libdomains
-## $Id: SConscript 1610 2012-01-30 23:30:19Z driscoll $
+## $Id$
 import os,os.path
 
 Import('Debug')

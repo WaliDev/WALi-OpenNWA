@@ -12,7 +12,7 @@ if Debug:
 ## ###############################
 ## Environment
 
-## Adding Domains paths to the enviornment
+## Adding Domains paths to the environment
 Env = ProgEnv.Clone()
 
 ## Note - Be sure to use a list when 'Append'ing to CPPPATH

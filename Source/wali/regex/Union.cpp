@@ -1,6 +1,6 @@
 /*!
  * @author Nicholas Kidd
- * @version $Id: Union.cpp 418 2008-05-12 17:19:03Z kidd $
+ * @version $Id$
  */
 
 

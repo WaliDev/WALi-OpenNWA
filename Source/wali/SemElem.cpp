@@ -1,6 +1,6 @@
 /**
  * @author Nicholas Kidd
- * @version $Id: SemElem.cpp 1093 2011-06-07 16:50:18Z driscoll $
+ * @version $Id$
  */
 
 #include "wali/SemElem.hpp"

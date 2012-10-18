@@ -1,7 +1,7 @@
 /**
  * @author Nicholas Kidd
  *
- * @version $Id: WfaHandler.cpp 634 2009-12-28 17:16:20Z kidd $
+ * @version $Id$
  */
 
 #include "StrX.hpp"

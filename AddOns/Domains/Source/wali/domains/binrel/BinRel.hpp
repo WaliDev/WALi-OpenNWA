@@ -23,6 +23,7 @@
 #include <vector>
 #include <utility>
 #include <string>
+#include <vector>
 
 #include <boost/shared_ptr.hpp> // It'd be nice to include the standard version but there are too many ways to get it.
 
@@ -99,6 +100,8 @@ namespace wali
       /**A BddContext has the binding information for the variables in the
        * domain.
        */
+
+
       class BddContext : public std::map<const std::string,bddinfo_t>
       {
         friend class BinRel;
@@ -184,11 +187,23 @@ namespace wali
           static int numBddContexts;
       };
 
+      
       typedef BddContext::iterator BddContextIter;
       typedef std::map<const int,std::string> RevBddContext;
       typedef wali::ref_ptr< BddContext > bdd_context_t;
 
+      typedef std::map<std::string, int> Assignment;
+      
+      extern
+      std::vector<Assignment>
+      getAllAssignments(BddContext const & voc);
 
+      extern
+      void
+      printImagemagickInstructions(bdd b, BddContext const & voc,
+                                   std::ostream & os, std::string const & for_file);
+      
+      
       class BinRel : public wali::SemElemTensor 
       {
         public:
@@ -202,7 +217,7 @@ namespace wali
           friend binrel_t operator&(binrel_t a, binrel_t b);
         public:
           BinRel(const BinRel& that);
-          BinRel(const BddContext * con, bdd b,bool is_tensored=false);
+          BinRel(BddContext const * con, bdd b,bool is_tensored=false);
           virtual ~BinRel();
         public:
           binrel_t Compose( binrel_t that ) const;
@@ -219,6 +234,18 @@ namespace wali
           sem_elem_t one() const;
           sem_elem_t zero() const;
 
+          bool isOne() const {
+            sem_elem_t one_semelem = one();
+            BinRel * one_binrel = dynamic_cast<BinRel*>(one_semelem.get_ptr());
+            return getBdd() == one_binrel->getBdd();
+          }
+
+          bool isZero() const {
+            sem_elem_t zero_semelem = zero();
+            BinRel * zero_binrel = dynamic_cast<BinRel*>(zero_semelem.get_ptr());
+            return getBdd() == zero_binrel->getBdd();
+          }
+        
           /** @return [this]->Union( cast<BinRel*>(se) ) */
           sem_elem_t combine(SemElem* se);
 
@@ -245,6 +272,17 @@ namespace wali
           /** @return [this]->Eq34Project() */
           sem_elem_tensor_t detensorTranspose();
 
+          /** @return The backing BDD */
+          bdd getBdd() const {
+            return rel;
+          }
+
+          /** @return Get the vocabulary the relation is over */
+        // TODO: change name -eed May 14 2012
+          BddContext const & getVocabulary() const {
+            return *con;
+          }
+
           // ////////////////////////////////
           // Printing functions
           //static void printHandler(FILE *o, int var);
@@ -255,7 +293,7 @@ namespace wali
           //This has to be a raw/weak pointer.
           //BddContext caches some BinRel objects. It is not BinRel's responsibility to
           //manage memory for BddContext. 
-          const BddContext * con;
+          BddContext const * con;
           bdd rel;
           bool isTensored;
 #ifdef BINREL_STATS

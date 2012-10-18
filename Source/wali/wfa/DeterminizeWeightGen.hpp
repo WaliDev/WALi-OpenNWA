@@ -37,7 +37,7 @@ namespace wali {
     /// the appropriate symbol, collects up all those weights, calls
     /// 'liftWeight' with each of them, and then 'combines' the result.
     class LiftCombineWeightGen
-      : DeterminizeWeightGen
+      : public DeterminizeWeightGen
     {
       /// Overload to return the lifted weight for a nondeterministic
       /// transition.

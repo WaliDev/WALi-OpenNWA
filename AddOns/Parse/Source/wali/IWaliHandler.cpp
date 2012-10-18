@@ -1,6 +1,6 @@
 /**
  * @author Nicholas Kidd
- * @version $Id: IWaliHandler.cpp 522 2009-05-28 20:17:28Z kidd $
+ * @version $Id$
  */
 
 #include "StrX.hpp"

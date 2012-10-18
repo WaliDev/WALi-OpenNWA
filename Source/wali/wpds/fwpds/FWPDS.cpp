@@ -2,7 +2,7 @@
  * @author Nicholas Kidd
  * @author Akash Lal
  *
- * @version $Id: FWPDS.cpp 1952 2012-08-18 09:22:58Z pprabhu $
+ * @version $Id$
  *
  */
 
@@ -451,7 +451,7 @@ void FWPDS::poststar_handle_eps_trans(wfa::ITrans* teps, wfa::ITrans* tprime, se
   if (0 != etrans) {
     erule_t r = etrans->getERule();
     interGr->addEdge(Transition(*tprime),
-       Transition(*teps),
+        Transition(*teps),
         Transition(teps->from(),tprime->stack(),tprime->to()),
         etrans->getMergeFn());
   } else {

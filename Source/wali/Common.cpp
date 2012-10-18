@@ -1,7 +1,7 @@
 /**
  * @author Nicholas Kidd
  *
- * @version $Id: Common.cpp 1830 2012-04-19 19:46:18Z pprabhu $
+ * @version $Id$
  */
 
 #include "wali/Common.hpp"

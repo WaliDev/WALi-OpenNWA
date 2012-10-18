@@ -1,6 +1,6 @@
 /*!
  * @author Nicholas Kidd
- * @version $Id: VisitorPrinter.cpp 1094 2011-06-07 16:53:12Z driscoll $
+ * @version $Id$
  */
 
 #include "wali/witness/VisitorPrinter.hpp"

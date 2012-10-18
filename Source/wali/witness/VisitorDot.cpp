@@ -1,6 +1,6 @@
 /**
  * @author Nicholas Kidd
- * @version $Id: VisitorDot.cpp 467 2008-10-23 20:47:11Z kidd $
+ * @version $Id$
  */
 
 #include "wali/Common.hpp"

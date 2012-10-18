@@ -1,7 +1,7 @@
 /**
  * @author Akash Lal
  * @author Nicholas Kidd
- * @version $Id: MergeFn.cpp 1760 2012-04-04 18:24:25Z pprabhu $
+ * @version $Id$
  */
 
 #include "wali/MergeFn.hpp"

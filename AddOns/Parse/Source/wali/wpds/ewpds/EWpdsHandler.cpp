@@ -1,6 +1,6 @@
 /**
  * @author Nicholas Kidd
- * @version $Id: EWpdsHandler.cpp 478 2008-11-24 19:33:16Z kidd $
+ * @version $Id$
  */
 
 #include "StrX.hpp"

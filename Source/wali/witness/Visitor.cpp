@@ -1,7 +1,7 @@
 /*!
  * @author Nicholas Kidd
  *
- * @version $Id: Visitor.cpp 1093 2011-06-07 16:50:18Z driscoll $
+ * @version $Id$
  */
 
 #include "wali/Common.hpp"

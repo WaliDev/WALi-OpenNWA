@@ -1,6 +1,6 @@
 /**
  * @author Nicholas Kidd
- * @version $Id: WitnessMerge.cpp 1617 2012-02-07 23:15:05Z driscoll $
+ * @version $Id$
  */
 
 #include "wali/Common.hpp"

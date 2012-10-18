@@ -1,6 +1,6 @@
 /**
  * @author kidd
- * @version $Id: StrX.cpp 463 2008-10-16 22:27:58Z kidd $
+ * @version $Id$
  */
 
 #include "StrX.hpp"

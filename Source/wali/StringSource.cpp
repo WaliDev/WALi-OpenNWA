@@ -1,6 +1,6 @@
 /**
  * @author Nicholas Kidd
- * @version $Id: StringSource.cpp 529 2009-06-16 02:01:29Z kidd $
+ * @version $Id$
  */
 
 #include "wali/StringSource.hpp"

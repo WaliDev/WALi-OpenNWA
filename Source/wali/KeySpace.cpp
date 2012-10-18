@@ -1,6 +1,6 @@
 /**
  * @author Nicholas Kidd
- * @version $Id: KeySpace.cpp 1025 2011-05-27 18:47:27Z driscoll $
+ * @version $Id$
  */
 
 #include <sstream>

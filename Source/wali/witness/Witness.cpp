@@ -1,7 +1,7 @@
 /*!
  * @author Nicholas Kidd
  *
- * @version $Id: Witness.cpp 1830 2012-04-19 19:46:18Z pprabhu $
+ * @version $Id$
  */
 
 #include "wali/Common.hpp"
@@ -236,6 +236,6 @@ namespace wali
 }   // namespace wali
 
 /*
- * $Id: Witness.cpp 1830 2012-04-19 19:46:18Z pprabhu $
+ * $Id$
  */
 

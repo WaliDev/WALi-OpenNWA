@@ -56,7 +56,7 @@ namespace wali
     class State;
     class TransFunctor;
     class ConstTransFunctor;
-    struct DeterminizeWeightGen;
+    class DeterminizeWeightGen;
 
     /**
      * "Callbacks" for outputting attributes in the Dot.
@@ -671,6 +671,24 @@ namespace wali
         void complete(std::set<Key> const & symbols);
         void complete(Key sink_state);
         void complete();
+
+        /// Sets F = Q - F.
+        ///
+        /// THIS IS NOT THE SAME AS COMPLEMENTING THE LANGUAGE: if the
+        /// machine is either nondeterministic or incomplete (has a non-total
+        /// transition function), then things can be different.
+        ///
+        /// This is intended to be used after calling either determinize() or
+        /// both semideterminize() then complete() [both have multiple
+        /// overloads]; the reason there is no 'complementLanguage()'
+        /// function is that the present design encourages you to explicitly
+        /// think about what you are complementing with respect to. This is
+        /// made especially acute because of the fact that WFA does not
+        /// explictly store its alphabet, so it is not possible to have a
+        /// symbol that's part of a WFA's alphabet and does not appear on a
+        /// transition (even if you want to think of the WFA as
+        /// incomplete/nondeterministic).
+        void complementStates();
         
 
         static
@@ -679,10 +697,16 @@ namespace wali
                        WFA const & right, std::vector<Key> const & right_states,
                        bool check_weights);
 
+
+        typedef std::map<Key, AccessibleStateMap> EpsilonCloseCache;
+        
         static
         std::map<Key, std::set<Key> >
         next_states(WFA const & wfa, std::set<Key> const & froms);
 
+        static
+        std::map<Key, std::set<Key> >
+        next_states(WFA const & wfa, std::set<Key> const & froms, EpsilonCloseCache & cache);
 
         //// Prints to 'os' statistics about this WFA. 
         void printStatistics(std::ostream & os) const;

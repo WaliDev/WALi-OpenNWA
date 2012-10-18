@@ -2,7 +2,7 @@
  * @author Nicholas Kidd
  * @author Akash Lal
  *
- * @version $Id: WPDS.cpp 1889 2012-05-14 16:53:32Z pprabhu $
+ * @version $Id$
  */
 
 #include "wali/Common.hpp"

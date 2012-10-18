@@ -1,6 +1,6 @@
 /**
  * @author Nicholas Kidd
- * @version $Revision: 529 $
+ * @version $Revision$
  */
 
 #include "wali/Common.hpp"

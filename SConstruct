@@ -23,7 +23,7 @@ else:
 
 
 Platform       = platform.system()
-MkStatic       = True #(Platform == 'Windows')
+MkStatic       = (Platform == 'Windows')
 WaliDir        = os.getcwd()
 ThirdPartyDir     = os.path.join(WaliDir,'ThirdParty')
 BaseEnv        = Environment() #MSVC_USE_SCRIPT=False)
@@ -114,7 +114,7 @@ if 'gcc' == BaseEnv['compiler']:
     # -Waddress -Wlogical-op
 
     # -Wcast-qual 
-    BaseEnv.Append(CCFLAGS='-Wall -g')
+    BaseEnv.Append(CCFLAGS='-Wall -ggdb -g3')
     if optimize:
        BaseEnv.Append(CCFLAGS=' -O2')
     if CheckedLevel == 'slow':
@@ -125,9 +125,9 @@ if 'gcc' == BaseEnv['compiler']:
     else:
         BaseEnv.Append(WARNING_FLAGS='')
     if profile:
-        BaseEnv.Append(CCFLAGS='-pg')
-        BaseEnv.Append(CXXFLAGS='-pg')
-        BaseEnv.Append(LINKFLAGS='-pg')
+        BaseEnv.Append(CCFLAGS=['-pg'])
+        BaseEnv.Append(CXXFLAGS=['-pg'])
+        BaseEnv.Append(LINKFLAGS=['-pg'])
 
     if platform_bits == 64 and not Is64:
         # If we're on a 64-bit platform but want to compile for 32.
@@ -147,7 +147,7 @@ elif BaseEnv['compiler'] in ['cl', 'cl.EXE']:
     else:
        BaseEnv.Append(CCFLAGS=' /MT')
 BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , 'Source')])
-#BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , '..', 'boost')])
+BaseEnv.Append(CPPPATH = [os.path.join(WaliDir , '..', 'boost')])
 try:
         BaseEnv.Append(CPPPATH = [os.environ['BOOST_HOME']])
         BaseEnv.Append(LIBPATH = [os.environ['BOOST_LIB']])

@@ -1,5 +1,5 @@
 # Run the python program
-# $Id: SConscript 1830 2012-04-19 19:46:18Z pprabhu $
+# $Id$
 import os, sys
 from xerces_consts import IsZip, get_name
 

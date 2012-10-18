@@ -1,6 +1,6 @@
 /*!
  * @author Nicholas Kidd
- * @version $Id: Star.cpp 425 2008-05-14 12:00:53Z kidd $
+ * @version $Id$
  */
 
 #include "wali/regex/Star.hpp"

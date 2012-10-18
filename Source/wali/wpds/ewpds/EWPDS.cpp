@@ -1,7 +1,7 @@
 /**
  * @author Akash Lal
  * @author Nicholas Kidd
- * @version $Id: EWPDS.cpp 1192 2011-06-22 20:41:38Z driscoll $
+ * @version $Id$
  */
 
 // ::wali

@@ -42,6 +42,8 @@ test_files = Split("""
     Source/wali/wali-prereqs.cpp    
     Source/wali/witness/calculating-visitor.cpp
     Source/wali/wfa/class-wfa/membership.cpp
+    Source/wali/wfa/class-wfa/determinize.cpp
+    Source/wali/wfa/class-wfa/complementStates.cpp
 
     Source/opennwa/fixtures.cpp
     Source/opennwa/class-NestedWord/nested-word.cpp
@@ -75,14 +77,13 @@ test_files = Split("""
     Source/AddOns/Domains/binrel/binrelmanager.cpp
     Source/AddOns/Domains/binrel/binrel.cpp
     """)
-    #Source/wali/wfa/class-wfa/determinize.cpp
 
 just_compile = env.SConscript('Source/header-compilation/SConscript')
 
 unit_tests = env.Program('unit-tests', test_files + just_compile)
 built = unit_tests
-built += env.Install('#/Tests/harness/unit-tests',unit_tests)
-built += env.Install('#/Tests/harness/unit-tests/','#/Tests/unit-tests/regression_baseline')
+built += env.Install('#/Tests/harness/unit-tests', unit_tests)
+built += env.Install('#/Tests/harness/unit-tests/', '#/Tests/unit-tests/regression_baseline')
 
 Return('built')
 
