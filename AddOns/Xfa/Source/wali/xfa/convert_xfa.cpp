@@ -49,6 +49,9 @@ namespace cfglib {
                       int fdd_size,
                       std::string const & prefix)
         {
+            static bool has_run = false;
+            assert(!has_run);
+            
             std::cerr << "Registering variables with size " << fdd_size << "\n";
             std::set<std::string> registered;
             for (auto ast_trans = ast.transitions.begin(); ast_trans != ast.transitions.end(); ++ast_trans) {
@@ -63,11 +66,28 @@ namespace cfglib {
                     }
                     assert (act.action_type == "ctr2");
                     if (registered.find(var_name(act.operand_id, prefix)) == registered.end()) {
-                        voc.addIntVar(var_name(act.operand_id, prefix), fdd_size);
+                        if (has_run) {
+                            voc.addIntVar(var_name(act.operand_id, prefix), fdd_size);
+                        }
                         std::cerr << "    " << var_name(act.operand_id, prefix) << "\n";
                         registered.insert(var_name(act.operand_id, prefix));
                     }
                 }
+            }
+
+
+            if (!has_run) {
+                std::map<std::string, int> vars;
+                for (auto var = registered.begin(); var != registered.end(); ++var) {
+                    //voc.addIntVar(*var, fdd_size);
+                    vars[*var] = fdd_size;
+                }
+
+                //voc.addIntVar("left_current_state", ast.states.size());
+                vars["left_current_state"] = ast.states.size();
+                
+                voc.setIntVars(vars);
+                has_run = true;
             }
         }
 
@@ -164,6 +184,7 @@ namespace cfglib {
             try {
                 if (trans.actions.size() == 0u) {
                     rel = new BinRel(&voc, ident);
+                    //rel->is_effectively_one = true;
                 }
                 else if (trans.actions.size() == 1u) {
                     rel = get_relation(*trans.actions[0], voc, zero, ident, prefix);
