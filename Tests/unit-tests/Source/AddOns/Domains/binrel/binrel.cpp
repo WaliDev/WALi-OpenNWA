@@ -828,5 +828,67 @@ namespace{
     b3 = b3->combine(b3);
   }
 
+
+#define STRESS_TEST_CONST1 500
+#define STRESS_TEST_CONST2 20000
+  TEST(SetVarAddVarTests, DISABLED_stressTest){
+    // Try to using setVars vs addVar
+    {
+      // Using addIntVar
+      cout << "Using addIntVar" << endl;
+      program_bdd_context_t brm;
+      brm = new ProgramBddContext();
+      map<string, int> vars;
+      for(unsigned i=0; i<STRESS_TEST_CONST1; ++i){
+        stringstream ss;
+        ss << "var " << i;
+        brm->addIntVar(ss.str(), 3);
+      }
+      cout << "Done adding variables" << endl;
+      bdd bdds[STRESS_TEST_CONST1];
+      unsigned i = 0;
+      for(ProgramBddContext::iterator iter = brm->begin(); iter != brm->end(); ++iter, ++i)
+        bdds[i] = brm->Plus(brm->From(iter->first), brm->Const(2));
+
+      sem_elem_t sems[STRESS_TEST_CONST2];
+      for(unsigned i=0; i<STRESS_TEST_CONST2; ++i){
+        unsigned j = i % 200;
+        unsigned k = (int)( i * 4.8) % 200;
+        sem_elem_t sem1 = new BinRel(brm.get_ptr(), bdds[j]);
+        sem_elem_t sem2 = new BinRel(brm.get_ptr(), bdds[k]);
+        sems[i] = sem1->extend(sem2);
+      }
+    }
+
+    {
+      cout << "Using SetIntVar" << endl;
+      // Using setIntVar
+      program_bdd_context_t brm;
+      brm = new ProgramBddContext();
+      map<string, int> vars;
+      for(unsigned i=0; i<STRESS_TEST_CONST1; ++i){
+        stringstream ss;
+        ss << "var " << i;
+        vars[ss.str()] = 3;
+      }
+      brm->setIntVars(vars);
+      cout << "Done adding variables" << endl;
+
+      bdd bdds[STRESS_TEST_CONST1];
+      unsigned i = 0;
+      for(ProgramBddContext::iterator iter = brm->begin(); iter != brm->end(); ++iter, ++i)
+        bdds[i] = brm->Plus(brm->From(iter->first), brm->Const(2));
+
+      sem_elem_t sems[STRESS_TEST_CONST2];
+      for(unsigned i=0; i<STRESS_TEST_CONST2; ++i){
+        unsigned j = i % 200;
+        unsigned k = (int)( i * 4.8) % 200;
+        sem_elem_t sem1 = new BinRel(brm.get_ptr(), bdds[j]);
+        sem_elem_t sem2 = new BinRel(brm.get_ptr(), bdds[k]);
+        sems[i] = sem1->extend(sem2);
+      }
+    }
+  }
+
 } //namespace
 
