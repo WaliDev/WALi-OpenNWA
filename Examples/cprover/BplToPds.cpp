@@ -16,6 +16,68 @@ using namespace wali::cprover::details::resolve_details;
 
 namespace wali
 {
+  namespace domains
+  {
+    namespace binrel
+    {
+      //We're breaking the ProgramBddContext abstraction here to get the bdds for constrain clauses.
+      static bdd xformer_for_constrain(const expr * e, const ProgramBddContext * con, const char * f)
+      {
+        bddinfo_t varInfo;
+        string s;
+        if(!e)
+          assert(0 && "xformer_for_constrain");
+        bdd l = bddfalse, r = bddfalse;
+        stringstream ss;
+        if(e->l)
+          l = xformer_for_constrain(e->l, con, f);
+        if(e->r)
+          r = xformer_for_constrain(e->r, con, f);
+        switch(e->op){
+          case AST_NOT:
+            return bdd_not(l);
+          case AST_XOR:
+            return bdd_or(bdd_and(l, bdd_not(r)), bdd_and(bdd_not(l), r));
+          case AST_OR:
+            return bdd_or(l, r);
+          case AST_AND:
+            return bdd_and(l, r);
+          case AST_EQ:
+            return bdd_or(bdd_and(l, r), bdd_and(bdd_not(l), bdd_not(r)));
+          case AST_NEQ:
+            return bdd_or(bdd_and(l, bdd_not(r)), bdd_and(bdd_not(l), r));
+          case AST_IMP:
+            return bdd_or(bdd_not(l), r);
+          case AST_SCHOOSE:
+            assert(0 && "xformer_for_constrain: AST_SCHOOSE not implemented");
+          case AST_VAR:
+          case AST_VAR_POST:
+            ss << f << "::" << e->v;
+            s = ss.str();
+            if(con->find(ss.str()) == con->end()){
+              stringstream ss2;
+              ss2 << "::" << e->v;
+              assert(con->find(ss2.str()) != con->end());
+              s = ss2.str();
+            }
+            varInfo = con->find(s)->second;
+            if(e->op == AST_VAR)
+              return bdd_ithvar(varInfo->baseLhs);
+            else // e->op == AST_VAR_POST
+              return bdd_ithvar(varInfo->baseRhs);
+          case AST_NONDET:
+            return bddtrue;
+          case AST_CONSTANT:
+            if(e->c == ONE)
+              return bddtrue;
+            else
+              return bddfalse;
+          default:
+            assert(0 && "expr_as_bdd: Unknown case");
+        }
+      }
+    }
+  }
   namespace cprover
   {
     namespace details
@@ -184,8 +246,9 @@ namespace wali
       }
 
 
+      
 
-      static bdd expr_as_bdd(const expr * e, const ProgramBddContext *  con, const char * f, bool isPost = false)
+      static bdd expr_as_bdd(const expr * e, const ProgramBddContext *  con, const char * f)
       {
         if(!e)
           assert(0 && "expr_as_bdd");
@@ -194,7 +257,7 @@ namespace wali
         if(e->l)
           l = expr_as_bdd(e->l, con, f);
         if(e->r)
-          l = expr_as_bdd(e->r, con, f);
+          r = expr_as_bdd(e->r, con, f);
         switch(e->op){
           case AST_NOT:
             return con->Not(l);
@@ -225,7 +288,7 @@ namespace wali
               return con->From(ss2.str());
             }
           case AST_VAR_POST:
-            assert(0 && "Aww! What do I do now???");
+            assert(0 && "expr_as_bdd: AST_VAR_POST should not occur in expr_as_bdd");
           case AST_CONSTANT:
             if(e->c == ONE)
               return con->True();
@@ -309,7 +372,9 @@ namespace wali
               b = b & con->Assign(lhs, expr_as_bdd(el->e, con, f));
               vl = vl->n;
               el = el->n;
-            }            
+            }
+            if(s->e)
+              b = b & xformer_for_constrain(s->e, con, f);
             pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
             break;       
           case AST_ITE:   
