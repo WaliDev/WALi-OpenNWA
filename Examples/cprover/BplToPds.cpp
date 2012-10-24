@@ -185,7 +185,7 @@ namespace wali
 
 
 
-      static bdd expr_as_bdd(const expr * e, const ProgramBddContext *  con, const char * f)
+      static bdd expr_as_bdd(const expr * e, const ProgramBddContext *  con, const char * f, bool isPost = false)
       {
         if(!e)
           assert(0 && "expr_as_bdd");
@@ -224,6 +224,8 @@ namespace wali
               assert(con->find(ss2.str()) != con->end());
               return con->From(ss2.str());
             }
+          case AST_VAR_POST:
+            assert(0 && "Aww! What do I do now???");
           case AST_CONSTANT:
             if(e->c == ONE)
               return con->True();

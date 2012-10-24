@@ -13,6 +13,7 @@ int main(int argc, char ** argv)
   }
 
   prog * pg = parse_prog(fname.c_str());
+  emit_prog(stdout, pg);
   //WPDS * pds = wpds_from_prog(pg);
   
   print_prog_stats(pg);

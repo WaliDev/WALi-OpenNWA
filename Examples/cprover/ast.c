@@ -112,6 +112,15 @@ inline expr * make_imp_expr(expr * l, expr * r)
   e->r = r;
   return e;
 }
+inline expr * mark_post_expr(expr *l)
+{
+  if(!l)
+    assert(0 && "mark_post_expr");
+  if(!(l->op == AST_VAR || l->op == AST_VAR_POST))
+    assert(0 && "mark_post_expr");
+  l->op = AST_VAR_POST;
+  return l;
+}
 
 inline stmt * make_clean_stmt()
 {
@@ -572,6 +581,9 @@ void emit_expr(FILE * fout, const expr * e)
     case AST_VAR:
       fprintf(fout, "%s", e->v);
       break;
+    case AST_VAR_POST:
+      fprintf(fout, "\'%s", e->v);
+      break;
     case AST_CONSTANT:
       fprintf(fout, "%d", (e->c == ONE)? 1 : 0);
       break;
@@ -611,6 +623,10 @@ void emit_stmt(FILE * fout, const stmt * s, unsigned indent)
       emit_comma_separated_str_list(fout, s->vl);
       fprintf(fout, " := ");
       emit_comma_separated_expr_list(fout, s->el);
+      if(s->e){
+        fprintf(fout, " constrain ");
+        emit_expr(fout, s->e);  
+      }
       fprintf(fout, ";\n");
       break;
     case AST_ITE:
