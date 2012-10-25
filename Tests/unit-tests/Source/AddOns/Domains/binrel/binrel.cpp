@@ -828,6 +828,27 @@ namespace{
     b3 = b3->combine(b3);
   }
 
+  TEST(Unclassified, dumbTensorTest1)
+  {
+    program_bdd_context_t brm = new ProgramBddContext();
+    brm->addBoolVar("b");
+
+    binrel_t a = new BinRel(brm.get_ptr(), brm->True());
+    a = dynamic_cast<BinRel*>(a->one().get_ptr());
+
+    binrel_t b = dynamic_cast<BinRel*>(a->tensor(a.get_ptr()).get_ptr());
+    b->print(cout) << std::endl;
+    binrel_t wt = dynamic_cast<BinRel*>(b->detensorTranspose().get_ptr());
+    if(wt == NULL){
+      ASSERT_TRUE(false);
+      return;
+    }
+    cout << wt->count;
+    wt->print(cout) << std::endl;
+    ASSERT_TRUE(b->detensor()->equal(a));
+    ASSERT_TRUE(b->detensorTranspose()->equal(a));
+
+  }
 
 #define STRESS_TEST_CONST1 500
 #define STRESS_TEST_CONST2 20000

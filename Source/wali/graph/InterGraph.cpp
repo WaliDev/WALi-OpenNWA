@@ -873,7 +873,7 @@ namespace wali {
             std::stringstream ss;
             ss << "digraph{\n";
             for(i=0; i<n; i++){
-              ss << "node" << i << " [label=\"(" <<
+              ss << "node" << i << " [label=\"[intergraphno: " << i << "](" <<
                 key2str(nodes[i].trans.src) <<
                 ", " << key2str(nodes[i].trans.stack) <<
                 ", " << key2str(nodes[i].trans.tgt) << ")\\n";

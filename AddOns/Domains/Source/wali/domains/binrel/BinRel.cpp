@@ -664,7 +664,7 @@ void BddContext::setIntVars(const std::vector<std::map<std::string, int> >& vars
   commonBddContextSet13 &= fdd_makeset(tensor2Lhs, this->size());
   assert(this->size() == 0 || (baseSecBddContextSet != bddfalse && tensorSecBddContextSet != bddfalse
         && tensorSecBddContextSet != bddfalse && commonBddContextSet23 != bddfalse && commonBddContextSet13 != bddfalse));
-#if defined(TENSOR_TOGETHER)
+#if defined(DETENSOR_TOGETHER)
   // Somehow make this efficient
   for(std::map<const std::string, bddinfo_t>::const_iterator ci = this->begin(); ci != this->end(); ++ci){
     bddinfo_t varInfo = ci->second;
