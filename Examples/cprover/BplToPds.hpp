@@ -116,6 +116,9 @@ namespace wali
     wpds::fwpds::FWPDS * fwpds_from_prog(prog * pg);
     void print_prog_stats(prog * pg);
 
+    // Must be called to fix assert statements, *before* resolving the program.
+    void instrument_asserts(prog * pg, const char * mainProc = "main", const char * errLbl = "error");
+    
     wali::Key getEntryStk(const prog * pg, const char * procname);
     wali::Key getPdsState();
   } 

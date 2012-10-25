@@ -180,6 +180,90 @@ namespace wali
           map_call_to_callee_helper(mout, min, p->sl);
         }
 
+      
+        // Froward declaration of static procedures having to do with instrumeting asserts. 
+        // The procedures are static because it is *wrong* to use them directly.
+        static void instrument_asserts_in_proc(proc * p, const char * errLbl);
+        static void instrument_asserts_in_stmt_list(stmt_list * sl, const char * errLbl);
+        static void instrument_asserts_in_stmt(stmt * s, const char * errLbl);
+
+        void instrument_asserts_prog(prog * pg, const char * mainProc, const char * errLbl)
+        {          
+          assert(pg && "instrument_asserts");
+          // Convert asserts to assumes + goto
+          proc_list * pl = pg->pl;
+          while(pl){
+            proc * p = pl->p;
+            instrument_asserts_in_proc(p, errLbl);
+            pl = pl->n;
+          }
+          // Add the error label to main proc.
+          str_list * l = make_str_list_item(strdup(errLbl));
+          stmt * s = make_goto_stmt(l);
+          str_list * ll = make_str_list_item(strdup(errLbl));
+          s->ll = ll;
+          proc * m = NULL;
+          pl = pg->pl;
+          while(pl){
+            if(pl->p && strcmp(pl->p->f, mainProc) == 0){
+              m = pl->p;
+              break;
+            }
+            pl = pl->n;
+          }
+          assert(m && "instrument_asserts: main not found");
+          if(m->sl){
+            add_stmt_right(m->sl, s);
+          }else{
+            stmt_list * sl = make_stmt_list_item(s);
+            m->sl = sl;
+          }
+          return;
+        }
+
+        static void instrument_asserts_in_proc(proc * p, const char * errLbl)
+        {        
+          assert(p && "instrument_asserts_in_proc");
+          if(p->sl)
+            instrument_asserts_in_stmt_list(p->sl, errLbl);
+        }
+
+        static void instrument_asserts_in_stmt_list(stmt_list * sl, const char * errLbl)
+        {
+          while(sl){
+            instrument_asserts_in_stmt(sl->s, errLbl);
+            sl = sl->n;
+          }
+        }
+
+        static void instrument_asserts_in_stmt(stmt * s, const char * errLbl)
+        {
+          assert(s && "instrument_asserts_in_stmt");
+          if(s->sl1)
+            instrument_asserts_in_stmt_list(s->sl1, errLbl);
+          if(s->sl1)
+            instrument_asserts_in_stmt_list(s->sl2, errLbl);
+          if(s->op == AST_ASSERT){
+            assert(!s->sl1 && !s->sl2);
+            // in place modification saves us from having to change the containing stmt_list
+            s->op = AST_ITE;
+            //condition holds
+            stmt * s1 = make_skip_stmt();
+            stmt_list * sl1 = make_stmt_list_item(s1);
+            s->sl1 = sl1;
+            //condition violated
+            str_list * l = make_str_list_item(strdup(errLbl));
+            stmt * s2 = make_goto_stmt(l);
+            stmt_list * sl2 = make_stmt_list_item(s2);
+            s->sl2 = sl2;
+          }
+        }
+
+
+
+
+
+
       }
 
       void dump_pds_from_prog(wpds::WPDS * pds, prog * pg)
@@ -403,11 +487,14 @@ namespace wali
             pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
             break;       
           case AST_ASSERT:
+            assert(0 && "assert statements can't be dumped to PDS");
             //WARNING: Asserts are treated as assumes.
             //write a prepass to handle asserts.
+            /*
             assert(s->e);
             b = con->Assume(expr_as_bdd(s->e, con, f), con->True());
             pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
+            */
             break;
           case AST_ASSUME:
             assert(s->e);
@@ -541,6 +628,13 @@ namespace wali
       fprintf(stdout, "\n");      
     }
 
+
+    void instrument_asserts(prog * pg, const char * mainProc, const char * errLbl)
+    {
+      instrument_asserts_prog(pg, mainProc, errLbl);
+    }
+
+
     Key getEntryStk(const prog * pg, const char * f)
     {
       assert(pg);
@@ -562,82 +656,3 @@ namespace wali
     }
   }
 }
-
-
-/*
-
-int main(int argc, char ** argv)
-{
-  FILE * fin;
-  if(argc >= 2)
-    fin = fopen(argv[1], "r");
-  else
-    fin = fopen("satabs.3.bp", "r"); 
-
-  if(parse(fin))
-    assert(0 &&  "Parsing Error");
-  prog * pg = parsing_result;
-  parsing_result = NULL;
-  fclose(fin);
-
-  emit_prog(stdout, pg);
-
-  const proc_list * pl;
-
-  str_stmt_ptr_hash_map label_to_stmt;
-  str_proc_ptr_hash_map name_to_proc;
-  stmt_ptr_stmt_list_ptr_hash_map goto_to_targets;
-  stmt_ptr_proc_ptr_hash_map call_to_callee;
-
-  map_name_to_proc(name_to_proc, pg);
-
-  fprintf(stdout, "Printing name_to_proc\n#######################\n");
-  for(str_proc_ptr_hash_map::iterator iter = name_to_proc.begin(); iter != name_to_proc.end(); ++iter)
-    fprintf(stdout, "%s: %s\n", iter->first, iter->second->f);
-
-  pl = pg->pl;
-  while(pl){
-    proc * p = pl->p;
-    map_label_to_stmt(label_to_stmt, p);
-    map_goto_to_targets(goto_to_targets, label_to_stmt, p);
-    map_call_to_callee(call_to_callee, name_to_proc, p);
-
-    fprintf(stdout, "PROC: %s\n@@@@@@@@@@@@@@@@@@@@\n@@@@@@@@@@@@@@@@@@@@\n", p->f);
-    fprintf(stdout, "Printing label_to_stmt\n#######################\n");
-    for(str_stmt_ptr_hash_map::iterator iter = label_to_stmt.begin(); iter != label_to_stmt.end(); ++iter){
-      fprintf(stdout, "%s ---> ", iter->first);
-      emit_stmt(stdout, iter->second, 0);
-    }
-    fprintf(stdout, "Printing goto_to_targets\n#######################\n");
-    for(stmt_ptr_stmt_list_ptr_hash_map::iterator iter = goto_to_targets.begin(); iter != goto_to_targets.end(); ++iter){
-      emit_stmt(stdout, iter->first, 0);
-      stmt_list * sl = iter->second;
-      while(sl){
-        emit_stmt(stdout, sl->s, 2);
-        sl = sl->n;
-      }
-    }
-    fprintf(stdout, "Printing call_to_callee\n#######################\n");
-    for(stmt_ptr_proc_ptr_hash_map::iterator iter = call_to_callee.begin(); iter != call_to_callee.end(); ++iter){
-      emit_stmt(stdout, iter->first, 0);
-      fprintf(stdout, "  %s\n", iter->second->f);
-    }
-
-
-    label_to_stmt.clear();
-    clear_stmt_ptr_stmt_list_ptr_hash_map(goto_to_targets);
-    call_to_callee.clear();
-    pl = pl->n;
-  }
-  name_to_proc.clear();
-
-  // pds geneartion
-  WPDS * pds = new WPDS;
-  dump_pds_from_prog(pds, pg);
-  //
-  deep_erase_prog(&pg);
-  return 0;
-}
-
-
-*/

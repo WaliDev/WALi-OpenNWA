@@ -53,8 +53,8 @@ built = [env.Install(LibInstallDir, bpparser)]
 penv = env.Clone()
 penv.Append(LIBS = ['bpparser', 'walidomains', 'glog', 'bdd']);
 built += penv.Program('PrintBplStats.cpp')
-built += penv.Program('NewtonFwpdsCompare.cpp')
-built += penv.Program('RunNewton.cpp')
+built += penv.Program('NewtonCompare.cpp')
+built += penv.Program('ParseAndPrint.cpp')
 
 Return('built')
 

@@ -350,13 +350,14 @@ namespace{
 int main(int argc, char ** argv)
 {
   short dump = false;
+  char * mainProc = NULL, * errLbl = NULL;
   string fname;
   if(argc >=2){
     stringstream s;
     s << argv[1];
     s >> fname;
   }else{
-    cerr << "Usage: ./NewtonFwpdsCompare input_file [<0/1> dump]\n";
+    cerr << "Usage: ./NewtonFwpdsCompare input_file [<0/1> dump] [entry function (default:main)] [error label (default:error)]\n";
     return -1;
   }
   if(argc >= 3){
@@ -364,54 +365,79 @@ int main(int argc, char ** argv)
     s << argv[2];
     s >> dump;
   }
-
+  if(argc >= 4){
+    stringstream s;
+    delete mainProc;
+    mainProc = argv[3];
+  }
+  if(argc >= 5){
+    stringstream s;
+    delete errLbl;
+    errLbl = argv[4];
+  }
 
   cout << "dump: " << dump << std::endl;
   
   WFACompare fac("FWPDS", "NEWTON");
   PDSCompare pac("FWPDS", "NEWTON");
 
+  cout << "[NewtonCompare] Parsing Program..." << endl;
   prog * pg = parse_prog(fname.c_str());
-  FWPDS * original_fwpds = fwpds_from_prog(pg);
+  
+  if(!mainProc) mainProc = strdup("main");
+  if(!errLbl) errLbl = strdup("error");
+  cout << "[Newton Compare] Instrumenting asserts... " << endl;
+  instrument_asserts(pg, mainProc, errLbl);
 
+  cout << "[Newton Compare] Obtaining PDS..." << endl;
+  FWPDS * originalPds = fwpds_from_prog(pg);
+  if(dump){
+    cout << "[Newton Compare] Dumping PDS to pds.dot..." << endl;
+    fstream pds_stream("pds.dot", fstream::out);
+    RuleDotty rd(pds_stream);
+    pds_stream << "digraph{" << endl;
+    originalPds->for_each(rd);
+    pds_stream << "}" << endl;
+  }
+
+  cout << "#################################################" << endl;
+  cout << "[Newton Compare] Goal I: Check Correctness by comparing the results with WPDS" << endl;
   {
-    WPDS * pds = new WPDS(*original_fwpds);
-    pac.advance_mode();
+    cout << "///////////////// WPDS ///////////////////" << endl;
+    WPDS * pds = new WPDS(*originalPds);
+
     WFA fa;
     wali::Key acc = wali::getKeySpace()->getKey("accept");
     fa.setInitialState(getPdsState());
     fa.addFinalState(acc);
-    fa.addTrans(getPdsState(),getEntryStk(pg, "main"), acc, pds->get_theZero()->one());
+    fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, pds->get_theZero()->one());
     if(dump){
-      fstream kleene_pds("kleene_pds.dot", fstream::out);
-      RuleDotty rd(kleene_pds);
-      kleene_pds << "digraph{" << endl;
-      pds->for_each(rd);
-      kleene_pds << "}" << endl;
-    }
-    if(dump){
-      fstream innfa("kleene_in_fa.dot", fstream::out);
-      TransDotty td(innfa,false, NULL);      
-      innfa << "digraph{" << endl;
+      cout << "[Newton Compare] Dumping the query automaton for WPDS" << endl;
+      fstream in_fa_stream("wpds_in_fa.dot", fstream::out);
+      TransDotty td(in_fa_stream,false, NULL);      
+      in_fa_stream << "digraph{" << endl;
       fa.for_each(td);
-      innfa << "}" << endl;
+      in_fa_stream << "}" << endl;
     }
+
     WFA outfa;
     {
+      cout << "[Newton Compare] Computing WPDS poststar..." << endl;
       wali::util::Timer * t3 = new wali::util::Timer("FWPDS poststar",cout);
-      cout << "[FWPDS poststar]\n";
       pds->poststar(fa,outfa); 
-      t3->print(std::cout);
+      t3->print(std::cout << "[Newton Compare] Time taken by WPDS poststar: ") << endl;
       delete t3;
     }
-    outfa.for_each(fac);
+    outfa.for_each(fac);    
     if(dump){
-      fstream outfaf("kleene_out_fa.dot", fstream::out);
-      TransDotty td(outfaf,false, NULL);
-      outfaf << "digraph{" << endl;
+      cout << "[Newton Compare] Dumping the result automaton for WPDS..." << endl;
+      fstream out_fa_stream("wpds_out_fa.dot", fstream::out);
+      TransDotty td(out_fa_stream,false, NULL);
+      out_fa_stream << "digraph{" << endl;
       outfa.for_each(td);
-      outfaf << "}" << endl;
+      out_fa_stream << "}" << endl;
     }
+
     fac.advance_mode();
     delete pds;
   }
@@ -419,66 +445,61 @@ int main(int argc, char ** argv)
 
 
   {
-    FWPDS * npds = new FWPDS(*original_fwpds);
+    cout << "///////////////// NWPDS ///////////////////" << endl;
+    FWPDS * npds = new FWPDS(*originalPds);
     wali::set_verify_fwpds(false);
     npds->useNewton(true);
-    npds->for_each(pac);
-    pac.advance_mode();
+
     WFA fa;
     wali::Key acc = wali::getKeySpace()->getKey("accept");
     fa.setInitialState(getPdsState());
     fa.addFinalState(acc);
-    fa.addTrans(getPdsState(),getEntryStk(pg, "main"), acc, npds->get_theZero()->one());
-
+    fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, npds->get_theZero()->one());
     if(dump){
-      fstream newton_pds("newton_pds.dot", fstream::out);
-      RuleDotty rd(newton_pds);
-      newton_pds << "digraph{" << endl;
-      npds->for_each(rd);
-      newton_pds << "}" << endl;
-    }
-    if(dump){
-      fstream innfa("newton_in_fa.dot", fstream::out);
-      TransDotty td(innfa,false, NULL);
-      innfa << "digraph{" << endl;
+      cout << "[Newton Compare] Dumping the query automaton for NWPDS" << endl;
+      fstream in_fa_stream("nwpds_in_fa.dot", fstream::out);
+      TransDotty td(in_fa_stream,false, NULL);
+      in_fa_stream << "digraph{" << endl;
       fa.for_each(td);
-      innfa << "}" << endl;
+      in_fa_stream << "}" << endl;
     }
+
     WFA outfa;
     {
+      cout << "[Newton Compare] Computing NWPDS poststar..." << endl; 
       wali::util::Timer * t2 = new wali::util::Timer("NWPDS poststar",cout);
       cout << "[NWPDS poststar]\n";
       npds->poststar(fa,outfa);
+      t2->print(std::cout << "[Newton Compare] Time take by NWPDS poststar: ") << endl;
       delete t2;
     }
     outfa.for_each(fac);
     if(dump){
-      fstream outfaf("newton_out_fa.dot", fstream::out);
-      TransDotty td(outfaf,false, NULL);
-      outfaf << "digraph{" << endl;
+      cout << "[Newton Compare] Dumping the result automaton for NWPDS..." << endl;
+      fstream out_fa_stream("nwpds_out_fa.dot", fstream::out);
+      TransDotty td(out_fa_stream,false, NULL);
+      out_fa_stream << "digraph{" << endl;
       outfa.for_each(td);
-      outfaf << "}" << endl;
+      out_fa_stream << "}" << endl;
     }
-    fac.advance_mode();
+
+    fac.advance_mode();    
     delete npds;
   }
 
   {
     fstream fadiff("fa_diff",fstream::out);
-    fstream pdsdiff("pds_diff",fstream::out);
     if(dump){
       fac.diff(&fadiff);
-      pac.diff(&pdsdiff);
     }else{
       bool fadifffound = fac.diff();
-      bool pdsdifffound = pac.diff();
       if(fadifffound)
         fadiff << "FA DIFF FOUND!!!" << std::endl;
-      if(pdsdifffound)
-        pdsdiff << "PA DIFF FOUND!!!" << std::endl;
     }
   }
-  delete original_fwpds;
+
+  // Clean Up.
+  delete originalPds;
   deep_erase_prog(&pg);
   return 0;
 }
