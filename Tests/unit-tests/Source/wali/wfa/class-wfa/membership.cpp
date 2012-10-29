@@ -2,6 +2,8 @@
 #include "wali/wfa/WFA.hpp"
 #include "wali/ShortestPathSemiring.hpp"
 #include "wali/LongestSaturatingPathSemiring.hpp"
+#include "wali/domains/binrel/ProgramBddContext.hpp"
+#include "wali/domains/binrel/BinRel.hpp"
 
 #include "fixtures.hpp"
 
@@ -312,5 +314,72 @@ namespace wali {
             EXPECT_EQ(10u, w_b->getNum());  // 1 max (1+1+1) max (1+1+1+1+1) max ... max 10
         }
 
+
+
+        TEST(wali$wfa$$epsilonClose, closureExtendsDoneInCorrectOrder)
+        {
+            using namespace wali::domains::binrel;
+            
+            // I need something that is non-commutative.
+            ProgramBddContext voc;
+            voc.addIntVar("x", 4);
+
+            // Make the weights:
+            //   to_zero * havoc   = havoc
+            //   havoc   * to_zero = to_zero
+            sem_elem_t to_zero = new BinRel(&voc, voc.Assign("x", voc.Const(0)));
+            sem_elem_t havoc = new BinRel(&voc, voc.True());
+
+            // The following is needed because of some extra stuff that
+            // Prathmesh does that I don't understand.
+            //
+            // to_zero starts out as:  <x':0>
+            // havoc starts out as:    <__regSize:2, __regA':1>
+            // thus havoc*to_zero is:  <x':0, __regSize:2, __regA':1>
+            //
+            // The following line deals with those extra regSize/regA things
+            // so that they are present in to_zero as well.
+            to_zero = havoc->extend(to_zero);
+
+            ASSERT_TRUE(to_zero->equal(havoc->extend(to_zero)));
+            ASSERT_TRUE(!havoc->equal(havoc->extend(to_zero)));
+
+            // Make the WFA
+            //    eps          eps
+            //  A ---------> B ------> C
+            //    [havoc x]    [x:=0]
+            WFA wfa;
+            Key A = getKey("A");
+            Key B = getKey("B");
+            Key C = getKey("C");
+
+            wfa.addState(A, havoc->zero());
+            wfa.addState(B, havoc->zero());
+            wfa.addState(C, havoc->zero());
+            wfa.setInitialState(A);
+
+            wfa.addTrans(A, WALI_EPSILON, B, havoc);
+            wfa.addTrans(B, WALI_EPSILON, C, to_zero);
+
+            // A should be reachable with weight one
+            // B should be reachable with weight [havoc x]
+            // C should be reachable with weight ([havoc x] * [x:=0]) = [x:=0]
+            WFA::AccessibleStateMap accessible = wfa.epsilonClose(A);
+
+            EXPECT_EQ(3u, accessible.size());
+            EXPECT_NE(accessible.find(A), accessible.end());
+            EXPECT_NE(accessible.find(B), accessible.end());
+            EXPECT_NE(accessible.find(C), accessible.end());
+
+#if 0
+            wfa.print(std::cout);
+            std::cout << "C weight: ";
+            accessible[C]->print(std::cout);
+#endif
+
+            EXPECT_TRUE(to_zero->one()->equal(accessible[A]));
+            EXPECT_TRUE(havoc->equal(accessible[B]));
+            EXPECT_TRUE(to_zero->equal(accessible[C]));
+        }
     }
 }
