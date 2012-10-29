@@ -5,6 +5,8 @@
  * @author Nicholas Kidd
  */
 
+#include <boost/function.hpp>
+
 // ::wali
 #include "wali/Common.hpp"
 #include "wali/Printable.hpp"
@@ -710,6 +712,26 @@ namespace wali
 
         //// Prints to 'os' statistics about this WFA. 
         void printStatistics(std::ostream & os) const;
+
+
+        /// "Converts" the automaton to a WPDS.
+        ///
+        /// The WPDS has a single state (given as a function parameter). WFA
+        /// states become WPDS stack symbols. Each transition in the WFA
+        /// becomes a rule in the WPDS.
+        ///
+        /// If delta(q, a) = q', then <p, q> -> <p, q'> becomes a rule
+        ///
+        /// The WPDS must be passed in so that we don't have to guess what
+        /// kind of WPDS to make (WPDS, EWPDS, FWPDS, etc.) The WPDS will
+        /// *not* be cleared before anything is added.
+        ///
+        /// The given callback function is called for each transition in the
+        /// NWA; a rule for that transition is added iff the callback returns
+        /// true. This callback may be set to empty.
+        void toWpds(Key p_state,
+                    wpds::WPDS * wpds,
+                    boost::function<bool (ITrans const *)> trans_accept) const;
     };
 
   } // namespace wfa

@@ -1,3 +1,4 @@
+
 /*!
  * @author Nicholas Kidd
  */
@@ -12,6 +13,7 @@
 #include "wali/regex/AllRegex.hpp"
 #include "wali/wpds/GenKeySource.hpp"
 #include "wali/wfa/DeterminizeWeightGen.hpp"
+#include "wali/wpds/WPDS.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -2268,7 +2270,37 @@ namespace wali
          << "             symbols: " << symbols.size() << "\n"
          << "         transitions: " << counter.getNumTrans() << "\n";
     }
-      
+
+
+    struct RuleAdder : ConstTransFunctor
+    {
+      Key p_state;
+      wpds::WPDS * wpds;
+      boost::function<bool (ITrans const *)> callback;
+
+      RuleAdder(Key st, wpds::WPDS * pds, boost::function<bool (ITrans const *)> cb)
+        : p_state(st), wpds(pds), callback(cb)
+      {}
+
+      virtual void operator()( ITrans const * t )
+      {
+        if (callback && callback(t)) {
+          wpds->add_rule(p_state, t->from(),
+                         p_state, t->to(),
+                         t->weight());
+        }
+      }
+    };
+
+    void
+    WFA::toWpds(Key p_state,
+                wpds::WPDS * wpds,
+                boost::function<bool (ITrans const *)> trans_accept) const
+    {
+      RuleAdder adder(p_state, wpds, trans_accept);
+      this->for_each(adder);
+    }
+    
     
   } // namespace wfa
 
