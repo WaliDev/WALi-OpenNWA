@@ -1,4 +1,4 @@
-#define EPSILON_CLOSE_WITH_FWPDS 1
+#define EPSILON_CLOSE_WITH_FWPDS 0
 
 /*!
  * @author Nicholas Kidd
