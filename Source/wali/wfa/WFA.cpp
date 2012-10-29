@@ -16,6 +16,10 @@
 #include "wali/wfa/DeterminizeWeightGen.hpp"
 #include "wali/wpds/WPDS.hpp"
 
+#include "wali/wpds/fwpds/FWPDS.hpp"
+#undef COMBINE // grumble grumble swear swear
+#undef EXTEND
+
 #include <algorithm>
 #include <iostream>
 #include <vector>
@@ -1550,6 +1554,82 @@ namespace wali
     }
     
 #if EPSILON_CLOSE_WITH_FWPDS
+    bool
+    is_epsilon_trans(ITrans const * trans)
+    {
+      return trans->stack() == WALI_EPSILON;
+    }
+
+      
+    WFA::AccessibleStateMap
+    WFA::epsilonClose(Key source) const
+    {
+      Key p_state = getKey("__p");
+      Key query_start = getKey("__start");
+      Key query_accept = getKey("__accept");
+      sem_elem_t zero = getSomeWeight()->zero();
+
+      // Convert this WFA into a WPDS so that we can run poststar
+      wali::wpds::fwpds::FWPDS wpds;
+      this->toWpds(p_state, &wpds, is_epsilon_trans);
+
+      // Set up the query automaton:
+      //                    source
+      //     query_start -----------> ((query_accept))
+      //                   weight 1
+      //
+      // source is what we are doing the epsilon closure from.
+      WFA query;
+      query.addState(query_start, zero);
+      query.addState(query_accept, zero);
+      query.setInitialState(query_start);
+      query.addFinalState(query_accept);
+      query.addTrans(query_start, source, query_accept, zero->one());
+
+      // Issue poststar. Be careful to not force the output a la what Cindy
+      // was doing! (Actually I think we look at all the weights anyway so
+      // that shouldn't matter, but whatever.)
+      WFA result;
+      wpds.poststar(query, result);
+
+      // The 'result' automaton should be something like
+      //
+      //               -------------->
+      //   query_start --------------> ((query_accept))
+      //               -------------->
+      //
+      // for lots of symbols S -- which are states in 'this' WFA. Each symbol
+      // S is in the epsilon close of 'source', so add it.
+      //
+      // Because of the representation of transitions, we again need to
+      // iterate over each (start, sym) pair then over the TransSet -- but in
+      // this case, there should only ever be one source, which is
+      // query_start, and for each (start, sym) there should only be one
+      // transition, to query_accept.
+      WFA::AccessibleStateMap accessible;
+
+      for (kp_map_t::const_iterator kp_iter = result.kpmap.begin();
+           kp_iter != result.kpmap.end(); ++kp_iter)
+      {
+        Key start = kp_iter->first.first; // should be query_start
+        Key sym = kp_iter->first.second;  // a state in eclose(source)
+        TransSet const & transitions = kp_iter->second;
+        
+        assert(start == query_start);
+        assert(transitions.size() == 1u);
+
+        // Pull out the one transition; do sanity checks
+        ITrans * trans = *(transitions.begin());
+        assert(trans->to() == query_accept);
+        assert(!trans->weight()->equal(zero)); // actually this should be fine to remove
+
+        // Now get the weight. That's the net weight from 'source' to 'sym',
+        // where 'sym' is actually a state in 'this' WFA.
+        accessible[sym] = trans->weight();
+      }
+
+      return accessible;
+    }
 #else
     WFA::AccessibleStateMap
     WFA::epsilonClose(Key start) const
