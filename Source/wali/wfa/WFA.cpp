@@ -1,3 +1,4 @@
+#define EPSILON_CLOSE_WITH_FWPDS 0
 
 /*!
  * @author Nicholas Kidd
@@ -1548,7 +1549,8 @@ namespace wali
       }
     }
     
-
+#if EPSILON_CLOSE_WITH_FWPDS
+#else
     WFA::AccessibleStateMap
     WFA::epsilonClose(Key start) const
     {
@@ -1646,6 +1648,7 @@ namespace wali
       
       return out;
     }
+#endif
 
     
     WFA::AccessibleStateMap
