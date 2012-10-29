@@ -1,4 +1,4 @@
-#define EPSILON_CLOSE_WITH_FWPDS 0
+#define EPSILON_CLOSE_WITH_FWPDS 1
 
 /*!
  * @author Nicholas Kidd
@@ -1565,38 +1565,51 @@ namespace wali
     WFA::epsilonClose(Key source) const
     {
       Key p_state = getKey("__p");
-      Key query_start = getKey("__start");
       Key query_accept = getKey("__accept");
       sem_elem_t zero = getSomeWeight()->zero();
 
       // Convert this WFA into a WPDS so that we can run poststar
-      wali::wpds::fwpds::FWPDS wpds;
+      wali::wpds::WPDS wpds;
       this->toWpds(p_state, &wpds, is_epsilon_trans);
 
       // Set up the query automaton:
       //                    source
-      //     query_start -----------> ((query_accept))
+      //     p_state -----------> ((query_accept))
       //                   weight 1
       //
       // source is what we are doing the epsilon closure from.
       WFA query;
-      query.addState(query_start, zero);
+      query.addState(p_state, zero);
       query.addState(query_accept, zero);
-      query.setInitialState(query_start);
+      query.setInitialState(p_state);
       query.addFinalState(query_accept);
-      query.addTrans(query_start, source, query_accept, zero->one());
+      query.addTrans(p_state, source, query_accept, zero->one());
 
       // Issue poststar. Be careful to not force the output a la what Cindy
       // was doing! (Actually I think we look at all the weights anyway so
       // that shouldn't matter, but whatever.)
-      WFA result;
-      wpds.poststar(query, result);
+      WFA const & result = wpds.poststar(query);
+
+#if 0
+      std::cout << "\n";
+      std::cout << "=====================================\n";
+      std::cout << "WPDS:\n";
+      wpds.print(std::cout);
+      std::cout << "======================================\n";
+      std::cout << "query automaton:\n";
+      query.print(std::cout);
+      std::cout << "======================================\n";
+      std::cout << "result automaton:\n";
+      result.print(std::cout);
+      std::cout << "=====================================\n";
+      std::cout << "\n";
+#endif
 
       // The 'result' automaton should be something like
       //
-      //               -------------->
-      //   query_start --------------> ((query_accept))
-      //               -------------->
+      //           -------------->
+      //   p_state --------------> ((query_accept))
+      //           -------------->
       //
       // for lots of symbols S -- which are states in 'this' WFA. Each symbol
       // S is in the epsilon close of 'source', so add it.
@@ -1604,18 +1617,18 @@ namespace wali
       // Because of the representation of transitions, we again need to
       // iterate over each (start, sym) pair then over the TransSet -- but in
       // this case, there should only ever be one source, which is
-      // query_start, and for each (start, sym) there should only be one
+      // p_state, and for each (start, sym) there should only be one
       // transition, to query_accept.
       WFA::AccessibleStateMap accessible;
 
       for (kp_map_t::const_iterator kp_iter = result.kpmap.begin();
            kp_iter != result.kpmap.end(); ++kp_iter)
       {
-        Key start = kp_iter->first.first; // should be query_start
+        Key start = kp_iter->first.first; // should be p_state
         Key sym = kp_iter->first.second;  // a state in eclose(source)
         TransSet const & transitions = kp_iter->second;
         
-        assert(start == query_start);
+        assert(start == p_state);
         assert(transitions.size() == 1u);
 
         // Pull out the one transition; do sanity checks
