@@ -686,7 +686,7 @@ namespace{
   // sure they get the same result.
   TEST(wali$domains$binrel$ProgramBddContext$$bddPlus, slowAndFastAdderAgree)
   {
-      for (int i=2; i<100; ++i) {
+      for (int i=2; i<10; ++i) {
           ProgramBddContext ctx;
           ctx.addIntVar("x", i);
           ctx.Plus(ctx.From("x"), ctx.From("x"));
