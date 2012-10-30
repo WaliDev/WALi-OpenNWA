@@ -186,7 +186,7 @@ if Debug:
     print "+ %20s : '%s'" % ('optimize', optimize)
     print "+ %20s : '%s'" % ('CheckedLevel', CheckedLevel)
 
-
+MkStatic = True
 Export('Debug')
 Export('WaliDir')
 Export('LibInstallDir')

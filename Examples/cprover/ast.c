@@ -402,6 +402,7 @@ inline prog * make_clean_prog()
   prog * p = (prog *) malloc(sizeof(prog));
   p->vl = NULL;
   p->pl = NULL;
+  p->e = NULL;
   return p;
 }
 inline prog * make_prog(str_list * vl, proc_list * pl)

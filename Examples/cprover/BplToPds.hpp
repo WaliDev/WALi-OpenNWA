@@ -118,9 +118,12 @@ namespace wali
 
     // Must be called to fix assert statements, *before* resolving the program.
     void instrument_asserts(prog * pg, const char * mainProc = "main", const char * errLbl = "error");
-    
+    // Must be called to fix fall-through returns *before* dumping PDS
+    void make_void_returns_explicit(prog * pg);
+
     wali::Key getEntryStk(const prog * pg, const char * procname);
     wali::Key getPdsState();
+    wali::Key getErrStk(const prog * pg);
   } 
 }
 

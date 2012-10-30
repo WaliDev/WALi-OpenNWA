@@ -218,6 +218,8 @@ namespace wali
             stmt_list * sl = make_stmt_list_item(s);
             m->sl = sl;
           }
+          // Update error label in program struct.
+          pg->e = s;
           return;
         }
 
@@ -260,9 +262,33 @@ namespace wali
         }
 
 
-
-
-
+        void make_void_returns_explicit_in_prog(prog * pg)
+        {
+          assert(pg && "make_void_returns_explicit_in_prog");
+          proc_list * pl = pg->pl;
+          while(pl){
+            proc * p = pl->p;
+            if(p){
+              stmt_list * sl = p->sl;
+              if(sl){
+                stmt_list * tl = sl->t;
+                stmt * t = tl->s;
+                assert(t && "make_void_returns_explicit");
+                if(t->op != AST_RETURN){
+                  if(p->r != 0){
+                    assert(0 && "procedure with non-void return, has a path that does not end in a return");
+                  }else{
+                    stmt * s = make_return_stmt(NULL);
+                    stmt_list * nsl = make_stmt_list_item(s);
+                    tl->n = nsl;
+                    tl->t = sl->t = nsl;
+                  }
+                }
+              }
+            }
+            pl = pl->n;
+          }
+        }
 
       }
 
@@ -390,16 +416,20 @@ namespace wali
 
       static wali::Key stk(const stmt * s)
       {
-        return getKey((long) s);
+        stringstream ss;
+        ss << (long) s;
+        str_list * ll = s->ll;
+        while(ll){
+          if(ll->v)
+            ss << "::" << ll->v;
+          ll = ll->n;
+        }
+        return getKey(ss.str());
       };
 
       void dump_pds_from_stmt(WPDS * pds, stmt * s, const ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const
           stmt_ptr_proc_ptr_hash_map& call_to_callee, const char * f, stmt * ns)
       {
-        if(0){
-          fprintf(stdout, "DUMPING: ");
-          emit_stmt(stdout, s, 2);            
-        }
         binrel_t temp = new BinRel(con, con->True());
         binrel_t one = dynamic_cast<BinRel*>(temp->one().get_ptr());
         bdd b, b1;
@@ -472,6 +502,10 @@ namespace wali
               assert(s->sl2->s);
               b = con->Assume(expr_as_bdd(s->e, con, f), con->False());
               pds->add_rule(stt(), stk(s), stt(), stk(s->sl2->s), new BinRel(con, b));
+            }else{
+              // fall through edge.
+              b = con->Assume(expr_as_bdd(s->e, con, f), con->False());
+              pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
             }
             if(s->sl1)
               dump_pds_from_stmt_list(pds, s->sl1, con, goto_to_targets, call_to_callee, f, ns);
@@ -635,6 +669,11 @@ namespace wali
     }
 
 
+    void make_void_returns_explicit(prog * pg)
+    {
+      make_void_returns_explicit_in_prog(pg);  
+    }
+
     Key getEntryStk(const prog * pg, const char * f)
     {
       assert(pg);
@@ -653,6 +692,12 @@ namespace wali
     Key getPdsState() 
     {
       return stt();
+    }
+
+    Key getErrStk(const prog * pg)
+    {
+      assert(pg && pg->e && "error label not set yet. Did you use instrument_assert?");
+      return stk(pg->e);
     }
   }
 }

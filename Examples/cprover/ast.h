@@ -71,6 +71,7 @@ typedef struct prog_struct
 {
   str_list * vl;
   proc_list * pl;
+  stmt * e; //error label
 } prog;
 
 // //////////////////////////////CONSTRUCTORS//////////////////////////////////
