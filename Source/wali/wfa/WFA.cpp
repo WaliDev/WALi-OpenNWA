@@ -1,4 +1,4 @@
-#define EPSILON_CLOSE_WITH_FWPDS 0
+#define EPSILON_CLOSE_WITH_FWPDS 1
 
 /*!
  * @author Nicholas Kidd
@@ -1569,8 +1569,9 @@ namespace wali
       sem_elem_t zero = getSomeWeight()->zero();
 
       // Convert this WFA into a WPDS so that we can run poststar
-      wali::wpds::WPDS wpds;
+      wali::wpds::fwpds::FWPDS wpds;
       this->toWpds(p_state, &wpds, is_epsilon_trans);
+      wpds.topDownEval(false);
 
       // Set up the query automaton:
       //                    source
