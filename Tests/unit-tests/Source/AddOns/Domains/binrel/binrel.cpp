@@ -688,7 +688,9 @@ namespace{
   {
       for (int i=2; i<10; ++i) {
           ProgramBddContext ctx;
-          ctx.addIntVar("x", i);
+          std::map<std::string, int> vars;
+          vars["x"] = i;
+          ctx.setIntVars(vars);
           ctx.Plus(ctx.From("x"), ctx.From("x"));
       }
   }
