@@ -67,13 +67,13 @@ namespace details
   }
 
   
-  bdd make_adder(int fdd_lhs, int fdd_rhs, int fdd_result, int num_vars)
+  bdd make_adder(int fdd_lhs, int fdd_rhs, int fdd_result, int num_bits)
   {
-    //int num_vars = fdd_varnum(fdd_lhs);
-    //assert(num_vars == fdd_varnum(fdd_rhs));
-    //assert(num_vars == fdd_varnum(fdd_result));
+    //int num_bits = fdd_varnum(fdd_lhs);
+    //assert(num_bits == fdd_varnum(fdd_rhs));
+    //assert(num_bits == fdd_varnum(fdd_result));
 
-    //std::cerr << "  make_adder: num_vars is " << num_vars << "\n";
+    //std::cerr << "  make_adder: num_bits is " << num_bits << "\n";
     //std::cerr << "              lhs fdd has " << fdd_varnum(fdd_lhs) << " vars\n";
     //std::cerr << "              rhs fdd has " << fdd_varnum(fdd_rhs) << " vars\n";
     //std::cerr << "              result fdd has " << fdd_varnum(fdd_result) << " vars\n";    
@@ -85,12 +85,12 @@ namespace details
     bdd left_box = bddtrue;
     bdd right_box = bddtrue;
 
-    for (int level=0; level<num_vars; ++level) {
-      // IMPORTANT: level counts from 0=msb to num_vars-1=lsb. However,
+    for (int level=0; level<num_bits; ++level) {
+      // IMPORTANT: level counts from 0=msb to num_bits-1=lsb. However,
       // *_vars have index 0 as the lsb.
-      int lhs_var = lhs_vars[num_vars-1 - level];
-      int rhs_var = rhs_vars[num_vars-1 - level];
-      int result_var = result_vars[num_vars-1 - level];
+      int lhs_var = lhs_vars[num_bits-1 - level];
+      int rhs_var = rhs_vars[num_bits-1 - level];
+      int result_var = result_vars[num_bits-1 - level];
 
       bdd new_left_box = make_adder_box(lhs_var, rhs_var, result_var,
                                         left_box, left_box, right_box, false);
@@ -101,9 +101,9 @@ namespace details
       right_box = new_right_box;
     }
 
-    bdd high_bits_zero = make_bdd_high_bits_zero(fdd_lhs, lhs_vars, num_vars)
-                         & make_bdd_high_bits_zero(fdd_rhs, rhs_vars, num_vars)
-                         & make_bdd_high_bits_zero(fdd_result, result_vars, num_vars);
+    bdd high_bits_zero = make_bdd_high_bits_zero(fdd_lhs, lhs_vars, num_bits)
+                         & make_bdd_high_bits_zero(fdd_rhs, rhs_vars, num_bits)
+                         & make_bdd_high_bits_zero(fdd_result, result_vars, num_bits);
 
     return left_box & high_bits_zero;
   }
@@ -603,7 +603,7 @@ bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size) const
       in1Size = in2Size;
   }
   unsigned outSize = in1Size;
-  int num_vars = details::log2_ceiling(outSize - 1);
+  int num_bits = details::log2_ceiling(outSize - 1);
 
   // Not really fast and slow, but fast and slow to construct.
   bdd fast_adder, slow_adder;
@@ -614,7 +614,7 @@ bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size) const
     //          << (details::is_power_of_two(outSize) ? " " : " not ")
     //          << "a power of two\n";
     assert(in1Size <= (unsigned)fdd_domainsize(regAInfo->baseRhs));
-    fast_adder = details::make_adder(regAInfo->baseRhs, regBInfo->baseRhs, regAInfo->baseExtra, num_vars);
+    fast_adder = details::make_adder(regAInfo->baseRhs, regBInfo->baseRhs, regAInfo->baseExtra, num_bits);
     fast_adder = fast_adder & fdd_ithvar(sizeInfo, outSize);
   }
 
