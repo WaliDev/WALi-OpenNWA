@@ -680,6 +680,20 @@ namespace{
     ASSERT_FALSE(failed);
   }
 
+  
+  // The following test just creates some add operations. The point is so
+  // that if both the slow and fast adders are turned on, then it will make
+  // sure they get the same result.
+  TEST(wali$domains$binrel$ProgramBddContext$$bddPlus, slowAndFastAdderAgree)
+  {
+      for (int i=2; i<100; ++i) {
+          ProgramBddContext ctx;
+          ctx.addIntVar("x", i);
+          ctx.Plus(ctx.From("x"), ctx.From("x"));
+      }
+  }
+   
+
   /**
    * The following 4 tests try the following configurations:
    *
