@@ -29,6 +29,19 @@ namespace wali
 
 namespace details
 {
+  bdd make_bdd_high_bits_zero(int fdd_no, int fdd_vars[], int start_at_bit)
+  {
+    int total_bits = fdd_varnum(fdd_no);
+
+    bdd ret = bddtrue;
+    for (int bit = start_at_bit; bit < total_bits; ++bit) {
+      int result_var = fdd_vars[bit];
+      ret = ret & bdd_nithvar(result_var);
+    }
+    return ret;
+  }
+
+
   bdd make_adder_box(int in1_varno, int in2_varno, int out_varno,
                      bdd t0, bdd t1, bdd t2, bool inv)
   {
@@ -54,11 +67,16 @@ namespace details
   }
 
   
-  bdd make_adder(int fdd_lhs, int fdd_rhs, int fdd_result)
+  bdd make_adder(int fdd_lhs, int fdd_rhs, int fdd_result, int num_vars)
   {
-    int num_vars = fdd_varnum(fdd_lhs);
-    assert(num_vars == fdd_varnum(fdd_rhs));
-    assert(num_vars == fdd_varnum(fdd_result));
+    //int num_vars = fdd_varnum(fdd_lhs);
+    //assert(num_vars == fdd_varnum(fdd_rhs));
+    //assert(num_vars == fdd_varnum(fdd_result));
+
+    //std::cerr << "  make_adder: num_vars is " << num_vars << "\n";
+    //std::cerr << "              lhs fdd has " << fdd_varnum(fdd_lhs) << " vars\n";
+    //std::cerr << "              rhs fdd has " << fdd_varnum(fdd_rhs) << " vars\n";
+    //std::cerr << "              result fdd has " << fdd_varnum(fdd_result) << " vars\n";    
 
     int * lhs_vars = fdd_vars(fdd_lhs);
     int * rhs_vars = fdd_vars(fdd_rhs);
@@ -83,7 +101,28 @@ namespace details
       right_box = new_right_box;
     }
 
-    return left_box;
+    bdd high_bits_zero = make_bdd_high_bits_zero(fdd_lhs, lhs_vars, num_vars)
+                         & make_bdd_high_bits_zero(fdd_rhs, rhs_vars, num_vars)
+                         & make_bdd_high_bits_zero(fdd_result, result_vars, num_vars);
+
+    return left_box & high_bits_zero;
+  }
+
+  
+  // http://www.exploringbinary.com/ten-ways-to-check-if-an-integer-is-a-power-of-two-in-c/
+  bool is_power_of_two(unsigned x)
+  {
+    return ((x != 0) && ((x & (~x + 1)) == x));
+  }
+
+  
+  int log2_ceiling(unsigned x)
+  {
+    int num_shifts = 0;
+    while ((1 << num_shifts) <= x) {
+      ++num_shifts;
+    }
+    return num_shifts;
   }
 }
 
@@ -553,6 +592,7 @@ bdd ProgramBddContext::bddNot() const
 
 bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size) const
 {
+  //std::cerr << "bddPlus(" << in1Size << ", " << in2Size << "):\n";
   if(in1Size != in2Size){
     LOG(WARNING) << 
       "[ProgramBddContext::bddPlus] Different sizes of registers in operation." 
@@ -563,38 +603,69 @@ bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size) const
       in1Size = in2Size;
   }
   unsigned outSize = in1Size;
+  int num_vars = details::log2_ceiling(outSize - 1);
 
-#if BINREL_BUILD_FAST_ADDER  
-  assert(in1Size <= (unsigned)fdd_domainsize(regAInfo->baseRhs));
-  bdd plus_bdd = details::make_adder(regAInfo->baseRhs, regBInfo->baseRhs, regAInfo->baseExtra);
-  plus_bdd = plus_bdd & fdd_ithvar(sizeInfo, outSize);
+  // Not really fast and slow, but fast and slow to construct.
+  bdd fast_adder, slow_adder;
+
+  // Build fast adder then maybe build slow adder
+  if (details::is_power_of_two(outSize)) {
+    //std::cerr << "  Building slow adder because " << outSize << " is"
+    //          << (details::is_power_of_two(outSize) ? " " : " not ")
+    //          << "a power of two\n";
+    assert(in1Size <= (unsigned)fdd_domainsize(regAInfo->baseRhs));
+    fast_adder = details::make_adder(regAInfo->baseRhs, regBInfo->baseRhs, regAInfo->baseExtra, num_vars);
+    fast_adder = fast_adder & fdd_ithvar(sizeInfo, outSize);
+  }
+
+#ifndef BINREL_ALWAYS_BUILD_SLOW_ADDER
+#error "You must define BINREL_ALWAYS_BUILD_SLOW_ADDER to 0 or 1"
 #endif
   
-#if BINREL_BUILD_SLOW_ADDER
-  bdd ret = bddfalse;
-  for(unsigned i=0; i<in1Size; ++i){
-    for(unsigned j=0; j<in2Size; ++j){
-      int k = (i + j) % outSize;
-      ret = ret  |
-        (fdd_ithvar(regAInfo->baseRhs,i) &
-         fdd_ithvar(regBInfo->baseRhs,j) &
-         fdd_ithvar(regAInfo->baseExtra,k));
+  if (BINREL_ALWAYS_BUILD_SLOW_ADDER
+      || (BINREL_ALLOW_BUILD_SLOW_ADDER &&
+          !details::is_power_of_two(outSize)))
+  {
+    //std::cerr << "  Building slow adder because"
+    //          << (BINREL_ALWAYS_BUILD_SLOW_ADDER ? " we always do;" : "")
+    //          << (details::is_power_of_two(outSize) ? "" : "outsize is not a power of two")
+    //          << "\n";
+    
+    slow_adder = bddfalse;
+    for(unsigned i=0; i<in1Size; ++i){
+      for(unsigned j=0; j<in2Size; ++j){
+        int k = (i + j) % outSize;
+        slow_adder = slow_adder  |
+          (fdd_ithvar(regAInfo->baseRhs,i) &
+           fdd_ithvar(regBInfo->baseRhs,j) &
+           fdd_ithvar(regAInfo->baseExtra,k));
+      }
     }
+    slow_adder = slow_adder & fdd_ithvar(sizeInfo, outSize);
   }
-  ret = ret & fdd_ithvar(sizeInfo, outSize);
-#endif
 
-#if BINREL_BUILD_FAST_ADDER && BINREL_BUILD_SLOW_ADDER
-  assert(plus_bdd == ret);  
-#endif
+  // If we built both, check they are the same
+  if (fast_adder.id() != 0
+      && slow_adder.id() != 0
+      && fast_adder != slow_adder)
+  {
+    std::cerr << "WARNING: the two methods of creating a plus BDD differ\n";
+    std::cerr << "   in1size: " << in1Size << "\n";
+    std::cerr << "   in2size: " << in2Size << "\n";
+    bdd_fnprintdot((char*)"slow_plus.dot", slow_adder);
+    bdd_fnprintdot((char*)"fast_plus.dot", fast_adder);
+    assert(fast_adder == slow_adder);  
+  }
 
-#if BINREL_BUILD_FAST_ADDER
-  return plus_bdd;
-#elif BINREL_BUILD_SLOW_ADDER
-  return ret;
-#else
-  #error "Must define one of BINREL_BUILD_FAST_ADDER or BINREL_BUILD_SLOW_ADDER"
-#endif
+
+  if (fast_adder.id() != 0) {
+    assert(BINREL_ALWAYS_BUILD_SLOW_ADDER || slow_adder.id() == 0);
+    return fast_adder;
+  }
+  else {
+    assert(slow_adder.id() != 0);
+    return slow_adder;
+  }
 }
 
 #ifdef BINREL_I_WANT_MINUS_TIMES_AND_DIV_EVEN_THOUGH_THEY_CAN_BE_EXPONENTIALLY_SLOW
