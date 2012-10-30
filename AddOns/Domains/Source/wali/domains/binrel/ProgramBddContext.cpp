@@ -119,7 +119,7 @@ namespace details
   int log2_ceiling(unsigned x)
   {
     int num_shifts = 0;
-    while ((1 << num_shifts) <= x) {
+    while ((1u << num_shifts) <= x) {
       ++num_shifts;
     }
     return num_shifts;
