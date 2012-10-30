@@ -1635,7 +1635,7 @@ namespace wali
         // Pull out the one transition; do sanity checks
         ITrans * trans = *(transitions.begin());
         assert(trans->to() == query_accept);
-        assert(!trans->weight()->equal(zero)); // actually this should be fine to remove
+        //assert(!trans->weight()->equal(zero)); // actually this should be fine to remove
 
         // Now get the weight. That's the net weight from 'source' to 'sym',
         // where 'sym' is actually a state in 'this' WFA.
