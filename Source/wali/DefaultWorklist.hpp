@@ -87,6 +87,12 @@ namespace wali
         wl.clear();
       }
 
+      virtual
+      size_t
+      size() const {
+          return wl.size();
+      }
+
     protected:
       std::list< T* > wl; //!< The default worklist data structure
 

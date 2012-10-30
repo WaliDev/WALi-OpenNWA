@@ -71,6 +71,12 @@ namespace wali
     }
 
     template<typename Compare>
+    size_t MultisetPriorityWorklist<Compare>::size() const
+    {
+      return workset.size();
+    }
+
+    template<typename Compare>
     void MultisetPriorityWorklist<Compare>::clear()
     {
       typename pwl_t::iterator i = workset.begin();

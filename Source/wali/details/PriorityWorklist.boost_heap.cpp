@@ -66,6 +66,12 @@ namespace wali
     }
 
     template<typename Compare>
+    size_t BoostHeapPriorityWorklist<Compare>::size() const
+    {
+      return workset.size();
+    }
+
+    template<typename Compare>
     void BoostHeapPriorityWorklist<Compare>::clear()
     {
       typename pwl_t::iterator i = workset.begin();
