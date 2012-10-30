@@ -27,7 +27,7 @@ namespace wali {
             };
 
 
-            TEST(wali$wpds$fwpds$$fwpds, poststarDestructorDoesNotTrashMemory)
+            bool test_memory(bool poststar, bool add_a_rule)
             {
                 sem_elem_t zero = Reach(true).zero();
 
@@ -38,30 +38,47 @@ namespace wali {
                 Key accept = getKey("accept");
                 Key symbol = getKey("symbol");
 
-                WFA wfa;
-                wfa.addState(start, zero);
-                wfa.addState(accept, zero);
+                WFA query;
+                query.addState(start, zero);
+                query.addState(accept, zero);
 
-                wfa.setInitialState(start);
-                wfa.addFinalState(accept);
+                query.setInitialState(start);
+                query.addFinalState(accept);
 
-                wfa.addTrans(start, symbol, accept, zero->one());
+                query.addTrans(start, symbol, accept, zero->one());
 
                 // Set up WPDS. I use a pointer so I can control its deletion
                 // time easier.
                 FWPDS * wpds = new FWPDS();
 
+                if (add_a_rule) {
+                    Key p = getKey("p");
+                    Key sym2 = getKey("sym2");
+                    wpds->add_rule(p, symbol, p, sym2, zero->one());
+                }
+
                 // Call poststar. In an old version of WALi, as a side effect
-                // this would (1) copy wfa's one transition into result then
+                // this would (1) copy query's one transition into result then
                 // (2) put the copy of the transition into the wpds's
                 // worklist and leave it there.
-                WFA result = wpds->poststar(wfa);
+                WFA result;
+                if (poststar) {
+                    result = wpds->poststar(query);
+                }
+                else {
+                    result = wpds->prestar(query);
+                }
 
                 // Get a handle to the one transition in the WFA
                 TransGetter getter;
                 result.for_each(getter);
                 ITrans * the_trans = getter.the_trans;
-                ASSERT_TRUE(the_trans != NULL);
+                if (the_trans == NULL) {
+                    // A little redundant in some sense, but we'll want to
+                    // tell gtest about the failure.
+                    std::cerr << "[Test failing because the_trans == NULL]\n";
+                    return false;
+                }
 
                 // The old version of WALi would, in FWPDS's destructor
                 // (indirectly), try to unmark the_trans. Thus we will mark
@@ -70,9 +87,28 @@ namespace wali {
                 delete wpds;
                 wpds = NULL;
 
-                EXPECT_TRUE(the_trans->marked());
+                return the_trans->marked();
             }
 
+            TEST(wali$wpds$fwpds$$fwpds, poststarDestructorDoesNotTrashMemoryEmptyFwpds)
+            {
+                EXPECT_TRUE(test_memory(true, false));
+            }
+
+            TEST(wali$wpds$fwpds$$fwpds, poststarDestructorDoesNotTrashMemoryNonemptyFwpds)
+            {
+                EXPECT_TRUE(test_memory(true, true));
+            }
+
+            TEST(wali$wpds$fwpds$$fwpds, prestarDestructorDoesNotTrashMemoryEmptyFwpds)
+            {
+                EXPECT_TRUE(test_memory(false, false));
+            }
+
+            TEST(wali$wpds$fwpds$$fwpds, prestarDestructorDoesNotTrashMemoryNonemptyFwpds)
+            {
+                EXPECT_TRUE(test_memory(false, true));
+            }
         }
     }
 }
