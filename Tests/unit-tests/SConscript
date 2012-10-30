@@ -29,7 +29,7 @@ env.AppendUnique(CPPPATH=['#/Tests/unit-tests/Source',
                           '#/AddOns/Domains/Source/'])
 env.AppendUnique(LIBPATH=['#/AddOns/Domains/ThirdParty/'])
 env.AppendUnique(CPPPATH=[glog_inc])
-env.AppendUnique(LIBS=[glog_lib, 'bdd', 'walidomains'])
+env.AppendUnique(LIBS=[glog_lib, 'walidomains', 'bdd'])
 
 #gtest and glog are ill begaved w.r.t. to these flags.
 env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
