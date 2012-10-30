@@ -44,6 +44,8 @@ test_files = Split("""
     Source/wali/wfa/class-wfa/membership.cpp
     Source/wali/wfa/class-wfa/determinize.cpp
     Source/wali/wfa/class-wfa/complementStates.cpp
+    Source/wali/wpds/class-fwpds/poststar.cpp
+    Source/wali/wpds/class-fwpds/prestar.cpp
 
     Source/opennwa/fixtures.cpp
     Source/opennwa/class-NestedWord/nested-word.cpp
