@@ -6,6 +6,8 @@
 #include <cstdlib>
 #include <ctime>
 
+#include <boost/lexical_cast.hpp>
+
 using namespace std;
 using namespace  wali::domains::binrel;
 
@@ -29,6 +31,77 @@ namespace wali
 
 namespace details
 {
+  std::map<int, std::string>
+  get_partial_mapping_for_fdd(std::string const & basename, int fdd_no)
+  {
+    int num_bits = fdd_varnum(fdd_no);
+    int * var_nums = fdd_vars(fdd_no); // [0] = lsb
+    std::map<int, std::string> ret;
+
+    for (int i=0; i<num_bits; ++i) {
+      ret[var_nums[i]] =
+        basename + "_" + boost::lexical_cast<std::string>(i)
+        + "(" + boost::lexical_cast<std::string>(var_nums[i]) + ")";
+    }
+
+    return ret;
+  }
+
+
+  void accumulate(std::map<int, std::string> & out,
+                  std::map<int, std::string> const & more)
+  {
+    for (std::map<int, std::string>::const_iterator iter = more.begin();
+         iter != more.end(); ++iter)
+    {
+      bool added = out.insert(*iter).second;
+      assert(added);
+    }
+  }
+
+  
+  std::map<int, std::string>
+  get_partial_mapping_for_var(std::string const & name, BddInfo const & info)
+  {
+    std::map<int, std::string> vars;
+    accumulate(vars, get_partial_mapping_for_fdd(name, info.baseLhs));
+    accumulate(vars, get_partial_mapping_for_fdd(name + "\'", info.baseRhs));
+    accumulate(vars, get_partial_mapping_for_fdd(name + "\'\'", info.baseExtra));
+    accumulate(vars, get_partial_mapping_for_fdd(name + "_t1", info.tensor1Lhs));
+    accumulate(vars, get_partial_mapping_for_fdd(name + "_t1\'", info.tensor1Rhs));
+    accumulate(vars, get_partial_mapping_for_fdd(name + "_t1\'\'", info.tensor1Extra));
+    accumulate(vars, get_partial_mapping_for_fdd(name + "_t2", info.tensor2Lhs));
+    accumulate(vars, get_partial_mapping_for_fdd(name + "_t2\'", info.tensor2Rhs));    
+    accumulate(vars, get_partial_mapping_for_fdd(name + "_t2\'\'", info.tensor2Extra));
+    return vars;
+  }
+
+  
+  std::map<int, std::string>
+  get_mapping()
+  {
+    std::map<int, std::string> mapping;
+    for (RevBddContext::const_iterator iter = idx2Name.begin(); iter != idx2Name.end(); ++iter)
+    {
+      accumulate(mapping, get_partial_mapping_for_fdd(iter->second, iter->first));
+    }
+    return mapping;
+  }
+  
+  
+  void
+  print_bdd_variable_order(std::ostream & os)
+  {
+    std::map<int, std::string> var_num_to_name = get_mapping();
+
+    int num = bdd_varnum();
+    for (int i=0; i<num; ++i) {
+      os << "  " << i << ": " << var_num_to_name[bdd_level2var(i)] << "\n";
+    }
+    os << "\n";
+  }
+
+  
   bdd make_bdd_high_bits_zero(int fdd_no, int fdd_vars[], int start_at_bit)
   {
     int total_bits = fdd_varnum(fdd_no);
