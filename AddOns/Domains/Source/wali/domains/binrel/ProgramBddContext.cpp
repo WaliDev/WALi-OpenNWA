@@ -31,6 +31,26 @@ namespace wali
 
 namespace details
 {
+  void
+  interleave_all_fdds()
+  {
+    vector<int> new_order;
+
+    for (int bit_num=0; bit_num<bdd_varnum(); ++bit_num) {
+      for (int fdd_num=0; fdd_num<fdd_domainnum(); ++fdd_num) {
+        if (bit_num < fdd_varnum(fdd_num)) {
+          int * vars = fdd_vars(fdd_num);
+          new_order.push_back(vars[bit_num]);
+        }
+      }
+    }
+
+    assert(new_order.size() == static_cast<size_t>(bdd_varnum()));
+
+    bdd_setvarorder(&new_order[0]);
+  }
+
+  
   std::map<int, std::string>
   get_partial_mapping_for_fdd(std::string const & basename, int fdd_no)
   {
