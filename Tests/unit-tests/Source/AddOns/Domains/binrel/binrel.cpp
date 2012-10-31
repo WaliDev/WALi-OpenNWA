@@ -694,7 +694,32 @@ namespace{
           ctx.Plus(ctx.From("x"), ctx.From("x"));
       }
   }
-   
+
+  TEST(wali$domains$binrel$ProgramBddContext$$Assign, canAssignAConstToNotTheBiggestVariable)
+  {
+      ProgramBddContext ctx;
+      std::map<std::string, int> vars;
+      vars["x"] = 2;
+      vars["y"] = 4;
+      ctx.setIntVars(vars);
+
+      // x = 0 should obviously succeed
+      bdd assigned = ctx.Assign("x", ctx.Const(0));
+
+      ASSERT_TRUE(assigned != bddfalse);
+
+      // We want to check that there's exactly one satisfying assignment for
+      // this (to make sure there's not something strange going
+      // on). 'assigned' should be the bdd " x' = 0 " but with some extra
+      // stuff tacked on for the auxiliary variables. We will make sure that,
+      // if we manually construct that bdd independently, take the
+      // complement, and 'and' it with 'assigned', the result is unsat --
+      // meaning that every satisfying assignement to 'assigned' has x'=0.
+      int x_prime_fdd_num = ctx["x"]->baseRhs;
+      bdd x_prime_is_zero = fdd_ithvar(x_prime_fdd_num, 0);
+
+      ASSERT_TRUE(bddfalse == (assigned & !x_prime_is_zero));
+  }
 
   /**
    * The following 4 tests try the following configurations:
