@@ -65,7 +65,7 @@ namespace{
     brm->addIntVar("q",4);
     brm->addIntVar("r",4);
     brm->addIntVar("s",4);
-    ASSERT_EQ(brm->size(), 8);
+    ASSERT_EQ(brm->size(), 8u);
 
     bdd a = brm->From("a");
     bdd p = brm->From("p");
