@@ -939,7 +939,7 @@ namespace wali {
           multiset<tup > worklist;
 
           {
-            wali::util::Timer * setupT = new wali::util::Timer("[setupInterSolution] setup IntraGraphs timer");
+            //wali::util::Timer * setupT = new wali::util::Timer("[setupInterSolution] setup IntraGraphs timer");
             for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
               intra_graph_uf->takeUnion((*it).src,(*it).tgt);
             }
@@ -1003,7 +1003,7 @@ namespace wali {
 #endif
 
             {
-              wali::util::Timer * timer3 = new wali::util::Timer("[setupInterSolution] Intra Graphs RegExp Timer");
+              //wali::util::Timer * timer3 = new wali::util::Timer("[setupInterSolution] Intra Graphs RegExp Timer");
               //int tempCount = 0;
               for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
                 (*gr_it)->setupIntraSolution(false);
@@ -1028,9 +1028,9 @@ namespace wali {
                 }
                  */
               }
-              delete timer3;
+              //delete timer3;
             }
-            delete setupT;
+            //delete setupT;
           }
           //cout << "Intra setup done.\n";
 
@@ -1041,7 +1041,7 @@ namespace wali {
 
 
           {
-            wali::util::Timer * timer4 = new wali::util::Timer("[setupInterSolution] saturation timer");
+            //wali::util::Timer * timer4 = new wali::util::Timer("[setupInterSolution] saturation timer");
             int numSteps = 0;
             // Saturate
             if(wt_required == NULL) {
@@ -1062,16 +1062,16 @@ namespace wali {
               setup_worklist(gr_sorted, gr_it, scc_n, worklist);
               numSteps += saturate(worklist,scc_n);
             }
-            delete timer4;
+            //delete timer4;
             // DEBUGGING
-            cout << "Total number of steps: " << numSteps << endl;
+            //cout << "Total number of steps: " << numSteps << endl;
           }
           max_scc_computed = max_scc_required;
 
           RegExp::stopSatProcess();
           RegExp::executingPoststar(!running_prestar);
 
-          RegExp::print_stats(cout);
+          //RegExp::print_stats(cout);
           //print_stats(cout);
 #ifdef STATIC_MEMORY
           IntraGraph::clearStaticBuffer();
