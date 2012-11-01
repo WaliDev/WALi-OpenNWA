@@ -241,6 +241,7 @@ void ProgramBddContext::setIntVars(const std::map<std::string, int>& flatvars)
   std::vector<std::map<std::string, int> > vars;
   vars.push_back(flatvars);
   setIntVars(vars);
+  details::interleave_all_fdds(); //speeds up ProgramBddContext operations.
 }
 
 
