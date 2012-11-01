@@ -33,6 +33,8 @@ namespace wali
           }
         } // for each target state
       } // for each source state
+
+      assert(total_weight != NULL);
       
       return total_weight;
     }
