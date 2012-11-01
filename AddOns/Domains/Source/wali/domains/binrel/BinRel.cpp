@@ -55,8 +55,8 @@ using std::cout;
  * 
  * The tensor choice is determined by the following macro:
  **/
-//#define TENSOR_MIN_AFFINITY
-#define TENSOR_MAX_AFFINITY
+#define TENSOR_MIN_AFFINITY
+//#define TENSOR_MAX_AFFINITY
 //#define BASE_MAX_AFFINITY_TENSOR_MIXED
 
 #define DETENSOR_TOGETHER
@@ -104,16 +104,6 @@ namespace wali
 // Definitions of static members from BddContext/BinRel class
 
 int BddContext::numBddContexts = 0;
-#ifdef BINREL_STATS
-StatCount BinRel::numCompose = 0;
-StatCount BinRel::numUnion = 0;
-StatCount BinRel::numIntersect = 0;
-StatCount BinRel::numEqual = 0;
-StatCount BinRel::numKronecker = 0;
-StatCount BinRel::numTranspose = 0;
-StatCount BinRel::numEq23Project = 0;
-StatCount BinRel::numEq24Project = 0;
-#endif
 // ////////////////////////////
 
 std::ostream& BddInfo::print(std::ostream& o) const
@@ -220,6 +210,17 @@ BddContext::BddContext(int bddMemSize, int cacheSize) :
   cachedBaseZero = NULL;
   cachedTensorOne = NULL;
   cachedTensorZero = NULL;
+
+#ifdef BINREL_STATS
+  numCompose = 0;
+  numUnion = 0;
+  numIntersect = 0;
+  numEqual = 0;
+  numKronecker = 0;
+  numTranspose = 0;
+  numEq23Project = 0;
+  numEq13Project = 0;
+#endif
   populateCache();
 }
 
@@ -247,6 +248,18 @@ BddContext::BddContext(const BddContext& other) :
   cachedTensorZero(other.cachedTensorZero)
 {
   numBddContexts++;
+
+#ifdef BINREL_STATS
+  // Althought we copied contexts, the statistics are independent.
+  numCompose = 0;
+  numUnion = 0;
+  numIntersect = 0;
+  numEqual = 0;
+  numKronecker = 0;
+  numTranspose = 0;
+  numEq23Project = 0;
+  numEq13Project = 0;
+#endif
   populateCache();
 }
 
@@ -833,17 +846,6 @@ void BddContext::populateCache()
 // Static
 void BinRel::reset()
 {
-#ifdef BINREL_STATS
-  //reset all counter;
-  BinRel::numCompose = 0;
-  BinRel::numUnion = 0;
-  BinRel::numIntersect = 0;
-  BinRel::numEqual = 0;
-  BinRel::numKronecker = 0;
-  BinRel::numTranspose = 0;
-  BinRel::numEq23Project = 0;
-  BinRel::numEq24Project = 0;
-#endif
 }
 
 
@@ -880,7 +882,7 @@ BinRel::BinRel(const BinRel& that) :
   isTensored(that.isTensored)
 {}
 
-BinRel::BinRel(BddContext const * c, bdd b,bool it) : 
+BinRel::BinRel(BddContext * c, bdd b,bool it) : 
   con(c),
   rel(b), 
   isTensored(it) 
@@ -890,6 +892,9 @@ BinRel::~BinRel() {}
 
 binrel_t BinRel::Compose( binrel_t that ) const
 {
+#ifdef BINREL_STATS
+  con->numCompose++;
+#endif
   if (this->isOne()) {
     return that;
   }
@@ -923,14 +928,14 @@ binrel_t BinRel::Compose( binrel_t that ) const
     bdd temp2 = bdd_relprod(rel, temp1, con->tensorSecBddContextSet);
     c = bdd_replace(temp2, con->tensorRestore.get());
   }
-#ifdef BINREL_STATS
-  BinRel::numCompose++;
-#endif
   return new BinRel(con,c,isTensored);
 }
 
 binrel_t BinRel::Union( binrel_t that ) const
 {
+#ifdef BINREL_STATS
+  con->numUnion++;
+#endif
   if (this->isZero()) {
     return that;
   }
@@ -947,14 +952,14 @@ binrel_t BinRel::Union( binrel_t that ) const
     return new BinRel(con,bddtrue,isTensored);
   }
 #endif
-#ifdef BINREL_STATS
-  BinRel::numUnion++;
-#endif
   return new BinRel(con,rel | that->rel, isTensored);
 }
 
 binrel_t BinRel::Intersect( binrel_t that ) const
 {
+#ifdef BINREL_STATS
+  con->numIntersect++;
+#endif
   //We skip this test if you insist
 #ifndef BINREL_HASTY
   if(isTensored != that->isTensored || con != that->con){
@@ -964,14 +969,14 @@ binrel_t BinRel::Intersect( binrel_t that ) const
     return new BinRel(con,bddfalse,isTensored);
   }
 #endif
-#ifdef BINREL_STATS
-  BinRel::numIntersect++;
-#endif
   return new BinRel(con, rel & that->rel,isTensored);
 }
 
 bool BinRel::Equal( binrel_t that) const
 {
+#ifdef BINREL_STATS
+  con->numEqual++;
+#endif
   //We skip this test if you insist
 #ifndef BINREL_HASTY
   if(isTensored != that->isTensored || con != that->con){
@@ -982,14 +987,14 @@ bool BinRel::Equal( binrel_t that) const
     return false;
   }
 #endif
-#ifdef BINREL_STATS
-  BinRel::numEqual++;
-#endif
   return rel == that->rel;
 }
 
 binrel_t BinRel::Transpose() const
 {
+#ifdef BINREL_STATS
+  con->numTranspose++;
+#endif
 #ifndef BINREL_HASTY
   if(isTensored){
     *waliErr << "[WARNING] " << "Attempted to transpose tensored weight."
@@ -1000,14 +1005,14 @@ binrel_t BinRel::Transpose() const
   }
 #endif
   bdd c = bdd_replace(rel, con->baseSwap.get());
-#ifdef BINREL_STATS
-  BinRel::numTranspose++;
-#endif
   return new BinRel(con, c, isTensored);
 }
 
 binrel_t BinRel::Kronecker(binrel_t that) const
 {
+#ifdef BINREL_STATS
+  con->numKronecker++;
+#endif
 #ifndef BINREL_HASTY
   if(isTensored || that->isTensored || con != that->con){
     *waliErr << "[WARNING] " << "Attempted to tensor two tensored weights OR attempted to tensor uncompatible relations."
@@ -1020,14 +1025,14 @@ binrel_t BinRel::Kronecker(binrel_t that) const
   bdd rel1 = bdd_replace(rel, con->move2Tensor1.get());
   bdd rel2 = bdd_replace(that->rel, con->move2Tensor2.get());
   bdd c = rel1 & rel2;
-#ifdef BINREL_STATS
-  BinRel::numKronecker++;
-#endif
   return new BinRel(con, c,true);
 }
 
 binrel_t BinRel::Eq23Project() const
 {
+#ifdef BINREL_STATS
+  con->numEq23Project++;
+#endif
 #ifndef BINREL_HASTY
   if(!isTensored){
     *waliErr << "[WARNING] " << "Attempted to detensor untensored weight."
@@ -1051,14 +1056,14 @@ binrel_t BinRel::Eq23Project() const
   }
   bdd c = bdd_replace(rel1, con->move2Base.get());
 #endif
-#ifdef BINREL_STATS
-  BinRel::numEq23Project++;
-#endif
   return new BinRel(con,c,false);
 }
 
 binrel_t BinRel::Eq13Project() const
 {
+#ifdef BINREL_STATS
+  con->numEq13Project++;
+#endif
 #ifndef BINREL_HASTY
   if(!isTensored){
     *waliErr << "[WARNING] " << "Attempted to detensor untensored weight."
@@ -1081,9 +1086,6 @@ binrel_t BinRel::Eq13Project() const
     rel1 = bdd_exist(rel1, fdd_ithset(varInfo->tensor1Lhs) & fdd_ithset(varInfo->tensor2Lhs));
   }
   bdd c = bdd_replace(rel1, con->move2BaseTwisted.get());
-#endif
-#ifdef BINREL_STATS
-  BinRel::numEq13Project++;
 #endif
   return new BinRel(con,c,false);
 }
@@ -1160,16 +1162,31 @@ wali::sem_elem_tensor_t BinRel::detensorTranspose()
 }
 
 #ifdef BINREL_STATS
-std::ostream& BinRel::printStats( std::ostream& o) const
+std::ostream& BddContext::printStats( std::ostream& o) const
 {
   o << "BinRel Statistics:" <<endl;
-  o << "Number of Compose operations: " << numCompose << endl; 
-  o << "Number of Union operations: " << numUnion << endl; 
-  o << "Number of Intersection operations: " << numIntersection << endl; 
-  o << "Number of Equal operations: " << numEqual << endl; 
+  o << "#Compose: " << numCompose << endl; 
+  o << "#Union: " << numUnion << endl; 
+  o << "#Intersect: " << numIntersect << endl; 
+  o << "#Equal: " << numEqual << endl; 
+  o << "#Kronecker: " << numKronecker << endl;
+  o << "#Transpose: " << numTranspose << endl;
+  o << "#Eq23Project: " << numEq23Project << endl;
+  o << "#Eq13Project: " << numEq13Project << endl;
   return o;
 }
 
+void BddContext::resetStats()
+{
+  numCompose = 0;
+  numUnion = 0;
+  numIntersect = 0;
+  numEqual = 0;
+  numKronecker = 0;
+  numTranspose = 0;
+  numEq23Project = 0;
+  numEq13Project = 0;
+}
 #endif //BINREL_STATS
 
 ///////////////////////////////

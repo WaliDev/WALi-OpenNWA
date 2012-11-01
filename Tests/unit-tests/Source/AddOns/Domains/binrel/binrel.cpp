@@ -869,6 +869,50 @@ namespace{
     b3 = b3->combine(b3);
   }
 
+#if defined(BINREL_STATS)
+  TEST(StatsTests, basicStatCollectionAndPrinting1)
+  {
+    program_bdd_context_t brm = new ProgramBddContext();
+    
+    brm->addIntVar("c", 5);
+    brm->addIntVar("d", 5);
+
+    sem_elem_t a = new BinRel(brm.get_ptr(), brm->True());
+    sem_elem_t b = new BinRel(brm.get_ptr(), brm->Plus(brm->From("c"), brm->From("d")));
+
+    sem_elem_t c;
+    c = a->extend(a);
+    c = c->extend(c);
+
+    c = c->combine(a);
+    c = c->combine(a);
+
+
+    sem_elem_tensor_t e = dynamic_cast<SemElemTensor*>(a.get_ptr());
+    sem_elem_tensor_t f = dynamic_cast<SemElemTensor*>(b.get_ptr());
+    sem_elem_tensor_t g,h;
+
+    g = dynamic_cast<SemElemTensor*>(f.get_ptr());
+    g = g->transpose();
+
+    g = e->tensor(f.get_ptr());
+    h = e->tensor(f.get_ptr());
+
+    g = dynamic_cast<SemElemTensor*>(g->extend(h.get_ptr()).get_ptr());
+    g = dynamic_cast<SemElemTensor*>(g->extend(h.get_ptr()).get_ptr());
+    g = dynamic_cast<SemElemTensor*>(g->combine(h.get_ptr()).get_ptr());
+
+    c = g->detensor();
+    c = h->detensorTranspose();
+  
+    stringstream ss;
+
+    brm->printStats(ss);
+    EXPECT_TRUE(compareOutput("StatTests", "basicStatCollectionAndPrinting1", ss));
+
+  }
+#endif
+
   TEST(Unclassified, dumbTensorTest1)
   {
     program_bdd_context_t brm = new ProgramBddContext();

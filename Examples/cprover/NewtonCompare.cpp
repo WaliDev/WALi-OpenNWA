@@ -35,6 +35,7 @@ using namespace wali::wpds;
 using namespace wali::wpds::ewpds;
 using namespace wali::wpds::fwpds;
 using namespace wali::cprover;
+using namespace wali::domains::binrel;
 
 namespace{
 
@@ -490,6 +491,12 @@ namespace goals {
 
     t3->print(std::cout << "[Newton Compare] Time taken by NWPDS poststar: ") << endl;
     delete t3;
+
+#if defined(BINREL_STATS)
+    binrel_t someWt = dynamic_cast<BinRel*>(npds->get_theZero().get_ptr());
+    BddContext const & con = someWt->getVocabulary();
+    con.printStats(cout);
+#endif //if defined(BINREL_STATS)
   }
   
   void endToEndCompare()

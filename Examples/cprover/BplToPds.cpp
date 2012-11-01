@@ -21,7 +21,7 @@ namespace wali
     namespace binrel
     {
       //We're breaking the ProgramBddContext abstraction here to get the bdds for constrain clauses.
-      static bdd xformer_for_constrain(const expr * e, const ProgramBddContext * con, const char * f)
+      static bdd xformer_for_constrain(const expr * e, ProgramBddContext * con, const char * f)
       {
         bddinfo_t varInfo;
         string s;
@@ -358,7 +358,7 @@ namespace wali
 
       
 
-      static bdd expr_as_bdd(const expr * e, const ProgramBddContext *  con, const char * f)
+      static bdd expr_as_bdd(const expr * e, ProgramBddContext *  con, const char * f)
       {
         if(!e)
           assert(0 && "expr_as_bdd");
@@ -427,7 +427,7 @@ namespace wali
         return getKey(ss.str());
       };
 
-      void dump_pds_from_stmt(WPDS * pds, stmt * s, const ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const
+      void dump_pds_from_stmt(WPDS * pds, stmt * s, ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const
           stmt_ptr_proc_ptr_hash_map& call_to_callee, const char * f, stmt * ns)
       {
         binrel_t temp = new BinRel(con, con->True());
@@ -545,7 +545,7 @@ namespace wali
         }
       }
 
-      void dump_pds_from_stmt_list(WPDS * pds, stmt_list * sl, const ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map&
+      void dump_pds_from_stmt_list(WPDS * pds, stmt_list * sl, ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map&
           goto_to_targets, const stmt_ptr_proc_ptr_hash_map& call_to_callee, const char * f, stmt * es)
       {
         while(sl){
@@ -556,7 +556,7 @@ namespace wali
           sl = sl->n;
         }
       }
-      void dump_pds_from_proc(WPDS * pds, proc * p, const ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const stmt_ptr_proc_ptr_hash_map& call_to_callee)
+      void dump_pds_from_proc(WPDS * pds, proc * p, ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const stmt_ptr_proc_ptr_hash_map& call_to_callee)
       {
         dump_pds_from_stmt_list(pds, p->sl, con, goto_to_targets, call_to_callee, p->f, NULL);
       }

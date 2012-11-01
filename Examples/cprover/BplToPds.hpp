@@ -88,13 +88,13 @@ namespace wali
       void dump_pds_from_proc(
           wpds::WPDS * pds, 
           proc * p, 
-          const domains::binrel::ProgramBddContext * con, 
+          domains::binrel::ProgramBddContext * con, 
           const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
           const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee);
       void dump_pds_from_stmt(
           wpds::WPDS * pds, 
           stmt * s, 
-          const domains::binrel::ProgramBddContext * con, 
+          domains::binrel::ProgramBddContext * con, 
           const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets,
           const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee,
           const char * f,
@@ -103,7 +103,7 @@ namespace wali
       void dump_pds_from_stmt_list(
           wpds::WPDS * pds, 
           stmt_list * sl, 
-          const domains::binrel::ProgramBddContext * con, 
+          domains::binrel::ProgramBddContext * con, 
           const resolve_details::stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, 
           const resolve_details::stmt_ptr_proc_ptr_hash_map& call_to_callee, 
           const char * f, 

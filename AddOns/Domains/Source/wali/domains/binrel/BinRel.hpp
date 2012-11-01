@@ -32,6 +32,12 @@
 #include "wali/SemElemTensor.hpp"
 #include "buddy/fdd.h"
 
+
+/** 
+  To switch on statistics collection in BinRel
+**/
+#define BINREL_STATS
+
 namespace wali 
 {
   namespace domains 
@@ -182,6 +188,25 @@ namespace wali
           binrel_t cachedTensorOne;
           binrel_t cachedTensorZero;
 
+#ifdef BINREL_STATS
+        private:
+          //Statistics for this contex
+          StatCount numCompose;
+          StatCount numUnion;
+          StatCount numIntersect;
+          StatCount numEqual;
+          StatCount numKronecker;
+          StatCount numTranspose;
+          StatCount numEq23Project;
+          StatCount numEq13Project;
+
+          // Related functions
+        public:
+          std::ostream& printStats( std::ostream& o ) const;
+          void resetStats();
+#endif
+
+        private:
           //Initialization of buddy is taken care of opaquely 
           //by keeping track of the number of BddContext objects alive
           static int numBddContexts;
@@ -217,7 +242,7 @@ namespace wali
           friend binrel_t operator&(binrel_t a, binrel_t b);
         public:
           BinRel(const BinRel& that);
-          BinRel(BddContext const * con, bdd b,bool is_tensored=false);
+          BinRel(BddContext * con, bdd b,bool is_tensored=false);
           virtual ~BinRel();
         public:
           binrel_t Compose( binrel_t that ) const;
@@ -286,27 +311,13 @@ namespace wali
           // ////////////////////////////////
           // Printing functions
           //static void printHandler(FILE *o, int var);
-#ifdef BINREL_STATS
-          std::ostream& printStats( std::ostream& o ) const;
-#endif
         protected:
           //This has to be a raw/weak pointer.
           //BddContext caches some BinRel objects. It is not BinRel's responsibility to
           //manage memory for BddContext. 
-          BddContext const * con;
+          BddContext * con;
           bdd rel;
           bool isTensored;
-#ifdef BINREL_STATS
-          //Statistics
-          static StatCount numCompose;
-          static StatCount numUnion;
-          static StatCount numIntersect;
-          static StatCount numEqual;
-          static StatCount numKronecker;
-          static StatCount numTranspose;
-          static StatCount numEq23Project;
-          static StatCount numEq24Project;
-#endif
       };
 
     } // namespace binrel
