@@ -869,10 +869,10 @@ bdd ProgramBddContext::Assign(std::string var, bdd expr) const
   }
 
   unsigned rvalsize = getRegSize(expr);
-  if(rvalsize > bi->maxVal){
-    LOG(WARNING) << "[ProgramBddContext::Assign] The register size of rhs is greater than what the variable can hold";
-    return bddfalse;
-  }
+  //if(rvalsize > bi->maxVal){
+  //  LOG(WARNING) << "[ProgramBddContext::Assign] The register size of rhs is greater than what the variable can hold";
+  //  return bddfalse;
+  //}
 
   // If rhs max size is smaller, only copy the relevant bits.
   unsigned copysize = bi->maxVal;

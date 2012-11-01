@@ -721,6 +721,8 @@ namespace{
       ASSERT_TRUE(bddfalse == (assigned & !x_prime_is_zero));
   }
 
+#undef SETVARADDVARTESTS
+#if defined(SETVARADDVARTESTS)
   /**
    * The following 4 tests try the following configurations:
    *
@@ -868,6 +870,8 @@ namespace{
     sem_elem_t b3 = b1->extend(b2.get_ptr());
     b3 = b3->combine(b3);
   }
+#endif //SETVARADDVARTESTS
+
 
 #if defined(BINREL_STATS)
   TEST(StatsTests, basicStatCollectionAndPrinting1)
