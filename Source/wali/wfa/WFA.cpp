@@ -1783,6 +1783,7 @@ namespace wali
               for (AccessibleStateMap::const_iterator dest = eclose.begin();
                    dest != eclose.end(); ++dest)
               {
+                assert(dest->second.get_ptr());
                 add_trans_to_accessible_states(after, dest->first, dest->second);
               }
             } // For each outgoing transition
@@ -1926,7 +1927,7 @@ namespace wali
         }
 
         // symbol -> next state
-        std::map<Key, KeySet> nexts = next_states(*this, sources);
+        std::map<Key, KeySet> nexts = next_states(*this, sources, eclose_cache);
 
         for (std::map<Key, KeySet>::const_iterator next = nexts.begin();
              next != nexts.end(); ++next)
