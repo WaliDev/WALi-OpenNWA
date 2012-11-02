@@ -626,7 +626,7 @@ namespace wali
 
         // This is a helper function used for both epsilonClose_Fwpds and
         // epsilonCloseCached_FwpdsAllMulti.
-        AccessibleStateMap epsilonClose_genericFwpdsPoststar(std::set<Key> const & sources) const;
+        EpsilonCloseCache epsilonClose_genericFwpdsPoststar(std::set<Key> const & sources) const;
 
         /// Creates (and returns) a new WFA which is the same as *this,
         /// except that it has no epsilon transitions.

@@ -138,7 +138,7 @@ namespace wali
                                            &wali::wfa::WFA::epsilonClose_Fwpds);
     }
 
-
+   
 
     ////////////////////////
     // epsilonClose variants
@@ -239,7 +239,7 @@ namespace wali
 
 
 
-    WFA::AccessibleStateMap
+    WFA::EpsilonCloseCache
     WFA::epsilonClose_genericFwpdsPoststar(std::set<Key> const & sources) const
     {
       Key p_state = getKey("__p");
@@ -295,7 +295,7 @@ namespace wali
       //
       // Because of the representation of transitions, we again need to
       // iterate over each (start, sym) pair then over the TransSet.
-      WFA::AccessibleStateMap accessible;
+      WFA::EpsilonCloseCache closures;
 
       for (kp_map_t::const_iterator kp_iter = result.kpmap.begin();
            kp_iter != result.kpmap.end(); ++kp_iter)
@@ -338,11 +338,11 @@ namespace wali
           
           // Now get the weight. That's the net weight from 'source' to
           // 'target', where 'target' is actually a state in 'this' WFA.
-          accessible[target] = (*trans)->weight();
+          closures[source][target] = (*trans)->weight();
         }
       }
       
-      return accessible;
+      return closures;
     }
 
 
@@ -351,7 +351,10 @@ namespace wali
     {
       std::set<Key> sources;
       sources.insert(source);
-      return epsilonClose_genericFwpdsPoststar(sources);
+      EpsilonCloseCache const & cache = epsilonClose_genericFwpdsPoststar(sources);
+      EpsilonCloseCache::const_iterator loc = cache.find(source);
+      assert(loc != cache.end());
+      return loc->second;
     }
 
   } // namespace wfa
