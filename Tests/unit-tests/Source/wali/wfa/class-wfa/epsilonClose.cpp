@@ -317,5 +317,28 @@ namespace wali {
             EXPECT_TRUE(havoc->equal(accessible[B]));
             EXPECT_TRUE(to_zero->equal(accessible[C]));
         }
+
+        TEST(wali$wfa$$removeEpsilons, epsilonCycleTerminates)
+        {
+            //        eps
+            //   A <------> B
+            Key A = getKey("A");
+            Key B = getKey("B");
+
+            sem_elem_t one = Reach(true).one();
+
+            WFA wfa;
+            wfa.addState(A, one);
+            wfa.addState(B, one);
+
+            wfa.setInitialState(A);
+
+            wfa.addTrans(A, WALI_EPSILON, B, one);
+            wfa.addTrans(B, WALI_EPSILON, A, one);
+
+            WFA no_eps = wfa.removeEpsilons();
+        }
+
+
     }
 }
