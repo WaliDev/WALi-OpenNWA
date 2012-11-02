@@ -623,6 +623,7 @@ namespace wali
         AccessibleStateMap epsilonCloseCached_FwpdsDemand     (Key start, EpsilonCloseCache & cache) const;
         AccessibleStateMap epsilonCloseCached_MohriAll        (Key start, EpsilonCloseCache & cache) const;
         AccessibleStateMap epsilonCloseCached_FwpdsAllSingles (Key start, EpsilonCloseCache & cache) const;
+        AccessibleStateMap epsilonCloseCached_FwpdsAllMulti   (Key start, EpsilonCloseCache & cache) const;
 
         // This is a helper function used for both epsilonClose_Fwpds and
         // epsilonCloseCached_FwpdsAllMulti.

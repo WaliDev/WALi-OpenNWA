@@ -39,7 +39,7 @@ namespace wali
     WFA::AccessibleStateMap
     WFA::epsilonCloseCached(Key state, WFA::EpsilonCloseCache & cache) const
     {
-      return epsilonCloseCached_FwpdsDemand(state, cache);
+      return epsilonCloseCached_FwpdsAllMulti(state, cache);
     }
     
 
@@ -138,6 +138,23 @@ namespace wali
                                            &wali::wfa::WFA::epsilonClose_Fwpds);
     }
 
+
+    WFA::AccessibleStateMap
+    WFA::epsilonCloseCached_FwpdsAllMulti(Key source, WFA::EpsilonCloseCache & cache) const
+    {
+      if (cache.size() == 0) {
+        TransTargetFinder finder;
+        this->for_each(finder);
+        finder.targets.insert(this->getInitialState());
+
+        cache = epsilonClose_genericFwpdsPoststar(finder.targets);
+      }
+      
+      // Return cache[state]
+      WFA::EpsilonCloseCache::iterator loc = cache.find(source);
+      assert(loc != cache.end());
+      return loc->second;
+    }
    
 
     ////////////////////////
