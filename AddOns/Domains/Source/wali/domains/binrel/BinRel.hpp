@@ -139,6 +139,13 @@ namespace wali
           virtual void setIntVars(const std::map<std::string, int>& vars);
           virtual void setIntVars(const std::vector<std::map<std::string, int> >& vars);
 
+        protected:
+          /**
+           * More fine grained control when setting multiple int vars together. These together 
+           * called in order are the same as calling setIntVars
+           **/
+          void createIntVars(const std::vector<std::map<std::string, int> >& vars);
+          virtual void setupCachedBdds();
         public:
           //using wali::Countable::count;
           int count;

@@ -55,7 +55,16 @@ namespace wali
            **/
           virtual void setIntVars(const std::map<std::string, int>& vars);
           virtual void setIntVars(const std::vector<std::map<std::string, int> >& vars);
-         
+        private:
+          /**
+           * 1) Create bdd space for extra variables.
+           * This is pulled out as a different function because both forms of 
+           * setIntVars need to use this, but slightly differently.
+           * 2) Create bdds chached here. Pulled out for the same reason.
+           **/
+          void createExtraVars();
+          virtual void setupCachedBdds(); 
+        public: 
           std::ostream& print(std::ostream& o) const;
 
           // ////////////////Create a expression for the variable var///////////////////////

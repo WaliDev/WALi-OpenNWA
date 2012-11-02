@@ -236,19 +236,52 @@ void ProgramBddContext::addBoolVar(std::string name)
   addIntVar(name,2);
 }
 
-void ProgramBddContext::setIntVars(const std::map<std::string, int>& flatvars)
+void ProgramBddContext::setIntVars(const std::map<std::string, int>& inflatvars)
 {
+  // copy inflatvars because we mess with it.
+  std::map<std::string, int> flatvars = inflatvars;
+  // Add extra variables at the end of the variables passed in.
+  unsigned size = 0;
+  for(std::map<std::string, int>::const_iterator ci = flatvars.begin(); ci != flatvars.end(); ++ci)
+    size = ((unsigned) ci->second) > size ? ci->second : size;
+  size = size < 2 ? 2 : size; // The least size handled is 2. There must be at least one bool variable.
+  maxSize = size;
+  flatvars["__regA"] = size;
+  flatvars["__regB"] = size;
+  flatvars["__regSize"] = size + 1; //only baseLhs will be used. Rest of the levels will be wasted. Ah, what the hell!
+
   std::vector<std::map<std::string, int> > vars;
   vars.push_back(flatvars);
-  setIntVars(vars);
-  details::interleave_all_fdds(); //speeds up ProgramBddContext operations.
+
+  createIntVars(vars);
+
+  //createExtraVars(); <-- not needed.
+  // Now extract the information about extra variables.
+  regAInfo = (*this)["__regA"];
+  regBInfo = (*this)["__regB"];
+  bddinfo_t regSizeInfo = (*this)["__regSize"];
+  sizeInfo = regSizeInfo->baseLhs;
+  // Now delete entries for these extra variables from the vocabulary.
+  this->erase(this->find("__regA"));
+  this->erase(this->find("__regB"));
+  this->erase(this->find("__regSize")); //will get deleted because no one references it anymore.
+
+  //details::interleave_all_fdds(); //speeds up ProgramBddContext operations.
+  BddContext::setupCachedBdds();
+  setupCachedBdds();
 }
 
 
 void ProgramBddContext::setIntVars(const std::vector<std::map<std::string, int> >& vars)
 {
-  BddContext::setIntVars(vars);
-  
+  createIntVars(vars);
+  createExtraVars();
+  BddContext::setupCachedBdds();
+  setupCachedBdds();
+}
+
+void ProgramBddContext::createExtraVars()
+{
   // Compute the size of register needed.
   unsigned size = 0;
   for(std::map<const std::string, bddinfo_t>::const_iterator ci = this->begin(); ci != this->end(); ++ci)
@@ -281,7 +314,10 @@ void ProgramBddContext::setIntVars(const std::vector<std::map<std::string, int> 
   idx2Name[regBInfo->baseLhs] = "__regB";
   idx2Name[regBInfo->baseRhs] = "__regB'";
   idx2Name[regBInfo->baseExtra] = "__regB''";
+}
 
+void ProgramBddContext::setupCachedBdds()
+{
   // Create cached identity
   baseId = bddtrue;
   int * baseLhs = new int[this->size()];

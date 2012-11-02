@@ -59,8 +59,8 @@ using std::cout;
 //#define TENSOR_MAX_AFFINITY
 //#define BASE_MAX_AFFINITY_TENSOR_MIXED
 
-#define DETENSOR_TOGETHER
-//#define DETENSOR_BIT_BY_BIT
+//#define DETENSOR_TOGETHER
+#define DETENSOR_BIT_BY_BIT
 
 // ////////////////////////////
 // Implementation of the initialization free function.
@@ -346,7 +346,7 @@ void BddContext::setIntVars(const std::map<std::string, int>& flatvars)
   setIntVars(vars);
 }
 
-void BddContext::setIntVars(const std::vector<std::map<std::string, int> >& vars)
+void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& vars)
 {
   int vari;
   // First work through the variable list and create the vocabulary structure
@@ -578,7 +578,17 @@ void BddContext::setIntVars(const std::vector<std::map<std::string, int> >& vars
     idx2Name[varInfo->tensor2Rhs] = ci->first + "_t2'";
     idx2Name[varInfo->tensor2Extra] = ci->first + "_t2''";
   } 
+}
 
+void BddContext::setIntVars(const std::vector<std::map<std::string, int> >& vars)
+{
+  createIntVars(vars);
+  setupCachedBdds();
+}
+
+void BddContext::setupCachedBdds()
+{
+  int vari;
 
   // Update bddPairs
   // We will first create arrays for each of columns
