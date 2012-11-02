@@ -892,7 +892,7 @@ BinRel::BinRel(const BinRel& that) :
   isTensored(that.isTensored)
 {}
 
-BinRel::BinRel(BddContext * c, bdd b,bool it) : 
+BinRel::BinRel(BddContext const * c, bdd b, bool it) : 
   con(c),
   rel(b), 
   isTensored(it) 

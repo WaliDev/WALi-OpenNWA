@@ -198,14 +198,14 @@ namespace wali
 #ifdef BINREL_STATS
         private:
           //Statistics for this contex
-          StatCount numCompose;
-          StatCount numUnion;
-          StatCount numIntersect;
-          StatCount numEqual;
-          StatCount numKronecker;
-          StatCount numTranspose;
-          StatCount numEq23Project;
-          StatCount numEq13Project;
+          mutable StatCount numCompose;
+          mutable StatCount numUnion;
+          mutable StatCount numIntersect;
+          mutable StatCount numEqual;
+          mutable StatCount numKronecker;
+          mutable StatCount numTranspose;
+          mutable StatCount numEq23Project;
+          mutable StatCount numEq13Project;
 
           // Related functions
         public:
@@ -249,7 +249,7 @@ namespace wali
           friend binrel_t operator&(binrel_t a, binrel_t b);
         public:
           BinRel(const BinRel& that);
-          BinRel(BddContext * con, bdd b,bool is_tensored=false);
+          BinRel(BddContext const * con, bdd b, bool is_tensored=false);
           virtual ~BinRel();
         public:
           binrel_t Compose( binrel_t that ) const;
@@ -322,7 +322,7 @@ namespace wali
           //This has to be a raw/weak pointer.
           //BddContext caches some BinRel objects. It is not BinRel's responsibility to
           //manage memory for BddContext. 
-          BddContext * con;
+          BddContext const * con;
           bdd rel;
           bool isTensored;
       };
