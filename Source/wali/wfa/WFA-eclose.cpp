@@ -65,7 +65,7 @@ namespace wali
     WFA::epsilonCloseCached_MohriDemand(Key state, WFA::EpsilonCloseCache & cache) const
     {
       return epsilonCloseCached_genericDemand(*this, state, cache,
-                                              &wali::wfa::WFA::epsilonCloseMohri);
+                                              &wali::wfa::WFA::epsilonClose_Mohri);
     }
 
     
@@ -73,7 +73,7 @@ namespace wali
     WFA::epsilonCloseCached_FwpdsDemand(Key state, WFA::EpsilonCloseCache & cache) const
     {
       return epsilonCloseCached_genericDemand(*this, state, cache,
-                                              &wali::wfa::WFA::epsilonCloseFwpds);
+                                              &wali::wfa::WFA::epsilonClose_Fwpds);
     }
 
 
@@ -125,7 +125,7 @@ namespace wali
     WFA::epsilonCloseCached_MohriAll(Key state, WFA::EpsilonCloseCache & cache) const
     {
       return epsilonCloseCached_genericAll(*this, state, cache,
-                                           &wali::wfa::WFA::epsilonCloseMohri);
+                                           &wali::wfa::WFA::epsilonClose_Mohri);
     }
 
     
@@ -133,7 +133,7 @@ namespace wali
     WFA::epsilonCloseCached_FwpdsAllSingles(Key state, WFA::EpsilonCloseCache & cache) const
     {
       return epsilonCloseCached_genericAll(*this, state, cache,
-                                           &wali::wfa::WFA::epsilonCloseFwpds);
+                                           &wali::wfa::WFA::epsilonClose_Fwpds);
     }
     
 
@@ -144,7 +144,7 @@ namespace wali
     WFA::AccessibleStateMap
     WFA::epsilonClose(Key state) const
     {
-      return this->epsilonCloseFwpds(state);
+      return this->epsilonClose_Fwpds(state);
     }
     
     
