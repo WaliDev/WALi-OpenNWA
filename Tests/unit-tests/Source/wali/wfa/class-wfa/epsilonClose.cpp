@@ -81,6 +81,99 @@ namespace wali {
 
             return default_close;
         }
+
+
+
+        ::testing::AssertionResult
+        assert_epsilonCloseCache_equal(char const * left_expr,
+                                       char const * right_expr,
+                                       WFA::EpsilonCloseCache const & left,
+                                       WFA::EpsilonCloseCache const & right)
+        {
+            if (left.size() != right.size()) {
+                return ::testing::AssertionFailure()
+                    << "The two expressions below have epsilon closure information for a differing number of states\n"
+                    << "    " << left_expr << " reports e-closures for " << left.size() << " states\n"
+                    << "    " << right_expr << " reports e-closures for " << right.size() << " states";
+            }
+
+            for (WFA::EpsilonCloseCache::const_iterator
+                     left_entry = left.begin(),
+                     right_entry = right.begin();
+                 left_entry != left.end();
+                 ++left_entry, ++right_entry)
+            {
+                if (left_entry->first != right_entry->first) {
+                    if (right.find(left_entry->first) == right.end()) {                   
+                        return ::testing::AssertionFailure()
+                            << "The two expressions below report epsilon closure information for a differing set of states\n"
+                            << "    " << left_expr << " reports an e-close for state " << key2str(left_entry->first) << " (" << left_entry->first << ")\n"
+                            << "    while " << right_expr << " does not";
+                    }
+                    else {
+                        assert(left.find(right_entry->first) == left.end());
+                        return ::testing::AssertionFailure()
+                            << "The two expressions below report epsilon closure information for a differing set of states\n"
+                            << "    " << left_expr << " does NOT report an e-close for state " << key2str(left_entry->first) << " (" << left_entry->first << ")\n"
+                            << "    while " << right_expr << " DOES";
+                    }
+                }
+
+                std::stringstream left_ss, right_ss;
+
+                left_ss << left_expr << " [from " << key2str(left_entry->first) << " (" << left_entry->first << ")]";
+                right_ss << right_expr << " [from " << key2str(right_entry->first) << " (" << right_entry->first << ")]";
+                
+                std::string
+                    full_left_expr = left_ss.str(),
+                    full_right_expr = right_ss.str();
+
+                ::testing::AssertionResult result_closures =
+                      assert_accessibleStateMaps_equal(full_left_expr.c_str(),
+                                                       full_right_expr.c_str(),
+                                                       left_entry->second,
+                                                       right_entry->second);
+
+                if (!result_closures) {
+                    return ::testing::AssertionFailure()
+                        << "The epsilon closures differ for a state:\n"
+                        << result_closures.message();
+                }
+            }
+            
+            return ::testing::AssertionSuccess();
+        }
+
+
+        ::testing::AssertionResult
+        check_all_source_epsilon_closure(char const * expr, WFA const & wfa)
+        {
+            WFA::EpsilonCloseCache mohri_closures, fwpds_singles_closures, fwpds_multi_closures;
+
+            wfa.epsilonCloseCached_MohriAll(wfa.getInitialState(), mohri_closures);
+            wfa.epsilonCloseCached_FwpdsAllSingles(wfa.getInitialState(), fwpds_singles_closures);
+            wfa.epsilonCloseCached_FwpdsAllMulti(wfa.getInitialState(), fwpds_multi_closures);
+
+            ::testing::AssertionResult
+                  eq12 = assert_epsilonCloseCache_equal("mohri_closures",
+                                                        "fwpds_singles_closures",
+                                                        mohri_closures,
+                                                        fwpds_singles_closures),
+                  eq13 = assert_epsilonCloseCache_equal("mohri_closures",
+                                                        "fwpds_multi_closures",
+                                                        mohri_closures,
+                                                        fwpds_multi_closures);
+
+            if (!eq12) {
+                return eq12;
+            }
+            else {
+                return eq13;
+            }
+        }
+
+#define EXPECT_CONSISTENT_EPSILON_CLOSURES(wfa) \
+        EXPECT_PRED_FORMAT1(check_all_source_epsilon_closure, wfa)
         
 
 #define EXPECT_CONTAINS(container, value) EXPECT_FALSE(container.end() == container.find(value))
@@ -98,6 +191,8 @@ namespace wali {
             WFA::AccessibleStateMap middle_closure = checkedEpsilonClose(fixture.wfa, middle);
             WFA::AccessibleStateMap almost_closure = checkedEpsilonClose(fixture.wfa, almost);
             WFA::AccessibleStateMap accept_closure = checkedEpsilonClose(fixture.wfa, accept);
+
+            EXPECT_CONSISTENT_EPSILON_CLOSURES(fixture.wfa);            
 
             WFA::AccessibleStateMap::const_iterator iter;
 
@@ -154,7 +249,8 @@ namespace wali {
 
             // Issue queries
             WFA::AccessibleStateMap end_from_zero = checkedEpsilonClose(wfa, start);
-
+            EXPECT_CONSISTENT_EPSILON_CLOSURES(wfa);
+            
             // Check the answers
             EXPECT_EQ(2u, end_from_zero.size());
             ASSERT_TRUE(end_from_zero.find(start) != end_from_zero.end());
@@ -195,6 +291,7 @@ namespace wali {
 
             // Issue queries
             WFA::AccessibleStateMap end_from_zero = checkedEpsilonClose(wfa, start);
+            EXPECT_CONSISTENT_EPSILON_CLOSURES(wfa);
 
             // Check the answers
             EXPECT_EQ(3u, end_from_zero.size());
@@ -270,6 +367,7 @@ namespace wali {
 
             // Issue queries
             WFA::AccessibleStateMap end_from_zero = checkedEpsilonClose(wfa, A);
+            EXPECT_CONSISTENT_EPSILON_CLOSURES(wfa);
 
             // Check the answers
             EXPECT_EQ(5u, end_from_zero.size());
@@ -307,6 +405,7 @@ namespace wali {
             wfa.addTrans(B, WALI_EPSILON, A, distance_one);
 
             WFA::AccessibleStateMap accessible = checkedEpsilonClose(wfa, A);
+            EXPECT_CONSISTENT_EPSILON_CLOSURES(wfa);
 
             EXPECT_EQ(2u, accessible.size());
             EXPECT_NE(accessible.find(A), accessible.end());
@@ -374,6 +473,7 @@ namespace wali {
             // B should be reachable with weight [havoc x]
             // C should be reachable with weight ([havoc x] * [x:=0]) = [x:=0]
             WFA::AccessibleStateMap accessible = checkedEpsilonClose(wfa, A);
+            EXPECT_CONSISTENT_EPSILON_CLOSURES(wfa);
 
             EXPECT_EQ(3u, accessible.size());
             EXPECT_NE(accessible.find(A), accessible.end());
