@@ -43,6 +43,7 @@ test_files = Split("""
     Source/wali/wali-prereqs.cpp    
     Source/wali/witness/calculating-visitor.cpp
     Source/wali/wfa/class-wfa/membership.cpp
+    Source/wali/wfa/class-wfa/epsilonClose.cpp
     Source/wali/wfa/class-wfa/determinize.cpp
     Source/wali/wfa/class-wfa/complementStates.cpp
     Source/wali/wpds/class-fwpds/poststar.cpp
