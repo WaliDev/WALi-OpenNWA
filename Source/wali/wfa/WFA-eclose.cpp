@@ -156,7 +156,7 @@ namespace wali
 
       
     WFA::AccessibleStateMap
-    WFA::epsilonCloseFwpds(Key source) const
+    WFA::epsilonClose_Fwpds(Key source) const
     {
       Key p_state = getKey("__p");
       Key query_accept = getKey("__accept");
@@ -184,21 +184,6 @@ namespace wali
       // was doing! (Actually I think we look at all the weights anyway so
       // that shouldn't matter, but whatever.)
       WFA const & result = wpds.poststar(query);
-
-#if 0
-      std::cout << "\n";
-      std::cout << "=====================================\n";
-      std::cout << "WPDS:\n";
-      wpds.print(std::cout);
-      std::cout << "======================================\n";
-      std::cout << "query automaton:\n";
-      query.print(std::cout);
-      std::cout << "======================================\n";
-      std::cout << "result automaton:\n";
-      result.print(std::cout);
-      std::cout << "=====================================\n";
-      std::cout << "\n";
-#endif
 
       // The 'result' automaton should be something like
       //
@@ -241,7 +226,7 @@ namespace wali
 
     
     WFA::AccessibleStateMap
-    WFA::epsilonCloseMohri(Key start) const
+    WFA::epsilonClose_Mohri(Key start) const
     {
       std::set<Key> worklist;
 
@@ -259,17 +244,12 @@ namespace wali
       d[start] = r[start] = getSomeWeight()->one();
       worklist.insert(start);
 
-
-      //std::cout << "--- epsilonClose(" << key2str(start) << ")\n";
-
       // Worklist loop
       while (worklist.size() > 0) {
         Key q = *worklist.begin();
         worklist.erase(worklist.begin());
         sem_elem_t r_q = r[q]; // the change in q's weight since the last time it was visited; just 'r' in the paper
         r[q] = zero;
-
-        //std::cout << "---   dequeued " << key2str(q) << "\n";
 
         // so we want to look at all outgoing transitions from 'q'.
         // kp_map_t maps from (source * stack) -> {trans}. Furthermore,
@@ -300,13 +280,6 @@ namespace wali
               sem_elem_t delta = r_q->extend(w_e);           // 'r*w[e]'
               sem_elem_t new_d_n = d[next]->combine(delta); // 'd[n[e]] + (r*w[e])'
 
-              // std::cout << "---     found transition to " << key2str(next) << "\n";
-              // w_e->print(std::cout << "---         the edge weight is ") << "\n";
-              // r_q->print(std::cout << "---         and the r weight is ") << "\n";
-              // delta->print(std::cout << "---         so delta is ") << ";\n";
-              // d[next]->print(std::cout << "---         the old weight on " << key2str(next) << " was ") << "\n";
-              //new_d_n->print(std::cout << "---         so the new weight would be ") << "\n";
-              
               if (!new_d_n->equal(d[next])) {
                 //std::cout << "---       so I updated it's reachability amount and re-enqueued\n";
                 d[next] = new_d_n;
@@ -319,17 +292,11 @@ namespace wali
         } // ...for each outgoing transition from q
       } // while (!worklist.empty())
 
-      //d[start] = zero->one();
-
-      //std::cout << "---   done finding state weights\n";
-      //std::cout << "---   now removing nonzero states\n";
-
       AccessibleStateMap out;
       for (AccessibleStateMap::const_iterator iter = d.begin();
            iter != d.end(); ++iter)
       {
         if (iter->second != zero) {
-          //iter->second->print(std::cout << "---     found state " << key2str(iter->first) << " with weight ") << "\n";
           assert(!iter->second->equal(zero));
           out[iter->first] = iter->second;
         }

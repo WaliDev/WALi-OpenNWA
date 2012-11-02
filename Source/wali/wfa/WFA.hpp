@@ -616,8 +616,8 @@ namespace wali
 
         // The following are specific variants. (epsilonClose() and epsilonCloseCached() each calls one of
         // these.)
-        AccessibleStateMap epsilonCloseMohri(Key start) const;
-        AccessibleStateMap epsilonCloseFwpds(Key start) const;
+        AccessibleStateMap epsilonClose_Mohri(Key start) const;
+        AccessibleStateMap epsilonClose_Fwpds(Key start) const;
 
         AccessibleStateMap epsilonCloseCached_MohriDemand     (Key start, EpsilonCloseCache & cache) const;
         AccessibleStateMap epsilonCloseCached_FwpdsDemand     (Key start, EpsilonCloseCache & cache) const;
