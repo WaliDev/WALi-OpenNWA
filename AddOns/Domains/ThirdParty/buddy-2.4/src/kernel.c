@@ -737,6 +737,9 @@ ALSO    {* bddCacheStat, bdd\_printstat *}
 */
 void bdd_cachestats(bddCacheStat *s)
 {
+#if !CACHESTATS
+    fprintf(stderr, "[WARNING]: calling bdd_cachestats with stats not enabled!\n");
+#endif
    *s = bddcachestats;
 }
 
