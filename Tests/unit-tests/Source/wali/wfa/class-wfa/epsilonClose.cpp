@@ -24,10 +24,10 @@ namespace wali {
             
 
         ::testing::AssertionResult
-        maps_equal(char const * left_expr,
-                   char const * right_expr,
-                   WFA::AccessibleStateMap const & left,
-                   WFA::AccessibleStateMap const & right)
+        assert_accessibleStateMaps_equal(char const * left_expr,
+                                         char const * right_expr,
+                                         WFA::AccessibleStateMap const & left,
+                                         WFA::AccessibleStateMap const & right)
         {
             if (left.size() != right.size()) {
                 return ::testing::AssertionFailure()
@@ -76,9 +76,9 @@ namespace wali {
                 mohri_close = wfa.epsilonClose_Mohri(state),
                 fwpds_close = wfa.epsilonClose_Fwpds(state);
 
-            EXPECT_PRED_FORMAT2(maps_equal, default_close, mohri_close);
-            EXPECT_PRED_FORMAT2(maps_equal, default_close, fwpds_close);
-            
+            EXPECT_PRED_FORMAT2(assert_accessibleStateMaps_equal, default_close, mohri_close);
+            EXPECT_PRED_FORMAT2(assert_accessibleStateMaps_equal, default_close, fwpds_close);
+
             return default_close;
         }
         
