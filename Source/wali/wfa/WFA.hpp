@@ -622,7 +622,11 @@ namespace wali
         AccessibleStateMap epsilonCloseCached_MohriDemand     (Key start, EpsilonCloseCache & cache) const;
         AccessibleStateMap epsilonCloseCached_FwpdsDemand     (Key start, EpsilonCloseCache & cache) const;
         AccessibleStateMap epsilonCloseCached_MohriAll        (Key start, EpsilonCloseCache & cache) const;
-        AccessibleStateMap epsilonCloseCached_FwpdsAllSingles (Key start, EpsilonCloseCache & cache) const;        
+        AccessibleStateMap epsilonCloseCached_FwpdsAllSingles (Key start, EpsilonCloseCache & cache) const;
+
+        // This is a helper function used for both epsilonClose_Fwpds and
+        // epsilonCloseCached_FwpdsAllMulti.
+        AccessibleStateMap epsilonClose_genericFwpdsPoststar(std::set<Key> const & sources) const;
 
         /// Creates (and returns) a new WFA which is the same as *this,
         /// except that it has no epsilon transitions.

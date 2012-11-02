@@ -15,6 +15,8 @@
 #include "wali/wpds/GenKeySource.hpp"
 #include "wali/wfa/DeterminizeWeightGen.hpp"
 #include "wali/wpds/WPDS.hpp"
+#include "wali/KeyPairSource.hpp"
+#include "wali/wpds/GenKeySource.hpp"
 
 #include "wali/wpds/fwpds/FWPDS.hpp"
 #undef COMBINE // grumble grumble swear swear
@@ -135,7 +137,7 @@ namespace wali
       return epsilonCloseCached_genericAll(*this, state, cache,
                                            &wali::wfa::WFA::epsilonClose_Fwpds);
     }
-    
+
 
 
     ////////////////////////
@@ -238,10 +240,11 @@ namespace wali
 
 
     WFA::AccessibleStateMap
-    WFA::epsilonClose_Fwpds(Key source) const
+    WFA::epsilonClose_genericFwpdsPoststar(std::set<Key> const & sources) const
     {
       Key p_state = getKey("__p");
       Key query_accept = getKey("__accept");
+      Key dummy = getKey("__dummy");
       sem_elem_t zero = getSomeWeight()->zero();
 
       // Convert this WFA into a WPDS so that we can run poststar
@@ -249,18 +252,25 @@ namespace wali
       this->toWpds(p_state, &wpds, is_epsilon_trans);
       wpds.topDownEval(false);
 
+      // Add an additional dummy node to pull off the multi-source trick
+      for (std::set<Key>::const_iterator source = sources.begin();
+           source != sources.end(); ++source)
+      {
+          wpds.add_rule(p_state, dummy,
+                        p_state, *source, *source,
+                        zero->one());
+      }
+
       // Set up the query automaton:
-      //                    source
+      //               dummy
       //     p_state -----------> ((query_accept))
-      //                   weight 1
-      //
-      // source is what we are doing the epsilon closure from.
+      //              weight 1
       WFA query;
       query.addState(p_state, zero);
       query.addState(query_accept, zero);
       query.setInitialState(p_state);
       query.addFinalState(query_accept);
-      query.addTrans(p_state, source, query_accept, zero->one());
+      query.addTrans(p_state, dummy, query_accept, zero->one());
 
       // Issue poststar. Be careful to not force the output a la what Cindy
       // was doing! (Actually I think we look at all the weights anyway so
@@ -269,41 +279,79 @@ namespace wali
 
       // The 'result' automaton should be something like
       //
-      //           -------------->
+      //               dummy
       //   p_state --------------> ((query_accept))
-      //           -------------->
+      //        \  \                 -+
+      //         \  \ S             /
+      //          \  \             /
+      //           \  \           / source
+      //            \  \         /
+      //            -+ -+       /
+      //          (p_state, source)
       //
-      // for lots of symbols S -- which are states in 'this' WFA. Each symbol
-      // S is in the epsilon close of 'source', so add it.
+      // for each 'source' in 'sources' and lots of symbols 'S' -- which are
+      // states in 'this' WFA. Each symbol S is in the epsilon close of
+      // 'source', so add it.
       //
       // Because of the representation of transitions, we again need to
-      // iterate over each (start, sym) pair then over the TransSet -- but in
-      // this case, there should only ever be one source, which is
-      // p_state, and for each (start, sym) there should only be one
-      // transition, to query_accept.
+      // iterate over each (start, sym) pair then over the TransSet.
       WFA::AccessibleStateMap accessible;
 
       for (kp_map_t::const_iterator kp_iter = result.kpmap.begin();
            kp_iter != result.kpmap.end(); ++kp_iter)
       {
-        Key start = kp_iter->first.first; // should be p_state
-        Key sym = kp_iter->first.second;  // a state in eclose(source)
+        Key start = kp_iter->first.first;
+        Key target = kp_iter->first.second;  // a state in some epsilon closure, maybe
         TransSet const & transitions = kp_iter->second;
+
+        if (start != p_state) {
+          // We are on a (p_state, source) ---source---> ((query_accept))
+          // transition, which we don't care about
+          continue;
+        }
         
-        assert(start == p_state);
-        assert(transitions.size() == 1u);
+        for (TransSet::const_iterator trans = transitions.begin();
+             trans != transitions.end(); ++trans)
+        {
+          Key to_state = (*trans)->to();
+          if (to_state == query_accept) {
+            // We are on the (p_state) ---dummy---> ((query_accept))
+            // transition, which we don't care about.
+            assert (transitions.size() == 1u);
+            continue;
+          }
 
-        // Pull out the one transition; do sanity checks
-        ITrans * trans = *(transitions.begin());
-        assert(trans->to() == query_accept);
-        //assert(!trans->weight()->equal(zero)); // actually this should be fine to remove
+          // to_state better be (p_state, source)_g#; we need to extract
+          // 'source'.
+          key_src_t to_state_refptr = getKeySource(to_state);
+          wpds::GenKeySource const * to_state_gen_source =
+            dynamic_cast<wpds::GenKeySource const *>(to_state_refptr.get_ptr());
+          assert(to_state_gen_source);
 
-        // Now get the weight. That's the net weight from 'source' to 'sym',
-        // where 'sym' is actually a state in 'this' WFA.
-        accessible[sym] = trans->weight();
+          key_src_t state_pair = getKeySource(to_state_gen_source->getKey());
+          KeyPairSource const * to_state_pair =
+            dynamic_cast<KeyPairSource const *>(state_pair.get_ptr());
+          assert(to_state_pair);
+
+          Key source = to_state_pair->second();
+          assert(this->getState(source) != NULL);
+          
+          // Now get the weight. That's the net weight from 'source' to
+          // 'target', where 'target' is actually a state in 'this' WFA.
+          accessible[target] = (*trans)->weight();
+        }
       }
-
+      
       return accessible;
+    }
+
+
+    WFA::AccessibleStateMap
+    WFA::epsilonClose_Fwpds(Key source) const
+    {
+      std::set<Key> sources;
+      sources.insert(source);
+      return epsilonClose_genericFwpdsPoststar(sources);
     }
 
   } // namespace wfa
