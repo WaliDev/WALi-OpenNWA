@@ -114,6 +114,11 @@ namespace wali
         static const std::string XMLInorderTag;
         static const std::string XMLReverseTag;
 
+        
+        typedef std::map<Key, sem_elem_t> AccessibleStateMap;
+        typedef std::map<Key, AccessibleStateMap> EpsilonCloseCache;        
+        typedef std::vector<Key> Word;
+        
       protected:
       private:
 
@@ -597,9 +602,6 @@ namespace wali
 
       public:
 
-        typedef std::map<Key, sem_elem_t> AccessibleStateMap;
-        typedef std::vector<Key> Word;
-
         /// Return the set of states reachable from 'start', along with the
         /// weights gathered by following those paths. Includes the start
         /// state, with weight one.
@@ -607,6 +609,16 @@ namespace wali
         /// Assumes there are no epsilon loops accessible via epsilon
         /// transitions from start.
         AccessibleStateMap epsilonClose(Key start) const;
+
+        /// Returns the same thing as epsilonClose(start). If 'start' is
+        /// already present in 'cache',
+        AccessibleStateMap epsilonCloseCached(Key start, EpsilonCloseCache & cache) const;
+
+        // The following are specific variants. (epsilonClose() and epsilonCloseCached() each calls one of
+        // these.)
+        AccessibleStateMap epsilonCloseMohri(Key start) const;
+        AccessibleStateMap epsilonCloseFwpds(Key start) const;
+
 
         /// Creates (and returns) a new WFA which is the same as *this,
         /// except that it has no epsilon transitions.
@@ -699,8 +711,6 @@ namespace wali
                        WFA const & right, std::vector<Key> const & right_states,
                        bool check_weights);
 
-
-        typedef std::map<Key, AccessibleStateMap> EpsilonCloseCache;
         
         static
         std::map<Key, std::set<Key> >

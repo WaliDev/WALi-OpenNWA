@@ -52,6 +52,7 @@ nice_files = Split("""
 ./wali/wpds/GenKeySource.cpp
 ./wali/wfa/State.cpp
 ./wali/wfa/WFA.cpp
+./wali/wfa/WFA-eclose.cpp
 ./wali/wfa/ITrans.cpp
 ./wali/wfa/Trans.cpp
 ./wali/wfa/WeightMaker.cpp
