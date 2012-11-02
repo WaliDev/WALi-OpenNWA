@@ -14,6 +14,7 @@ BuddyEnv['WARNING_FLAGS'] = BuddyEnv['WARNING_FLAGS'].replace('-Wconversion', ''
 BuddyEnv['WARNING_FLAGS'] = BuddyEnv['WARNING_FLAGS'].replace('-Werror', '')
 
 SRCS = Glob('buddy-2.4/src/*.c') + ['buddy-2.4/src/cppext.cxx']
+#BuddyEnv["CPPDEFINES"]["CACHESTATS"]=1
 liba   = BuddyEnv.StaticLibrary('bdd' , SRCS)
 iliba  = BuddyEnv.Install(LibInstallDir, liba)
 hfiles = BuddyEnv.Install('include/buddy',Glob('buddy-2.4/src/*.h'))
