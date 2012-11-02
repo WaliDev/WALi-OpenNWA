@@ -31,21 +31,52 @@ namespace wali
 {
   namespace wfa
   {
+    //////////////////////////////
+    // epsilonCloseCached variants
+
     WFA::AccessibleStateMap
     WFA::epsilonCloseCached(Key state, WFA::EpsilonCloseCache & cache) const
     {
-      EpsilonCloseCache::iterator loc = cache.find(state);
+      return epsilonCloseCached_FwpdsDemand(state, cache);
+    }
+    
+    
+    WFA::AccessibleStateMap
+    epsilonCloseCached_genericDemand(WFA const & wfa,
+                                     Key state,
+                                     WFA::EpsilonCloseCache & cache,
+                                     WFA::AccessibleStateMap (WFA::* accessor)(Key) const)
+    {
+      WFA::EpsilonCloseCache::iterator loc = cache.find(state);
 
       if (loc != cache.end()) {
         return loc->second;
       }
       else {
-        AccessibleStateMap eclose = this->epsilonClose(state);
+        WFA::AccessibleStateMap eclose = (wfa.*accessor)(state);
         cache[state] = eclose;
         return eclose;
       }
     }
 
+    WFA::AccessibleStateMap
+    WFA::epsilonCloseCached_MohriDemand(Key state, WFA::EpsilonCloseCache & cache) const
+    {
+      return epsilonCloseCached_genericDemand(*this, state, cache,
+                                              &wali::wfa::WFA::epsilonCloseMohri);
+    }
+
+    WFA::AccessibleStateMap
+    WFA::epsilonCloseCached_FwpdsDemand(Key state, WFA::EpsilonCloseCache & cache) const
+    {
+      return epsilonCloseCached_genericDemand(*this, state, cache,
+                                              &wali::wfa::WFA::epsilonCloseFwpds);
+    }
+
+
+    ////////////////////////
+    // epsilonClose variants
+    
     WFA::AccessibleStateMap
     WFA::epsilonClose(Key state) const
     {

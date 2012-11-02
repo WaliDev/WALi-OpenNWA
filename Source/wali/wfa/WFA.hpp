@@ -619,6 +619,8 @@ namespace wali
         AccessibleStateMap epsilonCloseMohri(Key start) const;
         AccessibleStateMap epsilonCloseFwpds(Key start) const;
 
+        AccessibleStateMap epsilonCloseCached_MohriDemand     (Key start, EpsilonCloseCache & cache) const;
+        AccessibleStateMap epsilonCloseCached_FwpdsDemand     (Key start, EpsilonCloseCache & cache) const;
 
         /// Creates (and returns) a new WFA which is the same as *this,
         /// except that it has no epsilon transitions.
