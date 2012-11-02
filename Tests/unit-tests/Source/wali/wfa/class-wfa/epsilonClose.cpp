@@ -10,6 +10,15 @@
 namespace wali {
     namespace wfa {
 
+        WFA::AccessibleStateMap
+        checkedEpsilonClose(WFA const & wfa, Key state)
+        {
+            WFA::AccessibleStateMap
+                default_close = wfa.epsilonClose(state);
+            return default_close;
+        }
+        
+
 #define EXPECT_CONTAINS(container, value) EXPECT_FALSE(container.end() == container.find(value))
 
         TEST(wali$wfa$$epsilonClose, EpsilonTransitionToMiddleToEpsilonToAccepting)
@@ -21,10 +30,10 @@ namespace wali {
             Key almost = getKey("almost");
             Key accept = getKey("accept");
 
-            WFA::AccessibleStateMap start_closure = fixture.wfa.epsilonClose(start);
-            WFA::AccessibleStateMap middle_closure = fixture.wfa.epsilonClose(middle);
-            WFA::AccessibleStateMap almost_closure = fixture.wfa.epsilonClose(almost);
-            WFA::AccessibleStateMap accept_closure = fixture.wfa.epsilonClose(accept);
+            WFA::AccessibleStateMap start_closure = checkedEpsilonClose(fixture.wfa, start);
+            WFA::AccessibleStateMap middle_closure = checkedEpsilonClose(fixture.wfa, middle);
+            WFA::AccessibleStateMap almost_closure = checkedEpsilonClose(fixture.wfa, almost);
+            WFA::AccessibleStateMap accept_closure = checkedEpsilonClose(fixture.wfa, accept);
 
             WFA::AccessibleStateMap::const_iterator iter;
 
@@ -80,7 +89,7 @@ namespace wali {
             start_zero[start] = distance_zero;
 
             // Issue queries
-            WFA::AccessibleStateMap end_from_zero = wfa.epsilonClose(start);
+            WFA::AccessibleStateMap end_from_zero = checkedEpsilonClose(wfa, start);
 
             // Check the answers
             EXPECT_EQ(2u, end_from_zero.size());
@@ -121,7 +130,7 @@ namespace wali {
             start_zero[start] = distance_zero;
 
             // Issue queries
-            WFA::AccessibleStateMap end_from_zero = wfa.epsilonClose(start);
+            WFA::AccessibleStateMap end_from_zero = checkedEpsilonClose(wfa, start);
 
             // Check the answers
             EXPECT_EQ(3u, end_from_zero.size());
@@ -196,7 +205,7 @@ namespace wali {
             start_zero[A] = distance_zero;
 
             // Issue queries
-            WFA::AccessibleStateMap end_from_zero = wfa.epsilonClose(A);
+            WFA::AccessibleStateMap end_from_zero = checkedEpsilonClose(wfa, A);
 
             // Check the answers
             EXPECT_EQ(5u, end_from_zero.size());
@@ -233,7 +242,7 @@ namespace wali {
             wfa.addTrans(A, WALI_EPSILON, B, distance_one);
             wfa.addTrans(B, WALI_EPSILON, A, distance_one);
 
-            WFA::AccessibleStateMap accessible = wfa.epsilonClose(A);
+            WFA::AccessibleStateMap accessible = checkedEpsilonClose(wfa, A);
 
             EXPECT_EQ(2u, accessible.size());
             EXPECT_NE(accessible.find(A), accessible.end());
@@ -300,7 +309,7 @@ namespace wali {
             // A should be reachable with weight one
             // B should be reachable with weight [havoc x]
             // C should be reachable with weight ([havoc x] * [x:=0]) = [x:=0]
-            WFA::AccessibleStateMap accessible = wfa.epsilonClose(A);
+            WFA::AccessibleStateMap accessible = checkedEpsilonClose(wfa, A);
 
             EXPECT_EQ(3u, accessible.size());
             EXPECT_NE(accessible.find(A), accessible.end());
