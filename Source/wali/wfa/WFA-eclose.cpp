@@ -40,7 +40,8 @@ namespace wali
       return epsilonCloseCached_FwpdsDemand(state, cache);
     }
     
-    
+
+    // On-demand variants
     WFA::AccessibleStateMap
     epsilonCloseCached_genericDemand(WFA const & wfa,
                                      Key state,
@@ -59,6 +60,7 @@ namespace wali
       }
     }
 
+    
     WFA::AccessibleStateMap
     WFA::epsilonCloseCached_MohriDemand(Key state, WFA::EpsilonCloseCache & cache) const
     {
@@ -66,12 +68,74 @@ namespace wali
                                               &wali::wfa::WFA::epsilonCloseMohri);
     }
 
+    
     WFA::AccessibleStateMap
     WFA::epsilonCloseCached_FwpdsDemand(Key state, WFA::EpsilonCloseCache & cache) const
     {
       return epsilonCloseCached_genericDemand(*this, state, cache,
                                               &wali::wfa::WFA::epsilonCloseFwpds);
     }
+
+
+    // "All" variants
+
+    /// Populates 'targets' with every state that is a target of a
+    /// non-epsilon transition. (The reason we do this is because algorithms
+    /// that require eclose(s) only do so for such states, plus the initial
+    /// state.
+    struct TransTargetFinder : ConstTransFunctor
+    {
+      std::set<Key> targets;
+    
+      virtual void operator()( const wali::wfa::ITrans* t ) {
+        if (t->stack() != wali::WALI_EPSILON) {
+          targets.insert(t->to());
+        }
+      }
+    };
+
+    
+    WFA::AccessibleStateMap
+    epsilonCloseCached_genericAll(WFA const & wfa,
+                                  Key state,
+                                  WFA::EpsilonCloseCache & cache,
+                                  WFA::AccessibleStateMap (WFA::* accessor)(Key) const)
+    {
+      if (cache.size() == 0) {
+        TransTargetFinder finder;
+        wfa.for_each(finder);
+        finder.targets.insert(wfa.getInitialState());
+
+        // A source of an eclose is the target of a non-eps transition
+        for (std::set<Key>::const_iterator source = finder.targets.begin();
+             source != finder.targets.end(); ++source)
+        {
+          cache[*source] = (wfa.*accessor)(*source);
+        }
+      }
+
+      // Return cache[state]
+      WFA::EpsilonCloseCache::iterator loc = cache.find(state);
+      assert(loc != cache.end());
+      return loc->second;
+    }
+
+    
+    WFA::AccessibleStateMap
+    WFA::epsilonCloseCached_MohriAll(Key state, WFA::EpsilonCloseCache & cache) const
+    {
+      return epsilonCloseCached_genericAll(*this, state, cache,
+                                           &wali::wfa::WFA::epsilonCloseMohri);
+    }
+
+    
+    WFA::AccessibleStateMap
+    WFA::epsilonCloseCached_FwpdsAllSingles(Key state, WFA::EpsilonCloseCache & cache) const
+    {
+      return epsilonCloseCached_genericAll(*this, state, cache,
+                                           &wali::wfa::WFA::epsilonCloseFwpds);
+    }
+    
 
 
     ////////////////////////
