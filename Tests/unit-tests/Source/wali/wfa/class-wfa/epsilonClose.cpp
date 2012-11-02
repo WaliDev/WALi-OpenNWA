@@ -10,11 +10,75 @@
 namespace wali {
     namespace wfa {
 
+        std::string
+        clamp(std::string const & str)
+        {
+            const size_t maxlen = 50;
+            if (str.size() < maxlen) {
+                return str;
+            }
+            else {
+                return str.substr(0, maxlen-3) + "...";
+            }
+        }
+            
+
+        ::testing::AssertionResult
+        maps_equal(char const * left_expr,
+                   char const * right_expr,
+                   WFA::AccessibleStateMap const & left,
+                   WFA::AccessibleStateMap const & right)
+        {
+            if (left.size() != right.size()) {
+                return ::testing::AssertionFailure()
+                    << "Epsilon closure results are different sizes:\n"
+                    << "    " << left_expr << " has " << left.size() << " states\n"
+                    << "    " << right_expr << " has " << right.size() << " states";
+            }
+
+            for (WFA::AccessibleStateMap::const_iterator
+                     left_entry = left.begin(),
+                     right_entry = right.begin();
+                 left_entry != left.end();
+                 ++left_entry, ++right_entry)
+            {
+                if (left_entry->first != right_entry->first) {
+                    assert(right.find(left_entry->first) == right.end());
+                    
+                    return ::testing::AssertionFailure()
+                        << "Epsilon closure results have a different set of states;\n"
+                        << "    " << left_expr << " contains state " << key2str(left_entry->first) << " (" << left_entry->first << ")\n"
+                        << "    while " << right_expr << " does not";
+                }
+
+                if (!left_entry->second->equal(right_entry->second)) {
+                    std::string
+                        left_weight_str = clamp(left_entry->second->to_string()),
+                        right_weight_str = clamp(right_entry->second->to_string());
+                    
+                    return ::testing::AssertionFailure()
+                        << "Epsilon closure results have a different weight for a state;\n"
+                        << "    the state is " << key2str(left_entry->first) << " (" << left_entry->first << ")\n"
+                        << "    which for " << left_expr << " has weight " << left_weight_str << "\n"
+                        << "    and for " << right_expr << " has weight " << right_weight_str;
+                }
+            }
+            
+            return ::testing::AssertionSuccess();
+        }
+        
+
         WFA::AccessibleStateMap
         checkedEpsilonClose(WFA const & wfa, Key state)
         {
             WFA::AccessibleStateMap
-                default_close = wfa.epsilonClose(state);
+                default_close = wfa.epsilonClose(state),
+                mohri_close = wfa.epsilonClose_Mohri(state),
+                fwpds_close = wfa.epsilonClose_Fwpds(state);
+
+            EXPECT_PRED_FORMAT2(maps_equal, default_close, mohri_close);
+            EXPECT_PRED_FORMAT2(maps_equal, default_close, fwpds_close);
+            
             return default_close;
         }
         
