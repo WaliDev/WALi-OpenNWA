@@ -84,7 +84,7 @@ namespace wali
         void map_call_to_callee(stmt_ptr_proc_ptr_hash_map& mout, str_proc_ptr_hash_map& min, const proc * p);
       }
 
-      void dump_pds_from_prog(wpds::WPDS * pds, prog * pg);
+      wali::domains::binrel::BddContext * dump_pds_from_prog(wpds::WPDS * pds, prog * pg);
       void dump_pds_from_proc(
           wpds::WPDS * pds, 
           proc * p, 
@@ -110,14 +110,19 @@ namespace wali
           stmt * es);
     }
 
-    void read_prog(wpds::WPDS * pds, const char * fname, bool dbg = false);
+    // Parses the program in file fname and generates the PDS in pds. pds must be preallocated.
+    // Returns the vocabulary generated when parsing the program.
+    wali::domains::binrel::BddContext * read_prog(wpds::WPDS * pds, const char * fname, bool dbg = false);
     prog * parse_prog(const char * fname);
-    wpds::WPDS * wpds_from_prog(prog * pg);
-    wpds::fwpds::FWPDS * fwpds_from_prog(prog * pg);
+//    wpds::WPDS * wpds_from_prog(prog * pg);
+//    wpds::fwpds::FWPDS * fwpds_from_prog(prog * pg);
+    // Dumps the program as a PDS into pds. pds must be preallocated.
+    // Returns the vocabulary gnerated when creating the pds.
+    wali::domains::binrel::BddContext * pds_from_prog(wpds::WPDS * pds, prog * pg);
     void print_prog_stats(prog * pg);
 
     // Must be called to fix assert statements, *before* resolving the program.
-    void instrument_asserts(prog * pg, const char * mainProc = "main", const char * errLbl = "error");
+    void instrument_asserts(prog * pg, const char * errLbl = "error");
     // Must be called to fix fall-through returns *before* dumping PDS
     void make_void_returns_explicit(prog * pg);
 

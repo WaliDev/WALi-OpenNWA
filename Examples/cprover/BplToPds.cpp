@@ -187,7 +187,7 @@ namespace wali
         static void instrument_asserts_in_stmt_list(stmt_list * sl, const char * errLbl);
         static void instrument_asserts_in_stmt(stmt * s, const char * errLbl);
 
-        void instrument_asserts_prog(prog * pg, const char * mainProc, const char * errLbl)
+        void instrument_asserts_prog(prog * pg, const char * errLbl)
         {          
           assert(pg && "instrument_asserts");
           // Convert asserts to assumes + goto
@@ -197,27 +197,15 @@ namespace wali
             instrument_asserts_in_proc(p, errLbl);
             pl = pl->n;
           }
-          // Add the error label to main proc.
+          // Add the error label to a new proc.
           str_list * l = make_str_list_item(strdup(errLbl));
           stmt * s = make_goto_stmt(l);
           str_list * ll = make_str_list_item(strdup(errLbl));
           s->ll = ll;
-          proc * m = NULL;
-          pl = pg->pl;
-          while(pl){
-            if(pl->p && strcmp(pl->p->f, mainProc) == 0){
-              m = pl->p;
-              break;
-            }
-            pl = pl->n;
-          }
-          assert(m && "instrument_asserts: main not found");
-          if(m->sl){
-            add_stmt_right(m->sl, s);
-          }else{
-            stmt_list * sl = make_stmt_list_item(s);
-            m->sl = sl;
-          }
+          stmt_list * sl = make_stmt_list_item(s);
+          proc * m = make_proc(0, strdup(errLbl), NULL, NULL, NULL, sl);
+          pg->pl = add_proc_right(pg->pl, m);
+
           // Update error label in program struct.
           pg->e = s;
           return;
@@ -254,8 +242,7 @@ namespace wali
             stmt_list * sl1 = make_stmt_list_item(s1);
             s->sl1 = sl1;
             //condition violated
-            str_list * l = make_str_list_item(strdup(errLbl));
-            stmt * s2 = make_goto_stmt(l);
+            stmt * s2 = make_call_stmt(strdup(errLbl), NULL, NULL); //We simply call the 'error' proc
             stmt_list * sl2 = make_stmt_list_item(s2);
             s->sl2 = sl2;
           }
@@ -292,7 +279,8 @@ namespace wali
 
       }
 
-      void dump_pds_from_prog(wpds::WPDS * pds, prog * pg)
+
+      BddContext * dump_pds_from_prog(wpds::WPDS * pds, prog * pg)
       {
         ProgramBddContext * con = new ProgramBddContext(); 
 
@@ -353,6 +341,8 @@ namespace wali
         }
         name_to_proc.clear();
         fprintf(stderr, "Done converting\n");
+
+        return con;
       }
 
 
@@ -579,7 +569,7 @@ namespace wali
 
     } //namespace details
   
-    void read_prog(WPDS * pds, const char * fname, bool dbg)
+    BddContext * read_prog(WPDS * pds, const char * fname, bool dbg)
     {
       FILE * fin;
       fin = fopen(fname, "r");
@@ -588,8 +578,9 @@ namespace wali
       parsing_result = NULL;
       if(dbg)
         emit_prog(stdout, pg);
-      dump_pds_from_prog(pds, pg);
+      BddContext * con = dump_pds_from_prog(pds, pg);
       deep_erase_prog(&pg);
+      return con;
     }
 
     prog * parse_prog(const char * fname)
@@ -603,6 +594,13 @@ namespace wali
       return pg;
     }
 
+    BddContext * pds_from_prog(wpds::WPDS * pds, prog * pg)
+    {
+      assert(pg);
+      BddContext * con = dump_pds_from_prog(pds, pg);
+      return con;
+    }
+    /*
     WPDS * wpds_from_prog(prog * pg)
     {
       assert(pg);
@@ -617,7 +615,7 @@ namespace wali
       dump_pds_from_prog(pds, pg);
       return pds;
     }
-
+*/
     void print_prog_stats(prog * pg)
     {
       assert(pg);
@@ -663,9 +661,9 @@ namespace wali
     }
 
 
-    void instrument_asserts(prog * pg, const char * mainProc, const char * errLbl)
+    void instrument_asserts(prog * pg, const char * errLbl)
     {
-      instrument_asserts_prog(pg, mainProc, errLbl);
+      instrument_asserts_prog(pg, errLbl);
     }
 
 
