@@ -284,6 +284,8 @@ namespace wali
           /** @return [this]->Compose( cast<BinRel*>(se) ) */
           sem_elem_t extend(SemElem* se);
 
+          sem_elem_t star();
+
           /** @return [this]->Equal( cast<BinRel*>(se) ) */
           bool equal(SemElem* se) const;
 

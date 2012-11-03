@@ -95,6 +95,16 @@ namespace wali
 
       static void myFddStrmHandler(std::ostream &o, int var);
       static BinRel* convert(wali::SemElem* se);
+
+
+      struct BddLessThan
+      {
+        bool operator() (bdd left, bdd right) {
+          return left.id() < right.id();
+        }
+      };
+
+      std::map<bdd, sem_elem_t, BddLessThan> star_cache;
     }
   }
 }
@@ -324,6 +334,7 @@ BddContext::~BddContext()
   numBddContexts--;
   if(numBddContexts == 0){
     //All BddContexts are now dead. So we must shutdown buddy.
+    star_cache.clear();
     if(bdd_isrunning() != 0)
       bdd_done();
     //Now clear the reverse map.
@@ -1104,6 +1115,22 @@ binrel_t BinRel::Eq13Project() const
 
 // ////////////////////////////
 // SemElem Interface functions
+
+wali::sem_elem_t BinRel::star()
+{
+  if (star_cache.find(getBdd()) == star_cache.end()) {
+    sem_elem_t w = combine(one().get_ptr());
+    sem_elem_t wn = w->extend(w);
+    while(!w->equal(wn)) {
+      w = wn;
+      wn = wn->extend(wn);
+    }
+    star_cache[getBdd()] = wn;
+  }
+
+  return star_cache[getBdd()];
+}
+
 
 wali::sem_elem_t BinRel::combine(wali::SemElem* se) 
 {
