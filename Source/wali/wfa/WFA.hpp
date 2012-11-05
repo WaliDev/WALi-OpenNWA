@@ -604,10 +604,9 @@ namespace wali
 
         /// Return the set of states reachable from 'start', along with the
         /// weights gathered by following those paths. Includes the start
-        /// state, with weight one.
-        ///
-        /// Assumes there are no epsilon loops accessible via epsilon
-        /// transitions from start.
+        /// state, with weight (at least) one. (If there is an epsilon loop
+        /// that involves the start state, then the net effect of that loop
+        /// will be included as well.)
         AccessibleStateMap epsilonClose(Key start) const;
 
         /// Returns the same thing as epsilonClose(start). If 'start' is
@@ -640,8 +639,9 @@ namespace wali
         /// simulate running the word 'word'. Return the list of accessible
         /// states, and the weights with which they can be accessed.
         ///
-        /// Assumes there are no epsilon loops along the path encountered by
-        /// 'word'.
+        /// This may assume there are no epsilon loops along the path
+        /// encountered by 'word' -- but that may be fixed now. Check the
+        /// tests if you need this feature.
         AccessibleStateMap simulate(AccessibleStateMap const & start,
                                     Word const & word) const;
 
