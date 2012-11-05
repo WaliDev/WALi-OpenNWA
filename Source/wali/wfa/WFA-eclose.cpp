@@ -33,11 +33,11 @@ using wali::wfa::ITrans;
 
 namespace
 {
-    bool
-    is_epsilon_transition(ITrans const * trans)
-    {
-      return trans->stack() == WALI_EPSILON;
-    }
+  bool
+  is_epsilon_transition(ITrans const * trans)
+  {
+    return trans->stack() == WALI_EPSILON;
+  }
 }    
   
 
