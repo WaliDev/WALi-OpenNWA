@@ -28,6 +28,19 @@
 #include <stack>
 #include <iterator>
 
+using wali::WALI_EPSILON;
+using wali::wfa::ITrans;
+
+namespace
+{
+    bool
+    is_epsilon_transition(ITrans const * trans)
+    {
+      return trans->stack() == WALI_EPSILON;
+    }
+}    
+  
+
 
 namespace wali
 {
@@ -147,7 +160,7 @@ namespace wali
         this->for_each(finder);
         finder.targets.insert(this->getInitialState());
 
-        cache = epsilonClose_genericFwpdsPoststar(finder.targets);
+        cache = genericFwpdsPoststar(finder.targets, is_epsilon_transition);
       }
       
       // Return cache[state]
@@ -166,13 +179,6 @@ namespace wali
       return this->epsilonClose_Fwpds(state);
     }
     
-    
-    bool
-    is_epsilon_trans(ITrans const * trans)
-    {
-      return trans->stack() == WALI_EPSILON;
-    }
-     
     
     WFA::AccessibleStateMap
     WFA::epsilonClose_Mohri(Key start) const
@@ -257,7 +263,8 @@ namespace wali
 
 
     WFA::EpsilonCloseCache
-    WFA::epsilonClose_genericFwpdsPoststar(std::set<Key> const & sources) const
+    WFA::genericFwpdsPoststar(std::set<Key> const & sources,
+                              boost::function<bool (ITrans const *)> trans_accept) const
     {
       Key p_state = getKey("__p");
       Key query_accept = getKey("__accept");
@@ -266,7 +273,7 @@ namespace wali
 
       // Convert this WFA into a WPDS so that we can run poststar
       wali::wpds::fwpds::FWPDS wpds;
-      this->toWpds(p_state, &wpds, is_epsilon_trans);
+      this->toWpds(p_state, &wpds, trans_accept);
       wpds.topDownEval(false);
 
       // Add an additional dummy node to pull off the multi-source trick
@@ -368,7 +375,7 @@ namespace wali
     {
       std::set<Key> sources;
       sources.insert(source);
-      EpsilonCloseCache const & cache = epsilonClose_genericFwpdsPoststar(sources);
+      EpsilonCloseCache const & cache = genericFwpdsPoststar(sources, is_epsilon_transition);
       EpsilonCloseCache::const_iterator loc = cache.find(source);
       assert(loc != cache.end());
       return loc->second;
