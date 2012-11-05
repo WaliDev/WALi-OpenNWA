@@ -41,6 +41,7 @@ test_files = Split("""
     Source/test.cpp
 
     Source/wali/wali-prereqs.cpp    
+    Source/wali/domains/class-SemElemSet/tests.cpp
     Source/wali/witness/calculating-visitor.cpp
     Source/wali/wfa/class-wfa/membership.cpp
     Source/wali/wfa/class-wfa/epsilonClose.cpp
