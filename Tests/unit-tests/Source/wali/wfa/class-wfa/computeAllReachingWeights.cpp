@@ -28,13 +28,16 @@ namespace {
 
     std::vector<sem_elem_t>
     make_vector(sem_elem_t a = sem_elem_t(), sem_elem_t b = sem_elem_t(),
-                sem_elem_t c = sem_elem_t(), sem_elem_t d = sem_elem_t())
+                sem_elem_t c = sem_elem_t(), sem_elem_t d = sem_elem_t(),
+                sem_elem_t e = sem_elem_t(), sem_elem_t f = sem_elem_t())
     {
         std::vector<sem_elem_t> vec;
         if (a.get_ptr()) vec.push_back(a);
         if (b.get_ptr()) vec.push_back(b);
         if (c.get_ptr()) vec.push_back(c);
         if (d.get_ptr()) vec.push_back(d);
+        if (e.get_ptr()) vec.push_back(e);
+        if (f.get_ptr()) vec.push_back(f);
         return vec;
     }
 
@@ -243,6 +246,67 @@ namespace wali {
             EXPECT_EQ_REACHABLE(expected, reachable);
         }
 
+
+        TEST(wali$wfa$WFA$$computeAllReachingWeights, biggerExample)
+        {
+            Key start = getKey("start"),
+                loop1_head = getKey("loop1_head"),
+                loop2_head = getKey("loop2_head"),
+                inside = getKey("inside"),
+                final = getKey("final"),
+                sym = getKey("sym");
+
+            sem_elem_t
+                distance_zero  = new LongestSaturatingPathSemiring(0, 10),
+                distance_one   = new LongestSaturatingPathSemiring(1, 10),
+                distance_two   = new LongestSaturatingPathSemiring(2, 10),
+                distance_three = new LongestSaturatingPathSemiring(3, 10),
+                distance_four  = new LongestSaturatingPathSemiring(4, 10),
+                distance_five  = new LongestSaturatingPathSemiring(5, 10),
+                distance_six   = new LongestSaturatingPathSemiring(6, 10),
+                distance_seven = new LongestSaturatingPathSemiring(7, 10),
+                distance_eight = new LongestSaturatingPathSemiring(8, 10),
+                distance_nine  = new LongestSaturatingPathSemiring(9, 10),
+                distance_ten   = new LongestSaturatingPathSemiring(10, 10),
+                zero = distance_one->zero();
+            
+            //     _
+            //    / \                                                [anti line-continuation]
+            //    \ /     0     {0,4,8,7,10}       1
+            //   start --------> loop1_head -----------> final
+            //                    |      /\                          [anti line-continuation]
+            //                   2|       |2
+            //                    \/      |
+            //                loop2_head--+   {2,5,6,8,9,10}
+            //                 |     /\                              [anti line-continuation]
+            //                1|     |2
+            //                 \/    |
+            //                  inside  {3,6,7,9,10}
+            WFA wfa;
+            wfa.addState(start, zero);
+            wfa.addState(loop1_head, zero);
+            wfa.addState(loop2_head, zero);
+            wfa.addState(inside, zero);
+            wfa.addState(final, zero);            
+            wfa.setInitialState(start);
+            wfa.addTrans(start,      sym, loop1_head, distance_zero);
+            wfa.addTrans(loop1_head, sym, loop2_head, distance_two);
+            wfa.addTrans(loop2_head, sym, inside,     distance_one);
+            wfa.addTrans(inside,     sym, loop2_head, distance_two);
+            wfa.addTrans(loop2_head, sym, loop1_head, distance_two);
+            wfa.addTrans(loop1_head, sym, final,      distance_one);
+
+            WFA::AccessibleStateSetMap expected;
+            expected[start]      = make_vector(distance_zero);
+            expected[loop1_head] = make_vector(distance_zero, distance_four, distance_seven, distance_eight, distance_ten);
+            expected[loop2_head] = make_vector(distance_two, distance_five, distance_six, distance_eight, distance_nine, distance_ten);
+            expected[inside]     = make_vector(distance_three, distance_six, distance_seven, distance_nine, distance_ten);
+            expected[final]      = make_vector(distance_one, distance_five, distance_eight, distance_nine, distance_ten);
+
+            WFA::AccessibleStateSetMap reachable = wfa.computeAllReachingWeights();
+
+            EXPECT_EQ_REACHABLE(expected, reachable);
+        }
 
     }
 }
