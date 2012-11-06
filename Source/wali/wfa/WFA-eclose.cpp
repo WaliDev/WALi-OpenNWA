@@ -17,6 +17,7 @@
 #include "wali/wpds/WPDS.hpp"
 #include "wali/KeyPairSource.hpp"
 #include "wali/wpds/GenKeySource.hpp"
+#include "wali/domains/SemElemSet.hpp"
 
 #include "wali/wpds/fwpds/FWPDS.hpp"
 #undef COMBINE // grumble grumble swear swear
@@ -29,15 +30,55 @@
 #include <iterator>
 
 using wali::WALI_EPSILON;
+using wali::wfa::WFA;
 using wali::wfa::ITrans;
+using wali::domains::SemElemSet;
 
 namespace
 {
+  int
+  num_trans(WFA const & wfa)
+  {
+    wali::wfa::TransCounter ctr;
+    wfa.for_each(ctr);
+    return ctr.getNumTrans();
+  }
+
+  
   bool
   is_epsilon_transition(ITrans const * trans)
   {
     return trans->stack() == WALI_EPSILON;
   }
+  
+
+  bool
+  is_any_transition(ITrans const * trans)
+  {
+    return true;
+  }
+
+
+  class SemElemSetLifter : public wali::wfa::ConstTransFunctor
+  {
+    WFA & target;
+    
+  public:
+    SemElemSetLifter(WFA * output_to_here)
+      : target(*output_to_here)
+    {}
+    
+    virtual void operator()(wali::wfa::ITrans const * t) {
+      wali::domains::SemElemSet::ElementSet es;
+      es.push_back(t->weight());
+      
+      target.addTrans(t->from(),
+                      t->stack(),
+                      t->to(),
+                      new wali::domains::SemElemSet(t->weight(), es));
+    }
+  };
+  
 }    
   
 
@@ -261,7 +302,6 @@ namespace wali
     }
 
 
-
     WFA::EpsilonCloseCache
     WFA::genericFwpdsPoststar(std::set<Key> const & sources,
                               boost::function<bool (ITrans const *)> trans_accept) const
@@ -379,6 +419,49 @@ namespace wali
       EpsilonCloseCache::const_iterator loc = cache.find(source);
       assert(loc != cache.end());
       return loc->second;
+    }
+
+
+
+    WFA::AccessibleStateSetMap
+    WFA::computeAllReachingWeights() const
+    {
+      // Lift weights to the sets
+      WFA lifted;
+      sem_elem_t lifted_zero = new SemElemSet(this->getSomeWeight()->zero());
+      SemElemSetLifter lifter(&lifted);
+      for (std::set<Key>::const_iterator q = Q.begin(); q != Q.end(); ++q) {
+        lifted.addState(*q, lifted_zero);
+      }
+      this->for_each(lifter);
+      lifted.setInitialState(this->getInitialState());
+      // finals don't matter
+
+      assert(num_trans(*this) == num_trans(lifted));
+
+      // Issue poststar from the initial state in the lifted automaton.
+      std::set<Key> sources;
+      sources.insert(lifted.getInitialState());
+      EpsilonCloseCache const & poststar_answer = lifted.genericFwpdsPoststar(sources, is_any_transition);
+      EpsilonCloseCache::const_iterator loc = poststar_answer.find(lifted.getInitialState());
+      assert(loc != poststar_answer.end());
+      assert(1u == poststar_answer.size());
+      AccessibleStateMap const & set_weights = loc->second;
+
+      // set_weights is almost what we want, except we don't want to make the
+      // user downcast everything to get the actual result.
+      AccessibleStateSetMap result;
+
+      for (AccessibleStateMap::const_iterator state_weight_pair = set_weights.begin();
+           state_weight_pair != set_weights.end(); ++state_weight_pair)
+      {
+        SemElemSet * set_weight = dynamic_cast<SemElemSet *>(state_weight_pair->second.get_ptr());
+        
+        assert(result.find(state_weight_pair->first) == result.end());
+        result[state_weight_pair->first] = set_weight->getElements();
+      }
+
+      return result;
     }
 
   } // namespace wfa

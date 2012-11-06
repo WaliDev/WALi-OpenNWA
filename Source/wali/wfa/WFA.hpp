@@ -116,7 +116,8 @@ namespace wali
 
         
         typedef std::map<Key, sem_elem_t> AccessibleStateMap;
-        typedef std::map<Key, AccessibleStateMap> EpsilonCloseCache;        
+        typedef std::map<Key, AccessibleStateMap> EpsilonCloseCache;
+        typedef std::map<Key, std::vector<sem_elem_t> > AccessibleStateSetMap;
         typedef std::vector<Key> Word;
         
       protected:
@@ -628,6 +629,13 @@ namespace wali
         // epsilonCloseCached_FwpdsAllMulti.
         EpsilonCloseCache genericFwpdsPoststar(std::set<Key> const & sources,
                                                boost::function<bool (ITrans const *)> trans_accept) const;
+
+        /// For each state q, compute the set of all possible weights w such
+        /// that there is a path from the initial state to q with weight w.
+        //
+        // This function is in WFA-eclose.cpp due to its similarity with the
+        // Tarjar/FWPDS epsilon closure algorithm.
+        AccessibleStateSetMap computeAllReachingWeights() const;
 
         /// Creates (and returns) a new WFA which is the same as *this,
         /// except that it has no epsilon transitions.
