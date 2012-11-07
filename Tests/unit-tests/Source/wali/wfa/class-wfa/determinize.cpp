@@ -311,12 +311,15 @@ namespace wali {
             : public LiftCombineWeightGen
         {
             sem_elem_t liftWeight(WFA const & UNUSED_PARAMETER(original_wfa),
-                                  ITrans const * trans_in_original) const
+                                  Key source,
+                                  Key symbol,
+                                  Key target,
+                                  sem_elem_t UNUSED_PARAMETER(weight)) const
             {
                 std::stringstream ss;
-                ss << key2str(trans_in_original->from())
-                   << " --" << key2str(trans_in_original->stack()) << "--> "
-                   << key2str(trans_in_original->to());
+                ss << key2str(source)
+                   << " --" << key2str(symbol) << "--> "
+                   << key2str(target);
                 return new StringWeight(ss.str());
             }
         };
@@ -364,9 +367,9 @@ namespace wali {
 
             // Finally, check that they are what we expect. These tests are a
             // bit fragile...
-            EXPECT_EQ("start --a--> a", w_start_mid->str);
-            EXPECT_EQ("a --a--> accept | ae --a--> accept | aee --a--> accept | aee --a-->accept",
-                      w_mid_accept->str);
+            EXPECT_EQ("start --a--> a | start --a--> ae | start --a--> aee | start --a--> aeee",
+                      w_start_mid->str);
+            EXPECT_EQ("aeee --a--> accept", w_mid_accept->str);
         }
         
         TEST(wali$wfa$$determinize, weightGen)
