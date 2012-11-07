@@ -446,7 +446,7 @@ namespace wali
       EpsilonCloseCache::const_iterator loc = poststar_answer.find(lifted.getInitialState());
       assert(loc != poststar_answer.end());
       assert(1u == poststar_answer.size());
-      AccessibleStateMap const & set_weights = loc->second;
+      AccessibleStateMap const & set_weights = loc->second;      
 
       // set_weights is almost what we want, except we don't want to make the
       // user downcast everything to get the actual result.
@@ -474,3 +474,4 @@ namespace wali
 //     c-basic-offset: 2
 //     indent-tabs-mode: nil
 // End:
+
