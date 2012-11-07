@@ -328,8 +328,12 @@ namespace wali {
 
         TEST(wali$wfa$$WFA$$semideterminize, weightGenKnowsAboutEpsilonTransitions)
         {
-            Letters l;
+            Letters letters;
             AEpsilonEpsilonEpsilonA nondet;
+            // Add an extra transition for a better test: the machine can
+            // take a transition without following all epsilons first.
+            nondet.wfa.addTrans(nondet.ae, nondet.a, nondet.accept, nondet.one);
+            nondet.wfa.addTrans(nondet.ae, letters.b, nondet.accept, nondet.one);
             WFA det = nondet.wfa.semideterminize(TestLifter());
 
             std::set<Key> start_set, mid_set, accept_set;
@@ -351,25 +355,30 @@ namespace wali {
             ASSERT_CONTAINS(det.getStates(), accept);
 
             // Extract the transitions
-            Trans trans_start_mid, trans_mid_accept;
+            Trans trans_start_mid, trans_mid_accept, trans_mid_accept_b;
             ASSERT_TRUE(det.find(start, nondet.a, mid, trans_start_mid));
             ASSERT_TRUE(det.find(mid, nondet.a, accept, trans_mid_accept));
+            ASSERT_TRUE(det.find(mid, letters.b, accept, trans_mid_accept_b));
 
             // Extract the weights
             sem_elem_t se_start_mid = trans_start_mid.weight();
             sem_elem_t se_mid_accept = trans_mid_accept.weight();
+            sem_elem_t se_mid_accept_b = trans_mid_accept_b.weight();
 
             StringWeight * w_start_mid = dynamic_cast<StringWeight*>(se_start_mid.get_ptr());
             StringWeight * w_mid_accept = dynamic_cast<StringWeight*>(se_mid_accept.get_ptr());
+            StringWeight * w_mid_accept_b = dynamic_cast<StringWeight*>(se_mid_accept_b.get_ptr());
 
             ASSERT_TRUE(w_start_mid != NULL);
             ASSERT_TRUE(w_mid_accept != NULL);
+            ASSERT_TRUE(w_mid_accept_b != NULL);
 
             // Finally, check that they are what we expect. These tests are a
             // bit fragile...
             EXPECT_EQ("start --a--> a | start --a--> ae | start --a--> aee | start --a--> aeee",
                       w_start_mid->str);
-            EXPECT_EQ("aeee --a--> accept", w_mid_accept->str);
+            EXPECT_EQ("ae --a--> accept | aeee --a--> accept", w_mid_accept->str);
+            EXPECT_EQ("ae --b--> accept", w_mid_accept_b->str);
         }
         
         TEST(wali$wfa$$determinize, weightGen)

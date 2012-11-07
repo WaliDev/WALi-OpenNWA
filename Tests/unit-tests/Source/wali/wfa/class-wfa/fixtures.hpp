@@ -517,11 +517,13 @@ namespace wali {
             Key aeee;
             Key accept;
             
+            sem_elem_t one;
+            sem_elem_t zero;
 
             AEpsilonEpsilonEpsilonA() {
-                sem_elem_t one = Reach(true).one();
-                sem_elem_t zero = Reach(true).zero();
-                
+                one = Reach(true).one();
+                zero = Reach(true).zero();
+               
                 start = getKey("start");
                 a = getKey("a");
                 ae = getKey("ae");
