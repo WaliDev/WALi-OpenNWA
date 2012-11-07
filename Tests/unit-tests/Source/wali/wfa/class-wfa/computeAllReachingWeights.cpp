@@ -218,6 +218,40 @@ namespace wali {
         }
 
 
+        TEST(wali$wfa$WFA$$computeAllReachingWeights, selfLoop)
+        {
+            Key start = getKey("start"), other = getKey("other"), final = getKey("final"), sym = getKey("sym");
+            sem_elem_t zero = new LongestSaturatingPathSemiring(0, 5); zero = zero->zero(); // make the name correct
+            sem_elem_t distance_one = new LongestSaturatingPathSemiring(1, 5);
+            sem_elem_t distance_two = new LongestSaturatingPathSemiring(2, 5);
+            sem_elem_t distance_three = new LongestSaturatingPathSemiring(3, 5);
+            sem_elem_t distance_four = new LongestSaturatingPathSemiring(4, 5);
+            sem_elem_t distance_five = new LongestSaturatingPathSemiring(5, 5);
+
+            //    {0}     1     {1,3,5}    1     {2,4,5}
+            //   start --------> other --------> final
+            //                   /   \                     [anti line-continuation]
+            //                   \___/
+            WFA wfa;
+            wfa.addState(start, zero);
+            wfa.addState(other, zero);
+            wfa.addState(final, zero);
+            wfa.setInitialState(start);
+            wfa.addTrans(start, sym, other, distance_one);
+            wfa.addTrans(other, sym, other, distance_two);
+            wfa.addTrans(other, sym, final, distance_one);
+
+            WFA::AccessibleStateSetMap expected;
+            expected[start] = make_vector(zero->one());
+            expected[other] = make_vector(distance_one, distance_three, distance_five);
+            expected[final] = make_vector(distance_two, distance_four, distance_five);
+
+            WFA::AccessibleStateSetMap reachable = wfa.computeAllReachingWeights();
+
+            EXPECT_EQ_REACHABLE(expected, reachable);
+        }
+
+
         TEST(wali$wfa$WFA$$computeAllReachingWeights, cycle)
         {
             Key start = getKey("start"), other = getKey("other"), final = getKey("final"), sym = getKey("sym");
@@ -270,9 +304,7 @@ namespace wali {
                 distance_ten   = new LongestSaturatingPathSemiring(10, 10),
                 zero = distance_one->zero();
             
-            //     _
-            //    / \                                                [anti line-continuation]
-            //    \ /     0     {0,4,8,7,10}       1
+            //            0     {0,4,8,7,10}       1
             //   start --------> loop1_head -----------> final
             //                    |      /\                          [anti line-continuation]
             //                   2|       |2
