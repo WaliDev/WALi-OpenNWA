@@ -507,18 +507,27 @@ namespace wali {
         {
             //     a     eps    eps    eps   a
             // -->o---->o----->o----->o---->o----->(o)
+            //  start   a     ae     aee   aeee   accept
             WFA wfa;
+
+            Key start;
+            Key a;
+            Key ae;
+            Key aee;
+            Key aeee;
+            Key accept;
+            
 
             AEpsilonEpsilonEpsilonA() {
                 sem_elem_t one = Reach(true).one();
                 sem_elem_t zero = Reach(true).zero();
                 
-                Key start = getKey("start");
-                Key a = getKey("a");
-                Key ae = getKey("a e");
-                Key aee = getKey("a e e");
-                Key aeee = getKey("a e e e");
-                Key accept = getKey("accept");
+                start = getKey("start");
+                a = getKey("a");
+                ae = getKey("ae");
+                aee = getKey("aee");
+                aeee = getKey("aeee");
+                accept = getKey("accept");
 
                 Letters l;
 
