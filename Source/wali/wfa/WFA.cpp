@@ -1625,22 +1625,18 @@ namespace wali
       return false;
     }
 
-    std::map<Key, KeySet>
-    WFA::next_states(WFA const & wfa, KeySet const & froms)
-    {
-      EpsilonCloseCache cache;
-      return next_states(wfa, froms, cache);
-    }
 
-    std::map<Key, KeySet>
-    WFA::next_states(WFA const & wfa, KeySet const & froms, EpsilonCloseCache & eclose_cache)
+    std::map<Key, std::map<Key, KeySet> >
+    WFA::next_states_no_eclose(WFA const & wfa, KeySet const & froms)
     {
-      // symbol -> keyset
-      std::map<Key, KeySet> nexts;
+      // symbol -> source -> keyset
+      std::map<Key, std::map<Key, KeySet> > nexts;
 
       for(KeySet::const_iterator from = froms.begin();
           from != froms.end(); ++from)
       {
+
+        // For each outgoing non-epsilon transition from 'from'...
         for (kp_map_t::const_iterator kpmap_iter = wfa.kpmap.begin();
              kpmap_iter != wfa.kpmap.end(); ++kpmap_iter)
         {
@@ -1654,13 +1650,9 @@ namespace wali
             for (TransSet::const_iterator trans = outgoing.begin();
                  trans != outgoing.end(); ++trans)
             {
-              AccessibleStateMap eclose = wfa.epsilonCloseCached((*trans)->to(), eclose_cache);
-
-              for (AccessibleStateMap::const_iterator target = eclose.begin();
-                   target != eclose.end(); ++target)
-              {
-                nexts[symbol].insert(target->first);
-              }
+              // ...for each
+              
+              nexts[symbol][source].insert( (*trans)->to() );
             } // for "each" outgoing transition [part 1]
           } // for "each" outgoing transition [part 2]
         } // for "each" outgoing transition [part 3]
@@ -1712,36 +1704,59 @@ namespace wali
           result.addFinalState(sources_key);
         }
 
-        // symbol -> next state
-        std::map<Key, KeySet> nexts = next_states(*this, sources, eclose_cache);
+        // symbol -> source -> next states [no eclose]
+        std::map<Key, std::map<Key, KeySet> > nexts
+          = next_states_no_eclose(*this, sources);
 
-        for (std::map<Key, KeySet>::const_iterator next = nexts.begin();
-             next != nexts.end(); ++next)
+        for (std::map<Key, std::map<Key, KeySet> >::const_iterator next_by_source = nexts.begin();
+             next_by_source != nexts.end(); ++next_by_source)
         {
-          Key symbol = next->first;
-          Key target_key = getKey(next->second);
+          Key symbol = next_by_source->first;
 
-          if (next->second.size() > 0) {
-            // Only add a transition if it doesn't go to {}. Why? This is
-            // borne out of the difference between determinize and
-            // semideterminize. Determinize "can't" produce a total
-            // automaton. However, without this check, it still inserts the
-            // initial transitions to {}. From the point of view of producing
-            // an incomplete automaton, these transitions are dumb. So we get
-            // rid of them.
-            sem_elem_t weight = wg.getWeight(*this, result, sources, symbol, next->second);
+          KeySet targets;
+
+          // source -> next states [no eclose]
+          for (std::map<Key, KeySet>::const_iterator next = next_by_source->second.begin();
+               next != next_by_source->second.end(); ++next)
+          {
+            Key source = next->first;
+            KeySet const & intermediates = next->second;
+
+            for (KeySet::const_iterator i = intermediates.begin();
+                 i != intermediates.end(); ++i)
+            {
+              AccessibleStateMap eclose = epsilonCloseCached(*i, eclose_cache);
+
+              for (AccessibleStateMap::const_iterator q_w = eclose.begin();
+                   q_w != eclose.end(); ++q_w)
+              {
+                targets.insert(q_w->first);
+              }
+            }
+          }
+
+          // Only add a transition if it doesn't go to {}. Why? This is borne
+          // out of the difference between determinize and
+          // semideterminize. Determinize "can't" produce a total
+          // automaton. However, without this check, it still inserts the
+          // initial transitions to {}. From the point of view of producing
+          // an incomplete automaton, these transitions are dumb. So we get
+          // rid of them.
+          if (targets.size() > 0) {
+            Key target_key = getKey(targets);
+          
+            sem_elem_t weight = wg.getWeight(*this, result, sources, symbol, targets);
             result.addTrans(sources_key, symbol, target_key, weight);
           
             std::pair<KeySet::iterator, bool> p = visited.insert(target_key);
             if (p.second) {
               // It wasn't already there
-              worklist.push(next->second);
+              worklist.push(targets);
             }
           }
         }
       }
       
-
       return result;
     }
 

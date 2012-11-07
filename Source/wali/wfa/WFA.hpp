@@ -731,12 +731,8 @@ namespace wali
 
         
         static
-        std::map<Key, std::set<Key> >
-        next_states(WFA const & wfa, std::set<Key> const & froms);
-
-        static
-        std::map<Key, std::set<Key> >
-        next_states(WFA const & wfa, std::set<Key> const & froms, EpsilonCloseCache & cache);
+        std::map<Key, std::map<Key, std::set<Key> > >
+        next_states_no_eclose(WFA const & wfa, std::set<Key> const & froms);
 
         //// Prints to 'os' statistics about this WFA. 
         void printStatistics(std::ostream & os) const;
