@@ -1715,6 +1715,15 @@ namespace wali
 
           KeySet targets;
 
+          // weight_spec[p][q] will represent the weight of
+          //
+          //            symbol      epsilon
+          //         p -------> i - - - - - -> q
+          //
+          // Each 'p' that is possible is a key in next->second. Each 'i'
+          // that is possible is a an element of next->second[p].
+          std::map<Key, AccessibleStateMap> weight_spec;
+
           // source -> next states [no eclose]
           for (std::map<Key, KeySet>::const_iterator next = next_by_source->second.begin();
                next != next_by_source->second.end(); ++next)
@@ -1725,11 +1734,16 @@ namespace wali
             for (KeySet::const_iterator i = intermediates.begin();
                  i != intermediates.end(); ++i)
             {
+              Trans trans_p_to_i;
+              bool found = this->find(source, symbol, *i, trans_p_to_i);
+              assert(found);
+                                        
               AccessibleStateMap eclose = epsilonCloseCached(*i, eclose_cache);
 
               for (AccessibleStateMap::const_iterator q_w = eclose.begin();
                    q_w != eclose.end(); ++q_w)
               {
+                weight_spec[source][q_w->first] = trans_p_to_i.weight()->extend(q_w->second);
                 targets.insert(q_w->first);
               }
             }
@@ -1745,7 +1759,7 @@ namespace wali
           if (targets.size() > 0) {
             Key target_key = getKey(targets);
           
-            sem_elem_t weight = wg.getWeight(*this, result, sources, symbol, targets);
+            sem_elem_t weight = wg.getWeight(*this, result, weight_spec, sources, symbol, targets);
             result.addTrans(sources_key, symbol, target_key, weight);
           
             std::pair<KeySet::iterator, bool> p = visited.insert(target_key);
