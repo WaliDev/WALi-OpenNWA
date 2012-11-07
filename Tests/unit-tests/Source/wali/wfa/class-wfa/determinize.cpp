@@ -322,6 +322,52 @@ namespace wali {
         };
 
 #define ASSERT_CONTAINS(container, value) ASSERT_FALSE(container.end() == container.find(value))
+
+        TEST(wali$wfa$$WFA$$semideterminize, weightGenKnowsAboutEpsilonTransitions)
+        {
+            Letters l;
+            AEpsilonEpsilonEpsilonA nondet;
+            WFA det = nondet.wfa.semideterminize(TestLifter());
+
+            std::set<Key> start_set, mid_set, accept_set;
+            start_set.insert(nondet.start);
+            mid_set.insert(nondet.a);
+            mid_set.insert(nondet.ae);
+            mid_set.insert(nondet.aee);
+            mid_set.insert(nondet.aeee);
+            accept_set.insert(nondet.accept);
+
+            Key start = getKey(start_set);
+            Key mid = getKey(mid_set);
+            Key accept = getKey(accept_set);
+
+            // Sanity checks
+            ASSERT_EQ(3u, det.getStates().size());
+            ASSERT_CONTAINS(det.getStates(), start);
+            ASSERT_CONTAINS(det.getStates(), mid);
+            ASSERT_CONTAINS(det.getStates(), accept);
+
+            // Extract the transitions
+            Trans trans_start_mid, trans_mid_accept;
+            ASSERT_TRUE(det.find(start, nondet.a, mid, trans_start_mid));
+            ASSERT_TRUE(det.find(mid, nondet.a, accept, trans_mid_accept));
+
+            // Extract the weights
+            sem_elem_t se_start_mid = trans_start_mid.weight();
+            sem_elem_t se_mid_accept = trans_mid_accept.weight();
+
+            StringWeight * w_start_mid = dynamic_cast<StringWeight*>(se_start_mid.get_ptr());
+            StringWeight * w_mid_accept = dynamic_cast<StringWeight*>(se_mid_accept.get_ptr());
+
+            ASSERT_TRUE(w_start_mid != NULL);
+            ASSERT_TRUE(w_mid_accept != NULL);
+
+            // Finally, check that they are what we expect. These tests are a
+            // bit fragile...
+            EXPECT_EQ("start --a--> a", w_start_mid->str);
+            EXPECT_EQ("a --a--> accept | ae --a--> accept | aee --a--> accept | aee --a-->accept",
+                      w_mid_accept->str);
+        }
         
         TEST(wali$wfa$$determinize, weightGen)
         {
