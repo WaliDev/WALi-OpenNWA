@@ -615,7 +615,7 @@ int main(int argc, char ** argv)
   if(argc >= curarg){
     stringstream s;
     s << argv[curarg-1];
-    s >> fname;
+    fname = s.str();
   }
 
   short goal;
@@ -624,13 +624,6 @@ int main(int argc, char ** argv)
     stringstream s;
     s << argv[curarg-1];
     s >> goal;
-  }
-
-  ++curarg;
-  if(argc >= curarg){
-    stringstream s;
-    s << argv[curarg-1];
-    s >> dump;
   }
 
   ++curarg;
