@@ -48,13 +48,19 @@ using std::cout;
  * x1b x1b' x1b'' y1b y1b' y1b'' x2b x2b' x2b'' y2b y2b' y2b'' z1b z1b' z1b'' w1b w1b' w1b'' z2b z2b' z2b'' w2b w2b' w2b''
  * x1t1 x1t1' x1t1'' y1t1 y1t1' y1t1'' x2t1 x2t1' x2t1'' y2t1 y2t1' y2t1'' z1t1 z1t1' z1t1'' w1t1 w1t1' w1t1'' z2t1 z2t1' z2t1'' w2t1 w2t1' w2t1''
  * x1t2 x1t2' x1t2'' y1t2 y1t2' y1t2'' x2t2 x2t2' x2t2'' y2t2 y2t2' y2t2'' z1t2 z1t2' z1t2'' w1t2 w1t2' w1t2'' z2t2 z2t2' z2t2'' w2t2 w2t2' w2t2''
+ * (3) BASE_MAX_AFFINITY_TENSOR_MIXED
+ * This makes sure that base is separate, but mixes together tensors vocabularies. 
+ * x1b x1b' x1b'' y1b y1b' y1b'' x2b x2b' x2b'' y2b y2b' y2b'' z1b z1b' z1b'' w1b w1b' w1b'' z2b z2b' z2b'' w2b w2b' w2b''
+ * followed by tensor levels as x1t1 x1t1' x1t1'' x1t2 x1t2' x1t2''
  * 
  * The tensor choice is determined by the following macro:
  **/
-#define TENSOR_MIN_AFFINITY
-//#define TENSOR_MAX_AFFINITY
+//#define TENSOR_MIN_AFFINITY
+#define TENSOR_MAX_AFFINITY
+//#define BASE_MAX_AFFINITY_TENSOR_MIXED
 
-
+#define DETENSOR_TOGETHER
+//#define DETENSOR_BIT_BY_BIT
 
 // ////////////////////////////
 // Implementation of the initialization free function.
@@ -475,7 +481,74 @@ void BddContext::setIntVars(const std::vector<std::map<std::string, int> >& vars
       vari++;  
     }
   }
+#elif defined(BASE_MAX_AFFINITY_TENSOR_MIXED)
+  //First the base levels
+  for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
+    std::map<std::string, int> interleavedVars = *cvi;
+    vari = 0;
+    int * domains = new int[3 * interleavedVars.size()];
+    for(std::map<std::string, int>::const_iterator cmi = interleavedVars.begin(); cmi != interleavedVars.end(); ++cmi){
+      for(int j=vari * 3; j < 3 * (vari + 1); ++j)
+        domains[j] = cmi->second;
+      vari++;
+    }
+    //Now actually create the fdd levels
+    // lock mutex
+    int base = fdd_extdomain(domains, 3 * interleavedVars.size());
+    // release mutex
+    if (base < 0){
+      *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
+      *waliErr << "    Aborting." << endl;
+      assert (false);
+    }
+    delete [] domains;
+    // Assign fdd levels to the variables.
+    vari = 0;
+    for(std::map<std::string, int>::const_iterator ci = interleavedVars.begin(); ci != interleavedVars.end(); ++ci){
+      bddinfo_t varInfo = (*this)[ci->first];
+      int j = 3 * vari;
+      varInfo->baseLhs = base + j++;
+      varInfo->baseRhs = base + j++;
+      varInfo->baseExtra = base + j++;
+      vari++;  
+    }
+  }
+  //Now mixed tensor1 and tensor2 levels
+  for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
+    std::map<std::string, int> interleavedVars = *cvi;
+    int * domains = new int[6 * interleavedVars.size()];
+    vari = 0;
+    for(std::map<std::string, int>::const_iterator cmi = interleavedVars.begin(); cmi != interleavedVars.end(); ++cmi){
+      for(int j=vari * 6; j < 6 * (vari + 1); ++j)
+        domains[j] = cmi->second;
+      vari++;
+    }
+    //Now actually create the fdd levels
+    // lock mutex
+    int base = fdd_extdomain(domains, 6 * interleavedVars.size());
+    // release mutex
+    if (base < 0){
+      *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
+      *waliErr << "    Aborting." << endl;
+      assert (false);
+    }
+    delete [] domains;
+    // Assign fdd levels to the variables.
+    vari = 0;
+    for(std::map<std::string, int>::const_iterator cmi = interleavedVars.begin(); cmi != interleavedVars.end(); ++cmi){
+      bddinfo_t varInfo = (*this)[cmi->first];
+      int j = 6 * vari;
+      varInfo->tensor1Lhs = base + j++;
+      varInfo->tensor1Rhs = base + j++;
+      varInfo->tensor1Extra = base + j++;
+      varInfo->tensor2Lhs = base + j++;
+      varInfo->tensor2Rhs = base + j++;
+      varInfo->tensor2Extra = base + j++;
+      vari++;  
+    }
+  }
 #else
+  Do not comment this. The code should not compile if this part is active.
   assert(0);
 #endif
 
@@ -521,7 +594,7 @@ void BddContext::setIntVars(const std::vector<std::map<std::string, int> >& vars
   }
 
   //DEBUGGING
-#if 1
+#if 0
   cout << "baseLhs: ";
   for(unsigned i =0; i < this->size(); ++i)
     cout << " " << baseLhs[i];
@@ -591,6 +664,7 @@ void BddContext::setIntVars(const std::vector<std::map<std::string, int> >& vars
   commonBddContextSet13 &= fdd_makeset(tensor2Lhs, this->size());
   assert(this->size() == 0 || (baseSecBddContextSet != bddfalse && tensorSecBddContextSet != bddfalse
         && tensorSecBddContextSet != bddfalse && commonBddContextSet23 != bddfalse && commonBddContextSet13 != bddfalse));
+#if defined(TENSOR_TOGETHER)
   // Somehow make this efficient
   for(std::map<const std::string, bddinfo_t>::const_iterator ci = this->begin(); ci != this->end(); ++ci){
     bddinfo_t varInfo = ci->second;
@@ -599,6 +673,7 @@ void BddContext::setIntVars(const std::vector<std::map<std::string, int> >& vars
     commonBddContextId13 = commonBddContextId13 & 
       fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
   }
+#endif
 
   // Create cached BinRel objects
   // Somehow make this efficient
@@ -962,9 +1037,20 @@ binrel_t BinRel::Eq23Project() const
     return new BinRel(con,bddfalse, false);
   }
 #endif
+#if defined(DETENSOR_TOGETHER)
   bdd rel1 = rel & con->commonBddContextId23; 
   bdd rel2 = bdd_exist(rel1, con->commonBddContextSet23);
   bdd c = bdd_replace(rel2, con->move2Base.get());
+#else
+  bdd rel1 = rel;
+  for(std::map<const std::string, bddinfo_t>::const_iterator citer = con->begin(); citer != con->end(); ++citer){
+    bddinfo_t varInfo = (*citer).second;
+    bdd id = fdd_equals(varInfo->tensor1Rhs, varInfo->tensor2Lhs);
+    rel1 = rel1 & id;
+    rel1 = bdd_exist(rel1, fdd_ithset(varInfo->tensor1Rhs) & fdd_ithset(varInfo->tensor2Lhs));
+  }
+  bdd c = bdd_replace(rel1, con->move2Base.get());
+#endif
 #ifdef BINREL_STATS
   BinRel::numEq23Project++;
 #endif
@@ -982,9 +1068,20 @@ binrel_t BinRel::Eq13Project() const
     return new BinRel(con,bddfalse, false);
   }
 #endif
+#if defined(DETENSOR_TOGETHER)
   bdd rel1 = rel & con->commonBddContextId13; 
   bdd rel2 = bdd_exist(rel1, con->commonBddContextSet13);
   bdd c = bdd_replace(rel2, con->move2BaseTwisted.get());
+#else
+  bdd rel1 = rel;
+  for(std::map<const std::string, bddinfo_t>::const_iterator citer = con->begin(); citer != con->end(); ++citer){
+    bddinfo_t varInfo = (*citer).second;
+    bdd id = fdd_equals(varInfo->tensor1Lhs, varInfo->tensor2Lhs);
+    rel1 = rel1 & id;
+    rel1 = bdd_exist(rel1, fdd_ithset(varInfo->tensor1Lhs) & fdd_ithset(varInfo->tensor2Lhs));
+  }
+  bdd c = bdd_replace(rel1, con->move2BaseTwisted.get());
+#endif
 #ifdef BINREL_STATS
   BinRel::numEq13Project++;
 #endif

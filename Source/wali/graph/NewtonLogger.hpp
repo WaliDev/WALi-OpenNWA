@@ -10,7 +10,7 @@
 #include <string>
 
 // Switch on logging in newton solver
-#define NEWTON_LOGGING 1
+//#define NEWTON_LOGGING 1
 
 namespace wali 
 {

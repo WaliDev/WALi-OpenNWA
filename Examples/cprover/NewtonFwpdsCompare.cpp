@@ -2,6 +2,8 @@
 #include "wali/wpds/fwpds/FWPDS.hpp"
 // ::wali::wpds::ewpds
 #include "wali/wpds/ewpds/EWPDS.hpp"
+// ::wali::wpds
+#include "wali/wpds/WPDS.hpp"
 #if defined(USE_AKASH_EWPDS) || defined(USING_AKASH_FWPDS)
 #include "wali/wpds/ewpds/ERule.hpp"
 #endif
@@ -369,22 +371,22 @@ int main(int argc, char ** argv)
   WFACompare fac("FWPDS", "NEWTON");
   PDSCompare pac("FWPDS", "NEWTON");
 
+  prog * pg = parse_prog(fname.c_str());
+  FWPDS * original_fwpds = fwpds_from_prog(pg);
+
   {
-    FWPDS * fpds;
-    prog * pg = parse_prog(fname.c_str());
-    fpds = fwpds_from_prog(pg);
-    fpds->for_each(pac);
+    WPDS * pds = new WPDS(*original_fwpds);
     pac.advance_mode();
     WFA fa;
     wali::Key acc = wali::getKeySpace()->getKey("accept");
     fa.setInitialState(getPdsState());
     fa.addFinalState(acc);
-    fa.addTrans(getPdsState(),getEntryStk(pg, "main"), acc, fpds->get_theZero()->one());
+    fa.addTrans(getPdsState(),getEntryStk(pg, "main"), acc, pds->get_theZero()->one());
     if(dump){
       fstream kleene_pds("kleene_pds.dot", fstream::out);
       RuleDotty rd(kleene_pds);
       kleene_pds << "digraph{" << endl;
-      fpds->for_each(rd);
+      pds->for_each(rd);
       kleene_pds << "}" << endl;
     }
     if(dump){
@@ -398,7 +400,8 @@ int main(int argc, char ** argv)
     {
       wali::util::Timer * t3 = new wali::util::Timer("FWPDS poststar",cout);
       cout << "[FWPDS poststar]\n";
-      fpds->poststarIGR(fa,outfa); 
+      pds->poststar(fa,outfa); 
+      t3->print(std::cout);
       delete t3;
     }
     outfa.for_each(fac);
@@ -410,17 +413,14 @@ int main(int argc, char ** argv)
       outfaf << "}" << endl;
     }
     fac.advance_mode();
-    deep_erase_prog(&pg);
-    delete fpds;
+    delete pds;
   }
 
 
 
   {
-    FWPDS * npds;
+    FWPDS * npds = new FWPDS(*original_fwpds);
     wali::set_verify_fwpds(false);
-    prog * pg = parse_prog(fname.c_str());
-    npds = fwpds_from_prog(pg);
     npds->useNewton(true);
     npds->for_each(pac);
     pac.advance_mode();
@@ -460,7 +460,6 @@ int main(int argc, char ** argv)
       outfaf << "}" << endl;
     }
     fac.advance_mode();
-    deep_erase_prog(&pg);
     delete npds;
   }
 
@@ -479,5 +478,7 @@ int main(int argc, char ** argv)
         pdsdiff << "PA DIFF FOUND!!!" << std::endl;
     }
   }
+  delete original_fwpds;
+  deep_erase_prog(&pg);
   return 0;
 }
