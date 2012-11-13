@@ -360,7 +360,9 @@ bdd ProgramBddContext::From(std::string var) const
   const bddinfo_t bi = iter->second;
   for(unsigned i = 0; i < bi->maxVal; ++i)
     ret = ret | (fdd_ithvar(bi->baseLhs, i) & fdd_ithvar(regAInfo->baseRhs, i));
-  return ret & fdd_ithvar(sizeInfo, bi->maxVal);
+  ret = bdd_exist(ret, fdd_ithset(sizeInfo));
+  ret = ret & fdd_ithvar(sizeInfo, bi->maxVal);
+  return ret;
 }
 
 bdd ProgramBddContext::True() const
@@ -378,18 +380,29 @@ bdd ProgramBddContext::Const(unsigned val) const
   if(val >= maxSize){
     LOG(ERROR) << "[Const] Attempted to create a constant value larger "
       << "than maxVal";
-    return bddfalse;
+    assert(0);
   }
   return fdd_ithvar(regAInfo->baseRhs, val) & fdd_ithvar(sizeInfo, maxSize);
 }
 
 bdd ProgramBddContext::NonDet() const
 {
-  return bddtrue;
+  bdd ret = bddtrue;
+  //ret = bdd_exist(ret, fdd_ithset(sizeInfo));
+  ret = ret & fdd_ithvar(sizeInfo, maxSize);
+  return ret;
 }
 
 bdd ProgramBddContext::applyBinOp(bdd lexpr, bdd rexpr, bdd op) const
 { 
+  unsigned old1Size = getRegSize(lexpr);
+  unsigned old2Size = getRegSize(rexpr);
+  // If the sizes are different, we don't want that part of
+  // the bdd interfering in actual operation.
+  if(old1Size != old2Size){
+    lexpr = bdd_exist(lexpr, fdd_ithset(sizeInfo));
+    rexpr = bdd_exist(rexpr, fdd_ithset(sizeInfo));
+  }
   bddPair *regA2regB = bdd_newpair();
   fdd_setpair(regA2regB, regAInfo->baseRhs, regBInfo->baseRhs);
   rexpr = bdd_replace(rexpr, regA2regB);
@@ -410,6 +423,12 @@ bdd ProgramBddContext::applyBinOp(bdd lexpr, bdd rexpr, bdd op) const
   lexpr = bdd_replace(lexpr, regAExtra2Rhs);
   bdd_freepair(regAExtra2Rhs);
 
+  //update the regsize
+  if(old1Size != old2Size){
+    unsigned minSize = (old1Size < old2Size)? old1Size : old2Size;
+    lexpr = lexpr & fdd_ithvar(sizeInfo, minSize);
+    getRegSize(lexpr);
+  }
   return lexpr;
 }
 
@@ -532,9 +551,16 @@ bdd ProgramBddContext::bddNot() const
 
 bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size) const
 {
-  if(in1Size != in2Size)
-    LOG(ERROR) << "[ProgramBddContext::bddPlus] Addition of number of different bit widths is not allowed.\n";
-  int outSize = in1Size;
+  if(in1Size != in2Size){
+    LOG(WARNING) << 
+      "[ProgramBddContext::bddPlus] Different sizes of registers in operation." 
+      << " Longer register / constant will be clipped.\n";
+    if(in1Size < in2Size)
+      in2Size = in1Size;
+    else
+      in1Size = in2Size;
+  }
+  unsigned outSize = in1Size;
 
 #if BINREL_BUILD_FAST_ADDER  
   assert(in1Size <= (unsigned)fdd_domainsize(regAInfo->baseRhs));
@@ -572,9 +598,16 @@ bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size) const
 #ifdef BINREL_I_WANT_MINUS_TIMES_AND_DIV_EVEN_THOUGH_THEY_CAN_BE_EXPONENTIALLY_SLOW
 bdd ProgramBddContext::bddMinus(unsigned in1Size, unsigned in2Size) const
 {
-  if(in1Size != in2Size)
-    LOG(ERROR) << "[ProgramBddContext::bddMinus] Subtraction of number of different bit widths is not allowed.\n";
-  int outSize = in1Size;
+  if(in1Size != in2Size){
+    LOG(WARNING) << 
+      "[ProgramBddContext::bddPlus] Different sizes of registers in operation." 
+      << " Longer register / constant will be clipped.\n";
+    if(in1Size < in2Size)
+      in2Size = in1Size;
+    else
+      in1Size = in2Size;
+  }
+  unsigned outSize = in1Size;
   bdd ret = bddfalse;
   for(unsigned i=0; i<in1Size; ++i){
     for(unsigned j=0; j<in2Size; ++j){
@@ -591,9 +624,16 @@ bdd ProgramBddContext::bddMinus(unsigned in1Size, unsigned in2Size) const
 
 bdd ProgramBddContext::bddTimes(unsigned in1Size, unsigned in2Size) const
 {
-  if(in1Size != in2Size)
-    LOG(ERROR) << "[ProgramBddContext::bddTimes] Multiplication of number of different bit widths is not allowed.\n";
-  int outSize = in1Size;
+  if(in1Size != in2Size){
+    LOG(WARNING) << 
+      "[ProgramBddContext::bddPlus] Different sizes of registers in operation." 
+      << " Longer register / constant will be clipped.\n";
+    if(in1Size < in2Size)
+      in2Size = in1Size;
+    else
+      in1Size = in2Size;
+  }
+  unsigned outSize = in1Size;
   bdd ret = bddfalse;
   for(unsigned i=0; i<in1Size; ++i){
     for(unsigned j=0; j<in2Size; ++j){
@@ -610,9 +650,16 @@ bdd ProgramBddContext::bddTimes(unsigned in1Size, unsigned in2Size) const
 
 bdd ProgramBddContext::bddDiv(unsigned in1Size, unsigned in2Size) const
 {
-  if(in1Size != in2Size)
-    LOG(ERROR) << "[ProgramBddContext::bddDiv] Division of number of different bit widths is not allowed.\n";
-  int outSize = in1Size;
+  if(in1Size != in2Size){
+    LOG(WARNING) << 
+      "[ProgramBddContext::bddPlus] Different sizes of registers in operation." 
+      << " Longer register / constant will be clipped.\n";
+    if(in1Size < in2Size)
+      in2Size = in1Size;
+    else
+      in1Size = in2Size;
+  }
+  unsigned outSize = in1Size;
   bdd ret = bddfalse;
   for(unsigned i=0; i<in1Size; ++i){
     for(unsigned j=0; j<in2Size; ++j){
@@ -655,6 +702,16 @@ bdd ProgramBddContext::Assign(std::string var, bdd expr) const
     bi = this->find(var)->second;
   }
 
+  unsigned rvalsize = getRegSize(expr);
+  if(rvalsize > bi->maxVal){
+    LOG(WARNING) << "[ProgramBddContext::Assign] The register size of rhs is greater than what the variable can hold";
+    return bddfalse;
+  }
+
+  // If rhs max size is smaller, only copy the relevant bits.
+  unsigned copysize = bi->maxVal;
+  copysize = (rvalsize < copysize) ? rvalsize : copysize;
+
   //redundant?
   bddPair *regARhs2Extra = bdd_newpair();
   fdd_setpair(
@@ -667,21 +724,10 @@ bdd ProgramBddContext::Assign(std::string var, bdd expr) const
   //up to here.
 
   bdd regA2var = bddfalse;
-  for(unsigned i = 0; i < bi->maxVal; ++i)
+  for(unsigned i = 0; i < copysize; ++i)
     regA2var = regA2var |
       (fdd_ithvar(regAInfo->baseExtra,i) & fdd_ithvar(bi->baseRhs,i));
   expr = bdd_relprod(expr,regA2var,fdd_ithset(regAInfo->baseExtra));
-
-  //bdd c = bddtrue;
-  //for(
-  //    BddContext::const_iterator iter = this->begin();
-  //    iter != this->end();
-  //    ++iter)
-  //{
-  //  if(var != iter->first)
-  //    c = c & fdd_equals((iter->second)->baseLhs,
-  //       (iter->second)->baseRhs);
-  //}
 
   // All transformers are slight perturbations of identity.
   bdd c = baseId;
@@ -692,6 +738,7 @@ bdd ProgramBddContext::Assign(std::string var, bdd expr) const
 
 bdd ProgramBddContext::Assume(bdd expr1, bdd expr2) const
 {
+
   bddPair *regARhs2Extra = bdd_newpair();
   fdd_setpair(
       regARhs2Extra,
@@ -710,26 +757,8 @@ bdd ProgramBddContext::Assume(bdd expr1, bdd expr2) const
   expr2 = bdd_replace(expr2, regARhs2BExtra);
   bdd_freepair(regARhs2BExtra);
 
-  /// This is now cached
-  //bddPair *baseLhs2Rhs = bdd_newpair();
-  //for(BddContext::const_iterator iter = this->begin(); iter != this->end(); ++iter){
-  //  fdd_setpair(
-  //      baseLhs2Rhs,
-  //      (iter->second)->baseLhs,
-  //      (iter->second)->baseRhs
-  //      );
-  //}
   expr2 = bdd_replace(expr2, baseLhs2Rhs.get());
 
-  /// This is now cached
-  //bdd equate = bddtrue;
-  //for(BddContext::const_iterator iter = this->begin(); iter != this->end(); ++iter){
-  //  equate = equate &
-  //    fdd_equals(
-  //        iter->second->baseLhs,
-  //        iter->second->baseRhs
-  //        );
-  //} 
   bdd equate = baseId &
     fdd_equals(
         regAInfo->baseExtra,
