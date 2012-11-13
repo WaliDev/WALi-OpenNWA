@@ -23,7 +23,7 @@ else:
 
 
 Platform       = platform.system()
-MkStatic       = True #(Platform == 'Windows')
+MkStatic       = (Platform == 'Windows')
 WaliDir        = os.getcwd()
 ThirdPartyDir     = os.path.join(WaliDir,'ThirdParty')
 BaseEnv        = Environment() #MSVC_USE_SCRIPT=False)
