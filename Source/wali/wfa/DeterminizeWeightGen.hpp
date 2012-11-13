@@ -5,6 +5,7 @@
 #include "wali/SemElem.hpp"
 
 #include <set>
+#include <map>
 
 namespace wali {
   namespace wfa {
@@ -15,6 +16,15 @@ namespace wali {
     class DeterminizeWeightGen
     {
     public:
+      typedef std::map<Key, sem_elem_t> AccessibleStateMap;
+
+      /// For each state 's' in 'source' and each 't' in 'target', the
+      /// computed weight spec will hold the net weight from 's' to 't'
+      /// including the first transition for the symbol in question and any
+      /// epsilon paths.
+      typedef std::map<Key, AccessibleStateMap> ComputedWeights;
+      
+      
       virtual ~DeterminizeWeightGen() {}
 
       /// Returns the weight for the transition from the source to target
@@ -23,6 +33,7 @@ namespace wali {
       /// automata are provided.
       virtual sem_elem_t getWeight(WFA const & original_wfa,
                                    WFA const & determinized_wfa_so_far,
+                                   ComputedWeights const & weight_spec,
                                    std::set<Key> const & source,
                                    Key symbol,
                                    std::set<Key> const & target) const
@@ -42,12 +53,16 @@ namespace wali {
       /// Overload to return the lifted weight for a nondeterministic
       /// transition.
       virtual sem_elem_t liftWeight(WFA const & original_wfa,
-                                    ITrans const * trans_in_original) const
+                                    Key source,
+                                    Key symbol,
+                                    Key target,
+                                    sem_elem_t weight) const
       = 0;
 
 
       sem_elem_t getWeight(WFA const & original_wfa,
                            WFA const & UNUSED_PARAMETER(determinized_wfa_so_far),
+                           ComputedWeights const & weight_spec,
                            std::set<Key> const & sources,
                            Key symbol,
                            std::set<Key> const & targets) const;
@@ -66,6 +81,7 @@ namespace wali {
 
       virtual sem_elem_t getWeight(WFA const & UNUSED_PARAMETER(original_wfa),
                                    WFA const & UNUSED_PARAMETER(determinized_wfa_so_far),
+                                   ComputedWeights const & UNUSED_PARAMETER(weight_spec),
                                    std::set<Key> const & UNUSED_PARAMETER(source),
                                    Key UNUSED_PARAMETER(symbol),
                                    std::set<Key> const & UNUSED_PARAMETER(target)) const

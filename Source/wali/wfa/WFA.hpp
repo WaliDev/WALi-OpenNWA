@@ -5,6 +5,8 @@
  * @author Nicholas Kidd
  */
 
+#include <boost/function.hpp>
+
 // ::wali
 #include "wali/Common.hpp"
 #include "wali/Printable.hpp"
@@ -112,6 +114,12 @@ namespace wali
         static const std::string XMLInorderTag;
         static const std::string XMLReverseTag;
 
+        
+        typedef std::map<Key, sem_elem_t> AccessibleStateMap;
+        typedef std::map<Key, AccessibleStateMap> EpsilonCloseCache;
+        typedef std::map<Key, std::vector<sem_elem_t> > AccessibleStateSetMap;
+        typedef std::vector<Key> Word;
+        
       protected:
       private:
 
@@ -595,16 +603,39 @@ namespace wali
 
       public:
 
-        typedef std::map<Key, sem_elem_t> AccessibleStateMap;
-        typedef std::vector<Key> Word;
-
         /// Return the set of states reachable from 'start', along with the
         /// weights gathered by following those paths. Includes the start
-        /// state, with weight one.
-        ///
-        /// Assumes there are no epsilon loops accessible via epsilon
-        /// transitions from start.
+        /// state, with weight (at least) one. (If there is an epsilon loop
+        /// that involves the start state, then the net effect of that loop
+        /// will be included as well.)
         AccessibleStateMap epsilonClose(Key start) const;
+
+        /// Returns the same thing as epsilonClose(start). If 'start' is
+        /// already present in 'cache',
+        AccessibleStateMap epsilonCloseCached(Key start, EpsilonCloseCache & cache) const;
+
+        // The following are specific variants. (epsilonClose() and epsilonCloseCached() each calls one of
+        // these.)
+        AccessibleStateMap epsilonClose_Mohri(Key start) const;
+        AccessibleStateMap epsilonClose_Fwpds(Key start) const;
+
+        AccessibleStateMap epsilonCloseCached_MohriDemand     (Key start, EpsilonCloseCache & cache) const;
+        AccessibleStateMap epsilonCloseCached_FwpdsDemand     (Key start, EpsilonCloseCache & cache) const;
+        AccessibleStateMap epsilonCloseCached_MohriAll        (Key start, EpsilonCloseCache & cache) const;
+        AccessibleStateMap epsilonCloseCached_FwpdsAllSingles (Key start, EpsilonCloseCache & cache) const;
+        AccessibleStateMap epsilonCloseCached_FwpdsAllMulti   (Key start, EpsilonCloseCache & cache) const;
+
+        // This is a helper function used for both epsilonClose_Fwpds and
+        // epsilonCloseCached_FwpdsAllMulti.
+        EpsilonCloseCache genericFwpdsPoststar(std::set<Key> const & sources,
+                                               boost::function<bool (ITrans const *)> trans_accept) const;
+
+        /// For each state q, compute the set of all possible weights w such
+        /// that there is a path from the initial state to q with weight w.
+        //
+        // This function is in WFA-eclose.cpp due to its similarity with the
+        // Tarjar/FWPDS epsilon closure algorithm.
+        AccessibleStateSetMap computeAllReachingWeights() const;
 
         /// Creates (and returns) a new WFA which is the same as *this,
         /// except that it has no epsilon transitions.
@@ -617,8 +648,9 @@ namespace wali
         /// simulate running the word 'word'. Return the list of accessible
         /// states, and the weights with which they can be accessed.
         ///
-        /// Assumes there are no epsilon loops along the path encountered by
-        /// 'word'.
+        /// This may assume there are no epsilon loops along the path
+        /// encountered by 'word' -- but that may be fixed now. Check the
+        /// tests if you need this feature.
         AccessibleStateMap simulate(AccessibleStateMap const & start,
                                     Word const & word) const;
 
@@ -697,19 +729,33 @@ namespace wali
                        WFA const & right, std::vector<Key> const & right_states,
                        bool check_weights);
 
-
-        typedef std::map<Key, AccessibleStateMap> EpsilonCloseCache;
         
         static
-        std::map<Key, std::set<Key> >
-        next_states(WFA const & wfa, std::set<Key> const & froms);
-
-        static
-        std::map<Key, std::set<Key> >
-        next_states(WFA const & wfa, std::set<Key> const & froms, EpsilonCloseCache & cache);
+        std::map<Key, std::map<Key, std::set<Key> > >
+        next_states_no_eclose(WFA const & wfa, std::set<Key> const & froms);
 
         //// Prints to 'os' statistics about this WFA. 
         void printStatistics(std::ostream & os) const;
+
+
+        /// "Converts" the automaton to a WPDS.
+        ///
+        /// The WPDS has a single state (given as a function parameter). WFA
+        /// states become WPDS stack symbols. Each transition in the WFA
+        /// becomes a rule in the WPDS.
+        ///
+        /// If delta(q, a) = q', then <p, q> -> <p, q'> becomes a rule
+        ///
+        /// The WPDS must be passed in so that we don't have to guess what
+        /// kind of WPDS to make (WPDS, EWPDS, FWPDS, etc.) The WPDS will
+        /// *not* be cleared before anything is added.
+        ///
+        /// The given callback function is called for each transition in the
+        /// NWA; a rule for that transition is added iff the callback returns
+        /// true. This callback may be set to empty.
+        void toWpds(Key p_state,
+                    wpds::WPDS * wpds,
+                    boost::function<bool (ITrans const *)> trans_accept) const;
     };
 
   } // namespace wfa

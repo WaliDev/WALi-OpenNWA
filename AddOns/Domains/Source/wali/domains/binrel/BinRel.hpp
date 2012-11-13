@@ -32,6 +32,12 @@
 #include "wali/SemElemTensor.hpp"
 #include "buddy/fdd.h"
 
+
+/** 
+  To switch on statistics collection in BinRel
+**/
+#define BINREL_STATS
+
 namespace wali 
 {
   namespace domains 
@@ -133,6 +139,13 @@ namespace wali
           virtual void setIntVars(const std::map<std::string, int>& vars);
           virtual void setIntVars(const std::vector<std::map<std::string, int> >& vars);
 
+        protected:
+          /**
+           * More fine grained control when setting multiple int vars together. These together 
+           * called in order are the same as calling setIntVars
+           **/
+          void createIntVars(const std::vector<std::map<std::string, int> >& vars);
+          virtual void setupCachedBdds();
         public:
           //using wali::Countable::count;
           int count;
@@ -182,6 +195,25 @@ namespace wali
           binrel_t cachedTensorOne;
           binrel_t cachedTensorZero;
 
+#ifdef BINREL_STATS
+        private:
+          //Statistics for this contex
+          mutable StatCount numCompose;
+          mutable StatCount numUnion;
+          mutable StatCount numIntersect;
+          mutable StatCount numEqual;
+          mutable StatCount numKronecker;
+          mutable StatCount numTranspose;
+          mutable StatCount numEq23Project;
+          mutable StatCount numEq13Project;
+
+          // Related functions
+        public:
+          std::ostream& printStats( std::ostream& o ) const;
+          void resetStats();
+#endif
+
+        private:
           //Initialization of buddy is taken care of opaquely 
           //by keeping track of the number of BddContext objects alive
           static int numBddContexts;
@@ -217,7 +249,7 @@ namespace wali
           friend binrel_t operator&(binrel_t a, binrel_t b);
         public:
           BinRel(const BinRel& that);
-          BinRel(BddContext const * con, bdd b,bool is_tensored=false);
+          BinRel(BddContext const * con, bdd b, bool is_tensored=false);
           virtual ~BinRel();
         public:
           binrel_t Compose( binrel_t that ) const;
@@ -251,6 +283,8 @@ namespace wali
 
           /** @return [this]->Compose( cast<BinRel*>(se) ) */
           sem_elem_t extend(SemElem* se);
+
+          sem_elem_t star();
 
           /** @return [this]->Equal( cast<BinRel*>(se) ) */
           bool equal(SemElem* se) const;
@@ -286,9 +320,6 @@ namespace wali
           // ////////////////////////////////
           // Printing functions
           //static void printHandler(FILE *o, int var);
-#ifdef BINREL_STATS
-          std::ostream& printStats( std::ostream& o ) const;
-#endif
         protected:
           //This has to be a raw/weak pointer.
           //BddContext caches some BinRel objects. It is not BinRel's responsibility to
@@ -296,17 +327,6 @@ namespace wali
           BddContext const * con;
           bdd rel;
           bool isTensored;
-#ifdef BINREL_STATS
-          //Statistics
-          static StatCount numCompose;
-          static StatCount numUnion;
-          static StatCount numIntersect;
-          static StatCount numEqual;
-          static StatCount numKronecker;
-          static StatCount numTranspose;
-          static StatCount numEq23Project;
-          static StatCount numEq24Project;
-#endif
       };
 
     } // namespace binrel

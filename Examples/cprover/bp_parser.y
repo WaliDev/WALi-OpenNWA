@@ -528,7 +528,7 @@ primary_expression
 	  }
 	| '\'' IDENTIFIER
 	  {
-      $$ = make_not_expr(make_var_expr($2));
+      $$ = mark_post_expr(make_var_expr($2));
 	  }
 	| INTEGER 
 	  { 

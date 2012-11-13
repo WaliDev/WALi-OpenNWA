@@ -10,8 +10,8 @@
 #include "buddy/fdd.h"
 
 #define BINREL_I_WANT_MINUS_TIMES_AND_DIV_EVEN_THOUGH_THEY_CAN_BE_EXPONENTIALLY_SLOW
-#define BINREL_BUILD_FAST_ADDER 0
-#define BINREL_BUILD_SLOW_ADDER 1
+#define BINREL_ALWAYS_BUILD_SLOW_ADDER 0
+#define BINREL_ALLOW_BUILD_SLOW_ADDER 1
 
 namespace wali
 {
@@ -55,7 +55,16 @@ namespace wali
            **/
           virtual void setIntVars(const std::map<std::string, int>& vars);
           virtual void setIntVars(const std::vector<std::map<std::string, int> >& vars);
-         
+        private:
+          /**
+           * 1) Create bdd space for extra variables.
+           * This is pulled out as a different function because both forms of 
+           * setIntVars need to use this, but slightly differently.
+           * 2) Create bdds chached here. Pulled out for the same reason.
+           **/
+          void createExtraVars();
+          virtual void setupCachedBdds(); 
+        public: 
           std::ostream& print(std::ostream& o) const;
 
           // ////////////////Create a expression for the variable var///////////////////////

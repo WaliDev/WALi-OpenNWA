@@ -32,7 +32,7 @@ namespace{
         brm->addIntVar("q",4);
         brm->addIntVar("r",4);
         brm->addIntVar("s",4);
-        ASSERT_EQ(brm->size(), 8);
+        ASSERT_EQ(brm->size(), 8u);
       }
   };
 
@@ -71,7 +71,7 @@ namespace{
     program_bdd_context_t brm  = new ProgramBddContext();
     brm->addBoolVar("a");
     brm->addIntVar("b",32);
-    EXPECT_EQ(brm->size(),2);
+    EXPECT_EQ(brm->size(),2u);
     }
 
     {
@@ -80,7 +80,7 @@ namespace{
     brm->addIntVar("b",32);
     brm->addBoolVar("c");
     brm->addIntVar("d",32);
-    EXPECT_EQ(brm->size(),4);
+    EXPECT_EQ(brm->size(),4u);
     }
   }
 
@@ -279,6 +279,7 @@ namespace{
           brm->Assume(brm->From("a"),brm->From("a")));
     } 
   }
+
 
 
 

@@ -12,6 +12,7 @@
 #include "wali/regex/AllRegex.hpp"
 #include "wali/wpds/GenKeySource.hpp"
 #include "wali/wfa/DeterminizeWeightGen.hpp"
+#include "wali/wpds/WPDS.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -30,24 +31,6 @@ for( ; name##it != name##itEND && (0 != (name = name##it->second)) ; name##it++ 
 std::set< Key >::iterator name##it = F.begin();                 \
 std::set< Key >::iterator name##itEND = F.end();                \
 for( ; name##it != name##itEND && (0 != (name = getState(*name##it))) ; name##it++ )
-
-
-namespace {
-  wali::wfa::WFA::AccessibleStateMap
-  epsilonCloseCached(wali::wfa::WFA const & wfa, wali::Key state, wali::wfa::WFA::EpsilonCloseCache & cache)
-  {
-    wali::wfa::WFA::EpsilonCloseCache::iterator loc = cache.find(state);
-
-    if (loc != cache.end()) {
-      return loc->second;
-    }
-    else {
-      wali::wfa::WFA::AccessibleStateMap eclose = wfa.epsilonClose(state);
-      cache[state] = eclose;
-      return eclose;
-    }
-  }
-}  
 
 
 namespace wali
@@ -1547,104 +1530,6 @@ namespace wali
     }
     
 
-    WFA::AccessibleStateMap
-    WFA::epsilonClose(Key start) const
-    {
-      std::set<Key> worklist;
-
-      // Follows Fig 3 from 'Generic epsilon-Removal Algorithm for Weighted
-      // Automata" by Mohri.
-      std::map<Key, sem_elem_t> d; // estimates the shortest distance from start to key
-      std::map<Key, sem_elem_t> r; // weight added to d[q] since last time q was visited
-
-      sem_elem_t zero = getSomeWeight()->zero();
-
-      // Inialization
-      for (std::set<Key>::const_iterator p = Q.begin(); p != Q.end(); ++p) {
-        d[*p] = r[*p] = zero;
-      }
-      d[start] = r[start] = getSomeWeight()->one();
-      worklist.insert(start);
-
-
-      //std::cout << "--- epsilonClose(" << key2str(start) << ")\n";
-
-      // Worklist loop
-      while (worklist.size() > 0) {
-        Key q = *worklist.begin();
-        worklist.erase(worklist.begin());
-        sem_elem_t r_q = r[q]; // the change in q's weight since the last time it was visited; just 'r' in the paper
-        r[q] = zero;
-
-        //std::cout << "---   dequeued " << key2str(q) << "\n";
-
-        // so we want to look at all outgoing transitions from 'q'.
-        // kp_map_t maps from (source * stack) -> {trans}. Furthermore,
-        // this is a hash map so is not in any particular order, which
-        // means we have to loop over the whole dang thing. (If we had an
-        // explicit list of symbols we could do (for every symbol) but we
-        // can't.)
-        //
-        // The next three indentation levels are like 'for each e in E[q]' in
-        // the paper except that 'e' is called 'transition'
-        for(kp_map_t::const_iterator group = kpmap.begin();
-            group != kpmap.end(); ++group)
-        {
-          if (group->first.first == q
-              && group->first.second == WALI_EPSILON)
-          {
-            //std::cout << "---     found some epsilon transitions\n";
-            TransSet const & transitions = group->second;
-            for (TransSet::const_iterator transition = transitions.begin();
-                 transition != transitions.end(); ++transition)
-            {             
-              // 'for each transition in E[q]'. Now we have one. The
-              // following variables aren't explicitly named in the paper,
-              // but I do here because either my names are too long (for
-              // 'next') or to reduce caching.
-              Key next = (*transition)->to();                // 'n[e]'
-              sem_elem_t w_e = (*transition)->weight();      // 'w[e]'
-              sem_elem_t delta = r_q->extend(w_e);           // 'r*w[e]'
-              sem_elem_t new_d_n = d[next]->combine(delta); // 'd[n[e]] + (r*w[e])'
-
-              // std::cout << "---     found transition to " << key2str(next) << "\n";
-              // w_e->print(std::cout << "---         the edge weight is ") << "\n";
-              // r_q->print(std::cout << "---         and the r weight is ") << "\n";
-              // delta->print(std::cout << "---         so delta is ") << ";\n";
-              // d[next]->print(std::cout << "---         the old weight on " << key2str(next) << " was ") << "\n";
-              //new_d_n->print(std::cout << "---         so the new weight would be ") << "\n";
-              
-              if (!new_d_n->equal(d[next])) {
-                //std::cout << "---       so I updated it's reachability amount and re-enqueued\n";
-                d[next] = new_d_n;
-                r[next] = r[next]->combine(delta);
-                worklist.insert(next);
-              }
-              
-            } // for each outgoing transition from q...
-          }  // ..
-        } // ...for each outgoing transition from q
-      } // while (!worklist.empty())
-
-      //d[start] = zero->one();
-
-      //std::cout << "---   done finding state weights\n";
-      //std::cout << "---   now removing nonzero states\n";
-
-      AccessibleStateMap out;
-      for (AccessibleStateMap::const_iterator iter = d.begin();
-           iter != d.end(); ++iter)
-      {
-        if (iter->second != zero) {
-          //iter->second->print(std::cout << "---     found state " << key2str(iter->first) << " with weight ") << "\n";
-          assert(!iter->second->equal(zero));
-          out[iter->first] = iter->second;
-        }
-      }
-      
-      return out;
-    }
-
     
     WFA::AccessibleStateMap
     WFA::simulate(AccessibleStateMap const & start,
@@ -1657,7 +1542,7 @@ namespace wali
       for (AccessibleStateMap::const_iterator start_it = start.begin();
            start_it != start.end(); ++start_it)
       {
-        AccessibleStateMap eclose = epsilonCloseCached(*this, start_it->first, eclose_cache);
+        AccessibleStateMap eclose = epsilonCloseCached(start_it->first, eclose_cache);
         merge_state_maps(before, eclose);
       }
 
@@ -1680,10 +1565,11 @@ namespace wali
             for (TransSet::const_iterator trans_it = transitions.begin();
                  trans_it != transitions.end(); ++trans_it)
             {
-              AccessibleStateMap eclose = epsilonCloseCached(*this, (*trans_it)->to(), eclose_cache);
+              AccessibleStateMap eclose = epsilonCloseCached((*trans_it)->to(), eclose_cache);
               for (AccessibleStateMap::const_iterator dest = eclose.begin();
                    dest != eclose.end(); ++dest)
               {
+                assert(dest->second.get_ptr());
                 add_trans_to_accessible_states(after, dest->first, dest->second);
               }
             } // For each outgoing transition
@@ -1739,22 +1625,18 @@ namespace wali
       return false;
     }
 
-    std::map<Key, KeySet>
-    WFA::next_states(WFA const & wfa, KeySet const & froms)
-    {
-      EpsilonCloseCache cache;
-      return next_states(wfa, froms, cache);
-    }
 
-    std::map<Key, KeySet>
-    WFA::next_states(WFA const & wfa, KeySet const & froms, EpsilonCloseCache & eclose_cache)
+    std::map<Key, std::map<Key, KeySet> >
+    WFA::next_states_no_eclose(WFA const & wfa, KeySet const & froms)
     {
-      // symbol -> keyset
-      std::map<Key, KeySet> nexts;
+      // symbol -> source -> keyset
+      std::map<Key, std::map<Key, KeySet> > nexts;
 
       for(KeySet::const_iterator from = froms.begin();
           from != froms.end(); ++from)
       {
+
+        // For each outgoing non-epsilon transition from 'from'...
         for (kp_map_t::const_iterator kpmap_iter = wfa.kpmap.begin();
              kpmap_iter != wfa.kpmap.end(); ++kpmap_iter)
         {
@@ -1768,13 +1650,9 @@ namespace wali
             for (TransSet::const_iterator trans = outgoing.begin();
                  trans != outgoing.end(); ++trans)
             {
-              AccessibleStateMap eclose = epsilonCloseCached(wfa, (*trans)->to(), eclose_cache);
-
-              for (AccessibleStateMap::const_iterator target = eclose.begin();
-                   target != eclose.end(); ++target)
-              {
-                nexts[symbol].insert(target->first);
-              }
+              // ...for each
+              
+              nexts[symbol][source].insert( (*trans)->to() );
             } // for "each" outgoing transition [part 1]
           } // for "each" outgoing transition [part 2]
         } // for "each" outgoing transition [part 3]
@@ -1799,7 +1677,7 @@ namespace wali
         // Set up initial states
         KeySet det_initial;
         
-        AccessibleStateMap initials = epsilonCloseCached(*this, this->getInitialState(), eclose_cache);
+        AccessibleStateMap initials = epsilonCloseCached(this->getInitialState(), eclose_cache);
         for (AccessibleStateMap::const_iterator initial = initials.begin();
              initial != initials.end(); ++initial)
         {
@@ -1826,36 +1704,73 @@ namespace wali
           result.addFinalState(sources_key);
         }
 
-        // symbol -> next state
-        std::map<Key, KeySet> nexts = next_states(*this, sources);
+        // symbol -> source -> next states [no eclose]
+        std::map<Key, std::map<Key, KeySet> > nexts
+          = next_states_no_eclose(*this, sources);
 
-        for (std::map<Key, KeySet>::const_iterator next = nexts.begin();
-             next != nexts.end(); ++next)
+        for (std::map<Key, std::map<Key, KeySet> >::const_iterator next_by_source = nexts.begin();
+             next_by_source != nexts.end(); ++next_by_source)
         {
-          Key symbol = next->first;
-          Key target_key = getKey(next->second);
+          Key symbol = next_by_source->first;
 
-          if (next->second.size() > 0) {
-            // Only add a transition if it doesn't go to {}. Why? This is
-            // borne out of the difference between determinize and
-            // semideterminize. Determinize "can't" produce a total
-            // automaton. However, without this check, it still inserts the
-            // initial transitions to {}. From the point of view of producing
-            // an incomplete automaton, these transitions are dumb. So we get
-            // rid of them.
-            sem_elem_t weight = wg.getWeight(*this, result, sources, symbol, next->second);
+          KeySet targets;
+
+          // weight_spec[p][q] will represent the weight of
+          //
+          //            symbol      epsilon
+          //         p -------> i - - - - - -> q
+          //
+          // Each 'p' that is possible is a key in next->second. Each 'i'
+          // that is possible is a an element of next->second[p].
+          std::map<Key, AccessibleStateMap> weight_spec;
+
+          // source -> next states [no eclose]
+          for (std::map<Key, KeySet>::const_iterator next = next_by_source->second.begin();
+               next != next_by_source->second.end(); ++next)
+          {
+            Key source = next->first;
+            KeySet const & intermediates = next->second;
+
+            for (KeySet::const_iterator i = intermediates.begin();
+                 i != intermediates.end(); ++i)
+            {
+              Trans trans_p_to_i;
+              bool found = this->find(source, symbol, *i, trans_p_to_i);
+              assert(found);
+                                        
+              AccessibleStateMap eclose = epsilonCloseCached(*i, eclose_cache);
+
+              for (AccessibleStateMap::const_iterator q_w = eclose.begin();
+                   q_w != eclose.end(); ++q_w)
+              {
+                weight_spec[source][q_w->first] = trans_p_to_i.weight()->extend(q_w->second);
+                targets.insert(q_w->first);
+              }
+            }
+          }
+
+          // Only add a transition if it doesn't go to {}. Why? This is borne
+          // out of the difference between determinize and
+          // semideterminize. Determinize "can't" produce a total
+          // automaton. However, without this check, it still inserts the
+          // initial transitions to {}. From the point of view of producing
+          // an incomplete automaton, these transitions are dumb. So we get
+          // rid of them.
+          if (targets.size() > 0) {
+            Key target_key = getKey(targets);
+          
+            sem_elem_t weight = wg.getWeight(*this, result, weight_spec, sources, symbol, targets);
             result.addTrans(sources_key, symbol, target_key, weight);
           
             std::pair<KeySet::iterator, bool> p = visited.insert(target_key);
             if (p.second) {
               // It wasn't already there
-              worklist.push(next->second);
+              worklist.push(targets);
             }
           }
         }
       }
       
-
       return result;
     }
 
@@ -2268,7 +2183,37 @@ namespace wali
          << "             symbols: " << symbols.size() << "\n"
          << "         transitions: " << counter.getNumTrans() << "\n";
     }
-      
+
+
+    struct RuleAdder : ConstTransFunctor
+    {
+      Key p_state;
+      wpds::WPDS * wpds;
+      boost::function<bool (ITrans const *)> callback;
+
+      RuleAdder(Key st, wpds::WPDS * pds, boost::function<bool (ITrans const *)> cb)
+        : p_state(st), wpds(pds), callback(cb)
+      {}
+
+      virtual void operator()( ITrans const * t )
+      {
+        if (callback && callback(t)) {
+          wpds->add_rule(p_state, t->from(),
+                         p_state, t->to(),
+                         t->weight());
+        }
+      }
+    };
+
+    void
+    WFA::toWpds(Key p_state,
+                wpds::WPDS * wpds,
+                boost::function<bool (ITrans const *)> trans_accept) const
+    {
+      RuleAdder adder(p_state, wpds, trans_accept);
+      this->for_each(adder);
+    }
+    
     
   } // namespace wfa
 

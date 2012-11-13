@@ -45,6 +45,11 @@ namespace wali
     return workset.empty();
   }
 
+  size_t RankedWorklist::size() const
+  {
+    return workset.size();
+  }
+
   void RankedWorklist::clear()
   {
     pwl_t::iterator i = workset.begin();

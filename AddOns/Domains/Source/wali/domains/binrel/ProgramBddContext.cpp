@@ -6,6 +6,8 @@
 #include <cstdlib>
 #include <ctime>
 
+#include <boost/lexical_cast.hpp>
+
 using namespace std;
 using namespace  wali::domains::binrel;
 
@@ -29,6 +31,110 @@ namespace wali
 
 namespace details
 {
+  void
+  interleave_all_fdds()
+  {
+    vector<int> new_order;
+
+    for (int bit_num=0; bit_num<bdd_varnum(); ++bit_num) {
+      for (int fdd_num=0; fdd_num<fdd_domainnum(); ++fdd_num) {
+        if (bit_num < fdd_varnum(fdd_num)) {
+          int * vars = fdd_vars(fdd_num);
+          new_order.push_back(vars[bit_num]);
+        }
+      }
+    }
+
+    assert(new_order.size() == static_cast<size_t>(bdd_varnum()));
+
+    bdd_setvarorder(&new_order[0]);
+  }
+
+  
+  std::map<int, std::string>
+  get_partial_mapping_for_fdd(std::string const & basename, int fdd_no)
+  {
+    int num_bits = fdd_varnum(fdd_no);
+    int * var_nums = fdd_vars(fdd_no); // [0] = lsb
+    std::map<int, std::string> ret;
+
+    for (int i=0; i<num_bits; ++i) {
+      ret[var_nums[i]] =
+        basename + "_" + boost::lexical_cast<std::string>(i)
+        + "(" + boost::lexical_cast<std::string>(var_nums[i]) + ")";
+    }
+
+    return ret;
+  }
+
+
+  void accumulate(std::map<int, std::string> & out,
+                  std::map<int, std::string> const & more)
+  {
+    for (std::map<int, std::string>::const_iterator iter = more.begin();
+         iter != more.end(); ++iter)
+    {
+      bool added = out.insert(*iter).second;
+      assert(added);
+    }
+  }
+
+  
+  std::map<int, std::string>
+  get_partial_mapping_for_var(std::string const & name, BddInfo const & info)
+  {
+    std::map<int, std::string> vars;
+    accumulate(vars, get_partial_mapping_for_fdd(name, info.baseLhs));
+    accumulate(vars, get_partial_mapping_for_fdd(name + "\'", info.baseRhs));
+    accumulate(vars, get_partial_mapping_for_fdd(name + "\'\'", info.baseExtra));
+    accumulate(vars, get_partial_mapping_for_fdd(name + "_t1", info.tensor1Lhs));
+    accumulate(vars, get_partial_mapping_for_fdd(name + "_t1\'", info.tensor1Rhs));
+    accumulate(vars, get_partial_mapping_for_fdd(name + "_t1\'\'", info.tensor1Extra));
+    accumulate(vars, get_partial_mapping_for_fdd(name + "_t2", info.tensor2Lhs));
+    accumulate(vars, get_partial_mapping_for_fdd(name + "_t2\'", info.tensor2Rhs));    
+    accumulate(vars, get_partial_mapping_for_fdd(name + "_t2\'\'", info.tensor2Extra));
+    return vars;
+  }
+
+  
+  std::map<int, std::string>
+  get_mapping()
+  {
+    std::map<int, std::string> mapping;
+    for (RevBddContext::const_iterator iter = idx2Name.begin(); iter != idx2Name.end(); ++iter)
+    {
+      accumulate(mapping, get_partial_mapping_for_fdd(iter->second, iter->first));
+    }
+    return mapping;
+  }
+  
+  
+  void
+  print_bdd_variable_order(std::ostream & os)
+  {
+    std::map<int, std::string> var_num_to_name = get_mapping();
+
+    int num = bdd_varnum();
+    for (int i=0; i<num; ++i) {
+      os << "  " << i << ": " << var_num_to_name[bdd_level2var(i)] << "\n";
+    }
+    os << "\n";
+  }
+
+  
+  bdd make_bdd_high_bits_zero(int fdd_no, int fdd_vars[], int start_at_bit)
+  {
+    int total_bits = fdd_varnum(fdd_no);
+
+    bdd ret = bddtrue;
+    for (int bit = start_at_bit; bit < total_bits; ++bit) {
+      int result_var = fdd_vars[bit];
+      ret = ret & bdd_nithvar(result_var);
+    }
+    return ret;
+  }
+
+
   bdd make_adder_box(int in1_varno, int in2_varno, int out_varno,
                      bdd t0, bdd t1, bdd t2, bool inv)
   {
@@ -54,11 +160,16 @@ namespace details
   }
 
   
-  bdd make_adder(int fdd_lhs, int fdd_rhs, int fdd_result)
+  bdd make_adder(int fdd_lhs, int fdd_rhs, int fdd_result, int num_bits)
   {
-    int num_vars = fdd_varnum(fdd_lhs);
-    assert(num_vars == fdd_varnum(fdd_rhs));
-    assert(num_vars == fdd_varnum(fdd_result));
+    //int num_bits = fdd_varnum(fdd_lhs);
+    //assert(num_bits == fdd_varnum(fdd_rhs));
+    //assert(num_bits == fdd_varnum(fdd_result));
+
+    //std::cerr << "  make_adder: num_bits is " << num_bits << "\n";
+    //std::cerr << "              lhs fdd has " << fdd_varnum(fdd_lhs) << " vars\n";
+    //std::cerr << "              rhs fdd has " << fdd_varnum(fdd_rhs) << " vars\n";
+    //std::cerr << "              result fdd has " << fdd_varnum(fdd_result) << " vars\n";    
 
     int * lhs_vars = fdd_vars(fdd_lhs);
     int * rhs_vars = fdd_vars(fdd_rhs);
@@ -67,12 +178,12 @@ namespace details
     bdd left_box = bddtrue;
     bdd right_box = bddtrue;
 
-    for (int level=0; level<num_vars; ++level) {
-      // IMPORTANT: level counts from 0=msb to num_vars-1=lsb. However,
+    for (int level=0; level<num_bits; ++level) {
+      // IMPORTANT: level counts from 0=msb to num_bits-1=lsb. However,
       // *_vars have index 0 as the lsb.
-      int lhs_var = lhs_vars[num_vars-1 - level];
-      int rhs_var = rhs_vars[num_vars-1 - level];
-      int result_var = result_vars[num_vars-1 - level];
+      int lhs_var = lhs_vars[num_bits-1 - level];
+      int rhs_var = rhs_vars[num_bits-1 - level];
+      int result_var = result_vars[num_bits-1 - level];
 
       bdd new_left_box = make_adder_box(lhs_var, rhs_var, result_var,
                                         left_box, left_box, right_box, false);
@@ -83,7 +194,28 @@ namespace details
       right_box = new_right_box;
     }
 
-    return left_box;
+    bdd high_bits_zero = make_bdd_high_bits_zero(fdd_lhs, lhs_vars, num_bits)
+                         & make_bdd_high_bits_zero(fdd_rhs, rhs_vars, num_bits)
+                         & make_bdd_high_bits_zero(fdd_result, result_vars, num_bits);
+
+    return left_box & high_bits_zero;
+  }
+
+  
+  // http://www.exploringbinary.com/ten-ways-to-check-if-an-integer-is-a-power-of-two-in-c/
+  bool is_power_of_two(unsigned x)
+  {
+    return ((x != 0) && ((x & (~x + 1)) == x));
+  }
+
+  
+  int log2_ceiling(unsigned x)
+  {
+    int num_shifts = 0;
+    while ((1u << num_shifts) <= x) {
+      ++num_shifts;
+    }
+    return num_shifts;
   }
 }
 
@@ -104,18 +236,52 @@ void ProgramBddContext::addBoolVar(std::string name)
   addIntVar(name,2);
 }
 
-void ProgramBddContext::setIntVars(const std::map<std::string, int>& flatvars)
+void ProgramBddContext::setIntVars(const std::map<std::string, int>& inflatvars)
 {
+  // copy inflatvars because we mess with it.
+  std::map<std::string, int> flatvars = inflatvars;
+  // Add extra variables at the end of the variables passed in.
+  unsigned size = 0;
+  for(std::map<std::string, int>::const_iterator ci = flatvars.begin(); ci != flatvars.end(); ++ci)
+    size = ((unsigned) ci->second) > size ? ci->second : size;
+  size = size < 2 ? 2 : size; // The least size handled is 2. There must be at least one bool variable.
+  maxSize = size;
+  flatvars["__regA"] = size;
+  flatvars["__regB"] = size;
+  flatvars["__regSize"] = size + 1; //only baseLhs will be used. Rest of the levels will be wasted. Ah, what the hell!
+
   std::vector<std::map<std::string, int> > vars;
   vars.push_back(flatvars);
-  setIntVars(vars);
+
+  createIntVars(vars);
+
+  //createExtraVars(); <-- not needed.
+  // Now extract the information about extra variables.
+  regAInfo = (*this)["__regA"];
+  regBInfo = (*this)["__regB"];
+  bddinfo_t regSizeInfo = (*this)["__regSize"];
+  sizeInfo = regSizeInfo->baseLhs;
+  // Now delete entries for these extra variables from the vocabulary.
+  this->erase(this->find("__regA"));
+  this->erase(this->find("__regB"));
+  this->erase(this->find("__regSize")); //will get deleted because no one references it anymore.
+
+  //details::interleave_all_fdds(); //speeds up ProgramBddContext operations.
+  BddContext::setupCachedBdds();
+  setupCachedBdds();
 }
 
 
 void ProgramBddContext::setIntVars(const std::vector<std::map<std::string, int> >& vars)
 {
-  BddContext::setIntVars(vars);
-  
+  createIntVars(vars);
+  createExtraVars();
+  BddContext::setupCachedBdds();
+  setupCachedBdds();
+}
+
+void ProgramBddContext::createExtraVars()
+{
   // Compute the size of register needed.
   unsigned size = 0;
   for(std::map<const std::string, bddinfo_t>::const_iterator ci = this->begin(); ci != this->end(); ++ci)
@@ -148,7 +314,10 @@ void ProgramBddContext::setIntVars(const std::vector<std::map<std::string, int> 
   idx2Name[regBInfo->baseLhs] = "__regB";
   idx2Name[regBInfo->baseRhs] = "__regB'";
   idx2Name[regBInfo->baseExtra] = "__regB''";
+}
 
+void ProgramBddContext::setupCachedBdds()
+{
   // Create cached identity
   baseId = bddtrue;
   int * baseLhs = new int[this->size()];
@@ -551,6 +720,7 @@ bdd ProgramBddContext::bddNot() const
 
 bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size) const
 {
+  //std::cerr << "bddPlus(" << in1Size << ", " << in2Size << "):\n";
   if(in1Size != in2Size){
     LOG(WARNING) << 
       "[ProgramBddContext::bddPlus] Different sizes of registers in operation." 
@@ -561,38 +731,69 @@ bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size) const
       in1Size = in2Size;
   }
   unsigned outSize = in1Size;
+  int num_bits = details::log2_ceiling(outSize - 1);
 
-#if BINREL_BUILD_FAST_ADDER  
-  assert(in1Size <= (unsigned)fdd_domainsize(regAInfo->baseRhs));
-  bdd plus_bdd = details::make_adder(regAInfo->baseRhs, regBInfo->baseRhs, regAInfo->baseExtra);
-  plus_bdd = plus_bdd & fdd_ithvar(sizeInfo, outSize);
+  // Not really fast and slow, but fast and slow to construct.
+  bdd fast_adder, slow_adder;
+
+  // Build fast adder then maybe build slow adder
+  if (details::is_power_of_two(outSize)) {
+    //std::cerr << "  Building slow adder because " << outSize << " is"
+    //          << (details::is_power_of_two(outSize) ? " " : " not ")
+    //          << "a power of two\n";
+    assert(in1Size <= (unsigned)fdd_domainsize(regAInfo->baseRhs));
+    fast_adder = details::make_adder(regAInfo->baseRhs, regBInfo->baseRhs, regAInfo->baseExtra, num_bits);
+    fast_adder = fast_adder & fdd_ithvar(sizeInfo, outSize);
+  }
+
+#ifndef BINREL_ALWAYS_BUILD_SLOW_ADDER
+#error "You must define BINREL_ALWAYS_BUILD_SLOW_ADDER to 0 or 1"
 #endif
   
-#if BINREL_BUILD_SLOW_ADDER
-  bdd ret = bddfalse;
-  for(unsigned i=0; i<in1Size; ++i){
-    for(unsigned j=0; j<in2Size; ++j){
-      int k = (i + j) % outSize;
-      ret = ret  |
-        (fdd_ithvar(regAInfo->baseRhs,i) &
-         fdd_ithvar(regBInfo->baseRhs,j) &
-         fdd_ithvar(regAInfo->baseExtra,k));
+  if (BINREL_ALWAYS_BUILD_SLOW_ADDER
+      || (BINREL_ALLOW_BUILD_SLOW_ADDER &&
+          !details::is_power_of_two(outSize)))
+  {
+    //std::cerr << "  Building slow adder because"
+    //          << (BINREL_ALWAYS_BUILD_SLOW_ADDER ? " we always do;" : "")
+    //          << (details::is_power_of_two(outSize) ? "" : "outsize is not a power of two")
+    //          << "\n";
+    
+    slow_adder = bddfalse;
+    for(unsigned i=0; i<in1Size; ++i){
+      for(unsigned j=0; j<in2Size; ++j){
+        int k = (i + j) % outSize;
+        slow_adder = slow_adder  |
+          (fdd_ithvar(regAInfo->baseRhs,i) &
+           fdd_ithvar(regBInfo->baseRhs,j) &
+           fdd_ithvar(regAInfo->baseExtra,k));
+      }
     }
+    slow_adder = slow_adder & fdd_ithvar(sizeInfo, outSize);
   }
-  ret = ret & fdd_ithvar(sizeInfo, outSize);
-#endif
 
-#if BINREL_BUILD_FAST_ADDER && BINREL_BUILD_SLOW_ADDER
-  assert(plus_bdd == ret);  
-#endif
+  // If we built both, check they are the same
+  if (fast_adder.id() != 0
+      && slow_adder.id() != 0
+      && fast_adder != slow_adder)
+  {
+    std::cerr << "WARNING: the two methods of creating a plus BDD differ\n";
+    std::cerr << "   in1size: " << in1Size << "\n";
+    std::cerr << "   in2size: " << in2Size << "\n";
+    bdd_fnprintdot((char*)"slow_plus.dot", slow_adder);
+    bdd_fnprintdot((char*)"fast_plus.dot", fast_adder);
+    assert(fast_adder == slow_adder);  
+  }
 
-#if BINREL_BUILD_FAST_ADDER
-  return plus_bdd;
-#elif BINREL_BUILD_SLOW_ADDER
-  return ret;
-#else
-  #error "Must define one of BINREL_BUILD_FAST_ADDER or BINREL_BUILD_SLOW_ADDER"
-#endif
+
+  if (fast_adder.id() != 0) {
+    assert(BINREL_ALWAYS_BUILD_SLOW_ADDER || slow_adder.id() == 0);
+    return fast_adder;
+  }
+  else {
+    assert(slow_adder.id() != 0);
+    return slow_adder;
+  }
 }
 
 #ifdef BINREL_I_WANT_MINUS_TIMES_AND_DIV_EVEN_THOUGH_THEY_CAN_BE_EXPONENTIALLY_SLOW
@@ -703,10 +904,10 @@ bdd ProgramBddContext::Assign(std::string var, bdd expr) const
   }
 
   unsigned rvalsize = getRegSize(expr);
-  if(rvalsize > bi->maxVal){
-    LOG(WARNING) << "[ProgramBddContext::Assign] The register size of rhs is greater than what the variable can hold";
-    return bddfalse;
-  }
+  //if(rvalsize > bi->maxVal){
+  //  LOG(WARNING) << "[ProgramBddContext::Assign] The register size of rhs is greater than what the variable can hold";
+  //  return bddfalse;
+  //}
 
   // If rhs max size is smaller, only copy the relevant bits.
   unsigned copysize = bi->maxVal;

@@ -8,7 +8,7 @@
 
 typedef enum {ZERO = 0, ONE = 1} constant;
 
-typedef enum {AST_NOT, AST_XOR, AST_OR, AST_AND, AST_EQ, AST_NEQ, AST_IMP, AST_NONDET, AST_SCHOOSE, AST_VAR, AST_CONSTANT} binop;
+typedef enum {AST_NOT, AST_XOR, AST_OR, AST_AND, AST_EQ, AST_NEQ, AST_IMP, AST_NONDET, AST_SCHOOSE, AST_VAR, AST_VAR_POST, AST_CONSTANT} binop;
 typedef struct expr_struct
 {
   binop op;
@@ -71,6 +71,7 @@ typedef struct prog_struct
 {
   str_list * vl;
   proc_list * pl;
+  stmt * e; //error label
 } prog;
 
 // //////////////////////////////CONSTRUCTORS//////////////////////////////////
@@ -86,6 +87,7 @@ inline expr * make_and_expr(expr * l, expr * r);
 inline expr * make_eq_expr(expr * l, expr * r);
 inline expr * make_neq_expr(expr * l, expr * r);
 inline expr * make_imp_expr(expr * l, expr * r);
+inline expr * mark_post_expr(expr * l);
 
 inline stmt * make_clean_stmt();
 

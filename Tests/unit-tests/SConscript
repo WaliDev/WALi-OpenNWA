@@ -29,21 +29,27 @@ env.AppendUnique(CPPPATH=['#/Tests/unit-tests/Source',
                           '#/AddOns/Domains/Source/'])
 env.AppendUnique(LIBPATH=['#/AddOns/Domains/ThirdParty/'])
 env.AppendUnique(CPPPATH=[glog_inc])
-env.AppendUnique(LIBS=[glog_lib, 'bdd', 'walidomains'])
+env.AppendUnique(LIBS=[glog_lib, 'walidomains', 'bdd'])
 
 #gtest and glog are ill begaved w.r.t. to these flags.
 env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
 env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Werror', '')
 env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wsign-compare', '')
 
+
 test_files = Split("""
     Source/test.cpp
 
     Source/wali/wali-prereqs.cpp    
+    Source/wali/domains/class-SemElemSet/tests.cpp
     Source/wali/witness/calculating-visitor.cpp
     Source/wali/wfa/class-wfa/membership.cpp
+    Source/wali/wfa/class-wfa/epsilonClose.cpp
+    Source/wali/wfa/class-wfa/computeAllReachingWeights.cpp
     Source/wali/wfa/class-wfa/determinize.cpp
     Source/wali/wfa/class-wfa/complementStates.cpp
+    Source/wali/wpds/class-fwpds/poststar.cpp
+    Source/wali/wpds/class-fwpds/prestar.cpp
 
     Source/opennwa/fixtures.cpp
     Source/opennwa/class-NestedWord/nested-word.cpp

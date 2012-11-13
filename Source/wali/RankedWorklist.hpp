@@ -31,6 +31,8 @@ namespace wali
 
       virtual void clear();
 
+      virtual size_t size() const;
+
       /*
        * Override this to get the rank of a transition
        */

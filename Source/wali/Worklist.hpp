@@ -67,6 +67,13 @@ namespace wali
        */
       virtual void clear() = 0;
 
+      /*!
+       * size
+       *
+       * Returns the number of items in the worklist
+       */
+      virtual size_t size() const  = 0;
+
     protected:
 
   }; // class Worklist

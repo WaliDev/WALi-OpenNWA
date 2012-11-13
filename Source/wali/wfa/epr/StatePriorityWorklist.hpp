@@ -78,6 +78,10 @@ namespace wali
             return wl.empty();
           }
 
+          size_t size() const {
+            return wl.size();
+          }
+
           /*!
            * clear
            *

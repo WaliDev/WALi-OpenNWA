@@ -241,7 +241,7 @@ if 'help' not in COMMAND_LINE_TARGETS:
         if 'examples' in COMMAND_LINE_TARGETS:
             built += SConscript('Examples/SConscript')
             BaseEnv.Alias('examples',built)
-        if 'tests' in COMMAND_LINE_TARGETS:
+        if 'tests' in COMMAND_LINE_TARGETS:            
             built += SConscript('Tests/SConscript', variant_dir=os.path.join(BuildDir,'tests'), duplicate=0)
             unit_tests = SConscript('Tests/unit-tests/SConscript', variant_dir=os.path.join(BuildDir,'unit-tests'), duplicate=0)
             built += unit_tests

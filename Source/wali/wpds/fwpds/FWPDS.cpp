@@ -185,6 +185,7 @@ void FWPDS::prestar( wfa::WFA const & input, wfa::WFA& output )
   // are no rules and not saturation to 
   // be done.
   if (!theZero.is_valid()) {
+    worklist->clear();
     return;
   }
 
@@ -381,8 +382,10 @@ void FWPDS::poststarIGR( wfa::WFA const & input, wfa::WFA& output )
   // been added to the WPDS and no saturation
   // can be done.
   if(!theZero.is_valid()) {
+    worklist->clear();
     return;
   }
+  
   // cache semiring 1
   wghtOne = theZero->one();
 

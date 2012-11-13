@@ -65,7 +65,7 @@ namespace{
     brm->addIntVar("q",4);
     brm->addIntVar("r",4);
     brm->addIntVar("s",4);
-    ASSERT_EQ(brm->size(), 8);
+    ASSERT_EQ(brm->size(), 8u);
 
     bdd a = brm->From("a");
     bdd p = brm->From("p");
@@ -680,6 +680,49 @@ namespace{
     ASSERT_FALSE(failed);
   }
 
+  
+  // The following test just creates some add operations. The point is so
+  // that if both the slow and fast adders are turned on, then it will make
+  // sure they get the same result.
+  TEST(wali$domains$binrel$ProgramBddContext$$bddPlus, slowAndFastAdderAgree)
+  {
+      for (int i=2; i<10; ++i) {
+          ProgramBddContext ctx;
+          std::map<std::string, int> vars;
+          vars["x"] = i;
+          ctx.setIntVars(vars);
+          ctx.Plus(ctx.From("x"), ctx.From("x"));
+      }
+  }
+
+  TEST(wali$domains$binrel$ProgramBddContext$$Assign, canAssignAConstToNotTheBiggestVariable)
+  {
+      ProgramBddContext ctx;
+      std::map<std::string, int> vars;
+      vars["x"] = 2;
+      vars["y"] = 4;
+      ctx.setIntVars(vars);
+
+      // x = 0 should obviously succeed
+      bdd assigned = ctx.Assign("x", ctx.Const(0));
+
+      ASSERT_TRUE(assigned != bddfalse);
+
+      // We want to check that there's exactly one satisfying assignment for
+      // this (to make sure there's not something strange going
+      // on). 'assigned' should be the bdd " x' = 0 " but with some extra
+      // stuff tacked on for the auxiliary variables. We will make sure that,
+      // if we manually construct that bdd independently, take the
+      // complement, and 'and' it with 'assigned', the result is unsat --
+      // meaning that every satisfying assignement to 'assigned' has x'=0.
+      int x_prime_fdd_num = ctx["x"]->baseRhs;
+      bdd x_prime_is_zero = fdd_ithvar(x_prime_fdd_num, 0);
+
+      ASSERT_TRUE(bddfalse == (assigned & !x_prime_is_zero));
+  }
+
+#undef SETVARADDVARTESTS
+#if defined(SETVARADDVARTESTS)
   /**
    * The following 4 tests try the following configurations:
    *
@@ -826,6 +869,135 @@ namespace{
     b2 = new BinRel(brm.get_ptr(), brm->Assign("w", brm->Plus(brm->Const(4), brm->From("w"))));
     sem_elem_t b3 = b1->extend(b2.get_ptr());
     b3 = b3->combine(b3);
+  }
+#endif //SETVARADDVARTESTS
+
+
+#if defined(BINREL_STATS)
+  TEST(StatsTests, basicStatCollectionAndPrinting1)
+  {
+    program_bdd_context_t brm = new ProgramBddContext();
+    
+    brm->addIntVar("c", 5);
+    brm->addIntVar("d", 5);
+
+    sem_elem_t a = new BinRel(brm.get_ptr(), brm->True());
+    sem_elem_t b = new BinRel(brm.get_ptr(), brm->Plus(brm->From("c"), brm->From("d")));
+
+    sem_elem_t c;
+    c = a->extend(a);
+    c = c->extend(c);
+
+    c = c->combine(a);
+    c = c->combine(a);
+
+
+    sem_elem_tensor_t e = dynamic_cast<SemElemTensor*>(a.get_ptr());
+    sem_elem_tensor_t f = dynamic_cast<SemElemTensor*>(b.get_ptr());
+    sem_elem_tensor_t g,h;
+
+    g = dynamic_cast<SemElemTensor*>(f.get_ptr());
+    g = g->transpose();
+
+    g = e->tensor(f.get_ptr());
+    h = e->tensor(f.get_ptr());
+
+    g = dynamic_cast<SemElemTensor*>(g->extend(h.get_ptr()).get_ptr());
+    g = dynamic_cast<SemElemTensor*>(g->extend(h.get_ptr()).get_ptr());
+    g = dynamic_cast<SemElemTensor*>(g->combine(h.get_ptr()).get_ptr());
+
+    c = g->detensor();
+    c = h->detensorTranspose();
+  
+    stringstream ss;
+
+    brm->printStats(ss);
+    EXPECT_TRUE(compareOutput("StatTests", "basicStatCollectionAndPrinting1", ss));
+
+  }
+#endif
+
+  TEST(Unclassified, dumbTensorTest1)
+  {
+    program_bdd_context_t brm = new ProgramBddContext();
+    brm->addBoolVar("b");
+
+    binrel_t a = new BinRel(brm.get_ptr(), brm->True());
+    a = dynamic_cast<BinRel*>(a->one().get_ptr());
+
+    binrel_t b = dynamic_cast<BinRel*>(a->tensor(a.get_ptr()).get_ptr());
+    b->print(cout) << std::endl;
+    binrel_t wt = dynamic_cast<BinRel*>(b->detensorTranspose().get_ptr());
+    if(wt == NULL){
+      ASSERT_TRUE(false);
+      return;
+    }
+    cout << wt->count;
+    wt->print(cout) << std::endl;
+    ASSERT_TRUE(b->detensor()->equal(a));
+    ASSERT_TRUE(b->detensorTranspose()->equal(a));
+
+  }
+
+#define STRESS_TEST_CONST1 500
+#define STRESS_TEST_CONST2 20000
+  TEST(SetVarAddVarTests, DISABLED_stressTest){
+    // Try to using setVars vs addVar
+    {
+      // Using addIntVar
+      cout << "Using addIntVar" << endl;
+      program_bdd_context_t brm;
+      brm = new ProgramBddContext();
+      map<string, int> vars;
+      for(unsigned i=0; i<STRESS_TEST_CONST1; ++i){
+        stringstream ss;
+        ss << "var " << i;
+        brm->addIntVar(ss.str(), 3);
+      }
+      cout << "Done adding variables" << endl;
+      bdd bdds[STRESS_TEST_CONST1];
+      unsigned i = 0;
+      for(ProgramBddContext::iterator iter = brm->begin(); iter != brm->end(); ++iter, ++i)
+        bdds[i] = brm->Plus(brm->From(iter->first), brm->Const(2));
+
+      sem_elem_t sems[STRESS_TEST_CONST2];
+      for(unsigned i=0; i<STRESS_TEST_CONST2; ++i){
+        unsigned j = i % 200;
+        unsigned k = (int)( i * 4.8) % 200;
+        sem_elem_t sem1 = new BinRel(brm.get_ptr(), bdds[j]);
+        sem_elem_t sem2 = new BinRel(brm.get_ptr(), bdds[k]);
+        sems[i] = sem1->extend(sem2);
+      }
+    }
+
+    {
+      cout << "Using SetIntVar" << endl;
+      // Using setIntVar
+      program_bdd_context_t brm;
+      brm = new ProgramBddContext();
+      map<string, int> vars;
+      for(unsigned i=0; i<STRESS_TEST_CONST1; ++i){
+        stringstream ss;
+        ss << "var " << i;
+        vars[ss.str()] = 3;
+      }
+      brm->setIntVars(vars);
+      cout << "Done adding variables" << endl;
+
+      bdd bdds[STRESS_TEST_CONST1];
+      unsigned i = 0;
+      for(ProgramBddContext::iterator iter = brm->begin(); iter != brm->end(); ++iter, ++i)
+        bdds[i] = brm->Plus(brm->From(iter->first), brm->Const(2));
+
+      sem_elem_t sems[STRESS_TEST_CONST2];
+      for(unsigned i=0; i<STRESS_TEST_CONST2; ++i){
+        unsigned j = i % 200;
+        unsigned k = (int)( i * 4.8) % 200;
+        sem_elem_t sem1 = new BinRel(brm.get_ptr(), bdds[j]);
+        sem_elem_t sem2 = new BinRel(brm.get_ptr(), bdds[k]);
+        sems[i] = sem1->extend(sem2);
+      }
+    }
   }
 
 } //namespace

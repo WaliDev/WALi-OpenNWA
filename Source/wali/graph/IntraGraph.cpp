@@ -1642,17 +1642,18 @@ namespace wali {
     }
 
 
-    // Used during Newton's method to saturate an IntraGraph corresponding to a linearized equation system
-    // Only for debugging
-    void IntraGraph::saturate(newton_logger_t nlog)
+    static unsigned saturateCount = 0; //DEBUGGING
+    void IntraGraph::saturate(newton_logger_t nlog __attribute__((unused)))
     {
-      //nlog might be unused
-      if(nlog == NULL) {}
 
       bool repeat = true;
 
-      while(repeat){
+      unsigned round = 0; //DEBUGGING
+      ++saturateCount; //DEBUGGING
+
+      while(repeat){        
         BEGIN_NEWTON_STEP(nlog);
+        ++round;    //DEBUGGING
         //First, evaluate the current regular expressions completely.
         BEGIN_EVALUATE_ROOTS(nlog);
         RegExp::evaluateRoots();
@@ -1744,9 +1745,10 @@ namespace wali {
             if(nodes[i].weight != NULL){
               nodes[i].weight->print(cout);
               cout << "\n";
-              SemElemTensor * wt =
+              sem_elem_tensor_t wt =
                 dynamic_cast<SemElemTensor*>(nodes[i].weight.get_ptr());
-              (wt->detensorTranspose())->print(cout);
+              wt = wt->detensorTranspose();
+              wt->print(cout);
             }
             else
               cout << "NULL";
@@ -1766,9 +1768,10 @@ namespace wali {
             if(edges[i].weight != NULL){
               edges[i].weight->print(cout);
               cout << "\n";
-              SemElemTensor * wt =
+              sem_elem_tensor_t wt =
                 dynamic_cast<SemElemTensor*>(edges[i].weight.get_ptr());
-              (wt->detensorTranspose())->print(cout);
+              wt = wt->detensorTranspose();
+              wt->print(cout);
             }
             else
               cout << "NULL";

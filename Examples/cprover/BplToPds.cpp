@@ -16,6 +16,68 @@ using namespace wali::cprover::details::resolve_details;
 
 namespace wali
 {
+  namespace domains
+  {
+    namespace binrel
+    {
+      //We're breaking the ProgramBddContext abstraction here to get the bdds for constrain clauses.
+      static bdd xformer_for_constrain(const expr * e, ProgramBddContext * con, const char * f)
+      {
+        bddinfo_t varInfo;
+        string s;
+        if(!e)
+          assert(0 && "xformer_for_constrain");
+        bdd l = bddfalse, r = bddfalse;
+        stringstream ss;
+        if(e->l)
+          l = xformer_for_constrain(e->l, con, f);
+        if(e->r)
+          r = xformer_for_constrain(e->r, con, f);
+        switch(e->op){
+          case AST_NOT:
+            return bdd_not(l);
+          case AST_XOR:
+            return bdd_or(bdd_and(l, bdd_not(r)), bdd_and(bdd_not(l), r));
+          case AST_OR:
+            return bdd_or(l, r);
+          case AST_AND:
+            return bdd_and(l, r);
+          case AST_EQ:
+            return bdd_or(bdd_and(l, r), bdd_and(bdd_not(l), bdd_not(r)));
+          case AST_NEQ:
+            return bdd_or(bdd_and(l, bdd_not(r)), bdd_and(bdd_not(l), r));
+          case AST_IMP:
+            return bdd_or(bdd_not(l), r);
+          case AST_SCHOOSE:
+            assert(0 && "xformer_for_constrain: AST_SCHOOSE not implemented");
+          case AST_VAR:
+          case AST_VAR_POST:
+            ss << f << "::" << e->v;
+            s = ss.str();
+            if(con->find(ss.str()) == con->end()){
+              stringstream ss2;
+              ss2 << "::" << e->v;
+              assert(con->find(ss2.str()) != con->end());
+              s = ss2.str();
+            }
+            varInfo = con->find(s)->second;
+            if(e->op == AST_VAR)
+              return bdd_ithvar(varInfo->baseLhs);
+            else // e->op == AST_VAR_POST
+              return bdd_ithvar(varInfo->baseRhs);
+          case AST_NONDET:
+            return bddtrue;
+          case AST_CONSTANT:
+            if(e->c == ONE)
+              return bddtrue;
+            else
+              return bddfalse;
+          default:
+            assert(0 && "expr_as_bdd: Unknown case");
+        }
+      }
+    }
+  }
   namespace cprover
   {
     namespace details
@@ -118,9 +180,107 @@ namespace wali
           map_call_to_callee_helper(mout, min, p->sl);
         }
 
+      
+        // Froward declaration of static procedures having to do with instrumeting asserts. 
+        // The procedures are static because it is *wrong* to use them directly.
+        static void instrument_asserts_in_proc(proc * p, const char * errLbl);
+        static void instrument_asserts_in_stmt_list(stmt_list * sl, const char * errLbl);
+        static void instrument_asserts_in_stmt(stmt * s, const char * errLbl);
+
+        void instrument_asserts_prog(prog * pg, const char * errLbl)
+        {          
+          assert(pg && "instrument_asserts");
+          // Convert asserts to assumes + goto
+          proc_list * pl = pg->pl;
+          while(pl){
+            proc * p = pl->p;
+            instrument_asserts_in_proc(p, errLbl);
+            pl = pl->n;
+          }
+          // Add the error label to a new proc.
+          str_list * l = make_str_list_item(strdup(errLbl));
+          stmt * s = make_goto_stmt(l);
+          str_list * ll = make_str_list_item(strdup(errLbl));
+          s->ll = ll;
+          stmt_list * sl = make_stmt_list_item(s);
+          proc * m = make_proc(0, strdup(errLbl), NULL, NULL, NULL, sl);
+          pg->pl = add_proc_right(pg->pl, m);
+
+          // Update error label in program struct.
+          pg->e = s;
+          return;
+        }
+
+        static void instrument_asserts_in_proc(proc * p, const char * errLbl)
+        {        
+          assert(p && "instrument_asserts_in_proc");
+          if(p->sl)
+            instrument_asserts_in_stmt_list(p->sl, errLbl);
+        }
+
+        static void instrument_asserts_in_stmt_list(stmt_list * sl, const char * errLbl)
+        {
+          while(sl){
+            instrument_asserts_in_stmt(sl->s, errLbl);
+            sl = sl->n;
+          }
+        }
+
+        static void instrument_asserts_in_stmt(stmt * s, const char * errLbl)
+        {
+          assert(s && "instrument_asserts_in_stmt");
+          if(s->sl1)
+            instrument_asserts_in_stmt_list(s->sl1, errLbl);
+          if(s->sl1)
+            instrument_asserts_in_stmt_list(s->sl2, errLbl);
+          if(s->op == AST_ASSERT){
+            assert(!s->sl1 && !s->sl2);
+            // in place modification saves us from having to change the containing stmt_list
+            s->op = AST_ITE;
+            //condition holds
+            stmt * s1 = make_skip_stmt();
+            stmt_list * sl1 = make_stmt_list_item(s1);
+            s->sl1 = sl1;
+            //condition violated
+            stmt * s2 = make_call_stmt(strdup(errLbl), NULL, NULL); //We simply call the 'error' proc
+            stmt_list * sl2 = make_stmt_list_item(s2);
+            s->sl2 = sl2;
+          }
+        }
+
+
+        void make_void_returns_explicit_in_prog(prog * pg)
+        {
+          assert(pg && "make_void_returns_explicit_in_prog");
+          proc_list * pl = pg->pl;
+          while(pl){
+            proc * p = pl->p;
+            if(p){
+              stmt_list * sl = p->sl;
+              if(sl){
+                stmt_list * tl = sl->t;
+                stmt * t = tl->s;
+                assert(t && "make_void_returns_explicit");
+                if(t->op != AST_RETURN){
+                  if(p->r != 0){
+                    assert(0 && "procedure with non-void return, has a path that does not end in a return");
+                  }else{
+                    stmt * s = make_return_stmt(NULL);
+                    stmt_list * nsl = make_stmt_list_item(s);
+                    tl->n = nsl;
+                    tl->t = sl->t = nsl;
+                  }
+                }
+              }
+            }
+            pl = pl->n;
+          }
+        }
+
       }
 
-      void dump_pds_from_prog(wpds::WPDS * pds, prog * pg)
+
+      BddContext * dump_pds_from_prog(wpds::WPDS * pds, prog * pg)
       {
         ProgramBddContext * con = new ProgramBddContext(); 
 
@@ -181,11 +341,14 @@ namespace wali
         }
         name_to_proc.clear();
         fprintf(stderr, "Done converting\n");
+
+        return con;
       }
 
 
+      
 
-      static bdd expr_as_bdd(const expr * e, const ProgramBddContext *  con, const char * f)
+      static bdd expr_as_bdd(const expr * e, ProgramBddContext *  con, const char * f)
       {
         if(!e)
           assert(0 && "expr_as_bdd");
@@ -194,7 +357,7 @@ namespace wali
         if(e->l)
           l = expr_as_bdd(e->l, con, f);
         if(e->r)
-          l = expr_as_bdd(e->r, con, f);
+          r = expr_as_bdd(e->r, con, f);
         switch(e->op){
           case AST_NOT:
             return con->Not(l);
@@ -224,6 +387,8 @@ namespace wali
               assert(con->find(ss2.str()) != con->end());
               return con->From(ss2.str());
             }
+          case AST_VAR_POST:
+            assert(0 && "expr_as_bdd: AST_VAR_POST should not occur in expr_as_bdd");
           case AST_CONSTANT:
             if(e->c == ONE)
               return con->True();
@@ -241,16 +406,20 @@ namespace wali
 
       static wali::Key stk(const stmt * s)
       {
-        return getKey((long) s);
+        stringstream ss;
+        ss << (long) s;
+        str_list * ll = s->ll;
+        while(ll){
+          if(ll->v)
+            ss << "::" << ll->v;
+          ll = ll->n;
+        }
+        return getKey(ss.str());
       };
 
-      void dump_pds_from_stmt(WPDS * pds, stmt * s, const ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const
+      void dump_pds_from_stmt(WPDS * pds, stmt * s, ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const
           stmt_ptr_proc_ptr_hash_map& call_to_callee, const char * f, stmt * ns)
       {
-        if(0){
-          fprintf(stdout, "DUMPING: ");
-          emit_stmt(stdout, s, 2);            
-        }
         binrel_t temp = new BinRel(con, con->True());
         binrel_t one = dynamic_cast<BinRel*>(temp->one().get_ptr());
         bdd b, b1;
@@ -307,7 +476,9 @@ namespace wali
               b = b & con->Assign(lhs, expr_as_bdd(el->e, con, f));
               vl = vl->n;
               el = el->n;
-            }            
+            }
+            if(s->e)
+              b = b & xformer_for_constrain(s->e, con, f);
             pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
             break;       
           case AST_ITE:   
@@ -321,6 +492,10 @@ namespace wali
               assert(s->sl2->s);
               b = con->Assume(expr_as_bdd(s->e, con, f), con->False());
               pds->add_rule(stt(), stk(s), stt(), stk(s->sl2->s), new BinRel(con, b));
+            }else{
+              // fall through edge.
+              b = con->Assume(expr_as_bdd(s->e, con, f), con->False());
+              pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
             }
             if(s->sl1)
               dump_pds_from_stmt_list(pds, s->sl1, con, goto_to_targets, call_to_callee, f, ns);
@@ -336,11 +511,14 @@ namespace wali
             pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
             break;       
           case AST_ASSERT:
+            assert(0 && "assert statements can't be dumped to PDS");
             //WARNING: Asserts are treated as assumes.
             //write a prepass to handle asserts.
+            /*
             assert(s->e);
             b = con->Assume(expr_as_bdd(s->e, con, f), con->True());
             pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
+            */
             break;
           case AST_ASSUME:
             assert(s->e);
@@ -357,7 +535,7 @@ namespace wali
         }
       }
 
-      void dump_pds_from_stmt_list(WPDS * pds, stmt_list * sl, const ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map&
+      void dump_pds_from_stmt_list(WPDS * pds, stmt_list * sl, ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map&
           goto_to_targets, const stmt_ptr_proc_ptr_hash_map& call_to_callee, const char * f, stmt * es)
       {
         while(sl){
@@ -368,7 +546,7 @@ namespace wali
           sl = sl->n;
         }
       }
-      void dump_pds_from_proc(WPDS * pds, proc * p, const ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const stmt_ptr_proc_ptr_hash_map& call_to_callee)
+      void dump_pds_from_proc(WPDS * pds, proc * p, ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const stmt_ptr_proc_ptr_hash_map& call_to_callee)
       {
         dump_pds_from_stmt_list(pds, p->sl, con, goto_to_targets, call_to_callee, p->f, NULL);
       }
@@ -391,7 +569,7 @@ namespace wali
 
     } //namespace details
   
-    void read_prog(WPDS * pds, const char * fname, bool dbg)
+    BddContext * read_prog(WPDS * pds, const char * fname, bool dbg)
     {
       FILE * fin;
       fin = fopen(fname, "r");
@@ -400,8 +578,9 @@ namespace wali
       parsing_result = NULL;
       if(dbg)
         emit_prog(stdout, pg);
-      dump_pds_from_prog(pds, pg);
+      BddContext * con = dump_pds_from_prog(pds, pg);
       deep_erase_prog(&pg);
+      return con;
     }
 
     prog * parse_prog(const char * fname)
@@ -415,6 +594,13 @@ namespace wali
       return pg;
     }
 
+    BddContext * pds_from_prog(wpds::WPDS * pds, prog * pg)
+    {
+      assert(pg);
+      BddContext * con = dump_pds_from_prog(pds, pg);
+      return con;
+    }
+    /*
     WPDS * wpds_from_prog(prog * pg)
     {
       assert(pg);
@@ -429,7 +615,7 @@ namespace wali
       dump_pds_from_prog(pds, pg);
       return pds;
     }
-
+*/
     void print_prog_stats(prog * pg)
     {
       assert(pg);
@@ -474,6 +660,18 @@ namespace wali
       fprintf(stdout, "\n");      
     }
 
+
+    void instrument_asserts(prog * pg, const char * errLbl)
+    {
+      instrument_asserts_prog(pg, errLbl);
+    }
+
+
+    void make_void_returns_explicit(prog * pg)
+    {
+      make_void_returns_explicit_in_prog(pg);  
+    }
+
     Key getEntryStk(const prog * pg, const char * f)
     {
       assert(pg);
@@ -493,84 +691,11 @@ namespace wali
     {
       return stt();
     }
+
+    Key getErrStk(const prog * pg)
+    {
+      assert(pg && pg->e && "error label not set yet. Did you use instrument_assert?");
+      return stk(pg->e);
+    }
   }
 }
-
-
-/*
-
-int main(int argc, char ** argv)
-{
-  FILE * fin;
-  if(argc >= 2)
-    fin = fopen(argv[1], "r");
-  else
-    fin = fopen("satabs.3.bp", "r"); 
-
-  if(parse(fin))
-    assert(0 &&  "Parsing Error");
-  prog * pg = parsing_result;
-  parsing_result = NULL;
-  fclose(fin);
-
-  emit_prog(stdout, pg);
-
-  const proc_list * pl;
-
-  str_stmt_ptr_hash_map label_to_stmt;
-  str_proc_ptr_hash_map name_to_proc;
-  stmt_ptr_stmt_list_ptr_hash_map goto_to_targets;
-  stmt_ptr_proc_ptr_hash_map call_to_callee;
-
-  map_name_to_proc(name_to_proc, pg);
-
-  fprintf(stdout, "Printing name_to_proc\n#######################\n");
-  for(str_proc_ptr_hash_map::iterator iter = name_to_proc.begin(); iter != name_to_proc.end(); ++iter)
-    fprintf(stdout, "%s: %s\n", iter->first, iter->second->f);
-
-  pl = pg->pl;
-  while(pl){
-    proc * p = pl->p;
-    map_label_to_stmt(label_to_stmt, p);
-    map_goto_to_targets(goto_to_targets, label_to_stmt, p);
-    map_call_to_callee(call_to_callee, name_to_proc, p);
-
-    fprintf(stdout, "PROC: %s\n@@@@@@@@@@@@@@@@@@@@\n@@@@@@@@@@@@@@@@@@@@\n", p->f);
-    fprintf(stdout, "Printing label_to_stmt\n#######################\n");
-    for(str_stmt_ptr_hash_map::iterator iter = label_to_stmt.begin(); iter != label_to_stmt.end(); ++iter){
-      fprintf(stdout, "%s ---> ", iter->first);
-      emit_stmt(stdout, iter->second, 0);
-    }
-    fprintf(stdout, "Printing goto_to_targets\n#######################\n");
-    for(stmt_ptr_stmt_list_ptr_hash_map::iterator iter = goto_to_targets.begin(); iter != goto_to_targets.end(); ++iter){
-      emit_stmt(stdout, iter->first, 0);
-      stmt_list * sl = iter->second;
-      while(sl){
-        emit_stmt(stdout, sl->s, 2);
-        sl = sl->n;
-      }
-    }
-    fprintf(stdout, "Printing call_to_callee\n#######################\n");
-    for(stmt_ptr_proc_ptr_hash_map::iterator iter = call_to_callee.begin(); iter != call_to_callee.end(); ++iter){
-      emit_stmt(stdout, iter->first, 0);
-      fprintf(stdout, "  %s\n", iter->second->f);
-    }
-
-
-    label_to_stmt.clear();
-    clear_stmt_ptr_stmt_list_ptr_hash_map(goto_to_targets);
-    call_to_callee.clear();
-    pl = pl->n;
-  }
-  name_to_proc.clear();
-
-  // pds geneartion
-  WPDS * pds = new WPDS;
-  dump_pds_from_prog(pds, pg);
-  //
-  deep_erase_prog(&pg);
-  return 0;
-}
-
-
-*/

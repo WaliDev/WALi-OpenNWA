@@ -68,6 +68,8 @@ namespace wali
 
       virtual void clear();
 
+      virtual size_t size() const;
+
     protected:
       pwl_t workset;
 

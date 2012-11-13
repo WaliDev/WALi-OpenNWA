@@ -147,7 +147,7 @@ namespace wali
       /**
        *  Perform the star operation (returns this^\inf)
        */
-      sem_elem_t star();
+      virtual sem_elem_t star();
 
       /** 
        * Wrapper method for extend that will remove the ref_ptr
