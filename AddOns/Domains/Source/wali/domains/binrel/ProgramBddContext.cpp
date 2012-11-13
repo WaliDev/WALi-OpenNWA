@@ -486,6 +486,7 @@ ProgramBddContext::ProgramBddContext(int bddMemSize, int cacheSize) :
   maxSize(0),
   regAInfo(NULL),
   regBInfo(NULL),
+  baseId(bddtrue),
   baseLhs2Rhs(BddPairPtr(bdd_newpair()))
 {}
 
@@ -494,7 +495,9 @@ ProgramBddContext::ProgramBddContext(const ProgramBddContext& other) :
   sizeInfo(other.sizeInfo),
   maxSize(other.maxSize),
   regAInfo(other.regAInfo),
-  regBInfo(other.regBInfo)
+  regBInfo(other.regBInfo),
+  baseId(other.baseId),
+  baseLhs2Rhs(other.baseLhs2Rhs)
 {}
 
 ProgramBddContext& ProgramBddContext::operator = (const ProgramBddContext& other)
@@ -521,7 +524,6 @@ std::ostream& ProgramBddContext::print(std::ostream& o) const
 
 bdd ProgramBddContext::From(std::string var) const
 {
-  //TODO: This header should be placed in all functions below.
   bdd ret = bddfalse;
   ProgramBddContext::const_iterator iter = (this->find(var));
   if(iter == this->end())
