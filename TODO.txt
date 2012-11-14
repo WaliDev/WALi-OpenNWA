@@ -1,3 +1,8 @@
+Build things:
+  - Some object and library files are generated in directories other than
+    _build. See the .gitignore file. Figure out why this is and stop it.
+
+
 Non-NWA tests:
 
  - Except for some tests of Key stuff in the NWA tests, there are none.
