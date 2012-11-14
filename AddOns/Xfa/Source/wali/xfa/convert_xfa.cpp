@@ -24,7 +24,7 @@ print_bdd_variable_order(std::ostream & os);
 }
 
 
-namespace cfglib {
+namespace wali {
     namespace xfa {
 
         struct ReadTransitionException {
@@ -295,7 +295,7 @@ details::print_bdd_variable_order(std::cout);
             bdd ident = voc.Assume(voc.True(), voc.True());
             Symbol eps(wali::WALI_EPSILON);
             
-            cfglib::xfa::Xfa ret;
+            wali::xfa::Xfa ret;
 
             for (auto ast_state = ast.states.begin(); ast_state != ast.states.end(); ++ast_state) {
                 State state = getState((*ast_state)->name);

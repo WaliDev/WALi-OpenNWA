@@ -1,5 +1,5 @@
-#ifndef INCLUDE_CFGLIB_XFA_XFA_HPP
-#define INCLUDE_CFGLIB_XFA_XFA_HPP
+#ifndef INCLUDE_WALI_XFA_XFA_HPP
+#define INCLUDE_WALI_XFA_XFA_HPP
 
 #include <boost/bimap.hpp>
 
@@ -22,7 +22,7 @@
 #include "../cpp11.hpp"
 #include "base64.hpp"
 
-namespace cfglib {
+namespace wali {
     namespace xfa {
 
         struct State {

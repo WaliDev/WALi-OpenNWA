@@ -27,7 +27,7 @@ print_bdd_variable_order(std::ostream & os);
 }
 
 
-using namespace cfglib::xfa;
+using namespace wali::xfa;
 using namespace wali;
 using namespace wali::wfa;
 using namespace wali::wpds;
@@ -102,7 +102,7 @@ makeGKW(VarSet const & kill, VarSet const & gen)
 
 
 
-namespace cfglib2 {
+namespace wali2 {
     namespace xfa {
         std::string
         var_name(int id,
@@ -379,7 +379,7 @@ namespace cfglib2 {
 
         void
         kill_variables(xfa_parser::Xfa const & ast,
-                       cfglib::xfa::Xfa & xfa,
+                       wali::xfa::Xfa & xfa,
                        ProgramBddContext & context,
                        std::string const & domain_var_name_prefix)
         {
