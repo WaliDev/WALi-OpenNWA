@@ -8,17 +8,32 @@
 #include <iostream>
 #include <vector>
 
+#include "../timer.hpp"
+
 using namespace xfa_parser;
+
+namespace details
+{
+extern
+void
+interleave_all_fdds();
+
+extern
+void
+print_bdd_variable_order(std::ostream & os);
+}
+
 
 namespace cfglib {
     namespace xfa {
 
         struct ReadTransitionException {
-            BinaryRelation back_weight, bit1_weight;
+            BinaryRelation back_weight, bit1_weight, init_weight;
 
-            ReadTransitionException(BinaryRelation back, BinaryRelation bit1)
+            ReadTransitionException(BinaryRelation init, BinaryRelation back, BinaryRelation bit1)
                 : back_weight(back)
                 , bit1_weight(bit1)
+                , init_weight(init)                  
             {}
         };
 
@@ -30,7 +45,9 @@ namespace cfglib {
             
             WeightedTransition(State src, Symbol sym, State tgt, BinaryRelation w)
                 : source(src), symbol(sym), target(tgt), weight(w)
-            {}
+            {
+                assert (weight.get_ptr());
+            }
         };
 
         typedef std::vector<WeightedTransition> TransList;
@@ -84,9 +101,12 @@ namespace cfglib {
                 }
 
                 //voc.addIntVar("left_current_state", ast.states.size());
-                vars["left_current_state"] = ast.states.size();
+                vars["left_current_state"] = ast.states.size() * 2;
+                std::cout << "Adding left_current_state with size " << vars["left_current_state"];
                 
                 voc.setIntVars(vars);
+                details::interleave_all_fdds();
+details::print_bdd_variable_order(std::cout);
                 has_run = true;
             }
         }
@@ -112,40 +132,54 @@ namespace cfglib {
             auto cmd = *act.command;
 
             if (cmd.name == "read") {
-                // FIXME
-                std::cerr << "    read\n";
-                // x = x + x (where x is the __io_return being read into)
-                BinaryRelation times2 = new BinRel(&voc, voc.Assign(var_name(act.operand_id, prefix),
-                                                                    voc.Plus(voc.From(var_name(act.operand_id, prefix)),
-                                                                             voc.From(var_name(act.operand_id, prefix)))));
-                // x = x + 1 (where x is the __io_return being read into)
-                BinaryRelation plus1 = new BinRel(&voc, voc.Assign(var_name(act.operand_id, prefix),
-                                                                   voc.Plus(voc.From(var_name(act.operand_id, prefix)),
-                                                                            voc.Const(1))));
-                throw ReadTransitionException(times2, plus1);
+                BinaryRelation times2, plus1, init;
+                {
+                    // x = 0
+                    BlockTimer tim("read: =0");
+                    bdd b = voc.Assign(var_name(act.operand_id, prefix),
+                                       voc.Const(0));
+                    init = new BinRel(&voc, b);
+                    std::cerr << "> read: =0 bdd node count " << bdd_nodecount(b) << "\n";
+                }
+                {
+                    // x = x + x (where x is the __io_return being read into)
+                    BlockTimer tim("read: *2");
+                    bdd b = voc.Assign(var_name(act.operand_id, prefix),
+                                       voc.Plus(voc.From(var_name(act.operand_id, prefix)),
+                                                voc.From(var_name(act.operand_id, prefix))));
+                    times2 = new BinRel(&voc, b);
+                    std::cerr << "> read: *2 bdd node count " << bdd_nodecount(b) << "\n";
+                }
+                {
+                    // x = x + 1 (where x is the __io_return being read into)
+                    BlockTimer tim("read: +1");
+                    bdd b = voc.Assign(var_name(act.operand_id, prefix),
+                                       voc.Plus(voc.From(var_name(act.operand_id, prefix)),
+                                                voc.Const(1)));
+                    plus1 = new BinRel(&voc, b);
+                    std::cerr << "> read: +1 bdd node count " << bdd_nodecount(b) << "\n";
+                }
+                throw ReadTransitionException(init, times2, plus1);
             }
 
             if (cmd.name == "reset") {
-                std::cerr << "    reset\n";
+                BlockTimer tim("reset");
                 assert(cmd.arguments.size() == 1u);
                 int val = boost::lexical_cast<int>(cmd.arguments[0]);
-                std::cerr << "      var " << var_name(act.operand_id, prefix) << "\n";
-                std::cerr << "      to " << val << "\n";
                 BinaryRelation ret = new BinRel(&voc, voc.Assign(var_name(act.operand_id, prefix),
                                                                  voc.Const(val)));
-                std::cerr << "    done\n";
                 return ret;
             }
 
             if (cmd.name == "incr") {
-                std::cerr << "    incr\n";
+                BlockTimer tim("incr");
                 return new BinRel(&voc, voc.Assign(var_name(act.operand_id, prefix),
                                                    voc.Plus(voc.From(var_name(act.operand_id, prefix)),
                                                             voc.Const(1))));
             }
 
             if (cmd.name == "testnectr2") {
-                std::cerr << "    testnectr2\n";
+                BlockTimer tim("testnectr2");
                 assert(cmd.arguments.size() == 1u);
                 assert(cmd.consequent);
                 assert(!cmd.alternative);
@@ -158,7 +192,13 @@ namespace cfglib {
                 int lhs_fdd = voc[lhs_name]->baseLhs;
                 int rhs_fdd = voc[rhs_name]->baseLhs;
                 bdd eq = fdd_equals(lhs_fdd, rhs_fdd);
-                return new BinRel(&voc, eq & ident);
+                binrel_t enforce_eq = new BinRel(&voc, eq & ident);
+                return enforce_eq;
+                    
+                bdd kill_counter = voc.Assign(rhs_name, voc.Const(0));
+                binrel_t kill_k = new BinRel(&voc, kill_counter);
+
+                return enforce_eq->Compose(kill_k.get_ptr());              
             }
 
             assert(false);
@@ -224,13 +264,13 @@ namespace cfglib {
                     State intermediate = getState(intermediate_name.str());
 
                     // source --> intermediate has identity weight, symbol '__startbits'
-                    rel = new BinRel(&voc, ident);
-                    ret.push_back(WeightedTransition(source, startbits, intermediate, rel));
+                    assert (e.init_weight.get_ptr());
+                    ret.push_back(WeightedTransition(source, startbits, intermediate, e.init_weight));
 
                     // intermediate --> dest has two transitions:
                     //     '__bit_0' has identity weight
                     //     '__bit_1' has +1 weight
-                    ret.push_back(WeightedTransition(intermediate, bit0, dest, rel));
+                    ret.push_back(WeightedTransition(intermediate, bit0, dest, new BinRel(&voc, ident)));
                     ret.push_back(WeightedTransition(intermediate, bit1, dest, e.bit1_weight));
 
                     // dest --> intermediate has epsilon and weight *2
