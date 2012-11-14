@@ -366,7 +366,7 @@ namespace cfglib {
             
 
             
-            wali::domains::binrel::ProgramBddContext new_voc;
+            wali::domains::binrel::ProgramBddContext const & new_voc;
             BinaryRelation havoc_current_state;
             std::string current_state;
 
@@ -385,7 +385,10 @@ namespace cfglib {
                 
             
             virtual sem_elem_t liftWeight(wali::wfa::WFA const & original_wfa,
-                                          wali::wfa::ITrans const * trans_in_original) const
+                                          wali::Key source,
+                                          wali::Key symbol,
+                                          wali::Key target,
+                                          sem_elem_t orig_weight) const
             {
                 //std::cout << "Lifting weight.\n";
                 using wali::domains::binrel::BddContext;
@@ -394,7 +397,7 @@ namespace cfglib {
 
                 // Zeroth step: havoc the current state
                 sem_elem_t orig_rel_then_havoc =
-                    trans_in_original->weight()->extend(havoc_current_state);
+                    orig_weight->extend(havoc_current_state);
 
                 // not really the *original* relation, but close enough
                 BinaryRelation orig_rel
@@ -437,15 +440,12 @@ namespace cfglib {
 
                 // Second step: create a BDD that enforces that the state
                 // changes in the right way.
-                wali::Key source = trans_in_original->from();
-                wali::Key dest = trans_in_original->to();
-
                 int source_fdd = safe_get(new_voc, current_state)->baseLhs;
                 int dest_fdd = safe_get(new_voc, current_state)->baseRhs;
 
                 SequentialFromZeroState
                     sfz_source = from_state(State(source)),
-                    sfz_dest = from_state(State(dest));
+                    sfz_dest = from_state(State(target));
 
                 //std::cout << "Creating state change BDD, setting\n"
                 //          << "    FDD " << source_fdd << " to " << source << " (really " << sfz_source.index << ")\n"
