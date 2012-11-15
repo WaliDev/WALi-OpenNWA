@@ -27,6 +27,7 @@
 
 #include <boost/shared_ptr.hpp> // It'd be nice to include the standard version but there are too many ways to get it.
 
+#include "wali/wfa/WeightMaker.hpp"
 #include "wali/Countable.hpp"
 #include "wali/ref_ptr.hpp"
 #include "wali/SemElemTensor.hpp"
@@ -328,6 +329,30 @@ namespace wali
           bdd rel;
           bool isTensored;
       };
+
+
+
+      /// Function object that, given two binary relations as weights,
+      /// returns the and/intersection of them.
+      ///
+      /// Useful for intersecting two WFAs.
+      struct AndWeightMaker
+        : wali::wfa::WeightMaker
+      {
+        virtual sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs ) {
+          wali::domains::binrel::BinRel
+            * l_rel = dynamic_cast<wali::domains::binrel::BinRel*>(lhs.get_ptr()),
+            * r_rel = dynamic_cast<wali::domains::binrel::BinRel*>(rhs.get_ptr());
+          assert(l_rel && r_rel);
+          assert(l_rel->getVocabulary() == r_rel->getVocabulary());
+
+          bdd both = bdd_and(l_rel->getBdd(), r_rel->getBdd());
+          
+          return new wali::domains::binrel::BinRel(&l_rel->getVocabulary(), both);
+        }
+      }; // WeightMaker
+        
+      
 
     } // namespace binrel
 
