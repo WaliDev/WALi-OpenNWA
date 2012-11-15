@@ -22,6 +22,43 @@
 #include "../cpp11.hpp"
 #include "base64.hpp"
 
+
+namespace wali {
+    namespace util {
+        /// Read all of the contents of 'file', returning the result.
+        ///
+        /// We have to use a FILE* because we will be interfacing with
+        /// popen() which gives us a FILE*.
+        static
+        std::vector<char>
+        read_all(FILE* file) {
+            std::vector<char> data;
+            const int block_size = 4096; // amt to read at once
+
+            while (true) {
+                assert(data.size() < 2000000000u);
+
+                // Make room for another block
+                data.resize(data.size() + block_size);
+                assert(data.size() - block_size >= 0);
+
+                // Read into that new space
+                int size_just_read = std::fread(&data[data.size()-block_size], 1u, block_size, file);
+                assert(size_just_read <= block_size);
+
+                if (size_just_read < block_size) {
+                    // We hit EOF (or an error...)
+                    int excess = block_size - size_just_read;
+                    data.resize(data.size() - excess);
+                    return data;
+                }
+            }
+        }
+    }
+}
+
+
+
 namespace wali {
     namespace xfa {
 
@@ -38,29 +75,9 @@ namespace wali {
         };
 
         
-        /// Another "type safety" thing to help confusion between states
-        /// numbered with Keys and states numbered starting from 0.
-        ///
-        /// (When determinizing an XFA, we introduce the 'current state'
-        /// variable to the XFA's domain. To reduce the size of the BDD
-        /// required to store that, we map all states in the XFA to the range
-        /// [0, num_states).
-        struct SequentialFromZeroState {
-            int index;
-            
-            explicit SequentialFromZeroState(int i)
-                : index(i)
-            {}
-        };
-        
         inline
         bool operator< (State left, State right) {
             return left.key < right.key;
-        }
-
-        inline
-        bool operator< (SequentialFromZeroState left, SequentialFromZeroState right) {
-            return left.index < right.index;
         }
 
 
@@ -210,35 +227,6 @@ namespace wali {
             }
 
 
-            // Read all of the contents of 'file', returning the result
-            static
-            std::vector<char>
-            read_all(FILE* file) {
-                std::vector<char> data;
-                const int block_size = 4096; // amt to read at once
-
-                while (true) {
-                    assert(data.size() < 2000000000u);
-
-                    // Make room for another block
-                    data.resize(data.size() + block_size);
-
-                    assert(data.size() - block_size >= 0);
-
-                    // Read into that new space
-                    int size_just_read = std::fread(&data[data.size()-block_size], 1u, block_size, file);
-                    assert(size_just_read <= block_size);
-
-                    if (size_just_read < block_size) {
-                        // We hit EOF (or an error...)
-                        int excess = block_size - size_just_read;
-                        data.resize(data.size() - excess);
-                        return data;
-                    }
-                }
-            }
-
-
             /// Pass an instance of this class to XFA::print_dot to get
             /// pretty diagrams.
             ///
@@ -280,12 +268,12 @@ namespace wali {
                         perror(NULL);
                     }
 
-                    std::vector<char> image_data = read_all(image_data_stream);
+                    std::vector<char> image_data = util::read_all(image_data_stream);
                     pclose(image_data_stream);
                     
                     std::vector<unsigned char> image_data_u(image_data.begin(), image_data.end());
 
-                    std::string image_data_base64 = base64_encode(&image_data_u[0], image_data_u.size());
+                    std::string image_data_base64 = util::base64_encode(&image_data_u[0], image_data_u.size());
 
                     os << ",onhover=\"<img src='data:image/png;base64," << image_data_base64 << "'>\"";
                 }
@@ -421,7 +409,21 @@ namespace wali {
         struct IntroduceStateToRelationWeightGen
             : wali::wfa::LiftCombineWeightGen
         {
-            // I like types.
+            /// Another "type safety" thing to help confusion between states
+            /// numbered with Keys and states numbered starting from 0.
+            struct SequentialFromZeroState {
+                int index;
+            
+                explicit SequentialFromZeroState(int i)
+                    : index(i)
+                {}
+            };
+        
+            inline
+            bool operator< (SequentialFromZeroState left, SequentialFromZeroState right) {
+                return left.index < right.index;
+            }
+
             typedef boost::bimap<State, SequentialFromZeroState> SfzMap;
 
             /// This map tracks the correspondence between the wali Key value
