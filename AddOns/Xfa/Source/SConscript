@@ -1,0 +1,31 @@
+# -*- python -*-
+
+import os,platform
+
+Import('WaliDir')
+Import('LibInstallDir')
+Import('ThirdPartyDir')
+Import('MkStatic')
+Import('BaseEnv')
+Import('Debug')
+
+if Debug:
+    print '\n+++ Entered "#/AddOns/Xfa/Source/SConscript"\n'
+
+
+sources = Split("""
+./wali/xfa/Xfa.cpp
+""")
+
+env = BaseEnv.Clone()
+
+built = []
+
+if MkStatic:
+  xfa = env.StaticLibrary('xfa', sources)
+  built = env.Install(LibInstallDir, xfa)
+else:
+  xfa = env.SharedLibrary('xfa', sources)
+  built = env.Install(LibInstallDir, xfa)
+
+Return('built')
