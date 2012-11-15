@@ -25,6 +25,10 @@
 namespace wali {
     namespace xfa {
 
+        /// Represent an XFA state.
+        ///
+        /// This is a thin wrapper around wali::Key -- made separate because
+        /// I like the extra type safety it provides.
         struct State {
             wali::Key key;
             
@@ -33,6 +37,14 @@ namespace wali {
             {}
         };
 
+        
+        /// Another "type safety" thing to help confusion between states
+        /// numbered with Keys and states numbered starting from 0.
+        ///
+        /// (When determinizing an XFA, we introduce the 'current state'
+        /// variable to the XFA's domain. To reduce the size of the BDD
+        /// required to store that, we map all states in the XFA to the range
+        /// [0, num_states).
         struct SequentialFromZeroState {
             int index;
             
@@ -51,6 +63,11 @@ namespace wali {
             return left.index < right.index;
         }
 
+
+        /// Represent a symbol on an XFA transition.
+        ///
+        /// This is a thin wrapper around wali::Key -- made separate because
+        /// I like the extra type safety it provides.
         struct Symbol {
             wali::Key key;
 
@@ -59,26 +76,51 @@ namespace wali {
             {}
         };
 
+
+        /// Wrapper around wali::getKey that returns a State.
+        ///
+        /// Again, type safety.
         inline
         State getState(std::string const & str) {
             return State(wali::getKey(str));
         }
 
+
+        /// Wrapper around wali::getKey that returns a Symbol.
+        ///
+        /// Again, type safety.
         inline
         Symbol getSymbol(std::string const & str) {
             return Symbol(wali::getKey(str));
         }
 
         
-
+        /// This is meant to abstract the representation of a relation so
+        /// it's not tied to BDDs. I'm not sure how successful it is.
         typedef wali::domains::binrel::binrel_t BinaryRelation;
 
         
         
-
+        /// An XFA is an "eXtended Finite Automaton".
+        ///
+        /// An XFA is a standard FA extended with an additional data domain
+        /// D. This essentially serves as an additional component of the
+        /// machine's state, which is then Q x D.
+        ///
+        /// The machine chooses a transition based on the current state and
+        /// the input symbol; that transition is associated with a (possibly
+        /// nondeterministic) state transformer which describes how the data
+        /// state may change change. The machine picks a choice and
+        /// continues.
+        ///
+        /// An XFA specification gives a set of starting configurations
+        /// (pairs from Q x D) and a set of accepting configurations, but
+        /// these are not well-modeled by this class at this point in
+        /// time. Possibly these should move into the WFA class.
+        ///
+        /// This does not inherit from WFA because I like type safety. :-)
         class Xfa
         {
-            
             wali::wfa::WFA wfa_;
 
             std::map<State, BinaryRelation> accepting_weights;            
@@ -197,10 +239,28 @@ namespace wali {
             }
 
 
+            /// Pass an instance of this class to XFA::print_dot to get
+            /// pretty diagrams.
+            ///
+            /// What it does is draw one of those dot-line diagrams for each
+            /// transition, which illustrates the data transformer for that
+            /// transition, and prints it out as an "onhover" attribute in
+            /// the dot output.
+            ///
+            /// Using my dot-svg Python script [1], you can convert the dot
+            /// output into an HTML file which, when you hover over a
+            /// transition in the diagram, will display the dot-line diagram.
+            ///
+            /// [1] https://github.com/EvanED/dot-svg
             struct HoverWeightPrinter : wali::wfa::DotAttributePrinter {
+                /// States do not get any extra attributes (though you could
+                /// imagine printing out something!)
                 virtual void print_extra_attributes(wali::wfa::State const * s, std::ostream & os) CPP11_OVERRIDE {
                 }
-                
+
+
+                ///
+                /// For transitions, output the "onhover" attribute.
                 virtual void print_extra_attributes( const wali::wfa::ITrans* t, std::ostream & os ) CPP11_OVERRIDE {
                     wali::sem_elem_t w_se = t->weight();
                     BinaryRelation w = dynamic_cast<wali::domains::binrel::BinRel*>(w_se.get_ptr());
@@ -232,6 +292,11 @@ namespace wali {
             };
 
 
+            /// Outputs a dot description of the XFA to the given file name,
+            /// including the onhover dot-line transformer diagrams.
+            ///
+            /// (The name of this function is outdated, from a time when it
+            /// would output the images in separate files.)
             void output_draw_package(std::string const & filename) const {
                 std::ofstream f(filename.c_str());
                 HoverWeightPrinter p;
@@ -240,17 +305,29 @@ namespace wali {
 
 
             /// Returns whether the given string is accepted with a non-zero
-            /// weight
+            /// weight.
+            ///
+            /// This currently ignores the accepting weights -- a state is
+            /// accepting or not.
             typedef std::vector<wali::Key> Word;            
             bool isAcceptedWithNonzeroWeight(Word const & word) const {
                 return wfa_.isAcceptedWithNonzeroWeight(word);
             }
 
 
+            /// Returns a WFA (unfortunately -- this should change TODO) that
+            /// is semi-state-deterministic.
+            ///
+            /// @see wali::wfa::WFA::semideterminize
             wali::wfa::WFA semideterminize() const {
                 return wfa_.semideterminize();
             }
 
+
+            /// Returns a WFA (unfortunately -- this should change TODO) that
+            /// is semi-state-deterministic.
+            ///
+            /// @see wali::wfa::WFA::semideterminize
             wali::wfa::WFA semideterminize(wali::wfa::DeterminizeWeightGen const & weight_gen) const {
                 return wfa_.semideterminize(weight_gen);
             }
@@ -258,6 +335,12 @@ namespace wali {
 
 
 
+        /// Converts an NWA (from OpenNWA) into an Xfa. The NWA should only
+        /// have internal transitions.
+        ///
+        /// All transitions in the resulting XFA have the identity relation
+        /// (semiring 1) and all states have the nullary relation (semiring
+        /// 0).
         inline
         Xfa from_internal_only_nwa(opennwa::Nwa const & nwa,
                                    BinaryRelation rel)
@@ -305,6 +388,10 @@ namespace wali {
         }
 
 
+        /// Function object that, given two binary relations as weights,
+        /// returns the and/intersection of them.
+        ///
+        /// Useful for intersection.
         struct AndWeightMaker
             : wali::wfa::WeightMaker
         {
@@ -323,10 +410,23 @@ namespace wali {
         }; // WeightMaker
         
 
+        /// Function object that will, given information about a transition
+        /// in an automaton, "lift" that transition so that the new
+        /// transformer also includes the current-state variable that
+        /// respects the given transition.
+        ///
+        /// The values used for the current-state variable in the relation
+        /// are [0,num-states) rather than the actual key values, which in
+        /// most cases will allow it to be represented in fewer bits.
         struct IntroduceStateToRelationWeightGen
             : wali::wfa::LiftCombineWeightGen
         {
+            // I like types.
             typedef boost::bimap<State, SequentialFromZeroState> SfzMap;
+
+            /// This map tracks the correspondence between the wali Key value
+            /// that's used for the state and the corresponding number in the
+            /// range [0,num-states).
             SfzMap sequential_state_map;
 
             void set_up_sequential_state_map(Xfa const & xfa)
@@ -342,6 +442,10 @@ namespace wali {
                 }
             }
 
+
+            /// Given a map 'm' and key 'k', return 'm[k]', except that it
+            /// works when 'm' is const and it will abort() when 'k' is not
+            /// present.
             template<typename Mapping>
             typename Mapping::mapped_type
             safe_get(Mapping const & m, typename Mapping::key_type const & k) const
@@ -368,6 +472,9 @@ namespace wali {
             
             wali::domains::binrel::ProgramBddContext const & new_voc;
             BinaryRelation havoc_current_state;
+
+            /// The name (according to the ProgramBddContext) of the
+            /// current-state variable for this XFA.
             std::string current_state;
 
             IntroduceStateToRelationWeightGen(wali::domains::binrel::ProgramBddContext const & v,
