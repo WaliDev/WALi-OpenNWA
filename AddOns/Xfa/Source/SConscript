@@ -14,13 +14,16 @@ if Debug:
 
 
 sources = Split("""
-./wali/xfa/Xfa.cpp
+    ./wali/xfa/Xfa.cpp
+    ./wali/util/read_file.cpp
+    ./wali/util/base64.cpp
 """)
 
 env = BaseEnv.Clone()
 
 env.Append(CPPPATH=["#/AddOns/Domains/Source",
-                    "#/AddOns/Domains/ThirdParty/include"])
+                    "#/AddOns/Domains/ThirdParty/include",
+                    "#/AddOns/Xfa/Source"])
 env.Append(LIBPATH=[LibInstallDir])
 env.Append(LIBS=["walidomains"])
 env.Append(CXXFLAGS=["-std=c++0x"])

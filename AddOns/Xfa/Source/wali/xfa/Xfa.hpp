@@ -11,6 +11,8 @@
 #include <wali/domains/binrel/BinRel.hpp>
 #include <wali/domains/binrel/ProgramBddContext.hpp>
 #include <wali/Key.hpp>
+#include <wali/util/read_file.hpp>
+#include <wali/util/base64.hpp>
 
 #include <opennwa/Nwa.hpp>
 
@@ -19,46 +21,8 @@
 #include <fstream>
 #include <cstdio>
 
-#include "base64.hpp"
-
 
 #define CPP11_OVERRIDE
-
-
-namespace wali {
-    namespace util {
-        /// Read all of the contents of 'file', returning the result.
-        ///
-        /// We have to use a FILE* because we will be interfacing with
-        /// popen() which gives us a FILE*.
-        static
-        std::vector<char>
-        read_all(FILE* file) {
-            std::vector<char> data;
-            const int block_size = 4096; // amt to read at once
-
-            while (true) {
-                assert(data.size() < 2000000000u);
-
-                // Make room for another block
-                data.resize(data.size() + block_size);
-                assert(static_cast<long>(data.size()) - block_size >= 0);
-
-                // Read into that new space
-                int size_just_read = std::fread(&data[data.size()-block_size], 1u, block_size, file);
-                assert(size_just_read <= block_size);
-
-                if (size_just_read < block_size) {
-                    // We hit EOF (or an error...)
-                    int excess = block_size - size_just_read;
-                    data.resize(data.size() - excess);
-                    return data;
-                }
-            }
-        }
-    }
-}
-
 
 
 namespace wali {
@@ -270,7 +234,7 @@ namespace wali {
                         perror(NULL);
                     }
 
-                    std::vector<char> image_data = util::read_all(image_data_stream);
+                    std::vector<char> image_data = util::read_file(image_data_stream);
                     pclose(image_data_stream);
                     
                     std::vector<unsigned char> image_data_u(image_data.begin(), image_data.end());
