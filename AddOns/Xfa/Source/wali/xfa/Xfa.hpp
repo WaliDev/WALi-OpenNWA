@@ -3,7 +3,7 @@
 
 #include <boost/bimap.hpp>
 
-#include "xfa-parser/ast.hh"
+#include "ast.hpp"
 
 #include <wali/wfa/WFA.hpp>
 #include <wali/wfa/TransFunctor.hpp>
@@ -19,8 +19,10 @@
 #include <fstream>
 #include <cstdio>
 
-#include "../cpp11.hpp"
 #include "base64.hpp"
+
+
+#define CPP11_OVERRIDE
 
 
 namespace wali {
@@ -40,7 +42,7 @@ namespace wali {
 
                 // Make room for another block
                 data.resize(data.size() + block_size);
-                assert(data.size() - block_size >= 0);
+                assert(static_cast<long>(data.size()) - block_size >= 0);
 
                 // Read into that new space
                 int size_just_read = std::fread(&data[data.size()-block_size], 1u, block_size, file);
@@ -417,12 +419,13 @@ namespace wali {
                 explicit SequentialFromZeroState(int i)
                     : index(i)
                 {}
+
+
+                bool operator< (SequentialFromZeroState right) const {
+                    return this->index < right.index;
+                }
             };
         
-            inline
-            bool operator< (SequentialFromZeroState left, SequentialFromZeroState right) {
-                return left.index < right.index;
-            }
 
             typedef boost::bimap<State, SequentialFromZeroState> SfzMap;
 

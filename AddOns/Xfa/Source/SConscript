@@ -19,6 +19,13 @@ sources = Split("""
 
 env = BaseEnv.Clone()
 
+env.Append(CPPPATH=["#/AddOns/Domains/Source",
+                    "#/AddOns/Domains/ThirdParty/include"])
+env.Append(LIBPATH=[LibInstallDir])
+env.Append(LIBS=["walidomains"])
+env.Append(CXXFLAGS=["-std=c++0x"])
+env['WARNING_FLAGS'] = []
+
 built = []
 
 if MkStatic:
