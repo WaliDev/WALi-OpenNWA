@@ -320,8 +320,9 @@ namespace wali {
         };
 
         
-        extern Xfa
-        from_parser_ast(xfa_parser::Xfa const & ast,
+        extern
+        Xfa
+        from_parser_ast(XfaAst const & ast,
                         wali::domains::binrel::ProgramBddContext & voc,
                         int fdd_size,
                         std::string const & domain_var_name_prefix);

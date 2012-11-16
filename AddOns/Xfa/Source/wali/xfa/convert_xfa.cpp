@@ -9,9 +9,6 @@
 #include <iostream>
 #include <vector>
 
-
-using namespace xfa_parser;
-
 namespace details
 {
 extern
@@ -61,7 +58,7 @@ namespace wali {
         }    
 
         void
-        register_vars(xfa_parser::Xfa const & ast,
+        register_vars(XfaAst const & ast,
                       wali::domains::binrel::ProgramBddContext & voc,
                       int fdd_size,
                       std::string const & prefix)
@@ -72,7 +69,7 @@ namespace wali {
             std::cerr << "Registering variables with size " << fdd_size << "\n";
             std::set<std::string> registered;
             for (auto ast_trans = ast.transitions.begin(); ast_trans != ast.transitions.end(); ++ast_trans) {
-                ActionList & acts = (*ast_trans)->actions;
+                ast::ActionList & acts = (*ast_trans)->actions;
                 for (auto act_it = acts.begin(); act_it != acts.end(); ++act_it) {
                     auto & act = **act_it;
                     if (act.action_type == "fire"
@@ -112,7 +109,7 @@ details::print_bdd_variable_order(std::cout);
         }
 
         BinaryRelation
-        get_relation(xfa_parser::Action const & act,
+        get_relation(ast::Action const & act,
                      wali::domains::binrel::ProgramBddContext & voc,
                      BinaryRelation zero,
                      bdd ident,
@@ -200,7 +197,7 @@ details::print_bdd_variable_order(std::cout);
         
 
         TransList
-        get_transitions(xfa_parser::Transition const & trans,
+        get_transitions(ast::Transition const & trans,
                         wali::domains::binrel::ProgramBddContext & voc,
                         BinaryRelation zero,
                         bdd ident,
@@ -229,7 +226,7 @@ details::print_bdd_variable_order(std::cout);
 
                 auto const & syms = trans.symbols;
                 for (auto sym = syms.begin(); sym != syms.end(); ++sym) {
-                    auto name = dynamic_cast<xfa_parser::Name*>(sym->get());
+                    auto name = dynamic_cast<ast::Name*>(sym->get());
                     assert(name);
                     if (name->name == "epsilon") {
                         ret.push_back(WeightedTransition(source, eps, dest, rel));
@@ -242,7 +239,7 @@ details::print_bdd_variable_order(std::cout);
             catch (ReadTransitionException & e) {
                 auto const & syms = trans.symbols;
                 for (auto sym = syms.begin(); sym != syms.end(); ++sym) {
-                    auto name = dynamic_cast<xfa_parser::Name*>(sym->get());
+                    auto name = dynamic_cast<ast::Name*>(sym->get());
                     assert(name->name != "epsilon");
 
                     // source ---> intermediate_name ---> dest
@@ -277,7 +274,7 @@ details::print_bdd_variable_order(std::cout);
 
 
         Xfa
-        from_parser_ast(xfa_parser::Xfa const & ast,
+        from_parser_ast(XfaAst const & ast,
                         wali::domains::binrel::ProgramBddContext & voc,
                         int fdd_size,
                         std::string const & domain_var_name_prefix)
@@ -289,7 +286,7 @@ details::print_bdd_variable_order(std::cout);
             bdd ident = voc.Assume(voc.True(), voc.True());
             Symbol eps(wali::WALI_EPSILON);
             
-            wali::xfa::Xfa ret;
+            Xfa ret;
 
             for (auto ast_state = ast.states.begin(); ast_state != ast.states.end(); ++ast_state) {
                 State state = getState((*ast_state)->name);

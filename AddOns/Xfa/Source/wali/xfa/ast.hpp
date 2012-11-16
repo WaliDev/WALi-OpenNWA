@@ -6,8 +6,11 @@
 #include <string>
 #include <cassert>
 
-namespace xfa_parser {
+namespace wali {
+namespace xfa {
+namespace ast {
 
+    
 struct Command;
 
 struct Action {
@@ -137,7 +140,7 @@ struct State
     {}
 };
 
-struct Xfa
+struct XfaAst
 {
     std::vector<std::shared_ptr<State> > states;
     std::vector<std::shared_ptr<Transition> > transitions;
@@ -152,8 +155,11 @@ struct Xfa
     }
 };
 
-extern Xfa * parse_stdin();
+    
+}
 
+using ast::XfaAst;
+}
 }
 
 #endif
