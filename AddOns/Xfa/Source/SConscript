@@ -15,6 +15,7 @@ if Debug:
 
 sources = Split("""
     ./wali/xfa/Xfa.cpp
+    ./wali/xfa/convert_xfa.cpp
     ./wali/util/read_file.cpp
     ./wali/util/base64.cpp
 """)

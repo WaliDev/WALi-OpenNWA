@@ -1,14 +1,14 @@
 #include "Xfa.hpp"
-#include "xfa-parser/ast.hh"
-#include "wali/domains/binrel/ProgramBddContext.hpp"
-#include "wali/domains/binrel/BinRel.hpp"
+#include "ast.hpp"
+
+#include <wali/domains/binrel/ProgramBddContext.hpp>
+#include <wali/domains/binrel/BinRel.hpp>
 
 #include <boost/lexical_cast.hpp>
 
 #include <iostream>
 #include <vector>
 
-#include "../timer.hpp"
 
 using namespace xfa_parser;
 
@@ -135,7 +135,6 @@ details::print_bdd_variable_order(std::cout);
                 BinaryRelation times2, plus1, init;
                 {
                     // x = 0
-                    BlockTimer tim("read: =0");
                     bdd b = voc.Assign(var_name(act.operand_id, prefix),
                                        voc.Const(0));
                     init = new BinRel(&voc, b);
@@ -143,7 +142,6 @@ details::print_bdd_variable_order(std::cout);
                 }
                 {
                     // x = x + x (where x is the __io_return being read into)
-                    BlockTimer tim("read: *2");
                     bdd b = voc.Assign(var_name(act.operand_id, prefix),
                                        voc.Plus(voc.From(var_name(act.operand_id, prefix)),
                                                 voc.From(var_name(act.operand_id, prefix))));
@@ -152,7 +150,6 @@ details::print_bdd_variable_order(std::cout);
                 }
                 {
                     // x = x + 1 (where x is the __io_return being read into)
-                    BlockTimer tim("read: +1");
                     bdd b = voc.Assign(var_name(act.operand_id, prefix),
                                        voc.Plus(voc.From(var_name(act.operand_id, prefix)),
                                                 voc.Const(1)));
@@ -163,7 +160,6 @@ details::print_bdd_variable_order(std::cout);
             }
 
             if (cmd.name == "reset") {
-                BlockTimer tim("reset");
                 assert(cmd.arguments.size() == 1u);
                 int val = boost::lexical_cast<int>(cmd.arguments[0]);
                 BinaryRelation ret = new BinRel(&voc, voc.Assign(var_name(act.operand_id, prefix),
@@ -172,14 +168,12 @@ details::print_bdd_variable_order(std::cout);
             }
 
             if (cmd.name == "incr") {
-                BlockTimer tim("incr");
                 return new BinRel(&voc, voc.Assign(var_name(act.operand_id, prefix),
                                                    voc.Plus(voc.From(var_name(act.operand_id, prefix)),
                                                             voc.Const(1))));
             }
 
             if (cmd.name == "testnectr2") {
-                BlockTimer tim("testnectr2");
                 assert(cmd.arguments.size() == 1u);
                 assert(cmd.consequent);
                 assert(!cmd.alternative);
