@@ -47,7 +47,7 @@ struct VarSet : public std::set<std::string>
     }
 
     static VarSet Diff( const VarSet& x, const VarSet& y,
-                     bool normalizing = false )
+                        bool UNUSED_PARAMETER(normalizing) = false )
     {      
         VarSet ret;
         std::set_difference(x.begin(), x.end(),
@@ -193,10 +193,8 @@ namespace wali {
             if (cmd.name == "reset") {
                 VarSet killed;
                 assert(cmd.arguments.size() == 1u);
-                int val = boost::lexical_cast<int>(cmd.arguments[0]);
                 killed.insert(var_name(act.operand_id, prefix));
                 sem_elem_t kill_weight = makeGKW(killed, empty);
-
                 return kill_weight;
             }
 
@@ -376,7 +374,7 @@ namespace wali {
 
             
         bool
-        always_include_trans(ITrans const * t)
+        always_include_trans(ITrans const * UNUSED_PARAMETER(t))
         {
             return true;
         }

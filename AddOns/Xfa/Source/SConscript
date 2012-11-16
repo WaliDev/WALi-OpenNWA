@@ -29,7 +29,7 @@ env.Append(CPPPATH=["#/AddOns/Domains/Source",
 env.Append(LIBPATH=[LibInstallDir])
 env.Append(LIBS=["walidomains"])
 env.Append(CXXFLAGS=["-std=c++0x"])
-env['WARNING_FLAGS'] = []
+env["WARNING_FLAGS"] = env["WARNING_FLAGS"] + " -Wno-overloaded-virtual"
 
 built = []
 

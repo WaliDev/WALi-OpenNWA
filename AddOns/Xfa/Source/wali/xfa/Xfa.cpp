@@ -101,9 +101,9 @@ namespace wali {
 
 
         sem_elem_t
-        IntroduceStateToRelationWeightGen::liftWeight(wali::wfa::WFA const & original_wfa,
+        IntroduceStateToRelationWeightGen::liftWeight(wali::wfa::WFA const & UNUSED_PARAMETER(original_wfa),
                                                       wali::Key source,
-                                                      wali::Key symbol,
+                                                      wali::Key UNUSED_PARAMETER(symbol),
                                                       wali::Key target,
                                                       sem_elem_t orig_weight) const
         {
@@ -149,7 +149,7 @@ namespace wali {
             fdd_setpairs(rename_pairs,
                          &orig_names[0],
                          &new_names[0],
-                         orig_names.size());
+                         static_cast<int>(orig_names.size()));
 
             bdd renamed_bdd = bdd_replace(orig_bdd, rename_pairs);
 

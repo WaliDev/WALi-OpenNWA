@@ -1,6 +1,8 @@
 #ifndef INCLUDE_WALI_XFA_XFA_HPP
 #define INCLUDE_WALI_XFA_XFA_HPP
 
+#include <wali/Common.hpp>
+
 #include <boost/bimap.hpp>
 
 #include "ast.hpp"
@@ -346,8 +348,8 @@ namespace wali {
             /// imagine printing out something!)
             virtual
             void
-            print_extra_attributes(wali::wfa::State const * s,
-                                   std::ostream & os
+            print_extra_attributes(wali::wfa::State const * UNUSED_PARAMETER(s),
+                                   std::ostream & UNUSED_PARAMETER(os)
                                    ) CPP11_OVERRIDE
             {}
 

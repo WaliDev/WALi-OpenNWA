@@ -48,7 +48,7 @@ namespace wali {
         }
 
 
-        std::string base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len) {
+        std::string base64_encode(unsigned char const* bytes_to_encode, size_t in_len) {
             std::string ret;
             int i = 0;
             int j = 0;
@@ -134,3 +134,4 @@ namespace wali {
 
     }
 }
+
