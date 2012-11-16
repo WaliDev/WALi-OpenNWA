@@ -1,5 +1,5 @@
-#include "Xfa.hpp"
-#include "xfa-parser/ast.hh"
+#include "wali/xfa/Xfa.hpp"
+#include "wali/xfa/ast.hpp"
 #include "wali/domains/binrel/ProgramBddContext.hpp"
 #include "wali/domains/binrel/BinRel.hpp"
 #include "wali/wpds/WPDS.hpp"
@@ -9,11 +9,7 @@
 #include <iostream>
 #include <vector>
 
-#include "../timer.hpp"
-
-#include "GenKillXformerTemplate.hpp"
-
-using namespace xfa_parser;
+#include "wali/util/GenKillXformerTemplate.hpp"
 
 namespace details
 {
@@ -102,8 +98,11 @@ makeGKW(VarSet const & kill, VarSet const & gen)
 
 
 
-namespace wali2 {
+namespace wali {
     namespace xfa {
+
+        namespace details {
+        
         std::string
         var_name(int id,
                  std::string const & domain_var_name_prefix)
@@ -114,13 +113,13 @@ namespace wali2 {
 
 
         void
-        register_vars(xfa_parser::Xfa const & ast,
+        register_vars(ast::XfaAst const & ast,
                       std::string const & prefix)
         {
             VarSet & all_vars = VarSet::UniverseSet();
             
             for (auto ast_trans = ast.transitions.begin(); ast_trans != ast.transitions.end(); ++ast_trans) {
-                ActionList & acts = (*ast_trans)->actions;
+                ast::ActionList & acts = (*ast_trans)->actions;
                 for (auto act_it = acts.begin(); act_it != acts.end(); ++act_it) {
                     auto & act = **act_it;
                     if (act.action_type == "fire"
@@ -165,7 +164,7 @@ namespace wali2 {
         
 
         sem_elem_t
-        get_relation(xfa_parser::Action const & act,
+        get_relation(ast::Action const & act,
                      std::string const & prefix)
         {
             VarSet empty;
@@ -209,7 +208,6 @@ namespace wali2 {
             }
 
             if (cmd.name == "testnectr2") {
-                BlockTimer tim("testnectr2");
                 assert(cmd.arguments.size() == 1u);
                 assert(cmd.consequent);
                 assert(!cmd.alternative);
@@ -232,7 +230,7 @@ namespace wali2 {
         
 
         TransList
-        get_transitions(xfa_parser::Transition const & trans,
+        get_transitions(ast::Transition const & trans,
                         std::string const & prefix)
         {
             Key source = getKey(trans.source);
@@ -256,7 +254,7 @@ namespace wali2 {
 
                 auto const & syms = trans.symbols;
                 for (auto sym = syms.begin(); sym != syms.end(); ++sym) {
-                    auto name = dynamic_cast<xfa_parser::Name*>(sym->get());
+                    auto name = dynamic_cast<ast::Name*>(sym->get());
                     assert(name);
                     if (name->name == "epsilon") {
                         ret.push_back(WeightedTransition(source, eps, dest, rel));
@@ -269,7 +267,7 @@ namespace wali2 {
             catch (ReadTransitionException & e) {
                 auto const & syms = trans.symbols;
                 for (auto sym = syms.begin(); sym != syms.end(); ++sym) {
-                    auto name = dynamic_cast<xfa_parser::Name*>(sym->get());
+                    auto name = dynamic_cast<ast::Name*>(sym->get());
                     assert(name->name != "epsilon");
 
                     // source ---> intermediate_name ---> dest
@@ -303,7 +301,7 @@ namespace wali2 {
 
 
         wali::wfa::WFA
-        create_live_var_wfa(xfa_parser::Xfa const & ast,
+        create_live_var_wfa(ast::XfaAst const & ast,
                             std::string const & domain_var_name_prefix)
         {
             register_vars(ast, domain_var_name_prefix);
@@ -375,10 +373,17 @@ namespace wali2 {
                 }
             }
         };
+
+            
+        bool
+        always_include_trans(ITrans const * t)
+        {
+            return true;
+        }
         
 
         void
-        kill_variables(xfa_parser::Xfa const & ast,
+        kill_variables(ast::XfaAst const & ast,
                        wali::xfa::Xfa & xfa,
                        ProgramBddContext & context,
                        std::string const & domain_var_name_prefix)
@@ -395,7 +400,7 @@ namespace wali2 {
                            wfa_genkill.getSomeWeight()->one());
 
             WPDS wpds;
-            wfa_genkill.toWpds(p_state, &wpds, [](ITrans const * t) { (void)t; return true; });
+            wfa_genkill.toWpds(p_state, &wpds, always_include_trans);
             WFA result = wpds.prestar(query);
 
             //
@@ -407,6 +412,7 @@ namespace wali2 {
             xfa.for_each(killer);
         }
 
+        }
         
     }
 }
