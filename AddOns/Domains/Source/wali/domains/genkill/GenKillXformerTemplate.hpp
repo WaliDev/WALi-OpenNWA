@@ -6,8 +6,7 @@
 #include <iostream>
 #include <climits>
 #include <cassert>
-//#include "common.h"
-#include "tsl/analyzer/TSLFiles/COMMON/Utilities/TslCommon.h"
+#include "tsl/uwr/assert/uw_assert.hpp"
 #include "gtr/src/ref_ptr/ref_ptr.hpp"
 
 #include "wali/SemElem.hpp"
@@ -120,7 +119,7 @@ public: // methods
     if(this == MkOne().get_ptr()) 
       return true;
 
-    TslCommon::shouldNeverHappen( Set::Eq(kill, Set::EmptySet()) 
+    UWAssert::shouldNeverHappen( Set::Eq(kill, Set::EmptySet()) 
                                     && Set::Eq(gen, Set::EmptySet()) );
 
     return false;
@@ -154,7 +153,7 @@ public: // methods
     if(this == MkBottom().get_ptr()) 
       return true;
 
-    TslCommon::shouldNeverHappen( Set::Eq(kill, Set::EmptySet()) 
+    UWAssert::shouldNeverHappen( Set::Eq(kill, Set::EmptySet()) 
                                     && Set::Eq(gen, Set::UniverseSet()));
 
     return false;
@@ -320,17 +319,17 @@ public: // methods
 
   Set apply( const Set & input ) const
   {
-    TslCommon::shouldNeverHappen( this->IsZero() );
+    UWAssert::shouldNeverHappen( this->IsZero() );
     return Set::Union( Set::Diff(input,kill), gen );
   }
 
   const Set& getKill() const {
-    TslCommon::shouldNeverHappen( this->IsZero() );
+    UWAssert::shouldNeverHappen( this->IsZero() );
     return kill;
   }
 
   const Set& getGen() const {
-    TslCommon::shouldNeverHappen( this->IsZero() );
+    UWAssert::shouldNeverHappen( this->IsZero() );
     return gen;
   }
 
