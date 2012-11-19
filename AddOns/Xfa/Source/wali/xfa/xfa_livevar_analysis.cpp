@@ -9,7 +9,7 @@
 #include <iostream>
 #include <vector>
 
-#include "wali/util/GenKillXformerTemplate.hpp"
+#include "wali/domains/genkill/GenKillXformerTemplate.hpp"
 
 namespace details
 {
