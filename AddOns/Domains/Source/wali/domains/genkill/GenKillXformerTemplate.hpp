@@ -6,8 +6,7 @@
 #include <iostream>
 #include <climits>
 #include <cassert>
-#include "tsl/uwr/assert/uw_assert.hpp"
-#include "gtr/src/ref_ptr/ref_ptr.hpp"
+#include "wali/ref_ptr.hpp"
 
 #include "wali/SemElem.hpp"
 
@@ -133,8 +132,8 @@ public: // methods
     if(this == MkOne().get_ptr()) 
       return true;
 
-    UWAssert::shouldNeverHappen( Set::Eq(kill, Set::EmptySet()) &&
-                                 Set::Eq(gen, Set::EmptySet()) );
+    assert(!Set::Eq(kill, Set::EmptySet())
+           || !Set::Eq(gen, Set::EmptySet()));
 
     return false;
   }
@@ -168,8 +167,8 @@ public: // methods
     if(this == MkBottom().get_ptr()) 
       return true;
 
-    UWAssert::shouldNeverHappen( Set::Eq(kill, Set::EmptySet()) 
-                                    && Set::Eq(gen, Set::UniverseSet()));
+    assert(!Set::Eq(kill, Set::EmptySet()) 
+           || !Set::Eq(gen, Set::UniverseSet()));
 
     return false;
   }
@@ -340,17 +339,17 @@ public: // methods
 
   Set apply( const Set & input ) const
   {
-    UWAssert::shouldNeverHappen( this->IsZero() );
+    assert(!this->IsZero());
     return Set::Union( Set::Diff(input,kill), gen );
   }
 
   const Set& getKill() const {
-    UWAssert::shouldNeverHappen( this->IsZero() );
+    assert(!this->IsZero());
     return kill;
   }
 
   const Set& getGen() const {
-    UWAssert::shouldNeverHappen( this->IsZero() );
+    assert(!this->IsZero());
     return gen;
   }
 
