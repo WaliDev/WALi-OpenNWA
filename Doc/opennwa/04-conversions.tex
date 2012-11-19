@@ -319,7 +319,7 @@ be overridden:
 \begin{align*}
 \text{where }
 w_0 & = \begin{cases}
-        \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{\wild} \\
+        \mathtt{wg.getWildWeight}(q_x,CI_{q_x},q_r,CI_{q_r}), & \text{if } \sigma = \text{\wild} \\
         \mathtt{wg.getWeight}(q_x,CI_{q_x},\sigma,\mathtt{EXIT\_TO\_RET},q_r,CI_{q_r}), & \text{otherwise}
       \end{cases}  \\
 w_1 &= \begin{cases}
@@ -327,7 +327,7 @@ w_1 &= \begin{cases}
          \mathtt{wg.getWeight}(q,CI_q,\sigma,\mathtt{INTRA},q',CI_{q'}), & \text{otherwise}
       \end{cases} \\
 w_2 &= \begin{cases}
-         \mathtt{wg.getWildWeight}(q,CI_q,q',CI_{q'}), & \text{if } \sigma = \text{\wild} \\
+         \mathtt{wg.getWildWeight}(q_c,CI_{q_c},q_e,CI_{q_e}), & \text{if } \sigma = \text{\wild} \\
          \mathtt{wg.getWeight}(q_c,CI_{q_c},\sigma,\mathtt{CALL\_TO\_ENTRY},q_e,CI_{q_e}), & \text{otherwise}
       \end{cases} \\
 w_3 &= \mathtt{wg.getOne}() 
