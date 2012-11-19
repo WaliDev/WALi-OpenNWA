@@ -6,7 +6,6 @@
 #include <iostream>
 #include <climits>
 #include <cassert>
-#include "wali/ref_ptr.hpp"
 
 #include "wali/SemElem.hpp"
 
@@ -393,5 +392,11 @@ operator<< (std::ostream& out, const GenKillTransformer_T<Set> & t)
   t.print(out);
   return out;
 }
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
 
 #endif
