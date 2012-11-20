@@ -100,6 +100,28 @@ namespace wali {
             }
 
 
+            TEST(wali$domains$$GenKillTransformer, makeOneGivesOne)
+            {
+                ref_ptr<Transformer> trans = Transformer::makeOne();
+
+                // Make sure it's zero, in a couple different ways
+                EXPECT_TRUE(trans->IsOne());
+                EXPECT_TRUE(trans->one()->equal(trans));
+                EXPECT_EQ(0u, trans->getKill().size());
+                EXPECT_EQ(0u, trans->getGen().size());
+            }
+
+
+            TEST(wali$domains$$GenKillTransformer, zeroAndOneAreDifferent)
+            {
+                ref_ptr<Transformer>
+                    one = Transformer::makeOne(),
+                    zero = Transformer::makeZero();
+
+                EXPECT_TRUE(!one->equal(zero));
+            }
+            
+
             TEST(wali$domains$$GenKillTransformer, genAndKillSetsAreStored)
             {
                 SetFixture sets;
@@ -192,6 +214,44 @@ namespace wali {
             }
 
 
+            TEST(wali$domains$$GenKillTransformer, equalSetsGiveEqualTransformers)
+            {
+                SetFixture sets1, sets2;
+
+                ref_ptr<Transformer>
+                    trans1 = Transformer::make(sets1.evens, sets1.odds),
+                    trans2 = Transformer::make(sets2.evens, sets2.odds);
+
+                // The following test is "too strict". It would be "fine" if
+                // Transformer cached results and returned the same
+                // representative. However, this is... unlikely, and I'm
+                // putting it here because if it fails, there should be many
+                // other tests that someone will want to write.
+                EXPECT_TRUE(trans1 != trans2);
+
+                // There are multiple versions of the equality function:
+                EXPECT_TRUE(trans1->equal(trans2));
+                EXPECT_TRUE(trans1->equal(trans2.get_ptr()));
+                EXPECT_TRUE(trans1->isEqual(trans2.get_ptr()));
+            }
+
+
+            TEST(wali$domains$$GenKillTransformer, unequalSetsGiveEqualTransformers)
+            {
+                SetFixture sets1, sets2;
+
+                ref_ptr<Transformer>
+                    trans1 = Transformer::make(sets1.evens, sets1.odds),
+                    trans2 = Transformer::make(sets2.odds, sets2.evens);
+
+                // There are multiple versions of the equality function:
+                EXPECT_TRUE(trans1 != trans2);
+                EXPECT_FALSE(trans1->equal(trans2));
+                EXPECT_FALSE(trans1->equal(trans2.get_ptr()));
+                EXPECT_FALSE(trans1->isEqual(trans2.get_ptr()));
+            }
+
+            
             // If we have (x * y), there are nine possibilities for what
             // happens. Each cell in the following table shows the net effect
             // for what happens if x and y do not do anything (-) with an
