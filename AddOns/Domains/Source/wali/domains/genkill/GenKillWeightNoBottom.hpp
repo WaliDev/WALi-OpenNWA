@@ -75,8 +75,8 @@ namespace wali {
       {
       public: // methods
 
-        wali::sem_elem_t one()    const { return MkOne();    }
-        wali::sem_elem_t zero()   const { return MkZero();   }
+        wali::sem_elem_t one()    const { return makeOne();    }
+        wali::sem_elem_t zero()   const { return makeZero();   }
 
 
         static
@@ -89,11 +89,25 @@ namespace wali {
         }
 
 
+        /// A client uses 'make()' to create a GenKillWeightNoBottom instead
+        /// of calling the constructor directly.
+        ///
+        /// 'make()' normalizes the kill and gen sets before storing them so
+        /// that (kill intersect gen == emptyset). It also ensures that there
+        /// is a unique representitive of semiring 1 (gen = kill = empty).
         static
         wali::ref_ptr<GenKillWeightNoBottom>
         make(Set const & kill, Set const & gen)
         {
-          return downcast(makeGenKillWeightNoBottom(kill, gen));
+          Set k_normalized = Set::Diff(kill, gen, true);
+          if (Set::Eq(k_normalized, Set::EmptySet())
+              && Set::Eq(gen, Set::EmptySet()))
+          {
+            return makeOne();
+          }
+          else {
+            return new GenKillWeightNoBottom(k_normalized, gen);
+          }
         }
 
   
@@ -101,7 +115,11 @@ namespace wali {
         wali::ref_ptr<GenKillWeightNoBottom>
         makeZero()
         {
-          return downcast(MkZero());
+          // Uses a method-static variable to avoid
+          // problems with static-initialization order
+          static GenKillWeightNoBottom* the_zero =
+            new GenKillWeightNoBottom(1);
+          return the_zero;
         }
   
 
@@ -109,50 +127,21 @@ namespace wali {
         wali::ref_ptr<GenKillWeightNoBottom>
         makeOne()
         {
-          return downcast(MkOne());
-        }
-  
-        
-        // A client uses makeGenKillWeightNoBottom to create a
-        // GenKillWeightNoBottom instead of calling the constructor directly;
-        //
-        // makeGenKillWeightNoBottom normalizes the stored kill and gen sets
-        // so that kill intersect gen == emptyset.
-        //
-        // makeGenKillWeightNoBottom also maintains unique representatives for
-        // semiring one.
-        //
-        static wali::sem_elem_t
-        makeGenKillWeightNoBottom(const Set& k, const Set& g )
-        {
-          Set k_normalized = Set::Diff(k, g, true);
-          if (Set::Eq(k_normalized, Set::EmptySet()) && 
-                   Set::Eq(g, Set::EmptySet()))
-          {
-            return MkOne();
-          }
-          else {
-            return new GenKillWeightNoBottom(k_normalized, g);
-          }
-        }
-
-        ~GenKillWeightNoBottom() {}
-
-        //-------------------------------------------------
-        // Semiring methods
-        //-------------------------------------------------
-        static wali::sem_elem_t MkOne()
-        {
           // Uses a method-static variable to avoid problems with
           // static-initialization order
-          static GenKillWeightNoBottom* ONE =
+          static GenKillWeightNoBottom* the_one =
             new GenKillWeightNoBottom(Set::EmptySet(), Set::EmptySet(), 1);
-          return ONE;
+          return the_one;
         }
+  
 
+        virtual
+        ~GenKillWeightNoBottom() {}
+
+        
         bool IsOne() const
         {
-          if(this == MkOne().get_ptr()) 
+          if(this == makeOne().get_ptr()) 
             return true;
 
           assert(!Set::Eq(kill, Set::EmptySet())
@@ -164,17 +153,12 @@ namespace wali {
         // Zero is a special value that doesn't map to any gen/kill pair, so
         // all we really want out of this is a unique representative.  The
         // gen/kill sets with which it is initialized are arbitrary.
-        static wali::sem_elem_t MkZero()
-        {
-          // Uses a method-static variable to avoid
-          // problems with static-initialization order
-          static GenKillWeightNoBottom* ZERO =
-            new GenKillWeightNoBottom(1);
-          return ZERO;
-        }
-
         bool IsZero() const { return is_zero; }
 
+
+        //-------------------------------------------------
+        // Semiring methods
+        //-------------------------------------------------
 
         //
         // extend
@@ -206,7 +190,7 @@ namespace wali {
           Set temp_k( Set::Union( kill, y->kill ) );
           Set temp_g( Set::Union( Set::Diff(gen,y->kill), y->gen) );
 
-          return makeGenKillWeightNoBottom( temp_k,temp_g );
+          return make( temp_k,temp_g );
         }
 
         // FIXME: const: wali::SemElem::combine is not declared as const
@@ -226,7 +210,7 @@ namespace wali {
           Set temp_k( Set::Intersect( kill, y->kill ) );
           Set temp_g( Set::Union( gen, y->gen ) );
 
-          return makeGenKillWeightNoBottom( temp_k,temp_g );
+          return make( temp_k,temp_g );
         }
 
         wali::sem_elem_t
@@ -263,7 +247,7 @@ namespace wali {
           Set temp_k( Set::Diff(Set::UniverseSet(),Set::Diff(y->kill,kill)) ); 
           Set temp_g( Set::Diff(gen,y->gen) ); 
 
-          return makeGenKillWeightNoBottom(temp_k, temp_g);
+          return make(temp_k, temp_g);
         }
 
         // Zero is a special representative that must be compared by address
