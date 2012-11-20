@@ -34,7 +34,6 @@ namespace wali {
 
            static Set Intersect(Set const & x, Set const & y);
 
-           // Optional (but recommended) constant generator
            static Set const & EmptySet();
 
            std::ostream& print(std::ostream& o);
@@ -71,7 +70,6 @@ namespace wali {
 
         wali::sem_elem_t one()    const { return MkOne();    }
         wali::sem_elem_t zero()   const { return MkZero();   }
-        wali::sem_elem_t bottom() const { return MkBottom(); }
 
 
         static
@@ -107,18 +105,13 @@ namespace wali {
         // so that kill intersect gen == emptyset.
         //
         // makeGenKillSemiring also maintains unique representatives for
-        // the special semiring values one, and bottom.
+        // semiring one.
         //
         static wali::sem_elem_t
         makeGenKillSemiring(const Set& k, const Set& g )
         {
           Set k_normalized = Set::Diff(k, g, true);
-          if (Set::Eq(k_normalized, Set::EmptySet())&& 
-              Set::Eq(g, Set::UniverseSet()))
-          {
-            return MkBottom();
-          }
-          else if (Set::Eq(k_normalized, Set::EmptySet()) && 
+          if (Set::Eq(k_normalized, Set::EmptySet()) && 
                    Set::Eq(g, Set::EmptySet()))
           {
             return MkOne();
@@ -167,27 +160,6 @@ namespace wali {
 
         bool IsZero() const { return is_zero; }
 
-        static wali::sem_elem_t
-        MkBottom()
-        {
-          // Uses a method-static variable to avoid problems with
-          // static-initialization order
-          static GenKillSemiring* BOTTOM = 
-            new GenKillSemiring(Set::EmptySet(), Set::UniverseSet(), 1);
-          return BOTTOM;
-        }
-
-        bool IsBottom() const
-        {
-          if(this == MkBottom().get_ptr()) 
-            return true;
-
-          assert(!Set::Eq(kill, Set::EmptySet()) 
-                 || !Set::Eq(gen, Set::UniverseSet()));
-
-          return false;
-        }
-
 
         //
         // extend
@@ -214,11 +186,6 @@ namespace wali {
             return this; // this extend one = this
           }
 
-          if( _y->equal(bottom()) )
-          {
-            return bottom();
-          }
-
           const GenKillSemiring* y = dynamic_cast<GenKillSemiring*>(_y);
 
           Set temp_k( Set::Union( kill, y->kill ) );
@@ -238,11 +205,6 @@ namespace wali {
           if( _y->equal(zero()) ) {
             return this; // this combine zero = this
           }
-
-          // Handle special case for either argument being bottom()
-          if( this->equal(bottom()) || _y->equal(bottom()) ) {
-            return bottom(); // bottom combine _y = bottom;
-          }                  // this combine bottom = bottom 
 
           const GenKillSemiring* y = dynamic_cast<GenKillSemiring*>(_y);
 
@@ -280,11 +242,6 @@ namespace wali {
             return this; // this - zero = this
           }
 
-          // Handle special case for second argument being bottom()
-          if( _y->equal(bottom()) ) {
-            return zero(); // this - bottom = zero
-          }
-
           const GenKillSemiring* y = dynamic_cast<GenKillSemiring*>(_y);
           // Both *this and *y are proper (non-zero) values
 
@@ -299,15 +256,14 @@ namespace wali {
         bool isEqual(const GenKillSemiring* y) const
         {
           // Check for identical arguments: could be two special values
-          // (i.e., two zeros, two ones, or two bottoms) or two identical
-          // instances of a non-special semiring value.
+          // (i.e., two zeros or two ones) or two identical instances of a
+          // non-special semiring value.
           if(this == y) return true;
 
           // Return false if any argument is zero.  Zero has a unique
           // representative, and thus the return value could only be true via
           // the preceding check for identicalness.  The same approach could
-          // be taken for one and bottom, but the extra tests are not worth
-          // it.
+          // be taken for one, but the extra tests are not worth it.
           if(this->IsZero() || y->IsZero())
             return false;
 
@@ -333,8 +289,6 @@ namespace wali {
             return o << "<zero>";
           if(this->IsOne())
             return o << "<one>";
-          if(this->IsBottom())
-            return o << "<bottom>";
 
           o << "<\\S.(S - {";
           kill.print(o);
@@ -372,7 +326,6 @@ namespace wali {
         {
           o << "ONE\t=\t";    one()->print(o);  o << std::endl;
           o << "ZERO\t=\t";   zero()->print(o); o << std::endl;
-          o << "BOTTOM\t=\t"; bottom()->print(o); o << std::endl;
           return o;
         }
 

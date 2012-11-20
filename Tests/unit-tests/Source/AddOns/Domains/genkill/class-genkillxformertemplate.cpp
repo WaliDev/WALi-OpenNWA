@@ -81,7 +81,6 @@ namespace wali {
 
                 // Make sure it's not another special value
                 EXPECT_FALSE(trans->IsZero());
-                EXPECT_FALSE(trans->IsBottom());
             }
 
 
