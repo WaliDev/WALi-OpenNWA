@@ -14,22 +14,22 @@ namespace wali {
     namespace genkill {
 
       /*!
-       * @class GenKillTransformer_T
+       * @class GenKillWeight
        *
-       * GenKillTransformer_T is a templated class that implements the
+       * GenKillWeight is a templated class that implements the
        * semiring needed for a gen-kill dataflow-analysis problem. The
        * template parameter must implement the "Set" interface defined below
        *
 
        class Set {
          public:
-           // not needed by GenKillTransformer_T but a good idea
+           // not needed by GenKillWeight but a good idea
            Set();
 
-           // Only Set constructor GenKillTransformer_T invokes
+           // Only Set constructor GenKillWeight invokes
            Set( const Set& );
 
-           // not needed by GenKillTransformer_T but a good idea
+           // not needed by GenKillWeight but a good idea
            Set& operator=( const Set& );
 
            static bool Eq( const Set& x, const Set& y );
@@ -76,7 +76,7 @@ namespace wali {
 
       */
       template< typename Set >
-      class GenKillTransformer_T : public wali::SemElem
+      class GenKillWeight : public wali::SemElem
       {
       public: // methods
 
@@ -86,42 +86,42 @@ namespace wali {
 
 
         static
-        wali::ref_ptr<GenKillTransformer_T>
+        wali::ref_ptr<GenKillWeight>
         downcast(wali::sem_elem_t se)
         {
-          wali::ref_ptr<GenKillTransformer_T> down
-            = dynamic_cast<GenKillTransformer_T *>(se.get_ptr());
+          wali::ref_ptr<GenKillWeight> down
+            = dynamic_cast<GenKillWeight *>(se.get_ptr());
           return down;
         }
 
 
         static
-        wali::ref_ptr<GenKillTransformer_T>
+        wali::ref_ptr<GenKillWeight>
         make(Set const & kill, Set const & gen)
         {
-          return downcast(makeGenKillTransformer_T(kill, gen));
+          return downcast(makeGenKillWeight(kill, gen));
         }
 
   
         static
-        wali::ref_ptr<GenKillTransformer_T>
+        wali::ref_ptr<GenKillWeight>
         makeZero()
         {
           return downcast(MkZero());
         }
   
 
-        // A client uses makeGenKillTransformer_T to create a
-        // GenKillTransformer_T instead of calling the constructor directly;
+        // A client uses makeGenKillWeight to create a
+        // GenKillWeight instead of calling the constructor directly;
         //
-        // makeGenKillTransformer_T normalizes the stored kill and gen sets
+        // makeGenKillWeight normalizes the stored kill and gen sets
         // so that kill intersect gen == emptyset.
         //
-        // makeGenKillTransformer_T also maintains unique representatives for
+        // makeGenKillWeight also maintains unique representatives for
         // the special semiring values one, and bottom.
         //
         static wali::sem_elem_t
-        makeGenKillTransformer_T(const Set& k, const Set& g )
+        makeGenKillWeight(const Set& k, const Set& g )
         {
           Set k_normalized = Set::Diff(k, g, true);
           if (Set::Eq(k_normalized, Set::EmptySet())&& 
@@ -135,11 +135,11 @@ namespace wali {
             return MkOne();
           }
           else {
-            return new GenKillTransformer_T(k_normalized, g);
+            return new GenKillWeight(k_normalized, g);
           }
         }
 
-        ~GenKillTransformer_T() {}
+        ~GenKillWeight() {}
 
         //-------------------------------------------------
         // Semiring methods
@@ -148,8 +148,8 @@ namespace wali {
         {
           // Uses a method-static variable to avoid problems with
           // static-initialization order
-          static GenKillTransformer_T* ONE =
-            new GenKillTransformer_T(Set::EmptySet(), Set::EmptySet(), 1);
+          static GenKillWeight* ONE =
+            new GenKillWeight(Set::EmptySet(), Set::EmptySet(), 1);
           return ONE;
         }
 
@@ -171,8 +171,8 @@ namespace wali {
         {
           // Uses a method-static variable to avoid
           // problems with static-initialization order
-          static GenKillTransformer_T* ZERO =
-            new GenKillTransformer_T(1);
+          static GenKillWeight* ZERO =
+            new GenKillWeight(1);
           return ZERO;
         }
 
@@ -183,8 +183,8 @@ namespace wali {
         {
           // Uses a method-static variable to avoid problems with
           // static-initialization order
-          static GenKillTransformer_T* BOTTOM = 
-            new GenKillTransformer_T(Set::EmptySet(), Set::UniverseSet(), 1);
+          static GenKillWeight* BOTTOM = 
+            new GenKillWeight(Set::EmptySet(), Set::UniverseSet(), 1);
           return BOTTOM;
         }
 
@@ -230,12 +230,12 @@ namespace wali {
             return bottom();
           }
 
-          const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>(_y);
+          const GenKillWeight* y = dynamic_cast<GenKillWeight*>(_y);
 
           Set temp_k( Set::Union( kill, y->kill ) );
           Set temp_g( Set::Union( Set::Diff(gen,y->kill), y->gen) );
 
-          return makeGenKillTransformer_T( temp_k,temp_g );
+          return makeGenKillWeight( temp_k,temp_g );
         }
 
         // FIXME: const: wali::SemElem::combine is not declared as const
@@ -255,12 +255,12 @@ namespace wali {
             return bottom(); // bottom combine _y = bottom;
           }                  // this combine bottom = bottom 
 
-          const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>(_y);
+          const GenKillWeight* y = dynamic_cast<GenKillWeight*>(_y);
 
           Set temp_k( Set::Intersect( kill, y->kill ) );
           Set temp_g( Set::Union( gen, y->gen ) );
 
-          return makeGenKillTransformer_T( temp_k,temp_g );
+          return makeGenKillWeight( temp_k,temp_g );
         }
 
         wali::sem_elem_t
@@ -270,7 +270,7 @@ namespace wali {
         }
 
         //
-        // diff(GenKillTransformer_T* y)
+        // diff(GenKillWeight* y)
         //
         // Return the difference between x (this) and y.
         //
@@ -296,18 +296,18 @@ namespace wali {
             return zero(); // this - bottom = zero
           }
 
-          const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>(_y);
+          const GenKillWeight* y = dynamic_cast<GenKillWeight*>(_y);
           // Both *this and *y are proper (non-zero) values
 
           Set temp_k( Set::Diff(Set::UniverseSet(),Set::Diff(y->kill,kill)) ); 
           Set temp_g( Set::Diff(gen,y->gen) ); 
 
-          return makeGenKillTransformer_T(temp_k, temp_g);
+          return makeGenKillWeight(temp_k, temp_g);
         }
 
         // Zero is a special representative that must be compared by address
         // rather by its contained Gen/Kill sets.
-        bool isEqual(const GenKillTransformer_T* y) const
+        bool isEqual(const GenKillWeight* y) const
         {
           // Check for identical arguments: could be two special values
           // (i.e., two zeros, two ones, or two bottoms) or two identical
@@ -327,13 +327,13 @@ namespace wali {
 
         bool equal(wali::SemElem* _y) const
         {
-          const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>(_y);
+          const GenKillWeight* y = dynamic_cast<GenKillWeight*>(_y);
           return this->isEqual(y);
         }
 
         bool equal(wali::sem_elem_t _y) const
         {
-          const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>
+          const GenKillWeight* y = dynamic_cast<GenKillWeight*>
             (_y.get_ptr());
           return this->isEqual(y);
         }
@@ -393,14 +393,14 @@ namespace wali {
         // The constructors are private to ensure uniqueness of one, zero, and bottom
 
         // Constructor for legitimate values
-        GenKillTransformer_T(const Set& k, const Set& g, unsigned int c=0) :
+        GenKillWeight(const Set& k, const Set& g, unsigned int c=0) :
           wali::SemElem(), kill(k), gen(g), is_zero(false)
         {
           count = c;
         }
 
         // Constructor for zero
-        GenKillTransformer_T(unsigned int c=0) :
+        GenKillWeight(unsigned int c=0) :
           wali::SemElem(), is_zero(true)
         {
           count = c;
@@ -414,7 +414,7 @@ namespace wali {
 
       template< typename Set >
       std::ostream &
-      operator<< (std::ostream& out, const GenKillTransformer_T<Set> & t)
+      operator<< (std::ostream& out, const GenKillWeight<Set> & t)
       {
         t.print(out);
         return out;
