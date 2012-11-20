@@ -75,10 +75,6 @@ namespace wali {
       {
       public: // methods
 
-        wali::sem_elem_t one()    const { return makeOne();    }
-        wali::sem_elem_t zero()   const { return makeZero();   }
-
-
         static
         wali::ref_ptr<GenKillWeightNoBottom>
         downcast(wali::sem_elem_t se)
@@ -141,8 +137,9 @@ namespace wali {
         
         bool IsOne() const
         {
-          if(this == makeOne().get_ptr()) 
+          if(this == makeOne().get_ptr()) {
             return true;
+          }
 
           assert(!Set::Eq(kill, Set::EmptySet())
                  || !Set::Eq(gen, Set::EmptySet()));
@@ -160,29 +157,33 @@ namespace wali {
         // Semiring methods
         //-------------------------------------------------
 
-        //
-        // extend
-        //
-        // Return the extend of x (this) and y.
-        // Considering x and y as functions, x extend y = y o x,
-        // where (g o f)(v) = g(f(v)).
-        //
-        // FIXME: const: wali::SemElem::extend is not declared as const
+        wali::sem_elem_t one()  const { return makeOne();  }
+        wali::sem_elem_t zero() const { return makeZero(); }
+
+
+        /// Return the extend of x (this) and y.
+        ///
+        /// Considering x and y as functions, x extend y = y o x,
+        /// where (g o f)(v) = g(f(v)).
+        ///
+        /// FIXME: const: wali::SemElem::extend is not declared as const
         wali::sem_elem_t
         extend( wali::SemElem* _y )
         {
-          // Handle special case for either argument being zero()
+          // Handle special case for either argument being zero():
+          // zero extend _y = zero; this extend zero = zero
           if( this->equal(zero()) || _y->equal(zero()) ) {
-            return zero(); // zero extend _y = zero; this extend zero = zero
+            return zero();
           }
 
           // Handle special case for either argument being one()
           if( this->equal(one()) ) {
-            return _y; // one extend _y = _y
+            // one extend _y = _y
+            return _y;
           }
-          else if( _y->equal(one()) )
-          {
-            return this; // this extend one = this
+          else if( _y->equal(one()) ) {
+            // this extend one = this
+            return this;
           }
 
           const GenKillWeightNoBottom* y = dynamic_cast<GenKillWeightNoBottom*>(_y);
@@ -193,16 +194,19 @@ namespace wali {
           return make( temp_k,temp_g );
         }
 
+
         // FIXME: const: wali::SemElem::combine is not declared as const
         wali::sem_elem_t
         combine( wali::SemElem* _y )
         {
           // Handle special case for either argument being zero()
           if( this->equal(zero()) ) {
-            return _y; // zero combine _y = _y
+            // zero combine _y = _y
+            return _y;
           }
           if( _y->equal(zero()) ) {
-            return this; // this combine zero = this
+            // this combine zero = this
+            return this;
           }
 
           const GenKillWeightNoBottom* y = dynamic_cast<GenKillWeightNoBottom*>(_y);
@@ -213,11 +217,13 @@ namespace wali {
           return make( temp_k,temp_g );
         }
 
+
         wali::sem_elem_t
         quasiOne() const
         {
           return one();
         }
+
 
         //
         // diff(GenKillWeightNoBottom* y)
@@ -235,10 +241,12 @@ namespace wali {
         {
           // Handle special case for either argument being zero()
           if( this->equal(zero()) ) {
-            return zero(); // zero - _y = zero
+            // zero - _y = zero
+            return zero();
           }
           if( _y->equal(zero()) ) {
-            return this; // this - zero = this
+            // this - zero = this
+            return this;
           }
 
           const GenKillWeightNoBottom* y = dynamic_cast<GenKillWeightNoBottom*>(_y);
@@ -250,6 +258,7 @@ namespace wali {
           return make(temp_k, temp_g);
         }
 
+
         // Zero is a special representative that must be compared by address
         // rather by its contained Gen/Kill sets.
         bool isEqual(const GenKillWeightNoBottom* y) const
@@ -257,37 +266,43 @@ namespace wali {
           // Check for identical arguments: could be two special values
           // (i.e., two zeros or two ones) or two identical instances of a
           // non-special semiring value.
-          if(this == y) return true;
+          if(this == y) {
+            return true;
+          }
 
           // Return false if any argument is zero.  Zero has a unique
           // representative, and thus the return value could only be true via
           // the preceding check for identicalness.  The same approach could
           // be taken for one, but the extra tests are not worth it.
-          if(this->IsZero() || y->IsZero())
+          if(this->IsZero() || y->IsZero()) {
             return false;
+          }
 
           return Set::Eq(kill,y->kill) && Set::Eq(gen,y->gen);
         }
 
+
         bool equal(wali::SemElem* _y) const
         {
-          const GenKillWeightNoBottom* y = dynamic_cast<GenKillWeightNoBottom*>(_y);
+          GenKillWeightNoBottom const * y = dynamic_cast<GenKillWeightNoBottom*>(_y);
           return this->isEqual(y);
         }
+
 
         bool equal(wali::sem_elem_t _y) const
         {
-          const GenKillWeightNoBottom* y = dynamic_cast<GenKillWeightNoBottom*>
-            (_y.get_ptr());
-          return this->isEqual(y);
+          return this->equal(_y.get_ptr());
         }
+
 
         std::ostream& print( std::ostream& o ) const 
         {
-          if(this->IsZero())
+          if(this->IsZero()) {
             return o << "<zero>";
-          if(this->IsOne())
+          }
+          if(this->IsOne()) {
             return o << "<one>";
+          }
 
           o << "<\\S.(S - {";
           kill.print(o);
@@ -297,7 +312,9 @@ namespace wali {
           return o;
         }
 
-        std::ostream& prettyPrint( std::ostream& o ) const {
+
+        std::ostream& prettyPrint( std::ostream& o ) const
+        {
           return this->print(o);
         }
 
@@ -311,15 +328,19 @@ namespace wali {
           return Set::Union( Set::Diff(input,kill), gen );
         }
 
-        const Set& getKill() const {
+        const Set& getKill() const
+        {
           assert(!this->IsZero());
           return kill;
         }
 
-        const Set& getGen() const {
+
+        const Set& getGen() const
+        {
           assert(!this->IsZero());
           return gen;
         }
+
 
         static std::ostream& print_static_transformers( std::ostream& o )
         {
@@ -334,28 +355,33 @@ namespace wali {
         // The constructors are private to ensure uniqueness of one, zero, and bottom
 
         // Constructor for legitimate values
-        GenKillWeightNoBottom(const Set& k, const Set& g, unsigned int c=0) :
-          wali::SemElem(), kill(k), gen(g), is_zero(false)
+        GenKillWeightNoBottom(const Set& k, const Set& g, unsigned int c=0)
+          : wali::SemElem()
+          , kill(k)
+          , gen(g)
+          , is_zero(false)
         {
           count = c;
         }
 
         // Constructor for zero
-        GenKillWeightNoBottom(unsigned int c=0) :
-          wali::SemElem(), is_zero(true)
+        GenKillWeightNoBottom(unsigned int c=0)
+          : wali::SemElem()
+          , is_zero(true)
         {
           count = c;
         }
 
-      private: // members -----------------------------------------------------------
+      private:
+        // members -----------------------------------------------------------
         Set kill, gen;   // Used to represent the function \S.(S - kill) U gen
         bool is_zero;    // True for the zero element, False for all other values
-
       };
+
 
       template< typename Set >
       std::ostream &
-      operator<< (std::ostream& out, const GenKillWeightNoBottom<Set> & t)
+      operator<< (std::ostream& out, GenKillWeightNoBottom<Set> const & t)
       {
         t.print(out);
         return out;
