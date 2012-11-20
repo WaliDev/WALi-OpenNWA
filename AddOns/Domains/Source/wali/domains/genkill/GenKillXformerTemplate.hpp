@@ -84,6 +84,33 @@ public: // methods
   wali::sem_elem_t zero()   const { return MkZero();   }
   wali::sem_elem_t bottom() const { return MkBottom(); }
 
+
+  static
+  wali::ref_ptr<GenKillTransformer_T>
+  downcast(wali::sem_elem_t se)
+  {
+    wali::ref_ptr<GenKillTransformer_T> down
+      = dynamic_cast<GenKillTransformer_T *>(se.get_ptr());
+    return down;
+  }
+
+
+  static
+  wali::ref_ptr<GenKillTransformer_T>
+  make(Set const & kill, Set const & gen)
+  {
+    return downcast(makeGenKillTransformer_T(kill, gen));
+  }
+
+  
+  static
+  wali::ref_ptr<GenKillTransformer_T>
+  makeZero()
+  {
+    return downcast(MkZero());
+  }
+  
+
   // A client uses makeGenKillTransformer_T to create a
   // GenKillTransformer_T instead of calling the constructor directly;
   //
