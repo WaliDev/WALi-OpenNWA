@@ -24,11 +24,13 @@ namespace wali {
        class Set {
          public:
            // Only Set constructor GenKillSemiring invokes
-           Set( const Set& );
+           Set(Set const &);
 
            static bool Eq(Set const & x, Set const & y);
 
-           static Set Diff(Set const & x, Set const & y);
+           static Set Diff(Set const & x,
+                           Set const & y,
+                           bool normalizing = false);
 
            static Set Union(Set const & x, Set const & y);
 
@@ -36,23 +38,28 @@ namespace wali {
 
            static Set const & EmptySet();
 
-           std::ostream& print(std::ostream& o);
+           std::ostream & print(std::ostream & o);
        };
 
        The above exact signatures are only recommended; for instance, the
        functions could also take non-const references (but why would you do
        that to yourself?) or by value; or they could take other optional
-       arguments.
+       arguments; Diff could be overloaded instead of using a default
+       parameter, etc.
 
        For normal elements, a semiring element is represented by a pair of
        sets (k,g), which have the meaning \x.(x - k) union g.
 
        Note that if k and g were allowed to be arbitrary sets, it would
        introduce redundant elements into the domain: e.g., ({a,b}, {c,d})
-       would have the same meaning as ({a,b,c,d}, {c,d}).  Therefore, there
-       is a class invariant that k intersect g = empty, and the operation
-       that builds a semiring element performs the normalization (k,g) |->
-       (k-g,g).
+       would have the same meaning as ({a,b,c,d}, {c,d}).  Therefore,
+       GenKillSemiring maintains an invarient that (k intersect g = empty),
+       and the operation that builds a semiring element performs the
+       normalization (k, g) |-> (k-g, g). When computing (k-g) for purposes
+       of this normalization, the Set::Diff function is called with
+       'normalizing' equal to 'true.' (At other times, e.g. in 'extend', this
+       parameter is left out.) See GenKillWeight for commentary about why
+       this might be useful.
 
        The special elements are
            1. zero
