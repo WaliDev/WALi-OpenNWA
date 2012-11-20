@@ -11,7 +11,7 @@ namespace {
     // Abbreviations
     typedef std::set<int> IntSet;
     typedef wali::domains::genkill::SortedContainerSetAdapter<IntSet> IntSetAdapter;
-    typedef GenKillTransformer_T<IntSetAdapter> Transformer;
+    typedef wali::domains::genkill::GenKillTransformer_T<IntSetAdapter> Transformer;
 
 
     struct SetFixture

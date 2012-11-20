@@ -9,6 +9,10 @@
 
 #include "wali/SemElem.hpp"
 
+namespace wali {
+  namespace domains {
+    namespace genkill {
+
       /*!
        * @class GenKillTransformer_T
        *
@@ -416,6 +420,10 @@
         return out;
       }
 
+
+    } // namespace genkill
+  }
+}
 
 // Yo, Emacs!
 // Local Variables:

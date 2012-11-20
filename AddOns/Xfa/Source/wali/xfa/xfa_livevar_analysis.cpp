@@ -88,7 +88,7 @@ struct VarSet : public std::set<std::string>
 
 };
 
-typedef GenKillTransformer_T<VarSet> GenKillWeight;
+typedef wali::domains::genkill::GenKillTransformer_T<VarSet> GenKillWeight;
 
 sem_elem_t
 makeGKW(VarSet const & kill, VarSet const & gen)
