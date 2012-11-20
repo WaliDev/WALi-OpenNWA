@@ -122,7 +122,33 @@ namespace wali {
                 EXPECT_NE(sets.evens, trans->getKill());
                 EXPECT_NE(sets.odds, trans->getGen());
             }
-            
+
+
+            TEST(wali$domains$$GenKillTransformer, oneElementsHaveUniqueRepresentation)
+            {
+                IntSet empty1, empty2, empty3, empty4;
+
+                ref_ptr<Transformer>
+                    one1 = Transformer::make(empty1, empty2),
+                    one2 = Transformer::make(empty3, empty4),
+                    one3 = Transformer::makeOne(),
+                    one4 = Transformer::makeOne();
+
+                EXPECT_EQ(one1, one2);
+                EXPECT_EQ(one1, one3);
+                EXPECT_EQ(one1, one4);
+            }
+
+
+            TEST(wali$domains$$GenKillTransformer, zeroElementsHaveUniqueRepresentation)
+            {
+                ref_ptr<Transformer>
+                    zero1 = Transformer::makeZero(),
+                    zero2 = Transformer::makeZero();
+
+                EXPECT_EQ(zero1, zero2);
+            }
+
 
             TEST(wali$domains$$GenKillTransformer, constructorNormalizes)
             {
