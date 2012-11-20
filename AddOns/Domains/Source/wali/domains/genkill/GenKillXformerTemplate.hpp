@@ -254,7 +254,7 @@ public: // methods
   //    i.e., isEqual(combine(y,r), combine(y,a)) == true
   //
   wali::sem_elem_t
-  diff( wali::SemElem* _y ) const
+  diff( wali::SemElem* _y ) // const
   {
       // Handle special case for either argument being zero()
       if( this->equal(zero()) ) {
