@@ -3,7 +3,7 @@
 #include <cassert>
 #include <set>
 
-#include <wali/domains/genkill/GenKillXformerTemplate.hpp>
+#include <wali/domains/genkill/GenKillSemiring.hpp>
 #include <wali/domains/genkill/SortedContainerSetAdapter.hpp>
 
 
@@ -11,7 +11,7 @@ namespace {
     // Abbreviations
     typedef std::set<int> IntSet;
     typedef wali::domains::genkill::SortedContainerSetAdapter<IntSet> IntSetAdapter;
-    typedef wali::domains::genkill::GenKillTransformer_T<IntSetAdapter> Transformer;
+    typedef wali::domains::genkill::GenKillSemiring<IntSetAdapter> Transformer;
 
 
     struct SetFixture

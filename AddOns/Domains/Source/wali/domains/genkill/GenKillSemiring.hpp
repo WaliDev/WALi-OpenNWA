@@ -14,41 +14,36 @@ namespace wali {
     namespace genkill {
 
       /*!
-       * @class GenKillTransformer_T
+       * @class GenKillSemiring
        *
-       * GenKillTransformer_T is a templated class that implements the
-       * semiring needed for a gen-kill dataflow-analysis problem. The
-       * template parameter must implement the "Set" interface defined below
+       * This is a templated class that implements the semiring needed for a
+       * gen-kill dataflow-analysis problem. The template parameter must
+       * implement the "Set" interface defined below
        *
 
        class Set {
          public:
-           // not needed by GenKillTransformer_T but a good idea
-           Set();
-
-           // Only Set constructor GenKillTransformer_T invokes
+           // Only Set constructor GenKillSemiring invokes
            Set( const Set& );
 
-           // not needed by GenKillTransformer_T but a good idea
-           Set& operator=( const Set& );
+           static bool Eq(Set const & x, Set const & y);
 
-           static bool Eq( const Set& x, const Set& y );
+           static Set Diff(Set const & x, Set const & y);
 
-           static Set Diff( const Set& x, const Set& y,
-           bool normalizing = false );
+           static Set Union(Set const & x, Set const & y);
 
-           static Set Union( const Set& x, const Set& y );
-
-           static Set Intersect( const Set& x, const Set& y );
+           static Set Intersect(Set const & x, Set const & y);
 
            // Optional (but recommended) constant generator
-           static const Set& UniverseSet(); 
-
-           // Optional (but recommended) constant generator
-           static const Set& EmptySet();
+           static Set const & EmptySet();
 
            std::ostream& print(std::ostream& o);
        };
+
+       The above exact signatures are only recommended; for instance, the
+       functions could also take non-const references (but why would you do
+       that to yourself?) or by value; or they could take other optional
+       arguments.
 
        For normal elements, a semiring element is represented by a pair of
        sets (k,g), which have the meaning \x.(x - k) union g.
@@ -58,25 +53,19 @@ namespace wali {
        would have the same meaning as ({a,b,c,d}, {c,d}).  Therefore, there
        is a class invariant that k intersect g = empty, and the operation
        that builds a semiring element performs the normalization (k,g) |->
-       (k-g,g).  However, often the universe of the domain is too large for
-       k-g to be represented efficiently when k is the universal set; in this
-       case, it may be acceptable to allow k and g to intersect iff k is the
-       universe.  (This also holds when Set is a cross product of domains and
-       k has a universe component.)  To support this, the normalization
-       invokes the function Diff with normalizing==true.
+       (k-g,g).
 
-       There are three special elements:
-         1. zero
-         2. one = (emptyset, emptyset) = \x.x
-         3. bottom = (emptyset, Univ) = \x.Univ        
+       The special elements are
+           1. zero
+           2. one = (emptyset, emptyset) = \x.x
        Note that zero is a different element from the element (Univ,
-       emptyset)
+       emptyset); it is not just a transformer with specific gen & kill sets,
+       it is a completely special value.
 
-       The implementation maintains unique representations for zero
-
+       The implementation maintains unique representations for zero and one.
       */
       template< typename Set >
-      class GenKillTransformer_T : public wali::SemElem
+      class GenKillSemiring : public wali::SemElem
       {
       public: // methods
 
@@ -86,42 +75,42 @@ namespace wali {
 
 
         static
-        wali::ref_ptr<GenKillTransformer_T>
+        wali::ref_ptr<GenKillSemiring>
         downcast(wali::sem_elem_t se)
         {
-          wali::ref_ptr<GenKillTransformer_T> down
-            = dynamic_cast<GenKillTransformer_T *>(se.get_ptr());
+          wali::ref_ptr<GenKillSemiring> down
+            = dynamic_cast<GenKillSemiring *>(se.get_ptr());
           return down;
         }
 
 
         static
-        wali::ref_ptr<GenKillTransformer_T>
+        wali::ref_ptr<GenKillSemiring>
         make(Set const & kill, Set const & gen)
         {
-          return downcast(makeGenKillTransformer_T(kill, gen));
+          return downcast(makeGenKillSemiring(kill, gen));
         }
 
   
         static
-        wali::ref_ptr<GenKillTransformer_T>
+        wali::ref_ptr<GenKillSemiring>
         makeZero()
         {
           return downcast(MkZero());
         }
   
 
-        // A client uses makeGenKillTransformer_T to create a
-        // GenKillTransformer_T instead of calling the constructor directly;
+        // A client uses makeGenKillSemiring to create a
+        // GenKillSemiring instead of calling the constructor directly;
         //
-        // makeGenKillTransformer_T normalizes the stored kill and gen sets
+        // makeGenKillSemiring normalizes the stored kill and gen sets
         // so that kill intersect gen == emptyset.
         //
-        // makeGenKillTransformer_T also maintains unique representatives for
+        // makeGenKillSemiring also maintains unique representatives for
         // the special semiring values one, and bottom.
         //
         static wali::sem_elem_t
-        makeGenKillTransformer_T(const Set& k, const Set& g )
+        makeGenKillSemiring(const Set& k, const Set& g )
         {
           Set k_normalized = Set::Diff(k, g, true);
           if (Set::Eq(k_normalized, Set::EmptySet())&& 
@@ -135,11 +124,11 @@ namespace wali {
             return MkOne();
           }
           else {
-            return new GenKillTransformer_T(k_normalized, g);
+            return new GenKillSemiring(k_normalized, g);
           }
         }
 
-        ~GenKillTransformer_T() {}
+        ~GenKillSemiring() {}
 
         //-------------------------------------------------
         // Semiring methods
@@ -148,8 +137,8 @@ namespace wali {
         {
           // Uses a method-static variable to avoid problems with
           // static-initialization order
-          static GenKillTransformer_T* ONE =
-            new GenKillTransformer_T(Set::EmptySet(), Set::EmptySet(), 1);
+          static GenKillSemiring* ONE =
+            new GenKillSemiring(Set::EmptySet(), Set::EmptySet(), 1);
           return ONE;
         }
 
@@ -171,8 +160,8 @@ namespace wali {
         {
           // Uses a method-static variable to avoid
           // problems with static-initialization order
-          static GenKillTransformer_T* ZERO =
-            new GenKillTransformer_T(1);
+          static GenKillSemiring* ZERO =
+            new GenKillSemiring(1);
           return ZERO;
         }
 
@@ -183,8 +172,8 @@ namespace wali {
         {
           // Uses a method-static variable to avoid problems with
           // static-initialization order
-          static GenKillTransformer_T* BOTTOM = 
-            new GenKillTransformer_T(Set::EmptySet(), Set::UniverseSet(), 1);
+          static GenKillSemiring* BOTTOM = 
+            new GenKillSemiring(Set::EmptySet(), Set::UniverseSet(), 1);
           return BOTTOM;
         }
 
@@ -230,12 +219,12 @@ namespace wali {
             return bottom();
           }
 
-          const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>(_y);
+          const GenKillSemiring* y = dynamic_cast<GenKillSemiring*>(_y);
 
           Set temp_k( Set::Union( kill, y->kill ) );
           Set temp_g( Set::Union( Set::Diff(gen,y->kill), y->gen) );
 
-          return makeGenKillTransformer_T( temp_k,temp_g );
+          return makeGenKillSemiring( temp_k,temp_g );
         }
 
         // FIXME: const: wali::SemElem::combine is not declared as const
@@ -255,12 +244,12 @@ namespace wali {
             return bottom(); // bottom combine _y = bottom;
           }                  // this combine bottom = bottom 
 
-          const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>(_y);
+          const GenKillSemiring* y = dynamic_cast<GenKillSemiring*>(_y);
 
           Set temp_k( Set::Intersect( kill, y->kill ) );
           Set temp_g( Set::Union( gen, y->gen ) );
 
-          return makeGenKillTransformer_T( temp_k,temp_g );
+          return makeGenKillSemiring( temp_k,temp_g );
         }
 
         wali::sem_elem_t
@@ -270,7 +259,7 @@ namespace wali {
         }
 
         //
-        // diff(GenKillTransformer_T* y)
+        // diff(GenKillSemiring* y)
         //
         // Return the difference between x (this) and y.
         //
@@ -296,18 +285,18 @@ namespace wali {
             return zero(); // this - bottom = zero
           }
 
-          const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>(_y);
+          const GenKillSemiring* y = dynamic_cast<GenKillSemiring*>(_y);
           // Both *this and *y are proper (non-zero) values
 
           Set temp_k( Set::Diff(Set::UniverseSet(),Set::Diff(y->kill,kill)) ); 
           Set temp_g( Set::Diff(gen,y->gen) ); 
 
-          return makeGenKillTransformer_T(temp_k, temp_g);
+          return makeGenKillSemiring(temp_k, temp_g);
         }
 
         // Zero is a special representative that must be compared by address
         // rather by its contained Gen/Kill sets.
-        bool isEqual(const GenKillTransformer_T* y) const
+        bool isEqual(const GenKillSemiring* y) const
         {
           // Check for identical arguments: could be two special values
           // (i.e., two zeros, two ones, or two bottoms) or two identical
@@ -327,13 +316,13 @@ namespace wali {
 
         bool equal(wali::SemElem* _y) const
         {
-          const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>(_y);
+          const GenKillSemiring* y = dynamic_cast<GenKillSemiring*>(_y);
           return this->isEqual(y);
         }
 
         bool equal(wali::sem_elem_t _y) const
         {
-          const GenKillTransformer_T* y = dynamic_cast<GenKillTransformer_T*>
+          const GenKillSemiring* y = dynamic_cast<GenKillSemiring*>
             (_y.get_ptr());
           return this->isEqual(y);
         }
@@ -393,14 +382,14 @@ namespace wali {
         // The constructors are private to ensure uniqueness of one, zero, and bottom
 
         // Constructor for legitimate values
-        GenKillTransformer_T(const Set& k, const Set& g, unsigned int c=0) :
+        GenKillSemiring(const Set& k, const Set& g, unsigned int c=0) :
           wali::SemElem(), kill(k), gen(g), is_zero(false)
         {
           count = c;
         }
 
         // Constructor for zero
-        GenKillTransformer_T(unsigned int c=0) :
+        GenKillSemiring(unsigned int c=0) :
           wali::SemElem(), is_zero(true)
         {
           count = c;
@@ -414,7 +403,7 @@ namespace wali {
 
       template< typename Set >
       std::ostream &
-      operator<< (std::ostream& out, const GenKillTransformer_T<Set> & t)
+      operator<< (std::ostream& out, const GenKillSemiring<Set> & t)
       {
         t.print(out);
         return out;

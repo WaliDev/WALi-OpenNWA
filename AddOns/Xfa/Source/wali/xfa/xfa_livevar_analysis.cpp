@@ -9,7 +9,7 @@
 #include <iostream>
 #include <vector>
 
-#include "wali/domains/genkill/GenKillXformerTemplate.hpp"
+#include "wali/domains/genkill/GenKillSemiring.hpp"
 
 namespace details
 {
@@ -88,12 +88,12 @@ struct VarSet : public std::set<std::string>
 
 };
 
-typedef wali::domains::genkill::GenKillTransformer_T<VarSet> GenKillWeight;
+typedef wali::domains::genkill::GenKillSemiring<VarSet> GenKillWeight;
 
 sem_elem_t
 makeGKW(VarSet const & kill, VarSet const & gen)
 {
-    return GenKillWeight::makeGenKillTransformer_T(kill, gen);
+    return GenKillWeight::make(kill, gen);
 }        
 
 
