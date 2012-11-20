@@ -9,7 +9,7 @@
 #include <iostream>
 #include <vector>
 
-#include "wali/domains/genkill/GenKillSemiring.hpp"
+#include "wali/domains/genkill/GenKillWeightNoBottom.hpp"
 
 namespace details
 {
@@ -88,7 +88,7 @@ struct VarSet : public std::set<std::string>
 
 };
 
-typedef wali::domains::genkill::GenKillSemiring<VarSet> GenKillWeight;
+typedef wali::domains::genkill::GenKillWeightNoBottom<VarSet> GenKillWeight;
 
 sem_elem_t
 makeGKW(VarSet const & kill, VarSet const & gen)

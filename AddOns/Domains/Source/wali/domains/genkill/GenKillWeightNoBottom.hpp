@@ -14,7 +14,7 @@ namespace wali {
     namespace genkill {
 
       /*!
-       * @class GenKillSemiring
+       * @class GenKillWeightNoBottom
        *
        * This is a templated class that implements the semiring needed for a
        * gen-kill dataflow-analysis problem. The template parameter must
@@ -23,7 +23,7 @@ namespace wali {
 
        class Set {
          public:
-           // Only Set constructor GenKillSemiring invokes
+           // Only Set constructor GenKillWeightNoBottom invokes
            Set(Set const &);
 
            static bool Eq(Set const & x, Set const & y);
@@ -53,7 +53,7 @@ namespace wali {
        Note that if k and g were allowed to be arbitrary sets, it would
        introduce redundant elements into the domain: e.g., ({a,b}, {c,d})
        would have the same meaning as ({a,b,c,d}, {c,d}).  Therefore,
-       GenKillSemiring maintains an invarient that (k intersect g = empty),
+       GenKillWeightNoBottom maintains an invarient that (k intersect g = empty),
        and the operation that builds a semiring element performs the
        normalization (k, g) |-> (k-g, g). When computing (k-g) for purposes
        of this normalization, the Set::Diff function is called with
@@ -71,7 +71,7 @@ namespace wali {
        The implementation maintains unique representations for zero and one.
       */
       template< typename Set >
-      class GenKillSemiring : public wali::SemElem
+      class GenKillWeightNoBottom : public wali::SemElem
       {
       public: // methods
 
@@ -80,42 +80,42 @@ namespace wali {
 
 
         static
-        wali::ref_ptr<GenKillSemiring>
+        wali::ref_ptr<GenKillWeightNoBottom>
         downcast(wali::sem_elem_t se)
         {
-          wali::ref_ptr<GenKillSemiring> down
-            = dynamic_cast<GenKillSemiring *>(se.get_ptr());
+          wali::ref_ptr<GenKillWeightNoBottom> down
+            = dynamic_cast<GenKillWeightNoBottom *>(se.get_ptr());
           return down;
         }
 
 
         static
-        wali::ref_ptr<GenKillSemiring>
+        wali::ref_ptr<GenKillWeightNoBottom>
         make(Set const & kill, Set const & gen)
         {
-          return downcast(makeGenKillSemiring(kill, gen));
+          return downcast(makeGenKillWeightNoBottom(kill, gen));
         }
 
   
         static
-        wali::ref_ptr<GenKillSemiring>
+        wali::ref_ptr<GenKillWeightNoBottom>
         makeZero()
         {
           return downcast(MkZero());
         }
   
 
-        // A client uses makeGenKillSemiring to create a
-        // GenKillSemiring instead of calling the constructor directly;
+        // A client uses makeGenKillWeightNoBottom to create a
+        // GenKillWeightNoBottom instead of calling the constructor directly;
         //
-        // makeGenKillSemiring normalizes the stored kill and gen sets
+        // makeGenKillWeightNoBottom normalizes the stored kill and gen sets
         // so that kill intersect gen == emptyset.
         //
-        // makeGenKillSemiring also maintains unique representatives for
+        // makeGenKillWeightNoBottom also maintains unique representatives for
         // semiring one.
         //
         static wali::sem_elem_t
-        makeGenKillSemiring(const Set& k, const Set& g )
+        makeGenKillWeightNoBottom(const Set& k, const Set& g )
         {
           Set k_normalized = Set::Diff(k, g, true);
           if (Set::Eq(k_normalized, Set::EmptySet()) && 
@@ -124,11 +124,11 @@ namespace wali {
             return MkOne();
           }
           else {
-            return new GenKillSemiring(k_normalized, g);
+            return new GenKillWeightNoBottom(k_normalized, g);
           }
         }
 
-        ~GenKillSemiring() {}
+        ~GenKillWeightNoBottom() {}
 
         //-------------------------------------------------
         // Semiring methods
@@ -137,8 +137,8 @@ namespace wali {
         {
           // Uses a method-static variable to avoid problems with
           // static-initialization order
-          static GenKillSemiring* ONE =
-            new GenKillSemiring(Set::EmptySet(), Set::EmptySet(), 1);
+          static GenKillWeightNoBottom* ONE =
+            new GenKillWeightNoBottom(Set::EmptySet(), Set::EmptySet(), 1);
           return ONE;
         }
 
@@ -160,8 +160,8 @@ namespace wali {
         {
           // Uses a method-static variable to avoid
           // problems with static-initialization order
-          static GenKillSemiring* ZERO =
-            new GenKillSemiring(1);
+          static GenKillWeightNoBottom* ZERO =
+            new GenKillWeightNoBottom(1);
           return ZERO;
         }
 
@@ -193,12 +193,12 @@ namespace wali {
             return this; // this extend one = this
           }
 
-          const GenKillSemiring* y = dynamic_cast<GenKillSemiring*>(_y);
+          const GenKillWeightNoBottom* y = dynamic_cast<GenKillWeightNoBottom*>(_y);
 
           Set temp_k( Set::Union( kill, y->kill ) );
           Set temp_g( Set::Union( Set::Diff(gen,y->kill), y->gen) );
 
-          return makeGenKillSemiring( temp_k,temp_g );
+          return makeGenKillWeightNoBottom( temp_k,temp_g );
         }
 
         // FIXME: const: wali::SemElem::combine is not declared as const
@@ -213,12 +213,12 @@ namespace wali {
             return this; // this combine zero = this
           }
 
-          const GenKillSemiring* y = dynamic_cast<GenKillSemiring*>(_y);
+          const GenKillWeightNoBottom* y = dynamic_cast<GenKillWeightNoBottom*>(_y);
 
           Set temp_k( Set::Intersect( kill, y->kill ) );
           Set temp_g( Set::Union( gen, y->gen ) );
 
-          return makeGenKillSemiring( temp_k,temp_g );
+          return makeGenKillWeightNoBottom( temp_k,temp_g );
         }
 
         wali::sem_elem_t
@@ -228,7 +228,7 @@ namespace wali {
         }
 
         //
-        // diff(GenKillSemiring* y)
+        // diff(GenKillWeightNoBottom* y)
         //
         // Return the difference between x (this) and y.
         //
@@ -249,18 +249,18 @@ namespace wali {
             return this; // this - zero = this
           }
 
-          const GenKillSemiring* y = dynamic_cast<GenKillSemiring*>(_y);
+          const GenKillWeightNoBottom* y = dynamic_cast<GenKillWeightNoBottom*>(_y);
           // Both *this and *y are proper (non-zero) values
 
           Set temp_k( Set::Diff(Set::UniverseSet(),Set::Diff(y->kill,kill)) ); 
           Set temp_g( Set::Diff(gen,y->gen) ); 
 
-          return makeGenKillSemiring(temp_k, temp_g);
+          return makeGenKillWeightNoBottom(temp_k, temp_g);
         }
 
         // Zero is a special representative that must be compared by address
         // rather by its contained Gen/Kill sets.
-        bool isEqual(const GenKillSemiring* y) const
+        bool isEqual(const GenKillWeightNoBottom* y) const
         {
           // Check for identical arguments: could be two special values
           // (i.e., two zeros or two ones) or two identical instances of a
@@ -279,13 +279,13 @@ namespace wali {
 
         bool equal(wali::SemElem* _y) const
         {
-          const GenKillSemiring* y = dynamic_cast<GenKillSemiring*>(_y);
+          const GenKillWeightNoBottom* y = dynamic_cast<GenKillWeightNoBottom*>(_y);
           return this->isEqual(y);
         }
 
         bool equal(wali::sem_elem_t _y) const
         {
-          const GenKillSemiring* y = dynamic_cast<GenKillSemiring*>
+          const GenKillWeightNoBottom* y = dynamic_cast<GenKillWeightNoBottom*>
             (_y.get_ptr());
           return this->isEqual(y);
         }
@@ -342,14 +342,14 @@ namespace wali {
         // The constructors are private to ensure uniqueness of one, zero, and bottom
 
         // Constructor for legitimate values
-        GenKillSemiring(const Set& k, const Set& g, unsigned int c=0) :
+        GenKillWeightNoBottom(const Set& k, const Set& g, unsigned int c=0) :
           wali::SemElem(), kill(k), gen(g), is_zero(false)
         {
           count = c;
         }
 
         // Constructor for zero
-        GenKillSemiring(unsigned int c=0) :
+        GenKillWeightNoBottom(unsigned int c=0) :
           wali::SemElem(), is_zero(true)
         {
           count = c;
@@ -363,7 +363,7 @@ namespace wali {
 
       template< typename Set >
       std::ostream &
-      operator<< (std::ostream& out, const GenKillSemiring<Set> & t)
+      operator<< (std::ostream& out, const GenKillWeightNoBottom<Set> & t)
       {
         t.print(out);
         return out;
