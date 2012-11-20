@@ -105,6 +105,14 @@ namespace wali {
         }
   
 
+        static
+        wali::ref_ptr<GenKillWeightNoBottom>
+        makeOne()
+        {
+          return downcast(MkOne());
+        }
+  
+        
         // A client uses makeGenKillWeightNoBottom to create a
         // GenKillWeightNoBottom instead of calling the constructor directly;
         //
