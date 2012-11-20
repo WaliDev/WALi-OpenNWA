@@ -992,7 +992,19 @@ namespace opennwa
         //       source/tgt, and sym/tgt.
         //
 
-
+        TEST(opennwa$Nwa$$addCallTrans$and$addReturnTrans$DeathTest, assertsOnAddingEpsilonTransition)
+        {
+            Nwa nwa;
+            SomeElements e;
+            EXPECT_DEATH({
+                    nwa.addCallTrans(e.state, EPSILON, e.state);
+                },
+                "EPSILON");
+            EXPECT_DEATH({
+                    nwa.addReturnTrans(e.state, e.state, EPSILON, e.state);
+                },
+                "EPSILON");
+        }
 
         /// Make sure wali::WALI_BAD_KEY causes an assertion
         TEST(opennwa$Nwa$$isState$and$addState$and$removeState$DeathTest, assertsOnWaliBadKey)
