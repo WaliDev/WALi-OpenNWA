@@ -1,6 +1,8 @@
 #ifndef WALI_DOMAINS_GENKILL_SORTED_CONTAINER_ADAPTER
 #define WALI_DOMAINS_GENKILL_SORTED_CONTAINER_ADAPTER
 
+#include <algorithm>
+
 namespace wali {
   namespace domains {
     namespace genkill {
@@ -20,6 +22,8 @@ namespace wali {
       class SortedContainerSetAdapter
         : public BackingType
       {
+      public:
+        
         SortedContainerSetAdapter()
         {}
 
@@ -97,7 +101,7 @@ namespace wali {
         print(std::ostream& o) const
         {
           o << "{";
-          for (SortedContainerSetAdapter::const_iterator iter = this->begin();
+          for (typename SortedContainerSetAdapter::const_iterator iter = this->begin();
                iter != this->end(); ++iter)
           {
             o << *iter << ", ";
