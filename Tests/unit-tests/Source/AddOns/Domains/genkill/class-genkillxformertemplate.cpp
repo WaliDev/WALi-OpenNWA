@@ -66,7 +66,7 @@ namespace wali {
     namespace domains {
         namespace genkill {
 
-            TEST(wali$domains$$GenKillTransformer, emptyEmptyGivesOne)
+            TEST(wali$domains$$GenKillTransformer$$make, emptyEmptyGivesOne)
             {
                 IntSet empty1, empty2;
 
@@ -84,7 +84,7 @@ namespace wali {
             }
 
 
-            TEST(wali$domains$$GenKillTransformer, makeZeroGivesZero)
+            TEST(wali$domains$$GenKillTransformer$$make, makeZeroGivesZero)
             {
                 ref_ptr<Transformer> trans = Transformer::makeZero();
 
@@ -100,7 +100,7 @@ namespace wali {
             }
 
 
-            TEST(wali$domains$$GenKillTransformer, makeOneGivesOne)
+            TEST(wali$domains$$GenKillTransformer$$make, makeOneGivesOne)
             {
                 ref_ptr<Transformer> trans = Transformer::makeOne();
 
@@ -112,7 +112,7 @@ namespace wali {
             }
 
 
-            TEST(wali$domains$$GenKillTransformer, zeroAndOneAreDifferent)
+            TEST(wali$domains$$GenKillTransformer$$makeOne$and$makeZero, zeroAndOneAreDifferent)
             {
                 ref_ptr<Transformer>
                     one = Transformer::makeOne(),
@@ -122,7 +122,7 @@ namespace wali {
             }
             
 
-            TEST(wali$domains$$GenKillTransformer, genAndKillSetsAreStored)
+            TEST(wali$domains$$GenKillTransformer$$make, genAndKillSetsAreStored)
             {
                 SetFixture sets;
 
@@ -133,7 +133,7 @@ namespace wali {
             }
 
 
-            TEST(wali$domains$$GenKillTransformer, genAndKillSetsAreCopied)
+            TEST(wali$domains$$GenKillTransformer$$make, genAndKillSetsAreCopied)
             {
                 SetFixture sets;
 
@@ -146,7 +146,7 @@ namespace wali {
             }
 
 
-            TEST(wali$domains$$GenKillTransformer, oneElementsHaveUniqueRepresentation)
+            TEST(wali$domains$$GenKillTransformer$$make$and$makeOne, oneElementsHaveUniqueRepresentation)
             {
                 IntSet empty1, empty2, empty3, empty4;
 
@@ -162,7 +162,7 @@ namespace wali {
             }
 
 
-            TEST(wali$domains$$GenKillTransformer, zeroElementsHaveUniqueRepresentation)
+            TEST(wali$domains$$GenKillTransformer$makeZero, zeroElementsHaveUniqueRepresentation)
             {
                 ref_ptr<Transformer>
                     zero1 = Transformer::makeZero(),
@@ -172,7 +172,7 @@ namespace wali {
             }
 
 
-            TEST(wali$domains$$GenKillTransformer, constructorNormalizes)
+            TEST(wali$domains$$GenKillTransformer$make, constructorNormalizes)
             {
                 IntSet
                     gen_start = SetFixture().evens,
@@ -214,7 +214,7 @@ namespace wali {
             }
 
 
-            TEST(wali$domains$$GenKillTransformer, equalSetsGiveEqualTransformers)
+            TEST(wali$domains$$GenKillTransformer$$equal, equalSetsGiveEqualTransformers)
             {
                 SetFixture sets1, sets2;
 
@@ -236,7 +236,7 @@ namespace wali {
             }
 
 
-            TEST(wali$domains$$GenKillTransformer, unequalSetsGiveEqualTransformers)
+            TEST(wali$domains$$GenKillTransformer$$equal, unequalSetsGiveEqualTransformers)
             {
                 SetFixture sets1, sets2;
 
@@ -274,7 +274,7 @@ namespace wali {
             //    gen_expected  = {2, 4, 5, 8}
             //    kill_expected = {3, 6, 7, 9}
 
-            TEST(wali$domains$$GenKillTransformer, extendProducesCorrectAnswers)
+            TEST(wali$domains$$GenKillTransformer$$extend, extendProducesCorrectAnswers)
             {
                 // Set up inputs and expected results
                 IntSet gen_x, kill_x, gen_y, kill_y, gen_expected, kill_expected;
@@ -326,7 +326,7 @@ namespace wali {
             //    gen_expected  = {2, 4, 5, 6, 8}
             //    kill_expected = {9}
 
-            TEST(wali$domains$$GenKillTransformer, combineProducesCorrectAnswers)
+            TEST(wali$domains$$GenKillTransformer$$combine, combineProducesCorrectAnswers)
             {
                 // Set up inputs and expected results
                 IntSet gen_x, kill_x, gen_y, kill_y, gen_expected, kill_expected;
