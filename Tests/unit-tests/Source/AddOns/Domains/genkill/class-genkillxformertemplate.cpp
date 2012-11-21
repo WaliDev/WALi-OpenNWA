@@ -10,11 +10,41 @@
 
 
 namespace {
-    // Abbreviations
     typedef std::set<int> IntSet;
+    
+    struct IntSetWithBottom
+        : wali::domains::genkill::SortedContainerSetAdapter<IntSet>
+    {
+        typedef wali::domains::genkill::SortedContainerSetAdapter<IntSet> BaseClass;
+
+        IntSetWithBottom(IntSetWithBottom const & other)
+            : BaseClass(other)
+        {}
+
+        IntSetWithBottom(BaseClass const & other)
+            : BaseClass(other)
+        {}
+
+        IntSetWithBottom(IntSet const & other)
+            : BaseClass(other)
+        {}
+
+        IntSetWithBottom()
+        {}
+        
+        static
+        IntSetWithBottom &
+        UniverseSet() {
+            static IntSetWithBottom universe;
+            return universe;
+        }
+    };
+    
+    // Abbreviations
     typedef wali::domains::genkill::SortedContainerSetAdapter<IntSet> IntSetAdapter;
+
     //typedef wali::domains::genkill::GenKillWeightNoBottom<IntSetAdapter> Transformer;
-    typedef wali::domains::genkill::GenKillWeight<IntSetAdapter> Transformer;
+    typedef wali::domains::genkill::GenKillWeight<IntSetWithBottom> Transformer;
 
 
     struct SetFixture
@@ -34,7 +64,7 @@ namespace {
         }
     };
 
-    
+
     // Oh god our API makes us to terrible things
     struct ConstructionRunner
     {
@@ -45,7 +75,7 @@ namespace {
     
     void make_universal_set_happy()
     {
-        IntSet & u = IntSetAdapter::UniverseSet();
+        IntSetWithBottom & u = IntSetWithBottom::UniverseSet();
         u.insert(0);
         u.insert(1);
         u.insert(2);
@@ -58,7 +88,7 @@ namespace {
         u.insert(9);
 
         // Cannot use ASSERT/EXPECT assertions here.
-        assert(IntSetAdapter::UniverseSet().size() == 10u);
+        assert(IntSetWithBottom::UniverseSet().size() == 10u);
     }
 
     ConstructionRunner make_happy(make_universal_set_happy);

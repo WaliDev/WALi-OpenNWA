@@ -33,15 +33,6 @@ namespace wali {
 
 
         static
-        SortedContainerSetAdapter &
-        UniverseSet()
-        {
-          static SortedContainerSetAdapter u;
-          return u;
-        }
-    
-
-        static
         SortedContainerSetAdapter
         EmptySet()
         {
