@@ -7,6 +7,7 @@
 #include <climits>
 #include <cassert>
 
+#include "wali/domains/genkill/GenKillBase.hpp"
 #include "wali/SemElem.hpp"
 
 namespace wali {
@@ -71,329 +72,29 @@ namespace wali {
        The implementation maintains unique representations for zero and one.
       */
       template< typename Set >
-      class GenKillWeightNoBottom : public wali::SemElem
+      class GenKillWeightNoBottom
+        : public GenKillBase<GenKillWeightNoBottom<Set>, Set>
       {
-      public: // methods
-
-        /// A client uses 'make()' to create a GenKillWeightNoBottom instead
-        /// of calling the constructor directly.
-        ///
-        /// 'make()' normalizes the kill and gen sets before storing them so
-        /// that (kill intersect gen == emptyset). It also ensures that there
-        /// is a unique representitive of semiring 1 (gen = kill = empty).
-        static
-        wali::ref_ptr<GenKillWeightNoBottom>
-        make(Set const & k, Set const & g)
-        {
-          Set k_normalized = Set::Diff(k, g, true);
-          if (shouldMakeOne(k_normalized, g)) {
-            return makeOne();
-          }
-          else {
-            return new GenKillWeightNoBottom(k_normalized, g);
-          }
-        }
-
-  
-        static
-        wali::ref_ptr<GenKillWeightNoBottom>
-        makeZero()
-        {
-          // Uses a method-static variable to avoid
-          // problems with static-initialization order
-          static GenKillWeightNoBottom* the_zero =
-            new GenKillWeightNoBottom(1);
-          return the_zero;
-        }
-  
-
-        static
-        wali::ref_ptr<GenKillWeightNoBottom>
-        makeOne()
-        {
-          // Uses a method-static variable to avoid problems with
-          // static-initialization order
-          static GenKillWeightNoBottom* the_one =
-            new GenKillWeightNoBottom(Set::EmptySet(), Set::EmptySet(), 1);
-          return the_one;
-        }
-  
-
-        virtual
-        ~GenKillWeightNoBottom() {}
-
-
-        /// This is a "virtual constructor" for whatever kind of GenKill
-        /// weight is being used here.
-        virtual
-        wali::ref_ptr<GenKillWeightNoBottom>
-        create(Set const & kill, Set const & gen)
-        {
-          return make(kill, gen);
-        }
-        
-        
-        bool IsOne() const
-        {
-          if(this == makeOne().get_ptr()) {
-            return true;
-          }
-
-          assert(!Set::Eq(kill, Set::EmptySet())
-                 || !Set::Eq(gen, Set::EmptySet()));
-
-          return false;
-        }
-
-        // Zero is a special value that doesn't map to any gen/kill pair, so
-        // all we really want out of this is a unique representative.  The
-        // gen/kill sets with which it is initialized are arbitrary.
-        bool IsZero() const { return is_zero; }
-
-
-        //-------------------------------------------------
-        // Semiring methods
-        //-------------------------------------------------
-
-        wali::sem_elem_t one()  const { return makeOne();  }
-        wali::sem_elem_t zero() const { return makeZero(); }
-
-
-        /// Return the extend of x (this) and y.
-        ///
-        /// Considering x and y as functions, x extend y = y o x,
-        /// where (g o f)(v) = g(f(v)).
-        ///
-        /// FIXME: const: wali::SemElem::extend is not declared as const
-        wali::sem_elem_t
-        extend( wali::SemElem* _y )
-        {
-          // Handle special case for either argument being zero():
-          // zero extend _y = zero; this extend zero = zero
-          if( this->equal(zero()) || _y->equal(zero()) ) {
-            return zero();
-          }
-
-          // Handle special case for either argument being one()
-          if( this->equal(one()) ) {
-            // one extend _y = _y
-            return _y;
-          }
-          else if( _y->equal(one()) ) {
-            // this extend one = this
-            return this;
-          }
-
-          const GenKillWeightNoBottom* y = dynamic_cast<GenKillWeightNoBottom*>(_y);
-
-          Set temp_k( Set::Union( kill, y->kill ) );
-          Set temp_g( Set::Union( Set::Diff(gen,y->kill), y->gen) );
-
-          return make( temp_k,temp_g );
-        }
-
-
-        // FIXME: const: wali::SemElem::combine is not declared as const
-        wali::sem_elem_t
-        combine( wali::SemElem* _y )
-        {
-          // Handle special case for either argument being zero()
-          if( this->equal(zero()) ) {
-            // zero combine _y = _y
-            return _y;
-          }
-          if( _y->equal(zero()) ) {
-            // this combine zero = this
-            return this;
-          }
-
-          const GenKillWeightNoBottom* y = dynamic_cast<GenKillWeightNoBottom*>(_y);
-
-          Set temp_k( Set::Intersect( kill, y->kill ) );
-          Set temp_g( Set::Union( gen, y->gen ) );
-
-          return make( temp_k,temp_g );
-        }
-
-
-        wali::sem_elem_t
-        quasiOne() const
-        {
-          return one();
-        }
-
-
-        //
-        // diff(GenKillWeightNoBottom* y)
-        //
-        // Return the difference between x (this) and y.
-        //
-        // The return value r has two properties:
-        // 1. r ]= x,
-        //    i.e., isEqual(combine(x,r), x) == true
-        // 2. y combine r = y combine a,
-        //    i.e., isEqual(combine(y,r), combine(y,a)) == true
-        //
-        wali::sem_elem_t
-        diff( wali::SemElem* _y ) // const
-        {
-          // Handle special case for either argument being zero()
-          if( this->equal(zero()) ) {
-            // zero - _y = zero
-            return zero();
-          }
-          if( _y->equal(zero()) ) {
-            // this - zero = this
-            return this;
-          }
-
-          const GenKillWeightNoBottom* y = dynamic_cast<GenKillWeightNoBottom*>(_y);
-          // Both *this and *y are proper (non-zero) values
-
-          Set temp_k( Set::Diff(Set::UniverseSet(),Set::Diff(y->kill,kill)) ); 
-          Set temp_g( Set::Diff(gen,y->gen) ); 
-
-          return make(temp_k, temp_g);
-        }
-
-
-        // Zero is a special representative that must be compared by address
-        // rather by its contained Gen/Kill sets.
-        bool isEqual(const GenKillWeightNoBottom* y) const
-        {
-          // Check for identical arguments: could be two special values
-          // (i.e., two zeros or two ones) or two identical instances of a
-          // non-special semiring value.
-          if(this == y) {
-            return true;
-          }
-
-          // Return false if any argument is zero.  Zero has a unique
-          // representative, and thus the return value could only be true via
-          // the preceding check for identicalness.  The same approach could
-          // be taken for one, but the extra tests are not worth it.
-          if(this->IsZero() || y->IsZero()) {
-            return false;
-          }
-
-          return Set::Eq(kill,y->kill) && Set::Eq(gen,y->gen);
-        }
-
-
-        bool equal(wali::SemElem* _y) const
-        {
-          GenKillWeightNoBottom const * y = dynamic_cast<GenKillWeightNoBottom*>(_y);
-          return this->isEqual(y);
-        }
-
-
-        bool equal(wali::sem_elem_t _y) const
-        {
-          return this->equal(_y.get_ptr());
-        }
-
-
-        std::ostream& print( std::ostream& o ) const 
-        {
-          if(this->IsZero()) {
-            return o << "<zero>";
-          }
-          if(this->IsOne()) {
-            return o << "<one>";
-          }
-
-          o << "<\\S.(S - {";
-          kill.print(o);
-          o << "}) U {";
-          gen.print(o);
-          o << "}>";
-          return o;
-        }
-
-
-        std::ostream& prettyPrint( std::ostream& o ) const
-        {
-          return this->print(o);
-        }
-
-        //-------------------------------------------------
-        // Other useful methods
-        //-------------------------------------------------
-
-        Set apply( const Set & input ) const
-        {
-          assert(!this->IsZero());
-          return Set::Union( Set::Diff(input,kill), gen );
-        }
-
-        const Set& getKill() const
-        {
-          assert(!this->IsZero());
-          return kill;
-        }
-
-
-        const Set& getGen() const
-        {
-          assert(!this->IsZero());
-          return gen;
-        }
-
-
-        static std::ostream& print_static_transformers( std::ostream& o )
-        {
-          o << "ONE\t=\t";    one()->print(o);  o << std::endl;
-          o << "ZERO\t=\t";   zero()->print(o); o << std::endl;
-          return o;
-        }
-
       private: // methods -----------------------------------------------------------
+
+        typedef GenKillBase<GenKillWeightNoBottom<Set>, Set> BaseClass;
+        friend class GenKillBase<GenKillWeightNoBottom<Set>, Set>; // god c++ is stupid sometimes
 
         // Constructors
         // The constructors are private to ensure uniqueness of one, zero, and bottom
 
         // Constructor for legitimate values
         GenKillWeightNoBottom(const Set& k, const Set& g, unsigned int c=0)
-          : wali::SemElem()
-          , kill(k)
-          , gen(g)
-          , is_zero(false)
-        {
-          count = c;
-        }
+          : BaseClass(k, g, c)
+        {}
 
         // Constructor for zero
         GenKillWeightNoBottom(unsigned int c=0)
-          : wali::SemElem()
-          , is_zero(true)
-        {
-          count = c;
-        }
+          : BaseClass(c)
+        {}
 
-
-        // Helpers
-        static
-        bool
-        shouldMakeOne(Set const & k, Set const & g)
-        {
-          return Set::Eq(k, Set::EmptySet())
-            && Set::Eq(g, Set::EmptySet());
-        }
-
-      private:
-        // members -----------------------------------------------------------
-        Set kill, gen;   // Used to represent the function \S.(S - kill) U gen
-        bool is_zero;    // True for the zero element, False for all other values
       };
 
-
-      template< typename Set >
-      std::ostream &
-      operator<< (std::ostream& out, GenKillWeightNoBottom<Set> const & t)
-      {
-        t.print(out);
-        return out;
-      }
 
 
     } // namespace genkill
