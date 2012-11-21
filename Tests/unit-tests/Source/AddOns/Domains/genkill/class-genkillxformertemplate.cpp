@@ -146,6 +146,21 @@ namespace wali {
             }
 
 
+            TEST(wali$domains$$GenKillTransformer$$create, createMakesNormalSetsLikeMake)
+            {
+                SetFixture sets;
+
+                ref_ptr<Transformer>
+                    zero = Transformer::makeZero(),
+                    expected = Transformer::make(sets.evens, sets.odds),
+                    actual = zero->create(sets.evens, sets.odds);
+
+                EXPECT_EQ(sets.evens, actual->getKill());
+                EXPECT_EQ(sets.odds, actual->getGen());
+                EXPECT_TRUE(expected->equal(actual));
+            }
+
+
             TEST(wali$domains$$GenKillTransformer$$make$and$makeOne, oneElementsHaveUniqueRepresentation)
             {
                 IntSet empty1, empty2, empty3, empty4;
@@ -156,12 +171,15 @@ namespace wali {
                     one3 = Transformer::makeOne(),
                     one4 = Transformer::makeOne();
 
-                sem_elem_t one5 = one1->one();
+                sem_elem_t
+                    one5 = one1->one(),
+                    one6 = one1->create(empty1, empty2);
 
                 EXPECT_EQ(one2, one1);
                 EXPECT_EQ(one3, one1);
                 EXPECT_EQ(one4, one1);
                 EXPECT_EQ(one5, one1);
+                EXPECT_EQ(one6, one1);
             }
 
 

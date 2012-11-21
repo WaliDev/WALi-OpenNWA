@@ -134,6 +134,16 @@ namespace wali {
         virtual
         ~GenKillWeightNoBottom() {}
 
+
+        /// This is a "virtual constructor" for whatever kind of GenKill
+        /// weight is being used here.
+        virtual
+        wali::ref_ptr<GenKillWeightNoBottom>
+        create(Set const & kill, Set const & gen)
+        {
+          return make(kill, gen);
+        }
+        
         
         bool IsOne() const
         {
