@@ -93,16 +93,14 @@ namespace wali {
         /// is a unique representitive of semiring 1 (gen = kill = empty).
         static
         wali::ref_ptr<GenKillWeightNoBottom>
-        make(Set const & kill, Set const & gen)
+        make(Set const & k, Set const & g)
         {
-          Set k_normalized = Set::Diff(kill, gen, true);
-          if (Set::Eq(k_normalized, Set::EmptySet())
-              && Set::Eq(gen, Set::EmptySet()))
-          {
+          Set k_normalized = Set::Diff(k, g, true);
+          if (shouldMakeOne(k_normalized, g)) {
             return makeOne();
           }
           else {
-            return new GenKillWeightNoBottom(k_normalized, gen);
+            return new GenKillWeightNoBottom(k_normalized, g);
           }
         }
 
@@ -380,6 +378,16 @@ namespace wali {
           , is_zero(true)
         {
           count = c;
+        }
+
+
+        // Helpers
+        static
+        bool
+        shouldMakeOne(Set const & k, Set const & g)
+        {
+          return Set::Eq(k, Set::EmptySet())
+            && Set::Eq(g, Set::EmptySet());
         }
 
       private:
