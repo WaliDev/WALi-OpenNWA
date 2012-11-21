@@ -75,16 +75,6 @@ namespace wali {
       {
       public: // methods
 
-        static
-        wali::ref_ptr<GenKillWeightNoBottom>
-        downcast(wali::sem_elem_t se)
-        {
-          wali::ref_ptr<GenKillWeightNoBottom> down
-            = dynamic_cast<GenKillWeightNoBottom *>(se.get_ptr());
-          return down;
-        }
-
-
         /// A client uses 'make()' to create a GenKillWeightNoBottom instead
         /// of calling the constructor directly.
         ///
