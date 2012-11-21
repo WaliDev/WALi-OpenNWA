@@ -6,12 +6,15 @@
 #include <wali/domains/genkill/GenKillWeightNoBottom.hpp>
 #include <wali/domains/genkill/SortedContainerSetAdapter.hpp>
 
+#include <wali/domains/genkill/GenKillWeight.hpp>
+
 
 namespace {
     // Abbreviations
     typedef std::set<int> IntSet;
     typedef wali::domains::genkill::SortedContainerSetAdapter<IntSet> IntSetAdapter;
-    typedef wali::domains::genkill::GenKillWeightNoBottom<IntSetAdapter> Transformer;
+    //typedef wali::domains::genkill::GenKillWeightNoBottom<IntSetAdapter> Transformer;
+    typedef wali::domains::genkill::GenKillWeight<IntSetAdapter> Transformer;
 
 
     struct SetFixture

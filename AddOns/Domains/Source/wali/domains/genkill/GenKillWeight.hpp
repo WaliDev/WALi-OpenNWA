@@ -1,7 +1,7 @@
 /* GT_EXTERNAL_LEGEND(2010) */
 
-#ifndef GEN_KILL_TRANSFORMER_GUARD
-#define GEN_KILL_TRANSFORMER_GUARD 1
+#ifndef WALI_DOMAINS_GENKILL_GEN_KILL_WEIGHT_INCLUDED
+#define WALI_DOMAINS_GENKILL_GEN_KILL_WEIGHT_INCLUDED
 
 #include <iostream>
 #include <climits>
@@ -76,40 +76,17 @@ namespace wali {
 
       */
       template< typename Set >
-      class GenKillWeight : public wali::SemElem
+      class GenKillWeight
+        : public GenKillBase<GenKillWeight<Set>, Set>
       {
       public: // methods
 
-        wali::sem_elem_t one()    const { return MkOne();    }
-        wali::sem_elem_t zero()   const { return MkZero();   }
-        wali::sem_elem_t bottom() const { return MkBottom(); }
+        typedef GenKillBase<GenKillWeight<Set>, Set> BaseClass;
+        friend class GenKillBase<GenKillWeight<Set>, Set>; // god c++ is stupid sometimes
+       
 
+        wali::sem_elem_t bottom() const { return makeBottom(); }
 
-        static
-        wali::ref_ptr<GenKillWeight>
-        downcast(wali::sem_elem_t se)
-        {
-          wali::ref_ptr<GenKillWeight> down
-            = dynamic_cast<GenKillWeight *>(se.get_ptr());
-          return down;
-        }
-
-
-        static
-        wali::ref_ptr<GenKillWeight>
-        make(Set const & kill, Set const & gen)
-        {
-          return downcast(makeGenKillWeight(kill, gen));
-        }
-
-  
-        static
-        wali::ref_ptr<GenKillWeight>
-        makeZero()
-        {
-          return downcast(MkZero());
-        }
-  
 
         // A client uses makeGenKillWeight to create a
         // GenKillWeight instead of calling the constructor directly;
@@ -120,66 +97,26 @@ namespace wali {
         // makeGenKillWeight also maintains unique representatives for
         // the special semiring values one, and bottom.
         //
-        static wali::sem_elem_t
+        static
+        ref_ptr<GenKillWeight>
         makeGenKillWeight(const Set& k, const Set& g )
         {
           Set k_normalized = Set::Diff(k, g, true);
-          if (Set::Eq(k_normalized, Set::EmptySet())&& 
-              Set::Eq(g, Set::UniverseSet()))
-          {
-            return MkBottom();
+          if (shouldMakeBottom(k_normalized, g)) {
+            return makeBottom();
           }
-          else if (Set::Eq(k_normalized, Set::EmptySet()) && 
-                   Set::Eq(g, Set::EmptySet()))
-          {
-            return MkOne();
+          else if (shouldMakeOne(k_normalized, g)) {
+            return BaseClass::makeOne();
           }
           else {
             return new GenKillWeight(k_normalized, g);
           }
         }
 
-        ~GenKillWeight() {}
 
-        //-------------------------------------------------
-        // Semiring methods
-        //-------------------------------------------------
-        static wali::sem_elem_t MkOne()
-        {
-          // Uses a method-static variable to avoid problems with
-          // static-initialization order
-          static GenKillWeight* ONE =
-            new GenKillWeight(Set::EmptySet(), Set::EmptySet(), 1);
-          return ONE;
-        }
-
-        bool IsOne() const
-        {
-          if(this == MkOne().get_ptr()) 
-            return true;
-
-          assert(!Set::Eq(kill, Set::EmptySet())
-                 || !Set::Eq(gen, Set::EmptySet()));
-
-          return false;
-        }
-
-        // Zero is a special value that doesn't map to any gen/kill pair, so
-        // all we really want out of this is a unique representative.  The
-        // gen/kill sets with which it is initialized are arbitrary.
-        static wali::sem_elem_t MkZero()
-        {
-          // Uses a method-static variable to avoid
-          // problems with static-initialization order
-          static GenKillWeight* ZERO =
-            new GenKillWeight(1);
-          return ZERO;
-        }
-
-        bool IsZero() const { return is_zero; }
-
-        static wali::sem_elem_t
-        MkBottom()
+        static
+        ref_ptr<GenKillWeight>
+        makeBottom()
         {
           // Uses a method-static variable to avoid problems with
           // static-initialization order
@@ -190,11 +127,11 @@ namespace wali {
 
         bool IsBottom() const
         {
-          if(this == MkBottom().get_ptr()) 
+          if(this == makeBottom().get_ptr()) 
             return true;
 
-          assert(!Set::Eq(kill, Set::EmptySet()) 
-                 || !Set::Eq(gen, Set::UniverseSet()));
+          assert(!Set::Eq(this->getKill(), Set::EmptySet()) 
+                 || !Set::Eq(this->getGen(), Set::UniverseSet()));
 
           return false;
         }
@@ -212,61 +149,35 @@ namespace wali {
         extend( wali::SemElem* _y )
         {
           // Handle special case for either argument being zero()
-          if( this->equal(zero()) || _y->equal(zero()) ) {
-            return zero(); // zero extend _y = zero; this extend zero = zero
+          if( this->equal(this->zero()) || _y->equal(this->zero()) ) {
+            return this->zero(); // zero extend _y = zero; this extend zero = zero
           }
 
-          // Handle special case for either argument being one()
-          if( this->equal(one()) ) {
-            return _y; // one extend _y = _y
-          }
-          else if( _y->equal(one()) )
-          {
-            return this; // this extend one = this
+          if( _y->equal(bottom()) ) {
+            return this->bottom();
           }
 
-          if( _y->equal(bottom()) )
-          {
-            return bottom();
-          }
-
-          const GenKillWeight* y = dynamic_cast<GenKillWeight*>(_y);
-
-          Set temp_k( Set::Union( kill, y->kill ) );
-          Set temp_g( Set::Union( Set::Diff(gen,y->kill), y->gen) );
-
-          return makeGenKillWeight( temp_k,temp_g );
+          return BaseClass::extend(_y);
         }
+
 
         // FIXME: const: wali::SemElem::combine is not declared as const
         wali::sem_elem_t
         combine( wali::SemElem* _y )
         {
-          // Handle special case for either argument being zero()
-          if( this->equal(zero()) ) {
-            return _y; // zero combine _y = _y
-          }
-          if( _y->equal(zero()) ) {
-            return this; // this combine zero = this
-          }
-
           // Handle special case for either argument being bottom()
           if( this->equal(bottom()) || _y->equal(bottom()) ) {
             return bottom(); // bottom combine _y = bottom;
           }                  // this combine bottom = bottom 
 
-          const GenKillWeight* y = dynamic_cast<GenKillWeight*>(_y);
-
-          Set temp_k( Set::Intersect( kill, y->kill ) );
-          Set temp_g( Set::Union( gen, y->gen ) );
-
-          return makeGenKillWeight( temp_k,temp_g );
+          return BaseClass::combine(_y);
         }
+
 
         wali::sem_elem_t
         quasiOne() const
         {
-          return one();
+          return this->one();
         }
 
         //
@@ -284,106 +195,41 @@ namespace wali {
         diff( wali::SemElem* _y ) // const
         {
           // Handle special case for either argument being zero()
-          if( this->equal(zero()) ) {
-            return zero(); // zero - _y = zero
+          if( this->equal(this->zero()) ) {
+            return this->zero(); // zero - _y = zero
           }
-          if( _y->equal(zero()) ) {
+          if( _y->equal(this->zero()) ) {
             return this; // this - zero = this
           }
 
           // Handle special case for second argument being bottom()
           if( _y->equal(bottom()) ) {
-            return zero(); // this - bottom = zero
+            return this->zero(); // this - bottom = zero
           }
 
           const GenKillWeight* y = dynamic_cast<GenKillWeight*>(_y);
           // Both *this and *y are proper (non-zero) values
 
-          Set temp_k( Set::Diff(Set::UniverseSet(),Set::Diff(y->kill,kill)) ); 
-          Set temp_g( Set::Diff(gen,y->gen) ); 
+          Set temp_k( Set::Diff(Set::UniverseSet(),Set::Diff(y->getKill(), this->getKill())) ); 
+          Set temp_g( Set::Diff(this->getGen(),y->getGen()) ); 
 
           return makeGenKillWeight(temp_k, temp_g);
         }
 
-        // Zero is a special representative that must be compared by address
-        // rather by its contained Gen/Kill sets.
-        bool isEqual(const GenKillWeight* y) const
-        {
-          // Check for identical arguments: could be two special values
-          // (i.e., two zeros, two ones, or two bottoms) or two identical
-          // instances of a non-special semiring value.
-          if(this == y) return true;
-
-          // Return false if any argument is zero.  Zero has a unique
-          // representative, and thus the return value could only be true via
-          // the preceding check for identicalness.  The same approach could
-          // be taken for one and bottom, but the extra tests are not worth
-          // it.
-          if(this->IsZero() || y->IsZero())
-            return false;
-
-          return Set::Eq(kill,y->kill) && Set::Eq(gen,y->gen);
-        }
-
-        bool equal(wali::SemElem* _y) const
-        {
-          const GenKillWeight* y = dynamic_cast<GenKillWeight*>(_y);
-          return this->isEqual(y);
-        }
-
-        bool equal(wali::sem_elem_t _y) const
-        {
-          const GenKillWeight* y = dynamic_cast<GenKillWeight*>
-            (_y.get_ptr());
-          return this->isEqual(y);
-        }
 
         std::ostream& print( std::ostream& o ) const 
         {
-          if(this->IsZero())
-            return o << "<zero>";
-          if(this->IsOne())
-            return o << "<one>";
           if(this->IsBottom())
             return o << "<bottom>";
 
-          o << "<\\S.(S - {";
-          kill.print(o);
-          o << "}) U {";
-          gen.print(o);
-          o << "}>";
-          return o;
-        }
-
-        std::ostream& prettyPrint( std::ostream& o ) const {
-          return this->print(o);
-        }
-
-        //-------------------------------------------------
-        // Other useful methods
-        //-------------------------------------------------
-
-        Set apply( const Set & input ) const
-        {
-          assert(!this->IsZero());
-          return Set::Union( Set::Diff(input,kill), gen );
-        }
-
-        const Set& getKill() const {
-          assert(!this->IsZero());
-          return kill;
-        }
-
-        const Set& getGen() const {
-          assert(!this->IsZero());
-          return gen;
+          return BaseClass::print(o);
         }
 
         static std::ostream& print_static_transformers( std::ostream& o )
         {
-          o << "ONE\t=\t";    one()->print(o);  o << std::endl;
-          o << "ZERO\t=\t";   zero()->print(o); o << std::endl;
-          o << "BOTTOM\t=\t"; bottom()->print(o); o << std::endl;
+          o << "ONE\t=\t";    BaseClass::makeOne()->print(o);  o << std::endl;
+          o << "ZERO\t=\t";   BaseClass::makeZero()->print(o); o << std::endl;
+          o << "BOTTOM\t=\t"; makeBottom()->print(o); o << std::endl;
           return o;
         }
 
@@ -393,32 +239,26 @@ namespace wali {
         // The constructors are private to ensure uniqueness of one, zero, and bottom
 
         // Constructor for legitimate values
-        GenKillWeight(const Set& k, const Set& g, unsigned int c=0) :
-          wali::SemElem(), kill(k), gen(g), is_zero(false)
-        {
-          count = c;
-        }
+        GenKillWeight(const Set& k, const Set& g, unsigned int c=0)
+          : BaseClass(k, g, c)
+        {}
 
         // Constructor for zero
-        GenKillWeight(unsigned int c=0) :
-          wali::SemElem(), is_zero(true)
-        {
-          count = c;
-        }
+        GenKillWeight(unsigned int c=0)
+          : BaseClass(c)
+        {}
 
-      private: // members -----------------------------------------------------------
-        Set kill, gen;   // Used to represent the function \S.(S - kill) U gen
-        bool is_zero;    // True for the zero element, False for all other values
+
+        static
+        bool
+        shouldMakeBottom(Set const & k_normalized, Set const & g)
+        {
+          return Set::Eq(k_normalized, Set::EmptySet())
+            && Set::Eq(g, Set::UniverseSet());
+        }
 
       };
 
-      template< typename Set >
-      std::ostream &
-      operator<< (std::ostream& out, const GenKillWeight<Set> & t)
-      {
-        t.print(out);
-        return out;
-      }
 
 
     } // namespace genkill
