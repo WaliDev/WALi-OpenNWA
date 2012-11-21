@@ -9,6 +9,17 @@
 #include <wali/domains/genkill/GenKillWeight.hpp>
 
 
+#define DEFINE_EMPTY_TEMPLATED_FIXTURE(classname, template_parameter_typedef_name)  \
+    template<typename T> class classname : public ::testing::Test { \
+      public: \
+        typedef T template_parameter_typedef_name; \
+    };
+
+#define DEFINE_TYPED_TEST_CASES(types, template_parameter_typedef_name, classname) \
+    DEFINE_EMPTY_TEMPLATED_FIXTURE(classname, template_parameter_typedef_name) \
+    TYPED_TEST_CASE(classname, types);
+
+
 namespace {
     typedef std::set<int> IntSet;
     
@@ -42,10 +53,8 @@ namespace {
     
     // Abbreviations
     typedef wali::domains::genkill::SortedContainerSetAdapter<IntSet> IntSetAdapter;
-
-    //typedef wali::domains::genkill::GenKillWeightNoBottom<IntSetAdapter> Transformer;
-    typedef wali::domains::genkill::GenKillWeight<IntSetWithBottom> Transformer;
-
+    typedef wali::domains::genkill::GenKillWeightNoBottom<IntSetAdapter> TransformerNoBottom;
+    typedef wali::domains::genkill::GenKillWeight<IntSetWithBottom> TransformerWithBottom;
 
     struct SetFixture
     {
@@ -92,15 +101,33 @@ namespace {
     }
 
     ConstructionRunner make_happy(make_universal_set_happy);
+
+
+    typedef ::testing::Types<TransformerWithBottom, TransformerNoBottom> TransformerTypes;
 }
+
+
 
 
 namespace wali {
     namespace domains {
         namespace genkill {
+            DEFINE_TYPED_TEST_CASES(TransformerTypes, Transformer, wali$domains$$GenKillTransformer)
+            DEFINE_TYPED_TEST_CASES(TransformerTypes, Transformer, wali$domains$$GenKillTransformer$$combine)
+            DEFINE_TYPED_TEST_CASES(TransformerTypes, Transformer, wali$domains$$GenKillTransformer$$create)
+            DEFINE_TYPED_TEST_CASES(TransformerTypes, Transformer, wali$domains$$GenKillTransformer$$equal)
+            DEFINE_TYPED_TEST_CASES(TransformerTypes, Transformer, wali$domains$$GenKillTransformer$$extend)
+            DEFINE_TYPED_TEST_CASES(TransformerTypes, Transformer, wali$domains$$GenKillTransformer$make)
+            DEFINE_TYPED_TEST_CASES(TransformerTypes, Transformer, wali$domains$$GenKillTransformer$$make)
+            DEFINE_TYPED_TEST_CASES(TransformerTypes, Transformer, wali$domains$$GenKillTransformer$$make$and$makeOne)
+            DEFINE_TYPED_TEST_CASES(TransformerTypes, Transformer, wali$domains$$GenKillTransformer$$makeOne$and$makeZero)
+            DEFINE_TYPED_TEST_CASES(TransformerTypes, Transformer, wali$domains$$GenKillTransformer$makeZero)
+            
 
-            TEST(wali$domains$$GenKillTransformer$$make, emptyEmptyGivesOne)
+            TYPED_TEST(wali$domains$$GenKillTransformer$$make, emptyEmptyGivesOne)
             {
+                typedef typename TestFixture::Transformer Transformer;
+                
                 IntSet empty1, empty2;
 
                 ref_ptr<Transformer> trans = Transformer::make(empty1, empty2);
@@ -117,8 +144,10 @@ namespace wali {
             }
 
 
-            TEST(wali$domains$$GenKillTransformer$$make, makeZeroGivesZero)
+            TYPED_TEST(wali$domains$$GenKillTransformer$$make, makeZeroGivesZero)
             {
+                typedef typename TestFixture::Transformer Transformer;
+                
                 ref_ptr<Transformer> trans = Transformer::makeZero();
 
                 // Make sure it's zero, in a couple different ways
@@ -133,8 +162,10 @@ namespace wali {
             }
 
 
-            TEST(wali$domains$$GenKillTransformer$$make, makeOneGivesOne)
+            TYPED_TEST(wali$domains$$GenKillTransformer$$make, makeOneGivesOne)
             {
+                typedef typename TestFixture::Transformer Transformer;
+                
                 ref_ptr<Transformer> trans = Transformer::makeOne();
 
                 // Make sure it's zero, in a couple different ways
@@ -145,8 +176,10 @@ namespace wali {
             }
 
 
-            TEST(wali$domains$$GenKillTransformer$$makeOne$and$makeZero, zeroAndOneAreDifferent)
+            TYPED_TEST(wali$domains$$GenKillTransformer$$makeOne$and$makeZero, zeroAndOneAreDifferent)
             {
+                typedef typename TestFixture::Transformer Transformer;
+
                 ref_ptr<Transformer>
                     one = Transformer::makeOne(),
                     zero = Transformer::makeZero();
@@ -155,8 +188,10 @@ namespace wali {
             }
             
 
-            TEST(wali$domains$$GenKillTransformer$$make, genAndKillSetsAreStored)
+            TYPED_TEST(wali$domains$$GenKillTransformer$$make, genAndKillSetsAreStored)
             {
+                typedef typename TestFixture::Transformer Transformer;
+
                 SetFixture sets;
 
                 ref_ptr<Transformer> trans = Transformer::make(sets.evens, sets.odds);
@@ -166,8 +201,10 @@ namespace wali {
             }
 
 
-            TEST(wali$domains$$GenKillTransformer$$make, genAndKillSetsAreCopied)
+            TYPED_TEST(wali$domains$$GenKillTransformer$$make, genAndKillSetsAreCopied)
             {
+                typedef typename TestFixture::Transformer Transformer;
+
                 SetFixture sets;
 
                 ref_ptr<Transformer> trans = Transformer::make(sets.evens, sets.odds);
@@ -179,8 +216,10 @@ namespace wali {
             }
 
 
-            TEST(wali$domains$$GenKillTransformer$$create, createMakesNormalSetsLikeMake)
+            TYPED_TEST(wali$domains$$GenKillTransformer$$create, createMakesNormalSetsLikeMake)
             {
+                typedef typename TestFixture::Transformer Transformer;
+
                 SetFixture sets;
 
                 ref_ptr<Transformer>
@@ -194,8 +233,10 @@ namespace wali {
             }
 
 
-            TEST(wali$domains$$GenKillTransformer$$make$and$makeOne, oneElementsHaveUniqueRepresentation)
+            TYPED_TEST(wali$domains$$GenKillTransformer$$make$and$makeOne, oneElementsHaveUniqueRepresentation)
             {
+                typedef typename TestFixture::Transformer Transformer;
+
                 IntSet empty1, empty2, empty3, empty4;
 
                 ref_ptr<Transformer>
@@ -216,8 +257,10 @@ namespace wali {
             }
 
 
-            TEST(wali$domains$$GenKillTransformer$makeZero, zeroElementsHaveUniqueRepresentation)
+            TYPED_TEST(wali$domains$$GenKillTransformer$makeZero, zeroElementsHaveUniqueRepresentation)
             {
+                typedef typename TestFixture::Transformer Transformer;
+
                 ref_ptr<Transformer>
                     zero1 = Transformer::makeZero(),
                     zero2 = Transformer::makeZero();
@@ -229,8 +272,10 @@ namespace wali {
             }
 
 
-            TEST(wali$domains$$GenKillTransformer$make, constructorNormalizes)
+            TYPED_TEST(wali$domains$$GenKillTransformer$make, constructorNormalizes)
             {
+                typedef typename TestFixture::Transformer Transformer;
+
                 IntSet
                     gen_start = SetFixture().evens,
                     kill_start = SetFixture().odds;
@@ -261,8 +306,10 @@ namespace wali {
             }
             
 
-            TEST(wali$domains$$GenKillTransformer, waliSemElemTestsPass)
+            TYPED_TEST(wali$domains$$GenKillTransformer, waliSemElemTestsPass)
             {
+                typedef typename TestFixture::Transformer Transformer;
+
                 SetFixture sets;
 
                 ref_ptr<Transformer> trans = Transformer::make(sets.evens, sets.odds);
@@ -271,8 +318,10 @@ namespace wali {
             }
 
 
-            TEST(wali$domains$$GenKillTransformer$$equal, equalSetsGiveEqualTransformers)
+            TYPED_TEST(wali$domains$$GenKillTransformer$$equal, equalSetsGiveEqualTransformers)
             {
+                typedef typename TestFixture::Transformer Transformer;
+
                 SetFixture sets1, sets2;
 
                 ref_ptr<Transformer>
@@ -293,8 +342,10 @@ namespace wali {
             }
 
 
-            TEST(wali$domains$$GenKillTransformer$$equal, unequalSetsGiveEqualTransformers)
+            TYPED_TEST(wali$domains$$GenKillTransformer$$equal, unequalSetsGiveEqualTransformers)
             {
+                typedef typename TestFixture::Transformer Transformer;
+
                 SetFixture sets1, sets2;
 
                 ref_ptr<Transformer>
@@ -331,8 +382,10 @@ namespace wali {
             //    gen_expected  = {2, 4, 5, 8}
             //    kill_expected = {3, 6, 7, 9}
 
-            TEST(wali$domains$$GenKillTransformer$$extend, extendProducesCorrectAnswers)
+            TYPED_TEST(wali$domains$$GenKillTransformer$$extend, extendProducesCorrectAnswers)
             {
+                typedef typename TestFixture::Transformer Transformer;
+
                 // Set up inputs and expected results
                 IntSet gen_x, kill_x, gen_y, kill_y, gen_expected, kill_expected;
 
@@ -383,8 +436,10 @@ namespace wali {
             //    gen_expected  = {2, 4, 5, 6, 8}
             //    kill_expected = {9}
 
-            TEST(wali$domains$$GenKillTransformer$$combine, combineProducesCorrectAnswers)
+            TYPED_TEST(wali$domains$$GenKillTransformer$$combine, combineProducesCorrectAnswers)
             {
+                typedef typename TestFixture::Transformer Transformer;
+
                 // Set up inputs and expected results
                 IntSet gen_x, kill_x, gen_y, kill_y, gen_expected, kill_expected;
 
