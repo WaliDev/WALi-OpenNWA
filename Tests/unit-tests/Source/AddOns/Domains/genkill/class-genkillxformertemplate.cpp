@@ -156,9 +156,12 @@ namespace wali {
                     one3 = Transformer::makeOne(),
                     one4 = Transformer::makeOne();
 
-                EXPECT_EQ(one1, one2);
-                EXPECT_EQ(one1, one3);
-                EXPECT_EQ(one1, one4);
+                sem_elem_t one5 = one1->one();
+
+                EXPECT_EQ(one2, one1);
+                EXPECT_EQ(one3, one1);
+                EXPECT_EQ(one4, one1);
+                EXPECT_EQ(one5, one1);
             }
 
 
@@ -167,8 +170,11 @@ namespace wali {
                 ref_ptr<Transformer>
                     zero1 = Transformer::makeZero(),
                     zero2 = Transformer::makeZero();
+                
+                sem_elem_t zero3 = zero1->zero();
 
-                EXPECT_EQ(zero1, zero2);
+                EXPECT_EQ(zero2, zero1);
+                EXPECT_EQ(zero3, zero1);
             }
 
 
