@@ -6,7 +6,6 @@
 #include <iostream>
 #include <climits>
 #include <cassert>
-#include "wali/ref_ptr.hpp"
 
 #include "wali/SemElem.hpp"
 
@@ -255,7 +254,7 @@ public: // methods
   //    i.e., isEqual(combine(y,r), combine(y,a)) == true
   //
   wali::sem_elem_t
-  diff( wali::SemElem* _y ) const
+  diff( wali::SemElem* _y ) // const
   {
       // Handle special case for either argument being zero()
       if( this->equal(zero()) ) {
@@ -393,5 +392,11 @@ operator<< (std::ostream& out, const GenKillTransformer_T<Set> & t)
   t.print(out);
   return out;
 }
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
 
 #endif
