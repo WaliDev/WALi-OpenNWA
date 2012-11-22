@@ -1000,5 +1000,76 @@ namespace{
     }
   }
 
+#if defined(TENSOR_MATCHED_PAREN)
+  TEST(BddContext, bitLevelInfo)
+  {
+    program_bdd_context_t con;
+    con = new ProgramBddContext();
+    map<string, int> vars;
+    vars["a"] = 2;
+    vars["b"] = 3;
+    con->setIntVars(vars);
+    
+    bddinfo_t a = (*con)["a"];
+    bddinfo_t b = (*con)["b"];
+
+    bdd t;
+
+    // Setup Level sets
+    con->setupLevelSets();
+
+    /*
+     * t looks like:
+     * "a".tensor1Lhs          *
+     *                       1/ \0
+     *              ----------   ---------
+     *          bddfalse              bddtrue
+     **/
+    t = fdd_ithvar(a->tensor1Lhs, 0);
+    EXPECT_TRUE(con->isRootInVocTensor1Lhs(t));
+    EXPECT_FALSE(con->isRootRelevant(bdd_low(t)));
+    EXPECT_FALSE(con->isRootRelevant(bdd_high(t)));
+ 
+    /*
+     * t looks like:
+     * "a".tensor1Rhs         *
+     *                      1/ \0
+     *                 ------   \
+     * "a".tensor1Lhs  *         \
+     *               1/ \         \
+     *               /   ----------
+     *            bddtrue        bddfalse
+     **/
+    t = fdd_ithvar(a->tensor1Rhs, 1) & fdd_ithvar(a->tensor1Lhs, 1);
+    EXPECT_TRUE(con->isRootInVocTensor1Rhs(t));
+    EXPECT_TRUE(con->isRootInVocTensor1Lhs(bdd_high(t)));
+    EXPECT_FALSE(con->isRootRelevant(bdd_low(t)));
+
+    /*
+     * t looks like:
+     * "b".1.tensor2Lhs         *
+     *                        1/ \0
+     * "b".1.tensor2Rhs       /   *
+     *                       /  0/ \1
+     * "b".2.tensor2Lhs      |  /   *
+     *                       |  | 1/ \0
+     * "b".2.tensor2Rhs      |  |  |  *
+     *                       |  |  |0/ \1
+     *                    -----------   \
+     *                  bddfalse       bddtrue
+     **/
+   t = fdd_ithvar(b->tensor2Lhs, 2) & fdd_ithvar(b->tensor2Rhs, 1);
+    EXPECT_TRUE(con->isRootInVocTensor2Lhs(t));
+    t = bdd_low(t);
+    EXPECT_TRUE(con->isRootInVocTensor2Rhs(t));
+    t = bdd_high(t);
+    EXPECT_TRUE(con->isRootInVocTensor2Lhs(t));
+    t = bdd_high(t);
+    EXPECT_TRUE(con->isRootInVocTensor2Rhs(t));
+    t = bdd_low(t);
+    EXPECT_TRUE(t == bddtrue);
+  }
+#endif //#if defined(TENSOR_MATCHED_PAREN)
+
 } //namespace
 
