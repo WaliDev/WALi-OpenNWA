@@ -495,7 +495,6 @@ namespace goals {
       cout << "[Newton Compare] NWPDS ==> error not reachable" << endl;
     else{
       cout << "[Newton Compare] NWPDS ==> error reachable" << endl;
-      wt->print(cout);
     }
 
     t3->print(std::cout << "[Newton Compare] Time taken by NWPDS poststar: ") << endl;

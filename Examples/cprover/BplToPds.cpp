@@ -13,6 +13,8 @@ using namespace wali::cprover;
 using namespace wali::cprover::details;
 using namespace wali::cprover::details::resolve_details;
 
+#define MILLION 1000000
+//#define MILLION 0
 
 namespace wali
 {
@@ -282,7 +284,7 @@ namespace wali
 
       BddContext * dump_pds_from_prog(wpds::WPDS * pds, prog * pg)
       {
-        ProgramBddContext * con = new ProgramBddContext(); 
+        ProgramBddContext * con = new ProgramBddContext(20*MILLION, 20 * MILLION); 
 
         map<string, int> vars;
 

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iterator>
 #include <cassert>
+#include <sstream>
 
 //debugging
 #include "wali/SemElemTensor.hpp"
@@ -76,8 +77,8 @@ namespace wali {
               updatable_nodes[nno]->last_change = update_count + 1;
               updatable_nodes[nno]->last_seen = update_count + 1;
               updatable_nodes[nno]->eval_map.clear();
+              updatable_nodes[nno]->updates.push_back(update_count);
             }
-            //updates.push_back(nno);
           }
           update_count = update_count + 1;
         }
@@ -92,7 +93,7 @@ namespace wali {
           updatable(nno,se); // make sure that this node exists
           if(!updatable_nodes[nno]->value->equal(se)) {
             unsigned int &update_count = satProcesses[currentSatProcess].update_count;
-
+            updatable_nodes[nno]->updates.push_back(update_count);
 #ifdef DWPDS
             updatable_nodes[nno]->delta[update_count+1] = se->diff(updatable_nodes[nno]->value);
 #endif
@@ -101,7 +102,7 @@ namespace wali {
             updatable_nodes[nno]->last_change = update_count;
             updatable_nodes[nno]->last_seen = update_count;
             updatable_nodes[nno]->eval_map.clear();
-
+            
           }
           //updates.push_back(nno);
         }
@@ -160,7 +161,7 @@ namespace wali {
 
         // nextLbl is the next label *to be used*
         // The returned label is the *last label used* and the label for the *returning node*.
-        long RegExp::toDot(ostream& out, std::set<long>& seen, bool isRoot)
+        long RegExp::toDot(ostream& out, std::set<long>& seen, bool printUpdates, bool isRoot)
         {
           hash_sem_elem hse;
           long me;
@@ -168,9 +169,11 @@ namespace wali {
           if(value != NULL){
             isZero = value->equal(value->zero());
             isOne = value->equal(value->one());
-          }else
+          }else{
             isZero = true;
+          }
           const long myptr = (const long) this;
+          stringstream updatess;
           switch(type){
             case Constant:
               me = hse(value);
@@ -194,6 +197,12 @@ namespace wali {
             case Updatable:
               //me = hse(value); 
               me = updatable_node_no;
+              //updates
+              if(printUpdates){
+                updatess << "updates: ";
+                for(vector<unsigned>::iterator it = updates.begin(); it != updates.end(); ++it)
+                  updatess << *it << " ";
+              }
               if(seen.find(me) != seen.end())
                 return me;
               if(isRoot)
@@ -202,12 +211,14 @@ namespace wali {
                   << "(root) \\n "
                   << "zero: " << isZero << "\\n "
                   << "one: " << isOne << "\\n "
+                  << updatess.str() << "\\n"                
                   << "\" color=red];\n";
               else
                 out << "n" << me << "[label = \""
                   << "updatable\\n "
                   << "zero: " << isZero << "\\n "
                   << "one: " << isOne << "\\n "
+                  << updatess.str() << "\\n"                
                   << "\" color=brown];\n";
               seen.insert(me);
               return me;
@@ -226,8 +237,17 @@ namespace wali {
             return me;
           }
           seen.insert(me);
+
+          //evaluations
+          stringstream evaluatess;
+          if(printUpdates){
+            evaluatess << "evaluations: ";
+            for(vector<unsigned>::iterator it = evaluations.begin(); it != evaluations.end(); ++it)
+              evaluatess << *it << " ";
+          }
+
           for(list<reg_exp_t>::iterator it = children.begin(); it != children.end(); it++)
-            others.push_back((*it)->toDot(out, seen));
+            others.push_back((*it)->toDot(out, seen, printUpdates));
           switch(type){
             case Constant:
             case Updatable:
@@ -239,12 +259,14 @@ namespace wali {
                   << "(root)\\n "<< myptr << "\\n "
                   << "zero: " << isZero << "\\n "
                   << "one: " << isOne << "\\n "
+                  << evaluatess.str() << "\\n"                
                   << "\" color=red];\n";
               else
                 out << "n" << me << "[label = \""
                   << "*\\n " << myptr << "\\n "
                   << "zero: " << isZero << "\\n "
                   << "one: " << isOne << "\\n "
+                  << evaluatess.str() << "\\n"                
                   << "\" color=aquamarine];\n";
               break;
             case Combine:
@@ -254,12 +276,14 @@ namespace wali {
                   << "(root)\\n "<< myptr << "\\n "
                   << "zero: " << isZero << "\\n "
                   << "one: " << isOne << "\\n "
+                  << evaluatess.str() << "\\n"                
                   << "\" color=red];\n";
               else
                 out << "n" << me << "[label = \""
                   << "+\\n " << myptr << "\\n "
                   << "zero: " << isZero << "\\n "
                   << "one: " << isOne << "\\n "
+                  << evaluatess.str() << "\\n"                
                   << "\" color=blue];\n";
               break;
             case Extend:
@@ -269,12 +293,14 @@ namespace wali {
                   << "(root)\\n "<< myptr << "\\n "
                   << "zero: " << isZero << "\\n "
                   << "one: " << isOne << "\\n "
+                  << evaluatess.str() << "\\n"                
                   << "\" color=red];\n";
               else
                 out << "n" << me << "[label = \""
                   << "x\\n " << myptr << "\\n "
                   << "zero: " << isZero << "\\n "
                   << "one: " << isOne << "\\n "
+                  << evaluatess.str() << "\\n"                
                   << "\" color=green];\n";
               break;
             default:
@@ -1164,7 +1190,8 @@ namespace wali {
           } else {
             eval_map.clear();
           }
-
+          unsigned int &update_count = satProcesses[currentSatProcess].update_count;
+          evaluations.push_back(update_count);
           switch(type) {
             case Constant:
             case Updatable:
@@ -1240,6 +1267,8 @@ namespace wali {
             eval_map.clear();
           }
 
+          unsigned int &update_count = satProcesses[currentSatProcess].update_count;
+          evaluations.push_back(update_count);
           switch(type) {
             case Constant:
             case Updatable:
@@ -1334,6 +1363,8 @@ namespace wali {
 
     void RegExp::evaluate() {
         if(last_seen == satProcesses[satProcess].update_count) return;
+        unsigned int &update_count = satProcesses[currentSatProcess].update_count;
+        evaluations.push_back(update_count);
         nevals++;
         switch(type) {
             case Constant: 
@@ -1573,6 +1604,121 @@ namespace wali {
         RegExp::initialized = false;
         RegExp::top_down_eval = true;
     }
+
+    reg_exp_hash_t RegExpDiagnostics::visited;
+
+    long RegExpDiagnostics::countTotalCombines()
+    {
+      long total = 0;
+      visited.clear();
+      for(reg_exp_hash_t::const_iterator rit = RegExp::roots.begin(); rit != RegExp::roots.end(); ++rit)
+        total += countTotalCombines(rit->second);
+      return total;
+    }
+
+    long RegExpDiagnostics::countTotalCombines(reg_exp_t e)
+    {
+      reg_exp_key_t ekey(e->type, e);
+      reg_exp_hash_t::iterator it = visited.find(ekey);
+      if(it != visited.end())
+        return 0;
+      visited.insert(ekey, e);
+      long total = 0;
+      if(e->type == wali::graph::Combine)
+        ++total;
+      for(list<reg_exp_t>::iterator cit = e->children.begin(); cit != e->children.end(); ++cit)
+        total += countTotalCombines(*cit);
+      return total;
+    }
+
+    long RegExpDiagnostics::countTotalExtends()
+    {
+      long total = 0;
+      visited.clear();
+      for(reg_exp_hash_t::const_iterator rit = RegExp::roots.begin(); rit != RegExp::roots.end(); ++rit){
+        total += countTotalExtends(rit->second);
+      }
+      return total;
+    }
+
+    long RegExpDiagnostics::countTotalExtends(reg_exp_t e)
+    {
+      reg_exp_key_t ekey(e->type, e);
+      reg_exp_hash_t::iterator it = visited.find(ekey);
+      if(it != visited.end())
+        return 0;
+      visited.insert(ekey, e);
+      long total = 0;
+      if(e->type == wali::graph::Extend)
+        ++total;
+      for(list<reg_exp_t>::iterator cit = e->children.begin(); cit != e->children.end(); ++cit)
+        total += countTotalExtends(*cit);
+      return total;
+    }
+
+    long RegExpDiagnostics::countTotalStars()
+    {
+      long total = 0;
+      visited.clear();
+      for(reg_exp_hash_t::const_iterator rit = RegExp::roots.begin(); rit != RegExp::roots.end(); ++rit)
+        total += countTotalStars(rit->second);
+      return total;
+    }
+
+    long RegExpDiagnostics::countTotalStars(reg_exp_t e)
+    {
+      reg_exp_key_t ekey(e->type, e);
+      reg_exp_hash_t::iterator it = visited.find(ekey);
+      if(it != visited.end())
+        return 0;
+      visited.insert(ekey, e);
+      long total = 0;
+      if(e->type == wali::graph::Star)
+        ++total;
+      for(list<reg_exp_t>::iterator cit = e->children.begin(); cit != e->children.end(); ++cit)
+        total += countTotalStars(*cit);
+      return total;
+    }
+
+    long RegExpDiagnostics::countExcept(std::vector<reg_exp_t>& exceptions)
+    {
+      visited.clear();
+      for(vector<reg_exp_t>::const_iterator cit = exceptions.begin(); cit != exceptions.end(); ++cit)
+        excludeFromCountReachable(*cit);
+      long total = 0;
+      for(reg_exp_hash_t::const_iterator cit = RegExp::roots.begin(); cit != RegExp::roots.end(); ++cit)
+        total += countTotalNodes(cit->second);
+      return total;
+    }
+
+    void RegExpDiagnostics::excludeFromCountReachable(reg_exp_t const e)
+    {
+      reg_exp_key_t ekey(e->type, e);
+      reg_exp_hash_t::iterator it = visited.find(ekey);
+      if(it != visited.end())
+        return;
+      visited.insert(ekey, e);
+      for(list<reg_exp_t>::iterator cit = e->children.begin(); cit != e->children.end(); ++cit)
+        excludeFromCountReachable(*cit);
+    }
+
+    long RegExpDiagnostics::countTotalNodes(reg_exp_t e)
+    {
+      reg_exp_key_t ekey(e->type, e);
+      reg_exp_hash_t::iterator it = visited.find(ekey);
+      if(it != visited.end())
+        return 0;
+      visited.insert(ekey, e);
+      long total = 0;
+      if(e->type == Combine || e->type == Extend || e->type == Star)
+        ++total;
+      for(list<reg_exp_t>::iterator cit = e->children.begin(); cit != e->children.end(); ++cit)
+        total += countTotalNodes(*cit);
+      return total;
+    }
+    
+
+    
 
     } // namespace graph
 } // namespace wali

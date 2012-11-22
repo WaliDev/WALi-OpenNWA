@@ -55,12 +55,12 @@ using std::cout;
  * 
  * The tensor choice is determined by the following macro:
  **/
-#define TENSOR_MIN_AFFINITY
-//#define TENSOR_MAX_AFFINITY
+//#define TENSOR_MIN_AFFINITY
+#define TENSOR_MAX_AFFINITY
 //#define BASE_MAX_AFFINITY_TENSOR_MIXED
 
-//#define DETENSOR_TOGETHER
-#define DETENSOR_BIT_BY_BIT
+#define DETENSOR_TOGETHER
+//#define DETENSOR_BIT_BY_BIT
 
 // ////////////////////////////
 // Implementation of the initialization free function.
@@ -72,8 +72,8 @@ using std::cout;
 #else
 #define BDDMEMSIZE 10000000
 #endif
-#define CACHESIZE 100000
-#define MAXMEMINC 100000
+#define CACHESIZE BDDMEMSIZE/10
+#define MAXMEMINC BDDMEMSIZE/10
 
 //It's a good habit to forward declare all the static functions in the
 //file so that there is an index and so that the contents of the file can
@@ -183,8 +183,8 @@ BddContext::BddContext(int bddMemSize, int cacheSize) :
         *waliErr << "[ERROR] " << bdd_errstring(rc) << endl;
         assert( 0 );
       }
-      // Default is 50,000 (1 Mb),memory is cheap, so use 100,000
-      bdd_setmaxincrease(MAXMEMINC);
+      // Default is 50,000 (1 Mb),memory is cheap, so use 100,000      
+      bdd_setmaxincrease((bddMemSize/10 > MAXMEMINC)? bddMemSize/10 : MAXMEMINC);
       // TODO: bdd_error_hook( my_error_handler );
       fdd_strm_hook( myFddStrmHandler );
     }else{

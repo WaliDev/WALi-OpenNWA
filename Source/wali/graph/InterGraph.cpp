@@ -661,6 +661,8 @@ namespace wali {
           sem_elem_tensor_t sem_old = dynamic_cast<SemElemTensor*>(sem.get_ptr());
           sem = sem_old->tensor(sem_old.get_ptr());
 
+          long totCombines=0, totExtends=0, totStars=0;
+
           // For each SCC, solve completely using Newton's method.
           {
             SCCGraphs::iterator gr_it = gr_sorted.begin();
@@ -857,12 +859,21 @@ namespace wali {
               BEGIN_NEWTON_SOLUTION(nlog);
               graph->saturate(nlog);
               END_NEWTON_SOLUTION(nlog);
+              // Must be saved *before* stopSatProcess
+              totCombines += RegExpDiagnostics::countTotalCombines();
+              totExtends += RegExpDiagnostics::countTotalExtends();
+              totStars += RegExpDiagnostics::countTotalStars();
               // The next SCC will use another sat procss phase.
               RegExp::stopSatProcess();
 
               END_SCC_SOLVER(nlog);
             }
           }
+
+          cout << "Total number of combines: " << totCombines << endl;
+          cout << "Total number of Extends: " << totExtends << endl;
+          cout << "Total number of Stars: " << totStars << endl;
+
           max_scc_computed = max_scc_required;
           //RegExp::stopSatProcess();
           RegExp::executingPoststar(!running_prestar);
@@ -1005,29 +1016,25 @@ namespace wali {
             {
               //wali::util::Timer * timer3 = new wali::util::Timer("[setupInterSolution] Intra Graphs RegExp Timer");
               //int tempCount = 0;
+              vector<reg_exp_t> outNodeRegExps; //DEBUGGING
               for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
                 (*gr_it)->setupIntraSolution(false);
-                /*
-                //temporary:
-                {
-                stringstream ss;
-                ss << "regexp" << tempCount++ << ".dot";
-                string filename = ss.str();
-                fstream foo;
-                foo.open(filename.c_str(), fstream::out);
-                const reg_exp_hash_t& roots = RegExp::getRoots();
-                foo << "digraph {\n";
-                for(reg_exp_hash_t::const_iterator iter = roots.begin();
-                iter != roots.end();
-                ++iter){
-                std::set<long> seen;
-                (iter->second)->toDot(foo, seen, true);
-                }
-                foo << "}\n";
-                foo.close();
-                }
-                 */
+                //DEBUGGING
+                for(list<int>::const_iterator cit = (*gr_it)->out_nodes_intra->begin(); cit != (*gr_it)->out_nodes_intra->end(); ++cit)
+                  outNodeRegExps.push_back((*gr_it)->nodes[*cit].regexp);
+                //
               }
+
+              long totNodes = 0, totNotComputed = 0;
+              totNodes = RegExpDiagnostics::countTotalCombines() +
+                RegExpDiagnostics::countTotalExtends() +
+                RegExpDiagnostics::countTotalStars();
+              totNotComputed = RegExpDiagnostics::countExcept(outNodeRegExps); 
+              cout << "Total number of combines: " << RegExpDiagnostics::countTotalCombines() << endl;
+              cout << "Total number of Extends: " << RegExpDiagnostics::countTotalExtends() << endl;
+              cout << "Total number of Stars: " << RegExpDiagnostics::countTotalStars() << endl;
+              cout << "#nodes definitely not evaluated during saturation: " << RegExpDiagnostics::countExcept(outNodeRegExps) << endl;
+              cout << "%Nodes never computed > " << 100 * (double)(((double)totNotComputed)/ (double)totNodes) << endl;;
               //delete timer3;
             }
             //delete setupT;
@@ -1067,6 +1074,41 @@ namespace wali {
             //cout << "Total number of steps: " << numSteps << endl;
           }
           max_scc_computed = max_scc_required;
+
+          //DEBUGGING
+          {
+            stringstream ss;
+            ss << "kleene_regexp.dot";
+            string filename = ss.str();
+            fstream foo;
+            foo.open(filename.c_str(), fstream::out);
+            const reg_exp_hash_t& roots = RegExp::getRoots();
+            foo << "digraph {\n";
+            std::set<long> seen;
+            for(reg_exp_hash_t::const_iterator iter = roots.begin();
+                iter != roots.end();
+                ++iter){
+              (iter->second)->toDot(foo, seen, true, true);
+            }
+            foo << "}\n";
+            foo.close();
+          }
+          int graphnum = 0;
+          for(gr_it = gr_list.begin(); gr_it != gr_list.end(); ++gr_it)
+          {
+            ++graphnum;
+            stringstream ss;
+            ss << "kleene_graph" << graphnum << ".dot";
+            string filename = ss.str();
+            fstream foo;
+            foo.open(filename.c_str(), fstream::out);
+            foo << "digraph{\n";
+            foo << (*gr_it)->toDot();
+            foo << "}";
+            foo.close();
+          }
+
+          //
 
           RegExp::stopSatProcess();
           RegExp::executingPoststar(!running_prestar);
