@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <cmath>
 
 #include <boost/algorithm/string/predicate.hpp>
 
@@ -19,48 +20,6 @@ using namespace wali::domains::binrel;
 using std::endl;
 using wali::waliErr;
 using std::cout;
-
-
-/**
- *
- * The following describes how to control the bdd variables are setup in buddy
- * Let x, y, w and z be variables, each requiring two bdd levels (x1 and x2)
- * Further, for the bit x1, there are three different levels x1b, x1t1 and x1t2 
- * -- the first one for base, the second and third for the two tensor spots. 
- * Finally, each spot needs three levels, x1b, x1b' and x1b''.
- *
- * Let's disregard tensors for the moment.
- * By default, the variables are interleaved at the bit level. So, a call to 
- * setInts({(x, 2), (y, 2), (z, 2)}) gives the interleaving
- * x1b x1b' x1b'' y1b y1b' y1b'' z1b z1b' z1b'' x2b x2b' x2b'' y2b y2b' y2b'' z2b z2b' z2b''
- * There is another way of interleaving these variables. Where variables are grouped together.
- * setInts({{(x, 2), (y, 2)}, {(z, 2), (w, 2)}}) 
- * x1b x1b' x1b'' y1b y1b' y1b'' x2b x2b' x2b'' y2b y2b' y2b'' z1b z1b' z1b'' w1b w1b' w1b'' z2b z2b' z2b'' w2b w2b' w2b''
- * 
- * There are two choices with regard to tensors. 
- * (1) TENSOR_MAX_AFFINITY
- * This makes sure that all three levels for a bit are always together, i.e., you always get
- * x1b x1b' x1b'' x1t1 x1t1' x1t1'' x1t2 x1t2' x1t2''
- * The interleaving at higher levels remains the same
- * (2) TENSOR_MIN_AFFINITY
- * This makes sure that the three levels for the whole vocabulary are separate and copies of each other.
- * So, for the example above, the levels would look like.
- * x1b x1b' x1b'' y1b y1b' y1b'' x2b x2b' x2b'' y2b y2b' y2b'' z1b z1b' z1b'' w1b w1b' w1b'' z2b z2b' z2b'' w2b w2b' w2b''
- * x1t1 x1t1' x1t1'' y1t1 y1t1' y1t1'' x2t1 x2t1' x2t1'' y2t1 y2t1' y2t1'' z1t1 z1t1' z1t1'' w1t1 w1t1' w1t1'' z2t1 z2t1' z2t1'' w2t1 w2t1' w2t1''
- * x1t2 x1t2' x1t2'' y1t2 y1t2' y1t2'' x2t2 x2t2' x2t2'' y2t2 y2t2' y2t2'' z1t2 z1t2' z1t2'' w1t2 w1t2' w1t2'' z2t2 z2t2' z2t2'' w2t2 w2t2' w2t2''
- * (3) BASE_MAX_AFFINITY_TENSOR_MIXED
- * This makes sure that base is separate, but mixes together tensors vocabularies. 
- * x1b x1b' x1b'' y1b y1b' y1b'' x2b x2b' x2b'' y2b y2b' y2b'' z1b z1b' z1b'' w1b w1b' w1b'' z2b z2b' z2b'' w2b w2b' w2b''
- * followed by tensor levels as x1t1 x1t1' x1t1'' x1t2 x1t2' x1t2''
- * 
- * The tensor choice is determined by the following macro:
- **/
-//#define TENSOR_MIN_AFFINITY
-#define TENSOR_MAX_AFFINITY
-//#define BASE_MAX_AFFINITY_TENSOR_MIXED
-
-#define DETENSOR_TOGETHER
-//#define DETENSOR_BIT_BY_BIT
 
 // ////////////////////////////
 // Implementation of the initialization free function.
@@ -411,7 +370,7 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
       vari++;  
     }
   }
-#elif defined(TENSOR_MIN_AFFINITY)
+#elif defined(TENSOR_MIN_AFFINITY) || defined(TENSOR_MATCHED_PAREN)
   //First the base levels
   for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
     std::map<std::string, int> interleavedVars = *cvi;
@@ -468,9 +427,16 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
     for(std::map<std::string, int>::const_iterator ci = interleavedVars.begin(); ci != interleavedVars.end(); ++ci){
       bddinfo_t varInfo = (*this)[ci->first];
       int j = 3 * vari;
+#if defined(TENSOR_MIN_AFFINITY)
       varInfo->tensor1Lhs = base + j++;
       varInfo->tensor1Rhs = base + j++;
       varInfo->tensor1Extra = base + j++;
+#elif defined(TENSOR_MATCHED_PAREN)
+      // In this case, tensor1 has the three levels reversed. 
+      varInfo->tensor1Extra = base + j++;
+      varInfo->tensor1Rhs = base + j++;
+      varInfo->tensor1Lhs = base + j++;
+#endif
       vari++;  
     }
   }
@@ -862,6 +828,88 @@ void BddContext::populateCache()
   cachedTensorZero = new BinRel(this, bddfalse, true);
 }
 
+
+// //////////////////////////////////////////
+// These functions provide a sneak-peek into the buddy bit-level
+// variable ordering.
+
+// Setup maps to enable quick lookup of information
+void BddContext::setupLevelSets()
+{
+  tensor1LhsLevels.clear();
+  tensor1RhsLevels.clear();
+  tensor2LhsLevels.clear();
+  tensor2RhsLevels.clear();
+
+  for(BddContext::const_iterator cit = this->begin(); cit != this->end(); ++cit){
+    int const * vars;
+    bddinfo_t const varInfo = cit->second;
+    //How many bits are used for me?
+    if(varInfo->maxVal <= 0)
+      continue;
+    double fracnumbits = log2(varInfo->maxVal);
+    int numbits = ceil(fracnumbits);
+
+    vars = fdd_vars(varInfo->tensor1Lhs);
+    assert(vars != NULL);
+    for(int i=0; i < numbits; ++i)
+      tensor1LhsLevels.insert(bdd_var2level(vars[i]));
+
+    vars = fdd_vars(varInfo->tensor1Rhs);
+    assert(vars != NULL);
+    for(int i=0; i < numbits; ++i)
+      tensor1RhsLevels.insert(bdd_var2level(vars[i]));
+
+    vars = fdd_vars(varInfo->tensor2Lhs);
+    assert(vars != NULL);
+    for(int i=0; i < numbits; ++i)
+      tensor2LhsLevels.insert(bdd_var2level(vars[i]));
+
+    vars = fdd_vars(varInfo->tensor2Rhs);
+    assert(vars != NULL);
+    for(int i=0; i < numbits; ++i)
+      tensor2RhsLevels.insert(bdd_var2level(vars[i]));
+  }
+  assert(tensor1LhsLevels.size() == tensor1RhsLevels.size());
+  assert(tensor1RhsLevels.size() == tensor2LhsLevels.size());
+  assert(tensor2LhsLevels.size() == tensor2RhsLevels.size());
+}
+
+unsigned BddContext::numVarsPerVoc()
+{
+  return tensor1LhsLevels.size();
+}
+
+bool BddContext::isRootInVocTensor1Lhs(bdd b)
+{
+  if(b == bddfalse || b == bddtrue) return false;
+  return tensor1LhsLevels.find(bdd_var2level(bdd_var(b))) != tensor1LhsLevels.end();
+}
+
+bool BddContext::isRootInVocTensor2Lhs(bdd b)
+{
+  if(b == bddfalse || b == bddtrue) return false;
+  return tensor2LhsLevels.find(bdd_var2level(bdd_var(b))) != tensor2LhsLevels.end();
+}
+
+bool BddContext::isRootInVocTensor1Rhs(bdd b)
+{
+  if(b == bddfalse || b == bddtrue) return false;
+  return tensor1RhsLevels.find(bdd_var2level(bdd_var(b))) != tensor1RhsLevels.end();
+}
+
+bool BddContext::isRootInVocTensor2Rhs(bdd b)
+{
+  if(b == bddfalse || b == bddtrue) return false;
+  return tensor2RhsLevels.find(bdd_var2level(bdd_var(b))) != tensor2RhsLevels.end();
+}
+
+bool BddContext::isRootRelevant(bdd b)
+{
+  if(b == bddfalse || b == bddtrue) return false;
+  return isRootInVocTensor1Lhs(b) || isRootInVocTensor1Rhs(b) 
+    || isRootInVocTensor2Lhs(b) || isRootInVocTensor2Rhs(b);
+}
 
 // ////////////////////////////
 // Static
