@@ -370,7 +370,7 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
       vari++;  
     }
   }
-#elif defined(TENSOR_MIN_AFFINITY) || defined(TENSOR_MATCHED_PAREN)
+#elif defined(TENSOR_MIN_AFFINITY)
   //First the base levels
   for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
     std::map<std::string, int> interleavedVars = *cvi;
@@ -427,16 +427,9 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
     for(std::map<std::string, int>::const_iterator ci = interleavedVars.begin(); ci != interleavedVars.end(); ++ci){
       bddinfo_t varInfo = (*this)[ci->first];
       int j = 3 * vari;
-#if defined(TENSOR_MIN_AFFINITY)
       varInfo->tensor1Lhs = base + j++;
       varInfo->tensor1Rhs = base + j++;
       varInfo->tensor1Extra = base + j++;
-#elif defined(TENSOR_MATCHED_PAREN)
-      // In this case, tensor1 has the three levels reversed. 
-      varInfo->tensor1Extra = base + j++;
-      varInfo->tensor1Rhs = base + j++;
-      varInfo->tensor1Lhs = base + j++;
-#endif
       vari++;  
     }
   }
@@ -464,6 +457,102 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
     vari = 0;
     for(std::map<std::string, int>::const_iterator ci = interleavedVars.begin(); ci != interleavedVars.end(); ++ci){
       bddinfo_t varInfo = (*this)[ci->first];
+      int j = 3 * vari;
+      varInfo->tensor2Lhs = base + j++;
+      varInfo->tensor2Rhs = base + j++;
+      varInfo->tensor2Extra = base + j++;
+      vari++;  
+    }
+  }
+
+#elif defined(TENSOR_MATCHED_PAREN)
+  //First the base levels
+  for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
+    std::map<std::string, int> interleavedVars = *cvi;
+    vari = 0;
+    int * domains = new int[3 * interleavedVars.size()];
+    for(std::map<std::string, int>::const_iterator cmi = interleavedVars.begin(); cmi != interleavedVars.end(); ++cmi){
+      for(int j=vari * 3; j < 3 * (vari + 1); ++j)
+        domains[j] = cmi->second;
+      vari++;
+    }
+    //Now actually create the fdd levels
+    // lock mutex
+    int base = fdd_extdomain(domains, 3 * interleavedVars.size());
+    // release mutex
+    if (base < 0){
+      *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
+      *waliErr << "    Aborting." << endl;
+      assert (false);
+    }
+    delete [] domains;
+    // Assign fdd levels to the variables.
+    vari = 0;
+    for(std::map<std::string, int>::const_iterator ci = interleavedVars.begin(); ci != interleavedVars.end(); ++ci){
+      bddinfo_t varInfo = (*this)[ci->first];
+      int j = 3 * vari;
+      varInfo->baseLhs = base + j++;
+      varInfo->baseRhs = base + j++;
+      varInfo->baseExtra = base + j++;
+      vari++;  
+    }
+  }
+  //Next for tensor1
+  for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
+    std::map<std::string, int> interleavedVars = *cvi;
+    vari = 0;
+    int * domains = new int[3 * interleavedVars.size()];
+    for(std::map<std::string, int>::const_iterator cmi = interleavedVars.begin(); cmi != interleavedVars.end(); ++cmi){
+      for(int j=vari * 3; j < 3 * (vari + 1); ++j)
+        domains[j] = cmi->second;
+      vari++;
+    }
+    //Now actually create the fdd levels
+    // lock mutex
+    int base = fdd_extdomain(domains, 3 * interleavedVars.size());
+    // release mutex
+    if (base < 0){
+      *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
+      *waliErr << "    Aborting." << endl;
+      assert (false);
+    }
+    delete [] domains;
+    // Assign fdd levels to the variables.
+    vari = 0;
+    for(std::map<std::string, int>::const_iterator ci = interleavedVars.begin(); ci != interleavedVars.end(); ++ci){
+      bddinfo_t varInfo = (*this)[ci->first];
+      int j = 3 * vari;
+      // In this case, tensor1 has the three levels reversed. 
+      varInfo->tensor1Extra = base + j++;
+      varInfo->tensor1Rhs = base + j++;
+      varInfo->tensor1Lhs = base + j++;
+      vari++;  
+    }
+  }
+  //Finally for tensor2
+  for(std::vector<std::map<std::string, int> >::const_reverse_iterator crvi = vars.rbegin(); crvi != vars.rend(); ++crvi){
+    std::map<std::string, int> interleavedVars = *crvi;
+    vari = 0;
+    int * domains = new int[3 * interleavedVars.size()];
+    for(std::map<std::string, int>::const_reverse_iterator crmi = interleavedVars.rbegin(); crmi != interleavedVars.rend(); ++crmi){
+      for(int j=vari * 3; j < 3 * (vari + 1); ++j)
+        domains[j] = crmi->second;
+      vari++;
+    }
+    //Now actually create the fdd levels
+    // lock mutex
+    int base = fdd_extdomain(domains, 3 * interleavedVars.size());
+    // release mutex
+    if (base < 0){
+      *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
+      *waliErr << "    Aborting." << endl;
+      assert (false);
+    }
+    delete [] domains;
+    // Assign fdd levels to the variables.
+    vari = 0;
+    for(std::map<std::string, int>::const_reverse_iterator cri = interleavedVars.rbegin(); cri != interleavedVars.rend(); ++cri){
+      bddinfo_t varInfo = (*this)[cri->first];
       int j = 3 * vari;
       varInfo->tensor2Lhs = base + j++;
       varInfo->tensor2Rhs = base + j++;

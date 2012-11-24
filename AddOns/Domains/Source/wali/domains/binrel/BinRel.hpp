@@ -73,12 +73,13 @@
  * x1b x1b' x1b'' y1b y1b' y1b'' x2b x2b' x2b'' y2b y2b' y2b'' z1b z1b' z1b'' w1b w1b' w1b'' z2b z2b' z2b'' w2b w2b' w2b''
  * x1t1'' x1t1' x1t1 y1t1'' y1t1' y1t1 x2t1'' x2t1' x2t1 y2t1'' y2t1' y2t1 z1t1'' z1t1' z1t1 w1t1'' w1t1' w1t1 z2t1'' z2t1' z2t1 w2t1'' w2t1' w2t1
  * x1t2 x1t2' x1t2'' y1t2 y1t2' y1t2'' x2t2 x2t2' x2t2'' y2t2 y2t2' y2t2'' z1t2 z1t2' z1t2'' w1t2 w1t2' w1t2'' z2t2 z2t2' z2t2'' w2t2 w2t2' w2t2''
- * 
+ * NOTE: ***This currently only works correctly with boolean variables.***
  * The tensor choice is determined by the following macro:
  **/
 //#define TENSOR_MIN_AFFINITY
 //#define TENSOR_MAX_AFFINITY
 //#define BASE_MAX_AFFINITY_TENSOR_MIXED
+/*** NOTE: This currently only works correctly with boolean variables.***/
 #define TENSOR_MATCHED_PAREN
 
 

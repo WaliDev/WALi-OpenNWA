@@ -1007,7 +1007,7 @@ namespace{
     con = new ProgramBddContext();
     map<string, int> vars;
     vars["a"] = 2;
-    vars["b"] = 3;
+    vars["b"] = 2;
     con->setIntVars(vars);
     
     bddinfo_t a = (*con)["a"];
@@ -1047,27 +1047,52 @@ namespace{
 
     /*
      * t looks like:
-     * "b".1.tensor2Lhs         *
-     *                        1/ \0
-     * "b".1.tensor2Rhs       /   *
-     *                       /  0/ \1
-     * "b".2.tensor2Lhs      |  /   *
-     *                       |  | 1/ \0
-     * "b".2.tensor2Rhs      |  |  |  *
-     *                       |  |  |0/ \1
-     *                    -----------   \
-     *                  bddfalse       bddtrue
+     * "b".tensor2Lhs         *
+     *                      1/ \0
+     * "b".tensor2Rhs       /   *
+     *                     /  0/ \1
+     * "a".tensor2Lhs      |  /   *
+     *                     |  | 1/ \0
+     * "a".tensor2Rhs      |  |  |  *
+     *                     |  |  |0/ \1
+     *                  -----------   \
+     *                bddfalse       bddtrue
      **/
-   t = fdd_ithvar(b->tensor2Lhs, 2) & fdd_ithvar(b->tensor2Rhs, 1);
+    t = fdd_ithvar(b->tensor2Lhs, 0) & fdd_ithvar(a->tensor2Lhs, 0) & fdd_ithvar(b->tensor2Rhs, 1) & fdd_ithvar(a->tensor2Rhs, 1);
     EXPECT_TRUE(con->isRootInVocTensor2Lhs(t));
     t = bdd_low(t);
     EXPECT_TRUE(con->isRootInVocTensor2Rhs(t));
     t = bdd_high(t);
     EXPECT_TRUE(con->isRootInVocTensor2Lhs(t));
-    t = bdd_high(t);
-    EXPECT_TRUE(con->isRootInVocTensor2Rhs(t));
     t = bdd_low(t);
+    EXPECT_TRUE(con->isRootInVocTensor2Rhs(t));
+    t = bdd_high(t);
     EXPECT_TRUE(t == bddtrue);
+
+    /*
+     * t looks like:
+     * "a".tensor1Rhs         *
+     *                      1/ \0
+     * "a".tensor1Lhs       /   *
+     *                     /  0/ \1
+     * "b".tensor1Rhs      |  /   *
+     *                     |  | 1/ \0
+     * "b".tensor1Lhs      |  |  |  *
+     *                     |  |  |0/ \1
+     *                  -----------   \
+     *                bddfalse       bddtrue
+     **/
+    t = fdd_ithvar(a->tensor1Rhs, 0) & fdd_ithvar(a->tensor1Lhs, 1) & fdd_ithvar(b->tensor1Rhs, 0) & fdd_ithvar(b->tensor1Lhs, 1);
+    EXPECT_TRUE(con->isRootInVocTensor1Rhs(t));
+    t = bdd_low(t);
+    EXPECT_TRUE(con->isRootInVocTensor1Lhs(t));
+    t = bdd_high(t);
+    EXPECT_TRUE(con->isRootInVocTensor1Rhs(t));
+    t = bdd_low(t);
+    EXPECT_TRUE(con->isRootInVocTensor1Lhs(t));
+    t = bdd_high(t);
+    EXPECT_TRUE(t == bddtrue);
+
   }
 #endif //#if defined(TENSOR_MATCHED_PAREN)
 
