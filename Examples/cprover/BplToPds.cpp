@@ -284,7 +284,8 @@ namespace wali
 
       BddContext * dump_pds_from_prog(wpds::WPDS * pds, prog * pg)
       {
-        ProgramBddContext * con = new ProgramBddContext(20*MILLION, 20 * MILLION); 
+        //ProgramBddContext * con = new ProgramBddContext(20*MILLION, 20 * MILLION); 
+        ProgramBddContext * con = new ProgramBddContext(); 
 
         map<string, int> vars;
 

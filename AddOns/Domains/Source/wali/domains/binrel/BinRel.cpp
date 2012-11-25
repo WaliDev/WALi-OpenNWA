@@ -22,16 +22,14 @@ using wali::waliErr;
 using std::cout;
 
 // ////////////////////////////
-// Implementation of the initialization free function.
-#ifdef BDDBIGMEM
 // For large memory machines consider allocating ~1500 MB
 // 25000000 ~~ 500 MB, change the multiple to get what you need.
-#define FIVE_CENT_MB 25000000
-#define BDDMEMSIZE (FIVE_CENT_MB*1)
-#else
-#define BDDMEMSIZE 10000000
-#endif
-#define CACHESIZE BDDMEMSIZE/10
+#define FIVE_HUNDRED_MB 25000000
+#define BDDMEMSIZE (FIVE_HUNDRED_MB*1)
+// Find out emperically what the best ratio of memsize to cache size is
+#define MEMTOCACHE 10
+
+#define CACHESIZE BDDMEMSIZE/MEMTOCACHE
 #define MAXMEMINC BDDMEMSIZE/10
 
 //It's a good habit to forward declare all the static functions in the
