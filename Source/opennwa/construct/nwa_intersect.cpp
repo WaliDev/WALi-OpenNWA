@@ -472,7 +472,7 @@ namespace opennwa
             } else if( newlyCreatedSt ) {
               removeState( st );
             }
-          }
+          } // for each pair in epsilon closure
             
             
           //Add an edge that is the current return transition.
@@ -489,7 +489,7 @@ namespace opennwa
             visitedPairs.erase(retPair);
             removeState(retSt);
           }
-        }
+        } // for each pair (fit, sit) of return transitions
       }
 
       // Process outgoing return transitions where currpair.first and currpair.second are
