@@ -27,6 +27,7 @@
 
 #include <boost/shared_ptr.hpp> // It'd be nice to include the standard version but there are too many ways to get it.
 #include <boost/unordered_set.hpp>
+#include <boost/function.hpp>
 
 #include "wali/wfa/WeightMaker.hpp"
 #include "wali/Countable.hpp"
@@ -304,6 +305,7 @@ namespace wali
       typedef wali::ref_ptr< BddContext > bdd_context_t;
 
       typedef std::map<std::string, int> Assignment;
+      typedef std::vector<std::pair<std::string, bddinfo_t> > VectorVocabulary;
       
       extern
       std::vector<Assignment>
@@ -312,7 +314,8 @@ namespace wali
       extern
       void
       printImagemagickInstructions(bdd b, BddContext const & voc,
-                                   std::ostream & os, std::string const & for_file);
+                                   std::ostream & os, std::string const & for_file,
+                                   boost::function<bool (VectorVocabulary const &)> include_component);
 
       extern
       bdd

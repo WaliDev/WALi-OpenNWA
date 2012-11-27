@@ -1403,7 +1403,6 @@ namespace wali {
         return bdd_exist(b, vars_to_remove);
       }
       
-      typedef std::vector<std::pair<std::string, bddinfo_t> > VectorVocabulary;
       
       std::vector<Assignment>
       getAllAssignments(VectorVocabulary const & voc);
@@ -1615,7 +1614,8 @@ namespace wali {
       }
       
       void
-      printImagemagickInstructions(bdd b, BddContext const & voc, std::ostream & os, std::string const & for_file)
+      printImagemagickInstructions(bdd b, BddContext const & voc, std::ostream & os, std::string const & for_file,
+                                   boost::function<bool (VectorVocabulary const &)> include_component)
       {
         std::vector<std::pair<VectorVocabulary, bdd> > independent_components = details::partition(voc, b);
         std::vector<std::vector<Assignment> > possible_assignments_by_component;
@@ -1630,7 +1630,11 @@ namespace wali {
           if(boost::starts_with(comp_voc.begin()->first, "DUMMY")) {
             assert(comp_voc.size() == 1);
             continue;
-          }        
+          }
+
+          if(include_component && !include_component(comp_voc)) {
+            continue;
+          }
             
           total_height += 2*details::v_margin;
           total_height += possibleAssignments.size() * details::v_separation;
@@ -1646,6 +1650,10 @@ namespace wali {
           VectorVocabulary const & comp_voc = independent_components.at(comp_no).first;
           if(boost::starts_with(comp_voc.begin()->first, "DUMMY")) {
             assert(comp_voc.size() == 1);
+            continue;
+          }
+
+          if(include_component && !include_component(comp_voc)) {
             continue;
           }
           
