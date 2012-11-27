@@ -123,9 +123,11 @@ if 'gcc' == BaseEnv['compiler']:
     # -Wcast-qual 
     BaseEnv.Append(CCFLAGS='-Wall -g')
     if optimize:
-       BaseEnv.Append(CCFLAGS=' -O2')
+        BaseEnv.Append(CCFLAGS=' -O2')
+    else:
+        BaseEnv.Append(CXXFLAGS=['-O0'])
     if CheckedLevel == 'slow':
-       BaseEnv['CPPDEFINES']['_GLIBCXX_DEBUG'] = 1
+        BaseEnv['CPPDEFINES']['_GLIBCXX_DEBUG'] = 1
     if strong_warnings:
         BaseEnv.Append(CCFLAGS='-Wextra $WARNING_FLAGS -fdiagnostics-show-option')
         BaseEnv.Append(WARNING_FLAGS='-Wformat=2 -Winit-self -Wunused -Wfloat-equal -Wundef -Wpointer-arith -Wcast-align -Wwrite-strings -Wconversion -Woverloaded-virtual')
