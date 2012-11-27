@@ -27,21 +27,28 @@ namespace {
     }
 
 
-    std::vector<sem_elem_t>
+    void insert(SemElemSet::ElementSet & set, sem_elem_t element)
+    {
+        //set.push_back(element);
+        set.insert(element);
+    }
+    
+
+    SemElemSet::ElementSet
     make_vector(sem_elem_t a = sem_elem_t(), sem_elem_t b = sem_elem_t(),
                 sem_elem_t c = sem_elem_t(), sem_elem_t d = sem_elem_t(),
                 sem_elem_t e = sem_elem_t(), sem_elem_t f = sem_elem_t())
     {
-        std::vector<sem_elem_t> vec;
-        if (a.get_ptr()) vec.push_back(a);
-        if (b.get_ptr()) vec.push_back(b);
-        if (c.get_ptr()) vec.push_back(c);
-        if (d.get_ptr()) vec.push_back(d);
-        if (e.get_ptr()) vec.push_back(e);
-        if (f.get_ptr()) vec.push_back(f);
+        SemElemSet::ElementSet vec;
+        if (a.get_ptr()) insert(vec, a);
+        if (b.get_ptr()) insert(vec, b);
+        if (c.get_ptr()) insert(vec, c);
+        if (d.get_ptr()) insert(vec, d);
+        if (e.get_ptr()) insert(vec, e);
+        if (f.get_ptr()) insert(vec, f);
         return vec;
     }
-
+    
 }    
 
 
@@ -83,7 +90,7 @@ namespace wali {
                         << "    in " << right_expr << ", " << right_entry->second.size() << " weights are reachable\n";
                 }
 
-                for (std::vector<sem_elem_t>::const_iterator left_weight = left_entry->second.begin();
+                for (SemElemSet::ElementSet::const_iterator left_weight = left_entry->second.begin();
                      left_weight != left_entry->second.end(); ++left_weight)
                 {
                     if (!is_present(right_entry->second, *left_weight)) {
