@@ -1370,6 +1370,38 @@ void BddContext::resetStats()
 namespace wali {
   namespace domains {
     namespace binrel {
+
+      bdd
+      quantifyOutOtherVariables(BddContext const & voc,
+                                std::vector<std::string> const & keep_these,
+                                bdd b)
+      {
+        std::vector<int> keep_these_fdds;
+        for (std::vector<std::string>::const_iterator keep_this = keep_these.begin();
+             keep_this != keep_these.end(); ++keep_this)
+        {
+          BddContext::const_iterator var_info = voc.find(*keep_this);
+          assert(var_info != voc.end());
+          
+          keep_these_fdds.push_back(var_info->second->baseLhs);
+          keep_these_fdds.push_back(var_info->second->baseRhs);
+        }
+
+        bdd vars_to_remove = bddtrue;
+
+        for (int fdd_num=0; fdd_num<fdd_domainnum(); ++fdd_num)
+        {
+          if (std::find(keep_these_fdds.begin(),
+                        keep_these_fdds.end(),
+                        fdd_num)
+              == keep_these_fdds.end())
+          {
+            vars_to_remove &= fdd_ithset(fdd_num);
+          }
+        }
+
+        return bdd_exist(b, vars_to_remove);
+      }
       
       typedef std::vector<std::pair<std::string, bddinfo_t> > VectorVocabulary;
       

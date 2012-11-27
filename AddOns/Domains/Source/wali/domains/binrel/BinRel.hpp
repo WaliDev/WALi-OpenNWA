@@ -313,6 +313,12 @@ namespace wali
       void
       printImagemagickInstructions(bdd b, BddContext const & voc,
                                    std::ostream & os, std::string const & for_file);
+
+      extern
+      bdd
+      quantifyOutOtherVariables(BddContext const & voc,
+                                std::vector<std::string> const & keep_these,
+                                bdd b);
       
       
       class BinRel : public wali::SemElemTensor 
