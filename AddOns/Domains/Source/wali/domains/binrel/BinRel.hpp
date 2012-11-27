@@ -396,6 +396,12 @@ namespace wali
             return *con;
           }
 
+          virtual bool fastLessThan(SemElem const * other) const;
+
+          virtual size_t fastHash() const {
+            return static_cast<size_t>(getBdd().id());
+          }
+
           // ////////////////////////////////
           // Printing functions
           //static void printHandler(FILE *o, int var);

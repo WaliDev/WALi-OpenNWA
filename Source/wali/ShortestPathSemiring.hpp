@@ -31,6 +31,10 @@ namespace wali {
 
     bool equal(SemElem *rhs) const;
 
+    bool fastLessThan(SemElem const * rhs) const;
+
+    size_t fastHash() const;
+
     //------------------------------------
     // output
     //------------------------------------

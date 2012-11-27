@@ -9,6 +9,7 @@
 #include "wali/ref_ptr.hpp"
 #include "wali/Countable.hpp"
 #include "wali/Printable.hpp"
+#include <cstdlib>
 #include <string>
 
 namespace wali
@@ -195,6 +196,36 @@ namespace wali
         return delta( se.get_ptr() );
       }
 
+
+      /// Returns true if this is less than the other. Should be
+      /// fast. HOWEVER -- does not need to have semantic meaning, other than
+      /// it must be consistent with equal() and different objects
+      /// representing the same semiring element should return consistent
+      /// results.
+      ///
+      /// Default implementation aborts.
+      virtual
+      bool
+      fastLessThan(SemElem const * other) const
+      {
+        (void) other;
+        std::abort();
+      }
+
+      
+      virtual
+      bool
+      fastLessThan(sem_elem_t se) const
+      {
+        return this->fastLessThan(se.get_ptr());
+      }
+
+      virtual
+      size_t
+      fastHash() const
+      {
+        std::abort();
+      }
   };
 
   /**
@@ -210,6 +241,34 @@ namespace wali
    */
   void test_semelem_impl(sem_elem_t x);
 
+
+
+  struct SemElemRefPtrFastLessThan
+  {
+    bool
+    operator() (sem_elem_t left, sem_elem_t right) const
+    {
+      return left->fastLessThan(right);
+    }
+  };
+
+  struct SemElemRefPtrFastHash
+  {
+    size_t
+    operator() (sem_elem_t se) const
+    {
+      return se->fastHash();
+    }
+  };
+
+  struct SemElemRefPtrEqual
+  {
+    bool
+    operator() (sem_elem_t left, sem_elem_t right) const
+    {
+      return left->equal(right);
+    }
+  };
 }
 #endif  // wali_SEM_ELEM_GUARD
 
