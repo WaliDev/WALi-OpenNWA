@@ -655,8 +655,9 @@ int main(int argc, char ** argv)
   if(!mainProc) mainProc = strdup("main");
   if(!errLbl) errLbl = strdup("error");
   cout << "[Newton Compare] Post processing parsed program... " << endl;
-  instrument_asserts(pg, errLbl);
   make_void_returns_explicit(pg);
+  instrument_enforce(pg);
+  instrument_asserts(pg, errLbl);
 
   cout << "[Newton Compare] Obtaining PDS..." << endl;
   originalPds = new FWPDS();

@@ -251,6 +251,7 @@ namespace wali
         }
 
 
+        // 
         void make_void_returns_explicit_in_prog(prog * pg)
         {
           assert(pg && "make_void_returns_explicit_in_prog");
@@ -279,6 +280,54 @@ namespace wali
           }
         }
 
+        // Forward declaration of static procedures having to do with instrumenting enforce conditions.
+        // We basically replace the enforce clause with an assert before every return statment.
+        static void instrument_enforce_in_prog(prog * pg);
+        static void instrument_enforce_in_proc(proc * p);
+        static stmt_list * instrument_enforce_in_stmt_list(stmt_list * sl, expr const * e);
+
+        static void instrument_enforce_in_prog(prog * pg)
+        {
+          assert(pg && "instrument_enforce_in_prog");
+          proc_list * pl = pg->pl;
+          while(pl){
+            instrument_enforce_in_proc(pl->p);
+            pl = pl->n;
+          }
+        }
+
+        static void instrument_enforce_in_proc(proc * p)
+        {
+          assert(p && "instrument_enforce_in_proc");
+          assert(p->sl && "instrument_enforce_in_proc: Please call make_void_returns_explicit first");
+          if(p->e){
+            p->sl = instrument_enforce_in_stmt_list(p->sl, p->e);
+            if(p->sl->s && p->sl->s->op == AST_RETURN){
+              expr * e = make_deep_copy_expr(p->e);
+              stmt * s = make_assert_stmt(e);
+              p->sl = add_stmt_left(p->sl, s);
+            }
+          }
+        }
+
+        static stmt_list * instrument_enforce_in_stmt_list(stmt_list * sl, expr const * e)
+        {
+          assert(sl && sl->s && "instrument_enforce_in_stmt_list");
+          if(sl->s->sl1)
+            sl->s->sl1 = instrument_enforce_in_stmt_list(sl->s->sl1, e);
+          if(sl->s->sl2)
+            sl->s->sl2 = instrument_enforce_in_stmt_list(sl->s->sl2, e);
+          if(sl->n)
+            sl->n = instrument_enforce_in_stmt_list(sl->n, e);
+
+          if(sl->n && sl->n->s && sl->n->s->op == AST_RETURN){
+            expr * ec = make_deep_copy_expr(e);
+            stmt * s = make_assert_stmt(ec);
+            sl = add_stmt_left(sl, s);
+          }
+          return sl;
+        }
+      
       }
 
 
@@ -549,6 +598,7 @@ namespace wali
           sl = sl->n;
         }
       }
+
       void dump_pds_from_proc(WPDS * pds, proc * p, ProgramBddContext * con, const stmt_ptr_stmt_list_ptr_hash_map& goto_to_targets, const stmt_ptr_proc_ptr_hash_map& call_to_callee)
       {
         dump_pds_from_stmt_list(pds, p->sl, con, goto_to_targets, call_to_callee, p->f, NULL);
@@ -663,6 +713,10 @@ namespace wali
       fprintf(stdout, "\n");      
     }
 
+    void instrument_enforce(prog * pg)
+    {
+      instrument_enforce_in_prog(pg);
+    }
 
     void instrument_asserts(prog * pg, const char * errLbl)
     {
