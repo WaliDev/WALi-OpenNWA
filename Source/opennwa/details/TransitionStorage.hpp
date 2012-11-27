@@ -65,9 +65,8 @@ namespace opennwa
       // returns the value. (In this case, it's stored as a
       // function-static variable, but this is somewhat irrelevant.
 #define DEFINE_FAKE_STATIC_DATA(name, value)    \
-      static std::string const & name() {       \
-        static std::string ret = value;         \
-        return ret;                             \
+      static std::string name() {               \
+        return value;                           \
       }
 
       DEFINE_FAKE_STATIC_DATA(XMLFromAttr, "from");

@@ -27,15 +27,9 @@ namespace opennwa
       typedef Symbol Sym;
       typedef std::set<Sym>::const_iterator const_iterator;
 
-      static std::string const & XMLSymbolTag() {
-        static std::string ret = "Symbol";
-        return ret;
-      }
+      static std::string const & XMLSymbolTag();
 
-      static std::string const & XMLNameAttr() {
-        static std::string ret = "name";
-        return ret;
-      }
+      static std::string const & XMLNameAttr();
 
       //
       // Methods

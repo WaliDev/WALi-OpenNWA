@@ -64,18 +64,9 @@ namespace opennwa
       typedef std::map<St,Ret> RetMap;
 #endif
 
-      static Internals const & emptyInternals() {
-        static Internals r;
-        return r;
-      }
-      static Calls const & emptyCalls() {
-        static Calls c;
-        return c;
-      }
-      static Returns const & emptyReturns() {
-        static Returns r;
-        return r;
-      }
+      static Internals const & emptyInternals();
+      static Calls const & emptyCalls();
+      static Returns const & emptyReturns();
 
       //
       // Methods

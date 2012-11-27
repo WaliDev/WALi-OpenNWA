@@ -140,29 +140,16 @@ namespace opennwa
     //
           
   public:
-    sem_elem_t getOne( ) const
-    {
-      static const Reach r(true);
-      return r.one();
-    }
+    sem_elem_t getOne( ) const;
   };
   
 
   class ShortestPathGen : public WeightGen
   {
   public:
-    sem_elem_t getOne( ) const
-    {
-      static const wali::ShortestPathSemiring r;
-      return r.one();
-    }
+    sem_elem_t getOne( ) const;
 
-
-    sem_elem_t getUnitWeight() const
-    {
-      static const sem_elem_t r = new wali::ShortestPathSemiring(1);
-      return r;
-    }
+    sem_elem_t getUnitWeight() const;
 
     virtual sem_elem_t getWeight( Key src, ClientInfoRefPtr srcInfo, Key sym, Kind kind, Key tgt, ClientInfoRefPtr tgtInfo ) const
     {
@@ -198,18 +185,9 @@ namespace opennwa
   {
   public:
     // Semiring 1 is length 0
-    sem_elem_t getOne( ) const
-    {
-      static const wali::ShortestPathSemiring r;
-      return r.one();
-    }
+    sem_elem_t getOne( ) const;
 
-
-    sem_elem_t getUnitWeight() const
-    {
-      static const sem_elem_t r = new wali::ShortestPathSemiring(1);
-      return r;
-    }
+    sem_elem_t getUnitWeight() const;
 
     virtual sem_elem_t getWeight( Key src, ClientInfoRefPtr srcInfo, Key sym, Kind kind, Key tgt, ClientInfoRefPtr tgtInfo ) const
     {

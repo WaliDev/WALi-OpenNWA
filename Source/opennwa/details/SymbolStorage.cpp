@@ -30,6 +30,19 @@ namespace opennwa {
       return *this;
     }
 
+    std::string const &
+    SymbolStorage::XMLSymbolTag() {
+      static std::string ret = "Symbol";
+      return ret;
+    }
+
+    std::string const &
+    SymbolStorage::XMLNameAttr() {
+      static std::string ret = "name";
+      return ret;
+    }
+    
+
     //Accessors
 
     /**

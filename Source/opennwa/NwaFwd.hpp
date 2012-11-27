@@ -24,8 +24,8 @@ namespace opennwa
   ///
   typedef wali::Key Symbol;
 
-  const Symbol EPSILON = wali::WALI_EPSILON;
-  const Symbol WILD = wali::WALI_WILD;
+  extern const Symbol & EPSILON;
+  extern const Symbol & WILD;
 
   using wali::getKey;
 

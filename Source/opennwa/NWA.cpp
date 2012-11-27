@@ -16,6 +16,9 @@ namespace opennwa
   using wali::key2str;
     
   const std::string Nwa::XMLTag = "XML";
+
+  const Symbol & EPSILON = wali::WALI_EPSILON;
+  const Symbol & WILD = wali::WALI_WILD;
       
   //
   // Methods
