@@ -1,6 +1,5 @@
 #include "wali/domains/SemElemSet.hpp"
 
-
 namespace
 {
   using namespace wali::domains;
@@ -9,14 +8,7 @@ namespace
   bool
   is_present(SemElemSet::ElementSet const & set, sem_elem_t add_this)
   {
-    for (SemElemSet::ElementSet::const_iterator candidate = set.begin();
-         candidate != set.end(); ++candidate)
-    {
-      if (add_this->equal(*candidate)) {
-        return true;
-      }
-    }
-    return false;
+    return (set.find(add_this) != set.end());
   }
 
 
@@ -24,7 +16,8 @@ namespace
   push_if_not_present(SemElemSet::ElementSet & set, sem_elem_t add_this)
   {
     if (!is_present(set, add_this)) {
-      set.push_back(add_this);
+      set.insert(add_this);
+      //set.push_back(add_this);
     }
   }
   
@@ -56,7 +49,8 @@ namespace wali
     SemElemSet::one() const
     {
       ElementSet es;
-      es.push_back(this->base_one);
+      //es.push_back(this->base_one);
+      es.insert(this->base_one);
       return new SemElemSet(this->base_one, es);
     }
 

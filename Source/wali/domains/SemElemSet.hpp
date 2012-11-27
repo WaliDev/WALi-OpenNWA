@@ -3,7 +3,11 @@
 
 #include "wali/SemElem.hpp"
 
-#include <vector>
+#include <set>
+#include <tr1/unordered_set>
+
+#include <boost/function.hpp>
+#include <boost/container/flat_set.hpp>
 
 namespace wali
 {
@@ -20,7 +24,10 @@ namespace wali
     class SemElemSet : public SemElem
     {
     public:
-      typedef std::vector<sem_elem_t> ElementSet;
+      //typedef boost::container::flat_set<sem_elem_t, SemElemRefPtrFastLessThan> ElementSet;
+      //typedef std::set<sem_elem_t, SemElemRefPtrFastLessThan> ElementSet;
+      typedef std::tr1::unordered_set<sem_elem_t, SemElemRefPtrFastHash, SemElemRefPtrEqual> ElementSet;
+      
       typedef ref_ptr<SemElemSet> Ptr;
       typedef ref_ptr<SemElemSet const> ConstPtr;
       
