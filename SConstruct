@@ -45,6 +45,7 @@ vars.Add(BoolVariable('strong_warnings', 'Enable (on by default) to get strong w
 vars.Add(BoolVariable('optimize', 'Turn on optimization', True))
 vars.Add(EnumVariable('checking', "Level of checking. 'slow' gives full checking, e.g. checked iterators. 'fast' gives only quick checks. 'none' removes all assertions. NOTE: On Windows, this also controls whether the library builds with /MTd (under 'slow') or /MT (under 'fast' and 'none').", None, allowed_values=('slow', 'fast', 'none')))
 vars.Add(BoolVariable('profile', 'Compile so that grpof can profile the exectuables', False))
+vars.Add(BoolVariable('coverage', 'Compile so that gcov can profile the execution', False))
 
 tempEnviron = Environment(tools=[], variables=vars)
 arch = tempEnviron['arch']
@@ -52,6 +53,10 @@ BaseEnv['CXX'] = tempEnviron['CXX']
 strong_warnings = tempEnviron['strong_warnings']
 optimize = tempEnviron['optimize']
 profile = tempEnviron['profile']
+coverage = tempEnviron['coverage']
+
+if coverage:
+   optimize = False
 
 if 'checking' not in tempEnviron:
    if optimize:
@@ -130,6 +135,9 @@ if 'gcc' == BaseEnv['compiler']:
         BaseEnv.Append(CCFLAGS=['-pg'])
         BaseEnv.Append(CXXFLAGS=['-pg'])
         BaseEnv.Append(LINKFLAGS=['-pg'])
+    if coverage:
+        BaseEnv.Append(CXXFLAGS=["--coverage"])
+        BaseEnv.Append(LINKFLAGS=["--coverage"])
 
     if platform_bits == 64 and not Is64:
         # If we're on a 64-bit platform but want to compile for 32.
