@@ -63,9 +63,49 @@ namespace wali
         }
       };
 
+      typedef std::pair<bdd, bdd> BddPair;
+      struct BddPairLessThan
+      {
+        bool operator() (BddPair left, BddPair right) const
+        {
+          if (left.first.id() < right.first.id()) {
+            return true;
+          }
+          if (left.first.id() > right.first.id()) {
+            return false;
+          }
+          if (left.second.id() < right.second.id()) {
+            return true;
+          }
+          return false;
+        }
+      };
+
+      struct BddPairHash
+      {
+        size_t operator() (BddPair pair) const
+        {
+          return (size_t) pair.first.id() << 32
+            | (size_t) pair.second.id();
+        }
+      };
+
       std::map<bdd, sem_elem_t, BddLessThan> star_cache;
+      //std::map<BddPair, sem_elem_t, BddPairLessThan> extend_cache;
+      //std::map<BddPair, sem_elem_t, BddPairLessThan> combine_cache;
+      std::tr1::unordered_map<BddPair, sem_elem_t, BddPairHash> extend_cache, combine_cache;
     }
   }
+}
+
+
+long extend_hits, extend_misses;
+void print_cache_sizes()
+{
+  std::cerr << "extend_cache is " << extend_cache.size() << "\n"
+            << "combine_cache is " << combine_cache.size() << "\n";
+  std::cerr << "extend cache hits " << extend_hits << "\n"
+            << "extend misses " << extend_misses << "\n";
 }
 
 
@@ -293,7 +333,10 @@ BddContext::~BddContext()
   numBddContexts--;
   if(numBddContexts == 0){
     //All BddContexts are now dead. So we must shutdown buddy.
+    print_cache_sizes();
     star_cache.clear();
+    extend_cache.clear();
+    combine_cache.clear();
     if(bdd_isrunning() != 0)
       bdd_done();
     //Now clear the reverse map.
@@ -1265,6 +1308,10 @@ wali::sem_elem_t BinRel::star()
       wn = wn->extend(wn);
     }
     star_cache[getBdd()] = wn;
+    //std::cerr << "Computing a non-cached star result\n";
+  }
+  else {
+    //std::cerr << "Retrieving a cached star result\n";
   }
 
   return star_cache[getBdd()];
@@ -1274,13 +1321,39 @@ wali::sem_elem_t BinRel::star()
 wali::sem_elem_t BinRel::combine(wali::SemElem* se) 
 {
   binrel_t that( convert(se) );
+  BddPair args(this->getBdd(), that->getBdd());
   return Union(that);
+
+  if (this->isTensored || that->isTensored) {
+    return Union(that);
+  }
+
+  if (combine_cache.find(args) == combine_cache.end()) {
+    combine_cache[args] = Union(that);
+  }
+
+  return combine_cache[args];
 }
 
 wali::sem_elem_t BinRel::extend(wali::SemElem* se) 
 {
   binrel_t that( convert(se) );
+  BddPair args(this->getBdd(), that->getBdd());
   return Compose(that);
+
+  if (this->isTensored || that->isTensored) {
+    return Compose(that);
+  }
+
+  if (extend_cache.find(args) == extend_cache.end()) {
+    extend_misses++;
+    extend_cache[args] = Compose(that);
+  }
+  else {
+    extend_hits++;
+  }
+
+  return extend_cache[args];
 }
 
 bool BinRel::equal(wali::SemElem* se) const 
