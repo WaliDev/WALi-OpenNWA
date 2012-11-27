@@ -1138,6 +1138,8 @@ bool BinRel::Equal( binrel_t that) const
   //We skip this test if you insist
 #ifndef BINREL_HASTY
   if(isTensored != that->isTensored || con != that->con){
+    std::cerr << "con: " << con << "\n";
+    std::cerr << "that->con: " << that->con << "\n";
     *waliErr << "[WARNING] " << "Compared (Equality) incompatible relations" 
       << endl;
     that->print(print(*waliErr) << endl) << endl;
