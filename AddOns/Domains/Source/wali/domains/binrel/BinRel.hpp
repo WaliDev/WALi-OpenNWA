@@ -441,6 +441,12 @@ namespace wali
         
       
 
+      
+      namespace details {
+        std::vector<std::pair<VectorVocabulary, bdd> >
+        partition(BddContext const & vars, bdd b);
+      }
+
     } // namespace binrel
 
   } // namespace domains
