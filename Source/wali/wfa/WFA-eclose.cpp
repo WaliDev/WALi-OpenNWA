@@ -70,7 +70,8 @@ namespace
     
     virtual void operator()(wali::wfa::ITrans const * t) {
       wali::domains::SemElemSet::ElementSet es;
-      es.push_back(t->weight());
+      es.insert(t->weight());
+      //es.push_back(t->weight());
       
       target.addTrans(t->from(),
                       t->stack(),

@@ -1,3 +1,4 @@
+#if 0
 #include "gtest/gtest.h"
 
 #include "wali/domains/SemElemSet.hpp"
@@ -271,3 +272,4 @@ namespace wali {
         
     }
 }
+#endif
