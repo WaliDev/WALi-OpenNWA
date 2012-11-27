@@ -37,12 +37,16 @@ namespace wali {
 
     bool equal(SemElem *rhs) const;
 
+    bool fastLessThan(SemElem const * rhs) const;
+
     //------------------------------------
     // output
     //------------------------------------
     std::ostream & print(std::ostream &out) const;
 
     unsigned int getNum() const;
+
+    size_t fastHash() const;      
 
   private:
     

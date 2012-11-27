@@ -1356,6 +1356,12 @@ bool BinRel::equal(wali::SemElem* se) const
   return Equal(that);
 }
 
+bool BinRel::containerLessThan(wali::SemElem const * se) const
+{
+  BinRel const * other = dynamic_cast<BinRel const *>(se);
+  return this->getBdd().id() < other->getBdd().id();
+}
+
 
 wali::sem_elem_t BinRel::one() const
 {

@@ -413,6 +413,12 @@ namespace wali
             return *con;
           }
 
+          virtual bool containerLessThan(SemElem const * other) const;
+
+          virtual size_t hash() const {
+            return static_cast<size_t>(getBdd().id());
+          }
+
           // ////////////////////////////////
           // Printing functions
           //static void printHandler(FILE *o, int var);
