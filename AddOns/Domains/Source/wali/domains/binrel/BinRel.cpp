@@ -69,7 +69,7 @@ namespace wali
       namespace details {
 
         bool
-        bdd_subsumes_using_bdd_imp(bdd left, bdd right)
+        bddImplies_using_bdd_imp(bdd left, bdd right)
         {
           // left_implies_right(x) = (left(x) => right(x))
           bdd left_implies_right = bdd_imp(left, right);
@@ -77,7 +77,7 @@ namespace wali
         }
         
         bool
-        bdd_subsumes_recursive(bdd left, bdd right)
+        bddImplies_recursive(bdd left, bdd right)
         {
           if (left == right
               || left == bddfalse
@@ -100,20 +100,20 @@ namespace wali
 
           if (left_level < right_level) {
             // Left's root is higher, so we look at left's children
-            bool left_good = bdd_subsumes_recursive(bdd_low(left), right);
-            bool right_good = bdd_subsumes_recursive(bdd_high(left), right);
+            bool left_good = bddImplies_recursive(bdd_low(left), right);
+            bool right_good = bddImplies_recursive(bdd_high(left), right);
             return left_good && right_good;
           }
           else if (left_level > right_level) {
             // Right's root is higher, so we look at right's children
-            bool left_good = bdd_subsumes_recursive(left, bdd_low(right));
-            bool right_good = bdd_subsumes_recursive(left, bdd_high(right));
+            bool left_good = bddImplies_recursive(left, bdd_low(right));
+            bool right_good = bddImplies_recursive(left, bdd_high(right));
             return left_good && right_good;
           }
           else {
             // The root is the same
-            bool left_good = bdd_subsumes_recursive(bdd_low(left), bdd_low(right));
-            bool right_good = bdd_subsumes_recursive(bdd_high(left), bdd_high(right));
+            bool left_good = bddImplies_recursive(bdd_low(left), bdd_low(right));
+            bool right_good = bddImplies_recursive(bdd_high(left), bdd_high(right));
             return left_good && right_good;
           }
         }
@@ -122,11 +122,11 @@ namespace wali
         /// Returns if 'left(x_vec) => right(x_vec)', aka if 'left' is a
         /// superset of 'right' (when viewed as sets of accepting 'x_vec's.
         bool
-        bdd_subsumes(bdd left, bdd right)
+        bddImplies(bdd left, bdd right)
         {
-          bool fast_answer = bdd_subsumes_recursive(left, right);
-#if CHECK_BDD_SUBSUMES_WITH_SLOWER_VERSION
-          bool slow_answer = bdd_subsumes_using_bdd_imp(left, right);
+          bool fast_answer = bddImplies_recursive(left, right);
+#if CHECK_BDDIMPLIES_WITH_SLOWER_VERSION
+          bool slow_answer = bddImplies_using_bdd_imp(left, right);
           assert(fast_answer == slow_answer);
 #endif
           return fast_answer;

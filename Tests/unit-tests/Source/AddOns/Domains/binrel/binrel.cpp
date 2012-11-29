@@ -1156,32 +1156,32 @@ namespace{
 #endif //#if defined(TENSOR_MATCHED_PAREN)
 
 
-  TEST(wali$domains$binrel$details$$bdd_subsumes, trueSubsumesTrue)
+  TEST(wali$domains$binrel$details$$bddImplies, trueImpliesTrue)
   {
     RawBuddyContext buddy;
-    EXPECT_TRUE(bdd_subsumes(bddtrue, bddtrue));
+    EXPECT_TRUE(bddImplies(bddtrue, bddtrue));
   }
 
-  TEST(wali$domains$binrel$details$$bdd_subsumes, trueDoesNotSubsumeFalse)
+  TEST(wali$domains$binrel$details$$bddImplies, trueDoesNotSubsumeFalse)
   {
     RawBuddyContext buddy;
-    EXPECT_FALSE(bdd_subsumes(bddtrue, bddfalse));
+    EXPECT_FALSE(bddImplies(bddtrue, bddfalse));
   }
 
-  TEST(wali$domains$binrel$details$$bdd_subsumes, falseSubsumesTrue)
+  TEST(wali$domains$binrel$details$$bddImplies, falseImpliesTrue)
   {
     RawBuddyContext buddy;
-    EXPECT_TRUE(bdd_subsumes(bddfalse, bddtrue));
+    EXPECT_TRUE(bddImplies(bddfalse, bddtrue));
   }
 
-  TEST(wali$domains$binrel$details$$bdd_subsumes, falseSubsumesFalse)
+  TEST(wali$domains$binrel$details$$bddImplies, falseImpliesFalse)
   {
     RawBuddyContext buddy;
-    EXPECT_TRUE(bdd_subsumes(bddfalse, bddfalse));
+    EXPECT_TRUE(bddImplies(bddfalse, bddfalse));
   }
 
 
-  TEST(wali$domains$binrel$details$$bdd_subsumes, subsetsOfFourBattery)
+  TEST(wali$domains$binrel$details$$bddImplies, subsetsOfFourBattery)
   {
     RawBuddyContext buddy(2);
     SubsetsOfFour subsets;
@@ -1240,7 +1240,9 @@ namespace{
           bdd left = bdds[left_no];
           bdd right = bdds[right_no];
           bool expected = answers[left_no][right_no];
-          bool actual = bdd_subsumes(left, right);
+          bool actual = bddImplies(left, right);
+          bool actual_imp = bddImplies_using_bdd_imp(left, right);
+          bool actual_rec = bddImplies_recursive(left, right);
           
           EXPECT_EQ(expected, actual);
         }

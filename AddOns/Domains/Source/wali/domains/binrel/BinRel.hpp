@@ -451,9 +451,9 @@ namespace wali
 
       
       namespace details {
-        bool bdd_subsumes_using_bdd_imp(bdd left, bdd right);
-        bool bdd_subsumes_recursive(bdd left, bdd right);
-        bool bdd_subsumes(bdd left, bdd right);
+        bool bddImplies_using_bdd_imp(bdd left, bdd right);
+        bool bddImplies_recursive(bdd left, bdd right);
+        bool bddImplies(bdd left, bdd right);
 
         
         std::vector<std::pair<VectorVocabulary, bdd> >
