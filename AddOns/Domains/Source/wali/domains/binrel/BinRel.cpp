@@ -64,6 +64,72 @@ namespace wali
       };
 
       std::map<bdd, sem_elem_t, BddLessThan> star_cache;
+
+
+      namespace details {
+
+        bool
+        bdd_subsumes_using_bdd_imp(bdd left, bdd right)
+        {
+          // left_implies_right(x) = (left(x) => right(x))
+          bdd left_implies_right = bdd_imp(left, right);
+          return left_implies_right == bddtrue;
+        }
+        
+        bool
+        bdd_subsumes_recursive(bdd left, bdd right)
+        {
+          if (left == right
+              || left == bddfalse
+              || right == bddtrue)
+          {
+            return true;
+          }
+
+          if (left == bddtrue || right == bddfalse) {
+            return false;
+          }
+
+          // Both are nontrivial. But the root of one might be different than
+          // the root of another...
+          int
+            left_varno  = bdd_var(left),
+            right_varno = bdd_var(right),
+            left_level  = bdd_var2level(left_varno),
+            right_level = bdd_var2level(right_varno);
+
+          if (left_level < right_level) {
+            // Left's root is higher, so we look at left's children
+            return bdd_subsumes_recursive(bdd_low(left), right)
+              && bdd_subsumes_recursive(bdd_high(left), right);
+          }
+          else if (left_level > right_level) {
+            // Right's root is higher, so we look at right's children
+            return bdd_subsumes_recursive(left, bdd_low(right))
+              && bdd_subsumes_recursive(left, bdd_high(right));
+          }
+          else {
+            // The root is the same
+            return bdd_subsumes_recursive(bdd_low(left), bdd_low(right))
+              && bdd_subsumes_recursive(bdd_high(left), bdd_high(right));
+          }
+        }
+        
+        
+        /// Returns if 'left(x_vec) => right(x_vec)', aka if 'left' is a
+        /// superset of 'right' (when viewed as sets of accepting 'x_vec's.
+        bool
+        bdd_subsumes(bdd left, bdd right)
+        {
+          bool fast_answer = bdd_subsumes_recursive(left, right);
+#if CHECK_BDD_SUBSUMES_WITH_SLOWER_VERSION
+          bool slow_answer = bdd_subsumes_using_bdd_imp(left, right);
+          assert(fast_answer == slow_answer);
+#endif
+          return fast_answer;
+        }
+        
+      }
     }
   }
 }

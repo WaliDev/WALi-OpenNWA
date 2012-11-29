@@ -93,6 +93,11 @@
 **/
 #define BINREL_STATS
 
+
+/// This checks two implementations of the 'subsumes' operation (subset) off
+/// each other (one faster, one simpler)
+#define CHECK_BDD_SUBSUMES_WITH_SLOWER_VERSION 1
+
 namespace wali 
 {
   namespace domains 
@@ -374,6 +379,9 @@ namespace wali
 
           sem_elem_t star();
 
+
+          bool subsumes(SemElem * other) const;
+
           /** @return [this]->Equal( cast<BinRel*>(se) ) */
           bool equal(SemElem* se) const;
 
@@ -443,6 +451,11 @@ namespace wali
 
       
       namespace details {
+        bool bdd_subsumes_using_bdd_imp(bdd left, bdd right);
+        bool bdd_subsumes_recursive(bdd left, bdd right);
+        bool bdd_subsumes(bdd left, bdd right);
+
+        
         std::vector<std::pair<VectorVocabulary, bdd> >
         partition(BddContext const & vars, bdd b);
       }
