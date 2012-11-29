@@ -733,18 +733,18 @@ bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size) const
       in1Size = in2Size;
   }
   unsigned outSize = in1Size;
-  int num_bits = details::log2_ceiling(outSize - 1);
+  int num_bits = ::details::log2_ceiling(outSize - 1);
 
   // Not really fast and slow, but fast and slow to construct.
   bdd fast_adder, slow_adder;
 
   // Build fast adder then maybe build slow adder
-  if (details::is_power_of_two(outSize)) {
+  if (::details::is_power_of_two(outSize)) {
     //std::cerr << "  Building slow adder because " << outSize << " is"
     //          << (details::is_power_of_two(outSize) ? " " : " not ")
     //          << "a power of two\n";
     assert(in1Size <= (unsigned)fdd_domainsize(regAInfo->baseRhs));
-    fast_adder = details::make_adder(regAInfo->baseRhs, regBInfo->baseRhs, regAInfo->baseExtra, num_bits);
+    fast_adder = ::details::make_adder(regAInfo->baseRhs, regBInfo->baseRhs, regAInfo->baseExtra, num_bits);
     fast_adder = fast_adder & fdd_ithvar(sizeInfo, outSize);
   }
 
@@ -754,7 +754,7 @@ bdd ProgramBddContext::bddPlus(unsigned in1Size, unsigned in2Size) const
   
   if (BINREL_ALWAYS_BUILD_SLOW_ADDER
       || (BINREL_ALLOW_BUILD_SLOW_ADDER &&
-          !details::is_power_of_two(outSize)))
+          !::details::is_power_of_two(outSize)))
   {
     //std::cerr << "  Building slow adder because"
     //          << (BINREL_ALWAYS_BUILD_SLOW_ADDER ? " we always do;" : "")

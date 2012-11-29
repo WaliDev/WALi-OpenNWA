@@ -1,5 +1,14 @@
 #include "Xfa.hpp"
 
+namespace {
+
+    bool include_all_vocabularies(wali::domains::binrel::VectorVocabulary const & UNUSED_PARAMETER(v))
+    {
+        return true;
+    }
+    
+}
+
 namespace wali {
     namespace xfa {
 
@@ -78,7 +87,8 @@ namespace wali {
             printImagemagickInstructions(w->getBdd(),
                                          w->getVocabulary(),
                                          command,
-                                         "png:-");
+                                         "png:-",
+                                         include_all_vocabularies);
 
             FILE* image_data_stream = popen(command.str().c_str(), "r");
 

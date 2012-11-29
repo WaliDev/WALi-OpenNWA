@@ -64,6 +64,75 @@ namespace wali
       };
 
       std::map<bdd, sem_elem_t, BddLessThan> star_cache;
+
+
+      namespace details {
+
+        bool
+        bddImplies_using_bdd_imp(bdd left, bdd right)
+        {
+          // left_implies_right(x) = (left(x) => right(x))
+          bdd left_implies_right = bdd_imp(left, right);
+          return left_implies_right == bddtrue;
+        }
+        
+        bool
+        bddImplies_recursive(bdd left, bdd right)
+        {
+          if (left == right
+              || left == bddfalse
+              || right == bddtrue)
+          {
+            return true;
+          }
+
+          if (left == bddtrue || right == bddfalse) {
+            return false;
+          }
+
+          // Both are nontrivial. But the root of one might be different than
+          // the root of another...
+          int
+            left_varno  = bdd_var(left),
+            right_varno = bdd_var(right),
+            left_level  = bdd_var2level(left_varno),
+            right_level = bdd_var2level(right_varno);
+
+          if (left_level < right_level) {
+            // Left's root is higher, so we look at left's children
+            bool left_good = bddImplies_recursive(bdd_low(left), right);
+            bool right_good = bddImplies_recursive(bdd_high(left), right);
+            return left_good && right_good;
+          }
+          else if (left_level > right_level) {
+            // Right's root is higher, so we look at right's children
+            bool left_good = bddImplies_recursive(left, bdd_low(right));
+            bool right_good = bddImplies_recursive(left, bdd_high(right));
+            return left_good && right_good;
+          }
+          else {
+            // The root is the same
+            bool left_good = bddImplies_recursive(bdd_low(left), bdd_low(right));
+            bool right_good = bddImplies_recursive(bdd_high(left), bdd_high(right));
+            return left_good && right_good;
+          }
+        }
+        
+        
+        /// Returns if 'left(x_vec) => right(x_vec)', aka if 'left' is a
+        /// superset of 'right' (when viewed as sets of accepting 'x_vec's.
+        bool
+        bddImplies(bdd left, bdd right)
+        {
+          bool fast_answer = bddImplies_recursive(left, right);
+#if CHECK_BDDIMPLIES_WITH_SLOWER_VERSION
+          bool slow_answer = bddImplies_using_bdd_imp(left, right);
+          assert(fast_answer == slow_answer);
+#endif
+          return fast_answer;
+        }
+        
+      }
     }
   }
 }
@@ -1138,6 +1207,8 @@ bool BinRel::Equal( binrel_t that) const
   //We skip this test if you insist
 #ifndef BINREL_HASTY
   if(isTensored != that->isTensored || con != that->con){
+    std::cerr << "con: " << con << "\n";
+    std::cerr << "that->con: " << that->con << "\n";
     *waliErr << "[WARNING] " << "Compared (Equality) incompatible relations" 
       << endl;
     that->print(print(*waliErr) << endl) << endl;
@@ -1374,8 +1445,39 @@ void BddContext::resetStats()
 namespace wali {
   namespace domains {
     namespace binrel {
+
+      bdd
+      quantifyOutOtherVariables(BddContext const & voc,
+                                std::vector<std::string> const & keep_these,
+                                bdd b)
+      {
+        std::vector<int> keep_these_fdds;
+        for (std::vector<std::string>::const_iterator keep_this = keep_these.begin();
+             keep_this != keep_these.end(); ++keep_this)
+        {
+          BddContext::const_iterator var_info = voc.find(*keep_this);
+          assert(var_info != voc.end());
+          
+          keep_these_fdds.push_back(var_info->second->baseLhs);
+          keep_these_fdds.push_back(var_info->second->baseRhs);
+        }
+
+        bdd vars_to_remove = bddtrue;
+
+        for (int fdd_num=0; fdd_num<fdd_domainnum(); ++fdd_num)
+        {
+          if (std::find(keep_these_fdds.begin(),
+                        keep_these_fdds.end(),
+                        fdd_num)
+              == keep_these_fdds.end())
+          {
+            vars_to_remove &= fdd_ithset(fdd_num);
+          }
+        }
+
+        return bdd_exist(b, vars_to_remove);
+      }
       
-      typedef std::vector<std::pair<std::string, bddinfo_t> > VectorVocabulary;
       
       std::vector<Assignment>
       getAllAssignments(VectorVocabulary const & voc);
@@ -1587,7 +1689,8 @@ namespace wali {
       }
       
       void
-      printImagemagickInstructions(bdd b, BddContext const & voc, std::ostream & os, std::string const & for_file)
+      printImagemagickInstructions(bdd b, BddContext const & voc, std::ostream & os, std::string const & for_file,
+                                   boost::function<bool (VectorVocabulary const &)> include_component)
       {
         std::vector<std::pair<VectorVocabulary, bdd> > independent_components = details::partition(voc, b);
         std::vector<std::vector<Assignment> > possible_assignments_by_component;
@@ -1602,7 +1705,11 @@ namespace wali {
           if(boost::starts_with(comp_voc.begin()->first, "DUMMY")) {
             assert(comp_voc.size() == 1);
             continue;
-          }        
+          }
+
+          if(include_component && !include_component(comp_voc)) {
+            continue;
+          }
             
           total_height += 2*details::v_margin;
           total_height += possibleAssignments.size() * details::v_separation;
@@ -1618,6 +1725,10 @@ namespace wali {
           VectorVocabulary const & comp_voc = independent_components.at(comp_no).first;
           if(boost::starts_with(comp_voc.begin()->first, "DUMMY")) {
             assert(comp_voc.size() == 1);
+            continue;
+          }
+
+          if(include_component && !include_component(comp_voc)) {
             continue;
           }
           
