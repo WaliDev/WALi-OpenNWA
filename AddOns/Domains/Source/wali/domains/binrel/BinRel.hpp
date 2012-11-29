@@ -380,7 +380,7 @@ namespace wali
           sem_elem_t star();
 
 
-          bool subsumes(SemElem * other) const;
+          bool underApproximates(SemElem * other);
 
           /** @return [this]->Equal( cast<BinRel*>(se) ) */
           bool equal(SemElem* se) const;
