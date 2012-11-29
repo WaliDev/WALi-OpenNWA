@@ -100,18 +100,21 @@ namespace wali
 
           if (left_level < right_level) {
             // Left's root is higher, so we look at left's children
-            return bdd_subsumes_recursive(bdd_low(left), right)
-              && bdd_subsumes_recursive(bdd_high(left), right);
+            bool left_good = bdd_subsumes_recursive(bdd_low(left), right);
+            bool right_good = bdd_subsumes_recursive(bdd_high(left), right);
+            return left_good && right_good;
           }
           else if (left_level > right_level) {
             // Right's root is higher, so we look at right's children
-            return bdd_subsumes_recursive(left, bdd_low(right))
-              && bdd_subsumes_recursive(left, bdd_high(right));
+            bool left_good = bdd_subsumes_recursive(left, bdd_low(right));
+            bool right_good = bdd_subsumes_recursive(left, bdd_high(right));
+            return left_good && right_good;
           }
           else {
             // The root is the same
-            return bdd_subsumes_recursive(bdd_low(left), bdd_low(right))
-              && bdd_subsumes_recursive(bdd_high(left), bdd_high(right));
+            bool left_good = bdd_subsumes_recursive(bdd_low(left), bdd_low(right));
+            bool right_good = bdd_subsumes_recursive(bdd_high(left), bdd_high(right));
+            return left_good && right_good;
           }
         }
         
