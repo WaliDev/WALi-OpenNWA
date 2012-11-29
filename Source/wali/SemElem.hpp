@@ -98,6 +98,18 @@ namespace wali
       virtual bool equal( SemElem * se ) const = 0;
 
       /**
+       *  Determines whether 'this' underapproximates 'that'
+       *
+       *  The following should be equivalent:
+       *      this.underApproximates(that)
+       *      this + that = that
+       *  (Where = is ->equals and + is ->combine.)
+       *
+       *  The latter is what the default implementation performs
+       */
+      virtual bool underApproximates(SemElem * that);
+
+      /**
        *  Print the semiring element to the std::ostream o
        */
       virtual std::ostream& print( std::ostream & o ) const = 0;
@@ -177,6 +189,11 @@ namespace wali
         return equal( se.get_ptr() ); 
       }
 
+      bool underApproximates( sem_elem_t se )
+      { 
+        return underApproximates( se.get_ptr() ); 
+      }
+      
       /**
        * Wrapper method for diff that will remove the ref_ptr
        * to make the call to the user's code. 

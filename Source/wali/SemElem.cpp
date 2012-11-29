@@ -26,6 +26,14 @@ namespace wali
     return o;
   }
 
+  bool
+  SemElem::underApproximates(SemElem * that)
+  {
+    // a \sqsubset b   iff   a + b = b
+    sem_elem_t combination = that->combine(this);
+    return that->equal(combination);
+  }
+
   /*
    * diff returns This - se
    * The default implementation justs lets the diff
@@ -133,6 +141,30 @@ namespace wali
     if (!x->equal( x->extend(o)) || !x->equal(o->extend(x)))
     {
       *waliErr << "[ERROR - test_semelem_impl] x != 1*x" << std::endl;
+      good = false;
+    }
+    if (!z->underApproximates(z)) {
+      *waliErr << "[ERROR - test_semelem_impl] 0 does not underapproximate 0" << std::endl;
+      good = false;
+    }
+    if (!o->underApproximates(o)) {
+      *waliErr << "[ERROR - test_semelem_impl] 1 does not underapproximate 1" << std::endl;
+      good = false;
+    }
+    if (!z->underApproximates(o)) {
+      *waliErr << "[ERROR - test_semelem_impl] 0 does not underapproximate 1" << std::endl;
+      good = false;
+    }
+    if (!z->underApproximates(x)) {
+      *waliErr << "[ERROR - test_semelem_impl] 0 does not underapproximate x" << std::endl;
+      good = false;
+    }
+    if (o->underApproximates(z)) {
+      *waliErr << "[ERROR - test_semelem_impl] 1 underapproximate 0" << std::endl;
+      good = false;
+    }
+    if (x->underApproximates(z) && !x->equal(z)) {
+      *waliErr << "[ERROR - test_semelem_impl] x underapproximates 0 (and x != 0)" << std::endl;
       good = false;
     }
 
