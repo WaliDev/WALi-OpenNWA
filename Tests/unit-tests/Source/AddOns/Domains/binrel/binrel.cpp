@@ -1245,6 +1245,8 @@ namespace{
           bool actual_rec = bddImplies_recursive(left, right);
           
           EXPECT_EQ(expected, actual);
+          EXPECT_EQ(expected, actual_imp);
+          EXPECT_EQ(expected, actual_rec);
         }
       }
     }
