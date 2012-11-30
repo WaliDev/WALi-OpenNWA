@@ -230,7 +230,6 @@ namespace wali
       }
 
       
-      virtual
       bool
       fastLessThan(sem_elem_t se) const
       {
