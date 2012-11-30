@@ -75,9 +75,11 @@ namespace wali
           bdd left_implies_right = bdd_imp(left, right);
           return left_implies_right == bddtrue;
         }
+
+        typedef std::map<bdd, std::set<bdd, BddLessThan>, BddLessThan> BddImpliesCache;
         
         bool
-        bddImplies_recursive(bdd left, bdd right)
+        bddImplies_recursive(bdd left, bdd right, BddImpliesCache & cache)
         {
           if (left == right
               || left == bddfalse
@@ -89,6 +91,15 @@ namespace wali
           if (left == bddtrue || right == bddfalse) {
             return false;
           }
+
+          if (cache[left].count(right) > 0) {
+            // We have visited this node already. If left does NOT imply
+            // right then we'll have already discovered that and the 'false'
+            // will propagate up that branch, thus it is safe to return
+            // 'true' even if that's a white lie.
+            return true;
+          }
+          cache[left].insert(right);
 
           // Both are nontrivial. But the root of one might be different than
           // the root of another...
@@ -118,6 +129,12 @@ namespace wali
           }
         }
         
+        bool
+        bddImplies_recursive(bdd left, bdd right)
+        {
+          BddImpliesCache cache;
+          return bddImplies_recursive(left, right, cache);
+        }
         
         /// Returns if 'left(x_vec) => right(x_vec)', aka if 'left' is a
         /// superset of 'right' (when viewed as sets of accepting 'x_vec's.
