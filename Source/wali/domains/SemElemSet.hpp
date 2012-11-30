@@ -50,6 +50,9 @@ namespace wali
       virtual sem_elem_t combine( SemElem * se );
 
       virtual bool equal( SemElem * se ) const;
+      bool equal( sem_elem_t se ) const {
+        return this->equal(se.get_ptr());
+      }
 
       virtual std::ostream& print( std::ostream & o ) const;
 
