@@ -37,7 +37,7 @@ namespace wali {
         TEST(wali$domains$SemElemSet$$SemElemSet, oneArgConstructorMakesZero)
         {
             sem_elem_t ten = new ShortestPathSemiring(10);
-            SemElemSet s(ten);
+            SemElemSet s(SemElemSet::KeepAllNonduplicates, ten);
             EXPECT_EQ(0u, s.getElements().size());
         }        
 
@@ -48,7 +48,7 @@ namespace wali {
             SemElemSet::ElementSet es;
             insert(es, ten);
             
-            SemElemSet s(ten, es);
+            SemElemSet s(SemElemSet::KeepAllNonduplicates, ten, es);
             //EXPECT_EQ(es, s.getElements());
             EXPECT_EQ(1u, s.getElements().size());
         }    
@@ -62,7 +62,7 @@ namespace wali {
             insert(es, ten);
             insert(es, ten);
             
-            SemElemSet s(ten, es);
+            SemElemSet s(SemElemSet::KeepAllNonduplicates, ten, es);
             ASSERT_EQ(1u, s.getElements().size());
             //EXPECT_EQ(ten, s.getElements()[0]);
             EXPECT_CONTAINS(s.getElements(), ten);
@@ -77,7 +77,7 @@ namespace wali {
             insert(es, ten1);
             insert(es, ten2);
             
-            SemElemSet s(ten1, es);
+            SemElemSet s(SemElemSet::KeepAllNonduplicates, ten1, es);
             EXPECT_EQ(1u, s.getElements().size());
             EXPECT_CONTAINS(s.getElements(), ten1); // could be ten2
         }    
@@ -91,7 +91,7 @@ namespace wali {
             insert(es, ten);
             insert(es, twenty);
             
-            SemElemSet s(ten, es);
+            SemElemSet s(SemElemSet::KeepAllNonduplicates, ten, es);
             //EXPECT_EQ(es, s.getElements());
             EXPECT_EQ(2u, s.getElements().size());
         }    
@@ -102,7 +102,7 @@ namespace wali {
             sem_elem_t ten = new ShortestPathSemiring(10);
             SemElemSet::ElementSet es;
             insert(es, ten);
-            SemElemSet s(ten, es);
+            SemElemSet s(SemElemSet::KeepAllNonduplicates, ten, es);
 
             sem_elem_t zero_se = s.zero();
             SemElemSet * zero_down = dynamic_cast<SemElemSet *>(zero_se.get_ptr());
@@ -116,7 +116,7 @@ namespace wali {
             sem_elem_t ten = new ShortestPathSemiring(10);
             SemElemSet::ElementSet es;
             insert(es, ten);
-            SemElemSet s(ten, es);
+            SemElemSet s(SemElemSet::KeepAllNonduplicates, ten, es);
 
             sem_elem_t one_se = s.one();
             SemElemSet * one_down = dynamic_cast<SemElemSet *>(one_se.get_ptr());
@@ -133,7 +133,7 @@ namespace wali {
             SemElemSet::ElementSet es;
             insert(es, ten);
             
-            sem_elem_t interesting_value = new SemElemSet(ten, es);
+            sem_elem_t interesting_value = new SemElemSet(SemElemSet::KeepAllNonduplicates, ten, es);
             test_semelem_impl(interesting_value);
         }
 
@@ -151,8 +151,8 @@ namespace wali {
             insert(all, twenty);
             insert(all, thirty);
             
-            SemElemSet s1(ten, es1);
-            SemElemSet s2(thirty, es2);
+            SemElemSet s1(SemElemSet::KeepAllNonduplicates, ten, es1);
+            SemElemSet s2(SemElemSet::KeepAllNonduplicates, thirty, es2);
 
             sem_elem_t answer = s1.combine(&s2);
             SemElemSet * answer_down = dynamic_cast<SemElemSet *>(answer.get_ptr());
@@ -172,8 +172,8 @@ namespace wali {
             insert(es2, thirty);
             insert(es2, ten2);
             
-            SemElemSet s1(ten1, es1);
-            SemElemSet s2(thirty, es2);
+            SemElemSet s1(SemElemSet::KeepAllNonduplicates, ten1, es1);
+            SemElemSet s2(SemElemSet::KeepAllNonduplicates, thirty, es2);
 
             sem_elem_t answer = s1.combine(&s2);
             SemElemSet * answer_down = dynamic_cast<SemElemSet *>(answer.get_ptr());
@@ -202,8 +202,8 @@ namespace wali {
             insert(es2, ten);
             insert(es2, twenty);
             
-            SemElemSet s1(one, es1);
-            SemElemSet s2(ten, es2);
+            SemElemSet s1(SemElemSet::KeepAllNonduplicates, one, es1);
+            SemElemSet s2(SemElemSet::KeepAllNonduplicates, ten, es2);
 
             sem_elem_t answer = s1.extend(&s2);
             SemElemSet * answer_down = dynamic_cast<SemElemSet *>(answer.get_ptr());
@@ -233,8 +233,8 @@ namespace wali {
             insert(es2, thirty);
             insert(es2, fourty);
             
-            SemElemSet s1(ten, es1);
-            SemElemSet s2(thirty, es2);
+            SemElemSet s1(SemElemSet::KeepAllNonduplicates, ten, es1);
+            SemElemSet s2(SemElemSet::KeepAllNonduplicates, thirty, es2);
 
             sem_elem_t answer = s1.extend(&s2);
             SemElemSet * answer_down = dynamic_cast<SemElemSet *>(answer.get_ptr());
@@ -261,8 +261,8 @@ namespace wali {
             insert(es2, thirty);
             insert(es2, fourty);
             
-            SemElemSet s1(ten, es1);
-            SemElemSet s2(thirty, es2);
+            SemElemSet s1(SemElemSet::KeepAllNonduplicates, ten, es1);
+            SemElemSet s2(SemElemSet::KeepAllNonduplicates, thirty, es2);
 
             EXPECT_FALSE(s1.equal(&s2));
         }
@@ -280,8 +280,8 @@ namespace wali {
             insert(es2, twenty);
             insert(es2, ten);
             
-            SemElemSet s1(ten, es1);
-            SemElemSet s2(ten, es2);
+            SemElemSet s1(SemElemSet::KeepAllNonduplicates, ten, es1);
+            SemElemSet s2(SemElemSet::KeepAllNonduplicates, ten, es2);
 
             EXPECT_TRUE(s1.equal(&s2));
         }
@@ -297,8 +297,8 @@ namespace wali {
             insert(es1, ten1);
             insert(es2, ten2);
             
-            SemElemSet s1(ten1, es1);
-            SemElemSet s2(ten2, es2);
+            SemElemSet s1(SemElemSet::KeepAllNonduplicates, ten1, es1);
+            SemElemSet s2(SemElemSet::KeepAllNonduplicates, ten2, es2);
 
             EXPECT_TRUE(s1.equal(&s2));
         }

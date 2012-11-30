@@ -4,7 +4,7 @@ namespace
 {
   using namespace wali::domains;
   using namespace wali;
-  
+
   bool
   is_present(SemElemSet::ElementSet const & set, sem_elem_t add_this)
   {
@@ -20,7 +20,63 @@ namespace
       //set.push_back(add_this);
     }
   }
+
+
+  bool
+  new_less_than_existing(sem_elem_t new_, sem_elem_t existing)
+  {
+    return new_->underApproximates(existing);
+  }
+
+  bool
+  existing_less_than_new(sem_elem_t new_, sem_elem_t existing)
+  {
+    return existing->underApproximates(new_);
+  }
+
+  typedef bool(*SemElemCompare)(sem_elem_t, sem_elem_t);
+
+  void
+  remove_subsumed_elements(SemElemSet::ElementSet & set,
+                           sem_elem_t element,
+                           SemElemCompare should_remove_existing)
+  {
+    SemElemSet::ElementSet::const_iterator iter = set.begin();
+    while (iter != set.end()) {
+      if (should_remove_existing(element, *iter)) {
+        // set.erase(iter++) for std::map
+        iter = set.erase(iter);
+      }
+      else {
+        ++iter;
+      }
+    }
+  }
   
+
+  void
+  add_element_if_appropriate(SemElemSet::KeepWhat keep_what,
+                             SemElemSet::ElementSet & set,
+                             sem_elem_t add_this)
+  {
+    switch(keep_what) {
+      case SemElemSet::KeepAllNonduplicates:
+        push_if_not_present(set, add_this);
+        break;
+
+      case SemElemSet::KeepMaximalElements:
+        // Should remove the existing element if new >= existing
+        remove_subsumed_elements(set, add_this, existing_less_than_new);
+        set.insert(add_this);
+        break;
+
+      case SemElemSet::KeepMinimalElements:
+        // Opposite of the previous case
+        remove_subsumed_elements(set, add_this, new_less_than_existing);
+        set.insert(add_this);
+        break;
+    }
+  }
 }
 
 
@@ -29,18 +85,20 @@ namespace wali
   namespace domains
   {
 
-    SemElemSet::SemElemSet(sem_elem_t base_element)
+    SemElemSet::SemElemSet(KeepWhat keep, sem_elem_t base_element)
       : base_one(base_element->one())
+      , keep_what(keep)
     {}
 
 
-    SemElemSet::SemElemSet(sem_elem_t base_element, ElementSet const & es)
+    SemElemSet::SemElemSet(KeepWhat keep, sem_elem_t base_element, ElementSet const & es)
       : base_one(base_element->one())
+      , keep_what(keep)
     {
       for (ElementSet::const_iterator element = es.begin();
            element != es.end(); ++element)
       {
-        push_if_not_present(this->elements, *element);
+        add_element_if_appropriate(this->keep_what, this->elements, *element);
       }
     }
 
@@ -51,14 +109,14 @@ namespace wali
       ElementSet es;
       //es.push_back(this->base_one);
       es.insert(this->base_one);
-      return new SemElemSet(this->base_one, es);
+      return new SemElemSet(this->keep_what, this->base_one, es);
     }
 
     
     sem_elem_t
     SemElemSet::zero() const
     {
-      return new SemElemSet(this->base_one);
+      return new SemElemSet(this->keep_what, this->base_one);
     }
     
 
@@ -67,9 +125,10 @@ namespace wali
     {
       SemElemSet const * other = dynamic_cast<SemElemSet const *>(se);
       assert(other);
+      assert(this->keep_what == other->keep_what);
       assert(this->base_one->equal(other->base_one));
 
-      Ptr result = new SemElemSet(this->base_one);
+      Ptr result = new SemElemSet(this->keep_what, this->base_one);
 
       for (ElementSet::const_iterator this_element = this->elements.begin();
            this_element != this->elements.end(); ++this_element)
@@ -77,8 +136,9 @@ namespace wali
         for (ElementSet::const_iterator other_element = other->elements.begin();
              other_element != other->elements.end(); ++other_element)
         {
-          push_if_not_present(result->elements,
-                              (*this_element)->extend(*other_element));
+          add_element_if_appropriate(this->keep_what,
+                                     result->elements,
+                                     (*this_element)->extend(*other_element));
         }
       }
       
@@ -91,13 +151,14 @@ namespace wali
     {
       SemElemSet const * other = dynamic_cast<SemElemSet const *>(se);
       assert(other);
+      assert(this->keep_what == other->keep_what);
       assert(this->base_one->equal(other->base_one));
 
-      Ptr result = new SemElemSet(this->base_one, this->elements);
+      Ptr result = new SemElemSet(this->keep_what, this->base_one, this->elements);
       for (ElementSet::const_iterator other_element = other->elements.begin();
            other_element != other->elements.end(); ++other_element)
       {
-        push_if_not_present(result->elements, *other_element);
+        add_element_if_appropriate(this->keep_what, result->elements, *other_element);
       }
       return result;
     }
@@ -108,6 +169,7 @@ namespace wali
     {
       SemElemSet const * other = dynamic_cast<SemElemSet const *>(se);
       assert(other);
+      assert(this->keep_what == other->keep_what);
       assert(this->base_one->equal(other->base_one)); // or return false? or what?
 
       if (this->elements.size() != other->elements.size()) {
