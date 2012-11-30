@@ -88,17 +88,25 @@ namespace wali
     SemElemSet::SemElemSet(KeepWhat keep, sem_elem_t base_element)
       : base_one(base_element->one())
       , keep_what(keep)
+      , the_hash(0)
     {}
 
 
     SemElemSet::SemElemSet(KeepWhat keep, sem_elem_t base_element, ElementSet const & es)
       : base_one(base_element->one())
       , keep_what(keep)
+      , the_hash(0)
     {
       for (ElementSet::const_iterator element = es.begin();
            element != es.end(); ++element)
       {
+        size_t pre_size = this->elements.size();
         add_element_if_appropriate(this->keep_what, this->elements, *element);
+        if (pre_size != this->elements.size()) {
+          // Added
+          assert(this->elements.size() == pre_size + 1u);
+          the_hash ^= (*element)->hash();
+        }
       }
     }
 
@@ -210,6 +218,13 @@ namespace wali
     SemElemSet::getElements() const
     {
       return elements;
+    }
+
+
+    size_t
+    SemElemSet::hash() const
+    {
+      return the_hash;
     }
 
   }
