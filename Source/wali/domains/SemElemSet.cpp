@@ -39,11 +39,11 @@ namespace
   void
   remove_subsumed_elements(SemElemSet::ElementSet & set,
                            sem_elem_t element,
-                           SemElemCompare should_remove_existing)
+                           SemElemCompare new_subsumes_existing)
   {
     SemElemSet::ElementSet::const_iterator iter = set.begin();
     while (iter != set.end()) {
-      if (should_remove_existing(element, *iter)) {
+      if (new_subsumes_existing(element, *iter)) {
         // set.erase(iter++) for std::map
         iter = set.erase(iter);
       }
