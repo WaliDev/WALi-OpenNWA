@@ -55,10 +55,13 @@ namespace wali
 
       ElementSet const & getElements() const;
 
+      size_t fastHash() const;
+
     private:
       sem_elem_t base_one;
       ElementSet elements;
       KeepWhat keep_what;
+      size_t the_hash;
     };
 
 
