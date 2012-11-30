@@ -58,7 +58,7 @@ namespace wali
 
       struct BddLessThan
       {
-        bool operator() (bdd left, bdd right) {
+        bool operator() (bdd left, bdd right) const {
           return left.id() < right.id();
         }
       };
