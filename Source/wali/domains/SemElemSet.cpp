@@ -52,8 +52,24 @@ namespace
       }
     }
   }
-  
 
+
+  void
+  add_element_if_not_subsumed(SemElemSet::ElementSet & set,
+                              sem_elem_t element,
+                              SemElemCompare existing_subsumes_new)
+  {
+    for(SemElemSet::ElementSet::const_iterator iter = set.begin();
+        iter != set.end(); ++iter)
+    {
+      if (existing_subsumes_new(*iter, element)) {
+        return;
+      }
+    }
+    set.insert(element);
+  }
+                              
+    
   void
   add_element_if_appropriate(SemElemSet::KeepWhat keep_what,
                              SemElemSet::ElementSet & set,
@@ -65,15 +81,15 @@ namespace
         break;
 
       case SemElemSet::KeepMaximalElements:
-        // Should remove the existing element if new >= existing
+        // Should remove an element if new >= existing
         remove_subsumed_elements(set, add_this, existing_less_than_new);
-        set.insert(add_this);
+        add_element_if_not_subsumed(set, add_this, existing_less_than_new);
         break;
 
       case SemElemSet::KeepMinimalElements:
         // Opposite of the previous case
         remove_subsumed_elements(set, add_this, new_less_than_existing);
-        set.insert(add_this);
+        add_element_if_not_subsumed(set, add_this, new_less_than_existing);
         break;
     }
   }
