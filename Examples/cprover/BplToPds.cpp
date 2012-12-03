@@ -281,10 +281,12 @@ namespace wali
         }
 
         // Forward declaration of static procedures having to do with instrumenting enforce conditions.
-        // We basically replace the enforce clause with an assert before every return statment.
+        // The semantics of the enforce is to assume that the given condition is true at every point in the
+        // given procedure, i.e., we begin by assuming that the condition holds at entry, and then assume 
+        // the condition holds after every statement.
         static void instrument_enforce_in_prog(prog * pg);
         static void instrument_enforce_in_proc(proc * p);
-        static stmt_list * instrument_enforce_in_stmt_list(stmt_list * sl, expr const * e);
+        static void instrument_enforce_in_stmt_list(stmt_list * sl, expr const * e);
 
         static void instrument_enforce_in_prog(prog * pg)
         {
@@ -296,38 +298,37 @@ namespace wali
           }
         }
 
+        
         static void instrument_enforce_in_proc(proc * p)
         {
           assert(p && "instrument_enforce_in_proc");
           assert(p->sl && "instrument_enforce_in_proc: Please call make_void_returns_explicit first");
           if(p->e){
-            p->sl = instrument_enforce_in_stmt_list(p->sl, p->e);
-            if(p->sl->s && p->sl->s->op == AST_RETURN){
-              expr * e = make_deep_copy_expr(p->e);
-              stmt * s = make_assert_stmt(e);
-              p->sl = add_stmt_left(p->sl, s);
-            }
+            instrument_enforce_in_stmt_list(p->sl, p->e);
+            expr * e = make_deep_copy_expr(p->e);
+            stmt * s = make_assume_stmt(e);
+            p->sl = add_stmt_left(p->sl, s);
           }
         }
 
-        static stmt_list * instrument_enforce_in_stmt_list(stmt_list * sl, expr const * e)
+        static void instrument_enforce_in_stmt_list(stmt_list * sl, expr const * e)
         {
           assert(sl && sl->s && "instrument_enforce_in_stmt_list");
           if(sl->s->sl1)
-            sl->s->sl1 = instrument_enforce_in_stmt_list(sl->s->sl1, e);
+            instrument_enforce_in_stmt_list(sl->s->sl1, e);
           if(sl->s->sl2)
-            sl->s->sl2 = instrument_enforce_in_stmt_list(sl->s->sl2, e);
+            instrument_enforce_in_stmt_list(sl->s->sl2, e);
           if(sl->n)
-            sl->n = instrument_enforce_in_stmt_list(sl->n, e);
+            instrument_enforce_in_stmt_list(sl->n, e);
 
-          if(sl->n && sl->n->s && sl->n->s->op == AST_RETURN){
+          if(sl->s->op != AST_RETURN){
             expr * ec = make_deep_copy_expr(e);
-            stmt * s = make_assert_stmt(ec);
-            sl = add_stmt_left(sl, s);
+            stmt * s = make_assume_stmt(ec);
+            stmt_list * nsl = make_stmt_list_item(s);
+            nsl->n = sl->n;
+            sl->n = nsl;
           }
-          return sl;
         }
-      
       }
 
 
@@ -563,14 +564,7 @@ namespace wali
             pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
             break;       
           case AST_ASSERT:
-            assert(0 && "assert statements can't be dumped to PDS");
-            //WARNING: Asserts are treated as assumes.
-            //write a prepass to handle asserts.
-            /*
-            assert(s->e);
-            b = con->Assume(expr_as_bdd(s->e, con, f), con->True());
-            pds->add_rule(stt(), stk(s), stt(), stk(ns), new BinRel(con, b));
-            */
+            assert(0 && "assert statements can't be dumped to PDS. Use instrument_asserts");
             break;
           case AST_ASSUME:
             assert(s->e);
