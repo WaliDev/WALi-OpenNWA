@@ -32,3 +32,6 @@
 /.sconsign.dblite
 /config.log
 
+#############
+## Text editor temporary files
+.*.swp
