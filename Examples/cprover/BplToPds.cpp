@@ -199,17 +199,25 @@ namespace wali
             instrument_asserts_in_proc(p, errLbl);
             pl = pl->n;
           }
-          // Add the error label to a new proc.
+          // Add the error label to a new proc. 
+          // Don't loop forever.
+          // stmt * s = make_skip_stmt();
+          // Loop Forever
           str_list * l = make_str_list_item(strdup(errLbl));
           stmt * s = make_goto_stmt(l);
           str_list * ll = make_str_list_item(strdup(errLbl));
           s->ll = ll;
           stmt_list * sl = make_stmt_list_item(s);
-          proc * m = make_proc(0, strdup(errLbl), NULL, NULL, NULL, sl);
-          pg->pl = add_proc_right(pg->pl, m);
 
           // Update error label in program struct.
           pg->e = s;
+
+          // Add a void return.
+          s = make_return_stmt(NULL);
+          sl = add_stmt_right(sl, s);
+          proc * m = make_proc(0, strdup(errLbl), NULL, NULL, NULL, sl);
+          pg->pl = add_proc_right(pg->pl, m);
+
           return;
         }
 
@@ -343,7 +351,6 @@ namespace wali
         while(vl){
           stringstream ss;
           ss << "::" << vl->v;
-          //con->addBoolVar(ss.str());
           vars[ss.str()] = 2;
           vl = vl->n;
         }
@@ -353,7 +360,6 @@ namespace wali
           while(vl){
             stringstream ss;
             ss << pl->p->f << "::" << vl->v;
-            //con->addBoolVar(ss.str());
             vars[ss.str()] = 2;
             vl = vl->n;
           }
