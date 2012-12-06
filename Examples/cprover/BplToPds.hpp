@@ -127,6 +127,8 @@ namespace wali
     void instrument_enforce(prog * pg);
     // Must be called to fix assert statements, *before* resolving the program.
     void instrument_asserts(prog * pg, const char * errLbl = "error");
+    // Must be called to add stuff to handle values returned from procedures correctly
+    void instrument_call_return(prog * pg);
 
     wali::Key getEntryStk(const prog * pg, const char * procname);
     wali::Key getPdsState();
