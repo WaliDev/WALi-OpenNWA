@@ -489,8 +489,11 @@ namespace goals {
     cout << "[Newton Compare] Checking error label reachability..." << endl;
     TransSet ts = outfa.match(getPdsState(), getErrStk(pg));
     sem_elem_t wt = outfa.getSomeWeight()->zero();
-    for(TransSet::const_iterator it = ts.begin(); it != ts.end(); ++it)
-      wt = wt->combine((*it)->weight());
+    for(TransSet::const_iterator it = ts.begin(); it != ts.end(); ++it){
+        Key toKey = (*it)->to();
+        State * toState = outfa.getState(toKey);
+        wt = wt->combine(toState->weight());
+    }
     if(wt->equal(wt->zero()))
       cout << "[Newton Compare] NWPDS ==> error not reachable" << endl;
     else{
@@ -537,8 +540,11 @@ namespace goals {
       cout << "[Newton Compare] Checking error label reachability..." << endl;
       TransSet ts = outfa.match(getPdsState(), getErrStk(pg));
       sem_elem_t wt = outfa.getSomeWeight()->zero();
-      for(TransSet::const_iterator it = ts.begin(); it != ts.end(); ++it)
-        wt = wt->combine((*it)->weight());
+      for(TransSet::const_iterator it = ts.begin(); it != ts.end(); ++it){
+        Key toKey = (*it)->to();
+        State * toState = outfa.getState(toKey);
+        wt = wt->combine(toState->weight());
+      }
       if(wt->equal(wt->zero()))
         cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
       else
@@ -578,8 +584,11 @@ namespace goals {
       cout << "[Newton Compare] Checking error label reachability..." << endl;
       TransSet ts = outfa.match(getPdsState(), getErrStk(pg));
       sem_elem_t wt = outfa.getSomeWeight()->zero();
-      for(TransSet::const_iterator it = ts.begin(); it != ts.end(); ++it)
-        wt = wt->combine((*it)->weight());
+      for(TransSet::const_iterator it = ts.begin(); it != ts.end(); ++it){
+        Key toKey = (*it)->to();
+        State * toState = outfa.getState(toKey);
+        wt = wt->combine(toState->weight());
+      }
       if(wt->equal(wt->zero()))
         cout << "[Newton Compare] NWPDS ==> error not reachable" << endl;
       else
