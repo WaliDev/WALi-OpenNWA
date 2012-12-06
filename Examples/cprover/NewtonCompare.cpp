@@ -658,6 +658,7 @@ int main(int argc, char ** argv)
   make_void_returns_explicit(pg);
   instrument_enforce(pg);
   instrument_asserts(pg, errLbl);
+  instrument_call_return(pg);
 
   cout << "[Newton Compare] Obtaining PDS..." << endl;
   originalPds = new FWPDS();

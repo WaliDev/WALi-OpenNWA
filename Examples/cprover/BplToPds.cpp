@@ -343,38 +343,30 @@ namespace wali
         // Forward declaration of static procedure having to do with
         // instrumenting calls to handle return values correctly.
         static void instrument_call_return_in_prog(prog * pg);
-        static void instrument_call_in_stmt_list(stmt_list * h, stmt_list * sl);
+        static void instrument_call_result_in_stmt_list(stmt_list * h, stmt_list * sl);
+        static void instrument_call_args_in_stmt_list(stmt_list * sl);
         static void instrument_return_in_stmt_list(stmt_list * sl);
         // Helper functions
         static char * getIthRetVarName(unsigned i)        
         {
           stringstream ss;
-          ss << "__returnvalue_" << i << "__";
+          ss << "__call_return_reserved_var_" << i << "__";
           return strdup(ss.str().c_str());
         }
 
         static unsigned count_max_returns_from_any_proc(prog const * pg)
         {
           if(!pg) return 0;
-          proc_list const * pl = pg->pl;
-          unsigned maxRet = 0;
-          while(pl)
-          {
-            maxRet = pl->p->r > maxRet ? pl->p->r : maxRet;
-            pl = pl->n;
-          }
-          return maxRet;
         }
 
-
-        static stmt * obtain_return_assign(stmt const * s)
+        static stmt * reserved_vars_from_exprs(expr_list const * el)
         {
-          assert(s->op == AST_RETURN && s->el != NULL);
+          assert(el != NULL);
           int i = 0;
-          expr_list * el = s->el;
           expr_list * fl = make_expr_list_item(make_deep_copy_expr(el->e));
           str_list * tl = make_str_list_item(getIthRetVarName(i));
           el = el->n;
+          ++i;
           while(el){
             add_expr_right(fl, make_deep_copy_expr(el->e));
             add_str_right(tl, getIthRetVarName(i));
@@ -384,58 +376,102 @@ namespace wali
           return make_assign_stmt(tl, fl, NULL);          
         }
 
+        static stmt * vars_from_reserved_vars(str_list const * vl)
+        {
+          assert(vl);
+          int i = 0;
+          str_list * tl = make_str_list_item(strdup(vl->v));
+          expr_list * fl = make_expr_list_item(make_var_expr(getIthRetVarName(i)));
+          vl = vl->n;
+          ++i;
+          while(vl){
+            add_str_right(tl, strdup(vl->v));
+            add_expr_right(fl, make_var_expr(getIthRetVarName(i)));
+            ++i;     
+            vl = vl->n;
+          }
+          return make_assign_stmt(tl, fl, NULL);
+        }
+
+
         static void instrument_call_return_in_prog(prog * pg)
         {
           // Add extra global variables to return values from functions
-          unsigned maxRetVals = count_max_returns_from_any_proc(pg);
-          for(unsigned i=0; i < maxRetVals; ++i)
-            add_str_right(pg->vl, getIthRetVarName(i));
-
+          unsigned maxReservedVals = 0;
           proc_list * pl = pg->pl;
-          while(pl){
-            instrument_call_in_stmt_list(pl->p->sl, pl->p->sl);
+          while(pl)
+          {
+            maxReservedVals = pl->p->r > maxReservedVals ? pl->p->r : maxReservedVals;
 
+            str_list const * al = pl->p->al;
+            int numArgs = 0;
+            while(al){
+              ++numArgs;
+              al = al->n;
+            }
+            maxReservedVals = numArgs > maxReservedVals ? numArgs : maxReservedVals;
+
+            pl = pl->n;
+          }
+
+          for(unsigned i=0; i < maxReservedVals; ++i)
+            add_str_right(pg->vl, getIthRetVarName(i));
+          ///
+
+          // Now instrument calls and returns
+          pl = pg->pl;
+          while(pl){
+            // Instrumentation to copy values back from reserved globals
+            instrument_call_result_in_stmt_list(pl->p->sl, pl->p->sl);
+
+            // Instrumentation to copy values to reserved globals at return
             instrument_return_in_stmt_list(pl->p->sl);
             stmt_list * sl = pl->p->sl;
             if(sl && sl->s->op == AST_RETURN && sl->s->el != NULL){
-              stmt * ns = obtain_return_assign(sl->s);
+              stmt * ns = reserved_vars_from_exprs(sl->s->el);
               stmt_list * asl = make_stmt_list_item(ns);
               asl->n = sl;
               asl->t = sl->t;
               pl->p->sl = asl;
             }
 
+            // Instrumentation to copy values to reserved globals at call
+            instrument_call_args_in_stmt_list(pl->p->sl);
+            sl = pl->p->sl;
+            if(sl && sl->s->op == AST_CALL && sl->s->el != NULL){
+              stmt * ns = reserved_vars_from_exprs(sl->s->el);
+              stmt_list * asl = make_stmt_list_item(ns);
+              asl->n = sl;
+              asl->t = sl->t;
+              pl->p->sl = asl;
+            }
+
+            // Instrumentation at the head to copy values back from reserved globals
+            if(pl->p->al){
+              stmt * ns = vars_from_reserved_vars(pl->p->al);
+              pl->p->sl = add_stmt_left(pl->p->sl, ns);
+            } 
+
             pl = pl->n;
           }
         }
 
-        static void instrument_call_in_stmt_list(stmt_list * h, stmt_list * sl)
+        static void instrument_call_result_in_stmt_list(stmt_list * h, stmt_list * sl)
         {
           if(!sl)
             return;
           stmt * s = sl->s;
-          assert(s && "instrument_call_return_in_stmt_list");
+          assert(s && "instrument_call_result_in_stmt_list");
           if(s->sl1)
-            instrument_call_in_stmt_list(s->sl1, s->sl1);
+            instrument_call_result_in_stmt_list(s->sl1, s->sl1);
           if(s->sl2)
-            instrument_call_in_stmt_list(s->sl2, s->sl2);
+            instrument_call_result_in_stmt_list(s->sl2, s->sl2);
           if(sl->n)
-            instrument_call_in_stmt_list(h, sl->n);
+            instrument_call_result_in_stmt_list(h, sl->n);
 
           if(s->op == AST_CALL){
             if(s->vl){
-              int i = 0;
-              str_list * vl = s->vl;
-              str_list * tl = make_str_list_item(strdup(vl->v));
-              expr_list * fl = make_expr_list_item(make_var_expr(getIthRetVarName(i)));
-              vl = vl->n;
-              while(vl){
-                add_str_right(tl, strdup(vl->v));
-                add_expr_right(fl, make_var_expr(getIthRetVarName(i)));
-                ++i;     
-                vl = vl->n;
-              }
-              stmt * ns = make_assign_stmt(tl, fl, NULL);
+              stmt * ns = vars_from_reserved_vars(s->vl);
               if(h->t != sl){
                 stmt_list * nsl = make_stmt_list_item(ns);
                 nsl->n = sl->n;
@@ -456,7 +492,7 @@ namespace wali
           if(s->sl1){
             instrument_return_in_stmt_list(s->sl1);
             if(s->sl1->s->op == AST_RETURN && s->sl1->s->el != NULL){
-              stmt * ns = obtain_return_assign(s->sl1->s);
+              stmt * ns = reserved_vars_from_exprs(s->sl1->s->el);
               stmt_list * asl = make_stmt_list_item(ns);
               asl->n = s->sl1;
               asl->t = s->sl1->t;
@@ -466,7 +502,7 @@ namespace wali
           if(s->sl2){
             instrument_return_in_stmt_list(s->sl2);
             if(s->sl2->s->op == AST_RETURN && s->sl2->s->el != NULL){
-              stmt * ns = obtain_return_assign(s->sl2->s);
+              stmt * ns = reserved_vars_from_exprs(s->sl2->s->el);
               stmt_list * asl = make_stmt_list_item(ns);
               asl->n = s->sl2;
               asl->t = s->sl1->t;
@@ -482,14 +518,53 @@ namespace wali
           s = nsl->s;
           assert(s && "instrument_call_return_in_stmt_list");
           if(s->op == AST_RETURN && s->el != NULL){
-            stmt * ns = obtain_return_assign(s);
+            stmt * ns = reserved_vars_from_exprs(s->el);
             stmt_list * asl = make_stmt_list_item(ns);
             asl->n = sl->n;
             sl->n = asl;
           }
         }
-
       
+        static void instrument_call_args_in_stmt_list(stmt_list * sl)
+        {
+          if(!sl || !sl->n)
+            return;
+          stmt * s = sl->s;
+          if(s->sl1){
+            instrument_call_args_in_stmt_list(s->sl1);
+            if(s->sl1->s->op == AST_CALL && s->sl1->s->el != NULL){
+              stmt * ns = reserved_vars_from_exprs(s->sl1->s->el);
+              stmt_list * asl = make_stmt_list_item(ns);
+              asl->n = s->sl1;
+              asl->t = s->sl1->t;
+              s->sl1 = asl;
+            }
+          }
+          if(s->sl2){
+            instrument_call_args_in_stmt_list(s->sl2);
+            if(s->sl2->s->op == AST_CALL && s->sl2->s->el != NULL){
+              stmt * ns = reserved_vars_from_exprs(s->sl2->s->el);
+              stmt_list * asl = make_stmt_list_item(ns);
+              asl->n = s->sl2;
+              asl->t = s->sl1->t;
+              s->sl2 = asl;
+            }
+          }
+          if(!sl->n)
+            return;
+          
+          instrument_call_args_in_stmt_list(sl->n);
+
+          stmt_list * nsl = sl->n;
+          s = nsl->s;
+          assert(s && "instrument_call_args_in_stmt_list");
+          if(s->op == AST_CALL && s->el != NULL){
+            stmt * ns = reserved_vars_from_exprs(s->el);
+            stmt_list * asl = make_stmt_list_item(ns);
+            asl->n = sl->n;
+            sl->n = asl;
+          }
+        }
       } // namespce resolve_details
 
       BddContext * dump_pds_from_prog(wpds::WPDS * pds, prog * pg)
