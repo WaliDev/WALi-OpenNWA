@@ -140,8 +140,11 @@ namespace wali {
           RegExpSatProcess() : update_count(1) { }
         };
 
+        class RegExpDiagnostics;
 
         class RegExp {
+            public:
+              friend class RegExpDiagnostics; 
             public:
                 unsigned int count; // for reference counting
             private:
@@ -185,6 +188,8 @@ namespace wali {
 
                 // For debugging
                 bool uptodate;
+                std::vector<unsigned int> updates;
+                std::vector<unsigned int> evaluations;
 
                 RegExp(node_no_t nno, sem_elem_t se) {
                     type = Updatable;
@@ -256,7 +261,7 @@ namespace wali {
                 }
 
                 ostream &print(ostream &out);
-                long toDot(ostream &out, std::set<long>& seen, bool isRoot = false);
+                long toDot(ostream &out, std::set<long>& seen, bool printUpdates = false, bool isRoot = false);
                 static reg_exp_t star(reg_exp_t r);
                 static reg_exp_t extend(reg_exp_t r1, reg_exp_t r2);
                 static reg_exp_t combine(reg_exp_t r1, reg_exp_t r2);
@@ -331,6 +336,36 @@ namespace wali {
 
                 bool dfs(set<RegExp *> &, set<RegExp *> &);
                 int calculate_height(set<RegExp *> &visited, out_node_stat_t &stat_map);
+        };
+
+        /**
+         * Provides a bunch of static functions to collect information
+         * about the current RegExp graph.
+         **/        
+        class RegExpDiagnostics
+        {
+          public:
+            /**
+             * Count the total number of active nodes in the RegExp graph
+             **/
+            static long countTotalCombines();
+            static long countTotalExtends();
+            static long countTotalStars();
+
+            /**
+             * Counts the total cumulative nodes except those reachable from
+             * the list of nodes given as exclude
+             **/
+            static long countExcept(std::vector<reg_exp_t>& exceptions);
+          private:
+            static long countTotalCombines(reg_exp_t const e);
+            static long countTotalExtends(reg_exp_t const e);
+            static long countTotalStars(reg_exp_t const e);
+            static void excludeFromCountReachable(reg_exp_t const e);
+            static long countTotalNodes(reg_exp_t const e);
+          private:
+            static reg_exp_hash_t visited;
+            
         };
 
     } // namespace graph

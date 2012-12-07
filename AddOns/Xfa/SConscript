@@ -1,0 +1,18 @@
+# -*- python -*-
+
+import os,os.path
+
+Import('Debug')
+Import('BaseEnv')
+Import('BuildDir')
+
+if Debug:
+    print '\n+++ Entered "#/AddOns/Xfa/SConscript"\n'
+    
+built = SConscript(
+    'Source/SConscript', 
+    variant_dir=os.path.join(BuildDir,'AddOns','Xfa'),
+    duplicate=0)
+
+Return('built')
+

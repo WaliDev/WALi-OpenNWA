@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <cmath>
 
 #include <boost/algorithm/string/predicate.hpp>
 
@@ -19,48 +20,6 @@ using namespace wali::domains::binrel;
 using std::endl;
 using wali::waliErr;
 using std::cout;
-
-
-/**
- *
- * The following describes how to control the bdd variables are setup in buddy
- * Let x, y, w and z be variables, each requiring two bdd levels (x1 and x2)
- * Further, for the bit x1, there are three different levels x1b, x1t1 and x1t2 
- * -- the first one for base, the second and third for the two tensor spots. 
- * Finally, each spot needs three levels, x1b, x1b' and x1b''.
- *
- * Let's disregard tensors for the moment.
- * By default, the variables are interleaved at the bit level. So, a call to 
- * setInts({(x, 2), (y, 2), (z, 2)}) gives the interleaving
- * x1b x1b' x1b'' y1b y1b' y1b'' z1b z1b' z1b'' x2b x2b' x2b'' y2b y2b' y2b'' z2b z2b' z2b''
- * There is another way of interleaving these variables. Where variables are grouped together.
- * setInts({{(x, 2), (y, 2)}, {(z, 2), (w, 2)}}) 
- * x1b x1b' x1b'' y1b y1b' y1b'' x2b x2b' x2b'' y2b y2b' y2b'' z1b z1b' z1b'' w1b w1b' w1b'' z2b z2b' z2b'' w2b w2b' w2b''
- * 
- * There are two choices with regard to tensors. 
- * (1) TENSOR_MAX_AFFINITY
- * This makes sure that all three levels for a bit are always together, i.e., you always get
- * x1b x1b' x1b'' x1t1 x1t1' x1t1'' x1t2 x1t2' x1t2''
- * The interleaving at higher levels remains the same
- * (2) TENSOR_MIN_AFFINITY
- * This makes sure that the three levels for the whole vocabulary are separate and copies of each other.
- * So, for the example above, the levels would look like.
- * x1b x1b' x1b'' y1b y1b' y1b'' x2b x2b' x2b'' y2b y2b' y2b'' z1b z1b' z1b'' w1b w1b' w1b'' z2b z2b' z2b'' w2b w2b' w2b''
- * x1t1 x1t1' x1t1'' y1t1 y1t1' y1t1'' x2t1 x2t1' x2t1'' y2t1 y2t1' y2t1'' z1t1 z1t1' z1t1'' w1t1 w1t1' w1t1'' z2t1 z2t1' z2t1'' w2t1 w2t1' w2t1''
- * x1t2 x1t2' x1t2'' y1t2 y1t2' y1t2'' x2t2 x2t2' x2t2'' y2t2 y2t2' y2t2'' z1t2 z1t2' z1t2'' w1t2 w1t2' w1t2'' z2t2 z2t2' z2t2'' w2t2 w2t2' w2t2''
- * (3) BASE_MAX_AFFINITY_TENSOR_MIXED
- * This makes sure that base is separate, but mixes together tensors vocabularies. 
- * x1b x1b' x1b'' y1b y1b' y1b'' x2b x2b' x2b'' y2b y2b' y2b'' z1b z1b' z1b'' w1b w1b' w1b'' z2b z2b' z2b'' w2b w2b' w2b''
- * followed by tensor levels as x1t1 x1t1' x1t1'' x1t2 x1t2' x1t2''
- * 
- * The tensor choice is determined by the following macro:
- **/
-#define TENSOR_MIN_AFFINITY
-//#define TENSOR_MAX_AFFINITY
-//#define BASE_MAX_AFFINITY_TENSOR_MIXED
-
-//#define DETENSOR_TOGETHER
-#define DETENSOR_BIT_BY_BIT
 
 // ////////////////////////////
 // Implementation of the initialization free function.
@@ -72,8 +31,8 @@ using std::cout;
 #else
 #define BDDMEMSIZE 10000000
 #endif
-#define CACHESIZE 100000
-#define MAXMEMINC 100000
+#define CACHESIZE BDDMEMSIZE/10
+#define MAXMEMINC BDDMEMSIZE/10
 
 //It's a good habit to forward declare all the static functions in the
 //file so that there is an index and so that the contents of the file can
@@ -105,6 +64,75 @@ namespace wali
       };
 
       std::map<bdd, sem_elem_t, BddLessThan> star_cache;
+
+
+      namespace details {
+
+        bool
+        bddImplies_using_bdd_imp(bdd left, bdd right)
+        {
+          // left_implies_right(x) = (left(x) => right(x))
+          bdd left_implies_right = bdd_imp(left, right);
+          return left_implies_right == bddtrue;
+        }
+        
+        bool
+        bddImplies_recursive(bdd left, bdd right)
+        {
+          if (left == right
+              || left == bddfalse
+              || right == bddtrue)
+          {
+            return true;
+          }
+
+          if (left == bddtrue || right == bddfalse) {
+            return false;
+          }
+
+          // Both are nontrivial. But the root of one might be different than
+          // the root of another...
+          int
+            left_varno  = bdd_var(left),
+            right_varno = bdd_var(right),
+            left_level  = bdd_var2level(left_varno),
+            right_level = bdd_var2level(right_varno);
+
+          if (left_level < right_level) {
+            // Left's root is higher, so we look at left's children
+            bool left_good = bddImplies_recursive(bdd_low(left), right);
+            bool right_good = bddImplies_recursive(bdd_high(left), right);
+            return left_good && right_good;
+          }
+          else if (left_level > right_level) {
+            // Right's root is higher, so we look at right's children
+            bool left_good = bddImplies_recursive(left, bdd_low(right));
+            bool right_good = bddImplies_recursive(left, bdd_high(right));
+            return left_good && right_good;
+          }
+          else {
+            // The root is the same
+            bool left_good = bddImplies_recursive(bdd_low(left), bdd_low(right));
+            bool right_good = bddImplies_recursive(bdd_high(left), bdd_high(right));
+            return left_good && right_good;
+          }
+        }
+        
+        
+        /// Returns if 'left(x_vec) => right(x_vec)', aka if 'left' is a
+        /// superset of 'right' (when viewed as sets of accepting 'x_vec's.
+        bool
+        bddImplies(bdd left, bdd right)
+        {
+          bool fast_answer = bddImplies_recursive(left, right);
+#if CHECK_BDDIMPLIES_WITH_SLOWER_VERSION
+          bool slow_answer = bddImplies_using_bdd_imp(left, right);
+          assert(fast_answer == slow_answer);
+#endif
+          return fast_answer;
+        }
+        
+      }
     }
   }
 }
@@ -183,8 +211,8 @@ BddContext::BddContext(int bddMemSize, int cacheSize) :
         *waliErr << "[ERROR] " << bdd_errstring(rc) << endl;
         assert( 0 );
       }
-      // Default is 50,000 (1 Mb),memory is cheap, so use 100,000
-      bdd_setmaxincrease(MAXMEMINC);
+      // Default is 50,000 (1 Mb),memory is cheap, so use 100,000      
+      bdd_setmaxincrease((bddMemSize/10 > MAXMEMINC)? bddMemSize/10 : MAXMEMINC);
       // TODO: bdd_error_hook( my_error_handler );
       fdd_strm_hook( myFddStrmHandler );
     }else{
@@ -498,6 +526,102 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
     vari = 0;
     for(std::map<std::string, int>::const_iterator ci = interleavedVars.begin(); ci != interleavedVars.end(); ++ci){
       bddinfo_t varInfo = (*this)[ci->first];
+      int j = 3 * vari;
+      varInfo->tensor2Lhs = base + j++;
+      varInfo->tensor2Rhs = base + j++;
+      varInfo->tensor2Extra = base + j++;
+      vari++;  
+    }
+  }
+
+#elif defined(TENSOR_MATCHED_PAREN)
+  //First the base levels
+  for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
+    std::map<std::string, int> interleavedVars = *cvi;
+    vari = 0;
+    int * domains = new int[3 * interleavedVars.size()];
+    for(std::map<std::string, int>::const_iterator cmi = interleavedVars.begin(); cmi != interleavedVars.end(); ++cmi){
+      for(int j=vari * 3; j < 3 * (vari + 1); ++j)
+        domains[j] = cmi->second;
+      vari++;
+    }
+    //Now actually create the fdd levels
+    // lock mutex
+    int base = fdd_extdomain(domains, 3 * interleavedVars.size());
+    // release mutex
+    if (base < 0){
+      *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
+      *waliErr << "    Aborting." << endl;
+      assert (false);
+    }
+    delete [] domains;
+    // Assign fdd levels to the variables.
+    vari = 0;
+    for(std::map<std::string, int>::const_iterator ci = interleavedVars.begin(); ci != interleavedVars.end(); ++ci){
+      bddinfo_t varInfo = (*this)[ci->first];
+      int j = 3 * vari;
+      varInfo->baseLhs = base + j++;
+      varInfo->baseRhs = base + j++;
+      varInfo->baseExtra = base + j++;
+      vari++;  
+    }
+  }
+  //Next for tensor1
+  for(std::vector<std::map<std::string, int> >::const_iterator cvi = vars.begin(); cvi != vars.end(); ++cvi){
+    std::map<std::string, int> interleavedVars = *cvi;
+    vari = 0;
+    int * domains = new int[3 * interleavedVars.size()];
+    for(std::map<std::string, int>::const_iterator cmi = interleavedVars.begin(); cmi != interleavedVars.end(); ++cmi){
+      for(int j=vari * 3; j < 3 * (vari + 1); ++j)
+        domains[j] = cmi->second;
+      vari++;
+    }
+    //Now actually create the fdd levels
+    // lock mutex
+    int base = fdd_extdomain(domains, 3 * interleavedVars.size());
+    // release mutex
+    if (base < 0){
+      *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
+      *waliErr << "    Aborting." << endl;
+      assert (false);
+    }
+    delete [] domains;
+    // Assign fdd levels to the variables.
+    vari = 0;
+    for(std::map<std::string, int>::const_iterator ci = interleavedVars.begin(); ci != interleavedVars.end(); ++ci){
+      bddinfo_t varInfo = (*this)[ci->first];
+      int j = 3 * vari;
+      // In this case, tensor1 has the three levels reversed. 
+      varInfo->tensor1Extra = base + j++;
+      varInfo->tensor1Rhs = base + j++;
+      varInfo->tensor1Lhs = base + j++;
+      vari++;  
+    }
+  }
+  //Finally for tensor2
+  for(std::vector<std::map<std::string, int> >::const_reverse_iterator crvi = vars.rbegin(); crvi != vars.rend(); ++crvi){
+    std::map<std::string, int> interleavedVars = *crvi;
+    vari = 0;
+    int * domains = new int[3 * interleavedVars.size()];
+    for(std::map<std::string, int>::const_reverse_iterator crmi = interleavedVars.rbegin(); crmi != interleavedVars.rend(); ++crmi){
+      for(int j=vari * 3; j < 3 * (vari + 1); ++j)
+        domains[j] = crmi->second;
+      vari++;
+    }
+    //Now actually create the fdd levels
+    // lock mutex
+    int base = fdd_extdomain(domains, 3 * interleavedVars.size());
+    // release mutex
+    if (base < 0){
+      *waliErr << "[ERROR-BuDDy initialization] \"" << bdd_errstring(base) << "\"" << endl;
+      *waliErr << "    Aborting." << endl;
+      assert (false);
+    }
+    delete [] domains;
+    // Assign fdd levels to the variables.
+    vari = 0;
+    for(std::map<std::string, int>::const_reverse_iterator cri = interleavedVars.rbegin(); cri != interleavedVars.rend(); ++cri){
+      bddinfo_t varInfo = (*this)[cri->first];
       int j = 3 * vari;
       varInfo->tensor2Lhs = base + j++;
       varInfo->tensor2Rhs = base + j++;
@@ -863,6 +987,88 @@ void BddContext::populateCache()
 }
 
 
+// //////////////////////////////////////////
+// These functions provide a sneak-peek into the buddy bit-level
+// variable ordering.
+
+// Setup maps to enable quick lookup of information
+void BddContext::setupLevelSets()
+{
+  tensor1LhsLevels.clear();
+  tensor1RhsLevels.clear();
+  tensor2LhsLevels.clear();
+  tensor2RhsLevels.clear();
+
+  for(BddContext::const_iterator cit = this->begin(); cit != this->end(); ++cit){
+    int const * vars;
+    bddinfo_t const varInfo = cit->second;
+    //How many bits are used for me?
+    if(varInfo->maxVal <= 0)
+      continue;
+    double fracnumbits = log2(varInfo->maxVal);
+    int numbits = ceil(fracnumbits);
+
+    vars = fdd_vars(varInfo->tensor1Lhs);
+    assert(vars != NULL);
+    for(int i=0; i < numbits; ++i)
+      tensor1LhsLevels.insert(bdd_var2level(vars[i]));
+
+    vars = fdd_vars(varInfo->tensor1Rhs);
+    assert(vars != NULL);
+    for(int i=0; i < numbits; ++i)
+      tensor1RhsLevels.insert(bdd_var2level(vars[i]));
+
+    vars = fdd_vars(varInfo->tensor2Lhs);
+    assert(vars != NULL);
+    for(int i=0; i < numbits; ++i)
+      tensor2LhsLevels.insert(bdd_var2level(vars[i]));
+
+    vars = fdd_vars(varInfo->tensor2Rhs);
+    assert(vars != NULL);
+    for(int i=0; i < numbits; ++i)
+      tensor2RhsLevels.insert(bdd_var2level(vars[i]));
+  }
+  assert(tensor1LhsLevels.size() == tensor1RhsLevels.size());
+  assert(tensor1RhsLevels.size() == tensor2LhsLevels.size());
+  assert(tensor2LhsLevels.size() == tensor2RhsLevels.size());
+}
+
+unsigned BddContext::numVarsPerVoc()
+{
+  return tensor1LhsLevels.size();
+}
+
+bool BddContext::isRootInVocTensor1Lhs(bdd b)
+{
+  if(b == bddfalse || b == bddtrue) return false;
+  return tensor1LhsLevels.find(bdd_var2level(bdd_var(b))) != tensor1LhsLevels.end();
+}
+
+bool BddContext::isRootInVocTensor2Lhs(bdd b)
+{
+  if(b == bddfalse || b == bddtrue) return false;
+  return tensor2LhsLevels.find(bdd_var2level(bdd_var(b))) != tensor2LhsLevels.end();
+}
+
+bool BddContext::isRootInVocTensor1Rhs(bdd b)
+{
+  if(b == bddfalse || b == bddtrue) return false;
+  return tensor1RhsLevels.find(bdd_var2level(bdd_var(b))) != tensor1RhsLevels.end();
+}
+
+bool BddContext::isRootInVocTensor2Rhs(bdd b)
+{
+  if(b == bddfalse || b == bddtrue) return false;
+  return tensor2RhsLevels.find(bdd_var2level(bdd_var(b))) != tensor2RhsLevels.end();
+}
+
+bool BddContext::isRootRelevant(bdd b)
+{
+  if(b == bddfalse || b == bddtrue) return false;
+  return isRootInVocTensor1Lhs(b) || isRootInVocTensor1Rhs(b) 
+    || isRootInVocTensor2Lhs(b) || isRootInVocTensor2Rhs(b);
+}
+
 // ////////////////////////////
 // Static
 void BinRel::reset()
@@ -1001,6 +1207,8 @@ bool BinRel::Equal( binrel_t that) const
   //We skip this test if you insist
 #ifndef BINREL_HASTY
   if(isTensored != that->isTensored || con != that->con){
+    std::cerr << "con: " << con << "\n";
+    std::cerr << "that->con: " << that->con << "\n";
     *waliErr << "[WARNING] " << "Compared (Equality) incompatible relations" 
       << endl;
     that->print(print(*waliErr) << endl) << endl;
@@ -1231,8 +1439,39 @@ void BddContext::resetStats()
 namespace wali {
   namespace domains {
     namespace binrel {
+
+      bdd
+      quantifyOutOtherVariables(BddContext const & voc,
+                                std::vector<std::string> const & keep_these,
+                                bdd b)
+      {
+        std::vector<int> keep_these_fdds;
+        for (std::vector<std::string>::const_iterator keep_this = keep_these.begin();
+             keep_this != keep_these.end(); ++keep_this)
+        {
+          BddContext::const_iterator var_info = voc.find(*keep_this);
+          assert(var_info != voc.end());
+          
+          keep_these_fdds.push_back(var_info->second->baseLhs);
+          keep_these_fdds.push_back(var_info->second->baseRhs);
+        }
+
+        bdd vars_to_remove = bddtrue;
+
+        for (int fdd_num=0; fdd_num<fdd_domainnum(); ++fdd_num)
+        {
+          if (std::find(keep_these_fdds.begin(),
+                        keep_these_fdds.end(),
+                        fdd_num)
+              == keep_these_fdds.end())
+          {
+            vars_to_remove &= fdd_ithset(fdd_num);
+          }
+        }
+
+        return bdd_exist(b, vars_to_remove);
+      }
       
-      typedef std::vector<std::pair<std::string, bddinfo_t> > VectorVocabulary;
       
       std::vector<Assignment>
       getAllAssignments(VectorVocabulary const & voc);
@@ -1444,7 +1683,8 @@ namespace wali {
       }
       
       void
-      printImagemagickInstructions(bdd b, BddContext const & voc, std::ostream & os, std::string const & for_file)
+      printImagemagickInstructions(bdd b, BddContext const & voc, std::ostream & os, std::string const & for_file,
+                                   boost::function<bool (VectorVocabulary const &)> include_component)
       {
         std::vector<std::pair<VectorVocabulary, bdd> > independent_components = details::partition(voc, b);
         std::vector<std::vector<Assignment> > possible_assignments_by_component;
@@ -1459,7 +1699,11 @@ namespace wali {
           if(boost::starts_with(comp_voc.begin()->first, "DUMMY")) {
             assert(comp_voc.size() == 1);
             continue;
-          }        
+          }
+
+          if(include_component && !include_component(comp_voc)) {
+            continue;
+          }
             
           total_height += 2*details::v_margin;
           total_height += possibleAssignments.size() * details::v_separation;
@@ -1475,6 +1719,10 @@ namespace wali {
           VectorVocabulary const & comp_voc = independent_components.at(comp_no).first;
           if(boost::starts_with(comp_voc.begin()->first, "DUMMY")) {
             assert(comp_voc.size() == 1);
+            continue;
+          }
+
+          if(include_component && !include_component(comp_voc)) {
             continue;
           }
           

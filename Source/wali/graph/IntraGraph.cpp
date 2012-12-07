@@ -1626,15 +1626,17 @@ namespace wali {
           ss << "node" << edges[i].src << " -> node" << edges[i].tgt 
             << " [color=red, label=\"";
           std::vector<int> leaves;
-          edges[i].exp->leafNodes(leaves);
-          for(std::vector<int>::iterator iter = leaves.begin(); iter !=
-              leaves.end(); ++iter)
-            if(*iter == 0)
-              ss << "(node 0)\\n";
-            else
-              ss << "(" << key2str(nodes[*iter].trans.src) << ", "
-                << key2str(nodes[*iter].trans.stack) << ", " <<
-                key2str(nodes[*iter].trans.tgt) << ")\\n";
+          if(edges[i].exp != NULL){
+            edges[i].exp->leafNodes(leaves);
+            for(std::vector<int>::iterator iter = leaves.begin(); iter !=
+                leaves.end(); ++iter)
+              if(*iter == 0)
+                ss << "(node 0)\\n";
+              else
+                ss << "(" << key2str(nodes[*iter].trans.src) << ", "
+                  << key2str(nodes[*iter].trans.stack) << ", " <<
+                  key2str(nodes[*iter].trans.tgt) << ")\\n";
+          }
           ss << "\"];\n";
         }
       }
@@ -1708,7 +1710,7 @@ namespace wali {
           //DEBUGGING 
           {
             stringstream ss;
-            ss << "regexp" << saturateCount << "_" << round << ".dot";
+            ss << "newton_regexp" << saturateCount << "_" << round << ".dot";
             string filename = ss.str();
             fstream foo;
             foo.open(filename.c_str(), fstream::out);
@@ -1718,7 +1720,7 @@ namespace wali {
             for(reg_exp_hash_t::const_iterator iter = roots.begin();
                 iter != roots.end();
                 ++iter){
-              (iter->second)->toDot(foo, seen, true);
+              (iter->second)->toDot(foo, seen, true, true);
             }
             foo << "}\n";
             foo.close();

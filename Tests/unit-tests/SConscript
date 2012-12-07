@@ -1,3 +1,5 @@
+# -*- python -*-
+
 # Build the test programs 
 import os,os.path
 
@@ -14,8 +16,10 @@ ListOfBuilds = ['glog']
 [(glog_lib, glog_inc)] = SConscript('#/ThirdParty/SConscript', 'ListOfBuilds')
 
 
-# If the following line is uncommented, 'scons all' fails. If it is commented, 'scons tests' fails. We will fix this properly eventually.
+# If the following line is uncommented, 'scons all' fails. If it is
+# commented, 'scons tests' fails. We will fix this properly eventually.
 SConscript('#/AddOns/Domains/SConscript')
+SConscript("#/AddOns/Xfa/SConscript")
 
 env = ProgEnv.Clone()
 
@@ -26,10 +30,11 @@ else:
 env.AppendUnique(CPPPATH=[gtest_include, WaliDir])
 env.AppendUnique(CPPPATH=['#/Tests/unit-tests/Source',
                           '#/AddOns/Domains/ThirdParty/include/',
-                          '#/AddOns/Domains/Source/'])
+                          '#/AddOns/Domains/Source/',
+                          '#/AddOns/Xfa/Source'])
 env.AppendUnique(LIBPATH=['#/AddOns/Domains/ThirdParty/'])
 env.AppendUnique(CPPPATH=[glog_inc])
-env.AppendUnique(LIBS=[glog_lib, 'walidomains', 'bdd'])
+env.AppendUnique(LIBS=[glog_lib, 'walidomains', 'bdd', "xfa"])
 
 #gtest and glog are ill begaved w.r.t. to these flags.
 env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
@@ -82,6 +87,8 @@ test_files = Split("""
 
     Source/AddOns/Domains/binrel/binrelmanager.cpp
     Source/AddOns/Domains/binrel/binrel.cpp
+
+    Source/AddOns/Xfa/wali/util/base64.cpp
     """)
 
 just_compile = env.SConscript('Source/header-compilation/SConscript')

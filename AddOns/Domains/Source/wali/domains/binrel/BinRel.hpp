@@ -26,17 +26,77 @@
 #include <vector>
 
 #include <boost/shared_ptr.hpp> // It'd be nice to include the standard version but there are too many ways to get it.
+#include <boost/unordered_set.hpp>
+#include <boost/function.hpp>
 
+#include "wali/wfa/WeightMaker.hpp"
 #include "wali/Countable.hpp"
 #include "wali/ref_ptr.hpp"
 #include "wali/SemElemTensor.hpp"
 #include "buddy/fdd.h"
 
 
+/**
+ *
+ * The following describes how to control the bdd variables are setup in buddy
+ * Let x, y, w and z be variables, each requiring two bdd levels (x1 and x2)
+ * Further, for the bit x1, there are three different levels x1b, x1t1 and x1t2 
+ * -- the first one for base, the second and third for the two tensor spots. 
+ * Finally, each spot needs three levels, x1b, x1b' and x1b''.
+ *
+ * Let's disregard tensors for the moment.
+ * By default, the variables are interleaved at the bit level. So, a call to 
+ * setInts({(x, 2), (y, 2), (z, 2)}) gives the interleaving
+ * x1b x1b' x1b'' y1b y1b' y1b'' z1b z1b' z1b'' x2b x2b' x2b'' y2b y2b' y2b'' z2b z2b' z2b''
+ * There is another way of interleaving these variables. Where variables are grouped together.
+ * setInts({{(x, 2), (y, 2)}, {(z, 2), (w, 2)}}) 
+ * x1b x1b' x1b'' y1b y1b' y1b'' x2b x2b' x2b'' y2b y2b' y2b'' z1b z1b' z1b'' w1b w1b' w1b'' z2b z2b' z2b'' w2b w2b' w2b''
+ * 
+ * There are two choices with regard to tensors. 
+ * (1) TENSOR_MAX_AFFINITY
+ * This makes sure that all three levels for a bit are always together, i.e., you always get
+ * x1b x1b' x1b'' x1t1 x1t1' x1t1'' x1t2 x1t2' x1t2''
+ * The interleaving at higher levels remains the same
+ * (2) TENSOR_MIN_AFFINITY
+ * This makes sure that the three levels for the whole vocabulary are separate and copies of each other.
+ * So, for the example above, the levels would look like.
+ * x1b x1b' x1b'' y1b y1b' y1b'' x2b x2b' x2b'' y2b y2b' y2b'' z1b z1b' z1b'' w1b w1b' w1b'' z2b z2b' z2b'' w2b w2b' w2b''
+ * x1t1 x1t1' x1t1'' y1t1 y1t1' y1t1'' x2t1 x2t1' x2t1'' y2t1 y2t1' y2t1'' z1t1 z1t1' z1t1'' w1t1 w1t1' w1t1'' z2t1 z2t1' z2t1'' w2t1 w2t1' w2t1''
+ * x1t2 x1t2' x1t2'' y1t2 y1t2' y1t2'' x2t2 x2t2' x2t2'' y2t2 y2t2' y2t2'' z1t2 z1t2' z1t2'' w1t2 w1t2' w1t2'' z2t2 z2t2' z2t2'' w2t2 w2t2' w2t2''
+ * (3) BASE_MAX_AFFINITY_TENSOR_MIXED
+ * This makes sure that base is separate, but mixes together tensors vocabularies. 
+ * x1b x1b' x1b'' y1b y1b' y1b'' x2b x2b' x2b'' y2b y2b' y2b'' z1b z1b' z1b'' w1b w1b' w1b'' z2b z2b' z2b'' w2b w2b' w2b''
+ * followed by tensor levels as x1t1 x1t1' x1t1'' x1t2 x1t2' x1t2''
+ * (4) TENSOR_MATCHED_PAREN
+ * Keeps all Three vocabs (base,tensor1,tensor2) separate, like TENSOR_MIN_AFFINITY.
+ * Additionally, the three microlevels in each bit x x' x'' are in reverse order for tensor1.
+ * So, for the example above, the levels would look like.
+ * x1b x1b' x1b'' y1b y1b' y1b'' x2b x2b' x2b'' y2b y2b' y2b'' z1b z1b' z1b'' w1b w1b' w1b'' z2b z2b' z2b'' w2b w2b' w2b''
+ * x1t1'' x1t1' x1t1 y1t1'' y1t1' y1t1 x2t1'' x2t1' x2t1 y2t1'' y2t1' y2t1 z1t1'' z1t1' z1t1 w1t1'' w1t1' w1t1 z2t1'' z2t1' z2t1 w2t1'' w2t1' w2t1
+ * x1t2 x1t2' x1t2'' y1t2 y1t2' y1t2'' x2t2 x2t2' x2t2'' y2t2 y2t2' y2t2'' z1t2 z1t2' z1t2'' w1t2 w1t2' w1t2'' z2t2 z2t2' z2t2'' w2t2 w2t2' w2t2''
+ * NOTE: ***This currently only works correctly with boolean variables.***
+ * The tensor choice is determined by the following macro:
+ **/
+//#define TENSOR_MIN_AFFINITY
+//#define TENSOR_MAX_AFFINITY
+//#define BASE_MAX_AFFINITY_TENSOR_MIXED
+/*** NOTE: This currently only works correctly with boolean variables.***/
+#define TENSOR_MATCHED_PAREN
+
+
+//#define DETENSOR_TOGETHER
+#define DETENSOR_BIT_BY_BIT
+
+
 /** 
   To switch on statistics collection in BinRel
 **/
 #define BINREL_STATS
+
+
+/// This checks two implementations of the 'subsumes' operation (subset) off
+/// each other (one faster, one simpler)
+#define CHECK_BDD_SUBSUMES_WITH_SLOWER_VERSION 1
 
 namespace wali 
 {
@@ -112,6 +172,8 @@ namespace wali
       {
         friend class BinRel;
         public:
+          typedef boost::unordered_set<int> VocLevelSet;
+        public:
            /** 
            * A BddContext manages the vocabularies and stores some useful bdds
            * that speed up BinRel operations.
@@ -139,6 +201,22 @@ namespace wali
           virtual void setIntVars(const std::map<std::string, int>& vars);
           virtual void setIntVars(const std::vector<std::map<std::string, int> >& vars);
 
+          /**
+           * These functions are used by an NWA based implementation of detensor.
+           * They provide information about the bit level information per variable, and
+           * provide ways to test what part of the vocabulary a certain buddy
+           * bdd level belongs to.
+           **/
+          // Setup the sets of levels in the different vocabularies for fast lookup
+          void setupLevelSets();
+          
+          unsigned numVarsPerVoc();
+          bool isRootInVocTensor1Lhs(bdd b); //A
+          bool isRootInVocTensor1Rhs(bdd b); //A'
+          bool isRootInVocTensor2Lhs(bdd b); //B
+          bool isRootInVocTensor2Rhs(bdd b); //B'
+          bool isRootRelevant(bdd b);
+
         protected:
           /**
            * More fine grained control when setting multiple int vars together. These together 
@@ -152,6 +230,7 @@ namespace wali
         private:
           /** caches zero/one binrel objects for this context **/
           void populateCache();
+          
         private:
           // ///////////////////////////////
           // We use the name convention for different 
@@ -194,7 +273,13 @@ namespace wali
           binrel_t cachedBaseZero;
           binrel_t cachedTensorOne;
           binrel_t cachedTensorZero;
-
+  
+          // Hash sets to store what bdd levels belong to what part of the voc.
+          VocLevelSet tensor1LhsLevels;
+          VocLevelSet tensor1RhsLevels;
+          VocLevelSet tensor2LhsLevels;
+          VocLevelSet tensor2RhsLevels;
+          
 #ifdef BINREL_STATS
         private:
           //Statistics for this contex
@@ -225,6 +310,7 @@ namespace wali
       typedef wali::ref_ptr< BddContext > bdd_context_t;
 
       typedef std::map<std::string, int> Assignment;
+      typedef std::vector<std::pair<std::string, bddinfo_t> > VectorVocabulary;
       
       extern
       std::vector<Assignment>
@@ -233,7 +319,14 @@ namespace wali
       extern
       void
       printImagemagickInstructions(bdd b, BddContext const & voc,
-                                   std::ostream & os, std::string const & for_file);
+                                   std::ostream & os, std::string const & for_file,
+                                   boost::function<bool (VectorVocabulary const &)> include_component);
+
+      extern
+      bdd
+      quantifyOutOtherVariables(BddContext const & voc,
+                                std::vector<std::string> const & keep_these,
+                                bdd b);
       
       
       class BinRel : public wali::SemElemTensor 
@@ -286,6 +379,9 @@ namespace wali
 
           sem_elem_t star();
 
+
+          bool subsumes(SemElem * other) const;
+
           /** @return [this]->Equal( cast<BinRel*>(se) ) */
           bool equal(SemElem* se) const;
 
@@ -328,6 +424,41 @@ namespace wali
           bdd rel;
           bool isTensored;
       };
+
+
+
+      /// Function object that, given two binary relations as weights,
+      /// returns the and/intersection of them.
+      ///
+      /// Useful for intersecting two WFAs.
+      struct AndWeightMaker
+        : wali::wfa::WeightMaker
+      {
+        virtual sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs ) {
+          wali::domains::binrel::BinRel
+            * l_rel = dynamic_cast<wali::domains::binrel::BinRel*>(lhs.get_ptr()),
+            * r_rel = dynamic_cast<wali::domains::binrel::BinRel*>(rhs.get_ptr());
+          assert(l_rel && r_rel);
+          assert(l_rel->getVocabulary() == r_rel->getVocabulary());
+
+          bdd both = bdd_and(l_rel->getBdd(), r_rel->getBdd());
+          
+          return new wali::domains::binrel::BinRel(&l_rel->getVocabulary(), both);
+        }
+      }; // WeightMaker
+        
+      
+
+      
+      namespace details {
+        bool bddImplies_using_bdd_imp(bdd left, bdd right);
+        bool bddImplies_recursive(bdd left, bdd right);
+        bool bddImplies(bdd left, bdd right);
+
+        
+        std::vector<std::pair<VectorVocabulary, bdd> >
+        partition(BddContext const & vars, bdd b);
+      }
 
     } // namespace binrel
 

@@ -1,0 +1,43 @@
+# -*- python -*-
+
+import os,platform
+
+Import('WaliDir')
+Import('LibInstallDir')
+Import('ThirdPartyDir')
+Import('MkStatic')
+Import('BaseEnv')
+Import('Debug')
+
+if Debug:
+    print '\n+++ Entered "#/AddOns/Xfa/Source/SConscript"\n'
+
+
+sources = Split("""
+    ./wali/xfa/Xfa.cpp
+    ./wali/xfa/convert_xfa.cpp
+    ./wali/xfa/xfa_livevar_analysis.cpp
+    ./wali/util/read_file.cpp
+    ./wali/util/base64.cpp
+""")
+
+env = BaseEnv.Clone()
+
+env.Append(CPPPATH=["#/AddOns/Domains/Source",
+                    "#/AddOns/Domains/ThirdParty/include",
+                    "#/AddOns/Xfa/Source"])
+env.Append(LIBPATH=[LibInstallDir])
+env.Append(LIBS=["walidomains"])
+env.Append(CXXFLAGS=["-std=c++0x"])
+env["WARNING_FLAGS"] = env["WARNING_FLAGS"] + " -Wno-overloaded-virtual"
+
+built = []
+
+if MkStatic:
+  xfa = env.StaticLibrary('xfa', sources)
+  built = env.Install(LibInstallDir, xfa)
+else:
+  xfa = env.SharedLibrary('xfa', sources)
+  built = env.Install(LibInstallDir, xfa)
+
+Return('built')
