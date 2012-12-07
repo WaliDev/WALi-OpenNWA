@@ -182,7 +182,7 @@ void FWPDS::prestar( wfa::WFA const & input, wfa::WFA& output )
   addEtrans = false;
 
   // If theZero is invalid, then there
-  // are no rules and not saturation to 
+  // are no rules and no saturation to 
   // be done.
   if (!theZero.is_valid()) {
     worklist->clear();

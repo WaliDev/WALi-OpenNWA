@@ -253,6 +253,24 @@ namespace wali
         }
 
         /*!
+         * TODO
+         *
+         */
+        void setModified()
+        {
+          status = MODIFIED;
+        }
+
+        /*!
+         * TODO
+         *
+         */
+        void setSame()
+        {
+          status = SAME;
+        }
+
+        /*!
          * @return A null pointer.
          */
         wpds::Config* getConfig() const;

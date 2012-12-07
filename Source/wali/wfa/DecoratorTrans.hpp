@@ -177,6 +177,14 @@ namespace wali
           return delegate->modified();
         }
 
+        virtual void setModified() {
+          delegate->setModified();
+        }
+
+        virtual void setSame() {
+          delegate->setSame();
+        }
+
         /*!
          * @return A null pointer.
          */

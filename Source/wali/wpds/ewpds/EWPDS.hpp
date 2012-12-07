@@ -289,12 +289,22 @@ namespace wali
               , Config * cfg
               );
 
+          virtual void update(
+              Key from
+              , Key stack
+              , Key to
+              , Config * cfg
+              , wfa::ITrans* t
+              , rule_t & r
+              , sem_elem_t delta
+              );
+
           virtual wfa::ITrans* update_prime(
               Key from, //<! Guaranteed to be a generated state
               wfa::ITrans* call, //<! The call transition
               rule_t r, //<! The push rule
               sem_elem_t delta, //<! Delta change on the call transition
-              sem_elem_t wWithRule //<! delta \extends r->weight()
+              sem_elem_t wWithRule = NULL //<! delta \extends r->weight()
               );
 
 

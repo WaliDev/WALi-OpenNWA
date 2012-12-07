@@ -94,6 +94,40 @@ namespace wali
     return wn;
   }
 
+  // default implementation of combineTransWeights
+  // 
+  //   wnew := delta extend this;
+  //   < wnew + told, delta combine (wnew - told), !delta->equal(delta combine (wnew - told)) >
+  //
+  std::pair<std::pair<sem_elem_t, sem_elem_t>, bool> 
+      SemElem::combineTransWeights( sem_elem_t delta, sem_elem_t rweight, sem_elem_t told, sem_elem_t dold, bool existold)
+  {
+    sem_elem_t wnew = delta->extend(rweight);
+
+    if(!existold) {
+      std::pair<sem_elem_t, sem_elem_t> tmp(wnew, wnew);
+      return std::pair<std::pair<sem_elem_t, sem_elem_t>, bool>(tmp, true);
+    }
+
+    // delta returns ( wnew + told, wnew - told )
+    // Use w->delta(told) b/c we want the returned diff
+    // to be what is in the new weight (wnew) and not
+    // in the existing weight (told)
+    std::pair< sem_elem_t , sem_elem_t > p = wnew->delta( told );
+
+    // This's weight is w+se
+    sem_elem_t ans_se = p.first;
+
+    // Combine current delta with p's delta (wnew - se) and set status to
+    // modified if this's delta changes value.
+    sem_elem_t old_delta = dold;
+    sem_elem_t ans_delta = dold->combine( p.second );
+
+    bool is_modified = ( !old_delta->equal(ans_delta) );
+
+    std::pair<sem_elem_t, sem_elem_t> tmp(ans_se, ans_delta);
+    return std::pair<std::pair<sem_elem_t, sem_elem_t>, bool>(tmp, is_modified);
+  }
 
 #if defined(__GNUC__)
   std::ostream &

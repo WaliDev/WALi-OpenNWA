@@ -20,7 +20,10 @@
 #include "wali/wpds/GenKeySource.hpp"
 #include "wali/DefaultWorklist.hpp"
 #include <iostream>
+#include <fstream>
 #include <cassert>
+
+//extern std::ofstream * awpdslog;
 
 //
 // TODO: 
@@ -209,16 +212,20 @@ namespace wali
         fa.clear();
         input.for_each(*this);
       }
+
+      sem_elem_t randwgt = input.getSomeWeight();
+      assert(randwgt != NULL);
+
       // Now copy over initial and final state information
       // that was stored before the clear() and adding
       // of transitions.
-      fa.addState(init,this->theZero);
+      fa.addState(init, randwgt->zero());
       fa.setInitialState( init );
       for (std::set<Key>::iterator cit = localF.begin();
           cit != localF.end() ; cit++)
       {
         Key f = *cit;
-        fa.addState(f,this->theZero);
+        fa.addState(f, randwgt->zero());
         fa.addFinalState(f);
       }
       currentOutputWFA->setGeneration(inputGeneration+1);
@@ -246,6 +253,9 @@ namespace wali
       setupOutput(input,fa);
       fa.setQuery(WFA::INORDER);
 
+      sem_elem_t randwgt = input.getSomeWeight();
+      assert(randwgt != NULL);
+
       //
       // do rules 0
       // rule_zeroes contains Configs of (p,WALI_EPSILON)
@@ -270,8 +280,8 @@ namespace wali
           // Rule 0s generate a transition right away. Because
           // WPDS::update invokes WFA::insert we must make sure
           // that the new states are inserted into the WFA. 
-          fa.addState( r->from_state(),r->weight()->zero() );
-          fa.addState( r->to_state(),r->weight()->zero() );
+          fa.addState( r->from_state(), randwgt->zero() );
+          fa.addState( r->to_state(), randwgt->zero() );
 
           // add transition for rule
           update( r->from_state()
@@ -438,6 +448,9 @@ namespace wali
       setupOutput(input,fa);
       fa.setQuery(WFA::REVERSE);
 
+      sem_elem_t randwgt = input.getSomeWeight();
+      assert(randwgt != NULL);
+
       // Generate midstates for each rule type two
       r2hash_t::iterator r2it = r2hash.begin();
       for( ; r2it != r2hash.end() ; r2it++ )
@@ -448,7 +461,7 @@ namespace wali
         {
           rule_t & r = *rlsit;
           Key gstate = gen_state( r->to_state(),r->to_stack1() );
-          fa.addState( gstate,r->weight()->zero() );
+          fa.addState( gstate, randwgt->zero() );
         }
         if( fa.progress.is_valid() )
             fa.progress->tick();
@@ -461,6 +474,8 @@ namespace wali
 
       while( get_from_worklist( t ) ) 
       {
+        //*awpdslog << key2str(t->from()) << " -> " << key2str(t->to()) << std::endl; 
+        //t->print(*awpdslog) << std::endl;// << key2str(t->r->from_stack()).c_str() << " -> " << key2str(r->to_stack1()).c_str() << std::endl;
         post( t , fa );
         if( fa.progress.is_valid() )
             fa.progress->tick();
@@ -477,12 +492,16 @@ namespace wali
 
       // Reset delta of t to zero to signify completion
       // of work for that delta
-      t->setDelta(theZero);
+      sem_elem_t fazero = fa.getSomeWeight();
+      assert(fazero != NULL);
+
+      t->setDelta(fazero);
 
       // For each forward rule of config
       // Apply rule to create new transition
       if( WALI_EPSILON != t->stack() )
       {
+        //std::cerr << "Looking for rules from " << key2str(config->kp.first) << " (" << config->kp.first << ") to " << key2str(config->kp.second) << " (" << config->kp.second << ")\n";
         Config::iterator fwit = config->begin();
         for( ; fwit != config->end() ; fwit++ ) {
           rule_t & r = *fwit;
@@ -514,8 +533,8 @@ namespace wali
     }
 
     void WPDS::poststar_handle_trans(
-        wfa::ITrans* t ,
-        WFA & fa   ,
+        wfa::ITrans* t, // t is a non-epsilon transition 
+        WFA & fa,
         rule_t & r,
         sem_elem_t delta
         )
@@ -524,9 +543,8 @@ namespace wali
       Key rtstack = r->to_stack1();
       sem_elem_t wrule_trans = delta->extend( r->weight() );
 
-      if( r->to_stack2() == WALI_EPSILON ) {
-        // t must be a rule 1 (pop rules handled by poststar_handle_eps_trans)
-        update( rtstate, rtstack, t->to(), wrule_trans, r->to() );
+      if( r->to_stack2() == WALI_EPSILON ) { // r is a rule 0 or rule 1 
+        update( rtstate, rtstack, t->to(), wrule_trans, r->to(), t, r, delta );
       }
       else {
 
@@ -567,8 +585,7 @@ namespace wali
               Config * config = make_config( teps->from(),tpstk );
               sem_elem_t epsW = tprime->getDelta()->extend( teps->weight() );
 
-              update( teps->from(),tpstk,tpto,
-                  epsW, config );
+              update( teps->from(), tpstk, tpto, epsW, config );
             }
           }
         }
@@ -1088,6 +1105,73 @@ namespace wali
     }
 
     /**
+     * @brief helper function to create and link a transition
+     *
+     */
+    void WPDS::update(
+        Key from,
+        Key stack,
+        Key to,
+        sem_elem_t se,
+        Config * cfg,
+        wfa::ITrans* t,
+        rule_t & r,
+        sem_elem_t delta
+        )
+    {
+      // _tnew->moditied == true; weight is dummy at this point; will be set later in this function
+      wfa::ITrans* _tnew = new Trans(from,stack,to,se); 
+      wfa::ITrans* told = currentOutputWFA->lookup_trans(_tnew);
+
+      bool existold;
+
+      if(told == 0)
+      { // Not exist in currentOutputWFA
+        // Insert the new trans to currentOutputWFA
+        told = currentOutputWFA->insert_trans(_tnew);
+        existold = false;
+      }
+      else 
+      {
+        existold = true;
+      }
+
+      // tnew := delta extend r->wright()
+      // dold := told->getDelta()
+      // Default implementation of combineTransWeights: 
+      //   < tnew + told, dold combine (tnew - told), !dold->equal(dold combine (tnew - told)) >
+      std::pair<std::pair<sem_elem_t, sem_elem_t>, bool> res = 
+              t->weight()->combineTransWeights( delta, r->weight(), told->weight(), told->getDelta(), existold );
+
+      // Delete _tnew if told is an existing trans from currentOutputWFA and told does not equal to _tnew
+      if( existold && told != _tnew ) {
+        delete _tnew;
+      }
+
+      sem_elem_t ans = res.first.first;
+      sem_elem_t ans_delta = res.first.second;
+      bool is_changed = res.second || told == 0;
+
+      // Set the resultant weight and delta to tnew
+      wfa::ITrans* tnew = told;
+      tnew->setWeight(ans);
+      tnew->setDelta(ans_delta);
+
+      // tnew->status = (is_changed ? SAME : MODIFIED)
+      if(is_changed)
+        tnew->setModified();
+      else
+        tnew->setSame();
+
+      tnew->setConfig(cfg);
+
+      if (tnew->modified()) {
+        //tnew->print(std::cout << "Adding transition: ") << "\n";
+        worklist->put( tnew );
+      }
+    }
+
+    /**
      * update_prime does not need to take a Config b/c no Config
      * will match a transition taht is created here. The from state
      * is not \in WFA.P. Therefore we do not need to add it to the
@@ -1100,12 +1184,44 @@ namespace wali
         wfa::ITrans* call, //<! The call transition
         rule_t r, //<! The push rule
         sem_elem_t delta ATTR_UNUSED, //<! Delta change on the call transition
-        sem_elem_t wWithRule //<! delta \extends r->weight()
+        sem_elem_t wWithRule // <! delta \extends r->weight()
         )
     {
-      wfa::ITrans* tmp = new Trans(from,r->to_stack2(),call->to(),wWithRule);
-      wfa::ITrans* t = currentOutputWFA->insert(tmp);
-      return t;
+      // _tnew->moditied == true; wWithRule is dummy at this point; weight will be set later in this function
+      wfa::ITrans* _tnew = new Trans(from,r->to_stack2(),call->to(),wWithRule);
+      wfa::ITrans* told = currentOutputWFA->lookup_trans(_tnew);
+
+      bool existold;
+      if(told == 0)
+      {
+        // Insert the new trans to currentOutputWFA
+        told = currentOutputWFA->insert_trans(_tnew);
+        existold = false;
+      }
+      else {
+        existold = true;
+      }
+
+      // tnew := delta extend r->weight()
+      // dold := told->getDelta()
+      // Default implementation of combineTransWeights:
+      //    < tnew + tnew, dold combine (tnew - told), !dold->equal(dold combine (tnew - told)) >
+      std::pair<std::pair<sem_elem_t, sem_elem_t>, bool> res = 
+            call->weight()->combineTransWeights(delta, r->weight(), told->weight(), told->getDelta(), existold);
+
+      // Delete _tnew if told is an existing trans from currentOutputWFA and told does not equal to _tnew
+      if(told != 0 && told != _tnew)
+        delete _tnew;
+
+      sem_elem_t ans = res.first.first;
+      sem_elem_t ans_delta = res.first.second;
+
+      // Set the resultant weight and delta to tnew
+      wfa::ITrans* tnew = told;
+      tnew->setDelta(ans_delta);
+      tnew->setWeight(ans);
+
+      return tnew;
     }
 
     /////////////////////////////////////////////////////////////////

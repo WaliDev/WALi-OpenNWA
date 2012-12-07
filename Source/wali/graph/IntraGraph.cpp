@@ -1635,7 +1635,6 @@ namespace wali {
      **/
     void IntraGraph::saturate(unsigned& numRounds)
     {
-
       bool repeat = true;
       numRounds = 0;
 #if defined(PPP_DBG) && PPP_DBG >= 0

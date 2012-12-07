@@ -196,6 +196,9 @@ namespace wali
          * @return true if this transition has been modified
          */
         virtual bool modified() const throw() = 0;
+        
+        virtual void setModified() = 0;
+        virtual void setSame() = 0;
 
         /*!
          * @return A null pointer.

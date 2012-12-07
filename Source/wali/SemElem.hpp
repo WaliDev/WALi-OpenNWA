@@ -182,6 +182,12 @@ namespace wali
         return combine( se.get_ptr() ); 
       }
 
+      /**
+       *  Perform the combine operation
+       */
+      virtual std::pair<std::pair<sem_elem_t, sem_elem_t>, bool> 
+        combineTransWeights( sem_elem_t dnew, sem_elem_t tweight, sem_elem_t told, sem_elem_t dold, bool existold );
+
       /** 
        * Wrapper method for equal that will remove the ref_ptr
        * to make the call to the user's code. 
