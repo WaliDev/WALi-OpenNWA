@@ -52,7 +52,7 @@ namespace wali
       printKey(o,to());
       o << " )\t";
 
-      weight()->print(o);
+      //weight()->print(o);
       { // BEGIN DEBUGGING
         // FIXME: make a debugging print
         //o << "\tdelta: " << delta->toString();

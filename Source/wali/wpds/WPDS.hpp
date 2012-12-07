@@ -518,6 +518,11 @@ namespace wali
             Key from, Key stack, Key to, 
             sem_elem_t se, Config * cfg );
 
+        virtual void update(
+            Key from, Key stack, Key to, 
+            sem_elem_t se, Config * cfg,
+            wfa::ITrans* t, rule_t & r, sem_elem_t delta);
+
         /**
          * update_prime does not need to take a Config b/c no Config
          * will match a transition that is created here. The from state

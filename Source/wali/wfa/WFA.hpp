@@ -457,6 +457,24 @@ namespace wali
         ITrans * insert( ITrans * tnew );
 
         /**
+         * @brief looks up kpmap
+         *
+         * If not found, create a new one and insert
+         *
+         * @return pointer to real transition
+         */
+        ITrans * lookup_trans( ITrans * tnew );
+
+        /**
+         * @brief looks up kpmap
+         *
+         * If not found, create a new one and insert
+         *
+         * @return pointer to real transition
+         */
+        ITrans * insert_trans( ITrans * tnew );
+
+        /**
          * @brief Returns a TransSet containing all 
          * transitions matching (p,y,?) in the WFA
          *

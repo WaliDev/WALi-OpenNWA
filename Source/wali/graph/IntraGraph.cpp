@@ -1643,7 +1643,7 @@ namespace wali {
 
 
     static unsigned saturateCount = 0; //DEBUGGING
-    void IntraGraph::saturate(newton_logger_t nlog __attribute__((unused)))
+    void IntraGraph::saturate(newton_logger_t UNUSED_PARAMETER(nlog))// __attribute__((unused)))
     {
 
       bool repeat = true;
