@@ -273,12 +273,19 @@ namespace wali
                 stmt * t = tl->s;
                 assert(t && "make_void_returns_explicit");
                 if(t->op != AST_RETURN){
+                  // Add a return with non-deterministic values. This is a safe approximation
+                  expr_list * el = NULL;
                   if(p->r != 0){
-                    assert(0 && "procedure with non-void return, has a path that does not end in a return");
-                  }else{
-                    stmt * s = make_return_stmt(NULL);
-                    add_stmt_right(sl, s);
+                    int r = p->r;
+                    el = make_expr_list_item(make_non_det_expr());
+                    --r;
+                    while(r>0){
+                      el = add_expr_right(el, make_non_det_expr());
+                      --r;
+                    }
                   }
+                  stmt * s = make_return_stmt(el);
+                  add_stmt_right(sl, s);
                 }
               }
             }
