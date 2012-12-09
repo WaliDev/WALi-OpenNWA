@@ -422,7 +422,11 @@ namespace wali
           }
 
           for(unsigned i=0; i < maxReservedVals; ++i)
-            add_str_right(pg->vl, getIthRetVarName(i));
+            if(pg->vl)
+              pg->vl = add_str_right(pg->vl, getIthRetVarName(i));
+            else
+              pg->vl = make_str_list_item(getIthRetVarName(i));
+          
           ///
 
           // Now instrument calls and returns
