@@ -94,6 +94,8 @@ return(IDENTIFIER); }
 ({D})+                  { 
 yylval.number = (unsigned) atoi(yytext); 
 return(INTEGER); }
+"T"   {yylval.number = 1; return(INTEGER);}
+"F"   {yylval.number = 0; return(INTEGER);}
 {L}({L}|{D})*	        { 
 yylval.v = strdup(yytext); 
 return(IDENTIFIER); }
