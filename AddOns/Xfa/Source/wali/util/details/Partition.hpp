@@ -1,9 +1,5 @@
-#ifndef DUVIDHA_PARTITION_HPP
-#define DUVIDHA_PARTITION_HPP
-
-#ifndef _WIN32
-#include<gflags/gflags.h>
-#endif
+#ifndef WALI_UTIL_DETAILS_PARTITION_HPP
+#define WALI_UTIL_DETAILS_PARTITION_HPP
 
 #include <ostream>
 #include <set>
@@ -18,26 +14,19 @@
 #include <boost/unordered_map.hpp>
 
 
-DECLARE_bool(linear_partition_intersect);
-
-namespace Duvidha
+namespace wali
 {
-
+namespace util
+{
+namespace details
+{
   class Partition;
 
-  // a \equiv b in ret iff a \equiv b in first and a \equiv b in second for all a,b
-  void intersect_partitions(const Partition &first, const Partition &second, Partition &ret);
+  extern
+  bool
+  equal_partitions(const Partition &first, const Partition &second);
 
-  // a \equiv b in ret iff a \equiv b in first or a \equiv b in second for all a,b
-  void union_partitions(const Partition &first, const Partition &second, Partition &ret);
-
-  // a \equiv b in ret iff a \equiv b in first or a \equiv b in second for all a,b
-  void union_partitions(const Partition &first, Partition &in_out);
-
-  // Return true iff first and second partition the elements in the same manner.
-  bool equal_partitions(const Partition &first, const Partition &second);
-
-// Implementation of Equivalence partition using disjoint-sets. 
+  // Implementation of Equivalence partition using disjoint-sets. 
   class Partition
   {
     typedef boost::unordered_map<int, std::size_t> rank_t;
@@ -292,6 +281,17 @@ namespace Duvidha
 
   };
   
-} //end namespace Duvidha
 
-#endif //DUVIDHA_PARTITION_HPP
+
+}
+}
+}
+
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
+
+#endif

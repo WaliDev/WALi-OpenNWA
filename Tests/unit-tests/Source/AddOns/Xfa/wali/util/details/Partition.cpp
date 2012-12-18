@@ -1,8 +1,12 @@
 #include <glog/logging.h>
 #include "gtest/gtest.h"
-#include "Partition.hpp"
+#include "wali/util/details/Partition.hpp"
 
-namespace Duvidha
+namespace wali
+{
+namespace util
+{
+namespace details
 {
 
 
@@ -153,79 +157,6 @@ namespace Duvidha
     EXPECT_TRUE(p.IsUnconstrained());
   }
 
-  TEST(Partition, Intersection1)
-  {
-    Partition p, res;
-
-    intersect_partitions(p, p, res);
-
-    EXPECT_EQ(p.CountSets(), static_cast<std::size_t>(0));
-    EXPECT_TRUE(p.IsUnconstrained());
-  }
-
-  TEST(Partition, Intersection2)
-  {
-    Partition p, q, res;
-
-    p.SetEquivalent(1, 2);
-    q = p;
-    
-    intersect_partitions(p, q, res);
-    EXPECT_TRUE(res.AreEquivalent(1,2));
-  }
-
-  TEST(Partition, Intersection3)
-  {
-    Partition p, q, res;
-
-    p.SetEquivalent(1, 2);
-    
-    intersect_partitions(p, q, res);
-
-    EXPECT_FALSE(res.AreEquivalent(1,2));
-    EXPECT_TRUE(res.IsUnconstrained());
-    EXPECT_EQ(res.CountSets(), static_cast<std::size_t>(0)) << "Intersection " << res.ToString();
-  }
-
-
-  TEST(Partition, Intersection4)
-  {
-    Partition p, q, res;
-
-    p.SetEquivalent(1, 2);
-    p.SetEquivalent(2,3);
-
-    q.SetEquivalent(1,3);
-    
-    intersect_partitions(p, q, res);
-
-    EXPECT_TRUE(res.AreEquivalent(1,3));
-    EXPECT_FALSE(res.AreEquivalent(1,2));
-    EXPECT_FALSE(res.AreEquivalent(2,3));
-    EXPECT_EQ(res.CountSets(), static_cast<std::size_t>(1));
-  }
-
-
-  TEST(Partition, Intersection5)
-  {
-    Partition p, q, res;
-
-    int const n=10;
-    for (int i=0;i<n; i++) {
-      p.SetEquivalent(i,i+3);
-    }
-    
-    for (int i=0;i<n; i++) {
-      q.SetEquivalent(i,i+2);
-    }
-    
-    intersect_partitions(p, q, res);
-    int const halfish = (n+2)/2;
-    for (int i=0; i<halfish; i++) {
-      EXPECT_TRUE(res.AreEquivalent(i,i+6));
-    }
-    EXPECT_EQ(res.CountSets(), static_cast<std::size_t>(6));
-  }
 
 
   TEST(Partition, LazyInitialization1)
@@ -237,132 +168,6 @@ namespace Duvidha
     EXPECT_EQ(p.CountSets(), static_cast<std::size_t>(0)) << p.ToString();
   }
 
-  TEST(Partition, Union1)
-  {
-    Partition p, res;
-
-    union_partitions(p, p, res);
-
-    EXPECT_EQ(p.CountSets(), static_cast<std::size_t>(0));
-    EXPECT_TRUE(p.IsUnconstrained());
-  }
-
-  TEST(Partition, Union2)
-  {
-    Partition p, q, res;
-
-    p.SetEquivalent(1, 2);
-    q = p;
-    
-    union_partitions(p, q, res);
-    EXPECT_TRUE(res.AreEquivalent(1,2));
-  }
-
-  TEST(Partition, Union3)
-  {
-    Partition p, q, res;
-
-    p.SetEquivalent(1, 2);
-    
-    union_partitions(p, q, res);
-
-    EXPECT_TRUE(res.AreEquivalent(1,2));
-    EXPECT_FALSE(res.IsUnconstrained());
-    EXPECT_EQ(res.CountSets(), static_cast<std::size_t>(1)) << "Union " << res.ToString();
-  }
-
-
-  TEST(Partition, Union4)
-  {
-    Partition p, q, res;
-
-    p.SetEquivalent(1, 2);
-    p.SetEquivalent(2,3);
-
-    q.SetEquivalent(1,3);
-    
-    union_partitions(p, q, res);
-
-    EXPECT_TRUE(res.AreEquivalent(1,3));
-    EXPECT_TRUE(res.AreEquivalent(1,2));
-    EXPECT_TRUE(res.AreEquivalent(2,3));
-    EXPECT_EQ(res.CountSets(), static_cast<std::size_t>(1));
-  }
-
-
-  TEST(Partition, Union5)
-  {
-    Partition p, q, res;
-
-    int const n=10;
-    for (int i=0;i<n; i++) {
-      p.SetEquivalent(i,i+3);
-    }
-    
-    for (int i=0;i<n; i++) {
-      q.SetEquivalent(i,i+2);
-    }
-    
-    union_partitions(p, q, res);
-
-
-    for (int i=0; i<n+2; i++) {
-      EXPECT_TRUE(res.AreEquivalent(i,i+1));
-    }
-    EXPECT_EQ(res.CountSets(), static_cast<std::size_t>(1));
-  }
-
-
-
-  TEST(Partition, Union6)
-  {
-    Partition p, q, res;
-
-    p.SetEquivalent(1, 2);
-
-    q.SetEquivalent(1,3);
-    
-    union_partitions(p, q, res);
-
-    EXPECT_TRUE(res.AreEquivalent(1,3));
-    EXPECT_TRUE(res.AreEquivalent(1,2));
-    EXPECT_TRUE(res.AreEquivalent(2,3));
-    EXPECT_EQ(res.CountSets(), static_cast<std::size_t>(1));
-  }
-
-
-  TEST(Partition, Union7)
-  {
-    Partition p, q, res;
-
-    p.SetEquivalent(1, 1);
-
-    q.SetEquivalent(2,2);
-    
-    union_partitions(p, q, res);
-
-    EXPECT_TRUE(res.AreEquivalent(1,1));
-    EXPECT_TRUE(res.AreEquivalent(2,2));
-    EXPECT_EQ(res.CountSets(), static_cast<std::size_t>(0));
-  }
-
-
-  TEST(Partition, Union8)
-  {
-    Partition p, q, res;
-
-    p.SetEquivalent(1, 2);
-
-    q.SetEquivalent(4,5);
-    
-    union_partitions(p, q, res);
-
-    EXPECT_TRUE(res.AreEquivalent(1,2));
-    EXPECT_TRUE(res.AreEquivalent(4,5));
-    EXPECT_FALSE(res.AreEquivalent(1,5));
-    EXPECT_FALSE(res.AreEquivalent(4,1));
-    EXPECT_EQ(res.CountSets(), static_cast<std::size_t>(2));
-  }
 
   TEST(Partition, Equal1) 
   {
@@ -522,4 +327,13 @@ namespace Duvidha
   }
 
 
+}
+}
 }//end namespace
+
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:

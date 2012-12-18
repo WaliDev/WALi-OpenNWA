@@ -1,105 +1,32 @@
 #include "Partition.hpp"
-#include "utils.hpp"
-
-DEFINE_bool(linear_partition_intersect, true, "If true, use linear partition intersection algorithm, else use quadratic.");
 
 
-namespace Duvidha
+namespace wali
 {
-
-
-
-  // a \equiv b in ret iff a \equiv b in first and a \equiv b in second for all a,b
-  void intersect_partitions_linear(const Partition &first, const Partition &second, Partition &ret)
+namespace util
+{
+namespace details
+{
+  
+  template<class T>
+  void unordered_set_intersection(const boost::unordered_set<T> &first, 
+				  const boost::unordered_set<T> &second,
+				  boost::unordered_set<T> &out)
   {
-    ret.Clear();
-
-    // Only consider elements are mentioned in both partitions.
-    boost::unordered_set<int> both;
-    unordered_set_intersection<int>(first.Elements(), second.Elements(), both);
-
-    // Linear intersection algorithm.
-    pair_int_map_t fingerprintMap;
-    for (boost::unordered_set<int>::const_iterator it=both.begin(); it!=both.end(); ++it) {
-      // Compute fingerprint.
-      std::pair<int, int> pairedRoots(first.FindSet(*it), second.FindSet(*it));
-      pair_int_map_t::const_iterator mit = fingerprintMap.find(pairedRoots);
-      if ( mit == fingerprintMap.end() ) {
-	fingerprintMap[pairedRoots] = *it;
-      }
-      else {
-	assert(*it != mit->second);
-	ret.SetEquivalent(*it, mit->second);
-      }
-    }
-    return;
-  }
-
-  // a \equiv b in ret iff a \equiv b in first and a \equiv b in second for all a,b
-  void intersect_partitions_quadratic(const Partition &first, const Partition &second, Partition &ret)
-  {
-    ret.Clear();
-
-    // Only consider elements are mentioned in both partitions.
-    boost::unordered_set<int> both;
-    unordered_set_intersection<int>(first.Elements(), second.Elements(), both);
-
-    // Linear intersection algorithm.
-    pair_int_map_t fingerprintMap;
-    for (boost::unordered_set<int>::const_iterator fit=both.begin(); fit!=both.end(); ++fit) {
-      for (boost::unordered_set<int>::const_iterator sit=both.begin(); sit!=both.end(); ++sit) {
-	if (first.AreEquivalent(*fit, *sit) &&
-	    second.AreEquivalent(*fit, *sit) ) {
-	  ret.SetEquivalent(*fit, *sit);
-	}
-      }
-    }
-    return;
-  }
-
-
-  void intersect_partitions(const Partition &first, const Partition &second, Partition &ret)
-  {
-    if (FLAGS_linear_partition_intersect) {
-      intersect_partitions_linear(first, second, ret);
-    } else {
-      intersect_partitions_quadratic(first, second, ret);
-    }
-    return;
-  }
-
-  // a \equiv b in ret iff a \equiv b in first or a \equiv b in second for all a,b
-  void union_partitions(const Partition &first, const Partition &second, Partition &ret)
-  {
-    if (second.NumElements() < first.NumElements()) {
-      union_partitions(second, first, ret);
+    if (second.size() < first.size()) {
+      unordered_set_intersection(second, first, out);
       return;
     }
-    ret.Clear();
+    out.clear();
 
-    // Simply copy over the second
-    ret = second;
-
-    // Iterate over all elems in first
-    boost::unordered_set<int> felems = first.Elements();
-    for (boost::unordered_set<int>::const_iterator it=felems.begin(); it!=felems.end();++it) {
-      ret.SetEquivalent(*it, first.FindSet(*it));
+    for (typename boost::unordered_set<T>::const_iterator it = first.begin(); it != first.end(); ++it) {
+      if (second.find(*it) != second.end()) {
+	out.insert(*it);
+      }
     }
-
     return;
-  }
+  } 
 
-  // a \equiv b in ret iff a \equiv b in first or a \equiv b in second for all a,b
-  void union_partitions(const Partition &first, Partition &in_out)
-  {
-    // Iterate over all elems in first
-    boost::unordered_set<int> felems = first.Elements();
-    for (boost::unordered_set<int>::const_iterator it=felems.begin(); it!=felems.end();++it) {
-      in_out.SetEquivalent(*it, first.FindSet(*it));
-    }
-
-    return;
-  }
 
   // Return true iff first and second partition the elements in the same manner.
   bool equal_partitions(const Partition &first, const Partition &second)
@@ -130,4 +57,12 @@ namespace Duvidha
   }
 
 
-} //end namespace Duvidha
+}
+}
+}
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:
