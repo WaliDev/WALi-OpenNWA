@@ -32,6 +32,11 @@ env.Append(LIBS=["walidomains"])
 env.Append(CXXFLAGS=["-std=c++0x"])
 env["WARNING_FLAGS"] = env["WARNING_FLAGS"] + " -Wno-overloaded-virtual"
 
+#boost is ill-behaved w.r.t. these flags
+env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wfloat-equal', '')
+env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
+
+
 built = []
 
 if MkStatic:

@@ -272,7 +272,6 @@ namespace details
       return;
     }
 
-    // If v does not exist, then add it to the disjoint set.
     bool elementExists(int v) const
     {
       elements_t::const_iterator it = elements_.find(v);
@@ -295,3 +294,4 @@ namespace details
 // End:
 
 #endif
+

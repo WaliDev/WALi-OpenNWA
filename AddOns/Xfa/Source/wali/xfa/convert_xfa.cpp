@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <vector>
+#include <sstream>
 
 namespace details
 {
@@ -54,7 +55,11 @@ namespace wali {
         var_name(int id,
                  std::string const & domain_var_name_prefix)
         {
-            return domain_var_name_prefix + "var" + boost::lexical_cast<std::string>(id);
+            std::stringstream os;
+            os << domain_var_name_prefix
+               << "var"
+               << id;
+            return os.str();
         }    
 
         void
@@ -98,7 +103,7 @@ namespace wali {
                 }
 
                 //voc.addIntVar("left_current_state", ast.states.size());
-                vars["left_current_state"] = ast.states.size() * 2;
+                vars["left_current_state"] = static_cast<int>(ast.states.size()) * 2;
                 std::cout << "Adding left_current_state with size " << vars["left_current_state"];
                 
                 voc.setIntVars(vars);

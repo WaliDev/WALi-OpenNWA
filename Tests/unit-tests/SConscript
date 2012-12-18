@@ -41,6 +41,8 @@ env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
 env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Werror', '')
 env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wsign-compare', '')
 
+#boost is ill-behaved w.r.t. these flags
+env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wfloat-equal', '')
 
 test_files = Split("""
     Source/test.cpp

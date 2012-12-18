@@ -268,7 +268,7 @@ namespace details
     set = p.GetRelatedSet(1);
     std::list<int>::iterator result = find(set.begin(), set.end(), 1);
     EXPECT_EQ(*result, 1);
-    EXPECT_EQ(set.size(), 1);
+    EXPECT_EQ(set.size(), 1u);
   }
 
 
@@ -286,7 +286,7 @@ namespace details
 	result = find(set.begin(), set.end(), i);
 	EXPECT_EQ(*result, i);
       }
-      EXPECT_EQ(set.size(), 3);
+      EXPECT_EQ(set.size(), 3u);
     }
   }
 
@@ -310,7 +310,7 @@ namespace details
 	result = find(set.begin(), set.end(), i);
 	EXPECT_EQ(*result, i);
       }
-      EXPECT_EQ(set.size(), 3);
+      EXPECT_EQ(set.size(), 3u);
     }
 
     for (int j=5; j<9; j++) {
@@ -320,7 +320,7 @@ namespace details
 	result = find(set.begin(), set.end(), i);
 	EXPECT_EQ(*result, i);
       }
-      EXPECT_EQ(set.size(), 4);
+      EXPECT_EQ(set.size(), 4u);
     }
 
 
