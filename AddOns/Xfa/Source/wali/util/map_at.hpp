@@ -10,7 +10,7 @@ namespace wali {
         /// when 'm' is const and it will throw an exception when 'k' is not
         /// present.
         template<typename Mapping>
-        typename Mapping::mapped_type
+        typename Mapping::mapped_type const &
         map_at(Mapping const & m, typename Mapping::key_type const & k)
         {
             typename Mapping::const_iterator it = m.find(k);
