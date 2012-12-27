@@ -19,6 +19,7 @@ sources = Split("""
     ./wali/xfa/xfa_livevar_analysis.cpp
     ./wali/util/read_file.cpp
     ./wali/util/base64.cpp
+    ./wali/util/details/Partition.cpp
 """)
 
 env = BaseEnv.Clone()
@@ -30,6 +31,11 @@ env.Append(LIBPATH=[LibInstallDir])
 env.Append(LIBS=["walidomains"])
 env.Append(CXXFLAGS=["-std=c++0x"])
 env["WARNING_FLAGS"] = env["WARNING_FLAGS"] + " -Wno-overloaded-virtual"
+
+#boost is ill-behaved w.r.t. these flags
+env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wfloat-equal', '')
+env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
+
 
 built = []
 

@@ -27,6 +27,7 @@
 
 #include <boost/shared_ptr.hpp> // It'd be nice to include the standard version but there are too many ways to get it.
 #include <boost/unordered_set.hpp>
+#include <boost/function.hpp>
 
 #include "wali/wfa/WeightMaker.hpp"
 #include "wali/Countable.hpp"
@@ -91,6 +92,11 @@
   To switch on statistics collection in BinRel
 **/
 #define BINREL_STATS
+
+
+/// This checks two implementations of the 'subsumes' operation (subset) off
+/// each other (one faster, one simpler)
+#define CHECK_BDD_SUBSUMES_WITH_SLOWER_VERSION 1
 
 namespace wali 
 {
@@ -304,6 +310,7 @@ namespace wali
       typedef wali::ref_ptr< BddContext > bdd_context_t;
 
       typedef std::map<std::string, int> Assignment;
+      typedef std::vector<std::pair<std::string, bddinfo_t> > VectorVocabulary;
       
       extern
       std::vector<Assignment>
@@ -312,7 +319,14 @@ namespace wali
       extern
       void
       printImagemagickInstructions(bdd b, BddContext const & voc,
-                                   std::ostream & os, std::string const & for_file);
+                                   std::ostream & os, std::string const & for_file,
+                                   boost::function<bool (VectorVocabulary const &)> include_component);
+
+      extern
+      bdd
+      quantifyOutOtherVariables(BddContext const & voc,
+                                std::vector<std::string> const & keep_these,
+                                bdd b);
       
       
       class BinRel : public wali::SemElemTensor 
@@ -364,6 +378,9 @@ namespace wali
           sem_elem_t extend(SemElem* se);
 
           sem_elem_t star();
+
+
+          bool subsumes(SemElem * other) const;
 
           /** @return [this]->Equal( cast<BinRel*>(se) ) */
           bool equal(SemElem* se) const;
@@ -431,6 +448,17 @@ namespace wali
       }; // WeightMaker
         
       
+
+      
+      namespace details {
+        bool bddImplies_using_bdd_imp(bdd left, bdd right);
+        bool bddImplies_recursive(bdd left, bdd right);
+        bool bddImplies(bdd left, bdd right);
+
+        
+        std::vector<std::pair<VectorVocabulary, bdd> >
+        partition(BddContext const & vars, bdd b);
+      }
 
     } // namespace binrel
 

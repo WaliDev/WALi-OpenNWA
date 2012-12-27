@@ -8,13 +8,21 @@
 /lib
 /Tests/harness
 /AddOns/Parse/ThirdParty/*.pyc
+/coverage
+/wali.info
 
 # Not sure why these aren't going to _build...
 /AddOns/Domains/ThirdParty/buddy-2.4/src/*.o
+/AddOns/Domains/ThirdParty/buddy-2.4/src/*.gcda
+/AddOns/Domains/ThirdParty/buddy-2.4/src/*.gcno
 /AddOns/Domains/ThirdParty/include
 /AddOns/Domains/ThirdParty/libbdd.a
+/AddOns/RandomFWPDS/Source/*.gcda
+/AddOns/RandomFWPDS/Source/*.gcno
 /AddOns/RandomFWPDS/Source/*.o
 /Examples/Reach/*.o
+/Examples/Reach/*.gcda
+/Examples/Reach/*.gcno
 /Examples/bin
 
 ##############
