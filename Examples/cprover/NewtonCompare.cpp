@@ -10,6 +10,7 @@
 // ::wali::wfa
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/TransFunctor.hpp"
+#include "wali/wfa/State.hpp"
 // ::wali::wpds
 #include "wali/wpds/RuleFunctor.hpp"
 #include "wali/wpds/Rule.hpp"
