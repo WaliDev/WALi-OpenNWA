@@ -106,6 +106,9 @@
     <Filter Include="Header Files\wali.nwa\query\details">
       <UniqueIdentifier>{ec809e5a-b618-4c9f-92dc-d4c9c3ee84f3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\wali.domains">
+      <UniqueIdentifier>{3e19b168-b2f9-48bb-a14a-1899b57f58a6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\wali\Reach.cpp">
@@ -386,6 +389,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\wali\graph\NewtonLogger.cpp">
       <Filter>Source Files\wali.graph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wfa\WFA-eclose.cpp">
+      <Filter>Source Files\wali.wfa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\domains\SemElemSet.cpp">
+      <Filter>Source Files\wali.domains</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\wali\wfa\DeterminizeWeightGen.cpp">
+      <Filter>Source Files\wali.wfa</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

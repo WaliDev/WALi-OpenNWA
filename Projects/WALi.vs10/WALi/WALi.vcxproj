@@ -251,10 +251,13 @@
     <ClCompile Include="..\..\..\Source\opennwa\query\language.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\query\returns.cpp" />
     <ClCompile Include="..\..\..\Source\opennwa\query\transitions.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\domains\SemElemSet.cpp" />
     <ClCompile Include="..\..\..\Source\wali\graph\Functional.cpp" />
     <ClCompile Include="..\..\..\Source\wali\graph\NewtonLogger.cpp" />
     <ClCompile Include="..\..\..\Source\wali\Reach.cpp" />
     <ClCompile Include="..\..\..\Source\wali\SemElemTensor.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wfa\DeterminizeWeightGen.cpp" />
+    <ClCompile Include="..\..\..\Source\wali\wfa\WFA-eclose.cpp" />
     <ClCompile Include="..\..\..\Source\wali\wpds\fwpds\FWPDS.cpp" />
     <ClCompile Include="..\..\..\Source\wali\wpds\fwpds\LazyTrans.cpp" />
     <ClCompile Include="..\..\..\Source\wali\wpds\fwpds\SWPDS.cpp" />
