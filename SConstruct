@@ -169,6 +169,7 @@ except KeyError:
 
 conf = Configure(BaseEnv)
 BaseEnv["HAS_BOOST_FILESYSTEM"] = conf.CheckLib('boost_filesystem', language='c++')
+BaseEnv["HAS_BOOST_SYSTEM"] = conf.CheckLib('boost_system', language='c++')
 BaseEnv = conf.Finish()
 
 levels={'slow': 2, 'fast':1, 'none':0}

@@ -42,7 +42,10 @@ built = [
     SingleProgramTarget(env, 'expand', 'expandNwa', 'experimental')
 ]
 
-if env["HAS_BOOST_FILESYSTEM"]:
+if env["HAS_BOOST_FILESYSTEM"] and env["HAS_BOOST_SYSTEM"]:
+    built.append(env.Program('nwa-synchronize-alphabets.exe', ['synchronize-alphabets.cpp'],
+                             LIBS=["boost_filesystem", "boost_system", "wali"]))
+elif env["HAS_BOOST_FILESYSTEM"]:
     built.append(env.Program('nwa-synchronize-alphabets.exe', ['synchronize-alphabets.cpp'],
                              LIBS=["boost_filesystem", "wali"]))
 
