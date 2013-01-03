@@ -5,6 +5,7 @@
 #include "wali/wfa/ITrans.hpp"
 
 #define PPP_DBG
+#define PUSH_EVAL
 
 namespace wali {
 
