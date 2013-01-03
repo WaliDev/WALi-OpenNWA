@@ -5,8 +5,9 @@
 #include <cassert>
 #include <sstream>
 
-//debugging
+#if defined(PPP_DBG)
 #include "wali/SemElemTensor.hpp"
+#endif
 
 namespace wali {
 
