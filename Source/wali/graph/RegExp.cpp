@@ -52,6 +52,13 @@ namespace wali {
             return (int)updatable_node_no;
         }
 
+        void RegExp::setDirty()
+        {
+          dirty = true;
+          for(list<reg_exp_t>::iterator pit = parents.begin(); pit != parents.end(); ++pit)
+            (*pit)->setDirty();
+        }
+
         // Updates all the updatable edgses given in the list together, so that all of them
         // get the same update_count.
         void RegExp::update(std::vector<node_no_t> nnos, std::vector<sem_elem_t> ses)
@@ -76,6 +83,7 @@ namespace wali {
               updatable_nodes[nno]->value = se;
               updatable_nodes[nno]->last_change = update_count + 1;
               updatable_nodes[nno]->last_seen = update_count + 1;
+              updatable_nodes[nno]->setDirty();
               updatable_nodes[nno]->eval_map.clear();
               updatable_nodes[nno]->updates.push_back(update_count);
             }
@@ -101,6 +109,7 @@ namespace wali {
             updatable_nodes[nno]->value = se;
             updatable_nodes[nno]->last_change = update_count;
             updatable_nodes[nno]->last_seen = update_count;
+            updatable_nodes[nno]->setDirty();
             updatable_nodes[nno]->eval_map.clear();
             
           }
@@ -1066,7 +1075,12 @@ namespace wali {
           const reg_exp_hash_t& roots = getRoots();
           for(reg_exp_hash_t::const_iterator iter = roots.begin(); iter != roots.end(); ++iter){
             reg_exp_t regexp = iter->second;
+#if defined(PUSH_EVAL)
+            if(!regexp->dirty)
+              continue;
+#else
             if(regexp->last_seen == satProcesses[regexp->satProcess].update_count && regexp->last_change != (unsigned)-1)  // evaluate(w) sets last_change to -1
+#endif
               continue;
             if(!top_down_eval || !saturation_complete)
               regexp->evaluate();
@@ -1079,6 +1093,9 @@ namespace wali {
         }
 
         void RegExp::evaluate_iteratively() {
+#if defined(PUSH_EVAL)
+          assert(0 && "evaluate_iteratively not implemented for PUSH_EVAL mode");
+#endif
           typedef list<reg_exp_t>::iterator iter_t;
           typedef pair<reg_exp_t, iter_t > stack_el;
 
@@ -1173,7 +1190,21 @@ namespace wali {
         sem_elem_t RegExp::evaluate(sem_elem_t w) {
           map<sem_elem_t, sem_elem_t,sem_elem_less>::iterator it;
           sem_elem_t ret;
-
+#if defined(PUSH_EVAL)
+          if(dirty){
+            eval_map.clear();
+            dirty = false;
+          }else{
+            it = eval_map.find(w);
+            if(it != eval_map.end()){
+              return it->second;
+            }else{
+              ret = w->extend(value);
+              eval_map[w] = ret;
+              return ret;
+            }
+          }
+#else
           if(last_seen == satProcesses[satProcess].update_count) {
             it = eval_map.find(w);
             if(it != eval_map.end()) {
@@ -1190,6 +1221,7 @@ namespace wali {
           } else {
             eval_map.clear();
           }
+#endif //#if defined(PUSH_EVAL)
           unsigned int &update_count = satProcesses[currentSatProcess].update_count;
           evaluations.push_back(update_count);
           switch(type) {
@@ -1362,6 +1394,12 @@ namespace wali {
     }
 
     void RegExp::evaluate() {
+#if defined(PUSH_EVAL)
+        if(!dirty){
+          last_seen = satProcesses[satProcess].update_count;
+          return;
+        }
+#endif
         if(last_seen == satProcesses[satProcess].update_count) return;
         unsigned int &update_count = satProcesses[currentSatProcess].update_count;
         evaluations.push_back(update_count);
@@ -1496,6 +1534,9 @@ namespace wali {
         }
         last_change = (last_change > 1) ? last_change : 1;
         assert(last_seen == satProcesses[satProcess].update_count);
+#if defined(PUSH_EVAL)
+        dirty = false;
+#endif 
     }
 
     sem_elem_t RegExp::reevaluate() {

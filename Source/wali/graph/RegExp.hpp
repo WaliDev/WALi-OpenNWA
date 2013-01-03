@@ -155,6 +155,17 @@ namespace wali {
 #endif
                 node_no_t updatable_node_no;
                 list<reg_exp_t> children;
+#if defined(PUSH_EVAL)
+                /*
+                   In push based evaluation of the RegExp graph, an updatable regular expression
+                   sets the dirty bit for all its ancestors. During a real evaluation, only the
+                   dirty bit is checked to determine whether reevaluation is needed. All
+                   non-terminal RegExp nodes are created with the dirty bit set.
+                */
+                bool dirty;
+                /* When set, points to the ancestors in the RegExp dag. */
+                list<reg_exp_t> parents;
+#endif
                 unsigned int last_change;
                 unsigned int last_seen;
 
@@ -196,6 +207,9 @@ namespace wali {
                     value = se;
                     updatable_node_no = nno;
                     count = 0;
+#if defined(PUSH_EVAL)
+                    dirty = true;
+#endif
                     last_change = 1;
                     last_seen = 1;
                     uptodate = false;
@@ -204,7 +218,7 @@ namespace wali {
                     lastchange=-1;
                     satProcess = currentSatProcess;
                 }
-                RegExp(reg_exp_type t, const reg_exp_t r1, const reg_exp_t r2 = 0) {
+                RegExp(reg_exp_type t, reg_exp_t r1, reg_exp_t r2 = 0) {
                     count = 0;
                     nevals = 0;
                     if(t == Extend || t == Combine) {
@@ -221,6 +235,12 @@ namespace wali {
                     } else {
                         assert(0);
                     }
+#if defined(PUSH_EVAL)
+                    dirty = true;
+                    r1->parents.push_back(static_cast<RegExp*>(this));
+                    if(!(r2 == NULL))
+                      r2->parents.push_back(static_cast<RegExp*>(this));
+#endif
                     last_change = 0;
                     last_seen = 0;
                     uptodate = false;
@@ -233,6 +253,9 @@ namespace wali {
                     value = se;
                     updatable_node_no = 0; // default value
                     count = 0;
+#if defined(PUSH_EVAL)
+                    dirty = false; //Will always remains o                    
+#endif
                     last_change = 1;
                     last_seen = 0;
                     uptodate = false;
@@ -326,6 +349,7 @@ namespace wali {
 
             private:
 
+                void setDirty();
                 void evaluate();
                 void evaluate_iteratively();
                 sem_elem_t evaluate(sem_elem_t w);
