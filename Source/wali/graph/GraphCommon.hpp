@@ -4,7 +4,7 @@
 #include "wali/Common.hpp"
 #include "wali/wfa/ITrans.hpp"
 
-#include "wali/graph/NewtonLogger.hpp"
+#define PPP_DBG
 
 namespace wali {
 
@@ -46,13 +46,6 @@ namespace wali {
         };
 
         typedef std::pair<Transition, wali::sem_elem_t> WTransition;
-
-
-  
-        //debugging
-        extern newton_logger_t debugNewtonLog;
-
-
     } // namespace graph
 
 } // namespace wali

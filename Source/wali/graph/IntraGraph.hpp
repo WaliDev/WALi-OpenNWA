@@ -284,7 +284,7 @@ namespace wali {
              * These should be cleaned up when we're finished with the analysis.
              **/
             static void cleanUp();
-            void saturate(newton_logger_t nlog = NULL);
+            void saturate();
 
             sem_elem_t getWeight(int nno) const ;
             string toDot();

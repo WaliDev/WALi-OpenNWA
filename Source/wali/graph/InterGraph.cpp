@@ -571,16 +571,9 @@ namespace wali {
             }
             gr_it++;
           }
-          //DEBUGGING
-          //cout << "Worklist Kleene: \n";
-          //for(multiset<tup>::const_iterator cit = worklist.begin(); cit != worklist.end(); ++cit)
-          //  cout << (*cit).second << " ";
-          //cout << "\n";
-          //DEBUGGING
-
         }                       
 
-#if 0
+#if defined(PPP_DBG)
         static std::ostream& pp_weight(std::ostream& o, sem_elem_t weight)
         {
           if(weight == NULL){
@@ -603,18 +596,13 @@ namespace wali {
           o << res;
           return o;
         }
-#endif //#if 0
+#endif
 
-        newton_logger_t debugNewtonLog; 
         void InterGraph::setupNewtonSolution()
         {
-          newton_logger_t nlog = new NewtonLogger("Newton Logger");
-          debugNewtonLog = new NewtonLogger("Debug Logger");
-          BEGIN_NEWTON_SOLVER(nlog);
           runningNewton = true;         
           // First populate SCCGraph objects
 
-          BEGIN_SCC_COMPUTATION(nlog);
           int n = nodes.size();
           int i;
           unsigned int max_scc_required;
@@ -655,26 +643,24 @@ namespace wali {
             max_scc_required = SCCLight(scc_gr_list, gr_sorted);
             STAT(stats.ncomponents = max_scc_required);
           }
-          END_SCC_COMPUTATION(nlog, max_scc_required);
 
           //Setup weights so that everything is tensored
           sem_elem_tensor_t sem_old = dynamic_cast<SemElemTensor*>(sem.get_ptr());
           sem = sem_old->tensor(sem_old.get_ptr());
-
+#if defined(PPP_DBG)
           long totCombines=0, totExtends=0, totStars=0;
+#endif
 
           // For each SCC, solve completely using Newton's method.
           {
             SCCGraphs::iterator gr_it = gr_sorted.begin();
             for(unsigned scc_n = 1; scc_n <= max_scc_required; scc_n++) {
-              BEGIN_SCC_SOLVER(nlog);
               RegExp::startSatProcess(sem);
 
               ////////////////We will now create the Newton IntraGraph which will store the
               ////////////////actual weights, and from which RegExp will be generated.
               ////////////////This is the TDG for the linearized problem for the current SCC
 
-              BEGIN_INTRAGRAPH_CREATION(nlog);
               SCCGraphs::iterator scc_head = gr_it;
               IntraGraph * graph = new IntraGraph(false, sem); //pre = false
               linear_gr_list.push_back(graph);
@@ -720,9 +706,7 @@ namespace wali {
                   // w' = (1^T,w)
                   sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>((iter->weight).get_ptr());
                   sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());
-              BEGIN_MISC(debugNewtonLog);
                   wt = one->tensor(wt.get_ptr());
-              END_MISC(debugNewtonLog);
                   graph->addEdge(nodes[iter->src].intra_nodeno, nodes[iter->tgt].intra_nodeno, wt);
                   //Also add a mutable edge (s--f-->tgt) from the source vertex s with weight 0 (tensored) and
                   //functional f = (1^T, DetTrans(wt(src)) x w) (one untensored)
@@ -834,13 +818,10 @@ namespace wali {
               
                 gr_it++;
               }              
-              END_INTRAGRAPH_CREATION(nlog);
               // Use Tarjan's path listing algorithm to generate regular expressions for nodes.
-              BEGIN_TARJAN(nlog);
               graph->setupIntraSolution();
-              END_TARJAN(nlog);
 
-#if 0
+#if defined(PPP_DBG) 
               // We have the intra graph ready at this point. 
                 // DEBUGGING
                 std::stringstream ss;
@@ -852,35 +833,28 @@ namespace wali {
                 foo << "}";
                 foo.close();
               cout << "GRAPH " << scc_n << "\n";
-#endif //#if 0
-
-
+#endif 
               // Now solve the linearized problem by saturating.
-              BEGIN_NEWTON_SOLUTION(nlog);
-              graph->saturate(nlog);
-              END_NEWTON_SOLUTION(nlog);
+              graph->saturate();
+#if defined(PPP_DBG)
               // Must be saved *before* stopSatProcess
               totCombines += RegExpDiagnostics::countTotalCombines();
               totExtends += RegExpDiagnostics::countTotalExtends();
               totStars += RegExpDiagnostics::countTotalStars();
+#endif
               // The next SCC will use another sat procss phase.
               RegExp::stopSatProcess();
-
-              END_SCC_SOLVER(nlog);
             }
           }
-
+#if defined(PPP_DBG)
           cout << "Total number of combines: " << totCombines << endl;
           cout << "Total number of Extends: " << totExtends << endl;
           cout << "Total number of Stars: " << totStars << endl;
-
+#endif
           max_scc_computed = max_scc_required;
-          //RegExp::stopSatProcess();
           RegExp::executingPoststar(!running_prestar);
-          END_NEWTON_SOLVER(nlog);
 
-#if 0
-          //DEBUGGING
+#if defined(PPP_DBG)
             std::stringstream ss;
             ss << "digraph{\n";
             for(i=0; i<n; i++){
@@ -918,26 +892,16 @@ namespace wali {
               }
             }
             ss << "}\n";
-
-
             ofstream foo("tdg.dot");
             foo << ss.str();
             foo.close();
-
-#endif //#if 0
-
-            PRINT_NEWTON_LOG(nlog);
-            PRINT_NEWTON_LOG(debugNewtonLog);
-            //RegExp::print_stats(cout);
+#endif 
         }
 
         // If an argument is passed in then only weights on those transitions will be available
         // I can fix this (i.e., weights for others will be available on demand), but not right now.
         void InterGraph::setupInterSolution(std::list<Transition> *wt_required) {
           RegExp::startSatProcess(sem);
-
-          //util::Timer *timer = new util::Timer("FWPDS Find Graphs");
-
           // First, find the IntraGraphs
           int n = nodes.size();
           int i;
@@ -949,484 +913,458 @@ namespace wali {
           std::list<IntraGraph *>::iterator gr_it;
           multiset<tup > worklist;
 
-          {
-            //wali::util::Timer * setupT = new wali::util::Timer("[setupInterSolution] setup IntraGraphs timer");
-            for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
-              intra_graph_uf->takeUnion((*it).src,(*it).tgt);
-            }
-
-
-            for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
-              intra_graph_uf->takeUnion((*it2).src1,(*it2).tgt);
-            }
-
-
-            for(i = 0; i < n;i++) {
-              int j = intra_graph_uf->find(i);
-              if(nodes[j].gr == NULL) {
-                nodes[j].gr = new IntraGraph(running_prestar,sem);
-                gr_list.push_back(nodes[j].gr);
-              }
-              nodes[i].gr = nodes[j].gr;
-
-              nodes[i].intra_nodeno = nodes[i].gr->makeNode(nodes[i].trans);
-
-              if(is_source_type(nodes[i].type)) {
-                nodes[i].gr->setSource(nodes[i].intra_nodeno, nodes[i].weight);
-              }
-              // zero all weights (some are set by setSource() )
-              if(nodes[i].weight.get_ptr() != NULL)
-                nodes[i].weight = nodes[i].weight->zero();
-
-            }
-
-            // Now fill up the IntraGraphs
-            for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
-              int s = (*it).src;
-              int t = (*it).tgt;
-              nodes[s].gr->addEdge(nodes[s].intra_nodeno, nodes[t].intra_nodeno, (*it).weight);
-            }
-
-            for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
-              IntraGraph *gr = nodes[(*it2).tgt].gr;
-              gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, sem->zero(), true);
-
-              IntraGraph *gr2 = nodes[(*it2).src2].gr;
-              gr2->setOutNode(nodes[(*it2).src2].intra_nodeno, (*it2).src2);
-            }
-
-            // For SWPDS
-            vector<call_edge_t>::iterator it3;
-            for(it3 = call_edges.begin(); it3 != call_edges.end(); it3++) {
-              IntraGraph *gr1 = nodes[(*it3).first].gr;
-              IntraGraph *gr2 = nodes[(*it3).second].gr;
-              gr1->addCallEdge(gr2);
-            }
-
-            // Setup Worklist
-
-#ifdef STATIC_MEMORY
-            int max_size = 0;
-            for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
-              max_size = (max_size > (*gr_it)->getSize()) ? max_size : (*gr_it)->getSize();
-            }
-            IntraGraph::addStaticBuffer(max_size);
-#endif
-
-            {
-              //wali::util::Timer * timer3 = new wali::util::Timer("[setupInterSolution] Intra Graphs RegExp Timer");
-              //int tempCount = 0;
-              vector<reg_exp_t> outNodeRegExps; //DEBUGGING
-              for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
-                (*gr_it)->setupIntraSolution(false);
-                //DEBUGGING
-                for(list<int>::const_iterator cit = (*gr_it)->out_nodes_intra->begin(); cit != (*gr_it)->out_nodes_intra->end(); ++cit)
-                  outNodeRegExps.push_back((*gr_it)->nodes[*cit].regexp);
-                //
-              }
-
-              long totNodes = 0, totNotComputed = 0;
-              totNodes = RegExpDiagnostics::countTotalCombines() +
-                RegExpDiagnostics::countTotalExtends() +
-                RegExpDiagnostics::countTotalStars();
-              totNotComputed = RegExpDiagnostics::countExcept(outNodeRegExps); 
-              cout << "Total number of combines: " << RegExpDiagnostics::countTotalCombines() << endl;
-              cout << "Total number of Extends: " << RegExpDiagnostics::countTotalExtends() << endl;
-              cout << "Total number of Stars: " << RegExpDiagnostics::countTotalStars() << endl;
-              cout << "#nodes definitely not evaluated during saturation: " << RegExpDiagnostics::countExcept(outNodeRegExps) << endl;
-              cout << "%Nodes never computed > " << 100 * (double)(((double)totNotComputed)/ (double)totNodes) << endl;;
-              //delete timer3;
-            }
-            //delete setupT;
+          for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
+            intra_graph_uf->takeUnion((*it).src,(*it).tgt);
           }
-          //cout << "Intra setup done.\n";
+          for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
+            intra_graph_uf->takeUnion((*it2).src1,(*it2).tgt);
+          }
 
+          for(i = 0; i < n;i++) {
+            int j = intra_graph_uf->find(i);
+            if(nodes[j].gr == NULL) {
+              nodes[j].gr = new IntraGraph(running_prestar,sem);
+              gr_list.push_back(nodes[j].gr);
+            }
+            nodes[i].gr = nodes[j].gr;
+            nodes[i].intra_nodeno = nodes[i].gr->makeNode(nodes[i].trans);
+            if(is_source_type(nodes[i].type)) {
+              nodes[i].gr->setSource(nodes[i].intra_nodeno, nodes[i].weight);
+            }
+            // zero all weights (some are set by setSource() )
+            if(nodes[i].weight.get_ptr() != NULL)
+              nodes[i].weight = nodes[i].weight->zero();
+          }
+
+          // Now fill up the IntraGraphs
+          for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
+            int s = (*it).src;
+            int t = (*it).tgt;
+            nodes[s].gr->addEdge(nodes[s].intra_nodeno, nodes[t].intra_nodeno, (*it).weight);
+          }
+
+          for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
+            IntraGraph *gr = nodes[(*it2).tgt].gr;
+            gr->addEdge(nodes[(*it2).src1].intra_nodeno, nodes[(*it2).tgt].intra_nodeno, sem->zero(), true);
+            IntraGraph *gr2 = nodes[(*it2).src2].gr;
+            gr2->setOutNode(nodes[(*it2).src2].intra_nodeno, (*it2).src2);
+          }
+
+          // For SWPDS
+          vector<call_edge_t>::iterator it3;
+          for(it3 = call_edges.begin(); it3 != call_edges.end(); it3++) {
+            IntraGraph *gr1 = nodes[(*it3).first].gr;
+            IntraGraph *gr2 = nodes[(*it3).second].gr;
+            gr1->addCallEdge(gr2);
+          }
+
+          // Setup Worklist
+#ifdef STATIC_MEMORY
+          int max_size = 0;
+          for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
+            max_size = (max_size > (*gr_it)->getSize()) ? max_size : (*gr_it)->getSize();
+          }
+          IntraGraph::addStaticBuffer(max_size);
+#endif
+#if defined(PPP_DBG)
+          vector<reg_exp_t> outNodeRegExps;
+#endif
+          for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
+            (*gr_it)->setupIntraSolution(false);
+#if defined(PPP_DBG)
+            for(list<int>::const_iterator cit = (*gr_it)->out_nodes_intra->begin(); cit != (*gr_it)->out_nodes_intra->end(); ++cit)
+              outNodeRegExps.push_back((*gr_it)->nodes[*cit].regexp);
+#endif
+          }
+
+#if defined(PPP_DBG)
+          long totNodes = 0, totNotComputed = 0;
+          totNodes = RegExpDiagnostics::countTotalCombines() +
+            RegExpDiagnostics::countTotalExtends() +
+            RegExpDiagnostics::countTotalStars();
+          totNotComputed = RegExpDiagnostics::countExcept(outNodeRegExps); 
+          cout << "Total number of combines: " << RegExpDiagnostics::countTotalCombines() << endl;
+          cout << "Total number of Extends: " << RegExpDiagnostics::countTotalExtends() << endl;
+          cout << "Total number of Stars: " << RegExpDiagnostics::countTotalStars() << endl;
+          cout << "#nodes definitely not evaluated during saturation: " << RegExpDiagnostics::countExcept(outNodeRegExps) << endl;
+          cout << "%Nodes never computed > " << 100 * (double)(((double)totNotComputed)/ (double)totNodes) << endl;;
+#endif
           // Do SCC decomposition of IntraGraphs
           std::list<IntraGraph *> gr_sorted;
           unsigned components = SCC(gr_list, gr_sorted);
           STAT(stats.ncomponents = components);
 
-
-          {
-            //wali::util::Timer * timer4 = new wali::util::Timer("[setupInterSolution] saturation timer");
-            int numSteps = 0;
-            // Saturate
-            if(wt_required == NULL) {
-              max_scc_required = components;
-            } else {
-              max_scc_required = 0;
-              std::list<Transition>::iterator trans_it;
-              for(trans_it = wt_required->begin(); trans_it != wt_required->end(); trans_it++) {
-                int nno = nodeno(*trans_it);
-                max_scc_required = (max_scc_required >= nodes[nno].gr->scc_number) ? max_scc_required : nodes[nno].gr->scc_number;
-              }
-            }
-            //cout << "Saturation started\n";
-            gr_it = gr_sorted.begin();
-            for(unsigned scc_n = 1; scc_n <= max_scc_required; scc_n++) {
-              //cout << ".";
-              bfsIntra(*gr_it, scc_n);
-              setup_worklist(gr_sorted, gr_it, scc_n, worklist);
-              numSteps += saturate(worklist,scc_n);
-            }
-            //delete timer4;
-            // DEBUGGING
-            //cout << "Total number of steps: " << numSteps << endl;
-          }
-          max_scc_computed = max_scc_required;
-
-          //DEBUGGING
-          {
-            stringstream ss;
-            ss << "kleene_regexp.dot";
-            string filename = ss.str();
-            fstream foo;
-            foo.open(filename.c_str(), fstream::out);
-            const reg_exp_hash_t& roots = RegExp::getRoots();
-            foo << "digraph {\n";
-            std::set<long> seen;
-            for(reg_exp_hash_t::const_iterator iter = roots.begin();
-                iter != roots.end();
-                ++iter){
-              (iter->second)->toDot(foo, seen, true, true);
-            }
-            foo << "}\n";
-            foo.close();
-          }
-          int graphnum = 0;
-          for(gr_it = gr_list.begin(); gr_it != gr_list.end(); ++gr_it)
-          {
-            ++graphnum;
-            stringstream ss;
-            ss << "kleene_graph" << graphnum << ".dot";
-            string filename = ss.str();
-            fstream foo;
-            foo.open(filename.c_str(), fstream::out);
-            foo << "digraph{\n";
-            foo << (*gr_it)->toDot();
-            foo << "}";
-            foo.close();
-          }
-
-          //
-
-          RegExp::stopSatProcess();
-          RegExp::executingPoststar(!running_prestar);
-
-          //RegExp::print_stats(cout);
-          //print_stats(cout);
-#ifdef STATIC_MEMORY
-          IntraGraph::clearStaticBuffer();
-#endif
-        }
-
-        std::ostream &InterGraph::print_stats(std::ostream &out) {
-          InterGraphStats total_stats = stats;
-          int n = nodes.size();
-          int i;      
-          set<RegExp *> reg_equations;
-          int ned = 0;
-          for(i = 0; i < n; i++) {
-            if(intra_graph_uf->find(i) == i) {
-              std::list<int>::iterator tbeg = nodes[i].gr->getOutTransitions()->begin();
-              std::list<int>::iterator tend = nodes[i].gr->getOutTransitions()->end();
-              for(; tbeg != tend; tbeg++) {
-                int onode = nodes[i].intra_nodeno;
-                reg_equations.insert(nodes[i].gr->nodes[onode].regexp.get_ptr());
-              }
-              total_stats.ngraphs ++;
-              IntraGraphStats st = nodes[i].gr->get_stats(); 
-              total_stats.ncombine += st.ncombine;
-              total_stats.nextend += st.nextend;
-              total_stats.nstar += st.nstar;
-              total_stats.nupdatable += st.nupdatable * st.nupdatable;
-              total_stats.ncutset += st.ncutset * st.ncutset * st.ncutset;
-              total_stats.nget_weight += st.nget_weight;
-              total_stats.ndom_sequence += st.ndom_sequence;
-              total_stats.ndom_components += st.ndom_components;
-              total_stats.ndom_componentsize += (st.ndom_componentsize * st.ndom_componentsize);
-              total_stats.ndom_componentcutset += st.ndom_componentcutset;
-              ned += st.nedges;
-            }
-          }
-          int changestat = RegExp::out_node_height(reg_equations);
-          total_stats.nhyperedges = inter_edges.size();
-          total_stats.nedges = intra_edges.size();
-          total_stats.nnodes = nodes.size();
-
-          RegExpStats rst = RegExp::get_stats();
-          total_stats.ncombine += rst.ncombine;
-          total_stats.nextend += rst.nextend;
-          total_stats.nstar += rst.nstar;
-          total_stats.ngraphs = (total_stats.ngraphs == 0) ? 1 : total_stats.ngraphs;
-          rst.out_nodes = (rst.out_nodes == 0) ? 1 : rst.out_nodes;
-          out << "----------------------------------\n";
-          out << "          FWPDS Stats             \n";
-          out << "----------------------------------\n";
-          out << "InterGraph nodes : " << total_stats.nnodes << "\n";
-          out << "InterGraph edges : " << total_stats.nedges << "\n";
-          out << "InterGraph hyperedges : " << total_stats.nhyperedges << "\n";
-          out << "InterGraph iterations : " << total_stats.niter << "\n";
-          out << "InterGraph get_weight : " << total_stats.nget_weight << "\n";
-          out << "IntraGraphs : " << total_stats.ngraphs << "\n";
-          out << "IntraGraph SCC : " << total_stats.ncomponents << "\n";
-          out << "IntraGraph SCC Computed: " << max_scc_computed << "\n";
-          out << "Avg. IntraGraph nodes : " << (total_stats.nnodes / total_stats.ngraphs) << "\n";
-          out << "Avg. IntraGraph edges : " << (ned / total_stats.ngraphs) << "\n";
-          out << "Avg. IntraGraph cutset : " << (pow(total_stats.ncutset/total_stats.ngraphs,0.33)) << "\n";
-          out << "Avg. IntraGraph updatable : " << (int)(pow((double)total_stats.nupdatable/total_stats.ngraphs,0.5)) << "\n";
-          out << "Avg. IntraGraph dom-sequence length : " << (total_stats.ndom_sequence / total_stats.ngraphs) << "\n";
-          out << "Avg. IntraGraph dom-component size : " << (int)pow((double)total_stats.ndom_componentsize / (total_stats.ndom_components+1),0.5) << "\n";
-          out << "Avg. IntraGraph dom-component cuset : " << setprecision(2) << (double)total_stats.ndom_componentcutset / (total_stats.ndom_components+1) << "\n";
-          out << "Semiring Combine : " << total_stats.ncombine << "\n";
-          out << "Semiring Extend : " << total_stats.nextend << "\n";
-          out << "Semiring Star : " << total_stats.nstar << "\n";
-          out << "RegExp HashMap hits : " << rst.hashmap_hits << "\n";
-          out << "RegExp HashMap misses : " << rst.hashmap_misses << "\n";
-          out << "OutNode Height : " << setprecision(4) << (rst.height / rst.out_nodes) << "\n"; 
-          out << "OutNode Loop ND : " << setprecision(4) << (rst.lnd / rst.out_nodes) << "\n";
-          out << "Change Stat : " << changestat << "\n";
-          out << "\n";
-          return out;
-        }
-
-        // New Saturation Procedure -- minimize calls to get_weight
-        int InterGraph::saturate(multiset<tup> &worklist, unsigned scc_n) {
           int numSteps = 0;
-          sem_elem_t weight;
-          std::list<int> *moutnodes;
-
-          while(!worklist.empty()) {
-            // Get an outnode whose weight is to be propagated
-            multiset<tup>::iterator wit = worklist.begin();
-            int onode = (*wit).second;
-            worklist.erase(wit);
-            //int onode = worklist.front();
-            //worklist.pop_front();
-
-            numSteps++;
-            weight = nodes[onode].gr->get_weight(nodes[onode].intra_nodeno);
-            if(nodes[onode].weight.get_ptr() != NULL && nodes[onode].weight->equal(weight))
-              continue;
-            nodes[onode].weight = weight;
-
-            STAT(stats.niter++);
-
-            FWPDSDBGS(
-                cout << "Popped ";
-                IntraGraph::print_trans(nodes[onode].trans,cout) << "with weight ";
-                weight->print(cout) << "\n";
-                );
-
-            // Go through all its targets and modify their weights
-            std::list<int>::iterator beg = nodes[onode].out_hyper_edges.begin();
-            std::list<int>::iterator end = nodes[onode].out_hyper_edges.end();
-            for(; beg != end; beg++) {
-              int inode = inter_edges[*beg].tgt;
-              int onode1 = inter_edges[*beg].src1;
-              sem_elem_t uw;
-              if(running_ewpds && inter_edges[*beg].mf.get_ptr()) {
-                uw = inter_edges[*beg].mf->apply_f(sem->one(), weight);
-                FWPDSDBGS(
-                    cout << "Apply merge function ";
-                    inter_edges[*beg].mf->print(cout) << " to ";
-                    weight->print(cout) << "\n";
-                    uw->print(cout << "Got ") << "\n";
-                    );
-              } else {
-                uw = inter_edges[*beg].weight->extend(weight);
-              }
-              STAT(stats.nextend++);
-              nodes[inode].gr->updateEdgeWeight(nodes[onode1].intra_nodeno, nodes[inode].intra_nodeno, uw);
-            }
-            // Go through all targets again and insert them into the workist without
-            // seeing if they actually got modified or not
-            beg = nodes[onode].out_hyper_edges.begin();
-            for(; beg != end; beg++) {
-              int inode = inter_edges[*beg].tgt;
-              IntraGraph *gr = nodes[inode].gr;
-              if(gr->scc_number != scc_n) {
-                assert(gr->scc_number > scc_n);
-                continue;
-              }
-              moutnodes = gr->getOutTransitions();
-              std::list<int>::iterator mbeg = moutnodes->begin();
-              std::list<int>::iterator mend = moutnodes->end();
-              for(; mbeg != mend; mbeg++) {
-                int mnode = (*mbeg);
-                worklist.insert(tup(gr->bfs_number, mnode));
-              }
+          // Saturate
+          if(wt_required == NULL) {
+            max_scc_required = components;
+          } else {
+            max_scc_required = 0;
+            std::list<Transition>::iterator trans_it;
+            for(trans_it = wt_required->begin(); trans_it != wt_required->end(); trans_it++) {
+              int nno = nodeno(*trans_it);
+              max_scc_required = (max_scc_required >= nodes[nno].gr->scc_number) ? max_scc_required : nodes[nno].gr->scc_number;
             }
           }
-          //DEBUGGING
-          //cout << "Kleene saturation # Steps: " << numSteps << endl;
-          return numSteps;
-
-        }
-
-        // Must be called after saturation
-        sem_elem_t InterGraph::get_call_weight(Transition t) {
-          unsigned orig_size = nodes.size();
-          unsigned n = nodeno(t);
-          assert(orig_size == nodes.size()); // Transition t must not be a new one
-
-          if(newtonGr)
-            return newtonGr->get_weight(nodes[n].intra_nodeno);
-          else
-            return nodes[n].gr->get_weight(nodes[n].intra_nodeno);
-        }
-
-        sem_elem_t InterGraph::get_weight(Transition t){
-          unsigned orig_size = nodes.size();
-          unsigned n = nodeno(t);
-          assert(orig_size == nodes.size()); // Transition t must not be a new one
-          return get_weight(n);
-        }
-        sem_elem_t InterGraph::get_weight(unsigned n) {
-          // check eHandler
-          if(eHandler.exists(n)) {
-            // This must be a return transition
-            int nc;
-            //sem_elem_tensor_t wtCallRule = dynamic_cast<SemElemTensor*>( eHandler.get_dependency(n, nc).get_ptr());
-            sem_elem_t wtCallRule = eHandler.get_dependency(n, nc);
-            sem_elem_t wt;
-            if(nc != -1) {
-              if(runningNewton){
-                sem_elem_tensor_t twt = dynamic_cast<SemElemTensor*>((nodes[nc].gr->get_weight(nodes[nc].intra_nodeno)).get_ptr());
-                wt = twt->detensorTranspose();
-
-                //DEBUGGING
-                if(0){
-                  cout << "get_weight whacky case:" << endl;
-                  cout << "Return trans: " 
-                    << key2str(nodes[n].trans.src) << " -- "
-                    << key2str(nodes[n].trans.stack) << " -> "
-                    << key2str(nodes[n].trans.tgt) << endl;
-                  cout << "Proxy trans: "
-                    << key2str(nodes[nc].trans.src) << " -- "
-                    << key2str(nodes[nc].trans.stack) << " -> "
-                    << key2str(nodes[nc].trans.tgt) << endl;
-                  wt->print(cout << "weight:" << endl) << endl;
-                  wtCallRule->print(cout << "wtCallRule:" << endl) << endl;
-                  wt->extend(wtCallRule)->print(cout << "Final:" << endl) 
-                    << endl;
-                }
-              }
-              else
-                wt = nodes[nc].gr->get_weight(nodes[nc].intra_nodeno);
-            } else {
-              // ESource
-              wt = wtCallRule->one();
-            }
-            return wt->extend(wtCallRule);
+          gr_it = gr_sorted.begin();
+          for(unsigned scc_n = 1; scc_n <= max_scc_required; scc_n++) {
+            bfsIntra(*gr_it, scc_n);
+            setup_worklist(gr_sorted, gr_it, scc_n, worklist);
+            numSteps += saturate(worklist,scc_n);
           }
+#if defined(PPP_DBG)
+          cout << "Total number of steps: " << numSteps << endl;
+#endif
+        max_scc_computed = max_scc_required;
 
-          if(runningNewton){
-            sem_elem_tensor_t twt = dynamic_cast<SemElemTensor*>((nodes[n].gr->get_weight(nodes[n].intra_nodeno)).get_ptr());
-            return twt->detensorTranspose();
-          } else
-            return nodes[n].gr->get_weight(nodes[n].intra_nodeno);
-        }
-
-        void InterGraph::update_all_weights() {
-          unsigned int i;
-          for(i=0;i<nodes.size();i++) {
-            sem_elem_t w;
-            if(newtonGr)
-              w = newtonGr->get_weight(nodes[i].intra_nodeno);
-            else
-              w = nodes[i].gr->get_weight(nodes[i].intra_nodeno);
-            nodes[i].weight = w;
-          }
-        }
-
-        inline int get_number(map<int,int> &intra_node_map, int src, IntraGraph *ca) {
-          std::map<int,int>::iterator it = intra_node_map.find(src);
-          if(it != intra_node_map.end()) {
-            return it->second;
-          }
-          int s = ca->makeNode();
-          intra_node_map[src] = s;
-          return s;
-        }
-
-        bool InterGraph::path_summary(int state, int stack, int accept, WT_CORRECT correct, WT_CHECK op) {
-          // Build a hashmap: transition.src -> transitions
-          typedef wali::HashMap<int, std::list<int> > trans_map_t;
-          std::map<int, int> intra_node_map; // transition.src -> intra node number
-
-          trans_map_t trans_map;
-          set<int> states_visited;
-          std::list<int> worklist;
-          unsigned int i;
-          IntraGraph *ca = new IntraGraph(true, sem); // running_prestar = true because extend goes backward
-          //Transition initial_st(state, 0, 0);
-
-          ca->setSource(get_number(intra_node_map,state,ca), sem->one());
-          for(i=0;i<nodes.size();i++) {
-            trans_map_t::iterator it = trans_map.find(nodes[i].trans.src);
-            if(it == trans_map.end()) {
-              std::list<int> temp;
-              temp.push_back(i);
-              trans_map.insert(nodes[i].trans.src, temp);
-            } else {
-              it->second.push_back(i);
-            }
-            // add initial (state, stack, _) transitions
-            if(nodes[i].trans.src == state && nodes[i].trans.stack == stack) {
-              Transition t1(state,0,0);
-              Transition t2(nodes[i].trans.tgt,0,0);
-              if(newtonGr)
-                ca->addEdge(get_number(intra_node_map,state,ca), get_number(intra_node_map, nodes[i].trans.tgt,ca), 
-                    correct(newtonGr->get_weight(nodes[i].intra_nodeno).get_ptr()));
-              else
-                ca->addEdge(get_number(intra_node_map,state,ca), get_number(intra_node_map, nodes[i].trans.tgt,ca), 
-                    correct(nodes[i].gr->get_weight(nodes[i].intra_nodeno).get_ptr()));
-              worklist.push_back(nodes[i].trans.tgt);
-            }
-          }
-          states_visited.insert(state);
-          while(!worklist.empty()) {
-            int st = worklist.front();
-            worklist.pop_front();
-            if(states_visited.find(st) != states_visited.end()) 
-              continue;
-            states_visited.insert(st);
-            trans_map_t::iterator trans_it = trans_map.find(st);
-            if(trans_it == trans_map.end())
-              continue;
-            std::list<int> &trans = trans_it->second;
-            std::list<int>::iterator it;
-            for(it = trans.begin(); it != trans.end(); it++) {
-              i = *it;
-              int t1 = get_number(intra_node_map,nodes[i].trans.src,ca);
-              int t2 = get_number(intra_node_map,nodes[i].trans.tgt,ca);
-              if(newtonGr)
-                ca->addEdge(t1, t2, correct(newtonGr->get_weight(nodes[i].intra_nodeno).get_ptr()));
-              else
-                ca->addEdge(t1, t2, correct(nodes[i].gr->get_weight(nodes[i].intra_nodeno).get_ptr()));
-              if(states_visited.find(nodes[i].trans.tgt) == states_visited.end()) {
-                worklist.push_back(nodes[i].trans.tgt);
-              }
-            }
-          }
-          int final_st = get_number(intra_node_map,accept, ca);
-          ca->setOutNode(final_st, 1); // second argument is not required
-          ca->setupIntraSolution(false);
-          bool r = op(ca->get_weight(final_st).get_ptr());
-          delete ca;
-          return r;
-        }
-
-        void InterGraph::cleanUp()
+        //DEBUGGING
+#if defined(PPP_DBG)
         {
-          //I don't have any static variables of my own.
-          //The following classes are not so well behaved.
-          IntraGraph::cleanUp();
-          RegExp::cleanUp();
+          stringstream ss;
+          ss << "kleene_regexp.dot";
+          string filename = ss.str();
+          fstream foo;
+          foo.open(filename.c_str(), fstream::out);
+          const reg_exp_hash_t& roots = RegExp::getRoots();
+          foo << "digraph {\n";
+          std::set<long> seen;
+          for(reg_exp_hash_t::const_iterator iter = roots.begin();
+              iter != roots.end();
+              ++iter){
+            (iter->second)->toDot(foo, seen, true, true);
+          }
+          foo << "}\n";
+          foo.close();
         }
+        int graphnum = 0;
+        for(gr_it = gr_list.begin(); gr_it != gr_list.end(); ++gr_it)
+        {
+          ++graphnum;
+          stringstream ss;
+          ss << "kleene_graph_" << graphnum << ".dot";
+          string filename = ss.str();
+          fstream foo;
+          foo.open(filename.c_str(), fstream::out);
+          foo << "digraph{\n";
+          foo << (*gr_it)->toDot();
+          foo << "}";
+          foo.close();
+        }
+#endif
+        RegExp::stopSatProcess();
+        RegExp::executingPoststar(!running_prestar);
+#ifdef STATIC_MEMORY
+        IntraGraph::clearStaticBuffer();
+#endif
+    }
 
-    } // namespace graph
+    std::ostream &InterGraph::print_stats(std::ostream &out) {
+      InterGraphStats total_stats = stats;
+      int n = nodes.size();
+      int i;      
+      set<RegExp *> reg_equations;
+      int ned = 0;
+      for(i = 0; i < n; i++) {
+        if(intra_graph_uf->find(i) == i) {
+          std::list<int>::iterator tbeg = nodes[i].gr->getOutTransitions()->begin();
+          std::list<int>::iterator tend = nodes[i].gr->getOutTransitions()->end();
+          for(; tbeg != tend; tbeg++) {
+            int onode = nodes[i].intra_nodeno;
+            reg_equations.insert(nodes[i].gr->nodes[onode].regexp.get_ptr());
+          }
+          total_stats.ngraphs ++;
+          IntraGraphStats st = nodes[i].gr->get_stats(); 
+          total_stats.ncombine += st.ncombine;
+          total_stats.nextend += st.nextend;
+          total_stats.nstar += st.nstar;
+          total_stats.nupdatable += st.nupdatable * st.nupdatable;
+          total_stats.ncutset += st.ncutset * st.ncutset * st.ncutset;
+          total_stats.nget_weight += st.nget_weight;
+          total_stats.ndom_sequence += st.ndom_sequence;
+          total_stats.ndom_components += st.ndom_components;
+          total_stats.ndom_componentsize += (st.ndom_componentsize * st.ndom_componentsize);
+          total_stats.ndom_componentcutset += st.ndom_componentcutset;
+          ned += st.nedges;
+        }
+      }
+      int changestat = RegExp::out_node_height(reg_equations);
+      total_stats.nhyperedges = inter_edges.size();
+      total_stats.nedges = intra_edges.size();
+      total_stats.nnodes = nodes.size();
+
+      RegExpStats rst = RegExp::get_stats();
+      total_stats.ncombine += rst.ncombine;
+      total_stats.nextend += rst.nextend;
+      total_stats.nstar += rst.nstar;
+      total_stats.ngraphs = (total_stats.ngraphs == 0) ? 1 : total_stats.ngraphs;
+      rst.out_nodes = (rst.out_nodes == 0) ? 1 : rst.out_nodes;
+      out << "----------------------------------\n";
+      out << "          FWPDS Stats             \n";
+      out << "----------------------------------\n";
+      out << "InterGraph nodes : " << total_stats.nnodes << "\n";
+      out << "InterGraph edges : " << total_stats.nedges << "\n";
+      out << "InterGraph hyperedges : " << total_stats.nhyperedges << "\n";
+      out << "InterGraph iterations : " << total_stats.niter << "\n";
+      out << "InterGraph get_weight : " << total_stats.nget_weight << "\n";
+      out << "IntraGraphs : " << total_stats.ngraphs << "\n";
+      out << "IntraGraph SCC : " << total_stats.ncomponents << "\n";
+      out << "IntraGraph SCC Computed: " << max_scc_computed << "\n";
+      out << "Avg. IntraGraph nodes : " << (total_stats.nnodes / total_stats.ngraphs) << "\n";
+      out << "Avg. IntraGraph edges : " << (ned / total_stats.ngraphs) << "\n";
+      out << "Avg. IntraGraph cutset : " << (pow(total_stats.ncutset/total_stats.ngraphs,0.33)) << "\n";
+      out << "Avg. IntraGraph updatable : " << (int)(pow((double)total_stats.nupdatable/total_stats.ngraphs,0.5)) << "\n";
+      out << "Avg. IntraGraph dom-sequence length : " << (total_stats.ndom_sequence / total_stats.ngraphs) << "\n";
+      out << "Avg. IntraGraph dom-component size : " << (int)pow((double)total_stats.ndom_componentsize / (total_stats.ndom_components+1),0.5) << "\n";
+      out << "Avg. IntraGraph dom-component cuset : " << setprecision(2) << (double)total_stats.ndom_componentcutset / (total_stats.ndom_components+1) << "\n";
+      out << "Semiring Combine : " << total_stats.ncombine << "\n";
+      out << "Semiring Extend : " << total_stats.nextend << "\n";
+      out << "Semiring Star : " << total_stats.nstar << "\n";
+      out << "RegExp HashMap hits : " << rst.hashmap_hits << "\n";
+      out << "RegExp HashMap misses : " << rst.hashmap_misses << "\n";
+      out << "OutNode Height : " << setprecision(4) << (rst.height / rst.out_nodes) << "\n"; 
+      out << "OutNode Loop ND : " << setprecision(4) << (rst.lnd / rst.out_nodes) << "\n";
+      out << "Change Stat : " << changestat << "\n";
+      out << "\n";
+      return out;
+    }
+
+    // New Saturation Procedure -- minimize calls to get_weight
+    int InterGraph::saturate(multiset<tup> &worklist, unsigned scc_n) {
+      int numSteps = 0;
+      sem_elem_t weight;
+      std::list<int> *moutnodes;
+
+      while(!worklist.empty()) {
+        // Get an outnode whose weight is to be propagated
+        multiset<tup>::iterator wit = worklist.begin();
+        int onode = (*wit).second;
+        worklist.erase(wit);
+        //int onode = worklist.front();
+        //worklist.pop_front();
+
+        numSteps++;
+        weight = nodes[onode].gr->get_weight(nodes[onode].intra_nodeno);
+        if(nodes[onode].weight.get_ptr() != NULL && nodes[onode].weight->equal(weight))
+          continue;
+        nodes[onode].weight = weight;
+
+        STAT(stats.niter++);
+
+        FWPDSDBGS(
+            cout << "Popped ";
+            IntraGraph::print_trans(nodes[onode].trans,cout) << "with weight ";
+            weight->print(cout) << "\n";
+            );
+
+        // Go through all its targets and modify their weights
+        std::list<int>::iterator beg = nodes[onode].out_hyper_edges.begin();
+        std::list<int>::iterator end = nodes[onode].out_hyper_edges.end();
+        for(; beg != end; beg++) {
+          int inode = inter_edges[*beg].tgt;
+          int onode1 = inter_edges[*beg].src1;
+          sem_elem_t uw;
+          if(running_ewpds && inter_edges[*beg].mf.get_ptr()) {
+            uw = inter_edges[*beg].mf->apply_f(sem->one(), weight);
+            FWPDSDBGS(
+                cout << "Apply merge function ";
+                inter_edges[*beg].mf->print(cout) << " to ";
+                weight->print(cout) << "\n";
+                uw->print(cout << "Got ") << "\n";
+                );
+          } else {
+            uw = inter_edges[*beg].weight->extend(weight);
+          }
+          STAT(stats.nextend++);
+          nodes[inode].gr->updateEdgeWeight(nodes[onode1].intra_nodeno, nodes[inode].intra_nodeno, uw);
+        }
+        // Go through all targets again and insert them into the workist without
+        // seeing if they actually got modified or not
+        beg = nodes[onode].out_hyper_edges.begin();
+        for(; beg != end; beg++) {
+          int inode = inter_edges[*beg].tgt;
+          IntraGraph *gr = nodes[inode].gr;
+          if(gr->scc_number != scc_n) {
+            assert(gr->scc_number > scc_n);
+            continue;
+          }
+          moutnodes = gr->getOutTransitions();
+          std::list<int>::iterator mbeg = moutnodes->begin();
+          std::list<int>::iterator mend = moutnodes->end();
+          for(; mbeg != mend; mbeg++) {
+            int mnode = (*mbeg);
+            worklist.insert(tup(gr->bfs_number, mnode));
+          }
+        }
+      }
+      //DEBUGGING
+      //cout << "Kleene saturation # Steps: " << numSteps << endl;
+      return numSteps;
+
+    }
+
+    // Must be called after saturation
+    sem_elem_t InterGraph::get_call_weight(Transition t) {
+      unsigned orig_size = nodes.size();
+      unsigned n = nodeno(t);
+      assert(orig_size == nodes.size()); // Transition t must not be a new one
+
+      if(newtonGr)
+        return newtonGr->get_weight(nodes[n].intra_nodeno);
+      else
+        return nodes[n].gr->get_weight(nodes[n].intra_nodeno);
+    }
+
+    sem_elem_t InterGraph::get_weight(Transition t){
+      unsigned orig_size = nodes.size();
+      unsigned n = nodeno(t);
+      assert(orig_size == nodes.size()); // Transition t must not be a new one
+      return get_weight(n);
+    }
+    sem_elem_t InterGraph::get_weight(unsigned n) {
+      // check eHandler
+      if(eHandler.exists(n)) {
+        // This must be a return transition
+        int nc;
+        //sem_elem_tensor_t wtCallRule = dynamic_cast<SemElemTensor*>( eHandler.get_dependency(n, nc).get_ptr());
+        sem_elem_t wtCallRule = eHandler.get_dependency(n, nc);
+        sem_elem_t wt;
+        if(nc != -1) {
+          if(runningNewton){
+            sem_elem_tensor_t twt = dynamic_cast<SemElemTensor*>((nodes[nc].gr->get_weight(nodes[nc].intra_nodeno)).get_ptr());
+            wt = twt->detensorTranspose();
+
+            //DEBUGGING
+            if(0){
+              cout << "get_weight whacky case:" << endl;
+              cout << "Return trans: " 
+                << key2str(nodes[n].trans.src) << " -- "
+                << key2str(nodes[n].trans.stack) << " -> "
+                << key2str(nodes[n].trans.tgt) << endl;
+              cout << "Proxy trans: "
+                << key2str(nodes[nc].trans.src) << " -- "
+                << key2str(nodes[nc].trans.stack) << " -> "
+                << key2str(nodes[nc].trans.tgt) << endl;
+              wt->print(cout << "weight:" << endl) << endl;
+              wtCallRule->print(cout << "wtCallRule:" << endl) << endl;
+              wt->extend(wtCallRule)->print(cout << "Final:" << endl) 
+                << endl;
+            }
+          }
+          else
+            wt = nodes[nc].gr->get_weight(nodes[nc].intra_nodeno);
+        } else {
+          // ESource
+          wt = wtCallRule->one();
+        }
+        return wt->extend(wtCallRule);
+      }
+
+      if(runningNewton){
+        sem_elem_tensor_t twt = dynamic_cast<SemElemTensor*>((nodes[n].gr->get_weight(nodes[n].intra_nodeno)).get_ptr());
+        return twt->detensorTranspose();
+      } else
+        return nodes[n].gr->get_weight(nodes[n].intra_nodeno);
+    }
+
+    void InterGraph::update_all_weights() {
+      unsigned int i;
+      for(i=0;i<nodes.size();i++) {
+        sem_elem_t w;
+        if(newtonGr)
+          w = newtonGr->get_weight(nodes[i].intra_nodeno);
+        else
+          w = nodes[i].gr->get_weight(nodes[i].intra_nodeno);
+        nodes[i].weight = w;
+      }
+    }
+
+    inline int get_number(map<int,int> &intra_node_map, int src, IntraGraph *ca) {
+      std::map<int,int>::iterator it = intra_node_map.find(src);
+      if(it != intra_node_map.end()) {
+        return it->second;
+      }
+      int s = ca->makeNode();
+      intra_node_map[src] = s;
+      return s;
+    }
+
+    bool InterGraph::path_summary(int state, int stack, int accept, WT_CORRECT correct, WT_CHECK op) {
+      // Build a hashmap: transition.src -> transitions
+      typedef wali::HashMap<int, std::list<int> > trans_map_t;
+      std::map<int, int> intra_node_map; // transition.src -> intra node number
+
+      trans_map_t trans_map;
+      set<int> states_visited;
+      std::list<int> worklist;
+      unsigned int i;
+      IntraGraph *ca = new IntraGraph(true, sem); // running_prestar = true because extend goes backward
+      //Transition initial_st(state, 0, 0);
+
+      ca->setSource(get_number(intra_node_map,state,ca), sem->one());
+      for(i=0;i<nodes.size();i++) {
+        trans_map_t::iterator it = trans_map.find(nodes[i].trans.src);
+        if(it == trans_map.end()) {
+          std::list<int> temp;
+          temp.push_back(i);
+          trans_map.insert(nodes[i].trans.src, temp);
+        } else {
+          it->second.push_back(i);
+        }
+        // add initial (state, stack, _) transitions
+        if(nodes[i].trans.src == state && nodes[i].trans.stack == stack) {
+          Transition t1(state,0,0);
+          Transition t2(nodes[i].trans.tgt,0,0);
+          if(newtonGr)
+            ca->addEdge(get_number(intra_node_map,state,ca), get_number(intra_node_map, nodes[i].trans.tgt,ca), 
+                correct(newtonGr->get_weight(nodes[i].intra_nodeno).get_ptr()));
+          else
+            ca->addEdge(get_number(intra_node_map,state,ca), get_number(intra_node_map, nodes[i].trans.tgt,ca), 
+                correct(nodes[i].gr->get_weight(nodes[i].intra_nodeno).get_ptr()));
+          worklist.push_back(nodes[i].trans.tgt);
+        }
+      }
+      states_visited.insert(state);
+      while(!worklist.empty()) {
+        int st = worklist.front();
+        worklist.pop_front();
+        if(states_visited.find(st) != states_visited.end()) 
+          continue;
+        states_visited.insert(st);
+        trans_map_t::iterator trans_it = trans_map.find(st);
+        if(trans_it == trans_map.end())
+          continue;
+        std::list<int> &trans = trans_it->second;
+        std::list<int>::iterator it;
+        for(it = trans.begin(); it != trans.end(); it++) {
+          i = *it;
+          int t1 = get_number(intra_node_map,nodes[i].trans.src,ca);
+          int t2 = get_number(intra_node_map,nodes[i].trans.tgt,ca);
+          if(newtonGr)
+            ca->addEdge(t1, t2, correct(newtonGr->get_weight(nodes[i].intra_nodeno).get_ptr()));
+          else
+            ca->addEdge(t1, t2, correct(nodes[i].gr->get_weight(nodes[i].intra_nodeno).get_ptr()));
+          if(states_visited.find(nodes[i].trans.tgt) == states_visited.end()) {
+            worklist.push_back(nodes[i].trans.tgt);
+          }
+        }
+      }
+      int final_st = get_number(intra_node_map,accept, ca);
+      ca->setOutNode(final_st, 1); // second argument is not required
+      ca->setupIntraSolution(false);
+      bool r = op(ca->get_weight(final_st).get_ptr());
+      delete ca;
+      return r;
+    }
+
+    void InterGraph::cleanUp()
+    {
+      //I don't have any static variables of my own.
+      //The following classes are not so well behaved.
+      IntraGraph::cleanUp();
+      RegExp::cleanUp();
+    }
+
+} // namespace graph
 
 } // namespace wali
 

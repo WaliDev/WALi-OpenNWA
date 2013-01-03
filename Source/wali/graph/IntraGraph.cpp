@@ -1644,25 +1644,25 @@ namespace wali {
     }
 
 
-    static unsigned saturateCount = 0; //DEBUGGING
-    void IntraGraph::saturate(newton_logger_t nlog __attribute__((unused)))
+#if defined(PPP_DBG)
+    static unsigned saturateCount = 0;
+#endif
+    void IntraGraph::saturate()
     {
 
       bool repeat = true;
+#if defined(PPP_DBG)
+      unsigned round = 0;
+      ++saturateCount;
+#endif
 
-      unsigned round = 0; //DEBUGGING
-      ++saturateCount; //DEBUGGING
-
-      while(repeat){        
-        BEGIN_NEWTON_STEP(nlog);
-        ++round;    //DEBUGGING
+      while(repeat){
+#if defined(PPP_DBG)
+        ++round;
+#endif
         //First, evaluate the current regular expressions completely.
-        BEGIN_EVALUATE_ROOTS(nlog);
         RegExp::evaluateRoots();
-        END_EVALUATE_ROOTS(nlog);
-        //RegExp::print_stats(cout);
 
-        BEGIN_FIND_CHANGED_NODES(nlog);
         //Now, obtain the set of nodes who's values have changed.
         std::vector<IntraGraphNode*> changedNodes;
         // The first node is the source node.
@@ -1672,10 +1672,6 @@ namespace wali {
             nodes[i].weight = nodes[i].regexp->get_weight();
           }
         }
-        END_FIND_CHANGED_NODES(nlog);
-        //RegExp::print_stats(cout);
-
-        BEGIN_FIND_CHANGED_EDGES(nlog);
         // Given the set of nodes who's weights have changed, find the set of mutable edges that need to
         // be updated.
         std::set<unsigned long> updateEdgesSet;
@@ -1695,22 +1691,14 @@ namespace wali {
             }
           }
         }
-        END_FIND_CHANGED_EDGES(nlog);
-
         if(updateEdges.size() > 0){
           repeat  = true;
-          BEGIN_UPDATE_EDGES(nlog);
           RegExp::update(updateEdges, weights);
-          END_UPDATE_EDGES(nlog);
         }else repeat = false;
-
-      END_NEWTON_STEP(nlog);
-
-#if 0
-          //DEBUGGING 
+#if defined(PPP_DBG)
           {
             stringstream ss;
-            ss << "newton_regexp" << saturateCount << "_" << round << ".dot";
+            ss << "newton_regexp_" << saturateCount << "_" << round << ".dot";
             string filename = ss.str();
             fstream foo;
             foo.open(filename.c_str(), fstream::out);
@@ -1758,7 +1746,6 @@ namespace wali {
           }
           cout << "EDGES \n";
           for(int i = 1; i < nedges; i++){
-            //if(!edges[i].updatable) continue;
             int src = edges[i].src;
             int tgt = edges[i].tgt;
             cout << "(" << key2str(nodes[src].trans.src) << ", " <<
@@ -1782,7 +1769,6 @@ namespace wali {
 #endif
       }
     }
-
 
   } // namespace graph
 } // namespace wali
