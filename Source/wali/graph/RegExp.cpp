@@ -53,12 +53,14 @@ namespace wali {
             return (int)updatable_node_no;
         }
 
+#if defined(PUSH_EVAL)
         void RegExp::setDirty()
         {
           dirty = true;
           for(list<reg_exp_t>::iterator pit = parents.begin(); pit != parents.end(); ++pit)
             (*pit)->setDirty();
         }
+#endif
 
         // Updates all the updatable edgses given in the list together, so that all of them
         // get the same update_count.
@@ -84,7 +86,9 @@ namespace wali {
               updatable_nodes[nno]->value = se;
               updatable_nodes[nno]->last_change = update_count + 1;
               updatable_nodes[nno]->last_seen = update_count + 1;
+#if defined(PUSH_EVAL)
               updatable_nodes[nno]->setDirty();
+#endif
               updatable_nodes[nno]->eval_map.clear();
               updatable_nodes[nno]->updates.push_back(update_count);
             }
@@ -110,7 +114,9 @@ namespace wali {
             updatable_nodes[nno]->value = se;
             updatable_nodes[nno]->last_change = update_count;
             updatable_nodes[nno]->last_seen = update_count;
+#if defined(PUSH_EVAL)
             updatable_nodes[nno]->setDirty();
+#endif
             updatable_nodes[nno]->eval_map.clear();
             
           }

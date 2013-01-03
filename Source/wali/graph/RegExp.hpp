@@ -349,7 +349,9 @@ namespace wali {
 
             private:
 
+#if defined(PUSH_EVAL)
                 void setDirty();
+#endif
                 void evaluate();
                 void evaluate_iteratively();
                 sem_elem_t evaluate(sem_elem_t w);
