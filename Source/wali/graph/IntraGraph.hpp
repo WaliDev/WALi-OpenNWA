@@ -6,7 +6,6 @@
 #include "wali/graph/RegExp.hpp"
 #include "wali/graph/Functional.hpp"
 #include "wali/graph/GraphCommon.hpp"
-#include "wali/graph/NewtonLogger.hpp"
 
 #include <map>
 
