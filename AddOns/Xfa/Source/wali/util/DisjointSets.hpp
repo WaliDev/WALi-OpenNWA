@@ -8,6 +8,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include <map>
+#include <string>
+#include <sstream>
 
 namespace wali
 {
@@ -262,7 +264,42 @@ namespace wali
                               _cached_roots,
                               _id_mapping);
       }
-      
+
+
+      std::ostream &
+      output(std::ostream & os) const {
+        std::stringstream ss;
+        ss << "{";
+        for(const_iterator outer_iter = this->begin();
+            outer_iter != this->end(); ++outer_iter)
+        {
+          if (outer_iter != this->begin()) {
+            ss << ", ";
+          }
+          ss << "{";
+          for(typename InnerSet::const_iterator inner_iter = outer_iter->begin();
+              inner_iter != outer_iter->end(); ++inner_iter)
+          {
+            if (inner_iter != outer_iter->begin()) {
+              ss << ", ";
+            }
+            ss << *inner_iter;
+          }
+          ss << "}";
+        }
+        ss << "}";
+        
+        os << ss.rdbuf();
+        return os;
+      }
+
+
+      std::string
+      to_string() const {
+        std::stringstream ss;
+        this->output(ss);
+        return ss.str();
+      }
 
 
     private:

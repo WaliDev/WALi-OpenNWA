@@ -69,6 +69,12 @@ namespace wali {
             EXPECT_EQ(sets.begin(), sets.end());
         }
 
+        TEST(wali$util$DisjointSets, emptyCollectionToString)
+        {
+            StringSets sets;
+            EXPECT_EQ("{}", sets.to_string());
+        }
+
 
         TEST(wali$util$DisjointSets, addingUnconnectedElementsAddsThem)
         {
@@ -144,6 +150,10 @@ namespace wali {
             expected[2].insert("g");
 
             EXPECT_TRUE(disjoint_sets_equal_matrix(expected, sets));
+
+            // This test, of course, is too strict. Hopefully it will be okay
+            // though...
+            EXPECT_EQ("{{d, c, b, a}, {f, e}, {g}}", sets.to_string());
         }
 
 
