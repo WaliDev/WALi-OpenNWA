@@ -73,6 +73,25 @@ namespace wali
       }
 
 
+      void
+      merge_all() {
+        if (this->begin() == this->end()) {
+          return;
+        }
+        
+        while (true) {
+          const_iterator
+            first = this->begin(),
+            second = first;
+          ++second;
+          
+          if (second == this->end()) {
+            return;
+          }
+
+          merge_sets(*(first->begin()), *(second->begin()));
+        }
+      }
 
       /// The DisjointSets is a set of sets of Elements -- the user-visible
       /// view of the second "sets" is provided by this type.

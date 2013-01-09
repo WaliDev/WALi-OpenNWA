@@ -157,6 +157,39 @@ namespace wali {
         }
 
 
+        TEST(wali$util$DisjointSets, mergeAll)
+        {
+            StringSets sets;
+
+            sets.insert("a");
+            sets.insert("b");
+            sets.insert("c");
+            sets.insert("d");
+            sets.insert("e");
+            sets.insert("f");
+            sets.insert("g");
+            sets.merge_sets("a", "b");
+            sets.merge_sets("c", "d");
+            sets.merge_sets("a", "d");
+            sets.merge_sets("a", "d");
+            sets.merge_sets("e", "f");
+
+            sets.merge_all();
+
+            StringMatrix expected;
+            expected.resize(1);
+            expected[0].insert("a");
+            expected[0].insert("b");
+            expected[0].insert("c");
+            expected[0].insert("d");
+            expected[0].insert("e");
+            expected[0].insert("f");
+            expected[0].insert("g");
+
+            EXPECT_TRUE(disjoint_sets_equal_matrix(expected, sets));
+        }
+
+
         TEST(wali$util$DisjointSets, copyConstructor)
         {
             StringSets sets1;
