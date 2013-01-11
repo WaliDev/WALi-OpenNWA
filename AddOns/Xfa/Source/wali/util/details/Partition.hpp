@@ -254,6 +254,20 @@ namespace details
       return ss.str();
     }
 
+
+    void Insert(int x)
+    {
+      ensureElementExists(x);
+    }
+
+
+    bool elementExists(int v) const
+    {
+      elements_t::const_iterator it = elements_.find(v);
+      return it != elements_.end();
+    }
+
+    
   private:
     // helper functions
 
@@ -270,12 +284,6 @@ namespace details
 	rootSetMap_[v] = li;
       }
       return;
-    }
-
-    bool elementExists(int v) const
-    {
-      elements_t::const_iterator it = elements_.find(v);
-      return it != elements_.end();
     }
 
   };

@@ -91,7 +91,8 @@ test_files = Split("""
     Source/AddOns/Domains/binrel/binrel.cpp
 
     Source/AddOns/Xfa/wali/util/base64.cpp
-    Source/AddOns/Xfa/wali/util/details/Partition.cpp    
+    Source/AddOns/Xfa/wali/util/DisjointSets.cpp
+    Source/AddOns/Xfa/wali/util/details/Partition.cpp
     """)
 
 just_compile = env.SConscript('Source/header-compilation/SConscript')

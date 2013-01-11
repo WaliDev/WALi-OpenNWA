@@ -3,6 +3,7 @@
 
 #include <wali/domains/binrel/ProgramBddContext.hpp>
 #include <wali/domains/binrel/BinRel.hpp>
+#include <wali/util/DisjointSets.hpp>
 
 #include <boost/lexical_cast.hpp>
 
@@ -60,8 +61,27 @@ namespace wali {
                << "var"
                << id;
             return os.str();
-        }    
+        }
 
+        typedef wali::util::DisjointSets<std::string> StringSets;
+
+        std::vector<std::map<std::string, int> >
+        disjoint_sets_to_var_order(StringSets const & sets,
+                                   int fdd_size)
+        {
+            std::vector<std::map<std::string, int> > answer;
+            for (auto outer_iter = sets.begin(); outer_iter != sets.end(); ++outer_iter) {
+                answer.push_back(std::map<std::string, int>());
+                for (auto inner_iter = outer_iter->begin();
+                     inner_iter != outer_iter->end(); ++inner_iter)
+                {
+                    answer.back()[*inner_iter] = fdd_size;
+                }
+            }
+            return answer;
+        }
+
+        
         void
         register_vars(XfaAst const & ast,
                       wali::domains::binrel::ProgramBddContext & voc,
@@ -70,6 +90,8 @@ namespace wali {
         {
             static bool has_run = false;
             assert(!has_run);
+
+            StringSets sets;
             
             std::cerr << "Registering variables with size " << fdd_size << "\n";
             std::set<std::string> registered;
@@ -91,23 +113,36 @@ namespace wali {
                         std::cerr << "    " << var_name(act.operand_id, prefix) << "\n";
                         registered.insert(var_name(act.operand_id, prefix));
                     }
+
+                    auto cmd = *act.command;
+                    if (cmd.name == "testnectr2") {
+                        assert(cmd.arguments.size() == 1u);
+                        assert(cmd.consequent);
+                        assert(!cmd.alternative);
+                        assert(cmd.consequent->action_type == "reject");
+
+                        int rhs_id = boost::lexical_cast<int>(cmd.arguments[0]);
+                        std::string lhs_name = var_name(act.operand_id, prefix);
+                        std::string rhs_name = var_name(rhs_id, prefix);
+
+                        sets.merge_sets(lhs_name, rhs_name);
+                    }
                 }
             }
 
+            std::cerr << "Here is the set of variables: " << sets.to_string();
+
 
             if (!has_run) {
-                std::map<std::string, int> vars;
-                for (auto var = registered.begin(); var != registered.end(); ++var) {
-                    //voc.addIntVar(*var, fdd_size);
-                    vars[*var] = fdd_size;
-                }
+                std::vector<std::map<std::string, int> > vars = disjoint_sets_to_var_order(sets, fdd_size);
+                vars.push_back(std::map<std::string, int>());
 
                 //voc.addIntVar("left_current_state", ast.states.size());
-                vars["left_current_state"] = static_cast<int>(ast.states.size()) * 2;
-                std::cout << "Adding left_current_state with size " << vars["left_current_state"];
+                vars.back()["left_current_state"] = static_cast<int>(ast.states.size()) * 2;
+                std::cout << "Adding left_current_state with size " << vars.back()["left_current_state"];
                 
                 voc.setIntVars(vars);
-                details::interleave_all_fdds();
+                //details::interleave_all_fdds();
 details::print_bdd_variable_order(std::cout);
                 has_run = true;
             }
