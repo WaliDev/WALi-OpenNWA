@@ -572,7 +572,7 @@ namespace wali {
           }
         }                       
 
-#if defined(PPP_DBG)
+#if defined(PPP_DBG) && PPP_DBG >= 2
         static std::ostream& pp_weight(std::ostream& o, sem_elem_t weight)
         {
           if(weight == NULL){
@@ -646,7 +646,7 @@ namespace wali {
           //Setup weights so that everything is tensored
           sem_elem_tensor_t sem_old = dynamic_cast<SemElemTensor*>(sem.get_ptr());
           sem = sem_old->tensor(sem_old.get_ptr());
-#if defined(PPP_DBG)
+#if defined(PPP_DBG) && PPP_DBG >= 0
           long totCombines=0, totExtends=0, totStars=0;
 #endif
 
@@ -820,7 +820,7 @@ namespace wali {
               // Use Tarjan's path listing algorithm to generate regular expressions for nodes.
               graph->setupIntraSolution();
 
-#if defined(PPP_DBG) 
+#if defined(PPP_DBG) && PPP_DBG >= 1
               // We have the intra graph ready at this point. 
                 // DEBUGGING
                 std::stringstream ss;
@@ -835,7 +835,7 @@ namespace wali {
 #endif 
               // Now solve the linearized problem by saturating.
               graph->saturate();
-#if defined(PPP_DBG)
+#if defined(PPP_DBG) && PPP_DBG >= 0
               // Must be saved *before* stopSatProcess
               totCombines += RegExpDiagnostics::countTotalCombines();
               totExtends += RegExpDiagnostics::countTotalExtends();
@@ -845,7 +845,7 @@ namespace wali {
               RegExp::stopSatProcess();
             }
           }
-#if defined(PPP_DBG)
+#if defined(PPP_DBG) && PPP_DBG >= 0
           cout << "Total number of combines: " << totCombines << endl;
           cout << "Total number of Extends: " << totExtends << endl;
           cout << "Total number of Stars: " << totStars << endl;
@@ -853,7 +853,7 @@ namespace wali {
           max_scc_computed = max_scc_required;
           RegExp::executingPoststar(!running_prestar);
 
-#if defined(PPP_DBG)
+#if defined(PPP_DBG) && PPP_DBG >= 2
             std::stringstream ss;
             ss << "digraph{\n";
             for(i=0; i<n; i++){
@@ -965,18 +965,18 @@ namespace wali {
           }
           IntraGraph::addStaticBuffer(max_size);
 #endif
-#if defined(PPP_DBG)
+#if defined(PPP_DBG) && PPP_DBG >= 0
           vector<reg_exp_t> outNodeRegExps;
 #endif
           for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
             (*gr_it)->setupIntraSolution(false);
-#if defined(PPP_DBG)
+#if defined(PPP_DBG) && PPP_DBG >= 0
             for(list<int>::const_iterator cit = (*gr_it)->out_nodes_intra->begin(); cit != (*gr_it)->out_nodes_intra->end(); ++cit)
               outNodeRegExps.push_back((*gr_it)->nodes[*cit].regexp);
 #endif
           }
 
-#if defined(PPP_DBG)
+#if defined(PPP_DBG) && PPP_DBG >= 0
           long totNodes = 0, totNotComputed = 0;
           totNodes = RegExpDiagnostics::countTotalCombines() +
             RegExpDiagnostics::countTotalExtends() +
@@ -1011,13 +1011,13 @@ namespace wali {
             setup_worklist(gr_sorted, gr_it, scc_n, worklist);
             numSteps += saturate(worklist,scc_n);
           }
-#if defined(PPP_DBG)
+#if defined(PPP_DBG) && PPP_DBG >= 0
           cout << "Total number of steps: " << numSteps << endl;
 #endif
         max_scc_computed = max_scc_required;
 
         //DEBUGGING
-#if defined(PPP_DBG)
+#if defined(PPP_DBG) && PPP_DBG >= 1
         {
           stringstream ss;
           ss << "kleene_regexp.dot";

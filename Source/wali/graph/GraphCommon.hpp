@@ -4,9 +4,9 @@
 #include "wali/Common.hpp"
 #include "wali/wfa/ITrans.hpp"
 
-//#define PPP_DBG
-//#define PUSH_EVAL
-
+//#define PPP_DBG 0
+#define PUSH_EVAL
+#define REGEXP_CACHING
 namespace wali {
 
     namespace graph {

@@ -1644,20 +1644,20 @@ namespace wali {
     }
 
 
-#if defined(PPP_DBG)
+#if defined(PPP_DBG) && PPP_DBG >= 0
     static unsigned saturateCount = 0;
 #endif
     void IntraGraph::saturate()
     {
 
       bool repeat = true;
-#if defined(PPP_DBG)
+#if defined(PPP_DBG) && PPP_DBG >= 0
       unsigned round = 0;
       ++saturateCount;
 #endif
 
       while(repeat){
-#if defined(PPP_DBG)
+#if defined(PPP_DBG) && PPP_DBG >= 0
         ++round;
 #endif
         //First, evaluate the current regular expressions completely.
@@ -1695,7 +1695,7 @@ namespace wali {
           repeat  = true;
           RegExp::update(updateEdges, weights);
         }else repeat = false;
-#if defined(PPP_DBG)
+#if defined(PPP_DBG) && PPP_DBG >= 1
           {
             stringstream ss;
             ss << "newton_regexp_" << saturateCount << "_" << round << ".dot";
@@ -1713,7 +1713,8 @@ namespace wali {
             foo << "}\n";
             foo.close();
           }
-
+#endif
+#if defined(PPP_DBG) && PPP_DBG >= 2
           cout << "Weights after saturateCount" << saturateCount << 
             ", round " << round << "\n";
           cout << "NODES \n";
