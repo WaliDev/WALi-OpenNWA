@@ -77,11 +77,11 @@
  * NOTE: ***This currently only works correctly with boolean variables.***
  * The tensor choice is determined by the following macro:
  **/
-//#define TENSOR_MIN_AFFINITY
+#define TENSOR_MIN_AFFINITY
 //#define TENSOR_MAX_AFFINITY
 //#define BASE_MAX_AFFINITY_TENSOR_MIXED
 /*** NOTE: This currently only works correctly with boolean variables.***/
-#define TENSOR_MATCHED_PAREN
+//#define TENSOR_MATCHED_PAREN
 
 
 //#define DETENSOR_TOGETHER
