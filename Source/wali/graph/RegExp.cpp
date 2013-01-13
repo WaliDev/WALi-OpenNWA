@@ -1205,10 +1205,6 @@ namespace wali {
             it = eval_map.find(w);
             if(it != eval_map.end()){
               return it->second;
-            }else{
-              ret = w->extend(value);
-              eval_map[w] = ret;
-              return ret;
             }
           }
 #else
