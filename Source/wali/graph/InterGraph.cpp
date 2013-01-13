@@ -707,6 +707,7 @@ namespace wali {
                   sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());
                   wt = one->tensor(wt.get_ptr());
                   graph->addEdge(nodes[iter->src].intra_nodeno, nodes[iter->tgt].intra_nodeno, wt);
+#if 0
                   //Also add a mutable edge (s--f-->tgt) from the source vertex s with weight 0 (tensored) and
                   //functional f = (1^T, DetTrans(wt(src)) x w) (one untensored)
                   sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>(sem->zero().get_ptr());
@@ -721,8 +722,8 @@ namespace wali {
                   int e = graph->setSource(nodes[iter->tgt].intra_nodeno, zerot, f);
                   // Back references in the node to edges that depend on it.
                   graph->addDependentEdge(e, nodes[iter->src].intra_nodeno);                  
+#endif
                 }
-
                 int trash; 
                 // Inter Edges:
                 for(vector<HyperEdge>::iterator iter = gr->interEdges.begin(); iter != gr->interEdges.end(); ++iter){
@@ -747,7 +748,7 @@ namespace wali {
                     sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());                                     
                     graph->addEdge(nodes[iter->src1].intra_nodeno, nodes[iter->tgt].intra_nodeno,
                         one->tensor(wt.get_ptr()));
-
+#if 0
                     //Also add a mutable edge (s--f-->tgt) from the source vertex s with weight 0 (tensored) and
                     //functional f = (1^T, DetTrans(wt(src1)) x (Constant(wtCallRule) x DetTrans(wt(src2)))) (one untensored)
                     sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>(sem->zero().get_ptr());
@@ -761,7 +762,7 @@ namespace wali {
                     int e = graph->setSource(nodes[iter->tgt].intra_nodeno, zerot, f);                    
                     // Back references in the node to edges that depend on it.
                     graph->addDependentEdge(e, nodes[iter->src1].intra_nodeno);
-
+#endif
                   }else{
                     // Case: The entry node does not belong to a graph that has a lower scc.
                     // Note: It must belong to the same scc then
