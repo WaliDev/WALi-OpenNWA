@@ -508,100 +508,106 @@ namespace goals {
     con->printStats(cout);
 #endif //if defined(BINREL_STATS)
   }
-  
+
+  void endToEndCompareFwpdsRun()
+  {
+    cout << "///////////////// FWPDS ///////////////////" << endl;
+    FWPDS * fpds = new FWPDS(*originalPds);
+    wali::set_verify_fwpds(false);
+    fpds->useNewton(false);
+
+    WFA fa;
+    wali::Key acc = wali::getKeySpace()->getKey("accept");
+    fa.setInitialState(getPdsState());
+    fa.addFinalState(acc);
+    fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, fpds->get_theZero()->one());
+
+    WFA outfa;
+    cout << "[Newton Compare] Computing FWPDS poststar..." << endl;
+    wali::util::Timer * t3 = new wali::util::Timer("FWPDS poststar",cout);
+    t3->measureAndReport = false;
+#if defined(BINREL_STATS)
+    con->resetStats(); 
+#endif
+    fpds->poststarIGR(fa,outfa); 
+
+    cout << "[Newton Compare] Computing path summary..." << endl;
+    outfa.path_summary(fpds->get_theZero()->one());
+
+    cout << "[Newton Compare] Checking error label reachability..." << endl;
+    TransSet ts = outfa.match(getPdsState(), getErrStk(pg));
+    sem_elem_t wt = outfa.getSomeWeight()->zero();
+    for(TransSet::const_iterator it = ts.begin(); it != ts.end(); ++it){
+      Key toKey = (*it)->to();
+      State * toState = outfa.getState(toKey);
+      wt = wt->combine(toState->weight());
+    }
+    if(wt->equal(wt->zero()))
+      cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
+    else
+      cout << "[Newton Compare] FWPDS ==> error reachable" << endl;
+
+    t3->print(std::cout << "[Newton Compare] Time taken by FWPDS poststar: ") << endl;
+    delete t3;
+
+#if defined(BINREL_STATS)
+    con->printStats(cout);
+#endif //if defined(BINREL_STATS)
+  }
+
+  void endToEndCompareNewtonRun()
+  {
+    cout << "///////////////// NWPDS ///////////////////" << endl;
+    FWPDS * npds = new FWPDS(*originalPds);
+    wali::set_verify_fwpds(false);
+    npds->useNewton(true);
+
+    WFA fa;
+    wali::Key acc = wali::getKeySpace()->getKey("accept");
+    fa.setInitialState(getPdsState());
+    fa.addFinalState(acc);
+    fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, npds->get_theZero()->one());
+
+    WFA outfa;
+    cout << "[Newton Compare] Computing NWPDS poststar..." << endl;
+    wali::util::Timer * t3 = new wali::util::Timer("FWPDS poststar",cout);
+    t3->measureAndReport = false;
+#if defined(BINREL_STATS)
+    con->resetStats(); 
+#endif
+    npds->poststarIGR(fa,outfa); 
+
+    cout << "[Newton Compare] Computing path summary..." << endl;
+    outfa.path_summary(npds->get_theZero()->one());
+
+    cout << "[Newton Compare] Checking error label reachability..." << endl;
+    TransSet ts = outfa.match(getPdsState(), getErrStk(pg));
+    sem_elem_t wt = outfa.getSomeWeight()->zero();
+    for(TransSet::const_iterator it = ts.begin(); it != ts.end(); ++it){
+      Key toKey = (*it)->to();
+      State * toState = outfa.getState(toKey);
+      wt = wt->combine(toState->weight());
+    }
+    if(wt->equal(wt->zero()))
+      cout << "[Newton Compare] NWPDS ==> error not reachable" << endl;
+    else
+      cout << "[Newton Compare] NWPDS ==> error reachable" << endl;
+
+    t3->print(std::cout << "[Newton Compare] Time taken by NWPDS poststar: ") << endl;
+    delete t3;
+
+#if defined(BINREL_STATS)
+    con->printStats(cout);
+#endif //if defined(BINREL_STATS)
+  }
+
   void endToEndCompare()
   {
     assert(originalPds && con && mainProc && errLbl);
     cout << "#################################################" << endl;
     cout << "[Newton Compare] Goal II: end-to-end time comparison: FWPDS vs NWPDS" << endl;
-    {
-      cout << "///////////////// FWPDS ///////////////////" << endl;
-      FWPDS * fpds = new FWPDS(*originalPds);
-      wali::set_verify_fwpds(false);
-      fpds->useNewton(false);
-
-      WFA fa;
-      wali::Key acc = wali::getKeySpace()->getKey("accept");
-      fa.setInitialState(getPdsState());
-      fa.addFinalState(acc);
-      fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, fpds->get_theZero()->one());
-
-      WFA outfa;
-      cout << "[Newton Compare] Computing FWPDS poststar..." << endl;
-      wali::util::Timer * t3 = new wali::util::Timer("FWPDS poststar",cout);
-      t3->measureAndReport = false;
-#if defined(BINREL_STATS)
-      con->resetStats(); 
-#endif
-      fpds->poststarIGR(fa,outfa); 
-
-      cout << "[Newton Compare] Computing path summary..." << endl;
-      outfa.path_summary(fpds->get_theZero()->one());
-
-      cout << "[Newton Compare] Checking error label reachability..." << endl;
-      TransSet ts = outfa.match(getPdsState(), getErrStk(pg));
-      sem_elem_t wt = outfa.getSomeWeight()->zero();
-      for(TransSet::const_iterator it = ts.begin(); it != ts.end(); ++it){
-        Key toKey = (*it)->to();
-        State * toState = outfa.getState(toKey);
-        wt = wt->combine(toState->weight());
-      }
-      if(wt->equal(wt->zero()))
-        cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
-      else
-        cout << "[Newton Compare] FWPDS ==> error reachable" << endl;
-
-      t3->print(std::cout << "[Newton Compare] Time taken by FWPDS poststar: ") << endl;
-      delete t3;
-
-#if defined(BINREL_STATS)
-      con->printStats(cout);
-#endif //if defined(BINREL_STATS)
-    }
-    {
-      cout << "///////////////// NWPDS ///////////////////" << endl;
-      FWPDS * npds = new FWPDS(*originalPds);
-      wali::set_verify_fwpds(false);
-      npds->useNewton(true);
-
-      WFA fa;
-      wali::Key acc = wali::getKeySpace()->getKey("accept");
-      fa.setInitialState(getPdsState());
-      fa.addFinalState(acc);
-      fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, npds->get_theZero()->one());
-
-      WFA outfa;
-      cout << "[Newton Compare] Computing NWPDS poststar..." << endl;
-      wali::util::Timer * t3 = new wali::util::Timer("FWPDS poststar",cout);
-      t3->measureAndReport = false;
-#if defined(BINREL_STATS)
-      con->resetStats(); 
-#endif
-      npds->poststarIGR(fa,outfa); 
-
-      cout << "[Newton Compare] Computing path summary..." << endl;
-      outfa.path_summary(npds->get_theZero()->one());
-
-      cout << "[Newton Compare] Checking error label reachability..." << endl;
-      TransSet ts = outfa.match(getPdsState(), getErrStk(pg));
-      sem_elem_t wt = outfa.getSomeWeight()->zero();
-      for(TransSet::const_iterator it = ts.begin(); it != ts.end(); ++it){
-        Key toKey = (*it)->to();
-        State * toState = outfa.getState(toKey);
-        wt = wt->combine(toState->weight());
-      }
-      if(wt->equal(wt->zero()))
-        cout << "[Newton Compare] NWPDS ==> error not reachable" << endl;
-      else
-        cout << "[Newton Compare] NWPDS ==> error reachable" << endl;
-
-      t3->print(std::cout << "[Newton Compare] Time taken by NWPDS poststar: ") << endl;
-      delete t3;
-
-#if defined(BINREL_STATS)
-      con->printStats(cout);
-#endif //if defined(BINREL_STATS)
-    }
+    endToEndCompareFwpdsRun();
+    endToEndCompareNewtonRun();
   }
 
 }
