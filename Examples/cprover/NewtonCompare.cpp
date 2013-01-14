@@ -509,6 +509,56 @@ namespace goals {
 #endif //if defined(BINREL_STATS)
   }
 
+  void runFwpds()
+  { 
+    assert(originalPds && con && mainProc && errLbl);
+    cout << "#################################################" << endl;
+    cout << "[Newton Compare] Goal IV: end-to-end FWPDS run" << endl;
+    FWPDS * npds = new FWPDS(*originalPds);
+    wali::set_verify_fwpds(false);
+    npds->useNewton(false);
+
+    WFA fa;
+    wali::Key acc = wali::getKeySpace()->getKey("accept");
+    fa.setInitialState(getPdsState());
+    fa.addFinalState(acc);
+    fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, npds->get_theZero()->one());
+
+    WFA outfa;
+    cout << "[Newton Compare] Computing FWPDS poststar..." << endl;
+    wali::util::Timer * t3 = new wali::util::Timer("NWPDS poststar",cout);
+    t3->measureAndReport = false;
+#if defined(BINREL_STATS)
+    con->resetStats(); 
+#endif
+    npds->poststarIGR(fa,outfa); 
+
+    cout << "[Newton Compare] Computing path summary..." << endl;
+    outfa.path_summary(npds->get_theZero()->one());
+
+    cout << "[Newton Compare] Checking error label reachability..." << endl;
+    TransSet ts = outfa.match(getPdsState(), getErrStk(pg));
+    sem_elem_t wt = outfa.getSomeWeight()->zero();
+    for(TransSet::const_iterator it = ts.begin(); it != ts.end(); ++it){
+        Key toKey = (*it)->to();
+        State * toState = outfa.getState(toKey);
+        wt = wt->combine(toState->weight());
+    }
+    if(wt->equal(wt->zero()))
+      cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
+    else{
+      cout << "[Newton Compare] FWPDS ==> error reachable" << endl;
+    }
+
+    t3->print(std::cout << "[Newton Compare] Time taken by FWPDS poststar: ") << endl;
+    delete t3;
+
+#if defined(BINREL_STATS)
+    con->printStats(cout);
+#endif //if defined(BINREL_STATS)
+  }
+
+
   void endToEndCompareFwpdsRun()
   {
     cout << "///////////////// FWPDS ///////////////////" << endl;
@@ -622,7 +672,8 @@ int main(int argc, char ** argv)
       << "./NewtonFwpdsCompare input_file goal(1/2) [<0/1> dump] [entry function (default:main)] [error label (default:error)]" << endl
       << "Goal: 1 --> Compare WPDS & NWPDS. Compute poststar and compare the output automata." << endl
       << "Goal: 2 --> Compare FWPDS & NWPDS. Compute poststar and check if any assertion can fail." << endl
-      << "Goal: 3 --> Simply run NWPDS end-to-end." << endl; 
+      << "Goal: 3 --> Simply run NWPDS end-to-end." << endl
+      << "Goal: 4 --> Simply run FWPDS end-to-end. You may need it some time!" << endl; 
     return -1;
   }
 
@@ -697,6 +748,9 @@ int main(int argc, char ** argv)
       break;
     case 3:
       runNewton();
+      break;
+    case 4:
+      runFwpds();
       break;
     default:
       assert(0 && "I don't understand that goal!!!");
