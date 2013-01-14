@@ -87,6 +87,9 @@
 //#define DETENSOR_TOGETHER
 #define DETENSOR_BIT_BY_BIT
 
+#if defined(NWA_DETENSOR) && not defined(TENSOR_MATCHED_PAREN)
+#error "Nwa based detensor only works with TENSOR_MATCHED_PAREN variable order"
+#endif
 
 /** 
   To switch on statistics collection in BinRel
