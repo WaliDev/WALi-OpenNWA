@@ -1059,7 +1059,7 @@ namespace{
     }
   }
 
-#if defined(TENSOR_MATCHED_PAREN)
+#if defined(TENSOR_MATCHED_PAREN) && defined(NWA_DETENSOR)
   TEST(BddContext, bitLevelInfo)
   {
     program_bdd_context_t con;
