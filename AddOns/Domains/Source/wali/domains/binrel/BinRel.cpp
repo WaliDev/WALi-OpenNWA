@@ -395,6 +395,10 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
         assert(false);
       }
       bddinfo_t varInfo = new BddInfo;
+#if defined(NWA_DETENSOR)
+      // Only boolean variables are supported under NWA_DETENSOR
+      assert(cmi->second == 2);
+#endif
       varInfo->maxVal = cmi->second;
       (*this)[cmi->first] = varInfo;
     }
@@ -865,6 +869,10 @@ void BddContext::addIntVar(std::string name, unsigned size)
     assert(false);
   }
   bddinfo_t varInfo = new BddInfo;
+#if defined(NWA_DETENSOR)
+  // Only boolean variables are supported under NWA_DETENSOR
+  assert(size == 2);
+#endif
   varInfo->maxVal = size;
   (*this)[name] = varInfo;
 
