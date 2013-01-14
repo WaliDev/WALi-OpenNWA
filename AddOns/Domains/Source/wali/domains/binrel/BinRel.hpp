@@ -171,8 +171,10 @@ namespace wali
       class BddContext : public std::map<const std::string,bddinfo_t>
       {
         friend class BinRel;
+#ifdef NWA_DETENSOR
         public:
           typedef boost::unordered_set<int> VocLevelSet;
+#endif
         public:
            /** 
            * A BddContext manages the vocabularies and stores some useful bdds
@@ -201,6 +203,7 @@ namespace wali
           virtual void setIntVars(const std::map<std::string, int>& vars);
           virtual void setIntVars(const std::vector<std::map<std::string, int> >& vars);
 
+#ifdef NWA_DETENSOR
           /**
            * These functions are used by an NWA based implementation of detensor.
            * They provide information about the bit level information per variable, and
@@ -216,6 +219,7 @@ namespace wali
           bool isRootInVocTensor2Lhs(bdd b); //B
           bool isRootInVocTensor2Rhs(bdd b); //B'
           bool isRootRelevant(bdd b);
+#endif
 
         protected:
           /**
@@ -273,13 +277,13 @@ namespace wali
           binrel_t cachedBaseZero;
           binrel_t cachedTensorOne;
           binrel_t cachedTensorZero;
-  
+#ifdef NWA_DETENSOR
           // Hash sets to store what bdd levels belong to what part of the voc.
           VocLevelSet tensor1LhsLevels;
           VocLevelSet tensor1RhsLevels;
           VocLevelSet tensor2LhsLevels;
           VocLevelSet tensor2RhsLevels;
-          
+#endif
 #ifdef BINREL_STATS
         private:
           //Statistics for this contex
