@@ -694,8 +694,7 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
     }
   }
 #else
-  Do not comment this. The code should not compile if this part is active.
-  assert(0);
+#error "Unknown bdd level arrangement macro"
 #endif
 
   // Also update the reverse vocabulary for printing.
