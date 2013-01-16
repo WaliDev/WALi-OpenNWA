@@ -27,6 +27,7 @@
 
 #include <boost/shared_ptr.hpp> // It'd be nice to include the standard version but there are too many ways to get it.
 #include <boost/unordered_set.hpp>
+#include <boost/unordered_map.hpp>
 #include <boost/function.hpp>
 
 #include "wali/wfa/WeightMaker.hpp"
@@ -34,6 +35,7 @@
 #include "wali/ref_ptr.hpp"
 #include "wali/SemElemTensor.hpp"
 #include "buddy/fdd.h"
+#include "wali/Key.hpp"
 
 
 /**
@@ -77,15 +79,18 @@
  * NOTE: ***This currently only works correctly with boolean variables.***
  * The tensor choice is determined by the following macro:
  **/
-#define TENSOR_MIN_AFFINITY
+//#define TENSOR_MIN_AFFINITY
 //#define TENSOR_MAX_AFFINITY
 //#define BASE_MAX_AFFINITY_TENSOR_MIXED
 /*** NOTE: This currently only works correctly with boolean variables.***/
-//#define TENSOR_MATCHED_PAREN
+#define TENSOR_MATCHED_PAREN
 
 
 //#define DETENSOR_TOGETHER
 #define DETENSOR_BIT_BY_BIT
+
+#define NWA_DETENSOR
+
 
 #if defined(NWA_DETENSOR) && not defined(TENSOR_MATCHED_PAREN)
 #error "Nwa based detensor only works with TENSOR_MATCHED_PAREN variable order"
@@ -100,6 +105,16 @@
 /// This checks two implementations of the 'subsumes' operation (subset) off
 /// each other (one faster, one simpler)
 #define CHECK_BDD_SUBSUMES_WITH_SLOWER_VERSION 1
+
+#ifdef NWA_DETENSOR
+namespace opennwa
+{
+  class Nwa;
+  typedef wali::Key State;
+}
+
+std::size_t hash_value(bdd const& b);
+#endif
 
 namespace wali 
 {
@@ -176,7 +191,7 @@ namespace wali
         friend class BinRel;
 #ifdef NWA_DETENSOR
         public:
-          typedef boost::unordered_set<int> VocLevelSet;
+          typedef std::vector<int> VocLevelArray;
 #endif
         public:
            /** 
@@ -209,19 +224,12 @@ namespace wali
 #ifdef NWA_DETENSOR
           /**
            * These functions are used by an NWA based implementation of detensor.
-           * They provide information about the bit level information per variable, and
-           * provide ways to test what part of the vocabulary a certain buddy
-           * bdd level belongs to.
+           * They provide information about the bit level information per variable.
            **/
           // Setup the sets of levels in the different vocabularies for fast lookup
-          void setupLevelSets();
-          
-          unsigned numVarsPerVoc();
-          bool isRootInVocTensor1Lhs(bdd b); //A
-          bool isRootInVocTensor1Rhs(bdd b); //A'
-          bool isRootInVocTensor2Lhs(bdd b); //B
-          bool isRootInVocTensor2Rhs(bdd b); //B'
-          bool isRootRelevant(bdd b);
+          void setupLevelArray();
+          VocLevelArray const& getLevelArray(); 
+          unsigned numVars();
 #endif
 
         protected:
@@ -281,11 +289,7 @@ namespace wali
           binrel_t cachedTensorOne;
           binrel_t cachedTensorZero;
 #ifdef NWA_DETENSOR
-          // Hash sets to store what bdd levels belong to what part of the voc.
-          VocLevelSet tensor1LhsLevels;
-          VocLevelSet tensor1RhsLevels;
-          VocLevelSet tensor2LhsLevels;
-          VocLevelSet tensor2RhsLevels;
+          VocLevelArray vocLevels;
 #endif
 #ifdef BINREL_STATS
         private:
@@ -430,6 +434,15 @@ namespace wali
           BddContext const * con;
           bdd rel;
           bool isTensored;
+#ifdef NWA_DETENSOR
+        private:
+          typedef std::pair< unsigned, bdd > StateTranslationKey;
+          typedef boost::unordered_map< StateTranslationKey, opennwa::State > StateTranslationTable; 
+          // Converts rel to an nwa, and solves a path problem to obtain the detensorTranspose bdd
+          bdd detensorViaNwa();
+          void populateNwa(opennwa::Nwa& nwa);
+          void tabulateStates(opennwa::Nwa& nwa, StateTranslationTable& tTable, unsigned v, bdd r);
+#endif
       };
 
 

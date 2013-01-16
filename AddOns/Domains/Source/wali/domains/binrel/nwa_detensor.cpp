@@ -1,92 +1,143 @@
 // ::wali::domains::binrel
 #include "BinRel.hpp"
-// ::opennwa
-#include "opennwa/Nwa.hpp"
+// ::std
+#include <algorithm>
 
-#ifndef NWA_DETENSOR
-#error "Please define macro NWA_DETENSOR"
-#endif
+#include "buddy/kernel.h"
+#include "buddy/bdd.h"
+#include "nwa_detensor.hpp"
+
+#ifdef NWA_DETENSOR
+
+using namespace std;
+using namespace wali;
+using namespace wali::domains::binrel;
+using namespace wali::domains::binrel::details;
+using namespace opennwa;
+
 // //////////////////////////////////////////
 // These functions provide a sneak-peek into the buddy bit-level
 // variable ordering.
-
 // Setup maps to enable quick lookup of information
-void BddContext::setupLevelSets()
+void BddContext::setupLevelArray()
 {
-  tensor1LhsLevels.clear();
-  tensor1RhsLevels.clear();
-  tensor2LhsLevels.clear();
-  tensor2RhsLevels.clear();
-
+  vocLevels.clear();
   for(BddContext::const_iterator cit = this->begin(); cit != this->end(); ++cit){
     int const * vars;
     bddinfo_t const varInfo = cit->second;
-    //How many bits are used for me?
-    if(varInfo->maxVal <= 0)
+    // XXX:HACK BddContext is not supposed to know that __regA etc exist.
+    // Try: skip this check and see if everything works out OK. Try the check below instead.
+    if(cit->first.compare("__regSize") == 0 || cit->first.compare("__regA") == 0 || cit->first.compare("__regB") == 0)
       continue;
-    double fracnumbits = log2(varInfo->maxVal);
-    int numbits = ceil(fracnumbits);
+    //Try this instead:
+    //if(varInfo->maxVal > 2) continue;
+
+    // Only supports boolean variables.
+    assert(varInfo->maxVal == 2);
 
     vars = fdd_vars(varInfo->tensor1Lhs);
     assert(vars != NULL);
-    for(int i=0; i < numbits; ++i)
-      tensor1LhsLevels.insert(bdd_var2level(vars[i]));
-
-    vars = fdd_vars(varInfo->tensor1Rhs);
-    assert(vars != NULL);
-    for(int i=0; i < numbits; ++i)
-      tensor1RhsLevels.insert(bdd_var2level(vars[i]));
-
+    vocLevels.push_back(bdd_var2level(vars[0]));
     vars = fdd_vars(varInfo->tensor2Lhs);
     assert(vars != NULL);
-    for(int i=0; i < numbits; ++i)
-      tensor2LhsLevels.insert(bdd_var2level(vars[i]));
-
+    vocLevels.push_back(bdd_var2level(vars[0]));
+    vars = fdd_vars(varInfo->tensor1Rhs);
+    assert(vars != NULL);
+    vocLevels.push_back(bdd_var2level(vars[0]));
     vars = fdd_vars(varInfo->tensor2Rhs);
     assert(vars != NULL);
-    for(int i=0; i < numbits; ++i)
-      tensor2RhsLevels.insert(bdd_var2level(vars[i]));
+    vocLevels.push_back(bdd_var2level(vars[0]));
   }
-  assert(tensor1LhsLevels.size() == tensor1RhsLevels.size());
-  assert(tensor1RhsLevels.size() == tensor2LhsLevels.size());
-  assert(tensor2LhsLevels.size() == tensor2RhsLevels.size());
+  sort(vocLevels.begin(), vocLevels.end());
 }
 
-unsigned BddContext::numVarsPerVoc()
+BddContext::VocLevelArray const& BddContext::getLevelArray()
 {
-  return tensor1LhsLevels.size();
+  return vocLevels;
 }
 
-bool BddContext::isRootInVocTensor1Lhs(bdd b)
+unsigned BddContext::numVars()
 {
-  if(b == bddfalse || b == bddtrue) return false;
-  return tensor1LhsLevels.find(bdd_var2level(bdd_var(b))) != tensor1LhsLevels.end();
+  return this->size();
 }
 
-bool BddContext::isRootInVocTensor2Lhs(bdd b)
+// ///////////////////////////////////////////
+// Modified dot output from a buddy bdd.
+// The output nodes are labeled with the actual levels rather than with
+// internal variable nubmers (as in the buddy provided dot output 
+extern "C"
 {
-  if(b == bddfalse || b == bddtrue) return false;
-  return tensor2LhsLevels.find(bdd_var2level(bdd_var(b))) != tensor2LhsLevels.end();
+  static void bdd_fprintdot_levels_rec(FILE* ofile, BDD r)
+  {
+    if (ISCONST(r) || MARKED(r))
+      return;
+
+    fprintf(ofile, "%d [label=\"", r);
+    fprintf(ofile, "%d",LEVEL(r));
+    fprintf(ofile, "\"];\n");
+
+    fprintf(ofile, "%d -> %d [style=dotted];\n", r, LOW(r));
+    fprintf(ofile, "%d -> %d [style=filled];\n", r, HIGH(r));
+
+    SETMARK(r);
+
+    bdd_fprintdot_levels_rec(ofile, LOW(r));
+    bdd_fprintdot_levels_rec(ofile, HIGH(r));
+  }
 }
 
-bool BddContext::isRootInVocTensor1Rhs(bdd b)
+void bdd_printdot_levels(bdd r)
 {
-  if(b == bddfalse || b == bddtrue) return false;
-  return tensor1RhsLevels.find(bdd_var2level(bdd_var(b))) != tensor1RhsLevels.end();
+  bdd_fprintdot_levels(stdout, r);
 }
 
-bool BddContext::isRootInVocTensor2Rhs(bdd b)
+int bdd_fnprintdot_levels(char *fname, bdd r)
 {
-  if(b == bddfalse || b == bddtrue) return false;
-  return tensor2RhsLevels.find(bdd_var2level(bdd_var(b))) != tensor2RhsLevels.end();
+  FILE *ofile = fopen(fname, "w");
+  if (ofile == NULL)
+    return bdd_error(BDD_FILE);
+  bdd_fprintdot_levels(ofile, r);
+  fclose(ofile);
+  return 0;
 }
 
-bool BddContext::isRootRelevant(bdd b)
+void bdd_fprintdot_levels(FILE* ofile, bdd r)
 {
-  if(b == bddfalse || b == bddtrue) return false;
-  return isRootInVocTensor1Lhs(b) || isRootInVocTensor1Rhs(b) 
-    || isRootInVocTensor2Lhs(b) || isRootInVocTensor2Rhs(b);
+  fprintf(ofile, "digraph G {\n");
+  fprintf(ofile, "0 [shape=box, label=\"0\", style=filled, shape=box, height=0.3, width=0.3];\n");
+  fprintf(ofile, "1 [shape=box, label=\"1\", style=filled, shape=box, height=0.3, width=0.3];\n");
+
+  bdd_fprintdot_levels_rec(ofile, r.root);
+
+  fprintf(ofile, "}\n");
+
+  bdd_unmark(r.root);
 }
 
 
+// //////////////////////////////////////////
+// The algorithm!!!
 
+size_t hash_value(bdd const& b)
+{
+  return b.root;
+}
+bdd BinRel::detensorViaNwa()
+{
+  Nwa nwa;
+  populateNwa(nwa);
+  return bddfalse;
+}
+
+void BinRel::populateNwa(Nwa& nwa)
+{
+  BinRel::StateTranslationTable tTable;
+  tabulateStates(nwa, tTable, con->vocLevels[0], rel);
+}
+
+void BinRel::tabulateStates(Nwa& nwa, BinRel::StateTranslationTable& tTable, unsigned v, bdd r)
+{
+  tTable.find(StateTranslationKey(v,r));
+  nwa.clear();
+}
+#endif //#ifdef NWA_DETENSOR
