@@ -710,6 +710,10 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
     idx2Name[varInfo->tensor2Rhs] = ci->first + "_t2'";
     idx2Name[varInfo->tensor2Extra] = ci->first + "_t2''";
   } 
+
+#ifdef NWA_DETENSOR
+  setupLevelArray();
+#endif
 }
 
 void BddContext::setIntVars(const std::vector<std::map<std::string, int> >& vars)
@@ -985,6 +989,10 @@ void BddContext::populateCache()
   cachedBaseZero = new BinRel(this, bddfalse, false);
   cachedTensorOne = new BinRel(this, tensorId, true);
   cachedTensorZero = new BinRel(this, bddfalse, true);
+
+#ifdef NWA_DETENSOR
+  setupLevelArray();
+#endif
 }
 
 // ////////////////////////////
