@@ -1328,7 +1328,11 @@ wali::sem_elem_tensor_t BinRel::detensor()
 
 wali::sem_elem_tensor_t BinRel::detensorTranspose()
 {
+#ifdef NWA_DETENSOR
+  return new BinRel(con, detensorViaNwa());
+#else
   return Eq13Project();
+#endif
 }
 
 #ifdef BINREL_STATS
