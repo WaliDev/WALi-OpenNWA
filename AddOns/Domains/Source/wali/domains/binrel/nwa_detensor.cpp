@@ -2,6 +2,9 @@
 #include "BinRel.hpp"
 // ::std
 #include <algorithm>
+#include <fstream>
+#include <sstream>
+
 
 #include "buddy/kernel.h"
 #include "buddy/bdd.h"
@@ -56,7 +59,7 @@ BddContext::VocLevelArray const& BddContext::getLevelArray()
   return vocLevels;
 }
 
-unsigned BddContext::numVars()
+unsigned BddContext::numVars() const
 {
   return this->size();
 }
@@ -73,7 +76,7 @@ extern "C"
       return;
 
     fprintf(ofile, "%d [label=\"", r);
-    fprintf(ofile, "%d",LEVEL(r));
+    fprintf(ofile, "%d:%d",r,LEVEL(r));
     fprintf(ofile, "\"];\n");
 
     fprintf(ofile, "%d -> %d [style=dotted];\n", r, LOW(r));
@@ -117,27 +120,199 @@ void bdd_fprintdot_levels(FILE* ofile, bdd r)
 
 // //////////////////////////////////////////
 // The algorithm!!!
+static inline bool post_upperplies(unsigned const v)
+{
+  return v % 2 == 0;
+}
+static inline bool post_lowerplies(unsigned const v)
+{
+  return !post_upperplies(v);
+}
 
 size_t hash_value(bdd const& b)
 {
   return b.root;
 }
+
 bdd BinRel::detensorViaNwa()
 {
-  Nwa nwa;
+  Nwa nwa; 
   populateNwa(nwa);
   return bddfalse;
 }
 
 void BinRel::populateNwa(Nwa& nwa)
 {
-  BinRel::StateTranslationTable tTable;
-  tabulateStates(nwa, tTable, con->vocLevels[0], rel);
+  nwa.clear();
+  acceptState = getKey("__accept_state_detensor_nwa");
+  nwa.addFinalState(acceptState);
+  // I can safely assume that the hash for all bdd's will be non-negative.  It
+  // is risky to use the hash of bddfalse for reject state because bddfalse
+  // might be NULL
+  rejectState = getKey(-1);
+  low = getKey("__trans_for_bdd_low_edge_detensor_nwa");
+  high = getKey("__trans_for_bdd_high_edge_detensor_nwa");
+  tTable.clear();
+  for(LevelToStatesTable::iterator it = lTable.begin(); it != lTable.end(); ++it)
+    it->clear();
+  lTable.clear();
+  for(unsigned i=0; i<con->numVars(); ++i)
+    lTable.push_back(vector< State >());
+  tabulateStates(nwa, 0, rel);
+  cout << "#Nwa State created: " << tTable.size() << endl;
+  visited.clear();
+  generateTransitions(nwa, 0, rel); 
+  //dbg
+  filebuf fb;
+  fb.open("detensor_nwa.dot", ios::out);
+  ostream o(&fb);
+  nwa.print_dot(o, string("Whatever"), false);
+  fb.close();
 }
 
-void BinRel::tabulateStates(Nwa& nwa, BinRel::StateTranslationTable& tTable, unsigned v, bdd r)
+void BinRel::tabulateStates(Nwa& nwa, unsigned v, bdd n)
 {
-  tTable.find(StateTranslationKey(v,r));
-  nwa.clear();
+  // We don't want any state for the false terminal of bdd
+  if(n == bddfalse)
+    return;
+  StateTranslationKey k = StateTranslationKey(v,n);
+  // Already visited, skip. Bdd is a dag, only walk each node once.
+  if(tTable.find(k) != tTable.end())
+    return;
+  // Last level, must be bddtrue, since bddfalse has already been taken care of
+  if(v == 4 * con->numVars()){
+    assert(n == bddtrue);
+    StateSet fStates = nwa.getFinalStates();
+    assert(fStates.size() == 1);
+    tTable[k] = *(fStates.begin());
+    return;
+  }
+  // Fast but cryptic
+  //boost::hash<StateTranslationKey> keyHash;
+  //State q = getKey(keyHash(k));
+  // Slow but informative
+  stringstream ss;
+  ss << hash_value(n) << "::" << v;
+  State q = getKey(ss.str());
+
+  if(!nwa.addState(q))
+    assert("Hash collision? or flawed logic?");
+  tTable[k] = q;
+  if(v < 2 * con->numVars() && !post_upperplies(v))
+    lTable[(v-1)/2].push_back(q);
+  if(v == 0)
+    nwa.addInitialState(q);
+  if(con->vocLevels[v] < bdd_var2level(bdd_var(n))){
+    // bdd skipped a level, create extra nwa states
+    tabulateStates(nwa, v+1, n);
+  }else{
+    // tabulate States for children
+    tabulateStates(nwa, v+1, bdd_low(n));
+    tabulateStates(nwa, v+1, bdd_high(n));
+  }
+}
+
+State BinRel::generateTransitions(Nwa& nwa, unsigned v, bdd n)
+{
+  if(n == bddfalse)
+    return rejectState;
+  if(v == 2 * con->numVars())
+    //process the lower plies of bdd
+    return generateTransitionsLowerPlies(nwa, v, n);
+  // Process the upper plies
+  StateTranslationKey k = StateTranslationKey(v,n);
+  State q = tTable[k];
+  if(visited.find(q) != visited.end())
+    // q already processed
+    return q;
+  visited.insert(q);
+
+  if(con->vocLevels[v] < bdd_var2level(bdd_var(n))){
+    // visit virtual child(v+1, n)
+    State qprime = generateTransitions(nwa, v+1, n);
+    if(qprime != rejectState){
+      if(post_upperplies(v)){
+        //Create internal transitions
+        nwa.addInternalTrans(q, low, qprime);
+        nwa.addInternalTrans(q, high, qprime);
+      }else{
+        //Create call transitions
+        nwa.addCallTrans(q, low, qprime);
+        nwa.addCallTrans(q, high, qprime);
+      }
+    }
+  }else{
+    // visit actual children
+    State qlow = generateTransitions(nwa, v+1, bdd_low(n));
+    State qhigh = generateTransitions(nwa, v+1, bdd_high(n));
+    if(qlow != rejectState){
+      if(post_upperplies(v))
+        nwa.addInternalTrans(q, low, qlow);
+      else
+        nwa.addCallTrans(q, low, qlow);
+    }
+    if(qhigh != rejectState){
+      if(post_upperplies(v))
+        nwa.addInternalTrans(q, high, qhigh);
+      else
+        nwa.addCallTrans(q, high, qhigh);
+    }
+  }
+  return q;
+}
+
+State BinRel::generateTransitionsLowerPlies(Nwa& nwa, unsigned v, bdd n)
+{
+  if(n == bddfalse)
+    return rejectState;
+  if(v == 4 * con->numVars())
+    return acceptState;
+  StateTranslationKey k = StateTranslationKey(v,n);
+  State q = tTable[k];
+  if(visited.find(q) != visited.end())
+    //q already processed
+    return q;
+  visited.insert(q);
+  if(con->vocLevels[v] < bdd_var2level(bdd_var(n))){
+    // visit virtual child n+1
+    State qprime = generateTransitionsLowerPlies(nwa, v+1, n);
+    if(qprime != rejectState){
+      if(post_lowerplies(v)){
+        nwa.addInternalTrans(q, low, qprime);
+        nwa.addInternalTrans(q, high, qprime);
+      }else{
+        vector< State > const& callStates = lTable[(4 * con->numVars() - v - 1)/2];
+        for(vector< State >::const_iterator cit = callStates.begin(); cit != callStates.end(); ++cit){
+          nwa.addReturnTrans(q, *cit, low, qprime);
+          nwa.addReturnTrans(q, *cit, high, qprime);
+        }
+      }
+    }
+  }else{
+    // visit actual children
+    State qlow = generateTransitionsLowerPlies(nwa, v+1, bdd_low(n));
+    State qhigh = generateTransitionsLowerPlies(nwa, v+1, bdd_high(n));
+    if(qlow != rejectState){
+      if(post_lowerplies(v)){
+        nwa.addInternalTrans(q, low, qlow);
+      }else{
+        vector< State > const& callStates = lTable[(4 * con->numVars() - v - 1)/2];
+        for(vector< State >::const_iterator cit = callStates.begin(); cit != callStates.end(); ++cit){
+          nwa.addReturnTrans(q, *cit, low, qlow);
+        }
+      }
+    }
+    if(qhigh != rejectState){
+      if(post_lowerplies(v)){
+        nwa.addInternalTrans(q, high, qhigh);
+      }else{
+        vector< State > const& callStates = lTable[(4 * con->numVars() - v - 1)/2];
+        for(vector< State >::const_iterator cit = callStates.begin(); cit != callStates.end(); ++cit){
+          nwa.addReturnTrans(q, *cit, high, qhigh);
+        }
+      }
+    }
+  }
+  return q;
 }
 #endif //#ifdef NWA_DETENSOR

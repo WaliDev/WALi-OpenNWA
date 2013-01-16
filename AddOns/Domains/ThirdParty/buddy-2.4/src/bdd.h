@@ -546,9 +546,9 @@ private:
    friend bdd  bvec_equ(const bvec &left, const bvec &right);
    friend bdd  bvec_neq(const bvec &left, const bvec &right);
 
-   /** Added for wali::domains::binrel::nwa_detensor **/
-   friend void bdd_fprintdot_levels(FILE* obdd, bdd r);
-   friend size_t hash_value(bdd const& b);
+   /** Added for nwa_detensor **/
+   friend void bdd_fprintdot_levels(FILE *ofile, bdd r);
+   friend size_t hash_value(bdd const& b); 
 };
 
 

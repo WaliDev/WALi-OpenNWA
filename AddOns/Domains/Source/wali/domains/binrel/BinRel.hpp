@@ -111,6 +111,7 @@ namespace opennwa
 {
   class Nwa;
   typedef wali::Key State;
+  typedef wali::Key Symbol;
 }
 
 std::size_t hash_value(bdd const& b);
@@ -229,7 +230,7 @@ namespace wali
           // Setup the sets of levels in the different vocabularies for fast lookup
           void setupLevelArray();
           VocLevelArray const& getLevelArray(); 
-          unsigned numVars();
+          unsigned numVars() const;
 #endif
 
         protected:
@@ -438,10 +439,22 @@ namespace wali
         private:
           typedef std::pair< unsigned, bdd > StateTranslationKey;
           typedef boost::unordered_map< StateTranslationKey, opennwa::State > StateTranslationTable; 
+          typedef std::vector< std::vector< opennwa::State > > LevelToStatesTable;
+          typedef boost::unordered_set< opennwa::State > StateHashSet;
+          // Maps etc needed during detensor operation
+          // We don't store the Nwa here because we don't have the complete type of opennwa::Nwa yet
+          StateTranslationTable tTable;
+          LevelToStatesTable lTable;
+          StateHashSet visited;
+          opennwa::State rejectState;
+          opennwa::State acceptState;
+          opennwa::Symbol low, high;
           // Converts rel to an nwa, and solves a path problem to obtain the detensorTranspose bdd
           bdd detensorViaNwa();
           void populateNwa(opennwa::Nwa& nwa);
-          void tabulateStates(opennwa::Nwa& nwa, StateTranslationTable& tTable, unsigned v, bdd r);
+          void tabulateStates(opennwa::Nwa& nwa, unsigned v, bdd r);
+          opennwa::State generateTransitions(opennwa::Nwa& nwa, unsigned v, bdd n);
+          opennwa::State generateTransitionsLowerPlies(opennwa::Nwa& nwa, unsigned v, bdd n);
 #endif
       };
 
