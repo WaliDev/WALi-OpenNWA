@@ -48,7 +48,27 @@ namespace
     bdd z = e->getBdd();
 
     bdd_fnprintdot_levels("ttt.dot", z);
+
+    binrel_t y = new BinRel(brm.get_ptr(), z);
+    binrel_t x = dynamic_cast<BinRel*>(y->detensorTranspose().get_ptr());
   }
+
+  TEST(Nwa_detensor, paperExample){
+    program_bdd_context_t brm = new ProgramBddContext();
+    map<string, int> vars;
+    vars["x1"] = 2;
+    vars["x2"] = 2;
+    brm->setIntVars(vars);
+
+    bdd b = brm->Assign("x1", brm->Not(brm->From("x1")));
+    binrel_t M = new BinRel(brm.get_ptr(), b);
+    binrel_t eye = dynamic_cast<BinRel*>(M->one().get_ptr());
+    binrel_t s = dynamic_cast<BinRel*>(((M->tensor(M.get_ptr()))->combine(eye->tensor(eye.get_ptr()).get_ptr())).get_ptr());
+    bdd z = s->getBdd();
+    bdd_fnprintdot_levels("mtmpiti.dot", z);
+    binrel_t x = dynamic_cast<BinRel*>(s->detensorTranspose().get_ptr());
+  }
+
 
 }
 
