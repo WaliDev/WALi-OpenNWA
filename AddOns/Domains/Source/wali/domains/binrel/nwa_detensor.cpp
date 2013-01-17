@@ -15,6 +15,8 @@
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/Trans.hpp"
 
+// ::wali::xfa
+//#include "wali/xfa/Xfa.hpp"
 #ifdef NWA_DETENSOR
 
 using namespace std;
@@ -214,6 +216,21 @@ bdd BinRel::detensorViaNwa()
   wali::wfa::Trans ansTrans;  
   outfa.find(initialStateWfa, acceptStateNwa, acceptStateWfa, ansTrans);
   detensor_weight_t ans = static_cast<DetensorWeight*>(ansTrans.weight().get_ptr());
+
+#if 0
+  //dbg
+  filebuf fb;
+  fb.open("detensor_nwa.dot", ios::out);
+  ostream o(&fb);
+  nwa.print_dot(o, string("Whatever"), false);
+  fb.close();
+  fb.open("outfa.dot", ios::out);
+  ostream oo(&fb);
+  wali::xfa::HoverWeightPrinter hwp;
+  outfa.print_dot(oo, false, hwp);
+  fb.close();
+#endif
+
   return ans->getBdd();
 }
 
@@ -239,12 +256,6 @@ void BinRel::populateNwa(Nwa& nwa, DetensorWeightGen& wts)
   cout << "#Nwa State created: " << tTable.size() << endl;
   visited.clear();
   generateTransitions(nwa, wts, 0, rel); 
-  //dbg
-  filebuf fb;
-  fb.open("detensor_nwa.dot", ios::out);
-  ostream o(&fb);
-  nwa.print_dot(o, string("Whatever"), false);
-  fb.close();
 }
 
 void BinRel::tabulateStates(Nwa& nwa, unsigned v, bdd n)
