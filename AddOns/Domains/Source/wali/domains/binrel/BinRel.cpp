@@ -883,7 +883,7 @@ void BddContext::addIntVar(std::string name, unsigned size)
 
   //lock mutex
   int base;
-  int domains[3] = {varInfo->maxVal, varInfo->maxVal, varInfo->maxVal};
+  int domains[3] = {(int)varInfo->maxVal, (int)varInfo->maxVal, (int)varInfo->maxVal};
 
   //Create fdds for base
   base = fdd_extdomain(domains,3);

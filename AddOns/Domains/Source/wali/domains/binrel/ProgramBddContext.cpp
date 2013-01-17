@@ -290,7 +290,8 @@ void ProgramBddContext::createExtraVars()
   maxSize = size;
 
   // Now create some buddy levels for scratchpad
-  int domains[7] = {size + 1, size, size, size, size, size, size};
+  int isize = (int) size;
+  int domains[7] = {isize + 1, isize, isize, isize, isize, isize, isize};
   int base = fdd_extdomain(domains,7);
 
   // Now create the corresponding bddinfo
@@ -341,7 +342,7 @@ void ProgramBddContext::addIntVar(std::string name, unsigned siz)
   if(siz > maxSize){
     if(maxSize == 0){
       //This is when we *create* the extra levels needed
-      int domains[1] = {siz+1};
+      int domains[1] = {(int)siz+1};
       int retSizeInfo = fdd_extdomain(domains,1);
       if(retSizeInfo < 0)
         LOG(FATAL) << "[ERROR-BuDDy initialization] \"" << bdd_errstring(retSizeInfo) << "\"" << endl
@@ -355,7 +356,7 @@ void ProgramBddContext::addIntVar(std::string name, unsigned siz)
       //We will create indices such that we get a default variable ordering where
       //baseLhs, baseRhs, baseExtra are mixed.
       {
-        int domains2[3] = {siz, siz, siz};
+        int domains2[3] = {(int)siz, (int)siz, (int)siz};
         regAInfo = new BddInfo();
         //Create fdds for base
         int base = fdd_extdomain(domains2,3);
@@ -374,7 +375,7 @@ void ProgramBddContext::addIntVar(std::string name, unsigned siz)
         idx2Name[regAInfo->baseExtra] = "__regA''";
       }
       {
-        int domains2[3] = {siz, siz, siz};
+        int domains2[3] = {(int)siz, (int)siz, (int)siz};
         regBInfo = new BddInfo();
         //Create fdds for base
         int base = fdd_extdomain(domains2,3);
