@@ -9,8 +9,13 @@
 // ::opennwa
 #include "opennwa/Nwa.hpp"
 #include "opennwa/WeightGen.hpp"
+// ::wali
+#include "wali/SemElem.hpp"
+#include "wali/ref_ptr.hpp"
 // ::wali::domains::binrel
 #include "BinRel.hpp"
+
+#include "buddy/bdd.h"
 
 class bdd;
 
@@ -23,6 +28,56 @@ namespace wali
   {
     namespace binrel
     {
+
+      class DetensorWeight;
+      typedef wali::ref_ptr<DetensorWeight> detensor_weight_t;
+      class DetensorWeight : public wali::SemElem
+      {
+        public:
+          DetensorWeight(bdd b) : rel(b) {}
+          virtual ~DetensorWeight() {}
+          virtual sem_elem_t one() const {
+            return detensor_weight_one.get_ptr();
+          }
+          virtual sem_elem_t zero() const {
+            return detensor_weight_zero.get_ptr();
+          }
+          virtual sem_elem_t extend(SemElem * se) {
+            DetensorWeight * dse = static_cast<DetensorWeight*>(se);
+            if(rel == bddtrue)
+              return dse;
+            if(dse->rel == bddtrue)
+              return this;
+            bdd res = bdd_and(rel, dse->rel);
+            if(res == bddfalse)
+              return detensor_weight_zero;
+            return new DetensorWeight(res);
+          }
+          virtual sem_elem_t combine(SemElem * se) {
+            DetensorWeight * dse = static_cast<DetensorWeight*>(se);
+            if(rel == bddfalse)
+              return dse;
+            if(dse->rel == bddfalse)
+              return this;
+            bdd res = bdd_or(rel, dse->rel);
+            if(res == bddtrue)
+              return detensor_weight_one;
+            return new DetensorWeight(res);
+          }
+          virtual bool equal(SemElem * se) const{
+            DetensorWeight * dse = static_cast<DetensorWeight*>(se);
+            return rel == dse->rel;
+          }
+          virtual std::ostream& print(std::ostream& o) const {
+            return (o << fddset << rel << std::endl);
+          }
+        private:
+          static detensor_weight_t const detensor_weight_one;
+          static detensor_weight_t const detensor_weight_zero;
+
+          bdd rel;
+      };
+
       class DetensorWeightGen : public opennwa::WeightGen
       {
         //The kinds of edges that need to be considered.

@@ -133,6 +133,10 @@ void bdd_fprintdot_levels(FILE* ofile, bdd r)
 }
 
 // /////////////////////////////////////////
+// Class DetensorWeight
+detensor_weight_t const DetensorWeight::detensor_weight_one(new DetensorWeight(bddtrue));
+detensor_weight_t const DetensorWeight::detensor_weight_zero(new DetensorWeight(bddfalse));
+// /////////////////////////////////////////
 // Class DetensorWeightGen
 
 sem_elem_t DetensorWeightGen::getOne() const
