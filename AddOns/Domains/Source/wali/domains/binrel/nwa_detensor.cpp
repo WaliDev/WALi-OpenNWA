@@ -315,9 +315,9 @@ State BinRel::generateTransitions(Nwa& nwa, DetensorWeightGen& wts, unsigned v, 
       }else{
         //Create call transitions
         nwa.addCallTrans(q, low, qprime);
-        wts.setWeight(WeightGen::CALL_TO_ENTRY, q, low, qprime, new BinRel(con, bdd_nithvar(bdd_level2var(con->baseLhsVocLevels[v]))));
+        wts.setWeight(WeightGen::CALL_TO_ENTRY, q, low, qprime, new BinRel(con, bdd_nithvar(bdd_level2var(con->baseLhsVocLevels[(v-1)/2]))));
         nwa.addCallTrans(q, high, qprime);
-        wts.setWeight(WeightGen::CALL_TO_ENTRY, q, high, qprime, new BinRel(con, bdd_ithvar(bdd_level2var(con->baseLhsVocLevels[v]))));
+        wts.setWeight(WeightGen::CALL_TO_ENTRY, q, high, qprime, new BinRel(con, bdd_ithvar(bdd_level2var(con->baseLhsVocLevels[(v-1)/2]))));
       }
     }
   }else{
@@ -330,7 +330,7 @@ State BinRel::generateTransitions(Nwa& nwa, DetensorWeightGen& wts, unsigned v, 
         wts.setWeight(WeightGen::INTRA, q, low, qlow, new BinRel(con, bddtrue)); 
       }else{
         nwa.addCallTrans(q, low, qlow);
-        wts.setWeight(WeightGen::CALL_TO_ENTRY, q, low, qlow, new BinRel(con, bdd_nithvar(bdd_level2var(con->baseLhsVocLevels[v]))));
+        wts.setWeight(WeightGen::CALL_TO_ENTRY, q, low, qlow, new BinRel(con, bdd_nithvar(bdd_level2var(con->baseLhsVocLevels[(v-1)/2]))));
       }
     }
     if(qhigh != rejectState){
@@ -339,7 +339,7 @@ State BinRel::generateTransitions(Nwa& nwa, DetensorWeightGen& wts, unsigned v, 
         wts.setWeight(WeightGen::INTRA, q, high, qhigh, new BinRel(con, bddtrue));
       }else{
         nwa.addCallTrans(q, high, qhigh);
-        wts.setWeight(WeightGen::CALL_TO_ENTRY, q, high, qhigh, new BinRel(con, bdd_ithvar(bdd_level2var(con->baseLhsVocLevels[v]))));
+        wts.setWeight(WeightGen::CALL_TO_ENTRY, q, high, qhigh, new BinRel(con, bdd_ithvar(bdd_level2var(con->baseLhsVocLevels[(v-1)/2]))));
       }
     }
   }
@@ -364,9 +364,9 @@ State BinRel::generateTransitionsLowerPlies(Nwa& nwa, DetensorWeightGen& wts, un
     if(qprime != rejectState){
       if(post_lowerplies(v)){
         nwa.addInternalTrans(q, low, qprime);
-        wts.setWeight(WeightGen::INTRA, q, low, qprime, new BinRel(con, bdd_nithvar(bdd_level2var(con->baseRhsVocLevels[v]))));
+        wts.setWeight(WeightGen::INTRA, q, low, qprime, new BinRel(con, bdd_nithvar(bdd_level2var(con->baseRhsVocLevels[(4*con->numVars() - v - 1)/2]))));
         nwa.addInternalTrans(q, high, qprime);
-        wts.setWeight(WeightGen::INTRA, q, high, qprime, new BinRel(con, bdd_ithvar(bdd_level2var(con->baseRhsVocLevels[v]))));
+        wts.setWeight(WeightGen::INTRA, q, high, qprime, new BinRel(con, bdd_ithvar(bdd_level2var(con->baseRhsVocLevels[(4*con->numVars() - v - 1)/2]))));
       }else{
         vector< State > const& callStates = lTable[(4 * con->numVars() - v - 1)/2];
         for(vector< State >::const_iterator cit = callStates.begin(); cit != callStates.end(); ++cit){
@@ -384,7 +384,7 @@ State BinRel::generateTransitionsLowerPlies(Nwa& nwa, DetensorWeightGen& wts, un
     if(qlow != rejectState){
       if(post_lowerplies(v)){
         nwa.addInternalTrans(q, low, qlow);
-        wts.setWeight(WeightGen::INTRA, q, low, qlow, new BinRel(con, bdd_nithvar(bdd_level2var(con->baseRhsVocLevels[v]))));
+        wts.setWeight(WeightGen::INTRA, q, low, qlow, new BinRel(con, bdd_nithvar(bdd_level2var(con->baseRhsVocLevels[(4*con->numVars() - v - 1)/2]))));
       }else{
         vector< State > const& callStates = lTable[(4 * con->numVars() - v - 1)/2];
         for(vector< State >::const_iterator cit = callStates.begin(); cit != callStates.end(); ++cit){
@@ -396,7 +396,7 @@ State BinRel::generateTransitionsLowerPlies(Nwa& nwa, DetensorWeightGen& wts, un
     if(qhigh != rejectState){
       if(post_lowerplies(v)){
         nwa.addInternalTrans(q, high, qhigh);
-        wts.setWeight(WeightGen::INTRA, q, high, qhigh, new BinRel(con, bdd_ithvar(bdd_level2var(con->baseRhsVocLevels[v]))));
+        wts.setWeight(WeightGen::INTRA, q, high, qhigh, new BinRel(con, bdd_ithvar(bdd_level2var(con->baseRhsVocLevels[(4*con->numVars() - v - 1)/2]))));
       }else{
         vector< State > const& callStates = lTable[(4 * con->numVars() - v - 1)/2];
         for(vector< State >::const_iterator cit = callStates.begin(); cit != callStates.end(); ++cit){
