@@ -117,6 +117,22 @@ void bdd_fprintdot_levels(FILE* ofile, bdd r)
   bdd_unmark(r.root);
 }
 
+// /////////////////////////////////////////
+// Class DetensorWeightGen
+
+sem_elem_t DetensorWeightGen::getOne() const
+{
+  return NULL;
+}
+
+sem_elem_t DetensorWeightGen::getWeight(Key, ClientInfoRefPtr, Key, Kind, Key, ClientInfoRefPtr) const
+{
+  return NULL;
+}
+
+void DetensorWeightGen::setWeight(Kind,Key,Key,Key,binrel_t)
+{
+}
 
 // //////////////////////////////////////////
 // The algorithm!!!

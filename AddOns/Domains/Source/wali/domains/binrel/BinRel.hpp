@@ -437,6 +437,7 @@ namespace wali
           bool isTensored;
 #ifdef NWA_DETENSOR
         private:
+          //TODO: Cleanup in the destructor for all these
           typedef std::pair< unsigned, bdd > StateTranslationKey;
           typedef boost::unordered_map< StateTranslationKey, opennwa::State > StateTranslationTable; 
           typedef std::vector< std::vector< opennwa::State > > LevelToStatesTable;
