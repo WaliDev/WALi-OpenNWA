@@ -290,7 +290,9 @@ namespace wali
           binrel_t cachedTensorOne;
           binrel_t cachedTensorZero;
 #ifdef NWA_DETENSOR
-          VocLevelArray vocLevels;
+          VocLevelArray tensorVocLevels;
+          VocLevelArray baseLhsVocLevels;
+          VocLevelArray baseRhsVocLevels;
 #endif
 #ifdef BINREL_STATS
         private:
