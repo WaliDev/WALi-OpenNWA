@@ -67,6 +67,8 @@ namespace
     bdd z = s->getBdd();
     bdd_fnprintdot_levels("mtmpiti.dot", z);
     binrel_t x = dynamic_cast<BinRel*>(s->detensorTranspose().get_ptr());
+    z = x->getBdd();
+    bdd_fnprintdot_levels("detensored.dot", z);
   }
 
 
