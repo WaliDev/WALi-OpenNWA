@@ -459,7 +459,10 @@ namespace wali
           LevelToStatesTable lTable;
           StateHashSet visited;
           opennwa::State rejectState;
-          opennwa::State acceptState;
+          opennwa::State acceptStateNwa;
+          opennwa::State initialStateNwa;
+          opennwa::State initialStateWfa;
+          opennwa::State acceptStateWfa;
           opennwa::Symbol low, high;
           // Converts rel to an nwa, and solves a path problem to obtain the detensorTranspose bdd
           bdd detensorViaNwa();

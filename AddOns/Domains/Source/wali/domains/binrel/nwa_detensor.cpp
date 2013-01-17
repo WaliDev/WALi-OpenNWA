@@ -9,10 +9,16 @@
 #include "buddy/kernel.h"
 #include "buddy/bdd.h"
 #include "nwa_detensor.hpp"
+// ::opennwa::nwa_pds
+#include "opennwa/nwa_pds/conversions.hpp"
+// ::wali::wfa
+#include "wali/wfa/WFA.hpp"
+#include "wali/wfa/Trans.hpp"
 
 #ifdef NWA_DETENSOR
 
 using namespace std;
+using namespace std::tr1;
 using namespace wali;
 using namespace wali::domains::binrel;
 using namespace wali::domains::binrel::details;
@@ -162,20 +168,33 @@ size_t hash_value(bdd const& b)
   return b.root;
 }
 
+
 bdd BinRel::detensorViaNwa()
 {
   Nwa nwa;
-  DetensorWeightGen wts; 
+  DetensorWeightGen wts(new BinRel(con, bddtrue)); 
   populateNwa(nwa, wts);
-  return bddfalse;
+
+  // Create the query automaron
+  wali::wfa::WFA infa;
+  acceptStateWfa = getKey("__accept_state_detensor_wfa");
+  infa.addFinalState(acceptStateWfa);
+  initialStateWfa = opennwa::nwa_pds::getProgramControlLocation();
+  infa.setInitialState(initialStateWfa);
+  infa.addTrans(initialStateWfa, initialStateNwa, acceptStateWfa, wts.getOne());
+  wali::wfa::WFA outfa = nwa.poststar(infa, wts);
+  wali::wfa::Trans ansTrans;  
+  outfa.find(initialStateWfa, acceptStateNwa, acceptStateWfa, ansTrans);
+  binrel_t ans = dynamic_cast<BinRel*>(ansTrans.weight().get_ptr());
+  return ans->rel;
 }
 
 void BinRel::populateNwa(Nwa& nwa, DetensorWeightGen& wts)
 {
   nwa.clear();
   //wts.clear();
-  acceptState = getKey("__accept_state_detensor_nwa");
-  nwa.addFinalState(acceptState);
+  acceptStateNwa = getKey("__accept_state_detensor_nwa");
+  nwa.addFinalState(acceptStateNwa);
   // I can safely assume that the hash for all bdd's will be non-negative.  It
   // is risky to use the hash of bddfalse for reject state because bddfalse
   // might be NULL
@@ -230,8 +249,10 @@ void BinRel::tabulateStates(Nwa& nwa, unsigned v, bdd n)
   tTable[k] = q;
   if(v < 2 * con->numVars() && !post_upperplies(v))
     lTable[(v-1)/2].push_back(q);
-  if(v == 0)
+  if(v == 0){
     nwa.addInitialState(q);
+    initialStateNwa = q;
+  }
   if(con->tensorVocLevels[v] < bdd_var2level(bdd_var(n))){
     // bdd skipped a level, create extra nwa states
     tabulateStates(nwa, v+1, n);
@@ -306,7 +327,7 @@ State BinRel::generateTransitionsLowerPlies(Nwa& nwa, DetensorWeightGen& wts, un
   if(n == bddfalse)
     return rejectState;
   if(v == 4 * con->numVars())
-    return acceptState;
+    return acceptStateNwa;
   StateTranslationKey k = StateTranslationKey(v,n);
   State q = tTable[k];
   if(visited.find(q) != visited.end())
