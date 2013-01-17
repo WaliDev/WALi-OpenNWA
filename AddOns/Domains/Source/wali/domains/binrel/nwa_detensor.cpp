@@ -134,6 +134,9 @@ void DetensorWeightGen::setWeight(Kind,Key,Key,Key,binrel_t)
 {
 }
 
+void DetensorWeightGen::clear()
+{
+}
 // //////////////////////////////////////////
 // The algorithm!!!
 static inline bool post_upperplies(unsigned const v)
@@ -152,14 +155,16 @@ size_t hash_value(bdd const& b)
 
 bdd BinRel::detensorViaNwa()
 {
-  Nwa nwa; 
-  populateNwa(nwa);
+  Nwa nwa;
+  DetensorWeightGen wts; 
+  populateNwa(nwa, wts);
   return bddfalse;
 }
 
-void BinRel::populateNwa(Nwa& nwa)
+void BinRel::populateNwa(Nwa& nwa, DetensorWeightGen& wts)
 {
   nwa.clear();
+  //wts.clear();
   acceptState = getKey("__accept_state_detensor_nwa");
   nwa.addFinalState(acceptState);
   // I can safely assume that the hash for all bdd's will be non-negative.  It
@@ -177,7 +182,7 @@ void BinRel::populateNwa(Nwa& nwa)
   tabulateStates(nwa, 0, rel);
   cout << "#Nwa State created: " << tTable.size() << endl;
   visited.clear();
-  generateTransitions(nwa, 0, rel); 
+  generateTransitions(nwa, wts, 0, rel); 
   //dbg
   filebuf fb;
   fb.open("detensor_nwa.dot", ios::out);
@@ -228,13 +233,13 @@ void BinRel::tabulateStates(Nwa& nwa, unsigned v, bdd n)
   }
 }
 
-State BinRel::generateTransitions(Nwa& nwa, unsigned v, bdd n)
+State BinRel::generateTransitions(Nwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n)
 {
   if(n == bddfalse)
     return rejectState;
   if(v == 2 * con->numVars())
     //process the lower plies of bdd
-    return generateTransitionsLowerPlies(nwa, v, n);
+    return generateTransitionsLowerPlies(nwa, wts, v, n);
   // Process the upper plies
   StateTranslationKey k = StateTranslationKey(v,n);
   State q = tTable[k];
@@ -245,7 +250,7 @@ State BinRel::generateTransitions(Nwa& nwa, unsigned v, bdd n)
 
   if(con->vocLevels[v] < bdd_var2level(bdd_var(n))){
     // visit virtual child(v+1, n)
-    State qprime = generateTransitions(nwa, v+1, n);
+    State qprime = generateTransitions(nwa, wts, v+1, n);
     if(qprime != rejectState){
       if(post_upperplies(v)){
         //Create internal transitions
@@ -259,8 +264,8 @@ State BinRel::generateTransitions(Nwa& nwa, unsigned v, bdd n)
     }
   }else{
     // visit actual children
-    State qlow = generateTransitions(nwa, v+1, bdd_low(n));
-    State qhigh = generateTransitions(nwa, v+1, bdd_high(n));
+    State qlow = generateTransitions(nwa, wts, v+1, bdd_low(n));
+    State qhigh = generateTransitions(nwa, wts, v+1, bdd_high(n));
     if(qlow != rejectState){
       if(post_upperplies(v))
         nwa.addInternalTrans(q, low, qlow);
@@ -277,7 +282,7 @@ State BinRel::generateTransitions(Nwa& nwa, unsigned v, bdd n)
   return q;
 }
 
-State BinRel::generateTransitionsLowerPlies(Nwa& nwa, unsigned v, bdd n)
+State BinRel::generateTransitionsLowerPlies(Nwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n)
 {
   if(n == bddfalse)
     return rejectState;
@@ -291,7 +296,7 @@ State BinRel::generateTransitionsLowerPlies(Nwa& nwa, unsigned v, bdd n)
   visited.insert(q);
   if(con->vocLevels[v] < bdd_var2level(bdd_var(n))){
     // visit virtual child n+1
-    State qprime = generateTransitionsLowerPlies(nwa, v+1, n);
+    State qprime = generateTransitionsLowerPlies(nwa, wts, v+1, n);
     if(qprime != rejectState){
       if(post_lowerplies(v)){
         nwa.addInternalTrans(q, low, qprime);
@@ -306,8 +311,8 @@ State BinRel::generateTransitionsLowerPlies(Nwa& nwa, unsigned v, bdd n)
     }
   }else{
     // visit actual children
-    State qlow = generateTransitionsLowerPlies(nwa, v+1, bdd_low(n));
-    State qhigh = generateTransitionsLowerPlies(nwa, v+1, bdd_high(n));
+    State qlow = generateTransitionsLowerPlies(nwa, wts, v+1, bdd_low(n));
+    State qhigh = generateTransitionsLowerPlies(nwa, wts, v+1, bdd_high(n));
     if(qlow != rejectState){
       if(post_lowerplies(v)){
         nwa.addInternalTrans(q, low, qlow);

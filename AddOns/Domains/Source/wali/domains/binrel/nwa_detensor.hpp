@@ -34,6 +34,7 @@ namespace wali
           virtual sem_elem_t getWeight( Key src, ClientInfoRefPtr srcInfo, Key sym, Kind kind, Key tgt, ClientInfoRefPtr tgtInfo ) const;
 
           void setWeight(Kind kind, Key src, Key sym, Key tgt, binrel_t b); 
+          void clear();
       };
     }
   }

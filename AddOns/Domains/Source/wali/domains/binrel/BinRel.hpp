@@ -340,7 +340,15 @@ namespace wali
                                 std::vector<std::string> const & keep_these,
                                 bdd b);
       
-      
+#ifdef NWA_DETENSOR
+      /*
+       * Subclass of opennwa::WeightGen used to attache weights to the nwa used
+       * for detensor. The class is declared in nwa_detensor.hpp. We can
+       * declare it here because we do not want to include Nwa.hpp above. 
+       **/
+      class DetensorWeightGen;
+#endif
+
       class BinRel : public wali::SemElemTensor 
       {
         public:
@@ -444,6 +452,7 @@ namespace wali
           typedef boost::unordered_set< opennwa::State > StateHashSet;
           // Maps etc needed during detensor operation
           // We don't store the Nwa here because we don't have the complete type of opennwa::Nwa yet
+          // Same goes for wali::domains::binrel::DetensorWeightGen
           StateTranslationTable tTable;
           LevelToStatesTable lTable;
           StateHashSet visited;
@@ -452,10 +461,10 @@ namespace wali
           opennwa::Symbol low, high;
           // Converts rel to an nwa, and solves a path problem to obtain the detensorTranspose bdd
           bdd detensorViaNwa();
-          void populateNwa(opennwa::Nwa& nwa);
+          void populateNwa(opennwa::Nwa& nwa, DetensorWeightGen& wts);
           void tabulateStates(opennwa::Nwa& nwa, unsigned v, bdd r);
-          opennwa::State generateTransitions(opennwa::Nwa& nwa, unsigned v, bdd n);
-          opennwa::State generateTransitionsLowerPlies(opennwa::Nwa& nwa, unsigned v, bdd n);
+          opennwa::State generateTransitions(opennwa::Nwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n);
+          opennwa::State generateTransitionsLowerPlies(opennwa::Nwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n);
 #endif
       };
 
