@@ -150,16 +150,16 @@ sem_elem_t DetensorWeightGen::getWeight(Key src, ClientInfoRefPtr, Key sym, Kind
   TransWeightMap::const_iterator rit = twmap.find(q);
   if(rit == twmap.end())
     assert(0);
-  binrel_t ans = rit->second;
+  detensor_weight_t ans = rit->second;
   return ans.get_ptr();
 }
 
-bool DetensorWeightGen::setWeight(Kind kind, Key src, Key sym, Key tgt, binrel_t b)
+bool DetensorWeightGen::setWeight(Kind kind, Key src, Key sym, Key tgt, detensor_weight_t b)
 {
   TransQuad q = make_tuple(kind, src, sym, tgt);
   if(twmap.find(q) != twmap.end()){
-    binrel_t old = twmap[q];
-    twmap[q] = dynamic_cast<BinRel*>(old->combine(b.get_ptr()).get_ptr());
+    detensor_weight_t old = twmap[q];
+    twmap[q] = dynamic_cast<DetensorWeight*>(old->combine(b.get_ptr()).get_ptr());
     return false;
   }else{
     twmap[q] = b;
@@ -200,7 +200,7 @@ size_t hash_value(bdd const& b)
 bdd BinRel::detensorViaNwa()
 {
   Nwa nwa;
-  DetensorWeightGen wts(new BinRel(con, bddtrue)); 
+  DetensorWeightGen wts(DetensorWeight::detensor_weight_one); 
   populateNwa(nwa, wts);
 
   // Create the query automaron
@@ -213,8 +213,8 @@ bdd BinRel::detensorViaNwa()
   wali::wfa::WFA outfa = nwa.poststar(infa, wts);
   wali::wfa::Trans ansTrans;  
   outfa.find(initialStateWfa, acceptStateNwa, acceptStateWfa, ansTrans);
-  binrel_t ans = dynamic_cast<BinRel*>(ansTrans.weight().get_ptr());
-  return ans->rel;
+  detensor_weight_t ans = static_cast<DetensorWeight*>(ansTrans.weight().get_ptr());
+  return ans->getBdd();
 }
 
 void BinRel::populateNwa(Nwa& nwa, DetensorWeightGen& wts)
@@ -313,15 +313,15 @@ State BinRel::generateTransitions(Nwa& nwa, DetensorWeightGen& wts, unsigned v, 
       if(post_upperplies(v)){
         //Create internal transitions
         nwa.addInternalTrans(q, low, qprime);
-        wts.setWeight(WeightGen::INTRA, q, low, qprime, new BinRel(con, bddtrue)); 
+        wts.setWeight(WeightGen::INTRA, q, low, qprime, DetensorWeight::detensor_weight_one); 
         nwa.addInternalTrans(q, high, qprime);
-        wts.setWeight(WeightGen::INTRA, q, high, qprime, new BinRel(con, bddtrue)); 
+        wts.setWeight(WeightGen::INTRA, q, high, qprime, DetensorWeight::detensor_weight_one); 
       }else{
         //Create call transitions
         nwa.addCallTrans(q, low, qprime);
-        wts.setWeight(WeightGen::CALL_TO_ENTRY, q, low, qprime, new BinRel(con, bdd_nithvar(bdd_level2var(con->baseLhsVocLevels[(v-1)/2]))));
+        wts.setWeight(WeightGen::CALL_TO_ENTRY, q, low, qprime, new DetensorWeight(bdd_nithvar(bdd_level2var(con->baseLhsVocLevels[(v-1)/2]))));
         nwa.addCallTrans(q, high, qprime);
-        wts.setWeight(WeightGen::CALL_TO_ENTRY, q, high, qprime, new BinRel(con, bdd_ithvar(bdd_level2var(con->baseLhsVocLevels[(v-1)/2]))));
+        wts.setWeight(WeightGen::CALL_TO_ENTRY, q, high, qprime, new DetensorWeight(bdd_ithvar(bdd_level2var(con->baseLhsVocLevels[(v-1)/2]))));
       }
     }
   }else{
@@ -331,19 +331,19 @@ State BinRel::generateTransitions(Nwa& nwa, DetensorWeightGen& wts, unsigned v, 
     if(qlow != rejectState){
       if(post_upperplies(v)){
         nwa.addInternalTrans(q, low, qlow);
-        wts.setWeight(WeightGen::INTRA, q, low, qlow, new BinRel(con, bddtrue)); 
+        wts.setWeight(WeightGen::INTRA, q, low, qlow, DetensorWeight::detensor_weight_one); 
       }else{
         nwa.addCallTrans(q, low, qlow);
-        wts.setWeight(WeightGen::CALL_TO_ENTRY, q, low, qlow, new BinRel(con, bdd_nithvar(bdd_level2var(con->baseLhsVocLevels[(v-1)/2]))));
+        wts.setWeight(WeightGen::CALL_TO_ENTRY, q, low, qlow, new DetensorWeight(bdd_nithvar(bdd_level2var(con->baseLhsVocLevels[(v-1)/2]))));
       }
     }
     if(qhigh != rejectState){
       if(post_upperplies(v)){
         nwa.addInternalTrans(q, high, qhigh);
-        wts.setWeight(WeightGen::INTRA, q, high, qhigh, new BinRel(con, bddtrue));
+        wts.setWeight(WeightGen::INTRA, q, high, qhigh, DetensorWeight::detensor_weight_one);
       }else{
         nwa.addCallTrans(q, high, qhigh);
-        wts.setWeight(WeightGen::CALL_TO_ENTRY, q, high, qhigh, new BinRel(con, bdd_ithvar(bdd_level2var(con->baseLhsVocLevels[(v-1)/2]))));
+        wts.setWeight(WeightGen::CALL_TO_ENTRY, q, high, qhigh, new DetensorWeight(bdd_ithvar(bdd_level2var(con->baseLhsVocLevels[(v-1)/2]))));
       }
     }
   }
@@ -368,16 +368,16 @@ State BinRel::generateTransitionsLowerPlies(Nwa& nwa, DetensorWeightGen& wts, un
     if(qprime != rejectState){
       if(post_lowerplies(v)){
         nwa.addInternalTrans(q, low, qprime);
-        wts.setWeight(WeightGen::INTRA, q, low, qprime, new BinRel(con, bdd_nithvar(bdd_level2var(con->baseRhsVocLevels[(4*con->numVars() - v - 1)/2]))));
+        wts.setWeight(WeightGen::INTRA, q, low, qprime, new DetensorWeight(bdd_nithvar(bdd_level2var(con->baseRhsVocLevels[(4*con->numVars() - v - 1)/2]))));
         nwa.addInternalTrans(q, high, qprime);
-        wts.setWeight(WeightGen::INTRA, q, high, qprime, new BinRel(con, bdd_ithvar(bdd_level2var(con->baseRhsVocLevels[(4*con->numVars() - v - 1)/2]))));
+        wts.setWeight(WeightGen::INTRA, q, high, qprime, new DetensorWeight(bdd_ithvar(bdd_level2var(con->baseRhsVocLevels[(4*con->numVars() - v - 1)/2]))));
       }else{
         vector< State > const& callStates = lTable[(4 * con->numVars() - v - 1)/2];
         for(vector< State >::const_iterator cit = callStates.begin(); cit != callStates.end(); ++cit){
           nwa.addReturnTrans(q, *cit, low, qprime);
-          wts.setWeight(WeightGen::EXIT_TO_RET, q, low, qprime, new BinRel(con, bddtrue));
+          wts.setWeight(WeightGen::EXIT_TO_RET, q, low, qprime, DetensorWeight::detensor_weight_one);
           nwa.addReturnTrans(q, *cit, high, qprime);
-          wts.setWeight(WeightGen::EXIT_TO_RET, q, high, qprime, new BinRel(con, bddtrue));
+          wts.setWeight(WeightGen::EXIT_TO_RET, q, high, qprime, DetensorWeight::detensor_weight_one);
         }
       }
     }
@@ -388,24 +388,24 @@ State BinRel::generateTransitionsLowerPlies(Nwa& nwa, DetensorWeightGen& wts, un
     if(qlow != rejectState){
       if(post_lowerplies(v)){
         nwa.addInternalTrans(q, low, qlow);
-        wts.setWeight(WeightGen::INTRA, q, low, qlow, new BinRel(con, bdd_nithvar(bdd_level2var(con->baseRhsVocLevels[(4*con->numVars() - v - 1)/2]))));
+        wts.setWeight(WeightGen::INTRA, q, low, qlow, new DetensorWeight(bdd_nithvar(bdd_level2var(con->baseRhsVocLevels[(4*con->numVars() - v - 1)/2]))));
       }else{
         vector< State > const& callStates = lTable[(4 * con->numVars() - v - 1)/2];
         for(vector< State >::const_iterator cit = callStates.begin(); cit != callStates.end(); ++cit){
           nwa.addReturnTrans(q, *cit, low, qlow);
-          wts.setWeight(WeightGen::EXIT_TO_RET, q, low, qlow, new BinRel(con, bddtrue));
+          wts.setWeight(WeightGen::EXIT_TO_RET, q, low, qlow, DetensorWeight::detensor_weight_one);
         }
       }
     }
     if(qhigh != rejectState){
       if(post_lowerplies(v)){
         nwa.addInternalTrans(q, high, qhigh);
-        wts.setWeight(WeightGen::INTRA, q, high, qhigh, new BinRel(con, bdd_ithvar(bdd_level2var(con->baseRhsVocLevels[(4*con->numVars() - v - 1)/2]))));
+        wts.setWeight(WeightGen::INTRA, q, high, qhigh, new DetensorWeight(bdd_ithvar(bdd_level2var(con->baseRhsVocLevels[(4*con->numVars() - v - 1)/2]))));
       }else{
         vector< State > const& callStates = lTable[(4 * con->numVars() - v - 1)/2];
         for(vector< State >::const_iterator cit = callStates.begin(); cit != callStates.end(); ++cit){
           nwa.addReturnTrans(q, *cit, high, qhigh);
-          wts.setWeight(WeightGen::EXIT_TO_RET, q, high, qhigh, new BinRel(con, bddtrue));
+          wts.setWeight(WeightGen::EXIT_TO_RET, q, high, qhigh, DetensorWeight::detensor_weight_one);
         }
       }
     }

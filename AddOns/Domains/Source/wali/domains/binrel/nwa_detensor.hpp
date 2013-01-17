@@ -71,10 +71,13 @@ namespace wali
           virtual std::ostream& print(std::ostream& o) const {
             return (o << fddset << rel << std::endl);
           }
-        private:
+          bdd getBdd() const {
+            return rel;
+          }
+        public:
           static detensor_weight_t const detensor_weight_one;
           static detensor_weight_t const detensor_weight_zero;
-
+        private:
           bdd rel;
       };
 
@@ -93,10 +96,10 @@ namespace wali
             public:
               size_t operator () (TransQuad const& q) const;
           };
-          typedef std::tr1::unordered_map< TransQuad, binrel_t, TransQuadHash > TransWeightMap;
+          typedef std::tr1::unordered_map< TransQuad, detensor_weight_t, TransQuadHash > TransWeightMap;
 
         public:
-          DetensorWeightGen(binrel_t o) : theOne(o) { }
+          DetensorWeightGen(detensor_weight_t o) : theOne(o) { }
           virtual ~DetensorWeightGen() {}
 
           virtual sem_elem_t getOne( ) const;
@@ -108,11 +111,11 @@ namespace wali
            * existed, combine the two weights.
            * @return true if the transition did not already exist, false otherwise 
            **/
-          bool setWeight(Kind kind, Key src, Key sym, Key tgt, binrel_t b); 
+          bool setWeight(Kind kind, Key src, Key sym, Key tgt, detensor_weight_t b); 
           void clear();
 
         private:
-          binrel_t theOne;
+          detensor_weight_t theOne;
           TransWeightMap twmap;
       };
     }
