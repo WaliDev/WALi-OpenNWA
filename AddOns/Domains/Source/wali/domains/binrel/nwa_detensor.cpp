@@ -137,21 +137,45 @@ void bdd_fprintdot_levels(FILE* ofile, bdd r)
 
 sem_elem_t DetensorWeightGen::getOne() const
 {
-  return NULL;
+  return theOne;
 }
 
-sem_elem_t DetensorWeightGen::getWeight(Key, ClientInfoRefPtr, Key, Kind, Key, ClientInfoRefPtr) const
+sem_elem_t DetensorWeightGen::getWeight(Key src, ClientInfoRefPtr, Key sym, Kind kind , Key tgt, ClientInfoRefPtr) const
 {
-  return NULL;
+  TransQuad q = make_tuple(kind, src, sym, tgt);
+  TransWeightMap::const_iterator rit = twmap.find(q);
+  if(rit == twmap.end())
+    assert(0);
+  binrel_t ans = rit->second;
+  return ans.get_ptr();
 }
 
-void DetensorWeightGen::setWeight(Kind,Key,Key,Key,binrel_t)
+bool DetensorWeightGen::setWeight(Kind kind, Key src, Key sym, Key tgt, binrel_t b)
 {
+  TransQuad q = make_tuple(kind, src, sym, tgt);
+  if(twmap.find(q) != twmap.end()){
+    binrel_t old = twmap[q];
+    twmap[q] = dynamic_cast<BinRel*>(old->combine(b.get_ptr()).get_ptr());
+    return false;
+  }else{
+    twmap[q] = b;
+    return true;
+  }
 }
 
 void DetensorWeightGen::clear()
 {
+  twmap.clear();
 }
+
+size_t DetensorWeightGen::TransQuadHash::operator () (DetensorWeightGen::TransQuad const& q) const
+{
+  DetensorWeightGen::Kind kind;
+  Key src, sym, tgt;
+  tie(kind, src, sym, tgt) = q;
+  return (kind << 30) + src + (sym << 8) + (tgt << 16);
+}
+
 // //////////////////////////////////////////
 // The algorithm!!!
 static inline bool post_upperplies(unsigned const v)

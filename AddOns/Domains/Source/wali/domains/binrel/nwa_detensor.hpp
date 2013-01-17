@@ -1,10 +1,16 @@
 #ifndef __NWA_DETENSOR_H_
 #define __NWA_DETENSOR_H_
-
+// ::std
 #include <utility>
+// ::std::tr1
+#include <tr1/tuple>
+// ::std::tr1
+#include <tr1/unordered_map>
 // ::opennwa
 #include "opennwa/Nwa.hpp"
 #include "opennwa/WeightGen.hpp"
+// ::wali::domains::binrel
+#include "BinRel.hpp"
 
 class bdd;
 
@@ -23,18 +29,36 @@ namespace wali
         //  INTRA:  corresponds to an Internal transition in the NWA
         //  CALL_TO_ENTRY:  corresponds to a Call transition in the NWA
         //  EXIT_TO_RET:  corresponds to the exit-to-return part of a Return transition in the NWA
-        //  CALL_TO_RET:  corresponds to the call-to-return part of a Return transition in the NWA
+        //  CALL_TO_RET:  corresponds to the call-to-return part of a Return transition in the NWA -- XXX: afaik, never used 
+        
         public:
+          typedef std::tr1::tuple< Kind, Key, Key, Key > TransQuad;
+          class TransQuadHash
+          {
+            public:
+              size_t operator () (TransQuad const& q) const;
+          };
+          typedef std::tr1::unordered_map< TransQuad, binrel_t, TransQuadHash > TransWeightMap;
 
-          DetensorWeightGen( ) { }
+        public:
+          DetensorWeightGen(binrel_t o) : theOne(o) { }
           virtual ~DetensorWeightGen() {}
 
           virtual sem_elem_t getOne( ) const;
 
           virtual sem_elem_t getWeight( Key src, ClientInfoRefPtr srcInfo, Key sym, Kind kind, Key tgt, ClientInfoRefPtr tgtInfo ) const;
 
-          void setWeight(Kind kind, Key src, Key sym, Key tgt, binrel_t b); 
+          /*
+           * Set the weight for the given transition. If the transition already
+           * existed, combine the two weights.
+           * @return true if the transition did not already exist, false otherwise 
+           **/
+          bool setWeight(Kind kind, Key src, Key sym, Key tgt, binrel_t b); 
           void clear();
+
+        private:
+          binrel_t theOne;
+          TransWeightMap twmap;
       };
     }
   }
