@@ -280,8 +280,10 @@ void BinRel::populateNwa(DetensorNwa& nwa, DetensorWeightGen& wts)
   // is risky to use the hash of bddfalse for reject state because bddfalse
   // might be NULL
   rejectState = getKey(-1);
-  low = getKey("__trans_for_bdd_low_edge_detensor_nwa");
-  high = getKey("__trans_for_bdd_high_edge_detensor_nwa");
+  //low = getKey("__trans_for_bdd_low_edge_detensor_nwa");
+  //high = getKey("__trans_for_bdd_high_edge_detensor_nwa");
+  low = getKey("t0");
+  high = getKey("t1");
   tTable.clear();
   for(LevelToStatesTable::iterator it = lTable.begin(); it != lTable.end(); ++it)
     it->clear();
