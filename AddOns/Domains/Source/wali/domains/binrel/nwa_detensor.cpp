@@ -281,7 +281,92 @@ void BinRel::populateNwa(DetensorNwa& nwa, DetensorWeightGen& wts)
   generateTransitions(nwa, wts, 0, rel); 
 }
 
-void BinRel::tabulateStates(Nwa& nwa, unsigned v, bdd n)
+void BinRel::setupConstraintNwa(DetensorNwa& nwa)
+{
+  // Fast by cryptic
+  // boost::hash<unsigned> unsignedHash;
+  // size_t magik = 354958734;
+  nwa.clear();
+  if(con->tensorVocLevels.size() == 0)
+    return;
+  std::tr1::unordered_map < unsigned, std::pair< State, State > > callStatesMap;
+  State upperPrimedState;
+  {
+    //upperPrimed = magik + unsignedHash(con->tensorVocLevels[0]);
+    stringstream ss;
+    ss << "u'::" << 0 << "::" << con->tensorVocLevels[0];
+    upperPrimedState = getKey(ss.str());
+  }
+  nwa.addInitialState(upperPrimedState);
+
+  for(unsigned level = 0; level < con->tensorVocLevels.size()/2; level += 2){
+    // Split on symbol
+    State highState; 
+    {
+      //highState = ((magik + unsignedHash(con->tensorVocLevels[level])) << 1) + 1 ;
+      stringstream ss;
+      ss << "u1::" << level+1 << "::" << con->tensorVocLevels[level+1];
+      highState = getKey(ss.str());
+    }
+    nwa.addState(highState);
+    State lowState;
+    {
+      //lowState = (magik + unsignedHash(con->tensorVocLevels[level])) << 1;
+      stringstream ss;
+      ss << "u0::" << level+1 << "::" << con->tensorVocLevels[level+1];
+      lowState = getKey(ss.str());
+    }
+    nwa.addState(lowState);
+    nwa.addInternalTrans(upperPrimedState, high, highState);
+    nwa.addInternalTrans(upperPrimedState, low, lowState);
+    callStatesMap[level/2] = std::pair< State, State >(highState, lowState);
+
+    //Merge with call transition
+    {
+      //upperPrimed = magik + unsignedHash(con->tensorVocLevels[level+2]);
+      stringstream ss;
+      if(level+2 < con->tensorVocLevels.size()/2)
+        ss << "u'::" << level+2 << "::" << con->tensorVocLevels[level+2];
+      else
+        ss << "l::" << level+2 << "::" << con->tensorVocLevels[level+2];
+      upperPrimedState = getKey(ss.str());
+    }
+    nwa.addCallTrans(highState, high, upperPrimedState);
+    nwa.addCallTrans(highState, low, upperPrimedState);
+    nwa.addCallTrans(lowState, low, upperPrimedState);
+    nwa.addCallTrans(lowState, high, upperPrimedState);
+  }
+
+  State lowerPlainState = upperPrimedState;
+  for(unsigned level = con->tensorVocLevels.size() / 2; level < con->tensorVocLevels.size(); level += 2){
+    // Return transitions
+    std::pair< State, State > callStates = callStatesMap[(con->numVars()*4 - level)/2 - 1];
+    State lowerPrimedState;
+    {
+      //lowerPrimedState = magik + unsignedHash(con->tensorVocLevels[level+1]);
+      stringstream ss;
+      ss << "l'::" << level+1 << "::" << con->tensorVocLevels[level+1];
+      lowerPrimedState = getKey(ss.str());
+    }
+    nwa.addReturnTrans(lowerPlainState, callStates.first, high, lowerPrimedState);
+    nwa.addReturnTrans(lowerPlainState, callStates.second, low, lowerPrimedState);
+
+    // Internal transition
+    if(level+2 < con->tensorVocLevels.size()){
+      // lowerPlainState = magik + unsignedHash(con->tensorVocLevels[level+2]);
+      stringstream ss;
+      ss << "l'::" << level+2 << "::" << con->tensorVocLevels[level+2];
+      lowerPlainState = getKey(ss.str());
+    }else{
+      lowerPlainState = getKey("intersectNwa::finalState");
+    }
+    nwa.addInternalTrans(lowerPrimedState, high, lowerPlainState);
+    nwa.addInternalTrans(lowerPrimedState, low, lowerPlainState);
+  }
+  nwa.addFinalState(lowerPlainState);
+}
+
+void BinRel::tabulateStates(DetensorNwa& nwa, unsigned v, bdd n)
 {
   // We don't want any state for the false terminal of bdd
   if(n == bddfalse)
