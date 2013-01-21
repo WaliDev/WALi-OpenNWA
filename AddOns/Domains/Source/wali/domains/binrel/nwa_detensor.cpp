@@ -136,8 +136,8 @@ void bdd_fprintdot_levels(FILE* ofile, bdd r)
 
 // /////////////////////////////////////////
 // Class DetensorWeight
-detensor_weight_t const DetensorWeight::detensor_weight_one(new DetensorWeight(bddtrue));
-detensor_weight_t const DetensorWeight::detensor_weight_zero(new DetensorWeight(bddfalse));
+detensor_weight_t DetensorWeight::detensor_weight_one = NULL;
+detensor_weight_t DetensorWeight::detensor_weight_zero = NULL;
 // /////////////////////////////////////////
 // Class DetensorWeightGen
 
@@ -202,6 +202,7 @@ size_t hash_value(bdd const& b)
 bdd BinRel::detensorViaNwa()
 {
   Nwa nwa;
+  DetensorWeight::initialize();
   DetensorWeightGen wts(DetensorWeight::detensor_weight_one); 
   populateNwa(nwa, wts);
 
@@ -281,6 +282,8 @@ void BinRel::tabulateStates(Nwa& nwa, unsigned v, bdd n)
   // Slow but informative
   stringstream ss;
   ss << hash_value(n) << "::" << v;
+  if(v == 0)
+    ss << "::NwaInitialState";
   State q = getKey(ss.str());
 
   if(!nwa.addState(q))

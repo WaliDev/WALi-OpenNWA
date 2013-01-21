@@ -34,6 +34,12 @@ namespace wali
       class DetensorWeight : public wali::SemElem
       {
         public:
+          static void initialize() 
+            {
+              detensor_weight_one = new DetensorWeight(bddtrue);
+              detensor_weight_zero = new DetensorWeight(bddfalse);
+            }
+        public:
           DetensorWeight(bdd b) : rel(b) {}
           virtual ~DetensorWeight() {}
           virtual sem_elem_t one() const {
@@ -69,14 +75,14 @@ namespace wali
             return rel == dse->rel;
           }
           virtual std::ostream& print(std::ostream& o) const {
-            return (o << fddset << rel << std::endl);
+            return (o << fddset << rel);
           }
           bdd getBdd() const {
             return rel;
           }
         public:
-          static detensor_weight_t const detensor_weight_one;
-          static detensor_weight_t const detensor_weight_zero;
+          static detensor_weight_t detensor_weight_one;
+          static detensor_weight_t detensor_weight_zero;
         private:
           bdd rel;
       };
