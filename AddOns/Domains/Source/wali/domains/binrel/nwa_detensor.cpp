@@ -9,6 +9,8 @@
 #include "buddy/kernel.h"
 #include "buddy/bdd.h"
 #include "nwa_detensor.hpp"
+// ::wali
+#include "wali/KeyPairSource.hpp"
 // ::opennwa::nwa_pds
 #include "opennwa/nwa_pds/conversions.hpp"
 // ::opennwa::construct
@@ -139,9 +141,7 @@ void bdd_fprintdot_levels(FILE* ofile, bdd r)
 bool DetensorNwa::stateIntersect(Nwa const& first, State state1, Nwa const& second, State state2, State& resSt, ClientInfoRefPtr& resCI)
 {
   if(Nwa::stateIntersect(first, state1, second, state2, resSt, resCI)){
-    stringstream ss;
-    ss << "(" << key2str(state1) << ", " << key2str(state2) << ")";
-    resSt = getKey(ss.str());
+    resSt = getKey(state1, state2);
     return true;
   }
   return false;
@@ -161,6 +161,11 @@ sem_elem_t DetensorWeightGen::getOne() const
 
 sem_elem_t DetensorWeightGen::getWeight(Key src, ClientInfoRefPtr, Key sym, Kind kind , Key tgt, ClientInfoRefPtr) const
 {
+  KeyPairSource * kps;
+  kps = dynamic_cast<KeyPairSource*>(getKeySource(src).get_ptr());
+  src = kps->first();
+  kps = dynamic_cast<KeyPairSource*>(getKeySource(tgt).get_ptr());
+  tgt = kps->first();
   TransQuad q = make_tuple(kind, src, sym, tgt);
   TransWeightMap::const_iterator rit = twmap.find(q);
   if(rit == twmap.end())
@@ -229,13 +234,19 @@ bdd BinRel::detensorViaNwa()
   infa.addFinalState(acceptStateWfa);
   initialStateWfa = opennwa::nwa_pds::getProgramControlLocation();
   infa.setInitialState(initialStateWfa);
-  infa.addTrans(initialStateWfa, initialStateNwa, acceptStateWfa, DetensorWeight::detensor_weight_one);
+  const StateSet& nwaInitStates = nwa.getInitialStates();
+  for(StateSet::const_iterator cit = nwaInitStates.begin(); cit != nwaInitStates.end(); ++cit)
+    infa.addTrans(initialStateWfa, *cit, acceptStateWfa, DetensorWeight::detensor_weight_one);
   wali::wfa::WFA outfa = nwa.poststar(infa, wts);
-  wali::wfa::Trans ansTrans;  
-  outfa.find(initialStateWfa, acceptStateNwa, acceptStateWfa, ansTrans);
-  detensor_weight_t ans = static_cast<DetensorWeight*>(ansTrans.weight().get_ptr());
+  detensor_weight_t ans = DetensorWeight::detensor_weight_zero;
+  const StateSet& nwaFinalStates = nwa.getFinalStates();
+  for(StateSet::const_iterator cit = nwaFinalStates.begin(); cit != nwaFinalStates.end(); ++cit){
+    wali::wfa::Trans ansTrans;  
+    outfa.find(initialStateWfa, *cit, acceptStateWfa, ansTrans);
+    ans = static_cast<DetensorWeight*>(ans->combine(static_cast<DetensorWeight*>(ansTrans.weight().get_ptr())).get_ptr());
+  }
 
-#if 1
+#if 0
   //dbg
   {
     filebuf fb;
@@ -265,9 +276,13 @@ bdd BinRel::detensorViaNwa()
     outfa.print_dot(o, true); 
     fb.close();
   }
-#endif
 
-  return ans->getBdd();
+  if(ans == NULL)
+    cout << "Answer: NULL\n";
+  else
+    cout << "Answer: " << fddset << ans->getBdd() << "\n";
+#endif
+  return (ans == NULL) ? bddfalse : ans->getBdd();
 }
 
 void BinRel::populateNwa(DetensorNwa& nwa, DetensorWeightGen& wts)
@@ -280,8 +295,6 @@ void BinRel::populateNwa(DetensorNwa& nwa, DetensorWeightGen& wts)
   // is risky to use the hash of bddfalse for reject state because bddfalse
   // might be NULL
   rejectState = getKey(-1);
-  //low = getKey("__trans_for_bdd_low_edge_detensor_nwa");
-  //high = getKey("__trans_for_bdd_high_edge_detensor_nwa");
   low = getKey("t0");
   high = getKey("t1");
   tTable.clear();
