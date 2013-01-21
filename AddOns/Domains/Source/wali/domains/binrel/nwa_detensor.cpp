@@ -133,6 +133,19 @@ void bdd_fprintdot_levels(FILE* ofile, bdd r)
 }
 
 // /////////////////////////////////////////
+// Class IntersectedNwa
+bool DetensorNwa::stateIntersect(Nwa const& first, State state1, Nwa const& second, State state2, State& resSt, ClientInfoRefPtr& resCI)
+{
+  if(Nwa::stateIntersect(first, state1, second, state2, resSt, resCI)){
+    stringstream ss;
+    ss << "(" << key2str(state1) << ", " << key2str(state2) << ")";
+    resSt = getKey(ss.str());
+    return true;
+  }
+  return false;
+}
+
+// /////////////////////////////////////////
 // Class DetensorWeight
 detensor_weight_t DetensorWeight::detensor_weight_one = NULL;
 detensor_weight_t DetensorWeight::detensor_weight_zero = NULL;
@@ -244,7 +257,7 @@ bdd BinRel::detensorViaNwa()
   return ans->getBdd();
 }
 
-void BinRel::populateNwa(Nwa& nwa, DetensorWeightGen& wts)
+void BinRel::populateNwa(DetensorNwa& nwa, DetensorWeightGen& wts)
 {
   nwa.clear();
   //wts.clear();
@@ -314,7 +327,7 @@ void BinRel::tabulateStates(Nwa& nwa, unsigned v, bdd n)
   }
 }
 
-State BinRel::generateTransitions(Nwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n)
+State BinRel::generateTransitions(DetensorNwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n)
 {
   if(n == bddfalse)
     return rejectState;
@@ -373,7 +386,7 @@ State BinRel::generateTransitions(Nwa& nwa, DetensorWeightGen& wts, unsigned v, 
   return q;
 }
 
-State BinRel::generateTransitionsLowerPlies(Nwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n)
+State BinRel::generateTransitionsLowerPlies(DetensorNwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n)
 {
   if(n == bddfalse)
     return rejectState;

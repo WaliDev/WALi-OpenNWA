@@ -29,6 +29,18 @@ namespace wali
     namespace binrel
     {
 
+      class DetensorNwa : public opennwa::Nwa
+      {
+        public:
+          virtual bool stateIntersect(
+              opennwa::Nwa const & first, 
+              opennwa::State state1, 
+              opennwa::Nwa const& second, 
+              opennwa::State state2,
+              opennwa::State& resSt, 
+              opennwa::ClientInfoRefPtr& resCI);
+      };
+
       class DetensorWeight;
       typedef wali::ref_ptr<DetensorWeight> detensor_weight_t;
       class DetensorWeight : public wali::SemElem

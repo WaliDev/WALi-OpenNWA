@@ -109,7 +109,6 @@
 #ifdef NWA_DETENSOR
 namespace opennwa
 {
-  class Nwa;
   typedef wali::Key State;
   typedef wali::Key Symbol;
 }
@@ -123,6 +122,8 @@ namespace wali
   {
     namespace binrel 
     {
+      class DetensorNwa;
+
       /// Reference-counting bddPair pointer. These must be freed using
       /// bdd_freepair, not delete, so we can't used ref_ptr. This just wraps
       /// Boost's shared_ptr, setting bdd_freepair as the custom
@@ -453,7 +454,7 @@ namespace wali
           typedef std::vector< std::vector< opennwa::State > > LevelToStatesTable;
           typedef boost::unordered_set< opennwa::State > StateHashSet;
           // Maps etc needed during detensor operation
-          // We don't store the Nwa here because we don't have the complete type of opennwa::Nwa yet
+          // We don't store the Nwa here because we don't have the complete type of DetensorNwa yet
           // Same goes for wali::domains::binrel::DetensorWeightGen
           StateTranslationTable tTable;
           LevelToStatesTable lTable;
@@ -466,10 +467,11 @@ namespace wali
           opennwa::Symbol low, high;
           // Converts rel to an nwa, and solves a path problem to obtain the detensorTranspose bdd
           bdd detensorViaNwa();
-          void populateNwa(opennwa::Nwa& nwa, DetensorWeightGen& wts);
-          void tabulateStates(opennwa::Nwa& nwa, unsigned v, bdd r);
-          opennwa::State generateTransitions(opennwa::Nwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n);
-          opennwa::State generateTransitionsLowerPlies(opennwa::Nwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n);
+          void populateNwa(DetensorNwa& nwa, DetensorWeightGen& wts);
+          void setupConstraintNwa(DetensorNwa& nwa);
+          void tabulateStates(DetensorNwa& nwa, unsigned v, bdd r);
+          opennwa::State generateTransitions(DetensorNwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n);
+          opennwa::State generateTransitionsLowerPlies(DetensorNwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n);
 #endif
       };
 
