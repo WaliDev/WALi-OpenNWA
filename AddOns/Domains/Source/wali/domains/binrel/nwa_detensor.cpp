@@ -304,7 +304,7 @@ void BinRel::populateNwa(DetensorNwa& nwa, DetensorWeightGen& wts)
   for(unsigned i=0; i<con->numVars(); ++i)
     lTable.push_back(vector< State >());
   tabulateStates(nwa, 0, rel);
-  cout << "#Nwa State created: " << tTable.size() << endl;
+  //cout << "#Nwa State created: " << tTable.size() << endl;
   visited.clear();
   generateTransitions(nwa, wts, 0, rel); 
 }
@@ -430,7 +430,7 @@ void BinRel::tabulateStates(DetensorNwa& nwa, unsigned v, bdd n)
     nwa.addInitialState(q);
     initialStateNwa = q;
   }
-  if(con->tensorVocLevels[v] < bdd_var2level(bdd_var(n))){
+  if((n == bddtrue && v < 4 * con->numVars()) || (con->tensorVocLevels[v] < bdd_var2level(bdd_var(n)))){
     // bdd skipped a level, create extra nwa states
     tabulateStates(nwa, v+1, n);
   }else{
@@ -455,7 +455,7 @@ State BinRel::generateTransitions(DetensorNwa& nwa, DetensorWeightGen& wts, unsi
     return q;
   visited.insert(q);
 
-  if(con->tensorVocLevels[v] < bdd_var2level(bdd_var(n))){
+  if((n == bddtrue && v < 4 * con->numVars()) || (con->tensorVocLevels[v] < bdd_var2level(bdd_var(n)))){
     // visit virtual child(v+1, n)
     State qprime = generateTransitions(nwa, wts, v+1, n);
     if(qprime != rejectState){
@@ -511,7 +511,7 @@ State BinRel::generateTransitionsLowerPlies(DetensorNwa& nwa, DetensorWeightGen&
     //q already processed
     return q;
   visited.insert(q);
-  if(con->tensorVocLevels[v] < bdd_var2level(bdd_var(n))){
+  if((n == bddtrue && v < 4 * con->numVars()) || (con->tensorVocLevels[v] < bdd_var2level(bdd_var(n)))){
     // visit virtual child n+1
     State qprime = generateTransitionsLowerPlies(nwa, wts, v+1, n);
     if(qprime != rejectState){
