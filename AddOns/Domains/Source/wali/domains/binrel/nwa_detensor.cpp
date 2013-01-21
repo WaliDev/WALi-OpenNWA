@@ -15,8 +15,6 @@
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/Trans.hpp"
 
-// ::wali::xfa
-//#include "wali/xfa/Xfa.hpp"
 #ifdef NWA_DETENSOR
 
 using namespace std;
@@ -212,24 +210,35 @@ bdd BinRel::detensorViaNwa()
   infa.addFinalState(acceptStateWfa);
   initialStateWfa = opennwa::nwa_pds::getProgramControlLocation();
   infa.setInitialState(initialStateWfa);
-  infa.addTrans(initialStateWfa, initialStateNwa, acceptStateWfa, wts.getOne());
+  infa.addTrans(initialStateWfa, initialStateNwa, acceptStateWfa, DetensorWeight::detensor_weight_one);
   wali::wfa::WFA outfa = nwa.poststar(infa, wts);
   wali::wfa::Trans ansTrans;  
   outfa.find(initialStateWfa, acceptStateNwa, acceptStateWfa, ansTrans);
   detensor_weight_t ans = static_cast<DetensorWeight*>(ansTrans.weight().get_ptr());
 
-#if 0
+#if 1
   //dbg
-  filebuf fb;
-  fb.open("detensor_nwa.dot", ios::out);
-  ostream o(&fb);
-  nwa.print_dot(o, string("Whatever"), false);
-  fb.close();
-  fb.open("outfa.dot", ios::out);
-  ostream oo(&fb);
-  wali::xfa::HoverWeightPrinter hwp;
-  outfa.print_dot(oo, false, hwp);
-  fb.close();
+  {
+    filebuf fb;
+    fb.open("detensor_nwa.dot", ios::out);
+    ostream o(&fb);
+    nwa.print_dot(o, string("Whatever"), false);
+    fb.close();
+  }
+  {
+    filebuf fb;
+    fb.open("infa.dot", ios::out);
+    ostream o(&fb);
+    infa.print_dot(o, true); 
+    fb.close();
+  }
+  {
+    filebuf fb;
+    fb.open("outfa.dot", ios::out);
+    ostream o(&fb);
+    outfa.print_dot(o, true); 
+    fb.close();
+  }
 #endif
 
   return ans->getBdd();
