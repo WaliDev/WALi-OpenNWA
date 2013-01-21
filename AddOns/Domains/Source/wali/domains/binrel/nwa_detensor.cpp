@@ -11,6 +11,8 @@
 #include "nwa_detensor.hpp"
 // ::opennwa::nwa_pds
 #include "opennwa/nwa_pds/conversions.hpp"
+// ::opennwa::construct
+#include "opennwa/construct/intersect.hpp"
 // ::wali::wfa
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/Trans.hpp"
@@ -212,12 +214,16 @@ size_t hash_value(bdd const& b)
 
 bdd BinRel::detensorViaNwa()
 {
-  Nwa nwa;
+  DetensorNwa inwa;
+  DetensorNwa cnwa;
+  DetensorNwa nwa;
   DetensorWeight::initialize();
   DetensorWeightGen wts(DetensorWeight::detensor_weight_one); 
-  populateNwa(nwa, wts);
+  populateNwa(inwa, wts);
+  setupConstraintNwa(cnwa);
+  opennwa::construct::intersect(nwa, inwa, cnwa);
 
-  // Create the query automaron
+  // Create the query automaton
   wali::wfa::WFA infa;
   acceptStateWfa = getKey("__accept_state_detensor_wfa");
   infa.addFinalState(acceptStateWfa);
@@ -236,6 +242,13 @@ bdd BinRel::detensorViaNwa()
     fb.open("detensor_nwa.dot", ios::out);
     ostream o(&fb);
     nwa.print_dot(o, string("Whatever"), false);
+    fb.close();
+  }
+  {
+    filebuf fb;
+    fb.open("constraint_nwa.dot", ios::out);
+    ostream o(&fb);
+    cnwa.print_dot(o, string("Whatever"), false);
     fb.close();
   }
   {
