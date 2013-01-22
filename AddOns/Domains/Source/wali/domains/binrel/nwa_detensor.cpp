@@ -113,7 +113,7 @@ void bdd_printdot_levels(bdd r)
   bdd_fprintdot_levels(stdout, r);
 }
 
-int bdd_fnprintdot_levels(char *fname, bdd r)
+int bdd_fnprintdot_levels(char const * fname, bdd r)
 {
   FILE *ofile = fopen(fname, "w");
   if (ofile == NULL)
@@ -246,8 +246,17 @@ bdd BinRel::detensorViaNwa()
     ans = static_cast<DetensorWeight*>(ans->combine(static_cast<DetensorWeight*>(ansTrans.weight().get_ptr())).get_ptr());
   }
 
-#if 0
+#if 1
   //dbg
+  char const * oldf = "original_obdd.dot";
+  bdd_fnprintdot_levels(oldf, rel);
+  {
+    filebuf fb;
+    fb.open("obdd2nwa.dot", ios::out);
+    ostream o(&fb);
+    inwa.print_dot(o, string("Whatever"), false);
+    fb.close();
+  }
   {
     filebuf fb;
     fb.open("detensor_nwa.dot", ios::out);
@@ -279,8 +288,11 @@ bdd BinRel::detensorViaNwa()
 
   if(ans == NULL)
     cout << "Answer: NULL\n";
-  else
+  else{
     cout << "Answer: " << fddset << ans->getBdd() << "\n";
+    char const * newf = "final_obdd.dot";
+    bdd_fnprintdot_levels(newf, ans->getBdd());
+  }
 #endif
   return (ans == NULL) ? bddfalse : ans->getBdd();
 }

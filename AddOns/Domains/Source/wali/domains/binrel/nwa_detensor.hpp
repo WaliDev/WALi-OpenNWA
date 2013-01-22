@@ -20,7 +20,7 @@
 class bdd;
 
 void bdd_printdot_levels(bdd r);
-int bdd_fnprintdot_levels(char *fname, bdd r);
+int bdd_fnprintdot_levels(char const * fname, bdd r);
 void bdd_fprintdot_levels(FILE* ofile, bdd r);
 namespace wali
 {
