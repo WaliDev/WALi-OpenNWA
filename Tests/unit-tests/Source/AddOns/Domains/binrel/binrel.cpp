@@ -138,6 +138,59 @@ namespace{
     ASSERT_TRUE(compareOutput("BinRelSelfTest","creationTest",ss));
   }
 
+  TEST(ProgramBddContext, mapConstructorNoVars)
+  {
+    std::map<std::string, int> vars;
+    ProgramBddContext ctx(vars);
+
+    EXPECT_EQ(0u, ctx.size());
+  }
+       
+  TEST(ProgramBddContext, mapConstructorFewVars)
+  {
+    std::map<std::string, int> vars;
+    vars["a"] = 2;
+    vars["b"] = 2;
+    vars["c"] = 4;
+    ProgramBddContext ctx(vars);
+
+    EXPECT_EQ(3u, ctx.size());
+  }
+
+  TEST(ProgramBddContext, vectorConstructorEmptyVec)
+  {
+    std::vector<std::map<std::string, int> > vars;
+    ProgramBddContext ctx(vars);
+
+    EXPECT_EQ(0u, ctx.size());
+  }
+       
+  TEST(ProgramBddContext, mapConstructorOneLevelFewVars)
+  {
+    std::vector<std::map<std::string, int> > vars;
+    vars.resize(1);
+    vars.at(0)["a"] = 2;
+    vars.at(0)["b"] = 2;
+    vars.at(0)["c"] = 4;
+    ProgramBddContext ctx(vars);
+
+    EXPECT_EQ(3u, ctx.size());
+  }
+
+  TEST(ProgramBddContext, mapConstructorFewLevelFewVars)
+  {
+    std::vector<std::map<std::string, int> > vars;
+    vars.resize(3);
+    vars.at(0)["a"] = 2;
+    vars.at(1)["b"] = 2;
+    vars.at(1)["c"] = 4;
+    vars.at(2)["d"] = 4;
+    vars.at(2)["e"] = 4;
+    ProgramBddContext ctx(vars);
+
+    EXPECT_EQ(5u, ctx.size());
+  }
+  
   TEST(BinRelSelfTest, selfTest){
     program_bdd_context_t brm = new ProgramBddContext();
     brm->addBoolVar("a");

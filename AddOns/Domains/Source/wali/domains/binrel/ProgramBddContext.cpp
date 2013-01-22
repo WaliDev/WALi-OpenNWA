@@ -512,6 +512,32 @@ ProgramBddContext& ProgramBddContext::operator = (const ProgramBddContext& other
   return *this;
 }
 
+
+ProgramBddContext::ProgramBddContext(const std::map<std::string, int>& vars, int bddMemSize, int cacheSize) :
+  BddContext(bddMemSize, cacheSize),
+  sizeInfo(0),
+  maxSize(0),
+  regAInfo(NULL),
+  regBInfo(NULL),
+  baseId(bddtrue),
+  baseLhs2Rhs(BddPairPtr(bdd_newpair()))
+{
+  setIntVars(vars);
+}
+
+ProgramBddContext::ProgramBddContext(const std::vector<std::map<std::string, int> >& vars, int bddMemSize, int cacheSize) :
+  BddContext(bddMemSize, cacheSize),
+  sizeInfo(0),
+  maxSize(0),
+  regAInfo(NULL),
+  regBInfo(NULL),
+  baseId(bddtrue),
+  baseLhs2Rhs(BddPairPtr(bdd_newpair()))
+{
+  setIntVars(vars);
+}
+
+
 std::ostream& ProgramBddContext::print(std::ostream& o) const
 {
   o << "ProgramBddContext dump:" << std::endl;
