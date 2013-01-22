@@ -528,7 +528,7 @@ bdd ProgramBddContext::From(std::string var) const
   bdd ret = bddfalse;
   ProgramBddContext::const_iterator iter = (this->find(var));
   if(iter == this->end())
-    LOG(FATAL) << "Attempted From () on \"" << var << "\". I don't recognize this name\n";
+    LOG(FATAL) << "attempted from () on \"" << var << "\". i don't recognize this name\n";
   const bddinfo_t bi = iter->second;
   for(unsigned i = 0; i < bi->maxVal; ++i)
     ret = ret | (fdd_ithvar(bi->baseLhs, i) & fdd_ithvar(regAInfo->baseRhs, i));
@@ -664,6 +664,84 @@ bdd ProgramBddContext::Div(bdd lexpr, bdd rexpr) const
   return applyBinOp(lexpr, rexpr, bddDiv(in1,in2));
 }
 #endif
+
+bdd ProgramBddContext::setPre(std::string var) const
+{
+  bdd ret;
+  ProgramBddContext::const_iterator iter = (this->find(var));
+  if(iter == this->end())
+    LOG(FATAL) << "attempted setPre () on \"" << var << "\". i don't recognize this name\n";
+  const bddinfo_t bi = iter->second;
+  for(unsigned i = 0; i < bi->maxVal; ++i)
+    ret = fdd_ithvar(bi->baseLhs, 1);
+  ret = bdd_exist(ret, fdd_ithset(sizeInfo));
+  return ret;
+}
+
+bdd ProgramBddContext::unsetPre(std::string var) const
+{
+  bdd ret;
+  ProgramBddContext::const_iterator iter = (this->find(var));
+  if(iter == this->end())
+    LOG(FATAL) << "attempted unsetPre () on \"" << var << "\". i don't recognize this name\n";
+  const bddinfo_t bi = iter->second;
+  for(unsigned i = 0; i < bi->maxVal; ++i)
+    ret = fdd_ithvar(bi->baseLhs, 0);
+  ret = bdd_exist(ret, fdd_ithset(sizeInfo));
+  return ret;
+}
+bdd ProgramBddContext::setPre(std::string var, unsigned val) const
+{
+  bdd ret;
+  ProgramBddContext::const_iterator iter = (this->find(var));
+  if(iter == this->end())
+    LOG(FATAL) << "attempted setPre () on \"" << var << "\". i don't recognize this name\n";
+  const bddinfo_t bi = iter->second;
+  if(val > bi->maxVal)
+    LOG(FATAL) << "setPre: val too large\n";
+  for(unsigned i = 0; i < bi->maxVal; ++i)
+    ret = fdd_ithvar(bi->baseLhs, val);
+  ret = bdd_exist(ret, fdd_ithset(sizeInfo));
+  return ret;
+}
+bdd ProgramBddContext::setPost(std::string var) const
+{
+  bdd ret;
+  ProgramBddContext::const_iterator iter = (this->find(var));
+  if(iter == this->end())
+    LOG(FATAL) << "attempted setPoist () on \"" << var << "\". i don't recognize this name\n";
+  const bddinfo_t bi = iter->second;
+  for(unsigned i = 0; i < bi->maxVal; ++i)
+    ret = fdd_ithvar(bi->baseRhs, 1);
+  ret = bdd_exist(ret, fdd_ithset(sizeInfo));
+  return ret;
+}
+bdd ProgramBddContext::unsetPost(std::string var) const
+{
+  bdd ret;
+  ProgramBddContext::const_iterator iter = (this->find(var));
+  if(iter == this->end())
+    LOG(FATAL) << "attempted unsetPost () on \"" << var << "\". i don't recognize this name\n";
+  const bddinfo_t bi = iter->second;
+  for(unsigned i = 0; i < bi->maxVal; ++i)
+    ret = fdd_ithvar(bi->baseRhs, 0);
+  ret = bdd_exist(ret, fdd_ithset(sizeInfo));
+  return ret;
+}
+bdd ProgramBddContext::setPost(std::string var, unsigned val) const
+{
+  bdd ret;
+  ProgramBddContext::const_iterator iter = (this->find(var));
+  if(iter == this->end())
+    LOG(FATAL) << "attempted setPost () on \"" << var << "\". i don't recognize this name\n";
+  const bddinfo_t bi = iter->second;
+  if(val > bi->maxVal)
+    LOG(FATAL) << "setPost: val too large\n";
+  for(unsigned i = 0; i < bi->maxVal; ++i)
+    ret = fdd_ithvar(bi->baseLhs, val);
+  ret = bdd_exist(ret, fdd_ithset(sizeInfo));
+  return ret;
+}
 
 bdd ProgramBddContext::bddAnd() const
 {

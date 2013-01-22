@@ -97,6 +97,21 @@ namespace wali
           // //////////////Generates a random bdd///////////////////////////////////////////
           bdd tGetRandomTransformer(bool isTensored = false, unsigned seed=0) const;
 
+        public:
+          // Very useful for testing. Just set variables in the bdd
+          // setPre("x") will return a bdd 
+          //      *
+          // x: 1/ \0
+          //    T   F
+          // unSet, and set(var,val) do what you'd expect.
+          // [uns/s]etPost do the same for post vocabularies. 
+          // No tensored plies are used.
+          bdd setPre(std::string var) const;
+          bdd unsetPre(std::string var) const;
+          bdd setPre(std::string var, unsigned val) const;
+          bdd setPost(std::string var) const;
+          bdd unsetPost(std::string var) const;
+          bdd setPost(std::string var, unsigned val) const;
         private:
           // This is the bdd index of the size info in each bdd
           unsigned sizeInfo;
