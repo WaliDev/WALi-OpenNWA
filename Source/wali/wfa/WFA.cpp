@@ -1502,6 +1502,8 @@ namespace wali
     bool add_trans_to_accessible_states(WFA::AccessibleStateMap & accessible,
                                         Key dest, sem_elem_t weight)
     {
+      assert(weight.get_ptr());
+      
       if (accessible.find(dest) != accessible.end()) {
         sem_elem_t old = accessible[dest];
         weight = weight->combine(old);
@@ -1569,8 +1571,12 @@ namespace wali
               for (AccessibleStateMap::const_iterator dest = eclose.begin();
                    dest != eclose.end(); ++dest)
               {
+                // We have
+                //   (start) - - - - - > (source) ---> (trans_it->->to()) - - - - - > (dest->first)
+                //         source_weight      trans_it->->weight()       dest->second
                 assert(dest->second.get_ptr());
-                add_trans_to_accessible_states(after, dest->first, dest->second);
+                sem_elem_t weight = source_weight->extend((*trans_it)->weight()->extend(dest->second));
+                add_trans_to_accessible_states(after, dest->first, weight);
               }
             } // For each outgoing transition
             
@@ -1591,7 +1597,7 @@ namespace wali
     WFA::isAcceptedWithNonzeroWeight(Word const & word) const
     {
       AccessibleStateMap start;
-      start[getInitialState()] = NULL;
+      start[getInitialState()] = this->getSomeWeight()->one();
 
       AccessibleStateMap finish = simulate(start, word);
 
@@ -1600,8 +1606,10 @@ namespace wali
           final != finals.end(); ++final)
       {
         if (finish.find(*final) != finish.end()) {
-          //  FIXME: check weight
-          return true;
+          sem_elem_t weight = finish[*final];
+          if (!weight->equal(weight->zero())) {
+            return true;
+          }
         }
       }
 
