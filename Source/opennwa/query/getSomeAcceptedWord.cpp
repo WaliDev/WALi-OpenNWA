@@ -28,6 +28,7 @@
 #include "wali/witness/VisitorDot.hpp"
 #include "wali/witness/VisitorPrinter.hpp"
 #include "wali/witness/WitnessRule.hpp"
+#include "wali/witness/CalculatingVisitor.hpp"
 
 
 using namespace std;
@@ -38,53 +39,68 @@ namespace opennwa {
   namespace query {
 
     namespace details {
-		
-      class PathVisitor : public wali::witness::Visitor {
-          
+
+      class PathVisitor : public witness::CalculatingVisitor<NestedWord> {
+
       private:
         /// Holds the NWA associated with the given query. We need this so
         /// that when we know that the trace went from state p to q, we can
         /// look up a symbol on that edge.
         Nwa const & nwa;
 
-        /// This is the word that corresponds to the trace; built up as
-        /// visitRule() is called.
-        NestedWord word;
-
         /// Holds the *PDS* state and stack symbol corresponding to the
         /// "first half" of a NWA return transition. See visitRule() for
         /// more details.
-        vector<wali::Key> symbs;
-        vector<wali::Key> states;
-          
-			
+        map<Key,Key> states;
+
       public:
-				
+
         PathVisitor(Nwa const & orig)
           : nwa(orig)
         {}
-				
+
         ~PathVisitor() {}
 
-        bool visit( wali::witness::Witness * w ) {
+        // Concatenates the left and right child.
+        NestedWord calculateExtend(witness::WitnessExtend * w, NestedWord& left, NestedWord& right) {
           (void) w;
-          return true;
-        }
-		
-        bool visitExtend( wali::witness::WitnessExtend * w ) {
-          (void) w;
-          return true;
-        }
-		
-        bool visitCombine( wali::witness::WitnessCombine * w ) {
-          (void) w;
-          return true;
+
+          NestedWord ret(left);
+          for (NestedWord::const_iterator it=right.begin(); it!=right.end(); it++) {
+            ret.append(*it);
+          }
+          return ret;
         }
 
-        /// This is basically called once for each WPDS rule taken on the
-        /// PDS's "accepting" path. Builds up 'word' so it contains the
-        /// actual NWA word.
-        bool visitRule( wali::witness::WitnessRule * w ) {
+        // Choses the shortest child.
+        NestedWord calculateCombine(witness::WitnessCombine * w, list<NestedWord>& children) {
+          (void) w;
+          
+          size_t min = INT_MAX;
+          NestedWord ret;
+          for (list<NestedWord>::const_iterator it=children.begin(); it!=children.end(); it++) {
+            NestedWord child = *it;
+            if (child.size() <= min) {
+              min = child.size();
+              ret = child;
+            }
+          }
+          
+          return ret;
+        }
+
+        // Not implemented.
+        NestedWord calculateMerge(witness::WitnessMerge* w, NestedWord& callerValue, NestedWord& ruleValue, NestedWord& calleeValue) {
+          (void) w;
+          (void) callerValue;
+          (void) calleeValue;
+
+          assert (0 && "Merge not implemented!");
+          return ruleValue;
+        }
+
+        /// Identifies the 'letter' represented by the rule.
+        NestedWord calculateRule(witness::WitnessRule * w) {
           // There are four kinds of WPDS rules that we need to
           // handle. Internal NWA transitions correspond to (some -- see
           // in a bit) internal PDS transitions. Call NWA transitions
@@ -127,89 +143,76 @@ namespace opennwa {
           // the second half of the transition.
 
 
-          wali::Key from = w->getRuleStub().from_stack();
-          wali::Key fromstate = w->getRuleStub().from_state();
-          wali::Key to = w->getRuleStub().to_stack1();
-          wali::Key to2 = w->getRuleStub().to_stack2();
-          wali::Key tostate = w->getRuleStub().to_state();
+          Key from = w->getRuleStub().from_stack();
+          Key fromstate = w->getRuleStub().from_state();
+          Key to = w->getRuleStub().to_stack1();
+          Key to2 = w->getRuleStub().to_stack2();
+          Key tostate = w->getRuleStub().to_state();
 
-          //std::cout << "visitRule(...):\n"
+          //cout << "visitRule(...):\n"
           //          << "  from stack [" << from << "] " << key2str(from) << "\n"
           //          << "  from state [" << fromstate << "] " << key2str(fromstate) << "\n"
           //          << "  to stack1 [" << to << "] " << key2str(to) << "\n"
-          //          << "  to state  [" << tostate << "] " << key2str(tostate) << std::endl;
+          //          << "  to state  [" << tostate << "] " << key2str(tostate) << endl;
 
+          //w->print(cerr);
 
           // Detect a pop rule: this discovers the first half of a return
           // transition. (Case #1 above.)
-          if( to == EPSILON) {
+          if (to == EPSILON) {
             // dealing with first half of return transition
-            assert(symbs.size() == 0);
-            assert(states.size() == 0);
-              
-            symbs.push_back(from);
-            states.push_back(tostate);
+            states[tostate] = from;
 
-            return true;
+            return NestedWord();
           }
 
-          // OK, we're in one of cases #2 or q3 above. Figure out which
+          // OK, we're in one of cases #2 or #3 above. Figure out which
           // one, and put the transition type in trans_type, and the symbol
           // in 'sym'.
-          wali::Key sym;
+          Key sym;
           NestedWord::Position::Type trans_type;
-	
-          if(states.size() > 0) {
+          NestedWord ret;
+
+          map<Key,Key>::const_iterator it = states.find(fromstate);
+          if (it != states.end()) {
             // Dealing with the second half of a return transition (case #2 above).
-            assert(fromstate == states.back());
-              
             trans_type = NestedWord::Position::ReturnType;
-            set<wali::Key> r = query::getReturnSym(nwa, symbs.back(), from, to);
+            set<Key> r = query::getReturnSym(nwa, it->second, from, to);
             assert(r.size() > 0);
             sym = *(r.begin());
-
-            states.pop_back();
-            symbs.pop_back();
           }
           else if (to2 != EPSILON) {
             // call (part of case #3)
             trans_type = NestedWord::Position::CallType;
-            set<wali::Key> r = query::getCallSym(nwa, from, to);
+            set<Key> r = query::getCallSym(nwa, from, to);
             assert(r.size() > 0);
             sym = *(r.begin());
           }
           else {
             // internal (part of case #3)
             trans_type = NestedWord::Position::InternalType;
-            set<wali::Key> r = query::getInternalSym(nwa, from, to);
+            set<Key> r = query::getInternalSym(nwa, from, to);
             assert(r.size() > 0);
             sym = *(r.begin());
           }
 
           // If the transition was an epsilon transition, then we don't
           // want to save it since it isn't part of the word.
-          if(sym != EPSILON) {
-            word.append(NestedWord::Position(sym, trans_type));
+          if (sym != EPSILON) {
+            ret.append(NestedWord::Position(sym, trans_type));
           }
-					
-          return true;
+
+          return ret;
         }
 
-          
-        NestedWord getPath() {return word;}
+        // Return an empty nested word.
+        NestedWord calculateTrans(witness::WitnessTrans * w) {
+          (void) w;
+          return NestedWord();
+        }
 
-        bool visitTrans( wali::witness::WitnessTrans * w ) {
-          (void) w;
-          return true;
-        }
-		
-        bool visitMerge( wali::witness::WitnessMerge * w ) {
-          (void) w;
-          return true;
-        }
-		
       };
-
+		
     } // namespace query::details
 
 
@@ -231,11 +234,19 @@ namespace opennwa {
       ShortestWordGen wg;
       return getSomeAcceptedWordInternal(nwa, wg);
     }
+
+
+    ref_ptr<NestedWord>
+    getSomeShortestAcceptedWordWithWeights(Nwa const & nwa, WeightGen const & wg)
+    {
+      return getSomeAcceptedWordInternal(nwa, wg);
+    }
+
       
     ref_ptr<NestedWord>
     getSomeAcceptedWordInternal(Nwa const & nwa, WeightGen const & wg)
     {
-      if (nwa.sizeInitialStates() == 0) {
+      if (nwa.sizeInitialStates() == 0 || nwa.sizeFinalStates() == 0) {
         return NULL;
       }
         
@@ -260,36 +271,47 @@ namespace opennwa {
 	
       // Execute the post* query
       wali::wfa::WFA path = conv.poststar(query);
+
+      // Intersect path with a new 2-state WFA with a transitioning edge
+      // for each final NWA state, and a self-loop from the WFA final
+      // state on each non-final NWA state.
+      wali::wfa::WFA fa;
+      wali::Key init = wali::getKey("__init");
+      fa.addState(init, wg.getOne());
+      fa.setInitialState(init);
+      wali::Key fin = wali::getKey("__final");
+      fa.addState(fin, wg.getOne());
+      fa.addFinalState(fin);
+
+      for( Nwa::StateIterator fit = nwa.beginFinalStates();
+        fit != nwa.endFinalStates(); fit++)
+      {
+        fa.addTrans(init, *fit, fin, wg.getOne());
+      }
+
+      for( Nwa::StateIterator sit = nwa.beginStates();
+        sit != nwa.endStates(); sit++ )
+      {
+        fa.addTrans(fin, *sit, fin, wg.getOne());
+      }
+
+      wfa::KeepLeft wmaker;
+      path = path.intersect(wmaker, fa);
+      
       path.path_summary();
 
-      for(Nwa::StateIterator final = nwa.beginFinalStates();
-          final != nwa.endFinalStates(); final++)
-      {
-        // See if there are any transitions to the current final state
-        wali::wfa::TransSet t = path.match(state, *final);
-            
-        // Collect the transitions
-        for(wali::wfa::TransSet::iterator trans = t.begin();
-            trans != t.end(); trans++)
-        {
-          sem_elem_t se =
-            path.getState((*trans)->to())
-            ->weight()
-            ->extend((*trans)->weight());
-          if(se->equal(se->zero())) {
-            // Doesn't make it to the final state. Try again.
-            continue;
-          }
+      sem_elem_t se = path.getState(path.getInitialState())->weight();
+      witness::Witness *wit =
+        dynamic_cast<witness::Witness*>(se.get_ptr());
+      assert(wit);
 
-          // We found an actual path to the final state, so figure out
-          // how it did that.
-          details::PathVisitor v(nwa);					
-          wali::witness::Witness* wit =
-            dynamic_cast<wali::witness::Witness*>(se.get_ptr());
-          assert(wit);
-          wit->accept(v);
-          return new NestedWord(v.getPath());
-        }
+      if (!wit->isZero()) {
+
+        // Find a shortest word through the witness.
+        query::details::PathVisitor pv(nwa);
+        wit->accept(pv);
+
+        return new NestedWord(pv.answer());
       }
 
       // No word was found.
