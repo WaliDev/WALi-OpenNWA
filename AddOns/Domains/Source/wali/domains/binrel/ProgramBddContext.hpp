@@ -98,6 +98,9 @@ namespace wali
           bdd Assign(std::string var, bdd expr) const;
           bdd Assume(bdd expr1, bdd expr2) const;
 
+          bdd Assign(std::string var, bdd expr, bdd skip) const;
+          bdd Assume(bdd expr1, bdd expr2, bdd skip) const;
+
           // //////////////Generates a random bdd///////////////////////////////////////////
           bdd tGetRandomTransformer(bool isTensored = false, unsigned seed=0) const;
 

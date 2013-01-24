@@ -923,6 +923,11 @@ unsigned ProgramBddContext::getRegSize(bdd forThis) const
 
 bdd ProgramBddContext::Assign(std::string var, bdd expr) const
 {
+  return Assign(var, expr, baseId);
+}
+
+bdd ProgramBddContext::Assign(std::string var, bdd expr, bdd skip) const
+{
   bddinfo_t bi;
   if(this->find(var) == this->end()){
     LOG(WARNING) << "[ProgramBddContext::Assign] Unknown Variable: " << var;
@@ -959,13 +964,24 @@ bdd ProgramBddContext::Assign(std::string var, bdd expr) const
   expr = bdd_relprod(expr,regA2var,fdd_ithset(regAInfo->baseExtra));
 
   // All transformers are slight perturbations of identity.
-  bdd c = baseId;
+  bdd c = skip;
+  c = bdd_exist(c, fdd_ithset(regAInfo->baseLhs));
+  c = bdd_exist(c, fdd_ithset(regAInfo->baseRhs));
+  c = bdd_exist(c, fdd_ithset(regAInfo->baseExtra));
+  c = bdd_exist(c, fdd_ithset(regBInfo->baseLhs));
+  c = bdd_exist(c, fdd_ithset(regBInfo->baseRhs));
+  c = bdd_exist(c, fdd_ithset(regBInfo->baseExtra));
   c = bdd_exist(c, fdd_ithset(bi->baseLhs));
   c = bdd_exist(c, fdd_ithset(bi->baseRhs));
   return bdd_exist(expr & c, fdd_ithset(sizeInfo));
 }
 
 bdd ProgramBddContext::Assume(bdd expr1, bdd expr2) const
+{
+  return Assume(expr1, expr2, baseId);
+}
+
+bdd ProgramBddContext::Assume(bdd expr1, bdd expr2, bdd skip) const
 {
 
   bddPair *regARhs2Extra = bdd_newpair();
@@ -988,7 +1004,15 @@ bdd ProgramBddContext::Assume(bdd expr1, bdd expr2) const
 
   expr2 = bdd_replace(expr2, baseLhs2Rhs.get());
 
-  bdd equate = baseId &
+  bdd c = skip;
+  c = bdd_exist(c, fdd_ithset(regAInfo->baseLhs));
+  c = bdd_exist(c, fdd_ithset(regAInfo->baseRhs));
+  c = bdd_exist(c, fdd_ithset(regAInfo->baseExtra));
+  c = bdd_exist(c, fdd_ithset(regBInfo->baseLhs));
+  c = bdd_exist(c, fdd_ithset(regBInfo->baseRhs));
+  c = bdd_exist(c, fdd_ithset(regBInfo->baseExtra));
+
+  bdd equate = c &
     fdd_equals(
         regAInfo->baseExtra,
         regBInfo->baseExtra
