@@ -589,10 +589,16 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
     for(std::map<std::string, int>::const_iterator ci = interleavedVars.begin(); ci != interleavedVars.end(); ++ci){
       bddinfo_t varInfo = (*this)[ci->first];
       int j = 3 * vari;
+#if 0
+  simply not true.
       // In this case, tensor1 has the three levels reversed. 
       varInfo->tensor1Extra = base + j++;
       varInfo->tensor1Rhs = base + j++;
       varInfo->tensor1Lhs = base + j++;
+#endif
+      varInfo->tensor1Lhs = base + j++;
+      varInfo->tensor1Rhs = base + j++;
+      varInfo->tensor1Extra = base + j++;
       vari++;  
     }
   }
