@@ -11,6 +11,8 @@
 #include <cstdlib>
 #include <map>
 
+#include <boost/static_assert.hpp>
+
 // ::wali::domains::binrel
 #include "wali/domains/binrel/BinRel.hpp"
 #include "wali/domains/binrel/ProgramBddContext.hpp"
@@ -19,10 +21,67 @@
 using namespace std;
 using namespace wali;
 using namespace wali::domains::binrel;
+using namespace wali::domains::binrel::details;
 
 #include "Common.cpp"
 
 namespace{
+
+  struct RawBuddyContext
+  {
+    RawBuddyContext(int numvars = 4) {
+      assert(!bdd_isrunning());
+      int err = bdd_init(10000,1000);
+      err |= bdd_setvarnum(numvars);
+      assert(!err);
+    }
+
+    ~RawBuddyContext() {
+      bdd_done();
+    }
+  };
+
+
+  struct SubsetsOfFour
+  {
+    bdd b0, b1, b2, b3, b01, b02, b03, b12, b13,
+      b23, b012, b013, b023, b123, b0123;
+    
+    SubsetsOfFour()
+    {
+      assert(bdd_isrunning());
+      if (bdd_varnum() < 2) {
+        int err = bdd_setvarnum(2);
+        assert(!err);
+      }
+
+      bdd zero  = bdd_nithvar(0) & bdd_nithvar(1);
+      bdd one   = bdd_nithvar(0) & bdd_ithvar(1);
+      bdd two   = bdd_ithvar(0) & bdd_nithvar(1);
+      bdd three = bdd_ithvar(0) & bdd_ithvar(1);
+
+      b0 = zero;
+      b1 = one;
+      b2 = two;
+      b3 = three;
+
+      b01 = zero | one;
+      b02 = zero | two;
+      b03 = zero | three;
+      b12 = one | two;
+      b13 = one | three;
+      b23 = two | three;
+
+      b012 = b01 | two;
+      b013 = b01 | three;
+      b023 = b02 | three;
+      b123 = b12 | three;
+
+      b0123 = b012 | three;
+    }
+  };
+  
+  
 
   TEST(BinRelSelfTest, copyTest){
     ProgramBddContext ctx;
@@ -79,6 +138,59 @@ namespace{
     ASSERT_TRUE(compareOutput("BinRelSelfTest","creationTest",ss));
   }
 
+  TEST(ProgramBddContext, mapConstructorNoVars)
+  {
+    std::map<std::string, int> vars;
+    ProgramBddContext ctx(vars);
+
+    EXPECT_EQ(0u, ctx.size());
+  }
+       
+  TEST(ProgramBddContext, mapConstructorFewVars)
+  {
+    std::map<std::string, int> vars;
+    vars["a"] = 2;
+    vars["b"] = 2;
+    vars["c"] = 4;
+    ProgramBddContext ctx(vars);
+
+    EXPECT_EQ(3u, ctx.size());
+  }
+
+  TEST(ProgramBddContext, vectorConstructorEmptyVec)
+  {
+    std::vector<std::map<std::string, int> > vars;
+    ProgramBddContext ctx(vars);
+
+    EXPECT_EQ(0u, ctx.size());
+  }
+       
+  TEST(ProgramBddContext, mapConstructorOneLevelFewVars)
+  {
+    std::vector<std::map<std::string, int> > vars;
+    vars.resize(1);
+    vars.at(0)["a"] = 2;
+    vars.at(0)["b"] = 2;
+    vars.at(0)["c"] = 4;
+    ProgramBddContext ctx(vars);
+
+    EXPECT_EQ(3u, ctx.size());
+  }
+
+  TEST(ProgramBddContext, mapConstructorFewLevelFewVars)
+  {
+    std::vector<std::map<std::string, int> > vars;
+    vars.resize(3);
+    vars.at(0)["a"] = 2;
+    vars.at(1)["b"] = 2;
+    vars.at(1)["c"] = 4;
+    vars.at(2)["d"] = 4;
+    vars.at(2)["e"] = 4;
+    ProgramBddContext ctx(vars);
+
+    EXPECT_EQ(5u, ctx.size());
+  }
+  
   TEST(BinRelSelfTest, selfTest){
     program_bdd_context_t brm = new ProgramBddContext();
     brm->addBoolVar("a");
@@ -1000,5 +1112,206 @@ namespace{
     }
   }
 
+#if defined(TENSOR_MATCHED_PAREN)
+  TEST(BddContext, bitLevelInfo)
+  {
+    program_bdd_context_t con;
+    con = new ProgramBddContext();
+    map<string, int> vars;
+    vars["a"] = 2;
+    vars["b"] = 2;
+    con->setIntVars(vars);
+    
+    bddinfo_t a = (*con)["a"];
+    bddinfo_t b = (*con)["b"];
+
+    bdd t;
+
+    // Setup Level sets
+    con->setupLevelSets();
+
+    /*
+     * t looks like:
+     * "a".tensor1Lhs          *
+     *                       1/ \0
+     *              ----------   ---------
+     *          bddfalse              bddtrue
+     **/
+    t = fdd_ithvar(a->tensor1Lhs, 0);
+    EXPECT_TRUE(con->isRootInVocTensor1Lhs(t));
+    EXPECT_FALSE(con->isRootRelevant(bdd_low(t)));
+    EXPECT_FALSE(con->isRootRelevant(bdd_high(t)));
+ 
+    /*
+     * t looks like:
+     * "a".tensor1Rhs         *
+     *                      1/ \0
+     *                 ------   \
+     * "a".tensor1Lhs  *         \
+     *               1/ \         \
+     *               /   ----------
+     *            bddtrue        bddfalse
+     **/
+    t = fdd_ithvar(a->tensor1Rhs, 1) & fdd_ithvar(a->tensor1Lhs, 1);
+    EXPECT_TRUE(con->isRootInVocTensor1Rhs(t));
+    EXPECT_TRUE(con->isRootInVocTensor1Lhs(bdd_high(t)));
+    EXPECT_FALSE(con->isRootRelevant(bdd_low(t)));
+
+    /*
+     * t looks like:
+     * "b".tensor2Lhs         *
+     *                      1/ \0
+     * "b".tensor2Rhs       /   *
+     *                     /  0/ \1
+     * "a".tensor2Lhs      |  /   *
+     *                     |  | 1/ \0
+     * "a".tensor2Rhs      |  |  |  *
+     *                     |  |  |0/ \1
+     *                  -----------   \
+     *                bddfalse       bddtrue
+     **/
+    t = fdd_ithvar(b->tensor2Lhs, 0) & fdd_ithvar(a->tensor2Lhs, 0) & fdd_ithvar(b->tensor2Rhs, 1) & fdd_ithvar(a->tensor2Rhs, 1);
+    EXPECT_TRUE(con->isRootInVocTensor2Lhs(t));
+    t = bdd_low(t);
+    EXPECT_TRUE(con->isRootInVocTensor2Rhs(t));
+    t = bdd_high(t);
+    EXPECT_TRUE(con->isRootInVocTensor2Lhs(t));
+    t = bdd_low(t);
+    EXPECT_TRUE(con->isRootInVocTensor2Rhs(t));
+    t = bdd_high(t);
+    EXPECT_TRUE(t == bddtrue);
+
+    /*
+     * t looks like:
+     * "a".tensor1Rhs         *
+     *                      1/ \0
+     * "a".tensor1Lhs       /   *
+     *                     /  0/ \1
+     * "b".tensor1Rhs      |  /   *
+     *                     |  | 1/ \0
+     * "b".tensor1Lhs      |  |  |  *
+     *                     |  |  |0/ \1
+     *                  -----------   \
+     *                bddfalse       bddtrue
+     **/
+    t = fdd_ithvar(a->tensor1Rhs, 0) & fdd_ithvar(a->tensor1Lhs, 1) & fdd_ithvar(b->tensor1Rhs, 0) & fdd_ithvar(b->tensor1Lhs, 1);
+    EXPECT_TRUE(con->isRootInVocTensor1Rhs(t));
+    t = bdd_low(t);
+    EXPECT_TRUE(con->isRootInVocTensor1Lhs(t));
+    t = bdd_high(t);
+    EXPECT_TRUE(con->isRootInVocTensor1Rhs(t));
+    t = bdd_low(t);
+    EXPECT_TRUE(con->isRootInVocTensor1Lhs(t));
+    t = bdd_high(t);
+    EXPECT_TRUE(t == bddtrue);
+
+  }
+#endif //#if defined(TENSOR_MATCHED_PAREN)
+
+
+  TEST(wali$domains$binrel$details$$bddImplies, trueImpliesTrue)
+  {
+    RawBuddyContext buddy;
+    EXPECT_TRUE(bddImplies(bddtrue, bddtrue));
+  }
+
+  TEST(wali$domains$binrel$details$$bddImplies, trueDoesNotSubsumeFalse)
+  {
+    RawBuddyContext buddy;
+    EXPECT_FALSE(bddImplies(bddtrue, bddfalse));
+  }
+
+  TEST(wali$domains$binrel$details$$bddImplies, falseImpliesTrue)
+  {
+    RawBuddyContext buddy;
+    EXPECT_TRUE(bddImplies(bddfalse, bddtrue));
+  }
+
+  TEST(wali$domains$binrel$details$$bddImplies, falseImpliesFalse)
+  {
+    RawBuddyContext buddy;
+    EXPECT_TRUE(bddImplies(bddfalse, bddfalse));
+  }
+
+
+  TEST(wali$domains$binrel$details$$bddImplies, subsetsOfFourBattery)
+  {
+    RawBuddyContext buddy(2);
+    SubsetsOfFour subsets;
+
+    bdd bdds[] = {
+      bddfalse, subsets.b0, subsets.b1, subsets.b2, subsets.b3, subsets.b01, subsets.b02,
+      subsets.b03, subsets.b12, subsets.b13, subsets.b23, subsets.b012, subsets.b013,
+      subsets.b023, subsets.b123, subsets.b0123
+    };
+
+    bool answers[][16] = {
+      //            {},    {0}    {1}    {2}    {3}    {01}   {02}   {03}   {12}   {13}   {23}   {012}  {013}  {023}  {123}  {0123}
+      /* {}    */ { true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true },
+
+      /* {0}   */ { false, true,  false, false, false, true,  true,  true,  false, false, false, true,  true,  true,  false, true },
+      /* {1}   */ { false, false, true,  false, false, true,  false, false, true,  true,  false, true,  true,  false, true,  true },
+      /* {2}   */ { false, false, false, true,  false, false, true,  false, true,  false, true,  true,  false, true,  true,  true },
+      /* {3}   */ { false, false, false, false, true,  false, false, true,  false, true,  true,  false, true,  true,  true,  true },
+
+      /* {01}  */ { false, false, false, false, false, true,  false, false, false, false, false, true,  true,  false, false, true },
+      /* {02}  */ { false, false, false, false, false, false, true,  false, false, false, false, true,  false, true,  false, true },
+      /* {03}  */ { false, false, false, false, false, false, false, true,  false, false, false, false, true,  true,  false, true },
+      /* {12}  */ { false, false, false, false, false, false, false, false, true,  false, false, true,  false, false, true,  true },
+      /* {13}  */ { false, false, false, false, false, false, false, false, false, true,  false, false, true,  false, true,  true },
+      /* {23}  */ { false, false, false, false, false, false, false, false, false, false, true,  false, false, true,  true,  true },
+
+      /* {012} */ { false, false, false, false, false, false, false, false, false, false, false, true,  false, false, false, true },
+      /* {013} */ { false, false, false, false, false, false, false, false, false, false, false, false, true,  false, false, true },
+      /* {023} */ { false, false, false, false, false, false, false, false, false, false, false, false, false, true,  false, true },
+      /* {123} */ { false, false, false, false, false, false, false, false, false, false, false, false, false, false, true,  true },
+
+      /* {0124}*/ { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true }
+    };
+
+#define NUM_ELEMENTS(array) (sizeof(array)/sizeof((array)[0]))
+
+    BOOST_STATIC_ASSERT(NUM_ELEMENTS(answers) == NUM_ELEMENTS(bdds));
+    BOOST_STATIC_ASSERT(NUM_ELEMENTS(answers[0]) == NUM_ELEMENTS(bdds));
+
+    for (int i=0; i<2; ++i) {
+      if (i==1) {
+        // reverse the order
+        int order[] = {1, 0};
+        int old_var_level_0 = bdd_var2level(0);
+        ASSERT_EQ(bdd_varnum(), NUM_ELEMENTS(order));
+        bdd_setvarorder(order);
+        EXPECT_NE(old_var_level_0, bdd_var2level(0));
+      }
+      
+      for (size_t left_no=0; left_no<NUM_ELEMENTS(bdds); ++left_no) {
+        for (size_t right_no=0; right_no<NUM_ELEMENTS(bdds); ++right_no) {
+          std::stringstream ss;
+          ss << "Checking whether BDD " << left_no << " is a subset of " << right_no;
+          SCOPED_TRACE(ss.str());
+          
+          bdd left = bdds[left_no];
+          bdd right = bdds[right_no];
+          bool expected = answers[left_no][right_no];
+          bool actual = bddImplies(left, right);
+          bool actual_imp = bddImplies_using_bdd_imp(left, right);
+          bool actual_rec = bddImplies_recursive(left, right);
+          
+          EXPECT_EQ(expected, actual);
+          EXPECT_EQ(expected, actual_imp);
+          EXPECT_EQ(expected, actual_rec);
+        }
+      }
+    }
+  }
+
+  
+
 } //namespace
 
+
+// Yo, Emacs!
+// Local Variables:
+//   c-file-style: "ellemtel"
+//   c-basic-offset: 2
+// End:

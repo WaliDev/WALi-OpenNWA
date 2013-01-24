@@ -5,6 +5,7 @@
  * @author Evan Driscoll
  */
 #include <stack>
+#include <map>
 
 #include "wali/Common.hpp"
 #include "wali/witness/Visitor.hpp"
@@ -48,9 +49,13 @@ namespace wali
     class CalculatingVisitor : public Visitor
     {
     private:
+
       typedef std::pair<AnswerType, Witness*> SourcedAnswer;
       std::stack<SourcedAnswer> answerStack;
 
+      typedef std::map<Witness*, AnswerType> Cache;
+      Cache cache;
+      
       AnswerType popCheck(Witness * expected_source) {
         assert(!answerStack.empty());
         SourcedAnswer temp = answerStack.top();
@@ -62,6 +67,18 @@ namespace wali
       void push(Witness * source, AnswerType const & ans) {
         answerStack.push(SourcedAnswer(ans, source));
       }
+
+      // Draw previously calculated values from cache, and if found,
+      // return false to indicate that children should not be traversed.
+      bool visit_helper(Witness * w) {
+        typedef typename Cache::const_iterator iter_type;
+        iter_type loc = cache.find(w);
+        if (loc == cache.end()) {
+          return true;
+        }
+        push(w, loc->second);
+        return false;
+      }
       
     public:
       AnswerType const & answer() const {
@@ -70,12 +87,12 @@ namespace wali
       }
       
       // These functions return true to continue visiting children.
-      virtual bool visit( Witness * w )                { (void) w; return true; }
-      virtual bool visitExtend( WitnessExtend * w )    { (void) w; return true; }
-      virtual bool visitCombine( WitnessCombine * w )  { (void) w; return true; }
-      virtual bool visitMerge( WitnessMerge * w )      { (void) w; return true; }
-      virtual bool visitRule( WitnessRule * w )        { (void) w; return true; }
-      virtual bool visitTrans( WitnessTrans * w )      { (void) w; return true; }
+      virtual bool visit( Witness * w )                { return visit_helper(w); }
+      virtual bool visitExtend( WitnessExtend * w )    { return visit_helper(w); }
+      virtual bool visitCombine( WitnessCombine * w )  { return visit_helper(w); }
+      virtual bool visitMerge( WitnessMerge * w )      { return visit_helper(w); }
+      virtual bool visitRule( WitnessRule * w )        { return visit_helper(w); }
+      virtual bool visitTrans( WitnessTrans * w )      { return visit_helper(w); }
 
       // These functions do fancy-schmancy stuff
       virtual void postvisitExtend( WitnessExtend * w) {
@@ -84,6 +101,8 @@ namespace wali
         
         AnswerType ans = calculateExtend(w, left, right);
         push(w, ans);
+        assert(cache.find(w) == cache.end());
+        cache[w] = ans;
       }
       
       virtual void postvisitCombine( WitnessCombine * w) {
@@ -98,6 +117,8 @@ namespace wali
 
         AnswerType ans = calculateCombine(w, child_answers);
         push(w, ans);
+        assert(cache.find(w) == cache.end());
+        cache[w] = ans;
       }
       
       virtual void postvisitMerge( WitnessMerge * w) {
@@ -107,16 +128,22 @@ namespace wali
         
         AnswerType ans = calculateMerge(w, caller, rule, callee);
         push(w, ans);
+        assert(cache.find(w) == cache.end());
+        cache[w] = ans;
       }
       
       virtual void postvisitRule( WitnessRule * w) {
         AnswerType ans = calculateRule(w);
         push(w, ans);
+        assert(cache.find(w) == cache.end());
+        cache[w] = ans;
       }
       
       virtual void postvisitTrans( WitnessTrans * w) {
         AnswerType ans = calculateTrans(w);
         push(w, ans);
+        assert(cache.find(w) == cache.end());
+        cache[w] = ans;
       }
 
 

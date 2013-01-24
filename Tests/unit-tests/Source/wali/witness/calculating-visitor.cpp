@@ -85,6 +85,13 @@ namespace wali {
         
         struct StringComputer : public CalculatingVisitor<std::string>
         {
+            int num_rule_computations;
+            
+            StringComputer()
+                : num_rule_computations(0)
+            {}
+            
+            
             //! Overload to calculate the value of an extend
             //! node. Modifications to the AnswerType& parameters will not
             //! persist.
@@ -130,6 +137,7 @@ namespace wali {
             virtual std::string calculateRule( WitnessRule * w)
             {
                 (void) w;
+                ++num_rule_computations;
                 return key2str(w->getRuleStub().from_state());
             }
 
@@ -301,6 +309,26 @@ namespace wali {
             StringComputer sc;
             tree->accept(sc);
             EXPECT_EQ(str_tree, sc.answer());
+        }
+
+
+        TEST(wali$witness$CalculatingVisitor, eachSubTreeIsOnlyComputedOnce)
+        {
+            //        +
+            //       / \      [anti line continuation]
+            //      /   \     [anti line continuation]
+            //      \   /
+            //       \ /
+            //        a
+
+            config_ptr_pair ptrs1, ptrs2;
+            witness_t leaf = make_example_rule("a", &ptrs1);
+            witness_t tree = make_combine(leaf, leaf);
+
+            StringComputer sc;
+            tree->accept(sc);
+            EXPECT_EQ("(a + a)", sc.answer());
+            EXPECT_EQ(1, sc.num_rule_computations);
         }
 
     }

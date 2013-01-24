@@ -121,6 +121,18 @@ inline expr * mark_post_expr(expr *l)
   l->op = AST_VAR_POST;
   return l;
 }
+inline expr * make_deep_copy_expr(expr const * e)
+{
+  if(!e) return NULL;
+  expr * res = make_clean_expr();
+  res->op = e->op;
+  res->l = make_deep_copy_expr(e->l);
+  res->r = make_deep_copy_expr(e->r);
+  res->c = e->c;
+  if(e->v)
+    res->v = strdup(e->v);
+  return res;
+}
 
 inline stmt * make_clean_stmt()
 {
@@ -674,8 +686,10 @@ void emit_stmt(FILE * fout, const stmt * s, unsigned indent)
       fprintf(fout, ";\n");
       break;
     case AST_CALL:
-      emit_comma_separated_str_list(fout, s->vl);
-      fprintf(fout, " := ");
+      if(s->vl){
+        emit_comma_separated_str_list(fout, s->vl);
+        fprintf(fout, " := ");
+      }
       fprintf(fout, "%s(", s->f);
       emit_comma_separated_expr_list(fout, s->el);
       fprintf(fout, ")\n");

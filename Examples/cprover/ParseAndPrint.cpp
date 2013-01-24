@@ -38,7 +38,10 @@ int main(int argc, char ** argv)
   cout << "Instrumenting asserts..." << endl;
   if(!mainProc) mainProc = strdup("main");
   if(!errLbl) errLbl = strdup("error");
+  make_void_returns_explicit(pg);
+  instrument_enforce(pg);
   instrument_asserts(pg, errLbl);
+  instrument_call_return(pg);
 
   cout << "The program..." << endl;
   emit_prog(stdout, pg);

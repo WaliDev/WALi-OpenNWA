@@ -6,7 +6,6 @@
 #include "wali/graph/RegExp.hpp"
 #include "wali/graph/Functional.hpp"
 #include "wali/graph/GraphCommon.hpp"
-#include "wali/graph/NewtonLogger.hpp"
 
 #include <map>
 
@@ -284,7 +283,7 @@ namespace wali {
              * These should be cleaned up when we're finished with the analysis.
              **/
             static void cleanUp();
-            void saturate(newton_logger_t nlog = NULL);
+            void saturate();
 
             sem_elem_t getWeight(int nno) const ;
             string toDot();

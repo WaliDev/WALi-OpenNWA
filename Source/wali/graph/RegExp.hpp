@@ -140,8 +140,11 @@ namespace wali {
           RegExpSatProcess() : update_count(1) { }
         };
 
+        class RegExpDiagnostics;
 
         class RegExp {
+            public:
+              friend class RegExpDiagnostics; 
             public:
                 unsigned int count; // for reference counting
             private:
@@ -152,6 +155,17 @@ namespace wali {
 #endif
                 node_no_t updatable_node_no;
                 list<reg_exp_t> children;
+#if defined(PUSH_EVAL)
+                /*
+                   In push based evaluation of the RegExp graph, an updatable regular expression
+                   sets the dirty bit for all its ancestors. During a real evaluation, only the
+                   dirty bit is checked to determine whether reevaluation is needed. All
+                   non-terminal RegExp nodes are created with the dirty bit set.
+                */
+                bool dirty;
+                /* When set, points to the ancestors in the RegExp dag. */
+                list<reg_exp_t> parents;
+#endif
                 unsigned int last_change;
                 unsigned int last_seen;
 
@@ -185,12 +199,17 @@ namespace wali {
 
                 // For debugging
                 bool uptodate;
+                std::vector<unsigned int> updates;
+                std::vector<unsigned int> evaluations;
 
                 RegExp(node_no_t nno, sem_elem_t se) {
                     type = Updatable;
                     value = se;
                     updatable_node_no = nno;
                     count = 0;
+#if defined(PUSH_EVAL)
+                    dirty = true;
+#endif
                     last_change = 1;
                     last_seen = 1;
                     uptodate = false;
@@ -199,7 +218,7 @@ namespace wali {
                     lastchange=-1;
                     satProcess = currentSatProcess;
                 }
-                RegExp(reg_exp_type t, const reg_exp_t r1, const reg_exp_t r2 = 0) {
+                RegExp(reg_exp_type t, reg_exp_t r1, reg_exp_t r2 = 0) {
                     count = 0;
                     nevals = 0;
                     if(t == Extend || t == Combine) {
@@ -216,6 +235,12 @@ namespace wali {
                     } else {
                         assert(0);
                     }
+#if defined(PUSH_EVAL)
+                    dirty = true;
+                    r1->parents.push_back(static_cast<RegExp*>(this));
+                    if(!(r2 == NULL))
+                      r2->parents.push_back(static_cast<RegExp*>(this));
+#endif
                     last_change = 0;
                     last_seen = 0;
                     uptodate = false;
@@ -228,6 +253,9 @@ namespace wali {
                     value = se;
                     updatable_node_no = 0; // default value
                     count = 0;
+#if defined(PUSH_EVAL)
+                    dirty = false; //Will always remains o                    
+#endif
                     last_change = 1;
                     last_seen = 0;
                     uptodate = false;
@@ -256,7 +284,7 @@ namespace wali {
                 }
 
                 ostream &print(ostream &out);
-                long toDot(ostream &out, std::set<long>& seen, bool isRoot = false);
+                long toDot(ostream &out, std::set<long>& seen, bool printUpdates = false, bool isRoot = false);
                 static reg_exp_t star(reg_exp_t r);
                 static reg_exp_t extend(reg_exp_t r1, reg_exp_t r2);
                 static reg_exp_t combine(reg_exp_t r1, reg_exp_t r2);
@@ -321,6 +349,9 @@ namespace wali {
 
             private:
 
+#if defined(PUSH_EVAL)
+                void setDirty();
+#endif
                 void evaluate();
                 void evaluate_iteratively();
                 sem_elem_t evaluate(sem_elem_t w);
@@ -331,6 +362,36 @@ namespace wali {
 
                 bool dfs(set<RegExp *> &, set<RegExp *> &);
                 int calculate_height(set<RegExp *> &visited, out_node_stat_t &stat_map);
+        };
+
+        /**
+         * Provides a bunch of static functions to collect information
+         * about the current RegExp graph.
+         **/        
+        class RegExpDiagnostics
+        {
+          public:
+            /**
+             * Count the total number of active nodes in the RegExp graph
+             **/
+            static long countTotalCombines();
+            static long countTotalExtends();
+            static long countTotalStars();
+
+            /**
+             * Counts the total cumulative nodes except those reachable from
+             * the list of nodes given as exclude
+             **/
+            static long countExcept(std::vector<reg_exp_t>& exceptions);
+          private:
+            static long countTotalCombines(reg_exp_t const e);
+            static long countTotalExtends(reg_exp_t const e);
+            static long countTotalStars(reg_exp_t const e);
+            static void excludeFromCountReachable(reg_exp_t const e);
+            static long countTotalNodes(reg_exp_t const e);
+          private:
+            static reg_exp_hash_t visited;
+            
         };
 
     } // namespace graph

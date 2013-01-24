@@ -91,6 +91,104 @@ namespace opennwa {
             }
 
 
+            // Technically this test is too strict. It would be correct to
+            // omit the return transition, or even everything (because
+            // nothing is accepted anyway).
+            TEST(opennwa$construct$$intersection, findsReturnTransitionWhenFirstPairDiscoveredIsExits)
+            {
+                State
+                    a1 = getKey("a1"),
+                    b1 = getKey("b1"),
+                    c1 = getKey("c1"),
+                    d1 = getKey("d1"),
+                    a2 = getKey("a2"),
+                    b2 = getKey("b2"),
+                    c2 = getKey("c2"),
+                    d2 = getKey("d2");
+                Symbol
+                    sym = getKey("sym"),
+                    ret = getKey("return");
+
+                // We build two coies of this automaton:
+                //
+                //     ret (c)
+                //  a ---------> d
+                //  |
+                //  | sym
+                //  \/
+                //  b
+                //  |
+                //  | sym
+                //  \/
+                //  c
+
+                Nwa m1, m2;
+
+                m1.addInitialState(a1);              m2.addInitialState(a2);
+                m1.addInternalTrans(a1, sym, b1);    m2.addInternalTrans(a2, sym, b2);
+                m1.addInternalTrans(b1, sym, c1);    m2.addInternalTrans(b2, sym, c2);
+                m1.addReturnTrans(a1, c1, ret, d1);  m2.addReturnTrans(a2, c2, ret, d2);
+
+                // Then intersect them and make sure that they look like the
+                // original. At least, as much as we can do really
+                // easily. :-)
+
+                NwaRefPtr result = intersect(m1, m2);
+
+                EXPECT_EQ(4u, result->sizeStates());
+                EXPECT_EQ(2u, result->sizeSymbols());
+                EXPECT_EQ(2u, result->sizeInternalTrans());
+                EXPECT_EQ(0u, result->sizeCallTrans());
+                EXPECT_EQ(1u, result->sizeReturnTrans());
+            }
+            
+
+            TEST(opennwa$construct$$intersection, findsReturnTransitionWhenFirstPairDiscoveredIsPredecessors)
+            {
+                State
+                    a1 = getKey("a1"),
+                    b1 = getKey("b1"),
+                    c1 = getKey("c1"),
+                    d1 = getKey("d1"),
+                    a2 = getKey("a2"),
+                    b2 = getKey("b2"),
+                    c2 = getKey("c2"),
+                    d2 = getKey("d2");
+                Symbol
+                    sym = getKey("sym"),
+                    ret = getKey("return");
+
+                // We build two coies of this automaton:
+                //
+                //  a
+                //  | sym
+                //  |
+                //  \/
+                //  b
+                //  |
+                //  | sym
+                //  \/   ret (a)
+                //  c ---------> d
+
+                Nwa m1, m2;
+
+                m1.addInitialState(a1);              m2.addInitialState(a2);
+                m1.addInternalTrans(a1, sym, b1);    m2.addInternalTrans(a2, sym, b2);
+                m1.addInternalTrans(b1, sym, c1);    m2.addInternalTrans(b2, sym, c2);
+                m1.addReturnTrans(c1, a1, ret, d1);  m2.addReturnTrans(c2, a2, ret, d2);
+
+                // Then intersect them and make sure that they look like the
+                // original. At least, as much as we can do really
+                // easily. :-)
+
+                NwaRefPtr result = intersect(m1, m2);
+
+                EXPECT_EQ(4u, result->sizeStates());
+                EXPECT_EQ(2u, result->sizeSymbols());
+                EXPECT_EQ(2u, result->sizeInternalTrans());
+                EXPECT_EQ(0u, result->sizeCallTrans());
+                EXPECT_EQ(1u, result->sizeReturnTrans());
+            }
             
     }
 }
