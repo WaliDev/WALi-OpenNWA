@@ -10,8 +10,8 @@ namespace wali
 {
   namespace wfa
   {
-    sem_elem_t WeightMaker::make_weight( ITrans *lhs,
-        ITrans *rhs) {
+    sem_elem_t WeightMaker::make_weight( ITrans const * lhs,
+        ITrans const * rhs) {
       return make_weight(lhs->weight(), rhs->weight());
     }
 

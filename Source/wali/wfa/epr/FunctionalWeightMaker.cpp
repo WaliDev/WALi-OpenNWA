@@ -15,7 +15,7 @@ namespace wali
     namespace epr 
     {
 
-      sem_elem_t FunctionalWeightMaker::make_weight( ITrans *lhs, ITrans *rhs) {
+      sem_elem_t FunctionalWeightMaker::make_weight( ITrans const *lhs, ITrans const *rhs) {
 
         return new FunctionalWeight(lhs, rhs);
       }

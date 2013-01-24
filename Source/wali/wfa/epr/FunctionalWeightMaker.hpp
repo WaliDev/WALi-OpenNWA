@@ -30,7 +30,7 @@ namespace wali {
 
         sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs );
 
-        sem_elem_t make_weight( ITrans *lhs, ITrans *rhs);
+        sem_elem_t make_weight( ITrans const * lhs, ITrans const * rhs);
 
       }; // FunctionalWeightMaker
 
