@@ -38,6 +38,21 @@ using namespace wali::wpds::fwpds;
 using namespace wali::cprover;
 using namespace wali::domains::binrel;
 
+#include <pthread.h>
+#include <signal.h>
+
+static pthread_t worker;
+
+extern "C" 
+{
+  void handle_sighup(int signum)
+  {
+    if(signum == SIGHUP){
+        pthread_cancel(worker);
+    }
+  }
+}
+
 namespace{
 
   class WFACompare : public wali::wfa::ConstTransFunctor
@@ -664,8 +679,39 @@ namespace goals {
 
 using namespace goals;
 
+static short goal;
+
+void * work(void *)
+{
+  int dump;
+  pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &dump);
+
+
+  switch(goal){
+    case 1:
+      deepCompare();
+      break;
+    case 2:
+      endToEndCompare();
+      break;
+    case 3:
+      runNewton();
+      break;
+    case 4:
+      runFwpds();
+      break;
+    default:
+      assert(0 && "I don't understand that goal!!!");
+  }
+  return NULL;
+}
+
 int main(int argc, char ** argv)
 {
+
+  // register signal handler
+  signal(SIGHUP, handle_sighup);
+
   if(argc < 3){
     cerr 
       << "Usage: " << endl
@@ -684,7 +730,6 @@ int main(int argc, char ** argv)
     fname = s.str();
   }
 
-  short goal;
   ++curarg;
   if(argc >= curarg){
     stringstream s;
@@ -739,22 +784,11 @@ int main(int argc, char ** argv)
     pds_stream << "}" << endl;
   }
 
-  switch(goal){
-    case 1:
-      deepCompare();
-      break;
-    case 2:
-      endToEndCompare();
-      break;
-    case 3:
-      runNewton();
-      break;
-    case 4:
-      runFwpds();
-      break;
-    default:
-      assert(0 && "I don't understand that goal!!!");
-  }
+
+  pthread_create(&worker, NULL, &work,  NULL);
+
+  void * dump;
+  pthread_join(worker, &dump);
 
   // Clean Up.
   delete originalPds;
