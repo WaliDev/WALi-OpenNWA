@@ -1279,7 +1279,7 @@ namespace{
         // reverse the order
         int order[] = {1, 0};
         int old_var_level_0 = bdd_var2level(0);
-        ASSERT_EQ(bdd_varnum(), NUM_ELEMENTS(order));
+        ASSERT_EQ(bdd_varnum(), static_cast<int>(NUM_ELEMENTS(order)));
         bdd_setvarorder(order);
         EXPECT_NE(old_var_level_0, bdd_var2level(0));
       }
