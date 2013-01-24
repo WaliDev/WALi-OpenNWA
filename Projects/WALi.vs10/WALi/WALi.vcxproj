@@ -253,7 +253,6 @@
     <ClCompile Include="..\..\..\Source\opennwa\query\transitions.cpp" />
     <ClCompile Include="..\..\..\Source\wali\domains\SemElemSet.cpp" />
     <ClCompile Include="..\..\..\Source\wali\graph\Functional.cpp" />
-    <ClCompile Include="..\..\..\Source\wali\graph\NewtonLogger.cpp" />
     <ClCompile Include="..\..\..\Source\wali\Reach.cpp" />
     <ClCompile Include="..\..\..\Source\wali\SemElemTensor.cpp" />
     <ClCompile Include="..\..\..\Source\wali\wfa\DeterminizeWeightGen.cpp" />

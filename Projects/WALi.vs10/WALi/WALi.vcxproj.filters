@@ -387,9 +387,6 @@
     <ClCompile Include="..\..\..\Source\wali\graph\Functional.cpp">
       <Filter>Source Files\wali.graph</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\wali\graph\NewtonLogger.cpp">
-      <Filter>Source Files\wali.graph</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\wali\wfa\WFA-eclose.cpp">
       <Filter>Source Files\wali.wfa</Filter>
     </ClCompile>
