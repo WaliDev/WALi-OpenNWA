@@ -225,6 +225,7 @@ BddContext::BddContext(int bddMemSize, int cacheSize) :
   //release mutex
 
   baseSwap = BddPairPtr(bdd_newpair());
+  tensor1Swap = BddPairPtr(bdd_newpair());
   baseRightShift = BddPairPtr(bdd_newpair());
   tensorRightShift = BddPairPtr(bdd_newpair());
   baseRestore = BddPairPtr(bdd_newpair());
@@ -265,6 +266,7 @@ BddContext::BddContext(const BddContext& other) :
   std::map< const std::string, bddinfo_t>(other),
   count(0),
   baseSwap(other.baseSwap),
+  tensor1Swap(other.tensor1Swap),
   baseRightShift(other.baseRightShift),
   tensorRightShift(other.tensorRightShift),
   baseRestore(other.baseRestore),
@@ -304,6 +306,7 @@ BddContext& BddContext::operator = (const BddContext& other)
   if(this!=&other){
     count=0;
     baseSwap=other.baseSwap;
+    tensor1Swap = other.baseSwap;
     baseRightShift=other.baseRightShift;
     tensorRightShift=other.tensorRightShift;
     baseRestore=other.baseRestore;
@@ -331,6 +334,7 @@ BddContext::~BddContext()
 {
   // shared_ptr::reset sets it to NULL
   baseSwap.reset();
+  tensor1Swap.reset();
   baseRightShift.reset();
   tensorRightShift.reset();
   baseRestore.reset();
@@ -558,9 +562,9 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
     for(std::map<std::string, int>::const_iterator ci = interleavedVars.begin(); ci != interleavedVars.end(); ++ci){
       bddinfo_t varInfo = (*this)[ci->first];
       int j = 3 * vari;
-      varInfo->baseLhs = base + j++;
-      varInfo->baseRhs = base + j++;
       varInfo->baseExtra = base + j++;
+      varInfo->baseRhs = base + j++;
+      varInfo->baseLhs = base + j++;
       vari++;  
     }
   }
@@ -589,16 +593,10 @@ void BddContext::createIntVars(const std::vector<std::map<std::string, int> >& v
     for(std::map<std::string, int>::const_iterator ci = interleavedVars.begin(); ci != interleavedVars.end(); ++ci){
       bddinfo_t varInfo = (*this)[ci->first];
       int j = 3 * vari;
-#if 0
-  simply not true.
       // In this case, tensor1 has the three levels reversed. 
       varInfo->tensor1Extra = base + j++;
       varInfo->tensor1Rhs = base + j++;
       varInfo->tensor1Lhs = base + j++;
-#endif
-      varInfo->tensor1Lhs = base + j++;
-      varInfo->tensor1Rhs = base + j++;
-      varInfo->tensor1Extra = base + j++;
       vari++;  
     }
   }
@@ -801,6 +799,8 @@ void BddContext::setupCachedBdds()
 
   fdd_setpairs(baseSwap.get(), baseLhs, baseRhs, this->size());
   fdd_setpairs(baseSwap.get(), baseRhs, baseLhs, this->size());
+  fdd_setpairs(tensor1Swap.get(), tensor1Lhs, tensor1Rhs, this->size());
+  fdd_setpairs(tensor1Swap.get(), tensor1Rhs, tensor1Lhs, this->size());
   fdd_setpairs(baseRightShift.get(), baseLhs, baseRhs, this->size());
   fdd_setpairs(baseRightShift.get(), baseRhs, baseExtra, this->size());
   fdd_setpairs(tensorRightShift.get(), tensor1Lhs, tensor1Rhs, this->size());
@@ -929,6 +929,8 @@ void BddContext::addIntVar(std::string name, unsigned size)
   //update bddPairs
   fdd_setpair(baseSwap.get(), varInfo->baseLhs, varInfo->baseRhs);
   fdd_setpair(baseSwap.get(), varInfo->baseRhs, varInfo->baseLhs);
+  fdd_setpair(tensor1Swap.get(), varInfo->tensor1Lhs, varInfo->tensor1Rhs);
+  fdd_setpair(tensor1Swap.get(), varInfo->tensor1Rhs, varInfo->tensor1Lhs);
   fdd_setpair(baseRightShift.get(), varInfo->baseLhs, varInfo->baseRhs);
   fdd_setpair(baseRightShift.get(), varInfo->baseRhs, varInfo->baseExtra);
   fdd_setpair(tensorRightShift.get(), varInfo->tensor1Lhs, varInfo->tensor1Rhs);

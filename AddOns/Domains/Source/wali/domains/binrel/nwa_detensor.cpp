@@ -315,10 +315,14 @@ void BinRel::populateNwa(DetensorNwa& nwa, DetensorWeightGen& wts)
   lTable.clear();
   for(unsigned i=0; i<con->numVars(); ++i)
     lTable.push_back(vector< State >());
-  tabulateStates(nwa, 0, rel);
+
+  // Transpose tensor1 levels.
+  bdd relt = bdd_replace(rel, con->tensor1Swap.get()); 
+  
+  tabulateStates(nwa, 0, relt);
   //cout << "#Nwa State created: " << tTable.size() << endl;
   visited.clear();
-  generateTransitions(nwa, wts, 0, rel); 
+  generateTransitions(nwa, wts, 0, relt); 
 }
 
 void BinRel::setupConstraintNwa(DetensorNwa& nwa)

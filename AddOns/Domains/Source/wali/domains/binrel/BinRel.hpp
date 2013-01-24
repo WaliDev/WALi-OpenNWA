@@ -255,6 +255,8 @@ namespace wali
           // Comments contain the more meaningful, but ghastly names
           //B1->B2 B2->B1
           BddPairPtr baseSwap;
+          //TL1->TL2 TL2->TL1
+          BddPairPtr tensor1Swap;
           //B1->B2 B2->B3
           BddPairPtr baseRightShift;
           //TL1->TL2 TR1->TR2 TL2->TL3 TR2->TR3 
