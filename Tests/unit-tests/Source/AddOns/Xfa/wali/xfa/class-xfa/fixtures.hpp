@@ -23,7 +23,7 @@ namespace wali {
                       std::string var)
             {
                 //false_ = new BinRel(&voc, voc.False());
-                true_  = new BinRel(&voc, voc.True());
+                true_  = new BinRel(&voc, voc.Assign(var, voc.NonDet()));
                 false_ = dynamic_cast<BinRel*>(true_->zero().get_ptr());
                 id     = new BinRel(&voc, voc.Assume(voc.True(), voc.True()));
                 set_to_zero  = new BinRel(&voc, voc.Assign(var, voc.Const(0)));
