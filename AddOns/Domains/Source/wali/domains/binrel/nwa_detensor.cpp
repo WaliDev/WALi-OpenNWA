@@ -34,6 +34,7 @@ using namespace opennwa;
 // Setup maps to enable quick lookup of information
 void BddContext::setupLevelArray()
 {
+  unsigned numVarsToSkip = 0;
   tensorVocLevels.clear();
   baseLhsVocLevels.clear();
   baseRhsVocLevels.clear();
@@ -42,8 +43,11 @@ void BddContext::setupLevelArray()
     bddinfo_t const varInfo = cit->second;
     // XXX:HACK BddContext is not supposed to know that __regA etc exist.
     // Try: skip this check and see if everything works out OK. Try the check below instead.
-    if(cit->first.compare("__regSize") == 0 || cit->first.compare("__regA") == 0 || cit->first.compare("__regB") == 0)
+    // This is a problem throught this function.
+    if(cit->first.compare("__regSize") == 0 || cit->first.compare("__regA") == 0 || cit->first.compare("__regB") == 0){
+      ++numVarsToSkip;
       continue;
+    }
     //Try this instead:
     //if(varInfo->maxVal > 2) continue;
 
@@ -71,6 +75,40 @@ void BddContext::setupLevelArray()
     baseRhsVocLevels.push_back(bdd_var2level(vars[0]));
   }
   sort(tensorVocLevels.begin(), tensorVocLevels.end());
+
+  // This raw bddpair is used to move stuff around for detensor based tensor
+  unsigned numUsefulVars = this->size() - numVarsToSkip;
+  int * base = new int[2 * numUsefulVars];
+  int * tensor2 = new int[2 * numUsefulVars];
+  int vari = 0;
+  for(std::map<const std::string, bddinfo_t>::const_iterator ci = this->begin(); ci != this->end(); ++ci){
+    if(ci->first.compare("__regSize") == 0 || ci->first.compare("__regA") == 0 || ci->first.compare("__regB") == 0)
+      continue;
+    bddinfo_t varInfo = ci->second;
+    base[vari] = varInfo->baseLhs;
+    base[vari+1] = varInfo->baseRhs;
+    vari+=2;
+  }
+  vari = 0;
+  for(std::map<const std::string, bddinfo_t>::const_reverse_iterator cri = this->rbegin(); cri != this->rend(); ++cri){
+    if(cri->first.compare("__regSize") == 0 || cri->first.compare("__regA") == 0 || cri->first.compare("__regB") == 0)
+      continue;
+    bddinfo_t varInfo = cri->second;
+    tensor2[vari] = varInfo->tensor2Lhs;
+    tensor2[vari+1] = varInfo->tensor2Rhs;
+    vari+=2;
+  }
+  fdd_setpairs(rawMove2Tensor2.get(), base, tensor2, 2 * numUsefulVars);
+  delete [] base;
+  delete [] tensor2;
+
+  t1OneBdd = bddtrue;
+  for(BddContextIter varIter = this->begin(); varIter != this->end();  ++varIter){
+    if(varIter->first.compare("__regSize") == 0 || varIter->first.compare("__regA") == 0 || varIter->first.compare("__regB") == 0)
+      continue;
+    bddinfo_t varInfo = varIter->second;
+    t1OneBdd = t1OneBdd & fdd_equals(varInfo->tensor1Lhs,  varInfo->tensor1Rhs);
+  }
 }
 
 BddContext::VocLevelArray const& BddContext::getLevelArray()
@@ -576,5 +614,23 @@ State BinRel::generateTransitionsLowerPlies(DetensorNwa& nwa, DetensorWeightGen&
     }
   }
   return q;
+}
+
+bdd BinRel::tensorViaDetensor(bdd other) const
+{
+  bdd_fnprintdot_levels("a.dot", rel);
+  bdd_fnprintdot_levels("b.dot", other);
+  bdd rel1 = bdd_replace(other, con->rawMove2Tensor2.get());
+  bdd_fnprintdot_levels("amoveddown.dot", rel1);
+  bdd rel2 = rel1 & con->t1OneBdd;
+  bdd_fnprintdot_levels("amovedandeyed.dot", rel2);
+  binrel_t halfwaythere = new BinRel(con, rel2);
+  binrel_t almostthere = static_cast<BinRel*>(halfwaythere->detensorTranspose().get_ptr());
+  bdd rel3 = almostthere->rel;
+  bdd rel4 = bdd_replace(rel3, con->rawMove2Tensor2.get());  
+  bdd rel5 = bdd_replace(rel, con->move2Tensor1.get());
+  bdd c = rel4 & rel5;
+  bdd_fnprintdot_levels("atensorb.dot", c);
+  return c;
 }
 #endif //#ifdef NWA_DETENSOR

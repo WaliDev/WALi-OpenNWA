@@ -296,6 +296,9 @@ namespace wali
           VocLevelArray tensorVocLevels;
           VocLevelArray baseLhsVocLevels;
           VocLevelArray baseRhsVocLevels;
+          
+          bdd t1OneBdd;
+          BddPairPtr rawMove2Tensor2;
 #endif
 #ifdef BINREL_STATS
         private:
@@ -474,6 +477,8 @@ namespace wali
           void tabulateStates(DetensorNwa& nwa, unsigned v, bdd r);
           opennwa::State generateTransitions(DetensorNwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n);
           opennwa::State generateTransitionsLowerPlies(DetensorNwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n);
+
+          bdd tensorViaDetensor(bdd other) const;
 #endif
       };
 

@@ -234,6 +234,9 @@ BddContext::BddContext(int bddMemSize, int cacheSize) :
   move2Tensor2 = BddPairPtr(bdd_newpair());
   move2Base = BddPairPtr(bdd_newpair());
   move2BaseTwisted = BddPairPtr(bdd_newpair());
+#ifdef NWA_DETENSOR
+  rawMove2Tensor2 = BddPairPtr(bdd_newpair());
+#endif
 
   //initialize static bdds
   baseSecBddContextSet = bddtrue;
@@ -343,6 +346,9 @@ BddContext::~BddContext()
   move2Tensor2.reset();
   move2Base.reset();
   move2BaseTwisted.reset();
+#ifdef NWA_DETENSOR
+  rawMove2Tensor2.reset();
+#endif
   
   baseSecBddContextSet = bddtrue;
   tensorSecBddContextSet = bddtrue;
@@ -1184,9 +1190,13 @@ binrel_t BinRel::Kronecker(binrel_t that) const
     return new BinRel(con, bddfalse, true);
   }
 #endif
+#ifdef NWA_DETENSOR
+  bdd c = tensorViaDetensor(that->rel); //nwa_detensor.cpp
+#else
   bdd rel1 = bdd_replace(rel, con->move2Tensor1.get());
   bdd rel2 = bdd_replace(that->rel, con->move2Tensor2.get());
   bdd c = rel1 & rel2;
+#endif
   return new BinRel(con, c,true);
 }
 
