@@ -59,15 +59,17 @@ namespace
     brm->setIntVars(vars);
     sem_elem_tensor_t b1 = new BinRel(brm.get_ptr(), bddtrue);
     sem_elem_tensor_t b2 = new BinRel(brm.get_ptr(), bddtrue);
-    sem_elem_tensor_t b3 = b2->tensor(b1.get_ptr());
-    sem_elem_tensor_t b4 = b3->detensorTranspose();
-    sem_elem_tensor_t b5 = dynamic_cast<SemElemTensor*>(b2->extend(dynamic_cast<SemElem*>(b1.get_ptr())).get_ptr());
+    sem_elem_tensor_t b3 = b2->transpose();
+    sem_elem_tensor_t b4 = b3->tensor(b1.get_ptr());
+    sem_elem_tensor_t b5 = b4->detensorTranspose();
+    sem_elem_tensor_t b6 = dynamic_cast<SemElemTensor*>(b2->extend(dynamic_cast<SemElem*>(b1.get_ptr())).get_ptr());
     b1->print(cout << "b1: ") << endl;
     b2->print(cout << "b2: ") << endl;
     b3->print(cout << "b3: ") << endl;
     b4->print(cout << "b4: ") << endl;
     b5->print(cout << "b5: ") << endl;
-    ASSERT_TRUE(b5->equal(b4));
+    b6->print(cout << "b6: ") << endl;
+    ASSERT_TRUE(b6->equal(b5));
   }
 
   TEST(Nwa_detensor, failing1)
@@ -82,15 +84,17 @@ namespace
     cout << "b: " << fddset << b << endl;
     sem_elem_tensor_t b1 = new BinRel(brm.get_ptr(), b);
     sem_elem_tensor_t b2 = new BinRel(brm.get_ptr(), b);
-    sem_elem_tensor_t b3 = b2->tensor(b1.get_ptr());
-    sem_elem_tensor_t b4 = b3->detensorTranspose();
-    sem_elem_tensor_t b5 = dynamic_cast<SemElemTensor*>(b2->extend(dynamic_cast<SemElem*>(b1.get_ptr())).get_ptr());
+    sem_elem_tensor_t b3 = b2->transpose();
+    sem_elem_tensor_t b4 = b3->tensor(b1.get_ptr());
+    sem_elem_tensor_t b5 = b4->detensorTranspose();
+    sem_elem_tensor_t b6 = dynamic_cast<SemElemTensor*>(b2->extend(dynamic_cast<SemElem*>(b1.get_ptr())).get_ptr());
     b1->print(cout << "b1: ") << endl;
     b2->print(cout << "b2: ") << endl;
     b3->print(cout << "b3: ") << endl;
     b4->print(cout << "b4: ") << endl;
     b5->print(cout << "b5: ") << endl;
-    ASSERT_TRUE(b5->equal(b4));
+    b6->print(cout << "b6: ") << endl;
+    ASSERT_TRUE(b6->equal(b5));
   }
 
   TEST(Nwa_detensor, smallRandom)
@@ -100,19 +104,23 @@ namespace
     vars["x1"] = 2;
     vars["x2"] = 2;
     vars["x3"] = 2;
+    vars["x4"] = 2;
+    vars["x5"] = 2;
     brm->setIntVars(vars);
-    for(unsigned i =0; i < 10; ++i){
+    for(unsigned i =0; i < 1000; ++i){
       sem_elem_tensor_t b1 = new BinRel(brm.get_ptr(), brm->tGetRandomTransformer(false, 0));
       sem_elem_tensor_t b2 = new BinRel(brm.get_ptr(), brm->tGetRandomTransformer(false, 0));
-      sem_elem_tensor_t b3 = b2->tensor(b1.get_ptr());
-      sem_elem_tensor_t b4 = b3->detensorTranspose();
-      sem_elem_tensor_t b5 = dynamic_cast<SemElemTensor*>(b2->extend(dynamic_cast<SemElem*>(b1.get_ptr())).get_ptr());
+      sem_elem_tensor_t b3 = b2->transpose();
+      sem_elem_tensor_t b4 = b3->tensor(b1.get_ptr());
+      sem_elem_tensor_t b5 = b4->detensorTranspose();
+      sem_elem_tensor_t b6 = dynamic_cast<SemElemTensor*>(b2->extend(dynamic_cast<SemElem*>(b1.get_ptr())).get_ptr());
       b1->print(cout << "b1: ") << endl;
       b2->print(cout << "b2: ") << endl;
       b3->print(cout << "b3: ") << endl;
       b4->print(cout << "b4: ") << endl;
       b5->print(cout << "b5: ") << endl;
-      ASSERT_TRUE(b5->equal(b4));
+      b6->print(cout << "b6: ") << endl;
+      ASSERT_TRUE(b6->equal(b5));
     }
   }
 
