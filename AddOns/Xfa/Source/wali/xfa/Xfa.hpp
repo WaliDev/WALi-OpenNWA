@@ -239,7 +239,7 @@ namespace wali {
             intersect(Xfa const & other) const {
                 Xfa output;
                 details::IntersectionWeightMaker maker;
-                this->wfa_.intersect(maker, other.wfa_, output.wfa_);
+                this->wfa_.intersect_worklist(maker, other.wfa_, output.wfa_);
                 return output;
             }
         };
