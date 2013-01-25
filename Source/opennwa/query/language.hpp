@@ -3,6 +3,7 @@
 
 #include "opennwa/NwaFwd.hpp"
 #include "opennwa/NestedWord.hpp"
+#include "opennwa/WeightGen.hpp"
 
 namespace opennwa {
   namespace query {
@@ -59,6 +60,9 @@ namespace opennwa {
     ref_ptr<NestedWord>
     getSomeShortestAcceptedWord(Nwa const & nwa);
       
+    extern
+    ref_ptr<NestedWord>
+    getSomeShortestAcceptedWordWithWeights(Nwa const & nwa, WeightGen const & wg);
 
     /**
      *

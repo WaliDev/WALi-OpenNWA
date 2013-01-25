@@ -434,13 +434,13 @@ namespace wali
      *
      * @see WeightMaker
      */
-    WFA WFA::intersect( WFA& fa )
+    WFA WFA::intersect( WFA const & fa ) const
     {
       KeepBoth wmaker;
       return intersect(wmaker,fa);
     }
 
-    void WFA::intersect( WFA& fa, WFA& dest )
+    void WFA::intersect( WFA const & fa, WFA& dest ) const
     {
       KeepBoth wmaker;
       intersect(wmaker,fa,dest);
@@ -449,7 +449,7 @@ namespace wali
     /* 
      * Intersect this and fa, returning the result
      */
-    WFA WFA::intersect( WeightMaker& wmaker , WFA& fa )
+    WFA WFA::intersect( WeightMaker& wmaker , WFA const & fa ) const
     {
       WFA dest;
       intersect(wmaker,fa,dest);
@@ -462,8 +462,8 @@ namespace wali
     //
     void WFA::intersect(
         WeightMaker& wmaker
-        , WFA& fa
-        , WFA& dest )
+        , WFA const & fa
+        , WFA& dest ) const
     {
       query_t lhsQuery = getQuery();
       // Hash transitions of fa on stack symbol. Then probe the hash
@@ -493,8 +493,8 @@ namespace wali
       }
 
       // Do this here in case dest == this
-      State *initThis = getState(getInitialState());
-      State *initFa = fa.getState(fa.getInitialState());
+      State const * initThis = getState(getInitialState());
+      State const * initFa = fa.getState(fa.getInitialState());
       if( initThis == NULL || initFa == NULL )
       {
         *waliErr << "[ERROR - WFA::intersect] No initial state.\n";
@@ -544,19 +544,19 @@ namespace wali
           continue;
         }
         // for each trans in (TransSet) stit->second 
-        TransSet& tsThis = stit->second;
-        TransSet::iterator tsit = tsThis.begin();
-        TransSet::iterator tsitEND = tsThis.end();
+        StackHasher::ConstTransSet& tsThis = stit->second;
+        StackHasher::ConstTransSet::iterator tsit = tsThis.begin();
+        StackHasher::ConstTransSet::iterator tsitEND = tsThis.end();
         for( ; tsit != tsitEND ; tsit++ )
         {
-          ITrans *t = *tsit;
+          ITrans const * t = *tsit;
 
           // for each trans in (TransSet) stkit->second
-          TransSet::iterator stklsit = stkit->second.begin();
-          TransSet::iterator stklsitEND = stkit->second.end();
+          StackHasher::ConstTransSet::iterator stklsit = stkit->second.begin();
+          StackHasher::ConstTransSet::iterator stklsitEND = stkit->second.end();
           for( ; stklsit != stklsitEND ; stklsit++ )
           {
-            ITrans*t2 = *stklsit;
+            ITrans const * t2 = *stklsit;
             Key fromkey = getKey( t->from(),t2->from() );
             Key tokey = getKey( t->to(),t2->to() );
             sem_elem_t W = wmaker.make_weight(t ,t2);
@@ -1502,6 +1502,8 @@ namespace wali
     bool add_trans_to_accessible_states(WFA::AccessibleStateMap & accessible,
                                         Key dest, sem_elem_t weight)
     {
+      assert(weight.get_ptr());
+      
       if (accessible.find(dest) != accessible.end()) {
         sem_elem_t old = accessible[dest];
         weight = weight->combine(old);
@@ -1569,8 +1571,12 @@ namespace wali
               for (AccessibleStateMap::const_iterator dest = eclose.begin();
                    dest != eclose.end(); ++dest)
               {
+                // We have
+                //   (start) - - - - - > (source) ---> (trans_it->->to()) - - - - - > (dest->first)
+                //         source_weight      trans_it->->weight()       dest->second
                 assert(dest->second.get_ptr());
-                add_trans_to_accessible_states(after, dest->first, dest->second);
+                sem_elem_t weight = source_weight->extend((*trans_it)->weight()->extend(dest->second));
+                add_trans_to_accessible_states(after, dest->first, weight);
               }
             } // For each outgoing transition
             
@@ -1591,7 +1597,7 @@ namespace wali
     WFA::isAcceptedWithNonzeroWeight(Word const & word) const
     {
       AccessibleStateMap start;
-      start[getInitialState()] = NULL;
+      start[getInitialState()] = this->getSomeWeight()->one();
 
       AccessibleStateMap finish = simulate(start, word);
 
@@ -1600,8 +1606,10 @@ namespace wali
           final != finals.end(); ++final)
       {
         if (finish.find(*final) != finish.end()) {
-          //  FIXME: check weight
-          return true;
+          sem_elem_t weight = finish[*final];
+          if (!weight->equal(weight->zero())) {
+            return true;
+          }
         }
       }
 

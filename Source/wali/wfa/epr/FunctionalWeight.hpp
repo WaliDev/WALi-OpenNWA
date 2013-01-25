@@ -26,7 +26,7 @@ namespace wali {
       class FunctionalWeight : public SemElem {
       public:
         //FunctionalWeight();
-        FunctionalWeight(ITrans *l, ITrans *r);
+        FunctionalWeight(ITrans const *l, ITrans const *r);
         virtual ~FunctionalWeight();
 
         //////////////////////

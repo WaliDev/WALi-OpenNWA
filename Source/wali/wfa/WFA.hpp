@@ -317,7 +317,7 @@ namespace wali
          * @see wali::wfa::WeightMaker
          * @see wali::wfa::KeepBoth
          */
-        virtual WFA intersect( WFA& fa );
+        virtual WFA intersect( WFA const & fa ) const;
 
         /**
          * Intersect this with parameter fa. This is a wrapper
@@ -327,7 +327,7 @@ namespace wali
          * @see wali::wfa::WeightMaker
          * @see wali::wfa::KeepBoth
          */
-        virtual void intersect( WFA& fa, WFA& dest );
+        virtual void intersect( WFA const & fa, WFA& dest ) const;
 
         /**
          * Intersect this with parameter fa and return the result
@@ -337,7 +337,7 @@ namespace wali
          *
          * @see wali::wfa::WeightMaker
          */
-        WFA intersect( WeightMaker& wmaker , WFA& fa );
+        WFA intersect( WeightMaker& wmaker , WFA const & fa ) const;
 
         /**
          * Intersect this with parameter fa. The result is stored in
@@ -348,7 +348,7 @@ namespace wali
          *
          * NOTE: For now this means (dest != this) && (dest != fa).
          */
-        virtual void intersect( WeightMaker& wmaker , WFA& fa, WFA& dest );
+        virtual void intersect( WeightMaker& wmaker , WFA const & fa, WFA& dest ) const;
 
         /**
          * Performs path summary. Simply calls the path_summary with

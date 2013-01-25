@@ -28,7 +28,7 @@ namespace wali
       public:
         virtual ~WeightMaker() {}
         virtual sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs ) = 0;
-        virtual sem_elem_t make_weight( ITrans *lhs, ITrans *rhs);
+        virtual sem_elem_t make_weight( ITrans const * lhs, ITrans const * rhs);
 
     }; // WeightMaker
 
@@ -47,7 +47,7 @@ namespace wali
         KeepLeft() {}
         virtual ~KeepLeft() {}
         virtual sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs );
-        virtual sem_elem_t make_weight( ITrans *lhs, ITrans *rhs) {
+        virtual sem_elem_t make_weight( ITrans const * lhs, ITrans const * rhs) {
             return this->WeightMaker::make_weight(lhs, rhs);
         }
     }; // KeepLeft
@@ -67,7 +67,7 @@ namespace wali
         KeepRight() {}
         virtual ~KeepRight() {}
         virtual sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs );
-        virtual sem_elem_t make_weight( ITrans *lhs, ITrans *rhs) {
+        virtual sem_elem_t make_weight( ITrans const * lhs, ITrans const * rhs) {
             return this->WeightMaker::make_weight(lhs, rhs);
         }
     }; // KeepRight
@@ -87,7 +87,7 @@ namespace wali
         KeepBoth() {}
         virtual ~KeepBoth() {}
         virtual sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs );
-        virtual sem_elem_t make_weight( ITrans *lhs, ITrans *rhs) {
+        virtual sem_elem_t make_weight( ITrans const * lhs, ITrans const * rhs) {
             return this->WeightMaker::make_weight(lhs, rhs);
         }
     }; // KeepBoth

@@ -36,6 +36,10 @@ namespace wali
           ProgramBddContext(int bddMemSize=0, int cacheSize=0);
           ProgramBddContext(const ProgramBddContext& other);
           virtual ProgramBddContext& operator = (const ProgramBddContext& other);
+
+          ProgramBddContext(const std::map<std::string, int>& vars, int bddMemSize = 0, int cacheSize = 0);
+          ProgramBddContext(const std::vector<std::map<std::string, int> >& vars, int bddMemSize = 0, int cacheSize = 0);
+        
           //This is left undefined. We need this declaration so that the compiler doesn't think we've
           //hidden the user defined operator = for base class BddContext. We leave it undefined so that 
           //you get a link error if you try to call this.

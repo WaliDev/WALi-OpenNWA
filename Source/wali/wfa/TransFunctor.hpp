@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <map>
+#include <set>
 #include "wali/HashMap.hpp"
 #include "wali/wfa/TransSet.hpp"
 
@@ -217,16 +218,17 @@ namespace wali
      * Used by WFA::intersect
      */
 
-    class StackHasher : public TransFunctor
+    class StackHasher : public ConstTransFunctor
     {
       public:
-        typedef wali::HashMap< Key , TransSet > stackmap_t;
+        typedef std::set<ITrans const *, ITransLT> ConstTransSet;
+        typedef wali::HashMap< Key , ConstTransSet > stackmap_t;
         typedef stackmap_t::iterator iterator;
         stackmap_t stackmap;
 
         virtual ~StackHasher() {}
 
-        virtual void operator()( ITrans* t );
+        virtual void operator()( ITrans const * t );
 
         iterator begin();
         iterator end();

@@ -4,7 +4,7 @@ namespace wali {
   namespace wfa {
     namespace epr {
 
-      FunctionalWeight::FunctionalWeight(ITrans *l, ITrans *r) : SemElem() {
+      FunctionalWeight::FunctionalWeight(ITrans const *l, ITrans const *r) : SemElem() {
         ltrans = l->copy();
         rtrans = r->copy();
         normalize();
