@@ -1074,20 +1074,6 @@ binrel_t BinRel::Compose( binrel_t that ) const
 #ifdef BINREL_STATS
   con->numCompose++;
 #endif
-  if (this->isOne()) {
-    return that;
-  }
-  if (that->isOne()) {
-    return new BinRel(*this);
-  }
-
-  if (this->isZero() || that->isZero()) {
-    sem_elem_t zero_semelem = zero();
-    BinRel * zero_binrel = dynamic_cast<BinRel*>(zero_semelem.get_ptr());
-    return zero_binrel;
-  }
-  
-  
   //We skip this test if you insist
 #ifndef BINREL_HASTY
   if(isTensored != that->isTensored || con != that->con){
@@ -1097,6 +1083,17 @@ binrel_t BinRel::Compose( binrel_t that ) const
     return new BinRel(con,bddfalse,isTensored);
   }
 #endif
+  if (this->isOne()) {
+    return that;
+  }
+  if (that->isOne()) {
+    return new BinRel(*this);
+  }
+  if (this->isZero() || that->isZero()) {
+    sem_elem_t zero_semelem = zero();
+    BinRel * zero_binrel = dynamic_cast<BinRel*>(zero_semelem.get_ptr());
+    return zero_binrel;
+  }
   bdd c;
   if(!isTensored){
     bdd temp1 = bdd_replace(that->rel, con->baseRightShift.get());
@@ -1115,13 +1112,6 @@ binrel_t BinRel::Union( binrel_t that ) const
 #ifdef BINREL_STATS
   con->numUnion++;
 #endif
-  if (this->isZero()) {
-    return that;
-  }
-  if (that->isZero()) {
-    return new BinRel(*this);
-  }  
-  
   //We skip this test if you insist
 #ifndef BINREL_HASTY
   if(isTensored != that->isTensored || con != that->con){
@@ -1131,6 +1121,12 @@ binrel_t BinRel::Union( binrel_t that ) const
     return new BinRel(con,bddtrue,isTensored);
   }
 #endif
+  if (this->isZero()) {
+    return that;
+  }
+  if (that->isZero()) {
+    return new BinRel(*this);
+  }  
   return new BinRel(con,rel | that->rel, isTensored);
 }
 
@@ -1361,6 +1357,7 @@ wali::sem_elem_tensor_t BinRel::detensor()
 wali::sem_elem_tensor_t BinRel::detensorTranspose()
 {
 #ifdef NWA_DETENSOR
+  assert(isTensored);
   return new BinRel(con, detensorViaNwa());
 #else
   return Eq13Project();
