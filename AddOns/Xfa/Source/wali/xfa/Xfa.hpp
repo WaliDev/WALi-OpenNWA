@@ -121,6 +121,11 @@ namespace wali {
             std::map<State, BinaryRelation> accepting_weights;            
 
         public:
+            wali::wfa::WFA const &
+            wfa() const {
+                return wfa_;
+            }
+            
             /// Returns the old one
             ///
             State setInitialState(State new_initial) {
