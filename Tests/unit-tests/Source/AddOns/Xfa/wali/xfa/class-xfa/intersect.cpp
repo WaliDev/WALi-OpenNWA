@@ -136,8 +136,8 @@ namespace wali {
             REGISTER_XFA("{}",     ImpossibleSequence);
             REGISTER_XFA("{a,b}",  AOrB);
             REGISTER_XFA("{a}",    AlternativePathImpossible);
-            //REGISTER_XFA("{}",     EmptyByImpossibleDataTransitionEpsilon);
-            //REGISTER_XFA("{eps}",  SingleSimpleTransEpsilon);
+            REGISTER_XFA("{}",     EmptyByImpossibleDataTransitionEpsilon);
+            REGISTER_XFA("{eps}",  SingleSimpleTransEpsilon);
 
 
             // Sanity check: every language should be the same.
