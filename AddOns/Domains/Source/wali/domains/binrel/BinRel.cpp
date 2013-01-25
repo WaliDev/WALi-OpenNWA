@@ -16,6 +16,8 @@
 
 #include <boost/algorithm/string/predicate.hpp>
 
+#include <tr1/unordered_map>
+
 using namespace wali::domains::binrel;
 using std::endl;
 using wali::waliErr;
@@ -54,14 +56,25 @@ namespace wali
       static BinRel* convert(wali::SemElem* se);
 
 
+      /*
       struct BddLessThan
       {
         bool operator() (bdd left, bdd right) {
           return left.id() < right.id();
         }
       };
-
       std::map<bdd, sem_elem_t, BddLessThan> star_cache;
+      */
+
+      typedef std::pair< bdd, bool> StarCacheKey;
+      struct StarCacheHash
+      {
+        size_t operator() (StarCacheKey k) const
+        {
+          return k.first.id() << 1 & (int) k.second;
+        }
+      };
+      std::tr1::unordered_map< StarCacheKey, sem_elem_t, StarCacheHash> star_cache;
 
 
       namespace details {
@@ -1269,17 +1282,18 @@ binrel_t BinRel::Eq13Project() const
 
 wali::sem_elem_t BinRel::star()
 {
-  if (star_cache.find(getBdd()) == star_cache.end()) {
+  StarCacheKey k(getBdd(), isTensored);
+  if (star_cache.find(k) == star_cache.end()) {
     sem_elem_t w = combine(one().get_ptr());
     sem_elem_t wn = w->extend(w);
     while(!w->equal(wn)) {
       w = wn;
       wn = wn->extend(wn);
     }
-    star_cache[getBdd()] = wn;
+    star_cache[k] = wn;
   }
 
-  return star_cache[getBdd()];
+  return star_cache[k];
 }
 
 

@@ -284,7 +284,7 @@ bdd BinRel::detensorViaNwa()
     ans = static_cast<DetensorWeight*>(ans->combine(static_cast<DetensorWeight*>(ansTrans.weight().get_ptr())).get_ptr());
   }
 
-#if 1
+#if 0
   //dbg
   char const * oldf = "original_obdd.dot";
   bdd_fnprintdot_levels(oldf, rel);
