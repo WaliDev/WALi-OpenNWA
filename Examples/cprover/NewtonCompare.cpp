@@ -117,23 +117,6 @@ namespace{
       {
         bool diffFound = false;
         assert(cur == COMPARE);
-        {//DEBUG
-          /*
-             if(out){
-           *out << "firstData:" << std::endl;
-           for(DataMap::const_iterator iter = firstData.begin();
-           iter != firstData.end();
-           iter++)
-           (iter->first).print(*out);
-           *out << "secondData:" << std::endl;
-           for(DataMap::const_iterator iter = secondData.begin();
-           iter != secondData.end();
-           iter++)
-           (iter->first).print(*out);
-           }
-           */
-        }//DEBUG
-
 
         for(DataMap::const_iterator iter = firstData.begin();
             iter != firstData.end();
@@ -151,21 +134,27 @@ namespace{
               }
             }
           }else{
-            if((iter->second == NULL && iter2->second != NULL) ||
-                (iter->second != NULL && iter2->second == NULL) ||
-                !((iter->second)->equal(iter2->second))){
+            sem_elem_t fwpdswt = iter->second;
+            sem_elem_tensor_t nwpdswt = dynamic_cast<SemElemTensor*>(iter2->second.get_ptr());
+            if(!(iter2->second == NULL)){
+              nwpdswt = dynamic_cast<SemElemTensor*>(nwpdswt->detensorTranspose().get_ptr());
+              assert(!(nwpdswt == NULL));
+            }
+            if((fwpdswt == NULL && nwpdswt != NULL) ||
+                (fwpdswt != NULL && nwpdswt == NULL) ||
+                !((fwpdswt)->equal(nwpdswt))){
               diffFound=true;
               if(out){
                 *out << "DIFF: Found in both but weights differ: " << std::endl;
                 (iter->first).print(*out);
                 *out << std::endl << "[ " << first << " weight]" << std::endl;
-                if(iter->second != NULL)
-                  iter->second->print(*out);
+                if(fwpdswt != NULL)
+                  fwpdswt->print(*out);
                 else
                   *out << "NULL" << std::endl;
                 *out << std::endl << "[ " << second << " weight]" << std::endl;
-                if(iter2->second != NULL)
-                  iter2->second->print(*out);
+                if(nwpdswt != NULL)
+                  nwpdswt->print(*out);
                 else
                   *out << "NULL" << std::endl;
                 *out << std::endl;
@@ -500,11 +489,15 @@ namespace goals {
     npds->poststarIGR(fa,outfa); 
 
     cout << "[Newton Compare] Computing path summary..." << endl;
-    outfa.path_summary(npds->get_theZero()->one());
+
+    sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>(npds->get_theZero().get_ptr());
+    zerot = zerot->tensor(zerot.get_ptr());
+
+    outfa.path_summary(zerot->one());
 
     cout << "[Newton Compare] Checking error label reachability..." << endl;
     TransSet ts = outfa.match(getPdsState(), getErrStk(pg));
-    sem_elem_t wt = outfa.getSomeWeight()->zero();
+    sem_elem_t wt = zerot;
     for(TransSet::const_iterator it = ts.begin(); it != ts.end(); ++it){
         Key toKey = (*it)->to();
         State * toState = outfa.getState(toKey);

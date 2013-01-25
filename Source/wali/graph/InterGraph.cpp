@@ -597,6 +597,10 @@ namespace wali {
         }
 #endif
 
+        sem_elem_tensor_t tensorSetUpFP(sem_elem_tensor_t a, sem_elem_tensor_t b)
+        {
+          return a->tensor(b.get_ptr());
+        }
         void InterGraph::setupNewtonSolution()
         {
           runningNewton = true;         
@@ -645,7 +649,7 @@ namespace wali {
 
           //Setup weights so that everything is tensored
           sem_elem_tensor_t sem_old = dynamic_cast<SemElemTensor*>(sem.get_ptr());
-          sem = sem_old->tensor(sem_old.get_ptr());
+          sem = tensorSetUpFP(sem_old, sem_old);
 #if defined(PPP_DBG) && PPP_DBG >= 0
           long totCombines=0, totExtends=0, totStars=0;
 #endif
@@ -689,7 +693,7 @@ namespace wali {
                     //Post*:  w -> (1^T,w)
                     sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>((nodes[i].weight).get_ptr());
                     sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());
-                    wt = one->tensor(wt.get_ptr());
+                    wt = tensorSetUpFP(one, wt);
                     graph->setSource(nodes[i].intra_nodeno, wt);
                   }
                   // zero all weights (some are set by InterGraph::setSource() )
@@ -705,7 +709,7 @@ namespace wali {
                   // w' = (1^T,w)
                   sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>((iter->weight).get_ptr());
                   sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());
-                  wt = one->tensor(wt.get_ptr());
+                  wt = tensorSetUpFP(one, wt);
                   graph->addEdge(nodes[iter->src].intra_nodeno, nodes[iter->tgt].intra_nodeno, wt);
 #if 0
                   //Also add a mutable edge (s--f-->tgt) from the source vertex s with weight 0 (tensored) and
@@ -747,7 +751,7 @@ namespace wali {
                     wt = dynamic_cast<SemElemTensor*>(wtCallRule->extend(wt.get_ptr()).get_ptr());
                     sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());                                     
                     graph->addEdge(nodes[iter->src1].intra_nodeno, nodes[iter->tgt].intra_nodeno,
-                        one->tensor(wt.get_ptr()));
+                        tensorSetUpFP(one, wt));
 #if 0
                     //Also add a mutable edge (s--f-->tgt) from the source vertex s with weight 0 (tensored) and
                     //functional f = (1^T, DetTrans(wt(src1)) x (Constant(wtCallRule) x DetTrans(wt(src2)))) (one untensored)
