@@ -87,6 +87,24 @@ static bool xfas_same_modulo_words(Xfa const & left, Xfa const & right) {
 namespace wali {
     namespace xfa {
 
+        TEST(wali$xfa$Xfa$helper, epsilonClose)
+        {
+            XfaContext context;
+            Relations lrelations(context.voc, "left");
+            Relations rrelations(context.voc, "left");
+            BinaryRelation zero = lrelations.false_;
+
+            Xfa lxfa = EmptyByImpossibleDataTransition(zero, lrelations).xfa;
+            Xfa rxfa = EmptyByImpossibleDataTransition(zero, rrelations).xfa;
+
+            wali::wfa::WFA::EpsilonCloseCache lcache,rcache;
+
+            lxfa.wfa().epsilonCloseCached(getKey("p"), lcache);
+            lxfa.wfa().epsilonCloseCached(getKey("q"), lcache);
+            rxfa.wfa().epsilonCloseCached(getKey("p"), rcache);
+            rxfa.wfa().epsilonCloseCached(getKey("q"), rcache);
+        }
+
         TEST(wali$xfa$Xfa$intersect, Battery)
         {
             XfaContext context;

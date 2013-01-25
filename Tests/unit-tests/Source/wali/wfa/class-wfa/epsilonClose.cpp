@@ -529,10 +529,16 @@ namespace wali {
             wfa.setInitialState(A);
             wfa.addFinalState(B);
 
-            WFA::AccessibleStateMap eclose = checkedEpsilonClose(wfa, A);
             EXPECT_CONSISTENT_EPSILON_CLOSURES(wfa);
-            EXPECT_EQ(1u, eclose.size());
-            EXPECT_CONTAINS(eclose, A);
+
+            WFA::AccessibleStateMap eclose_A = checkedEpsilonClose(wfa, A);
+            WFA::AccessibleStateMap eclose_B = checkedEpsilonClose(wfa, B);
+            
+            EXPECT_EQ(1u, eclose_A.size());
+            EXPECT_EQ(1u, eclose_B.size());
+            
+            EXPECT_CONTAINS(eclose_A, A);
+            EXPECT_CONTAINS(eclose_B, B);
         }
 
         
