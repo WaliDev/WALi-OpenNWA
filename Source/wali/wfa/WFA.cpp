@@ -494,7 +494,7 @@ namespace wali
       {
         // Create the "fake" initial state. This will have epsilon transitions
         // to any "real" start states.
-        Key initial_key = getKey(this->getInitialState(), fa.getInitialState());
+        Key initial_key = getKey("WFA__intersect__dummy__start");
         dest.setInitialState(initial_key);
       
         for (AccessibleStateMap::const_iterator this_target_iter = this_start_eclose.begin();
