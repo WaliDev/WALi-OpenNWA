@@ -889,6 +889,7 @@ namespace wali
     {
       assert(pg);
       BddContext * con = dump_pds_from_prog(pds, pg);
+      pds->printStatistics(cout);
       return con;
     }
     /*
