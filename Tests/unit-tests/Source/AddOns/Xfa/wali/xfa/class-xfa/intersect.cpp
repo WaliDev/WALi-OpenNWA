@@ -114,10 +114,11 @@ namespace wali {
             REGISTER_XFA("{a^n}",  BoringCycle);
             REGISTER_XFA("{a^2n}", DataRestrictedCycle);
             REGISTER_XFA("{ab}",   SimpleAB);
+            REGISTER_XFA("{ab}",   AEpsilonB);
             REGISTER_XFA("{}",     ImpossibleSequence);
             REGISTER_XFA("{a,b}",  AOrB);
             REGISTER_XFA("{a}",    AlternativePathImpossible);
-            REGISTER_XFA("{}",     EmptyByImpossibleDataTransitionEpsilon);
+            //REGISTER_XFA("{}",     EmptyByImpossibleDataTransitionEpsilon);
             //REGISTER_XFA("{eps}",  SingleSimpleTransEpsilon);
 
 
