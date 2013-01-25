@@ -484,9 +484,16 @@ namespace wali
 
       KeyPair initial_pair(this->getInitialState(), fa.getInitialState());
       worklist.push_back(initial_pair);
-      dest.addState(getKey(initial_pair.first, initial_pair.second),
+      Key initial_key = getKey(initial_pair.first, initial_pair.second);
+      dest.addState(initial_key,
                     wmaker.make_weight(this->getState(this->getInitialState())->weight(),
                                        fa.getState(fa.getInitialState())->weight()));
+      dest.setInitialState(initial_key);
+      if (this->isFinalState(initial_pair.first)
+          && fa.isFinalState(initial_pair.second))
+      {
+        dest.addFinalState(initial_key);
+      }
 
       while (!worklist.empty()) {
         KeyPair source_pair = worklist.back();
@@ -515,6 +522,11 @@ namespace wali
                               wmaker.make_weight(this->getState(target_pair.first)->weight(),
                                                  fa.getState(target_pair.second)->weight()));
                 worklist.push_back(target_pair);
+                if (this->isFinalState(target_pair.first)
+                    && fa.isFinalState(target_pair.second))
+                {
+                  dest.addFinalState(target_key);
+                }
               }
 
               sem_elem_t trans_weight = wmaker.make_weight(*this_trans_iter, *fa_trans_iter);
