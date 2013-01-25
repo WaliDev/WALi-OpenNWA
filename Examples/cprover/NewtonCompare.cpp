@@ -626,12 +626,13 @@ namespace goals {
     FWPDS * npds = new FWPDS(*originalPds);
     wali::set_verify_fwpds(false);
     npds->useNewton(true);
-
+    sem_elem_tensor_t tzero = dynamic_cast<SemElemTensor*>(npds->get_theZero().get_ptr())->tensor(dynamic_cast<SemElemTensor*>(npds->get_theZero().get_ptr()));
     WFA fa;
     wali::Key acc = wali::getKeySpace()->getKey("accept");
     fa.setInitialState(getPdsState());
     fa.addFinalState(acc);
     fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, npds->get_theZero()->one());
+    tzero->print(cout) << endl;
 
     WFA outfa;
     cout << "[Newton Compare] Computing NWPDS poststar..." << endl;
@@ -643,7 +644,7 @@ namespace goals {
     npds->poststarIGR(fa,outfa); 
 
     cout << "[Newton Compare] Computing path summary..." << endl;
-    outfa.path_summary(npds->get_theZero()->one());
+    outfa.path_summary(tzero->one());
 
     cout << "[Newton Compare] Checking error label reachability..." << endl;
     TransSet ts = outfa.match(getPdsState(), getErrStk(pg));

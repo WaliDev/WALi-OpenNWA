@@ -1225,33 +1225,12 @@ namespace wali {
       if(eHandler.exists(n)) {
         // This must be a return transition
         int nc;
-        //sem_elem_tensor_t wtCallRule = dynamic_cast<SemElemTensor*>( eHandler.get_dependency(n, nc).get_ptr());
-        sem_elem_t wtCallRule = eHandler.get_dependency(n, nc);
+        sem_elem_tensor_t wtCallRule = dynamic_cast<SemElemTensor*>( eHandler.get_dependency(n, nc).get_ptr());
+        if(runningNewton)
+          wtCallRule = dynamic_cast<SemElemTensor*>(wtCallRule->one().get_ptr())->tensor(wtCallRule.get_ptr());
         sem_elem_t wt;
         if(nc != -1) {
-          if(runningNewton){
-            sem_elem_tensor_t twt = dynamic_cast<SemElemTensor*>((nodes[nc].gr->get_weight(nodes[nc].intra_nodeno)).get_ptr());
-            wt = twt->detensorTranspose();
-
-            //DEBUGGING
-            if(0){
-              cout << "get_weight whacky case:" << endl;
-              cout << "Return trans: " 
-                << key2str(nodes[n].trans.src) << " -- "
-                << key2str(nodes[n].trans.stack) << " -> "
-                << key2str(nodes[n].trans.tgt) << endl;
-              cout << "Proxy trans: "
-                << key2str(nodes[nc].trans.src) << " -- "
-                << key2str(nodes[nc].trans.stack) << " -> "
-                << key2str(nodes[nc].trans.tgt) << endl;
-              wt->print(cout << "weight:" << endl) << endl;
-              wtCallRule->print(cout << "wtCallRule:" << endl) << endl;
-              wt->extend(wtCallRule)->print(cout << "Final:" << endl) 
-                << endl;
-            }
-          }
-          else
-            wt = nodes[nc].gr->get_weight(nodes[nc].intra_nodeno);
+          wt = nodes[nc].gr->get_weight(nodes[nc].intra_nodeno);
         } else {
           // ESource
           wt = wtCallRule->one();
@@ -1259,11 +1238,7 @@ namespace wali {
         return wt->extend(wtCallRule);
       }
 
-      if(runningNewton){
-        sem_elem_tensor_t twt = dynamic_cast<SemElemTensor*>((nodes[n].gr->get_weight(nodes[n].intra_nodeno)).get_ptr());
-        return twt->detensorTranspose();
-      } else
-        return nodes[n].gr->get_weight(nodes[n].intra_nodeno);
+      return nodes[n].gr->get_weight(nodes[n].intra_nodeno);
     }
 
     void InterGraph::update_all_weights() {
