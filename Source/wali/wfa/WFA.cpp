@@ -460,6 +460,75 @@ namespace wali
     // Intersect this and fa, storing the result in dest
     // TODO: Note: if this == dest there might be a problem
     //
+    void WFA::intersect_worklist(
+        WeightMaker& wmaker
+        , WFA const & fa
+        , WFA& dest ) const
+    {
+      dest.clear();
+      
+      // Sigh
+      std::set<Key> alphabet;
+      for(kp_map_t::const_iterator iter = kpmap.begin();
+          iter != kpmap.end(); ++iter)
+      {
+        alphabet.insert(iter->first.second);
+      }
+
+      // Siiiiiiiigh. (nc = non-const)
+      WFA * this_nc = const_cast<WFA*>(this);
+      WFA * fa_nc = const_cast<WFA*>(&fa);
+
+      // Now start the actual worklist algorithm     
+      std::vector<KeyPair> worklist;
+
+      KeyPair initial_pair(this->getInitialState(), fa.getInitialState());
+      worklist.push_back(initial_pair);
+      dest.addState(getKey(initial_pair.first, initial_pair.second),
+                    wmaker.make_weight(this->getState(this->getInitialState())->weight(),
+                                       fa.getState(fa.getInitialState())->weight()));
+
+      while (!worklist.empty()) {
+        KeyPair source_pair = worklist.back();
+        Key source_key = getKey(source_pair.first, source_pair.second);
+        worklist.pop_back();
+
+        for (std::set<Key>::const_iterator sym_iter = alphabet.begin();
+             sym_iter != alphabet.end(); ++sym_iter)
+        {
+          TransSet
+            this_outgoing = this_nc->match(source_pair.first, *sym_iter),
+            fa_outgoing = fa_nc->match(source_pair.second, *sym_iter);
+
+          for (TransSet::const_iterator this_trans_iter = this_outgoing.begin();
+               this_trans_iter != this_outgoing.end(); ++this_trans_iter)
+          {
+            for (TransSet::const_iterator fa_trans_iter = fa_outgoing.begin();
+                 fa_trans_iter != fa_outgoing.end(); ++fa_trans_iter)
+            {
+
+              KeyPair target_pair((*this_trans_iter)->to(), (*fa_trans_iter)->to());
+              Key target_key = getKey(target_pair.first, target_pair.second);
+
+              if (dest.Q.count(target_key) == 0) {
+                dest.addState(target_key,
+                              wmaker.make_weight(this->getState(target_pair.first)->weight(),
+                                                 fa.getState(target_pair.second)->weight()));
+                worklist.push_back(target_pair);
+              }
+
+              sem_elem_t trans_weight = wmaker.make_weight(*this_trans_iter, *fa_trans_iter);
+              dest.addTrans(source_key, *sym_iter, target_key, trans_weight);
+            }
+          } // for each transition in this_outgoing
+        }// for each alphabet
+      } // while (worklist)
+    }
+
+    //
+    // Intersect this and fa, storing the result in dest
+    // TODO: Note: if this == dest there might be a problem
+    //
     void WFA::intersect(
         WeightMaker& wmaker
         , WFA const & fa
