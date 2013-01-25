@@ -195,6 +195,35 @@ namespace opennwa {
             EXPECT_NE(word6, word5);
         }
 
+
+    TEST(opennwa$NestedWord$$print, emptyNestedWord)
+    {
+        NestedWord word;
+        EXPECT_EQ("<  >", word.toString());
+    }
+
+
+    TEST(opennwa$NestedWord$$print, singleSymbols)
+    {
+        NestedWord internal, call, return_;
+        SomeElements e;
+
+        internal.appendInternal(e.symbol);
+        call.appendCall(e.symbol);
+        return_.appendReturn(e.symbol);
+
+        EXPECT_EQ("< a symbol! >", internal.toString());
+        EXPECT_EQ("< (a symbol! >", call.toString());
+        EXPECT_EQ("< a symbol!) >", return_.toString());
+    }
+
+    TEST(opennwa$NestedWord$$print, word)
+    {
+        WordCollection words;
+        EXPECT_EQ("< 0,  (call,  0,  return),  (call,  0,  (call,  0,  return),  0,  return),  0 >",
+                  words.balanced0.toString());
+    }
+    
 }
 
     
