@@ -513,5 +513,28 @@ namespace wali {
         }
 
 
+        TEST(wali$wfa$$epsilonClose, unreachableNodes)
+        {
+            //      
+            //  -> A     (B)
+            Key A = getKey("A");
+            Key B = getKey("B");
+
+            sem_elem_t one = Reach(true).one();
+
+            WFA wfa;
+            wfa.addState(A, one);
+            wfa.addState(B, one);
+
+            wfa.setInitialState(A);
+            wfa.addFinalState(B);
+
+            WFA::AccessibleStateMap eclose = checkedEpsilonClose(wfa, A);
+            EXPECT_CONSISTENT_EPSILON_CLOSURES(wfa);
+            EXPECT_EQ(1u, eclose.size());
+            EXPECT_CONTAINS(eclose, A);
+        }
+
+        
     }
 }
