@@ -90,7 +90,10 @@ namespace wali {
           * If using Newton Method based on tensored weights, these weights need to be tensored as well.
           **/
          sem_elem_t get_dependency(int ret, int &call);
-
+         /** 
+          * For Newton, use this to tensore all weights
+          **/
+         void tensorAllWeights();
        private:
          EdgeMap edgeMap;
 

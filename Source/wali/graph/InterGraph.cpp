@@ -119,6 +119,11 @@ namespace wali {
             return (t1 == InterSource || t1 == InterSourceOutNode);
         }
 
+        sem_elem_tensor_t tensorSetUpFP(sem_elem_tensor_t a, sem_elem_tensor_t b)
+        {
+          return a->tensor(b.get_ptr());
+        }
+
         void ETransHandler::addEdge(int call, int ret, sem_elem_t wtCallRule) {
           EdgeMap::iterator it = edgeMap.find(ret);
           if(it != edgeMap.end()) {
@@ -127,6 +132,16 @@ namespace wali {
           } else {
             edgeMap[ret] = Dependency(call, wtCallRule);
           }
+        }
+
+        void ETransHandler::tensorAllWeights()
+        {
+          if(edgeMap.size() == 0)
+            return;
+          Dependency dy = edgeMap.begin()->second;
+          sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>(dy.second->one().get_ptr());
+          for(EdgeMap::iterator it = edgeMap.begin(); it != edgeMap.end(); ++it)
+            edgeMap[it->first] = Dependency(it->second.first, tensorSetUpFP(dynamic_cast<SemElemTensor*>(it->second.second.get_ptr()), one).get_ptr());
         }
 
         bool ETransHandler::exists(int ret) {
@@ -597,10 +612,6 @@ namespace wali {
         }
 #endif
 
-        sem_elem_tensor_t tensorSetUpFP(sem_elem_tensor_t a, sem_elem_tensor_t b)
-        {
-          return a->tensor(b.get_ptr());
-        }
         void InterGraph::setupNewtonSolution()
         {
           runningNewton = true;         
@@ -850,6 +861,9 @@ namespace wali {
               RegExp::stopSatProcess();
             }
           }
+          // Before saying you're done, tensor the weights lying around as call rule weights so that
+          // path summary will see tensored weights.
+          eHandler.tensorAllWeights();
 #if defined(PPP_DBG) && PPP_DBG >= 0
           cout << "Total number of combines: " << totCombines << endl;
           cout << "Total number of Extends: " << totExtends << endl;
@@ -1224,14 +1238,13 @@ namespace wali {
       assert(orig_size == nodes.size()); // Transition t must not be a new one
       return get_weight(n);
     }
+
     sem_elem_t InterGraph::get_weight(unsigned n) {
       // check eHandler
       if(eHandler.exists(n)) {
         // This must be a return transition
         int nc;
-        sem_elem_tensor_t wtCallRule = dynamic_cast<SemElemTensor*>( eHandler.get_dependency(n, nc).get_ptr());
-        if(runningNewton)
-          wtCallRule = dynamic_cast<SemElemTensor*>(wtCallRule->one().get_ptr())->tensor(wtCallRule.get_ptr());
+        sem_elem_t wtCallRule = eHandler.get_dependency(n, nc);
         sem_elem_t wt;
         if(nc != -1) {
           wt = nodes[nc].gr->get_weight(nodes[nc].intra_nodeno);
