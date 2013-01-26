@@ -272,8 +272,8 @@ BddContext::BddContext(int bddMemSize, int cacheSize) :
   numKronecker = 0;
   numReverse = 0;
   numTranspose = 0;
-  numEq23Project = 0;
-  numEq13Project = 0;
+  numDetensor = 0;
+  numDetensorTranspose = 0;
 #endif
   populateCache();
 }
@@ -313,8 +313,8 @@ BddContext::BddContext(const BddContext& other) :
   numKronecker = 0;
   numReverse = 0;
   numTranspose = 0;
-  numEq23Project = 0;
-  numEq13Project = 0;
+  numDetensor = 0;
+  numDetensorTranspose = 0;
 #endif
   populateCache();
 }
@@ -1215,9 +1215,6 @@ binrel_t BinRel::Kronecker(binrel_t that) const
 
 binrel_t BinRel::Eq23Project() const
 {
-#ifdef BINREL_STATS
-  con->numEq23Project++;
-#endif
 #ifndef BINREL_HASTY
   if(!isTensored){
     *waliErr << "[WARNING] " << "Attempted to detensor untensored weight."
@@ -1246,9 +1243,6 @@ binrel_t BinRel::Eq23Project() const
 
 binrel_t BinRel::Eq13Project() const
 {
-#ifdef BINREL_STATS
-  con->numEq13Project++;
-#endif
 #ifndef BINREL_HASTY
   if(!isTensored){
     *waliErr << "[WARNING] " << "Attempted to detensor untensored weight."
@@ -1355,11 +1349,17 @@ wali::sem_elem_tensor_t BinRel::tensor(wali::SemElemTensor* se)
 
 wali::sem_elem_tensor_t BinRel::detensor()
 {
+#ifdef BINREL_STATS
+  con->numDetensor++;
+#endif
   return Eq23Project();
 }
 
 wali::sem_elem_tensor_t BinRel::detensorTranspose()
 {
+#ifdef BINREL_STATS
+  con->numDetensorTranspose++;
+#endif
 #ifdef NWA_DETENSOR
   assert(isTensored);
   return new BinRel(con, detensorViaNwa());
@@ -1381,8 +1381,8 @@ std::ostream& BddContext::printStats( std::ostream& o) const
   o << "#Reverse: " << numReverse << endl;
 #endif
   o << "#Transpose: " << numTranspose << endl;
-  o << "#Eq23Project: " << numEq23Project << endl;
-  o << "#Eq13Project: " << numEq13Project << endl;
+  o << "#Eq23Project: " << numDetensor << endl;
+  o << "#Eq13Project: " << numDetensorTranspose << endl;
   return o;
 }
 
@@ -1395,8 +1395,8 @@ void BddContext::resetStats()
   numKronecker = 0;
   numReverse = 0;
   numTranspose = 0;
-  numEq23Project = 0;
-  numEq13Project = 0;
+  numDetensor = 0;
+  numDetensorTranspose = 0;
 }
 #endif //BINREL_STATS
 

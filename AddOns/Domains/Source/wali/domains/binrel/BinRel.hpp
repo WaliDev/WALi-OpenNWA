@@ -310,8 +310,8 @@ namespace wali
           mutable StatCount numKronecker;
           mutable StatCount numReverse;
           mutable StatCount numTranspose;
-          mutable StatCount numEq23Project;
-          mutable StatCount numEq13Project;
+          mutable StatCount numDetensor;
+          mutable StatCount numDetensorTranspose;
 
           // Related functions
         public:
