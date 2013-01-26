@@ -466,6 +466,7 @@ namespace wali
         , WFA& dest ) const
     {
       dest.clear();
+      dest.setQuery(this->getQuery());
       EpsilonCloseCache this_eclose_cache, fa_eclose_cache;
       
       // Sigh
