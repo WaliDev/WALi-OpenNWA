@@ -479,6 +479,7 @@ namespace wali
           opennwa::State generateTransitions(DetensorNwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n);
           opennwa::State generateTransitionsLowerPlies(DetensorNwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n);
 
+          bdd reverse(bdd toReverse) const;
           bdd tensorViaDetensor(bdd other) const;
 #endif
       };
