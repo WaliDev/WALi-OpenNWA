@@ -619,7 +619,7 @@ State BinRel::generateTransitionsLowerPlies(DetensorNwa& nwa, DetensorWeightGen&
 bdd BinRel::tensorViaDetensor(bdd other) const
 {
   bdd rel3;
-  if(rel != con->cachedTensorOne->rel){
+  if(rel != con->cachedBaseOne->rel){
     //  bdd_fnprintdot_levels("a.dot", rel);
     //  bdd_fnprintdot_levels("b.dot", other);
     bdd rel1 = bdd_replace(other, con->rawMove2Tensor2.get());
