@@ -351,6 +351,7 @@ namespace wali
         virtual void intersect(WeightMaker& wmaker, WFA const & fa, WFA& dest) const;
 
         virtual void intersect_worklist(WeightMaker& wmaker, WFA const & fa, WFA& dest ) const;
+        virtual void intersect_cross(WeightMaker& wmaker, WFA const & fa, WFA& dest ) const;
 
         /**
          * Performs path summary. Simply calls the path_summary with

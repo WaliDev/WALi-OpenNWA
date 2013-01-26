@@ -456,6 +456,14 @@ namespace wali
       return dest;
     }
 
+    void WFA::intersect(
+        WeightMaker& wmaker
+        , WFA const & fa
+        , WFA& dest ) const
+    {
+      intersect_worklist(wmaker, fa, dest);
+    }
+    
     //
     // Intersect this and fa, storing the result in dest
     // TODO: Note: if this == dest there might be a problem
@@ -614,7 +622,7 @@ namespace wali
     // Intersect this and fa, storing the result in dest
     // TODO: Note: if this == dest there might be a problem
     //
-    void WFA::intersect(
+    void WFA::intersect_cross(
         WeightMaker& wmaker
         , WFA const & fa
         , WFA& dest ) const
