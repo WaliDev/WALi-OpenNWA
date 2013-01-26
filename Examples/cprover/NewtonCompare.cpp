@@ -137,7 +137,7 @@ namespace{
             sem_elem_t fwpdswt = iter->second;
             sem_elem_tensor_t nwpdswt = dynamic_cast<SemElemTensor*>(iter2->second.get_ptr());
             if(!(iter2->second == NULL)){
-              nwpdswt = dynamic_cast<SemElemTensor*>(nwpdswt->detensorTranspose().get_ptr());
+              nwpdswt = dynamic_cast<SemElemTensor*>(nwpdswt->detensorTranspose().get_ptr())->transpose();
               assert(!(nwpdswt == NULL));
             }
             if((fwpdswt == NULL && nwpdswt != NULL) ||
@@ -503,6 +503,7 @@ namespace goals {
         State * toState = outfa.getState(toKey);
         wt = wt->combine(toState->weight());
     }
+    wt = dynamic_cast<SemElemTensor*>(wt.get_ptr())->detensorTranspose()->transpose();
     if(wt->equal(wt->zero()))
       cout << "[Newton Compare] NWPDS ==> error not reachable" << endl;
     else{
@@ -647,6 +648,7 @@ namespace goals {
       State * toState = outfa.getState(toKey);
       wt = wt->combine(toState->weight());
     }
+    wt = dynamic_cast<SemElemTensor*>(wt.get_ptr())->detensorTranspose()->transpose();
     if(wt->equal(wt->zero()))
       cout << "[Newton Compare] NWPDS ==> error not reachable" << endl;
     else
