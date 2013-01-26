@@ -618,18 +618,23 @@ State BinRel::generateTransitionsLowerPlies(DetensorNwa& nwa, DetensorWeightGen&
 
 bdd BinRel::tensorViaDetensor(bdd other) const
 {
-//  bdd_fnprintdot_levels("a.dot", rel);
-//  bdd_fnprintdot_levels("b.dot", other);
-  bdd rel1 = bdd_replace(other, con->rawMove2Tensor2.get());
-//  bdd_fnprintdot_levels("amoveddown.dot", rel1);
-  bdd rel2 = rel1 & con->t1OneBdd;
-//  bdd_fnprintdot_levels("amovedandeyed.dot", rel2);
-  binrel_t halfwaythere = new BinRel(con, rel2);
-  bdd rel3 = halfwaythere->detensorViaNwa();
+  bdd rel3;
+  if(rel != con->cachedTensorOne->rel){
+    //  bdd_fnprintdot_levels("a.dot", rel);
+    //  bdd_fnprintdot_levels("b.dot", other);
+    bdd rel1 = bdd_replace(other, con->rawMove2Tensor2.get());
+    //  bdd_fnprintdot_levels("amoveddown.dot", rel1);
+    bdd rel2 = rel1 & con->t1OneBdd;
+    //  bdd_fnprintdot_levels("amovedandeyed.dot", rel2);
+    binrel_t halfwaythere = new BinRel(con, rel2);
+    rel3 = halfwaythere->detensorViaNwa();
+  }else{
+    rel3 = rel;
+  }
   bdd rel4 = bdd_replace(rel3, con->rawMove2Tensor2.get());  
   bdd rel5 = bdd_replace(rel, con->move2Tensor1.get());
   bdd c = rel4 & rel5;
-//  bdd_fnprintdot_levels("atensorb.dot", c);
+  //  bdd_fnprintdot_levels("atensorb.dot", c);
   return c;
 }
 #endif //#ifdef NWA_DETENSOR

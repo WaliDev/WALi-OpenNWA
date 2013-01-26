@@ -1199,6 +1199,8 @@ binrel_t BinRel::Kronecker(binrel_t that) const
     return new BinRel(con, bddfalse, true);
   }
 #endif
+  if(rel == bddfalse || that->rel == bddfalse)
+    return con->cachedTensorZero;
 #ifdef NWA_DETENSOR
   bdd c = tensorViaDetensor(that->rel); //nwa_detensor.cpp
 #else
