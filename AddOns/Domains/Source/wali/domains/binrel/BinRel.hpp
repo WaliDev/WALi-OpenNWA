@@ -308,6 +308,7 @@ namespace wali
           mutable StatCount numIntersect;
           mutable StatCount numEqual;
           mutable StatCount numKronecker;
+          mutable StatCount numReverse;
           mutable StatCount numTranspose;
           mutable StatCount numEq23Project;
           mutable StatCount numEq13Project;

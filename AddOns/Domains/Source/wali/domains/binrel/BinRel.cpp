@@ -270,6 +270,7 @@ BddContext::BddContext(int bddMemSize, int cacheSize) :
   numIntersect = 0;
   numEqual = 0;
   numKronecker = 0;
+  numReverse = 0;
   numTranspose = 0;
   numEq23Project = 0;
   numEq13Project = 0;
@@ -310,6 +311,7 @@ BddContext::BddContext(const BddContext& other) :
   numIntersect = 0;
   numEqual = 0;
   numKronecker = 0;
+  numReverse = 0;
   numTranspose = 0;
   numEq23Project = 0;
   numEq13Project = 0;
@@ -1375,6 +1377,9 @@ std::ostream& BddContext::printStats( std::ostream& o) const
   o << "#Intersect: " << numIntersect << endl; 
   o << "#Equal: " << numEqual << endl; 
   o << "#Kronecker: " << numKronecker << endl;
+#if defined(NWA_DETENSOR)
+  o << "#Reverse: " << numReverse << endl;
+#endif
   o << "#Transpose: " << numTranspose << endl;
   o << "#Eq23Project: " << numEq23Project << endl;
   o << "#Eq13Project: " << numEq13Project << endl;
@@ -1388,6 +1393,7 @@ void BddContext::resetStats()
   numIntersect = 0;
   numEqual = 0;
   numKronecker = 0;
+  numReverse = 0;
   numTranspose = 0;
   numEq23Project = 0;
   numEq13Project = 0;
