@@ -8,6 +8,7 @@
 #include "wali/Countable.hpp"
 #include "wali/Printable.hpp"
 #include "opennwa/NwaFwd.hpp"
+#include <sstream>
 #include <vector>
 #include <algorithm>
 
@@ -153,6 +154,17 @@ namespace opennwa
 
 
   typedef ref_ptr<NestedWord> NestedWordRefPtr;
+
+
+  inline
+  std::ostream &
+  operator << (std::ostream & os, NestedWord const & word)
+  {
+    std::stringstream ss;
+    word.print(ss);
+    os << ss.str();
+    return os;
+  }
 }
 
 
