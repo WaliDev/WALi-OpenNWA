@@ -93,7 +93,7 @@ namespace wali
     WFA::AccessibleStateMap
     WFA::epsilonCloseCached(Key state, WFA::EpsilonCloseCache & cache) const
     {
-      return epsilonCloseCached_FwpdsAllMulti(state, cache);
+      return epsilonCloseCached_FwpdsDemand(state, cache);
     }
     
 

@@ -663,7 +663,10 @@ namespace wali {
           sem = tensorSetUpFP(sem_old, sem_old);
 #if defined(PPP_DBG) && PPP_DBG >= 0
           long totCombines=0, totExtends=0, totStars=0;
+          unsigned maxNewtonRounds = 0;
+          unsigned totNewtonRounds = 0;
 #endif
+
 
           // For each SCC, solve completely using Newton's method.
           {
@@ -850,8 +853,11 @@ namespace wali {
               cout << "GRAPH " << scc_n << "\n";
 #endif 
               // Now solve the linearized problem by saturating.
-              graph->saturate();
+              unsigned numRounds = 0;
+              graph->saturate(numRounds);
 #if defined(PPP_DBG) && PPP_DBG >= 0
+              maxNewtonRounds = numRounds > maxNewtonRounds ? numRounds : maxNewtonRounds;
+              totNewtonRounds += numRounds;
               // Must be saved *before* stopSatProcess
               totCombines += RegExpDiagnostics::countTotalCombines();
               totExtends += RegExpDiagnostics::countTotalExtends();
@@ -864,7 +870,10 @@ namespace wali {
           // Before saying you're done, tensor the weights lying around as call rule weights so that
           // path summary will see tensored weights.
           eHandler.tensorAllWeights();
+
 #if defined(PPP_DBG) && PPP_DBG >= 0
+          cout << "Maximum number of Newton rounds: " << maxNewtonRounds << endl;
+          cout << "Total number of Newton rounds: " << totNewtonRounds << endl;
           cout << "Total number of combines: " << totCombines << endl;
           cout << "Total number of Extends: " << totExtends << endl;
           cout << "Total number of Stars: " << totStars << endl;

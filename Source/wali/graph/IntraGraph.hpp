@@ -283,7 +283,7 @@ namespace wali {
              * These should be cleaned up when we're finished with the analysis.
              **/
             static void cleanUp();
-            void saturate();
+            void saturate(unsigned& numRounds);
 
             sem_elem_t getWeight(int nno) const ;
             string toDot();
