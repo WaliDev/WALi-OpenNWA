@@ -652,7 +652,7 @@ namespace goals {
     errfa.addState(getPdsState(),outfa.getSomeWeight());
     errfa.setInitialState(init);
     wali::Key fin = wali::getKey("__final");
-    errfa.addState(fin);
+    errfa.addState(fin,outfa.getSomeWeight());
     errfa.addFinalState(fin);
 
     std::set<Key>::iterator it;
