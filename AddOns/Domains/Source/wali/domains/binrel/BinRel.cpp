@@ -1085,17 +1085,13 @@ binrel_t BinRel::Compose( binrel_t that ) const
     return new BinRel(con,bddfalse,isTensored);
   }
 #endif
-  if (this->isOne()) {
+  if (this->isZero() || that->isZero())
+    return static_cast<BinRel*>(zero().get_ptr());;
+  if (this->isOne())
     return that;
-  }
-  if (that->isOne()) {
+  if (that->isOne())
     return new BinRel(*this);
-  }
-  if (this->isZero() || that->isZero()) {
-    sem_elem_t zero_semelem = zero();
-    BinRel * zero_binrel = dynamic_cast<BinRel*>(zero_semelem.get_ptr());
-    return zero_binrel;
-  }
+
   bdd c;
   if(!isTensored){
     bdd temp1 = bdd_replace(that->rel, con->baseRightShift.get());
@@ -1106,7 +1102,14 @@ binrel_t BinRel::Compose( binrel_t that ) const
     bdd temp2 = bdd_relprod(rel, temp1, con->tensorSecBddContextSet);
     c = bdd_replace(temp2, con->tensorRestore.get());
   }
-  return new BinRel(con,c,isTensored);
+
+  binrel_t ret = new BinRel(con,c,isTensored);
+  // Keep zero/one unique.
+  if(ret->isZero())
+    return static_cast<BinRel*>(ret->zero().get_ptr());
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  return ret;
 }
 
 binrel_t BinRel::Union( binrel_t that ) const
@@ -1123,13 +1126,17 @@ binrel_t BinRel::Union( binrel_t that ) const
     return new BinRel(con,bddtrue,isTensored);
   }
 #endif
-  if (this->isZero()) {
+  if (this->isZero())
     return that;
-  }
-  if (that->isZero()) {
+  if (that->isZero())
     return new BinRel(*this);
-  }  
-  return new BinRel(con,rel | that->rel, isTensored);
+
+  // Keep zero/one unique
+  binrel_t ret = new BinRel(con,rel | that->rel, isTensored);
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  //can't be zero.
+  return ret;
 }
 
 binrel_t BinRel::Intersect( binrel_t that ) const
@@ -1146,7 +1153,16 @@ binrel_t BinRel::Intersect( binrel_t that ) const
     return new BinRel(con,bddfalse,isTensored);
   }
 #endif
-  return new BinRel(con, rel & that->rel,isTensored);
+  if(this->isZero() || that->isZero())
+    return static_cast<BinRel*>(this->zero().get_ptr());
+
+  // Keep zero/one unique
+  binrel_t ret = new BinRel(con, rel & that->rel,isTensored);
+  if(ret->isZero())
+    return static_cast<BinRel*>(ret->zero().get_ptr());
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  return ret;
 }
 
 bool BinRel::Equal( binrel_t that) const
@@ -1183,6 +1199,11 @@ binrel_t BinRel::Transpose() const
     return new BinRel(con, bddfalse, true);
   }
 #endif
+  if(this->isZero())
+    return static_cast<BinRel*>(zero().get_ptr());
+  if(this->isOne())
+    return static_cast<BinRel*>(one().get_ptr());
+
   bdd c = bdd_replace(rel, con->baseSwap.get());
   return new BinRel(con, c, isTensored);
 }
@@ -1210,7 +1231,12 @@ binrel_t BinRel::Kronecker(binrel_t that) const
   bdd rel2 = bdd_replace(that->rel, con->move2Tensor2.get());
   bdd c = rel1 & rel2;
 #endif
-  return new BinRel(con, c,true);
+  binrel_t ret = new BinRel(con, c,true);
+  if(ret->isZero())
+    return static_cast<BinRel*>(ret->zero().get_ptr());
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  return ret;
 }
 
 binrel_t BinRel::Eq23Project() const
@@ -1238,7 +1264,12 @@ binrel_t BinRel::Eq23Project() const
   }
   bdd c = bdd_replace(rel1, con->move2Base.get());
 #endif
-  return new BinRel(con,c,false);
+  binrel_t ret = new BinRel(con,c,false);
+  if(ret->isZero())
+    return static_cast<BinRel*>(ret->zero().get_ptr());
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  return ret;
 }
 
 binrel_t BinRel::Eq13Project() const
@@ -1266,7 +1297,12 @@ binrel_t BinRel::Eq13Project() const
   }
   bdd c = bdd_replace(rel1, con->move2BaseTwisted.get());
 #endif
-  return new BinRel(con,c,false);
+  binrel_t ret = new BinRel(con,c,false);
+  if(ret->isZero())
+    return static_cast<BinRel*>(ret->zero().get_ptr());
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  return ret;
 }
 
 
@@ -1362,7 +1398,13 @@ wali::sem_elem_tensor_t BinRel::detensorTranspose()
 #endif
 #ifdef NWA_DETENSOR
   assert(isTensored);
-  return new BinRel(con, detensorViaNwa());
+  bdd c = detensorViaNwa();
+  binrel_t ret = new BinRel(con, detensorViaNwa());
+  if(ret->isZero())
+    return static_cast<BinRel*>(ret->zero().get_ptr());
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  return ret;
 #else
   return Eq13Project();
 #endif

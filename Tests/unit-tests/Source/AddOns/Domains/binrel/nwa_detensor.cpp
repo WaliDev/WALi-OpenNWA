@@ -24,7 +24,7 @@ using namespace std;
 using namespace wali;
 using namespace wali::domains::binrel;
 using namespace wali::domains::binrel::details;
-
+#ifdef NWA_DETENSOR
 namespace
 {
   TEST(Nwa_detensor, paperExample){
@@ -125,7 +125,7 @@ namespace
   }
 
 }
-
+#endif
 // Yo, Emacs!
 // Local Variables:
 //   c-file-style: "ellemtel"
