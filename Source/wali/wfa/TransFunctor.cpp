@@ -145,13 +145,13 @@ namespace wali
     // StackHasher
     //    - used by WFA::intersect
     //////////////////
-    void StackHasher::operator()( ITrans* t )
+    void StackHasher::operator()( ITrans const * t )
     {
       Key stack = t->stack();
       stackmap_t::iterator it = stackmap.find( stack );
       if( it == stackmap.end() )
       {
-        TransSet transSet;
+        ConstTransSet transSet;
         it = stackmap.insert(stack,transSet).first;
       }
       it->second.insert(t);

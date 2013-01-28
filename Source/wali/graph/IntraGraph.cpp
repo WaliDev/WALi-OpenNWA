@@ -1647,19 +1647,17 @@ namespace wali {
 #if defined(PPP_DBG) && PPP_DBG >= 0
     static unsigned saturateCount = 0;
 #endif
-    void IntraGraph::saturate()
+    void IntraGraph::saturate(unsigned& numRounds)
     {
 
       bool repeat = true;
+      numRounds = 0;
 #if defined(PPP_DBG) && PPP_DBG >= 0
-      unsigned round = 0;
       ++saturateCount;
 #endif
 
       while(repeat){
-#if defined(PPP_DBG) && PPP_DBG >= 0
-        ++round;
-#endif
+        ++numRounds;
         //First, evaluate the current regular expressions completely.
         RegExp::evaluateRoots();
 
@@ -1698,7 +1696,7 @@ namespace wali {
 #if defined(PPP_DBG) && PPP_DBG >= 1
           {
             stringstream ss;
-            ss << "newton_regexp_" << saturateCount << "_" << round << ".dot";
+            ss << "newton_regexp_" << saturateCount << "_" << numRound << ".dot";
             string filename = ss.str();
             fstream foo;
             foo.open(filename.c_str(), fstream::out);
@@ -1716,7 +1714,7 @@ namespace wali {
 #endif
 #if defined(PPP_DBG) && PPP_DBG >= 2
           cout << "Weights after saturateCount" << saturateCount << 
-            ", round " << round << "\n";
+            ", round " << numRounds << "\n";
           cout << "NODES \n";
           cout << "node0:\n";
           if(nodes[0].weight != NULL){

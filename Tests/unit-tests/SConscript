@@ -35,6 +35,7 @@ env.AppendUnique(CPPPATH=['#/Tests/unit-tests/Source',
 env.AppendUnique(LIBPATH=['#/AddOns/Domains/ThirdParty/'])
 env.AppendUnique(CPPPATH=[glog_inc])
 env.AppendUnique(LIBS=[glog_lib, 'walidomains', 'bdd', "xfa"])
+env.Append(CXXFLAGS=["-std=c++0x"])
 
 #gtest and glog are ill begaved w.r.t. to these flags.
 env['WARNING_FLAGS'] = env['WARNING_FLAGS'].replace('-Wundef', '')
@@ -94,6 +95,9 @@ test_files = Split("""
     Source/AddOns/Xfa/wali/util/base64.cpp
     Source/AddOns/Xfa/wali/util/DisjointSets.cpp
     Source/AddOns/Xfa/wali/util/details/Partition.cpp
+
+    Source/AddOns/Xfa/wali/xfa/class-xfa/intersect.cpp
+    Source/AddOns/Xfa/wali/xfa/class-xfa/is-member.cpp
     """)
 
 just_compile = env.SConscript('Source/header-compilation/SConscript')

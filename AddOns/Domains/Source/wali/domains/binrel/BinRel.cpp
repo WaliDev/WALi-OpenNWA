@@ -270,9 +270,10 @@ BddContext::BddContext(int bddMemSize, int cacheSize) :
   numIntersect = 0;
   numEqual = 0;
   numKronecker = 0;
+  numReverse = 0;
   numTranspose = 0;
-  numEq23Project = 0;
-  numEq13Project = 0;
+  numDetensor = 0;
+  numDetensorTranspose = 0;
 #endif
   populateCache();
 }
@@ -310,9 +311,10 @@ BddContext::BddContext(const BddContext& other) :
   numIntersect = 0;
   numEqual = 0;
   numKronecker = 0;
+  numReverse = 0;
   numTranspose = 0;
-  numEq23Project = 0;
-  numEq13Project = 0;
+  numDetensor = 0;
+  numDetensorTranspose = 0;
 #endif
   populateCache();
 }
@@ -1074,20 +1076,6 @@ binrel_t BinRel::Compose( binrel_t that ) const
 #ifdef BINREL_STATS
   con->numCompose++;
 #endif
-  if (this->isOne()) {
-    return that;
-  }
-  if (that->isOne()) {
-    return new BinRel(*this);
-  }
-
-  if (this->isZero() || that->isZero()) {
-    sem_elem_t zero_semelem = zero();
-    BinRel * zero_binrel = dynamic_cast<BinRel*>(zero_semelem.get_ptr());
-    return zero_binrel;
-  }
-  
-  
   //We skip this test if you insist
 #ifndef BINREL_HASTY
   if(isTensored != that->isTensored || con != that->con){
@@ -1097,6 +1085,13 @@ binrel_t BinRel::Compose( binrel_t that ) const
     return new BinRel(con,bddfalse,isTensored);
   }
 #endif
+  if (this->isZero() || that->isZero())
+    return static_cast<BinRel*>(zero().get_ptr());;
+  if (this->isOne())
+    return that;
+  if (that->isOne())
+    return new BinRel(*this);
+
   bdd c;
   if(!isTensored){
     bdd temp1 = bdd_replace(that->rel, con->baseRightShift.get());
@@ -1107,7 +1102,14 @@ binrel_t BinRel::Compose( binrel_t that ) const
     bdd temp2 = bdd_relprod(rel, temp1, con->tensorSecBddContextSet);
     c = bdd_replace(temp2, con->tensorRestore.get());
   }
-  return new BinRel(con,c,isTensored);
+
+  binrel_t ret = new BinRel(con,c,isTensored);
+  // Keep zero/one unique.
+  if(ret->isZero())
+    return static_cast<BinRel*>(ret->zero().get_ptr());
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  return ret;
 }
 
 binrel_t BinRel::Union( binrel_t that ) const
@@ -1115,13 +1117,6 @@ binrel_t BinRel::Union( binrel_t that ) const
 #ifdef BINREL_STATS
   con->numUnion++;
 #endif
-  if (this->isZero()) {
-    return that;
-  }
-  if (that->isZero()) {
-    return new BinRel(*this);
-  }  
-  
   //We skip this test if you insist
 #ifndef BINREL_HASTY
   if(isTensored != that->isTensored || con != that->con){
@@ -1131,7 +1126,17 @@ binrel_t BinRel::Union( binrel_t that ) const
     return new BinRel(con,bddtrue,isTensored);
   }
 #endif
-  return new BinRel(con,rel | that->rel, isTensored);
+  if (this->isZero())
+    return that;
+  if (that->isZero())
+    return new BinRel(*this);
+
+  // Keep zero/one unique
+  binrel_t ret = new BinRel(con,rel | that->rel, isTensored);
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  //can't be zero.
+  return ret;
 }
 
 binrel_t BinRel::Intersect( binrel_t that ) const
@@ -1148,7 +1153,16 @@ binrel_t BinRel::Intersect( binrel_t that ) const
     return new BinRel(con,bddfalse,isTensored);
   }
 #endif
-  return new BinRel(con, rel & that->rel,isTensored);
+  if(this->isZero() || that->isZero())
+    return static_cast<BinRel*>(this->zero().get_ptr());
+
+  // Keep zero/one unique
+  binrel_t ret = new BinRel(con, rel & that->rel,isTensored);
+  if(ret->isZero())
+    return static_cast<BinRel*>(ret->zero().get_ptr());
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  return ret;
 }
 
 bool BinRel::Equal( binrel_t that) const
@@ -1185,6 +1199,11 @@ binrel_t BinRel::Transpose() const
     return new BinRel(con, bddfalse, true);
   }
 #endif
+  if(this->isZero())
+    return static_cast<BinRel*>(zero().get_ptr());
+  if(this->isOne())
+    return static_cast<BinRel*>(one().get_ptr());
+
   bdd c = bdd_replace(rel, con->baseSwap.get());
   return new BinRel(con, c, isTensored);
 }
@@ -1203,6 +1222,8 @@ binrel_t BinRel::Kronecker(binrel_t that) const
     return new BinRel(con, bddfalse, true);
   }
 #endif
+  if(rel == bddfalse || that->rel == bddfalse)
+    return con->cachedTensorZero;
 #ifdef NWA_DETENSOR
   bdd c = tensorViaDetensor(that->rel); //nwa_detensor.cpp
 #else
@@ -1210,14 +1231,16 @@ binrel_t BinRel::Kronecker(binrel_t that) const
   bdd rel2 = bdd_replace(that->rel, con->move2Tensor2.get());
   bdd c = rel1 & rel2;
 #endif
-  return new BinRel(con, c,true);
+  binrel_t ret = new BinRel(con, c,true);
+  if(ret->isZero())
+    return static_cast<BinRel*>(ret->zero().get_ptr());
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  return ret;
 }
 
 binrel_t BinRel::Eq23Project() const
 {
-#ifdef BINREL_STATS
-  con->numEq23Project++;
-#endif
 #ifndef BINREL_HASTY
   if(!isTensored){
     *waliErr << "[WARNING] " << "Attempted to detensor untensored weight."
@@ -1241,14 +1264,16 @@ binrel_t BinRel::Eq23Project() const
   }
   bdd c = bdd_replace(rel1, con->move2Base.get());
 #endif
-  return new BinRel(con,c,false);
+  binrel_t ret = new BinRel(con,c,false);
+  if(ret->isZero())
+    return static_cast<BinRel*>(ret->zero().get_ptr());
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  return ret;
 }
 
 binrel_t BinRel::Eq13Project() const
 {
-#ifdef BINREL_STATS
-  con->numEq13Project++;
-#endif
 #ifndef BINREL_HASTY
   if(!isTensored){
     *waliErr << "[WARNING] " << "Attempted to detensor untensored weight."
@@ -1272,7 +1297,12 @@ binrel_t BinRel::Eq13Project() const
   }
   bdd c = bdd_replace(rel1, con->move2BaseTwisted.get());
 #endif
-  return new BinRel(con,c,false);
+  binrel_t ret = new BinRel(con,c,false);
+  if(ret->isZero())
+    return static_cast<BinRel*>(ret->zero().get_ptr());
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  return ret;
 }
 
 
@@ -1355,13 +1385,26 @@ wali::sem_elem_tensor_t BinRel::tensor(wali::SemElemTensor* se)
 
 wali::sem_elem_tensor_t BinRel::detensor()
 {
+#ifdef BINREL_STATS
+  con->numDetensor++;
+#endif
   return Eq23Project();
 }
 
 wali::sem_elem_tensor_t BinRel::detensorTranspose()
 {
+#ifdef BINREL_STATS
+  con->numDetensorTranspose++;
+#endif
 #ifdef NWA_DETENSOR
-  return new BinRel(con, detensorViaNwa());
+  assert(isTensored);
+  bdd c = detensorViaNwa();
+  binrel_t ret = new BinRel(con, detensorViaNwa());
+  if(ret->isZero())
+    return static_cast<BinRel*>(ret->zero().get_ptr());
+  if(ret->isOne())
+    return static_cast<BinRel*>(ret->one().get_ptr());
+  return ret;
 #else
   return Eq13Project();
 #endif
@@ -1376,9 +1419,12 @@ std::ostream& BddContext::printStats( std::ostream& o) const
   o << "#Intersect: " << numIntersect << endl; 
   o << "#Equal: " << numEqual << endl; 
   o << "#Kronecker: " << numKronecker << endl;
+#if defined(NWA_DETENSOR)
+  o << "#Reverse: " << numReverse << endl;
+#endif
   o << "#Transpose: " << numTranspose << endl;
-  o << "#Eq23Project: " << numEq23Project << endl;
-  o << "#Eq13Project: " << numEq13Project << endl;
+  o << "#Eq23Project: " << numDetensor << endl;
+  o << "#Eq13Project: " << numDetensorTranspose << endl;
   return o;
 }
 
@@ -1389,9 +1435,10 @@ void BddContext::resetStats()
   numIntersect = 0;
   numEqual = 0;
   numKronecker = 0;
+  numReverse = 0;
   numTranspose = 0;
-  numEq23Project = 0;
-  numEq13Project = 0;
+  numDetensor = 0;
+  numDetensorTranspose = 0;
 }
 #endif //BINREL_STATS
 

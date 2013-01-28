@@ -80,16 +80,16 @@
  * The tensor choice is determined by the following macro:
  **/
 //#define TENSOR_MIN_AFFINITY
-//#define TENSOR_MAX_AFFINITY
+#define TENSOR_MAX_AFFINITY
 //#define BASE_MAX_AFFINITY_TENSOR_MIXED
 /*** NOTE: This currently only works correctly with boolean variables.***/
-#define TENSOR_MATCHED_PAREN
+//#define TENSOR_MATCHED_PAREN
 
 
 //#define DETENSOR_TOGETHER
 #define DETENSOR_BIT_BY_BIT
 
-#define NWA_DETENSOR
+//#define NWA_DETENSOR
 
 
 #if defined(NWA_DETENSOR) && not defined(TENSOR_MATCHED_PAREN)
@@ -308,9 +308,10 @@ namespace wali
           mutable StatCount numIntersect;
           mutable StatCount numEqual;
           mutable StatCount numKronecker;
+          mutable StatCount numReverse;
           mutable StatCount numTranspose;
-          mutable StatCount numEq23Project;
-          mutable StatCount numEq13Project;
+          mutable StatCount numDetensor;
+          mutable StatCount numDetensorTranspose;
 
           // Related functions
         public:
@@ -388,15 +389,17 @@ namespace wali
           sem_elem_t zero() const;
 
           bool isOne() const {
-            sem_elem_t one_semelem = one();
-            BinRel * one_binrel = dynamic_cast<BinRel*>(one_semelem.get_ptr());
-            return getBdd() == one_binrel->getBdd();
+            if(isTensored)
+              return getBdd() == con->cachedTensorOne->getBdd();
+            else
+              return getBdd() == con->cachedBaseOne->getBdd();
           }
 
           bool isZero() const {
-            sem_elem_t zero_semelem = zero();
-            BinRel * zero_binrel = dynamic_cast<BinRel*>(zero_semelem.get_ptr());
-            return getBdd() == zero_binrel->getBdd();
+            if(isTensored)
+              return getBdd() == con->cachedTensorZero->getBdd();
+            else
+              return getBdd() == con->cachedBaseZero->getBdd();
           }
         
           /** @return [this]->Union( cast<BinRel*>(se) ) */
@@ -478,6 +481,7 @@ namespace wali
           opennwa::State generateTransitions(DetensorNwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n);
           opennwa::State generateTransitionsLowerPlies(DetensorNwa& nwa, DetensorWeightGen& wts, unsigned v, bdd n);
 
+          bdd reverse(bdd toReverse) const;
           bdd tensorViaDetensor(bdd other) const;
 #endif
       };
