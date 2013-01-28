@@ -646,11 +646,38 @@ namespace goals {
     outfa.path_summary(npds->get_theZero()->one());
 
     cout << "[Newton Compare] Checking error label reachability..." << endl;
-    TransSet ts = outfa.match(getPdsState(), getErrStk(pg));
-    sem_elem_t wt = outfa.getSomeWeight()->zero();
+	//    //Construct an automata that accepts errorsigma*
+    WpdsStackSymbols syms;
+    npds->for_each(syms);
+
+
+    WFA errfa;
+
+    wali::Key init = wali::getKey("__init");
+    errfa.addState(getPdsState(),outfa.getSomeWeight());
+    errfa.setInitialState(init);
+    wali::Key fin = wali::getKey("__final");
+    //errfa.addState(fin);
+    errfa.addFinalState(fin);
+
+    std::set<Key>::iterator it;
+    errfa.addTrans(init, getErrStk(pg), fin, outfa.getSomeWeight());
+
+    for(it = syms.gamma.begin(); it != syms.gamma.end(); it++)
+    {
+      errfa.addTrans(fin, *it, fin, outfa.getSomeWeight());
+    }
+
+    WFA interfa;
+    KeepRight wmaker;
+    interfa = errfa.intersect(wmaker, outfa);
+
+
+    TransSet ts = interfa.match(getPdsState(), getErrStk(pg));
+    sem_elem_t wt = interfa.getSomeWeight()->zero();
     for(TransSet::const_iterator it = ts.begin(); it != ts.end(); ++it){
       Key toKey = (*it)->to();
-      State * toState = outfa.getState(toKey);
+      State * toState = interfa.getState(toKey);
       wt = wt->combine(toState->weight());
     }
     if(wt->equal(wt->zero()))
