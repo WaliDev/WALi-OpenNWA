@@ -143,7 +143,7 @@ namespace wali {
                 
                 voc.setIntVars(vars);
                 //details::interleave_all_fdds();
-details::print_bdd_variable_order(std::cout);
+::details::print_bdd_variable_order(std::cout);
                 has_run = true;
             }
         }
