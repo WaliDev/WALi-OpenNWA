@@ -646,7 +646,7 @@ namespace goals {
     outfa.path_summary(npds->get_theZero()->one());
 
     cout << "[Newton Compare] Checking error label reachability..." << endl;
-	//    //Construct an automata that accepts errorsigma*
+    
     WpdsStackSymbols syms;
     npds->for_each(syms);
 
@@ -657,7 +657,7 @@ namespace goals {
     errfa.addState(getPdsState(),outfa.getSomeWeight());
     errfa.setInitialState(init);
     wali::Key fin = wali::getKey("__final");
-    //errfa.addState(fin);
+    errfa.addState(fin);
     errfa.addFinalState(fin);
 
     std::set<Key>::iterator it;
