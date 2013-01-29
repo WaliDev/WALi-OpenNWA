@@ -1005,7 +1005,8 @@ bdd ProgramBddContext::Assign(std::string var, bdd expr) const
   bddinfo_t bi;
   if(this->find(var) == this->end()){
     LOG(WARNING) << "[ProgramBddContext::Assign] Unknown Variable: " << var;
-    return bddfalse;
+    //This is a safe result. We assume that anything can be assigned to anything!
+    return bddtrue;
   }else{
     bi = this->find(var)->second;
   }
