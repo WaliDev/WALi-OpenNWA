@@ -48,9 +48,10 @@ namespace
     }
   }
 
+
   typedef std::pair<sem_elem_t, sem_elem_t>(*SemElemCompare)(sem_elem_t, sem_elem_t);
 
-  void
+  sem_elem_t
   remove_subsumed_elements(SemElemSet::ElementSet & set,
                            sem_elem_t element,
                            SemElemCompare keep_what)
@@ -60,13 +61,22 @@ namespace
       std::pair<sem_elem_t, sem_elem_t> keep_these = keep_what(element, *iter);
       if (keep_these.second == NULL) {
         // set.erase(iter++) for std::map
-        assert(keep_these.first == element);
+        element = keep_these.first;
         iter = set.erase(iter);
       }
       else {
+        // These two assertions are to check that 'keep_what' returns either
+        // a single element which means that the existing one should be
+        // removed and the returned single element is carried forward and
+        // eventually inserted (this is the true case of this if statement),
+        // or (this case) it returns both the new and existing elements
+        // unchanged.
+        assert(keep_these.first == element || keep_these.second == element);
+        assert(keep_these.first == *iter || keep_these.second == *iter);
         ++iter;
       }
     }
+    return element;
   }
 
 
@@ -80,9 +90,24 @@ namespace
     {
       std::pair<sem_elem_t, sem_elem_t> keep_these = keep_what(*iter, element);
       if (keep_these.second == NULL) {
-        assert(keep_these.first == *iter);
+        // The existing element subsumes the new one. However, the existing
+        // element may need to incorporate information from the new element
+        // into it. The following is like *iter = keep_these.first, except
+        // that we can do it. :-)
+        if (*iter != keep_these.first) {
+          // 'tis OK to invalidate iter because we're just returning anyway :-)
+          set.erase(iter);
+          set.insert(keep_these.first);
+        }
         return;
       }
+      // These two assertions are to check that 'keep_what' returns either a
+      // single element which means that the existing one should be removed
+      // and the returned single element is carried forward and eventually
+      // inserted (this is the true case of this if statement), or (this
+      // case) it returns both the new and existing elements unchanged.
+      assert(keep_these.first == element || keep_these.second == element);
+      assert(keep_these.first == *iter || keep_these.second == *iter);
     }
     set.insert(element);
   }
@@ -100,13 +125,13 @@ namespace
 
       case SemElemSet::KeepMaximalElements:
         // Should remove an element if new >= existing
-        remove_subsumed_elements(set, add_this, keep_larger);
+        add_this = remove_subsumed_elements(set, add_this, keep_larger);
         add_element_if_not_subsumed(set, add_this, keep_larger);
         break;
 
       case SemElemSet::KeepMinimalElements:
         // Opposite of the previous case
-        remove_subsumed_elements(set, add_this, keep_smaller);
+        add_this = remove_subsumed_elements(set, add_this, keep_smaller);
         add_element_if_not_subsumed(set, add_this, keep_smaller);
         break;
     }
