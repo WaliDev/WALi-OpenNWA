@@ -1,4 +1,3 @@
-#if 0
 #include "gtest/gtest.h"
 #include "wali/wfa/WFA.hpp"
 #include "wali/ShortestPathSemiring.hpp"
@@ -359,5 +358,3 @@ namespace wali {
 //     c-basic-offset: 4
 //     indent-tabs-mode: nil
 // End:
-#endif
-

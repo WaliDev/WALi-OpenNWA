@@ -64,7 +64,7 @@ namespace wali {
   }
 
   
-  bool ShortestPathSemiring::fastLessThan(SemElem const *rhs) const
+  bool ShortestPathSemiring::containerLessThan(SemElem const *rhs) const
   {
     assert(dynamic_cast<ShortestPathSemiring const *>(rhs));
 
@@ -73,7 +73,7 @@ namespace wali {
   }
 
 
-  size_t ShortestPathSemiring::fastHash() const
+  size_t ShortestPathSemiring::hash() const
   {
     return v;
   }

@@ -37,7 +37,7 @@ namespace wali {
 
     bool equal(SemElem *rhs) const;
 
-    bool fastLessThan(SemElem const * rhs) const;
+    bool containerLessThan(SemElem const * rhs) const;
 
     //------------------------------------
     // output
@@ -46,7 +46,7 @@ namespace wali {
 
     unsigned int getNum() const;
 
-    size_t fastHash() const;      
+    size_t hash() const;      
 
   private:
     
