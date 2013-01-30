@@ -390,11 +390,7 @@ void NWPDS::updateFa(wfa::WFA& fa)
         wali::wfa::ITrans * oldt = NULL;
         oldt = t->copy(oldFrom,oldStack,oldTo);
         assert(oldt != NULL);
-        fa.addTrans(oldt);
-        //DEBUGGING
-        //oldt->print(*waliErr << "[Newton] Updated transition: ") << std::endl;
-        //t->print(*waliErr << "from: ") << std::endl << std::endl;
-        //DEBUGGING
+        oldt = fa.insert(oldt);
         if(fromIt == state2ConstMap.end()){
           wali::Key f = oldt->from();
           wali::Key s = oldt->stack();
