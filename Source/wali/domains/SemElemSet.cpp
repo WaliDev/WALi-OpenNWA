@@ -25,13 +25,23 @@ namespace
   bool
   new_less_than_existing(sem_elem_t new_, sem_elem_t existing)
   {
-    return new_->underApproximates(existing);
+    if (new_->underApproximates(existing)) {
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 
   bool
   existing_less_than_new(sem_elem_t new_, sem_elem_t existing)
   {
-    return existing->underApproximates(new_);
+    if (existing->underApproximates(new_)) {
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 
   typedef bool(*SemElemCompare)(sem_elem_t, sem_elem_t);
