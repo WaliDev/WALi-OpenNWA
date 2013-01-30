@@ -29,6 +29,8 @@
 // ::wali::cprover
 #include "BplToPds.hpp"
 
+#include "buddy/bdd.h"
+
 using namespace std;
 using namespace wali;
 using namespace wali::wfa;
@@ -503,6 +505,26 @@ namespace goals {
         State * toState = outfa.getState(toKey);
         wt = wt->combine(toState->weight());
     }
+    {
+      // Print out this weight so that we can later read it in.
+      {
+        stringstream ss;
+        ss << fname;
+        ss << ".programbddcontext";
+        ofstream foo(ss.str().c_str());
+        static_cast<ProgramBddContext*>(con)->printHistory(foo);
+        foo.close();
+      }
+      {
+        stringstream ss;
+        ss << fname;
+        ss << ".pathsummary_weight";     
+        char * bddfname = strdup(ss.str().c_str());
+        bdd_fnsave(bddfname, dynamic_cast<BinRel*>(wt.get_ptr())->getBdd());
+        free(bddfname);
+        bddfname = NULL;      
+      }
+    }
     wt = dynamic_cast<SemElemTensor*>(wt.get_ptr())->detensorTranspose()->transpose();
     if(wt->equal(wt->zero()))
       cout << "[Newton Compare] NWPDS ==> error not reachable" << endl;
@@ -549,9 +571,9 @@ namespace goals {
     TransSet ts = outfa.match(getPdsState(), getErrStk(pg));
     sem_elem_t wt = outfa.getSomeWeight()->zero();
     for(TransSet::const_iterator it = ts.begin(); it != ts.end(); ++it){
-        Key toKey = (*it)->to();
-        State * toState = outfa.getState(toKey);
-        wt = wt->combine(toState->weight());
+      Key toKey = (*it)->to();
+      State * toState = outfa.getState(toKey);
+      wt = wt->combine(toState->weight());
     }
     if(wt->equal(wt->zero()))
       cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
