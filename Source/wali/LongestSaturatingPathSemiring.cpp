@@ -76,6 +76,22 @@ namespace wali {
   }
 
   
+  bool LongestSaturatingPathSemiring::containerLessThan(SemElem const *rhs) const
+  {
+    assert(dynamic_cast<LongestSaturatingPathSemiring const *>(rhs));
+
+    LongestSaturatingPathSemiring const * that = static_cast< LongestSaturatingPathSemiring const * >(rhs);
+    assert(this->biggest == that->biggest);    
+    return v < that->v;
+  }
+
+  size_t
+  LongestSaturatingPathSemiring::hash() const
+  {
+    return v;
+  }
+
+  
   //------------------------------------
   // output
   //------------------------------------

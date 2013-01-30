@@ -9,6 +9,7 @@
 #include "wali/ref_ptr.hpp"
 #include "wali/Countable.hpp"
 #include "wali/Printable.hpp"
+#include <cstdlib>
 #include <string>
 
 namespace wali
@@ -97,6 +98,18 @@ namespace wali
       virtual bool equal( SemElem * se ) const = 0;
 
       /**
+       *  Determines whether 'this' underapproximates 'that'
+       *
+       *  The following should be equivalent:
+       *      this.underApproximates(that)
+       *      this + that = that
+       *  (Where = is ->equals and + is ->combine.)
+       *
+       *  The latter is what the default implementation performs
+       */
+      virtual bool underApproximates(SemElem * that);
+
+      /**
        *  Print the semiring element to the std::ostream o
        */
       virtual std::ostream& print( std::ostream & o ) const = 0;
@@ -176,6 +189,11 @@ namespace wali
         return equal( se.get_ptr() ); 
       }
 
+      bool underApproximates( sem_elem_t se )
+      { 
+        return underApproximates( se.get_ptr() ); 
+      }
+      
       /**
        * Wrapper method for diff that will remove the ref_ptr
        * to make the call to the user's code. 
@@ -195,6 +213,35 @@ namespace wali
         return delta( se.get_ptr() );
       }
 
+
+      /// Returns true if this is less than the other. Should be
+      /// fast. HOWEVER -- does not need to have semantic meaning, other than
+      /// it must be consistent with equal() and different objects
+      /// representing the same semiring element should return consistent
+      /// results.
+      ///
+      /// Default implementation aborts.
+      virtual
+      bool
+      containerLessThan(SemElem const * other) const
+      {
+        (void) other;
+        std::abort();
+      }
+
+      
+      bool
+      containerLessThan(sem_elem_t se) const
+      {
+        return this->containerLessThan(se.get_ptr());
+      }
+
+      virtual
+      size_t
+      hash() const
+      {
+        std::abort();
+      }
   };
 
   /**
@@ -210,6 +257,34 @@ namespace wali
    */
   void test_semelem_impl(sem_elem_t x);
 
+
+
+  struct SemElemRefPtrContainerLessThan
+  {
+    bool
+    operator() (sem_elem_t left, sem_elem_t right) const
+    {
+      return left->containerLessThan(right);
+    }
+  };
+
+  struct SemElemRefPtrHash
+  {
+    size_t
+    operator() (sem_elem_t se) const
+    {
+      return se->hash();
+    }
+  };
+
+  struct SemElemRefPtrEqual
+  {
+    bool
+    operator() (sem_elem_t left, sem_elem_t right) const
+    {
+      return left->equal(right);
+    }
+  };
 }
 #endif  // wali_SEM_ELEM_GUARD
 
