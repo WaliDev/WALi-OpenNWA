@@ -577,12 +577,14 @@ namespace goals {
     cout << "[Newton Compare] Goal V: end-to-end NWPDS run" << endl;
     NWPDS * npds = new NWPDS();
     con = pds_from_prog(npds, pg);
+    
+    sem_elem_t zero = npds->get_theZero();
 
     WFA fa;
     wali::Key acc = wali::getKeySpace()->getKey("accept");
     fa.setInitialState(getPdsState());
     fa.addFinalState(acc);
-    fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, npds->get_theZero()->one());
+    fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, zero->one());
 
     WFA outfa;
     cout << "[Newton Compare] Computing NWPDS poststar..." << endl;
@@ -595,20 +597,17 @@ namespace goals {
 
     cout << "[Newton Compare] Computing path summary..." << endl;
 
-    sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>(npds->get_theZero().get_ptr());
-    zerot = zerot->tensor(zerot.get_ptr());
 
-    outfa.path_summary(zerot->one());
+    outfa.path_summary(zero->one());
 
     cout << "[Newton Compare] Checking error label reachability..." << endl;
     TransSet ts = outfa.match(getPdsState(), getErrStk(pg));
-    sem_elem_t wt = zerot;
+    sem_elem_t wt = zero;
     for(TransSet::const_iterator it = ts.begin(); it != ts.end(); ++it){
         Key toKey = (*it)->to();
         State * toState = outfa.getState(toKey);
         wt = wt->combine(toState->weight());
     }
-    wt = dynamic_cast<SemElemTensor*>(wt.get_ptr())->detensorTranspose()->transpose();
     if(wt->equal(wt->zero()))
       cout << "[Newton Compare] NWPDS ==> error not reachable" << endl;
     else{
