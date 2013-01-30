@@ -542,6 +542,36 @@ namespace goals {
 #endif
     npds->poststarIGR(fa,outfa); 
 
+    WpdsStackSymbols syms;
+    npds->for_each(syms);
+
+
+    WFA errfa;
+
+    errfa.setInitialState(getPdsState());
+    wali::Key fin = wali::getKeySpace()->getKey("accept");
+    errfa.addFinalState(fin);
+
+    std::set<Key>::iterator it;
+    errfa.addTrans(getPdsState(), getErrStk(pg), fin, outfa.getSomeWeight());
+
+    for(it = syms.gamma.begin(); it != syms.gamma.end(); it++)
+    {
+      errfa.addTrans(fin, *it, fin, outfa.getSomeWeight());
+    }
+
+    WFA interfa;
+    KeepRight wmaker;
+    interfa = errfa.intersect(wmaker, outfa);
+
+    cout << "[Newton Compare] Computing path summary..." << endl;
+    interfa.path_summary(npds->get_theZero()->one());
+
+    sem_elem_t wt = interfa.getState(interfa.getInitialState())->weight();
+
+
+
+/*
     cout << "[Newton Compare] Computing path summary..." << endl;
     outfa.path_summary(npds->get_theZero()->one());
 
@@ -552,7 +582,7 @@ namespace goals {
         Key toKey = (*it)->to();
         State * toState = outfa.getState(toKey);
         wt = wt->combine(toState->weight());
-    }
+    }*/
     if(wt->equal(wt->zero()))
       cout << "[Newton Compare] FWPDS ==> error not reachable" << endl;
     else{
@@ -637,18 +667,46 @@ namespace goals {
 #endif
     npds->poststarIGR(fa,outfa); 
 
-    cout << "[Newton Compare] Computing path summary..." << endl;
+    /*cout << "[Newton Compare] Computing path summary..." << endl;
     outfa.path_summary(tzero->one());
-
+*/
     cout << "[Newton Compare] Checking error label reachability..." << endl;
-    TransSet ts = outfa.match(getPdsState(), getErrStk(pg));
-    sem_elem_t wt = outfa.getSomeWeight()->zero();
+    
+    WpdsStackSymbols syms;
+    npds->for_each(syms);
+
+
+    WFA errfa;
+
+    errfa.setInitialState(getPdsState());
+    wali::Key fin = wali::getKeySpace()->getKey("accept");
+    errfa.addFinalState(fin);
+
+    std::set<Key>::iterator it;
+    errfa.addTrans(getPdsState(), getErrStk(pg), fin, outfa.getSomeWeight());
+
+    for(it = syms.gamma.begin(); it != syms.gamma.end(); it++)
+    {
+      errfa.addTrans(fin, *it, fin, outfa.getSomeWeight());
+    }
+
+    WFA interfa;
+    KeepRight wmaker;
+    interfa = errfa.intersect(wmaker, outfa);
+
+    cout << "[Newton Compare] Computing path summary..." << endl;
+    interfa.path_summary(tzero->one());
+    
+    sem_elem_t wt = interfa.getState(interfa.getInitialState())->weight();
+    /*TransSet ts = interfa.match(getPdsState(), getErrStk(pg));
+    sem_elem_t wt = interfa.getSomeWeight()->zero();
     for(TransSet::const_iterator it = ts.begin(); it != ts.end(); ++it){
       Key toKey = (*it)->to();
-      State * toState = outfa.getState(toKey);
+      State * toState = interfa.getState(toKey);
       wt = wt->combine(toState->weight());
     }
-    wt = dynamic_cast<SemElemTensor*>(wt.get_ptr())->detensorTranspose()->transpose();
+    wt = dynamic_cast<SemElemTensor*>(wt.get_ptr())->detensorTranspose()->transpose();*/
+    
     if(wt->equal(wt->zero()))
       cout << "[Newton Compare] NWPDS ==> error not reachable" << endl;
     else
