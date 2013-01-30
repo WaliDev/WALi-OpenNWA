@@ -1,3 +1,10 @@
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/string.hpp>
+#include <boost/serialization/base_object.hpp>
+
 #include "ProgramBddContext.hpp"
 
 #include "glog/logging.h"
@@ -240,6 +247,13 @@ void ProgramBddContext::setIntVars(const std::map<std::string, int>& inflatvars)
 {
   // copy inflatvars because we mess with it.
   std::map<std::string, int> flatvars = inflatvars;
+  
+  // Remember creation history
+  CreationCall cc;
+  cc.cf = SET_INT_MAP;
+  cc.arg.push_back(flatvars);
+  creationHistory.push_back(cc);
+  
   // Add extra variables at the end of the variables passed in.
   unsigned size = 0;
   for(std::map<std::string, int>::const_iterator ci = flatvars.begin(); ci != flatvars.end(); ++ci)
@@ -274,6 +288,13 @@ void ProgramBddContext::setIntVars(const std::map<std::string, int>& inflatvars)
 
 void ProgramBddContext::setIntVars(const std::vector<std::map<std::string, int> >& vars)
 {
+  //Remember Creation history
+  CreationCall cc;
+  cc.cf = SET_INT_VECT;
+  for(vector< map< string, int > >::const_iterator cit = vars.begin(); cit != vars.end(); ++cit)
+    cc.arg.push_back(*cit);
+  creationHistory.push_back(cc);
+
   createIntVars(vars);
   createExtraVars();
   BddContext::setupCachedBdds();
@@ -338,6 +359,14 @@ void ProgramBddContext::setupCachedBdds()
 
 void ProgramBddContext::addIntVar(std::string name, unsigned siz)
 {
+  //Remember Creation history
+  CreationCall cc;
+  cc.cf = ADD_INT;
+  map< string, int > m;
+  m[name] = siz;
+  cc.arg.push_back(m);
+  creationHistory.push_back(cc);
+
   BddContext::addIntVar(name,siz);
   if(siz > maxSize){
     if(maxSize == 0){
@@ -1134,6 +1163,83 @@ bdd ProgramBddContext::tGetRandomTransformer(bool isTensored, unsigned seed) con
   return ret;
 }
 
+void ProgramBddContext::printHistory(std::ostream& o) const
+{
+  boost::archive::text_oarchive oa(o);
+  oa << creationHistory;
+}
+
+ProgramBddContext * ProgramBddContext::buildFromHistory(std::istream& in)
+{
+  CreationHistory ch;
+  boost::archive::text_iarchive ia(in);
+  ia >> ch;
+
+  ProgramBddContext * con = new ProgramBddContext();
+  for(CreationHistory::const_iterator ci = ch.begin(); ci != ch.end(); ++ci){
+    CreationCall cc = *ci;
+    switch(cc.cf){
+      case SET_INT_VECT:
+        con->setIntVars(cc.arg);
+        break;
+      case SET_INT_MAP:
+        con->setIntVars(cc.arg[0]);
+        break;
+      case ADD_INT:        
+        {
+          map< string, int >::iterator m = cc.arg[0].begin();
+          con->addIntVar(m->first, m->second);
+        }
+        break;
+      case ADD_BOOL:
+      default:
+        assert(0);
+    }
+  }
+  return con;
+}
+
+template<class Archive>
+void ProgramBddContext::CreationCall::serialize(Archive &ar, const unsigned int)
+{
+  //ignore file_version
+  ar & cf;
+  ar & arg;
+}
+
+ostream& ProgramBddContext::CreationCall::print(ostream& o) const
+{
+  switch(cf){
+    case SET_INT_VECT:
+      o << "SET_INT_VECT";
+      break;
+    case SET_INT_MAP:
+      o << "SET_INT_MAP";
+      break;
+    case ADD_INT:
+      o << "ADD_INT";
+      break;
+    case ADD_BOOL:
+      o << "ADD_BOOL";
+      break;
+    default:
+      o << "UNKNOWN";
+  }
+  o << ": ";
+  for(vector< map< string, int > >::const_iterator cvi = arg.begin(); cvi != arg.end(); ++cvi){
+    o << "{";
+    bool first = true;
+    for(map< string, int >::const_iterator cmi = cvi->begin(); cmi != cvi->end(); ++cmi){
+      if(!first)
+        o << ", ";
+      o << cmi->first << ": " << cmi->second;
+      first = false;
+    }
+    o << "}";
+  }
+  o << endl;
+  return o;
+}
 // Yo, Emacs!
 // Local Variables:
 //   c-file-style: "ellemtel"
