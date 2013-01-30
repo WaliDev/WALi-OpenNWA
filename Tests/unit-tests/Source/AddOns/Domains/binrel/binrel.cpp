@@ -1305,6 +1305,25 @@ namespace{
     }
   }
 
+  TEST(wali$domains$binrel$ProgramBddContext$printHistoryAndRecreate, setIntVarsMap)
+  {
+    stringstream ss;
+    ProgramBddContext * con = new ProgramBddContext();
+    std::map<string, int> m;
+    m["a"] = 3;
+    m["b"] = 4;
+    con->setIntVars(m);
+    con->printHistory(ss);
+
+    ProgramBddContext * hist;
+    hist = ProgramBddContext::buildFromHistory(ss);
+    BddContext::const_iterator cit = con->begin();
+    ASSERT_TRUE(string("a") == cit->first);
+    ASSERT_TRUE(3 == cit->second->maxVal);
+    ++cit;
+    ASSERT_TRUE(string("b") == cit->first);
+    ASSERT_TRUE(4 == cit->second->maxVal);
+  }
   
 
 } //namespace
