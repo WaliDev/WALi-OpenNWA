@@ -303,8 +303,15 @@ namespace wali
           assert(pg && "remove_skip_in_prog");
           proc_list * pl = pg->pl;
           while(pl){
-            if(pl->p->sl)
+            if(pl->p->sl){
               pl->p->sl = remove_skip_in_stmt_list(pl->p->sl);
+              if(pl->p->sl == NULL){
+                // Don't empty a previously non-empty proc
+                pl->p->sl = make_stmt_list_item(make_skip_stmt());
+              }
+
+            }
+
             pl = pl->n;
           }
         }
