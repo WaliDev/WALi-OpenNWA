@@ -60,6 +60,7 @@ built += penv.Program('PrintBplStats.cpp')
 built += penv.Program('NewtonCompare.cpp')
 built += penv.Program('ParseAndPrint.cpp')
 built += penv.Program('CheckRecursive.cpp')
+built += penv.Program('ReadBddAndDetensor.cpp')
 
 Return('built')
 
