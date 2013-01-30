@@ -1326,6 +1326,28 @@ namespace{
   }
   
 
+  TEST(wali$domains$binrel$ProgramBddContext$printHistoryAndRecreate, bddSaveNRestore)
+  {
+    stringstream ss;
+    {
+      ProgramBddContext * con = new ProgramBddContext();
+      std::map<string, int> m;
+      m["a"] = 3;
+      m["b"] = 4;
+      con->setIntVars(m);
+      bdd b = con->Assign("a", con->From("b"));
+      con->printHistory(ss);
+      bdd_fnsave("dusty_bdd", b);
+      delete con;
+    }
+    ProgramBddContext * hist;
+    hist = ProgramBddContext::buildFromHistory(ss);
+    bdd c;
+    bdd_fnload("dusty_bdd", c);
+    bdd d = hist->Assign("a", hist->From("b"));
+    ASSERT_EQ(c,d);
+
+  }
 } //namespace
 
 
