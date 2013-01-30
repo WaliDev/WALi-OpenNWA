@@ -293,6 +293,61 @@ namespace wali
           }
         }
 
+
+        // Forward declaration of static procedures to remove skip statements from the program.
+        static void remove_skip_in_prog(prog * pg);
+        static stmt_list * remove_skip_in_stmt_list(stmt_list * sl);
+
+        static void remove_skip_in_prog(prog * pg)
+        {
+          assert(pg && "remove_skip_in_prog");
+          proc_list * pl = pg->pl;
+          while(pl){
+            if(pl->p->sl){
+              pl->p->sl = remove_skip_in_stmt_list(pl->p->sl);
+              if(pl->p->sl == NULL){
+                // Don't empty a previously non-empty proc
+                pl->p->sl = make_stmt_list_item(make_skip_stmt());
+              }
+
+            }
+
+            pl = pl->n;
+          }
+        }
+
+        // Also rewrite tail for the whole stmt_list. That's easier, trust me.
+        static stmt_list * remove_skip_in_stmt_list(stmt_list *sl)
+        {
+          if(sl == NULL)
+            return NULL;
+          assert(sl && sl->s && "remove_skip_in_stmt_list");
+          if(sl->s->sl1){
+            sl->s->sl1 = remove_skip_in_stmt_list(sl->s->sl1);
+            if(sl->s->sl1 == NULL){
+              //Can't make it null, this will become an if statement w/o any stmt_list
+              sl->s->sl1 = make_stmt_list_item(make_skip_stmt());
+            }
+          }
+          if(sl->s->sl2)
+            sl->s->sl2 = remove_skip_in_stmt_list(sl->s->sl2);
+
+          stmt_list * cl = remove_skip_in_stmt_list(sl->n);
+          if(sl->s->op == AST_SKIP){
+            sl->n = NULL;
+            deep_erase_stmt_list(&sl);
+            return cl;
+          }else{
+            sl->n = cl;
+            if(cl == NULL)
+              sl->t = sl;
+            else
+              sl->t = cl->t;
+            return sl;
+          }
+        }
+
+
         // Forward declaration of static procedures having to do with instrumenting enforce conditions.
         // The semantics of the enforce is to assume that the given condition is true at every point in the
         // given procedure, i.e., we begin by assuming that the condition holds at entry, and then assume 
@@ -950,6 +1005,12 @@ namespace wali
       fprintf(stdout, "#local vars: \t\t%u\n", vc);
       fprintf(stdout, "#total vars: \t\t\t%u\n", vc + gvc);
       fprintf(stdout, "\n");      
+    }
+
+    // May be called any time.
+    void remove_skip(prog * pg)
+    {
+      remove_skip_in_prog(pg);
     }
 
     void instrument_enforce(prog * pg)

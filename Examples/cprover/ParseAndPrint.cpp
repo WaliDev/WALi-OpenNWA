@@ -39,6 +39,7 @@ int main(int argc, char ** argv)
   if(!mainProc) mainProc = strdup("main");
   if(!errLbl) errLbl = strdup("error");
   make_void_returns_explicit(pg);
+  remove_skip(pg);
   instrument_enforce(pg);
   instrument_asserts(pg, errLbl);
   instrument_call_return(pg);

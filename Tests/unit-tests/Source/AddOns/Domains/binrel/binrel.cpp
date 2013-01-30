@@ -1323,6 +1323,34 @@ namespace{
     ++cit;
     ASSERT_TRUE(string("b") == cit->first);
     ASSERT_TRUE(4 == cit->second->maxVal);
+
+  TEST(wali$domains$binrel$$BinRel$$underApproximates, bddContainmentChecks)
+  {
+    ProgramBddContext context;
+
+    map<string, int> vars;
+    vars["x"] = 4;
+    context.setIntVars(vars);
+
+    bdd plus1 = context.Assign("x", context.Plus(context.From("x"), context.Const(1)));
+    bdd plus2 = context.Assign("x", context.Plus(context.From("x"), context.Const(2)));
+    bdd plus3 = context.Assign("x", context.Plus(context.From("x"), context.Const(3)));
+
+    binrel_t plus1_rel = new BinRel(&context, plus1);
+    binrel_t plus2_rel = new BinRel(&context, plus2);
+    binrel_t plus3_rel = new BinRel(&context, plus3);
+
+    sem_elem_t plus12_rel = plus1_rel->combine(plus2_rel.get_ptr());
+    sem_elem_t plus13_rel = plus1_rel->combine(plus3_rel.get_ptr());
+    sem_elem_t plus123_rel = plus12_rel->combine(plus3_rel.get_ptr());
+
+    EXPECT_TRUE(plus1_rel->zero()->underApproximates(plus1_rel.get_ptr())); //    0 <== {1}
+    EXPECT_TRUE(plus1_rel->underApproximates(plus1_rel.get_ptr()));         //  {1} <== {1}
+    EXPECT_TRUE(plus1_rel->underApproximates(plus12_rel.get_ptr()));        //  {1} <== {12}
+    EXPECT_FALSE(plus12_rel->underApproximates(plus1_rel.get_ptr()));       // {12} </= {1}
+    EXPECT_TRUE(plus12_rel->underApproximates(plus123_rel.get_ptr()));      // {12} <== {123}
+    EXPECT_FALSE(plus12_rel->underApproximates(plus13_rel.get_ptr()));      // {12} </= {13}
+    EXPECT_FALSE(plus13_rel->underApproximates(plus12_rel.get_ptr()));      // {13} </= {12}
   }
   
 

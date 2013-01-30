@@ -37,12 +37,16 @@ namespace wali {
 
     bool equal(SemElem *rhs) const;
 
+    bool containerLessThan(SemElem const * rhs) const;
+
     //------------------------------------
     // output
     //------------------------------------
     std::ostream & print(std::ostream &out) const;
 
     unsigned int getNum() const;
+
+    size_t hash() const;      
 
   private:
     

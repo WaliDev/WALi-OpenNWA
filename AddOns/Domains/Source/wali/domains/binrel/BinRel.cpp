@@ -59,7 +59,7 @@ namespace wali
       /*
       struct BddLessThan
       {
-        bool operator() (bdd left, bdd right) {
+        bool operator() (bdd left, bdd right) const {
           return left.id() < right.id();
         }
       };
@@ -1165,6 +1165,27 @@ binrel_t BinRel::Intersect( binrel_t that ) const
   return ret;
 }
 
+
+
+bool BinRel::underApproximates(SemElem * se)
+{
+  binrel_t that = convert(se);
+  //We skip this test if you insist
+#ifndef BINREL_HASTY
+  if(isTensored != that->isTensored || con != that->con){
+    std::cerr << "con: " << con << "\n";
+    std::cerr << "that->con: " << that->con << "\n";
+    *waliErr << "[WARNING] " << "Compared (containment) incompatible relations" 
+      << endl;
+    that->print(print(*waliErr) << endl) << endl;
+    assert(false);
+    return false;
+  }
+#endif
+  return details::bddImplies(rel, that->rel);
+}
+
+
 bool BinRel::Equal( binrel_t that) const
 {
 #ifdef BINREL_STATS
@@ -1343,6 +1364,12 @@ bool BinRel::equal(wali::SemElem* se) const
 {
   binrel_t that( convert(se) );
   return Equal(that);
+}
+
+bool BinRel::containerLessThan(wali::SemElem const * se) const
+{
+  BinRel const * other = dynamic_cast<BinRel const *>(se);
+  return this->getBdd().id() < other->getBdd().id();
 }
 
 
