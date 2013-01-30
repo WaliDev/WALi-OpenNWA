@@ -22,29 +22,33 @@ namespace
   }
 
 
-  bool
+  std::pair<sem_elem_t, sem_elem_t>
   new_less_than_existing(sem_elem_t new_, sem_elem_t existing)
   {
     if (new_->underApproximates(existing)) {
-      return true;
+      // new subsumes existing. we only need to keep new_
+      return std::pair<sem_elem_t, sem_elem_t>(new_, NULL);
     }
     else {
-      return false;
+      // no subsumption; keep both
+      return std::pair<sem_elem_t, sem_elem_t>(new_, existing);
     }
   }
 
-  bool
+  std::pair<sem_elem_t, sem_elem_t>
   existing_less_than_new(sem_elem_t new_, sem_elem_t existing)
   {
     if (existing->underApproximates(new_)) {
-      return true;
+      // existing subsumes new. we only need to keep existing
+      return std::pair<sem_elem_t, sem_elem_t>(new_, NULL);
     }
     else {
-      return false;
+      // no subsumption; keep both
+      return std::pair<sem_elem_t, sem_elem_t>(new_, existing);
     }
   }
 
-  typedef bool(*SemElemCompare)(sem_elem_t, sem_elem_t);
+  typedef std::pair<sem_elem_t, sem_elem_t>(*SemElemCompare)(sem_elem_t, sem_elem_t);
 
   void
   remove_subsumed_elements(SemElemSet::ElementSet & set,
@@ -53,8 +57,10 @@ namespace
   {
     SemElemSet::ElementSet::const_iterator iter = set.begin();
     while (iter != set.end()) {
-      if (new_subsumes_existing(element, *iter)) {
+      std::pair<sem_elem_t, sem_elem_t> keep_these = new_subsumes_existing(element, *iter);
+      if (keep_these.second == NULL) {
         // set.erase(iter++) for std::map
+        assert(keep_these.first == element);
         iter = set.erase(iter);
       }
       else {
@@ -72,7 +78,9 @@ namespace
     for(SemElemSet::ElementSet::const_iterator iter = set.begin();
         iter != set.end(); ++iter)
     {
-      if (existing_subsumes_new(*iter, element)) {
+      std::pair<sem_elem_t, sem_elem_t> keep_these = existing_subsumes_new(*iter, element);
+      if (keep_these.second == NULL) {
+        assert(keep_these.first == *iter);
         return;
       }
     }
