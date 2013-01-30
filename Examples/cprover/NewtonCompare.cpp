@@ -4,6 +4,8 @@
 #include "wali/wpds/ewpds/EWPDS.hpp"
 // ::wali::wpds
 #include "wali/wpds/WPDS.hpp"
+// ::wali::wpds::nwpds
+#include "wali/wpds/nwpds/NWPDS.hpp"
 #if defined(USE_AKASH_EWPDS) || defined(USING_AKASH_FWPDS)
 #include "wali/wpds/ewpds/ERule.hpp"
 #endif
@@ -35,6 +37,7 @@ using namespace wali::wfa;
 using namespace wali::wpds;
 using namespace wali::wpds::ewpds;
 using namespace wali::wpds::fwpds;
+using namespace wali::wpds::nwpds;
 using namespace wali::cprover;
 using namespace wali::domains::binrel;
 
@@ -567,6 +570,58 @@ namespace goals {
 #endif //if defined(BINREL_STATS)
   }
 
+  void runNwpds()
+  { 
+    assert(originalPds && con && mainProc && errLbl);
+    cout << "#################################################" << endl;
+    cout << "[Newton Compare] Goal V: end-to-end NWPDS run" << endl;
+    NWPDS * npds = new NWPDS();
+    con = pds_from_prog(npds, pg);
+
+    WFA fa;
+    wali::Key acc = wali::getKeySpace()->getKey("accept");
+    fa.setInitialState(getPdsState());
+    fa.addFinalState(acc);
+    fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, npds->get_theZero()->one());
+
+    WFA outfa;
+    cout << "[Newton Compare] Computing NWPDS poststar..." << endl;
+    wali::util::Timer * t3 = new wali::util::Timer("NWPDS poststar",cout);
+    t3->measureAndReport = false;
+#if defined(BINREL_STATS)
+    con->resetStats(); 
+#endif
+    npds->poststar(fa,outfa); 
+
+    cout << "[Newton Compare] Computing path summary..." << endl;
+
+    sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>(npds->get_theZero().get_ptr());
+    zerot = zerot->tensor(zerot.get_ptr());
+
+    outfa.path_summary(zerot->one());
+
+    cout << "[Newton Compare] Checking error label reachability..." << endl;
+    TransSet ts = outfa.match(getPdsState(), getErrStk(pg));
+    sem_elem_t wt = zerot;
+    for(TransSet::const_iterator it = ts.begin(); it != ts.end(); ++it){
+        Key toKey = (*it)->to();
+        State * toState = outfa.getState(toKey);
+        wt = wt->combine(toState->weight());
+    }
+    wt = dynamic_cast<SemElemTensor*>(wt.get_ptr())->detensorTranspose()->transpose();
+    if(wt->equal(wt->zero()))
+      cout << "[Newton Compare] NWPDS ==> error not reachable" << endl;
+    else{
+      cout << "[Newton Compare] NWPDS ==> error reachable" << endl;
+    }
+
+    t3->print(std::cout << "[Newton Compare] Time taken by NWPDS poststar: ") << endl;
+    delete t3;
+
+#if defined(BINREL_STATS)
+    con->printStats(cout);
+#endif //if defined(BINREL_STATS)
+  }
 
   void endToEndCompareFwpdsRun()
   {
@@ -696,6 +751,9 @@ void * work(void *)
     case 4:
       runFwpds();
       break;
+    case 5:
+      runNwpds();
+      break;
     default:
       assert(0 && "I don't understand that goal!!!");
   }
@@ -712,10 +770,11 @@ int main(int argc, char ** argv)
     cerr 
       << "Usage: " << endl
       << "./NewtonFwpdsCompare input_file goal(1/2) [<0/1> dump] [entry function (default:main)] [error label (default:error)]" << endl
-      << "Goal: 1 --> Compare WPDS & NWPDS. Compute poststar and compare the output automata." << endl
-      << "Goal: 2 --> Compare FWPDS & NWPDS. Compute poststar and check if any assertion can fail." << endl
-      << "Goal: 3 --> Simply run NWPDS end-to-end." << endl
-      << "Goal: 4 --> Simply run FWPDS end-to-end. You may need it some time!" << endl; 
+      << "Goal: 1 --> Compare WPDS & NewtonFWPDS. Compute poststar and compare the output automata." << endl
+      << "Goal: 2 --> Compare FWPDS & NewtonFWPDS. Compute poststar and check if any assertion can fail." << endl
+      << "Goal: 3 --> Simply run NewtonFWPDS end-to-end." << endl
+      << "Goal: 4 --> Simply run FWPDS end-to-end. You may need it some time!" << endl
+      << "Goal: 5 --> Simply fun the NWPDS end-to-end" << endl;
     return -1;
   }
 
