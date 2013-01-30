@@ -23,7 +23,7 @@ namespace
 
 
   std::pair<sem_elem_t, sem_elem_t>
-  new_less_than_existing(sem_elem_t new_, sem_elem_t existing)
+  keep_smaller(sem_elem_t new_, sem_elem_t existing)
   {
     if (new_->underApproximates(existing)) {
       // new subsumes existing. we only need to keep new_
@@ -36,7 +36,7 @@ namespace
   }
 
   std::pair<sem_elem_t, sem_elem_t>
-  existing_less_than_new(sem_elem_t new_, sem_elem_t existing)
+  keep_larger(sem_elem_t new_, sem_elem_t existing)
   {
     if (existing->underApproximates(new_)) {
       // existing subsumes new. we only need to keep existing
@@ -53,11 +53,11 @@ namespace
   void
   remove_subsumed_elements(SemElemSet::ElementSet & set,
                            sem_elem_t element,
-                           SemElemCompare new_subsumes_existing)
+                           SemElemCompare keep_what)
   {
     SemElemSet::ElementSet::const_iterator iter = set.begin();
     while (iter != set.end()) {
-      std::pair<sem_elem_t, sem_elem_t> keep_these = new_subsumes_existing(element, *iter);
+      std::pair<sem_elem_t, sem_elem_t> keep_these = keep_what(element, *iter);
       if (keep_these.second == NULL) {
         // set.erase(iter++) for std::map
         assert(keep_these.first == element);
@@ -73,12 +73,12 @@ namespace
   void
   add_element_if_not_subsumed(SemElemSet::ElementSet & set,
                               sem_elem_t element,
-                              SemElemCompare existing_subsumes_new)
+                              SemElemCompare keep_what)
   {
     for(SemElemSet::ElementSet::const_iterator iter = set.begin();
         iter != set.end(); ++iter)
     {
-      std::pair<sem_elem_t, sem_elem_t> keep_these = existing_subsumes_new(*iter, element);
+      std::pair<sem_elem_t, sem_elem_t> keep_these = keep_what(*iter, element);
       if (keep_these.second == NULL) {
         assert(keep_these.first == *iter);
         return;
@@ -100,14 +100,14 @@ namespace
 
       case SemElemSet::KeepMaximalElements:
         // Should remove an element if new >= existing
-        remove_subsumed_elements(set, add_this, existing_less_than_new);
-        add_element_if_not_subsumed(set, add_this, existing_less_than_new);
+        remove_subsumed_elements(set, add_this, keep_larger);
+        add_element_if_not_subsumed(set, add_this, keep_larger);
         break;
 
       case SemElemSet::KeepMinimalElements:
         // Opposite of the previous case
-        remove_subsumed_elements(set, add_this, new_less_than_existing);
-        add_element_if_not_subsumed(set, add_this, new_less_than_existing);
+        remove_subsumed_elements(set, add_this, keep_smaller);
+        add_element_if_not_subsumed(set, add_this, keep_smaller);
         break;
     }
   }
