@@ -31,6 +31,10 @@ namespace wali {
 
     bool equal(SemElem *rhs) const;
 
+    bool containerLessThan(SemElem const * rhs) const;
+
+    size_t hash() const;
+
     //------------------------------------
     // output
     //------------------------------------

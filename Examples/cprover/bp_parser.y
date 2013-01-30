@@ -347,7 +347,21 @@ statement
 dead_statement
 	: DEAD assign_id_list 
 	{
-		deep_erase_str_list(&$2);
+    str_list const * it = $2;
+    if(it != NULL){
+      expr_list * el = NULL;
+      while(it!=NULL){
+         expr * e =  make_non_det_expr();
+         if(!el)
+           el = make_expr_list_item(e);
+         else
+           add_expr_right(el, e);
+         it = it->n;
+      }
+      $$ = make_assign_stmt($2, el, NULL);
+    }else{
+      $$ = make_skip_stmt();
+    }
 	}
 	;
 	   
