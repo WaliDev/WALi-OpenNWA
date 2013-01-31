@@ -1323,6 +1323,7 @@ namespace{
     ++cit;
     ASSERT_TRUE(string("b") == cit->first);
     ASSERT_TRUE(4 == cit->second->maxVal);
+  }
 
   TEST(wali$domains$binrel$$BinRel$$underApproximates, bddContainmentChecks)
   {
