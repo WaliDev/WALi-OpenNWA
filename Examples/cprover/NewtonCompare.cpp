@@ -4,6 +4,8 @@
 #include "wali/wpds/ewpds/EWPDS.hpp"
 // ::wali::wpds
 #include "wali/wpds/WPDS.hpp"
+// ::wali::wpds::nwpds
+#include "wali/wpds/nwpds/NWPDS.hpp"
 #if defined(USE_AKASH_EWPDS) || defined(USING_AKASH_FWPDS)
 #include "wali/wpds/ewpds/ERule.hpp"
 #endif
@@ -37,6 +39,7 @@ using namespace wali::wfa;
 using namespace wali::wpds;
 using namespace wali::wpds::ewpds;
 using namespace wali::wpds::fwpds;
+using namespace wali::wpds::nwpds;
 using namespace wali::cprover;
 using namespace wali::domains::binrel;
 
@@ -519,6 +522,35 @@ namespace goals {
     delete pds;
   }
 
+  void runNewtonDirect(WFA& outfa)
+  { 
+    assert(mainProc && errLbl);
+    cout << "#################################################" << endl;
+    cout << "[Newton Compare] Goal VI: end-to-end NewtonDirect run" << endl;
+    NWPDS * npds = new NWPDS();
+    con = pds_from_prog(npds, pg);
+
+#if defined(BINREL_STATS)
+    con->resetStats(); 
+#endif
+    wali::util::Timer * t = new wali::util::Timer("NewtonDirect poststar",cout);
+    t->measureAndReport = false;
+    doPostStar(npds, outfa);
+    sem_elem_t wt = computePathSummary(npds, outfa);
+    if(wt->equal(wt->zero()))
+      cout << "[Newton Compare] NewtonDirect ==> error not reachable" << endl;
+    else{
+      cout << "[Newton Compare] NewtonDirect ==> error reachable" << endl;
+    }
+    t->print(std::cout << "[Newton Compare] Time taken by NewtonDirect poststar: ") << endl;
+    delete t;
+
+#if defined(BINREL_STATS)
+    con->printStats(cout);
+#endif //if defined(BINREL_STATS)
+    delete npds;
+  }
+
   void compareWpdsNwpds()
   {    
     assert(originalPds && con && mainProc && errLbl);
@@ -591,7 +623,7 @@ void * work(void *)
       runFwpds(outfa);
       break;
     case 5:
-      assert(0);
+      runNewtonDirect(outfa);
       break;
     case 6:
       runWpds(outfa);
@@ -616,7 +648,7 @@ int main(int argc, char ** argv)
       << "Goal: 2 [NOW DEFUNCT]--> Compare FWPDS & NWPDS. Compute poststar and check if any assertion can fail." << endl
       << "Goal: 3 --> Run NWPDS end-to-end." << endl
       << "Goal: 4 --> Run FWPDS end-to-end." << endl 
-      << "Goal: 5 [RESERVED] --> Will run old NWPDS end-to-end." << endl
+      << "Goal: 5 --> Run old NWPDS end-to-end (Referred to as DirectNewton)." << endl
       << "Goal: 6 --> Run WPDS end-to-end." << endl; 
     return -1;
   }
@@ -672,8 +704,11 @@ int main(int argc, char ** argv)
   instrument_call_return(pg);
 
   cout << "[Newton Compare] Obtaining PDS..." << endl;
-  originalPds = new FWPDS();
-  con = pds_from_prog(originalPds, pg);
+  if(goal != 5){
+    // Except when running NewtonDirect
+    originalPds = new FWPDS();
+    con = pds_from_prog(originalPds, pg);
+  }
   if(dump){
     cout << "[Newton Compare] Dumping PDS to pds.dot..." << endl;
     fstream pds_stream("pds.dot", fstream::out);
