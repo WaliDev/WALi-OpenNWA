@@ -8,6 +8,7 @@
 #include "opennwa/query/calls.hpp"
 #include "opennwa/query/internals.hpp"
 #include "opennwa/nwa_pds/conversions.hpp"
+#include "wali/wpds/fwpds/FWPDS.hpp"
 
 namespace opennwa
 {
@@ -1889,6 +1890,25 @@ namespace opennwa
       wpds.setWorklist(worklist);
     }
     wpds.poststar(input, output);
+  }
+
+  wali::wfa::WFA Nwa::poststarViaFwpds(
+      wali::wfa::WFA const & input,
+      WeightGen const & wg) const
+  {
+    wali::wpds::fwpds::FWPDS pds;
+    nwa_pds::NwaToWpdsCalls(*this, wg, pds);
+    return pds.poststar(input);
+  }
+
+  void Nwa::poststarViaFwpds(
+      wali::wfa::WFA const & input,
+      wali::wfa::WFA & output,
+      WeightGen const & wg) const
+  {
+    wali::wpds::fwpds::FWPDS pds;
+    nwa_pds::NwaToWpdsCalls(*this, wg, pds);
+    pds.poststar(input, output);
   }
 
   //Utilities	
