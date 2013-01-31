@@ -32,7 +32,9 @@ int main(int argc, char ** argv)
   binrel_t b = new BinRel(con, a, true);
 
   wali::util::Timer * t = new wali::util::Timer("Detensor Time");
+  t->measureAndReport = false;
   b->detensorTranspose();
+  t->print(cout);
   delete t;
 
   return 0;
