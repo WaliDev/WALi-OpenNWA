@@ -1030,8 +1030,7 @@ namespace opennwa
     // {{{ deprecated nwa_pds functions (and cheater functions)
     wali::wpds::WPDS _private_NwaToPdsReturns_( WeightGen const & wg ) const;
     wali::wpds::WPDS _private_NwaToBackwardsPdsReturns_( WeightGen const & wg ) const;
-    wali::wpds::WPDS _private_NwaToPdsCalls_( WeightGen const & wg,
-                                              ref_ptr<wali::wpds::Wrapper> wrapper ) const;
+    void _private_NwaToPdsCalls_( WeightGen const & wg, wali::wpds::WPDS& outpds) const;
     wali::wpds::WPDS _private_NwaToBackwardsPdsCalls_( WeightGen const & wg ) const;
     // }}}
 
@@ -1146,6 +1145,42 @@ namespace opennwa
                            wali::wfa::WFA & output,
                            WeightGen const & wg,
                            ref_ptr< wali::Worklist<wali::wfa::ITrans> > worklist) const;
+
+    /**
+     *
+     * @brief perform the poststar reachability query defined by the given WFA using FWPDS
+     *
+     * This method performs the poststar reachability query defined by the
+     * given WFA by converting the nwa to an FWPDS.
+     *
+     * @param - input: the starting point of the reachability query
+     * @param - wg: the functions to use in generating weights
+     * @return the WFA resulting from performing the poststar reachability query
+     *
+     */
+    wali::wfa::WFA poststarViaFwpds(
+        wali::wfa::WFA const & input,
+        WeightGen const & wg) const;
+
+    /**
+     *
+     * @brief perform the poststar reachability query defined by the given WFA using FWPDS
+     * 
+     * This method performs the poststar reachability query defined by the
+     * given WFA by converting the nwa to an FWPDS.
+     * The result of the query is stored in the 'output' parameter.
+     * Note: Any transitions in output before the query will be there after the query but
+     * will have no effect on the reachability query.
+     *
+     * @param - input: the starting point of the reachability query
+     * @param - output: the result of performing the reachability query
+     * @param - wg: the functions to use in generating weights
+     *
+     */
+    void poststarViaFwpds( 
+        wali::wfa::WFA const & input,
+        wali::wfa::WFA & output,
+        WeightGen const & wg) const;
 
     //Utilities	
 
