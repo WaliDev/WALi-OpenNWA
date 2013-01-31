@@ -1,12 +1,48 @@
 #ifndef WALI_NWA_QUERY_LANGUAGE_HPP
 #define WALI_NWA_QUERY_LANGUAGE_HPP
 
+#include <map>
+#include <list>
+
 #include "opennwa/NwaFwd.hpp"
 #include "opennwa/NestedWord.hpp"
 #include "opennwa/WeightGen.hpp"
+#include "wali/witness/Witness.hpp"
+#include "wali/witness/CalculatingVisitor.hpp"
 
 namespace opennwa {
   namespace query {
+    namespace details {
+      class PathVisitor : public wali::witness::CalculatingVisitor<NestedWord> {
+      private:
+        /// Holds the NWA associated with the given query. We need this so
+        /// that when we know that the trace went from state p to q, we can
+        /// look up a symbol on that edge.
+        Nwa const & nwa;
+
+        /// Holds the *PDS* state and stack symbol corresponding to the
+        /// "first half" of a NWA return transition. See visitRule() for
+        /// more details.
+        // %%% Fix comment, possibly make this more efficient.
+        std::map<wali::Key,wali::Key> states;
+
+      public:
+
+        PathVisitor(Nwa const & orig)
+          : nwa(orig)
+        {}
+
+        ~PathVisitor() {}
+
+        NestedWord calculateExtend(wali::witness::WitnessExtend * w, NestedWord& left, NestedWord& right);
+        NestedWord calculateCombine(wali::witness::WitnessCombine * w, std::list<NestedWord>& children);
+        NestedWord calculateMerge(wali::witness::WitnessMerge* w, NestedWord& callerValue, NestedWord& ruleValue, NestedWord& calleeValue);
+        NestedWord calculateRule(wali::witness::WitnessRule * w);
+        NestedWord calculateTrans(wali::witness::WitnessTrans * w);
+      };
+        
+    } // namespace details
+
 
     /// @brief Determines whether word is in the language of the given NWA.
     ///
@@ -62,7 +98,11 @@ namespace opennwa {
       
     extern
     ref_ptr<NestedWord>
-    getSomeShortestAcceptedWordWithWeights(Nwa const & nwa, WeightGen const & wg);
+    getSomeAcceptedWordWithWeights(Nwa const & nwa, WeightGen const & wg);
+
+    extern
+    sem_elem_t
+    getWitnessForSomeAcceptedWordWithWeights(Nwa const & nwa, WeightGen const & wg);
 
     /**
      *

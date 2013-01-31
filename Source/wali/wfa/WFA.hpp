@@ -69,6 +69,9 @@ namespace wali
       virtual ~DotAttributePrinter() {}
     };
 
+    bool is_epsilon_transition(ITrans const * trans);
+    
+    bool is_any_transition(ITrans const * trans);
       
 
     /** @class WFA
@@ -281,7 +284,7 @@ namespace wali
          *
          * If a Trans matching (p,g,q) exists then it is copied into the
          * passed in reference "Trans & t". This way the user is not given
-         * and handle to the WFA's internal Trans * pointer and deleting
+         * a handle to the WFA's internal Trans * pointer and deleting
          * all transitions associated with this WFA when it is deleted is
          * safe. However, because the weight of this transition is a
          * sem_elem_t (ref_ptr< SemElem >) modifying the weight from
@@ -384,6 +387,13 @@ namespace wali
          * useful for efficiency in some cases)
          */
         virtual void path_summary(sem_elem_t wt);
+
+        /**
+         * Performs path summary using Tarjan's algorithm. This results
+         * in the dual benefits of lazy witness evaluation and
+         * transparent witness propagation.
+         */
+        virtual void path_summary_tarjan();
 
         /**
          * Prunes the WFA. This removes any transitions that are
@@ -753,9 +763,11 @@ namespace wali
         /// The given callback function is called for each transition in the
         /// NWA; a rule for that transition is added iff the callback returns
         /// true. This callback may be set to empty.
+        // %%% Review above paragraph.
         void toWpds(Key p_state,
                     wpds::WPDS * wpds,
-                    boost::function<bool (ITrans const *)> trans_accept) const;
+                    boost::function<bool (ITrans const *)> trans_accept,
+                    bool reverse=false) const;
     };
 
   } // namespace wfa
