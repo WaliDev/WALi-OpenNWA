@@ -12,11 +12,11 @@ namespace opennwa
       return nwa._private_NwaToPdsReturns_(wg);
     }
 
-    WPDS NwaToWpdsCalls( Nwa const & nwa,
+    void NwaToWpdsCalls( Nwa const & nwa,
                          WeightGen const & wg,
-                         ref_ptr<wali::wpds::Wrapper> wrapper  )
+                         WPDS& outpds)
     {
-      return nwa._private_NwaToPdsCalls_(wg, wrapper);
+      nwa._private_NwaToPdsCalls_(wg, outpds);
     }
 
     WPDS NwaToBackwardsWpdsReturns( Nwa const & nwa, WeightGen const & wg )
@@ -242,13 +242,10 @@ namespace opennwa
 
 
   // constructs the PDS equivalent to this NWA, stacking calls
-  WPDS Nwa::_private_NwaToPdsCalls_( WeightGen const & wg,
-                                     ref_ptr<wali::wpds::Wrapper> wrapper ) const
+  void Nwa::_private_NwaToPdsCalls_( WeightGen const & wg, WPDS& result) const
   {
     //TODO: beware the implicit transitions
     //Q: do we need to make all transitions explicit in order to make this correct?
-
-    WPDS result(wrapper);
 
     Key program = nwa_pds::getProgramControlLocation();  // = wali::getKey("program");
 
@@ -344,8 +341,6 @@ namespace opennwa
                       tgt,                      //to_stack (q_r)
                       wgt);                     //weight (1)
     }
-
-    return result;
   }
 
 

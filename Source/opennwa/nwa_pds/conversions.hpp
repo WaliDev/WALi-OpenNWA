@@ -32,21 +32,33 @@ namespace opennwa
       
     /**
      *
-     * @brief constructs the backwards PDS equivalent to this NWA
+     * @brief constructs the PDS equivalent to this NWA in outpds
      *
      * This method constructs the backwards PDS that is equivalent to this NWA.
      * Note: This version keeps returns on the stack.
      *
      * @param - wg: the functions to use in generating weights
-     * @return the backwards PDS equivalent to this NWA
+     * @param - outpds: the output wpds to be populated
      *
-     */ 
-    extern
+     */
+    extern 
+    void 
+    NwaToWpdsCalls( 
+        Nwa const & nwa,
+        WeightGen const & wg,
+        wali::wpds::WPDS & outpds);
+
+    inline
     wali::wpds::WPDS
     NwaToWpdsCalls( Nwa const & nwa,
                     WeightGen const & wg,
-                    ref_ptr<wali::wpds::Wrapper> wrapper );
-        
+                    ref_ptr<wali::wpds::Wrapper> wrapper )
+    {
+      wali::wpds::WPDS outpds(wrapper);
+      NwaToWpdsCalls(nwa, wg, outpds);
+      return outpds;
+    }
+
     inline
     wali::wpds::WPDS
     NwaToWpdsCalls( Nwa const & nwa, WeightGen const & wg )

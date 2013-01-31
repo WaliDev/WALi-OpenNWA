@@ -1030,8 +1030,7 @@ namespace opennwa
     // {{{ deprecated nwa_pds functions (and cheater functions)
     wali::wpds::WPDS _private_NwaToPdsReturns_( WeightGen const & wg ) const;
     wali::wpds::WPDS _private_NwaToBackwardsPdsReturns_( WeightGen const & wg ) const;
-    wali::wpds::WPDS _private_NwaToPdsCalls_( WeightGen const & wg,
-                                              ref_ptr<wali::wpds::Wrapper> wrapper ) const;
+    void _private_NwaToPdsCalls_( WeightGen const & wg, wali::wpds::WPDS& outpds) const;
     wali::wpds::WPDS _private_NwaToBackwardsPdsCalls_( WeightGen const & wg ) const;
     // }}}
 
