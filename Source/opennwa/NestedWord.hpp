@@ -6,7 +6,9 @@
 ///
 
 #include "wali/Countable.hpp"
+#include "wali/Printable.hpp"
 #include "opennwa/NwaFwd.hpp"
+#include <sstream>
 #include <vector>
 #include <algorithm>
 
@@ -25,7 +27,9 @@ namespace opennwa
   /// with whether it is an internal, call, or return position. The
   /// nesting relation is induced by the matchings between calls and
   /// returns.
-  class NestedWord : public wali::Countable
+  class NestedWord
+    : public wali::Countable
+    , public wali::Printable
   {
   public:
     /// Each position in the nested word has a symbol and a type.
@@ -125,11 +129,42 @@ namespace opennwa
     {
       return !(*this == other);
     }
+
+
+    virtual std::ostream & print( std::ostream & os) const
+    {
+      os << "< ";
+      for (const_iterator iter = begin(); iter != end(); ++iter) {
+        if (iter != begin()) {
+          os << ",  ";
+        }
+        if (iter->type == Position::CallType) {
+          os << "(";
+        }
+        os << wali::key2str(iter->symbol);
+        if (iter->type == Position::ReturnType) {
+          os << ")";
+        }
+      }
+      os << " >";
+      return os;
+    }
       
   };
 
 
   typedef ref_ptr<NestedWord> NestedWordRefPtr;
+
+
+  inline
+  std::ostream &
+  operator << (std::ostream & os, NestedWord const & word)
+  {
+    std::stringstream ss;
+    word.print(ss);
+    os << ss.str();
+    return os;
+  }
 }
 
 

@@ -380,7 +380,7 @@ namespace wali
           sem_elem_t star();
 
 
-          bool subsumes(SemElem * other) const;
+          bool underApproximates(SemElem * other);
 
           /** @return [this]->Equal( cast<BinRel*>(se) ) */
           bool equal(SemElem* se) const;
@@ -411,6 +411,12 @@ namespace wali
         // TODO: change name -eed May 14 2012
           BddContext const & getVocabulary() const {
             return *con;
+          }
+
+          virtual bool containerLessThan(SemElem const * other) const;
+
+          virtual size_t hash() const {
+            return static_cast<size_t>(getBdd().id());
           }
 
           // ////////////////////////////////

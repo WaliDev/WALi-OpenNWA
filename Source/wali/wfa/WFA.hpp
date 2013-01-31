@@ -14,6 +14,7 @@
 #include "wali/HashMap.hpp"
 #include "wali/KeyContainer.hpp"
 #include "wali/Progress.hpp"
+#include "wali/domains/SemElemSet.hpp"
 
 // ::wali::wfa
 #include "wali/wfa/WeightMaker.hpp"
@@ -120,7 +121,7 @@ namespace wali
         
         typedef std::map<Key, sem_elem_t> AccessibleStateMap;
         typedef std::map<Key, AccessibleStateMap> EpsilonCloseCache;
-        typedef std::map<Key, std::vector<sem_elem_t> > AccessibleStateSetMap;
+        typedef std::map<Key, domains::SemElemSet::ElementSet > AccessibleStateSetMap;
         typedef std::vector<Key> Word;
         
       protected:
@@ -351,7 +352,10 @@ namespace wali
          *
          * NOTE: For now this means (dest != this) && (dest != fa).
          */
-        virtual void intersect( WeightMaker& wmaker , WFA const & fa, WFA& dest ) const;
+        virtual void intersect(WeightMaker& wmaker, WFA const & fa, WFA& dest) const;
+
+        virtual void intersect_worklist(WeightMaker& wmaker, WFA const & fa, WFA& dest ) const;
+        virtual void intersect_cross(WeightMaker& wmaker, WFA const & fa, WFA& dest ) const;
 
         /**
          * Performs path summary. Simply calls the path_summary with

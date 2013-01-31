@@ -8,6 +8,7 @@
 #include "ast.hpp"
 
 #include <wali/wfa/WFA.hpp>
+#include <wali/wfa/WeightMaker.hpp>
 #include <wali/wfa/TransFunctor.hpp>
 #include <wali/wfa/ITrans.hpp>
 #include <wali/domains/binrel/BinRel.hpp>
@@ -24,12 +25,20 @@
 #include <fstream>
 #include <cstdio>
 
-
 #define CPP11_OVERRIDE
 
 
 namespace wali {
     namespace xfa {
+
+        namespace details {
+            class IntersectionWeightMaker
+                : public wali::wfa::WeightMaker
+            {
+                virtual sem_elem_t make_weight( sem_elem_t lhs, sem_elem_t rhs ) CPP11_OVERRIDE;
+            };
+        }
+        
 
         /// Represent an XFA state.
         ///
@@ -112,6 +121,11 @@ namespace wali {
             std::map<State, BinaryRelation> accepting_weights;            
 
         public:
+            wali::wfa::WFA const &
+            wfa() const {
+                return wfa_;
+            }
+            
             /// Returns the old one
             ///
             State setInitialState(State new_initial) {
@@ -215,6 +229,18 @@ namespace wali {
             wali::wfa::WFA
             semideterminize(wali::wfa::DeterminizeWeightGen const & weight_gen) const {
                 return wfa_.semideterminize(weight_gen);
+            }
+
+
+            /// Intersects this XFA with the other one and returns the result
+            ///
+            /// @see wali::wfa::WFA::intersect
+            Xfa
+            intersect(Xfa const & other) const {
+                Xfa output;
+                details::IntersectionWeightMaker maker;
+                this->wfa_.intersect(maker, other.wfa_, output.wfa_);
+                return output;
             }
         };
 

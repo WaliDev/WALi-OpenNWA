@@ -12,6 +12,37 @@ namespace {
 namespace wali {
     namespace xfa {
 
+        using namespace wali::domains::binrel;
+
+        namespace details {
+            sem_elem_t
+            IntersectionWeightMaker::make_weight( sem_elem_t lhs, sem_elem_t rhs )
+            {
+                return lhs->extend(rhs);
+                BinaryRelation left = dynamic_cast<BinRel*>(lhs.get_ptr());
+                BinaryRelation right = dynamic_cast<BinRel*>(rhs.get_ptr());
+
+                assert(left.get_ptr());
+                assert(right.get_ptr());
+
+                bdd left_bdd = left->getBdd();
+                bdd right_bdd = right->getBdd();
+                
+                BddContext const & voc = left->getVocabulary();
+                assert(&voc == &(right->getVocabulary()));
+
+                BinaryRelation result = new BinRel(&voc, left_bdd & right_bdd);
+
+                std::cerr << "== IntersectionWeightMaker:\n"
+                          << "==        " << lhs->toString() << "\n"
+                          << "==    and " << rhs->toString() << "\n"
+                          << "==    ->  " << result->toString() << "\n";
+
+                return result;
+            }
+        }
+        
+
         std::set<State>
         Xfa::getFinalStates() const
         {

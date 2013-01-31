@@ -56,12 +56,15 @@ namespace
     
     virtual void operator()(wali::wfa::ITrans const * t) {
       wali::domains::SemElemSet::ElementSet es;
-      es.push_back(t->weight());
+      es.insert(t->weight());
+      //es.push_back(t->weight());
       
       target.addTrans(t->from(),
                       t->stack(),
                       t->to(),
-                      new wali::domains::SemElemSet(t->weight(), es));
+                      new wali::domains::SemElemSet(wali::domains::SemElemSet::KeepAllNonduplicates,
+                                                    t->weight(),
+                                                    es));
     }
   };
   
@@ -79,7 +82,7 @@ namespace wali
     WFA::AccessibleStateMap
     WFA::epsilonCloseCached(Key state, WFA::EpsilonCloseCache & cache) const
     {
-      return epsilonCloseCached_FwpdsAllMulti(state, cache);
+      return epsilonCloseCached_FwpdsDemand(state, cache);
     }
     
 
@@ -414,7 +417,7 @@ namespace wali
     {
       // Lift weights to the sets
       WFA lifted;
-      sem_elem_t lifted_zero = new SemElemSet(this->getSomeWeight()->zero());
+      sem_elem_t lifted_zero = new SemElemSet(SemElemSet::KeepAllNonduplicates, this->getSomeWeight()->zero());
       SemElemSetLifter lifter(&lifted);
       for (std::set<Key>::const_iterator q = Q.begin(); q != Q.end(); ++q) {
         lifted.addState(*q, lifted_zero);
