@@ -179,6 +179,17 @@ namespace wali
       std::copy(wc->children().begin(),wc->children().end(),std::back_inserter(kids));
     }
 
+    int WitnessCombine::getLength() const {
+      int len = INT_MAX;
+      std::list<witness_t>::const_iterator kit;
+      for (kit=kids.begin(); kit!=kids.end(); kit++) {
+        witness_t child = *kit;
+        int sublen = child->getLength();
+        if (sublen < len) len = sublen;
+      }
+      return len; 
+    }
+
   } // namespace witness
 
 } // namespace wali
