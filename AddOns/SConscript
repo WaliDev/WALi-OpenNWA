@@ -3,7 +3,8 @@ import os,os.path;
 Import('BuildDir')
 
 built = []
-built += SConscript('Parse/SConscript')
+#I want to build statically on linux, and this causes problems with that.
+#built += SConscript('Parse/SConscript')
 built += SConscript('Domains/SConscript')
 built += SConscript('RandomNwa/SConscript')
 built += SConscript('RandomFWPDS/SConscript', variant_dir=os.path.join(BuildDir,'AddOns','RandomFWPDS'), duplicate=0)

@@ -7,6 +7,7 @@ Import('WaliDir')
 Import('LibInstallDir')
 Import('ProgEnv')
 Import('Debug')
+Import('MkStatic')
 
 if Debug:
     print '\n+++ Entered "#/Tests/unit-tests/SConscript"\n'
@@ -23,10 +24,6 @@ SConscript("#/AddOns/Xfa/SConscript")
 
 env = ProgEnv.Clone()
 
-if 'cl' != env['compiler']:
-    env.AppendUnique(LIBS=[gtest_lib, 'pthread'])
-else:
-    env.AppendUnique(LIBS=[gtest_lib])
 env.AppendUnique(CPPPATH=[gtest_include, WaliDir])
 env.AppendUnique(CPPPATH=['#/Tests/unit-tests/Source',
                           '#/AddOns/Domains/ThirdParty/include/',
@@ -34,7 +31,11 @@ env.AppendUnique(CPPPATH=['#/Tests/unit-tests/Source',
                           '#/AddOns/Xfa/Source'])
 env.AppendUnique(LIBPATH=['#/AddOns/Domains/ThirdParty/'])
 env.AppendUnique(CPPPATH=[glog_inc])
-env.AppendUnique(LIBS=[glog_lib, 'walidomains', 'bdd', "xfa"])
+env.PrependUnique(LIBS=[glog_lib, 'walidomains', 'bdd', "xfa"])
+if 'cl' != env['compiler']:
+    env.PrependUnique(LIBS=[gtest_lib, 'pthread'])
+else:
+    env.PrependUnique(LIBS=[gtest_lib])
 env.Append(CXXFLAGS=["-std=c++0x"])
 
 #gtest and glog are ill begaved w.r.t. to these flags.
@@ -102,6 +103,8 @@ test_files = Split("""
 
 just_compile = env.SConscript('Source/header-compilation/SConscript')
 
+if MkStatic:
+  env.AppendUnique(LINKFLAGS = ['--static'])
 unit_tests = env.Program('unit-tests', test_files + just_compile)
 built = unit_tests
 built += env.Install('#/Tests/harness/unit-tests', unit_tests)
