@@ -429,26 +429,6 @@ namespace goals {
     t->measureAndReport =false;
     doPostStar(npds, outfa);
     sem_elem_t wt = computePathSummary(npds, outfa);
-    {
-      // Print out this weight so that we can later read it in.
-      {
-        stringstream ss;
-        ss << fname;
-        ss << ".programbddcontext";
-        ofstream foo(ss.str().c_str());
-        static_cast<ProgramBddContext*>(con)->printHistory(foo);
-        foo.close();
-      }
-      {
-        stringstream ss;
-        ss << fname;
-        ss << ".pathsummary_weight";     
-        char * bddfname = strdup(ss.str().c_str());
-        bdd_fnsave(bddfname, dynamic_cast<BinRel*>(wt.get_ptr())->getBdd());
-        free(bddfname);
-        bddfname = NULL;      
-      }
-    }
     wt = dynamic_cast<SemElemTensor*>(wt.get_ptr())->detensorTranspose().get_ptr();
     if(wt->equal(wt->zero()))
       cout << "[Newton Compare] NWPDS ==> error not reachable" << endl;
