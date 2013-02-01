@@ -31,7 +31,6 @@ using std::cout;
 // Find out emperically what the best ratio of memsize to cache size is
 #define MEMTOCACHE 10
 
-#define CACHESIZE BDDMEMSIZE/MEMTOCACHE
 #define MAXMEMINC BDDMEMSIZE/10
 
 //It's a good habit to forward declare all the static functions in the
@@ -215,7 +214,7 @@ BddContext::BddContext(int bddMemSize, int cacheSize) :
     // ///////////////////////
     // Begin initialize BuDDy
     bddMemSize = (bddMemSize==0)?BDDMEMSIZE:bddMemSize;
-    cacheSize = (cacheSize==0)?CACHESIZE:cacheSize;
+    cacheSize = (bddMemSize/MEMTOCACHE > cacheSize)? bddMemSize/MEMTOCACHE : cacheSize;
     if (0 == bdd_isrunning()){
       int rc = bdd_init(bddMemSize,cacheSize);
       if( rc < 0 ){
