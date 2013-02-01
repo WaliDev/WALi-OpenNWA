@@ -13,9 +13,10 @@ namespace
 
 
   void
-  push_if_not_present(SemElemSet::ElementSet & set, sem_elem_t add_this)
+  push_if_not_present(SemElemSet::ElementSet & set, size_t & the_hash, sem_elem_t add_this)
   {
     if (!is_present(set, add_this)) {
+      the_hash ^= add_this->hash();
       set.insert(add_this);
       //set.push_back(add_this);
     }
@@ -64,6 +65,7 @@ namespace
 
   sem_elem_t
   remove_subsumed_elements(SemElemSet::ElementSet & set,
+                           size_t & the_hash,
                            sem_elem_t element,
                            SemElemSet::SemElemSubsumptionComputer keep_what)
   {
@@ -72,6 +74,7 @@ namespace
       std::pair<sem_elem_t, sem_elem_t> keep_these = keep_what(element, *iter);
       if (keep_these.second == NULL) {
         // set.erase(iter++) for std::map
+        the_hash ^= (*iter)->hash();
         element = keep_these.first;
         iter = set.erase(iter);
       }
@@ -93,6 +96,7 @@ namespace
 
   void
   add_element_if_not_subsumed(SemElemSet::ElementSet & set,
+                              size_t & the_hash,
                               sem_elem_t element,
                               SemElemSet::SemElemSubsumptionComputer keep_what)
   {
@@ -107,6 +111,8 @@ namespace
         // that we can do it. :-)
         if (*iter != keep_these.first) {
           // 'tis OK to invalidate iter because we're just returning anyway :-)
+          the_hash ^= (*iter)->hash();
+          the_hash ^= keep_these.first->hash();
           set.erase(iter);
           set.insert(keep_these.first);
         }
@@ -127,15 +133,16 @@ namespace
   void
   add_element_if_appropriate(SemElemSet::SemElemSubsumptionComputer keep_what,
                              SemElemSet::ElementSet & set,
+                             size_t & the_hash,
                              sem_elem_t add_this)
   {
     if (keep_what == dummy_keep_nonduplicates) {
-      push_if_not_present(set, add_this);
+      push_if_not_present(set, the_hash, add_this);
     }
     else {
       // Should remove an element if new >= existing
-      add_this = remove_subsumed_elements(set, add_this, keep_what);
-      add_element_if_not_subsumed(set, add_this, keep_what);
+      add_this = remove_subsumed_elements(set, the_hash, add_this, keep_what);
+      add_element_if_not_subsumed(set, the_hash, add_this, keep_what);
     }
   }
 }
@@ -167,11 +174,10 @@ namespace wali
            element != es.end(); ++element)
       {
         size_t pre_size = this->elements.size();
-        add_element_if_appropriate(this->keep_what, this->elements, *element);
+        add_element_if_appropriate(this->keep_what, this->elements, this->the_hash, *element);
         if (pre_size != this->elements.size()) {
           // Added
           assert(this->elements.size() == pre_size + 1u);
-          the_hash ^= (*element)->hash();
         }
       }
     }
@@ -212,6 +218,7 @@ namespace wali
         {
           add_element_if_appropriate(this->keep_what,
                                      result->elements,
+                                     result->the_hash,
                                      (*this_element)->extend(*other_element));
         }
       }
@@ -232,7 +239,7 @@ namespace wali
       for (ElementSet::const_iterator other_element = other->elements.begin();
            other_element != other->elements.end(); ++other_element)
       {
-        add_element_if_appropriate(this->keep_what, result->elements, *other_element);
+        add_element_if_appropriate(this->keep_what, result->elements, result->the_hash, *other_element);
       }
 
       return result;

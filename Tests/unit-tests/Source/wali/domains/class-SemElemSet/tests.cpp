@@ -183,6 +183,30 @@ namespace wali {
         }
 
 
+        TEST(wali$domains$SemElemSet$$combine, combineSetsHash)
+        {
+            sem_elem_t ten = new ShortestPathSemiring(10);
+            sem_elem_t twenty = new ShortestPathSemiring(20);
+            sem_elem_t thirtyone = new ShortestPathSemiring(31);
+            SemElemSet::ElementSet es1, es2;
+            insert(es1, ten);
+            insert(es1, twenty);
+            insert(es2, thirtyone);
+            
+            SemElemSet s1(SemElemSet::KeepAllNonduplicates, ten, es1);
+            SemElemSet s2(SemElemSet::KeepAllNonduplicates, thirtyone, es2);
+
+            sem_elem_t answer = s1.combine(&s2);
+
+            // *technically* these are too strict.
+            EXPECT_NE(0u, s1.hash());
+            EXPECT_NE(0u, s2.hash());
+            EXPECT_NE(0u, answer->hash());
+            EXPECT_NE(s1.hash(), answer->hash());
+            EXPECT_NE(s2.hash(), answer->hash());
+        }
+        
+
         TEST(wali$domains$SemElemSet$$combine, combineWillNotDuplicateAnElementEvenIfTheyAreSeparateObjects)
         {
             sem_elem_t ten1 = new ShortestPathSemiring(10);
