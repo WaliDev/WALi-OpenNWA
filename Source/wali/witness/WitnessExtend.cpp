@@ -83,6 +83,17 @@ namespace wali
       }
     }
 
+    int WitnessExtend::getLength() const {
+      int len = 0;
+      if( hasLeft() ) {
+        len = lchild->getLength();
+      }
+      if( hasRight() ) {
+        len = len + rchild->getLength();
+      }
+      return len; 
+    }
+
   } // namespace witness
 
 } // namespace wali

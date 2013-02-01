@@ -226,6 +226,10 @@ namespace wali
       return o;
     }
 
+    int Witness::getLength() const {
+      return 1;
+    }
+
     void Witness::reset_marks() const
     {
       unmark();

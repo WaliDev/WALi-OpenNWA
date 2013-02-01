@@ -137,7 +137,9 @@ namespace opennwa {
       witness::Witness *wit =
         dynamic_cast<witness::Witness*>(se.get_ptr());
       assert(wit);
-      std::cerr << "WITNESS DEPTH: " << wit->getDepth(0) << std::endl;
+#ifdef JAMDEBUG
+      std::cerr << "WITNESS DEPTH: " << wit->getLength() << std::endl;
+#endif
 
       if (!wit->isZero()) {
 

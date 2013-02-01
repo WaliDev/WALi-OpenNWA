@@ -55,8 +55,12 @@ namespace wali
         //! absorb param wc's children into this
         void absorb( WitnessCombine * wc );
 
+        // Return the length of the shortest child.
+        virtual int getLength() const;
+
       protected:
         std::list< witness_t > kids;
+
 
     }; // class WitnessCombine
 

@@ -123,6 +123,9 @@ namespace wali
         //! Reset all marks (recursively)
         virtual void reset_marks() const;
 
+        // @return length, taking the shorter of any combine branches
+        virtual int getLength() const;
+
       protected:
         sem_elem_t user_se; //!< The user SemElem value
         bool isEmpty;       //!< True if type == Witness. Cheap reflection.
