@@ -76,7 +76,7 @@ namespace
       target.addTrans(t->from(),
                       t->stack(),
                       t->to(),
-                      new wali::domains::SemElemSet(wali::domains::SemElemSet::SubsumeKeepAllNonduplicates,
+                      new wali::domains::SemElemSet(wali::domains::SemElemSet::KeepAllNonduplicates,
                                                     t->weight(),
                                                     es));
     }
@@ -431,7 +431,7 @@ namespace wali
     {
       // Lift weights to the sets
       WFA lifted;
-      sem_elem_t lifted_zero = new SemElemSet(SemElemSet::SubsumeKeepAllNonduplicates, this->getSomeWeight()->zero());
+      sem_elem_t lifted_zero = new SemElemSet(SemElemSet::KeepAllNonduplicates, this->getSomeWeight()->zero());
       SemElemSetLifter lifter(&lifted);
       for (std::set<Key>::const_iterator q = Q.begin(); q != Q.end(); ++q) {
         lifted.addState(*q, lifted_zero);

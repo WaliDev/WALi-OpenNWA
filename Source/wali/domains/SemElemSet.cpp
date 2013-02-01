@@ -145,9 +145,9 @@ namespace wali
 {
   namespace domains
   {
-    SemElemSet::SemElemSubsumptionComputer const SemElemSet::SubsumeKeepAllNonduplicates(dummy_keep_nonduplicates);
-    SemElemSet::SemElemSubsumptionComputer const SemElemSet::SubsumeKeepMaximalElements(keep_larger);
-    SemElemSet::SemElemSubsumptionComputer const SemElemSet::SubsumeKeepMinimalElements(keep_smaller);
+    SemElemSet::SemElemSubsumptionComputer const SemElemSet::KeepAllNonduplicates(dummy_keep_nonduplicates);
+    SemElemSet::SemElemSubsumptionComputer const SemElemSet::KeepMaximalElements(keep_larger);
+    SemElemSet::SemElemSubsumptionComputer const SemElemSet::KeepMinimalElements(keep_smaller);
 
     
 

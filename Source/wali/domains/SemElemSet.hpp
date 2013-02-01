@@ -64,9 +64,9 @@ namespace wali
       size_t the_hash;
 
     public:
-      static SemElemSubsumptionComputer const SubsumeKeepAllNonduplicates;
-      static SemElemSubsumptionComputer const SubsumeKeepMaximalElements;
-      static SemElemSubsumptionComputer const SubsumeKeepMinimalElements;
+      static SemElemSubsumptionComputer const KeepAllNonduplicates;
+      static SemElemSubsumptionComputer const KeepMaximalElements;
+      static SemElemSubsumptionComputer const KeepMinimalElements;
     };
 
   }
