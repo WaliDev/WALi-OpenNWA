@@ -59,6 +59,11 @@ penv.Append(RPATH = ['/unsup/gperftools-2.0/lib'])
 penv.Append(LIBS = ['profiler'])
 if MkStatic:
   penv.AppendUnique(LINKFLAGS = ['--static'])
+  # You have to work more to get cpu profiling to work statically.
+  # I don't know if heap profiling works right now.
+  penv.Append(LIBPATH = ['/unsup/libunwind-1.0.1/amd64_rhel6/lib/'])
+  penv.Append(LIBS = ['unwind'])
+  penv.Append(LINKFLAGS = ['-uProfilerStart'])
 built += penv.Program('PrintBplStats.cpp')
 built += penv.Program('NewtonCompare.cpp')
 built += penv.Program('ParseAndPrint.cpp')
