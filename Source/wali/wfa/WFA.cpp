@@ -13,12 +13,19 @@
 #include "wali/wpds/GenKeySource.hpp"
 #include "wali/wfa/DeterminizeWeightGen.hpp"
 #include "wali/wpds/WPDS.hpp"
+#include "wali/wpds/fwpds/FWPDS.hpp"
+#include "wali/wpds/fwpds/LazyTrans.hpp"
+#include "wali/graph/RegExp.hpp"
 
 #include <algorithm>
 #include <iostream>
 #include <vector>
 #include <stack>
 #include <iterator>
+#include <fstream>
+
+//#define USE_FWPDS 1
+//#define JAMDEBUG 1
 
 #define FOR_EACH_STATE(name)                                \
   State* name;                                            \
@@ -41,6 +48,17 @@ namespace wali
     const std::string WFA::XMLQueryTag("query");
     const std::string WFA::XMLInorderTag("INORDER");
     const std::string WFA::XMLReverseTag("REVERSE");
+
+    bool is_epsilon_transition(ITrans const * trans)
+    {
+      return trans->stack() == WALI_EPSILON; 
+    }
+    
+    bool is_any_transition(ITrans const * trans)
+    {
+      (void) trans;
+      return true;
+    }
 
     WFA::WFA( query_t q, progress_t prog )
         : init_state( WALI_EPSILON ),query(q),generation(0),progress(prog)
@@ -869,6 +887,85 @@ namespace wali
         //    st->weight()->print( *waliErr ) << std::endl;
         //}
       } // END DEBUGGING
+    }
+
+    void WFA::path_summary_tarjan() {
+      sem_elem_t wt = getSomeWeight()->one();
+      Key pkey = getKey("__pstate");
+#ifdef USE_FWPDS
+      wpds::fwpds::FWPDS pds;
+#else
+      wpds::WPDS pds;
+#endif
+      //pds.useNewton(false);
+      //wpds::fwpds::FWPDS::topDownEval(false);
+      this->toWpds(pkey, &pds, is_any_transition, true);
+
+#ifdef JAMDEBUG
+      std::cerr << "##### FWPDS" << std::endl;
+      pds.print(std::cerr);
+#endif
+
+      WFA query;
+      query.addState(pkey, wt->zero());
+      query.setInitialState(pkey);
+      Key fin = getKey("__done");
+      query.addState(fin, wt->zero());
+      query.addFinalState(fin);
+      
+      for (std::set<Key>::const_iterator fit = getFinalStates().begin();
+        fit!=getFinalStates().end(); fit++)
+      {
+        Key fkey = *fit;
+        query.addTrans(pkey, fkey, fin, wt->one());
+      }
+
+#ifdef JAMDEBUG
+      std::cerr << "##### QUERY2" << std::endl;
+      query.print(std::cerr);
+#endif
+
+      WFA ans;
+      pds.poststar(query, ans);
+
+#ifdef JAMDEBUG
+      fstream foo;
+      foo.open("regexp_prestar.dot", fstream::out);
+      const wali::graph::reg_exp_hash_t& roots = wali::graph::RegExp::getRoots();
+      foo << "digraph {\n";
+      std::set<long> seen;
+      for(wali::graph::reg_exp_hash_t::const_iterator iter = roots.begin();
+          iter != roots.end();
+          ++iter){
+        (iter->second)->toDot(foo, seen, true, true);
+      }
+      foo << "}\n";
+      foo.close();
+      
+      std::cerr << "##### ANS" << std::endl;
+      ans.print(std::cerr);
+#endif
+
+
+      for (state_map_t::const_iterator smit=state_map.begin();
+        smit!=state_map.end(); smit++)
+      {
+        Key stkey = smit->first;
+
+        Key initkey = ans.init_state;
+        Key finkey = *ans.getFinalStates().begin();
+
+        State *st = smit->second;
+        ITrans *trans = ans.find(initkey, stkey, finkey);
+        if (trans != NULL) {
+          //wpds::fwpds::LazyTrans *ltrans = dynamic_cast<wpds::fwpds::LazyTrans*>(trans);
+          //st->se = ltrans->se;
+          st->weight() = trans->weight();
+        } else {
+          //assert (found && "Cannot find transition associated with state.");
+          st->weight() = wt->zero();
+        }
+      }
     }
 
     //
@@ -2375,13 +2472,35 @@ namespace wali
       }
     };
 
+    struct ReverseRuleAdder : RuleAdder
+    {
+      ReverseRuleAdder(Key st, wpds::WPDS * pds, boost::function<bool (ITrans const *)> cb)
+        : RuleAdder(st, pds, cb)
+      {}
+
+      virtual void operator()( ITrans const * t )
+      {
+        if (callback && callback(t)) {
+          wpds->add_rule(p_state, t->to(),
+                         p_state, t->from(),
+                         t->weight());
+        }
+      }
+    };
+
     void
     WFA::toWpds(Key p_state,
                 wpds::WPDS * wpds,
-                boost::function<bool (ITrans const *)> trans_accept) const
+                boost::function<bool (ITrans const *)> trans_accept,
+                bool reverse) const
     {
-      RuleAdder adder(p_state, wpds, trans_accept);
-      this->for_each(adder);
+      if (reverse) {
+        ReverseRuleAdder adder(p_state, wpds, trans_accept);
+        this->for_each(adder);
+      } else {
+        RuleAdder adder(p_state, wpds, trans_accept);
+        this->for_each(adder);
+      }
     }
     
     
