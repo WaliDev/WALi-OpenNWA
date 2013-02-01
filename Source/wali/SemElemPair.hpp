@@ -54,7 +54,15 @@ namespace wali
       /** @brief return second element */
       sem_elem_t get_second() const {
         return second; 
-      } 
+      }
+
+
+      size_t hash() const {
+        // Wikipedia's entry for the Java hashcode() function recommends
+        // basically a + 17*b + 17*31*c, but I'll skip the b step.
+        return get_first()->hash() + (17*31) * get_second()->hash();
+      }
+      
 
     protected:
       sem_elem_t first;
