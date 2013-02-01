@@ -423,6 +423,8 @@ namespace wali {
                 SETS(set0), SETS(set1), SETS(set2), SETS(set3), SETS(set4), SETS(set5), SETS(set6), SETS(set7),
                 SETS(set8), SETS(set9), SETS(setA), SETS(setB), SETS(setC), SETS(setD), SETS(setE), SETS(setF);
 
+#undef SETS
+
 #define EXPECT_SET_REDUCES_TO(root, maximal, minimal) \
     EXPECT_TRUE(root##_keeping_min.equal(&minimal##_keeping_min)); \
     EXPECT_TRUE(root##_keeping_max.equal(&maximal##_keeping_max))
