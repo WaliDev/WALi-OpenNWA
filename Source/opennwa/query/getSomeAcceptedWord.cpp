@@ -1,4 +1,10 @@
 
+#include <vector>
+#include <set>
+
+#include "opennwa/query/returns.hpp"
+#include "opennwa/query/calls.hpp"
+#include "opennwa/query/internals.hpp"
 #include "wali/TotalOrderWorklist.hpp"
 #include "wali/wfa/WFA.hpp"
 #include "wali/wfa/State.hpp"
@@ -8,8 +14,9 @@
 #include "wali/wpds/WPDS.hpp"
 #include "opennwa/ClientInfo.hpp"
 #include "wali/witness/WitnessWrapper.hpp"
+#include "opennwa/query/PathVisitor.hpp"
+#include "opennwa/query/ShortWitnessVisitor.hpp"
 
-//#define JAMDEBUG 1
 
 using namespace wali;
 
@@ -18,11 +25,11 @@ namespace opennwa {
   namespace query {
 
 
-    ref_ptr<NestedWord>
+    NestedWordRefPtr
     getSomeAcceptedWordInternal(Nwa const & nwa, WeightGen const & wg);
 
       
-    ref_ptr<NestedWord>
+    NestedWordRefPtr
     getSomeAcceptedWord(Nwa const & nwa)
     {
       ReachGen wg;
@@ -30,7 +37,7 @@ namespace opennwa {
     }
 
 
-    ref_ptr<NestedWord>
+    NestedWordRefPtr
     getSomeShortestAcceptedWord(Nwa const & nwa)
     {
       ShortestWordGen wg;
@@ -38,7 +45,7 @@ namespace opennwa {
     }
 
 
-    ref_ptr<NestedWord>
+    NestedWordRefPtr
     getSomeAcceptedWordWithWeights(Nwa const & nwa, WeightGen const & wg)
     {
       return getSomeAcceptedWordInternal(nwa, wg);
@@ -52,17 +59,14 @@ namespace opennwa {
       ref_ptr<wpds::Wrapper> wrapper = new witness::WitnessWrapper();
       wpds::WPDS conv = nwa_pds::NwaToWpdsCalls(nwa, wg, wrapper);
 
-#ifdef JAMDEBUG
-      std::cerr << "##### WPDS" << std::endl;
-      conv.print(std::cerr);
-#endif
-
+      // Set the worklist to determine the order of poststar traversal.
       conv.setWorklist(new TotalOrderWorklist());
 
       Key state = nwa_pds::getProgramControlLocation();
       Key accept = getKey("__accept");
 
-      // Construct the query automaton
+      // Construct the poststar query automaton to get all
+      // configurations reachable from the initial state.
       wfa::WFA query;
       query.addState(state, wg.getOne()->zero());
       query.setInitialState(state);
@@ -74,18 +78,12 @@ namespace opennwa {
         query.addTrans(state, *initial, accept, wg.getOne());
         query.addTrans(accept, *initial, accept, wg.getOne()); // Accept pending returns
       }
-#ifdef JAMDEBUG
-      std::cerr << "##### QUERY1" << std::endl;
-      query.print(std::cerr);
-#endif
 
-	
-      // Execute the post* query
+      // Execute the post* query.
       wfa::WFA path = conv.poststar(query);
-#ifdef JAMDEBUG
-      std::cerr << "##### POSTSTAR" << std::endl;
-      path.print(std::cerr);
-#endif
+
+      // Prune unreachable states.
+      path.prune();
 
       // Intersect path with a new 2-state WFA with a transitioning edge
       // for each final NWA state, and a self-loop from the WFA final
@@ -111,43 +109,44 @@ namespace opennwa {
       }
 
       wfa::KeepLeft wmaker;
-      path = path.intersect(wmaker, fa);
-      
-#ifdef JAMDEBUG
-      std::cerr << "##### INTERSECTION" << std::endl;
-      path.print(std::cerr);
-#endif
 
-      path.path_summary_tarjan();
+      // %%% The new intersect screws with the Nwa somehow.
+      wfa::WFA ipath;
+      path.intersect_cross(wmaker, fa, ipath);
 
-#ifdef JAMDEBUG
-      std::cerr << "##### SUMMARY" << std::endl;
-      path.print(std::cerr);
-#endif
+      ipath.path_summary_tarjan();
+      //path.path_summary();
 
-      return path.getState(path.getInitialState())->weight();
+      return ipath.getState(ipath.getInitialState())->weight();
     }
       
-    ref_ptr<NestedWord>
+    NestedWordRefPtr
     getSomeAcceptedWordInternal(Nwa const & nwa, WeightGen const & wg)
     {
       sem_elem_t se = getWitnessForSomeAcceptedWordWithWeights(nwa, wg);
-      if (se.is_empty()) return ref_ptr<NestedWord>();
+      if (se.is_empty()) return NULL;
 
       witness::Witness *wit =
         dynamic_cast<witness::Witness*>(se.get_ptr());
       assert(wit);
-#ifdef JAMDEBUG
-      std::cerr << "WITNESS DEPTH: " << wit->getLength() << std::endl;
-#endif
 
       if (!wit->isZero()) {
 
-        // Find a shortest word through the witness.
-        details::PathVisitor pv(nwa);
-        wit->accept(pv);
+        // Find a shortest single-path witness.
+        ShortWitnessVisitor swv;
+        wit->accept(swv, false);
 
-        return new NestedWord(pv.answer());
+        witness::Witness *pathWit = swv.answer().get_ptr();
+        assert(pathWit);
+        //std::cerr << "##### PATHWIT LENGTH: " << pathWit->getLength() << std::endl;
+        //pathWit->reset_marks();
+
+        // Generate a NestedWord from the single-path witness.
+        PathVisitor pv(nwa);
+        pathWit->accept(pv, false);
+
+        NestedWord *nw = new NestedWord(pv.getPath());
+        return NestedWordRefPtr(nw);
       }
 
       // No word was found.
