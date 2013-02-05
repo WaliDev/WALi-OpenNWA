@@ -178,15 +178,17 @@ namespace wali {
           public:
             typedef std::ostream & (*PRINT_OP)(std::ostream &, int);
 
-          private:
-            friend class SummaryGraph;
-
             /**
              * All the regular expressions created in different IntraGraphs
              * belong to a shared regular expression dag. This is the best
              * place to store it.
+             *
+             * Keeping it public so that SummaryGraph can grab it.
              **/
             RegExpDag * dag;
+
+          private:
+            friend class SummaryGraph;
 
             typedef std::vector< int > Int1D;
             typedef std::vector< Int1D > Int2D;
