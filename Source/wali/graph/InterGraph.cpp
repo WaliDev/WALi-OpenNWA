@@ -163,7 +163,22 @@ namespace wali {
           return sem_elem_t(0);
         }
 
+        InterGraph::InterGraph(wali::sem_elem_t s, bool e, bool pre, bool n)
+        {
+          sem = s;
+          intra_graph_uf = NULL;
+          running_ewpds = e;
+          running_nwpds = n;
+          running_prestar = pre;
+          max_scc_computed = 0;
+          newtonGr = NULL;
+          runningNewton = false;
+          dag = new RegExpDag();
+          count = 0;
+        }
+
         InterGraph::~InterGraph() {
+          delete dag;
           std::set<IntraGraph*> deleteGr;
           for(unsigned i = 0; i < nodes.size(); i++) {
             if(nodes[i].gr && intra_graph_uf->find(i) == (int)i) {
@@ -674,14 +689,14 @@ namespace wali {
             sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>(sem_old->one().get_ptr());
             sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>((sem->zero()).get_ptr()); //sem is tensored
             for(unsigned scc_n = 1; scc_n <= max_scc_required; scc_n++) {
-              RegExp::startSatProcess(sem);
+              dag->startSatProcess(sem);
 
               ////////////////We will now create the Newton IntraGraph which will store the
               ////////////////actual weights, and from which RegExp will be generated.
               ////////////////This is the TDG for the linearized problem for the current SCC
 
               SCCGraphs::iterator scc_head = gr_it;
-              IntraGraph * graph = new IntraGraph(false, sem); //pre = false
+              IntraGraph * graph = new IntraGraph(dag, false, sem); //pre = false
               linear_gr_list.push_back(graph);
               //Add nodes to IntraGraph
               while(gr_it != gr_sorted.end() && (*gr_it)->scc_number == scc_n){
@@ -864,7 +879,7 @@ namespace wali {
               totStars += RegExpDiagnostics::countTotalStars();
 #endif
               // The next SCC will use another sat procss phase.
-              RegExp::stopSatProcess();
+              dag->stopSatProcess();
             }
           }
           // Before saying you're done, tensor the weights lying around as call rule weights so that
@@ -879,7 +894,7 @@ namespace wali {
           cout << "Total number of Stars: " << totStars << endl;
 #endif
           max_scc_computed = max_scc_required;
-          RegExp::executingPoststar(!running_prestar);
+          dag->executingPoststar(!running_prestar);
 
 #if defined(PPP_DBG) && PPP_DBG >= 2
             std::stringstream ss;
@@ -928,7 +943,7 @@ namespace wali {
         // If an argument is passed in then only weights on those transitions will be available
         // I can fix this (i.e., weights for others will be available on demand), but not right now.
         void InterGraph::setupInterSolution(std::list<Transition> *wt_required) {
-          RegExp::startSatProcess(sem);
+          dag->startSatProcess(sem);
           // First, find the IntraGraphs
           int n = nodes.size();
           int i;
@@ -960,7 +975,7 @@ namespace wali {
           for(i = 0; i < n;i++) {
             int j = intra_graph_uf->find(i);
             if(nodes[j].gr == NULL) {
-              nodes[j].gr = new IntraGraph(running_prestar,sem, memBuf);
+              nodes[j].gr = new IntraGraph(dag, running_prestar,sem, memBuf);
               gr_list.push_back(nodes[j].gr);
             }
             nodes[i].gr = nodes[j].gr;
@@ -1055,7 +1070,7 @@ namespace wali {
           string filename = ss.str();
           fstream foo;
           foo.open(filename.c_str(), fstream::out);
-          const reg_exp_hash_t& roots = RegExp::getRoots();
+          const reg_exp_hash_t& roots = dag->getRoots();
           foo << "digraph {\n";
           std::set<long> seen;
           for(reg_exp_hash_t::const_iterator iter = roots.begin();
@@ -1081,8 +1096,8 @@ namespace wali {
           foo.close();
         }
 #endif
-        RegExp::stopSatProcess();
-        RegExp::executingPoststar(!running_prestar);
+        dag->stopSatProcess();
+        dag->executingPoststar(!running_prestar);
 #ifdef INTRAGRAPH_SHARED_MEMORY
         delete memBuf;
 #endif
@@ -1117,12 +1132,12 @@ namespace wali {
           ned += st.nedges;
         }
       }
-      int changestat = RegExp::out_node_height(reg_equations);
+      int changestat = dag->out_node_height(reg_equations);
       total_stats.nhyperedges = inter_edges.size();
       total_stats.nedges = intra_edges.size();
       total_stats.nnodes = nodes.size();
 
-      RegExpStats rst = RegExp::get_stats();
+      RegExpStats rst = dag->get_stats();
       total_stats.ncombine += rst.ncombine;
       total_stats.nextend += rst.nextend;
       total_stats.nstar += rst.nstar;
@@ -1301,7 +1316,7 @@ namespace wali {
       set<int> states_visited;
       std::list<int> worklist;
       unsigned int i;
-      IntraGraph *ca = new IntraGraph(true, sem); // running_prestar = true because extend goes backward
+      IntraGraph *ca = new IntraGraph(dag, true, sem); // running_prestar = true because extend goes backward
       //Transition initial_st(state, 0, 0);
 
       ca->setSource(get_number(intra_node_map,state,ca), sem->one());
@@ -1358,13 +1373,6 @@ namespace wali {
       bool r = op(ca->get_weight(final_st).get_ptr());
       delete ca;
       return r;
-    }
-
-    void InterGraph::cleanUp()
-    {
-      //I don't have any static variables of my own.
-      //The following classes are not so well behaved.
-      RegExp::cleanUp();
     }
 
 } // namespace graph
