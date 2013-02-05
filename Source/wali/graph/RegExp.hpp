@@ -284,14 +284,6 @@ namespace wali {
 
                 /**
                  * @author Prathmesh Prabhu
-                 * There are a bunch of static variables in this class that cause trouble during
-                 * multiple runs of analyses in the same process.
-                 * Anyway, FWPDS (using RegExps) should be able to clean up after itself.
-                 **/
-                static void cleanUp();
-
-                /**
-                 * @author Prathmesh Prabhu
                  * Obtain the hash map that stores the roots in the current
                  * sat process
                  **/
