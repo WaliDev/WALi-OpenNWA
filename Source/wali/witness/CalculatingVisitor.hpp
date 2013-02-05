@@ -55,6 +55,7 @@ namespace wali
 
       typedef std::map<Witness*, AnswerType> Cache;
       Cache cache;
+      typedef typename Cache::const_iterator cache_iter;
       
       AnswerType popCheck(Witness * expected_source) {
         assert(!answerStack.empty());
@@ -71,21 +72,21 @@ namespace wali
       // Draw previously calculated values from cache, and if found,
       // return false to indicate that children should not be traversed.
       bool visit_helper(Witness * w) {
-        typedef typename Cache::const_iterator iter_type;
-        iter_type loc = cache.find(w);
+        cache_iter loc = cache.find(w);
         if (loc == cache.end()) {
           return true;
         }
         push(w, loc->second);
         return false;
       }
+
       
     public:
       AnswerType const & answer() const {
         assert(answerStack.size() == 1);
         return answerStack.top().first;
       }
-      
+
       // These functions return true to continue visiting children.
       virtual bool visit( Witness * w )                { return visit_helper(w); }
       virtual bool visitExtend( WitnessExtend * w )    { return visit_helper(w); }

@@ -20,7 +20,10 @@ namespace wali
     // Pass weight to base class Witness
     //
     WitnessCombine::WitnessCombine( sem_elem_t the_weight ) :
-      Witness( the_weight ) {}
+      Witness( the_weight )
+    {
+      min_length = ULONG_MAX;
+    }
 
     //
     // Destructor does nothing.
@@ -135,7 +138,7 @@ namespace wali
     std::ostream& WitnessCombine::prettyPrint( std::ostream& o, size_t depth ) const
     {
       formatDepth(o,depth);
-      o << "WitnessCombine: ";
+      o << "WitnessCombine: " << std::endl;
       user_se->print(o);
       // Dumps out to much information.
       // TODO. Make a compile or runtime flag.
@@ -161,6 +164,9 @@ namespace wali
     {
       //*waliErr << "[WitnessCombine::addChild]\n";
       kids.push_back( w );
+      if (w->getLength() < min_length) {
+        min_length = w->getLength() + 1UL;
+      }
     }
 
     //
@@ -177,17 +183,6 @@ namespace wali
     void WitnessCombine::absorb( WitnessCombine * wc )
     {
       std::copy(wc->children().begin(),wc->children().end(),std::back_inserter(kids));
-    }
-
-    int WitnessCombine::getLength() const {
-      int len = INT_MAX;
-      std::list<witness_t>::const_iterator kit;
-      for (kit=kids.begin(); kit!=kids.end(); kit++) {
-        witness_t child = *kit;
-        int sublen = child->getLength();
-        if (sublen < len) len = sublen;
-      }
-      return len; 
     }
 
   } // namespace witness

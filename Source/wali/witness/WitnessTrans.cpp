@@ -12,6 +12,7 @@ namespace wali
   {
     WitnessTrans::WitnessTrans( const wfa::ITrans& t_ ) : Witness(t_.weight()),t(t_)
     {
+      min_length = 0UL;
     }
 
     // Destructor does nothing.

@@ -87,6 +87,7 @@ namespace wali
       Witness(r_t.weight()),
       stub(r_t)
     {
+      min_length = 1UL;
     }
 
     //! Destructor does nothing.

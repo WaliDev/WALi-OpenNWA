@@ -23,6 +23,7 @@ namespace wali
       Witness(the_weight),lchild(the_left),rchild(the_right) {
       assert(the_left != NULL);
       assert(the_right != NULL);
+      min_length = the_left->getLength() + the_right->getLength() + 1UL;
     }
 
     // virtual destructor
@@ -50,7 +51,7 @@ namespace wali
     std::ostream& WitnessExtend::prettyPrint( std::ostream& o, size_t depth ) const
     {
       formatDepth(o,depth);
-      o << "WitnessExtend: ";
+      o << "WitnessExtend: " << std::endl;
       user_se->print(o) << std::endl;
       // Dumps out to much information.
       // TODO. Make a compile or runtime flag.
@@ -81,17 +82,6 @@ namespace wali
         if( hasLeft() ) lchild->reset_marks();
         if( hasRight() ) rchild->reset_marks();
       }
-    }
-
-    int WitnessExtend::getLength() const {
-      int len = 0;
-      if( hasLeft() ) {
-        len = lchild->getLength();
-      }
-      if( hasRight() ) {
-        len = len + rchild->getLength();
-      }
-      return len; 
     }
 
   } // namespace witness

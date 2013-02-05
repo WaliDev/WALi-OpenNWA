@@ -68,8 +68,6 @@ namespace wali
         //! @return true if the right child is valid
         bool hasRight() const { return !rchild.is_empty(); }
           
-        // @return the sum of the childrens' lengths
-        virtual int getLength() const;
 
       protected:
         witness_t lchild;      //! < left parameter of binary extend

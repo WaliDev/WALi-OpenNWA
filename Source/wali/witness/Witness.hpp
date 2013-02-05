@@ -124,11 +124,12 @@ namespace wali
         virtual void reset_marks() const;
 
         // @return length, taking the shorter of any combine branches
-        virtual int getLength() const;
+        virtual unsigned long getLength() const;
 
       protected:
         sem_elem_t user_se; //!< The user SemElem value
         bool isEmpty;       //!< True if type == Witness. Cheap reflection.
+        unsigned long min_length;
 
       private:
         Witness( sem_elem_t se, bool ie );

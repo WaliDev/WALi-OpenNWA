@@ -70,6 +70,7 @@ namespace wali
       : user_se(se)
       , isEmpty(ie)
     {
+      min_length = 1UL;
       COUNT++;
     }
 
@@ -212,7 +213,7 @@ namespace wali
     std::ostream& Witness::prettyPrint( std::ostream& o, size_t depth ) const
     {
       formatDepth( o , depth );
-      o << "Witness: ";
+      o << "Witness: " << std::endl;
       user_se->print(o) << std::endl;
       return o;
     }
@@ -226,8 +227,8 @@ namespace wali
       return o;
     }
 
-    int Witness::getLength() const {
-      return 1;
+    unsigned long Witness::getLength() const {
+      return min_length;
     }
 
     void Witness::reset_marks() const
