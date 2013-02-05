@@ -140,14 +140,21 @@ namespace wali {
           RegExpSatProcess() : update_count(1) { }
         };
 
-        class RegExpDiagnostics;
+        class RegExpDag;
 
         class RegExp {
             public:
-              friend class RegExpDiagnostics; 
+              friend class RegExpDag; 
             public:
                 unsigned int count; // for reference counting
             private:
+                /**
+                 * @author Prathmesh Prabhu
+                 * Ideally, I would like to not store dag in RegExp.
+                 * but RegExp accesses static variables formerly in RegExp, now in RegExpDag very often. 
+                 * We will indirect all such accesses through dag.
+                 **/
+                RegExpDag * dag;
                 reg_exp_type type;
                 sem_elem_t value;
 #ifdef DWPDS
@@ -174,35 +181,16 @@ namespace wali {
                 int samechange,differentchange,lastchange;
 
                 map<sem_elem_t, sem_elem_t, sem_elem_less> eval_map; // value under certain contexts
-                static bool saturation_complete;
-                static bool executing_poststar;
-                static bool initialized;
-                static bool top_down_eval;
                 int nevals; // for gathering stats: no of times eval was called on this regexp
 
-                static vector<reg_exp_t> updatable_nodes;
-
-                static vector<RegExpSatProcess> satProcesses;
-                static long unsigned int currentSatProcess;
                 long unsigned int satProcess;
-
-                static bool extend_backwards;
-                static reg_exp_hash_t reg_exp_hash;
-                static const_reg_exp_hash_t const_reg_exp_hash;
-                // Remember what Regular Experessions are the root of the tree
-                // in the current Saturation phase. This is reset between saturation
-                // phases.
-                // Note that constant RegExps never go in this map.
-                static reg_exp_hash_t roots;
-                static RegExpStats stats;
-                static reg_exp_t reg_exp_zero, reg_exp_one;
 
                 // For debugging
                 bool uptodate;
                 std::vector<unsigned int> updates;
                 std::vector<unsigned int> evaluations;
 
-                RegExp(node_no_t nno, sem_elem_t se) {
+                RegExp(long unsigned int currentSatProcess, RegExpDag * d, node_no_t nno, sem_elem_t se) {
                     type = Updatable;
                     value = se;
                     updatable_node_no = nno;
@@ -217,8 +205,9 @@ namespace wali {
                     samechange = differentchange = 0;
                     lastchange=-1;
                     satProcess = currentSatProcess;
+                    dag = d;
                 }
-                RegExp(reg_exp_type t, reg_exp_t r1, reg_exp_t r2 = 0) {
+                RegExp(long unsigned int currentSatProcess, RegExpDag * d, reg_exp_type t, reg_exp_t r1, reg_exp_t r2 = 0) {
                     count = 0;
                     nevals = 0;
                     if(t == Extend || t == Combine) {
@@ -247,8 +236,9 @@ namespace wali {
                     samechange = differentchange = 0;
                     lastchange=-1;
                     satProcess = currentSatProcess;
+                    dag = d;
                 }
-                RegExp(sem_elem_t se) {
+                RegExp(long unsigned int currentSatProcess, RegExpDag * d, sem_elem_t se) {
                     type = Constant;
                     value = se;
                     updatable_node_no = 0; // default value
@@ -263,62 +253,22 @@ namespace wali {
                     samechange = differentchange = 0;
                     lastchange=-1;
                     satProcess = currentSatProcess;
+                    dag = d;
                 }
 
             public:
 
-                static void extendDirectionBackwards(bool b) {
-                    extend_backwards = b;
-                }
-
-                static void saturationComplete() {
-                    saturation_complete = true;
-                }
-
-                static void executingPoststar(bool f) {
-                    executing_poststar = f;
-                }
-
-                static void topDownEval(bool f) {
-                    top_down_eval = f;
-                }
 
                 ostream &print(ostream &out);
                 long toDot(ostream &out, std::set<long>& seen, bool printUpdates = false, bool isRoot = false);
-                static reg_exp_t star(reg_exp_t r);
-                static reg_exp_t extend(reg_exp_t r1, reg_exp_t r2);
-                static reg_exp_t combine(reg_exp_t r1, reg_exp_t r2);
-                static reg_exp_t combine(list<reg_exp_t> &ls);
-                static reg_exp_t constant(sem_elem_t se);
-                static void startSatProcess(const sem_elem_t se);
-                static void stopSatProcess();
-
-                static reg_exp_t updatable(node_no_t nno, sem_elem_t se);
-                static reg_exp_t compress(reg_exp_t r, reg_exp_cache_t &cache);
-                static reg_exp_t minimize_height(reg_exp_t r, reg_exp_cache_t &cache);
-                static size_t getNextUpdatableNumber() {
-                    return updatable_nodes.size();
-                }
-                static void update(node_no_t nno, sem_elem_t se);
-                static void update(std::vector<node_no_t> nnos, std::vector<sem_elem_t> ses);
                 int updatableNumber();
 #ifdef DWPDS
                 sem_elem_t get_delta(unsigned int ls);
 #endif
-                static ostream &print_stats(ostream & out) {
-                    out << stats;
-                    return out;
-                }
-                static int out_node_height(set<RegExp *> reg_equations);
                 sem_elem_t get_weight();
-                static void evaluateRoots();
 
                 int get_nevals() {
                     return nevals;
-                }
-
-                static RegExpStats get_stats() {
-                    return stats;
                 }
 
                 bool isZero() {
@@ -345,7 +295,6 @@ namespace wali {
                  * Obtain the hash map that stores the roots in the current
                  * sat process
                  **/
-                static const reg_exp_hash_t& getRoots();
 
             private:
 
@@ -357,41 +306,134 @@ namespace wali {
                 sem_elem_t evaluate(sem_elem_t w);
                 sem_elem_t evaluateRev(sem_elem_t w);
                 sem_elem_t reevaluateIter();
-                static reg_exp_t compressExtend(reg_exp_t r1, reg_exp_t r2);
-                static reg_exp_t compressCombine(reg_exp_t r1, reg_exp_t r2);
 
                 bool dfs(set<RegExp *> &, set<RegExp *> &);
                 int calculate_height(set<RegExp *> &visited, out_node_stat_t &stat_map);
         };
 
         /**
-         * Provides a bunch of static functions to collect information
-         * about the current RegExp graph.
+         * @class RegExpDag
+         * This is a context to build a RegExp dag
+         * Different RegExpDag objects should not share RegExp nodes, I don't know what will happen.
+         * An object of RegExpDag
+         * -- Provides functions to actually create RegExp nodes. (Its own constructor is private)
+         * -- Provides a bunch of functions to collect information
+         * -- Stores and manipulates dag level information for RegExp
+         * -- encapsulates what was earlier a bunch of static data members of RegExp.
+         *
+         * @author Prathmesh Prabhu
          **/        
-        class RegExpDiagnostics
+        class RegExpDag
         {
+          /**
+           * This class is not properly decoupled from RegExp.
+           * All it has succeeded in doing is getting rid of static variables.
+           **/
+          friend class RegExp;
+          public:
+            RegExpDag();
+            ~RegExpDag();
           public:
             /**
              * Count the total number of active nodes in the RegExp graph
              **/
-            static long countTotalCombines();
-            static long countTotalExtends();
-            static long countTotalStars();
+            long countTotalCombines();
+            long countTotalExtends();
+            long countTotalStars();
 
             /**
              * Counts the total cumulative nodes except those reachable from
              * the list of nodes given as exclude
              **/
-            static long countExcept(std::vector<reg_exp_t>& exceptions);
+            long countExcept(std::vector<reg_exp_t>& exceptions);
           private:
-            static long countTotalCombines(reg_exp_t const e);
-            static long countTotalExtends(reg_exp_t const e);
-            static long countTotalStars(reg_exp_t const e);
-            static void excludeFromCountReachable(reg_exp_t const e);
-            static long countTotalNodes(reg_exp_t const e);
+            long countTotalCombines(reg_exp_t const e);
+            long countTotalExtends(reg_exp_t const e);
+            long countTotalStars(reg_exp_t const e);
+            void excludeFromCountReachable(reg_exp_t const e);
+            long countTotalNodes(reg_exp_t const e);
+
+
+            /**
+             * Functions copied from RegExp (used to be static)
+             **/
+          public:
+                reg_exp_t star(reg_exp_t r);
+                reg_exp_t extend(reg_exp_t r1, reg_exp_t r2);
+                reg_exp_t combine(reg_exp_t r1, reg_exp_t r2);
+                reg_exp_t combine(list<reg_exp_t> &ls);
+                reg_exp_t constant(sem_elem_t se);
+                void startSatProcess(const sem_elem_t se);
+                void stopSatProcess();
+
+                reg_exp_t updatable(node_no_t nno, sem_elem_t se);
+                reg_exp_t compress(reg_exp_t r, reg_exp_cache_t &cache);
+                reg_exp_t minimize_height(reg_exp_t r, reg_exp_cache_t &cache);
+                size_t getNextUpdatableNumber() {
+                    return updatable_nodes.size();
+                }
+                void update(node_no_t nno, sem_elem_t se);
+                void update(std::vector<node_no_t> nnos, std::vector<sem_elem_t> ses);
+
+                int out_node_height(set<RegExp *> reg_equations);
+                void evaluateRoots();
+                const reg_exp_hash_t& getRoots();
+
+                reg_exp_t compressExtend(reg_exp_t r1, reg_exp_t r2);
+                reg_exp_t compressCombine(reg_exp_t r1, reg_exp_t r2);
+
+                ostream &print_stats(ostream & out) {
+                    out << stats;
+                    return out;
+                }
+
+                void extendDirectionBackwards(bool b) {
+                    extend_backwards = b;
+                }
+
+                void saturationComplete() {
+                    saturation_complete = true;
+                }
+
+                void executingPoststar(bool f) {
+                    executing_poststar = f;
+                }
+
+                void topDownEval(bool f) {
+                    top_down_eval = f;
+                }
+
+                RegExpStats get_stats() {
+                    return stats;
+                }
+
           private:
-            static reg_exp_hash_t visited;
+            reg_exp_hash_t visited;
+
+            /**
+             * Data copied from RegExp (used to be static)
+             **/
+          private:
+                bool saturation_complete;
+                bool executing_poststar;
+                bool initialized;
+                bool top_down_eval;
             
+                vector<reg_exp_t> updatable_nodes;
+
+                vector<RegExpSatProcess> satProcesses;
+                long unsigned int currentSatProcess;
+
+                bool extend_backwards;
+                reg_exp_hash_t reg_exp_hash;
+                const_reg_exp_hash_t const_reg_exp_hash;
+                // Remember what Regular Experessions are the root of the tree
+                // in the current Saturation phase. This is reset between saturation
+                // phases.
+                // Note that constant RegExps never go in this map.
+                reg_exp_hash_t roots;
+                RegExpStats stats;
+                reg_exp_t reg_exp_zero, reg_exp_one;
         };
 
     } // namespace graph
