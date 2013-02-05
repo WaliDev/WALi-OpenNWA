@@ -329,16 +329,45 @@ namespace wali {
             /**
              * Count the total number of active nodes in the RegExp graph
              **/
+            long countTotalNodes();
             long countTotalCombines();
             long countTotalExtends();
             long countTotalStars();
+            long countTotalLeaves();            
+            long getHeight();
+            long countSpline();
+            long countFrontier();
 
             /**
              * Counts the total cumulative nodes except those reachable from
              * the list of nodes given as exclude
              **/
             long countExcept(std::vector<reg_exp_t>& exceptions);
+
+            /**
+             * Print information about the structure of the RegExp:
+             *   Spline: is a path from a root to an updatable node.
+             *   Frontier: is the set of children of nodes on a Spline that are
+             *   not themselves on a spline.
+             *
+             * - #spline
+             * - #frontier
+             * - #totalNodes
+             * - fraction spline/totalNodes
+             * - fraction frontier/totalNodes
+             * - fraction (totalNodes - (spline U frontier U leaves)) / totalNodes
+             *
+             * Additionally print:
+             * - Height of the dag.
+             * - fraction (height) / log_2(totalNodes)  
+             **/
+             void printStructureInformation();
           private:
+            long countFrontier(reg_exp_t const e);
+            void markSpline();
+            bool markSpline(reg_exp_t const e);
+            long getHeight(reg_exp_t const e);
+            long countTotalLeaves(reg_exp_t const e);
             long countTotalCombines(reg_exp_t const e);
             long countTotalExtends(reg_exp_t const e);
             long countTotalStars(reg_exp_t const e);
@@ -401,6 +430,8 @@ namespace wali {
 
           private:
             reg_exp_hash_t visited;
+            reg_exp_hash_t spline;
+            wali::HashMap<reg_exp_key_t, long, hash_reg_exp_key, reg_exp_key_t> height;
 
             /**
              * Data copied from RegExp (used to be static)

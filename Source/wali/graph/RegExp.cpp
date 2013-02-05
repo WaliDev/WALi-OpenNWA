@@ -1,5 +1,6 @@
 #include "wali/graph/RegExp.hpp"
 #include "wali/graph/GraphCommon.hpp"
+#include <math.h>
 #include <algorithm>
 #include <iterator>
 #include <cassert>
@@ -1644,6 +1645,147 @@ namespace wali {
         visited.clear();
     }
 
+    void RegExpDag::printStructureInformation()
+    {
+     long nodes = countTotalNodes();
+     long leaves = countTotalLeaves();
+     long height = getHeight();
+     long splines = countSpline();
+     long frontiers = countFrontier();
+
+     cout << "RegExp statistics:" << endl;
+     cout << "#Nodes: " << nodes << endl;
+     cout << "#Leaves: " << leaves << endl;
+     cout << "#Spline: " << splines << endl;
+     cout << "#Frontiers: " << frontiers << endl;
+     if(nodes > 0){
+       cout << "Spline/nodes: " << ((double) splines) / ((double) nodes);
+       cout << "Frontier/nodes: " << ((double) frontiers) / ((double) nodes);
+       cout << "Height/log(nodes): " << ((double) height) * log10(2)  / log10((double) nodes);
+     }
+    }
+
+    long RegExpDag::getHeight()
+    {
+      long max = 0;
+      height.clear();
+      for(reg_exp_hash_t::const_iterator rit = roots.begin(); rit != roots.end(); ++rit){
+        long cur = countTotalLeaves(rit->second);
+        max = cur > max ? cur : max;
+      }
+      return max;
+    }
+
+    // Relies on the dag actually being a dag
+    // Will go into an infinite loop otherwise
+    long RegExpDag::getHeight(reg_exp_t const e)
+    {
+      reg_exp_key_t ekey(e->type, e);
+      wali::HashMap<reg_exp_key_t, long, hash_reg_exp_key, reg_exp_key_t>::iterator it = height.find(ekey);
+      if(it != height.end())
+        return it->second;
+      long max = 0;
+      if(e->children.size() == 0){
+        max = 1;
+      }else{
+        for(list<reg_exp_t>::iterator cit = e->children.begin(); cit != e->children.end(); ++cit){
+          long cur = countTotalLeaves(*cit);
+          max = cur > max ? cur : max;
+        }
+      }
+      height[ekey] = max;
+      return max;
+    }
+
+    long RegExpDag::countSpline(){
+      markSpline();
+      return (long) spline.size();
+    }
+    void RegExpDag::markSpline()
+    {
+      visited.clear();
+      spline.clear();
+      for(reg_exp_hash_t::const_iterator rit = roots.begin(); rit != roots.end(); ++rit)
+        markSpline(rit->second);
+    }
+
+    // on dag actually being a dag
+    // will give incorrect answers (will not mark all) otherwise.
+    bool RegExpDag::markSpline(reg_exp_t const e)
+    {
+      reg_exp_key_t ekey(e->type, e);
+      reg_exp_hash_t::iterator it = visited.find(ekey);
+      if(it != visited.end()){
+        return spline.find(ekey) != spline.end();
+      }
+      visited.insert(ekey, e);
+      bool onSpline = false;
+      for(list<reg_exp_t>::iterator cit = e->children.begin(); cit != e->children.end(); ++cit)
+        onSpline |= markSpline(*cit);
+      if(onSpline)
+        spline.insert(ekey, e);
+      return onSpline;
+    }
+
+    long RegExpDag::countFrontier()
+    {
+      visited.clear();
+      spline.clear();
+      markSpline();
+      long count = 0;
+      for(reg_exp_hash_t::const_iterator rit = roots.begin(); rit != roots.end(); ++rit)
+        count += countFrontier(rit->second);
+      return count;
+    }
+
+    long RegExpDag::countFrontier(reg_exp_t const e)
+    {
+      reg_exp_key_t ekey(e->type, e);
+      reg_exp_hash_t::iterator it = visited.find(ekey);
+      if(it != visited.end())
+        return 0;
+      visited.insert(ekey, e);
+      it = spline.find(ekey);
+      if(it == spline.end())
+        return 0;
+      long count = 0;
+      for(list<reg_exp_t>::iterator cit = e->children.begin(); cit != e->children.end(); ++cit){
+        reg_exp_key_t ckey((*cit)->type, *cit);
+        if(spline.find(ckey) != spline.end()){
+          count += countFrontier(*cit);
+        }else{
+          if(visited.find(ckey) == visited.end()){
+            count += 1;
+            visited.insert(ckey, *cit);
+          }
+        }
+      }
+      return count;
+    }
+
+    long RegExpDag::countTotalLeaves()
+    {
+      long total = 0;
+      visited.clear();
+      for(reg_exp_hash_t::const_iterator rit = roots.begin(); rit != roots.end(); ++rit)
+        total += countTotalLeaves(rit->second);
+      return total;
+    }
+
+    long RegExpDag::countTotalLeaves(reg_exp_t const e)
+    {
+      reg_exp_key_t ekey(e->type, e);
+      reg_exp_hash_t::iterator it = visited.find(ekey);
+      if(it != visited.end())
+        return 0;
+      visited.insert(ekey, e);
+      if(e->children.size() == 0)
+        return 1;
+      long total = 0;
+      for(list<reg_exp_t>::iterator cit = e->children.begin(); cit != e->children.end(); ++cit)
+        total += countTotalLeaves(*cit);
+      return total;
+    }
 
     long RegExpDag::countTotalCombines()
     {
@@ -1654,7 +1796,7 @@ namespace wali {
       return total;
     }
 
-    long RegExpDag::countTotalCombines(reg_exp_t e)
+    long RegExpDag::countTotalCombines(reg_exp_t const e)
     {
       reg_exp_key_t ekey(e->type, e);
       reg_exp_hash_t::iterator it = visited.find(ekey);
@@ -1679,7 +1821,7 @@ namespace wali {
       return total;
     }
 
-    long RegExpDag::countTotalExtends(reg_exp_t e)
+    long RegExpDag::countTotalExtends(reg_exp_t const e)
     {
       reg_exp_key_t ekey(e->type, e);
       reg_exp_hash_t::iterator it = visited.find(ekey);
@@ -1703,7 +1845,7 @@ namespace wali {
       return total;
     }
 
-    long RegExpDag::countTotalStars(reg_exp_t e)
+    long RegExpDag::countTotalStars(reg_exp_t const e)
     {
       reg_exp_key_t ekey(e->type, e);
       reg_exp_hash_t::iterator it = visited.find(ekey);
@@ -1740,7 +1882,17 @@ namespace wali {
         excludeFromCountReachable(*cit);
     }
 
-    long RegExpDag::countTotalNodes(reg_exp_t e)
+    long RegExpDag::countTotalNodes()
+    {
+      long total = 0;
+      visited.clear();
+      for(reg_exp_hash_t::const_iterator rit = roots.begin(); rit != roots.end(); ++rit){
+        total += countTotalNodes(rit->second);
+      }
+      return total;
+    }
+
+    long RegExpDag::countTotalNodes(reg_exp_t const e)
     {
       reg_exp_key_t ekey(e->type, e);
       reg_exp_hash_t::iterator it = visited.find(ekey);
@@ -1748,8 +1900,8 @@ namespace wali {
         return 0;
       visited.insert(ekey, e);
       long total = 0;
-      if(e->type == Combine || e->type == Extend || e->type == Star)
-        ++total;
+      //if(e->type == Combine || e->type == Extend || e->type == Star)
+      ++total;
       for(list<reg_exp_t>::iterator cit = e->children.begin(); cit != e->children.end(); ++cit)
         total += countTotalNodes(*cit);
       return total;
