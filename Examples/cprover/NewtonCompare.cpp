@@ -46,6 +46,7 @@ using namespace wali::domains::binrel;
 #include <pthread.h>
 #include <signal.h>
 
+
 static pthread_t worker;
 
 extern "C" 
@@ -699,11 +700,12 @@ int main(int argc, char ** argv)
   }
 
 
-  pthread_create(&worker, NULL, &work,  NULL);
+  //void * dump; 
+  //pthread_create(&worker, NULL, &work,  NULL);
+  work(NULL);
+  //pthread_join(worker, &dump);
 
-  void * dump;
-  pthread_join(worker, &dump);
-
+  bdd_printstat();
   // Clean Up.
   delete originalPds;
   deep_erase_prog(&pg);

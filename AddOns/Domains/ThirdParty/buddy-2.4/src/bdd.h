@@ -43,6 +43,9 @@
 #define CPLUSPLUS
 #endif
 
+// Debugging
+#define CACHESTATS 1 
+
 #include <stdio.h>
 
 /*=== Defined operators for apply calls ================================*/
