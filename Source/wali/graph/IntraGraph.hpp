@@ -48,17 +48,23 @@ namespace wali {
 
         class IntraGraphEdge {
             public:
+              /**
+               * The context in which the regular expressions are to be generated.
+               * IntraGraphEdge does not own this. 
+               **/
+                RegExpDag * dag;         
+
                 int src, tgt;
                 sem_elem_t weight;
                 bool updatable;
                 int updatable_no;
                 functional_t exp;
                 reg_exp_t regexp;
-                IntraGraphEdge(int s, int t, sem_elem_t w, bool u, int uno = 0, functional_t e = NULL) : src(s), tgt(t), weight(w), updatable(u), updatable_no(uno), exp(e) {
+                IntraGraphEdge(RegExpDag * d, int s, int t, sem_elem_t w, bool u, int uno = 0, functional_t e = NULL) : dag(d), src(s), tgt(t), weight(w), updatable(u), updatable_no(uno), exp(e) {
                     if(updatable) 
-                        regexp = RegExp::updatable(uno, weight);
+                        regexp = dag->updatable(uno, weight);
                     else
-                        regexp = RegExp::constant(weight);
+                        regexp = dag->constant(weight);
                 }
                 void set(int s, int t, sem_elem_t w, bool u, int uno = 0, functional_t e = NULL) {
                     src = s;
@@ -68,12 +74,13 @@ namespace wali {
                     updatable_no = uno;
                     exp = e;
                     if(updatable) 
-                        regexp = RegExp::updatable(uno, weight);
+                        regexp = dag->updatable(uno, weight);
                     else
-                        regexp = RegExp::constant(weight);
+                        regexp = dag->constant(weight);
                 }
-                IntraGraphEdge() : src(-1), tgt(-1) { } // creates a fake edge
+                IntraGraphEdge(RegExpDag * d) : dag(d), src(-1), tgt(-1) { } // creates a fake edge
                 IntraGraphEdge(const IntraGraphEdge &e) {
+                    dag = e.dag;
                     src = e.src;
                     tgt = e.tgt;
                     weight = e.weight;
@@ -154,6 +161,14 @@ namespace wali {
             friend class InterGraph;
             friend class SummaryGraph;
             private:
+
+            /**
+             * The context in which all regular expressions are to be created.
+             * This is usually shared by all IntraGraphs. Allocation/Deallocation is
+             * the responsibility of InterGraph
+             **/
+            RegExpDag * dag;
+
             typedef ostream & (*PRINT_OP)(ostream &, int);
 
             vector<IntraGraphNode> nodes;
@@ -219,7 +234,12 @@ namespace wali {
                 return out;
             }
             public:
-            IntraGraph(bool pre, sem_elem_t _se, SharedMemBuffer * m = NULL) :nodes(50), edges(50), memBuf(m) {
+            IntraGraph(RegExpDag * d, bool pre, sem_elem_t _se, SharedMemBuffer * m = NULL) : 
+              dag(d), 
+              nodes(50),               
+              edges(50, IntraGraphEdge(dag)),
+              memBuf(m)
+            {
                 visited = false;
                 scc_number = 0;
                 bfs_number = 0;
