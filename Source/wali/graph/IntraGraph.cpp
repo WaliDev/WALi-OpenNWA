@@ -16,8 +16,6 @@ namespace wali {
 
   namespace graph {
 
-    sem_elem_t IntraGraph::se;
-
 #define nodeno(a) (a.node_no)
 
     void IntraGraph::create_node(int a) {
@@ -1581,7 +1579,6 @@ namespace wali {
 
     void IntraGraph::cleanUp()
     {
-      IntraGraph::se = NULL;
     }
 
     string IntraGraph::toDot()

@@ -182,7 +182,7 @@ namespace wali {
 
             vector<int> updatable_edges;
             IntraGraphStats stats;
-            static sem_elem_t se;
+            sem_elem_t se;
 
             /**
              * An IntraGraph can be created with a preallocated
