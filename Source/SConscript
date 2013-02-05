@@ -75,6 +75,7 @@ nice_files = Split("""
 ./wali/witness/Witness.cpp
 ./wali/witness/WitnessCombine.cpp
 ./wali/witness/WitnessMerge.cpp
+./wali/witness/WitnessLengthWorklist.cpp
 ./wali/graph/RegExp.cpp
 ./wali/graph/LinkEval.cpp
 ./wali/regex/Concat.cpp
