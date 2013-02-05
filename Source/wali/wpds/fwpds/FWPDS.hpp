@@ -97,7 +97,7 @@ namespace wali {
            * but setting it to false seems to be far more efficient
            * while using BDD-based weight domain (Moped)
            */
-          static void topDownEval(bool f);
+          void topDownEval(bool f);
 
         private:
           void prestar_handle_call(
