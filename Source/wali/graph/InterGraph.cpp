@@ -1364,7 +1364,6 @@ namespace wali {
     {
       //I don't have any static variables of my own.
       //The following classes are not so well behaved.
-      IntraGraph::cleanUp();
       RegExp::cleanUp();
     }
 

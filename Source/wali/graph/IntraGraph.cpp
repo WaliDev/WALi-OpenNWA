@@ -1577,10 +1577,6 @@ namespace wali {
       }
     }
 
-    void IntraGraph::cleanUp()
-    {
-    }
-
     string IntraGraph::toDot()
     {
       std::stringstream ss;

@@ -290,7 +290,6 @@ namespace wali {
              * IntraGraph holds on to some static variables. 
              * These should be cleaned up when we're finished with the analysis.
              **/
-            static void cleanUp();
             void saturate(unsigned& numRounds);
 
             sem_elem_t getWeight(int nno) const ;
