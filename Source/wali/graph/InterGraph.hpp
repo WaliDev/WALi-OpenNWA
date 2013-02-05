@@ -178,6 +178,7 @@ namespace wali {
           public:
             typedef std::ostream & (*PRINT_OP)(std::ostream &, int);
 
+
             /**
              * All the regular expressions created in different IntraGraphs
              * belong to a shared regular expression dag. This is the best
@@ -188,6 +189,8 @@ namespace wali {
             RegExpDag * dag;
 
           private:
+
+
             friend class SummaryGraph;
 
             typedef std::vector< int > Int1D;

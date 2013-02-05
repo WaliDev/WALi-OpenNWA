@@ -151,6 +151,7 @@ namespace wali {
 
         protected:
           sem_elem_t wghtOne;
+          std::vector< graph::InterGraphPtr > interGrs;
           graph::InterGraphPtr interGr;
           bool checkingPhase;
           bool newton;

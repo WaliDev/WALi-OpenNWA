@@ -67,20 +67,18 @@ FWPDS::FWPDS(bool _newton) : EWPDS(), newton(_newton)
 
 FWPDS::~FWPDS()
 {
-  // This cleans up the graph structures.
-  // There are some static variables holding on to values
-  // that cause trouble when re-running analysis.
-  // The downside is that if you have other FWPDSs
-  // hanging around, deleting even one of them will clean up
-  // the graph structure, and bad things will happen.
-
-  // You would have to clean up outside *after* you're done
-  // will *all* FWPDSs.
-  interGr->cleanUp();
+  // This means that if you delete an FWPDS, any WFA that was created by prestar/poststar on that FWPDS is useless.
+  // I don't know where else to delete the InterGraph.
+  // The ideal way to do this is to move the RegExpDag dag into FWPDS, and copy it the WFA after poststar.
+  interGr = NULL;
+  interGrs.clear();
 }
 ///////////////////////////////////////////////////////////////////
 void FWPDS::topDownEval(bool f) {
-  graph::RegExp::topDownEval(f);
+  //Used to be -->
+  //graph::RegExp::topDownEval(f);
+  interGr->dag->topDownEval(f);
+  // is no worse than what it used to be
 }
 
 struct FWPDSCopyBackFunctor : public wfa::TransFunctor
@@ -369,8 +367,6 @@ void FWPDS::poststar( wfa::WFA const & input, wfa::WFA& output ) {
   //  interGr->update_all_weights();
   //}
   //interGr->print_stats(*waliErr) << "\n";
-
-  interGr = NULL;
 }
 
 void FWPDS::poststarIGR( wfa::WFA const & input, wfa::WFA& output )
@@ -394,6 +390,7 @@ void FWPDS::poststarIGR( wfa::WFA const & input, wfa::WFA& output )
   // merge functions, it can be treated as a WPDS.
   // However, there is no cost benefit in using WPDS
   interGr = new graph::InterGraph(theZero, true, false);
+  interGrs.push_back(interGr);
 
   // Input transitions become source nodes in FWPDS
   FWPDSSourceFunctor sources(*interGr.get_ptr(), true);
