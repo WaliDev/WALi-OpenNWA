@@ -17,12 +17,6 @@ namespace wali {
   namespace graph {
 
     sem_elem_t IntraGraph::se;
-#ifdef STATIC_MEMORY
-    int *IntraGraph::intraGraphBuffer = 0;
-    set<int> *IntraGraph::childrenBuffer = 0;
-    reg_exp_t *IntraGraph::regBuffer = 0;
-    int IntraGraph::intraGraphBufferSize = 0;
-#endif
 
 #define nodeno(a) (a.node_no)
 
@@ -1033,11 +1027,11 @@ namespace wali {
       set<int> *children;
       reg_exp_t *reg;
 
-#ifdef STATIC_MEMORY
-      if(n < intraGraphBufferSize) {
-        buffer = intraGraphBuffer;
-        children = childrenBuffer;
-        reg = regBuffer;
+#ifdef INTRAGRAPH_SHARED_MEMORY
+      if(n < sharedMem->intraGraphBufferSize) {
+        buffer = sharedMem->intraGraphBuffer;
+        children = shared->MemchildrenBuffer;
+        reg = sharedMem->regBuffer;
 
         for(i=0;i<n;i++) {
           children[i].clear();
@@ -1588,21 +1582,6 @@ namespace wali {
     void IntraGraph::cleanUp()
     {
       IntraGraph::se = NULL;
-#ifdef STATIC_MEMORY
-      if(IntraGraph::intraGraphBuffer){
-        delete IntraGraph::intraGraphBuffer;
-        IntraGraph::intraGraphBuffer = 0;
-      }
-      if(IntraGraph::childrenBuffer){
-        delete [] IntraGraph::childreBuffer;
-        IntraGraph::childrenBuffer = 0;
-      }
-      if(IntraGraph::regBuffer){
-        delete [] IntraGraph::regBuffer;
-        IntraGraph::regBuffer = 0;
-      }
-      IntraGraph::intraGraphBufferSize = 0;
-#endif
     }
 
     string IntraGraph::toDot()

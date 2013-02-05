@@ -183,18 +183,43 @@ namespace wali {
             vector<int> updatable_edges;
             IntraGraphStats stats;
             static sem_elem_t se;
-#ifdef STATIC_MEMORY
-            static int * intraGraphBuffer;
-            static set<int> *childrenBuffer;
-            static reg_exp_t *regBuffer;
-            static int intraGraphBufferSize;
-#endif
+
+            /**
+             * An IntraGraph can be created with a preallocated
+             * memory buffer to use for its operations.  
+             **/
+            struct SharedMemBuffer {
+              int * intraGraphBuffer;
+              set<int> *childrenBuffer;
+              reg_exp_t *regBuffer;
+              int intraGraphBufferSize;
+              SharedMemBuffer(int s)
+              {
+                intraGraphBuffer = new int[5*s];
+                childrenBuffer = new set<int>[s];
+                regBuffer = new reg_exp_t[s];
+                intraGraphBufferSize = s;
+              }
+              ~SharedMemBuffer()
+              {
+                delete [] intraGraphBuffer;
+                delete [] childrenBuffer;
+                delete [] regBuffer;
+                intraGraphBuffer = 0;
+                childrenBuffer = 0;
+                regBuffer = 0;
+                intraGraphBufferSize = 0;
+              }
+            };
+
+            SharedMemBuffer * memBuf;
+
             static ostream &defaultPrintOp(ostream &out, int a) {
                 out << a;
                 return out;
             }
             public:
-            IntraGraph(bool pre, sem_elem_t _se) :nodes(50), edges(50) {
+            IntraGraph(bool pre, sem_elem_t _se, SharedMemBuffer * m = NULL) :nodes(50), edges(50), memBuf(m) {
                 visited = false;
                 scc_number = 0;
                 bfs_number = 0;
@@ -211,6 +236,8 @@ namespace wali {
             ~IntraGraph() {
                 delete out_nodes_intra;
                 delete out_nodes_inter;
+                //It is not my responsibility to delete sharedMem. Whoever constructed it must delete it.
+                //delete sharedMem;
                 if(apsp != NULL) {
                     int i;
                     for(i=0;i<nnodes;i++)
@@ -226,25 +253,6 @@ namespace wali {
             int getSize() {
                 return nnodes;
             }
-#ifdef STATIC_MEMORY
-            static void addStaticBuffer(int s) {
-                intraGraphBuffer = new int[5*s];
-                childrenBuffer = new set<int>[s];
-                regBuffer = new reg_exp_t[s];
-                intraGraphBufferSize = s;
-            }
-            static void clearStaticBuffer() {
-                delete [] intraGraphBuffer;
-                delete [] childrenBuffer;
-                delete [] regBuffer;
-
-                intraGraphBuffer = 0;
-                childrenBuffer = 0;
-                regBuffer = 0;
-
-                intraGraphBufferSize = 0;
-            }
-#endif
             int makeNode(Transition t) {
                 create_node(t, nnodes);
                 return (nnodes-1); // nnodes gets incremented by create_node

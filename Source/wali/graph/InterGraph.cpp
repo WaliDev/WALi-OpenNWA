@@ -940,17 +940,27 @@ namespace wali {
           std::list<IntraGraph *>::iterator gr_it;
           multiset<tup > worklist;
 
+
           for(it = intra_edges.begin(); it != intra_edges.end(); it++) {
             intra_graph_uf->takeUnion((*it).src,(*it).tgt);
           }
           for(it2 = inter_edges.begin(); it2 != inter_edges.end(); it2++) {
             intra_graph_uf->takeUnion((*it2).src1,(*it2).tgt);
           }
+          IntraGraph::SharedMemBuffer * memBuf = NULL;
+#ifdef INTRAGRAPH_SHARED_MEMORY
+          // Before creating IntraGraphs, create a CommonBuffer, if needed.
+          int max_size = 0;
+          for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
+            max_size = (max_size > (*gr_it)->getSize()) ? max_size : (*gr_it)->getSize();
+          }
+          memBuf  = new IntraGraph::SharedMemBuffer(max_size);
+#endif
 
           for(i = 0; i < n;i++) {
             int j = intra_graph_uf->find(i);
             if(nodes[j].gr == NULL) {
-              nodes[j].gr = new IntraGraph(running_prestar,sem);
+              nodes[j].gr = new IntraGraph(running_prestar,sem, memBuf);
               gr_list.push_back(nodes[j].gr);
             }
             nodes[i].gr = nodes[j].gr;
@@ -986,13 +996,6 @@ namespace wali {
           }
 
           // Setup Worklist
-#ifdef STATIC_MEMORY
-          int max_size = 0;
-          for(gr_it = gr_list.begin(); gr_it != gr_list.end(); gr_it++) {
-            max_size = (max_size > (*gr_it)->getSize()) ? max_size : (*gr_it)->getSize();
-          }
-          IntraGraph::addStaticBuffer(max_size);
-#endif
 #if defined(PPP_DBG) && PPP_DBG >= 0
           vector<reg_exp_t> outNodeRegExps;
 #endif
@@ -1080,8 +1083,8 @@ namespace wali {
 #endif
         RegExp::stopSatProcess();
         RegExp::executingPoststar(!running_prestar);
-#ifdef STATIC_MEMORY
-        IntraGraph::clearStaticBuffer();
+#ifdef INTRAGRAPH_SHARED_MEMORY
+        delete memBuf;
 #endif
     }
 
