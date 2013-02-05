@@ -155,6 +155,7 @@ namespace wali {
           graph::InterGraphPtr interGr;
           bool checkingPhase;
           bool newton;
+          bool topDown;
 
       }; // class FWPDS
 
