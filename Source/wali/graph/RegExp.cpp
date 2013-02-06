@@ -1710,7 +1710,7 @@ namespace wali {
        cout << "Frontier/nodes %: " << ((double) frontiers * 100) / ((double) nodes) << endl;
        cout << "label nodes/nodes %: " << ((double) edgels * 100) / ((double) nodes) << endl;
        cout << "Height/log(nodes) %: " << ((double) height * 100) * log10(2)  / log10((double) nodes) << endl;
-       cout << "roots/log(nodes) %: " << ((double) roots * 100) * log10(2)  / log10((double) nodes) << endl;
+       cout << "roots/nodes %: " << ((double) roots * 100) /((double) nodes) << endl;
      }
     }
 
