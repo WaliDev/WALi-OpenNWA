@@ -328,12 +328,12 @@ namespace wali {
             if(r->type == Star) {
                 return r;
             }
+#ifndef REGEXP_CACHING
             if(r->type == Constant) {
                 if(r->value->equal(r->value->zero())) {
                     return new RegExp(currentSatProcess, this, r->value->one());
                 }
             }
-#ifndef REGEXP_CACHING
             reg_exp_t res = new RegExp(currentSatProcess, this, Star, r);
             // Manipulate the set of root nodes.
             // remove r from roots.
@@ -347,8 +347,9 @@ namespace wali {
 #else // REGEXP_CACHING
 
             if(r->type == Constant) {
-                if(r->value->equal(r->value->one())) {
-                    return r;
+                if(r->value->equal(r->value->one()) || r->value->equal(r->value->zero())) {
+                    assert(r == reg_exp_one || r == reg_exp_zero);
+                    return reg_exp_one;
                 }
             }
 
