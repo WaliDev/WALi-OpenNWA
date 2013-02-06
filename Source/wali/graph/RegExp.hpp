@@ -381,8 +381,8 @@ namespace wali {
           public:
                 reg_exp_t star(reg_exp_t r);
                 reg_exp_t extend(reg_exp_t r1, reg_exp_t r2);
+                reg_exp_t combine(std::list<reg_exp_t>& rlist);
                 reg_exp_t combine(reg_exp_t r1, reg_exp_t r2);
-                reg_exp_t combine(list<reg_exp_t> &ls);
                 reg_exp_t constant(sem_elem_t se);
                 void startSatProcess(const sem_elem_t se);
                 void stopSatProcess();

@@ -375,6 +375,21 @@ namespace wali {
 #endif // REGEXP_CACHING
         }
 
+        reg_exp_t RegExpDag::combine(std::list<reg_exp_t> & rlist)
+        {
+           if(rlist.size() == 0)
+             return reg_exp_zero;
+           if(rlist.size() == 1)
+             return *(rlist.begin());
+
+           std::list<reg_exp_t>::iterator it = rlist.begin();
+           reg_exp_t res = *it;
+           it++;
+           for(;it != rlist.end(); ++it)
+             res = combine(res, *it);
+           return res;
+        }
+
         reg_exp_t RegExpDag::combine(reg_exp_t r1, reg_exp_t r2) {
             if(r1->type == Constant && r1->value->equal(r1->value->zero())) {
                 return r2;
@@ -425,23 +440,6 @@ namespace wali {
             return it->second;
 #endif // REGEXP_CACHING
         }
-
-        reg_exp_t RegExpDag::combine(list<reg_exp_t> &ls) {
-          // Prathmesh: I added this "false" assertion here.
-          // It looks like this one doesn't implement the whole
-          // RegExp caching logic. A remnant of old times?
-          assert(false && "Prathmesh: Deprecated?\n");
-          if(ls.size() == 0)
-            return reg_exp_zero;
-          if(ls.size() == 1)
-            return *ls.begin();
-          
-          reg_exp_t reg = new RegExp(currentSatProcess, this, reg_exp_zero->value);
-          reg->type = Combine;
-          reg->children = ls;
-          return reg;
-        }
-      
 
         reg_exp_t RegExpDag::extend(reg_exp_t r1, reg_exp_t r2) {
             if(extend_backwards) {
