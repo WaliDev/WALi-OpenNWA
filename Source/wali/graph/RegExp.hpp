@@ -471,7 +471,6 @@ namespace wali {
             // Also remember the set of all roots created
             // This is used for diagnostic purposes
             reg_exp_hash_t rootsAccrossSatProcesses;
-            reg_exp_hash_t 
             RegExpStats stats;
             reg_exp_t reg_exp_zero, reg_exp_one;
         };

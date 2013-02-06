@@ -544,7 +544,7 @@ namespace wali {
           // The set of root nodes is cleared between saturation phases.
           // but only after transferring the set to rootsAcrossSatProcesses
           for(reg_exp_hash_t::iterator it = rootsInSatProcess.begin(); it != rootsInSatProcess.end(); ++it)
-            rootsAccrossSatProcess.insert(it->first, it->second);
+            rootsAccrossSatProcesses.insert(it->first, it->second);
           rootsInSatProcess.clear();
           updatable_nodes.clear();
          
@@ -1713,7 +1713,7 @@ namespace wali {
     {
       long max = 0;
       height.clear();
-      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcessesbegin(); rit != rootsAccrossSatProcessesend(); ++rit){
+      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcesses.begin(); rit != rootsAccrossSatProcesses.end(); ++rit){
         long cur = countTotalLeaves(rit->second);
         max = cur > max ? cur : max;
       }
@@ -1749,7 +1749,7 @@ namespace wali {
     {
       visited.clear();
       spline.clear();
-      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcessesbegin(); rit != rootsAccrossSatProcessesend(); ++rit)
+      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcesses.begin(); rit != rootsAccrossSatProcesses.end(); ++rit)
         markSpline(rit->second);
     }
 
@@ -1777,7 +1777,7 @@ namespace wali {
       spline.clear();
       markSpline();
       long count = 0;
-      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcessesbegin(); rit != rootsAccrossSatProcessesend(); ++rit)
+      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcesses.begin(); rit != rootsAccrossSatProcesses.end(); ++rit)
         count += countFrontier(rit->second);
       return count;
     }
@@ -1811,7 +1811,7 @@ namespace wali {
     {
       long total = 0;
       visited.clear();
-      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcessesbegin(); rit != rootsAccrossSatProcessesend(); ++rit)
+      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcesses.begin(); rit != rootsAccrossSatProcesses.end(); ++rit)
         total += countTotalLeaves(rit->second);
       return total;
     }
@@ -1835,7 +1835,7 @@ namespace wali {
     {
       long total = 0;
       visited.clear();
-      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcessesbegin(); rit != rootsAccrossSatProcessesend(); ++rit)
+      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcesses.begin(); rit != rootsAccrossSatProcesses.end(); ++rit)
         total += countTotalCombines(rit->second);
       return total;
     }
@@ -1859,7 +1859,7 @@ namespace wali {
     {
       long total = 0;
       visited.clear();
-      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcessesbegin(); rit != rootsAccrossSatProcessesend(); ++rit){
+      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcesses.begin(); rit != rootsAccrossSatProcesses.end(); ++rit){
         total += countTotalExtends(rit->second);
       }
       return total;
@@ -1884,7 +1884,7 @@ namespace wali {
     {
       long total = 0;
       visited.clear();
-      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcessesbegin(); rit != rootsAccrossSatProcessesend(); ++rit)
+      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcesses.begin(); rit != rootsAccrossSatProcesses.end(); ++rit)
         total += countTotalStars(rit->second);
       return total;
     }
@@ -1910,7 +1910,7 @@ namespace wali {
       for(vector<reg_exp_t>::const_iterator cit = exceptions.begin(); cit != exceptions.end(); ++cit)
         excludeFromCountReachable(*cit);
       long total = 0;
-      for(reg_exp_hash_t::const_iterator cit = rootsAccrossSatProcessesbegin(); cit != rootsAccrossSatProcessesend(); ++cit)
+      for(reg_exp_hash_t::const_iterator cit = rootsAccrossSatProcesses.begin(); cit != rootsAccrossSatProcesses.end(); ++cit)
         total += countTotalNodes(cit->second);
       return total;
     }
@@ -1930,7 +1930,7 @@ namespace wali {
     {
       long total = 0;
       visited.clear();
-      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcessesbegin(); rit != rootsAccrossSatProcessesend(); ++rit){
+      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcesses.begin(); rit != rootsAccrossSatProcesses.end(); ++rit){
         total += countTotalNodes(rit->second);
       }
       return total;
