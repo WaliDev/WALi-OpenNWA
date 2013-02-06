@@ -873,10 +873,6 @@ namespace wali {
 #if defined(PPP_DBG) && PPP_DBG >= 0
               maxNewtonRounds = numRounds > maxNewtonRounds ? numRounds : maxNewtonRounds;
               totNewtonRounds += numRounds;
-              // Must be saved *before* stopSatProcess
-              totCombines += dag->countTotalCombines();
-              totExtends += dag->countTotalExtends();
-              totStars += dag->countTotalStars();
 #endif
               // The next SCC will use another sat procss phase.
               dag->stopSatProcess();
@@ -887,6 +883,11 @@ namespace wali {
           eHandler.tensorAllWeights();
 
 #if defined(PPP_DBG) && PPP_DBG >= 0
+          dag->sanitizeRootsAcrossSatProcesses();
+          totCombines = dag->countTotalCombines();
+          totExtends = dag->countTotalExtends();
+          totStars = dag->countTotalStars();
+
           cout << "Maximum number of Newton rounds: " << maxNewtonRounds << endl;
           cout << "Total number of Newton rounds: " << totNewtonRounds << endl;
           cout << "Total number of combines: " << totCombines << endl;
