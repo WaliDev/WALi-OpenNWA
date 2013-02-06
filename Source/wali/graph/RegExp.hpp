@@ -330,6 +330,13 @@ namespace wali {
             // RegExp dag diagnositcs.
             // Whenever this information is available, it is available across
             // calls to startSatProcess / stopSatProcess.
+            
+            // Although we try our best, the set of roots accross sat processes
+            // may not be correct.  Some roots might have become non-roots. It
+            // is a good idea to sanitize the set before collecting diagnostic
+            // information. This can be called any number of times.
+            void sanitizeRootsAccrossSatProcesses();
+
             /**
              * Count the total number of active nodes in the RegExp graph
              **/
@@ -377,6 +384,7 @@ namespace wali {
             long countTotalStars(reg_exp_t const e);
             void excludeFromCountReachable(reg_exp_t const e);
             long countTotalNodes(reg_exp_t const e);
+            void removeDagFromRoots(reg_exp_t const e);
 
             reg_exp_t _minimize_height(reg_exp_t r, reg_exp_cache_t &cache);
             reg_exp_t compressExtend(reg_exp_t r1, reg_exp_t r2);

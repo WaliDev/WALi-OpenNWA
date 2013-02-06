@@ -1952,7 +1952,31 @@ namespace wali {
     }
     
 
+    // Relies on the dag actually being a dag.
+    // If not, a circular path has no root.
+    void RegExpDag::sanitizeRootsAccrossSatProcesses()
+    {
+      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcesses.begin(); rit != rootsAccrossSatProcesses.end(); ++rit){
+        visited.clear();
+        reg_exp_t const e = rit->second;
+        reg_exp_key_t ekey(e->type, e);
+        visited.insert(ekey, e);
+        for(list<reg_exp_t>::iterator cit = e->children.begin(); cit != e->children.end(); ++cit)
+          removeDagFromRoots(*cit);
+      }
+    }
     
+    void RegExpDag::removeDagFromRoots(reg_exp_t const e)
+    {
+      reg_exp_key_t ekey(e->type, e);
+      reg_exp_hash_t::iterator it = visited.find(ekey);
+      if(it != visited.end())
+        return;
+      visited.insert(ekey, e);      
+      rootsAccrossSatProcesses.erase(ekey);
+      for(list<reg_exp_t>::iterator cit = e->children.begin(); cit != e->children.end(); ++cit)
+        removeDagFromRoots(*cit);
+    }
 
     } // namespace graph
 } // namespace wali
