@@ -1668,7 +1668,7 @@ namespace wali {
 #if defined(PPP_DBG) && PPP_DBG >= 1
           {
             stringstream ss;
-            ss << "newton_regexp_" << saturateCount << "_" << numRound << ".dot";
+            ss << "newton_regexp_" << saturateCount << "_" << numRounds << ".dot";
             string filename = ss.str();
             fstream foo;
             foo.open(filename.c_str(), fstream::out);

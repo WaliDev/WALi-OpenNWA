@@ -874,9 +874,9 @@ namespace wali {
               maxNewtonRounds = numRounds > maxNewtonRounds ? numRounds : maxNewtonRounds;
               totNewtonRounds += numRounds;
               // Must be saved *before* stopSatProcess
-              totCombines += RegExpDiagnostics::countTotalCombines();
-              totExtends += RegExpDiagnostics::countTotalExtends();
-              totStars += RegExpDiagnostics::countTotalStars();
+              totCombines += dag->countTotalCombines();
+              totExtends += dag->countTotalExtends();
+              totStars += dag->countTotalStars();
 #endif
               // The next SCC will use another sat procss phase.
               dag->stopSatProcess();
@@ -1024,14 +1024,14 @@ namespace wali {
 
 #if defined(PPP_DBG) && PPP_DBG >= 0
           long totNodes = 0, totNotComputed = 0;
-          totNodes = RegExpDiagnostics::countTotalCombines() +
-            RegExpDiagnostics::countTotalExtends() +
-            RegExpDiagnostics::countTotalStars();
-          totNotComputed = RegExpDiagnostics::countExcept(outNodeRegExps); 
-          cout << "Total number of combines: " << RegExpDiagnostics::countTotalCombines() << endl;
-          cout << "Total number of Extends: " << RegExpDiagnostics::countTotalExtends() << endl;
-          cout << "Total number of Stars: " << RegExpDiagnostics::countTotalStars() << endl;
-          cout << "#nodes definitely not evaluated during saturation: " << RegExpDiagnostics::countExcept(outNodeRegExps) << endl;
+          totNodes = dag->countTotalCombines() +
+            dag->countTotalExtends() +
+            dag->countTotalStars();
+          totNotComputed = dag->countExcept(outNodeRegExps); 
+          cout << "Total number of combines: " << dag->countTotalCombines() << endl;
+          cout << "Total number of Extends: " << dag->countTotalExtends() << endl;
+          cout << "Total number of Stars: " << dag->countTotalStars() << endl;
+          cout << "#nodes definitely not evaluated during saturation: " << dag->countExcept(outNodeRegExps) << endl;
           cout << "%Nodes never computed > " << 100 * (double)(((double)totNotComputed)/ (double)totNodes) << endl;;
 #endif
           // Do SCC decomposition of IntraGraphs
