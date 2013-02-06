@@ -893,6 +893,8 @@ namespace wali {
           cout << "Total number of combines: " << totCombines << endl;
           cout << "Total number of Extends: " << totExtends << endl;
           cout << "Total number of Stars: " << totStars << endl;
+
+          dag->printStructureInformation();
 #endif
           max_scc_computed = max_scc_required;
           dag->executingPoststar(!running_prestar);

@@ -335,7 +335,7 @@ namespace wali {
             // may not be correct.  Some roots might have become non-roots. It
             // is a good idea to sanitize the set before collecting diagnostic
             // information. This can be called any number of times.
-            void sanitizeRootsAccrossSatProcesses();
+            void sanitizeRootsAcrossSatProcesses();
 
             /**
              * Count the total number of active nodes in the RegExp graph

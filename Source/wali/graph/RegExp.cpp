@@ -1703,9 +1703,9 @@ namespace wali {
      cout << "#Spline: " << splines << endl;
      cout << "#Frontiers: " << frontiers << endl;
      if(nodes > 0){
-       cout << "Spline/nodes: " << ((double) splines) / ((double) nodes);
-       cout << "Frontier/nodes: " << ((double) frontiers) / ((double) nodes);
-       cout << "Height/log(nodes): " << ((double) height) * log10(2)  / log10((double) nodes);
+       cout << "Spline/nodes: " << ((double) splines) / ((double) nodes) << endl;
+       cout << "Frontier/nodes: " << ((double) frontiers) / ((double) nodes) << endl;
+       cout << "Height/log(nodes): " << ((double) height) * log10(2)  / log10((double) nodes) << endl;
      }
     }
 
@@ -1954,7 +1954,7 @@ namespace wali {
 
     // Relies on the dag actually being a dag.
     // If not, a circular path has no root.
-    void RegExpDag::sanitizeRootsAccrossSatProcesses()
+    void RegExpDag::sanitizeRootsAcrossSatProcesses()
     {
       for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcesses.begin(); rit != rootsAccrossSatProcesses.end(); ++rit){
         visited.clear();
