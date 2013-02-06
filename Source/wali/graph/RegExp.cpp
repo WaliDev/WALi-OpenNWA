@@ -376,8 +376,6 @@ namespace wali {
         }
 
         reg_exp_t RegExpDag::combine(reg_exp_t r1, reg_exp_t r2) {
-            if(r1.get_ptr() == r2.get_ptr()) 
-                return r1;
             if(r1->type == Constant && r1->value->equal(r1->value->zero())) {
                 return r2;
             } else if(r2->type == Constant && r2->value->equal(r2->value->zero())) {
