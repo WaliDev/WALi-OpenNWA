@@ -983,6 +983,9 @@ namespace wali {
 
 #endif // REGEXP_METHOD
 
+      // All edges now have regexp. 
+      // Tel RegExpDag what regexp are used as labels
+      markEdgeLabels();
     }
 
     sem_elem_t IntraGraph::extend(sem_elem_t w1, sem_elem_t w2) {
@@ -1741,5 +1744,10 @@ namespace wali {
       }
     }
 
+    void IntraGraph::markEdgeLabels()
+    {
+      for(int i=0; i < nedges; ++i)
+        edges[i].markEdgeLabel();
+    }
   } // namespace graph
 } // namespace wali

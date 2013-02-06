@@ -1978,5 +1978,11 @@ namespace wali {
         removeDagFromRoots(*cit);
     }
 
+    void RegExpDag::markAsEdgeLabel(reg_exp_t e)
+    {
+      reg_exp_key_t ekey(e->type, e);
+      edgeLabels.insert(ekey,e);
+    }
+
     } // namespace graph
 } // namespace wali

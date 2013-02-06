@@ -89,6 +89,16 @@ namespace wali {
                     exp = e.exp;
                     regexp = e.regexp;
                 }
+
+                // This marks the currently held regexp as labelling an edge.
+                // Used by RegExpDag to collect the set of regexp nodes that label edges.
+                bool markEdgeLabel()
+                {
+                  if(regexp == NULL)
+                    return false;
+                  dag->markAsEdgeLabel(regexp);
+                  return true;
+                }
         };
 
         struct PathSequence {
@@ -352,7 +362,8 @@ namespace wali {
 
             void solveRegSummarySolution();
             void preSolveRegSummarySolution();
-
+            
+            void markEdgeLabels();
         };
 
     } // namespace graph

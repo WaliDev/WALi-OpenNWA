@@ -373,7 +373,16 @@ namespace wali {
              * - fraction (height) / log_2(totalNodes)  
              **/
              void printStructureInformation();
+
+             // Add a reg_exp_t to the set of regular expressions labelling some
+             // IntraGraphEdge. Used only for diagnostic purposes.
+             void markAsEdgeLabel(reg_exp_t r);
+               
+               
           private:
+            /**
+              * Helper functions for diagnostics.
+              **/
             long countFrontier(reg_exp_t const e);
             void markSpline();
             bool markSpline(reg_exp_t const e);
@@ -386,6 +395,9 @@ namespace wali {
             long countTotalNodes(reg_exp_t const e);
             void removeDagFromRoots(reg_exp_t const e);
 
+            /**
+             * Functions related to those copied from RegExp (used to be static).
+             **/
             reg_exp_t _minimize_height(reg_exp_t r, reg_exp_cache_t &cache);
             reg_exp_t compressExtend(reg_exp_t r1, reg_exp_t r2);
             reg_exp_t compressCombine(reg_exp_t r1, reg_exp_t r2);
@@ -471,6 +483,9 @@ namespace wali {
             // Also remember the set of all roots created
             // This is used for diagnostic purposes
             reg_exp_hash_t rootsAccrossSatProcesses;
+            // Set of reg_exp nodes that label some IntraGraphEdge
+            reg_exp_hash_t edgeLabels;
+
             RegExpStats stats;
             reg_exp_t reg_exp_zero, reg_exp_one;
         };
