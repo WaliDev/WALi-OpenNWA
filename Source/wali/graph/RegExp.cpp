@@ -544,7 +544,7 @@ namespace wali {
           // The set of root nodes is cleared between saturation phases.
           // but only after transferring the set to rootsAcrossSatProcesses
           for(reg_exp_hash_t::iterator it = rootsInSatProcess.begin(); it != rootsInSatProcess.end(); ++it)
-            rootsAccrossSatProcesses.insert(it->first, it->second);
+            rootsAcrossSatProcesses.insert(it->first, it->second);
           rootsInSatProcess.clear();
           updatable_nodes.clear();
          
@@ -1696,16 +1696,21 @@ namespace wali {
      long height = getHeight();
      long splines = countSpline();
      long frontiers = countFrontier();
+     long edgels = edgeLabels.size();
+     long roots = rootsAcrossSatProcesses.size();
 
      cout << "RegExp statistics:" << endl;
      cout << "#Nodes: " << nodes << endl;
      cout << "#Leaves: " << leaves << endl;
      cout << "#Spline: " << splines << endl;
      cout << "#Frontiers: " << frontiers << endl;
+     cout << "#Edge Labels: " << edgels << endl;
      if(nodes > 0){
-       cout << "Spline/nodes: " << ((double) splines) / ((double) nodes) << endl;
-       cout << "Frontier/nodes: " << ((double) frontiers) / ((double) nodes) << endl;
-       cout << "Height/log(nodes): " << ((double) height) * log10(2)  / log10((double) nodes) << endl;
+       cout << "Spline/nodes %: " << ((double) splines * 100) / ((double) nodes) << endl;
+       cout << "Frontier/nodes %: " << ((double) frontiers * 100) / ((double) nodes) << endl;
+       cout << "label nodes/nodes %: " << ((double) edgels * 100) / ((double) nodes) << endl;
+       cout << "Height/log(nodes) %: " << ((double) height * 100) * log10(2)  / log10((double) nodes) << endl;
+       cout << "roots/log(nodes) %: " << ((double) roots * 100) * log10(2)  / log10((double) nodes) << endl;
      }
     }
 
@@ -1713,8 +1718,8 @@ namespace wali {
     {
       long max = 0;
       height.clear();
-      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcesses.begin(); rit != rootsAccrossSatProcesses.end(); ++rit){
-        long cur = countTotalLeaves(rit->second);
+      for(reg_exp_hash_t::const_iterator rit = rootsAcrossSatProcesses.begin(); rit != rootsAcrossSatProcesses.end(); ++rit){
+        long cur = getHeight(rit->second);
         max = cur > max ? cur : max;
       }
       return max;
@@ -1733,7 +1738,7 @@ namespace wali {
         max = 1;
       }else{
         for(list<reg_exp_t>::iterator cit = e->children.begin(); cit != e->children.end(); ++cit){
-          long cur = countTotalLeaves(*cit);
+          long cur = getHeight(*cit);
           max = cur > max ? cur : max;
         }
       }
@@ -1749,11 +1754,11 @@ namespace wali {
     {
       visited.clear();
       spline.clear();
-      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcesses.begin(); rit != rootsAccrossSatProcesses.end(); ++rit)
+      for(reg_exp_hash_t::const_iterator rit = rootsAcrossSatProcesses.begin(); rit != rootsAcrossSatProcesses.end(); ++rit)
         markSpline(rit->second);
     }
 
-    // on dag actually being a dag
+    // Relies on dag actually being a dag
     // will give incorrect answers (will not mark all) otherwise.
     bool RegExpDag::markSpline(reg_exp_t const e)
     {
@@ -1766,6 +1771,8 @@ namespace wali {
       bool onSpline = false;
       for(list<reg_exp_t>::iterator cit = e->children.begin(); cit != e->children.end(); ++cit)
         onSpline |= markSpline(*cit);
+      if(e->type == Updatable)
+       onSpline = true; 
       if(onSpline)
         spline.insert(ekey, e);
       return onSpline;
@@ -1773,11 +1780,10 @@ namespace wali {
 
     long RegExpDag::countFrontier()
     {
-      visited.clear();
-      spline.clear();
       markSpline();
+      visited.clear();
       long count = 0;
-      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcesses.begin(); rit != rootsAccrossSatProcesses.end(); ++rit)
+      for(reg_exp_hash_t::const_iterator rit = rootsAcrossSatProcesses.begin(); rit != rootsAcrossSatProcesses.end(); ++rit)
         count += countFrontier(rit->second);
       return count;
     }
@@ -1811,7 +1817,7 @@ namespace wali {
     {
       long total = 0;
       visited.clear();
-      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcesses.begin(); rit != rootsAccrossSatProcesses.end(); ++rit)
+      for(reg_exp_hash_t::const_iterator rit = rootsAcrossSatProcesses.begin(); rit != rootsAcrossSatProcesses.end(); ++rit)
         total += countTotalLeaves(rit->second);
       return total;
     }
@@ -1835,7 +1841,7 @@ namespace wali {
     {
       long total = 0;
       visited.clear();
-      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcesses.begin(); rit != rootsAccrossSatProcesses.end(); ++rit)
+      for(reg_exp_hash_t::const_iterator rit = rootsAcrossSatProcesses.begin(); rit != rootsAcrossSatProcesses.end(); ++rit)
         total += countTotalCombines(rit->second);
       return total;
     }
@@ -1859,7 +1865,7 @@ namespace wali {
     {
       long total = 0;
       visited.clear();
-      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcesses.begin(); rit != rootsAccrossSatProcesses.end(); ++rit){
+      for(reg_exp_hash_t::const_iterator rit = rootsAcrossSatProcesses.begin(); rit != rootsAcrossSatProcesses.end(); ++rit){
         total += countTotalExtends(rit->second);
       }
       return total;
@@ -1884,7 +1890,7 @@ namespace wali {
     {
       long total = 0;
       visited.clear();
-      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcesses.begin(); rit != rootsAccrossSatProcesses.end(); ++rit)
+      for(reg_exp_hash_t::const_iterator rit = rootsAcrossSatProcesses.begin(); rit != rootsAcrossSatProcesses.end(); ++rit)
         total += countTotalStars(rit->second);
       return total;
     }
@@ -1910,7 +1916,7 @@ namespace wali {
       for(vector<reg_exp_t>::const_iterator cit = exceptions.begin(); cit != exceptions.end(); ++cit)
         excludeFromCountReachable(*cit);
       long total = 0;
-      for(reg_exp_hash_t::const_iterator cit = rootsAccrossSatProcesses.begin(); cit != rootsAccrossSatProcesses.end(); ++cit)
+      for(reg_exp_hash_t::const_iterator cit = rootsAcrossSatProcesses.begin(); cit != rootsAcrossSatProcesses.end(); ++cit)
         total += countTotalNodes(cit->second);
       return total;
     }
@@ -1930,7 +1936,7 @@ namespace wali {
     {
       long total = 0;
       visited.clear();
-      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcesses.begin(); rit != rootsAccrossSatProcesses.end(); ++rit){
+      for(reg_exp_hash_t::const_iterator rit = rootsAcrossSatProcesses.begin(); rit != rootsAcrossSatProcesses.end(); ++rit){
         total += countTotalNodes(rit->second);
       }
       return total;
@@ -1956,7 +1962,7 @@ namespace wali {
     // If not, a circular path has no root.
     void RegExpDag::sanitizeRootsAcrossSatProcesses()
     {
-      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcesses.begin(); rit != rootsAccrossSatProcesses.end(); ++rit){
+      for(reg_exp_hash_t::const_iterator rit = rootsAcrossSatProcesses.begin(); rit != rootsAcrossSatProcesses.end(); ++rit){
         visited.clear();
         reg_exp_t const e = rit->second;
         reg_exp_key_t ekey(e->type, e);
@@ -1973,7 +1979,7 @@ namespace wali {
       if(it != visited.end())
         return;
       visited.insert(ekey, e);      
-      rootsAccrossSatProcesses.erase(ekey);
+      rootsAcrossSatProcesses.erase(ekey);
       for(list<reg_exp_t>::iterator cit = e->children.begin(); cit != e->children.end(); ++cit)
         removeDagFromRoots(*cit);
     }

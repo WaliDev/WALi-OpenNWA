@@ -917,16 +917,12 @@ namespace wali {
 
 
       STAT(stats.ndom_sequence = path_sequence.size());
-      return;
-
 #elif REGEXP_METHOD==1
       // Dominator
       domRegExp(nodes, nnodes, edges, nedges, path_sequence);
       buildRegExp(path_sequence);
 
       STAT(stats.ndom_sequence = path_sequence.size());
-      return;
-
 #elif REGEXP_METHOD==2
 
       // Dominator version + regexp compression and huffman-height minimization
@@ -941,8 +937,6 @@ namespace wali {
         nodes[nno].regexp = dag->minimize_height(temp, cache);
         cache.clear();
       }
-      return;
-
 #elif REGEXP_METHOD==3
 
       // Dominators with compression
@@ -955,8 +949,6 @@ namespace wali {
         int nno = *nit;
         nodes[nno].regexp = cnodes[orig_to_compress[nno]].regexp;
       }
-      return;
-
 #elif REGEXP_METHOD==4
 
       // Cutset version
@@ -974,13 +966,10 @@ namespace wali {
         int nno = *nit;
         nodes[nno].regexp = cnodes[orig_to_compress[nno]].regexp;
       }
-      return;
-
 #elif REGEXP_METHOD==6
 
       // O(n^3) method
       basicRegExp(compress_regexp);
-
 #endif // REGEXP_METHOD
 
       // All edges now have regexp. 

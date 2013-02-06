@@ -482,7 +482,7 @@ namespace wali {
             reg_exp_hash_t rootsInSatProcess;
             // Also remember the set of all roots created
             // This is used for diagnostic purposes
-            reg_exp_hash_t rootsAccrossSatProcesses;
+            reg_exp_hash_t rootsAcrossSatProcesses;
             // Set of reg_exp nodes that label some IntraGraphEdge
             reg_exp_hash_t edgeLabels;
 
