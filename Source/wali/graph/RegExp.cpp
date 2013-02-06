@@ -589,7 +589,22 @@ namespace wali {
             }
         };
 
-        reg_exp_t RegExpDag::minimize_height(reg_exp_t r, reg_exp_cache_t &cache) {
+        // This is a wrapper to manipulate the roots data structure only once
+        // per call to minimize_height
+        reg_exp_t RegExpDag::minimize_height(reg_exp_t r, reg_exp_cache_t& cache) 
+        {
+          reg_exp_t res = _minimize_height(r,cache);
+          // If r was a root, replace it with res
+          reg_exp_key_t delKey(r->type, r);
+          if(roots.find(delKey) != roots.end()){
+            roots.erase(delKey);
+            reg_exp_key_t insKey(res->type, res);
+            roots.insert(insKey, res);
+          }
+          return res;
+        }
+
+        reg_exp_t RegExpDag::_minimize_height(reg_exp_t r, reg_exp_cache_t &cache) {
             reg_exp_cache_t::iterator cpos = cache.find(r);
             if(cpos != cache.end()) {
                 return cpos->second;
@@ -724,16 +739,30 @@ namespace wali {
                 temp = list1; list1 = list2; list2 = temp;
             }
             reg_exp_t ans = list1->front();
-
 #endif
             cache[r] = ans;
             return ans;
 
         }
 
+        // This is a wrapper around _compress to manipulate the roots
+        // hashmap only once per call to compress
+        reg_exp_t RegExpDag::compress(reg_exp_t r, reg_exp_cache_t &cache) 
+        {
+          reg_exp_t res = _compress(r,cache);
+          // If r was a root, replace it with res
+          reg_exp_key_t delKey(r->type, r);
+          if(roots.find(delKey) != roots.end()){
+            roots.erase(delKey);
+            reg_exp_key_t insKey(res->type, res);
+            roots.insert(insKey, res);
+          }
+          return res;
+        }
+
         // precond: Extend and Combine have 2 successsors and Star has 1
         // postcond: r is not changed
-        reg_exp_t RegExpDag::compress(reg_exp_t r, reg_exp_cache_t &cache) {
+        reg_exp_t RegExpDag::_compress(reg_exp_t r, reg_exp_cache_t &cache) {
             reg_exp_cache_t::iterator cpos = cache.find(r);
             if(cpos != cache.end()) {
                 return cpos->second;

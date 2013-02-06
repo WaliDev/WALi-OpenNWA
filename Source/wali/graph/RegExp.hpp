@@ -374,59 +374,61 @@ namespace wali {
             void excludeFromCountReachable(reg_exp_t const e);
             long countTotalNodes(reg_exp_t const e);
 
+            reg_exp_t _minimize_height(reg_exp_t r, reg_exp_cache_t &cache);
+            reg_exp_t compressExtend(reg_exp_t r1, reg_exp_t r2);
+            reg_exp_t compressCombine(reg_exp_t r1, reg_exp_t r2);
+            reg_exp_t _compress(reg_exp_t r, reg_exp_cache_t &cache);
 
             /**
              * Functions copied from RegExp (used to be static)
              **/
           public:
-                reg_exp_t star(reg_exp_t r);
-                reg_exp_t extend(reg_exp_t r1, reg_exp_t r2);
-                reg_exp_t combine(std::list<reg_exp_t>& rlist);
-                reg_exp_t combine(reg_exp_t r1, reg_exp_t r2);
-                reg_exp_t constant(sem_elem_t se);
-                void startSatProcess(const sem_elem_t se);
-                void stopSatProcess();
+            reg_exp_t star(reg_exp_t r);
+            reg_exp_t extend(reg_exp_t r1, reg_exp_t r2);
+            reg_exp_t combine(std::list<reg_exp_t>& rlist);
+            reg_exp_t combine(reg_exp_t r1, reg_exp_t r2);
+            reg_exp_t constant(sem_elem_t se);
+            void startSatProcess(const sem_elem_t se);
+            void stopSatProcess();
 
-                reg_exp_t updatable(node_no_t nno, sem_elem_t se);
-                reg_exp_t compress(reg_exp_t r, reg_exp_cache_t &cache);
-                reg_exp_t minimize_height(reg_exp_t r, reg_exp_cache_t &cache);
-                size_t getNextUpdatableNumber() {
-                    return updatable_nodes.size();
-                }
-                void update(node_no_t nno, sem_elem_t se);
-                void update(std::vector<node_no_t> nnos, std::vector<sem_elem_t> ses);
+            reg_exp_t updatable(node_no_t nno, sem_elem_t se);
+            reg_exp_t compress(reg_exp_t r, reg_exp_cache_t &cache);
+            reg_exp_t minimize_height(reg_exp_t r, reg_exp_cache_t &cache);
+            size_t getNextUpdatableNumber() {
+              return updatable_nodes.size();
+            }
+            void update(node_no_t nno, sem_elem_t se);
+            void update(std::vector<node_no_t> nnos, std::vector<sem_elem_t> ses);
 
-                int out_node_height(set<RegExp *> reg_equations);
-                void evaluateRoots();
-                const reg_exp_hash_t& getRoots();
+            int out_node_height(set<RegExp *> reg_equations);
+            void evaluateRoots();
+            const reg_exp_hash_t& getRoots();
 
-                reg_exp_t compressExtend(reg_exp_t r1, reg_exp_t r2);
-                reg_exp_t compressCombine(reg_exp_t r1, reg_exp_t r2);
 
-                ostream &print_stats(ostream & out) {
-                    out << stats;
-                    return out;
-                }
+            ostream &print_stats(ostream & out) {
+              out << stats;
+              return out;
+            }
 
-                void extendDirectionBackwards(bool b) {
-                    extend_backwards = b;
-                }
+            void extendDirectionBackwards(bool b) {
+              extend_backwards = b;
+            }
 
-                void saturationComplete() {
-                    saturation_complete = true;
-                }
+            void saturationComplete() {
+              saturation_complete = true;
+            }
 
-                void executingPoststar(bool f) {
-                    executing_poststar = f;
-                }
+            void executingPoststar(bool f) {
+              executing_poststar = f;
+            }
 
-                void topDownEval(bool f) {
-                    top_down_eval = f;
-                }
+            void topDownEval(bool f) {
+              top_down_eval = f;
+            }
 
-                RegExpStats get_stats() {
-                    return stats;
-                }
+            RegExpStats get_stats() {
+              return stats;
+            }
 
           private:
             reg_exp_hash_t visited;
@@ -437,26 +439,26 @@ namespace wali {
              * Data copied from RegExp (used to be static)
              **/
           private:
-                bool saturation_complete;
-                bool executing_poststar;
-                bool initialized;
-                bool top_down_eval;
-            
-                vector<reg_exp_t> updatable_nodes;
+            bool saturation_complete;
+            bool executing_poststar;
+            bool initialized;
+            bool top_down_eval;
 
-                vector<RegExpSatProcess> satProcesses;
-                long unsigned int currentSatProcess;
+            vector<reg_exp_t> updatable_nodes;
 
-                bool extend_backwards;
-                reg_exp_hash_t reg_exp_hash;
-                const_reg_exp_hash_t const_reg_exp_hash;
-                // Remember what Regular Experessions are the root of the tree
-                // in the current Saturation phase. This is reset between saturation
-                // phases.
-                // Note that constant RegExps never go in this map.
-                reg_exp_hash_t roots;
-                RegExpStats stats;
-                reg_exp_t reg_exp_zero, reg_exp_one;
+            vector<RegExpSatProcess> satProcesses;
+            long unsigned int currentSatProcess;
+
+            bool extend_backwards;
+            reg_exp_hash_t reg_exp_hash;
+            const_reg_exp_hash_t const_reg_exp_hash;
+            // Remember what Regular Experessions are the root of the tree
+            // in the current Saturation phase. This is reset between saturation
+            // phases.
+            // Note that constant RegExps never go in this map.
+            reg_exp_hash_t roots;
+            RegExpStats stats;
+            reg_exp_t reg_exp_zero, reg_exp_one;
         };
 
     } // namespace graph
