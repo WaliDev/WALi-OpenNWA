@@ -326,6 +326,10 @@ namespace wali {
             RegExpDag();
             ~RegExpDag();
           public:
+            // ///////////////////////////////////////////////////////
+            // RegExp dag diagnositcs.
+            // Whenever this information is available, it is available across
+            // calls to startSatProcess / stopSatProcess.
             /**
              * Count the total number of active nodes in the RegExp graph
              **/
@@ -345,7 +349,7 @@ namespace wali {
             long countExcept(std::vector<reg_exp_t>& exceptions);
 
             /**
-             * Print information about the structure of the RegExp:
+             * Print information about the structure of the RegExp dag:
              *   Spline: is a path from a root to an updatable node.
              *   Frontier: is the set of children of nodes on a Spline that are
              *   not themselves on a spline.
@@ -455,8 +459,11 @@ namespace wali {
             // Remember what Regular Experessions are the root of the tree
             // in the current Saturation phase. This is reset between saturation
             // phases.
-            // Note that constant RegExps never go in this map.
-            reg_exp_hash_t roots;
+            reg_exp_hash_t rootsInSatProcess;
+            // Also remember the set of all roots created
+            // This is used for diagnostic purposes
+            reg_exp_hash_t rootsAccrossSatProcesses;
+            reg_exp_hash_t 
             RegExpStats stats;
             reg_exp_t reg_exp_zero, reg_exp_one;
         };

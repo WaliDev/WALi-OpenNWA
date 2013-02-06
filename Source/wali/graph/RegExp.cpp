@@ -36,7 +36,7 @@ namespace wali {
             if(updatable_nodes.size() > nno) {
               // This node will likely get used now.
               reg_exp_key_t insKey(updatable_nodes[nno]->type, updatable_nodes[nno]);
-              roots.insert(insKey, updatable_nodes[nno]);
+              rootsInSatProcess.insert(insKey, updatable_nodes[nno]);
               return updatable_nodes[nno];
             }
             for(size_t i = updatable_nodes.size(); i < nno; i++) {
@@ -48,7 +48,7 @@ namespace wali {
             // Create the desired updatable node, and add it to roots
             reg_exp_t r = new RegExp(currentSatProcess, this, nno, se);
             reg_exp_key_t insKey(r->type, r);
-            roots.insert(insKey, r);
+            rootsInSatProcess.insert(insKey, r);
             updatable_nodes.push_back(r);
             return updatable_nodes[nno];
         }
@@ -347,10 +347,10 @@ namespace wali {
             // Manipulate the set of root nodes.
             // remove r from roots.
             reg_exp_key_t delkey(r->type, r);
-            roots.erase(delkey);
+            rootsInSatProcess.erase(delkey);
             // Add the new regexp to roots
             reg_exp_key_t inskey(res->type, res);
-            roots.insert(inskey, res);           
+            rootsInSatProcess.insert(inskey, res);           
 
             return res;
 #else // REGEXP_CACHING
@@ -371,10 +371,10 @@ namespace wali {
                 // Manipulate the set of root nodes.
                 // remove r from roots.
                 reg_exp_key_t delkey(r->type, r);
-                roots.erase(delkey);
+                rootsInSatProcess.erase(delkey);
                 // Add the new regexp to roots
                 reg_exp_key_t inskey(res->type, res);
-                roots.insert(inskey, res);           
+                rootsInSatProcess.insert(inskey, res);           
 
                 STAT(stats.hashmap_misses++);
                 return res;
@@ -410,12 +410,12 @@ namespace wali {
             // Manipulate the set of root nodes.
             // remove r1,r2 from roots.
             reg_exp_key_t del1key(r1->type, r1);
-            roots.erase(del1key);
+            rootsInSatProcess.erase(del1key);
             reg_exp_key_t del2key(r2->type, r2);
-            roots.erase(del2key);
+            rootsInSatProcess.erase(del2key);
             // Add the new regexp to roots
             reg_exp_key_t inskey(res->type, res);
-            roots.insert(inskey, res);           
+            rootsInSatProcess.insert(inskey, res);           
 
             return res;
 #else
@@ -434,12 +434,12 @@ namespace wali {
                     // Manipulate the set of root nodes.
                     // remove r1,r2 from roots.
                     reg_exp_key_t del1key(r1->type, r1);
-                    roots.erase(del1key);
+                    rootsInSatProcess.erase(del1key);
                     reg_exp_key_t del2key(r2->type, r2);
-                    roots.erase(del2key);
+                    rootsInSatProcess.erase(del2key);
                     // Add the new regexp to roots
                     reg_exp_key_t inskey(res->type, res);
-                    roots.insert(inskey, res);           
+                    rootsInSatProcess.insert(inskey, res);           
 
                     STAT(stats.hashmap_misses++);
                     return res;
@@ -467,12 +467,12 @@ namespace wali {
             // Manipulate the set of root nodes.
             // remove r1,r2 from roots.
             reg_exp_key_t del1key(r1->type, r1);
-            roots.erase(del1key);
+            rootsInSatProcess.erase(del1key);
             reg_exp_key_t del2key(r2->type, r2);
-            roots.erase(del2key);
+            rootsInSatProcess.erase(del2key);
             // Add the new regexp to roots
             reg_exp_key_t inskey(res->type, res);
-            roots.insert(inskey, res);           
+            rootsInSatProcess.insert(inskey, res);           
 
             return res;
 #else
@@ -490,12 +490,12 @@ namespace wali {
                 // Manipulate the set of root nodes.
                 // remove r1,r2 from roots.
                 reg_exp_key_t del1key(r1->type, r1);
-                roots.erase(del1key);
+                rootsInSatProcess.erase(del1key);
                 reg_exp_key_t del2key(r2->type, r2);
-                roots.erase(del2key);
+                rootsInSatProcess.erase(del2key);
                 // Add the new regexp to roots
                 reg_exp_key_t inskey(res->type, res);
-                roots.insert(inskey, res);           
+                rootsInSatProcess.insert(inskey, res);           
 
                 STAT(stats.hashmap_misses++);
                 return res;
@@ -511,7 +511,7 @@ namespace wali {
 #ifndef REGEXP_CACHING
             reg_exp_t res = new RegExp(currentSatProcess, this, se);
             reg_exp_key_t insKey(res->type, res);
-            roots.insert(insKey, res);
+            rootsInSatProcess.insert(insKey, res);
             return res;
 #else
             if(se->equal(se->one()))
@@ -522,7 +522,7 @@ namespace wali {
                 reg_exp_t res = new RegExp(currentSatProcess, this, se);
                 const_reg_exp_hash.insert(se, res);
                 reg_exp_key_t insKey(res->type, res);
-                roots.insert(insKey, res);
+                rootsInSatProcess.insert(insKey, res);
                 return res;
             }
             return it->second;
@@ -542,15 +542,18 @@ namespace wali {
           reg_exp_hash.clear();
           const_reg_exp_hash.clear();
           // The set of root nodes is cleared between saturation phases.
-          roots.clear();
+          // but only after transferring the set to rootsAcrossSatProcesses
+          for(reg_exp_hash_t::iterator it = rootsInSatProcess.begin(); it != rootsInSatProcess.end(); ++it)
+            rootsAccrossSatProcess.insert(it->first, it->second);
+          rootsInSatProcess.clear();
           updatable_nodes.clear();
          
           reg_exp_zero = new RegExp(currentSatProcess, this, se->zero());
           reg_exp_key_t insZeroKey(reg_exp_zero->type, reg_exp_zero);
-          roots.insert(insZeroKey, reg_exp_zero);
+          rootsInSatProcess.insert(insZeroKey, reg_exp_zero);
           reg_exp_one = new RegExp(currentSatProcess, this, se->one());
           reg_exp_key_t insOneKey(reg_exp_one->type, reg_exp_one);
-          roots.insert(insOneKey, reg_exp_one);
+          rootsInSatProcess.insert(insOneKey, reg_exp_one);
           saturation_complete = false;
           executing_poststar = true;
         }
@@ -568,7 +571,7 @@ namespace wali {
 
         const reg_exp_hash_t& RegExpDag::getRoots()
         {
-          return roots;
+          return rootsInSatProcess;
         }
 
         // a = a union b
@@ -596,10 +599,10 @@ namespace wali {
           reg_exp_t res = _minimize_height(r,cache);
           // If r was a root, replace it with res
           reg_exp_key_t delKey(r->type, r);
-          if(roots.find(delKey) != roots.end()){
-            roots.erase(delKey);
+          if(rootsInSatProcess.find(delKey) != rootsInSatProcess.end()){
+            rootsInSatProcess.erase(delKey);
             reg_exp_key_t insKey(res->type, res);
-            roots.insert(insKey, res);
+            rootsInSatProcess.insert(insKey, res);
           }
           return res;
         }
@@ -752,10 +755,10 @@ namespace wali {
           reg_exp_t res = _compress(r,cache);
           // If r was a root, replace it with res
           reg_exp_key_t delKey(r->type, r);
-          if(roots.find(delKey) != roots.end()){
-            roots.erase(delKey);
+          if(rootsInSatProcess.find(delKey) != rootsInSatProcess.end()){
+            rootsInSatProcess.erase(delKey);
             reg_exp_key_t insKey(res->type, res);
-            roots.insert(insKey, res);
+            rootsInSatProcess.insert(insKey, res);
           }
           return res;
         }
@@ -1115,8 +1118,8 @@ namespace wali {
 
         void RegExpDag::evaluateRoots()
         {
-          const reg_exp_hash_t& roots = getRoots();
-          for(reg_exp_hash_t::const_iterator iter = roots.begin(); iter != roots.end(); ++iter){
+          const reg_exp_hash_t& rootsInSatProcess = getRoots();
+          for(reg_exp_hash_t::const_iterator iter = rootsInSatProcess.begin(); iter != rootsInSatProcess.end(); ++iter){
             reg_exp_t regexp = iter->second;
 #if defined(PUSH_EVAL)
             if(!regexp->dirty)
@@ -1675,7 +1678,7 @@ namespace wali {
         extend_backwards = false;
         reg_exp_hash.clear();
         const_reg_exp_hash.clear();
-        roots.clear();
+        rootsInSatProcess.clear();
         stats.reset();
         reg_exp_one = NULL;
         reg_exp_zero = NULL;
@@ -1710,7 +1713,7 @@ namespace wali {
     {
       long max = 0;
       height.clear();
-      for(reg_exp_hash_t::const_iterator rit = roots.begin(); rit != roots.end(); ++rit){
+      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcessesbegin(); rit != rootsAccrossSatProcessesend(); ++rit){
         long cur = countTotalLeaves(rit->second);
         max = cur > max ? cur : max;
       }
@@ -1746,7 +1749,7 @@ namespace wali {
     {
       visited.clear();
       spline.clear();
-      for(reg_exp_hash_t::const_iterator rit = roots.begin(); rit != roots.end(); ++rit)
+      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcessesbegin(); rit != rootsAccrossSatProcessesend(); ++rit)
         markSpline(rit->second);
     }
 
@@ -1774,7 +1777,7 @@ namespace wali {
       spline.clear();
       markSpline();
       long count = 0;
-      for(reg_exp_hash_t::const_iterator rit = roots.begin(); rit != roots.end(); ++rit)
+      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcessesbegin(); rit != rootsAccrossSatProcessesend(); ++rit)
         count += countFrontier(rit->second);
       return count;
     }
@@ -1808,7 +1811,7 @@ namespace wali {
     {
       long total = 0;
       visited.clear();
-      for(reg_exp_hash_t::const_iterator rit = roots.begin(); rit != roots.end(); ++rit)
+      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcessesbegin(); rit != rootsAccrossSatProcessesend(); ++rit)
         total += countTotalLeaves(rit->second);
       return total;
     }
@@ -1832,7 +1835,7 @@ namespace wali {
     {
       long total = 0;
       visited.clear();
-      for(reg_exp_hash_t::const_iterator rit = roots.begin(); rit != roots.end(); ++rit)
+      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcessesbegin(); rit != rootsAccrossSatProcessesend(); ++rit)
         total += countTotalCombines(rit->second);
       return total;
     }
@@ -1856,7 +1859,7 @@ namespace wali {
     {
       long total = 0;
       visited.clear();
-      for(reg_exp_hash_t::const_iterator rit = roots.begin(); rit != roots.end(); ++rit){
+      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcessesbegin(); rit != rootsAccrossSatProcessesend(); ++rit){
         total += countTotalExtends(rit->second);
       }
       return total;
@@ -1881,7 +1884,7 @@ namespace wali {
     {
       long total = 0;
       visited.clear();
-      for(reg_exp_hash_t::const_iterator rit = roots.begin(); rit != roots.end(); ++rit)
+      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcessesbegin(); rit != rootsAccrossSatProcessesend(); ++rit)
         total += countTotalStars(rit->second);
       return total;
     }
@@ -1907,7 +1910,7 @@ namespace wali {
       for(vector<reg_exp_t>::const_iterator cit = exceptions.begin(); cit != exceptions.end(); ++cit)
         excludeFromCountReachable(*cit);
       long total = 0;
-      for(reg_exp_hash_t::const_iterator cit = roots.begin(); cit != roots.end(); ++cit)
+      for(reg_exp_hash_t::const_iterator cit = rootsAccrossSatProcessesbegin(); cit != rootsAccrossSatProcessesend(); ++cit)
         total += countTotalNodes(cit->second);
       return total;
     }
@@ -1927,7 +1930,7 @@ namespace wali {
     {
       long total = 0;
       visited.clear();
-      for(reg_exp_hash_t::const_iterator rit = roots.begin(); rit != roots.end(); ++rit){
+      for(reg_exp_hash_t::const_iterator rit = rootsAccrossSatProcessesbegin(); rit != rootsAccrossSatProcessesend(); ++rit){
         total += countTotalNodes(rit->second);
       }
       return total;
