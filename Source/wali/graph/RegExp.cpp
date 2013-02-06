@@ -34,12 +34,22 @@ namespace wali {
             }
 
             if(updatable_nodes.size() > nno) {
+              // This node will likely get used now.
+              reg_exp_key_t insKey(updatable_nodes[nno]->type, updatable_nodes[nno]);
+              roots.insert(insKey, updatable_nodes[nno]);
               return updatable_nodes[nno];
             }
             for(size_t i = updatable_nodes.size(); i < nno; i++) {
-              updatable_nodes.push_back(new RegExp(currentSatProcess, this, i,se->zero()));
+              // These nodes are being created proactively. They aren't referenced in the 
+              // graphs yet, so don't add them to roots.
+              RegExp * r = new RegExp(currentSatProcess, this, i,se->zero());
+              updatable_nodes.push_back(r);
             }
-            updatable_nodes.push_back(new RegExp(currentSatProcess, this, nno, se));
+            // Create the desired updatable node, and add it to roots
+            reg_exp_t r = new RegExp(currentSatProcess, this, nno, se);
+            reg_exp_key_t insKey(r->type, r);
+            roots.insert(insKey, r);
+            updatable_nodes.push_back(r);
             return updatable_nodes[nno];
         }
 
@@ -329,12 +339,11 @@ namespace wali {
                 return r;
             }
 #ifndef REGEXP_CACHING
-            if(r->type == Constant) {
-                if(r->value->equal(r->value->zero())) {
-                    return new RegExp(currentSatProcess, this, r->value->one());
-                }
-            }
-            reg_exp_t res = new RegExp(currentSatProcess, this, Star, r);
+            reg_exp_t res;
+            if(r->type == Constant && r->value->equal(r->value->zero()))
+              res = new RegExp(currentSatProcess, this, r->value->one());
+            else 
+              res = new RegExp(currentSatProcess, this, Star, r);
             // Manipulate the set of root nodes.
             // remove r from roots.
             reg_exp_key_t delkey(r->type, r);
@@ -500,7 +509,10 @@ namespace wali {
             if(se->equal(se->zero()))
                 return reg_exp_zero;
 #ifndef REGEXP_CACHING
-            return new RegExp(currentSatProcess, this, se);
+            reg_exp_t res = new RegExp(currentSatProcess, this, se);
+            reg_exp_key_t insKey(res->type, res);
+            roots.insert(insKey, res);
+            return res;
 #else
             if(se->equal(se->one()))
                 return reg_exp_one;
@@ -509,6 +521,8 @@ namespace wali {
             if(it == const_reg_exp_hash.end()) {
                 reg_exp_t res = new RegExp(currentSatProcess, this, se);
                 const_reg_exp_hash.insert(se, res);
+                reg_exp_key_t insKey(res->type, res);
+                roots.insert(insKey, res);
                 return res;
             }
             return it->second;
@@ -530,9 +544,13 @@ namespace wali {
           // The set of root nodes is cleared between saturation phases.
           roots.clear();
           updatable_nodes.clear();
-          
+         
           reg_exp_zero = new RegExp(currentSatProcess, this, se->zero());
+          reg_exp_key_t insZeroKey(reg_exp_zero->type, reg_exp_zero);
+          roots.insert(insZeroKey, reg_exp_zero);
           reg_exp_one = new RegExp(currentSatProcess, this, se->one());
+          reg_exp_key_t insOneKey(reg_exp_one->type, reg_exp_one);
+          roots.insert(insOneKey, reg_exp_one);
           saturation_complete = false;
           executing_poststar = true;
         }
@@ -604,10 +622,9 @@ namespace wali {
                 cache[r] = res;
                 return res;
             }
+
             // Now r->type == Extend
-
 #define MINIMIZE_HEIGHT 2
-
 #if MINIMIZE_HEIGHT==1 // Commutative Huffman-style tree
             list<reg_exp_t>::iterator it;
             multiset< heap_t, cmp_heap_t > heap;
@@ -634,7 +651,6 @@ namespace wali {
             }
 
             reg_exp_t ans = (*heap.begin()).second;
-
 #elif MINIMIZE_HEIGHT==2 // Non-Commutative Huffman-style tree
             list<reg_exp_t>::iterator it;
             list<reg_exp_t> heap;
@@ -679,7 +695,6 @@ namespace wali {
             }
 
             reg_exp_t ans = heap.front();
-
 #elif MINIMIZE_HEIGHT==3 // Binary tree
             list<reg_exp_t>::iterator it, next_it;
             list<reg_exp_t> *list1 = new list<reg_exp_t>;
