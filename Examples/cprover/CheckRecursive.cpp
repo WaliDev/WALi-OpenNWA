@@ -37,26 +37,32 @@ void printLoop(ProcStack& path){
     loop.pop();
   }
 }
-bool dfs(ProcSet& visited, ProcSet& onPath, ProcStack path, proc * p)
+
+void collectReachable(proc * p, ProcSet& reachable)
+{
+  if(reachable.find(p) != reachable.end())
+    return;
+  reachable.insert(p);
+  for(ProcSet::iterator pit = callees[p].begin(); pit != callees[p].end(); ++pit)
+    collectReachable(*pit, reachable);
+}
+
+void dfs(ProcSet& visited, ProcSet& onPath, ProcSet& loopHeads, proc * p)
 {
   if(onPath.find(p) != onPath.end()){
-    path.push(p);
-    printLoop(path);
-    return true;
+    loopHeads.insert(p);
+    return;
   }
   if(visited.find(p) != visited.end())
-    return false;
+    return;
   onPath.insert(p);
-  path.push(p);
   visited.insert(p);
   if(callees.find(p) == callees.end())
-    return false;
+    return;
   for(ProcSet::iterator pit = callees[p].begin(); pit != callees[p].end(); ++pit)
-    if(dfs(visited, onPath, path, *pit))
-      return true;
+    dfs(visited, onPath, loopHeads, *pit);
   onPath.erase(p);
-  path.pop();
-  return false;
+  return;
 }
 
 int main(int argc, char ** argv)
@@ -101,22 +107,24 @@ int main(int argc, char ** argv)
 
   ProcSet visited;
   ProcSet onPath;
-  ProcStack path;
-
-  bool rec = dfs(visited,onPath,path,main);
-  if(!rec)
+  ProcSet loopHeads;
+  dfs(visited,onPath,loopHeads,main);
+  if(loopHeads.size() == 0)
     cout << "Program not recursive" << endl;
-
-/*
-  for(Callees::iterator it = callees.begin(); it != callees.end(); ++it){
-    ProcSet& m = it->second;
-    cout << it->first->f << ":" << endl; 
-    for(ProcSet::iterator pit = m.begin(); pit != m.end(); ++pit){
-      cout << "  " << (*pit)->f << endl;
-    }
+  else{
+    cout << "Program is recursive." << endl;
+    cout << "Loop Heads: " << endl;
+    for(ProcSet::const_iterator it = loopHeads.begin(); it != loopHeads.end(); ++it)
+      cout << (*it)->f << " ";
+    cout << endl;
+    ProcSet reachableFromMain, reachableFromLoopHeads;
+    collectReachable(main, reachableFromMain);
+    for(ProcSet::iterator it = loopHeads.begin(); it != loopHeads.end(); ++it)
+      collectReachable(*it, reachableFromLoopHeads);
+    cout << "\% procs in a recursive loop: " 
+      << 100 * double(reachableFromLoopHeads.size()) / double(reachableFromMain.size())
+      << endl;
   }
-*/
 
   deep_erase_prog(&pg);
-  return (int) rec;
 }
