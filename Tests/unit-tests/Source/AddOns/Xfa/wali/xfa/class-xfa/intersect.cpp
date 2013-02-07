@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "fixtures.hpp"
+#include <boost/tuple/tuple.hpp>
 
 using namespace wali::xfa;
 
@@ -105,15 +106,13 @@ namespace wali {
             rxfa.wfa().epsilonCloseCached(getKey("q"), rcache);
         }
 
-        TEST(wali$xfa$Xfa$intersect, Battery)
+
+        std::pair<std::map<std::string, std::vector<Xfa> >,
+                  std::map<std::string, std::vector<Xfa> > >
+        produce_xfas(BinaryRelation zero,
+                     Relations const & left_relations,
+                     Relations const & right_relations)
         {
-            XfaContext context;
-            Relations left_relations(context.voc, "left");
-            Relations right_relations(context.voc, "right");
-
-            BinaryRelation zero = left_relations.false_;
-            ASSERT_TRUE(zero->equal(right_relations.false_.get_ptr()));
-
             std::map<std::string, std::vector<Xfa>> left_xfas, right_xfas;
 
             left_xfas["{}"].push_back(TrivialEmptyXfa(zero).xfa);
@@ -138,7 +137,23 @@ namespace wali {
             REGISTER_XFA("{a}",    AlternativePathImpossible);
             REGISTER_XFA("{}",     EmptyByImpossibleDataTransitionEpsilon);
             REGISTER_XFA("{eps}",  SingleSimpleTransEpsilon);
+#undef REGISTER_XFA
 
+            return std::make_pair(left_xfas, right_xfas);
+        }
+        
+
+        TEST(wali$xfa$Xfa$intersect, Battery)
+        {
+            XfaContext context;
+            Relations left_relations(context.voc, "left");
+            Relations right_relations(context.voc, "right");
+
+            BinaryRelation zero = left_relations.false_;
+            ASSERT_TRUE(zero->equal(right_relations.false_.get_ptr()));
+
+            std::map<std::string, std::vector<Xfa>> left_xfas, right_xfas;
+            boost::tie(left_xfas, right_xfas) = produce_xfas(zero, left_relations, right_relations);
 
             // Sanity check: every language should be the same.
             for (auto left_map_iter = left_xfas.begin(); left_map_iter != left_xfas.end(); ++left_map_iter) {
