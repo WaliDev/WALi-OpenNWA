@@ -351,12 +351,12 @@ namespace wali
       //
       //               dummy
       //   p_state --------------> ((query_accept))
-      //        \  \                 -+
-      //         \  \ S             /
+      //        \  \               --+
+      //         \  \ S             /|
       //          \  \             /
       //           \  \           / source
-      //            \  \         /
-      //            -+ -+       /
+      //            \| \|        /
+      //           --+ -+       /
       //          (p_state, source)
       //
       // for each 'source' in 'sources' and lots of symbols 'S' -- which are
