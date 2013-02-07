@@ -92,11 +92,11 @@ namespace wali {
 
                 // This marks the currently held regexp as labelling an edge.
                 // Used by RegExpDag to collect the set of regexp nodes that label edges.
-                bool markEdgeLabel()
+                bool markLabel()
                 {
                   if(regexp == NULL)
                     return false;
-                  dag->markAsEdgeLabel(regexp);
+                  dag->markAsLabel(regexp);
                   return true;
                 }
         };
@@ -115,6 +115,11 @@ namespace wali {
 
         class IntraGraphNode {
             public:
+              /**
+               * The context in which the regular expressions are to be generated.
+               * IntraGraphNode does not own this. 
+               **/
+                RegExpDag * dag;         
                 Transition trans;
                 int node_no; // Node number in the IntraGraph node array (-1 if not in the array)
                 node_type type;
@@ -128,9 +133,9 @@ namespace wali {
                 sem_elem_t weight;
                 std::set<int> dependentEdges; 
 
-                IntraGraphNode() : trans(0,0,0), node_no(-1), type(None), weight(NULL){ } // creates a fake node
-                IntraGraphNode(int nno, node_type ty = None) : trans(0,0,0), node_no(nno), type(ty), iscutset(false), visited(0), scc_number(0), weight(NULL) {}
-                IntraGraphNode(const IntraGraphNode &n) : trans(n.trans), node_no(n.node_no), type(n.type), outgoing(n.outgoing), incoming(n.incoming), 
+                IntraGraphNode(RegExpDag * d) : dag(d), trans(0,0,0), node_no(-1), type(None), weight(NULL){ } // creates a fake node
+                IntraGraphNode(RegExpDag * d, int nno, node_type ty = None) : dag(d), trans(0,0,0), node_no(nno), type(ty), iscutset(false), visited(0), scc_number(0), weight(NULL) {}
+                IntraGraphNode(const IntraGraphNode &n) : dag(n.dag), trans(n.trans), node_no(n.node_no), type(n.type), outgoing(n.outgoing), incoming(n.incoming), 
                 regexp(n.regexp), iscutset(n.iscutset), visited(n.visited), scc_number(n.scc_number), weight(n.weight) 
                 {
                   for(std::set<int>::const_iterator iter = n.dependentEdges.begin(); iter != n.dependentEdges.end(); ++iter)
@@ -148,6 +153,15 @@ namespace wali {
                 void addDependentEdge(int e)
                 {
                   dependentEdges.insert(e);
+                }
+                // This marks the currently held regexp as labelling a node.
+                // Used by RegExpDag to collect the set of regexp nodes that label nodes.
+                bool markLabel()
+                {
+                  if(regexp == NULL)
+                    return false;
+                  dag->markAsLabel(regexp);
+                  return true;
                 }
         };
 
@@ -246,7 +260,7 @@ namespace wali {
             public:
             IntraGraph(RegExpDag * d, bool pre, sem_elem_t _se, SharedMemBuffer * m = NULL) : 
               dag(d), 
-              nodes(50),               
+              nodes(50, IntraGraphNode(dag)),  
               edges(50, IntraGraphEdge(dag)),
               memBuf(m)
             {
@@ -363,7 +377,7 @@ namespace wali {
             void solveRegSummarySolution();
             void preSolveRegSummarySolution();
             
-            void markEdgeLabels();
+            void markLabels();
         };
 
     } // namespace graph

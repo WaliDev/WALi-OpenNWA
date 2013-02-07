@@ -1696,7 +1696,7 @@ namespace wali {
      long height = getHeight();
      long splines = countSpline();
      long frontiers = countFrontier();
-     long edgels = edgeLabels.size();
+     long graphls = graphLabels.size();
      long roots = rootsAcrossSatProcesses.size();
 
      cout << "RegExp statistics:" << endl;
@@ -1704,11 +1704,11 @@ namespace wali {
      cout << "#Leaves: " << leaves << endl;
      cout << "#Spline: " << splines << endl;
      cout << "#Frontiers: " << frontiers << endl;
-     cout << "#Edge Labels: " << edgels << endl;
+     cout << "#Edge Labels: " << graphls << endl;
      if(nodes > 0){
        cout << "Spline/nodes %: " << ((double) splines * 100) / ((double) nodes) << endl;
        cout << "Frontier/nodes %: " << ((double) frontiers * 100) / ((double) nodes) << endl;
-       cout << "label nodes/nodes %: " << ((double) edgels * 100) / ((double) nodes) << endl;
+       cout << "label nodes/nodes %: " << ((double) graphls * 100) / ((double) nodes) << endl;
        cout << "Height/log(nodes) %: " << ((double) height * 100) * log10(2)  / log10((double) nodes) << endl;
        cout << "roots/nodes %: " << ((double) roots * 100) /((double) nodes) << endl;
      }
@@ -1984,10 +1984,10 @@ namespace wali {
         removeDagFromRoots(*cit);
     }
 
-    void RegExpDag::markAsEdgeLabel(reg_exp_t e)
+    void RegExpDag::markAsLabel(reg_exp_t e)
     {
       reg_exp_key_t ekey(e->type, e);
-      edgeLabels.insert(ekey,e);
+      graphLabels.insert(ekey,e);
     }
 
     } // namespace graph

@@ -376,7 +376,7 @@ namespace wali {
 
              // Add a reg_exp_t to the set of regular expressions labelling some
              // IntraGraphEdge. Used only for diagnostic purposes.
-             void markAsEdgeLabel(reg_exp_t r);
+             void markAsLabel(reg_exp_t r);
                
                
           private:
@@ -484,7 +484,7 @@ namespace wali {
             // This is used for diagnostic purposes
             reg_exp_hash_t rootsAcrossSatProcesses;
             // Set of reg_exp nodes that label some IntraGraphEdge
-            reg_exp_hash_t edgeLabels;
+            reg_exp_hash_t graphLabels;
 
             RegExpStats stats;
             reg_exp_t reg_exp_zero, reg_exp_one;

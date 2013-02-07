@@ -24,7 +24,7 @@ namespace wali {
 
     void IntraGraph::create_node(Transition &t, int a) {
       int n = nodes.size();
-      if(n <= a) nodes.resize(2*a);
+      if(n <= a) nodes.resize(2*a, IntraGraphNode(dag));
       int i;
       for(i=nnodes;i<=a;i++) {
         nodes[i].set(i);
@@ -974,7 +974,7 @@ namespace wali {
 
       // All edges now have regexp. 
       // Tel RegExpDag what regexp are used as labels
-      markEdgeLabels();
+      markLabels();
     }
 
     sem_elem_t IntraGraph::extend(sem_elem_t w1, sem_elem_t w2) {
@@ -1733,10 +1733,10 @@ namespace wali {
       }
     }
 
-    void IntraGraph::markEdgeLabels()
+    void IntraGraph::markLabels()
     {
-      for(int i=0; i < nedges; ++i)
-        edges[i].markEdgeLabel();
+      for(int i=0; i < nnodes; ++i)
+        nodes[i].markLabel();
     }
   } // namespace graph
 } // namespace wali
