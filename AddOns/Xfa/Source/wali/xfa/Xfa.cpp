@@ -1,5 +1,8 @@
 #include "Xfa.hpp"
 
+#include <wali/SemElemPair.hpp>
+#include <wali/domains/SemElemSet.hpp>
+
 #include <buddy/fdd.h>
 
 namespace {
@@ -286,18 +289,28 @@ namespace wali {
 
 
         bool
-        transformer_accepts(bdd exists_relation,
-                            bdd accept_exists_prime,
-                            bdd forall_relation,
-                            bdd accept_forall_prime)
+        transformer_accepts(sem_elem_t weight)
         {
-            // forall (l, l', r, r') in R.  ~accept_L(l')     [uncomplemented]
-            // and exists (l, l', r, r') in R. accept_R(r')
-            bdd
-                forall_check = bdd_imp(forall_relation, accept_forall_prime),
-                exists_check = exists_relation & accept_exists_prime;
+            SemElemPair
+                * weight_down = dynamic_cast<SemElemPair*>(weight.get_ptr());
 
-            return (forall_check == bddtrue) && (exists_check != bddfalse);
+            sem_elem_t
+                weight_exists = weight_down->get_first(),
+                weight_forall = weight_down->get_second();
+
+            // The exist half just needs to be non-zero. This means that
+            // there is some path to any data configuration. The forall half
+            // must be zero: this means that there is NO path to any data
+            // configuration.
+            //
+            // This assumes that the weight on the final state is 1;
+            // otherwise we would have to do an intersection or something.
+
+            bool
+                exists_is_zero = weight_exists->equal(weight_exists->zero()),
+                forall_is_zero = weight_forall->equal(weight_forall->zero());
+
+            return !exists_is_zero && forall_is_zero;
         }
 
 
@@ -324,86 +337,70 @@ namespace wali {
         }
 
 
-        std::pair<binrel_t, binrel_t>
-	getNonsubsumedElements(BinRel * left_rel,
-                               BinRel * right_rel,
-                               bdd left,
-                               bdd right,
-                               BddContext const * context,
-			       std::vector<std::string> const & left_vars_to_ignore,
-                               std::vector<std::string> const & right_vars_to_ignore)
-	{
-	    bdd
-                left_ignore = to_bdd_variable_set(left_vars_to_ignore, *context),
-                right_ignore = to_bdd_variable_set(right_vars_to_ignore, *context),
-		left_keep = bdd_exist(left, left_ignore),
-		right_keep = bdd_exist(right, right_ignore);
-
-	    if (wali::domains::binrel::details::bddImplies(left_keep, right_keep)
-		|| wali::domains::binrel::details::bddImplies(right_keep, left_keep))
-	    {
-		std::vector<bdd> ans;
-		ans.push_back(left | right);
-		return std::make_pair(new BinRel(context, left | right),
-                                      static_cast<BinRel*>(NULL));
-	    }
-	    else
-	    {
-		return std::make_pair(left_rel, right_rel);
-	    }
-        }
-
-        
-        struct
-        XfaContainSetSubsume
+        std::pair<sem_elem_t, sem_elem_t>
+        asymmetric_pair_keep_minimal(sem_elem_t left, sem_elem_t right)
         {
-            std::vector<std::string> const & left_vocab_;
-            std::vector<std::string> const & right_vocab_;
+            SemElemPair
+                * left_down = dynamic_cast<SemElemPair*>(left.get_ptr()),
+                * right_down = dynamic_cast<SemElemPair*>(right.get_ptr());
 
-            XfaContainSetSubsume(std::vector<std::string> const & left_vocab,
-                                 std::vector<std::string> const & right_vocab)
-                : left_vocab_(left_vocab)
-                , right_vocab_(right_vocab)
-            {}
-            
-            
-            std::pair<sem_elem_t, sem_elem_t>
-            operator() (sem_elem_t left, sem_elem_t right) const
+            sem_elem_t
+                left_exists = left_down->get_first(),
+                left_forall = left_down->get_second(),
+                right_exists = right_down->get_first(),
+                right_forall = right_down->get_second(),
+                null;
+
+            // left <= right if
+            //  * left exists >= right exists
+            //  * left forall <= right forall
+            if (right_exists->underApproximates(left_exists)
+                && left_forall->underApproximates(right_forall))
             {
-                BinRel
-                    * left_down = dynamic_cast<BinRel*>(left.get_ptr()),
-                    * right_down = dynamic_cast<BinRel*>(right.get_ptr());
-
-                bdd
-                    left_bdd = left_down->getBdd(),
-                    right_bdd = right_down->getBdd();
-
-                BddContext const * context = &(left_down->getVocabulary());
-                assert(context = &(right_down->getVocabulary()));
-                
-                std::vector<std::string> a, b;
-
-                return getNonsubsumedElements(left_down, right_down,
-                                              left_bdd, right_bdd,
-                                              context,
-                                              right_vocab_, left_vocab_); // switched because this is what is going to be IGNORED
+                // Keeping minimal, so we keep left.
+                return std::pair<sem_elem_t, sem_elem_t>(left, null);
             }
-        };
+
+            // right <= left if
+            //  * right exists >= left exists
+            //  * right forall <= left forall
+            if (left_exists->underApproximates(right_exists)
+                && right_forall->underApproximates(left_forall))
+            {
+                // Keeping minimal, so we keep right.
+                return std::pair<sem_elem_t, sem_elem_t>(right, null);
+            }
+
+            // Neither subsumes the other, so return both
+            return std::make_pair(left, right);
+        }
 
 
         bool
-        language_contains(Xfa const & left, std::vector<std::string> const & left_vocab,
-                          Xfa const & right, std::vector<std::string> const & right_vocab)
+        language_contains(Xfa const & left, Xfa const & right)
         {
-            XfaContainSetSubsume subsumption(left_vocab, right_vocab);
-
+            typedef domains::SemElemSet::ElementSet ElementSet;
+            
             Xfa const & intersected = left.intersect(right);
 
-            wali::wfa::WFA::AccessibleStateSetMap reaching_weights =
-                intersected.wfa().computeAllReachingWeights(SemElemSet::KeepMinimalElements);
+            wali::wfa::WFA::AccessibleStateSetMap reached_states =
+                intersected.wfa().computeAllReachingWeights(domains::SemElemSet::KeepMinimalElements);
 
-            
-            bdd_accepts(reaching
+            std::set<State> const & finals = intersected.getFinalStates();
+            for(std::set<State>::const_iterator final = finals.begin();
+                final != finals.end(); ++final)
+            {
+                ElementSet const & reached_weights = reached_states[final->key];
+                for (ElementSet::const_iterator final_weight = reached_weights.begin();
+                     final_weight != reached_weights.end(); ++final_weight)
+                {
+                    if (transformer_accepts(*final_weight)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
     }
@@ -411,3 +408,9 @@ namespace wali {
 
 
         
+// Yo emacs!
+// Local Variables:
+//     c-file-style: "ellemtel"
+//     c-basic-offset: 4
+//     indent-tabs-mode: nil
+// End:
