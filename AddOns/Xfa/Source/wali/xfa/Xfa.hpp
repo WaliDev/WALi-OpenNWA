@@ -238,8 +238,8 @@ namespace wali {
             Xfa
             intersect(Xfa const & other) const {
                 Xfa output;
-                details::IntersectionWeightMaker maker;
-                this->wfa_.intersect(maker, other.wfa_, output.wfa_);
+                //details::IntersectionWeightMaker maker;
+                this->wfa_.intersect(other.wfa_, output.wfa_);
                 return output;
             }
         };
@@ -395,6 +395,10 @@ namespace wali {
                                    ) CPP11_OVERRIDE;
         };
         
+        bool
+        language_contains(Xfa const & left, Xfa const & right,
+                          wali::domains::binrel::ProgramBddContext const & voc);
+
     }
 }
 

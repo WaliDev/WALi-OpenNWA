@@ -377,20 +377,27 @@ namespace wali {
 
 
         bool
-        language_contains(Xfa const & left, Xfa const & right)
+        language_contains(Xfa const & left, Xfa const & right,
+                          wali::domains::binrel::ProgramBddContext const & voc)
         {
             typedef domains::SemElemSet::ElementSet ElementSet;
+
+            IntroduceStateToRelationWeightGen r_det_weight_gen(voc, right, "right_");
+            wali::wfa::WFA right_det = right.semideterminize();
             
-            Xfa const & intersected = left.intersect(right);
+            IntroduceStateToRelationWeightGen l_det_weight_gen(voc, left, "left_");
+            wali::wfa::WFA left_det = left.semideterminize();
+
+            wali::wfa::WFA intersected = left_det.intersect(right_det);
 
             wali::wfa::WFA::AccessibleStateSetMap reached_states =
-                intersected.wfa().computeAllReachingWeights(domains::SemElemSet::KeepMinimalElements);
+                intersected.computeAllReachingWeights(domains::SemElemSet::KeepMinimalElements);
 
-            std::set<State> const & finals = intersected.getFinalStates();
-            for(std::set<State>::const_iterator final = finals.begin();
+            std::set<Key> const & finals = intersected.getFinalStates();
+            for(std::set<Key>::const_iterator final = finals.begin();
                 final != finals.end(); ++final)
             {
-                ElementSet const & reached_weights = reached_states[final->key];
+                ElementSet const & reached_weights = reached_states[*final];
                 for (ElementSet::const_iterator final_weight = reached_weights.begin();
                      final_weight != reached_weights.end(); ++final_weight)
                 {
