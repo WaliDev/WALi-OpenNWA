@@ -1714,7 +1714,7 @@ namespace wali {
       cout << "#Spline: " << splines << endl;
       cout << "#Frontiers: " << frontiers << endl;
       cout << "#Labels: " << graphls << endl;
-      cout << "#Labels ^ Roots: " << rootsNgraphls;
+      cout << "#Labels ^ Roots: " << rootsNgraphls << endl;
       if(nodes > 0){
         cout << "Spline/nodes %: " << ((double) splines * 100) / ((double) nodes) << endl;
         cout << "Frontier/nodes %: " << ((double) frontiers * 100) / ((double) nodes) << endl;
