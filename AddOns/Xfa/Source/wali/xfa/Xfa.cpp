@@ -1,5 +1,7 @@
 #include "Xfa.hpp"
 
+#include <buddy/fdd.h>
+
 namespace {
 
     bool include_all_vocabularies(wali::domains::binrel::VectorVocabulary const & UNUSED_PARAMETER(v))
@@ -281,7 +283,129 @@ namespace wali {
             // Third step: combine them together
             return new BinRel(&new_voc, renamed_bdd & state_change);
         }
+
+
+        bool
+        transformer_accepts(bdd exists_relation,
+                            bdd accept_exists_prime,
+                            bdd forall_relation,
+                            bdd accept_forall_prime)
+        {
+            // forall (l, l', r, r') in R.  ~accept_L(l')     [uncomplemented]
+            // and exists (l, l', r, r') in R. accept_R(r')
+            bdd
+                forall_check = bdd_imp(forall_relation, accept_forall_prime),
+                exists_check = exists_relation & accept_exists_prime;
+
+            return (forall_check == bddtrue) && (exists_check != bddfalse);
+        }
+
+
+        bdd
+        to_bdd_variable_set(std::vector<std::string> const & vars,
+                            BddContext const & context)
+        {
+            bdd result = bddtrue;
+            for (size_t i=0; i<vars.size(); ++i) {
+                assert(context.find(vars[i]) != context.end());
+                bddinfo_t info = context.find(vars[i])->second;
+                result = result
+                    & fdd_ithset(info->baseLhs)
+                    & fdd_ithset(info->baseRhs)
+                    & fdd_ithset(info->baseExtra)
+                    & fdd_ithset(info->tensor1Lhs)
+                    & fdd_ithset(info->tensor1Rhs)
+                    & fdd_ithset(info->tensor1Extra)
+                    & fdd_ithset(info->tensor2Lhs)
+                    & fdd_ithset(info->tensor2Rhs)
+                    & fdd_ithset(info->tensor2Extra);
+            }
+            return result;
+        }
+
+
+        std::pair<binrel_t, binrel_t>
+	getNonsubsumedElements(BinRel * left_rel,
+                               BinRel * right_rel,
+                               bdd left,
+                               bdd right,
+                               BddContext const * context,
+			       std::vector<std::string> const & left_vars_to_ignore,
+                               std::vector<std::string> const & right_vars_to_ignore)
+	{
+	    bdd
+                left_ignore = to_bdd_variable_set(left_vars_to_ignore, *context),
+                right_ignore = to_bdd_variable_set(right_vars_to_ignore, *context),
+		left_keep = bdd_exist(left, left_ignore),
+		right_keep = bdd_exist(right, right_ignore);
+
+	    if (wali::domains::binrel::details::bddImplies(left_keep, right_keep)
+		|| wali::domains::binrel::details::bddImplies(right_keep, left_keep))
+	    {
+		std::vector<bdd> ans;
+		ans.push_back(left | right);
+		return std::make_pair(new BinRel(context, left | right),
+                                      static_cast<BinRel*>(NULL));
+	    }
+	    else
+	    {
+		return std::make_pair(left_rel, right_rel);
+	    }
+        }
+
         
+        struct
+        XfaContainSetSubsume
+        {
+            std::vector<std::string> const & left_vocab_;
+            std::vector<std::string> const & right_vocab_;
+
+            XfaContainSetSubsume(std::vector<std::string> const & left_vocab,
+                                 std::vector<std::string> const & right_vocab)
+                : left_vocab_(left_vocab)
+                , right_vocab_(right_vocab)
+            {}
+            
+            
+            std::pair<sem_elem_t, sem_elem_t>
+            operator() (sem_elem_t left, sem_elem_t right) const
+            {
+                BinRel
+                    * left_down = dynamic_cast<BinRel*>(left.get_ptr()),
+                    * right_down = dynamic_cast<BinRel*>(right.get_ptr());
+
+                bdd
+                    left_bdd = left_down->getBdd(),
+                    right_bdd = right_down->getBdd();
+
+                BddContext const * context = &(left_down->getVocabulary());
+                assert(context = &(right_down->getVocabulary()));
+                
+                std::vector<std::string> a, b;
+
+                return getNonsubsumedElements(left_down, right_down,
+                                              left_bdd, right_bdd,
+                                              context,
+                                              right_vocab_, left_vocab_); // switched because this is what is going to be IGNORED
+            }
+        };
+
+
+        bool
+        language_contains(Xfa const & left, std::vector<std::string> const & left_vocab,
+                          Xfa const & right, std::vector<std::string> const & right_vocab)
+        {
+            XfaContainSetSubsume subsumption(left_vocab, right_vocab);
+
+            Xfa const & intersected = left.intersect(right);
+
+            wali::wfa::WFA::AccessibleStateSetMap reaching_weights =
+                intersected.wfa().computeAllReachingWeights(SemElemSet::KeepMinimalElements);
+
+            
+            bdd_accepts(reaching
+        }
+
     }
 }
 
