@@ -1691,27 +1691,38 @@ namespace wali {
 
     void RegExpDag::printStructureInformation()
     {
-     long nodes = countTotalNodes();
-     long leaves = countTotalLeaves();
-     long height = getHeight();
-     long splines = countSpline();
-     long frontiers = countFrontier();
-     long graphls = graphLabels.size();
-     long roots = rootsAcrossSatProcesses.size();
+      long nodes = countTotalNodes();
+      long leaves = countTotalLeaves();
+      long height = getHeight();
+      long splines = countSpline();
+      long frontiers = countFrontier();
+      long graphls = graphLabels.size();
+      long roots = rootsAcrossSatProcesses.size();
 
-     cout << "RegExp statistics:" << endl;
-     cout << "#Nodes: " << nodes << endl;
-     cout << "#Leaves: " << leaves << endl;
-     cout << "#Spline: " << splines << endl;
-     cout << "#Frontiers: " << frontiers << endl;
-     cout << "#Edge Labels: " << graphls << endl;
-     if(nodes > 0){
-       cout << "Spline/nodes %: " << ((double) splines * 100) / ((double) nodes) << endl;
-       cout << "Frontier/nodes %: " << ((double) frontiers * 100) / ((double) nodes) << endl;
-       cout << "label nodes/nodes %: " << ((double) graphls * 100) / ((double) nodes) << endl;
-       cout << "Height/log(nodes) %: " << ((double) height * 100) * log10(2)  / log10((double) nodes) << endl;
-       cout << "roots/nodes %: " << ((double) roots * 100) /((double) nodes) << endl;
-     }
+      // Find roots that are also labels
+      reg_exp_hash_t rootsThatAreLabels;
+      for(reg_exp_hash_t::iterator it = rootsAcrossSatProcesses.begin();
+          it != rootsAcrossSatProcesses.end();
+          ++it)
+        if(graphLabels.find(it->first) != graphLabels.end())
+          rootsThatAreLabels[it->first] = it->second;
+      long rootsNgraphls = rootsThatAreLabels.size();
+
+      cout << "RegExp statistics:" << endl;
+      cout << "#Nodes: " << nodes << endl;
+      cout << "#Leaves: " << leaves << endl;
+      cout << "#Spline: " << splines << endl;
+      cout << "#Frontiers: " << frontiers << endl;
+      cout << "#Labels: " << graphls << endl;
+      cout << "#Labels ^ Roots: " << rootsNgraphls;
+      if(nodes > 0){
+        cout << "Spline/nodes %: " << ((double) splines * 100) / ((double) nodes) << endl;
+        cout << "Frontier/nodes %: " << ((double) frontiers * 100) / ((double) nodes) << endl;
+        cout << "label nodes/nodes %: " << ((double) graphls * 100) / ((double) nodes) << endl;
+        cout << "Height/log(nodes) %: " << ((double) height * 100) * log10(2)  / log10((double) nodes) << endl;
+        cout << "roots/nodes %: " << ((double) roots * 100) /((double) nodes) << endl;
+        cout << "(roots intersect labels)/nodes %: " << ((double) rootsNgraphls * 100) /((double) nodes) << endl;
+      }
     }
 
     long RegExpDag::getHeight()
