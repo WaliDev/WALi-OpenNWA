@@ -187,6 +187,12 @@ namespace wali {
             private:
 
             /**
+             * Under the mixed strategy of Newton method for saturation, 
+             * is this graph labelled with tensored weights?
+             **/
+            bool hasTensoredWeights;
+
+            /**
              * The context in which all regular expressions are to be created.
              * This is usually shared by all IntraGraphs. Allocation/Deallocation is
              * the responsibility of InterGraph
@@ -259,6 +265,7 @@ namespace wali {
             }
             public:
             IntraGraph(RegExpDag * d, bool pre, sem_elem_t _se, SharedMemBuffer * m = NULL) : 
+              hasTensoredWeights(false),
               dag(d), 
               nodes(50, IntraGraphNode(dag)),  
               edges(50, IntraGraphEdge(dag)),
