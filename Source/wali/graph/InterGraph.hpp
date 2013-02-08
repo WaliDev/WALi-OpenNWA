@@ -215,6 +215,7 @@ namespace wali {
             std::list<IntraGraph *> gr_list;
             std::list<IntraGraph *> linear_gr_list;
 
+            bool isOutputAutomatonTensored;
             IntraGraph * newtonGr; //to be removed
 
             bool runningNewton;
@@ -269,6 +270,10 @@ namespace wali {
             bool path_summary(int state, int stack, int accept, WT_CORRECT correct, WT_CHECK op);
 
             bool exists(Transition &t);
+
+            bool isOutputTensored(){
+              return isOutputAutomatonTensored;
+            }
 
             int nGraphs() {
               return (int)gr_list.size();

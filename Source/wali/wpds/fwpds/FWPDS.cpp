@@ -533,7 +533,11 @@ void FWPDS::poststar_handle_trans(
   }
 }
 
-
+bool FWPDS::isOutputTensored()
+{
+  if(interGr != NULL)
+    return interGr->isOutputTensored();
+}
 
 ////////////////////////////////////////////
 // These guys take care of LazyTrans stuff

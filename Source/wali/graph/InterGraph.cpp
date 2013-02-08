@@ -175,6 +175,7 @@ namespace wali {
           runningNewton = false;
           dag = new RegExpDag();
           count = 0;
+          isOutputAutomatonTensored = false;
         }
 
         InterGraph::~InterGraph() {
@@ -958,13 +959,36 @@ namespace wali {
               maxNewtonRounds = numRounds > maxNewtonRounds ? numRounds : maxNewtonRounds;
               totNewtonRounds += numRounds;
 #endif
-              // The next SCC will use another sat procss phase.
+              // The next SCC will use another sat process phase.
               dag->stopSatProcess();
             }
           }
-          // Before saying you're done, tensor the weights lying around as call rule weights so that
-          // path summary will see tensored weights.
-          eHandler.tensorAllWeights();
+
+          // It is time to decide whether the output automaton should have
+          // tensored weights or not.
+          // Currently, we will decide by counting the number of edges in the
+          // output automaton (i.e. the number of IntraGraph nodes that have
+          // tensored/non-tensored weights, and then switching at some
+          // ciritical ratio (decided emprically)
+          int totTensoredNodes=0, totNonTensoredNodes=0;
+          for(std::list<IntraGraph*>::iterator gr_it = linear_gr_list.begin(); gr_it != linear_gr_list.end(); ++gr_it){
+            IntraGraph * graph = *gr_it;
+            if(graph->hasTensoredWeights)
+              totTensoredNodes += graph->nnodes;
+            else
+              totNonTensoredNodes += graph->nnodes;
+          }
+          if(totTensoredNodes == 0 || ((float)totNonTensoredNodes)/((float)totTensoredNodes) > 0.33)
+            isOutputAutomatonTensored = true;
+          //XXX:HACK
+          isOutputAutomatonTensored = true; //override
+          cerr << "Warning: overriding to OutputAutomatonTensored\n";
+
+          if(isOutputAutomatonTensored){
+            // Before saying you're done, tensor the weights lying around as call rule weights so that
+            // path summary will see tensored weights.
+            eHandler.tensorAllWeights();
+          }
 
 #if defined(PPP_DBG) && PPP_DBG >= 0
           dag->sanitizeRootsAcrossSatProcesses();
@@ -1353,23 +1377,33 @@ namespace wali {
       return get_weight(n);
     }
 
-    sem_elem_t InterGraph::get_weight(unsigned n) {
+    sem_elem_t InterGraph::get_weight(unsigned n) 
+    {
       // check eHandler
       if(eHandler.exists(n)) {
         // This must be a return transition
         int nc;
         sem_elem_t wtCallRule = eHandler.get_dependency(n, nc);
-        sem_elem_t wt;
+        sem_elem_tensor_t wt;
         if(nc != -1) {
-          wt = nodes[nc].gr->get_weight(nodes[nc].intra_nodeno);
+          wt = dynamic_cast<SemElemTensor*>(nodes[nc].gr->get_weight(nodes[nc].intra_nodeno).get_ptr());
+          if(isOutputAutomatonTensored && ! nodes[nc].gr->hasTensoredWeights)
+            wt = tensorSetUpFP(wt,dynamic_cast<SemElemTensor*>(wt->one().get_ptr()));
+          if(! isOutputAutomatonTensored && nodes[nc].gr->hasTensoredWeights)
+            wt = wt->detensorTranspose();
         } else {
           // ESource
-          wt = wtCallRule->one();
+          wt = dynamic_cast<SemElemTensor*>(wtCallRule->one().get_ptr());
         }
-        return wt->extend(wtCallRule);
+        return wt->extend(wtCallRule.get_ptr());
       }
 
-      return nodes[n].gr->get_weight(nodes[n].intra_nodeno);
+      sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>(nodes[n].gr->get_weight(nodes[n].intra_nodeno).get_ptr());
+      if(isOutputAutomatonTensored && ! nodes[n].gr->hasTensoredWeights)
+        wt = tensorSetUpFP(wt,dynamic_cast<SemElemTensor*>(wt->one().get_ptr()));
+      if(! isOutputAutomatonTensored && nodes[n].gr->hasTensoredWeights)
+        wt = wt->detensorTranspose();
+      return wt;
     }
 
     void InterGraph::update_all_weights() {
