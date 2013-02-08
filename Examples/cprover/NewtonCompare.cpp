@@ -424,7 +424,8 @@ namespace goals {
     t->measureAndReport =false;
     doPostStar(npds, outfa);
     sem_elem_t wt = computePathSummary(npds, outfa);
-    wt = dynamic_cast<SemElemTensor*>(wt.get_ptr())->detensorTranspose().get_ptr();
+    if(npds->isOutputTensored())
+      wt = dynamic_cast<SemElemTensor*>(wt.get_ptr())->detensorTranspose().get_ptr();
     if(wt->equal(wt->zero()))
       cout << "[Newton Compare] NWPDS ==> error not reachable" << endl;
     else{

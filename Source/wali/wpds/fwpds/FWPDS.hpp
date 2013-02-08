@@ -59,7 +59,9 @@ namespace wali {
           ///Must be called before the graph based solvers are setup.
           ///So, call before calling poststar/prestar etc.
           void useNewton(bool set);
-
+          
+          // Newton can leave the output automaton with either tensored weights or not.
+          bool isOutputTensored();
           ////////////
           // add rules
           ////////////
