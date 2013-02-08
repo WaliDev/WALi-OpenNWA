@@ -688,9 +688,8 @@ namespace wali {
             SCCGraphs::iterator gr_it = gr_sorted.begin();
             sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>(sem_old->one().get_ptr());
             sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>((sem->zero()).get_ptr()); //sem is tensored
+            sem_elem_tensor_t zero = dynamic_cast<SemElemTensor*>((sem_old->zero()).get_ptr());
             for(unsigned scc_n = 1; scc_n <= max_scc_required; scc_n++) {
-              dag->startSatProcess(sem);
-
               ////////////////We will now create the Newton IntraGraph which will store the
               ////////////////actual weights, and from which RegExp will be generated.
               ////////////////This is the TDG for the linearized problem for the current SCC
@@ -711,146 +710,231 @@ namespace wali {
 
               //Reset gr_it
               gr_it = scc_head;
-              // Now add the myriad edges
+              // Determine if this SCC has a recursive call
+              bool isRecursive = false;
               while(gr_it != gr_sorted.end() && (*gr_it)->scc_number == scc_n){
                 scc_graph_t gr = *gr_it;
+                for(vector<HyperEdge>::iterator iter = gr->interEdges.begin(); iter != gr->interEdges.end(); ++iter){
+                  if(nodes[iter->src2].gr == graph){
+                    isRecursive = true;
+                    break;
+                  }                    
+                }
+                if(isRecursive)
+                  break;
+                gr_it++;
+              }
+              // Will the current graph have tensored weights?
+              graph->hasTensoredWeights = isRecursive;
+              
+              //Reset gr_it
+              gr_it = scc_head;
+              // Now add in the myriad edges.
+              if(isRecursive){
+                //Do Newton Magic
+                dag->startSatProcess(sem);
+                while(gr_it != gr_sorted.end() && (*gr_it)->scc_number == scc_n){
+                  scc_graph_t gr = *gr_it;
 
-                // Source nodes:
-                for(vector<int>::iterator iter = gr->nodes.begin(); iter != gr->nodes.end(); ++iter){
-                  int i = *iter;
-                  if(is_source_type(nodes[i].type)) {
-                    //This is a source node. 
-                    //Create an immutable edge with weight:
-                    //Post*:  w -> (w,1^T)
-                    sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>((nodes[i].weight).get_ptr());
+                  // Source nodes:
+                  for(vector<int>::iterator iter = gr->nodes.begin(); iter != gr->nodes.end(); ++iter){
+                    int i = *iter;
+                    if(is_source_type(nodes[i].type)) {
+                      //This is a source node. 
+                      //Create an immutable edge with weight:
+                      //Post*:  w -> (w,1^T)
+                      sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>((nodes[i].weight).get_ptr());
+                      sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());
+                      wt = tensorSetUpFP(wt,one);
+                      graph->setSource(nodes[i].intra_nodeno, wt);
+                    }
+                    // zero all weights (some are set by InterGraph::setSource() )
+                    if(nodes[i].weight.get_ptr() != NULL)
+                      nodes[i].weight = zerot;
+                  }
+
+                  // Intra Edges:
+                  for(vector<GraphEdge>::iterator iter = gr->intraEdges.begin(); iter != gr->intraEdges.end(); iter++){
+                    //This is an edge (src--w-->tgt)
+                    //Add an immutable edge src--w'-->tgt)
+                    // w' = (w,1^T)
+                    sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>((iter->weight).get_ptr());
                     sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());
                     wt = tensorSetUpFP(wt,one);
-                    graph->setSource(nodes[i].intra_nodeno, wt);
-                  }
-                  // zero all weights (some are set by InterGraph::setSource() )
-                  if(nodes[i].weight.get_ptr() != NULL)
-                    nodes[i].weight = zerot;
-                }
-
-                // Intra Edges:
-                for(vector<GraphEdge>::iterator iter = gr->intraEdges.begin(); iter != gr->intraEdges.end(); iter++){
-                  //This is an edge (src--w-->tgt)
-                  //Add an immutable edge src--w'-->tgt)
-                  // w' = (w,1^T)
-                  sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>((iter->weight).get_ptr());
-                  sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());
-                  wt = tensorSetUpFP(wt,one);
-                  graph->addEdge(nodes[iter->src].intra_nodeno, nodes[iter->tgt].intra_nodeno, wt);
-#if 0
-                  //Also add a mutable edge (s--f-->tgt) from the source vertex s with weight 0 (tensored) and
-                  //functional f = (DetTrans(wt(src)) x w,1^T) (one untensored)
-                  sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>(sem->zero().get_ptr());
-                  wt = dynamic_cast<SemElemTensor*>((iter->weight).get_ptr());
-                  functional_t f = 
-                    SemElemFunctional::tensor(
-                        SemElemFunctional::extend(
-                          SemElemFunctional::detensorTranspose(
-                            SemElemFunctional::in(nodes[iter->src].intra_nodeno)),
-                          SemElemFunctional::constant(wt)),
-                        SemElemFunctional::constant(one));
-                  int e = graph->setSource(nodes[iter->tgt].intra_nodeno, zerot, f);
-                  // Back references in the node to edges that depend on it.
-                  graph->addDependentEdge(e, nodes[iter->src].intra_nodeno);                  
-#endif
-                }
-                int trash; 
-                // Inter Edges:
-                for(vector<HyperEdge>::iterator iter = gr->interEdges.begin(); iter != gr->interEdges.end(); ++iter){
-
-                  //Obtain the weight on the call edge
-                  assert(eHandler.exists(iter->src1));                    
-                  sem_elem_tensor_t wtCallRule =
-                    dynamic_cast<SemElemTensor*>(eHandler.get_dependency(iter->src1,trash).get_ptr());
-                  assert(trash != -1);
-
-                  // src2 is the external source for a hyperedge
-                  if(nodes[iter->src2].gr != NULL && nodes[iter->src2].gr != graph){
-                    // Case: The entry node belongs to a graph that has a lower scc.
-                    // Treat this case as an intraedge
-
-                    //Add an immutable edge src1--w'-->tgt)
-                    // w' = (wtCallRule x DetTrans(wt(src2)), 1^T)
-                    sem_elem_t wtsrc2 = nodes[iter->src2].gr->getWeight(nodes[iter->src2].intra_nodeno);
-                    sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>(wtsrc2.get_ptr());
-                    wt = wt->detensorTranspose();
-                    wt = dynamic_cast<SemElemTensor*>(wtCallRule->extend(wt.get_ptr()).get_ptr());
-                    sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());                                     
-                    graph->addEdge(nodes[iter->src1].intra_nodeno, nodes[iter->tgt].intra_nodeno,
-                        tensorSetUpFP(wt,one));
+                    graph->addEdge(nodes[iter->src].intra_nodeno, nodes[iter->tgt].intra_nodeno, wt);
 #if 0
                     //Also add a mutable edge (s--f-->tgt) from the source vertex s with weight 0 (tensored) and
-                    //functional f = (DetTrans(wt(src1)) x (Constant(wtCallRule) x DetTrans(wt(src2))), 1^T) (one untensored)
+                    //functional f = (DetTrans(wt(src)) x w,1^T) (one untensored)
                     sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>(sem->zero().get_ptr());
+                    wt = dynamic_cast<SemElemTensor*>((iter->weight).get_ptr());
                     functional_t f = 
                       SemElemFunctional::tensor(
                           SemElemFunctional::extend(
                             SemElemFunctional::detensorTranspose(
-                              SemElemFunctional::in(nodes[iter->src1].intra_nodeno)),
+                              SemElemFunctional::in(nodes[iter->src].intra_nodeno)),
                             SemElemFunctional::constant(wt)),
                           SemElemFunctional::constant(one));
-                    int e = graph->setSource(nodes[iter->tgt].intra_nodeno, zerot, f);                    
+                    int e = graph->setSource(nodes[iter->tgt].intra_nodeno, zerot, f);
                     // Back references in the node to edges that depend on it.
-                    graph->addDependentEdge(e, nodes[iter->src1].intra_nodeno);
+                    graph->addDependentEdge(e, nodes[iter->src].intra_nodeno);                  
 #endif
-                  }else{
-                    // Case: The entry node does not belong to a graph that has a lower scc.
-                    // Note: It must belong to the same scc then
-                    assert(nodes[iter->src2].gr == graph);
+                  }
+                  int trash; 
+                  // Inter Edges:
+                  for(vector<HyperEdge>::iterator iter = gr->interEdges.begin(); iter != gr->interEdges.end(); ++iter){
 
-                    // Add mutable edge src1--f-->tgt with weight 0 (tensored) and
-                    // f = (Constant(callWt) x DetTrans(wt(src2)), 1^T)
-                    sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>(sem->zero().get_ptr());
-                    functional_t f = 
-                      SemElemFunctional::tensor(
-                          SemElemFunctional::extend(
-                            SemElemFunctional::constant(wtCallRule),
-                            SemElemFunctional::detensorTranspose(
-                              SemElemFunctional::in(nodes[iter->src2].intra_nodeno))),
-                          SemElemFunctional::constant(one));
-                    int e = graph->addEdge(nodes[iter->src1].intra_nodeno, nodes[iter->tgt].intra_nodeno, zerot, true, f);
-                    // Back references in the node to edges that depend on it.
-                    graph->addDependentEdge(e, nodes[iter->src2].intra_nodeno);
+                    //Obtain the weight on the call edge
+                    assert(eHandler.exists(iter->src1));                    
+                    sem_elem_tensor_t wtCallRule =
+                      dynamic_cast<SemElemTensor*>(eHandler.get_dependency(iter->src1,trash).get_ptr());
+                    assert(trash != -1);
 
-                    // Add mutable edge src2--f-->tgt with weight 0 (tensored) and
-                    // f = (1, (DetTrans(wt(src1)) x callWt)^T)
-                    f = 
-                      SemElemFunctional::tensor(
-                          SemElemFunctional::constant(one),
-                          SemElemFunctional::transpose(
+                    // src2 is the external source for a hyperedge
+                    if(nodes[iter->src2].gr != NULL && nodes[iter->src2].gr != graph){
+                      // Case: The entry node belongs to a graph that has a lower scc.
+                      // Treat this case as an intraedge
+
+
+                      //Add an immutable edge src1--w'-->tgt)
+                      // If the graph for src2 has tensoredWeights, then
+                      // w' = (wtCallRule x DetTrans(wt(src2)), 1^T)
+                      // If it has base weights, then
+                      // w' = (wtCallRule x wt(src2), 1^T)
+                      sem_elem_t wtsrc2 = nodes[iter->src2].gr->getWeight(nodes[iter->src2].intra_nodeno);
+                      sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>(wtsrc2.get_ptr());
+                      if(nodes[iter->src2].gr->hasTensoredWeights)
+                        wt = wt->detensorTranspose();
+                      wt = dynamic_cast<SemElemTensor*>(wtCallRule->extend(wt.get_ptr()).get_ptr());
+                      sem_elem_tensor_t one = dynamic_cast<SemElemTensor*>((wt->one()).get_ptr());                                     
+                      graph->addEdge(nodes[iter->src1].intra_nodeno, nodes[iter->tgt].intra_nodeno,
+                          tensorSetUpFP(wt,one));
+#if 0
+                      //Also add a mutable edge (s--f-->tgt) from the source vertex s with weight 0 (tensored) and
+                      //if graph for src2 has tensored weights, then
+                      //functional f = (DetTrans(wt(src1)) x (Constant(wtCallRule) x DetTrans(wt(src2))), 1^T) (one untensored)
+                      //else
+                      //functional f = (DetTrans(wt(src1)) x (Constant(wtCallRule) x DetTrans(wt(src2))), 1^T) (one untensored)
+                      sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>(sem->zero().get_ptr());
+                      functional_t f = 
+                        SemElemFunctional::tensor(
                             SemElemFunctional::extend(
                               SemElemFunctional::detensorTranspose(
                                 SemElemFunctional::in(nodes[iter->src1].intra_nodeno)),
-                              SemElemFunctional::constant(wtCallRule))));
-                    e = graph->addEdge(nodes[iter->src2].intra_nodeno, nodes[iter->tgt].intra_nodeno, zerot, true, f);
-                    // Back references in the node to edges that depend on it.
-                    graph->addDependentEdge(e, nodes[iter->src1].intra_nodeno);
+                              SemElemFunctional::constant(wt)),
+                            SemElemFunctional::constant(one));
+                      int e = graph->setSource(nodes[iter->tgt].intra_nodeno, zerot, f);                    
+                      // Back references in the node to edges that depend on it.
+                      graph->addDependentEdge(e, nodes[iter->src1].intra_nodeno);
+#endif
+                    }else{
+                      // Case: The entry node does not belong to a graph that has a lower scc.
+                      // Note: It must belong to the same scc then
+                      assert(nodes[iter->src2].gr == graph);
 
-                    // Add mutable edge s--f-->tgt from source node s with weight 0(tensored) and
-                    // f = (DetTrans(wt(src1)) x callWt x DetTrans(wt(src2)), 1^T)
-                    f =
-                      SemElemFunctional::tensor(
-                          SemElemFunctional::extend(
-                            SemElemFunctional::extend(                                
+                      // Add mutable edge src1--f-->tgt with weight 0 (tensored) and
+                      // f = (Constant(callWt) x DetTrans(wt(src2)), 1^T)
+                      sem_elem_tensor_t zerot = dynamic_cast<SemElemTensor*>(sem->zero().get_ptr());
+                      functional_t f = 
+                        SemElemFunctional::tensor(
+                            SemElemFunctional::extend(
+                              SemElemFunctional::constant(wtCallRule),
                               SemElemFunctional::detensorTranspose(
-                                SemElemFunctional::in(nodes[iter->src1].intra_nodeno)),
-                              SemElemFunctional::constant(wtCallRule)),
-                            SemElemFunctional::detensorTranspose(
-                              SemElemFunctional::in(nodes[iter->src2].intra_nodeno))),
-                          SemElemFunctional::constant(one));
-                    e = graph->setSource(nodes[iter->tgt].intra_nodeno, zerot, f);
-                    // Back references in the node to edges that depend on it.
-                    graph->addDependentEdge(e, nodes[iter->src1].intra_nodeno);
-                    graph->addDependentEdge(e, nodes[iter->src2].intra_nodeno);
+                                SemElemFunctional::in(nodes[iter->src2].intra_nodeno))),
+                            SemElemFunctional::constant(one));
+                      int e = graph->addEdge(nodes[iter->src1].intra_nodeno, nodes[iter->tgt].intra_nodeno, zerot, true, f);
+                      // Back references in the node to edges that depend on it.
+                      graph->addDependentEdge(e, nodes[iter->src2].intra_nodeno);
+
+                      // Add mutable edge src2--f-->tgt with weight 0 (tensored) and
+                      // f = (1, (DetTrans(wt(src1)) x callWt)^T)
+                      f = 
+                        SemElemFunctional::tensor(
+                            SemElemFunctional::constant(one),
+                            SemElemFunctional::transpose(
+                              SemElemFunctional::extend(
+                                SemElemFunctional::detensorTranspose(
+                                  SemElemFunctional::in(nodes[iter->src1].intra_nodeno)),
+                                SemElemFunctional::constant(wtCallRule))));
+                      e = graph->addEdge(nodes[iter->src2].intra_nodeno, nodes[iter->tgt].intra_nodeno, zerot, true, f);
+                      // Back references in the node to edges that depend on it.
+                      graph->addDependentEdge(e, nodes[iter->src1].intra_nodeno);
+
+                      // Add mutable edge s--f-->tgt from source node s with weight 0(tensored) and
+                      // f = (DetTrans(wt(src1)) x callWt x DetTrans(wt(src2)), 1^T)
+                      f =
+                        SemElemFunctional::tensor(
+                            SemElemFunctional::extend(
+                              SemElemFunctional::extend(                                
+                                SemElemFunctional::detensorTranspose(
+                                  SemElemFunctional::in(nodes[iter->src1].intra_nodeno)),
+                                SemElemFunctional::constant(wtCallRule)),
+                              SemElemFunctional::detensorTranspose(
+                                SemElemFunctional::in(nodes[iter->src2].intra_nodeno))),
+                            SemElemFunctional::constant(one));
+                      e = graph->setSource(nodes[iter->tgt].intra_nodeno, zerot, f);
+                      // Back references in the node to edges that depend on it.
+                      graph->addDependentEdge(e, nodes[iter->src1].intra_nodeno);
+                      graph->addDependentEdge(e, nodes[iter->src2].intra_nodeno);
+                    }
                   }
-                }
-              
-                gr_it++;
-              }              
+
+                  gr_it++;
+                }              
+              }else{
+                //Do Fwpds Magic
+                dag->startSatProcess(sem_old); //non tensored
+                while(gr_it != gr_sorted.end() && (*gr_it)->scc_number == scc_n){
+                  scc_graph_t gr = *gr_it;
+
+                  // Source nodes:
+                  for(vector<int>::iterator iter = gr->nodes.begin(); iter != gr->nodes.end(); ++iter){
+                    int i = *iter;
+                    if(is_source_type(nodes[i].type)) {
+                      //This is a source node. 
+                      //Create an immutable edge with weight w
+                      sem_elem_t wt = nodes[i].weight;
+                      graph->setSource(nodes[i].intra_nodeno, wt);
+                    }
+                    // zero all weights (some are set by InterGraph::setSource() )
+                    if(nodes[i].weight.get_ptr() != NULL)
+                      nodes[i].weight = zero;
+                  }
+
+                  // Intra Edges:
+                  for(vector<GraphEdge>::iterator iter = gr->intraEdges.begin(); iter != gr->intraEdges.end(); iter++){
+                    //This is an edge (src--w-->tgt)
+                    //Add an immutable edge src--w-->tgt)
+                    sem_elem_t wt = iter->weight;
+                    graph->addEdge(nodes[iter->src].intra_nodeno, nodes[iter->tgt].intra_nodeno, wt);
+                  }
+                  int trash; 
+                  // Inter Edges:
+                  for(vector<HyperEdge>::iterator iter = gr->interEdges.begin(); iter != gr->interEdges.end(); ++iter){
+                    // Obtain the weight on the call edge
+                    assert(eHandler.exists(iter->src1));                    
+                    sem_elem_tensor_t wtCallRule =
+                      dynamic_cast<SemElemTensor*>(eHandler.get_dependency(iter->src1,trash).get_ptr());
+                    assert(trash != -1);
+
+                    // src2 is the external source for a hyperedge. This can't be recursive, hence --
+                    assert(nodes[iter->src2].gr != NULL && nodes[iter->src2].gr != graph);
+                    // Treat this case as an intraedge
+
+                    // Add an immutable edge src1--w'-->tgt)
+                    // If the graph for src2 has tensoredWeights, then
+                    // w' = wtCallRule x DetTrans(wt(src2))
+                    // else
+                    // w' = wtCallRule x wt(src2)
+                    sem_elem_t wtsrc2 = nodes[iter->src2].gr->getWeight(nodes[iter->src2].intra_nodeno);
+                    sem_elem_tensor_t wt = dynamic_cast<SemElemTensor*>(wtsrc2.get_ptr());
+                    if(nodes[iter->src2].gr->hasTensoredWeights)
+                      wt = wt->detensorTranspose();
+                    wt = dynamic_cast<SemElemTensor*>(wtCallRule->extend(wt.get_ptr()).get_ptr());
+                    graph->addEdge(nodes[iter->src1].intra_nodeno, nodes[iter->tgt].intra_nodeno, wt);
+                  }
+                  gr_it++;
+                }              
+              }
               // Use Tarjan's path listing algorithm to generate regular expressions for nodes.
               graph->setupIntraSolution();
 
