@@ -154,7 +154,7 @@ void IntraGraph::compressGraphAggressive(list<int> &ts, vector<int> &cs,
     u = nodeno(cnodes[i]);
     for(j=0;j<(int)cnodes.size();j++) {
       v = nodeno(cnodes[j]);
-      IntraGraphEdge ed(i,j,temp[u][v],false);
+      IntraGraphEdge ed(dag, i,j,temp[u][v],false);
       for(k=0;k<m;k++) {
         w = cs[k];
         ed.weight = ed.weight->combine(extend(temp[u][w],temp[w][v]));
@@ -162,7 +162,7 @@ void IntraGraph::compressGraphAggressive(list<int> &ts, vector<int> &cs,
       }
       if(!ed.weight->equal(se->zero()) && !(i==j && ed.weight->equal(se->one()))) {
         //ed.weight->print(cout << i << "," << j << ":") << "\n";
-        ed.regexp = RegExp::constant(ed.weight);
+        ed.regexp = dag->constant(ed.weight);
         cedges.push_back(ed);
         int e = cedges.size() - 1;
         cnodes[i].outgoing.push_back(e);
@@ -314,10 +314,10 @@ void IntraGraph::compressGraph(list<int> &ts, vector<int> &cs,
     u = nodeno(cnodes[i]);
     for(j=0;j<(int)cnodes.size();j++) {
       v = nodeno(cnodes[j]);
-      IntraGraphEdge ed(i,j,temp[u][v],false);
+      IntraGraphEdge ed(dag, i,j,temp[u][v],false);
       if(!ed.weight->equal(se->zero()) && !(i==j && ed.weight->equal(se->one()))) {
         //ed.weight->print(cout << i << "," << j << ":") << "\n";
-        ed.regexp = RegExp::constant(ed.weight);
+        ed.regexp = dag->constant(ed.weight);
         cedges.push_back(ed);
         int e = cedges.size() - 1;
         cnodes[i].outgoing.push_back(e);
@@ -362,46 +362,46 @@ void IntraGraph::basicRegExp(bool compress_regexp) {
   for(i = 0; i < n; i++) {
     reg[i] = new reg_exp_t[n];
     for(j = 0; j < n; j++) {
-      reg[i][j] = RegExp::constant(se->zero());
+      reg[i][j] = dag->constant(se->zero());
     }
   }
   for(i = 0; i < m; i++) {
     if(edges[i].updatable) {
-      reg[edges[i].src][edges[i].tgt] = RegExp::combine(reg[edges[i].src][edges[i].tgt],
-                                                        RegExp::updatable(edges[i].updatable_no, edges[i].weight));
+      reg[edges[i].src][edges[i].tgt] = dag->combine(reg[edges[i].src][edges[i].tgt],
+                                                        dag->updatable(edges[i].updatable_no, edges[i].weight));
     } else {
-      reg[edges[i].src][edges[i].tgt] = RegExp::combine(reg[edges[i].src][edges[i].tgt],
-                                                        RegExp::constant(edges[i].weight));
+      reg[edges[i].src][edges[i].tgt] = dag->combine(reg[edges[i].src][edges[i].tgt],
+                                                        dag->constant(edges[i].weight));
     }
   }
     
   // construct the path sequence
   for(v = 0; v < n; v++) {
-    reg[v][v] = RegExp::star(reg[v][v]);
+    reg[v][v] = dag->star(reg[v][v]);
     for(u = v+1; u < n; u++) {
       if(reg[u][v]->isZero()) continue;
-      reg[u][v] = RegExp::extend(reg[u][v],reg[v][v]);
+      reg[u][v] = dag->extend(reg[u][v],reg[v][v]);
       for(w = v+1; w < n; w++) {
         if(reg[v][w]->isZero()) continue;
-        reg[u][w] = RegExp::combine(reg[u][w],RegExp::extend(reg[u][v],reg[v][w]));
+        reg[u][w] = dag->combine(reg[u][w],dag->extend(reg[u][v],reg[v][w]));
       }
     }
   }
 
   // initialize answer
   for(i = 1; i < n; i++) {
-    nodes[i].regexp = RegExp::constant(se->zero());
+    nodes[i].regexp = dag->constant(se->zero());
   }
-  nodes[0].regexp = RegExp::constant(se->one());
+  nodes[0].regexp = dag->constant(se->one());
   // now traverse the path sequence in order
   for(u = 0; u < n; u++) {
     for(w = u; w < n; w++) {
       if(w == u && reg[u][w]->isOne()) continue;
       if(reg[u][w]->isZero()) continue;
       if(u == w) {
-        nodes[u].regexp = RegExp::extend(nodes[u].regexp,reg[u][w]);
+        nodes[u].regexp = dag->extend(nodes[u].regexp,reg[u][w]);
       } else {
-        nodes[w].regexp = RegExp::combine(nodes[w].regexp,RegExp::extend(nodes[u].regexp,reg[u][w]));
+        nodes[w].regexp = dag->combine(nodes[w].regexp,dag->extend(nodes[u].regexp,reg[u][w]));
       }
     }
   }
@@ -409,9 +409,9 @@ void IntraGraph::basicRegExp(bool compress_regexp) {
     for(w = u-1; w >= 0; w--) {
       if(reg[u][w]->isZero()) continue;
       if(u == w) {
-        nodes[u].regexp = RegExp::extend(nodes[u].regexp,reg[u][w]);
+        nodes[u].regexp = dag->extend(nodes[u].regexp,reg[u][w]);
       } else {
-        nodes[w].regexp = RegExp::combine(nodes[w].regexp,RegExp::extend(nodes[u].regexp,reg[u][w]));
+        nodes[w].regexp = dag->combine(nodes[w].regexp,dag->extend(nodes[u].regexp,reg[u][w]));
       }
     }
   }
@@ -419,7 +419,7 @@ void IntraGraph::basicRegExp(bool compress_regexp) {
     reg_exp_cache_t cache;
     for(i = 0; i < n; i++) {
       FWPDSDBGS(nodes[i].regexp->print(cout) << "\n");
-      nodes[i].regexp = RegExp::compress(nodes[i].regexp,cache);
+      nodes[i].regexp = dag->compress(nodes[i].regexp,cache);
       //nodes[i].regexp->get_weight();
       FWPDSDBGS(nodes[i].regexp->print(cout) << "\n");
     }

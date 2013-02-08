@@ -28,6 +28,7 @@ namespace wali {
 
     SummaryGraph::SummaryGraph(InterGraphPtr gr, Key ss, set<Key> &pe, wfa::WFA &Agrow, InterGraph::PRINT_OP pop) {
       post_igr = gr;
+      dag = gr->dag;
       pkey = pop;
       init_state = ss;
 
@@ -390,8 +391,8 @@ namespace wali {
     // after that do APSP style computation of weights on the eps transtions.
     void SummaryGraph::summaryPoststar(wali::wfa::WFA const & ca_in, wali::wfa::WFA& ca_out) {
       int i;
-      RegExp::startSatProcess(post_igr->sem);
-      RegExp::extendDirectionBackwards(false);
+      dag->startSatProcess(post_igr->sem);
+      dag->extendDirectionBackwards(false);
 
       typedef pair<int, Key> tup;
       std::set<tup> worklist;
@@ -532,9 +533,9 @@ namespace wali {
           } else {
             assert(t->stack() != WALI_EPSILON);
             if(nodes[cno].uno == -1) {
-              int uno = RegExp::getNextUpdatableNumber();
-              reg_exp_t reg = RegExp::updatable(uno, post_igr->sem->zero()); // create the updatable node (increments updatable number)
-              reg = RegExp::extend(reg, RegExp::constant(popWeight(t->stack())));
+              int uno = dag->getNextUpdatableNumber();
+              reg_exp_t reg = dag->updatable(uno, post_igr->sem->zero()); // create the updatable node (increments updatable number)
+              reg = dag->extend(reg, dag->constant(popWeight(t->stack())));
               pop_regexp_list.push_back(reg);
 
               gr->updateWeight(intra_nno, uno);
@@ -543,7 +544,7 @@ namespace wali {
           }
         }
 
-        popRegExpMap[q] = RegExp::combine(pop_regexp_list);
+        popRegExpMap[q] = dag->combine(pop_regexp_list);
 
         // Go through all the IntraGraphs and get regexp from them
         for(gr_it = gr_set.begin(); gr_it != gr_set.end(); gr_it++) {
@@ -559,7 +560,7 @@ namespace wali {
             if(nodes[nno].regexp.is_valid()) { 
               assert(tr.stack == (int)WALI_EPSILON || multiple_proc(tr.stack));
               // Take combine
-              nodes[nno].regexp = RegExp::combine(nodes[nno].regexp, gr->nodes[i].regexp);
+              nodes[nno].regexp = dag->combine(nodes[nno].regexp, gr->nodes[i].regexp);
             } else {
               nodes[nno].regexp = gr->nodes[i].regexp;
             }
@@ -639,7 +640,7 @@ namespace wali {
 
           // New weight has been computed, take combine with old one
           nodes[nno2].weight = nodes[nno2].weight->combine(nweight);
-          RegExp::update(nodes[nno2].uno, nodes[nno2].weight);
+          dag->update(nodes[nno2].uno, nodes[nno2].weight);
 
           // qprime goes onto the worklist
           worklist.insert(tup(ca_gr.getSccNumber(qprime), qprime));
@@ -647,8 +648,8 @@ namespace wali {
       }
 
       delete timer;
-      RegExp::stopSatProcess();
-      RegExp::executingPoststar(true);
+      dag->stopSatProcess();
+      dag->executingPoststar(true);
 
       Timer *timer2 = new Timer("SWPDS: All Weights");
       // Start adding transitions to ca_out

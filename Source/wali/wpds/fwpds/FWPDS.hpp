@@ -59,7 +59,9 @@ namespace wali {
           ///Must be called before the graph based solvers are setup.
           ///So, call before calling poststar/prestar etc.
           void useNewton(bool set);
-
+          
+          // Newton can leave the output automaton with either tensored weights or not.
+          bool isOutputTensored();
           ////////////
           // add rules
           ////////////
@@ -97,7 +99,7 @@ namespace wali {
            * but setting it to false seems to be far more efficient
            * while using BDD-based weight domain (Moped)
            */
-          static void topDownEval(bool f);
+          void topDownEval(bool f);
 
         private:
           void prestar_handle_call(
@@ -151,9 +153,11 @@ namespace wali {
 
         protected:
           sem_elem_t wghtOne;
+          std::vector< graph::InterGraphPtr > interGrs;
           graph::InterGraphPtr interGr;
           bool checkingPhase;
           bool newton;
+          bool topDown;
 
       }; // class FWPDS
 

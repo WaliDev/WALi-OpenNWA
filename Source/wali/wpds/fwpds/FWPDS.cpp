@@ -49,38 +49,38 @@ using namespace wali::wpds::ewpds;
 
 const std::string FWPDS::XMLTag("FWPDS");
 
-FWPDS::FWPDS() : EWPDS(), interGr(NULL), checkingPhase(false), newton(false)
+FWPDS::FWPDS() : EWPDS(), interGr(NULL), checkingPhase(false), newton(false), topDown(true)
 {
 }
 
-FWPDS::FWPDS(ref_ptr<wpds::Wrapper> wr) : EWPDS(wr) , interGr(NULL), checkingPhase(false), newton(false)
+FWPDS::FWPDS(ref_ptr<wpds::Wrapper> wr) : EWPDS(wr) , interGr(NULL), checkingPhase(false), newton(false), topDown(true)
 {
 }
 
-FWPDS::FWPDS( const FWPDS& f ) : EWPDS(f),interGr(NULL),checkingPhase(false), newton(f.newton)
+FWPDS::FWPDS( const FWPDS& f ) : EWPDS(f),interGr(NULL),checkingPhase(false), newton(f.newton), topDown(f.topDown)
 {
 }
 
-FWPDS::FWPDS(bool _newton) : EWPDS(), newton(_newton)
+FWPDS::FWPDS(bool _newton) : EWPDS(), newton(_newton), topDown(true)
 {
 }
 
 FWPDS::~FWPDS()
 {
-  // This cleans up the graph structures.
-  // There are some static variables holding on to values
-  // that cause trouble when re-running analysis.
-  // The downside is that if you have other FWPDSs
-  // hanging around, deleting even one of them will clean up
-  // the graph structure, and bad things will happen.
-
-  // You would have to clean up outside *after* you're done
-  // will *all* FWPDSs.
-  interGr->cleanUp();
+  // This means that if you delete an FWPDS, any WFA that was created by prestar/poststar on that FWPDS is useless.
+  // I don't know where else to delete the InterGraph.
+  // The ideal way to do this is to move the RegExpDag dag into FWPDS, and copy it the WFA after poststar.
+  interGr = NULL;
+  interGrs.clear();
 }
 ///////////////////////////////////////////////////////////////////
 void FWPDS::topDownEval(bool f) {
-  graph::RegExp::topDownEval(f);
+  //Used to be -->
+  //graph::RegExp::topDownEval(f);
+  if(!(interGr == NULL))
+    interGr->dag->topDownEval(f);
+  topDown = f;
+  // is no worse than what it used to be
 }
 
 struct FWPDSCopyBackFunctor : public wfa::TransFunctor
@@ -198,6 +198,8 @@ void FWPDS::prestar( wfa::WFA const & input, wfa::WFA& output )
   // However, there is no cost benefit in using WPDS
   // (it only saves on debugging effort)
   interGr = new graph::InterGraph(theZero, true, true);
+  interGr->dag->topDownEval(topDown);
+  interGrs.push_back(interGr);
 
   // Input transitions become source nodes in FWPDS
   FWPDSSourceFunctor sources(*interGr.get_ptr(), false);
@@ -369,8 +371,6 @@ void FWPDS::poststar( wfa::WFA const & input, wfa::WFA& output ) {
   //  interGr->update_all_weights();
   //}
   //interGr->print_stats(*waliErr) << "\n";
-
-  interGr = NULL;
 }
 
 void FWPDS::poststarIGR( wfa::WFA const & input, wfa::WFA& output )
@@ -394,6 +394,8 @@ void FWPDS::poststarIGR( wfa::WFA const & input, wfa::WFA& output )
   // merge functions, it can be treated as a WPDS.
   // However, there is no cost benefit in using WPDS
   interGr = new graph::InterGraph(theZero, true, false);
+  interGr->dag->topDownEval(topDown);
+  interGrs.push_back(interGr);
 
   // Input transitions become source nodes in FWPDS
   FWPDSSourceFunctor sources(*interGr.get_ptr(), true);
@@ -531,7 +533,11 @@ void FWPDS::poststar_handle_trans(
   }
 }
 
-
+bool FWPDS::isOutputTensored()
+{
+  if(interGr != NULL)
+    return interGr->isOutputTensored();
+}
 
 ////////////////////////////////////////////
 // These guys take care of LazyTrans stuff

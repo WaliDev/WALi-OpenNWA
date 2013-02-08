@@ -7,6 +7,7 @@
 
 #include "wali/graph/GraphCommon.hpp"
 
+
 #include <list>
 #include <vector>
 #include <iostream>
@@ -172,11 +173,24 @@ namespace wali {
         };
 
 
+        class RegExpDag;
         class InterGraph : public Countable {
           public:
             typedef std::ostream & (*PRINT_OP)(std::ostream &, int);
 
+
+            /**
+             * All the regular expressions created in different IntraGraphs
+             * belong to a shared regular expression dag. This is the best
+             * place to store it.
+             *
+             * Keeping it public so that SummaryGraph can grab it.
+             **/
+            RegExpDag * dag;
+
           private:
+
+
             friend class SummaryGraph;
 
             typedef std::vector< int > Int1D;
@@ -201,6 +215,7 @@ namespace wali {
             std::list<IntraGraph *> gr_list;
             std::list<IntraGraph *> linear_gr_list;
 
+            bool isOutputAutomatonTensored;
             IntraGraph * newtonGr; //to be removed
 
             bool runningNewton;
@@ -226,17 +241,7 @@ namespace wali {
             }
 
           public:
-            InterGraph(wali::sem_elem_t s, bool e, bool pre, bool n = false) {
-              sem = s;
-              intra_graph_uf = NULL;
-              running_ewpds = e;
-              running_nwpds = n;
-              running_prestar = pre;
-              max_scc_computed = 0;
-              newtonGr = NULL;
-              runningNewton = false;
-              count = 0;
-            }
+            InterGraph(wali::sem_elem_t s, bool e, bool pre, bool n = false);
             ~InterGraph();
             void addEdge(Transition src, Transition tgt, wali::sem_elem_t se);
             void addEdge(Transition src1, Transition src2, Transition tgt, wali::sem_elem_t se);
@@ -266,16 +271,13 @@ namespace wali {
 
             bool exists(Transition &t);
 
+            bool isOutputTensored(){
+              return isOutputAutomatonTensored;
+            }
+
             int nGraphs() {
               return (int)gr_list.size();
             }
-
-            /**
-             * @author Prathmesh Prabhu
-             * Classes in the graph* structures use some static variables to hold on to values.
-             * We want to clean up the structure before finishing the anlysis.
-             **/
-            static void cleanUp();
 
           private:
             int nodeno(Transition &t);

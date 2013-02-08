@@ -44,6 +44,13 @@ namespace wali {
 
         class SummaryGraph {
             private:
+
+              /**
+               * The context in which all regular expression are to be generated.
+               * Grab this from the InterGraph passed in to the constructor.
+               **/              
+                RegExpDag * dag;
+
                 typedef wali::HashMap<int, int> StackGraphMap;
                 typedef std::map<Transition, int, TransitionCmp> TransMap;
 
