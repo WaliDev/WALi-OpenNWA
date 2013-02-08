@@ -1336,6 +1336,17 @@ namespace{
   }
   
 
+  TEST(wali$domains$binrel$$BinRel$$Assume, differentVocSizes)
+  {
+    ProgramBddContext * p = new ProgramBddContext();
+    map< string, int> m;
+    m["a"] = 2;
+    m["b"] = 4;
+    p->setIntVars(m);
+
+    bdd b = p->Assume(p->From("a"), p->Const(0));
+    ASSERT_NE(b, bddfalse);
+  }
 } //namespace
 
 
