@@ -640,6 +640,7 @@ namespace wali
         // This function is in WFA-eclose.cpp due to its similarity with the
         // Tarjar/FWPDS epsilon closure algorithm.
         AccessibleStateSetMap computeAllReachingWeights() const;
+        AccessibleStateSetMap computeAllReachingWeights(domains::SemElemSet::SemElemSubsumptionComputer) const;
 
         /// Creates (and returns) a new WFA which is the same as *this,
         /// except that it has no epsilon transitions.

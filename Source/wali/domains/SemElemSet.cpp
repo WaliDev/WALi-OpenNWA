@@ -282,6 +282,7 @@ namespace wali
           o << ", ";
         }
         (*element)->print(o);
+        first = false;
       }
       o << "}";
       return o;

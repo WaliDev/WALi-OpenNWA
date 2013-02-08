@@ -11,7 +11,7 @@ namespace opennwa
 {
     namespace nwa_pds
     {
-	TEST(opennwa$nwa_pds$$getProgramControlLocation, doesNotCacheAnswer)
+	TEST(DISABLED_opennwa$nwa_pds$$getProgramControlLocation, doesNotCacheAnswer)
 	{
 	    Key orig_key = getProgramControlLocation();
 	    EXPECT_EQ(key2str(orig_key), "program");

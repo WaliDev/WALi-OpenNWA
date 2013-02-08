@@ -19,7 +19,7 @@ namespace wali {
     };
     
 
-    TEST(wali$getKey, returnsSequentialAcrossTypes)
+    TEST(DISABLED_wali$getKey, returnsSequentialAcrossTypes)
     {
         clearKeyspace();
 
@@ -85,7 +85,7 @@ namespace wali {
         EXPECT_EQ("@", key2str(WALI_WILD));
     }
 
-    TEST(wali$clearKeySpace, clearingKeySpaceLeavesWildAndEpsilon)
+    TEST(DISABLED_wali$clearKeySpace, clearingKeySpaceLeavesWildAndEpsilon)
     {
         clearKeyspace();
 
