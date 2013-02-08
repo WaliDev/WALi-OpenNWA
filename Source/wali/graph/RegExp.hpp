@@ -387,6 +387,8 @@ namespace wali {
              // Add a reg_exp_t to the set of regular expressions labelling some
              // IntraGraphEdge. Used only for diagnostic purposes.
              void markAsLabel(reg_exp_t r);
+
+             long countLabelsUnderNonLabelRoots();
                
                
           private:
@@ -404,6 +406,7 @@ namespace wali {
             void excludeFromCountReachable(reg_exp_t const e);
             long countTotalNodes(reg_exp_t const e);
             void removeDagFromRoots(reg_exp_t const e);
+            long countLabels(reg_exp_t const e);
 
             /**
              * Functions related to those copied from RegExp (used to be static).

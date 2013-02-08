@@ -1700,6 +1700,7 @@ namespace wali {
       long frontiers = countFrontier();
       long graphls = graphLabels.size();
       long roots = rootsAcrossSatProcesses.size();
+      long errorls = countLabelsUnderNonLabelRoots();
 
       // Find roots that are also labels
       reg_exp_hash_t rootsThatAreLabels;
@@ -1717,6 +1718,7 @@ namespace wali {
       cout << "#Frontiers: " << frontiers << endl;
       cout << "#Labels: " << graphls << endl;
       cout << "#Labels ^ Roots: " << rootsNgraphls << endl;
+      cout << "#Labels under non-label roots: " << errorls << endl;
       if(nodes > 0){
         cout << "Spline/nodes %: " << ((double) splines * 100) / ((double) nodes) << endl;
         cout << "Frontier/nodes %: " << ((double) frontiers * 100) / ((double) nodes) << endl;
@@ -1724,7 +1726,39 @@ namespace wali {
         cout << "Height/log(nodes) %: " << ((double) height * 100) * log10(2)  / log10((double) nodes) << endl;
         cout << "roots/nodes %: " << ((double) roots * 100) /((double) nodes) << endl;
         cout << "(roots intersect labels)/nodes %: " << ((double) rootsNgraphls * 100) /((double) nodes) << endl;
+        cout << "(labels under non-label roots) / nodes %: " << ((double) errorls * 100) / ((double) nodes) << endl;
       }
+    }
+
+    long RegExpDag::countLabelsUnderNonLabelRoots()
+    {
+      long count = 0;
+      visited.clear();
+      reg_exp_hash_t rootsThatAreLabels;
+      for(reg_exp_hash_t::iterator it = rootsAcrossSatProcesses.begin();
+          it != rootsAcrossSatProcesses.end();
+          ++it){
+        if(graphLabels.find(it->first) != graphLabels.end()){
+          count += countLabels(it->second);
+        }
+      }
+      visited.clear();
+      return count;
+    }
+
+    long RegExpDag::countLabels(reg_exp_t const e)
+    {
+      reg_exp_key_t ekey(e->type, e);
+      reg_exp_hash_t::iterator it = visited.find(ekey);
+      if(it != visited.end())
+        return 0;
+      visited.insert(ekey, e);
+      long total = 0;
+      for(list<reg_exp_t>::iterator cit = e->children.begin(); cit != e->children.end(); ++cit)
+        total += countLabels(*cit);
+      if(graphLabels.find(ekey) != graphLabels.end())
+        total += 1;
+      return total;
     }
 
     long RegExpDag::getHeight()
