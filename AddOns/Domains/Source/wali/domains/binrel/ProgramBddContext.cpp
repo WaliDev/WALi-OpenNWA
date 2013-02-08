@@ -994,12 +994,17 @@ bdd ProgramBddContext::Assume(bdd expr1, bdd expr2) const
         regBInfo->baseExtra
         );
 
+  // expr1 and expr2 can have different regSize.
+  // In that case, only the smaller number of bits are constrainted.
+  expr1 = bdd_exist(expr1, fdd_ithset(sizeInfo));
+  expr2 = bdd_exist(expr2, fdd_ithset(sizeInfo));
+
   bdd ret = expr1 & expr2 & equate;
 
   ret = bdd_exist(ret, fdd_ithset(regAInfo->baseExtra));
   ret = bdd_exist(ret, fdd_ithset(regBInfo->baseExtra));
 
-  return bdd_exist(ret, fdd_ithset(sizeInfo));
+  return ret;
 }
 
 bdd ProgramBddContext::tGetRandomTransformer(bool isTensored, unsigned seed) const
