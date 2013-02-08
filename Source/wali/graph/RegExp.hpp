@@ -5,6 +5,7 @@
 #include <list>
 #include <vector>
 #include <set>
+#include <tr1/unordered_set>
 #include <map>
 
 #include "wali/SemElem.hpp"
@@ -171,7 +172,9 @@ namespace wali {
                 */
                 bool dirty;
                 /* When set, points to the ancestors in the RegExp dag. */
-                list<reg_exp_t> parents;
+                /* Must be a weak pointer because parents have reference to the child */
+                /* I don't know what will happen if I mix boost smart pointers and ref_ptr, so use raw */
+                tr1::unordered_set<RegExp*> parents;
 #endif
                 unsigned int last_change;
                 unsigned int last_seen;
@@ -225,10 +228,12 @@ namespace wali {
                         assert(0);
                     }
 #if defined(PUSH_EVAL)
+                    // Not thread safe? Constructore isn't done yet, and some
+                    // outside has a pointer to the object.
                     dirty = true;
-                    r1->parents.push_back(static_cast<RegExp*>(this));
+                    r1->parents.insert(static_cast<RegExp*>(this));
                     if(!(r2 == NULL))
-                      r2->parents.push_back(static_cast<RegExp*>(this));
+                      r2->parents.insert(static_cast<RegExp*>(this));
 #endif
                     last_change = 0;
                     last_seen = 0;
@@ -258,6 +263,11 @@ namespace wali {
 
             public:
 
+                ~RegExp()
+                {
+                  for(list<reg_exp_t>::iterator it = children.begin(); it != children.end(); ++it)
+                    (*it)->parents.erase(this);
+                }
 
                 ostream &print(ostream &out);
                 long toDot(ostream &out, std::set<long>& seen, bool printUpdates = false, bool isRoot = false);
