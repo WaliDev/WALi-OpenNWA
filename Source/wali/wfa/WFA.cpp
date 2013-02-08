@@ -2383,6 +2383,27 @@ namespace wali
       RuleAdder adder(p_state, wpds, trans_accept);
       this->for_each(adder);
     }
+
+
+    struct AlphabetComputer : ConstTransFunctor
+    {
+      std::set<Key> alphabet;
+
+      virtual void operator()( ITrans const * t )
+      {
+        if (t->stack() != WALI_EPSILON) {
+          alphabet.insert(t->stack());
+        }
+      }
+    };
+
+    std::set<Key>
+    WFA::alphabet() const
+    {
+      AlphabetComputer x;
+      this->for_each(x);
+      return x.alphabet;
+    }
     
     
   } // namespace wfa

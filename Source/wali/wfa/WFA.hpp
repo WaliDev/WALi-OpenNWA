@@ -761,6 +761,16 @@ namespace wali
         void toWpds(Key p_state,
                     wpds::WPDS * wpds,
                     boost::function<bool (ITrans const *)> trans_accept) const;
+
+
+        /// Returns the set of symbols that appear on a transition somewhere
+        /// in this WFA. Never includes epsilon.
+        ///
+        /// (Note that it is impossible to have an element of the alphabet
+        /// that does not appear as a transition due to this fact -- the
+        /// alphabet is never stored explicitly, and this function will
+        /// recompute it each time.)
+        std::set<Key> alphabet() const;
     };
 
   } // namespace wfa
