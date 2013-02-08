@@ -272,6 +272,12 @@ namespace wali {
 
             public:
 
+                ~RegExp()
+                {
+                  for(list<reg_exp_t>::iterator it = children.begin(); it != children.end(); ++it)
+                    (*it)->parents.erase(this);
+                }
+
                 static void extendDirectionBackwards(bool b) {
                     extend_backwards = b;
                 }
