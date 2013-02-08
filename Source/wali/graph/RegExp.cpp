@@ -57,7 +57,7 @@ namespace wali {
         void RegExp::setDirty()
         {
           dirty = true;
-          for(list<reg_exp_t>::iterator pit = parents.begin(); pit != parents.end(); ++pit)
+          for(tr1::unordered_set<RegExp*>::iterator pit = parents.begin(); pit != parents.end(); ++pit)
             (*pit)->setDirty();
         }
 #endif
