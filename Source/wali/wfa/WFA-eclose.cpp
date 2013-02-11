@@ -408,7 +408,10 @@ namespace wali
           
           // Now get the weight. That's the net weight from 'source' to
           // 'target', where 'target' is actually a state in 'this' WFA.
-          closures[source][target] = (*trans)->weight();
+          sem_elem_t weight = (*trans)->weight();
+          if (!weight->equal(weight->zero())) {
+            closures[source][target] = (*trans)->weight();
+          }
         }
       }
       

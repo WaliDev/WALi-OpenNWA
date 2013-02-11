@@ -541,6 +541,31 @@ namespace wali {
             EXPECT_CONTAINS(eclose_B, B);
         }
 
+        TEST(wali$wfa$$epsilonClose, zeroWeightsAreOmitted)
+        {
+            //      zero
+            //  -> A ---> (B)
+            Key A = getKey("A");
+            Key B = getKey("B");
+
+            sem_elem_t zero = Reach(true).zero();
+
+            WFA wfa;
+            wfa.addState(A, zero);
+            wfa.addState(B, zero);
+            wfa.addTrans(A, A, B, zero);
+
+            wfa.setInitialState(A);
+            wfa.addFinalState(B);
+
+            EXPECT_CONSISTENT_EPSILON_CLOSURES(wfa);
+
+            WFA::AccessibleStateMap eclose_A = checkedEpsilonClose(wfa, A);
+            
+            EXPECT_EQ(1u, eclose_A.size());
+            EXPECT_CONTAINS(eclose_A, A);
+        }
+
         
     }
 }

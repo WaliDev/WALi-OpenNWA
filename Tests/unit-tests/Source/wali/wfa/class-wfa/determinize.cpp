@@ -431,6 +431,37 @@ namespace wali {
             EXPECT_EQ("a (top) --b--> ab", weight_a_ab->str);
             EXPECT_EQ("a (left) --c--> ac", weight_a_ac->str);
         }
+
+
+        TEST(wali$wfa$$semideterminize, zeroWeightPathDoesNotAccept)
+        {
+            //      zero
+            //  -> A ---> (B)
+            Key A = getKey("A");
+            Key B = getKey("B");
+
+            sem_elem_t zero = Reach(true).zero();
+
+            WFA wfa;
+            wfa.addState(A, zero);
+            wfa.addState(B, zero);
+            wfa.addTrans(A, A, B, zero);
+
+            wfa.setInitialState(A);
+            wfa.addFinalState(B);
+
+            WFA det = wfa.semideterminize();
+
+            wfa.print(std::cerr);
+            det.print(std::cerr);
+
+            WFA::Word w;
+            w.push_back(A);
+
+            std::cerr << "wfa accepts: " << wfa.isAcceptedWithNonzeroWeight(w) << "\n";
+            std::cerr << "det accepts: " << det.isAcceptedWithNonzeroWeight(w) << "\n";
+        }
+        
         
     }
 }
