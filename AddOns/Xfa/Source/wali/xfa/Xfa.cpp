@@ -111,6 +111,14 @@ namespace wali {
         {
             wali::sem_elem_t w_se = t->weight();
             BinaryRelation w = dynamic_cast<wali::domains::binrel::BinRel*>(w_se.get_ptr());
+
+            if (w == NULL) {
+                SemElemPair * p = dynamic_cast<SemElemPair*>(w_se.get_ptr());
+                assert(p != NULL);
+                sem_elem_t r = p->get_first()->extend(p->get_second());
+                w = dynamic_cast<wali::domains::binrel::BinRel*>(r.get_ptr());
+            }
+            
             assert(w != NULL);
 
             std::stringstream command;
