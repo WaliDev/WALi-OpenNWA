@@ -2,6 +2,7 @@
 
 #include <wali/SemElemPair.hpp>
 #include <wali/domains/SemElemSet.hpp>
+#include <wali/wfa/State.hpp>
 
 #include <buddy/fdd.h>
 
@@ -289,14 +290,14 @@ namespace wali {
 
 
         bool
-        transformer_accepts(sem_elem_t weight)
+        transformer_accepts(sem_elem_t weight, sem_elem_t left_accept, sem_elem_t right_accept)
         {
             SemElemPair
                 * weight_down = dynamic_cast<SemElemPair*>(weight.get_ptr());
 
             sem_elem_t
-                weight_exists = weight_down->get_first(),
-                weight_forall = weight_down->get_second();
+                weight_exists = weight_down->get_first()->extend(left_accept),
+                weight_forall = weight_down->get_second()->extend(right_accept);
 
             // The exist half just needs to be non-zero. This means that
             // there is some path to any data configuration. The forall half
@@ -382,32 +383,65 @@ namespace wali {
         {
             typedef domains::SemElemSet::ElementSet ElementSet;
 
+            std::set<Key>
+                left_alpha = left.wfa().alphabet(),
+                right_alpha = right.wfa().alphabet(),
+                both_alpha;
+            
+            both_alpha.insert(left_alpha.begin(), left_alpha.end());
+            both_alpha.insert(right_alpha.begin(), right_alpha.end());
+
             IntroduceStateToRelationWeightGen r_det_weight_gen(voc, right, "right_");
-            wali::wfa::WFA right_det = right.semideterminize();
+            wali::wfa::WFA right_det = right.semideterminize(r_det_weight_gen);
+            right_det.complete(both_alpha);
+            right_det.complementStates();
             
             IntroduceStateToRelationWeightGen l_det_weight_gen(voc, left, "left_");
-            wali::wfa::WFA left_det = left.semideterminize();
+            wali::wfa::WFA left_det = left.semideterminize(l_det_weight_gen);
+            left_det.complete(both_alpha);
 
             wali::wfa::WFA intersected = left_det.intersect(right_det);
 
             wali::wfa::WFA::AccessibleStateSetMap reached_states =
-                intersected.computeAllReachingWeights(domains::SemElemSet::KeepMinimalElements);
+                intersected.computeAllReachingWeights(domains::SemElemSet::KeepAllNonduplicates);
 
-            std::set<Key> const & finals = intersected.getFinalStates();
-            for(std::set<Key>::const_iterator final = finals.begin();
-                final != finals.end(); ++final)
+            std::set<Key> const
+                & left_states = left_det.getStates(),
+                & right_states = right_det.getStates();
+            
+            for(std::set<Key>::const_iterator left_state = left_states.begin();
+                left_state != left_states.end(); ++left_state)
             {
-                ElementSet const & reached_weights = reached_states[*final];
-                for (ElementSet::const_iterator final_weight = reached_weights.begin();
-                     final_weight != reached_weights.end(); ++final_weight)
+                for(std::set<Key>::const_iterator right_state = right_states.begin();
+                    right_state != right_states.end(); ++right_state)
                 {
-                    if (transformer_accepts(*final_weight)) {
-                        return true;
+                    Key pairkey = getKey(*left_state, *right_state);
+                    ElementSet const & reached_weights = reached_states[pairkey];
+
+                    if (reached_weights.size() == 0u) {
+                        // This state doesn't even exist, so of course it's fine
+                        continue;
                     }
+
+                    sem_elem_t
+                        left_accept = left_det.getState(*left_state)->acceptWeight(),
+                        right_accept = right_det.getState(*right_state)->acceptWeight();
+
+                    // There must be a reaching weight which is accepting --
+                    // that is, has a zero forall and non-zero exists weight.
+                    for (ElementSet::const_iterator final_weight = reached_weights.begin();
+                         final_weight != reached_weights.end(); ++final_weight)
+                    {
+                        if (transformer_accepts(*final_weight, left_accept, right_accept)) {
+                            // there is a word present in L-R
+                            return false;
+                        }
+                    }
+
                 }
             }
 
-            return false;
+            return true;
         }
 
     }

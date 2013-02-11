@@ -216,9 +216,12 @@ namespace wali {
             /// is semi-state-deterministic.
             ///
             /// @see wali::wfa::WFA::semideterminize
-            wali::wfa::WFA
+            Xfa
             semideterminize() const {
-                return wfa_.semideterminize();
+                assert(false);
+                Xfa ret;
+                ret.wfa_ = wfa_.semideterminize();
+                return ret;
             }
 
 
