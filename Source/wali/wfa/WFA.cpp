@@ -75,6 +75,9 @@ namespace wali
         for( ; it != rhs.state_map.end(); it++ ) {
           // FIXME: why is this ->zero()? --EED 5/11/2012
           addState( it->first, it->second->weight()->zero() );
+          if (!it->second->acceptWeight()->equal(it->second->acceptWeight()->zero())) {
+            getState(it->first)->acceptWeight() = it->second->acceptWeight();
+          }
         }
 
         // This will populate all maps
@@ -153,7 +156,13 @@ namespace wali
     //
     void WFA::addFinalState( Key key )
     {
+      addFinalState(key, getSomeWeight()->one());
+    }
+
+    void WFA::addFinalState(Key key, sem_elem_t accept_weight)
+    {
       F.insert(key);
+      getState(key)->acceptWeight() = accept_weight;
     }
 
     //!
@@ -1068,9 +1077,9 @@ namespace wali
       state_map_t::const_iterator sitEND = state_map.end();
       for(; sit != sitEND; sit++)
       {
-        o << key2str( sit->first ) << ": \n";
-        sit->second->weight()->print( o );
-        o << "\n";
+        o << key2str( sit->first ) << " " << sit->second <<  ": \n";
+        sit->second->weight()->print( o << "\tWeight: " ) << "\n";
+        sit->second->acceptWeight()->print(o << "\tAccept: ") << "\n";
       }
 
       return o;
@@ -1871,7 +1880,8 @@ namespace wali
         result.addState(sources_key, zero);
 
         if (any_final(*this, sources)) {
-          result.addFinalState(sources_key);
+          sem_elem_t accept_weight = wg.getAcceptWeight(*this, result, sources);
+          result.addFinalState(sources_key, accept_weight);
         }
 
         // symbol -> source -> next states [no eclose]
@@ -2031,7 +2041,6 @@ namespace wali
                         bool check_weights)
     {
       assert(left_states.size() == right_states.size());
-      (void) check_weights;
 
       std::map<Key, Key> left_to_right;
       for (size_t state_index = 0; state_index < left_states.size(); ++state_index) {
@@ -2043,8 +2052,10 @@ namespace wali
         Key left_state = left_states[state_index];
         Key right_state = right_states[state_index];
 
-        if (!left.getState(left_state)->weight()->equal(
-              right.getState(right_state)->weight().get_ptr())
+        if ((!left.getState(left_state)->weight()->equal(
+               right.getState(right_state)->weight().get_ptr())
+             || !left.getState(left_state)->acceptWeight()->equal(
+               right.getState(right_state)->acceptWeight().get_ptr()))
             && check_weights)
         {
           return false;

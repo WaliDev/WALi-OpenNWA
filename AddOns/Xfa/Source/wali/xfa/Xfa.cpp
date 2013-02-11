@@ -146,7 +146,64 @@ namespace wali {
             os << ",onhover=\"<img src='data:image/png;base64," << image_data_base64 << "'>\"";
         }
 
+        
+        sem_elem_t
+        IntroduceStateToRelationWeightGen::liftAcceptWeight(wali::wfa::WFA const & UNUSED_PARAMETER(original_wfa),
+                                                            Key state,
+                                                            sem_elem_t original_accept_weight) const
+        {
+            //std::cout << "Lifting weight.\n";
+            using wali::domains::binrel::BddContext;
+            using wali::domains::binrel::BinRel;
+            using wali::domains::binrel::bddinfo_t;
 
+            BinaryRelation orig_rel
+                = dynamic_cast<BinRel*>(original_accept_weight.get_ptr());
+
+            // Now pull out the BDD and vocabulary
+            bdd orig_bdd = orig_rel->getBdd();
+            BddContext const & orig_voc = orig_rel->getVocabulary();
+
+            // First step: rename variables to new domain
+            std::vector<int> orig_names, new_names;
+
+            for (BddContext::const_iterator var=orig_voc.begin(); var!=orig_voc.end(); ++var) {
+                bddinfo_t
+                    orig_info = var->second,
+                    new_info = util::map_at(new_voc, var->first);
+
+                assert(new_info.get_ptr());
+
+                //std::cout << "Will rename: " << orig_info->baseLhs << "->" << new_info->baseLhs << "\n";
+                //std::cout << "Will rename: " << orig_info->baseRhs << "->" << new_info->baseRhs << "\n";
+
+                orig_names.push_back(orig_info->baseLhs);
+                orig_names.push_back(orig_info->baseRhs);
+                new_names.push_back(new_info->baseLhs);
+                new_names.push_back(new_info->baseRhs);
+
+            }
+
+            bddPair* rename_pairs = bdd_newpair();
+            assert(orig_names.size() == new_names.size());
+            fdd_setpairs(rename_pairs,
+                         &orig_names[0],
+                         &new_names[0],
+                         static_cast<int>(orig_names.size()));
+
+            bdd renamed_bdd = bdd_replace(orig_bdd, rename_pairs);
+
+            bdd_freepair(rename_pairs);
+
+            // Second step: create a BDD that enforces that the current state
+            // is "state"
+            SequentialFromZeroState sfz_state = from_state(State(state));
+
+            bdd state_change = new_voc.Assume(new_voc.From(current_state), new_voc.Const(sfz_state.index));
+
+            // Third step: combine them together
+            return new BinRel(&new_voc, renamed_bdd & state_change);
+        }
 
 
         sem_elem_t

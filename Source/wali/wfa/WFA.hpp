@@ -193,6 +193,12 @@ namespace wali
         void addFinalState( Key key );
 
         /**
+         * Add parameter key to the set of final states, accepting with the
+         * given weight.
+         */
+        void addFinalState(Key key, sem_elem_t accept_weight);
+
+        /**
          * Return true if parameter key is a final state
          */
         bool isFinalState( Key key ) const;

@@ -99,6 +99,20 @@ namespace wali
         }
 
         /*!
+         * Return a reference to the State's accepting weight. (This will
+         * often be just se->one() or se->zero().)
+         */
+        sem_elem_t &
+        acceptWeight() {
+            return accepting_weight;
+        }
+
+        sem_elem_t const &
+        acceptWeight() const {
+            return accepting_weight;
+        }
+
+        /*!
          * Return reference to the State's delta
          */
         sem_elem_t& delta() {
@@ -158,6 +172,7 @@ namespace wali
 
       protected:
         Key key;
+        sem_elem_t accepting_weight;
         sem_elem_t se;
         sem_elem_t delta_se;
         sem_elem_t quasi;

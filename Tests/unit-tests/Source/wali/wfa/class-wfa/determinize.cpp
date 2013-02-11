@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "wali/wfa/WFA.hpp"
+#include "wali/wfa/State.hpp"
 #include "wali/ShortestPathSemiring.hpp"
 #include "wali/wfa/DeterminizeWeightGen.hpp"
 
@@ -223,6 +224,13 @@ namespace wali {
                 WFA det = input.semideterminize();
 
                 EXPECT_TRUE(expected.isIsomorphicTo(det));
+
+                if (!expected.isIsomorphicTo(det)) {
+                    std::cerr << "\n\n=============================================================\n";
+                    input.print(std::cerr << "Input:\n") << "\n";
+                    expected.print(std::cerr << "Expected:\n") << "\n";
+                    det.print(std::cerr << "Det:\n") << "\n";
+                }
             }
         }
         
@@ -322,9 +330,79 @@ namespace wali {
                    << key2str(target);
                 return new StringWeight(ss.str());
             }
+
+            sem_elem_t liftAcceptWeight(WFA const & original_wfa,
+                                        Key state,
+                                        sem_elem_t UNUSED_PARAMETER(original_accept_weight)) const
+            {
+                std::stringstream ss;
+                if (original_wfa.isFinalState(state)) {
+                    ss << key2str(state);
+                }
+                return new StringWeight(ss.str());
+            }
+            
         };
 
 #define ASSERT_CONTAINS(container, value) ASSERT_FALSE(container.end() == container.find(value))
+
+        TEST(wali$wfa$$WFA$$semideterminize, weightGenAcceptingStates)
+        {
+            sem_elem_t reach_one = Reach(true).one();
+            sem_elem_t reach_zero = Reach(true).zero();
+
+            Letters letters;
+            Key start = getKey("start"),
+                acc1 = getKey("acc1"),
+                acc2 = getKey("acc2"),
+                rej = getKey("rej");
+
+            //  --> start -----> ((acc1))
+            //       |  |
+            //       |  +------> ((acc2))
+            //       |
+            //       +---------> rej
+            
+            WFA nondet;
+
+            nondet.addState(start, reach_zero);
+            nondet.addState(acc1, reach_zero);
+            nondet.addState(acc2, reach_zero);
+            nondet.addState(rej, reach_zero);
+
+            nondet.setInitialState(start);
+            nondet.addFinalState(acc1);
+            nondet.addFinalState(acc2);
+
+            nondet.addTrans(start, letters.a, acc1, reach_one);
+            nondet.addTrans(start, letters.a, acc2, reach_one);
+            nondet.addTrans(start, letters.a, rej, reach_one);
+
+            
+
+            WFA det = nondet.semideterminize(TestLifter());
+
+            // Sanity checks
+            std::set<Key> start_set, fin_set;
+            start_set.insert(start);
+            fin_set.insert(acc1);
+            fin_set.insert(acc2);
+            fin_set.insert(rej);
+
+            Key start_set_key = getKey(start_set),
+                fin_set_key = getKey(fin_set);
+
+            ASSERT_EQ(2u, det.getStates().size());
+            ASSERT_CONTAINS(det.getStates(), start_set_key);
+            ASSERT_CONTAINS(det.getStates(), fin_set_key);
+
+            // Extract the transition, then the weight
+            StringWeight * w = dynamic_cast<StringWeight*>(det.getState(fin_set_key)->acceptWeight().get_ptr());
+            ASSERT_TRUE(w != NULL);
+
+            // Test. This is fragile...
+            EXPECT_EQ("acc1 | acc2 | ", w->str);
+        }
 
         TEST(wali$wfa$$WFA$$semideterminize, weightGenKnowsAboutEpsilonTransitions)
         {

@@ -345,6 +345,12 @@ namespace wali {
                                           wali::Key symbol,
                                           wali::Key target,
                                           sem_elem_t orig_weight) const;
+
+            virtual
+            sem_elem_t
+            liftAcceptWeight(wali::wfa::WFA const & UNUSED_PARAMETER(original_wfa),
+                             wali::Key state,
+                             sem_elem_t original_accept_weight) const;
         };
 
         
