@@ -242,6 +242,14 @@ namespace wali {
                 this->wfa_.intersect(other.wfa_, output.wfa_);
                 return output;
             }
+
+            Xfa
+            intersect_conjoin(Xfa const & other) const {
+                Xfa output;
+                details::IntersectionWeightMaker maker;
+                this->wfa_.intersect(maker, other.wfa_, output.wfa_);
+                return output;
+            }
         };
 
 

@@ -205,7 +205,7 @@ namespace wali {
                                << "Current XFA in that right language: " << (right_xfa - right_some_xfas.begin()) << "\n";
                             SCOPED_TRACE(ss.str());
 
-                            Xfa const & intersection = left_xfa->intersect(*right_xfa);
+                            Xfa const & intersection = left_xfa->intersect_conjoin(*right_xfa);
                             EXPECT_TRUE(xfas_same_modulo_words(expected_representative, intersection));
                         }
                     }
