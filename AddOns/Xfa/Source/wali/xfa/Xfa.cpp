@@ -403,7 +403,8 @@ namespace wali {
             wali::wfa::WFA intersected = left_det.intersect(right_det);
 
             wali::wfa::WFA::AccessibleStateSetMap reached_states =
-                intersected.computeAllReachingWeights(domains::SemElemSet::KeepAllNonduplicates);
+                //intersected.computeAllReachingWeights(domains::SemElemSet::KeepAllNonduplicates);
+                intersected.computeAllReachingWeights(asymmetric_pair_keep_minimal);
 
             std::set<Key> const
                 & left_states = left_det.getStates(),
