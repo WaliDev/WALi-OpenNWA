@@ -130,8 +130,8 @@ namespace wali {
             vars.push_back(std::map<std::string, int>());
 
             //voc.addIntVar("left_current_state", ast.states.size());
-            vars.back()[prefix + "_current_state"] = static_cast<int>(ast.states.size()) * 2;
-            std::cout << "Adding " << prefix << "_current_state with size " << vars.back()[prefix + "_current_state"];
+            vars.back()[prefix + "current_state"] = static_cast<int>(ast.states.size()) * 2;
+            std::cout << "Adding " << prefix << "current_state with size " << vars.back()[prefix + "current_state"];
 
             return vars;
             
