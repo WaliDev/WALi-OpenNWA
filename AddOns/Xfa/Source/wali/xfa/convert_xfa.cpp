@@ -83,7 +83,7 @@ namespace wali {
 
         
         std::vector<std::map<std::string, int> >
-        register_vars(XfaAst const & ast,
+        get_vars(XfaAst const & ast,
                       int fdd_size,
                       std::string const & prefix)
         {
