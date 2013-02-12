@@ -335,6 +335,7 @@ namespace wali {
           public:
             RegExpDag();
             ~RegExpDag();
+#if defined(PPP_DBG) && PPP_DBG >= 0
           public:
             // ///////////////////////////////////////////////////////
             // RegExp dag diagnositcs.
@@ -384,10 +385,6 @@ namespace wali {
              **/
              void printStructureInformation();
 
-             // Add a reg_exp_t to the set of regular expressions labelling some
-             // IntraGraphEdge. Used only for diagnostic purposes.
-             void markAsLabel(reg_exp_t r);
-
              long countLabelsUnderNonLabelRoots();
                
                
@@ -407,7 +404,14 @@ namespace wali {
             long countTotalNodes(reg_exp_t const e);
             void removeDagFromRoots(reg_exp_t const e);
             long countLabels(reg_exp_t const e);
+#endif //#if defined(PPP_DBG) && PPP_DBG >= 0
 
+          public:
+             // Add a reg_exp_t to the set of regular expressions labelling some
+             // IntraGraphEdge. Used only for diagnostic purposes.
+             void markAsLabel(reg_exp_t r);
+
+          private:
             /**
              * Functions related to those copied from RegExp (used to be static).
              **/
@@ -438,7 +442,21 @@ namespace wali {
             void update(std::vector<node_no_t> nnos, std::vector<sem_elem_t> ses);
 
             int out_node_height(set<RegExp *> reg_equations);
+            void markReachable(reg_exp_t const r);
+            /** 
+             * Start with the set of regexp nodes that label some node in the IntraGraph
+             * Remove those that are covered by some other node in this set.
+             * Find minimal such set.
+             * Must be called before evaluateRoots.
+             **/
+            void computeMinimalRoots();
+            /**
+             * Compute all weights of interest in the dag.
+             * Must be called after computeMinimalRoots has been called in the current
+             * SAT process.
+             **/
             void evaluateRoots();
+
             const reg_exp_hash_t& getRoots();
 
 
@@ -489,6 +507,7 @@ namespace wali {
             bool extend_backwards;
             reg_exp_hash_t reg_exp_hash;
             const_reg_exp_hash_t const_reg_exp_hash;
+#if defined(PPP_DGB) && PPP_DBG >= 0
             // Remember what Regular Experessions are the root of the tree
             // in the current Saturation phase. This is reset between saturation
             // phases.
@@ -496,8 +515,13 @@ namespace wali {
             // Also remember the set of all roots created
             // This is used for diagnostic purposes
             reg_exp_hash_t rootsAcrossSatProcesses;
+#endif
+            // We will collect the minimal set of graphLabels needed to compute
+            // the whole graph.
+            reg_exp_hash_t minimalRoots;
             // Set of reg_exp nodes that label some IntraGraphEdge
-            reg_exp_hash_t graphLabels;
+            reg_exp_hash_t graphLabelsInSatProcess;
+            reg_exp_hash_t graphLabelsAcrossSatProcesses;
 
             RegExpStats stats;
             reg_exp_t reg_exp_zero, reg_exp_one;

@@ -1621,6 +1621,8 @@ namespace wali {
       ++saturateCount;
 #endif
 
+      // Just once, set up the minimal dag that needs to be evaluated each time.
+      dag->computeMinimalRoots();
       while(repeat){
         ++numRounds;
         //First, evaluate the current regular expressions completely.
