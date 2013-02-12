@@ -254,8 +254,7 @@ namespace wali {
                 return output;
             }
         };
-
-
+        
 
         /// Converts an NWA (from OpenNWA) into an Xfa. The NWA should only
         /// have internal transitions.
@@ -365,6 +364,12 @@ namespace wali {
         };
 
         
+        extern
+        std::vector<std::map<std::string, int> >
+        get_vars(XfaAst const & ast,
+                 int fdd_size,
+                 std::string const & prefix);
+
         extern
         Xfa
         from_parser_ast(XfaAst const & ast,
