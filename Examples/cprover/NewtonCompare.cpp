@@ -369,9 +369,9 @@ namespace goals {
   {
     WFA fa;
     wali::Key acc = wali::getKeySpace()->getKey("accept");
+    fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, pds->get_theZero()->one());
     fa.setInitialState(getPdsState());
     fa.addFinalState(acc);
-    fa.addTrans(getPdsState(),getEntryStk(pg, mainProc), acc, pds->get_theZero()->one());
 
     cout << "[Newton Compare] Computing poststar..." << endl;
     FWPDS * fpds = NULL;
@@ -390,14 +390,13 @@ namespace goals {
     pds->for_each(syms);
 
     WFA errfa;
-    errfa.setInitialState(getPdsState());
     wali::Key fin = wali::getKeySpace()->getKey("accept");
-    errfa.addFinalState(fin);
-
     std::set<Key>::iterator it;
     errfa.addTrans(getPdsState(), getErrStk(pg), fin, outfa.getSomeWeight());
     for(it = syms.gamma.begin(); it != syms.gamma.end(); it++)
       errfa.addTrans(fin, *it, fin, outfa.getSomeWeight());
+    errfa.setInitialState(getPdsState());
+    errfa.addFinalState(fin);
 
     WFA interfa;
     KeepRight wmaker;
