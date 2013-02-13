@@ -65,12 +65,6 @@ namespace
     sem_elem_tensor_t b4 = b3->tensor(b1.get_ptr());
     sem_elem_tensor_t b5 = b4->detensorTranspose();
     sem_elem_tensor_t b6 = boost::polymorphic_downcast<SemElemTensor*>(b2->extend(boost::polymorphic_downcast<SemElem*>(b1.get_ptr())).get_ptr());
-    b1->print(cout << "b1: ") << endl;
-    b2->print(cout << "b2: ") << endl;
-    b3->print(cout << "b3: ") << endl;
-    b4->print(cout << "b4: ") << endl;
-    b5->print(cout << "b5: ") << endl;
-    b6->print(cout << "b6: ") << endl;
     ASSERT_TRUE(b6->equal(b5));
   }
 
@@ -83,19 +77,12 @@ namespace
     vars["x3"] = 2;
     brm->setIntVars(vars);
     bdd b = brm->setPost("x2") & brm->setPre("x3") & brm->unsetPost("x3");
-    cout << "b: " << fddset << b << endl;
     sem_elem_tensor_t b1 = new BinRel(brm.get_ptr(), b);
     sem_elem_tensor_t b2 = new BinRel(brm.get_ptr(), b);
     sem_elem_tensor_t b3 = b2->transpose();
     sem_elem_tensor_t b4 = b3->tensor(b1.get_ptr());
     sem_elem_tensor_t b5 = b4->detensorTranspose();
     sem_elem_tensor_t b6 = boost::polymorphic_downcast<SemElemTensor*>(b2->extend(boost::polymorphic_downcast<SemElem*>(b1.get_ptr())).get_ptr());
-    b1->print(cout << "b1: ") << endl;
-    b2->print(cout << "b2: ") << endl;
-    b3->print(cout << "b3: ") << endl;
-    b4->print(cout << "b4: ") << endl;
-    b5->print(cout << "b5: ") << endl;
-    b6->print(cout << "b6: ") << endl;
     ASSERT_TRUE(b6->equal(b5));
   }
 
@@ -116,12 +103,6 @@ namespace
       sem_elem_tensor_t b4 = b3->tensor(b1.get_ptr());
       sem_elem_tensor_t b5 = b4->detensorTranspose();
       sem_elem_tensor_t b6 = boost::polymorphic_downcast<SemElemTensor*>(b2->extend(boost::polymorphic_downcast<SemElem*>(b1.get_ptr())).get_ptr());
-      b1->print(cout << "b1: ") << endl;
-      b2->print(cout << "b2: ") << endl;
-      b3->print(cout << "b3: ") << endl;
-      b4->print(cout << "b4: ") << endl;
-      b5->print(cout << "b5: ") << endl;
-      b6->print(cout << "b6: ") << endl;
       ASSERT_TRUE(b6->equal(b5));
     }
   }
