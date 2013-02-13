@@ -816,6 +816,15 @@ namespace wali
             while(vl || el){
               if(!vl || !el)
                 assert(0 && "[dump_pds_from_stmt] Assignment should have the same number of lhs/rhs");
+              // Special case added after correspondance with Tom Ball.
+              // Assignments of the type _ = <exp> are dummy assignments 
+              // that we don't care about.
+              if(strcmp(vl->v,"_") == 0){
+                cout << "Skipped assignment to dummy variable _" << endl;
+                vl = vl->n;
+                el = el->n;
+                continue;
+              }
               stringstream ss;
               ss << f << "::" << vl->v;
               if(con->find(ss.str()) != con->end()){
