@@ -507,7 +507,7 @@ namespace wali {
             bool extend_backwards;
             reg_exp_hash_t reg_exp_hash;
             const_reg_exp_hash_t const_reg_exp_hash;
-#if defined(PPP_DGB) && PPP_DBG >= 0
+#if defined(PPP_DBG) && PPP_DBG >= 0
             // Remember what Regular Experessions are the root of the tree
             // in the current Saturation phase. This is reset between saturation
             // phases.

@@ -34,7 +34,7 @@ namespace wali {
             }
 
             if(updatable_nodes.size() > nno) {
-#if defined(PPP_DGB) && PPP_DBG >= 0
+#if defined(PPP_DBG) && PPP_DBG >= 0
               // This node will likely get used now.
               reg_exp_key_t insKey(updatable_nodes[nno]->type, updatable_nodes[nno]);
               rootsInSatProcess.insert(insKey, updatable_nodes[nno]);
@@ -49,7 +49,7 @@ namespace wali {
             }
             // Create the desired updatable node, and add it to roots
             reg_exp_t r = new RegExp(currentSatProcess, this, nno, se);
-#if defined(PPP_DGB) && PPP_DBG >= 0
+#if defined(PPP_DBG) && PPP_DBG >= 0
             reg_exp_key_t insKey(r->type, r);
             rootsInSatProcess.insert(insKey, r);
 #endif
@@ -348,7 +348,7 @@ namespace wali {
               res = new RegExp(currentSatProcess, this, r->value->one());
             else 
               res = new RegExp(currentSatProcess, this, Star, r);
-#if defined(PPP_DGB) && PPP_DBG >= 0
+#if defined(PPP_DBG) && PPP_DBG >= 0
             // Manipulate the set of root nodes.
             // remove r from roots.
             reg_exp_key_t delkey(r->type, r);
@@ -373,7 +373,7 @@ namespace wali {
                 reg_exp_t res = new RegExp(currentSatProcess, this, Star, r);
                 reg_exp_hash.insert(rkey, res);
 
-#if defined(PPP_DGB) && PPP_DBG >= 0
+#if defined(PPP_DBG) && PPP_DBG >= 0
                 // Manipulate the set of root nodes.
                 // remove r from roots.
                 reg_exp_key_t delkey(r->type, r);
@@ -415,7 +415,7 @@ namespace wali {
             }
 #ifndef REGEXP_CACHING
             reg_exp_t res = new RegExp(currentSatProcess, this, Combine, r1, r2);
-#if defined(PPP_DGB) && PPP_DBG >= 0
+#if defined(PPP_DBG) && PPP_DBG >= 0
             // Manipulate the set of root nodes.
             // remove r1,r2 from roots.
             reg_exp_key_t del1key(r1->type, r1);
@@ -440,7 +440,7 @@ namespace wali {
                     reg_exp_t res = new RegExp(currentSatProcess, this, Combine, r1, r2);
                     reg_exp_hash.insert(rkey2, res);
 
-#if defined(PPP_DGB) && PPP_DBG >= 0
+#if defined(PPP_DBG) && PPP_DBG >= 0
                     // Manipulate the set of root nodes.
                     // remove r1,r2 from roots.
                     reg_exp_key_t del1key(r1->type, r1);
@@ -474,7 +474,7 @@ namespace wali {
 
 #ifndef REGEXP_CACHING
             reg_exp_t res = new RegExp(currentSatProcess, this, Extend, r1, r2);
-#if defined(PPP_DGB) && PPP_DBG >= 0
+#if defined(PPP_DBG) && PPP_DBG >= 0
             // Manipulate the set of root nodes.
             // remove r1,r2 from roots.
             reg_exp_key_t del1key(r1->type, r1);
@@ -498,7 +498,7 @@ namespace wali {
                 reg_exp_t res = new RegExp(currentSatProcess, this, Extend, r1, r2);
                 reg_exp_hash.insert(rkey, res);
 
-#if defined(PPP_DGB) && PPP_DBG >= 0
+#if defined(PPP_DBG) && PPP_DBG >= 0
                 // Manipulate the set of root nodes.
                 // remove r1,r2 from roots.
                 reg_exp_key_t del1key(r1->type, r1);
@@ -522,7 +522,7 @@ namespace wali {
                 return reg_exp_zero;
 #ifndef REGEXP_CACHING
             reg_exp_t res = new RegExp(currentSatProcess, this, se);
-#if defined(PPP_DGB) && PPP_DBG >= 0
+#if defined(PPP_DBG) && PPP_DBG >= 0
             reg_exp_key_t insKey(res->type, res);
             rootsInSatProcess.insert(insKey, res);
 #endif
@@ -535,7 +535,7 @@ namespace wali {
             if(it == const_reg_exp_hash.end()) {
                 reg_exp_t res = new RegExp(currentSatProcess, this, se);
                 const_reg_exp_hash.insert(se, res);
-#if defined(PPP_DGB) && PPP_DBG >= 0
+#if defined(PPP_DBG) && PPP_DBG >= 0
                 reg_exp_key_t insKey(res->type, res);
                 rootsInSatProcess.insert(insKey, res);
 #endif
@@ -557,7 +557,7 @@ namespace wali {
           
           reg_exp_hash.clear();
           const_reg_exp_hash.clear();
-#if defined(PPP_DGB) && PPP_DBG >= 0
+#if defined(PPP_DBG) && PPP_DBG >= 0
           // The set of root nodes is cleared between saturation phases.
           // but only after transferring the set to rootsAcrossSatProcesses
           for(reg_exp_hash_t::iterator it = rootsInSatProcess.begin(); it != rootsInSatProcess.end(); ++it)
@@ -573,7 +573,7 @@ namespace wali {
           reg_exp_key_t insZeroKey(reg_exp_zero->type, reg_exp_zero);
           reg_exp_one = new RegExp(currentSatProcess, this, se->one());
           reg_exp_key_t insOneKey(reg_exp_one->type, reg_exp_one);
-#if defined(PPP_DGB) && PPP_DBG >= 0
+#if defined(PPP_DBG) && PPP_DBG >= 0
           rootsInSatProcess.insert(insZeroKey, reg_exp_zero);
           rootsInSatProcess.insert(insOneKey, reg_exp_one);
 #endif
@@ -592,7 +592,7 @@ namespace wali {
           
         }
 
-#if defined(PPP_DGB) && PPP_DBG >= 0
+#if defined(PPP_DBG) && PPP_DBG >= 0
         const reg_exp_hash_t& RegExpDag::getRoots()
         {
           return rootsInSatProcess;
@@ -621,7 +621,7 @@ namespace wali {
         reg_exp_t RegExpDag::minimize_height(reg_exp_t r, reg_exp_cache_t& cache) 
         {
           reg_exp_t res = _minimize_height(r,cache);
-#if defined(PPP_DGB) && PPP_DBG >= 0
+#if defined(PPP_DBG) && PPP_DBG >= 0
           // If r was a root, replace it with res
           reg_exp_key_t delKey(r->type, r);
           if(rootsInSatProcess.find(delKey) != rootsInSatProcess.end()){
@@ -779,7 +779,7 @@ namespace wali {
         reg_exp_t RegExpDag::compress(reg_exp_t r, reg_exp_cache_t &cache) 
         {
           reg_exp_t res = _compress(r,cache);
-#if defined(PPP_DGB) && PPP_DBG >= 0
+#if defined(PPP_DBG) && PPP_DBG >= 0
           // If r was a root, replace it with res
           reg_exp_key_t delKey(r->type, r);
           if(rootsInSatProcess.find(delKey) != rootsInSatProcess.end()){
@@ -1733,7 +1733,7 @@ namespace wali {
         extend_backwards = false;
         reg_exp_hash.clear();
         const_reg_exp_hash.clear();
-#if defined(PPP_DGB) && PPP_DBG >= 0
+#if defined(PPP_DBG) && PPP_DBG >= 0
         rootsInSatProcess.clear();
         rootsAcrossSatProcesses.clear();
 #endif
@@ -1749,7 +1749,7 @@ namespace wali {
         visited.clear();
     }
 
-#if defined(PPP_DGB) && PPP_DBG >= 0
+#if defined(PPP_DBG) && PPP_DBG >= 0
     void RegExpDag::printStructureInformation()
     {
       long nodes = countTotalNodes();
@@ -2090,7 +2090,7 @@ namespace wali {
         removeDagFromRoots(*cit);
     }
 
-#endif //#if defined(PPP_DGB) && PPP_DBG >= 0
+#endif //#if defined(PPP_DBG) && PPP_DBG >= 0
 
     void RegExpDag::markAsLabel(reg_exp_t e)
     {
