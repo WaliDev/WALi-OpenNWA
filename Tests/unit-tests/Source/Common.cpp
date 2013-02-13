@@ -3,6 +3,8 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <algorithm>
+#include <cctype>
 
 namespace{
   //std::string regrDir = "Tests/harness/unit-tests/regression_baseline";
@@ -43,12 +45,17 @@ namespace{
     while(fin.get(c)){
       ins.put(c);
     }
-   
-    bool res = ins.str() == outs.str();
+  
+
+    std::string inc = ins.str();
+    inc.erase(std::remove_if(inc.begin(), inc.end(), ::isspace), inc.end());
+    std::string outc = outs.str();
+    outc.erase(std::remove_if(outc.begin(), outc.end(), ::isspace), outc.end());
+    bool res = (inc == outc);
     if(!res){
       cout << "Difference found!!!\n";
-      cout << "ins.str(): " << ins.str() << "\n";;
-      cout << "outs.str(): " << outs.str() << "\n";
+      cout << "expected.str(): " << ins.str() << "\n";;
+      cout << "obtained.str(): " << outs.str() << "\n";
     }
     return res;
   };
