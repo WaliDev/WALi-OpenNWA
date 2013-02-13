@@ -1323,6 +1323,8 @@ namespace{
     ++cit;
     ASSERT_TRUE(string("b") == cit->first);
     ASSERT_TRUE(4 == cit->second->maxVal);
+    delete con;
+    delete hist;
   }
 
   TEST(wali$domains$binrel$$BinRel$$underApproximates, bddContainmentChecks)
@@ -1375,6 +1377,7 @@ namespace{
     bdd_fnload("dusty_bdd", c);
     bdd d = hist->Assign("a", hist->From("b"));
     ASSERT_EQ(c,d);
+    delete hist;
   }
   
   TEST(wali$domains$binrel$$BinRel$$Assume, differentVocSizes)
