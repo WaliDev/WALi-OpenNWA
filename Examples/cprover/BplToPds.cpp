@@ -635,8 +635,7 @@ namespace wali
 
       BddContext * dump_pds_from_prog(wpds::WPDS * pds, prog * pg)
       {
-        ProgramBddContext * con = new ProgramBddContext(20 * MILLION, 20 * MILLION); 
-        //ProgramBddContext * con = new ProgramBddContext(); 
+        ProgramBddContext * con = new ProgramBddContext(100*MILLION, 10*MILLION); 
 
         map<string, int> vars;
 
@@ -816,6 +815,15 @@ namespace wali
             while(vl || el){
               if(!vl || !el)
                 assert(0 && "[dump_pds_from_stmt] Assignment should have the same number of lhs/rhs");
+              // Special case added after correspondance with Tom Ball.
+              // Assignments of the type _ = <exp> are dummy assignments 
+              // that we don't care about.
+              if(strcmp(vl->v,"_") == 0){
+                cout << "Skipped assignment to dummy variable _" << endl;
+                vl = vl->n;
+                el = el->n;
+                continue;
+              }
               stringstream ss;
               ss << f << "::" << vl->v;
               if(con->find(ss.str()) != con->end()){
@@ -825,7 +833,11 @@ namespace wali
                 ss2 << "::" << vl->v;           
                 lhs = string(ss2.str());
               }
-              b = b & con->Assign(lhs, expr_as_bdd(el->e, con, f));
+              if(con->find(lhs) == con->end()){
+                cout << "Unknown variable: [" << vl->v << "]" << endl;
+                assert(0);
+              }
+              b = bdd_exist(b, fdd_ithset((*con)[lhs]->baseRhs)) & con->Assign(lhs, expr_as_bdd(el->e, con, f));
               vl = vl->n;
               el = el->n;
             }
