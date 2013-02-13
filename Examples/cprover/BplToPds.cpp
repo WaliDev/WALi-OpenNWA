@@ -834,7 +834,11 @@ namespace wali
                 ss2 << "::" << vl->v;           
                 lhs = string(ss2.str());
               }
-              b = b & con->Assign(lhs, expr_as_bdd(el->e, con, f));
+              if(con->find(lhs) == con->end()){
+                cout << "Unknown variable: [" << vl->v << "]" << endl;
+                assert(0);
+              }
+              b = bdd_exist(b, fdd_ithset((*con)[lhs]->baseRhs)) & con->Assign(lhs, expr_as_bdd(el->e, con, f));
               vl = vl->n;
               el = el->n;
             }
