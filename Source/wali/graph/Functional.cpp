@@ -1,6 +1,8 @@
 #include "wali/graph/Functional.hpp"
 #include "wali/graph/IntraGraph.hpp"
 
+#include <boost/cast.hpp>
+
 using namespace wali;
 using namespace std;
 using namespace wali::graph;
@@ -98,28 +100,28 @@ sem_elem_tensor_t SemElemFunctional::evaluate(IntraGraph * const gr)
     case Constant:
       return value;
     case In:
-      return dynamic_cast<SemElemTensor*>(gr->getWeight(intra_nodeno).get_ptr());
+      return boost::polymorphic_downcast<SemElemTensor*>(gr->getWeight(intra_nodeno).get_ptr());
     case Extend:
        lval = lhs->evaluate(gr);
        rval = rhs->evaluate(gr);
-      return dynamic_cast<SemElemTensor*>(lval->extend(rval.get_ptr()).get_ptr());
+      return boost::polymorphic_downcast<SemElemTensor*>(lval->extend(rval.get_ptr()).get_ptr());
     case Combine:
        lval = lhs->evaluate(gr);
        rval = rhs->evaluate(gr);
-      return dynamic_cast<SemElemTensor*>(lval->combine(rval.get_ptr()).get_ptr());
+      return boost::polymorphic_downcast<SemElemTensor*>(lval->combine(rval.get_ptr()).get_ptr());
     case Tensor:
        lval = lhs->evaluate(gr);
        rval = rhs->evaluate(gr);
-      return dynamic_cast<SemElemTensor*>(lval->tensor(rval.get_ptr()).get_ptr());
+      return boost::polymorphic_downcast<SemElemTensor*>(lval->tensor(rval.get_ptr()).get_ptr());
     case Detensor:
        val = lhs->evaluate(gr);
-      return dynamic_cast<SemElemTensor*>(val->detensor().get_ptr());
+      return boost::polymorphic_downcast<SemElemTensor*>(val->detensor().get_ptr());
     case DetensorTranspose:
        val = lhs->evaluate(gr);
-      return dynamic_cast<SemElemTensor*>(val->detensorTranspose().get_ptr());
+      return boost::polymorphic_downcast<SemElemTensor*>(val->detensorTranspose().get_ptr());
     case Transpose:
        val = lhs->evaluate(gr);
-       return dynamic_cast<SemElemTensor*>(val->transpose().get_ptr());
+       return boost::polymorphic_downcast<SemElemTensor*>(val->transpose().get_ptr());
     default:
       assert(false && "[SemElemFunctiona::evaluate] Unknown case\n");
   }

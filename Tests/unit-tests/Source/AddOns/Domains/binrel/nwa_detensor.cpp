@@ -12,6 +12,8 @@
 #include <cstdlib>
 #include <map>
 
+#include <boost/cast.hpp>
+
 #include <boost/static_assert.hpp>
 
 // ::wali::domains::binrel
@@ -36,11 +38,11 @@ namespace
 
     bdd b = brm->Assign("x1", brm->Not(brm->From("x1")));
     binrel_t M = new BinRel(brm.get_ptr(), b);
-    binrel_t eye = dynamic_cast<BinRel*>(M->one().get_ptr());
-    binrel_t s = dynamic_cast<BinRel*>(((M->tensor(M.get_ptr()))->combine(eye->tensor(eye.get_ptr()).get_ptr())).get_ptr());
+    binrel_t eye = boost::polymorphic_downcast<BinRel*>(M->one().get_ptr());
+    binrel_t s = boost::polymorphic_downcast<BinRel*>(((M->tensor(M.get_ptr()))->combine(eye->tensor(eye.get_ptr()).get_ptr())).get_ptr());
     bdd z = s->getBdd();
     //bdd_fnprintdot_levels("mtmpiti.dot", z);
-    binrel_t x = dynamic_cast<BinRel*>(s->detensorTranspose().get_ptr());
+    binrel_t x = boost::polymorphic_downcast<BinRel*>(s->detensorTranspose().get_ptr());
     z = x->getBdd();
     ASSERT_TRUE(x->equal(x->one().get_ptr()));
     //bdd_fnprintdot_levels("detensored.dot", z);
@@ -62,7 +64,7 @@ namespace
     sem_elem_tensor_t b3 = b2->transpose();
     sem_elem_tensor_t b4 = b3->tensor(b1.get_ptr());
     sem_elem_tensor_t b5 = b4->detensorTranspose();
-    sem_elem_tensor_t b6 = dynamic_cast<SemElemTensor*>(b2->extend(dynamic_cast<SemElem*>(b1.get_ptr())).get_ptr());
+    sem_elem_tensor_t b6 = boost::polymorphic_downcast<SemElemTensor*>(b2->extend(boost::polymorphic_downcast<SemElem*>(b1.get_ptr())).get_ptr());
     b1->print(cout << "b1: ") << endl;
     b2->print(cout << "b2: ") << endl;
     b3->print(cout << "b3: ") << endl;
@@ -87,7 +89,7 @@ namespace
     sem_elem_tensor_t b3 = b2->transpose();
     sem_elem_tensor_t b4 = b3->tensor(b1.get_ptr());
     sem_elem_tensor_t b5 = b4->detensorTranspose();
-    sem_elem_tensor_t b6 = dynamic_cast<SemElemTensor*>(b2->extend(dynamic_cast<SemElem*>(b1.get_ptr())).get_ptr());
+    sem_elem_tensor_t b6 = boost::polymorphic_downcast<SemElemTensor*>(b2->extend(boost::polymorphic_downcast<SemElem*>(b1.get_ptr())).get_ptr());
     b1->print(cout << "b1: ") << endl;
     b2->print(cout << "b2: ") << endl;
     b3->print(cout << "b3: ") << endl;
@@ -113,7 +115,7 @@ namespace
       sem_elem_tensor_t b3 = b2->transpose();
       sem_elem_tensor_t b4 = b3->tensor(b1.get_ptr());
       sem_elem_tensor_t b5 = b4->detensorTranspose();
-      sem_elem_tensor_t b6 = dynamic_cast<SemElemTensor*>(b2->extend(dynamic_cast<SemElem*>(b1.get_ptr())).get_ptr());
+      sem_elem_tensor_t b6 = boost::polymorphic_downcast<SemElemTensor*>(b2->extend(boost::polymorphic_downcast<SemElem*>(b1.get_ptr())).get_ptr());
       b1->print(cout << "b1: ") << endl;
       b2->print(cout << "b2: ") << endl;
       b3->print(cout << "b3: ") << endl;

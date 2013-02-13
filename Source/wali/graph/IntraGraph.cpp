@@ -10,6 +10,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <boost/cast.hpp>
 using namespace std;
 
 namespace wali {
@@ -1685,7 +1686,7 @@ namespace wali {
             nodes[0].weight->print(cout);
             cout << "\n";
             SemElemTensor * wt =
-              dynamic_cast<SemElemTensor*>(nodes[0].weight.get_ptr());
+              boost::polymorphic_downcast<SemElemTensor*>(nodes[0].weight.get_ptr());
             (wt->detensorTranspose())->print(cout);
           }
           else
@@ -1699,7 +1700,7 @@ namespace wali {
               nodes[i].weight->print(cout);
               cout << "\n";
               sem_elem_tensor_t wt =
-                dynamic_cast<SemElemTensor*>(nodes[i].weight.get_ptr());
+                boost::polymorphic_downcast<SemElemTensor*>(nodes[i].weight.get_ptr());
               wt = wt->detensorTranspose();
               wt->print(cout);
             }
@@ -1721,7 +1722,7 @@ namespace wali {
               edges[i].weight->print(cout);
               cout << "\n";
               sem_elem_tensor_t wt =
-                dynamic_cast<SemElemTensor*>(edges[i].weight.get_ptr());
+                boost::polymorphic_downcast<SemElemTensor*>(edges[i].weight.get_ptr());
               wt = wt->detensorTranspose();
               wt->print(cout);
             }

@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include <map>
+#include <boost/cast.hpp>
 
 using namespace std;
 using namespace wali;
@@ -773,7 +774,7 @@ namespace wali
           stmt_ptr_proc_ptr_hash_map& call_to_callee, const char * f, stmt * ns)
       {
         binrel_t temp = new BinRel(con, con->True());
-        binrel_t one = dynamic_cast<BinRel*>(temp->one().get_ptr());
+        binrel_t one = boost::polymorphic_downcast<BinRel*>(temp->one().get_ptr());
         bdd b, b1;
         str_list * vl;
         expr_list * el;

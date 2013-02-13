@@ -40,6 +40,7 @@ using namespace wali::domains::binrel;
 
 #include <pthread.h>
 #include <signal.h>
+#include <boost/cast.hpp>
 
 static pthread_t worker;
 
@@ -98,7 +99,7 @@ namespace{
         if(cur == READ_FIRST)
           firstData[TransKey(t->from(),t->stack(),t->to())] = t->weight();
         else if(cur == READ_SECOND){
-          wali::SemElemTensor * wt = dynamic_cast<SemElemTensor*>(t->weight().get_ptr());
+          wali::SemElemTensor * wt = boost::polymorphic_downcast<SemElemTensor*>(t->weight().get_ptr());
           secondData[TransKey(t->from(),t->stack(),t->to())] = wt;//->detensorTranspose();
         }
         else
@@ -135,9 +136,9 @@ namespace{
             }
           }else{
             sem_elem_t fwpdswt = iter->second;
-            sem_elem_tensor_t nwpdswt = dynamic_cast<SemElemTensor*>(iter2->second.get_ptr());
+            sem_elem_tensor_t nwpdswt = boost::polymorphic_downcast<SemElemTensor*>(iter2->second.get_ptr());
             if(!(iter2->second == NULL)){
-              nwpdswt = dynamic_cast<SemElemTensor*>(nwpdswt->detensorTranspose().get_ptr())->transpose();
+              nwpdswt = boost::polymorphic_downcast<SemElemTensor*>(nwpdswt->detensorTranspose().get_ptr())->transpose();
               assert(!(nwpdswt == NULL));
             }
             if((fwpdswt == NULL && nwpdswt != NULL) ||
@@ -425,7 +426,7 @@ namespace goals {
     doPostStar(npds, outfa);
     sem_elem_t wt = computePathSummary(npds, outfa);
     if(npds->isOutputTensored())
-      wt = dynamic_cast<SemElemTensor*>(wt.get_ptr())->detensorTranspose().get_ptr();
+      wt = boost::polymorphic_downcast<SemElemTensor*>(wt.get_ptr())->detensorTranspose().get_ptr();
     if(wt->equal(wt->zero()))
       cout << "[Newton Compare] NWPDS ==> error not reachable" << endl;
     else{
