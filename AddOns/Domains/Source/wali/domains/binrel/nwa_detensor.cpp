@@ -257,6 +257,11 @@ size_t hash_value(bdd const& b)
 
 bdd BinRel::detensorViaNwa()
 {
+  if(rel == bddfalse)
+    return bddfalse;
+  if(rel == bddtrue)
+    return bddtrue;
+
   DetensorNwa inwa;
   DetensorNwa cnwa;
   DetensorNwa nwa;
@@ -268,13 +273,13 @@ bdd BinRel::detensorViaNwa()
 
   // Create the query automaton
   wali::wfa::WFA infa;
-  acceptStateWfa = getKey("__accept_state_detensor_wfa");
-  infa.addFinalState(acceptStateWfa);
   initialStateWfa = opennwa::nwa_pds::getProgramControlLocation();
-  infa.setInitialState(initialStateWfa);
+  acceptStateWfa = getKey("__accept_state_detensor_wfa");
   const StateSet& nwaInitStates = nwa.getInitialStates();
   for(StateSet::const_iterator cit = nwaInitStates.begin(); cit != nwaInitStates.end(); ++cit)
     infa.addTrans(initialStateWfa, *cit, acceptStateWfa, DetensorWeight::detensor_weight_one);
+  infa.setInitialState(initialStateWfa);
+  infa.addFinalState(acceptStateWfa);
   wali::wfa::WFA outfa = nwa.poststar(infa, wts);
   detensor_weight_t ans = DetensorWeight::detensor_weight_zero;
   const StateSet& nwaFinalStates = nwa.getFinalStates();
